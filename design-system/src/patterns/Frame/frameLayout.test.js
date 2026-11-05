@@ -1,11 +1,23 @@
 import { describe, it, expect } from 'vitest';
-import { resolveFrameLayout, FRAME_LAYOUT } from './frameLayout';
+import { readdirSync, readFileSync } from 'node:fs';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { resolveFrameLayout, FRAME_LAYOUT, clamp } from './frameLayout';
 
 const byDefault = { open: true, setBy: 'default' };
 const byHand = { open: true, setBy: 'hand' };
 const closedByHand = { open: false, setBy: 'hand' };
 
-const resolve = (over) => resolveFrameLayout({ frameWidth: 1440, ...over });
+const resolve = (over) => {
+    const frameWidth = over?.frameWidth ?? 1440;
+    const r = resolveFrameLayout({ frameWidth, ...over });
+    // The content width, derived here from what the Frame draws (the resolver does not return it).
+    const raw = frameWidth
+        - (r.sidebar === 'docked' ? FRAME_LAYOUT.sidebarWidth : 0)
+        - (r.panel === 'docked' ? r.panelWidth : 0)
+        - FRAME_LAYOUT.pagePad * 2;
+    return { ...r, contentWidth: Math.min(FRAME_LAYOUT.contentCap, raw) };
+};
 
 describe('constants', () => {
     it('carry the spec numbers', () => {
@@ -50,10 +62,10 @@ describe('Sidebar under 1024', () => {
     it('never docks by default', () => {
         expect(resolve({ frameWidth: 1023, sidebar: byDefault }).sidebar).toBe('collapsed');
     });
-    it('opened by hand is an overlay with a Blanket, never docked', () => {
+    it('opened by hand is an overlay without a Blanket, never docked', () => {
         const r = resolve({ frameWidth: 1023, sidebar: byHand });
         expect(r.sidebar).toBe('overlay');
-        expect(r.blanket).toBe(true);
+        expect(r.blanket).toBe(false);
         expect(r.contentWidth).toBe(975);
     });
     it('peeks on hover when collapsed, without a Blanket', () => {
@@ -97,8 +109,8 @@ describe('Panel thresholds, Sidebar by default', () => {
     });
 
     it('marks the Sidebar auto-collapsed so it can be restored', () => {
-        expect(resolve({ frameWidth: 1407, chatMode: 'panel' }).sidebarAutoCollapsed).toBe(true);
-        expect(resolve({ frameWidth: 1408, chatMode: 'panel' }).sidebarAutoCollapsed).toBe(false);
+        expect(resolve({ frameWidth: 1407, chatMode: 'panel' }).sidebar).toBe('collapsed');
+        expect(resolve({ frameWidth: 1408, chatMode: 'panel' }).sidebar).toBe('docked');
     });
 
     it('restores the Sidebar when the Panel closes', () => {
@@ -112,7 +124,6 @@ describe('Panel with the Sidebar opened by hand', () => {
         expect(r.sidebar).toBe('docked');
         expect(r.panel).toBe('overlay');
         expect(r.blanket).toBe(true);
-        expect(r.sidebarAutoCollapsed).toBe(false);
     });
     it('both dock when they fit', () => {
         const r = resolve({ frameWidth: 1408, chatMode: 'panel', sidebar: byHand });
@@ -160,11 +171,6 @@ describe('chat mode', () => {
         expect(resolve({ chatMode: 'fullscreen' }).panel).toBe('none');
         expect(resolve({ chatMode: 'panel' }).panel).toBe('docked');
     });
-    it('the popup goes full screen under 768', () => {
-        expect(resolve({ frameWidth: 767, chatMode: 'popup' }).popupFullScreen).toBe(true);
-        expect(resolve({ frameWidth: 768, chatMode: 'popup' }).popupFullScreen).toBe(false);
-        expect(resolve({ frameWidth: 767, chatMode: 'panel' }).popupFullScreen).toBe(false);
-    });
 });
 
 describe('List and detail', () => {
@@ -180,7 +186,7 @@ describe('List and detail', () => {
         // 1440 - 400 - 48 = 992 (Sidebar docked would be 752)
         const r = resolve({ frameWidth: 1440, chatMode: 'panel', listDetail: true });
         expect(r.sidebar).toBe('collapsed');
-        expect(r.sidebarAutoCollapsed).toBe(true);
+        expect(r.sidebar).toBe('collapsed');
         expect(r.panel).toBe('docked');
         expect(r.contentWidth).toBe(992);
         expect(r.splitHolds).toBe(true);
@@ -208,5 +214,66 @@ describe('List and detail', () => {
         const r = resolve({ frameWidth: 1100, listDetail: true });
         expect(r.sidebar).toBe('docked');
         expect(r.splitHolds).toBe(false);
+    });
+});
+
+describe('the Blanket', () => {
+    it('is true only for an overlay Panel', () => {
+        for (const frameWidth of [900, 1023, 1024, 1167, 1407, 1440]) {
+            for (const sidebar of [byDefault, byHand, closedByHand]) {
+                for (const chatMode of ['popup', 'panel', 'fullscreen']) {
+                    const r = resolve({ frameWidth, sidebar, chatMode });
+                    expect(r.blanket, `${frameWidth} ${sidebar.setBy} ${sidebar.open} ${chatMode}`).toBe(r.panel === 'overlay');
+                }
+            }
+        }
+    });
+});
+
+describe('outputs', () => {
+    it('are exactly the ones the Frame reads', () => {
+        expect(Object.keys(resolveFrameLayout({ frameWidth: 1440 })).sort())
+            .toEqual(['blanket', 'panel', 'panelWidth', 'sidebar', 'splitHolds']);
+    });
+});
+
+describe('clamp', () => {
+    it('is the one clamp', () => {
+        expect(clamp(5, 10, 20)).toBe(10);
+        expect(clamp(25, 10, 20)).toBe(20);
+        expect(clamp(15, 10, 20)).toBe(15);
+    });
+});
+
+describe('FRAME_LAYOUT against the token source', () => {
+    const tokenDir = join(dirname(fileURLToPath(import.meta.url)), '../../tokens');
+    const decls = new Map();
+    const walk = (dir) => {
+        for (const e of readdirSync(dir, { withFileTypes: true })) {
+            const full = join(dir, e.name);
+            if (e.isDirectory()) walk(full);
+            else if (e.name.endsWith('.scss')) {
+                for (const m of readFileSync(full, 'utf8').matchAll(/^\s*(--[\w-]+)\s*:\s*([^;]+);/gm)) decls.set(m[1], m[2].trim());
+            }
+        }
+    };
+    walk(tokenDir);
+    const px = (name) => {
+        const raw = decls.get(name);
+        if (raw === undefined) throw new Error(`token ${name} not found`);
+        const ref = raw.match(/^var\((--[\w-]+)\)$/);
+        if (ref) return px(ref[1]);
+        const n = raw.match(/^(-?[\d.]+)px$/);
+        if (!n) throw new Error(`token ${name} is not a px length: ${raw}`);
+        return Number(n[1]);
+    };
+    it.each([
+        ['sidebarWidth', '--frame-sidebar-width'],
+        ['pagePad', '--page-pad'],
+        ['panelMin', '--panel-min-width'],
+        ['panelDefault', '--panel-width-default'],
+        ['panelMax', '--panel-max-width'],
+    ])('%s matches %s', (key, token) => {
+        expect(FRAME_LAYOUT[key]).toBe(px(token));
     });
 });

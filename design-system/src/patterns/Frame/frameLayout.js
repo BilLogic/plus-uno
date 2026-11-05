@@ -18,8 +18,9 @@
  *      Sidebar first when the Panel is docked.
  */
 
-// Numbers from the Frame spec. sidebarWidth mirrors the Frame's `--frame-sidebar-width`;
-// pagePad is the single Page pad (24 at every width). Keep them in step with the tokens.
+// Numbers from the Frame spec. sidebarWidth, pagePad and the three Panel widths
+// restate `--frame-sidebar-width`, `--page-pad` and `--panel-*-width`;
+// frameLayout.test.js reads the token source and fails when they differ.
 export const FRAME_LAYOUT = Object.freeze({
     sidebarWidth: 240,
     pagePad: 24,
@@ -36,7 +37,8 @@ export const FRAME_LAYOUT = Object.freeze({
 const L = FRAME_LAYOUT;
 const padTotal = L.pagePad * 2;
 
-const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
+/** The one clamp: the Frame, the splitter and the resolver share it. */
+export const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 
 /**
  * @param {object} input
@@ -48,13 +50,10 @@ const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
  * @param {boolean} [input.listDetail]
  * @returns {{
  *   sidebar: 'docked' | 'collapsed' | 'peeking' | 'overlay',
- *   sidebarAutoCollapsed: boolean,
  *   panel: 'none' | 'docked' | 'overlay',
  *   panelWidth: number,
- *   contentWidth: number,
  *   splitHolds: boolean,
  *   blanket: boolean,
- *   popupFullScreen: boolean,
  * }}
  */
 export function resolveFrameLayout({
@@ -81,7 +80,6 @@ export function resolveFrameLayout({
 
     let sidebarState; // 'docked' | 'collapsed' | 'overlay'; 'peeking' is set last
     let panelState = 'none';
-    let autoCollapsed = false;
 
     if (narrow) {
         if (wantsPanel) {
@@ -108,7 +106,6 @@ export function resolveFrameLayout({
         // Rule 4.
         sidebarState = 'collapsed';
         panelState = 'docked';
-        autoCollapsed = true;
     } else {
         // Rule 5.
         sidebarState = 'docked';
@@ -125,24 +122,20 @@ export function resolveFrameLayout({
         contentFor(false, true) >= L.splitFloor
     ) {
         sidebarState = 'collapsed';
-        autoCollapsed = true;
     }
 
     const sidebarDocked = sidebarState === 'docked';
     const panelDocked = panelState === 'docked';
-    const contentWidth = Math.min(L.contentCap, contentFor(sidebarDocked, panelDocked));
     const rawContent = contentFor(sidebarDocked, panelDocked);
 
     if (sidebarState === 'collapsed' && sidebarPeek) sidebarState = 'peeking';
 
     return {
         sidebar: sidebarState,
-        sidebarAutoCollapsed: autoCollapsed,
         panel: panelState,
         panelWidth: effectivePanelWidth,
-        contentWidth,
         splitHolds: listDetail && rawContent >= L.splitFloor,
-        blanket: panelState === 'overlay' || sidebarState === 'overlay',
-        popupFullScreen: chatMode === 'popup' && frameWidth < L.fullWidthBelow,
+        // The Blanket belongs to an overlay Panel only: a raised Sidebar has none.
+        blanket: panelState === 'overlay',
     };
 }
