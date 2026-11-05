@@ -108,7 +108,7 @@ describe('Panel thresholds, Sidebar by default', () => {
         expect(r.blanket).toBe(panel === 'overlay');
     });
 
-    it('marks the Sidebar auto-collapsed so it can be restored', () => {
+    it('collapses the default Sidebar one pixel under 1408, and docks it at 1408', () => {
         expect(resolve({ frameWidth: 1407, chatMode: 'panel' }).sidebar).toBe('collapsed');
         expect(resolve({ frameWidth: 1408, chatMode: 'panel' }).sidebar).toBe('docked');
     });
@@ -185,7 +185,6 @@ describe('List and detail', () => {
     it('collapses the Sidebar first to keep the split when the Panel opens', () => {
         // 1440 - 400 - 48 = 992 (Sidebar docked would be 752)
         const r = resolve({ frameWidth: 1440, chatMode: 'panel', listDetail: true });
-        expect(r.sidebar).toBe('collapsed');
         expect(r.sidebar).toBe('collapsed');
         expect(r.panel).toBe('docked');
         expect(r.contentWidth).toBe(992);

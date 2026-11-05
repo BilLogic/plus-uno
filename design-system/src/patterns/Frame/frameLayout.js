@@ -1,8 +1,8 @@
 /**
  * Frame layout resolver. One pure function: the Frame's width, the Panel's
  * width, the Sidebar's request, the chat mode and whether a List and detail
- * layout is active go in; the Sidebar state, the Panel state, the content
- * width and whether the split holds come out. Fit is measured from the
+ * layout is active go in; the Sidebar state, the Panel state, the Panel's
+ * width, whether the split holds and whether a Blanket shows come out. Fit is measured from the
  * Frame's own width, never the window.
  *
  * Rules, in order:

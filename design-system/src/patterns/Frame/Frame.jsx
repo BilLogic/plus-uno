@@ -189,7 +189,7 @@ const Frame = ({
 
     const narrow = frameWidth < FRAME_LAYOUT.dockMin;
     const panelState = layout.panel;
-    const panelOverlay = panelState === 'overlay';
+    const panelOverlay = layout.blanket;
 
     const docked = hasSidebar && layout.sidebar === 'docked';
     const peeking = hasSidebar && layout.sidebar === 'peeking';
