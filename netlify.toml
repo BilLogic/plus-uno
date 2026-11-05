@@ -2,6 +2,14 @@
   command = "npm run build:all"
   publish = "dist"
 
+# Production publishes once a day, not on every merge. Each production deploy
+# costs 15 Netlify credits; deploy previews and branch deploys are free. A push
+# to main is skipped here (exit 0 = skip); a build started by the
+# daily-production build hook (INCOMING_HOOK_TITLE is set) runs. The hook is
+# called by .github/workflows/netlify-daily-deploy.yml, on a schedule or by hand.
+[context.production]
+  ignore = "test -z \"$INCOMING_HOOK_TITLE\""
+
 [build.environment]
   VITE_STORYBOOK_URL = "https://plus-uno.netlify.app/storybook/"
   # Notion Prototype Marketplace (team catalog — replaces in-app /market UI)
