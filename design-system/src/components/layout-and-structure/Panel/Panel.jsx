@@ -12,8 +12,8 @@ import './Panel.scss';
  */
 const PanelContext = createContext(null);
 
-/** The width a Panel opens at when nothing sets one: the Frame's Panel area default (`--panel-width-default`). */
-const DEFAULT_WIDTH = '400px';
+/** The width a Panel opens at when nothing sets one: the Frame's Panel area default, 400. */
+const DEFAULT_WIDTH = 'var(--panel-width-default)';
 
 /**
  * Set by a host that owns the Panel's width, fill and edge (the Frame's Panel
@@ -57,7 +57,7 @@ export const PanelContainer = ({ width, className, children, ...props }) => {
 };
 
 PanelContainer.propTypes = {
-    /** Falls back to the nearest PanelProvider's width, then 400px. Inside the Frame's Panel area it fills the area instead. */
+    /** Falls back to the nearest PanelProvider's width, then `--panel-width-default` (400). Inside the Frame's Panel area it fills the area instead. */
     width: PropTypes.string,
     className: PropTypes.string,
     children: PropTypes.node,

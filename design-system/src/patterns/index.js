@@ -6,6 +6,7 @@ export { default as Page, PAGE_LEVELS } from './Page';
 export { default as Frame } from './Frame';
 export { useSidebarControl } from './Frame/SidebarControl';
 export { usePanelControl } from './Frame/PanelControl';
+export { PANEL_STORAGE_KEY } from './Frame';
 export { default as Topbar } from './Topbar';
 export {
     default as PatternSidebar,

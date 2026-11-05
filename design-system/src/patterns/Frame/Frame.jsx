@@ -158,9 +158,12 @@ const Frame = ({
     const [panelPreview, setPanelPreview] = useState(null);
     const [panelPeeking, setPanelPeeking] = useState(false);
 
+    // A controlled Panel's open state belongs to its owner, so only the width is kept for it.
+    const panelControlled = panelOpenProp !== undefined;
     useEffect(() => {
-        if (hasPanel) writePanelMemory(panelStorageKey, { open: panelOpen, width: panelWidth });
-    }, [hasPanel, panelStorageKey, panelOpen, panelWidth]);
+        if (!hasPanel) return;
+        writePanelMemory(panelStorageKey, panelControlled ? { width: panelWidth } : { open: panelOpen, width: panelWidth });
+    }, [hasPanel, panelStorageKey, panelControlled, panelOpen, panelWidth]);
 
     // `sidebarDocked` sets the default request; a press on the toggle (or
     // Ctrl+[) overrides it by hand until the prop changes.
@@ -367,14 +370,13 @@ const Frame = ({
         const onPointerDown = (e) => {
             if (openOverlayCount() > 0) return;
             if (!frameRef.current?.contains(e.target) || panelRef.current?.contains(e.target)) return;
+            // A trigger that controls the Panel (in the Topbar, say) toggles it itself.
+            if (e.target.closest?.(`[aria-controls="${panelId}"]`)) return;
             close();
         };
         const onKeyDown = (e) => {
             if (e.key !== 'Escape' || e.defaultPrevented || openOverlayCount() > 0) return;
-            const doc = frameRef.current?.ownerDocument ?? document;
-            const hadFocus = panelRef.current?.contains(doc.activeElement);
             close();
-            if (hadFocus && panelPeekShown) toggleRef.current?.focus();
         };
         document.addEventListener('pointerdown', onPointerDown);
         document.addEventListener('keydown', onKeyDown);
@@ -382,14 +384,19 @@ const Frame = ({
             document.removeEventListener('pointerdown', onPointerDown);
             document.removeEventListener('keydown', onKeyDown);
         };
-    }, [panelShown, panelOverlay, panelPeekShown, setPanelOpen]);
+    }, [panelShown, panelOverlay, panelPeekShown, setPanelOpen, panelId]);
 
-    // The splitter's range: docked, the widest width that keeps the content
-    // floor beside whatever is docked now, so a drag never collapses the Sidebar.
+    // The splitter's range never lets a resize collapse the Sidebar. Docked,
+    // the widest width keeps the content floor beside whatever is docked now.
+    // As an overlay beside a Sidebar docked by default, the narrowest width
+    // stays too wide for the Panel to dock alone, which would collapse it.
+    const room = frameWidth - FRAME_LAYOUT.pagePad * 2 - FRAME_LAYOUT.contentFloor;
     const splitterMax = panelState === 'docked'
-        ? clampPanelWidth(frameWidth - (layout.sidebar === 'docked' ? FRAME_LAYOUT.sidebarWidth : 0)
-            - FRAME_LAYOUT.pagePad * 2 - FRAME_LAYOUT.contentFloor)
+        ? clampPanelWidth(room - (layout.sidebar === 'docked' ? FRAME_LAYOUT.sidebarWidth : 0))
         : FRAME_LAYOUT.panelMax;
+    const splitterMin = panelState === 'overlay' && layout.sidebar === 'docked' && hand !== true
+        ? clampPanelWidth(room + 1)
+        : FRAME_LAYOUT.panelMin;
     const commitPanelWidth = useCallback((next) => setPanelWidth(clampPanelWidth(next)), []);
 
     const panelControl = useMemo(() => (hasPanel ? {
@@ -403,7 +410,7 @@ const Frame = ({
     const renderPanel = () => {
         const mode = panelPeekShown ? 'peek' : panelState;
         const width = panelPeekShown
-            ? (narrow ? Math.min(frameWidth, FRAME_LAYOUT.panelMin) : panelWidth)
+            ? (narrow ? layout.panelWidth : panelWidth)
             : (panelPreview ?? layout.panelWidth);
         // The splitter resizes from 1024 up; under it the Panel is fixed at 320, or full width under 768.
         const resizable = !panelPeekShown && !narrow;
@@ -421,8 +428,8 @@ const Frame = ({
                 {resizable ? (
                     <PanelSplitter
                         width={panelWidth}
-                        min={FRAME_LAYOUT.panelMin}
-                        max={Math.max(FRAME_LAYOUT.panelMin, splitterMax)}
+                        min={splitterMin}
+                        max={Math.max(splitterMin, splitterMax)}
                         controls={panelId}
                         onCommit={commitPanelWidth}
                         onPreview={setPanelPreview}

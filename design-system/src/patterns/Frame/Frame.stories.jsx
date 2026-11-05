@@ -2,8 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Sidebar } from '@/components';
-import { Frame, Topbar, usePanelControl } from '@/patterns';
-import { PANEL_STORAGE_KEY } from '@/patterns/Frame';
+import { Frame, PANEL_STORAGE_KEY, Topbar, usePanelControl } from '@/patterns';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -859,6 +858,27 @@ export const ModalOverOverlayPanelAt1100 = {
     }),
 };
 
+/** 1100: resizing an overlay Panel never collapses the default Sidebar: the narrowest it goes still leaves the Panel too wide to dock alone. */
+export const OverlaySplitterKeepsSidebarAt1100 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(1100, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
+        const splitter = p.splitter();
+        // 1100 - 48 - 720 = 332 would let the Panel dock alone, so the floor is one above it.
+        await expect(splitter).toHaveAttribute('aria-valuemin', '333');
+        splitter.focus();
+        await userEvent.keyboard('{Home}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '333'));
+        await expect(p.sidebar(), 'the Sidebar stays docked').not.toBeNull();
+        await expect(getComputedStyle(p.panel()).position, 'still an overlay').toBe('absolute');
+        await userEvent.keyboard('{End}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '640'));
+        await expectOverlayPanel(p, 640);
+    }),
+};
+
 /** 768: the Panel is an overlay capped at 320, and only one overlay is open at a time. */
 export const OneOverlayAt768 = {
     render: WithPanel,
@@ -973,7 +993,7 @@ const Remountable = (args) => {
     const [mount, setMount] = useState(0);
     return (
         <>
-            <button type="button" className="frame-story-reload" onClick={() => setMount((n) => n + 1)}>Reload</button>
+            <Button text="Reload" className="frame-story-reload" onClick={() => setMount((n) => n + 1)} />
             <WithPanel key={mount} {...args} />
         </>
     );

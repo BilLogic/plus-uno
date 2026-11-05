@@ -16,14 +16,14 @@ describe('Panel', () => {
         expect(screen.getByText('Content')).toBeInTheDocument();
     });
 
-    it('defaults its width to 400px, the Panel area default, with no provider or prop', () => {
+    it('defaults its width to the Panel area default token (400) with no provider or prop', () => {
         const { container } = render(<PanelContainer><PanelBody>X</PanelBody></PanelContainer>);
-        expect(container.firstChild).toHaveStyle({ width: '400px' });
+        expect(container.firstChild.style.width).toBe('var(--panel-width-default)');
     });
 
-    it('PanelProvider defaults to 400px', () => {
+    it('PanelProvider defaults to the Panel area default token (400)', () => {
         const { container } = render(<PanelProvider><PanelContainer><PanelBody>X</PanelBody></PanelContainer></PanelProvider>);
-        expect(container.firstChild).toHaveStyle({ width: '400px' });
+        expect(container.firstChild.style.width).toBe('var(--panel-width-default)');
     });
 
     it('inside a host it fills the host and leaves the fill and edge to it', () => {
