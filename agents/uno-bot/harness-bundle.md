@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **114,631 chars from 9 files**, against an assembled budget of 175,500 (60,869 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 94,247 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **116,608 chars from 9 files**, against an assembled budget of 175,500 (58,892 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 96,224 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,364 (−7,715 ide-only) | 10,364 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 26,721 | 37,114 | 20,000 (constitution) ⚠️ **over by 6,721** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,427 | 58,582 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 60,228 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 61,476 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 67,170 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 78,956 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 19,769 (−8,407 ide-only) | 98,776 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 102,244 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 108,802 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 113,775 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 114,631 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 28,698 | 39,091 | 20,000 (constitution) ⚠️ **over by 8,698** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,427 | 60,559 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 62,205 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 63,453 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 69,147 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 80,933 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 19,769 (−8,407 ide-only) | 100,753 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 104,221 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 110,779 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 115,752 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 116,608 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -241,12 +241,36 @@ A reusable layout of components with named slots, which the patterns overview in
 _Avoid_: "layout component"
 
 **Frame**:
-The pattern for the app's outer shell: the Topbar and Sidebar that stay put while the **Page** inside changes.
-_Avoid_: "surface container", "shell"
+The pattern for the app's outer shell: the Topbar, Sidebar and **Panel** that stay put while the **Page** inside changes. "App shell" is an informal alias for talk; code and docs say Frame.
+_Avoid_: "surface container", bare "shell"
 
 **Topbar**:
 The bar across the top of the **Frame**, one word like Sidebar.
 _Avoid_: "top bar", "navbar"
+
+**Sidebar**:
+The area at the left of the **Frame**, below the **Topbar**, holding navigation. It is **docked** from 1024 and collapsed below, where a hover **peek**s it.
+_Avoid_: "left nav", "side nav"
+
+**Panel**:
+The area at the right of the **Frame**, below the **Topbar**, holding AI chat first. It is app-level, 320 to 640 wide (400 by default), and **docked** beside the **Page** or opens as an **overlay** on a **Blanket** when there is no room. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
+_Avoid_: "right sidebar", "side panel", "inspector", "Card" for the area
+
+**Docked / overlay**:
+The two states of the **Sidebar** and the **Panel**. Docked sits beside the **Page** and moves it; overlay opens over the **Page**, and an overlay **Panel** has a **Blanket**.
+_Avoid_: "inline", "pinned", "floating" as a state
+
+**Peek**:
+A collapsed **Sidebar**, or a closed **Panel** whose `panelPeek` option is on, shown over the **Page** while a pointer rests on its toggle or edge. It has no **Blanket**, does not move the **Page**, and closes on an outside click or Escape.
+_Avoid_: "flyout" as our word, "hover menu"
+
+**Splitter**:
+The draggable edge of the docked **Panel**, a vertical separator that resizes it from 320 to 640 and leaves the **Sidebar** as it is. It resists past its limit and springs back; the arrow keys move it by 16, with Shift by 64.
+_Avoid_: "resize handle", "drag bar"
+
+**List and detail**:
+A page layout that opens a record beside its list: the list takes 7 of the **Page**'s 12 columns and the detail, a **Section** with a subtle fill, takes 5. It keeps the split from 960 of content, and below that the detail replaces the list under a back link.
+_Avoid_: "master-detail", "split view"
 
 **Page**:
 The pattern for the main content area inside a **Frame**: it carries the page title and a body.
@@ -261,8 +285,8 @@ The pattern for the container of one object, raised at rest with no border. Rela
 _Avoid_: "tile" (Tile is its own component), "panel"
 
 **Blanket**:
-The pattern for the full-screen layer that holds a **Modal** or **Drawer**, sets the content width and dims what sits behind.
-_Avoid_: "overlay" for the pattern, "scrim"
+The pattern for the layer that dims what sits behind it: full screen for a **Modal** or **Drawer**, which it also holds and sizes; under an **overlay** **Panel** it covers the **Page** and **Sidebar** but not the **Topbar**.
+_Avoid_: "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
 
 **Modal**:
 The pattern for content that takes over the screen until it is closed: one at a time, so a follow-up decision swaps the same Modal's content for its confirm view. **Modal dialog** is the component built on it.
