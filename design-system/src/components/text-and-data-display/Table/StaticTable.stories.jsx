@@ -59,14 +59,8 @@ export default {
         // DESIGN
         size: {
             control: 'select',
-            options: ['sm', 'md', 'lg'],
-            description: 'Row height: sm 32, md 40, lg 48, from the Row size tokens',
-            table: { category: 'Design' }
-        },
-        density: {
-            control: 'select',
-            options: ['sm', 'md', 'lg'],
-            description: 'The older name for size',
+            options: [32, 40, 48],
+            description: 'Row height in pixels, from the Row size tokens',
             table: { category: 'Design' }
         },
         frame: {
@@ -118,22 +112,22 @@ const rows = [
 const rowOf = (canvasElement, name) => within(canvasElement).getByText(name).closest('tr');
 
 export const Overview = {
-    args: { headers, rows, hover: true, size: 'md', titleColumn: 1 }
+    args: { headers, rows, hover: true, size: 40, titleColumn: 1 }
 };
 
 export const Striped = {
-    args: { headers, rows, striped: true, size: 'md' }
+    args: { headers, rows, striped: true, size: 40 }
 };
 
 export const Bordered = {
-    args: { headers, rows, bordered: true, size: 'sm' }
+    args: { headers, rows, bordered: true, size: 32 }
 };
 
 export const Sizes = {
     parameters: { docs: { description: { story: 'Rows are 32, 40 or 48 tall at minimum, from `--size-row-compact`, `--size-row-default` and `--size-row-comfortable`.' } } },
     render: () => (
         <div style={{ display: 'grid', gap: 'var(--size-spacing-medium-space-300)' }}>
-            {['sm', 'md', 'lg'].map((size) => (
+            {[32, 40, 48].map((size) => (
                 <Table
                     key={size}
                     size={size}
@@ -144,7 +138,7 @@ export const Sizes = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const expected = { sm: '--size-row-compact', md: '--size-row-default', lg: '--size-row-comfortable' };
+        const expected = { 32: '--size-row-compact', 40: '--size-row-default', 48: '--size-row-comfortable' };
         for (const [size, token] of Object.entries(expected)) {
             await expect(
                 rowOf(canvasElement, `Student ${size}`).getBoundingClientRect().height,
@@ -257,7 +251,7 @@ export const Static = {
 };
 
 const HeadRow = ({ children }) => (
-    <table className="plus-table plus-table-md" style={{ tableLayout: 'fixed' }}>
+    <table className="plus-table plus-table-40" style={{ tableLayout: 'fixed' }}>
         <thead><tr>{children}</tr></thead>
     </table>
 );

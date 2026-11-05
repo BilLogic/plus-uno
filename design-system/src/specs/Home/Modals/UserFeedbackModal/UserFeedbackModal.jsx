@@ -39,8 +39,8 @@ const severityCountForType = (type) => (type === 'problem' ? 5 : 4);
  * @param {(payload: { type: FeedbackType, severity: number | null, productArea: string, description: string }) => void} [props.onSubmit]
  * @param {string} [props.className]
  * @param {React.CSSProperties} [props.style]
- * @param {boolean} [props.noOverlay=false] Render the dialog inline without a scrim
- * @param {boolean} [props.containOverlay=false] Keep the scrim inside a positioned parent (docs stages)
+ * @param {boolean} [props.noOverlay=false] Render the dialog inline without a blanket
+ * @param {boolean} [props.containOverlay=false] Keep the blanket inside a positioned parent (docs stages)
  */
 const UserFeedbackModal = ({
     id,

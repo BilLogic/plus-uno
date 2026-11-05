@@ -24,7 +24,7 @@ A 10-column grid table used to display student information with name, status, pr
 
 ## Row States
 - **Default**: No background
-- **Hover**: Surface container background
+- **Hover**: Raised surface background
 
 ## Design Tokens
 - **Row radius**: \`--size-table-row-radius\`

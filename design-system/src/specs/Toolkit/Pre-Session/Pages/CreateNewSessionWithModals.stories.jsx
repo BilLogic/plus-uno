@@ -11,7 +11,7 @@ import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 import { Forming } from '../Modals/CreateNewSession/Forming.stories';
 import { Filled } from '../Modals/CreateNewSession/Filled.stories';
 import { Unsaved_Warning } from '../Modals/CreateNewSession/UnsavedWarning.stories';
-import { SectionTitle, ModalScrim, MissingModal } from './_pageHelpers';
+import { SectionTitle, ModalBlanket, MissingModal } from './_pageHelpers';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -223,10 +223,10 @@ export const WithModals = (args) => {
                     />
                 </PageLayout>
 
-                {/* Scrim Overlay + Modal */}
-                <ModalScrim open={args.open}>
+                {/* Blanket Overlay + Modal */}
+                <ModalBlanket open={args.open}>
                     {ModalComponent ? <ModalComponent /> : <MissingModal>No modal available for this selection</MissingModal>}
-                </ModalScrim>
+                </ModalBlanket>
             </div>
         </div>
     );

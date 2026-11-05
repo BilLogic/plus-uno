@@ -104,11 +104,11 @@
         }
     }
 
-    // Scrim overlay for completion modal.
-    // position: absolute (not fixed) so the scrim is contained by the nearest
+    // Blanket overlay for completion modal.
+    // position: absolute (not fixed) so the blanket is contained by the nearest
     // positioned ancestor — the PageLayout root — and never covers content
     // outside the page frame (e.g. a Storybook docs page).
-    &__scrim {
+    &__blanket {
         position: absolute;
         inset: 0;
         background-color: var(--ds-blanket);

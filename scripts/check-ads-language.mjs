@@ -5,9 +5,9 @@
  * The library speaks the ADS names: `appearance`, `spacing`, named state
  * tokens, Blanket / Frame / Page. The old words (Alert, Toast, Switch, NavTabs,
  * Badge, `style` x `fill`, small / medium / large, the 08 / 12 / 16 state
- * steps, surface container, scrim, Rovo) are being replaced family by family,
- * and every PR in that migration is held to one rule: the old language may
- * leave the tree and may not arrive in it.
+ * steps, surface container, scrim, Rovo) are gone from the tree, and the ban is
+ * hard: any hit is a finding, with no baseline and no exemption beyond the
+ * allowlist below.
  *
  * WHAT IT READS. Every tracked `.scss .css .jsx .js .html .mdx` file under
  * `design-system/src`, `prototypes` and `src` (`.mjs` counts as js), by `git ls-files` (a filesystem
@@ -36,41 +36,16 @@
  *   token:surface-layout  a `var(--surface-*)` read of a legacy layout token (#1755).
  *   token:color-surface   a `var(--color-surface*)` or `var(--color-on-surface*)` read (#1755).
  *
- * ONE RULE IS NOT A RATCHET. `state-step`, `token:surface-layout`,
- * `token:color-surface` and `word:Atlassian` allow zero: any hit is a finding, the baseline never
- * holds it, and `--update` never records it. The other `word:*` rules
- * (surface container, scrim, Rovo) stay a ratchet — `surface container` and `scrim` still appear as a Figma-name
- * citation or as the Blanket pattern's own anatomy ("the Blanket holds the
- * scrim"), so a blanket ban on the word would rewrite correct prose. Only the
- * `--surface-*`/`--color-surface*` custom properties have no legitimate
- * remaining reader, which is what makes them safe to hold at zero.
- *
- * THE RATCHET. The count of a (rule, file) pair may fall and never rise, and a
- * pair the baseline does not hold is a finding. A pair that reaches zero leaves
- * the record, and the check reports the stale entry until the record is
- * regenerated: a baseline that holds ground the code no longer occupies has
- * stopped being readable. The record is `scripts/baselines/ads-language.json`,
- * read and written through `scripts/lib/ratchet.mjs` (`counts` form).
- *
- * HOW A PR LOWERS THE BASELINE. A migration PR removes old language, then runs
- *
- *     npm run check:ads-language -- --update
- *
- * and commits the regenerated file in the same PR. Never edit the JSON by hand:
- * `--update` refuses to record a rise or a new pair, so the only movement it can
- * write is down, and a hand edit can write anything. The count in the diff is
- * the evidence the PR cleaned what it says it cleaned.
+ * EVERY RULE ALLOWS ZERO. A hit is a finding; there is no baseline to hold it
+ * and no `--update` to record it. A word that is legitimately cited (a Figma
+ * layer name, a decision record) goes into the allowlist below, named.
  */
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
-import { openRatchet } from './lib/ratchet.mjs';
 import { trackedSources } from './lib/tracked-sources.mjs';
 
 export { REPO_ROOT };
-/** Repo-relative: this record's key in the shape table, and what the registry row declares. */
-export const BASELINE = 'scripts/baselines/ads-language.json';
-
 export const SEARCH_ROOTS = ['design-system/src', 'prototypes', 'src'];
 export const SEARCHED = /\.(scss|css|jsx|js|mjs|html|mdx)$/;
 /**
@@ -86,6 +61,16 @@ const ALLOWED_PATHS = [
   /^docs\/adr\//,
   /^design-system\/src\/tokens\/_elevation\.scss$/,
   /^design-system\/src\/tokens\/_color_roles\.scss$/,
+];
+/**
+ * The two files that define `--color-scrim` (the generated value and its alias
+ * to `--ds-blanket`). Removing a token waits on the token-removal decision, so
+ * the word may stay here and only here, and only the `word:` rules are lenient:
+ * every other rule still reads these files.
+ */
+const TOKEN_NAME_FILES = [
+  /^design-system\/src\/tokens\/_colors\.scss$/,
+  /^design-system\/src\/tokens\/color\/_legacy-aliases\.scss$/,
 ];
 /**
  * Decision records that cite the benchmark on purpose: each says what a
@@ -176,6 +161,7 @@ export function measure(sources) {
     if (ALLOWED_PATHS.some((re) => re.test(file))) continue;
     const live = text.split('\n').map((l) => (ALLOWED_LINE.test(l) ? '' : l));
     for (const [rule, re] of LINE_RULES) {
+      if (rule.startsWith('word:') && TOKEN_NAME_FILES.some((p) => p.test(file))) continue;
       const hits = live.flatMap((l, i) => (re.test(l) ? [i + 1] : []));
       add(rule, file, hits.length, hits[0]);
     }
@@ -213,14 +199,8 @@ export function sourcesOf(repoRoot) {
   return trackedSources(repoRoot, SEARCH_ROOTS, SEARCHED);
 }
 
-/** Rules that allow none: a hit is a finding, whatever the baseline says. */
-const HARD_RULES = ['state-step', 'token:surface-layout', 'token:color-surface', 'word:Atlassian'];
-const isHard = (key) => {
-  const rule = key.split(' ')[0];
-  return HARD_RULES.includes(rule) || rule.startsWith('stale-name:');
-};
-/** Per-hard-rule reason, keyed by rule name. */
-const HARD_RULE_MESSAGE = new Map([
+/** Per-rule reason, keyed by rule name; a rule without one gets the generic line. */
+const RULE_MESSAGE = new Map([
   ...Object.entries(RENAMED_NO_ALIAS).map(([oldName, newName]) => [
     `stale-name:${oldName}`,
     `${newName} was renamed with no alias; \`${oldName}\` may not survive in doc prose either`,
@@ -230,102 +210,39 @@ const HARD_RULE_MESSAGE = new Map([
     'shipped docs state the PLUS rule and do not cite the benchmark (no name, no atlassian.design link); a decision record that must is named in ATLASSIAN_RECORDS',
   ],
   [
+    'state-step',
+    'the 08 / 12 / 16 state steps are gone (use the named hovered, pressed and selected tokens)',
+  ],
+  [
     'token:surface-layout',
-    'the surface-to-zero sweep (#1755) moved every component off the legacy `--surface-*` layout tokens; use the `--ds-surface-*` family',
+    'every component moved off the legacy `--surface-*` layout tokens; use the `--ds-surface-*` family',
   ],
   [
     'token:color-surface',
-    'the surface-to-zero sweep (#1755) moved every component off `--color-surface*`/`--color-on-surface*`; use `--ds-surface-*`, `--ds-text`/`--ds-text-subtle` or `--ds-icon`/`--ds-icon-subtle`',
+    'every component moved off `--color-surface*`/`--color-on-surface*`; use `--ds-surface-*`, `--ds-text`/`--ds-text-subtle` or `--ds-icon`/`--ds-icon-subtle`',
   ],
 ]);
 
-/** The ratchet's side of a measurement: a plain `key -> count` object in key order, hard rules left out. */
-const asRecord = (found) =>
-  Object.fromEntries(
-    [...found.entries()]
-      .filter(([k]) => !isHard(k))
-      .sort(([a], [b]) => (a < b ? -1 : 1))
-      .map(([k, v]) => [k, v.count]),
-  );
-
-/** Opened fresh on every call: `--update` writes the record and the gate then reads it back. */
-const ratchetFor = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
-
-export const REMEDY =
-  '  -> use the ADS names (spec #1604 section 2). A migration PR that removed old language lowers\n' +
-  '     the baseline with `npm run check:ads-language -- --update` and commits the result; never edit it by hand.';
+export const REMEDY = '  -> use the ADS names (spec #1604 section 2); the old language may not come back.';
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT, sources } = {}) {
   const found = measure(sources ?? sourcesOf(repoRoot));
-  const ratchet = ratchetFor(repoRoot);
-  const findings = ratchet.failures(asRecord(found)).map((failure) => {
-    if (failure.kind === 'absent') return { message: failure.message };
-    const [rule, ...rest] = failure.key.split(' ');
+  return [...found].map(([key, { count, line }]) => {
+    const [rule, ...rest] = key.split(' ');
     return {
       file: rest.join(' '),
-      line: found.get(failure.key)?.line,
-      message:
-        failure.kind === 'new'
-          ? `old language: ${failure.count} x ${rule} in a file the baseline does not hold`
-          : `old language rose: ${failure.count} x ${rule} against a baseline of ${failure.recorded}`,
+      line,
+      message: `old language: ${count} x ${rule}; ${RULE_MESSAGE.get(rule) ?? 'use the current prop, class or word'}`,
     };
   });
-  for (const [key, { count, line }] of found) {
-    if (!isHard(key)) continue;
-    const [rule, ...rest] = key.split(' ');
-    const why =
-      HARD_RULE_MESSAGE.get(rule) ??
-      'the 08 / 12 / 16 state steps are gone, so zero allowed (use the named hovered, pressed and selected tokens)';
-    findings.push({
-      file: rest.join(' '),
-      line,
-      message: `old language: ${count} x ${rule}; ${why}`,
-    });
-  }
-  if (!ratchet.absent) {
-    for (const entry of ratchet.stale(asRecord(found))) {
-      const [rule, ...rest] = entry.key.split(' ');
-      findings.push({
-        file: rest.join(' '),
-        message: `${rule} is gone (baseline held ${entry.recorded}); regenerate with \`npm run check:ads-language -- --update\``,
-      });
-    }
-  }
-  return findings;
 }
 
-/** The total against the record, and a nudge when the code is under it. */
+/** The total, for the one-line summary. */
 export function summary({ repoRoot = REPO_ROOT, sources } = {}) {
   const found = measure(sources ?? sourcesOf(repoRoot));
   const now = [...found.values()].reduce((sum, { count }) => sum + count, 0);
-  const recorded = Object.values(ratchetFor(repoRoot).envelope('counts') ?? {}).reduce((a, b) => a + b, 0);
-  const fell = now < recorded ? ` — under the baseline of ${recorded}; record it with --update` : '';
-  return `${now} old-language hits in ${found.size} rule/file pairs${fell}`;
+  return `${now} old-language hits in ${found.size} rule/file pairs`;
 }
 
-/**
- * `--update` re-records the ratchet downward. It refuses a rise or a pair the
- * record does not hold, which is the whole difference between regenerating the
- * baseline and editing it: this can only write less old language than before.
- * It falls through to the gate, so a refused update still fails loudly.
- */
-function record() {
-  const found = asRecord(measure(sourcesOf(REPO_ROOT)));
-  const ratchet = ratchetFor(REPO_ROOT);
-  const rising = ratchet.absent ? [] : ratchet.failures(found).filter((f) => f.kind === 'new' || f.kind === 'rose');
-  if (rising.length) {
-    console.error(`[check-ads-language] not recorded: ${rising.length} pair(s) rose or are new. Remove the old language instead.`);
-    return;
-  }
-  ratchet.update(found, {
-    seed: {
-      why:
-        'Old component language still in the tree, per rule and per file (spec #1604). A count may fall and never rise; ' +
-        'a pair that reaches zero leaves the record. Regenerate with `npm run check:ads-language -- --update`; never edit by hand.',
-    },
-  });
-  console.log(`[check-ads-language] baseline recorded: ${Object.keys(found).length} pairs`);
-}
-
-main(import.meta.url, 'check:ads-language', { run, summary, remedy: REMEDY, fallThrough: { '--update': record } });
+main(import.meta.url, 'check:ads-language', { run, summary, remedy: REMEDY });

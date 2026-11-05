@@ -273,9 +273,8 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-ads-language.mjs',
-    baseline: 'scripts/baselines/ads-language.json',
     guards:
-      'the old component language not coming back while the library moves to the ADS names: the 08 / 12 / 16 state steps, the legacy component tags and imports (Alert, Toast, Switch, NavTabs, Badge and the rest), the `style` x `fill` and small / medium / large props, `plus-btn--` modifier classes, and the words surface container, scrim and Rovo, counted per rule and per file in design-system/src, prototypes and src. A count may fall and never rise; a migration PR lowers the record with `npm run check:ads-language -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
+      'the old component language staying out of the tree, a hard ban with no baseline: the 08 / 12 / 16 state steps, the legacy component tags and imports (Alert, Toast, Switch, NavTabs, Badge and the rest), the `style` x `fill` and small / medium / large props, `plus-btn--` modifier classes, and the words surface container, scrim and Rovo, read in design-system/src, prototypes and src. Any hit is a finding; a decision record that must cite the benchmark is named in the check.',
   },
   {
     name: 'check:legacy-colors',

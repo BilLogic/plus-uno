@@ -11,12 +11,12 @@ import { SessionStatusFilter } from '../Elements/Filters/SessionStatusFilter.sto
 import { TutorFilter } from '../Elements/Filters/TutorFilter/TutorFilter.stories';
 import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
-import { SectionTitle, UpdateAlert, ModalScrim } from './_pageHelpers';
+import { SectionTitle, UpdateAlert, ModalBlanket } from './_pageHelpers';
 
 /*
  * Open tabs. "Details" on a row opens that session as a temporary tab under
  * Toolkit › Sessions, and the selected session tab is what the page shows: the
- * existing Session Details mock, over the page. Escape or a press on the scrim
+ * existing Session Details mock, over the page. Escape or a press on the blanket
  * closes it and selects Sessions again; the tab stays open in the sidebar until
  * its × closes it. Nothing here touches the URL.
  */
@@ -65,7 +65,7 @@ const OpenedSessionDetails = ({ shownId, onClose }) => {
     if (!shownId) return null;
     return (
         <div onClick={onClose}>
-            <ModalScrim open>
+            <ModalBlanket open>
                 <div
                     ref={dialog}
                     role="dialog"
@@ -75,7 +75,7 @@ const OpenedSessionDetails = ({ shownId, onClose }) => {
                 >
                     <SessionInfo_PostSignUp />
                 </div>
-            </ModalScrim>
+            </ModalBlanket>
         </div>
     );
 };

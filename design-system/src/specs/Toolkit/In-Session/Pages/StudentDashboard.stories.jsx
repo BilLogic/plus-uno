@@ -1035,7 +1035,7 @@ export const RegularTutorView = {
  * Figma loaded: 4551:56269
  * Figma empty: 3999:204238
  */
-const scrim1ModalMap = {
+const blanket1ModalMap = {
     'attendance-loaded': InSessionModals.AttendanceLoadedLead,
     'attendance-initial': InSessionModals.AttendanceInitialLead,
     'attendance-loading': InSessionModals.AttendanceLoadingLead,
@@ -1045,7 +1045,7 @@ const scrim1ModalMap = {
     'session-info-loading': InSessionModals.SessionInfoLoadingLead,
 };
 
-const scrim1ModalLabels = {
+const blanket1ModalLabels = {
     'attendance-loaded': 'Attendance (Loaded)',
     'attendance-initial': 'Attendance (Initial)',
     'attendance-loading': 'Attendance (Loading)',
@@ -1055,13 +1055,13 @@ const scrim1ModalLabels = {
     'session-info-loading': 'Session Info (Loading)',
 };
 
-const scrim2ModalMap = {
+const blanket2ModalMap = {
     'zoom-session': StartingZoomSession,
     'add-tutor': AddTutor,
     'add-student': AddStudent,
 };
 
-const scrim2ModalLabels = {
+const blanket2ModalLabels = {
     'zoom-session': 'Zoom Session',
     'add-tutor': 'Add Tutor',
     'add-student': 'Add Student',
@@ -1082,8 +1082,8 @@ const LeadSupervisorViewRender = (args) => {
     const viewState = args.viewState;
     const showBanner = args.goalBanner;
     const bannerSessionType = args.sessionType;
-    const Scrim1Modal = args.scrim1 !== 'none' ? scrim1ModalMap[args.scrim1] : null;
-    const Scrim2Modal = args.scrim2 !== 'none' ? scrim2ModalMap[args.scrim2] : null;
+    const Blanket1Modal = args.blanket1 !== 'none' ? blanket1ModalMap[args.blanket1] : null;
+    const Blanket2Modal = args.blanket2 !== 'none' ? blanket2ModalMap[args.blanket2] : null;
 
     return (
         // Fixed-height frame so PageLayout resolves height:100% in the docs well; width/breakpoint
@@ -1154,17 +1154,17 @@ const LeadSupervisorViewRender = (args) => {
                 </div>
             )}
 
-            {/* Scrim 1 — in-session pop-up modal; select via the `scrim1` arg. */}
-            {Scrim1Modal && (
+            {/* Blanket 1 — in-session pop-up modal; select via the `blanket1` arg. */}
+            {Blanket1Modal && (
                 <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--size-section-pad-x-lg)', zIndex: 'var(--layer-blanket)' }}>
-                    <Scrim1Modal />
+                    <Blanket1Modal />
                 </div>
             )}
 
-            {/* Scrim 2 — stacks on Scrim 1; select via the `scrim2` arg. */}
-            {Scrim1Modal && Scrim2Modal && (
+            {/* Blanket 2 — stacks on Blanket 1; select via the `blanket2` arg. */}
+            {Blanket1Modal && Blanket2Modal && (
                 <div style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0, 0, 0, 0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'var(--size-section-pad-x-lg)', zIndex: 'var(--layer-blanket)' }}>
-                    <Scrim2Modal />
+                    <Blanket2Modal />
                 </div>
             )}
 
@@ -1187,8 +1187,8 @@ export const LeadSupervisorView = {
         sessionType: { control: 'radio', options: ['goal-setting', 'non-goal-setting'], name: 'Session type', table: { category: 'State' } },
         toast: { control: 'boolean', name: 'Flag', table: { category: 'State' } },
         toastType: { control: 'radio', options: ['assignment-leads', 'goal-setting-warmup'], name: 'Flag type', table: { category: 'State' } },
-        scrim1: { control: 'select', options: ['none', ...Object.keys(scrim1ModalMap)], name: 'Scrim 1 modal', table: { category: 'Scrims' } },
-        scrim2: { control: 'select', options: ['none', ...Object.keys(scrim2ModalMap)], name: 'Scrim 2 modal (needs Scrim 1)', table: { category: 'Scrims' } },
+        blanket1: { control: 'select', options: ['none', ...Object.keys(blanket1ModalMap)], name: 'Blanket 1 modal', table: { category: 'Blankets' } },
+        blanket2: { control: 'select', options: ['none', ...Object.keys(blanket2ModalMap)], name: 'Blanket 2 modal (needs Blanket 1)', table: { category: 'Blankets' } },
     },
-    args: { viewState: 'loaded', goalBanner: true, sessionType: 'goal-setting', toast: false, toastType: 'assignment-leads', scrim1: 'none', scrim2: 'none' },
+    args: { viewState: 'loaded', goalBanner: true, sessionType: 'goal-setting', toast: false, toastType: 'assignment-leads', blanket1: 'none', blanket2: 'none' },
 };

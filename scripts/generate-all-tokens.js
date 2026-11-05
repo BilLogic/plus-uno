@@ -120,7 +120,7 @@ const NEUTRAL_GROUPS = {
     'Surface': ['surface', 'on-surface'],
     'Surface Variant': ['surface-variant', 'on-surface-variant'],
     'Outline': ['outline', 'outline-variant'],
-    'Surface Containers': ['surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high', 'surface-container-highest'],
+    'Raised surfaces': ['surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high', 'surface-container-highest'],
     'Alternative Surfaces': ['surface-dim', 'surface-bright', 'scrim', 'disabled-opacity', 'inverse-surface', 'inverse-on-surface'],
 };
 
@@ -386,7 +386,7 @@ const SEMANTIC_LAYERS = [
     { prefix: 'section', heading: 'Sections Layer' },
     { prefix: 'modal', heading: 'Modals Layer' },
     { prefix: 'surface', heading: 'Surfaces Layer' },
-    { prefix: 'surface-container', heading: 'Surface Containers Layer' },
+    { prefix: 'surface-container', heading: 'Frames Layer' },
     { prefix: 'table', heading: 'Table Tokens' },
     ...SIZE_ROLES.map(({ prefix, heading, steps }) => ({ prefix, heading, steps: Object.keys(steps) })),
 ];
@@ -464,7 +464,7 @@ function generateSemanticsSCSS() {
     let scss = `/**
  * Semantic Spacing Tokens
  * These are the tokens designers and developers should use
- * Organized by component layer: Elements, Cards, Sections, Modals, Surfaces, Surface Containers,
+ * Organized by component layer: Elements, Cards, Sections, Modals, Surfaces, Frames,
  * Table, then the size roles: Icon, Indicator, Control, Row, Media
  */
 

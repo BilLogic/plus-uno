@@ -13,7 +13,7 @@ import { Session_Type } from '../Modals/EditSession/SessionType.stories';
 import { Attendee_Edit } from '../Modals/EditSession/AttendeeEdit.stories';
 import { Reconfirm_Tutor_Availability } from '../Modals/EditSession/ReconfirmTutorAvailability.stories';
 import { Unsaved_Warning } from '../Modals/EditSession/UnsavedWarning.stories';
-import { SectionTitle, ModalScrim, MissingModal } from './_pageHelpers';
+import { SectionTitle, ModalBlanket, MissingModal } from './_pageHelpers';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -232,10 +232,10 @@ export const WithModals = (args) => {
                     />
                 </PageLayout>
 
-                {/* Scrim Overlay + Modal */}
-                <ModalScrim open={args.open}>
+                {/* Blanket Overlay + Modal */}
+                <ModalBlanket open={args.open}>
                     {ModalComponent ? <ModalComponent /> : <MissingModal>No modal available for this selection</MissingModal>}
-                </ModalScrim>
+                </ModalBlanket>
             </div>
         </div>
     );

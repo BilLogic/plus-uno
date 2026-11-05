@@ -39,9 +39,9 @@
     background-color: transparent;
     color: var(--ds-text);
 
-    &.plus-table-sm { --plus-table-row-height: var(--size-row-compact); }
-    &.plus-table-md { --plus-table-row-height: var(--size-row-default); }
-    &.plus-table-lg { --plus-table-row-height: var(--size-row-comfortable); }
+    &.plus-table-32 { --plus-table-row-height: var(--size-row-compact); }
+    &.plus-table-40 { --plus-table-row-height: var(--size-row-default); }
+    &.plus-table-48 { --plus-table-row-height: var(--size-row-comfortable); }
 
     th,
     td {

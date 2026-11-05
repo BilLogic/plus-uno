@@ -6,8 +6,8 @@
     background: var(--ds-background-accent-teal-subtler);
     color: var(--ds-text-accent-teal);
 }
-.tr-avatar--sm { width: var(--space-150); height: var(--space-150); font: var(--heading-xxsmall); }
-.tr-avatar--md { width: var(--space-200); height: var(--space-200); font: var(--heading-xsmall); }
+.tr-avatar--24 { width: var(--space-150); height: var(--space-150); font: var(--heading-xxsmall); }
+.tr-avatar--32 { width: var(--space-200); height: var(--space-200); font: var(--heading-xsmall); }
 .tr-avatar--blue { background: var(--ds-background-accent-blue-subtler); color: var(--ds-text-accent-blue); }
 .tr-avatar--purple { background: var(--ds-background-accent-purple-subtler); color: var(--ds-text-accent-purple); }
 .tr-avatar--yellow { background: var(--ds-background-accent-yellow-subtler); color: var(--ds-text-accent-yellow); }

@@ -21,7 +21,7 @@ export default {
                 value="16.8"
                 unit="of 20"
                 caption="Includes prep and training"
-                meter={<GoalMeter value={16.8} max={20} target={20} size="sm" interactive={false} label="16.8 of 20 paid hours" />}
+                meter={<GoalMeter value={16.8} max={20} target={20} size={6} interactive={false} label="16.8 of 20 paid hours" />}
             />
         </div>
     ),

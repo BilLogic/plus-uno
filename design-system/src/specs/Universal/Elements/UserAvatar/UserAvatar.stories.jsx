@@ -112,12 +112,12 @@ export const Interactive = {
     }
 };
 
-/** `size="md"` is 32 high for the topbar; a lead tutor shows "Lead" in place of the counter. */
-export const Medium32 = {
+/** `spacing="compact"` is 32 high for the topbar; a lead tutor shows "Lead" in place of the counter. */
+export const Compact = {
     render: () => (
         <div className="d-flex flex-column gap-3">
-            <UserAvatar size="md" firstChar="J" name="John Doe" type="lead tutor" />
-            <UserAvatar size="md" firstChar="R" name="Regular Tutor" counter counterValue={3} />
+            <UserAvatar spacing="compact" firstChar="J" name="John Doe" type="lead tutor" />
+            <UserAvatar spacing="compact" firstChar="R" name="Regular Tutor" counter counterValue={3} />
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -137,7 +137,7 @@ export const Medium32 = {
 /** At 32 a long name ends in an ellipsis at `--label-max-width`. */
 export const LongName = {
     render: () => (
-        <UserAvatar size="md" firstChar="M" name="Maximiliana Alexandra Constantinopoulou-Whitfield" type="lead tutor" />
+        <UserAvatar spacing="compact" firstChar="M" name="Maximiliana Alexandra Constantinopoulou-Whitfield" type="lead tutor" />
     ),
     play: async ({ canvasElement }) => {
         const name = canvasElement.querySelector('.plus-user-avatar__name');
@@ -148,11 +148,11 @@ export const LongName = {
 };
 
 /** The default `lg` row pads around a 32 pill, for tables. */
-export const Large = {
+export const Default = {
     render: () => <UserAvatar firstChar="J" name="John Doe" counter={false} />,
     play: async ({ canvasElement }) => {
         const avatar = canvasElement.querySelector('.plus-user-avatar');
-        await expect(avatar).toHaveClass('plus-user-avatar--lg');
+        await expect(avatar).toHaveClass('plus-user-avatar--default');
         await expect(rect(avatar.querySelector('.plus-user-avatar__initial')).height).toBeCloseTo(token('--image-md'), 0);
         await expect(rect(avatar).height, 'taller than the 32 topbar size').toBeGreaterThan(token('--item-height-md'));
     },

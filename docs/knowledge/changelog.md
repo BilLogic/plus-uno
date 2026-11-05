@@ -58,3 +58,13 @@ audits above. The harness audit's request to be kept is overruled by that rule;
 its P2 finding survives as the quote that opens this ledger. Git keeps every
 file. `archive/eval-runs/`, archived the same week, stays: `docs/evals/` and
 the blueprint integration cite it.
+
+## 2026-11-05 — the old component language is a hard ban
+
+`check:ads-language` stopped being a ratchet: its baseline record is deleted and
+every rule allows zero. The last rows cleared at the source — `size` props now
+take pixel values or `spacing` (Table, Object, LoadingGif, StatusIndicators,
+UserAvatar, TrainingProgressCard, the tutor-revamp kit), the screen overlay is
+the Blanket everywhere it was called a scrim, and the stale Rovo and surface
+container wording is gone. One named carve-out remains: the two token files that
+define `--color-scrim` may keep the word until token removal is decided.

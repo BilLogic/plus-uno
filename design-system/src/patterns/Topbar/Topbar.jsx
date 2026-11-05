@@ -99,7 +99,7 @@ const Topbar = ({
                         )}
                         {user ? (
                             <UserAvatar
-                                size="md"
+                                spacing="compact"
                                 firstChar={user.firstChar || user.name?.charAt(0) || 'U'}
                                 name={user.name || 'User'}
                                 counter={Boolean(user.counter)}

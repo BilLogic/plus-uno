@@ -29,8 +29,8 @@ export default {
         },
         size: {
             control: { type: 'select' },
-            options: ['small', 'medium', 'large'],
-            description: 'Size variant',
+            options: [12, 14, 18],
+            description: 'Glyph size in pixels',
             table: { category: 'Design' }
         }
     }
@@ -81,16 +81,16 @@ export const Overview = {
                     alignItems: 'center'
                 }}>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                        <StatusIndicators stage="completed" size="small" />
-                        <span className="body3-txt">Small</span>
+                        <StatusIndicators stage="completed" size={12} />
+                        <span className="body3-txt">12</span>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                        <StatusIndicators stage="completed" size="medium" />
-                        <span className="body3-txt">Medium</span>
+                        <StatusIndicators stage="completed" size={14} />
+                        <span className="body3-txt">14</span>
                     </div>
                     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                        <StatusIndicators stage="completed" size="large" />
-                        <span className="body3-txt">Large</span>
+                        <StatusIndicators stage="completed" size={18} />
+                        <span className="body3-txt">18</span>
                     </div>
                 </div>
             </section>
@@ -105,7 +105,7 @@ export const Overview = {
 export const Interactive = {
     args: {
         stage: 'not started',
-        size: 'medium'
+        size: 14
     },
     render: (args) => (
         <div style={{

@@ -28,7 +28,7 @@ const SessionModal = ({
             show={show}
             onHide={onHide}
             centered
-            size="lg"
+            dialogClassName="modal-lg"
             className={`session-modal ${className}`}
             aria-labelledby="session-modal-title"
             {...props}

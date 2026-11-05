@@ -11,7 +11,7 @@ import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 import { Recurring_NA } from '../Modals/DeleteSession/RecurringNA.stories';
 import { One_Session_NA } from '../Modals/DeleteSession/OneSessionNA.stories';
 import { During_Specific_Day_Period } from '../Modals/DeleteSession/DuringSpecificDayPeriod.stories';
-import { SectionTitle, ModalScrim, MissingModal } from './_pageHelpers';
+import { SectionTitle, ModalBlanket, MissingModal } from './_pageHelpers';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -226,10 +226,10 @@ export const WithModals = (args) => {
                     />
                 </PageLayout>
 
-                {/* Scrim Overlay + Modal */}
-                <ModalScrim open={args.open}>
+                {/* Blanket Overlay + Modal */}
+                <ModalBlanket open={args.open}>
                     {ModalComponent ? <ModalComponent /> : <MissingModal>No modal available for this selection</MissingModal>}
-                </ModalScrim>
+                </ModalBlanket>
             </div>
         </div>
     );

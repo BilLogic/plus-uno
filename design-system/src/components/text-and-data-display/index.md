@@ -10,7 +10,7 @@ authored half (#166), counted rather than assumed.
 | [Code](Code/index.md) | 2 | ✅ | ✅ | ✅ |
 | [CodeBlock](CodeBlock/index.md) | 7 | ✅ | ✅ | ✅ |
 | [Heading](Heading/index.md) | 6 | ✅ | ✕ | ✅ |
-| [Table](Table/index.md) | 18 | ✕ | ✕ | ✕ |
+| [Table](Table/index.md) | 17 | ✕ | ✕ | ✕ |
 
 **Authored coverage:** When to use 3/4 (75%) · Correct/incorrect 2/4 (50%) · Accessibility 3/4 (75%)
 

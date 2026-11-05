@@ -12,19 +12,14 @@ const rows = [
 const inBody = (...children) => render(<table><tbody>{children}</tbody></table>);
 
 describe('Table sizes', () => {
-    it.each([['sm'], ['md'], ['lg']])('emits the size class for %s', (size) => {
+    it.each([[32], [40], [48]])('emits the size class for %s', (size) => {
         render(<Table headers={headers} rows={rows} size={size} />);
         expect(screen.getByRole('table')).toHaveClass(`plus-table-${size}`);
     });
 
-    it('keeps density as the legacy name for size', () => {
-        render(<Table headers={headers} rows={rows} density="lg" />);
-        expect(screen.getByRole('table')).toHaveClass('plus-table-lg');
-    });
-
-    it('defaults to the md row', () => {
+    it('defaults to the 40 row', () => {
         render(<Table headers={headers} rows={rows} />);
-        expect(screen.getByRole('table')).toHaveClass('plus-table-md');
+        expect(screen.getByRole('table')).toHaveClass('plus-table-40');
     });
 });
 
