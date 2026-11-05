@@ -153,6 +153,9 @@ const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
     await expect(getComputedStyle(aside).boxShadow, 'floating sidebar shadow')
         .toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
     await expect(rect(aside).width, 'sidebar width').toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
+    // Below the topbar, like the Panel and its Blanket: the topbar row stays clear.
+    await expect(rect(aside).top, 'the raised sidebar starts under the topbar').toBeCloseTo(rect(frame.querySelector('.plus-frame__topbar')).bottom, 0);
+    await expect(rect(aside).bottom, 'the raised sidebar runs to the foot').toBeCloseTo(rect(frame).bottom, 0);
     await expect(rect(surface).left, 'the surface did not move').toBeCloseTo(surfaceLeftBefore, 0);
     // No Blanket: a point on the page beside the sidebar still hits the page.
     const s = rect(surface);

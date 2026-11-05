@@ -85,25 +85,19 @@
     border-right: var(--border-default) solid var(--ds-border);
 }
 
-// Raised (a peek, or an overlay under 1024): over the Page, from the top of the frame, with a shadow and no Blanket.
+// Raised (a peek, or an overlay under 1024): over the Page, from the Topbar down, with a shadow and no Blanket.
 // The fill and shadow are the overlay role's fill/shadow pairing. It is on
 // the navigation layer (200), under popups (400) and a modal's Blanket (500); the
 // toggle (one above) and the hover edge (one below) sit either side of it.
 .plus-frame__sidebar--raised {
     position: absolute;
-    top: 0;
+    top: var(--frame-topbar-height);
     bottom: 0;
     left: 0;
     z-index: var(--frame-layer-sidebar);
     padding: var(--pad-x-sm);
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
-}
-
-// The toggle sits in this space, so the sidebar's first row starts under the topbar.
-.plus-frame__topbar-space {
-    flex-shrink: 0;
-    height: var(--frame-topbar-height);
 }
 
 // The hover strip that peeks a closed sidebar: the frame's left edge beside the
