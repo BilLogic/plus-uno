@@ -67,14 +67,13 @@ const px = (n) => `${+n.toFixed(2)}px`;
 const LAYOUT = {
   '--frame-topbar-height': ['32px', '32px', '32px'],
   '--frame-sidebar-width': ['240px', '240px', '240px'],
-  '--grid-pad-left-container': ['8px', '0px', '0px'],
   '--grid-gutter': ['16px', '16px', '16px'],
-  '--grid-width-column': ['45.33px', '47.33px', '80.67px'],
+  '--grid-width-column': ['45.33px', '46.67px', '81.33px'],
   '--grid-width-column-screen': ['45.33px', '66.67px', '88px'],
   '--content-max-width': ['1232px', '1232px', '1232px'],
   '--content-max-width-reading': ['864px', '864px', '864px'],
   '--content-min-width': ['720px', '720px', '720px'],
-  '--content-width': ['720px', '744px', '1144px'],
+  '--content-width': ['720px', '736px', '1152px'],
   '--modal-width-sm': ['384px', '512px', '640px'],
   '--modal-width-md': ['507px', '677px', '848px'],
   '--modal-width-lg': ['629px', '843px', '1056px'],
@@ -85,17 +84,18 @@ const LAYOUT = {
   '--grid-columns': ['12', '12', '12'],
 };
 
-/* Surface has modes for its pad only. */
-const PAGE_PAD = ['16px', '16px', '24px'];
+/* The Page pad has one value; it is still a mode-aware variable in Figma. */
+const PAGE_PAD = ['24px', '24px', '24px'];
 
 /* One-mode collections. */
 const FIXED = {
-  '--frame-pad': '8px',
-  '--frame-stack': '8px',
   '--page-stack-sm': '16px',
   '--page-stack-md': '24px',
   '--page-stack-lg': '40px',
-  '--page-radius': '16px',
+  '--page-radius': '8px',
+  '--panel-min-width': '320px',
+  '--panel-width-default': '400px',
+  '--panel-max-width': '640px',
   '--section-stack-sm': '8px',
   '--section-stack-md': '16px',
   '--section-stack-lg': '24px',
@@ -171,10 +171,9 @@ test('the derived Layout rows are the frame rules worked at each mode width', ()
   }
 });
 
-test('the screen and container pads alias the space scale per mode', () => {
+test('the screen pad aliases the space scale per mode, its own rule apart from the Page pad', () => {
   const RAW = {
-    '--grid-pad-left-container': ['var(--space-050)', 'var(--space-0)', 'var(--space-0)'],
-    '--screen-pad-x': ['var(--space-150)', 'var(--space-150)', 'var(--space-200)'],
+      '--screen-pad-x': ['var(--space-150)', 'var(--space-150)', 'var(--space-200)'],
   };
   for (const [name, raws] of Object.entries(RAW)) {
     const actual = Object.keys(LAYOUT_MODES).map((mode) => rawAtMode(name, mode));
@@ -228,9 +227,20 @@ test('the column count is a plain number, so a grid can repeat it', () => {
   assert.equal(corpus.get('--grid-columns')?.raw, '12');
 });
 
-test('Surface/pad is 16 below 1440 and 24 from 1440', () => {
+test('Page/pad is 24 at every width', () => {
   const actual = Object.keys(LAYOUT_MODES).map((mode) => atMode('--page-pad', mode));
   assert.deepEqual(actual, PAGE_PAD);
+});
+
+test('the Frame has no seams: no Frame pad, Frame stack or container-left pad is declared', () => {
+  for (const name of ['--frame-pad', '--frame-stack', '--grid-pad-left-container']) {
+    assert.equal(corpus.get(name), undefined, `${name} is retired`);
+  }
+});
+
+test('the Panel widths run 320 · 400 · 640 and sit in patterns, in step', () => {
+  const [min, def, max] = ['--panel-min-width', '--panel-width-default', '--panel-max-width'].map((n) => parseFloat(corpus.get(n)?.value));
+  assert.ok(min < def && def < max, `${min} < ${def} < ${max}`);
 });
 
 test('every one-mode frame and layer token resolves to its value', () => {
@@ -298,13 +308,12 @@ test('every alias lands on the scales, never on an old --size-* primitive', () =
     '--frame-sidebar-width': 'var(--width-1500)',
     '--grid-gutter': 'var(--space-100)',
     '--content-max-width': 'var(--size-7700)',
-    '--page-pad': 'var(--space-100)',
+    '--page-pad': 'var(--space-150)',
     '--card-min-width-md': 'var(--width-1900)',
     '--card-max-height-sm': 'var(--size-1900)',
     '--card-max-height-md': 'var(--size-2500)',
     '--card-max-height-lg': 'var(--size-4000)',
     '--table-stack': 'var(--space-050)',
-    '--grid-pad-left-container': 'var(--space-050)',
     '--screen-pad-x': 'var(--space-150)',
     '--section-min-width-main': 'var(--width-3000)',
     '--modal-radius': 'var(--radius-075)',

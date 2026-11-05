@@ -117,9 +117,8 @@ export const TOKEN_LADDER = [
   // ─── Semantics / Grid (dissolved from spacing / layout) ──────────────
   { tier: 'semantics', group: 'Grid', new: '--grid-gutter', old: '--layout-gutter', ref: 'var(--space-100)' },
   { tier: 'semantics', group: 'Grid', new: '--grid-columns', old: '--layout-columns', ref: '12' },
-  { tier: 'semantics', group: 'Grid', new: '--grid-width-column', old: '--layout-width-column', ref: '45.33px', at: { '(min-width: 1024px)': '47.33px', '(min-width: 1440px)': '80.67px' } },
+  { tier: 'semantics', group: 'Grid', new: '--grid-width-column', old: '--layout-width-column', ref: '45.33px', at: { '(min-width: 1024px)': '46.67px', '(min-width: 1440px)': '81.33px' } },
   { tier: 'semantics', group: 'Grid', new: '--grid-width-column-screen', old: '--layout-width-column-screen', ref: '45.33px', at: { '(min-width: 1024px)': '66.67px', '(min-width: 1440px)': '88px' } },
-  { tier: 'semantics', group: 'Grid', new: '--grid-pad-left-container', old: '--layout-pad-left-container', ref: 'var(--space-050)', at: { '(min-width: 1024px)': 'var(--space-0)' } },
 
   // ─── Semantics / Screen (dissolved from spacing / layout) ────────────
   { tier: 'semantics', group: 'Screen', new: '--screen-width', old: '--layout-width-screen', ref: '768px', at: { '(min-width: 1024px)': '1024px', '(min-width: 1440px)': '1440px' } },
@@ -131,7 +130,7 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Content', new: '--content-max-width', old: '--layout-max-width-content', ref: 'var(--size-7700)' },
   { tier: 'semantics', group: 'Content', new: '--content-max-width-reading', old: '--layout-max-width-reading', ref: 'var(--size-5400)' },
   { tier: 'semantics', group: 'Content', new: '--content-min-width', old: '--layout-min-width-content', ref: 'var(--size-4500)' },
-  { tier: 'semantics', group: 'Content', new: '--content-width', old: '--layout-width-content', ref: '720px', at: { '(min-width: 1024px)': '744px', '(min-width: 1440px)': '1144px' } },
+  { tier: 'semantics', group: 'Content', new: '--content-width', old: '--layout-width-content', ref: '720px', at: { '(min-width: 1024px)': '736px', '(min-width: 1440px)': '1152px' } },
 
   // ─── Semantics / Size (dimension roles; mostly reclassified, + Control) ─
   { tier: 'semantics', group: 'Size', new: '--icon-sm', old: '--icon-sm' },
@@ -163,8 +162,6 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Size', new: '--control-lg', old: '--size-control-lg', ref: 'var(--size-250)' },
 
   // ─── Patterns / Frame (with Topbar and Sidebar) ──────────────────────
-  { tier: 'patterns', group: 'Frame', new: '--frame-pad', old: '--frame-pad' },
-  { tier: 'patterns', group: 'Frame', new: '--frame-stack', old: '--frame-stack' },
   { tier: 'patterns', group: 'Frame', new: '--frame-topbar-height', old: '--layout-height-topbar', ref: 'var(--height-200)' },
   { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-width', old: '--layout-width-sidebar', ref: 'var(--width-1500)' },
   { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-width-nav', old: '--layout-sidebar-width', ref: '164px', note: 'fixed SideNav width (164), distinct from the responsive sidebar above' },
@@ -181,6 +178,11 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Page', new: '--page-stack-md', old: '--page-stack-md' },
   { tier: 'patterns', group: 'Page', new: '--page-stack-lg', old: '--page-stack-lg' },
   { tier: 'patterns', group: 'Page', new: '--page-radius', old: '--page-radius' },
+
+  // ─── Patterns / Panel (the Frame's right-hand area) ──────────────────
+  { tier: 'patterns', group: 'Panel', new: '--panel-min-width', old: null, ref: 'var(--width-2000)', note: 'the narrowest the splitter allows (320)' },
+  { tier: 'patterns', group: 'Panel', new: '--panel-width-default', old: null, ref: 'var(--width-2500)', note: 'the width a Panel opens at (400)' },
+  { tier: 'patterns', group: 'Panel', new: '--panel-max-width', old: null, ref: 'var(--size-4000)', note: 'the widest the splitter allows (640)' },
 
   // ─── Patterns / Section ───────────────────────────────────────────────
   { tier: 'patterns', group: 'Section', new: '--section-pad-x-compact', old: null, value: '--space-100' },

@@ -171,8 +171,6 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --focused-page-stack-lg
 --focused-page-stack-md
 --focused-page-stack-sm
---frame-pad
---frame-stack
 --modal-inline-lg
 --modal-inline-md
 --modal-inline-sm

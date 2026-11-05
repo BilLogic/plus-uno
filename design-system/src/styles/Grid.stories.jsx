@@ -37,7 +37,7 @@ export const GridAnatomy = () => (
                 ))}
             </div>
         </div>
-        <span style={caption}>12 columns · <C>--grid-gutter</C> 16 between them · <C>--page-pad</C> around them, 16 below 1440 and 24 from 1440.</span>
+        <span style={caption}>12 columns · <C>--grid-gutter</C> 16 between them · <C>--page-pad</C> around them, 24 at every width.</span>
     </div>
 );
 

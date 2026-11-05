@@ -197,7 +197,7 @@ function PatternCardRowsDemo() {
     ];
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-300)' }}>
-            {[['Medium', 720], ['Large', 744], ['X-Large', 1144]].map(([mode, width]) => (
+            {[['Medium', 720], ['Large', 736], ['X-Large', 1152]].map(([mode, width]) => (
                 <div key={mode} style={{ overflowX: 'auto' }}>
                     <DemoCaption>{`${mode} · content ${width}`}</DemoCaption>
                     <div
