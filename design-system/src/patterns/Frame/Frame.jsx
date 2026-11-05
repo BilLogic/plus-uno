@@ -7,7 +7,7 @@ import { SidebarControlContext } from './SidebarControl';
 import { PanelControlContext } from './PanelControl';
 import { SplitContext } from './SplitContext';
 import PanelSplitter from './PanelSplitter';
-import { FRAME_LAYOUT, resolveFrameLayout } from './frameLayout';
+import { FRAME_LAYOUT, clamp, resolveFrameLayout } from './frameLayout';
 import './Frame.scss';
 
 /** How long a peek survives the pointer leaving it, so a pass between toggle and panel does not drop it. */
@@ -16,7 +16,7 @@ const PEEK_LEAVE_MS = 200;
 /** The sessionStorage key the Panel's width and open state are kept under, for this tab. */
 export const PANEL_STORAGE_KEY = 'plus-frame-panel';
 
-const clampPanelWidth = (n) => Math.min(FRAME_LAYOUT.panelMax, Math.max(FRAME_LAYOUT.panelMin, n));
+const clampPanelWidth = (n) => clamp(n, FRAME_LAYOUT.panelMin, FRAME_LAYOUT.panelMax);
 
 /** The Panel's remembered `{ open, width }`, or null where there is none or no storage. */
 const readPanelMemory = (key) => {
@@ -189,7 +189,7 @@ const Frame = ({
 
     const narrow = frameWidth < FRAME_LAYOUT.dockMin;
     const panelState = layout.panel;
-    const panelOverlay = panelState === 'overlay';
+    const panelOverlay = layout.blanket;
 
     const docked = hasSidebar && layout.sidebar === 'docked';
     const peeking = hasSidebar && layout.sidebar === 'peeking';
@@ -496,7 +496,7 @@ const Frame = ({
                 {raised ? sidebarPanel(true) : null}
 
                 {/* Covers the Page and the Sidebar, never the Topbar. A press on it closes the Panel. */}
-                {panelShown && panelOverlay ? <div className="plus-frame__blanket" aria-hidden="true" /> : null}
+                {panelShown && layout.blanket ? <div className="plus-frame__blanket" aria-hidden="true" /> : null}
                 {hasPanel && panelPeek && !panelOpen && !panelPeekShown ? (
                     <div className="plus-frame__panel-edge" aria-hidden="true" onPointerEnter={peekPanel} />
                 ) : null}
