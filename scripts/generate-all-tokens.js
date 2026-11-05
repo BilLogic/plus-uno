@@ -827,7 +827,7 @@ function generateFrameLayersSCSS() {
  * sets in Figma. spacing / layout has modes Medium (768px) · Large (1024px) ·
  * X-Large (1440px): the Medium value is in :root, wider modes override below.
  *
- * The derived Layout rows (pad-left-container, width-content, width-column,
+ * The derived Layout rows (width-content, width-column,
  * width-column-screen, width-modal-*) are each mode's value at its screen width, 768 · 1024 · 1440,
  * the same numbers Figma's modes hold. Between those widths they step rather
  * than follow the screen, so code that needs the exact width at any screen

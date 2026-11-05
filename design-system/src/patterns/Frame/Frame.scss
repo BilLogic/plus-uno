@@ -10,14 +10,13 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--frame-stack);
     width: 100%;
     height: 100%;
     min-height: 0;
     box-sizing: border-box;
-    // Pad 8 top, right and bottom and 0 on the left: the Topbar pads its own
-    // left, so the toggle sits at (8, 8) whatever the sidebar is doing.
-    padding: var(--frame-pad) var(--frame-pad) var(--frame-pad) var(--space-0);
+    // No seams: the Page runs to the window edges and meets the Sidebar at a
+    // hairline. The Topbar pads its own start, so the toggle sits 8 from the left, flush to the top
+    // whatever the sidebar is doing.
     background-color: var(--ds-surface-sunken);
     color: var(--ds-text);
 }
@@ -47,36 +46,15 @@
     display: flex;
     flex: 1 1 auto;
     min-height: 0;
-    // 8 while the sidebar is closed, 0 once it docks (the sidebar carries its own).
-    padding-left: var(--grid-pad-left-container);
-}
-
-// The token assumes the width's default; these follow the user's choice instead.
-.plus-frame--docked-narrow .plus-frame__row {
-    padding-left: var(--space-0);
-}
-
-.plus-frame--undocked-wide .plus-frame__row {
-    padding-left: var(--frame-pad);
 }
 
 /* ------------------------------------------------------------- footer */
 
-// A row under the page, padded on the left as the page row is, so what
-// it holds lines up with the page.
+// A row under the page.
 .plus-frame__footer {
     display: flex;
     flex-shrink: 0;
     min-width: 0;
-    padding-left: var(--grid-pad-left-container);
-}
-
-.plus-frame--docked-narrow .plus-frame__footer {
-    padding-left: var(--space-0);
-}
-
-.plus-frame--undocked-wide .plus-frame__footer {
-    padding-left: var(--frame-pad);
 }
 
 /* ------------------------------------------------------------- sidebar */
@@ -96,7 +74,7 @@
 .plus-frame__sidebar--docked {
     position: static;
     flex-shrink: 0;
-    padding: 0 var(--frame-pad);
+    padding: 0 var(--pad-x-sm);
     border-right: var(--stroke-1) solid var(--ds-border);
 }
 
@@ -110,7 +88,7 @@
     bottom: 0;
     left: 0;
     z-index: var(--layer-navigation);
-    padding: var(--frame-pad);
+    padding: var(--pad-x-sm);
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
 }
@@ -126,11 +104,11 @@
 // so a pointer resting in the screen's top-left corner opens nothing.
 .plus-frame__edge {
     position: absolute;
-    top: calc(var(--frame-pad) + var(--frame-topbar-height));
+    top: var(--frame-topbar-height);
     bottom: 0;
     left: 0;
     z-index: calc(var(--layer-navigation) - 1);
-    width: var(--frame-pad);
+    width: var(--pad-x-sm);
 }
 
 /* ------------------------------------------------------------- page */

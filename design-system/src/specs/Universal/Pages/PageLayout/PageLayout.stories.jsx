@@ -111,7 +111,7 @@ export const Overview = {
 
 /**
  * The page sits in `Frame`: a 32 topbar the avatar fits in,
- * the toggle at (8, 8), and the sidebar docked from 1024 and closed below.
+ * the toggle 8 from the left, flush to the top, and the sidebar docked from 1024 and closed below.
  */
 export const Frame = {
     ...Overview,
@@ -123,10 +123,10 @@ export const Frame = {
             const frame = canvasElement.querySelector('.plus-frame');
             const topbar = frame.querySelector('.plus-frame__topbar');
             const toggle = canvas.getByRole('button', { name: /sidebar/i });
-            const pad = tokenLength(frame, '--frame-pad');
+            const pad = tokenLength(frame, '--pad-x-sm');
             await expect(topbar.getBoundingClientRect().height).toBeCloseTo(tokenLength(frame, '--frame-topbar-height'), 0);
             await expect(toggle.getBoundingClientRect().left - frame.getBoundingClientRect().left).toBeCloseTo(pad, 0);
-            await expect(toggle.getBoundingClientRect().top - frame.getBoundingClientRect().top).toBeCloseTo(pad, 0);
+            await expect(toggle.getBoundingClientRect().top - frame.getBoundingClientRect().top).toBeCloseTo(0, 0);
             const avatar = frame.querySelector('.plus-user-avatar');
             await expect(avatar.getBoundingClientRect().height, 'the avatar fits the topbar')
                 .toBeLessThanOrEqual(topbar.getBoundingClientRect().height + 0.5);

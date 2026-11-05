@@ -169,8 +169,7 @@ Card pad of its size: a Section message and File upload take 16.
         { token: '--popover-pad-menu', figma: 'Menu/pad-menu', use: 'The outer box of a menu' },
         { token: '--blanket-pad-x', figma: 'Blanket/pad-x', use: 'The Blanket’s side pad' },
         { token: '--blanket-pad-y', figma: 'Blanket/pad-y', use: 'The Blanket’s top and bottom pad' },
-        { token: '--frame-pad', figma: 'Frame/pad', use: 'The Frame around the Page' },
-        { token: '--page-pad', figma: 'Page/pad', value: '16 · 16 · 24', use: 'Inside the Page, at MD · LG · XL' },
+        { token: '--page-pad', figma: 'Page/pad', value: '24', use: 'Inside the Page, at every width' },
     ]}
 />
 
@@ -234,9 +233,7 @@ the content grid's margin.
 
 <TokenTable
     rows={[
-        { token: '--frame-pad', figma: 'Frame/pad' },
-        { token: '--frame-stack', figma: 'Frame/stack' },
-        { token: '--page-pad', figma: 'Page/pad', value: '16 · 16 · 24', use: 'MD · LG · XL' },
+        { token: '--page-pad', figma: 'Page/pad', value: '24', use: 'Every width' },
         { token: '--page-stack-sm', figma: 'Page/stack-sm' },
         { token: '--page-stack-md', figma: 'Page/stack-md', use: 'Between sections' },
         { token: '--page-stack-lg', figma: 'Page/stack-lg', use: 'Before a new topic' },

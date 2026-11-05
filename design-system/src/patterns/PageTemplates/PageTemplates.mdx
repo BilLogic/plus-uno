@@ -92,7 +92,7 @@ The page carries two grids, and the modal guide marks where a modal sits.
 - **Screen grid** (red in Figma). It lives on Blanket only, so turning the blanket off hides it. A page frame carries only the content grid.
 - **Modal guide** (purple in Figma). It belongs to Modal and shows the modal's width within the screen grid.
 
-The sidebar toggle stays at (8, 8) at every width and in every sidebar state.
+The sidebar toggle stays 8 from the left, flush to the top at every width and in every sidebar state.
 
 </div>
 
@@ -172,7 +172,7 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
     <tbody>
         <tr><td><code>--grid-columns</code></td><td>12</td><td>12</td><td>12</td><td>The column count at every width.</td></tr>
         <tr><td><code>--grid-gutter</code></td><td>16</td><td>16</td><td>16</td><td>The gap between columns, in every grid.</td></tr>
-        <tr><td><code>--grid-width-column</code></td><td>45.33</td><td>47.33</td><td>80.67</td><td>One column of the content grid.</td></tr>
+        <tr><td><code>--grid-width-column</code></td><td>45.33</td><td>46.67</td><td>81.33</td><td>One column of the content grid.</td></tr>
         <tr><td><code>--grid-width-column-screen</code></td><td>45.33</td><td>66.67</td><td>88</td><td>One column of the screen grid.</td></tr>
     </tbody>
 </DocsTable>
@@ -187,7 +187,7 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
         <tr><td><code>--content-max-width</code></td><td>1232</td><td>1232</td><td>1232</td><td>The content cap.</td></tr>
         <tr><td><code>--content-max-width-reading</code></td><td>864</td><td>864</td><td>864</td><td>The reading cap.</td></tr>
         <tr><td><code>--content-min-width</code></td><td>720</td><td>720</td><td>720</td><td>Narrower than this, the page scrolls sideways and the topbar stays.</td></tr>
-        <tr><td><code>--content-width</code></td><td>720</td><td>744</td><td>1144</td><td>The content width at 768, 1024 and 1440. It reaches 1232 from a 1528 screen.</td></tr>
+        <tr><td><code>--content-width</code></td><td>720</td><td>736</td><td>1152</td><td>The content width at 768, 1024 and 1440. It reaches 1232 from a 1520 screen.</td></tr>
     </tbody>
 </DocsTable>
 
@@ -200,10 +200,8 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
     <tbody>
         <tr><td><code>--frame-topbar-height</code></td><td>32</td><td>The topbar row.</td></tr>
         <tr><td><code>--frame-sidebar-width</code></td><td>240</td><td>The sidebar, docked from 1024.</td></tr>
-        <tr><td><code>--frame-pad</code> · <code>--frame-stack</code></td><td>8 · 8</td><td>The frame's pad on top, right and bottom, and the gap between its rows.</td></tr>
-        <tr><td><code>--grid-pad-left-container</code></td><td>8 · 0 from 1024</td><td>The left pad of the page row: 8 while the sidebar floats, 0 once it docks.</td></tr>
-        <tr><td><code>--page-pad</code></td><td>16 · 16 · 24</td><td>The page pad at Medium, Large and X-Large. The grid margin is the same token.</td></tr>
-        <tr><td><code>--page-radius</code></td><td>16</td><td>The page corners.</td></tr>
+        <tr><td><code>--page-pad</code></td><td>24</td><td>The page pad at every width. The grid margin is the same token.</td></tr>
+        <tr><td><code>--page-radius</code></td><td>8</td><td>The page corners.</td></tr>
     </tbody>
 </DocsTable>
 
@@ -250,17 +248,17 @@ The default frame comes with three contents. **Blank** is one empty slot. **Dash
 
 ### Layout modes
 
-The mode is set once, on the template. The frame width follows it through `--screen-width`, and everything inside moves with it. The sidebar docks from Large, the page row's left pad drops to 0, the page pad grows to 24 at X-Large, and the content lands at 720, 744 and 1144.
+The mode is set once, on the template. The frame width follows it through `--screen-width`, and everything inside moves with it. The sidebar docks from Large, the page pad stays 24 at every width, and the content lands at 720, 736 and 1152.
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>Medium, 768.</strong> The sidebar is closed and the content is 720. Two medium cards fit in a row.</>}>
     <ModeFrame storyId="foundations-patterns-page-templates--dashboard" width={768} height={560} title="Dashboard page template at 768" />
 </DocsCanvasShell>
 
-<DocsCanvasShell attachSourceBelow={false} description={<><strong>Large, 1024.</strong> The sidebar docks and the content is 744.</>}>
+<DocsCanvasShell attachSourceBelow={false} description={<><strong>Large, 1024.</strong> The sidebar docks and the content is 736.</>}>
     <ModeFrame storyId="foundations-patterns-page-templates--dashboard" width={1024} height={560} title="Dashboard page template at 1024" />
 </DocsCanvasShell>
 
-<DocsCanvasShell attachSourceBelow={false} description={<><strong>X-Large, 1440.</strong> The page pad is 24 and the content is 1144.</>}>
+<DocsCanvasShell attachSourceBelow={false} description={<><strong>X-Large, 1440.</strong> The page pad is 24 and the content is 1152.</>}>
     <ModeFrame storyId="foundations-patterns-page-templates--dashboard" width={1440} height={640} title="Dashboard page template at 1440" />
 </DocsCanvasShell>
 
@@ -321,11 +319,11 @@ A drawer opens over the page template. The blanket covers the whole frame, the d
 
 ### Usage
 
-- **Two rows.** The topbar runs across the full width, 32 high with no padding of its own. Under it, the sidebar and the page sit 8 apart.
-- **Container pad.** 8 on top, right and bottom. On the left it is 8 while the sidebar floats and 0 once it docks.
+- **Two rows.** The topbar runs across the full width, 32 high with no padding of its own. Under it, the sidebar and the page meet with no gap.
+- **No seams.** The page runs to the window edges. There is no frame pad around it.
 - **Sidebar.** 240 wide, from the screen edge to the page. It docks from 1024.
-- **Page pad.** 16 below 1440 and 24 from 1440. The grid margin is the same token.
-- **Content cap.** 1232. With the sidebar docked it binds from a 1528 screen, and past that the margins grow.
+- **Page pad.** 24 at every width. The grid margin is the same token.
+- **Content cap.** 1232. With the sidebar docked it binds from a 1520 screen, and past that the margins grow.
 - **Content minimum.** 720. Narrower, the page scrolls sideways and the topbar stays.
 - **Set the mode on the template, never inside it.** Sections, Cards and Tables inherit the mode and never carry one of their own.
 
