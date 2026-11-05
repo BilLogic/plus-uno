@@ -1,0 +1,160 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as AiMessageStories from './AiMessage.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={AiMessageStories} />
+
+<Title />
+An assistant reply in the three states it moves through: finished, streaming and
+the typing indicator.
+
+<DocsTabs of={AiMessageStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/AiMessage"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell description={<>A finished reply, as plain text.</>}>
+    <DsCanvasQuiet of={AiMessageStories.Message} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Streaming
+
+<DocsCanvasShell description={<>Text still arriving: a caret follows the last character.</>}>
+    <DsCanvasQuiet of={AiMessageStories.Streaming} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Typing indicator
+
+<DocsCanvasShell description={<>Three pulsing dots before any text exists.</>}>
+    <DsCanvasQuiet of={AiMessageStories.TypingIndicator} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Typed out
+
+<DocsCanvasShell description={<>A finished reply typed out as it arrives.</>}>
+    <DsCanvasQuiet of={AiMessageStories.TypedOut} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## With parts
+
+<DocsCanvasShell description={<>Text parts and a part the caller draws.</>}>
+    <DsCanvasQuiet of={AiMessageStories.WithParts} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={AiMessageStories.Interactive}
+    description={<>Change the status and text in the table below.</>}
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `AiMessage` for every reply an assistant writes: in the AI chat, in a panel,
+anywhere text comes from the model. Show `thinking` from the moment a message is
+sent until the first text arrives, `streaming` while text arrives, then
+`complete`.
+
+<DocsTable>
+    <thead>
+        <tr><th>Prop</th><th>Type</th><th>What it does</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>text</code></td><td>string</td><td>A single text reply.</td></tr>
+        <tr><td><code>parts</code></td><td>array</td><td>Text parts and other parts, in order.</td></tr>
+        <tr><td><code>status</code></td><td>complete | streaming | thinking</td><td>Which state the reply is in.</td></tr>
+        <tr><td><code>typeOut</code></td><td>boolean</td><td>Types a finished text out character by character.</td></tr>
+        <tr><td><code>renderPart</code></td><td>function</td><td>Draws a part that is not text.</td></tr>
+    </tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Show the state, not a blank.
+
+```jsx
+// Incorrect: nothing appears until the whole reply is ready.
+{reply ? <AiMessage text={reply} /> : null}
+
+// Correct: the typing indicator holds the place, then text streams in.
+<AiMessage status={reply ? 'streaming' : 'thinking'} text={reply} />
+```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Busy while arriving.** A streaming message is marked `aria-busy`, so a
+  screen reader waits for the finished text. A typed-out reply carries its full
+  text for assistive technology and hides the character-by-character copy.
+- **Announced indicator.** The typing indicator is a status named "AI is writing";
+  its dots are hidden from assistive technology.
+- **Reduced motion.** The caret and dots stop animating, and typed-out text
+  shows at once.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `AiChat`, which shows every reply in an `AiMessage`.
+- `AiLabel`, which marks content the agent produced.
+- `PromptInput`, which sends the message.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

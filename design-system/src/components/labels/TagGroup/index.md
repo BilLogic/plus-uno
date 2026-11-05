@@ -42,6 +42,6 @@ From `design-system/src/components/labels/TagGroup/TagGroup.scss`. Override thes
 
 ## Related
 
-Same group: `AiLabel` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag`
+Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
