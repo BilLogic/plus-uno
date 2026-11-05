@@ -443,3 +443,42 @@ test('the Overlay screen grid lands on Modal/width-modal-* at 768, 1024 and 1440
     }
   }
 });
+
+const read = (rel) => fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8');
+
+test('the Frame stacks its layers by name: no arithmetic on --layer-navigation and no bare z-index in Frame.scss', () => {
+  const scss = read('design-system/src/patterns/Frame/Frame.scss');
+  assert.doesNotMatch(scss, /calc\(var\(--layer-navigation\)/);
+  assert.doesNotMatch(scss, /z-index:\s*-?\d/);
+});
+
+test('the Frame layer steps are named and ordered edge < Sidebar < Topbar start < Blanket < Panel peek', () => {
+  const order = ['edge', 'sidebar', 'topbar-start', 'blanket', 'panel-peek'].map((n) => `--frame-layer-${n}`);
+  const values = order.map((n) => {
+    const token = corpus.get(n);
+    assert.ok(token, `${n} is not declared`);
+    return token.raw;
+  });
+  assert.equal(values[1], 'var(--layer-navigation)');
+  const nav = parseFloat(corpus.get('--layer-navigation').value);
+  const resolved = values.map((v) => {
+    const step = v.match(/^calc\(var\(--layer-navigation\) ([+-]) (\d+)\)$/);
+    return step ? nav + (step[1] === '-' ? -1 : 1) * Number(step[2]) : nav;
+  });
+  assert.deepEqual(resolved, [...resolved].sort((a, b) => a - b));
+  assert.equal(new Set(resolved).size, resolved.length);
+  assert.ok(corpus.get('--frame-layer-splitter'), 'the splitter layer is named');
+});
+
+test('one hairline token across the Frame: the semantic border width, never the primitive', () => {
+  assert.doesNotMatch(read('design-system/src/patterns/Frame/Frame.scss'), /--stroke-1/);
+});
+
+test('a Section takes its radius from a Section token, not the Card', () => {
+  assert.equal(corpus.get('--section-radius')?.value, corpus.get('--card-radius')?.value);
+  assert.doesNotMatch(read('design-system/src/patterns/PatternSection/PatternSection.scss'), /--card-radius/);
+});
+
+test('the Frame names its server-render width instead of writing 1440 bare', () => {
+  assert.doesNotMatch(read('design-system/src/patterns/Frame/useOwnWidth.js'), /fallback = 1440/);
+});

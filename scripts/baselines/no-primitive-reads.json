@@ -34,7 +34,6 @@
     "design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.scss": 2,
     "design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss": 4,
     "design-system/src/components/text-and-data-display/Table/Table.scss": 2,
-    "design-system/src/patterns/Frame/Frame.scss": 4,
     "design-system/src/patterns/PageTemplates/PageTemplateExamples.jsx": 6,
     "design-system/src/patterns/PatternModal/PatternModal.scss": 1,
     "design-system/src/patterns/PatternSection/PatternSection.scss": 1,

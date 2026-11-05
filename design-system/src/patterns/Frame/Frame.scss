@@ -41,7 +41,7 @@
         position: absolute;
         inset-inline: 0;
         bottom: 0;
-        height: var(--stroke-1);
+        height: var(--border-default);
         background-color: var(--ds-border);
         pointer-events: none;
     }
@@ -53,7 +53,7 @@
 // stacking context, and a z-index inside one would not reach the sidebar.
 .plus-frame__topbar .plus-topbar__start {
     position: relative;
-    z-index: calc(var(--layer-navigation) + 1);
+    z-index: var(--frame-layer-topbar-start);
 }
 
 /* ------------------------------------------------------------- row */
@@ -82,7 +82,7 @@
     position: static;
     flex-shrink: 0;
     padding: 0 var(--pad-x-sm);
-    border-right: var(--stroke-1) solid var(--ds-border);
+    border-right: var(--border-default) solid var(--ds-border);
 }
 
 // Raised (a peek, or an overlay under 1024): over the Page, from the top of the frame, with a shadow and no Blanket.
@@ -94,7 +94,7 @@
     top: 0;
     bottom: 0;
     left: 0;
-    z-index: var(--layer-navigation);
+    z-index: var(--frame-layer-sidebar);
     padding: var(--pad-x-sm);
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
@@ -114,7 +114,7 @@
     top: var(--frame-topbar-height);
     bottom: 0;
     left: 0;
-    z-index: calc(var(--layer-navigation) - 1);
+    z-index: var(--frame-layer-edge);
     width: var(--pad-x-sm);
 }
 
@@ -207,7 +207,7 @@
     top: var(--frame-topbar-height);
     right: 0;
     bottom: 0;
-    z-index: calc(var(--layer-navigation) + 3);
+    z-index: var(--frame-layer-panel-peek);
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
 }
@@ -219,7 +219,7 @@
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: calc(var(--layer-navigation) + 2);
+    z-index: var(--frame-layer-blanket);
     background-color: var(--ds-blanket);
 }
 
@@ -229,7 +229,7 @@
     top: var(--frame-topbar-height);
     right: 0;
     bottom: 0;
-    z-index: calc(var(--layer-navigation) - 1);
+    z-index: var(--frame-layer-edge);
     width: var(--pad-x-sm);
 }
 
@@ -241,7 +241,7 @@
     top: 0;
     bottom: 0;
     inset-inline-start: 0;
-    z-index: 1;
+    z-index: var(--frame-layer-splitter);
     width: var(--pad-x-sm);
     transform: translateX(-50%);
     cursor: col-resize;

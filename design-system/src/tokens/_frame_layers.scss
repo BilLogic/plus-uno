@@ -97,4 +97,10 @@
 
     /* Code only; not Figma variables (CODE_ONLY_FRAME_LAYERS) */
     --popover-offset: var(--space-025); /* gap from a popover to its trigger */
+    --frame-layer-edge: calc(var(--layer-navigation) - 1); /* the hover strips that peek a closed Sidebar or Panel */
+    --frame-layer-sidebar: var(--layer-navigation); /* the raised Sidebar */
+    --frame-layer-topbar-start: calc(var(--layer-navigation) + 1); /* the Topbar start, above a raised Sidebar */
+    --frame-layer-blanket: calc(var(--layer-navigation) + 2); /* the overlay Panel's Blanket */
+    --frame-layer-panel-peek: calc(var(--layer-navigation) + 3); /* a peeking or overlay Panel, above its Blanket */
+    --frame-layer-splitter: 1; /* local to the Panel's own stacking context, not a step on the navigation scale: the splitter's hit strip */
 }

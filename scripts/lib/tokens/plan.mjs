@@ -191,6 +191,7 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Section', new: '--section-pad-y-compact', old: null, value: '--space-100' },
   { tier: 'patterns', group: 'Section', new: '--section-pad-y-default', old: null, value: '--space-150' },
   { tier: 'patterns', group: 'Section', new: '--section-pad-y-spacious', old: null, value: '--space-200' },
+  { tier: 'patterns', group: 'Section', new: '--section-radius', old: null, ref: 'var(--radius-100)', note: 'the rounding of a Section with a fill' },
   { tier: 'patterns', group: 'Section', new: '--section-stack-sm', old: '--section-stack-sm' },
   { tier: 'patterns', group: 'Section', new: '--section-stack-md', old: '--section-stack-md' },
   { tier: 'patterns', group: 'Section', new: '--section-stack-lg', old: '--section-stack-lg' },
