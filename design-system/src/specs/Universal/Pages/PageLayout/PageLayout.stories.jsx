@@ -123,7 +123,7 @@ export const Frame = {
             const frame = canvasElement.querySelector('.plus-frame');
             const topbar = frame.querySelector('.plus-frame__topbar');
             const toggle = canvas.getByRole('button', { name: /sidebar/i });
-            const pad = tokenLength(frame, '--frame-pad');
+            const pad = tokenLength(frame, '--space-050');
             await expect(topbar.getBoundingClientRect().height).toBeCloseTo(tokenLength(frame, '--frame-topbar-height'), 0);
             await expect(toggle.getBoundingClientRect().left - frame.getBoundingClientRect().left).toBeCloseTo(pad, 0);
             await expect(toggle.getBoundingClientRect().top - frame.getBoundingClientRect().top).toBeCloseTo(pad, 0);

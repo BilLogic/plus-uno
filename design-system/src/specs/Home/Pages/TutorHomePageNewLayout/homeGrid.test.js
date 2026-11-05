@@ -5,7 +5,7 @@ import { tokenCorpus } from '@/lib/tokens-node.mjs';
 
 /**
  * The lesson strip's arithmetic at the three content widths the Layout tokens
- * hold: 720 at Medium, 744 at Large (sidebar docked) and 1144 at X-Large. The
+ * hold: 720 at Medium, 736 at Large (sidebar docked) and 1152 at X-Large. The
  * gutter and the card minimum are read from the token corpus. The first test
  * pins the values they read as, so a token change fails here by name.
  */
@@ -20,15 +20,15 @@ const grid = {
 };
 const width = {
     md: px('--content-width'),
-    // Large's content: the screen less the docked sidebar, the frame's right pad and two surface pads.
-    lg: px('--breakpoint-lg-min') - px('--frame-sidebar-width') - px('--frame-pad') - 2 * px('--page-pad'),
+    // Large's content: the screen less the docked sidebar and two Page pads (the Frame has no seams).
+    lg: px('--breakpoint-lg-min') - px('--frame-sidebar-width') - 2 * px('--page-pad'),
     xl: px('--content-width', last),
 };
 
 describe('the grid arithmetic', () => {
     it('reads the decided tokens', () => {
         expect(grid).toEqual({ columns: 12, gutter: 16, cardMin: 304 });
-        expect(width).toEqual({ md: 720, lg: 744, xl: 1144 });
+        expect(width).toEqual({ md: 720, lg: 736, xl: 1152 });
     });
 
     it('covers the content width with 12 columns and 11 gutters', () => {

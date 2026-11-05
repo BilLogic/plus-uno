@@ -45,7 +45,7 @@ screen-grid tokens below to size itself.
 | Token | Value | Description |
 |:---|:---|:---|
 | `--screen-width` | 768 · 1024 · 1440 | The screen each mode is worked at |
-| `--screen-pad-x` | 24 · 24 · 32 | Screen pad, the container pad plus the Page pad |
+| `--screen-pad-x` | 24 · 24 · 32 | Screen pad, a rule of its own so a Modal or Drawer keeps its width when the Page pad changes |
 | `--grid-width-column-screen` | 45.33 · 66.67 · 88 | One screen-grid column |
 
 The grid is `clamp(720, screen − 2 × 24, 1232)` wide: 720 · 976 · 1232 at the
@@ -60,15 +60,16 @@ taken their share. Page content (cards, tables, forms, charts) aligns to it.
 
 | Token | Value | Description |
 |:---|:---|:---|
-| `--content-width` | 720 · 744 · 1144 | Content width at each mode's screen |
-| `--grid-width-column` | 45.33 · 47.33 · 80.67 | One content-grid column |
+| `--content-width` | 720 · 736 · 1152 | Content width at each mode's screen |
+| `--grid-width-column` | 45.33 · 46.67 · 81.33 | One content-grid column |
 | `--content-max-width` / `--content-max-width-reading` | 1232 / 864 | Content cap, centered past it; the reading cap for long-form text |
 | `--content-min-width` | 720 | Content minimum; the Page scrolls sideways under it |
 
 At X-Large the content width is
-`1440 − 240 sidebar, from the screen edge − 8 container pad − 2 × 24 Page pad` = 1144.
-At Medium the sidebar is closed, so the Page starts at the container pad and
-content holds its 720 minimum.
+`1440 − 240 sidebar, from the screen edge − 2 × 24 Page pad` = 1152.
+The Frame has no seams, so nothing else takes a share. At Medium the sidebar is
+closed, so the Page starts at the window edge and content is `768 − 2 × 24` = 720,
+exactly its minimum. The cap of 1232 binds from a 1520 screen with the sidebar docked.
 
 ```css
 /* correct — the content grid from its tokens */
@@ -115,9 +116,12 @@ The `Frame` pattern draws, from the same file:
 |:---|:---|:---|
 | `--frame-topbar-height` | 32 | Topbar height, with no vertical padding; it pads 8 on the left so the toggle sits at (8, 8) |
 | `--frame-sidebar-width` | 240 | Sidebar width; docked from Large, closed below |
-| `--grid-pad-left-container` | 8 · 0 · 0 | Left pad of the sidebar-and-Page row: 8 while the sidebar is closed, 0 once it docks |
-| `--frame-pad` / `--frame-stack` | 8 / 8 | Frame pad and the stack between topbar and row |
-| `--page-pad` | 16 · 16 · 24 | Page pad, the content grid's margin |
+| `--page-pad` | 24 | Page pad at every width, the content grid's margin |
+| `--page-radius` | 8 | Page corner radius |
+| `--panel-min-width` / `--panel-width-default` / `--panel-max-width` | 320 / 400 / 640 | The Panel's width range and the width it opens at |
+
+The Frame has no pad and no stack: the Page runs to the window edges and meets
+the sidebar at a hairline.
 
 ## Ownership layering
 

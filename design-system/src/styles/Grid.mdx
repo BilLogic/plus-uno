@@ -28,7 +28,7 @@ PLUS is desktop only, from 768 up. The screen grid spans the screen and lives on
 
 <Banner appearance="announcement">
 <strong>How the PLUS grid differs from a standard one</strong><br />
-PLUS is desktop only, from 768 up: there are no 2 or 6 column tiers and no mobile size. The gutter is 16 at every width. The page margin is 16 below 1440 and 24 from 1440. The 1232 maximum counts content only, without margins. Layers over the page sit outside the grid; only the Modal and Drawer take their width from the screen grid.
+PLUS is desktop only, from 768 up: there are no 2 or 6 column tiers and no mobile size. The gutter is 16 at every width. The page margin is 24 at every width. The 1232 maximum counts content only, without margins. Layers over the page sit outside the grid; only the Modal and Drawer take their width from the screen grid.
 </Banner>
 
 <Canvas of={GridStories.GridAnatomy} sourceState="none" />
@@ -53,9 +53,9 @@ and the gutter 16 at every width. The sidebar docks from 1024.
 <RefTable
     head={['Mode', 'From', 'Code', 'Sidebar', 'Page pad', 'Content width', 'Column']}
     rows={[
-        ['Medium', '768', <C>--breakpoint-md-min</C>, 'closed', '16', '720', '45.33'],
-        ['Large', '1024', <C>--breakpoint-lg-min</C>, 'docked, 240', '16', '744', '47.33'],
-        ['X-Large', '1440', <C>--breakpoint-xl-min</C>, 'docked, 240', '24', '1144', '80.67'],
+        ['Medium', '768', <C>--breakpoint-md-min</C>, 'closed', '24', '720', '45.33'],
+        ['Large', '1024', <C>--breakpoint-lg-min</C>, 'docked, 240', '24', '736', '46.67'],
+        ['X-Large', '1440', <C>--breakpoint-xl-min</C>, 'docked, 240', '24', '1152', '81.33'],
     ]}
 />
 
@@ -80,7 +80,7 @@ Both grids are 12 columns with a 16 gutter.
 - **The content grid** sits inside the Page, after the sidebar and the
   Page pad take their share. Cards, tables, forms and text blocks align to
   it, and it is the only grid a page frame carries. At X-Large:
-  1440 − 240 sidebar − 8 container pad − 2 × 24 = 1144.
+  1440 − 240 sidebar − 2 × 24 = 1152. The Frame has no seams, so nothing else takes a share.
 
 These tokens change with the screen, so the table gives the value at each
 breakpoint: Medium · Large · X-Large.
@@ -93,11 +93,13 @@ breakpoint: Medium · Large · X-Large.
         { token: '--screen-width', figma: 'Screen/width-screen', value: '768 · 1024 · 1440' },
         { token: '--screen-pad-x', figma: 'Screen/pad-x-screen', value: '24 · 24 · 32' },
         { token: '--grid-width-column-screen', figma: 'Grid/width-column-screen', value: '45.33 · 66.67 · 88' },
-        { token: '--content-width', figma: 'Content/width-content', value: '720 · 744 · 1144' },
-        { token: '--grid-width-column', figma: 'Grid/width-column', value: '45.33 · 47.33 · 80.67' },
-        { token: '--page-pad', figma: 'Page/pad', value: '16 · 16 · 24' },
+        { token: '--content-width', figma: 'Content/width-content', value: '720 · 736 · 1152' },
+        { token: '--grid-width-column', figma: 'Grid/width-column', value: '45.33 · 46.67 · 81.33' },
+        { token: '--page-pad', figma: 'Page/pad', value: '24 · 24 · 24' },
     ]}
 />
+
+The screen pad is its own rule, not the Page pad: it stays 24 · 24 · 32 so a Modal or Drawer keeps its width when the Page pad changes.
 
 </FoundationSection>
 
@@ -125,7 +127,7 @@ Pick one width mode per page and keep it.
 <RefTable
     head={['Mode', 'Width', 'Token', 'Use']}
     rows={[
-        ['Fixed-wide (default)', '1232', <C>--content-max-width</C>, 'Dashboards, directories, tables. Past the cap the content centers; with the sidebar docked, the cap binds from a 1528 screen.'],
+        ['Fixed-wide (default)', '1232', <C>--content-max-width</C>, 'Dashboards, directories, tables. Past the cap the content centers; with the sidebar docked, the cap binds from a 1520 screen.'],
         ['Fixed-narrow', '864', <C>--content-max-width-reading</C>, 'Long-form reading, so lines stay a comfortable length.'],
         ['Fluid', 'no cap', '—', 'Canvases, boards and timelines that grow sideways.'],
         ['Minimum', '720', <C>--content-min-width</C>, 'Narrower than this, the content stays 720 and the page scrolls sideways; the topbar stays put.'],
@@ -144,17 +146,16 @@ row with the sidebar and the Page.
     rows={[
         { token: '--frame-topbar-height', figma: 'Topbar/height-topbar', value: '32 · 32 · 32' },
         { token: '--frame-sidebar-width', figma: 'Sidebar/width-sidebar', value: '240 · 240 · 240' },
-        { token: '--grid-pad-left-container', figma: 'Sidebar/pad-left-container', value: '8 · 0 · 0' },
-        { token: '--page-pad', figma: 'Page/pad', value: '16 · 16 · 24' },
-        { token: '--page-radius', figma: 'Page/radius', value: '16 · 16 · 16' },
+        { token: '--page-pad', figma: 'Page/pad', value: '24 · 24 · 24' },
+        { token: '--page-radius', figma: 'Page/radius', value: '8 · 8 · 8' },
     ]}
 />
 
-The Frame pad and stack are 8. The topbar is 32 with no vertical pad. Below
+The Frame has no seams: the Page runs to the window edges, with no pad or gap around it or between it and the topbar. The topbar is 32 with no vertical pad. Below
 1024 the sidebar opens over the page: 240 wide, full height, with a shadow and
 no Blanket. An outside click closes it, and the page never reflows. The dock is a
 step: at 1023 the content is 975 wide, and at 1024 the sidebar docks and it is
-744, so cards reflow there while modals keep their width.
+736, so cards reflow there while modals keep their width.
 
 </FoundationSection>
 
@@ -167,13 +168,13 @@ A region takes whole columns: span n = n × column + (n − 1) × 16.
 <RefTable
     head={['Span', 'Medium', 'Large', 'X-Large']}
     rows={[
-        ['span 1', '45.33', '47.33', '80.67'],
-        ['span 2', '106.67', '110.67', '177.33'],
-        ['span 3', '168', '174', '274'],
-        ['span 4', '229.33', '237.33', '370.67'],
-        ['span 6', '352', '364', '564'],
-        ['span 8', '474.67', '490.67', '757.33'],
-        ['span 12', '720', '744', '1144'],
+        ['span 1', '45.33', '46.67', '81.33'],
+        ['span 2', '106.67', '109.33', '178.67'],
+        ['span 3', '168', '172', '276'],
+        ['span 4', '229.33', '234.67', '373.33'],
+        ['span 6', '352', '360', '568'],
+        ['span 8', '474.67', '485.33', '762.67'],
+        ['span 12', '720', '736', '1152'],
     ]}
 />
 

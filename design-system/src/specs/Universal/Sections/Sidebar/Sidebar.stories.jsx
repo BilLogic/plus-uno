@@ -30,7 +30,7 @@ const panel = {
     flexDirection: 'column',
     width: 'var(--frame-sidebar-width)',
     boxSizing: 'border-box',
-    padding: 'var(--frame-pad)',
+    padding: 'var(--space-050)',
     backgroundColor: 'var(--ds-surface-sunken)',
 };
 

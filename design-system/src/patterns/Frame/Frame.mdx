@@ -17,22 +17,19 @@ export const propRows = [
     ['className', 'string', 'none', 'An extra class on the frame.', 'none'],
     ['style', 'object', 'none', 'Inline style on the frame.', 'none'],
     ['id', 'string', 'none', 'The frame\'s id.', 'none'],
-    ['footer', 'node', 'none', 'An optional row under the page, 8 below it and lined up with it. A focused page puts its actions here.', 'none'],
+    ['footer', 'node', 'none', 'An optional row directly under the page, with no gap, lined up with it. A focused page puts its actions here.', 'none'],
     ['children', 'node', 'none', 'The content slot. Each child spans all 12 columns unless it sets its own column span.', 'Page content slot'],
 ];
 
 export const tokens = [
-    ['--frame-pad', '8', '8', '8', 'Pads the frame on the top, right and bottom. The left is 0 so the toggle sits at (8, 8) at every width.'],
-    ['--frame-stack', '8', '8', '8', 'The gap between the Topbar row and the Page row.'],
-    ['--grid-pad-left-container', '8', '0', '0', 'The left pad of the Page row: 8 while the sidebar is closed, 0 once it docks.'],
     ['--screen-width', '768', '1024', '1440', 'The page template frame width. Switching the layout mode resizes the frame.'],
-    ['--screen-pad-x', '24', '24', '32', 'Pads the screen. The screen grid is clamp(720, screen minus 2 pads, 1232), centered, and belongs to the Overlay only, not the page grid.'],
+    ['--screen-pad-x', '24', '24', '32', 'Pads the screen, a rule of its own so a Modal does not move when the Page pad does. The screen grid is clamp(720, screen minus 2 pads, 1232), centered, and belongs to the Overlay only, not the page grid.'],
     ['--frame-topbar-height', '32', '32', '32', 'The Topbar height.'],
     ['--frame-sidebar-width', '240', '240', '240', 'The sidebar width, docked or floating.'],
-    ['--page-pad', '16', '16', '24', "The page's pad, which is also the grid margin."],
-    ['--page-radius', '16', '16', '16', "The page's corner radius."],
-    ['--content-width', '720', '744', '1144', 'The content width at each mode, inside the Page pad.'],
-    ['--grid-width-column', '45.33', '47.33', '80.67', 'The width of one content column.'],
+    ['--page-pad', '24', '24', '24', "The page's pad, which is also the grid margin. One value at every width."],
+    ['--page-radius', '8', '8', '8', "The page's corner radius."],
+    ['--content-width', '720', '736', '1152', 'The content width at each mode, inside the Page pad.'],
+    ['--grid-width-column', '45.33', '46.67', '81.33', 'The width of one content column.'],
     ['--grid-columns', '12', '12', '12', 'The columns in the content grid.'],
     ['--grid-gutter', '16', '16', '16', 'The gap between columns.'],
     ['--content-max-width', '1232', '1232', '1232', 'The content cap.'],
@@ -94,7 +91,7 @@ For a whole page with the PLUS Topbar and sidebar already filled in, start from 
 3. **Content** is the slot where Sections go. It is a 12-column grid, centered and capped at 1232.
 4. **Sidebar** is a part. It holds the logo, Home, then the sidebar sections. It docks from 1024 and floats over the page below that.
 
-An optional footer row sits under the page, 8 below it and lined up with it. A focused page puts its actions there.
+An optional footer row sits directly under the page, with no gap, lined up with it. A focused page puts its actions there.
 
 The Topbar, Sidebar and Page have their own pages. This page covers how the frame places them.
 

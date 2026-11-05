@@ -116,7 +116,7 @@ const surfacePad = (surface) => px(getComputedStyle(surface).paddingLeft);
 
 /** The toggle sits at (8, 8) at every width and in every sidebar state. */
 const expectToggleHome = async (frame, toggle) => {
-    const pad = tokenLength(frame, '--frame-pad');
+    const pad = tokenLength(frame, '--space-050');
     const at = offset(frame, toggle);
     await expect(at.x, 'toggle x').toBeCloseTo(pad, 0);
     await expect(at.y, 'toggle y').toBeCloseTo(pad, 0);
@@ -143,11 +143,10 @@ const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
 
 const atViewport = (width, run) => withTestViewport(width, HEIGHT, run);
 
-/** The topbar row and the sidebar-and-surface row stack 8 apart. */
-const expectRowStack = async (frame, surface) => {
+/** No seams: the surface starts where the topbar ends. */
+const expectNoSeam = async (frame, surface) => {
     const topbar = frame.querySelector('.plus-frame__topbar');
-    await expect(rect(surface).top - rect(topbar).bottom, 'stack between the rows')
-        .toBeCloseTo(tokenLength(frame, '--frame-stack'), 0);
+    await expect(rect(surface).top - rect(topbar).bottom, 'no gap between the rows').toBeCloseTo(0, 0);
 };
 
 /* ------------------------------------------------------------- stories */
@@ -258,7 +257,7 @@ export const Floating = {
     },
 };
 
-/** A `footer` is a third row: a stack under the surface, at the container pad from the foot, lined up with the surface. */
+/** A `footer` is a third row: directly under the surface, to the foot of the frame, lined up with the surface. */
 export const WithFooter = {
     parameters: { docs: { disable: true } },
     render: (args) => (
@@ -270,10 +269,8 @@ export const WithFooter = {
         const { frame, surface } = parts(canvasElement);
         const footer = frame.querySelector('.plus-frame__footer');
         await expect(footer, 'the footer row renders').not.toBeNull();
-        await expect(rect(footer).top - rect(surface).bottom, 'a stack under the surface')
-            .toBeCloseTo(tokenLength(frame, '--frame-stack'), 0);
-        await expect(rect(frame).bottom - rect(footer).bottom, 'the container pad below it')
-            .toBeCloseTo(tokenLength(frame, '--frame-pad'), 0);
+        await expect(rect(footer).top - rect(surface).bottom, 'no gap under the surface').toBeCloseTo(0, 0);
+        await expect(rect(frame).bottom - rect(footer).bottom, 'no pad below it').toBeCloseTo(0, 0);
         await expect(rect(footer.firstElementChild).left, 'what it holds lines up with the surface').toBeCloseTo(rect(surface).left, 0);
     }),
 };
@@ -287,12 +284,11 @@ export const Medium768 = {
         await waitFor(() => expect(sidebar(), `closed below 1024 (found ${sidebar()?.className}, viewport ${window.innerWidth})`).toBeNull());
         await expect(toggle).toHaveAttribute('aria-expanded', 'false');
 
-        const pad = tokenLength(frame, '--frame-pad');
-        await expect(offset(frame, surface).x, 'surface starts after the container pad').toBeCloseTo(pad, 0);
+        await expect(offset(frame, surface).x, 'surface starts at the window edge').toBeCloseTo(0, 0);
         await expect(surfacePad(surface), 'surface pad').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
-        await expect(surfacePad(surface), 'surface pad below 1440').toBeCloseTo(tokenLength(frame, '--space-100'), 0);
+        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(tokenLength(frame, '--space-150'), 0);
         await expect(rect(content).width, 'content width').toBeCloseTo(tokenLength(frame, '--content-width'), 0);
-        await expectRowStack(frame, surface);
+        await expectNoSeam(frame, surface);
 
         // Hover the toggle: the sidebar peeks, floating.
         const surfaceLeft = rect(surface).left;
@@ -347,9 +343,9 @@ export const Large1024 = {
         await expect(getComputedStyle(sidebar()).position).toBe('static');
         await expect(offset(frame, surface).x).toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
         await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
-        await expect(surfacePad(surface), 'surface pad below 1440').toBeCloseTo(tokenLength(frame, '--space-100'), 0);
+        await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(tokenLength(frame, '--space-150'), 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-width'), 0);
-        await expectRowStack(frame, surface);
+        await expectNoSeam(frame, surface);
 
         // The sidebar's rows are the 32 item height.
         const tab = within(sidebar()).getAllByRole('button')[0];
@@ -357,8 +353,7 @@ export const Large1024 = {
 
         await userEvent.click(toggle);
         await waitFor(() => expect(sidebar()).toBeNull());
-        await expect(offset(frame, surface).x, 'closed: the surface takes the container pad')
-            .toBeCloseTo(tokenLength(frame, '--frame-pad'), 0);
+        await expect(offset(frame, surface).x, 'closed: the surface runs to the window edge').toBeCloseTo(0, 0);
         await expectToggleHome(frame, toggle);
 
         // Closed at 1024, a hover still peeks without pushing.

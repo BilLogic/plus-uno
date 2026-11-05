@@ -14,14 +14,14 @@
 
 /* ------------------------------------------------------------- start */
 
-// Padded 8 on the left so the toggle sits at the container pad, and 12 on the
+// Padded 8 on the left so the toggle sits at (8, 8), and 12 on the
 // right so the breadcrumb follows the toggle.
 .plus-topbar__start {
     display: flex;
     align-items: center;
     flex-shrink: 0;
     box-sizing: border-box;
-    padding-left: var(--frame-pad);
+    padding-left: var(--pad-x-sm);
     padding-right: var(--inline-lg);
 }
 
