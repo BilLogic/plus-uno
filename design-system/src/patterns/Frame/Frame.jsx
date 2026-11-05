@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { openOverlayCount, subscribeOverlays } from '@/lib/overlay';
 import { PanelHostContext } from '@/components';
@@ -41,10 +41,6 @@ const writePanelMemory = (key, memory) => {
 
 /** Whether focus has nowhere to be: on the body, or on an element that left the page. */
 const focusLost = (doc) => !doc.activeElement || doc.activeElement === doc.body || !doc.activeElement.isConnected;
-
-    }, [ref]);
-    return width;
-};
 
 /**
  * Frame pattern: the app frame, a full-width 32 topbar over a row holding the

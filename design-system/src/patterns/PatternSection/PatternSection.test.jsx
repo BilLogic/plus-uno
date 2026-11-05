@@ -188,3 +188,13 @@ describe('SectionToolbar', () => {
         expect(PatternSection.Toolbar).toBe(SectionToolbar);
     });
 });
+
+describe('PatternSection named', () => {
+    it('is a region named by its title only when asked', () => {
+        const { unmount } = render(<PatternSection title="Flag 1" named>Body</PatternSection>);
+        expect(screen.getByRole('region', { name: 'Flag 1' })).toBeInTheDocument();
+        unmount();
+        render(<PatternSection title="Flag 1">Body</PatternSection>);
+        expect(screen.queryByRole('region')).toBeNull();
+    });
+});
