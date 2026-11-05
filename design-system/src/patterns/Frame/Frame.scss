@@ -181,7 +181,7 @@
     box-sizing: border-box;
     border-inline-start: var(--border-default) solid var(--ds-border);
 
-    // Focus lands here only when what had it left the page; the Panel is not a control, so no ring.
+    // Focus lands here when what had it left the page, or when the Panel turns modal around it; the Panel is not a control, so no ring.
     &:focus {
         @include plus-ring-reset;
     }
@@ -210,6 +210,11 @@
     z-index: var(--frame-layer-panel-peek);
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
+
+    // The ring reset on focus must not take the overlay's shadow with it.
+    &:focus {
+        box-shadow: var(--ds-shadow-overlay);
+    }
 }
 
 // The overlay Panel's Blanket: the Page and the Sidebar, never the Topbar.
@@ -247,4 +252,9 @@
     cursor: col-resize;
     touch-action: none;
     @include plus-state(());
+}
+
+// The Panel's portal node in the row: it draws no box, so the Panel is the row's flex item.
+.plus-frame__panel-host {
+    display: contents;
 }
