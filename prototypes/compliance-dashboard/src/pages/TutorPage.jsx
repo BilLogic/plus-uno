@@ -106,7 +106,7 @@ const TutorPage = ({
                     text={reviewOf(s) === 'Needs verification' ? 'Verify' : 'Open session'}
                     appearance={reviewOf(s) === 'Needs verification' ? 'primary' : 'default'}
                     iconBefore="play"
-                    disabled={!s.transcriptId}
+                    isDisabled={!s.transcriptId}
                     onClick={() => onOpenSession(tutor, s)}
                 />
             ) : (
@@ -119,7 +119,7 @@ const TutorPage = ({
         <div className="cm-stack">
             <div className="cm-tutor-head">
                 <div className="cm-tutor-head__who">
-                    <Avatar name={tutor.name} size={48} />
+                    <Avatar name={tutor.name} size={40} />
                     <div className="cm-tutor-head__text">
                         <div className="cm-row">
                             <StatusTag appearance={STATUS_STYLE[status ?? tutor.status]}>{status ?? tutor.status}</StatusTag>

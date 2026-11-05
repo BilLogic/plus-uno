@@ -119,7 +119,7 @@ const FlagsTab = ({ decisions, relabels = {}, flags = FLAG_INSTANCES, onOpenReco
                         <Button
                             text={f.source === 'supervisor' ? 'Open' : isOpen(f, decisions) ? 'Review' : 'Reopen'}
                             iconAfter="arrow-right"
-                            disabled={!f.moments}
+                            isDisabled={!f.moments}
                             // The list as shown, filters and sort included, becomes the review queue,
                             // so "Submit and next" on the recording page follows this order.
                             onClick={() => onOpenRecording(f, f.category, rows.map((r) => r.id))}

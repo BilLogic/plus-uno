@@ -54,7 +54,7 @@ const AddViolationForm = ({ at, lineText, onAdd, onCancel }) => {
             <div className="cm-submit">
                 <Button
                     text="Add"
-                    disabled={!categoryId}
+                    isDisabled={!categoryId}
                     onClick={() => onAdd({ at, categoryId, note, lineText })}
                 />
                 <Button text="Cancel" appearance="subtle" onClick={onCancel} />
@@ -185,7 +185,7 @@ const RecordingPage = ({
             {saved ? savedMarker('Submitted') : (
                 <Button
                     text={submitLabel()}
-                    disabled={!ready}
+                    isDisabled={!ready}
                     onClick={submit}
                 />
             )}
@@ -313,7 +313,7 @@ const RecordingPage = ({
                                             text="Previous"
                                             appearance="subtle"
                                             iconBefore="arrow-left"
-                                            disabled={flagged.length < 2}
+                                            isDisabled={flagged.length < 2}
                                             onClick={() => goToFlag(current - 1)}
                                         />
                                         <span className="cm-counter">
@@ -324,7 +324,7 @@ const RecordingPage = ({
                                             text="Next"
                                             appearance="subtle"
                                             iconAfter="arrow-right"
-                                            disabled={flagged.length < 2}
+                                            isDisabled={flagged.length < 2}
                                             onClick={() => goToFlag(current + 1)}
                                         />
                                     </div>

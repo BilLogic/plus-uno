@@ -59,7 +59,7 @@ const SessionSearchPage = ({ onOpenSession }) => {
                 <Button
                     text="Open session"
                     iconBefore="play"
-                    disabled={!s.transcriptId}
+                    isDisabled={!s.transcriptId}
                     onClick={() => onOpenSession(s)}
                 />
             ) : (
