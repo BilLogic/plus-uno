@@ -5,6 +5,7 @@
  */
 
 @use '../../styles/surface-edge' as *;
+@use '../../styles/state' as *;
 
 .plus-frame {
     position: relative;
@@ -178,10 +179,11 @@
     width: var(--frame-panel-width, var(--panel-width-default));
     min-height: 0;
     box-sizing: border-box;
-    border-inline-start: var(--stroke-1) solid var(--ds-border);
+    border-inline-start: var(--border-default) solid var(--ds-border);
 
+    // Focus lands here only when what had it left the page; the Panel is not a control, so no ring.
     &:focus {
-        outline: none;
+        @include plus-ring-reset;
     }
 
     > .plus-panel {
@@ -232,40 +234,17 @@
 }
 
 // The splitter: a hit strip centered on the Panel's hairline. It belongs to
-// the Panel, not the Page, so the Page's scroll box never clips its ring.
+// the Panel, not the Page, so the Page's scroll box never clips its ring. The
+// hairline itself is the Panel's edge; the strip draws only the focus ring.
 .plus-frame__splitter {
     position: absolute;
     top: 0;
     bottom: 0;
-    inset-inline-start: calc(var(--stroke-1) * -1);
+    inset-inline-start: 0;
     z-index: 1;
     width: var(--pad-x-sm);
     transform: translateX(-50%);
     cursor: col-resize;
     touch-action: none;
-
-    &::after {
-        content: '';
-        position: absolute;
-        top: 0;
-        bottom: 0;
-        left: 50%;
-        width: var(--stroke-2);
-        transform: translateX(-50%);
-        background-color: transparent;
-    }
-
-    &:hover::after {
-        background-color: var(--ds-border-bold);
-    }
-
-    &:focus {
-        outline: none;
-    }
-
-    &:focus-visible::after,
-    &:active::after {
-        width: var(--focus-ring-width);
-        background-color: var(--ds-border-focused);
-    }
+    @include plus-state(());
 }

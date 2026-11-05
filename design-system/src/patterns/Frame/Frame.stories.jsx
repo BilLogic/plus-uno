@@ -72,6 +72,27 @@ export default {
             description: 'Renders children straight into the surface, with no content box or grid.',
             table: { category: 'Design' },
         },
+        panel: { table: { disable: true } },
+        panelLabel: { control: false, table: { disable: true } },
+        panelOpen: { control: false, table: { disable: true } },
+        onPanelOpenChange: { control: false, table: { disable: true } },
+        panelStorageKey: { control: false, table: { disable: true } },
+        panelDefaultWidth: { control: false, table: { disable: true } },
+        defaultPanelOpen: {
+            control: 'boolean',
+            description: 'Whether the Panel starts open when the tab has nothing remembered.',
+            table: { category: 'Design' },
+        },
+        panelPeek: {
+            control: 'boolean',
+            description: 'Hovering the right edge peeks a closed Panel over the Page, with no Blanket. Off by default.',
+            table: { category: 'Design' },
+        },
+        listDetail: {
+            control: 'boolean',
+            description: 'A List and detail layout is on the Page: the Sidebar collapses first to keep the 960 split.',
+            table: { category: 'Design' },
+        },
         contentAs: { control: false, table: { disable: true } },
         contentClassName: { control: false, table: { disable: true } },
         width: {
@@ -678,6 +699,13 @@ const panelParts = (canvasElement) => {
 const openPanel = async (p) => {
     await userEvent.click(p.canvas.getByRole('button', { name: 'Open chat' }));
     await waitFor(() => expect(p.panel(), 'the Panel opens').not.toBeNull());
+};
+
+/** Docs example: the Panel open, inline at a fixed height. Nothing is remembered, so it always opens. */
+export const DocsPanel = {
+    render: (args) => <WithPanel {...args} height={DOCS_HEIGHT} />,
+    args: { defaultPanelOpen: true, panelStorageKey: null },
+    parameters: { layout: 'padded' },
 };
 
 /** 1440 with a 400 Panel: both fit at the 720 floor, so the Sidebar and the Panel dock, and the Page meets the Panel at a hairline. */
