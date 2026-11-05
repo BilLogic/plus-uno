@@ -53,7 +53,7 @@ The layout holds the split from **960** of Page content. Inside a Frame with `li
 
 - **At 960 or more**, both show. Selecting another record updates the detail in place.
 - **Below 960**, the detail replaces the list and a back link returns to it. With no record open, the list fills the row.
-- **With the Panel open**, pass `listDetail` to the Frame. The Frame collapses the Sidebar first, so the content keeps 960 beside a docked Panel. If it cannot, the split gives way as above.
+- **With the Panel open**, pass `listDetail` to the Frame. The Frame collapses the Sidebar first, so the content keeps 960 beside a docked Panel. If a collapsed Sidebar still leaves under 960, the Panel stays docked and the split gives way as above. While the split holds, dragging the Panel's splitter stops at the width that keeps 960.
 
 <DocsCanvasShell attachSourceBelow description={<>At 1440 with the 400 Panel open, the Sidebar has collapsed and the split holds.</>}>
     <Canvas of={ListDetailStories.WithPanel} story={{ inline: true }} layout="padded" sourceState="hidden" />

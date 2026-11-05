@@ -9,7 +9,7 @@ import { PanelControlContext } from './PanelControl';
 import { SplitContext } from './SplitContext';
 import PanelSplitter from './PanelSplitter';
 import { useOwnWidth } from './useOwnWidth';
-import { FRAME_LAYOUT, clamp, resolveFrameLayout } from './frameLayout';
+import { FRAME_LAYOUT, clamp, dockedPanelMax, resolveFrameLayout } from './frameLayout';
 import './Frame.scss';
 
 /** How long a peek survives the pointer leaving it, so a pass between toggle and panel does not drop it. */
@@ -413,8 +413,9 @@ const Frame = ({
     // As an overlay beside a Sidebar docked by default, the narrowest width
     // stays too wide for the Panel to dock alone, which would collapse it.
     const room = frameWidth - FRAME_LAYOUT.pagePad * 2 - FRAME_LAYOUT.contentFloor;
+    // While a List and detail split holds the floor is 960, so a drag never breaks it.
     const splitterMax = panelState === 'docked'
-        ? clampPanelWidth(room - (layout.sidebar === 'docked' ? FRAME_LAYOUT.sidebarWidth : 0))
+        ? dockedPanelMax({ frameWidth, sidebarDocked: layout.sidebar === 'docked', splitHolds: layout.splitHolds })
         : FRAME_LAYOUT.panelMax;
     const splitterMin = panelState === 'overlay' && layout.sidebar === 'docked' && hand !== true
         ? clampPanelWidth(room + 1)

@@ -15,7 +15,9 @@
  *      if that keeps the floor with the Panel docked.
  *   5. Otherwise the Panel goes to overlay.
  *   6. For List and detail the split holds from 960, met by collapsing the
- *      Sidebar first when the Panel is docked.
+ *      Sidebar first when the Panel is docked. When even a collapsed Sidebar
+ *      leaves under 960 the Panel stays docked and the detail replaces the
+ *      list. While a split holds, the splitter's maximum keeps 960.
  */
 
 // Numbers from the Frame spec. sidebarWidth, pagePad and the three Panel widths
@@ -39,6 +41,17 @@ const padTotal = L.pagePad * 2;
 
 /** The one clamp: the Frame, the splitter and the resolver share it. */
 export const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
+
+/**
+ * The splitter's widest docked Panel: it keeps the 720 content floor beside
+ * whatever is docked now, or 960 while a List and detail split holds, so a
+ * drag never breaks the split.
+ */
+export function dockedPanelMax({ frameWidth, sidebarDocked, splitHolds }) {
+    const floor = splitHolds ? L.splitFloor : L.contentFloor;
+    const room = frameWidth - padTotal - floor - (sidebarDocked ? L.sidebarWidth : 0);
+    return clamp(room, L.panelMin, L.panelMax);
+}
 
 /**
  * @param {object} input
