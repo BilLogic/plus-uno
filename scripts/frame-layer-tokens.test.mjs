@@ -470,8 +470,8 @@ test('the Frame layer steps are named and ordered edge < Sidebar < Topbar start 
   assert.ok(corpus.get('--frame-layer-splitter'), 'the splitter layer is named');
 });
 
-test('one hairline token across the Frame', () => {
-  assert.doesNotMatch(read('design-system/src/patterns/Frame/Frame.scss'), /--border-default/);
+test('one hairline token across the Frame: the semantic border width, never the primitive', () => {
+  assert.doesNotMatch(read('design-system/src/patterns/Frame/Frame.scss'), /--stroke-1/);
 });
 
 test('a Section takes its radius from a Section token, not the Card', () => {

@@ -1,7 +1,7 @@
 import { useLayoutEffect, useState } from 'react';
 
 /** The width assumed when there is no window to measure: the X-Large screen. */
-export const SERVER_RENDER_WIDTH = 1440;
+const SERVER_RENDER_WIDTH = 1440;
 
 /**
  * The width of the box `ref` points at, kept current by a ResizeObserver and

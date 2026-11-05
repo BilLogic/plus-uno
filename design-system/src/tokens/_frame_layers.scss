@@ -102,5 +102,5 @@
     --frame-layer-topbar-start: calc(var(--layer-navigation) + 1); /* the Topbar start, above a raised Sidebar */
     --frame-layer-blanket: calc(var(--layer-navigation) + 2); /* the overlay Panel's Blanket */
     --frame-layer-panel-peek: calc(var(--layer-navigation) + 3); /* a peeking or overlay Panel, above its Blanket */
-    --frame-layer-splitter: 1; /* the splitter's hit strip over the Panel's own content */
+    --frame-layer-splitter: 1; /* local to the Panel's own stacking context, not a step on the navigation scale: the splitter's hit strip */
 }

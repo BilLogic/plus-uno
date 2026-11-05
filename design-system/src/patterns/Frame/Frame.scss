@@ -41,7 +41,7 @@
         position: absolute;
         inset-inline: 0;
         bottom: 0;
-        height: var(--stroke-1);
+        height: var(--border-default);
         background-color: var(--ds-border);
         pointer-events: none;
     }
@@ -82,7 +82,7 @@
     position: static;
     flex-shrink: 0;
     padding: 0 var(--pad-x-sm);
-    border-right: var(--stroke-1) solid var(--ds-border);
+    border-right: var(--border-default) solid var(--ds-border);
 }
 
 // Raised (a peek, or an overlay under 1024): over the Page, from the top of the frame, with a shadow and no Blanket.
@@ -179,7 +179,7 @@
     width: var(--frame-panel-width, var(--panel-width-default));
     min-height: 0;
     box-sizing: border-box;
-    border-inline-start: var(--stroke-1) solid var(--ds-border);
+    border-inline-start: var(--border-default) solid var(--ds-border);
 
     // Focus lands here only when what had it left the page; the Panel is not a control, so no ring.
     &:focus {
