@@ -8,6 +8,11 @@
 
 /* ------------------------------------------------------------- topbar */
 
+// The Frame pads only the topbar's end; Back keeps the same inset at the start.
+.plus-page-layout--focused .plus-frame__topbar {
+    padding-inline-start: var(--pad-x-sm);
+}
+
 .plus-page-focused__topbar {
     display: flex;
     align-items: center;
@@ -41,11 +46,10 @@
 .plus-page-focused__actions-bar {
     position: sticky;
     bottom: 0;
-    z-index: 1;
-    margin-top: auto;
+    // The Page pads its foot; the bar reaches through that pad to the edge.
+    margin-bottom: calc(-1 * var(--page-pad));
     padding-block: var(--focused-page-stack-sm);
     background-color: var(--ds-surface);
-    border-top: var(--stroke-1) solid var(--ds-border);
 }
 
 .plus-page-focused__actions {

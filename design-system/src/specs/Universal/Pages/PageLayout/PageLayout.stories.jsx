@@ -336,7 +336,7 @@ const focusedParts = (canvasElement) => {
 
 /** The focused page at one width: the Frame's own rules, no seams, no footer row, the actions over the content column. */
 const expectFocusedLayout = async (canvasElement, width) => {
-    const { layout, frame, banner, surface, main, actions, canvas } = focusedParts(canvasElement);
+    const { layout, frame, banner, back, surface, main, actions, canvas } = focusedParts(canvasElement);
     const reading = tokenLength(frame, '--content-max-width-reading');
     const minimum = tokenLength(frame, '--content-min-width');
     const surfacePad = tokenLength(frame, '--page-pad');
@@ -347,6 +347,7 @@ const expectFocusedLayout = async (canvasElement, width) => {
     await expect(rect(frame).left, 'no seam at the start').toBeCloseTo(rect(layout).left, 0);
     await expect(rect(frame).right, 'no seam at the end').toBeCloseTo(rect(layout).right, 0);
     await expect(rect(frame).bottom, 'no seam below').toBeCloseTo(rect(layout).bottom, 0);
+    await expect(rect(back).left - rect(frame).left, 'Back keeps the topbar inset').toBeCloseTo(tokenLength(frame, '--pad-x-sm'), 0);
     await expect(rect(surface).left, 'the surface starts at the edge').toBeCloseTo(rect(frame).left, 0);
     await expect(rect(surface).right, 'the surface ends at the edge').toBeCloseTo(rect(frame).right, 0);
     await expect(rect(surface).bottom, 'the surface runs to the foot').toBeCloseTo(rect(frame).bottom, 0);
