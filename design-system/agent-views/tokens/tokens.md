@@ -415,6 +415,9 @@ Use for font sizes, weights, and line heights.
 The Atlassian-shaped color set, generated from a plan into `design-system/src/tokens/color/` with a value per mode (light, dark, and each with increased contrast). Name a token `color.property.role.emphasis.state` without `color.`: `var(--ds-background-brand-bold)`, `var(--ds-text-subtle)`, `var(--ds-border-focused)`. Never write one with a fallback (`check:ds-fallbacks`).
 
 ```css
+--ds-ai-background-bold
+--ds-ai-background-bold-hovered
+--ds-ai-background-bold-pressed
 --ds-background-accent-blue-bolder
 --ds-background-accent-blue-bolder-hovered
 --ds-background-accent-blue-bolder-pressed

@@ -207,6 +207,11 @@ export function buildSemantics(basePalette, atlassian = loadAtlassian()) {
     ['color.border.surface', TRANSPARENT, TRANSPARENT, NA(49), TRANSPARENT,
       "The Surface pattern's 1px edge. Invisible except in light increased contrast, where the sunken frame turns white.",
       'PLUS addition: keeps the frame and the Surface apart when increased contrast removes the tone step.'],
+    ['color.ai.background.bold', N(1000), D(1000), null, null,
+      'Ground of the one primary AI action in a region (Button, AI appearance). Pair its label with color.text.inverse.',
+      'PLUS addition: AI is a register, not a hue, so the ground is neutral ink like neutral.bold until the AI hue is decided; change these three aliases to re-ground every AI action.'],
+    ['color.ai.background.bold.hovered', N(900), D(900), null, null, 'Hovered ground of an AI action.', 'PLUS addition: see color.ai.background.bold.'],
+    ['color.ai.background.bold.pressed', N(800), D(800), null, null, 'Pressed ground of an AI action.', 'PLUS addition: see color.ai.background.bold.'],
   ];
 
   const KEYS = ['light', 'dark', 'lic', 'dic'];

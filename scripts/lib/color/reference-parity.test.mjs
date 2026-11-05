@@ -47,8 +47,8 @@ const values = (rows) => rows.map((r) => Object.fromEntries(VALUE_KEYS.map((k) =
 const withoutProse = (value) =>
   JSON.parse(JSON.stringify(value, (k, v) => (k === 'description' || k === 'use' || k === 'deviation' ? undefined : v)));
 /** Tokens PLUS added after the reference was cut. */
-const PLUS_ONLY_TOKEN = /^color[./]background[./]smart[./][a-z-]+[./]subtle$/;
-const PLUS_ONLY_SCSS_DECL = /^ +--ds-background-smart-[a-z-]+-subtle: [^\n]*\n/gm;
+const PLUS_ONLY_TOKEN = /^color[./]background[./]smart[./][a-z-]+[./]subtle$|^color[./]ai[./]background[./]bold/;
+const PLUS_ONLY_SCSS_DECL = /^ +--ds-(?:background-smart-[a-z-]+-subtle|ai-background-bold[a-z-]*): [^\n]*\n/gm;
 const withoutPlusOnly = (spec) => ({
   ...spec,
   collections: spec.collections.map((c) => ({ ...c, variables: c.variables.filter((v) => !PLUS_ONLY_TOKEN.test(v.name)) })),

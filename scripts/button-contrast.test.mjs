@@ -187,6 +187,6 @@ test('against the real repo, every label clears AA and every appearance draws it
   assert.deepEqual(duplicateGrounds(themes, values), []);
   assert.deepEqual(
     themes.map((theme) => theme.appearance),
-    ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'selected'],
+    ['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'ai', 'selected'],
   );
 });
