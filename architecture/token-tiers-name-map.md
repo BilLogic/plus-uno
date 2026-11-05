@@ -114,6 +114,7 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Section | *(new)* | `--section-pad-y-compact` |  |
 | Section | *(new)* | `--section-pad-y-default` |  |
 | Section | *(new)* | `--section-pad-y-spacious` |  |
+| Section | *(new)* | `--section-radius` | the rounding of a Section with a fill |
 | Section | `--section-stack-sm` | `--section-stack-sm` (reclassified, unchanged) |  |
 | Section | `--section-stack-md` | `--section-stack-md` (reclassified, unchanged) |  |
 | Section | `--section-stack-lg` | `--section-stack-lg` (reclassified, unchanged) |  |

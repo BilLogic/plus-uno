@@ -1,5 +1,8 @@
 import { useLayoutEffect, useState } from 'react';
 
+/** The width assumed when there is no window to measure: the X-Large screen. */
+export const SERVER_RENDER_WIDTH = 1440;
+
 /**
  * The width of the box `ref` points at, kept current by a ResizeObserver and
  * the window's resize event. Frame and List and detail both size themselves
@@ -10,7 +13,7 @@ import { useLayoutEffect, useState } from 'react';
  * @param {number} [fallback] width when there is no window (server render)
  * @returns {number}
  */
-export const useOwnWidth = (ref, fallback = 1440) => {
+export const useOwnWidth = (ref, fallback = SERVER_RENDER_WIDTH) => {
     const [width, setWidth] = useState(() => (typeof window === 'undefined' ? fallback : window.innerWidth));
     useLayoutEffect(() => {
         const read = () => setWidth((last) => ref.current?.getBoundingClientRect().width || last);

@@ -1137,7 +1137,7 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1463,
+    "scssTokenCount": 1470,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 1016,

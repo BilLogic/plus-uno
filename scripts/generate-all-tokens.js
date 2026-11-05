@@ -720,6 +720,14 @@ const CODE_ONLY_FRAME_LAYERS = {
         note: 'gap from a popover to its trigger',
         figmaName: 'Popover/Placement/offset',
     },
+    // The Frame's own stacking steps around the navigation layer, named so
+    // Frame.scss does arithmetic on none of them.
+    'frame-layer-edge': { value: 'calc(var(--layer-navigation) - 1)', note: 'the hover strips that peek a closed Sidebar or Panel', figmaName: 'Layer/frame-edge' },
+    'frame-layer-sidebar': { value: 'var(--layer-navigation)', note: 'the raised Sidebar', figmaName: 'Layer/frame-sidebar' },
+    'frame-layer-topbar-start': { value: 'calc(var(--layer-navigation) + 1)', note: 'the Topbar start, above a raised Sidebar', figmaName: 'Layer/frame-topbar-start' },
+    'frame-layer-blanket': { value: 'calc(var(--layer-navigation) + 2)', note: "the overlay Panel's Blanket", figmaName: 'Layer/frame-blanket' },
+    'frame-layer-panel-peek': { value: 'calc(var(--layer-navigation) + 3)', note: 'a peeking or overlay Panel, above its Blanket', figmaName: 'Layer/frame-panel-peek' },
+    'frame-layer-splitter': { value: '1', note: "the splitter's hit strip over the Panel's own content", figmaName: 'Layer/frame-splitter' },
 };
 
 /**

@@ -413,6 +413,13 @@
           }
         },
         {
+          "name": "Section/radius",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--section-radius)"
+          }
+        },
+        {
           "name": "Card/pad-compact",
           "resolvedType": "FLOAT",
           "codeSyntax": {
