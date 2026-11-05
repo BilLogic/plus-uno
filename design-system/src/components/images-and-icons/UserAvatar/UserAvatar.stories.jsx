@@ -16,13 +16,13 @@ export default {
         type: { control: 'inline-radio', options: ['regular tutor', 'lead tutor', 'admin'], description: 'The user type. `lead tutor` adds the Lead status tag.', table: { category: 'Content' } },
         counter: { control: 'boolean', description: 'Show the notification counter.', table: { category: 'Content' } },
         counterValue: { control: 'number', description: 'The number in the counter.', table: { category: 'Content' } },
-        size: { control: 'inline-radio', options: ['md', 'lg'], description: '`md` is 32 high, for the topbar. `lg` is padded, for table rows.', table: { category: 'Appearance' } },
+        spacing: { control: 'inline-radio', options: ['compact', 'default'], description: '`compact` is 32 high, for the topbar. `default` is padded, for table rows.', table: { category: 'Appearance' } },
         state: { control: 'inline-radio', options: ['enabled', 'hover'], description: 'Forces the hover look, for docs.', table: { category: 'Appearance' } },
         onClick: { control: false, table: { category: 'Events' } },
         id: { control: false, table: { disable: true, category: 'Development' } },
         className: { control: false, table: { disable: true, category: 'Development' } },
     },
-    args: { firstChar: 'J', name: 'John Doe', type: 'regular tutor', counter: true, counterValue: 2, size: 'lg', state: 'enabled' },
+    args: { firstChar: 'J', name: 'John Doe', type: 'regular tutor', counter: true, counterValue: 2, spacing: 'default', state: 'enabled' },
 };
 
 export const Overview = {
@@ -32,10 +32,10 @@ export const Overview = {
     },
 };
 
-export const Sizes = {
+export const Spacing = {
     render: () => (
         <div style={row}>
-            {['md', 'lg'].map((size) => <UserAvatar key={size} size={size} />)}
+            {['compact', 'default'].map((spacing) => <UserAvatar key={spacing} spacing={spacing} />)}
         </div>
     ),
 };

@@ -31,10 +31,10 @@ The signed-in user: an initial pill, the name, a role tag for a lead tutor and a
 
 <div className="sb-ds-doc-section">
 
-## Size
+## Spacing
 
-<DocsCanvasShell description={<>`md` is 32 high for the topbar. `lg` is padded for table rows.</>}>
-    <DsCanvasQuiet of={UserAvatarStories.Sizes} />
+<DocsCanvasShell description={<>`compact` is 32 high for the topbar. `default` is padded for table rows.</>}>
+    <DsCanvasQuiet of={UserAvatarStories.Spacing} />
 </DocsCanvasShell>
 
 </div>
@@ -89,12 +89,12 @@ Use `UserAvatar` for the current user's identity in the topbar or in a row that 
 
 ## Usage notes
 
-### Pick `size` by where it sits.
+### Pick `spacing` by where it sits.
 
-`md` fits the 32 topbar. `lg` fits table rows. The name truncates at the label maximum width and keeps the full name in its `title`.
+`compact` fits the 32 topbar. `default` fits table rows. The name truncates at the label maximum width and keeps the full name in its `title`.
 
 ```jsx
-<UserAvatar size={topbar ? 'md' : 'lg'} name={user.name} firstChar={user.name[0]} type="lead tutor" counterValue={3} />
+<UserAvatar spacing={topbar ? 'compact' : 'default'} name={user.name} firstChar={user.name[0]} type="lead tutor" counterValue={3} />
 ```
 
 ### Pass `onClick` to make it clickable.
