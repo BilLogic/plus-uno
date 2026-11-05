@@ -1,12 +1,12 @@
 {
-  "measured": "2026-11-05",
+  "measured": "2026-11-04",
   "suite": {
-    "storyFiles": 480,
-    "tests": 1885
+    "storyFiles": 475,
+    "tests": 1828
   },
-  "violatingStories": 17,
+  "violatingStories": 18,
   "rules": {
-    "color-contrast": 15,
+    "color-contrast": 16,
     "landmark-no-duplicate-main": 1,
     "landmark-unique": 1,
     "select-name": 1
@@ -32,6 +32,9 @@
       "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/ToggleOrganism/ToggleOrganism.stories.jsx::Overview": [
+      "color-contrast"
+    ],
+    "design-system/src/specs/Toolkit/Pre-Session/Elements/SessionManagementSnackbar.stories.jsx::All Variations": [
       "color-contrast"
     ],
     "design-system/src/specs/Toolkit/Pre-Session/Pages/DeleteSession.stories.jsx::Interactive": [

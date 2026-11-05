@@ -9,7 +9,7 @@ The signed-in user: an initial pill, the name, the role indicator ("Lead") and a
 
 **Source:** `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.stories.jsx` — Overview, Sizes, Types, Counter, Interactive
+**Stories:** `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.stories.jsx` — Overview, Spacing, Types, Counter, Interactive
 
 **Storybook page:** `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.mdx`
 
@@ -23,7 +23,7 @@ The signed-in user: an initial pill, the name, the role indicator ("Lead") and a
 | `counterValue` | number | `2` | The number in the counter. |
 | `state` | enum | `'enabled'` | Forces the hover look, for docs. |
 | `type` | enum | `'regular tutor'` | The user type. `lead tutor` adds the Lead status tag. |
-| `spacing` | enum | `'default'` | `compact` 32 high, for the topbar · `default` the padded row, for tables |
+| `spacing` | enum | `'default'` | `compact` is 32 high, for the topbar. `default` is padded, for table rows. |
 | `id` | string | — | — |
 | `onClick` | func | — | — |
 | `className` | string | `''` | — |
