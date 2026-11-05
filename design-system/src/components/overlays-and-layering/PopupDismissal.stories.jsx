@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import Button from '@/components/forms-and-inputs/Button/Button';
 import Popup from './Popup/Popup';
+import Modal from '@/components/messaging/Modal/Modal';
 
 /**
  * Getting a `Popover` shut again.
@@ -171,4 +172,43 @@ TriggerSemantics.play = async ({ canvasElement }) => {
     await userEvent.keyboard('{Escape}');
     await expectPopoverGone(canvasElement, 'Sessions are scored on the rubric agreed at intake.');
     await waitFor(() => expect(trigger.getAttribute('aria-expanded')).toBe('false'));
+};
+
+/**
+ * A Modal the popup raised does not count as "away".
+ *
+ * The AI chat popup raises a confirm (clear chat). The Modal portals to the
+ * document, outside the popup, so Base UI hears a press in it as an outside
+ * press. The popup stays open under the Modal's Blanket instead.
+ */
+const RaisedModal = () => {
+    const [open, setOpen] = React.useState(false);
+    return (
+        <div style={stack}>
+            <Popup trigger={<Button appearance="primary" text="Chat" />} title="Chat">
+                <Button text="Clear chat" onClick={() => setOpen(true)} />
+            </Popup>
+            <Modal
+                show={open}
+                title="Clear this chat?"
+                body="The popup stays open under this Modal."
+                primaryButton={{ text: 'Done', onClick: () => setOpen(false) }}
+                onClose={() => setOpen(false)}
+            />
+        </div>
+    );
+};
+
+export const StaysOpenUnderModal = () => <RaisedModal />;
+
+StaysOpenUnderModal.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const doc = documentOf(canvasElement);
+    await userEvent.click(canvas.getByRole('button', { name: 'Chat' }));
+    await userEvent.click(await doc.findByRole('button', { name: 'Clear chat' }));
+    await userEvent.click(await doc.findByText('The popup stays open under this Modal.'));
+    await expect(doc.getByRole('button', { name: 'Clear chat', hidden: true }), 'the popup survived a press in the Modal').toBeTruthy();
+    await userEvent.click(doc.getByRole('button', { name: 'Done' }));
+    await waitFor(() => expect(doc.queryByText('The popup stays open under this Modal.')).toBeNull());
+    await expect(doc.getByRole('button', { name: 'Clear chat' }), 'still open after the Modal').toBeTruthy();
 };

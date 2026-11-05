@@ -30,6 +30,12 @@ import { useRef, useState, useLayoutEffect } from 'react';
  *   drawer does not have to sit under the frame in the tree, and a page
  *   should not have to thread a callback from the frame to each one.
  *
+ * - **A Modal never dismisses what raised it.** The Panel and the AI popup
+ *   stay open under a Modal's Blanket. The Panel is excluded in `Frame` by
+ *   the open count; a popup is a Base UI popover that hears a press in the
+ *   Modal as "outside", so it asks `isPressInRaisedOverlay` and keeps
+ *   itself open when the press landed in a Modal or Drawer it sits outside.
+ *
  * `--layout-z-index-*` itself stays in `_layout.scss` — this module
  * coordinates who uses the scale, it does not duplicate its values in JS.
  */
@@ -153,4 +159,22 @@ export function useOverlaySlot(active, onRefused) {
         };
     }, [active]);
     return [placed, trigger];
+}
+
+/**
+ * Whether a press landed inside a Modal or Drawer that the surface owning
+ * `ownerNode` sits outside of: the one case where an "outside press" is not a
+ * dismissal. The AI popup and the Panel stay open under the Blanket of a
+ * Modal they raised, so a click in that Modal must not close them. A surface
+ * that is itself inside the Modal (a popup opened in a dialog) still closes
+ * on a press elsewhere in that dialog.
+ *
+ * @param {EventTarget | null | undefined} target where the press landed
+ * @param {Element | null | undefined} ownerNode the trigger or root of the surface asking
+ * @returns {boolean}
+ */
+export function isPressInRaisedOverlay(target, ownerNode) {
+    const blanket = target?.closest?.('.plus-pattern-blanket');
+    if (!blanket) return false;
+    return !blanket.contains(ownerNode ?? null);
 }
