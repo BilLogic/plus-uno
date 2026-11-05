@@ -24,6 +24,6 @@ A border is a width token paired with a color token. Choose them as a pair.
 
 - **State and emphasis use the whole shape.** Show a selected, active or flagged row, card, banner, quote or nav item with its fill, text, icon or weight, or with a border or ring on every side. A colored stripe on one edge (a left or leading bar) is not part of this system.
 - A card has no border: its edge comes from elevation. A divider is a border, not a component, and space comes first.
-- The docked sidebar has one 1 divider on the edge facing the Page; the topbar has none.
+- The docked sidebar and the topbar have no border; the Page's own edge separates them.
 - Use the selected width only for selection. Selection never rests on color alone.
 - A border that is the only cue for a control's edge reaches 3:1 against its surround.

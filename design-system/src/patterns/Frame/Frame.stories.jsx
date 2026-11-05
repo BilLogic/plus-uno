@@ -643,7 +643,7 @@ export const ModalClosesOverlaySidebarAt768 = {
 
 /**
  * The Panel area: the Frame's right-hand area, under the Topbar. The layout
- * resolver decides whether it docks beside the Page at a hairline or opens
+ * resolver decides whether it docks beside the Page with no line or opens
  * over it on a Blanket. Each story sets the viewport first, then opens the
  * Panel the way a person does, from a button on the Page.
  */
@@ -772,7 +772,7 @@ export const DocsPanel = {
     parameters: { layout: 'padded' },
 };
 
-/** 1440 with a 400 Panel: both fit at the 720 floor, so the Sidebar and the Panel dock, and the Page meets the Panel at a hairline. */
+/** 1440 with a 400 Panel: both fit at the 720 floor, so the Sidebar and the Panel dock, and the Page meets the Panel with no line. */
 export const PanelDockedAt1440 = {
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(1440, async () => {

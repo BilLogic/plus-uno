@@ -99,6 +99,11 @@
     }
 }
 
+// A docked Panel sits on the sunken frame fill, so the bubble lifts to the raised fill to stay visible.
+.plus-frame__panel--docked .plus-ai-chat__message--user {
+    background-color: var(--ds-surface-raised);
+}
+
 .plus-ai-chat__footer {
     display: flex;
     flex-direction: column;
