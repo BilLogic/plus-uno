@@ -11,15 +11,14 @@ import {
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
   "props": {
-    "size": { "type": "enum", "values": ["sm", "md", "lg"] },
-    "density": { "type": "enum", "values": ["sm", "md", "lg"] },
+    "size": { "type": "enum", "values": [32, 40, 48] },
     "frame": { "type": "enum", "values": ["plain", "framed"] },
     "verticalLines": { "type": "boolean" },
     "striped": { "type": "boolean" },
     "hover": { "type": "boolean" },
     "bordered": { "type": "boolean" }
   },
-  "modelNote": "Figma has three table pages under Text and data display: Static table for fixed records, Dynamic table for a table people sort, filter, select, page or act on, and Tree table for rows that nest. Each is a set built from shared _Table parts (head cell, cell, row, footer). This component is the static case, with `headers` + `rows`. Neither the Dynamic nor the Tree table has a component of its own in code (PatternTable carries part of Dynamic table's behavior: the sticky header and column, paging and the empty state), so the three pages are listed here as docs pages, not as sets to write back to. `size`, `density`, `frame`, `verticalLines`, `striped`, `hover` and `bordered` are code-only until a set maps them. The shared `_Table` parts are exported as `TableRow`, `TableCell`, `TableMessageRow`, `TableSummaryRow` and `TableFooter`, and `StaticTable` is this table with no hover.",
+  "modelNote": "Figma has three table pages under Text and data display: Static table for fixed records, Dynamic table for a table people sort, filter, select, page or act on, and Tree table for rows that nest. Each is a set built from shared _Table parts (head cell, cell, row, footer). This component is the static case, with `headers` + `rows`. Neither the Dynamic nor the Tree table has a component of its own in code (PatternTable carries part of Dynamic table's behavior: the sticky header and column, paging and the empty state), so the three pages are listed here as docs pages, not as sets to write back to. `size`, `frame`, `verticalLines`, `striped`, `hover` and `bordered` are code-only until a set maps them. The shared `_Table` parts are exported as `TableRow`, `TableCell`, `TableMessageRow`, `TableSummaryRow` and `TableFooter`, and `StaticTable` is this table with no hover.",
   "sets": [
     {
       "id": "static-table-page",
@@ -59,7 +58,7 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>Default table with hover enabled and medium density.</>}
+    description={<>Default table with hover enabled and 40 rows.</>}
 >
 
 <Canvas of={StaticTableStories.Overview} />
@@ -207,7 +206,7 @@ card. A table people sort, filter, select or page is a Dynamic table.
 ## Usage notes
 
 - **Per-cell control** — pass `{ content, align, emphasis, overflow, secondary, leading, state, loading, colSpan, className }` instead of a bare value. `align` is `text`, `number` or `icon`.
-- **Row size** — `size` (`density` is the older name) is `sm`, `md` or `lg`, at 32, 40 and 48 from the `--size-row-*` tokens. Cell padding is `--size-table-cell-pad-x` and `--size-table-cell-pad-y`.
+- **Row size** — `size` is `32`, `40` or `48` (default 40), from the `--size-row-*` tokens. Cell padding is `--size-table-cell-pad-x` and `--size-table-cell-pad-y`.
 - **Long text** truncates to one line with an ellipsis and shows the full text in a tooltip; pass `overflow: 'wrap'` for a cell that should wrap.
 - **One title column** — `titleColumn` is the index of the column that names the record.
 - **No hover, no sort.** `StaticTable` renders `Table` with `hover` forced off. Nothing in it reaches for the Dynamic table's sorting, selection or paging.

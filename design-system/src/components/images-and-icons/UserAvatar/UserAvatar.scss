@@ -1,6 +1,6 @@
 /**
  * UserAvatar: an initial pill, the name, the role indicator and a counter.
- * `md` is the 32 topbar size; `lg` keeps the original padded table row.
+ * `compact` is the 32 topbar spacing; `default` is the padded table row.
  */
 @use '../../../styles/state' as *;
 
@@ -88,7 +88,7 @@
 
 /* ------------------------------------------------------------- md: 32 high */
 
-.plus-user-avatar--md {
+.plus-user-avatar--compact {
     gap: var(--inline-md);
     height: var(--item-height-md);
     padding: 0 var(--pad-x-sm);

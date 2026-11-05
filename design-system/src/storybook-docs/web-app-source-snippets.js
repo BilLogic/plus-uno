@@ -120,24 +120,6 @@ export const webAppSourceSnippets = {
         '  />',
         '</Collapse>'
     ]),
-    divider: snippet([
-        '<div style={{ width: "100%", maxWidth: "600px" }}>',
-        '  <p className="plus-body-1">Section above</p>',
-        '  <Divider size="md" style="light" />',
-        '  <p className="plus-body-1">Section below</p>',
-        '</div>'
-    ]),
-    dropdown: snippet([
-        '<Dropdown',
-        '  buttonText="Dropdown"',
-        '  style="primary"',
-        '  items={[',
-        '    { text: "Action" },',
-        '    { text: "Another action" },',
-        '    { text: "Something else here" },',
-        '  ]}',
-        '/>'
-    ]),
     jumbotron: snippet([
         '<Jumbotron',
         '  title="Plan your next session"',
@@ -147,13 +129,6 @@ export const webAppSourceSnippets = {
         '    <Button text="Learn more" />',
         '  </>}',
         '/>'
-    ]),
-    listGroup: snippet([
-        '<ListGroup>',
-        '  <ListGroup.Item>List item 1</ListGroup.Item>',
-        '  <ListGroup.Item>List item 2</ListGroup.Item>',
-        '  <ListGroup.Item>List item 3</ListGroup.Item>',
-        '</ListGroup>'
     ]),
     mediaObject: snippet([
         '<MediaObject',
@@ -176,13 +151,6 @@ export const webAppSourceSnippets = {
         '  secondaryButton={{ text: "Secondary" }}',
         '  onClose={() => {}}',
         '/>'
-    ]),
-    navPills: snippet([
-        '<NavPills defaultActiveKey="1">',
-        '  <NavPills.Item eventKey="1">Home</NavPills.Item>',
-        '  <NavPills.Item eventKey="2">Profile</NavPills.Item>',
-        '  <NavPills.Item eventKey="3">Messages</NavPills.Item>',
-        '</NavPills>'
     ]),
     tabs: snippet([
         '<Tabs defaultActiveKey="1">',

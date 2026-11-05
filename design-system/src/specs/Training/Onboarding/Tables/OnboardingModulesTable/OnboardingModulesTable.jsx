@@ -135,7 +135,7 @@ const OnboardingModulesTable = ({
 
                             {/* Progress column */}
                             <td className="onboarding-modules-table__cell onboarding-modules-table__cell--center">
-                                <StatusIndicators stage={module.stage} size="small" />
+                                <StatusIndicators stage={module.stage} size={12} />
                             </td>
 
                             {/* Actions column */}

@@ -13,7 +13,7 @@ const ReadOnlyQuote = ({ children, author, initials, tone = 'teal', date, marker
     <figure className={['tr-quote', className].filter(Boolean).join(' ')}>
         <blockquote className="tr-quote__body">{typeof children === 'string' ? <p>{children}</p> : children}</blockquote>
         <figcaption className="tr-quote__caption">
-            {initials ? <Avatar initials={initials} tone={tone} size="sm" /> : null}
+            {initials ? <Avatar initials={initials} tone={tone} size={24} /> : null}
             <span className="tr-quote__author">{author}</span>
             {date ? <span aria-hidden="true">·</span> : null}
             {date ? <span>{date}</span> : null}

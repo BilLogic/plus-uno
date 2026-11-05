@@ -84,7 +84,7 @@ const LessonsTable = ({
 
         return (
             <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <StatusIndicators stage={stage} size="medium" />
+                <StatusIndicators stage={stage} size={14} />
             </div>
         );
     };

@@ -22,7 +22,7 @@ const LessonsOverviewPage = () => {
                 {/* Filter Bar */}
                 <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
                     <div className="d-flex gap-2">
-                        <Form.Select size="sm" style={{ width: 'auto' }}>
+                        <Form.Select className="form-select-sm" style={{ width: 'auto' }}>
                             <option>All Statuses</option>
                             <option>In Progress</option>
                             <option>Completed</option>
@@ -30,7 +30,7 @@ const LessonsOverviewPage = () => {
                     </div>
                     <div className="d-flex gap-2 align-items-center">
                         <Button spacing="compact" text="Expand All" />
-                        <Form.Select size="sm" style={{ width: 'auto' }}>
+                        <Form.Select className="form-select-sm" style={{ width: 'auto' }}>
                             <option>Sort by Name</option>
                         </Form.Select>
                         <ButtonGroup spacing="compact">
