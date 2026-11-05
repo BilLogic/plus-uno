@@ -8,6 +8,8 @@ import {
     getOverlayPortalRoot,
     overlayMountOf,
     useOverlaySlot,
+    isPressInRaisedOverlay,
+    isOverlayRaisedOver,
 } from './overlay';
 
 const opened = [];
@@ -153,5 +155,59 @@ describe('useOverlaySlot', () => {
         act(() => rerender({ active: false }));
         expect(result.current[0]).toBe(false);
         expect(openOverlayCount()).toBe(0);
+    });
+});
+
+describe('isPressInRaisedOverlay', () => {
+    const build = () => {
+        document.body.innerHTML = `
+            <button id="chat"></button>
+            <div id="popup"><span id="popup-text"></span></div>
+            <div class="plus-pattern-blanket" id="blanket">
+                <div role="dialog"><p id="modal-text"></p><button id="inner"></button></div>
+            </div>
+            <main id="page"></main>`;
+        const el = (id) => document.getElementById(id);
+        return el;
+    };
+    afterEach(() => { document.body.innerHTML = ''; });
+
+    it('is true for a press in a Modal the owner sits outside of', () => {
+        const el = build();
+        expect(isPressInRaisedOverlay(el('modal-text'), el('chat'))).toBe(true);
+        expect(isPressInRaisedOverlay(el('blanket'), el('popup'))).toBe(true);
+    });
+
+    it('is false for a press on the page or in the popup itself', () => {
+        const el = build();
+        expect(isPressInRaisedOverlay(el('page'), el('chat'))).toBe(false);
+        expect(isPressInRaisedOverlay(el('popup-text'), el('chat'))).toBe(false);
+    });
+
+    it('is false when the owner sits inside that same Modal', () => {
+        const el = build();
+        expect(isPressInRaisedOverlay(el('modal-text'), el('inner'))).toBe(false);
+    });
+
+    it('is false without a target, and true in a Modal when there is no owner', () => {
+        const el = build();
+        expect(isPressInRaisedOverlay(null, el('chat'))).toBe(false);
+        expect(isPressInRaisedOverlay(el('modal-text'), null)).toBe(true);
+    });
+});
+
+describe('isOverlayRaisedOver', () => {
+    afterEach(() => { document.body.innerHTML = ''; });
+
+    it('is false with no overlay open', () => {
+        document.body.innerHTML = '<button id="chat"></button>';
+        expect(isOverlayRaisedOver(document.getElementById('chat'))).toBe(false);
+    });
+
+    it('is true for an owner outside the open Modal, false for one inside it', () => {
+        document.body.innerHTML = '<button id="chat"></button><div class="plus-pattern-blanket"><button id="inner"></button></div>';
+        open();
+        expect(isOverlayRaisedOver(document.getElementById('chat'))).toBe(true);
+        expect(isOverlayRaisedOver(document.getElementById('inner'))).toBe(false);
     });
 });
