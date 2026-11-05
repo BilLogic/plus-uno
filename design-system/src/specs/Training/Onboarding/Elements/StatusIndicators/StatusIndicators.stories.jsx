@@ -30,7 +30,7 @@ export default {
         size: {
             control: { type: 'select' },
             options: [12, 14, 18],
-            description: 'Size variant',
+            description: 'Glyph size in pixels',
             table: { category: 'Design' }
         }
     }

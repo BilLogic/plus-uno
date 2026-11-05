@@ -74,7 +74,7 @@ ScaleStartsUnanswered.play = async ({ canvasElement }) => {
     const radios = within(group).getAllByRole('radio');
 
     await expect(radios).toHaveLength(3);
-    // The diblanketinator: the first radio used to arrive checked.
+    // The discriminator: the first radio used to arrive checked.
     await expect(radios.filter((radio) => radio.nextElementSibling.checked)).toHaveLength(0);
 
     // And it still answers when asked to.

@@ -113,7 +113,7 @@ export const Interactive = {
 };
 
 /** `spacing="compact"` is 32 high for the topbar; a lead tutor shows "Lead" in place of the counter. */
-export const Medium32 = {
+export const Compact = {
     render: () => (
         <div className="d-flex flex-column gap-3">
             <UserAvatar spacing="compact" firstChar="J" name="John Doe" type="lead tutor" />
@@ -148,7 +148,7 @@ export const LongName = {
 };
 
 /** The default `lg` row pads around a 32 pill, for tables. */
-export const Large = {
+export const Default = {
     render: () => <UserAvatar firstChar="J" name="John Doe" counter={false} />,
     play: async ({ canvasElement }) => {
         const avatar = canvasElement.querySelector('.plus-user-avatar');

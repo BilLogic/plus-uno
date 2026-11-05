@@ -51,7 +51,7 @@ DisabledSectionsStayShut.play = async ({ canvasElement }) => {
     const open = canvas.getByRole('button', { name: 'Available' });
     const shut = canvas.getByRole('button', { name: 'Unavailable' });
 
-    // The diblanketinator: a real attribute, not a class.
+    // The discriminator: a real attribute, not a class.
     await expect(shut.getAttribute('aria-disabled')).toBe('true');
     await expect(open.getAttribute('aria-disabled')).toBe('false');
 

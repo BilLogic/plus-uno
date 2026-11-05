@@ -220,7 +220,7 @@ Blanket.play = async ({ canvasElement }) => {
     await expect(blanket).not.toBeNull();
     // The blanket's fill is color.blanket, in whichever mode is in force, and nothing else tints it.
     await expect(getComputedStyle(blanket).backgroundColor).toBe(colorOf(doc, '--ds-blanket'));
-    // Atlassian's layers: blanket 500, modal 510. The dialog is the blanket's
+    // The layers: blanket 500, modal 510. The dialog is the blanket's
     // direct child, so it takes the modal layer straight from Blanket's own
     // `> *` rule, with no intermediate wrapper.
     await expect(getComputedStyle(blanket).zIndex).toBe('500');
