@@ -1,24 +1,12 @@
-// The ADS language ratchet, mutation-tested: each rule proven by a fixture that breaks it.
+// The ADS language ban, mutation-tested: each rule proven by a fixture that breaks it.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from 'node:path';
-
-import { BASELINE, measure, run } from './check-ads-language.mjs';
+import { measure, run } from './check-ads-language.mjs';
 
 const src = (file, text) => ({ path: file, text });
 /** A state-step custom property, assembled so this file does not itself carry the old name. */
 const step = (role, n) => `--color-${role}-state-${n}`;
 const countOf = (sources, key) => measure(sources).get(key)?.count;
-
-/** A scratch repo root holding a baseline record of `counts`. */
-function scratch(counts) {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ads-language-'));
-  fs.mkdirSync(path.join(root, path.dirname(BASELINE)), { recursive: true });
-  fs.writeFileSync(path.join(root, BASELINE), JSON.stringify({ why: 'fixture', counts }, null, 2));
-  return root;
-}
 
 test('a state step custom property is counted per line, in the token files too', () => {
   const css = `.a { color: var(${step('primary', '08')}); background: var(${step('danger', '12')}); }\n.b { x: var(${step('primary', '16')}) }\n`;
@@ -71,52 +59,24 @@ test('the allowlist: archive, ADR text and _Avoid_ lines say the old words on pu
   assert.equal(measure([src('design-system/src/G.mdx', '_Avoid_: "scrim", "Rovo"\n')]).size, 0);
 });
 
-test('a state step fails with zero allowed, and a recorded baseline does not excuse it', () => {
-  const root = scratch({ 'state-step design-system/src/A.scss': 1 });
-  const findings = run({ repoRoot: root, sources: [src('design-system/src/A.scss', `.a { c: var(${step('info', '08')}) }`)] });
-  assert.ok(findings.some((f) => /state-step/.test(f.message) && /zero allowed/.test(f.message) && f.line === 1));
-});
-
-test('a fixture with a new state step fails against the baseline', () => {
-  const root = scratch({});
-  const findings = run({ repoRoot: root, sources: [src('design-system/src/A.scss', `.a { c: var(${step('info', '08')}) }`)] });
+test('a state step fails with zero allowed', () => {
+  const findings = run({ sources: [src('design-system/src/A.scss', `.a { c: var(${step('info', '08')}) }`)] });
   assert.equal(findings.length, 1);
   assert.match(findings[0].message, /state-step/);
   assert.equal(findings[0].file, 'design-system/src/A.scss');
   assert.equal(findings[0].line, 1);
 });
 
-test('a count that rises fails, and one that falls passes', () => {
-  const key = 'word:scrim design-system/src/A.scss';
-  const two = '.a { /* scrim */ }\n.b { /* scrim */ }\n';
-  const one = '.a { /* scrim */ }\n';
-  const three = `${two}.c { /* scrim */ }\n`;
-  const root = scratch({ [key]: 2 });
-  assert.deepEqual(run({ repoRoot: root, sources: [src('design-system/src/A.scss', two)] }), []);
-  assert.deepEqual(run({ repoRoot: root, sources: [src('design-system/src/A.scss', one)] }), [], 'lowering a count passes');
-  const rose = run({ repoRoot: root, sources: [src('design-system/src/A.scss', three)] });
-  assert.equal(rose.length, 1);
-  assert.match(rose[0].message, /rose: 3 x word:scrim against a baseline of 2/);
-});
-
-test('a pair that reaches zero is stale until the baseline is regenerated', () => {
-  const root = scratch({ 'word:Rovo design-system/src/A.mdx': 1 });
-  const findings = run({ repoRoot: root, sources: [src('design-system/src/A.mdx', 'PLUS AI')] });
+test('every rule is a hard ban: one hit is one finding, with no baseline to excuse it', () => {
+  const findings = run({ sources: [src('design-system/src/A.scss', '.a { /* scrim */ }\n')] });
   assert.equal(findings.length, 1);
-  assert.match(findings[0].message, /--update/);
+  assert.match(findings[0].message, /word:scrim/);
+  assert.deepEqual(run({ sources: [src('design-system/src/A.scss', '.a { /* blanket */ }\n')] }), []);
 });
 
-test('a missing baseline fails loudly rather than passing', () => {
-  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ads-language-'));
-  const findings = run({ repoRoot: root, sources: [] });
-  assert.equal(findings.length, 1);
-  assert.match(findings[0].message, /no baseline is recorded/);
-});
-
-test('a renamed-with-no-alias component surviving in doc prose fails with zero allowed, even with no baseline entry', () => {
-  const root = scratch({});
+test('a renamed-with-no-alias component surviving in doc prose fails with zero allowed', () => {
   const mdx = '- For something the user only needs to know, use `Toast`.\n';
-  const findings = run({ repoRoot: root, sources: [src('design-system/src/components/loading/Spinner/Spinner.mdx', mdx)] });
+  const findings = run({ sources: [src('design-system/src/components/loading/Spinner/Spinner.mdx', mdx)] });
   assert.ok(findings.some((f) => /stale-name:Toast/.test(f.message) && /renamed with no alias/.test(f.message) && f.line === 1));
 });
 
@@ -125,8 +85,7 @@ test('a renamed-with-no-alias name outside component docs is not flagged', () =>
 });
 
 test('the word Atlassian is zero allowed in MDX, in story doc strings and as a URL, a code comment is not shipped unless it carries a link', () => {
-  const root = scratch({});
-  const hit = (file, text) => run({ repoRoot: root, sources: [src(file, text)] }).filter((f) => /word:Atlassian/.test(f.message));
+  const hit = (file, text) => run({ sources: [src(file, text)] }).filter((f) => /word:Atlassian/.test(f.message));
   assert.equal(hit('design-system/src/patterns/P/P.mdx', 'Atlassian is retiring it.\n')[0]?.line, 1);
   assert.equal(hit('design-system/src/components/B/B.stories.jsx', "x: { summary: 'Props follow Atlassian: `a`' },\n")[0]?.line, 1);
   assert.equal(hit('design-system/src/components/B/B.stories.jsx', "docs: { description: { component: 'Adapted from Atlassian.' } }\n")[0]?.line, 1);
@@ -135,14 +94,19 @@ test('the word Atlassian is zero allowed in MDX, in story doc strings and as a U
 });
 
 test('the named decision records keep their Atlassian citations', () => {
-  const root = scratch({});
   const text = "const a = { why: 'Atlassian’s own answer' }; // https://atlassian.design/x\n";
-  assert.equal(run({ repoRoot: root, sources: [src('design-system/src/styles/Other.stories.jsx', text)] }).length, 1, 'a sibling story is not exempt');
+  assert.equal(run({ sources: [src('design-system/src/styles/Other.stories.jsx', text)] }).length, 1, 'a sibling story is not exempt');
   for (const f of ['TypeScaleCandidates', 'ColorCandidates', 'AiIdentity']) {
-    assert.deepEqual(run({ repoRoot: root, sources: [src(`design-system/src/styles/${f}.stories.jsx`, text)] }), []);
+    assert.deepEqual(run({ sources: [src(`design-system/src/styles/${f}.stories.jsx`, text)] }), []);
   }
 });
 
-test('the live tree holds its own baseline', () => {
+test('the live tree holds no old language', () => {
   assert.deepEqual(run(), []);
+});
+
+test('the token files that define the scrim token may name it, and are still read for every other rule', () => {
+  const file = 'design-system/src/tokens/_colors.scss';
+  assert.deepEqual(run({ sources: [src(file, '--color-scrim: #000;\n')] }), []);
+  assert.equal(run({ sources: [src(file, `--color-scrim: var(${step('info', '08')});\n`)] }).length, 1);
 });

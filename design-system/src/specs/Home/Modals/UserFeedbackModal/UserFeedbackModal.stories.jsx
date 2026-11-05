@@ -54,19 +54,19 @@ export default {
         },
         noOverlay: {
             control: 'boolean',
-            description: 'Render inline without the scrim',
+            description: 'Render inline without the blanket',
             table: { category: 'Behavior' },
         },
         containOverlay: {
             control: 'boolean',
-            description: 'Keep the scrim inside the demo stage',
+            description: 'Keep the blanket inside the demo stage',
             table: { category: 'Behavior' },
         },
     },
 };
 
 /**
- * App chrome + scrim + open problem modal (docs Overview default).
+ * App chrome + blanket + open problem modal (docs Overview default).
  */
 export const Overview = {
     render: () => (

@@ -3,7 +3,7 @@
 
 # UserAvatar
 
-The signed-in user: an initial pill, the name, the role indicator ("Lead") and an optional notification counter. Per the Specs User Avatar (111-227876). - `size="md"` is 32 high (`--item-height-md`), for the 32 topbar. The name truncates at `--label-max-width`. - `size="lg"` pads `--pad-y-md` around a 32 pill, for table rows.
+The signed-in user: an initial pill, the name, the role indicator ("Lead") and an optional notification counter. Per the Specs User Avatar (111-227876). - `spacing="compact"` is 32 high (`--item-height-md`), for the 32 topbar. The name truncates at `--label-max-width`. - `spacing="default"` pads `--pad-y-md` around a 32 pill, for table rows.
 
 **Import:** `import { UserAvatar } from '@/components';`
 
@@ -19,7 +19,7 @@ The signed-in user: an initial pill, the name, the role indicator ("Lead") and a
 | `counterValue` | number | `2` | — |
 | `state` | enum | `'enabled'` | — |
 | `type` | enum | `'regular tutor'` | `lead tutor` shows the "Lead" role indicator; other types show none. |
-| `size` | enum | `'lg'` | `md` 32 high, for the topbar · `lg` the original padded row, for tables |
+| `spacing` | enum | `'default'` | `compact` 32 high, for the topbar · `default` the padded row, for tables |
 | `id` | string | — | — |
 | `onClick` | func | — | — |
 | `className` | string | `''` | — |
@@ -30,7 +30,7 @@ The signed-in user: an initial pill, the name, the role indicator ("Lead") and a
 
 **`type`** — `regular tutor` · `lead tutor` · `admin`
 
-**`size`** — `md` · `lg`
+**`spacing`** — `default` · `compact`
 
 Anything not listed is not a valid value.
 

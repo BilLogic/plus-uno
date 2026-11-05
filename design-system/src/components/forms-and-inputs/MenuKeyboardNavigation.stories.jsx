@@ -69,7 +69,7 @@ export default {
 /**
  * Open, walk, choose — the whole path, with no pointer at any step.
  *
- * The first assertion is the discriminator for the old state: focus inside the
+ * The first assertion is the diblanketinator for the old state: focus inside the
  * tree. Before the fix nothing in the panel could hold it.
  */
 export const OpensAndSelectsFromTheKeyboard = () => {

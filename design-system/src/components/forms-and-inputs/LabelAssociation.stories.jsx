@@ -265,7 +265,7 @@ ForwardedProps.play = async ({ canvasElement }) => {
 
     const group = canvas.getByRole('group', { name: 'Session start' });
 
-    // The discriminator. `null` before #230, because the rest object was
+    // The diblanketinator. `null` before #230, because the rest object was
     // collected and dropped.
     // The caller's id leads; the field's own time zone caption follows it.
     await expect(group.getAttribute('aria-describedby').split(' ')[0]).toBe('fp-starts-error');

@@ -274,7 +274,7 @@ time {
 
 // Bootstrap's layers, on the layer scale
 // Bootstrap's own numbers (dropdown 1000, sticky 1020, fixed 1030, toast 1090,
-// popover 1070, tooltip 1080) sit above a modal's scrim (500). Each moves to
+// popover 1070, tooltip 1080) sit above a modal's blanket (500). Each moves to
 // Atlassian's layer for what it is: a popover is a popup (400), and one opened
 // from a modal mounts inside it and so takes the modal's layer (510). Modal
 // and Flag draw their own overlay/blanket layers directly, with no Bootstrap

@@ -1,7 +1,7 @@
 /**
  * Semantic Spacing Tokens
  * These are the tokens designers and developers should use
- * Organized by component layer: Elements, Cards, Sections, Modals, Surfaces, Surface Containers,
+ * Organized by component layer: Elements, Cards, Sections, Modals, Surfaces, Frames,
  * Table, then the size roles: Icon, Indicator, Control, Row, Media
  */
 
@@ -66,7 +66,7 @@
     --size-surface-radius: var(--size-border-radius-radius-400);
     --size-surface-border: var(--size-border-stroke-stroke-200);
 
-    /* Surface Containers Layer */
+    /* Frames Layer */
     --size-surface-container-pad-x: var(--size-spacing-medium-space-300);
     --size-surface-container-pad-y: var(--size-spacing-medium-space-200);
     --size-surface-container-gap-md: var(--size-spacing-medium-space-300);

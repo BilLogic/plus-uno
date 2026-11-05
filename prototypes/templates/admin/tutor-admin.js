@@ -828,7 +828,7 @@ function showModal(modal) {
     backdrop.style.left = '0';
     backdrop.style.width = '100%';
     backdrop.style.height = '100%';
-    backdrop.style.backgroundColor = 'var(--color-scrim)';
+    backdrop.style.backgroundColor = 'var(--ds-blanket)';
     backdrop.style.zIndex = '1040';
     backdrop.style.display = 'flex';
     backdrop.style.alignItems = 'center';

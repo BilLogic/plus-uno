@@ -12,7 +12,7 @@ import { TimeframeFilter } from '../Elements/Filters/TimeframeFilter.stories';
 // Import Session Detail modals
 import * as SessionDetailsModals from '../Modals/SessionDetailsAllUser/SessionDetails.stories';
 import * as OneTimeAttendeesCompletedModal from '../Modals/SessionDetailsAllUser/OneTimeAttendeesCompleted.stories';
-import { SectionTitle, ModalScrim, MissingModal } from './_pageHelpers';
+import { SectionTitle, ModalBlanket, MissingModal } from './_pageHelpers';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -308,10 +308,10 @@ export const WithModals = (args) => {
                     />
                 </PageLayout>
 
-                {/* Scrim Overlay + Modal */}
-                <ModalScrim open={args.open}>
+                {/* Blanket Overlay + Modal */}
+                <ModalBlanket open={args.open}>
                     {ModalComponent ? <ModalComponent /> : <MissingModal>No modal available for: {sessionType} / {tab} / {sessionStatus}</MissingModal>}
-                </ModalScrim>
+                </ModalBlanket>
             </div>
         </div>
     );

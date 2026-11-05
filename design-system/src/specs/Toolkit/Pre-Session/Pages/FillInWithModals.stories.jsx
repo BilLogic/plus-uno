@@ -8,7 +8,7 @@ import { SiteFilter } from '../Elements/Filters/SiteFilter.stories';
 
 // Import Session Fill-ins modals
 import * as FillInModals from '../Modals/SessionFillIns/SessionFillIns.stories';
-import { SectionTitle, ModalScrim, MissingModal } from './_pageHelpers';
+import { SectionTitle, ModalBlanket, MissingModal } from './_pageHelpers';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -229,10 +229,10 @@ export const WithModals = (args) => {
                     />
                 </PageLayout>
 
-                {/* Scrim Overlay + Modal */}
-                <ModalScrim open={args.open}>
+                {/* Blanket Overlay + Modal */}
+                <ModalBlanket open={args.open}>
                     {ModalComponent ? <ModalComponent /> : <MissingModal>No modal available for: {modalStep}</MissingModal>}
-                </ModalScrim>
+                </ModalBlanket>
             </div>
         </div>
     );

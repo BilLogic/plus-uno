@@ -13,7 +13,7 @@ import { Session_Details_Recurring_Session } from '../Modals/ConfirmSessionAvail
 import { Attendees_One_Time_Session } from '../Modals/ConfirmSessionAvailability/AttendeesOneTimeSession.stories';
 import { Attendees_Recurring_Session } from '../Modals/ConfirmSessionAvailability/AttendeesRecurringSession.stories';
 import { Session_Details_NA } from '../Modals/ConfirmSessionAvailability/SessionDetailsNA.stories';
-import { SectionTitle, ModalScrim, MissingModal } from './_pageHelpers';
+import { SectionTitle, ModalBlanket, MissingModal } from './_pageHelpers';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -232,10 +232,10 @@ export const WithModals = (args) => {
                     />
                 </PageLayout>
 
-                {/* Scrim Overlay + Modal */}
-                <ModalScrim open={args.open}>
+                {/* Blanket Overlay + Modal */}
+                <ModalBlanket open={args.open}>
                     {ModalComponent ? <ModalComponent /> : <MissingModal>No modal available for this selection</MissingModal>}
-                </ModalScrim>
+                </ModalBlanket>
             </div>
         </div>
     );

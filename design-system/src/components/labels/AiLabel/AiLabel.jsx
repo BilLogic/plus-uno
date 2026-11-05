@@ -25,18 +25,16 @@ import './AiLabel.scss';
  * local one.
  *
  * NO BRAND HUE IS PICKED HERE, ON PURPOSE. #269 says the color is Bill's call
- * and this file does not make it. What it does take from Atlassian's Rovo — read
- * from `@atlaskit/tokens` and recorded on #269 — are the three decisions that
- * are NOT about which hue:
+ * and this file does not make it. What it does take from the reference AI identities
+ * studied on #269 are the three decisions that are NOT about which hue:
  *
- *   1. THE BOLD GROUND IS ACHROMATIC. `color.rovo.background.brand.bold` is
- *      #000000. AI is a different REGISTER, not another semantic color
+ *   1. THE BOLD GROUND IS ACHROMATIC. The reference identity's bold ground is #000000. AI is a different REGISTER, not another semantic color
  *      competing with success and danger — so this uses the neutral surface
  *      ramp the system already has, and adding a hue later changes one token.
- *   2. THE ACCENT IS ONLY EVER A BORDER AND AN ICON. Rovo has no `rovo.text`
- *      and no `rovo.background` in its accent hues: the identity marks an edge
+ *   2. THE ACCENT IS ONLY EVER A BORDER AND AN ICON. The reference identity has no accent text
+ *      and no accent background: the identity marks an edge
  *      and a glyph, it never floods a surface. So does this.
- *   3. LOW CONFIDENCE IS A STATE, NOT A FOOTNOTE. Rovo's voice guidance is
+ *   3. LOW CONFIDENCE IS A STATE, NOT A FOOTNOTE. The reference voice guidance is
  *      explicit that the system must "define… what happens when confidence is
  *      low", so `confidence="low"` is part of the API and carries a required
  *      note rather than being left to each caller's prose.
@@ -124,7 +122,7 @@ export const AiLabel = ({
                       * The note is REQUIRED by propTypes when confidence is low,
                       * and defaulted here as well: a low-confidence mark with no
                       * advice is a warning with no instruction, which is the
-                      * thing #269 quotes Rovo's guidance against.
+                      * thing #269 quotes the reference guidance against.
                       */}
                     {note ?? 'Check this before relying on it'}
                 </span>

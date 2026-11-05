@@ -50,7 +50,7 @@ export default {
 /**
  * The state, and the single tab stop that comes with the role.
  *
- * The discriminator is `aria-checked` on exactly one item. Before the fix every
+ * The diblanketinator is `aria-checked` on exactly one item. Before the fix every
  * item was a button and none of them carried it, so the whole group answered
  * "which one is chosen?" with silence.
  */
@@ -147,7 +147,7 @@ DisabledStaysAnnounced.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const group = canvas.getByRole('radiogroup', { name: 'Session rating' });
 
-    // Still five radios — the discriminator. `getAllByRole` threw here before.
+    // Still five radios — the diblanketinator. `getAllByRole` threw here before.
     const radios = within(group).getAllByRole('radio');
     await expect(radios).toHaveLength(5);
 
