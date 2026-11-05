@@ -94,7 +94,7 @@ Use `UserAvatar` for the current user's identity in the topbar or in a row that 
 `md` fits the 32 topbar. `lg` fits table rows. The name truncates at the label maximum width and keeps the full name in its `title`.
 
 ```jsx
-<UserAvatar size="md" name={user.name} firstChar={user.name[0]} type="lead tutor" counterValue={3} />
+<UserAvatar size={topbar ? 'md' : 'lg'} name={user.name} firstChar={user.name[0]} type="lead tutor" counterValue={3} />
 ```
 
 ### Pass `onClick` to make it clickable.

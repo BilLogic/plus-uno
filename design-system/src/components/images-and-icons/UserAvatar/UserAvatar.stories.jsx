@@ -35,8 +35,7 @@ export const Overview = {
 export const Sizes = {
     render: () => (
         <div style={row}>
-            <UserAvatar size="md" />
-            <UserAvatar size="lg" />
+            {['md', 'lg'].map((size) => <UserAvatar key={size} size={size} />)}
         </div>
     ),
 };
