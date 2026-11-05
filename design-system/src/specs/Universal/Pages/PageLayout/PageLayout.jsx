@@ -2,7 +2,7 @@
  * PageLayout Component
  *
  * The app frame every spec page is laid out in: the Frame pattern
- * (32 topbar, 240 sidebar docking from 1024, the surface and its 12-column
+ * (48 topbar, 240 sidebar docking from 1024, the surface and its 12-column
  * content grid) filled with the PLUS TopBar and Sidebar. The frame's sizes and
  * the sidebar's dock, peek and float behavior live in Frame; this
  * component supplies the content and the page outline.
@@ -48,8 +48,8 @@ const PAGE_TITLE_STYLE = {
  * `_Focused footer`, here the actions at the foot of the Page.
  *
  * - The Frame with no sidebar and the Frame's own edges: no seams on any side,
- *   no gap under the topbar, the hairline kept, and no footer row.
- * - Topbar (a `header`, the banner), 32 high: Back, a secondary text button
+ *   no gap under the topbar, the topbar without a border, and no footer row.
+ * - Topbar (a `header`, the banner), 48 high: Back, a secondary text button
  *   with `arrow-left`; the title, the page's one visible `h1` at Heading/xsmall,
  *   on one line and truncated; Close, the `CloseButton`; `--focused-page-inline-md`
  *   12 apart.

@@ -55,7 +55,7 @@ export const colorTokens = [
     ['--ds-surface-sunken', 'The frame\'s fill.'],
     ['--ds-surface', 'The page\'s fill.'],
     ['--ds-border-surface', 'The page\'s edge ring. Transparent, except in light increased contrast, where the frame turns white and the page needs a line to stand on.'],
-    ['--ds-border', 'The Panel\'s hairline. The Topbar and a docked Sidebar have no border; the Page\'s own edge separates them.'],
+    ['--ds-surface-sunken', 'The frame fill, which the Topbar, a docked Sidebar and a docked Panel sit on. None of them has a border.'],
     ['--ds-surface-overlay', 'The fill of a peeking or overlay Sidebar, and of an overlay or peeking Panel.'],
     ['--ds-shadow-overlay', 'The shadow of a peeking or overlay Sidebar, and of an overlay or peeking Panel.'],
     ['--ds-blanket', 'The Blanket under an overlay Panel. It covers the Page and the Sidebar, never the Topbar.'],
@@ -63,7 +63,7 @@ export const colorTokens = [
 ];
 
 <Title>Frame</Title>
-Frame is the app frame: a full-width Topbar above a row that holds the Sidebar, the Page and the Panel. It has no seams: the Page runs to the window edges and meets the Panel at a hairline and the Sidebar with no divider. Every value is a token, and values read Medium, Large and X-Large where the layout mode changes them.
+Frame is the app frame: a full-width Topbar above a row that holds the Sidebar, the Page and the Panel. It has no seams: the Page runs to the window edges and meets the Sidebar and the Panel with no line between them: zoning is by background color, never lines. Every value is a token, and values read Medium, Large and X-Large where the layout mode changes them.
 
 The examples on this page follow the **Color mode** switch in the toolbar.
 
@@ -102,7 +102,7 @@ For a whole page with the PLUS Topbar and sidebar already filled in, start from 
 2. **Page** is a part. It is the content box on `--ds-surface`, starting right under the Topbar and running to the window edges. Its top-left corner is rounded only while the Sidebar is docked, and the corner switches in the same frame as the Sidebar's width.
 3. **Content** is the slot where Sections go. It is a 12-column grid, centered and capped at 1232.
 4. **Sidebar** is a part. It holds the logo, Home, then the Sidebar sections. It docks from 1024 and never docks below that.
-5. **Panel** is an area on the right, under the Topbar, holding AI chat first. It is filled with the Panel parts (`PanelContainer`, header, body, footer). Its splitter sits on its left hairline.
+5. **Panel** is an area on the right, under the Topbar, holding AI chat first. It is filled with the Panel parts (`PanelContainer`, header, body, footer). Its splitter sits on its left edge, with no line.
 
 There is no footer row. A page that needs actions at its foot places them inside the Page.
 
@@ -240,7 +240,7 @@ The Panel opens from anything inside the Frame through `usePanelControl()`. The 
 - Under 1024 the Panel is an overlay 320 wide, and only one overlay is open at a time: opening the Sidebar closes the Panel, and opening the Panel closes the Sidebar. Under 768 the Panel is full width.
 - With `listDetail`, the Sidebar collapses first so the list and the detail keep 960 side by side.
 
-Docked, the Panel is the Page's white and meets the Page at a hairline. Its splitter resizes it from 320 to 640, but never past what keeps 720 beside a docked Sidebar: a drag resists past the limit and springs back, and it never collapses the Sidebar. The width and whether the Panel is open are kept for the tab in sessionStorage. A modal leaves the Panel open under its Blanket. The `panelPeek` option, off by default, peeks a closed Panel when a pointer rests on the right edge, with no Blanket.
+Docked, the Panel sits on the frame fill beside the Page, with no line between them, and the Page rounds its top-right corner. Its splitter resizes it from 320 to 640, but never past what keeps 720 beside a docked Sidebar: a drag resists past the limit and springs back, and it never collapses the Sidebar. The width and whether the Panel is open are kept for the tab in sessionStorage. A modal leaves the Panel open under its Blanket. The `panelPeek` option, off by default, peeks a closed Panel when a pointer rests on the right edge, with no Blanket.
 
 <DocsCanvasShell description={<>The Panel open at the docs page's width. Wide enough, it docks beside the Page; narrower, it opens on a Blanket.</>}>
     <Canvas of={FrameStories.DocsPanel} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -273,7 +273,9 @@ Use the reading width for long text. The content caps at 864 instead of 1232 and
 - Docked or peeking, the Panel is a complementary landmark named by `panelLabel`, after the Page in reading order, and it leaves focus where it is. When opening it collapses the Sidebar that held focus, focus moves into the Panel; closing it returns focus to what opened it.
 - As an overlay, the Panel is a modal dialog named by `panelLabel`. Opening it moves focus to its first control and Tab stays inside it; the Page and the Sidebar under the Blanket are inert, so a keyboard or screen reader cannot reach what a pointer cannot. Closing it, by Escape, a press on the Blanket or its Close button, returns focus to what opened it.
 - The splitter is a vertical separator named "Resize panel" that reports its width as its value. The left arrow widens the Panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
-- The Panel's edge is `--ds-border`. The Topbar and a docked Sidebar have no border.
+- No border anywhere in the Frame: the Topbar, a docked Sidebar and a docked Panel have none.
+- The Page's corners follow the state, at `--page-radius` (8): top-left rounds while the Sidebar is docked and is square when it is collapsed or raised; top-right rounds while the Panel is docked and is square otherwise. A raised Sidebar (a peek or an overlay) leaves the Page square and rounds its own top-right and bottom-right corners, with its shadow. The corners switch in the same frame as the width change.
+- Padding: the Topbar is a 32 row padded 8 above and below, 8 on the left and 8 on the right, so the avatar is never flush. The Sidebar pads 8 on all sides, with its items 4 apart.
 - In light increased contrast the page draws its edge ring in `--ds-border-surface`, so it stays distinct from the frame behind it.
 
 </div>

@@ -120,11 +120,11 @@ The `Frame` pattern draws, from the same file:
 | `--frame-topbar-height` | 48 | Topbar height: a 32 row padded 8 above and below (`--pad-y-lg`); it pads 8 on the left, so the toggle sits at (8, 8) |
 | `--frame-sidebar-width` | 240 | Sidebar width; docked from Large, closed below |
 | `--page-pad` | 24 | Page pad at every width, the content grid's margin |
-| `--page-radius` | 8 | Page corner radius |
+| `--page-radius` | 8 | Page corner radius: top-left while the Sidebar is docked, top-right while the Panel is docked, square otherwise; a raised Sidebar rounds its own right corners |
 | `--panel-min-width` / `--panel-width-default` / `--panel-max-width` | 320 / 400 / 640 | The Panel's width range and the width it opens at |
 
 The Frame has no pad and no stack: the Page runs to the window edges and meets
-the sidebar at a hairline.
+the sidebar and the Panel with no line: zoning is by background color. The Topbar is a 32 row padded 8 on every side and the Sidebar pads 8 on every side.
 
 ## Ownership layering
 

@@ -156,6 +156,12 @@ const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
     // Below the topbar, like the Panel and its Blanket: the topbar row stays clear.
     await expect(rect(aside).top, 'the raised sidebar starts under the topbar').toBeCloseTo(rect(frame.querySelector('.plus-frame__topbar')).bottom, 0);
     await expect(rect(aside).bottom, 'the raised sidebar runs to the foot').toBeCloseTo(rect(frame).bottom, 0);
+    // A floating layer: it rounds its own right corners, and the Page stays square behind it.
+    const radius = tokenLength(frame, '--page-radius');
+    await expect(px(getComputedStyle(aside).borderTopRightRadius), 'raised: top-right rounded').toBeCloseTo(radius, 0);
+    await expect(px(getComputedStyle(aside).borderBottomRightRadius), 'raised: bottom-right rounded').toBeCloseTo(radius, 0);
+    await expect(px(getComputedStyle(aside).borderTopLeftRadius), 'raised: left corners square').toBeCloseTo(0, 0);
+    await expectCorner(frame, surface, false);
     await expect(rect(surface).left, 'the surface did not move').toBeCloseTo(surfaceLeftBefore, 0);
     // No Blanket: a point on the page beside the sidebar still hits the page.
     const s = rect(surface);
@@ -180,12 +186,15 @@ const expectNoSeam = async (frame, surface) => {
     await expect(px(getComputedStyle(topbar).paddingRight), 'the topbar pads its end').toBeCloseTo(tokenLength(frame, '--pad-x-sm'), 0);
 };
 
-/** The Page's top-left corner: rounded (`--page-radius`) while docked, square otherwise; the other three never round. */
-const expectCorner = async (frame, surface, rounded) => {
+/**
+ * The Page's corners by state: top-left rounds (`--page-radius`) only while the
+ * Sidebar is docked, top-right only while the Panel is docked; the bottom two never round.
+ */
+const expectCorner = async (frame, surface, topLeft, topRight = false) => {
     const style = getComputedStyle(surface);
-    const radius = rounded ? tokenLength(frame, '--page-radius') : 0;
-    await expect(px(style.borderTopLeftRadius), rounded ? 'top-left is rounded while docked' : 'top-left is square when not docked').toBeCloseTo(radius, 0);
-    await expect(px(style.borderTopRightRadius), 'top-right is square').toBeCloseTo(0, 0);
+    const radius = tokenLength(frame, '--page-radius');
+    await expect(px(style.borderTopLeftRadius), topLeft ? 'top-left is rounded while the Sidebar is docked' : 'top-left is square when the Sidebar is not docked').toBeCloseTo(topLeft ? radius : 0, 0);
+    await expect(px(style.borderTopRightRadius), topRight ? 'top-right is rounded while the Panel is docked' : 'top-right is square when the Panel is not docked').toBeCloseTo(topRight ? radius : 0, 0);
     await expect(px(style.borderBottomRightRadius), 'bottom-right is square').toBeCloseTo(0, 0);
     await expect(px(style.borderBottomLeftRadius), 'bottom-left is square').toBeCloseTo(0, 0);
 };
@@ -430,6 +439,9 @@ export const SidebarMeetsPage = {
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expect(rect(sidebar()).right, 'no gap between the Sidebar and the Page').toBeCloseTo(rect(surface).left, 0);
         await expect(px(getComputedStyle(sidebar()).borderRightWidth), 'no divider').toBeCloseTo(0, 0);
+        await expect(px(getComputedStyle(sidebar()).paddingTop), 'the Sidebar pads 8 at the top').toBeCloseTo(tokenLength(frame, '--pad-y-lg'), 0);
+        await expect(px(getComputedStyle(sidebar()).paddingLeft), 'and 8 at the sides').toBeCloseTo(tokenLength(frame, '--pad-x-sm'), 0);
+        await expect(px(getComputedStyle(sidebar()).paddingBottom), 'and 8 at the foot').toBeCloseTo(tokenLength(frame, '--pad-y-lg'), 0);
         await expectNoSeam(frame, surface);
     }),
 };
@@ -775,8 +787,9 @@ export const PanelDockedAt1440 = {
         await expect(rect(panel).right, 'flush to the window edge').toBeCloseTo(rect(p.frame).right, 0);
         await expect(rect(panel).top, 'under the Topbar').toBeCloseTo(rect(p.frame.querySelector('.plus-frame__topbar')).bottom, 0);
         await expect(rect(p.surface).right, 'the Page meets the Panel').toBeCloseTo(rect(panel).left, 0);
-        await expect(px(getComputedStyle(panel).borderLeftWidth), 'at a hairline').toBeCloseTo(tokenLength(p.frame, '--stroke-1'), 1);
-        await expect(getComputedStyle(panel).backgroundColor, 'docked, the Panel is the Page fill').toBe(tokenColor(p.frame, '--ds-surface'));
+        await expect(px(getComputedStyle(panel).borderLeftWidth), 'no line between the Page and the Panel').toBeCloseTo(0, 0);
+        await expect(getComputedStyle(panel).backgroundColor, 'docked, the Panel is the frame fill').toBe(tokenColor(p.frame, '--ds-surface-sunken'));
+        await expectCorner(p.frame, p.surface, true, true);
         await expect(p.sidebar(), 'the Sidebar stays docked').not.toBeNull();
         await expect(rect(p.content).width, 'content 1440 - 240 - 400 - 48').toBeCloseTo(752, 0);
         await expect(p.blanket(), 'docked has no Blanket').toBeNull();
@@ -823,7 +836,7 @@ export const PanelAutoCollapsesSidebarAt1200 = {
         await expect(getComputedStyle(p.panel()).position).not.toBe('absolute');
         await expect(offset(p.frame, p.surface).x, 'the Page runs to the left edge').toBeCloseTo(0, 0);
         await expect(rect(p.content).width, '1200 - 400 - 48').toBeCloseTo(752, 0);
-        await expectCorner(p.frame, p.surface, false);
+        await expectCorner(p.frame, p.surface, false, true);
         await expect(p.toggle).toHaveAttribute('aria-expanded', 'false');
 
         await userEvent.click(within(p.panel()).getByRole('button', { name: 'Close' }));

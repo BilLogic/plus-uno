@@ -19,7 +19,7 @@ export const propRows = [
 
 export const tokens = [
     ['--frame-topbar-height', '48', 'The bar height: a 32 row padded 8 above and below.'],
-    ['--pad-y-lg', '8', 'The bar\'s top and bottom pad, so the toggle sits at (8, 8).'],
+    ['--pad-y-lg', '8', 'The bar\'s top and bottom pad, so the toggle sits at (8, 8) and the avatar has 8 above and below.'],
     ['--frame-sidebar-width', '240', 'The start area\'s width while the sidebar is docked, so the breadcrumb lines up with the Page.'],
     ['--pad-x-sm', '8', 'The left pad of the start area, so the toggle sits 8 from the left.'],
     ['--inline-lg', '12', 'The right pad of the start area, the left pad of the end area, and the gap between Help Center and the avatar.'],
@@ -30,7 +30,7 @@ export const tokens = [
 ];
 
 <Title>Topbar</Title>
-The Topbar is the top row of the page frame, 32 high. It holds the sidebar toggle at the start, the page's breadcrumb in the middle, and Help Center and the account at the end. It is a part of Frame and sits in the frame's topbar slot.
+The Topbar is the top row of the page frame, 48 high: a 32 row padded 8 above and below. It holds the sidebar toggle at the start, the page's breadcrumb in the middle, and Help Center and the account at the end. It is a part of Frame and sits in the frame's topbar slot.
 
 The examples on this page follow the **Color mode** switch in the toolbar.
 
@@ -65,7 +65,7 @@ The trail is always a Breadcrumb and never plain text, so the current page trunc
 
 ### Anatomy
 
-1. **Start** is the left area, padded 8 on the left, with the toggle flush to the top. Docked, it is 240 wide. Otherwise it hugs the toggle and pads 12 before the breadcrumb.
+1. **Start** is the left area, padded 8 on the left, with the toggle 8 from the top. Docked, it is 240 wide. Otherwise it hugs the toggle and pads 12 before the breadcrumb.
 2. **Sidebar toggle** is a primary tonal icon-only Button at 32.
 3. **Middle** is a Breadcrumb that fills what is left. It stays on one line, and its crumbs end in an ellipsis rather than wrap.
 4. **Help Center** is a secondary text icon Button with the circle-question icon.

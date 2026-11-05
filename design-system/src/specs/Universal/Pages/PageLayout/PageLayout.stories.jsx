@@ -110,8 +110,8 @@ export const Overview = {
 };
 
 /**
- * The page sits in `Frame`: a 32 topbar the avatar fits in,
- * the toggle 8 from the left, flush to the top, and the sidebar docked from 1024 and closed below.
+ * The page sits in `Frame`: a 48 topbar the avatar fits in,
+ * the toggle at (8, 8), and the sidebar docked from 1024 and closed below.
  */
 export const Frame = {
     ...Overview,
@@ -352,7 +352,7 @@ const expectFocusedLayout = async (canvasElement, width) => {
     await expect(rect(surface).right, 'the surface ends at the edge').toBeCloseTo(rect(frame).right, 0);
     await expect(rect(surface).bottom, 'the surface runs to the foot').toBeCloseTo(rect(frame).bottom, 0);
     await expect(rect(surface).top - rect(banner).bottom, 'no gap under the topbar').toBeCloseTo(0, 0);
-    await expect(parseFloat(getComputedStyle(banner.parentElement, '::after').height), 'the topbar hairline stays').toBeCloseTo(tokenLength(frame, '--stroke-1'), 1);
+    await expect(getComputedStyle(banner.parentElement, '::after').content, 'no hairline under the topbar').toBe('none');
     await expect(canvasElement.querySelector('aside'), 'no sidebar').toBeNull();
     await expect(canvas.queryByRole('contentinfo'), 'no footer row').toBeNull();
 

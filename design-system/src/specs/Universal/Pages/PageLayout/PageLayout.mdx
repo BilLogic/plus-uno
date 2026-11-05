@@ -27,7 +27,7 @@ export const figmaMeta = {
 
 <Title />
 
-App outer layout — wraps every page with Sidebar, TopBar and the content slot, in `Frame`: a 32 topbar, a 240 sidebar docked from 1024, and the surface with its 12-column content grid capped at 1232. Below 1024 the sidebar never docks: hover the menu control or the left edge to peek it over the page, and click the control (or press Ctrl+[) to open it as an overlay.
+App outer layout — wraps every page with Sidebar, TopBar and the content slot, in `Frame`: a 48 topbar, a 240 sidebar docked from 1024, and the surface with its 12-column content grid capped at 1232. Below 1024 the sidebar never docks: hover the menu control or the left edge to peek it over the page, and click the control (or press Ctrl+[) to open it as an overlay.
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=112-597"
@@ -85,7 +85,7 @@ App outer layout — wraps every page with Sidebar, TopBar and the content slot,
     />
 </DocsCanvasShell>
 
-- **Frame** — the `Frame` with no sidebar: the Frame's own edges: the Page runs to the window edges, meets the topbar with no gap, and the topbar keeps its hairline.
+- **Frame** — the `Frame` with no sidebar: the Frame's own edges: the Page runs to the window edges, meets the topbar with no gap, and the topbar has no border.
 - **Topbar** — a `header`, the page's banner, `--frame-topbar-height` 48: Back (`onBack` or `backHref`), the `title` as the page's one visible `h1` at Heading/xsmall, truncated on one line, and Close (`onClose`), `--focused-page-inline-md` 12 apart. Without a handler, that control is not drawn.
 - **Surface** — the page's `main`, at reading width: content capped at `--content-max-width-reading` 864, centered, never under 720. A long task scrolls inside it.
 - **Actions** — a group named by `actionsLabel` ("Page actions") inside the Page, not a footer row: the `actions`, end-aligned, `--focused-page-inline-sm` 8 apart, in the content column. It is held at the foot of the Page while a long task scrolls, and follows the content on a short one; without `actions` there is no bar.

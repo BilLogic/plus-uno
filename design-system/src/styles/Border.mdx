@@ -201,19 +201,19 @@ Patterns draw their edges with the same three widths. Take the line from this ta
     ]}
 />
 
-<FoundationSubsection title="Give the sidebar one edge and the topbar none">
+<FoundationSubsection title="Give the sidebar and the topbar no edge">
 
-The sidebar ends in a 1 divider in `color/border/default`. The topbar has no border.
+Neither the sidebar nor the topbar has a border: the Page\'s own edge separates them.
 
 <DoDont>
-<Do caption="One hairline on the sidebar edge.">
+<Do caption="No line on the sidebar or the topbar.">
 <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gridTemplateRows: 'auto 1fr', font: 'var(--body-default)', background: 'var(--ds-surface-sunken)' }}>
     <div style={{ gridColumn: '1 / -1', padding: 'var(--pad-x-md)' }}>Topbar</div>
-    <div style={{ padding: 'var(--pad-x-md)', borderInlineEnd: 'var(--border-default) solid var(--ds-border)' }}>Home<br />Sessions<br />Training</div>
+    <div style={{ padding: 'var(--pad-x-md)' }}>Home<br />Sessions<br />Training</div>
     <div style={{ padding: 'var(--pad-x-md)', background: 'var(--ds-surface)' }}><strong style={{ font: 'var(--heading-xsmall)' }}>Upcoming sessions</strong></div>
 </div>
 </Do>
-<Dont caption="A line under the topbar adds a second edge the Frame does not use.">
+<Dont caption="A line under the topbar or beside the sidebar adds an edge the Frame does not use.">
 <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', gridTemplateRows: 'auto 1fr', font: 'var(--body-default)', background: 'var(--ds-surface-sunken)' }}>
     <div style={{ gridColumn: '1 / -1', padding: 'var(--pad-x-md)', borderBlockEnd: 'var(--border-default) solid var(--ds-border)' }}>Topbar</div>
     <div style={{ padding: 'var(--pad-x-md)', borderInlineEnd: 'var(--border-default) solid var(--ds-border)' }}>Home<br />Sessions<br />Training</div>

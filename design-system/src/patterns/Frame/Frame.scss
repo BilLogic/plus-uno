@@ -68,7 +68,7 @@
 .plus-frame__sidebar--docked {
     position: static;
     flex-shrink: 0;
-    padding: 0 var(--pad-x-sm);
+    padding: var(--pad-y-lg) var(--pad-x-sm);
 }
 
 // Raised (a peek, or an overlay under 1024): over the Page, from the Topbar down, with a shadow and no Blanket.
@@ -81,7 +81,9 @@
     bottom: 0;
     left: 0;
     z-index: var(--frame-layer-sidebar);
-    padding: var(--pad-x-sm);
+    padding: var(--pad-y-lg) var(--pad-x-sm);
+    border-start-end-radius: var(--page-radius);
+    border-end-end-radius: var(--page-radius);
     background-color: var(--ds-surface-overlay);
     box-shadow: var(--ds-shadow-overlay);
 }
@@ -114,11 +116,16 @@
     @include surface-edge;
 }
 
-// The top-left corner rounds only while the Sidebar is docked. The class
-// follows the same render as the width change, and nothing transitions it, so
-// the corner never shows detached from the Sidebar's edge.
+// Zoning is by background, never lines. The top-left corner rounds only while
+// the Sidebar is docked, the top-right only while the Panel is docked; a raised
+// Sidebar rounds its own right corners and leaves the Page square. The classes
+// follow the same render as the width change, and nothing transitions them.
 .plus-frame--sidebar-docked .plus-frame__surface {
     border-start-start-radius: var(--page-radius);
+}
+
+.plus-frame--panel-docked .plus-frame__surface {
+    border-start-end-radius: var(--page-radius);
 }
 
 // The 12-column content grid, capped and centered; never narrower than 720,
@@ -159,7 +166,6 @@
     width: var(--frame-panel-width, var(--panel-width-default));
     min-height: 0;
     box-sizing: border-box;
-    border-inline-start: var(--border-default) solid var(--ds-border);
 
     // Focus lands here when what had it left the page, or when the Panel turns modal around it; the Panel is not a control, so no ring.
     &:focus {
@@ -173,10 +179,10 @@
     }
 }
 
-// Docked: in flow beside the Page, which it meets at the hairline; the same
-// white as the Page, so it reads as part of the frame rather than a card.
+// Docked: in flow beside the Page, with no line between them. It keeps the
+// frame's sunken fill, so the Page's rounded corner reads against it.
 .plus-frame__panel--docked {
-    background-color: var(--ds-surface);
+    background-color: var(--ds-surface-sunken);
 }
 
 // Overlay and peek: over the Page from the Topbar down, with the overlay
@@ -218,9 +224,9 @@
     width: var(--pad-x-sm);
 }
 
-// The splitter: a hit strip centered on the Panel's hairline. It belongs to
+// The splitter: a hit strip centered on the Panel's left edge. It belongs to
 // the Panel, not the Page, so the Page's scroll box never clips its ring. The
-// hairline itself is the Panel's edge; the strip draws only the focus ring.
+// strip draws only the focus ring; there is no line.
 .plus-frame__splitter {
     position: absolute;
     top: 0;

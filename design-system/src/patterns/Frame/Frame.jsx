@@ -60,7 +60,9 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  * - The Topbar spans the full width, pads its end, and has no border. The
  *   Page starts right under it.
  * - The Page's top-left corner is rounded (`--page-radius`) only while the
- *   Sidebar is docked, switching in the same render as the width change.
+ *   Sidebar is docked, and its top-right only while the Panel is docked,
+ *   switching in the same render as the width change. A raised Sidebar rounds
+ *   its own right corners instead.
  * - Hovering the toggle or the left edge peeks a collapsed Sidebar: it floats
  *   over the Page with a shadow and no Blanket, so the Page does not move. An
  *   outside click, Escape, or the pointer leaving closes the peek.
@@ -473,6 +475,7 @@ const Frame = ({
     const classes = [
         'plus-frame',
         docked ? 'plus-frame--sidebar-docked' : '',
+        panelShown && panelState === 'docked' ? 'plus-frame--panel-docked' : '',
         className,
     ].filter(Boolean).join(' ');
 

@@ -125,6 +125,8 @@ export const Overview = {
         await expect(rect(breadcrumb()).left - rect(bar).left, 'docked: the breadcrumb starts at the sidebar width')
             .toBeCloseTo(token('--frame-sidebar-width'), 0);
         await expect(rect(avatar()).height, 'avatar at 32').toBeCloseTo(token('--item-height-md'), 0);
+        await expect(rect(avatar()).top - rect(bar).top, 'the avatar has 8 above').toBeCloseTo(token('--pad-y-lg'), 0);
+        await expect(rect(bar).bottom - rect(avatar()).bottom, 'and 8 below').toBeCloseTo(token('--pad-y-lg'), 0);
         await expect(rect(avatar()).left - rect(help()).right, 'end gap').toBeCloseTo(token('--inline-lg'), 0);
         await expect(within(avatar()).getByText('Lead')).toBeVisible();
 

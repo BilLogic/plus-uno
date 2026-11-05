@@ -33,6 +33,7 @@ export const itemProps = [
 export const tokens = [
     ['--frame-sidebar-width', '240', 'The sidebar width, set by Frame.'],
     ['--pad-x-sm', '8', 'The sidebar pads 8 at the sides.'],
+    ['--pad-y-lg', '8', 'The sidebar pads 8 at the top, below the Topbar, and at the foot.'],
     ['--stack-sm', '4', 'The gap between rows, between sections, and between a section\'s items.'],
     ['--pad-y-md, --pad-x-sm', '6, 8', 'The header around the logo.'],
     ['--pad-y-md, --pad-x-md', '6, 12', 'The section group label.'],
@@ -106,7 +107,7 @@ For a place inside a page, use **Tabs**. For one destination on its own, use a l
 4. **Item** is a Sidebar tab: at least 32 high, a 16 icon, a label that truncates, and the description, elemAfter and actionsOnHover slots.
 5. **Divider** is optional, after a section: a Divider inset 12.
 
-Rows sit 4 apart, and the sidebar pads 8 at the sides.
+Rows sit 4 apart, and the sidebar pads 8 on all sides, including 8 at the top below the Topbar. It has no border; docked, the Page\'s rounded corner separates them. Raised, it rounds its own top-right and bottom-right corners (`--page-radius`) and has a shadow.
 
 </div>
 
