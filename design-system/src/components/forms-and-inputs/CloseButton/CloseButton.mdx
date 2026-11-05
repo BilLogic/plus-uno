@@ -7,8 +7,7 @@ import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQui
 <Meta of={CloseButtonStories} />
 
 <Title />
-The one dismiss control for a surface that closes as a whole — a Modal
-dialog, a Section message, a Flag.
+The one dismiss control for a surface that closes as a whole — a Modal, a Section message, a Flag.
 
 <DocsTabs of={CloseButtonStories}>
 
@@ -93,7 +92,7 @@ dialog, a Section message, a Flag.
 ## When to use
 
 Use `CloseButton` wherever a surface closes as a whole — the corner of a
-Modal dialog, the end of a Section message or a Flag. For an action that
+Modal, the end of a Section message or a Flag. For an action that
 removes one item from a set rather than closing a surface, use a plain
 `IconButton` with its own icon and label instead.
 
@@ -105,7 +104,7 @@ removes one item from a set rather than closing a surface, use a plain
 
 ### Write `label` for what closes, not a generic "close."
 
-"Close" fits a surface that blocks, like a Modal dialog. For a message, name
+"Close" fits a surface that blocks, like a Modal. For a message, name
 what's dismissed: "Dismiss update," "Dismiss warning" — so the accessible
 name tells a screen reader user what just went away.
 

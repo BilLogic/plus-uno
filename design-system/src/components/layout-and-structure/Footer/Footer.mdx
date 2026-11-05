@@ -1,0 +1,115 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as FooterStories from './Footer.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={FooterStories} />
+
+<Title />
+The page's footnote line: product version, copyright and a terms link, left-aligned with no border.
+
+<DocsTabs of={FooterStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Footer"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>The default footnote.</>}>
+    <Canvas of={FooterStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>Every part is a prop: `version`, `copyright`, `termsText` and `termsUrl`.</>}>
+    <DsCanvasQuiet of={FooterStories.CustomContent} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={FooterStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `Footer` once, at the bottom of a Page, for the legal and version line. It is a quiet footnote, not navigation: do not put actions or a link list in it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Set `version` and `termsUrl` from the app, not the defaults.
+
+The defaults are placeholders. Pass the running version and the real terms address.
+
+```jsx
+<Footer version={appVersion} termsUrl="/terms" />
+```
+
+### Text and color come from tokens.
+
+The line uses the small body style and `--ds-text`; the terms link uses `--ds-link`. Pass `style` only to change spacing.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A landmark.** It renders a `<footer>`, which assistive technology announces as the page's content information.
+- **A real link.** The terms text is an `<a>` with `termsUrl` as its `href`, so it is keyboard focusable and announced as a link.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the page's top edge, use `PageHeader`.
+- For legal text inside a form or card, use body text, not `Footer`.
+
+</div>
+
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

@@ -298,7 +298,7 @@ ChromeUnderTheBlanket.play = async ({ canvasElement }) => {
 
 /**
  * A follow-up that needs confirming does not stack a second Modal: `view`
- * swaps this same dialog's content and footer in place. See the Modal dialog
+ * swaps this same dialog's content and footer in place. See the Modal
  * stories (`ConfirmView`, `ConfirmViewEscape`, `TwoOverlayLimit`) for the
  * confirm view and the overlay stack limit.
  */

@@ -9,17 +9,21 @@ The signed-in user: an initial pill, the name, the role indicator ("Lead") and a
 
 **Source:** `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.jsx`
 
+**Stories:** `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.stories.jsx` — Overview, Spacing, Types, Counter, Interactive
+
+**Storybook page:** `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.mdx`
+
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `firstChar` | string | `'J'` | — |
-| `name` | string | `'John Doe'` | — |
-| `counter` | bool | `true` | — |
-| `counterValue` | number | `2` | — |
-| `state` | enum | `'enabled'` | — |
-| `type` | enum | `'regular tutor'` | `lead tutor` shows the "Lead" role indicator; other types show none. |
-| `spacing` | enum | `'default'` | `compact` 32 high, for the topbar · `default` the padded row, for tables |
+| `firstChar` | string | `'J'` | The initial shown in the pill. |
+| `name` | string | `'John Doe'` | The user's name. Truncates at the label maximum width. |
+| `counter` | bool | `true` | Show the notification counter. |
+| `counterValue` | number | `2` | The number in the counter. |
+| `state` | enum | `'enabled'` | Forces the hover look, for docs. |
+| `type` | enum | `'regular tutor'` | The user type. `lead tutor` adds the Lead status tag. |
+| `spacing` | enum | `'default'` | `compact` is 32 high, for the topbar. `default` is padded, for table rows. |
 | `id` | string | — | — |
 | `onClick` | func | — | — |
 | `className` | string | `''` | — |
@@ -44,8 +48,6 @@ From `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.scss`.
 
 Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `UserAvatar` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).

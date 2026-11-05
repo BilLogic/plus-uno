@@ -1,0 +1,129 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as GenerativeBorderStories from './GenerativeBorder.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={GenerativeBorderStories} />
+
+<Title />
+The border that shows PLUS AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments running clockwise.
+
+<DocsTabs of={GenerativeBorderStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/loading/GenerativeBorder"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Content wrapped in the border while it generates.</>}>
+    <Canvas of={GenerativeBorderStories.Generating} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## States
+
+<DocsCanvasShell description={<>`isActive` off: the children render with no ring.</>}>
+    <DsCanvasQuiet of={GenerativeBorderStories.Idle} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Under reduced motion the same segments hold still.</>}>
+    <DsCanvasQuiet of={GenerativeBorderStories.ReducedMotion} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Radius
+
+<DocsCanvasShell description={<>`radius` names the radius token the ring follows. Match the content it wraps.</>}>
+    <DsCanvasQuiet of={GenerativeBorderStories.Radii} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={GenerativeBorderStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `GenerativeBorder` only while PLUS AI is generating into a piece of content, one ring per piece. It is never decoration, and two must not nest. For other waits, use `Spinner` or `Skeleton`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Wrap the content and toggle `isActive`.
+
+```jsx
+<GenerativeBorder isActive={isGenerating} radius="radius-100">
+    <Card>{draft}</Card>
+</GenerativeBorder>
+```
+
+### Match `radius` to the wrapped content.
+
+The wrapper is as wide as its parent, so set the width of the thing it surrounds.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **`aria-busy` says content is changing.** The wrapper sets it from `isActive`; the ring itself is decorative and hidden from assistive technology.
+- **Motion respects the user.** The segments turn slowly while active and hold still under reduced motion.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For the icons that start an AI action, use `AiIcon`.
+- For a general wait, use `Spinner`, `Skeleton` or `ProgressBar`.
+
+</div>
+
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>
