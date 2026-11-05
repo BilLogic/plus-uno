@@ -274,7 +274,7 @@ export const Interactive = {
 
 /**
  * `frame="focused"` — the page for one task: no sidebar, a Back · title · Close
- * topbar, the surface at reading width, and the actions in a footer row. The
+ * topbar, the surface at reading width, and the actions held at the foot of the Page. The
  * focused stories below set the viewport first, because the layout tokens
  * switch on `@media (min-width: …)`, and read every expected length and color
  * from its token through a probe.
@@ -341,7 +341,7 @@ const expectFocusedLayout = async (canvasElement, width) => {
     const minimum = tokenLength(frame, '--content-min-width');
     const surfacePad = tokenLength(frame, '--page-pad');
 
-    await expect(banner.getBoundingClientRect().height, 'topbar height').toBeCloseTo(tokenLength(frame, '--frame-topbar-height'), 0);
+    await expect(rect(banner).height, 'topbar height').toBeCloseTo(tokenLength(frame, '--frame-topbar-height'), 0);
     // No seams: the Frame fills the layout box to every edge and the Page meets the topbar.
     await expect(rect(frame).top, 'no seam above').toBeCloseTo(rect(layout).top, 0);
     await expect(rect(frame).left, 'no seam at the start').toBeCloseTo(rect(layout).left, 0);
@@ -363,19 +363,19 @@ const expectFocusedLayout = async (canvasElement, width) => {
     await expect(rect(actions).left, 'the actions line up with the content').toBeCloseTo(rect(main).left, 0);
 };
 
-/** A focused page: a session note, with Save draft and Submit note in the footer. */
+/** A focused page: a session note, with Save draft and Submit note at the foot of the Page. */
 export const Focused = {
     args: focusedArgs,
     render: (args) => <FocusedNote {...args} />,
 };
 
-/** Back, Close, the content and the footer actions, in that order, with the page's landmarks. */
+/** Back, Close, the content and the actions, in that order, with the page's landmarks. */
 export const FocusedKeyboardAndLandmarks = {
     args: focusedArgs,
     render: (args) => <FocusedNote {...args} />,
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement, args }) => {
-        const { canvas, banner, main, actionsBar: footer, back, close, title } = focusedParts(canvasElement);
+        const { canvas, banner, main, actionsBar, back, close, title } = focusedParts(canvasElement);
 
         // One banner, one main, the actions in a named group inside it, no footer landmark; the title is the page's one h1, in the banner.
         await expect(canvas.getAllByRole('banner')).toHaveLength(1);
@@ -386,7 +386,7 @@ export const FocusedKeyboardAndLandmarks = {
         await expect(banner).toContainElement(back);
         await expect(banner).toContainElement(close);
         await expect(canvas.queryByRole('contentinfo'), 'no footer landmark').toBeNull();
-        await expect(main).toContainElement(footer);
+        await expect(main).toContainElement(actionsBar);
         await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'no sidebar').toBeNull();
         await expect(canvas.queryByRole('button', { name: /sidebar/i }), 'no sidebar toggle').toBeNull();
 
@@ -404,9 +404,9 @@ export const FocusedKeyboardAndLandmarks = {
         await userEvent.tab();
         await expect(canvas.getByLabelText('Next step')).toHaveFocus();
         await userEvent.tab();
-        await expect(within(footer).getByRole('button', { name: 'Save draft' })).toHaveFocus();
+        await expect(within(actionsBar).getByRole('button', { name: 'Save draft' })).toHaveFocus();
         await userEvent.tab();
-        await expect(within(footer).getByRole('button', { name: 'Submit note' })).toHaveFocus();
+        await expect(within(actionsBar).getByRole('button', { name: 'Submit note' })).toHaveFocus();
 
         // Back and Close call their handlers, from a click and from the keyboard.
         await userEvent.click(back);
@@ -459,7 +459,7 @@ export const FocusedLongTitle = {
     }),
 };
 
-/** Without actions there is no footer; without handlers there is no Back or Close. */
+/** Without actions there is no actions bar; without handlers there is no Back or Close. */
 export const FocusedBare = {
     args: { title: 'Session report' },
     render: (args) => <FocusedNote {...args} withActions={false} />,
