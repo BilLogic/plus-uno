@@ -45,11 +45,10 @@ const PAGE_TITLE_STYLE = {
 /**
  * `frame="focused"`: the page for one task, with no sidebar. Mirrors the Figma
  * `Pattern/Page template` frame=focused and its parts `_Focused topbar` and
- * `_Focused footer`.
+ * `_Focused footer`, here the actions at the foot of the Page.
  *
- * - The Frame with no sidebar and its footer row under it: three rows,
- *   `--focused-page-stack-sm` 8 apart inside `--focused-page-pad-y` ·
- *   `--focused-page-pad-x` 8, which the layout box holds.
+ * - The Frame with no sidebar and the Frame's own edges: no seams on any side,
+ *   no gap under the topbar, the hairline kept, and no footer row.
  * - Topbar (a `header`, the banner), 32 high: Back, a secondary text button
  *   with `arrow-left`; the title, the page's one visible `h1` at Heading/xsmall,
  *   on one line and truncated; Close, the `CloseButton`; `--focused-page-inline-md`
@@ -57,9 +56,9 @@ const PAGE_TITLE_STYLE = {
  * - Surface (the `main`): the frame's surface at reading width, content capped
  *   at `--content-max-width-reading` 864, centered, never under 720. It scrolls
  *   on its own.
- * - Footer (a `footer` named by `actionsLabel`): the actions, end-aligned,
- *   `--focused-page-inline-sm` 8 apart, in a column as wide as the content and
- *   lined up with it. It stays put while the surface scrolls.
+ * - Actions (a group named by `actionsLabel`, inside the Page): end-aligned,
+ *   `--focused-page-inline-sm` 8 apart, in the content column, held at the foot
+ *   of the Page while it scrolls.
  *
  * Focus order follows the DOM: Back, Close, the content, then the actions.
  */
@@ -106,27 +105,25 @@ const FocusedFrame = ({
             ) : null}
         </header>
     );
-    const footer = actions ? (
-        <footer className="plus-page-focused__footer" aria-label={actionsLabel}>
+    // The Frame has no footer row, so the actions sit at the foot of the Page,
+    // held there while it scrolls, in the content column.
+    const actionsBar = actions ? (
+        <div className="plus-page-focused__actions-bar" role="group" aria-label={actionsLabel}>
             <div className="plus-page-focused__actions">{actions}</div>
-        </footer>
+        </div>
     ) : null;
 
-    // The Frame has no footer row, so the focused page's actions sit in a row
-    // of its own under the Frame, in the layout's column.
     return (
-        <>
-            <Frame
-                topbar={topbar}
-                width="reading"
-                contentClassName={['plus-page-main', mainClassName].filter(Boolean).join(' ')}
-                surfaceDirect={contentDirect}
-                style={{ flex: '1 1 auto', minHeight: 0 }}
-            >
-                {children}
-            </Frame>
-            {footer}
-        </>
+        <Frame
+            topbar={topbar}
+            width="reading"
+            contentClassName={['plus-page-main', mainClassName].filter(Boolean).join(' ')}
+            surfaceDirect={contentDirect}
+            style={{ flex: '1 1 auto', minHeight: 0 }}
+        >
+            {children}
+            {actionsBar}
+        </Frame>
     );
 };
 

@@ -1,33 +1,10 @@
 /**
  * PageLayout frame="focused": the Frame with no sidebar, a Back · title ·
- * Close topbar, the surface at reading width, and a footer row for the
- * actions under the Frame. Mirrors the Figma `Pattern/Page template` frame=focused. Every
- * length is a Focused page, Layout or Surface token.
+ * Close topbar, the surface at reading width, and the actions held at the
+ * foot of the Page. It has the Frame's own seamless edges, hairline and
+ * Page, with no pad or footer row of its own. Every length is a Focused page,
+ * Layout or Surface token.
  */
-
-/* ------------------------------------------------------------- frame */
-
-// The layout box pads the focused page on every side and holds the Frame and
-// the footer row 8 apart. The Frame's own hairline under the Topbar gives way
-// to that gap.
-.plus-page-layout--focused {
-    padding: var(--focused-page-pad-y) var(--focused-page-pad-x);
-    gap: var(--focused-page-stack-sm);
-    box-sizing: border-box;
-    background-color: var(--ds-surface-sunken);
-}
-
-.plus-page-layout--focused > .plus-frame {
-    gap: var(--focused-page-stack-sm);
-}
-
-.plus-page-layout--focused > .plus-frame .plus-frame__topbar {
-    padding-inline-end: var(--space-0);
-
-    &::after {
-        display: none;
-    }
-}
 
 /* ------------------------------------------------------------- topbar */
 
@@ -57,14 +34,18 @@
     color: var(--ds-text);
 }
 
-/* ------------------------------------------------------------- footer */
+/* ------------------------------------------------------------- actions */
 
-// As wide as the surface and padded like it, so the actions column lands
-// exactly over the content column.
-.plus-page-focused__footer {
-    flex: 1 1 auto;
-    min-width: 0;
-    padding-inline: var(--page-pad);
+// Held at the foot of the Page while it scrolls, as wide as the content column
+// so the actions land under the content. Not a footer row: it lives in the Page.
+.plus-page-focused__actions-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 1;
+    margin-top: auto;
+    padding-block: var(--focused-page-stack-sm);
+    background-color: var(--ds-surface);
+    border-top: var(--stroke-1) solid var(--ds-border);
 }
 
 .plus-page-focused__actions {
@@ -73,8 +54,5 @@
     justify-content: flex-end;
     gap: var(--focused-page-inline-sm);
     width: 100%;
-    min-width: var(--content-min-width);
-    max-width: var(--content-max-width-reading);
-    margin-inline: auto;
     box-sizing: border-box;
 }

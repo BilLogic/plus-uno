@@ -486,7 +486,6 @@ const Frame = ({
             onPointerEnter={isRaised ? cancelLeave : undefined}
             onPointerLeave={isRaised ? leave : undefined}
         >
-            {isRaised ? <div className="plus-frame__topbar-space" aria-hidden="true" /> : null}
             {sidebar}
         </div>
     );
