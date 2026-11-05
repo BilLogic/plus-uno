@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button, Modal, Sidebar } from '@/components';
-import { Frame, Topbar } from '@/patterns';
+import { Button, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Sidebar } from '@/components';
+import { Frame, Topbar, usePanelControl } from '@/patterns';
+import { PANEL_STORAGE_KEY } from '@/patterns/Frame';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -52,6 +53,8 @@ export default {
     component: Frame,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },
+    // Each story starts with nothing remembered for the Panel.
+    beforeEach: () => { window.sessionStorage.removeItem(PANEL_STORAGE_KEY); },
     render: FrameWithSlots,
     argTypes: {
         children: { table: { disable: true } },
@@ -603,5 +606,105 @@ export const ModalClosesOverlaySidebarAt768 = {
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(dialog(canvasElement)).toBeNull());
         await expect(p.sidebar()).toBeNull();
+    }),
+};
+
+/* ------------------------------------------------------------- panel */
+
+/**
+ * The Panel area: the Frame's right-hand area, under the Topbar. The layout
+ * resolver decides whether it docks beside the Page at a hairline or opens
+ * over it on a Blanket. Each story sets the viewport first, then opens the
+ * Panel the way a person does, from a button on the Page.
+ */
+const ChatToggle = () => {
+    const panel = usePanelControl();
+    return (
+        <div>
+            <Button
+                appearance="primary"
+                text={panel?.open ? 'Close chat' : 'Open chat'}
+                onClick={() => panel?.setOpen(!panel.open)}
+            />
+        </div>
+    );
+};
+
+const ChatPanel = () => {
+    const panel = usePanelControl();
+    return (
+        <PanelContainer>
+            <PanelHeader title="AI chat" actions={<PanelCloseAction onClick={() => panel?.setOpen(false)} />} />
+            <PanelBody>Ask about this page.</PanelBody>
+        </PanelContainer>
+    );
+};
+
+const WithPanel = ({ withModal = false, ...args }) => {
+    const [modal, setModal] = useState(false);
+    return (
+        <>
+            <InAppFrame panel={<ChatPanel />} panelLabel="AI chat" {...args}>
+                <ChatToggle />
+                {withModal ? <div><Button text="Page settings" onClick={() => setModal(true)} /></div> : null}
+                {slot('Content slot')}
+            </InAppFrame>
+            {withModal ? (
+                <Modal
+                    show={modal}
+                    width="6-col"
+                    title="Settings"
+                    body="The Panel stays open under this Modal."
+                    primaryButton={{ text: 'Done', onClick: () => setModal(false) }}
+                    onClose={() => setModal(false)}
+                />
+            ) : null}
+        </>
+    );
+};
+
+const panelParts = (canvasElement) => {
+    const p = parts(canvasElement);
+    return {
+        ...p,
+        panel: () => p.frame.querySelector('.plus-frame__panel'),
+        landmark: () => p.canvas.queryByRole('complementary', { name: 'AI chat' }),
+        splitter: () => p.canvas.queryByRole('separator', { name: /resize/i }),
+        blanket: () => p.frame.querySelector('.plus-frame__blanket'),
+        openButton: () => p.canvas.getByRole('button', { name: /chat/i }),
+    };
+};
+
+const openPanel = async (p) => {
+    await userEvent.click(p.canvas.getByRole('button', { name: 'Open chat' }));
+    await waitFor(() => expect(p.panel(), 'the Panel opens').not.toBeNull());
+};
+
+/** 1440 with a 400 Panel: both fit at the 720 floor, so the Sidebar and the Panel dock, and the Page meets the Panel at a hairline. */
+export const PanelDockedAt1440 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = panelParts(canvasElement);
+        await waitFor(() => expect(p.sidebar(), 'docked at 1440').not.toBeNull());
+        await expect(p.panel(), 'closed by default').toBeNull();
+        await openPanel(p);
+        const panel = p.panel();
+        await expect(p.landmark(), 'a complementary landmark named for its content').toBe(panel);
+        await expect(getComputedStyle(panel).position, 'docked, in flow').not.toBe('absolute');
+        await expect(rect(panel).width, 'the default width').toBeCloseTo(tokenLength(p.frame, '--panel-width-default'), 0);
+        await expect(rect(panel).right, 'flush to the window edge').toBeCloseTo(rect(p.frame).right, 0);
+        await expect(rect(panel).top, 'under the Topbar').toBeCloseTo(rect(p.frame.querySelector('.plus-frame__topbar')).bottom, 0);
+        await expect(rect(p.surface).right, 'the Page meets the Panel').toBeCloseTo(rect(panel).left, 0);
+        await expect(px(getComputedStyle(panel).borderLeftWidth), 'at a hairline').toBeCloseTo(tokenLength(p.frame, '--stroke-1'), 1);
+        await expect(getComputedStyle(panel).backgroundColor, 'docked, the Panel is the Page fill').toBe(tokenColor(p.frame, '--ds-surface'));
+        await expect(p.sidebar(), 'the Sidebar stays docked').not.toBeNull();
+        await expect(rect(p.content).width, 'content 1440 - 240 - 400 - 48').toBeCloseTo(752, 0);
+        await expect(p.blanket(), 'docked has no Blanket').toBeNull();
+        // Landmark order: topbar, nav, main, panel.
+        const main = p.canvas.getByRole('main');
+        await expect(main.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+        await userEvent.click(within(panel).getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(p.panel(), 'Close closes it').toBeNull());
     }),
 };

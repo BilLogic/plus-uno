@@ -164,3 +164,108 @@
 .plus-frame__content--reading {
     max-width: var(--content-max-width-reading);
 }
+
+/* ------------------------------------------------------------- panel */
+
+// The Panel area: the Frame's right-hand area, full height under the Topbar.
+// The Frame paints its fill and edge by state; the Panel parts inside paint
+// neither. Its width is set inline from the resolver and the splitter.
+.plus-frame__panel {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    flex-shrink: 0;
+    width: var(--frame-panel-width, var(--panel-width-default));
+    min-height: 0;
+    box-sizing: border-box;
+    border-inline-start: var(--stroke-1) solid var(--ds-border);
+
+    &:focus {
+        outline: none;
+    }
+
+    > .plus-panel {
+        flex: 1 1 auto;
+        height: auto;
+        min-height: 0;
+    }
+}
+
+// Docked: in flow beside the Page, which it meets at the hairline; the same
+// white as the Page, so it reads as part of the frame rather than a card.
+.plus-frame__panel--docked {
+    background-color: var(--ds-surface);
+}
+
+// Overlay and peek: over the Page from the Topbar down, with the overlay
+// role's fill and shadow. The overlay sits on its Blanket; a peek has none.
+.plus-frame__panel--overlay,
+.plus-frame__panel--peek {
+    position: absolute;
+    top: var(--frame-topbar-height);
+    right: 0;
+    bottom: 0;
+    z-index: calc(var(--layer-navigation) + 3);
+    background-color: var(--ds-surface-overlay);
+    box-shadow: var(--ds-shadow-overlay);
+}
+
+// The overlay Panel's Blanket: the Page and the Sidebar, never the Topbar.
+.plus-frame__blanket {
+    position: absolute;
+    top: var(--frame-topbar-height);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: calc(var(--layer-navigation) + 2);
+    background-color: var(--ds-blanket);
+}
+
+// The hover strip that peeks a closed Panel, when the peek option is on.
+.plus-frame__panel-edge {
+    position: absolute;
+    top: var(--frame-topbar-height);
+    right: 0;
+    bottom: 0;
+    z-index: calc(var(--layer-navigation) - 1);
+    width: var(--pad-x-sm);
+}
+
+// The splitter: a hit strip centered on the Panel's hairline. It belongs to
+// the Panel, not the Page, so the Page's scroll box never clips its ring.
+.plus-frame__splitter {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    inset-inline-start: calc(var(--stroke-1) * -1);
+    z-index: 1;
+    width: var(--pad-x-sm);
+    transform: translateX(-50%);
+    cursor: col-resize;
+    touch-action: none;
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: var(--stroke-2);
+        transform: translateX(-50%);
+        background-color: transparent;
+    }
+
+    &:hover::after {
+        background-color: var(--ds-border-bold);
+    }
+
+    &:focus {
+        outline: none;
+    }
+
+    &:focus-visible::after,
+    &:active::after {
+        width: var(--focus-ring-width);
+        background-color: var(--ds-border-focused);
+    }
+}

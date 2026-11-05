@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import PanelContainer, {
-    PanelBody, PanelCloseAction, PanelHeader, PanelProvider, usePanelManager,
+    PanelBody, PanelCloseAction, PanelHeader, PanelHostContext, PanelProvider, usePanelManager,
 } from './Panel';
 
 describe('Panel', () => {
@@ -16,9 +16,24 @@ describe('Panel', () => {
         expect(screen.getByText('Content')).toBeInTheDocument();
     });
 
-    it('defaults its width to 320px with no provider or prop', () => {
+    it('defaults its width to 400px, the Panel area default, with no provider or prop', () => {
         const { container } = render(<PanelContainer><PanelBody>X</PanelBody></PanelContainer>);
-        expect(container.firstChild).toHaveStyle({ width: '320px' });
+        expect(container.firstChild).toHaveStyle({ width: '400px' });
+    });
+
+    it('PanelProvider defaults to 400px', () => {
+        const { container } = render(<PanelProvider><PanelContainer><PanelBody>X</PanelBody></PanelContainer></PanelProvider>);
+        expect(container.firstChild).toHaveStyle({ width: '400px' });
+    });
+
+    it('inside a host it fills the host and leaves the fill and edge to it', () => {
+        const { container } = render(
+            <PanelHostContext.Provider value>
+                <PanelContainer width="240px"><PanelBody>X</PanelBody></PanelContainer>
+            </PanelHostContext.Provider>
+        );
+        expect(container.firstChild).toHaveStyle({ width: '100%' });
+        expect(container.firstChild).toHaveClass('plus-panel--hosted');
     });
 
     it('takes its width from the nearest PanelProvider', () => {

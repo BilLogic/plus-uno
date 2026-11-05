@@ -1,13 +1,44 @@
 import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { openOverlayCount, subscribeOverlays } from '@/lib/overlay';
+import { PanelHostContext } from '@/components';
 import Topbar from '../Topbar';
 import { SidebarControlContext } from './SidebarControl';
-import { resolveFrameLayout } from './frameLayout';
+import { PanelControlContext } from './PanelControl';
+import PanelSplitter from './PanelSplitter';
+import { FRAME_LAYOUT, resolveFrameLayout } from './frameLayout';
 import './Frame.scss';
 
 /** How long a peek survives the pointer leaving it, so a pass between toggle and panel does not drop it. */
 const PEEK_LEAVE_MS = 200;
+
+/** The sessionStorage key the Panel's width and open state are kept under, for this tab. */
+export const PANEL_STORAGE_KEY = 'plus-frame-panel';
+
+const clampPanelWidth = (n) => Math.min(FRAME_LAYOUT.panelMax, Math.max(FRAME_LAYOUT.panelMin, n));
+
+/** The Panel's remembered `{ open, width }`, or null where there is none or no storage. */
+const readPanelMemory = (key) => {
+    if (!key || typeof window === 'undefined') return null;
+    try {
+        const memory = JSON.parse(window.sessionStorage.getItem(key));
+        return memory && typeof memory === 'object' ? memory : null;
+    } catch {
+        return null;
+    }
+};
+
+const writePanelMemory = (key, memory) => {
+    if (!key || typeof window === 'undefined') return;
+    try {
+        window.sessionStorage.setItem(key, JSON.stringify(memory));
+    } catch {
+        // Storage full or blocked: the Panel still works, it just forgets.
+    }
+};
+
+/** Whether focus has nowhere to be: on the body, or on an element that left the page. */
+const focusLost = (doc) => !doc.activeElement || doc.activeElement === doc.body || !doc.activeElement.isConnected;
 
 /**
  * The Frame's own width, in pixels, kept current as it resizes. Fit is measured
@@ -61,7 +92,19 @@ const useFrameWidth = (ref) => {
  *   so a page does not wire its modals to the frame. A modal opened from inside
  *   the floating Sidebar hands focus to the toggle when it closes, since its
  *   trigger left with the Sidebar.
- * - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation.
+ * - The Panel area (`panel`) is the Frame's right-hand area, under the
+ *   Topbar. The resolver docks it beside the Page at a hairline when the
+ *   content keeps 720, collapsing a default Sidebar first (and restoring it
+ *   when the Panel closes); otherwise it opens over the Page on a Blanket that
+ *   covers the Page and the Sidebar but not the Topbar, and a press outside or
+ *   Escape closes it. Under 1024 it is an overlay capped at 320, and only one
+ *   overlay is open at a time; under 768 it is full width. Its splitter
+ *   resizes it from 320 to 640 (never past what keeps 720 beside a docked
+ *   Sidebar) by drag or keys. Width and open state are kept in
+ *   sessionStorage. A modal leaves it open. Anything inside the Frame opens
+ *   it through `usePanelControl`.
+ * - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the
+ *   Panel is a complementary landmark named by `panelLabel`.
  * - The Page pads `--page-pad` (24 at every width) and caps its content at
  *   `--content-max-width` (1232), centered, on a 12-column grid with a
  *   16 gutter. Children span all 12 columns unless they set `grid-column`.
@@ -71,6 +114,15 @@ const Frame = ({
     topbar,
     sidebar,
     sidebarDocked,
+    panel,
+    panelLabel = 'AI chat',
+    panelOpen: panelOpenProp,
+    defaultPanelOpen = false,
+    onPanelOpenChange,
+    panelDefaultWidth = FRAME_LAYOUT.panelDefault,
+    panelPeek = false,
+    panelStorageKey = PANEL_STORAGE_KEY,
+    listDetail = false,
     width = 'content',
     contentAs: Content = 'main',
     contentClassName = '',
@@ -85,8 +137,30 @@ const Frame = ({
     const sidebarRef = useRef(null);
     const leaveTimer = useRef(null);
     const sidebarId = useId();
+    const panelId = useId();
+    const panelRef = useRef(null);
+    const panelOpenerRef = useRef(null);
+    const panelLeaveTimer = useRef(null);
     const frameWidth = useFrameWidth(frameRef);
     const hasSidebar = Boolean(sidebar);
+    const hasPanel = Boolean(panel);
+
+    // The Panel's open state and width, remembered for the tab in sessionStorage.
+    const [panelMemory] = useState(() => readPanelMemory(panelStorageKey));
+    const [panelOpenState, setPanelOpenState] = useState(() => (
+        typeof panelMemory?.open === 'boolean' ? panelMemory.open : defaultPanelOpen
+    ));
+    const panelOpen = hasPanel && (panelOpenProp ?? panelOpenState);
+    const [panelWidth, setPanelWidth] = useState(() => clampPanelWidth(
+        Number.isFinite(panelMemory?.width) ? panelMemory.width : panelDefaultWidth,
+    ));
+    // The width a splitter drag draws, past the limits while it resists; null when settled.
+    const [panelPreview, setPanelPreview] = useState(null);
+    const [panelPeeking, setPanelPeeking] = useState(false);
+
+    useEffect(() => {
+        if (hasPanel) writePanelMemory(panelStorageKey, { open: panelOpen, width: panelWidth });
+    }, [hasPanel, panelStorageKey, panelOpen, panelWidth]);
 
     // `sidebarDocked` sets the default request; a press on the toggle (or
     // Ctrl+[) overrides it by hand until the prop changes.
@@ -102,9 +176,16 @@ const Frame = ({
 
     const layout = useMemo(() => resolveFrameLayout({
         frameWidth,
+        panelWidth,
         sidebar: hand === null ? { open: defaultOpen, setBy: 'default' } : { open: hand, setBy: 'hand' },
         sidebarPeek: peek,
-    }), [frameWidth, hand, defaultOpen, peek]);
+        chatMode: panelOpen ? 'panel' : 'popup',
+        listDetail,
+    }), [frameWidth, panelWidth, hand, defaultOpen, peek, panelOpen, listDetail]);
+
+    const narrow = frameWidth < FRAME_LAYOUT.dockMin;
+    const panelState = layout.panel;
+    const panelOverlay = panelState === 'overlay';
 
     const docked = hasSidebar && layout.sidebar === 'docked';
     const peeking = hasSidebar && layout.sidebar === 'peeking';
@@ -121,10 +202,16 @@ const Frame = ({
     }, []);
     useEffect(() => cancelLeave, [cancelLeave]);
 
+    // The latest Panel state, read by handlers that must not re-bind on every change.
+    const panelStateRef = useRef(panelState);
+    panelStateRef.current = panelState;
+    const narrowRef = useRef(narrow);
+    narrowRef.current = narrow;
+
     const peekSidebar = useCallback(() => {
         cancelLeave();
-        // Under an open modal the Sidebar stays put.
-        if (openOverlayCount() > 0) return;
+        // Under an open modal the Sidebar stays put, and under an overlay Panel's Blanket too.
+        if (openOverlayCount() > 0 || panelStateRef.current === 'overlay') return;
         setPeek(true);
     }, [cancelLeave]);
 
@@ -151,11 +238,27 @@ const Frame = ({
     const stateRef = useRef(layout.sidebar);
     stateRef.current = layout.sidebar;
 
+    const setPanelOpen = useCallback((next) => {
+        const doc = frameRef.current?.ownerDocument ?? document;
+        if (next) {
+            const active = doc.activeElement;
+            panelOpenerRef.current = active && active !== doc.body && !panelRef.current?.contains(active) ? active : null;
+            // Under 1024 only one overlay at a time: an overlay Sidebar gives way to the Panel.
+            if (narrowRef.current) setHand((h) => (h === true ? null : h));
+        }
+        setPanelPeeking(false);
+        if (panelOpenProp === undefined) setPanelOpenState(next);
+        onPanelOpenChange?.(next);
+    }, [panelOpenProp, onPanelOpenChange, setHand]);
+
     const toggle = useCallback(() => {
         cancelLeave();
         setPeek(false);
-        setHand(stateRef.current === 'docked' || stateRef.current === 'overlay' ? false : true);
-    }, [cancelLeave, setHand]);
+        const opening = !(stateRef.current === 'docked' || stateRef.current === 'overlay');
+        // Under 1024 only one overlay at a time: an overlay Sidebar closes the overlay Panel.
+        if (opening && narrowRef.current && panelStateRef.current === 'overlay') setPanelOpen(false);
+        setHand(!opening ? false : true);
+    }, [cancelLeave, setHand, setPanelOpen]);
 
     // A peek has no pointer on it once the Sidebar docks or opens as an overlay.
     useEffect(() => {
@@ -214,6 +317,124 @@ const Frame = ({
         };
     }, [raised, closeRaised]);
 
+    /* ------------------------------------------------------------- panel */
+
+    const panelShown = panelOpen && panelState !== 'none';
+    const panelPeekShown = hasPanel && panelPeek && !panelOpen && panelPeeking;
+
+    const cancelPanelLeave = useCallback(() => {
+        if (panelLeaveTimer.current) {
+            clearTimeout(panelLeaveTimer.current);
+            panelLeaveTimer.current = null;
+        }
+    }, []);
+    useEffect(() => cancelPanelLeave, [cancelPanelLeave]);
+
+    const peekPanel = useCallback(() => {
+        cancelPanelLeave();
+        if (openOverlayCount() > 0) return;
+        setPanelPeeking(true);
+    }, [cancelPanelLeave]);
+
+    const leavePanel = useCallback(() => {
+        cancelPanelLeave();
+        panelLeaveTimer.current = setTimeout(() => {
+            panelLeaveTimer.current = null;
+            setPanelPeeking(false);
+        }, PEEK_LEAVE_MS);
+    }, [cancelPanelLeave]);
+
+    // Opening the Panel moves focus into it when what had focus left the page
+    // (a Sidebar that auto-collapsed under it); closing it hands focus back to
+    // what opened it.
+    const wasPanelShown = useRef(panelShown);
+    useEffect(() => {
+        const doc = frameRef.current?.ownerDocument ?? document;
+        if (panelShown && !wasPanelShown.current && focusLost(doc)) panelRef.current?.focus();
+        if (!panelShown && wasPanelShown.current && focusLost(doc)) {
+            const opener = panelOpenerRef.current;
+            (opener?.isConnected ? opener : toggleRef.current)?.focus();
+        }
+        wasPanelShown.current = panelShown;
+    }, [panelShown]);
+
+    // An overlay Panel closes on a press outside it in the Frame (the Blanket
+    // or the Topbar) or on Escape. Presses inside an open modal, or in a popup
+    // drawn outside the Frame, leave it open.
+    useEffect(() => {
+        if (!(panelShown && panelOverlay) && !panelPeekShown) return undefined;
+        const close = () => (panelPeekShown ? setPanelPeeking(false) : setPanelOpen(false));
+        const onPointerDown = (e) => {
+            if (openOverlayCount() > 0) return;
+            if (!frameRef.current?.contains(e.target) || panelRef.current?.contains(e.target)) return;
+            close();
+        };
+        const onKeyDown = (e) => {
+            if (e.key !== 'Escape' || e.defaultPrevented || openOverlayCount() > 0) return;
+            const doc = frameRef.current?.ownerDocument ?? document;
+            const hadFocus = panelRef.current?.contains(doc.activeElement);
+            close();
+            if (hadFocus && panelPeekShown) toggleRef.current?.focus();
+        };
+        document.addEventListener('pointerdown', onPointerDown);
+        document.addEventListener('keydown', onKeyDown);
+        return () => {
+            document.removeEventListener('pointerdown', onPointerDown);
+            document.removeEventListener('keydown', onKeyDown);
+        };
+    }, [panelShown, panelOverlay, panelPeekShown, setPanelOpen]);
+
+    // The splitter's range: docked, the widest width that keeps the content
+    // floor beside whatever is docked now, so a drag never collapses the Sidebar.
+    const splitterMax = panelState === 'docked'
+        ? clampPanelWidth(frameWidth - (layout.sidebar === 'docked' ? FRAME_LAYOUT.sidebarWidth : 0)
+            - FRAME_LAYOUT.pagePad * 2 - FRAME_LAYOUT.contentFloor)
+        : FRAME_LAYOUT.panelMax;
+    const commitPanelWidth = useCallback((next) => setPanelWidth(clampPanelWidth(next)), []);
+
+    const panelControl = useMemo(() => (hasPanel ? {
+        open: panelOpen,
+        setOpen: setPanelOpen,
+        state: panelOpen ? panelState : 'none',
+        width: layout.panelWidth,
+        panelId,
+    } : null), [hasPanel, panelOpen, setPanelOpen, panelState, layout.panelWidth, panelId]);
+
+    const renderPanel = () => {
+        const mode = panelPeekShown ? 'peek' : panelState;
+        const width = panelPeekShown
+            ? (narrow ? Math.min(frameWidth, FRAME_LAYOUT.panelMin) : panelWidth)
+            : (panelPreview ?? layout.panelWidth);
+        // The splitter resizes from 1024 up; under it the Panel is fixed at 320, or full width under 768.
+        const resizable = !panelPeekShown && !narrow;
+        return (
+            <aside
+                ref={panelRef}
+                id={panelId}
+                aria-label={panelLabel}
+                tabIndex={-1}
+                className={`plus-frame__panel plus-frame__panel--${mode}`}
+                style={{ '--frame-panel-width': `${width}px` }}
+                onPointerEnter={panelPeekShown ? cancelPanelLeave : undefined}
+                onPointerLeave={panelPeekShown ? leavePanel : undefined}
+            >
+                {resizable ? (
+                    <PanelSplitter
+                        width={panelWidth}
+                        min={FRAME_LAYOUT.panelMin}
+                        max={Math.max(FRAME_LAYOUT.panelMin, splitterMax)}
+                        controls={panelId}
+                        onCommit={commitPanelWidth}
+                        onPreview={setPanelPreview}
+                    />
+                ) : null}
+                <PanelHostContext.Provider value>
+                    {panel}
+                </PanelHostContext.Provider>
+            </aside>
+        );
+    };
+
     const classes = [
         'plus-frame',
         docked ? 'plus-frame--sidebar-docked' : '',
@@ -253,33 +474,43 @@ const Frame = ({
 
     return (
         <div id={id} ref={frameRef} className={classes} style={style} {...props}>
-            <SidebarControlContext.Provider value={control}>
-                <div className="plus-frame__topbar">
-                    {topbar ?? (hasSidebar ? <Topbar /> : null)}
+            <PanelControlContext.Provider value={panelControl}>
+                <SidebarControlContext.Provider value={control}>
+                    <div className="plus-frame__topbar">
+                        {topbar ?? (hasSidebar ? <Topbar /> : null)}
+                    </div>
+                </SidebarControlContext.Provider>
+
+                {collapsed ? (
+                    <div className="plus-frame__edge" aria-hidden="true" onPointerEnter={peekSidebar} />
+                ) : null}
+                {raised ? sidebarPanel(true) : null}
+
+                {/* Covers the Page and the Sidebar, never the Topbar. A press on it closes the Panel. */}
+                {panelShown && panelOverlay ? <div className="plus-frame__blanket" aria-hidden="true" /> : null}
+                {hasPanel && panelPeek && !panelOpen && !panelPeekShown ? (
+                    <div className="plus-frame__panel-edge" aria-hidden="true" onPointerEnter={peekPanel} />
+                ) : null}
+
+                <div className="plus-frame__row">
+                    {docked ? sidebarPanel(false) : null}
+                    <SurfaceTag className="plus-frame__surface">
+                        {surfaceDirect ? children : (
+                            <Content
+                                className={[
+                                    'plus-frame__content',
+                                    `plus-frame__content--${width}`,
+                                    contentClassName,
+                                ].filter(Boolean).join(' ')}
+                            >
+                                {children}
+                            </Content>
+                        )}
+                    </SurfaceTag>
+                    {/* One place in the tree for every Panel state, so docking or overlaying never remounts its content. */}
+                    {panelShown || panelPeekShown ? renderPanel() : null}
                 </div>
-            </SidebarControlContext.Provider>
-
-            {collapsed ? (
-                <div className="plus-frame__edge" aria-hidden="true" onPointerEnter={peekSidebar} />
-            ) : null}
-            {raised ? sidebarPanel(true) : null}
-
-            <div className="plus-frame__row">
-                {docked ? sidebarPanel(false) : null}
-                <SurfaceTag className="plus-frame__surface">
-                    {surfaceDirect ? children : (
-                        <Content
-                            className={[
-                                'plus-frame__content',
-                                `plus-frame__content--${width}`,
-                                contentClassName,
-                            ].filter(Boolean).join(' ')}
-                        >
-                            {children}
-                        </Content>
-                    )}
-                </SurfaceTag>
-            </div>
+            </PanelControlContext.Provider>
         </div>
     );
 };
@@ -292,6 +523,24 @@ Frame.propTypes = {
     sidebar: PropTypes.node,
     /** Sets the Sidebar's default request: true opens it, false closes it. Under 1024 it never docks. Unset opens it where it fits. */
     sidebarDocked: PropTypes.bool,
+    /** Panel area content, usually a `PanelContainer` and its parts. Without it there is no Panel. */
+    panel: PropTypes.node,
+    /** The Panel's complementary landmark name, named for its content. */
+    panelLabel: PropTypes.string,
+    /** Controlled open state. Leave unset to let the Frame keep it (and remember it for the tab). */
+    panelOpen: PropTypes.bool,
+    /** Uncontrolled: whether the Panel starts open when the tab has nothing remembered. */
+    defaultPanelOpen: PropTypes.bool,
+    /** Called with the next open state whenever the Panel opens or closes. */
+    onPanelOpenChange: PropTypes.func,
+    /** The width (px) the Panel opens at when the tab has nothing remembered: 320 to 640, default 400. */
+    panelDefaultWidth: PropTypes.number,
+    /** Hovering the Frame's right edge peeks a closed Panel over the Page, with no Blanket. Off by default. */
+    panelPeek: PropTypes.bool,
+    /** The sessionStorage key the Panel's width and open state are kept under; null keeps nothing. */
+    panelStorageKey: PropTypes.string,
+    /** A List and detail layout is on the Page: the Sidebar collapses first to keep the 960 split. */
+    listDetail: PropTypes.bool,
     /** Content cap: content 1232, reading 864 */
     width: PropTypes.oneOf(['content', 'reading']),
     /** Element for the content box. `main` by default, the Page's landmark; pass `div` when the page supplies its own `main`. */

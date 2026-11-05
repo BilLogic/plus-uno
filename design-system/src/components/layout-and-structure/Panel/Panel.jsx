@@ -12,7 +12,17 @@ import './Panel.scss';
  */
 const PanelContext = createContext(null);
 
-export const PanelProvider = ({ defaultWidth = '320px', children }) => {
+/** The width a Panel opens at when nothing sets one: the Frame's Panel area default (`--panel-width-default`). */
+const DEFAULT_WIDTH = '400px';
+
+/**
+ * Set by a host that owns the Panel's width, fill and edge (the Frame's Panel
+ * area). Inside one, a PanelContainer fills the host and paints no fill or edge
+ * of its own, so the host can paint them by state.
+ */
+export const PanelHostContext = createContext(false);
+
+export const PanelProvider = ({ defaultWidth = DEFAULT_WIDTH, children }) => {
     const [width, setWidth] = useState(defaultWidth);
     const value = useMemo(() => ({ width, setWidth }), [width]);
     return <PanelContext.Provider value={value}>{children}</PanelContext.Provider>;
@@ -32,17 +42,22 @@ export const usePanelManager = () => {
 /** PanelContainer: the panel's own surface, at a fixed or the provider's width. */
 export const PanelContainer = ({ width, className, children, ...props }) => {
     const panelContext = useContext(PanelContext);
-    const resolvedWidth = width ?? panelContext?.width ?? '320px';
+    const hosted = useContext(PanelHostContext);
+    const resolvedWidth = hosted ? '100%' : (width ?? panelContext?.width ?? DEFAULT_WIDTH);
 
     return (
-        <section className={classNames('plus-panel', className)} style={{ width: resolvedWidth }} {...props}>
+        <section
+            className={classNames('plus-panel', hosted && 'plus-panel--hosted', className)}
+            style={{ width: resolvedWidth }}
+            {...props}
+        >
             {children}
         </section>
     );
 };
 
 PanelContainer.propTypes = {
-    /** Falls back to the nearest PanelProvider's width, then 320px. */
+    /** Falls back to the nearest PanelProvider's width, then 400px. Inside the Frame's Panel area it fills the area instead. */
     width: PropTypes.string,
     className: PropTypes.string,
     children: PropTypes.node,
