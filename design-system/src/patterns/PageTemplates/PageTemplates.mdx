@@ -136,7 +136,7 @@ In Figma, Page template has the variants `frame` (default or focused) and `conte
         <tr><td><code>contentDirect</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Puts the children straight in the page with no content grid, for a full-width page such as chat.</td></tr>
         <tr><td><code>shellLoading</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Shows the topbar as skeletons and holds the sidebar's entrance.</td></tr>
         <tr><td><code>shellEntered</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Plays the entrance animation on the topbar and the sidebar.</td></tr>
-        <tr><td><code>sidebarExpanded</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Docks the sidebar at every width, for demos.</td></tr>
+        <tr><td><code>sidebarExpanded</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Opens the sidebar by default, for demos. Under 1024 it still never docks.</td></tr>
         <tr><td><code>id</code> · <code>className</code> · <code>style</code></td><td>string · string · object</td><td>—</td><td>none</td><td>Set on the page's outer element.</td></tr>
     </tbody>
 </DocsTable>
@@ -201,7 +201,7 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
         <tr><td><code>--frame-topbar-height</code></td><td>32</td><td>The topbar row.</td></tr>
         <tr><td><code>--frame-sidebar-width</code></td><td>240</td><td>The sidebar, docked from 1024.</td></tr>
         <tr><td><code>--page-pad</code></td><td>24</td><td>The page pad at every width. The grid margin is the same token.</td></tr>
-        <tr><td><code>--page-radius</code></td><td>8</td><td>The page corners.</td></tr>
+        <tr><td><code>--page-radius</code></td><td>8</td><td>The page's top-left corner, only while the sidebar is docked.</td></tr>
     </tbody>
 </DocsTable>
 
@@ -264,7 +264,7 @@ The mode is set once, on the template. The frame width follows it through `--scr
 
 #### Sidebar over the page
 
-Below 1024 the sidebar is closed. Hovering the menu control, or the left edge of the frame, opens it over the page. It has the overlay shadow and no Blanket, and the page does not move. An outside click, Escape or the pointer leaving closes it. Clicking the control docks it instead.
+Below 1024 the sidebar is closed. Hovering the menu control, or the left edge of the frame, opens it over the page. It has the overlay shadow and no Blanket, and the page does not move. An outside click, Escape or the pointer leaving closes it. Clicking the control (or pressing Ctrl+[) opens it as an overlay instead: below 1024 the sidebar never docks.
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>Medium, 768.</strong> The sidebar open over the page.</>}>
     <ModeFrame storyId="foundations-patterns-page-templates--sidebar-over-page" width={768} height={560} title="Sidebar open over the page at 768" />

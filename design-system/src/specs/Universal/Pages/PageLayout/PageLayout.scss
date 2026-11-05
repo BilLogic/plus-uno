@@ -1,22 +1,32 @@
 /**
  * PageLayout frame="focused": the Frame with no sidebar, a Back · title ·
  * Close topbar, the surface at reading width, and a footer row for the
- * actions. Mirrors the Figma `Pattern/Page template` frame=focused. Every
+ * actions under the Frame. Mirrors the Figma `Pattern/Page template` frame=focused. Every
  * length is a Focused page, Layout or Surface token.
  */
 
 /* ------------------------------------------------------------- frame */
 
-// The focused frame pads the same on every side, so the row and the footer
-// drop the left pad the default frame keeps for its sidebar toggle.
-.plus-page-layout--focused > .plus-frame {
+// The layout box pads the focused page on every side and holds the Frame and
+// the footer row 8 apart. The Frame's own hairline under the Topbar gives way
+// to that gap.
+.plus-page-layout--focused {
     padding: var(--focused-page-pad-y) var(--focused-page-pad-x);
+    gap: var(--focused-page-stack-sm);
+    box-sizing: border-box;
+    background-color: var(--ds-surface-sunken);
+}
+
+.plus-page-layout--focused > .plus-frame {
     gap: var(--focused-page-stack-sm);
 }
 
-.plus-page-layout--focused > .plus-frame > .plus-frame__row,
-.plus-page-layout--focused > .plus-frame > .plus-frame__footer {
-    padding-left: var(--space-0);
+.plus-page-layout--focused > .plus-frame .plus-frame__topbar {
+    padding-inline-end: var(--space-0);
+
+    &::after {
+        display: none;
+    }
 }
 
 /* ------------------------------------------------------------- topbar */

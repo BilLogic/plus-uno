@@ -10,8 +10,8 @@ import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { PAGE_EDGE } from '@/patterns/Page';
 
 /**
- * Frame — the app frame: a 32 topbar over a row holding the sidebar and the
- * page.
+ * Frame — the app frame: a full-width 32 topbar over a row holding the Sidebar
+ * and the Page.
  *
  * THE TEST SEAM IS THIS FILE. Each width story sets the viewport first, because
  * the layout tokens switch on `@media (min-width: …)`, then asserts what a
@@ -61,13 +61,8 @@ export default {
         sidebarDocked: {
             control: 'select',
             options: [undefined, true, false],
-            description: 'Overrides the width default: true docks the sidebar, false closes it. Unset follows the breakpoint.',
+            description: "Sets the Sidebar's default request: true opens it, false closes it. Under 1024 it never docks. Unset opens it where it fits.",
             table: { category: 'Design' },
-        },
-        sidebarLabel: {
-            control: 'text',
-            description: 'Accessible name of the sidebar region.',
-            table: { category: 'Accessibility' },
         },
         surfaceDirect: {
             control: 'boolean',
@@ -98,10 +93,11 @@ const parts = (canvasElement) => {
         toggle: canvas.getByRole('button', { name: /sidebar/i }),
         surface: frame.querySelector('.plus-frame__surface'),
         content: frame.querySelector('.plus-frame__content'),
-        sidebar: () => canvas.queryByRole('complementary', { name: 'Sidebar' }),
+        // The Sidebar's `nav` is the navigation landmark; the box around it is what docks or floats.
+        sidebar: () => canvas.queryByRole('navigation', { name: 'Main' })?.closest('.plus-frame__sidebar') ?? null,
         // Under an open modal the page is hidden from assistive tech, so the
-        // sidebar is found among the hidden roles: still there, still docked.
-        coveredSidebar: () => canvas.queryByRole('complementary', { name: 'Sidebar', hidden: true }),
+        // Sidebar is found among the hidden roles: still there, still docked.
+        coveredSidebar: () => canvas.queryByRole('navigation', { name: 'Main', hidden: true })?.closest('.plus-frame__sidebar') ?? null,
         edge: () => frame.querySelector('.plus-frame__edge'),
     };
 };
@@ -128,14 +124,14 @@ const expectTopbar = async (frame) => {
     await expect(rect(topbar).height, 'topbar height').toBeCloseTo(tokenLength(frame, '--frame-topbar-height'), 0);
 };
 
-/** A peeked sidebar floats: shadow, over the page, and no scrim under it. */
+/** A peeked sidebar floats: shadow, over the page, and no Blanket under it. */
 const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
     await expect(getComputedStyle(aside).position).toBe('absolute');
     await expect(getComputedStyle(aside).boxShadow, 'floating sidebar shadow')
         .toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
     await expect(rect(aside).width, 'sidebar width').toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
     await expect(rect(surface).left, 'the surface did not move').toBeCloseTo(surfaceLeftBefore, 0);
-    // No scrim: a point on the page beside the sidebar still hits the page.
+    // No Blanket: a point on the page beside the sidebar still hits the page.
     const s = rect(surface);
     const hit = document.elementFromPoint(s.right - 40, s.top + 40);
     await expect(surface.contains(hit), 'nothing covers the page beside the floating sidebar').toBe(true);
@@ -143,10 +139,30 @@ const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
 
 const atViewport = (width, run) => withTestViewport(width, HEIGHT, run);
 
-/** No seams: the surface starts where the topbar ends. */
+/**
+ * No seams: the Topbar spans the full width, the Page starts where it ends and
+ * runs to the right and bottom edges, and a hairline closes the Topbar.
+ */
 const expectNoSeam = async (frame, surface) => {
     const topbar = frame.querySelector('.plus-frame__topbar');
+    await expect(rect(topbar).width, 'the topbar spans the full width').toBeCloseTo(rect(frame).width, 0);
     await expect(rect(surface).top - rect(topbar).bottom, 'no gap between the rows').toBeCloseTo(0, 0);
+    await expect(rect(frame).right - rect(surface).right, 'no seam on the right').toBeCloseTo(0, 0);
+    await expect(rect(frame).bottom - rect(surface).bottom, 'no seam at the bottom').toBeCloseTo(0, 0);
+    const line = getComputedStyle(topbar, '::after');
+    await expect(px(line.height), 'a hairline under the topbar').toBeCloseTo(tokenLength(frame, '--stroke-1'), 1);
+    await expect(line.backgroundColor, 'in the border color').toBe(tokenColor(frame, '--ds-border'));
+    await expect(px(getComputedStyle(topbar).paddingRight), 'the topbar pads its end').toBeCloseTo(tokenLength(frame, '--pad-x-sm'), 0);
+};
+
+/** The Page's top-left corner: rounded (`--page-radius`) while docked, square otherwise; the other three never round. */
+const expectCorner = async (frame, surface, rounded) => {
+    const style = getComputedStyle(surface);
+    const radius = rounded ? tokenLength(frame, '--page-radius') : 0;
+    await expect(px(style.borderTopLeftRadius), rounded ? 'top-left is rounded while docked' : 'top-left is square when not docked').toBeCloseTo(radius, 0);
+    await expect(px(style.borderTopRightRadius), 'top-right is square').toBeCloseTo(0, 0);
+    await expect(px(style.borderBottomRightRadius), 'bottom-right is square').toBeCloseTo(0, 0);
+    await expect(px(style.borderBottomLeftRadius), 'bottom-left is square').toBeCloseTo(0, 0);
 };
 
 /* ------------------------------------------------------------- stories */
@@ -241,9 +257,9 @@ export const DocsAuto1024 = atMode('lg', false);
 export const DocsAuto1440 = atMode('xl', false);
 
 /** sidebar = floating: a closed sidebar peeked over the page. */
-export const DocsFloating768 = atMode('md', true);
-export const DocsFloating1024 = atMode('lg', true);
-export const DocsFloating1440 = atMode('xl', true);
+export const DocsPeeking768 = atMode('md', true);
+export const DocsPeeking1024 = atMode('lg', true);
+export const DocsPeeking1440 = atMode('xl', true);
 
 export const Floating = {
     render: PeekedFrame,
@@ -257,25 +273,7 @@ export const Floating = {
     },
 };
 
-/** A `footer` is a third row: directly under the surface, to the foot of the frame, lined up with the surface. */
-export const WithFooter = {
-    parameters: { docs: { disable: true } },
-    render: (args) => (
-        <InAppFrame {...args} footer={slot('Footer row', 'var(--height-250)')}>
-            {slot('Content slot')}
-        </InAppFrame>
-    ),
-    play: async ({ canvasElement }) => atViewport(768, async () => {
-        const { frame, surface } = parts(canvasElement);
-        const footer = frame.querySelector('.plus-frame__footer');
-        await expect(footer, 'the footer row renders').not.toBeNull();
-        await expect(rect(footer).top - rect(surface).bottom, 'no gap under the surface').toBeCloseTo(0, 0);
-        await expect(rect(frame).bottom - rect(footer).bottom, 'no pad below it').toBeCloseTo(0, 0);
-        await expect(rect(footer.firstElementChild).left, 'what it holds lines up with the surface').toBeCloseTo(rect(surface).left, 0);
-    }),
-};
-
-/** 768: the sidebar is closed; hover peeks it, an outside click closes it, a click docks it. */
+/** 768: the Sidebar is collapsed; hover peeks it, an outside click closes it, a click opens it as an overlay (it never docks under 1024). */
 export const Medium768 = {
     play: async ({ canvasElement }) => atViewport(768, async () => {
         const { frame, toggle, surface, content, sidebar, edge } = parts(canvasElement);
@@ -296,6 +294,8 @@ export const Medium768 = {
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expectFloating(frame, sidebar(), surface, surfaceLeft);
         await expectToggleHome(frame, toggle);
+        // Peeking is not docking: the corner stays square.
+        await expectCorner(frame, surface, false);
 
         // An outside click closes it.
         await userEvent.click(surface);
@@ -310,33 +310,30 @@ export const Medium768 = {
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(sidebar()).toBeNull());
 
-        // A click docks it: the page moves over and scrolls sideways under 720.
+        // A click opens it by hand. Under 1024 it never docks: it floats over the Page as an overlay.
         await userEvent.click(toggle);
         await waitFor(() => expect(sidebar()).not.toBeNull());
-        await expect(getComputedStyle(sidebar()).position).toBe('static');
+        await userEvent.unhover(toggle);
+        await new Promise((resolve) => { setTimeout(resolve, 400); });
+        await expect(sidebar(), 'it stays open once the pointer leaves').not.toBeNull();
+        await expectFloating(frame, sidebar(), surface, surfaceLeft);
         await expect(toggle).toHaveAttribute('aria-expanded', 'true');
-        await expect(offset(frame, surface).x, 'docked: the surface starts after the sidebar')
-            .toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
-        await expect(rect(content).width, 'content never goes under its minimum')
-            .toBeCloseTo(tokenLength(frame, '--content-min-width'), 0);
-        await expect(surface.scrollWidth, 'the surface scrolls sideways').toBeGreaterThan(surface.clientWidth);
-        // Scrolled sideways, the topbar stays put.
-        const topbarLeft = rect(frame.querySelector('.plus-frame__topbar')).left;
-        surface.scrollLeft = surface.scrollWidth;
-        await expect(rect(frame.querySelector('.plus-frame__topbar')).left, 'the topbar stays put')
-            .toBeCloseTo(topbarLeft, 0);
+        await expect(rect(content).width, 'the Page keeps its width').toBeCloseTo(tokenLength(frame, '--content-width'), 0);
+        await expectCorner(frame, surface, false);
         await expectToggleHome(frame, toggle);
 
-        // Docked, an outside click leaves it docked.
+        // An outside click closes an overlay Sidebar.
         await userEvent.click(surface);
-        await expect(sidebar()).not.toBeNull();
+        await waitFor(() => expect(sidebar()).toBeNull());
+        await expect(toggle).toHaveAttribute('aria-expanded', 'false');
     }),
 };
 
 /** 1024: the sidebar docks; the toggle closes it and does not move. */
 export const Large1024 = {
     play: async ({ canvasElement }) => atViewport(1024, async () => {
-        const { frame, toggle, surface, content, sidebar } = parts(canvasElement);
+        const p = parts(canvasElement);
+        const { frame, toggle, surface, content, sidebar } = p;
         await expectTopbar(frame);
         await expectToggleHome(frame, toggle);
         await waitFor(() => expect(sidebar(), 'docked from 1024').not.toBeNull());
@@ -346,6 +343,12 @@ export const Large1024 = {
         await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(tokenLength(frame, '--space-150'), 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-width'), 0);
         await expectNoSeam(frame, surface);
+        await expectCorner(frame, surface, true);
+
+        // Landmarks: the Page is the main, the Sidebar's nav is the navigation, and nothing is a bare "sidebar" aside.
+        await expect(p.canvas.getByRole('main')).toBe(content);
+        await expect(p.canvas.getByRole('navigation', { name: 'Main' })).toBeInTheDocument();
+        await expect(frame.querySelector('aside'), 'no aside landmark').toBeNull();
 
         // The sidebar's rows are the 32 item height.
         const tab = within(sidebar()).getAllByRole('button')[0];
@@ -354,6 +357,7 @@ export const Large1024 = {
         await userEvent.click(toggle);
         await waitFor(() => expect(sidebar()).toBeNull());
         await expect(offset(frame, surface).x, 'closed: the surface runs to the window edge').toBeCloseTo(0, 0);
+        await expectCorner(frame, surface, false);
         await expectToggleHome(frame, toggle);
 
         // Closed at 1024, a hover still peeks without pushing.
@@ -361,6 +365,51 @@ export const Large1024 = {
         await userEvent.hover(toggle);
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expectFloating(frame, sidebar(), surface, surfaceLeft);
+    }),
+};
+
+/** Ctrl+[ toggles the Sidebar, and the corner follows it in the same frame. */
+export const CtrlBracketToggle = {
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const { frame, surface, sidebar, toggle } = parts(canvasElement);
+        await waitFor(() => expect(sidebar(), 'docked at 1440').not.toBeNull());
+        await expectCorner(frame, surface, true);
+        await expect(toggle).toHaveAttribute('aria-keyshortcuts', 'Control+[');
+
+        await userEvent.keyboard('{Control>}[[{/Control}');
+        await waitFor(() => expect(sidebar(), 'Ctrl+[ closes it').toBeNull());
+        await expect(offset(frame, surface).x, 'the Page runs to the window edge').toBeCloseTo(0, 0);
+        await expectCorner(frame, surface, false);
+
+        await userEvent.keyboard('{Control>}[[{/Control}');
+        await waitFor(() => expect(sidebar(), 'Ctrl+[ opens it again').not.toBeNull());
+        await expect(offset(frame, surface).x).toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
+        await expectCorner(frame, surface, true);
+    }),
+};
+
+/** Ctrl+[ under 1024 opens the Sidebar as an overlay, since it never docks there, and closes it again. */
+export const CtrlBracketAt768 = {
+    play: async ({ canvasElement }) => atViewport(768, async () => {
+        const { frame, surface, sidebar } = parts(canvasElement);
+        await expect(sidebar()).toBeNull();
+        await userEvent.keyboard('{Control>}[[{/Control}');
+        await waitFor(() => expect(sidebar(), 'Ctrl+[ opens it').not.toBeNull());
+        await expect(getComputedStyle(sidebar()).position, 'as an overlay, not docked').toBe('absolute');
+        await expectCorner(frame, surface, false);
+        await userEvent.keyboard('{Control>}[[{/Control}');
+        await waitFor(() => expect(sidebar(), 'Ctrl+[ closes it').toBeNull());
+    }),
+};
+
+/** The Page meets the Sidebar at a hairline: the Sidebar's 1px border sits flush against the Page, with no gap. */
+export const SidebarMeetsPage = {
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const { frame, surface, sidebar } = parts(canvasElement);
+        await waitFor(() => expect(sidebar()).not.toBeNull());
+        await expect(rect(sidebar()).right, 'no gap between the Sidebar and the Page').toBeCloseTo(rect(surface).left, 0);
+        await expect(px(getComputedStyle(sidebar()).borderRightWidth)).toBeCloseTo(tokenLength(frame, '--stroke-1'), 1);
+        await expectNoSeam(frame, surface);
     }),
 };
 
@@ -535,21 +584,24 @@ export const ModalLeavesDockedSidebar = {
     }),
 };
 
-/** 768: a sidebar the user docked stays docked under a modal too. */
-export const ModalLeavesDockedSidebarAt768 = {
+/** 768: a Sidebar the user opened is an overlay under 1024, so a modal closes it like a peek. */
+export const ModalClosesOverlaySidebarAt768 = {
     render: WithModal,
     play: async ({ canvasElement }) => atViewport(768, async () => {
         const p = parts(canvasElement);
         await userEvent.click(p.toggle);
         await waitFor(() => expect(p.sidebar()).not.toBeNull());
-        await expect(getComputedStyle(p.sidebar()).position, 'docked').toBe('static');
+        await userEvent.unhover(p.toggle);
+        await expect(getComputedStyle(p.sidebar()).position, 'an overlay, not docked').toBe('absolute');
 
-        await userEvent.click(p.canvas.getByRole('button', { name: 'Page settings' }));
+        const trigger = p.canvas.getByRole('button', { name: 'Page settings' });
+        trigger.focus();
+        await userEvent.keyboard('{Enter}');
         await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
-        await expect(p.coveredSidebar(), 'still docked').not.toBeNull();
+        await waitFor(() => expect(p.sidebar(), 'the overlay Sidebar closed').toBeNull());
 
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(dialog(canvasElement)).toBeNull());
-        await expect(p.sidebar(), 'still docked after Escape').not.toBeNull();
+        await expect(p.sidebar()).toBeNull();
     }),
 };

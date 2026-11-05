@@ -85,7 +85,7 @@ export const Overview = {
             <h2 className="h3">Page Title</h2>
             <p className="body2-txt mt-3" style={{ color: 'var(--ds-text-subtle)' }}>
                 This demonstrates the PageLayout component with TopBar, Sidebar, and content area.
-                The sidebar docks from 1024px; below that, hover the menu control to peek it and click to dock it.
+                The sidebar docks from 1024px; below that it never docks: hover the menu control to peek it and click to open it as an overlay.
             </p>
 
             <div
@@ -117,7 +117,7 @@ export const Frame = {
     ...Overview,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const sidebar = () => canvas.queryByRole('complementary', { name: 'Sidebar' });
+        const sidebar = () => canvas.queryByRole('navigation', { name: 'Main' })?.closest('.plus-frame__sidebar') ?? null;
         const check = async (width, docked) => {
             await setTestViewport(width, 900);
             const frame = canvasElement.querySelector('.plus-frame');
@@ -225,7 +225,7 @@ export const Interactive = {
                 <PageHeader title="Page Title" />
                 <p className="body1-txt mt-3" style={{ color: 'var(--ds-text-subtle)' }}>
                     Use the MD / LG / XL toolbar above to simulate viewport width. The sidebar docks from
-                    1024px; below that, hover the menu control to peek it over the page and click to dock it.
+                    1024px; below that it never docks: hover the menu control to peek it over the page and click to open it as an overlay.
                 </p>
 
                 <div
@@ -318,7 +318,8 @@ const rect = (el) => el.getBoundingClientRect();
 
 const focusedParts = (canvasElement) => {
     const canvas = within(canvasElement);
-    const frame = canvasElement.querySelector('.plus-page-layout--focused .plus-frame');
+    // The layout box holds the focused pads; the Frame and the footer row sit inside it.
+    const frame = canvasElement.querySelector('.plus-page-layout--focused');
     return {
         canvas,
         frame,
@@ -385,7 +386,7 @@ export const FocusedKeyboardAndLandmarks = {
         await expect(banner).toContainElement(back);
         await expect(banner).toContainElement(close);
         await expect(main).not.toContainElement(footer);
-        await expect(canvas.queryByRole('complementary'), 'no sidebar').toBeNull();
+        await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'no sidebar').toBeNull();
         await expect(canvas.queryByRole('button', { name: /sidebar/i }), 'no sidebar toggle').toBeNull();
 
         // Focus order: Back first in the page, then Close, the fields, then the actions.
