@@ -1270,3 +1270,20 @@ export const ListDetailKeepsSplitAt1440 = {
         await expect(rect(p.content).width, '1440 - 400 - 48').toBeCloseTo(992, 0);
     }),
 };
+
+/** 1440 with List and detail: the splitter's limit keeps 960 of content, so dragging to it never breaks the split. */
+export const ListDetailSplitterKeepsSplitAt1440 = {
+    render: WithPanel,
+    args: { listDetail: true },
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        const splitter = p.splitter();
+        // 1440 - 48 - 960, with the Sidebar collapsed to keep the split.
+        await expect(splitter).toHaveAttribute('aria-valuemax', '432');
+        splitter.focus();
+        await userEvent.keyboard('{End}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '432'));
+        await expect(rect(p.content).width, 'content keeps 960').toBeGreaterThanOrEqual(960 - 0.5);
+    }),
+};
