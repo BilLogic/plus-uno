@@ -10,12 +10,9 @@ import {
 } from '@/storybook-docs/foundation-page.jsx';
 
 export const CURVES = [
-    ['out-bold', [0, 0.4, 0, 1]],
-    ['inout-bold', [0.4, 0, 0, 1]],
-    ['in-practical', [0.6, 0, 0.8, 0.6]],
-    ['out-practical', [0.4, 1, 0.6, 1]],
-    ['out-expressive', [0.22, 1, 0.36, 1]],
-    ['linear', [0, 0, 1, 1]],
+    ['standard', [0.2, 0, 0, 1]],
+    ['entrance', [0, 0, 0.2, 1]],
+    ['exit', [0.4, 0, 1, 1]],
 ];
 
 export const Curve = ({ name, points }) => {
@@ -52,7 +49,7 @@ export const Label = ({ children }) => (
 
 Motion in PLUS has three attributes (duration, easing and property) and four principles, tuned for a calm tutoring product. Interactions are near-instant, entrances orient people and exits get out of the way. Playful motion is kept for moments that are not part of a task.
 
-Motion is defined by numeric tokens: `Motion/duration-150` for a duration and `Motion/easing-out-practical` for a curve. Bundles that package a duration, an easing and a property exist only for Modal, Blanket, Drawer, Popup, Flag, Tooltip, Tab and Button. Bootstrap's own motion variables are overridden by these tokens, so react-bootstrap keeps its focus and transition lifecycle.
+Motion is defined by six tokens: three durations (`short`, `medium`, `long`) and three easings (`standard`, `entrance`, `exit`), written as CSS variables such as `--motion-duration-short`. Components name a duration and an easing and add nothing else. They are built for Base UI's starting and ending style transitions.
 
 </FoundationSection>
 
@@ -80,44 +77,33 @@ A tutor in a live session is looking at something else. Frequent things (hover, 
 
 <FoundationSection title="Duration">
 
-Every motion is defined by duration, easing and property. Interactions run 50 to 150 ms; transitions run 150 to 400 ms, and larger elements take longer. Frequent things stay under 150 ms.
+Pick the duration by how often the motion happens and how much of the screen it moves. Frequent things are short, things that appear are medium, and large surfaces are long. When unsure, go shorter.
 
 <RefTable
     head={['Token', 'Duration', 'Use']}
     rows={[
-        [<C>Motion/duration-0</C>, '0 ms', 'Focus ring, selected state and the reduced-motion fallback.'],
-        [<C>Motion/duration-50</C>, '50 ms', 'Table row and list item hover, tooltip exit.'],
-        [<C>Motion/duration-100</C>, '100 ms', 'Button hover and press, list item press, popup exit, tooltip hide delay.'],
-        [<C>Motion/duration-150</C>, '150 ms', 'Popup enter, input and field states, tab, checkbox, skeleton-to-content fade, and the exit of a modal, drawer or flag.'],
-        [<C>Motion/duration-200</C>, '200 ms', 'Flag enter, accordion panel and chevron, state changes inside a card.'],
-        [<C>Motion/duration-250</C>, '250 ms', 'Modal and Blanket enter, drawer enter, progress fill.'],
-        [<C>Motion/duration-400</C>, '400 ms', 'Page or route transitions, and the first-load reveal.'],
-        [<C>Motion/duration-600</C>, '600 ms', 'Onboarding steps, chart and card intros. The ceiling for anything a tutor meets mid-task, and only once per view.'],
-        [<C>Motion/duration-1000</C>, '1000 ms', 'Character moments only: empty state, completion, onboarding and error. Never inside a task flow. Also the one Spinner period.'],
-        [<C>Motion/stagger-40</C>, '40 ms', 'Delay between siblings entering, up to 6 steps (240 ms), first item immediate.'],
+        [<C>--motion-duration-short</C>, '100 ms', 'Frequent interactions: button hover and press, list item and table row, tab, checkbox, input and field states, tooltip.'],
+        [<C>--motion-duration-medium</C>, '200 ms', 'Things that appear or change in place: popup, menu, flag, accordion panel, content swaps, a skeleton fading to content, chart transitions.'],
+        [<C>--motion-duration-long</C>, '300 ms', 'Large surfaces: modal, blanket and drawer. The ceiling for anything a tutor meets mid-task.'],
     ]}
 />
 
-- Exits are shorter than entrances: a modal, drawer or flag leaves in 150 ms.
-- The first-load reveal of the topbar and sidebar plays once per session in 400 ms or less, and never on in-app navigation.
-- A tooltip hides 100 ms after the pointer leaves.
-- Chart and card intros are capped at 600 ms. Only a character moment may run to 1000 ms.
+- Exits are shorter than entrances: a modal or drawer enters in long and leaves in medium; a popup or flag enters in medium and leaves in short.
+- A tooltip hides 100 ms after the pointer leaves. That delay is a component rule, not a token.
+- Spinner rotation, the Skeleton sweep and character moments are loops or one-offs outside the token set. They never run inside a task flow, and a character plays once per view.
 
 </FoundationSection>
 
 <FoundationSection title="Easing">
 
-Entering elements ease out, exiting elements ease in, and elements that scale or reposition in place ease in and out. Use the practical curves for everyday interactions and the bold curves for larger movement. Curve names are written `Motion/easing-name`.
+The curve follows direction. Arriving elements use entrance, leaving elements use exit, and everything that stays on screen (color changes, repositioning, resizing in place) uses standard.
 
 <RefTable
     head={['Token', 'cubic-bezier', 'Use']}
     rows={[
-        [<C>Motion/easing-out-bold</C>, '0, 0.4, 0, 1', 'Drawer and flag enter, panel enter. A fast start and a controlled landing.'],
-        [<C>Motion/easing-inout-bold</C>, '0.4, 0, 0, 1', 'Modal and Blanket scale-in, repositioning, a progress fill changing.'],
-        [<C>Motion/easing-in-practical</C>, '0.6, 0, 0.8, 0.6', 'Every exit, drawer exit included. Starts slowly and accelerates away.'],
-        [<C>Motion/easing-out-practical</C>, '0.4, 1, 0.6, 1', 'Hover and press color, popup and tooltip enter, tabs, form fields, content swaps.'],
-        [<C>Motion/easing-out-expressive</C>, '0.22, 1, 0.36, 1', 'Non-task moments only: character moments, first-load reveals, chart and card intros. Everywhere else, use out-bold.'],
-        [<C>Motion/easing-linear</C>, '0, 0, 1, 1', 'Rotation and time-based loops only.'],
+        [<C>--motion-easing-standard</C>, '0.2, 0, 0, 1', 'Default. Hover and press color, state changes, elements that reposition or resize in place, accordion and progress.'],
+        [<C>--motion-easing-entrance</C>, '0, 0, 0.2, 1', 'Anything arriving: popup, menu, tooltip, flag, modal, blanket, drawer. A fast start and a soft landing.'],
+        [<C>--motion-easing-exit</C>, '0.4, 0, 1, 1', 'Anything leaving. Starts slowly and accelerates away.'],
     ]}
 />
 
@@ -131,22 +117,21 @@ Entering elements ease out, exiting elements ease in, and elements that scale or
 
 <FoundationSection title="Patterns">
 
-Entrances and exits are not symmetrical: entrances orient people, exits confirm a dismissal and clear the way. Open from where an element belongs, use one or two properties per transition, and prefer transform and opacity to width, height and top.
+Entrances and exits are not symmetrical: entrances orient people, exits confirm a dismissal and clear the way. Use one or two properties per transition, and prefer transform and opacity to width, height and top.
 
 <RefTable
     head={['Pattern', 'Enter', 'Exit', 'Notes']}
     rows={[
-        ['Enter and exit', 'Ease out, 150 to 250 ms. Orients people to what appeared.', 'Ease in, 100 to 150 ms. Shorter and quieter, so it clears the way.', 'Fade with a short slide. Exit the way the element came.'],
-        ['Popup, Menu and Tooltip', 'Fade and an 8 px slide from the trigger side, 150 ms, out-practical. A Tooltip only fades, 100 ms.', 'Fade and a 4 px slide, 100 ms, in-practical. A Tooltip exits in 50 ms, after a 100 ms hide delay.', 'A Tooltip never moves. Keyboard focus shows it as hover does.'],
-        ['Modal on a Blanket', 'Modal: scale 95 to 100% and fade, 250 ms, inout-bold. Blanket: fade, 250 ms, inout-bold, running at the same time as the Modal.', 'Modal: scale 100 to 95% and fade, 150 ms, in-practical. Blanket: fade, 150 ms.', 'Move focus into the Modal as the enter starts, not when it ends.'],
-        ['Drawer', 'Slide from its edge, 250 ms, out-bold.', 'Slide out, 150 ms, in-practical.', 'A narrow-width sidebar, if one is specified, takes the Drawer tokens.'],
-        ['Flag', 'Fade and an 8 px slide toward its anchor edge, 200 ms, out-bold. When a neighbor leaves, the stack moves in 200 ms, inout-bold.', 'Fade, 150 ms, in-practical.', 'Flag travel is 8 px, not half of the flag’s width: a 400-wide flag would sweep 200 px. Announce errors at once.'],
-        ['Loading', 'Skeleton sweep: a 1600 ms ease-in-out loop. Spinner: one 1000 ms linear rotation everywhere, buttons included.', 'Skeleton to content: fade, 150 ms, out-practical.', 'One focal point leads. Do not run a Spinner, a Skeleton and a chart intro together.'],
-        ['Character moments', 'From the rest pose to one short celebration, up to 1000 ms, out-expressive, once per view.', 'Back to the rest pose.', 'Only in empty states, completion, onboarding and error screens. Never in a task flow.'],
+        ['Hover, press, focus', 'short, standard', 'short, standard', 'Settle color and nothing else.'],
+        ['Popup and Menu', 'medium, entrance', 'short, exit', 'Fade with a short slide from the trigger side.'],
+        ['Tooltip', 'short, entrance', 'short, exit', 'Fade only, never moves. Keyboard focus shows it as hover does. Hides 100 ms after the pointer leaves.'],
+        ['Modal on a Blanket', 'long, entrance, together', 'medium, exit, together', 'Move focus into the Modal as the enter starts, not when it ends.'],
+        ['Drawer', 'long, entrance', 'medium, exit', 'Slides from its edge. A narrow-width sidebar, if one is specified, takes the Drawer motion.'],
+        ['Flag', 'medium, entrance', 'short, exit', 'Travel is a short fixed distance, not half of the flag’s width. Announce errors at once.'],
+        ['Accordion and Progress', 'medium, standard', 'medium, standard', 'Animate size and are documented exceptions to the transform-and-opacity rule. A Progress fill carries a label, so scaling it would distort the text.'],
     ]}
 />
 
-- Accordion and Progress animate size (grid rows, width) against the transform-and-opacity rule. They are documented exceptions. A Progress fill carries a label, so scaling it would distort the text.
 - Reduce the number of properties in one transition before you shorten its duration.
 
 </FoundationSection>
@@ -158,8 +143,8 @@ Entrances and exits are not symmetrical: entrances orient people, exits confirm 
 A tutor presses buttons dozens of times in a session, so the response settles color and nothing else.
 
 <DoDont>
-<Do caption="Color only, 100 ms, out-practical. The next action is a second away."><Label>Button hover and press · 100 ms</Label></Do>
-<Dont caption="Scale or bounce on press, or a 200 ms ease across five properties. It slows the next action."><Label>Press with scale and bounce · 200 ms</Label></Dont>
+<Do caption="Color only, short, standard. The next action is a second away."><Label>Button hover and press · short</Label></Do>
+<Dont caption="Scale or bounce on press, or a medium ease across five properties. It slows the next action."><Label>Press with scale and bounce · medium</Label></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -169,8 +154,8 @@ A tutor presses buttons dozens of times in a session, so the response settles co
 Entrances orient people; exits get out of the way.
 
 <DoDont>
-<Do caption="A confirm opens in 250 ms and closes in 150, so the tutor is back on the roster at once."><Label>Modal enter · 250 ms</Label> <Label>Modal exit · 150 ms</Label></Do>
-<Dont caption="A modal that leaves as slowly as it arrived keeps the tutor waiting."><Label>Modal enter · 250 ms</Label> <Label>Modal exit · 250 ms</Label></Dont>
+<Do caption="A confirm opens in long and closes in medium, so the tutor is back on the roster at once."><Label>Modal enter · long</Label> <Label>Modal exit · medium</Label></Do>
+<Dont caption="A modal that leaves as slowly as it arrived keeps the tutor waiting."><Label>Modal enter · long</Label> <Label>Modal exit · long</Label></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -180,8 +165,8 @@ Entrances orient people; exits get out of the way.
 Characters move in empty states, completion, onboarding and error screens, and nowhere a tutor is mid-task.
 
 <DoDont>
-<Do caption="One short celebration in the completion modal, then the character rests."><Label>Completion character, once · 1000 ms</Label></Do>
-<Dont caption="A character moving in the In-Session toolkit, over a form or while someone types."><Label>Character waving over a notes form · 1000 ms, repeating</Label></Dont>
+<Do caption="One short celebration in the completion modal, then the character rests."><Label>Completion character, once</Label></Do>
+<Dont caption="A character moving in the In-Session toolkit, over a form or while someone types."><Label>Character waving over a notes form, repeating</Label></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -190,9 +175,9 @@ Characters move in empty states, completion, onboarding and error screens, and n
 
 <FoundationSection title="Accessibility">
 
-When a person asks for reduced motion, product motion is off and instant. Set it once at the token layer so every component complies without an extra rule.
+When a person asks for reduced motion, product motion is off and instant. It is set once at the token layer.
 
-- Set every duration and stagger token to 0 ms under `prefers-reduced-motion`, and jump to the final state, so nothing is left half-transparent.
+- Under `prefers-reduced-motion: reduce` every `--motion-duration-*` token becomes 0 ms, so components that read the tokens comply without a branch of their own. Jump to the final state, so nothing is left half-transparent.
 - Never flash, oscillate rapidly or sweep large areas of the screen, whether or not reduced motion is on.
 - Replace a rotating Spinner with a static icon and the word Loading, so the status still reads. A Skeleton becomes a flat fill with no sweep.
 - Charts draw their final state with no intro. Characters show the rest pose.
