@@ -70,4 +70,63 @@ describe('Cascader', () => {
         await user.click(screen.getByRole('combobox', { name: 'Region' }));
         expect(screen.getAllByRole('option')[0]).toHaveClass('plus-option-row--compact');
     });
+
+    // ADR-037 exception: Base UI has no multi-column listbox, so the Cascader
+    // keeps its own keyboard handler. These tests are what holds it.
+    describe('keyboard', () => {
+        const rows = () => screen.getAllByRole('option');
+        const focusedName = () => document.activeElement?.textContent;
+
+        it('opens on ArrowDown and walks a column with Up, Down, Home and End', async () => {
+            const user = userEvent.setup();
+            render(<Harness />);
+            screen.getByRole('combobox', { name: 'Region' }).focus();
+            await user.keyboard('{ArrowDown}');
+            expect(screen.getAllByRole('listbox')).toHaveLength(1);
+            rows()[0].focus();
+            await user.keyboard('{ArrowDown}');
+            expect(focusedName()).toContain('Wales');
+            await user.keyboard('{ArrowUp}');
+            expect(focusedName()).toContain('Scotland');
+            await user.keyboard('{End}');
+            expect(focusedName()).toContain('Wales');
+            await user.keyboard('{Home}');
+            expect(focusedName()).toContain('Scotland');
+        });
+
+        it('ArrowRight opens the next column and ArrowLeft steps back out', async () => {
+            const user = userEvent.setup();
+            render(<Harness />);
+            await user.click(screen.getByRole('combobox', { name: 'Region' }));
+            screen.getByRole('option', { name: 'Scotland' }).focus();
+            await user.keyboard('{ArrowRight}');
+            expect(screen.getAllByRole('listbox')).toHaveLength(2);
+            expect(focusedName()).toContain('Edinburgh');
+            await user.keyboard('{ArrowLeft}');
+            expect(focusedName()).toContain('Scotland');
+        });
+
+        it('Enter on a leaf commits the path, closes and returns focus to the field', async () => {
+            const user = userEvent.setup();
+            render(<Harness />);
+            const trigger = screen.getByRole('combobox', { name: 'Region' });
+            await user.click(trigger);
+            screen.getByRole('option', { name: 'Scotland' }).focus();
+            await user.keyboard('{ArrowRight}{ArrowDown}{Enter}');
+            expect(trigger).toHaveValue('Scotland / Glasgow');
+            expect(screen.queryByRole('listbox')).toBeNull();
+            expect(trigger).toHaveFocus();
+        });
+
+        it('Escape closes and returns focus to the field', async () => {
+            const user = userEvent.setup();
+            render(<Harness />);
+            const trigger = screen.getByRole('combobox', { name: 'Region' });
+            await user.click(trigger);
+            screen.getByRole('option', { name: 'Scotland' }).focus();
+            await user.keyboard('{Escape}');
+            expect(screen.queryByRole('listbox')).toBeNull();
+            expect(trigger).toHaveFocus();
+        });
+    });
 });
