@@ -1,5 +1,5 @@
 /**
- * Damping (rubber-band) unit. Pure maths plus a spring-back helper, no DOM.
+ * Damping (rubber-band) unit. Pure math plus a spring-back helper, no DOM.
  *
  * Built for the Panel's splitter: the drag follows the pointer up to a limit,
  * then resists and stops stretching at a maximum, and springs back on release.

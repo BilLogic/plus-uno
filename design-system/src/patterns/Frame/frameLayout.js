@@ -18,6 +18,8 @@
  *      Sidebar first when the Panel is docked.
  */
 
+// Numbers from the Frame spec. sidebarWidth mirrors the Frame's `--frame-sidebar-width`;
+// pagePad is the single Page pad (24 at every width). Keep them in step with the tokens.
 export const FRAME_LAYOUT = Object.freeze({
     sidebarWidth: 240,
     pagePad: 24,
@@ -44,6 +46,16 @@ const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
  * @param {boolean} [input.sidebarPeek] hover on the collapsed Sidebar's toggle
  * @param {'popup' | 'panel' | 'fullscreen'} [input.chatMode]
  * @param {boolean} [input.listDetail]
+ * @returns {{
+ *   sidebar: 'docked' | 'collapsed' | 'peeking' | 'overlay',
+ *   sidebarAutoCollapsed: boolean,
+ *   panel: 'none' | 'docked' | 'overlay',
+ *   panelWidth: number,
+ *   contentWidth: number,
+ *   splitHolds: boolean,
+ *   blanket: boolean,
+ *   popupFullScreen: boolean,
+ * }}
  */
 export function resolveFrameLayout({
     frameWidth,
@@ -67,7 +79,7 @@ export function resolveFrameLayout({
     const contentFor = (sidebarDocked, panelDocked) =>
         frameWidth - (sidebarDocked ? L.sidebarWidth : 0) - (panelDocked ? effectivePanelWidth : 0) - padTotal;
 
-    let sidebarState; // 'docked' | 'collapsed' | 'overlay'
+    let sidebarState; // 'docked' | 'collapsed' | 'overlay'; 'peeking' is set last
     let panelState = 'none';
     let autoCollapsed = false;
 
