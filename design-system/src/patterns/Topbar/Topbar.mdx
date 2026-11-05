@@ -20,7 +20,7 @@ export const propRows = [
 export const tokens = [
     ['--frame-topbar-height', '32', 'The row height. The bar has no padding of its own except the left pad of the start area.'],
     ['--frame-sidebar-width', '240', 'The start area\'s width while the sidebar is docked, so the breadcrumb lines up with the Page.'],
-    ['--pad-x-sm', '8', 'The left pad of the start area, so the toggle sits at (8, 8).'],
+    ['--pad-x-sm', '8', 'The left pad of the start area, so the toggle sits 8 from the left.'],
     ['--inline-lg', '12', 'The right pad of the start area, the left pad of the end area, and the gap between Help Center and the avatar.'],
     ['--item-height-md', '32', 'The toggle, Help Center and the avatar.'],
     ['--image-sm', '24', 'The avatar initial.'],
@@ -64,7 +64,7 @@ The trail is always a Breadcrumb and never plain text, so the current page trunc
 
 ### Anatomy
 
-1. **Start** is the left area, padded 8 on the left so the toggle sits at (8, 8). Docked, it is 240 wide. Otherwise it hugs the toggle and pads 12 before the breadcrumb.
+1. **Start** is the left area, padded 8 on the left, with the toggle flush to the top. Docked, it is 240 wide. Otherwise it hugs the toggle and pads 12 before the breadcrumb.
 2. **Sidebar toggle** is a primary tonal icon-only Button at 32.
 3. **Middle** is a Breadcrumb that fills what is left. It stays on one line, and its crumbs end in an ellipsis rather than wrap.
 4. **Help Center** is a secondary text icon Button with the circle-question icon.

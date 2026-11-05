@@ -58,7 +58,7 @@ const useWide = (ref) => {
  * - The frame owns the sidebar state; the Topbar in the `topbar` slot draws the
  *   one toggle from it (through `SidebarControlContext`). Without a `topbar`,
  *   the frame renders a bare Topbar so the toggle is still there.
- * - The sidebar toggle sits at (8, 8) at every width and never moves.
+ * - The sidebar toggle sits 8 from the left, flush to the top at every width and never moves.
  * - From 1024 the sidebar docks (240, in flow). Below 1024 it is closed.
  * - Hovering the toggle or the left edge peeks a closed sidebar: it floats over
  *   the page with a shadow and no scrim, so the page does not move. An outside

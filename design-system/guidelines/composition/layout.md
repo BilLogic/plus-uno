@@ -97,7 +97,7 @@ navigation through it, so there is one navigation surface.
 Figma `Pattern/Surface container`), which owns every frame size and the sidebar's
 behavior:
 
-- **Topbar** — the `Topbar` pattern (`@/patterns`), 32 high (`--frame-topbar-height`): the sidebar toggle, the breadcrumb, Help Center and the account. The toggle sits at (8, 8) at every width and shows `angles-left` while the sidebar is open, `bars` while it is closed. Docked, the breadcrumb lines up with the Page.
+- **Topbar** — the `Topbar` pattern (`@/patterns`), 32 high (`--frame-topbar-height`): the sidebar toggle, the breadcrumb, Help Center and the account. The toggle sits 8 from the left, flush to the top at every width and shows `angles-left` while the sidebar is open, `bars` while it is closed. Docked, the breadcrumb lines up with the Page.
 - **Sidebar** — 240 (`--frame-sidebar-width`), docked from 1024. Below 1024 it is closed: hovering the toggle or the left edge peeks it floating over the page (shadow, no Blanket, the page does not move), an outside click or Escape closes the peek, and a click on the toggle docks it.
 - **Page** — pads `--page-pad` (24 at every width).
 - **Content** — a 12-column grid with gutter `--grid-gutter` 16, capped at 1232 (`--content-max-width`) and centered on wide screens, never under 720 (`--content-min-width`): narrower, the page scrolls sideways. A child spans all 12 columns; give it `grid-column: span N` to span fewer, in whole columns.

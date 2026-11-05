@@ -15,7 +15,7 @@
     min-height: 0;
     box-sizing: border-box;
     // No seams: the Page runs to the window edges and meets the Sidebar at a
-    // hairline. The Topbar pads its own start, so the toggle sits at (8, 8)
+    // hairline. The Topbar pads its own start, so the toggle sits 8 from the left, flush to the top
     // whatever the sidebar is doing.
     background-color: var(--ds-surface-sunken);
     color: var(--ds-text);

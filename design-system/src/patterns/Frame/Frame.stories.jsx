@@ -114,12 +114,12 @@ const offset = (frame, el) => ({ x: rect(el).left - rect(frame).left, y: rect(el
 /** The surface's padding in pixels (all four sides share one token). */
 const surfacePad = (surface) => px(getComputedStyle(surface).paddingLeft);
 
-/** The toggle sits at (8, 8) at every width and in every sidebar state. */
+/** The toggle sits 8 from the left and flush to the top at every width and in every sidebar state. */
 const expectToggleHome = async (frame, toggle) => {
     const pad = tokenLength(frame, '--pad-x-sm');
     const at = offset(frame, toggle);
     await expect(at.x, 'toggle x').toBeCloseTo(pad, 0);
-    await expect(at.y, 'toggle y').toBeCloseTo(pad, 0);
+    await expect(at.y, 'toggle y').toBeCloseTo(0, 0);
     await expect(rect(toggle).height, 'toggle height').toBeCloseTo(tokenLength(frame, '--item-height-md'), 0);
 };
 
