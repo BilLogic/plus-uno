@@ -41,6 +41,6 @@ From `design-system/src/components/labels/AiLabel/AiLabel.scss`. Override these 
 
 ## Related
 
-Same group: `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
