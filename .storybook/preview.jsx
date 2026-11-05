@@ -216,6 +216,7 @@ const preview = {
               "Sidebar",
               "Section",
               "List and detail",
+              "AI chat",
               "Card",
               "Table",
               "Blanket",

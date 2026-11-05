@@ -1,0 +1,72 @@
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as AiChatStories from './AiChat.stories.jsx';
+import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={AiChatStories} />
+
+<Title>AI chat</Title>
+AI chat sits beside the work or over it, whichever the task needs. One floating action button at the bottom right of the Page opens it as a popup. From there it moves to the Frame's Panel or to full screen, and the app remembers the mode for the tab.
+
+The examples on this page follow the **Color mode** switch in the toolbar.
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/AiChat"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Chat closed: the floating action button at the bottom right of the Page.</>}>
+    <Canvas of={AiChatStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Modes
+
+1. **Popup** is the default. It opens anchored to the button, over the Page.
+2. **Panel** docks beside the Page, or opens over it on a Blanket when there is no room. The Frame decides.
+3. **Full screen** covers the window.
+
+Under 768 the popup is shown full screen.
+
+<DocsCanvasShell attachSourceBelow description={<>The popup, open.</>}>
+    <Canvas of={AiChatStories.Popup} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+<DocsCanvasShell attachSourceBelow description={<>The same chat in the Panel.</>}>
+    <Canvas of={AiChatStories.PanelMode} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Behavior
+
+- **The button is the one way in.** It hides while chat is open in the Panel or full screen, and returns when chat closes.
+- **Header controls** are clear chat, switch mode (popup and Panel trade places), full screen, more and close.
+- **The conversation moves with the mode.** There is no history: clearing chat empties it.
+- **The mode is remembered for the tab.** A Panel left open comes back open. A popup or full screen comes back closed, and the button opens it in the remembered mode.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Storybook variant
+
+`variant="storybook"` is the chat in the Storybook docs. Its header shows clear chat, move to Panel and close, with no full screen and no more menu.
+
+<DocsCanvasShell attachSourceBelow description={<>The Storybook variant.</>}>
+    <Canvas of={AiChatStories.StorybookVariant} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+</div>
