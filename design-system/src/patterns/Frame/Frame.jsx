@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { openOverlayCount, subscribeOverlays } from '@/lib/overlay';
 import { PanelHostContext } from '@/components';
@@ -7,6 +7,7 @@ import { SidebarControlContext } from './SidebarControl';
 import { PanelControlContext } from './PanelControl';
 import { SplitContext } from './SplitContext';
 import PanelSplitter from './PanelSplitter';
+import { useOwnWidth } from './useOwnWidth';
 import { FRAME_LAYOUT, clamp, resolveFrameLayout } from './frameLayout';
 import './Frame.scss';
 
@@ -40,31 +41,6 @@ const writePanelMemory = (key, memory) => {
 
 /** Whether focus has nowhere to be: on the body, or on an element that left the page. */
 const focusLost = (doc) => !doc.activeElement || doc.activeElement === doc.body || !doc.activeElement.isConnected;
-
-/**
- * The Frame's own width, in pixels, kept current as it resizes. Fit is measured
- * here, not on the window, so a docs preview narrower or wider than the
- * viewport lays out by the width it really has. Before the first measure (and
- * where nothing has a width, as in a unit test's DOM) it reads the window.
- * @param {React.RefObject<HTMLElement>} ref
- * @returns {number}
- */
-const useFrameWidth = (ref) => {
-    const windowWidth = () => (typeof window === 'undefined' ? 1440 : window.innerWidth);
-    const [width, setWidth] = useState(windowWidth);
-    useLayoutEffect(() => {
-        const read = () => setWidth(ref.current?.getBoundingClientRect().width || windowWidth());
-        read();
-        const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(read);
-        if (ref.current) ro?.observe(ref.current);
-        window.addEventListener('resize', read);
-        return () => {
-            ro?.disconnect();
-            window.removeEventListener('resize', read);
-        };
-    }, [ref]);
-    return width;
-};
 
 /**
  * Frame pattern: the app frame, a full-width 32 topbar over a row holding the
@@ -142,7 +118,7 @@ const Frame = ({
     const panelRef = useRef(null);
     const panelOpenerRef = useRef(null);
     const panelLeaveTimer = useRef(null);
-    const frameWidth = useFrameWidth(frameRef);
+    const frameWidth = useOwnWidth(frameRef);
     const hasSidebar = Boolean(sidebar);
     const hasPanel = Boolean(panel);
 

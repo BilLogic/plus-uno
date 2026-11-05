@@ -1,9 +1,10 @@
-import React, { useLayoutEffect, useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
 import { Button, IconButton } from '@/components';
 import PatternSection from '../PatternSection';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
 import { useSplitHolds } from '../Frame/SplitContext';
+import { useOwnWidth } from '../Frame/useOwnWidth';
 import './ListDetail.scss';
 
 /**
@@ -30,25 +31,12 @@ export const LIST_DETAIL_FLOOR = FRAME_LAYOUT.splitFloor;
 /**
  * Which of the two the layout shows: both (`split`), the list alone (`list`)
  * or the detail alone (`detail`).
- * @param {{ width: number, hasSelection: boolean }} input content width and whether a record is open
+ * @param {{ splitHolds: boolean, hasSelection: boolean }} input whether the split holds (content reaches the floor) and whether a record is open
  * @returns {'split' | 'list' | 'detail'}
  */
-export const listDetailView = ({ width, hasSelection }) => {
-    if (width >= LIST_DETAIL_FLOOR) return 'split';
+export const listDetailView = ({ splitHolds, hasSelection }) => {
+    if (splitHolds) return 'split';
     return hasSelection ? 'detail' : 'list';
-};
-
-// A box that measures 0 (hidden, not laid out) keeps the last width it had.
-const useOwnWidth = (ref) => {
-    const [width, setWidth] = useState(() => (typeof window === 'undefined' ? LIST_DETAIL_FLOOR : window.innerWidth));
-    useLayoutEffect(() => {
-        const read = () => setWidth((last) => ref.current?.getBoundingClientRect().width || last);
-        read();
-        const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(read);
-        if (ref.current) ro?.observe(ref.current);
-        return () => ro?.disconnect();
-    }, [ref]);
-    return width;
 };
 
 const ListDetail = ({
@@ -70,12 +58,12 @@ const ListDetail = ({
     ...props
 }) => {
     const ref = useRef(null);
-    const ownWidth = useOwnWidth(ref);
+    const ownWidth = useOwnWidth(ref, LIST_DETAIL_FLOOR);
     // Inside a Frame with `listDetail` the resolver decides, so the two never disagree.
-    const splitHolds = useSplitHolds();
-    const width = splitHolds === null ? ownWidth : (splitHolds ? LIST_DETAIL_FLOOR : 0);
+    const resolved = useSplitHolds();
+    const splitHolds = resolved ?? ownWidth >= LIST_DETAIL_FLOOR;
     const open = Boolean(detail) && hasSelection;
-    const view = listDetailView({ width, hasSelection: open });
+    const view = listDetailView({ splitHolds, hasSelection: open });
     const showList = view !== 'detail';
     const showDetail = open && view !== 'list';
     const stepper = (onPrevious || onNext) && (
@@ -94,7 +82,7 @@ const ListDetail = ({
             {showList && <div className="plus-list-detail__list">{list}</div>}
             {showDetail && (
                 <div className="plus-list-detail__detail">
-                    {view === 'detail' && (
+                    {view === 'detail' && onBack && (
                         <Button
                             className="plus-list-detail__back"
                             text={backLabel}
@@ -106,6 +94,7 @@ const ListDetail = ({
                     )}
                     <PatternSection
                         fill="subtle"
+                        named
                         title={detailTitle}
                         description={detailDescription}
                         actions={stepper || undefined}
@@ -132,7 +121,7 @@ ListDetail.propTypes = {
     detailFooter: PropTypes.node,
     /** Whether a record is open. Defaults to whether `detail` is given */
     hasSelection: PropTypes.bool,
-    /** Runs the back link, shown when the detail replaces the list */
+    /** Runs the back link. The link shows only when this is set and the detail replaces the list */
     onBack: PropTypes.func,
     /** The back link's label */
     backLabel: PropTypes.string,
