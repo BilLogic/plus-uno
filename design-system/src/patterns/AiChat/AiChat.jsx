@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { Dialog } from '@base-ui/react/dialog';
 import {
     AiIcon,
+    AiMessage,
     ButtonItem,
     DropdownMenu,
     IconButton,
@@ -122,9 +123,17 @@ const ChatSurface = ({ presentation }) => {
                     ) : messages.map((m) => (
                         <div key={m.id} className={`plus-ai-chat__message plus-ai-chat__message--${m.role}`}>
                             {m.role === 'ai' ? <AiIcon name="generate" label="AI" /> : null}
-                            <p className="plus-ai-chat__text">{m.text}</p>
+                            {m.role === 'ai'
+                                ? <AiMessage className="plus-ai-chat__text" text={m.text} />
+                                : <p className="plus-ai-chat__text">{m.text}</p>}
                         </div>
                     ))}
+                    {loading ? (
+                        <div className="plus-ai-chat__message plus-ai-chat__message--ai">
+                            <AiIcon name="generate" label="AI" />
+                            <AiMessage className="plus-ai-chat__text" status="thinking" />
+                        </div>
+                    ) : null}
                 </div>
             </PanelBody>
             <PanelFooter className="plus-ai-chat__footer">
