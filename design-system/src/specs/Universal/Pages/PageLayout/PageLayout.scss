@@ -41,13 +41,16 @@
 
 /* ------------------------------------------------------------- actions */
 
+// With actions, the Page gives up its foot pad: the bar is the foot, and pads itself.
+.plus-frame--focused-actions .plus-frame__surface {
+    padding-bottom: 0;
+}
+
 // Held at the foot of the Page while it scrolls, as wide as the content column
 // so the actions land under the content. Not a footer row: it lives in the Page.
 .plus-page-focused__actions-bar {
     position: sticky;
     bottom: 0;
-    // The Page pads its foot; the bar reaches through that pad to the edge.
-    margin-bottom: calc(-1 * var(--page-pad));
     padding-block: var(--focused-page-stack-sm);
     background-color: var(--ds-surface);
 }

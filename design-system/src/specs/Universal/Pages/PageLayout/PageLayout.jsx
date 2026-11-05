@@ -117,6 +117,7 @@ const FocusedFrame = ({
         <Frame
             topbar={topbar}
             width="reading"
+            className={actions ? 'plus-frame--focused-actions' : undefined}
             contentClassName={['plus-page-main', mainClassName].filter(Boolean).join(' ')}
             surfaceDirect={contentDirect}
             style={{ flex: '1 1 auto', minHeight: 0 }}
