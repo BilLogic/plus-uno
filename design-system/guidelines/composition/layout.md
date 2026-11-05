@@ -98,9 +98,25 @@ Figma `Pattern/Surface container`), which owns every frame size and the sidebar'
 behavior:
 
 - **Topbar** — the `Topbar` pattern (`@/patterns`), full width, 32 high (`--frame-topbar-height`), padded at its end and closed by a hairline: the sidebar toggle, the breadcrumb, Help Center and the account. The toggle sits 8 from the left, flush to the top at every width and shows `angles-left` while the sidebar is open, `bars` while it is closed. Docked, the breadcrumb lines up with the Page.
-- **Sidebar** — 240 (`--frame-sidebar-width`), docked from 1024. Below 1024 it never docks and starts collapsed: hovering the toggle or the left edge peeks it floating over the page (shadow, no Blanket, the page does not move), an outside click or Escape closes the peek, and a click on the toggle (or Ctrl+[) opens it as an overlay that closes the same way. The Page's top-left corner is rounded (`--page-radius`) only while the Sidebar is docked.
+- **Sidebar** — 240 (`--frame-sidebar-width`), docked from 1024. Below 1024 it never docks and starts collapsed: hovering the toggle or the left edge peeks it over the page (shadow, no Blanket, the page does not move), an outside click or Escape closes the peek, and a click on the toggle (or Ctrl+[) opens it as an overlay that closes the same way. The Page's top-left corner is rounded (`--page-radius`) only while the Sidebar is docked.
+- **Panel** — the area at the right, under the Topbar, holding AI chat first: 320 · 400 (default) · 640 (`--panel-min-width`, `--panel-width-default`, `--panel-max-width`). Docked it sits beside the Page and moves it; overlay it opens over the Page on a Blanket that covers the Page and the Sidebar but not the Topbar, and an outside click or Escape closes it. Its splitter resizes it, resists at the limit and never collapses the Sidebar. Open it from anywhere in the Frame with `usePanelControl()`. A Modal leaves it open under its Blanket.
 - **Page** — pads `--page-pad` (24 at every width).
 - **Content** — a 12-column grid with gutter `--grid-gutter` 16, capped at 1232 (`--content-max-width`) and centered on wide screens, never under 720 (`--content-min-width`): narrower, the page scrolls sideways. A child spans all 12 columns; give it `grid-column: span N` to span fewer, in whole columns.
+
+### Who gives way
+
+The content never drops under 720, so the Frame, not the page, decides what docks. It measures its own width, not the window's:
+
+1. Under 1024 the Sidebar never docks. The Panel is capped at 320 and opens as an overlay, one overlay at a time. Under 768 it is full width.
+2. A Sidebar the person opened by hand stays docked, and the Panel opens as an overlay if both do not fit.
+3. If both fit with 720 of content, both dock. With a 400 Panel that is from 1408.
+4. Otherwise a Sidebar left open by default collapses, and returns when the Panel closes. With a 400 Panel the Panel docks alone from 1168.
+5. Otherwise the Panel opens as an overlay.
+6. A List and detail layout keeps its split from 960 of content, met by collapsing the Sidebar first.
+
+## List and detail
+
+For a queue a person works through (Admin › Compliance, Admin › Reflections), use `ListDetail` (`@/patterns`): the list takes 7 columns and the detail, a Section with a subtle fill, takes 5, with next and previous in its header. Pass `listDetail` to the Frame so opening the Panel collapses the Sidebar first and the split keeps 960 of content. Below 960 the detail replaces the list under a back link. Heavy work, such as the recording review, gets its own page: "Open full review" in the detail's footer.
 
 Column spans and breakpoint tokens: `../foundations/grid.md`.
 
