@@ -1,10 +1,8 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { AiChat, AI_CHAT_STORAGE_KEY } from '@/patterns';
-import { Topbar } from '@/patterns';
-import { Sidebar } from '@/components';
-import { PANEL_STORAGE_KEY } from '@/patterns';
+import { Button, Modal, Sidebar } from '@/components';
+import { AiChat, AI_CHAT_STORAGE_KEY, PANEL_STORAGE_KEY, Topbar } from '@/patterns';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 
@@ -30,7 +28,9 @@ const USER = { name: 'John Doe', type: 'lead tutor' };
 
 const respond = async (text) => `You asked: "${text}". Here is what I found on this page.`;
 
-const ChatPage = ({ height = '100vh', ...args }) => (
+const ChatPage = ({ height = '100vh', withModal = false, ...args }) => {
+    const [modal, setModal] = React.useState(false);
+    return (
     <div style={{ height }}>
         <AiChat
             topbar={<Topbar breadcrumbs={BREADCRUMBS} user={USER} />}
@@ -40,9 +40,21 @@ const ChatPage = ({ height = '100vh', ...args }) => (
             {...args}
         >
             {slotContent('Page content')}
+            {withModal ? <div><Button text="Page settings" onClick={() => setModal(true)} /></div> : null}
+            {withModal ? (
+                <Modal
+                    show={modal}
+                    title="Page settings"
+                    primaryButton={{ text: 'Done', onClick: () => setModal(false) }}
+                    onClose={() => setModal(false)}
+                >
+                    Settings
+                </Modal>
+            ) : null}
         </AiChat>
     </div>
-);
+    );
+};
 
 export default {
     title: 'Foundations/Patterns/AI chat',
@@ -59,6 +71,7 @@ export default {
     argTypes: {
         variant: { control: 'select', options: ['app', 'storybook'], table: { category: 'Design' } },
         defaultMode: { control: 'select', options: ['popup', 'panel', 'fullscreen'], table: { category: 'Design' } },
+        withModal: { table: { disable: true } },
         defaultOpen: { control: 'boolean', table: { category: 'Design' } },
         title: { control: 'text', table: { category: 'Design' } },
         respond: { table: { disable: true } },
@@ -251,5 +264,20 @@ export const AppVariantControls = {
         const names = within(p.popup()).getAllByRole('button').map((b) => b.getAttribute('aria-label'))
             .filter((n) => ['Clear chat', 'Move to Panel', 'Full screen', 'More actions', 'Close chat'].includes(n));
         await expect(names).toEqual(['Clear chat', 'Move to Panel', 'Full screen', 'More actions', 'Close chat']);
+    }),
+};
+
+/** A Modal raised from the Page leaves the open popup where it is, and a press inside the Modal does not close it. */
+export const ModalLeavesThePopupOpen = {
+    args: { withModal: true, defaultOpen: true },
+    play: async ({ canvasElement }) => withTestViewport(1440, HEIGHT, async () => {
+        const p = parts(canvasElement);
+        await waitFor(() => expect(p.popup()).not.toBeNull());
+        await userEvent.click(within(canvasElement).getByRole('button', { name: 'Page settings' }));
+        const dialog = await within(document.body).findByRole('dialog', { name: 'Page settings' });
+        await expect(p.popup(), 'the popup stays under the Modal').not.toBeNull();
+        await userEvent.click(within(dialog).getByRole('button', { name: 'Done' }));
+        await waitFor(() => expect(within(document.body).queryByRole('dialog', { name: 'Page settings' })).toBeNull());
+        await expect(p.popup(), 'still open after the Modal').not.toBeNull();
     }),
 };

@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { Dialog } from '@base-ui/react/dialog';
 import {
     AiIcon,
+    ButtonItem,
     DropdownMenu,
     IconButton,
     Popup,
@@ -16,7 +17,6 @@ import {
     PanelHeader,
     PanelHostContext,
 } from '@/components';
-import { ButtonItem } from '@/components/navigation/MenuGroup';
 import Frame from '../Frame';
 import {
     AI_CHAT_FULLSCREEN_BELOW,
@@ -66,7 +66,7 @@ const transcriptOf = (messages) => messages
 const ChatSurface = ({ presentation }) => {
     const chat = useAiChat();
     const {
-        variant, title, messages, loading, draft, setDraft, starters, state, dispatch, clear, send, stop, narrow,
+        variant, title, messages, loading, draft, setDraft, starters, dispatch, clear, send, stop, narrow,
     } = chat;
     const storybook = variant === 'storybook';
     const listRef = useRef(null);
@@ -165,7 +165,7 @@ const Launcher = () => {
 
     return (
         <>
-            {fabHidden ? null : (
+            {fabHidden || fullscreenShown ? null : (
                 <Popup
                     triggerType="manual"
                     placement="top-end"
@@ -221,7 +221,7 @@ const AiChat = ({
     variant = 'app',
     defaultMode = 'popup',
     defaultOpen = false,
-    storageKey = AI_CHAT_STORAGE_KEY,
+    storageKey = variant === 'storybook' ? `${AI_CHAT_STORAGE_KEY}-storybook` : AI_CHAT_STORAGE_KEY,
     onModeChange,
     respond,
     starters,
@@ -267,10 +267,16 @@ const AiChat = ({
         setMessages((prev) => [...prev, { id: `u${prev.length}-${ticket}`, role: 'user', text }]);
         if (!respond) return;
         setLoading(true);
-        const reply = await respond(text);
+        let reply;
+        try {
+            reply = await respond(text);
+        } catch {
+            reply = null;
+        }
         // A clear or a stop in the meantime owns the conversation now.
         if (pending.current !== ticket) return;
         setLoading(false);
+        if (reply == null) return;
         setMessages((prev) => [...prev, { id: `a${prev.length}-${ticket}`, role: 'ai', text: reply }]);
     }, [respond]);
 
@@ -301,7 +307,7 @@ AiChat.propTypes = {
     defaultMode: PropTypes.oneOf(AI_CHAT_MODES),
     /** Whether chat starts open when the tab has nothing remembered. */
     defaultOpen: PropTypes.bool,
-    /** The sessionStorage key the mode is kept under; null keeps nothing. */
+    /** The sessionStorage key the mode is kept under (the Storybook variant has its own); null keeps nothing. */
     storageKey: PropTypes.string,
     /** Called with the new mode whenever chat moves between popup, Panel and full screen. */
     onModeChange: PropTypes.func,

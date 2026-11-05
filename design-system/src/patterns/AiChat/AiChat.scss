@@ -4,7 +4,7 @@
  */
 
 // The one entry point, at the bottom right of the Page. Under the Sidebar's
-// layer so a floating Sidebar and the Blanket cover it.
+// layer so an overlay Sidebar and the Blanket cover it.
 .plus-ai-chat__fab.plus-btn {
     position: fixed;
     inset-block-end: var(--page-pad);
