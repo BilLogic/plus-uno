@@ -47,9 +47,9 @@ const focusLost = (doc) => !doc.activeElement || doc.activeElement === doc.body 
 const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
 
 /**
- * Frame pattern: the app frame, a full-width 32 topbar over a row holding the
+ * Frame pattern: the app frame, a full-width 48 topbar over a row holding the
  * Sidebar and the Page. The Frame has no seams: the Page runs to the window
- * edges and meets the Sidebar at a hairline.
+ * edges and meets the Sidebar flush, with no divider.
  *
  * - The frame owns the Sidebar state; the Topbar in the `topbar` slot draws the
  *   one toggle from it (through `SidebarControlContext`). Without a `topbar`,
@@ -57,7 +57,7 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  * - What docks is decided by the layout resolver (`./frameLayout`) from the
  *   Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024
  *   it never docks.
- * - The Topbar spans the full width, pads its end, and ends in a hairline. The
+ * - The Topbar spans the full width, pads its end, and has no border. The
  *   Page starts right under it.
  * - The Page's top-left corner is rounded (`--page-radius`) only while the
  *   Sidebar is docked, switching in the same render as the width change.
@@ -74,7 +74,7 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  *   the floating Sidebar hands focus to the toggle when it closes, since its
  *   trigger left with the Sidebar.
  * - The Panel area (`panel`) is the Frame's right-hand area, under the
- *   Topbar. The resolver docks it beside the Page at a hairline when the
+ *   Topbar. The resolver docks it beside the Page when the
  *   content keeps 720, collapsing a default Sidebar first (and restoring it
  *   when the Panel closes); otherwise it opens over the Page on a Blanket that
  *   covers the Page and the Sidebar but not the Topbar, and a press outside or

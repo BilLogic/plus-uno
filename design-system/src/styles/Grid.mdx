@@ -144,14 +144,14 @@ row with the sidebar and the Page.
 <TokenTable
     valueHeader="MD · LG · XL"
     rows={[
-        { token: '--frame-topbar-height', figma: 'Topbar/height-topbar', value: '32 · 32 · 32' },
+        { token: '--frame-topbar-height', figma: 'Topbar/height-topbar', value: '48 · 48 · 48' },
         { token: '--frame-sidebar-width', figma: 'Sidebar/width-sidebar', value: '240 · 240 · 240' },
         { token: '--page-pad', figma: 'Page/pad', value: '24 · 24 · 24' },
         { token: '--page-radius', figma: 'Page/radius', value: '8 · 8 · 8' },
     ]}
 />
 
-The Frame has no seams: the Page runs to the window edges, with no pad or gap around it or between it and the topbar. The topbar is 32 with no vertical pad. Below
+The Frame has no seams: the Page runs to the window edges, with no pad or gap around it or between it and the topbar. The topbar is 48: a 32 row padded 8 above and below. Below
 1024 the sidebar opens over the page: 240 wide, full height, with a shadow and
 no Blanket. An outside click closes it, and the page never reflows. The dock is a
 step: at 1023 the content is 975 wide, and at 1024 the sidebar docks and it is
@@ -247,7 +247,7 @@ One Size scale, used through five roles. Pick the role, then its size; the pixel
     ]}
 />
 
-Icon sizes (12, 16, 20, 24) are documented on Iconography. Frame sizes (topbar 32, sidebar 240) are under The frame, and the 720 minimum and the 864 and 1232 caps are under Content widths. Minimum and maximum widths come from the common width scale (`--width-1000` is 160); there is no separate list.
+Icon sizes (12, 16, 20, 24) are documented on Iconography. Frame sizes (topbar 48, sidebar 240) are under The frame, and the 720 minimum and the 864 and 1232 caps are under Content widths. Minimum and maximum widths come from the common width scale (`--width-1000` is 160); there is no separate list.
 
 <FoundationSubsection title="Size tokens">
 

@@ -68,7 +68,7 @@ The default frame is `Frame`, a content slot and a topbar.
     <tbody>
         <tr><td><strong>1 Frame</strong></td><td>The frame around the page: the topbar, the sidebar and the page row. Its fill is the sunken page.</td></tr>
         <tr><td><strong>2 Content</strong></td><td>A slot in the page. It holds a page-level Section header and the Sections.</td></tr>
-        <tr><td><strong>3 Topbar</strong></td><td>The 32 row across the full width. It carries the sidebar toggle, the breadcrumb, Help Center and the account.</td></tr>
+        <tr><td><strong>3 Topbar</strong></td><td>The 48 bar across the full width, a 32 row padded 8 above and below. It carries the sidebar toggle, the breadcrumb, Help Center and the account.</td></tr>
     </tbody>
 </DocsTable>
 
@@ -92,7 +92,7 @@ The page carries two grids, and the modal guide marks where a modal sits.
 - **Screen grid** (red in Figma). It lives on Blanket only, so turning the blanket off hides it. A page frame carries only the content grid.
 - **Modal guide** (purple in Figma). It belongs to Modal and shows the modal's width within the screen grid.
 
-The sidebar toggle stays 8 from the left, flush to the top at every width and in every sidebar state.
+The sidebar toggle stays 8 from the left, at (8, 8) at every width and in every sidebar state.
 
 </div>
 
@@ -198,7 +198,7 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
         <tr><th>Token</th><th>Value</th><th>Purpose</th></tr>
     </thead>
     <tbody>
-        <tr><td><code>--frame-topbar-height</code></td><td>32</td><td>The topbar row.</td></tr>
+        <tr><td><code>--frame-topbar-height</code></td><td>48</td><td>The topbar: a 32 row padded 8 above and below.</td></tr>
         <tr><td><code>--frame-sidebar-width</code></td><td>240</td><td>The sidebar, docked from 1024.</td></tr>
         <tr><td><code>--page-pad</code></td><td>24</td><td>The page pad at every width. The grid margin is the same token.</td></tr>
         <tr><td><code>--page-radius</code></td><td>8</td><td>The page's top-left corner, only while the sidebar is docked.</td></tr>
@@ -318,7 +318,7 @@ A drawer opens over the page template. The blanket covers the whole frame, the d
 
 ### Usage
 
-- **Two rows.** The topbar runs across the full width, 32 high with no padding of its own. Under it, the sidebar and the page meet with no gap.
+- **Two rows.** The topbar runs across the full width, 48 high, a 32 row padded 8 above and below. Under it, the sidebar and the page meet with no gap.
 - **No seams.** The page runs to the window edges. There is no frame pad around it.
 - **Sidebar.** 240 wide, from the screen edge to the page. It docks from 1024.
 - **Page pad.** 24 at every width. The grid margin is the same token.

@@ -5,7 +5,7 @@ import { useSidebarControl } from '../Frame/SidebarControl';
 import './Topbar.scss';
 
 /**
- * Topbar pattern: the app frame's top row, 32 high (`--frame-topbar-height`).
+ * Topbar pattern: the app frame's top row, 48 high (`--frame-topbar-height`): a 32 row padded 8 above and below.
  * Mirrors the Figma `_Topbar` and the Specs Top Bar (111-227859).
  *
  * - **Start:** the sidebar toggle, a primary tonal 32 icon button. It shows

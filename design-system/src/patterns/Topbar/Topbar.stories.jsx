@@ -15,7 +15,7 @@ import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
  * THE TEST SEAM IS THIS FILE. Each story asserts what a person sees and what a
  * screen reader hears: the toggle's icon and name in every sidebar state, where
  * the breadcrumb starts, that a long breadcrumb or name truncates instead of
- * pushing the end controls off screen, and the 32 height. Every expected length
+ * pushing the end controls off screen, and the 48 height. Every expected length
  * is read from its token through a probe, never typed in.
  */
 
@@ -119,6 +119,9 @@ export const Overview = {
         await expect(rect(toggle()).width, 'toggle is square').toBeCloseTo(rect(toggle()).height, 0);
         await expect(rect(toggle()).left - rect(bar).left, 'toggle sits at 8')
             .toBeCloseTo(token('--pad-x-sm'), 0);
+        await expect(rect(toggle()).top - rect(bar).top, 'toggle sits 8 from the top')
+            .toBeCloseTo(token('--pad-y-lg'), 0);
+        await expect(rect(bar).height, 'the bar is 48').toBeCloseTo(token('--item-height-md') + 2 * token('--pad-y-lg'), 0);
         await expect(rect(breadcrumb()).left - rect(bar).left, 'docked: the breadcrumb starts at the sidebar width')
             .toBeCloseTo(token('--frame-sidebar-width'), 0);
         await expect(rect(avatar()).height, 'avatar at 32').toBeCloseTo(token('--item-height-md'), 0);

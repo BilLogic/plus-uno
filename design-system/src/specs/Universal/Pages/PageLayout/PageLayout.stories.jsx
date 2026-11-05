@@ -126,7 +126,7 @@ export const Frame = {
             const pad = tokenLength(frame, '--pad-x-sm');
             await expect(topbar.getBoundingClientRect().height).toBeCloseTo(tokenLength(frame, '--frame-topbar-height'), 0);
             await expect(toggle.getBoundingClientRect().left - frame.getBoundingClientRect().left).toBeCloseTo(pad, 0);
-            await expect(toggle.getBoundingClientRect().top - frame.getBoundingClientRect().top).toBeCloseTo(0, 0);
+            await expect(toggle.getBoundingClientRect().top - frame.getBoundingClientRect().top).toBeCloseTo(tokenLength(frame, '--pad-y-lg'), 0);
             const avatar = frame.querySelector('.plus-user-avatar');
             await expect(avatar.getBoundingClientRect().height, 'the avatar fits the topbar')
                 .toBeLessThanOrEqual(topbar.getBoundingClientRect().height + 0.5);

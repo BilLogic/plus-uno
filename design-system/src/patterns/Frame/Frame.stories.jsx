@@ -10,7 +10,7 @@ import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { PAGE_EDGE } from '@/patterns/Page';
 
 /**
- * Frame — the app frame: a full-width 32 topbar over a row holding the Sidebar
+ * Frame — the app frame: a full-width 48 topbar over a row holding the Sidebar
  * and the Page.
  *
  * THE TEST SEAM IS THIS FILE. Each width story sets the viewport first, because
@@ -133,12 +133,12 @@ const offset = (frame, el) => ({ x: rect(el).left - rect(frame).left, y: rect(el
 /** The surface's padding in pixels (all four sides share one token). */
 const surfacePad = (surface) => px(getComputedStyle(surface).paddingLeft);
 
-/** The toggle sits 8 from the left and flush to the top at every width and in every sidebar state. */
+/** The toggle sits at (8, 8) at every width and in every sidebar state. */
 const expectToggleHome = async (frame, toggle) => {
     const pad = tokenLength(frame, '--pad-x-sm');
     const at = offset(frame, toggle);
     await expect(at.x, 'toggle x').toBeCloseTo(pad, 0);
-    await expect(at.y, 'toggle y').toBeCloseTo(0, 0);
+    await expect(at.y, 'toggle y').toBeCloseTo(tokenLength(frame, '--pad-y-lg'), 0);
     await expect(rect(toggle).height, 'toggle height').toBeCloseTo(tokenLength(frame, '--item-height-md'), 0);
 };
 
@@ -167,7 +167,7 @@ const atViewport = (width, run) => withTestViewport(width, HEIGHT, run);
 
 /**
  * No seams: the Topbar spans the full width, the Page starts where it ends and
- * runs to the right and bottom edges, and a hairline closes the Topbar.
+ * runs to the right and bottom edges, and the Topbar has no border.
  */
 const expectNoSeam = async (frame, surface) => {
     const topbar = frame.querySelector('.plus-frame__topbar');
@@ -175,9 +175,8 @@ const expectNoSeam = async (frame, surface) => {
     await expect(rect(surface).top - rect(topbar).bottom, 'no gap between the rows').toBeCloseTo(0, 0);
     await expect(rect(frame).right - rect(surface).right, 'no seam on the right').toBeCloseTo(0, 0);
     await expect(rect(frame).bottom - rect(surface).bottom, 'no seam at the bottom').toBeCloseTo(0, 0);
-    const line = getComputedStyle(topbar, '::after');
-    await expect(px(line.height), 'a hairline under the topbar').toBeCloseTo(tokenLength(frame, '--stroke-1'), 1);
-    await expect(line.backgroundColor, 'in the border color').toBe(tokenColor(frame, '--ds-border'));
+    await expect(getComputedStyle(topbar, '::after').content, 'no hairline under the topbar').toBe('none');
+    await expect(px(getComputedStyle(topbar).borderBottomWidth), 'no border on the topbar').toBeCloseTo(0, 0);
     await expect(px(getComputedStyle(topbar).paddingRight), 'the topbar pads its end').toBeCloseTo(tokenLength(frame, '--pad-x-sm'), 0);
 };
 
@@ -198,9 +197,9 @@ export const Overview = {};
 /**
  * In every color mode the frame is the sunken backdrop in the body text color,
  * and the surface is the default surface edged by the surface border, so the
- * pair moves together. Docked, the sidebar ends in a 1px border-color divider,
- * flush against the surface, so the surface edge (where increased contrast
- * draws one) lies over the divider instead of beside it.
+ * pair moves together. Docked, the sidebar has no divider: it sits flush
+ * against the surface, whose own edge (where increased contrast draws one)
+ * is the only line between them.
  */
 export const ColorModes = {
     parameters: { docs: { disable: true } },
@@ -210,8 +209,6 @@ export const ColorModes = {
         await waitFor(() => expect(getComputedStyle(sidebar()).position, 'docked at 1024').toBe('static'));
         const aside = sidebar();
         await expect(rect(aside).right, 'the sidebar sits flush against the surface').toBeCloseTo(rect(surface).left, 0);
-        await expect(tokenLength(frame, '--size-surface-border'), 'the surface edge covers the divider')
-            .toBeGreaterThanOrEqual(tokenLength(frame, '--stroke-1'));
         await inEveryColorMode(async (mode) => {
             const frameStyle = getComputedStyle(frame);
             const surfaceStyle = getComputedStyle(surface);
@@ -221,9 +218,7 @@ export const ColorModes = {
             await expect(surfaceStyle.backgroundColor, `${mode}: the surface`).toBe(tokenColor(canvasElement, '--ds-surface'));
             await expect(surfaceStyle.boxShadow, `${mode}: the surface edge`)
                 .toBe(computedShadow(canvasElement, PAGE_EDGE));
-            await expect(asideStyle.borderRightStyle, `${mode}: the docked sidebar's divider`).toBe('solid');
-            await expect(px(asideStyle.borderRightWidth), `${mode}: a 1px divider`).toBeCloseTo(tokenLength(frame, '--stroke-1'), 1);
-            await expect(asideStyle.borderRightColor, `${mode}: in the border color`).toBe(tokenColor(canvasElement, '--ds-border'));
+            await expect(px(asideStyle.borderRightWidth), `${mode}: no divider on the docked sidebar`).toBeCloseTo(0, 0);
             if (mode.startsWith('dark')) {
                 await expect(frameStyle.backgroundColor, `${mode}: the frame moves with the mode`).not.toBe(lightSunken);
             }
@@ -428,13 +423,13 @@ export const CtrlBracketAt768 = {
     }),
 };
 
-/** The Page meets the Sidebar at a hairline: the Sidebar's 1px border sits flush against the Page, with no gap. */
+/** The Page meets the Sidebar flush, with no gap and no divider. */
 export const SidebarMeetsPage = {
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const { frame, surface, sidebar } = parts(canvasElement);
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expect(rect(sidebar()).right, 'no gap between the Sidebar and the Page').toBeCloseTo(rect(surface).left, 0);
-        await expect(px(getComputedStyle(sidebar()).borderRightWidth)).toBeCloseTo(tokenLength(frame, '--stroke-1'), 1);
+        await expect(px(getComputedStyle(sidebar()).borderRightWidth), 'no divider').toBeCloseTo(0, 0);
         await expectNoSeam(frame, surface);
     }),
 };

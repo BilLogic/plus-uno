@@ -15,8 +15,8 @@
     height: 100%;
     min-height: 0;
     box-sizing: border-box;
-    // No seams: the Page runs to the window edges and meets the Sidebar at a
-    // hairline. The Topbar pads its own start, so the toggle sits 8 from the left, flush to the top
+    // No seams: the Page runs to the window edges and meets the Sidebar with
+    // no divider. The Topbar pads 8 on every side, so the toggle sits at (8, 8)
     // whatever the Sidebar is doing.
     background-color: var(--ds-surface-sunken);
     color: var(--ds-text);
@@ -24,8 +24,7 @@
 
 /* ------------------------------------------------------------- topbar */
 
-// Full width, with an end pad and a hairline under it. The hairline is drawn
-// over the bottom edge rather than as a border, so the Topbar stays 32 high.
+// Full width, with an end pad and no border: the Page's own edge marks where it begins.
 .plus-frame__topbar {
     position: relative;
     display: flex;
@@ -35,16 +34,6 @@
     height: var(--frame-topbar-height);
     box-sizing: border-box;
     padding-inline-end: var(--pad-x-sm);
-
-    &::after {
-        content: '';
-        position: absolute;
-        inset-inline: 0;
-        bottom: 0;
-        height: var(--border-default);
-        background-color: var(--ds-border);
-        pointer-events: none;
-    }
 }
 
 // The Topbar's start, which holds the toggle, stays above a floating sidebar,
@@ -75,14 +64,11 @@
     overflow-y: auto;
 }
 
-// Docked, the sidebar ends in a divider on its right. It sits flush against the
-// page, so where increased contrast draws the page's edge, that ring lies
-// over this line rather than beside it: one line, never two.
+// Docked, the sidebar has no divider: the Page's own edge and corner separate them.
 .plus-frame__sidebar--docked {
     position: static;
     flex-shrink: 0;
     padding: 0 var(--pad-x-sm);
-    border-right: var(--border-default) solid var(--ds-border);
 }
 
 // Raised (a peek, or an overlay under 1024): over the Page, from the Topbar down, with a shadow and no Blanket.

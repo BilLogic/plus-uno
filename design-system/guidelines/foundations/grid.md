@@ -117,7 +117,7 @@ The `Frame` pattern draws, from the same file:
 
 | Token | Value | Description |
 |:---|:---|:---|
-| `--frame-topbar-height` | 32 | Topbar height, with no vertical padding; it pads 8 on the left, and the toggle sits flush to the top |
+| `--frame-topbar-height` | 48 | Topbar height: a 32 row padded 8 above and below (`--pad-y-lg`); it pads 8 on the left, so the toggle sits at (8, 8) |
 | `--frame-sidebar-width` | 240 | Sidebar width; docked from Large, closed below |
 | `--page-pad` | 24 | Page pad at every width, the content grid's margin |
 | `--page-radius` | 8 | Page corner radius |

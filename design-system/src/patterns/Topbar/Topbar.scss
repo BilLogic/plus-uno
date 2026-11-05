@@ -1,5 +1,5 @@
 /**
- * Topbar pattern (Patterns/Topbar): start · middle · end in a 32 row.
+ * Topbar pattern (Patterns/Topbar): start · middle · end in a 32 row, padded 8 above and below (48 in all).
  * Every length is a Layout, Frame, Item or Element token.
  */
 
@@ -10,6 +10,7 @@
     min-width: 0;
     height: var(--frame-topbar-height);
     box-sizing: border-box;
+    padding-block: var(--pad-y-lg);
 }
 
 /* ------------------------------------------------------------- start */

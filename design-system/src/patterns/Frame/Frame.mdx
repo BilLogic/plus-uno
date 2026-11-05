@@ -31,7 +31,7 @@ export const propRows = [
 export const tokens = [
     ['--screen-width', '768', '1024', '1440', 'The page template frame width. Switching the layout mode resizes the frame.'],
     ['--screen-pad-x', '24', '24', '32', 'Pads the screen, a rule of its own so a Modal does not move when the Page pad does. The screen grid is clamp(720, screen minus 2 pads, 1232), centered, and belongs to the Overlay only, not the page grid.'],
-    ['--frame-topbar-height', '32', '32', '32', 'The Topbar height.'],
+    ['--frame-topbar-height', '48', '48', '48', 'The Topbar height: a 32 row padded 8 above and below.'],
     ['--frame-sidebar-width', '240', '240', '240', 'The Sidebar width, docked, peeking or as an overlay.'],
     ['--page-pad', '24', '24', '24', "The page's pad, which is also the grid margin. One value at every width."],
     ['--page-radius', '8', '8', '8', "The Page's top-left corner radius, applied only while the Sidebar is docked."],
@@ -55,7 +55,7 @@ export const colorTokens = [
     ['--ds-surface-sunken', 'The frame\'s fill.'],
     ['--ds-surface', 'The page\'s fill.'],
     ['--ds-border-surface', 'The page\'s edge ring. Transparent, except in light increased contrast, where the frame turns white and the page needs a line to stand on.'],
-    ['--ds-border', 'The 1px hairline under the Topbar and the divider at the right edge of a docked Sidebar. Where the Page\'s edge is drawn, it lies over the divider, so one line shows.'],
+    ['--ds-border', 'The Panel\'s hairline. The Topbar and a docked Sidebar have no border; the Page\'s own edge separates them.'],
     ['--ds-surface-overlay', 'The fill of a peeking or overlay Sidebar, and of an overlay or peeking Panel.'],
     ['--ds-shadow-overlay', 'The shadow of a peeking or overlay Sidebar, and of an overlay or peeking Panel.'],
     ['--ds-blanket', 'The Blanket under an overlay Panel. It covers the Page and the Sidebar, never the Topbar.'],
@@ -63,7 +63,7 @@ export const colorTokens = [
 ];
 
 <Title>Frame</Title>
-Frame is the app frame: a full-width Topbar above a row that holds the Sidebar, the Page and the Panel. It has no seams: the Page runs to the window edges and meets the Sidebar and the Panel at hairlines. Every value is a token, and values read Medium, Large and X-Large where the layout mode changes them.
+Frame is the app frame: a full-width Topbar above a row that holds the Sidebar, the Page and the Panel. It has no seams: the Page runs to the window edges and meets the Panel at a hairline and the Sidebar with no divider. Every value is a token, and values read Medium, Large and X-Large where the layout mode changes them.
 
 The examples on this page follow the **Color mode** switch in the toolbar.
 
@@ -98,7 +98,7 @@ For a whole page with the PLUS Topbar and sidebar already filled in, start from 
 
 ### Anatomy
 
-1. **Topbar** is a part. It spans the full width and holds the Sidebar toggle, the breadcrumb and the account, in a row 32 high with no fill of its own. It pads its end and ends in a hairline. The toggle sits 8 from the left, flush to the top at every width.
+1. **Topbar** is a part. It spans the full width and holds the Sidebar toggle, the breadcrumb and the account, in a 32 row padded 8 above and below (48 in all) with no fill and no border of its own. The toggle sits at (8, 8) at every width.
 2. **Page** is a part. It is the content box on `--ds-surface`, starting right under the Topbar and running to the window edges. Its top-left corner is rounded only while the Sidebar is docked, and the corner switches in the same frame as the Sidebar's width.
 3. **Content** is the slot where Sections go. It is a 12-column grid, centered and capped at 1232.
 4. **Sidebar** is a part. It holds the logo, Home, then the Sidebar sections. It docks from 1024 and never docks below that.
@@ -273,7 +273,7 @@ Use the reading width for long text. The content caps at 864 instead of 1232 and
 - Docked or peeking, the Panel is a complementary landmark named by `panelLabel`, after the Page in reading order, and it leaves focus where it is. When opening it collapses the Sidebar that held focus, focus moves into the Panel; closing it returns focus to what opened it.
 - As an overlay, the Panel is a modal dialog named by `panelLabel`. Opening it moves focus to its first control and Tab stays inside it; the Page and the Sidebar under the Blanket are inert, so a keyboard or screen reader cannot reach what a pointer cannot. Closing it, by Escape, a press on the Blanket or its Close button, returns focus to what opened it.
 - The splitter is a vertical separator named "Resize panel" that reports its width as its value. The left arrow widens the Panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
-- The Topbar's hairline, the Sidebar's divider and the Panel's edge are `--ds-border`.
+- The Panel's edge is `--ds-border`. The Topbar and a docked Sidebar have no border.
 - In light increased contrast the page draws its edge ring in `--ds-border-surface`, so it stays distinct from the frame behind it.
 
 </div>
