@@ -269,7 +269,7 @@ Use the reading width for long text. The content caps at 864 instead of 1232 and
 - The Page is the `main` landmark, and the `nav` inside the Sidebar is the navigation landmark. The box around that `nav` is not a landmark of its own.
 - The toggle is a button. Its name says what a press does: "Close sidebar" while docked, "Open sidebar" otherwise. It reports whether the Sidebar is showing, points at it while it is open, and announces its shortcut, Ctrl+[.
 - A peeking or overlay Sidebar closes on Escape, and focus returns to the toggle. A control that handles its own Escape, such as a menu, keeps it.
-- Opening a modal from the floating Sidebar returns focus to the toggle when the modal closes, because the trigger left with the Sidebar.
+- Opening a modal from the peeking Sidebar returns focus to the toggle when the modal closes, because the trigger left with the Sidebar.
 - The Panel is a complementary landmark named by `panelLabel`, after the Page in reading order. When opening it collapses the Sidebar that held focus, focus moves into the Panel; closing it returns focus to what opened it.
 - The splitter is a vertical separator named "Resize panel" that reports its width as its value. The left arrow widens the Panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
 - The Topbar's hairline, the Sidebar's divider and the Panel's edge are `--ds-border`.
