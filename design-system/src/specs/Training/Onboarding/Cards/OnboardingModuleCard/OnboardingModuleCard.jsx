@@ -85,7 +85,7 @@ const OnboardingModuleCard = ({
                     {/* Badge and Status */}
                     <div className="onboarding-module-card__footer">
                         <StrategyBadge type={badgeType} />
-                        <StatusIndicators stage={stage} size="small" />
+                        <StatusIndicators stage={stage} size={12} />
                     </div>
                 </div>
             </div>

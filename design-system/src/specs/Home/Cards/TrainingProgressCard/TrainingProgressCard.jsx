@@ -10,7 +10,7 @@ import './TrainingProgressCard.scss';
  */
 const TrainingProgressCard = ({
     id,
-    size = 'default', // 'default' or 'small'
+    spacing = 'default', // 'default' or 'compact'
     title = 'Training Progress',
     completed = 6,
     total = 10,
@@ -22,7 +22,7 @@ const TrainingProgressCard = ({
         'R': 25, // Relationships
         'T': 30  // Technology Tools
     },
-    // For small size: breakdown showing completed/total for each competency
+    // For compact spacing: breakdown showing completed/total for each competency
     competencyBreakdown = {
         'S': { completed: 6, total: 9 },
         'M': { completed: 2, total: 8 },
@@ -98,7 +98,7 @@ const TrainingProgressCard = ({
 
     const cardClasses = [
         'plus-training-progress-card',
-        `plus-training-progress-card-${size}`,
+        `plus-training-progress-card-${spacing}`,
         className
     ].filter(Boolean).join(' ');
 
@@ -113,7 +113,7 @@ const TrainingProgressCard = ({
             className={cardClasses}
             style={cardStyle}
             padding="md"
-            gap={size === 'small' ? 'sm' : 'md'}
+            gap={spacing === 'compact' ? 'sm' : 'md'}
         >
             <div className="plus-training-progress-content">
                 {/* Title with info icon */}
@@ -124,15 +124,15 @@ const TrainingProgressCard = ({
 
                 {/* Main content */}
                 <div className="plus-training-progress-main">
-                    {size === 'small' ? (
+                    {spacing === 'compact' ? (
                         <>
-                            {/* Competency bars on left for small size */}
+                            {/* Competency bars on left for compact spacing */}
                             <div className="plus-training-progress-competencies">
                                 {Object.entries(competencies).map(([letter, value]) =>
                                     renderCompetencyBar(letter, value)
                                 )}
                             </div>
-                            {/* Breakdown list on right for small size */}
+                            {/* Breakdown list on right for compact spacing */}
                             <div className="plus-training-progress-breakdown">
                                 {Object.entries(competencyBreakdown).map(([letter, breakdown]) => {
                                     const colors = competencyColors[letter];
@@ -152,7 +152,7 @@ const TrainingProgressCard = ({
                         </>
                     ) : (
                         <>
-                            {/* Text content for default size */}
+                            {/* Text content for default spacing */}
                             <div className="plus-training-progress-text">
                                 {/* A count is not a section. `.plus-training-progress-value`
                                     carries the whole appearance, so the tag stays out of the
@@ -170,7 +170,7 @@ const TrainingProgressCard = ({
                                 />
                             </div>
 
-                            {/* Competency bars on right for default size */}
+                            {/* Competency bars on right for default spacing */}
                             <div className="plus-training-progress-competencies">
                                 {Object.entries(competencies).map(([letter, value]) =>
                                     renderCompetencyBar(letter, value)
@@ -186,7 +186,7 @@ const TrainingProgressCard = ({
 
 TrainingProgressCard.propTypes = {
     id: PropTypes.string,
-    size: PropTypes.oneOf(['default', 'small']),
+    spacing: PropTypes.oneOf(['default', 'compact']),
     title: PropTypes.string,
     completed: PropTypes.number,
     total: PropTypes.number,

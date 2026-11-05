@@ -315,7 +315,7 @@ const StudentsOverviewSection = ({
                     <Table
                         headers={tableHeaders}
                         rows={tableRows}
-                        density="md"
+                        size={40}
                         className="plus-students-table"
                     />
                 </div>
@@ -354,7 +354,7 @@ const StudentsOverviewSection = ({
                 <Table
                     headers={tableHeaders}
                     rows={tableRows}
-                    density="md"
+                    size={40}
                     className="plus-students-table"
                 />
             </div>

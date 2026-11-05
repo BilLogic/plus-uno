@@ -39,6 +39,6 @@ From `design-system/src/components/labels/Suggestion/Suggestion.scss`. Override 
 
 ## Related
 
-Same group: `AiLabel` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Tag` · `TagGroup`
+Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

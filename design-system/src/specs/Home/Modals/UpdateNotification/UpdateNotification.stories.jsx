@@ -42,7 +42,7 @@ export default {
 };
 
 /**
- * App chrome + scrim + open notification (docs Overview).
+ * App chrome + blanket + open notification (docs Overview).
  */
 export const Overview = {
     render: () => (

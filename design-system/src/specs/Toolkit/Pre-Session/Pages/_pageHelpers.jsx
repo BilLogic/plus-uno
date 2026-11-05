@@ -7,10 +7,10 @@ import React from 'react';
  */
 
 /**
- * Full-bleed modal scrim overlay for the *WithModals page mocks. Replaces the
+ * Full-bleed modal blanket overlay for the *WithModals page mocks. Replaces the
  * hand-rolled `rgba(0,0,0,0.5)` overlay that was copy-pasted into ~9 pages.
  */
-export const ModalScrim = ({ open, children }) => (
+export const ModalBlanket = ({ open, children }) => (
     <div style={{
         position: 'absolute',
         inset: 0,
@@ -25,7 +25,7 @@ export const ModalScrim = ({ open, children }) => (
     </div>
 );
 
-/** Placeholder card shown inside a scrim when no modal matches the current args. */
+/** Placeholder card shown inside a blanket when no modal matches the current args. */
 export const MissingModal = ({ children }) => (
     <div style={{
         backgroundColor: 'var(--ds-surface-container)',

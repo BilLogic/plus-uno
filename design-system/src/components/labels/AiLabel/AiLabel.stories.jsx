@@ -68,7 +68,7 @@ TheMarkIsNotAControl.play = async ({ canvasElement }) => {
 /**
  * Low confidence says what to do about it.
  *
- * #269 quotes Rovo's voice guidance: the system must "define… what happens when
+ * #269 quotes the reference voice guidance: the system must "define… what happens when
  * confidence is low". A caution treatment with no instruction is a warning with
  * no instruction, so the note is part of the component and not left to each
  * caller's prose — it has a default, and the default is an instruction.

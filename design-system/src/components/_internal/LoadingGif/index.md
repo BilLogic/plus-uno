@@ -12,7 +12,7 @@
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `type` | enum | `'growing'` | — |
-| `size` | enum | `'default'` | — |
+| `size` | enum | `10` | — |
 | `label` | string | `'Loading...'` | — |
 | `id` | string | — | — |
 | `className` | string | `''` | — |
@@ -21,7 +21,7 @@
 
 **`type`** — `growing` · `rotating` · `stacking`
 
-**`size`** — `small` · `default` · `large`
+**`size`** — `6` · `10` · `14`
 
 Anything not listed is not a valid value.
 

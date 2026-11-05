@@ -82,7 +82,7 @@ export const Footer = {
 };
 
 const HeadRow = ({ children }) => (
-    <table className="plus-table plus-table-md" style={{ tableLayout: 'fixed' }}>
+    <table className="plus-table plus-table-40" style={{ tableLayout: 'fixed' }}>
         <thead><tr>{children}</tr></thead>
     </table>
 );

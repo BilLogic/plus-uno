@@ -75,6 +75,7 @@ export const CHROME = {
     separator: v('border-inverse'),
     track: v('background-neutral'),
     tooltip: v('surface-overlay'),
+    surface: v('surface'),
 };
 
 /** The hues with a chart ramp. */

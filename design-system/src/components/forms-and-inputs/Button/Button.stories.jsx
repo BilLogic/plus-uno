@@ -45,13 +45,17 @@ const PAINT = {
         ground: '--ds-background-danger-bold', label: '--ds-text-inverse', icon: '--ds-icon-inverse',
         hovered: '--ds-background-danger-bold-hovered', pressed: '--ds-background-danger-bold-pressed',
     },
+    ai: {
+        ground: '--ds-ai-background-bold', label: '--ds-text-inverse', icon: '--ds-icon-inverse',
+        hovered: '--ds-ai-background-bold-hovered', pressed: '--ds-ai-background-bold-pressed',
+    },
     discovery: {
         ground: '--ds-background-discovery-bold', label: '--ds-text-inverse', icon: '--ds-icon-inverse',
         hovered: '--ds-background-discovery-bold-hovered', pressed: '--ds-background-discovery-bold-pressed',
     },
 };
 
-const label = (appearance) => appearance.charAt(0).toUpperCase() + appearance.slice(1);
+const label = (appearance) => appearance === 'ai' ? 'Generate summary' : appearance.charAt(0).toUpperCase() + appearance.slice(1);
 const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
 /** A hover or pressed read with the transition out of the way. */
 const settled = (button) => { button.style.transition = 'none'; };
@@ -64,6 +68,7 @@ export default {
     parameters: {
         changelog: [
             { date: '2026-11-03', kind: 'changed', summary: 'Props: `appearance` (default, primary, subtle, warning, danger, discovery), `spacing` (default 32, compact 24), `isSelected`, `isDisabled`, `isLoading`, `shouldFitContainer`, `iconBefore` and `iconAfter`. Radius is 6 at default spacing and 4 at compact, the icon-to-label gap is 4, and hover and pressed take named tokens.' },
+            { date: '2026-11-05', kind: 'added', summary: 'Appearance `ai`: the one primary AI action in a region, on `--ds-ai-background-bold` with the sparkle always drawn before its label.' },
         ],
         docs: {
             toc: {

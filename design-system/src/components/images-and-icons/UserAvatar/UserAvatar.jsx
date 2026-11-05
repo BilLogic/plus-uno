@@ -14,9 +14,9 @@ const ROLE_LABELS = {
  * The signed-in user: an initial pill, the name, the role indicator ("Lead")
  * and an optional notification counter. Per the Specs User Avatar (111-227876).
  *
- * - `size="md"` is 32 high (`--item-height-md`), for the 32 topbar. The name
+ * - `spacing="compact"` is 32 high (`--item-height-md`), for the 32 topbar. The name
  *   truncates at `--label-max-width`.
- * - `size="lg"` pads `--pad-y-md` around a 32 pill, for table rows.
+ * - `spacing="default"` pads `--pad-y-md` around a 32 pill, for table rows.
  */
 const UserAvatar = ({
     firstChar = 'J',
@@ -25,7 +25,7 @@ const UserAvatar = ({
     counterValue = 2,
     state = 'enabled',
     type = 'regular tutor',
-    size = 'lg',
+    spacing = 'default',
     id,
     onClick,
     className = ''
@@ -33,7 +33,7 @@ const UserAvatar = ({
     const role = ROLE_LABELS[type];
     const classes = [
         'plus-user-avatar',
-        `plus-user-avatar--${size}`,
+        `plus-user-avatar--${spacing}`,
         `plus-user-avatar--${state}`,
         onClick ? 'plus-user-avatar--clickable' : '',
         className,
@@ -69,8 +69,8 @@ UserAvatar.propTypes = {
     state: PropTypes.oneOf(['enabled', 'hover']),
     /** `lead tutor` shows the "Lead" role indicator; other types show none. */
     type: PropTypes.oneOf(['regular tutor', 'lead tutor', 'admin']),
-    /** `md` 32 high, for the topbar · `lg` the original padded row, for tables */
-    size: PropTypes.oneOf(['md', 'lg']),
+    /** `compact` 32 high, for the topbar · `default` the padded row, for tables */
+    spacing: PropTypes.oneOf(['default', 'compact']),
     id: PropTypes.string,
     onClick: PropTypes.func,
     className: PropTypes.string

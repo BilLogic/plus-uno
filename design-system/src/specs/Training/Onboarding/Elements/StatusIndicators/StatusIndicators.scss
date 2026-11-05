@@ -18,7 +18,7 @@
     }
 
     // Size variants
-    &--small {
+    &--12 {
         min-width: 28px;
         padding: var(--space-025, 4px) var(--pad-x-sm, 8px);
 
@@ -27,7 +27,7 @@
         }
     }
 
-    &--medium {
+    &--14 {
         min-width: 36px;
         padding: var(--pad-y-md, 8px) var(--pad-x-md, 12px);
 
@@ -36,7 +36,7 @@
         }
     }
 
-    &--large {
+    &--18 {
         min-width: 44px;
         padding: var(--pad-y-lg, 12px) var(--pad-x-lg, 16px);
 

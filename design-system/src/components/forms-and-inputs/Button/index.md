@@ -41,7 +41,7 @@ Button: triggers an action.
 
 ## Variants
 
-**`appearance`** — `default` · `primary` · `subtle` · `warning` · `danger` · `discovery`
+**`appearance`** — `default` · `primary` · `subtle` · `warning` · `danger` · `discovery` · `ai`
 
 **`spacing`** — `default` · `compact`
 

@@ -110,7 +110,7 @@ const TutorModal = ({
             show={show}
             onHide={onHide}
             centered
-            size="lg"
+            dialogClassName="modal-lg"
             className={`tutor-modal tutor-modal--${mode} ${className}`}
             aria-labelledby="tutor-modal-title"
             {...props}

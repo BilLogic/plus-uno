@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { TableCell, TableRow, TableMessageRow, TableSummaryRow, alignName } from './TableParts';
 import './Table.scss';
 
-const SIZES = ['sm', 'md', 'lg'];
+const SIZES = [32, 40, 48];
 
 const isCellObject = (cell) => typeof cell === 'object' && cell !== null
     && !React.isValidElement(cell) && cell.content !== undefined;
@@ -16,8 +16,7 @@ const isCellObject = (cell) => typeof cell === 'object' && cell !== null
  *
  * The feel: hairline horizontal dividers, no outer frame, a quiet header over
  * a stronger rule, single-line cells that end in an ellipsis with a tooltip,
- * no zebra. Rows are 32, 40 or 48 tall (`size`); `density` is the older name
- * for the same prop. `StaticTable` is this table for a fixed grid people read.
+ * no zebra. Rows are 32, 40 or 48 tall (`size`). `StaticTable` is this table for a fixed grid people read.
  */
 const Table = ({
     id,
@@ -29,7 +28,6 @@ const Table = ({
     verticalLines = false,
     frame = 'plain',
     size,
-    density,
     titleColumn,
     rowStates,
     summary,
@@ -40,7 +38,7 @@ const Table = ({
     onRowClick,
     ...props
 }) => {
-    const rowSize = size || density || 'md';
+    const rowSize = size || 40;
     const framed = frame === 'framed' || bordered;
     const lines = verticalLines || bordered;
     const tableClasses = [
@@ -189,7 +187,6 @@ Table.propTypes = {
     verticalLines: PropTypes.bool,
     frame: PropTypes.oneOf(['plain', 'framed']),
     size: PropTypes.oneOf(SIZES),
-    density: PropTypes.oneOf(SIZES),
     titleColumn: PropTypes.number,
     rowStates: PropTypes.arrayOf(PropTypes.oneOf(['rest', 'highlighted', 'selected', 'disabled'])),
     summary: PropTypes.arrayOf(PropTypes.node),

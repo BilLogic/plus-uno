@@ -170,7 +170,7 @@ const DrawerOverPage = () => {
 };
 
 /**
- * A drawer open over the page: the scrim covers the whole frame, and the md
+ * A drawer open over the page: the blanket covers the whole frame, and the md
  * drawer runs the full height at the right edge (677 at 1024). Escape closes
  * it and leaves the page.
  */
@@ -184,8 +184,8 @@ export const WithDrawer = {
             const overlay = drawer.parentElement;
             const box = overlay.getBoundingClientRect();
             const panel = drawer.getBoundingClientRect();
-            await expect(box.width, 'the scrim covers the screen').toBeCloseTo(window.innerWidth, 0);
-            await expect(box.height, 'the scrim covers the screen').toBeCloseTo(window.innerHeight, 0);
+            await expect(box.width, 'the blanket covers the screen').toBeCloseTo(window.innerWidth, 0);
+            await expect(box.height, 'the blanket covers the screen').toBeCloseTo(window.innerHeight, 0);
             await expect(panel.right, 'at the right edge').toBeCloseTo(box.right, 0);
             await expect(panel.height, 'full height').toBeCloseTo(box.height, 0);
             await expect(panel.width, 'width md at 1024').toBeCloseTo(677, 0);

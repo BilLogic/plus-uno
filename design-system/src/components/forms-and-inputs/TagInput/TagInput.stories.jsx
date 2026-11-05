@@ -24,7 +24,7 @@ export default {
             { date: '2026-11-04', kind: 'changed', summary: '`size` became `spacing` (`default` or `compact`), the name every other field uses; the small and large sizes are gone.' },
             { date: '2026-10-25', kind: 'changed', summary: 'The color menu and a new tag\'s random color cover Tag\'s ten colors: orange, lime and brown joined.' },
             { date: '2026-10-23', kind: 'changed', summary: 'The field became 32 with one row of tags, growing as they wrap.' },
-            { date: '2026-10-23', kind: 'deprecated', summary: '`size="small"` and `size="large"` were deprecated: they draw like `medium` and warn in development.' },
+            { date: '2026-10-23', kind: 'deprecated', summary: 'The `small` and `large` sizes were deprecated: they draw like `medium` and warn in development.' },
         ],
     },
 };

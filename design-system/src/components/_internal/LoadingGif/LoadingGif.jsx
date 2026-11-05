@@ -4,7 +4,7 @@ import './LoadingGif.scss';
 
 const LoadingGif = ({
     type = 'growing',
-    size = 'default',
+    size = 10,
     label = 'Loading...',
     id,
     className = ''
@@ -42,7 +42,7 @@ const LoadingGif = ({
 
 LoadingGif.propTypes = {
     type: PropTypes.oneOf(['growing', 'rotating', 'stacking']),
-    size: PropTypes.oneOf(['small', 'default', 'large']),
+    size: PropTypes.oneOf([6, 10, 14]),
     label: PropTypes.string,
     id: PropTypes.string,
     className: PropTypes.string

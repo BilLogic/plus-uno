@@ -421,7 +421,7 @@ export const WithModals = (args) => {
                     />
                 </PageLayout>
 
-                {/* Scrim Overlay */}
+                {/* Blanket Overlay */}
                 <div style={{
                     position: 'absolute',
                     top: 0,

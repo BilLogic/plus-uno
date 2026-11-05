@@ -30,7 +30,7 @@ From `design-system/src/components/labels/PromptStarters/PromptStarters.scss`. O
 
 ## Related
 
-Same group: `AiLabel` · `CountTag` · `DateTag` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { CHROME } from '@/dataviz/palette';
 
 /**
  * ParliamentChart Component
@@ -38,7 +39,8 @@ const ParliamentChart = ({
                 enabled: true,
                 format: '{point.label}',
                 style: {
-                    textOutline: '3px contrast'
+                    color: CHROME.text,
+                    textOutline: 'none'
                 }
             },
             center: ['50%', '88%'],

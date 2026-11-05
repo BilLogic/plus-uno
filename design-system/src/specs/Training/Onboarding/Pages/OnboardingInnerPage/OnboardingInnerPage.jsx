@@ -151,7 +151,7 @@ const OnboardingInnerPage = ({
 
             {/* Completion Modal Overlay */}
             {isModalVisible && (
-                <div className="onboarding-inner-page__scrim">
+                <div className="onboarding-inner-page__blanket">
                     <ModuleCompletionModal
                         show={true}
                         title="Module Completed!"

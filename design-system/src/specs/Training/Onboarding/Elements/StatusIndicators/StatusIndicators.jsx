@@ -11,7 +11,7 @@ import './StatusIndicators.scss';
 
 const StatusIndicators = ({
     stage = 'not started',
-    size = 'medium',
+    size = 14,
     className = '',
     ...props
 }) => {
@@ -49,8 +49,8 @@ StatusIndicators.propTypes = {
     /** Status stage: "not started", "in progress", "completed" */
     /** Status stage: "not started", "in progress", "completed" */
     stage: PropTypes.oneOf(['not started', 'in progress', 'completed']),
-    /** Size variant */
-    size: PropTypes.oneOf(['small', 'medium', 'large']),
+    /** Glyph size in pixels */
+    size: PropTypes.oneOf([12, 14, 18]),
     /** Additional CSS classes */
     className: PropTypes.string,
 };

@@ -303,10 +303,10 @@ export const Interactive = {
 
 /**
  * My Sessions Page - With Modals
- * Shows the My Sessions page with a scrim overlay and Session Details modal
+ * Shows the My Sessions page with a blanket overlay and Session Details modal
  * Features:
  * - Toggle between different modal states (organized by tab and stage)
- * - Scrim overlay to simulate modal context
+ * - Blanket overlay to simulate modal context
  * - Breakpoint toggle for responsive preview
  */
 export const WithModals = (args) => {
@@ -482,7 +482,7 @@ export const WithModals = (args) => {
                     />
                 </PageLayout>
 
-                {/* Scrim Overlay */}
+                {/* Blanket Overlay */}
                 <div style={{
                     position: 'absolute',
                     top: 0,
