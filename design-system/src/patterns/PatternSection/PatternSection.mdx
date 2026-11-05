@@ -7,7 +7,7 @@ import { SectionOfTwoCards, SectionRepeatingCardTitle, CardOwnsCommit, SectionFo
 <Meta of={PatternSectionStories} />
 
 <Title />
-A section is a span of the page grid that groups content under one heading. It has no fill, no pad and no size options: the Page around it supplies the pad, so a section never draws a box of its own. The Section header comes first, then the body, then an optional footer.
+A section is a span of the page grid that groups content under one heading. It has no fill, no pad and no size options by default: the Page around it supplies the pad, so a section draws no box of its own. Set `fill="subtle"` for a section that stands apart from the one beside it, such as the detail in List and detail. The Section header comes first, then the body, then an optional footer.
 
 The examples on this page follow the toolbar's Color mode switch.
 
@@ -92,6 +92,7 @@ Parts stack Section/stack-md 16 apart. Inside the header, the title row sits Sec
         <tr><td><code>side</code></td><td>node</td><td>The side column of a split</td><td>none</td><td>side slot</td></tr>
         <tr><td><code>footer</code></td><td>node</td><td>"View all" or paging, at the end</td><td>none</td><td><code>footer?</code></td></tr>
         <tr><td><code>loading</code></td><td>boolean</td><td>Replaces the header with skeleton bars</td><td><code>false</code></td><td><code>loading?</code></td></tr>
+        <tr><td><code>fill</code></td><td>string</td><td><code>none</code>, <code>subtle</code> (sunken surface with a pad and a radius)</td><td><code>none</code></td><td>none</td></tr>
         <tr><td><code>gap</code></td><td>string</td><td><code>sm</code>, <code>md</code>, <code>lg</code> (Section/stack)</td><td><code>md</code></td><td>none; the Figma section stacks Section/stack-md</td></tr>
         <tr><td><code>children</code></td><td>node</td><td>The content slot; with <code>split</code>, the main column</td><td>none</td><td>content slot</td></tr>
     </tbody>
@@ -305,6 +306,7 @@ A table gets its controls from the section header above it, never from the table
 - <a target="_top" href="./?path=/docs/foundations-patterns-card--docs">Card</a>: for one object rather than a region.
 - <a target="_top" href="./?path=/docs/foundations-patterns-page--docs">Page</a>: for a region that needs a fill or an edge. A section is transparent.
 - <a target="_top" href="./?path=/docs/foundations-patterns-table--docs">Table</a>: the section header above a table carries its toolbar and tabs.
+- <a target="_top" href="./?path=/docs/foundations-patterns-list-and-detail--docs">List and detail</a>: the layout that sets a subtle-fill section beside a list.
 - <a target="_top" href="./?path=/docs/foundations-patterns-frame--docs">Frame</a>: the frame that sets the pad a section sits in.
 
 </div>

@@ -5,6 +5,7 @@ import { PanelHostContext } from '@/components';
 import Topbar from '../Topbar';
 import { SidebarControlContext } from './SidebarControl';
 import { PanelControlContext } from './PanelControl';
+import { SplitContext } from './SplitContext';
 import PanelSplitter from './PanelSplitter';
 import { FRAME_LAYOUT, resolveFrameLayout } from './frameLayout';
 import './Frame.scss';
@@ -481,6 +482,7 @@ const Frame = ({
 
     return (
         <div id={id} ref={frameRef} className={classes} style={style} {...props}>
+            <SplitContext.Provider value={listDetail ? layout.splitHolds : null}>
             <PanelControlContext.Provider value={panelControl}>
                 <SidebarControlContext.Provider value={control}>
                     <div className="plus-frame__topbar">
@@ -518,6 +520,7 @@ const Frame = ({
                     {panelShown || panelPeekShown ? renderPanel() : null}
                 </div>
             </PanelControlContext.Provider>
+            </SplitContext.Provider>
         </div>
     );
 };
