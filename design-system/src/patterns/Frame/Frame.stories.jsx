@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button, Modal, Sidebar } from '@/components';
-import { Frame, Topbar } from '@/patterns';
+import { Button, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Sidebar } from '@/components';
+import { Frame, PANEL_STORAGE_KEY, Topbar, usePanelControl } from '@/patterns';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -52,6 +52,8 @@ export default {
     component: Frame,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },
+    // Each story starts with nothing remembered for the Panel.
+    beforeEach: () => { window.sessionStorage.removeItem(PANEL_STORAGE_KEY); },
     render: FrameWithSlots,
     argTypes: {
         children: { table: { disable: true } },
@@ -67,6 +69,27 @@ export default {
         surfaceDirect: {
             control: 'boolean',
             description: 'Renders children straight into the surface, with no content box or grid.',
+            table: { category: 'Design' },
+        },
+        panel: { table: { disable: true } },
+        panelLabel: { control: false, table: { disable: true } },
+        panelOpen: { control: false, table: { disable: true } },
+        onPanelOpenChange: { control: false, table: { disable: true } },
+        panelStorageKey: { control: false, table: { disable: true } },
+        panelDefaultWidth: { control: false, table: { disable: true } },
+        defaultPanelOpen: {
+            control: 'boolean',
+            description: 'Whether the Panel starts open when the tab has nothing remembered.',
+            table: { category: 'Design' },
+        },
+        panelPeek: {
+            control: 'boolean',
+            description: 'Hovering the right edge peeks a closed Panel over the Page, with no Blanket. Off by default.',
+            table: { category: 'Design' },
+        },
+        listDetail: {
+            control: 'boolean',
+            description: 'A List and detail layout is on the Page: the Sidebar collapses first to keep the 960 split.',
             table: { category: 'Design' },
         },
         contentAs: { control: false, table: { disable: true } },
@@ -603,5 +626,445 @@ export const ModalClosesOverlaySidebarAt768 = {
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(dialog(canvasElement)).toBeNull());
         await expect(p.sidebar()).toBeNull();
+    }),
+};
+
+/* ------------------------------------------------------------- panel */
+
+/**
+ * The Panel area: the Frame's right-hand area, under the Topbar. The layout
+ * resolver decides whether it docks beside the Page at a hairline or opens
+ * over it on a Blanket. Each story sets the viewport first, then opens the
+ * Panel the way a person does, from a button on the Page.
+ */
+const ChatToggle = () => {
+    const panel = usePanelControl();
+    return (
+        <div>
+            <Button
+                appearance="primary"
+                text={panel?.open ? 'Close chat' : 'Open chat'}
+                onClick={() => panel?.setOpen(!panel.open)}
+            />
+        </div>
+    );
+};
+
+const ChatPanel = () => {
+    const panel = usePanelControl();
+    return (
+        <PanelContainer>
+            <PanelHeader title="AI chat" actions={<PanelCloseAction onClick={() => panel?.setOpen(false)} />} />
+            <PanelBody>Ask about this page.</PanelBody>
+        </PanelContainer>
+    );
+};
+
+const WithPanel = ({ withModal = false, ...args }) => {
+    const [modal, setModal] = useState(false);
+    return (
+        <>
+            <InAppFrame panel={<ChatPanel />} panelLabel="AI chat" {...args}>
+                <ChatToggle />
+                {withModal ? <div><Button text="Page settings" onClick={() => setModal(true)} /></div> : null}
+                {slot('Content slot')}
+            </InAppFrame>
+            {withModal ? (
+                <Modal
+                    show={modal}
+                    width="6-col"
+                    title="Settings"
+                    body="The Panel stays open under this Modal."
+                    primaryButton={{ text: 'Done', onClick: () => setModal(false) }}
+                    onClose={() => setModal(false)}
+                />
+            ) : null}
+        </>
+    );
+};
+
+const panelParts = (canvasElement) => {
+    const p = parts(canvasElement);
+    return {
+        ...p,
+        panel: () => p.frame.querySelector('.plus-frame__panel'),
+        landmark: () => p.canvas.queryByRole('complementary', { name: 'AI chat' }),
+        splitter: () => p.canvas.queryByRole('separator', { name: /resize/i }),
+        blanket: () => p.frame.querySelector('.plus-frame__blanket'),
+        openButton: () => p.canvas.getByRole('button', { name: /chat/i }),
+    };
+};
+
+const openPanel = async (p) => {
+    await userEvent.click(p.canvas.getByRole('button', { name: 'Open chat' }));
+    await waitFor(() => expect(p.panel(), 'the Panel opens').not.toBeNull());
+};
+
+/** Docs example: the Panel open, inline at a fixed height. Nothing is remembered, so it always opens. */
+export const DocsPanel = {
+    render: (args) => <WithPanel {...args} height={DOCS_HEIGHT} />,
+    args: { defaultPanelOpen: true, panelStorageKey: null },
+    parameters: { layout: 'padded' },
+};
+
+/** 1440 with a 400 Panel: both fit at the 720 floor, so the Sidebar and the Panel dock, and the Page meets the Panel at a hairline. */
+export const PanelDockedAt1440 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = panelParts(canvasElement);
+        await waitFor(() => expect(p.sidebar(), 'docked at 1440').not.toBeNull());
+        await expect(p.panel(), 'closed by default').toBeNull();
+        await openPanel(p);
+        const panel = p.panel();
+        await expect(p.landmark(), 'a complementary landmark named for its content').toBe(panel);
+        await expect(getComputedStyle(panel).position, 'docked, in flow').not.toBe('absolute');
+        await expect(rect(panel).width, 'the default width').toBeCloseTo(tokenLength(p.frame, '--panel-width-default'), 0);
+        await expect(rect(panel).right, 'flush to the window edge').toBeCloseTo(rect(p.frame).right, 0);
+        await expect(rect(panel).top, 'under the Topbar').toBeCloseTo(rect(p.frame.querySelector('.plus-frame__topbar')).bottom, 0);
+        await expect(rect(p.surface).right, 'the Page meets the Panel').toBeCloseTo(rect(panel).left, 0);
+        await expect(px(getComputedStyle(panel).borderLeftWidth), 'at a hairline').toBeCloseTo(tokenLength(p.frame, '--stroke-1'), 1);
+        await expect(getComputedStyle(panel).backgroundColor, 'docked, the Panel is the Page fill').toBe(tokenColor(p.frame, '--ds-surface'));
+        await expect(p.sidebar(), 'the Sidebar stays docked').not.toBeNull();
+        await expect(rect(p.content).width, 'content 1440 - 240 - 400 - 48').toBeCloseTo(752, 0);
+        await expect(p.blanket(), 'docked has no Blanket').toBeNull();
+        // Landmark order: topbar, nav, main, panel.
+        const main = p.canvas.getByRole('main');
+        await expect(main.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+
+        await userEvent.click(within(panel).getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(p.panel(), 'Close closes it').toBeNull());
+    }),
+};
+
+/** The Blanket covers the Page and the Sidebar's column but starts under the Topbar. */
+const expectBlanket = async (p) => {
+    const blanket = p.blanket();
+    await expect(blanket, 'an overlay Panel has a Blanket').not.toBeNull();
+    const topbar = p.frame.querySelector('.plus-frame__topbar');
+    await expect(rect(blanket).top, 'the Blanket leaves the Topbar uncovered').toBeCloseTo(rect(topbar).bottom, 0);
+    await expect(rect(blanket).left, 'it covers the Sidebar column').toBeCloseTo(rect(p.frame).left, 0);
+    await expect(getComputedStyle(blanket).backgroundColor).toBe(tokenColor(p.frame, '--ds-blanket'));
+    const s = rect(p.surface);
+    const hit = document.elementFromPoint(s.left + 40, s.top + 40);
+    await expect(hit, 'a press on the Page lands on the Blanket').toBe(blanket);
+};
+
+const expectOverlayPanel = async (p, width) => {
+    const panel = p.panel();
+    await expect(getComputedStyle(panel).position, 'over the Page').toBe('absolute');
+    await expect(getComputedStyle(panel).boxShadow).toBe(computedShadow(p.frame, 'var(--ds-shadow-overlay)'));
+    await expect(rect(panel).width, 'overlay width').toBeCloseTo(width, 0);
+    await expect(rect(panel).right).toBeCloseTo(rect(p.frame).right, 0);
+    await expect(rect(panel).top).toBeCloseTo(rect(p.frame.querySelector('.plus-frame__topbar')).bottom, 0);
+};
+
+/** 1200 with a 400 Panel: both would leave 512, the Panel alone 752, so the default Sidebar collapses and comes back when the Panel closes. */
+export const PanelAutoCollapsesSidebarAt1200 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(1200, async () => {
+        const p = panelParts(canvasElement);
+        await waitFor(() => expect(p.sidebar(), 'docked at 1200').not.toBeNull());
+        await expectCorner(p.frame, p.surface, true);
+        await openPanel(p);
+        await waitFor(() => expect(p.sidebar(), 'the Sidebar collapses to keep 720').toBeNull());
+        await expect(getComputedStyle(p.panel()).position).not.toBe('absolute');
+        await expect(offset(p.frame, p.surface).x, 'the Page runs to the left edge').toBeCloseTo(0, 0);
+        await expect(rect(p.content).width, '1200 - 400 - 48').toBeCloseTo(752, 0);
+        await expectCorner(p.frame, p.surface, false);
+        await expect(p.toggle).toHaveAttribute('aria-expanded', 'false');
+
+        await userEvent.click(within(p.panel()).getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(p.panel()).toBeNull());
+        await waitFor(() => expect(p.sidebar(), 'restored when the Panel closes').not.toBeNull());
+        await expectCorner(p.frame, p.surface, true);
+        await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus goes back to what opened it')
+            .toBe(p.canvas.getByRole('button', { name: 'Open chat' })));
+    }),
+};
+
+/** 1100 with a 400 Panel: even the Panel alone leaves 652, so it opens over the Page on a Blanket; a press outside closes it. */
+export const PanelOverlayAt1100 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(1100, async () => {
+        const p = panelParts(canvasElement);
+        await waitFor(() => expect(p.sidebar()).not.toBeNull());
+        await openPanel(p);
+        await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
+        await expect(p.sidebar(), 'the Sidebar stays docked under the Blanket').not.toBeNull();
+        await expect(rect(p.content).width, 'the Page keeps its width').toBeCloseTo(1100 - 240 - 48, 0);
+        await expectBlanket(p);
+
+        // A press on the Blanket closes it.
+        await userEvent.click(p.blanket());
+        await waitFor(() => expect(p.panel(), 'a press outside closes it').toBeNull());
+        await expect(p.blanket()).toBeNull();
+
+        // Escape closes it too.
+        await openPanel(p);
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(p.panel(), 'Escape closes it').toBeNull());
+    }),
+};
+
+/** 1300: the Panel docks by collapsing the default Sidebar; opening the Sidebar by hand wins, so the Panel moves to overlay. */
+export const SidebarByHandWinsAt1300 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(1300, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        await waitFor(() => expect(p.sidebar()).toBeNull());
+        const panel = p.panel();
+        await expect(getComputedStyle(panel).position).not.toBe('absolute');
+        // The Topbar is above the Blanket, so the toggle stays pressable.
+        await userEvent.click(p.toggle);
+        await waitFor(() => expect(p.sidebar(), 'opened by hand, it docks').not.toBeNull());
+        await expect(getComputedStyle(p.sidebar()).position).toBe('static');
+        await expect(p.panel(), 'the same Panel, not remounted').toBe(panel);
+        await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
+        await expectBlanket(p);
+    }),
+};
+
+/** 1440: a Modal over a docked Panel leaves it open; closing the Modal finds it still there. */
+export const ModalLeavesPanelOpen = {
+    render: (args) => <WithPanel {...args} withModal />,
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        await userEvent.click(p.canvas.getByRole('button', { name: 'Page settings' }));
+        await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
+        await expect(p.frame.querySelector('.plus-frame__panel'), 'the Panel stays open under the Modal').not.toBeNull();
+        await userEvent.click(within(dialog(canvasElement)).getByRole('button', { name: 'Done' }));
+        await waitFor(() => expect(dialog(canvasElement)).toBeNull());
+        await expect(p.panel(), 'still open after the Modal').not.toBeNull();
+    }),
+};
+
+/** 1100: a Modal over an overlay Panel leaves it open, and a press inside the Modal does not count as outside. */
+export const ModalOverOverlayPanelAt1100 = {
+    render: (args) => <WithPanel {...args} withModal />,
+    play: async ({ canvasElement }) => atViewport(1100, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
+        // A keyboard press on the page button, under the Blanket: the Modal opens on top.
+        p.canvas.getByRole('button', { name: 'Page settings', hidden: true }).focus();
+        await userEvent.keyboard('{Enter}');
+        await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
+        await userEvent.click(within(dialog(canvasElement)).getByText('The Panel stays open under this Modal.'));
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(dialog(canvasElement)).toBeNull());
+        await expect(p.panel(), 'the overlay Panel survived the Modal').not.toBeNull();
+    }),
+};
+
+/** 1100: resizing an overlay Panel never collapses the default Sidebar: the narrowest it goes still leaves the Panel too wide to dock alone. */
+export const OverlaySplitterKeepsSidebarAt1100 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(1100, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
+        const splitter = p.splitter();
+        // 1100 - 48 - 720 = 332 would let the Panel dock alone, so the floor is one above it.
+        await expect(splitter).toHaveAttribute('aria-valuemin', '333');
+        splitter.focus();
+        await userEvent.keyboard('{Home}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '333'));
+        await expect(p.sidebar(), 'the Sidebar stays docked').not.toBeNull();
+        await expect(getComputedStyle(p.panel()).position, 'still an overlay').toBe('absolute');
+        await userEvent.keyboard('{End}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '640'));
+        await expectOverlayPanel(p, 640);
+    }),
+};
+
+/** 768: the Panel is an overlay capped at 320, and only one overlay is open at a time. */
+export const OneOverlayAt768 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(768, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        await expectOverlayPanel(p, tokenLength(p.frame, '--panel-min-width'));
+        await expectBlanket(p);
+        await expect(p.splitter(), 'no splitter under 1024').toBeNull();
+        // Hovering the toggle under the Blanket does not peek the Sidebar.
+        await userEvent.hover(p.toggle);
+        await new Promise((resolve) => { setTimeout(resolve, 100); });
+        await expect(p.sidebar(), 'no second overlay').toBeNull();
+        // Opening the Sidebar by hand closes the Panel.
+        await userEvent.click(p.toggle);
+        await waitFor(() => expect(p.sidebar(), 'the Sidebar opens as an overlay').not.toBeNull());
+        await waitFor(() => expect(p.panel(), 'and the Panel closes').toBeNull());
+        await userEvent.unhover(p.toggle);
+        // Opening the Panel closes the overlay Sidebar.
+        p.canvas.getByRole('button', { name: 'Open chat' }).focus();
+        await userEvent.keyboard('{Enter}');
+        await waitFor(() => expect(p.panel()).not.toBeNull());
+        await waitFor(() => expect(p.sidebar(), 'the Sidebar gives way').toBeNull());
+    }),
+};
+
+/** 600: under 768 the Panel opens full width. */
+export const FullWidthUnder768 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(600, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        await expectOverlayPanel(p, rect(p.frame).width);
+    }),
+};
+
+const panelWidthNow = (p) => rect(p.panel()).width;
+
+/** 1440: the splitter is a separator with its value; arrows step 16, Shift 64, Home and End go to the limits, and the limit keeps 720 beside the docked Sidebar. */
+export const SplitterKeyboardAt1440 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        const splitter = p.splitter();
+        await expect(splitter).toHaveAttribute('aria-orientation', 'vertical');
+        await expect(splitter).toHaveAttribute('aria-controls', p.panel().id);
+        await expect(splitter).toHaveAttribute('aria-valuenow', '400');
+        await expect(splitter).toHaveAttribute('aria-valuetext', '400 pixels');
+        await expect(splitter).toHaveAttribute('aria-valuemin', String(tokenLength(p.frame, '--panel-min-width')));
+        // 1440 - 240 - 48 - 720: the widest Panel that keeps the floor beside the docked Sidebar.
+        await expect(splitter).toHaveAttribute('aria-valuemax', '432');
+
+        splitter.focus();
+        await userEvent.keyboard('{ArrowLeft}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '416'));
+        await expect(panelWidthNow(p)).toBeCloseTo(416, 0);
+        await userEvent.keyboard('{ArrowRight}{ArrowRight}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '384'));
+        await userEvent.keyboard('{Shift>}{ArrowRight}{/Shift}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '320'));
+        await userEvent.keyboard('{End}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '432'));
+        await expect(panelWidthNow(p)).toBeCloseTo(432, 0);
+        await expect(p.sidebar(), 'resizing never collapses the Sidebar').not.toBeNull();
+        await expect(rect(p.content).width, 'content holds the floor').toBeCloseTo(tokenLength(p.frame, '--content-min-width'), 0);
+        await userEvent.keyboard('{Home}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '320'));
+    }),
+};
+
+const pointer = (el, type, clientX) => {
+    const r = rect(el);
+    el.dispatchEvent(new PointerEvent(type, {
+        bubbles: true, cancelable: true, pointerId: 1, pointerType: 'mouse', button: 0, buttons: type === 'pointerup' ? 0 : 1, clientX, clientY: r.top + r.height / 2,
+    }));
+};
+
+/** 1440: a drag past the limit resists (damped, never more than 48 over) and springs back to the limit on release; the Sidebar stays docked. */
+export const SplitterDragAt1440 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        const splitter = p.splitter();
+        const x = rect(splitter).left + rect(splitter).width / 2;
+        pointer(splitter, 'pointerdown', x);
+        pointer(splitter, 'pointermove', x - 20);
+        await waitFor(() => expect(panelWidthNow(p), 'inside the range it follows the pointer').toBeCloseTo(420, 0));
+        pointer(splitter, 'pointermove', x - 300);
+        await waitFor(() => expect(panelWidthNow(p), 'past the limit it stretches').toBeGreaterThan(432));
+        await expect(panelWidthNow(p), 'but resists: far less than the pointer moved').toBeLessThan(432 + 48);
+        await expect(p.sidebar(), 'mid-drag the Sidebar stays docked').not.toBeNull();
+        pointer(splitter, 'pointerup', x - 300);
+        await waitFor(() => expect(panelWidthNow(p), 'springs back to the limit').toBeCloseTo(432, 0));
+        await expect(splitter).toHaveAttribute('aria-valuenow', '432');
+        await expect(p.sidebar(), 'and the Sidebar never collapsed').not.toBeNull();
+
+        // Past the minimum it resists the other way and settles at 320.
+        const x2 = rect(splitter).left + rect(splitter).width / 2;
+        pointer(splitter, 'pointerdown', x2);
+        pointer(splitter, 'pointermove', x2 + 400);
+        await waitFor(() => expect(panelWidthNow(p)).toBeLessThan(320));
+        await expect(panelWidthNow(p)).toBeGreaterThan(320 - 48);
+        pointer(splitter, 'pointerup', x2 + 400);
+        await waitFor(() => expect(panelWidthNow(p)).toBeCloseTo(320, 0));
+    }),
+};
+
+/** The Panel's width and open state are kept in sessionStorage, so a reload in the same tab finds it as it was. */
+const Remountable = (args) => {
+    const [mount, setMount] = useState(0);
+    return (
+        <>
+            <Button text="Reload" className="frame-story-reload" onClick={() => setMount((n) => n + 1)} />
+            <WithPanel key={mount} {...args} />
+        </>
+    );
+};
+
+/** Remounts the Frame and waits for the new one. */
+const reload = async (canvasElement, before) => {
+    canvasElement.querySelector('.frame-story-reload').click();
+    await waitFor(() => expect(canvasElement.querySelector('.plus-frame'), 'a fresh Frame').not.toBe(before));
+    return panelParts(canvasElement);
+};
+
+export const PanelRememberedForTheTab = {
+    render: Remountable,
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        let p = panelParts(canvasElement);
+        await openPanel(p);
+        p.splitter().focus();
+        await userEvent.keyboard('{Home}');
+        await waitFor(() => expect(p.splitter()).toHaveAttribute('aria-valuenow', '320'));
+        await expect(JSON.parse(window.sessionStorage.getItem(PANEL_STORAGE_KEY))).toEqual({ open: true, width: 320 });
+
+        p = await reload(canvasElement, p.frame);
+        await waitFor(() => expect(p.panel(), 'open after the reload').not.toBeNull());
+        await expect(panelWidthNow(p), 'at the width it was left').toBeCloseTo(320, 0);
+
+        await userEvent.click(within(p.panel()).getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(p.panel()).toBeNull());
+        p = await reload(canvasElement, p.frame);
+        await expect(p.panel(), 'closed after the reload').toBeNull();
+    }),
+};
+
+/** The peek is off by default; turned on, hovering the right edge peeks a closed Panel over the Page with no Blanket. */
+export const PanelPeek = {
+    render: WithPanel,
+    args: { panelPeek: true },
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = panelParts(canvasElement);
+        const edge = p.frame.querySelector('.plus-frame__panel-edge');
+        await expect(edge, 'a hover strip on the right edge').not.toBeNull();
+        const contentWidth = rect(p.content).width;
+        await userEvent.hover(edge);
+        await waitFor(() => expect(p.panel(), 'the Panel peeks').not.toBeNull());
+        await expect(getComputedStyle(p.panel()).position, 'over the Page').toBe('absolute');
+        await expect(p.blanket(), 'a peek has no Blanket').toBeNull();
+        await expect(rect(p.content).width, 'the Page does not move').toBeCloseTo(contentWidth, 0);
+        await expect(p.splitter(), 'a peek does not resize').toBeNull();
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(p.panel(), 'Escape closes the peek').toBeNull());
+    }),
+};
+
+export const NoPanelPeekByDefault = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => {
+        const p = panelParts(canvasElement);
+        await expect(p.frame.querySelector('.plus-frame__panel-edge'), 'no hover strip').toBeNull();
+    },
+};
+
+/** 1440 with List and detail: both docked would leave 752, under the 960 split, so the default Sidebar collapses to keep it (992). */
+export const ListDetailKeepsSplitAt1440 = {
+    render: WithPanel,
+    args: { listDetail: true },
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = panelParts(canvasElement);
+        await waitFor(() => expect(p.sidebar()).not.toBeNull());
+        await openPanel(p);
+        await waitFor(() => expect(p.sidebar(), 'the Sidebar collapses first').toBeNull());
+        await expect(getComputedStyle(p.panel()).position).not.toBe('absolute');
+        await expect(rect(p.content).width, '1440 - 400 - 48').toBeCloseTo(992, 0);
     }),
 };

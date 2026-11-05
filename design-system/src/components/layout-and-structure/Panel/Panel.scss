@@ -6,6 +6,13 @@
     border-inline-start: var(--border-default) solid var(--ds-border);
 }
 
+// Inside the Frame's Panel area the host paints the fill and the edge by
+// state (docked or overlay), so the Panel paints neither.
+.plus-panel--hosted {
+    background: none;
+    border-inline-start: 0;
+}
+
 .plus-panel-header {
     display: flex;
     align-items: center;

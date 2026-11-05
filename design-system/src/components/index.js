@@ -62,7 +62,7 @@ export { default as Accordion } from '@/components/layout-and-structure/Accordio
 export { default as Carousel } from '@/components/layout-and-structure/Carousel';
 export { default as Footer } from '@/components/layout-and-structure/Footer';
 export { default as PageHeader } from '@/components/layout-and-structure/PageHeader';
-export { default as Panel, PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelDownAction, PanelFooter, PanelHeader, PanelMoreAction, PanelNewTabAction, PanelProvider, PanelSubheader, PanelUpAction, PanelViewSwitcher, usePanelManager } from '@/components/layout-and-structure/Panel';
+export { default as Panel, PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelDownAction, PanelFooter, PanelHeader, PanelHostContext, PanelMoreAction, PanelNewTabAction, PanelProvider, PanelSubheader, PanelUpAction, PanelViewSwitcher, usePanelManager } from '@/components/layout-and-structure/Panel';
 export { default as ScrollBar } from '@/components/layout-and-structure/ScrollBar';
 export { default as VisuallyHidden } from '@/components/layout-and-structure/VisuallyHidden';
 

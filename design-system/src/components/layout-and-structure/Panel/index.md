@@ -19,7 +19,7 @@ PanelContainer: the panel's own surface, at a fixed or the provider's width.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `width` | string | — | Falls back to the nearest PanelProvider's width, then 320px. |
+| `width` | string | — | Falls back to the nearest PanelProvider's width, then `--panel-width-default` (400). Inside the Frame's Panel area it fills the area instead. |
 | `className` | string | — | — |
 | `children` | node | — | — |
 
