@@ -2,7 +2,7 @@ import React, { useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { Popover as BasePopover } from '@base-ui/react/popover';
 import { popupMountOf } from '@/lib/popoverPlacement';
-import { isPressInRaisedOverlay } from '@/lib/overlay';
+import { isOverlayRaisedOver, isPressInRaisedOverlay } from '@/lib/overlay';
 import './Popup.scss';
 
 /** The width tiers, Popover/width-sm · md · lg: 320 · 400 · 480. */
@@ -93,6 +93,9 @@ const Popup = ({
         // A press inside a Modal or Drawer this popup sits outside of is not a click away from it.
         if (!next && eventDetails?.reason === 'outside-press'
             && isPressInRaisedOverlay(eventDetails.event?.target, triggerNodeRef.current)) return;
+        // Escape and focus moving into the Modal belong to the Modal; the popup stays under it.
+        if (!next && (eventDetails?.reason === 'escape-key' || eventDetails?.reason === 'focus-out')
+            && isOverlayRaisedOver(triggerNodeRef.current)) return;
         if (show === undefined) setUncontrolledOpen(next);
         onToggle?.(next);
     };

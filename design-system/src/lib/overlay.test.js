@@ -9,6 +9,7 @@ import {
     overlayMountOf,
     useOverlaySlot,
     isPressInRaisedOverlay,
+    isOverlayRaisedOver,
 } from './overlay';
 
 const opened = [];
@@ -188,9 +189,25 @@ describe('isPressInRaisedOverlay', () => {
         expect(isPressInRaisedOverlay(el('modal-text'), el('inner'))).toBe(false);
     });
 
-    it('is false without a target or an owner', () => {
+    it('is false without a target, and true in a Modal when there is no owner', () => {
         const el = build();
         expect(isPressInRaisedOverlay(null, el('chat'))).toBe(false);
         expect(isPressInRaisedOverlay(el('modal-text'), null)).toBe(true);
+    });
+});
+
+describe('isOverlayRaisedOver', () => {
+    afterEach(() => { document.body.innerHTML = ''; });
+
+    it('is false with no overlay open', () => {
+        document.body.innerHTML = '<button id="chat"></button>';
+        expect(isOverlayRaisedOver(document.getElementById('chat'))).toBe(false);
+    });
+
+    it('is true for an owner outside the open Modal, false for one inside it', () => {
+        document.body.innerHTML = '<button id="chat"></button><div class="plus-pattern-blanket"><button id="inner"></button></div>';
+        open();
+        expect(isOverlayRaisedOver(document.getElementById('chat'))).toBe(true);
+        expect(isOverlayRaisedOver(document.getElementById('inner'))).toBe(false);
     });
 });

@@ -1,9 +1,8 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import Button from '@/components/forms-and-inputs/Button/Button';
+import { Button, Modal } from '@/components';
 import Popup from './Popup/Popup';
-import Modal from '@/components/messaging/Modal/Modal';
 
 /**
  * Getting a `Popover` shut again.
@@ -207,6 +206,14 @@ StaysOpenUnderModal.play = async ({ canvasElement }) => {
     await userEvent.click(canvas.getByRole('button', { name: 'Chat' }));
     await userEvent.click(await doc.findByRole('button', { name: 'Clear chat' }));
     await userEvent.click(await doc.findByText('The popup stays open under this Modal.'));
+    await userEvent.keyboard('{Escape}');
+    await waitFor(() => expect(doc.queryByText('The popup stays open under this Modal.')).toBeNull());
+    await expect(doc.getByRole('button', { name: 'Clear chat' }), 'Escape closed only the Modal').toBeTruthy();
+    // Reopen by keyboard: focus moves into the Modal and must not close the popup either.
+    doc.getByRole('button', { name: 'Clear chat' }).focus();
+    await userEvent.keyboard('{Enter}');
+    await doc.findByText('The popup stays open under this Modal.');
+    await userEvent.click(doc.getByText('The popup stays open under this Modal.'));
     await expect(doc.getByRole('button', { name: 'Clear chat', hidden: true }), 'the popup survived a press in the Modal').toBeTruthy();
     await userEvent.click(doc.getByRole('button', { name: 'Done' }));
     await waitFor(() => expect(doc.queryByText('The popup stays open under this Modal.')).toBeNull());

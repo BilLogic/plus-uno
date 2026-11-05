@@ -178,3 +178,16 @@ export function isPressInRaisedOverlay(target, ownerNode) {
     if (!blanket) return false;
     return !blanket.contains(ownerNode ?? null);
 }
+
+/**
+ * Whether a Modal or Drawer is open that the surface owning `ownerNode` sits
+ * outside of. While one is, the surface is not dismissed by Escape (which
+ * belongs to the Modal) or by focus moving into the Modal.
+ *
+ * @param {Element | null | undefined} ownerNode the trigger or root of the surface asking
+ * @returns {boolean}
+ */
+export function isOverlayRaisedOver(ownerNode) {
+    if (count === 0) return false;
+    return !ownerNode?.closest?.('.plus-pattern-blanket');
+}
