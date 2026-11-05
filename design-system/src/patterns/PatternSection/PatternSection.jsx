@@ -7,7 +7,7 @@ import './PatternSection.scss';
 /**
  * Section pattern for PLUS design system: a span of the page grid that
  * groups content under one heading. It has no fill, no pad and no size
- * options; the Surface around it supplies the pad. It mirrors
+ * options unless `fill="subtle"` is set; the Surface around it supplies the pad. It mirrors
  * `Pattern/Section` in the Figma design system file.
  *
  * Its parts stack Section/stack-md: the `_Section header`, the body, then an
@@ -34,12 +34,17 @@ import './PatternSection.scss';
  * min Section/min-width-side); when a column would drop below its minimum,
  * they stack. `subsections` stacks nested sections Section/stack-lg apart.
  *
+ * FILL. A section has none by default. `fill="subtle"` sets it on the sunken
+ * surface with a pad and a radius, for a section that stands apart from the
+ * list beside it, such as the detail in List and detail.
+ *
  * FOOTER. Only for "View all" or paging, aligned to the end. Actions that
  * commit changes belong in a card footer, not on the section.
  */
 
 export const SECTION_HEADER_TYPES = ['default', 'tabs', 'toolbar', 'custom', 'tabs-only'];
 export const SECTION_LAYOUTS = ['single', 'split', 'subsections'];
+export const SECTION_FILLS = ['none', 'subtle'];
 
 const inferType = ({ header, toolbar, tabs }) => {
     if (header) return 'custom';
@@ -165,6 +170,7 @@ const PatternSection = ({
     footer,
     level: rankProp,
     gap = 'md',
+    fill = 'none',
     className = '',
     style,
     children,
@@ -173,6 +179,7 @@ const PatternSection = ({
     const classes = [
         'plus-pattern-section',
         `plus-pattern-section-gap-${gap}`,
+        fill !== 'none' && `plus-pattern-section-fill-${fill}`,
         className,
     ].filter(Boolean).join(' ');
 
@@ -288,6 +295,8 @@ PatternSection.propTypes = {
     level: PropTypes.oneOf(['page']),
     /** Gap between the header, the body and the footer (Section/stack tokens); `md` is the Figma value */
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),
+    /** `subtle` sets the section on the sunken surface with a pad and a radius; `none` (default) draws nothing */
+    fill: PropTypes.oneOf(SECTION_FILLS),
     className: PropTypes.string,
     style: PropTypes.object,
     /** Content slot; with `layout="split"`, the main column */
