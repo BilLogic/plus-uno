@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, IconButton } from '@/components';
 import PatternSection from '../PatternSection';
 import { FRAME_LAYOUT } from '../Frame/frameLayout';
+import { useSplitHolds } from '../Frame/SplitContext';
 import './ListDetail.scss';
 
 /**
@@ -16,7 +17,8 @@ import './ListDetail.scss';
  * with the Panel docked, the Sidebar collapses to keep the 960 before the
  * layout gives up the split.
  *
- * The layout measures its own width, the Page's content, not the window. The
+ * The layout follows the Frame's resolver when the Frame has `listDetail`,
+ * and otherwise measures its own width, the Page's content. The
  * caller owns the selection: `hasSelection` says a record is open, `onBack`
  * clears it. Heavy work, such as the recording review, belongs on its own
  * page: put "Open full review" in `detailFooter`.
@@ -36,10 +38,11 @@ export const listDetailView = ({ width, hasSelection }) => {
     return hasSelection ? 'detail' : 'list';
 };
 
+// A box that measures 0 (hidden, not laid out) keeps the last width it had.
 const useOwnWidth = (ref) => {
     const [width, setWidth] = useState(() => (typeof window === 'undefined' ? LIST_DETAIL_FLOOR : window.innerWidth));
     useLayoutEffect(() => {
-        const read = () => setWidth(ref.current?.getBoundingClientRect().width || window.innerWidth);
+        const read = () => setWidth((last) => ref.current?.getBoundingClientRect().width || last);
         read();
         const ro = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(read);
         if (ref.current) ro?.observe(ref.current);
@@ -67,7 +70,10 @@ const ListDetail = ({
     ...props
 }) => {
     const ref = useRef(null);
-    const width = useOwnWidth(ref);
+    const ownWidth = useOwnWidth(ref);
+    // Inside a Frame with `listDetail` the resolver decides, so the two never disagree.
+    const splitHolds = useSplitHolds();
+    const width = splitHolds === null ? ownWidth : (splitHolds ? LIST_DETAIL_FLOOR : 0);
     const open = Boolean(detail) && hasSelection;
     const view = listDetailView({ width, hasSelection: open });
     const showList = view !== 'detail';

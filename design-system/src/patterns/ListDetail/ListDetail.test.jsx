@@ -1,6 +1,7 @@
 import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
+import { SplitContext } from '../Frame/SplitContext';
 import ListDetail, { LIST_DETAIL_FLOOR, listDetailView } from './ListDetail';
 
 /**
@@ -61,5 +62,22 @@ describe('ListDetail', () => {
         renderIt({ onNext: vi.fn(), onPrevious: vi.fn(), nextDisabled: true, previousDisabled: true });
         expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'Previous' })).toBeDisabled();
+    });
+});
+
+describe('ListDetail inside a Frame with listDetail', () => {
+    const inFrame = (splitHolds) => render(
+        <SplitContext.Provider value={splitHolds}>
+            <ListDetail list={<div>Queue rows</div>} detail={<div>Flag body</div>} detailTitle="Flag 1" hasSelection />
+        </SplitContext.Provider>,
+    );
+
+    it('follows the resolver: split when it holds, the detail alone when it does not', () => {
+        const held = inFrame(true);
+        expect(held.container.querySelector('.plus-list-detail--split')).not.toBeNull();
+        held.unmount();
+        const dropped = inFrame(false);
+        expect(dropped.container.querySelector('.plus-list-detail--detail')).not.toBeNull();
+        expect(screen.queryByText('Queue rows')).toBeNull();
     });
 });

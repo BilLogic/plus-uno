@@ -49,7 +49,7 @@ Use it for a queue a person works through: Admin › Compliance, Admin › Refle
 
 ### Behavior
 
-The layout measures the Page's content, not the window, and holds the split from **960**.
+The layout holds the split from **960** of Page content. Inside a Frame with `listDetail`, the Frame's resolver decides it; elsewhere the layout measures its own width.
 
 - **At 960 or more**, both show. Selecting another record updates the detail in place.
 - **Below 960**, the detail replaces the list and a back link returns to it. With no record open, the list fills the row.

@@ -7,7 +7,7 @@ import './PatternSection.scss';
 /**
  * Section pattern for PLUS design system: a span of the page grid that
  * groups content under one heading. It has no fill, no pad and no size
- * options unless `fill="subtle"` is set; the Surface around it supplies the pad. It mirrors
+ * options unless `fill="subtle"` is set; the Page around it supplies the pad. It mirrors
  * `Pattern/Section` in the Figma design system file.
  *
  * Its parts stack Section/stack-md: the `_Section header`, the body, then an

@@ -122,10 +122,11 @@ const probes = (canvasElement) => {
 /** `n` of the 12 columns across `total` pixels, with the 16 gutters between them. */
 const spanWidth = (total, gutter, n) => ((total - 11 * gutter) / 12) * n + (n - 1) * gutter;
 
-const expectSplit = async (p) => {
+const expectSplit = async (p, contentWidth) => {
     const gutter = parseFloat(getComputedStyle(p.root).columnGap);
     const total = rect(p.root).width;
     await expect(total, 'content holds the split floor').toBeGreaterThanOrEqual(LIST_DETAIL_FLOOR);
+    await expect(total, 'content is the Frame minus Sidebar, Panel and the 48 pad').toBeCloseTo(contentWidth, 0);
     await expect(rect(p.list()).width, 'list spans 7 columns').toBeCloseTo(spanWidth(total, gutter, 7), 0);
     await expect(rect(p.detail()).width, 'detail spans 5 columns').toBeCloseTo(spanWidth(total, gutter, 5), 0);
     await expect(rect(p.detail()).left - rect(p.list()).right, 'a gutter apart').toBeCloseTo(gutter, 0);
@@ -146,7 +147,7 @@ export const SplitAt1440 = {
         const p = probes(canvasElement);
         await waitFor(() => expect(p.detail(), 'the detail opens beside the list').not.toBeNull());
         await expect(p.sidebar(), 'the Sidebar stays docked').not.toBeNull();
-        await expectSplit(p);
+        await expectSplit(p, 1440 - 240 - 48);
         const detail = within(p.detail());
         await expect(detail.getByRole('button', { name: 'Previous' }), 'first flag: no previous').toBeDisabled();
         await userEvent.click(detail.getByRole('button', { name: 'Next' }));
@@ -163,7 +164,7 @@ export const SplitHoldsWithPanelAt1440 = {
         await waitFor(() => expect(canvasElement.querySelector('.plus-frame__panel'), 'the Panel is open').not.toBeNull());
         await waitFor(() => expect(p.sidebar(), 'the Sidebar collapsed to keep 960').toBeNull());
         await waitFor(() => expect(rect(p.root).width).toBeGreaterThanOrEqual(LIST_DETAIL_FLOOR));
-        await expectSplit(p);
+        await expectSplit(p, 1440 - 400 - 48);
         await expect(canvasElement.querySelector('.plus-frame__blanket'), 'the Panel stays docked').toBeNull();
     }),
 };
