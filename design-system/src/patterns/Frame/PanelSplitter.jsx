@@ -51,7 +51,11 @@ const PanelSplitter = ({ width, min, max, controls, onCommit, onPreview }) => {
         if (e.button !== 0) return;
         e.preventDefault();
         cancelSpring.current();
-        e.currentTarget.setPointerCapture?.(e.pointerId);
+        try {
+            e.currentTarget.setPointerCapture?.(e.pointerId);
+        } catch {
+            // A pointer the browser no longer tracks: the drag still works on the handle itself.
+        }
         drag.current = { x: e.clientX, width };
         e.currentTarget.focus();
     };
@@ -67,7 +71,7 @@ const PanelSplitter = ({ width, min, max, controls, onCommit, onPreview }) => {
         if (!drag.current) return;
         const raw = drag.current.raw ?? drag.current.width;
         drag.current = null;
-        e.currentTarget.releasePointerCapture?.(e.pointerId);
+        if (e.currentTarget.hasPointerCapture?.(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
         const committed = clamp(raw, min, max);
         const shown = dampedWidth(raw, min, max);
         onCommit(committed);

@@ -866,3 +866,157 @@ export const FullWidthUnder768 = {
         await expectOverlayPanel(p, rect(p.frame).width);
     }),
 };
+
+const panelWidthNow = (p) => rect(p.panel()).width;
+
+/** 1440: the splitter is a separator with its value; arrows step 16, Shift 64, Home and End go to the limits, and the limit keeps 720 beside the docked Sidebar. */
+export const SplitterKeyboardAt1440 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        const splitter = p.splitter();
+        await expect(splitter).toHaveAttribute('aria-orientation', 'vertical');
+        await expect(splitter).toHaveAttribute('aria-controls', p.panel().id);
+        await expect(splitter).toHaveAttribute('aria-valuenow', '400');
+        await expect(splitter).toHaveAttribute('aria-valuetext', '400 pixels');
+        await expect(splitter).toHaveAttribute('aria-valuemin', String(tokenLength(p.frame, '--panel-min-width')));
+        // 1440 - 240 - 48 - 720: the widest Panel that keeps the floor beside the docked Sidebar.
+        await expect(splitter).toHaveAttribute('aria-valuemax', '432');
+
+        splitter.focus();
+        await userEvent.keyboard('{ArrowLeft}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '416'));
+        await expect(panelWidthNow(p)).toBeCloseTo(416, 0);
+        await userEvent.keyboard('{ArrowRight}{ArrowRight}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '384'));
+        await userEvent.keyboard('{Shift>}{ArrowRight}{/Shift}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '320'));
+        await userEvent.keyboard('{End}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '432'));
+        await expect(panelWidthNow(p)).toBeCloseTo(432, 0);
+        await expect(p.sidebar(), 'resizing never collapses the Sidebar').not.toBeNull();
+        await expect(rect(p.content).width, 'content holds the floor').toBeCloseTo(tokenLength(p.frame, '--content-min-width'), 0);
+        await userEvent.keyboard('{Home}');
+        await waitFor(() => expect(splitter).toHaveAttribute('aria-valuenow', '320'));
+    }),
+};
+
+const pointer = (el, type, clientX) => {
+    const r = rect(el);
+    el.dispatchEvent(new PointerEvent(type, {
+        bubbles: true, cancelable: true, pointerId: 1, pointerType: 'mouse', button: 0, buttons: type === 'pointerup' ? 0 : 1, clientX, clientY: r.top + r.height / 2,
+    }));
+};
+
+/** 1440: a drag past the limit resists (damped, never more than 48 over) and springs back to the limit on release; the Sidebar stays docked. */
+export const SplitterDragAt1440 = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = panelParts(canvasElement);
+        await openPanel(p);
+        const splitter = p.splitter();
+        const x = rect(splitter).left + rect(splitter).width / 2;
+        pointer(splitter, 'pointerdown', x);
+        pointer(splitter, 'pointermove', x - 20);
+        await waitFor(() => expect(panelWidthNow(p), 'inside the range it follows the pointer').toBeCloseTo(420, 0));
+        pointer(splitter, 'pointermove', x - 300);
+        await waitFor(() => expect(panelWidthNow(p), 'past the limit it stretches').toBeGreaterThan(432));
+        await expect(panelWidthNow(p), 'but resists: far less than the pointer moved').toBeLessThan(432 + 48);
+        await expect(p.sidebar(), 'mid-drag the Sidebar stays docked').not.toBeNull();
+        pointer(splitter, 'pointerup', x - 300);
+        await waitFor(() => expect(panelWidthNow(p), 'springs back to the limit').toBeCloseTo(432, 0));
+        await expect(splitter).toHaveAttribute('aria-valuenow', '432');
+        await expect(p.sidebar(), 'and the Sidebar never collapsed').not.toBeNull();
+
+        // Past the minimum it resists the other way and settles at 320.
+        const x2 = rect(splitter).left + rect(splitter).width / 2;
+        pointer(splitter, 'pointerdown', x2);
+        pointer(splitter, 'pointermove', x2 + 400);
+        await waitFor(() => expect(panelWidthNow(p)).toBeLessThan(320));
+        await expect(panelWidthNow(p)).toBeGreaterThan(320 - 48);
+        pointer(splitter, 'pointerup', x2 + 400);
+        await waitFor(() => expect(panelWidthNow(p)).toBeCloseTo(320, 0));
+    }),
+};
+
+/** The Panel's width and open state are kept in sessionStorage, so a reload in the same tab finds it as it was. */
+const Remountable = (args) => {
+    const [mount, setMount] = useState(0);
+    return (
+        <>
+            <button type="button" className="frame-story-reload" onClick={() => setMount((n) => n + 1)}>Reload</button>
+            <WithPanel key={mount} {...args} />
+        </>
+    );
+};
+
+/** Remounts the Frame and waits for the new one. */
+const reload = async (canvasElement, before) => {
+    canvasElement.querySelector('.frame-story-reload').click();
+    await waitFor(() => expect(canvasElement.querySelector('.plus-frame'), 'a fresh Frame').not.toBe(before));
+    return panelParts(canvasElement);
+};
+
+export const PanelRememberedForTheTab = {
+    render: Remountable,
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        let p = panelParts(canvasElement);
+        await openPanel(p);
+        p.splitter().focus();
+        await userEvent.keyboard('{Home}');
+        await waitFor(() => expect(p.splitter()).toHaveAttribute('aria-valuenow', '320'));
+        await expect(JSON.parse(window.sessionStorage.getItem(PANEL_STORAGE_KEY))).toEqual({ open: true, width: 320 });
+
+        p = await reload(canvasElement, p.frame);
+        await waitFor(() => expect(p.panel(), 'open after the reload').not.toBeNull());
+        await expect(panelWidthNow(p), 'at the width it was left').toBeCloseTo(320, 0);
+
+        await userEvent.click(within(p.panel()).getByRole('button', { name: 'Close' }));
+        await waitFor(() => expect(p.panel()).toBeNull());
+        p = await reload(canvasElement, p.frame);
+        await expect(p.panel(), 'closed after the reload').toBeNull();
+    }),
+};
+
+/** The peek is off by default; turned on, hovering the right edge peeks a closed Panel over the Page with no Blanket. */
+export const PanelPeek = {
+    render: WithPanel,
+    args: { panelPeek: true },
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = panelParts(canvasElement);
+        const edge = p.frame.querySelector('.plus-frame__panel-edge');
+        await expect(edge, 'a hover strip on the right edge').not.toBeNull();
+        const contentWidth = rect(p.content).width;
+        await userEvent.hover(edge);
+        await waitFor(() => expect(p.panel(), 'the Panel peeks').not.toBeNull());
+        await expect(getComputedStyle(p.panel()).position, 'over the Page').toBe('absolute');
+        await expect(p.blanket(), 'a peek has no Blanket').toBeNull();
+        await expect(rect(p.content).width, 'the Page does not move').toBeCloseTo(contentWidth, 0);
+        await expect(p.splitter(), 'a peek does not resize').toBeNull();
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(p.panel(), 'Escape closes the peek').toBeNull());
+    }),
+};
+
+export const NoPanelPeekByDefault = {
+    render: WithPanel,
+    play: async ({ canvasElement }) => {
+        const p = panelParts(canvasElement);
+        await expect(p.frame.querySelector('.plus-frame__panel-edge'), 'no hover strip').toBeNull();
+    },
+};
+
+/** 1440 with List and detail: both docked would leave 752, under the 960 split, so the default Sidebar collapses to keep it (992). */
+export const ListDetailKeepsSplitAt1440 = {
+    render: WithPanel,
+    args: { listDetail: true },
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = panelParts(canvasElement);
+        await waitFor(() => expect(p.sidebar()).not.toBeNull());
+        await openPanel(p);
+        await waitFor(() => expect(p.sidebar(), 'the Sidebar collapses first').toBeNull());
+        await expect(getComputedStyle(p.panel()).position).not.toBe('absolute');
+        await expect(rect(p.content).width, '1440 - 400 - 48').toBeCloseTo(992, 0);
+    }),
+};
