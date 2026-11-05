@@ -279,7 +279,7 @@ const atWidth = (width, expected) => async ({ canvasElement }) => withTestViewpo
     await expect(within(list.find((b) => b.name === 'impact').el).getByText('Student Interaction Rating')).toBeTruthy();
 
     // The tutor sidebar, with Home selected, docks from 1024; below it is closed.
-    const sidebar = canvas.queryByRole('complementary', { name: 'Sidebar' });
+    const sidebar = canvas.queryByRole('navigation', { name: 'Main' })?.closest('.plus-frame__sidebar') ?? null;
     if (expected.sidebarDocked) {
         await expect(sidebar, 'the sidebar docks').not.toBeNull();
         await expect(within(sidebar).getByRole('button', { name: /Home/ })).toHaveAttribute('aria-current', 'page');
