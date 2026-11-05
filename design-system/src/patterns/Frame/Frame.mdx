@@ -17,7 +17,7 @@ export const propRows = [
     ['panelDefaultWidth', 'number', '400', 'The width the Panel opens at when the tab has nothing remembered, from 320 to 640.', 'Panel width'],
     ['panelPeek', 'boolean', 'false', 'Hovering the right edge peeks a closed Panel over the Page, with no Blanket.', 'none'],
     ['panelStorageKey', 'string | null', 'plus-frame-panel', 'The sessionStorage key the Panel\'s width and open state are kept under. Null keeps nothing.', 'none'],
-    ['listDetail', 'boolean', 'false', 'A List and detail layout is on the Page, so the Sidebar collapses first to keep the 960 split.', 'none'],
+    ['listDetail', 'boolean', 'false', 'A List and detail layout is on the Page, so the Sidebar collapses first to keep the 960 split. If a collapsed Sidebar still leaves under 960, the Panel stays docked and the detail replaces the list. While the split holds, the splitter stops where content would drop under 960.', 'none'],
     ['width', 'content | reading', 'content', 'The content cap: content 1232, reading 864.', 'Page width = content | reading'],
     ['surfaceDirect', 'boolean', 'false', 'Renders children straight into the page, with no content box or grid, for full-bleed views.', 'none'],
     ['contentAs', 'element type', 'main', 'The element for the content box, which is the Page\'s main landmark. Pass div when the page supplies its own main.', 'none'],

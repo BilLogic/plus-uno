@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { resolveFrameLayout, FRAME_LAYOUT, clamp } from './frameLayout';
+import { resolveFrameLayout, dockedPanelMax, FRAME_LAYOUT, clamp } from './frameLayout';
 
 const byDefault = { open: true, setBy: 'default' };
 const byHand = { open: true, setBy: 'hand' };
@@ -213,6 +213,28 @@ describe('List and detail', () => {
         const r = resolve({ frameWidth: 1100, listDetail: true });
         expect(r.sidebar).toBe('docked');
         expect(r.splitHolds).toBe(false);
+    });
+});
+
+describe('docked Panel maximum (the splitter)', () => {
+    it('keeps the 720 floor when no split holds', () => {
+        // 1440 - 240 - 48 - 720 = 432
+        expect(dockedPanelMax({ frameWidth: 1440, sidebarDocked: true, splitHolds: false })).toBe(432);
+    });
+    it('keeps 960 while a split holds, so a drag never breaks it', () => {
+        // 1440 - 0 - 48 - 960 = 432
+        expect(dockedPanelMax({ frameWidth: 1440, sidebarDocked: false, splitHolds: true })).toBe(432);
+        // 1600 - 48 - 960 = 592 (floor-only would allow 640)
+        expect(dockedPanelMax({ frameWidth: 1600, sidebarDocked: false, splitHolds: true })).toBe(592);
+    });
+    it('stays inside the Panel range', () => {
+        expect(dockedPanelMax({ frameWidth: 3000, sidebarDocked: false, splitHolds: true })).toBe(640);
+        expect(dockedPanelMax({ frameWidth: 1100, sidebarDocked: true, splitHolds: true })).toBe(320);
+    });
+    it('resolves a split that holds at the maximum', () => {
+        const max = dockedPanelMax({ frameWidth: 1600, sidebarDocked: false, splitHolds: true });
+        const r = resolve({ frameWidth: 1600, chatMode: 'panel', listDetail: true, panelWidth: max });
+        expect(r.splitHolds).toBe(true);
     });
 });
 
