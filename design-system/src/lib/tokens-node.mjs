@@ -304,7 +304,7 @@ export const FAMILIES = [
   },
   { family: 'page', prefix: '--page-', what: 'the Page: its pad, stack and radius' },
   { family: 'panel', prefix: '--panel-', what: 'the Panel: its minimum, default and maximum width' },
-  { family: 'frame', prefix: '--frame-', what: 'the Frame: its pad and stack' },
+  { family: 'frame', prefix: '--frame-', what: 'the Frame: the topbar height and the sidebar widths' },
   { family: 'font-size', prefix: '--font-size-', what: 'the type scale, icon sizes included' },
   { family: 'font-line-height', prefix: '--font-line-height-', what: 'line height per type step' },
   { family: 'font-family', prefix: '--font-family-', what: 'font stacks' },

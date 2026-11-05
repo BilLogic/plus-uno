@@ -116,7 +116,7 @@ const surfacePad = (surface) => px(getComputedStyle(surface).paddingLeft);
 
 /** The toggle sits at (8, 8) at every width and in every sidebar state. */
 const expectToggleHome = async (frame, toggle) => {
-    const pad = tokenLength(frame, '--space-050');
+    const pad = tokenLength(frame, '--pad-x-sm');
     const at = offset(frame, toggle);
     await expect(at.x, 'toggle x').toBeCloseTo(pad, 0);
     await expect(at.y, 'toggle y').toBeCloseTo(pad, 0);
