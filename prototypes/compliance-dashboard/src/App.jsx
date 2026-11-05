@@ -366,8 +366,7 @@ const App = () => {
                     actions={(
                         <Button
                             text="Find a session"
-                            fill="outline"
-                            leadingVisual="magnifying-glass"
+                            iconBefore="magnifying-glass"
                             onClick={() => setView('search')}
                         />
                     )}
@@ -394,8 +393,7 @@ const App = () => {
                     actions={(
                         <Button
                             text={`Back to ${back?.text ?? 'Compliance'}`}
-                            fill="outline"
-                            leadingVisual="arrow-left"
+                            iconBefore="arrow-left"
                             onClick={() => (back?.onClick ? back.onClick() : goToCompliance())}
                         />
                     )}

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, Input, Dropdown, HeadCell, TableCell, TableRow } from '@/components';
+import { Button, TextField, HeadCell, TableCell, TableRow } from '@/components';
+import OptionMenu from './OptionMenu';
 import { PatternCard, PatternSection } from '@/patterns';
 import { METRICS, FLAG_CATEGORIES, latest } from '../data';
 
@@ -38,20 +39,19 @@ export const FilterBar = ({
     return (
         <PatternSection.Toolbar
             search={(
-                <Input
+                <TextField
                     label="Search"
-                    showLabel={false}
+                    isLabelHidden
                     placeholder={searchPlaceholder}
-                    leadingVisual="fa-solid fa-search"
+                    elemBeforeInput={<i className="fa-solid fa-search" aria-hidden="true" />}
                     value={query}
                     onChange={(e) => onQuery(e.target.value)}
                 />
             )}
             filters={(
                 <>
-                    <Dropdown
+                    <OptionMenu
                         buttonText={`Compliance: ${current.name}`}
-                        fill="outline"
                         items={COMPLIANCE_OPTIONS.map((c) => ({
                             text: c.name,
                             selected: c.id === compliance,
@@ -61,16 +61,15 @@ export const FilterBar = ({
                     {onPriorityOnly && (
                         <Button
                             text="Priority only"
-                            fill={priorityOnly ? undefined : 'outline'}
-                            leadingVisual={priorityOnly ? 'check' : 'filter'}
+                            appearance={priorityOnly ? 'primary' : 'default'}
+                            iconBefore={priorityOnly ? 'check' : 'filter'}
                             onClick={() => onPriorityOnly(!priorityOnly)}
                         />
                     )}
                     {filters.map((f) => (
-                        <Dropdown
+                        <OptionMenu
                             key={f.label}
                             buttonText={`${f.label}: ${f.value}`}
-                            fill="outline"
                             items={f.options.map((o) => ({
                                 text: o,
                                 selected: o === f.value,
@@ -78,7 +77,7 @@ export const FilterBar = ({
                             }))}
                         />
                     ))}
-                    {active && onClear && <Button text="Clear filters" fill="text" onClick={onClear} />}
+                    {active && onClear && <Button text="Clear filters" appearance="subtle" onClick={onClear} />}
                 </>
             )}
             count={`${count} of ${total} shown`}

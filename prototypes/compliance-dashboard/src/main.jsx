@@ -1,8 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ThemeProvider } from 'react-bootstrap';
 import { BrowserRouter } from 'react-router-dom';
-import 'bootstrap/dist/css/bootstrap.min.css';
+import '@/styles/bootstrap-layer.css';
 import '@/styles/main.scss';
 import App from './App';
 import './index.css';
@@ -14,11 +13,9 @@ if (!rootEl) {
     try {
         ReactDOM.createRoot(rootEl).render(
             <React.StrictMode>
-                <ThemeProvider>
-                    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || undefined}>
-                        <App />
-                    </BrowserRouter>
-                </ThemeProvider>
+                <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || undefined}>
+                    <App />
+                </BrowserRouter>
             </React.StrictMode>
         );
     } catch (err) {

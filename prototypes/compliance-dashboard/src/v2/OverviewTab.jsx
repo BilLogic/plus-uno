@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Dropdown } from '@/components';
+import OptionMenu from './OptionMenu';
 import { PatternCard, PatternSection } from '@/patterns';
 import Tabs from './Tabs';
 import { Tiles } from './Shared';
@@ -226,9 +226,8 @@ const OverviewTab = ({ decisions, relabels = {}, flags = FLAG_INSTANCES, onOpenR
                 <PatternCard
                     title="Compliance flags over time"
                     actions={(
-                        <Dropdown
+                        <OptionMenu
                             buttonText={complianceFilter}
-                            fill="outline"
                             items={WEEKLY_BY_COMPLIANCE.map((c) => c.name).map((n) => ({
                                 text: n,
                                 selected: n === complianceFilter,

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Avatar, Button, Dropdown, EmptyState, StaticTable, Status, Tag, VisuallyHidden } from '@/components';
+import { Avatar, Button, EmptyState, StaticTable, StatusTag, Tag, VisuallyHidden } from '@/components';
+import OptionMenu from '../v2/OptionMenu';
 import { PatternCard, PatternSection } from '@/patterns';
 import { THIS_WEEK } from '../data';
 import { unitsOnSession, patternState, isPatternFlag } from '../v2/audit';
@@ -95,7 +96,7 @@ const TutorPage = ({
                 </div>
             ),
         reviewOf(s)
-            ? <Status key={`${s.id}-rv`} style={REVIEW_STYLE[reviewOf(s)]}>{reviewOf(s)}</Status>
+            ? <StatusTag key={`${s.id}-rv`} appearance={REVIEW_STYLE[reviewOf(s)]}>{reviewOf(s)}</StatusTag>
             : <span key={`${s.id}-rv`} className="cm-muted cm-small">—</span>,
         {
             align: 'right',
@@ -103,8 +104,8 @@ const TutorPage = ({
                 <Button
                     // The sessions waiting on you get the stronger button.
                     text={reviewOf(s) === 'Needs verification' ? 'Verify' : 'Open session'}
-                    fill={reviewOf(s) === 'Needs verification' ? 'filled' : 'outline'}
-                    leadingVisual="play"
+                    appearance={reviewOf(s) === 'Needs verification' ? 'primary' : 'default'}
+                    iconBefore="play"
                     disabled={!s.transcriptId}
                     onClick={() => onOpenSession(tutor, s)}
                 />
@@ -121,7 +122,7 @@ const TutorPage = ({
                     <Avatar name={tutor.name} size={48} />
                     <div className="cm-tutor-head__text">
                         <div className="cm-row">
-                            <Status style={STATUS_STYLE[status ?? tutor.status]}>{status ?? tutor.status}</Status>
+                            <StatusTag appearance={STATUS_STYLE[status ?? tutor.status]}>{status ?? tutor.status}</StatusTag>
                         </div>
                         <p className="cm-muted cm-small">
                             {tutor.sessions.length} sessions on record ·
@@ -129,7 +130,7 @@ const TutorPage = ({
                         </p>
                     </div>
                 </div>
-                <Button text="Export tutor record" fill="outline" leadingVisual="download" />
+                <Button text="Export tutor record" iconBefore="download" />
             </div>
 
             <PatternSection
@@ -199,7 +200,7 @@ const TutorPage = ({
                 title="Session history"
                 description={`${visibleSessions.length} of ${tutor.sessions.length} sessions · ${flaggedSessions.length} flagged${toVerify.length > 0 ? ` · ${toVerify.length} need verification` : ''}`}
                 actions={(
-                    <Dropdown
+                    <OptionMenu
                         buttonText={`Show: ${sessionFilter}`}
                         items={SESSION_FILTERS.map((f) => ({
                             text: f,
@@ -212,7 +213,7 @@ const TutorPage = ({
                 <PatternCard padding="lg">
                     {tutor.sessions.length === 0 ? (
                         <EmptyState
-                            size="compact"
+                            spacing="compact"
                             icon="clock-rotate-left"
                             header="No session history yet"
                             description="No session history is loaded for this tutor yet."

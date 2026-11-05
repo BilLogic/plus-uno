@@ -111,7 +111,7 @@
 
 .cm-matrix__cell {
     padding: var(--space-150);
-    border-radius: var(--size-element-radius-md);
+    border-radius: var(--radius-md);
     font: var(--body-small);
     text-align: center;
 }

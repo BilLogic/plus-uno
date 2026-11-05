@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Avatar, Button, EmptyState, Count } from '@/components';
+import { Avatar, Button, EmptyState, CountTag } from '@/components';
 import { PatternCard, PatternSection } from '@/patterns';
 import { DataTable, FilterBar, COMPLIANCE_OPTIONS } from './Shared';
 import {
@@ -133,7 +133,7 @@ const TutorsTab = ({ decisions = {}, relabels = {}, flags = FLAG_INSTANCES, onOp
                             ? `${violations} violation${violations === 1 ? '' : 's'} · ${notViolations} not`
                             : undefined,
                     },
-                t.hasPage ? <Button key="o" text="Open" fill="outline" trailingVisual="arrow-right" onClick={() => onOpenTutor(t)} /> : null,
+                t.hasPage ? <Button key="o" text="Open" iconAfter="arrow-right" onClick={() => onOpenTutor(t)} /> : null,
             ],
         };
     };
@@ -192,17 +192,17 @@ const TutorsTab = ({ decisions = {}, relabels = {}, flags = FLAG_INSTANCES, onOp
                             title={(
                                 <span className="cm-person">
                                     {group}
-                                    <Count value={members.length} showZero label={`${members.length} tutors`} />
+                                    <CountTag value={members.length} showZero label={`${members.length} tutors`} />
                                 </span>
                             )}
                             description={STATUS_META[group]}
                             actions={collapsible && members.length > 0 ? (
-                                <Button text={open ? 'Hide' : 'Show'} fill="text" onClick={() => setShowOnTrack((v) => !v)} />
+                                <Button text={open ? 'Hide' : 'Show'} appearance="subtle" onClick={() => setShowOnTrack((v) => !v)} />
                             ) : undefined}
                         >
                             {members.length === 0 ? (
                                 <PatternCard padding="sm">
-                                    <EmptyState size="compact" icon="user-check" header="No tutors in this group with these filters" />
+                                    <EmptyState spacing="compact" icon="user-check" header="No tutors in this group with these filters" />
                                 </PatternCard>
                             ) : open && (
                                 <PatternCard padding="sm">

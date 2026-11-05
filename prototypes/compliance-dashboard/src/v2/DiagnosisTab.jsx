@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { AiIcon, Button, Dropdown, EmptyState, Status } from '@/components';
+import { AiIcon, Button, EmptyState, StatusTag } from '@/components';
+import OptionMenu from './OptionMenu';
 import { PatternCard, PatternSection } from '@/patterns';
 import Tabs from './Tabs';
 import { DataTable, Tiles, statusStyle } from './Shared';
@@ -180,9 +181,9 @@ const DiagnosisTab = ({
             a.tutor,
             { content: a.category, secondary: a.aiCategory ? `AI said: ${a.aiCategory}` : undefined },
             a.confidence == null ? '—' : `${Math.round(a.confidence * 100)}%`,
-            <Status key="r" style={statusStyle(OUTCOMES[a.outcome].tone)}>{OUTCOMES[a.outcome].label}</Status>,
+            <StatusTag key="r" appearance={statusStyle(OUTCOMES[a.outcome].tone)}>{OUTCOMES[a.outcome].label}</StatusTag>,
             a.note || '—',
-            a.live ? <Button key="o" text="Open" fill="text" onClick={() => onOpenRecording(a, a.category)} /> : null,
+            a.live ? <Button key="o" text="Open" appearance="subtle" onClick={() => onOpenRecording(a, a.category)} /> : null,
         ],
     });
 
@@ -266,9 +267,8 @@ const DiagnosisTab = ({
                     {/* Every reason in this tab, with its count, zeros included, so it is
                         clear what is not going wrong as well as what is. */}
                     <div className="cm-reason-bar">
-                        <Dropdown
+                        <OptionMenu
                             buttonText={`Reason: ${chosen ? chosen.title : 'All'} (${chosen ? chosen.members.length : tabTotal})`}
-                            fill="outline"
                             items={[
                                 // Counts in parentheses, matching the tabs above.
                                 { text: `All (${tabTotal})`, selected: !chosen, onClick: () => setReason('all') },
@@ -288,7 +288,7 @@ const DiagnosisTab = ({
                         )}
                     </div>
                     {shown.length === 0 ? (
-                        <EmptyState size="compact" icon="clipboard-check" header="No audits in this category yet" />
+                        <EmptyState spacing="compact" icon="clipboard-check" header="No audits in this category yet" />
                     ) : shown.map(({ title, members }) => (
                         <section key={title} className="cm-audit-group">
                             <h4 className="cm-audit-group__title">

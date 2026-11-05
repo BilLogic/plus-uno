@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import { Avatar, Button, Dropdown, EmptyState, Input, StaticTable, Status, VisuallyHidden } from '@/components';
+import { Avatar, Button, EmptyState, StaticTable, StatusTag, TextField, VisuallyHidden } from '@/components';
+import OptionMenu from '../v2/OptionMenu';
 import { PatternCard, PatternSection } from '@/patterns';
 import { SESSIONS } from '../data';
 import './pages.css';
@@ -45,20 +46,19 @@ const SessionSearchPage = ({ onOpenSession }) => {
         { content: s.date, secondary: s.time, emphasis: 'title' },
         { content: s.tutor, leading: <Avatar name={s.tutor} size={24} /> },
         s.students.join(', '),
-        <Status
+        <StatusTag
             key={`${s.id}-state`}
-            style={STATES[s.state].style}
-            count={s.state === 'flagged' ? s.flags : undefined}
+            appearance={STATES[s.state].style}
+            trailingMetric={s.state === 'flagged' ? s.flags : undefined}
         >
             {STATES[s.state].text}
-        </Status>,
+        </StatusTag>,
         {
             align: 'right',
             content: s.recording ? (
                 <Button
                     text="Open session"
-                    fill="outline"
-                    leadingVisual="play"
+                    iconBefore="play"
                     disabled={!s.transcriptId}
                     onClick={() => onOpenSession(s)}
                 />
@@ -75,18 +75,18 @@ const SessionSearchPage = ({ onOpenSession }) => {
             toolbar={(
                 <PatternSection.Toolbar
                     search={(
-                        <Input
+                        <TextField
                             label="Search"
-                            showLabel={false}
+                            isLabelHidden
                             placeholder="Tutor or student name"
-                            leadingVisual="fa-solid fa-search"
+                            elemBeforeInput={<i className="fa-solid fa-search" aria-hidden="true" />}
                             value={query}
                             onChange={(e) => setQuery(e.target.value)}
                             className="cm-search"
                         />
                     )}
                     filters={(
-                        <Dropdown
+                        <OptionMenu
                             buttonText={state}
                             items={['Any status', ...Object.values(STATES).map((s) => s.text)].map((s) => ({
                                 text: s,
@@ -102,7 +102,7 @@ const SessionSearchPage = ({ onOpenSession }) => {
             <PatternCard padding="lg">
                 {results.length === 0 ? (
                     <EmptyState
-                        size="compact"
+                        spacing="compact"
                         icon="magnifying-glass"
                         header="No sessions match"
                         description="Try a tutor name, or widen the filters."

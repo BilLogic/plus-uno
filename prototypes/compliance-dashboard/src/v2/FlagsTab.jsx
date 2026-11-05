@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { AiIcon, Button, EmptyState, Status } from '@/components';
+import { AiIcon, Button, EmptyState, StatusTag } from '@/components';
 import { PatternCard, PatternSection } from '@/patterns';
 import { DataTable, FilterBar, matchesCompliance } from './Shared';
 import { FLAG_INSTANCES } from '../data';
@@ -98,7 +98,7 @@ const FlagsTab = ({ decisions, relabels = {}, flags = FLAG_INSTANCES, onOpenReco
                     ),
                     secondary: f.aiCategory ? `AI said: ${f.aiCategory}` : undefined,
                 },
-                <Status key="sev" style={SEVERITY_TONE[f.severity]}>{f.severity}</Status>,
+                <StatusTag key="sev" appearance={SEVERITY_TONE[f.severity]}>{f.severity}</StatusTag>,
                 {
                     content: (
                         <span className="cm-ai-quote">
@@ -109,7 +109,7 @@ const FlagsTab = ({ decisions, relabels = {}, flags = FLAG_INSTANCES, onOpenReco
                 },
                 {
                     // A pattern also says how far its sessions have got.
-                    content: <Status key="st" style={STATUS_TONE[label]}>{label}</Status>,
+                    content: <StatusTag key="st" appearance={STATUS_TONE[label]}>{label}</StatusTag>,
                     secondary: p
                         ? `${p.confirmed} of ${p.total} sessions confirmed${p.open > 0 ? ` · ${p.open} to verify` : ''}`
                         : undefined,
@@ -118,8 +118,7 @@ const FlagsTab = ({ decisions, relabels = {}, flags = FLAG_INSTANCES, onOpenReco
                     content: (
                         <Button
                             text={f.source === 'supervisor' ? 'Open' : isOpen(f, decisions) ? 'Review' : 'Reopen'}
-                            fill="outline"
-                            trailingVisual="arrow-right"
+                            iconAfter="arrow-right"
                             disabled={!f.moments}
                             // The list as shown, filters and sort included, becomes the review queue,
                             // so "Submit and next" on the recording page follows this order.
@@ -167,11 +166,11 @@ const FlagsTab = ({ decisions, relabels = {}, flags = FLAG_INSTANCES, onOpenReco
             <PatternCard padding="sm">
                 {rows.length === 0 ? (
                     <EmptyState
-                        size="compact"
+                        spacing="compact"
                         icon="flag"
                         header="No flags match these filters"
                         description="Clear a filter to see more."
-                        primaryAction={<Button text="Clear filters" fill="outline" onClick={clear} />}
+                        primaryAction={<Button text="Clear filters" onClick={clear} />}
                     />
                 ) : (
                     <DataTable

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { AiIcon, Button, Dropdown, Status, Tag, Textarea } from '@/components';
+import { AiIcon, Button, StatusTag, Tag, TextArea } from '@/components';
+import OptionMenu from '../v2/OptionMenu';
 import { PatternCard } from '@/patterns';
 import { TRANSCRIPTS, REASON_GROUPS, FLAG_CATEGORIES } from '../data';
 import { categoryById, severityFor } from '../v2/audit';
@@ -14,12 +15,12 @@ const SAVED_STYLE = 'success';
 const FLAGGED_STYLE = 'danger';
 
 const savedMarker = (text) => (
-    <Status style={SAVED_STYLE} leadingVisual="check">{text}</Status>
+    <StatusTag appearance={SAVED_STYLE} leadingVisual="check">{text}</StatusTag>
 );
 
 /** Compliance picker shared by the Violation panel and the add-a-violation form. */
 const ComplianceDropdown = ({ value, onChange, placeholder = 'Choose a compliance' }) => (
-    <Dropdown
+    <OptionMenu
         buttonText={categoryById(value)?.name ?? placeholder}
         items={FLAG_CATEGORIES.map((c) => ({
             text: c.name,
@@ -43,7 +44,7 @@ const AddViolationForm = ({ at, lineText, onAdd, onCancel }) => {
                 {lineText && <span className="cm-muted"> · {lineText}</span>}
             </p>
             <ComplianceDropdown value={categoryId} onChange={setCategoryId} />
-            <Textarea
+            <TextArea
                 label="Notes"
                 rows={2}
                 placeholder="What did you see or hear?"
@@ -56,7 +57,7 @@ const AddViolationForm = ({ at, lineText, onAdd, onCancel }) => {
                     disabled={!categoryId}
                     onClick={() => onAdd({ at, categoryId, note, lineText })}
                 />
-                <Button text="Cancel" fill="ghost" onClick={onCancel} />
+                <Button text="Cancel" appearance="subtle" onClick={onCancel} />
             </div>
         </div>
     );
@@ -68,7 +69,7 @@ const AddedRow = ({ v, onRemove }) => (
         <Tag color="blue" text="Added by you" />
         <span className="cm-strong">{v.category}</span>
         {v.note && <span className="cm-muted">{v.note}</span>}
-        <Button text="Remove" fill="text" onClick={() => onRemove(v.id)} />
+        <Button text="Remove" appearance="subtle" onClick={() => onRemove(v.id)} />
     </div>
 );
 
@@ -221,8 +222,7 @@ const RecordingPage = ({
                     <div className="cm-transport">
                         <Button
                             text={playing ? 'Pause' : 'Play'}
-                            fill="outline"
-                            leadingVisual={playing ? 'pause' : 'play'}
+                            iconBefore={playing ? 'pause' : 'play'}
                             onClick={() => setPlaying((p) => !p)}
                         />
                         <div className="cm-timeline" role="group" aria-label="Flagged moments">
@@ -261,7 +261,6 @@ const RecordingPage = ({
                                 <div className="cm-submit">
                                     <Button
                                         text="Remove this violation"
-                                        fill="outline"
                                         onClick={() => {
                                             onRemoveViolation(flag.id);
                                             onBack();
@@ -312,8 +311,8 @@ const RecordingPage = ({
                                     <div className="cm-stepper">
                                         <Button
                                             text="Previous"
-                                            fill="ghost"
-                                            leadingVisual="arrow-left"
+                                            appearance="subtle"
+                                            iconBefore="arrow-left"
                                             disabled={flagged.length < 2}
                                             onClick={() => goToFlag(current - 1)}
                                         />
@@ -323,8 +322,8 @@ const RecordingPage = ({
                                         </span>
                                         <Button
                                             text="Next"
-                                            fill="ghost"
-                                            trailingVisual="arrow-right"
+                                            appearance="subtle"
+                                            iconAfter="arrow-right"
                                             disabled={flagged.length < 2}
                                             onClick={() => goToFlag(current + 1)}
                                         />
@@ -337,8 +336,8 @@ const RecordingPage = ({
                                         <Button
                                             key={key}
                                             text={label}
-                                            fill={choice === key ? 'filled' : 'outline'}
-                                            leadingVisual={choice === key ? 'check' : undefined}
+                                            appearance={choice === key ? 'primary' : 'default'}
+                                            iconBefore={choice === key ? 'check' : undefined}
                                             aria-pressed={choice === key}
                                             onClick={() => setChoice(key)}
                                         />
@@ -356,7 +355,7 @@ const RecordingPage = ({
                                             anything the reason misses.
                                         </p>
                                         <div>
-                                            <Dropdown
+                                            <OptionMenu
                                                 buttonText={reason || 'Choose a reason'}
                                                 // Grouped by where the error came from, so the choice also
                                                 // tells a developer which part of the pipeline to look at.
@@ -370,7 +369,7 @@ const RecordingPage = ({
                                                 ])}
                                             />
                                         </div>
-                                        <Textarea
+                                        <TextArea
                                             label="Notes"
                                             rows={2}
                                             placeholder="What did you see or hear that the AI missed?"
@@ -398,7 +397,7 @@ const RecordingPage = ({
                                                 </p>
                                             )}
                                         </div>
-                                        <Textarea
+                                        <TextArea
                                             label="Notes (optional)"
                                             rows={2}
                                             placeholder="What did you see or hear?"
@@ -424,14 +423,13 @@ const RecordingPage = ({
                         {/* For what isn't on a line: camera off, someone leaving, a skipped rotation. */}
                         <Button
                             text={`Flag at ${fmt(time)}`}
-                            fill="outline"
-                            leadingVisual="plus"
+                            iconBefore="plus"
                             onClick={() => {
                                 setPlaying(false);
                                 setAdding({ at: time, lineText: null });
                             }}
                         />
-                        <Dropdown
+                        <OptionMenu
                             buttonText={filter}
                             items={['All lines', 'Flagged only'].map((f) => ({
                                 text: f,
@@ -483,13 +481,13 @@ const RecordingPage = ({
                                         <span className="cm-line__text">
                                             <span className="cm-line__speaker">{l.speaker}</span>
                                             <span>{l.text}</span>
-                                            {l.flagged && <Status style={FLAGGED_STYLE}>Flagged</Status>}
+                                            {l.flagged && <StatusTag appearance={FLAGGED_STYLE}>Flagged</StatusTag>}
                                         </span>
                                     </button>
                                     {/* Only on the line under the pointer, so scrolling stays calm. */}
                                     <Button
-                                        fill="ghost"
-                                        leadingVisual="plus"
+                                        appearance="subtle"
+                                        iconBefore="plus"
                                         className="cm-add-line"
                                         aria-label={`Add a violation at ${fmt(l.at)}`}
                                         title="Add a violation on this line"
