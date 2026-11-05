@@ -41,6 +41,6 @@ From `design-system/src/components/labels/StatusTag/StatusTag.scss`. Override th
 
 ## Related
 
-Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiChat` · `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

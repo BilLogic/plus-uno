@@ -38,6 +38,6 @@ From `design-system/src/components/labels/AiMessage/AiMessage.scss`. Override th
 
 ## Related
 
-Same group: `AiLabel` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiChat` · `AiLabel` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

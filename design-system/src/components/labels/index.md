@@ -2,11 +2,12 @@
 
 # Labels
 
-10 components. Each row links to the generated facts; the three columns after it are the
+11 components. Each row links to the generated facts; the three columns after it are the
 authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
+| [AiChat](AiChat/index.md) | 10 | ✕ | ✕ | ✕ |
 | [AiLabel](AiLabel/index.md) | 9 | ✅ | ✅ | ✅ |
 | [AiMessage](AiMessage/index.md) | 6 | ✅ | ✅ | ✅ |
 | [CountTag](CountTag/index.md) | 12 | ✅ | ✅ | ✅ |
@@ -18,7 +19,7 @@ authored half (#166), counted rather than assumed.
 | [Tag](Tag/index.md) | 22 | ✅ | ✅ | ✅ |
 | [TagGroup](TagGroup/index.md) | 10 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 10/10 (100%) · Correct/incorrect 7/10 (70%) · Accessibility 10/10 (100%)
+**Authored coverage:** When to use 10/11 (91%) · Correct/incorrect 7/11 (64%) · Accessibility 10/11 (91%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

@@ -48,6 +48,7 @@ export { default as Object, BugIcon, createObjectIcon, IdeaIcon, OBJECT_SIZES, P
 export { default as Tile, TILE_APPEARANCES, TILE_COLORS, TILE_CONTENTS, TILE_SIZES } from '@/components/images-and-icons/Tile';
 export { default as UserAvatar } from '@/components/images-and-icons/UserAvatar';
 
+export { default as AiChat, AI_CHAT_FULLSCREEN_BELOW, AI_CHAT_MODES, AI_CHAT_STORAGE_KEY, useAiChat } from '@/components/labels/AiChat';
 export { default as AiLabel } from '@/components/labels/AiLabel';
 export { default as AiMessage, AI_MESSAGE_STATUSES, TypingText } from '@/components/labels/AiMessage';
 export { default as CountTag, COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS, formatCount } from '@/components/labels/CountTag';

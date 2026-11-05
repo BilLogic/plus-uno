@@ -104,6 +104,12 @@ const inputs = byRoot((repoRoot) => {
   return { taxonomy, folders, tracked, stories };
 });
 
+/**
+ * Component code that Storybook documents as a pattern. The folder stays the
+ * component's home; the title is the pattern's, so the docs sit with Frame.
+ */
+const PATTERN_DOCS = new Set(['design-system/src/components/layout-and-structure/Panel/Panel.stories.jsx']);
+
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
   const { taxonomy, folders, tracked, stories } = inputs(repoRoot);
@@ -153,6 +159,8 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
 
   // (3) and (4) Titles.
   for (const { rel, title } of stories) {
+    // A component whose code lives here but whose docs belong to a pattern (Panel).
+    if (PATTERN_DOCS.has(rel) && title?.startsWith('Foundations/Patterns/')) continue;
     if (title === null) {
       found.push(`${rel}  has no \`title:\` on its default export.`);
       continue;

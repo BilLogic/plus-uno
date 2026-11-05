@@ -18,7 +18,7 @@ import {
     PanelHeader,
     PanelHostContext,
 } from '@/components';
-import Frame from '../Frame';
+import Frame from '@/patterns/Frame';
 import {
     AI_CHAT_FULLSCREEN_BELOW,
     AI_CHAT_MODES,

@@ -214,9 +214,9 @@ const preview = {
               "Page",
               "Topbar",
               "Sidebar",
+              "Panel",
               "Section",
               "List and detail",
-              "AI chat",
               "Card",
               "Table",
               "Blanket",
@@ -302,7 +302,6 @@ const preview = {
               "Accordion",
               "Carousel",
               "Page header",
-              "Panel",
               "Scrollbar",
               "Visually hidden"
             ],
@@ -354,7 +353,6 @@ const preview = {
           ],
           "Data visualizations",
           [
-            "Overview",
             "Color",
             "Comparison",
             "Correlation",

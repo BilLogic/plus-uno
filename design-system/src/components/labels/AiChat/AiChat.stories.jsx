@@ -1,8 +1,8 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button, Modal, Sidebar } from '@/components';
-import { AiChat, AI_CHAT_STORAGE_KEY, PANEL_STORAGE_KEY, Topbar } from '@/patterns';
+import { AiChat, AI_CHAT_STORAGE_KEY, Button, Modal, Sidebar } from '@/components';
+import { PANEL_STORAGE_KEY, Topbar } from '@/patterns';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 
@@ -57,8 +57,7 @@ const ChatPage = ({ height = '100vh', withModal = false, ...args }) => {
 };
 
 export default {
-    title: 'Foundations/Patterns/AI chat',
-    id: 'foundations-patterns-ai-chat',
+    title: 'Components/Labels/AI label/AI chat',
     component: AiChat,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },

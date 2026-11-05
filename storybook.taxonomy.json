@@ -66,7 +66,6 @@
       "Accordion",
       "Carousel",
       "Page header",
-      "Panel",
       "Scrollbar",
       "Visually hidden"
     ],
@@ -150,9 +149,9 @@
         "Page",
         "Topbar",
         "Sidebar",
+        "Panel",
         "Section",
         "List and detail",
-        "AI chat",
         "Card",
         "Table",
         "Blanket",
@@ -238,7 +237,6 @@
         "Accordion",
         "Carousel",
         "Page header",
-        "Panel",
         "Scrollbar",
         "Visually hidden"
       ],

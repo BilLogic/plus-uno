@@ -1208,7 +1208,7 @@
         "mdxPath": "design-system/src/components/layout-and-structure/Panel/Panel.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Panel",
         "source": "design-system/src/components/layout-and-structure/Panel/Panel.jsx",
-        "storybookId": "components-layout-and-structure-panel--docs"
+        "storybookId": "foundations-patterns-panel--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",

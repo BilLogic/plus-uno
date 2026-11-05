@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as AiChatStories from './AiChat.stories.jsx';
@@ -10,15 +11,19 @@ AI chat sits beside the work or over it, whichever the task needs. One floating 
 
 The examples on this page follow the **Color mode** switch in the toolbar.
 
+<DocsTabs of={AiChatStories}>
+
+<DocsTab tab="examples">
+
 <ResourcesBlock
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/AiChat"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/AiChat"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Chat closed: the floating action button at the bottom right of the Page.</>}>
     <Canvas of={AiChatStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
@@ -28,7 +33,7 @@ The examples on this page follow the **Color mode** switch in the toolbar.
 
 <div className="sb-ds-doc-section">
 
-### Modes
+## Modes
 
 1. **Popup** is the default. It opens anchored to the button, over the Page.
 2. **Panel** docks beside the Page, or opens over it on a Blanket when there is no room. The Frame decides.
@@ -48,18 +53,7 @@ Under 768 the popup is shown full screen.
 
 <div className="sb-ds-doc-section">
 
-### Behavior
-
-- **The button is the one way in.** It hides while chat is open in the Panel or full screen, and returns when chat closes.
-- **Header controls** are clear chat, switch mode (popup and Panel trade places), full screen, more and close.
-- **The conversation moves with the mode.** There is no history: clearing chat empties it.
-- **The mode is remembered for the tab.** A Panel left open comes back open. A popup or full screen comes back closed, and the button opens it in the remembered mode.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Storybook variant
+## Storybook variant
 
 `variant="storybook"` is the chat in the Storybook docs. Its header shows clear chat, move to Panel and close, with no full screen and no more menu.
 
@@ -69,4 +63,37 @@ Under 768 the popup is shown full screen.
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## Behavior
+
+- **The button is the one way in.** It hides while chat is open in the Panel or full screen, and returns when chat closes.
+- **Header controls** are clear chat, switch mode (popup and Panel trade places), full screen, more and close.
+- **The conversation moves with the mode.** There is no history: clearing chat empties it.
+- **The mode is remembered for the tab.** A Panel left open comes back open. A popup or full screen comes back closed, and the button opens it in the remembered mode.
+
 </div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- `AiMessage`, which shows every reply.
+- `PromptInput`, which sends the message.
+- Panel, the pattern that holds chat when it docks beside the Page.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>
