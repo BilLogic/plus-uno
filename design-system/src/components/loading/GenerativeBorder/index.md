@@ -11,6 +11,8 @@ The border that shows PLUS AI is generating content: a 2px rounded stroke in two
 
 **Stories:** `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.stories.jsx` — Idle, Generating, ReducedMotion, Radii, Interactive
 
+**Storybook page:** `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.mdx`
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -37,8 +39,6 @@ From `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.scs
 
 Same group: `ProgressBar` · `Skeleton` · `Spinner`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `GenerativeBorder` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).

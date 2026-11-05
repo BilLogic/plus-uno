@@ -1,0 +1,135 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+
+import * as AiIconStories from './AiIcon.stories.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={AiIconStories} />
+
+<Title />
+Icons for PLUS AI actions: generate, ask, rewrite, summarize, plan, suggest and stop generating. A Font Awesome Free glyph with a sparkle badge, or the sparkle alone.
+
+<DocsTabs of={AiIconStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/AiIcon"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<DocsCanvasShell attachSourceBelow description={<>Every icon at every size it is drawn in, light and dark.</>}>
+    <Canvas of={AiIconStories.AllIcons} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Size
+
+<DocsCanvasShell description={<>`size` is 16 by default or 24. Generate and stop generating also have 12; another icon asked for 12 is drawn at 16 and warns.</>}>
+    <DsCanvasQuiet of={AiIconStories.CloseUp} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>`label` names the icon for assistive technology.</>}>
+    <DsCanvasQuiet of={AiIconStories.Labelled} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<DocsCanvasShell description={<>The shapes fill with `currentColor`; set `color` to change it.</>}>
+    <DsCanvasQuiet of={AiIconStories.Color} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={AiIconStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## When to use
+
+Use `AiIcon` to mark an action that PLUS AI performs. For any other action, use a Font Awesome Free glyph. Stop generating has no sparkle on purpose, because stopping is not generative.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage notes
+
+### Pair it with visible text, or give it a `label`.
+
+Without `label` the icon is hidden from assistive technology.
+
+```jsx
+<AiIcon name="summarize" label="Summarize" />
+```
+
+### Pick `name` from the set.
+
+`generate`, `ask`, `rewrite`, `summarize`, `plan`, `suggest` and `stop-generating`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Labelled or hidden.** With `label` the icon is `role="img"` named by it. Without, it is `aria-hidden`.
+- **Color follows the text.** It fills with `currentColor`, so it keeps contrast with its surroundings.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- For any non-AI icon, use a Font Awesome Free glyph.
+- For the border that shows generation in progress, use `GenerativeBorder`.
+
+</div>
+
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

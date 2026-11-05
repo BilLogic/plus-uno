@@ -1,0 +1,78 @@
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as HeadingOutlineStories from './HeadingOutline.stories.jsx';
+import { DocsCanvasShell, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={HeadingOutlineStories} />
+
+<Title />
+Headings step down one size per nesting level, and their tags follow the nesting. The page's one h1 is Heading large (24), a section's h2 is Heading medium (20), and a subsection's h3 is Heading small (16).
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/HeadingOutline.stories.jsx"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+### Purpose
+
+The outline keeps a page's headings in one order, so a reader and assistive technology see the same structure the sizes show. It applies across the Page, Section, Card, Modal, Popup and Flag patterns.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Page, Section and Subsection
+
+<DocsCanvasShell attachSourceBelow description={<>The h1 is 24, the section's h2 is 20 and the subsection's h3 is 16.</>}>
+    <DsCanvasQuiet of={HeadingOutlineStories.PageSectionSubsection} />
+</DocsCanvasShell>
+
+Use one h1 per page. Each Section opens with an h2, and a subsection inside it with an h3. Do not skip a level to get a different size: the size follows from the level.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Container titles
+
+Container titles are fixed whatever level they sit at.
+
+<DocsCanvasShell description={<>A card's title is 14 over a 14 description, and its tag is one level below its section.</>}>
+    <DsCanvasQuiet of={HeadingOutlineStories.CardTitles} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A modal's title is 20. It is the dialog's own h1 and names it.</>}>
+    <DsCanvasQuiet of={HeadingOutlineStories.ModalTitle} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A popup's and a flag's titles are 14.</>}>
+    <DsCanvasQuiet of={HeadingOutlineStories.PopupAndFlagTitles} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Group labels
+
+<DocsCanvasShell description={<>Group labels are 12 semibold and are not headings.</>}>
+    <DsCanvasQuiet of={HeadingOutlineStories.GroupLabels} />
+</DocsCanvasShell>
+
+A menu's label names a group, and a table's labels are column headers. Neither joins the outline.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Accessibility
+
+- **Tags follow nesting.** Heading levels are real `h1` to `h3` elements, not styled text, so screen reader users can move by heading.
+- **A modal names itself.** Its title is the dialog's accessible name.
+
+</div>
+
+</div>

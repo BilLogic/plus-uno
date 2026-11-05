@@ -1041,7 +1041,7 @@
         "mdxPath": "design-system/src/components/messaging/Modal/Modal.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Modal",
         "source": "design-system/src/components/messaging/Modal/Modal.jsx",
-        "storybookId": "components-messaging-modal-dialog--docs"
+        "storybookId": "components-messaging-modal--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",

@@ -11,6 +11,8 @@ An icon for a PLUS AI action: generate, ask, rewrite, summarize, plan, suggest o
 
 **Stories:** `design-system/src/components/images-and-icons/AiIcon/AiIcon.stories.jsx` — AllIcons, CloseUp, Labelled, Color, Interactive
 
+**Storybook page:** `design-system/src/components/images-and-icons/AiIcon/AiIcon.mdx`
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -37,8 +39,6 @@ From `design-system/src/components/images-and-icons/AiIcon/AiIcon.scss`. Overrid
 
 Same group: `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile` · `UserAvatar`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `AiIcon` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).

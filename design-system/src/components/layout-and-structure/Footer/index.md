@@ -9,14 +9,18 @@ Per Figma spec: node-id=111-227939 Simple footer with version, copyright, and te
 
 **Source:** `design-system/src/components/layout-and-structure/Footer/Footer.jsx`
 
+**Stories:** `design-system/src/components/layout-and-structure/Footer/Footer.stories.jsx` — Overview, CustomContent, Interactive
+
+**Storybook page:** `design-system/src/components/layout-and-structure/Footer/Footer.mdx`
+
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `version` | string | `'v5.2.0'` | — |
-| `copyright` | string | `'Copyright © Carnegie Mellon University 2024'` | — |
-| `termsText` | string | `'Terms of Use'` | — |
-| `termsUrl` | string | `'#'` | — |
+| `version` | string | `'v5.2.0'` | The product version, shown first. |
+| `copyright` | string | `'Copyright © Carnegie Mellon University 2024'` | The copyright line. |
+| `termsText` | string | `'Terms of Use'` | The label of the terms link. |
+| `termsUrl` | string | `'#'` | Where the terms link goes. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 
@@ -24,8 +28,6 @@ Per Figma spec: node-id=111-227939 Simple footer with version, copyright, and te
 
 Same group: `Accordion` · `Carousel` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
 
-<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
 
-> No authored guidance yet — when to use, correct/incorrect, and accessibility
-> are unwritten for this component (#166). Nothing above tells you whether
-> reaching for `Footer` is the right call, only what it accepts.
+> Authored guidance is partial — missing: correct/incorrect (#166).

@@ -5,7 +5,7 @@ import Modal from '@/components/messaging/Modal';
 import { IconButton, Button } from '@/components';
 
 export default {
-    title: 'Components/Messaging/Modal dialog',
+    title: 'Components/Messaging/Modal',
     component: Modal,
     tags: ['!dev', '!autodocs'],
     argTypes: {
