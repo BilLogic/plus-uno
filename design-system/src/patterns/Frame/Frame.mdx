@@ -23,7 +23,7 @@ export const tokens = [
     ['--screen-width', '768', '1024', '1440', 'The page template frame width. Switching the layout mode resizes the frame.'],
     ['--screen-pad-x', '24', '24', '32', 'Pads the screen, a rule of its own so a Modal does not move when the Page pad does. The screen grid is clamp(720, screen minus 2 pads, 1232), centered, and belongs to the Overlay only, not the page grid.'],
     ['--frame-topbar-height', '32', '32', '32', 'The Topbar height.'],
-    ['--frame-sidebar-width', '240', '240', '240', 'The sidebar width, docked or floating.'],
+    ['--frame-sidebar-width', '240', '240', '240', 'The Sidebar width, docked, peeking or as an overlay.'],
     ['--page-pad', '24', '24', '24', "The page's pad, which is also the grid margin. One value at every width."],
     ['--page-radius', '8', '8', '8', "The Page's top-left corner radius, applied only while the Sidebar is docked."],
     ['--content-width', '720', '736', '1152', 'The content width at each mode, inside the Page pad.'],
@@ -33,7 +33,7 @@ export const tokens = [
     ['--content-max-width', '1232', '1232', '1232', 'The content cap.'],
     ['--content-max-width-reading', '864', '864', '864', 'The content cap for the reading width.'],
     ['--content-min-width', '720', '720', '720', 'The narrowest the content gets. Narrower, the Page scrolls sideways and the Topbar stays.'],
-    ['Sidebar docked', 'false', 'true', 'true', 'A Figma variable. The sidebar docks from 1024. In code the frame reads the viewport width and has no token for it.'],
+    ['Sidebar docked', 'false', 'true', 'true', 'A Figma variable. The sidebar docks from 1024. In code the Frame measures its own width through the layout resolver and has no token for it.'],
     ['--page-stack-sm', '16', '16', '16', 'Related sections.'],
     ['--page-stack-md', '24', '24', '24', 'Sections, and the row gap of the content grid.'],
     ['--page-stack-lg', '40', '40', '40', 'A new topic.'],
@@ -44,8 +44,8 @@ export const colorTokens = [
     ['--ds-surface', 'The page\'s fill.'],
     ['--ds-border-surface', 'The page\'s edge ring. Transparent, except in light increased contrast, where the frame turns white and the page needs a line to stand on.'],
     ['--ds-border', 'The 1px hairline under the Topbar and the divider at the right edge of a docked Sidebar. Where the Page\'s edge is drawn, it lies over the divider, so one line shows.'],
-    ['--ds-surface-overlay', 'The fill of a floating sidebar.'],
-    ['--ds-shadow-overlay', 'The shadow of a floating sidebar.'],
+    ['--ds-surface-overlay', 'The fill of a peeking or overlay Sidebar.'],
+    ['--ds-shadow-overlay', 'The shadow of a peeking or overlay Sidebar.'],
 ];
 
 <Title>Frame</Title>
@@ -201,15 +201,15 @@ Under 1024 the Sidebar never docks: opened by hand it floats over the Page as an
 Hovering the toggle or the left edge of the frame opens a collapsed Sidebar over the Page. It uses the overlay fill and shadow, has no Blanket, and does not move the page. An outside click, Escape or the pointer leaving closes it.
 
 <DocsCanvasShell description={<>Medium · 768, peeking: a collapsed Sidebar peeked over the Page. The Page does not move.</>}>
-    <Canvas of={FrameStories.DocsFloating768} story={{ inline: true }} layout="padded" sourceState="hidden" />
+    <Canvas of={FrameStories.DocsPeeking768} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>Large · 1024, peeking.</>}>
-    <Canvas of={FrameStories.DocsFloating1024} story={{ inline: true }} layout="padded" sourceState="hidden" />
+    <Canvas of={FrameStories.DocsPeeking1024} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 <DocsCanvasShell description={<>X-Large · 1440, peeking.</>}>
-    <Canvas of={FrameStories.DocsFloating1440} story={{ inline: true }} layout="padded" sourceState="hidden" />
+    <Canvas of={FrameStories.DocsPeeking1440} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 Opening a modal closes a peeking or overlay Sidebar, and a docked Sidebar stays. While a modal is open the Sidebar does not peek, and Escape closes the modal only.

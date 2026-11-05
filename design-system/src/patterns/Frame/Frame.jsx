@@ -91,11 +91,14 @@ const Frame = ({
     // `sidebarDocked` sets the default request; a press on the toggle (or
     // Ctrl+[) overrides it by hand until the prop changes.
     const defaultOpen = sidebarDocked ?? true;
-    const [hand, setHand] = useState(null);
-    const [peek, setPeek] = useState(false);
-    useEffect(() => {
-        setHand(null);
+    // The hand choice is stamped with the default it was made against, so a new
+    // `sidebarDocked` drops it in the same render rather than one paint later.
+    const [handChoice, setHandChoice] = useState({ open: null, against: defaultOpen });
+    const hand = handChoice.against === defaultOpen ? handChoice.open : null;
+    const setHand = useCallback((next) => {
+        setHandChoice((h) => ({ open: typeof next === 'function' ? next(h.open) : next, against: defaultOpen }));
     }, [defaultOpen]);
+    const [peek, setPeek] = useState(false);
 
     const layout = useMemo(() => resolveFrameLayout({
         frameWidth,
@@ -106,7 +109,8 @@ const Frame = ({
     const docked = hasSidebar && layout.sidebar === 'docked';
     const peeking = hasSidebar && layout.sidebar === 'peeking';
     const overlay = hasSidebar && layout.sidebar === 'overlay';
-    const floating = peeking || overlay;
+    // Peeking or an overlay: the Sidebar floats over the Page instead of taking room.
+    const raised = peeking || overlay;
     const collapsed = hasSidebar && layout.sidebar === 'collapsed';
 
     const cancelLeave = useCallback(() => {
@@ -132,12 +136,16 @@ const Frame = ({
         }, PEEK_LEAVE_MS);
     }, [cancelLeave]);
 
-    /** Closes whatever floats: a peek and an overlay Sidebar. */
-    const closeFloating = useCallback(() => {
+    /**
+     * Closes what is raised over the Page: a peek and an overlay Sidebar. An
+     * overlay opened by hand returns to the default request rather than
+     * counting as a choice to keep it shut, so widening the Frame still docks it.
+     */
+    const closeRaised = useCallback(() => {
         cancelLeave();
         setPeek(false);
-        setHand((h) => (h === true ? false : h));
-    }, [cancelLeave]);
+        setHand((h) => (h === true ? null : h));
+    }, [cancelLeave, setHand]);
 
     // The latest resolved state, read by handlers that must not re-bind on every change.
     const stateRef = useRef(layout.sidebar);
@@ -147,13 +155,19 @@ const Frame = ({
         cancelLeave();
         setPeek(false);
         setHand(stateRef.current === 'docked' || stateRef.current === 'overlay' ? false : true);
-    }, [cancelLeave]);
+    }, [cancelLeave, setHand]);
+
+    // A peek has no pointer on it once the Sidebar docks or opens as an overlay.
+    useEffect(() => {
+        if (layout.sidebar === 'docked' || layout.sidebar === 'overlay') setPeek(false);
+    }, [layout.sidebar]);
 
     // Ctrl+[ toggles the Sidebar.
     useEffect(() => {
         if (!hasSidebar) return undefined;
         const onKeyDown = (e) => {
-            if (e.defaultPrevented || !e.ctrlKey || e.altKey || e.metaKey || e.key !== '[') return;
+            // Under an open modal the Sidebar stays put, as it does for a peek.
+            if (e.defaultPrevented || !e.ctrlKey || e.altKey || e.metaKey || e.key !== '[' || openOverlayCount() > 0) return;
             e.preventDefault();
             toggle();
         };
@@ -168,28 +182,28 @@ const Frame = ({
     useEffect(() => subscribeOverlays((event) => {
         // The first overlay of a stack starts afresh; a confirm on top keeps the mark.
         if (event.type === 'open' && event.count === 1) focusToggleOnClose.current = false;
-        const floatingNow = stateRef.current === 'peeking' || stateRef.current === 'overlay';
-        if (event.type === 'open' && floatingNow) {
+        const raisedNow = stateRef.current === 'peeking' || stateRef.current === 'overlay';
+        if (event.type === 'open' && raisedNow) {
             focusToggleOnClose.current = Boolean(sidebarRef.current?.contains(document.activeElement));
-            closeFloating();
+            closeRaised();
         } else if (event.type === 'focus-lost' && focusToggleOnClose.current) {
             focusToggleOnClose.current = false;
             toggleRef.current?.focus();
         }
-    }), [closeFloating]);
+    }), [closeRaised]);
 
-    // A floating Sidebar closes on an outside press or Escape; the toggle and the Sidebar are inside.
+    // A raised Sidebar closes on an outside press or Escape; the toggle and the Sidebar are inside.
     useEffect(() => {
-        if (!floating) return undefined;
+        if (!raised) return undefined;
         const onPointerDown = (e) => {
             if (sidebarRef.current?.contains(e.target) || toggleRef.current?.contains(e.target)) return;
-            closeFloating();
+            closeRaised();
         };
         const onKeyDown = (e) => {
             // A control that handled its own Escape (a menu, a field) keeps it,
             // and so does an open modal.
             if (e.key !== 'Escape' || e.defaultPrevented || openOverlayCount() > 0) return;
-            closeFloating();
+            closeRaised();
             toggleRef.current?.focus();
         };
         document.addEventListener('pointerdown', onPointerDown);
@@ -198,7 +212,7 @@ const Frame = ({
             document.removeEventListener('pointerdown', onPointerDown);
             document.removeEventListener('keydown', onKeyDown);
         };
-    }, [floating, closeFloating]);
+    }, [raised, closeRaised]);
 
     const classes = [
         'plus-frame',
@@ -207,33 +221,33 @@ const Frame = ({
     ].filter(Boolean).join(' ');
 
     // A plain box: the `nav` inside the Sidebar is the navigation landmark.
-    const sidebarPanel = (isFloating) => (
+    const sidebarPanel = (isRaised) => (
         <div
             ref={sidebarRef}
             id={sidebarId}
-            className={`plus-frame__sidebar plus-frame__sidebar--${isFloating ? 'floating' : 'docked'}`}
-            onPointerEnter={isFloating ? cancelLeave : undefined}
-            onPointerLeave={isFloating ? leave : undefined}
+            className={`plus-frame__sidebar plus-frame__sidebar--${isRaised ? 'raised' : 'docked'}`}
+            onPointerEnter={isRaised ? cancelLeave : undefined}
+            onPointerLeave={isRaised ? leave : undefined}
         >
-            {isFloating ? <div className="plus-frame__topbar-space" aria-hidden="true" /> : null}
+            {isRaised ? <div className="plus-frame__topbar-space" aria-hidden="true" /> : null}
             {sidebar}
         </div>
     );
 
     const toggleProps = useMemo(() => ({
         ref: toggleRef,
-        'aria-controls': docked || floating ? sidebarId : undefined,
+        'aria-controls': docked || raised ? sidebarId : undefined,
         'aria-keyshortcuts': 'Control+[',
         onClick: toggle,
         onPointerEnter: peekSidebar,
         onPointerLeave: leave,
-    }), [docked, floating, sidebarId, toggle, peekSidebar, leave]);
+    }), [docked, raised, sidebarId, toggle, peekSidebar, leave]);
 
     const control = useMemo(() => (hasSidebar ? {
-        sidebar: docked || floating ? 'open' : 'closed',
+        sidebar: docked || raised ? 'open' : 'closed',
         docked,
         toggleProps,
-    } : null), [hasSidebar, docked, floating, toggleProps]);
+    } : null), [hasSidebar, docked, raised, toggleProps]);
 
     const SurfaceTag = surfaceDirect ? 'main' : 'div';
 
@@ -248,7 +262,7 @@ const Frame = ({
             {collapsed ? (
                 <div className="plus-frame__edge" aria-hidden="true" onPointerEnter={peekSidebar} />
             ) : null}
-            {floating ? sidebarPanel(true) : null}
+            {raised ? sidebarPanel(true) : null}
 
             <div className="plus-frame__row">
                 {docked ? sidebarPanel(false) : null}

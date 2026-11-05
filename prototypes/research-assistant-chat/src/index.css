@@ -78,6 +78,8 @@ body {
 #tutor-training-progress-page.admin-demo-layout .plus-frame__surface {
   width: 100%;
   flex-basis: 100%;
+  /* The Sidebar is hidden here, so the Page has no docked Sidebar to round against. */
+  border-radius: 0;
 }
 
 /** Page fills root frame; no horizontal scroll. */

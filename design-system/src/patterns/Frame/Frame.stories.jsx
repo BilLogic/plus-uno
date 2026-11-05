@@ -124,14 +124,14 @@ const expectTopbar = async (frame) => {
     await expect(rect(topbar).height, 'topbar height').toBeCloseTo(tokenLength(frame, '--frame-topbar-height'), 0);
 };
 
-/** A peeked sidebar floats: shadow, over the page, and no scrim under it. */
+/** A peeked sidebar floats: shadow, over the page, and no Blanket under it. */
 const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
     await expect(getComputedStyle(aside).position).toBe('absolute');
     await expect(getComputedStyle(aside).boxShadow, 'floating sidebar shadow')
         .toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
     await expect(rect(aside).width, 'sidebar width').toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
     await expect(rect(surface).left, 'the surface did not move').toBeCloseTo(surfaceLeftBefore, 0);
-    // No scrim: a point on the page beside the sidebar still hits the page.
+    // No Blanket: a point on the page beside the sidebar still hits the page.
     const s = rect(surface);
     const hit = document.elementFromPoint(s.right - 40, s.top + 40);
     await expect(surface.contains(hit), 'nothing covers the page beside the floating sidebar').toBe(true);
@@ -257,9 +257,9 @@ export const DocsAuto1024 = atMode('lg', false);
 export const DocsAuto1440 = atMode('xl', false);
 
 /** sidebar = floating: a closed sidebar peeked over the page. */
-export const DocsFloating768 = atMode('md', true);
-export const DocsFloating1024 = atMode('lg', true);
-export const DocsFloating1440 = atMode('xl', true);
+export const DocsPeeking768 = atMode('md', true);
+export const DocsPeeking1024 = atMode('lg', true);
+export const DocsPeeking1440 = atMode('xl', true);
 
 export const Floating = {
     render: PeekedFrame,
@@ -294,6 +294,8 @@ export const Medium768 = {
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expectFloating(frame, sidebar(), surface, surfaceLeft);
         await expectToggleHome(frame, toggle);
+        // Peeking is not docking: the corner stays square.
+        await expectCorner(frame, surface, false);
 
         // An outside click closes it.
         await userEvent.click(surface);
@@ -307,9 +309,6 @@ export const Medium768 = {
         // Escape closes a peek.
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(sidebar()).toBeNull());
-
-        // Peeking is not docking: the corner stays square.
-        await expectCorner(frame, surface, false);
 
         // A click opens it by hand. Under 1024 it never docks: it floats over the Page as an overlay.
         await userEvent.click(toggle);
@@ -386,6 +385,20 @@ export const CtrlBracketToggle = {
         await waitFor(() => expect(sidebar(), 'Ctrl+[ opens it again').not.toBeNull());
         await expect(offset(frame, surface).x).toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
         await expectCorner(frame, surface, true);
+    }),
+};
+
+/** Ctrl+[ under 1024 opens the Sidebar as an overlay, since it never docks there, and closes it again. */
+export const CtrlBracketAt768 = {
+    play: async ({ canvasElement }) => atViewport(768, async () => {
+        const { frame, surface, sidebar } = parts(canvasElement);
+        await expect(sidebar()).toBeNull();
+        await userEvent.keyboard('{Control>}[[{/Control}');
+        await waitFor(() => expect(sidebar(), 'Ctrl+[ opens it').not.toBeNull());
+        await expect(getComputedStyle(sidebar()).position, 'as an overlay, not docked').toBe('absolute');
+        await expectCorner(frame, surface, false);
+        await userEvent.keyboard('{Control>}[[{/Control}');
+        await waitFor(() => expect(sidebar(), 'Ctrl+[ closes it').toBeNull());
     }),
 };
 

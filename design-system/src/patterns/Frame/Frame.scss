@@ -84,11 +84,11 @@
     border-right: var(--stroke-1) solid var(--ds-border);
 }
 
-// Floating (a peek, or an overlay under 1024): over the Page, from the top of the frame, with a shadow and no Blanket.
+// Raised (a peek, or an overlay under 1024): over the Page, from the top of the frame, with a shadow and no Blanket.
 // The fill and shadow are the overlay role's fill/shadow pairing. It is on
 // the navigation layer (200), under popups (400) and a modal's Blanket (500); the
 // toggle (one above) and the hover edge (one below) sit either side of it.
-.plus-frame__sidebar--floating {
+.plus-frame__sidebar--raised {
     position: absolute;
     top: 0;
     bottom: 0;

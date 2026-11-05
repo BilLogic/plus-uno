@@ -185,7 +185,7 @@ const PageLayout = ({
     shellEntered = false,
     /** When true, there is no sidebar and no sidebar toggle. */
     sidebarHidden = false,
-    /** When true, dock the sidebar at every width (e.g. for Storybook/demos). Overrides the breakpoint default. */
+    /** When true, the sidebar's default request is open (e.g. for Storybook/demos). Under 1024 it still never docks. */
     sidebarExpanded = false,
 }) => {
     const pageShell = usePageLayoutShell();
