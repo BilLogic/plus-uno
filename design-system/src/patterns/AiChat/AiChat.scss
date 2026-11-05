@@ -10,7 +10,7 @@
     inset-block-end: var(--page-pad);
     inset-inline-end: var(--page-pad);
     z-index: calc(var(--layer-navigation) - 1);
-    width: var(--size-300);
+    width: var(--height-300);
     height: var(--height-300);
     padding: 0;
     box-shadow: var(--ds-shadow-overlay);
@@ -20,7 +20,7 @@
 .plus-popup.plus-ai-chat__popup {
     padding: 0;
     gap: 0;
-    height: var(--size-4000);
+    height: calc(var(--height-2000) * 2);
     max-height: calc(100vh - var(--height-300) - var(--page-pad) * 2);
     overflow: hidden;
 
