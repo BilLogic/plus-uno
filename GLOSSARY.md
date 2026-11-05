@@ -97,7 +97,7 @@ The area at the left of the **Frame**, below the **Topbar**, holding navigation.
 _Avoid_: "left nav", "side nav"
 
 **Panel**:
-The area at the right of the **Frame**, below the **Topbar**, holding AI chat first. It is app-level, 320 to 640 wide (400 by default), and **docked** beside the **Page** or **overlay**ed on a **Blanket** when there is no room. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
+The area at the right of the **Frame**, below the **Topbar**, holding AI chat first. It is app-level, 320 to 640 wide (400 by default), and **docked** beside the **Page** or opens as an **overlay** on a **Blanket** when there is no room. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
 _Avoid_: "right sidebar", "side panel", "inspector", "Card" for the area
 
 **Docked / overlay**:

@@ -233,9 +233,9 @@ Opening a modal closes a peeking or overlay Sidebar, and a docked Sidebar stays.
 
 The Panel opens from anything inside the Frame through `usePanelControl()`. The layout resolver places it, from the Frame's own width, so the content never drops under 720:
 
+- A Sidebar opened by hand stays docked, and the Panel opens as an overlay if both do not fit.
 - Both dock when the Sidebar, the Panel and 720 fit. With a 400 Panel that is from 1408.
 - Otherwise a Sidebar left open by default collapses, and comes back when the Panel closes. With a 400 Panel the Panel docks alone from 1168.
-- A Sidebar opened by hand stays docked, and the Panel opens as an overlay instead.
 - Otherwise the Panel opens as an overlay: over the Page on a Blanket that covers the Page and the Sidebar but not the Topbar. A press outside it, or Escape, closes it.
 - Under 1024 the Panel is an overlay 320 wide, and only one overlay is open at a time: opening the Sidebar closes the Panel, and opening the Panel closes the Sidebar. Under 768 the Panel is full width.
 - With `listDetail`, the Sidebar collapses first so the list and the detail keep 960 side by side.
