@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useId } from 'react';
 import PropTypes from 'prop-types';
 import { Button, Skeleton } from '@/components';
 import { HeadingLevelContext, headingTag, useHeadingLevel } from '@/lib/headingLevel';
@@ -171,6 +171,7 @@ const PatternSection = ({
     level: rankProp,
     gap = 'md',
     fill = 'none',
+    named = false,
     className = '',
     style,
     children,
@@ -197,8 +198,10 @@ const PatternSection = ({
     // In `custom` and `tabs-only` the title names the section without showing.
     const titleHidden = custom || tabsOnly;
 
+    const titleId = useId();
+    const labelled = named && Boolean(title);
     const titleNode = title && (
-        <Title className={`plus-pattern-section-title plus-pattern-section-title--${rank}`}>{title}</Title>
+        <Title id={labelled ? titleId : undefined} className={`plus-pattern-section-title plus-pattern-section-title--${rank}`}>{title}</Title>
     );
 
     const renderHeader = () => {
@@ -251,6 +254,7 @@ const PatternSection = ({
             className={classes}
             style={style}
             aria-busy={loading ? 'true' : undefined}
+            aria-labelledby={labelled ? titleId : undefined}
             {...props}
         >
             {hasHeader && renderHeader()}
@@ -297,6 +301,8 @@ PatternSection.propTypes = {
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),
     /** `subtle` sets the section on the sunken surface with a pad and a radius; `none` (default) draws nothing */
     fill: PropTypes.oneOf(SECTION_FILLS),
+    /** Makes the section a region named by its title, for a section that stands apart as a landmark */
+    named: PropTypes.bool,
     className: PropTypes.string,
     style: PropTypes.object,
     /** Content slot; with `layout="split"`, the main column */
