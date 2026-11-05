@@ -14,14 +14,13 @@ import ListDetail, { LIST_DETAIL_FLOOR, listDetailView } from './ListDetail';
 describe('listDetailView', () => {
     it('splits from the floor up, with or without a selection', () => {
         expect(LIST_DETAIL_FLOOR).toBe(960);
-        expect(listDetailView({ width: 960, hasSelection: true })).toBe('split');
-        expect(listDetailView({ width: 1232, hasSelection: false })).toBe('split');
+        expect(listDetailView({ splitHolds: true, hasSelection: true })).toBe('split');
+        expect(listDetailView({ splitHolds: true, hasSelection: false })).toBe('split');
     });
 
     it('below the floor shows the detail alone when a record is open, the list otherwise', () => {
-        expect(listDetailView({ width: 959, hasSelection: true })).toBe('detail');
-        expect(listDetailView({ width: 959, hasSelection: false })).toBe('list');
-        expect(listDetailView({ width: 400, hasSelection: true })).toBe('detail');
+        expect(listDetailView({ splitHolds: false, hasSelection: true })).toBe('detail');
+        expect(listDetailView({ splitHolds: false, hasSelection: false })).toBe('list');
     });
 });
 
@@ -58,6 +57,11 @@ describe('ListDetail', () => {
         expect(screen.getByText('Queue rows')).toBeInTheDocument();
     });
 
+    it('names the detail region from its title', () => {
+        renderIt();
+        expect(screen.getByRole('region', { name: 'Flag 1' })).toBeInTheDocument();
+    });
+
     it('disables next and previous when the caller says there is none', () => {
         renderIt({ onNext: vi.fn(), onPrevious: vi.fn(), nextDisabled: true, previousDisabled: true });
         expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
@@ -79,5 +83,25 @@ describe('ListDetail inside a Frame with listDetail', () => {
         const dropped = inFrame(false);
         expect(dropped.container.querySelector('.plus-list-detail--detail')).not.toBeNull();
         expect(screen.queryByText('Queue rows')).toBeNull();
+    });
+});
+
+describe('ListDetail back link', () => {
+    const narrow = (props) => render(
+        <SplitContext.Provider value={false}>
+            <ListDetail list={<div>Queue rows</div>} detail={<div>Flag body</div>} detailTitle="Flag 1" hasSelection {...props} />
+        </SplitContext.Provider>,
+    );
+
+    it('is not drawn without a handler', () => {
+        narrow();
+        expect(screen.queryByRole('button', { name: 'Back to list' })).toBeNull();
+    });
+
+    it('runs onBack when the detail replaces the list', async () => {
+        const onBack = vi.fn();
+        narrow({ onBack });
+        await userEvent.click(screen.getByRole('button', { name: 'Back to list' }));
+        expect(onBack).toHaveBeenCalledOnce();
     });
 });
