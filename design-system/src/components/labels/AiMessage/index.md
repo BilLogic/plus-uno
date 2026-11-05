@@ -32,7 +32,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-text` · `--ds-text-subtle` · `--stack-md` · `--stack-sm`
+`--body-default` · `--ds-text` · `--ds-text-subtle` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-easing-standard` · `--radius-full` · `--space-0375` · `--stack-md` · `--stack-sm` · `--stroke-2`
 
 From `design-system/src/components/labels/AiMessage/AiMessage.scss`. Override these through the token layer, never with a literal.
 

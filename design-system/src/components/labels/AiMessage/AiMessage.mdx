@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as AiMessageStories from './AiMessage.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={AiMessageStories} />
 
@@ -22,7 +22,7 @@ the typing indicator.
 
 <div className="sb-ds-doc-section">
 
-## Message
+## Overview
 
 <DocsCanvasShell description={<>A finished reply, as plain text.</>}>
     <DsCanvasQuiet of={AiMessageStories.Message} />
@@ -98,7 +98,7 @@ anywhere text comes from the model. Show `thinking` from the moment a message is
 sent until the first text arrives, `streaming` while text arrives, then
 `complete`.
 
-<table>
+<DocsTable>
     <thead>
         <tr><th>Prop</th><th>Type</th><th>What it does</th></tr>
     </thead>
@@ -109,7 +109,7 @@ sent until the first text arrives, `streaming` while text arrives, then
         <tr><td><code>typeOut</code></td><td>boolean</td><td>Types a finished text out character by character.</td></tr>
         <tr><td><code>renderPart</code></td><td>function</td><td>Draws a part that is not text.</td></tr>
     </tbody>
-</table>
+</DocsTable>
 
 </div>
 
@@ -133,8 +133,9 @@ sent until the first text arrives, `streaming` while text arrives, then
 
 ## Accessibility
 
-- **Busy while arriving.** A streaming or thinking message is marked
-  `aria-busy`, so a screen reader waits for the finished text.
+- **Busy while arriving.** A streaming message is marked `aria-busy`, so a
+  screen reader waits for the finished text. A typed-out reply carries its full
+  text for assistive technology and hides the character-by-character copy.
 - **Announced indicator.** The typing indicator is a status named "AI is writing";
   its dots are hidden from assistive technology.
 - **Reduced motion.** The caret and dots stop animating, and typed-out text

@@ -84,7 +84,7 @@ const AiMessage = ({
     return (
         <div
             className={classNames('plus-ai-message', `plus-ai-message--${status}`, className)}
-            aria-busy={status === 'complete' ? undefined : true}
+            aria-busy={status === 'streaming' ? true : undefined}
             {...rest}
         >
             {status === 'thinking' ? <TypingIndicator /> : items.map((part, index) => {
@@ -93,7 +93,12 @@ const AiMessage = ({
                     const streaming = status === 'streaming' && index === lastText;
                     return (
                         <p key={index} className="plus-ai-message__text">
-                            {typeOut && status === 'complete' ? <TypingText text={part.text} /> : part.text}
+                            {typeOut && status === 'complete' ? (
+                                <>
+                                    <span className="plus-ai-message__sr">{part.text}</span>
+                                    <span aria-hidden="true"><TypingText text={part.text} /></span>
+                                </>
+                            ) : part.text}
                             {streaming ? <span className="plus-ai-message__caret" aria-hidden="true" /> : null}
                         </p>
                     );

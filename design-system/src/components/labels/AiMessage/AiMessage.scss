@@ -24,14 +24,23 @@
         margin-block: var(--stack-md);
     }
 
+    &__sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
     &__caret {
         display: inline-block;
-        width: 2px;
+        width: var(--stroke-2);
         height: 1em;
-        margin-inline-start: 2px;
+        margin-inline-start: var(--stroke-2);
         vertical-align: text-bottom;
         background: currentcolor;
-        animation: plus-ai-message-blink 1s steps(2, start) infinite;
+        animation: plus-ai-message-blink calc(var(--motion-duration-long) * 3) steps(2, start) infinite;
     }
 
     &__typing {
@@ -42,14 +51,14 @@
     }
 
     &__dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
+        width: var(--space-0375, 0.375rem);
+        height: var(--space-0375, 0.375rem);
+        border-radius: var(--radius-full);
         background: var(--ds-text-subtle);
-        animation: plus-ai-message-pulse 1.2s ease-in-out infinite;
+        animation: plus-ai-message-pulse calc(var(--motion-duration-long) * 4) var(--motion-easing-standard) infinite;
 
-        &:nth-child(2) { animation-delay: 0.2s; }
-        &:nth-child(3) { animation-delay: 0.4s; }
+        &:nth-child(2) { animation-delay: var(--motion-duration-medium); }
+        &:nth-child(3) { animation-delay: calc(var(--motion-duration-medium) * 2); }
     }
 }
 
