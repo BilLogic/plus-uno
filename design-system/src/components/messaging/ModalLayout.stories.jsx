@@ -3,7 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import Modal from './Modal';
 import { Select } from '@/components';
-// The app shell's floating nav: it has to sit under a modal's scrim like any page chrome.
+// The app shell's floating nav: it has to sit under a modal's blanket like any page chrome.
 import NavFab from '../../../../src/components/NavFab/NavFab';
 
 /**
@@ -42,7 +42,7 @@ function lengthOf(doc, token) {
     return px;
 }
 
-/** The scrim color the token resolves to, read the same way. */
+/** The blanket color the token resolves to, read the same way. */
 function colorOf(doc, token) {
     const probe = doc.createElement('div');
     probe.style.backgroundColor = `var(${token})`;
@@ -63,7 +63,7 @@ export default {
             description: {
                 component:
                     'Interaction cover for the modal grid: width per layout mode with the sidebar '
-                    + 'open and closed, Hug and Fill with short and long content, the scrim, and the '
+                    + 'open and closed, Hug and Fill with short and long content, the blanket, and the '
                     + 'layer a menu takes inside a modal.',
             },
         },
@@ -209,21 +209,21 @@ FillLong.play = async ({ canvasElement }) => {
 };
 
 /* -------------------------------------------------------------------------- */
-/* Scrim and layers                                                            */
+/* Blanket and layers                                                            */
 /* -------------------------------------------------------------------------- */
 
-export const Scrim = () => <HeightCase height="hug" body={SHORT} title="Over the scrim" />;
-Scrim.play = async ({ canvasElement }) => {
+export const Blanket = () => <HeightCase height="hug" body={SHORT} title="Over the blanket" />;
+Blanket.play = async ({ canvasElement }) => {
     const doc = canvasElement.ownerDocument;
-    const dialog = await dialogOf(canvasElement, 'Over the scrim');
-    const scrim = dialog.closest('.plus-pattern-blanket');
-    await expect(scrim).not.toBeNull();
-    // The scrim is the blanket (color.blanket), in whichever mode is in force, and nothing else tints it.
-    await expect(getComputedStyle(scrim).backgroundColor).toBe(colorOf(doc, '--ds-blanket'));
-    // Atlassian's layers: scrim 500, modal 510. The dialog is the blanket's
+    const dialog = await dialogOf(canvasElement, 'Over the blanket');
+    const blanket = dialog.closest('.plus-pattern-blanket');
+    await expect(blanket).not.toBeNull();
+    // The blanket's fill is color.blanket, in whichever mode is in force, and nothing else tints it.
+    await expect(getComputedStyle(blanket).backgroundColor).toBe(colorOf(doc, '--ds-blanket'));
+    // The layers: blanket 500, modal 510. The dialog is the blanket's
     // direct child, so it takes the modal layer straight from Blanket's own
     // `> *` rule, with no intermediate wrapper.
-    await expect(getComputedStyle(scrim).zIndex).toBe('500');
+    await expect(getComputedStyle(blanket).zIndex).toBe('500');
     await expect(getComputedStyle(dialog).zIndex).toBe('510');
 };
 
@@ -255,11 +255,11 @@ MenuInsideModal.play = async ({ canvasElement }) => {
 };
 
 /**
- * Page chrome sits under the scrim: a sticky table header (Bootstrap's
+ * Page chrome sits under the blanket: a sticky table header (Bootstrap's
  * `.sticky-top`, on the card layer) and the app's floating nav (navigation).
  * Bootstrap had them at 1020 and 1100, above a modal at 510.
  */
-export const ChromeUnderTheScrim = () => (
+export const ChromeUnderTheBlanket = () => (
     <div>
         <div style={{ height: 'var(--size-2000)', overflow: 'auto' }}>
             {/* Bootstrap's markup, as LessonsOverviewPage draws it. */}
@@ -277,17 +277,17 @@ export const ChromeUnderTheScrim = () => (
     </div>
 );
 
-ChromeUnderTheScrim.play = async ({ canvasElement }) => {
+ChromeUnderTheBlanket.play = async ({ canvasElement }) => {
     const doc = canvasElement.ownerDocument;
     const dialog = await dialogOf(canvasElement, 'Over the page chrome');
-    const scrim = dialog.closest('.plus-pattern-blanket');
-    const scrimLayer = Number(getComputedStyle(scrim).zIndex);
+    const blanket = dialog.closest('.plus-pattern-blanket');
+    const blanketLayer = Number(getComputedStyle(blanket).zIndex);
     const head = within(canvasElement).getByTestId('sticky-head');
     const fab = doc.querySelector('.nav-fab');
     await expect(getComputedStyle(head).zIndex).toBe('100');
     await expect(getComputedStyle(fab).zIndex).toBe('200');
     for (const el of [head, fab]) {
-        await expect(Number(getComputedStyle(el).zIndex)).toBeLessThan(scrimLayer);
+        await expect(Number(getComputedStyle(el).zIndex)).toBeLessThan(blanketLayer);
         // Nothing of the chrome is the top element where it is drawn: the overlay covers it.
         const box = el.getBoundingClientRect();
         const hit = doc.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);

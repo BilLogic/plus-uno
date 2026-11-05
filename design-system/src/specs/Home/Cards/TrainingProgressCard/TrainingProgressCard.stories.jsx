@@ -12,7 +12,7 @@ export const Overview = () => (
         <div>
             <h4 className="h3" style={{ marginBottom: '16px', fontSize: '14px', fontWeight: '600' }}>Default</h4>
             <TrainingProgressCard
-                size="default"
+                spacing="default"
                 completed={6}
                 total={10}
                 competencies={{
@@ -25,9 +25,9 @@ export const Overview = () => (
             />
         </div>
         <div>
-            <h4 className="h3" style={{ marginBottom: '16px', fontSize: '14px', fontWeight: '600' }}>Small</h4>
+            <h4 className="h3" style={{ marginBottom: '16px', fontSize: '14px', fontWeight: '600' }}>Compact</h4>
             <TrainingProgressCard
-                size="small"
+                spacing="compact"
                 completed={4}
                 total={8}
                 competencies={{

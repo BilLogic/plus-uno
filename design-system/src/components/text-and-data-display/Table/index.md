@@ -3,7 +3,7 @@
 
 # Table
 
-Standard table component for displaying tabular data, built from the shared `_Table` parts (`TableRow`, `TableCell`, `TableMessageRow`, `TableSummaryRow`, `TableFooter`). The feel: hairline horizontal dividers, no outer frame, a quiet header over a stronger rule, single-line cells that end in an ellipsis with a tooltip, no zebra. Rows are 32, 40 or 48 tall (`size`); `density` is the older name for the same prop. `StaticTable` is this table for a fixed grid people read.
+Standard table component for displaying tabular data, built from the shared `_Table` parts (`TableRow`, `TableCell`, `TableMessageRow`, `TableSummaryRow`, `TableFooter`). The feel: hairline horizontal dividers, no outer frame, a quiet header over a stronger rule, single-line cells that end in an ellipsis with a tooltip, no zebra. Rows are 32, 40 or 48 tall (`size`). `StaticTable` is this table for a fixed grid people read.
 
 **Import:** `import { Table } from '@/components';`
 
@@ -22,7 +22,6 @@ Standard table component for displaying tabular data, built from the shared `_Ta
 | `verticalLines` | bool | `false` | — |
 | `frame` | enum | `'plain'` | — |
 | `size` | enum | — | — |
-| `density` | enum | — | — |
 | `titleColumn` | number | — | — |
 | `rowStates` | enum | — | — |
 | `summary` | arrayOf | — | — |
@@ -38,9 +37,7 @@ Standard table component for displaying tabular data, built from the shared `_Ta
 
 **`frame`** — `plain` · `framed`
 
-**`size`** — `sm` · `md` · `lg`
-
-**`density`** — `sm` · `md` · `lg`
+**`size`** — `32` · `40` · `48`
 
 **`rowStates`** — `rest` · `highlighted` · `selected` · `disabled`
 

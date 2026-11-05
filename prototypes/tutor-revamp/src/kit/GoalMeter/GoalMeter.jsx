@@ -28,7 +28,7 @@ const GoalMeter = ({
     hint,
     pinned = false,
     tone = 'brand',
-    size = 'md',
+    size = 8,
     interactive = true,
     className = '',
 }) => {
@@ -82,8 +82,8 @@ GoalMeter.propTypes = {
     pinned: PropTypes.bool,
     /** `warning` paints the fill in warning, for a value outside its range */
     tone: PropTypes.oneOf(['brand', 'success', 'warning']),
-    /** `sm` 6 high (in a stat tile) · `md` 8 high */
-    size: PropTypes.oneOf(['sm', 'md']),
+    /** Height in pixels: `6` (in a stat tile) or `8` */
+    size: PropTypes.oneOf([6, 8]),
     /** False inside a link: no tab stop, no tooltip */
     interactive: PropTypes.bool,
     className: PropTypes.string,

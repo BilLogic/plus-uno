@@ -48,7 +48,7 @@ const ROWS = [
 export const Overview = () => (
     <div className="plus-table-wrapper">
         <div className="plus-table-scroll">
-            <table className="plus-table plus-table-md" data-testid="tree-table">
+            <table className="plus-table plus-table-40" data-testid="tree-table">
                 <thead>
                     <tr>
                         <HeadCell label="Topic" width="60%" />

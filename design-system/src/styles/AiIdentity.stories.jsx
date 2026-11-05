@@ -8,8 +8,8 @@ import { contrast as contrastOf, parseColor } from '../lib/tokens.mjs';
  *
  * WHAT THIS PAGE IS. A decision aid, not a proposal with a preferred answer.
  * #269 concluded that we have no AI brand and that this blocks the components
- * rather than the other way round; reading `@atlaskit/tokens` 16.9.0 sharpened
- * it — Rovo's identity is FOURTEEN tokens and they exist before any component:
+ * rather than the other way round; reading the reference tokens sharpened
+ * it — the reference identity is FOURTEEN tokens and they exist before any component:
  *
  *   color.rovo.background.brand.bold   #000000   (+ hovered, pressed)
  *   color.rovo.border|icon.lime        #6A9A23
@@ -245,8 +245,8 @@ export const Candidates = () => (
             </li>
             <li>What must be disclosed, and whether a tutor or a student is being told.</li>
             <li>
-                Whether the agent has a name. Rovo&rsquo;s nine components cohere because
-                &ldquo;Rovo&rdquo; is a decided thing; without a name the chip above has nothing to
+                Whether the agent has a name. The reference components cohere because
+                the name is a decided thing; without a name the chip above has nothing to
                 put in it.
             </li>
         </ol>

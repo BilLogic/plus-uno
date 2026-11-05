@@ -17,14 +17,14 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `size` | enum | — | `small` (12px) or `medium` (16px, the default). |
+| `size` | enum | — | `12` or `16` (the default), in pixels. |
 | `label` | string | — | The accessible name. An empty string marks the glyph decorative. |
 | `testId` | string | — | — |
 | `className` | string | — | — |
 
 ## Variants
 
-**`size`** — `small` · `medium`
+**`size`** — `12` · `16`
 
 Anything not listed is not a valid value.
 

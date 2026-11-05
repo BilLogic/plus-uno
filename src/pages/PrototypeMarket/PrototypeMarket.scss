@@ -238,7 +238,7 @@ html.market-active #root {
   &__modal-backdrop {
     position: fixed;
     inset: 0;
-    background: var(--color-scrim, rgba(0, 0, 0, 0.38));
+    background: var(--ds-blanket);
     display: flex;
     align-items: center;
     justify-content: center;

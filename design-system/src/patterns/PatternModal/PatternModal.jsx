@@ -11,7 +11,7 @@ import './PatternModal.scss';
  * title and close button, body slot, footer slot. Width is a step of the
  * screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and
  * height hugs the content up to the screen less 128 or fills to it, the body
- * scrolling past it. Place it in `Blanket` for the scrim.
+ * scrolling past it. Place it in `Blanket`.
  * Baked-in tokens: the overlay pair (`--ds-surface-overlay` with
  * `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad,
  * Modal/stack-md and Modal/radius.

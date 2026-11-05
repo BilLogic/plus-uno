@@ -81,7 +81,7 @@ const Home = () => {
                             value={PAID_HOURS.value}
                             max={PAID_HOURS.target}
                             target={PAID_HOURS.target}
-                            size="sm"
+                            size={6}
                             tone="success"
                             interactive={false}
                             label={`${PAID_HOURS.value} of ${PAID_HOURS.target} paid hours`}
@@ -152,7 +152,7 @@ const Home = () => {
                             action={<LinkButton to={`/students/${s.id}`} text="Open" appearance="default" spacing="compact" aria-label={`Open ${s.name}`} />}
                         >
                             <span className="tr-home__student">
-                                <Avatar initials={s.initials} tone={s.tone} size="md" />
+                                <Avatar initials={s.initials} tone={s.tone} size={32} />
                                 <b>{s.name}</b>
                             </span>
                             <Sparkline points={s.practice} domain={[0, 24]} label={`${firstName(s.name)}’s practice minutes, last 7 sessions`} />

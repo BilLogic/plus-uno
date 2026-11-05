@@ -3,7 +3,7 @@
  *
  * The Specs User Avatar on the design system's UserAvatar (`@/components`):
  * user initial, name, and the "Lead" role indicator for a lead tutor or a
- * notification counter for everyone else. Pass `size="md"` for the 32 topbar.
+ * notification counter for everyone else. Pass `spacing="compact"` for the 32 topbar.
  * Figma Spec: node-id=111-227876
  */
 

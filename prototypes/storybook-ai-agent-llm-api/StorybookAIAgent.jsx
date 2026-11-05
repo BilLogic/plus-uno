@@ -148,11 +148,11 @@ const LogoBgFigma = ({ id }) => {
     );
 };
 
-const LogoContainer = ({ size = 'default', className = '', variant = 'default' }) => {
+const LogoContainer = ({ size = 32, className = '', variant = 'default' }) => {
     const id = React.useId().replace(/:/g, '');
     const sizeMap = {
-        default: { width: 31.9, height: 31.9 },
-        large: { width: 64, height: 64 }
+        32: { width: 31.9, height: 31.9 },
+        64: { width: 64, height: 64 }
     };
     const { width, height } = sizeMap[size];
     const IconComponent = variant === 'fab-open' ? Icons.FabOpen : Icons.FabClosed;
@@ -1539,7 +1539,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                     {/* Header */}
                     <div className="sb-ai-agent__header">
                         <div className="sb-ai-agent__header-container">
-                            <LogoContainer size="default" />
+                            <LogoContainer size={32} />
                             <div className="sb-ai-agent__header-text">
                                 <h3 className="sb-ai-agent__header-name">PLUS UNO</h3>
                                 <span className="sb-ai-agent__header-sub">STORYBOOK ASSISTANT</span>
@@ -1560,7 +1560,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                         <>
                                 {/* Welcome Message */}
                                 <div className="sb-ai-agent__welcome-msg">
-                                    <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
+                                    <LogoContainer size={32} className="sb-ai-agent__logo-container--message" />
                                     <div className="sb-ai-agent__bubble sb-ai-agent__bubble--bot">
                                         Welcome to Storybook Assistant. How can I assist you today?
                                     </div>
@@ -1586,7 +1586,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                                     {messages.map((m, i) => (
                                         <div key={i} className={m.noBubble ? '' : `sb-ai-agent__msg sb-ai-agent__msg--${m.role}`}>
                                             {!m.noLogo && m.role === 'bot' && (
-                                                <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
+                                                <LogoContainer size={32} className="sb-ai-agent__logo-container--message" />
                                             )}
                                             {m.noBubble ? (
                                                 m.content
@@ -1636,7 +1636,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                                     {/* Typing indicator (Bot Message Loading) */}
                                     {isTyping && (
                                         <div className="sb-ai-agent__msg sb-ai-agent__msg--bot">
-                                            <LogoContainer size="default" className="sb-ai-agent__logo-container--message" />
+                                            <LogoContainer size={32} className="sb-ai-agent__logo-container--message" />
                                             <div className="sb-ai-agent__typing">
                                                 <span /><span /><span />
                                             </div>
@@ -1671,7 +1671,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                 {/* Floating Trigger Button */}
                 <div className="sb-ai-agent__fab-wrapper">
                     <button className="sb-ai-agent__fab" onClick={() => setIsOpen(o => !o)} title="Toggle AI Agent (⌘+/) · ⌘+Shift+/ to hide">
-                        <LogoContainer size="large" variant={isOpen ? 'fab-open' : 'fab-closed'} />
+                        <LogoContainer size={64} variant={isOpen ? 'fab-open' : 'fab-closed'} />
                     </button>
                 </div>
             </div>

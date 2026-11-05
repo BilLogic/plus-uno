@@ -122,15 +122,6 @@ export const SHAPES = [
     sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
   },
   {
-    file: 'scripts/baselines/ads-language.json',
-    check: 'check:ads-language',
-    command: 'node scripts/check-ads-language.mjs --update',
-    prose: 'why',
-    // `<rule> <path>` -> count of old-language hits. A pair may fall; one that
-    // reaches zero leaves the record, and the stale sweep asks for a regenerate.
-    sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
-  },
-  {
     file: 'scripts/baselines/state-mixin.json',
     check: 'check:state-mixin',
     command: 'node scripts/check-state-mixin.mjs --update',

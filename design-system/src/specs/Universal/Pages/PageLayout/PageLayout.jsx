@@ -6,7 +6,7 @@
  * content grid) filled with the PLUS TopBar and Sidebar. The frame's sizes and
  * the sidebar's dock, peek and float behavior live in Frame; this
  * component supplies the content and the page outline.
- * Figma: BS4 Foundation `Pattern/Page template` and `Pattern/Surface container`.
+ * Figma: BS4 Foundation `Pattern/Page template` and the Frame pattern.
  */
 
 import React from 'react';
