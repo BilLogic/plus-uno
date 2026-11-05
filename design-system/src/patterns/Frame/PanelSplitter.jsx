@@ -1,12 +1,11 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { dampedStretch, springBack } from '@/lib/damping';
+import { clamp } from './frameLayout';
 
 /** Keyboard steps, in pixels: an arrow moves 16, Shift with an arrow 64. */
 export const SPLITTER_STEP = 16;
 export const SPLITTER_STEP_LARGE = 64;
-
-const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 
 const prefersReducedMotion = () => typeof window !== 'undefined'
     && typeof window.matchMedia === 'function'
