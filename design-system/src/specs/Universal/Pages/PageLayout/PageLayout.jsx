@@ -47,8 +47,9 @@ const PAGE_TITLE_STYLE = {
  * `Pattern/Page template` frame=focused and its parts `_Focused topbar` and
  * `_Focused footer`.
  *
- * - The Frame with no sidebar and three rows, `--focused-page-stack-sm` 8
- *   apart inside `--focused-page-pad-y` · `--focused-page-pad-x` 8.
+ * - The Frame with no sidebar and its footer row under it: three rows,
+ *   `--focused-page-stack-sm` 8 apart inside `--focused-page-pad-y` ·
+ *   `--focused-page-pad-x` 8, which the layout box holds.
  * - Topbar (a `header`, the banner), 32 high: Back, a secondary text button
  *   with `arrow-left`; the title, the page's one visible `h1` at Heading/xsmall,
  *   on one line and truncated; Close, the `CloseButton`; `--focused-page-inline-md`
@@ -111,18 +112,21 @@ const FocusedFrame = ({
         </footer>
     ) : null;
 
+    // The Frame has no footer row, so the focused page's actions sit in a row
+    // of its own under the Frame, in the layout's column.
     return (
-        <Frame
-            topbar={topbar}
-            footer={footer}
-            width="reading"
-            contentAs="main"
-            contentClassName={['plus-page-main', mainClassName].filter(Boolean).join(' ')}
-            surfaceDirect={contentDirect}
-            style={{ flex: '1 1 auto', minHeight: 0 }}
-        >
-            {children}
-        </Frame>
+        <>
+            <Frame
+                topbar={topbar}
+                width="reading"
+                contentClassName={['plus-page-main', mainClassName].filter(Boolean).join(' ')}
+                surfaceDirect={contentDirect}
+                style={{ flex: '1 1 auto', minHeight: 0 }}
+            >
+                {children}
+            </Frame>
+            {footer}
+        </>
     );
 };
 

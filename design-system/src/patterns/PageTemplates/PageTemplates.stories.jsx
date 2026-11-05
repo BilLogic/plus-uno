@@ -170,7 +170,7 @@ export const SidebarOverPage = {
             // It is sent again until the frame has taken it, because the frame settles its width after the first paint.
             await waitFor(() => {
                 toggle.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
-                expect(canvas.queryByRole('complementary', { name: 'Sidebar' })).not.toBeNull();
+                expect(canvas.queryByRole('navigation', { name: 'Main' })).not.toBeNull();
             }, { timeout: 4000 });
             return toggle;
         };
@@ -180,7 +180,7 @@ export const SidebarOverPage = {
         }
         await withTestViewport(768, 900, async () => {
             await peek();
-            const aside = canvas.getByRole('complementary', { name: 'Sidebar' });
+            const aside = canvas.getByRole('navigation', { name: 'Main' }).closest('.plus-frame__sidebar');
             const frame = canvasElement.querySelector('.plus-frame');
             await expect(getComputedStyle(aside).position, 'the sidebar floats over the page').toBe('absolute');
             await expect(aside.getBoundingClientRect().width).toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);

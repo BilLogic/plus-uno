@@ -257,7 +257,7 @@ export const InFrame = {
         const canvas = within(canvasElement);
         const frame = canvasElement.querySelector('.plus-frame');
         const toggles = () => canvas.getAllByRole('button', { name: /sidebar$/i });
-        const sidebar = () => canvas.queryByRole('complementary', { name: 'Sidebar' });
+        const sidebar = () => canvas.queryByRole('navigation', { name: 'Main' })?.closest('.plus-frame__sidebar') ?? null;
         const breadcrumb = () => canvas.getByRole('navigation', { name: /breadcrumb/i });
         const surface = frame.querySelector('.plus-frame__surface');
 
@@ -314,7 +314,7 @@ export const InFrameWithTransformedStart = {
         const canvas = within(canvasElement);
         const toggle = canvas.getByRole('button', { name: /sidebar$/i });
         await userEvent.hover(toggle);
-        await waitFor(() => expect(canvas.queryByRole('complementary', { name: 'Sidebar' })).not.toBeNull());
+        await waitFor(() => expect(canvas.queryByRole('navigation', { name: 'Main' })).not.toBeNull());
         const t = rect(toggle);
         const hit = document.elementFromPoint(t.left + t.width / 2, t.top + t.height / 2);
         await expect(toggle.contains(hit), 'the floating sidebar does not cover the toggle').toBe(true);
