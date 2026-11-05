@@ -107,7 +107,7 @@ const markTokens = () => {
 };
 /** Charts whose fills a color axis interpolates between ramp stops; their ends are checked instead. */
 const INTERPOLATED = new Set(['heatmap', 'diverging', 'HeatmapChart']);
-const INK_TOKENS = ['--ds-text', '--ds-text-subtle', '--ds-text-inverse', '--ds-text-disabled'];
+const INK_TOKENS = ['--ds-text', '--ds-text-subtle', '--ds-text-subtlest', '--ds-text-inverse', '--ds-text-disabled'];
 
 /**
  * A color as rgb channels. Highcharts mixes the stops of a solid gauge with

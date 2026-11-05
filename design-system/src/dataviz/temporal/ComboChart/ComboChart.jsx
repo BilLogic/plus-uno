@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme, { CHART_LINE_WIDTH_NUMBER } from '@/dataviz/chartTheme';
+import { CHROME } from '@/dataviz/palette';
 
 /**
  * ComboChart Component
@@ -30,7 +31,7 @@ const ComboChart = ({
         marker: {
             lineWidth: CHART_LINE_WIDTH_NUMBER,
             lineColor: Highcharts.getOptions().colors[3], // default
-            fillColor: 'white'
+            fillColor: CHROME.surface
         }
     }));
 
