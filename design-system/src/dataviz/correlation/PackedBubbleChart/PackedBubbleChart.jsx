@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
+import { inkFor, resolveColor, textInks, useColorModeKey } from '@/dataviz/colorMode';
 
 /**
  * PackedBubbleChart Component
@@ -14,6 +15,9 @@ const PackedBubbleChart = ({
     height = 500,
     splitSeries = true
 }) => {
+    // A label sits on its bubble, so it takes whichever text ink reads on that fill; the key re-renders on a color-mode change.
+    useColorModeKey();
+    const inks = textInks();
     const options = {
         ...chartTheme,
         chart: {
@@ -39,14 +43,15 @@ const PackedBubbleChart = ({
                 },
                 dataLabels: {
                     enabled: true,
-                    format: '{point.name}',
                     filter: {
                         property: 'y',
                         operator: '>',
                         value: 50
                     },
+                    formatter: function () {
+                        return `<span style="color: ${inkFor(resolveColor(this.point.color), inks)}">${this.point.name}</span>`;
+                    },
                     style: {
-                        color: 'black',
                         textOutline: 'none',
                         fontWeight: 'var(--font-weight-normal)'
                     }
