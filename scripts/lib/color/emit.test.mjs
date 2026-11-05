@@ -44,10 +44,10 @@ test('_semantic.scss selector structure: light, dark, auto dark, and all 8 incre
   assert.equal((sem.match(/color-scheme: dark;/g) ?? []).length, 2);
 });
 
-test('light and dark carry all 533 tokens; increased contrast only the rows it changes', () => {
+test('light and dark carry all 536 tokens; increased contrast only the rows it changes', () => {
   const sem = files['_semantic.scss'];
   const blocks = sem.split(/\n(?=\S)/).map((b) => (b.match(/--ds-[\w-]+:/g) ?? []).length).filter(Boolean);
-  assert.deepEqual(blocks.slice(0, 3), [533, 533, 533]);
+  assert.deepEqual(blocks.slice(0, 3), [536, 536, 536]);
   assert.equal(blocks[3], 326); // light IC overrides
   assert.equal(blocks.at(-1), 297); // dark IC overrides
   assert.doesNotMatch(sem, /var\(--ds-[^)]*,/); // no fallbacks

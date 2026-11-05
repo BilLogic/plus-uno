@@ -16492,6 +16492,96 @@
      }
     },
     {
+     "name": "color/ai/background/bold/default",
+     "codeSyntax": {
+      "WEB": "var(--ds-ai-background-bold)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Ground of the one primary AI action in a region (Button, AI appearance). Pair its label with color.text.inverse. PLUS: PLUS addition: AI is a register, not a hue, so the ground is neutral ink like neutral.bold until the AI hue is decided; change these three aliases to re-ground every AI action.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "neutral/1000"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/1000"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutral/1000"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/1000"
+      }
+     }
+    },
+    {
+     "name": "color/ai/background/bold/hovered",
+     "codeSyntax": {
+      "WEB": "var(--ds-ai-background-bold-hovered)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Hovered ground of an AI action. PLUS: PLUS addition: see color.ai.background.bold.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "neutral/900"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/900"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutral/900"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/900"
+      }
+     }
+    },
+    {
+     "name": "color/ai/background/bold/pressed",
+     "codeSyntax": {
+      "WEB": "var(--ds-ai-background-bold-pressed)"
+     },
+     "scopes": [
+      "FRAME_FILL",
+      "SHAPE_FILL"
+     ],
+     "hiddenFromPublishing": false,
+     "description": "Pressed ground of an AI action. PLUS: PLUS addition: see color.ai.background.bold.",
+     "values": {
+      "Light": {
+       "alias": "color / primitives",
+       "name": "neutral/800"
+      },
+      "Dark": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/800"
+      },
+      "Light IC": {
+       "alias": "color / primitives",
+       "name": "neutral/800"
+      },
+      "Dark IC": {
+       "alias": "color / primitives",
+       "name": "darkNeutral/800"
+      }
+     }
+    },
+    {
      "name": "color/background/smart/mastering-content/default",
      "codeSyntax": {
       "WEB": "var(--ds-background-smart-mastering-content)"

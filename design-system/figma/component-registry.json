@@ -194,7 +194,8 @@
               "subtle",
               "warning",
               "danger",
-              "discovery"
+              "discovery",
+              "ai"
             ]
           },
           "spacing": {

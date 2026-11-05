@@ -15,13 +15,22 @@ describe('Button', () => {
         expect(button).not.toHaveClass('plus-btn--compact');
     });
 
-    it.each(['default', 'primary', 'subtle', 'warning', 'danger', 'discovery'])(
+    it.each(['default', 'primary', 'subtle', 'warning', 'danger', 'discovery', 'ai'])(
         'draws the %s appearance',
         (appearance) => {
             render(<Button appearance={appearance} text={appearance} />);
             expect(screen.getByRole('button')).toHaveClass(`plus-btn--${appearance}`);
         },
     );
+
+    it('draws the sparkle before an AI label, and leaves a given icon alone', () => {
+        const { container, rerender } = render(<Button appearance="ai" text="Generate summary" />);
+        expect(screen.getByRole('button', { name: 'Generate summary' })).toBeInTheDocument();
+        expect(container.querySelector('.plus-btn-visual--before svg')).not.toBeNull();
+        rerender(<Button appearance="ai" text="Ask" iconBefore="wand-magic-sparkles" />);
+        expect(container.querySelector('.plus-btn-visual--before i.fa-wand-magic-sparkles')).not.toBeNull();
+        expect(container.querySelector('.plus-btn-visual--before svg')).toBeNull();
+    });
 
     it('draws compact spacing', () => {
         render(<Button spacing="compact" text="Row action" />);

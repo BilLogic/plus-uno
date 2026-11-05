@@ -474,6 +474,9 @@
   --ds-interaction-inverse-pressed: var(--palette-dark-neutral-alpha-500);
   --ds-border-focused-inverse: var(--palette-neutral-0);
   --ds-border-surface: transparent;
+  --ds-ai-background-bold: var(--palette-neutral-1000);
+  --ds-ai-background-bold-hovered: var(--palette-neutral-900);
+  --ds-ai-background-bold-pressed: var(--palette-neutral-800);
   --ds-background-smart-mastering-content: var(--palette-teal-200);
   --ds-background-smart-mastering-content-hovered: var(--palette-teal-250);
   --ds-background-smart-mastering-content-pressed: var(--palette-teal-300);
@@ -1011,6 +1014,9 @@
   --ds-interaction-inverse-pressed: var(--palette-neutral-alpha-500);
   --ds-border-focused-inverse: var(--palette-dark-neutral-100);
   --ds-border-surface: transparent;
+  --ds-ai-background-bold: var(--palette-dark-neutral-1000);
+  --ds-ai-background-bold-hovered: var(--palette-dark-neutral-900);
+  --ds-ai-background-bold-pressed: var(--palette-dark-neutral-800);
   --ds-background-smart-mastering-content: var(--palette-teal-900);
   --ds-background-smart-mastering-content-hovered: var(--palette-teal-850);
   --ds-background-smart-mastering-content-pressed: var(--palette-teal-800);
@@ -1549,6 +1555,9 @@
     --ds-interaction-inverse-pressed: var(--palette-neutral-alpha-500);
     --ds-border-focused-inverse: var(--palette-dark-neutral-100);
     --ds-border-surface: transparent;
+    --ds-ai-background-bold: var(--palette-dark-neutral-1000);
+    --ds-ai-background-bold-hovered: var(--palette-dark-neutral-900);
+    --ds-ai-background-bold-pressed: var(--palette-dark-neutral-800);
     --ds-background-smart-mastering-content: var(--palette-teal-900);
     --ds-background-smart-mastering-content-hovered: var(--palette-teal-850);
     --ds-background-smart-mastering-content-pressed: var(--palette-teal-800);

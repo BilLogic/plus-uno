@@ -5,7 +5,7 @@
 
 /*
  * Button styles. Six appearances (default, primary, subtle, warning, danger,
- * discovery), two spacings (default 32, compact 24), and the selected,
+ * discovery, ai), two spacings (default 32, compact 24), and the selected,
  * disabled and loading states, all on named `--ds-*` tokens. Each appearance
  * takes its hovered and pressed fills from the named tokens, laid straight on
  * the container.
@@ -23,6 +23,7 @@ $btn-appearances: (
     'warning': ('--ds-background-warning-bold', '--ds-text-warning-inverse', '--ds-icon-warning-inverse', '--ds-background-warning-bold-hovered', '--ds-background-warning-bold-pressed', 'transparent'),
     'danger': ('--ds-background-danger-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-background-danger-bold-hovered', '--ds-background-danger-bold-pressed', 'transparent'),
     'discovery': ('--ds-background-discovery-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-background-discovery-bold-hovered', '--ds-background-discovery-bold-pressed', 'transparent'),
+    'ai': ('--ds-ai-background-bold', '--ds-text-inverse', '--ds-icon-inverse', '--ds-ai-background-bold-hovered', '--ds-ai-background-bold-pressed', 'transparent'),
     'selected': ('--ds-background-selected', '--ds-text-selected', '--ds-icon-selected', '--ds-background-selected-hovered', '--ds-background-selected-pressed', 'transparent')
 );
 
