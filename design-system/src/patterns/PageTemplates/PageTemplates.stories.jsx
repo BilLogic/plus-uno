@@ -89,6 +89,9 @@ export default {
     component: PageLayout,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },
+    // The preview's `^on[A-Z]` actions rule skips an arg that is already a key, so naming
+    // these keeps an ordinary page from getting a Back or Close. Focused stories pass their own.
+    args: { onBack: undefined, onClose: undefined },
     argTypes: {
         frame: {
             control: 'select',
@@ -119,8 +122,8 @@ export default {
         drawer: { table: { disable: true } },
         children: { table: { disable: true } },
         actions: { table: { disable: true } },
-        onBack: { table: { disable: true } },
-        onClose: { table: { disable: true } },
+        onBack: { control: false, table: { disable: true } },
+        onClose: { control: false, table: { disable: true } },
         backHref: { table: { disable: true } },
         actionsLabel: { table: { disable: true } },
         sidebarConfig: { table: { disable: true } },
@@ -143,6 +146,12 @@ export default {
 /** content=dashboard: a page header, metric cards that reflow, and a section. */
 export const Dashboard = {
     render: () => fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>),
+    // An ordinary page: no Back, no Close.
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.queryByRole('button', { name: 'Back' }), 'no Back on an ordinary page').toBeNull();
+        await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close on an ordinary page').toBeNull();
+    },
 };
 
 /** content=blank: the template with one empty slot. */

@@ -36,10 +36,16 @@ export default {
             </ResponsiveFrame>
         ),
     ],
+    // The preview's `^on[A-Z]` actions rule skips an arg that is already a key, so naming
+    // these keeps an ordinary page from getting a Back or Close. Focused stories pass their own.
     args: {
         breakpoint: 'native',
+        onBack: undefined,
+        onClose: undefined,
     },
     argTypes: {
+        onBack: { control: false, table: { disable: true } },
+        onClose: { control: false, table: { disable: true } },
         breakpoint: {
             control: 'select',
             options: ['native', 'md', 'lg', 'xl'],
@@ -106,6 +112,12 @@ export const Overview = {
     ),
     parameters: {
         layout: 'fullscreen',
+    },
+    // An ordinary page: no Back, no Close.
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.queryByRole('button', { name: 'Back' }), 'no Back on an ordinary page').toBeNull();
+        await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close on an ordinary page').toBeNull();
     },
 };
 

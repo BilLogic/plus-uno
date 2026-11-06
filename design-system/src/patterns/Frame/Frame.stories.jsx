@@ -56,7 +56,20 @@ export default {
     // Each story starts with nothing remembered for the Panel.
     beforeEach: () => { window.sessionStorage.removeItem(PANEL_STORAGE_KEY); },
     render: FrameWithSlots,
+    decorators: [
+        // A width story renders at its stated width whatever the preview is. The
+        // Frame sizes itself from its own box, so a box of that width makes it dock
+        // or float as it does there. The runner also resizes the viewport to match.
+        (Story, { parameters }) => (parameters.frameWidth
+            ? <div style={{ width: parameters.frameWidth, minWidth: parameters.frameWidth }}><Story /></div>
+            : <Story />),
+    ],
+    // The preview's `^on[A-Z]` actions rule skips an arg that is already a key, so naming
+    // these keeps an ordinary page from getting a Back or Close. Focused stories pass their own.
+    args: { onBack: undefined, onClose: undefined },
     argTypes: {
+        onBack: { control: false, table: { disable: true } },
+        onClose: { control: false, table: { disable: true } },
         children: { table: { disable: true } },
         header: { table: { disable: true } },
         sidebar: { table: { disable: true } },
@@ -195,7 +208,15 @@ const expectCorner = async (frame, surface) => {
 
 /* ------------------------------------------------------------- stories */
 
-export const Overview = {};
+export const Overview = {
+    // An ordinary page: no Back, no Close. Only a focused page shows them.
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.queryByRole('button', { name: 'Back' }), 'no Back on an ordinary page').toBeNull();
+        await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close on an ordinary page').toBeNull();
+        await expect(canvasElement.querySelector('.plus-frame__back, .plus-frame__close'), 'no Back or Close in the header row').toBeNull();
+    },
+};
 
 /**
  * In every color mode the frame is the sunken backdrop in the body text color,
@@ -303,6 +324,7 @@ export const Floating = {
 
 /** 768: the Sidebar is collapsed; the left edge peeks it, an outside click closes it, the toggle opens it as an overlay (it never docks under 1024). */
 export const Medium768 = {
+    parameters: { frameWidth: 768 },
     play: async ({ canvasElement }) => atViewport(768, async () => {
         const p = parts(canvasElement);
         const { frame, surface, content, sidebar, edge } = p;
@@ -364,6 +386,7 @@ export const Medium768 = {
 
 /** 1024: the sidebar docks; the toggle closes it and does not move. */
 export const Large1024 = {
+    parameters: { frameWidth: 1024 },
     play: async ({ canvasElement }) => atViewport(1024, async () => {
         const p = parts(canvasElement);
         const { frame, surface, content, sidebar } = p;
@@ -403,6 +426,7 @@ export const Large1024 = {
 
 /** Ctrl+[ toggles the Sidebar, and the corner follows it in the same frame. */
 export const CtrlBracketToggle = {
+    parameters: { frameWidth: 1440 },
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const p = parts(canvasElement);
         const { frame, surface, sidebar } = p;
@@ -424,6 +448,7 @@ export const CtrlBracketToggle = {
 
 /** Ctrl+[ under 1024 opens the Sidebar as an overlay, since it never docks there, and closes it again. */
 export const CtrlBracketAt768 = {
+    parameters: { frameWidth: 768 },
     play: async ({ canvasElement }) => atViewport(768, async () => {
         const { frame, surface, sidebar } = parts(canvasElement);
         await expect(sidebar()).toBeNull();
@@ -438,6 +463,7 @@ export const CtrlBracketAt768 = {
 
 /** The Page meets the Sidebar at a hairline: the Sidebar's 1px edge lies on the Page's first pixel, with no gap. */
 export const SidebarMeetsPage = {
+    parameters: { frameWidth: 1440 },
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const { frame, surface, sidebar } = parts(canvasElement);
         await waitFor(() => expect(sidebar()).not.toBeNull());
@@ -450,6 +476,7 @@ export const SidebarMeetsPage = {
 
 /** 1440: the surface pads 24. */
 export const XLarge1440 = {
+    parameters: { frameWidth: 1440 },
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const p = parts(canvasElement);
         const { frame, surface, content, sidebar } = p;
@@ -463,6 +490,7 @@ export const XLarge1440 = {
 
 /** 1600: content caps at 1232 and centers in the surface. */
 export const Wide1600 = {
+    parameters: { frameWidth: 1600 },
     play: async ({ canvasElement }) => atViewport(1600, async () => {
         const p = parts(canvasElement);
         const { frame, surface, content } = p;
@@ -480,6 +508,7 @@ export const Wide1600 = {
 
 /** Reading pages cap at 864. */
 export const ReadingAt1440 = {
+    parameters: { frameWidth: 1440 },
     args: { width: 'reading' },
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const { frame, content } = parts(canvasElement);
@@ -489,6 +518,7 @@ export const ReadingAt1440 = {
 
 /** The content grid: 12 columns with a 16 gutter, children span the whole row by default. */
 export const ContentGrid = {
+    parameters: { frameWidth: 1440 },
     render: (args) => (
         <div style={{ height: '100vh' }}>
             <Frame sidebar={<Sidebar user="tutor" account={{ id: 'story', name: 'John Doe', role: 'Tutor' }} />} {...args}>
@@ -564,6 +594,7 @@ const peekSidebar = async ({ edge, sidebar }) => {
 
 /** 768: a modal opened from the page closes the floating sidebar; Escape closes the modal only. */
 export const ModalClosesFloatingSidebar = {
+    parameters: { frameWidth: 768 },
     render: WithModal,
     play: async ({ canvasElement }) => atViewport(768, async () => {
         const p = parts(canvasElement);
@@ -586,6 +617,7 @@ export const ModalClosesFloatingSidebar = {
 
 /** 768: a trigger inside the floating sidebar leaves with it; focus lands on the toggle. */
 export const ModalFromFloatingSidebar = {
+    parameters: { frameWidth: 768 },
     render: WithModal,
     play: async ({ canvasElement }) => atViewport(768, async () => {
         const p = parts(canvasElement);
@@ -604,6 +636,7 @@ export const ModalFromFloatingSidebar = {
 
 /** 1024: a docked sidebar stays docked under a modal. */
 export const ModalLeavesDockedSidebar = {
+    parameters: { frameWidth: 1024 },
     render: WithModal,
     play: async ({ canvasElement }) => atViewport(1024, async () => {
         const p = parts(canvasElement);
@@ -625,6 +658,7 @@ export const ModalLeavesDockedSidebar = {
 
 /** 768: a Sidebar the user opened is an overlay under 1024, so a modal closes it like a peek. */
 export const ModalClosesOverlaySidebarAt768 = {
+    parameters: { frameWidth: 768 },
     render: WithModal,
     play: async ({ canvasElement }) => atViewport(768, async () => {
         const p = parts(canvasElement);
@@ -784,6 +818,7 @@ export const DocsPanel = {
 
 /** 1440 with a 400 Panel: both fit at the 720 floor, so the Sidebar and the Panel dock, and the Page meets the Panel at a hairline. */
 export const PanelDockedAt1440 = {
+    parameters: { frameWidth: 1440 },
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const p = panelParts(canvasElement);
@@ -798,6 +833,7 @@ export const PanelDockedAt1440 = {
         await expect(rect(panel).top, 'full height, from the top').toBeCloseTo(rect(p.frame).top, 0);
         await expect(rect(p.surface).right, 'the Page meets the Panel').toBeCloseTo(rect(panel).left, 0);
         await expect(px(getComputedStyle(panel).borderLeftWidth), 'at a hairline').toBeCloseTo(tokenLength(p.frame, '--stroke-1'), 1);
+        await expect(getComputedStyle(panel).borderLeftColor, 'the start edge draws in the border color').toBe(tokenColor(p.frame, '--ds-border'));
         await expect(getComputedStyle(panel).backgroundColor, 'docked, the Panel is the Page fill').toBe(tokenColor(p.frame, '--ds-surface'));
         await expect(p.sidebar(), 'the Sidebar stays docked').not.toBeNull();
         await expect(rect(p.content).width, 'content 1440 - 240 - 400 - 48').toBeCloseTo(752, 0);
@@ -834,6 +870,7 @@ const expectOverlayPanel = async (p, width) => {
 
 /** 1200 with a 400 Panel: both would leave 512, the Panel alone 752, so the default Sidebar collapses and comes back when the Panel closes. */
 export const PanelAutoCollapsesSidebarAt1200 = {
+    parameters: { frameWidth: 1200 },
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(1200, async () => {
         const p = panelParts(canvasElement);
@@ -858,6 +895,7 @@ export const PanelAutoCollapsesSidebarAt1200 = {
 
 /** 1100 with a 400 Panel: even the Panel alone leaves 652, so it opens over the Page on a Blanket; a press outside closes it. */
 export const PanelOverlayAt1100 = {
+    parameters: { frameWidth: 1100 },
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(1100, async () => {
         const p = panelParts(canvasElement);
@@ -882,6 +920,7 @@ export const PanelOverlayAt1100 = {
 
 /** 1300: the Panel docks by collapsing the default Sidebar; opening the Sidebar by hand wins, so the Panel moves to overlay. */
 export const SidebarByHandWinsAt1300 = {
+    parameters: { frameWidth: 1300 },
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(1300, async () => {
         const p = panelParts(canvasElement);
@@ -905,6 +944,7 @@ export const SidebarByHandWinsAt1300 = {
 
 /** 1440: a Modal over a docked Panel leaves it open; closing the Modal finds it still there. */
 export const ModalLeavesPanelOpen = {
+    parameters: { frameWidth: 1440 },
     render: (args) => <WithPanel {...args} withModal />,
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const p = panelParts(canvasElement);
@@ -920,6 +960,7 @@ export const ModalLeavesPanelOpen = {
 
 /** 1100: a Modal raised from an overlay Panel leaves it open, and a press inside the Modal does not count as outside. */
 export const ModalOverOverlayPanelAt1100 = {
+    parameters: { frameWidth: 1100 },
     render: (args) => <WithPanel {...args} withModal />,
     play: async ({ canvasElement }) => atViewport(1100, async () => {
         const p = panelParts(canvasElement);
@@ -945,6 +986,7 @@ export const ModalOverOverlayPanelAt1100 = {
  * hands focus back to the opener.
  */
 export const OverlayPanelIsModalAt1100 = {
+    parameters: { frameWidth: 1100 },
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(1100, async () => {
         const p = panelParts(canvasElement);
@@ -988,6 +1030,7 @@ export const OverlayPanelIsModalAt1100 = {
 
 /** 1440: a docked Panel is not modal. Opening it leaves focus where it was, and nothing goes inert. */
 export const DockedPanelIsNotModalAt1440 = {
+    parameters: { frameWidth: 1440 },
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const p = panelParts(canvasElement);
@@ -1013,6 +1056,7 @@ export const DockedPanelIsNotModalAt1440 = {
 
 /** 1100: a field in the Panel keeps its own Escape; the next Escape closes the Panel. */
 export const PanelFieldKeepsEscapeAt1100 = {
+    parameters: { frameWidth: 1100 },
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(1100, async () => {
         const p = panelParts(canvasElement);
@@ -1030,6 +1074,7 @@ export const PanelFieldKeepsEscapeAt1100 = {
 
 /** 1200: a docked Panel does not take Escape, so Escape still closes a Sidebar peek. */
 export const DockedPanelLeavesEscapeAt1200 = {
+    parameters: { frameWidth: 1200 },
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(1200, async () => {
         const p = panelParts(canvasElement);
@@ -1044,6 +1089,7 @@ export const DockedPanelLeavesEscapeAt1200 = {
 
 /** 1200: opened from the Sidebar it collapses, the docked Panel takes focus; closed, focus goes to the toggle, since its opener left. */
 export const DockedPanelTakesLostFocusAt1200 = {
+    parameters: { frameWidth: 1200 },
     render: (args) => <WithPanel {...args} sidebar={<ChatSidebar />} />,
     play: async ({ canvasElement }) => atViewport(1200, async () => {
         const p = panelParts(canvasElement);
@@ -1064,6 +1110,7 @@ export const DockedPanelTakesLostFocusAt1200 = {
 
 /** 1100: a header button that controls the Panel toggles it itself; its press is not an outside press that would close and reopen it. */
 export const HeaderTriggerTogglesOverlayAt1100 = {
+    parameters: { frameWidth: 1100 },
     render: (args) => <WithPanel {...args} withHeaderTrigger />,
     play: async ({ canvasElement }) => atViewport(1100, async () => {
         const p = panelParts(canvasElement);
@@ -1080,6 +1127,7 @@ export const HeaderTriggerTogglesOverlayAt1100 = {
 
 /** 1100: resizing an overlay Panel never collapses the default Sidebar: the narrowest it goes still leaves the Panel too wide to dock alone. */
 export const OverlaySplitterKeepsSidebarAt1100 = {
+    parameters: { frameWidth: 1100 },
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(1100, async () => {
         const p = panelParts(canvasElement);
@@ -1101,6 +1149,7 @@ export const OverlaySplitterKeepsSidebarAt1100 = {
 
 /** 768: the Panel is an overlay capped at 320, and only one overlay is open at a time. */
 export const OneOverlayAt768 = {
+    parameters: { frameWidth: 768 },
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(768, async () => {
         const p = panelParts(canvasElement);
@@ -1126,6 +1175,7 @@ export const OneOverlayAt768 = {
 
 /** 600: under 768 the Panel opens full width. */
 export const FullWidthUnder768 = {
+    parameters: { frameWidth: 600 },
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(600, async () => {
         const p = panelParts(canvasElement);
@@ -1138,6 +1188,7 @@ const panelWidthNow = (p) => rect(p.panel()).width;
 
 /** 1440: the splitter is a separator with its value; arrows step 16, Shift 64, Home and End go to the limits, and the limit keeps 720 beside the docked Sidebar. */
 export const SplitterKeyboardAt1440 = {
+    parameters: { frameWidth: 1440 },
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const p = panelParts(canvasElement);
@@ -1178,6 +1229,7 @@ const pointer = (el, type, clientX) => {
 
 /** 1440: a drag past the limit resists (damped, never more than 48 over) and springs back to the limit on release; the Sidebar stays docked. */
 export const SplitterDragAt1440 = {
+    parameters: { frameWidth: 1440 },
     render: WithPanel,
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const p = panelParts(canvasElement);
@@ -1226,6 +1278,7 @@ const reload = async (canvasElement, before) => {
 };
 
 export const PanelRememberedForTheTab = {
+    parameters: { frameWidth: 1440 },
     render: Remountable,
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         let p = panelParts(canvasElement);
@@ -1248,6 +1301,7 @@ export const PanelRememberedForTheTab = {
 
 /** The peek is off by default; turned on, hovering the right edge peeks a closed Panel over the Page with no Blanket. */
 export const PanelPeek = {
+    parameters: { frameWidth: 1440 },
     render: WithPanel,
     args: { panelPeek: true },
     play: async ({ canvasElement }) => atViewport(1440, async () => {
@@ -1276,6 +1330,7 @@ export const NoPanelPeekByDefault = {
 
 /** 1440 with Section detail: both docked would leave 752, under the 960 split, so the default Sidebar collapses to keep it (992). */
 export const SectionDetailKeepsSplitAt1440 = {
+    parameters: { frameWidth: 1440 },
     render: WithPanel,
     args: { sectionDetail: true },
     play: async ({ canvasElement }) => atViewport(1440, async () => {
@@ -1290,6 +1345,7 @@ export const SectionDetailKeepsSplitAt1440 = {
 
 /** 1440 with Section detail: the splitter's limit keeps 960 of content, so dragging to it never breaks the split. */
 export const SectionDetailSplitterKeepsSplitAt1440 = {
+    parameters: { frameWidth: 1440 },
     render: WithPanel,
     args: { sectionDetail: true },
     play: async ({ canvasElement }) => atViewport(1440, async () => {
