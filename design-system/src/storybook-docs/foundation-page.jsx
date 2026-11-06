@@ -190,3 +190,16 @@ export const TokenSwatches = ({ items, min = 'var(--card-min-width-sm)' }) => (
         ))}
     </ul>
 );
+
+/**
+ * A link to another page in this Storybook, by its id: a docs page by default,
+ * or a story when `story` names one (a page with no docs entry).
+ */
+export const DocsLink = ({ id, story, children }) => (
+    <a
+        href={story ? `?path=/story/${id}--${story}` : `?path=/docs/${id}--docs`}
+        style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}
+    >
+        {children}
+    </a>
+);

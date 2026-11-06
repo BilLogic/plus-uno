@@ -41,7 +41,7 @@ import { contrast as contrastOf, parseColor } from '../lib/tokens.mjs';
  *              argues against.
  */
 export default {
-    title: 'Foundations/AI identity candidates',
+    title: 'AI/AI identity candidates',
     tags: ['!dev', '!autodocs'],
 };
 

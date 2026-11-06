@@ -247,7 +247,7 @@ const Manifest = ({ subjects }) => (
 const subjects = documentedComponents();
 
 export default {
-  title: 'Docs/Documented contract',
+  title: 'Tools/Documented contract',
   component: Manifest,
   tags: ['!autodocs'],
   parameters: {

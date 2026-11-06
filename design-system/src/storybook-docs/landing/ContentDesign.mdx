@@ -1,0 +1,30 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="Get started/Content design" tags={['!dev']} />
+
+<FoundationHero
+    title="Content design"
+    summary="Where the guidance lives for the words a tutor reads inside PLUS."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Guidance">
+
+The content guidance lives in the repo, under `design-system/guidelines/foundations/content/`:
+
+- `overview.md`: the index, which file answers which question.
+- `voice-and-tone.md`: how PLUS sounds.
+- `language-and-grammar.md`: the house rules for grammar, capitalization and punctuation.
+- `message-design.md`: errors, warnings, success messages and empty states.
+- `date-and-time.md`: how to write dates and times.
+- `inclusive-language.md`: writing for everyone.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+- <DocsLink id="foundations-typography">Typography</DocsLink>: the text styles the words are set in.
+
+</FoundationSection>

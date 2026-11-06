@@ -16,7 +16,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: `The Specs Top Bar on the foundation Topbar pattern (Foundations/Patterns/Topbar), 32 high:
+                component: `The Specs Top Bar on the foundation Topbar pattern (Patterns/Frame/Topbar), 32 high:
 - **Button** (primary tonal) for sidebar control: \`angles-left\` while expanded, \`bars\` while collapsed
 - **Breadcrumb** for navigation, truncating on one line
 - **Help Center** (secondary text button) and **UserAvatar** at 32`

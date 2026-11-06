@@ -32,8 +32,8 @@ The Popup family names the pattern for four floating layers. A **Menu** lists ac
 - Use a Popup for a small aside anchored to a control, such as a definition, a preview or a short list. A Popup is never a form.
 - Use a Flag to report an outcome that does not need a decision.
 - Use a Tooltip for one line of help on a control.
-- For a decision that must be made before going on, use a [Modal](?path=/docs/foundations-patterns-modal--docs). It takes a [Blanket](?path=/docs/foundations-patterns-blanket--docs), and the Popup family never does.
-- For a task that needs the page in view, use a [Drawer](?path=/docs/foundations-patterns-drawer--docs).
+- For a decision that must be made before going on, use a [Modal](?path=/docs/patterns-overlays-modal--docs). It takes a [Blanket](?path=/docs/patterns-overlays-blanket--docs), and the Popup family never does.
+- For a task that needs the page in view, use a [Drawer](?path=/docs/patterns-overlays-drawer--docs).
 
 </div>
 
@@ -110,7 +110,7 @@ A Menu opens the public Menu family (`Section`, `ButtonItem`, `LinkItem`, `Custo
     <DsCanvasQuiet of={PopupFamilyStories.Popups} />
 </DocsCanvasShell>
 
-A Popup sits on layer 400, the popup layer. Opened from inside a Modal, it mounts in the Modal and takes layer 510. It never takes a form. A form needs a decision and a way out, so use a [Modal](?path=/docs/foundations-patterns-modal--docs) or a [Drawer](?path=/docs/foundations-patterns-drawer--docs).
+A Popup sits on layer 400, the popup layer. Opened from inside a Modal, it mounts in the Modal and takes layer 510. It never takes a form. A form needs a decision and a way out, so use a [Modal](?path=/docs/patterns-overlays-modal--docs) or a [Drawer](?path=/docs/patterns-overlays-drawer--docs).
 
 </div>
 
@@ -158,7 +158,7 @@ Every layer stays at least 8 from the screen edge and flips when there is no roo
 
 ### Layers
 
-The layer numbers are shared with the [Blanket](?path=/docs/foundations-patterns-blanket--docs) page.
+The layer numbers are shared with the [Blanket](?path=/docs/patterns-overlays-blanket--docs) page.
 
 <DocsTable>
 <thead>
@@ -247,8 +247,8 @@ The layer numbers are shared with the [Blanket](?path=/docs/foundations-patterns
 - [Popup](?path=/docs/components-overlays-and-layering-popup--docs) is the component page for the Popup, with its triggers and dismissal.
 - [Tooltip](?path=/docs/components-overlays-and-layering-tooltip--docs) is the component page for the Tooltip.
 - [Flag](?path=/docs/components-messaging-flag--docs) is the component page for the Flag.
-- [Blanket](?path=/docs/foundations-patterns-blanket--docs) holds the dimmed ground a Modal needs and a Popup-family layer never takes.
-- [Modal](?path=/docs/foundations-patterns-modal--docs) is the layer for a decision that blocks the page.
+- [Blanket](?path=/docs/patterns-overlays-blanket--docs) holds the dimmed ground a Modal needs and a Popup-family layer never takes.
+- [Modal](?path=/docs/patterns-overlays-modal--docs) is the layer for a decision that blocks the page.
 
 </div>
 

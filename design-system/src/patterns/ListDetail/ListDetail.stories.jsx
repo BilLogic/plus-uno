@@ -89,8 +89,8 @@ const ComplianceQueue = ({ withPanel = false, ...frameArgs }) => {
 };
 
 export default {
-    title: 'Foundations/Patterns/List and detail',
-    id: 'foundations-patterns-list-and-detail',
+    title: 'Patterns/Section/List and detail',
+    id: 'patterns-section-list-and-detail',
     component: ListDetail,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },

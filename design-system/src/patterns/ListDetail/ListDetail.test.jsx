@@ -8,7 +8,7 @@ import ListDetail, { LIST_DETAIL_FLOOR, listDetailView } from './ListDetail';
  * List and detail: a list of 7 columns beside a detail Section of 5 while the
  * content holds the split floor (960); below it the detail replaces the list
  * behind a back link. `listDetailView` is the rule; widths and columns are
- * asserted in the browser, in the `Foundations/Patterns/List and detail`
+ * asserted in the browser, in the `Patterns/Section/List and detail`
  * stories.
  */
 describe('listDetailView', () => {

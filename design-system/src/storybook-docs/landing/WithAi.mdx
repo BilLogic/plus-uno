@@ -1,0 +1,27 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="Get started/With AI" tags={['!dev']} />
+
+<FoundationHero
+    title="With AI"
+    summary="How a coding agent reads this design system and stays on its components and tokens."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="What an agent reads">
+
+- The Storybook MCP endpoint, served while Storybook runs: `docs/connectors/storybook-mcp.md` says how to connect and what it returns.
+- The generated agent views under `design-system/agent-views/`: the indexes of components, forms and tokens.
+- One generated `index.md` beside each component, with its props, variants and tokens.
+- `AGENTS.md` at the repo root: the rules every agent follows here.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+- <DocsLink id="tools-overview">Tools</DocsLink>: the generators and checks that keep these files current.
+- <DocsLink id="ai-overview">AI</DocsLink>: designing AI features for PLUS.
+
+</FoundationSection>

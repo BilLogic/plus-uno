@@ -190,7 +190,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/layout-and-structure/Panel/",
     "Panel",
-    "components-layout-and-structure-panel--docs"
+    "patterns-panel--docs"
   ],
   [
     "design-system/src/components/layout-and-structure/ScrollBar/",

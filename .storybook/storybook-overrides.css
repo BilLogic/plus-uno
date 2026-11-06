@@ -101,7 +101,7 @@ body,
  *
  * `:not([class])` IS THE POLICY, not a trick. Prose that carries no class of its
  * own is ours to type; prose that carries one — the Tailwind captions authored
- * in Getting started/Introduction — is that page's own decision, and this must
+ * in Get started/About — is that page's own decision, and this must
  * not overrule it. The fence keeps the rule out of story canvases, where it
  * would smash DS utilities (body3-txt captions, h6 titles); `:where()` costs the
  * rule no specificity.

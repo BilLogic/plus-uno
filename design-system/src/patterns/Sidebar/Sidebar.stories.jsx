@@ -73,7 +73,7 @@ const Interactive = (args) => {
 };
 
 export default {
-    title: 'Foundations/Patterns/Sidebar',
+    title: 'Patterns/Sidebar',
     component: PatternSidebar,
     tags: ['!dev', '!autodocs'],
     render: Interactive,
