@@ -14,7 +14,7 @@ export default {
 
 export const Basic = () => (
     <SpotlightProvider>
-        <div style={{ padding: '64px' }}>
+        <div style={{ padding: 'var(--space-400)' }}>
             <SpotlightTarget>
                 <Button id="spotlight-target-basic" text="Create" />
             </SpotlightTarget>
@@ -40,7 +40,7 @@ Basic.play = async () => {
 
 export const WithMedia = () => (
     <SpotlightProvider>
-        <div style={{ padding: '64px' }}>
+        <div style={{ padding: 'var(--space-400)' }}>
             <SpotlightTarget><Button text="Target" /></SpotlightTarget>
             <Spotlight
                 headline="See it in action"
@@ -55,7 +55,7 @@ export const WithMedia = () => (
 
 export const LinkAction = () => (
     <SpotlightProvider>
-        <div style={{ padding: '64px' }}>
+        <div style={{ padding: 'var(--space-400)' }}>
             <SpotlightTarget><Button text="Target" /></SpotlightTarget>
             <Spotlight
                 headline="Read more"
@@ -77,7 +77,7 @@ export function Dismissible() {
     const [isOpen, setIsOpen] = useState(true);
     return (
         <SpotlightProvider>
-            <div style={{ padding: '64px' }}>
+            <div style={{ padding: 'var(--space-400)' }}>
                 <SpotlightTarget><Button text="Target" /></SpotlightTarget>
                 {isOpen && (
                     <Spotlight headline="Dismiss me" onDismiss={() => setIsOpen(false)}>
@@ -93,7 +93,7 @@ export function Dismissible() {
 
 const StateSpotlight = () => (
     <SpotlightProvider>
-        <div style={{ padding: '64px' }}>
+        <div style={{ padding: 'var(--space-400)' }}>
             <SpotlightTarget><Button text="Create" /></SpotlightTarget>
             <Spotlight
                 headline="Create a new board"

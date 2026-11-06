@@ -1,6 +1,5 @@
-
-
 @use '../../../styles/state' as *;
+
 .plus-spotlight {
     width: var(--popover-width-md);
     max-width: calc(100vw - var(--space-100) * 2);
@@ -35,7 +34,6 @@
     color: var(--ds-icon-inverse);
     cursor: pointer;
     padding: var(--space-025);
-
     border-radius: var(--radius-md);
 
     @include plus-state((
