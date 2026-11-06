@@ -104,6 +104,8 @@
         color: var(--ds-text);
         text-decoration: underline;
         cursor: pointer;
+
+        @include plus-state((), $ring: true);
     }
 
     // --- APPEARANCES: the icon's color ---
@@ -156,6 +158,10 @@
                 // @contrast: non-text
                 color: var(--ds-icon-inverse);
             }
+        }
+
+        .plus-flag-action {
+            @include plus-state((), $ring-token: --ds-border-focused-inverse);
         }
     }
 
@@ -283,7 +289,7 @@
 .plus-flag-interactive-demo {
     position: relative;
     box-sizing: border-box;
-    min-height: 280px;
+    min-height: calc(var(--size-spacing-xlarge-space-2000) + var(--size-spacing-large-space-1500));
     border: var(--border-default) solid var(--ds-border);
     background-color: var(--ds-surface);
     border-radius: var(--radius-md);

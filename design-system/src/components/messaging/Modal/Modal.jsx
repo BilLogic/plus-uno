@@ -245,13 +245,13 @@ const Modal = ({
                     {scrollable && (
                         <div className="plus-modal-scrollbar">
                             <div className="plus-modal-scrollbar-icon">
-                                <i className="fas fa-caret-up" />
+                                <i className="fa-solid fa-caret-up" />
                             </div>
                             <div className="plus-modal-scrollbar-track">
                                 <div className="plus-modal-scrollbar-bar" />
                             </div>
                             <div className="plus-modal-scrollbar-icon">
-                                <i className="fas fa-caret-down" />
+                                <i className="fa-solid fa-caret-down" />
                             </div>
                         </div>
                     )}
