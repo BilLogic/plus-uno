@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
+import { TimePicker } from '@/components';
 import * as TimePickerStories from './TimePicker.stories.jsx';
-import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -23,7 +30,7 @@ export const figmaMeta = {
 <Meta of={TimePickerStories} />
 
 <Title />
-Use a time picker when a user needs to set a time of day.
+Use a time picker when a user needs to enter a time of day.
 
 <DocsTabs of={TimePickerStories}>
 
@@ -39,76 +46,51 @@ Use a time picker when a user needs to set a time of day.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Content
 
-<DocsCanvasShell attachSourceBelow description={<>A time field with an AM/PM toggle.</>}>
-    <Canvas of={TimePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={TimePickerStories.Default} title="Default" description="An empty field with an AM/PM toggle beside the text." />
 
-</div>
+<ComponentExample of={TimePickerStories.WithValue} title="With a value" description="A chosen time. The text holds the hour and minute; the toggle holds the period." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={TimePickerStories.PickTime} title="Pick a time" description="Type an hour and a minute, with or without a colon, and press Enter. Anything that is not a real hour (1 to 12) and minute (0 to 59) is kept as typed and marked invalid. The AM/PM toggle reports immediately." />
 
-## Spacing
-
-<DocsCanvasShell description={<>`default` draws 40; `compact` draws 32.</>}>
-    <DsCanvasQuiet of={TimePickerStories.Spacing} />
-</DocsCanvasShell>
+<ComponentExample of={TimePickerStories.TwentyFourHourValueIsSplit} title="A 24-hour value" description="A 24-hour value is split into the hour this control shows and the period that says which half of the day it is." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## Size
 
-<DocsCanvasShell description={<>Invalid, valid, read-only and disabled.</>}>
-    <DsCanvasQuiet of={TimePickerStories.InteractionStates} />
-</DocsCanvasShell>
+<ComponentExample of={TimePickerStories.Compact} title="Compact" description="Compact spacing draws 32, for dense forms. Default draws 40." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Picking a time
+## State
 
-<DocsCanvasShell description={<>Typing an hour and a minute, with or without a colon, and pressing Enter commits the time. Anything that isn't a real hour (1–12) and minute (0–59) is kept as typed and marked invalid. The AM/PM toggle reports immediately.</>}>
-    <DsCanvasQuiet of={TimePickerStories.PickTime} />
-</DocsCanvasShell>
+<ComponentExample of={TimePickerStories.Invalid} title="Invalid" description="A danger edge. Pair it with a message that says what time is expected." />
 
-</div>
+<ComponentExample of={TimePickerStories.ReadOnly} title="Read-only" description="Shows a time the person may read but not change." />
 
-<div className="sb-ds-doc-section">
-
-## A 24-hour value is split on read
-
-<DocsCanvasShell description={<>`value` also accepts a 24-hour string ("14:30"); it is split into the hour this control shows and the period that says which half of the day it was.</>}>
-    <DsCanvasQuiet of={TimePickerStories.TwentyFourHourValueIsSplit} />
-</DocsCanvasShell>
+<ComponentExample of={TimePickerStories.Disabled} title="Disabled" description="A time that does not apply right now." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Properties
+## Interactive playground
 
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>value</code></td><td>string</td><td>A 12-hour string ("02:30 PM") or a 24-hour one ("14:30"), split on read.</td></tr>
-        <tr><td><code>onChange</code></td><td>function</td><td><code>(value)</code> — a 12-hour string, or <code>null</code> once either half is cleared.</td></tr>
-        <tr><td><code>placeholder</code></td><td>string</td><td>Defaults to <code>__ : __</code>.</td></tr>
-        <tr><td><code>spacing</code></td><td>enum</td><td><code>default</code> (40) or <code>compact</code> (32).</td></tr>
-        <tr><td><code>isDisabled</code>, <code>isReadOnly</code></td><td>—</td><td>—</td></tr>
-        <tr><td><code>isInvalid</code></td><td>boolean</td><td>Draws the field invalid; a typed time outside 1–12 / 0–59 does too.</td></tr>
-        <tr><td><code>isValid</code></td><td>boolean</td><td>Draws the field valid.</td></tr>
-    </tbody>
-</DocsTable>
+<DocsInteractivePlayground
+    of={TimePickerStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
 
 </div>
 
@@ -122,23 +104,57 @@ Use a time picker when a user needs to set a time of day.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
-Use `TimePicker` for a time of day alone — a reminder time, a recurring
-slot's start. For a date alone, use `DatePicker`; for a date and a time
-together, use `DateTimePicker`.
+Use a time picker for a time of day alone: a reminder time, a recurring slot's start. For a date alone, use Date picker; for a date and a time together, use Date time picker.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Field.** A 40 box (32 at compact) on the input fill, holding the hour and minute as text.
+2. **AM/PM toggle.** A button that opens a small menu to set the period. It is a separate control from the typed text.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>The border takes <code>--ds-border-focused</code>.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box.</td></tr>
+<tr><td>Invalid</td><td>The border takes <code>--ds-border-danger</code>.</td></tr>
+<tr><td>Read-only</td><td>The box takes <code>--ds-background-neutral</code>.</td></tr>
+<tr><td>Disabled</td><td>The box fades to <code>--ds-opacity-disabled</code> and leaves the tab order.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Fill</td><td><code>--ds-background-input</code>; read-only <code>--ds-background-neutral</code>.</td></tr>
+<tr><td>Border</td><td><code>--ds-border-input</code>; hovered <code>--ds-border-focused</code>; invalid <code>--ds-border-danger</code>.</td></tr>
+<tr><td>Text</td><td><code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### The field always reports a 12-hour value.
 
-`onChange` fires with a string like `"02:30 PM"` regardless of how `value`
-was given. A 24-hour `value` passed in is accepted and split into the hour
-and period this control shows, but what it hands back is always 12-hour.
+`onChange` fires with a string like `"02:30 PM"` regardless of how `value` was given. A 24-hour `value` is accepted and split into the hour and period this control shows, but what it hands back is always 12-hour.
 
 ```jsx
 <TimePicker value={time} onChange={setTime} />
@@ -146,10 +162,32 @@ and period this control shows, but what it hands back is always 12-hour.
 
 ### AM/PM is a separate control from the typed text.
 
-The field itself has no notion of which half of the day it is — typing sets
-the hour and minute, and the AM/PM toggle beside it sets the period
-independently, reporting immediately with whichever half of the time is
-already set.
+Typing sets the hour and minute; the toggle sets the period independently and reports immediately with whichever half of the time is already set.
+
+<DoDontPair
+    doExample={<TimePicker aria-label="Reminder time" value="02:30 PM" />}
+    doCaption="Name the field by what the time is for."
+    dontExample={<TimePicker aria-label="Time" isInvalid />}
+    dontCaption="A generic name does not say which time is wanted, and an invalid field needs a message."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the time by its role: "Reminder time", "Session start".</td><td>A generic name: "Time".</td></tr>
+<tr><td>Say what is expected when invalid: "Enter a time such as 2:30".</td><td>"Invalid time".</td></tr>
+<tr><td>Show the period in the toggle, AM or PM.</td><td>Ask people to type AM or PM into the text.</td></tr>
+<tr><td>Use sentence case in labels and messages.</td><td>Title case: "Reminder Time".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -157,13 +195,9 @@ already set.
 
 ## Accessibility
 
-- **There is no `label` prop.** Name the field with `aria-label` or
-  `aria-labelledby`, forwarded straight to the input a screen reader lands
-  on, same as `aria-describedby` and `data-*`.
-- **The AM/PM toggle is a real button inside a menu**, reachable and
-  operable by keyboard like any other PLUS dropdown.
-- **An invalid typed time keeps the typed text** rather than silently
-  reverting, so the person can see and correct what they entered.
+- **There is no `label` prop.** Name the field with `aria-label` or `aria-labelledby`, forwarded straight to the input a screen reader lands on, same as `aria-describedby` and `data-*`.
+- **The AM/PM toggle is a real button inside a menu**, reachable and operable by keyboard like any other PLUS dropdown.
+- **An invalid typed time keeps the typed text** rather than silently reverting, so the person can see and correct what they entered.
 
 </div>
 
@@ -171,8 +205,8 @@ already set.
 
 ## Related
 
-- For a date alone, use `DatePicker`.
-- For a date and a time together, use `DateTimePicker`.
+- For a date alone, use Date picker.
+- For a date and a time together, use Date time picker.
 
 </div>
 

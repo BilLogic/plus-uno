@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
+import { DatePicker } from '@/components';
 import * as DatePickerStories from './DatePicker.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -59,61 +66,37 @@ Use a date picker when a user needs to select a date or a date range.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Content
 
-<DocsCanvasShell attachSourceBelow description={<>A date field, closed.</>}>
-    <Canvas of={DatePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={DatePickerStories.Default} title="Default" description="An empty field that shows the date format. The calendar opens from the icon or the field." />
 
-</div>
+<ComponentExample of={DatePickerStories.WithValue} title="With a value" description="A chosen date, written MM/DD/YYYY." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={DatePickerStories.PickDate} title="Pick a date" description="Typing MM/DD/YYYY and pressing Enter, or clicking a day, both commit a pick. A date outside `minDate` to `maxDate`, or one that does not read as a date, is kept as typed and marked invalid." />
 
-## Spacing
+<ComponentExample of={DatePickerStories.PickRange} title="Range" description="With `range`, the first click sets the first day and the second sets the last; a click before the first day starts over. The field shows both ends joined by a dash." />
 
-<DocsCanvasShell description={<>`default` draws 40; `compact` draws 32.</>}>
-    <DsCanvasQuiet of={DatePickerStories.Spacing} />
-</DocsCanvasShell>
+<ComponentExample of={DatePickerStories.Bounds} title="Earliest and latest dates" description="Days before `minDate` or after `maxDate` are disabled in the calendar and rejected if typed." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## Size
 
-<DocsCanvasShell description={<>Invalid, valid, read-only and disabled.</>}>
-    <DsCanvasQuiet of={DatePickerStories.InteractionStates} />
-</DocsCanvasShell>
+<ComponentExample of={DatePickerStories.Compact} title="Compact" description="Compact spacing draws 32, for dense forms. Default draws 40." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Picking a date
+## State
 
-<DocsCanvasShell description={<>Typing MM/DD/YYYY and pressing Enter, or clicking a day, both commit a pick. A date outside `minDate`–`maxDate` or otherwise unreadable is kept as typed and marked invalid.</>}>
-    <DsCanvasQuiet of={DatePickerStories.PickDate} />
-</DocsCanvasShell>
+<ComponentExample of={DatePickerStories.Invalid} title="Invalid" description="A danger edge. Pair it with a message that says how to fix the date." />
 
-</div>
+<ComponentExample of={DatePickerStories.ReadOnly} title="Read-only" description="Shows a date the person may read but not change." />
 
-<div className="sb-ds-doc-section">
-
-## Range
-
-<DocsCanvasShell description={<>With `range`, the first click sets the first day and the second sets the last; a click before the first day starts over. The field shows both ends joined by a dash.</>}>
-    <DsCanvasQuiet of={DatePickerStories.PickRange} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Bounds
-
-<DocsCanvasShell description={<>Days before `minDate` or after `maxDate` are disabled in the calendar and rejected if typed.</>}>
-    <DsCanvasQuiet of={DatePickerStories.Bounds} />
-</DocsCanvasShell>
+<ComponentExample of={DatePickerStories.Disabled} title="Disabled" description="A date that does not apply right now. Avoid disabling where an explanation would help." />
 
 </div>
 
@@ -133,34 +116,6 @@ Use a date picker when a user needs to select a date or a date range.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>value</code></td><td>string or array</td><td>ISO <code>YYYY-MM-DD</code>; with <code>range</code>, <code>[start, end]</code>, either end may be <code>null</code>.</td></tr>
-        <tr><td><code>range</code></td><td>boolean</td><td>Picks a first and a last day instead of one.</td></tr>
-        <tr><td><code>onChange</code></td><td>function</td><td><code>(iso)</code>, or <code>([start, end])</code> with <code>range</code>; <code>''</code> or nulls when cleared.</td></tr>
-        <tr><td><code>minDate</code>, <code>maxDate</code></td><td>string or Date</td><td>The earliest and latest day that can be picked or typed.</td></tr>
-        <tr><td><code>placeholder</code></td><td>string</td><td>Defaults to <code>MM/DD/YYYY</code>, or two of them for a range.</td></tr>
-        <tr><td><code>calendarAlign</code></td><td>enum</td><td><code>left</code> (default), <code>center</code> or <code>right</code> — which edge of the field the calendar lines up with.</td></tr>
-        <tr><td><code>spacing</code></td><td>enum</td><td><code>default</code> (40) or <code>compact</code> (32).</td></tr>
-        <tr><td><code>isDisabled</code>, <code>isReadOnly</code></td><td>—</td><td>—</td></tr>
-        <tr><td><code>isInvalid</code></td><td>boolean</td><td>Draws the field invalid; a typed date outside the allowed span does too.</td></tr>
-        <tr><td><code>isValid</code></td><td>boolean</td><td>Draws the field valid, as a form does once a date is accepted.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
 </div>
 
 </DocsTab>
@@ -171,23 +126,60 @@ Use a date picker when a user needs to select a date or a date range.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
-Use `DatePicker` for a single date or a date range typed or chosen from a
-calendar — a session date, a billing period. For a time alone, use
-`TimePicker`; for a date and a time together, use `DateTimePicker`.
+Use `DatePicker` for a single date or a date range typed or chosen from a calendar: a session date, a billing period. For a time alone, use Time picker; for a date and a time together, use Date time picker.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Field.** A 40 box (32 at compact) on the input fill, with the date as text.
+2. **Calendar icon.** Opens the calendar. Decoration for assistive technology; the input is the control.
+3. **Calendar.** A month grid in a popup 4px below the field, flipped above when there is no room. A picked day is the selected fill; days between a range's ends are the neutral selection.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>The border takes <code>--ds-border-focused</code>.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box.</td></tr>
+<tr><td>Invalid</td><td>The border takes <code>--ds-border-danger</code> and the input sets <code>aria-invalid</code>.</td></tr>
+<tr><td>Read-only</td><td>The box takes <code>--ds-background-neutral</code>.</td></tr>
+<tr><td>Disabled</td><td>The box fades to <code>--ds-opacity-disabled</code> and leaves the tab order.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Fill</td><td><code>--ds-background-input</code>; read-only <code>--ds-background-neutral</code>.</td></tr>
+<tr><td>Border</td><td><code>--ds-border-input</code>; hovered <code>--ds-border-focused</code>; invalid <code>--ds-border-danger</code>.</td></tr>
+<tr><td>Text</td><td><code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
+<tr><td>Icon</td><td><code>--ds-icon-subtle</code>.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
+<tr><td>Popup gap</td><td><code>--stack-sm</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Typing is checked on Enter or on leaving the field.
 
-A real day inside `minDate`–`maxDate` is picked; anything else is kept exactly
-as typed and marked invalid, and `onChange` is not called until the text
-reads as a real date.
+A real day inside `minDate` to `maxDate` is picked; anything else is kept exactly as typed and marked invalid, and `onChange` is not called until the text reads as a real date.
 
 ```jsx
 <DatePicker
@@ -200,14 +192,36 @@ reads as a real date.
 
 ### A range is two clicks, not a drag.
 
-The first click sets the first day, the second sets the last day, and
-`onChange` receives `[start, end]`. A click before the already-set first day
-starts the range again rather than erroring.
+The first click sets the first day, the second sets the last day, and `onChange` receives `[start, end]`. A click before the first day starts the range again rather than erroring.
 
-### There is no `label` prop.
+### Name the field.
 
-Name the field with `aria-label` or `aria-labelledby` — props the component
-forwards straight to the input, same as `aria-describedby` and `data-*`.
+There is no `label` prop. Pass `aria-label` or `aria-labelledby`; both go straight to the input.
+
+<DoDontPair
+    doExample={<DatePicker aria-label="Session date" value="2026-10-25" />}
+    doCaption="One field, named, with a value in the format it asks for."
+    dontExample={<DatePicker aria-label="Session date" isInvalid value="10-25" />}
+    dontCaption="A date in another format is kept as typed and marked invalid. Say which format is expected beside the field."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the date by its role: "Session date", "Start date".</td><td>A generic name: "Date", or "Pick a date".</td></tr>
+<tr><td>Leave the placeholder as the format, MM/DD/YYYY.</td><td>Put an instruction in the placeholder: "Click to choose".</td></tr>
+<tr><td>Say how to fix an invalid date: "Enter a date between October 5 and October 23".</td><td>"Invalid date".</td></tr>
+<tr><td>Use sentence case in labels and messages.</td><td>Title case: "Session Date".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -215,15 +229,11 @@ forwards straight to the input, same as `aria-describedby` and `data-*`.
 
 ## Accessibility
 
-- **The input is the named control.** `aria-label`, `aria-labelledby` and
-  `aria-describedby` are read straight off the props and land on the text
-  input a screen reader focuses.
-- **The popup is a labeled dialog.** It opens as `role="dialog"` with an
-  `aria-label` of "Choose a date" or "Choose dates", not a bare list.
-- **`aria-expanded` and `aria-haspopup` track the calendar's open state** on
-  the input itself, which is `role="combobox"`.
-- **An invalid typed date keeps the typed text** rather than silently
-  reverting, so the person can see and correct what they entered.
+- **The input is the named control.** `aria-label`, `aria-labelledby` and `aria-describedby` are read straight off the props and land on the text input a screen reader focuses.
+- **The popup is a labeled dialog.** It opens as `role="dialog"` with an `aria-label` of "Choose a date" or "Choose dates", not a bare list.
+- **`aria-expanded` and `aria-haspopup` track the calendar's open state** on the input itself, which is `role="combobox"`.
+- **An invalid typed date keeps the typed text** rather than silently reverting, so the person can see and correct what they entered.
+- **Invalid is not color alone:** the input sets `aria-invalid`.
 
 </div>
 
@@ -231,9 +241,9 @@ forwards straight to the input, same as `aria-describedby` and `data-*`.
 
 ## Related
 
-- For a time alone, use `TimePicker`.
-- For a date and a time together, use `DateTimePicker`.
-- The month grid itself is the public `Calendar` component.
+- For a time alone, use Time picker.
+- For a date and a time together, use Date time picker.
+- The month grid itself is the public Calendar component.
 
 </div>
 
