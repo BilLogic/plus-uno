@@ -183,6 +183,29 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 
 <div className="sb-ds-doc-section">
 
+## Best practices
+
+### Say where the link goes.
+
+<DoDontPair
+    doExample={<LinkIconButton href="#help" icon="circle-question" label="Open Help Center" />}
+    doCaption="The label names the destination."
+    dontExample={<LinkIconButton href="#help" icon="circle-question" label="Help" />}
+    dontCaption="A bare noun does not say the link leaves the page."
+/>
+
+### A link goes somewhere; a button does something.
+
+If the icon acts on the current page, use Icon button. Navigation uses a link icon button so assistive technology announces a link and it can be opened in a new tab.
+
+### Pick a glyph people know.
+
+Use the glyph people already read as that destination, and do not reuse one glyph for several links in the same area.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Content guidelines
 
 <DocsTable>
