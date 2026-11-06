@@ -85,12 +85,12 @@ export const Tutor = {
     },
 };
 
-/** A tutor mid-onboarding: the Toolkit locked, with the modules left in its message. */
+/** A tutor mid-onboarding: the Toolkit locked with a message that names no number; Training rows count what is left. */
 export const TutorOnboarding = {
-    render: () => <div style={panel}><Sidebar user="tutor" activeTabId="onboarding" modulesLeft={3} account={ACCOUNTS.tutor} /></div>,
+    render: () => <div style={panel}><Sidebar user="tutor" activeTabId="onboarding" modulesLeft={3} lessonsLeft={2} account={ACCOUNTS.tutor} /></div>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getByRole('img', { name: 'Locked. Finish onboarding to unlock the Toolkit · 3 modules left' })).toBeInTheDocument();
+        await expect(canvas.getByRole('img', { name: 'Locked. Complete your assigned training to unlock the Toolkit' })).toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Sessions' })).toHaveAttribute('aria-disabled', 'true');
     },
 };
