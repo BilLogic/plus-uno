@@ -18,7 +18,7 @@ const IFRAME_ID = new RegExp(`iframe\\.html\\?(?:[^"'\`\\s)]*&)?id=(${ID})${END}
 const DOCS_LINK = /<DocsLink\s+id="([a-z0-9-]+)"(?:\s+story="([a-z0-9-]+)")?/g;
 
 /** Paths whose Storybook ids are a record or a test fixture, not a link a reader follows. */
-const NOT_LINKS = [/^docs\/plans\//, /^docs\/adr\//, /^agents\/uno-bot\/tests\//, /(^|\/)package-lock\.json$/, /(^|\/)node_modules\//];
+const NOT_LINKS = [/^docs\/plans\//, /^docs\/adr\//, /^agents\/uno-bot\/tests\//, /^scripts\/lib\/storybook-links\.test\.mjs$/, /(^|\/)package-lock\.json$/, /(^|\/)node_modules\//];
 
 export const isLinkable = (file) => !NOT_LINKS.some((pattern) => pattern.test(file));
 
