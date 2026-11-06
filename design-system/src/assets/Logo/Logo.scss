@@ -32,7 +32,17 @@
 .plus-logo__wordmark path { fill: var(--palette-neutral-1000); }
 .plus-logo--colored .plus-logo__wordmark path { fill: var(--ds-text); }
 .plus-logo--colored-dark .plus-logo__wordmark path,
+.plus-logo--dark .plus-logo__wordmark path,
 .plus-logo--outlined-reversed .plus-logo__wordmark path { fill: var(--palette-dark-neutral-1000); }
+
+/* Light letters on a dark ground read heavier, so each takes a hairline stroke in the ground color. */
+.plus-logo--colored-dark .plus-logo__wordmark path,
+.plus-logo--dark .plus-logo__wordmark path,
+.plus-logo--outlined-reversed .plus-logo__wordmark path {
+    stroke: var(--palette-dark-neutral-0);
+    stroke-width: 0.55;
+    stroke-linejoin: round;
+}
 
 /* Glows: today's on light, one step up each ramp on dark. */
 .plus-logo__glows--light .plus-logo__glow--0 { fill: var(--palette-yellow-300); }
@@ -53,10 +63,20 @@
 :is([data-color-mode="dark"]) .plus-logo--colored {
     .plus-logo__glows--light { display: none; }
     .plus-logo__glows--dark { display: inline; }
+    .plus-logo__wordmark path {
+        stroke: var(--palette-dark-neutral-0);
+        stroke-width: 0.55;
+        stroke-linejoin: round;
+    }
 }
 
 @media (prefers-color-scheme: dark) {
     :is([data-color-mode="auto"]) .plus-logo--colored {
+        .plus-logo__wordmark path {
+            stroke: var(--palette-dark-neutral-0);
+            stroke-width: 0.55;
+            stroke-linejoin: round;
+        }
         .plus-logo__glows--light { display: none; }
         .plus-logo__glows--dark { display: inline; }
     }

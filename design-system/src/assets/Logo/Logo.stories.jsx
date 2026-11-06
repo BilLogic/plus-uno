@@ -41,7 +41,7 @@ const Ground = ({ mode, children }) => (
     </div>
 );
 
-const reversedGround = (appearance) => (appearance === 'outlined-reversed' || appearance === 'colored-dark' ? 'dark' : 'light');
+const reversedGround = (appearance) => (['outlined-reversed', 'colored-dark', 'dark'].includes(appearance) ? 'dark' : 'light');
 
 const sizeRow = (props) => LOGO_SIZES.map((size) => (
     <figure key={size} style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', alignItems: 'flex-start' }}>
