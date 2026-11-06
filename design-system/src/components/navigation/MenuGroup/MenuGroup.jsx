@@ -29,7 +29,7 @@ export const MenuGroup = ({ density = 'regular', maxHeight, maxWidth, minWidth, 
     }, []);
 
     const moveFocus = useCallback((fromNode, delta) => {
-        const items = itemsRef.current.filter((n) => n && !n.disabled);
+        const items = itemsRef.current.filter((n) => n && !n.disabled && n.getAttribute('aria-disabled') !== 'true');
         const index = items.indexOf(fromNode);
         if (index === -1 || items.length === 0) return;
         const next = items[(index + delta + items.length) % items.length];

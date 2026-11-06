@@ -76,7 +76,7 @@
     font-weight: var(--type-weight-medium);
     text-decoration: none;
     cursor: pointer;
-    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+    transition: border-color var(--motion-duration-short) var(--motion-easing-standard), color var(--motion-duration-short) var(--motion-easing-standard), background-color var(--motion-duration-short) var(--motion-easing-standard);
 
     @include plus-state((
         disabled: (color: var(--ds-text-disabled)),

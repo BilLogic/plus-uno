@@ -4,7 +4,7 @@ import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
 
-import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Tabs from './Tabs';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
@@ -281,6 +281,19 @@ export const Focused = {
         selected.focus();
         await userEvent.keyboard('{ArrowRight}');
         await expect(tabOf(canvasElement, 'Sessions')).toHaveAttribute('aria-selected', 'true');
+    },
+};
+
+/** Selected, underline: the selected ink over the selected bar; no fill. */
+export const Selected = {
+    render: () => <StateTabs />,
+    play: async ({ canvasElement }) => {
+        const selected = tabOf(canvasElement, 'Overview');
+        await expectInk(canvasElement, selected, undefined, '--ds-text-selected', 'selected tab');
+        const style = getComputedStyle(selected);
+        await expect(style.borderBottomColor, 'the bar').toBe(tokenColor(canvasElement, '--ds-border-selected'));
+        await expect(px(style.borderBottomWidth), 'bar width').toBe(tokenLength(canvasElement, '--border-selected'));
+        await expect(selected).toHaveAttribute('aria-selected', 'true');
     },
 };
 

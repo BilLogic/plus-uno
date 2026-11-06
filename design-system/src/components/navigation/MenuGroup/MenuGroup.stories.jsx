@@ -93,6 +93,7 @@ const StateMenu = () => (
         <ButtonItem id="state-item">Rename board</ButtonItem>
         <ButtonItem isSelected id="state-selected">Current board</ButtonItem>
         <ButtonItem isDisabled id="state-disabled">Archive board</ButtonItem>
+        <LinkItem href="#" isDisabled id="state-disabled-link">Open archive</LinkItem>
         <LinkItem href="#" id="state-link">Open in a new view</LinkItem>
     </MenuGroup>
 );
@@ -159,6 +160,7 @@ export const Disabled = {
         await expect(getComputedStyle(disabled).pointerEvents, 'a pointer never reaches it').toBe('none');
         itemOf(canvasElement, 'selected').focus();
         await userEvent.keyboard('{ArrowDown}');
-        await expect(itemOf(canvasElement, 'link'), 'the disabled row is skipped').toHaveFocus();
+        await expect(itemOf(canvasElement, 'link'), 'disabled button and link rows are skipped').toHaveFocus();
+        await expect(itemOf(canvasElement, 'disabled-link')).toHaveAttribute('aria-disabled', 'true');
     },
 };

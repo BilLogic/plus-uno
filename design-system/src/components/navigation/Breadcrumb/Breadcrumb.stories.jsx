@@ -1,5 +1,5 @@
 import React from 'react';
-import { expect } from 'storybook/test';
+import { expect, userEvent } from 'storybook/test';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { decorationUnder, expectInk } from '@/storybook-docs/lib/navigation-states.js';
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
@@ -155,13 +155,13 @@ export const Hovered = {
     },
 };
 
-/** Pressed: a link takes no pressed step of its own; the hovered underline holds. */
+/** Pressed: a link takes no pressed step of its own; the trail does not change under the pointer. */
 export const Pressed = {
     render: () => <Breadcrumb items={sampleItems} />,
     play: async ({ canvasElement }) => {
         const { ancestor, current } = trailOf(canvasElement);
-        await expectInk(canvasElement, ancestor, ':active', '--ds-link', 'ancestor');
-        await expectNoStateChange(current, ':hover', 'current page');
+        await expectNoStateChange(ancestor, ':active', 'ancestor');
+        await expectNoStateChange(current, ':active', 'current page');
     },
 };
 
@@ -171,6 +171,7 @@ export const Focused = {
     play: async ({ canvasElement }) => {
         const { ancestor, current } = trailOf(canvasElement);
         await expectFocusRing(canvasElement, ancestor, 'ancestor link');
-        await expect(current.tabIndex, 'the current page is not a tab stop').toBe(-1);
+        await userEvent.tab();
+        await expect(current.contains(document.activeElement), 'the current page takes no focus').toBe(false);
     },
 };

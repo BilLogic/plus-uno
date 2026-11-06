@@ -236,9 +236,10 @@ A description clarifies a row; it does not carry the row. If it needs two lines,
 ## Accessibility
 
 - **A real `menu` with arrow keys.** `MenuGroup` is `role="menu"`; Arrow Down
-  and Arrow Up move focus between enabled items and wrap at the ends. Every
-  enabled item is also a tab stop; the group does not yet collapse them into
-  one.
+  and Arrow Up move focus between enabled items and wrap at the ends. Buttons
+  and links are tab stops; a `CustomItem` rendered as a `div` is reached by the
+  arrow keys only when the caller gives it a tab stop. The group does not yet
+  collapse the items into one tab stop.
 - **Sections are named groups.** A `Section` with a `title` is
   `role="group"` with `aria-labelledby` pointing at that title.
 - **Disabled items leave the tab order.** `isDisabled` removes a `LinkItem`'s

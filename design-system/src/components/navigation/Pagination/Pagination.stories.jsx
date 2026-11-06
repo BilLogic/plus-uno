@@ -72,11 +72,11 @@ const Template = (args) => {
     return <Pagination {...args} currentPage={page} onPageChange={setPage} />;
 };
 
-const paginationCanvas = { display: 'flex', flexDirection: 'column', gap: '24px', padding: '24px', backgroundColor: 'var(--ds-surface)' };
+const paginationCanvas = { display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-md)', padding: 'var(--size-card-gap-md)', backgroundColor: 'var(--ds-surface)' };
 const contentVariantCard = {
-    padding: '12px',
-    border: '1px solid var(--ds-border)',
-    borderRadius: '12px',
+    padding: 'var(--pad-x-md)',
+    border: 'var(--border-default) solid var(--ds-border)',
+    borderRadius: 'var(--radius-lg)',
     background: 'var(--ds-surface-container)',
 };
 
@@ -95,7 +95,7 @@ function PaginationContentDemos() {
                     />
                 </div>
             </section>
-            <section style={{ marginTop: '24px' }}>
+            <section style={{ marginTop: 'var(--size-card-gap-md)' }}>
                 <div style={contentVariantCard}>
                     <Pagination
                         currentPage={5}
@@ -117,24 +117,24 @@ function PaginationSpacingDemos() {
     return (
         <>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ICON NAVIGATOR SPACINGS</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ICON NAVIGATOR SPACINGS</span>
+                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Default and compact icon pagination.
                 </p>
                 <div style={contentVariantCard}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--pad-x-lg)' }}>
                         <Pagination currentPage={1} totalPages={10} navigator="icon" spacing="compact" label="Icon pagination, compact" onPageChange={(p) => console.log('Page:', p)} />
                         <Pagination currentPage={1} totalPages={10} navigator="icon" spacing="default" label="Icon pagination, default spacing" onPageChange={(p) => console.log('Page:', p)} />
                     </div>
                 </div>
             </section>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TEXT NAVIGATOR SPACINGS</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TEXT NAVIGATOR SPACINGS</span>
+                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Default and compact text pagination with Previous and Next labels.
                 </p>
                 <div style={contentVariantCard}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--pad-x-lg)' }}>
                         <Pagination currentPage={1} totalPages={10} navigator="text" spacing="compact" previousLabel="Previous" nextLabel="Next" label="Text pagination, compact" onPageChange={(p) => console.log('Page:', p)} />
                         <Pagination currentPage={1} totalPages={10} navigator="text" spacing="default" previousLabel="Previous" nextLabel="Next" label="Text pagination, default spacing" onPageChange={(p) => console.log('Page:', p)} />
                     </div>
@@ -148,8 +148,8 @@ function PaginationInteractionStatesDemos() {
     return (
         <>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FIRST PAGE</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FIRST PAGE</span>
+                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Previous control is disabled at the first page.
                 </p>
                 <div style={contentVariantCard}>
@@ -164,8 +164,8 @@ function PaginationInteractionStatesDemos() {
                 </div>
             </section>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LAST PAGE</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LAST PAGE</span>
+                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Next control is disabled at the last page.
                 </p>
                 <div style={contentVariantCard}>
@@ -180,8 +180,8 @@ function PaginationInteractionStatesDemos() {
                 </div>
             </section>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MIDDLE PAGE</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MIDDLE PAGE</span>
+                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Both previous and next controls are enabled.
                 </p>
                 <div style={contentVariantCard}>
@@ -272,7 +272,8 @@ Accessibility.play = async ({ canvasElement }) => {
 
 /* ------------------------------------------------------------------- states */
 
-const StatePages = () => <Pagination currentPage={1} totalPages={8} label="State pages" onPageChange={fn()} />;
+const onDisabledChange = fn();
+const StatePages = () => <Pagination currentPage={1} totalPages={8} label="State pages" onPageChange={onDisabledChange} />;
 const pageOf = (canvasElement, name) => within(canvasElement).getByRole('button', { name });
 
 /** Rest: pages in subtle ink on the surface; the current page is named by aria-current. */
@@ -335,7 +336,8 @@ export const Disabled = {
         await expectInk(canvasElement, previous, undefined, '--ds-text-disabled', 'Previous');
         await expect(getComputedStyle(previous).pointerEvents, 'a pointer never reaches it').toBe('none');
         previous.focus();
+        onDisabledChange.mockClear();
         await userEvent.keyboard('{Enter}');
-        await expect(pageOf(canvasElement, 'Page 1')).toHaveAttribute('aria-current', 'page');
+        await expect(onDisabledChange, 'a disabled Previous does nothing').not.toHaveBeenCalled();
     },
 };
