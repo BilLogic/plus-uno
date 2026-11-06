@@ -22,6 +22,7 @@ import {
   TAB_IDS,
   componentIdentity,
   normalizeChangelog,
+  importLineFor,
 } from '../src/storybook-docs/lib/component-tabs-contract.js';
 
 describe('componentIdentity', () => {
@@ -136,5 +137,16 @@ describe('the tab contract', () => {
 
   it('states the adoption date once, as an ISO date', () => {
     expect(CHANGELOG_ADOPTED).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+  });
+});
+
+describe('importLineFor', () => {
+  it('names the component from the barrel, the only public import path', () => {
+    expect(importLineFor('Button')).toBe("import { Button } from '@/components';");
+  });
+
+  it('falls back to nothing when the meta carries no component', () => {
+    expect(importLineFor(undefined)).toBeNull();
+    expect(importLineFor('')).toBeNull();
   });
 });

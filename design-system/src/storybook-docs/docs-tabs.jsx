@@ -32,7 +32,7 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { ArgTypes, useOf } from '@storybook/addon-docs/blocks';
 
-import { CHANGELOG_ADOPTED, TABS, normalizeChangelog } from './lib/component-tabs-contract.js';
+import { CHANGELOG_ADOPTED, TABS, importLineFor, normalizeChangelog } from './lib/component-tabs-contract.js';
 
 /**
  * The window whose query string holds the tab — the manager's, normally.
@@ -129,9 +129,18 @@ function GeneratedTabBody({ children }) {
  * deliberately NOT inlined: it would put every component file into the docs
  * bundle to duplicate something GitHub already renders better, with history.
  */
-function CodeTabPanel({ of }) {
+function CodeTabPanel({ of, importName }) {
+  const importLine = importLineFor(importName);
   return (
     <GeneratedTabBody>
+      {importLine ? (
+        <>
+          <h2>Import</h2>
+          <pre className="sb-ds-code-import">
+            <code>{importLine}</code>
+          </pre>
+        </>
+      ) : null}
       <h2>Props</h2>
       <ArgTypes of={of} />
     </GeneratedTabBody>
@@ -331,7 +340,7 @@ export function DocsTabs({ of, examplesTitle, children }) {
         className="sb-ds-docs-tabs__panel"
       >
         {activeTab.key === 'code' ? (
-          <CodeTabPanel of={of} />
+          <CodeTabPanel of={of} importName={resolved?.preparedMeta?.component?.displayName ?? resolved?.preparedMeta?.component?.name} />
         ) : activeTab.key === 'changelog' ? (
           <ChangelogTabPanel entries={entries} />
         ) : (

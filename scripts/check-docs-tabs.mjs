@@ -87,6 +87,8 @@ const USAGE_HEADINGS = new Set([
   'Content guidelines',
   'Accessibility',
   'Usage notes',
+  'Parts',
+  'Best practices',
   'Related',
   'Why `showLabel` cannot take the name away',
 ]);

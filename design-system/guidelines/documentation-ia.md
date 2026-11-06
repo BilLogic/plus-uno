@@ -75,6 +75,14 @@ Changelog** — as real Storybook tabs, not sidebar entries. Four entries per
 component would fragment the sidebar, which is the one place the tree above is
 spoken out loud.
 
+**The component page template.** Every component page fills the same three faces, in this order:
+
+- **Examples:** one story per appearance, state and size, each as a `ComponentExample` (an h3 and a one-line description over the live canvas), then the interactive playground.
+- **Code:** generated. The import line (from the `@/components` barrel) and the props table, derived from the story meta, so neither is authored.
+- **Usage:** parts (anatomy and tokens), the main rules as do and don't pairs, best practices, content guidelines, accessibility, related components.
+
+`Button/Button.mdx` is the reference page.
+
 **The tabs are a human affordance and change nothing for an agent.** The
 agent-facing file stays one flat generated `index.md` per component. An agent
 that had to open four files to answer one question would be paying for a
