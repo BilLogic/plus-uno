@@ -15,7 +15,7 @@
 
 .plus-count {
     --plus-count-size: #{label.$count-height};
-    --plus-count-min: var(--size-150, 24px);
+    --plus-count-min: var(--control-sm, 24px);
 
     display: inline-flex;
     align-items: center;
@@ -26,14 +26,14 @@
     min-width: var(--plus-count-min);
     margin: 0;
     padding: 0 var(--pad-x-xs, 4px);
-    border-radius: var(--radius-0125, 2px);
+    border-radius: var(--radius-sm, 2px);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
 }
 
 .plus-count--compact {
     --plus-count-size: #{label.$count-height-compact};
-    --plus-count-min: var(--size-150, 24px);
+    --plus-count-min: var(--control-sm, 24px);
 }
 
 /*

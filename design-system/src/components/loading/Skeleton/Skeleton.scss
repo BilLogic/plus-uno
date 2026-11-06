@@ -77,9 +77,9 @@
 }
 
 .plus-skeleton--count {
-    --plus-skeleton-width: var(--size-150, 24px);
+    --plus-skeleton-width: var(--control-sm, 24px);
     --plus-skeleton-height: #{label.$count-height};
-    --plus-skeleton-radius: var(--radius-0125, 2px);
+    --plus-skeleton-radius: var(--radius-sm, 2px);
 }
 
 .plus-skeleton--tag {
