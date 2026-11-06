@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as ChoiceGridStories from './ChoiceGrid.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { ChoiceGrid } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -32,12 +39,13 @@ export const figmaMeta = {
 <Meta of={ChoiceGridStories} />
 
 <Title />
+A choice grid asks one question of several things at once, as a matrix of radios or checkboxes.
 
 <DocsTabs of={ChoiceGridStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
+<ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13317-2958"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
@@ -48,55 +56,39 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>Single-row radio grid with one selected column.</>}>
-    <Canvas of={ChoiceGridStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Selection type
 
-<DocsCanvasShell description={<>Radio (single per row) and checkbox (multiple per row).</>}>
-    <DsCanvasQuiet of={ChoiceGridStories.Variants} />
-</DocsCanvasShell>
+<ComponentExample of={ChoiceGridStories.Overview} title="Radio" description="One selected column per row." />
+
+<ComponentExample of={ChoiceGridStories.Variants} title="Radio and checkbox" description="Radio allows one answer per row; checkbox allows several." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Layout & composition
+## Layout
 
-<DocsCanvasShell description={<>Several rows against the same column headers.</>}>
-    <DsCanvasQuiet of={ChoiceGridStories.Layout} />
-</DocsCanvasShell>
+<ComponentExample of={ChoiceGridStories.Layout} title="Rows" description="Several rows against the same column headers." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Disabled grid.</>}>
-    <DsCanvasQuiet of={ChoiceGridStories.InteractionStates} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Read-only grid: the answers show and stay in the tab order, and clicking a cell changes nothing.</>}>
-    <DsCanvasQuiet of={ChoiceGridStories.ReadOnly} />
-</DocsCanvasShell>
+<ComponentExample of={ChoiceGridStories.Size} title="Size" description="`size` sets the option-label font (12, 14 or 16) and the control width that goes with it (10, 12 or 12). Unset keeps the default." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Size
+## State
 
-<DocsCanvasShell description={<>`size` sets the option-label font (12 · 14 · 16) and the control width that goes with it (10 · 12 · 12). Unset keeps the default rendering.</>}>
-    <DsCanvasQuiet of={ChoiceGridStories.Size} />
-</DocsCanvasShell>
+<ComponentExample of={ChoiceGridStories.Unselected} title="Unselected" description="The resting cells." />
+
+<ComponentExample of={ChoiceGridStories.Selected} title="Selected" description="The chosen cell holds the selected bold fill." />
+
+<ComponentExample of={ChoiceGridStories.Hovered} title="Hovered" description="The hovered input fill and a brand edge on the cell under the pointer." />
+
+<ComponentExample of={ChoiceGridStories.Focused} title="Focused" description="A 2px ring on the focused cell, for keyboard focus only." />
+
+<ComponentExample of={ChoiceGridStories.ReadOnly} title="Read-only" description="The answers show and stay in the tab order, and clicking a cell changes nothing." />
+
+<ComponentExample of={ChoiceGridStories.Disabled} title="Disabled" description="The whole grid takes the disabled fill. Cells leave the tab order." />
 
 </div>
 
@@ -126,49 +118,107 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
-Use `ChoiceGrid` when the same question is asked of several things at once — rate
-each of these six statements, tick which of these tools each tutor uses. It is a
-matrix: one question in the column headers, one subject per row.
+Use a choice grid when the same question is asked of several things at once: rate each of these six statements, tick which of these tools each tutor uses. It is a matrix with one question in the column headers and one subject per row.
 
-It is fully controlled. `values` is `{ rowId: columnId }` in `radio` mode and
-`{ rowId: { columnId: boolean } }` in `checkbox` mode, and the component holds no
-state of its own.
+It is fully controlled. `values` is `{ rowId: columnId }` in `radio` mode and `{ rowId: { columnId: boolean } }` in `checkbox` mode, and the component holds no state of its own.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Column headers.** The answer scale. They name every cell in their column.
+2. **Row labels.** The subject of each row. They name every cell in their row.
+3. **Cells.** A real Radio or Checkbox, centered, with no visible label of its own.
+4. **Row-header corner.** Empty on purpose; it carries a visually hidden "Row".
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered, selected, focused</td><td>As the Radio or Checkbox in the cell: input hovered fill and brand edge, selected bold fill, 2px focus ring in <code>--ds-border-focused</code>.</td></tr>
+<tr><td>Pressed</td><td>No step of its own. The hovered look holds while the pointer is down.</td></tr>
+<tr><td>Read-only</td><td>Full contrast, cells stay in the tab order with <code>aria-readonly</code>; changes are ignored.</td></tr>
+<tr><td>Disabled</td><td>Cells take the disabled fill and edge and leave the tab order; header text uses a solid muted token, not opacity.</td></tr>
+<tr><td>Invalid</td><td>Not drawn by the grid. Put the message above it and mark the question there.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Surface</td><td><code>--ds-surface-container</code> on the table, headers, labels and cells.</td></tr>
+<tr><td>Padding</td><td><code>--pad-y-md</code> and <code>--pad-x-md</code> on headers, labels and cells.</td></tr>
+<tr><td>Corner</td><td><code>--radius-md</code>.</td></tr>
+<tr><td>Text</td><td><code>--ds-text</code>, body default, or the label font <code>size</code> picks.</td></tr>
+<tr><td>Control</td><td><code>--checkbox-control-size</code>, or <code>--choice-grid-control-size-10</code> and <code>-12</code> through <code>size</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### `onChange` has two shapes, and only one of them is the new state.
 
 ```jsx
-// radio — the two ids that changed. Merge them yourself.
+// radio: the two ids that changed. Merge them yourself.
 <ChoiceGrid type="radio" values={v} rows={rows} columns={cols}
             onChange={(rowId, columnId) => setV({ ...v, [rowId]: columnId })} />
 
-// checkbox — the whole new values object, already merged.
+// checkbox: the whole new values object, already merged.
 <ChoiceGrid type="checkbox" values={v} rows={rows} columns={cols}
             onChange={(next) => setV(next)} />
 ```
 
-### In checkbox mode, `onChange` hands you a fresh object.
-
-The merge copies the top level and the row it changes, so the `values` you passed
-in is left as it was and can be compared against the next one.
+In checkbox mode the merge copies the top level and the row it changes, so the `values` you passed in is left as it was and can be compared against the next one.
 
 ### A radio row cannot be unanswered again.
 
-Selecting a column always sets it; there is no path back to "not answered". If
-that state is meaningful, add a column for it — "Not applicable" as a real
-option is better than a row the user cannot clear.
+Selecting a column always sets it; there is no path back to "not answered". If that state is meaningful, add a column for it. "Not applicable" as a real option is better than a row the user cannot clear.
 
 ### Keep the grid small.
 
-Every cell is a control, so a six-by-five grid is thirty tab stops. Past that,
-ask the questions one at a time with `RadioGroup`.
+Every cell is a control, so a six-by-five grid is thirty tab stops. Past that, ask the questions one at a time with Radio group.
+
+### Give the grid a question above it.
+
+<DoDontPair
+    doExample={<div><p>How often did each happen?</p><ChoiceGrid id="do-grid" type="radio" rows={[{ id: 'a', label: 'Punctuality' }]} columns={[{ id: '1', label: 'Rarely' }, { id: '2', label: 'Often' }]} values={{ a: '2' }} onChange={() => {}} /></div>}
+    doCaption="A question above the grid, and the scale named in the column headers."
+    dontExample={<ChoiceGrid id="dont-grid" type="radio" rows={[{ id: 'a', label: 'Punctuality' }]} columns={[{ id: '1', label: '1' }, { id: '2', label: '2' }]} values={{ a: '2' }} onChange={() => {}} />}
+    dontCaption="Bare numbers with no question: the grid has no name of its own, so the scale means nothing."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Write column headers as the scale: "Rarely", "Sometimes", "Often".</td><td>Bare numbers with no meaning attached.</td></tr>
+<tr><td>Keep row labels short and parallel; they do not wrap.</td><td>A sentence per row.</td></tr>
+<tr><td>Phrase the question above the grid so every row answers it.</td><td>A different question in each row.</td></tr>
+<tr><td>Keep column headers short and the same length.</td><td>A header the person cannot read at a glance.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -176,24 +226,12 @@ ask the questions one at a time with `RadioGroup`.
 
 ## Accessibility
 
-- **Every cell is named by its row and its column.** Each input carries
-  `aria-labelledby` pointing at both the row label and the column header, so it
-  is announced as "Punctuality, Agree" rather than as an unnamed radio in a
-  table.
-- **Every cell is the real control.** Cells render `Checkbox` and `Radio`, so
-  focus, states and read-only behave as they do anywhere else.
-- **Radio rows are grouped per row.** Each row's inputs share a `name` built from
-  the grid's id and the row's id, which is what makes one answer per row and
-  arrow-key movement along it. With no `id` or `name` the grid generates its own
-  base, so two grids on a page never share ids or radio groups.
-- **The grid itself has no name.** There is no caption and no `aria-label` on the
-  table. Put the question above it as a heading, and describe the scale in the
-  column headers.
-- **The row-header column is empty on purpose.** It carries a visually hidden
-  "Row" so the header row is not a blank cell.
-- **On a narrow screen this is a wide table.** Put it in a horizontal
-  `ScrollBar` rather than letting the columns crush — a header the user cannot
-  read is a question they cannot answer.
+- **Every cell is named by its row and its column.** Each input carries `aria-labelledby` pointing at both the row label and the column header, so it is announced as "Punctuality, Agree" rather than as an unnamed radio in a table.
+- **Every cell is the real control.** Cells render Checkbox and Radio, so focus, states and read-only behave as they do anywhere else.
+- **Radio rows are grouped per row.** Each row's inputs share a `name` built from the grid's id and the row's id, which makes one answer per row and arrow-key movement along it. With no `id` or `name` the grid generates its own base, so two grids on a page never share ids or radio groups.
+- **The grid itself has no name.** There is no caption and no `aria-label` on the table. Put the question above it as a heading, and describe the scale in the column headers.
+- **The row-header column is empty on purpose.** It carries a visually hidden "Row" so the header row is not a blank cell.
+- **On a narrow screen this is a wide table.** Put it in a horizontal scroll area rather than letting the columns crush.
 
 </div>
 
@@ -201,9 +239,9 @@ ask the questions one at a time with `RadioGroup`.
 
 ## Related
 
-- For one question with several answers, use `RadioGroup`.
-- For a rated answer with end labels, use `RadioGroup` with `leadingText` and `trailingText`.
-- For data being displayed rather than answered, use `Table`.
+- For one question with several answers, use Radio group.
+- For a rated answer with end labels, use Radio group with `leadingText` and `trailingText`.
+- For data being displayed rather than answered, use Table.
 
 </div>
 

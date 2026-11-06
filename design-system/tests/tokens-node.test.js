@@ -558,7 +558,8 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // fallbacks with it.
     // 164: the Storybook docs chrome stylesheet moved onto --ds- tokens, and its 37
     // color fallbacks went (the ladder migration of the chrome).
-    expect(comparable).toBe(164);
+    // 162: Rating moved onto --ds- icon tokens, and its two hex fallbacks went.
+    expect(comparable).toBe(162);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

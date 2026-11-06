@@ -1,9 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as RadioStories from './Radio.stories.jsx';
 import { Radio } from '@/components';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -28,7 +34,7 @@ A radio lets a person choose one option from a set.
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
+<ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
@@ -39,80 +45,33 @@ A radio lets a person choose one option from a set.
 
 <div className="sb-ds-doc-section">
 
-## Anatomy
-
-<DocsCanvasShell attachSourceBelow description={<>Radios that share a name form a group: choosing one clears the others.</>}>
-    <Canvas of={RadioStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-<DocsTable>
-    <thead>
-        <tr><th>Part</th><th>What it is</th></tr>
-    </thead>
-    <tbody>
-        <tr><td>1 Radio</td><td>A 12 circle. Selected, it fills with the selected bold fill and draws an inverse dot; unselected, it is an empty circle.</td></tr>
-        <tr><td>2 Label</td><td>14/20 text beside the radio. It names the option.</td></tr>
-        <tr><td>3 Description</td><td>Optional 12/16 text under the label that describes the option. It does not name it.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr><th>Property</th><th>Type</th><th>Default</th><th>Notes</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>name</code></td><td>string</td><td>required</td><td>Shared by the radios of one group.</td></tr>
-        <tr><td><code>label</code></td><td>node</td><td>none</td><td>Names the option. Without a label, pass <code>aria-label</code>.</td></tr>
-        <tr><td><code>value</code></td><td>string, number</td><td>none</td><td>The value this option submits.</td></tr>
-        <tr><td><code>isChecked</code></td><td>boolean</td><td>uncontrolled</td><td>Controlled value. Needs an <code>onChange</code>.</td></tr>
-        <tr><td><code>defaultChecked</code></td><td>boolean</td><td><code>false</code></td><td>Initial value when uncontrolled.</td></tr>
-        <tr><td><code>isInvalid</code></td><td>boolean</td><td><code>false</code></td><td>Danger edge on an unselected radio only.</td></tr>
-        <tr><td><code>isDisabled</code></td><td>boolean</td><td><code>false</code></td><td>Out of the tab order, disabled fill.</td></tr>
-        <tr><td><code>isRequired</code></td><td>boolean</td><td><code>false</code></td><td>Requires an answer natively.</td></tr>
-        <tr><td><code>isReadOnly</code></td><td>boolean</td><td><code>false</code></td><td>PLUS addition. Full contrast, in the tab order, not changeable.</td></tr>
-        <tr><td><code>description</code></td><td>node</td><td>none</td><td>PLUS addition. Linked with <code>aria-describedby</code>.</td></tr>
-        <tr><td><code>appearance</code></td><td><code>plain</code>, <code>card</code></td><td><code>plain</code></td><td>PLUS addition. <code>card</code> draws the option as a bordered tile.</td></tr>
-        <tr><td><code>onChange</code></td><td>function</td><td>none</td><td>Called with the change event.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Selected, unselected and disabled.</>}>
-    <DsCanvasQuiet of={RadioStories.States} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Invalid marks the unselected radios. A selected radio keeps its fill.</>}>
-    <DsCanvasQuiet of={RadioStories.Invalid} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Read-only: focusable, full contrast, and the answer does not change.</>}>
-    <DsCanvasQuiet of={RadioStories.ReadOnly} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Content
 
-<DocsCanvasShell description={<>Concise labels, in a logical order, stacked.</>}>
-    <DsCanvasQuiet of={RadioStories.Content} />
-</DocsCanvasShell>
+<ComponentExample of={RadioStories.Content} title="Options" description="Concise labels in a logical order, stacked. Radios that share a name form a group." />
 
-<DocsCanvasShell description={<>A description under the label, and the card appearance.</>}>
-    <DsCanvasQuiet of={RadioStories.DescriptionAndCard} />
-</DocsCanvasShell>
+<ComponentExample of={RadioStories.DescriptionAndCard} title="Description and card" description="A description under the label, and the card appearance for options that need more room." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={RadioStories.Unselected} title="Unselected" description="The resting circle." />
+
+<ComponentExample of={RadioStories.Selected} title="Selected" description="The selected bold fill with an inverse dot." />
+
+<ComponentExample of={RadioStories.Hovered} title="Hovered" description="The hovered input fill and a brand edge. A selected radio steps to the hovered step of its fill." />
+
+<ComponentExample of={RadioStories.Focused} title="Focused" description="A 2px ring, 2px off the radio, for keyboard focus only." />
+
+<ComponentExample of={RadioStories.Required} title="Required" description="Draws the marker and requires an answer natively." />
+
+<ComponentExample of={RadioStories.Invalid} title="Invalid" description="A danger edge on the unselected radios. A selected radio keeps its fill." />
+
+<ComponentExample of={RadioStories.ReadOnly} title="Read-only" description="Focusable, full contrast, and the answer does not change." />
+
+<ComponentExample of={RadioStories.Disabled} title="Disabled" description="The disabled fill. The radio leaves the tab order." />
 
 </div>
 
@@ -142,28 +101,68 @@ A radio lets a person choose one option from a set.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use Radio when the options need custom presentation, such as options listed in a table. For a plain list of options, use RadioGroup, which owns the group label, the value and the error.
 
 Make one option the default. Pick the safest and lowest-risk option, and never preselect a high-risk choice such as one about privacy or payment. If a person may decline all options, add a "None" option; if the list cannot be complete, add "Other".
 
-<DoDontGrid
-    pairs={[
-        {
-            doExample: <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="do-order" label="In person" value="a" defaultChecked /><Radio name="do-order" label="Online" value="b" /><Radio name="do-order" label="Either" value="c" /></div>,
-            doCaption: 'Order options from most to least likely, or from least to most risk.',
-            dontExample: <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="dont-order" label="Online" value="a" /><Radio name="dont-order" label="Either" value="b" /><Radio name="dont-order" label="In person" value="c" /></div>,
-            dontCaption: "Alphabetical order cannot be localized and says nothing about which option fits most people.",
-        },
-    ]}
-/>
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Radio.** A 12 circle. Selected, it fills with the selected bold fill and draws an inverse dot; unselected, it is an empty circle.
+2. **Label.** 14/20 text beside the radio in a 24 row. It names the option. A required marker follows it.
+3. **Description.** Optional 12/16 text under the label that describes the option. It does not name it.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>Unselected: <code>--ds-background-input-hovered</code> with a <code>--ds-border-brand</code> edge. Selected: the hovered step of the selected bold fill.</td></tr>
+<tr><td>Pressed</td><td>No step of its own. The hovered look holds while the pointer is down.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the radio, for keyboard focus only.</td></tr>
+<tr><td>Selected</td><td><code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge; the dot is <code>--ds-icon-inverse</code>.</td></tr>
+<tr><td>Invalid</td><td>The unselected radio takes <code>--ds-border-danger</code>. A selected radio keeps its fill.</td></tr>
+<tr><td>Read-only</td><td>Full contrast, in the tab order, not changeable.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code> fill, <code>--ds-border-disabled</code> edge, <code>--ds-icon-disabled</code> dot. Out of the tab order.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Circle fill and edge</td><td><code>--ds-background-input</code> and <code>--ds-border-input</code>; selected <code>--ds-background-selected-bold</code> and <code>--ds-border-selected</code>.</td></tr>
+<tr><td>Circle size, edge width</td><td><code>--radio-control-size</code> (12); <code>--stroke-2</code>.</td></tr>
+<tr><td>Row</td><td><code>--item-height-sm</code> (24); gap <code>--space-050</code>.</td></tr>
+<tr><td>Label</td><td><code>--ds-text</code>, body default.</td></tr>
+<tr><td>Card</td><td><code>--radius-025</code>, <code>--stroke-1</code> edge in <code>--ds-border</code>, <code>--ds-surface</code> fill.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Best practices
+
+### Order options by likelihood or risk.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="do-order" label="In person" value="a" defaultChecked /><Radio name="do-order" label="Online" value="b" /><Radio name="do-order" label="Either" value="c" /></div>}
+    doCaption="Order options from most to least likely, or from least to most risk."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="dont-order" label="Online" value="a" /><Radio name="dont-order" label="Either" value="b" /><Radio name="dont-order" label="In person" value="c" /></div>}
+    dontCaption="Alphabetical order cannot be localized and says nothing about which option fits most people."
+/>
 
 ### A lone Radio is not a group.
 
@@ -176,6 +175,25 @@ For a long list, use Select. Do not write numeric options that overlap ("0-20", 
 ### A description describes; the label names.
 
 `description` renders under the label and is read after the name.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Write each label as the option: "In person".</td><td>A sentence or an instruction: "Choose this if you meet in person."</td></tr>
+<tr><td>Use sentence case and no end punctuation.</td><td>Title case, or a period after the label.</td></tr>
+<tr><td>Keep labels parallel in length and form.</td><td>Mix one word with a full clause.</td></tr>
+<tr><td>Add "None" when a person may decline every option, "Other" when the list cannot be complete.</td><td>Force an answer that does not fit.</td></tr>
+<tr><td>Say what to do in an error: "Select an option".</td><td>"Required" or "Invalid".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

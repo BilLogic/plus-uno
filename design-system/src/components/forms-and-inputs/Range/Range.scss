@@ -35,7 +35,7 @@
 }
 
 .plus-form-range-label {
-    margin-bottom: var(--space-025, 4px);
+    margin-bottom: var(--space-025);
     color: var(--ds-text);
     font: var(--body-default);
 }
@@ -65,7 +65,7 @@
     position: relative;
     width: 100%;
     height: var(--_range-track-height, var(--range-track-height-4));
-    border-radius: var(--radius-full, 9999px);
+    border-radius: var(--radius-full);
     background-color: var(--ds-background-neutral);
 
     [data-disabled] & {
@@ -76,7 +76,7 @@
 // The filled portion, from the start to the thumb. Base UI positions and
 // sizes this inline as the value changes.
 .plus-form-range-indicator {
-    border-radius: var(--radius-full, 9999px);
+    border-radius: var(--radius-full);
     background-color: var(--ds-background-selected-bold);
 
     [data-disabled] & {
@@ -89,7 +89,7 @@
 .plus-form-range-thumb {
     width: var(--_range-dot-size, var(--range-dot-size-default));
     height: var(--_range-dot-size, var(--range-dot-size-default));
-    border-radius: var(--radius-full, 9999px);
+    border-radius: var(--radius-full);
     background-color: var(--ds-background-selected-bold);
     box-shadow: var(--ds-shadow-raised);
     cursor: pointer;
@@ -109,6 +109,13 @@
     // Checkbox and Radio draw.
     &[data-dragging] {
         background-color: var(--ds-background-selected-bold-hovered);
+    }
+
+    // The focused element is the native input inside the thumb, not the thumb,
+    // so the ring reads it through `:has()`; Base UI only sets `data-focused`
+    // on the thumb inside a Field.
+    &:has(input[type="range"]:focus-visible) {
+        @include plus-ring();
     }
 
     // The real, focusable, `role="slider"` element — Base UI's hidden native

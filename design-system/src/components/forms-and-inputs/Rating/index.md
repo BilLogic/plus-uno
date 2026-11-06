@@ -9,7 +9,7 @@ Rating component with 5 stars, supporting two variants: 1. With "Comments" label
 
 **Source:** `design-system/src/components/forms-and-inputs/Rating/Rating.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Rating/Rating.stories.jsx` — Overview, Content, Variants, InteractionStates, Interactive, PropsRender
+**Stories:** `design-system/src/components/forms-and-inputs/Rating/Rating.stories.jsx` — Overview, Content, Variants, InteractionStates, Interactive, PropsRender, Unrated, Rated, Hovered, Focused, Required, Disabled
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Rating/Rating.mdx`
 
@@ -41,7 +41,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-danger` · `--color-outline-variant` · `--color-primary` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-text` · `--icon-md` · `--item-height-md` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
+`--body-default` · `--ds-background-disabled` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-icon-disabled` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-danger` · `--icon-lg` · `--icon-md` · `--item-height-md` · `--space-0625` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/Rating/Rating.scss`. Override these through the token layer, never with a literal.
 
