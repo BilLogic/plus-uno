@@ -1,0 +1,30 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection } from '@/storybook-docs/foundation-page.jsx';
+
+export const Go = ({ id, children }) => <a href={`?path=/docs/${id}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{children}</a>;
+
+<Meta title="Get started/Design" tags={['!dev']} />
+
+<FoundationHero
+    title="Design"
+    summary="Where a designer finds the rules, the parts and the page shells for PLUS."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Start here">
+
+Storybook holds the rules for every foundation, component and pattern. The Figma library holds the visual layer: the component, its anatomy and redlines, a variants grid, a few visual do and don'ts, and a pointer back to its Storybook page.
+
+- <Go id="foundations-foundations-overview">Foundations</Go>: color, spacing, typography and the other styles everything is built from.
+- <Go id="components-forms-and-inputs-button-button">Components</Go>: the parts, grouped by what they do.
+- <Go id="patterns-introduction">Patterns</Go>: the page shells, from Frame down to Section, Overlays and Popups.
+- <Go id="ai-overview">AI</Go>: how PLUS AI looks and behaves.
+
+</FoundationSection>
+
+<FoundationSection title="Content">
+
+Words are part of the design. <Go id="get-started-content-design">Content design</Go> says where the voice, grammar and message guidance lives.
+
+</FoundationSection>

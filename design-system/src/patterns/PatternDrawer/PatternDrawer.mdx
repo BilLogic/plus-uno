@@ -28,8 +28,8 @@ A Drawer opens a panel beside the page so a person can work on one thing while t
 ### When to use
 
 - Use a Drawer for a task that needs the page in view, such as the details of a row, filters or a short edit.
-- For a task that blocks the page, or needs none of it in view, use a [Modal](?path=/docs/foundations-patterns-modal--docs).
-- For content that belongs on the page itself, use a [Section](?path=/docs/foundations-patterns-section--docs) or a [Card](?path=/docs/foundations-patterns-card--docs).
+- For a task that blocks the page, or needs none of it in view, use a [Modal](?path=/docs/patterns-overlays-modal--docs).
+- For content that belongs on the page itself, use a [Section](?path=/docs/patterns-section-section--docs) or a [Card](?path=/docs/patterns-section-card--docs).
 - A Drawer is never wider than <code>lg</code>. Past that the page behind it is no longer in view, and the task wants a Modal or a page of its own.
 
 </div>
@@ -162,7 +162,7 @@ A Drawer runs from the top of the screen to the bottom, so it has no hug or fill
 
 ### Relation to Blanket and Modal
 
-A Drawer is placed in the [Blanket](?path=/docs/foundations-patterns-blanket--docs) with an edge placement. The Blanket drops its pad and holds the Drawer at that edge, over the same blanket and the same layers a [Modal](?path=/docs/foundations-patterns-modal--docs) takes. The Drawer follows the Modal's title, width and footer rules. One Drawer shows at a time. A confirm raised from a Drawer is a Modal in a second Blanket above it.
+A Drawer is placed in the [Blanket](?path=/docs/patterns-overlays-blanket--docs) with an edge placement. The Blanket drops its pad and holds the Drawer at that edge, over the same blanket and the same layers a [Modal](?path=/docs/patterns-overlays-modal--docs) takes. The Drawer follows the Modal's title, width and footer rules. One Drawer shows at a time. A confirm raised from a Drawer is a Modal in a second Blanket above it.
 
 </div>
 
@@ -230,10 +230,10 @@ None. The Drawer has no do and don't pairs.
 
 ### Related
 
-- [Modal](?path=/docs/foundations-patterns-modal--docs) is the centered layer for a task that blocks the page.
-- [Blanket](?path=/docs/foundations-patterns-blanket--docs) places the Drawer at an edge and draws the fill.
-- [Section](?path=/docs/foundations-patterns-section--docs) and [Card](?path=/docs/foundations-patterns-card--docs) hold content that belongs on the page itself.
-- <a href="?path=/docs/foundations-patterns-page-templates--docs">Page templates</a> show a medium Drawer over the page.
+- [Modal](?path=/docs/patterns-overlays-modal--docs) is the centered layer for a task that blocks the page.
+- [Blanket](?path=/docs/patterns-overlays-blanket--docs) places the Drawer at an edge and draws the fill.
+- [Section](?path=/docs/patterns-section-section--docs) and [Card](?path=/docs/patterns-section-card--docs) hold content that belongs on the page itself.
+- <a href="?path=/docs/patterns-templates--docs">Page templates</a> show a medium Drawer over the page.
 
 </div>
 

@@ -57,8 +57,8 @@ const ChatPage = ({ height = '100vh', withModal = false, ...args }) => {
 };
 
 export default {
-    title: 'Foundations/Patterns/AI chat',
-    id: 'foundations-patterns-ai-chat',
+    title: 'AI/AI chat',
+    id: 'ai-ai-chat',
     component: AiChat,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },

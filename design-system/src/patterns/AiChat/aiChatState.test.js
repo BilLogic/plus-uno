@@ -13,7 +13,7 @@ import {
 /**
  * AI chat's state: one pure reducer for which mode chat is in and whether it is
  * open, and the tab's memory of it. The rules are asserted here; what a person
- * sees of each mode is asserted in the `Foundations/Patterns/AI chat` stories.
+ * sees of each mode is asserted in the `AI/AI chat` stories.
  */
 const back = (mode) => (mode === 'fullscreen' ? 'popup' : mode);
 const closed = (mode = 'popup', from = back(mode)) => ({ mode, open: false, from });

@@ -81,7 +81,7 @@ const wideTable = (
 );
 
 export default {
-    title: 'Foundations/Patterns/Table',
+    title: 'Patterns/Section/Table',
     component: PatternTable,
     tags: ['!dev', '!autodocs'],
     argTypes: {

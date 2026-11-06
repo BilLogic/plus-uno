@@ -24,6 +24,17 @@
  *   4. Every segment after `Components/` is in sentence case: "Text field",
  *      not "Text Field". An all-caps acronym (AI, API) is allowed.
  *   5. No tracked file names a retired folder path.
+ *   6. The sidebar's roots lead with the site's sections, in order: Get
+ *      started, Foundations, Components, Patterns, AI, Tools. Our own extras
+ *      (Data visualizations, Specs, Deprecated) follow them.
+ *   7. Every docs page and story file under `design-system/src/` is titled
+ *      under a root the sidebar sort lists, so a page left under a retired
+ *      root (`Getting started/…`, `Foundations/Patterns/…`) cannot open a
+ *      stray top-level entry of its own.
+ *
+ * A component whose docs read as a layout area rather than a component (the
+ * Panel) is listed in the taxonomy's `patternComponents` and titled
+ * `Patterns/<name>`; its folder stays under its category.
  *
  * The categories are Atlassian's, read live from atlassian.design/components on
  * 2026-10-24. Only the ones with members are used; adding a member to another
@@ -56,6 +67,9 @@ export const ATLASSIAN_CATEGORIES = [
   'Text and data display',
 ];
 
+/** The site's top-level sections, in the order the sidebar shows them. */
+export const SITE_SECTIONS = ['Get started', 'Foundations', 'Components', 'Patterns', 'AI', 'Tools'];
+
 /**
  * Folders that held components before the move, as the repo path or the `@/`
  * alias, with or without a path after them. Assembled from parts so this file
@@ -81,6 +95,16 @@ export function isSentenceCase(segment) {
   return words.slice(1).every((w) => !/^[A-Z][a-z]/.test(w));
 }
 
+/** A docs file's title: a story file's default export, or an MDX page's `<Meta title>`. */
+export function docsTitle(src) {
+  const meta = /<Meta\b[^>]*?\btitle=["']([^"']+)["']/.exec(src);
+  return meta ? meta[1] : metaTitle(src);
+}
+
+/** The sidebar sort's roots, in order, without the `*` catch-all. */
+const sortRoots = (taxonomy) =>
+  (taxonomy.storySortOrder ?? []).filter((e) => typeof e === 'string' && e !== '*');
+
 /** The Components entries of the sidebar sort, groups only. */
 function sortGroups(taxonomy) {
   const order = taxonomy.storySortOrder ?? [];
@@ -101,12 +125,15 @@ const inputs = byRoot((repoRoot) => {
   const stories = tracked
     .filter((rel) => rel.startsWith('design-system/src/components/') && /\.stories\.[jt]sx?$/.test(rel))
     .map((rel) => ({ rel, title: metaTitle(fs.readFileSync(path.join(repoRoot, rel), 'utf8')) }));
-  return { taxonomy, folders, tracked, stories };
+  const pages = tracked
+    .filter((rel) => rel.startsWith('design-system/src/') && /(\.stories\.[jt]sx?|\.mdx)$/.test(rel))
+    .map((rel) => ({ rel, title: docsTitle(fs.readFileSync(path.join(repoRoot, rel), 'utf8')) }));
+  return { taxonomy, folders, tracked, stories, pages };
 });
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { taxonomy, folders, tracked, stories } = inputs(repoRoot);
+  const { taxonomy, folders, tracked, stories, pages } = inputs(repoRoot);
   const found = [];
 
   if (stories.length < MIN_FILES) {
@@ -160,6 +187,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     const [root, category, ...rest] = title.split('/');
     const parts = rel.split('/');
     const folder = parts.length > 4 ? parts[3] : '_internal';
+    if (root === 'Patterns' && (taxonomy.patternComponents ?? []).includes(category)) continue;
     if (root !== 'Components' || !groups.includes(category)) {
       found.push(
         `${rel}  is titled "${title}", outside every component category.\n` +
@@ -177,6 +205,27 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
       if (!isSentenceCase(segment)) {
         found.push(`${rel}  title segment "${segment}" is not sentence case.`);
       }
+    }
+  }
+
+  // (6) Site sections lead the sidebar.
+  const roots = sortRoots(taxonomy);
+  if (roots.slice(0, SITE_SECTIONS.length).join('|') !== SITE_SECTIONS.join('|')) {
+    found.push(
+      `storybook.taxonomy.json  storySortOrder roots must lead with ${SITE_SECTIONS.join(' · ')}.\n` +
+        `      -> Found ${roots.join(' · ')}.`,
+    );
+  }
+
+  // (7) Every docs title sits under a listed root.
+  for (const { rel, title } of pages) {
+    if (title === null) continue;
+    const root = title.split('/')[0];
+    if (!roots.includes(root)) {
+      found.push(
+        `${rel}  is titled "${title}", under "${root}", which the sidebar sort does not list.\n` +
+          `      -> Retitle it under one of ${roots.join(' · ')}.`,
+      );
     }
   }
 

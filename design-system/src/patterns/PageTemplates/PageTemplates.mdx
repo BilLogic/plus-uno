@@ -230,15 +230,15 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
 The default frame comes with three contents. **Blank** is one empty slot. **Dashboard** is a page header, metric cards and Sections. **Reading** caps the page at 864 for long-form text. Each is shown at Large, 1024.
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>content=blank</strong>. Keep the slot wrapper and replace what is inside it with Sections.</>}>
-    <ModeFrame storyId="foundations-patterns-page-templates--blank" width={1024} height={560} title="Blank page template at 1024" />
+    <ModeFrame storyId="patterns-templates--blank" width={1024} height={560} title="Blank page template at 1024" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>content=dashboard</strong>. Cards reflow to the most per row that keeps their minimum width.</>}>
-    <ModeFrame storyId="foundations-patterns-page-templates--dashboard" width={1024} height={560} title="Dashboard page template at 1024" />
+    <ModeFrame storyId="patterns-templates--dashboard" width={1024} height={560} title="Dashboard page template at 1024" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>content=reading</strong>. The content is capped at <code>--content-max-width-reading</code> 864 and centered.</>}>
-    <ModeFrame storyId="foundations-patterns-page-templates--reading" width={1024} height={560} title="Reading page template at 1024" />
+    <ModeFrame storyId="patterns-templates--reading" width={1024} height={560} title="Reading page template at 1024" />
 </DocsCanvasShell>
 
 </div>
@@ -250,15 +250,15 @@ The default frame comes with three contents. **Blank** is one empty slot. **Dash
 The mode is set once, on the template. The frame width follows it through `--screen-width`, and everything inside moves with it. The sidebar docks from Large, the page pad stays 24 at every width, and the content lands at 720, 736 and 1152.
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>Medium, 768.</strong> The sidebar is closed and the content is 720. Two medium cards fit in a row.</>}>
-    <ModeFrame storyId="foundations-patterns-page-templates--dashboard" width={768} height={560} title="Dashboard page template at 768" />
+    <ModeFrame storyId="patterns-templates--dashboard" width={768} height={560} title="Dashboard page template at 768" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>Large, 1024.</strong> The sidebar docks and the content is 736.</>}>
-    <ModeFrame storyId="foundations-patterns-page-templates--dashboard" width={1024} height={560} title="Dashboard page template at 1024" />
+    <ModeFrame storyId="patterns-templates--dashboard" width={1024} height={560} title="Dashboard page template at 1024" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>X-Large, 1440.</strong> The page pad is 24 and the content is 1152.</>}>
-    <ModeFrame storyId="foundations-patterns-page-templates--dashboard" width={1440} height={640} title="Dashboard page template at 1440" />
+    <ModeFrame storyId="patterns-templates--dashboard" width={1440} height={640} title="Dashboard page template at 1440" />
 </DocsCanvasShell>
 
 #### Sidebar over the page
@@ -266,7 +266,7 @@ The mode is set once, on the template. The frame width follows it through `--scr
 Below 1024 the sidebar is closed. Hovering the menu control, or the left edge of the frame, opens it over the page. It has the overlay shadow and no Blanket, and the page does not move. An outside click, Escape or the pointer leaving closes it. Clicking the control (or pressing Ctrl+[) opens it as an overlay instead: below 1024 the sidebar never docks.
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>Medium, 768.</strong> The sidebar open over the page.</>}>
-    <ModeFrame storyId="foundations-patterns-page-templates--sidebar-over-page" width={768} height={560} title="Sidebar open over the page at 768" />
+    <ModeFrame storyId="patterns-templates--sidebar-over-page" width={768} height={560} title="Sidebar open over the page at 768" />
 </DocsCanvasShell>
 
 </div>
@@ -278,19 +278,19 @@ Below 1024 the sidebar is closed. Hovering the menu control, or the left edge of
 The focused frame is the page for one task. It has no sidebar toggle, breadcrumb, Help Center or account. The topbar has Back and Close and the task's name, the sections sit in the 864 reading column, and the actions sit in a footer row.
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>frame=focused, Medium, 768.</strong> The reading column is the page less its pads, 720, and the actions line up with it.</>}>
-    <ModeFrame storyId="foundations-patterns-page-templates--focused" width={768} height={640} title="Focused page at 768" />
+    <ModeFrame storyId="patterns-templates--focused" width={768} height={640} title="Focused page at 768" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>frame=focused, Large, 1024.</strong> Back returns to where the person came from. Close leaves the task. The footer stays in place while the page scrolls.</>}>
-    <ModeFrame storyId="foundations-patterns-page-templates--focused" width={1024} height={640} title="Focused page at 1024" />
+    <ModeFrame storyId="patterns-templates--focused" width={1024} height={640} title="Focused page at 1024" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>frame=focused, X-Large, 1440.</strong> The column caps at 864 and is centered, and the actions cap with it.</>}>
-    <ModeFrame storyId="foundations-patterns-page-templates--focused" width={1440} height={640} title="Focused page at 1440" />
+    <ModeFrame storyId="patterns-templates--focused" width={1440} height={640} title="Focused page at 1440" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>footer? off.</strong> A read-only task, such as a report or a review with nothing to submit, drops the footer. Back can go too when the page opens from a link with no way back. Close then leaves the task.</>}>
-    <ModeFrame storyId="foundations-patterns-page-templates--focused-read-only" width={1024} height={480} title="Focused page without a footer at 1024" />
+    <ModeFrame storyId="patterns-templates--focused-read-only" width={1024} height={480} title="Focused page without a footer at 1024" />
 </DocsCanvasShell>
 
 Rules for the focused frame:
@@ -309,7 +309,7 @@ Rules for the focused frame:
 A drawer opens over the page template. The blanket covers the whole frame, the drawer runs the full height at the end edge, and its width is a modal width step. Escape, the close button or a click on the blanket closes it and returns focus to what opened it. The page stays where it was.
 
 <DocsCanvasShell attachSourceBelow={false} description={<>A <code>md</code> drawer over the dashboard at 1024: 677 wide. The page opens it from a button and holds its open state, passing it to the template's <code>drawer</code> prop.</>}>
-    <ModeFrame storyId="foundations-patterns-page-templates--with-drawer" width={1024} height={560} title="Page template with a drawer at 1024" />
+    <ModeFrame storyId="patterns-templates--with-drawer" width={1024} height={560} title="Page template with a drawer at 1024" />
 </DocsCanvasShell>
 
 </div>
@@ -417,11 +417,11 @@ The page template is `PageLayout`, which fills `Frame` with the PLUS topbar and 
 
 ### Related
 
-- [**Frame**](?path=/docs/foundations-patterns-frame--docs). The frame, its sidebar behavior and its parts, in detail.
-- [**Section**](?path=/docs/foundations-patterns-section--docs). The page header and the regions that fill the page.
-- [**Modal**](?path=/docs/foundations-patterns-modal--docs). A short decision over the page, instead of the focused frame.
-- [**Drawer**](?path=/docs/foundations-patterns-drawer--docs). A panel over the page that keeps it in view.
-- [**Blanket**](?path=/docs/foundations-patterns-blanket--docs). The screen grid and the fill a drawer or a modal sits in.
+- [**Frame**](?path=/docs/patterns-frame-frame--docs). The frame, its sidebar behavior and its parts, in detail.
+- [**Section**](?path=/docs/patterns-section-section--docs). The page header and the regions that fill the page.
+- [**Modal**](?path=/docs/patterns-overlays-modal--docs). A short decision over the page, instead of the focused frame.
+- [**Drawer**](?path=/docs/patterns-overlays-drawer--docs). A panel over the page that keeps it in view.
+- [**Blanket**](?path=/docs/patterns-overlays-blanket--docs). The screen grid and the fill a drawer or a modal sits in.
 
 </div>
 

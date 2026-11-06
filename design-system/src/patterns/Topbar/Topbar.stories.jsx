@@ -29,7 +29,7 @@ const LONG_TRAIL = [
 ];
 
 export default {
-    title: 'Foundations/Patterns/Topbar',
+    title: 'Patterns/Frame/Topbar',
     component: Topbar,
     tags: ['!dev', '!autodocs'],
     args: {

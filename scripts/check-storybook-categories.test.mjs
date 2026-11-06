@@ -8,6 +8,8 @@ import path from 'node:path';
 import {
   ATLASSIAN_CATEGORIES,
   MIN_FILES,
+  SITE_SECTIONS,
+  docsTitle,
   folderOf,
   isSentenceCase,
   run,
@@ -32,7 +34,18 @@ function fixture(files) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sb-categories-'));
   const taxonomy = {
     componentGroups: { 'Forms and inputs': [], Labels: [] },
-    storySortOrder: ['Components', ['Forms and inputs', [], 'Labels', []]],
+    patternComponents: ['Panel'],
+    storySortOrder: [
+      'Get started',
+      'Foundations',
+      'Components',
+      ['Forms and inputs', [], 'Labels', []],
+      'Patterns',
+      'AI',
+      'Tools',
+      'Specs',
+      '*',
+    ],
   };
   const all = {
     'storybook.taxonomy.json': JSON.stringify(taxonomy),
@@ -113,7 +126,7 @@ test('a group that is not an Atlassian category, and a sort that disagrees, go r
     path.join(root, 'storybook.taxonomy.json'),
     JSON.stringify({
       componentGroups: { 'Forms and inputs': [], Actions: [], Labels: [] },
-      storySortOrder: ['Components', ['Forms and inputs', [], 'Labels', []]],
+      storySortOrder: [...SITE_SECTIONS.slice(0, 3), ['Forms and inputs', [], 'Labels', []], ...SITE_SECTIONS.slice(3)],
     }),
   );
   const found = messages(root);
@@ -131,4 +144,43 @@ test('a retired folder is matched by repo path or alias, with no trailing path n
   const found = messages(root);
   assert.ok(found.some((m) => m.startsWith('docs/a.md')));
   assert.ok(!found.some((m) => m.startsWith('docs/b.md')));
+});
+
+test('a docs title is read from a story default export or an MDX Meta', () => {
+  assert.equal(docsTitle(story('Patterns/Frame')), 'Patterns/Frame');
+  assert.equal(docsTitle('<Meta\n  title="Get started/About"\n/>'), 'Get started/About');
+  assert.equal(docsTitle('<Meta of={Stories} />'), null);
+});
+
+test('the sidebar roots lead with the site sections, in order', () => {
+  const root = fixture({});
+  fs.writeFileSync(
+    path.join(root, 'storybook.taxonomy.json'),
+    JSON.stringify({
+      componentGroups: { 'Forms and inputs': [], Labels: [] },
+      storySortOrder: ['Getting started', 'Components', ['Forms and inputs', [], 'Labels', []], 'Patterns'],
+    }),
+  );
+  assert.ok(messages(root).some((m) => m.includes('roots must lead with')));
+});
+
+test('a docs page under a root the sidebar does not list goes red', () => {
+  const root = fixture({
+    'design-system/src/storybook-docs/Intro.mdx': '<Meta title="Getting started/Introduction" />\n',
+    'design-system/src/patterns/Frame.stories.jsx': story('Foundations/Patterns/Frame'),
+    'design-system/src/patterns/Page.stories.jsx': story('Patterns/Page'),
+  });
+  const found = messages(root);
+  assert.ok(found.some((m) => m.includes('Intro.mdx') && m.includes('"Getting started"')));
+  assert.ok(!found.some((m) => m.includes('Page.stories.jsx')));
+});
+
+test('a pattern-backed component may sit under Patterns, and only one the taxonomy names', () => {
+  const root = fixture({
+    'design-system/src/components/layout-and-structure/Panel.stories.jsx': story('Patterns/Panel'),
+    'design-system/src/components/labels/Tag.stories.jsx': story('Patterns/Tag'),
+  });
+  const found = messages(root);
+  assert.ok(!found.some((m) => m.includes('Panel.stories.jsx')));
+  assert.ok(found.some((m) => m.includes('Tag.stories.jsx')));
 });

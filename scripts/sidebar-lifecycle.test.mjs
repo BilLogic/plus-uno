@@ -49,7 +49,7 @@ test('the three lifecycle tags are the vocabulary', () => {
 });
 
 test('roots foundations, components, data-visualizations and specs start collapsed, by id', () => {
-  assert.deepEqual(COLLAPSED_ROOTS, ['foundations', 'components', 'data-visualizations', 'specs']);
+  assert.deepEqual(COLLAPSED_ROOTS, ['foundations', 'components', 'patterns', 'ai', 'tools', 'data-visualizations', 'specs']);
 });
 
 test('each badge is painted from tokens the manager theme resolves in every mode', () => {

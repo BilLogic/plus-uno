@@ -18,7 +18,7 @@ import { PatternCard, PatternSection, Page } from '@/patterns';
  * group, and a table's labels are column headers.
  */
 export default {
-    title: 'Foundations/Patterns/Heading outline',
+    title: 'Patterns/Page/Heading outline',
     tags: ['!dev', '!autodocs'],
 };
 

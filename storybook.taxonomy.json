@@ -3,9 +3,12 @@
   "version": 2,
   "$comment": "Single source of truth for the Storybook IA. After editing, run: node scripts/sync-storybook-sort.mjs — that regenerates the storySort literal between IA-SORT markers in .storybook/preview.jsx (Storybook requires a static literal; do not hand-edit the sort there). Grammar: docs/plans/2026-07-12-001-feat-ds-docs-ia-upgrade-plan.md",
   "titlePrefixes": [
-    "Getting started/",
+    "Get started/",
     "Foundations/",
     "Components/",
+    "Patterns/",
+    "AI/",
+    "Tools/",
     "Data visualizations/",
     "Specs/",
     "Deprecated/"
@@ -66,7 +69,6 @@
       "Accordion",
       "Carousel",
       "Page header",
-      "Panel",
       "Scrollbar",
       "Visually hidden"
     ],
@@ -107,6 +109,10 @@
       "Table"
     ]
   },
+  "$patternComponentsComment": "Components whose docs read as a layout area: titled Patterns/<name>, folder stays under its category (check:storybook-categories).",
+  "patternComponents": [
+    "Panel"
+  ],
   "specTypeOrder": [
     "Overview",
     "Elements",
@@ -122,9 +128,13 @@
   ],
   "docsFirstTag": "!dev",
   "storySortOrder": [
-    "Getting started",
+    "Get started",
     [
-      "Introduction"
+      "Design",
+      "Develop",
+      "With AI",
+      "Content design",
+      "About"
     ],
     "Foundations",
     [
@@ -142,24 +152,6 @@
       "Logos",
       "Motion",
       "Accessibility",
-      "Patterns",
-      [
-        "Introduction",
-        "Page templates",
-        "Frame",
-        "Page",
-        "Topbar",
-        "Sidebar",
-        "Section",
-        "List and detail",
-        "AI chat",
-        "Card",
-        "Table",
-        "Blanket",
-        "Modal",
-        "Popup family",
-        "Drawer"
-      ],
       "Imagery"
     ],
     "Components",
@@ -238,7 +230,6 @@
         "Accordion",
         "Carousel",
         "Page header",
-        "Panel",
         "Scrollbar",
         "Visually hidden"
       ],
@@ -287,6 +278,48 @@
         ],
         "Table"
       ]
+    ],
+    "Patterns",
+    [
+      "Introduction",
+      "Frame",
+      [
+        "Frame",
+        "Topbar"
+      ],
+      "Sidebar",
+      "Page",
+      [
+        "Page",
+        "Heading outline"
+      ],
+      "Panel",
+      "Section",
+      [
+        "Section",
+        "List and detail",
+        "Card",
+        "Table"
+      ],
+      "Overlays",
+      [
+        "Blanket",
+        "Modal",
+        "Drawer"
+      ],
+      "Popups",
+      "Templates"
+    ],
+    "AI",
+    [
+      "Overview",
+      "AI chat",
+      "AI identity candidates"
+    ],
+    "Tools",
+    [
+      "Overview",
+      "Documented contract"
     ],
     "Data visualizations",
     [

@@ -7,7 +7,7 @@ import PatternSection, { SectionToolbar } from './PatternSection';
  * own, a `_Section header` of five types, a body laid out single, split or
  * as subsections, an optional footer, a toolbar with a default and a selected
  * state, and a loading header. Sizes and colors are asserted in the browser,
- * in the `Foundations/Patterns/Section` stories; this file holds structure.
+ * in the `Patterns/Section/Section` stories; this file holds structure.
  */
 const section = (container) => container.querySelector('section');
 

@@ -159,7 +159,7 @@ function LayoutsDemo() {
 }
 
 export default {
-    title: 'Foundations/Patterns/Section',
+    title: 'Patterns/Section/Section',
     component: PatternSection,
     tags: ['!dev', '!autodocs'],
     argTypes: {
