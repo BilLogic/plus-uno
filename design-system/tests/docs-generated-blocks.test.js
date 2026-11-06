@@ -12,9 +12,9 @@ import path from 'node:path';
 const root = path.resolve(__dirname, '../..');
 const read = (rel) => fs.readFileSync(path.join(root, rel), 'utf8');
 
-const MOVED = [
-  'design-system/src/components/forms-and-inputs/IconButton/IconButton.mdx',
-];
+const BUTTONS = ['Button', 'ButtonGroup', 'CloseButton', 'FilterButton', 'IconButton', 'LinkButton', 'LinkIconButton', 'SplitButton', 'VerticalButton'].map(
+  (name) => `design-system/src/components/forms-and-inputs/${name}/${name}.mdx`,
+);
 
 describe('generated docs blocks', () => {
   it('the shared layout exports DocsProperties, DocsSource and DocsStories', () => {
@@ -24,16 +24,8 @@ describe('generated docs blocks', () => {
     }
   });
 
-  it.each(MOVED)('%s renders Properties from the story meta, not a hand table', (file) => {
+  it.each(BUTTONS)('%s takes its props table from the Code tab, so the page authors none', (file) => {
     const mdx = read(file);
-    const section = mdx.match(/## Properties\n([\s\S]*?)(?=\n## |\n<\/div>)/);
-    expect(section, 'has a Properties section').not.toBeNull();
-    expect(section[1]).toMatch(/<DocsProperties of=\{\w+Stories\} \/>/);
-    expect(section[1]).not.toMatch(/<DocsTable|<tr>/);
-  });
-
-  it('Button takes its props table from the Code tab, so the page authors none', () => {
-    const mdx = read('design-system/src/components/forms-and-inputs/Button/Button.mdx');
     expect(mdx).not.toMatch(/^## Properties/m);
     expect(mdx).not.toMatch(/<th>(Prop|Property|Default)<\/th>/);
   });
