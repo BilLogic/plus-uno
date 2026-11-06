@@ -167,7 +167,7 @@ export const HoveredState = {
     },
 };
 
-/** Keyboard focus on the month buttons draws the 2px ring, 2px off the edge. */
+/** Keyboard focus on a month button or a day draws the 2px ring, 2px off the edge. */
 export const KeyboardFocus = {
     parameters: { docs: { disable: true } },
     render: () => <Calendar viewDate={october} onViewDateChange={none} onPick={none} />,
@@ -181,5 +181,13 @@ export const KeyboardFocus = {
         await expect(px(style.outlineOffset)).toBe(2);
         await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
         next.blur();
+        const picked = day(canvasElement, /October 14, 2026/);
+        picked.style.transition = 'none';
+        picked.focus({ focusVisible: true });
+        const dayStyle = getComputedStyle(picked);
+        await waitFor(() => expect(dayStyle.outlineStyle).toBe('solid'));
+        await expect(px(dayStyle.outlineWidth), 'day ring width').toBe(2);
+        await expect(dayStyle.outlineColor, 'day ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        picked.blur();
     },
 };

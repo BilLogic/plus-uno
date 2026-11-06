@@ -235,7 +235,7 @@ The underlying value is still checked or unchecked. Clicking a mixed box resolve
 - **A checkbox with no `label` has no accessible name.** Where the design has no room for visible text, pass `aria-label`; it is spread onto the input.
 - **Do not disable a box that must stay reachable.** Use `isInvalid` with a message linked by `aria-describedby`, so a screen reader user hears why the option cannot be chosen.
 - **Include an error message for a required or invalid box**, for example "Select an option".
-- **`isRequired` reaches the input**, so native validation applies. The marker is a span marked `aria-label="required"`.
+- **`isRequired` reaches the input**, so native validation applies. The marker is decoration, hidden from assistive technology.
 - **`isIndeterminate` is set on the DOM node**, the only way to express it. Screen readers report it as "mixed".
 - **Keyboard focus is a 2px ring on `border.focused`, 2px off the box.** A pointer focus draws none. Space toggles the box; Enter does not.
 - **Group related boxes** in a Fieldset with a `legend`: a Checkbox group.

@@ -9,7 +9,7 @@ Built from the shared parts: the field is `FieldBox`, which owns the box, the bo
 
 **Source:** `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickTime, TwentyFourHourValueIsSplit
+**Stories:** `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickTime, TwentyFourHourValueIsSplit, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.mdx`
 
@@ -48,6 +48,4 @@ From `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.scss`.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

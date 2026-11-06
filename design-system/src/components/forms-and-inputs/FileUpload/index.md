@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.stories.jsx` — Overview, Content, Styles, InteractionStates, ReadOnly, WithFiles, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.stories.jsx` — Overview, Content, Styles, InteractionStates, ReadOnly, WithFiles, Interactive, Default, Required, Invalid, Valid, Disabled, KeyboardFocus
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.mdx`
 
@@ -41,7 +41,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--color-danger` · `--color-success` · `--ds-background-danger-subtler` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border-focused` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-md` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-small` · `--ds-background-danger-subtler` · `--ds-background-neutral` · `--ds-background-success-subtler` · `--ds-border-focused` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-success` · `--focus-ring-width` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-md` · `--space-0125` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.scss`. Override these through the token layer, never with a literal.
 

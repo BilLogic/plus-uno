@@ -9,7 +9,7 @@ A thin, token-styled wrap around Base UI's Fieldset: `Root` renders the `<fields
 
 **Source:** `design-system/src/components/forms-and-inputs/Fieldset.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Fieldset.stories.jsx` — Default, CheckboxGroup, WithRequiredAndError
+**Stories:** `design-system/src/components/forms-and-inputs/Fieldset.stories.jsx` — Default, CheckboxGroup, WithRequiredAndError, Required, Invalid, Disabled, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Fieldset.mdx`
 
@@ -36,6 +36,4 @@ From `design-system/src/components/forms-and-inputs/Fieldset.scss`. Override the
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

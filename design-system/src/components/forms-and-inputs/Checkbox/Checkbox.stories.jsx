@@ -381,7 +381,9 @@ export const Disabled = {
 export const Required = {
     render: () => <Checkbox id="cb-ex-required" label="I accept the terms" isRequired />,
     play: async ({ canvasElement }) => {
-        await expect(canvasElement.querySelector('[aria-label="required"]')).toBeInTheDocument();
+        const el = box(canvasElement, 'I accept the terms');
+        await expect(el).toHaveClass('plus-form-checkbox-required');
+        await expect(canvasElement.querySelector('.plus-field-required')).toHaveAttribute('aria-hidden', 'true');
     },
 };
 
