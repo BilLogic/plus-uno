@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--color-danger-text` · `--color-primary-text` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-border-focused` · `--ds-interaction-hovered` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text` · `--image-md` · `--image-sm` · `--inline-md` · `--item-height-md` · `--label-height-md` · `--label-max-width` · `--pad-x-md` · `--pad-x-sm` · `--pad-y-md` · `--radius-full` · `--radius-h32` · `--radius-md` · `--space-0625`
+`--body-default` · `--body-small` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-interaction-hovered` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text` · `--ds-text-brand` · `--ds-text-danger` · `--image-md` · `--image-sm` · `--inline-md` · `--item-height-md` · `--label-height-md` · `--label-max-width` · `--pad-x-md` · `--pad-x-sm` · `--pad-y-md` · `--radius-full` · `--radius-h32` · `--radius-md` · `--space-0625`
 
 From `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.scss`. Override these through the token layer, never with a literal.
 

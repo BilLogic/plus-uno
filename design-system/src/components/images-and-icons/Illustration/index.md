@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/images-and-icons/Illustration/Illustration.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/Illustration/Illustration.stories.jsx` — Gallery, SmartCharacters, MathCharacters, Sizes, DefaultSize, Decorative, Titled, MasteringContent, Advocacy, Technology, Relationships, SocialEmotional, Dot, ApproximatelyEqual, Root, All, Pi, Equal, Divider, Interactive
+**Stories:** `design-system/src/components/images-and-icons/Illustration/Illustration.stories.jsx` — Gallery, SmartCharacters, MathCharacters, Sizes, DefaultSize, Rest, Decorative, Titled, MasteringContent, Advocacy, Technology, Relationships, SocialEmotional, Dot, ApproximatelyEqual, Root, All, Pi, Equal, Divider, Interactive
 
 **Storybook page:** `design-system/src/components/images-and-icons/Illustration/Illustration.mdx`
 
