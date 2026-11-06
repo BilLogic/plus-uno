@@ -9,7 +9,7 @@ Notion's multi-select. Focusing the field opens a list of the options. Typing fi
 
 **Source:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, PastedTagsGetTagColors, MaxLength, PickLimit, CollapsesWithoutFocus, SmallFitsItsTags, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, OptionMenuRenames, OptionMenuDeletes, OptionMenuChangesColor, KeyboardReorder, DragReorder, NoTidyingWithoutHandlers, OptionMenu, Reordering, Overview, Spacings, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.stories.jsx` — TypingFilters, CreateWhenNothingMatches, MatchIgnoresCase, ClickPicks, BackspaceRemovesTheLastTag, EscClearsOnlyTheText, PasteSplitsOnCommas, PastedTagsGetTagColors, MaxLength, PickLimit, CollapsesWithoutFocus, SmallFitsItsTags, TemporaryIdUntilConfirmed, ReadOnly, Invalid, Disabled, Controlled, OptionMenuRenames, OptionMenuDeletes, OptionMenuChangesColor, KeyboardReorder, DragReorder, NoTidyingWithoutHandlers, OptionMenu, Reordering, Overview, Spacings, Interactive, Rest, Hovered, Focused, FieldDisabled
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TagInput/TagInput.mdx`
 

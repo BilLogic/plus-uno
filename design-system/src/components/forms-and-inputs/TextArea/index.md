@@ -9,7 +9,7 @@ Text area — free text over several lines, on `_Field`. The field is 80 high at
 
 **Source:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.stories.jsx` — Overview, Rows, Spacing, States, FocusRing, Count, Subtle, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.stories.jsx` — Overview, Rows, Spacing, States, FocusRing, Count, Subtle, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.mdx`
 

@@ -9,7 +9,7 @@ Text field — a labeled single-line field on `_Field`, 40 high and 32 when `spa
 
 **Source:** `design-system/src/components/forms-and-inputs/TextField/TextField.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TextField/TextField.stories.jsx` — Overview, Content, Validation, Spacing, States, FocusRing, Interactive, Anatomy, ErrorAndCount, Warning, Autofill, Search, ButtonsInside, Subtle, CaptionColors, NumberSteppers, NumberEmptyIsNotZero, NumberClampOnBlur, NumberWheelLeavesTheValue, NumberReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/TextField/TextField.stories.jsx` — Overview, Content, Validation, Spacing, States, FocusRing, Interactive, Anatomy, ErrorAndCount, Warning, Autofill, Search, ButtonsInside, Subtle, CaptionColors, NumberSteppers, NumberEmptyIsNotZero, NumberClampOnBlur, NumberWheelLeavesTheValue, NumberReadOnly, Rest, Hovered, Focused, FieldDisabled, FieldInvalid
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TextField/TextField.mdx`
 
