@@ -18,7 +18,7 @@
 | `children` | node (required) | — | The status text, as people say it: "Needs review", "Due tomorrow". |
 | `appearance` | enum | `'neutral'` | The meaning. Info is Tertiary; discovery is the curriculum purple. |
 | `spacing` | enum | `'default'` | `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. |
-| `leadingVisual` | string or node | — | One icon before the label: a Font Awesome solid name (`circle-check`) or a node. |
+| `leadingVisual` | string or node | — | One icon before the label: a Font Awesome Free name (`circle-check`) or a node. |
 | `trailingMetric` | number or string | — | A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. |
 | `trailingMetricAppearance` | oneOf | — | The Count tag's appearance. Defaults to the Status tag's own. |
 | `maxWidth` | number or string | `200` | The widest the Status tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. |

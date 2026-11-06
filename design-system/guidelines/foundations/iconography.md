@@ -17,7 +17,7 @@ Pass the icon name as a string to `iconBefore` or `iconAfter`:
 <Button appearance="primary" text="Next" iconAfter="arrow-right" />
 ```
 
-This automatically renders: `<i className="fa-solid fa-{icon-name}"></i>`
+This renders `<i className="fa-regular fa-{icon-name}"></i>`, or `fa-solid` where Font Awesome Free has no regular weight (`iconClass` in `design-system/src/lib/icon.js` decides).
 
 ### Node Prop (Advanced)
 For custom icons or non-FA icons, pass a React node:
@@ -62,7 +62,8 @@ Before using an icon, verify it exists in FontAwesome Free:
 ## Foundation rules
 
 - Icons come in three sizes: 12 (`--icon-sm`: chevrons, validation, compact parts), 16 (`--icon-md`: the default beside text) and 24 (`--icon-lg`). Above 24, use a Tile.
-- Font Awesome Free only: `fa-solid`, `fa-regular`, `fa-brands`. Pro families render blank.
+- Font Awesome Free 7.2 only: `fa-solid`, `fa-regular`, `fa-brands`. Pro families render blank. Regular is the default weight; solid only where Free has no regular. Where one set needs a glyph Free draws only solid, that glyph is solid; do not pick solid for the rest.
+- An icon's box is its font size (`--fa-width: 1em`, set globally), so the glyph fills the square it is sized to.
 - Color an icon with a color token; a status icon takes its hue's icon token.
 - Pair an icon with a label where there is room; one glyph for one meaning. Before adding an icon, check that a similar one does not exist, that an existing one cannot serve, that it cannot be confused with another and that a label would not do better.
 - Partner and tool logos go in a Tile, never in the Logo set.

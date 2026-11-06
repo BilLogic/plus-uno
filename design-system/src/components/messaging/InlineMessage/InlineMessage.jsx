@@ -4,6 +4,7 @@ import Popup from '../../overlays-and-layering/Popup/Popup';
 import { IconButton } from '../../forms-and-inputs/IconButton/IconButton';
 import { messageIcon } from '../messageAppearance';
 import './InlineMessage.scss';
+import { iconClass } from '../../../lib/icon';
 
 /**
  * The appearances this library has a role token for. ADS also offers
@@ -41,7 +42,7 @@ export const InlineMessage = ({
         <Popup
             trigger={(
                 <IconButton
-                    icon={<i className={`fa-solid fa-${glyph}`} style={{ color: `var(${token})` }} aria-hidden="true" />}
+                    icon={<i className={iconClass(glyph)} style={{ color: `var(${token})` }} aria-hidden="true" />}
                     label={label}
                     appearance="subtle"
                     spacing="compact"

@@ -425,7 +425,7 @@ export const IconColors = () => (
                     icon={(
                         <>
                             <i className="fa-brands fa-github" data-glyph="brands" aria-hidden="true" />
-                            <i className="fa-light fa-star" data-glyph="light" aria-hidden="true" />
+                            <i className="fa-regular fa-star" data-glyph="regular" aria-hidden="true" />
                             <span data-glyph="text">A</span>
                         </>
                     )}
@@ -446,7 +446,7 @@ IconColors.play = async ({ canvasElement }) => {
         await expect(colorOf(glyph), `${type}: the default glyph is ${token}`).toBe(hue);
 
         const custom = card('custom');
-        for (const style of ['brands', 'light']) {
+        for (const style of ['brands', 'regular']) {
             const el = custom.querySelector(`[data-glyph="${style}"]`);
             await expect(colorOf(el), `${type}: a ${style} glyph is ${token}`).toBe(hue);
         }
