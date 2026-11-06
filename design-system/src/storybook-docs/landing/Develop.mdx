@@ -1,7 +1,5 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { FoundationHero, FoundationContents, FoundationSection } from '@/storybook-docs/foundation-page.jsx';
-
-export const Go = ({ id, children }) => <a href={`?path=/docs/${id}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{children}</a>;
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 
 <Meta title="Get started/Develop" tags={['!dev']} />
 
@@ -14,16 +12,16 @@ export const Go = ({ id, children }) => <a href={`?path=/docs/${id}--docs`} styl
 
 <FoundationSection title="Start here">
 
-- Run Storybook locally: the steps are on <Go id="get-started-about">About</Go>.
+- Run Storybook locally: the steps are on <DocsLink id="get-started-about">About</DocsLink>.
 - Check that a component exists before you use it: `design-system/agent-views/components/index.md` is the generated list.
 - Import public components from the `@/components` barrel, never from a component's own folder.
-- Style with `--ds-*` tokens, never literal values: <Go id="foundations-tokens">Tokens</Go> explains the names.
+- Style with `--ds-*` tokens, never literal values: <DocsLink id="foundations-tokens">Tokens</DocsLink> explains the names.
 - Build new interactive behavior (open and closed state, focus, keyboard) on Base UI, styled on the tokens.
 
 </FoundationSection>
 
 <FoundationSection title="Pages">
 
-A new page starts from a template in <Go id="patterns-templates">Templates</Go>, sits in a <Go id="patterns-frame-frame">Frame</Go> and is filled with <Go id="patterns-section-section">Sections</Go>.
+A new page starts from a template in <DocsLink id="patterns-templates">Templates</DocsLink>, sits in a <DocsLink id="patterns-frame-frame">Frame</DocsLink> and is filled with <DocsLink id="patterns-section-section">Sections</DocsLink>.
 
 </FoundationSection>

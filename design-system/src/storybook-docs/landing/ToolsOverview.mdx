@@ -1,7 +1,5 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { FoundationHero, FoundationContents, FoundationSection } from '@/storybook-docs/foundation-page.jsx';
-
-export const Go = ({ id, children }) => <a href={`?path=/docs/${id}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{children}</a>;
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 
 <Meta title="Tools/Overview" tags={['!dev']} />
 
@@ -14,8 +12,8 @@ export const Go = ({ id, children }) => <a href={`?path=/docs/${id}--docs`} styl
 
 <FoundationSection title="Generators">
 
-- `npm run regenerate` runs every generator in order, then the ratchets. Generated files are never edited by hand.
-- `node scripts/sync-storybook-sort.mjs` writes this sidebar's order from `storybook.taxonomy.json`.
+- `npm run regenerate` runs the generators in the order their inputs need, then the ratchets. Generated files are never edited by hand.
+- `node scripts/sync-storybook-sort.mjs` is run on its own after a taxonomy edit: it writes this sidebar's order from `storybook.taxonomy.json`.
 
 </FoundationSection>
 
@@ -23,12 +21,12 @@ export const Go = ({ id, children }) => <a href={`?path=/docs/${id}--docs`} styl
 
 - `npm run check:harness` says which generated file is stale.
 - `npm run check:storybook-categories` holds the sidebar sections, component groups and story titles to the taxonomy.
-- <a href="?path=/story/tools-documented-contract--documented-variants-render" style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>Documented contract</a> mounts every prop and variant the docs name, in a real browser.
+- <DocsLink id="tools-documented-contract" story="documented-variants-render">Documented contract</DocsLink> mounts every prop and variant the docs name, in a real browser.
 
 </FoundationSection>
 
 <FoundationSection title="Related">
 
-- <Go id="get-started-with-ai">With AI</Go>: what an agent reads from this design system.
+- <DocsLink id="get-started-with-ai">With AI</DocsLink>: what an agent reads from this design system.
 
 </FoundationSection>

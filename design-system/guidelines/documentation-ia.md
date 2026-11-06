@@ -17,7 +17,7 @@ and regenerate rather than touching the literal.
 
 ## The tree
 
-- **Top level:** Get started · Foundations · Components · Patterns · AI · Tools, then our own Data visualizations · Specs · Deprecated. The first six are the benchmark site's sections in its order, with Patterns as our addition; `npm run check:storybook-categories` holds the sort to that order and fails any page titled under a root the sort does not list.
+- **Top level:** Get started · Foundations · Components · Patterns · AI · Tools, then our own Data visualizations · Specs · Deprecated. The first six are the benchmark site's sections in its order, with Patterns as our addition; `npm run check:storybook-categories` holds the sort to that order and fails any page under `design-system/src/` titled under a root the sort does not list.
 - **Get started:** Design · Develop · With AI · Content design · About. About is the old Introduction page; the other four are short landing pages that point into the tree (`design-system/src/storybook-docs/landing/`).
 - **Foundations:** source still lives in `design-system/src/styles/` + `design-system/src/assets/`. Patterns no longer sit under Foundations.
 - **Patterns:** Introduction · Frame (Frame, Topbar) · Sidebar · Page (Page, Heading outline) · Panel · Section (Section, List and detail, Card, Table) · Overlays (Blanket, Modal, Drawer) · Popups · Templates. Source lives in `design-system/src/patterns/`. The Panel's docs are the Panel component's: a component whose docs read as a layout area is listed in the taxonomy's `patternComponents` and titled `Patterns/<name>`, while its folder stays under its category.

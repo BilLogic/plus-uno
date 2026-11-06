@@ -24,9 +24,9 @@
  *   4. Every segment after `Components/` is in sentence case: "Text field",
  *      not "Text Field". An all-caps acronym (AI, API) is allowed.
  *   5. No tracked file names a retired folder path.
- *   6. The sidebar's roots lead with the site's sections, in order: Get
- *      started, Foundations, Components, Patterns, AI, Tools. Our own extras
- *      (Data visualizations, Specs, Deprecated) follow them.
+ *   6. The sidebar's roots lead with the benchmark site's sections plus our
+ *      Patterns, in order: Get started, Foundations, Components, Patterns, AI,
+ *      Tools. Our own extras (Data visualizations, Specs, Deprecated) follow.
  *   7. Every docs page and story file under `design-system/src/` is titled
  *      under a root the sidebar sort lists, so a page left under a retired
  *      root (`Getting started/…`, `Foundations/Patterns/…`) cannot open a
@@ -67,7 +67,7 @@ export const ATLASSIAN_CATEGORIES = [
   'Text and data display',
 ];
 
-/** The site's top-level sections, in the order the sidebar shows them. */
+/** The sidebar's leading sections, in order: the benchmark site's five, with our Patterns after Components. */
 export const SITE_SECTIONS = ['Get started', 'Foundations', 'Components', 'Patterns', 'AI', 'Tools'];
 
 /**

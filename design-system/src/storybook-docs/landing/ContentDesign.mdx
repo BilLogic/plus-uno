@@ -1,7 +1,5 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { FoundationHero, FoundationContents, FoundationSection } from '@/storybook-docs/foundation-page.jsx';
-
-export const Go = ({ id, children }) => <a href={`?path=/docs/${id}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{children}</a>;
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 
 <Meta title="Get started/Content design" tags={['!dev']} />
 
@@ -16,6 +14,7 @@ export const Go = ({ id, children }) => <a href={`?path=/docs/${id}--docs`} styl
 
 The content guidance lives in the repo, under `design-system/guidelines/foundations/content/`:
 
+- `overview.md`: the index, which file answers which question.
 - `voice-and-tone.md`: how PLUS sounds.
 - `language-and-grammar.md`: the house rules for grammar, capitalization and punctuation.
 - `message-design.md`: errors, warnings, success messages and empty states.
@@ -26,6 +25,6 @@ The content guidance lives in the repo, under `design-system/guidelines/foundati
 
 <FoundationSection title="Related">
 
-- <Go id="foundations-typography">Typography</Go>: the text styles the words are set in.
+- <DocsLink id="foundations-typography">Typography</DocsLink>: the text styles the words are set in.
 
 </FoundationSection>

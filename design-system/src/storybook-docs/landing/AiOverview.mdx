@@ -1,7 +1,5 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { FoundationHero, FoundationContents, FoundationSection } from '@/storybook-docs/foundation-page.jsx';
-
-export const Go = ({ id, children }) => <a href={`?path=/docs/${id}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{children}</a>;
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
 
 <Meta title="AI/Overview" tags={['!dev']} />
 
@@ -14,8 +12,8 @@ export const Go = ({ id, children }) => <a href={`?path=/docs/${id}--docs`} styl
 
 <FoundationSection title="Patterns and foundations">
 
-- <Go id="ai-ai-chat">AI chat</Go>: the conversation with PLUS AI, as a popup, in the Panel or full screen.
-- <Go id="ai-ai-identity-candidates">AI identity candidates</Go>: candidate register colors for PLUS AI, measured side by side.
+- <DocsLink id="ai-ai-chat">AI chat</DocsLink>: the conversation with PLUS AI, as a popup, in the Panel or full screen.
+- <DocsLink id="ai-ai-identity-candidates" story="candidates">AI identity candidates</DocsLink>: candidate register colors for PLUS AI, measured side by side.
 
 </FoundationSection>
 
@@ -23,11 +21,11 @@ export const Go = ({ id, children }) => <a href={`?path=/docs/${id}--docs`} styl
 
 These live with the other components, in their groups.
 
-- <Go id="components-images-and-icons-ai-icon">AI icon</Go>
-- <Go id="components-labels-ai-label-ai-label">AI label</Go>
-- <Go id="components-labels-ai-label-ai-message">AI message</Go>
-- <Go id="components-labels-ai-label-prompt-starters">Prompt starters</Go>
-- <Go id="components-labels-ai-label-suggestion">Suggestion</Go>
-- <Go id="components-loading-generative-border">Generative border</Go>
+- <DocsLink id="components-images-and-icons-ai-icon">AI icon</DocsLink>
+- <DocsLink id="components-labels-ai-label-ai-label">AI label</DocsLink>
+- <DocsLink id="components-labels-ai-label-ai-message">AI message</DocsLink>
+- <DocsLink id="components-labels-ai-label-prompt-starters">Prompt starters</DocsLink>
+- <DocsLink id="components-labels-ai-label-suggestion">Suggestion</DocsLink>
+- <DocsLink id="components-loading-generative-border">Generative border</DocsLink>
 
 </FoundationSection>
