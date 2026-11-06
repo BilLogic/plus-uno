@@ -7,7 +7,7 @@ import Tag, { TagContext } from '../Tag';
 import TagGroup from '../TagGroup';
 import Suggestion, { SUGGESTION_TYPES } from './Suggestion';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 
 /**

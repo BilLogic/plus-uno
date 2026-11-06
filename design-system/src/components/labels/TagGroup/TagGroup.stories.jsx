@@ -7,7 +7,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import Tag from '../Tag';
 import Suggestion from '../Suggestion';
 import TagGroup from './TagGroup';
-import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { expectGroundUnder, expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 
 /**
  * `TagGroup` — the gaps, the wrapping, the alignment and the disabled field.

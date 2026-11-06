@@ -6,7 +6,7 @@ import { computedShadow, probe, px, tokenColor } from '@/storybook-docs/lib/styl
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import Tag, { AVATAR_TAG_TYPES, TAG_COLORS, TagContext } from './Tag';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectFocusRing as expectRing } from '@/storybook-docs/lib/button-states.js';
 
 /**
@@ -1623,10 +1623,11 @@ export const Focused = {
 
 /** Disabled: the disabled ground and words, no ×, out of the tab order, and held under hover and press. */
 export const Disabled = {
-    render: () => <Tag isSelected={false} color="blue" isDisabled>Science</Tag>,
+    render: () => <Tag isSelected={false} isRemovable onAfterRemoveAction={() => {}} color="blue" isDisabled>Science</Tag>,
     play: async ({ canvasElement }) => {
         const tag = within(canvasElement).getByRole('button', { name: 'Science' });
         await expect(tag).toBeDisabled();
+        await expect(within(canvasElement).queryByRole('button', { name: /^Remove/ }), 'no ×').toBeNull();
         await expectGroundUnder(canvasElement, tag, undefined, '--ds-background-disabled', 'disabled');
         await expectGroundUnder(canvasElement, tag, ':hover', '--ds-background-disabled', 'disabled');
         await expectGroundUnder(canvasElement, tag, ':active', '--ds-background-disabled', 'disabled');

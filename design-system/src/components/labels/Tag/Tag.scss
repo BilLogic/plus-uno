@@ -242,7 +242,7 @@ $tag-colors: (
     border-radius: var(--radius-full);
 }
 
-/* Radius 2: a primitive, because no Element radius token is 2. */
+/* Radius 2: the small radius role. */
 .plus-tag__avatar--team {
     border-radius: var(--radius-sm);
 }
