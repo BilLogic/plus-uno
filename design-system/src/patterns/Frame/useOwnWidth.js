@@ -5,7 +5,7 @@ const SERVER_RENDER_WIDTH = 1440;
 
 /**
  * The width of the box `ref` points at, kept current by a ResizeObserver and
- * the window's resize event. Frame and List and detail both size themselves
+ * the window's resize event. Frame and Section detail both size themselves
  * from their own box rather than the window, so they share this one hook.
  * A box that measures 0 (hidden, not laid out) keeps the last width it had.
  * Before the first measure it reads the window, or `fallback` where there is none.

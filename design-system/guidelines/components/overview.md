@@ -44,7 +44,7 @@ benchmark for every page, so a name that matches it needs no row.
 | Page (pattern) | Main | The content area inside the Frame, with the page title |
 | Panel (area) | Panel | Same name; the app-level area at the right of the Frame, holding AI chat first |
 | Frame (informal) | none | "App shell" is an informal alias in talk only; code and docs say Frame |
-| List and detail (layout) | none | A page layout PLUS adds: a record opens beside its list, 7 + 5 columns |
+| Section detail (region) | none | A region PLUS adds to Section: a record opens beside its list, 7 + 5 columns |
 | Docked | Inline (side nav mode) | We say docked for a Sidebar or Panel that sits beside the Page and moves it |
 | Peek | Flyout (side nav mode) | We say peek for a closed Sidebar, or a closed Panel with `panelPeek`, shown over the Page, which does not move |
 | Splitter | Splitter | Same name; the draggable edge that resizes the docked Panel |

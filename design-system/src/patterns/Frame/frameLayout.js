@@ -1,6 +1,6 @@
 /**
  * Frame layout resolver. One pure function: the Frame's width, the Panel's
- * width, the Sidebar's request, the chat mode and whether a List and detail
+ * width, the Sidebar's request, the chat mode and whether a Section detail
  * layout is active go in; the Sidebar state, the Panel state, the Panel's
  * width, whether the split holds and whether a Blanket shows come out. Fit is measured from the
  * Frame's own width, never the window.
@@ -14,7 +14,7 @@
  *   4. Otherwise the Sidebar auto-collapses (restored when the Panel closes)
  *      if that keeps the floor with the Panel docked.
  *   5. Otherwise the Panel goes to overlay.
- *   6. For List and detail the split holds from 960, met by collapsing the
+ *   6. For Section detail the split holds from 960, met by collapsing the
  *      Sidebar first when the Panel is docked. When even a collapsed Sidebar
  *      leaves under 960 the Panel stays docked and the detail replaces the
  *      list. While a split holds, the splitter's maximum keeps 960.
@@ -44,7 +44,7 @@ export const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
 
 /**
  * The splitter's widest docked Panel: it keeps the 720 content floor beside
- * whatever is docked now, or 960 while a List and detail split holds, so a
+ * whatever is docked now, or 960 while a Section detail split holds, so a
  * drag never breaks the split.
  */
 export function dockedPanelMax({ frameWidth, sidebarDocked, splitHolds }) {
@@ -60,7 +60,7 @@ export function dockedPanelMax({ frameWidth, sidebarDocked, splitHolds }) {
  * @param {{open: boolean, setBy: 'hand' | 'default'}} [input.sidebar]
  * @param {boolean} [input.sidebarPeek] hover on the collapsed Sidebar's toggle
  * @param {'popup' | 'panel' | 'fullscreen'} [input.chatMode]
- * @param {boolean} [input.listDetail]
+ * @param {boolean} [input.sectionDetail]
  * @returns {{
  *   sidebar: 'docked' | 'collapsed' | 'peeking' | 'overlay',
  *   panel: 'none' | 'docked' | 'overlay',
@@ -75,7 +75,7 @@ export function resolveFrameLayout({
     sidebar = { open: true, setBy: 'default' },
     sidebarPeek = false,
     chatMode = 'popup',
-    listDetail = false,
+    sectionDetail = false,
 }) {
     const narrow = frameWidth < L.dockMin;
     const wantsPanel = chatMode === 'panel';
@@ -125,9 +125,9 @@ export function resolveFrameLayout({
         panelState = 'overlay';
     }
 
-    // Rule 6: collapse a default Sidebar to keep the List and detail split.
+    // Rule 6: collapse a default Sidebar to keep the Section detail split.
     if (
-        listDetail &&
+        sectionDetail &&
         panelState === 'docked' &&
         sidebarState === 'docked' &&
         !byHand &&
@@ -147,7 +147,7 @@ export function resolveFrameLayout({
         sidebar: sidebarState,
         panel: panelState,
         panelWidth: effectivePanelWidth,
-        splitHolds: listDetail && rawContent >= L.splitFloor,
+        splitHolds: sectionDetail && rawContent >= L.splitFloor,
         // The Blanket belongs to an overlay Panel only: a raised Sidebar has none.
         blanket: panelState === 'overlay',
     };

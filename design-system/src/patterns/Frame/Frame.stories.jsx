@@ -89,9 +89,9 @@ export default {
             description: 'Hovering the right edge peeks a closed Panel over the Page, with no Blanket. Off by default.',
             table: { category: 'Design' },
         },
-        listDetail: {
+        sectionDetail: {
             control: 'boolean',
-            description: 'A List and detail layout is on the Page: the Sidebar collapses first to keep the 960 split.',
+            description: 'A Section detail layout is on the Page: the Sidebar collapses first to keep the 960 split.',
             table: { category: 'Design' },
         },
         contentAs: { control: false, table: { disable: true } },
@@ -1275,10 +1275,10 @@ export const NoPanelPeekByDefault = {
     },
 };
 
-/** 1440 with List and detail: both docked would leave 752, under the 960 split, so the default Sidebar collapses to keep it (992). */
-export const ListDetailKeepsSplitAt1440 = {
+/** 1440 with Section detail: both docked would leave 752, under the 960 split, so the default Sidebar collapses to keep it (992). */
+export const SectionDetailKeepsSplitAt1440 = {
     render: WithPanel,
-    args: { listDetail: true },
+    args: { sectionDetail: true },
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const p = panelParts(canvasElement);
         await waitFor(() => expect(p.sidebar()).not.toBeNull());
@@ -1289,10 +1289,10 @@ export const ListDetailKeepsSplitAt1440 = {
     }),
 };
 
-/** 1440 with List and detail: the splitter's limit keeps 960 of content, so dragging to it never breaks the split. */
-export const ListDetailSplitterKeepsSplitAt1440 = {
+/** 1440 with Section detail: the splitter's limit keeps 960 of content, so dragging to it never breaks the split. */
+export const SectionDetailSplitterKeepsSplitAt1440 = {
     render: WithPanel,
-    args: { listDetail: true },
+    args: { sectionDetail: true },
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const p = panelParts(canvasElement);
         await openPanel(p);

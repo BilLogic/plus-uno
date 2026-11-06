@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { expect } from 'storybook/test';
-import { Button, TextField, Tabs as TabsComponent } from '@/components';
-import { PatternCard, PatternSection } from '@/patterns';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { Button, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, StatusTag, TextField, Tabs as TabsComponent } from '@/components';
+import { PANEL_STORAGE_KEY, PatternCard, PatternSection, SECTION_DETAIL_FLOOR, usePanelControl } from '@/patterns';
+import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import { DemoLabel, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { DemoLabel, InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 
 const col = { display: 'flex', flexDirection: 'column', gap: 'var(--space-200)' };
 
@@ -396,4 +397,180 @@ export const Spacing = {
         await expect(q('.plus-pattern-section-description').top - q('.plus-pattern-section-title').bottom, 'title to description')
             .toBeCloseTo(tokenLength(canvasElement, '--stack-sm'), 0);
     },
+};
+
+/* ------------------------------------------------- detail region */
+/*
+ * A Section with a `detail` region: a Compliance queue with the selected flag
+ * beside it. Each width story sets the viewport first, then reads what a person
+ * sees: the columns the list and the detail take, whether the Sidebar gave way
+ * to the Panel, and what replaces what below 960.
+ */
+
+const resetPanel = () => { window.sessionStorage.removeItem(PANEL_STORAGE_KEY); };
+const DETAIL_HEIGHT = 900;
+const atViewport = (width, run) => withTestViewport(width, DETAIL_HEIGHT, run);
+
+const FLAGS = [
+    { id: 'f1', tutor: 'Maya Chen', reason: 'Session ended early', status: 'Open' },
+    { id: 'f2', tutor: 'Jordan Reyes', reason: 'Missing reflection', status: 'Open' },
+    { id: 'f3', tutor: 'Priya Nair', reason: 'Late start', status: 'In review' },
+    { id: 'f4', tutor: 'Sam Okafor', reason: 'No student check-in', status: 'Open' },
+];
+
+const ChatPanel = () => {
+    const panel = usePanelControl();
+    return (
+        <PanelContainer>
+            <PanelHeader title="AI chat" actions={<PanelCloseAction onClick={() => panel?.setOpen(false)} />} />
+            <PanelBody>Ask about this flag.</PanelBody>
+        </PanelContainer>
+    );
+};
+
+const ComplianceQueue = ({ withPanel = false, ...frameArgs }) => {
+    const [index, setIndex] = useState(0);
+    const [open, setOpen] = useState(true);
+    const flag = FLAGS[index];
+    const select = (i) => { setIndex(i); setOpen(true); };
+
+    const list = (
+            <ul className="list-unstyled m-0" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                {FLAGS.map((f, i) => (
+                    <li key={f.id}>
+                        <Button
+                            text={`${f.tutor}: ${f.reason}`}
+                            appearance={i === index && open ? 'default' : 'subtle'}
+                            isSelected={i === index && open}
+                            onClick={() => select(i)}
+                        />
+                    </li>
+                ))}
+            </ul>
+    );
+
+    return (
+        <InAppFrame
+            sectionDetail
+            panel={withPanel ? <ChatPanel /> : undefined}
+            defaultPanelOpen={withPanel}
+            panelStorageKey={null}
+            {...frameArgs}
+        >
+            <PatternSection
+                title="Compliance queue"
+                description={`${FLAGS.length} flags to review`}
+                hasSelection={open}
+                detail={(
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
+                        <StatusTag appearance={flag.status === 'Open' ? 'warning' : 'info'}>{flag.status}</StatusTag>
+                        <p className="m-0">{flag.reason}. Review the session notes, then decide.</p>
+                    </div>
+                )}
+                detailTitle={`Flag: ${flag.tutor}`}
+                detailDescription={flag.reason}
+                detailFooter={<Button text="Open full review" appearance="subtle" iconAfter="arrow-up-right-from-square" onClick={() => {}} />}
+                onBack={() => setOpen(false)}
+                backLabel="Back to queue"
+                onPrevious={() => select(index - 1)}
+                onNext={() => select(index + 1)}
+                previousDisabled={index === 0}
+                nextDisabled={index === FLAGS.length - 1}
+            >
+                {list}
+            </PatternSection>
+        </InAppFrame>
+    );
+};
+
+/* ------------------------------------------------------------- probes */
+
+const rect = (el) => el.getBoundingClientRect();
+const probes = (canvasElement) => {
+    const canvas = within(canvasElement);
+    const root = canvasElement.querySelector('.plus-pattern-section-with-detail');
+    return {
+        canvas,
+        root,
+        list: () => root.querySelector('.plus-pattern-section-list'),
+        detail: () => root.querySelector('.plus-pattern-section-detail'),
+        sidebar: () => canvas.queryByRole('navigation', { name: 'Main' })?.closest('.plus-frame__sidebar') ?? null,
+    };
+};
+
+/** `n` of the 12 columns across `total` pixels, with the 16 gutters between them. */
+const spanWidth = (total, gutter, n) => ((total - 11 * gutter) / 12) * n + (n - 1) * gutter;
+
+const expectSplit = async (p, contentWidth) => {
+    const gutter = parseFloat(getComputedStyle(p.root).columnGap);
+    const total = rect(p.root).width;
+    await expect(total, 'content holds the split floor').toBeGreaterThanOrEqual(SECTION_DETAIL_FLOOR);
+    await expect(total, 'content is the Frame minus Sidebar, Panel and the 48 pad').toBeCloseTo(contentWidth, 0);
+    await expect(rect(p.list()).width, 'list spans 7 columns').toBeCloseTo(spanWidth(total, gutter, 7), 0);
+    await expect(rect(p.detail()).width, 'detail spans 5 columns').toBeCloseTo(spanWidth(total, gutter, 5), 0);
+    await expect(rect(p.detail()).left - rect(p.list()).right, 'a gutter apart').toBeCloseTo(gutter, 0);
+    const section = p.detail().querySelector('section');
+    await expect(getComputedStyle(section).backgroundColor, 'the detail has a fill').not.toBe('rgba(0, 0, 0, 0)');
+    await expect(p.canvas.queryByRole('button', { name: 'Back to queue' }), 'no back link at the split').toBeNull();
+};
+
+/** A Section with a detail region: a Compliance queue with the selected flag beside it. */
+export const Detail = { render: (args) => <ComplianceQueue {...args} />, parameters: { layout: 'fullscreen' },
+    beforeEach: resetPanel };
+
+/** The same layout with the Panel open, for the docs page. */
+export const DetailWithPanel = { render: (args) => <ComplianceQueue {...args} />, parameters: { layout: 'fullscreen' },
+    beforeEach: resetPanel, args: { withPanel: true } };
+
+/** 1440, no Panel: content is 1152, so the split holds with the Sidebar docked. */
+export const DetailSplitAt1440 = {
+    render: (args) => <ComplianceQueue {...args} />,
+    parameters: { layout: 'fullscreen' },
+    beforeEach: resetPanel,
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = probes(canvasElement);
+        await waitFor(() => expect(p.detail(), 'the detail opens beside the list').not.toBeNull());
+        await expect(p.sidebar(), 'the Sidebar stays docked').not.toBeNull();
+        await expectSplit(p, 1440 - 240 - 48);
+        const detail = within(p.detail());
+        await expect(detail.getByRole('button', { name: 'Previous' }), 'first flag: no previous').toBeDisabled();
+        await userEvent.click(detail.getByRole('button', { name: 'Next' }));
+        await waitFor(() => expect(within(p.detail()).getByRole('heading', { name: 'Flag: Jordan Reyes' })).toBeInTheDocument());
+        await expect(p.list(), 'the list stays while the detail steps').not.toBeNull();
+    }),
+};
+
+/** 1440 with the 400 Panel open: the Sidebar collapses to keep 960, and the split holds. */
+export const DetailSplitHoldsWithPanelAt1440 = {
+    render: (args) => <ComplianceQueue {...args} />,
+    parameters: { layout: 'fullscreen' },
+    beforeEach: resetPanel,
+    args: { withPanel: true },
+    play: async ({ canvasElement }) => atViewport(1440, async () => {
+        const p = probes(canvasElement);
+        await waitFor(() => expect(canvasElement.querySelector('.plus-frame__panel'), 'the Panel is open').not.toBeNull());
+        await waitFor(() => expect(p.sidebar(), 'the Sidebar collapsed to keep 960').toBeNull());
+        await waitFor(() => expect(rect(p.root).width).toBeGreaterThanOrEqual(SECTION_DETAIL_FLOOR));
+        await expectSplit(p, 1440 - 400 - 48);
+        await expect(canvasElement.querySelector('.plus-frame__blanket'), 'the Panel stays docked').toBeNull();
+    }),
+};
+
+/** 1024: content is 736, under 960, so the detail replaces the list behind a back link. */
+export const DetailReplacesListBelow960 = {
+    render: (args) => <ComplianceQueue {...args} />,
+    parameters: { layout: 'fullscreen' },
+    beforeEach: resetPanel,
+    play: async ({ canvasElement }) => atViewport(1024, async () => {
+        const p = probes(canvasElement);
+        await waitFor(() => expect(p.list(), 'the list is replaced').toBeNull());
+        await expect(rect(p.root).width, 'content under the floor').toBeLessThan(SECTION_DETAIL_FLOOR);
+        await expect(rect(p.detail()).width, 'the detail takes the row').toBeCloseTo(rect(p.root).width, 0);
+        await userEvent.click(p.canvas.getByRole('button', { name: 'Back to queue' }));
+        await waitFor(() => expect(p.list(), 'back to the list').not.toBeNull());
+        await expect(p.detail(), 'the detail closes').toBeNull();
+        await userEvent.click(p.canvas.getByRole('button', { name: /Maya Chen/ }));
+        await waitFor(() => expect(p.list()).toBeNull());
+        await expect(p.canvas.getByRole('heading', { name: 'Flag: Maya Chen' })).toBeInTheDocument();
+    }),
 };

@@ -112,11 +112,11 @@ The content never drops under 720, so the Frame, not the page, decides what dock
 3. If both fit with 720 of content, both dock. With a 400 Panel that is from 1408.
 4. Otherwise a Sidebar left open by default collapses, and returns when the Panel closes. With a 400 Panel the Panel docks alone from 1168.
 5. Otherwise the Panel opens as an overlay.
-6. A List and detail layout keeps its split from 960 of content, met by collapsing the Sidebar first.
+6. A Section with a detail region keeps its split from 960 of content, met by collapsing the Sidebar first.
 
-## List and detail
+## Section detail
 
-For a queue a person works through (Admin › Compliance, Admin › Reflections), use `ListDetail` (`@/patterns`): the list takes 7 columns and the detail, a Section with a subtle fill, takes 5, with next and previous in its header. Pass `listDetail` to the Frame so opening the Panel collapses the Sidebar first and the split keeps 960 of content. Below 960 the detail replaces the list under a back link. Heavy work, such as the recording review, gets its own page: "Open full review" in the detail's footer.
+For a queue a person works through (Admin › Compliance, Admin › Reflections), give the Section a `detail` (`PatternSection`, `@/patterns`): the body is the list and takes 7 columns, the detail region, a subtle-fill Section, takes 5, with next and previous in its header. Pass `sectionDetail` to the Frame so opening the Panel collapses the Sidebar first and the split keeps 960 of content. Below 960 the detail replaces the list under a back link. Heavy work, such as the recording review, gets its own page: "Open full review" in the detail's footer.
 
 Column spans and breakpoint tokens: `../foundations/grid.md`.
 

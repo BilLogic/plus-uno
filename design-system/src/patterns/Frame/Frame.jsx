@@ -109,7 +109,7 @@ const Frame = ({
     panelDefaultWidth = FRAME_LAYOUT.panelDefault,
     panelPeek = false,
     panelStorageKey = PANEL_STORAGE_KEY,
-    listDetail = false,
+    sectionDetail = false,
     width = 'content',
     contentAs: Content = 'main',
     contentClassName = '',
@@ -174,8 +174,8 @@ const Frame = ({
         sidebar: hand === null ? { open: defaultOpen, setBy: 'default' } : { open: hand, setBy: 'hand' },
         sidebarPeek: peek,
         chatMode: panelOpen ? 'panel' : 'popup',
-        listDetail,
-    }), [frameWidth, panelWidth, hand, defaultOpen, peek, panelOpen, listDetail]);
+        sectionDetail,
+    }), [frameWidth, panelWidth, hand, defaultOpen, peek, panelOpen, sectionDetail]);
 
     const narrow = frameWidth < FRAME_LAYOUT.dockMin;
     const panelState = layout.panel;
@@ -433,7 +433,7 @@ const Frame = ({
     // As an overlay beside a Sidebar docked by default, the narrowest width
     // stays too wide for the Panel to dock alone, which would collapse it.
     const room = frameWidth - FRAME_LAYOUT.pagePad * 2 - FRAME_LAYOUT.contentFloor;
-    // While a List and detail split holds the floor is 960, so a drag never breaks it.
+    // While a Section detail split holds the floor is 960, so a drag never breaks it.
     const splitterMax = panelState === 'docked'
         ? dockedPanelMax({ frameWidth, sidebarDocked: layout.sidebar === 'docked', splitHolds: layout.splitHolds })
         : FRAME_LAYOUT.panelMax;
@@ -560,7 +560,7 @@ const Frame = ({
 
     return (
         <div id={id} ref={frameRef} className={classes} style={style} {...props}>
-            <SplitContext.Provider value={listDetail ? layout.splitHolds : null}>
+            <SplitContext.Provider value={sectionDetail ? layout.splitHolds : null}>
             <PanelControlContext.Provider value={panelControl}>
                 <SidebarControlContext.Provider value={control}>
                 {!hasSidebar && topbar ? <div className="plus-frame__topbar">{topbar}</div> : null}
@@ -639,8 +639,8 @@ Frame.propTypes = {
     panelPeek: PropTypes.bool,
     /** The sessionStorage key the Panel's width and open state are kept under; null keeps nothing. */
     panelStorageKey: PropTypes.string,
-    /** A List and detail layout is on the Page: the Sidebar collapses first to keep the 960 split. */
-    listDetail: PropTypes.bool,
+    /** A Section detail layout is on the Page: the Sidebar collapses first to keep the 960 split. */
+    sectionDetail: PropTypes.bool,
     /** Content cap: content 1232, reading 864 */
     width: PropTypes.oneOf(['content', 'reading']),
     /** Element for the content box. `main` by default, the Page's landmark; pass `div` when the page supplies its own `main`. */

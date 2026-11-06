@@ -2,39 +2,41 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import userEvent from '@testing-library/user-event';
 import { SplitContext } from '../Frame/SplitContext';
-import ListDetail, { LIST_DETAIL_FLOOR, listDetailView } from './ListDetail';
+import PatternSection, { SECTION_DETAIL_FLOOR, sectionDetailView } from './PatternSection';
 
 /**
- * List and detail: a list of 7 columns beside a detail Section of 5 while the
- * content holds the split floor (960); below it the detail replaces the list
- * behind a back link. `listDetailView` is the rule; widths and columns are
- * asserted in the browser, in the `Patterns/Section/List and detail`
- * stories.
+ * The Section's optional `detail` region: the body is the list, the region on
+ * its right shows one record. The split holds from 960 of the Section's own
+ * width (or the Frame's resolver); below it the detail replaces the list behind
+ * a back link. `sectionDetailView` is the rule; widths and columns are asserted
+ * in the browser, in the `Patterns/Section/Section` stories.
  */
-describe('listDetailView', () => {
+describe('sectionDetailView', () => {
     it('splits from the floor up, with or without a selection', () => {
-        expect(LIST_DETAIL_FLOOR).toBe(960);
-        expect(listDetailView({ splitHolds: true, hasSelection: true })).toBe('split');
-        expect(listDetailView({ splitHolds: true, hasSelection: false })).toBe('split');
+        expect(SECTION_DETAIL_FLOOR).toBe(960);
+        expect(sectionDetailView({ splitHolds: true, hasSelection: true })).toBe('split');
+        expect(sectionDetailView({ splitHolds: true, hasSelection: false })).toBe('split');
     });
 
     it('below the floor shows the detail alone when a record is open, the list otherwise', () => {
-        expect(listDetailView({ splitHolds: false, hasSelection: true })).toBe('detail');
-        expect(listDetailView({ splitHolds: false, hasSelection: false })).toBe('list');
+        expect(sectionDetailView({ splitHolds: false, hasSelection: true })).toBe('detail');
+        expect(sectionDetailView({ splitHolds: false, hasSelection: false })).toBe('list');
     });
 });
 
 const renderIt = (props = {}) => render(
-    <ListDetail
-        list={<div>Queue rows</div>}
-        detailTitle="Flag 1"
+    <PatternSection
+        title="Queue"
         detail={<div>Flag body</div>}
+        detailTitle="Flag 1"
         hasSelection
         {...props}
-    />,
+    >
+        <div>Queue rows</div>
+    </PatternSection>,
 );
 
-describe('ListDetail', () => {
+describe('PatternSection detail', () => {
     it('puts next and previous in the detail header and runs them', async () => {
         const onNext = vi.fn();
         const onPrevious = vi.fn();
@@ -46,14 +48,14 @@ describe('ListDetail', () => {
         expect(onPrevious).toHaveBeenCalledOnce();
     });
 
-    it('draws the detail Section with the subtle fill', () => {
+    it('draws the detail with the subtle fill', () => {
         renderIt();
         expect(screen.getByRole('heading', { name: 'Flag 1' }).closest('section').className).toContain('plus-pattern-section-fill-subtle');
     });
 
     it('lets the list span the row when no record is open at the split', () => {
         const { container } = renderIt({ hasSelection: false, detail: null });
-        expect(container.querySelector('.plus-list-detail__detail')).toBeNull();
+        expect(container.querySelector('.plus-pattern-section-detail')).toBeNull();
         expect(screen.getByText('Queue rows')).toBeInTheDocument();
     });
 
@@ -67,29 +69,38 @@ describe('ListDetail', () => {
         expect(screen.getByRole('button', { name: 'Next' })).toBeDisabled();
         expect(screen.getByRole('button', { name: 'Previous' })).toBeDisabled();
     });
+
+    it('draws no detail wrapper on a plain Section', () => {
+        const { container } = render(<PatternSection title="Sessions">Body</PatternSection>);
+        expect(container.querySelector('.plus-pattern-section-with-detail')).toBeNull();
+    });
 });
 
-describe('ListDetail inside a Frame with listDetail', () => {
+describe('PatternSection detail inside a Frame with sectionDetail', () => {
     const inFrame = (splitHolds) => render(
         <SplitContext.Provider value={splitHolds}>
-            <ListDetail list={<div>Queue rows</div>} detail={<div>Flag body</div>} detailTitle="Flag 1" hasSelection />
+            <PatternSection title="Queue" detail={<div>Flag body</div>} detailTitle="Flag 1" hasSelection>
+                <div>Queue rows</div>
+            </PatternSection>
         </SplitContext.Provider>,
     );
 
     it('follows the resolver: split when it holds, the detail alone when it does not', () => {
         const held = inFrame(true);
-        expect(held.container.querySelector('.plus-list-detail--split')).not.toBeNull();
+        expect(held.container.querySelector('.plus-pattern-section-with-detail--split')).not.toBeNull();
         held.unmount();
         const dropped = inFrame(false);
-        expect(dropped.container.querySelector('.plus-list-detail--detail')).not.toBeNull();
+        expect(dropped.container.querySelector('.plus-pattern-section-with-detail--detail')).not.toBeNull();
         expect(screen.queryByText('Queue rows')).toBeNull();
     });
 });
 
-describe('ListDetail back link', () => {
+describe('PatternSection detail back link', () => {
     const narrow = (props) => render(
         <SplitContext.Provider value={false}>
-            <ListDetail list={<div>Queue rows</div>} detail={<div>Flag body</div>} detailTitle="Flag 1" hasSelection {...props} />
+            <PatternSection title="Queue" detail={<div>Flag body</div>} detailTitle="Flag 1" hasSelection {...props}>
+                <div>Queue rows</div>
+            </PatternSection>
         </SplitContext.Provider>,
     );
 

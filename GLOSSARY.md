@@ -112,16 +112,12 @@ _Avoid_: "flyout" as our word, "hover menu"
 The draggable edge of the docked **Panel**, a vertical separator that resizes it from 320 to 640 and leaves the **Sidebar** as it is. It resists past its limit and springs back; the arrow keys move it by 16, with Shift by 64.
 _Avoid_: "resize handle", "drag bar"
 
-**List and detail**:
-A page layout that opens a record beside its list: the list takes 7 of the **Page**'s 12 columns and the detail, a **Section** with a subtle fill, takes 5. It keeps the split from 960 of content, and below that the detail replaces the list under a back link.
-_Avoid_: "master-detail", "split view"
-
 **Page**:
 The pattern for the main content area inside a **Frame**: it carries the page title and a body.
 _Avoid_: "surface"
 
 **Section**:
-The pattern for a span of the page grid that groups content, including **Card**s, under one heading with a `_Section header`. A bare "Section" always means this pattern.
+The pattern for a span of the page grid that groups content, including **Card**s, under one heading with a `_Section header`. It can carry an optional `detail` region on its right that shows one record of its content: the body takes 7 of the **Page**'s 12 columns and the detail, a Section with a subtle fill, takes 5; the split holds from 960 and below that the detail replaces the list under a back link. A bare "Section" always means this pattern.
 _Avoid_: "block", "region"; "section" for a **Figma section** or a **Menu section**
 
 **Card**:

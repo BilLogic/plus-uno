@@ -18,7 +18,7 @@ export const propRows = [
     ['panelDefaultWidth', 'number', '400', 'The width the Panel opens at when the tab has nothing remembered, from 320 to 640.', 'Panel width'],
     ['panelPeek', 'boolean', 'false', 'Hovering the right edge peeks a closed Panel over the Page, with no Blanket.', 'none'],
     ['panelStorageKey', 'string | null', 'plus-frame-panel', 'The sessionStorage key the Panel\'s width and open state are kept under. Null keeps nothing.', 'none'],
-    ['listDetail', 'boolean', 'false', 'A List and detail layout is on the Page, so the Sidebar collapses first to keep the 960 split. If a collapsed Sidebar still leaves under 960, the Panel stays docked and the detail replaces the list. While the split holds, the splitter stops where content would drop under 960.', 'none'],
+    ['sectionDetail', 'boolean', 'false', 'A Section detail layout is on the Page, so the Sidebar collapses first to keep the 960 split. If a collapsed Sidebar still leaves under 960, the Panel stays docked and the detail replaces the list. While the split holds, the splitter stops where content would drop under 960.', 'none'],
     ['width', 'content | reading', 'content', 'The content cap: content 1232, reading 864.', 'Page width = content | reading'],
     ['surfaceDirect', 'boolean', 'false', 'Renders children straight into the page, with no content box or grid, for full-bleed views.', 'none'],
     ['contentAs', 'element type', 'main', 'The element for the content box, which is the Page\'s main landmark. Pass div when the page supplies its own main.', 'none'],
@@ -239,7 +239,7 @@ The Panel opens from anything inside the Frame through `usePanelControl()`. The 
 - Otherwise a Sidebar left open by default collapses, and comes back when the Panel closes. With a 400 Panel the Panel docks alone from 1168.
 - Otherwise the Panel opens as an overlay: over the Page on a Blanket that covers the Page and the Sidebar. A press outside it, or Escape, closes it.
 - Under 1024 the Panel is an overlay 320 wide, and only one overlay is open at a time: opening the Sidebar closes the Panel, and opening the Panel closes the Sidebar. Under 768 the Panel is full width.
-- With `listDetail`, the Sidebar collapses first so the list and the detail keep 960 side by side.
+- With `sectionDetail`, the Sidebar collapses first so the list and the detail keep 960 side by side.
 
 Docked, the Panel is the Page's white and meets the Page at a hairline. Its splitter resizes it from 320 to 640, but never past what keeps 720 beside a docked Sidebar: a drag resists past the limit and springs back, and it never collapses the Sidebar. The width and whether the Panel is open are kept for the tab in sessionStorage. A modal leaves the Panel open under its Blanket. The `panelPeek` option, off by default, peeks a closed Panel when a pointer rests on the right edge, with no Blanket.
 
