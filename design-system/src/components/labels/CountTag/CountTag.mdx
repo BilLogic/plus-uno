@@ -62,7 +62,7 @@ own: unread items, results, errors.
 
 ## Variants
 
-<DocsCanvasShell description={<>Default (20) on its own; compact (16) for use inside a label. The minimum width equals the height, so one digit is a circle and more digits grow the pill.</>}>
+<DocsCanvasShell description={<>Default (20) on its own; compact (16) for use inside a label. Every count has a 2px corner and a minimum width of 24, so one digit is a small rectangle and more digits grow it from the trailing edge. Only the dot is round.</>}>
     <DsCanvasQuiet of={CountTagStories.Spacings} />
 </DocsCanvasShell>
 
@@ -176,7 +176,7 @@ count per area.
 
 ### Use inverse on filled buttons and dark surfaces.
 
-Inverse is a solid white pill with dark text, so it passes contrast on any fill.
+Inverse is a solid white badge with dark text, so it passes contrast on any fill.
 On a light surface it barely separates from the page; use subtle there.
 
 </div>
@@ -189,13 +189,13 @@ On a light surface it barely separates from the page; use subtle there.
   exposed as an image with that name. Without one it is announced as nothing,
   and the component warns in development.
 - **A label turns a digit into information.** "Messages 4" is ambiguous; with
-  `label="4 unread"` a screen reader hears "Messages 4 unread", while the pill
+  `label="4 unread"` a screen reader hears "Messages 4 unread", while the badge
   still shows 4.
 - **The count is not a control.** It is a `span` that sits inside buttons, tabs
   and nav items; whatever is pressable is the thing around it.
 - **Contrast.** Subtle uses each appearance's (Text) color, and bold warning uses the
   Warning Container pair because warning with white text fails AA. Inverse
-  is a solid white pill with dark text, so it clears AA on any fill, including
+  is a solid white badge with dark text, so it clears AA on any fill, including
   a primary button.
 
 </div>

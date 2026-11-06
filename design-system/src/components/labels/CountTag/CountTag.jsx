@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import './CountTag.scss';
 
 /**
- * `CountTag` — a number on its own, as a pill.
+ * `CountTag` — a number on its own, as a near-square badge.
  *
  * WHICH LABEL, IN THREE QUESTIONS. Is it a number? Count tag. Is it the
  * condition something is in, and can that condition change? Status tag.
@@ -23,7 +23,7 @@ export const COUNT_TAG_APPEARANCES = ['neutral', 'success', 'warning', 'danger',
 export const COUNT_TAG_SPACINGS = ['default', 'compact'];
 
 /**
- * What the pill shows for a value. `null` means "render nothing": a count of
+ * What the badge shows for a value. `null` means "render nothing": a count of
  * zero is an empty tab, and an empty tab showing "0" is noise unless the caller
  * asks for it.
  */
@@ -105,7 +105,7 @@ export const CountTag = ({
 CountTag.propTypes = {
     /** The number. Hidden at 0 (and below) unless `showZero`. Ignored by `isDot`. */
     value: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
-    /** Above this the pill shows `{max}+`. */
+    /** Above this the count shows `{max}+`. */
     max: PropTypes.number,
     /** Render a count of 0 instead of nothing. */
     showZero: PropTypes.bool,
@@ -115,7 +115,7 @@ CountTag.propTypes = {
     spacing: PropTypes.oneOf(COUNT_TAG_SPACINGS),
     /** The solid fill: asks for action now (at most one per area). */
     isBold: PropTypes.bool,
-    /** A solid white pill with dark text, for filled buttons and dark grounds. Always neutral. */
+    /** A solid white badge with dark text, for filled buttons and dark grounds. Always neutral. */
     isInverse: PropTypes.bool,
     /** Presence without a number. Needs `label`. */
     isDot: PropTypes.bool,

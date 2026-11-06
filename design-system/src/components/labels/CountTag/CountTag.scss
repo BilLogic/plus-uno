@@ -1,9 +1,9 @@
 /*
- * Count tag — a number on its own, as a pill.
+ * Count tag — a number on its own, as a near-square badge.
  *
- * EVERY COUNT IS A PILL: 20 on its own, 16 for use inside a label, with the
- * minimum width equal to the height so a single digit is a circle and 9 → 10
- * grows the pill instead of jumping the layout.
+ * EVERY NUMBER IS A BADGE: 20 high on its own, 16 for use inside a label, a
+ * 2 corner and a minimum width of 24, so one digit is a small rectangle and
+ * two or three digits grow it from the trailing edge. Only the dot is round.
  *
  * The two heights have no semantic token yet (label heights 16/20/22/32 are a
  * token follow-up), so they are local custom properties set from
@@ -15,7 +15,7 @@
 
 .plus-count {
     --plus-count-size: #{label.$count-height};
-    --plus-count-min: var(--size-spacing-medium-space-400, 20px);
+    --plus-count-min: var(--size-150, 24px);
 
     display: inline-flex;
     align-items: center;
@@ -26,14 +26,14 @@
     min-width: var(--plus-count-min);
     margin: 0;
     padding: 0 var(--pad-x-xs, 4px);
-    border-radius: var(--radius-full, 999px);
+    border-radius: var(--radius-0125, 2px);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
 }
 
 .plus-count--compact {
     --plus-count-size: #{label.$count-height-compact};
-    --plus-count-min: var(--size-spacing-medium-space-300, 16px);
+    --plus-count-min: var(--size-150, 24px);
 }
 
 /*
@@ -90,7 +90,7 @@ $count-dot: (
 
 /*
  * Inverse is for counts on filled buttons and bold or brand fills. It is the
- * page surface with subtle text, so it reads as a pill cut out of the fill in
+ * page surface with subtle text, so it reads as a badge cut out of the fill in
  * light and in dark, rather than depending on the ground beneath it. It is
  * neutral whatever `style` says.
  */
@@ -106,6 +106,7 @@ $count-dot: (
     width: var(--plus-count-size);
     min-width: 0;
     padding: 0;
+    border-radius: var(--radius-full, 999px);
 }
 
 @each $name, $ground in $count-dot {
@@ -116,15 +117,15 @@ $count-dot: (
 
 /*
  * The ring, for a count pinned to the top right of an icon or avatar. It is a
- * box-shadow outside the box, as in Figma, so the pill keeps its exact height.
+ * box-shadow outside the box, as in Figma, so the badge keeps its exact height.
  */
 .plus-count--ring {
     box-shadow: 0 0 0 var(--stroke-2, 2px) var(--ds-surface);
 }
 
 /*
- * The compact pill is 16 tall and the B3 line is 20; the flex box centers the
- * line, and a line height of the pill keeps the digits from being clipped.
+ * The compact badge is 16 tall and the B3 line is 20; the flex box centers the
+ * line, and a line height of the badge keeps the digits from being clipped.
  */
 .plus-count .plus-count__value {
     font: var(--body-small);
