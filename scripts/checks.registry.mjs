@@ -910,6 +910,20 @@ export const EXCLUDED = [
     'run it by hand is what that ticket was for.',
   },
   {
+    name: 'check:storybook-links',
+    script: 'node scripts/check-storybook-links.mjs',
+    pkg: 'root',
+    trigger: 'storybook-gate',
+    kind: 'spawn',
+    spawnReason: 'it builds Storybook to read the index of ids that exist — see check:storybook.',
+    reason:
+      'it needs the built `index.json`, the only authority on which Storybook ids exist, so it ' +
+      'pays a Storybook build that `check:harness` has no budget for. It guards every link to a ' +
+      'Storybook page (MDX, registry, docs map, embeds) against an id a page move or rename ' +
+      'left behind. It is a step in `.github/workflows/storybook-gate.yml`, which already has ' +
+      '`npm ci`.',
+  },
+  {
     name: 'check:docs-chrome',
     script: 'node scripts/check-docs-chrome.mjs',
     pkg: 'root',
@@ -1030,6 +1044,17 @@ export const WORKFLOW_STEPS = [
       "for by this point, and a failure here should not hide a story failure.",
     ],
     runs: ["check:docs-chrome"],
+  },
+  {
+    workflow: ".github/workflows/storybook-gate.yml",
+    region: "storybook-checks",
+    name: "npm run check:storybook-links",
+    note: [
+      "Every link to a Storybook page against the built index of ids. A page move",
+      "changes its id, and links written with the old one open nothing without",
+      "turning any build red. This builds Storybook, so it goes after the suite.",
+    ],
+    runs: ["check:storybook-links"],
   },
   {
     workflow: ".github/workflows/storybook-gate.yml",
