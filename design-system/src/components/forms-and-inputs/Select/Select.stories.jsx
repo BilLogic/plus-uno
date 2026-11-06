@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
 import Select from './Select';
 
 /**
@@ -337,4 +338,33 @@ export const Colors = {
         });
         await userEvent.keyboard('{Escape}');
     },
+};
+
+/** One story per state, for the Examples tab. */
+const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Option' });
+const wrap = { maxWidth: '360px', minHeight: 48 };
+
+export const Rest = {
+    render: () => <div style={wrap}><Select id="select-ex-rest" label="Option" options={sampleOptions} placeholder="Please select" /></div>,
+    play: async ({ canvasElement }) => expectRest(canvasElement, controlOf(canvasElement)),
+};
+
+export const Hovered = {
+    render: () => <div style={wrap}><Select id="select-ex-hover" label="Option" options={sampleOptions} placeholder="Please select" /></div>,
+    play: async ({ canvasElement }) => expectHovered(canvasElement, controlOf(canvasElement)),
+};
+
+export const Focused = {
+    render: () => <div style={wrap}><Select id="select-ex-focus" label="Option" options={sampleOptions} placeholder="Please select" /></div>,
+    play: async ({ canvasElement }) => expectFocused(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldDisabled = {
+    render: () => <div style={wrap}><Select id="select-ex-disabled" label="Option" options={sampleOptions} placeholder="Please select" isDisabled /></div>,
+    play: async ({ canvasElement }) => expectDisabled(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldInvalid = {
+    render: () => <div style={wrap}><Select id="select-ex-invalid" label="Option" options={sampleOptions} placeholder="Please select" isInvalid errorMessage="Pick an option." /></div>,
+    play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
 };

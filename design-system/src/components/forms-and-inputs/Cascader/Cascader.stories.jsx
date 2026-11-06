@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
 import Cascader from './Cascader';
 
 export default {
@@ -191,4 +193,33 @@ Interactive.args = {
     label: 'Region',
     isDisabled: false,
     placeholder: 'Please select',
+};
+
+/** One story per state, for the Examples tab. */
+const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Region' });
+const wrap = { maxWidth: '360px', minHeight: 48 };
+
+export const Rest = {
+    render: () => <div style={wrap}><Cascader id="cascader-ex-rest" label="Region" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
+    play: async ({ canvasElement }) => expectRest(canvasElement, controlOf(canvasElement)),
+};
+
+export const Hovered = {
+    render: () => <div style={wrap}><Cascader id="cascader-ex-hover" label="Region" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
+    play: async ({ canvasElement }) => expectHovered(canvasElement, controlOf(canvasElement)),
+};
+
+export const Focused = {
+    render: () => <div style={wrap}><Cascader id="cascader-ex-focus" label="Region" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
+    play: async ({ canvasElement }) => expectFocused(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldDisabled = {
+    render: () => <div style={wrap}><Cascader id="cascader-ex-disabled" label="Region" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" isDisabled /></div>,
+    play: async ({ canvasElement }) => expectDisabled(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldInvalid = {
+    render: () => <div style={wrap}><Cascader id="cascader-ex-invalid" label="Region" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" isInvalid errorMessage="Pick a region." /></div>,
+    play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
 };

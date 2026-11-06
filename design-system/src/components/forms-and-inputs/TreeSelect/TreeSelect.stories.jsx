@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { expect, within } from 'storybook/test';
+import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
 import TreeSelect from './TreeSelect';
 
 export default {
@@ -193,4 +195,33 @@ Interactive.args = {
     isMulti: true,
     isDisabled: false,
     placeholder: 'Please select',
+};
+
+/** One story per state, for the Examples tab. */
+const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Topic' });
+const wrap = { maxWidth: '360px', minHeight: 48 };
+
+export const Rest = {
+    render: () => <div style={wrap}><TreeSelect id="treeselect-ex-rest" label="Topic" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
+    play: async ({ canvasElement }) => expectRest(canvasElement, controlOf(canvasElement)),
+};
+
+export const Hovered = {
+    render: () => <div style={wrap}><TreeSelect id="treeselect-ex-hover" label="Topic" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
+    play: async ({ canvasElement }) => expectHovered(canvasElement, controlOf(canvasElement)),
+};
+
+export const Focused = {
+    render: () => <div style={wrap}><TreeSelect id="treeselect-ex-focus" label="Topic" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,
+    play: async ({ canvasElement }) => expectFocused(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldDisabled = {
+    render: () => <div style={wrap}><TreeSelect id="treeselect-ex-disabled" label="Topic" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" isDisabled /></div>,
+    play: async ({ canvasElement }) => expectDisabled(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldInvalid = {
+    render: () => <div style={wrap}><TreeSelect id="treeselect-ex-invalid" label="Topic" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" isInvalid errorMessage="Pick a topic." /></div>,
+    play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
 };

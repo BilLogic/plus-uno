@@ -243,17 +243,6 @@ export const Hovered = {
     },
 };
 
-export const Pressed = {
-    render: () => <Toggle id="toggle-ex-pressed" label="Send reminders" />,
-    play: async ({ canvasElement }) => {
-        // No step of its own: the hovered fill holds while the pointer is down.
-        const el = switchOf(canvasElement, 'Send reminders');
-        el.style.transition = 'none';
-        const fill = withForcedPseudo(el, ':hover', () => getComputedStyle(el).backgroundColor);
-        await expect(fill).toBe(tokenColor(canvasElement, '--ds-background-neutral-bold-hovered'));
-    },
-};
-
 export const Focused = {
     render: () => <Toggle id="toggle-ex-focus" label="Send reminders" defaultChecked />,
     play: async ({ canvasElement }) => {

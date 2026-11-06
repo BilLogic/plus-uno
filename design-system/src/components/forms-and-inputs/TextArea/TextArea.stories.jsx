@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
 import TextArea from './TextArea';
 
 export default {
@@ -270,4 +271,33 @@ Interactive.args = {
     errorMessage: '',
     isDisabled: false,
     isReadOnly: false,
+};
+
+/** One story per state, for the Examples tab. */
+const controlOf = (canvasElement) => within(canvasElement).getByRole('textbox', { name: 'Notes' });
+const wrap = { maxWidth: '360px', minHeight: 48 };
+
+export const Rest = {
+    render: () => <div style={wrap}><TextArea id="textarea-ex-rest" label="Notes" placeholder="Notes" /></div>,
+    play: async ({ canvasElement }) => expectRest(canvasElement, controlOf(canvasElement)),
+};
+
+export const Hovered = {
+    render: () => <div style={wrap}><TextArea id="textarea-ex-hover" label="Notes" placeholder="Notes" /></div>,
+    play: async ({ canvasElement }) => expectHovered(canvasElement, controlOf(canvasElement)),
+};
+
+export const Focused = {
+    render: () => <div style={wrap}><TextArea id="textarea-ex-focus" label="Notes" placeholder="Notes" /></div>,
+    play: async ({ canvasElement }) => expectFocused(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldDisabled = {
+    render: () => <div style={wrap}><TextArea id="textarea-ex-disabled" label="Notes" placeholder="Notes" isDisabled /></div>,
+    play: async ({ canvasElement }) => expectDisabled(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldInvalid = {
+    render: () => <div style={wrap}><TextArea id="textarea-ex-invalid" label="Notes" placeholder="Notes" isInvalid errorMessage="Add a note." /></div>,
+    play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
 };
