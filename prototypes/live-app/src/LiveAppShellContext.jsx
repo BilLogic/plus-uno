@@ -17,7 +17,6 @@ export const SIDEBAR_TAB_ROUTES = {
   sessions: '/toolkit/sessions',
   // Toolkit › Students has no tutor page yet; the admin students list stands in.
   'toolkit-students': '/toolkit/students',
-  reviews: '/toolkit/post-session',
   tutors: '/admin/tutors/training',
   'admin-sessions': '/admin/sessions',
   students: '/admin/students',
@@ -36,9 +35,9 @@ export function activeTabFromPath(pathname) {
   if (pathname.startsWith('/training/lessons')) return 'lessons';
   if (pathname.startsWith('/training/onboarding')) return 'onboarding';
   if (pathname.startsWith('/toolkit/students')) return 'toolkit-students';
-  // Post-session and reflection pages sit under Toolkit › Sessions: the sidebar
-  // shows Reviews only with `showItemsNotInSpecs`, which the live app leaves off.
+  // Post-session and reflection pages sit under Toolkit › Sessions.
   if (pathname.startsWith('/toolkit')) return 'sessions';
+  if (pathname.startsWith('/admin/tutors/warnings')) return 'compliance-monitor';
   if (pathname.startsWith('/admin/tutors')) return 'tutors';
   if (pathname.startsWith('/admin/sessions')) return 'admin-sessions';
   if (pathname.startsWith('/admin/students')) return 'students';
@@ -81,6 +80,9 @@ export function LiveAppShellProvider({ children }) {
       forceSidebarExpanded: true,
       activeTab: activeTabFromPath(location.pathname),
       goHome: () => navigate('/home'),
+      // The account menu: Profile, and Sign out to the sign-in page (which clears the open tabs).
+      onProfile: () => navigate('/profile'),
+      onSignOut: () => navigate(SIGN_IN_ROUTE),
       /**
        * @param {string} tabId
        */

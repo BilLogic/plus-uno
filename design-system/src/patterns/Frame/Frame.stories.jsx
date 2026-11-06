@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Sidebar } from '@/components';
-import { Frame, PANEL_STORAGE_KEY, Topbar, usePanelControl } from '@/patterns';
+import { Breadcrumb, Button, IconButton, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Sidebar } from '@/components';
+import { Frame, PANEL_STORAGE_KEY, usePanelControl, useSidebarControl } from '@/patterns';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -10,8 +10,9 @@ import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { PAGE_EDGE } from '@/patterns/Page';
 
 /**
- * Frame — the app frame: a full-width 32 topbar over a row holding the Sidebar
- * and the Page.
+ * Frame — the app frame: the Sidebar beside the Page (and the Panel), with no
+ * top bar. Open, the Sidebar's own toggle ends its logo row; closed, the
+ * Frame draws the toggle at the Page's top left.
  *
  * THE TEST SEAM IS THIS FILE. Each width story sets the viewport first, because
  * the layout tokens switch on `@media (min-width: …)`, then asserts what a
@@ -58,6 +59,7 @@ export default {
     argTypes: {
         children: { table: { disable: true } },
         topbar: { table: { disable: true } },
+        header: { table: { disable: true } },
         sidebar: { table: { disable: true } },
         style: { table: { disable: true } },
         sidebarDocked: {
@@ -113,7 +115,12 @@ const parts = (canvasElement) => {
     return {
         frame,
         canvas,
-        toggle: canvas.getByRole('button', { name: /sidebar/i }),
+        // The toggle that shows: the Page's (Open sidebar) while the Sidebar is
+        // closed, else the Sidebar's own (Close sidebar). Read it when needed.
+        get toggle() {
+            return canvas.queryByRole('button', { name: 'Open sidebar' }) ?? canvas.queryByRole('button', { name: 'Close sidebar' });
+        },
+        pageToggle: () => canvas.queryByRole('button', { name: 'Open sidebar' }),
         surface: frame.querySelector('.plus-frame__surface'),
         content: frame.querySelector('.plus-frame__content'),
         // The Sidebar's `nav` is the navigation landmark; the box around it is what docks or floats.
@@ -133,18 +140,23 @@ const offset = (frame, el) => ({ x: rect(el).left - rect(frame).left, y: rect(el
 /** The surface's padding in pixels (all four sides share one token). */
 const surfacePad = (surface) => px(getComputedStyle(surface).paddingLeft);
 
-/** The toggle sits 8 from the left and flush to the top at every width and in every sidebar state. */
+/**
+ * The toggle sits on the logo row's center line (y 28): closed, at the Page's
+ * top left on the icon column (x 32); open, at the end of the Sidebar's logo
+ * row on the trailing column (x 208).
+ */
 const expectToggleHome = async (frame, toggle) => {
-    const pad = tokenLength(frame, '--pad-x-sm');
     const at = offset(frame, toggle);
-    await expect(at.x, 'toggle x').toBeCloseTo(pad, 0);
-    await expect(at.y, 'toggle y').toBeCloseTo(0, 0);
-    await expect(rect(toggle).height, 'toggle height').toBeCloseTo(tokenLength(frame, '--item-height-md'), 0);
+    const r = rect(toggle);
+    const open = toggle.getAttribute('aria-label') === 'Close sidebar';
+    await expect(at.x + r.width / 2, open ? 'toggle on the trailing column' : 'toggle on the icon column').toBeCloseTo(open ? 208 : 32, 0);
+    await expect(at.y + r.height / 2, 'toggle on the logo row\'s center line').toBeCloseTo(28, 0);
+    await expect(r.height, 'toggle height').toBeCloseTo(tokenLength(frame, '--item-height-md'), 0);
 };
 
-const expectTopbar = async (frame) => {
-    const topbar = frame.querySelector('.plus-frame__topbar');
-    await expect(rect(topbar).height, 'topbar height').toBeCloseTo(tokenLength(frame, '--frame-topbar-height'), 0);
+/** No top bar: nothing sits above the Sidebar and the Page. */
+const expectNoTopbar = async (frame) => {
+    await expect(frame.querySelector('.plus-frame__topbar'), 'no top bar').toBeNull();
 };
 
 /** A peeked sidebar floats: shadow, over the page, and no Blanket under it. */
@@ -153,8 +165,8 @@ const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
     await expect(getComputedStyle(aside).boxShadow, 'floating sidebar shadow')
         .toBe(computedShadow(frame, 'var(--ds-shadow-overlay)'));
     await expect(rect(aside).width, 'sidebar width').toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
-    // Below the topbar, like the Panel and its Blanket: the topbar row stays clear.
-    await expect(rect(aside).top, 'the raised sidebar starts under the topbar').toBeCloseTo(rect(frame.querySelector('.plus-frame__topbar')).bottom, 0);
+    await expect(getComputedStyle(aside).backgroundColor, 'on the sunken fill').toBe(tokenColor(frame, '--ds-surface-sunken'));
+    await expect(rect(aside).top, 'the raised sidebar runs from the top').toBeCloseTo(rect(frame).top, 0);
     await expect(rect(aside).bottom, 'the raised sidebar runs to the foot').toBeCloseTo(rect(frame).bottom, 0);
     await expect(rect(surface).left, 'the surface did not move').toBeCloseTo(surfaceLeftBefore, 0);
     // No Blanket: a point on the page beside the sidebar still hits the page.
@@ -165,27 +177,18 @@ const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
 
 const atViewport = (width, run) => withTestViewport(width, HEIGHT, run);
 
-/**
- * No seams: the Topbar spans the full width, the Page starts where it ends and
- * runs to the right and bottom edges, and a hairline closes the Topbar.
- */
+/** No seams: there is no top bar, and the Page runs to the top, right and bottom edges. */
 const expectNoSeam = async (frame, surface) => {
-    const topbar = frame.querySelector('.plus-frame__topbar');
-    await expect(rect(topbar).width, 'the topbar spans the full width').toBeCloseTo(rect(frame).width, 0);
-    await expect(rect(surface).top - rect(topbar).bottom, 'no gap between the rows').toBeCloseTo(0, 0);
+    await expectNoTopbar(frame);
+    await expect(rect(surface).top - rect(frame).top, 'the Page runs to the top').toBeCloseTo(0, 0);
     await expect(rect(frame).right - rect(surface).right, 'no seam on the right').toBeCloseTo(0, 0);
     await expect(rect(frame).bottom - rect(surface).bottom, 'no seam at the bottom').toBeCloseTo(0, 0);
-    const line = getComputedStyle(topbar, '::after');
-    await expect(px(line.height), 'a hairline under the topbar').toBeCloseTo(tokenLength(frame, '--stroke-1'), 1);
-    await expect(line.backgroundColor, 'in the border color').toBe(tokenColor(frame, '--ds-border'));
-    await expect(px(getComputedStyle(topbar).paddingRight), 'the topbar pads its end').toBeCloseTo(tokenLength(frame, '--pad-x-sm'), 0);
 };
 
-/** The Page's top-left corner: rounded (`--page-radius`) while docked, square otherwise; the other three never round. */
-const expectCorner = async (frame, surface, rounded) => {
+/** The Page is flush: no corner rounds, docked or not. */
+const expectCorner = async (frame, surface) => {
     const style = getComputedStyle(surface);
-    const radius = rounded ? tokenLength(frame, '--page-radius') : 0;
-    await expect(px(style.borderTopLeftRadius), rounded ? 'top-left is rounded while docked' : 'top-left is square when not docked').toBeCloseTo(radius, 0);
+    await expect(px(style.borderTopLeftRadius), 'top-left is square').toBeCloseTo(0, 0);
     await expect(px(style.borderTopRightRadius), 'top-right is square').toBeCloseTo(0, 0);
     await expect(px(style.borderBottomRightRadius), 'bottom-right is square').toBeCloseTo(0, 0);
     await expect(px(style.borderBottomLeftRadius), 'bottom-left is square').toBeCloseTo(0, 0);
@@ -207,9 +210,10 @@ export const ColorModes = {
     play: async ({ canvasElement }) => withTestViewport(1024, HEIGHT, async () => {
         const { frame, surface, sidebar } = parts(canvasElement);
         const lightSunken = tokenColor(canvasElement, '--ds-surface-sunken');
-        await waitFor(() => expect(getComputedStyle(sidebar()).position, 'docked at 1024').toBe('static'));
+        await waitFor(() => expect(getComputedStyle(sidebar()).position, 'docked at 1024, in flow').not.toBe('absolute'));
         const aside = sidebar();
         await expect(rect(aside).right, 'the sidebar sits flush against the surface').toBeCloseTo(rect(surface).left, 0);
+        const edgeLine = 'var(--border-default) 0 0 0 var(--ds-border)';
         await expect(tokenLength(frame, '--size-surface-border'), 'the surface edge covers the divider')
             .toBeGreaterThanOrEqual(tokenLength(frame, '--stroke-1'));
         await inEveryColorMode(async (mode) => {
@@ -221,9 +225,8 @@ export const ColorModes = {
             await expect(surfaceStyle.backgroundColor, `${mode}: the surface`).toBe(tokenColor(canvasElement, '--ds-surface'));
             await expect(surfaceStyle.boxShadow, `${mode}: the surface edge`)
                 .toBe(computedShadow(canvasElement, PAGE_EDGE));
-            await expect(asideStyle.borderRightStyle, `${mode}: the docked sidebar's divider`).toBe('solid');
-            await expect(px(asideStyle.borderRightWidth), `${mode}: a 1px divider`).toBeCloseTo(tokenLength(frame, '--stroke-1'), 1);
-            await expect(asideStyle.borderRightColor, `${mode}: in the border color`).toBe(tokenColor(canvasElement, '--ds-border'));
+            await expect(asideStyle.boxShadow, `${mode}: the docked sidebar's 1px edge in the border color`)
+                .toBe(computedShadow(canvasElement, edgeLine));
             if (mode.startsWith('dark')) {
                 await expect(frameStyle.backgroundColor, `${mode}: the frame moves with the mode`).not.toBe(lightSunken);
             }
@@ -246,14 +249,14 @@ export const DocsReading = { render: DocsFrame, args: { width: 'reading' }, para
 
 /**
  * The sidebar floating: a closed sidebar peeked over the page. The story
- * hovers the toggle once it mounts, which is what a pointer does.
+ * hovers the frame's left edge once it mounts, which is what a pointer does.
  */
 const FrameDemo = ({ peek = false, ...args }) => {
     const ref = useRef(null);
     useEffect(() => {
         if (!peek) return;
-        const toggle = ref.current?.querySelector('.plus-topbar__toggle');
-        toggle?.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
+        const edge = ref.current?.querySelector('.plus-frame__edge');
+        edge?.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
     }, [peek]);
     return (
         <div ref={ref}>
@@ -299,13 +302,14 @@ export const Floating = {
     },
 };
 
-/** 768: the Sidebar is collapsed; hover peeks it, an outside click closes it, a click opens it as an overlay (it never docks under 1024). */
+/** 768: the Sidebar is collapsed; the left edge peeks it, an outside click closes it, the toggle opens it as an overlay (it never docks under 1024). */
 export const Medium768 = {
     play: async ({ canvasElement }) => atViewport(768, async () => {
-        const { frame, toggle, surface, content, sidebar, edge } = parts(canvasElement);
-        await expectTopbar(frame);
-        await expectToggleHome(frame, toggle);
+        const p = parts(canvasElement);
+        const { frame, surface, content, sidebar, edge } = p;
         await waitFor(() => expect(sidebar(), `closed below 1024 (found ${sidebar()?.className}, viewport ${window.innerWidth})`).toBeNull());
+        const toggle = p.toggle;
+        await expectToggleHome(frame, toggle);
         await expect(toggle).toHaveAttribute('aria-expanded', 'false');
 
         await expect(offset(frame, surface).x, 'surface starts at the window edge').toBeCloseTo(0, 0);
@@ -314,20 +318,24 @@ export const Medium768 = {
         await expect(rect(content).width, 'content width').toBeCloseTo(tokenLength(frame, '--content-width'), 0);
         await expectNoSeam(frame, surface);
 
-        // Hover the toggle: the sidebar peeks, floating.
+        // Hovering the toggle peeks nothing: the toggle is a button, not a hover zone.
         const surfaceLeft = rect(surface).left;
         await userEvent.hover(toggle);
+        await new Promise((resolve) => { setTimeout(resolve, 100); });
+        await expect(sidebar(), 'no peek from the toggle').toBeNull();
+        await userEvent.unhover(toggle);
+
+        // Hovering the left edge peeks it, floating.
+        await userEvent.hover(edge());
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expectFloating(frame, sidebar(), surface, surfaceLeft);
-        await expectToggleHome(frame, toggle);
-        // Peeking is not docking: the corner stays square.
-        await expectCorner(frame, surface, false);
+        await expectCorner(frame, surface);
 
         // An outside click closes it.
         await userEvent.click(surface);
         await waitFor(() => expect(sidebar()).toBeNull());
 
-        // Hovering the left edge peeks it too.
+        // Hovering the left edge again peeks it again.
         await userEvent.hover(edge());
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expectFloating(frame, sidebar(), surface, surfaceLeft);
@@ -337,21 +345,21 @@ export const Medium768 = {
         await waitFor(() => expect(sidebar()).toBeNull());
 
         // A click opens it by hand. Under 1024 it never docks: it floats over the Page as an overlay.
-        await userEvent.click(toggle);
+        await userEvent.click(p.toggle);
         await waitFor(() => expect(sidebar()).not.toBeNull());
-        await userEvent.unhover(toggle);
         await new Promise((resolve) => { setTimeout(resolve, 400); });
         await expect(sidebar(), 'it stays open once the pointer leaves').not.toBeNull();
         await expectFloating(frame, sidebar(), surface, surfaceLeft);
-        await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+        await expect(p.toggle, 'the Sidebar\'s own toggle now').toHaveAttribute('aria-label', 'Close sidebar');
+        await expect(p.toggle).toHaveAttribute('aria-expanded', 'true');
         await expect(rect(content).width, 'the Page keeps its width').toBeCloseTo(tokenLength(frame, '--content-width'), 0);
-        await expectCorner(frame, surface, false);
-        await expectToggleHome(frame, toggle);
+        await expectCorner(frame, surface);
+        await expectToggleHome(frame, p.toggle);
 
         // An outside click closes an overlay Sidebar.
         await userEvent.click(surface);
         await waitFor(() => expect(sidebar()).toBeNull());
-        await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+        await expect(p.toggle).toHaveAttribute('aria-expanded', 'false');
     }),
 };
 
@@ -359,17 +367,16 @@ export const Medium768 = {
 export const Large1024 = {
     play: async ({ canvasElement }) => atViewport(1024, async () => {
         const p = parts(canvasElement);
-        const { frame, toggle, surface, content, sidebar } = p;
-        await expectTopbar(frame);
-        await expectToggleHome(frame, toggle);
+        const { frame, surface, content, sidebar } = p;
         await waitFor(() => expect(sidebar(), 'docked from 1024').not.toBeNull());
-        await expect(getComputedStyle(sidebar()).position).toBe('static');
+        await expectToggleHome(frame, p.toggle);
+        await expect(getComputedStyle(sidebar()).position).not.toBe('absolute');
         await expect(offset(frame, surface).x).toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
         await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
         await expect(surfacePad(surface), 'surface pad is 24 at every width').toBeCloseTo(tokenLength(frame, '--space-150'), 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-width'), 0);
         await expectNoSeam(frame, surface);
-        await expectCorner(frame, surface, true);
+        await expectCorner(frame, surface);
 
         // Landmarks: the Page is the main, the Sidebar's nav is the navigation, and nothing is a bare "sidebar" aside.
         await expect(p.canvas.getByRole('main')).toBe(content);
@@ -380,15 +387,16 @@ export const Large1024 = {
         const tab = within(sidebar()).getAllByRole('button')[0];
         await expect(rect(tab).height, 'sidebar row height').toBeCloseTo(tokenLength(frame, '--item-height-md'), 0);
 
-        await userEvent.click(toggle);
+        await userEvent.click(p.toggle);
         await waitFor(() => expect(sidebar()).toBeNull());
         await expect(offset(frame, surface).x, 'closed: the surface runs to the window edge').toBeCloseTo(0, 0);
-        await expectCorner(frame, surface, false);
-        await expectToggleHome(frame, toggle);
+        await expectCorner(frame, surface);
+        await expectToggleHome(frame, p.toggle);
+        await waitFor(() => expect(p.toggle, 'focus follows to the Page\'s toggle').toHaveFocus());
 
-        // Closed at 1024, a hover still peeks without pushing.
+        // Closed at 1024, the left edge still peeks without pushing.
         const surfaceLeft = rect(surface).left;
-        await userEvent.hover(toggle);
+        await userEvent.hover(p.edge());
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expectFloating(frame, sidebar(), surface, surfaceLeft);
     }),
@@ -397,20 +405,21 @@ export const Large1024 = {
 /** Ctrl+[ toggles the Sidebar, and the corner follows it in the same frame. */
 export const CtrlBracketToggle = {
     play: async ({ canvasElement }) => atViewport(1440, async () => {
-        const { frame, surface, sidebar, toggle } = parts(canvasElement);
+        const p = parts(canvasElement);
+        const { frame, surface, sidebar } = p;
         await waitFor(() => expect(sidebar(), 'docked at 1440').not.toBeNull());
-        await expectCorner(frame, surface, true);
-        await expect(toggle).toHaveAttribute('aria-keyshortcuts', 'Control+[');
+        await expectCorner(frame, surface);
+        await expect(p.toggle).toHaveAttribute('aria-keyshortcuts', 'Control+[ Meta+[');
 
         await userEvent.keyboard('{Control>}[[{/Control}');
         await waitFor(() => expect(sidebar(), 'Ctrl+[ closes it').toBeNull());
         await expect(offset(frame, surface).x, 'the Page runs to the window edge').toBeCloseTo(0, 0);
-        await expectCorner(frame, surface, false);
+        await expectCorner(frame, surface);
 
         await userEvent.keyboard('{Control>}[[{/Control}');
         await waitFor(() => expect(sidebar(), 'Ctrl+[ opens it again').not.toBeNull());
         await expect(offset(frame, surface).x).toBeCloseTo(tokenLength(frame, '--frame-sidebar-width'), 0);
-        await expectCorner(frame, surface, true);
+        await expectCorner(frame, surface);
     }),
 };
 
@@ -422,19 +431,20 @@ export const CtrlBracketAt768 = {
         await userEvent.keyboard('{Control>}[[{/Control}');
         await waitFor(() => expect(sidebar(), 'Ctrl+[ opens it').not.toBeNull());
         await expect(getComputedStyle(sidebar()).position, 'as an overlay, not docked').toBe('absolute');
-        await expectCorner(frame, surface, false);
+        await expectCorner(frame, surface);
         await userEvent.keyboard('{Control>}[[{/Control}');
         await waitFor(() => expect(sidebar(), 'Ctrl+[ closes it').toBeNull());
     }),
 };
 
-/** The Page meets the Sidebar at a hairline: the Sidebar's 1px border sits flush against the Page, with no gap. */
+/** The Page meets the Sidebar at a hairline: the Sidebar's 1px edge lies on the Page's first pixel, with no gap. */
 export const SidebarMeetsPage = {
     play: async ({ canvasElement }) => atViewport(1440, async () => {
         const { frame, surface, sidebar } = parts(canvasElement);
         await waitFor(() => expect(sidebar()).not.toBeNull());
         await expect(rect(sidebar()).right, 'no gap between the Sidebar and the Page').toBeCloseTo(rect(surface).left, 0);
-        await expect(px(getComputedStyle(sidebar()).borderRightWidth)).toBeCloseTo(tokenLength(frame, '--stroke-1'), 1);
+        await expect(getComputedStyle(sidebar()).boxShadow, 'a 1px edge in the border color')
+            .toBe(computedShadow(frame, 'var(--border-default) 0 0 0 var(--ds-border)'));
         await expectNoSeam(frame, surface);
     }),
 };
@@ -442,9 +452,10 @@ export const SidebarMeetsPage = {
 /** 1440: the surface pads 24. */
 export const XLarge1440 = {
     play: async ({ canvasElement }) => atViewport(1440, async () => {
-        const { frame, toggle, surface, content, sidebar } = parts(canvasElement);
-        await expectToggleHome(frame, toggle);
+        const p = parts(canvasElement);
+        const { frame, surface, content, sidebar } = p;
         await waitFor(() => expect(sidebar()).not.toBeNull());
+        await expectToggleHome(frame, p.toggle);
         await expect(surfacePad(surface), 'surface pad from 1440').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
         await expect(surfacePad(surface)).toBeCloseTo(tokenLength(frame, '--space-150'), 0);
         await expect(rect(content).width).toBeCloseTo(tokenLength(frame, '--content-width'), 0);
@@ -454,8 +465,10 @@ export const XLarge1440 = {
 /** 1600: content caps at 1232 and centers in the surface. */
 export const Wide1600 = {
     play: async ({ canvasElement }) => atViewport(1600, async () => {
-        const { frame, toggle, surface, content } = parts(canvasElement);
-        await expectToggleHome(frame, toggle);
+        const p = parts(canvasElement);
+        const { frame, surface, content } = p;
+        await waitFor(() => expect(p.toggle).not.toBeNull());
+        await expectToggleHome(frame, p.toggle);
         const max = tokenLength(frame, '--content-max-width');
         await expect(rect(content).width, 'content caps').toBeCloseTo(max, 0);
         const pad = surfacePad(surface);
@@ -479,7 +492,7 @@ export const ReadingAt1440 = {
 export const ContentGrid = {
     render: (args) => (
         <div style={{ height: '100vh' }}>
-            <Frame sidebar={<Sidebar user="tutor" />} {...args}>
+            <Frame sidebar={<Sidebar user="tutor" account={{ id: 'story', name: 'John Doe', role: 'Tutor' }} />} {...args}>
                 {slot('Full width')}
                 <div style={{ gridColumn: 'span 4' }}>{slot('4 columns')}</div>
                 <div style={{ gridColumn: 'span 8' }}>{slot('8 columns')}</div>
@@ -506,7 +519,7 @@ export const ContentGrid = {
  * A page with a modal. Opening a modal closes a floating sidebar and leaves a
  * docked one alone; Escape then closes the modal only, and focus goes back to
  * what opened it. A trigger inside the floating sidebar leaves with the
- * sidebar, so focus goes to the sidebar toggle instead.
+ * sidebar, so focus goes to the Page's toggle instead.
  */
 const WithModal = (args) => {
     const [open, setOpen] = useState(false);
@@ -514,10 +527,10 @@ const WithModal = (args) => {
     return (
         <div style={{ height: '100vh' }}>
             <Frame
-                topbar={<Topbar breadcrumbs={[{ text: 'Home', href: '#' }, { text: 'Dashboard' }]} />}
+                header={<Breadcrumb items={[{ text: 'Home', href: '#' }, { text: 'Dashboard' }]} />}
                 sidebar={(
                     <>
-                        <Sidebar user="tutor" activeTabId="home" />
+                        <Sidebar user="tutor" activeTabId="home" account={{ id: 'story', name: 'John Doe', role: 'Tutor' }} />
                         <Button text="Preferences" onClick={() => setOpen(true)} />
                     </>
                 )}
@@ -542,9 +555,10 @@ const WithModal = (args) => {
 
 const dialog = (canvasElement) => within(canvasElement.ownerDocument.body).queryByRole('dialog', { name: 'Settings' });
 
-/** Hover the toggle until the sidebar floats over the page. */
-const peekSidebar = async ({ toggle, sidebar }) => {
-    await userEvent.hover(toggle);
+/** Hover the frame's left edge until the sidebar floats over the page. */
+const peekSidebar = async ({ edge, sidebar }) => {
+    await waitFor(() => expect(edge()).not.toBeNull());
+    await userEvent.hover(edge());
     await waitFor(() => expect(sidebar()).not.toBeNull());
     await expect(getComputedStyle(sidebar()).position, 'floating').toBe('absolute');
 };
@@ -601,7 +615,7 @@ export const ModalLeavesDockedSidebar = {
         await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
         await expect(p.sidebar(), 'hidden from assistive tech under the modal').toBeNull();
         await expect(p.coveredSidebar(), 'still docked').not.toBeNull();
-        await expect(getComputedStyle(p.coveredSidebar()).position).toBe('static');
+        await expect(getComputedStyle(p.coveredSidebar()).position).not.toBe('absolute');
 
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(dialog(canvasElement)).toBeNull());
@@ -617,7 +631,6 @@ export const ModalClosesOverlaySidebarAt768 = {
         const p = parts(canvasElement);
         await userEvent.click(p.toggle);
         await waitFor(() => expect(p.sidebar()).not.toBeNull());
-        await userEvent.unhover(p.toggle);
         await expect(getComputedStyle(p.sidebar()).position, 'an overlay, not docked').toBe('absolute');
 
         const trigger = p.canvas.getByRole('button', { name: 'Page settings' });
@@ -635,7 +648,7 @@ export const ModalClosesOverlaySidebarAt768 = {
 /* ------------------------------------------------------------- panel */
 
 /**
- * The Panel area: the Frame's right-hand area, under the Topbar. The layout
+ * The Panel area: the Frame's right-hand area, full height. The layout
  * resolver decides whether it docks beside the Page at a hairline or opens
  * over it on a Blanket. Each story sets the viewport first, then opens the
  * Panel the way a person does, from a button on the Page.
@@ -687,15 +700,18 @@ const AskField = () => {
 /** A Sidebar whose own button opens the Panel, so opening it can collapse the Sidebar that held focus. */
 const ChatSidebar = () => {
     const panel = usePanelControl();
+    const control = useSidebarControl();
     return (
         <nav aria-label="Main">
+            {/* A sidebar of its own still draws the Frame's toggle, as the Sidebar pattern does. */}
+            <IconButton appearance="subtle" icon="angles-left" label="Close sidebar" {...control?.closeProps} />
             <Button text="Ask AI" onClick={() => panel?.setOpen(true)} />
         </nav>
     );
 };
 
-/** A Topbar button that controls the Panel, the way an app's chat button sits in its Topbar. */
-const TopbarChatTrigger = () => {
+/** A button in the Page's header row that controls the Panel, the way an app's chat button sits beside its breadcrumb. */
+const HeaderChatTrigger = () => {
     const panel = usePanelControl();
     return (
         <Button
@@ -707,12 +723,12 @@ const TopbarChatTrigger = () => {
     );
 };
 
-const WithPanel = ({ withModal = false, withTopbarTrigger = false, ...args }) => {
+const WithPanel = ({ withModal = false, withHeaderTrigger = false, ...args }) => {
     const [modal, setModal] = useState(false);
-    const topbar = withTopbarTrigger ? (
-        <div style={{ display: 'flex', alignItems: 'center' }}>
-            <Topbar />
-            <TopbarChatTrigger />
+    const header = withHeaderTrigger ? (
+        <div style={{ display: 'flex', flex: '1 1 auto', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Breadcrumb items={[{ text: 'Home', href: '#' }, { text: 'Dashboard' }]} />
+            <HeaderChatTrigger />
         </div>
     ) : undefined;
     return (
@@ -720,7 +736,7 @@ const WithPanel = ({ withModal = false, withTopbarTrigger = false, ...args }) =>
             <InAppFrame
                 panel={<ChatPanel onSettings={withModal ? () => setModal(true) : undefined} />}
                 panelLabel="AI chat"
-                {...(topbar ? { topbar } : {})}
+                {...(header ? { header } : {})}
                 {...args}
             >
                 <ChatToggle />
@@ -745,6 +761,8 @@ const panelParts = (canvasElement) => {
     const p = parts(canvasElement);
     return {
         ...p,
+        // Spreading reads the toggle once; keep it a live getter.
+        get toggle() { return p.toggle; },
         panel: () => p.frame.querySelector('.plus-frame__panel'),
         landmark: () => p.canvas.queryByRole('complementary', { name: 'AI chat' }),
         splitter: () => p.canvas.queryByRole('separator', { name: /resize/i }),
@@ -778,14 +796,14 @@ export const PanelDockedAt1440 = {
         await expect(getComputedStyle(panel).position, 'docked, in flow').not.toBe('absolute');
         await expect(rect(panel).width, 'the default width').toBeCloseTo(tokenLength(p.frame, '--panel-width-default'), 0);
         await expect(rect(panel).right, 'flush to the window edge').toBeCloseTo(rect(p.frame).right, 0);
-        await expect(rect(panel).top, 'under the Topbar').toBeCloseTo(rect(p.frame.querySelector('.plus-frame__topbar')).bottom, 0);
+        await expect(rect(panel).top, 'full height, from the top').toBeCloseTo(rect(p.frame).top, 0);
         await expect(rect(p.surface).right, 'the Page meets the Panel').toBeCloseTo(rect(panel).left, 0);
         await expect(px(getComputedStyle(panel).borderLeftWidth), 'at a hairline').toBeCloseTo(tokenLength(p.frame, '--stroke-1'), 1);
         await expect(getComputedStyle(panel).backgroundColor, 'docked, the Panel is the Page fill').toBe(tokenColor(p.frame, '--ds-surface'));
         await expect(p.sidebar(), 'the Sidebar stays docked').not.toBeNull();
         await expect(rect(p.content).width, 'content 1440 - 240 - 400 - 48').toBeCloseTo(752, 0);
         await expect(p.blanket(), 'docked has no Blanket').toBeNull();
-        // Landmark order: topbar, nav, main, panel.
+        // Landmark order: nav, main, panel.
         const main = p.canvas.getByRole('main');
         await expect(main.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
@@ -794,12 +812,11 @@ export const PanelDockedAt1440 = {
     }),
 };
 
-/** The Blanket covers the Page and the Sidebar's column but starts under the Topbar. */
+/** The Blanket covers the Page and the Sidebar's column, full height. */
 const expectBlanket = async (p) => {
     const blanket = p.blanket();
     await expect(blanket, 'an overlay Panel has a Blanket').not.toBeNull();
-    const topbar = p.frame.querySelector('.plus-frame__topbar');
-    await expect(rect(blanket).top, 'the Blanket leaves the Topbar uncovered').toBeCloseTo(rect(topbar).bottom, 0);
+    await expect(rect(blanket).top, 'from the top').toBeCloseTo(rect(p.frame).top, 0);
     await expect(rect(blanket).left, 'it covers the Sidebar column').toBeCloseTo(rect(p.frame).left, 0);
     await expect(getComputedStyle(blanket).backgroundColor).toBe(tokenColor(p.frame, '--ds-blanket'));
     const s = rect(p.surface);
@@ -813,7 +830,7 @@ const expectOverlayPanel = async (p, width) => {
     await expect(getComputedStyle(panel).boxShadow).toBe(computedShadow(p.frame, 'var(--ds-shadow-overlay)'));
     await expect(rect(panel).width, 'overlay width').toBeCloseTo(width, 0);
     await expect(rect(panel).right).toBeCloseTo(rect(p.frame).right, 0);
-    await expect(rect(panel).top).toBeCloseTo(rect(p.frame.querySelector('.plus-frame__topbar')).bottom, 0);
+    await expect(rect(panel).top).toBeCloseTo(rect(p.frame).top, 0);
 };
 
 /** 1200 with a 400 Panel: both would leave 512, the Panel alone 752, so the default Sidebar collapses and comes back when the Panel closes. */
@@ -822,19 +839,19 @@ export const PanelAutoCollapsesSidebarAt1200 = {
     play: async ({ canvasElement }) => atViewport(1200, async () => {
         const p = panelParts(canvasElement);
         await waitFor(() => expect(p.sidebar(), 'docked at 1200').not.toBeNull());
-        await expectCorner(p.frame, p.surface, true);
+        await expectCorner(p.frame, p.surface);
         await openPanel(p);
         await waitFor(() => expect(p.sidebar(), 'the Sidebar collapses to keep 720').toBeNull());
         await expect(getComputedStyle(p.panel()).position).not.toBe('absolute');
         await expect(offset(p.frame, p.surface).x, 'the Page runs to the left edge').toBeCloseTo(0, 0);
         await expect(rect(p.content).width, '1200 - 400 - 48').toBeCloseTo(752, 0);
-        await expectCorner(p.frame, p.surface, false);
+        await expectCorner(p.frame, p.surface);
         await expect(p.toggle).toHaveAttribute('aria-expanded', 'false');
 
         await userEvent.click(within(p.panel()).getByRole('button', { name: 'Close' }));
         await waitFor(() => expect(p.panel()).toBeNull());
         await waitFor(() => expect(p.sidebar(), 'restored when the Panel closes').not.toBeNull());
-        await expectCorner(p.frame, p.surface, true);
+        await expectCorner(p.frame, p.surface);
         await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus goes back to what opened it')
             .toBe(p.canvas.getByRole('button', { name: 'Open chat' })));
     }),
@@ -873,11 +890,11 @@ export const SidebarByHandWinsAt1300 = {
         await waitFor(() => expect(p.sidebar()).toBeNull());
         const panel = p.panel();
         await expect(getComputedStyle(panel).position).not.toBe('absolute');
-        // The Topbar is above the Blanket, so the toggle stays pressable.
+        // Docked, the Panel has no Blanket, so the Page's toggle is pressable.
         await userEvent.click(p.toggle);
         // The Panel moves to overlay, so the docked Sidebar is under its Blanket, out of reach.
         await waitFor(() => expect(p.coveredSidebar(), 'opened by hand, it docks').not.toBeNull());
-        await expect(getComputedStyle(p.coveredSidebar()).position).toBe('static');
+        await expect(getComputedStyle(p.coveredSidebar()).position).not.toBe('absolute');
         await expect(p.panel(), 'the same Panel, not remounted').toBe(panel);
         await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
         await expectBlanket(p);
@@ -947,7 +964,6 @@ export const OverlayPanelIsModalAt1100 = {
         await expect(p.surface.inert, 'the Page under the Blanket is inert').toBe(true);
         await expect(p.coveredSidebar().inert, 'the Sidebar under the Blanket is inert').toBe(true);
         await expect(p.sidebar(), 'and out of the accessibility tree').toBeNull();
-        await expect(p.frame.querySelector('.plus-frame__topbar').inert, 'the Topbar stays live').toBe(false);
         // Tab and Shift+Tab stay inside the Panel.
         for (let i = 0; i < 4; i += 1) {
             await userEvent.tab();
@@ -1047,9 +1063,9 @@ export const DockedPanelTakesLostFocusAt1200 = {
     }),
 };
 
-/** 1100: a Topbar button that controls the Panel toggles it itself; its press is not an outside press that would close and reopen it. */
-export const TopbarTriggerTogglesOverlayAt1100 = {
-    render: (args) => <WithPanel {...args} withTopbarTrigger />,
+/** 1100: a header button that controls the Panel toggles it itself; its press is not an outside press that would close and reopen it. */
+export const HeaderTriggerTogglesOverlayAt1100 = {
+    render: (args) => <WithPanel {...args} withHeaderTrigger />,
     play: async ({ canvasElement }) => atViewport(1100, async () => {
         const p = panelParts(canvasElement);
         const trigger = p.canvas.getByRole('button', { name: 'Chat' });
@@ -1093,15 +1109,14 @@ export const OneOverlayAt768 = {
         await expectOverlayPanel(p, tokenLength(p.frame, '--panel-min-width'));
         await expectBlanket(p);
         await expect(p.splitter(), 'no splitter under 1024').toBeNull();
-        // Hovering the toggle under the Blanket does not peek the Sidebar.
-        await userEvent.hover(p.toggle);
+        // Hovering the left edge under the Blanket does not peek the Sidebar.
+        await userEvent.hover(p.edge());
         await new Promise((resolve) => { setTimeout(resolve, 100); });
         await expect(p.sidebar(), 'no second overlay').toBeNull();
-        // Opening the Sidebar by hand closes the Panel.
-        await userEvent.click(p.toggle);
+        // Opening the Sidebar by hand (the toggle is under the Blanket, so Ctrl+[) closes the Panel.
+        await userEvent.keyboard('{Control>}[[{/Control}');
         await waitFor(() => expect(p.sidebar(), 'the Sidebar opens as an overlay').not.toBeNull());
         await waitFor(() => expect(p.panel(), 'and the Panel closes').toBeNull());
-        await userEvent.unhover(p.toggle);
         // Opening the Panel closes the overlay Sidebar.
         p.canvas.getByRole('button', { name: 'Open chat' }).focus();
         await userEvent.keyboard('{Enter}');

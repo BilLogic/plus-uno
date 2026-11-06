@@ -146,15 +146,18 @@ test('SidebarTab: neutral hover and press, neutral selection with its own steps,
   expectNoFill(TAB, '.plus-sidebar-tab:focus-visible:not(.plus-sidebar-tab--disabled)');
 });
 
-test('Sidebar: an open-tab parent hovers on the neutral subtle hovered step', () => {
+test('Sidebar: rows, titles and the account row hover on the neutral subtle hovered step; a selected row climbs the selected steps', () => {
   const decls = [];
   sheet('patterns/Sidebar/Sidebar.scss').walkRules((rule) => {
     if (/:hover/.test(rule.selector)) {
-      for (const node of rule.nodes) if (node.prop === 'background-color') decls.push(node.value);
+      const selected = /--selected/.test(rule.selector) && !/:not\(\.plus-pattern-sidebar__row--selected\)/.test(rule.selector);
+      for (const node of rule.nodes) if (node.prop === 'background-color') decls.push([selected, node.value]);
     }
   });
   assert.ok(decls.length > 0, 'Sidebar.scss has no hover fill');
-  for (const value of decls) assert.equal(value, layer('--ds-background-neutral-subtle-hovered'));
+  for (const [selected, value] of decls) {
+    assert.equal(value, layer(selected ? '--ds-background-selected-hovered' : '--ds-background-neutral-subtle-hovered'));
+  }
 });
 
 /* ─── Button ─────────────────────────────────────────────────────────────── */

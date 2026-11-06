@@ -17,25 +17,30 @@ export const recordPath = (parentId, recordId) => `${ROUTES[parentId]}/${recordI
 
 export const SLACK_URL = 'https://slack.com/';
 
-export const HOME_ITEMS = [{ id: 'home', text: 'Home', icon: 'house' }];
-
-export const NAV_SECTIONS = [
+/** The sidebar's groups: Home and Slack, then Training, then the Toolkit. */
+export const NAV_GROUPS = [
+    {
+        id: 'home',
+        items: [
+            { id: 'home', text: 'Home', icon: 'fa-regular fa-house' },
+            { id: 'slack', text: 'Slack', icon: 'fa-brands fa-slack', href: SLACK_URL, external: true },
+        ],
+    },
     {
         id: 'training',
         title: 'Training',
         items: [
-            { id: 'lessons', text: 'Lessons', icon: 'book-open' },
-            { id: 'onboarding', text: 'Onboarding', icon: 'graduation-cap' },
+            { id: 'lessons', text: 'Lessons', icon: 'fa-regular fa-lightbulb' },
+            { id: 'onboarding', text: 'Onboarding', icon: 'fa-regular fa-compass' },
         ],
     },
     {
         id: 'toolkit',
         title: 'Toolkit',
         items: [
-            { id: 'sessions', text: 'Sessions', icon: 'calendar-days' },
-            { id: 'students', text: 'Students', icon: 'user-group' },
-            { id: 'reviews', text: 'Reviews', icon: 'chart-simple' },
-            { id: 'slack', text: 'Slack', icon: 'message', href: SLACK_URL, external: true },
+            { id: 'sessions', text: 'Sessions', icon: 'fa-regular fa-calendar' },
+            { id: 'students', text: 'Students', icon: 'fa-regular fa-user' },
+            { id: 'reviews', text: 'Reviews', icon: 'fa-regular fa-chart-bar' },
         ],
     },
 ];

@@ -2,8 +2,10 @@
  * PageLayout Component
  *
  * The app frame every spec page is laid out in: the Frame pattern
- * (32 topbar, 240 sidebar docking from 1024, the surface and its 12-column
- * content grid) filled with the PLUS TopBar and Sidebar. The frame's sizes and
+ * (the 240 sidebar docking from 1024, the Page and its 12-column content
+ * grid) filled with the PLUS Sidebar, and the breadcrumb in the Page's header
+ * row. The signed-in person and Help Center sit in the Sidebar's account row.
+ * The frame's sizes and
  * the sidebar's dock, peek and float behavior live in Frame; this
  * component supplies the content and the page outline.
  * Figma: BS4 Foundation `Pattern/Page template` and the Frame pattern.
@@ -11,9 +13,9 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, CloseButton, LinkButton } from '@/components';
+import { Breadcrumb, Button, CloseButton, LinkButton, Skeleton } from '@/components';
 import { Frame, PatternDrawer } from '@/patterns';
-import { TopBar, Sidebar } from '../../Sections';
+import { Sidebar } from '../../Sections';
 import { usePageLayoutShell } from './PageLayoutShellContext';
 import './PageLayout.scss';
 
@@ -128,9 +130,23 @@ const FocusedFrame = ({
     );
 };
 
+/** The one-word role the account row shows, from a Specs user's `type` or `role`. */
+const ROLE_OF = { 'regular tutor': 'Tutor', tutor: 'Tutor', 'lead tutor': 'Lead', lead: 'Lead', admin: 'Admin' };
+
+/**
+ * The account row's person: the page's `topBarConfig.user` when it names one,
+ * else a demo person for the sidebar's role.
+ */
+const accountOf = (user, sidebarUser) => {
+    const name = user?.name || 'John Doe';
+    const role = ROLE_OF[String(user?.type ?? user?.role ?? '').toLowerCase()]
+        ?? (sidebarUser === 'supervisor' ? 'Lead' : 'Tutor');
+    return { id: user?.id ?? name.toLowerCase().replace(/\s+/g, '-'), name, role };
+};
+
 const PageLayout = ({
     children,
-    /** `default`: the app frame with the TopBar and Sidebar. `focused`: one task, no sidebar — see FocusedFrame. */
+    /** `default`: the app frame with the Sidebar and the breadcrumb. `focused`: one task, no sidebar — see FocusedFrame. */
     frame = 'default',
     /** Focused: called when Back is pressed. With this or `backHref`, the topbar shows Back. */
     onBack,
@@ -168,7 +184,7 @@ const PageLayout = ({
      * not by remembering a convention. `scripts/check-page-outline.mjs` and the
      * `.storybook/page-outline.js` assertion are what make forgetting it red.
      *
-     * It is visually hidden because these pages put their name in the TopBar
+     * It is visually hidden because these pages put their name in the
      * breadcrumb, not in the content — see the note on PAGE_TITLE_STYLE. With
      * `frame="focused"` it is the visible title in the focused topbar instead. A page
      * that DOES render its own visible title heading marks that heading up as
@@ -177,9 +193,9 @@ const PageLayout = ({
     title,
     /** When true, render children straight into the surface, with no `<main>` content grid (e.g. full-width chat). */
     contentDirect = false,
-    /** When true, show the TopBar skeleton and hold the sidebar's entrance reveal. */
+    /** When true, show the breadcrumb skeleton and hold the sidebar's entrance reveal. */
     shellLoading = false,
-    /** When true, apply shell-reveal has-entered for entrance animation (TopBar + Sidebar). */
+    /** When true, apply shell-reveal has-entered for entrance animation (the header and the Sidebar). */
     shellEntered = false,
     /** When true, there is no sidebar and no sidebar toggle. */
     sidebarHidden = false,
@@ -198,6 +214,8 @@ const PageLayout = ({
         if (pageShell.goHome) sidebarProps.onHomeClick = pageShell.goHome;
         if (pageShell.onTabClick) sidebarProps.onTabClick = pageShell.onTabClick;
         if (pageShell.onOpenTabSelect) sidebarProps.onOpenTabSelect = pageShell.onOpenTabSelect;
+        if (pageShell.onProfile) sidebarProps.onProfile = pageShell.onProfile;
+        if (pageShell.onSignOut) sidebarProps.onSignOut = pageShell.onSignOut;
     }
     const sidebarActiveCombined =
         (pageShell?.enabled && pageShell.activeTab ? pageShell.activeTab : null)
@@ -217,19 +235,20 @@ const PageLayout = ({
 
     const reveal = `shell-reveal${shellEntered ? ' has-entered' : ''}`;
 
-    // The topbar row is the frame's; the TopBar draws the sidebar toggle from the
-    // frame's state, so there is one toggle. Loading keeps it and shows skeletons.
-    const topbar = (
-        <div className={shellLoading ? undefined : reveal} style={{ display: 'flex', flex: '1 1 auto', minWidth: 0, height: '100%' }}>
-            <TopBar
-                breadcrumbs={topBarConfig.breadcrumbs}
-                user={topBarConfig.user}
-                onHelpClick={topBarConfig.onHelpClick}
-                helpHref={topBarConfig.helpHref}
-                loading={shellLoading}
-            />
+    // The Page's header row: the breadcrumb, a skeleton while loading. The
+    // Frame leads it with the sidebar toggle while the Sidebar is closed.
+    const header = (
+        <div className={shellLoading ? undefined : reveal} style={{ display: 'flex', flex: '1 1 auto', minWidth: 0 }}>
+            {shellLoading ? (
+                <Skeleton shape="text" width="var(--label-max-width)" />
+            ) : (
+                <Breadcrumb items={topBarConfig.breadcrumbs ?? []} />
+            )}
         </div>
     );
+
+    // The signed-in person, for the Sidebar's account row.
+    const account = accountOf(topBarConfig.user, sidebarProps.user);
 
     const sidebar = sidebarHidden ? null : (
         // A flex column that fills the sidebar panel, so the pattern's body
@@ -239,6 +258,8 @@ const PageLayout = ({
             style={{ display: 'flex', flexDirection: 'column', flex: '1 1 auto', minHeight: 0 }}
         >
             <Sidebar
+                account={account}
+                helpHref={topBarConfig.helpHref}
                 {...sidebarProps}
                 activeTabId={sidebarActiveCombined}
                 visible={true}
@@ -278,7 +299,7 @@ const PageLayout = ({
                 </FocusedFrame>
             ) : (
             <Frame
-                topbar={topbar}
+                header={header}
                 sidebar={sidebar}
                 sidebarDocked={forceExpanded ? true : undefined}
                 contentAs="main"
@@ -323,6 +344,7 @@ PageLayout.propTypes = {
     actions: PropTypes.node,
     actionsLabel: PropTypes.string,
     sidebarConfig: PropTypes.object,
+    /** The page's breadcrumbs, the signed-in user (`{ name, type }`) and `helpHref`: the header row and the Sidebar's account row */
     topBarConfig: PropTypes.object,
     footerConfig: PropTypes.object,
     id: PropTypes.string,

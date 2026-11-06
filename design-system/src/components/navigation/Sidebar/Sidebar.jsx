@@ -1,34 +1,36 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Logo from '@/components/images-and-icons/Logo';
 // The pattern's own folder, not the patterns barrel: the components barrel loads
 // this file, and pulling every pattern (and its stylesheet) in here would
 // reorder the cascade for every component that loads after it.
-import PatternSidebar, { useOpenTabs } from '@/patterns/Sidebar';
-import { sidebarContent } from './sidebarConfig';
+import PatternSidebar, { clearOpenTabs, useOpenTabs } from '@/patterns/Sidebar';
+import { sidebarGroups } from './sidebarConfig';
 
 /**
- * The PLUS sidebar: the foundation Sidebar pattern (`@/patterns`) with the
- * logo in its header and the Specs item list for the role (`sidebarConfig.js`).
- * Figma Specs: node 111:227891; BS4 Foundation `_Sidebar`.
- *
- * Both roles come from one config. Home is selected when nothing else is.
+ * The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups
+ * for the role (`sidebarConfig.js`), the signed-in person's account row, and
+ * the open tabs. Home is selected when nothing else is.
  *
  * Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a
  * student) calls `open(parentId, record)`, and the record shows here as a tab
- * under that item. A tab is selected while its parent is the current page
- * (`activeTabId`); elsewhere the page's own item is. Pressing a tab selects it
+ * under its row. A tab is selected while its row is the current page
+ * (`activeTabId`); elsewhere the page's own row is. Pressing a tab selects it
  * and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's
- * route if it is not already there. Nothing here changes the URL.
+ * route if it is not already there. Signing out clears the tabs. Nothing here
+ * changes the URL.
  */
 const Sidebar = ({
     user = 'tutor',
+    account,
+    modulesLeft = 0,
+    badges,
     onHomeClick,
     onTabClick,
     onOpenTabSelect,
-    /** When set, the tab with this id is shown as selected (anchored). e.g. 'sessions' for Sessions page */
+    onProfile,
+    onSignOut,
+    helpHref,
     activeTabId,
-    showItemsNotInSpecs = false,
     slackUrl,
     label = 'Main',
     visible = true,
@@ -38,11 +40,14 @@ const Sidebar = ({
     const openTabs = useOpenTabs();
     if (!visible) return null;
 
-    const { items, sections } = sidebarContent(user, { showItemsNotInSpecs, slackUrl });
-
     const page = activeTabId || 'home';
     const selectedTab = openTabs.tabs.find((tab) => tab.id === openTabs.selectedId);
     const activeId = selectedTab && selectedTab.parentId === page ? selectedTab.id : page;
+
+    const tabs = Object.fromEntries(Object.entries(openTabs.byParent).map(([parentId, list]) => [
+        parentId,
+        list.map((tab) => ({ ...tab, label: tab.title, live: tab.status === 'live' })),
+    ]));
 
     const handleSelect = (id) => {
         openTabs.select(id);
@@ -57,18 +62,25 @@ const Sidebar = ({
         <PatternSidebar
             className={['plus-sidebar', className].filter(Boolean).join(' ')}
             style={style}
-            header={<Logo appearance="colored" size={24} wordmark className="p-0" />}
-            items={items}
-            sections={sections}
+            groups={sidebarGroups(user, { slackUrl, badges })}
             activeId={activeId}
             onSelect={handleSelect}
-            openTabs={openTabs.byParent}
-            onTabSelect={(tab) => {
+            tabs={tabs}
+            onSelectTab={(tab) => {
                 openTabs.select(tab.id);
                 onOpenTabSelect?.(tab);
             }}
-            onTabClose={(tab) => openTabs.close(tab.id)}
-            onTabsCloseAll={(item) => openTabs.closeAll(item.id)}
+            onCloseTab={(tab) => openTabs.close(tab.id)}
+            onCloseAllTabs={(item) => openTabs.closeAll(item.id)}
+            modulesLeft={user === 'tutor' ? modulesLeft : 0}
+            account={account}
+            onProfile={onProfile}
+            onSignOut={() => {
+                clearOpenTabs();
+                onSignOut?.();
+            }}
+            helpHref={helpHref}
+            onHome={() => handleSelect('home')}
             label={label}
         />
     );
@@ -76,17 +88,38 @@ const Sidebar = ({
 
 Sidebar.propTypes = {
     user: PropTypes.oneOf(['tutor', 'supervisor']),
-    /** Home's press; without it Home calls `onTabClick('home')` */
+    /** The signed-in person: name, preferred name, one-word role, and an id that keys their remembered sections */
+    account: PropTypes.shape({
+        id: PropTypes.string,
+        name: PropTypes.string.isRequired,
+        preferredName: PropTypes.string,
+        /** Tutor, Lead or Admin; the pattern holds the list (`ACCOUNT_ROLES`), read at render, since this file loads inside the pattern's own import cycle */
+        role: PropTypes.string.isRequired,
+    }),
+    /** A tutor's onboarding modules left. Above 0 the Toolkit is locked; supervisors are never locked. */
+    modulesLeft: PropTypes.number,
+    /** The trailing slot by row id: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }` */
+    badges: PropTypes.objectOf(PropTypes.shape({
+        count: PropTypes.number,
+        countLabel: PropTypes.string,
+        dot: PropTypes.bool,
+        dotLabel: PropTypes.string,
+    })),
+    /** Home's press (the row and the logo); without it Home calls `onTabClick('home')` */
     onHomeClick: PropTypes.func,
-    /** Called with the item id for every other item (external links excepted) */
+    /** Called with the row id for every other row (external links excepted) */
     onTabClick: PropTypes.func,
     /** Called with the open tab (`{ id, parentId, recordId, title, href, status }`) when one is pressed */
     onOpenTabSelect: PropTypes.func,
-    /** Id of the tab to show as selected (e.g. 'sessions', 'home') */
+    /** The account menu's Profile */
+    onProfile: PropTypes.func,
+    /** The account menu's Sign out, after the open tabs are cleared */
+    onSignOut: PropTypes.func,
+    /** Help Center, opened in a new tab */
+    helpHref: PropTypes.string,
+    /** Id of the row to show as selected (e.g. 'sessions', 'home') */
     activeTabId: PropTypes.string,
-    /** Also show the code-only items that are not in Specs: Toolkit › Reviews and Admin › Compliance */
-    showItemsNotInSpecs: PropTypes.bool,
-    /** Where Toolkit › Slack links; defaults to `SLACK_URL` */
+    /** Where Slack links; defaults to `SLACK_URL` */
     slackUrl: PropTypes.string,
     /** Accessible name of the navigation landmark */
     label: PropTypes.string,

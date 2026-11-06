@@ -1,4 +1,5 @@
-export { default } from './Sidebar';
+export { default, SIDEBAR_SECTIONS_STORAGE_KEY, lockMessage } from './Sidebar';
+export { default as SidebarAccount, ACCOUNT_ROLES } from './SidebarAccount';
 export { default as SidebarTab } from './SidebarTab';
 export {
     useOpenTabs,

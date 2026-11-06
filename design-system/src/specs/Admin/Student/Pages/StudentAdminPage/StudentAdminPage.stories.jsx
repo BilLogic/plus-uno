@@ -280,7 +280,9 @@ export const ToolkitStudents = {
         const tab = await within(nav).findByRole('link', { name: 'Chris Hudson' });
         await expect(tab).toHaveAttribute('aria-current', 'page');
         await expect(tab).toHaveAttribute('href', '/toolkit/students');
-        await expect(within(nav).getByRole('button', { name: 'Students tabs' })).toHaveAttribute('aria-expanded', 'true');
+        // The collapse angle shows on hover and focus of the Students row.
+        within(nav).getByRole('button', { name: /^Students$/ }).focus();
+        await expect(within(nav).getByRole('button', { name: 'Hide Students tabs' })).toHaveAttribute('aria-expanded', 'true');
         await expect(await canvas.findByRole('dialog')).toBeInTheDocument();
 
         await userEvent.click(within(canvas.getByRole('dialog')).getAllByRole('button', { name: 'Close' })[0]);

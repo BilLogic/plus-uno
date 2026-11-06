@@ -3,7 +3,7 @@
 
 # Sidebar
 
-The PLUS sidebar: the foundation Sidebar pattern (`@/patterns`) with the logo in its header and the Specs item list for the role (`sidebarConfig.js`). Figma Specs: node 111:227891; BS4 Foundation `_Sidebar`. Both roles come from one config. Home is selected when nothing else is. Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a student) calls `open(parentId, record)`, and the record shows here as a tab under that item. A tab is selected while its parent is the current page (`activeTabId`); elsewhere the page's own item is. Pressing a tab selects it and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's route if it is not already there. Nothing here changes the URL.
+The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups for the role (`sidebarConfig.js`), the signed-in person's account row, and the open tabs. Home is selected when nothing else is. Open tabs come from `useOpenTabs()`: a page that opens a record (a session, a student) calls `open(parentId, record)`, and the record shows here as a tab under its row. A tab is selected while its row is the current page (`activeTabId`); elsewhere the page's own row is. Pressing a tab selects it and calls `onOpenTabSelect(tab)`, which is where an app goes to the record's route if it is not already there. Signing out clears the tabs. Nothing here changes the URL.
 
 **Import:** `import { Sidebar } from '@/components';`
 
@@ -14,12 +14,17 @@ The PLUS sidebar: the foundation Sidebar pattern (`@/patterns`) with the logo in
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `user` | enum | `'tutor'` | — |
-| `onHomeClick` | func | — | Home's press; without it Home calls `onTabClick('home')` |
-| `onTabClick` | func | — | Called with the item id for every other item (external links excepted) |
+| `account` | shape (required) | — | The signed-in person: name, preferred name, one-word role, and an id that keys their remembered sections |
+| `modulesLeft` | number | `0` | A tutor's onboarding modules left. Above 0 the Toolkit is locked; supervisors are never locked. |
+| `badges` | objectOf | — | The trailing slot by row id: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }` |
+| `onHomeClick` | func | — | Home's press (the row and the logo); without it Home calls `onTabClick('home')` |
+| `onTabClick` | func | — | Called with the row id for every other row (external links excepted) |
 | `onOpenTabSelect` | func | — | Called with the open tab (`{ id, parentId, recordId, title, href, status }`) when one is pressed |
-| `activeTabId` | string | — | Id of the tab to show as selected (e.g. 'sessions', 'home') |
-| `showItemsNotInSpecs` | bool | `false` | Also show the code-only items that are not in Specs: Toolkit › Reviews and Admin › Compliance |
-| `slackUrl` | string | — | Where Toolkit › Slack links; defaults to `SLACK_URL` |
+| `onProfile` | func | — | The account menu's Profile |
+| `onSignOut` | func | — | The account menu's Sign out, after the open tabs are cleared |
+| `helpHref` | string | — | Help Center, opened in a new tab |
+| `activeTabId` | string | — | Id of the row to show as selected (e.g. 'sessions', 'home') |
+| `slackUrl` | string | — | Where Slack links; defaults to `SLACK_URL` |
 | `label` | string | `'Main'` | Accessible name of the navigation landmark |
 | `visible` | bool | `true` | — |
 | `className` | string | `''` | — |

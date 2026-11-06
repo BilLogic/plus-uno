@@ -23,8 +23,8 @@ import { createContext, createElement, useContext, useSyncExternalStore } from '
 /** Where the default store keeps its state in `sessionStorage`. */
 export const OPEN_TABS_STORAGE_KEY = 'plus-uno:open-tabs';
 
-/** How many tabs a parent shows before "Show N more". */
-export const SIDEBAR_RECENT_TABS = 5;
+/** How many tabs a row shows before "Show n more". */
+export const SIDEBAR_RECENT_TABS = 3;
 
 const EMPTY = Object.freeze({ tabs: [], selectedId: null, seq: 0 });
 
@@ -102,7 +102,7 @@ export function createOpenTabsStore({ key = OPEN_TABS_STORAGE_KEY, storage } = {
         /**
          * Open a record as a tab under `parentId`, or bring it to the front, and select it.
          * @param {string} parentId the sidebar item it belongs to, e.g. `sessions`
-         * @param {{ id: string, title: string, href?: string, status?: 'live' }} record
+         * @param {{ id: string, title: string, tooltip?: string, href?: string, status?: 'live' }} record the title is short (time · teacher); the tooltip carries the longer name
          * @returns {string} the tab's id
          */
         open(parentId, record) {
@@ -113,6 +113,7 @@ export function createOpenTabsStore({ key = OPEN_TABS_STORAGE_KEY, storage } = {
                 parentId,
                 recordId: record.id,
                 title: record.title,
+                tooltip: record.tooltip,
                 href: record.href,
                 status: record.status,
                 openedAt: seq,
