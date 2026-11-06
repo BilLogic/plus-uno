@@ -71,9 +71,9 @@
 }
 
 .plus-skeleton--status-spacious {
-    --plus-skeleton-width: calc(var(--space-500) + var(--space-050));
+    --plus-skeleton-width: calc(var(--size-spacing-large-space-1000) + var(--size-spacing-small-space-100));
     --plus-skeleton-height: #{label.$status-height-spacious};
-    --plus-skeleton-radius: var(--radius-0375);
+    --plus-skeleton-radius: var(--size-border-radius-radius-150);
 }
 
 .plus-skeleton--count {
@@ -83,7 +83,7 @@
 }
 
 .plus-skeleton--tag {
-    --plus-skeleton-width: calc(var(--space-400) + var(--space-050));
+    --plus-skeleton-width: calc(var(--size-spacing-large-space-900) + var(--size-spacing-small-space-100));
     --plus-skeleton-height: #{label.$tag-height};
     --plus-skeleton-radius: var(--radius-md);
 }
@@ -127,11 +127,11 @@
 }
 
 .plus-skeleton--tag-narrow {
-    --plus-skeleton-width: calc(var(--space-250) + var(--space-100));
+    --plus-skeleton-width: calc(var(--size-spacing-large-space-700) + var(--size-spacing-medium-space-300));
 }
 
 .plus-skeleton--tag-widest {
-    --plus-skeleton-width: calc(var(--space-500) + var(--space-050));
+    --plus-skeleton-width: calc(var(--size-spacing-large-space-1000) + var(--size-spacing-small-space-100));
 }
 
 /* ----------------------------------------------------------------- shimmer */

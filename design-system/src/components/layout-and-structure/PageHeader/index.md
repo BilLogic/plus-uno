@@ -9,7 +9,7 @@ actions to its side, and a bottom bar below.
 
 **Source:** `design-system/src/components/layout-and-structure/PageHeader/PageHeader.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/PageHeader/PageHeader.stories.jsx` — Basic, WithBreadcrumbsActionsAndBottomBar, DisableTitleStyles, Interactive
+**Stories:** `design-system/src/components/layout-and-structure/PageHeader/PageHeader.stories.jsx` — Basic, WithBreadcrumbsActionsAndBottomBar, DisableTitleStyles, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/layout-and-structure/PageHeader/PageHeader.mdx`
 

@@ -9,7 +9,7 @@ The border that shows PLUS AI is generating content: a 2px rounded stroke in two
 
 **Source:** `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.jsx`
 
-**Stories:** `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.stories.jsx` — Idle, Generating, ReducedMotion, Radii, Interactive
+**Stories:** `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.stories.jsx` — Idle, Generating, ReducedMotion, Radii, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.mdx`
 

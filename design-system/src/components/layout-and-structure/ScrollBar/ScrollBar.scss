@@ -13,8 +13,8 @@
 
     // WebKit (Chrome, Safari, Edge)
     &::-webkit-scrollbar {
-        width: var(--space-0375);
-        height: var(--space-0375);
+        width: var(--size-spacing-small-space-075);
+        height: var(--size-spacing-small-space-075);
     }
 
     &::-webkit-scrollbar-track {

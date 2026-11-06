@@ -114,9 +114,9 @@
         align-items: center;
         justify-content: center;
 
-        padding: var(--space-100);
-        min-width: var(--size-300); // Touch target, 48
-        min-height: var(--size-300);
+        padding: var(--size-spacing-medium-space-300);
+        min-width: var(--size-spacing-large-space-800); // Touch target, 48
+        min-height: var(--size-spacing-large-space-800);
 
         color: var(--ds-text-subtle);
         background: none;

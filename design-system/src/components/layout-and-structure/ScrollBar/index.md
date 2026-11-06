@@ -9,7 +9,7 @@ scrollbar styling (thin width, outline-colored thumb, transparent track) to its 
 
 **Source:** `design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.stories.jsx` — Overview, Layout, Content, Interactive
+**Stories:** `design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.stories.jsx` — Overview, Layout, Content, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.mdx`
 
@@ -18,7 +18,7 @@ scrollbar styling (thin width, outline-colored thumb, transparent track) to its 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | node | — | — |
-| `maxHeight` | string or number | `'320px'` | Maximum height before vertical scrolling begins (e.g., "240px") |
+| `maxHeight` | string or number | `'calc(var(--size-spacing-xlarge-space-2000) * 2)'` | Maximum height before vertical scrolling begins (e.g., "240px") |
 | `horizontal` | bool | `false` | Scroll horizontally instead of vertically |
 | `id` | string | — | — |
 | `className` | string | `''` | — |
@@ -26,7 +26,7 @@ scrollbar styling (thin width, outline-colored thumb, transparent track) to its 
 
 ## Tokens touched
 
-`--color-outline` · `--color-outline-variant` · `--radius-md`
+`--ds-border` · `--ds-border-bold` · `--radius-md` · `--size-spacing-small-space-075`
 
 From `design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.scss`. Override these through the token layer, never with a literal.
 

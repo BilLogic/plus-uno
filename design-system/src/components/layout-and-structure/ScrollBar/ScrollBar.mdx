@@ -122,7 +122,7 @@ list in a fixed panel, a wide table in a narrow column. It is a wrapper: it caps
 the height, turns on overflow, and applies the design system's thin scrollbar so
 the region does not draw the platform's default one.
 
-`maxHeight` (default `var(--size-2000)`, 320 tall) caps a vertical region. `horizontal` switches the
+`maxHeight` (default twice the `2000` size, 320 tall) caps a vertical region. `horizontal` switches the
 axis, and in that mode `maxHeight` is ignored — the width comes from the
 container.
 
@@ -159,9 +159,9 @@ container.
 </thead>
 <tbody>
 <tr><td>Thumb</td><td><code>--ds-border</code>; <code>--ds-border-bold</code> on hover.</td></tr>
-<tr><td>Width</td><td><code>--space-0375</code>.</td></tr>
+<tr><td>Width</td><td><code>--size-spacing-small-space-075</code>.</td></tr>
 <tr><td>Corner</td><td><code>--radius-md</code>.</td></tr>
-<tr><td>Height cap</td><td><code>--size-2000</code> by default.</td></tr>
+<tr><td>Height cap</td><td>twice <code>--size-spacing-xlarge-space-2000</code> by default.</td></tr>
 </tbody>
 </DocsTable>
 
