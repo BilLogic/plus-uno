@@ -4,6 +4,8 @@ import { expect, userEvent, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 
 import AiLabel, { AI_ORIGINS } from './AiLabel';
+import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 
 /**
  * `AiLabel` — identity and trust before chat (#269).
@@ -200,4 +202,63 @@ Interactive.args = {
     confidence: 'high',
     text: '',
     note: '',
+};
+
+/* ------------------------------------------------------------------- states */
+
+/** Rest: a note, not a control, with the confidence in its name. */
+export const Rest = {
+    render: () => <AiLabel origin="generated" />,
+    play: async ({ canvasElement }) => {
+        const mark = within(canvasElement).getByRole('note');
+        await expect(mark).not.toHaveAttribute('tabindex');
+        await expect(mark.querySelector('button')).toBeNull();
+    },
+};
+
+/** Hovered: the mark does not react. */
+export const Hovered = {
+    render: () => <AiLabel origin="generated" />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(within(canvasElement).getByRole('note'), ':hover', 'AiLabel');
+    },
+};
+
+/** Pressed: the mark does not react. */
+export const Pressed = {
+    render: () => <AiLabel origin="generated" />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(within(canvasElement).getByRole('note'), ':active', 'AiLabel');
+    },
+};
+
+/** Focused: the mark is skipped; the explain button, when there is one, takes the 2px ring. */
+export const Focused = {
+    render: () => (
+        <div>
+            <AiLabel origin="generated" />
+            <AiLabel origin="assisted" onExplain={() => {}} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const [plain] = canvas.getAllByRole('note');
+        await expectNotAControl(plain, 'AiLabel');
+        const explain = canvas.getByRole('button', { name: 'How was this made?' });
+        explain.focus({ focusVisible: true });
+        await expect(explain).toHaveFocus();
+        const style = getComputedStyle(explain);
+        await expect(style.outlineStyle).toBe('solid');
+        await expect(style.outlineWidth).toBe('2px');
+    },
+};
+
+/** Disabled: there is none; the mark is never dimmed. */
+export const Disabled = {
+    render: () => <AiLabel origin="generated" />,
+    play: async ({ canvasElement }) => {
+        const mark = within(canvasElement).getByRole('note');
+        await expect(mark).not.toHaveAttribute('aria-disabled');
+        await expect(getComputedStyle(mark).opacity).toBe('1');
+    },
 };

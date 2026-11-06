@@ -5,6 +5,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
 import StatusTag, { STATUS_TAG_APPEARANCES, STATUS_TAG_SPACINGS } from './StatusTag';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 
 /**
  * `StatusTag` — the condition something is in.
@@ -467,4 +468,50 @@ export const Interactive = {
         spacing: { control: 'inline-radio', options: STATUS_TAG_SPACINGS },
     },
     render: ({ leadingVisual, ...args }) => <StatusTag {...args} leadingVisual={leadingVisual || undefined} />,
+};
+
+/* ------------------------------------------------------------------- states */
+
+/** Rest, the only state: a status tag is a label, not a control. */
+export const Rest = {
+    render: () => <StatusTag data-testid="status">In review</StatusTag>,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByTestId('status');
+        await expect(px(getComputedStyle(el).height), 'default is 20').toBe(20);
+        await expect(el).not.toHaveAttribute('tabindex');
+    },
+};
+
+/** Hovered: nothing changes. */
+export const Hovered = {
+    render: () => <StatusTag data-testid="status">In review</StatusTag>,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(within(canvasElement).getByTestId('status'), ':hover', 'StatusTag');
+    },
+};
+
+/** Pressed: nothing changes. */
+export const Pressed = {
+    render: () => <StatusTag data-testid="status">In review</StatusTag>,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(within(canvasElement).getByTestId('status'), ':active', 'StatusTag');
+    },
+};
+
+/** Focused: not in the tab order, so Tab skips it. */
+export const Focused = {
+    render: () => <StatusTag data-testid="status">In review</StatusTag>,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(within(canvasElement).getByTestId('status'), 'StatusTag');
+    },
+};
+
+/** Disabled: there is none. A label is never dimmed; a disabled thing is described by the control beside it. */
+export const Disabled = {
+    render: () => <StatusTag data-testid="status">In review</StatusTag>,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByTestId('status');
+        await expect(el).not.toHaveAttribute('aria-disabled');
+        await expect(getComputedStyle(el).opacity, 'never dimmed').toBe('1');
+    },
 };

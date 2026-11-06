@@ -6,6 +6,8 @@ import { computedShadow, probe, px, tokenColor } from '@/storybook-docs/lib/styl
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import Tag, { AVATAR_TAG_TYPES, TAG_COLORS, TagContext } from './Tag';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
+import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { expectFocusRing as expectRing } from '@/storybook-docs/lib/button-states.js';
 
 /**
  * `Tag` — a category, outlined: color on the border and swatch, neutral text,
@@ -1565,4 +1567,71 @@ Interactive.args = {
     isRemovable: false,
     isDisabled: false,
     isLoading: false,
+};
+
+/* ------------------------------------------------------------------- states */
+
+/** Rest: a selectable tag is outlined only, its hue on the border. */
+export const Rest = {
+    render: () => <Tag isSelected={false} color="blue">Science</Tag>,
+    play: async ({ canvasElement }) => {
+        const tag = within(canvasElement).getByRole('button', { name: 'Science', pressed: false });
+        await expect(getComputedStyle(tag).backgroundColor, 'outlined only').toBe(CLEAR);
+        await expect(getComputedStyle(tag).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-accent-blue-subtle'));
+        await expect(px(getComputedStyle(tag).height)).toBe(22);
+    },
+};
+
+/** Hovered: the accent's subtlest step. A selected tag holds its ground. */
+export const Hovered = {
+    render: () => (
+        <div style={row}>
+            <Tag isSelected={false} color="blue">Science</Tag>
+            <Tag isSelected color="blue">Selected</Tag>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectGroundUnder(canvasElement, canvas.getByRole('button', { name: 'Science' }), ':hover', '--ds-background-accent-blue-subtlest', 'selectable');
+        await expectGroundUnder(canvasElement, canvas.getByRole('button', { name: 'Selected' }), ':hover', '--ds-background-accent-blue-subtler', 'selected');
+    },
+};
+
+/** Pressed: the accent's subtlest pressed step. */
+export const Pressed = {
+    render: () => <Tag isSelected={false} color="blue">Science</Tag>,
+    play: async ({ canvasElement }) => {
+        const tag = within(canvasElement).getByRole('button', { name: 'Science' });
+        await expectGroundUnder(canvasElement, tag, ':active', '--ds-background-accent-blue-subtlest-pressed', 'selectable');
+    },
+};
+
+/** Focused: the 2px ring 2px off the edge, on the tag and on its ×. */
+export const Focused = {
+    render: () => (
+        <div style={row}>
+            <Tag isSelected={false} color="blue">Science</Tag>
+            <Tag isRemovable color="green" onAfterRemoveAction={() => {}}>Removable</Tag>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectRing(canvasElement, canvas.getByRole('button', { name: 'Science' }), 'selectable tag');
+        await expectRing(canvasElement, canvas.getByRole('button', { name: 'Remove Removable' }), 'remove button');
+    },
+};
+
+/** Disabled: the disabled ground and words, no ×, out of the tab order, and held under hover and press. */
+export const Disabled = {
+    render: () => <Tag isSelected={false} color="blue" isDisabled>Science</Tag>,
+    play: async ({ canvasElement }) => {
+        const tag = within(canvasElement).getByRole('button', { name: 'Science' });
+        await expect(tag).toBeDisabled();
+        await expectGroundUnder(canvasElement, tag, undefined, '--ds-background-disabled', 'disabled');
+        await expectGroundUnder(canvasElement, tag, ':hover', '--ds-background-disabled', 'disabled');
+        await expectGroundUnder(canvasElement, tag, ':active', '--ds-background-disabled', 'disabled');
+        await expect(getComputedStyle(tag).color).toBe(tokenColor(canvasElement, '--ds-text-disabled'));
+        await userEvent.tab();
+        await expect(tag).not.toHaveFocus();
+    },
 };

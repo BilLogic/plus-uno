@@ -7,6 +7,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import Tag from '../Tag';
 import Suggestion from '../Suggestion';
 import TagGroup from './TagGroup';
+import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 
 /**
  * `TagGroup` — the gaps, the wrapping, the alignment and the disabled field.
@@ -955,4 +956,67 @@ Interactive.args = {
     overflow: 'wrap',
     alignment: 'start',
     isDisabled: false,
+};
+
+/* ------------------------------------------------------------------- states */
+
+const Group = (props) => (
+    <TagGroup label="Focus areas" {...props}>
+        <Tag color="blue">Science</Tag>
+        <Tag isSelected={false} color="blue">Selectable</Tag>
+    </TagGroup>
+);
+
+/** Rest: a named list; each tag keeps its own state. */
+export const Rest = {
+    render: () => <Group />,
+    play: async ({ canvasElement }) => {
+        const list = within(canvasElement).getByRole('list', { name: 'Focus areas' });
+        await expect(within(list).getAllByRole('listitem')).toHaveLength(2);
+        await expect(list).not.toHaveAttribute('tabindex');
+    },
+};
+
+/** Hovered: the group has no ground of its own; the tag under the pointer reacts. */
+export const Hovered = {
+    render: () => <Group />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectNoStateChange(canvas.getByRole('list', { name: 'Focus areas' }), ':hover', 'TagGroup');
+        await expectGroundUnder(canvasElement, canvas.getByRole('button', { name: 'Selectable' }), ':hover', '--ds-background-accent-blue-subtlest', 'tag in group');
+    },
+};
+
+/** Pressed: the group does not react; the tag does. */
+export const Pressed = {
+    render: () => <Group />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectNoStateChange(canvas.getByRole('list', { name: 'Focus areas' }), ':active', 'TagGroup');
+        await expectGroundUnder(canvasElement, canvas.getByRole('button', { name: 'Selectable' }), ':active', '--ds-background-accent-blue-subtlest-pressed', 'tag in group');
+    },
+};
+
+/** Focused: Tab skips the list and lands on the first control inside it. */
+export const Focused = {
+    render: () => <Group />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.tab();
+        await expect(canvas.getByRole('list', { name: 'Focus areas' })).not.toHaveFocus();
+        await expect(canvas.getByRole('button', { name: 'Selectable' })).toHaveFocus();
+    },
+};
+
+/** Disabled: the set's, passed to every tag. */
+export const DisabledSet = {
+    render: () => <Group isDisabled />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const tag = canvas.getByRole('button', { name: 'Selectable' });
+        await expect(tag).toBeDisabled();
+        await expectGroundUnder(canvasElement, tag, undefined, '--ds-background-disabled', 'tag in disabled group');
+        await userEvent.tab();
+        await expect(tag).not.toHaveFocus();
+    },
 };

@@ -4,6 +4,8 @@ import { expect, spyOn, userEvent, within } from 'storybook/test';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
 import SmartTag, { SMART_TAG_SUBJECTS } from './SmartTag';
+import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 
 /**
  * `SmartTag` — a SMART competency area, as a thin wrapper on Tag.
@@ -173,4 +175,73 @@ export const Interactive = {
         subject: { control: 'select', options: SMART_TAG_SUBJECTS },
     },
     render: ({ text, ...args }) => <SmartTag {...args} text={text || undefined} />,
+};
+
+/* ------------------------------------------------------------------- states */
+
+/** Rest: a SMART tag is a Tag, so on its own it is a span with its subject's hue on the border. */
+export const Rest = {
+    render: () => <SmartTag subject="mastering-content" data-testid="smart" />,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByTestId('smart');
+        await expect(el.tagName).toBe('SPAN');
+        await expect(getComputedStyle(el).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-accent-teal-subtle'));
+        await expect(el).not.toHaveAttribute('tabindex');
+    },
+};
+
+/** Hovered: nothing, until it is selectable; then the subject's subtlest step. */
+export const Hovered = {
+    render: () => (
+        <div style={row}>
+            <SmartTag subject="mastering-content" data-testid="smart" />
+            <SmartTag subject="advocacy" isSelected={false} data-testid="selectable" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectNoStateChange(canvas.getByTestId('smart'), ':hover', 'SmartTag');
+        await expectGroundUnder(canvasElement, canvas.getByTestId('selectable'), ':hover', '--ds-background-accent-lime-subtlest', 'selectable');
+    },
+};
+
+/** Pressed: nothing, until it is selectable; then the subtlest pressed step. */
+export const Pressed = {
+    render: () => (
+        <div style={row}>
+            <SmartTag subject="mastering-content" data-testid="smart" />
+            <SmartTag subject="advocacy" isSelected={false} data-testid="selectable" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectNoStateChange(canvas.getByTestId('smart'), ':active', 'SmartTag');
+        await expectGroundUnder(canvasElement, canvas.getByTestId('selectable'), ':active', '--ds-background-accent-lime-subtlest-pressed', 'selectable');
+    },
+};
+
+/** Focused: the plain tag is skipped; a selectable one takes the 2px ring. */
+export const Focused = {
+    render: () => (
+        <div style={row}>
+            <SmartTag subject="mastering-content" data-testid="smart" />
+            <SmartTag subject="advocacy" isSelected={false} data-testid="selectable" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expectNotAControl(canvas.getByTestId('smart'), 'SmartTag');
+        await expectFocusRing(canvasElement, canvas.getByTestId('selectable'), 'selectable SmartTag');
+    },
+};
+
+/** Disabled: the disabled ground and words, as any Tag. */
+export const Disabled = {
+    render: () => <SmartTag subject="mastering-content" isSelected={false} isDisabled data-testid="smart" />,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByTestId('smart');
+        await expect(el).toBeDisabled();
+        await expectGroundUnder(canvasElement, el, undefined, '--ds-background-disabled', 'disabled');
+        await expect(getComputedStyle(el).color).toBe(tokenColor(canvasElement, '--ds-text-disabled'));
+    },
 };
