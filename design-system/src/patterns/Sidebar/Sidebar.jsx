@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useId, useState } from 'react';
 import PropTypes from 'prop-types';
-import { CountTag, IconButton, Tooltip } from '@/components';
-import Lockup from '@/assets/Logo/Lockup';
+import { CountTag, IconButton, Logo, Tooltip } from '@/components';
 import { useSidebarControl } from '../Frame/SidebarControl';
 import SidebarAccount, { ACCOUNT_ROLES } from './SidebarAccount';
 import { SIDEBAR_RECENT_TABS } from './openTabs';
@@ -52,7 +51,7 @@ const writeCollapsed = (key, value) => {
  * radius 6, a 24 icon slot centered on x 32, the label on x 48, and a trailing
  * slot centered on x 208.
  *
- * - **Logo row**: the PLUS lockup at height 24, a link to Home, and the
+ * - **Logo row**: the PLUS Logo lockup at height 24, a link to Home, and the
  *   sidebar toggle (`angles-left`) on the trailing column. Inside a Frame the
  *   toggle comes from the Frame; standalone, pass `onToggle`.
  * - **Groups**: the first has no title (Home, Slack). Every other group has a
@@ -452,11 +451,11 @@ const PatternSidebar = ({
                 onHome();
             }}
         >
-            <Lockup />
+            <Logo appearance="colored" size={24} wordmark />
         </a>
     ) : (
         <a className="plus-pattern-sidebar__brand" href={homeHref} aria-label="PLUS, go to Home">
-            <Lockup />
+            <Logo appearance="colored" size={24} wordmark />
         </a>
     );
 

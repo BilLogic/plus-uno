@@ -227,7 +227,7 @@ export const Geometry = {
         await expect(threadX, 'thread on the icon column').toBeCloseTo(32, 0);
         const turn = getComputedStyle(nav(canvasElement).querySelector('.plus-pattern-sidebar__tab--last .plus-pattern-sidebar__slot'), '::after');
         await expect(px(turn.borderBottomLeftRadius), 'the last tab turns at radius 6').toBeCloseTo(tokenLength(canvasElement, '--frame-sidebar-row-radius'), 0);
-        const mark = canvasElement.querySelector('.plus-lockup__mark');
+        const mark = canvasElement.querySelector('.plus-pattern-sidebar__brand .plus-logo');
         await expect(leftX(canvasElement, mark), 'mark on the slot edge').toBeCloseTo(20, 0);
         await expect(px(getComputedStyle(mark).height), 'lockup height 24').toBeCloseTo(24, 0);
         const toggle = within(canvasElement).getByRole('button', { name: 'Close sidebar' });
