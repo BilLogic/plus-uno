@@ -24,16 +24,19 @@ describe('sectionDetailView', () => {
     });
 });
 
+// The resolver is set so the split state never depends on jsdom's window width.
 const renderIt = (props = {}) => render(
-    <PatternSection
-        title="Queue"
-        detail={<div>Flag body</div>}
-        detailTitle="Flag 1"
-        hasSelection
-        {...props}
-    >
-        <div>Queue rows</div>
-    </PatternSection>,
+    <SplitContext.Provider value>
+        <PatternSection
+            title="Queue"
+            detail={<div>Flag body</div>}
+            detailTitle="Flag 1"
+            hasSelection
+            {...props}
+        >
+            <div>Queue rows</div>
+        </PatternSection>
+    </SplitContext.Provider>,
 );
 
 describe('PatternSection detail', () => {
@@ -53,9 +56,10 @@ describe('PatternSection detail', () => {
         expect(screen.getByRole('heading', { name: 'Flag 1' }).closest('section').className).toContain('plus-pattern-section-fill-subtle');
     });
 
-    it('lets the list span the row when no record is open at the split', () => {
+    it('draws no detail when no record is open at the split, so the list spans the row', () => {
         const { container } = renderIt({ hasSelection: false, detail: null });
         expect(container.querySelector('.plus-pattern-section-detail')).toBeNull();
+        expect(container.querySelector('.plus-pattern-section-with-detail--split')).not.toBeNull();
         expect(screen.getByText('Queue rows')).toBeInTheDocument();
     });
 

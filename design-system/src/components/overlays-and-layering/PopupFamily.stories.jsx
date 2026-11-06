@@ -13,7 +13,7 @@ import Tooltip from './Tooltip/Tooltip';
  * Menu family's own tokens rather than this page's older Popover numbers.
  *
  * Floating layers behave the same everywhere, and these stories hold them to
- * the Patterns page's Popover section: popups 320 · 400 · 480 padded 16,
+ * the Popups pattern page: popups 320 · 400 · 480 padded 16,
  * tooltips 4 · 8 up to 240, flags 400 wide stacking 16 apart bottom-left, and
  * every one of them at least 8 from the screen edge, 4 from its trigger.
  *
@@ -24,7 +24,7 @@ import Tooltip from './Tooltip/Tooltip';
  */
 
 export default {
-    title: 'Components/Overlays and layering/Popup family',
+    title: 'Components/Overlays and layering/Popups behavior',
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {

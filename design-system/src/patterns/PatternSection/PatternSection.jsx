@@ -51,7 +51,8 @@ import './PatternSection.scss';
  * so the Sidebar collapses first to keep the 960. The caller owns the
  * selection: `hasSelection` says a record is open, `onBack` clears it. Heavy
  * work, such as the recording review, belongs on its own page: put "Open full
- * review" in `detailFooter`.
+ * review" in `detailFooter`. A section with a `detail` keeps `layout="single"`: the
+ * body is the list.
  *
  * FOOTER. Only for "View all" or paging, aligned to the end. Actions that
  * commit changes belong in a card footer, not on the section.
@@ -400,9 +401,13 @@ PatternSection.propTypes = {
     onPrevious: PropTypes.func,
     /** Runs the next button */
     onNext: PropTypes.func,
+    /** Disables the previous button, at the start of the queue */
     previousDisabled: PropTypes.bool,
+    /** Disables the next button, at the end of the queue */
     nextDisabled: PropTypes.bool,
+    /** The previous button's label */
     previousLabel: PropTypes.string,
+    /** The next button's label */
     nextLabel: PropTypes.string,
     /** `page` makes the title the page's h1 at Heading/large 24; by default it nests one level down */
     level: PropTypes.oneOf(['page']),
