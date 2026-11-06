@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ButtonGroup from './ButtonGroup';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 
@@ -108,6 +110,63 @@ export const Selected = {
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('button', { name: 'Week' })).toHaveAttribute('aria-pressed', 'true');
         await expect(canvas.getByRole('button', { name: 'Month' })).toHaveAttribute('aria-pressed', 'false');
+    },
+};
+
+/** A hovered member takes the default hovered step and rises above its neighbor. */
+export const HoveredState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <ButtonGroup label="Hover example">
+            <Button text="Week hover" />
+            <Button text="Month hover" />
+        </ButtonGroup>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        for (const name of ['Week hover', 'Month hover']) {
+            const member = canvas.getByRole('button', { name });
+            await expectHovered(canvasElement, member, 'default', name);
+            const raised = withForcedPseudo(member, ':hover', () => getComputedStyle(member).zIndex);
+            await expect(raised, `${name} rises above its neighbor`).toBe('1');
+        }
+    },
+};
+
+/** A pressed member takes the default pressed step. */
+export const PressedState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <ButtonGroup label="Press example">
+            <Button text="Week press" />
+            <Button text="Month press" />
+        </ButtonGroup>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        for (const name of ['Week press', 'Month press']) {
+            await expectPressed(canvasElement, canvas.getByRole('button', { name }), 'default', name);
+        }
+    },
+};
+
+/** Tabbing onto a member draws the 2px ring, raised above its neighbor. */
+export const KeyboardFocus = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <ButtonGroup label="Focus example">
+            <Button text="Week focus" />
+            <Button text="Month focus" />
+        </ButtonGroup>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const month = canvas.getByRole('button', { name: 'Month focus' });
+        await expectFocusRing(canvasElement, canvas.getByRole('button', { name: 'Week focus' }), 'first member');
+        await expectFocusRing(canvasElement, month, 'last member');
+        month.focus({ focusVisible: true });
+        await expect(getComputedStyle(month).zIndex, 'ring sits above the neighbor').toBe('1');
+        month.blur();
     },
 };
 

@@ -9,7 +9,7 @@ Split button: a primary action joined to a chevron that opens a menu of related 
 
 **Source:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.stories.jsx` — Overview, Appearances, Spacing, MenuState, States, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.stories.jsx` — Overview, Appearances, Spacing, MenuState, States, HoveredState, PressedState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.mdx`
 

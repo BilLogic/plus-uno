@@ -9,7 +9,7 @@ Icon button: a button that is an icon and nothing else. `label` is required beca
 
 **Source:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.stories.jsx` — Overview, Appearances, Spacing, Shapes, States, Default, Subtle, Primary, Discovery, Compact, Circle, Selected, Disabled, Loading, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.stories.jsx` — Overview, Appearances, Spacing, Shapes, States, Default, Subtle, Primary, Discovery, Compact, Circle, Selected, Disabled, Loading, HoveredState, PressedState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/IconButton/IconButton.mdx`
 

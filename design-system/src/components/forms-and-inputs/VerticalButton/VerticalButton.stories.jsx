@@ -2,6 +2,7 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import VerticalButton, { VERTICAL_BUTTON_APPEARANCES } from './VerticalButton';
+import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
@@ -91,6 +92,51 @@ export const Loading = {
     render: () => <VerticalButton icon="user-gear" label="Admin" isLoading />,
     play: async ({ canvasElement }) => {
         await expect(within(canvasElement).getByRole('button', { name: 'Admin' })).toHaveAttribute('aria-busy', 'true');
+    },
+};
+
+/** Hovered takes the appearance's hovered step, laid straight on the container. */
+export const HoveredState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={row}>
+            {VERTICAL_BUTTON_APPEARANCES.map((appearance) => (
+                <VerticalButton key={appearance} icon="user-gear" label={`${appearance} hover`} appearance={appearance} />
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        for (const appearance of VERTICAL_BUTTON_APPEARANCES) {
+            await expectHovered(canvasElement, canvas.getByRole('button', { name: `${appearance} hover` }), appearance);
+        }
+    },
+};
+
+/** Pressed takes the appearance's pressed step. */
+export const PressedState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={row}>
+            {VERTICAL_BUTTON_APPEARANCES.map((appearance) => (
+                <VerticalButton key={appearance} icon="user-gear" label={`${appearance} press`} appearance={appearance} />
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        for (const appearance of VERTICAL_BUTTON_APPEARANCES) {
+            await expectPressed(canvasElement, canvas.getByRole('button', { name: `${appearance} press` }), appearance);
+        }
+    },
+};
+
+/** Tabbing onto it draws the 2px focus ring 2px off the edge, and no fill. */
+export const KeyboardFocus = {
+    parameters: { docs: { disable: true } },
+    render: () => <VerticalButton icon="user-gear" label="Admin" />,
+    play: async ({ canvasElement }) => {
+        await expectFocusRing(canvasElement, within(canvasElement).getByRole('button', { name: 'Admin' }));
     },
 };
 
