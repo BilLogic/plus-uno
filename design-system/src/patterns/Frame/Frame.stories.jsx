@@ -8,6 +8,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { PAGE_EDGE } from '@/patterns/Page';
+import BrowserFrame from '@/storybook-docs/chrome/BrowserFrame';
 
 /**
  * Frame — the app frame: the Sidebar beside the Page (and the Panel), with no
@@ -255,6 +256,48 @@ export const ColorModes = {
 };
 
 export const Reading = { args: { width: 'reading' } };
+
+/**
+ * The docs browser frame draws window chrome above the story and leaves the
+ * page alone: the sidebar's left edge and the Page's width match the same
+ * Frame with no chrome, in Chrome and in Safari. Hidden from the sidebar.
+ */
+export const InBrowserFrame = {
+    // Three Frames side by side, so duplicate landmarks: the comparison is the point, and Frame's own stories check a11y.
+    parameters: { docs: { disable: true }, a11y: { test: 'off' } },
+    render: (args) => (
+        <div>
+            <div data-case="bare"><FrameWithSlots {...args} height={DOCS_HEIGHT} /></div>
+            <div data-case="chrome"><BrowserFrame browser="chrome"><FrameWithSlots {...args} height={DOCS_HEIGHT} /></BrowserFrame></div>
+            <div data-case="safari"><BrowserFrame browser="safari"><FrameWithSlots {...args} height={DOCS_HEIGHT} /></BrowserFrame></div>
+        </div>
+    ),
+    play: async ({ canvasElement }) => withTestViewport(1024, HEIGHT, async () => {
+        const measure = (name) => {
+            const box = canvasElement.querySelector(`[data-case="${name}"]`);
+            const frame = box.querySelector('.plus-frame');
+            const aside = frame.querySelector('.plus-frame__sidebar');
+            return {
+                box,
+                sidebarLeft: rect(aside).left - rect(box).left,
+                pageWidth: rect(frame.querySelector('.plus-frame__surface')).width,
+                frameWidth: rect(frame).width,
+            };
+        };
+        await inEveryColorMode(async (mode) => {
+            const bare = measure('bare');
+            for (const name of ['chrome', 'safari']) {
+                const framed = measure(name);
+                await expect(framed.box.querySelector('[data-browser]'), `${name} chrome is drawn (${mode})`).not.toBeNull();
+                await expect(framed.sidebarLeft, `${name}: sidebar left edge (${mode})`).toBeCloseTo(bare.sidebarLeft, 0);
+                await expect(framed.pageWidth, `${name}: page width (${mode})`).toBeCloseTo(bare.pageWidth, 0);
+                await expect(framed.frameWidth, `${name}: frame width (${mode})`).toBeCloseTo(bare.frameWidth, 0);
+            }
+        });
+        const bare = measure('bare');
+        await expect(bare.box.querySelector('[data-browser]'), 'no chrome without the frame').toBeNull();
+    }),
+};
 
 /**
  * Docs examples. They render inline at a fixed height, so they follow the

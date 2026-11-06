@@ -11,6 +11,7 @@ import { TocDocsContainer } from './docs-toc.jsx';
 import StorybookAIAgent from '../prototypes/storybook-ai-agent-llm-api/StorybookAIAgent';
 import { mountDocsFab } from '../design-system/src/storybook-docs/chrome/mount-docs-fab.js';
 import ResponsiveFrame from '../design-system/src/specs/Universal/ResponsiveFrame';
+import BrowserFrame from '../design-system/src/storybook-docs/chrome/BrowserFrame';
 import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storybook-docs/lib/color-modes.js';
 
 /**
@@ -621,6 +622,19 @@ const preview = {
         dynamicTitle: true,
       },
     },
+    plusBrowser: {
+      description: 'Browser window chrome around the Frame and page-template stories (docs only)',
+      toolbar: {
+        title: 'Browser',
+        icon: 'browser',
+        items: [
+          { value: 'none', title: 'No browser' },
+          { value: 'chrome', title: 'Chrome' },
+          { value: 'safari', title: 'Safari' },
+        ],
+        dynamicTitle: true,
+      },
+    },
     plusColorMode: {
       description: 'Color mode, set as data-color-mode on <html>; auto follows the OS',
       toolbar: {
@@ -650,6 +664,17 @@ const preview = {
   },
 
   decorators: [
+    // Browser chrome from the toolbar, around the Frame and page-template
+    // stories. A story can opt in or out with parameters.browserFrame ('chrome' | 'safari' | 'none').
+    (Story, context) => {
+      const framed = /^Patterns\/(Frame\/Frame|Templates)/.test(context.title);
+      const browser = context.parameters.browserFrame || (framed ? context.globals.plusBrowser : 'none');
+      return (
+        <BrowserFrame browser={browser || 'none'}>
+          <Story />
+        </BrowserFrame>
+      );
+    },
     // Color and contrast modes from the toolbar, on <html> (see applyColorModes).
     (Story, context) => (
       <ColorModes
@@ -727,6 +752,7 @@ const preview = {
     backgrounds: {
       value: DEFAULT_BACKGROUND
     },
+    plusBrowser: 'none',
     plusColorMode: 'light',
     plusContrastMode: 'no-preference',
   },
