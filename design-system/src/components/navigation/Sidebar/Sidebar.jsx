@@ -23,6 +23,7 @@ const Sidebar = ({
     user = 'tutor',
     account,
     modulesLeft = 0,
+    lessonsLeft = 0,
     badges,
     onHomeClick,
     onTabClick,
@@ -73,6 +74,7 @@ const Sidebar = ({
             onCloseTab={(tab) => openTabs.close(tab.id)}
             onCloseAllTabs={(item) => openTabs.closeAll(item.id)}
             modulesLeft={user === 'tutor' ? modulesLeft : 0}
+            lessonsLeft={user === 'tutor' ? lessonsLeft : 0}
             account={account}
             onProfile={onProfile}
             onSignOut={() => {
@@ -98,6 +100,8 @@ Sidebar.propTypes = {
     }),
     /** A tutor's onboarding modules left. Above 0 the Toolkit is locked; supervisors are never locked. */
     modulesLeft: PropTypes.number,
+    /** A tutor's assigned lessons left; counted on the Lessons row */
+    lessonsLeft: PropTypes.number,
     /** The trailing slot by row id: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }` */
     badges: PropTypes.objectOf(PropTypes.shape({
         count: PropTypes.number,

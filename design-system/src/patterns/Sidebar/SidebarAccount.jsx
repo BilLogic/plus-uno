@@ -7,14 +7,13 @@ import {
     IconButton,
     LinkIconButton,
     Section,
-    Tooltip,
     initialsOf,
 } from '@/components';
 
 /** The one-word roles the account row shows. */
 export const ACCOUNT_ROLES = ['Tutor', 'Lead', 'Admin'];
 
-/** The role in full, for the tooltip and the menu header. */
+/** The role in full, for the accessible name and the menu header. */
 const ROLE_IN_FULL = { Tutor: 'Tutor', Lead: 'Lead tutor', Admin: 'Admin' };
 
 /**
@@ -22,8 +21,10 @@ const ROLE_IN_FULL = { Tutor: 'Tutor', Lead: 'Lead tutor', Admin: 'Admin' };
  * first and last initials, the preferred first name (14), a middle dot and the
  * one-word role (12, subtlest), then Help Center on the trailing column.
  *
- * - The name truncates with an ellipsis; the role never does. The full name
- *   and role show in the tooltip and the menu header.
+ * - The button hugs avatar, name and role, padded 4 left (plus the avatar
+ *   slot's 4) and 8 right, so its hover fill ends 8 after the role. It has no
+ *   tooltip; the full name and role are its accessible name and the menu header.
+ * - The name truncates with an ellipsis; the role never does.
  * - The row opens a menu with Profile and Sign out. States: rest, hover,
  *   focus, and menu open (the selected fill).
  * - Help Center opens in a new tab: `circle-question` at rest, the external
@@ -66,26 +67,24 @@ const SidebarAccount = ({
 
     return (
         <div className={['plus-sidebar-account', className].filter(Boolean).join(' ')}>
-            <Tooltip text={full} placement="top">
-                <span className="plus-sidebar-account__hit">
-                    <DropdownMenu
-                        trigger={trigger}
-                        isOpen={open}
-                        onOpenChange={setOpen}
-                        placement="top-start"
-                        spacing="compact"
-                    >
-                        <Section title={full}>
-                            <ButtonItem elemBefore={<i className="fa-regular fa-user" aria-hidden="true" />} onClick={onProfile}>
-                                Profile
-                            </ButtonItem>
-                            <ButtonItem elemBefore={<i className="fa-solid fa-arrow-right-from-bracket" aria-hidden="true" />} onClick={onSignOut}>
-                                Sign out
-                            </ButtonItem>
-                        </Section>
-                    </DropdownMenu>
-                </span>
-            </Tooltip>
+            <span className="plus-sidebar-account__hit">
+                <DropdownMenu
+                    trigger={trigger}
+                    isOpen={open}
+                    onOpenChange={setOpen}
+                    placement="top-start"
+                    spacing="compact"
+                >
+                    <Section title={full}>
+                        <ButtonItem elemBefore={<i className="fa-regular fa-user" aria-hidden="true" />} onClick={onProfile}>
+                            Profile
+                        </ButtonItem>
+                        <ButtonItem elemBefore={<i className="fa-solid fa-arrow-right-from-bracket" aria-hidden="true" />} onClick={onSignOut}>
+                            Sign out
+                        </ButtonItem>
+                    </Section>
+                </DropdownMenu>
+            </span>
             {helpHref ? (
                 <LinkIconButton
                     className="plus-sidebar-account__help"
@@ -110,7 +109,7 @@ const SidebarAccount = ({
 };
 
 SidebarAccount.propTypes = {
-    /** Full name: the initials, the tooltip and the menu header */
+    /** Full name: the initials, the accessible name and the menu header */
     name: PropTypes.string.isRequired,
     /** The name the row shows; the first name when unset */
     preferredName: PropTypes.string,

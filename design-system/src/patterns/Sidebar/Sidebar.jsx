@@ -13,10 +13,19 @@ export const SIDEBAR_SECTIONS_STORAGE_KEY = 'plus-sidebar-sections';
 /** A Font Awesome Free class list, from a bare solid name (`house`) or a full list (`fa-regular fa-house`). */
 const faClass = (icon) => (icon.includes('fa-') ? icon : `fa-solid fa-${icon}`);
 
-/** The tooltip and message of a section locked until onboarding is done. */
-export const lockMessage = (title, modulesLeft) => (
-    `Finish onboarding to unlock the ${title} · ${modulesLeft} ${modulesLeft === 1 ? 'module' : 'modules'} left`
-);
+/** The tooltip and message of a section locked until assigned training is done. */
+export const lockMessage = (title) => `Complete your assigned training to unlock the ${title}`;
+
+/** What a Training row counts: assigned lessons, or onboarding modules while onboarding is in progress. */
+export const trainingCount = (kind, { lessonsLeft = 0, modulesLeft = 0 }) => {
+    if (kind === 'lessons' && lessonsLeft > 0) {
+        return { count: lessonsLeft, label: `${lessonsLeft} assigned ${lessonsLeft === 1 ? 'lesson' : 'lessons'} left` };
+    }
+    if (kind === 'modules' && modulesLeft > 0) {
+        return { count: modulesLeft, label: `${modulesLeft} onboarding ${modulesLeft === 1 ? 'module' : 'modules'} left` };
+    }
+    return null;
+};
 
 const readCollapsed = (key) => {
     if (!key || typeof window === 'undefined') return {};
@@ -52,8 +61,12 @@ const writeCollapsed = (key, value) => {
  *   person's collapsed sections are remembered in localStorage.
  * - **Locked group**: while `modulesLeft` is above 0, a group marked
  *   `lockedDuringOnboarding` shows a lock in the title's caret slot, its rows
- *   in the subtlest text with no hover, and the tooltip "Finish onboarding to
- *   unlock the Toolkit · N modules left". It neither collapses nor opens.
+ *   in the subtlest text with no hover, and the tooltip "Complete your assigned
+ *   training to unlock the Toolkit" (no number). It neither collapses nor opens.
+ * - **Training counts**: a row with `training: 'lessons'` shows the Count tag of
+ *   `lessonsLeft` ("2 assigned lessons left"); `training: 'modules'` shows
+ *   `modulesLeft` ("3 onboarding modules left"), only while onboarding is in
+ *   progress. Zero shows nothing.
  * - **Trailing slot**: a count, a dot, the external icon for a link that
  *   leaves the app, or a close button.
  * - **Open tabs** (`tabs[item.id]`): records a person opened (a session, a
@@ -78,6 +91,7 @@ const PatternSidebar = ({
     onCloseTab,
     onCloseAllTabs,
     modulesLeft = 0,
+    lessonsLeft = 0,
     account,
     onProfile,
     onSignOut,
@@ -145,7 +159,15 @@ const PatternSidebar = ({
     ) : null;
 
     const trailing = (item, extra) => {
+        const training = trainingCount(item.training, { lessonsLeft, modulesLeft });
         if (extra) return <span className="plus-pattern-sidebar__end">{extra}</span>;
+        if (training) {
+            return (
+                <span className="plus-pattern-sidebar__end">
+                    <CountTag value={training.count} spacing="compact" label={training.label} />
+                </span>
+            );
+        }
         if (item.count) {
             return (
                 <span className="plus-pattern-sidebar__end">
@@ -368,7 +390,7 @@ const PatternSidebar = ({
         const titleId = `${baseId}-${group.id}-title`;
         const listId = `${baseId}-${group.id}-list`;
         const locked = Boolean(group.lockedDuringOnboarding) && modulesLeft > 0;
-        const message = locked ? lockMessage(group.title, modulesLeft) : null;
+        const message = locked ? lockMessage(group.title) : null;
         const shut = Boolean(group.title) && !locked && Boolean(shutGroups[group.id]);
 
         let title = null;
@@ -479,6 +501,8 @@ const itemShape = PropTypes.shape({
     dot: PropTypes.bool,
     /** The dot's accessible name; "New" by default */
     dotLabel: PropTypes.string,
+    /** A Training row: `lessons` counts `lessonsLeft`, `modules` counts `modulesLeft` */
+    training: PropTypes.oneOf(['lessons', 'modules']),
 });
 
 const tabShape = PropTypes.shape({
@@ -516,8 +540,10 @@ PatternSidebar.propTypes = {
     onCloseTab: PropTypes.func,
     /** Called with `(item)` by a row's Close all */
     onCloseAllTabs: PropTypes.func,
-    /** Onboarding modules a tutor has left. Above 0, groups marked `lockedDuringOnboarding` lock. */
+    /** Onboarding modules a tutor has left. Above 0, groups marked `lockedDuringOnboarding` lock, and the `modules` row counts it. */
     modulesLeft: PropTypes.number,
+    /** Assigned lessons a tutor has left; the `lessons` row counts it */
+    lessonsLeft: PropTypes.number,
     /** The signed-in person, for the account row. Their `id` keys the remembered sections. */
     account: PropTypes.shape({
         id: PropTypes.string,

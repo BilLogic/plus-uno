@@ -440,18 +440,19 @@ button.plus-pattern-sidebar__title {
 
 .plus-sidebar-account__hit {
     display: flex;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     min-width: 0;
 }
 
 .plus-sidebar-account__trigger {
     display: flex;
     align-items: center;
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     gap: var(--inline-sm);
     min-width: 0;
+    max-width: 100%;
     height: var(--item-height-md);
-    padding: 0 var(--pad-x-xs);
+    padding: 0 var(--pad-x-sm) 0 var(--pad-x-xs);
     border: 0;
     border-radius: var(--frame-sidebar-row-radius);
     background: none;
@@ -499,6 +500,7 @@ button.plus-pattern-sidebar__title {
 
 .plus-sidebar-account__help {
     flex-shrink: 0;
+    margin-inline-start: auto;
 
     @include plus-state(
         (pressed: (background-color: var(--ds-background-selected))),
