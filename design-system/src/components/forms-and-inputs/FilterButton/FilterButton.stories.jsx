@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import FilterButton, { FILTER_BUTTON_APPEARANCES } from './FilterButton';
+import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
 
@@ -127,6 +128,51 @@ export const Loading = {
     render: () => <FilterButton text="Status" isLoading />,
     play: async ({ canvasElement }) => {
         await expect(within(canvasElement).getByRole('button', { name: 'Status' })).toHaveAttribute('aria-busy', 'true');
+    },
+};
+
+/** Hovered takes the appearance's hovered step, laid straight on the container. */
+export const HoveredState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={row}>
+            {FILTER_BUTTON_APPEARANCES.map((appearance) => (
+                <FilterButton key={appearance} text={`${appearance} hover`} appearance={appearance} />
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        for (const appearance of FILTER_BUTTON_APPEARANCES) {
+            await expectHovered(canvasElement, canvas.getByRole('button', { name: `${appearance} hover` }), appearance);
+        }
+    },
+};
+
+/** Pressed takes the appearance's pressed step. */
+export const PressedState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={row}>
+            {FILTER_BUTTON_APPEARANCES.map((appearance) => (
+                <FilterButton key={appearance} text={`${appearance} press`} appearance={appearance} />
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        for (const appearance of FILTER_BUTTON_APPEARANCES) {
+            await expectPressed(canvasElement, canvas.getByRole('button', { name: `${appearance} press` }), appearance);
+        }
+    },
+};
+
+/** Tabbing onto it draws the 2px focus ring 2px off the edge, and no fill. */
+export const KeyboardFocus = {
+    parameters: { docs: { disable: true } },
+    render: () => <FilterButton text="Status" />,
+    play: async ({ canvasElement }) => {
+        await expectFocusRing(canvasElement, within(canvasElement).getByRole('button', { name: 'Status' }));
     },
 };
 

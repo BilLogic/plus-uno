@@ -3,6 +3,7 @@ import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import LinkButton from './LinkButton';
 import { BUTTON_APPEARANCES } from '../Button/Button';
+import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
@@ -88,6 +89,51 @@ export const Selected = {
     render: () => <LinkButton href="#sessions" text="Sessions" isSelected />,
     play: async ({ canvasElement }) => {
         await expect(within(canvasElement).getByRole('link', { name: 'Sessions' })).toHaveAttribute('aria-current', 'true');
+    },
+};
+
+/** Hovered takes the appearance's hovered step, laid straight on the container. */
+export const HoveredState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={row}>
+            {BUTTON_APPEARANCES.map((appearance) => (
+                <LinkButton key={appearance} href="#state" text={`${appearance} hover`} appearance={appearance} />
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        for (const appearance of BUTTON_APPEARANCES) {
+            await expectHovered(canvasElement, canvas.getByRole('link', { name: `${appearance} hover` }), appearance);
+        }
+    },
+};
+
+/** Pressed takes the appearance's pressed step. */
+export const PressedState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={row}>
+            {BUTTON_APPEARANCES.map((appearance) => (
+                <LinkButton key={appearance} href="#state" text={`${appearance} press`} appearance={appearance} />
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        for (const appearance of BUTTON_APPEARANCES) {
+            await expectPressed(canvasElement, canvas.getByRole('link', { name: `${appearance} press` }), appearance);
+        }
+    },
+};
+
+/** Tabbing onto it draws the 2px focus ring 2px off the edge, and no fill. */
+export const KeyboardFocus = {
+    parameters: { docs: { disable: true } },
+    render: () => <LinkButton href="#state" text="Read the guide" />,
+    play: async ({ canvasElement }) => {
+        await expectFocusRing(canvasElement, within(canvasElement).getByRole('link', { name: 'Read the guide' }));
     },
 };
 
