@@ -66,3 +66,13 @@ test('no MDX means no coverage', () => {
   assert.deepEqual(authoredCoverage(''), { whenToUse: false, correctIncorrect: false, accessibility: false });
   assert.deepEqual(authoredCoverage(null), { whenToUse: false, correctIncorrect: false, accessibility: false });
 });
+
+test('a `## Usage` section on the component page template counts as when to use', () => {
+  const mdx = '## Usage\n\nUse it for closing a surface.\n\n## Accessibility\n\nLabel it.\n';
+  assert.equal(authoredCoverage(mdx).whenToUse, true);
+});
+
+test('doExample / dontExample props under a ### rule count as a pair', () => {
+  const mdx = '### Count once applied\n\n<DoDontPair\n    doExample={<A />}\n    dontExample={<B />}\n/>\n';
+  assert.equal(authoredCoverage(mdx).correctIncorrect, true);
+});

@@ -107,13 +107,33 @@ export const States = {
 };
 
 /** One story per appearance, state and size, for the Examples tab. */
-export const Default = { render: () => <IconButton icon="pen" label="Edit page" /> };
+export const Default = {
+    render: () => <IconButton icon="pen" label="Edit page" />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: 'Edit page' })).toBeEnabled();
+    },
+};
 
-export const Subtle = { render: () => <IconButton icon="ellipsis" label="More actions" appearance="subtle" /> };
+export const Subtle = {
+    render: () => <IconButton icon="ellipsis" label="More actions" appearance="subtle" />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: 'More actions' })).toBeEnabled();
+    },
+};
 
-export const Primary = { render: () => <IconButton icon="paper-plane" label="Send comment" appearance="primary" /> };
+export const Primary = {
+    render: () => <IconButton icon="paper-plane" label="Send comment" appearance="primary" />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: 'Send comment' })).toBeEnabled();
+    },
+};
 
-export const Discovery = { render: () => <IconButton icon="wand-magic-sparkles" label="Try the new view" appearance="discovery" /> };
+export const Discovery = {
+    render: () => <IconButton icon="wand-magic-sparkles" label="Try the new view" appearance="discovery" />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: 'Try the new view' })).toBeEnabled();
+    },
+};
 
 export const Compact = {
     render: () => <IconButton icon="trash" label="Delete session" spacing="compact" />,
