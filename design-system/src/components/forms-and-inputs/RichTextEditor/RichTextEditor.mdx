@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as RichTextEditorStories from './RichTextEditor.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { RichTextEditor } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -21,12 +28,13 @@ export const figmaMeta = {
 <Meta of={RichTextEditorStories} />
 
 <Title />
+A rich text editor lets a person write text with formatting such as emphasis, lists and links.
 
 <DocsTabs of={RichTextEditorStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
+<ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9662-17308"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/RichTextEditor"
     sets={figmaMeta.sets}
@@ -37,11 +45,29 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Toolbar
 
-<DocsCanvasShell attachSourceBelow description={<>Default editor and placeholder.</>}>
-    <Canvas of={RichTextEditorStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={RichTextEditorStories.Empty} title="Compact" description="The default toolbar over an empty writing area with a placeholder." />
+
+<ComponentExample of={RichTextEditorStories.FullToolbar} title="Full" description="`toolbarPreset` set to `full` shows every formatting button in a bordered editor." />
+
+<ComponentExample of={RichTextEditorStories.Compact} title="Compact spacing" description="`spacing` set to `compact` tightens the writing area's padding and minimum height." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={RichTextEditorStories.Empty} title="Empty" description="The placeholder shows until something is typed." />
+
+<ComponentExample of={RichTextEditorStories.Filled} title="Filled" description="The writing area holds formatted content." />
+
+<ComponentExample of={RichTextEditorStories.Focused} title="Focused" description="A 2px ring wraps the editor while the writing area has keyboard focus." />
+
+<ComponentExample of={RichTextEditorStories.ReadOnly} title="Read-only" description="The content shows on the neutral fill and cannot be edited. The toolbar is inactive." />
+
+<ComponentExample of={RichTextEditorStories.DisabledState} title="Disabled" description="The content and toolbar fade and leave the tab order." />
 
 </div>
 
@@ -71,49 +97,107 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
-Use `RichTextEditor` where the formatting is part of the meaning — session notes
-with a list, feedback with emphasis, a description that needs a link. Where it is
-not, a `TextArea` is the smaller, sturdier control.
+Use a rich text editor where the formatting is part of the meaning: session notes with a list, feedback with emphasis, a description that needs a link. Where it is not, a text area is the smaller, sturdier control.
 
-`toolbarPreset` is `compact` or `full`; passing `toolbarButtons` selects the
-buttons by name and implies the full toolbar. `value` and `onChange` are HTML
-strings. Giving it a `name` also renders a hidden input, so the HTML posts with a
-plain form.
+`toolbarPreset` is `compact` or `full`; passing `toolbarButtons` selects the buttons by name and implies the full toolbar. `value` and `onChange` are HTML strings. Giving it a `name` also renders a hidden input, so the HTML posts with a plain form.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Label.** Text above the editor that names it.
+2. **Toolbar.** Formatting buttons: block style, bold, italic, underline, lists, link and more.
+3. **Writing area.** The editable region, with a placeholder while it is empty.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>Toolbar buttons take <code>--ds-background-neutral-subtle-hovered</code>. The writing area has no hover step.</td></tr>
+<tr><td>Pressed</td><td>Toolbar buttons take <code>--ds-background-neutral-subtle-pressed</code>.</td></tr>
+<tr><td>Active format</td><td>The button takes <code>--ds-background-selected</code> with <code>--ds-text-selected</code> and <code>--ds-icon-selected</code>.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> wraps the editor while the writing area has keyboard focus.</td></tr>
+<tr><td>Read-only</td><td><code>--ds-background-neutral</code> writing area, <code>--ds-text-subtle</code> text, toolbar faded and inert.</td></tr>
+<tr><td>Disabled</td><td>As read-only, with the toolbar and content faded to <code>--ds-opacity-disabled</code>.</td></tr>
+<tr><td>Invalid</td><td>Not drawn. Mark the surrounding field and explain the error beside it.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Fill, edge</td><td><code>--ds-background-input</code>; <code>--ds-border-input</code> at <code>--stroke-1</code>; corner <code>--radius-md</code>.</td></tr>
+<tr><td>Toolbar</td><td><code>--ds-surface-container</code>; gap <code>--stack-md</code>; padding <code>--space-025</code> and <code>--pad-x-sm</code>.</td></tr>
+<tr><td>Writing area</td><td>Body default in <code>--ds-text</code>; minimum height <code>--field-min-height-lg</code> (120).</td></tr>
+<tr><td>Placeholder</td><td><code>--ds-text-subtlest</code>.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### `value` is written to the DOM as HTML.
 
 ```jsx
-// Incorrect — the value is assigned to the editable region's innerHTML, so
+// Incorrect: the value is assigned to the editable region's innerHTML, so
 // anything a user can influence is executed as markup.
 <RichTextEditor value={note.bodyFromApi} onChange={setBody} />
 
-// Correct — sanitize on the way in, and again on the way out before storing.
+// Correct: sanitize on the way in, and again on the way out before storing.
 <RichTextEditor value={sanitize(note.bodyFromApi)} onChange={(html) => setBody(sanitize(html))} />
 ```
 
-The same applies to what you receive: `onChange` hands you whatever the browser
-produced, which is markup from a paste as much as from the toolbar.
+The same applies to what you receive: `onChange` hands you whatever the browser produced, which is markup from a paste as much as from the toolbar.
 
 ### It is built on a deprecated browser API.
 
-Formatting runs through `document.execCommand`, which every engine now documents
-as deprecated. It works today and its exact output differs between browsers —
-one may wrap a line in `<div>`, another in `<p>`. Do not depend on the shape of
-the HTML; store it and render it, or convert it once on save.
+Formatting runs through `document.execCommand`, which every engine now documents as deprecated. It works today and its exact output differs between browsers: one may wrap a line in `<div>`, another in `<p>`. Do not depend on the shape of the HTML; store it and render it, or convert it once on save.
 
 ### Link and image ask with a browser prompt.
 
-Pressing those buttons opens the platform `prompt()` dialog for a URL. It is
-unstyled, it is not translatable, and some environments suppress it. Where that
-matters, leave those two buttons out of `toolbarButtons`.
+Pressing those buttons opens the platform `prompt()` dialog for a URL. It is unstyled, it is not translatable, and some environments suppress it. Where that matters, leave those two buttons out of `toolbarButtons`.
+
+### Label the editor.
+
+<DoDontPair
+    doExample={<RichTextEditor label="Session notes" placeholder="Type something..." minHeight={96} />}
+    doCaption="A label names the editor on screen and for assistive technology."
+    dontExample={<RichTextEditor placeholder="Session notes" minHeight={96} />}
+    dontCaption="A placeholder is not a name. It disappears as soon as someone types, and it is not read as the name."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name what the person writes: "Session notes".</td><td>"Editor" or "Text".</td></tr>
+<tr><td>Use the placeholder for a hint about the content: "What did you cover?"</td><td>Repeat the label in the placeholder.</td></tr>
+<tr><td>Offer only the buttons the content needs.</td><td>Every button by default.</td></tr>
+<tr><td>Use sentence case and no end punctuation on the label.</td><td>Title case, or a period after the label.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -121,23 +205,11 @@ matters, leave those two buttons out of `toolbarButtons`.
 
 ## Accessibility
 
-- **The editable region announces itself as a multi-line textbox.**
-  `role="textbox"` with `aria-multiline` and `aria-readonly` tracking the flag
-  that turns editing off.
-- **`label` names it, and is effectively required.** The prop renders a `span`
-  above the editor and the region points at it with `aria-labelledby` — a
-  `label` element cannot be used, because `contentEditable` is not a form
-  control for `htmlFor` to bind to. Without a `label` the region is a named role
-  with no name, which axe reports and a screen-reader user hears as nothing.
-- **The toolbar buttons are named.** Each carries an `aria-label` from its
-  definition, and the bold/italic/underline set is a `role="group"` labeled
-  "Bold, italic, and underline". Their pressed state is tracked internally and is
-  not exposed as `aria-pressed`.
-- **The placeholder is CSS.** It is drawn from a `data-placeholder` attribute, so
-  it is not part of the accessible name and may not be announced at all.
-- **Keep the formatting optional.** Anything that only exists as bold text or a
-  color in the body is invisible to someone hearing the page. Structure it with
-  lists and headings instead.
+- **The editable region announces itself as a multi-line textbox.** `role="textbox"` with `aria-multiline`, and `aria-readonly` tracking the flag that turns editing off.
+- **`label` names it, and is effectively required.** The prop renders a `span` above the editor and the region points at it with `aria-labelledby`. A `label` element cannot be used, because `contentEditable` is not a form control for `htmlFor` to bind to. Without a `label` the region is a named role with no name, which a screen-reader user hears as nothing.
+- **The toolbar buttons are named.** Each carries an `aria-label` from its definition, and the bold, italic and underline set is a `role="group"` labeled "Bold, italic, and underline". Their pressed state is tracked internally and is not exposed as `aria-pressed`.
+- **The placeholder is CSS.** It is drawn from a `data-placeholder` attribute, so it is not part of the accessible name and may not be announced at all.
+- **Keep the formatting optional.** Anything that only exists as bold text or a color in the body is invisible to someone hearing the page. Structure it with lists and headings instead.
 
 </div>
 
@@ -145,11 +217,9 @@ matters, leave those two buttons out of `toolbarButtons`.
 
 ## Related
 
-- For plain multi-line text, use `TextArea` — smaller, labeled, and with none
-  of the above.
-- For one line, use `TextField`.
-- For displaying formatted content the user cannot edit, render the HTML
-  yourself after sanitizing it.
+- For plain multi-line text, use Text area: smaller, labeled, and with none of the above.
+- For one line, use Text field.
+- For displaying formatted content the user cannot edit, render the HTML yourself after sanitizing it.
 
 </div>
 
