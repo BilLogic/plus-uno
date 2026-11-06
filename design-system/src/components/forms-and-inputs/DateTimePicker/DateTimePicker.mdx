@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
+import { DateTimePicker } from '@/components';
 import * as DateTimePickerStories from './DateTimePicker.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -23,8 +30,7 @@ export const figmaMeta = {
 <Meta of={DateTimePickerStories} />
 
 <Title />
-A date field and a time field read as one moment, composed from `DatePicker`
-and `TimePicker`.
+Use a date time picker when a date and a time are one answer.
 
 <DocsTabs of={DateTimePickerStories}>
 
@@ -40,51 +46,35 @@ and `TimePicker`.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Content
 
-<DocsCanvasShell attachSourceBelow description={<>A labeled date section and time section, each its own field.</>}>
-    <Canvas of={DateTimePickerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={DateTimePickerStories.Default} title="Default" description="A labeled group: a date field and a time field, each its own control." />
 
-</div>
+<ComponentExample of={DateTimePickerStories.WithValue} title="With a value" description="Both halves filled. The time zone is named under the time." />
 
-<div className="sb-ds-doc-section">
-
-## Spacing
-
-<DocsCanvasShell description={<>`default` draws 40; `compact` draws 32 — both fields share one `spacing` prop.</>}>
-    <DsCanvasQuiet of={DateTimePickerStories.Spacing} />
-</DocsCanvasShell>
+<ComponentExample of={DateTimePickerStories.TimeZones} title="Time zones" description="The caption names the viewer's zone. When the other person is elsewhere, it adds their time too." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Validation
+## Size
 
-<DocsCanvasShell description={<>`isInvalid`/`errorMessage` and `isValid`/`successMessage` draw one caption under both fields, not one each.</>}>
-    <DsCanvasQuiet of={DateTimePickerStories.Validation} />
-</DocsCanvasShell>
+<ComponentExample of={DateTimePickerStories.Compact} title="Compact" description="Compact spacing draws both fields at 32. Default draws 40." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## State
 
-<DocsCanvasShell description={<>Read-only and disabled.</>}>
-    <DsCanvasQuiet of={DateTimePickerStories.InteractionStates} />
-</DocsCanvasShell>
+<ComponentExample of={DateTimePickerStories.Invalid} title="Invalid" description="Both fields take the danger edge, with one message under the pair." />
 
-</div>
+<ComponentExample of={DateTimePickerStories.Valid} title="Valid" description="Both fields take the success edge, with one message under the pair." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={DateTimePickerStories.ReadOnly} title="Read-only" description="Shows a moment the person may read but not change." />
 
-## Time zones
-
-<DocsCanvasShell description={<>With `showTimeZone`, a caption under the time names the viewer's zone; an `otherTimeZone` and `otherPerson` add that person's time when their zone differs.</>}>
-    <DsCanvasQuiet of={DateTimePickerStories.TimeZones} />
-</DocsCanvasShell>
+<ComponentExample of={DateTimePickerStories.Disabled} title="Disabled" description="A moment that does not apply right now." />
 
 </div>
 
@@ -104,37 +94,6 @@ and `TimePicker`.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>dateValue</code>, <code>timeValue</code></td><td>string</td><td>A typed date (<code>MM/DD/YYYY</code>, legacy <code>MM/DD/YY</code>) or ISO <code>YYYY-MM-DD</code>; a 12- or 24-hour time string.</td></tr>
-        <tr><td><code>onChange</code></td><td>function</td><td>Called with <code>{'{ date, time, utc }'}</code> on either field's change — <code>utc</code> is the combined moment once both halves are set.</td></tr>
-        <tr><td><code>label</code>, <code>isRequired</code>, <code>isLabelHidden</code></td><td>—</td><td>The label names the whole field as a group; hiding it visually never removes the name.</td></tr>
-        <tr><td><code>showDate</code></td><td>boolean</td><td>Defaults <code>true</code>; set <code>false</code> to show only the time half.</td></tr>
-        <tr><td><code>showSectionLabels</code></td><td>boolean</td><td>Shows "Date" and "Time" captions above each section; defaults <code>true</code>.</td></tr>
-        <tr><td><code>datePlaceholder</code>, <code>timePlaceholder</code></td><td>string</td><td>Defaults <code>MM/DD/YY</code> and <code>__ : __</code>.</td></tr>
-        <tr><td><code>minDate</code>, <code>maxDate</code>, <code>calendarAlign</code></td><td>—</td><td>Passed through to the date half; see `DatePicker`.</td></tr>
-        <tr><td><code>timeZone</code></td><td>string</td><td>An IANA zone such as <code>America/New_York</code>; defaults to the browser's, as does a zone the browser does not know.</td></tr>
-        <tr><td><code>showTimeZone</code></td><td>boolean</td><td>Names the viewer's zone under the time; defaults <code>true</code>.</td></tr>
-        <tr><td><code>otherTimeZone</code>, <code>otherPerson</code></td><td>string</td><td>When the other person's zone differs, the caption adds their time, named by <code>otherPerson</code>.</td></tr>
-        <tr><td><code>spacing</code></td><td>enum</td><td><code>default</code> (40) or <code>compact</code> (32), shared by both fields.</td></tr>
-        <tr><td><code>isDisabled</code>, <code>isReadOnly</code></td><td>—</td><td>Applies to both fields.</td></tr>
-        <tr><td><code>isInvalid</code>, <code>errorMessage</code>, <code>isValid</code>, <code>successMessage</code></td><td>—</td><td>One caption under both fields, not one per field.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
 </div>
 
 </DocsTab>
@@ -145,24 +104,61 @@ and `TimePicker`.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
-Use `DateTimePicker` when a date and a time are one answer — a session's
-start, a deadline. For a date with no time, use `DatePicker` alone; for a
-time with no date, use `TimePicker` alone.
+Use a date time picker when a date and a time are one answer: a session's start, a deadline. For a date with no time, use Date picker alone; for a time with no date, use Time picker alone.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Label.** Names the whole group. `isLabelHidden` hides it visually and keeps the name.
+2. **Section labels** (optional). "Date" and "Time" captions above each field.
+3. **Date field.** The Date picker, on its own calendar.
+4. **Time field.** The Time picker, with its AM/PM toggle.
+5. **Caption.** One line under the pair: the validation message, or the viewer's time zone and the other person's time.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>The hovered half's border takes <code>--ds-border-focused</code>.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the focused half.</td></tr>
+<tr><td>Invalid</td><td>Both borders take <code>--ds-border-danger</code>; the caption shows the error message.</td></tr>
+<tr><td>Valid</td><td>Both borders take <code>--ds-border-success</code>; the caption shows the success message.</td></tr>
+<tr><td>Read-only</td><td>Both boxes take <code>--ds-background-neutral</code>.</td></tr>
+<tr><td>Disabled</td><td>Both boxes fade to <code>--ds-opacity-disabled</code> and leave the tab order.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Fill</td><td><code>--ds-background-input</code>; read-only <code>--ds-background-neutral</code>.</td></tr>
+<tr><td>Border</td><td><code>--ds-border-input</code>; hovered <code>--ds-border-focused</code>; invalid <code>--ds-border-danger</code>; valid <code>--ds-border-success</code>.</td></tr>
+<tr><td>Caption</td><td><code>--ds-text-subtle</code>; error <code>--ds-text-danger</code>.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### `onChange` reports the date, the time and the combined moment.
 
-Each field's change calls `onChange` with `{ date, time, utc }` — `date` and
-`time` are the two fields' own display values, and `utc` is the ISO moment
-once both halves are set, computed from `timeZone`. Store `utc`; show
-`date`/`time` back to the person who typed them.
+Each field's change calls `onChange` with `{ date, time, utc }`. `date` and `time` are the two fields' own display values, and `utc` is the ISO moment once both halves are set, computed from `timeZone`. Store `utc`; show `date` and `time` back to the person who typed them.
 
 ```jsx
 <DateTimePicker
@@ -179,17 +175,36 @@ once both halves are set, computed from `timeZone`. Store `utc`; show
 
 ### `label` names the whole field, not either input.
 
-`htmlFor` points at the date input (or the time input, with `showDate`
-false), but the label's text is read as the group's accessible name — both
-the date and time inputs are additionally named off the "Date"/"Time"
-section headings. `isLabelHidden` only hides the label visually; it is
-still rendered and still names the group.
+The label's text is read as the group's accessible name, and the date and time inputs are additionally named off the "Date" and "Time" section headings. `isLabelHidden` only hides the label visually.
 
-### A time-zone mismatch adds the other person's time, it doesn't replace yours.
+### A time-zone mismatch adds the other person's time, it does not replace yours.
 
-`otherTimeZone` only changes the caption when it differs from the viewer's
-own zone, and then it adds the other person's time rather than converting
-the field itself — the fields always show the viewer's local time.
+`otherTimeZone` only changes the caption when it differs from the viewer's own zone, and then it adds the other person's time rather than converting the field. The fields always show the viewer's local time.
+
+<DoDontPair
+    doExample={<DateTimePicker id="dt-do" label="Session start" dateValue="2026-10-21" timeValue="04:00 PM" showSectionLabels={false} />}
+    doCaption="One label for the moment, with the time zone named under it."
+    dontExample={<DateTimePicker id="dt-dont" label="Session start" isInvalid errorMessage="Invalid" showSectionLabels={false} />}
+    dontCaption="A bare 'Invalid' does not say what to change. Name the problem."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Label the moment by its role: "Session start", "Deadline".</td><td>A label for each half: "Date and time".</td></tr>
+<tr><td>Say what to fix: "Choose a start date and time."</td><td>"Invalid".</td></tr>
+<tr><td>Keep the placeholders as formats: MM/DD/YY and __ : __.</td><td>Instructions in the placeholders.</td></tr>
+<tr><td>Name the other person in the time-zone caption: "the student".</td><td>A time with no name: "also 1:00 PM".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -197,15 +212,9 @@ the field itself — the fields always show the viewer's local time.
 
 ## Accessibility
 
-- **One group, two named inputs.** The wrapper is `role="group"` named by
-  `label`; the date and time inputs are each named by that label plus their
-  own section heading, so a screen reader announces "Session start, Date"
-  and "Session start, Time".
-- **Validation and the time-zone caption are both wired through
-  `aria-describedby`**, composed with anything already passed in rather than
-  overwriting it.
-- **`isLabelHidden` never removes the accessible name** — only its visible
-  text.
+- **One group, two named inputs.** The wrapper is `role="group"` named by `label`; the date and time inputs are each named by that label plus their own section heading, so a screen reader announces "Session start, Date" and "Session start, Time".
+- **Validation and the time-zone caption are both wired through `aria-describedby`**, composed with anything already passed in rather than overwriting it.
+- **`isLabelHidden` never removes the accessible name**, only its visible text.
 
 </div>
 
@@ -213,8 +222,8 @@ the field itself — the fields always show the viewer's local time.
 
 ## Related
 
-- For a date with no time, use `DatePicker`.
-- For a time with no date, use `TimePicker`.
+- For a date with no time, use Date picker.
+- For a time with no date, use Time picker.
 
 </div>
 

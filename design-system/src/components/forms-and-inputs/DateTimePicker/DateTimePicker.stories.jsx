@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { expect, within } from 'storybook/test';
+import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import DateTimePicker from './DateTimePicker';
 
 export default {
@@ -228,4 +230,124 @@ Interactive.args = {
     isInvalid: false,
     isValid: false,
     showSectionLabels: false,
+};
+
+/** One story per state, for the Examples tab. */
+const wrap = { maxWidth: '600px' };
+const dateInput = (canvasElement) => canvasElement.querySelectorAll('input')[0];
+const timeInput = (canvasElement) => canvasElement.querySelectorAll('input')[1];
+
+export const Default = {
+    render: () => (
+        <div style={wrap}>
+            <DateTimePicker id="dt-state-default" label="Session start" showSectionLabels={false} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('group', { name: 'Session start' })).toBeVisible();
+        await expect(dateInput(canvasElement)).toHaveValue('');
+        await expect(timeInput(canvasElement)).toHaveValue('');
+    },
+};
+
+export const WithValue = {
+    render: () => (
+        <div style={wrap}>
+            <DateTimePicker id="dt-state-value" label="Session start" dateValue="2026-10-21" timeValue="04:00 PM" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(dateInput(canvasElement)).toHaveValue('10/21/2026');
+        await expect(timeInput(canvasElement)).toHaveValue('04:00');
+    },
+};
+
+export const Compact = {
+    render: () => (
+        <div style={wrap}>
+            <DateTimePicker id="dt-state-compact" label="Session start" spacing="compact" showSectionLabels={false} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(fieldBox(canvasElement, 0).getBoundingClientRect().height).toBe(32);
+        await expect(fieldBox(canvasElement, 1).getBoundingClientRect().height).toBe(32);
+    },
+};
+
+export const Invalid = {
+    render: () => (
+        <div style={wrap}>
+            <DateTimePicker id="dt-state-invalid" label="Session start" isInvalid errorMessage="Choose a start date and time." showSectionLabels={false} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expectFieldInvalid(canvasElement, fieldBox(canvasElement, 0), 'date half');
+        await expectFieldInvalid(canvasElement, fieldBox(canvasElement, 1), 'time half');
+        await expect(within(canvasElement).getByText('Choose a start date and time.')).toBeVisible();
+    },
+};
+
+export const Valid = {
+    render: () => (
+        <div style={wrap}>
+            <DateTimePicker id="dt-state-valid" label="Session start" isValid successMessage="Start saved." dateValue="2026-10-21" timeValue="04:00 PM" showSectionLabels={false} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(fieldBox(canvasElement, 0)).toHaveClass('plus-field--valid');
+        await expect(within(canvasElement).getByText('Start saved.')).toBeVisible();
+    },
+};
+
+export const ReadOnly = {
+    render: () => (
+        <div style={wrap}>
+            <DateTimePicker id="dt-state-readonly" label="Session start" isReadOnly dateValue="2026-10-21" timeValue="04:00 PM" showSectionLabels={false} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expectFieldReadOnly(canvasElement, fieldBox(canvasElement, 0), 'date half');
+        await expectFieldReadOnly(canvasElement, fieldBox(canvasElement, 1), 'time half');
+    },
+};
+
+export const Disabled = {
+    render: () => (
+        <div style={wrap}>
+            <DateTimePicker id="dt-state-disabled" label="Session start" isDisabled showSectionLabels={false} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expectFieldDisabled(fieldBox(canvasElement, 0), 'date half');
+        await expectFieldDisabled(fieldBox(canvasElement, 1), 'time half');
+        await expect(dateInput(canvasElement)).toBeDisabled();
+    },
+};
+
+/** Hover turns each half's border `border.focused`. */
+export const HoveredState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={wrap}>
+            <DateTimePicker id="dt-state-hover" label="Session start" showSectionLabels={false} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expectFieldHovered(canvasElement, fieldBox(canvasElement, 0), 'date half');
+        await expectFieldHovered(canvasElement, fieldBox(canvasElement, 1), 'time half');
+    },
+};
+
+/** Keyboard focus draws the 2px ring, 2px off the focused half. */
+export const KeyboardFocus = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={wrap}>
+            <DateTimePicker id="dt-state-focus" label="Session start" showSectionLabels={false} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expectFieldFocused(canvasElement, fieldBox(canvasElement, 0), dateInput(canvasElement), 'date half');
+        await expectFieldFocused(canvasElement, fieldBox(canvasElement, 1), timeInput(canvasElement), 'time half');
+    },
 };
