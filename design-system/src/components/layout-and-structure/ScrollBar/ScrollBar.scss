@@ -13,8 +13,8 @@
 
     // WebKit (Chrome, Safari, Edge)
     &::-webkit-scrollbar {
-        width: 6px;
-        height: 6px;
+        width: var(--space-0375);
+        height: var(--space-0375);
     }
 
     &::-webkit-scrollbar-track {
@@ -23,7 +23,7 @@
 
     &::-webkit-scrollbar-thumb {
         background-color: var(--color-outline-variant);
-        border-radius: var(--radius-md, 4px);
+        border-radius: var(--radius-md);
 
         // The hover pseudo-class alone: a `[data-hovered]` twin after a
         // pseudo-element is an invalid selector and would drop the whole rule.

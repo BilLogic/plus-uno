@@ -9,7 +9,7 @@ import './ScrollBar.scss';
  */
 const ScrollBar = ({
     children,
-    maxHeight = '320px',
+    maxHeight = 'var(--size-2000)',
     horizontal = false,
     id,
     'aria-label': ariaLabel = 'Scrollable content',
