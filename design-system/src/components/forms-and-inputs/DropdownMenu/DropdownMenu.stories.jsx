@@ -200,7 +200,7 @@ const noop = () => {};
 
 export const Default = {
     render: () => (
-        <div style={{ padding: 'var(--space-150) var(--space-150) 24px' }}>
+        <div style={{ padding: '24px 24px 24px' }}>
             <DropdownMenu trigger={<Button text="Actions" iconAfter={<i className="fa-solid fa-chevron-down" aria-hidden="true" />} />}>
                 {basicMenu}
             </DropdownMenu>
@@ -215,7 +215,7 @@ export const Default = {
 
 export const Open = {
     render: () => (
-        <div style={{ padding: 'var(--space-150) var(--space-150) 200px' }}>
+        <div style={{ padding: '24px 24px 200px' }}>
             <DropdownMenu trigger={<Button text="Actions" />} isOpen onOpenChange={noop}>
                 {basicMenu}
             </DropdownMenu>
@@ -229,7 +229,7 @@ export const Open = {
 
 export const CompactRows = {
     render: () => (
-        <div style={{ padding: 'var(--space-150) var(--space-150) 200px' }}>
+        <div style={{ padding: '24px 24px 200px' }}>
             <DropdownMenu trigger={<Button text="Compact" />} spacing="compact" isOpen onOpenChange={noop}>
                 {basicMenu}
             </DropdownMenu>
@@ -243,7 +243,7 @@ export const CompactRows = {
 
 export const DisabledRow = {
     render: () => (
-        <div style={{ padding: 'var(--space-150) var(--space-150) 200px' }}>
+        <div style={{ padding: '24px 24px 200px' }}>
             <DropdownMenu trigger={<Button text="Manage" />} isOpen onOpenChange={noop}>
                 <ButtonItem onClick={noop}>Rename</ButtonItem>
                 <ButtonItem onClick={noop} isDisabled>Archive</ButtonItem>
@@ -261,7 +261,7 @@ export const DisabledRow = {
 export const HoveredState = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ padding: 'var(--space-150) var(--space-150) 200px' }}>
+        <div style={{ padding: '24px 24px 200px' }}>
             <DropdownMenu trigger={<Button text="Actions" />} isOpen onOpenChange={noop}>
                 {basicMenu}
             </DropdownMenu>
