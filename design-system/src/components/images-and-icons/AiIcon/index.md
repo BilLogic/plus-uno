@@ -9,7 +9,7 @@ An icon for a PLUS AI action: generate, ask, rewrite, summarize, plan, suggest o
 
 **Source:** `design-system/src/components/images-and-icons/AiIcon/AiIcon.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/AiIcon/AiIcon.stories.jsx` — AllIcons, CloseUp, Labeled, Color, Interactive
+**Stories:** `design-system/src/components/images-and-icons/AiIcon/AiIcon.stories.jsx` — AllIcons, CloseUp, Labeled, Color, Interactive, Rest
 
 **Storybook page:** `design-system/src/components/images-and-icons/AiIcon/AiIcon.mdx`
 

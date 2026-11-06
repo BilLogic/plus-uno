@@ -30,8 +30,13 @@
         cursor: pointer;
     }
 
+    &:focus-visible {
+        outline: calc(var(--border-default) * 2) solid var(--ds-border-focused);
+        outline-offset: var(--border-default);
+    }
+
     &--disabled {
-        opacity: var(--color-disabled-opacity);
+        opacity: var(--ds-opacity-disabled);
         pointer-events: none;
     }
 }

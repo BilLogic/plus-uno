@@ -31,6 +31,35 @@ const UserAvatar = ({
     className = ''
 }) => {
     const role = ROLE_LABELS[type];
+    // A clickable user is a button to the keyboard: focusable, Enter presses it
+    // on keydown and Space on keyup, as a native button does. A disabled one
+    // keeps the role and says so, but leaves the tab order and ignores presses.
+    const disabled = state === 'disabled';
+    const interactive = onClick
+        ? {
+            role: 'button',
+            ...(disabled
+                ? { 'aria-disabled': true }
+                : {
+                    tabIndex: 0,
+                    onClick,
+                    onKeyDown: (event) => {
+                        if (event.key === 'Enter' && !event.repeat) {
+                            event.preventDefault();
+                            onClick(event);
+                        } else if (event.key === ' ') {
+                            event.preventDefault();
+                        }
+                    },
+                    onKeyUp: (event) => {
+                        if (event.key === ' ') {
+                            event.preventDefault();
+                            onClick(event);
+                        }
+                    },
+                }),
+        }
+        : {};
     const classes = [
         'plus-user-avatar',
         `plus-user-avatar--${spacing}`,
@@ -40,7 +69,7 @@ const UserAvatar = ({
     ].filter(Boolean).join(' ');
 
     return (
-        <div className={classes} onClick={onClick} id={id}>
+        <div className={classes} id={id} aria-disabled={disabled && !onClick ? true : undefined} {...interactive}>
             <div className="plus-user-avatar__name-section">
                 <div className="plus-user-avatar__initial" aria-hidden="true">
                     <span className="plus-user-avatar__initial-text">{firstChar}</span>
@@ -55,6 +84,7 @@ const UserAvatar = ({
             {counter && (
                 <div className="plus-user-avatar__counter">
                     <span className="plus-user-avatar__counter-text">{counterValue}</span>
+                    <span className="visually-hidden">{counterValue === 1 ? 'notification' : 'notifications'}</span>
                 </div>
             )}
         </div>
@@ -66,7 +96,7 @@ UserAvatar.propTypes = {
     name: PropTypes.string,
     counter: PropTypes.bool,
     counterValue: PropTypes.number,
-    state: PropTypes.oneOf(['enabled', 'hover']),
+    state: PropTypes.oneOf(['enabled', 'hover', 'disabled']),
     /** `lead tutor` shows the "Lead" role indicator; other types show none. */
     type: PropTypes.oneOf(['regular tutor', 'lead tutor', 'admin']),
     /** `compact` 32 high, for the topbar · `default` the padded row, for tables */

@@ -9,7 +9,7 @@ in by the browser rather than by script.
 
 **Source:** `design-system/src/components/images-and-icons/Image/Image.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/Image/Image.stories.jsx` — Sizes, DarkVariant, Interactive
+**Stories:** `design-system/src/components/images-and-icons/Image/Image.stories.jsx` — Sizes, DarkVariant, Interactive, Rest
 
 **Storybook page:** `design-system/src/components/images-and-icons/Image/Image.mdx`
 

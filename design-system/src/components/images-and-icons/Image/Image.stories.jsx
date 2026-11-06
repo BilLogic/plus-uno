@@ -48,3 +48,12 @@ export const Interactive = {
     args: { src: SAMPLE, alt: 'Sample image', size: 'fluid' },
     render: (args) => <div style={{ width: '240px' }}><Image {...args} /></div>,
 };
+
+/** An image is a picture, not a control: its one state is at rest. */
+export const Rest = () => <Image src={SAMPLE} alt="A sample" testId="image-rest" />;
+
+Rest.play = async ({ canvasElement }) => {
+    const node = canvasElement.querySelector('[data-testid="image-rest"]');
+    await expect(node).toHaveAttribute('alt', 'A sample');
+    await expect(node).not.toHaveAttribute('tabindex');
+};
