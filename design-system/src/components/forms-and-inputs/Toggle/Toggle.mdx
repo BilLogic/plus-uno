@@ -1,9 +1,9 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as ToggleStories from './Toggle.stories.jsx';
 import { Toggle } from '@/components';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -39,45 +39,11 @@ A toggle turns one setting on or off, and the change takes effect at once.
 
 <div className="sb-ds-doc-section">
 
-## Anatomy
+## Content
 
-<DocsCanvasShell attachSourceBelow description={<>A track, a thumb and a label in a 24 row.</>}>
-    <Canvas of={ToggleStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={ToggleStories.Overview} title="Label" description="The label names the setting and stays the same in both positions." />
 
-<DocsTable>
-    <thead>
-        <tr><th>Part</th><th>What it is</th></tr>
-    </thead>
-    <tbody>
-        <tr><td>1 Track</td><td>A pill, 32 by 16 or 40 by 20. Off it is the neutral bold fill; on it is the selected bold fill.</td></tr>
-        <tr><td>2 Thumb</td><td>An inverse circle inset 2 from the track. It slides to the end when the toggle is on.</td></tr>
-        <tr><td>3 Label</td><td>14/20 text beside the track. It names the setting and stays the same in both states.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr><th>Property</th><th>Type</th><th>Default</th><th>Notes</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>label</code></td><td>node</td><td>none</td><td>Names the setting. Without a visible label, pass <code>aria-label</code>.</td></tr>
-        <tr><td><code>isChecked</code></td><td>boolean</td><td>uncontrolled</td><td>Controlled value. Needs an <code>onChange</code>.</td></tr>
-        <tr><td><code>defaultChecked</code></td><td>boolean</td><td><code>false</code></td><td>Initial value when uncontrolled.</td></tr>
-        <tr><td><code>size</code></td><td><code>16</code>, <code>20</code></td><td><code>16</code></td><td>Track height in pixels.</td></tr>
-        <tr><td><code>isDisabled</code></td><td>boolean</td><td><code>false</code></td><td>Disabled fill on both positions; the thumb says which.</td></tr>
-        <tr><td><code>isLoading</code></td><td>boolean</td><td><code>false</code></td><td>A change is being saved: a spinner shows beside the track, the toggle ignores changes and sets <code>aria-busy</code>.</td></tr>
-        <tr><td><code>isReadOnly</code></td><td>boolean</td><td><code>false</code></td><td>PLUS addition. Full contrast, in the tab order, not changeable.</td></tr>
-        <tr><td><code>id</code>, <code>name</code>, <code>value</code></td><td>string</td><td>generated id</td><td><code>name</code> is a form key, not an id.</td></tr>
-        <tr><td><code>onChange</code></td><td>function</td><td>none</td><td>Called with the change event.</td></tr>
-    </tbody>
-</DocsTable>
+<ComponentExample of={ToggleStories.Content} title="Short and long labels" description="Name the setting in a few words. A long label wraps beside the track." />
 
 </div>
 
@@ -85,33 +51,29 @@ A toggle turns one setting on or off, and the change takes effect at once.
 
 ## Size
 
-<DocsCanvasShell description={<>16 is the default for pages with many toggles. 20 calls attention to one setting.</>}>
-    <DsCanvasQuiet of={ToggleStories.Sizes} />
-</DocsCanvasShell>
+<ComponentExample of={ToggleStories.Sizes} title="Size" description="16 is the default for pages with many toggles. 20 calls attention to one setting." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## State
 
-<DocsCanvasShell description={<>Off, on, and disabled in each position.</>}>
-    <DsCanvasQuiet of={ToggleStories.States} />
-</DocsCanvasShell>
+<ComponentExample of={ToggleStories.Unchecked} title="Off" description="The neutral bold track with the thumb at the start." />
 
-<DocsCanvasShell description={<>Read-only: focusable, full contrast, and the setting does not change.</>}>
-    <DsCanvasQuiet of={ToggleStories.ReadOnly} />
-</DocsCanvasShell>
+<ComponentExample of={ToggleStories.Checked} title="On" description="The selected bold track with the thumb at the end." />
 
-</div>
+<ComponentExample of={ToggleStories.Hovered} title="Hovered" description="The track steps to its named hovered step, off or on." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={ToggleStories.Pressed} title="Pressed" description="No step of its own. The hovered fill holds while the pointer is down." />
 
-## Content
+<ComponentExample of={ToggleStories.Focused} title="Focused" description="A 2px ring, 2px off the track, for keyboard focus only." />
 
-<DocsCanvasShell description={<>Short and long labels.</>}>
-    <DsCanvasQuiet of={ToggleStories.Content} />
-</DocsCanvasShell>
+<ComponentExample of={ToggleStories.Loading} title="Loading" description="A change is being saved. A spinner shows, input is ignored and the toggle sets aria-busy." />
+
+<ComponentExample of={ToggleStories.ReadOnly} title="Read-only" description="Focusable, full contrast, and the setting does not change." />
+
+<ComponentExample of={ToggleStories.Disabled} title="Disabled" description="The disabled fill in both positions, with an icon.disabled thumb. The toggle leaves the tab order." />
 
 </div>
 
@@ -141,7 +103,7 @@ A toggle turns one setting on or off, and the change takes effect at once.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use a toggle to let a person turn something on or off instantly, such as making a resource public. If a physical switch would work for the action, a toggle is the right component.
 
@@ -149,22 +111,61 @@ A toggle never waits for a button. For an option that needs a button press to ap
 
 Pick the size by the page. Use 16 where the page has many toggles, such as a settings list. Use 20 to call attention to one setting, such as the single switch in a modal.
 
-<DoDontGrid
-    pairs={[
-        {
-            doExample: <div><Toggle label="Send reminders" defaultChecked /></div>,
-            doCaption: 'The label names the setting and stays the same whether the toggle is on or off.',
-            dontExample: <div><Toggle label="Reminders are on" defaultChecked /></div>,
-            dontCaption: "A label that changes with the state reads as a status, and a screen reader hears it twice.",
-        },
-    ]}
-/>
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Track.** A pill, 32 by 16 or 40 by 20. Off it is the neutral bold fill; on it is the selected bold fill.
+2. **Thumb.** An inverse circle inset 2 from the track. It slides to the end when the toggle is on.
+3. **Label.** 14/20 text beside the track in a 24 row. It names the setting and stays the same in both states.
+4. **Spinner.** Optional, between the track and the label while a change is saved.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>Off: <code>--ds-background-neutral-bold-hovered</code>. On: <code>--ds-background-selected-bold-hovered</code>.</td></tr>
+<tr><td>Pressed</td><td>No step of its own. The hovered fill holds while the pointer is down.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the track, for keyboard focus only.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code> track, <code>--ds-icon-disabled</code> thumb, in both positions. Out of the tab order.</td></tr>
+<tr><td>Read-only</td><td>Full contrast, in the tab order, not changeable.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Track size</td><td><code>--toggle-track-height-16</code> and <code>--toggle-track-width-16</code>; <code>-20</code> for the large size.</td></tr>
+<tr><td>Thumb inset</td><td><code>--toggle-pad</code>.</td></tr>
+<tr><td>Track fill</td><td><code>--ds-background-neutral-bold</code> off; <code>--ds-background-selected-bold</code> on.</td></tr>
+<tr><td>Thumb</td><td><code>--ds-icon-inverse</code>; <code>--ds-icon-disabled</code> when disabled.</td></tr>
+<tr><td>Row</td><td><code>--item-height-sm</code>; gap <code>--stack-md</code>.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Best practices
+
+### The label names the setting, in both positions.
+
+<DoDontPair
+    doExample={<div><Toggle label="Send reminders" defaultChecked /></div>}
+    doCaption="The label names the setting and stays the same whether the toggle is on or off."
+    dontExample={<div><Toggle label="Reminders are on" defaultChecked /></div>}
+    dontCaption="A label that changes with the state reads as a status, and a screen reader hears it twice."
+/>
 
 ### The change lands at once.
 
@@ -177,6 +178,24 @@ A toggle changes the setting as the person flips it. If the change needs confirm
 ### The role is a switch.
 
 The native input is a checkbox with `role="switch"`, the markup the W3C switch pattern ships. The platform maps the checked state, so no `aria-checked` is written. A `role` prop on the toggle replaces it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the setting as a noun phrase: "Send reminders".</td><td>An instruction or a status: "Turn on reminders", "Reminders are on".</td></tr>
+<tr><td>Use sentence case and no end punctuation.</td><td>Title case, or a period after the label.</td></tr>
+<tr><td>Keep the label to a few words.</td><td>A sentence that explains the setting. Put the explanation in a caption or a Tooltip.</td></tr>
+<tr><td>Write the label so it reads right in both positions.</td><td>"Enable" or "Disable" in the label, which the position already says.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
