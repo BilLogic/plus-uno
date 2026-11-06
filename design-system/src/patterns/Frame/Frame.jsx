@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 
 import PropTypes from 'prop-types';
 import { Dialog } from '@base-ui/react/dialog';
 import { openOverlayCount, subscribeOverlays } from '@/lib/overlay';
-import { IconButton, PanelHostContext } from '@/components';
+import { IconButton, LinkIconButton, PanelHostContext } from '@/components';
 import { SidebarControlContext } from './SidebarControl';
 import { PanelControlContext } from './PanelControl';
 import { SplitContext } from './SplitContext';
@@ -88,8 +88,9 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  *   drag or keys. Width and open state are kept in sessionStorage. A modal
  *   leaves it open. Anything inside the Frame opens it through
  *   `usePanelControl`.
- * - A Frame without a Sidebar (a focused page) may carry a `topbar` row of its
- *   own above the Page.
+ * - There is no top bar on any Frame. A focused page (no Sidebar) puts Back
+ *   (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header
+ *   row, around the `header` content.
  * - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the
  *   Panel is a complementary landmark named by `panelLabel`.
  * - The Page pads `--page-pad` (24 at every width) and caps its content at
@@ -98,8 +99,12 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  */
 const Frame = ({
     id,
-    topbar,
     header,
+    onBack,
+    backHref,
+    backLabel = 'Back',
+    onClose,
+    closeLabel = 'Close',
     sidebar,
     sidebarDocked,
     panel,
@@ -550,10 +555,20 @@ const Frame = ({
             {...toggleProps}
         />
     ) : null;
-    const pageHead = pageToggle || header ? (
+    const backButton = backHref ? (
+        <LinkIconButton className="plus-frame__back" appearance="subtle" icon="arrow-left" label={backLabel} href={backHref} onClick={onBack} />
+    ) : onBack ? (
+        <IconButton className="plus-frame__back" appearance="subtle" icon="arrow-left" label={backLabel} onClick={onBack} type="button" />
+    ) : null;
+    const closeButton = onClose ? (
+        <IconButton className="plus-frame__close" appearance="subtle" icon="xmark" label={closeLabel} onClick={onClose} type="button" />
+    ) : null;
+    const pageHead = pageToggle || header || backButton || closeButton ? (
         <div className={['plus-frame__head', pageToggle ? 'plus-frame__head--toggle' : ''].filter(Boolean).join(' ')}>
+            {backButton}
             {pageToggle}
             {header}
+            {closeButton}
         </div>
     ) : null;
 
@@ -564,8 +579,6 @@ const Frame = ({
             <SplitContext.Provider value={sectionDetail ? layout.splitHolds : null}>
             <PanelControlContext.Provider value={panelControl}>
                 <SidebarControlContext.Provider value={control}>
-                {!hasSidebar && topbar ? <div className="plus-frame__topbar">{topbar}</div> : null}
-
                 {collapsed ? (
                     <div className="plus-frame__edge" aria-hidden="true" onPointerEnter={peekSidebar} />
                 ) : null}
@@ -616,10 +629,18 @@ const Frame = ({
 
 Frame.propTypes = {
     id: PropTypes.string,
-    /** A row above the Page, for a Frame without a Sidebar (a focused page's header). With a Sidebar there is no top row. */
-    topbar: PropTypes.node,
     /** The Page's header row, 32 high on the logo row's center line: the breadcrumb. While the Sidebar is closed it follows the toggle. */
     header: PropTypes.node,
+    /** A focused page: called when Back is pressed. With it the header row leads with a Back icon button. */
+    onBack: PropTypes.func,
+    /** A focused page: where Back goes, as a link. */
+    backHref: PropTypes.string,
+    /** The accessible name of Back. */
+    backLabel: PropTypes.string,
+    /** A focused page: called when Close is pressed. With it the header row ends with a Close icon button. */
+    onClose: PropTypes.func,
+    /** The accessible name of Close. */
+    closeLabel: PropTypes.string,
     /** Sidebar content. Without it there is no Sidebar and no toggle. */
     sidebar: PropTypes.node,
     /** Sets the Sidebar's default request: true opens it, false closes it. Under 1024 it never docks. Unset opens it where it fits. */

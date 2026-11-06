@@ -13,7 +13,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Breadcrumb, Button, CloseButton, LinkButton, Skeleton } from '@/components';
+import { Breadcrumb, Skeleton } from '@/components';
 import { Frame, PatternDrawer } from '@/patterns';
 import { Sidebar } from '../../Sections';
 import { usePageLayoutShell } from './PageLayoutShellContext';
@@ -46,15 +46,14 @@ const PAGE_TITLE_STYLE = {
 
 /**
  * `frame="focused"`: the page for one task, with no sidebar. Mirrors the Figma
- * `Pattern/Page template` frame=focused and its parts `_Focused topbar` and
- * `_Focused footer`, here the actions at the foot of the Page.
+ * `Pattern/Page template` frame=focused and its part `_Focused footer`, here the actions at the foot of the Page.
  *
  * - The Frame with no sidebar and the Frame's own edges: no seams on any side,
- *   no gap under the topbar, the hairline kept, and no footer row.
- * - Topbar (a `header`, the banner), 32 high: Back, a secondary text button
- *   with `arrow-left`; the title, the page's one visible `h1` at Heading/xsmall,
- *   on one line and truncated; Close, the `CloseButton`; `--focused-page-inline-md`
- *   12 apart.
+ *   and no footer row.
+ * - No top bar. The Page's header row (32 high, `Frame`'s `header` row) leads with
+ *   Back, an icon button with `arrow-left`; the title, the page's one visible `h1`
+ *   at Heading/xsmall, on one line and truncated; and ends with Close, an icon
+ *   button with `xmark`. Both are named "Back" and "Close" and drawn only with a handler.
  * - Surface (the `main`): the frame's surface at reading width, content capped
  *   at `--content-max-width-reading` 864, centered, never under 720. It scrolls
  *   on its own.
@@ -77,36 +76,10 @@ const FocusedFrame = ({
     contentDirect,
     children,
 }) => {
-    const hasBack = Boolean(onBack || backHref);
-    const topbar = (
-        <header className="plus-page-focused__topbar">
-            {hasBack ? (
-                backHref ? (
-                    <LinkButton
-                        className="plus-page-focused__back"
-                        appearance="subtle"
-                        iconBefore="arrow-left"
-                        text={backLabel}
-                        href={backHref}
-                        onClick={onBack}
-                    />
-                ) : (
-                    <Button
-                        className="plus-page-focused__back"
-                        appearance="subtle"
-                        iconBefore="arrow-left"
-                        text={backLabel}
-                        onClick={onBack}
-                    />
-                )
-            ) : null}
-            {/* The focused page names its task here, so it needs a title; the spacer keeps Close at the end without one. */}
-            {title ? <h1 className="plus-page-focused__title">{title}</h1> : <span className="plus-page-focused__title" aria-hidden="true" />}
-            {onClose ? (
-                <CloseButton className="plus-page-focused__close" label={closeLabel} onClick={onClose} />
-            ) : null}
-        </header>
-    );
+    // The title sits in the Page's header row between Back and Close; the spacer keeps Close at the end without one.
+    const header = title
+        ? <h1 className="plus-page-focused__title">{title}</h1>
+        : <span className="plus-page-focused__title" aria-hidden="true" />;
     // The Frame has no footer row, so the actions sit at the foot of the Page,
     // held there while it scrolls, in the content column.
     const actionsBar = actions ? (
@@ -117,7 +90,12 @@ const FocusedFrame = ({
 
     return (
         <Frame
-            topbar={topbar}
+            header={header}
+            onBack={onBack}
+            backHref={backHref}
+            backLabel={backLabel}
+            onClose={onClose}
+            closeLabel={closeLabel}
             width="reading"
             className={actions ? 'plus-frame--focused-actions' : undefined}
             contentClassName={['plus-page-main', mainClassName].filter(Boolean).join(' ')}
@@ -148,7 +126,7 @@ const PageLayout = ({
     children,
     /** `default`: the app frame with the Sidebar and the breadcrumb. `focused`: one task, no sidebar — see FocusedFrame. */
     frame = 'default',
-    /** Focused: called when Back is pressed. With this or `backHref`, the topbar shows Back. */
+    /** Focused: called when Back is pressed. With this or `backHref`, the Page header row leads with Back. */
     onBack,
     /** Focused: where Back goes, as a link. */
     backHref,

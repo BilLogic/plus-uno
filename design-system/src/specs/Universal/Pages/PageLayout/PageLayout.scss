@@ -6,25 +6,23 @@
  * Layout or Surface token.
  */
 
-/* ------------------------------------------------------------- topbar */
+/* ------------------------------------------------------------- header row */
 
-// The Frame pads only the topbar's end; Back keeps the same inset at the start.
-.plus-page-layout--focused .plus-frame__topbar {
-    padding-inline-start: var(--pad-x-sm);
-}
-
-.plus-page-focused__topbar {
-    display: flex;
-    align-items: center;
-    gap: var(--focused-page-inline-md);
-    width: 100%;
-    min-width: 0;
-    height: var(--frame-topbar-height);
-}
-
-.plus-page-focused__back,
-.plus-page-focused__close {
-    flex-shrink: 0;
+// The Page's header row carries Back, the title and Close; the Frame draws the
+// two buttons. It is held at the top of the Page while the content scrolls: it
+// starts at the Page's edge and carries the 8 above and the stack below, so
+// nothing shows through around it.
+.plus-page-layout--focused .plus-frame__head {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    box-sizing: content-box;
+    height: var(--item-height-md);
+    margin-top: calc(-1 * var(--page-pad));
+    margin-bottom: 0;
+    padding-top: var(--frame-sidebar-pad);
+    padding-bottom: var(--page-stack-sm);
+    background-color: var(--ds-surface);
 }
 
 // The title takes what is left and stays on one line.

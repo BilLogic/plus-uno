@@ -5,7 +5,7 @@ import { Button, TextField, TextArea } from '@/components';
 import { PatternCard, PatternSection } from '@/patterns';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
 /**
@@ -98,7 +98,7 @@ export default {
         },
         title: {
             control: 'text',
-            description: 'The page title. In a focused page it is the visible title in the topbar.',
+            description: 'The page title. In a focused page it is the visible title in the Page header row.',
             table: { category: 'Slots' },
         },
         backLabel: {
@@ -214,7 +214,7 @@ const NoteActions = () => (
     </>
 );
 
-/** frame="focused": Back, the title and Close in the topbar, the sections at reading width, the actions in a footer. */
+/** frame="focused": Back, the title and Close in the Page header row, the sections at reading width, the actions in a footer. */
 export const Focused = {
     args: { title: 'Add a session note', onBack: fn(), onClose: fn() },
     render: (args) => fullHeight(
@@ -222,6 +222,40 @@ export const Focused = {
             <NoteForm />
         </PageLayout>,
     ),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const head = canvasElement.querySelector('.plus-frame__head');
+        await expect(canvas.queryByRole('banner'), 'no top bar').toBeNull();
+        const back = canvas.getByRole('button', { name: 'Back' });
+        const close = canvas.getByRole('button', { name: 'Close' });
+        const title = canvas.getByRole('heading', { level: 1 });
+        // Back left of the title, Close at the right end, all in the Page header row.
+        await expect(head).toContainElement(back);
+        await expect(head).toContainElement(title);
+        await expect(head).toContainElement(close);
+        await expect(back.getBoundingClientRect().right, 'Back is left of the title').toBeLessThanOrEqual(title.getBoundingClientRect().left + 1);
+        await expect(close.getBoundingClientRect().left, 'Close is right of the title').toBeGreaterThanOrEqual(title.getBoundingClientRect().left);
+        await expect(close.getBoundingClientRect().right, 'Close ends the row').toBeCloseTo(head.getBoundingClientRect().right, 0);
+        await expect(back.querySelector('.fa-arrow-left')).not.toBeNull();
+        await expect(close.querySelector('.fa-xmark')).not.toBeNull();
+        // Keyboard: both take focus with the ring, and fire their callbacks.
+        await userEvent.tab();
+        await expect(back).toHaveFocus();
+        await userEvent.tab();
+        await expect(close).toHaveFocus();
+        for (const el of [back, close]) {
+            el.focus();
+            const style = getComputedStyle(el);
+            await expect(parseFloat(style.outlineWidth), 'a 2px focus ring').toBeCloseTo(tokenLength(canvasElement, '--focus-ring-width'), 0);
+            await expect(style.outlineColor, 'the focus ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        }
+        back.focus();
+        await userEvent.keyboard('{Enter}');
+        await expect(args.onBack).toHaveBeenCalledTimes(1);
+        close.focus();
+        await userEvent.keyboard(' ');
+        await expect(args.onClose).toHaveBeenCalledTimes(1);
+    },
 };
 
 /** A read-only task drops the footer; with no way back, Close alone leaves the task. */

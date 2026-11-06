@@ -21,31 +21,6 @@
     color: var(--ds-text);
 }
 
-/* ------------------------------------------------------------- topbar */
-
-// A Frame without a Sidebar (a focused page) may carry a row above the Page,
-// ending in a hairline drawn over its bottom edge so it keeps its height.
-.plus-frame__topbar {
-    position: relative;
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    min-width: 0;
-    height: var(--frame-topbar-height);
-    box-sizing: border-box;
-    padding-inline-end: var(--pad-x-sm);
-
-    &::after {
-        content: '';
-        position: absolute;
-        inset-inline: 0;
-        bottom: 0;
-        height: var(--border-default);
-        background-color: var(--ds-border);
-        pointer-events: none;
-    }
-}
-
 /* ------------------------------------------------------------- row */
 
 .plus-frame__row {
@@ -133,6 +108,11 @@
     height: var(--item-height-md);
     margin-top: calc(var(--frame-sidebar-pad) - var(--page-pad));
     margin-bottom: var(--page-stack-sm);
+}
+
+.plus-frame__back,
+.plus-frame__close {
+    flex-shrink: 0;
 }
 
 .plus-frame__toggle {

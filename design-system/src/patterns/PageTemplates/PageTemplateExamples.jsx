@@ -24,7 +24,7 @@ const noteActions = (
 );
 
 /** Do: a focused page names its task and offers Back and Close. */
-export const FocusedTopbarDo = () => (
+export const FocusedHeaderDo = () => (
     <div style={box}>
         <PageLayout frame="focused" title="Add a session note" style={{ height: '100%' }} onBack={() => {}} onClose={() => {}}>
             {slotContent('Content slot: Sections')}
@@ -33,7 +33,7 @@ export const FocusedTopbarDo = () => (
 );
 
 /** Don't: the app frame, with the sidebar and a breadcrumb, on a page for one task. */
-export const FocusedTopbarDont = () => (
+export const FocusedHeaderDont = () => (
     <div style={box}>
         <Frame header={<Breadcrumb items={BREADCRUMBS} />} sidebar={<Sidebar user="tutor" account={ACCOUNT} />} style={{ height: '100%' }} width="reading">
             {slotContent('Add a session note')}

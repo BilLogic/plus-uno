@@ -7,7 +7,11 @@ import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, 
 
 export const propRows = [
     ['header', 'node', 'none', 'The Page\'s header row, on the logo row\'s center line: the breadcrumb. While the Sidebar is closed it follows the toggle.', 'none'],
-    ['topbar', 'node', 'none', 'A row above the Page, for a Frame without a Sidebar (a focused page). With a Sidebar there is no top row.', 'none'],
+    ['onBack', 'function', 'none', 'A focused page: called when Back is pressed. With it the Page header row leads with a Back icon button (`arrow-left`, named Back).', 'none'],
+    ['backHref', 'string', 'none', 'A focused page: where Back goes, as a link.', 'none'],
+    ['backLabel', 'string', 'Back', 'The accessible name of Back.', 'none'],
+    ['onClose', 'function', 'none', 'A focused page: called when Close is pressed. With it the Page header row ends with a Close icon button (`xmark`, named Close).', 'none'],
+    ['closeLabel', 'string', 'Close', 'The accessible name of Close.', 'none'],
     ['sidebar', 'node', 'none', 'The Sidebar content. Without it there is no Sidebar and no toggle.', 'Sidebar = docked | collapsed'],
     ['sidebarDocked', 'true | false', 'unset: open where it fits', 'Sets the Sidebar\'s default request. True opens it, false closes it. Under 1024 it never docks.', 'Sidebar = docked | collapsed'],
     ['panel', 'node', 'none', 'The Panel area content, usually a PanelContainer and its parts. Without it there is no Panel.', 'Panel = none | docked | overlay'],
@@ -32,7 +36,6 @@ export const propRows = [
 export const tokens = [
     ['--screen-width', '768', '1024', '1440', 'The template frame width. Switching the layout mode resizes the frame.'],
     ['--screen-pad-x', '24', '24', '32', 'Pads the screen, a rule of its own so a Modal does not move when the Page pad does. The screen grid is clamp(720, screen minus 2 pads, 1232), centered, and belongs to the Overlay only, not the page grid.'],
-    ['--frame-topbar-height', '32', '32', '32', 'The focused page\'s top row.'],
     ['--frame-sidebar-width', '240', '240', '240', 'The Sidebar width, docked, peeking or as an overlay.'],
     ['--page-pad', '24', '24', '24', "The page's pad, which is also the grid margin. One value at every width."],
     ['--page-radius', '8', '8', '8', "The Page's corner radius token. The Frame places the Page flush, so it does not apply this."],
