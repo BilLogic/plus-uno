@@ -1,5 +1,5 @@
 import React from 'react';
-import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import { Label } from '@/storybook-docs/form-demos.jsx';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import TextField from '@/components/forms-and-inputs/TextField/TextField';
 

@@ -9,7 +9,7 @@ import React, { useCallback, useId, useState } from 'react';
 import TutorProfilePage from './TutorProfilePage';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import { PageLayout } from '../../../Universal/Pages';
-import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import { Label } from '@/storybook-docs/form-demos.jsx';
 import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';

@@ -56,13 +56,13 @@ export default {
     }
 };
 
-const ratingCol = { display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' };
+const ratingCol = { display: 'flex', flexDirection: 'column', gap: 'var(--space-200)', maxWidth: 'var(--size-5400)' };
 
 export const Overview = () => {
     const [value, setValue] = useState(3);
 
     return (
-        <div style={{ ...ratingCol, maxWidth: '480px' }}>
+        <div style={{ ...ratingCol, maxWidth: 'var(--size-3000)' }}>
             <Rating
                 id="rating-overview"
                 label="Rating"
@@ -150,7 +150,7 @@ export const Interactive = (args) => {
     }, [args.variant]);
 
     return (
-        <div style={{ maxWidth: '400px' }}>
+        <div style={{ maxWidth: 'var(--size-2500)' }}>
             <Rating
                 label={args.label}
                 isRequired={args.isRequired}
@@ -205,7 +205,7 @@ PropsRender.play = async ({ canvasElement }) => {
 };
 
 /** One story per state, for the Examples tab. */
-const frame = { maxWidth: '480px' };
+const frame = { maxWidth: 'var(--size-3000)' };
 
 export const Unrated = {
     render: () => (

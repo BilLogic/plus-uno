@@ -68,10 +68,10 @@ export default {
     },
 };
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: '360px' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', maxWidth: 'var(--size-2500)' };
 
 export const Overview = () => (
-    <div style={{ maxWidth: '600px' }}>
+    <div style={{ maxWidth: 'var(--size-4000)' }}>
         <Checkbox id="cb-overview" name="cb-overview" label="Option" defaultChecked />
     </div>
 );

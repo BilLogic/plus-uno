@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import { Label, Caption } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import { Label, Caption } from '@/storybook-docs/form-demos.jsx';
 import DateTimePicker from '@/components/forms-and-inputs/DateTimePicker';
 
 export default {

@@ -2,131 +2,8 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-
-/**
- * Label — form label with optional required asterisk.
- * Renders as a native `<label>` so it is announced by assistive tech; pass
- * `htmlFor` matching the paired control's `id` to associate them explicitly.
- * Caption — helper text with semantic states.
- *
- * @param {object} props
- * @param {string} [props.text] Label copy.
- * @param {boolean} [props.required] Whether to show the required asterisk.
- * @param {string} [props.htmlFor] `id` of the form control this label describes.
- * @returns {JSX.Element}
- */
-const Label = ({ text = 'Label', required = true, htmlFor }) => (
-    <label
-        htmlFor={htmlFor}
-        style={{
-            display: 'flex',
-            gap: 'var(--size-spacing-small-space-050)',
-            alignItems: 'flex-start',
-            lineHeight: 0,
-        }}
-    >
-        <span
-            className="body3-txt"
-            style={{
-                color: 'var(--ds-text)',
-                fontFamily: 'var(--font-family-body)',
-                fontWeight: 400,
-                lineHeight: 1.667,
-            }}
-        >
-            {text}
-        </span>
-        {required && (
-            <span
-                className="body3-txt"
-                style={{
-                    color: 'var(--ds-text-danger)',
-                    fontFamily: 'var(--font-family-body)',
-                    fontWeight: 300,
-                    lineHeight: 1.667,
-                }}
-            >
-                *
-            </span>
-        )}
-    </label>
-);
-
-const Caption = ({ text = 'caption', state = 'default', icon = 'square-plus' }) => {
-    const getTextColor = () => {
-        switch (state) {
-            case 'success':
-                return 'var(--ds-text-success)';
-            case 'danger':
-                return 'var(--ds-text-danger)';
-            case 'warning':
-                return 'var(--ds-text-warning)';
-            case 'disabled':
-                return 'var(--ds-text)';
-            case 'default':
-            default:
-                return 'var(--ds-text-subtle)';
-        }
-    };
-
-    const getIconColor = () => {
-        switch (state) {
-            case 'success':
-                return 'var(--ds-icon-success)';
-            case 'danger':
-                return 'var(--ds-icon-danger)';
-            case 'warning':
-                return 'var(--ds-icon-warning)';
-            case 'disabled':
-            case 'default':
-            default:
-                return 'var(--ds-icon-subtle)';
-        }
-    };
-
-    const showIcon = ['default', 'success', 'danger', 'warning', 'disabled'].includes(state);
-
-    return (
-        <div
-            style={{
-                display: 'flex',
-                gap: 'var(--space-025)',
-                alignItems: 'flex-start',
-                opacity: state === 'disabled' ? 0.78 : 1,
-            }}
-        >
-            {showIcon && (
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                    }}
-                >
-                    <i
-                        className={`fa-solid fa-${icon}`}
-                        style={{
-                            fontSize: '10px',
-                            lineHeight: 2,
-                            color: getIconColor(),
-                        }}
-                    />
-                </div>
-            )}
-            <span
-                className="body3-txt"
-                style={{
-                    color: getTextColor(),
-                    fontFamily: 'var(--font-family-body)',
-                    fontWeight: 300,
-                    lineHeight: 1.667,
-                }}
-            >
-                {text}
-            </span>
-        </div>
-    );
-};
+import TextField from './TextField';
+import { Label, Caption } from '@/storybook-docs/form-demos.jsx';
 
 export default {
     title: 'Components/Forms and inputs/Form',
@@ -137,23 +14,25 @@ export default {
         docs: {
             description: {
                 component:
-                    'Typography patterns for field labels (with optional required asterisk) and captions with semantic states. Compositions use plain inputs for context only.',
+                    'The label above a field, with its optional required marker, and the caption below it, in the tone its state names. Every field in Forms and inputs draws both for you.',
             },
         },
     },
+    argTypes: {
+        text: { control: 'text', table: { category: 'Content' } },
+        required: { control: 'boolean', table: { category: 'Behavior' } },
+        htmlFor: { table: { disable: true } },
+    },
 };
 
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', maxWidth: 'var(--size-3000)' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--size-section-gap-md)', alignItems: 'flex-start' };
+const cell = { minWidth: 'var(--size-1000)' };
+
 export const Overview = () => (
-    <div
-        style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--stack-sm)',
-            maxWidth: '480px',
-        }}
-    >
+    <div style={stack}>
         <Label text="Field label" required />
-        <Caption text="Helper or validation copy beneath the label." state="default" icon="square-plus" />
+        <Caption text="Helper or validation copy beneath the label." state="default" />
     </div>
 );
 Overview.parameters = {
@@ -161,205 +40,52 @@ Overview.parameters = {
         source: { language: 'jsx', code: webAppSourceSnippets.formLabelCaption }
     }
 };
+Overview.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByText('Field label').closest('label')).toBeInTheDocument();
+    await expect(canvas.getByText('Helper or validation copy beneath the label.')).toBeInTheDocument();
+};
 
 export const LabelContent = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
         <section>
-            <h6 className="h6 mb-3">With required indicator</h6>
+            <h6 className="h6 mb-3">With required marker</h6>
             <Label text="Label" required />
         </section>
         <section>
-            <h6 className="h6 mb-3">Without required indicator</h6>
+            <h6 className="h6 mb-3">Without required marker</h6>
             <Label text="Label" required={false} />
         </section>
     </div>
 );
-
-export const CaptionVariants = () => (
-    <div
-        style={{
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: 'var(--size-section-gap-md)',
-            alignItems: 'flex-start',
-        }}
-    >
-        <section style={{ minWidth: '160px' }}>
-            <h6 className="h6 mb-3">Default</h6>
-            <Caption text="caption" state="default" icon="square-plus" />
-        </section>
-        <section style={{ minWidth: '160px' }}>
-            <h6 className="h6 mb-3">Success</h6>
-            <Caption text="caption" state="success" icon="circle-check" />
-        </section>
-        <section style={{ minWidth: '160px' }}>
-            <h6 className="h6 mb-3">Danger</h6>
-            <Caption text="caption" state="danger" icon="circle-xmark" />
-        </section>
-        <section style={{ minWidth: '160px' }}>
-            <h6 className="h6 mb-3">Warning</h6>
-            <Caption text="caption" state="warning" icon="triangle-exclamation" />
-        </section>
-        <section style={{ minWidth: '160px' }}>
-            <h6 className="h6 mb-3">Disabled</h6>
-            <Caption text="caption" state="disabled" icon="square-plus" />
-        </section>
-    </div>
-);
-
-export const Layout = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)' }}>
-        <section>
-            <h6 className="h6 mb-4">Field column: label, control, caption</h6>
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--stack-sm)',
-                    maxWidth: '400px',
-                }}
-            >
-                <Label text="Email Address" required htmlFor="layout-email" />
-                <input
-                    id="layout-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    style={{
-                        padding: '8px 12px',
-                        border: '1px solid var(--ds-border)',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                    }}
-                />
-                <Caption text="We'll never share your email with anyone else." state="default" icon="circle-info" />
-            </div>
-        </section>
-        <section>
-            <h6 className="h6 mb-4">Success</h6>
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--stack-sm)',
-                    maxWidth: '400px',
-                }}
-            >
-                <Label text="Username" required htmlFor="layout-username" />
-                <input
-                    id="layout-username"
-                    type="text"
-                    value="john_doe"
-                    readOnly
-                    style={{
-                        padding: '8px 12px',
-                        border: '1px solid var(--ds-border-success)',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        backgroundColor: 'var(--ds-background-success)',
-                    }}
-                />
-                <Caption text="Username is available!" state="success" icon="circle-check" />
-            </div>
-        </section>
-        <section>
-            <h6 className="h6 mb-4">Error</h6>
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--stack-sm)',
-                    maxWidth: '400px',
-                }}
-            >
-                <Label text="Password" required htmlFor="layout-password" />
-                <input
-                    id="layout-password"
-                    type="password"
-                    value="123"
-                    readOnly
-                    style={{
-                        padding: '8px 12px',
-                        border: '1px solid var(--ds-border-danger)',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        backgroundColor: 'var(--ds-background-danger)',
-                    }}
-                />
-                <Caption text="Password must be at least 8 characters long." state="danger" icon="circle-xmark" />
-            </div>
-        </section>
-        <section>
-            <h6 className="h6 mb-4">Warning</h6>
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--stack-sm)',
-                    maxWidth: '400px',
-                }}
-            >
-                <Label text="Phone Number" required={false} htmlFor="layout-phone" />
-                <input
-                    id="layout-phone"
-                    type="tel"
-                    value="555-0123"
-                    readOnly
-                    style={{
-                        padding: '8px 12px',
-                        border: '1px solid var(--ds-border-warning)',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        backgroundColor: 'var(--ds-background-warning)',
-                    }}
-                />
-                <Caption
-                    text="Please include country code for international numbers."
-                    state="warning"
-                    icon="triangle-exclamation"
-                />
-            </div>
-        </section>
-        <section>
-            <h6 className="h6 mb-4">Disabled</h6>
-            <div
-                style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 'var(--stack-sm)',
-                    maxWidth: '400px',
-                }}
-            >
-                <Label text="Account Type" required htmlFor="layout-account-type" />
-                <input
-                    id="layout-account-type"
-                    type="text"
-                    value="Premium"
-                    disabled
-                    style={{
-                        padding: '8px 12px',
-                        border: '1px solid var(--ds-border)',
-                        borderRadius: '4px',
-                        fontSize: '14px',
-                        backgroundColor: 'var(--ds-surface-container)',
-                        opacity: 0.78,
-                    }}
-                />
-                <Caption text="Account type cannot be changed." state="disabled" icon="lock" />
-            </div>
-        </section>
-    </div>
-);
-
-export { Label, Caption };
-
 LabelContent.play = async ({ canvasElement }) => {
     const labels = canvasElement.querySelectorAll('label');
     await expect(labels).toHaveLength(2);
     await expect(labels[0]).toHaveTextContent('Label*');
     await expect(labels[1]).not.toHaveTextContent('*');
+    await expect(getComputedStyle(labels[0].querySelector('.plus-field-required')).color).toBe(tokenColor(canvasElement, '--ds-text-danger'));
 };
 
+export const CaptionVariants = () => (
+    <div style={row}>
+        <section style={cell}>
+            <h6 className="h6 mb-3">Default</h6>
+            <Caption text="caption" state="default" />
+        </section>
+        <section style={cell}>
+            <h6 className="h6 mb-3">Success</h6>
+            <Caption text="caption" state="success" />
+        </section>
+        <section style={cell}>
+            <h6 className="h6 mb-3">Danger</h6>
+            <Caption text="caption" state="danger" />
+        </section>
+        <section style={cell}>
+            <h6 className="h6 mb-3">Warning</h6>
+            <Caption text="caption" state="warning" />
+        </section>
+    </div>
+);
 /** Each caption state takes its own text color: help is subtle, the others carry their status. */
 CaptionVariants.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -371,6 +97,49 @@ CaptionVariants.play = async ({ canvasElement }) => {
     };
     for (const [heading, token] of Object.entries(colors)) {
         const section = canvas.getByRole('heading', { name: heading }).closest('section');
-        await expect(getComputedStyle(section.querySelector('span')).color, `${heading} caption`).toBe(tokenColor(canvasElement, token));
+        await expect(getComputedStyle(section.querySelector('.plus-field-caption__message')).color, `${heading} caption`).toBe(tokenColor(canvasElement, token));
     }
+};
+
+/** Label, control and caption stacked as the fields draw them, one per caption state. */
+export const Layout = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)' }}>
+        <section>
+            <h6 className="h6 mb-4">Default</h6>
+            <div style={stack}>
+                <TextField id="layout-email" type="email" label="Email address" isRequired placeholder="Enter your email" caption="We'll never share your email with anyone else." />
+            </div>
+        </section>
+        <section>
+            <h6 className="h6 mb-4">Success</h6>
+            <div style={stack}>
+                <TextField id="layout-username" label="Username" isRequired defaultValue="john_doe" successMessage="Username is available." />
+            </div>
+        </section>
+        <section>
+            <h6 className="h6 mb-4">Error</h6>
+            <div style={stack}>
+                <TextField id="layout-password" type="password" label="Password" isRequired defaultValue="123" isInvalid errorMessage="Password must be at least 8 characters long." />
+            </div>
+        </section>
+        <section>
+            <h6 className="h6 mb-4">Warning</h6>
+            <div style={stack}>
+                <TextField id="layout-phone" type="tel" label="Phone number" defaultValue="555-0123" warningMessage="Include a country code for international numbers." />
+            </div>
+        </section>
+        <section>
+            <h6 className="h6 mb-4">Disabled</h6>
+            <div style={stack}>
+                <TextField id="layout-account-type" label="Account type" isRequired defaultValue="Premium" isDisabled />
+            </div>
+        </section>
+    </div>
+);
+Layout.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByLabelText(/Email address/)).toHaveAttribute('id', 'layout-email');
+    await expect(canvas.getByLabelText(/Password/)).toHaveAttribute('aria-invalid', 'true');
+    await expect(canvas.getByLabelText(/Account type/)).toBeDisabled();
+    await expect(canvas.getByRole('alert')).toHaveTextContent('Password must be at least 8 characters long.');
 };

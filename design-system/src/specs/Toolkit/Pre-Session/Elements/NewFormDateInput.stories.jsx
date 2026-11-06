@@ -1,5 +1,5 @@
 import React from 'react';
-import { Label, Caption } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import { Label, Caption } from '@/storybook-docs/form-demos.jsx';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/New Form Date Input',

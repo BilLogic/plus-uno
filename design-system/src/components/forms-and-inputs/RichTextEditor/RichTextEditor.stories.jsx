@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import RichTextEditor from './RichTextEditor';
 
 export default {
@@ -103,7 +104,7 @@ export const Interactive = (args) => {
     }, [args.initialContent]);
 
     return (
-        <div style={{ maxWidth: '880px' }}>
+        <div style={{ maxWidth: 'var(--size-5400)' }}>
             <RichTextEditor
                 label="Session notes"
                 spacing={args.spacing}
@@ -238,5 +239,27 @@ export const FullToolbar = {
     play: async ({ canvasElement }) => {
         await expect(canvasElement.querySelector('.plus-rich-text-editor')).toHaveClass('plus-rich-text-editor--full');
         await expect(within(canvasElement).getByRole('button', { name: 'Bold' })).toBeInTheDocument();
+    },
+};
+
+const boldButton = (canvasElement) => within(canvasElement).getByRole('button', { name: 'Bold' });
+
+export const ToolbarButtonHovered = {
+    render: () => <RichTextEditor label="Session notes" placeholder="Type something..." minHeight={150} />,
+    play: async ({ canvasElement }) => {
+        const button = boldButton(canvasElement);
+        button.style.transition = 'none';
+        const fill = withForcedPseudo(button, ':hover', () => getComputedStyle(button).backgroundColor);
+        await expect(fill).toBe(tokenColor(canvasElement, '--ds-background-neutral-subtle-hovered'));
+    },
+};
+
+export const ToolbarButtonPressed = {
+    render: () => <RichTextEditor label="Session notes" placeholder="Type something..." minHeight={150} />,
+    play: async ({ canvasElement }) => {
+        const button = boldButton(canvasElement);
+        button.style.transition = 'none';
+        const fill = withForcedPseudo(button, ':active', () => getComputedStyle(button).backgroundColor);
+        await expect(fill).toBe(tokenColor(canvasElement, '--ds-background-neutral-subtle-pressed'));
     },
 };

@@ -54,7 +54,7 @@
  * - Additional Email info icon tooltip: "Get notifications sent to an alternate email address"
  */
 import React from 'react';
-import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import { Label } from '@/storybook-docs/form-demos.jsx';
 import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';

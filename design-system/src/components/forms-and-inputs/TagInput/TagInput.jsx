@@ -110,8 +110,8 @@ const TagInput = ({
     spacing = 'default',
     disabled = false,
     readOnly = false,
-    validation = 'none',
-    validationMessage,
+    isInvalid = false,
+    errorMessage,
     maxLength,
     maxTags,
     onAdd,
@@ -650,8 +650,8 @@ const TagInput = ({
     }, [open, editable]);
 
     /* ---------- validation and description ---------- */
-    const tone = validation === 'invalid' ? 'invalid' : 'help';
-    const message = (validation === 'invalid' && validationMessage) || caption;
+    const tone = isInvalid ? 'invalid' : 'help';
+    const message = (isInvalid && errorMessage) || caption;
     const { messageId, describedBy } = fieldDescription({
         fieldId,
         message,
@@ -886,9 +886,9 @@ TagInput.propTypes = {
     disabled: PropTypes.bool,
     /** Shows the tags with no × and no entry, on the read-only fill. */
     readOnly: PropTypes.bool,
-    validation: PropTypes.oneOf(['none', 'invalid']),
-    /** Shown under the field, and announced, while `validation` is `invalid`. */
-    validationMessage: PropTypes.node,
+    isInvalid: PropTypes.bool,
+    /** Shown under the field, and announced, while `isInvalid` is set. */
+    errorMessage: PropTypes.node,
     /** The longest a new value can be. */
     maxLength: PropTypes.number,
     /** The most tags the field holds. At the limit, Create hides and the list says so. */

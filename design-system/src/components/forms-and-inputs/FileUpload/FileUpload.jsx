@@ -8,11 +8,11 @@ const FileUpload = ({
     id,
     name,
     label,
-    required = false,
+    isRequired = false,
     description,
     acceptedFormats,
-    disabled = false,
-    readOnly = false,
+    isDisabled = false,
+    isReadOnly = false,
     validation = 'none',
     validationMessage,
     buttonText = 'Choose a file',
@@ -53,13 +53,13 @@ const FileUpload = ({
 
     const handleButtonClick = (e) => {
         e.preventDefault();
-        if (!disabled && !readOnly && fileInputRef.current) {
+        if (!isDisabled && !isReadOnly && fileInputRef.current) {
             fileInputRef.current.click();
         }
     };
 
     const handleFileChange = (e) => {
-        if (disabled || readOnly) return;
+        if (isDisabled || isReadOnly) return;
         if (onChange) {
             onChange(e);
         }
@@ -87,9 +87,9 @@ const FileUpload = ({
             style={style}
         >
             {label && (
-                <label htmlFor={fieldId} className={`plus-file-upload-label ${disabled ? 'plus-file-upload-label-disabled' : ''}`}>
+                <label htmlFor={fieldId} className={`plus-file-upload-label ${isDisabled ? 'plus-file-upload-label-disabled' : ''}`}>
                     {label}
-                    {required && (
+                    {isRequired && (
                         <span className="plus-file-upload-required" aria-label="required">*</span>
                     )}
                 </label>
@@ -102,7 +102,7 @@ const FileUpload = ({
              * validation message sit below it.
              */}
             <div
-                className={`plus-file-upload-container ${disabled ? 'plus-file-upload-disabled' : ''} ${readOnly ? 'plus-file-upload-readonly' : ''} ${state !== 'none' ? `plus-file-upload-${state}` : ''} ${isFocused ? 'plus-file-upload-focused' : ''}`}
+                className={`plus-file-upload-container ${isDisabled ? 'plus-file-upload-disabled' : ''} ${isReadOnly ? 'plus-file-upload-readonly' : ''} ${state !== 'none' ? `plus-file-upload-${state}` : ''} ${isFocused ? 'plus-file-upload-focused' : ''}`}
             >
 
                 {descriptionText && (
@@ -124,7 +124,7 @@ const FileUpload = ({
                         id={fieldId}
                         name={name}
                         accept={acceptAttribute}
-                        disabled={disabled}
+                        disabled={isDisabled}
                         onChange={handleFileChange}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
@@ -137,13 +137,13 @@ const FileUpload = ({
                             validationId,
                         ].filter(Boolean).join(' ') || undefined}
                         aria-invalid={state === 'invalid' || undefined}
-                        aria-readonly={readOnly || undefined}
-                        tabIndex={readOnly ? -1 : props.tabIndex}
+                        aria-readonly={isReadOnly || undefined}
+                        tabIndex={isReadOnly ? -1 : props.tabIndex}
                     />
-                    {!readOnly && (<Button
+                    {!isReadOnly && (<Button
                         text={buttonText}
                         appearance="primary"
-                        isDisabled={disabled}
+                        isDisabled={isDisabled}
                         onClick={handleButtonClick}
                         onFocus={handleFocus}
                         onBlur={handleBlur}
@@ -174,12 +174,12 @@ FileUpload.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
     label: PropTypes.node,
-    required: PropTypes.bool,
+    isRequired: PropTypes.bool,
     description: PropTypes.string,
     acceptedFormats: PropTypes.arrayOf(PropTypes.string),
-    disabled: PropTypes.bool,
+    isDisabled: PropTypes.bool,
     /** Shows the field and its files without a way to choose a file. */
-    readOnly: PropTypes.bool,
+    isReadOnly: PropTypes.bool,
     validation: PropTypes.oneOf(['none', 'invalid', 'valid']),
     validationMessage: PropTypes.string,
     buttonText: PropTypes.string,

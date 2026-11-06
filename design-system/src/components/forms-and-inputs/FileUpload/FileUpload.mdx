@@ -212,7 +212,7 @@ The picker offers the listed types first and every platform lets the user overri
 - **The control is a real file input.** The label points at it with `htmlFor`, it takes the `accept` and `disabled` attributes, and it fires a genuine change event. All the platform behavior is intact.
 - **It is one control with two tab stops.** The input is hidden at zero size rather than removed, so it stays in the tab order: the keyboard reaches the invisible input first and the visible button second. Focusing either draws the container's focus ring, so the stop is at least visible, but it is two stops, and Enter on the first opens the picker just as the second does.
 - **The description and the message are both attached.** The format rules and the validation message each carry an id and the input points at both, in that order: "PDF, up to 10 MB" is heard before "that file was too large" rather than instead of it. An invalid field also carries `aria-invalid`.
-- **`required` marks the label only.** The asterisk is decorative; the input carries no `required` attribute.
+- **`isRequired` marks the label only.** The asterisk is decorative; the input carries no `required` attribute.
 
 </div>
 

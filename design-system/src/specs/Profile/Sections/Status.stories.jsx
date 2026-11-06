@@ -51,7 +51,7 @@
  * - This information determines your eligibility to tutor with PLUS.
  */
 import React from 'react';
-import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import { Label } from '@/storybook-docs/form-demos.jsx';
 import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';
 import { SemesterAtPLUS } from '../Elements/SemesterAtPLUS.stories';

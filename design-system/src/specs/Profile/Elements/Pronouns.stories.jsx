@@ -6,7 +6,7 @@
  * Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=4913-8269&m=dev
  */
 import React from 'react';
-import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import { Label } from '@/storybook-docs/form-demos.jsx';
 import Select from '@/components/forms-and-inputs/Select';
 
 export default {

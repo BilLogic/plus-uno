@@ -340,7 +340,7 @@ export const webAppSourceSnippets = {
     formLabelCaption: snippet([
         '<div style={{ display: "flex", flexDirection: "column", gap: "var(--stack-sm)" }}>',
         '  <Label text="Field label" required />',
-        '  <Caption text="Helper or validation copy beneath the label." state="default" icon="square-plus" />',
+        '  <Caption text="Helper or validation copy beneath the label." state="default" />',
         '</div>'
     ]),
     formDatePicker: snippet([
