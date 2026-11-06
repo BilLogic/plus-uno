@@ -16,6 +16,7 @@ The PLUS sidebar: the Sidebar pattern (`@/patterns`) filled with the groups for 
 | `user` | enum | `'tutor'` | — |
 | `account` | shape (required) | — | The signed-in person: name, preferred name, one-word role, and an id that keys their remembered sections |
 | `modulesLeft` | number | `0` | A tutor's onboarding modules left. Above 0 the Toolkit is locked; supervisors are never locked. |
+| `lessonsLeft` | number | `0` | A tutor's assigned lessons left; counted on the Lessons row |
 | `badges` | objectOf | — | The trailing slot by row id: `{ compliance-monitor: { count: 3, countLabel: '3 open flags' }, lessons: { dot: true } }` |
 | `onHomeClick` | func | — | Home's press (the row and the logo); without it Home calls `onTabClick('home')` |
 | `onTabClick` | func | — | Called with the row id for every other row (external links excepted) |

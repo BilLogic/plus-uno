@@ -11,7 +11,7 @@ authored half (#166), counted rather than assumed.
 | [Link](Link/index.md) | 7 | ✅ | ✕ | ✅ |
 | [MenuGroup](MenuGroup/index.md) | 7 | ✅ | ✕ | ✅ |
 | [Pagination](Pagination/index.md) | 11 | ✅ | ✅ | ✅ |
-| [Sidebar](Sidebar/index.md) | 16 | ✕ | ✕ | ✕ |
+| [Sidebar](Sidebar/index.md) | 17 | ✕ | ✕ | ✕ |
 | [Tabs](Tabs/index.md) | 9 | ✅ | ✅ | ✅ |
 
 **Authored coverage:** When to use 5/6 (83%) · Correct/incorrect 3/6 (50%) · Accessibility 5/6 (83%)

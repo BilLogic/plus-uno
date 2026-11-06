@@ -26,8 +26,8 @@ export const SIDEBAR_GROUPS = [
         id: 'training',
         title: 'Training',
         items: [
-            { id: 'lessons', text: 'Lessons', icon: 'fa-regular fa-lightbulb' },
-            { id: 'onboarding', text: 'Onboarding', icon: 'fa-regular fa-compass' },
+            { id: 'lessons', text: 'Lessons', icon: 'fa-regular fa-lightbulb', training: 'lessons' },
+            { id: 'onboarding', text: 'Onboarding', icon: 'fa-regular fa-compass', training: 'modules' },
         ],
     },
     {

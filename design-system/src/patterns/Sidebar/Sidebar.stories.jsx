@@ -38,8 +38,8 @@ const groups = (view) => [
         id: 'training',
         title: 'Training',
         items: [
-            { id: 'lessons', text: 'Lessons', icon: 'fa-regular fa-lightbulb', dot: true, dotLabel: 'New lesson assigned' },
-            { id: 'onboarding', text: 'Onboarding', icon: 'fa-regular fa-compass' },
+            { id: 'lessons', text: 'Lessons', icon: 'fa-regular fa-lightbulb', training: 'lessons' },
+            { id: 'onboarding', text: 'Onboarding', icon: 'fa-regular fa-compass', training: 'modules' },
         ],
     },
     {
@@ -131,7 +131,7 @@ export default {
     component: PatternSidebar,
     tags: ['!dev', '!autodocs'],
     render: (args) => <Live {...args} />,
-    args: { view: 'supervisor', tabSet: 'few', activeId: 'sessions', modulesLeft: 0, label: 'Main', storageKey: SIDEBAR_SECTIONS_STORAGE_KEY },
+    args: { view: 'supervisor', tabSet: 'few', activeId: 'sessions', modulesLeft: 0, lessonsLeft: 0, label: 'Main', storageKey: SIDEBAR_SECTIONS_STORAGE_KEY },
     argTypes: {
         view: { control: 'inline-radio', options: ['tutor', 'supervisor'], table: { category: 'Story' } },
         tabSet: { control: 'inline-radio', options: ['none', 'few', 'many'], table: { category: 'Story' } },
@@ -139,6 +139,7 @@ export default {
         tabs: { control: false, table: { category: 'Content' } },
         account: { control: 'object', table: { category: 'Content' } },
         modulesLeft: { control: { type: 'number', min: 0 }, table: { category: 'Content' } },
+        lessonsLeft: { control: { type: 'number', min: 0 }, table: { category: 'Content' } },
         activeId: { control: 'text', table: { category: 'Behavior' } },
         helpHref: { control: 'text', table: { category: 'Content' } },
         homeHref: { control: 'text', table: { category: 'Content' } },
@@ -264,12 +265,17 @@ export const Tutor = {
 
 /** A tutor mid-onboarding: the Toolkit locked, not hidden; its rows dimmed, with no tabs. */
 export const OnboardingInProgress = {
-    args: { view: 'tutor', modulesLeft: 3, activeId: 'onboarding' },
+    args: { view: 'tutor', modulesLeft: 3, lessonsLeft: 2, activeId: 'onboarding' },
     play: async ({ canvasElement }) => {
-        const message = 'Finish onboarding to unlock the Toolkit · 3 modules left';
+        const message = 'Complete your assigned training to unlock the Toolkit';
         const lock = within(canvasElement).getByRole('img', { name: `Locked. ${message}` });
         await expect(lock).toHaveAttribute('tabindex', '0');
         await expect(within(canvasElement).queryByRole('button', { name: 'Toolkit' }), 'a locked title does not collapse').toBeNull();
+        const lessons = rowNamed(canvasElement, 'Lessons');
+        const onboarding = rowNamed(canvasElement, 'Onboarding');
+        await expect(lessons.querySelector('.plus-count:not(.plus-count--dot)'), 'a Count tag, not a dot').toHaveAccessibleName('2 assigned lessons left');
+        await expect(onboarding.querySelector('.plus-count:not(.plus-count--dot)')).toHaveAccessibleName('3 onboarding modules left');
+        await expect(lessons.querySelector('.plus-count--dot')).toBeNull();
         const sessions = rowNamed(canvasElement, 'Sessions');
         await expect(sessions).toHaveAttribute('aria-disabled', 'true');
         await expect(getComputedStyle(sessions).color).toBe(tokenColor(canvasElement, '--ds-text-subtlest'));
@@ -283,8 +289,10 @@ export const OnboardingInProgress = {
 
 /** Onboarding done: the lock becomes the caret and the Toolkit collapses like the others. */
 export const OnboardingDone = {
-    args: { view: 'tutor', modulesLeft: 0 },
+    args: { view: 'tutor', modulesLeft: 0, lessonsLeft: 1 },
     play: async ({ canvasElement }) => {
+        await expect(rowNamed(canvasElement, 'Onboarding').querySelector('.plus-count'), 'no onboarding count once done').toBeNull();
+        await expect(rowNamed(canvasElement, 'Lessons').querySelector('.plus-count')).toHaveAccessibleName('1 assigned lesson left');
         await expect(within(canvasElement).queryByRole('img', { name: /Locked/ })).toBeNull();
         await expect(within(canvasElement).getByRole('button', { name: 'Toolkit' })).toHaveAttribute('aria-expanded', 'true');
     },
@@ -474,6 +482,25 @@ export const ClosingTabs = {
 
 /* ------------------------------------------------------------- account row */
 
+/** The account button hugs avatar · name · role: its hover fill ends within 8 of the role; Help stays on x 208. */
+export const AccountHug = {
+    args: { account: { id: 'story-hug', name: 'Maria Lopez', role: 'Tutor' } },
+    play: async ({ canvasElement }) => {
+        const trigger = within(canvasElement).getByRole('button', { name: /Maria Lopez, Tutor: account menu/ });
+        const role = trigger.querySelector('.plus-sidebar-account__role');
+        const gap = trigger.getBoundingClientRect().right - role.getBoundingClientRect().right;
+        const eight = tokenLength(canvasElement, '--space-050');
+        await expect(gap, 'the fill ends 8 after the role').toBeLessThanOrEqual(eight + 1);
+        await expect(gap).toBeGreaterThanOrEqual(eight - 1);
+        const avatar = trigger.querySelector('.plus-avatar');
+        await expect(avatar.getBoundingClientRect().left - trigger.getBoundingClientRect().left, 'the avatar sits 8 in').toBeCloseTo(eight, 0);
+        await expect(px(getComputedStyle(trigger).height), 'the button is 32 high').toBeCloseTo(tokenLength(canvasElement, '--size-200'), 0);
+        await expect(avatar.getBoundingClientRect().height, 'the avatar is 24').toBeCloseTo(tokenLength(canvasElement, '--size-150'), 0);
+        const help = within(canvasElement).queryByRole('link', { name: /Help Center/ }) ?? within(canvasElement).getByRole('button', { name: 'Help Center' });
+        await expect(centerX(canvasElement, help), 'Help stays centered on x 208').toBeCloseTo(208, 0);
+    },
+};
+
 /** Initials avatar, first name · role, the menu (Profile, Sign out) and Help Center. */
 export const AccountRow = {
     args: { onProfile: fn(), onSignOut: fn(), account: { id: 'story-long', name: 'Maria-Guadalupe Fernández-Castellanos', role: 'Admin' } },
@@ -485,6 +512,10 @@ export const AccountRow = {
         const role = trigger.querySelector('.plus-sidebar-account__role');
         await expect(name.scrollWidth, 'the name truncates').toBeGreaterThan(name.clientWidth);
         await expect(role.scrollWidth, 'the role never truncates').toBeLessThanOrEqual(role.clientWidth + 1);
+        await userEvent.hover(trigger);
+        await new Promise((resolve) => { setTimeout(resolve, 600); });
+        await expect(within(document.body).queryByRole('tooltip'), 'no tooltip on the account button').toBeNull();
+        await userEvent.unhover(trigger);
         trigger.focus();
         await userEvent.keyboard('{Enter}');
         await waitFor(() => expect(trigger).toHaveAttribute('aria-expanded', 'true'));
@@ -523,7 +554,7 @@ const InFrame = ({ width, sidebarDocked }) => {
                 <Frame
                     sidebarDocked={sidebarDocked}
                     header={<Breadcrumb items={[{ text: 'Toolkit' }, { text: 'Sessions' }]} />}
-                    sidebar={<RoleSidebar user="supervisor" activeTabId="sessions" account={ACCOUNT} badges={{ 'compliance-monitor': { count: 3, countLabel: '3 open flags' }, lessons: { dot: true, dotLabel: 'New lesson assigned' } }} />}
+                    sidebar={<RoleSidebar user="supervisor" activeTabId="sessions" account={ACCOUNT} badges={{ 'compliance-monitor': { count: 3, countLabel: '3 open flags' } } lessonsLeft={2} />}
                     panelStorageKey={null}
                 >
                     <p style={{ margin: 0 }}>Upcoming and past sessions.</p>
