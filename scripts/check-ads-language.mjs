@@ -73,13 +73,10 @@ const TOKEN_NAME_FILES = [
   /^design-system\/src\/tokens\/color\/_legacy-aliases\.scss$/,
 ];
 /**
- * Decision records that cite the benchmark on purpose: each says what a
- * candidate was weighed against, so the citation is the content. Named, not
- * globbed; a new record earns its own line here.
+ * Decision records that cite the benchmark on purpose, so the citation is the
+ * content. Named, not globbed; a new record earns its own line here. None today.
  */
-const ATLASSIAN_RECORDS = [
-  /^design-system\/src\/styles\/(?:TypeScaleCandidates|ColorCandidates|AiIdentity)\.stories\.jsx$/,
-];
+const ATLASSIAN_RECORDS = [];
 const COMMENT_LINE = /^\s*(?:\/\/|\/\*|\*)/;
 /** A glossary line saying what not to say. */
 const ALLOWED_LINE = /^\s*_Avoid_:/;

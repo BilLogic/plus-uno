@@ -38,3 +38,18 @@ export const FocusRing = () => (
         </Dont>
     </DoDont>
 );
+
+/** Color alone is not a message. */
+export const StatusNotColorAlone = () => (
+    <DoDont>
+        <Do caption="Color, an icon and a word together. The status reads with no color vision.">
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text-danger)' }}>
+                <i className="fa-solid fa-circle-exclamation" aria-hidden="true" />
+                Payment failed
+            </span>
+        </Do>
+        <Dont caption="A red dot and no words. Users who cannot tell the colors apart get nothing.">
+            <span aria-hidden="true" style={{ display: 'inline-block', width: 'var(--icon-sm)', height: 'var(--icon-sm)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-danger-bold)' }} />
+        </Dont>
+    </DoDont>
+);

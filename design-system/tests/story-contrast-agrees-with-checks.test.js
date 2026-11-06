@@ -3,8 +3,8 @@
  * The number a designer reads in Storybook is the number the build fails on
  * (#507).
  *
- * THE DEFECT THIS PINS. Five stories — `FocusRing`, `IntentRoles`,
- * `AiIdentity`, `ColorCandidates` and `BadgeVariants` — each carried their own
+ * THE DEFECT THIS PINS. Several stories — `FocusRing`, `IntentRoles`
+ * and `BadgeVariants` — each carried their own
  * copy of WCAG relative luminance, and `check:focus-ring`,
  * `check:text-contrast` and `check:button-contrast` carried a sixth in
  * `scripts/button-contrast.mjs`. Six copies of one formula agree until one of
