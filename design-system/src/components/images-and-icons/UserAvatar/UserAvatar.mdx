@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as UserAvatarStories from './UserAvatar.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsTable, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={UserAvatarStories} />
 
@@ -55,6 +55,33 @@ The signed-in user: an initial pill, the name, a role tag for a lead tutor and a
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>Rest. A clickable row shows the pointer and takes a tab stop.</>}>
+    <DsCanvasQuiet of={UserAvatarStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Hovered. The row takes the interaction fill.</>}>
+    <DsCanvasQuiet of={UserAvatarStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focused. A 2px ring for keyboard focus.</>}>
+    <DsCanvasQuiet of={UserAvatarStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Pressed. Click, Enter and Space each call <code>onClick</code>.</>}>
+    <DsCanvasQuiet of={UserAvatarStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled. Dimmed, not focusable, ignores clicks.</>}>
+    <DsCanvasQuiet of={UserAvatarStories.Disabled} />
+</DocsCanvasShell>
+
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -79,7 +106,7 @@ The signed-in user: an initial pill, the name, a role tag for a lead tutor and a
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `UserAvatar` for the current user's identity in the topbar or in a row that names a person. For a person who is not the signed-in user, or a picture-only avatar, use `Avatar`.
 
@@ -87,11 +114,52 @@ Use `UserAvatar` for the current user's identity in the topbar or in a row that 
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Initial.** A round pill with the first letter of the name, in `--ds-background-brand-subtlest`. Hidden from assistive technology.
+2. **Name.** Truncates with an ellipsis (at the label maximum width in the compact spacing) and keeps the full name in its `title`.
+3. **Role.** A Status tag with the text "Lead" for a lead tutor; other types show none.
+4. **Counter.** Optional, a danger-subtler pill with the notification count.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Transparent in the compact spacing; <code>--ds-surface</code> in the default spacing. With <code>onClick</code> it shows the pointer.</td></tr>
+<tr><td>Hovered</td><td><code>--ds-interaction-hovered</code> fill. <code>state="hover"</code> forces it for docs.</td></tr>
+<tr><td>Pressed</td><td>Calls <code>onClick</code> on click, and on Enter or Space from the keyboard. No fill step of its own.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 1px off the row, for keyboard focus only. Only a clickable user is focusable.</td></tr>
+<tr><td>Disabled</td><td><code>state="disabled"</code>: <code>--ds-opacity-disabled</code>, <code>aria-disabled</code>, no pointer events, out of the tab order.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Compact row</td><td><code>--item-height-md</code>; radius <code>--radius-h32</code>; initial <code>--image-sm</code>.</td></tr>
+<tr><td>Default row</td><td>Padding <code>--pad-y-md</code> and <code>--pad-x-md</code>; radius <code>--radius-md</code>; initial <code>--image-md</code>.</td></tr>
+<tr><td>Hovered fill</td><td><code>--ds-interaction-hovered</code>.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>.</td></tr>
+<tr><td>Counter</td><td><code>--ds-background-danger-subtler</code>; text <code>--color-danger-text</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Pick `spacing` by where it sits.
 
-`compact` fits the 32 topbar. `default` fits table rows. The name truncates at the label maximum width and keeps the full name in its `title`.
+`compact` fits the 32 topbar. `default` fits table rows. The name truncates with an ellipsis, at the label maximum width in `compact`, and keeps the full name in its `title`.
 
 ```jsx
 <UserAvatar spacing={topbar ? 'compact' : 'default'} name={user.name} firstChar={user.name[0]} type="lead tutor" counterValue={3} />
@@ -99,7 +167,23 @@ Use `UserAvatar` for the current user's identity in the topbar or in a row that 
 
 ### Pass `onClick` to make it clickable.
 
-Without it the avatar is static. With it, the avatar shows the clickable look. The avatar renders a plain `div` with no role or keyboard handling, so when the click opens a menu or navigates, wrap it in a button or link that carries the focus and key behavior.
+Without it the avatar is a static line. With it, the row shows the pointer, takes focus, and presses on Enter (keydown) and Space (keyup). When the click opens a menu or navigates, wrap the avatar in the button or link that owns that behavior instead, so the control carries its own name and expanded state.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Show the name as the person wrote it.</td><td>Shorten the name yourself; the row truncates it.</td></tr>
+<tr><td>Keep the counter to the number of unread items.</td><td>Put text, or a count over 99, in the counter.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -107,6 +191,7 @@ Without it the avatar is static. With it, the avatar shows the clickable look. T
 
 ## Accessibility
 
+- **A clickable row is a button.** With `onClick` it has `role="button"`, a tab stop, and a 2px focus ring. `state="disabled"` keeps the role, sets `aria-disabled` and removes the tab stop. The counter is read with its unit ("2 notifications").
 - **The initial is decorative.** The pill is hidden from assistive technology; the name carries the meaning.
 - **The role is text.** The Lead tag is a Status tag with visible text, not color alone.
 

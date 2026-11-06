@@ -36,3 +36,12 @@ Decorative.play = async ({ canvasElement }) => {
     await expect(node).toHaveAttribute('aria-hidden', 'true');
     await expect(node.hasAttribute('aria-label')).toBe(false);
 };
+
+/** An object glyph is a picture, not a control: its one state is at rest. */
+export const Rest = () => <TaskIcon testId="object-rest" />;
+
+Rest.play = async ({ canvasElement }) => {
+    const node = canvasElement.querySelector('[data-testid="object-rest"]');
+    await expect(node).toHaveAttribute('role', 'img');
+    await expect(node).not.toHaveAttribute('tabindex');
+};

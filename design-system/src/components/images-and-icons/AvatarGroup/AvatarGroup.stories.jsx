@@ -1,6 +1,8 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import Avatar, { AVATAR_SIZES } from '../Avatar';
 import AvatarGroup from './AvatarGroup';
 
@@ -141,4 +143,71 @@ Interactive.args = {
 Interactive.argTypes = {
     size: { control: 'select', options: AVATAR_SIZES },
     shape: { control: 'select', options: ['circle', 'square'] },
+};
+
+/* ------------------------------------------------------- one per state */
+
+/** The `+n` is the only part of the group that is a control. */
+const overflowRow = () => (
+    <AvatarGroup label="Session attendees" max={3}>
+        {PEOPLE.map((name) => <Avatar key={name} name={name} />)}
+    </AvatarGroup>
+);
+
+const overflowOf = (canvasElement) => within(canvasElement).getByRole('button', { name: /more people$/ });
+
+export const Rest = {
+    render: overflowRow,
+    play: async ({ canvasElement }) => {
+        const more = overflowOf(canvasElement);
+        await expect(getComputedStyle(more).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-accent-gray-subtler'));
+        await expect(more).toHaveAttribute('aria-expanded', 'false');
+    },
+};
+
+export const Hovered = {
+    render: overflowRow,
+    play: async ({ canvasElement }) => {
+        const more = overflowOf(canvasElement);
+        more.style.transition = 'none';
+        const fill = withForcedPseudo(more, ':hover', () => getComputedStyle(more).backgroundColor);
+        await expect(fill).toBe(tokenColor(canvasElement, '--ds-background-accent-gray-subtle'));
+    },
+};
+
+export const Pressed = {
+    render: overflowRow,
+    play: async ({ canvasElement }) => {
+        const more = overflowOf(canvasElement);
+        await userEvent.click(more);
+        await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'true'));
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(more).toHaveAttribute('aria-expanded', 'false'));
+    },
+};
+
+export const Focused = {
+    render: overflowRow,
+    play: async ({ canvasElement }) => {
+        const more = overflowOf(canvasElement);
+        more.style.transition = 'none';
+        more.focus({ focusVisible: true });
+        await waitFor(() => expect(getComputedStyle(more).outlineStyle).toBe('solid'));
+        const style = getComputedStyle(more);
+        await expect(px(style.outlineWidth)).toBe(2);
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        more.blur();
+    },
+};
+
+export const Disabled = {
+    render: () => (
+        <AvatarGroup label="Session attendees" max={5}>
+            {PEOPLE.slice(0, 3).map((name) => <Avatar key={name} name={name} />)}
+        </AvatarGroup>
+    ),
+    play: async ({ canvasElement }) => {
+        // Nothing to fold, so no `+n` control exists; the group is only pictures.
+        await expect(within(canvasElement).queryByRole('button')).toBeNull();
+    },
 };

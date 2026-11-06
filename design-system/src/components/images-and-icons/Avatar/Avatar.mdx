@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as AvatarStories from './Avatar.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsTable, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -92,6 +92,32 @@ folds the rest into a `+n`.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>Rest. The only state.</>}>
+    <DsCanvasQuiet of={AvatarStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Hovered. No change: an avatar is not a control.</>}>
+    <DsCanvasQuiet of={AvatarStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Pressed. No change.</>}>
+    <DsCanvasQuiet of={AvatarStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focused. Not in the tab order.</>}>
+    <DsCanvasQuiet of={AvatarStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled. Never dimmed.</>}>
+    <DsCanvasQuiet of={AvatarStories.Disabled} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -116,7 +142,7 @@ folds the rest into a `+n`.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Avatar` wherever a person or an agent is named in a row, a thread or a
 list of attendees. Use `AvatarGroup` for a short set of people that would crowd
@@ -130,7 +156,46 @@ role and notification counter beside the initial.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Face.** The picture when it loads; otherwise the initials, then the icon, then a plain person glyph.
+2. **Frame.** A circle for a person; a square for a team or an agent, with a radius of a quarter of its size.
+3. **Presence dot.** Optional, a quarter of the avatar's size at the bottom right, ringed in the surface color.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The only state. The ground and ink come from the Tag color set; a picture covers them.</td></tr>
+<tr><td>Hovered, pressed</td><td>None. An avatar is a picture, not a control; wrap it in a button or link for a click.</td></tr>
+<tr><td>Focused</td><td>None. It is not in the tab order.</td></tr>
+<tr><td>Disabled</td><td>None. A person is never dimmed; a state for the account belongs in the name or the page.</td></tr>
+<tr><td>Presence</td><td>The dot takes the success, warning, danger or neutral bold fill for online, away, busy and offline.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Size</td><td><code>--size-media-xxs</code> to <code>--size-media-lg</code> for 16 to 40; 96 and 128 are built from the large spacing primitives.</td></tr>
+<tr><td>Ground and ink</td><td><code>--ds-background-accent-blue-subtler</code> and <code>--ds-text-accent-blue</code> for blue, and the same pair for each other Tag color.</td></tr>
+<tr><td>Radius</td><td><code>--radius-full</code> for a circle; a quarter of the size for a square.</td></tr>
+<tr><td>Presence dot</td><td><code>--ds-background-success-bold</code>, <code>-warning-bold</code>, <code>-danger-bold</code>, <code>-neutral-bold</code>; ring <code>--ds-surface</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Circle for people, square for teams and agents.
 
@@ -162,6 +227,32 @@ even.
     {people.map((p) => <Avatar key={p.id} name={p.name} src={p.photo} />)}
 </AvatarGroup>
 ```
+
+
+### A color is a category, not a status.
+
+Keep one color per kind of person, or leave avatars blue. Green, yellow and red belong to the presence dot, so a green avatar reads as "online".
+
+### Show presence only where it helps.
+
+Use the dot in a list a person scans for who is around. Leave it off a byline or a comment, where presence is not the question.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Use the person's full name: "Jane Park".</td><td>Initials alone, or a nickname, where a full name is known.</td></tr>
+<tr><td>Name an agent by its job: "Study bot".</td><td>A generic "Bot" or "AI".</td></tr>
+<tr><td>Write a <code>label</code> that says who or what it is.</td><td>"Avatar" or "Profile picture", which says nothing about whom.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
