@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as AccordionStories from './Accordion.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -88,6 +88,36 @@ Accordion component for organizing content into collapsible sections.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>A closed trigger on the surface, chevron down.</>}>
+    <DsCanvasQuiet of={AccordionStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The neutral subtle hovered ground.</>}>
+    <DsCanvasQuiet of={AccordionStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The neutral subtle pressed ground.</>}>
+    <DsCanvasQuiet of={AccordionStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The 2px focus ring, 2px off the edge. The ground stays put.</>}>
+    <DsCanvasQuiet of={AccordionStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The selected ground, chevron turned up. Press again to close.</>}>
+    <DsCanvasQuiet of={AccordionStories.Expanded} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Dimmed to the disabled opacity, announced as disabled, and it never opens.</>}>
+    <DsCanvasQuiet of={AccordionStories.Disabled} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -112,7 +142,7 @@ Accordion component for organizing content into collapsible sections.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Accordion` when a page carries several long, independent sections and only
 one of them matters at a time — a settings page, a FAQ, the optional detail
@@ -127,7 +157,51 @@ lets more than one item stay open at once.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Trigger.** The full-width button: the section title on the left, the chevron on the right.
+2. **Chevron.** Turns up when the section is open, so the state reads without the body.
+3. **Body.** The content, shown under an open trigger.
+4. **Edge.** One border round the group, with the card corner radius on the first and last item. `flush` drops it for a divider line.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Surface ground, subtle text, chevron down.</td></tr>
+<tr><td>Hovered</td><td><code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
+<tr><td>Pressed</td><td><code>--ds-background-neutral-subtle-pressed</code>.</td></tr>
+<tr><td>Focused</td><td>A 2px ring 2px off the edge; no fill change.</td></tr>
+<tr><td>Expanded</td><td><code>--ds-background-selected</code>, and <code>--ds-background-selected-hovered</code> under the pointer. The chevron turns up.</td></tr>
+<tr><td>Disabled</td><td>The item is dimmed to <code>--ds-opacity-disabled</code>. The trigger is announced as disabled, stays in the tab order, and a press never opens it.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Trigger ground</td><td><code>--ds-surface</code>; selected, <code>--ds-background-selected</code>.</td></tr>
+<tr><td>Trigger and chevron</td><td><code>--ds-text-subtle</code>; title in <code>--heading-small</code>.</td></tr>
+<tr><td>Body</td><td><code>--body-large</code> on <code>--ds-surface</code>, <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Edge</td><td><code>--ds-border</code> at <code>--size-card-border-sm</code>, corners <code>--size-card-radius-sm</code>.</td></tr>
+<tr><td>Padding</td><td><code>--size-card-pad-y-md</code> and <code>--size-card-pad-x-md</code>.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code> wide and offset.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-opacity-disabled</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### There are two ways to author items, and `children` wins.
 
@@ -164,6 +238,23 @@ lets more than one item stay open at once.
 It removes the outer border and the corner radius so the item rows sit flat
 against their container. Inside a Card pattern that is what you want; on the bare page
 it leaves the accordion with no edge to hold it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the section with a short noun phrase: "Session notes".</td><td>Write a sentence or a question as the header.</td></tr>
+<tr><td>Lead the body with the answer or the content itself.</td><td>Repeat the header as the first line of the body.</td></tr>
+<tr><td>Keep sibling headers parallel: all nouns, all the same case.</td><td>Mix "Goals", "How do I set goals?" and "SETTINGS".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

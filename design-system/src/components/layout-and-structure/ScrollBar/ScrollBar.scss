@@ -1,6 +1,6 @@
 /**
  * ScrollBar Component Styles
- * Tokenized custom scrollbar treatment: thin width, outline-colored thumb,
+ * Tokenized custom scrollbar treatment: thin width, border-colored thumb,
  * transparent track. Applied through a wrapper class so any scrollable region
  * can opt in to the Design System scrollbar.
  */
@@ -9,7 +9,7 @@
 .plus-scrollbar {
     // Firefox
     scrollbar-width: thin;
-    scrollbar-color: var(--color-outline-variant) transparent;
+    scrollbar-color: var(--ds-border) transparent;
 
     // WebKit (Chrome, Safari, Edge)
     &::-webkit-scrollbar {
@@ -22,13 +22,13 @@
     }
 
     &::-webkit-scrollbar-thumb {
-        background-color: var(--color-outline-variant);
+        background-color: var(--ds-border);
         border-radius: var(--radius-md);
 
         // The hover pseudo-class alone: a `[data-hovered]` twin after a
         // pseudo-element is an invalid selector and would drop the whole rule.
         @include plus-state((
-            hovered: (background-color: var(--color-outline)),
+            hovered: (background-color: var(--ds-border-bold)),
         ), $ring: false,
             $hovered-selector: '&:hover');
     }

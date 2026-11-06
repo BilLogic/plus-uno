@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ScrollBarStories from './ScrollBar.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -69,6 +69,28 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>A region capped at its height, scrolling inside.</>}>
+    <DsCanvasQuiet of={ScrollBarStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The region has no hover layer. The thumb darkens under the pointer in the browser.</>}>
+    <DsCanvasQuiet of={ScrollBarStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>No pressed layer on the region.</>}>
+    <DsCanvasQuiet of={ScrollBarStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Tab lands on the region so the arrow keys can scroll it.</>}>
+    <DsCanvasQuiet of={ScrollBarStories.Focused} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -93,7 +115,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `ScrollBar` when a region has to scroll inside a page that does not — a long
 list in a fixed panel, a wide table in a narrow column. It is a wrapper: it caps
@@ -108,7 +130,46 @@ container.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Region.** The wrapper that caps the height and scrolls.
+2. **Track.** Transparent, so it never reads as a second edge.
+3. **Thumb.** The border-colored bar, darker under the pointer.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>A thin thumb in the border color on a transparent track.</td></tr>
+<tr><td>Hovered</td><td>The thumb takes the bold border color.</td></tr>
+<tr><td>Pressed</td><td>No pressed layer.</td></tr>
+<tr><td>Focused</td><td>The region takes focus from Tab, named by <code>aria-label</code>.</td></tr>
+<tr><td>Disabled</td><td>A scroll region has no disabled state.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Thumb</td><td><code>--ds-border</code>; <code>--ds-border-bold</code> on hover.</td></tr>
+<tr><td>Width</td><td><code>--space-0375</code>.</td></tr>
+<tr><td>Corner</td><td><code>--radius-md</code>.</td></tr>
+<tr><td>Height cap</td><td><code>--size-2000</code> by default.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Name each region.
 
@@ -140,6 +201,23 @@ container.
 scrolls both ways is usually a sign the content should be laid out differently —
 a table that needs horizontal scroll inside a page that scrolls vertically is
 the case this handles, and that is one axis each.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the region for what is in it: "Session notes".</td><td>Leave the region unnamed.</td></tr>
+<tr><td>Give a horizontal region a width its content cannot fit.</td><td>Wrap content that already fits.</td></tr>
+<tr><td>Keep the label short and specific.</td><td>Start it with "Scrollable".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
