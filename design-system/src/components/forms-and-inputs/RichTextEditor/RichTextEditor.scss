@@ -4,9 +4,6 @@
 @use '../../../styles/state' as *;
 
 .plus-rich-text-editor {
-    --rte-toolbar-height: calc(
-        var(--size-spacing-medium-space-200) + var(--size-spacing-medium-space-300)
-    );
     --rte-content-pad-x: var(--pad-x-sm);
     --rte-content-pad-y: var(--space-025);
 
@@ -16,9 +13,15 @@
     max-width: 56rem;
     align-items: stretch;
     background-color: var(--ds-background-input);
-    border-radius: var(--size-border-radius-radius-50);
+    border-radius: var(--radius-md);
     overflow: hidden;
     box-sizing: border-box;
+
+    // The writing area is the control; the ring wraps the whole editor, as a
+    // Field's does. Toolbar buttons draw their own.
+    &:has(.plus-rich-text-editor-content:focus-visible) {
+        @include plus-ring();
+    }
 
     // `spacing="compact"` tightens the writing area's padding and minimum height.
     &.plus-rich-text-editor--compact {
@@ -28,7 +31,7 @@
 
     &.plus-rich-text-editor--full {
         max-width: none;
-        border: var(--size-border-stroke-stroke-100) solid var(--color-outline-variant);
+        border: var(--stroke-1) solid var(--ds-border-input);
         border-radius: var(--radius-md);
     }
 }
@@ -75,7 +78,7 @@
 
     &:disabled {
         cursor: not-allowed;
-        opacity: calc(1 - var(--color-disabled-opacity));
+        opacity: var(--ds-opacity-disabled);
     }
 }
 
@@ -109,23 +112,23 @@
 
         &.active {
             background-color: var(--ds-background-selected);
-            color: var(--color-primary-text);
+            color: var(--ds-text-selected);
         }
 
         &:disabled,
         &.disabled {
             background-color: transparent;
             border: none;
-            opacity: calc(1 - var(--color-disabled-opacity));
+            opacity: var(--ds-opacity-disabled);
         }
     }
 
     .plus-btn:not(.active) .fa-solid {
-        color: var(--color-secondary-text);
+        color: var(--ds-icon-subtle);
     }
 
     .plus-btn.active .fa-solid {
-        color: var(--color-primary-text);
+        color: var(--ds-icon-selected);
     }
 }
 
@@ -148,7 +151,7 @@
 
 .plus-rich-text-editor-readonly .plus-rich-text-editor-toolbar,
 .plus-rich-text-editor-disabled .plus-rich-text-editor-toolbar {
-    opacity: calc(1 - var(--color-disabled-opacity));
+    opacity: var(--ds-opacity-disabled);
     pointer-events: none;
 }
 
@@ -173,7 +176,7 @@
     color: var(--ds-text);
     background-color: var(--ds-background-input);
     box-sizing: border-box;
-    border: var(--size-border-stroke-stroke-150) solid var(--color-outline-variant);
+    border: var(--stroke-1) solid var(--ds-border-input);
     font-weight: var(--type-weight-regular);
 
     &:focus {
