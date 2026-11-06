@@ -334,3 +334,16 @@ Interactive.args = {
 Interactive.argTypes = {
     size: { control: 'select', options: TILE_SIZES },
 };
+
+/* ------------------------------------------------------- one per state */
+
+/** A tile is a picture, not a control: its one state is at rest. */
+export const Rest = {
+    render: () => <Tile icon="book-open" label="Lessons" size={32} />,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByRole('img', { name: 'Lessons' });
+        await expect(el).not.toHaveAttribute('tabindex');
+        await expect(Math.round(el.getBoundingClientRect().width)).toBe(32);
+        await expect(getComputedStyle(el).cursor).not.toBe('pointer');
+    },
+};

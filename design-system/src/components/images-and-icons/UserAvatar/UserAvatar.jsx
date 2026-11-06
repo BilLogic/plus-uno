@@ -31,6 +31,21 @@ const UserAvatar = ({
     className = ''
 }) => {
     const role = ROLE_LABELS[type];
+    // A clickable user is a button to the keyboard: focusable, and Enter or
+    // Space press it. A disabled one leaves the tab order.
+    const interactive = onClick && state !== 'disabled'
+        ? {
+            role: 'button',
+            tabIndex: 0,
+            onClick,
+            onKeyDown: (event) => {
+                if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    onClick(event);
+                }
+            },
+        }
+        : {};
     const classes = [
         'plus-user-avatar',
         `plus-user-avatar--${spacing}`,
@@ -40,7 +55,7 @@ const UserAvatar = ({
     ].filter(Boolean).join(' ');
 
     return (
-        <div className={classes} onClick={onClick} id={id}>
+        <div className={classes} id={id} aria-disabled={state === 'disabled' ? true : undefined} {...interactive}>
             <div className="plus-user-avatar__name-section">
                 <div className="plus-user-avatar__initial" aria-hidden="true">
                     <span className="plus-user-avatar__initial-text">{firstChar}</span>
@@ -66,7 +81,7 @@ UserAvatar.propTypes = {
     name: PropTypes.string,
     counter: PropTypes.bool,
     counterValue: PropTypes.number,
-    state: PropTypes.oneOf(['enabled', 'hover']),
+    state: PropTypes.oneOf(['enabled', 'hover', 'disabled']),
     /** `lead tutor` shows the "Lead" role indicator; other types show none. */
     type: PropTypes.oneOf(['regular tutor', 'lead tutor', 'admin']),
     /** `compact` 32 high, for the topbar · `default` the padded row, for tables */

@@ -166,3 +166,11 @@ Interactive.args = { name: 'generate', size: 16 };
 Interactive.play = async ({ canvasElement }) => {
     await expect(canvasElement.querySelector('svg')).not.toBeNull();
 };
+
+/** An AI icon is a picture, not a control: its one state is at rest. */
+export const Rest = () => <AiIcon name="summarize" label="Summarize" data-testid="rest" />;
+
+Rest.play = async ({ canvasElement }) => {
+    const el = within(canvasElement).getByRole('img', { name: 'Summarize' });
+    await expect(el).not.toHaveAttribute('tabindex');
+};

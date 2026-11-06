@@ -1,5 +1,7 @@
 import React from 'react';
-import { expect, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import UserAvatar from './UserAvatar';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '24px', alignItems: 'center' };
@@ -64,4 +66,66 @@ export const Counter = {
 
 export const Interactive = {
     render: (args) => <UserAvatar {...args} />,
+};
+
+/* ------------------------------------------------------- one per state */
+
+const rowOf = (canvasElement, name = 'John Doe') => within(canvasElement).getByText(name).closest('.plus-user-avatar');
+
+export const Rest = {
+    render: () => <UserAvatar onClick={fn()} />,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByRole('button');
+        await expect(getComputedStyle(el).cursor).toBe('pointer');
+        await expect(el).toHaveAttribute('tabindex', '0');
+    },
+};
+
+export const Hovered = {
+    render: () => <UserAvatar spacing="default" onClick={fn()} />,
+    play: async ({ canvasElement }) => {
+        const el = rowOf(canvasElement);
+        el.style.transition = 'none';
+        const fill = withForcedPseudo(el, ':hover', () => getComputedStyle(el).backgroundColor);
+        await expect(fill).toBe(tokenColor(canvasElement, '--ds-interaction-hovered'));
+    },
+};
+
+export const Pressed = {
+    args: { onClick: fn() },
+    render: (args) => <UserAvatar onClick={args.onClick} />,
+    play: async ({ canvasElement, args }) => {
+        const el = within(canvasElement).getByRole('button');
+        await userEvent.click(el);
+        await expect(args.onClick).toHaveBeenCalledTimes(1);
+        el.focus();
+        await userEvent.keyboard('{Enter}');
+        await expect(args.onClick).toHaveBeenCalledTimes(2);
+        await userEvent.keyboard(' ');
+        await expect(args.onClick).toHaveBeenCalledTimes(3);
+    },
+};
+
+export const Focused = {
+    render: () => <UserAvatar onClick={fn()} />,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByRole('button');
+        el.style.transition = 'none';
+        el.focus({ focusVisible: true });
+        await waitFor(() => expect(getComputedStyle(el).outlineStyle).toBe('solid'));
+        const style = getComputedStyle(el);
+        await expect(px(style.outlineWidth)).toBe(2);
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        el.blur();
+    },
+};
+
+export const Disabled = {
+    render: () => <UserAvatar state="disabled" onClick={fn()} />,
+    play: async ({ canvasElement }) => {
+        const el = rowOf(canvasElement);
+        await expect(el).toHaveAttribute('aria-disabled', 'true');
+        await expect(el.hasAttribute('tabindex')).toBe(false);
+        await expect(within(canvasElement).queryByRole('button')).toBeNull();
+    },
 };

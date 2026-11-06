@@ -2,6 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import Avatar, { AVATAR_SIZES, AVATAR_STATUSES, initialsOf } from './Avatar';
 
@@ -226,4 +227,53 @@ Interactive.args = {
 Interactive.argTypes = {
     size: { control: 'select', options: AVATAR_SIZES },
     status: { control: 'select', options: [undefined, ...AVATAR_STATUSES] },
+};
+
+/* ------------------------------------------------------- one per state */
+
+/** An avatar is a picture, not a control: one story per state it has. */
+export const Rest = {
+    render: () => <Avatar name="Jane Park" data-testid="avatar-rest" />,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByRole('img', { name: 'Jane Park' });
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-accent-blue-subtler'));
+        await expect(el).not.toHaveAttribute('tabindex');
+    },
+};
+
+export const Hovered = {
+    render: () => <Avatar name="Jane Park" />,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByRole('img', { name: 'Jane Park' });
+        el.style.transition = 'none';
+        const fill = withForcedPseudo(el, ':hover', () => getComputedStyle(el).backgroundColor);
+        await expect(fill, 'no hover state of its own').toBe(tokenColor(canvasElement, '--ds-background-accent-blue-subtler'));
+    },
+};
+
+export const Pressed = {
+    render: () => <Avatar name="Jane Park" />,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByRole('img', { name: 'Jane Park' });
+        const fill = withForcedPseudo(el, ':active', () => getComputedStyle(el).backgroundColor);
+        await expect(fill, 'no pressed state of its own').toBe(tokenColor(canvasElement, '--ds-background-accent-blue-subtler'));
+    },
+};
+
+export const Focused = {
+    render: () => <Avatar name="Jane Park" />,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByRole('img', { name: 'Jane Park' });
+        await userEvent.tab();
+        await expect(el, 'not in the tab order').not.toHaveFocus();
+    },
+};
+
+export const Disabled = {
+    render: () => <Avatar name="Jane Park" />,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByRole('img', { name: 'Jane Park' });
+        await expect(el).not.toHaveAttribute('aria-disabled');
+        await expect(getComputedStyle(el).opacity, 'a person is never dimmed').toBe('1');
+    },
 };

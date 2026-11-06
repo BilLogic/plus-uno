@@ -5,18 +5,17 @@
  * inner size an icon or a logo is inset to; the radius is a quarter of the
  * square, computed, so every size gets the same proportion.
  *
- * No Element size token names a tile's square yet, so it takes the spacing
- * primitives. The inner size is the Font Awesome size of the same step, so an
- * icon and a logo in the same tile are the same size. Every value carries its
- * literal as a fallback, so a page without the token sheet still gets squares.
+ * The square is the Media size of the same step (--size-media-*). The inner
+ * size is the Font Awesome size of the same step, so an icon and a logo in the
+ * same tile are the same size.
  */
 $tile-sizes: (
-    16: (var(--size-spacing-medium-space-300, 16px), var(--font-size-fa-body3, 10px)),
-    20: (var(--size-spacing-medium-space-400, 20px), var(--font-size-fa-body2, 12px)),
-    24: (var(--size-spacing-medium-space-500, 24px), var(--font-size-fa-body1, 14px)),
-    32: (var(--size-spacing-large-space-600, 32px), var(--font-size-fa-h5, 16px)),
-    40: (var(--size-spacing-large-space-700, 40px), var(--font-size-fa-h4, 20px)),
-    48: (var(--size-spacing-large-space-800, 48px), var(--font-size-fa-h3, 24px)),
+    16: (var(--size-media-xxs), var(--font-size-fa-body3)),
+    20: (var(--size-media-xs), var(--font-size-fa-body2)),
+    24: (var(--size-media-sm), var(--font-size-fa-body1)),
+    32: (var(--size-media-md), var(--font-size-fa-h5)),
+    40: (var(--size-media-lg), var(--font-size-fa-h4)),
+    48: (var(--size-media-xl), var(--font-size-fa-h3)),
 );
 
 /*
@@ -45,9 +44,9 @@ $tile-colors: (
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    inline-size: var(--tile-size, 32px);
-    block-size: var(--tile-size, 32px);
-    border-radius: var(--tile-radius, calc(var(--tile-size, 32px) / 4));
+    inline-size: var(--tile-size, var(--size-media-md));
+    block-size: var(--tile-size, var(--size-media-md));
+    border-radius: var(--tile-radius, calc(var(--tile-size, var(--size-media-md)) / 4));
     overflow: hidden;
     vertical-align: middle;
     background-color: var(--ds-background-neutral);
@@ -63,10 +62,10 @@ $tile-colors: (
     }
 }
 
-// The 40 tile takes its radius from the token; the other sizes keep the
-// quarter of their square. Both come to 10px at 40.
+// The 40 tile takes a radius token; the other sizes keep the quarter of their
+// square. Both come to the same value at 40.
 .plus-tile--40 {
-    --tile-radius: var(--tile-radius-lg, 10px);
+    --tile-radius: var(--radius-0625);
 }
 
 /* ------------------------------------------------------------------ icon */
@@ -113,11 +112,11 @@ $tile-colors: (
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    inline-size: var(--tile-inner, 16px);
-    block-size: var(--tile-inner, 16px);
+    inline-size: var(--tile-inner, var(--font-size-fa-body3));
+    block-size: var(--tile-inner, var(--font-size-fa-body3));
     font-size: var(--tile-inner);
     line-height: 1;
-    border-radius: var(--size-border-radius-radius-50, 2px);
+    border-radius: var(--radius-0125);
     overflow: hidden;
 }
 
