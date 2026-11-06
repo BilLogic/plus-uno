@@ -41,6 +41,6 @@ From `design-system/src/components/forms-and-inputs/CloseButton/CloseButton.scss
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
+<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=yes -->
 
-> Authored guidance is partial — missing: correct/incorrect (#166).
+> Authored guidance is partial — missing: when to use, correct/incorrect (#166).

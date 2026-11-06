@@ -1,12 +1,11 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
-import * as IconButtonStories from './IconButton.stories.jsx';
 import { IconButton, Button } from '@/components';
+import * as IconButtonStories from './IconButton.stories.jsx';
 import {
-    DocsCanvasShell,
+    ComponentExample,
     DocsInteractivePlayground,
-    DocsProperties,
     DocsTable,
     DoDontPair,
     ResourcesBlock,
@@ -76,117 +75,37 @@ An icon button is a button with an icon and no visible label. Its required `labe
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell description={<>A default icon button at default spacing.</>}>
-    <Canvas of={IconButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={IconButtonStories.Default} title="Default" description="Most icon buttons: an action with a clear, familiar glyph." />
 
-</div>
+<ComponentExample of={IconButtonStories.Subtle} title="Subtle" description="Toolbars, table rows and headers where it is already clear they are interactive." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={IconButtonStories.Primary} title="Primary" description="The main action of a small area when space allows no label. Use sparingly." />
 
-## Anatomy
-
-<DocsCanvasShell description={<>An icon button with its label shown as the tooltip.</>}>
-    <Canvas of={IconButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-1. **Container.** A square, 32 at default spacing and 24 at compact. `shape="circle"` rounds it for top navigation.
-2. **Icon.** A Font Awesome Free glyph at 16. Use an existing system glyph; do not draw custom icons.
-3. **Label.** Not drawn. It is the accessible name and the tooltip on hover and focus.
-4. **Spinner** (loading only). Replaces the icon while the button is busy.
+<ComponentExample of={IconButtonStories.Discovery} title="Discovery" description="The call to action for a new experience." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Properties
+## Size and shape
 
-<DocsProperties of={IconButtonStories} />
+<ComponentExample of={IconButtonStories.Compact} title="Compact" description="Spacing compact draws 24, for table rows and inline toolbars. Default draws 32." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Variants
-
-### Appearance
-
-<DocsCanvasShell description={<>One of each appearance. Warning and danger belong to Button, which has room for a label that explains a risky action.</>}>
-    <Canvas of={IconButtonStories.Appearances} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-<DocsTable>
-<thead>
-<tr><th>Appearance</th><th>When to use</th></tr>
-</thead>
-<tbody>
-<tr><td>Default</td><td>Most icon buttons: an action with a clear, familiar glyph. Example: Edit page.</td></tr>
-<tr><td>Subtle</td><td>Icon buttons in toolbars, table rows and headers where it is already clear they are interactive. Example: More actions in a row.</td></tr>
-<tr><td>Primary</td><td>The main action of a small area when space allows no label. Use sparingly. Example: Send comment.</td></tr>
-<tr><td>Discovery</td><td>The call to action for a new experience. Example: Try the new view.</td></tr>
-</tbody>
-</DocsTable>
-
-### Spacing
-
-<DocsCanvasShell description={<>Default draws 32; compact draws 24. Radius is 6 and 4.</>}>
-    <Canvas of={IconButtonStories.Spacing} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-Default spacing suits most places. Use compact in table rows and inline toolbars.
-
-### Shape
-
-<DocsCanvasShell description={<>Square is the default. Circle is for top navigation.</>}>
-    <Canvas of={IconButtonStories.Shapes} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={IconButtonStories.Circle} title="Circle" description="Round, for top navigation." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## State
 
-<DocsCanvasShell description={<>Selected, disabled and loading. Hover, pressed and focus are the browser's own.</>}>
-    <Canvas of={IconButtonStories.States} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={IconButtonStories.Selected} title="Selected" description="Sets aria-pressed." />
 
-<DocsTable>
-<thead>
-<tr><th>State</th><th>What changes</th></tr>
-</thead>
-<tbody>
-<tr><td>Hovered</td><td>The container takes the appearance's hovered fill.</td></tr>
-<tr><td>Pressed</td><td>The container takes the appearance's pressed fill.</td></tr>
-<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
-<tr><td>Selected</td><td>The selected role fill and icon. Applies to default and subtle, and sets <code>aria-pressed</code>.</td></tr>
-<tr><td>Disabled</td><td>The disabled fill and icon. Avoid disabling icon buttons.</td></tr>
-<tr><td>Loading</td><td>A spinner replaces the icon. The container keeps its fill, blocks interaction and sets <code>aria-busy</code>.</td></tr>
-</tbody>
-</DocsTable>
+<ComponentExample of={IconButtonStories.Disabled} title="Disabled" description="A change of color, not of opacity. Avoid disabling icon buttons." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Tokens
-
-<DocsTable>
-<thead>
-<tr><th>Part</th><th>Token</th></tr>
-</thead>
-<tbody>
-<tr><td>Fill: default, subtle</td><td><code>--ds-background-neutral-subtle</code>, hovered and pressed steps. Default adds a 1px <code>--ds-border-input</code> edge.</td></tr>
-<tr><td>Fill: primary, discovery</td><td><code>--ds-background-brand-bold</code>, <code>--ds-background-discovery-bold</code>, each with hovered and pressed steps.</td></tr>
-<tr><td>Fill: selected, disabled</td><td><code>--ds-background-selected</code> with hovered and pressed steps; <code>--ds-background-disabled</code>.</td></tr>
-<tr><td>Icon</td><td><code>--ds-icon-subtle</code> (default, subtle), <code>--ds-icon-inverse</code> (primary, discovery); the selected and disabled roles. 16, <code>--icon-md</code>.</td></tr>
-<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
-<tr><td>Size</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>. Square.</td></tr>
-<tr><td>Radius</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>. Circle 50%.</td></tr>
-</tbody>
-</DocsTable>
+<ComponentExample of={IconButtonStories.Loading} title="Loading" description="A spinner replaces the icon while the button is busy." />
 
 </div>
 
@@ -220,6 +139,83 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 ## Usage
 
 Use an icon button when space is limited and the glyph clearly matches the action: a toolbar, a table row, a card header. Where space allows, or the action is important, use a Button with a text label.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Container.** A square, 32 at default spacing and 24 at compact. `shape="circle"` rounds it for top navigation.
+2. **Icon.** A Font Awesome Free glyph at 16. Use an existing system glyph; do not draw custom icons.
+3. **Label.** Not drawn. It is the accessible name and the tooltip on hover and focus.
+4. **Spinner** (loading only). Replaces the icon while the button is busy.
+
+### Appearance
+
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Default</td><td>Most icon buttons: an action with a clear, familiar glyph. Example: Edit page.</td></tr>
+<tr><td>Subtle</td><td>Icon buttons in toolbars, table rows and headers where it is already clear they are interactive. Example: More actions in a row.</td></tr>
+<tr><td>Primary</td><td>The main action of a small area when space allows no label. Use sparingly. Example: Send comment.</td></tr>
+<tr><td>Discovery</td><td>The call to action for a new experience. Example: Try the new view.</td></tr>
+</tbody>
+</DocsTable>
+
+### Spacing
+
+Default spacing suits most places. Use compact in table rows and inline toolbars.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>The container takes the appearance's hovered fill.</td></tr>
+<tr><td>Pressed</td><td>The container takes the appearance's pressed fill.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
+<tr><td>Selected</td><td>The selected role fill and icon. Applies to default and subtle, and sets <code>aria-pressed</code>.</td></tr>
+<tr><td>Disabled</td><td>The disabled fill and icon. Avoid disabling icon buttons.</td></tr>
+<tr><td>Loading</td><td>A spinner replaces the icon. The container keeps its fill, blocks interaction and sets <code>aria-busy</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Fill: default, subtle</td><td><code>--ds-background-neutral-subtle</code>, hovered and pressed steps. Default adds a 1px <code>--ds-border-input</code> edge.</td></tr>
+<tr><td>Fill: primary, discovery</td><td><code>--ds-background-brand-bold</code>, <code>--ds-background-discovery-bold</code>, each with hovered and pressed steps.</td></tr>
+<tr><td>Fill: selected, disabled</td><td><code>--ds-background-selected</code> with hovered and pressed steps; <code>--ds-background-disabled</code>.</td></tr>
+<tr><td>Icon</td><td><code>--ds-icon-subtle</code> (default, subtle), <code>--ds-icon-inverse</code> (primary, discovery); the selected and disabled roles. 16, <code>--icon-md</code>.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
+<tr><td>Size</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>. Square.</td></tr>
+<tr><td>Radius</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>. Circle 50%.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Name the object acted on.
+
+<DoDontPair
+    doExample={<IconButton icon="pen" label="Edit page" />}
+    doCaption="The label names the action and its object."
+    dontExample={<IconButton icon="pen" label="Edit" />}
+    dontCaption="A bare verb does not say what is edited."
+/>
 
 ### Pick a glyph people know.
 

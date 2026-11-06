@@ -9,7 +9,7 @@ Link icon button: an icon that navigates. It renders an anchor with an accessibl
 
 **Source:** `design-system/src/components/forms-and-inputs/LinkIconButton/LinkIconButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/LinkIconButton/LinkIconButton.stories.jsx` — Overview, Appearances, Spacing, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/LinkIconButton/LinkIconButton.stories.jsx` — Overview, Appearances, Spacing, Selected, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/LinkIconButton/LinkIconButton.mdx`
 

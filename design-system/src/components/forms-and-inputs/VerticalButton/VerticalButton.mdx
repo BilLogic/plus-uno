@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
+import { VerticalButton } from '@/components';
 import * as VerticalButtonStories from './VerticalButton.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={VerticalButtonStories} />
 
@@ -22,31 +29,23 @@ choosing between a few large options, such as a role.
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>An icon over a one- or two-word label.</>}>
-    <Canvas of={VerticalButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Appearance
 
-<DocsCanvasShell description={<>`default`, `subtle` and `primary` — the same three appearances `Button` uses.</>}>
-    <DsCanvasQuiet of={VerticalButtonStories.Appearances} />
-</DocsCanvasShell>
+<ComponentExample of={VerticalButtonStories.Overview} title="Default" description="An icon over a short label, for a few big options." />
+
+<ComponentExample of={VerticalButtonStories.Appearances} title="Appearance" description="The available appearances." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## State
 
-<DocsCanvasShell description={<>Selected, disabled and loading, all passed straight through to the underlying `Button`.</>}>
-    <DsCanvasQuiet of={VerticalButtonStories.States} />
-</DocsCanvasShell>
+<ComponentExample of={VerticalButtonStories.Selected} title="Selected" description="Sets aria-pressed." />
+
+<ComponentExample of={VerticalButtonStories.Disabled} title="Disabled" description="A change of color, not of opacity." />
+
+<ComponentExample of={VerticalButtonStories.Loading} title="Loading" description="A spinner replaces the icon and label." />
 
 </div>
 
@@ -76,7 +75,7 @@ choosing between a few large options, such as a role.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `VerticalButton` for a small set of large, equally weighted choices
 picked at a glance — a role at sign-up, a mode at the start of a flow. For a
@@ -87,9 +86,56 @@ longer list or for actions that read better in a row, use `Button` or
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Container.** One size, 60 by 60.
+2. **Icon.** A Font Awesome Free glyph, stacked above the label.
+3. **Label.** One or two words in Body/small at the medium weight.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>The container takes the hovered fill of its appearance.</td></tr>
+<tr><td>Pressed</td><td>The container takes the pressed fill of its appearance.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
+<tr><td>Selected</td><td>The selected role fill. Sets <code>aria-pressed</code>.</td></tr>
+<tr><td>Disabled</td><td>The disabled fill, label and icon: a change of color, not of opacity.</td></tr>
+<tr><td>Loading</td><td>A spinner replaces the icon and label. Blocks interaction and sets <code>aria-busy</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Size</td><td>60 by 60: <code>--size-column-xs</code>.</td></tr>
+<tr><td>Padding</td><td><code>--pad-y-sm</code> and <code>--pad-x-xs</code>.</td></tr>
+<tr><td>Icon-to-label gap</td><td>4: <code>--inline-sm</code>.</td></tr>
+<tr><td>Label</td><td>Body/small: <code>--body-small</code>, medium weight.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Keep the label to one or two words.
+
+<DoDontPair
+    doExample={<VerticalButton icon="user-gear" label="Admin" />}
+    doCaption="A short label under a familiar glyph."
+    dontExample={<VerticalButton icon="user-gear" label="Manage account settings" />}
+    dontCaption="A long label wraps and breaks the fixed size."
+/>
 
 The button is a fixed size, so a longer label wraps awkwardly or clips. Pick
 a short noun or verb phrase in sentence case, matching the icon's meaning.
