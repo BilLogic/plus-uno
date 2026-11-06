@@ -17,7 +17,7 @@ export default {
 };
 
 export const Appearances = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
         {LINK_APPEARANCES.map((appearance) => (
             <Link key={appearance} href="#" appearance={appearance} id={`link-${appearance}`}>
                 {appearance} link
