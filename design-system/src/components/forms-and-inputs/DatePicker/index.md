@@ -9,7 +9,7 @@ Built from the shared parts: the field is `FieldBox` with the calendar icon in T
 
 **Source:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors
+**Stories:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.stories.jsx` — Overview, Spacing, InteractionStates, PickDate, PickRange, Bounds, Interactive, CalendarColors, Default, WithValue, Compact, Invalid, ReadOnly, Disabled, HoveredState, KeyboardFocus
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx`
 
@@ -20,7 +20,7 @@ Built from the shared parts: the field is `FieldBox` with the calendar icon in T
 | `id` | string | — | — |
 | `name` | string | — | — |
 | `placeholder` | string | — | Placeholder text |
-| `value` | string or arrayOf | — | ISO `YYYY-MM-DD`; with `range`, `[start, end]`, either end may be null. |
+| `value` | string or arrayOf | — | ISO `YYYY-MM-DD`; with `range`, `[start, end]`, either end may be `null`. |
 | `range` | bool | `false` | Pick a first and a last day |
 | `spacing` | enum | `'default'` | Field height: 40 default, 32 compact |
 | `isDisabled` | bool | `false` | Disable the picker |
@@ -30,7 +30,7 @@ Built from the shared parts: the field is `FieldBox` with the calendar icon in T
 | `minDate` | string or instanceOf | — | Optional minimum allowed date |
 | `maxDate` | string or instanceOf | — | Optional maximum allowed date |
 | `calendarAlign` | enum | `'left'` | Calendar dropdown alignment |
-| `onChange` | func | — | `(iso)`, or `([start, end])` with `range`; '' or nulls when cleared. |
+| `onChange` | func | — | `(iso)`, or `([start, end])` with `range`; `\'\'` or nulls when cleared. |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
 | `className` | string | `''` | — |
@@ -54,6 +54,4 @@ From `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss`.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

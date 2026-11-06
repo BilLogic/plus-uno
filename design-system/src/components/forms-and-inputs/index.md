@@ -9,16 +9,16 @@ authored half (#166), counted rather than assumed.
 |-----------|------:|:---:|:---:|:---:|
 | [Button](Button/index.md) | 21 | ✅ | ✅ | ✅ |
 | [ButtonGroup](ButtonGroup/index.md) | 5 | ✅ | ✅ | ✅ |
-| [Calendar](Calendar/index.md) | 10 | ✅ | ✕ | ✅ |
+| [Calendar](Calendar/index.md) | 10 | ✅ | ✅ | ✅ |
 | [Cascader](Cascader/index.md) | 16 | ✅ | ✕ | ✅ |
 | [Checkbox](Checkbox/index.md) | 20 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid/index.md) | 12 | ✅ | ✕ | ✅ |
 | [CloseButton](CloseButton/index.md) | 5 | ✅ | ✅ | ✅ |
-| [Comment](Comment/index.md) | 14 | ✅ | ✕ | ✅ |
-| [DatePicker](DatePicker/index.md) | 18 | ✅ | ✕ | ✅ |
-| [DateTimePicker](DateTimePicker/index.md) | 30 | ✅ | ✕ | ✅ |
-| [DropdownMenu](DropdownMenu/index.md) | 15 | ✅ | ✕ | ✅ |
-| [Fieldset](Fieldset.md) | 8 | ✅ | ✕ | ✅ |
+| [Comment](Comment/index.md) | 14 | ✅ | ✅ | ✅ |
+| [DatePicker](DatePicker/index.md) | 18 | ✅ | ✅ | ✅ |
+| [DateTimePicker](DateTimePicker/index.md) | 30 | ✅ | ✅ | ✅ |
+| [DropdownMenu](DropdownMenu/index.md) | 15 | ✅ | ✅ | ✅ |
+| [Fieldset](Fieldset.md) | 8 | ✅ | ✅ | ✅ |
 | [FileUpload](FileUpload/index.md) | 17 | ✅ | ✅ | ✅ |
 | [FilterButton](FilterButton/index.md) | 10 | ✅ | ✅ | ✅ |
 | [IconButton](IconButton/index.md) | 13 | ✅ | ✅ | ✅ |
@@ -37,12 +37,12 @@ authored half (#166), counted rather than assumed.
 | [TagInput](TagInput/index.md) | 27 | ✅ | ✅ | ✅ |
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✅ | ✅ |
 | [TextField](TextField/index.md) | 35 | ✅ | ✅ | ✅ |
-| [TimePicker](TimePicker/index.md) | 14 | ✅ | ✕ | ✅ |
+| [TimePicker](TimePicker/index.md) | 14 | ✅ | ✅ | ✅ |
 | [Toggle](Toggle/index.md) | 17 | ✅ | ✕ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✕ | ✅ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 33/34 (97%) · Correct/incorrect 17/34 (50%) · Accessibility 33/34 (97%)
+**Authored coverage:** When to use 33/34 (97%) · Correct/incorrect 24/34 (71%) · Accessibility 33/34 (97%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

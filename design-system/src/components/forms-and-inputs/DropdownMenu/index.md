@@ -9,7 +9,7 @@ floating popup. Positioning and dismissal (outside click, Escape) are Base UI Me
 
 **Source:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, EscapeCloses, MenuKeyboardNavigation, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.stories.jsx` — Overview, Placements, Spacing, WithSections, Loading, EscapeCloses, MenuKeyboardNavigation, Interactive, Default, Open, CompactRows, DisabledRow, HoveredState, KeyboardFocus
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.mdx`
 
@@ -51,6 +51,4 @@ From `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.sc
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

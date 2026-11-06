@@ -1,9 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as CheckboxStories from './Checkbox.stories.jsx';
 import { Checkbox } from '@/components';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -28,7 +34,7 @@ A checkbox lets a person select one or more options from a list, or confirm a si
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
+<ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19493"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
@@ -39,80 +45,33 @@ A checkbox lets a person select one or more options from a list, or confirm a si
 
 <div className="sb-ds-doc-section">
 
-## Anatomy
-
-<DocsCanvasShell attachSourceBelow description={<>A checkbox is a box and a label in a 24 row.</>}>
-    <Canvas of={CheckboxStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-<DocsTable>
-    <thead>
-        <tr><th>Part</th><th>What it is</th></tr>
-    </thead>
-    <tbody>
-        <tr><td>1 Box</td><td>An 18 square with a 2px edge. Selected, it fills with the selected bold fill and draws a check; mixed, it draws a dash.</td></tr>
-        <tr><td>2 Label</td><td>14/20 text beside the box. It names the checkbox. A required marker follows it.</td></tr>
-        <tr><td>3 Description</td><td>Optional 12/16 text under the label that describes the choice. It does not name it.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr><th>Property</th><th>Type</th><th>Default</th><th>Notes</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>label</code></td><td>node</td><td>none</td><td>Names the checkbox. Without a label, pass <code>aria-label</code>.</td></tr>
-        <tr><td><code>isChecked</code></td><td>boolean</td><td>uncontrolled</td><td>Controlled value. Needs an <code>onChange</code>.</td></tr>
-        <tr><td><code>defaultChecked</code></td><td>boolean</td><td><code>false</code></td><td>Initial value when uncontrolled.</td></tr>
-        <tr><td><code>isIndeterminate</code></td><td>boolean</td><td><code>false</code></td><td>The mixed state. Display only.</td></tr>
-        <tr><td><code>isInvalid</code></td><td>boolean</td><td><code>false</code></td><td>Danger edge on the unselected box only.</td></tr>
-        <tr><td><code>isDisabled</code></td><td>boolean</td><td><code>false</code></td><td>Out of the tab order, disabled fill.</td></tr>
-        <tr><td><code>isRequired</code></td><td>boolean</td><td><code>false</code></td><td>Draws the marker and requires the box natively.</td></tr>
-        <tr><td><code>isReadOnly</code></td><td>boolean</td><td><code>false</code></td><td>PLUS addition. Full contrast, in the tab order, not changeable.</td></tr>
-        <tr><td><code>description</code></td><td>node</td><td>none</td><td>PLUS addition. Linked with <code>aria-describedby</code>.</td></tr>
-        <tr><td><code>appearance</code></td><td><code>plain</code>, <code>card</code></td><td><code>plain</code></td><td>PLUS addition. <code>card</code> draws the choice as a bordered tile.</td></tr>
-        <tr><td><code>id</code>, <code>name</code>, <code>value</code></td><td>string</td><td>generated id</td><td><code>name</code> is a form key, not an id.</td></tr>
-        <tr><td><code>onChange</code></td><td>function</td><td>none</td><td>Called with the change event.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Unselected, selected, mixed and disabled.</>}>
-    <DsCanvasQuiet of={CheckboxStories.States} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Invalid marks the unselected box. A selected box keeps its fill.</>}>
-    <DsCanvasQuiet of={CheckboxStories.Invalid} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Read-only: focusable, full contrast, and the answer does not change.</>}>
-    <DsCanvasQuiet of={CheckboxStories.ReadOnly} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Content
 
-<DocsCanvasShell description={<>A long label wraps inside its row. The required marker follows the label.</>}>
-    <DsCanvasQuiet of={CheckboxStories.Content} />
-</DocsCanvasShell>
+<ComponentExample of={CheckboxStories.Content} title="Label" description="A long label wraps inside its row. The required marker follows the label." />
 
-<DocsCanvasShell description={<>A description under the label, and the card appearance.</>}>
-    <DsCanvasQuiet of={CheckboxStories.DescriptionAndCard} />
-</DocsCanvasShell>
+<ComponentExample of={CheckboxStories.Description} title="Description" description="Text under the label that describes the choice. It is read after the name." />
+
+<ComponentExample of={CheckboxStories.Card} title="Card" description="The choice drawn as a bordered tile, for choices that need more room." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={CheckboxStories.Unselected} title="Unselected" description="The resting box." />
+
+<ComponentExample of={CheckboxStories.Selected} title="Selected" description="The selected bold fill with a check." />
+
+<ComponentExample of={CheckboxStories.Mixed} title="Mixed" description="A dash, for a parent of partly selected children. Display only." />
+
+<ComponentExample of={CheckboxStories.Required} title="Required" description="Draws the marker and requires the box natively." />
+
+<ComponentExample of={CheckboxStories.Invalid} title="Invalid" description="A danger edge on the unselected box. A selected box keeps its fill." />
+
+<ComponentExample of={CheckboxStories.ReadOnly} title="Read-only" description="Focusable, full contrast, and the answer does not change." />
+
+<ComponentExample of={CheckboxStories.Disabled} title="Disabled" description="The disabled fill. The box leaves the tab order." />
 
 </div>
 
@@ -120,13 +79,9 @@ A checkbox lets a person select one or more options from a list, or confirm a si
 
 ## Grouped checkboxes
 
-<DocsCanvasShell description={<>A parent box shows the mixed state while some, not all, children are selected.</>}>
-    <DsCanvasQuiet of={CheckboxStories.SelectAll} />
-</DocsCanvasShell>
+<ComponentExample of={CheckboxStories.SelectAll} title="Select all" description="A parent box shows the mixed state while some, not all, children are selected." />
 
-<DocsCanvasShell description={<>A Checkbox group: Checkboxes inside a Fieldset with a legend, for picking any number of answers.</>}>
-    <DsCanvasQuiet of={CheckboxStories.CheckboxGroup} />
-</DocsCanvasShell>
+<ComponentExample of={CheckboxStories.CheckboxGroup} title="Checkbox group" description="Checkboxes inside a Fieldset with a legend, for picking any number of answers." />
 
 </div>
 
@@ -156,34 +111,77 @@ A checkbox lets a person select one or more options from a list, or confirm a si
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use a checkbox when a person needs to select one or more options from a list of related items, or when a setting needs an explicit confirmation before it applies, such as accepting terms or saving a form.
 
 Individual checkboxes have two states, selected and unselected. When checkboxes are grouped, a parent shows a third, mixed state while some, not all, of its children are selected.
 
-<DoDontGrid
-    pairs={[
-        {
-            doExample: <div><Checkbox label="Email me a summary" /></div>,
-            doCaption: 'Keep the label short and descriptive, with no punctuation after it.',
-            dontExample: <div><Checkbox label="Check this box if you would like to receive an email summary." /></div>,
-            dontCaption: "A sentence as a label reads as an instruction and ends in punctuation. Name the choice instead.",
-        },
-        {
-            doExample: <div><Checkbox label="I accept the terms" isInvalid /></div>,
-            doCaption: 'Pair an invalid checkbox with a message that says what to do.',
-            dontExample: <div><Checkbox label="I accept the terms" isInvalid isDisabled /></div>,
-            dontCaption: "A disabled box cannot take focus, so a screen reader never reaches the reason it is off. Use validation instead.",
-        },
-    ]}
-/>
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Box.** An 18 square with a 2px edge. Selected, it fills with the selected bold fill and draws a check; mixed, it draws a dash.
+2. **Label.** 14/20 text beside the box in a 24 row. It names the checkbox. A required marker follows it.
+3. **Description.** Optional 12/16 text under the label that describes the choice. It does not name it.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>Unselected: <code>--ds-background-input-hovered</code> with a <code>--ds-border-brand</code> edge. Selected: the hovered step of the selected bold fill.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box, for keyboard focus only.</td></tr>
+<tr><td>Selected, mixed</td><td><code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge; the mark is <code>--ds-icon-inverse</code>.</td></tr>
+<tr><td>Invalid</td><td>The unselected box takes <code>--ds-border-danger</code>. A selected or mixed box keeps its fill.</td></tr>
+<tr><td>Read-only</td><td>Full contrast, in the tab order, <code>aria-readonly</code>; ignores clicks and Space.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code> fill, <code>--ds-border-disabled</code> edge, <code>--ds-icon-disabled</code> mark. Out of the tab order.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Box fill</td><td><code>--ds-background-input</code>; selected <code>--ds-background-selected-bold</code>.</td></tr>
+<tr><td>Box edge</td><td><code>--ds-border-input</code>; selected <code>--ds-border-selected</code>; invalid <code>--ds-border-danger</code>.</td></tr>
+<tr><td>Box size, radius</td><td><code>--checkbox-control-size</code> (18); <code>--radius-025</code>; <code>--stroke-2</code> edge.</td></tr>
+<tr><td>Row</td><td><code>--item-height-sm</code> (24); gap <code>--space-050</code>.</td></tr>
+<tr><td>Label</td><td><code>--ds-text</code>, body default.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Best practices
+
+### Name the choice, not the instruction.
+
+<DoDontPair
+    doExample={<Checkbox label="Email me a summary" />}
+    doCaption="Keep the label short and descriptive, with no punctuation after it."
+    dontExample={<Checkbox label="Check this box if you would like to receive an email summary." />}
+    dontCaption="A sentence as a label reads as an instruction and ends in punctuation. Name the choice instead."
+/>
+
+### Explain an invalid box; do not disable it.
+
+<DoDontPair
+    doExample={<Checkbox label="I accept the terms" isInvalid />}
+    doCaption="Pair an invalid checkbox with a message that says what to do."
+    dontExample={<Checkbox label="I accept the terms" isInvalid isDisabled />}
+    dontCaption="A disabled box cannot take focus, so a screen reader never reaches the reason it is off. Use validation instead."
+/>
 
 ### Read-only is not disabled.
 
@@ -212,16 +210,35 @@ The underlying value is still checked or unchecked. Clicking a mixed box resolve
 
 <div className="sb-ds-doc-section">
 
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Write the label as the choice: "Email me a summary".</td><td>An instruction: "Check this box to receive an email summary."</td></tr>
+<tr><td>Use sentence case and no end punctuation.</td><td>Title case, or a period after the label.</td></tr>
+<tr><td>Phrase every label in the positive: "Send reminders".</td><td>A negative that makes selecting mean "no": "Do not send reminders".</td></tr>
+<tr><td>Say what to do in an error: "Select an option".</td><td>"Required" or "Invalid".</td></tr>
+<tr><td>Put extra detail in the description: "Sent the evening before."</td><td>Stretch the label into a sentence.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Accessibility
 
 - **The label is wired for you, `id` or no `id`.** The component derives an id and hands it to the input and the label, so a caller who passes neither `id` nor `name` still gets a label that names the input.
 - **A checkbox with no `label` has no accessible name.** Where the design has no room for visible text, pass `aria-label`; it is spread onto the input.
 - **Do not disable a box that must stay reachable.** Use `isInvalid` with a message linked by `aria-describedby`, so a screen reader user hears why the option cannot be chosen.
 - **Include an error message for a required or invalid box**, for example "Select an option".
-- **`isRequired` reaches the input**, so native validation applies. The marker is a span marked `aria-label="required"`.
+- **`isRequired` reaches the input**, so native validation applies. The marker is decoration, hidden from assistive technology.
 - **`isIndeterminate` is set on the DOM node**, the only way to express it. Screen readers report it as "mixed".
-- **Keyboard focus is a 2px ring on `border.focused`, 2px off the box.** A pointer focus draws none.
-- **Group related boxes** in a `Fieldset` with a `legend` — a Checkbox group.
+- **Keyboard focus is a 2px ring on `border.focused`, 2px off the box.** A pointer focus draws none. Space toggles the box; Enter does not.
+- **Group related boxes** in a Fieldset with a `legend`: a Checkbox group.
 
 </div>
 
@@ -232,7 +249,7 @@ The underlying value is still checked or unchecked. Clicking a mixed box resolve
 - To turn a setting on or off at once, use Toggle.
 - For one answer from several options, use Radio, or Radio group for the whole set.
 - For a group of checkboxes, use a Checkbox group: Checkboxes inside a Fieldset with a legend.
-- For a rows-by-columns matrix of choices, use ChoiceGrid.
+- For a rows-by-columns matrix of choices, use Choice grid.
 - For choices in a popup, use Select.
 
 </div>

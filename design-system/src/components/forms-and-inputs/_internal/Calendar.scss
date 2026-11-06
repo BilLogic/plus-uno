@@ -54,7 +54,6 @@
         $states: (
             hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
         ),
-        $ring: false
     );
 }
 
@@ -96,7 +95,6 @@
         $states: (
             hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
         ),
-        $ring: false,
         $hovered-selector: '&:hover:not(.plus-calendar-day--disabled):not(.plus-calendar-day--outside):not(.plus-calendar-day--selected)'
     );
 

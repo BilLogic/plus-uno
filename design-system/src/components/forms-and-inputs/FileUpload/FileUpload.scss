@@ -7,37 +7,43 @@
 .plus-file-upload-wrapper {
     display: flex;
     flex-direction: column;
-    gap: var(--stack-sm, 4px);
+    gap: var(--stack-sm);
     width: 100%;
 }
 
 .plus-file-upload-container {
     display: flex;
     flex-direction: column;
-    gap: var(--stack-md, 8px);
-    padding: var(--pad-y-md, 12px) var(--pad-x-md, 16px);
-    border-radius: var(--radius-md, 4px);
+    gap: var(--stack-md);
+    padding: var(--pad-y-md) var(--pad-x-md);
+    border-radius: var(--radius-md);
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    
-    // Focus state with border
+
+    border: var(--border-default) solid transparent;
+
+    &.plus-file-upload-invalid {
+        border-color: var(--ds-border-danger);
+        box-shadow: 0 0 0 var(--focus-ring-width) var(--ds-background-danger-subtler);
+    }
+
+    &.plus-file-upload-valid {
+        border-color: var(--ds-border-success);
+        box-shadow: 0 0 0 var(--focus-ring-width) var(--ds-background-success-subtler);
+    }
+
+    // Focus comes last so the ring stays visible on an invalid or valid field;
+    // the status keeps the border.
     &.plus-file-upload-focused {
         box-shadow: 0 0 0 var(--focus-ring-width) var(--ds-border-focused);
+
+        &:not(.plus-file-upload-invalid):not(.plus-file-upload-valid) {
+            border-color: var(--ds-border-focused);
+        }
     }
-    
-    // Validation states
-    &.plus-file-upload-invalid {
-        box-shadow: 0 0 0 0.2rem var(--ds-background-danger-subtler);
-    }
-    
-    &.plus-file-upload-valid {
-        box-shadow: 0 0 0 0.2rem var(--ds-background-success-subtler);
-    }
-    
-    // Disabled state
-    // Text color is muted via solid tokens below (not opacity), so label/description
-    // keep sufficient color contrast (WCAG AA). The button handles its own disabled style.
+
     &.plus-file-upload-disabled {
         cursor: not-allowed;
+        border-color: transparent;
     }
 
     // Read-only: the field box reads as a fixed value, like the Input read-only state.
@@ -53,8 +59,8 @@
     font: var(--body-default);
     
     .plus-file-upload-required {
-        color: var(--color-danger);
-        margin-left: 2px;
+        color: var(--ds-text-danger);
+        margin-left: var(--stack-sm);
     }
 }
 
@@ -98,7 +104,7 @@
 .plus-file-upload-validation {
     display: flex;
     align-items: center;
-    gap: var(--stack-sm, 4px);
+    gap: var(--stack-sm);
     font: var(--body-small);
     
     i {
@@ -108,18 +114,18 @@
 }
 
 .plus-file-upload-validation-invalid {
-    color: var(--color-danger);
+    color: var(--ds-text-danger);
     
     i {
-        color: var(--color-danger);
+        color: var(--ds-icon-danger);
     }
 }
 
 .plus-file-upload-validation-valid {
-    color: var(--color-success);
+    color: var(--ds-text-success);
     
     i {
-        color: var(--color-success);
+        color: var(--ds-icon-success);
     }
 }
 

@@ -1,14 +1,20 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
+import { Fieldset, Checkbox } from '@/components';
 import * as FieldsetStories from './Fieldset.stories.jsx';
-import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={FieldsetStories} />
 
 <Title />
-A legend plus the fields it groups. `RadioGroup` is built on this same
-composition; a checkbox group is the same shape with `Checkbox` instead.
+A fieldset is a legend plus the fields it groups. Radio group is built on this same composition; a checkbox group is the same shape with Checkbox instead.
 
 <DocsTabs of={FieldsetStories}>
 
@@ -22,54 +28,39 @@ composition; a checkbox group is the same shape with `Checkbox` instead.
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>A legend over a set of fields.</>}>
-    <Canvas of={FieldsetStories.Default} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Content
 
-<DocsCanvasShell description={<>The same composition groups a set of checkboxes.</>}>
-    <DsCanvasQuiet of={FieldsetStories.CheckboxGroup} />
-</DocsCanvasShell>
+<ComponentExample of={FieldsetStories.Default} title="Default" description="A legend over a set of fields." />
+
+<ComponentExample of={FieldsetStories.CheckboxGroup} title="Checkbox group" description="The same composition groups a set of checkboxes." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## State
 
-<DocsCanvasShell description={<>`isRequired` marks the legend; `error` renders one message for the whole group, announced when it appears.</>}>
-    <DsCanvasQuiet of={FieldsetStories.WithRequiredAndError} />
-</DocsCanvasShell>
+<ComponentExample of={FieldsetStories.Required} title="Required" description="Marks the legend with an asterisk and adds a hidden (required) to its name." />
+
+<ComponentExample of={FieldsetStories.Invalid} title="Invalid" description="One error message for the whole group, announced when it appears." />
+
+<ComponentExample of={FieldsetStories.Disabled} title="Disabled" description="Disables every field inside the group at once." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Properties
+## Interactive playground
 
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>legend</code></td><td>node</td><td>Labels the fieldset's contents.</td></tr>
-        <tr><td><code>isDisabled</code></td><td>boolean</td><td>Disables the whole group.</td></tr>
-        <tr><td><code>isRequired</code></td><td>boolean</td><td>Marked on the legend.</td></tr>
-        <tr><td><code>error</code></td><td>node</td><td>One error for the group, announced with <code>role="alert"</code> when it appears.</td></tr>
-        <tr><td><code>children</code></td><td>node</td><td>The fields the legend labels.</td></tr>
-    </tbody>
-</DocsTable>
+<DocsInteractivePlayground
+    of={FieldsetStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
 
 </div>
 
@@ -83,25 +74,57 @@ composition; a checkbox group is the same shape with `Checkbox` instead.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
-Use `Fieldset` wherever a set of fields shares one label and, often, one
-validation message — a group of radios, a group of checkboxes, related text
-fields asked together. For a single field with its own label, use the
-<a target="_top" href="./?path=/docs/components-forms-and-inputs-form--docs">label and caption</a>{' '}
-convention instead.
+Use a fieldset wherever a set of fields shares one label and, often, one validation message: a group of radios, a group of checkboxes, related text fields asked together. For a single field with its own label, use the <a target="_top" href="./?path=/docs/components-forms-and-inputs-form--docs">label and caption</a>{' '}convention instead.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Legend.** Names the group, in body default. A required marker follows it.
+2. **Fields.** The grouped fields, stacked with `--stack-md` between them.
+3. **Error.** One message under the fields, in body small.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Required</td><td>An asterisk in <code>--ds-text-danger</code> follows the legend. A visually hidden "(required)" joins its name.</td></tr>
+<tr><td>Invalid</td><td>The error shows in <code>--ds-text-danger</code>, announced with <code>role="alert"</code> and linked with <code>aria-describedby</code>.</td></tr>
+<tr><td>Disabled</td><td>The native <code>disabled</code> attribute disables every field inside.</td></tr>
+</tbody>
+</DocsTable>
+
+A fieldset has no hover, pressed or focus state of its own. The fields inside carry theirs.
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Legend</td><td><code>--ds-text</code>, body default.</td></tr>
+<tr><td>Required marker, error</td><td><code>--ds-text-danger</code>; the error in body small.</td></tr>
+<tr><td>Gap</td><td><code>--stack-md</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### One `error` covers the whole group.
 
-Pass `error` on the `Fieldset`, not on each field inside it, when the
-validation applies to the set as a whole — "Choose at least one," for
-example, rather than a field-by-field message.
+Pass `error` on the Fieldset, not on each field inside it, when the validation applies to the set as a whole: "Choose at least one", for example, rather than a field-by-field message.
 
 ```jsx
 <Fieldset legend="Notify me by" isRequired error={error}>
@@ -110,11 +133,34 @@ example, rather than a field-by-field message.
 </Fieldset>
 ```
 
-### Build on `Fieldset` rather than reimplementing it.
+### Build on a fieldset rather than reimplementing it.
 
-`RadioGroup` already composes `Fieldset` with `Radio` children. Reach for
-`RadioGroup` directly for radios, and use `Fieldset` on its own only for a
-shape it doesn't already cover, like a checkbox group.
+Radio group already composes Fieldset with Radio children. Reach for Radio group directly for radios, and use Fieldset on its own only for a shape it does not already cover, like a checkbox group.
+
+<DoDontPair
+    doExample={<Fieldset legend="Notify me by" error="Choose at least one."><Checkbox label="Email" /><Checkbox label="Text" /></Fieldset>}
+    doCaption="One legend and one message for the set."
+    dontExample={<div><Checkbox label="Email" /><Checkbox label="Text" /></div>}
+    dontCaption="Related boxes with no legend leave a screen reader without the question they answer."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Write the legend as the question or topic: "Notify me by".</td><td>A generic legend: "Options".</td></tr>
+<tr><td>Use sentence case and no end punctuation.</td><td>Title case, or a colon after the legend.</td></tr>
+<tr><td>Say what to do in the error: "Choose at least one."</td><td>"Required" or "Invalid".</td></tr>
+<tr><td>Keep the legend short enough to read as a heading.</td><td>A paragraph of instructions in the legend.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -122,14 +168,9 @@ shape it doesn't already cover, like a checkbox group.
 
 ## Accessibility
 
-- **A real `fieldset`/`legend` pair.** The legend is tied to the group
-  through native HTML semantics, which every screen reader already
-  understands.
-- **The error is announced once.** `role="alert"` on the error message means
-  assistive technology hears it as soon as it appears, without needing focus
-  to move there.
-- **`isRequired` is visual and spoken.** The asterisk is `aria-hidden`, and a
-  visually hidden "(required)" is added to the legend's accessible name.
+- **A real `fieldset` and `legend` pair.** The legend is tied to the group through native HTML semantics, which every screen reader already understands.
+- **The error is announced once.** `role="alert"` on the error message means assistive technology hears it as soon as it appears, without needing focus to move there.
+- **`isRequired` is visual and spoken.** The asterisk is `aria-hidden`, and a visually hidden "(required)" is added to the legend's accessible name.
 
 </div>
 
@@ -137,9 +178,8 @@ shape it doesn't already cover, like a checkbox group.
 
 ## Related
 
-- For the ready-made radio composition, use `RadioGroup`.
-- For a single field's label and help text, see the
-  <a target="_top" href="./?path=/docs/components-forms-and-inputs-form--docs">label and caption</a> convention.
+- For the ready-made radio composition, use Radio group.
+- For a single field's label and help text, see the <a target="_top" href="./?path=/docs/components-forms-and-inputs-form--docs">label and caption</a> convention.
 
 </div>
 

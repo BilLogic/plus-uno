@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import TimePicker from './TimePicker';
 
 export default {
@@ -162,3 +163,81 @@ TwentyFourHourValueIsSplit.play = async ({ canvasElement }) => {
     const toggle = canvasElement.querySelector('.plus-time-picker__period-toggle');
     await expect(toggle.textContent.trim()).toBe('PM');
 };
+
+/** One story per state, for the Examples tab. */
+const wrap = { maxWidth: '200px' };
+const input = (canvasElement) => within(canvasElement).getByRole('textbox');
+const period = (canvasElement) => canvasElement.querySelector('.plus-time-picker__period-toggle');
+
+export const Default = {
+    render: () => <div style={wrap}><TimePicker aria-label="Reminder time" /></div>,
+    play: async ({ canvasElement }) => {
+        await expect(input(canvasElement)).toHaveAttribute('placeholder', '__ : __');
+        await expect(input(canvasElement)).toHaveValue('');
+    },
+};
+
+export const WithValue = {
+    render: () => <div style={wrap}><TimePicker aria-label="Reminder time" value="02:30 PM" /></div>,
+    play: async ({ canvasElement }) => {
+        await expect(input(canvasElement)).toHaveValue('02:30');
+        await expect(period(canvasElement).textContent.trim()).toBe('PM');
+    },
+};
+
+export const Compact = {
+    render: () => <div style={wrap}><TimePicker aria-label="Reminder time" spacing="compact" /></div>,
+    play: async ({ canvasElement }) => {
+        await expect(fieldBox(canvasElement).getBoundingClientRect().height).toBe(32);
+    },
+};
+
+export const Invalid = {
+    render: () => <div style={wrap}><TimePicker aria-label="Reminder time" isInvalid /></div>,
+    play: async ({ canvasElement }) => {
+        await expectFieldInvalid(canvasElement, fieldBox(canvasElement), 'time picker');
+    },
+};
+
+export const ReadOnly = {
+    render: () => <div style={wrap}><TimePicker aria-label="Reminder time" isReadOnly value="02:30 PM" /></div>,
+    play: async ({ canvasElement }) => {
+        await expectFieldReadOnly(canvasElement, fieldBox(canvasElement), 'time picker');
+    },
+};
+
+export const Disabled = {
+    render: () => <div style={wrap}><TimePicker aria-label="Reminder time" isDisabled /></div>,
+    play: async ({ canvasElement }) => {
+        await expectFieldDisabled(fieldBox(canvasElement), 'time picker');
+        await expect(input(canvasElement)).toBeDisabled();
+    },
+};
+
+/** Hover turns the border `border.focused`. */
+export const HoveredState = {
+    parameters: { docs: { disable: true } },
+    render: () => <div style={wrap}><TimePicker aria-label="Reminder time" /></div>,
+    play: async ({ canvasElement }) => {
+        await expectFieldHovered(canvasElement, fieldBox(canvasElement), 'time picker');
+    },
+};
+
+/** Keyboard focus draws the 2px ring, 2px off the box. */
+export const KeyboardFocus = {
+    parameters: { docs: { disable: true } },
+    render: () => <div style={wrap}><TimePicker aria-label="Reminder time" /></div>,
+    play: async ({ canvasElement }) => {
+        await expectFieldFocused(canvasElement, fieldBox(canvasElement), input(canvasElement), 'time picker');
+    },
+};
+
+export const Interactive = (args) => {
+    const [value, setValue] = useState('');
+    return (
+        <div style={wrap}>
+            <TimePicker {...args} value={value} onChange={setValue} />
+        </div>
+    );
+};
+Interactive.args = { 'aria-label': 'Reminder time', spacing: 'default', isDisabled: false, isReadOnly: false, isInvalid: false };
