@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/images-and-icons/Tile/Tile.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/Tile/Tile.stories.jsx` — Sizes, DefaultSize, IconSubtle, IconBold, Logos, LogoDefaultsToWhite, Images, WithBorder, Decorative, Labeled, Interactive
+**Stories:** `design-system/src/components/images-and-icons/Tile/Tile.stories.jsx` — Sizes, DefaultSize, IconSubtle, IconBold, Logos, LogoDefaultsToWhite, Images, WithBorder, Decorative, Labeled, Interactive, Rest
 
 **Storybook page:** `design-system/src/components/images-and-icons/Tile/Tile.mdx`
 
@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--border-default` · `--color-advocacy` · `--color-advocacy-container` · `--color-mastering-content` · `--color-mastering-content-container` · `--color-on-advocacy` · `--color-on-advocacy-container` · `--color-on-mastering-content` · `--color-on-mastering-content-container` · `--color-on-relationship` · `--color-on-relationship-container` · `--color-on-social-emotional` · `--color-on-social-emotional-container` · `--color-on-technology-tools` · `--color-on-technology-tools-container` · `--color-on-tertiary` · `--color-on-tertiary-container` · `--color-outline-variant` · `--color-relationship` · `--color-relationship-container` · `--color-social-emotional` · `--color-social-emotional-container` · `--color-technology-tools` · `--color-technology-tools-container` · `--color-tertiary` · `--color-tertiary-container` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-surface` · `--font-size-fa-body1` · `--font-size-fa-body2` · `--font-size-fa-body3` · `--font-size-fa-h3` · `--font-size-fa-h4` · `--font-size-fa-h5` · `--size-border-radius-radius-50` · `--size-spacing-large-space-600` · `--size-spacing-large-space-700` · `--size-spacing-large-space-800` · `--size-spacing-medium-space-300` · `--size-spacing-medium-space-400` · `--size-spacing-medium-space-500` · `--tile-inner` · `--tile-radius` · `--tile-radius-lg` · `--tile-size`
+`--border-default` · `--color-advocacy` · `--color-advocacy-container` · `--color-mastering-content` · `--color-mastering-content-container` · `--color-on-advocacy` · `--color-on-advocacy-container` · `--color-on-mastering-content` · `--color-on-mastering-content-container` · `--color-on-relationship` · `--color-on-relationship-container` · `--color-on-social-emotional` · `--color-on-social-emotional-container` · `--color-on-technology-tools` · `--color-on-technology-tools-container` · `--color-on-tertiary` · `--color-on-tertiary-container` · `--color-outline-variant` · `--color-relationship` · `--color-relationship-container` · `--color-social-emotional` · `--color-social-emotional-container` · `--color-technology-tools` · `--color-technology-tools-container` · `--color-tertiary` · `--color-tertiary-container` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-surface` · `--font-size-fa-body1` · `--font-size-fa-body2` · `--font-size-fa-body3` · `--font-size-fa-h3` · `--font-size-fa-h4` · `--font-size-fa-h5` · `--radius-0125` · `--radius-0625` · `--size-media-lg` · `--size-media-md` · `--size-media-sm` · `--size-media-xl` · `--size-media-xs` · `--size-media-xxs` · `--tile-inner` · `--tile-radius` · `--tile-size`
 
 From `design-system/src/components/images-and-icons/Tile/Tile.scss`. Override these through the token layer, never with a literal.
 

@@ -9,7 +9,7 @@
 
 **Source:** `design-system/src/components/images-and-icons/Object/Object.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/Object/Object.stories.jsx` — Kinds, Sizes, Decorative
+**Stories:** `design-system/src/components/images-and-icons/Object/Object.stories.jsx` — Kinds, Sizes, Decorative, Rest
 
 **Storybook page:** `design-system/src/components/images-and-icons/Object/Object.mdx`
 

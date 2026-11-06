@@ -9,7 +9,7 @@ The signed-in user: an initial pill, the name, the role indicator ("Lead") and a
 
 **Source:** `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.stories.jsx` — Overview, Spacing, Types, Counter, Interactive
+**Stories:** `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.stories.jsx` — Overview, Spacing, Types, Counter, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.mdx`
 
@@ -30,7 +30,7 @@ The signed-in user: an initial pill, the name, the role indicator ("Lead") and a
 
 ## Variants
 
-**`state`** — `enabled` · `hover`
+**`state`** — `enabled` · `hover` · `disabled`
 
 **`type`** — `regular tutor` · `lead tutor` · `admin`
 
@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--color-danger-text` · `--color-disabled-opacity` · `--color-primary-text` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-interaction-hovered` · `--ds-surface` · `--ds-text` · `--image-md` · `--image-sm` · `--inline-md` · `--item-height-md` · `--label-height-md` · `--label-max-width` · `--pad-x-md` · `--pad-x-sm` · `--pad-y-md` · `--radius-full` · `--radius-h32` · `--radius-md` · `--space-0625`
+`--body-default` · `--body-small` · `--border-default` · `--color-danger-text` · `--color-primary-text` · `--ds-background-brand-subtlest` · `--ds-background-danger-subtler` · `--ds-border-focused` · `--ds-interaction-hovered` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text` · `--image-md` · `--image-sm` · `--inline-md` · `--item-height-md` · `--label-height-md` · `--label-max-width` · `--pad-x-md` · `--pad-x-sm` · `--pad-y-md` · `--radius-full` · `--radius-h32` · `--radius-md` · `--space-0625`
 
 From `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.scss`. Override these through the token layer, never with a literal.
 

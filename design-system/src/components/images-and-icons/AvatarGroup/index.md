@@ -9,7 +9,7 @@ A row of avatars that overlap, with the rest behind a `+n`. The group owns what 
 
 **Source:** `design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.stories.jsx` — Group, GroupFits, Sizes, GroupSizeAndShape, Interactive
+**Stories:** `design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.stories.jsx` — Group, GroupFits, Sizes, GroupSizeAndShape, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.mdx`
 
