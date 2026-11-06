@@ -105,7 +105,7 @@ Tile.propTypes = {
     src: PropTypes.string,
     /** `logo` or `image`: the picture as a node, in place of `src`. */
     children: PropTypes.node,
-    /** Adds a 1px outline-variant border inside the tile. */
+    /** Adds a 1px border inside the tile. */
     hasBorder: PropTypes.bool,
     /** Makes the tile an image with this name. Without it the tile is decorative and hidden. */
     label: PropTypes.string,

@@ -6,6 +6,7 @@ import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.j
 import { contrastRatio, paintedOver } from '@/storybook-docs/lib/contrast.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import SectionMessage, { SECTION_MESSAGE_ICONS, SECTION_MESSAGE_APPEARANCES } from './SectionMessage';
+import { iconClass } from '../../../lib/icon';
 
 const ICON_TOKEN = {
     primary: '--ds-icon-brand',
@@ -287,7 +288,7 @@ export const LeadingIcon = () => (
         <SectionMessage appearance="info" title="Replaced by name" leadingVisual="bell" data-testid="icon-named">
             A Font Awesome solid name replaces the default icon.
         </SectionMessage>
-        <SectionMessage appearance="info" leadingVisual={<i className="fa-solid fa-star" />} data-testid="icon-node">
+        <SectionMessage appearance="info" leadingVisual={<i className={iconClass('star')} />} data-testid="icon-node">
             A node replaces it too.
         </SectionMessage>
         <SectionMessage appearance="warning" leadingVisual={false} data-testid="icon-none">

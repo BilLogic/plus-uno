@@ -9,7 +9,7 @@ One line of help on hover or focus, built on Base UI.
 
 **Source:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.jsx`
 
-**Stories:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx` — Placements, Interactive, Overview
+**Stories:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.stories.jsx` — Placements, Interactive, Overview, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.mdx`
 

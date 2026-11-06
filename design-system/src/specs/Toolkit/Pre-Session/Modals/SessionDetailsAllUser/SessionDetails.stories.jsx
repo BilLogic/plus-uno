@@ -26,6 +26,7 @@ import {
     FillInButton,
     CloseButton
 } from '@/specs/Toolkit/Pre-Session/Elements/CTATutorViewButtons.stories';
+import { iconClass } from '../../../../../lib/icon';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Modals/Session Details (All User)',
@@ -104,32 +105,32 @@ export const SessionInfo_PostSignUp = () => (
                         content="1:30 PM - 2:20 PM (Thursday)"
                     />
                     <SessionInfoCard
-                        icon="fa-solid fa-graduation-cap"
+                        icon={iconClass('graduation-cap')}
                         title="Teacher"
                         content="Mr. Snape"
                     />
 
                     {/* Row 2 */}
                     <SessionInfoCard
-                        icon="fa-solid fa-person"
+                        icon={iconClass('person')}
                         title="Tutor Count"
                         content="5/5 (Leads: 1/1)"
                     />
                     <SessionInfoCard
-                        icon="fa-solid fa-users"
+                        icon={iconClass('users')}
                         title="Student Count"
                         content="25"
                     />
 
                     {/* Row 3 */}
                     <SessionInfoCard
-                        icon="fa-solid fa-video"
+                        icon={iconClass('video')}
                         title="Session Link"
                         content="Zoom"
                         contentLink="https://zoom.us"
                     />
                     <SessionInfoCard
-                        icon="fa-solid fa-key"
+                        icon={iconClass('key')}
                         title="Session Passcode"
                         content="123 456 789"
                         showCopyButton={true}
@@ -218,7 +219,7 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                             padding: 'var(--size-modal-pad-y-md) var(--size-modal-pad-x-md)',
                         }}>
                             <span className="h6 m-0">Tutor Roster</span>
-                            <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-users" />}>4</StatusTag>
+                            <StatusTag appearance="info" leadingVisual={<i className={iconClass('users')} />}>4</StatusTag>
                         </div>
                         {/* Panel Body - Content + Scrollbar */}
                         <div className="d-flex" style={{ flex: 1, overflow: 'hidden' }}>
@@ -264,7 +265,7 @@ export const SessionAttendees_PostSignUp_FillIn = () => (
                             padding: 'var(--size-modal-pad-y-md) var(--size-modal-pad-x-md)',
                         }}>
                             <span className="h6 m-0">Student Roster</span>
-                            <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-users" />}>4</StatusTag>
+                            <StatusTag appearance="info" leadingVisual={<i className={iconClass('users')} />}>4</StatusTag>
                         </div>
                         {/* Panel Body - Content + Scrollbar */}
                         <div className="d-flex" style={{ flex: 1, overflow: 'hidden' }}>
@@ -364,7 +365,7 @@ export const OneTimeSession_PreFillIn = () => (
                 }}>
                     {/* Row 1 */}
                     <SessionInfoCard
-                        icon="fa-solid fa-circle-info"
+                        icon={iconClass('circle-info')}
                         title="Type"
                         content="One-time (8/14/2025)"
                     />
@@ -376,26 +377,26 @@ export const OneTimeSession_PreFillIn = () => (
 
                     {/* Row 2 */}
                     <SessionInfoCard
-                        icon="fa-solid fa-person"
+                        icon={iconClass('person')}
                         title="Tutor Count"
                         content="5/5 (Leads: 1/1)"
                     />
                     <SessionInfoCard
-                        icon="fa-solid fa-graduation-cap"
+                        icon={iconClass('graduation-cap')}
                         title="Student Count"
                         content="25"
                     />
 
                     {/* Row 3 */}
                     <SessionInfoCard
-                        icon="fa-solid fa-video"
+                        icon={iconClass('video')}
                         title="Session Link"
                         content="Zoom"
                         contentLink="https://zoom.us"
                         showCopyButton={true}
                     />
                     <SessionInfoCard
-                        icon="fa-solid fa-key"
+                        icon={iconClass('key')}
                         title="Session Passcode"
                         content="123 456 789"
                         showCopyButton={true}
@@ -517,7 +518,7 @@ export const FillIn_ReviewChoices = () => {
                     Date & time
                 </span>
                 <i
-                    className="fa-solid fa-arrow-up"
+                    className={iconClass('arrow-up')}
                     style={{
                         fontSize: 'var(--font-size-fa-body1-solid)',
                         color: 'var(--ds-icon)',
@@ -536,7 +537,7 @@ export const FillIn_ReviewChoices = () => {
                     School & teacher
                 </span>
                 <i
-                    className="fa-solid fa-arrow-up"
+                    className={iconClass('arrow-up')}
                     style={{
                         fontSize: 'var(--font-size-fa-body1-solid)',
                         color: 'var(--color-outline-variant)',

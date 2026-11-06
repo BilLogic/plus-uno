@@ -5,6 +5,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Button from '../Button/Button';
 import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
 import TextField from './TextField';
+import { iconClass } from '../../../lib/icon';
 
 export default {
     title: 'Components/Forms and inputs/Text field',
@@ -65,7 +66,7 @@ export default {
 const caption = 'text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3';
 const row = { display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'flex-start' };
 const px = (value) => Math.round(parseFloat(value));
-const icon = (name) => <i className={`fa-solid fa-${name}`} aria-hidden="true" />;
+const icon = (name) => <i className={iconClass(name)} aria-hidden="true" />;
 
 /** Overview: a labeled field with a placeholder and an element after the control. */
 export const Overview = () => (

@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './EmptyState.scss';
+import { iconClass } from '../../../lib/icon';
 
 /** The two spacings: roomy for a whole page or panel, or compact for the room inside a table or card. */
 export const EMPTY_STATE_SPACINGS = ['default', 'compact'];
@@ -42,7 +43,7 @@ const EmptyState = ({
             {image ? (
                 <div className="plus-empty-state__image" aria-hidden="true">{image}</div>
             ) : icon ? (
-                <i className={`plus-empty-state__icon fa-solid fa-${icon}`} aria-hidden="true" />
+                <i className={`plus-empty-state__icon ${iconClass(icon)}`} aria-hidden="true" />
             ) : null}
             {(header || description) && (
                 <div className="plus-empty-state__text">

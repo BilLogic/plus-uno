@@ -243,7 +243,7 @@ const expectIcons = async (canvasElement) => {
     for (const i of canvasElement.querySelectorAll('i[class*="fa-"]')) {
         // The Sidebar's 12 glyphs (the collapse angle, Close, the external icon) are its own, held by its stories.
         if (i.closest('.plus-pattern-sidebar')) continue;
-        const label = i.className.split(' ').find((c) => c.startsWith('fa-') && c !== 'fa-solid');
+        const label = i.className.split(' ').find((c) => c.startsWith('fa-') && c !== 'fa-solid' && c !== 'fa-regular');
         const size = parseFloat(getComputedStyle(i).fontSize);
         const isSmall = i.closest('.plus-status') || i.closest('.plus-tag');
         await expect(size, `${label} draws at its icon size`).toBeCloseTo(isSmall ? sm : md, 0);

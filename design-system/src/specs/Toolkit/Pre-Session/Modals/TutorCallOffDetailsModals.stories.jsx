@@ -10,6 +10,7 @@ import {
     ConfirmWithdrawalButton,
     ViewUpdatedScheduleButton
 } from '../Elements/CTATutorViewButtons.stories';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -154,7 +155,7 @@ export const PreReview_WithdrawRequest = () => (
                 }}>
                     {/* Warning Triangle Icon */}
                     <i
-                        className="fa-solid fa-triangle-exclamation"
+                        className={iconClass('triangle-exclamation')}
                         style={{
                             fontSize: 'var(--font-size-fa-huge-solid, 8rem)',
                             lineHeight: 1,
@@ -217,7 +218,7 @@ export const PreReview_RequestWithdrawn = () => (
                 }}>
                     {/* Success Checkmark Icon */}
                     <i
-                        className="fa-solid fa-circle-check"
+                        className={iconClass('circle-check')}
                         style={{
                             fontSize: 'var(--font-size-fa-huge-solid, 8rem)',
                             lineHeight: 1,

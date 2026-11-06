@@ -32,7 +32,7 @@ const basicMenu = (
 );
 
 export const Overview = () => (
-    <div style={{ padding: '100px 24px 160px' }}>
+    <div style={{ padding: 'var(--space-500) var(--space-150) var(--size-1000)' }}>
         <DropdownMenu trigger={<Button text="Dropdown" iconAfter={<i className="fa-solid fa-chevron-down" aria-hidden="true" />} />}>
             {basicMenu}
         </DropdownMenu>
@@ -52,7 +52,7 @@ Overview.play = async ({ canvasElement }) => {
 };
 
 export const Placements = () => (
-    <div style={{ display: 'flex', gap: '48px', padding: '100px 24px 240px' }}>
+    <div style={{ display: 'flex', gap: 'var(--space-300)', padding: 'var(--space-500) var(--space-150) var(--size-1500)' }}>
         <DropdownMenu trigger={<Button>Bottom start</Button>} placement="bottom-start">
             {basicMenu}
         </DropdownMenu>
@@ -66,7 +66,7 @@ export const Placements = () => (
 );
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', gap: '48px', padding: '24px 24px 240px' }}>
+    <div style={{ display: 'flex', gap: 'var(--space-300)', padding: 'var(--space-150) var(--space-150) var(--size-1500)' }}>
         <DropdownMenu trigger={<Button>Cozy</Button>} spacing="cozy">
             {basicMenu}
         </DropdownMenu>
@@ -91,7 +91,7 @@ Spacing.play = async ({ canvasElement }) => {
 };
 
 export const WithSections = () => (
-    <div style={{ padding: '24px 24px 280px' }}>
+    <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1900)' }}>
         <DropdownMenu trigger={<Button>Views</Button>}>
             <Section title="Manage">
                 <ButtonItem onClick={() => {}}>Rename</ButtonItem>
@@ -105,7 +105,7 @@ export const WithSections = () => (
 );
 
 export const Loading = () => (
-    <div style={{ padding: '24px 24px 200px' }}>
+    <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
         <DropdownMenu trigger={<Button>Assignees</Button>} loading isOpen onOpenChange={() => {}} />
     </div>
 );
@@ -114,7 +114,7 @@ export const Loading = () => (
 
 /** Open with the keyboard, move into the menu, then Escape: closed, focus on the trigger. */
 export const EscapeCloses = () => (
-    <div style={{ padding: '24px 24px 160px' }}>
+    <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1000)' }}>
         <DropdownMenu trigger={<Button>Actions</Button>}>
             <ButtonItem onClick={() => {}}>Rename</ButtonItem>
             <ButtonItem onClick={() => {}}>Archive</ButtonItem>
@@ -144,7 +144,7 @@ EscapeCloses.play = async ({ canvasElement }) => {
 export const MenuKeyboardNavigation = () => {
     const [picked, setPicked] = React.useState('');
     return (
-        <div style={{ padding: '24px 24px 200px' }}>
+        <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
             <p data-testid="picked">{picked}</p>
             <DropdownMenu trigger={<Button>Actions</Button>}>
                 <ButtonItem onClick={() => setPicked('Rename')}>Rename</ButtonItem>
@@ -186,7 +186,7 @@ export const Interactive = {
         shouldFlip: true,
     },
     render: (args) => (
-        <div style={{ padding: '100px 50px' }}>
+        <div style={{ padding: 'var(--space-500) var(--space-300)' }}>
             <DropdownMenu trigger={<Button>Dropdown</Button>} {...args}>
                 {basicMenu}
             </DropdownMenu>
@@ -200,7 +200,7 @@ const noop = () => {};
 
 export const Default = {
     render: () => (
-        <div style={{ padding: '24px 24px 24px' }}>
+        <div style={{ padding: 'var(--space-150) var(--space-150) var(--space-150)' }}>
             <DropdownMenu trigger={<Button text="Actions" iconAfter={<i className="fa-solid fa-chevron-down" aria-hidden="true" />} />}>
                 {basicMenu}
             </DropdownMenu>
@@ -215,7 +215,7 @@ export const Default = {
 
 export const Open = {
     render: () => (
-        <div style={{ padding: '24px 24px 200px' }}>
+        <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
             <DropdownMenu trigger={<Button text="Actions" />} isOpen onOpenChange={noop}>
                 {basicMenu}
             </DropdownMenu>
@@ -229,7 +229,7 @@ export const Open = {
 
 export const CompactRows = {
     render: () => (
-        <div style={{ padding: '24px 24px 200px' }}>
+        <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
             <DropdownMenu trigger={<Button text="Compact" />} spacing="compact" isOpen onOpenChange={noop}>
                 {basicMenu}
             </DropdownMenu>
@@ -243,7 +243,7 @@ export const CompactRows = {
 
 export const DisabledRow = {
     render: () => (
-        <div style={{ padding: '24px 24px 200px' }}>
+        <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
             <DropdownMenu trigger={<Button text="Manage" />} isOpen onOpenChange={noop}>
                 <ButtonItem onClick={noop}>Rename</ButtonItem>
                 <ButtonItem onClick={noop} isDisabled>Archive</ButtonItem>
@@ -261,7 +261,7 @@ export const DisabledRow = {
 export const HoveredState = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ padding: '24px 24px 200px' }}>
+        <div style={{ padding: 'var(--space-150) var(--space-150) var(--size-1400)' }}>
             <DropdownMenu trigger={<Button text="Actions" />} isOpen onOpenChange={noop}>
                 {basicMenu}
             </DropdownMenu>
@@ -279,7 +279,7 @@ export const HoveredState = {
 export const KeyboardFocus = {
     parameters: { docs: { disable: true } },
     render: () => (
-        <div style={{ padding: '24px' }}>
+        <div style={{ padding: 'var(--space-150)' }}>
             <DropdownMenu trigger={<Button text="Actions" />}>{basicMenu}</DropdownMenu>
         </div>
     ),

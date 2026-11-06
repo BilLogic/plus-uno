@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import StatusTag from '@/components/labels/StatusTag';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -198,7 +199,7 @@ export const TableHeaderRow = () => (
                 Date & time
             </span>
             <i
-                className="fa-solid fa-arrow-up"
+                className={iconClass('arrow-up')}
                 style={{
                     fontSize: 'var(--font-size-fa-body1-solid)',
                     color: 'var(--ds-icon)'
@@ -219,7 +220,7 @@ export const TableHeaderRow = () => (
                 School & teacher
             </span>
             <i
-                className="fa-solid fa-arrow-up"
+                className={iconClass('arrow-up')}
                 style={{
                     fontSize: 'var(--font-size-fa-body1-solid)',
                     color: 'var(--color-outline-variant)'

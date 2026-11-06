@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import './Object.scss';
+import { iconClass } from '../../../lib/icon';
 
 export const OBJECT_SIZES = [12, 16];
 
@@ -37,12 +38,12 @@ export function createObjectIcon(faClass, defaultLabel) {
     return ObjectIcon;
 }
 
-export const TaskIcon = createObjectIcon('fa-solid fa-list-check', 'Task');
-export const BugIcon = createObjectIcon('fa-solid fa-bug', 'Bug');
-export const IdeaIcon = createObjectIcon('fa-solid fa-lightbulb', 'Idea');
-export const PullRequestIcon = createObjectIcon('fa-solid fa-code-pull-request', 'Pull request');
-export const ProjectIcon = createObjectIcon('fa-solid fa-diagram-project', 'Project');
-export const PageIcon = createObjectIcon('fa-solid fa-file-lines', 'Page');
+export const TaskIcon = createObjectIcon(iconClass('list-check'), 'Task');
+export const BugIcon = createObjectIcon(iconClass('bug'), 'Bug');
+export const IdeaIcon = createObjectIcon(iconClass('lightbulb'), 'Idea');
+export const PullRequestIcon = createObjectIcon(iconClass('code-pull-request'), 'Pull request');
+export const ProjectIcon = createObjectIcon(iconClass('diagram-project'), 'Project');
+export const PageIcon = createObjectIcon(iconClass('file-lines'), 'Page');
 
 createObjectIcon.propTypes = {
     /** `12` or `16` (the default), in pixels. */

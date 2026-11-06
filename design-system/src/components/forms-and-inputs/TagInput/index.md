@@ -30,8 +30,8 @@ Notion's multi-select. Focusing the field opens a list of the options. Typing fi
 | `spacing` | enum | `'default'` | `default` draws a 40 field and `compact` a 32 one. |
 | `disabled` | bool | `false` | Disables every tag and the entry. |
 | `readOnly` | bool | `false` | Shows the tags with no × and no entry, on the read-only fill. |
-| `validation` | enum | `'none'` | — |
-| `validationMessage` | node | — | Shown under the field, and announced, while `validation` is `invalid`. |
+| `isInvalid` | bool | `false` | — |
+| `errorMessage` | node | — | Shown under the field, and announced, while `isInvalid` is set. |
 | `maxLength` | number | — | The longest a new value can be. |
 | `maxTags` | number | — | The most tags the field holds. At the limit, Create hides and the list says so. |
 | `onAdd` | func | — | `(tag)`: a tag was added, picked or created. |
@@ -48,8 +48,6 @@ Notion's multi-select. Focusing the field opens a list of the options. Typing fi
 ## Variants
 
 **`spacing`** — `default` · `compact`
-
-**`validation`** — `none` · `invalid`
 
 Anything not listed is not a valid value.
 

@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import VisuallyHidden from '@/components/layout-and-structure/VisuallyHidden';
 import './Link.scss';
+import { iconClass } from '../../../lib/icon';
 
 export const LINK_APPEARANCES = ['default', 'subtle', 'inverse'];
 
@@ -33,7 +34,7 @@ export const Link = ({
             {children}
             {isOpenInNewWindow && (
                 <>
-                    <i className="fa-solid fa-arrow-up-right-from-square plus-link-icon" aria-hidden="true" />
+                    <i className={`${iconClass('arrow-up-right-from-square')} plus-link-icon`} aria-hidden="true" />
                     <VisuallyHidden> (opens in a new tab)</VisuallyHidden>
                 </>
             )}

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { DropdownMenu, ButtonItem } from '@/components';
+import { iconClass } from '../../../../../lib/icon';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Supervisor Controls',
@@ -11,7 +12,7 @@ export default {
 
 const gearTrigger = (
     <button type="button" className="plus-btn plus-btn--default" aria-label="Session actions" style={{ border: 'none', background: 'none' }}>
-        <i className="fa-solid fa-gear" style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--ds-icon-subtle)' }} />
+        <i className={iconClass('gear')} style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--ds-icon-subtle)' }} />
     </button>
 );
 
@@ -20,19 +21,19 @@ const gearTrigger = (
  * Reusable rows for the supervisor actions menu. Cancel session is danger.
  */
 const supervisorMenuRows = ({ onJoin, onEdit, onRecruit, onCancel } = {}) => [
-    <ButtonItem key="join" onClick={onJoin} elemBefore={<i className="fa-solid fa-right-to-bracket" aria-hidden="true" />}>
+    <ButtonItem key="join" onClick={onJoin} elemBefore={<i className={iconClass('right-to-bracket')} aria-hidden="true" />}>
         Join session
     </ButtonItem>,
-    <ButtonItem key="edit" onClick={onEdit} elemBefore={<i className="fa-solid fa-pen-to-square" aria-hidden="true" />}>
+    <ButtonItem key="edit" onClick={onEdit} elemBefore={<i className={iconClass('pen-to-square')} aria-hidden="true" />}>
         Edit session
     </ButtonItem>,
-    <ButtonItem key="recruit" onClick={onRecruit} elemBefore={<i className="fa-solid fa-users" aria-hidden="true" />}>
+    <ButtonItem key="recruit" onClick={onRecruit} elemBefore={<i className={iconClass('users')} aria-hidden="true" />}>
         Recruit tutors
     </ButtonItem>,
     <ButtonItem
         key="cancel"
         onClick={onCancel}
-        elemBefore={<i className="fa-solid fa-trash" aria-hidden="true" style={{ color: 'var(--color-danger)' }} />}
+        elemBefore={<i className={iconClass('trash')} aria-hidden="true" style={{ color: 'var(--color-danger)' }} />}
     >
         <span style={{ color: 'var(--color-danger)' }}>Cancel session</span>
     </ButtonItem>,
@@ -89,7 +90,7 @@ const GearIconButton = ({ state = 'default' }) => {
             }}
         >
             <i
-                className="fa-solid fa-gear"
+                className={iconClass('gear')}
                 style={{
                     fontSize: 'var(--font-size-fa-h6-solid)',
                     color: 'var(--color-primary)'
@@ -183,7 +184,7 @@ export const Overview = () => (
                     padding: 'var(--pad-y-md) var(--pad-x-md)',
                     cursor: 'pointer'
                 }}>
-                    <i className="fa-solid fa-right-to-bracket" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--ds-icon-subtle)' }} />
+                    <i className={iconClass('right-to-bracket')} style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--ds-icon-subtle)' }} />
                     <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-icon)', flex: 1 }}>Join session</span>
                 </div>
                 
@@ -195,7 +196,7 @@ export const Overview = () => (
                     padding: 'var(--pad-y-md) var(--pad-x-md)',
                     cursor: 'pointer'
                 }}>
-                    <i className="fa-solid fa-pen-to-square" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--ds-icon-subtle)' }} />
+                    <i className={iconClass('pen-to-square')} style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--ds-icon-subtle)' }} />
                     <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-icon)', flex: 1 }}>Edit session</span>
                 </div>
                 
@@ -207,7 +208,7 @@ export const Overview = () => (
                     padding: 'var(--pad-y-md) var(--pad-x-md)',
                     cursor: 'pointer'
                 }}>
-                    <i className="fa-solid fa-users" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--ds-icon-subtle)' }} />
+                    <i className={iconClass('users')} style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--ds-icon-subtle)' }} />
                     <span className="body2-txt font-weight-light" style={{ color: 'var(--ds-icon)', flex: 1 }}>Recruit tutors</span>
                 </div>
                 
@@ -219,7 +220,7 @@ export const Overview = () => (
                     padding: 'var(--pad-y-md) var(--pad-x-md)',
                     cursor: 'pointer'
                 }}>
-                    <i className="fa-solid fa-trash" style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--color-danger)' }} />
+                    <i className={iconClass('trash')} style={{ fontSize: 'var(--font-size-fa-body2-solid)', color: 'var(--color-danger)' }} />
                     <span className="body2-txt font-weight-light" style={{ color: 'var(--color-danger)', flex: 1 }}>Cancel session</span>
                 </div>
             </div>

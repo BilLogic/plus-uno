@@ -9,7 +9,7 @@ A heading's text style, independent of the HTML tag it renders. The tag tracks t
 
 **Source:** `design-system/src/components/text-and-data-display/Heading/Heading.jsx`
 
-**Stories:** `design-system/src/components/text-and-data-display/Heading/Heading.stories.jsx` — Overview, Sizes, OverridesTheTag, NestedContext, InverseColor, Interactive
+**Stories:** `design-system/src/components/text-and-data-display/Heading/Heading.stories.jsx` — Overview, Sizes, OverridesTheTag, NestedContext, InverseColor, Interactive, Rest, Hovered, Pressed, NotAControl
 
 **Storybook page:** `design-system/src/components/text-and-data-display/Heading/Heading.mdx`
 

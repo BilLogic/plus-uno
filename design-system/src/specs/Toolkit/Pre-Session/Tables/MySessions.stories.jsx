@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Button from '@/components/forms-and-inputs/Button';
 import StatusTag from '@/components/labels/StatusTag';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -120,7 +121,7 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <StatusTag appearance={getStatusConfig(status).style} leadingVisual={<i className={`fa-solid fa-${getStatusConfig(status).icon}`} />}>{status}</StatusTag>
+                <StatusTag appearance={getStatusConfig(status).style} leadingVisual={<i className={iconClass(getStatusConfig(status).icon)} />}>{status}</StatusTag>
             </div>
 
             {/* Actions Cell - column 7 */}
@@ -168,7 +169,7 @@ export const TableHeaderRow = () => (
                 Date & time
             </span>
             <i
-                className="fa-solid fa-arrow-up"
+                className={iconClass('arrow-up')}
                 style={{
                     fontSize: 'var(--font-size-fa-body1-solid)',
                     color: 'var(--color-outline-variant)'
@@ -190,7 +191,7 @@ export const TableHeaderRow = () => (
                 School & teacher
             </span>
             <i
-                className="fa-solid fa-arrow-up"
+                className={iconClass('arrow-up')}
                 style={{
                     fontSize: 'var(--font-size-fa-body1-solid)',
                     color: 'var(--color-outline-variant)'

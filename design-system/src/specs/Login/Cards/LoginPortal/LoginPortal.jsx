@@ -14,6 +14,7 @@ import {
 } from '@/specs/Login/Elements';
 
 import './LoginPortal.scss';
+import { iconClass } from '../../../../lib/icon';
 
 export default function LoginPortal({
     type = 'official',
@@ -190,7 +191,7 @@ export default function LoginPortal({
                         placeholder="Add your institution name..."
                     />
                     <div className="login-field__caption body3-txt">
-                        <i className="fa-solid fa-circle-info" aria-hidden="true" />
+                        <i className={iconClass('circle-info')} aria-hidden="true" />
                         <span>
                             Are you a new tutor?{' '}
                             <button type="button" className="login-field__link">

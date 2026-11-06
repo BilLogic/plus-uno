@@ -22,7 +22,7 @@
 | `icon` | string or node | — | `icon` only: a Font Awesome Free name (`book-open`), a class list, or a node. |
 | `src` | string | — | `logo` or `image`: the picture's URL. |
 | `children` | node | — | `logo` or `image`: the picture as a node, in place of `src`. |
-| `hasBorder` | bool | `false` | Adds a 1px outline-variant border inside the tile. |
+| `hasBorder` | bool | `false` | Adds a 1px border inside the tile. |
 | `label` | string | — | Makes the tile an image with this name. Without it the tile is decorative and hidden. |
 | `className` | string | `''` | — |
 
@@ -40,7 +40,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--border-default` · `--color-advocacy` · `--color-advocacy-container` · `--color-mastering-content` · `--color-mastering-content-container` · `--color-on-advocacy` · `--color-on-advocacy-container` · `--color-on-mastering-content` · `--color-on-mastering-content-container` · `--color-on-relationship` · `--color-on-relationship-container` · `--color-on-social-emotional` · `--color-on-social-emotional-container` · `--color-on-technology-tools` · `--color-on-technology-tools-container` · `--color-on-tertiary` · `--color-on-tertiary-container` · `--color-outline-variant` · `--color-relationship` · `--color-relationship-container` · `--color-social-emotional` · `--color-social-emotional-container` · `--color-technology-tools` · `--color-technology-tools-container` · `--color-tertiary` · `--color-tertiary-container` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-surface` · `--font-size-fa-body1` · `--font-size-fa-body2` · `--font-size-fa-body3` · `--font-size-fa-h3` · `--font-size-fa-h4` · `--font-size-fa-h5` · `--radius-sm` · `--size-media-lg` · `--size-media-md` · `--size-media-sm` · `--size-media-xl` · `--size-media-xs` · `--size-media-xxs` · `--tile-inner` · `--tile-radius` · `--tile-radius-lg` · `--tile-size`
+`--border-default` · `--ds-background-accent-blue-bolder` · `--ds-background-accent-blue-subtler` · `--ds-background-accent-green-bolder` · `--ds-background-accent-green-subtler` · `--ds-background-accent-magenta-bolder` · `--ds-background-accent-magenta-subtler` · `--ds-background-accent-purple-bolder` · `--ds-background-accent-purple-subtler` · `--ds-background-accent-teal-bolder` · `--ds-background-accent-teal-subtler` · `--ds-background-accent-yellow-bolder` · `--ds-background-accent-yellow-subtler` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-border` · `--ds-icon-accent-blue` · `--ds-icon-accent-green` · `--ds-icon-accent-magenta` · `--ds-icon-accent-purple` · `--ds-icon-accent-teal` · `--ds-icon-accent-yellow` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-surface` · `--font-size-fa-body1` · `--font-size-fa-body2` · `--font-size-fa-body3` · `--font-size-fa-h3` · `--font-size-fa-h4` · `--font-size-fa-h5` · `--radius-sm` · `--size-media-lg` · `--size-media-md` · `--size-media-sm` · `--size-media-xl` · `--size-media-xs` · `--size-media-xxs` · `--tile-inner` · `--tile-radius` · `--tile-radius-lg` · `--tile-size`
 
 From `design-system/src/components/images-and-icons/Tile/Tile.scss`. Override these through the token layer, never with a literal.
 

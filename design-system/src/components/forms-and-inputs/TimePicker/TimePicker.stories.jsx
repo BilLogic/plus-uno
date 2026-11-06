@@ -53,13 +53,13 @@ export default {
 };
 
 export const Overview = () => (
-    <div style={{ maxWidth: '200px' }}>
+    <div style={{ maxWidth: 'var(--size-1400)' }}>
         <TimePicker placeholder="__ : __" aria-label="Time" />
     </div>
 );
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '200px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-1400)' }}>
         <div>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT (40)</span>
             <TimePicker spacing="default" aria-label="Time" placeholder="Default" />
@@ -80,7 +80,7 @@ Spacing.play = async ({ canvasElement }) => {
 };
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', gap: 'var(--space-150)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
             <TimePicker aria-label="Time" placeholder="Default" />
@@ -115,19 +115,19 @@ export const PickTime = () => {
     const [value, setValue] = useState('');
 
     return (
-        <div style={{ maxWidth: '200px' }}>
-            <h6 style={{ marginBottom: '16px' }}>Set a Time</h6>
+        <div style={{ maxWidth: 'var(--size-1400)' }}>
+            <h6 style={{ marginBottom: 'var(--space-100)' }}>Set a Time</h6>
             <TimePicker aria-label="Time" value={value} onChange={setValue} />
             {value && (
                 <div
                     style={{
-                        marginTop: '16px',
-                        padding: '12px',
+                        marginTop: 'var(--space-100)',
+                        padding: 'var(--space-075)',
                         backgroundColor: 'var(--ds-surface-container)',
-                        borderRadius: '4px',
+                        borderRadius: 'var(--radius-025)',
                     }}
                 >
-                    <p style={{ margin: 0, fontSize: '14px' }}>
+                    <p style={{ margin: 0, fontSize: 'var(--font-size-0875)' }}>
                         <strong>Time:</strong> {value}
                     </p>
                 </div>
@@ -165,7 +165,7 @@ TwentyFourHourValueIsSplit.play = async ({ canvasElement }) => {
 };
 
 /** One story per state, for the Examples tab. */
-const wrap = { maxWidth: '200px' };
+const wrap = { maxWidth: 'var(--size-1400)' };
 const input = (canvasElement) => within(canvasElement).getByRole('textbox');
 const period = (canvasElement) => canvasElement.querySelector('.plus-time-picker__period-toggle');
 

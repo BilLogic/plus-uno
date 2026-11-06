@@ -1,7 +1,7 @@
 import React from 'react';
 import Modal from '@/components/messaging/Modal';
 import Select from '@/components/forms-and-inputs/Select';
-import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import { Label } from '@/storybook-docs/form-demos.jsx';
 import { SessionDateInput } from '@/specs/Toolkit/Pre-Session/Elements/NewFormDateInput.stories';
 import { SessionTimeInput } from '@/specs/Toolkit/Pre-Session/Elements/NewFormTimeInput.stories';
 import { Stepper } from '@/specs/Toolkit/Pre-Session/Elements/Steppers.stories';

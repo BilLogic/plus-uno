@@ -12,6 +12,7 @@ import * as InSessionModals from '../Modals/InSessionPopUpModal.stories';
 import { StartingZoomSession } from '../Modals/StartingZoomSession.stories';
 import { AddTutor, AddStudent } from '../Modals/AddModal.stories';
 import { RequestTutorOffCanvas } from '../Elements/RequestTutor/RequestTutorOffCanvas.jsx';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -338,7 +339,7 @@ const RegularTutorEmptyState = () => (
             }}
         >
             <i
-                className="fa-solid fa-user-clock"
+                className={iconClass('user-clock')}
                 style={{
                     fontSize: '128px',
                     lineHeight: 1.875,
@@ -462,7 +463,7 @@ const LeadSupervisorEmptyState = () => (
             }}
         >
             <i
-                className="fa-solid fa-user-gear"
+                className={iconClass('user-gear')}
                 style={{
                     fontSize: '128px',
                     lineHeight: 1.875,

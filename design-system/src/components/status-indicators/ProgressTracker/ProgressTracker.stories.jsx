@@ -1,5 +1,7 @@
 import React from 'react';
 import { expect, fireEvent, within } from 'storybook/test';
+import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
 import ProgressTracker, {
     PROGRESS_TRACKER_ORIENTATIONS,
@@ -50,7 +52,7 @@ Vertical.play = async ({ canvasElement }) => {
 };
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)' }}>
         <ProgressTracker items={ITEMS} spacing="comfortable" label="Progress tracker, comfortable" />
         <ProgressTracker items={ITEMS} spacing="cozy" label="Progress tracker, cozy" />
         <ProgressTracker items={ITEMS} spacing="compact" label="Progress tracker, compact" />
@@ -81,3 +83,45 @@ export const Completed = () => (
         ]}
     />
 );
+
+const itemOf = (canvasElement, name) => within(canvasElement).getByText(name).closest('.plus-progress-tracker__item');
+
+/** Rest: the current step is on the selected ground, a visited step carries the success check. */
+export const Rest = () => <ProgressTracker items={ITEMS} />;
+Rest.play = async ({ canvasElement }) => {
+    await expect(getComputedStyle(itemOf(canvasElement, 'Student reflection')).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+    await expect(canvasElement.querySelector('.plus-progress-tracker__icon--visited')).not.toBeNull();
+};
+
+/** Hovered: a step that can be opened takes the subtle hovered step. */
+export const Hovered = () => <ProgressTracker items={ITEMS} />;
+Hovered.play = async ({ canvasElement }) => {
+    await expectGroundUnder(canvasElement, itemOf(canvasElement, 'Session information'), ':hover', '--ds-background-neutral-subtle-hovered', 'visited step');
+};
+
+/** Pressed: the same step takes the subtle pressed step. */
+export const Pressed = () => <ProgressTracker items={ITEMS} />;
+Pressed.play = async ({ canvasElement }) => {
+    await expectGroundUnder(canvasElement, itemOf(canvasElement, 'Session information'), ':active', '--ds-background-neutral-subtle-pressed', 'visited step');
+};
+
+/** Focused: a step that can be opened shows the 2px ring, inset in the step. */
+export const Focused = () => <ProgressTracker items={ITEMS} />;
+Focused.play = async ({ canvasElement }) => {
+    const step = itemOf(canvasElement, 'Session information');
+    step.focus({ focusVisible: true });
+    await expect(step.matches(':focus-visible')).toBe(true);
+    const style = getComputedStyle(step);
+    await expect(style.outlineStyle).toBe('solid');
+    await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+    step.blur();
+};
+
+/** Disabled: the step takes the disabled ink, is no link or button and says so. */
+export const Disabled = () => <ProgressTracker items={ITEMS} />;
+Disabled.play = async ({ canvasElement }) => {
+    const step = itemOf(canvasElement, 'Form feedback');
+    await expect(step).toHaveAttribute('aria-disabled', 'true');
+    await expect(step.tagName).toBe('SPAN');
+    await expect(getComputedStyle(step).color).toBe(tokenColor(canvasElement, '--ds-text-disabled'));
+};

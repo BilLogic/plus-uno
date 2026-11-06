@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Button, IconButton, DropdownMenu, ButtonItem } from '@/components';
 import StatusTag from '@/components/labels/StatusTag';
 import './SessionControlsConsolidated.scss';
+import { iconClass } from '../../../../../lib/icon';
 
 /**
  * SessionControlsConsolidated
@@ -23,10 +24,10 @@ import './SessionControlsConsolidated.scss';
 /** Live session-info badges (tonal). Room count is lead-only. */
 const SessionInfoBadges = ({ studentCount, tutorCount, roomCount, showRoom }) => (
     <div className="plus-session-controls__badges">
-        <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-user-graduate" aria-hidden="true"></i>} className="fw-normal" title="Students marked present / listed on roster for this session">{studentCount}</StatusTag>
-        <StatusTag appearance="discovery" leadingVisual={<i className="fa-solid fa-chalkboard-user" aria-hidden="true"></i>} className="fw-normal" title="Tutors marked present / listed on roster for this session">{tutorCount}</StatusTag>
+        <StatusTag appearance="info" leadingVisual={<i className={iconClass('user-graduate')} aria-hidden="true"></i>} className="fw-normal" title="Students marked present / listed on roster for this session">{studentCount}</StatusTag>
+        <StatusTag appearance="discovery" leadingVisual={<i className={iconClass('chalkboard-user')} aria-hidden="true"></i>} className="fw-normal" title="Tutors marked present / listed on roster for this session">{tutorCount}</StatusTag>
         {showRoom && (
-            <StatusTag appearance="neutral" leadingVisual={<i className="fa-solid fa-door-open" aria-hidden="true"></i>} className="fw-normal" title={roomCount === '—'
+            <StatusTag appearance="neutral" leadingVisual={<i className={iconClass('door-open')} aria-hidden="true"></i>} className="fw-normal" title={roomCount === '—'
                     ? 'Assign students to tutors to size breakout rooms'
                     : 'Rooms to create in Zoom (includes each tutor\'s buffer)'}>{roomCount}</StatusTag>
         )}
@@ -57,7 +58,7 @@ const SessionControlsConsolidated = ({
         <ButtonItem
             key="copy"
             onClick={handleCopyAssignments}
-            elemBefore={<i className={`fa-solid fa-${copyState === 'copied' ? 'check' : 'copy'}`} aria-hidden="true" />}
+            elemBefore={<i className={iconClass(copyState === 'copied' ? 'check' : 'copy')} aria-hidden="true" />}
             data-keep-open={copyState === 'copied' ? 'true' : undefined}
         >
             {copyState === 'copied' ? 'Copied' : 'Copy assignments'}
@@ -84,10 +85,10 @@ const SessionControlsConsolidated = ({
                     id="session-overflow"
                     trigger={<IconButton spacing="compact" icon="ellipsis" label="More session actions" />}
                 >
-                    <ButtonItem onClick={onRequestTutors} elemBefore={<i className="fa-solid fa-user-plus" aria-hidden="true" />}>
+                    <ButtonItem onClick={onRequestTutors} elemBefore={<i className={iconClass('user-plus')} aria-hidden="true" />}>
                         Request tutors
                     </ButtonItem>
-                    <ButtonItem onClick={onViewSessionInfo} elemBefore={<i className="fa-solid fa-circle-info" aria-hidden="true" />}>
+                    <ButtonItem onClick={onViewSessionInfo} elemBefore={<i className={iconClass('circle-info')} aria-hidden="true" />}>
                         View session info
                     </ButtonItem>
                     {copyRow}
@@ -115,10 +116,10 @@ const SessionControlsConsolidated = ({
                     />
                 )}
             >
-                <ButtonItem onClick={onRequestLeadTutor} elemBefore={<i className="fa-solid fa-user-plus" aria-hidden="true" />}>
+                <ButtonItem onClick={onRequestLeadTutor} elemBefore={<i className={iconClass('user-plus')} aria-hidden="true" />}>
                     Request lead tutor
                 </ButtonItem>
-                <ButtonItem onClick={onViewSessionInfo} elemBefore={<i className="fa-solid fa-circle-info" aria-hidden="true" />}>
+                <ButtonItem onClick={onViewSessionInfo} elemBefore={<i className={iconClass('circle-info')} aria-hidden="true" />}>
                     View session info
                 </ButtonItem>
                 {copyRow}

@@ -9,6 +9,7 @@ import { AttendanceDropdown } from '../Elements/AttendanceDropdown';
 import { SessionInfoCard } from '../Cards/SessionInfoCard.stories';
 import { LeadBadge, CountBadge } from '../Elements/badges/TutorBadges';
 import { SessionAttendeeListItem } from '@/specs/Toolkit/Pre-Session/Elements/SessionAttendeeListItems/SessionAttendeeListItems.stories';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     title: 'Specs/Toolkit/In-Session/Modals/In-Session Pop-up Modal',
@@ -572,7 +573,7 @@ const AssignmentCard = ({ tutorName, studentCount, students }) => (
             >
                 {tutorName}
             </span>
-            <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-user-group" style={{ fontSize: 'var(--font-size-fa-body3-solid)', color: 'var(--color-secondary-text)' }} />}>{String(studentCount)}</StatusTag>
+            <StatusTag appearance="info" leadingVisual={<i className={iconClass('user-group')} style={{ fontSize: 'var(--font-size-fa-body3-solid)', color: 'var(--color-secondary-text)' }} />}>{String(studentCount)}</StatusTag>
         </div>
         {/* Student List */}
         {students.map((name) => (
@@ -806,29 +807,29 @@ export const SessionInfoLoadedLead = () => (
                             content="1:30 PM – 2:20 PM (Thursday)"
                         />
                         <SessionInfoCard
-                            icon="fa-solid fa-graduation-cap"
+                            icon={iconClass('graduation-cap')}
                             title="Teacher"
                             content="Mr. Snape"
                         />
                         <SessionInfoCard
-                            icon="fa-solid fa-person"
+                            icon={iconClass('person')}
                             title="Tutor Count"
                             content="5/5 (Leads: 1/1)"
                         />
                         <SessionInfoCard
-                            icon="fa-solid fa-graduation-cap"
+                            icon={iconClass('graduation-cap')}
                             title="Student Count"
                             content="25"
                         />
                         <SessionInfoCard
-                            icon="fa-solid fa-video"
+                            icon={iconClass('video')}
                             title="Session Link"
                             content="{zoom url}"
                             contentLink="#"
                             showCopyButton={true}
                         />
                         <SessionInfoCard
-                            icon="fa-solid fa-key"
+                            icon={iconClass('key')}
                             title="Session Passcode"
                             content="123 456 789"
                             showCopyButton={true}
@@ -908,29 +909,29 @@ export const SessionInfoLoadedRegular = () => (
                             content="1:30 PM – 2:20 PM (Thursday)"
                         />
                         <SessionInfoCard
-                            icon="fa-solid fa-graduation-cap"
+                            icon={iconClass('graduation-cap')}
                             title="Teacher"
                             content="Mr. Snape"
                         />
                         <SessionInfoCard
-                            icon="fa-solid fa-person"
+                            icon={iconClass('person')}
                             title="Tutor Count"
                             content="5/5 (Leads: 1/1)"
                         />
                         <SessionInfoCard
-                            icon="fa-solid fa-graduation-cap"
+                            icon={iconClass('graduation-cap')}
                             title="Student Count"
                             content="25"
                         />
                         <SessionInfoCard
-                            icon="fa-solid fa-video"
+                            icon={iconClass('video')}
                             title="Session Link"
                             content="{zoom url}"
                             contentLink="#"
                             showCopyButton={true}
                         />
                         <SessionInfoCard
-                            icon="fa-solid fa-key"
+                            icon={iconClass('key')}
                             title="Session Passcode"
                             content="123 456 789"
                             showCopyButton={true}
@@ -968,7 +969,7 @@ const RosterHeader = ({ title, count, showInfo = false }) => (
         </span>
         {showInfo && (
             <i
-                className="fa-solid fa-circle-info"
+                className={iconClass('circle-info')}
                 style={{
                     fontSize: 'var(--font-size-fa-body3-solid)',
                     lineHeight: 'var(--font-line-height-fa-body3-solid)',

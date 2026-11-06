@@ -76,11 +76,11 @@ its size.
 
 ## Icon colors
 
-<DocsCanvasShell description={<>Subtle is the color's container with its on-container icon. Gray is surface-container-high with on-surface-variant.</>}>
+<DocsCanvasShell description={<>Subtle is the color's subtler accent ground with its accent icon. Gray is the neutral ground with the subtle icon.</>}>
     <DsCanvasQuiet of={TileStories.IconSubtle} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Bold is the solid color with its on-color icon. Gray bold is the inverse surface.</>}>
+<DocsCanvasShell description={<>Bold is the bolder accent ground with the inverse icon. Gray bold is the bold neutral fill.</>}>
     <DsCanvasQuiet of={TileStories.IconBold} />
 </DocsCanvasShell>
 
@@ -90,7 +90,7 @@ its size.
 
 ## Logos
 
-<DocsCanvasShell description={<>A logo is inset like an icon and keeps its own colors. It sits on white by default, or on gray or a color's container when it needs contrast.</>}>
+<DocsCanvasShell description={<>A logo is inset like an icon and keeps its own colors. It sits on white by default, or on gray or a color's subtler accent background when it needs contrast.</>}>
     <DsCanvasQuiet of={TileStories.Logos} />
 </DocsCanvasShell>
 
@@ -110,7 +110,7 @@ its size.
 
 ## Border
 
-<DocsCanvasShell description={<><code>hasBorder</code> adds a 1px outline-variant edge inside the tile, for a logo or image whose own edge fades into the page.</>}>
+<DocsCanvasShell description={<><code>hasBorder</code> adds a 1px border edge inside the tile, for a logo or image whose own edge fades into the page.</>}>
     <DsCanvasQuiet of={TileStories.WithBorder} />
 </DocsCanvasShell>
 
@@ -195,10 +195,10 @@ Use an icon on its own when it sits inline with text and needs no frame. Use
 <tr><td>Square</td><td><code>--size-media-xxs</code> to <code>--size-media-xl</code> for 16 to 48.</td></tr>
 <tr><td>Icon size</td><td><code>--font-size-fa-body3</code> to <code>--font-size-fa-h3</code>, by step.</td></tr>
 <tr><td>Radius</td><td>A quarter of the square; <code>--tile-radius-lg</code> at 40. Logo inset <code>--radius-sm</code>.</td></tr>
-<tr><td>Icon ground and glyph, subtle</td><td>Per color: a container role and its on-container role; gray uses <code>--ds-background-neutral</code> and <code>--ds-icon-subtle</code>.</td></tr>
-<tr><td>Icon ground and glyph, bold</td><td>Per color: the role and its on-role; gray uses <code>--ds-background-neutral-bold</code> and <code>--ds-icon-inverse</code>.</td></tr>
-<tr><td>Logo ground</td><td>The color's container role; white is <code>--ds-surface</code>.</td></tr>
-<tr><td>Border</td><td><code>--border-default</code> in <code>--color-outline-variant</code>.</td></tr>
+<tr><td>Icon ground and glyph, subtle</td><td>Per color: the subtler accent background and the accent icon of that color; gray uses <code>--ds-background-neutral</code> and <code>--ds-icon-subtle</code>.</td></tr>
+<tr><td>Icon ground and glyph, bold</td><td>Per color: the bolder accent background and <code>--ds-icon-inverse</code>; gray uses <code>--ds-background-neutral-bold</code> and <code>--ds-icon-inverse</code>.</td></tr>
+<tr><td>Logo ground</td><td>The color's subtler accent background; white is <code>--ds-surface</code>.</td></tr>
+<tr><td>Border</td><td><code>--border-default</code> in <code>--ds-border</code>.</td></tr>
 </tbody>
 </DocsTable>
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components';
 import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { iconClass } from '../lib/icon';
 
 export default {
     title: 'Foundations/Accessibility',
@@ -35,6 +36,21 @@ export const FocusRing = () => (
                 <Button text="Save changes" appearance="primary" className="sb-focus-by-fill" />
                 <style>{'.sb-focus-by-fill.btn { background-color: var(--ds-background-brand-bold-pressed); }'}</style>
             </span>
+        </Dont>
+    </DoDont>
+);
+
+/** Color alone is not a message. */
+export const StatusNotColorAlone = () => (
+    <DoDont>
+        <Do caption="Color, an icon and a word together. The status reads with no color vision.">
+            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text-danger)' }}>
+                <i className={iconClass('circle-exclamation')} aria-hidden="true" />
+                Payment failed
+            </span>
+        </Do>
+        <Dont caption="A red dot and no words. Users who cannot tell the colors apart get nothing.">
+            <span aria-hidden="true" style={{ display: 'inline-block', width: 'var(--icon-sm)', height: 'var(--icon-sm)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-danger-bold)' }} />
         </Dont>
     </DoDont>
 );

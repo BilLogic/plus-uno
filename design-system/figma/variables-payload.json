@@ -621,6 +621,20 @@
           }
         },
         {
+          "name": "Progress/indicator-dot-size-8",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--progress-indicator-dot-size-8)"
+          }
+        },
+        {
+          "name": "Progress/indicator-dot-size-12",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--progress-indicator-dot-size-12)"
+          }
+        },
+        {
           "name": "Checkbox/control-size",
           "resolvedType": "FLOAT",
           "codeSyntax": {

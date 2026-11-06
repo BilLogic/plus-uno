@@ -22,17 +22,11 @@
         $states: (
             hovered: (background-color: var(--ds-interaction-hovered)),
         ),
-        $ring: false,
         $hovered-selector: '&:hover, &--hover'
     );
 
     &--clickable {
         cursor: pointer;
-    }
-
-    &:focus-visible {
-        outline: calc(var(--border-default) * 2) solid var(--ds-border-focused);
-        outline-offset: var(--border-default);
     }
 
     &--disabled {
@@ -58,7 +52,7 @@
     height: var(--image-md);
     border-radius: var(--radius-full);
     background-color: var(--ds-background-brand-subtlest);
-    color: var(--color-primary-text);
+    color: var(--ds-text-brand);
     font: var(--body-default);
     line-height: 1;
 }
@@ -87,7 +81,7 @@
     padding: 0 var(--pad-x-sm);
     border-radius: var(--radius-full);
     background-color: var(--ds-background-danger-subtler);
-    color: var(--color-danger-text);
+    color: var(--ds-text-danger);
     font: var(--body-small);
 }
 

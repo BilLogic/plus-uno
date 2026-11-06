@@ -13,6 +13,7 @@ import { StatusSelect } from '@/specs/Toolkit/In-Session/Elements/StatusSelect';
 import StatusTag from '@/components/labels/StatusTag';
 import UserAvatar from '@/components/images-and-icons/UserAvatar/UserAvatar';
 import './TutorsStatusAndWarningsTable.scss';
+import { iconClass } from '../../../../../lib/icon';
 
 /**
  * A tutor's status, set from the table. "Check-In Needed" asks the admin to
@@ -82,7 +83,7 @@ const TutorsStatusAndWarningsTable = ({
             text: (
                 <div className="flex items-center gap-2">
                     <span className="body3-txt font-medium">Tutor Name</span>
-                    <i className="fa-solid fa-arrow-up text-xs" />
+                    <i className={`${iconClass('arrow-up')} text-xs`} />
                 </div>
             ),
             width: '200px',
@@ -92,7 +93,7 @@ const TutorsStatusAndWarningsTable = ({
             text: (
                 <div className="flex items-center gap-2">
                     <span className="body3-txt">Status</span>
-                    <i className="fa-solid fa-arrow-up text-xs opacity-20" />
+                    <i className={`${iconClass('arrow-up')} text-xs opacity-20`} />
                 </div>
             ),
             width: '180px',
@@ -102,7 +103,7 @@ const TutorsStatusAndWarningsTable = ({
             text: (
                 <div className="flex items-center justify-center gap-2 w-full">
                     <span className="body3-txt">Total Warnings</span>
-                    <i className="fa-solid fa-arrow-up text-xs opacity-20" />
+                    <i className={`${iconClass('arrow-up')} text-xs opacity-20`} />
                 </div>
             ),
             width: '140px',
@@ -112,7 +113,7 @@ const TutorsStatusAndWarningsTable = ({
             text: (
                 <div className="flex items-center justify-center gap-2 w-full">
                     <span className="body3-txt">Mic off</span>
-                    <i className="fa-solid fa-arrow-up text-xs opacity-20" />
+                    <i className={`${iconClass('arrow-up')} text-xs opacity-20`} />
                 </div>
             ),
             width: '100px',
@@ -122,7 +123,7 @@ const TutorsStatusAndWarningsTable = ({
             text: (
                 <div className="flex items-center justify-center gap-2 w-full">
                     <span className="body3-txt">Cam off</span>
-                    <i className="fa-solid fa-arrow-up text-xs opacity-20" />
+                    <i className={`${iconClass('arrow-up')} text-xs opacity-20`} />
                 </div>
             ),
             width: '100px',
@@ -132,7 +133,7 @@ const TutorsStatusAndWarningsTable = ({
             text: (
                 <div className="flex items-center justify-center gap-2 w-full">
                     <span className="body3-txt">Absence</span>
-                    <i className="fa-solid fa-arrow-up text-xs opacity-20" />
+                    <i className={`${iconClass('arrow-up')} text-xs opacity-20`} />
                 </div>
             ),
             width: '100px',
@@ -142,7 +143,7 @@ const TutorsStatusAndWarningsTable = ({
             text: (
                 <div className="flex items-center justify-center gap-2 w-full">
                     <span className="body3-txt">Late Call-off</span>
-                    <i className="fa-solid fa-arrow-up text-xs opacity-20" />
+                    <i className={`${iconClass('arrow-up')} text-xs opacity-20`} />
                 </div>
             ),
             width: '120px',

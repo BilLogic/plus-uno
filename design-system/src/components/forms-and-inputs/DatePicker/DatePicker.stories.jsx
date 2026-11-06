@@ -88,7 +88,7 @@ export default {
 };
 
 export const Overview = () => (
-    <div style={{ paddingBottom: '300px', maxWidth: '300px' }}>
+    <div style={{ paddingBottom: 'var(--size-1900)', maxWidth: 'var(--size-1900)' }}>
         <DatePicker placeholder="MM/DD/YYYY" />
     </div>
 );
@@ -99,7 +99,7 @@ Overview.parameters = {
 };
 
 export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '300px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', paddingBottom: 'var(--size-1900)' }}>
         <div>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT (40)</span>
             <DatePicker spacing="default" placeholder="Default" />
@@ -112,11 +112,11 @@ export const Spacing = () => (
 );
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', paddingBottom: '300px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', paddingBottom: 'var(--size-1900)' }}>
         <p className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
             Empty, with value, disabled, and read-only.
         </p>
-        <div style={{ display: 'flex', gap: '24px', alignItems: 'flex-start', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: 'var(--space-150)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <div>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
                 <DatePicker placeholder="Default" />
@@ -141,22 +141,22 @@ export const PickDate = () => {
     const [date, setDate] = useState('');
 
     return (
-        <div style={{ paddingBottom: '300px', maxWidth: '300px' }}>
-            <h6 style={{ marginBottom: '16px' }}>Select a Single Date</h6>
-            <p style={{ fontSize: '14px', color: 'var(--ds-text-subtle)', marginBottom: '16px' }}>
+        <div style={{ paddingBottom: 'var(--size-1900)', maxWidth: 'var(--size-1900)' }}>
+            <h6 style={{ marginBottom: 'var(--space-100)' }}>Select a Single Date</h6>
+            <p style={{ fontSize: 'var(--font-size-0875)', color: 'var(--ds-text-subtle)', marginBottom: 'var(--space-100)' }}>
                 Click on the input to open the calendar and select a date.
             </p>
             <DatePicker value={date} onChange={setDate} placeholder="Select a date" />
             {date && (
                 <div
                     style={{
-                        marginTop: '16px',
-                        padding: '12px',
+                        marginTop: 'var(--space-100)',
+                        padding: 'var(--space-075)',
                         backgroundColor: 'var(--ds-surface-container)',
-                        borderRadius: '4px',
+                        borderRadius: 'var(--radius-025)',
                     }}
                 >
-                    <p style={{ margin: 0, fontSize: '14px' }}>
+                    <p style={{ margin: 0, fontSize: 'var(--font-size-0875)' }}>
                         <strong>Selected:</strong> {date}
                     </p>
                 </div>
@@ -178,22 +178,22 @@ export const PickRange = () => {
     const [start, end] = range;
 
     return (
-        <div style={{ paddingBottom: '300px', maxWidth: '320px' }}>
-            <h6 style={{ marginBottom: '16px' }}>Select a Date Range</h6>
-            <p style={{ fontSize: '14px', color: 'var(--ds-text-subtle)', marginBottom: '16px' }}>
+        <div style={{ paddingBottom: 'var(--size-1900)', maxWidth: 'var(--size-2000)' }}>
+            <h6 style={{ marginBottom: 'var(--space-100)' }}>Select a Date Range</h6>
+            <p style={{ fontSize: 'var(--font-size-0875)', color: 'var(--ds-text-subtle)', marginBottom: 'var(--space-100)' }}>
                 Click a first day, then a last day. The days between are marked.
             </p>
             <DatePicker range value={range} onChange={setRange} />
             {(start || end) && (
                 <div
                     style={{
-                        marginTop: '16px',
-                        padding: '12px',
+                        marginTop: 'var(--space-100)',
+                        padding: 'var(--space-075)',
                         backgroundColor: 'var(--ds-surface-container)',
-                        borderRadius: '4px',
+                        borderRadius: 'var(--radius-025)',
                     }}
                 >
-                    <p style={{ margin: 0, fontSize: '14px' }}>
+                    <p style={{ margin: 0, fontSize: 'var(--font-size-0875)' }}>
                         <strong>Range:</strong> {start || '(not set)'} → {end || '(not set)'}
                     </p>
                 </div>
@@ -214,7 +214,7 @@ export const Bounds = () => {
     const [date, setDate] = useState('');
 
     return (
-        <div style={{ paddingBottom: '300px', maxWidth: '300px' }}>
+        <div style={{ paddingBottom: 'var(--size-1900)', maxWidth: 'var(--size-1900)' }}>
             <DatePicker
                 value={date}
                 onChange={setDate}
@@ -238,7 +238,7 @@ export const Interactive = (args) => {
     const [date, setDate] = useState('');
 
     return (
-        <div style={{ paddingBottom: '300px' }}>
+        <div style={{ paddingBottom: 'var(--size-1900)' }}>
             <p>Selected Date: {date || 'None'}</p>
             <DatePicker {...args} value={date} onChange={setDate} />
         </div>
@@ -286,7 +286,7 @@ CalendarColors.play = async ({ canvasElement }) => {
 };
 
 /** One story per state, for the Examples tab. */
-const wrap = { maxWidth: '300px' };
+const wrap = { maxWidth: 'var(--size-1900)' };
 const field = (canvasElement) => within(canvasElement).getByRole('combobox');
 
 export const Default = {

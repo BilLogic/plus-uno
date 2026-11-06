@@ -1,0 +1,138 @@
+// Docs-only window chrome for Storybook. Color tokens and the x16
+// primitives only; the traffic lights are the one macOS-fixed artwork, drawn
+// from the accent tokens. The outline is an outline, not a border, so the
+// page inside keeps its width and left edge.
+.plus-browser-frame {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    background: var(--ds-surface);
+    outline: var(--stroke-1) solid var(--ds-border);
+    outline-offset: calc(-1 * var(--stroke-1));
+    border-radius: var(--radius-075);
+    overflow: hidden;
+}
+
+// Type, icon and selection rules sit on the chrome alone, so the framed page inherits nothing.
+.plus-browser-frame__chrome {
+    color: var(--ds-text);
+    font: var(--body-small);
+    user-select: none;
+
+    i {
+        width: var(--icon-sm);
+        text-align: center;
+        font-size: var(--icon-sm);
+        color: var(--ds-icon-subtle);
+    }
+}
+
+.plus-browser-frame__page {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.plus-browser-frame__lights {
+    display: flex;
+    gap: var(--space-050);
+    padding-inline: var(--space-0125) var(--space-025);
+
+    b {
+        width: var(--space-075);
+        height: var(--space-075);
+        border-radius: var(--radius-full);
+        background: var(--ds-background-accent-red-bolder);
+    }
+    b:nth-child(2) { background: var(--ds-background-accent-yellow-bolder); }
+    b:nth-child(3) { background: var(--ds-background-accent-green-bolder); }
+}
+
+.plus-browser-frame__tabs {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-075);
+    height: var(--size-250);
+    padding-inline: var(--space-075);
+    background: var(--ds-surface-sunken);
+
+    .plus-browser-frame__lights,
+    > i { align-self: center; }
+}
+
+.plus-browser-frame__tab {
+    display: flex;
+    align-items: center;
+    gap: var(--space-050);
+    width: var(--size-1500);
+    height: var(--size-200);
+    padding-inline: var(--space-075);
+    background: var(--ds-surface);
+    border-radius: var(--radius-050) var(--radius-050) 0 0;
+}
+
+.plus-browser-frame__tab-title {
+    flex: 1;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.plus-browser-frame__favicon {
+    flex: none;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    border-radius: var(--radius-025);
+    background: var(--ds-background-brand-bold);
+}
+
+.plus-browser-frame__toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-075);
+    height: var(--size-250);
+    padding-inline: var(--space-075);
+    background: var(--ds-surface);
+    border-bottom: var(--stroke-1) solid var(--ds-border);
+}
+
+.plus-browser-frame__toolbar--safari {
+    gap: var(--space-100);
+    height: var(--size-300);
+    padding-inline: var(--space-100);
+    background: var(--ds-surface-sunken);
+}
+
+.plus-browser-frame__omnibox {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: var(--space-050);
+    height: var(--size-200);
+    padding-inline: var(--space-100);
+    border-radius: var(--radius-full);
+    background: var(--ds-background-input);
+    font: var(--body-default);
+
+    em {
+        font-style: normal;
+        color: var(--ds-text-subtle);
+    }
+}
+
+.plus-browser-frame__field {
+    flex: 0 1 var(--size-3000);
+    margin-inline: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-050);
+    height: var(--size-200);
+    border-radius: var(--radius-050);
+    background: var(--ds-background-neutral);
+    font: var(--body-default);
+}
+
+.plus-browser-frame__tools {
+    display: flex;
+    gap: var(--space-100);
+}

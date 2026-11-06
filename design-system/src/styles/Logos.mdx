@@ -10,6 +10,9 @@ import {
 } from '@/storybook-docs/foundation-page.jsx';
 
 import { Logo } from '@/components';
+import { LOGO_SIZES } from '@/assets/Logo/Logo';
+import LogoConstruction from '@/assets/Logo/LogoConstruction';
+import LogoClearSpace from '@/assets/Logo/LogoClearSpace';
 
 export const Mark = ({ color = 'colored', size = 64, wordmark = false }) => <Logo appearance={color} size={size} wordmark={wordmark} />;
 
@@ -74,8 +77,23 @@ The Logo comes in fixed sizes and the logomark has a pre-defined shape. Do not a
 
 <FoundationExample>
 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--section-stack-lg)' }}>
-    {[16, 20, 24, 32, 48, 64, 96].map((s) => <Mark key={s} size={s} />)}
+    {LOGO_SIZES.map((s) => (
+        <figure key={s} style={{ margin: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'var(--stack-sm)' }}>
+            <Mark size={s} />
+            <figcaption style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{s}</figcaption>
+        </figure>
+    ))}
 </div>
+</FoundationExample>
+
+</FoundationSection>
+
+<FoundationSection title="Construction">
+
+The logomark is drawn on a 12 by 12 unit square, where 1 unit is 8 of the 96 drawing coordinates. Two circles of 6 and 4.5 units share its center, two corner circles of 2 units sit at the top right and bottom left, and the plus is 3 units across, centered 8.5 units from the left and 3.5 from the top. Use the Logo component; the drawing explains the shape and is not a template to redraw from.
+
+<FoundationExample>
+<LogoConstruction />
 </FoundationExample>
 
 </FoundationSection>
@@ -85,10 +103,12 @@ The Logo comes in fixed sizes and the logomark has a pre-defined shape. Do not a
 Logos come in six color options to suit different grounds. Choose by the ground the logo sits on.
 
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
-    <Ground token="--ds-surface" caption="Colored on a light surface."><Mark color="colored" size={64} wordmark /></Ground>
+    <Ground token="--ds-surface" caption="Colored, on a light surface."><Mark color="colored" size={64} wordmark /></Ground>
     <Ground token="--ds-background-neutral-bold" caption="Colored dark, with stronger glows, on a dark ground."><Mark color="colored-dark" size={64} wordmark /></Ground>
-    <Ground token="--ds-background-neutral-bold" caption="Filled on a bold or dark ground."><Mark color="filled" size={64} wordmark /></Ground>
-    <Ground token="--ds-background-accent-blue-bolder" caption="Outlined on a photo or busy ground."><Mark color="outlined-reversed" size={64} wordmark /></Ground>
+    <Ground token="--ds-surface" caption="Filled, on a light ground."><Mark color="filled" size={64} wordmark /></Ground>
+    <Ground token="--ds-background-neutral-bold" caption="Dark, on a dark ground."><Mark color="dark" size={64} wordmark /></Ground>
+    <Ground token="--ds-surface" caption="Outlined, on a light ground."><Mark color="outlined" size={64} wordmark /></Ground>
+    <Ground token="--ds-background-accent-blue-bolder" caption="Outlined reversed, on a photo or busy ground."><Mark color="outlined-reversed" size={64} wordmark /></Ground>
 </div>
 
 <RefTable
@@ -96,8 +116,8 @@ Logos come in six color options to suit different grounds. Choose by the ground 
     rows={[
         ['Colored', 'Light and dark surfaces', 'The default. The brand artwork on a white ground; in the dark color mode each glow moves one step up its ramp.'],
         ['Colored dark', 'Dark surfaces', 'The stronger glows, drawn whatever the color mode.'],
-        ['Filled', 'Any ground', 'A solid teal tile with a white plus, for where the glow cannot sit.'],
-        ['Dark', 'Any ground', 'A solid deep teal tile with a white plus.'],
+        ['Filled', 'Light grounds', 'A solid teal tile with a white plus and a dark wordmark, for where the glow cannot sit.'],
+        ['Dark', 'Dark grounds', 'A solid deep teal tile with a white plus and a light wordmark.'],
         ['Outlined', 'Light grounds', 'A dark outline mark, where a solid block would compete with the content.'],
         ['Outlined reversed', 'Photos or dark grounds', 'A light outline mark, where a solid block would hide or compete with the image.'],
     ]}
@@ -116,6 +136,10 @@ Surround the logo with clear space free of type, graphics and other elements tha
         ['Minimum size', '24 (lockup)', 'The wordmark needs a 24 logomark; below that the logo is the logomark alone, down to 16. Never scale an instance by hand.'],
     ]}
 />
+
+<FoundationExample caption="Clear space is half the logomark's height on every side of the lockup.">
+<LogoClearSpace />
+</FoundationExample>
 
 Every PLUS logo has the logomark, so clearance is measured from the logomark. Align a logo to its neighbors by the logomark's edge and center it on the same line as the text beside it.
 

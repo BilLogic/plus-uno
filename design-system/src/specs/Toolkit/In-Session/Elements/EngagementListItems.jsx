@@ -1,4 +1,5 @@
 import React from 'react';
+import { iconClass } from '../../../../lib/icon';
 
 /**
  * Engagement List Items Component
@@ -15,7 +16,7 @@ const partiallyEngagedReasons = [
     { id: 'joined-late', label: 'Joined late (10+ min)', icon: null },
     { id: 'unresponsive', label: 'Unresponsive on zoom', icon: null },
     { id: 'left-early', label: 'Left zoom early', icon: null },
-    { id: 'other', label: 'Other', icon: 'fa-solid fa-circle-info', tooltip: 'If none apply, select "Other" and message your supervisor on Slack.' }
+    { id: 'other', label: 'Other', icon: iconClass('circle-info'), tooltip: 'If none apply, select "Other" and message your supervisor on Slack.' }
 ];
 
 export const EngagementListItems = ({ 
@@ -93,7 +94,7 @@ export const EngagementSubmenuItems = ({
                     >
                         {selectedReason === reason.id && (
                             <i 
-                                className="fa-solid fa-check" 
+                                className={iconClass('check')} 
                                 style={{ 
                                     fontSize: '8px', 
                                     color: 'var(--color-on-primary)',

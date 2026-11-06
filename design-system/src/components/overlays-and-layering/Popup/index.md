@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/overlays-and-layering/Popup/Popup.jsx`
 
-**Stories:** `design-system/src/components/overlays-and-layering/Popup/Popup.stories.jsx` — Layout, Content, InteractionStates, Overview, Interactive
+**Stories:** `design-system/src/components/overlays-and-layering/Popup/Popup.stories.jsx` — Layout, Content, InteractionStates, Overview, Interactive, Rest, Hovered, Pressed, Focused, Open
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Popup/Popup.mdx`
 

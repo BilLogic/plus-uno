@@ -7,6 +7,7 @@ import { popupLayerOf, useAnchoredPopup } from '../_internal/anchorPlacement';
 import { formatDisplay, formatIso, outOfBounds, parseDate, parseTyped } from '../_internal/dates';
 import '../_internal/Listbox.scss';
 import './DatePicker.scss';
+import { iconClass } from '../../../lib/icon';
 
 /** Joins a range's two ends in the field: "10/19/2026 – 10/23/2026". */
 const RANGE_JOIN = ' – ';
@@ -214,7 +215,7 @@ const DatePicker = ({
                             if (open) setOpen(false); else openCalendar();
                         }}
                     >
-                        <i className="fa-solid fa-calendar-day" />
+                        <i className={iconClass('calendar-day')} />
                     </span>
                 )}
             >

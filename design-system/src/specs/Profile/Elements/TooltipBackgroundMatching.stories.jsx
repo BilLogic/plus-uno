@@ -7,6 +7,7 @@
  */
 import React from 'react';
 import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';
+import { iconClass } from '../../../lib/icon';
 
 export default {
     title: 'Specs/Profile/Elements/Tooltip Background Matching',
@@ -34,7 +35,7 @@ const TooltipContent = () => (
 
 const TriggerIcon = () => (
     <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
-        <i className="fa-solid fa-circle-info" style={{ fontSize: '10px', color: 'var(--color-primary)' }} />
+        <i className={iconClass('circle-info')} style={{ fontSize: '10px', color: 'var(--color-primary)' }} />
     </span>
 );
 

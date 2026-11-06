@@ -1,6 +1,7 @@
 import React from 'react';
 import Modal from '@/components/messaging/Modal';
 import { CancelButton, ConfirmCancelButton } from '@/specs/Toolkit/Pre-Session/Elements/SupervisorManagementButtons.stories';
+import { iconClass } from '../../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -43,7 +44,7 @@ const UnsavedWarningModalBody = () => (
         >
             {/* Danger Icon */}
             <i
-                className="fa-solid fa-circle-exclamation"
+                className={iconClass('circle-exclamation')}
                 style={{
                     fontSize: 'var(--font-size-fa-huge-solid, 8rem)',
                     lineHeight: 1,

@@ -215,6 +215,8 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Calendar | `--layout-calendar-day-md` | `--calendar-day-md` |  |
 | Calendar | `--layout-calendar-day-lg` | `--calendar-day-lg` |  |
 | Calendar | `--layout-calendar-nav` | `--calendar-nav-size` |  |
+| Progress indicator | *(new)* | `--progress-indicator-dot-size-8` | ProgressIndicator size 8 |
+| Progress indicator | *(new)* | `--progress-indicator-dot-size-12` | ProgressIndicator size 12 |
 | Checkbox | `--layout-control-checkbox` | `--checkbox-control-size` |  |
 | Radio | `--layout-control-radio` | `--radio-control-size` |  |
 | Radio | *(new)* | `--radio-control-size-10` | RadioGroup size 10 |

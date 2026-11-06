@@ -2,6 +2,8 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 
 import Logo, { LOGO_SIZES, LOGO_APPEARANCES, LOCKUP_MIN_SIZE } from './Logo';
+import LogoClearSpace from './LogoClearSpace';
+import LogoConstruction, { CONSTRUCTION_RADII } from './LogoConstruction';
 
 /**
  * `Logo` — the PLUS mark and lockup.
@@ -152,5 +154,49 @@ export const LightAndDark = {
         await expect(glows('light-colored')).not.toBe('none');
         const darkLight = canvas.getByTestId('dark-colored').querySelector('.plus-logo__glows--light');
         await expect(getComputedStyle(darkLight).display).toBe('none');
+    },
+};
+
+/** The construction drawing, docs only: guides over the Logo at a large size. The Logo itself takes no extra props. */
+export const Construction = {
+    render: () => (
+        <Ground mode="light">
+            <LogoConstruction />
+        </Ground>
+    ),
+    play: async ({ canvasElement }) => {
+        const guides = canvasElement.querySelector('[data-testid="construction-guides"]');
+        const radii = [...guides.querySelectorAll('circle[r]:not(.plus-logo-construction__dot)')].map((c) => parseFloat(c.getAttribute('r')));
+        await expect(radii.sort((a, b) => a - b)).toEqual([
+            CONSTRUCTION_RADII.corner,
+            CONSTRUCTION_RADII.corner,
+            CONSTRUCTION_RADII.inner,
+            CONSTRUCTION_RADII.outer,
+        ]);
+        await expect(guides.querySelectorAll('.plus-logo-construction__dot').length).toBe(3);
+        // The Logo underneath is the ordinary 96 mark, unchanged.
+        const logo = within(canvasElement).getByTestId('construction-logo');
+        await expect(logo).toHaveClass('plus-logo--colored');
+        await expect(logo.querySelector('svg').getAttribute('viewBox')).toBe('0 0 96 96');
+        await expect(plusHeight(logo)).toBe(24);
+    },
+};
+
+/** The clear-space drawing, docs only: half the mark's height on every side of the lockup. */
+export const ClearSpace = {
+    render: () => (
+        <Ground mode="light">
+            <LogoClearSpace />
+        </Ground>
+    ),
+    play: async ({ canvasElement }) => {
+        const zone = canvasElement.querySelector('[data-testid="logo-clear-space"]');
+        const mark = within(canvasElement).getByTestId('clear-space-logo').querySelector('svg');
+        const z = zone.getBoundingClientRect();
+        const m = mark.getBoundingClientRect();
+        await expect(Math.abs(m.left - z.left - m.height / 2)).toBeLessThanOrEqual(2); // the zone's own 1px border
+        await expect(Math.abs(m.top - z.top - m.height / 2)).toBeLessThanOrEqual(2); // the zone's own 1px border
+        await expect(Math.abs(z.right - m.right - m.height / 2)).toBeLessThanOrEqual(2); // the zone's own 1px border
+        await expect(Math.abs(z.bottom - m.bottom - m.height / 2)).toBeLessThanOrEqual(2);
     },
 };

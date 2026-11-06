@@ -6,6 +6,7 @@
 import { createPageLayout } from '../Universal/Pages/PageLayout.js';
 import { createSection } from '@/components/_internal/Section/index.js';
 import { createTable } from '@/components/_internal/Table/index.js';
+import { iconClass } from '../../lib/icon';
 
 // Export Home Cards
 export * from './Cards';
@@ -65,7 +66,7 @@ const createButton = ({ btnText = 'Button', icon } = {}) => {
     button.className = 'btn';
     if (icon) {
         const glyph = document.createElement('i');
-        glyph.className = `fa-solid fa-${icon}`;
+        glyph.className = iconClass(icon);
         glyph.setAttribute('aria-hidden', 'true');
         button.appendChild(glyph);
     }

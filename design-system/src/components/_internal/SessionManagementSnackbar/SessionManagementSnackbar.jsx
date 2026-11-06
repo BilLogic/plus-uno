@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './SessionManagementSnackbar.scss';
+import { iconClass } from '../../../lib/icon';
 
 export const SessionManagementSnackbar = ({
     type = 'session created',
@@ -12,7 +13,7 @@ export const SessionManagementSnackbar = ({
     // Content configuration based on type
     const config = {
         'session created': {
-            icon: 'fa-circle-check', // Solid circle check
+            icon: 'circle-check',
             headerClass: 'plus-session-snackbar__header--created',
             title: 'Session created',
             body: (
@@ -22,19 +23,19 @@ export const SessionManagementSnackbar = ({
             )
         },
         'session updated': {
-            icon: 'fa-circle-info',
+            icon: 'circle-info',
             headerClass: 'plus-session-snackbar__header--updated',
             title: 'Session updated',
             body: 'Changes have been saved successfully.'
         },
         'session canceled': {
-            icon: 'fa-circle-exclamation',
+            icon: 'circle-exclamation',
             headerClass: 'plus-session-snackbar__header--canceled',
             title: 'Session canceled',
             body: 'The session has been removed.'
         },
         'sessions canceled': {
-            icon: 'fa-circle-exclamation',
+            icon: 'circle-exclamation',
             headerClass: 'plus-session-snackbar__header--canceled',
             title: 'Sessions canceled',
             body: 'The sessions have been removed.'
@@ -47,7 +48,7 @@ export const SessionManagementSnackbar = ({
         <div className={`plus-session-snackbar ${className}`} {...props}>
             <div className={`plus-session-snackbar__header ${currentConfig.headerClass}`}>
                 <div className="plus-session-snackbar__header-content">
-                    <i className={`fa-solid ${currentConfig.icon} plus-session-snackbar__icon`}></i>
+                    <i className={`${iconClass(currentConfig.icon)} plus-session-snackbar__icon`}></i>
                     <span className="plus-session-snackbar__title">{currentConfig.title}</span>
                 </div>
                 <div className="plus-session-snackbar__meta">

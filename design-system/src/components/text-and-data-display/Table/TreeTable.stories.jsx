@@ -1,5 +1,6 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { TableRow, TableCell, HeadCell } from '@/components/text-and-data-display/Table';
 
 /**
@@ -24,13 +25,11 @@ export default {
     }
 };
 
-const INDENT_PX = 20;
-
 const TreeCell = ({ depth, expandable, children }) => (
     <TableCell
         emphasis="title"
         leading={expandable ? <i className="fa-solid fa-chevron-down" aria-hidden="true" /> : null}
-        style={{ paddingLeft: `calc(var(--size-table-cell-pad-x, 12px) + ${depth * INDENT_PX}px)` }}
+        style={{ paddingLeft: `calc(var(--size-table-cell-pad-x) + ${depth} * var(--space-125))` }}
     >
         {children}
     </TableCell>
@@ -79,4 +78,40 @@ Overview.play = async ({ canvasElement }) => {
     await expect(leafPad, 'a depth-2 row indents further than depth-0').toBeGreaterThan(rootPad);
     await expect(root.querySelector('.fa-chevron-down')).not.toBeNull();
     await expect(leaf.querySelector('.fa-chevron-down')).toBeNull();
+};
+
+const treeRow = (canvasElement, name) => within(canvasElement).getByText(name).closest('tr');
+
+/** Rest: a row is clear, its title cell is semibold and the chevron sits in the leading slot. */
+export const Rest = {
+    render: () => <Overview />,
+    play: async ({ canvasElement }) => {
+        const row = treeRow(canvasElement, 'Algebra I');
+        await expect(getComputedStyle(row).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+        await expect(row.querySelector('.fa-chevron-down')).not.toBeNull();
+    },
+};
+
+/** Hovered: the tree table has no `hover` class, so a row under the pointer does not change. */
+export const Hovered = {
+    render: () => <Overview />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(treeRow(canvasElement, 'Linear equations'), ':hover', 'tree row');
+    },
+};
+
+/** Pressed: a row is not a control, so a press does not change it either. */
+export const Pressed = {
+    render: () => <Overview />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(treeRow(canvasElement, 'Linear equations'), ':active', 'tree row');
+    },
+};
+
+/** Focused: nothing in the tree table takes focus yet; the chevron is static. */
+export const Focused = {
+    render: () => <Overview />,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(treeRow(canvasElement, 'Algebra I'), 'tree row');
+    },
 };

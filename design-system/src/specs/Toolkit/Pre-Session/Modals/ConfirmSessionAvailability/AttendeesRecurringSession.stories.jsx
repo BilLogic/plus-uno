@@ -7,6 +7,7 @@ import CountTag from '@/components/labels/CountTag';
 import { AttendanceRosterRow } from '@/specs/Toolkit/Pre-Session/Elements/PopupModalAttendanceRoster.stories';
 import { AvailableButton, UnavailableButton } from '@/specs/Toolkit/Pre-Session/Elements/CTATutorsButton.stories';
 import { Recurring_Session } from '@/specs/Toolkit/Pre-Session/Cards/TutorViewSessionManagement.stories';
+import { iconClass } from '../../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -101,7 +102,7 @@ const AttendeesRecurringSessionModalBody = () => (
                         }}
                     >
                         <span className="h6 m-0">Tutor Roster</span>
-                        <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-users" />}>4</StatusTag>
+                        <StatusTag appearance="info" leadingVisual={<i className={iconClass('users')} />}>4</StatusTag>
                     </div>
 
                     {/* Panel Body */}
@@ -159,7 +160,7 @@ const AttendeesRecurringSessionModalBody = () => (
                         }}
                     >
                         <span className="h6 m-0">Student Roster</span>
-                        <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-users" />}>4</StatusTag>
+                        <StatusTag appearance="info" leadingVisual={<i className={iconClass('users')} />}>4</StatusTag>
                     </div>
 
                     {/* Panel Body */}

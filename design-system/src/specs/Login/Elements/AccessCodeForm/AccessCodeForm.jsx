@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import TextField from '@/components/forms-and-inputs/TextField/TextField';
 
 import '../shared/login-field.scss';
+import { iconClass } from '../../../../lib/icon';
 
 /**
  * Access-code field with label, helper caption, and optional validation state.
@@ -39,7 +40,7 @@ export function LoginAccessCodeField({
                 isLabelHidden
                 autoComplete="one-time-code"
                 placeholder="e.g., funny-walrus"
-                elemAfterInput={<i className="fa-solid fa-circle-info" aria-hidden="true" />}
+                elemAfterInput={<i className={iconClass('circle-info')} aria-hidden="true" />}
                 value={value}
                 isInvalid={validation === 'invalid'}
                 errorMessage={validationMessage}
@@ -48,7 +49,7 @@ export function LoginAccessCodeField({
 
             {caption && (
                 <div className="login-field__caption body3-txt">
-                    <i className="fa-solid fa-circle-info" aria-hidden="true" />
+                    <i className={iconClass('circle-info')} aria-hidden="true" />
                     <span>{caption}</span>
                 </div>
             )}

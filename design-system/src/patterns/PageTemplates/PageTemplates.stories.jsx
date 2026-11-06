@@ -6,6 +6,7 @@ import { PatternCard, PatternSection } from '@/patterns';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import BrowserFrame from '@/storybook-docs/chrome/BrowserFrame';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
 /**
@@ -142,6 +143,43 @@ export default {
 };
 
 /* ------------------------------------------------------------- templates */
+
+/**
+ * The docs browser frame leaves a template's geometry alone: the sidebar's
+ * left edge and the page's width match the same template with no chrome.
+ * Hidden from the sidebar.
+ */
+export const InBrowserFrame = {
+    parameters: { docs: { disable: true }, a11y: { test: 'off' } },
+    render: () => (
+        <div>
+            <div data-case="bare">{fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>)}</div>
+            {['chrome', 'safari'].map((browser) => (
+                <div key={browser} data-case={browser}>
+                    <BrowserFrame browser={browser}>
+                        {fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>)}
+                    </BrowserFrame>
+                </div>
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => withTestViewport(1280, 900, async () => {
+        const measure = (name) => {
+            const box = canvasElement.querySelector(`[data-case="${name}"]`);
+            const aside = box.querySelector('.plus-frame__sidebar');
+            return {
+                sidebarLeft: aside.getBoundingClientRect().left - box.getBoundingClientRect().left,
+                pageWidth: box.querySelector('.plus-frame__surface').getBoundingClientRect().width,
+            };
+        };
+        const bare = measure('bare');
+        for (const name of ['chrome', 'safari']) {
+            const framed = measure(name);
+            await expect(framed.sidebarLeft, `${name}: sidebar left edge`).toBeCloseTo(bare.sidebarLeft, 0);
+            await expect(framed.pageWidth, `${name}: page width`).toBeCloseTo(bare.pageWidth, 0);
+        }
+    }),
+};
 
 /** content=dashboard: a page header, metric cards that reflow, and a section. */
 export const Dashboard = {

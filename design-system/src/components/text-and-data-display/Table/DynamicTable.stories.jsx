@@ -2,6 +2,7 @@ import React from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
+import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import Table, { TableFooter, HeadCell } from '@/components/text-and-data-display/Table';
 
 /**
@@ -150,4 +151,58 @@ export const SortableHeadCells = {
             button.blur();
         });
     }
+};
+
+const sortButton = (canvasElement) => within(within(canvasElement).getByRole('columnheader', { name: /Student/ })).getByRole('button');
+
+/** Rest: a sortable head cell is clear, with its arrow hidden until the cell is hovered or focused. */
+export const Rest = {
+    render: () => <SortableHeads />,
+    play: async ({ canvasElement }) => {
+        const th = within(canvasElement).getByRole('columnheader', { name: /Student/ });
+        await expect(th).toHaveAttribute('aria-sort', 'none');
+        await expect(getComputedStyle(sortButton(canvasElement)).backgroundColor).toBe(
+            sortButton(canvasElement).matches(':hover') ? tokenColor(canvasElement, '--ds-background-neutral-subtle-hovered') : 'rgba(0, 0, 0, 0)',
+        );
+    },
+};
+
+/** Hovered: the head cell takes the subtle hovered step. */
+export const Hovered = {
+    render: () => <SortableHeads />,
+    play: async ({ canvasElement }) => {
+        await expectGroundUnder(canvasElement, sortButton(canvasElement), ':hover', '--ds-background-neutral-subtle-hovered', 'head cell');
+    },
+};
+
+/** Pressed: the head cell takes the subtle pressed step. */
+export const Pressed = {
+    render: () => <SortableHeads />,
+    play: async ({ canvasElement }) => {
+        await expectGroundUnder(canvasElement, sortButton(canvasElement), ':active', '--ds-background-neutral-subtle-pressed', 'head cell');
+    },
+};
+
+/** Focused: the sort button shows the 2px ring inset in the cell, and the arrow appears. */
+export const Focused = {
+    render: () => <SortableHeads />,
+    play: async ({ canvasElement }) => {
+        const button = sortButton(canvasElement);
+        button.focus({ focusVisible: true });
+        await expect(button.matches(':focus-visible')).toBe(true);
+        const style = getComputedStyle(button);
+        await expect(style.outlineStyle).toBe('solid');
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        await expect(getComputedStyle(button.querySelector('.plus-table-head-cell-sort')).opacity).toBe('1');
+        button.blur();
+    },
+};
+
+/** Disabled: the table has no disabled sort; a row can be disabled (see the Static table) and takes the disabled ink. */
+export const DisabledRow = {
+    args: { headers, rows: [['Jul 3', 'Priya Nair', '1.0 hrs', { content: '$32.00', align: 'number' }]], rowStates: ['disabled'] },
+    play: async ({ canvasElement }) => {
+        const row = within(canvasElement).getByText('Priya Nair').closest('tr');
+        await expect(row).toHaveAttribute('aria-disabled', 'true');
+    },
 };

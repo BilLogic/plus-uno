@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import { Fieldset, Checkbox, TextField, Select } from '@/components';
+import { iconClass } from '../../../../../lib/icon';
 
 /**
  * RequestTutorOffCanvas — the "Request tutor(s)" / "Request lead tutor" side sheet triggered
@@ -50,7 +51,7 @@ const NumberStepper = ({ value, min = 1, max = 5, onChange }) => {
                 cursor: disabled ? 'not-allowed' : 'pointer',
             }}
         >
-            <i className={`fa-solid fa-${icon}`} style={{ fontSize: 'var(--font-size-fa-body2-solid)' }} />
+            <i className={iconClass(icon)} style={{ fontSize: 'var(--font-size-fa-body2-solid)' }} />
         </button>
     );
     return (

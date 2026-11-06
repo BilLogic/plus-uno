@@ -89,7 +89,7 @@ button.plus-progress-tracker__item:focus-visible {
     flex-shrink: 0;
     width: var(--space-050);
     height: var(--space-050);
-    border-radius: 50%;
+    border-radius: var(--radius-full);
     border: var(--size-border-stroke-stroke-150) solid var(--ds-icon-subtle);
 }
 

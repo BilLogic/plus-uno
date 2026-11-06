@@ -5,6 +5,7 @@ import Button from '@/components/forms-and-inputs/Button';
 import Tooltip from '@/components/overlays-and-layering/Tooltip';
 import CertifiedTutorBadge from '@/specs/Home/Elements/CertifiedTutorBadge';
 import './BadgeCard.scss';
+import { iconClass } from '../../../../lib/icon';
 
 /**
  * BadgeCard — Home “My Badge” overview card (Figma Overview Card / Training Progress badge variants).
@@ -52,12 +53,12 @@ const BadgeCard = ({
                     {tooltipText ? (
                         <Tooltip text={tooltipText} placement="top">
                             <button type="button" className="plus-badge-card__info" aria-label="More information">
-                                <i className="fa-solid fa-circle-info" aria-hidden="true" />
+                                <i className={iconClass('circle-info')} aria-hidden="true" />
                             </button>
                         </Tooltip>
                     ) : (
                         <span className="plus-badge-card__info" aria-hidden="true">
-                            <i className="fa-solid fa-circle-info" />
+                            <i className={iconClass('circle-info')} />
                         </span>
                     )}
                 </div>

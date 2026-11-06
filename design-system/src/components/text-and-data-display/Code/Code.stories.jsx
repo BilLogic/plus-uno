@@ -2,7 +2,9 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import { px } from '@/storybook-docs/lib/style-probes.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+
 import Code from './Code';
 
 /**
@@ -98,3 +100,39 @@ export const Interactive = (args) => (
 );
 Interactive.args = { children: 'npm run dev' };
 Interactive.argTypes = { children: { control: 'text' } };
+
+const chipOf = (canvasElement) => within(canvasElement).getByText('getSession()');
+
+/** Rest: the neutral fill and the code ink. */
+export const Rest = {
+    render: () => <Overview />,
+    play: async ({ canvasElement }) => {
+        const chip = chipOf(canvasElement);
+        await expect(getComputedStyle(chip).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(getComputedStyle(chip).color).toBe(tokenColor(canvasElement, '--ds-text-code-default'));
+    },
+};
+
+/** Hovered: the chip is text, so a pointer over it changes nothing. */
+export const Hovered = {
+    render: () => <Overview />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(chipOf(canvasElement), ':hover', 'code chip');
+    },
+};
+
+/** Pressed: nothing changes under a press either. */
+export const Pressed = {
+    render: () => <Overview />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(chipOf(canvasElement), ':active', 'code chip');
+    },
+};
+
+/** Focused and disabled: the chip is not a control, so Tab skips it and it is never dimmed. */
+export const NotAControl = {
+    render: () => <Overview />,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(chipOf(canvasElement), 'code chip');
+    },
+};

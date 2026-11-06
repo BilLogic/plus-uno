@@ -1,4 +1,5 @@
 import React from 'react';
+import { iconClass } from '../../../../lib/icon';
 
 /**
  * Shared presentational helpers for the Pre-Session page mocks.
@@ -56,7 +57,7 @@ export const SectionTitle = ({ title, titleAs: Heading = 'h3' }) => (
             {title}
         </Heading>
         <i
-            className="fa-solid fa-circle-info"
+            className={iconClass('circle-info')}
             style={{
                 fontSize: 'var(--font-size-fa-h6-solid)',
                 color: 'var(--ds-icon-subtle)',

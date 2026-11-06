@@ -3,6 +3,7 @@ import { expect, within } from 'storybook/test';
 
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import VisuallyHidden from './VisuallyHidden';
+import { iconClass } from '../../../lib/icon';
 
 /**
  * `VisuallyHidden` -- text for assistive technology that is not drawn.
@@ -83,7 +84,7 @@ Overview.play = async ({ canvasElement }) => {
 
 export const NamesAControl = () => (
     <button type="button" className="btn btn-outline-secondary" style={{ width: 40, height: 40 }}>
-        <i className="fa-solid fa-trash" aria-hidden="true" />
+        <i className={iconClass('trash')} aria-hidden="true" />
         <VisuallyHidden>Delete session</VisuallyHidden>
     </button>
 );
@@ -117,7 +118,7 @@ export const HiddenColumnHeaders = () => (
             <tr>
                 <td><input type="checkbox" aria-label="Select Ada" /></td>
                 <td>Ada</td>
-                <td><i className="fa-solid fa-ellipsis" aria-hidden="true" /></td>
+                <td><i className={iconClass('ellipsis')} aria-hidden="true" /></td>
             </tr>
         </tbody>
     </table>

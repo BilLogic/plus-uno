@@ -9,7 +9,7 @@ A row of dots showing where you are along the steps of a journey. Unlike `Progre
 
 **Source:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.jsx`
 
-**Stories:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.stories.jsx` — Default, Interactive, Appearances, Sizes, Spacing
+**Stories:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.stories.jsx` — Default, Interactive, Appearances, Sizes, Spacing, Rest, Hovered, Pressed, Focused, Decorative, SizeTokens
 
 **Storybook page:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.mdx`
 
@@ -20,7 +20,7 @@ A row of dots showing where you are along the steps of a journey. Unlike `Progre
 | `values` | array (required) | — | — |
 | `selectedIndex` | number (required) | — | — |
 | `appearance` | enum | `'default'` | — |
-| `size` | number | `8` | — |
+| `size` | enum | `8` | — |
 | `spacing` | enum | `'comfortable'` | — |
 | `onSelect` | func | — | — |
 | `ariaControls` | string | — | — |
@@ -30,13 +30,15 @@ A row of dots showing where you are along the steps of a journey. Unlike `Progre
 
 **`appearance`** — `default` · `primary` · `help` · `inverted`
 
+**`size`** — `8` · `12`
+
 **`spacing`** — `comfortable` · `cozy` · `compact`
 
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--ds-background-brand-bold` · `--ds-background-discovery-bold` · `--ds-background-inverse-subtle` · `--ds-background-neutral-bold` · `--ds-border-focused` · `--ds-icon-inverse` · `--focus-ring-width` · `--inline-md` · `--inline-sm` · `--plus-progress-indicator-dot-size` · `--space-050` · `--stack-sm`
+`--ds-background-brand-bold` · `--ds-background-discovery-bold` · `--ds-background-inverse-subtle` · `--ds-background-inverse-subtle-hovered` · `--ds-background-inverse-subtle-pressed` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--focus-ring-width` · `--inline-md` · `--inline-sm` · `--motion-duration-short` · `--motion-easing-standard` · `--progress-indicator-dot-size-12` · `--progress-indicator-dot-size-8` · `--radius-full` · `--stack-sm`
 
 From `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.scss`. Override these through the token layer, never with a literal.
 

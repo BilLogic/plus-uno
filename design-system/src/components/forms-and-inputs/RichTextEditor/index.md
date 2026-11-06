@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.stories.jsx` — Overview, Interactive, BlockStyleMenu, Empty, Filled, Focused, ReadOnly, DisabledState, Compact, FullToolbar
+**Stories:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.stories.jsx` — Overview, Interactive, BlockStyleMenu, Empty, Filled, Focused, ReadOnly, DisabledState, Compact, FullToolbar, ToolbarButtonHovered, ToolbarButtonPressed
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.mdx`
 

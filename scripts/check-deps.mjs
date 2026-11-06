@@ -61,10 +61,6 @@ const ALLOWED = new Map([
  */
 const CDN_BASELINE = new Map([
   [
-    "fontawesome",
-    { versions: ["6.4.0", "7.2.0"], why: "6.4.0 on cdnjs in six prototype templates, 7.2.0 on jsdelivr in eleven files including index.html and both Storybook head files. FA7 renamed and re-categorized icons, so unifying means loading the six prototypes and looking at them — not a find-and-replace. Until then this is two icon fonts in one repo." },
-  ],
-  [
     "bootstrap",
     { versions: ["5.3.3"], why: "pinned 5.3.3 on the CDN across the prototype pages while package.json installs 5.3.8 for the app, so a prototype and a component can render the same markup differently. Closing it means deciding whether the prototypes should share the app's Bootstrap at all." },
   ],

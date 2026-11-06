@@ -24,6 +24,7 @@
     "generate:design-tokens": "node scripts/generate-design-tokens.mjs",
     "generate:legacy-color-list": "node scripts/generate-legacy-color-list.mjs",
     "generate:old-size-token-list": "node scripts/generate-old-size-token-list.mjs",
+    "generate:icon-regular-list": "node scripts/generate-icon-regular-list.mjs",
     "generate:brand-image": "node scripts/generate-brand-image.js",
     "generate:agent": "node scripts/generate-agent.js",
     "generate:agent-views": "node scripts/generate-cheat-sheet.js && node scripts/generate-knowledge-components.js",

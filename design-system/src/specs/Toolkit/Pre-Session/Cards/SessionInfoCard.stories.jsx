@@ -1,4 +1,5 @@
 import React from 'react';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Cards/Session Info Card',
@@ -122,7 +123,7 @@ export const SessionInfoCard = ({
  */
 export const Default = () => (
     <SessionInfoCard
-        icon="fa-solid fa-square-plus"
+        icon={iconClass('square-plus')}
         title="Title"
         content="Content"
         showCopyButton={true}
@@ -147,7 +148,7 @@ export const TimeExample = () => (
  */
 export const TeacherExample = () => (
     <SessionInfoCard
-        icon="fa-solid fa-graduation-cap"
+        icon={iconClass('graduation-cap')}
         title="Teacher"
         content="Mr. Snape"
     />
@@ -159,7 +160,7 @@ export const TeacherExample = () => (
  */
 export const SessionLinkExample = () => (
     <SessionInfoCard
-        icon="fa-solid fa-video"
+        icon={iconClass('video')}
         title="Session Link"
         content="Zoom"
         contentLink="https://zoom.us"
@@ -172,7 +173,7 @@ export const SessionLinkExample = () => (
  */
 export const PasscodeExample = () => (
     <SessionInfoCard
-        icon="fa-solid fa-key"
+        icon={iconClass('key')}
         title="Session Passcode"
         content="123 456 789"
         showCopyButton={true}

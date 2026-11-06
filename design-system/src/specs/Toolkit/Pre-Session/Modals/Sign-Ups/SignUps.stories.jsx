@@ -21,6 +21,7 @@ import {
 } from '@/specs/Toolkit/Pre-Session/Elements/CtaSignUpRelatedButtons';
 // Import modal table components
 import { SignInTableHeaderRowModal, SignInTableRowModal } from '@/specs/Toolkit/Pre-Session/Tables/SignInTable.stories';
+import { iconClass } from '../../../../../lib/icon';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Modals/Sign-Ups',
@@ -94,7 +95,7 @@ export const RecurringSession_PreSignUp = () => (
                 }}>
                     {/* Row 1 */}
                     <SessionInfoCard
-                        icon="fa-solid fa-circle-info"
+                        icon={iconClass('circle-info')}
                         title="Type"
                         content="Recurring (Thursdays)"
                     />
@@ -106,25 +107,25 @@ export const RecurringSession_PreSignUp = () => (
 
                     {/* Row 2 */}
                     <SessionInfoCard
-                        icon="fa-solid fa-person"
+                        icon={iconClass('person')}
                         title="Tutor Count"
                         content="5/5 (Leads: 1/1)"
                     />
                     <SessionInfoCard
-                        icon="fa-solid fa-graduation-cap"
+                        icon={iconClass('graduation-cap')}
                         title="Student Count"
                         content="25"
                     />
 
                     {/* Row 3 */}
                     <SessionInfoCard
-                        icon="fa-solid fa-video"
+                        icon={iconClass('video')}
                         title="Session Link"
                         content="Available after sign-up"
                         showCopyButton={true}
                     />
                     <SessionInfoCard
-                        icon="fa-solid fa-key"
+                        icon={iconClass('key')}
                         title="Session Passcode"
                         content="Available after sign-up"
                     />

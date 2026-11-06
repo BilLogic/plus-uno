@@ -55,6 +55,7 @@ import { University } from '../Elements/University.stories';
 import { GradYearDropdown } from '../Elements/GradYearDropdown.stories';
 import { MathLevel } from '../Elements/MathLevel.stories';
 import { LanguagePreferences } from '../Elements/LanguagePreferences.stories';
+import { iconClass } from '../../../lib/icon';
 
 export default {
     title: 'Specs/Profile/Sections/Background And Matching',
@@ -150,7 +151,7 @@ export const BackgroundAndMatchingSection = ({ changed = false }) => {
                             }}
                         >
                             <i
-                                className="fa-solid fa-circle-info"
+                                className={iconClass('circle-info')}
                                 style={{
                                     fontSize: '10px',
                                     color: 'var(--color-primary)',

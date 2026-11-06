@@ -5,6 +5,7 @@ import { Button, IconButton } from '@/components';
 import TextArea from '@/components/forms-and-inputs/TextArea/TextArea';
 import { ProductAreaDropdown } from '@/specs/Home/Elements/ProductAreaDropdown/ProductAreaDropdown';
 import './UserFeedbackModal.scss';
+import { iconClass } from '../../../../lib/icon';
 
 /** @typedef {'problem' | 'question' | 'feedback'} FeedbackType */
 
@@ -162,7 +163,7 @@ const UserFeedbackModal = ({
      * @returns {React.ReactElement}
      */
     const severityLeadingVisual = (iconName) => (
-        <i className={`fa-regular fa-${iconName}`} aria-hidden="true" />
+        <i className={iconClass(iconName)} aria-hidden="true" />
     );
 
     return (

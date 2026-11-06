@@ -93,12 +93,9 @@ test('the word Atlassian is zero allowed in MDX, in story doc strings and as a U
   assert.deepEqual(hit('design-system/src/components/B/B.stories.jsx', '// Atlassian\'s layers: scrim 500\n * Atlassian\'s raised pair\n'), [], 'a comment is not shipped');
 });
 
-test('the named decision records keep their Atlassian citations', () => {
-  const text = "const a = { why: 'Atlassian’s own answer' }; // https://atlassian.design/x\n";
-  assert.equal(run({ sources: [src('design-system/src/styles/Other.stories.jsx', text)] }).length, 1, 'a sibling story is not exempt');
-  for (const f of ['TypeScaleCandidates', 'ColorCandidates', 'AiIdentity']) {
-    assert.deepEqual(run({ sources: [src(`design-system/src/styles/${f}.stories.jsx`, text)] }), []);
-  }
+test('a story is not exempt from the benchmark rule', () => {
+  const text = "const a = { why: 'Atlassian’s own answer' };\n";
+  assert.equal(run({ sources: [src('design-system/src/styles/Other.stories.jsx', text)] }).length, 1);
 });
 
 test('the live tree holds no old language', () => {
