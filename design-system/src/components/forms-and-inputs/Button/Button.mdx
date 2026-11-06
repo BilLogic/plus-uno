@@ -6,7 +6,7 @@ import { Button } from '@/components';
 import {
     DocsCanvasShell,
     DocsInteractivePlayground,
-    DocsProperties,
+    ComponentExample,
     DocsTable,
     DoDontPair,
     ResourcesBlock,
@@ -90,141 +90,49 @@ A button triggers an action and lets people know what happens next.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell
-    attachSourceBelow
-    description="A primary button at default spacing: the call to action of a page or area."
->
-    <Canvas
-        of={ButtonStories.Overview}
-        story={{ inline: true }}
-        layout="padded"
-        sourceState="hidden"
-    />
-</DocsCanvasShell>
+<ComponentExample of={ButtonStories.Default} title="Default" description="Most actions that are not the main call to action of a page or area." />
 
-</div>
+<ComponentExample of={ButtonStories.Primary} title="Primary" description="The main call to action or a form submission. One per page or area." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={ButtonStories.Subtle} title="Subtle" description="Secondary actions beside a primary button, and toolbars." />
 
-## Anatomy
+<ComponentExample of={ButtonStories.Warning} title="Warning" description="Confirms an action that may cause a significant change or a loss of data." />
 
-<DocsCanvasShell description={<>A button with an icon before and an icon after the label.</>}>
-    <Canvas of={ButtonStories.Icons} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={ButtonStories.Danger} title="Danger" description="The final confirmation of a destructive, irreversible action." />
 
-1. **Container.** The pressable area, 32 high at default spacing and 24 at compact.
-2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
-3. **Label.** Body/default at the medium weight. It says what the action does.
-4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label.
-5. **Spinner** (loading only). Replaces the label and the icons while the button is busy.
+<ComponentExample of={ButtonStories.Discovery} title="Discovery" description="The call to action for a new experience." />
 
-Most buttons need no icon. Add one where the glyph has a clear, established meaning, such as `plus` for add.
+<ComponentExample of={ButtonStories.Ai} title="AI" description="The one primary AI action in a region. The sparkle is always drawn." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Properties
+## Size and layout
 
-<DocsProperties of={ButtonStories} />
+<ComponentExample of={ButtonStories.Compact} title="Compact" description="Spacing compact draws 24 high, for table rows and inline toolbars. Default draws 32." />
 
-</div>
+<ComponentExample of={ButtonStories.Icons} title="Icons" description="An icon before, after, or on both sides of the label." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={ButtonStories.FitContainer} title="Fit container" description="shouldFitContainer fills the parent, as in a narrow card footer or a mobile sheet." />
 
-## Variants
-
-### Appearance
-
-<DocsCanvasShell description={<>One of each appearance.</>}>
-    <Canvas of={ButtonStories.Appearances} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-<DocsTable>
-<thead>
-<tr><th>Appearance</th><th>When to use</th></tr>
-</thead>
-<tbody>
-<tr><td>Default</td><td>Most actions that are not the main call to action of a page or area. Less prominent than primary. Example: "Reschedule session".</td></tr>
-<tr><td>Primary</td><td>The main call to action or a form submission. One per page or area. Example: "Book session".</td></tr>
-<tr><td>Subtle</td><td>Secondary actions next to a primary button, and places where it is already clear items are interactive, such as toolbars and button groups. Example: "Cancel" beside "Save notes".</td></tr>
-<tr><td>Warning</td><td>Confirms an action that may cause a significant change or a loss of data, often in a confirmation modal. Example: "Remove from this week".</td></tr>
-<tr><td>Danger</td><td>The final confirmation of a destructive, irreversible action such as deleting. Example: "Delete session recording".</td></tr>
-<tr><td>Discovery</td><td>The call to action for a new experience. Example: "Try the new schedule view".</td></tr>
-<tr><td>AI</td><td>The one primary AI action in a region. Draws the sparkle before its label. Example: "Generate summary".</td></tr>
-</tbody>
-</DocsTable>
-
-### Spacing
-
-<DocsCanvasShell description={<>Default draws 32; compact draws 24. Radius is 6 and 4, and the icon-to-label gap is 4.</>}>
-    <Canvas of={ButtonStories.Spacing} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-Default spacing suits most places. Use compact in table rows and inline toolbars.
-
-### Width
-
-<DocsCanvasShell description={<><code>shouldFitContainer</code> fills the parent, as in a narrow Card footer or a mobile sheet.</>}>
-    <Canvas of={ButtonStories.FitContainer} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-### Truncation
-
-<DocsCanvasShell description={<>A label that does not fit ends in an ellipsis. Screen readers still read the full text.</>}>
-    <Canvas of={ButtonStories.Truncation} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={ButtonStories.Truncation} title="Truncation" description="A label that does not fit ends in an ellipsis. Screen readers still read the full text." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## State
 
-<DocsCanvasShell description={<>Selected, disabled and loading. Hover, pressed and focus are the browser's own.</>}>
-    <Canvas of={ButtonStories.States} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={ButtonStories.Selected} title="Selected" description="Applies to default and subtle, and sets aria-pressed." />
 
-<DocsTable>
-<thead>
-<tr><th>State</th><th>What changes</th></tr>
-</thead>
-<tbody>
-<tr><td>Hovered</td><td>The container takes the appearance's hovered fill. The label and icon keep their colors.</td></tr>
-<tr><td>Pressed</td><td>The container takes the appearance's pressed fill.</td></tr>
-<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
-<tr><td>Selected</td><td>The selected role fill, label and icon. Applies to default and subtle, and sets <code>aria-pressed</code>.</td></tr>
-<tr><td>Disabled</td><td>The disabled fill, label and icon: a change of color, not of opacity. Subtle stays transparent.</td></tr>
-<tr><td>Loading</td><td>A spinner replaces the label and icons. The container keeps its fill, blocks interaction and sets <code>aria-busy</code>.</td></tr>
-</tbody>
-</DocsTable>
+<ComponentExample of={ButtonStories.Disabled} title="Disabled" description="A change of color, not of opacity." />
 
-</div>
+<ComponentExample of={ButtonStories.Loading} title="Loading" description="A spinner replaces the label and icons while the button is busy." />
 
-<div className="sb-ds-doc-section">
-
-## Tokens
-
-<DocsTable>
-<thead>
-<tr><th>Part</th><th>Token</th></tr>
-</thead>
-<tbody>
-<tr><td>Fill: default, subtle</td><td><code>--ds-background-neutral-subtle</code>, hovered and pressed steps. Default adds a 1px <code>--ds-border-input</code> edge.</td></tr>
-<tr><td>Fill: primary, warning, danger, discovery</td><td><code>--ds-background-brand-bold</code>, <code>-warning-bold</code>, <code>-danger-bold</code>, <code>-discovery-bold</code>, each with hovered and pressed steps.</td></tr>
-<tr><td>Fill: AI</td><td><code>--ds-ai-background-bold</code>, with hovered and pressed steps.</td></tr>
-<tr><td>Fill: selected, disabled</td><td><code>--ds-background-selected</code> with hovered and pressed steps; <code>--ds-background-disabled</code>.</td></tr>
-<tr><td>Label and icon</td><td><code>--ds-text-subtle</code> and <code>--ds-icon-subtle</code> (default, subtle); <code>--ds-text-inverse</code> and <code>--ds-icon-inverse</code> (primary, danger, discovery, ai); <code>--ds-text-warning-inverse</code> (warning); the selected and disabled roles.</td></tr>
-<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
-<tr><td>Height</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>.</td></tr>
-<tr><td>Padding</td><td>12: <code>--pad-x-md</code>. Compact 8: <code>--pad-x-sm</code>.</td></tr>
-<tr><td>Radius</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>.</td></tr>
-<tr><td>Icon-to-label gap</td><td>4: <code>--inline-sm</code>.</td></tr>
-<tr><td>Label</td><td>Body/default at the medium weight; icons at 16 (<code>--icon-md</code>).</td></tr>
-</tbody>
-</DocsTable>
+Hover, pressed and focus are the browser's own states and are described under Usage.
 
 </div>
 
@@ -256,6 +164,82 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 <div className="sb-ds-doc-section">
 
 ## Usage
+
+Use a button for an action on the current page: submit a form, mark attendance, close a dialog. For navigation to another page, use Link button.
+
+### Appearance guidance
+
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Default</td><td>Most actions that are not the main call to action of a page or area. Less prominent than primary. Example: "Reschedule session".</td></tr>
+<tr><td>Primary</td><td>The main call to action or a form submission. One per page or area. Example: "Book session".</td></tr>
+<tr><td>Subtle</td><td>Secondary actions next to a primary button, and places where it is already clear items are interactive, such as toolbars and button groups. Example: "Cancel" beside "Save notes".</td></tr>
+<tr><td>Warning</td><td>Confirms an action that may cause a significant change or a loss of data, often in a confirmation modal. Example: "Remove from this week".</td></tr>
+<tr><td>Danger</td><td>The final confirmation of a destructive, irreversible action such as deleting. Example: "Delete session recording".</td></tr>
+<tr><td>Discovery</td><td>The call to action for a new experience. Example: "Try the new schedule view".</td></tr>
+<tr><td>AI</td><td>The one primary AI action in a region. Draws the sparkle before its label. Example: "Generate summary".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Container.** The pressable area, 32 high at default spacing and 24 at compact.
+2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
+3. **Label.** Body/default at the medium weight. It says what the action does.
+4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label.
+5. **Spinner** (loading only). Replaces the label and the icons while the button is busy.
+
+Most buttons need no icon. Add one where the glyph has a clear, established meaning, such as `plus` for add.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>The container takes the appearance's hovered fill. The label and icon keep their colors.</td></tr>
+<tr><td>Pressed</td><td>The container takes the appearance's pressed fill.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
+<tr><td>Selected</td><td>The selected role fill, label and icon. Applies to default and subtle, and sets <code>aria-pressed</code>.</td></tr>
+<tr><td>Disabled</td><td>The disabled fill, label and icon: a change of color, not of opacity. Subtle stays transparent.</td></tr>
+<tr><td>Loading</td><td>A spinner replaces the label and icons. The container keeps its fill, blocks interaction and sets <code>aria-busy</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Fill: default, subtle</td><td><code>--ds-background-neutral-subtle</code>, hovered and pressed steps. Default adds a 1px <code>--ds-border-input</code> edge.</td></tr>
+<tr><td>Fill: primary, warning, danger, discovery</td><td><code>--ds-background-brand-bold</code>, <code>-warning-bold</code>, <code>-danger-bold</code>, <code>-discovery-bold</code>, each with hovered and pressed steps.</td></tr>
+<tr><td>Fill: AI</td><td><code>--ds-ai-background-bold</code>, with hovered and pressed steps.</td></tr>
+<tr><td>Fill: selected, disabled</td><td><code>--ds-background-selected</code> with hovered and pressed steps; <code>--ds-background-disabled</code>.</td></tr>
+<tr><td>Label and icon</td><td><code>--ds-text-subtle</code> and <code>--ds-icon-subtle</code> (default, subtle); <code>--ds-text-inverse</code> and <code>--ds-icon-inverse</code> (primary, danger, discovery, ai); <code>--ds-text-warning-inverse</code> (warning); the selected and disabled roles.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
+<tr><td>Height</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>.</td></tr>
+<tr><td>Padding</td><td>12: <code>--pad-x-md</code>. Compact 8: <code>--pad-x-sm</code>.</td></tr>
+<tr><td>Radius</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>.</td></tr>
+<tr><td>Icon-to-label gap</td><td>4: <code>--inline-sm</code>.</td></tr>
+<tr><td>Label</td><td>Body/default at the medium weight; icons at 16 (<code>--icon-md</code>).</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 Use a button for an action on the current page: submit a form, mark attendance, close a dialog. For navigation to another page, use Link button.
 

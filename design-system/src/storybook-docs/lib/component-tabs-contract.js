@@ -178,3 +178,15 @@ export function normalizeChangelog(raw) {
     }))
     .sort((a, b) => b.date.localeCompare(a.date));
 }
+
+/**
+ * The import line the Code tab shows. Public components come from the
+ * `@/components` barrel and never from a deep path.
+ *
+ * @param {string | undefined} name The component's export name.
+ * @returns {string | null} The line, or null when the meta names no component.
+ */
+export function importLineFor(name) {
+  if (!name || typeof name !== 'string') return null;
+  return `import { ${name} } from '@/components';`;
+}

@@ -376,6 +376,26 @@ export function DocsCanvasShell({ description, children, attachSourceBelow = tru
 }
 
 /**
+ * One example of the Examples tab: one story, one appearance, state or size,
+ * under an h3 and a one-line description (a fragment, so the heading stays a direct child of the section). The template for every
+ * component page is Examples (these), Code (generated) and Usage.
+ *
+ * @param {unknown} props.of - the story export, as `<ComponentExample of={ButtonStories.Primary} />`
+ * @param {string} props.title - the appearance, state or size the story shows
+ * @param {React.ReactNode} [props.description] - when it applies, in one sentence
+ */
+export function ComponentExample({ of: ofStory, title, description }) {
+    return (
+        <>
+            <h3>{title}</h3>
+            <DocsCanvasShell description={description}>
+                <Canvas of={ofStory} story={{ inline: true }} layout="padded" sourceState="hidden" />
+            </DocsCanvasShell>
+        </>
+    );
+}
+
+/**
  * The breathing room between the canvas's tallest state and the Controls
  * divider. A design value, so it names a Token rather than a number:
  * `--stack-lg` is the design system's 12px element gap.

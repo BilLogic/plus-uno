@@ -9,7 +9,7 @@ Button: triggers an action.
 
 **Source:** `design-system/src/components/forms-and-inputs/Button/Button.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard, AnchorHref
+**Stories:** `design-system/src/components/forms-and-inputs/Button/Button.stories.jsx` — Overview, Appearances, Spacing, Icons, States, Default, Primary, Subtle, Warning, Danger, Discovery, Ai, Compact, Selected, Disabled, Loading, FitContainer, Truncation, Interactive, StateSteps, KeyboardFocus, AnchorKeyboard, AnchorHref
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Button/Button.mdx`
 

@@ -275,6 +275,39 @@ export const States = {
     },
 };
 
+/** The default appearance: most actions that are not the main call to action. */
+export const Default = { render: () => <Button text="Reschedule session" /> };
+
+/** The main call to action of a page or area. */
+export const Primary = { render: () => <Button appearance="primary" text="Book session" /> };
+
+/** Secondary actions beside a primary button. */
+export const Subtle = { render: () => <Button appearance="subtle" text="Cancel" /> };
+
+/** Confirms an action that may cause a significant change. */
+export const Warning = { render: () => <Button appearance="warning" text="Remove from this week" /> };
+
+/** The final confirmation of a destructive action. */
+export const Danger = { render: () => <Button appearance="danger" text="Delete session recording" /> };
+
+/** The call to action for a new experience. */
+export const Discovery = { render: () => <Button appearance="discovery" text="Try the new schedule view" /> };
+
+/** The one primary AI action in a region. */
+export const Ai = { render: () => <Button appearance="ai" text="Generate summary" /> };
+
+/** Compact spacing, 24 high, for tables and toolbars. */
+export const Compact = { render: () => <Button appearance="primary" spacing="compact" text="Compact" /> };
+
+/** Selected sets `aria-pressed`. */
+export const Selected = { render: () => <Button text="Selected" isSelected /> };
+
+/** Disabled is a change of color, not of opacity. */
+export const Disabled = { render: () => <Button appearance="primary" text="Disabled" isDisabled /> };
+
+/** Loading swaps the label for a spinner and blocks interaction. */
+export const Loading = { render: () => <Button appearance="primary" text="Loading" isLoading /> };
+
 /** Fills the width of its container. */
 export const FitContainer = {
     render: () => (
