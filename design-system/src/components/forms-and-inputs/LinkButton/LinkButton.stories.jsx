@@ -83,11 +83,11 @@ export const WithIcons = {
     },
 };
 
-/** Selected draws the selected role fill. */
+/** Selected draws the selected role fill and sets aria-current. */
 export const Selected = {
     render: () => <LinkButton href="#sessions" text="Sessions" isSelected />,
     play: async ({ canvasElement }) => {
-        await expect(within(canvasElement).getByRole('link', { name: 'Sessions' })).toHaveClass('plus-btn--selected');
+        await expect(within(canvasElement).getByRole('link', { name: 'Sessions' })).toHaveAttribute('aria-current', 'true');
     },
 };
 

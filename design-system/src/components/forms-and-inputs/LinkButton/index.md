@@ -9,7 +9,7 @@ Link button: navigates, and looks like a button. It renders an anchor, so it has
 
 **Source:** `design-system/src/components/forms-and-inputs/LinkButton/LinkButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/LinkButton/LinkButton.stories.jsx` — Overview, Appearances, Spacing, WithIcons, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/LinkButton/LinkButton.stories.jsx` — Overview, Appearances, Spacing, WithIcons, Selected, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/LinkButton/LinkButton.mdx`
 

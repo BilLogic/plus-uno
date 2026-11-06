@@ -73,7 +73,7 @@ export const Spacing = {
 export const Selected = {
     render: () => <LinkIconButton href="#help" icon="circle-question" label="Open Help Center" isSelected />,
     play: async ({ canvasElement }) => {
-        await expect(within(canvasElement).getByRole('link', { name: 'Open Help Center' })).toHaveClass('plus-btn--selected');
+        await expect(within(canvasElement).getByRole('link', { name: 'Open Help Center' })).toHaveAttribute('aria-current', 'true');
     },
 };
 

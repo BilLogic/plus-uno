@@ -9,7 +9,7 @@ Vertical button: an icon stacked over a short label, one size (60 by 60). For ch
 
 **Source:** `design-system/src/components/forms-and-inputs/VerticalButton/VerticalButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/VerticalButton/VerticalButton.stories.jsx` — Overview, Appearances, States, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/VerticalButton/VerticalButton.stories.jsx` — Overview, Appearances, States, Selected, Disabled, Loading, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/VerticalButton/VerticalButton.mdx`
 
@@ -36,6 +36,6 @@ Anything not listed is not a valid value.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
+<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=yes -->
 
-> Authored guidance is partial — missing: correct/incorrect (#166).
+> Authored guidance is partial — missing: when to use, correct/incorrect (#166).
