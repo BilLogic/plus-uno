@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
+import { Calendar } from '@/components';
 import * as CalendarStories from './Calendar.stories.jsx';
-import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -23,8 +30,7 @@ export const figmaMeta = {
 <Meta of={CalendarStories} />
 
 <Title />
-The month grid a date field opens — the same component `DatePicker` and
-`DateTimePicker` use, public for a caller who wants the grid on its own.
+A calendar is the month grid that Date picker and Date time picker open, on its own.
 
 <DocsTabs of={CalendarStories}>
 
@@ -40,11 +46,13 @@ The month grid a date field opens — the same component `DatePicker` and
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Content
 
-<DocsCanvasShell attachSourceBelow description={<>Always six weeks, 42 cells, so the panel never changes height as months turn. Days outside the month are drawn but can't be picked.</>}>
-    <Canvas of={CalendarStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={CalendarStories.Default} title="Default" description="Always six weeks, 42 cells, so the panel never changes height as months turn. Days outside the month are drawn but cannot be picked." />
+
+<ComponentExample of={CalendarStories.PickADay} title="Pick a day" description="Pressing a day picks it and marks it with aria-pressed." />
+
+<ComponentExample of={CalendarStories.TurnMonths} title="Turn months" description="Previous month and Next month move the grid. The caller holds which month shows." />
 
 </div>
 
@@ -52,58 +60,19 @@ The month grid a date field opens — the same component `DatePicker` and
 
 ## Size
 
-<DocsCanvasShell description={<>`small`, `medium` and `large` draw 28, 36 and 44px days.</>}>
-    <DsCanvasQuiet of={CalendarStories.Sizes} />
-</DocsCanvasShell>
+<ComponentExample of={CalendarStories.Sizes} title="Sizes" description="The day cell is 28, 36 or 44 wide. 36 is the default." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Bounds
+## State
 
-<DocsCanvasShell description={<>Days before `minDate` or after `maxDate` are disabled.</>}>
-    <DsCanvasQuiet of={CalendarStories.Bounds} />
-</DocsCanvasShell>
+<ComponentExample of={CalendarStories.Selected} title="Selected" description="The picked day takes the selected bold fill." />
 
-</div>
+<ComponentExample of={CalendarStories.Range} title="Range" description="A range's ends are picked days; the days between take the neutral selection." />
 
-<div className="sb-ds-doc-section">
-
-## Picking a day
-
-<DocsCanvasShell description={<>`onPick` fires with the pressed day. `aria-pressed` marks the selected day.</>}>
-    <DsCanvasQuiet of={CalendarStories.PickADay} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Previous/Next month call `onViewDateChange` with the new month's first day.</>}>
-    <DsCanvasQuiet of={CalendarStories.TurnMonths} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>viewDate</code></td><td>Date</td><td>Required. Any day in the month shown.</td></tr>
-        <tr><td><code>onViewDateChange</code></td><td>function</td><td>Required. Called with the new month's first day on Previous/Next.</td></tr>
-        <tr><td><code>selected</code></td><td>string or Date</td><td>The picked day, as ISO <code>YYYY-MM-DD</code> or a <code>Date</code>.</td></tr>
-        <tr><td><code>rangeStart</code>, <code>rangeEnd</code></td><td>string or Date</td><td>With both set, the days between are marked via <code>data-in-range</code>.</td></tr>
-        <tr><td><code>minDate</code>, <code>maxDate</code></td><td>string or Date</td><td>Days outside this range are disabled.</td></tr>
-        <tr><td><code>size</code></td><td>enum</td><td><code>28</code>, <code>36</code> or <code>44</code>, the day width in pixels.</td></tr>
-        <tr><td><code>onPick</code></td><td>function</td><td>Required. Called with the date when an enabled day is pressed.</td></tr>
-    </tbody>
-</DocsTable>
+<ComponentExample of={CalendarStories.Disabled} title="Disabled" description="Days before minDate or after maxDate are disabled and take no focus." />
 
 </div>
 
@@ -117,24 +86,60 @@ The month grid a date field opens — the same component `DatePicker` and
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
-Use `Calendar` directly only when a date grid needs to be visible on the page
-without a field or a popup around it — a scheduling view, an embedded picker.
-For a single date field, use `DatePicker`; for a date and time together, use
-`DateTimePicker`. Both already use this same grid internally.
+Use a calendar directly only when a date grid needs to be visible on the page without a field or a popup around it: a scheduling view, an embedded picker. For a single date field, use Date picker; for a date and time together, use Date time picker. Both already use this same grid.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Header.** The month and year, with Previous month and Next month buttons.
+2. **Weekday row.** Seven short day names.
+3. **Day cells.** Forty-two buttons in six weeks. Days of neighboring months fill the spare cells.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>An enabled day takes <code>--ds-background-neutral-subtle-hovered</code>. A picked day keeps its fill.</td></tr>
+<tr><td>Focused</td><td>The month buttons draw a 2px ring in <code>--ds-border-focused</code>, 2px off the edge.</td></tr>
+<tr><td>Today</td><td>A 1px <code>--ds-border-brand</code> edge and <code>--ds-text-brand</code> text.</td></tr>
+<tr><td>In range</td><td><code>--ds-background-selected</code>.</td></tr>
+<tr><td>Selected</td><td><code>--ds-background-selected-bold</code> with <code>--ds-text-inverse</code>, and <code>aria-pressed</code>.</td></tr>
+<tr><td>Outside the month</td><td><code>--ds-text-subtle</code>; not pickable.</td></tr>
+<tr><td>Disabled</td><td>Faded to <code>--ds-opacity-disabled</code>; no focus, no <code>onPick</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Day text</td><td><code>--ds-text</code>; weekday names <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Month buttons</td><td><code>--ds-icon-subtle</code>, hovered <code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
+<tr><td>Day width</td><td><code>--calendar-day-sm</code> (28), <code>--calendar-day-md</code> (36), <code>--calendar-day-lg</code> (44).</td></tr>
+<tr><td>Day radius</td><td><code>--radius-md</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### `viewDate` and `onViewDateChange` are the component's own navigation state.
 
-`Calendar` holds no state of its own — the caller owns which month shows and
-updates it when `onViewDateChange` fires, the same pattern `DatePicker` uses
-internally.
+`Calendar` holds no state of its own. The caller owns which month shows and updates it when `onViewDateChange` fires, the same pattern Date picker uses internally.
 
 ```jsx
 const [viewDate, setViewDate] = useState(new Date());
@@ -149,10 +154,31 @@ const [viewDate, setViewDate] = useState(new Date());
 
 ### A fixed grid, not a shrinking one.
 
-Six weeks render every month, including the days of neighboring months that
-fill the remaining cells — this keeps the panel's height constant as someone
-pages through months, at the cost of occasionally showing a mostly-empty
-week.
+Six weeks render every month, including the days of neighboring months that fill the remaining cells. This keeps the panel's height constant as someone pages through months, at the cost of occasionally showing a mostly-empty week.
+
+<DoDontPair
+    doExample={<Calendar viewDate={new Date(2026, 9, 1)} onViewDateChange={() => {}} minDate="2026-10-12" maxDate="2026-10-25" onPick={() => {}} />}
+    doCaption="Limit the days to the span that can be chosen. Days outside it are disabled."
+    dontExample={<Calendar viewDate={new Date(2026, 9, 1)} onViewDateChange={() => {}} onPick={() => {}} />}
+    dontCaption="Leaving every day open when only a span is valid sends people to an error afterward."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Say which dates can be chosen in text near the calendar: "Pick a day between October 12 and 25."</td><td>Leave people to find the limit by trying disabled days.</td></tr>
+<tr><td>Name the choice by its role: "Session date".</td><td>"Calendar" or "Pick a date".</td></tr>
+<tr><td>Write dates in full where text names them: "October 21, 2026".</td><td>All-numeric dates that read differently by locale: "10/11/12".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -160,14 +186,10 @@ week.
 
 ## Accessibility
 
-- **Each day is a real, named button.** The accessible name is the day's
-  full date, not just a number, so a screen reader announces an unambiguous
-  date on every cell.
-- **State is marked, not just styled.** `aria-pressed` marks the picked day
-  or a range's ends, `aria-current="date"` marks today, and `data-in-range`
-  marks the days between — none of this relies on color alone.
-- **Out-of-range and out-of-month days are truly disabled**, not just dimmed:
-  they take no focus and fire no `onPick`.
+- **Each day is a real, named button.** The accessible name is the day's full date, not just a number, so a screen reader announces an unambiguous date on every cell.
+- **State is marked, not just styled.** `aria-pressed` marks the picked day or a range's ends, `aria-current="date"` marks today, and `data-in-range` marks the days between. None of this relies on color alone.
+- **Out-of-range and out-of-month days are truly disabled**, not just dimmed: they take no focus and fire no `onPick`.
+- **The month buttons are named** "Previous month" and "Next month".
 
 </div>
 
@@ -175,8 +197,8 @@ week.
 
 ## Related
 
-- For a single date field with this grid in a popup, use `DatePicker`.
-- For a date and time together, use `DateTimePicker`.
+- For a single date field with this grid in a popup, use Date picker.
+- For a date and time together, use Date time picker.
 
 </div>
 
