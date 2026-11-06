@@ -1,237 +1,63 @@
 /**
- * Logo Component Styles
- * Matches Figma design system specifications
- * 
- * Figma Reference: https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4?node-id=1133-12915
+ * Logo: the mark's grounds, glows and wordmark take their colors from the
+ * palette, so the logo looks the same on every surface. Only the wordmark in
+ * the colored appearance follows the color mode, through `--ds-text`.
  */
 
 .plus-logo {
     display: inline-flex;
     align-items: center;
-    justify-content: flex-start;
-    box-sizing: border-box;
-    /* overflow: hidden; - Removed to prevent clipping of text/effects and aid debugging */
     flex-shrink: 0;
-    gap: 0;
-    /* Default: no gap (for icon-only logos) */
-    padding: 0;
-    /* Default: no padding (for icon-only logos) */
+    line-height: 0;
 }
 
-/* Apply gap and padding when the wordmark is present - size-dependent based on Figma */
-.plus-logo--with-wordmark {
-    /* When text is included, the container expands horizontally */
-    width: auto;
-    height: auto;
-    /* Base values - will be overridden by size-specific rules */
-    gap: var(--size-spacing-medium-space-300);
-    padding: var(--size-spacing-medium-space-300);
-}
-
-.plus-logo__container {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.plus-logo__icon {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.plus-logo__icon svg {
+.plus-logo > svg {
     display: block;
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
+    overflow: visible;
 }
 
-.plus-logo__text {
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    height: 100%;
-    width: auto;
-    max-width: none;
+/* Plus and ground per appearance. */
+.plus-logo__plus rect { fill: var(--palette-neutral-0); }
+.plus-logo__ground { fill: var(--palette-neutral-0); }
+
+.plus-logo--filled .plus-logo__tile { fill: var(--palette-lagoon-700); }
+.plus-logo--dark .plus-logo__tile { fill: var(--palette-lagoon-900); }
+
+.plus-logo--outlined .plus-logo__ring { stroke: var(--palette-neutral-1000); }
+.plus-logo--outlined .plus-logo__plus rect { fill: var(--palette-neutral-1000); }
+.plus-logo--outlined-reversed .plus-logo__ring { stroke: var(--palette-dark-neutral-1000); }
+.plus-logo--outlined-reversed .plus-logo__plus rect { fill: var(--palette-dark-neutral-1000); }
+
+/* Wordmark. */
+.plus-logo__wordmark path { fill: var(--palette-neutral-1000); }
+.plus-logo--colored .plus-logo__wordmark path { fill: var(--ds-text); }
+.plus-logo--colored-dark .plus-logo__wordmark path,
+.plus-logo--outlined-reversed .plus-logo__wordmark path { fill: var(--palette-dark-neutral-1000); }
+
+/* Glows: today's on light, one step up each ramp on dark. */
+.plus-logo__glows--light .plus-logo__glow--0 { fill: var(--palette-yellow-300); }
+.plus-logo__glows--light .plus-logo__glow--1 { fill: var(--palette-yellow-250); }
+.plus-logo__glows--light .plus-logo__glow--2 { fill: var(--palette-teal-200); }
+.plus-logo__glows--light .plus-logo__glow--3 { fill: var(--palette-red-200); }
+.plus-logo__glows--light .plus-logo__glow--4 { fill: var(--palette-lagoon-400); }
+
+.plus-logo__glows--dark .plus-logo__glow--0 { fill: var(--palette-yellow-400); }
+.plus-logo__glows--dark .plus-logo__glow--1 { fill: var(--palette-yellow-300); }
+.plus-logo__glows--dark .plus-logo__glow--2 { fill: var(--palette-teal-300); }
+.plus-logo__glows--dark .plus-logo__glow--3 { fill: var(--palette-red-300); }
+.plus-logo__glows--dark .plus-logo__glow--4 { fill: var(--palette-lagoon-500); }
+
+/* The colored mark shows one set: light by default, dark when the mode is dark. */
+.plus-logo--colored .plus-logo__glows--dark { display: none; }
+
+:is([data-color-mode="dark"]) .plus-logo--colored {
+    .plus-logo__glows--light { display: none; }
+    .plus-logo__glows--dark { display: inline; }
 }
 
-.plus-logo__text svg {
-    display: block;
-    height: 100%;
-    width: auto;
-    object-fit: contain;
-}
-
-/* Size Variants - Refactored to match Figma Container Model (Padding included) */
-
-/* 60: 40px Icon + 10px Padding = 60px Total Height (Est) */
-/* Re-evaluating based on codebase: Previous XS was 40px total. 
-   If we follow the M pattern (Icon Only also has padding), the "Icon" size must be distinct.
-   However, without explicit Figma checks for XS, I will follow the pattern:
-   Layout: Padding + Content.
-   XS Padding: space-150 (10px). 
-   XS Icon: 40px (existing). 
-   New Total: 60px.
-*/
-.plus-logo--60 {
-    width: auto;
-    height: auto;
-    padding: var(--size-spacing-small-space-150);
-    border-radius: 4px;
-    gap: var(--size-spacing-small-space-150);
-}
-
-.plus-logo--60 .plus-logo__container {
-    width: 40px;
-    height: 40px;
-}
-
-.plus-logo--60 .plus-logo__icon svg {
-    width: 40px;
-    height: 40px;
-}
-
-.plus-logo--60 .plus-logo__text svg {
-    height: 40px;
-}
-
-/* 96: 64px Icon + 16px Padding = 96px Total Height */
-.plus-logo--96 {
-    width: auto;
-    height: auto;
-    padding: var(--size-spacing-medium-space-300);
-    border-radius: 1.778px;
-    gap: var(--size-spacing-medium-space-300);
-}
-
-.plus-logo--96 .plus-logo__container {
-    width: 64px;
-    height: 64px;
-}
-
-.plus-logo--96 .plus-logo__icon svg {
-    width: 64px;
-    height: 64px;
-}
-
-.plus-logo--96 .plus-logo__text svg {
-    height: 64px;
-}
-
-/* 132: 92px Icon + 20px Padding = 132px Total Height */
-.plus-logo--132 {
-    width: auto;
-    height: auto;
-    padding: var(--size-spacing-medium-space-400);
-    border-radius: 2.556px;
-    gap: var(--size-spacing-medium-space-400);
-}
-
-.plus-logo--132 .plus-logo__container {
-    width: 92px;
-    height: 92px;
-}
-
-.plus-logo--132 .plus-logo__icon svg {
-    width: 92px;
-    height: 92px;
-}
-
-.plus-logo--132 .plus-logo__text svg {
-    height: 92px;
-}
-
-/* 192: 144px Icon + 24px Padding = 192px Total Height */
-.plus-logo--192 {
-    width: auto;
-    height: auto;
-    padding: var(--size-spacing-medium-space-500);
-    border-radius: 4px;
-    gap: var(--size-spacing-medium-space-500);
-}
-
-.plus-logo--192 .plus-logo__container {
-    width: 144px;
-    height: 144px;
-}
-
-.plus-logo--192 .plus-logo__icon svg {
-    width: 144px;
-    height: 144px;
-}
-
-.plus-logo--192 .plus-logo__text svg {
-    height: 144px;
-}
-
-/* 224: 160px Icon + 32px Padding = 224px Total Height */
-.plus-logo--224 {
-    width: auto;
-    height: auto;
-    padding: var(--size-spacing-large-space-600);
-    border-radius: 4px;
-    gap: var(--size-spacing-large-space-600);
-}
-
-.plus-logo--224 .plus-logo__container {
-    width: 160px;
-    height: 160px;
-}
-
-.plus-logo--224 .plus-logo__icon svg {
-    width: 160px;
-    height: 160px;
-}
-
-.plus-logo--224 .plus-logo__text svg {
-    height: 160px;
-}
-
-/* With Text Modifiers:
-   Explicitly set height/width to auto to ensure specificity overrides any legacy/default sizing.
-   The padding is handled by the base class, but we need to ensure the container grows.
-*/
-
-/* 60 */
-.plus-logo--60.plus-logo--with-wordmark {
-    width: auto;
-    height: auto;
-}
-
-/* 96 */
-.plus-logo--96.plus-logo--with-wordmark {
-    width: auto;
-    height: auto;
-}
-
-/* 132 */
-.plus-logo--132.plus-logo--with-wordmark {
-    width: auto;
-    height: auto;
-    /* Ensure content+padding dictates height (92 + 20 + 20 = 132) */
-}
-
-/* 192 */
-.plus-logo--192.plus-logo--with-wordmark {
-    width: auto;
-    height: auto;
-}
-
-/* 224 */
-.plus-logo--224.plus-logo--with-wordmark {
-    width: auto;
-    height: auto;
-}
-
-.plus-logo--with-wordmark {
-    /* Base modifier fallback */
+@media (prefers-color-scheme: dark) {
+    :is([data-color-mode="auto"]) .plus-logo--colored {
+        .plus-logo__glows--light { display: none; }
+        .plus-logo__glows--dark { display: inline; }
+    }
 }
