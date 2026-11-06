@@ -58,7 +58,6 @@ export default {
     render: FrameWithSlots,
     argTypes: {
         children: { table: { disable: true } },
-        topbar: { table: { disable: true } },
         header: { table: { disable: true } },
         sidebar: { table: { disable: true } },
         style: { table: { disable: true } },

@@ -39,7 +39,7 @@ export default function MyDashboard() {
 }
 ```
 
-For a page that holds one task the person finishes or leaves (a session note, a setup flow), pass `frame="focused"`: no sidebar, Back · title · Close in the topbar, the 864 reading column, and `actions` held at the foot of the Page. It has the Frame's seamless edges, with no pad, no gap under the topbar and no footer row. The props and when to use it versus a Modal are in `PageLayout.mdx` § Focused frame.
+For a page that holds one task the person finishes or leaves (a session note, a setup flow), pass `frame="focused"`: no sidebar, Back · title · Close in the Page header row, the 864 reading column, and `actions` held at the foot of the Page. It has the Frame's seamless edges, with no pad, no top bar and no footer row. The props and when to use it versus a Modal are in `PageLayout.mdx` § Focused frame.
 
 ## The standard overlay
 

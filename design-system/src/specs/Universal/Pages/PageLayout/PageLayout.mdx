@@ -85,7 +85,7 @@ App outer layout — wraps every page with the Sidebar, the breadcrumb and the c
     />
 </DocsCanvasShell>
 
-- **Frame** — the `Frame` with no sidebar: the Frame's own edges: the Page runs to the window edges, has no top bar above it.
+- **Frame** — the `Frame` with no sidebar: the Frame's own edges: the Page runs to the window edges and has no top bar above it.
 - **Page header row** — the Frame's header row, `--item-height-md` 32: Back (`onBack` or `backHref`, an icon button with `arrow-left`, named "Back") leads, the `title` is the page's one visible `h1` at Heading/xsmall, truncated on one line, and Close (`onClose`, an icon button with `xmark`, named "Close") ends the row. Without a handler, that control is not drawn.
 - **Surface** — the page's `main`, at reading width: content capped at `--content-max-width-reading` 864, centered, never under 720. A long task scrolls inside it.
 - **Actions** — a group named by `actionsLabel` ("Page actions") inside the Page, not a footer row: the `actions`, end-aligned, `--focused-page-inline-sm` 8 apart, in the content column. It is held at the foot of the Page while a long task scrolls, and follows the content on a short one; without `actions` there is no bar.
