@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ButtonGroup from './ButtonGroup';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
@@ -124,7 +125,10 @@ export const HoveredState = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         for (const name of ['Week hover', 'Month hover']) {
-            await expectHovered(canvasElement, canvas.getByRole('button', { name }), 'default', name);
+            const member = canvas.getByRole('button', { name });
+            await expectHovered(canvasElement, member, 'default', name);
+            const raised = withForcedPseudo(member, ':hover', () => getComputedStyle(member).zIndex);
+            await expect(raised, `${name} rises above its neighbor`).toBe('1');
         }
     },
 };
