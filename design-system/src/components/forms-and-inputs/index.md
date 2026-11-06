@@ -25,7 +25,7 @@ authored half (#166), counted rather than assumed.
 | [InlineEdit](InlineEdit/index.md) | 18 | ✅ | ✅ | ✅ |
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
 | [LinkButton](LinkButton/index.md) | 13 | ✅ | ✅ | ✅ |
-| [LinkIconButton](LinkIconButton/index.md) | 11 | ✅ | ✕ | ✅ |
+| [LinkIconButton](LinkIconButton/index.md) | 11 | ✅ | ✅ | ✅ |
 | [PromptInput](PromptInput/index.md) | 16 | ✅ | ✕ | ✅ |
 | [Radio](Radio/index.md) | 20 | ✅ | ✕ | ✅ |
 | [RadioGroup](RadioGroup/index.md) | 19 | ✅ | ✕ | ✅ |
@@ -42,7 +42,7 @@ authored half (#166), counted rather than assumed.
 | [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✕ | ✅ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 33/34 (97%) · Correct/incorrect 16/34 (47%) · Accessibility 33/34 (97%)
+**Authored coverage:** When to use 33/34 (97%) · Correct/incorrect 17/34 (50%) · Accessibility 33/34 (97%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

@@ -9,7 +9,7 @@ Vertical button: an icon stacked over a short label, one size (60 by 60). For ch
 
 **Source:** `design-system/src/components/forms-and-inputs/VerticalButton/VerticalButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/VerticalButton/VerticalButton.stories.jsx` — Overview, Appearances, States, Selected, Disabled, Loading, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/VerticalButton/VerticalButton.stories.jsx` — Overview, Appearances, States, Selected, Disabled, Loading, HoveredState, PressedState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/VerticalButton/VerticalButton.mdx`
 

@@ -9,7 +9,7 @@ Filter button: opens or toggles a filter. It shows the filter's name, an optiona
 
 **Source:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.stories.jsx` — Overview, Metric, Appearances, Spacing, States, Selected, Disabled, Loading, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.stories.jsx` — Overview, Metric, Appearances, Spacing, States, Selected, Disabled, Loading, HoveredState, PressedState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.mdx`
 

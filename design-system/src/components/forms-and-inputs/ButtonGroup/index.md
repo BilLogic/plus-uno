@@ -9,7 +9,7 @@ Button group: a visually connected row of related actions. A plain container for
 
 **Source:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.stories.jsx` — Overview, Appearances, Spacing, IconOnly, Selected, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.stories.jsx` — Overview, Appearances, Spacing, IconOnly, Selected, HoveredState, PressedState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.mdx`
 
