@@ -13,7 +13,6 @@ const root = path.resolve(__dirname, '../..');
 const read = (rel) => fs.readFileSync(path.join(root, rel), 'utf8');
 
 const MOVED = [
-  'design-system/src/components/forms-and-inputs/Button/Button.mdx',
   'design-system/src/components/forms-and-inputs/IconButton/IconButton.mdx',
 ];
 
@@ -31,6 +30,12 @@ describe('generated docs blocks', () => {
     expect(section, 'has a Properties section').not.toBeNull();
     expect(section[1]).toMatch(/<DocsProperties of=\{\w+Stories\} \/>/);
     expect(section[1]).not.toMatch(/<DocsTable|<tr>/);
+  });
+
+  it('Button takes its props table from the Code tab, so the page authors none', () => {
+    const mdx = read('design-system/src/components/forms-and-inputs/Button/Button.mdx');
+    expect(mdx).not.toMatch(/^## Properties/m);
+    expect(mdx).not.toMatch(/<th>(Prop|Property|Default)<\/th>/);
   });
 
   it('canvases default to code behind a Show code button', () => {
