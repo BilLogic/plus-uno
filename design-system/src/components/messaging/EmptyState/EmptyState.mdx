@@ -109,23 +109,8 @@ Use `EmptyState` when a view, panel, card or table has no content yet, in place
 of a blank area or a bare "No results". It carries a picture, a header, one line
 and one primary action.
 
-<DocsTable>
-    <thead>
-        <tr><th>Prop</th><th>Type</th><th>What it does</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>header</code></td><td>node</td><td>What this view is, as a heading.</td></tr>
-        <tr><td><code>description</code></td><td>node</td><td>One line on what goes here and what to do.</td></tr>
-        <tr><td><code>image</code></td><td>node</td><td>Picture slot, such as an Illustration.</td></tr>
-        <tr><td><code>icon</code></td><td>string</td><td>A Font Awesome Free solid name, used when there is no image.</td></tr>
-        <tr><td><code>primaryAction</code></td><td>node</td><td>One filled Button.</td></tr>
-        <tr><td><code>secondaryAction</code></td><td>node</td><td>An optional outlined Button.</td></tr>
-        <tr><td><code>spacing</code></td><td>default | compact</td><td>A view or panel, or a table body or card.</td></tr>
-    </tbody>
-</DocsTable>
-
-Use `default` for a view or panel and `compact` inside a Table or Card. Use an
-SectionMessage, not an EmptyState, for a failure.
+Use `default` for a view or panel and `compact` inside a Table or Card. Use a
+`SectionMessage`, not an `EmptyState`, for a failure.
 
 </div>
 
