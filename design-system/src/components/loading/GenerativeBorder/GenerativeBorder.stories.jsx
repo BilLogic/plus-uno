@@ -204,7 +204,7 @@ Interactive.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------------- states */
 
 
-const Subject = (props) => <GenerativeBorder {...props}><p style={{ margin: 0, padding: 'var(--space-100)' }}>Session summary</p></GenerativeBorder>;
+const Subject = (props) => <GenerativeBorder {...props}><p style={{ margin: 0, padding: 'var(--pad-x-lg)' }}>Session summary</p></GenerativeBorder>;
 const root = (canvasElement) => canvasElement.firstElementChild;
 
 /** Rest: generative border. */

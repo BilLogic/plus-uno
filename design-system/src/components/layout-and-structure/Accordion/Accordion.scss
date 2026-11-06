@@ -137,8 +137,4 @@
     .plus-accordion-item--disabled {
         opacity: var(--ds-opacity-disabled);
     }
-
-    &--flush .plus-accordion-item--disabled {
-        opacity: var(--ds-opacity-disabled);
-    }
 }

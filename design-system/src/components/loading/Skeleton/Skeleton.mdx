@@ -89,26 +89,6 @@ Status, Count and Tag, so nothing moves when the value arrives.
     <DsCanvasQuiet of={SkeletonStories.ReducedMotion} />
 </DocsCanvasShell>
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>A loading table. The region carries <code>aria-busy="true"</code>, a visually hidden status beside it says "Loading students…", and every label inside it is a plain text bar: the container owns the skeleton. <strong>Finish loading</strong> shows the students arriving: <code>aria-busy</code> comes off and the status says "Students loaded".</>}>
-    <DsCanvasQuiet of={SkeletonStories.LoadingTable} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A loading card. The card's skeleton owns everything inside it, its tags included. When the content arrives, <code>aria-busy</code> comes off and the status beside the card announces it.</>}>
-    <DsCanvasQuiet of={SkeletonStories.LoadingCard} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## State
-
 <DocsCanvasShell description={<>A status label placeholder with the shimmer.</>}>
     <DsCanvasQuiet of={SkeletonStories.Rest} />
 </DocsCanvasShell>
@@ -123,6 +103,20 @@ Status, Count and Tag, so nothing moves when the value arrives.
 
 <DocsCanvasShell description={<>Never focusable, so Tab skips it.</>}>
     <DsCanvasQuiet of={SkeletonStories.Focused} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<DocsCanvasShell description={<>A loading table. The region carries <code>aria-busy="true"</code>, a visually hidden status beside it says "Loading students…", and every label inside it is a plain text bar: the container owns the skeleton. <strong>Finish loading</strong> shows the students arriving: <code>aria-busy</code> comes off and the status says "Students loaded".</>}>
+    <DsCanvasQuiet of={SkeletonStories.LoadingTable} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A loading card. The card's skeleton owns everything inside it, its tags included. When the content arrives, <code>aria-busy</code> comes off and the status beside the card announces it.</>}>
+    <DsCanvasQuiet of={SkeletonStories.LoadingCard} />
 </DocsCanvasShell>
 
 </div>

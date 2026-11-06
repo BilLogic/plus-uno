@@ -3,7 +3,7 @@
 
 # ScrollBar
 
-scrollbar styling (thin width, outline-colored thumb, transparent track) to its scrollable content.
+scrollbar styling (thin width, border-colored thumb, transparent track) to its scrollable content.
 
 **Import:** `import { ScrollBar } from '@/components';`
 

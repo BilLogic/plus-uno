@@ -10,7 +10,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'ScrollBar wraps scrollable content and applies the Design System scrollbar treatment: thin width, outline-colored thumb, and a transparent track. Supports vertical (default, with maxHeight) and horizontal orientations.'
+                component: 'ScrollBar wraps scrollable content and applies the Design System scrollbar treatment: thin width, border-colored thumb, and a transparent track. Supports vertical (default, with maxHeight) and horizontal orientations.'
             }
         }
     },
@@ -43,7 +43,7 @@ export default {
 };
 
 const demoBox = {
-    border: '1px solid var(--color-outline-variant)',
+    border: 'var(--stroke-1) solid var(--ds-border)',
     borderRadius: '8px',
     padding: '16px'
 };
