@@ -3,7 +3,7 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as BreadcrumbStories from './Breadcrumb.stories.jsx';
 import * as BreadcrumbSubStories from './Breadcrumb.Subcomponents.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -83,6 +83,28 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>Linked ancestors in the link color; the current page is plain, subtlest text with <code>aria-current="page"</code>.</>}>
+    <DsCanvasQuiet of={BreadcrumbStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>An ancestor link is underlined and keeps the link color.</>}>
+    <DsCanvasQuiet of={BreadcrumbStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A link takes no pressed step of its own; the trail does not change under the pointer.</>}>
+    <DsCanvasQuiet of={BreadcrumbStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The 2px ring, 2px off an ancestor link. The current page is not focusable.</>}>
+    <DsCanvasQuiet of={BreadcrumbStories.Focused} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -107,7 +129,7 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Breadcrumb` when a page sits inside a hierarchy the user needs to see and
 climb — a student inside a cohort inside a program, a lesson inside a unit. It
@@ -121,7 +143,48 @@ item before it is a link.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Landmark and list.** A `nav` named by `label` around an ordered list, one item per level, root first.
+2. **Ancestor link.** Every item before the last, in the link color; an `onClick` intercepts it for a router.
+3. **Separator.** A slash drawn between items; `separator` swaps the character.
+4. **Current page.** The last item, plain text in the subtlest ink, marked `aria-current="page"`.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Ancestors in the link color with no underline; the current page in subtlest ink.</td></tr>
+<tr><td>Hovered</td><td>Underline on an ancestor link; the ink stays the link color.</td></tr>
+<tr><td>Pressed</td><td>No change of its own.</td></tr>
+<tr><td>Focused</td><td>The 2px ring, 2px off the link, for keyboard focus only.</td></tr>
+<tr><td>Disabled</td><td>Not a state. A level the person cannot open is the current page or is left out, never a dimmed link.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Ancestor link</td><td><code>--ds-link</code></td></tr>
+<tr><td>Separator and current page</td><td><code>--ds-text-subtlest</code></td></tr>
+<tr><td>Row</td><td><code>--item-height-md</code>, <code>--body-default</code></td></tr>
+<tr><td>Gap and separator space</td><td><code>--stack-md</code></td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### The last item is always the current page, whatever you pass it.
 
@@ -167,6 +230,32 @@ divider custom property, and a custom property holds text. A string is quoted
 for you and works; a React element is stringified by CSS and disappears. Pass
 `'/'`, `'›'`, `'—'`.
 
+### Show the whole path, root first.
+
+A trail that starts mid-hierarchy leaves people unsure where they are. List every level from the top down to the current page, and let the row wrap rather than dropping a level.
+
+### Use it for position, not for history.
+
+A breadcrumb shows where a page sits in the hierarchy, never the pages the person happened to visit. The trail for a page is the same whichever way they arrived.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name each level as the page is titled, in sentence case.</td><td>Abbreviate or invent a shorter name that appears nowhere else.</td></tr>
+<tr><td>Keep each name to a few words so the trail fits on one line.</td><td>Repeat the full page title when it runs long.</td></tr>
+<tr><td>End the trail on the current page.</td><td>Add a trailing link, arrow or the word “current”.</td></tr>
+<tr><td>Use real nouns: “Autumn 2026”, “Lessons”.</td><td>Use “here”, “back” or “click”.</td></tr>
+</tbody>
+</DocsTable>
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -175,10 +264,9 @@ for you and works; a React element is stringified by CSS and disappears. Pass
 
 - **The landmark and the current page are handled.** It renders a `nav` around
   an `ol`, and the last item carries `aria-current="page"`.
-- **Every breadcrumb on the page is named "breadcrumb".** That is React
-  Bootstrap's default label, and this component does not expose a way to change
-  it. One breadcrumb per page is the shape that works; two produce two landmarks
-  with the same name.
+- **Every breadcrumb is named "breadcrumb" unless you say otherwise.** Pass
+  `label` to name the landmark. One breadcrumb per page is the shape that works;
+  two with the default name produce two landmarks with the same name.
 - **Keep `text` short and literal.** It is the whole accessible name of the
   link. "Autumn 2026" navigates; "here" does not.
 - **The separator is generated content.** It is a `::before` on each item after
@@ -197,7 +285,7 @@ for you and works; a React element is stringified by CSS and disappears. Pass
 - For progress through a sequence of steps, use `ProgressBar`. A breadcrumb is a
   position in a tree, not a position in a flow.
 - For moving between sibling views, use `Tabs`.
-- For a persistent hierarchy the user browses rather than retraces, use `SidebarTab`.
+- For a persistent hierarchy the user browses rather than retraces, use the Sidebar pattern.
 - When the hierarchy is one level deep, a single "Back to X" link says the same
   thing with less furniture.
 
