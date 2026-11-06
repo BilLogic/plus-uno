@@ -509,7 +509,7 @@ describe("F3: a to-do to make a card", () => {
     const [c] = m.posts[0]!.cards;
     assert.equal(c!.subtitle!.text, "<@U0BEA> <@U0ADE> · from the running note");
     assert.match(m.posts[0]!.text, /\n• <@U0BEA> — .*\n• <@U0ADE> — /, "one bullet per taker");
-    assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open source", "https://www.notion.so/note1"]]);
+    assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open source ↗", "https://www.notion.so/note1"]]);
   });
 
   it("a drafted card's pillar is exact-matched against the Roadmap's options", async () => {
@@ -557,7 +557,7 @@ describe("F4: an active card with no owner", () => {
     const [c] = m.posts[0]!.cards;
     assert.equal(c!.title.text, "Facelift — last stage");
     assert.equal(c!.subtitle!.text, "<@U0BEA> · WIP · no Contributor for a week");
-    assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open card", "https://www.notion.so/p1"]]);
+    assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open card ↗", "https://www.notion.so/p1"]]);
     // Posted at the channel's top, it starts a thread that is uno-bot's own:
     // nothing is marked, so a reply there engages uno-bot with no @mention.
     assert.deepEqual(m.marked, []);
@@ -573,7 +573,7 @@ describe("F4: an active card with no owner", () => {
     ]);
     const { ran, redrawn } = await review(m.threadState, m.posts[0]!, only(store).id, "confirm", { userId: MAYA, choice: "assign" });
     assert.deepEqual(ran[0]!.execute?.input.properties, { Contributor: "n-bea" });
-    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Assigned <@U0BEA> · <@U0MAYA>");
+    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Assigned to <@U0BEA> by <@U0MAYA>");
   });
 
   it("Leave it sets nobody, says so on the card, and is not asked again", async () => {
@@ -584,8 +584,8 @@ describe("F4: an active card with no owner", () => {
     await m.run();
     const { ran, redrawn } = await review(m.threadState, m.posts[0]!, only(store).id, "cancel", { userId: BEA, choice: "leave" });
     assert.ok(!ran.some((v) => v.execute), "nothing runs");
-    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Left unassigned · <@U0BEA>");
-    assert.equal(redrawn.at(-1)![0]!.body.text, "No Contributor set. Not asked again until the card changes.");
+    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Left unassigned by <@U0BEA>");
+    assert.match(redrawn.at(-1)![0]!.body.text, /^Who should take it\?/, "the card keeps its question");
     const weekOn = morning(store, rm, at(39, 13), { threadState: m.threadState });
     await weekOn.run();
     assert.equal(weekOn.posts.length, 0);
@@ -674,7 +674,7 @@ describe("F4: an active card with no owner", () => {
     assert.equal(later.posts.length, 1);
     assert.equal(later.posts[0]!.threadTs, m.posts[0]!.ts);
     assert.match(later.posts[0]!.text, /^<@U0BEA>, checking in once more on this card\./);
-    assert.deepEqual(later.posts[0]!.cards[0]!.actions.map((x) => x.text.text), ["Review", "Open card"]);
+    assert.deepEqual(later.posts[0]!.cards[0]!.actions.map((x) => x.text.text), ["Review", "Open card ↗"]);
     // Its own thread still: asking again there marks nothing either.
     assert.deepEqual(later.marked, []);
   });
@@ -775,7 +775,7 @@ describe("F5: a stuck card", () => {
     assert.equal(c!.subtitle!.text, "<@U0MAYA> · Under Review · no comments for 3 weeks");
     assert.equal(c!.body.text, "Is it still moving? Done moves it to Under Dev or another status, Still on it checks again in 3 weeks, Drop it archives it.");
     // Two buttons: Review and Open card. No one-tap Still on it.
-    assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open card", "https://www.notion.so/p1"]]);
+    assert.deepEqual(c!.actions.map((x) => [x.text.text, x.url]), [["Review", undefined], ["Open card ↗", "https://www.notion.so/p1"]]);
   });
 
   /** A stuck card asked about on the shared card, with a clock its thread store shares. */
@@ -810,23 +810,23 @@ describe("F5: a stuck card", () => {
     ]);
     const { ran, redrawn } = await review(threadState, m.posts[0]!, only(store).id, "confirm", { userId: BEA, choice: "done", edits: { "0.properties.Design Status": "Shipped" } });
     assert.deepEqual(ran[0]!.execute?.input.properties, { "Design Status": "Shipped" });
-    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Done · <@U0BEA>");
+    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Marked done by <@U0BEA>");
   });
 
   it("Drop it archives the card, whatever the select says", async () => {
     const { store, m, threadState } = await stuckOnCard();
     const { ran, redrawn } = await review(threadState, m.posts[0]!, only(store).id, "confirm", { userId: ADE, choice: "drop", edits: { "0.properties.Design Status": "Shipped" } });
     assert.deepEqual(ran[0]!.execute?.input.properties, { "Design Status": "Archived" });
-    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Dropped · <@U0ADE>");
-    assert.equal(redrawn.at(-1)![0]!.body.text, "Written: moved to Archived.");
+    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Dropped by <@U0ADE>");
+    assert.equal(redrawn.at(-1)![0]!.body.text, m.posts[0]!.cards[0]!.body.text, "the card keeps its question");
   });
 
   it("Still on it writes nothing, and the card says when it is checked again: three weeks from the card", async () => {
     const { store, m, threadState, on } = await stuckOnCard();
     const { ran, redrawn } = await review(threadState, m.posts[0]!, only(store).id, "cancel", { userId: BEA, choice: "still" });
     assert.ok(!ran.some((v) => v.execute), "nothing runs");
-    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Still on it · <@U0BEA>");
-    assert.equal(redrawn.at(-1)![0]!.body.text, "Nothing written. Checked again Oct 26.");
+    assert.equal(redrawn.at(-1)![0]!.subtitle!.text, "Kept open by <@U0BEA>");
+    assert.equal(redrawn.at(-1)![0]!.body.text, m.posts[0]!.cards[0]!.body.text, "the card keeps its question");
     const weekOn = await on(at(44, 13));
     assert.equal(weekOn.posts.length, 0);
     assert.equal(only(store).state, "snoozed");
@@ -1211,7 +1211,7 @@ describe("shared rules", () => {
     assert.match(bea.text, /^Checking in on 2 Roadmap cards\.\n• <@U0BEA> — /);
     assert.equal((bea.blocks as Array<{ type: string }>).at(-1)?.type, "carousel", "the cards last, with no deadline under them");
     assert.doesNotMatch(JSON.stringify(bea.blocks), /Expires/);
-    assert.deepEqual(bea.cards.map((c) => c.actions.map((x) => x.text.text)), [["Review", "Open card"], ["Review", "Open card"]]);
+    assert.deepEqual(bea.cards.map((c) => c.actions.map((x) => x.text.text)), [["Review", "Open card ↗"], ["Review", "Open card ↗"]]);
     assert.equal(maya.cards.length, 1);
     // Each card is its own proposal, on its own message.
     assert.equal(m.staged.length, 3);
@@ -1230,7 +1230,7 @@ describe("shared rules", () => {
     await m.run();
     const [c] = m.edits.at(-1)!.cards;
     assert.equal(c!.subtitle!.text, "Didn't go through, so it comes back tomorrow morning");
-    assert.deepEqual(c!.actions.map((x) => x.text.text), ["Open card"]);
+    assert.deepEqual(c!.actions.map((x) => x.text.text), ["Open card ↗"]);
     assert.equal(only(store).state, "open");
     const next = morning(store, rm, at(31, 13));
     await next.run();
@@ -1343,8 +1343,8 @@ describe("one card per follow-up", () => {
     clock.now = at(35, 13, 1);
     const cards = cardsOf((await currentReport(threadState, m.posts[0]!.ts, clock.now))!.blocks);
     assert.match(cards[0]!.subtitle!.text, /^Approved by <@U0MAYA>/);
-    assert.equal(cards[1]!.subtitle!.text, "Closed, no decision");
-    assert.deepEqual(cards[1]!.actions.map((x) => x.text.text), ["View", "Open source"]);
+    assert.equal(cards[1]!.subtitle!.text, "Expired with no decision");
+    assert.deepEqual(cards[1]!.actions.map((x) => x.text.text), ["View card"]);
   });
 });
 
@@ -2505,7 +2505,7 @@ describe("the morning's one message a channel", () => {
     assert.match(lines[0]!, /^• <@U0STARTER>, .* Here are 8; 4 more come in the next report\.$/);
     assert.match(lines[1]!, /^• <@U0BEA>, checking in on 2 Roadmap cards\.$/);
     // Grouped by person, in bullet order: the starter's eight, then Bea's two.
-    assert.deepEqual(cards.slice(8).map((c) => c.actions[1]!.text.text), ["Open card", "Open card"]);
+    assert.deepEqual(cards.slice(8).map((c) => c.actions[1]!.text.text), ["Open card ↗", "Open card ↗"]);
     assert.equal(h.staged.length, 8);
     assert.equal((await h.store.pendingFindings()).length, 4, "the fixes past ten stay queued");
     assert.equal(m.staged.length, 2);

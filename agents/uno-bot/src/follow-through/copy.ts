@@ -218,7 +218,7 @@ export function etDay(at: number): string {
  */
 export function unownedChoices(creator: string): ReviewChoice[] {
   return [
-    { value: "assign", label: `Assign <@${creator}>`, past: `Assigned <@${creator}>`, verdict: "confirm" },
+    { value: "assign", label: `Assign <@${creator}>`, past: `Assigned to <@${creator}>`, verdict: "confirm" },
     { value: "leave", label: "Leave it", past: "Left unassigned", verdict: "cancel", decided: "No Contributor set. Not asked again until the card changes." },
   ];
 }
@@ -233,8 +233,8 @@ export function unownedChoices(creator: string): ReviewChoice[] {
  */
 export function staleChoices(again: number, drop: string | null): ReviewChoice[] {
   return [
-    { value: "done", label: "Done", verdict: "confirm" },
-    { value: "still", label: "Still on it", verdict: "cancel", decided: `Nothing written. Checked again ${etDay(again)}.` },
+    { value: "done", label: "Done", past: "Marked done", verdict: "confirm" },
+    { value: "still", label: "Still on it", past: "Kept open", verdict: "cancel", decided: `Nothing written. Checked again ${etDay(again)}.` },
     ...(drop
       ? [{ value: "drop", label: "Drop it", past: "Dropped", verdict: "confirm" as const, args: { properties: { "Design Status": drop } }, decided: `Written: moved to ${drop}.` }]
       : []),

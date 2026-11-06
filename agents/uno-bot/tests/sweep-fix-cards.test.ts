@@ -96,7 +96,7 @@ test("three fixes post as a parent line and three cards in a carousel, each with
   cards.forEach((card, i) => {
     assert.equal(plainOf(card.title), "Reflection PRD", "the page names the card, with no number");
     assert.match(plainOf(card.body), /^Page says “.*” · decision says “.*”$/);
-    assert.deepEqual(card.actions.map((a: Block) => a.text.text), ["Review", "Open page"]);
+    assert.deepEqual(card.actions.map((a: Block) => a.text.text), ["Review", "Open page ↗"]);
     assert.equal(card.actions[0].action_id, `uno_decision_review:${PAGE.blocks[i]!.id}`);
     assert.equal(card.actions[1].url, PAGE.url, "Open goes to the page");
     assert.match(card.icon.image_url, /notion/, "the Notion logo");
@@ -130,7 +130,7 @@ test("one fix posts as a parent line naming its page, and one card", async () =>
   assert.equal(blocks[1]!.type, "card", "one card stands alone, no carousel, no deadline under it");
   assert.doesNotMatch(JSON.stringify(blocks), /Expires/);
   assert.equal(plainOf(blocks[1]!.title), "Reflection PRD");
-  assert.deepEqual(blocks[1]!.actions.map((a: Block) => a.text.text), ["Review", "Open page"]);
+  assert.deepEqual(blocks[1]!.actions.map((a: Block) => a.text.text), ["Review", "Open page ↗"]);
   assert.doesNotMatch(JSON.stringify(blocks), GATE_WORDS);
 });
 
@@ -213,8 +213,8 @@ test("a decision on a report that posted plain redraws it plain", async () => {
   assert.equal(redrawn.ts, post.ts);
   const blocks = redrawn.blocks as Block[];
   assert.equal(blocks.some((b) => b.type === "card" || b.type === "carousel"), false, "still plain");
-  assert.match(blocks[2]!.text.text, /Approved by <@U0BEA> · written /);
-  assert.equal(blocks[2]!.accessory.text.text, "View");
+  assert.match(blocks[2]!.text.text, /\nApproved by <@U0BEA>\n/);
+  assert.equal(blocks[2]!.accessory.text.text, "View decision");
   assert.equal(blocks[1]!.accessory.text.text, "Review");
   assert.equal(messageBlocksRefusal(blocks), null);
 });
@@ -239,9 +239,9 @@ test("Review decides one fix: Approve runs only it, and its card redraws as appr
   assert.deepEqual(door.ran[0]!.execute?.operations, second.operations, "only that fix runs");
   assert.equal(door.updates.at(-1)!.ts, post.ts, "the report's own message is edited");
   const cards = (door.updates.at(-1)!.blocks as Block[])[1]!.elements as Block[];
-  assert.match(cards[1]!.subtitle.text, /^Approved by <@U0BEA> · written /);
-  assert.equal(plainOf(cards[1]!.body), `Written: ${FIXES[1]}`);
-  assert.deepEqual(cards[0]!.actions.map((a: Block) => a.text.text), ["Review", "Open page"], "the others wait on their own decisions");
+  assert.equal(cards[1]!.subtitle.text, "Approved by <@U0BEA>");
+  assert.doesNotMatch(plainOf(cards[1]!.body), /^Written/);
+  assert.deepEqual(cards[0]!.actions.map((a: Block) => a.text.text), ["Review", "Open page ↗"], "the others wait on their own decisions");
   assert.equal(messageBlocksRefusal(door.updates.at(-1)!.blocks as Block[]), null);
 });
 

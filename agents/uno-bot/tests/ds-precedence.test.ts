@@ -637,7 +637,7 @@ describe("the morning post", () => {
     assert.equal(button!.title.text, "Button");
     assert.equal(button!.subtitle!.text, "Library side");
     assert.match(button!.body.text, /^Code has one fill prop \(/, "plain words, no backticks");
-    assert.deepEqual(button!.actions.map((a) => a.text.text), ["Review", "Code", "Figma"]);
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["Review", "Code ↗", "Figma ↗"]);
     assert.match(button!.actions[1]!.url!, /^https:\/\/github\.com\/BilLogic\/plus-uno\/blob\/main\//);
     assert.match(button!.actions[2]!.url!, /^https:\/\/www\.figma\.com\//);
     assert.equal(tree!.title.text, "TreeSelect");
@@ -759,7 +759,7 @@ describe("the morning post", () => {
     assert.deepEqual(reportBox.box.value!.items.map((i) => i.component), ["TreeSelect"], "it waits for the next morning");
     const [, tree] = cardsIn(edits[0]!.message.blocks!);
     assert.equal(tree!.subtitle!.text, NOT_STAGED);
-    assert.deepEqual(tree!.actions.map((a) => a.text.text), ["Code", "Figma"], "no Review");
+    assert.deepEqual(tree!.actions.map((a) => a.text.text), ["Code ↗", "Figma ↗"], "no Review");
   });
 
   it("keeps the report for tomorrow when the members cannot be read, or the message does not carry it", async () => {
@@ -954,19 +954,20 @@ describe("deciding a weekly card in its Review", () => {
     assert.equal(gh.comments.length, 1);
     assert.match(gh.comments[0]!.comment, /^### Button/);
     const [button, tree] = cardsIn(updates.at(-1)!.message.blocks);
-    assert.match(tree!.subtitle!.text, /^Approved by <@U0MEMBER1> · written /);
-    assert.match(button!.subtitle!.text, /^Approved by <@U0MEMBER2> · written /);
-    assert.equal(tree!.body.text, "Written: added to DS precedence intake #1101.");
-    assert.equal(button!.body.text, "Written: added to DS precedence intake #1101.");
-    assert.deepEqual(button!.actions.map((a) => a.text.text), ["View", "Code", "Figma"]);
+    assert.equal(tree!.subtitle!.text, "Approved by <@U0MEMBER1>");
+    assert.equal(button!.subtitle!.text, "Approved by <@U0MEMBER2>");
+    assert.match(tree!.body.text, /^(?!Written|Nothing written|Note:)/, "the card keeps its finding");
+    assert.match(button!.body.text, /^(?!Written|Nothing written|Note:)/, "the card keeps its finding");
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["View decision"]);
   });
 
   it("names the existing intake found at write time, rather than the draft's destination", async () => {
-    const { decide, gh, updates } = await decided([{ number: 1090, url: `https://github.com/${REPO}/issues/1090`, body: precedenceMarker("2026-10-02") }]);
+    const { decide, gh, store } = await decided([{ number: 1090, url: `https://github.com/${REPO}/issues/1090`, body: precedenceMarker("2026-10-02") }]);
     await decide("ds-Button", "confirm", MEMBERS[0]!);
     assert.equal(gh.created.length, 0);
     assert.equal(gh.comments[0]!.issue_number, 1090);
-    assert.equal(cardsIn(updates.at(-1)!.message.blocks)[0]!.body.text, "Written: added to DS precedence intake #1090.");
+    const state = (await store.getReport(MSG))!.entries.find((e) => e.id === "ds-Button")!.state;
+    assert.equal(state.kind === "approved" ? state.done : undefined, "added to DS precedence intake #1090.", "kept for View to say");
   });
 
   it("keeps a failed write as not written even if its result carries a receipt", async () => {
@@ -974,8 +975,8 @@ describe("deciding a weekly card in its Review", () => {
     gh.deps.comment = async () => JSON.stringify({ ok: false, error: "GitHub unavailable", report_done: "added to intake #1090." });
     await decide("ds-Button", "confirm", MEMBERS[0]!);
     const button = cardsIn(updates.at(-1)!.message.blocks)[0]!;
-    assert.match(button.subtitle!.text, /not written/);
-    assert.equal(button.body.text, "Nothing written.");
+    assert.match(button.subtitle!.text, /, not written$/);
+    assert.match(button.body.text, /^(?!Written|Nothing written|Note:)/, "the card keeps its finding");
   });
 
   it("Needs changes disputes the card: its note goes on the week's intake, filing it first, and the card reads Noted by", async () => {
@@ -988,8 +989,8 @@ describe("deciding a weekly card in its Review", () => {
     assert.match(gh.created[0]!.body, /\*\*Button\*\*: disputed by Maya — ghost is library-only on purpose/);
     const [button] = cardsIn(updates.at(-1)!.message.blocks);
     assert.equal(button!.subtitle!.text, "Noted by <@U0MEMBER1>");
-    assert.equal(button!.body.text, "Note: ghost is library-only on purpose");
-    assert.deepEqual(button!.actions.map((a) => a.text.text), ["View", "Code", "Figma"]);
+    assert.match(button!.body.text, /^(?!Written|Nothing written|Note:)/, "the card keeps its finding");
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["View decision"]);
     assert.notEqual((await store.getProposalByTs(itemProposal(MSG, "ds-Button").proposalTs)).state, "found", "nothing else decides it");
 
     await decide("ds-TreeSelect", "revise", MEMBERS[1]!, "the library is right, code is behind");
@@ -1034,7 +1035,7 @@ describe("deciding a weekly card in its Review", () => {
     await decide("ds-Button", "revise", MEMBERS[0]!, "deliberate");
     const [button] = cardsIn(updates.at(-1)!.message.blocks);
     assert.equal(button!.subtitle!.text, "Library side");
-    assert.deepEqual(button!.actions.map((a) => a.text.text), ["Review", "Code", "Figma"]);
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["Review", "Code ↗", "Figma ↗"]);
     assert.match(said[0]!, /didn't reach this week's intake/);
     const live = await store.getProposalByTs(itemProposal(MSG, "ds-Button").proposalTs);
     assert.equal(live.state, "found");

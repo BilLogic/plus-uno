@@ -188,8 +188,8 @@ export function driftCardWords(): StatedCardWords {
 export function driftChoices(): ReviewChoice[] {
   return [
     { value: "file", label: "File an intake", past: "Intake filed", verdict: "confirm" },
-    { value: "updated", label: "Already updated", verdict: "cancel" },
-    { value: "untouched", label: "Didn't touch this file", verdict: "cancel" },
+    { value: "updated", label: "Already updated", past: "Marked updated", verdict: "cancel" },
+    { value: "untouched", label: "Didn't touch this file", past: "Marked not yours", verdict: "cancel" },
   ];
 }
 

@@ -431,7 +431,7 @@ export interface PendingProposal {
  * One answer a card offers in its Review pop-up. Choosing it decides the card
  * as its `verdict`: `confirm` runs the batch with `args` merged into each
  * operation's input, `cancel` writes nothing. The decided card names it:
- * "<past or label> · <@who>", with `decided` as its body when set.
+ * "<past> by <@who>"; its pop-up says `decided`, what the answer changed.
  */
 export interface ReviewChoice {
   /** Unique within the card; no `:`. */
@@ -441,8 +441,9 @@ export interface ReviewChoice {
   verdict: "confirm" | "cancel";
   /** Merged into each operation's input on confirm, objects key by key. */
   args?: Record<string, unknown>;
-  /** How the decided card names it, mrkdwn ("Dropped"); absent, `label`. */
-  past?: string;
+  /** How the decided card names it, in the past tense, mrkdwn: "Dropped",
+   *  read as "Dropped by <@who>". */
+  past: string;
   /** The decided card's body after this choice, plain text. */
   decided?: string;
 }
@@ -640,7 +641,7 @@ export interface ReportItem {
   open: { label?: string; url: string };
   /** A second source, as the card's third button. */
   also?: { label: string; url: string };
-  /** What the card says once written, after "Written: ". Absent, its body. */
+  /** What the write did, as View says it once approved. Absent, its body. */
   done?: string;
   /** The item's whole words, mrkdwn, when its body is a shortened view of
    *  them: View shows them once its proposal is gone. */

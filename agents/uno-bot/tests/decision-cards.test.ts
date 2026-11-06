@@ -68,7 +68,7 @@ describe("the shared decision card", () => {
     assert.equal(card!.title!.text, "Page 1");
     assert.equal(card!.subtitle!.text, "<@U0OWNER1> · card comment");
     assert.equal(card!.body!.text, "Page says 1 · decision says 2.");
-    assert.deepEqual(labels(card!), ["Review", "Open"]);
+    assert.deepEqual(labels(card!), ["Review", "Open ↗"]);
     const [review, open] = card!.actions!;
     assert.equal(review!.action_id, `${DECISION_REVIEW_ACTION_PREFIX}c1`);
     assert.equal(open!.url, "https://www.notion.so/page1");
@@ -98,7 +98,7 @@ describe("the shared decision card", () => {
     assert.equal(card!.subtitle!.text.length, 150);
     assert.equal(card!.body!.text.length, 200);
     assert.ok(card!.body!.text.endsWith("…"));
-    assert.deepEqual(labels(card!), ["Review", "Open page", "Open DM"]);
+    assert.deepEqual(labels(card!), ["Review", "Open page ↗", "Open DM"]);
   });
 
   it("shows ten and holds the rest, and the parent line counts the same set", () => {
@@ -263,53 +263,57 @@ describe("whom a report pings", () => {
 describe("what a card shows once decided", () => {
   // 2026-10-09 15:26 UTC is 11:26 ET.
   const AT = Date.UTC(2026, 9, 9, 15, 26);
+  const BODY = "Page says 1 · decision says 2.";
+  const as = (label: string) => ({ value: "x", label });
 
-  it("approved and written: who, when (ET), and what was written; View", () => {
-    const card = cardIn({ kind: "approved", by: "U0BILL", at: AT }, { done: "the percentage is deleted." });
-    assert.equal(card.subtitle!.text, "Approved by <@U0BILL> · written 11:26");
-    assert.equal(card.body!.text, "Written: the percentage is deleted.");
-    assert.deepEqual(labels(card), ["View", "Open"]);
-    assert.equal(card.actions![0]!.action_id, `${DECISION_REVIEW_ACTION_PREFIX}c1`, "View opens the same item");
-  });
+  // Each outcome in the copy table: its subtitle, and the one button a decided
+  // card keeps. The body is always the item's own.
+  const decided: Array<[string, ReportItemState, string, string]> = [
+    ["approved", { kind: "approved", by: "U0BILL", at: AT }, "Approved by <@U0BILL>", "View decision"],
+    ["rejected", { kind: "rejected", by: "U0BILL", reason: "deliberate" }, "Rejected by <@U0BILL>", "View decision"],
+    ["noted", { kind: "noted", by: "U0BILL", note: "is this the old badge?" }, "Noted by <@U0BILL>", "View decision"],
+    ["marked done", { kind: "approved", by: "U0BILL", at: AT, as: as("Marked done") }, "Marked done by <@U0BILL>", "View decision"],
+    ["kept open", { kind: "rejected", by: "U0BILL", as: as("Kept open") }, "Kept open by <@U0BILL>", "View decision"],
+    ["dropped", { kind: "approved", by: "U0BILL", at: AT, as: as("Dropped") }, "Dropped by <@U0BILL>", "View decision"],
+    ["assigned", { kind: "approved", by: "U0BILL", at: AT, as: as("Assigned to <@U0ANN>") }, "Assigned to <@U0ANN> by <@U0BILL>", "View decision"],
+    ["left unassigned", { kind: "rejected", by: "U0BILL", as: as("Left unassigned") }, "Left unassigned by <@U0BILL>", "View decision"],
+    ["marked moved", { kind: "rejected", by: "U0BILL", as: as("Marked moved") }, "Marked moved by <@U0BILL>", "View decision"],
+    ["left as is", { kind: "approved", by: "U0BILL", at: AT, as: as("Left as is") }, "Left as is by <@U0BILL>", "View decision"],
+    ["intake filed", { kind: "approved", by: "U0BILL", at: AT, as: as("Intake filed") }, "Intake filed by <@U0BILL>", "View decision"],
+    ["marked updated", { kind: "rejected", by: "U0BILL", as: as("Marked updated") }, "Marked updated by <@U0BILL>", "View decision"],
+    ["marked not yours", { kind: "rejected", by: "U0BILL", as: as("Marked not yours") }, "Marked not yours by <@U0BILL>", "View decision"],
+    ["not written", { kind: "failed", by: "U0BILL", at: AT, reason: "the page changed since" }, "Approved by <@U0BILL>, not written", "View decision"],
+    ["expired", { kind: "expired" }, "Expired with no decision", "View card"],
+  ];
+  for (const [name, state, subtitle, button] of decided) {
+    it(`${name}: "${subtitle}", the item's own body, and ${button} alone`, () => {
+      const card = cardIn(state, { done: "the percentage is deleted.", also: { label: "Figma", url: "https://www.figma.com/design/F" } });
+      assert.equal(card.subtitle!.text, subtitle);
+      assert.equal(card.body!.text, BODY);
+      assert.deepEqual(labels(card), [button]);
+      assert.equal(card.actions![0]!.action_id, `${DECISION_REVIEW_ACTION_PREFIX}c1`, "it opens the same item");
+      assert.ok(card.actions!.every((a) => a.url === undefined), "no decided card carries a link");
+    });
+  }
 
-  it("approved and not written: why, and nothing written", () => {
-    const card = cardIn({ kind: "failed", by: "U0BILL", at: AT, reason: "the page changed since" });
-    assert.equal(card.subtitle!.text, "Approved by <@U0BILL> · not written: the page changed since");
-    assert.equal(card.body!.text, "Nothing written.");
-    assert.deepEqual(labels(card), ["View", "Open"]);
-  });
-
-  it("rejected: who, and the reason in the body when given", () => {
-    const card = cardIn({ kind: "rejected", by: "U0BILL", reason: "deliberate, the library is ahead" });
-    assert.equal(card.subtitle!.text, "Rejected by <@U0BILL>");
-    assert.equal(card.body!.text, "Nothing written. Reason: deliberate, the library is ahead");
-    assert.equal(cardIn({ kind: "rejected", by: "U0BILL" }).body!.text, "Nothing written.");
-  });
-
-  it("closed with no decision; View", () => {
-    const card = cardIn({ kind: "expired" });
-    assert.equal(card.subtitle!.text, "Closed, no decision");
-    assert.deepEqual(labels(card), ["View", "Open"]);
-  });
-
-  it("changes asked: who asked, and Review stays", () => {
-    const card = cardIn({ kind: "changes-asked", by: "U0A" });
+  it("changes asked: still open, so Review and its links stay, each link leaving Slack marked", () => {
+    const card = cardIn({ kind: "changes-asked", by: "U0A" }, { also: { label: "Open DM", url: "https://slack.com/archives/D1/p1" } });
     assert.equal(card.subtitle!.text, "Changes asked by <@U0A>");
-    assert.deepEqual(labels(card), ["Review", "Open"]);
+    assert.equal(card.body!.text, BODY);
+    assert.deepEqual(labels(card), ["Review", "Open ↗", "Open DM"]);
   });
 
   it("never staged: says so, and offers nothing to review", () => {
     const card = cardIn({ kind: "not-staged", note: "Didn't go through, so it's queued again for tomorrow morning." });
     assert.equal(card.subtitle!.text, "Didn't go through, so it's queued again for tomorrow morning.");
-    assert.deepEqual(labels(card), ["Open"]);
+    assert.deepEqual(labels(card), ["Open ↗"]);
   });
 
   it("keeps the whole reason for View, past what the card's body holds", () => {
     const reason = "R".repeat(400);
     const record = reportRecord("C1", "1790000000.000100", decisionReport([item(1)], "One."), 3_600_000);
     const rejected = { ...record, entries: [{ ...record.entries[0]!, state: { kind: "rejected" as const, by: "U0BILL", reason } }] };
-    assert.equal(cardsOf(reportMessage(rejected).blocks)[0]!.body!.text.length, 200);
-    assert.equal(itemText(rejected, "c1"), `Page 1\nRejected by <@U0BILL>\nNothing written. Reason: ${reason}`);
+    assert.equal(itemText(rejected, "c1"), `Page 1\nRejected by <@U0BILL>\n${BODY}\nReason: ${reason}`);
     assert.equal(itemText(rejected, "c9"), null);
   });
 

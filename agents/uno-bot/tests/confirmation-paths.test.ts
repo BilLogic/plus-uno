@@ -282,7 +282,7 @@ describe("five signals, one verdict", () => {
   it("does not count a card's own answer as an edit, but does an edit made beside it", async () => {
     // A choice card merges the chosen answer's args into the batch; picking
     // one of the card's own answers changes nothing the stager did not offer.
-    const choices = [{ value: "keep", label: "Keep", verdict: "confirm" as const, args: { status: "Kept" } }];
+    const choices = [{ value: "keep", label: "Keep", past: "Kept", verdict: "confirm" as const, args: { status: "Kept" } }];
     const card = { ...PROPOSAL, input: { title: "T" }, choices };
     for (const [name, input, edited] of [
       ["the answer alone", { title: "T", status: "Kept" }, false],

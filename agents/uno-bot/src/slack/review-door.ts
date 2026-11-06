@@ -435,7 +435,7 @@ export async function runReviewDecision(request: ReviewDecisionRequest, deps: Re
     return;
   }
   await applyPressVerdict(
-    { channel: request.channel, messageTs: request.messageTs, decision, userId: request.userId, ...(own ? { as: { value: own.value, label: own.past ?? own.label, ...(own.decided ? { decided: own.decided } : {}) } } : {}) },
+    { channel: request.channel, messageTs: request.messageTs, decision, userId: request.userId, ...(own ? { as: { value: own.value, label: own.past, ...(own.decided ? { decided: own.decided } : {}) } } : {}) },
     verdict,
     {
       delivery: deps.delivery,

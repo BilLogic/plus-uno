@@ -172,8 +172,8 @@ describe("a draft outside the share-out keeps its body and gains its title and d
     const view = draftView(card, {
       ...BASE,
       choices: [
-        { value: "done", label: "Done", verdict: "confirm", decided: "Marked done." },
-        { value: "still", label: "Still on it", verdict: "cancel", decided: "Nothing written. Checked again Monday." },
+        { value: "done", label: "Done", past: "Marked done", verdict: "confirm", decided: "Marked done." },
+        { value: "still", label: "Still on it", past: "Kept open", verdict: "cancel", decided: "Nothing written. Checked again Monday." },
       ],
     }, access);
     const choice = blocks(view).find((b) => b.block_id === "uno_review_choice") as { label: { text: string }; element: { options: Array<{ value: string; description?: { text: string } }> } };

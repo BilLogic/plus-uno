@@ -24,7 +24,7 @@ describe("the report expiry job", () => {
     now = 1001;
     await redrawExpiredReport("1700.9", { store, edit: async (_channel, _ts, message) => void edits.push(message) });
     assert.equal(edits.length, 1);
-    assert.match(edits[0]!.text, /Closed, no decision/);
+    assert.match(edits[0]!.text, /Expired with no decision/);
     assert.match(JSON.stringify(edits[0]!.blocks), /Approved by/);
     assert.deepEqual(edits[0]!.metadata, report().metadata);
     assert.deepEqual((await store.getReport("1700.9"))!.entries.map((e) => e.state.kind), ["approved", "expired"]);
@@ -71,9 +71,9 @@ describe("the report expiry job", () => {
     await redrawExpiredReport("1700.9", { store, edit: async () => assert.fail("not expired") });
     now++;
     await redrawExpiredReport("1700.9", { store, edit: async (_c, _ts, message) => {
-      assert.match(message.text, /Closed, no decision/);
+      assert.match(message.text, /Expired with no decision/);
       const actions = message.blocks.map((block) => (block as { accessory?: { text: { text: string } } }).accessory).filter(Boolean);
-      assert.deepEqual(actions.map((action) => action!.text.text), ["View", "View"]);
+      assert.deepEqual(actions.map((action) => action!.text.text), ["View card", "View card"]);
       assert.deepEqual(message.metadata, report().metadata);
     } });
   });

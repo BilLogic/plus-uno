@@ -161,7 +161,7 @@ export function tidyFacts(finding: TidyFinding, likely: { number: number; title:
 /** The two answers. Neither writes to Figma. */
 export function tidyChoices(): ReviewChoice[] {
   return [
-    { value: "moved", label: "Moved it", verdict: "cancel", decided: "Next week's tidy-up checks the file again." },
+    { value: "moved", label: "Moved it", past: "Marked moved", verdict: "cancel", decided: "Next week's tidy-up checks the file again." },
     { value: "leave", label: "Leave as is", past: "Left as is", verdict: "confirm", decided: "Not raised again until the file's cards change." },
   ];
 }

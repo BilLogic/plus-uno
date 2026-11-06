@@ -144,7 +144,7 @@ describe("Needs changes on one item of a report", () => {
     assert.notEqual(last, asked);
     const two = cards(last.message.blocks)[1]!;
     assert.equal(two.subtitle!.text, "Bill · card comment", "open again");
-    assert.deepEqual(two.actions.map((a) => a.text.text), ["Review", "Open"]);
+    assert.deepEqual(two.actions.map((a) => a.text.text), ["Review", "Open ↗"]);
     assert.equal(two.actions[0]!.action_id, "uno_decision_review:c2", "the same proposal, decidable again");
     const look = await store.getProposalByTs(itemProposal(MSG, "c2").proposalTs);
     assert.equal(look.state, "found");

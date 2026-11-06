@@ -543,10 +543,10 @@ describe("the morning's decisions on the sweep's message in #plus-design (#900)"
     assert.equal(cards[1]!.body.text, "Card 2482 › Design Status: WIP → Under Review");
     assert.match(cards[2]!.body.text, /^Intake: "Goal chips use the Badge pill variant"\. Agreed in Figma/);
     // Each card is decided from its own Review; Open goes to its comment.
-    assert.deepEqual(cards[0]!.actions.map((a) => a.text.text), ["Review", "Open comment", "Open page"]);
+    assert.deepEqual(cards[0]!.actions.map((a) => a.text.text), ["Review", "Open comment ↗", "Open page ↗"]);
     assert.equal(cards[0]!.actions[1]!.url, "https://www.figma.com/design/GoalFile1?node-id=4-1#c1");
-    assert.deepEqual(cards[1]!.actions.map((a) => a.text.text), ["Review", "Open comment", "Open card"]);
-    assert.deepEqual(cards[2]!.actions.map((a) => a.text.text), ["Review", "Open comment"]);
+    assert.deepEqual(cards[1]!.actions.map((a) => a.text.text), ["Review", "Open comment ↗", "Open card ↗"]);
+    assert.deepEqual(cards[2]!.actions.map((a) => a.text.text), ["Review", "Open comment ↗"]);
     // Nothing to type or react: no gate footer anywhere it posted or staged.
     for (const text of [parent.text, JSON.stringify(blocks), ...h.staged.map((p) => p.proposalText)]) {
       assert.doesNotMatch(text, /white_check_mark|no_entry|✅|⛔|\bdrop \d|\bskip\b|react/);
@@ -694,7 +694,7 @@ describe("the morning's decisions on the sweep's message in #plus-design (#900)"
     const parent = parentOf(h);
     const cards = (parent.editedBlocks as Array<{ elements?: Card[] }>)[1]!.elements!;
     assert.equal(cards[0]!.subtitle!.text, "Didn't go through, so it's queued again for tomorrow morning.");
-    assert.deepEqual(cards[0]!.actions.map((a) => a.text.text), ["Open comment", "Open page"], "nothing to review");
+    assert.deepEqual(cards[0]!.actions.map((a) => a.text.text), ["Open comment ↗", "Open page ↗"], "nothing to review");
     assert.deepEqual(cards.slice(1).map((c) => c.actions[0]!.text.text), ["Review", "Review", "Review"], "the others stand");
     assert.deepEqual(h.figma.queue.get(FILE)?.decisions.map((d) => d.commentId), ["c1"]);
     // The next morning's message carries it, numbered from 1 there.
