@@ -94,10 +94,25 @@ folds the rest into a `+n`.
 
 ## State
 
-<DocsCanvasShell description={<>An avatar has no hover, pressed, focus or disabled state. These stories check that, so a state added by accident is caught.</>}>
+<DocsCanvasShell description={<>Rest. The only state.</>}>
     <DsCanvasQuiet of={AvatarStories.Rest} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<>Hovered. No change: an avatar is not a control.</>}>
+    <DsCanvasQuiet of={AvatarStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Pressed. No change.</>}>
+    <DsCanvasQuiet of={AvatarStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focused. Not in the tab order.</>}>
+    <DsCanvasQuiet of={AvatarStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled. Never dimmed.</>}>
+    <DsCanvasQuiet of={AvatarStories.Disabled} />
+</DocsCanvasShell>
 
 </div>
 

@@ -18,10 +18,10 @@ The signed-in user: an initial pill, the name, the role indicator ("Lead") and a
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `firstChar` | string | `'J'` | The initial shown in the pill. |
-| `name` | string | `'John Doe'` | The user's name. Truncates at the label maximum width. |
+| `name` | string | `'John Doe'` | The user's name. Truncates with an ellipsis; at the label maximum width in the compact spacing. |
 | `counter` | bool | `true` | Show the notification counter. |
 | `counterValue` | number | `2` | The number in the counter. |
-| `state` | enum | `'enabled'` | Forces the hover look, for docs. |
+| `state` | enum | `'enabled'` | Forces the hover look, for docs, or dims the row as disabled. |
 | `type` | enum | `'regular tutor'` | The user type. `lead tutor` adds the Lead status tag. |
 | `spacing` | enum | `'default'` | `compact` is 32 high, for the topbar. `default` is padded, for table rows. |
 | `id` | string | — | — |

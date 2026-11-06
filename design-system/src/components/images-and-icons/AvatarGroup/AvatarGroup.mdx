@@ -83,7 +83,7 @@ overlap, the ring between neighbors, and how many fit on the row.
     <DsCanvasQuiet of={AvatarGroupStories.Hovered} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>Focused. A 2px ring, 2px off the button, for keyboard focus.</>}>
+<DocsCanvasShell description={<>Focused. A 2px ring, 1px off the button, for keyboard focus.</>}>
     <DsCanvasQuiet of={AvatarGroupStories.Focused} />
 </DocsCanvasShell>
 
@@ -139,7 +139,7 @@ each person beside their picture.
 
 ## Parts
 
-1. **Avatars.** Up to `max` minus one, each the group's size and shape, overlapping by a quarter.
+1. **Avatars.** Up to `max`; when people overflow, `max` minus one plus the `+n`. Each the group's size and shape, overlapping by a quarter.
 2. **Ring.** A surface-colored ring around each avatar that separates neighbors.
 3. **Overflow.** A gray `+n` button that opens a menu of the people left out, by name.
 

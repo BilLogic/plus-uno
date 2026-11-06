@@ -117,7 +117,7 @@ Use `UserAvatar` for the current user's identity in the topbar or in a row that 
 ## Parts
 
 1. **Initial.** A round pill with the first letter of the name, in `--ds-background-brand-subtlest`. Hidden from assistive technology.
-2. **Name.** Truncates at the label maximum width and keeps the full name in its `title`.
+2. **Name.** Truncates with an ellipsis (at the label maximum width in the compact spacing) and keeps the full name in its `title`.
 3. **Role.** A Status tag with the text "Lead" for a lead tutor; other types show none.
 4. **Counter.** Optional, a danger-subtler pill with the notification count.
 
@@ -159,7 +159,7 @@ Use `UserAvatar` for the current user's identity in the topbar or in a row that 
 
 ### Pick `spacing` by where it sits.
 
-`compact` fits the 32 topbar. `default` fits table rows. The name truncates at the label maximum width and keeps the full name in its `title`.
+`compact` fits the 32 topbar. `default` fits table rows. The name truncates with an ellipsis, at the label maximum width in `compact`, and keeps the full name in its `title`.
 
 ```jsx
 <UserAvatar spacing={topbar ? 'compact' : 'default'} name={user.name} firstChar={user.name[0]} type="lead tutor" counterValue={3} />
