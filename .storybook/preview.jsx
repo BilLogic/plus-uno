@@ -186,9 +186,13 @@ const preview = {
         // must be a literal — edit the taxonomy, then run: node scripts/sync-storybook-sort.mjs
         /* IA-SORT-START */
         order: [
-          "Getting started",
+          "Get started",
           [
-            "Introduction"
+            "Design",
+            "Develop",
+            "With AI",
+            "Content design",
+            "About"
           ],
           "Foundations",
           [
@@ -206,24 +210,6 @@ const preview = {
             "Logos",
             "Motion",
             "Accessibility",
-            "Patterns",
-            [
-              "Introduction",
-              "Page templates",
-              "Frame",
-              "Page",
-              "Topbar",
-              "Sidebar",
-              "Section",
-              "List and detail",
-              "AI chat",
-              "Card",
-              "Table",
-              "Blanket",
-              "Modal",
-              "Popup family",
-              "Drawer"
-            ],
             "Imagery"
           ],
           "Components",
@@ -302,7 +288,6 @@ const preview = {
               "Accordion",
               "Carousel",
               "Page header",
-              "Panel",
               "Scrollbar",
               "Visually hidden"
             ],
@@ -352,9 +337,50 @@ const preview = {
               "Table"
             ]
           ],
-          "Data visualizations",
+          "Patterns",
+          [
+            "Introduction",
+            "Frame",
+            [
+              "Frame",
+              "Topbar"
+            ],
+            "Sidebar",
+            "Page",
+            [
+              "Page",
+              "Heading outline"
+            ],
+            "Panel",
+            "Section",
+            [
+              "Section",
+              "List and detail",
+              "Card",
+              "Table"
+            ],
+            "Overlays",
+            [
+              "Blanket",
+              "Modal",
+              "Drawer"
+            ],
+            "Popups",
+            "Templates"
+          ],
+          "AI",
           [
             "Overview",
+            "AI chat",
+            "AI identity candidates"
+          ],
+          "Tools",
+          [
+            "Overview",
+            "Documented contract"
+          ],
+          "Data visualizations",
+          [
             "Color",
             "Comparison",
             "Correlation",

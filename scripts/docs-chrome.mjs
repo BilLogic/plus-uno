@@ -164,7 +164,7 @@ export function measureScript(page) {
     });
     // Prose the fix in #252 owns, and only that: elements carrying no class of
     // their own. A paragraph with an authored class — the Tailwind captions on
-    // Getting started/Introduction — is that page's decision, not this one's,
+    // Get started/About — is that page's decision, not this one's,
     // and asserting over it would turn a typography gate into a content gate.
     // The selector here is deliberately the same population the CSS rule claims.
     const prose = [...document.querySelectorAll('.sbdocs-content p, .sbdocs-content li')]

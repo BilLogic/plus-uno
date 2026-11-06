@@ -47,8 +47,8 @@ const FrameWithSlots = (args) => (
 );
 
 export default {
-    title: 'Foundations/Patterns/Frame',
-    id: 'foundations-patterns-frame',
+    title: 'Patterns/Frame/Frame',
+    id: 'patterns-frame-frame',
     component: Frame,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },

@@ -85,7 +85,7 @@ const pageProps = {
 };
 
 export default {
-    title: 'Foundations/Patterns/Page templates',
+    title: 'Patterns/Templates',
     component: PageLayout,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },

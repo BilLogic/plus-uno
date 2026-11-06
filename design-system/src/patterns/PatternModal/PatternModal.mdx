@@ -38,9 +38,9 @@ A Modal asks for one decision or one short task before the person goes on. It bl
 ### When to use
 
 - Use a Modal when one task blocks the page, such as moving a session or confirming a delete.
-- For a task that needs the page in view, use a [Drawer](?path=/docs/foundations-patterns-drawer--docs).
-- For an aside that needs no decision, use a Popup from the [Popup family](?path=/docs/foundations-patterns-popup-family--docs). A Modal blocks the page and a Popup does not.
-- For content that belongs in the page flow, use a [Card](?path=/docs/foundations-patterns-card--docs) or a [Section](?path=/docs/foundations-patterns-section--docs).
+- For a task that needs the page in view, use a [Drawer](?path=/docs/patterns-overlays-drawer--docs).
+- For an aside that needs no decision, use a Popup from the [Popup family](?path=/docs/patterns-popups--docs). A Modal blocks the page and a Popup does not.
+- For content that belongs in the page flow, use a [Card](?path=/docs/patterns-section-card--docs) or a [Section](?path=/docs/patterns-section-section--docs).
 - To tell someone something without interrupting them, use a Flag or a Banner.
 - For one line of help on a control, use a Tooltip.
 
@@ -69,7 +69,7 @@ The Modal pads 16 on every side and rounds 12 at every width. The header, body a
 <tbody>
 <tr><td><code>title</code></td><td>node</td><td>text</td><td>none</td><td>The title in the header. It is the dialog's heading and its name.</td></tr>
 <tr><td><code>width</code></td><td>string</td><td><code>sm</code>, <code>md</code>, <code>lg</code></td><td><code>sm</code></td><td>6, 8 or 10 columns of the screen grid plus 16 on each side.</td></tr>
-<tr><td><code>height</code></td><td>string</td><td><code>hug</code>, <code>fill</code></td><td><code>hug</code></td><td>Hug grows with the content to the cap set by the <a href="?path=/docs/foundations-patterns-blanket--docs">Blanket</a>. Fill always sits at that height.</td></tr>
+<tr><td><code>height</code></td><td>string</td><td><code>hug</code>, <code>fill</code></td><td><code>hug</code></td><td>Hug grows with the content to the cap set by the <a href="?path=/docs/patterns-overlays-blanket--docs">Blanket</a>. Fill always sits at that height.</td></tr>
 <tr><td><code>footer</code></td><td>node</td><td>buttons</td><td>none</td><td>The footer slot. Leaving it out removes the footer.</td></tr>
 <tr><td><code>header</code></td><td>node</td><td>content</td><td>none</td><td>A custom header, Figma's header <code>type</code> custom. It replaces the title and the Close button, so name the dialog with <code>aria-label</code>. Tabs, when set, still sit under it.</td></tr>
 <tr><td><code>divider</code></td><td>boolean</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td><td>Draws a 1px rule under the header and, when there is a footer, above it.</td></tr>
@@ -123,7 +123,7 @@ Figma's Modal has more options than the code draws.
 <tr><td><code>--modal-body-min-height</code></td><td>96</td><td>The least height the body draws, so a short body or the loading skeleton does not collapse. It aliases the 96 step of the space scale.</td></tr>
 <tr><td><code>--modal-radius</code></td><td>12</td><td>Corner radius at every width.</td></tr>
 <tr><td><code>--modal-width-sm</code>, <code>-md</code>, <code>-lg</code></td><td>see Width</td><td>The three width steps, per screen size.</td></tr>
-<tr><td><code>--blanket-max-height-modal</code></td><td>screen height less 2 × pad-y</td><td>The cap a hug Modal grows to and a fill Modal sits at. See Tokens on the <a href="?path=/docs/foundations-patterns-blanket--docs">Blanket</a> page.</td></tr>
+<tr><td><code>--blanket-max-height-modal</code></td><td>screen height less 2 × pad-y</td><td>The cap a hug Modal grows to and a fill Modal sits at. See Tokens on the <a href="?path=/docs/patterns-overlays-blanket--docs">Blanket</a> page.</td></tr>
 <tr><td><code>--ds-surface-overlay</code></td><td>overlay surface</td><td>The Modal's fill.</td></tr>
 <tr><td><code>--ds-shadow-overlay</code></td><td>overlay shadow</td><td>The Modal's elevation, the overlay pair.</td></tr>
 </tbody>
@@ -252,7 +252,7 @@ Inline confirmations of a destructive action do not dismiss on a Blanket click �
 
 ### Rules
 
-- Always center the Modal on the screen, inside a [Blanket](?path=/docs/foundations-patterns-blanket--docs). A Modal has no backdrop of its own.
+- Always center the Modal on the screen, inside a [Blanket](?path=/docs/patterns-overlays-blanket--docs). A Modal has no backdrop of its own.
 - Use a width step: 384, 507 or 629 at 768, 512, 677 or 843 at 1024, and 640, 848 or 1056 at 1440.
 - Pad 16 on every side, and round 12 for every size.
 - Put the buttons in the footer, end-aligned, with the primary last. Never place them in the body, which scrolls while the footer stays put.
@@ -327,10 +327,10 @@ The pattern draws inline, with no portal, focus trap or Escape handling. For a r
 
 ### Related
 
-- [Blanket](?path=/docs/foundations-patterns-blanket--docs) places the Modal and carries the dimmed ground, the pads and the screen grid.
-- [Drawer](?path=/docs/foundations-patterns-drawer--docs) takes the same width steps at a screen edge, for a task that needs the page in view.
-- [Popup family](?path=/docs/foundations-patterns-popup-family--docs) holds the floating layers that never block the page.
-- [Section](?path=/docs/foundations-patterns-section--docs) groups content that belongs on the page itself.
+- [Blanket](?path=/docs/patterns-overlays-blanket--docs) places the Modal and carries the dimmed ground, the pads and the screen grid.
+- [Drawer](?path=/docs/patterns-overlays-drawer--docs) takes the same width steps at a screen edge, for a task that needs the page in view.
+- [Popup family](?path=/docs/patterns-popups--docs) holds the floating layers that never block the page.
+- [Section](?path=/docs/patterns-section-section--docs) groups content that belongs on the page itself.
 
 </div>
 
