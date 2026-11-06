@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import { expectRest, expectHovered, expectFocused, expectDisabled } from '../_internal/fieldStatePlays';
 import TextField from '../TextField/TextField';
 import TagInput from './TagInput';
 
@@ -797,4 +798,28 @@ export const Interactive = {
         onCreateSpy: { table: { disable: true } },
     },
     render: (args) => <div style={stack}><Owned {...args} caption={args.caption || undefined} /></div>,
+};
+
+/** One story per state, for the Examples tab. */
+const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Topics' });
+const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
+
+export const Rest = {
+    render: () => <div style={wrap}><TagInput id="taginput-ex-rest" label="Topics" options={TOPICS} /></div>,
+    play: async ({ canvasElement }) => expectRest(canvasElement, controlOf(canvasElement)),
+};
+
+export const Hovered = {
+    render: () => <div style={wrap}><TagInput id="taginput-ex-hover" label="Topics" options={TOPICS} /></div>,
+    play: async ({ canvasElement }) => expectHovered(canvasElement, controlOf(canvasElement)),
+};
+
+export const Focused = {
+    render: () => <div style={wrap}><TagInput id="taginput-ex-focus" label="Topics" options={TOPICS} /></div>,
+    play: async ({ canvasElement }) => expectFocused(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldDisabled = {
+    render: () => <div style={wrap}><TagInput id="taginput-ex-disabled" label="Topics" options={TOPICS} disabled /></div>,
+    play: async ({ canvasElement }) => expectDisabled(canvasElement, controlOf(canvasElement)),
 };

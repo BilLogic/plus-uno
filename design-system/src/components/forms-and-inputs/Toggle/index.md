@@ -9,7 +9,7 @@ Controlled with `isChecked` or uncontrolled with `defaultChecked`. Built on Base
 
 **Source:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors
+**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, HoveredOn, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.mdx`
 
@@ -51,6 +51,4 @@ From `design-system/src/components/forms-and-inputs/Toggle/Toggle.scss`. Overrid
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

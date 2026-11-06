@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TagInputStories from './TagInput.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet, ComponentExample, DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -116,7 +116,7 @@ from a list or adds, such as the topics a session covers.
 
 <div className="sb-ds-doc-section">
 
-## States
+## More states
 
 <DocsCanvasShell description={<>Invalid: the danger border, and the message under the field is announced.</>}>
     <DsCanvasQuiet of={TagInputStories.Invalid} />
@@ -133,6 +133,24 @@ from a list or adds, such as the topics a session covers.
 <DocsCanvasShell description={<>Controlled: with <code>onChange</code> or <code>onRemove</code> the × removes the tag; with neither there is no ×.</>}>
     <DsCanvasQuiet of={TagInputStories.Controlled} />
 </DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={TagInputStories.Rest} title="Rest" description="The input fill and edge." />
+
+<ComponentExample of={TagInputStories.Hovered} title="Hovered" description="The edge turns the focused color." />
+
+<ComponentExample of={TagInputStories.Focused} title="Focused" description="A 2px ring, 2px off the box. No fill changes." />
+
+<ComponentExample of={TagInputStories.Invalid} title="Invalid" description="The danger edge with the message under the field, which is announced." />
+
+<ComponentExample of={TagInputStories.ReadOnly} title="Read-only" description="The tags on the read-only fill, with no × and no list." />
+
+<ComponentExample of={TagInputStories.FieldDisabled} title="Disabled" description="The whole field fades and leaves the tab order." />
 
 </div>
 
@@ -162,7 +180,7 @@ from a list or adds, such as the topics a session covers.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `TagInput` when a field's value is a set of short labels the person picks
 from a list and may add to: the topics a session covered, or the languages a
@@ -178,7 +196,37 @@ focusing it opens the list of options under it.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Field.** The box holding the tags and the text entry.
+2. **Tags.** The picked values, each removable unless the field is read-only or disabled.
+3. **Entry.** The text entry after the tags. Typing filters the list.
+4. **List.** The options under the field, with a "Create" row when nothing matches.
+5. **Caption.** Helper text, or the error that replaces it.
+
+### States and tokens
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-default</code> edge in <code>--ds-border-input</code>, <code>--radius-0625</code> (<code>--radius-h32</code> compact).</td></tr>
+<tr><td>Hovered</td><td>The edge turns <code>--ds-border-focused</code>.</td></tr>
+<tr><td>Focused</td><td>A <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, 2px off the box. No fill changes.</td></tr>
+<tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code> and the message <code>--ds-text-danger</code>.</td></tr>
+<tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill.</td></tr>
+<tr><td>Disabled</td><td>The whole field fades to <code>--ds-opacity-disabled</code>.</td></tr>
+<tr><td>Text</td><td>Placeholder <code>--ds-text-subtlest</code>, helper text <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Pressed</td><td>No step of its own. The hovered edge holds while the pointer is down.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### The caller owns the options, and stores what is created.
 
@@ -278,6 +326,24 @@ On a row's handle and in its menu:
 | Enter on the "…" | Opens the menu with focus in the name. |
 | Enter in the name | Renames the option. After ↑ ↓, picks the highlighted row instead. |
 | Esc in the menu | Closes it without renaming, and focus goes back to the "…". |
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Write each tag as a short noun phrase: "Fractions".</td><td>A sentence as a tag.</td></tr>
+<tr><td>Reuse existing tags before creating a new one.</td><td>Near-duplicates: "Fraction" and "Fractions".</td></tr>
+<tr><td>Say what to do in an error: "Pick at least one topic".</td><td>"Required" or "Invalid".</td></tr>
+<tr><td>Keep tags to a few words.</td><td>A tag that wraps.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

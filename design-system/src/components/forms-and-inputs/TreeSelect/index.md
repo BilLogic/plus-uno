@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.stories.jsx` — Overview, Content, Spacing, InteractionStates, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.stories.jsx` — Overview, Content, Spacing, InteractionStates, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.mdx`
 

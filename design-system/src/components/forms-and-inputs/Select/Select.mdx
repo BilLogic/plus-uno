@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SelectStories from './Select.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet, ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SelectStories} />
 
@@ -63,7 +63,7 @@ list as you type.
 
 <div className="sb-ds-doc-section">
 
-## States
+## More states
 
 <DocsCanvasShell description={<>Enabled, invalid, read-only and disabled.</>}>
     <DsCanvasQuiet of={SelectStories.InteractionStates} />
@@ -93,6 +93,24 @@ list as you type.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<ComponentExample of={SelectStories.Rest} title="Rest" description="The input fill and edge." />
+
+<ComponentExample of={SelectStories.Hovered} title="Hovered" description="The edge turns the focused color." />
+
+<ComponentExample of={SelectStories.Focused} title="Focused" description="A 2px ring, 2px off the box. No fill changes." />
+
+<ComponentExample of={SelectStories.FieldInvalid} title="Invalid" description="The danger edge with the message under the field." />
+
+<ComponentExample of={SelectStories.FieldReadOnly} title="Read-only" description="The read-only fill. The value can be read, selected and copied." />
+
+<ComponentExample of={SelectStories.FieldDisabled} title="Disabled" description="The whole field fades and leaves the tab order." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -107,37 +125,6 @@ list as you type.
 
 </div>
 
-<div className="sb-ds-doc-section">
-
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>options</code></td><td>array</td><td>Each: <code>value</code> (required), <code>label</code> or <code>text</code>, <code>description</code>, <code>disabled</code>, <code>group</code> (groups consecutive options under a heading).</td></tr>
-        <tr><td><code>value</code>, <code>defaultValue</code>, <code>onChange</code></td><td>—</td><td>An id, or an array of ids with <code>isMulti</code>.</td></tr>
-        <tr><td><code>isMulti</code></td><td>boolean</td><td>Shows picks as Tags; the list shows checkboxes.</td></tr>
-        <tr><td><code>isSearchable</code>, <code>isCreatable</code>, <code>onCreate</code></td><td>—</td><td><code>isCreatable</code> implies typing and offers a "Create" row when nothing matches.</td></tr>
-        <tr><td><code>displayMode</code></td><td>enum</td><td><code>tags</code> (default) or <code>text</code> — <code>isMulti</code> only.</td></tr>
-        <tr><td><code>commitOnClose</code></td><td>boolean</td><td><code>isMulti</code> only: <code>onChange</code> fires once on close rather than per pick, for a filter bar.</td></tr>
-        <tr><td><code>clearable</code></td><td>boolean</td><td>Defaults to <code>true</code> with <code>isMulti</code>, <code>!isRequired</code> otherwise.</td></tr>
-        <tr><td><code>selectAll</code>, <code>maxSelections</code></td><td>—</td><td><code>isMulti</code> only: a "Select all" row, and a pick limit past which other rows disable.</td></tr>
-        <tr><td><code>dependsOn</code></td><td><code>{'{ value, label }'}</code></td><td>Disables the field with "Choose {'{label}'} first" until <code>value</code> is set; clears this field when the parent's value changes.</td></tr>
-        <tr><td><code>loadOptions</code>, <code>isLoading</code>, <code>recent</code>, <code>suggested</code></td><td>—</td><td>Async loading as the list opens, as you type and as you scroll, 50 at a time.</td></tr>
-        <tr><td><code>spacing</code></td><td>enum</td><td><code>default</code> (40) or <code>compact</code> (32).</td></tr>
-        <tr><td><code>isDisabled</code>, <code>isReadOnly</code>, <code>isRequired</code></td><td>—</td><td>—</td></tr>
-        <tr><td><code>isInvalid</code>, <code>errorMessage</code>, <code>isValid</code>, <code>successMessage</code>, <code>caption</code></td><td>—</td><td>The caption's content and tone follow validation state.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
 </div>
 
 </DocsTab>
@@ -148,7 +135,7 @@ list as you type.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Select` for a list too long to show all at once, or when typing to
 filter helps more than scanning — a tutor roster, a list of schools. For a
@@ -159,7 +146,44 @@ options arranged in a hierarchy, use `TreeSelect` or `Cascader`.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Field.** The box that shows the value, or the placeholder, and a chevron.
+2. **Label.** Names the field. A required marker follows it.
+3. **List.** The options, in a popup under the field. Groups carry a heading.
+4. **Caption.** Helper text, or the error that replaces it.
+
+### States and tokens
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-default</code> edge in <code>--ds-border-input</code>, <code>--radius-0625</code> (<code>--radius-h32</code> compact).</td></tr>
+<tr><td>Hovered</td><td>The edge turns <code>--ds-border-focused</code>.</td></tr>
+<tr><td>Focused</td><td>A <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, 2px off the box. No fill changes.</td></tr>
+<tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code> and the message <code>--ds-text-danger</code>.</td></tr>
+<tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill.</td></tr>
+<tr><td>Disabled</td><td>The whole field fades to <code>--ds-opacity-disabled</code>.</td></tr>
+<tr><td>Text</td><td>Placeholder <code>--ds-text-subtlest</code>, helper text <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Pressed</td><td>No step of its own. The hovered edge holds while the pointer is down.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Pick the mode by the answer.
+
+`isMulti` shows picks as Tags and checkboxes in the list; `selectAll` and `maxSelections` apply to it only. `isSearchable` filters by typing, and `isCreatable` adds a "Create" row when nothing matches. `clearable` defaults to on with `isMulti` and off for a required single select.
+
+### Show picks as text when Tags crowd the field.
+
+`displayMode="text"` (with `isMulti`) shows picks as comma-separated text instead of Tags. `isValid` with `successMessage` draws the success edge and message.
 
 ### Chain `dependsOn` for fields that filter each other.
 
@@ -189,6 +213,24 @@ where firing once, on close, avoids re-querying on every checkbox click.
 
 `recent` and `suggested` only change the order past 50 static options;
 `loadOptions` is for a list too large to ship as a static array at all.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Write each option as the thing itself: "Algebra I".</td><td>A sentence or an instruction: "Choose this for algebra".</td></tr>
+<tr><td>Order options by how often they are picked, or alphabetically for a long list.</td><td>A random order that makes people scan.</td></tr>
+<tr><td>Use a placeholder that names the action: "Select a school".</td><td>The label repeated as the placeholder.</td></tr>
+<tr><td>Say what to do in an error: "Select a school".</td><td>"Required" or "Invalid".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
