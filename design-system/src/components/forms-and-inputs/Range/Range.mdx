@@ -1,9 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as RangeStories from './Range.stories.jsx';
 import { Range } from '@/components';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -22,13 +28,13 @@ export const figmaMeta = {
 <Meta of={RangeStories} />
 
 <Title />
-A range lets a person choose an approximate value on a slider.
+A range lets a person choose a value within a minimum and a maximum by moving a handle along a track.
 
 <DocsTabs of={RangeStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
+<ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6622"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
@@ -39,75 +45,11 @@ A range lets a person choose an approximate value on a slider.
 
 <div className="sb-ds-doc-section">
 
-## Anatomy
+## Content
 
-<DocsCanvasShell attachSourceBelow description={<>A label above a slider: a track that fills to a handle.</>}>
-    <Canvas of={RangeStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={RangeStories.Labels} title="Label" description="The label sits above the slider. A hidden label still names it." />
 
-<DocsTable>
-    <thead>
-        <tr><th>Part</th><th>What it is</th></tr>
-    </thead>
-    <tbody>
-        <tr><td>1 Label</td><td>14/20 text directly above the slider, aligned left. It names the slider.</td></tr>
-        <tr><td>2 Track</td><td>A 4 line showing the span. It fills with the selected bold fill from the start to the handle.</td></tr>
-        <tr><td>3 Handle</td><td>A 20 circle the person moves along the track to change the value.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr><th>Property</th><th>Type</th><th>Default</th><th>Notes</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>label</code></td><td>node</td><td>none</td><td>Names the slider. Without it the slider has no accessible name.</td></tr>
-        <tr><td><code>showLabel</code></td><td>boolean</td><td><code>true</code></td><td>PLUS addition. <code>false</code> hides the label visually; it still names the slider.</td></tr>
-        <tr><td><code>value</code></td><td>number</td><td>uncontrolled</td><td>Controlled value. Needs an <code>onChange</code>.</td></tr>
-        <tr><td><code>defaultValue</code></td><td>number</td><td><code>0</code></td><td>Initial value when uncontrolled.</td></tr>
-        <tr><td><code>min</code>, <code>max</code></td><td>number</td><td><code>0</code>, <code>100</code></td><td>The span.</td></tr>
-        <tr><td><code>step</code></td><td>number</td><td><code>1</code></td><td>The increment.</td></tr>
-        <tr><td><code>isDisabled</code></td><td>boolean</td><td><code>false</code></td><td>Disabled fill on the track and handle.</td></tr>
-        <tr><td><code>size</code></td><td><code>8 | 12 | 16</code></td><td>unset</td><td>PLUS addition. The handle and bar in px; the track between them follows a step behind (4/6/8). Unset keeps the default rendering.</td></tr>
-        <tr><td><code>onChange</code></td><td>function</td><td>none</td><td>Called with the new value as a number, then the event.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Labels
-
-<DocsCanvasShell description={<>The label sits above the slider. A hidden label still names it.</>}>
-    <DsCanvasQuiet of={RangeStories.Labels} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Positions
-
-<DocsCanvasShell description={<>The handle at the start, the middle and the end of the span.</>}>
-    <DsCanvasQuiet of={RangeStories.Positions} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Disabled takes the disabled fill on the track and the handle.</>}>
-    <DsCanvasQuiet of={RangeStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={RangeStories.Positions} title="Position" description="The handle at the start, the middle and the end of the span." />
 
 </div>
 
@@ -115,9 +57,23 @@ A range lets a person choose an approximate value on a slider.
 
 ## Size
 
-<DocsCanvasShell description={<>The handle and bar in px (8 · 12 · 16); the track between them follows a step behind.</>}>
-    <DsCanvasQuiet of={RangeStories.Size} />
-</DocsCanvasShell>
+<ComponentExample of={RangeStories.Size} title="Size" description="The handle and bar in px (8, 12 or 16); the track between them follows a step behind." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={RangeStories.Rest} title="Rest" description="The track fills with the selected bold fill from the start to the handle." />
+
+<ComponentExample of={RangeStories.Hovered} title="Hovered" description="The handle steps to the hovered selected bold fill." />
+
+<ComponentExample of={RangeStories.Pressed} title="Pressed" description="While the handle is held it reads the same as hover." />
+
+<ComponentExample of={RangeStories.Focused} title="Focused" description="A 2px ring, 2px off the handle, for keyboard focus only." />
+
+<ComponentExample of={RangeStories.DisabledState} title="Disabled" description="The disabled fill on the track and handle. The slider leaves the tab order." />
 
 </div>
 
@@ -147,28 +103,66 @@ A range lets a person choose an approximate value on a slider.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use a range in a form to let a person choose a value within a minimum and a maximum, when an approximate value is enough: a zoom level, a volume, a rough rating of effort.
 
 Do not use a range when choosing a specific value matters. A slider is less precise than typing a number or picking an option from a list. Do not use it for values that are not numeric, such as weekdays, or for spans that are extremely large (over 100 steps) or very small (1 to 3).
 
-<DoDontGrid
-    pairs={[
-        {
-            doExample: <div style={{ width: '100%' }}><Range label="Zoom" defaultValue={40} /></div>,
-            doCaption: 'Put the label directly above the slider, aligned left, and keep it short.',
-            dontExample: <div style={{ width: '100%' }}><Range label="Choose how far you would like to zoom into the image" showLabel={false} defaultValue={40} /></div>,
-            dontCaption: "A hidden label leaves the slider unnamed on screen. Show the label unless the layout names it clearly.",
-        },
-    ]}
-/>
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Label.** 14/20 text directly above the slider, aligned left. It names the slider.
+2. **Track.** A 4 line showing the span. It fills with the selected bold fill from the start to the handle.
+3. **Handle.** A 20 circle the person moves along the track to change the value.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>The handle takes <code>--ds-background-selected-bold-hovered</code>.</td></tr>
+<tr><td>Pressed</td><td>While the handle is dragged it reads the same as hovered.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the handle, for keyboard focus only.</td></tr>
+<tr><td>Disabled</td><td>Track and fill take <code>--ds-background-disabled</code>; the handle takes <code>--ds-icon-disabled</code> with no shadow. Out of the tab order.</td></tr>
+<tr><td>Invalid, read-only</td><td>Not drawn. A range always holds a value, so there is nothing to mark invalid.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Track</td><td><code>--ds-background-neutral</code>; fill <code>--ds-background-selected-bold</code>; height <code>--range-track-height-4</code>.</td></tr>
+<tr><td>Handle</td><td><code>--range-dot-size-default</code> (20), <code>--ds-background-selected-bold</code>, <code>--ds-shadow-raised</code>.</td></tr>
+<tr><td>Corner</td><td><code>--radius-full</code> on track, fill and handle.</td></tr>
+<tr><td>Hit area</td><td><code>--item-height-md</code> (32), the whole row.</td></tr>
+<tr><td>Label</td><td><code>--ds-text</code>, body default; gap <code>--space-025</code>.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Best practices
+
+### Put the label directly above the slider.
+
+<DoDontPair
+    doExample={<div style={{ width: '100%' }}><Range label="Zoom" defaultValue={40} /></div>}
+    doCaption="Put the label directly above the slider, aligned left, and keep it short."
+    dontExample={<div style={{ width: '100%' }}><Range label="Choose how far you would like to zoom into the image" showLabel={false} defaultValue={40} /></div>}
+    dontCaption="A hidden label leaves the slider unnamed on screen. Show the label unless the layout names it clearly."
+/>
 
 ### `onChange` reports a number.
 
@@ -181,6 +175,24 @@ In a right-to-left layout it is on the right.
 ### Use helper text to explain how.
 
 If the slider needs explaining, put one line of helper text under it rather than a longer label.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name what the slider sets: "Zoom", "Volume".</td><td>An instruction: "Slide to choose a zoom level."</td></tr>
+<tr><td>Keep the label to one or two words.</td><td>A sentence that wraps above the slider.</td></tr>
+<tr><td>Use one line of helper text under the slider to explain how.</td><td>A longer label.</td></tr>
+<tr><td>Use sentence case and no end punctuation.</td><td>Title case, or a period after the label.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

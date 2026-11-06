@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as RatingStories from './Rating.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Rating } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -21,12 +28,13 @@ export const figmaMeta = {
 <Meta of={RatingStories} />
 
 <Title />
+A rating lets a person give one score out of five in a single gesture.
 
 <DocsTabs of={RatingStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
+<ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs"
     sets={figmaMeta.sets}
@@ -37,41 +45,35 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>Comments-style rating with label and required indicator.</>}>
-    <Canvas of={RatingStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Content
 
-<DocsCanvasShell description={<>Baseline rating field with supporting copy.</>}>
-    <DsCanvasQuiet of={RatingStories.Content} />
-</DocsCanvasShell>
+<ComponentExample of={RatingStories.Content} title="Label" description="A labeled comments-style rating with the required marker." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Behavior
+## Variant
 
-<DocsCanvasShell description={<>Comments and numeric rating patterns.</>}>
-    <DsCanvasQuiet of={RatingStories.Variants} />
-</DocsCanvasShell>
+<ComponentExample of={RatingStories.Variants} title="Comments and numeric" description="`comments` puts one caption under the row; `numeric` puts 1 to 5 above each item." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## State
 
-<DocsCanvasShell description={<>Disabled comments and numeric ratings.</>}>
-    <DsCanvasQuiet of={RatingStories.InteractionStates} />
-</DocsCanvasShell>
+<ComponentExample of={RatingStories.Unrated} title="Unrated" description="No item is chosen. The row rests on the neutral fill." />
+
+<ComponentExample of={RatingStories.Rated} title="Rated" description="Every item up to the score fills with the selected icon color." />
+
+<ComponentExample of={RatingStories.Hovered} title="Hovered" description="The item under the pointer steps to the hovered neutral fill." />
+
+<ComponentExample of={RatingStories.Focused} title="Focused" description="A 2px ring on the focused item, for keyboard focus only." />
+
+<ComponentExample of={RatingStories.Required} title="Required" description="Draws the marker on the label." />
+
+<ComponentExample of={RatingStories.Disabled} title="Disabled" description="The disabled fill and icon. The items stay announced and leave the tab order." />
 
 </div>
 
@@ -101,55 +103,107 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
-Use `Rating` for a single satisfaction score out of five — the end of a session,
-a piece of feedback, a quick judgment the user makes in one gesture. Five items
-is the whole scale; there is no other length.
+Use a rating for a single satisfaction score out of five: the end of a session, a piece of feedback, a quick judgment the person makes in one gesture. Five items is the whole scale; there is no other length.
 
-`variant` chooses what the row says about itself: `comments` puts one caption
-under the row, `numeric` puts 1–5 above each item. `icon` is `star` or
-`thumbs-up`.
+`variant` chooses what the row says about itself: `comments` puts one caption under the row, `numeric` puts 1 to 5 above each item. `icon` is `star` or `thumbs-up`.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Label.** Text above the row that names the rating. A required marker follows it.
+2. **Items.** Five 32 circles, each drawing a 16 icon. Items up to the score are filled.
+3. **Number.** In the numeric variant, 1 to 5 above each item.
+4. **Caption.** In the comments variant, one line under the row.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>The item takes <code>--ds-background-neutral-hovered</code>.</td></tr>
+<tr><td>Pressed</td><td>No step of its own. The hovered look holds while the pointer is down.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the item, for keyboard focus only.</td></tr>
+<tr><td>Selected</td><td>Icon is filled in <code>--ds-icon-selected</code>; unselected items are outlined in <code>--ds-icon-subtle</code>.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code> fill and <code>--ds-icon-disabled</code> icon. Out of the tab order, still announced.</td></tr>
+<tr><td>Invalid, read-only</td><td>Not drawn. Validate the answer in the form and explain the error beside the rating.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Item</td><td><code>--item-height-md</code> (32) circle on <code>--ds-background-neutral</code>.</td></tr>
+<tr><td>Icon</td><td><code>--icon-md</code> (16).</td></tr>
+<tr><td>Gaps</td><td><code>--space-0625</code> between items; <code>--stack-sm</code> inside an item group; <code>--stack-md</code> between label and row, plus <code>--stack-sm</code> under the label.</td></tr>
+<tr><td>Label, number</td><td><code>--ds-text</code>, body default.</td></tr>
+<tr><td>Required marker</td><td><code>--ds-text-danger</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### It is always controlled.
 
 ```jsx
-// Incorrect — the component holds no state. Without an onChange the items are
+// Incorrect: the component holds no state. Without an onChange the items are
 // clickable and nothing ever changes.
 <Rating label="How was the session?" />
 
-// Correct — onChange receives the number, not an event.
+// Correct: onChange receives the number, not an event.
 <Rating label="How was the session?" value={score} onChange={setScore} />
 ```
 
-### It is not a form field.
+### It submits its value under `name`.
+
+A hidden input carries the score with its form, so `name` is how a server reads it.
 
 ```jsx
-// Incorrect — `name` is accepted and never used. There is no input, so nothing
-// is submitted and nothing is restored on a back navigation.
-<form action="/feedback" method="post">
-    <Rating name="score" value={score} onChange={setScore} />
-</form>
-
-// Correct — carry the value yourself.
 <form onSubmit={submit}>
-    <Rating label="Rating" value={score} onChange={setScore} />
-    <input type="hidden" name="score" value={score} />
+    <Rating name="score" label="Rating" value={score} onChange={setScore} />
 </form>
 ```
 
 ### Give it a `label`.
 
-The row is a `radiogroup` either way, but the label is what names it. Without
-one it falls back to the generic name "Rating", which says nothing when a page
-carries two of them. `commentsLabel` is a caption under the row, not a
-substitute.
+<DoDontPair
+    doExample={<Rating label="How was the session?" value={3} onChange={() => {}} />}
+    doCaption="A label names the row, so a page with two ratings tells them apart."
+    dontExample={<Rating value={3} onChange={() => {}} />}
+    dontCaption={'Without a label the row falls back to the generic name "Rating". `commentsLabel` is a caption, not a substitute.'}
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name what is rated, as a question: "How was the session?"</td><td>"Rating" alone, or an instruction: "Click a star."</td></tr>
+<tr><td>Use sentence case and no end punctuation except a question mark.</td><td>Title case.</td></tr>
+<tr><td>Keep the comments caption to one short line.</td><td>A paragraph under the row.</td></tr>
+<tr><td>Pair the rating with a comment box when you need the reason.</td><td>Ask for the reason in the label.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -157,26 +211,12 @@ substitute.
 
 ## Accessibility
 
-- **It is one value out of five, and says so.** The row is a `radiogroup` and
-  each item is a `radio` carrying `aria-checked` and an `aria-label` of "Rate 1"
-  … "Rate 5". The chosen value is in the accessibility tree, not only in
-  the fill color.
-- **One tab stop, arrow keys within it.** Tab reaches the group once — landing
-  on the checked item, or the first when nothing is checked — and Left/Right,
-  Up/Down, Home and End move the value. Enter and Space still activate an item
-  directly.
-- **Moving the selection is changing it.** There is no "focused but not chosen"
-  state: an arrow key calls `onChange`. That is the usual radio-group behavior
-  and it means a keyboard user cannot browse the scale without setting it.
-- **Disabled stays announced.** The items keep their role, label and
-  `aria-checked` and take `aria-disabled` — an unavailable rating rather than an
-  invisible one — and drop out of the tab order.
-- **The label is a `span`, deliberately.** There is no form control for a
-  `label` element to point at, so the label is a `span` with an id and the row
-  is named by `aria-labelledby`. That is why the `id` lands on the row rather
-  than on a field.
-- **`isRequired` marks the label only.** The asterisk is decorative; nothing
-  carries `aria-required` and nothing blocks a submit.
+- **It is one value out of five, and says so.** The row is a `radiogroup` and each item is a `radio` carrying `aria-checked` and an `aria-label` of "Rate 1" through "Rate 5". The chosen value is in the accessibility tree, not only in the fill color.
+- **One tab stop, arrow keys within it.** Tab reaches the group once, landing on the checked item, or the first when nothing is checked; Left/Right, Up/Down, Home and End move the value. Enter and Space still activate an item directly.
+- **Moving the selection is changing it.** An arrow key calls `onChange`, so a keyboard user cannot browse the scale without setting it. That is the usual radio-group behavior.
+- **Disabled stays announced.** The items keep their role, label and `aria-checked` and take `aria-disabled`, and drop out of the tab order.
+- **The label is a `span`, deliberately.** There is no form control for a `label` element to point at, so the label has an id and the row is named by `aria-labelledby`.
+- **`isRequired` marks the label and requires the group.** The asterisk follows the label and is read as "required"; the group carries the native required constraint.
 
 </div>
 
@@ -184,10 +224,9 @@ substitute.
 
 ## Related
 
-- For a value on a longer scale, use `Range`.
-- For a choice among labeled options rather than a score, use `RadioGroup`
-  or `Radio`.
-- For the comment that usually accompanies a rating, use `TextArea`.
+- For a value on a longer scale, use Range.
+- For a choice among labeled options rather than a score, use Radio group or Radio.
+- For the comment that usually accompanies a rating, use Text area.
 
 </div>
 

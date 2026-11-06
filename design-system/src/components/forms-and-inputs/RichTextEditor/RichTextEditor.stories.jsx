@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import RichTextEditor from './RichTextEditor';
 
 export default {
@@ -169,4 +170,73 @@ BlockStyleMenu.play = async ({ canvasElement }) => {
     await body.findByRole('menuitem', { name: 'Normal' });
     await userEvent.keyboard('{Escape}');
     await closed();
+};
+
+/** One story per state, for the Examples tab. */
+const writing = (canvasElement) => within(canvasElement).getByRole('textbox');
+
+export const Empty = {
+    render: () => <RichTextEditor label="Session notes" placeholder="Type something..." minHeight={150} />,
+    play: async ({ canvasElement }) => {
+        const area = writing(canvasElement);
+        await expect(area).toHaveAttribute('data-placeholder', 'Type something...');
+        await expect(area.textContent).toBe('');
+    },
+};
+
+export const Filled = {
+    render: () => <RichTextEditor label="Session notes" defaultValue="<p>Worked through fractions.</p>" minHeight={150} />,
+    play: async ({ canvasElement }) => {
+        await expect(writing(canvasElement).textContent).toBe('Worked through fractions.');
+    },
+};
+
+export const Focused = {
+    render: () => <RichTextEditor label="Session notes" placeholder="Type something..." minHeight={150} />,
+    play: async ({ canvasElement }) => {
+        const area = writing(canvasElement);
+        const editor = canvasElement.querySelector('.plus-rich-text-editor');
+        editor.style.transition = 'none';
+        area.focus({ focusVisible: true });
+        const style = getComputedStyle(editor);
+        await waitFor(() => expect(style.outlineStyle).toBe('solid'));
+        await expect(px(style.outlineWidth)).toBe(2);
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        area.blur();
+    },
+};
+
+export const ReadOnly = {
+    render: () => <RichTextEditor label="Session notes" readOnly defaultValue="<p>Worked through fractions.</p>" minHeight={150} />,
+    play: async ({ canvasElement }) => {
+        const area = writing(canvasElement);
+        await expect(area).toHaveAttribute('aria-readonly', 'true');
+        await expect(area).toHaveAttribute('contenteditable', 'false');
+        await expect(getComputedStyle(area).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+    },
+};
+
+export const DisabledState = {
+    render: () => <RichTextEditor label="Session notes" disabled defaultValue="<p>Worked through fractions.</p>" minHeight={150} />,
+    play: async ({ canvasElement }) => {
+        const area = writing(canvasElement);
+        await expect(area).toHaveAttribute('contenteditable', 'false');
+        await expect(getComputedStyle(area).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        await expect(within(canvasElement).getAllByRole('button').every((b) => b.disabled)).toBe(true);
+    },
+};
+
+export const Compact = {
+    render: () => <RichTextEditor label="Session notes" spacing="compact" placeholder="Type something..." minHeight={150} />,
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-rich-text-editor')).toHaveClass('plus-rich-text-editor--compact');
+    },
+};
+
+export const FullToolbar = {
+    render: () => <RichTextEditor label="Session notes" toolbarPreset="full" placeholder="Type something..." minHeight={150} />,
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-rich-text-editor')).toHaveClass('plus-rich-text-editor--full');
+        await expect(within(canvasElement).getByRole('button', { name: 'Bold' })).toBeInTheDocument();
+    },
 };

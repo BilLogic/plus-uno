@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import RadioGroup from './RadioGroup';
 
@@ -334,4 +336,84 @@ Interactive.args = {
     isRequired: false,
     isDisabled: false,
     isReadOnly: false,
+};
+
+/** One story per state, for the Examples tab. */
+const groupRadio = (canvasElement, name) => within(canvasElement).getByRole('radio', { name });
+
+export const Unanswered = {
+    render: () => <RadioGroup name="rg-ex-unanswered" legend="Subject" options={subjects} />,
+    play: async ({ canvasElement }) => {
+        const radios = within(canvasElement).getAllByRole('radio');
+        await expect(radios.every((r) => r.getAttribute('aria-checked') === 'false')).toBe(true);
+    },
+};
+
+export const Selected = {
+    render: () => <RadioGroup name="rg-ex-selected" legend="Subject" options={subjects} defaultValue="math" />,
+    play: async ({ canvasElement }) => {
+        const el = groupRadio(canvasElement, 'Math');
+        await expect(el).toHaveAttribute('aria-checked', 'true');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected-bold'));
+    },
+};
+
+export const Hovered = {
+    render: () => <RadioGroup name="rg-ex-hover" legend="Subject" options={subjects} />,
+    play: async ({ canvasElement }) => {
+        const el = groupRadio(canvasElement, 'Reading');
+        el.style.transition = 'none';
+        const border = withForcedPseudo(el, ':hover', () => getComputedStyle(el).borderTopColor);
+        await expect(border).toBe(tokenColor(canvasElement, '--ds-border-brand'));
+    },
+};
+
+export const Focused = {
+    render: () => <RadioGroup name="rg-ex-focus" legend="Subject" options={subjects} defaultValue="math" />,
+    play: async ({ canvasElement }) => {
+        await userEvent.tab();
+        const el = groupRadio(canvasElement, 'Math');
+        await expect(document.activeElement).toBe(el);
+        const style = getComputedStyle(el);
+        await waitFor(() => expect(style.outlineStyle).toBe('solid'));
+        await expect(px(style.outlineWidth)).toBe(2);
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        el.blur();
+    },
+};
+
+export const Required = {
+    render: () => <RadioGroup name="rg-ex-required" legend="Did the session happen?" options={['Yes', 'No']} isRequired />,
+    play: async ({ canvasElement }) => {
+        const group = within(canvasElement).getByRole('radiogroup', { name: /Did the session happen\?/ });
+        await expect(group.getAttribute('aria-required')).toBe('true');
+    },
+};
+
+export const Invalid = {
+    render: () => <RadioGroup name="rg-ex-invalid" legend="Did the session happen?" options={['Yes', 'No']} isRequired error="Choose an answer." />,
+    play: async ({ canvasElement }) => {
+        const radios = within(canvasElement).getAllByRole('radio');
+        await expect(radios.every((r) => r.getAttribute('aria-invalid') === 'true')).toBe(true);
+        await expect(getComputedStyle(radios[0]).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-danger'));
+    },
+};
+
+export const ReadOnly = {
+    render: () => <RadioGroup name="rg-ex-readonly" legend="Subject" options={subjects} defaultValue="math" isReadOnly />,
+    play: async ({ canvasElement }) => {
+        const group = within(canvasElement).getByRole('radiogroup', { name: 'Subject' });
+        await expect(group.getAttribute('aria-readonly')).toBe('true');
+        await userEvent.click(groupRadio(canvasElement, 'Science'));
+        await expect(groupRadio(canvasElement, 'Math')).toHaveAttribute('aria-checked', 'true');
+    },
+};
+
+export const Disabled = {
+    render: () => <RadioGroup name="rg-ex-disabled" legend="Subject" options={subjects} defaultValue="math" isDisabled />,
+    play: async ({ canvasElement }) => {
+        const radios = within(canvasElement).getAllByRole('radio');
+        await expect(radios.every((r) => r.hasAttribute('data-disabled'))).toBe(true);
+        await expect(getComputedStyle(radios[1]).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+    },
 };
