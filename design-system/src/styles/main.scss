@@ -301,4 +301,13 @@ time {
 .fixed-bottom {
     z-index: var(--layer-navigation);
 }
+
+// A Font Awesome glyph's box is its font size: Free 7 draws every icon 1.25em
+// wide unless `--fa-width` says otherwise, so the 12, 16 and 24 icon sizes
+// (`--icon-sm`, `--icon-md`, `--icon-lg`) are the square the glyph sits in.
+.fa-solid,
+.fa-regular,
+.fa-brands {
+    --fa-width: 1em;
+}
 } // @layer components

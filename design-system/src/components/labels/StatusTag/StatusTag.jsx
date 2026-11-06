@@ -5,6 +5,7 @@ import CountTag, { COUNT_TAG_APPEARANCES, formatCount } from '../CountTag/CountT
 import Tooltip from '../../overlays-and-layering/Tooltip';
 import { useIsTruncated } from '../../../lib/useIsTruncated';
 import './StatusTag.scss';
+import { iconClass } from '../../../lib/icon';
 
 /**
  * `StatusTag` — the condition something is in.
@@ -38,7 +39,7 @@ const warn = (message) => {
 
 /** A string is a Font Awesome solid icon name, as Button takes it; anything else renders as given. */
 const renderVisual = (visual) => (typeof visual === 'string'
-    ? <i className={`fa-solid fa-${visual}`} aria-hidden="true" />
+    ? <i className={iconClass(visual)} aria-hidden="true" />
     : visual);
 
 export const StatusTag = ({
