@@ -11,7 +11,7 @@ import {
 
 import { Logo } from '@/components';
 
-export const Mark = ({ color = 'colored', size = 132, wordmark = false }) => <Logo appearance={color} size={size} wordmark={wordmark} />;
+export const Mark = ({ color = 'colored', size = 64, wordmark = false }) => <Logo appearance={color} size={size} wordmark={wordmark} />;
 
 export const Ground = ({ token, children, caption }) => (
     <figure style={{ margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
@@ -55,8 +55,8 @@ PLUS has one logo. In product, use the Logo component; do not redraw or export t
 
 <FoundationExample>
 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--section-stack-lg)' }}>
-    <Mark color="colored" size={132} />
-    <Mark color="colored" size={132} wordmark />
+    <Mark color="colored" size={64} />
+    <Mark color="colored" size={64} wordmark />
 </div>
 </FoundationExample>
 
@@ -68,13 +68,13 @@ Use the logomark on its own where the PLUS name already appears nearby or space 
 
 The Logo comes in fixed sizes and the logomark has a pre-defined shape. Do not alter either.
 
-- Sizes are fixed steps: 60, 96, 132, 192 and 224, the frame of the logomark. Pick a step; never scale an instance by hand.
+- Sizes are fixed steps: 16, 20, 24, 32, 48, 64 and 96, the height of the logomark. At 24 and below the logomark uses a heavier small-size drawing so the plus stays open. Pick a step; never scale an instance by hand.
 - Use the default shape and corner radius of the logomark.
 - Never nest the logomark inside an additional container, and leave breathing room around it.
 
 <FoundationExample>
 <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'flex-end', gap: 'var(--section-stack-lg)' }}>
-    {[60, 96, 132, 192, 224].map((s) => <Mark key={s} size={s} />)}
+    {[16, 20, 24, 32, 48, 64, 96].map((s) => <Mark key={s} size={s} />)}
 </div>
 </FoundationExample>
 
@@ -82,24 +82,26 @@ The Logo comes in fixed sizes and the logomark has a pre-defined shape. Do not a
 
 <FoundationSection title="Color options">
 
-Logos are available in three color options to suit different grounds. Choose by the ground the logo sits on.
+Logos come in six color options to suit different grounds. Choose by the ground the logo sits on.
 
 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--grid-gutter)' }}>
-    <Ground token="--ds-surface" caption="Colored on a light surface."><Mark color="colored" size={132} wordmark /></Ground>
-    <Ground token="--ds-background-neutral-bold" caption="Filled on a bold or dark ground."><Mark color="filled" size={132} wordmark /></Ground>
-    <Ground token="--ds-background-accent-blue-bolder" caption="Outlined on a photo or busy ground."><Mark color="outlined" size={132} wordmark /></Ground>
+    <Ground token="--ds-surface" caption="Colored on a light surface."><Mark color="colored" size={64} wordmark /></Ground>
+    <Ground token="--ds-background-neutral-bold" caption="Colored dark, with stronger glows, on a dark ground."><Mark color="colored-dark" size={64} wordmark /></Ground>
+    <Ground token="--ds-background-neutral-bold" caption="Filled on a bold or dark ground."><Mark color="filled" size={64} wordmark /></Ground>
+    <Ground token="--ds-background-accent-blue-bolder" caption="Outlined on a photo or busy ground."><Mark color="outlined-reversed" size={64} wordmark /></Ground>
 </div>
 
 <RefTable
     head={['Color option', 'Ground', 'When to use it']}
     rows={[
-        ['Colored', 'Light surfaces', 'The default. The brand artwork on a light surface.'],
-        ['Filled', 'Any bold or dark ground', 'A white block logomark. Use where the logomark must read as a solid shape on a bold or dark ground.'],
-        ['Outlined', 'Photos or busy grounds', 'A white outline logomark. Use where a solid block would hide or compete with the image.'],
+        ['Colored', 'Light and dark surfaces', 'The default. The brand artwork on a white ground; in the dark color mode each glow moves one step up its ramp.'],
+        ['Colored dark', 'Dark surfaces', 'The stronger glows, drawn whatever the color mode.'],
+        ['Filled', 'Any ground', 'A solid teal tile with a white plus, for where the glow cannot sit.'],
+        ['Dark', 'Any ground', 'A solid deep teal tile with a white plus.'],
+        ['Outlined', 'Light grounds', 'A dark outline mark, where a solid block would compete with the content.'],
+        ['Outlined reversed', 'Photos or dark grounds', 'A light outline mark, where a solid block would hide or compete with the image.'],
     ]}
 />
-
-Filled and outlined are drawn in white, so neither works on a light ground.
 
 </FoundationSection>
 
@@ -111,7 +113,7 @@ Surround the logo with clear space free of type, graphics and other elements tha
     head={['Rule', 'Value', 'Note']}
     rows={[
         ['Clear space', 'Half the logomark’s height', 'On every side, measured from the edge of the logomark, not the edge of the Logo frame.'],
-        ['Minimum size', '60', 'The lowest step. Do not use the logo below that, and never scale an instance by hand.'],
+        ['Minimum size', '24 (lockup)', 'The wordmark needs a 24 logomark; below that the logo is the logomark alone, down to 16. Never scale an instance by hand.'],
     ]}
 />
 
@@ -141,8 +143,8 @@ Write the name in the alt text for the logo in digital experiences.
 Use the color options as drawn, on the ground each belongs on.
 
 <DoDont>
-<Do caption="The colored logomark on a light ground."><Mark color="colored" size={132} /></Do>
-<Dont caption="An unapproved color combination."><span style={{ display: 'inline-block', filter: 'hue-rotate(160deg) saturate(2)' }}><Mark color="colored" size={132} /></span></Dont>
+<Do caption="The colored logomark on a light ground."><Mark color="colored" size={64} /></Do>
+<Dont caption="An unapproved color combination."><span style={{ display: 'inline-block', filter: 'hue-rotate(160deg) saturate(2)' }}><Mark color="colored" size={64} /></span></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -152,8 +154,8 @@ Use the color options as drawn, on the ground each belongs on.
 Pick a size step. Do not stretch, crop or rotate the logomark.
 
 <DoDont>
-<Do caption="A size step, wordmark included."><Mark color="colored" size={132} wordmark /></Do>
-<Dont caption="A stretched logomark."><span style={{ display: 'inline-block', transform: 'scaleX(1.8)', transformOrigin: 'left center', marginInlineEnd: 'var(--card-pad-spacious)' }}><Mark color="colored" size={132} /></span></Dont>
+<Do caption="A size step, wordmark included."><Mark color="colored" size={64} wordmark /></Do>
+<Dont caption="A stretched logomark."><span style={{ display: 'inline-block', transform: 'scaleX(1.8)', transformOrigin: 'left center', marginInlineEnd: 'var(--card-pad-spacious)' }}><Mark color="colored" size={64} /></span></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -163,8 +165,8 @@ Pick a size step. Do not stretch, crop or rotate the logomark.
 Do not add unnecessary containers around the logomark.
 
 <DoDont>
-<Do caption="The logomark on its own, with space around it."><Mark color="colored" size={132} /></Do>
-<Dont caption="The logomark nested in an extra container."><span style={{ display: 'inline-block', padding: 'var(--pad-x-sm)', borderRadius: 'var(--radius-full)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)' }}><Mark color="colored" size={132} /></span></Dont>
+<Do caption="The logomark on its own, with space around it."><Mark color="colored" size={64} /></Do>
+<Dont caption="The logomark nested in an extra container."><span style={{ display: 'inline-block', padding: 'var(--pad-x-sm)', borderRadius: 'var(--radius-full)', boxShadow: 'inset 0 0 0 var(--border-default) var(--ds-border-bold)' }}><Mark color="colored" size={64} /></span></Dont>
 </DoDont>
 
 </FoundationSubsection>
@@ -174,8 +176,8 @@ Do not add unnecessary containers around the logomark.
 Do not add effects to the logo.
 
 <DoDont>
-<Do caption="The logomark as drawn."><Mark color="colored" size={132} /></Do>
-<Dont caption="A drop shadow added to the logomark."><span style={{ display: 'inline-block', filter: 'drop-shadow(0 4px 4px var(--ds-shadow-overlay))' }}><Mark color="colored" size={132} /></span></Dont>
+<Do caption="The logomark as drawn."><Mark color="colored" size={64} /></Do>
+<Dont caption="A drop shadow added to the logomark."><span style={{ display: 'inline-block', filter: 'drop-shadow(0 4px 4px var(--ds-shadow-overlay))' }}><Mark color="colored" size={64} /></span></Dont>
 </DoDont>
 
 </FoundationSubsection>
