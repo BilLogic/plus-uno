@@ -1,5 +1,6 @@
 import React from 'react';
-import { expect } from 'storybook/test';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { expect, within } from 'storybook/test';
 import Button from '@/components/forms-and-inputs/Button';
 import PageHeader from '@/components/layout-and-structure/PageHeader';
 
@@ -45,4 +46,43 @@ DisableTitleStyles.play = async ({ canvasElement }) => {
 export const Interactive = {
     args: { title: 'Page title' },
     render: (args) => <PageHeader {...args} />,
+};
+
+/* ------------------------------------------------------------------- states */
+
+
+const Subject = (props) => <PageHeader title="Session plans" actions={<Button appearance="primary" text="Schedule" />} {...props} />;
+const root = (canvasElement) => canvasElement.firstElementChild;
+
+/** Rest: page header. */
+export const Rest = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('heading', { level: 2 })).toHaveTextContent('Session plans');
+        await expect(root(canvasElement).tagName).toBe('HEADER');
+    },
+};
+
+/** Hovered: a display component has no hover layer, so nothing moves. */
+export const Hovered = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':hover', 'page header');
+    },
+};
+
+/** Pressed: no pressed layer either. */
+export const Pressed = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':active', 'page header');
+    },
+};
+
+/** Focused: not a control, so Tab skips it. */
+export const Focused = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(root(canvasElement), 'page header');
+    },
 };

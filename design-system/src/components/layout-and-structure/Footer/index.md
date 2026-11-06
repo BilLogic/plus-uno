@@ -9,7 +9,7 @@ Per Figma spec: node-id=111-227939 Simple footer with version, copyright, and te
 
 **Source:** `design-system/src/components/layout-and-structure/Footer/Footer.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Footer/Footer.stories.jsx` — Overview, CustomContent, Interactive
+**Stories:** `design-system/src/components/layout-and-structure/Footer/Footer.stories.jsx` — Overview, CustomContent, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Footer/Footer.mdx`
 
@@ -23,6 +23,12 @@ Per Figma spec: node-id=111-227939 Simple footer with version, copyright, and te
 | `termsUrl` | string | `'#'` | Where the terms link goes. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
+
+## Tokens touched
+
+`--ds-link` · `--ds-link-pressed` · `--radius-sm`
+
+From `design-system/src/components/layout-and-structure/Footer/Footer.scss`. Override these through the token layer, never with a literal.
 
 ## Related
 

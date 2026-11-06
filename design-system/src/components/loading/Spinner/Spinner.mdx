@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SpinnerStories from './Spinner.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -93,6 +93,28 @@ An animated ring that says a wait is in progress, with no duration to report.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>The default 24 ring, inheriting the text color.</>}>
+    <DsCanvasQuiet of={SpinnerStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A spinner has no hover layer, so nothing moves.</>}>
+    <DsCanvasQuiet of={SpinnerStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>No pressed layer.</>}>
+    <DsCanvasQuiet of={SpinnerStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Not a control, so Tab skips it.</>}>
+    <DsCanvasQuiet of={SpinnerStories.Focused} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -117,7 +139,7 @@ An animated ring that says a wait is in progress, with no duration to report.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Spinner` when the wait is short, indeterminate, and the user has nothing
 to do but wait — a submit in flight, a panel fetching on open. It says
@@ -131,7 +153,41 @@ bold or colored background.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Ring.** A circle with one side open, turning.
+2. **Label.** Visually hidden text read as a status, "Loading" unless `label` names more.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Spinning</td><td>The ring turns at 0.75s. Under reduced motion it slows to 1.5s rather than stopping.</td></tr>
+<tr><td>Hovered, pressed, focused, disabled</td><td>None. It is not a control.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Ring</td><td><code>currentColor</code>; <code>--ds-icon-inverse</code> for <code>invert</code>.</td></tr>
+<tr><td>Size</td><td><code>--spinner-size-sm</code>, <code>--spinner-size-md</code>, <code>--spinner-size-lg</code> (16, 24, 48).</td></tr>
+<tr><td>Stroke</td><td>An eighth of the diameter.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### The color comes from `appearance`, not a prop that picks a hue.
 
@@ -155,6 +211,23 @@ bold or colored background.
     {saving && <Spinner size={16} />} Save
 </Button>
 ```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Say what is loading when it is not obvious: "Loading session plans".</td><td>Leave a bare "Loading" as the only thing on a page.</td></tr>
+<tr><td>Show text with the spinner after a few seconds.</td><td>Leave a spinner as the only sign of a long wait.</td></tr>
+<tr><td>Keep the label to a few words.</td><td>Write a sentence in the label.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

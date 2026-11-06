@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SkeletonStories from './Skeleton.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -89,6 +89,22 @@ Status, Count and Tag, so nothing moves when the value arrives.
     <DsCanvasQuiet of={SkeletonStories.ReducedMotion} />
 </DocsCanvasShell>
 
+<DocsCanvasShell description={<>A status label placeholder with the shimmer.</>}>
+    <DsCanvasQuiet of={SkeletonStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A placeholder has no hover layer, so nothing moves.</>}>
+    <DsCanvasQuiet of={SkeletonStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>No pressed layer.</>}>
+    <DsCanvasQuiet of={SkeletonStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Never focusable, so Tab skips it.</>}>
+    <DsCanvasQuiet of={SkeletonStories.Focused} />
+</DocsCanvasShell>
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -131,7 +147,7 @@ Status, Count and Tag, so nothing moves when the value arrives.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Skeleton` while content loads, so the space it will fill is already on
 screen and the layout does not jump when it arrives.
@@ -146,7 +162,44 @@ screen and the layout does not jump when it arrives.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Bar.** A flat fill in the skeleton color: a rectangle, a circle, a text line or a label shape.
+2. **Shimmer.** A band that sweeps across. Off, or under reduced motion, it is a flat fill.
+3. **Group.** Lines and tag groups are columns or rows of bars.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Loading</td><td>The fill shimmers.</td></tr>
+<tr><td>Not shimmering</td><td><code>isShimmering={false}</code> is a flat fill, which is also what reduced motion gets.</td></tr>
+<tr><td>Hovered, pressed, focused, disabled</td><td>None. It is <code>aria-hidden</code>, with no role and no tab stop.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Fill</td><td><code>--ds-skeleton</code>.</td></tr>
+<tr><td>Radius</td><td><code>--radius-md</code>, <code>--radius-sm</code>, <code>--radius-full</code> or the named radius token.</td></tr>
+<tr><td>Label presets</td><td>Heights from the label height roles, so a placeholder is the size of its label.</td></tr>
+<tr><td>Gap</td><td><code>--stack-md</code> between lines and tags.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 The loading rules, as Do and Don't.
 
@@ -190,6 +243,23 @@ Skeleton the host instead: one `preset="status"` for the whole Status.
 
 They appear when they have something to say. A Tag saving a change keeps its
 own spinner (`isLoading`), so saving and loading look different.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Match the shape of what is loading: a circle for an avatar, bars for text.</td><td>Draw a placeholder for a layout the page does not have.</td></tr>
+<tr><td>Keep the surrounding words, such as column headers, on screen.</td><td>Skeleton a heading the person already knows.</td></tr>
+<tr><td>Name the loading region once, in the live region around it.</td><td>Give each placeholder its own label.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

@@ -17,21 +17,21 @@
      * 12px in and 6px up, asymmetrically, and the literal made it read square.
      * Caught by check:size-fallbacks (#336).
      */
-    left: var(--size-spacing-small-space-150, 10px);
-    bottom: var(--size-spacing-small-space-150, 10px);
+    left: var(--size-spacing-small-space-150);
+    bottom: var(--size-spacing-small-space-150);
     z-index: 2;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: var(--control-md);
+    height: var(--control-md);
     border: 0;
     border-radius: 50%;
     color: var(--ds-text);
     background-color: var(--ds-surface);
     cursor: pointer;
 
-    @include plus-state((), $ring-offset: 2px);
+    @include plus-state(());
 }
 
 /*
@@ -114,9 +114,9 @@
         align-items: center;
         justify-content: center;
 
-        padding: 16px;
-        min-width: 44px; // Touch target
-        min-height: 44px;
+        padding: var(--size-spacing-medium-space-300);
+        min-width: var(--size-spacing-large-space-800); // Touch target, 48
+        min-height: var(--size-spacing-large-space-800);
 
         color: var(--ds-text-subtle);
         background: none;
@@ -133,8 +133,8 @@
 
         @include plus-state((
             hovered: (opacity: 1, color: var(--ds-text)),
-            disabled: (opacity: 0.38, cursor: not-allowed),
-        ), $ring-offset: 2px,
+            disabled: (opacity: var(--ds-opacity-disabled), cursor: not-allowed),
+        ),
             $hovered-selector: '&:hover:not(:disabled)');
     }
 
@@ -171,7 +171,7 @@
         cursor: pointer;
         transition: background-color 0.3s ease;
 
-        @include plus-state((), $ring-offset: 2px);
+        @include plus-state(());
 
         &.active {
             background-color: var(--ds-background-selected-bold);

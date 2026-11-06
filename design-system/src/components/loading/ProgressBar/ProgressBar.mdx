@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ProgressBarStories from './ProgressBar.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -79,6 +79,28 @@ A determinate bar for a task whose proportion done is known.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>A determinate bar at 50%.</>}>
+    <DsCanvasQuiet of={ProgressBarStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The bar has no hover layer, so nothing moves.</>}>
+    <DsCanvasQuiet of={ProgressBarStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>No pressed layer.</>}>
+    <DsCanvasQuiet of={ProgressBarStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Not a control, so Tab skips it.</>}>
+    <DsCanvasQuiet of={ProgressBarStories.Focused} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -103,7 +125,7 @@ A determinate bar for a task whose proportion done is known.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `ProgressBar` when the proportion done is known and worth showing — an
 upload, a course, a multi-step form. If you cannot say how far along it is,
@@ -116,7 +138,43 @@ is `default`, `success` or `inverse`.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Track.** The full-width bar the fill runs along, a pill 8 tall.
+2. **Fill.** The done part, a percent of the track. Indeterminate, it is a moving segment.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Determinate</td><td>The fill width is <code>value</code>, clamped to 0 to 100 together with <code>aria-valuenow</code>.</td></tr>
+<tr><td>Indeterminate</td><td>A segment slides along the track. No value is announced.</td></tr>
+<tr><td>Complete</td><td><code>appearance="success"</code> at 100.</td></tr>
+<tr><td>Hovered, pressed, focused, disabled</td><td>None. It is not a control.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Track</td><td><code>--ds-background-neutral</code>, <code>--progress-bar-height</code> tall, <code>--radius-full</code>.</td></tr>
+<tr><td>Fill</td><td><code>--ds-background-brand-bold</code>; <code>--ds-background-success-bold</code> for <code>success</code>.</td></tr>
+<tr><td>Inverse</td><td><code>--ds-background-inverse-subtle</code> on a bold or colored ground.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### `isIndeterminate` drops `value`.
 
@@ -143,6 +201,23 @@ its own maximum.
 // Correct.
 <ProgressBar value={68} ariaLabel="68% of goals met" />
 ```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the bar for what it measures: "68% of goals met".</td><td>Leave the default "Progress" label.</td></tr>
+<tr><td>Put the percent or count in text beside the bar.</td><td>Expect the 8 tall bar to carry text.</td></tr>
+<tr><td>Show 100 as the success appearance when the task is done.</td><td>Leave a finished task as a brand bar.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

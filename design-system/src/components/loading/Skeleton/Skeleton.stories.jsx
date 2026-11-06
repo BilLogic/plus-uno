@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
@@ -614,4 +615,45 @@ export const Interactive = {
         lines: { control: 'number' },
     },
     render: (args) => <Skeleton {...args} />,
+};
+
+/* ------------------------------------------------------------------- states */
+
+
+const Subject = (props) => <Skeleton preset="status" {...props} />;
+const root = (canvasElement) => canvasElement.firstElementChild;
+
+/** Rest: skeleton. */
+export const Rest = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        const el = root(canvasElement);
+        await expect(el).toHaveAttribute('aria-hidden', 'true');
+        await expect(el).not.toHaveAttribute('role');
+        await expect(getComputedStyle(el).backgroundColor).not.toBe('rgba(0, 0, 0, 0)');
+    },
+};
+
+/** Hovered: a display component has no hover layer, so nothing moves. */
+export const Hovered = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':hover', 'skeleton');
+    },
+};
+
+/** Pressed: no pressed layer either. */
+export const Pressed = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':active', 'skeleton');
+    },
+};
+
+/** Focused: not a control, so Tab skips it. */
+export const Focused = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(root(canvasElement), 'skeleton');
+    },
 };

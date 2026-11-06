@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as CarouselStories from './Carousel.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -59,6 +59,32 @@ A slideshow component for cycling through elements—images or slides of text—
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>The previous and next controls at 70%, in the subtle text color.</>}>
+    <DsCanvasQuiet of={CarouselStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The control at full opacity in the default text color.</>}>
+    <DsCanvasQuiet of={CarouselStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The controls have no pressed layer. Pressing an indicator or a control moves to its slide.</>}>
+    <DsCanvasQuiet of={CarouselStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The 2px focus ring, 2px off the control.</>}>
+    <DsCanvasQuiet of={CarouselStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Without wrap, the first slide has no previous. The control dims to the disabled opacity.</>}>
+    <DsCanvasQuiet of={CarouselStories.Disabled} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -83,7 +109,7 @@ A slideshow component for cycling through elements—images or slides of text—
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Carousel` for a small set of equal, browsable panels the user is invited to
 look through — onboarding screens, a few featured items, a gallery. Everything in
@@ -98,7 +124,49 @@ on. `fade` is accepted and ignored — the transition is always a slide.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Slide.** One at a time, sliding across the track.
+2. **Previous and next.** Controls over the left and right edge, each a 48 tall touch target.
+3. **Indicators.** One bar per slide at the bottom; the current slide is the selected one.
+4. **Play and pause.** Only when `interval` is set. It sits outside the track at the bottom-left, so it never scrolls away.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Controls at 70% opacity in <code>--ds-text-subtle</code>. Indicators in <code>--ds-border</code>, the current one in <code>--ds-background-selected-bold</code>.</td></tr>
+<tr><td>Hovered</td><td>Controls at full opacity in <code>--ds-text</code>.</td></tr>
+<tr><td>Pressed</td><td>No pressed layer. The press moves to the slide.</td></tr>
+<tr><td>Focused</td><td>A 2px ring 2px off the control or indicator.</td></tr>
+<tr><td>Disabled</td><td>At the first or last slide with <code>wrap</code> off, the control is disabled and dimmed to <code>--ds-opacity-disabled</code>. Autoplay pauses while a person hovers or focuses.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Corner</td><td><code>--radius-md</code>.</td></tr>
+<tr><td>Controls</td><td><code>--ds-text-subtle</code>, <code>--ds-text</code> on hover; icon <code>--icon-lg</code>; padding <code>--size-spacing-medium-space-300</code>; touch target <code>--size-spacing-large-space-800</code>.</td></tr>
+<tr><td>Play and pause</td><td><code>--control-md</code> round, <code>--ds-surface</code> ground, inset <code>--size-spacing-small-space-150</code>.</td></tr>
+<tr><td>Indicators</td><td><code>--ds-border</code>, <code>--ds-background-selected-bold</code> when current; <code>--stack-md</code> apart.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code> wide and offset.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-opacity-disabled</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### A string slide is text, and only text.
 
@@ -137,6 +205,23 @@ on. `fade` is accepted and ignored — the transition is always a slide.
 
 <Carousel slides={slides} />
 ```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Give each slide one idea and a short title.</td><td>Put a paragraph on a slide that rotates away.</td></tr>
+<tr><td>Write alt text that says what the image shows.</td><td>Leave `alt` empty on an image that carries the point.</td></tr>
+<tr><td>Write a caption that adds to the image.</td><td>Repeat the title as the caption.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

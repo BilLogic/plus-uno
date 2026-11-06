@@ -14,7 +14,7 @@
  * their heights from `_label-heights.scss`, the file Status, Count and Tag
  * read theirs from, and their corners from the same tokens the labels use, so
  * a preset is always the size of its label. The widths are stand-ins for the
- * text; 72, 56 and 88 have no spacing primitive, so they are literals.
+ * text; 72, 56 and 88 are sums of two spacing primitives.
  *
  * THE SPACING PRIMITIVES. The rest of the sizes are Figma-bound spacing
  * primitives, because no Element token names them: space-900 (64) for the
@@ -30,8 +30,8 @@
 
 .plus-skeleton {
     --plus-skeleton-width: 100%;
-    --plus-skeleton-height: var(--size-spacing-large-space-900, 64px);
-    --plus-skeleton-radius: var(--radius-md, 4px);
+    --plus-skeleton-height: var(--size-spacing-large-space-900);
+    --plus-skeleton-radius: var(--radius-md);
     --plus-skeleton-duration: 1.6s;
 
     display: inline-block;
@@ -51,47 +51,47 @@
 /* ------------------------------------------------------------------ shapes */
 
 .plus-skeleton--circle {
-    --plus-skeleton-width: var(--size-spacing-large-space-600, 32px);
-    --plus-skeleton-height: var(--size-spacing-large-space-600, 32px);
-    --plus-skeleton-radius: var(--radius-full, 999px);
+    --plus-skeleton-width: var(--size-spacing-large-space-600);
+    --plus-skeleton-height: var(--size-spacing-large-space-600);
+    --plus-skeleton-radius: var(--radius-full);
 }
 
 /* A text bar: 16 tall, radius 4, filling the line unless given a width. */
 .plus-skeleton--text {
-    --plus-skeleton-height: var(--size-spacing-medium-space-300, 16px);
-    --plus-skeleton-radius: var(--radius-md, 4px);
+    --plus-skeleton-height: var(--size-spacing-medium-space-300);
+    --plus-skeleton-radius: var(--radius-md);
 }
 
 /* ----------------------------------------------------------- label presets */
 
 .plus-skeleton--status {
-    --plus-skeleton-width: var(--size-spacing-large-space-900, 64px);
+    --plus-skeleton-width: var(--size-spacing-large-space-900);
     --plus-skeleton-height: #{label.$status-height};
-    --plus-skeleton-radius: var(--radius-md, 4px);
+    --plus-skeleton-radius: var(--radius-md);
 }
 
 .plus-skeleton--status-spacious {
-    --plus-skeleton-width: 88px;
+    --plus-skeleton-width: calc(var(--size-spacing-large-space-1000) + var(--size-spacing-small-space-100));
     --plus-skeleton-height: #{label.$status-height-spacious};
-    --plus-skeleton-radius: var(--size-border-radius-radius-150, 6px);
+    --plus-skeleton-radius: var(--size-border-radius-radius-150);
 }
 
 .plus-skeleton--count {
-    --plus-skeleton-width: var(--control-sm, 24px);
+    --plus-skeleton-width: var(--control-sm);
     --plus-skeleton-height: #{label.$count-height};
-    --plus-skeleton-radius: var(--radius-sm, 2px);
+    --plus-skeleton-radius: var(--radius-sm);
 }
 
 .plus-skeleton--tag {
-    --plus-skeleton-width: 72px;
+    --plus-skeleton-width: calc(var(--size-spacing-large-space-900) + var(--size-spacing-small-space-100));
     --plus-skeleton-height: #{label.$tag-height};
-    --plus-skeleton-radius: var(--radius-md, 4px);
+    --plus-skeleton-radius: var(--radius-md);
 }
 
 .plus-skeleton--tag-person {
-    --plus-skeleton-width: var(--size-spacing-large-space-1000, 80px);
+    --plus-skeleton-width: var(--size-spacing-large-space-1000);
     --plus-skeleton-height: #{label.$tag-height};
-    --plus-skeleton-radius: var(--radius-full, 999px);
+    --plus-skeleton-radius: var(--radius-full);
 }
 
 /* ------------------------------------------------------------------ groups */
@@ -102,7 +102,7 @@
 
     display: inline-flex;
     flex-direction: column;
-    gap: var(--stack-md, 8px);
+    gap: var(--stack-md);
     width: var(--plus-skeleton-width);
     max-width: 100%;
     vertical-align: middle;
@@ -121,17 +121,17 @@
 .plus-skeleton-group--tags {
     display: inline-flex;
     align-items: center;
-    gap: var(--stack-md, 8px);
+    gap: var(--stack-md);
     vertical-align: middle;
     pointer-events: none;
 }
 
 .plus-skeleton--tag-narrow {
-    --plus-skeleton-width: 56px;
+    --plus-skeleton-width: calc(var(--size-spacing-large-space-700) + var(--size-spacing-medium-space-300));
 }
 
 .plus-skeleton--tag-widest {
-    --plus-skeleton-width: 88px;
+    --plus-skeleton-width: calc(var(--size-spacing-large-space-1000) + var(--size-spacing-small-space-100));
 }
 
 /* ----------------------------------------------------------------- shimmer */
@@ -164,7 +164,7 @@
 /* Forced colors drop the fill; an outline keeps the shape without changing its size. */
 @media (forced-colors: active) {
     .plus-skeleton {
-        outline: var(--stroke-1, 1px) solid GrayText;
-        outline-offset: calc(-1 * var(--stroke-1, 1px));
+        outline: var(--stroke-1) solid GrayText;
+        outline-offset: calc(-1 * var(--stroke-1));
     }
 }

@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/layout-and-structure/Accordion/Accordion.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Accordion/Accordion.stories.jsx` — Styles, Behavior, InteractionStates, Content, Overview, Interactive
+**Stories:** `design-system/src/components/layout-and-structure/Accordion/Accordion.stories.jsx` — Styles, Behavior, InteractionStates, Content, Overview, Interactive, Rest, Hovered, Pressed, Focused, Expanded, Disabled
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Accordion/Accordion.mdx`
 
@@ -27,7 +27,7 @@
 
 ## Tokens touched
 
-`--body-large` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-surface` · `--ds-text-subtle` · `--font-size-fa-h6-solid` · `--heading-small` · `--size-card-border-sm` · `--size-card-pad-x-md` · `--size-card-pad-y-md` · `--size-card-radius-sm`
+`--body-large` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text-subtle` · `--font-size-fa-h6-solid` · `--heading-small` · `--size-card-border-sm` · `--size-card-pad-x-md` · `--size-card-pad-y-md` · `--size-card-radius-sm`
 
 From `design-system/src/components/layout-and-structure/Accordion/Accordion.scss`. Override these through the token layer, never with a literal.
 

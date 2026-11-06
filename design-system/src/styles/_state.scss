@@ -54,7 +54,7 @@
 @mixin plus-state(
     $states: (),
     $ring: true,
-    $ring-offset: var(--focus-ring-width), /* one param, used for both outline and outline-offset below; Carousel overrides it with a literal for both too */
+    $ring-offset: var(--focus-ring-width), /* one param, used for both outline and outline-offset below */
     $ring-token: --ds-border-focused,
     $high-contrast: false,
     $important: false,

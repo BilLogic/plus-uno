@@ -9,7 +9,7 @@ Rotates through a set of slides, with controls, indicators, captions, and a paus
 
 **Source:** `design-system/src/components/layout-and-structure/Carousel/Carousel.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Carousel/Carousel.stories.jsx` — Content, Overview, Interactive
+**Stories:** `design-system/src/components/layout-and-structure/Carousel/Carousel.stories.jsx` — Content, Overview, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Carousel/Carousel.mdx`
 
@@ -42,7 +42,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-large` · `--ds-background-inverse-subtle` · `--ds-background-selected-bold` · `--ds-border` · `--ds-surface` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--heading-medium` · `--icon-lg` · `--radius-lg` · `--radius-md` · `--size-column-lg` · `--size-column-md` · `--size-column-xs` · `--size-section-pad-x-lg` · `--size-section-pad-x-md` · `--size-section-pad-x-sm` · `--size-section-pad-y-lg` · `--size-section-pad-y-md` · `--size-section-pad-y-sm` · `--size-spacing-small-space-050` · `--size-spacing-small-space-075` · `--size-spacing-small-space-100` · `--size-spacing-small-space-150` · `--size-spacing-xlarge-space-2000` · `--size-spacing-xlarge-space-2500` · `--size-spacing-xlarge-space-5000` · `--stack-md`
+`--body-large` · `--control-md` · `--ds-background-inverse-subtle` · `--ds-background-selected-bold` · `--ds-border` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--heading-medium` · `--icon-lg` · `--radius-lg` · `--radius-md` · `--size-column-lg` · `--size-column-md` · `--size-column-xs` · `--size-section-pad-x-lg` · `--size-section-pad-x-md` · `--size-section-pad-x-sm` · `--size-section-pad-y-lg` · `--size-section-pad-y-md` · `--size-section-pad-y-sm` · `--size-spacing-large-space-800` · `--size-spacing-medium-space-300` · `--size-spacing-small-space-050` · `--size-spacing-small-space-075` · `--size-spacing-small-space-100` · `--size-spacing-small-space-150` · `--size-spacing-xlarge-space-2000` · `--size-spacing-xlarge-space-2500` · `--size-spacing-xlarge-space-5000` · `--stack-md`
 
 From `design-system/src/components/layout-and-structure/Carousel/Carousel.scss`. Override these through the token layer, never with a literal.
 

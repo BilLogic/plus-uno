@@ -4,12 +4,12 @@ import './ScrollBar.scss';
 
 /**
  * ScrollBar — a wrapper that applies the Design System's tokenized custom
- * scrollbar styling (thin width, outline-colored thumb, transparent track)
+ * scrollbar styling (thin width, border-colored thumb, transparent track)
  * to its scrollable content.
  */
 const ScrollBar = ({
     children,
-    maxHeight = '320px',
+    maxHeight = 'calc(var(--size-spacing-xlarge-space-2000) * 2)',
     horizontal = false,
     id,
     'aria-label': ariaLabel = 'Scrollable content',
