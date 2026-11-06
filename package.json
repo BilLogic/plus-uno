@@ -131,6 +131,7 @@
     "check:token-registry": "node scripts/generate-token-registry.mjs --check",
     "check:knowledge-audit": "node scripts/generate-knowledge-audit.js --check",
     "check:storybook": "node scripts/check-storybook.mjs",
+    "check:storybook-links": "node scripts/check-storybook-links.mjs",
     "check:docs-chrome": "node scripts/check-docs-chrome.mjs",
     "//check-registry:end": "END of the generated check:* block."
   },
