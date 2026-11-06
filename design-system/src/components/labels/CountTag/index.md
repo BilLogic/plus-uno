@@ -16,12 +16,12 @@
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `value` | number or string | — | The number. Hidden at 0 (and below) unless `showZero`. Ignored by `isDot`. |
-| `max` | number | `99` | Above this the pill shows `{max}+`. |
+| `max` | number | `99` | Above this the count shows `{max}+`. |
 | `showZero` | bool | `false` | Render a count of 0 instead of nothing. |
 | `appearance` | enum | `'neutral'` | The intent. Use one only when the number carries it. |
 | `spacing` | enum | `'default'` | `default` (20) on its own; `compact` (16) is for use inside a label. A dot is always 8. |
 | `isBold` | bool | `false` | The solid fill: asks for action now (at most one per area). |
-| `isInverse` | bool | `false` | A solid white pill with dark text, for filled buttons and dark grounds. Always neutral. |
+| `isInverse` | bool | `false` | A solid white badge with dark text, for filled buttons and dark grounds. Always neutral. |
 | `isDot` | bool | `false` | Presence without a number. Needs `label`. |
 | `hasRing` | bool | `false` | A 2px ring in the page color, for a count pinned to the corner of an icon or avatar. |
 | `label` | string | — | The accessible name. Required for `isDot`; on a number it replaces the bare digits for screen readers. |
@@ -38,7 +38,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-small` · `--ds-background-danger` · `--ds-background-danger-bold` · `--ds-background-information` · `--ds-background-information-bold` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-background-smart-mastering-content` · `--ds-background-smart-mastering-content-bold` · `--ds-background-success` · `--ds-background-success-bold` · `--ds-background-warning` · `--ds-background-warning-bold` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-smart-mastering-content` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-surface` · `--ds-text` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-inverse` · `--ds-text-smart-mastering-content` · `--ds-text-subtle` · `--ds-text-success` · `--ds-text-warning` · `--ds-text-warning-inverse` · `--pad-x-xs` · `--plus-count-min` · `--plus-count-size` · `--radius-full` · `--size-spacing-medium-space-300` · `--size-spacing-medium-space-400` · `--size-spacing-small-space-100` · `--stroke-2`
+`--body-small` · `--ds-background-danger` · `--ds-background-danger-bold` · `--ds-background-information` · `--ds-background-information-bold` · `--ds-background-neutral` · `--ds-background-neutral-bold` · `--ds-background-smart-mastering-content` · `--ds-background-smart-mastering-content-bold` · `--ds-background-success` · `--ds-background-success-bold` · `--ds-background-warning` · `--ds-background-warning-bold` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-smart-mastering-content` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-surface` · `--ds-text` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-inverse` · `--ds-text-smart-mastering-content` · `--ds-text-subtle` · `--ds-text-success` · `--ds-text-warning` · `--ds-text-warning-inverse` · `--pad-x-xs` · `--plus-count-min` · `--plus-count-size` · `--radius-0125` · `--radius-full` · `--size-150` · `--size-spacing-small-space-100` · `--stroke-2`
 
 From `design-system/src/components/labels/CountTag/CountTag.scss`. Override these through the token layer, never with a literal.
 
