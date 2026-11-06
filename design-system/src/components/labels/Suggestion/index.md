@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/labels/Suggestion/Suggestion.jsx`
 
-**Stories:** `design-system/src/components/labels/Suggestion/Suggestion.stories.jsx` — Types, InATagRow, Callbacks, StateLayers, FocusRing, DisabledBesideTags, AcceptIntoTags, Interactive
+**Stories:** `design-system/src/components/labels/Suggestion/Suggestion.stories.jsx` — Types, InATagRow, Callbacks, StateLayers, FocusRing, DisabledBesideTags, AcceptIntoTags, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/Suggestion/Suggestion.mdx`
 

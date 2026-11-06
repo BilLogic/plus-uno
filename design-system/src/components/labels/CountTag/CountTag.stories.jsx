@@ -4,6 +4,7 @@ import { expect, spyOn, userEvent, within } from 'storybook/test';
 import { contrastRatio as contrast } from '@/storybook-docs/lib/contrast.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import CountTag, { COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS } from './CountTag';
+import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 
 /**
  * `CountTag` — a number on its own, as a near-square badge.
@@ -350,4 +351,51 @@ export const Interactive = {
         spacing: { control: 'inline-radio', options: COUNT_TAG_SPACINGS },
     },
     render: (args) => <CountTag {...args} label={args.label || (args.isDot ? 'Notification' : undefined)} />,
+};
+
+/* ------------------------------------------------------------------- states */
+
+/** Rest, the only state: a count is a label, not a control. */
+export const Rest = {
+    render: () => <CountTag value={4} data-testid="count" />,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByTestId('count');
+        await expectGroundUnder(canvasElement, el, undefined, '--ds-background-neutral', 'count');
+        await expect(el).toHaveTextContent('4');
+        await expect(el).not.toHaveAttribute('tabindex');
+    },
+};
+
+/** Hovered: nothing changes. */
+export const Hovered = {
+    render: () => <CountTag value={4} data-testid="count" />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(within(canvasElement).getByTestId('count'), ':hover', 'CountTag');
+    },
+};
+
+/** Pressed: nothing changes. */
+export const Pressed = {
+    render: () => <CountTag value={4} data-testid="count" />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(within(canvasElement).getByTestId('count'), ':active', 'CountTag');
+    },
+};
+
+/** Focused: not in the tab order, so Tab skips it. */
+export const Focused = {
+    render: () => <CountTag value={4} data-testid="count" />,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(within(canvasElement).getByTestId('count'), 'CountTag');
+    },
+};
+
+/** Disabled: there is none. A label is never dimmed; a disabled thing is described by the control beside it. */
+export const Disabled = {
+    render: () => <CountTag value={4} data-testid="count" />,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByTestId('count');
+        await expect(el).not.toHaveAttribute('aria-disabled');
+        await expect(getComputedStyle(el).opacity, 'never dimmed').toBe('1');
+    },
 };

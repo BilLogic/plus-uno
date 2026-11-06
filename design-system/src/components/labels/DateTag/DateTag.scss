@@ -17,7 +17,7 @@
 
 .plus-date-tag {
     --plus-date-tag-height: #{label.$status-height};
-    --plus-date-tag-icon-box: 20px;
+    --plus-date-tag-icon-box: var(--size-media-xs);
 
     display: inline-flex;
     align-items: center;
@@ -26,36 +26,36 @@
     height: var(--plus-date-tag-height);
     min-width: 0;
     /* The cap from `maxWidth` (200 by default), never wider than the container. */
-    max-width: min(var(--plus-date-tag-max, 200px), 100%);
+    max-width: min(var(--plus-date-tag-max), 100%);
     margin: 0;
-    padding: 0 var(--size-spacing-small-space-025, 2px) 0 var(--pad-x-xs, 4px);
-    gap: var(--size-spacing-small-space-025, 2px);
-    border-radius: var(--radius-md, 4px);
+    padding: 0 var(--size-spacing-small-space-025) 0 var(--pad-x-xs);
+    gap: var(--size-spacing-small-space-025);
+    border-radius: var(--radius-md);
     vertical-align: middle;
     white-space: nowrap;
     background-color: transparent;
-    box-shadow: inset 0 0 0 var(--stroke-1, 1px) var(--plus-date-tag-edge);
+    box-shadow: inset 0 0 0 var(--stroke-1) var(--plus-date-tag-edge);
 }
 
 .plus-date-tag__content {
     display: inline-flex;
     align-items: center;
     min-width: 0;
-    padding-right: var(--size-spacing-small-space-025, 2px);
-    gap: var(--stack-sm, 4px);
+    padding-right: var(--size-spacing-small-space-025);
+    gap: var(--stack-sm);
 }
 
 .plus-date-tag--spacious {
     --plus-date-tag-height: #{label.$status-height-spacious};
-    --plus-date-tag-icon-box: 22px;
+    --plus-date-tag-icon-box: calc(var(--size-media-xs) + var(--size-spacing-small-space-025));
 
-    padding: 0 var(--size-spacing-small-space-075, 6px) 0 var(--pad-x-md, 12px);
+    padding: 0 var(--size-spacing-small-space-075) 0 var(--pad-x-md);
     gap: 0;
-    border-radius: var(--size-border-radius-radius-150, 6px);
+    border-radius: var(--size-border-radius-radius-150);
 
     .plus-date-tag__content {
-        padding-right: var(--size-spacing-small-space-075, 6px);
-        gap: var(--size-spacing-small-space-075, 6px);
+        padding-right: var(--size-spacing-small-space-075);
+        gap: var(--size-spacing-small-space-075);
     }
 
     .plus-date-tag__label {
@@ -113,13 +113,13 @@ $date-look: (
 
 /* Focusable only while truncated, as the tooltip's trigger. */
 .plus-date-tag:focus-visible {
-    outline: var(--focus-ring-width, 2px) solid var(--ds-border-focused);
-    outline-offset: var(--focus-ring-width, 2px);
+    outline: var(--focus-ring-width) solid var(--ds-border-focused);
+    outline-offset: var(--focus-ring-width);
 }
 
 /* Forced colors drop box-shadows; a real border keeps the edge. */
 @media (forced-colors: active) {
     .plus-date-tag {
-        border: var(--stroke-1, 1px) solid CanvasText;
+        border: var(--stroke-1) solid CanvasText;
     }
 }

@@ -53,7 +53,7 @@ own: unread items, results, errors.
 ## Overview
 
 <DocsCanvasShell attachSourceBelow description={<>Subtle by default; <code>isBold</code> when it asks for action now; <code>isInverse</code> on filled buttons and dark surfaces; <code>isDot</code> for presence without a number.</>}>
-    <Canvas of={CountTagStories.Emphasis} story={{ inline: true }} layout="padded" sourceState="hidden" />
+    <Canvas of={CountTagStories.Appearances} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>
@@ -74,7 +74,7 @@ own: unread items, results, errors.
 
 <div className="sb-ds-doc-section">
 
-## States
+## Behavior
 
 <DocsCanvasShell description={<><code>max</code> caps the number with a <code>+</code>; the default is 99.</>}>
     <DsCanvasQuiet of={CountTagStories.Max} />
@@ -106,6 +106,32 @@ own: unread items, results, errors.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>Rest. The only state: a number in a near-square badge.</>}>
+    <DsCanvasQuiet of={CountTagStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Hovered. No change: a count is not a control.</>}>
+    <DsCanvasQuiet of={CountTagStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Pressed. No change.</>}>
+    <DsCanvasQuiet of={CountTagStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focused. Not in the tab order.</>}>
+    <DsCanvasQuiet of={CountTagStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled. Never dimmed.</>}>
+    <DsCanvasQuiet of={CountTagStories.Disabled} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -131,7 +157,7 @@ own: unread items, results, errors.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `CountTag` for a number on its own: unread messages on a nav item, results on a
 tab, errors in a section header, a notification on a bell.
@@ -147,7 +173,49 @@ tab, errors in a section header, a notification on a bell.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Number.** The count in the body-small size with tabular digits, hidden at 0 unless <code>showZero</code>, capped at <code>max</code> with a <code>+</code>.
+2. **Badge.** 20 tall on its own and 16 inside a label, 24 wide at minimum, with a 2 corner, so one digit is a small rectangle and more digits grow it from the trailing edge.
+3. **Dot.** Presence without a number: an 8 circle that needs a <code>label</code> for its name.
+4. **Ring.** Optional, in the surface color, for a count pinned to the corner of an icon or an avatar.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The only state. Subtle neutral by default; bold, inverse and the dot are choices of ground, not states.</td></tr>
+<tr><td>Hovered, pressed</td><td>None. It is a label, not a control; the thing around it is what responds.</td></tr>
+<tr><td>Focused</td><td>None. It is not in the tab order.</td></tr>
+<tr><td>Disabled</td><td>None. A label is never dimmed; a disabled thing is described by the control beside it.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Height</td><td><code>--label-height-md</code> (20) on its own, <code>--label-height-sm</code> (16) when compact.</td></tr>
+<tr><td>Width and padding</td><td><code>--control-sm</code> for the minimum, <code>--pad-x-xs</code> either side.</td></tr>
+<tr><td>Corner</td><td><code>--radius-sm</code>; the dot is <code>--radius-full</code>.</td></tr>
+<tr><td>Subtle</td><td><code>--ds-background-neutral</code> with <code>--ds-text</code>, and the same pair for each other appearance.</td></tr>
+<tr><td>Bold</td><td><code>--ds-background-neutral-bold</code> with <code>--ds-text-inverse</code>; warning takes <code>--ds-text-warning-inverse</code>.</td></tr>
+<tr><td>Inverse</td><td><code>--ds-surface</code> with <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Ring</td><td><code>--stroke-2</code> in <code>--ds-surface</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Keep most counts quiet.
 
@@ -178,6 +246,24 @@ count per area.
 
 Inverse is a solid white badge with dark text, so it passes contrast on any fill.
 On a light surface it barely separates from the page; use subtle there.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Show the bare number: 4, 12, 99+.</td><td>Add words or units to the badge: "4 unread".</td></tr>
+<tr><td>Put the meaning in <code>label</code>, which a screen reader reads: "4 unread messages".</td><td>Write "04" or pad with zeros.</td></tr>
+<tr><td>Leave a zero out. An empty tab needs no badge.</td><td>Show "0" unless the zero is the news.</td></tr>
+<tr><td>Give a dot a <code>label</code> that says what it marks: "New message".</td><td>Ship a dot with no name.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

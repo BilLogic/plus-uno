@@ -48,6 +48,17 @@ const FORMS_PART_3 = [
   'Toggle/Toggle',
 ].map((name) => `design-system/src/components/forms-and-inputs/${name}.mdx`);
 
+const LABELS = [
+  'AiLabel',
+  'CountTag',
+  'DateTag',
+  'SmartTag',
+  'StatusTag',
+  'Suggestion',
+  'Tag',
+  'TagGroup',
+].map((name) => `design-system/src/components/labels/${name}/${name}.mdx`);
+
 describe('generated docs blocks', () => {
   it('the shared layout exports DocsProperties, DocsSource and DocsStories', () => {
     const layout = read('design-system/src/storybook-docs/ds-docs-layout.jsx');
@@ -62,7 +73,7 @@ describe('generated docs blocks', () => {
     expect(mdx).not.toMatch(/<th>(Prop|Property|Default)<\/th>/);
   });
 
-  it.each([...FORMS_PART_1, ...FORMS_PART_2, ...FORMS_PART_3])('%s authors no props table and carries the template headings', (file) => {
+  it.each([...FORMS_PART_1, ...FORMS_PART_2, ...FORMS_PART_3, ...LABELS])('%s authors no props table and carries the template headings', (file) => {
     const mdx = read(file);
     expect(mdx).not.toMatch(/^## Properties/m);
     expect(mdx).not.toMatch(/<th>(Prop|Property|Default)<\/th>/);

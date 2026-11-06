@@ -76,7 +76,7 @@ as Tag, so it sits in the tag row where the value will land.
 
 <div className="sb-ds-doc-section">
 
-## States
+## Behavior
 
 <DocsCanvasShell description={<>Rest is a dashed edge on a clear ground. Hover is the discovery ground and pressed its hovered step.</>}>
     <DsCanvasQuiet of={SuggestionStories.StateLayers} />
@@ -84,6 +84,32 @@ as Tag, so it sits in the tag row where the value will land.
 
 <DocsCanvasShell description={<>Keyboard focus is a 2px Focus Ring 2px outside the dashed edge. Press Tab to see it.</>}>
     <DsCanvasQuiet of={SuggestionStories.FocusRing} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<DocsCanvasShell description={<>Rest. A dashed discovery edge on a clear ground.</>}>
+    <DsCanvasQuiet of={SuggestionStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Hovered. The discovery ground.</>}>
+    <DsCanvasQuiet of={SuggestionStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Pressed. The next discovery step.</>}>
+    <DsCanvasQuiet of={SuggestionStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focused. The 2px focus ring, 2px off the dashed edge.</>}>
+    <DsCanvasQuiet of={SuggestionStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled. A native disabled button, never accepted.</>}>
+    <DsCanvasQuiet of={SuggestionStories.Disabled} />
 </DocsCanvasShell>
 
 </div>
@@ -114,7 +140,7 @@ as Tag, so it sits in the tag row where the value will land.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Suggestion` when the system proposes a value and a person decides whether
 to take it: an AI-suggested focus area beside the ones already chosen, or a
@@ -129,7 +155,48 @@ already produced.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Glyph.** A plus for an <code>insert</code> suggestion, a sparkles wand for a <code>prompt</code>. It says which kind of proposal this is.
+2. **Label.** The proposed value or prompt, short.
+3. **Edge.** Dashed, in the discovery border: the system proposed it, the person has not accepted it.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>A dashed edge on a clear ground. The accessible name is "Add Fractions, suggested" or "Summarize, suggested".</td></tr>
+<tr><td>Hovered</td><td><code>--ds-background-discovery</code>.</td></tr>
+<tr><td>Pressed</td><td><code>--ds-background-discovery-hovered</code>.</td></tr>
+<tr><td>Focused</td><td>A 2px ring 2px off the dashed edge. The ground stays clear, so focus never reads as pressed.</td></tr>
+<tr><td>Disabled</td><td>Disabled ground and words, no focus, and <code>onAccept</code> never fires. A disabled field or tag group disables every suggestion in it.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Edge</td><td><code>--ds-border-discovery</code>, dashed, <code>--border-default</code> wide.</td></tr>
+<tr><td>Words and glyph</td><td><code>--ds-text-discovery</code> and <code>--ds-icon-discovery</code>.</td></tr>
+<tr><td>Hovered, pressed</td><td><code>--ds-background-discovery</code> and <code>--ds-background-discovery-hovered</code>.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code> wide and offset.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code>, <code>--ds-text-disabled</code>, <code>--ds-icon-disabled</code>.</td></tr>
+<tr><td>Box</td><td>22 tall, <code>--pad-x-xs</code> padding, <code>--radius-md</code> corner.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### The field decides what happens next.
 
@@ -168,6 +235,23 @@ suggestion is disabled with the tags beside it.
   <Suggestion label="Ratios" onAccept={add} />
 </TagGroup>
 ```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Use the value itself: "Fractions".</td><td>Write an instruction: "Click to add Fractions".</td></tr>
+<tr><td>Keep a prompt to a few words that read as a request: "Summarize".</td><td>Send a whole paragraph as the label.</td></tr>
+<tr><td>Offer a few. Three to five fit a row.</td><td>Fill a row with suggestions until the real tags are lost.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

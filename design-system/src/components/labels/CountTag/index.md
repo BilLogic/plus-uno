@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/labels/CountTag/CountTag.jsx`
 
-**Stories:** `design-system/src/components/labels/CountTag/CountTag.stories.jsx` — Appearances, Spacings, Max, Zero, Ring, Styles, DotNeedsALabel, LabeledNumber, Interactive
+**Stories:** `design-system/src/components/labels/CountTag/CountTag.stories.jsx` — Appearances, Spacings, Max, Zero, Ring, Styles, DotNeedsALabel, LabeledNumber, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/CountTag/CountTag.mdx`
 

@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/labels/AiLabel/AiLabel.jsx`
 
-**Stories:** `design-system/src/components/labels/AiLabel/AiLabel.stories.jsx` — Origins, TheMarkIsNotAControl, LowConfidenceCarriesItsAdvice, ConfidenceIsInTheName, ExplainIsARealButton, TheGlyphIsDecoration, NoBrandHueIsAssumed, Interactive
+**Stories:** `design-system/src/components/labels/AiLabel/AiLabel.stories.jsx` — Origins, TheMarkIsNotAControl, LowConfidenceCarriesItsAdvice, ConfidenceIsInTheName, ExplainIsARealButton, TheGlyphIsDecoration, NoBrandHueIsAssumed, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/AiLabel/AiLabel.mdx`
 

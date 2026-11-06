@@ -136,6 +136,32 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>Rest. A named list; each tag keeps its own state.</>}>
+    <DsCanvasQuiet of={TagGroupStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Hovered. The group has no ground; the tag under the pointer reacts.</>}>
+    <DsCanvasQuiet of={TagGroupStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Pressed. The group does not react; the tag does.</>}>
+    <DsCanvasQuiet of={TagGroupStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focused. Tab skips the list and lands on the first control inside it.</>}>
+    <DsCanvasQuiet of={TagGroupStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled. The set's, passed to every tag and suggestion.</>}>
+    <DsCanvasQuiet of={TagGroupStories.DisabledSet} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -160,7 +186,7 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `TagGroup` wherever more than one `Tag` appears together: the subjects on a
 profile, the filters above a table, the recipients on a message. It is the
@@ -175,7 +201,44 @@ A single tag standing alone does not need it.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Tags and suggestions.** The group owns the gaps between them; a tag carries no margin.
+2. **Overflow tag.** A <code>+n</code> that opens a menu of the hidden tags, or runs <code>onOverflowClick</code>.
+3. **List.** A named <code>list</code> of <code>listitem</code>s; the <code>label</code> is its accessible name.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>A wrapping row, or a collapsed row with a <code>+n</code> tag.</td></tr>
+<tr><td>Hovered, pressed</td><td>None on the group. Each tag reacts as it would alone.</td></tr>
+<tr><td>Focused</td><td>None on the list. Tab reaches the controls inside it in order: selectable tags, links, ×, suggestions, the overflow tag.</td></tr>
+<tr><td>Disabled</td><td><code>isDisabled</code> disables every tag and suggestion and the overflow menu, as a disabled field does.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Gap</td><td><code>--stack-md</code> (8) between tags, and between rows.</td></tr>
+<tr><td>Overflow tag</td><td>A selectable Tag, so its ground, ring and disabled tokens are Tag's.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code> and <code>--ds-text-disabled</code>, from <code>TagContext</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### The gap lives here, not on the tag.
 
@@ -254,6 +317,23 @@ menu.
 
 `alignment="end"` belongs in a table column whose other cells are
 right-aligned. Everywhere else, tags read from the start.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Give the group a <code>label</code> that names the set: "Focus areas".</td><td>Leave it out, or write "Tags".</td></tr>
+<tr><td>Order tags by importance or by the order the person added them.</td><td>Sort them arbitrarily.</td></tr>
+<tr><td>Name the overflow by what is hidden: "+3 focus areas".</td><td>Say "More" with no count.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

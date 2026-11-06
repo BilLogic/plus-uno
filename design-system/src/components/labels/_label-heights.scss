@@ -1,17 +1,17 @@
 /*
  * Label heights — written down once, for the labels and their skeletons.
  *
- * Status, Count and Tag have no semantic height token yet (label heights
- * 16/20/22/32 are a token follow-up). Each label sets its own height custom
- * property from these values, and Skeleton's presets read the same values, so
- * a label and its placeholder cannot drift apart. The compiled CSS of each
- * label is unchanged: it still declares the same pixel value.
+ * Status and Count read the label height roles (--label-height-sm is 16,
+ * --label-height-md is 20) and the item height for the spacious Status tag
+ * (32). Each label sets its own height custom property from these, and
+ * Skeleton's presets read the same values, so a label and its placeholder
+ * cannot drift apart.
  *
- * When the height tokens exist, they replace these values here and nowhere
- * else.
+ * The Tag is 22, which is not a step of the ×16 scale and has no role yet.
+ * It stays a literal here and nowhere else, until a height role names it.
  */
-$status-height: 20px;
-$status-height-spacious: 32px;
-$count-height: 20px;
-$count-height-compact: 16px;
+$status-height: var(--label-height-md);
+$status-height-spacious: var(--item-height-md);
+$count-height: var(--label-height-md);
+$count-height-compact: var(--label-height-sm);
 $tag-height: 22px;
