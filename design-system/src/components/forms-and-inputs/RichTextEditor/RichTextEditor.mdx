@@ -47,7 +47,7 @@ A rich text editor lets a person write text with formatting such as emphasis, li
 
 ## Toolbar
 
-<ComponentExample of={RichTextEditorStories.Empty} title="Compact" description="The default toolbar over an empty writing area with a placeholder." />
+<ComponentExample of={RichTextEditorStories.Empty} title="Default" description="The default toolbar over an empty writing area with a placeholder." />
 
 <ComponentExample of={RichTextEditorStories.FullToolbar} title="Full" description="`toolbarPreset` set to `full` shows every formatting button in a bordered editor." />
 
@@ -63,7 +63,7 @@ A rich text editor lets a person write text with formatting such as emphasis, li
 
 <ComponentExample of={RichTextEditorStories.Filled} title="Filled" description="The writing area holds formatted content." />
 
-<ComponentExample of={RichTextEditorStories.Focused} title="Focused" description="A 2px ring wraps the editor while the writing area has keyboard focus." />
+<ComponentExample of={RichTextEditorStories.Focused} title="Focused" description="A 2px ring wraps the editor while the writing area has focus." />
 
 <ComponentExample of={RichTextEditorStories.ReadOnly} title="Read-only" description="The content shows on the neutral fill and cannot be edited. The toolbar is inactive." />
 
@@ -123,9 +123,9 @@ Use a rich text editor where the formatting is part of the meaning: session note
 <tr><td>Hovered</td><td>Toolbar buttons take <code>--ds-background-neutral-subtle-hovered</code>. The writing area has no hover step.</td></tr>
 <tr><td>Pressed</td><td>Toolbar buttons take <code>--ds-background-neutral-subtle-pressed</code>.</td></tr>
 <tr><td>Active format</td><td>The button takes <code>--ds-background-selected</code> with <code>--ds-text-selected</code> and <code>--ds-icon-selected</code>.</td></tr>
-<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> wraps the editor while the writing area has keyboard focus.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> wraps the editor while the writing area has focus.</td></tr>
 <tr><td>Read-only</td><td><code>--ds-background-neutral</code> writing area, <code>--ds-text-subtle</code> text, toolbar faded and inert.</td></tr>
-<tr><td>Disabled</td><td>As read-only, with the toolbar and content faded to <code>--ds-opacity-disabled</code>.</td></tr>
+<tr><td>Disabled</td><td>As read-only: the neutral writing area and subtle text, and the toolbar faded to <code>--ds-opacity-disabled</code> and inert.</td></tr>
 <tr><td>Invalid</td><td>Not drawn. Mark the surrounding field and explain the error beside it.</td></tr>
 </tbody>
 </DocsTable>
