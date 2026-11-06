@@ -1,4 +1,5 @@
 import React from 'react';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Spinner, { SPINNER_APPEARANCES, SPINNER_SIZES } from './Spinner';
@@ -48,4 +49,45 @@ Interactive.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const spinner = canvas.getByRole('status');
     await expect(spinner).toHaveTextContent('Loading');
+};
+
+/* ------------------------------------------------------------------- states */
+
+
+const Subject = (props) => <Spinner {...props} />;
+const root = (canvasElement) => canvasElement.firstElementChild;
+
+/** Rest: spinner. */
+export const Rest = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        const el = root(canvasElement);
+        await expect(el).toHaveAttribute('role', 'status');
+        await expect(el).toHaveAttribute('data-size', '24');
+        await expect(within(canvasElement).getByText('Loading')).toBeInTheDocument();
+    },
+};
+
+/** Hovered: a display component has no hover layer, so nothing moves. */
+export const Hovered = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':hover', 'spinner');
+    },
+};
+
+/** Pressed: no pressed layer either. */
+export const Pressed = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':active', 'spinner');
+    },
+};
+
+/** Focused: not a control, so Tab skips it. */
+export const Focused = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(root(canvasElement), 'spinner');
+    },
 };

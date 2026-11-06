@@ -1,6 +1,9 @@
 import React from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { expect, userEvent, within } from 'storybook/test';
 import Accordion from './Accordion';
+import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
+import { probe, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
 export default {
     title: 'Components/Layout and structure/Accordion',
@@ -235,4 +238,79 @@ Interactive.args = {
     flush: false,
     alwaysOpen: false,
     itemCount: 3
+};
+
+/* ------------------------------------------------------------------- states */
+
+const Sections = ({ defaultActiveKey, disabled = false }) => (
+    <div style={{ maxWidth: '520px' }}>
+        <Accordion defaultActiveKey={defaultActiveKey}>
+            <Accordion.Item eventKey="0" header="Session notes" disabled={disabled}>
+                <p>Notes from the last session.</p>
+            </Accordion.Item>
+            <Accordion.Item eventKey="1" header="Goals">
+                <p>Goals for the next session.</p>
+            </Accordion.Item>
+        </Accordion>
+    </div>
+);
+const trigger = (canvasElement, name = 'Session notes') => within(canvasElement).getByRole('button', { name });
+
+/** Rest: a closed trigger sits on the surface. */
+export const Rest = {
+    render: () => <Sections />,
+    play: async ({ canvasElement }) => {
+        const el = trigger(canvasElement);
+        await expect(el).toHaveAttribute('aria-expanded', 'false');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface'));
+    },
+};
+
+/** Hovered: the neutral subtle hovered ground. */
+export const Hovered = {
+    render: () => <Sections />,
+    play: async ({ canvasElement }) => {
+        await expectHovered(canvasElement, trigger(canvasElement), 'default', 'accordion trigger');
+    },
+};
+
+/** Pressed: the neutral subtle pressed ground. */
+export const Pressed = {
+    render: () => <Sections />,
+    play: async ({ canvasElement }) => {
+        await expectPressed(canvasElement, trigger(canvasElement), 'default', 'accordion trigger');
+    },
+};
+
+/** Focused: the 2px ring, 2px off the edge; the ground stays put. */
+export const Focused = {
+    render: () => <Sections />,
+    play: async ({ canvasElement }) => {
+        await expectFocusRing(canvasElement, trigger(canvasElement), 'accordion trigger');
+    },
+};
+
+/** Expanded: the selected ground, and a press closes it again. */
+export const Expanded = {
+    render: () => <Sections defaultActiveKey="0" />,
+    play: async ({ canvasElement }) => {
+        const el = trigger(canvasElement);
+        await expect(el).toHaveAttribute('aria-expanded', 'true');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+        await userEvent.click(el);
+        await expect(el).toHaveAttribute('aria-expanded', 'false');
+    },
+};
+
+/** Disabled: dimmed to the disabled opacity, announced as disabled, never opens. */
+export const Disabled = {
+    render: () => <Sections disabled />,
+    play: async ({ canvasElement }) => {
+        const el = trigger(canvasElement);
+        await expect(el).toHaveAttribute('aria-disabled', 'true');
+        const item = el.closest('.plus-accordion-item');
+        await expect(getComputedStyle(item).opacity).toBe(probe(canvasElement, 'opacity', 'var(--ds-opacity-disabled)'));
+        await userEvent.click(el, { pointerEventsCheck: 0 });
+        await expect(el).toHaveAttribute('aria-expanded', 'false');
+    },
 };

@@ -1,5 +1,6 @@
 import React from 'react';
-import { expect } from 'storybook/test';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { expect, within } from 'storybook/test';
 import Button from '@/components/forms-and-inputs/Button';
 import PanelContainer, {
     PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelDisclaimer,
@@ -54,4 +55,48 @@ export const WidthFromProvider = () => (
 WidthFromProvider.play = async ({ canvasElement }) => {
     const panel = canvasElement.querySelector('#panel-provider-width');
     await expect(panel.style.width).toBe('480px');
+};
+
+/* ------------------------------------------------------------------- states */
+
+
+const Subject = (props) => (
+    <PanelContainer width="360px" {...props}>
+        <PanelHeader title="Session details" actions={<PanelActionGroup><PanelCloseAction /></PanelActionGroup>} />
+        <PanelBody>Panel body content goes here.</PanelBody>
+    </PanelContainer>
+);
+const root = (canvasElement) => canvasElement.firstElementChild;
+
+/** Rest: panel. */
+export const Rest = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expect(root(canvasElement).style.width).toBe('360px');
+        await expect(within(canvasElement).getByText('Session details')).toBeVisible();
+    },
+};
+
+/** Hovered: a display component has no hover layer, so nothing moves. */
+export const Hovered = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':hover', 'panel');
+    },
+};
+
+/** Pressed: no pressed layer either. */
+export const Pressed = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':active', 'panel');
+    },
+};
+
+/** Focused: not a control, so Tab skips it. */
+export const Focused = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(root(canvasElement), 'panel');
+    },
 };

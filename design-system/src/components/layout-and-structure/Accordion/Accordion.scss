@@ -133,12 +133,12 @@
     }
 
     // --- DISABLED STATE ---
-    // 78% opacity for flush, 38% for non-flush
+    // the disabled opacity token, flush or not
     .plus-accordion-item--disabled {
-        opacity: 0.38;
+        opacity: var(--ds-opacity-disabled);
     }
 
     &--flush .plus-accordion-item--disabled {
-        opacity: 0.78;
+        opacity: var(--ds-opacity-disabled);
     }
 }

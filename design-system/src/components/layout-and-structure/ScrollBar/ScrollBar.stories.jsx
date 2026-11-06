@@ -1,4 +1,6 @@
 import React from 'react';
+import { expect, userEvent } from 'storybook/test';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import ScrollBar from '@/components/layout-and-structure/ScrollBar';
 
 export default {
@@ -148,4 +150,49 @@ export const Interactive = {
             </div>
         </div>
     )
+};
+
+/* ------------------------------------------------------------------- states */
+
+
+const Subject = (props) => (
+    <ScrollBar maxHeight="160px" aria-label="Notes" {...props}>
+        {Array.from({ length: 20 }, (_, i) => <p key={i}>Note {i + 1}</p>)}
+    </ScrollBar>
+);
+const root = (canvasElement) => canvasElement.firstElementChild;
+
+/** Rest: scroll region. */
+export const Rest = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        const el = root(canvasElement);
+        await expect(getComputedStyle(el).overflowY).toBe('auto');
+        await expect(el.scrollHeight).toBeGreaterThan(el.clientHeight);
+    },
+};
+
+/** Hovered: a display component has no hover layer, so nothing moves. */
+export const Hovered = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':hover', 'scroll region');
+    },
+};
+
+/** Pressed: no pressed layer either. */
+export const Pressed = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':active', 'scroll region');
+    },
+};
+
+/** Focused: the region takes focus from Tab so the keyboard can scroll it. */
+export const Focused = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await userEvent.tab();
+        await expect(root(canvasElement)).toHaveFocus();
+    },
 };
