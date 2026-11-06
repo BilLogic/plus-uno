@@ -65,7 +65,7 @@ $tile-colors: (
 // The 40 tile takes a radius token; the other sizes keep the quarter of their
 // square. Both come to the same value at 40.
 .plus-tile--40 {
-    --tile-radius: var(--radius-0625);
+    --tile-radius: var(--tile-radius-lg);
 }
 
 /* ------------------------------------------------------------------ icon */
@@ -116,7 +116,7 @@ $tile-colors: (
     block-size: var(--tile-inner, var(--font-size-fa-body3));
     font-size: var(--tile-inner);
     line-height: 1;
-    border-radius: var(--radius-0125);
+    border-radius: var(--radius-sm);
     overflow: hidden;
 }
 
