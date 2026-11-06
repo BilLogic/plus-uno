@@ -554,7 +554,7 @@ const InFrame = ({ width, sidebarDocked }) => {
                 <Frame
                     sidebarDocked={sidebarDocked}
                     header={<Breadcrumb items={[{ text: 'Toolkit' }, { text: 'Sessions' }]} />}
-                    sidebar={<RoleSidebar user="supervisor" activeTabId="sessions" account={ACCOUNT} badges={{ 'compliance-monitor': { count: 3, countLabel: '3 open flags' } } lessonsLeft={2} />}
+                    sidebar={<RoleSidebar user="supervisor" activeTabId="sessions" account={ACCOUNT} badges={{ 'compliance-monitor': { count: 3, countLabel: '3 open flags' } }} lessonsLeft={2} />}
                     panelStorageKey={null}
                 >
                     <p style={{ margin: 0 }}>Upcoming and past sessions.</p>
