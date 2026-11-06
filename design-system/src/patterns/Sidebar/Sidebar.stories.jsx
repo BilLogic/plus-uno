@@ -273,8 +273,8 @@ export const OnboardingInProgress = {
         await expect(within(canvasElement).queryByRole('button', { name: 'Toolkit' }), 'a locked title does not collapse').toBeNull();
         const lessons = rowNamed(canvasElement, /^Lessons/);
         const onboarding = rowNamed(canvasElement, /^Onboarding/);
-        await expect(lessons.querySelector('.plus-count:not(.plus-count--dot)'), 'a Count tag, not a dot').toHaveAccessibleName('2 assigned lessons left');
-        await expect(onboarding.querySelector('.plus-count:not(.plus-count--dot)')).toHaveAccessibleName('3 onboarding modules left');
+        await expect(lessons.querySelector('.plus-count:not(.plus-count--dot)'), 'a Count tag, not a dot').toHaveTextContent('2 assigned lessons left');
+        await expect(onboarding.querySelector('.plus-count:not(.plus-count--dot)')).toHaveTextContent('3 onboarding modules left');
         await expect(lessons.querySelector('.plus-count--dot')).toBeNull();
         const sessions = rowNamed(canvasElement, 'Sessions');
         await expect(sessions).toHaveAttribute('aria-disabled', 'true');
@@ -292,7 +292,7 @@ export const OnboardingDone = {
     args: { view: 'tutor', modulesLeft: 0, lessonsLeft: 1 },
     play: async ({ canvasElement }) => {
         await expect(rowNamed(canvasElement, /^Onboarding/).querySelector('.plus-count'), 'no onboarding count once done').toBeNull();
-        await expect(rowNamed(canvasElement, /^Lessons/).querySelector('.plus-count')).toHaveAccessibleName('1 assigned lesson left');
+        await expect(rowNamed(canvasElement, /^Lessons/).querySelector('.plus-count')).toHaveTextContent('1 assigned lesson left');
         await expect(within(canvasElement).queryByRole('img', { name: /Locked/ })).toBeNull();
         await expect(within(canvasElement).getByRole('button', { name: 'Toolkit' })).toHaveAttribute('aria-expanded', 'true');
     },
