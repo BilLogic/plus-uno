@@ -9,7 +9,7 @@ Each cell is the real Checkbox or Radio, named by its row and its column.
 
 **Source:** `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.stories.jsx` — Overview, Variants, Layout, Size, InteractionStates, TwoGridsWithoutIds, ReadOnly, Interactive, Keyboard
+**Stories:** `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.stories.jsx` — Overview, Variants, Layout, Size, InteractionStates, TwoGridsWithoutIds, ReadOnly, Interactive, Keyboard, Unselected, Selected, Hovered, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.mdx`
 
@@ -48,6 +48,4 @@ From `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.scss`.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

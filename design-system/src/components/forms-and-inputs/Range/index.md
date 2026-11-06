@@ -9,7 +9,7 @@ A range input carries its value, never its meaning: "49" says nothing about what
 
 **Source:** `design-system/src/components/forms-and-inputs/Range/Range.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Range/Range.stories.jsx` — Overview, Labels, Positions, Disabled, Interactive, Size, ReportsNumber, Aria, Keyboard
+**Stories:** `design-system/src/components/forms-and-inputs/Range/Range.stories.jsx` — Overview, Labels, Positions, Disabled, Interactive, Size, ReportsNumber, Aria, Keyboard, Rest, Hovered, Pressed, Focused, DisabledState
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Range/Range.mdx`
 
@@ -48,6 +48,4 @@ From `design-system/src/components/forms-and-inputs/Range/Range.scss`. Override 
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
