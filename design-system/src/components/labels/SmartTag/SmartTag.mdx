@@ -73,6 +73,32 @@ meaning with a different color.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>Rest. A span with its subject's hue on the border and a fixed icon.</>}>
+    <DsCanvasQuiet of={SmartTagStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Hovered. Nothing on the plain tag; once selectable, the subject's subtlest step.</>}>
+    <DsCanvasQuiet of={SmartTagStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Pressed. Nothing on the plain tag; once selectable, the subtlest pressed step.</>}>
+    <DsCanvasQuiet of={SmartTagStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focused. The plain tag is skipped; a selectable one takes the 2px focus ring.</>}>
+    <DsCanvasQuiet of={SmartTagStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled. The disabled ground and words, as any Tag.</>}>
+    <DsCanvasQuiet of={SmartTagStories.Disabled} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -97,7 +123,7 @@ meaning with a different color.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `SmartTag` wherever training content, a tutor's strengths or a feedback
 item is tagged by SMART area. For a category that is not a SMART subject, use
@@ -108,7 +134,46 @@ not to add new behavior.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Subject icon.** Fixed per subject: a heart, a book, a bullhorn, a handshake, a laptop. It is decoration.
+2. **Label.** The subject's own name unless the context needs other words.
+3. **Edge and ground.** The subject's hue on the border and the swatch, with neutral text, exactly as Tag draws a color.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>A span with no role. The five subjects are the hues orange, teal, lime, magenta and brown.</td></tr>
+<tr><td>Hovered, pressed</td><td>None until <code>isSelected</code> makes it selectable; then the subject's subtlest and subtlest pressed steps, as Tag.</td></tr>
+<tr><td>Focused</td><td>Only when selectable or removable: the 2px focus ring, 2px off the edge.</td></tr>
+<tr><td>Disabled</td><td><code>isDisabled</code>, or a disabled field, drops it to the disabled ground and words and removes the ×.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest edge</td><td><code>--ds-border-accent-orange-subtle</code> for social-emotional, and the same step for each other subject hue.</td></tr>
+<tr><td>Hovered, pressed</td><td><code>--ds-background-accent-orange-subtlest</code> and <code>--ds-background-accent-orange-subtlest-pressed</code>.</td></tr>
+<tr><td>Selected</td><td><code>--ds-background-accent-orange-subtler</code> with a <code>--ds-border-accent-orange</code> edge.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code> with <code>--ds-text-disabled</code>.</td></tr>
+<tr><td>Height</td><td>22, as Tag.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Older spellings still work.
 
@@ -126,6 +191,23 @@ spelling; the aliases exist for content written before it changed.
 Each subject already has a label people recognize. Override it with
 `children` or `text` only when the surrounding content needs a shorter or
 longer phrasing.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Let the default label stand: "Mastering content".</td><td>Rename a subject to taste: "Math stuff".</td></tr>
+<tr><td>Use a SMART tag only for a SMART subject.</td><td>Use one as a general colored label. Use Tag.</td></tr>
+<tr><td>Write a custom label only where the context needs it, in the same register.</td><td>Shorten it to an abbreviation nobody has met.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

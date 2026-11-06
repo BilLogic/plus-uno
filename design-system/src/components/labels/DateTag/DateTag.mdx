@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as DateTagStories from './DateTag.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={DateTagStories} />
 
@@ -52,6 +52,32 @@ and the due-soon window — never a caller's choice.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>Rest. The only state: an outlined date with a fixed icon.</>}>
+    <DsCanvasQuiet of={DateTagStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Hovered. No change: a date tag is not a control.</>}>
+    <DsCanvasQuiet of={DateTagStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Pressed. No change.</>}>
+    <DsCanvasQuiet of={DateTagStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focused. Not in the tab order.</>}>
+    <DsCanvasQuiet of={DateTagStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled. Never dimmed.</>}>
+    <DsCanvasQuiet of={DateTagStories.Disabled} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -76,7 +102,7 @@ and the due-soon window — never a caller's choice.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `DateTag` for a due or event date beside the thing it belongs to — an
 assignment, a session, a report. For a status or a category, use `Tag`
@@ -87,7 +113,47 @@ dates.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Icon.** Fixed by the appearance: a calendar for neutral, a clock for warning and a triangle for danger. It is decoration; the date says the rest.
+2. **Date.** One short string, set by the app: "Due tomorrow", "Mar 4".
+3. **Outline.** A 1 inside border, so the height stays exact. A date tag has no fill.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The only state. The appearance (neutral, warning, danger) is chosen from the date and the due-soon window.</td></tr>
+<tr><td>Hovered, pressed</td><td>None. It is a label, not a control; the thing around it is what responds.</td></tr>
+<tr><td>Focused</td><td>None. It is not in the tab order. A truncated label takes focus only so a keyboard user can reach the tooltip with its full text.</td></tr>
+<tr><td>Disabled</td><td>None. A label is never dimmed; a disabled thing is described by the control beside it.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Height</td><td><code>--label-height-md</code> (20), or <code>--item-height-md</code> (32) when spacious.</td></tr>
+<tr><td>Padding and gap</td><td><code>--pad-x-xs</code> and <code>--stack-sm</code>; spacious <code>--pad-x-md</code>.</td></tr>
+<tr><td>Corner</td><td><code>--radius-md</code>; spacious 6.</td></tr>
+<tr><td>Neutral</td><td><code>--ds-border</code> edge, <code>--ds-text-subtle</code> words.</td></tr>
+<tr><td>Warning</td><td><code>--ds-border-warning-subtle</code> edge, <code>--ds-text-warning</code> words.</td></tr>
+<tr><td>Danger</td><td><code>--ds-border-danger-subtle</code> edge, <code>--ds-text-danger</code> words.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### The app picks the appearance, never taste.
 
@@ -106,6 +172,23 @@ It renders a `span` with no role and no click handler — `onClick`, `role` and
 `tabIndex` are dropped with a console warning in development. The one time it
 takes focus is when its text is truncated, so a keyboard user can still reach
 the tooltip holding the full date.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Say it in the reader's terms: "Due tomorrow", "Mar 4".</td><td>Write a timestamp: "2026-03-04T09:00".</td></tr>
+<tr><td>Keep one date to a tag. Use two tags for a range.</td><td>Pack a range or a time zone into one tag.</td></tr>
+<tr><td>Let the app turn the tag warning or danger from the date.</td><td>Pick a color for emphasis.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

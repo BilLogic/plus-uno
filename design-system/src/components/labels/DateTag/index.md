@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/labels/DateTag/DateTag.jsx`
 
-**Stories:** `design-system/src/components/labels/DateTag/DateTag.stories.jsx` — Overview, Styles, Truncation, NeverAButton, UnknownAppearanceFallsBack, Interactive
+**Stories:** `design-system/src/components/labels/DateTag/DateTag.stories.jsx` — Overview, Styles, Truncation, NeverAButton, UnknownAppearanceFallsBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/DateTag/DateTag.mdx`
 
@@ -32,7 +32,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-border` · `--ds-border-danger-subtle` · `--ds-border-focused` · `--ds-border-warning-subtle` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-warning` · `--focus-ring-width` · `--icon-md` · `--icon-sm` · `--pad-x-md` · `--pad-x-xs` · `--plus-date-tag-edge` · `--plus-date-tag-height` · `--plus-date-tag-icon-box` · `--plus-date-tag-max` · `--radius-md` · `--size-border-radius-radius-150` · `--size-spacing-small-space-025` · `--size-spacing-small-space-075` · `--stack-sm` · `--stroke-1`
+`--body-default` · `--body-small` · `--ds-border` · `--ds-border-danger-subtle` · `--ds-border-focused` · `--ds-border-warning-subtle` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-warning` · `--focus-ring-width` · `--icon-md` · `--icon-sm` · `--pad-x-md` · `--pad-x-xs` · `--plus-date-tag-edge` · `--plus-date-tag-height` · `--plus-date-tag-icon-box` · `--plus-date-tag-max` · `--radius-md` · `--size-border-radius-radius-150` · `--size-media-xs` · `--size-spacing-small-space-025` · `--size-spacing-small-space-075` · `--stack-sm` · `--stroke-1`
 
 From `design-system/src/components/labels/DateTag/DateTag.scss`. Override these through the token layer, never with a literal.
 

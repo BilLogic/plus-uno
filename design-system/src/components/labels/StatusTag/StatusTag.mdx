@@ -34,7 +34,7 @@ calculated it or a person set it.
 
 <div className="sb-ds-doc-section">
 
-## States
+## Behavior
 
 <DocsCanvasShell description={<>Past <code>maxWidth</code> (200) the label ends in an ellipsis, and the full text shows in a tooltip on hover and on keyboard focus. A Status tag that fits is not a tab stop.</>}>
     <DsCanvasQuiet of={StatusTagStories.Truncation} />
@@ -70,6 +70,32 @@ calculated it or a person set it.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>Rest. The only state: a filled label for the condition something is in.</>}>
+    <DsCanvasQuiet of={StatusTagStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Hovered. No change: a status tag is not a control.</>}>
+    <DsCanvasQuiet of={StatusTagStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Pressed. No change. To edit a status, the field around it becomes a dropdown.</>}>
+    <DsCanvasQuiet of={StatusTagStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focused. Not in the tab order, unless the text is truncated.</>}>
+    <DsCanvasQuiet of={StatusTagStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled. Never dimmed.</>}>
+    <DsCanvasQuiet of={StatusTagStories.Disabled} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -94,7 +120,7 @@ calculated it or a person set it.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `StatusTag` for the condition something is in when that condition can change:
 completed, needs review, missed, in progress. It is the same component whether
@@ -112,7 +138,48 @@ Use `spacing="default"` (20) in rows, lists, tables and sentences, and
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Leading visual.** Optional: a Font Awesome Free icon by name, or a node.
+2. **Label.** The condition, in a word or two. Past <code>maxWidth</code> it ends in an ellipsis and the full text is a tooltip.
+3. **Trailing metric.** Optional: a compact Count tag nested inside, with its own appearance when it means something else.
+4. **Fill.** The appearance's tinted ground with its words and an edge one step darker.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The only state. A status that can change is edited in the field around it.</td></tr>
+<tr><td>Hovered, pressed</td><td>None. It is a label, not a control; the thing around it is what responds.</td></tr>
+<tr><td>Focused</td><td>None. It is not in the tab order. A truncated label takes focus only so a keyboard user can reach the tooltip with its full text.</td></tr>
+<tr><td>Disabled</td><td>None. A label is never dimmed; a disabled thing is described by the control beside it.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Height</td><td><code>--label-height-md</code> (20), or <code>--item-height-md</code> (32) when spacious.</td></tr>
+<tr><td>Padding and gap</td><td><code>--pad-x-xs</code> and <code>--stack-sm</code>; spacious <code>--pad-x-md</code>.</td></tr>
+<tr><td>Corner</td><td><code>--radius-md</code>; spacious 6.</td></tr>
+<tr><td>Neutral</td><td><code>--ds-background-neutral</code>, <code>--ds-text</code>, edge <code>--ds-background-neutral-pressed</code>.</td></tr>
+<tr><td>Success, warning, danger</td><td>The same three for each: <code>--ds-background-success</code>, <code>--ds-text-success</code>, edge <code>--ds-background-success-pressed</code>.</td></tr>
+<tr><td>Info and discovery</td><td><code>--ds-background-information</code> and <code>--ds-background-smart-mastering-content</code>, with their text and pressed steps.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Let the appearance carry a meaning.
 
@@ -154,6 +221,24 @@ A Status tag never opens a menu. Where a status can be changed, the field around
 it becomes an inline Dropdown whose options are grouped To do · In progress ·
 Complete · Exception · Failed, each group with one appearance (neutral · info ·
 success · warning · danger).
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the condition: "In review", "Overdue", "Approved".</td><td>Write an action: "Review now". A status is not a button.</td></tr>
+<tr><td>Use one or two words, in sentence case.</td><td>Write a sentence or end with a period.</td></tr>
+<tr><td>Keep one wording for one condition across the product.</td><td>Use "Done" here and "Complete" there for the same state.</td></tr>
+<tr><td>Let a trailing metric be a plain number.</td><td>Put words in the metric.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
