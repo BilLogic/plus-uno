@@ -38,9 +38,6 @@ export const FREE_REGULAR_ICONS = new Set([
     "user", "window-maximize", "window-minimize", "window-restore",
 ]);
 
-/** The icon sizes, as token names: the font size is the icon box. */
-export const ICON_SIZES = Object.freeze({ sm: "--icon-sm", md: "--icon-md", lg: "--icon-lg" });
-
 /**
  * The Font Awesome classes for a Free icon name: `fa-regular fa-<name>` where
  * Free has a regular weight, `fa-solid fa-<name>` where it does not. A string

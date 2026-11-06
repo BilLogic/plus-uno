@@ -307,7 +307,10 @@ time {
 // (`--icon-sm`, `--icon-md`, `--icon-lg`) are the square the glyph sits in.
 .fa-solid,
 .fa-regular,
-.fa-brands {
+.fa-brands,
+.fas,
+.far,
+.fab {
     --fa-width: 1em;
 }
 } // @layer components

@@ -26,7 +26,7 @@ export const TILE_APPEARANCES = ['subtle', 'bold'];
 export const TILE_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yellow', 'teal', 'white'];
 
 /**
- * A string icon is a Font Awesome Free name (`book-open`, drawn solid) or a full
+ * A string icon is a Font Awesome Free name (`book-open`, drawn regular where Free has it) or a full
  * class list (`fa-brands fa-figma`). Anything else is rendered as given.
  */
 const renderIcon = (icon) => {

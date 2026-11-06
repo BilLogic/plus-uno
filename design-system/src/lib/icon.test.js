@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { iconClass, FREE_REGULAR_ICONS, ICON_SIZES } from './icon';
+import { iconClass, FREE_REGULAR_ICONS } from './icon';
 
 describe('iconClass', () => {
     it('draws regular where Free has it', () => {
@@ -16,8 +16,5 @@ describe('iconClass', () => {
     it('lists only current names, never a Pro-only family', () => {
         expect(FREE_REGULAR_ICONS.has('grid-2')).toBe(false);
         expect(FREE_REGULAR_ICONS.size).toBeGreaterThan(150);
-    });
-    it('names the three icon box tokens', () => {
-        expect(Object.values(ICON_SIZES)).toEqual(['--icon-sm', '--icon-md', '--icon-lg']);
     });
 });

@@ -1,5 +1,5 @@
 /**
- * The leading glyph of each message role (Font Awesome solid names), shared
+ * The leading glyph of each message role (Font Awesome Free names), shared
  * by Flag, Section message, Banner and Inline message so one role never draws
  * two icons.
  */
