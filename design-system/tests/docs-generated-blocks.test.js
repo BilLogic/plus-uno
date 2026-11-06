@@ -16,6 +16,19 @@ const BUTTONS = ['Button', 'ButtonGroup', 'CloseButton', 'FilterButton', 'IconBu
   (name) => `design-system/src/components/forms-and-inputs/${name}/${name}.mdx`,
 );
 
+const FORMS_PART_1 = [
+  'Calendar/Calendar',
+  'Checkbox/Checkbox',
+  'Comment/Comment',
+  'DateTimePicker/DateTimePicker',
+  'DatePicker/DatePicker',
+  'TimePicker/TimePicker',
+  'DropdownMenu/DropdownMenu',
+  'Fieldset',
+  'FileUpload/FileUpload',
+  'LabelAndCaption',
+].map((name) => `design-system/src/components/forms-and-inputs/${name}.mdx`);
+
 describe('generated docs blocks', () => {
   it('the shared layout exports DocsProperties, DocsSource and DocsStories', () => {
     const layout = read('design-system/src/storybook-docs/ds-docs-layout.jsx');
@@ -28,6 +41,14 @@ describe('generated docs blocks', () => {
     const mdx = read(file);
     expect(mdx).not.toMatch(/^## Properties/m);
     expect(mdx).not.toMatch(/<th>(Prop|Property|Default)<\/th>/);
+  });
+
+  it.each(FORMS_PART_1)('%s authors no props table and carries the template headings', (file) => {
+    const mdx = read(file);
+    expect(mdx).not.toMatch(/^## Properties/m);
+    expect(mdx).not.toMatch(/<th>(Prop|Property|Default)<\/th>/);
+    expect(mdx).toMatch(/^## Best practices/m);
+    expect(mdx).toMatch(/^## Content guidelines/m);
   });
 
   it('canvases default to code behind a Show code button', () => {
