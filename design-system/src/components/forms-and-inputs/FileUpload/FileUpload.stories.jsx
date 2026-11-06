@@ -362,3 +362,27 @@ export const KeyboardFocus = {
         await expect(getComputedStyle(container(canvasElement)).boxShadow).toContain(tokenColor(canvasElement, '--ds-border-focused'));
     },
 };
+
+/** An invalid field keeps its danger border and still draws the focus ring. */
+export const InvalidFocus = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={wrap}>
+            <FileUpload
+                id="file-upload-ex-invalid-focus"
+                label="Upload files"
+                acceptedFormats={formats}
+                buttonText="Choose a file"
+                validation="invalid"
+                validationMessage="Choose a smaller file."
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        container(canvasElement).style.transition = 'none';
+        await userEvent.tab();
+        const style = getComputedStyle(container(canvasElement));
+        await expect(style.boxShadow).toContain(tokenColor(canvasElement, '--ds-border-focused'));
+        await expect(style.borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-danger'));
+    },
+};

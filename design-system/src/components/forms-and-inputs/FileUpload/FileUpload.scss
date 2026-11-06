@@ -18,26 +18,32 @@
     padding: var(--pad-y-md) var(--pad-x-md);
     border-radius: var(--radius-md);
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-    
-    // Focus state with border
-    &.plus-file-upload-focused {
-        box-shadow: 0 0 0 var(--focus-ring-width) var(--ds-border-focused);
-    }
-    
-    // Validation states
+
+    border: var(--stroke-1) solid transparent;
+
     &.plus-file-upload-invalid {
+        border-color: var(--ds-border-danger);
         box-shadow: 0 0 0 var(--focus-ring-width) var(--ds-background-danger-subtler);
     }
-    
+
     &.plus-file-upload-valid {
+        border-color: var(--ds-border-success);
         box-shadow: 0 0 0 var(--focus-ring-width) var(--ds-background-success-subtler);
     }
-    
-    // Disabled state
-    // Text color is muted via solid tokens below (not opacity), so label/description
-    // keep sufficient color contrast (WCAG AA). The button handles its own disabled style.
+
+    // Focus comes last so the ring stays visible on an invalid or valid field;
+    // the status keeps the border.
+    &.plus-file-upload-focused {
+        box-shadow: 0 0 0 var(--focus-ring-width) var(--ds-border-focused);
+
+        &:not(.plus-file-upload-invalid):not(.plus-file-upload-valid) {
+            border-color: var(--ds-border-focused);
+        }
+    }
+
     &.plus-file-upload-disabled {
         cursor: not-allowed;
+        border-color: transparent;
     }
 
     // Read-only: the field box reads as a fixed value, like the Input read-only state.

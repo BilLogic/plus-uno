@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
@@ -350,4 +350,31 @@ export const KeyboardFocus = {
     play: async ({ canvasElement }) => {
         await expectFieldFocused(canvasElement, fieldBox(canvasElement), field(canvasElement), 'date picker');
     },
+};
+
+/** Typing a real date and pressing Enter commits the pick. */
+PickDate.play = async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox');
+    await userEvent.type(input, '10/21/2026{Enter}');
+    await expect(within(canvasElement).getByText('Selected:')).toBeVisible();
+    await expect(input).not.toHaveAttribute('aria-invalid');
+};
+
+/** Two clicks set a range's ends; the field shows both. */
+PickRange.play = async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox');
+    await userEvent.click(input);
+    const dialog = await within(canvasElement.ownerDocument.body).findByRole('dialog');
+    const days = () => [...dialog.querySelectorAll('.plus-calendar-day:not(.plus-calendar-day--outside)')];
+    await userEvent.click(days()[9]);
+    await userEvent.click(days()[13]);
+    await waitFor(() => expect(input.value).toContain(' – '));
+};
+
+/** A typed date outside minDate to maxDate is kept and marked invalid. */
+Bounds.play = async ({ canvasElement }) => {
+    const input = within(canvasElement).getByRole('combobox');
+    await userEvent.type(input, '10/30/2026{Enter}');
+    await expect(input).toHaveAttribute('aria-invalid', 'true');
+    await expect(input).toHaveValue('10/30/2026');
 };

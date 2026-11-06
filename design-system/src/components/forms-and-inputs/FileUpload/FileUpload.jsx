@@ -65,15 +65,6 @@ const FileUpload = ({
         }
     };
 
-    // Determine border color based on state
-    const getBorderColor = () => {
-        if (disabled) return 'transparent';
-        if (state === 'invalid') return 'var(--color-danger)';
-        if (state === 'valid') return 'var(--color-success)';
-        if (isFocused) return 'var(--color-primary)';
-        return 'transparent';
-    };
-
     const validationIcon = state === 'invalid' ? (
         <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" />
     ) : state === 'valid' ? (
@@ -112,11 +103,6 @@ const FileUpload = ({
              */}
             <div
                 className={`plus-file-upload-container ${disabled ? 'plus-file-upload-disabled' : ''} ${readOnly ? 'plus-file-upload-readonly' : ''} ${state !== 'none' ? `plus-file-upload-${state}` : ''} ${isFocused ? 'plus-file-upload-focused' : ''}`}
-                style={{
-                    borderColor: getBorderColor(),
-                    borderWidth: getBorderColor() !== 'transparent' ? '1px' : '0',
-                    borderStyle: 'solid'
-                }}
             >
 
                 {descriptionText && (

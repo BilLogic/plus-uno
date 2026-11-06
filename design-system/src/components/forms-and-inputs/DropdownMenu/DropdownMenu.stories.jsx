@@ -287,3 +287,17 @@ export const KeyboardFocus = {
         await expectFocusRing(canvasElement, within(canvasElement).getByRole('button', { name: 'Actions' }), 'trigger');
     },
 };
+
+Loading.play = async ({ canvasElement }) => {
+    await waitFor(() => expect(within(canvasElement.ownerDocument.body).queryAllByRole('menuitem')).toHaveLength(0));
+    await expect(within(canvasElement).getByRole('button', { name: 'Assignees' })).toHaveAttribute('aria-expanded', 'true');
+};
+
+WithSections.play = async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name: 'Views' }));
+    const page = within(canvasElement.ownerDocument.body);
+    await expect(await page.findByRole('menuitem', { name: 'Rename' })).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Archive' })).toHaveAttribute('aria-disabled', 'true');
+    await expect(page.getByRole('menuitem', { name: 'Open report' })).toBeVisible();
+    await userEvent.keyboard('{Escape}');
+};
