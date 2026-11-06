@@ -106,6 +106,52 @@ export const States = {
     },
 };
 
+/** One story per appearance, state and size, for the Examples tab. */
+export const Default = { render: () => <IconButton icon="pen" label="Edit page" /> };
+
+export const Subtle = { render: () => <IconButton icon="ellipsis" label="More actions" appearance="subtle" /> };
+
+export const Primary = { render: () => <IconButton icon="paper-plane" label="Send comment" appearance="primary" /> };
+
+export const Discovery = { render: () => <IconButton icon="wand-magic-sparkles" label="Try the new view" appearance="discovery" /> };
+
+export const Compact = {
+    render: () => <IconButton icon="trash" label="Delete session" spacing="compact" />,
+    play: async ({ canvasElement }) => {
+        const button = within(canvasElement).getByRole('button', { name: 'Delete session' });
+        await expect(button.getBoundingClientRect().height).toBe(24);
+        await expect(button.getBoundingClientRect().width).toBe(24);
+    },
+};
+
+export const Circle = {
+    render: () => <IconButton icon="bars" label="Open menu" shape="circle" />,
+    play: async ({ canvasElement }) => {
+        await expect(getComputedStyle(within(canvasElement).getByRole('button', { name: 'Open menu' })).borderTopLeftRadius).toBe('50%');
+    },
+};
+
+export const Selected = {
+    render: () => <IconButton icon="list-ul" label="List view" appearance="subtle" isSelected />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: 'List view' })).toHaveAttribute('aria-pressed', 'true');
+    },
+};
+
+export const Disabled = {
+    render: () => <IconButton icon="trash" label="Delete unavailable" isDisabled />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: 'Delete unavailable' })).toBeDisabled();
+    },
+};
+
+export const Loading = {
+    render: () => <IconButton icon="pen" label="Saving" isLoading />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: 'Saving' })).toHaveAttribute('aria-busy', 'true');
+    },
+};
+
 export const Interactive = {
     render: (args) => <IconButton {...args} />,
     parameters: { docs: { source: { language: 'jsx', code: webAppSourceSnippets.iconButton } } },

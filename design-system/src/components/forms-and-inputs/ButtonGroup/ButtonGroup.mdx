@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
+import { ButtonGroup, Button } from '@/components';
 import * as ButtonGroupStories from './ButtonGroup.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ButtonGroupStories} />
 
@@ -22,39 +29,23 @@ children, each keeping its own appearance and spacing.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Layout
 
-<DocsCanvasShell attachSourceBelow description={<>Three connected buttons.</>}>
-    <Canvas of={ButtonGroupStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={ButtonGroupStories.Overview} title="Default" description="A plain container for Button children. Each keeps its own appearance and spacing." />
 
-</div>
+<ComponentExample of={ButtonGroupStories.Appearances} title="Mixed appearances" description="Each child chooses its own appearance." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={ButtonGroupStories.Spacing} title="Spacing" description="Set compact on every child; the group does not." />
 
-## Content
-
-<DocsCanvasShell description={<>Each button keeps its own `appearance` — the group adds no styling of its own beyond the connecting edges.</>}>
-    <DsCanvasQuiet of={ButtonGroupStories.Appearances} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Every button in a group shares the same `spacing`, for an even row.</>}>
-    <DsCanvasQuiet of={ButtonGroupStories.Spacing} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Icon-only buttons connect the same way as text buttons.</>}>
-    <DsCanvasQuiet of={ButtonGroupStories.IconOnly} />
-</DocsCanvasShell>
+<ComponentExample of={ButtonGroupStories.IconOnly} title="Icon only" description="Icon buttons grouped as a choice between views." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## State
 
-<DocsCanvasShell description={<>A selected button is each `Button`'s own state — `ButtonGroup` has no selection logic of its own.</>}>
-    <DsCanvasQuiet of={ButtonGroupStories.Selected} />
-</DocsCanvasShell>
+<ComponentExample of={ButtonGroupStories.Selected} title="Selected" description="Selection lives on each Button, not on the group." />
 
 </div>
 
@@ -84,7 +75,7 @@ children, each keeping its own appearance and spacing.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `ButtonGroup` for a short row of related actions that read as one unit —
 view toggles, a set of filters. For mutually exclusive options that pick one
@@ -95,7 +86,51 @@ styled to look selected.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Container.** Groups its children with `role="group"` and the `label` as its name. It paints nothing of its own.
+2. **Buttons.** Button or Icon button children. Each keeps its own appearance, spacing and state.
+3. **Seam.** Inner corners are square and neighbors overlap by one edge, so the row reads as one control.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>The hovered button rises above its neighbors so its fill is not covered.</td></tr>
+<tr><td>Focused</td><td>The focused button rises above its neighbors so its ring is not covered.</td></tr>
+<tr><td>Selected</td><td>Set on each button with <code>isSelected</code>, which sets <code>aria-pressed</code>. The group has no selection logic.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Outer corners</td><td>6: <code>--button-radius-default</code>.</td></tr>
+<tr><td>Seam overlap</td><td>1: <code>--border-default</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Group actions that belong together.
+
+<DoDontPair
+    doExample={<ButtonGroup label="Date range"><Button text="Week" /><Button text="Month" /></ButtonGroup>}
+    doCaption="Related choices connected in one group, with a name."
+    dontExample={<ButtonGroup label="Actions"><Button text="Week" /><Button appearance="danger" text="Delete" /></ButtonGroup>}
+    dontCaption="Unrelated actions, one of them destructive, sit side by side as if they were a choice."
+/>
 
 ### Give every group a `label`.
 

@@ -1,10 +1,10 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
-import * as LinkButtonStories from './LinkButton.stories.jsx';
 import { LinkButton, Button } from '@/components';
+import * as LinkButtonStories from './LinkButton.stories.jsx';
 import {
-    DocsCanvasShell,
+    ComponentExample,
     DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
@@ -76,127 +76,23 @@ A link button navigates to another page, site or place on a page, and looks like
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance and layout
 
-<DocsCanvasShell description={<>A default link button at default spacing.</>}>
-    <Canvas of={LinkButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={LinkButtonStories.Overview} title="Default" description="Navigates, and looks like a button." />
 
-</div>
+<ComponentExample of={LinkButtonStories.Appearances} title="Appearance" description="The same appearances as Button." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={LinkButtonStories.Spacing} title="Spacing" description="Default draws 32; compact draws 24." />
 
-## Anatomy
-
-<DocsCanvasShell description={<>A link button with its label.</>}>
-    <Canvas of={LinkButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-1. **Container.** An anchor drawn as a button: 32 high at default spacing and 24 at compact.
-2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
-3. **Label.** Body/default at the medium weight. It describes the destination or purpose.
-4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label, such as the external-link glyph.
+<ComponentExample of={LinkButtonStories.WithIcons} title="Icons" description="An icon before, after, or on both sides of the label." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Properties
+## State
 
-<DocsTable>
-<thead>
-<tr><th>Property</th><th>Values</th><th>Default</th><th>Description</th></tr>
-</thead>
-<tbody>
-<tr><td><code>href</code></td><td>string</td><td>required</td><td>Where the link goes.</td></tr>
-<tr><td><code>text</code></td><td>string</td><td>none</td><td>The label. Children work too.</td></tr>
-<tr><td><code>target</code>, <code>rel</code></td><td>string</td><td>none</td><td><code>target="_blank"</code> adds <code>rel="noopener noreferrer"</code> unless <code>rel</code> is set.</td></tr>
-<tr><td><code>appearance</code></td><td><code>default</code>, <code>primary</code>, <code>subtle</code>, <code>warning</code>, <code>danger</code>, <code>discovery</code></td><td><code>default</code></td><td>The visual style, the same as Button.</td></tr>
-<tr><td><code>spacing</code></td><td><code>default</code> (32), <code>compact</code> (24)</td><td><code>default</code></td><td>Height and padding.</td></tr>
-<tr><td><code>iconBefore</code>, <code>iconAfter</code></td><td>a Font Awesome Free glyph name, or a node</td><td>none</td><td>An icon before or after the label.</td></tr>
-<tr><td><code>isSelected</code></td><td>boolean</td><td><code>false</code></td><td>Marks the link selected, for the current page in a set.</td></tr>
-<tr><td><code>shouldFitContainer</code></td><td>boolean</td><td><code>false</code></td><td>Stretches the link to the width of its container.</td></tr>
-</tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Variants
-
-### Appearance
-
-<DocsCanvasShell description={<>One of each appearance, drawn as links. They paint exactly like Button.</>}>
-    <Canvas of={LinkButtonStories.Appearances} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-<DocsTable>
-<thead>
-<tr><th>Appearance</th><th>When to use</th></tr>
-</thead>
-<tbody>
-<tr><td>Default</td><td>Most links that need button weight. Example: View sessions.</td></tr>
-<tr><td>Primary</td><td>The main way forward to another page. Example: Start onboarding.</td></tr>
-<tr><td>Subtle</td><td>Navigation inside toolbars and headers. Example: Back to lessons.</td></tr>
-<tr><td>Warning, danger</td><td>Rare for a link; a destination that leads to a risky area. Prefer default.</td></tr>
-<tr><td>Discovery</td><td>The call to action for a new experience. Example: Try the new schedule view.</td></tr>
-</tbody>
-</DocsTable>
-
-### Spacing
-
-<DocsCanvasShell description={<>Default draws 32; compact draws 24. Radius is 6 and 4.</>}>
-    <Canvas of={LinkButtonStories.Spacing} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-Default spacing suits most places. Use compact in table rows and inline toolbars.
-
-### Icons
-
-<DocsCanvasShell description={<>An icon before the label for a familiar glyph; an icon after it flags an external destination.</>}>
-    <Canvas of={LinkButtonStories.WithIcons} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
-
-<p>Hover, pressed and focus are the browser's own. A link button has no disabled or loading state.</p>
-
-<DocsTable>
-<thead>
-<tr><th>State</th><th>What changes</th></tr>
-</thead>
-<tbody>
-<tr><td>Hovered</td><td>The container takes the appearance's hovered fill.</td></tr>
-<tr><td>Pressed</td><td>The container takes the appearance's pressed fill.</td></tr>
-<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
-<tr><td>Selected</td><td>The selected role fill, label and icon, with <code>aria-pressed</code>.</td></tr>
-</tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Tokens
-
-<DocsTable>
-<thead>
-<tr><th>Part</th><th>Token</th></tr>
-</thead>
-<tbody>
-<tr><td>Fill, label, icon</td><td>The same named tokens as Button for each appearance, with hovered and pressed steps.</td></tr>
-<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
-<tr><td>Size</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>. Square.</td></tr>
-<tr><td>Radius</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>. Circle 50%.</td></tr>
-<tr><td>Padding</td><td>12: <code>--pad-x-md</code>. Compact 8: <code>--pad-x-sm</code>.</td></tr>
-<tr><td>Icon-to-label gap</td><td>4: <code>--inline-sm</code>.</td></tr>
-</tbody>
-</DocsTable>
+<ComponentExample of={LinkButtonStories.Selected} title="Selected" description="Draws the selected role fill." />
 
 </div>
 
@@ -230,6 +126,74 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 ## Usage
 
 Use a link button to open another page, a site or a place on the page. For an action that stays on the current page, use a Button.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Container.** An anchor drawn as a button: 32 high at default spacing and 24 at compact.
+2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
+3. **Label.** Body/default at the medium weight. It describes the destination or purpose.
+4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label, such as the external-link glyph.
+
+### Appearance
+
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Default</td><td>Most links that need button weight. Example: View sessions.</td></tr>
+<tr><td>Primary</td><td>The main way forward to another page. Example: Start onboarding.</td></tr>
+<tr><td>Subtle</td><td>Navigation inside toolbars and headers. Example: Back to lessons.</td></tr>
+<tr><td>Warning, danger</td><td>Rare for a link; a destination that leads to a risky area. Prefer default.</td></tr>
+<tr><td>Discovery</td><td>The call to action for a new experience. Example: Try the new schedule view.</td></tr>
+</tbody>
+</DocsTable>
+
+### Spacing
+
+Default spacing suits most places. Use compact in table rows and inline toolbars.
+
+### States
+
+<p>Hover, pressed and focus are the browser's own. A link button has no disabled or loading state.</p>
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>The container takes the appearance's hovered fill.</td></tr>
+<tr><td>Pressed</td><td>The container takes the appearance's pressed fill.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
+<tr><td>Selected</td><td>The selected role fill, label and icon, with <code>aria-pressed</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Fill, label, icon</td><td>The same named tokens as Button for each appearance, with hovered and pressed steps.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
+<tr><td>Size</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>. Square.</td></tr>
+<tr><td>Radius</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>. Circle 50%.</td></tr>
+<tr><td>Padding</td><td>12: <code>--pad-x-md</code>. Compact 8: <code>--pad-x-sm</code>.</td></tr>
+<tr><td>Icon-to-label gap</td><td>4: <code>--inline-sm</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### A link goes somewhere; a button does something.
 
