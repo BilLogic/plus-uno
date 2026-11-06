@@ -3,7 +3,7 @@ import { expect, fireEvent, fn, userEvent, waitFor, within } from 'storybook/tes
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Button from '../Button/Button';
-import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
+import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
 import TextField from './TextField';
 
 export default {
@@ -617,7 +617,7 @@ NumberReadOnly.play = async ({ canvasElement }) => {
 
 /** One story per state, for the Examples tab. */
 const controlOf = (canvasElement) => within(canvasElement).getByRole('textbox', { name: 'Your name' });
-const wrap = { maxWidth: '360px', minHeight: 48 };
+const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
 
 export const Rest = {
     render: () => <div style={wrap}><TextField id="textfield-ex-rest" label="Your name" placeholder="Name" /></div>,
@@ -642,4 +642,9 @@ export const FieldDisabled = {
 export const FieldInvalid = {
     render: () => <div style={wrap}><TextField id="textfield-ex-invalid" label="Your name" placeholder="Name" isInvalid errorMessage="Enter your name." /></div>,
     play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldReadOnly = {
+    render: () => <div style={wrap}><TextField id="textfield-ex-readonly" label="Your name" placeholder="Name" isReadOnly /></div>,
+    play: async ({ canvasElement }) => expectReadOnly(canvasElement, controlOf(canvasElement)),
 };

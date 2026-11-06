@@ -45,3 +45,9 @@ export const expectInvalid = async (canvasElement, control) => {
     await expect(control).toHaveAttribute('aria-invalid', 'true');
     await expect(getComputedStyle(boxOf(control)).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-danger'));
 };
+
+export const expectReadOnly = async (canvasElement, control) => {
+    const box = boxOf(control);
+    await expect(box).toHaveClass('plus-field--readonly');
+    await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+};

@@ -9,7 +9,7 @@ Controlled with `isChecked` or uncontrolled with `defaultChecked`. Built on Base
 
 **Source:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, Focused, Disabled
+**Stories:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.stories.jsx` — Overview, Sizes, States, Loading, Content, Interactive, ReadOnly, KeyboardFocus, TrackColors, Unchecked, Checked, Hovered, HoveredOn, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Toggle/Toggle.mdx`
 

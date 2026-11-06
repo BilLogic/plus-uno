@@ -197,7 +197,7 @@ Interactive.args = {
 
 /** One story per state, for the Examples tab. */
 const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Region' });
-const wrap = { maxWidth: '360px', minHeight: 48 };
+const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
 
 export const Rest = {
     render: () => <div style={wrap}><Cascader id="cascader-ex-rest" label="Region" options={sampleOptions} value={[]} onChange={() => {}} placeholder="Please select" /></div>,

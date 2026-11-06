@@ -65,6 +65,8 @@ A toggle turns one setting on or off, and the change takes effect at once.
 
 <ComponentExample of={ToggleStories.Hovered} title="Hovered" description="The track steps to its named hovered step, off or on." />
 
+<ComponentExample of={ToggleStories.HoveredOn} title="Hovered, on" description="The on track steps to its hovered step." />
+
 <ComponentExample of={ToggleStories.Focused} title="Focused" description="A 2px ring, 2px off the track, for keyboard focus only." />
 
 <ComponentExample of={ToggleStories.Loading} title="Loading" description="A change is being saved. A spinner shows, input is ignored and the toggle sets aria-busy." />
@@ -172,6 +174,10 @@ A toggle changes the setting as the person flips it. If the change needs confirm
 ### Read-only is not disabled.
 
 `isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast and ignores clicks. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now. Say why next to it.
+
+### Name and id.
+
+`name` is a form key, not an id; two toggles may share a name. `isChecked` controls the value and needs an `onChange`; `defaultChecked` sets the start.
 
 ### The role is a switch.
 

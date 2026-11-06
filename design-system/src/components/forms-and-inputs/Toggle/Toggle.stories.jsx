@@ -243,6 +243,16 @@ export const Hovered = {
     },
 };
 
+export const HoveredOn = {
+    render: () => <Toggle id="toggle-ex-hover-on" label="Send reminders" defaultChecked />,
+    play: async ({ canvasElement }) => {
+        const el = switchOf(canvasElement, 'Send reminders');
+        el.style.transition = 'none';
+        const fill = withForcedPseudo(el, ':hover', () => getComputedStyle(el).backgroundColor);
+        await expect(fill).toBe(tokenColor(canvasElement, '--ds-background-selected-bold-hovered'));
+    },
+};
+
 export const Focused = {
     render: () => <Toggle id="toggle-ex-focus" label="Send reminders" defaultChecked />,
     play: async ({ canvasElement }) => {
@@ -252,6 +262,7 @@ export const Focused = {
         const style = getComputedStyle(el);
         await waitFor(() => expect(style.outlineStyle).toBe('solid'));
         await expect(px(style.outlineWidth)).toBe(2);
+        await expect(px(style.outlineOffset)).toBe(2);
         await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
         el.blur();
     },

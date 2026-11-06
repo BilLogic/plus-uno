@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TagInputStories from './TagInput.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet, ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet, ComponentExample, DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -144,9 +144,11 @@ from a list or adds, such as the topics a session covers.
 
 <ComponentExample of={TagInputStories.Hovered} title="Hovered" description="The edge turns the focused color." />
 
-<ComponentExample of={TagInputStories.Focused} title="Focused" description="A 2px ring, 2px off the box, for keyboard focus only." />
+<ComponentExample of={TagInputStories.Focused} title="Focused" description="A 2px ring, 2px off the box. No fill changes." />
 
 <ComponentExample of={TagInputStories.Invalid} title="Invalid" description="The danger edge with the message under the field, which is announced." />
+
+<ComponentExample of={TagInputStories.ReadOnly} title="Read-only" description="The tags on the read-only fill, with no × and no list." />
 
 <ComponentExample of={TagInputStories.FieldDisabled} title="Disabled" description="The whole field fades and leaves the tab order." />
 
@@ -211,7 +213,7 @@ focusing it opens the list of options under it.
 <tbody>
 <tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-default</code> edge in <code>--ds-border-input</code>, <code>--radius-0625</code> (<code>--radius-h32</code> compact).</td></tr>
 <tr><td>Hovered</td><td>The edge turns <code>--ds-border-focused</code>.</td></tr>
-<tr><td>Focused</td><td>A <code>--stroke-2</code> ring in <code>--ds-border-focused</code>, 2px off the box, for keyboard focus only. No fill changes.</td></tr>
+<tr><td>Focused</td><td>A <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, 2px off the box. No fill changes.</td></tr>
 <tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code> and the message <code>--ds-text-danger</code>.</td></tr>
 <tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill.</td></tr>
 <tr><td>Disabled</td><td>The whole field fades to <code>--ds-opacity-disabled</code>.</td></tr>

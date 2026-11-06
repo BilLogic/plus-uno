@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid } from '../_internal/fieldStatePlays';
+import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
 import Select from './Select';
 
 /**
@@ -342,7 +342,7 @@ export const Colors = {
 
 /** One story per state, for the Examples tab. */
 const controlOf = (canvasElement) => within(canvasElement).getByRole('combobox', { name: 'Option' });
-const wrap = { maxWidth: '360px', minHeight: 48 };
+const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
 
 export const Rest = {
     render: () => <div style={wrap}><Select id="select-ex-rest" label="Option" options={sampleOptions} placeholder="Please select" /></div>,
@@ -367,4 +367,9 @@ export const FieldDisabled = {
 export const FieldInvalid = {
     render: () => <div style={wrap}><Select id="select-ex-invalid" label="Option" options={sampleOptions} placeholder="Please select" isInvalid errorMessage="Pick an option." /></div>,
     play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldReadOnly = {
+    render: () => <div style={wrap}><Select id="select-ex-readonly" label="Option" options={sampleOptions} placeholder="Please select" isReadOnly /></div>,
+    play: async ({ canvasElement }) => expectReadOnly(canvasElement, controlOf(canvasElement)),
 };

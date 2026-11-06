@@ -117,9 +117,11 @@ A text area lets users enter long form text which spans over multiple lines.
 
 <ComponentExample of={TextAreaStories.Hovered} title="Hovered" description="The edge turns the focused color." />
 
-<ComponentExample of={TextAreaStories.Focused} title="Focused" description="A 2px ring, 2px off the box, for keyboard focus only." />
+<ComponentExample of={TextAreaStories.Focused} title="Focused" description="A 2px ring, 2px off the box. No fill changes." />
 
 <ComponentExample of={TextAreaStories.FieldInvalid} title="Invalid" description="The danger edge with the message under the field." />
+
+<ComponentExample of={TextAreaStories.FieldReadOnly} title="Read-only" description="The read-only fill. The value can be read, selected and copied." />
 
 <ComponentExample of={TextAreaStories.FieldDisabled} title="Disabled" description="The whole field fades and leaves the tab order." />
 
@@ -176,7 +178,7 @@ the text needs formatting.
 <tbody>
 <tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-default</code> edge in <code>--ds-border-input</code>, <code>--radius-0625</code> (<code>--radius-h32</code> compact).</td></tr>
 <tr><td>Hovered</td><td>The edge turns <code>--ds-border-focused</code>.</td></tr>
-<tr><td>Focused</td><td>A <code>--stroke-2</code> ring in <code>--ds-border-focused</code>, 2px off the box, for keyboard focus only. No fill changes.</td></tr>
+<tr><td>Focused</td><td>A <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, 2px off the box. No fill changes.</td></tr>
 <tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code> and the message <code>--ds-text-danger</code>.</td></tr>
 <tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill.</td></tr>
 <tr><td>Disabled</td><td>The whole field fades to <code>--ds-opacity-disabled</code>.</td></tr>
@@ -199,6 +201,10 @@ the text needs formatting.
     dontExample={<TextArea label="Session notes" rows={3} placeholder="Write what went well and what to try next time" />}
     dontCaption="Help in the placeholder disappears when the person starts typing."
 />
+
+### Warning and success.
+
+`warningMessage` draws the warning edge and `successMessage` the success edge, each with its message. The value is accepted in both.
 
 ### Rules
 
