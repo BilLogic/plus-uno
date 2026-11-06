@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, within } from 'storybook/test';
+import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
+import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
+import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -226,4 +230,82 @@ Interactive.args = {
     appearance: 'default',
     spacing: 'default',
     alignment: 'left'
+};
+
+/* ------------------------------------------------------------------- states */
+
+const StateTabs = (props) => (
+    <Tabs defaultActiveKey="1" {...props}>
+        <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
+        <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
+        <Tabs.Tab eventKey="3" isDisabled>Reports</Tabs.Tab>
+    </Tabs>
+);
+const tabOf = (canvasElement, name) => within(canvasElement).getByRole('tab', { name });
+
+/** Rest: an unselected tab is subtle ink on a clear ground over the baseline. */
+export const Rest = {
+    render: () => <StateTabs />,
+    play: async ({ canvasElement }) => {
+        const tab = tabOf(canvasElement, 'Sessions');
+        await expectInk(canvasElement, tab, undefined, '--ds-text-subtle', 'unselected tab');
+        await expect(getComputedStyle(tab).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+        await expect(tab).toHaveAttribute('aria-selected', 'false');
+    },
+};
+
+/** Hovered: the subtle neutral hovered fill; the selected tab takes it too and keeps its bar and ink. */
+export const Hovered = {
+    render: () => <StateTabs />,
+    play: async ({ canvasElement }) => {
+        await expectGroundUnder(canvasElement, tabOf(canvasElement, 'Sessions'), ':hover', '--ds-background-neutral-subtle-hovered', 'unselected tab');
+        const selected = tabOf(canvasElement, 'Overview');
+        await expectGroundUnder(canvasElement, selected, ':hover', '--ds-background-neutral-subtle-hovered', 'selected tab');
+        await expectInk(canvasElement, selected, ':hover', '--ds-text-selected', 'selected tab');
+    },
+};
+
+/** Pressed: the subtle neutral pressed fill. */
+export const Pressed = {
+    render: () => <StateTabs />,
+    play: async ({ canvasElement }) => {
+        await expectGroundUnder(canvasElement, tabOf(canvasElement, 'Sessions'), ':active', '--ds-background-neutral-subtle-pressed', 'unselected tab');
+    },
+};
+
+/** Focused: the 2px ring, 2px off the tab, with no fill. Arrow keys move selection with focus. */
+export const Focused = {
+    render: () => <StateTabs />,
+    play: async ({ canvasElement }) => {
+        const selected = tabOf(canvasElement, 'Overview');
+        await expectFocusRing(canvasElement, selected, 'tab');
+        selected.focus();
+        await userEvent.keyboard('{ArrowRight}');
+        await expect(tabOf(canvasElement, 'Sessions')).toHaveAttribute('aria-selected', 'true');
+    },
+};
+
+/** Selected, pill: the bold selected fill with inverse ink; its hover and press step the bold fill. */
+export const SelectedPill = {
+    render: () => <StateTabs appearance="pill" />,
+    play: async ({ canvasElement }) => {
+        const selected = tabOf(canvasElement, 'Overview');
+        await expectGroundUnder(canvasElement, selected, undefined, '--ds-background-selected-bold', 'selected pill');
+        await expectInk(canvasElement, selected, undefined, '--ds-text-inverse', 'selected pill');
+        await expectGroundUnder(canvasElement, selected, ':hover', '--ds-background-selected-bold-hovered', 'hovered selected pill');
+        await expectGroundUnder(canvasElement, selected, ':active', '--ds-background-selected-bold-pressed', 'pressed selected pill');
+    },
+};
+
+/** Disabled: disabled ink, no hover fill, never selected. */
+export const Disabled = {
+    render: () => <StateTabs />,
+    play: async ({ canvasElement }) => {
+        const disabled = tabOf(canvasElement, 'Reports');
+        await expect(disabled).toHaveAttribute('aria-disabled', 'true');
+        await expectInk(canvasElement, disabled, undefined, '--ds-text-disabled', 'disabled tab');
+        await expect(withForcedPseudo(disabled, ':hover', () => getComputedStyle(disabled).backgroundColor), 'hovered disabled tab').toBe('rgba(0, 0, 0, 0)');
+        await userEvent.click(disabled);
+        await expect(disabled).toHaveAttribute('aria-selected', 'false');
+    },
 };

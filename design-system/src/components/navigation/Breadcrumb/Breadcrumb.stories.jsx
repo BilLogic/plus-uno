@@ -1,4 +1,8 @@
 import React from 'react';
+import { expect } from 'storybook/test';
+import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
+import { decorationUnder, expectInk } from '@/storybook-docs/lib/navigation-states.js';
+import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Breadcrumb from './Breadcrumb';
 
@@ -119,4 +123,54 @@ export const Interactive = (args) => (
 );
 Interactive.args = {
     pathPreset: 'standard',
+};
+
+/* ------------------------------------------------------------------- states */
+
+const trailOf = (canvasElement) => ({
+    ancestor: canvasElement.querySelector('.plus-breadcrumb-link a'),
+    current: canvasElement.querySelector('.plus-breadcrumb-current'),
+});
+
+/** Rest: linked ancestors in the link color, the current page plain and subtlest. */
+export const Rest = {
+    render: () => <Breadcrumb items={sampleItems} />,
+    play: async ({ canvasElement }) => {
+        const { ancestor, current } = trailOf(canvasElement);
+        await expectInk(canvasElement, ancestor, undefined, '--ds-link', 'ancestor');
+        await expect(decorationUnder(ancestor), 'ancestor is not underlined at rest').toBe('none');
+        await expect(current).toHaveAttribute('aria-current', 'page');
+        await expect(current.querySelector('a'), 'the current page is not a link').toBeNull();
+        await expectInk(canvasElement, current, undefined, '--ds-text-subtlest', 'current page');
+    },
+};
+
+/** Hovered: an ancestor link is underlined and keeps the link color. */
+export const Hovered = {
+    render: () => <Breadcrumb items={sampleItems} />,
+    play: async ({ canvasElement }) => {
+        const { ancestor } = trailOf(canvasElement);
+        await expect(decorationUnder(ancestor, ':hover'), 'hovered ancestor').toBe('underline');
+        await expectInk(canvasElement, ancestor, ':hover', '--ds-link', 'ancestor');
+    },
+};
+
+/** Pressed: a link takes no pressed step of its own; the hovered underline holds. */
+export const Pressed = {
+    render: () => <Breadcrumb items={sampleItems} />,
+    play: async ({ canvasElement }) => {
+        const { ancestor, current } = trailOf(canvasElement);
+        await expectInk(canvasElement, ancestor, ':active', '--ds-link', 'ancestor');
+        await expectNoStateChange(current, ':hover', 'current page');
+    },
+};
+
+/** Focused: the 2px ring, 2px off an ancestor link. The current page is not focusable. */
+export const Focused = {
+    render: () => <Breadcrumb items={sampleItems} />,
+    play: async ({ canvasElement }) => {
+        const { ancestor, current } = trailOf(canvasElement);
+        await expectFocusRing(canvasElement, ancestor, 'ancestor link');
+        await expect(current.tabIndex, 'the current page is not a tab stop').toBe(-1);
+    },
 };

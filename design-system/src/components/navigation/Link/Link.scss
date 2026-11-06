@@ -3,7 +3,7 @@
 .plus-link {
     display: inline;
     cursor: pointer;
-    border-radius: var(--radius-050);
+    border-radius: var(--radius-lg);
 
     &--default {
         color: var(--ds-link);
@@ -39,7 +39,7 @@
     }
 
     .plus-link-icon {
-        margin-inline-start: var(--space-050);
+        margin-inline-start: var(--inline-md);
         font-size: var(--icon-sm);
     }
 }

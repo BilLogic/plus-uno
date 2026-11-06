@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
+import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
+import { expectInk, expectInsetRing } from '@/storybook-docs/lib/navigation-states.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Pagination from './Pagination';
 
@@ -266,4 +268,73 @@ Accessibility.play = async ({ canvasElement }) => {
     await userEvent.tab();
     const two = within(nav).getByRole('button', { name: 'Page 2' });
     await expect(two).toHaveFocus();
+};
+
+/* ------------------------------------------------------------------- states */
+
+const StatePages = () => <Pagination currentPage={1} totalPages={8} label="State pages" onPageChange={fn()} />;
+const pageOf = (canvasElement, name) => within(canvasElement).getByRole('button', { name });
+
+/** Rest: pages in subtle ink on the surface; the current page is named by aria-current. */
+export const Rest = {
+    render: () => <StatePages />,
+    play: async ({ canvasElement }) => {
+        const two = pageOf(canvasElement, 'Page 2');
+        await expectInk(canvasElement, two, undefined, '--ds-text-subtle', 'page');
+        await expectGroundUnder(canvasElement, two, undefined, '--ds-surface', 'page');
+        await expect(pageOf(canvasElement, 'Page 1')).toHaveAttribute('aria-current', 'page');
+    },
+};
+
+/** Hovered: the subtle neutral hovered fill on a page and an enabled Navigator. */
+export const Hovered = {
+    render: () => <StatePages />,
+    play: async ({ canvasElement }) => {
+        await expectGroundUnder(canvasElement, pageOf(canvasElement, 'Page 2'), ':hover', '--ds-background-neutral-subtle-hovered', 'page');
+        await expectGroundUnder(canvasElement, pageOf(canvasElement, 'Next'), ':hover', '--ds-background-neutral-subtle-hovered', 'Next');
+    },
+};
+
+/** Pressed: the subtle neutral pressed fill. */
+export const Pressed = {
+    render: () => <StatePages />,
+    play: async ({ canvasElement }) => {
+        await expectGroundUnder(canvasElement, pageOf(canvasElement, 'Page 2'), ':active', '--ds-background-neutral-subtle-pressed', 'page');
+        await expectGroundUnder(canvasElement, pageOf(canvasElement, 'Next'), ':active', '--ds-background-neutral-subtle-pressed', 'Next');
+    },
+};
+
+/** Focused: the 2px ring inside the segment, so a neighbor never covers it. */
+export const Focused = {
+    render: () => <StatePages />,
+    play: async ({ canvasElement }) => {
+        await expectInsetRing(canvasElement, pageOf(canvasElement, 'Page 2'), 'page');
+        await expectInsetRing(canvasElement, pageOf(canvasElement, 'Next'), 'Next');
+    },
+};
+
+/** Current: the selected fill and ink, semibold, and no hover step of its own. */
+export const Current = {
+    render: () => <StatePages />,
+    play: async ({ canvasElement }) => {
+        const one = pageOf(canvasElement, 'Page 1');
+        await expectGroundUnder(canvasElement, one, undefined, '--ds-background-selected', 'current page');
+        await expectInk(canvasElement, one, undefined, '--ds-text-selected', 'current page');
+        await expect(getComputedStyle(one).fontWeight).toBe('600');
+        await expectGroundUnder(canvasElement, one, ':hover', '--ds-background-selected', 'hovered current page');
+    },
+};
+
+/** Disabled: Previous on the first page keeps its tab stop, takes the disabled ground and ink, and does nothing. */
+export const Disabled = {
+    render: () => <StatePages />,
+    play: async ({ canvasElement }) => {
+        const previous = pageOf(canvasElement, 'Previous');
+        await expect(previous).toHaveAttribute('aria-disabled', 'true');
+        await expectGroundUnder(canvasElement, previous, undefined, '--ds-background-disabled', 'Previous');
+        await expectGroundUnder(canvasElement, previous, ':hover', '--ds-background-disabled', 'hovered Previous');
+        await expectInk(canvasElement, previous, undefined, '--ds-text-disabled', 'Previous');
+        await userEvent.click(previous);
+        await expect(pageOf(canvasElement, 'Page 1')).toHaveAttribute('aria-current', 'page');
+    },
 };

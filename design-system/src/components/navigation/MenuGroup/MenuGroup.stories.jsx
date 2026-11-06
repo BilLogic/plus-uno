@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
+import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
+import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
+import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
 import MenuGroup, { ButtonItem, CustomItem, LinkItem, Section } from '@/components/navigation/MenuGroup';
 
 export default {
@@ -81,4 +84,81 @@ export const Interactive = {
             <ButtonItem>Item two</ButtonItem>
         </MenuGroup>
     ),
+};
+
+/* ------------------------------------------------------------------- states */
+
+const StateMenu = () => (
+    <MenuGroup>
+        <ButtonItem id="state-item">Rename board</ButtonItem>
+        <ButtonItem isSelected id="state-selected">Current board</ButtonItem>
+        <ButtonItem isDisabled id="state-disabled">Archive board</ButtonItem>
+        <LinkItem href="#" id="state-link">Open in a new view</LinkItem>
+    </MenuGroup>
+);
+const itemOf = (canvasElement, id) => canvasElement.querySelector(`#state-${id}`);
+
+/** Rest: a row is body ink on a clear ground; the selected row is marked with aria-current. */
+export const Rest = {
+    render: () => <StateMenu />,
+    play: async ({ canvasElement }) => {
+        const item = itemOf(canvasElement, 'item');
+        await expectInk(canvasElement, item, undefined, '--ds-text', 'item');
+        await expect(getComputedStyle(item).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+        await expect(itemOf(canvasElement, 'selected')).toHaveAttribute('aria-current', 'true');
+    },
+};
+
+/** Hovered: the subtle neutral hovered fill, on buttons and links alike. */
+export const Hovered = {
+    render: () => <StateMenu />,
+    play: async ({ canvasElement }) => {
+        for (const id of ['item', 'link']) {
+            await expectGroundUnder(canvasElement, itemOf(canvasElement, id), ':hover', '--ds-background-neutral-subtle-hovered', `${id} row`);
+        }
+    },
+};
+
+/** Pressed: the subtle neutral pressed fill. */
+export const Pressed = {
+    render: () => <StateMenu />,
+    play: async ({ canvasElement }) => {
+        for (const id of ['item', 'link']) {
+            await expectGroundUnder(canvasElement, itemOf(canvasElement, id), ':active', '--ds-background-neutral-subtle-pressed', `${id} row`);
+        }
+    },
+};
+
+/** Focused: the 2px ring, 2px off the row; Arrow Down moves it to the next enabled row. */
+export const Focused = {
+    render: () => <StateMenu />,
+    play: async ({ canvasElement }) => {
+        const item = itemOf(canvasElement, 'item');
+        await expectFocusRing(canvasElement, item, 'menu row');
+        item.focus();
+        await userEvent.keyboard('{ArrowDown}');
+        await expect(itemOf(canvasElement, 'selected')).toHaveFocus();
+    },
+};
+
+/** Selected: the selected fill marks the current row. */
+export const SelectedRow = {
+    render: () => <StateMenu />,
+    play: async ({ canvasElement }) => {
+        await expectGroundUnder(canvasElement, itemOf(canvasElement, 'selected'), undefined, '--ds-background-selected', 'selected row');
+    },
+};
+
+/** Disabled: disabled ink, no hover fill, skipped by the arrow keys. */
+export const Disabled = {
+    render: () => <StateMenu />,
+    play: async ({ canvasElement }) => {
+        const disabled = itemOf(canvasElement, 'disabled');
+        await expect(disabled).toBeDisabled();
+        await expectInk(canvasElement, disabled, undefined, '--ds-text-disabled', 'disabled row');
+        await expect(getComputedStyle(disabled).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+        itemOf(canvasElement, 'selected').focus();
+        await userEvent.keyboard('{ArrowDown}');
+        await expect(itemOf(canvasElement, 'link'), 'the disabled row is skipped').toHaveFocus();
+    },
 };

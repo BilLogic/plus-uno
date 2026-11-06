@@ -4,20 +4,20 @@
     display: flex;
     flex-direction: column;
     overflow: auto;
-    min-width: 200px;
-    padding: var(--space-050) 0;
+    min-width: var(--size-spacing-xlarge-space-2500);
+    padding: var(--pad-y-lg) 0;
 
     &--compact .plus-menu-item {
         // 20px of body-default line-height + 6px top and bottom = a 32px row.
-        padding-block: var(--space-0375);
+        padding-block: var(--pad-y-md);
     }
 }
 
 .plus-menu-section {
     &--separated {
         border-top: var(--border-default) solid var(--ds-border);
-        margin-top: var(--space-050);
-        padding-top: var(--space-050);
+        margin-top: var(--stack-md);
+        padding-top: var(--stack-md);
     }
 }
 
@@ -25,19 +25,19 @@
     font: var(--heading-xxsmall);
     color: var(--ds-text-subtlest);
     text-transform: uppercase;
-    padding: var(--space-075) var(--space-150) var(--space-025);
+    padding: var(--stack-lg) var(--size-spacing-medium-space-500) var(--stack-sm);
 }
 
 .plus-menu-item {
     display: flex;
     align-items: center;
     width: 100%;
-    gap: var(--space-100);
+    gap: var(--size-spacing-medium-space-300);
     // 20px of body-default line-height + 10px top and bottom = a 40px row.
-    padding: var(--space-0625) var(--space-150);
+    padding: var(--size-spacing-small-space-150) var(--size-spacing-medium-space-500);
     border: none;
     background: none;
-    border-radius: var(--radius-050);
+    border-radius: var(--radius-lg);
     color: var(--ds-text);
     text-decoration: none;
     cursor: pointer;
