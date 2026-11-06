@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as InlineMessageStories from './InlineMessage.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={InlineMessageStories} />
 
@@ -52,6 +52,28 @@ secondary note out of the page's reading order until someone asks for it.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>An icon trigger named by its label, popup closed.</>}>
+    <DsCanvasQuiet of={InlineMessageStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The trigger takes the subtle hovered fill.</>}>
+    <DsCanvasQuiet of={InlineMessageStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The trigger takes the subtle pressed fill.</>}>
+    <DsCanvasQuiet of={InlineMessageStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The 2px ring, 2px off the trigger; Enter opens the popup.</>}>
+    <DsCanvasQuiet of={InlineMessageStories.Focused} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -76,7 +98,7 @@ secondary note out of the page's reading order until someone asks for it.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `InlineMessage` for a note that explains or qualifies something right
 beside it — why a field is required, what a score means — without taking up
@@ -91,7 +113,45 @@ detail that most people will never need to open.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Trigger.** An icon button in the appearance color, named by <code>label</code>.
+2. **Popup.** Opens on press with a title, optional secondary line and body.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The icon in its appearance color; the popup closed.</td></tr>
+<tr><td>Hovered</td><td>The subtle neutral fill behind the icon button.</td></tr>
+<tr><td>Pressed</td><td>A stronger neutral fill.</td></tr>
+<tr><td>Focused</td><td>The 2px ring, 2px off the trigger, for keyboard focus only.</td></tr>
+<tr><td>Open</td><td>The Popup is shown with its own fill, shadow and radius.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Trigger</td><td><code>--ds-icon-information</code>, <code>--ds-icon-warning</code>, <code>--ds-icon-danger</code>, <code>--ds-icon-success</code></td></tr>
+<tr><td>Title</td><td><code>--heading-small</code></td></tr>
+<tr><td>Secondary text</td><td><code>--body-default</code>, <code>--ds-text-subtle</code></td></tr>
+<tr><td>Spacing</td><td><code>--stack-sm</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### `label` is the only visible text before the popup opens.
 
@@ -110,6 +170,24 @@ something — the icon is a second cue, not a style choice.
     Your institution uses this to route invoices.
 </InlineMessage>
 ```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Warning: say what happens if they proceed and offer an alternative.</td><td>Alarm without a next step.</td></tr>
+<tr><td>Error: explain the problem and give a next step.</td><td>Use technical detail or blame the person.</td></tr>
+<tr><td>Confirmation: confirm the outcome and get out of the way.</td><td>Add detail the person did not ask for.</td></tr>
+<tr><td>Keep the title concise, in sentence case.</td><td>Let the message run past five lines.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

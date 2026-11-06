@@ -1,9 +1,20 @@
 import React from 'react';
+import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
+import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { expect, userEvent, within } from 'storybook/test';
 import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { contrastRatio, paintedOver } from '@/storybook-docs/lib/contrast.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import SectionMessage, { SECTION_MESSAGE_ICONS, SECTION_MESSAGE_APPEARANCES } from './SectionMessage';
+
+const ICON_TOKEN = {
+    primary: '--ds-icon-brand',
+    secondary: '--ds-icon-subtle',
+    success: '--ds-icon-success',
+    danger: '--ds-icon-danger',
+    warning: '--ds-icon-warning',
+    info: '--ds-icon-information',
+};
 
 export default {
     title: 'Components/Messaging/Section message',
@@ -314,7 +325,7 @@ LeadingIcon.play = async ({ canvasElement }) => {
         await expect(icon, `${id} has a leading icon`).not.toBeNull();
         await expect(getComputedStyle(icon, '::before').content, `${id} icon is ${SECTION_MESSAGE_ICONS[appearance]}`)
             .toBe(glyphOf(canvasElement, `fa-${SECTION_MESSAGE_ICONS[appearance]}`));
-        await expect(getComputedStyle(icon).color, `${id} icon color`).toBe(tokenColor(canvasElement, `--color-${appearance}-icon`));
+        await expect(getComputedStyle(icon).color, `${id} icon color`).toBe(tokenColor(canvasElement, ICON_TOKEN[appearance]));
         await expect(px(getComputedStyle(icon).fontSize), `${id} icon size`).toBe(20);
         const box = icon.getBoundingClientRect();
         await expect(Math.round(box.width), `${id} icon box is 20 wide, the column's width`).toBe(20);
@@ -443,4 +454,54 @@ Actions.play = async ({ canvasElement }) => {
     const message = canvas.getByTestId('actions');
     await expect(within(message).getByRole('button', { name: 'Reschedule' })).toBeVisible();
     await expect(within(message).getByRole('link', { name: 'Learn more' })).toHaveAttribute('href', '#');
+};
+
+/* ------------------------------------------------------------------- states */
+
+const StateMessage = ({ actions }) => (
+    <SectionMessage appearance="warning" title="Two sessions overlap" actions={actions}>
+        Monday at 4:00 PM is booked twice.
+    </SectionMessage>
+);
+const messageRoot = (canvasElement) => within(canvasElement).getByRole('alert');
+const dismissOf = (canvasElement) => within(canvasElement).getByRole('button', { name: 'Dismiss message' });
+
+/** Rest: the warning ground, with the leading icon in the warning icon token. */
+export const Rest = {
+    render: () => <StateMessage />,
+    play: async ({ canvasElement }) => {
+        await expect(getComputedStyle(messageRoot(canvasElement)).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-warning'));
+        await expect(getComputedStyle(canvasElement.querySelector('.plus-section-message-leading')).color).toBe(tokenColor(canvasElement, '--ds-icon-warning'));
+    },
+};
+
+/** Hovered: the message does not react; Dismiss takes the subtle hovered ground. */
+export const Hovered = {
+    render: () => <StateMessage />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(messageRoot(canvasElement), ':hover', 'section message');
+        await expectHovered(canvasElement, dismissOf(canvasElement), 'subtle', 'section message dismiss');
+    },
+};
+
+/** Pressed: Dismiss takes the subtle pressed ground. */
+export const Pressed = {
+    render: () => <StateMessage />,
+    play: async ({ canvasElement }) => {
+        await expectPressed(canvasElement, dismissOf(canvasElement), 'subtle', 'section message dismiss');
+    },
+};
+
+/** Focused: Dismiss and each action show the 2px ring. */
+export const Focused = {
+    render: () => <StateMessage actions={[{ text: 'Reschedule', onClick: () => {} }]} />,
+    play: async ({ canvasElement }) => {
+        await expectFocusRing(canvasElement, dismissOf(canvasElement), 'section message dismiss');
+        const action = within(canvasElement).getByRole('button', { name: 'Reschedule' });
+        action.focus({ focusVisible: true });
+        const style = getComputedStyle(action);
+        await expect(style.outlineStyle).toBe('solid');
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        action.blur();
+    },
 };

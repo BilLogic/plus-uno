@@ -1,3 +1,5 @@
+@use '../../../styles/state' as *;
+
 .plus-spotlight {
     width: var(--popover-width-md);
     max-width: calc(100vw - var(--space-100) * 2);
@@ -32,11 +34,17 @@
     color: var(--ds-icon-inverse);
     cursor: pointer;
     padding: var(--space-025);
+    border-radius: var(--radius-md);
+
+    @include plus-state((
+        hovered: (background-color: var(--ds-interaction-inverse-hovered)),
+        pressed: (background-color: var(--ds-interaction-inverse-pressed)),
+    ), $ring-token: --ds-border-focused-inverse);
 }
 
 .plus-spotlight-media {
-    width: 295px;
-    height: 135px;
+    width: 100%;
+    height: calc(var(--size-spacing-large-space-1500) + var(--size-spacing-medium-space-500));
     margin: var(--space-100) auto;
     border-radius: var(--radius-050);
     overflow: hidden;
@@ -65,7 +73,6 @@
 .plus-spotlight-step-count {
     font: var(--body-small);
     color: var(--ds-text-inverse);
-    opacity: 0.8;
 }
 
 .plus-spotlight-actions {
@@ -81,6 +88,8 @@
     cursor: pointer;
     border: none;
     text-decoration: none;
+
+    @include plus-state((), $ring-token: --ds-border-focused-inverse);
 
     &--primary {
         background: var(--ds-surface-overlay);

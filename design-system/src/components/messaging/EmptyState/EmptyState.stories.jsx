@@ -1,4 +1,6 @@
 import React from 'react';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { tokenColor as stateTokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expect, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
@@ -150,4 +152,48 @@ Interactive.args = {
     description: 'Add a student to start planning sessions.',
     icon: 'user-group',
     spacing: 'default',
+};
+
+/* ------------------------------------------------------------------- states */
+
+const emptyRoot = (canvasElement) => canvasElement.querySelector('.plus-empty-state');
+const StateEmpty = () => (
+    <EmptyState header="No students yet" description="Add a student to start planning sessions." icon="user-group" />
+);
+
+/** Rest: the header and the description on their text tokens. */
+export const Rest = {
+    render: () => <StateEmpty />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('heading', { name: 'No students yet' })).toBeVisible();
+        await expect(canvas.getByText('Add a student to start planning sessions.')).toBeVisible();
+        await expect(getComputedStyle(canvas.getByRole('heading', { name: 'No students yet' })).color).toBe(stateTokenColor(canvasElement, '--ds-text'));
+        await expect(getComputedStyle(canvas.getByText('Add a student to start planning sessions.')).color).toBe(stateTokenColor(canvasElement, '--ds-text-subtle'));
+        await expect(emptyRoot(canvasElement).querySelector('.plus-empty-state__icon')).toHaveAttribute('aria-hidden', 'true');
+    },
+};
+
+/** Hovered: the message is not a control, so nothing changes under a pointer. */
+export const Hovered = {
+    render: () => <StateEmpty />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(emptyRoot(canvasElement), ':hover', 'empty state');
+    },
+};
+
+/** Pressed: no pressed layer. */
+export const Pressed = {
+    render: () => <StateEmpty />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(emptyRoot(canvasElement), ':active', 'empty state');
+    },
+};
+
+/** Focused: without actions there is nothing to focus; the actions are Buttons and carry their own ring. */
+export const Focused = {
+    render: () => <StateEmpty />,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(emptyRoot(canvasElement), 'empty state');
+    },
 };

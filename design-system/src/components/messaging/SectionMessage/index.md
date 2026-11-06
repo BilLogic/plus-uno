@@ -9,7 +9,7 @@ it is resolved or dismissed. // Simple message <SectionMessage appearance="warni
 
 **Source:** `design-system/src/components/messaging/SectionMessage/SectionMessage.jsx`
 
-**Stories:** `design-system/src/components/messaging/SectionMessage/SectionMessage.stories.jsx` — Styles, Content, Overview, Interactive, DismissPlacement, LeadingIcon, GroundAndText, Actions
+**Stories:** `design-system/src/components/messaging/SectionMessage/SectionMessage.stories.jsx` — Styles, Content, Overview, Interactive, DismissPlacement, LeadingIcon, GroundAndText, Actions, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/SectionMessage/SectionMessage.mdx`
 
@@ -38,7 +38,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--color-` · `--ds-text` · `--font-size-fa-h4-solid` · `--heading-small` · `--item-height-md` · `--size-card-gap-sm` · `--size-card-pad-x-sm` · `--size-card-pad-y-sm` · `--size-modal-radius-sm` · `--stack-md` · `--type-weight-medium`
+`--body-default` · `--border-default` · `--ds-border` · `--ds-text` · `--font-size-fa-h4-solid` · `--heading-small` · `--item-height-md` · `--size-card-gap-sm` · `--size-card-pad-x-sm` · `--size-card-pad-y-sm` · `--size-modal-radius-sm` · `--stack-md` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/SectionMessage/SectionMessage.scss`. Override these through the token layer, never with a literal.
 

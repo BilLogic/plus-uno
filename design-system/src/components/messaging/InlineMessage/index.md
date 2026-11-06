@@ -9,7 +9,7 @@ message. Built on Popup so placement, dismissal and focus return are shared with
 
 **Source:** `design-system/src/components/messaging/InlineMessage/InlineMessage.jsx`
 
-**Stories:** `design-system/src/components/messaging/InlineMessage/InlineMessage.stories.jsx` — Overview, Appearances, WithSecondaryText, Interactive
+**Stories:** `design-system/src/components/messaging/InlineMessage/InlineMessage.stories.jsx` — Overview, Appearances, WithSecondaryText, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/InlineMessage/InlineMessage.mdx`
 

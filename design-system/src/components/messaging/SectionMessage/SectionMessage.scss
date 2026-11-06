@@ -3,6 +3,8 @@
  * Matches Figma design system specifications
  */
 
+@use '../../../styles/state' as *;
+
 .plus-section-message {
     display: flex;
     align-items: flex-start;
@@ -70,13 +72,14 @@
     color: inherit;
     text-decoration: underline;
     cursor: pointer;
+
+    @include plus-state((), $ring: true);
 }
 
 .plus-section-message-actions-divider {
-    width: 1px;
+    width: var(--border-default);
     align-self: stretch;
-    background-color: currentColor;
-    opacity: 0.3;
+    background-color: var(--ds-border);
 }
 
 /*
@@ -156,6 +159,15 @@
 
 $section-message-themes: 'primary', 'secondary', 'success', 'danger', 'warning', 'info';
 
+$section-message-icons: (
+    'primary': '--ds-icon-brand',
+    'secondary': '--ds-icon-subtle',
+    'success': '--ds-icon-success',
+    'danger': '--ds-icon-danger',
+    'warning': '--ds-icon-warning',
+    'info': '--ds-icon-information',
+);
+
 $section-message-grounds: (
     'primary': '--ds-background-brand-subtlest',
     'secondary': '--ds-background-neutral',
@@ -170,7 +182,7 @@ $section-message-grounds: (
         background-color: var(#{map-get($section-message-grounds, $theme)});
 
         .plus-section-message-leading {
-            color: var(--color-#{$theme}-icon);
+            color: var(#{map-get($section-message-icons, $theme)});
         }
     }
 }
