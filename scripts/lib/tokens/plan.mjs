@@ -165,6 +165,10 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Frame', new: '--frame-topbar-height', old: '--layout-height-topbar', ref: 'var(--height-200)' },
   { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-width', old: '--layout-width-sidebar', ref: 'var(--width-1500)' },
   { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-width-nav', old: '--layout-sidebar-width', ref: '164px', note: 'fixed SideNav width (164), distinct from the responsive sidebar above' },
+  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-pad', old: null, value: '--space-075', note: 'the Sidebar pads 12 on every side' },
+  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-row-gap', old: null, value: '--space-0125', note: 'two Sidebar rows sit 2 apart' },
+  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-group-gap', old: null, value: '--space-100', note: 'two Sidebar groups sit 16 apart' },
+  { tier: 'patterns', group: 'Frame', new: '--frame-sidebar-row-radius', old: null, ref: 'var(--radius-0375)', note: 'the rounding of a Sidebar row (6)' },
 
   // ─── Patterns / Page ──────────────────────────────────────────────────
   { tier: 'patterns', group: 'Page', new: '--page-pad', old: '--page-pad' },

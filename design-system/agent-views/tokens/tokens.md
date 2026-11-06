@@ -172,6 +172,7 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --focused-page-stack-md
 --focused-page-stack-sm
 --frame-layer-blanket
+--frame-layer-docked-edge
 --frame-layer-edge
 --frame-layer-panel-peek
 --frame-layer-sidebar

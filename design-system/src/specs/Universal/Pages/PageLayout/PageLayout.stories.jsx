@@ -110,8 +110,10 @@ export const Overview = {
 };
 
 /**
- * The page sits in `Frame`: a 32 topbar the avatar fits in,
- * the toggle 8 from the left, flush to the top, and the sidebar docked from 1024 and closed below.
+ * The page sits in `Frame`: no top bar, the sidebar docked from 1024 with its
+ * toggle at the end of the logo row, and closed below with the toggle at the
+ * Page's top left; the breadcrumb sits in the Page's header row on the same
+ * center line.
  */
 export const Frame = {
     ...Overview,
@@ -121,22 +123,21 @@ export const Frame = {
         const check = async (width, docked) => {
             await setTestViewport(width, 900);
             const frame = canvasElement.querySelector('.plus-frame');
-            const topbar = frame.querySelector('.plus-frame__topbar');
-            const toggle = canvas.getByRole('button', { name: /sidebar/i });
-            const pad = tokenLength(frame, '--pad-x-sm');
-            await expect(topbar.getBoundingClientRect().height).toBeCloseTo(tokenLength(frame, '--frame-topbar-height'), 0);
-            await expect(toggle.getBoundingClientRect().left - frame.getBoundingClientRect().left).toBeCloseTo(pad, 0);
-            await expect(toggle.getBoundingClientRect().top - frame.getBoundingClientRect().top).toBeCloseTo(0, 0);
-            const avatar = frame.querySelector('.plus-user-avatar');
-            await expect(avatar.getBoundingClientRect().height, 'the avatar fits the topbar')
-                .toBeLessThanOrEqual(topbar.getBoundingClientRect().height + 0.5);
+            await expect(frame.querySelector('.plus-frame__topbar'), 'no top bar').toBeNull();
             await waitFor(() => expect(Boolean(sidebar()), `sidebar at ${width} (found ${sidebar()?.className})`).toBe(docked));
+            const toggle = canvas.getByRole('button', { name: docked ? 'Close sidebar' : 'Open sidebar' });
+            const t = toggle.getBoundingClientRect();
+            const f = frame.getBoundingClientRect();
+            await expect(t.left + t.width / 2 - f.left, 'the toggle column').toBeCloseTo(docked ? 208 : 32, 0);
+            await expect(t.top + t.height / 2 - f.top, 'the logo row\'s center line').toBeCloseTo(28, 0);
+            const head = frame.querySelector('.plus-frame__head').getBoundingClientRect();
+            await expect(head.top + head.height / 2 - f.top, 'the header row shares it').toBeCloseTo(28, 0);
             await expect(canvas.getByRole('main')).toBeInTheDocument();
         };
         await withTestViewport(1024, 900, async () => {
             await check(1024, true);
             await check(768, false);
-            await userEvent.click(canvas.getByRole('button', { name: /sidebar/i }));
+            await userEvent.click(canvas.getByRole('button', { name: 'Open sidebar' }));
             await waitFor(() => expect(sidebar()).toBeInTheDocument());
         });
     },
@@ -389,7 +390,7 @@ export const FocusedKeyboardAndLandmarks = {
         await expect(canvas.queryByRole('contentinfo'), 'no footer landmark').toBeNull();
         await expect(main).toContainElement(actionsBar);
         await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'no sidebar').toBeNull();
-        await expect(canvas.queryByRole('button', { name: /sidebar/i }), 'no sidebar toggle').toBeNull();
+        await expect(canvas.queryByRole('button', { name: /(Open|Close) sidebar/ }), 'no sidebar toggle').toBeNull();
 
         // Focus order: Back first in the page, then Close, the fields, then the actions.
         const page = canvasElement.querySelector('.plus-page-layout--focused');

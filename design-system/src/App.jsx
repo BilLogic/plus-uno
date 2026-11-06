@@ -1,15 +1,12 @@
 import React from 'react';
-import { Button, Navigation } from '@/components';
-import { Topbar, PatternSection } from '@/patterns';
+import { Breadcrumb, Button, Navigation } from '@/components';
+import { PatternSection } from '@/patterns';
 
 // A simple App component to serve as the entry point
 const App = () => {
     return (
         <div className="app-container">
-            <Topbar
-                breadcrumbs={[{ text: 'PLUS Design System', href: '#' }]}
-                user={{ name: 'User' }}
-            />
+            <Breadcrumb items={[{ text: 'PLUS Design System', href: '#' }]} />
             <div className="d-flex">
                 <Navigation
                     items={[

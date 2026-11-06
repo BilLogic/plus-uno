@@ -10,6 +10,8 @@ import React, { createContext, useContext } from 'react';
  * @property {boolean} [forceSidebarExpanded]
  * @property {string} [activeTab]
  * @property {() => void} [goHome]
+ * @property {() => void} [onProfile] The account menu's Profile
+ * @property {() => void} [onSignOut] The account menu's Sign out
  * @property {(tabId: string) => void} [onTabClick]
  * @property {(tab: { id: string, parentId: string, recordId: string, href?: string }) => void} [onOpenTabSelect] Go to an open tab's record (its `href`)
  * @property {boolean} [fullscreen] Fill the viewport without the Specs card chrome

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Button } from '@/components';
-import { Frame, PatternCard, Topbar } from '@/patterns';
+import { Breadcrumb, Button, Sidebar } from '@/components';
+import { Frame, PatternCard } from '@/patterns';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
@@ -12,7 +12,7 @@ import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
  */
 
 const BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions' }];
-const USER = { name: 'John Doe', type: 'lead tutor' };
+const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
 
 const box = { height: 280, width: '100%' };
 
@@ -32,10 +32,10 @@ export const FocusedTopbarDo = () => (
     </div>
 );
 
-/** Don't: the app topbar, with a sidebar toggle and a breadcrumb, on a page for one task. */
+/** Don't: the app frame, with the sidebar and a breadcrumb, on a page for one task. */
 export const FocusedTopbarDont = () => (
     <div style={box}>
-        <Frame topbar={<Topbar breadcrumbs={BREADCRUMBS} user={USER} />} style={{ height: '100%' }} width="reading">
+        <Frame header={<Breadcrumb items={BREADCRUMBS} />} sidebar={<Sidebar user="tutor" account={ACCOUNT} />} style={{ height: '100%' }} width="reading">
             {slotContent('Add a session note')}
         </Frame>
     </div>

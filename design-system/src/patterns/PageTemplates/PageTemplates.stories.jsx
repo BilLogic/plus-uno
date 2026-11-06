@@ -2,15 +2,15 @@ import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button, TextField, TextArea } from '@/components';
-import { Frame, PatternCard, PatternSection, Topbar } from '@/patterns';
+import { PatternCard, PatternSection } from '@/patterns';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
 /**
- * Page templates: the page every screen starts from. The frame (a 32 topbar, a
- * 240 sidebar docked from 1024, the surface on a 12-column grid) with content
+ * Page templates: the page every screen starts from. The frame (a 240
+ * sidebar docked from 1024, the Page on a 12-column grid under its breadcrumb) with content
  * in the surface. The stories here are the examples the docs page shows, each
  * built from `PageLayout`, `Frame`, `PatternSection` and `PatternCard`.
  */
@@ -93,7 +93,7 @@ export default {
         frame: {
             control: 'select',
             options: ['default', 'focused'],
-            description: 'default: the app frame with the topbar and the sidebar. focused: one task, with no sidebar.',
+            description: 'default: the app frame with the sidebar and the breadcrumb. focused: one task, with no sidebar.',
             table: { category: 'Design', defaultValue: { summary: 'default' } },
         },
         title: {
@@ -155,24 +155,24 @@ export const Blank = {
 /** content=reading: the surface capped at 864. */
 export const Reading = {
     render: () => fullHeight(
-        <InAppFrame breadcrumbs={BREADCRUMBS} user={USER} width="reading"><ReadingContent /></InAppFrame>,
+        <InAppFrame breadcrumbs={BREADCRUMBS} width="reading"><ReadingContent /></InAppFrame>,
     ),
 };
 
-/** 768: the sidebar is closed, and the menu control is hovered, so it floats over the page. */
+/** 768: the sidebar is closed, and the frame's left edge is hovered, so it floats over the page. */
 export const SidebarOverPage = {
     render: () => fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const peek = async () => {
-            const toggle = await canvas.findByRole('button', { name: /sidebar/i });
-            // A pointer entering the toggle, as the page's reader would; React reads it from `pointerover`.
+            await canvas.findByRole('button', { name: 'Open sidebar' });
+            // A pointer entering the frame's left edge, as the page's reader would; React reads it from `pointerover`.
             // It is sent again until the frame has taken it, because the frame settles its width after the first paint.
             await waitFor(() => {
-                toggle.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
+                canvasElement.querySelector('.plus-frame__edge')
+                    ?.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
                 expect(canvas.queryByRole('navigation', { name: 'Main' })).not.toBeNull();
             }, { timeout: 4000 });
-            return toggle;
         };
         if (window.innerWidth < 1024) {
             await peek();

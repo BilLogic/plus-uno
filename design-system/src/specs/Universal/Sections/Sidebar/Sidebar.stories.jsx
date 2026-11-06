@@ -1,11 +1,10 @@
 /**
  * Sidebar - Universal Section
  *
- * The PLUS sidebar: the foundation Sidebar pattern filled with the Specs item
- * list for each role. Figma Spec: node-id=111-227891.
+ * The PLUS sidebar: the Sidebar pattern filled with the groups for each role.
  *
- * The stories assert the content of each role against the Specs list (plus
- * Toolkit › Students), so a config edit that drops or adds an item turns red.
+ * The stories assert the content of each role, so a config edit that drops or
+ * adds a row turns red.
  */
 
 import React from 'react';
@@ -25,20 +24,28 @@ export default {
     }
 };
 
+const ACCOUNTS = {
+    tutor: { id: 'specs-tutor', name: 'John Doe', role: 'Tutor' },
+    supervisor: { id: 'specs-supervisor', name: 'John Doe', role: 'Lead' },
+};
+
 const panel = {
     display: 'flex',
     flexDirection: 'column',
     width: 'var(--frame-sidebar-width)',
+    height: 'var(--size-5400)',
     boxSizing: 'border-box',
-    padding: 'var(--pad-x-sm)',
     backgroundColor: 'var(--ds-surface-sunken)',
 };
 
-/** The item labels in each named group, in order. */
+/** The row labels in each named group, in order. */
 const groupItems = (canvasElement, name) => {
     const group = within(canvasElement).getByRole('group', { name });
-    return [...group.querySelectorAll('.plus-sidebar-tab__label')].map((el) => el.textContent);
+    return [...group.querySelectorAll('.plus-pattern-sidebar__label')].map((el) => el.textContent);
 };
+
+/** The first group, with no title: its row labels. */
+const firstGroupItems = (canvasElement) => [...canvasElement.querySelector('.plus-pattern-sidebar__group').querySelectorAll('.plus-pattern-sidebar__label')].map((el) => el.textContent);
 
 /**
  * Overview
@@ -49,44 +56,54 @@ export const Overview = {
         <div style={{ display: 'flex', gap: 'var(--section-stack-lg)' }}>
             <div>
                 <p style={{ font: 'var(--body-small)', fontWeight: 'var(--type-weight-semibold)', marginBottom: 'var(--stack-md)' }}>Tutor</p>
-                <div style={panel}><Sidebar user="tutor" label="Tutor navigation" /></div>
+                <div style={panel}><Sidebar user="tutor" label="Tutor navigation" account={ACCOUNTS.tutor} /></div>
             </div>
             <div>
                 <p style={{ font: 'var(--body-small)', fontWeight: 'var(--type-weight-semibold)', marginBottom: 'var(--stack-md)' }}>Supervisor</p>
-                <div style={panel}><Sidebar user="supervisor" label="Supervisor navigation" /></div>
+                <div style={panel}><Sidebar user="supervisor" label="Supervisor navigation" account={ACCOUNTS.supervisor} /></div>
             </div>
         </div>
     )
 };
 
-/** Tutor: Home · Training (Lessons, Onboarding) · Toolkit (Sessions, Students, Slack ↗). No Admin. */
+/** Tutor: Home and Slack ↗ · Training (Lessons, Onboarding) · Toolkit (Sessions, Students). No Admin. */
 export const Tutor = {
-    render: () => <div style={panel}><Sidebar user="tutor" activeTabId="sessions" /></div>,
+    render: () => <div style={panel}><Sidebar user="tutor" activeTabId="sessions" account={ACCOUNTS.tutor} /></div>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getByRole('button', { name: 'Home' })).toBeInTheDocument();
+        await expect(firstGroupItems(canvasElement)).toEqual(['Home', 'Slack']);
         await expect(groupItems(canvasElement, 'Training')).toEqual(['Lessons', 'Onboarding']);
-        await expect(groupItems(canvasElement, 'Toolkit')).toEqual(['Sessions', 'Students', 'Slack']);
+        await expect(groupItems(canvasElement, 'Toolkit')).toEqual(['Sessions', 'Students']);
         await expect(canvas.queryByRole('group', { name: 'Admin' }), 'no Admin for a tutor').toBeNull();
-        await expect(canvas.queryByText('Reviews'), 'not in Specs').toBeNull();
         await expect(canvas.getByRole('button', { name: 'Sessions' })).toHaveAttribute('aria-current', 'page');
 
         const slack = canvas.getByRole('link', { name: /Slack/ });
         await expect(slack).toHaveAttribute('target', '_blank');
         await expect(slack).toHaveAccessibleName(/opens in a new tab/i);
-        await expect(canvas.queryAllByRole('heading'), 'group labels are not headings').toHaveLength(0);
+        await expect(slack.querySelector('.fa-brands.fa-slack')).not.toBeNull();
+        await expect(canvas.queryAllByRole('heading'), 'section titles are not headings').toHaveLength(0);
     },
 };
 
-/** Supervisor: the tutor's sections, then Admin (Tutors, Sessions, Students, Groups). */
+/** A tutor mid-onboarding: the Toolkit locked, with the modules left in its message. */
+export const TutorOnboarding = {
+    render: () => <div style={panel}><Sidebar user="tutor" activeTabId="onboarding" modulesLeft={3} account={ACCOUNTS.tutor} /></div>,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('img', { name: 'Locked. Finish onboarding to unlock the Toolkit · 3 modules left' })).toBeInTheDocument();
+        await expect(canvas.getByRole('button', { name: 'Sessions' })).toHaveAttribute('aria-disabled', 'true');
+    },
+};
+
+/** Supervisor: the tutor's groups, then Admin (Compliance, Reflections, Tutors, Sessions, Students, Groups). Never locked. */
 export const Supervisor = {
-    render: () => <div style={panel}><Sidebar user="supervisor" activeTabId="students" /></div>,
+    render: () => <div style={panel}><Sidebar user="supervisor" activeTabId="students" modulesLeft={3} account={ACCOUNTS.supervisor} /></div>,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await expect(groupItems(canvasElement, 'Training')).toEqual(['Lessons', 'Onboarding']);
-        await expect(groupItems(canvasElement, 'Toolkit')).toEqual(['Sessions', 'Students', 'Slack']);
-        await expect(groupItems(canvasElement, 'Admin')).toEqual(['Tutors', 'Sessions', 'Students', 'Groups']);
-        await expect(canvas.queryByText('Compliance'), 'not in Specs').toBeNull();
+        await expect(groupItems(canvasElement, 'Toolkit')).toEqual(['Sessions', 'Students']);
+        await expect(groupItems(canvasElement, 'Admin')).toEqual(['Compliance', 'Reflections', 'Tutors', 'Sessions', 'Students', 'Groups']);
+        await expect(canvas.queryByRole('img', { name: /Locked/ }), 'a supervisor is never locked').toBeNull();
 
         // Admin › Students is selected, not Toolkit › Students.
         const current = canvasElement.querySelectorAll('[aria-current="page"]');
@@ -94,16 +111,7 @@ export const Supervisor = {
         await expect(within(canvas.getByRole('group', { name: 'Admin' })).getByRole('button', { name: 'Students' }))
             .toHaveAttribute('aria-current', 'page');
         const icon = current[0].querySelector('i');
-        await expect(icon).toHaveClass('fa-users');
-    },
-};
-
-/** With `showItemsNotInSpecs`, the two code-only items come back: Reviews and Compliance. */
-export const WithItemsNotInSpecs = {
-    render: () => <div style={panel}><Sidebar user="supervisor" showItemsNotInSpecs /></div>,
-    play: async ({ canvasElement }) => {
-        await expect(groupItems(canvasElement, 'Toolkit')).toEqual(['Sessions', 'Students', 'Reviews', 'Slack']);
-        await expect(groupItems(canvasElement, 'Admin')).toEqual(['Tutors', 'Sessions', 'Students', 'Groups', 'Compliance']);
+        await expect(icon).toHaveClass('fa-regular', 'fa-address-book');
     },
 };
 
@@ -113,18 +121,12 @@ export const WithItemsNotInSpecs = {
  */
 export const Interactive = {
     render: (args) => (
-        <div
-            style={{
-                ...panel,
-                height: 'var(--size-5400)',
-                overflow: 'hidden',
-                borderRadius: 'var(--page-radius)',
-            }}
-        >
+        <div style={{ ...panel, overflow: 'hidden' }}>
             <Sidebar
                 user={args.user}
                 visible={args.visible}
-                showItemsNotInSpecs={args.showItemsNotInSpecs}
+                modulesLeft={args.modulesLeft}
+                account={ACCOUNTS[args.user]}
                 onHomeClick={() => console.log('Home clicked')}
                 onTabClick={(tabName) => console.log('Tab clicked:', tabName)}
             />
@@ -133,7 +135,7 @@ export const Interactive = {
     args: {
         user: 'tutor',
         visible: true,
-        showItemsNotInSpecs: false,
+        modulesLeft: 0,
     },
     argTypes: {
         user: {
@@ -145,8 +147,8 @@ export const Interactive = {
             control: 'boolean',
             table: { category: 'State' }
         },
-        showItemsNotInSpecs: {
-            control: 'boolean',
+        modulesLeft: {
+            control: { type: 'number', min: 0 },
             table: { category: 'Content' }
         }
     }

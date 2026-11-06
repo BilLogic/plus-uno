@@ -11,6 +11,10 @@
     --frame-topbar-height: var(--height-200);
     --frame-sidebar-width: var(--width-1500);
     --frame-sidebar-width-nav: 164px; /* fixed SideNav width (164), distinct from the responsive sidebar above */
+    --frame-sidebar-pad: var(--space-075); /* the Sidebar pads 12 on every side */
+    --frame-sidebar-row-gap: var(--space-0125); /* two Sidebar rows sit 2 apart */
+    --frame-sidebar-group-gap: var(--space-100); /* two Sidebar groups sit 16 apart */
+    --frame-sidebar-row-radius: var(--radius-0375); /* the rounding of a Sidebar row (6) */
 
     /* Page */
     --page-pad-x-compact: var(--space-150);

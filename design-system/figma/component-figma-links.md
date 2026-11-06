@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-45 docs-page links + 62 style/variant entries across 66 components.
+44 docs-page links + 61 style/variant entries across 65 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -56,7 +56,6 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Other | PageLayout | `112:597` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=112-597) |
 | Other | Sidebar | `111:227891` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227891) |
 | Other | SmartBadges | `83:125838` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=83-125838) |
-| Other | TopBar | `111:227860` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227860) |
 | Other | UserAvatar | `111:227876` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227876) |
 | Other | UserTypeIndicator | `2370:191400` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=2370-191400) |
 
@@ -125,6 +124,5 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Other | PageLayout | Page Layout | `111:241933` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-241933) | verified |
 | Other | Sidebar | Sidebar | `111:227891` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227891) | verified |
 | Other | SmartBadges | Static Badge / SMART | `956:256793` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=956-256793) | verified |
-| Other | TopBar | Top Bar | `111:227859` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227859) | verified |
 | Other | UserAvatar | User Avatar | `111:227876` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227876) | verified |
 | Other | UserTypeIndicator | User Type Indicator | `2370:191400` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=2370-191400) | verified |

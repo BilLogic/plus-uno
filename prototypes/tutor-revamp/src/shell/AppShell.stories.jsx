@@ -6,7 +6,7 @@ import { ScreenFrame } from '../storyFrame';
 import { DARK_WITH_LEGACY, LIGHT } from '../kit/storyModes';
 
 /**
- * AppShell: Frame, Topbar and the tutor sidebar with its open tabs. The play
+ * AppShell: Frame, the breadcrumb and the tutor sidebar with its open tabs. The play
  * opens a student (a tab appears and is selected) and closes a session tab.
  */
 export default {

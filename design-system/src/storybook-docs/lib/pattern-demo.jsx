@@ -1,10 +1,10 @@
 import React from 'react';
-import { Sidebar } from '@/components';
-import { Frame, Topbar } from '@/patterns';
+import { Breadcrumb, Sidebar } from '@/components';
+import { Frame } from '@/patterns';
 
 /**
  * Story chrome shared by the pattern stories: a demo caption, a dashed
- * content slot, and the app frame with the PLUS Topbar and Sidebar in it.
+ * content slot, and the app frame with the PLUS Sidebar and a breadcrumb in it.
  * Every color is a `--ds-*` token, so the chrome follows the color modes
  * with the patterns it frames.
  */
@@ -43,18 +43,19 @@ export const slotContent = (label) => (
 );
 
 const BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Dashboard' }];
-const USER = { name: 'John Doe', type: 'lead tutor' };
+const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
 
 /**
- * The app frame at full height: a Topbar with `breadcrumbs` and `user`, the
- * tutor Sidebar, and `children` in the surface. `height` sizes the box the
+ * The app frame at full height: the tutor Sidebar with `account` in its
+ * account row, `breadcrumbs` in the Page's header row, and `children` in the
+ * surface. `height` sizes the box the
  * frame fills (the viewport by default). Any other prop goes to Frame.
  */
-export const InAppFrame = ({ breadcrumbs = BREADCRUMBS, user = USER, height = '100vh', children, ...frameProps }) => (
+export const InAppFrame = ({ breadcrumbs = BREADCRUMBS, account = ACCOUNT, height = '100vh', children, ...frameProps }) => (
     <div style={{ height }}>
         <Frame
-            topbar={<Topbar breadcrumbs={breadcrumbs} user={user} />}
-            sidebar={<Sidebar user="tutor" activeTabId="home" />}
+            header={<Breadcrumb items={breadcrumbs} />}
+            sidebar={<Sidebar user="tutor" activeTabId="home" account={account} />}
             {...frameProps}
         >
             {children}

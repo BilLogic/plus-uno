@@ -1,0 +1,28 @@
+/**
+ * The refined PLUS lockup at height 24: the mark fills a 24 box, and the
+ * wordmark follows at a quarter of the height.
+ */
+
+.plus-lockup {
+    display: inline-flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: calc(var(--icon-lg) / 4);
+    height: var(--icon-lg);
+    color: var(--ds-text);
+}
+
+.plus-lockup__mark {
+    display: block;
+    flex-shrink: 0;
+    width: var(--icon-lg);
+    height: var(--icon-lg);
+}
+
+.plus-lockup__wordmark {
+    display: block;
+    flex-shrink: 0;
+    width: auto;
+    height: var(--icon-lg);
+    aspect-ratio: 37.48 / 24;
+}

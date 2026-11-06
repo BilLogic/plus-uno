@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useHref, useLocation, useNavigate } from 'react-router-dom';
-import { Logo } from '@/components';
-import { Frame, PatternSidebar, Topbar, useOpenTabs } from '@/patterns';
+import { Breadcrumb } from '@/components';
+import { Frame, PatternSidebar, useOpenTabs } from '@/patterns';
 import { SESSIONS, STUDENTS, TUTOR } from '../data/mock';
-import { HOME_ITEMS, NAV_SECTIONS, ROUTES, recordPath } from './nav';
+import { NAV_GROUPS, ROUTES, recordPath } from './nav';
 import './AppShell.css';
 
 /** The record a route names, for its sidebar tab: `/sessions/:id` or `/students/:id`. */
@@ -30,9 +30,10 @@ const activeIdFor = (pathname, tabs) => {
 };
 
 /**
- * AppShell: the tutor app's frame. `Frame` with a `Topbar` (breadcrumbs, Help
- * Center, the tutor) and a `PatternSidebar`: Home; Training (Lessons,
- * Onboarding); Toolkit (Sessions, Students, Reviews, Slack ↗).
+ * AppShell: the tutor app's frame. `Frame` with the breadcrumbs in the Page's
+ * header row and a `PatternSidebar`: Home and Slack ↗; Training (Lessons,
+ * Onboarding); Toolkit (Sessions, Students, Reviews); the tutor in the
+ * account row.
  *
  * Opened sessions and students are temporary tabs under their item, kept by
  * the open-tabs store the app provides. Visiting a session or a student opens
@@ -53,7 +54,7 @@ const AppShell = ({ breadcrumbs = [], children }) => {
     const withHrefs = Object.fromEntries(
         Object.entries(byParent).map(([parentId, list]) => [
             parentId,
-            list.map((tab) => ({ ...tab, href: `${base}${recordPath(tab.parentId, tab.recordId)}` })),
+            list.map((tab) => ({ ...tab, label: tab.title, live: tab.status === 'live', href: `${base}${recordPath(tab.parentId, tab.recordId)}` })),
         ]),
     );
 
@@ -73,23 +74,19 @@ const AppShell = ({ breadcrumbs = [], children }) => {
         <Frame
             className="tr-shell"
             contentAs="main"
-            topbar={(
-                <Topbar
-                    breadcrumbs={crumbs}
-                    user={{ name: TUTOR.name, type: 'regular tutor' }}
-                />
-            )}
+            header={<Breadcrumb items={crumbs} />}
             sidebar={(
                 <PatternSidebar
-                    header={<Logo appearance="colored" size={60} wordmark className="p-0" />}
-                    items={HOME_ITEMS}
-                    sections={NAV_SECTIONS}
+                    groups={NAV_GROUPS}
                     activeId={activeIdFor(pathname, tabs)}
                     onSelect={(id) => navigate(ROUTES[id] ?? '/')}
-                    openTabs={withHrefs}
-                    onTabSelect={(tab) => navigate(recordPath(tab.parentId, tab.recordId))}
-                    onTabClose={closeTab}
-                    onTabsCloseAll={(item) => {
+                    tabs={withHrefs}
+                    onSelectTab={(tab) => navigate(recordPath(tab.parentId, tab.recordId))}
+                    onCloseTab={closeTab}
+                    homeHref={`${base}/`}
+                    onHome={() => navigate('/')}
+                    account={{ id: 'tutor', name: TUTOR.name, role: 'Tutor' }}
+                    onCloseAllTabs={(item) => {
                         closeAll(item.id);
                         if (pathname.startsWith(`${ROUTES[item.id]}/`)) navigate(ROUTES[item.id]);
                     }}

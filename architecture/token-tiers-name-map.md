@@ -94,6 +94,10 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Frame | `--layout-height-topbar` | `--frame-topbar-height` |  |
 | Frame | `--layout-width-sidebar` | `--frame-sidebar-width` |  |
 | Frame | `--layout-sidebar-width` | `--frame-sidebar-width-nav` | fixed SideNav width (164), distinct from the responsive sidebar above |
+| Frame | *(new)* | `--frame-sidebar-pad` | the Sidebar pads 12 on every side |
+| Frame | *(new)* | `--frame-sidebar-row-gap` | two Sidebar rows sit 2 apart |
+| Frame | *(new)* | `--frame-sidebar-group-gap` | two Sidebar groups sit 16 apart |
+| Frame | *(new)* | `--frame-sidebar-row-radius` | the rounding of a Sidebar row (6) |
 | Page | `--page-pad` | `--page-pad` (reclassified, unchanged) |  |
 | Page | *(new)* | `--page-pad-x-compact` |  |
 | Page | *(new)* | `--page-pad-x-default` |  |
