@@ -355,7 +355,6 @@ const preview = {
             "Section",
             [
               "Section",
-              "List and detail",
               "Card",
               "Table"
             ],

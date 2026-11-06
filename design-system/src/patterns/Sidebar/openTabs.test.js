@@ -130,6 +130,6 @@ describe('open tabs model', () => {
 
     it('names its defaults', () => {
         expect(OPEN_TABS_STORAGE_KEY).toBe('plus-uno:open-tabs');
-        expect(SIDEBAR_RECENT_TABS).toBe(5);
+        expect(SIDEBAR_RECENT_TABS).toBe(3);
     });
 });

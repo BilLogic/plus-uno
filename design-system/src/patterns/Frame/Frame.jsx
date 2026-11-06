@@ -2,12 +2,12 @@ import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 
 import PropTypes from 'prop-types';
 import { Dialog } from '@base-ui/react/dialog';
 import { openOverlayCount, subscribeOverlays } from '@/lib/overlay';
-import { PanelHostContext } from '@/components';
-import Topbar from '../Topbar';
+import { IconButton, LinkIconButton, PanelHostContext } from '@/components';
 import { SidebarControlContext } from './SidebarControl';
 import { PanelControlContext } from './PanelControl';
 import { SplitContext } from './SplitContext';
 import PanelSplitter from './PanelSplitter';
+import Blanket from '../Blanket';
 import { useOwnWidth } from './useOwnWidth';
 import { FRAME_LAYOUT, clamp, dockedPanelMax, resolveFrameLayout } from './frameLayout';
 import './Frame.scss';
@@ -47,49 +47,50 @@ const focusLost = (doc) => !doc.activeElement || doc.activeElement === doc.body 
 const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
 
 /**
- * Frame pattern: the app frame, a full-width 32 topbar over a row holding the
- * Sidebar and the Page. The Frame has no seams: the Page runs to the window
- * edges and meets the Sidebar at a hairline.
+ * Frame pattern: the app frame, the Sidebar beside the Page (and the Panel).
+ * There is no top bar: the Page runs the full height, and meets a docked
+ * Sidebar at its 1px edge.
  *
- * - The frame owns the Sidebar state; the Topbar in the `topbar` slot draws the
- *   one toggle from it (through `SidebarControlContext`). Without a `topbar`,
- *   the frame renders a bare Topbar so the toggle is still there.
+ * - The Frame owns the Sidebar state and hands it to the Sidebar through
+ *   `SidebarControlContext`. Open, the toggle (`angles-left`) ends the
+ *   Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top
+ *   left, centered on x 32, and the Page's header row (`header`, the
+ *   breadcrumb) follows it on the same center line from x 56.
  * - What docks is decided by the layout resolver (`./frameLayout`) from the
  *   Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024
  *   it never docks.
- * - The Topbar spans the full width, pads its end, and ends in a hairline. The
- *   Page starts right under it.
- * - The Page's top-left corner is rounded (`--page-radius`) only while the
- *   Sidebar is docked, switching in the same render as the width change.
- * - Hovering the toggle or the left edge peeks a collapsed Sidebar: it floats
- *   over the Page with a shadow and no Blanket, so the Page does not move. An
- *   outside click, Escape, or the pointer leaving closes the peek.
- * - Clicking the toggle, or pressing Ctrl+[, opens a collapsed or peeking
- *   Sidebar and closes an open one. Opened by hand under 1024 it is an
- *   overlay: it floats over the Page and closes on an outside press.
- * - Opening a modal (or drawer) closes a floating Sidebar (peek or overlay)
- *   and leaves a docked one alone, and while one is open the Sidebar does not
- *   peek. The frame hears it from the shared overlay module (`@/lib/overlay`),
- *   so a page does not wire its modals to the frame. A modal opened from inside
- *   the floating Sidebar hands focus to the toggle when it closes, since its
- *   trigger left with the Sidebar.
- * - The Panel area (`panel`) is the Frame's right-hand area, under the
- *   Topbar. The resolver docks it beside the Page at a hairline when the
- *   content keeps 720, collapsing a default Sidebar first (and restoring it
- *   when the Panel closes); otherwise it opens over the Page on a Blanket that
- *   covers the Page and the Sidebar but not the Topbar, and a press outside or
- *   Escape closes it. Under 1024 it is an overlay capped at 320, and only one
- *   overlay is open at a time; under 768 it is full width. As an overlay the
- *   Panel is modal: focus moves into it and stays there, the Page and the
- *   Sidebar under the Blanket are inert, and closing it hands focus back to
- *   what opened it. Docked or peeking it is not modal and leaves focus where
- *   it is. Its open state, dismissal and focus run on Base UI's `Dialog`,
- *   portaled into the Frame's row so a dock or overlay switch never remounts
- *   the Panel's content. Its splitter
- *   resizes it from 320 to 640 (never past what keeps 720 beside a docked
- *   Sidebar) by drag or keys. Width and open state are kept in
- *   sessionStorage. A modal leaves it open. Anything inside the Frame opens
- *   it through `usePanelControl`.
+ * - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on
+ *   its Page-facing edge. Floating (a peek, or opened by hand under 1024) it
+ *   lies over the Page with `--ds-shadow-overlay` and no Blanket.
+ * - Hovering the left edge peeks a closed Sidebar. An outside press, Escape,
+ *   or the pointer leaving closes the peek.
+ * - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and
+ *   opens a closed one; focus follows to the toggle that is left.
+ * - Opening a modal (or drawer) closes a floating Sidebar and leaves a docked
+ *   one alone, and while one is open the Sidebar does not peek. The frame
+ *   hears it from the shared overlay module (`@/lib/overlay`), so a page does
+ *   not wire its modals to the frame. A modal opened from inside the floating
+ *   Sidebar hands focus to the toggle when it closes, since its trigger left
+ *   with the Sidebar.
+ * - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks
+ *   it beside the Page at a hairline when the content keeps 720, collapsing a
+ *   default Sidebar first (and restoring it when the Panel closes); otherwise
+ *   it opens over the Page on a Blanket that covers the Page and the Sidebar,
+ *   and a press outside or Escape closes it. Under 1024 it is an overlay
+ *   capped at 320, and only one overlay is open at a time; under 768 it is
+ *   full width. As an overlay the Panel is modal: focus moves into it and
+ *   stays there, the Page and the Sidebar under the Blanket are inert, and
+ *   closing it hands focus back to what opened it. Docked or peeking it is not
+ *   modal and leaves focus where it is. Its open state, dismissal and focus
+ *   run on Base UI's `Dialog`, portaled into the Frame's row so a dock or
+ *   overlay switch never remounts the Panel's content. Its splitter resizes
+ *   it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by
+ *   drag or keys. Width and open state are kept in sessionStorage. A modal
+ *   leaves it open. Anything inside the Frame opens it through
+ *   `usePanelControl`.
+ * - There is no top bar on any Frame. A focused page (no Sidebar) puts Back
+ *   (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header
+ *   row, around the `header` content.
  * - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the
  *   Panel is a complementary landmark named by `panelLabel`.
  * - The Page pads `--page-pad` (24 at every width) and caps its content at
@@ -98,7 +99,12 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  */
 const Frame = ({
     id,
-    topbar,
+    header,
+    onBack,
+    backHref,
+    backLabel = 'Back',
+    onClose,
+    closeLabel = 'Close',
     sidebar,
     sidebarDocked,
     panel,
@@ -109,7 +115,7 @@ const Frame = ({
     panelDefaultWidth = FRAME_LAYOUT.panelDefault,
     panelPeek = false,
     panelStorageKey = PANEL_STORAGE_KEY,
-    listDetail = false,
+    sectionDetail = false,
     width = 'content',
     contentAs: Content = 'main',
     contentClassName = '',
@@ -122,6 +128,9 @@ const Frame = ({
     const frameRef = useRef(null);
     const rowRef = useRef(null);
     const toggleRef = useRef(null);
+    const closeRef = useRef(null);
+    // Set by a toggle press or the shortcut: focus follows to the toggle that is left.
+    const refocusToggle = useRef(false);
     const sidebarRef = useRef(null);
     const leaveTimer = useRef(null);
     const sidebarId = useId();
@@ -171,8 +180,8 @@ const Frame = ({
         sidebar: hand === null ? { open: defaultOpen, setBy: 'default' } : { open: hand, setBy: 'hand' },
         sidebarPeek: peek,
         chatMode: panelOpen ? 'panel' : 'popup',
-        listDetail,
-    }), [frameWidth, panelWidth, hand, defaultOpen, peek, panelOpen, listDetail]);
+        sectionDetail,
+    }), [frameWidth, panelWidth, hand, defaultOpen, peek, panelOpen, sectionDetail]);
 
     const narrow = frameWidth < FRAME_LAYOUT.dockMin;
     const panelState = layout.panel;
@@ -184,6 +193,12 @@ const Frame = ({
     // Peeking or an overlay: the Sidebar floats over the Page instead of taking room.
     const raised = peeking || overlay;
     const collapsed = hasSidebar && layout.sidebar === 'collapsed';
+
+    /** The toggle that shows: the Page's when the Sidebar is closed, else the Sidebar's own. */
+    const focusToggle = useCallback(() => {
+        const visible = [toggleRef.current, closeRef.current].find((el) => el?.isConnected);
+        visible?.focus();
+    }, []);
 
     const cancelLeave = useCallback(() => {
         if (leaveTimer.current) {
@@ -245,6 +260,9 @@ const Frame = ({
     const toggle = useCallback(() => {
         cancelLeave();
         setPeek(false);
+        refocusToggle.current = true;
+        // A peek is showing: the toggle hides it, as it hides a docked Sidebar.
+        if (stateRef.current === 'peeking') return;
         const opening = !(stateRef.current === 'docked' || stateRef.current === 'overlay');
         // Under 1024 only one overlay at a time: an overlay Sidebar closes the overlay Panel.
         if (opening && narrowRef.current && panelStateRef.current === 'overlay') setPanelOpen(false);
@@ -256,12 +274,20 @@ const Frame = ({
         if (layout.sidebar === 'docked' || layout.sidebar === 'overlay') setPeek(false);
     }, [layout.sidebar]);
 
-    // Ctrl+[ toggles the Sidebar.
+    // Focus follows a toggle press or the shortcut to the toggle that is left.
+    useEffect(() => {
+        if (!refocusToggle.current) return;
+        refocusToggle.current = false;
+        const visible = [closeRef.current, toggleRef.current].find((el) => el?.isConnected);
+        visible?.focus({ preventScroll: true });
+    }, [layout.sidebar]);
+
+    // Ctrl+[ (Cmd+[ on a Mac) toggles the Sidebar.
     useEffect(() => {
         if (!hasSidebar) return undefined;
         const onKeyDown = (e) => {
             // Under an open modal the Sidebar stays put, as it does for a peek.
-            if (e.defaultPrevented || !e.ctrlKey || e.altKey || e.metaKey || e.key !== '[' || openOverlayCount() > 0) return;
+            if (e.defaultPrevented || !(e.ctrlKey || e.metaKey) || e.altKey || e.key !== '[' || openOverlayCount() > 0) return;
             e.preventDefault();
             toggle();
         };
@@ -285,7 +311,7 @@ const Frame = ({
             closeRaised();
         } else if (event.type === 'focus-lost' && focusToggleOnClose.current) {
             focusToggleOnClose.current = false;
-            toggleRef.current?.focus();
+            focusToggle();
         }
     }), [closeRaised]);
 
@@ -300,8 +326,8 @@ const Frame = ({
             // A control that handled its own Escape (a menu, a field) keeps it,
             // and so does an open modal.
             if (e.key !== 'Escape' || e.defaultPrevented || openOverlayCount() > 0) return;
+            refocusToggle.current = true;
             closeRaised();
-            toggleRef.current?.focus();
         };
         document.addEventListener('pointerdown', onPointerDown);
         document.addEventListener('keydown', onKeyDown);
@@ -349,7 +375,7 @@ const Frame = ({
     /**
      * Base UI reports each attempt to dismiss the Panel's dialog; the Frame
      * keeps the rules. Only an overlay or a peek is dismissed, by a press on
-     * the Blanket or the Topbar or by Escape. A press inside an open modal, in
+     * the Blanket or by Escape. A press inside an open modal, in
      * a popup drawn outside the Frame, or on a trigger that controls the Panel
      * (which toggles it itself) leaves it open. So does Escape while a modal
      * is open, since that Escape is the modal's, and an Escape a control in
@@ -405,7 +431,7 @@ const Frame = ({
         const doc = frameRef.current?.ownerDocument ?? document;
         if (!focusLost(doc) && !panelRef.current?.contains(doc.activeElement)) return false;
         const opener = panelOpenerRef.current;
-        return (opener?.isConnected ? opener : toggleRef.current) ?? false;
+        return (opener?.isConnected ? opener : [toggleRef.current, closeRef.current].find((el) => el?.isConnected)) ?? false;
     }, []);
 
     // The splitter's range never lets a resize collapse the Sidebar. Docked,
@@ -413,7 +439,7 @@ const Frame = ({
     // As an overlay beside a Sidebar docked by default, the narrowest width
     // stays too wide for the Panel to dock alone, which would collapse it.
     const room = frameWidth - FRAME_LAYOUT.pagePad * 2 - FRAME_LAYOUT.contentFloor;
-    // While a List and detail split holds the floor is 960, so a drag never breaks it.
+    // While a Section detail split holds the floor is 960, so a drag never breaks it.
     const splitterMax = panelState === 'docked'
         ? dockedPanelMax({ frameWidth, sidebarDocked: layout.sidebar === 'docked', splitHolds: layout.splitHolds })
         : FRAME_LAYOUT.panelMax;
@@ -473,6 +499,7 @@ const Frame = ({
     const classes = [
         'plus-frame',
         docked ? 'plus-frame--sidebar-docked' : '',
+        hasSidebar ? 'plus-frame--with-sidebar' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -490,40 +517,75 @@ const Frame = ({
         </div>
     );
 
+    const shortcut = 'Control+[ Meta+[';
+
+    // The Page's toggle, drawn while the Sidebar is closed (or only peeking): it opens it.
     const toggleProps = useMemo(() => ({
         ref: toggleRef,
-        'aria-controls': docked || raised ? sidebarId : undefined,
-        'aria-keyshortcuts': 'Control+[',
+        'aria-controls': raised ? sidebarId : undefined,
+        'aria-keyshortcuts': shortcut,
         onClick: toggle,
-        onPointerEnter: peekSidebar,
-        onPointerLeave: leave,
-    }), [docked, raised, sidebarId, toggle, peekSidebar, leave]);
+    }), [raised, sidebarId, toggle]);
+
+    // The Sidebar's own toggle, at the end of its logo row: it closes it.
+    const closeProps = useMemo(() => ({
+        ref: closeRef,
+        'aria-controls': sidebarId,
+        'aria-keyshortcuts': shortcut,
+        onClick: toggle,
+    }), [sidebarId, toggle]);
 
     const control = useMemo(() => (hasSidebar ? {
         sidebar: docked || raised ? 'open' : 'closed',
         docked,
+        floating: raised,
         toggleProps,
-    } : null), [hasSidebar, docked, raised, toggleProps]);
+        closeProps,
+    } : null), [hasSidebar, docked, raised, toggleProps, closeProps]);
+
+    // The Page's toggle shows whenever the Sidebar is not docked or open over the Page.
+    const pageToggle = hasSidebar && !docked && !overlay ? (
+        <IconButton
+            className="plus-frame__toggle"
+            appearance="subtle"
+            icon="bars"
+            label="Open sidebar"
+            tooltip="Open sidebar · Ctrl ["
+            aria-expanded={false}
+            {...toggleProps}
+        />
+    ) : null;
+    const backButton = backHref ? (
+        <LinkIconButton className="plus-frame__back" appearance="subtle" icon="arrow-left" label={backLabel} href={backHref} onClick={onBack} />
+    ) : onBack ? (
+        <IconButton className="plus-frame__back" appearance="subtle" icon="arrow-left" label={backLabel} onClick={onBack} type="button" />
+    ) : null;
+    const closeButton = onClose ? (
+        <IconButton className="plus-frame__close" appearance="subtle" icon="xmark" label={closeLabel} onClick={onClose} type="button" />
+    ) : null;
+    const pageHead = pageToggle || header || backButton || closeButton ? (
+        <div className={['plus-frame__head', pageToggle ? 'plus-frame__head--toggle' : ''].filter(Boolean).join(' ')}>
+            {backButton}
+            {pageToggle}
+            {header}
+            {closeButton}
+        </div>
+    ) : null;
 
     const SurfaceTag = surfaceDirect ? 'main' : 'div';
 
     return (
         <div id={id} ref={frameRef} className={classes} style={style} {...props}>
-            <SplitContext.Provider value={listDetail ? layout.splitHolds : null}>
+            <SplitContext.Provider value={sectionDetail ? layout.splitHolds : null}>
             <PanelControlContext.Provider value={panelControl}>
                 <SidebarControlContext.Provider value={control}>
-                    <div className="plus-frame__topbar">
-                        {topbar ?? (hasSidebar ? <Topbar /> : null)}
-                    </div>
-                </SidebarControlContext.Provider>
-
                 {collapsed ? (
                     <div className="plus-frame__edge" aria-hidden="true" onPointerEnter={peekSidebar} />
                 ) : null}
                 {raised ? sidebarPanel(true) : null}
 
-                {/* Covers the Page and the Sidebar, never the Topbar. A press on it closes the Panel. */}
-                {panelShown && layout.blanket ? <div className="plus-frame__blanket" aria-hidden="true" /> : null}
+                {/* Covers the Page and the Sidebar. A press on it closes the Panel. */}
+                {panelShown && layout.blanket ? <Blanket contained className="plus-frame__blanket" aria-hidden="true" /> : null}
                 {hasPanel && panelPeek && !panelOpen && !panelPeekShown ? (
                     <div className="plus-frame__panel-edge" aria-hidden="true" onPointerEnter={peekPanel} />
                 ) : null}
@@ -532,6 +594,7 @@ const Frame = ({
                     {docked ? sidebarPanel(false) : null}
                     {/* Under an overlay Panel's Blanket the Page is out of reach for keyboards too. */}
                     <SurfaceTag className="plus-frame__surface" inert={panelModal}>
+                        {pageHead}
                         {surfaceDirect ? children : (
                             <Content
                                 className={[
@@ -557,6 +620,7 @@ const Frame = ({
                         {renderPanel()}
                     </Dialog.Portal>
                 </Dialog.Root>
+                </SidebarControlContext.Provider>
             </PanelControlContext.Provider>
             </SplitContext.Provider>
         </div>
@@ -565,8 +629,18 @@ const Frame = ({
 
 Frame.propTypes = {
     id: PropTypes.string,
-    /** The topbar row: a `Topbar`, which draws the Sidebar toggle from the frame's state. Defaults to a bare Topbar when there is a Sidebar. */
-    topbar: PropTypes.node,
+    /** The Page's header row, 32 high on the logo row's center line: the breadcrumb. While the Sidebar is closed it follows the toggle. */
+    header: PropTypes.node,
+    /** A focused page: called when Back is pressed. With it the header row leads with a Back icon button. */
+    onBack: PropTypes.func,
+    /** A focused page: where Back goes, as a link. */
+    backHref: PropTypes.string,
+    /** The accessible name of Back. */
+    backLabel: PropTypes.string,
+    /** A focused page: called when Close is pressed. With it the header row ends with a Close icon button. */
+    onClose: PropTypes.func,
+    /** The accessible name of Close. */
+    closeLabel: PropTypes.string,
     /** Sidebar content. Without it there is no Sidebar and no toggle. */
     sidebar: PropTypes.node,
     /** Sets the Sidebar's default request: true opens it, false closes it. Under 1024 it never docks. Unset opens it where it fits. */
@@ -587,8 +661,8 @@ Frame.propTypes = {
     panelPeek: PropTypes.bool,
     /** The sessionStorage key the Panel's width and open state are kept under; null keeps nothing. */
     panelStorageKey: PropTypes.string,
-    /** A List and detail layout is on the Page: the Sidebar collapses first to keep the 960 split. */
-    listDetail: PropTypes.bool,
+    /** A Section detail layout is on the Page: the Sidebar collapses first to keep the 960 split. */
+    sectionDetail: PropTypes.bool,
     /** Content cap: content 1232, reading 864 */
     width: PropTypes.oneOf(['content', 'reading']),
     /** Element for the content box. `main` by default, the Page's landmark; pass `div` when the page supplies its own `main`. */

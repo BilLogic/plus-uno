@@ -173,44 +173,44 @@ describe('chat mode', () => {
     });
 });
 
-describe('List and detail', () => {
+describe('Section detail', () => {
     it('holds the split from 960 content', () => {
-        expect(resolve({ frameWidth: 1440, listDetail: true }).splitHolds).toBe(true); // 1152
-        expect(resolve({ frameWidth: 1248, listDetail: true }).splitHolds).toBe(true); // 960
-        expect(resolve({ frameWidth: 1247, listDetail: true }).splitHolds).toBe(false); // 959
+        expect(resolve({ frameWidth: 1440, sectionDetail: true }).splitHolds).toBe(true); // 1152
+        expect(resolve({ frameWidth: 1248, sectionDetail: true }).splitHolds).toBe(true); // 960
+        expect(resolve({ frameWidth: 1247, sectionDetail: true }).splitHolds).toBe(false); // 959
     });
-    it('is off when List and detail is off', () => {
-        expect(resolve({ frameWidth: 1440, listDetail: false }).splitHolds).toBe(false);
+    it('is off when Section detail is off', () => {
+        expect(resolve({ frameWidth: 1440, sectionDetail: false }).splitHolds).toBe(false);
     });
     it('collapses the Sidebar first to keep the split when the Panel opens', () => {
         // 1440 - 400 - 48 = 992 (Sidebar docked would be 752)
-        const r = resolve({ frameWidth: 1440, chatMode: 'panel', listDetail: true });
+        const r = resolve({ frameWidth: 1440, chatMode: 'panel', sectionDetail: true });
         expect(r.sidebar).toBe('collapsed');
         expect(r.panel).toBe('docked');
         expect(r.contentWidth).toBe(992);
         expect(r.splitHolds).toBe(true);
     });
-    it('without List and detail the same frame keeps both docked', () => {
-        const r = resolve({ frameWidth: 1440, chatMode: 'panel', listDetail: false });
+    it('without Section detail the same frame keeps both docked', () => {
+        const r = resolve({ frameWidth: 1440, chatMode: 'panel', sectionDetail: false });
         expect(r.sidebar).toBe('docked');
         expect(r.panel).toBe('docked');
         expect(r.contentWidth).toBe(752);
     });
     it('does not collapse a Sidebar opened by hand: the split gives way', () => {
-        const r = resolve({ frameWidth: 1440, chatMode: 'panel', listDetail: true, sidebar: byHand });
+        const r = resolve({ frameWidth: 1440, chatMode: 'panel', sectionDetail: true, sidebar: byHand });
         expect(r.sidebar).toBe('docked');
         expect(r.panel).toBe('docked');
         expect(r.splitHolds).toBe(false);
     });
     it('gives way when even a collapsed Sidebar leaves under 960', () => {
         // 1300 - 400 - 48 = 852
-        const r = resolve({ frameWidth: 1300, chatMode: 'panel', listDetail: true });
+        const r = resolve({ frameWidth: 1300, chatMode: 'panel', sectionDetail: true });
         expect(r.panel).toBe('docked');
         expect(r.contentWidth).toBe(852);
         expect(r.splitHolds).toBe(false);
     });
     it('does not auto-collapse for the split when no Panel is docked', () => {
-        const r = resolve({ frameWidth: 1100, listDetail: true });
+        const r = resolve({ frameWidth: 1100, sectionDetail: true });
         expect(r.sidebar).toBe('docked');
         expect(r.splitHolds).toBe(false);
     });
@@ -233,7 +233,7 @@ describe('docked Panel maximum (the splitter)', () => {
     });
     it('resolves a split that holds at the maximum', () => {
         const max = dockedPanelMax({ frameWidth: 1600, sidebarDocked: false, splitHolds: true });
-        const r = resolve({ frameWidth: 1600, chatMode: 'panel', listDetail: true, panelWidth: max });
+        const r = resolve({ frameWidth: 1600, chatMode: 'panel', sectionDetail: true, panelWidth: max });
         expect(r.splitHolds).toBe(true);
     });
 });

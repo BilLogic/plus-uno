@@ -43,7 +43,7 @@
         $pressed-selector: '&:active:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected)'
     );
 
-    // The ring sits 2px inside the row's edge, so the sidebar's edge or a
+    // The ring sits one focus-ring width inside the row's edge, so the sidebar's edge or a
     // scroller never clips it.
     &:focus-visible:not(.plus-sidebar-tab--disabled) {
         outline: var(--focus-ring-width) solid var(--ds-border-focused);

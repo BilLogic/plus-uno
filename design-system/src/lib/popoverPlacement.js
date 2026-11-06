@@ -1,5 +1,5 @@
 /**
- * The Popup family's placement rule, read from its tokens: a menu, popup,
+ * The Popups pattern's placement rule, read from its tokens: a menu, popup,
  * tooltip or flag opens `--popover-offset` (4px) from its trigger and never
  * comes nearer than `--popover-gap-screen` (8px) to the screen's edge.
  * Field popups place themselves with `placePopup` (forms-and-inputs); popups

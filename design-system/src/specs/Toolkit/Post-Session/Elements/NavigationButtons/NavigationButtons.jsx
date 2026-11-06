@@ -8,7 +8,7 @@ import { useReflectionChrome } from '@/specs/Toolkit/Post-Session/reflectionChro
  * A step's actions: Previous, Cancel, Save & Exit and Next (or Submit).
  *
  * On a reflection page they go into the page footer, end-aligned with the
- * primary last, and the step's Cancel is what Back and Close in the topbar run.
+ * primary last, and the step's Cancel is what Back and Close in the Page header row run.
  * On their own they sit in a row.
  *
  * @param {object} props

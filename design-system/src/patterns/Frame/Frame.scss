@@ -1,6 +1,6 @@
 /**
- * Frame pattern (Patterns/Frame): the app frame, holding the Topbar, the
- * Sidebar and the Page. Every length is a Layout, Frame or Page token; the
+ * Frame pattern (Patterns/Frame): the app frame, holding the Sidebar, the
+ * Page and the Panel. Every length is a Layout, Frame or Page token; the
  * per-breakpoint values come from the tokens' own media queries.
  */
 
@@ -15,45 +15,10 @@
     height: 100%;
     min-height: 0;
     box-sizing: border-box;
-    // No seams: the Page runs to the window edges and meets the Sidebar at a
-    // hairline. The Topbar pads its own start, so the toggle sits 8 from the left, flush to the top
-    // whatever the Sidebar is doing.
+    // No seams: the Page runs to the window edges and meets a docked Sidebar
+    // at its 1px edge. The frame's own fill is the Sidebar's, sunken.
     background-color: var(--ds-surface-sunken);
     color: var(--ds-text);
-}
-
-/* ------------------------------------------------------------- topbar */
-
-// Full width, with an end pad and a hairline under it. The hairline is drawn
-// over the bottom edge rather than as a border, so the Topbar stays 32 high.
-.plus-frame__topbar {
-    position: relative;
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-    min-width: 0;
-    height: var(--frame-topbar-height);
-    box-sizing: border-box;
-    padding-inline-end: var(--pad-x-sm);
-
-    &::after {
-        content: '';
-        position: absolute;
-        inset-inline: 0;
-        bottom: 0;
-        height: var(--border-default);
-        background-color: var(--ds-border);
-        pointer-events: none;
-    }
-}
-
-// The Topbar's start, which holds the toggle, stays above a floating sidebar,
-// so the toggle never moves and stays pressable. The layer goes on the start
-// area, not the button: a page-reveal transform on the start makes it a
-// stacking context, and a z-index inside one would not reach the sidebar.
-.plus-frame__topbar .plus-topbar__start {
-    position: relative;
-    z-index: var(--frame-layer-topbar-start);
 }
 
 /* ------------------------------------------------------------- row */
@@ -69,43 +34,45 @@
 .plus-frame__sidebar {
     display: flex;
     flex-direction: column;
-    gap: var(--stack-sm);
     width: var(--frame-sidebar-width);
     box-sizing: border-box;
-    overflow-y: auto;
+    overflow: hidden;
+    background-color: var(--ds-surface-sunken);
 }
 
-// Docked, the sidebar ends in a divider on its right. It sits flush against the
-// page, so where increased contrast draws the page's edge, that ring lies
-// over this line rather than beside it: one line, never two.
+// Docked, the sidebar ends in a 1px line on its Page-facing edge, the same
+// `--ds-border` as the divider above its account row. Where increased
+// contrast draws the page's edge, that ring lies on the same pixel: one line,
+// never two.
 .plus-frame__sidebar--docked {
-    position: static;
+    position: relative;
+    z-index: var(--frame-layer-docked-edge);
     flex-shrink: 0;
-    padding: 0 var(--pad-x-sm);
-    border-right: var(--border-default) solid var(--ds-border);
+    // The line lies just outside the 240, over the Page's first pixel, so the
+    // Sidebar's grid keeps its columns and the Page keeps its width. The layer
+    // lifts it over the Page's fill.
+    box-shadow: var(--border-default) 0 0 0 var(--ds-border);
 }
 
-// Raised (a peek, or an overlay under 1024): over the Page, from the Topbar down, with a shadow and no Blanket.
-// The fill and shadow are the overlay role's fill/shadow pairing. It is on
-// the navigation layer (200), under popups (400) and a modal's Blanket (500); the
-// toggle (one above) and the hover edge (one below) sit either side of it.
+// Floating (a peek, or an overlay under 1024): over the Page, full height, on
+// the same sunken fill with the overlay shadow and no Blanket, so docked and
+// floating read differently. It is on the navigation layer (200), under
+// popups (400) and a modal's Blanket (500); the hover edge sits one below it.
 .plus-frame__sidebar--raised {
     position: absolute;
-    top: var(--frame-topbar-height);
+    top: 0;
     bottom: 0;
     left: 0;
     z-index: var(--frame-layer-sidebar);
-    padding: var(--pad-x-sm);
-    background-color: var(--ds-surface-overlay);
+    background-color: var(--ds-surface-sunken);
     box-shadow: var(--ds-shadow-overlay);
 }
 
-// The hover strip that peeks a closed sidebar: the frame's left edge beside the
-// page row. The topbar's corner belongs to the toggle, which peeks on its own,
-// so a pointer resting in the screen's top-left corner opens nothing.
+// The hover strip that peeks a closed sidebar: the frame's left edge, under
+// the toggle's row, so a pointer resting on the toggle opens nothing.
 .plus-frame__edge {
     position: absolute;
-    top: var(--frame-topbar-height);
+    top: calc(var(--frame-sidebar-pad) + var(--item-height-md));
     bottom: 0;
     left: 0;
     z-index: var(--frame-layer-edge);
@@ -128,11 +95,29 @@
     @include surface-edge;
 }
 
-// The top-left corner rounds only while the Sidebar is docked. The class
-// follows the same render as the width change, and nothing transitions it, so
-// the corner never shows detached from the Sidebar's edge.
-.plus-frame--sidebar-docked .plus-frame__surface {
-    border-start-start-radius: var(--page-radius);
+// The Page's header row: 32 high on the Sidebar logo row's center line, so
+// it starts the Sidebar's pad from the top rather than the Page's. While the
+// Sidebar is closed, the toggle leads it, centered on the icon column (x 32),
+// and the header follows 8 later (x 56).
+.plus-frame__head {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: var(--inline-md);
+    min-width: 0;
+    height: var(--item-height-md);
+    margin-top: calc(var(--frame-sidebar-pad) - var(--page-pad));
+    margin-bottom: var(--page-stack-sm);
+}
+
+.plus-frame__back,
+.plus-frame__close {
+    flex-shrink: 0;
+}
+
+.plus-frame__toggle {
+    flex-shrink: 0;
+    margin-inline-start: calc(var(--frame-sidebar-pad) + var(--pad-x-xs) - var(--page-pad));
 }
 
 // The 12-column content grid, capped and centered; never narrower than 720,
@@ -162,7 +147,7 @@
 
 /* ------------------------------------------------------------- panel */
 
-// The Panel area: the Frame's right-hand area, full height under the Topbar.
+// The Panel area: the Frame's right-hand area, full height.
 // The Frame paints its fill and edge by state; the Panel parts inside paint
 // neither. Its width is set inline from the resolver and the splitter.
 .plus-frame__panel {
@@ -193,12 +178,12 @@
     background-color: var(--ds-surface);
 }
 
-// Overlay and peek: over the Page from the Topbar down, with the overlay
+// Overlay and peek: over the Page, full height, with the overlay
 // role's fill and shadow. The overlay sits on its Blanket; a peek has none.
 .plus-frame__panel--overlay,
 .plus-frame__panel--peek {
     position: absolute;
-    top: var(--frame-topbar-height);
+    top: 0;
     right: 0;
     bottom: 0;
     z-index: var(--frame-layer-panel-peek);
@@ -211,21 +196,16 @@
     }
 }
 
-// The overlay Panel's Blanket: the Page and the Sidebar, never the Topbar.
+// The overlay Panel's Blanket: the shared Blanket, contained to the Frame so it
+// covers the Page and the Sidebar. The Frame only picks its layer.
 .plus-frame__blanket {
-    position: absolute;
-    top: var(--frame-topbar-height);
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: var(--frame-layer-blanket);
-    background-color: var(--ds-blanket);
+    --blanket-contained-layer: var(--frame-layer-blanket);
 }
 
 // The hover strip that peeks a closed Panel, when the peek option is on.
 .plus-frame__panel-edge {
     position: absolute;
-    top: var(--frame-topbar-height);
+    top: 0;
     right: 0;
     bottom: 0;
     z-index: var(--frame-layer-edge);

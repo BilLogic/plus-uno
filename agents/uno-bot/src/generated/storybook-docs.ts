@@ -326,10 +326,5 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/specs/Universal/Sections/Sidebar/",
     "Sidebar",
     "specs-universal-sections-sidebar--docs"
-  ],
-  [
-    "design-system/src/specs/Universal/Sections/TopBar/",
-    "TopBar",
-    "specs-universal-sections-top-bar--docs"
   ]
 ];

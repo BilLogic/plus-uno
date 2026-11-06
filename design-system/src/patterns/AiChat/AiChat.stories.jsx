@@ -1,8 +1,8 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
-import { Button, Modal, Sidebar } from '@/components';
-import { AiChat, AI_CHAT_STORAGE_KEY, PANEL_STORAGE_KEY, Topbar } from '@/patterns';
+import { Breadcrumb, Button, Modal, Sidebar } from '@/components';
+import { AiChat, AI_CHAT_STORAGE_KEY, PANEL_STORAGE_KEY } from '@/patterns';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 
@@ -24,7 +24,7 @@ const STARTERS = [
 ];
 
 const BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Dashboard' }];
-const USER = { name: 'John Doe', type: 'lead tutor' };
+const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
 
 const respond = async (text) => `You asked: "${text}". Here is what I found on this page.`;
 
@@ -33,8 +33,8 @@ const ChatPage = ({ height = '100vh', withModal = false, ...args }) => {
     return (
     <div style={{ height }}>
         <AiChat
-            topbar={<Topbar breadcrumbs={BREADCRUMBS} user={USER} />}
-            sidebar={<Sidebar user="tutor" activeTabId="home" />}
+            header={<Breadcrumb items={BREADCRUMBS} />}
+            sidebar={<Sidebar user="tutor" activeTabId="home" account={ACCOUNT} />}
             respond={respond}
             starters={STARTERS}
             {...args}

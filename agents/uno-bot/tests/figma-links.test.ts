@@ -351,8 +351,9 @@ describe("only registry components", () => {
     // went with them (-9 net). 67: SidebarTab folded into patterns/Sidebar
     // as a pattern-internal part, and its registry row went with it (-1 net).
     // 66: Dropdown was retired for DropdownMenu, which has no figmaMeta of
-    // its own yet (-1 net); Phase D backfills Figma for it.
-    assert.equal(names.length, 66);
+    // its own yet (-1 net); Phase D backfills Figma for it. 65: the Specs
+    // TopBar left when the Sidebar refresh removed the top bar (-1 net).
+    assert.equal(names.length, 65);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);

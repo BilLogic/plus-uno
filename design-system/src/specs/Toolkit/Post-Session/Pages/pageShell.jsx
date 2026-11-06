@@ -39,7 +39,7 @@ BreakpointPreview.propTypes = {
 
 /**
  * The focused Page template for a reflection step: Back, the title and Close in
- * the topbar, the step in the reading column, and the step's actions in the
+ * the header row, the step in the reading column, and the step's actions in the
  * footer. Back and Close leave the way the step's Cancel does.
  *
  * @param {object} props

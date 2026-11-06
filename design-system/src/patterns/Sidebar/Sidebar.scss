@@ -1,202 +1,536 @@
 /**
- * Sidebar pattern (Patterns/Sidebar): the header stays put and the body
- * scrolls. Mirrors the Figma `_Sidebar` and `_Sidebar section`. Every length is
- * an Item, Element or Layout token; the width is the frame's
- * (`--frame-sidebar-width`, set by the Frame).
+ * Sidebar pattern (Patterns/Sidebar). One grid holds every part: the Sidebar
+ * pads 12, so rows run from x 12 to 228; a row pads 4, its 24 icon slot sits
+ * 4 in (x 20 to 44, center 32), the label follows 4 later (x 48), and the
+ * trailing slot ends 4 before the row's end (center 208). Section titles start
+ * on x 20, the slot's left edge, and so does the logo's mark. Every length is
+ * a Frame, semantic or size token; every color is a `--ds-*` role.
  */
 
 @use '../../styles/state' as *;
+
+// The ring sits inside the row's edge, so the scrolling nav never clips it.
+@mixin sidebar-ring-inside {
+    @include plus-state((), $ring: true, $ring-offset: calc(-1 * var(--focus-ring-width)));
+
+    &:focus-visible,
+    &[data-focus-visible] {
+        outline-width: var(--focus-ring-width);
+    }
+}
+
+// How far a 24 box sits inside a 32 row, top and bottom.
+$inset-24: calc((var(--item-height-md) - var(--icon-lg)) / 2);
 
 .plus-pattern-sidebar {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
-    gap: var(--stack-sm);
     width: 100%;
     height: 100%;
     min-width: 0;
     min-height: 0;
     box-sizing: border-box;
+    padding: var(--frame-sidebar-pad);
+    color: var(--ds-text-subtle);
 }
 
-// The logo: padded 6 / 8, outside the scroller so it never moves.
-.plus-pattern-sidebar__header {
+/* ------------------------------------------------------------- logo row */
+
+// The mark fills the icon slot (x 20 to 44); the toggle ends the row on the
+// trailing column (x 192 to 224, center 208).
+.plus-pattern-sidebar__logo-row {
     display: flex;
     align-items: center;
     flex-shrink: 0;
-    gap: var(--inline-md);
-    padding: var(--pad-y-md) var(--pad-x-sm);
+    height: var(--item-height-md);
+    padding-inline-start: calc(2 * var(--pad-x-xs));
 }
 
-.plus-pattern-sidebar__body {
+.plus-pattern-sidebar__brand {
+    display: inline-flex;
+    align-items: center;
+    height: var(--item-height-md);
+    border-radius: var(--frame-sidebar-row-radius);
+    color: var(--ds-text);
+    text-decoration: none;
+    @include sidebar-ring-inside;
+}
+
+.plus-pattern-sidebar__toggle {
+    margin-inline-start: auto;
+    margin-inline-end: var(--pad-x-xs);
+}
+
+/* ------------------------------------------------------------- nav and groups */
+
+.plus-pattern-sidebar__nav {
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
-    gap: var(--stack-sm);
+    gap: var(--frame-sidebar-group-gap);
     min-height: 0;
+    margin-top: var(--stack-lg);
+    overflow-x: hidden;
     overflow-y: auto;
     overscroll-behavior: contain;
+    scrollbar-width: none;
 }
 
-.plus-pattern-sidebar__list {
+.plus-pattern-sidebar__group,
+.plus-pattern-sidebar__list,
+.plus-pattern-sidebar__tabs {
     display: flex;
     flex-direction: column;
-    gap: var(--stack-sm);
+    gap: var(--frame-sidebar-row-gap);
+}
+
+.plus-pattern-sidebar__list,
+.plus-pattern-sidebar__tabs {
     margin: 0;
     padding: 0;
     list-style: none;
 }
 
-.plus-pattern-sidebar__item {
+.plus-pattern-sidebar__tabs {
+    margin-top: var(--frame-sidebar-row-gap);
+}
+
+.plus-pattern-sidebar__item,
+.plus-pattern-sidebar__tab {
+    position: relative;
     min-width: 0;
 }
 
-.plus-pattern-sidebar__section {
+/* ------------------------------------------------------------- section titles */
+
+// A full 32 row: the title on x 20, 14 regular in the subtlest text, then the
+// collapse angle 4 after it, shown on hover and focus and turned right while
+// collapsed. Hover takes the row's hover fill and ink; pressed, the selected fill.
+.plus-pattern-sidebar__title {
     display: flex;
-    flex-direction: column;
-    gap: var(--stack-sm);
+    align-items: center;
+    gap: var(--inline-sm);
+    width: 100%;
+    height: var(--item-height-md);
+    box-sizing: border-box;
+    padding: 0 var(--pad-x-md) 0 calc(2 * var(--pad-x-xs));
+    border: 0;
+    border-radius: var(--frame-sidebar-row-radius);
+    background: none;
+    font: var(--body-default);
+    color: var(--ds-text-subtlest);
+    text-align: start;
+    white-space: nowrap;
+    cursor: pointer;
 }
 
-// 12 semibold, padded 6 / 12: a group's name, not a heading. The type style is
-// Heading/xxsmall, as Atlassian's menu section heading is; the element is not.
-.plus-pattern-sidebar__section-label {
-    padding: var(--pad-y-md) var(--pad-x-md);
+button.plus-pattern-sidebar__title {
+    @include plus-state((
+        hovered: (background-color: var(--ds-background-neutral-subtle-hovered), color: var(--ds-text)),
+        pressed: (background-color: var(--ds-background-selected), color: var(--ds-text)),
+    ), $ring: false);
+    @include sidebar-ring-inside;
+}
+
+.plus-pattern-sidebar__title-text {
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
-    white-space: nowrap;
-    font: var(--heading-xxsmall);
-    color: var(--ds-text-subtlest);
 }
 
-.plus-pattern-sidebar__divider {
+.plus-pattern-sidebar__caret {
+    display: grid;
+    place-items: center;
     flex-shrink: 0;
-    margin: var(--stack-sm) var(--pad-x-md);
-    height: var(--border-default);
-    border-radius: var(--radius-sm);
-    background-color: var(--ds-border);
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    color: inherit;
+    visibility: hidden;
+
+    i {
+        font-size: var(--icon-sm);
+        transition: transform 0.15s ease;
+    }
 }
 
-/* ------------------------------------------------------------- open tabs */
+@include plus-state(
+    (hovered: (visibility: visible)),
+    $ring: false,
+    $hovered-selector: 'button.plus-pattern-sidebar__title:hover .plus-pattern-sidebar__caret, button.plus-pattern-sidebar__title:focus-visible .plus-pattern-sidebar__caret'
+);
 
-// An item with open tabs: its row, the "Close all" hover action (the row's
-// actionsOnHover) and the chevron. The chevron is the row's sibling, never its
-// child, so the disclosure button does not nest inside the row's button.
+.plus-pattern-sidebar__title--shut .plus-pattern-sidebar__caret i {
+    transform: rotate(-90deg);
+}
+
+// Locked: read only, no hover and no pressed state. The lock always shows in
+// the caret's slot and takes focus for its message.
+.plus-pattern-sidebar__title--locked {
+    cursor: default;
+}
+
+.plus-pattern-sidebar__caret--lock {
+    visibility: visible;
+    border-radius: var(--radius-sm);
+    cursor: default;
+    @include plus-state(());
+}
+
+/* ------------------------------------------------------------- rows */
+
+.plus-pattern-sidebar__row {
+    display: flex;
+    align-items: center;
+    gap: var(--inline-sm);
+    width: 100%;
+    height: var(--item-height-md);
+    min-width: 0;
+    box-sizing: border-box;
+    padding: 0 var(--pad-x-xs);
+    border: 0;
+    border-radius: var(--frame-sidebar-row-radius);
+    background: none;
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+    text-align: start;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+
+    @include plus-state((
+        hovered: (background-color: var(--ds-background-neutral-subtle-hovered), color: var(--ds-text), text-decoration: none),
+        pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+    ), $ring: false,
+        $hovered-selector: '&:hover:not(.plus-pattern-sidebar__row--locked):not(.plus-pattern-sidebar__row--selected)',
+        $pressed-selector: '&:active:not(.plus-pattern-sidebar__row--locked):not(.plus-pattern-sidebar__row--selected)');
+    @include sidebar-ring-inside;
+}
+
+.plus-pattern-sidebar__slot {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: var(--icon-lg);
+    height: var(--icon-lg);
+    margin-inline-start: var(--pad-x-xs);
+    color: var(--ds-icon-subtle);
+
+    i {
+        font-size: var(--icon-md);
+    }
+}
+
+@include plus-state(
+    (hovered: (color: var(--ds-icon))),
+    $ring: false,
+    $hovered-selector: '.plus-pattern-sidebar__row:hover:not(.plus-pattern-sidebar__row--locked) .plus-pattern-sidebar__slot'
+);
+
+.plus-pattern-sidebar__label {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+// The trailing slot, 24 high and at least 24 wide, ending 4 before the row's
+// end, so its center is x 208. A count grows leftward.
+.plus-pattern-sidebar__end {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    min-width: var(--icon-lg);
+    height: var(--icon-lg);
+    margin-inline: auto var(--pad-x-xs);
+}
+
+.plus-pattern-sidebar__end--icon {
+    color: var(--ds-icon-subtlest);
+
+    i {
+        font-size: var(--icon-sm);
+    }
+}
+
+// The nav's count is square: corner 2, at least 24 wide. The dot stays round.
+.plus-pattern-sidebar__end .plus-count:not(.plus-count--dot) {
+    min-width: var(--icon-lg);
+    border-radius: var(--radius-sm);
+}
+
+// Selected: the selected fill, ink text and icon, and the label in the medium
+// weight, with `aria-current="page"`, so selection never rests on fill alone.
+.plus-pattern-sidebar__row--selected {
+    background-color: var(--ds-background-selected);
+    color: var(--ds-text-selected);
+
+    @include plus-state((
+        hovered: (background-color: var(--ds-background-selected-hovered)),
+        pressed: (background-color: var(--ds-background-selected-pressed)),
+    ), $ring: false);
+
+    .plus-pattern-sidebar__label {
+        font-weight: var(--type-weight-medium);
+    }
+
+    .plus-pattern-sidebar__slot {
+        color: var(--ds-icon-selected);
+    }
+}
+
+// A row whose tab is selected: ink without the fill, so only one row reads as selected.
+.plus-pattern-sidebar__row--ancestor {
+    color: var(--ds-text-selected);
+
+    .plus-pattern-sidebar__slot {
+        color: var(--ds-icon-selected);
+    }
+}
+
+// Locked: the subtlest text and icon, no hover fill, no press.
+.plus-pattern-sidebar__row--locked {
+    color: var(--ds-text-subtlest);
+    cursor: default;
+
+    .plus-pattern-sidebar__slot {
+        color: var(--ds-icon-subtlest);
+    }
+}
+
+/* ------------------------------------------------------------- rows with tabs */
+
+// On hover or focus the row's icon gives way to the collapse angle in the same
+// 24 slot (center x 32), and its trailing slot to Close all (center x 208).
+// Both are the row's siblings, so no button nests in the row.
 .plus-pattern-sidebar__parent {
     position: relative;
     display: flex;
     min-width: 0;
-
-    > .plus-sidebar-tab,
-    > .plus-sidebar-tab-item {
-        flex: 1 1 auto;
-        min-width: 0;
-    }
-
-    // Room for the chevron at rest, so the label and elemAfter stop before it.
-    .plus-sidebar-tab {
-        padding-right: calc(var(--pad-x-xs) + var(--item-height-sm) + var(--inline-sm));
-    }
-
-    // "Close all" shows left of the chevron while the pointer is anywhere on
-    // the parent (the chevron included) or anything in it has focus.
-    .plus-sidebar-tab__actions {
-        right: calc(var(--pad-x-xs) + var(--item-height-sm) + var(--inline-sm));
-    }
-
-    // The chevron, a gap, and "Close all" (a small button, under 80).
-    @include plus-state(
-        (hovered: (padding-right: calc(var(--pad-x-xs) + var(--item-height-sm) + 2 * var(--inline-sm) + var(--width-500)))),
-        $ring: false,
-        $hovered-selector: '&:hover > .plus-sidebar-tab-item > .plus-sidebar-tab, &:focus-within > .plus-sidebar-tab-item > .plus-sidebar-tab'
-    );
-
-    @include plus-state(
-        (hovered: (visibility: hidden)),
-        $ring: false,
-        $hovered-selector: '&:hover .plus-sidebar-tab__after, &:focus-within .plus-sidebar-tab__after'
-    );
-
-    @include plus-state(
-        (hovered: (visibility: visible)),
-        $ring: false,
-        $hovered-selector: '&:hover .plus-sidebar-tab__actions, &:focus-within .plus-sidebar-tab__actions'
-    );
-
-    @include plus-state(
-        (hovered: (background-color: var(--ds-background-neutral-subtle-hovered))),
-        $ring: false,
-        $hovered-selector: '&:hover > .plus-sidebar-tab-item > .plus-sidebar-tab:not(.plus-sidebar-tab--disabled):not(.plus-sidebar-tab--selected)'
-    );
 }
 
-.plus-pattern-sidebar__chevron {
+.plus-pattern-sidebar__twist,
+.plus-pattern-sidebar__close-all,
+.plus-pattern-sidebar__tab-close {
     position: absolute;
-    top: 0;
-    right: var(--pad-x-xs);
-    bottom: 0;
-    display: flex;
-    align-items: center;
+    top: $inset-24;
+    display: none;
 }
 
-// An open-tab row is two parts side by side, and neither pads the row: the
-// thread column (28: the parent's pad 12 plus its 16 icon), which holds only the
-// guide line, and the surface, a `SidebarTab` filling the rest. The surface pads
-// 8, so a tab's label lands at 36, the parent's label x (12 + 16 + 8). Every
-// state fill and the focus ring are the surface's, never the column's. The list
-// keeps the 4 row gap of every other list.
-.plus-pattern-sidebar__tabs {
-    // The same 4 gap between the parent and its first tab as between rows.
-    margin-top: var(--stack-sm);
+.plus-pattern-sidebar__twist {
+    inset-inline-start: calc(2 * var(--pad-x-xs));
 
-    &[hidden] {
-        display: none;
-    }
-
-    // The thread hangs from the parent: the first row's line runs up through
-    // the gap above it to the parent row's bottom edge.
-    > li:first-child::before {
-        top: calc(-1 * var(--stack-sm));
-    }
-
-    > li {
-        position: relative;
-        padding-left: calc(var(--pad-x-md) + var(--icon-md));
-
-        // The thread: a line under the parent icon's center (12 + 8 = 20). A
-        // middle row's runs on through the 4 gap, so the line reads unbroken.
-        // It never changes with the row's state.
-        &::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            bottom: calc(-1 * var(--stack-sm));
-            left: calc(var(--pad-x-md) + var(--icon-md) / 2);
-            box-sizing: border-box;
-            border-left: var(--stroke-1) solid var(--ds-border);
-            pointer-events: none;
-        }
-    }
-
-    // The surface: pad-x 8, radius 8 (the SidebarTab's own Element/radius-item-md).
-    .plus-sidebar-tab {
-        padding-left: var(--pad-x-sm);
-        padding-right: var(--pad-x-sm);
-    }
-
-    // The last row, "Show N more" when it shows: the line stops at the row's
-    // middle and curves (radius 6) into a stub toward the surface. The line sits
-    // half an icon (8) before the surface; a focused row's ring is 2 wide and 2
-    // out from the surface, so the stub stops two strokes (4) short of it and
-    // never runs into the ring: 8 - 4 = 4.
-    > .plus-pattern-sidebar__thread-end::before {
-        bottom: 50%;
-        width: calc(var(--icon-md) / 2 - 2 * var(--stroke-2));
-        border-bottom: var(--stroke-1) solid var(--ds-border);
-        border-bottom-left-radius: var(--radius-h24);
+    i {
+        font-size: var(--icon-sm);
+        transition: transform 0.15s ease;
     }
 }
 
-// "Show N more" reads as a control, not a record: the muted text color.
-.plus-pattern-sidebar__more .plus-sidebar-tab {
+.plus-pattern-sidebar__parent--shut .plus-pattern-sidebar__twist i {
+    transform: rotate(-90deg);
+}
+
+.plus-pattern-sidebar__close-all,
+.plus-pattern-sidebar__tab-close {
+    inset-inline-end: calc(2 * var(--pad-x-xs));
+
+    i {
+        font-size: var(--icon-sm);
+    }
+}
+
+@include plus-state(
+    (hovered: (display: inline-flex)),
+    $ring: false,
+    $hovered-selector: '.plus-pattern-sidebar__parent:hover > .plus-pattern-sidebar__twist, .plus-pattern-sidebar__parent:focus-within > .plus-pattern-sidebar__twist, .plus-pattern-sidebar__parent:hover > .plus-pattern-sidebar__close-all, .plus-pattern-sidebar__parent:focus-within > .plus-pattern-sidebar__close-all'
+);
+
+@include plus-state(
+    (hovered: (visibility: hidden)),
+    $ring: false,
+    $hovered-selector: '.plus-pattern-sidebar__parent:hover .plus-pattern-sidebar__slot > *, .plus-pattern-sidebar__parent:focus-within .plus-pattern-sidebar__slot > *, .plus-pattern-sidebar__parent:hover .plus-pattern-sidebar__end, .plus-pattern-sidebar__parent:focus-within .plus-pattern-sidebar__end'
+);
+
+@include plus-state(
+    (hovered: (background-color: var(--ds-background-neutral-subtle-hovered), color: var(--ds-text))),
+    $ring: false,
+    $hovered-selector: '.plus-pattern-sidebar__parent:hover > .plus-pattern-sidebar__row:not(.plus-pattern-sidebar__row--selected)'
+);
+
+/* ------------------------------------------------------------- open tabs */
+
+// The thread, as in the Claude desktop app: one line on the icon column
+// (x 32) through each tab's empty slot and on through the gaps, so it hangs
+// from the row above. Only the last tab turns, radius 6, into the label
+// column (ending on x 44, 4 before the label), so the thread visibly ends.
+.plus-pattern-sidebar__tab .plus-pattern-sidebar__slot {
+    position: relative;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: calc(-1 * (#{$inset-24} + var(--frame-sidebar-row-gap)));
+        bottom: calc(-1 * (#{$inset-24} + var(--frame-sidebar-row-gap)));
+        inset-inline-start: calc(var(--icon-lg) / 2 - var(--border-default) / 2);
+        width: var(--border-default);
+        background-color: var(--ds-border);
+        pointer-events: none;
+    }
+}
+
+.plus-pattern-sidebar__tab--last .plus-pattern-sidebar__slot {
+    &::before {
+        content: none;
+    }
+
+    &::after {
+        content: '';
+        position: absolute;
+        top: calc(-1 * (#{$inset-24} + var(--frame-sidebar-row-gap)));
+        height: calc(50% + #{$inset-24} + var(--frame-sidebar-row-gap));
+        inset-inline-start: calc(var(--icon-lg) / 2 - var(--border-default) / 2);
+        width: var(--icon-sm);
+        box-sizing: border-box;
+        border-inline-start: var(--border-default) solid var(--ds-border);
+        border-bottom: var(--border-default) solid var(--ds-border);
+        border-end-start-radius: var(--frame-sidebar-row-radius);
+        pointer-events: none;
+    }
+}
+
+// Close shows on hover, focus and the selected tab, on the trailing column,
+// in place of the live dot.
+@include plus-state(
+    (hovered: (display: inline-flex)),
+    $ring: false,
+    $hovered-selector: '.plus-pattern-sidebar__tab:hover > .plus-pattern-sidebar__tab-close, .plus-pattern-sidebar__tab:focus-within > .plus-pattern-sidebar__tab-close, .plus-pattern-sidebar__tab--selected > .plus-pattern-sidebar__tab-close'
+);
+
+@include plus-state(
+    (hovered: (visibility: hidden)),
+    $ring: false,
+    $hovered-selector: '.plus-pattern-sidebar__tab:hover .plus-pattern-sidebar__end, .plus-pattern-sidebar__tab:focus-within .plus-pattern-sidebar__end, .plus-pattern-sidebar__tab--selected .plus-pattern-sidebar__end'
+);
+
+// "Show n more" reads as a control, not a record.
+.plus-pattern-sidebar__tab--more .plus-pattern-sidebar__label {
     color: var(--ds-text-subtlest);
 }
+
+@include plus-state(
+    (hovered: (color: var(--ds-text))),
+    $ring: false,
+    $hovered-selector: '.plus-pattern-sidebar__tab--more .plus-pattern-sidebar__row:hover .plus-pattern-sidebar__label'
+);
+
+/* ------------------------------------------------------------- account row */
+
+// Under the one divider, full bleed. The trigger is a nav row (avatar in the
+// icon slot); Help Center sits on the trailing column, center x 208.
+.plus-sidebar-account {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: var(--frame-sidebar-row-gap);
+    margin: var(--stack-md) calc(-1 * var(--frame-sidebar-pad)) calc(-1 * var(--frame-sidebar-pad));
+    padding: var(--stack-md) var(--pad-x-lg) var(--frame-sidebar-pad) var(--frame-sidebar-pad);
+    border-top: var(--border-default) solid var(--ds-border);
+}
+
+.plus-sidebar-account__hit {
+    display: flex;
+    flex: 0 1 auto;
+    min-width: 0;
+}
+
+.plus-sidebar-account__trigger {
+    display: flex;
+    align-items: center;
+    flex: 0 1 auto;
+    gap: var(--inline-sm);
+    min-width: 0;
+    max-width: 100%;
+    height: var(--item-height-md);
+    padding: 0 var(--pad-x-sm) 0 var(--pad-x-xs);
+    border: 0;
+    border-radius: var(--frame-sidebar-row-radius);
+    background: none;
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+    text-align: start;
+    white-space: nowrap;
+    cursor: pointer;
+
+    @include plus-state((
+        hovered: (background-color: var(--ds-background-neutral-subtle-hovered), color: var(--ds-text)),
+        pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
+    ), $ring: false);
+    @include plus-state((), $ring: true);
+
+    &[aria-expanded='true'] {
+        background-color: var(--ds-background-selected);
+        color: var(--ds-text-selected);
+    }
+
+    .plus-avatar {
+        margin-inline: var(--pad-x-xs);
+    }
+}
+
+.plus-sidebar-account__who {
+    display: flex;
+    align-items: baseline;
+    gap: var(--inline-sm);
+    min-width: 0;
+    overflow: hidden;
+}
+
+.plus-sidebar-account__name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.plus-sidebar-account__role {
+    flex-shrink: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtlest);
+}
+
+.plus-sidebar-account__help {
+    flex-shrink: 0;
+    margin-inline-start: auto;
+
+    @include plus-state(
+        (pressed: (background-color: var(--ds-background-selected))),
+        $ring: false
+    );
+}
+
+.plus-sidebar-account__help-glyphs {
+    display: inline-grid;
+    place-items: center;
+
+    i {
+        grid-area: 1 / 1;
+        font-size: var(--icon-md);
+    }
+}
+
+// Help Center opens in a new tab: on hover and focus its glyph turns into the external icon.
+.plus-sidebar-account__help-go {
+    visibility: hidden;
+}
+
+@include plus-state(
+    (hovered: (visibility: visible)),
+    $ring: false,
+    $hovered-selector: '.plus-sidebar-account__help:hover .plus-sidebar-account__help-go, .plus-sidebar-account__help:focus-visible .plus-sidebar-account__help-go'
+);
+
+@include plus-state(
+    (hovered: (visibility: hidden)),
+    $ring: false,
+    $hovered-selector: '.plus-sidebar-account__help:hover .plus-sidebar-account__help-rest, .plus-sidebar-account__help:focus-visible .plus-sidebar-account__help-rest'
+);

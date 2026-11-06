@@ -36,10 +36,16 @@ export default {
             </ResponsiveFrame>
         ),
     ],
+    // The preview's `^on[A-Z]` actions rule skips an arg that is already a key, so naming
+    // these keeps an ordinary page from getting a Back or Close. Focused stories pass their own.
     args: {
         breakpoint: 'native',
+        onBack: undefined,
+        onClose: undefined,
     },
     argTypes: {
+        onBack: { control: false, table: { disable: true } },
+        onClose: { control: false, table: { disable: true } },
         breakpoint: {
             control: 'select',
             options: ['native', 'md', 'lg', 'xl'],
@@ -107,11 +113,19 @@ export const Overview = {
     parameters: {
         layout: 'fullscreen',
     },
+    // An ordinary page: no Back, no Close.
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.queryByRole('button', { name: 'Back' }), 'no Back on an ordinary page').toBeNull();
+        await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close on an ordinary page').toBeNull();
+    },
 };
 
 /**
- * The page sits in `Frame`: a 32 topbar the avatar fits in,
- * the toggle 8 from the left, flush to the top, and the sidebar docked from 1024 and closed below.
+ * The page sits in `Frame`: no top bar, the sidebar docked from 1024 with its
+ * toggle at the end of the logo row, and closed below with the toggle at the
+ * Page's top left; the breadcrumb sits in the Page's header row on the same
+ * center line.
  */
 export const Frame = {
     ...Overview,
@@ -121,22 +135,21 @@ export const Frame = {
         const check = async (width, docked) => {
             await setTestViewport(width, 900);
             const frame = canvasElement.querySelector('.plus-frame');
-            const topbar = frame.querySelector('.plus-frame__topbar');
-            const toggle = canvas.getByRole('button', { name: /sidebar/i });
-            const pad = tokenLength(frame, '--pad-x-sm');
-            await expect(topbar.getBoundingClientRect().height).toBeCloseTo(tokenLength(frame, '--frame-topbar-height'), 0);
-            await expect(toggle.getBoundingClientRect().left - frame.getBoundingClientRect().left).toBeCloseTo(pad, 0);
-            await expect(toggle.getBoundingClientRect().top - frame.getBoundingClientRect().top).toBeCloseTo(0, 0);
-            const avatar = frame.querySelector('.plus-user-avatar');
-            await expect(avatar.getBoundingClientRect().height, 'the avatar fits the topbar')
-                .toBeLessThanOrEqual(topbar.getBoundingClientRect().height + 0.5);
+            await expect(frame.querySelector('.plus-frame__topbar'), 'no top bar').toBeNull();
             await waitFor(() => expect(Boolean(sidebar()), `sidebar at ${width} (found ${sidebar()?.className})`).toBe(docked));
+            const toggle = canvas.getByRole('button', { name: docked ? 'Close sidebar' : 'Open sidebar' });
+            const t = toggle.getBoundingClientRect();
+            const f = frame.getBoundingClientRect();
+            await expect(t.left + t.width / 2 - f.left, 'the toggle column').toBeCloseTo(docked ? 208 : 32, 0);
+            await expect(t.top + t.height / 2 - f.top, 'the logo row\'s center line').toBeCloseTo(28, 0);
+            const head = frame.querySelector('.plus-frame__head').getBoundingClientRect();
+            await expect(head.top + head.height / 2 - f.top, 'the header row shares it').toBeCloseTo(28, 0);
             await expect(canvas.getByRole('main')).toBeInTheDocument();
         };
         await withTestViewport(1024, 900, async () => {
             await check(1024, true);
             await check(768, false);
-            await userEvent.click(canvas.getByRole('button', { name: /sidebar/i }));
+            await userEvent.click(canvas.getByRole('button', { name: 'Open sidebar' }));
             await waitFor(() => expect(sidebar()).toBeInTheDocument());
         });
     },
@@ -274,7 +287,7 @@ export const Interactive = {
 
 /**
  * `frame="focused"` — the page for one task: no sidebar, a Back · title · Close
- * topbar, the surface at reading width, and the actions held at the foot of the Page. The
+ * header row, the surface at reading width, and the actions held at the foot of the Page. The
  * focused stories below set the viewport first, because the layout tokens
  * switch on `@media (min-width: …)`, and read every expected length and color
  * from its token through a probe.
@@ -316,6 +329,13 @@ const FocusedNote = ({ breakpoint, body = 1, withActions = true, ...args }) => (
 
 const rect = (el) => el.getBoundingClientRect();
 
+/** The focus ring: 2px, in the focus border color. */
+const expectFocusRing = async (canvasElement, el) => {
+    const style = getComputedStyle(el);
+    await expect(parseFloat(style.outlineWidth), 'a 2px focus ring').toBeCloseTo(tokenLength(canvasElement, '--focus-ring-width'), 0);
+    await expect(style.outlineColor, 'the focus ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
+};
+
 const focusedParts = (canvasElement) => {
     const canvas = within(canvasElement);
     const layout = canvasElement.querySelector('.plus-page-layout--focused');
@@ -323,7 +343,7 @@ const focusedParts = (canvasElement) => {
         canvas,
         layout,
         frame: layout.querySelector('.plus-frame'),
-        banner: canvas.getByRole('banner'),
+        head: layout.querySelector('.plus-frame__head'),
         main: canvas.getByRole('main'),
         actionsBar: canvas.queryByRole('group', { name: 'Page actions' }),
         back: canvas.queryByRole('button', { name: 'Back' }) ?? canvas.queryByRole('link', { name: 'Back' }),
@@ -336,23 +356,25 @@ const focusedParts = (canvasElement) => {
 
 /** The focused page at one width: the Frame's own rules, no seams, no footer row, the actions over the content column. */
 const expectFocusedLayout = async (canvasElement, width) => {
-    const { layout, frame, banner, back, surface, main, actions, canvas } = focusedParts(canvasElement);
+    const { layout, frame, head, back, close, surface, main, actions, canvas } = focusedParts(canvasElement);
     const reading = tokenLength(frame, '--content-max-width-reading');
     const minimum = tokenLength(frame, '--content-min-width');
     const surfacePad = tokenLength(frame, '--page-pad');
 
-    await expect(rect(banner).height, 'topbar height').toBeCloseTo(tokenLength(frame, '--frame-topbar-height'), 0);
-    // No seams: the Frame fills the layout box to every edge and the Page meets the topbar.
+    await expect(canvasElement.querySelector('.plus-frame__topbar'), 'no top bar').toBeNull();
+    await expect(canvas.queryByRole('banner'), 'no top bar landmark').toBeNull();
+    await expect(rect(close).height, 'header row height').toBeCloseTo(tokenLength(frame, '--item-height-md'), 0);
+    // No seams: the Frame fills the layout box to every edge and the Page runs to each.
     await expect(rect(frame).top, 'no seam above').toBeCloseTo(rect(layout).top, 0);
     await expect(rect(frame).left, 'no seam at the start').toBeCloseTo(rect(layout).left, 0);
     await expect(rect(frame).right, 'no seam at the end').toBeCloseTo(rect(layout).right, 0);
     await expect(rect(frame).bottom, 'no seam below').toBeCloseTo(rect(layout).bottom, 0);
-    await expect(rect(back).left - rect(frame).left, 'Back keeps the topbar inset').toBeCloseTo(tokenLength(frame, '--pad-x-sm'), 0);
+    await expect(rect(back).left, 'Back leads the header row').toBeCloseTo(rect(head).left, 0);
+    await expect(rect(close).right, 'Close ends the header row').toBeCloseTo(rect(head).right, 0);
+    await expect(getComputedStyle(head).position, 'the header row is held at the top').toBe('sticky');
     await expect(rect(surface).left, 'the surface starts at the edge').toBeCloseTo(rect(frame).left, 0);
     await expect(rect(surface).right, 'the surface ends at the edge').toBeCloseTo(rect(frame).right, 0);
     await expect(rect(surface).bottom, 'the surface runs to the foot').toBeCloseTo(rect(frame).bottom, 0);
-    await expect(rect(surface).top - rect(banner).bottom, 'no gap under the topbar').toBeCloseTo(0, 0);
-    await expect(parseFloat(getComputedStyle(banner.parentElement, '::after').height), 'the topbar hairline stays').toBeCloseTo(tokenLength(frame, '--stroke-1'), 1);
     await expect(canvasElement.querySelector('aside'), 'no sidebar').toBeNull();
     await expect(canvas.queryByRole('contentinfo'), 'no footer row').toBeNull();
 
@@ -376,20 +398,20 @@ export const FocusedKeyboardAndLandmarks = {
     render: (args) => <FocusedNote {...args} />,
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement, args }) => {
-        const { canvas, banner, main, actionsBar, back, close, title } = focusedParts(canvasElement);
+        const { canvas, head, main, actionsBar, back, close, title } = focusedParts(canvasElement);
 
-        // One banner, one main, the actions in a named group inside it, no footer landmark; the title is the page's one h1, in the banner.
-        await expect(canvas.getAllByRole('banner')).toHaveLength(1);
+        // No top bar, one main, the actions in a named group inside it, no footer landmark; the title is the page's one h1, in the header row.
+        await expect(canvas.queryByRole('banner'), 'no top bar').toBeNull();
         await expect(canvas.getAllByRole('main')).toHaveLength(1);
         await expect(canvas.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-        await expect(banner).toContainElement(title);
+        await expect(head).toContainElement(title);
         await expect(title).toHaveTextContent(args.title);
-        await expect(banner).toContainElement(back);
-        await expect(banner).toContainElement(close);
+        await expect(head).toContainElement(back);
+        await expect(head).toContainElement(close);
         await expect(canvas.queryByRole('contentinfo'), 'no footer landmark').toBeNull();
         await expect(main).toContainElement(actionsBar);
         await expect(canvas.queryByRole('navigation', { name: 'Main' }), 'no sidebar').toBeNull();
-        await expect(canvas.queryByRole('button', { name: /sidebar/i }), 'no sidebar toggle').toBeNull();
+        await expect(canvas.queryByRole('button', { name: /(Open|Close) sidebar/ }), 'no sidebar toggle').toBeNull();
 
         // Focus order: Back first in the page, then Close, the fields, then the actions.
         const page = canvasElement.querySelector('.plus-page-layout--focused');
@@ -398,6 +420,11 @@ export const FocusedKeyboardAndLandmarks = {
         back.focus();
         await userEvent.tab();
         await expect(close).toHaveFocus();
+        await expectFocusRing(canvasElement, close);
+        await userEvent.tab({ shift: true });
+        await expect(back).toHaveFocus();
+        await expectFocusRing(canvasElement, back);
+        await userEvent.tab();
         await userEvent.tab();
         await expect(canvas.getByLabelText('Topic')).toHaveFocus();
         await userEvent.tab();
@@ -456,7 +483,7 @@ export const FocusedLongTitle = {
         await expect(title.scrollWidth, 'the title overflows and truncates').toBeGreaterThan(title.clientWidth);
         await expect(rect(close).height, 'Close keeps its 32').toBeCloseTo(tokenLength(frame, '--item-height-md'), 0);
         await expect(rect(back).height, 'Back keeps its 32').toBeCloseTo(tokenLength(frame, '--item-height-md'), 0);
-        await expect(rect(frame).right - rect(close).right, 'Close stays on screen').toBeCloseTo(tokenLength(frame, '--pad-x-sm'), 0);
+        await expect(rect(frame).right - rect(close).right, 'Close stays on screen at the Page pad').toBeCloseTo(tokenLength(frame, '--page-pad'), 0);
     }),
 };
 
@@ -474,33 +501,33 @@ export const FocusedBare = {
     },
 };
 
-/** With `backHref`, Back is an anchor to that address (Button keeps its button role). */
+/** With `backHref`, Back is an anchor to that address. */
 export const FocusedBackAsLink = {
     args: { ...focusedArgs, onBack: undefined, backHref: '#sessions' },
     render: (args) => <FocusedNote {...args} />,
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => {
-        const { back, banner } = focusedParts(canvasElement);
+        const { back, head } = focusedParts(canvasElement);
         await expect(back.tagName).toBe('A');
         await expect(back).toHaveAttribute('href', '#sessions');
-        await expect(banner).toContainElement(back);
+        await expect(head).toContainElement(back);
     },
 };
 
-/** A long body scrolls inside the surface; the topbar stays put and the actions stay at the foot of the Page. */
+/** A long body scrolls inside the surface; the header row stays put and the actions stay at the foot of the Page. */
 export const FocusedLongBody = {
     args: focusedArgs,
     render: (args) => <FocusedNote {...args} body={3} />,
     parameters: { docs: { disable: true } },
     play: async ({ canvasElement }) => withTestViewport(1024, 600, async () => {
-        const { surface, actionsBar, banner, frame } = focusedParts(canvasElement);
+        const { surface, actionsBar, head, frame } = focusedParts(canvasElement);
         await waitFor(() => expect(surface.scrollHeight, 'the body overflows').toBeGreaterThan(surface.clientHeight));
         const barTop = rect(actionsBar).top;
-        const bannerTop = rect(banner).top;
+        const headTop = rect(head).top;
         surface.scrollTop = surface.scrollHeight;
         await expect(surface.scrollTop, 'the surface scrolled').toBeGreaterThan(0);
         await expect(rect(actionsBar).top, 'the actions did not move').toBeCloseTo(barTop, 0);
-        await expect(rect(banner).top, 'the topbar did not move').toBeCloseTo(bannerTop, 0);
+        await expect(rect(head).top, 'the header row did not move').toBeCloseTo(headTop, 0);
         await expect(rect(frame).bottom - rect(actionsBar).bottom, 'the actions sit at the foot of the Page').toBeCloseTo(0, 0);
     }),
 };

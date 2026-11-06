@@ -1,7 +1,10 @@
-import React, { useId } from 'react';
+import React, { useId, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { Button, Skeleton } from '@/components';
+import { Button, IconButton, Skeleton } from '@/components';
 import { HeadingLevelContext, headingTag, useHeadingLevel } from '@/lib/headingLevel';
+import { FRAME_LAYOUT } from '../Frame/frameLayout';
+import { useSplitHolds } from '../Frame/SplitContext';
+import { useOwnWidth } from '../Frame/useOwnWidth';
 import './PatternSection.scss';
 
 /**
@@ -36,7 +39,20 @@ import './PatternSection.scss';
  *
  * FILL. A section has none by default. `fill="subtle"` sets it on the sunken
  * surface with a pad and a radius, for a section that stands apart from the
- * list beside it, such as the detail in List and detail.
+ * content beside it, such as the `detail` region.
+ *
+ * DETAIL. An optional region on the right that shows one record of the
+ * section's content, for a queue a person works through. The body is the
+ * list and takes 7 columns of the Page's grid; the detail, a subtle Section,
+ * takes 5. Next and previous sit in the detail's header, so a supervisor can
+ * work down the queue without going back to it. The split holds from 960 of
+ * the section's own width. Below that the detail replaces the list and a back
+ * link returns to it. Inside a Frame with `sectionDetail` the Frame's resolver decides,
+ * so the Sidebar collapses first to keep the 960. The caller owns the
+ * selection: `hasSelection` says a record is open, `onBack` clears it. Heavy
+ * work, such as the recording review, belongs on its own page: put "Open full
+ * review" in `detailFooter`. A section with a `detail` keeps `layout="single"`: the
+ * body is the list.
  *
  * FOOTER. Only for "View all" or paging, aligned to the end. Actions that
  * commit changes belong in a card footer, not on the section.
@@ -45,6 +61,20 @@ import './PatternSection.scss';
 export const SECTION_HEADER_TYPES = ['default', 'tabs', 'toolbar', 'custom', 'tabs-only'];
 export const SECTION_LAYOUTS = ['single', 'split', 'subsections'];
 export const SECTION_FILLS = ['none', 'subtle'];
+
+/** Section width from which the detail region sits beside the body. One number, shared with the Frame's resolver. */
+export const SECTION_DETAIL_FLOOR = FRAME_LAYOUT.splitFloor;
+
+/**
+ * Which of the two the section shows when it has a detail: both (`split`),
+ * the body alone (`list`) or the detail alone (`detail`).
+ * @param {{ splitHolds: boolean, hasSelection: boolean }} input whether the split holds (width reaches the floor) and whether a record is open
+ * @returns {'split' | 'list' | 'detail'}
+ */
+export const sectionDetailView = ({ splitHolds, hasSelection }) => {
+    if (splitHolds) return 'split';
+    return hasSelection ? 'detail' : 'list';
+};
 
 const inferType = ({ header, toolbar, tabs }) => {
     if (header) return 'custom';
@@ -168,6 +198,19 @@ const PatternSection = ({
     layout = 'single',
     side,
     footer,
+    detail,
+    detailTitle,
+    detailDescription,
+    detailFooter,
+    hasSelection = Boolean(detail),
+    onBack,
+    backLabel = 'Back to list',
+    onPrevious,
+    onNext,
+    previousDisabled = false,
+    nextDisabled = false,
+    previousLabel = 'Previous',
+    nextLabel = 'Next',
     level: rankProp,
     gap = 'md',
     fill = 'none',
@@ -248,6 +291,51 @@ const PatternSection = ({
         </>
     ) : children;
 
+    // The detail region: the body becomes the list beside it.
+    const detailRef = useRef(null);
+    const hasDetailRegion = detail !== undefined;
+    const ownWidth = useOwnWidth(detailRef, SECTION_DETAIL_FLOOR);
+    // Inside a Frame with `sectionDetail` the resolver decides, so the two never disagree.
+    const resolved = useSplitHolds();
+    const splitHolds = resolved ?? ownWidth >= SECTION_DETAIL_FLOOR;
+    const detailOpen = Boolean(detail) && hasSelection;
+    const view = sectionDetailView({ splitHolds, hasSelection: detailOpen });
+    const stepper = (onPrevious || onNext) && (
+        <>
+            <IconButton icon="chevron-up" label={previousLabel} appearance="subtle" spacing="compact" isDisabled={previousDisabled} onClick={onPrevious} />
+            <IconButton icon="chevron-down" label={nextLabel} appearance="subtle" spacing="compact" isDisabled={nextDisabled} onClick={onNext} />
+        </>
+    );
+    const withDetail = hasDetailRegion ? (
+        <div ref={detailRef} className={`plus-pattern-section-with-detail plus-pattern-section-with-detail--${view}`}>
+            {view !== 'detail' && <div className="plus-pattern-section-list">{body}</div>}
+            {detailOpen && view !== 'list' && (
+                <div className="plus-pattern-section-detail">
+                    {view === 'detail' && onBack && (
+                        <Button
+                            className="plus-pattern-section-detail-back"
+                            text={backLabel}
+                            appearance="subtle"
+                            spacing="compact"
+                            iconBefore="arrow-left"
+                            onClick={onBack}
+                        />
+                    )}
+                    <PatternSection
+                        fill="subtle"
+                        named
+                        title={detailTitle}
+                        description={detailDescription}
+                        actions={stepper || undefined}
+                        footer={detailFooter}
+                    >
+                        {detail}
+                    </PatternSection>
+                </div>
+            )}
+        </div>
+    ) : null;
+
     return (
         <section
             id={id}
@@ -260,7 +348,7 @@ const PatternSection = ({
             {hasHeader && renderHeader()}
             {/* A section with no title is a wrapper: what it holds keeps the parent's level. */}
             <HeadingLevelContext.Provider value={title ? level : parentLevel}>
-                <div className={`plus-pattern-section-content plus-pattern-section-content--${layout}`}>{body}</div>
+                <div className={`plus-pattern-section-content plus-pattern-section-content--${layout}`}>{withDetail ?? body}</div>
             </HeadingLevelContext.Provider>
             {footer && <div className="plus-pattern-section-footer">{footer}</div>}
         </section>
@@ -295,6 +383,32 @@ PatternSection.propTypes = {
     side: PropTypes.node,
     /** Footer, for "View all" or paging only; aligned to the end */
     footer: PropTypes.node,
+    /** The optional detail region on the right: one record of the content. Pass `null` for the region with nothing open; leave it off for a plain Section */
+    detail: PropTypes.node,
+    /** The detail's title; also the region's accessible name */
+    detailTitle: PropTypes.node,
+    /** Optional description under the detail title */
+    detailDescription: PropTypes.node,
+    /** Detail footer, such as "Open full review" */
+    detailFooter: PropTypes.node,
+    /** Whether a record is open. Defaults to whether `detail` is given */
+    hasSelection: PropTypes.bool,
+    /** Runs the back link. The link shows only when this is set and the detail replaces the list */
+    onBack: PropTypes.func,
+    /** The back link's label */
+    backLabel: PropTypes.string,
+    /** Runs the previous button; the stepper shows when either handler is set */
+    onPrevious: PropTypes.func,
+    /** Runs the next button */
+    onNext: PropTypes.func,
+    /** Disables the previous button, at the start of the queue */
+    previousDisabled: PropTypes.bool,
+    /** Disables the next button, at the end of the queue */
+    nextDisabled: PropTypes.bool,
+    /** The previous button's label */
+    previousLabel: PropTypes.string,
+    /** The next button's label */
+    nextLabel: PropTypes.string,
     /** `page` makes the title the page's h1 at Heading/large 24; by default it nests one level down */
     level: PropTypes.oneOf(['page']),
     /** Gap between the header, the body and the footer (Section/stack tokens); `md` is the Figma value */

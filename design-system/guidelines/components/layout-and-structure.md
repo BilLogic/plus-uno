@@ -26,7 +26,7 @@ library (Figma keeps them under Retired). Their replacements:
 | `MediaObject` | `Avatar` / `Tile` with the text layout primitives |
 | `Scrollspy` | `NavTabs` or `ProgressTracker` |
 | `NavPills` | `NavTabs` |
-| `Navbar` | the Top bar pattern (`design-system/src/patterns/Topbar`) |
+| `Navbar` | the Sidebar pattern (`design-system/src/patterns/Sidebar`), inside `Frame` |
 
 ## The choice
 

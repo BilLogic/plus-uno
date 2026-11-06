@@ -103,4 +103,5 @@
     --frame-layer-blanket: calc(var(--layer-navigation) + 2); /* the overlay Panel's Blanket */
     --frame-layer-panel-peek: calc(var(--layer-navigation) + 3); /* a peeking or overlay Panel, above its Blanket */
     --frame-layer-splitter: 1; /* local to the Panel's own stacking context, not a step on the navigation scale: the splitter's hit strip */
+    --frame-layer-docked-edge: 1; /* local to the Frame's row, not a step on the navigation scale: lifts a docked Sidebar so its 1px edge lies over the Page's first pixel */
 }

@@ -2,8 +2,8 @@ import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as PageTemplatesStories from './PageTemplates.stories.jsx';
 import {
-    FocusedTopbarDo,
-    FocusedTopbarDont,
+    FocusedHeaderDo,
+    FocusedHeaderDont,
     FocusedActionsDo,
     FocusedActionsDont,
     SlotsDo,
@@ -21,7 +21,7 @@ import { ModeFrame } from '@/storybook-docs/lib/mode-frame.jsx';
 <Meta of={PageTemplatesStories} />
 
 <Title />
-A page template is the whole page every screen starts from: the topbar, the sidebar and the page that holds the page's content. It sets the screen width, the grid and the content width once, and everything inside moves with it. The default frame is for pages people move among. The focused frame is for one task, with no sidebar.
+A template is the whole page every screen starts from: the sidebar and the page that holds the page's content, under its breadcrumb. It sets the screen width, the grid and the content width once, and everything inside moves with it. The default frame is for pages people move among. The focused frame is for one task, with no sidebar.
 
 The examples on this page follow the toolbar's Color mode and Contrast switches.
 
@@ -46,7 +46,7 @@ The examples on this page follow the toolbar's Color mode and Contrast switches.
 
 ### When to use
 
-Start every page from a page template. Pick the frame by the kind of work the page holds.
+Start every page from a template. Pick the frame by the kind of work the page holds.
 
 - **Default frame.** The person moves among pages: browse, compare, come back. It keeps the sidebar and the breadcrumb.
 - **Focused frame.** One task that takes more than a screen or a few minutes. The person finishes or leaves it, and the rest of the app would only distract. Writing a session note, setting up a session and reviewing an import are focused tasks.
@@ -59,20 +59,20 @@ Start every page from a page template. Pick the frame by the kind of work the pa
 
 ### Anatomy
 
-The default frame is `Frame`, a content slot and a topbar.
+The default frame is `Frame`, the sidebar, a content slot and the breadcrumb.
 
 <DocsTable>
     <thead>
         <tr><th>Part</th><th>What it is</th></tr>
     </thead>
     <tbody>
-        <tr><td><strong>1 Frame</strong></td><td>The frame around the page: the topbar, the sidebar and the page row. Its fill is the sunken page.</td></tr>
+        <tr><td><strong>1 Frame</strong></td><td>The frame around the page: the sidebar beside the page. Its fill is the sunken page.</td></tr>
         <tr><td><strong>2 Content</strong></td><td>A slot in the page. It holds a page-level Section header and the Sections.</td></tr>
-        <tr><td><strong>3 Topbar</strong></td><td>The 32 row across the full width. It carries the sidebar toggle, the breadcrumb, Help Center and the account.</td></tr>
+        <tr><td><strong>3 Header</strong></td><td>The page's first row, 32 high on the sidebar logo row's center line: the breadcrumb. While the sidebar is closed the toggle leads it. Help Center and the account sit in the sidebar's account row.</td></tr>
     </tbody>
 </DocsTable>
 
-The focused frame has four parts.
+The focused frame has three parts.
 
 <DocsTable>
     <thead>
@@ -80,9 +80,8 @@ The focused frame has four parts.
     </thead>
     <tbody>
         <tr><td><strong>1 Focused page</strong></td><td>The frame, on the sunken page. It pads 8 on every side and stacks its rows 8 apart.</td></tr>
-        <tr><td><strong>2 Focused topbar</strong></td><td>32 high. Back, a text button with <code>arrow-left</code>, then the title, the page's <code>h1</code> at Heading/xsmall on one line that truncates, then Close. The parts sit 12 apart.</td></tr>
-        <tr><td><strong>3 Page</strong></td><td>The page at reading width. Its content slot holds Sections, capped at 864 and centered.</td></tr>
-        <tr><td><strong>4 Focused footer</strong></td><td>The actions slot, end-aligned in the same 864 column, 8 apart, the primary action last.</td></tr>
+        <tr><td><strong>2 Page</strong></td><td>The page at reading width. Its header row is 32 high: Back, an icon button with <code>arrow-left</code>, leads; the title, the page's <code>h1</code> at Heading/xsmall on one line that truncates, follows; Close, an icon button with <code>xmark</code>, ends the row. Its content slot holds Sections, capped at 864 and centered.</td></tr>
+        <tr><td><strong>3 Focused footer</strong></td><td>The actions slot, end-aligned in the same 864 column, 8 apart, the primary action last.</td></tr>
     </tbody>
 </DocsTable>
 
@@ -100,16 +99,16 @@ The sidebar toggle stays 8 from the left, flush to the top at every width and in
 
 ### Properties
 
-In Figma, Page template has the variants `frame` (default or focused) and `content` (blank, dashboard or reading; focused has blank and reading), and the focused frame has a `footer?` boolean. The spacing and layout mode is set on the template instance.
+In Figma, Template has the variants `frame` (default or focused) and `content` (blank, dashboard or reading; focused has blank and reading), and the focused frame has a `footer?` boolean. The spacing and layout mode is set on the template instance.
 
 <DocsTable>
     <thead>
         <tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>Notes</th></tr>
     </thead>
     <tbody>
-        <tr><td><code>frame</code></td><td>enum</td><td><code>default</code> · <code>focused</code></td><td><code>default</code></td><td>The default frame has the topbar and the sidebar. The focused frame has neither toggle nor sidebar.</td></tr>
-        <tr><td><code>title</code></td><td>string</td><td>any text</td><td>none</td><td>The page <code>h1</code>. In the default frame it is visually hidden. In the focused frame it is the visible title in the topbar.</td></tr>
-        <tr><td><code>onBack</code> · <code>backHref</code></td><td>function · string</td><td>—</td><td>none</td><td>Focused. With either, the topbar shows Back. With <code>backHref</code>, Back is a link.</td></tr>
+        <tr><td><code>frame</code></td><td>enum</td><td><code>default</code> · <code>focused</code></td><td><code>default</code></td><td>The default frame has the sidebar and the breadcrumb. The focused frame has neither toggle nor sidebar.</td></tr>
+        <tr><td><code>title</code></td><td>string</td><td>any text</td><td>none</td><td>The page <code>h1</code>. In the default frame it is visually hidden. In the focused frame it is the visible title in the Page header row.</td></tr>
+        <tr><td><code>onBack</code> · <code>backHref</code></td><td>function · string</td><td>—</td><td>none</td><td>Focused. With either, the Page header row leads with Back, an icon button named Back. With <code>backHref</code>, Back is a link.</td></tr>
         <tr><td><code>backLabel</code></td><td>string</td><td>any text</td><td><code>Back</code></td><td>Focused. The Back button label.</td></tr>
         <tr><td><code>onClose</code></td><td>function</td><td>—</td><td>none</td><td>Focused. Without it there is no Close.</td></tr>
         <tr><td><code>closeLabel</code></td><td>string</td><td>any text</td><td><code>Close</code></td><td>Focused. The accessible name of the Close button.</td></tr>
@@ -117,7 +116,7 @@ In Figma, Page template has the variants `frame` (default or focused) and `conte
         <tr><td><code>actionsLabel</code></td><td>string</td><td>any text</td><td><code>Page actions</code></td><td>Focused. The accessible name of the footer.</td></tr>
         <tr><td><code>children</code></td><td>node</td><td>Sections</td><td>none</td><td>The content slot in the page.</td></tr>
         <tr><td><code>sidebarHidden</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Leaves out the sidebar and its toggle.</td></tr>
-        <tr><td><code>topBarConfig</code></td><td>object</td><td>keys <code>breadcrumbs</code>, <code>user</code>, <code>onHelpClick</code>, <code>helpHref</code></td><td><code>{'{}'}</code></td><td>Default frame. The breadcrumb and the account in the topbar, and where Help Center goes.</td></tr>
+        <tr><td><code>topBarConfig</code></td><td>object</td><td>keys <code>breadcrumbs</code>, <code>user</code>, <code>helpHref</code></td><td><code>{'{}'}</code></td><td>Default frame. The breadcrumb in the page's header row, the account in the sidebar's account row, and where Help Center goes.</td></tr>
         <tr><td><code>sidebarConfig</code></td><td>object</td><td>keys <code>user</code>, <code>activeTabId</code> (or <code>activeTab</code>); the rest go to the sidebar</td><td><code>{'{}'}</code></td><td>Default frame. The user type and the active tab in the sidebar.</td></tr>
         <tr><td><code>drawer</code></td><td>object</td><td>the props of the Drawer: <code>open</code>, <code>title</code>, <code>description</code>, <code>width</code>, <code>placement</code>, <code>footer</code>, <code>onClose</code>, <code>children</code></td><td>none</td><td>Draws the Drawer over the page. Without it there is no drawer. This is Figma's <code>drawer?</code>. The page holds the open state and passes it as <code>open</code>.</td></tr>
     </tbody>
@@ -134,8 +133,8 @@ In Figma, Page template has the variants `frame` (default or focused) and `conte
         <tr><td><code>floatingContent</code></td><td>node</td><td>a floating control</td><td>none</td><td>Anchored to the page's lower end corner, over the content.</td></tr>
         <tr><td><code>mainClassName</code></td><td>string</td><td>a class name</td><td>none</td><td>Added to the page's content element.</td></tr>
         <tr><td><code>contentDirect</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Puts the children straight in the page with no content grid, for a full-width page such as chat.</td></tr>
-        <tr><td><code>shellLoading</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Shows the topbar as skeletons and holds the sidebar's entrance.</td></tr>
-        <tr><td><code>shellEntered</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Plays the entrance animation on the topbar and the sidebar.</td></tr>
+        <tr><td><code>shellLoading</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Shows the breadcrumb as a skeleton and holds the sidebar's entrance.</td></tr>
+        <tr><td><code>shellEntered</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Plays the entrance animation on the header and the sidebar.</td></tr>
         <tr><td><code>sidebarExpanded</code></td><td>boolean</td><td><code>true</code> · <code>false</code></td><td><code>false</code></td><td>Opens the sidebar by default, for demos. Under 1024 it still never docks.</td></tr>
         <tr><td><code>id</code> · <code>className</code> · <code>style</code></td><td>string · string · object</td><td>—</td><td>none</td><td>Set on the page's outer element.</td></tr>
     </tbody>
@@ -156,7 +155,7 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
         <tr><th>Token</th><th>Medium</th><th>Large</th><th>X-Large</th><th>Purpose</th></tr>
     </thead>
     <tbody>
-        <tr><td><code>--screen-width</code></td><td>768</td><td>1024</td><td>1440</td><td>The width of the page template frame.</td></tr>
+        <tr><td><code>--screen-width</code></td><td>768</td><td>1024</td><td>1440</td><td>The width of the template frame.</td></tr>
         <tr><td><code>--screen-pad-x</code></td><td>24</td><td>24</td><td>32</td><td>Pads the screen grid on Blanket, not the page grid.</td></tr>
         <tr><td><code>--screen-min-width</code></td><td>768</td><td>1024</td><td>1440</td><td>The narrowest the frame goes within the mode.</td></tr>
         <tr><td><code>--screen-max-width</code></td><td>1023</td><td>1439</td><td>none</td><td>The widest the frame goes within the mode. X-Large has no limit.</td></tr>
@@ -186,7 +185,7 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
     <tbody>
         <tr><td><code>--content-max-width</code></td><td>1232</td><td>1232</td><td>1232</td><td>The content cap.</td></tr>
         <tr><td><code>--content-max-width-reading</code></td><td>864</td><td>864</td><td>864</td><td>The reading cap.</td></tr>
-        <tr><td><code>--content-min-width</code></td><td>720</td><td>720</td><td>720</td><td>Narrower than this, the page scrolls sideways and the topbar stays.</td></tr>
+        <tr><td><code>--content-min-width</code></td><td>720</td><td>720</td><td>720</td><td>Narrower than this, the page scrolls sideways.</td></tr>
         <tr><td><code>--content-width</code></td><td>720</td><td>736</td><td>1152</td><td>The content width at 768, 1024 and 1440. It reaches 1232 from a 1520 screen.</td></tr>
     </tbody>
 </DocsTable>
@@ -198,7 +197,6 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
         <tr><th>Token</th><th>Value</th><th>Purpose</th></tr>
     </thead>
     <tbody>
-        <tr><td><code>--frame-topbar-height</code></td><td>32</td><td>The topbar row.</td></tr>
         <tr><td><code>--frame-sidebar-width</code></td><td>240</td><td>The sidebar, docked from 1024.</td></tr>
         <tr><td><code>--page-pad</code></td><td>24</td><td>The page pad at every width. The grid margin is the same token.</td></tr>
         <tr><td><code>--page-radius</code></td><td>8</td><td>The page's top-left corner, only while the sidebar is docked.</td></tr>
@@ -214,7 +212,6 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
     <tbody>
                 <tr><td><code>--focused-page-stack-sm</code></td><td>8</td><td>Above and below the actions at the foot of the Page.</td></tr>
         <tr><td><code>--focused-page-stack-md</code> · <code>--focused-page-stack-lg</code></td><td>16 · 24</td><td>Larger gaps between the rows.</td></tr>
-        <tr><td><code>--focused-page-inline-md</code></td><td>12</td><td>Between Back, the title and Close.</td></tr>
         <tr><td><code>--focused-page-inline-sm</code></td><td>8</td><td>Between the actions.</td></tr>
         <tr><td><code>--content-max-width-reading</code> · <code>--content-min-width</code></td><td>864 · 720</td><td>The content column and the actions column.</td></tr>
         <tr><td><code>--ds-page-sunken</code> · <code>--ds-page</code> · <code>--ds-text</code></td><td>color</td><td>The frame, the page and the title. They follow Light, Dark and increased contrast.</td></tr>
@@ -230,15 +227,15 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
 The default frame comes with three contents. **Blank** is one empty slot. **Dashboard** is a page header, metric cards and Sections. **Reading** caps the page at 864 for long-form text. Each is shown at Large, 1024.
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>content=blank</strong>. Keep the slot wrapper and replace what is inside it with Sections.</>}>
-    <ModeFrame storyId="patterns-templates--blank" width={1024} height={560} title="Blank page template at 1024" />
+    <ModeFrame storyId="patterns-templates--blank" width={1024} height={560} title="Blank template at 1024" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>content=dashboard</strong>. Cards reflow to the most per row that keeps their minimum width.</>}>
-    <ModeFrame storyId="patterns-templates--dashboard" width={1024} height={560} title="Dashboard page template at 1024" />
+    <ModeFrame storyId="patterns-templates--dashboard" width={1024} height={560} title="Dashboard template at 1024" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>content=reading</strong>. The content is capped at <code>--content-max-width-reading</code> 864 and centered.</>}>
-    <ModeFrame storyId="patterns-templates--reading" width={1024} height={560} title="Reading page template at 1024" />
+    <ModeFrame storyId="patterns-templates--reading" width={1024} height={560} title="Reading template at 1024" />
 </DocsCanvasShell>
 
 </div>
@@ -250,15 +247,15 @@ The default frame comes with three contents. **Blank** is one empty slot. **Dash
 The mode is set once, on the template. The frame width follows it through `--screen-width`, and everything inside moves with it. The sidebar docks from Large, the page pad stays 24 at every width, and the content lands at 720, 736 and 1152.
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>Medium, 768.</strong> The sidebar is closed and the content is 720. Two medium cards fit in a row.</>}>
-    <ModeFrame storyId="patterns-templates--dashboard" width={768} height={560} title="Dashboard page template at 768" />
+    <ModeFrame storyId="patterns-templates--dashboard" width={768} height={560} title="Dashboard template at 768" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>Large, 1024.</strong> The sidebar docks and the content is 736.</>}>
-    <ModeFrame storyId="patterns-templates--dashboard" width={1024} height={560} title="Dashboard page template at 1024" />
+    <ModeFrame storyId="patterns-templates--dashboard" width={1024} height={560} title="Dashboard template at 1024" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>X-Large, 1440.</strong> The page pad is 24 and the content is 1152.</>}>
-    <ModeFrame storyId="patterns-templates--dashboard" width={1440} height={640} title="Dashboard page template at 1440" />
+    <ModeFrame storyId="patterns-templates--dashboard" width={1440} height={640} title="Dashboard template at 1440" />
 </DocsCanvasShell>
 
 #### Sidebar over the page
@@ -275,7 +272,7 @@ Below 1024 the sidebar is closed. Hovering the menu control, or the left edge of
 
 ### Focused page
 
-The focused frame is the page for one task. It has no sidebar toggle, breadcrumb, Help Center or account. The topbar has Back and Close and the task's name, the sections sit in the 864 reading column, and the actions sit in a footer row.
+The focused frame is the page for one task. It has no sidebar toggle, breadcrumb, Help Center or account. The Page header row has Back, the task's name and Close, the sections sit in the 864 reading column, and the actions sit in a footer row.
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>frame=focused, Medium, 768.</strong> The reading column is the page less its pads, 720, and the actions line up with it.</>}>
     <ModeFrame storyId="patterns-templates--focused" width={768} height={640} title="Focused page at 768" />
@@ -306,10 +303,10 @@ Rules for the focused frame:
 
 ### With a drawer
 
-A drawer opens over the page template. The blanket covers the whole frame, the drawer runs the full height at the end edge, and its width is a modal width step. Escape, the close button or a click on the blanket closes it and returns focus to what opened it. The page stays where it was.
+A drawer opens over the template. The blanket covers the whole frame, the drawer runs the full height at the end edge, and its width is a modal width step. Escape, the close button or a click on the blanket closes it and returns focus to what opened it. The page stays where it was.
 
 <DocsCanvasShell attachSourceBelow={false} description={<>A <code>md</code> drawer over the dashboard at 1024: 677 wide. The page opens it from a button and holds its open state, passing it to the template's <code>drawer</code> prop.</>}>
-    <ModeFrame storyId="patterns-templates--with-drawer" width={1024} height={560} title="Page template with a drawer at 1024" />
+    <ModeFrame storyId="patterns-templates--with-drawer" width={1024} height={560} title="Template with a drawer at 1024" />
 </DocsCanvasShell>
 
 </div>
@@ -318,12 +315,12 @@ A drawer opens over the page template. The blanket covers the whole frame, the d
 
 ### Usage
 
-- **Two rows.** The topbar runs across the full width, 32 high with no padding of its own. Under it, the sidebar and the page meet with no gap.
+- **No top bar.** The sidebar and the page run the full height and meet at the sidebar's 1px edge.
 - **No seams.** The page runs to the window edges. There is no frame pad around it.
 - **Sidebar.** 240 wide, from the screen edge to the page. It docks from 1024.
 - **Page pad.** 24 at every width. The grid margin is the same token.
 - **Content cap.** 1232. With the sidebar docked it binds from a 1520 screen, and past that the margins grow.
-- **Content minimum.** 720. Narrower, the page scrolls sideways and the topbar stays.
+- **Content minimum.** 720. Narrower, the page scrolls sideways.
 - **Set the mode on the template, never inside it.** Sections, Cards and Tables inherit the mode and never carry one of their own.
 
 #### Slots, not variants
@@ -332,13 +329,13 @@ A slot is a region left open for real content. The pattern owns the layout, the 
 
 - **Keep the slot wrapper** and replace the placeholder inside it. A slot is a place for content, not a placeholder to delete.
 - **Slots, not variants.** If a layout is duplicated to handle a variation, that layout needs a slot.
-- **Slots live in** Card (header, body, footer), Modal (body, footer), Section (content, side, actions, tabs) and the page templates (the page). A table is never a slot shell.
+- **Slots live in** Card (header, body, footer), Modal (body, footer), Section (content, side, actions, tabs) and the Templates (the page). A table is never a slot shell.
 
 #### Build a real page
 
 A page is built from the top down out of patterns. A Sessions page is built on Page, holding a page header, a row of metric cards and a table under a header with tabs.
 
-1. **Frame.** The topbar, the sidebar and the content box around the page. The template sets the layout mode once for everything inside.
+1. **Frame.** The sidebar and the content box around the page. The template sets the layout mode once for everything inside.
 2. **Section header, level page.** The page title, description and page-level actions. One per page.
 3. **Card, size sm.** Metric tiles. A card shows one piece of information, with the header turned off when the body carries its own title.
 4. **Section header, tabs type.** The tabs are the header's bottom row. They replace a separate tab group above the table.
@@ -359,10 +356,10 @@ A page is built from the top down out of patterns. A Sessions page is built on P
             dontCaption: 'Don’t rebuild a card by hand with 24 of extra space added to the chrome. It drifts from the pattern and misses later fixes.',
         },
         {
-            doExample: <FocusedTopbarDo />,
+            doExample: <FocusedHeaderDo />,
             doCaption: 'Give the task Back and Close and its name. Nothing else competes with the task.',
-            dontExample: <FocusedTopbarDont />,
-            dontCaption: 'Don’t bring the app topbar to a focused page. A sidebar toggle and a breadcrumb invite the person away mid-task.',
+            dontExample: <FocusedHeaderDont />,
+            dontCaption: 'Don’t bring the app frame to a focused page. A sidebar toggle and a breadcrumb invite the person away mid-task.',
         },
         {
             doExample: <FocusedActionsDo />,
@@ -379,10 +376,10 @@ A page is built from the top down out of patterns. A Sessions page is built on P
 
 ### Accessibility
 
-- **Landmarks.** The topbar is the banner, the page is the one `main`, and the focused footer is a named footer (`Page actions`).
-- **One page title.** The page has one `h1`. In the default frame it is visually hidden and the breadcrumb shows the place. In the focused frame it is the visible title in the topbar.
+- **Landmarks.** The sidebar's `nav` is the navigation, the page is the one `main`, and the focused footer is a named footer (`Page actions`).
+- **One page title.** The page has one `h1`. In the default frame it is visually hidden and the breadcrumb shows the place. In the focused frame it is the visible title in the Page header row.
 - **Focus order.** In the focused frame it is Back, Close, the content, then the actions. In the default frame the sidebar toggle comes first, then the page.
-- **Names.** Back and Close are buttons with names, and Close keeps its name when the title truncates. Name the Close button for the task, such as "Close note".
+- **Names.** Back and Close are buttons with names, and Close keeps its name when the title truncates. They are icon buttons named Back and Close.
 - **Sidebar.** The toggle reports whether the sidebar is open. Hover is never the only way in: the toggle opens and docks it from the keyboard, and Escape closes a floating sidebar.
 - **Drawer.** It is a dialog named by its title. It moves focus inside, keeps Tab there and returns focus to its trigger.
 - **Color.** The frame, the page and the title use color roles, so they hold their contrast in Light, Dark and increased contrast.
@@ -409,7 +406,7 @@ A page is built from the top down out of patterns. A Sessions page is built on P
 
 ### For developers
 
-The page template is `PageLayout`, which fills `Frame` with the PLUS topbar and sidebar. `frame="focused"` fills it with the focused topbar, the reading page and the footer. There is no mode prop in code: the layout tokens switch on the viewport width, so the screen picks the mode. A page that needs the reading cap in the default frame composes `Frame` with `width="reading"`. Figma's `drawer?` toggle is the `drawer` prop: pass it the props of `PatternDrawer` and the template renders the Drawer over the page. The page holds the open state and passes it as `open`.
+The template is `PageLayout`, which fills `Frame` with the PLUS sidebar and the breadcrumb. `frame="focused"` fills it with the reading page, whose header row carries Back and Close, and the footer. There is no mode prop in code: the layout tokens switch on the viewport width, so the screen picks the mode. A page that needs the reading cap in the default frame composes `Frame` with `width="reading"`. Figma's `drawer?` toggle is the `drawer` prop: pass it the props of `PatternDrawer` and the template renders the Drawer over the page. The page holds the open state and passes it as `open`.
 
 </div>
 

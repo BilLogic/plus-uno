@@ -10,12 +10,12 @@ summary: If you are building a full page (like a dashboard, student list, or too
 
 ## The standard app shell
 
-If you are building a full page (like a dashboard, student list, or toolkit), you MUST wrap the entire page in the `<PageLayout>` component. This automatically handles the responsive Sidebar and TopBar (§ The frame).
+If you are building a full page (like a dashboard, student list, or toolkit), you MUST wrap the entire page in the `<PageLayout>` component. This automatically handles the responsive Sidebar and the breadcrumb row (§ The frame).
 
 ```jsx
 import React from 'react';
 import { PageLayout } from '@/specs/Universal/Pages';
-// Note: TopBar and Sidebar are auto-imported inside PageLayout, you just pass configs.
+// Note: the Sidebar and the breadcrumb are drawn inside PageLayout, you just pass configs.
 
 export default function MyDashboard() {
     return (
@@ -39,7 +39,7 @@ export default function MyDashboard() {
 }
 ```
 
-For a page that holds one task the person finishes or leaves (a session note, a setup flow), pass `frame="focused"`: no sidebar, Back · title · Close in the topbar, the 864 reading column, and `actions` held at the foot of the Page. It has the Frame's seamless edges, with no pad, no gap under the topbar and no footer row. The props and when to use it versus a Modal are in `PageLayout.mdx` § Focused frame.
+For a page that holds one task the person finishes or leaves (a session note, a setup flow), pass `frame="focused"`: no sidebar, Back · title · Close in the Page header row, the 864 reading column, and `actions` held at the foot of the Page. It has the Frame's seamless edges, with no pad, no top bar and no footer row. The props and when to use it versus a Modal are in `PageLayout.mdx` § Focused frame.
 
 ## The standard overlay
 
@@ -97,9 +97,9 @@ navigation through it, so there is one navigation surface.
 Figma `Pattern/Surface container`), which owns every frame size and the sidebar's
 behavior:
 
-- **Topbar** — the `Topbar` pattern (`@/patterns`), full width, 32 high (`--frame-topbar-height`), padded at its end and closed by a hairline: the sidebar toggle, the breadcrumb, Help Center and the account. The toggle sits 8 from the left, flush to the top at every width and shows `angles-left` while the sidebar is open, `bars` while it is closed. Docked, the breadcrumb lines up with the Page.
-- **Sidebar** — 240 (`--frame-sidebar-width`), docked from 1024. Below 1024 it never docks and starts collapsed: hovering the toggle or the left edge peeks it over the page (shadow, no Blanket, the page does not move), an outside click or Escape closes the peek, and a click on the toggle (or Ctrl+[) opens it as an overlay that closes the same way. The Page's top-left corner is rounded (`--page-radius`) only while the Sidebar is docked.
-- **Panel** — the area at the right, under the Topbar, holding AI chat first: 320 · 400 (default) · 640 (`--panel-min-width`, `--panel-width-default`, `--panel-max-width`). Docked it sits beside the Page and moves it; overlay it opens over the Page on a Blanket that covers the Page and the Sidebar but not the Topbar, and an outside click or Escape closes it. Overlay, it is modal: focus moves in, the Page and the Sidebar under the Blanket are inert, and closing it returns focus to what opened it; docked, it leaves focus alone. Its splitter resizes it, resists at the limit and never collapses the Sidebar. Open it from anywhere in the Frame with `usePanelControl()`. A Modal leaves it open under its Blanket.
+- **No top bar.** The Sidebar and the Page run the full height. The Page's header row (Frame's `header`, the breadcrumb) sits 32 high on the Sidebar logo row's center line.
+- **Sidebar** — 240 (`--frame-sidebar-width`), docked from 1024 with a 1px `--ds-border` on its Page-facing edge; its logo row ends in the toggle (`angles-left`), and the account row and Help Center sit at its foot. Closed, the toggle (`bars`) sits at the Page's top left on x 32 and the breadcrumb follows from x 56. Below 1024 it never docks and starts collapsed: hovering the left edge peeks it over the page (overlay shadow, no Blanket, the page does not move), an outside click or Escape closes the peek, and the toggle (or Ctrl+[) opens it as an overlay that closes the same way. The Page is flush, with no corner radius.
+- **Panel** — the area at the right, full height, holding AI chat first: 320 · 400 (default) · 640 (`--panel-min-width`, `--panel-width-default`, `--panel-max-width`). Docked it sits beside the Page and moves it; overlay it opens over the Page on a Blanket that covers the Page and the Sidebar, and an outside click or Escape closes it. Overlay, it is modal: focus moves in, the Page and the Sidebar under the Blanket are inert, and closing it returns focus to what opened it; docked, it leaves focus alone. Its splitter resizes it, resists at the limit and never collapses the Sidebar. Open it from anywhere in the Frame with `usePanelControl()`. A Modal leaves it open under its Blanket.
 - **Page** — pads `--page-pad` (24 at every width).
 - **Content** — a 12-column grid with gutter `--grid-gutter` 16, capped at 1232 (`--content-max-width`) and centered on wide screens, never under 720 (`--content-min-width`): narrower, the page scrolls sideways. A child spans all 12 columns; give it `grid-column: span N` to span fewer, in whole columns.
 
@@ -112,11 +112,11 @@ The content never drops under 720, so the Frame, not the page, decides what dock
 3. If both fit with 720 of content, both dock. With a 400 Panel that is from 1408.
 4. Otherwise a Sidebar left open by default collapses, and returns when the Panel closes. With a 400 Panel the Panel docks alone from 1168.
 5. Otherwise the Panel opens as an overlay.
-6. A List and detail layout keeps its split from 960 of content, met by collapsing the Sidebar first.
+6. A Section with a detail region keeps its split from 960 of content, met by collapsing the Sidebar first.
 
-## List and detail
+## Section detail
 
-For a queue a person works through (Admin › Compliance, Admin › Reflections), use `ListDetail` (`@/patterns`): the list takes 7 columns and the detail, a Section with a subtle fill, takes 5, with next and previous in its header. Pass `listDetail` to the Frame so opening the Panel collapses the Sidebar first and the split keeps 960 of content. Below 960 the detail replaces the list under a back link. Heavy work, such as the recording review, gets its own page: "Open full review" in the detail's footer.
+For a queue a person works through (Admin › Compliance, Admin › Reflections), give the Section a `detail` (`PatternSection`, `@/patterns`): the body is the list and takes 7 columns, the detail region, a subtle-fill Section, takes 5, with next and previous in its header. Pass `sectionDetail` to the Frame so opening the Panel collapses the Sidebar first and the split keeps 960 of content. Below 960 the detail replaces the list under a back link. Heavy work, such as the recording review, gets its own page: "Open full review" in the detail's footer.
 
 Column spans and breakpoint tokens: `../foundations/grid.md`.
 

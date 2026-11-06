@@ -2,7 +2,7 @@ import { createContext, useContext } from 'react';
 
 /**
  * The Panel state a Frame hands everything inside it, so whatever opens the
- * Panel (a button on the Page, a control in the Topbar, the Panel's own Close)
+ * Panel (a button on the Page, a control in the Sidebar, the Panel's own Close)
  * reads and sets one state.
  *
  * - `open`: whether the Panel is open (docked or overlay).

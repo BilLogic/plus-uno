@@ -2,15 +2,15 @@ import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button, TextField, TextArea } from '@/components';
-import { Frame, PatternCard, PatternSection, Topbar } from '@/patterns';
+import { PatternCard, PatternSection } from '@/patterns';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
+import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
 /**
- * Page templates: the page every screen starts from. The frame (a 32 topbar, a
- * 240 sidebar docked from 1024, the surface on a 12-column grid) with content
+ * Templates: the page every screen starts from. The frame (a 240
+ * sidebar docked from 1024, the Page on a 12-column grid under its breadcrumb) with content
  * in the surface. The stories here are the examples the docs page shows, each
  * built from `PageLayout`, `Frame`, `PatternSection` and `PatternCard`.
  */
@@ -89,16 +89,19 @@ export default {
     component: PageLayout,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },
+    // The preview's `^on[A-Z]` actions rule skips an arg that is already a key, so naming
+    // these keeps an ordinary page from getting a Back or Close. Focused stories pass their own.
+    args: { onBack: undefined, onClose: undefined },
     argTypes: {
         frame: {
             control: 'select',
             options: ['default', 'focused'],
-            description: 'default: the app frame with the topbar and the sidebar. focused: one task, with no sidebar.',
+            description: 'default: the app frame with the sidebar and the breadcrumb. focused: one task, with no sidebar.',
             table: { category: 'Design', defaultValue: { summary: 'default' } },
         },
         title: {
             control: 'text',
-            description: 'The page title. In a focused page it is the visible title in the topbar.',
+            description: 'The page title. In a focused page it is the visible title in the Page header row.',
             table: { category: 'Slots' },
         },
         backLabel: {
@@ -119,8 +122,8 @@ export default {
         drawer: { table: { disable: true } },
         children: { table: { disable: true } },
         actions: { table: { disable: true } },
-        onBack: { table: { disable: true } },
-        onClose: { table: { disable: true } },
+        onBack: { control: false, table: { disable: true } },
+        onClose: { control: false, table: { disable: true } },
         backHref: { table: { disable: true } },
         actionsLabel: { table: { disable: true } },
         sidebarConfig: { table: { disable: true } },
@@ -143,6 +146,12 @@ export default {
 /** content=dashboard: a page header, metric cards that reflow, and a section. */
 export const Dashboard = {
     render: () => fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>),
+    // An ordinary page: no Back, no Close.
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.queryByRole('button', { name: 'Back' }), 'no Back on an ordinary page').toBeNull();
+        await expect(canvas.queryByRole('button', { name: 'Close' }), 'no Close on an ordinary page').toBeNull();
+    },
 };
 
 /** content=blank: the template with one empty slot. */
@@ -155,24 +164,24 @@ export const Blank = {
 /** content=reading: the surface capped at 864. */
 export const Reading = {
     render: () => fullHeight(
-        <InAppFrame breadcrumbs={BREADCRUMBS} user={USER} width="reading"><ReadingContent /></InAppFrame>,
+        <InAppFrame breadcrumbs={BREADCRUMBS} width="reading"><ReadingContent /></InAppFrame>,
     ),
 };
 
-/** 768: the sidebar is closed, and the menu control is hovered, so it floats over the page. */
+/** 768: the sidebar is closed, and the frame's left edge is hovered, so it floats over the page. */
 export const SidebarOverPage = {
     render: () => fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const peek = async () => {
-            const toggle = await canvas.findByRole('button', { name: /sidebar/i });
-            // A pointer entering the toggle, as the page's reader would; React reads it from `pointerover`.
+            await canvas.findByRole('button', { name: 'Open sidebar' });
+            // A pointer entering the frame's left edge, as the page's reader would; React reads it from `pointerover`.
             // It is sent again until the frame has taken it, because the frame settles its width after the first paint.
             await waitFor(() => {
-                toggle.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
+                canvasElement.querySelector('.plus-frame__edge')
+                    ?.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
                 expect(canvas.queryByRole('navigation', { name: 'Main' })).not.toBeNull();
             }, { timeout: 4000 });
-            return toggle;
         };
         if (window.innerWidth < 1024) {
             await peek();
@@ -214,7 +223,7 @@ const NoteActions = () => (
     </>
 );
 
-/** frame="focused": Back, the title and Close in the topbar, the sections at reading width, the actions in a footer. */
+/** frame="focused": Back, the title and Close in the Page header row, the sections at reading width, the actions in a footer. */
 export const Focused = {
     args: { title: 'Add a session note', onBack: fn(), onClose: fn() },
     render: (args) => fullHeight(
@@ -222,6 +231,40 @@ export const Focused = {
             <NoteForm />
         </PageLayout>,
     ),
+    play: async ({ canvasElement, args }) => {
+        const canvas = within(canvasElement);
+        const head = canvasElement.querySelector('.plus-frame__head');
+        await expect(canvas.queryByRole('banner'), 'no top bar').toBeNull();
+        const back = canvas.getByRole('button', { name: 'Back' });
+        const close = canvas.getByRole('button', { name: 'Close' });
+        const title = canvas.getByRole('heading', { level: 1 });
+        // Back left of the title, Close at the right end, all in the Page header row.
+        await expect(head).toContainElement(back);
+        await expect(head).toContainElement(title);
+        await expect(head).toContainElement(close);
+        await expect(back.getBoundingClientRect().right, 'Back is left of the title').toBeLessThanOrEqual(title.getBoundingClientRect().left + 1);
+        await expect(close.getBoundingClientRect().left, 'Close is right of the title').toBeGreaterThanOrEqual(title.getBoundingClientRect().left);
+        await expect(close.getBoundingClientRect().right, 'Close ends the row').toBeCloseTo(head.getBoundingClientRect().right, 0);
+        await expect(back.querySelector('.fa-arrow-left')).not.toBeNull();
+        await expect(close.querySelector('.fa-xmark')).not.toBeNull();
+        // Keyboard: both take focus with the ring, and fire their callbacks.
+        await userEvent.tab();
+        await expect(back).toHaveFocus();
+        await userEvent.tab();
+        await expect(close).toHaveFocus();
+        for (const el of [back, close]) {
+            el.focus();
+            const style = getComputedStyle(el);
+            await expect(parseFloat(style.outlineWidth), 'a 2px focus ring').toBeCloseTo(tokenLength(canvasElement, '--focus-ring-width'), 0);
+            await expect(style.outlineColor, 'the focus ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        }
+        back.focus();
+        await userEvent.keyboard('{Enter}');
+        await expect(args.onBack).toHaveBeenCalledTimes(1);
+        close.focus();
+        await userEvent.keyboard(' ');
+        await expect(args.onClose).toHaveBeenCalledTimes(1);
+    },
 };
 
 /** A read-only task drops the footer; with no way back, Close alone leaves the task. */

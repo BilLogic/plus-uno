@@ -6,7 +6,7 @@ import { createContext, useContext } from 'react';
  * - `stepMenu`: the step menu, for the side column of the step's Section.
  * - `footerEl`: the page footer's slot; the step's actions are portaled into it.
  * - `registerCancel`: where a step hands over its Cancel, so Back and Close in
- *   the topbar leave the same way Cancel does.
+ *   the header row leave the same way Cancel does.
  *
  * Outside a page (a step on its own) all three are empty: the step draws its
  * Section without a side column and its actions inline.

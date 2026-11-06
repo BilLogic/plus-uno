@@ -308,6 +308,34 @@
           }
         },
         {
+          "name": "Frame/sidebar-pad",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--frame-sidebar-pad)"
+          }
+        },
+        {
+          "name": "Frame/sidebar-row-gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--frame-sidebar-row-gap)"
+          }
+        },
+        {
+          "name": "Frame/sidebar-group-gap",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--frame-sidebar-group-gap)"
+          }
+        },
+        {
+          "name": "Frame/sidebar-row-radius",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--frame-sidebar-row-radius)"
+          }
+        },
+        {
           "name": "Page/pad-x-compact",
           "resolvedType": "FLOAT",
           "codeSyntax": {

@@ -126,6 +126,53 @@
 }
 
 /*
+ * Detail: the body is the list, spanning 7 of the Page's 12 columns, and the
+ * detail region spans 5, a gutter apart. Below the split floor one of them
+ * fills the row.
+ */
+.plus-pattern-section-with-detail {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: var(--grid-gutter);
+    align-items: start;
+    min-width: 0;
+}
+
+.plus-pattern-section-with-detail--split > .plus-pattern-section-list {
+    grid-column: span 7;
+}
+
+.plus-pattern-section-with-detail--split > .plus-pattern-section-detail {
+    grid-column: span 5;
+}
+
+.plus-pattern-section-with-detail--list > .plus-pattern-section-list,
+.plus-pattern-section-with-detail--detail > .plus-pattern-section-detail {
+    grid-column: 1 / -1;
+}
+
+/* No record open at the split: the list takes the row. */
+.plus-pattern-section-with-detail--split:not(:has(> .plus-pattern-section-detail)) > .plus-pattern-section-list {
+    grid-column: 1 / -1;
+}
+
+.plus-pattern-section-list,
+.plus-pattern-section-detail {
+    min-width: 0;
+}
+
+.plus-pattern-section-detail {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--section-stack-sm);
+}
+
+.plus-pattern-section-detail-back {
+    align-self: flex-start;
+}
+
+/*
  * Split: a main column (span 8) beside a side column (span 4), a gutter
  * apart. Growing 2:1 from these bases gives the 8/4 spans of the 12-column
  * grid exactly; each column wraps under the other once it would drop below

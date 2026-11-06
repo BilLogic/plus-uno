@@ -1,42 +1,42 @@
 /**
  * The PLUS sidebar's content: one config for both roles.
  *
- * It follows the Specs Sidebar (Web App Specs, node 111:227891), plus Students
- * under Toolkit from the Toolkit Information Architecture PRD. A section with
- * `roles` shows only to those roles; every other section shows to everyone.
- *
- * Two items are in code but not in Specs. They are marked `notInSpecs` and
- * hidden unless the caller sets `showItemsNotInSpecs`:
- * - Toolkit › Reviews. The demo walkthrough reaches Monthly Reports only
- *   through it, so the demo keeps it on.
- * - Admin › Compliance. Its live-app page (/admin/tutors/warnings) is also in
- *   the live app's page index.
+ * Home and Slack, then Training, then the Toolkit, then Admin for
+ * supervisors. Training comes before the Toolkit because it gates it: a tutor
+ * mid-onboarding sees the Toolkit locked. Sessions and Students show in the
+ * Toolkit and in Admin with different meanings: a tutor's own, and everyone's.
+ * A group with `roles` shows only to those roles; every other group shows to
+ * everyone.
  */
 
-/** Where the Toolkit › Slack link goes. A placeholder until PLUS names its workspace URL. */
+/** Where Slack links. A placeholder until PLUS names its workspace URL. */
 export const SLACK_URL = 'https://slack.com/';
 
 /** @typedef {'tutor' | 'supervisor'} SidebarUser */
 
-export const SIDEBAR_HOME = { id: 'home', text: 'Home', icon: 'house' };
-
-export const SIDEBAR_SECTIONS = [
+export const SIDEBAR_GROUPS = [
+    {
+        id: 'home',
+        items: [
+            { id: 'home', text: 'Home', icon: 'fa-regular fa-house' },
+            { id: 'slack', text: 'Slack', icon: 'fa-brands fa-slack', href: SLACK_URL, external: true },
+        ],
+    },
     {
         id: 'training',
         title: 'Training',
         items: [
-            { id: 'lessons', text: 'Lessons', icon: 'book-open' },
-            { id: 'onboarding', text: 'Onboarding', icon: 'clipboard' },
+            { id: 'lessons', text: 'Lessons', icon: 'fa-regular fa-lightbulb', training: 'lessons' },
+            { id: 'onboarding', text: 'Onboarding', icon: 'fa-regular fa-compass', training: 'modules' },
         ],
     },
     {
         id: 'toolkit',
         title: 'Toolkit',
+        lockedDuringOnboarding: true,
         items: [
-            { id: 'sessions', text: 'Sessions', icon: 'calendar-alt' },
-            { id: 'toolkit-students', text: 'Students', icon: 'user-graduate' },
-            { id: 'reviews', text: 'Reviews', icon: 'chart-bar', notInSpecs: true },
-            { id: 'slack', text: 'Slack', icon: 'arrow-up-right-from-square', href: SLACK_URL, external: true },
+            { id: 'sessions', text: 'Sessions', icon: 'fa-regular fa-calendar' },
+            { id: 'toolkit-students', text: 'Students', icon: 'fa-regular fa-user' },
         ],
     },
     {
@@ -44,30 +44,30 @@ export const SIDEBAR_SECTIONS = [
         title: 'Admin',
         roles: ['supervisor'],
         items: [
-            { id: 'tutors', text: 'Tutors', icon: 'chart-pie' },
-            { id: 'admin-sessions', text: 'Sessions', icon: 'calendar-week' },
-            { id: 'students', text: 'Students', icon: 'users' },
-            { id: 'groups', text: 'Groups', icon: 'users-rectangle' },
-            { id: 'compliance-monitor', text: 'Compliance', icon: 'clipboard-check', notInSpecs: true },
+            { id: 'compliance-monitor', text: 'Compliance', icon: 'fa-regular fa-flag' },
+            { id: 'reflections', text: 'Reflections', icon: 'fa-regular fa-comment-dots' },
+            { id: 'tutors', text: 'Tutors', icon: 'fa-regular fa-id-badge' },
+            { id: 'admin-sessions', text: 'Sessions', icon: 'fa-regular fa-calendar-check' },
+            { id: 'students', text: 'Students', icon: 'fa-regular fa-address-book' },
+            { id: 'groups', text: 'Groups', icon: 'fa-regular fa-object-group' },
         ],
     },
 ];
 
 /**
- * The items and sections one role sees, ready for `PatternSidebar`.
+ * The groups one role sees, ready for `PatternSidebar`.
  *
  * @param {SidebarUser} user
- * @param {{ showItemsNotInSpecs?: boolean, slackUrl?: string }} [options]
+ * @param {{ slackUrl?: string, badges?: Record<string, { count?: number, countLabel?: string, dot?: boolean, dotLabel?: string }> }} [options]
  */
-export function sidebarContent(user, { showItemsNotInSpecs = false, slackUrl = SLACK_URL } = {}) {
-    const keep = (item) => showItemsNotInSpecs || !item.notInSpecs;
-    // eslint-disable-next-line no-unused-vars
-    const shape = ({ notInSpecs, ...item }) => (item.id === 'slack' ? { ...item, href: slackUrl } : item);
-    return {
-        items: [SIDEBAR_HOME],
-        sections: SIDEBAR_SECTIONS
-            .filter((section) => !section.roles || section.roles.includes(user))
-            // eslint-disable-next-line no-unused-vars
-            .map(({ roles, ...section }) => ({ ...section, items: section.items.filter(keep).map(shape) })),
-    };
+export function sidebarGroups(user, { slackUrl = SLACK_URL, badges = {} } = {}) {
+    const shape = (item) => ({
+        ...item,
+        ...(item.id === 'slack' ? { href: slackUrl } : {}),
+        ...(badges[item.id] ?? {}),
+    });
+    return SIDEBAR_GROUPS
+        .filter((group) => !group.roles || group.roles.includes(user))
+        // eslint-disable-next-line no-unused-vars
+        .map(({ roles, ...group }) => ({ ...group, items: group.items.map(shape) }));
 }

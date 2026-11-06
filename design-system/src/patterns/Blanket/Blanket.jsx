@@ -27,6 +27,10 @@ export const BLANKET_PLACEMENTS = ['center', 'start', 'end'];
  * With `placement` `start` or `end` it drops the pad and holds its child
  * full height at that edge of the screen, for a drawer.
  *
+ * Modal, Drawer and the overlay Panel all draw this one Blanket, so the fill
+ * and the layer order are the same under each. The Panel's is `contained`:
+ * it covers its Frame, not the screen.
+ *
  * It draws the layer only: it does not trap focus, close on Escape or count
  * toward the two-overlay limit. For a real dialog, use the core Modal
  * component, which draws the same layers and blanket token; PatternDrawer
@@ -35,6 +39,7 @@ export const BLANKET_PLACEMENTS = ['center', 'start', 'end'];
 const Blanket = ({
     placement = 'center',
     inline = false,
+    contained = false,
     screenWidth,
     screenHeight,
     onBlanketClick,
@@ -47,6 +52,7 @@ const Blanket = ({
         'plus-pattern-blanket',
         placement !== 'center' ? `plus-pattern-blanket-placement-${placement}` : '',
         inline ? 'plus-pattern-blanket-inline' : '',
+        contained ? 'plus-pattern-blanket-contained' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -78,6 +84,11 @@ Blanket.propTypes = {
     placement: PropTypes.oneOf(BLANKET_PLACEMENTS),
     /** Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page. */
     inline: PropTypes.bool,
+    /**
+     * Cover the nearest positioned parent instead of the screen, with no pad and no layer inside: the
+     * overlay Panel's Blanket over a Frame's Page and Sidebar. The fill and the layer order stay the shared ones.
+     */
+    contained: PropTypes.bool,
     /** Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440. */
     screenWidth: PropTypes.number,
     /**

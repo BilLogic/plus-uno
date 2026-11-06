@@ -7,13 +7,13 @@ import Popup from './Popup/Popup';
 import Tooltip from './Tooltip/Tooltip';
 
 /**
- * The Popup family: Popup, Flag and Tooltip. Menu's own behavior and size
+ * The Popups pattern: Popup, Flag and Tooltip. Menu's own behavior and size
  * cover lives on `DropdownMenu`'s own stories
  * (`Components/Forms and inputs/Dropdown menu`), since it draws from the
  * Menu family's own tokens rather than this page's older Popover numbers.
  *
  * Floating layers behave the same everywhere, and these stories hold them to
- * the Patterns page's Popover section: popups 320 · 400 · 480 padded 16,
+ * the Popups pattern page: popups 320 · 400 · 480 padded 16,
  * tooltips 4 · 8 up to 240, flags 400 wide stacking 16 apart bottom-left, and
  * every one of them at least 8 from the screen edge, 4 from its trigger.
  *
@@ -24,13 +24,13 @@ import Tooltip from './Tooltip/Tooltip';
  */
 
 export default {
-    title: 'Components/Overlays and layering/Popup family',
+    title: 'Components/Overlays and layering/Popups behavior',
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
                 component:
-                    'Behavior cover for the Popup family: menu rows and scrolling, popup '
+                    'Behavior cover for the Popups pattern: menu rows and scrolling, popup '
                     + 'and tooltip sizes, flag stacking, and the 8 kept from the screen edge.',
             },
         },

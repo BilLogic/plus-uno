@@ -1,6 +1,5 @@
 import React from 'react';
-import { Button } from '@/components/forms-and-inputs/Button';
-import { Topbar } from '@/patterns';
+import { Breadcrumb } from '@/components';
 
 const DashboardLayout = ({ children }) => {
     return (
@@ -22,11 +21,10 @@ const DashboardLayout = ({ children }) => {
 
             {/* Main Content Area */}
             <div className="flex-grow-1 d-flex flex-column">
-                {/* Top Bar */}
-                <Topbar
-                    breadcrumbs={[{ text: 'Home', href: '#' }, { text: 'Group Admin' }]}
-                    user={{ name: 'John Doe' }}
-                />
+                {/* The page's header row: its breadcrumb */}
+                <div className="px-4 pt-3">
+                    <Breadcrumb items={[{ text: 'Home', href: '#' }, { text: 'Group Admin' }]} />
+                </div>
 
                 {/* Page Content */}
                 <main className="p-4 overflow-auto">
