@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TextAreaStories from './TextArea.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet, DocsTable, DoDontPair, ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
 import TextArea from './TextArea';
 
 export const figmaMeta = {
@@ -63,29 +63,6 @@ A text area lets users enter long form text which spans over multiple lines.
 
 <div className="sb-ds-doc-section">
 
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr><th scope="col">Prop</th><th scope="col">Values</th><th scope="col">Default</th><th scope="col">Notes</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>label</code></td><td>node</td><td>none</td><td>Names the field. Pass <code>isLabelHidden</code> to clip it out of sight and keep the name.</td></tr>
-        <tr><td><code>rows</code></td><td>number</td><td>3</td><td>Visible lines. The box never goes below 80.</td></tr>
-        <tr><td><code>spacing</code></td><td><code>default</code>, <code>compact</code></td><td><code>default</code></td><td>The same corners as a Text field of that spacing.</td></tr>
-        <tr><td><code>appearance</code></td><td><code>standard</code>, <code>subtle</code></td><td><code>standard</code></td><td><code>subtle</code> shows Save and Cancel while editing.</td></tr>
-        <tr><td><code>isRequired</code>, <code>isDisabled</code>, <code>isReadOnly</code></td><td>boolean</td><td>false</td><td>As on the Text field.</td></tr>
-        <tr><td><code>isInvalid</code></td><td>boolean</td><td>false</td><td>Draws the error border and sets <code>aria-invalid</code>. <code>errorMessage</code> says why.</td></tr>
-        <tr><td><code>warningMessage</code>, <code>successMessage</code></td><td>node</td><td>none</td><td>Draw the warning and confirmation borders.</td></tr>
-        <tr><td><code>caption</code></td><td>node</td><td>none</td><td>Standing help under the field.</td></tr>
-        <tr><td><code>maxLength</code></td><td>number</td><td>none</td><td>Limits the length and shows a count.</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Rows and spacing
 
 <DocsCanvasShell description={<>The field is 80 high at least, and <code>rows</code> grows it from there.</>}>
@@ -100,7 +77,7 @@ A text area lets users enter long form text which spans over multiple lines.
 
 <div className="sb-ds-doc-section">
 
-## States
+## More states
 
 <DocsCanvasShell description={<>Default, filled, success, warning, error, disabled and read-only.</>}>
     <DsCanvasQuiet of={TextAreaStories.States} />
@@ -134,6 +111,24 @@ A text area lets users enter long form text which spans over multiple lines.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<ComponentExample of={TextAreaStories.Rest} title="Rest" description="The input fill and edge." />
+
+<ComponentExample of={TextAreaStories.Hovered} title="Hovered" description="The edge turns the focused color." />
+
+<ComponentExample of={TextAreaStories.Focused} title="Focused" description="A 2px ring, 2px off the box. No fill changes." />
+
+<ComponentExample of={TextAreaStories.FieldInvalid} title="Invalid" description="The danger edge with the message under the field." />
+
+<ComponentExample of={TextAreaStories.FieldReadOnly} title="Read-only" description="The read-only fill. The value can be read, selected and copied." />
+
+<ComponentExample of={TextAreaStories.FieldDisabled} title="Disabled" description="The whole field fades and leaves the tab order." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -158,7 +153,7 @@ A text area lets users enter long form text which spans over multiple lines.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use a Text area for free text over several lines: session notes, feedback, a
 reason. Use a Text field for one short answer, and a Rich text editor only when
@@ -168,7 +163,35 @@ the text needs formatting.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Label.** Names the field. A required marker follows it.
+2. **Box.** The text box. It sets its height by `rows` and scrolls past it.
+3. **Caption.** A message on the left and, with `maxLength`, a count on the right.
+
+### States and tokens
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-default</code> edge in <code>--ds-border-input</code>, <code>--radius-0625</code> (<code>--radius-h32</code> compact).</td></tr>
+<tr><td>Hovered</td><td>The edge turns <code>--ds-border-focused</code>.</td></tr>
+<tr><td>Focused</td><td>A <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, 2px off the box. No fill changes.</td></tr>
+<tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code> and the message <code>--ds-text-danger</code>.</td></tr>
+<tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill.</td></tr>
+<tr><td>Disabled</td><td>The whole field fades to <code>--ds-opacity-disabled</code>.</td></tr>
+<tr><td>Text</td><td>Placeholder <code>--ds-text-subtlest</code>, helper text <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Pressed</td><td>No step of its own. The hovered edge holds while the pointer is down.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Put help in the caption.
 
@@ -178,6 +201,10 @@ the text needs formatting.
     dontExample={<TextArea label="Session notes" rows={3} placeholder="Write what went well and what to try next time" />}
     dontCaption="Help in the placeholder disappears when the person starts typing."
 />
+
+### Warning and success.
+
+`warningMessage` draws the warning edge and `successMessage` the success edge, each with its message. The value is accepted in both.
 
 ### Rules
 
@@ -190,6 +217,24 @@ the text needs formatting.
   elsewhere in the middle of a paragraph does not publish half a thought.
 - **A warning accepts the value.** Use `isInvalid` only when the form cannot
   go on.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the field with a short noun: "Email address".</td><td>An instruction where the name belongs: "Enter your email address here".</td></tr>
+<tr><td>Use sentence case and no end punctuation on labels.</td><td>Title case, or a period after the label.</td></tr>
+<tr><td>Say what to do about an error: "Enter a 10-digit number."</td><td>"Invalid" or "Error".</td></tr>
+<tr><td>Keep helper text to one short line.</td><td>Paragraphs in the caption. Link to help instead.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

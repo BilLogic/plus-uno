@@ -3,6 +3,7 @@ import { expect, fireEvent, fn, userEvent, waitFor, within } from 'storybook/tes
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Button from '../Button/Button';
+import { expectRest, expectHovered, expectFocused, expectDisabled, expectInvalid, expectReadOnly } from '../_internal/fieldStatePlays';
 import TextField from './TextField';
 
 export default {
@@ -612,4 +613,38 @@ export const NumberReadOnly = () => (
 NumberReadOnly.play = async ({ canvasElement }) => {
     await expect(within(canvasElement).queryByRole('button')).toBeNull();
     await expect(within(canvasElement).getByRole('textbox', { name: 'Seats' })).toHaveValue('12');
+};
+
+/** One story per state, for the Examples tab. */
+const controlOf = (canvasElement) => within(canvasElement).getByRole('textbox', { name: 'Your name' });
+const wrap = { maxWidth: 'var(--width-2500)', minHeight: 'var(--height-250)' };
+
+export const Rest = {
+    render: () => <div style={wrap}><TextField id="textfield-ex-rest" label="Your name" placeholder="Name" /></div>,
+    play: async ({ canvasElement }) => expectRest(canvasElement, controlOf(canvasElement)),
+};
+
+export const Hovered = {
+    render: () => <div style={wrap}><TextField id="textfield-ex-hover" label="Your name" placeholder="Name" /></div>,
+    play: async ({ canvasElement }) => expectHovered(canvasElement, controlOf(canvasElement)),
+};
+
+export const Focused = {
+    render: () => <div style={wrap}><TextField id="textfield-ex-focus" label="Your name" placeholder="Name" /></div>,
+    play: async ({ canvasElement }) => expectFocused(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldDisabled = {
+    render: () => <div style={wrap}><TextField id="textfield-ex-disabled" label="Your name" placeholder="Name" isDisabled /></div>,
+    play: async ({ canvasElement }) => expectDisabled(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldInvalid = {
+    render: () => <div style={wrap}><TextField id="textfield-ex-invalid" label="Your name" placeholder="Name" isInvalid errorMessage="Enter your name." /></div>,
+    play: async ({ canvasElement }) => expectInvalid(canvasElement, controlOf(canvasElement)),
+};
+
+export const FieldReadOnly = {
+    render: () => <div style={wrap}><TextField id="textfield-ex-readonly" label="Your name" placeholder="Name" isReadOnly /></div>,
+    play: async ({ canvasElement }) => expectReadOnly(canvasElement, controlOf(canvasElement)),
 };

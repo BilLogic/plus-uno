@@ -38,11 +38,11 @@ authored half (#166), counted rather than assumed.
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✅ | ✅ |
 | [TextField](TextField/index.md) | 35 | ✅ | ✅ | ✅ |
 | [TimePicker](TimePicker/index.md) | 14 | ✅ | ✅ | ✅ |
-| [Toggle](Toggle/index.md) | 17 | ✅ | ✕ | ✅ |
+| [Toggle](Toggle/index.md) | 17 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✕ | ✅ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 33/34 (97%) · Correct/incorrect 28/34 (82%) · Accessibility 33/34 (97%)
+**Authored coverage:** When to use 33/34 (97%) · Correct/incorrect 29/34 (85%) · Accessibility 33/34 (97%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

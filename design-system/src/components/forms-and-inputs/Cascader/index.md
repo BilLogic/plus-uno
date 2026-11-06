@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.stories.jsx` — Overview, Content, Spacing, InteractionStates, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.stories.jsx` — Overview, Content, Spacing, InteractionStates, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.mdx`
 

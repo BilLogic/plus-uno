@@ -3,7 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import { px } from '@/storybook-docs/lib/style-probes.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Toggle from './Toggle';
 
 export default {
@@ -210,4 +210,69 @@ TrackColors.play = async ({ canvasElement }) => {
             await expect(getComputedStyle(thumb(control(name))).backgroundColor, `${mode}: ${name} thumb`).toBe(token('--ds-icon-disabled'));
         }
     });
+};
+
+/** One story per state, for the Examples tab. */
+const switchOf = (canvasElement, name) => within(canvasElement).getByRole('switch', { name });
+
+export const Unchecked = {
+    render: () => <Toggle id="toggle-ex-off" label="Send reminders" />,
+    play: async ({ canvasElement }) => {
+        const el = switchOf(canvasElement, 'Send reminders');
+        await expect(el).toHaveAttribute('aria-checked', 'false');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral-bold'));
+    },
+};
+
+export const Checked = {
+    render: () => <Toggle id="toggle-ex-on" label="Send reminders" defaultChecked />,
+    play: async ({ canvasElement }) => {
+        const el = switchOf(canvasElement, 'Send reminders');
+        await expect(el).toHaveAttribute('aria-checked', 'true');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected-bold'));
+    },
+};
+
+export const Hovered = {
+    render: () => <Toggle id="toggle-ex-hover" label="Send reminders" />,
+    play: async ({ canvasElement }) => {
+        const el = switchOf(canvasElement, 'Send reminders');
+        el.style.transition = 'none';
+        const fill = withForcedPseudo(el, ':hover', () => getComputedStyle(el).backgroundColor);
+        await expect(fill).toBe(tokenColor(canvasElement, '--ds-background-neutral-bold-hovered'));
+    },
+};
+
+export const HoveredOn = {
+    render: () => <Toggle id="toggle-ex-hover-on" label="Send reminders" defaultChecked />,
+    play: async ({ canvasElement }) => {
+        const el = switchOf(canvasElement, 'Send reminders');
+        el.style.transition = 'none';
+        const fill = withForcedPseudo(el, ':hover', () => getComputedStyle(el).backgroundColor);
+        await expect(fill).toBe(tokenColor(canvasElement, '--ds-background-selected-bold-hovered'));
+    },
+};
+
+export const Focused = {
+    render: () => <Toggle id="toggle-ex-focus" label="Send reminders" defaultChecked />,
+    play: async ({ canvasElement }) => {
+        const el = switchOf(canvasElement, 'Send reminders');
+        el.style.transition = 'none';
+        el.focus({ focusVisible: true });
+        const style = getComputedStyle(el);
+        await waitFor(() => expect(style.outlineStyle).toBe('solid'));
+        await expect(px(style.outlineWidth)).toBe(2);
+        await expect(px(style.outlineOffset)).toBe(2);
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        el.blur();
+    },
+};
+
+export const Disabled = {
+    render: () => <Toggle id="toggle-ex-disabled" label="Not available" isDisabled defaultChecked />,
+    play: async ({ canvasElement }) => {
+        const el = switchOf(canvasElement, 'Not available');
+        await expect(el).toHaveAttribute('data-disabled');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+    },
 };
