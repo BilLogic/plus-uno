@@ -5,6 +5,7 @@ import CountTag, { COUNT_TAG_APPEARANCES, formatCount } from '../CountTag/CountT
 import Tooltip from '../../overlays-and-layering/Tooltip';
 import { useIsTruncated } from '../../../lib/useIsTruncated';
 import './StatusTag.scss';
+import { iconClass } from '../../../lib/icon';
 
 /**
  * `StatusTag` — the condition something is in.
@@ -36,9 +37,9 @@ const warn = (message) => {
     }
 };
 
-/** A string is a Font Awesome solid icon name, as Button takes it; anything else renders as given. */
+/** A string is a Font Awesome Free icon name, as Button takes it; anything else renders as given. */
 const renderVisual = (visual) => (typeof visual === 'string'
-    ? <i className={`fa-solid fa-${visual}`} aria-hidden="true" />
+    ? <i className={iconClass(visual)} aria-hidden="true" />
     : visual);
 
 export const StatusTag = ({
@@ -152,7 +153,7 @@ StatusTag.propTypes = {
     appearance: PropTypes.oneOf(STATUS_TAG_APPEARANCES),
     /** `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. */
     spacing: PropTypes.oneOf(STATUS_TAG_SPACINGS),
-    /** One icon before the label: a Font Awesome solid name (`circle-check`) or a node. */
+    /** One icon before the label: a Font Awesome Free name (`circle-check`) or a node. */
     leadingVisual: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. */
     trailingMetric: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),

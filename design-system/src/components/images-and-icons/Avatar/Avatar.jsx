@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import './Avatar.scss';
+import { iconClass } from '../../../lib/icon';
 
 /**
  * A person or an agent, as a picture, their initials or an icon.
@@ -35,7 +36,7 @@ export const initialsOf = (name = '', max = 2) => {
 
 const renderIcon = (icon) => {
     if (typeof icon !== 'string') return icon;
-    const className = icon.includes('fa-') ? icon : `fa-solid fa-${icon}`;
+    const className = iconClass(icon);
     return <i className={className} aria-hidden="true" />;
 };
 
