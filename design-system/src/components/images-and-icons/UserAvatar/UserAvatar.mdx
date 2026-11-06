@@ -167,7 +167,7 @@ Use `UserAvatar` for the current user's identity in the topbar or in a row that 
 
 ### Pass `onClick` to make it clickable.
 
-Without it the avatar is a static line. With it, the row shows the pointer, takes focus, and presses on Enter and Space. When the click opens a menu or navigates, wrap the avatar in the button or link that owns that behavior instead, so the control carries its own name and expanded state.
+Without it the avatar is a static line. With it, the row shows the pointer, takes focus, and presses on Enter (keydown) and Space (keyup). When the click opens a menu or navigates, wrap the avatar in the button or link that owns that behavior instead, so the control carries its own name and expanded state.
 
 </div>
 
@@ -191,7 +191,7 @@ Without it the avatar is a static line. With it, the row shows the pointer, take
 
 ## Accessibility
 
-- **A clickable row is a button.** With `onClick` it has `role="button"`, a tab stop, and a 2px focus ring. `state="disabled"` sets `aria-disabled` and removes the tab stop.
+- **A clickable row is a button.** With `onClick` it has `role="button"`, a tab stop, and a 2px focus ring. `state="disabled"` keeps the role, sets `aria-disabled` and removes the tab stop. The counter is read with its unit ("2 notifications").
 - **The initial is decorative.** The pill is hidden from assistive technology; the name carries the meaning.
 - **The role is text.** The Lead tag is a Status tag with visible text, not color alone.
 

@@ -121,11 +121,14 @@ export const Focused = {
 };
 
 export const Disabled = {
-    render: () => <UserAvatar state="disabled" onClick={fn()} />,
-    play: async ({ canvasElement }) => {
+    args: { onClick: fn() },
+    render: (args) => <UserAvatar state="disabled" onClick={args.onClick} />,
+    play: async ({ canvasElement, args }) => {
         const el = rowOf(canvasElement);
         await expect(el).toHaveAttribute('aria-disabled', 'true');
         await expect(el.hasAttribute('tabindex')).toBe(false);
-        await expect(within(canvasElement).queryByRole('button')).toBeNull();
+        await expect(el).toHaveAttribute('role', 'button');
+        await userEvent.click(el);
+        await expect(args.onClick).not.toHaveBeenCalled();
     },
 };

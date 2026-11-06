@@ -31,19 +31,33 @@ const UserAvatar = ({
     className = ''
 }) => {
     const role = ROLE_LABELS[type];
-    // A clickable user is a button to the keyboard: focusable, and Enter or
-    // Space press it. A disabled one leaves the tab order.
-    const interactive = onClick && state !== 'disabled'
+    // A clickable user is a button to the keyboard: focusable, Enter presses it
+    // on keydown and Space on keyup, as a native button does. A disabled one
+    // keeps the role and says so, but leaves the tab order and ignores presses.
+    const disabled = state === 'disabled';
+    const interactive = onClick
         ? {
             role: 'button',
-            tabIndex: 0,
-            onClick,
-            onKeyDown: (event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                    event.preventDefault();
-                    onClick(event);
-                }
-            },
+            ...(disabled
+                ? { 'aria-disabled': true }
+                : {
+                    tabIndex: 0,
+                    onClick,
+                    onKeyDown: (event) => {
+                        if (event.key === 'Enter' && !event.repeat) {
+                            event.preventDefault();
+                            onClick(event);
+                        } else if (event.key === ' ') {
+                            event.preventDefault();
+                        }
+                    },
+                    onKeyUp: (event) => {
+                        if (event.key === ' ') {
+                            event.preventDefault();
+                            onClick(event);
+                        }
+                    },
+                }),
         }
         : {};
     const classes = [
@@ -55,7 +69,7 @@ const UserAvatar = ({
     ].filter(Boolean).join(' ');
 
     return (
-        <div className={classes} id={id} aria-disabled={state === 'disabled' ? true : undefined} {...interactive}>
+        <div className={classes} id={id} aria-disabled={disabled && !onClick ? true : undefined} {...interactive}>
             <div className="plus-user-avatar__name-section">
                 <div className="plus-user-avatar__initial" aria-hidden="true">
                     <span className="plus-user-avatar__initial-text">{firstChar}</span>
@@ -70,6 +84,7 @@ const UserAvatar = ({
             {counter && (
                 <div className="plus-user-avatar__counter">
                     <span className="plus-user-avatar__counter-text">{counterValue}</span>
+                    <span className="visually-hidden">{counterValue === 1 ? 'notification' : 'notifications'}</span>
                 </div>
             )}
         </div>
