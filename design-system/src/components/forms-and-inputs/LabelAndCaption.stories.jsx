@@ -1,4 +1,6 @@
 import React from 'react';
+import { expect, within } from 'storybook/test';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 
 /**
@@ -350,3 +352,25 @@ export const Layout = () => (
 );
 
 export { Label, Caption };
+
+LabelContent.play = async ({ canvasElement }) => {
+    const labels = canvasElement.querySelectorAll('label');
+    await expect(labels).toHaveLength(2);
+    await expect(labels[0]).toHaveTextContent('Label*');
+    await expect(labels[1]).not.toHaveTextContent('*');
+};
+
+/** Each caption state takes its own text color: help is subtle, the others carry their status. */
+CaptionVariants.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const colors = {
+        Default: '--ds-text-subtle',
+        Success: '--ds-text-success',
+        Danger: '--ds-text-danger',
+        Warning: '--ds-text-warning',
+    };
+    for (const [heading, token] of Object.entries(colors)) {
+        const section = canvas.getByRole('heading', { name: heading }).closest('section');
+        await expect(getComputedStyle(section.querySelector('span')).color, `${heading} caption`).toBe(tokenColor(canvasElement, token));
+    }
+};

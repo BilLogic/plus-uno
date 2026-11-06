@@ -2,6 +2,9 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import Button from '@/components/forms-and-inputs/Button';
 import { ButtonItem, LinkItem, Section } from '@/components/navigation/MenuGroup';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import DropdownMenu from './DropdownMenu';
 
 export default {
@@ -189,4 +192,112 @@ export const Interactive = {
             </DropdownMenu>
         </div>
     ),
+};
+
+/** One story per state, for the Examples tab. */
+const body = (canvasElement) => within(canvasElement.ownerDocument.body);
+const noop = () => {};
+
+export const Default = {
+    render: () => (
+        <div style={{ padding: '24px 24px 24px' }}>
+            <DropdownMenu trigger={<Button text="Actions" iconAfter={<i className="fa-solid fa-chevron-down" aria-hidden="true" />} />}>
+                {basicMenu}
+            </DropdownMenu>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const trigger = within(canvasElement).getByRole('button', { name: 'Actions' });
+        await expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
+        await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    },
+};
+
+export const Open = {
+    render: () => (
+        <div style={{ padding: '24px 24px 200px' }}>
+            <DropdownMenu trigger={<Button text="Actions" />} isOpen onOpenChange={noop}>
+                {basicMenu}
+            </DropdownMenu>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(await body(canvasElement).findByRole('menuitem', { name: 'Action' })).toBeVisible();
+        await expect(within(canvasElement).getByRole('button', { name: 'Actions' })).toHaveAttribute('aria-expanded', 'true');
+    },
+};
+
+export const CompactRows = {
+    render: () => (
+        <div style={{ padding: '24px 24px 200px' }}>
+            <DropdownMenu trigger={<Button text="Compact" />} spacing="compact" isOpen onOpenChange={noop}>
+                {basicMenu}
+            </DropdownMenu>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const row = await body(canvasElement).findByRole('menuitem', { name: 'Action' });
+        await expect(Math.round(row.getBoundingClientRect().height)).toBe(32);
+    },
+};
+
+export const DisabledRow = {
+    render: () => (
+        <div style={{ padding: '24px 24px 200px' }}>
+            <DropdownMenu trigger={<Button text="Manage" />} isOpen onOpenChange={noop}>
+                <ButtonItem onClick={noop}>Rename</ButtonItem>
+                <ButtonItem onClick={noop} isDisabled>Archive</ButtonItem>
+            </DropdownMenu>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const row = await body(canvasElement).findByRole('menuitem', { name: 'Archive' });
+        await expect(row).toHaveAttribute('aria-disabled', 'true');
+        await expect(getComputedStyle(row).color).toBe(tokenColor(canvasElement, '--ds-text-disabled'));
+    },
+};
+
+/** Hovered and pressed rows take the neutral subtle steps. */
+export const HoveredState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={{ padding: '24px 24px 200px' }}>
+            <DropdownMenu trigger={<Button text="Actions" />} isOpen onOpenChange={noop}>
+                {basicMenu}
+            </DropdownMenu>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const row = await body(canvasElement).findByRole('menuitem', { name: 'Another action' });
+        row.style.transition = 'none';
+        await expect(withForcedPseudo(row, ':hover', () => getComputedStyle(row).backgroundColor), 'hovered row').toBe(tokenColor(canvasElement, '--ds-background-neutral-subtle-hovered'));
+        await expect(withForcedPseudo(row, ':active', () => getComputedStyle(row).backgroundColor), 'pressed row').toBe(tokenColor(canvasElement, '--ds-background-neutral-subtle-pressed'));
+    },
+};
+
+/** Keyboard focus on the trigger draws the 2px ring, 2px off the edge. */
+export const KeyboardFocus = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={{ padding: '24px' }}>
+            <DropdownMenu trigger={<Button text="Actions" />}>{basicMenu}</DropdownMenu>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expectFocusRing(canvasElement, within(canvasElement).getByRole('button', { name: 'Actions' }), 'trigger');
+    },
+};
+
+Loading.play = async ({ canvasElement }) => {
+    await waitFor(() => expect(within(canvasElement.ownerDocument.body).queryAllByRole('menuitem')).toHaveLength(0));
+    await expect(within(canvasElement).getByRole('button', { name: 'Assignees' })).toHaveAttribute('aria-expanded', 'true');
+};
+
+WithSections.play = async ({ canvasElement }) => {
+    await userEvent.click(within(canvasElement).getByRole('button', { name: 'Views' }));
+    const page = within(canvasElement.ownerDocument.body);
+    await expect(await page.findByRole('menuitem', { name: 'Rename' })).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Archive' })).toHaveAttribute('aria-disabled', 'true');
+    await expect(page.getByRole('menuitem', { name: 'Open report' })).toBeVisible();
+    await userEvent.keyboard('{Escape}');
 };

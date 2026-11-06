@@ -1,7 +1,14 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Comment } from '@/components';
 import * as CommentStories from './Comment.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -21,8 +28,7 @@ export const figmaMeta = {
 <Meta of={CommentStories} />
 
 <Title />
-One entry in a threaded discussion, with slots for an avatar, author, time,
-content, actions and nested replies.
+A comment is one entry in a threaded discussion: who wrote it, when, and what they said.
 
 <DocsTabs of={CommentStories}>
 
@@ -38,71 +44,25 @@ content, actions and nested replies.
 
 <div className="sb-ds-doc-section">
 
-## Anatomy
+## Content
 
-1. **Avatar** sits beside the comment's content.
-2. **Header** holds the author, the time, an "edited" marker and, when
-   restricted, who the comment is visible to.
-3. **Content** is the comment body.
-4. **Actions**, or **saving text** in their place while a change is in
-   flight.
-5. **Nested replies** sit below, at one heading level deeper via
-   `headingLevel`.
+<ComponentExample of={CommentStories.Basic} title="Default" description="An avatar, author, time and content, with actions below." />
 
-<DocsCanvasShell attachSourceBelow description={<>An avatar, author, time and content, with actions below.</>}>
-    <Canvas of={CommentStories.Basic} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={CommentStories.Edited} title="Edited" description="The edited marker follows the time when the comment changed after it was posted." />
+
+<ComponentExample of={CommentStories.Restricted} title="Restricted" description="Who can see the comment, stated as text in the header." />
+
+<ComponentExample of={CommentStories.WithNestedReplies} title="Nested replies" description="Replies sit below the comment, indented, and nest one heading level deeper." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## State
 
-<DocsCanvasShell description={<>`isSaving` hides `actions` and shows `savingText` in their place.</>}>
-    <DsCanvasQuiet of={CommentStories.Saving} />
-</DocsCanvasShell>
+<ComponentExample of={CommentStories.Saving} title="Saving" description="isSaving hides the actions and shows the saving text in their place." />
 
-<DocsCanvasShell description={<>`isHighlighted` marks a comment, for linking directly to one in a thread.</>}>
-    <DsCanvasQuiet of={CommentStories.Highlighted} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Nested replies
-
-<DocsCanvasShell description={<>`nestedReplies` opens a `HeadingContextProvider` at `headingLevel`, so anything inside that uses `Heading` nests correctly.</>}>
-    <DsCanvasQuiet of={CommentStories.WithNestedReplies} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>avatar</code>, <code>author</code>, <code>time</code>, <code>edited</code></td><td>node</td><td>The header's parts.</td></tr>
-        <tr><td><code>restrictedTo</code></td><td>node</td><td>Who the comment is visible to, shown in the header.</td></tr>
-        <tr><td><code>content</code></td><td>node</td><td>The comment body.</td></tr>
-        <tr><td><code>actions</code></td><td>node</td><td>Hidden while <code>isSaving</code> is true.</td></tr>
-        <tr><td><code>isSaving</code>, <code>savingText</code></td><td>—</td><td>Shows <code>savingText</code> in place of <code>actions</code> while a change is in flight. Default "Saving…".</td></tr>
-        <tr><td><code>isHighlighted</code></td><td>boolean</td><td>Marks the comment, for deep-linking to one in a thread.</td></tr>
-        <tr><td><code>nestedReplies</code></td><td>node</td><td>Replies rendered inside their own heading context.</td></tr>
-        <tr><td><code>headingLevel</code></td><td>enum</td><td>1–6. The heading level <code>nestedReplies</code> opens at.</td></tr>
-        <tr><td><code>type</code></td><td>string</td><td>Set as <code>data-type</code>, for styling hooks.</td></tr>
-    </tbody>
-</DocsTable>
+<ComponentExample of={CommentStories.Highlighted} title="Highlighted" description="Marks a comment, for linking directly to one in a thread." />
 
 </div>
 
@@ -132,24 +92,60 @@ content, actions and nested replies.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
-Use `Comment` for one entry in a threaded discussion — a note on a session, a
-reply in a review thread. For a single-field text entry with no author or
-thread context, use `TextArea` instead.
+Use a comment for one entry in a threaded discussion: a note on a session, a reply in a review thread. For a single text entry with no author or thread context, use Text area.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Avatar.** Sits beside the comment's content.
+2. **Header.** The author, the time, an edited marker and, when restricted, who the comment is visible to.
+3. **Content.** The comment body.
+4. **Actions**, or **saving text** in their place while a change is in flight.
+5. **Nested replies.** Sit below, indented, at one heading level deeper through `headingLevel`.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Saving</td><td>The actions give way to the saving text in <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Highlighted</td><td>The comment takes <code>--ds-background-selected</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+A comment has no hover, pressed, focus or disabled state of its own. The actions a caller passes in carry theirs.
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Author</td><td>Body default, semibold.</td></tr>
+<tr><td>Time, edited, restricted, saving</td><td><code>--ds-text-subtle</code>, body small.</td></tr>
+<tr><td>Highlight fill</td><td><code>--ds-background-selected</code>.</td></tr>
+<tr><td>Padding and gaps</td><td><code>--space-100</code>, <code>--space-075</code>, <code>--space-050</code>, <code>--space-025</code>.</td></tr>
+<tr><td>Replies indent and rule</td><td><code>--space-150</code>; <code>--ds-border</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Nest replies through `nestedReplies`, not by composing comments yourself.
 
-Passing replies through `nestedReplies` opens a `HeadingContextProvider` at
-`headingLevel`, so any `Heading` inside the reply tree nests one level deeper
-automatically — composing `Comment`s directly without this prop skips that
-step.
+Passing replies through `nestedReplies` opens a heading context at `headingLevel`, so any `Heading` inside the reply tree nests one level deeper automatically. Composing comments directly without this prop skips that step.
 
 ```jsx
 <Comment
@@ -160,10 +156,34 @@ step.
 />
 ```
 
-### Swap `actions` for `savingText` with `isSaving`, don't hide them yourself.
+### Swap `actions` for `savingText` with `isSaving`; do not hide them yourself.
 
-Set `isSaving` rather than conditionally rendering `actions` — it keeps the
-saving state in one prop instead of two places making the same decision.
+Set `isSaving` rather than conditionally rendering `actions`. It keeps the saving state in one prop instead of two places making the same decision.
+
+<DoDontPair
+    doExample={<Comment author="Ari Patel" time="2h ago" content="Can we move Thursday's session to 5pm?" isSaving savingText="Saving your reply…" />}
+    doCaption="One prop swaps the actions for the saving text."
+    dontExample={<Comment author="Ari Patel" time="2h ago" content="Can we move Thursday's session to 5pm?" actions={<button type="button">Reply</button>} />}
+    dontCaption="Leaving the actions live while a change saves invites a second submit."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Show the author's name as people know them: "Ari Patel".</td><td>A username or an id.</td></tr>
+<tr><td>Write the time as relative or dated text: "2h ago", "Oct 21".</td><td>A raw timestamp: "2026-10-21T14:03:11Z".</td></tr>
+<tr><td>State who can see a restricted comment: "Visible to staff only".</td><td>A lock icon with no words.</td></tr>
+<tr><td>Name the action in the saving text: "Saving your reply…".</td><td>A bare "Loading".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -171,14 +191,9 @@ saving state in one prop instead of two places making the same decision.
 
 ## Accessibility
 
-- **A real article.** Each comment is an `<article>`, giving assistive
-  technology a landmark per entry in the thread.
-- **Replies nest their headings correctly.** Because `nestedReplies` opens
-  its own `HeadingContextProvider`, a reply thread's headings read in the
-  right outline order rather than all landing at the same level.
-- **Restricted visibility is stated, not just implied.** `restrictedTo`
-  renders as visible text in the header, so who can see the comment isn't
-  communicated by color or icon alone.
+- **A real article.** Each comment is an `<article>`, giving assistive technology a landmark per entry in the thread.
+- **Replies nest their headings correctly.** Because `nestedReplies` opens its own heading context, a reply thread's headings read in the right outline order rather than all landing at the same level.
+- **Restricted visibility is stated, not just implied.** `restrictedTo` renders as visible text in the header, so who can see the comment is not communicated by color or icon alone.
 
 </div>
 
@@ -186,8 +201,8 @@ saving state in one prop instead of two places making the same decision.
 
 ## Related
 
-- For the person shown beside the comment, use `Avatar`.
-- For a single text field with no thread context, use `TextArea`.
+- For the person shown beside the comment, use Avatar.
+- For a single text field with no thread context, use Text area.
 
 </div>
 

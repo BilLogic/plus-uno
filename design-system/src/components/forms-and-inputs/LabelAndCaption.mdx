@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as LabelAndCaptionStories from './LabelAndCaption.stories.jsx';
-import { DocsCanvasShell, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -108,7 +108,7 @@ explains, and it carries a state: `default`, `success`, `danger`, `warning`,
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Best practices
 
 ### Say what the field is, not what to do with it.
 
@@ -149,6 +149,25 @@ Across these components the required marker is a `span` beside the label with
 `aria-label="required"`. None of them sets the `required` attribute or
 `aria-required` on the control, so the asterisk is a convention for sighted
 users and your own validation is what enforces it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the field: "Email address".</td><td>An instruction: "Enter your email address".</td></tr>
+<tr><td>Use sentence case, with no colon or end punctuation on the label.</td><td>Title case, or "Email address:".</td></tr>
+<tr><td>Put standing help in the caption: "Include the area code".</td><td>Put help in the placeholder, where it disappears as people type.</td></tr>
+<tr><td>Say what to do in an error: "Choose a date after today."</td><td>"Invalid date".</td></tr>
+<tr><td>Keep a caption to one short line.</td><td>A paragraph under the field.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

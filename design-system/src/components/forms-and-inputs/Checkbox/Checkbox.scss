@@ -34,8 +34,8 @@
     min-height: var(--checkbox-control-size);
     padding: 0;
     margin: 0;
-    border: var(--stroke-2, 2px) solid var(--ds-border-input);
-    border-radius: var(--radius-025, 4px);
+    border: var(--stroke-2) solid var(--ds-border-input);
+    border-radius: var(--radius-025);
     background-color: var(--ds-background-input);
     cursor: pointer;
     transition: background-color 0.2s, border-color 0.2s;
@@ -126,7 +126,7 @@
 
 // Required indicator — drawn by `FieldLabel` as `.plus-field-required`.
 .plus-form-checkbox-wrapper .plus-field-required {
-    margin-left: 2px;
+    margin-left: var(--stack-sm);
     font-weight: var(--type-weight-regular);
 }
 

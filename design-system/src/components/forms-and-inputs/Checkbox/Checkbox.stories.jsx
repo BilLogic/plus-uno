@@ -3,7 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import { px } from '@/storybook-docs/lib/style-probes.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Checkbox from './Checkbox';
 import Fieldset from '../Fieldset';
 
@@ -341,4 +341,63 @@ HoverStep.play = async ({ canvasElement }) => {
         await expect(offHovered.backgroundColor, `${mode}: unchecked hover fill`).toBe(token('--ds-background-input-hovered'));
         await expect(offHovered.borderTopColor, `${mode}: unchecked hover edge`).toBe(token('--ds-border-brand'));
     });
+};
+
+/** One story per state, for the Examples tab. */
+const box = (canvasElement, name) => within(canvasElement).getByRole('checkbox', { name });
+
+export const Unselected = {
+    render: () => <Checkbox id="cb-ex-off" label="Email me a summary" />,
+    play: async ({ canvasElement }) => {
+        await expect(box(canvasElement, 'Email me a summary')).toHaveAttribute('aria-checked', 'false');
+    },
+};
+
+export const Selected = {
+    render: () => <Checkbox id="cb-ex-on" label="Email me a summary" defaultChecked />,
+    play: async ({ canvasElement }) => {
+        const el = box(canvasElement, 'Email me a summary');
+        await expect(el).toHaveAttribute('aria-checked', 'true');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected-bold'));
+    },
+};
+
+export const Mixed = {
+    render: () => <Checkbox id="cb-ex-mixed" label="All days" isIndeterminate />,
+    play: async ({ canvasElement }) => {
+        await expect(box(canvasElement, 'All days')).toHaveAttribute('aria-checked', 'mixed');
+    },
+};
+
+export const Disabled = {
+    render: () => <Checkbox id="cb-ex-disabled" label="Not available" isDisabled />,
+    play: async ({ canvasElement }) => {
+        const el = box(canvasElement, 'Not available');
+        await expect(el).toHaveAttribute('data-disabled');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+    },
+};
+
+export const Required = {
+    render: () => <Checkbox id="cb-ex-required" label="I accept the terms" isRequired />,
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-form-checkbox-wrapper')).toHaveClass('plus-form-checkbox-required');
+        await expect(canvasElement.querySelector('.plus-field-required')).toHaveAttribute('aria-hidden', 'true');
+    },
+};
+
+export const Description = {
+    render: () => <Checkbox id="cb-ex-desc" label="Email reminders" description="Sent the evening before." />,
+    play: async ({ canvasElement }) => {
+        const el = box(canvasElement, 'Email reminders');
+        const desc = canvasElement.ownerDocument.getElementById(el.getAttribute('aria-describedby'));
+        await expect(desc.textContent).toBe('Sent the evening before.');
+    },
+};
+
+export const Card = {
+    render: () => <Checkbox id="cb-ex-card" label="Text reminders" description="Sent an hour before." appearance="card" defaultChecked />,
+    play: async ({ canvasElement }) => {
+        await expect(box(canvasElement, 'Text reminders')).toHaveAttribute('aria-checked', 'true');
+    },
 };

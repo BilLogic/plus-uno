@@ -9,7 +9,7 @@ Composed from DatePicker and TimePicker, laid out as labeled sections with a sha
 
 **Source:** `design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.stories.jsx` — Overview, Spacing, Validation, InteractionStates, TimeZones, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.stories.jsx` — Overview, Spacing, Validation, InteractionStates, TimeZones, Interactive, Default, WithValue, Compact, Invalid, Valid, ReadOnly, Disabled, HoveredState, KeyboardFocus
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.mdx`
 
@@ -66,6 +66,4 @@ From `design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicke
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

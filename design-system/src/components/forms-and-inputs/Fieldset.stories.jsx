@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { expect, userEvent, within } from 'storybook/test';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Fieldset from './Fieldset';
 import Checkbox from './Checkbox';
 
@@ -82,3 +83,55 @@ export const WithRequiredAndError = () => (
         </Fieldset>
     </div>
 );
+
+/** One story per state, for the Examples tab. */
+export const Required = {
+    render: () => (
+        <Fieldset legend="Notify me by" isRequired>
+            <Checkbox name="fs-ex-required" label="Email" />
+            <Checkbox name="fs-ex-required-2" label="Text" />
+        </Fieldset>
+    ),
+    play: async ({ canvasElement }) => {
+        const group = within(canvasElement).getByRole('group', { name: /Notify me by/ });
+        await expect(group).toHaveAccessibleName('Notify me by (required)');
+        await expect(canvasElement.querySelector('.plus-fieldset-required')).toHaveAttribute('aria-hidden', 'true');
+    },
+};
+
+export const Invalid = {
+    render: () => (
+        <Fieldset legend="Notify me by" error="Choose at least one.">
+            <Checkbox name="fs-ex-invalid" label="Email" />
+            <Checkbox name="fs-ex-invalid-2" label="Text" />
+        </Fieldset>
+    ),
+    play: async ({ canvasElement }) => {
+        const group = within(canvasElement).getByRole('group', { name: 'Notify me by' });
+        const alert = within(canvasElement).getByRole('alert');
+        await expect(alert).toHaveTextContent('Choose at least one.');
+        await expect(group.getAttribute('aria-describedby')).toContain(alert.id);
+        await expect(getComputedStyle(alert).color).toBe(tokenColor(canvasElement, '--ds-text-danger'));
+    },
+};
+
+export const Disabled = {
+    render: () => (
+        <Fieldset legend="Notify me by" isDisabled>
+            <Checkbox name="fs-ex-disabled" label="Email" />
+        </Fieldset>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('group', { name: 'Notify me by' })).toBeDisabled();
+    },
+};
+
+export const Interactive = {
+    args: { legend: 'Notify me by', isRequired: false, isDisabled: false, error: '' },
+    render: (args) => (
+        <Fieldset {...args}>
+            <Checkbox name="fs-playground" label="Email" />
+            <Checkbox name="fs-playground-2" label="Text" />
+        </Fieldset>
+    ),
+};

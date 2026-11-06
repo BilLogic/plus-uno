@@ -537,7 +537,7 @@
         "import": "@/components/forms-and-inputs",
         "export": "default",
         "mdxPath": "design-system/src/components/forms-and-inputs/FileUpload/FileUpload.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/FileUpload",
         "source": "design-system/src/components/forms-and-inputs/FileUpload/FileUpload.jsx",
         "storybookId": "components-forms-and-inputs-file-upload--docs"
       },
@@ -552,8 +552,7 @@
             "source": "node-chart",
             "status": "verified"
           }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13337-2288"
+        ]
       }
     },
     "Flag": {

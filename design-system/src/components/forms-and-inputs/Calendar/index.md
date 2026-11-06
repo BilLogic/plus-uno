@@ -9,7 +9,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.stories.jsx` — Overview, Sizes, Bounds, PickADay, TurnMonths
+**Stories:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.stories.jsx` — Overview, Sizes, Bounds, PickADay, TurnMonths, Default, Selected, Range, Disabled, HoveredState, KeyboardFocus
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.mdx`
 
@@ -38,6 +38,4 @@ Anything not listed is not a valid value.
 
 Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
