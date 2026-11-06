@@ -3,7 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import { px } from '@/storybook-docs/lib/style-probes.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Radio from './Radio';
 
 export default {
@@ -275,4 +275,70 @@ HoverStep.play = async ({ canvasElement }) => {
         await expect(uncheckedHover.backgroundColor, `${mode}: unchecked hover fill`).toBe(token('--ds-background-input-hovered'));
         await expect(uncheckedHover.borderTopColor, `${mode}: unchecked hover edge`).toBe(token('--ds-border-brand'));
     });
+};
+
+/** One story per state, for the Examples tab. */
+const radioOf = (canvasElement, name) => within(canvasElement).getByRole('radio', { name });
+
+export const Unselected = {
+    render: () => <Radio id="radio-ex-off" name="radio-ex-off" label="Online" value="online" />,
+    play: async ({ canvasElement }) => {
+        const el = radioOf(canvasElement, 'Online');
+        await expect(el).toHaveAttribute('aria-checked', 'false');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-input'));
+    },
+};
+
+export const Selected = {
+    render: () => <Radio id="radio-ex-on" name="radio-ex-on" label="In person" value="in-person" defaultChecked />,
+    play: async ({ canvasElement }) => {
+        const el = radioOf(canvasElement, 'In person');
+        await expect(el).toHaveAttribute('aria-checked', 'true');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected-bold'));
+    },
+};
+
+export const Hovered = {
+    render: () => <Radio id="radio-ex-hover" name="radio-ex-hover" label="Online" value="online" />,
+    play: async ({ canvasElement }) => {
+        const el = radioOf(canvasElement, 'Online');
+        el.style.transition = 'none';
+        const { backgroundColor, borderTopColor } = withForcedPseudo(el, ':hover', () => ({
+            backgroundColor: getComputedStyle(el).backgroundColor,
+            borderTopColor: getComputedStyle(el).borderTopColor,
+        }));
+        await expect(backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-input-hovered'));
+        await expect(borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-brand'));
+    },
+};
+
+export const Focused = {
+    render: () => <Radio id="radio-ex-focus" name="radio-ex-focus" label="Online" value="online" />,
+    play: async ({ canvasElement }) => {
+        const el = radioOf(canvasElement, 'Online');
+        el.style.transition = 'none';
+        el.focus({ focusVisible: true });
+        const style = getComputedStyle(el);
+        await waitFor(() => expect(style.outlineStyle).toBe('solid'));
+        await expect(px(style.outlineWidth)).toBe(2);
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        el.blur();
+    },
+};
+
+export const Disabled = {
+    render: () => <Radio id="radio-ex-disabled" name="radio-ex-disabled" label="Not available" value="na" isDisabled />,
+    play: async ({ canvasElement }) => {
+        const el = radioOf(canvasElement, 'Not available');
+        await expect(el).toHaveAttribute('data-disabled');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+    },
+};
+
+export const Required = {
+    render: () => <Radio id="radio-ex-required" name="radio-ex-required" label="Weekly" value="weekly" isRequired />,
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-form-radio-wrapper')).toHaveClass('plus-form-radio-required');
+        await expect(canvasElement.querySelector('.plus-field-required')).toHaveAttribute('aria-hidden', 'true');
+    },
 };
