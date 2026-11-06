@@ -10,7 +10,7 @@
  */
 
 export const AUTHORED_SECTIONS = [
-  { key: 'whenToUse', label: 'When to use', match: /^#{2,4}\s*when (to use|not to use)/i },
+  { key: 'whenToUse', label: 'When to use', match: /^#{2,4}\s*(when (to use|not to use)|usage$)/i },
   { key: 'correctIncorrect', label: 'Correct/incorrect', match: /^#{2,4}\s*(correct|do(s)? and don|usage (do|guidance))/i },
   { key: 'accessibility', label: 'Accessibility', match: /^#{2,4}\s*accessibility/i },
 ];
@@ -21,8 +21,8 @@ export const AUTHORED_SECTIONS = [
  * prose that happens to open with "Do not" is a sentence, not a label.
  */
 const LEAD = String.raw`^(?:\/\/|\{\/\*|<!--)?\s*`;
-const DONT = new RegExp(`${LEAD}(?:incorrect\\b|✗|\\*\\*don['’]t\\*\\*)`, 'i');
-const DO = new RegExp(`${LEAD}(?:correct\\b|✓|\\*\\*do\\*\\*)`, 'i');
+const DONT = new RegExp(`${LEAD}(?:incorrect\\b|✗|\\*\\*don['’]t\\*\\*|dontExample=)`, 'i');
+const DO = new RegExp(`${LEAD}(?:correct\\b|✓|\\*\\*do\\*\\*|doExample=)`, 'i');
 
 const RULE = /^###\s/;
 const ANY_HEADING = /^#{1,6}\s/;
