@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { expect, userEvent, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
@@ -198,4 +199,43 @@ Interactive.play = async ({ canvasElement }) => {
     await userEvent.click(canvas.getByRole('button', { name: 'Finish generating' }));
     await expect(wrapper.getAttribute('aria-busy')).toBe('false');
     await expect(ringOf(canvasElement)).toBeNull();
+};
+
+/* ------------------------------------------------------------------- states */
+
+
+const Subject = (props) => <GenerativeBorder {...props}><p style={{ margin: 0, padding: 'var(--pad-x-lg)' }}>Session summary</p></GenerativeBorder>;
+const root = (canvasElement) => canvasElement.firstElementChild;
+
+/** Rest: generative border. */
+export const Rest = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expect(root(canvasElement)).toHaveAttribute('aria-busy', 'false');
+        await expect(canvasElement.querySelector('.plus-generative-border__ring')).toBeNull();
+    },
+};
+
+/** Hovered: a display component has no hover layer, so nothing moves. */
+export const Hovered = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':hover', 'generative border');
+    },
+};
+
+/** Pressed: no pressed layer either. */
+export const Pressed = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':active', 'generative border');
+    },
+};
+
+/** Focused: not a control, so Tab skips it. */
+export const Focused = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(root(canvasElement), 'generative border');
+    },
 };

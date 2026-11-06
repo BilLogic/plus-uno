@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as GenerativeBorderStories from './GenerativeBorder.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={GenerativeBorderStories} />
 
@@ -39,6 +39,22 @@ The border that shows PLUS AI is generating content: a 2px rounded stroke in two
 
 <DocsCanvasShell description={<>Under reduced motion the same segments hold still.</>}>
     <DsCanvasQuiet of={GenerativeBorderStories.ReducedMotion} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Idle: the content alone, no ring, not busy.</>}>
+    <DsCanvasQuiet of={GenerativeBorderStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The border has no hover layer, so nothing moves.</>}>
+    <DsCanvasQuiet of={GenerativeBorderStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>No pressed layer.</>}>
+    <DsCanvasQuiet of={GenerativeBorderStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Not a control, so Tab skips it.</>}>
+    <DsCanvasQuiet of={GenerativeBorderStories.Focused} />
 </DocsCanvasShell>
 
 </div>
@@ -79,7 +95,7 @@ The border that shows PLUS AI is generating content: a 2px rounded stroke in two
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `GenerativeBorder` only while PLUS AI is generating into a piece of content, one ring per piece. It is never decoration, and two must not nest. For other waits, use `Spinner` or `Skeleton`.
 
@@ -87,7 +103,44 @@ Use `GenerativeBorder` only while PLUS AI is generating into a piece of content,
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Content.** What is being generated into, unchanged by the border.
+2. **Ring.** A 2px stroke over the edge while `isActive`, so layout never moves.
+3. **Segments.** Four flat segments, brand and discovery alternating, turning clockwise.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Idle</td><td>No ring. <code>aria-busy</code> is false.</td></tr>
+<tr><td>Generating</td><td>The ring is on and turns. <code>aria-busy</code> is true.</td></tr>
+<tr><td>Reduced motion</td><td>The ring stays at its still frame.</td></tr>
+<tr><td>Hovered, pressed, focused, disabled</td><td>None. It is not a control.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Segments</td><td><code>--ds-border-brand</code> and <code>--ds-border-discovery</code>.</td></tr>
+<tr><td>Stroke</td><td><code>--size-border-stroke-stroke-200</code>.</td></tr>
+<tr><td>Corner</td><td>The radius token named by <code>radius</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Wrap the content and toggle `isActive`.
 
@@ -100,6 +153,23 @@ Use `GenerativeBorder` only while PLUS AI is generating into a piece of content,
 ### Match `radius` to the wrapped content.
 
 The wrapper is as wide as its parent, so set the width of the thing it surrounds.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Say what is being made beside the border: "Drafting the session summary…".</td><td>Show the border with no text about what is happening.</td></tr>
+<tr><td>Use one ring per piece of content.</td><td>Nest two rings.</td></tr>
+<tr><td>End the ring when the content is complete.</td><td>Leave it on after the content arrives.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

@@ -11,7 +11,7 @@ PanelContainer: the panel's own surface, at a fixed or the provider's width.
 
 **Source:** `design-system/src/components/layout-and-structure/Panel/Panel.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Panel/Panel.stories.jsx` — FullComposition, MinimalHeaderAndBody, WidthFromProvider
+**Stories:** `design-system/src/components/layout-and-structure/Panel/Panel.stories.jsx` — FullComposition, MinimalHeaderAndBody, WidthFromProvider, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Panel/Panel.mdx`
 

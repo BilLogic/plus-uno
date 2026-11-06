@@ -1,4 +1,5 @@
 import React from 'react';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ProgressBar, { PROGRESS_BAR_APPEARANCES } from './ProgressBar';
@@ -69,4 +70,44 @@ export const Interactive = {
             <ProgressBar {...args} />
         </div>
     ),
+};
+
+/* ------------------------------------------------------------------- states */
+
+
+const Subject = (props) => <div style={{ width: '240px' }}><ProgressBar value={50} ariaLabel="Goals met" {...props} /></div>;
+const root = (canvasElement) => canvasElement.firstElementChild;
+
+/** Rest: progress bar. */
+export const Rest = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        const bar = within(canvasElement).getByRole('progressbar', { name: 'Goals met' });
+        await expect(bar).toHaveAttribute('aria-valuenow', '50');
+        await expect(bar.style.width).toBe('50%');
+    },
+};
+
+/** Hovered: a display component has no hover layer, so nothing moves. */
+export const Hovered = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':hover', 'progress bar');
+    },
+};
+
+/** Pressed: no pressed layer either. */
+export const Pressed = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(root(canvasElement), ':active', 'progress bar');
+    },
+};
+
+/** Focused: not a control, so Tab skips it. */
+export const Focused = {
+    render: () => <Subject />,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(root(canvasElement), 'progress bar');
+    },
 };

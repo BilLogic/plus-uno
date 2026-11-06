@@ -98,6 +98,28 @@ its glyph and accessible name already set.
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## State
+
+<DocsCanvasShell description={<>A panel with its header, body and close action.</>}>
+    <DsCanvasQuiet of={PanelStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The panel has no hover layer. Only the actions inside it react.</>}>
+    <DsCanvasQuiet of={PanelStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>No pressed layer on the panel.</>}>
+    <DsCanvasQuiet of={PanelStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The panel is not a control, so Tab skips it and lands on the close action.</>}>
+    <DsCanvasQuiet of={PanelStories.Focused} />
+</DocsCanvasShell>
+
+</div>
+
 </div>
 
 </DocsTab>
@@ -108,7 +130,7 @@ its glyph and accessible name already set.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Panel` for context or a focused task beside the page's main content — a
 detail view opened from a list, a filter set, a secondary thread — where
@@ -120,7 +142,47 @@ instead.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Header.** Back action, optional title icon, title, and an action group.
+2. **Subheader.** Optional line under the header.
+3. **Body.** The panel's content, which scrolls.
+4. **Footer.** Optional disclaimer and actions.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>An overlay surface with a leading edge.</td></tr>
+<tr><td>Hovered</td><td>Nothing changes on the panel.</td></tr>
+<tr><td>Pressed</td><td>Nothing changes on the panel.</td></tr>
+<tr><td>Focused</td><td>Not focusable. Focus goes to the fixed actions and the content.</td></tr>
+<tr><td>Disabled</td><td>A panel has no disabled state. Disable the controls in it.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Ground and edge</td><td><code>--ds-surface-overlay</code>; <code>--ds-border</code> at <code>--border-default</code> on the leading edge.</td></tr>
+<tr><td>Header</td><td>Padding <code>--space-100</code> and <code>--space-150</code>; <code>--border-default</code> rule below.</td></tr>
+<tr><td>Body</td><td>Padding <code>--space-150</code>.</td></tr>
+<tr><td>Footer</td><td>Padding <code>--space-100</code> and <code>--space-150</code>; rule above; disclaimer in <code>--body-small</code>, <code>--ds-text-subtle</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Share one width across a page's panels with `PanelProvider`.
 
@@ -142,6 +204,23 @@ stay the same size instead of each picking its own.
 `PanelBackAction`, `PanelCloseAction` and the rest already carry the right
 icon, label and compact spacing — building a custom `IconButton` for the same
 job only risks a different icon or label than the rest of the system uses.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Title the panel for its subject: "Session details".</td><td>Title it "Panel" or "Details".</td></tr>
+<tr><td>Keep the disclaimer to one line.</td><td>Put instructions in the footer that belong in the body.</td></tr>
+<tr><td>Name the footer action for its result: "Done", "Save".</td><td>Use "OK" or "Submit".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

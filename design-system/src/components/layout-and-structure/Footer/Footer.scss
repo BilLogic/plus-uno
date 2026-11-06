@@ -1,0 +1,17 @@
+@use '../../../styles/state' as *;
+
+/*
+ * Footer: one line of small text. The terms link is the only control: it reads
+ * as a link at rest, takes the pressed link color on hover and press, and
+ * draws the focus ring for the keyboard.
+ */
+.plus-footer-link {
+    color: var(--ds-link);
+    text-decoration: underline;
+    border-radius: var(--radius-sm);
+
+    @include plus-state((
+        hovered: (color: var(--ds-link-pressed)),
+        pressed: (color: var(--ds-link-pressed)),
+    ));
+}

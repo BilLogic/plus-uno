@@ -62,15 +62,15 @@ export const SKELETON_PRESETS = [...SKELETON_SHAPES, ...Object.keys(PRESETS)];
 /** Radius token names, each the full token with its fallback. */
 export const SKELETON_RADII = {
     none: '0',
-    'element-radius-sm': 'var(--radius-md, 4px)',
-    'element-radius-md': 'var(--radius-md, 4px)',
-    'element-radius-lg': 'var(--radius-lg, 8px)',
-    'element-radius-full': 'var(--radius-full, 999px)',
-    'card-radius-sm': 'var(--size-card-radius-sm, 12px)',
-    'card-radius-md': 'var(--size-card-radius-md, 16px)',
-    'section-radius-sm': 'var(--size-section-radius-sm, 8px)',
-    'section-radius-md': 'var(--size-section-radius-md, 12px)',
-    'section-radius-lg': 'var(--size-section-radius-lg, 16px)',
+    'element-radius-sm': 'var(--radius-md)',
+    'element-radius-md': 'var(--radius-md)',
+    'element-radius-lg': 'var(--radius-lg)',
+    'element-radius-full': 'var(--radius-full)',
+    'card-radius-sm': 'var(--size-card-radius-sm)',
+    'card-radius-md': 'var(--size-card-radius-md)',
+    'section-radius-sm': 'var(--size-section-radius-sm)',
+    'section-radius-md': 'var(--size-section-radius-md)',
+    'section-radius-lg': 'var(--size-section-radius-lg)',
 };
 
 const toLength = (value) => (typeof value === 'number' ? `${value}px` : value);

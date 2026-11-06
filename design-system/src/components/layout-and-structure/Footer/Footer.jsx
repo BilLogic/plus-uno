@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import './Footer.scss';
 
 /**
  * Footer (Footnote) Component
@@ -36,9 +37,7 @@ const Footer = ({
             >
                 {version} | {copyright} | <a
                     href={termsUrl}
-                    style={{
-                        color: 'var(--ds-link)'
-                    }}
+                    className="plus-footer-link"
                 >{termsText}</a>
             </p>
         </footer>
