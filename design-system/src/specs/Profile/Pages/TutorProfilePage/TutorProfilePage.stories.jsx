@@ -21,6 +21,7 @@ import { MathLevel } from '../../Elements/MathLevel.stories';
 import { LanguagePreferences } from '../../Elements/LanguagePreferences.stories';
 import { SemesterAtPLUS } from '../../Elements/SemesterAtPLUS.stories';
 import { UploadProfilePic } from '../../Elements/UploadProfilePic.stories';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     title: 'Specs/Profile/Pages/Tutor Profile Page',
@@ -287,7 +288,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                         }}
                                     >
                                         <i
-                                            className="fa-solid fa-circle-info"
+                                            className={iconClass('circle-info')}
                                             style={{ fontSize: '10px', color: 'var(--color-primary)' }}
                                         />
                                     </span>
@@ -360,7 +361,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                         width: '9px',
                                     }}
                                 >
-                                    <i className="fa-solid fa-circle-info" style={{ fontSize: '10px', color: 'var(--color-primary)' }} />
+                                    <i className={iconClass('circle-info')} style={{ fontSize: '10px', color: 'var(--color-primary)' }} />
                                 </span>
                             </Tooltip>
                         </div>
@@ -401,7 +402,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                         <Label text="Clearance Status" required={false} />
                         <div style={{ display: 'flex', gap: 'var(--size-spacing-space-050, 4px)', alignItems: 'flex-start' }}>
                             <i
-                                className="fa-solid fa-circle-check"
+                                className={iconClass('circle-check')}
                                 style={{ fontSize: '10px', color: 'var(--color-success)', lineHeight: '20px' }}
                             />
                             <span className="body3-txt font-weight-light" style={{ color: 'var(--color-success-text)' }}>
@@ -439,7 +440,7 @@ function TutorProfileInteractiveDemo({ profileState }) {
                                         width: '9px',
                                     }}
                                 >
-                                    <i className="fa-solid fa-circle-info" style={{ fontSize: '10px', color: 'var(--color-primary)' }} />
+                                    <i className={iconClass('circle-info')} style={{ fontSize: '10px', color: 'var(--color-primary)' }} />
                                 </span>
                             </Tooltip>
                         </div>

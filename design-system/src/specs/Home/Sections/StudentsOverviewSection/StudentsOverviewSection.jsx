@@ -5,6 +5,7 @@ import Table from '@/components/text-and-data-display/Table';
 import Button from '@/components/forms-and-inputs/Button';
 import StatusTag from '@/components/labels/StatusTag';
 import './StudentsOverviewSection.scss';
+import { iconClass } from '../../../../lib/icon';
 
 /**
  * OverviewCard component for displaying metrics
@@ -31,7 +32,7 @@ const OverviewCard = ({
         >
             <div className="plus-overview-card-header">
                 <h5 className="plus-overview-card-title h5">{title}</h5>
-                <i className="fa-solid fa-circle-info"></i>
+                <i className={iconClass('circle-info')}></i>
             </div>
             <div className="plus-overview-card-body">
                 <div className="plus-overview-card-text">
@@ -234,7 +235,7 @@ const StudentsOverviewSection = ({
             text: (
                 <div className="plus-students-table-header">
                     <span>Name</span>
-                    <i className="fa-solid fa-arrow-up"></i>
+                    <i className={iconClass('arrow-up')}></i>
                 </div>
             ),
             width: '33.33%'
@@ -243,7 +244,7 @@ const StudentsOverviewSection = ({
             text: (
                 <div className="plus-students-table-header">
                     <span>Status</span>
-                    <i className="fa-solid fa-arrow-up"></i>
+                    <i className={iconClass('arrow-up')}></i>
                 </div>
             ),
             width: '33.33%'
@@ -252,7 +253,7 @@ const StudentsOverviewSection = ({
             text: (
                 <div className="plus-students-table-header">
                     <span>Focus Area</span>
-                    <i className="fa-solid fa-arrow-up"></i>
+                    <i className={iconClass('arrow-up')}></i>
                 </div>
             ),
             width: '33.33%'

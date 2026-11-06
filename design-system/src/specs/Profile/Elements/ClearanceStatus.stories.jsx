@@ -6,6 +6,7 @@
  * Figma: https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=5667-26454&m=dev
  */
 import React from 'react';
+import { iconClass } from '../../../lib/icon';
 
 export default {
     title: 'Specs/Profile/Elements/Clearance Status',
@@ -31,17 +32,17 @@ export default {
 export function ClearanceStatus({ status = 'verified', date = 'March 16, 2026' }) {
     const statusConfig = {
         verified: {
-            icon: 'fa-solid fa-circle-check',
+            icon: iconClass('circle-check'),
             color: 'var(--color-success-text)',
             text: `Verified: ${date}`,
         },
         expired: {
-            icon: 'fa-solid fa-triangle-exclamation',
+            icon: iconClass('triangle-exclamation'),
             color: 'var(--color-danger-text)',
             text: `Expired: ${date}`,
         },
         'in-progress': {
-            icon: 'fa-solid fa-triangle-exclamation',
+            icon: iconClass('triangle-exclamation'),
             color: 'var(--color-warning-text)',
             text: 'In Progress',
         },

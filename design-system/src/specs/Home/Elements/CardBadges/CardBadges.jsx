@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './CardBadges.scss';
+import { iconClass } from '../../../../lib/icon';
 
 /**
  * CardBadges Component
@@ -26,7 +27,7 @@ export const CardBadges = ({
             <div className="plus-card-badge-inner">
                 <div className="plus-card-badge-content">
                     <div className="plus-card-badge-icon">
-                        <i className={`fa-solid fa-${iconName}`} aria-hidden="true"></i>
+                        <i className={iconClass(iconName)} aria-hidden="true"></i>
                     </div>
                     <span className="plus-card-badge-text body2-txt font-weight-semibold">
                         {sign}{displayPercentage}% {text}

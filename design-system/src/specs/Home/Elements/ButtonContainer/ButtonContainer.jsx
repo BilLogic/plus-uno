@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Button from '@/components/forms-and-inputs/Button';
 import { Select } from '@/components';
 import './ButtonContainer.scss';
+import { iconClass } from '../../../../lib/icon';
 
 /**
  * ButtonContainer Component
@@ -55,7 +56,7 @@ export const ButtonContainer = ({
             </div>
             <div className={`plus-button-container-message ${messageColorClass}`}>
                 <div className="plus-button-container-message-icon">
-                    <i className={`fa-solid fa-${messageIcon}`} aria-hidden="true"></i>
+                    <i className={iconClass(messageIcon)} aria-hidden="true"></i>
                 </div>
                 <span className="plus-button-container-message-text body3-txt">
                     {message}

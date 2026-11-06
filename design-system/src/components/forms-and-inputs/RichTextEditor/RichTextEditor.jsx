@@ -6,6 +6,7 @@ import { ButtonItem } from '@/components/navigation/MenuGroup';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup/ButtonGroup';
 import './RichTextEditor.scss';
+import { iconClass } from '../../../lib/icon';
 
 const FULL_DEFAULT_BUTTONS = [
     'bold', 'italic', 'underline', 'strikethrough',
@@ -261,7 +262,7 @@ const RichTextEditor = ({
                                 >
                                     <span className="plus-rich-text-editor-block-toggle-label">{blockLabel}</span>
                                     <span className="plus-rich-text-editor-block-toggle-caret" aria-hidden>
-                                        <i className="fa-solid fa-arrows-up-down" />
+                                        <i className={iconClass('arrows-up-down')} />
                                     </span>
                                 </button>
                             )}

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './SessionAvailabilitySnackbar.scss';
+import { iconClass } from '../../../lib/icon';
 
 export const SessionAvailabilitySnackbar = ({
     type = 'one-time session',
@@ -25,7 +26,7 @@ export const SessionAvailabilitySnackbar = ({
         <div className={`plus-session-availability-snackbar ${className}`} {...props}>
             <div className="plus-session-availability-snackbar__header">
                 <div className="plus-session-availability-snackbar__header-content">
-                    <i className="fa-solid fa-circle-check plus-session-availability-snackbar__icon"></i>
+                    <i className={`${iconClass('circle-check')} plus-session-availability-snackbar__icon`}></i>
                     <span className="plus-session-availability-snackbar__title">Success</span>
                 </div>
                 <div className="plus-session-availability-snackbar__meta">

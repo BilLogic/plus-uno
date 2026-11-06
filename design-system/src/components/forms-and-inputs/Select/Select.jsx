@@ -10,6 +10,7 @@ import useOptionSource from '../_internal/useOptionSource';
 import useStagedValue from '../_internal/useStagedValue';
 import useFieldId from '../useFieldId';
 import './Select.scss';
+import { iconClass } from '../../../lib/icon';
 
 export { SEARCH_FIRST_ABOVE };
 
@@ -361,7 +362,7 @@ const Select = ({
                     onMouseDown={(event) => event.preventDefault()}
                     onClick={() => { clear(); controlRef.current?.focus(); }}
                 >
-                    <i className="fa-solid fa-circle-xmark" aria-hidden="true" />
+                    <i className={iconClass('circle-xmark')} aria-hidden="true" />
                 </button>
             )}
             {!isReadOnly && (
@@ -377,7 +378,7 @@ const Select = ({
         header = (
             <button type="button" className="plus-select-all" aria-pressed={allPicked} onClick={toggleAll}>
                 <span aria-hidden="true" className={`plus-select-all-mark${allPicked ? ' is-checked' : ''}`}>
-                    {allPicked && <i className="fa-solid fa-check" />}
+                    {allPicked && <i className={iconClass('check')} />}
                 </span>
                 Select all
             </button>

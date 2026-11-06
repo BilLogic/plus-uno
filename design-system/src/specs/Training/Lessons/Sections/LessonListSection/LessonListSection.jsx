@@ -11,6 +11,7 @@ import { Table } from 'react-bootstrap';
 import Button from '@/components/forms-and-inputs/Button';
 import SmartTag from '@/components/labels/SmartTag';
 import './LessonListSection.scss';
+import { iconClass } from '../../../../../lib/icon';
 
 const LessonListSection = ({
     title = 'My Students',
@@ -30,7 +31,7 @@ const LessonListSection = ({
     ];
 
     const SortIcon = () => (
-        <i className="fa-solid fa-arrow-up-long lesson-list-section__sort-icon" aria-hidden="true" />
+        <i className={`${iconClass('arrow-up-long')} lesson-list-section__sort-icon`} aria-hidden="true" />
     );
 
     return (

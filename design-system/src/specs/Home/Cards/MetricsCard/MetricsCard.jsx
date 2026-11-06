@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import PatternCard from '@/patterns/PatternCard';
 import StatusTag from '@/components/labels/StatusTag';
 import './MetricsCard.scss';
+import { iconClass } from '../../../../lib/icon';
 
 /**
  * MetricsCard component for Home page
@@ -182,7 +183,7 @@ const MetricItem = ({ value, label, showBadge = false, badgeState = 'increase' }
         const badgeText = badgeState === 'increase' ? '+{#}% since last week' : '-{#}% since last week';
         
         return (
-            <StatusTag appearance="success" leadingVisual={<i className={`fas fa-${icon}`}></i>}>{badgeText}</StatusTag>
+            <StatusTag appearance="success" leadingVisual={<i className={iconClass(icon)}></i>}>{badgeText}</StatusTag>
         );
     };
 
@@ -206,7 +207,7 @@ const StackedMetricCard = ({ value, label, showBadge = false, badgeState = 'incr
         const badgeText = badgeState === 'increase' ? '+{#}% since last week' : '-{#}% since last week';
         
         return (
-            <StatusTag appearance="success" leadingVisual={<i className={`fas fa-${icon}`}></i>}>{badgeText}</StatusTag>
+            <StatusTag appearance="success" leadingVisual={<i className={iconClass(icon)}></i>}>{badgeText}</StatusTag>
         );
     };
 

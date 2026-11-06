@@ -14,6 +14,7 @@ import { Attendees_One_Time_Session } from '../Modals/ConfirmSessionAvailability
 import { Attendees_Recurring_Session } from '../Modals/ConfirmSessionAvailability/AttendeesRecurringSession.stories';
 import { Session_Details_NA } from '../Modals/ConfirmSessionAvailability/SessionDetailsNA.stories';
 import { SectionTitle, ModalBlanket, MissingModal } from './_pageHelpers';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -69,9 +70,9 @@ const BackgroundContent = ({ tabs, selectedTab }) => (
 
         {/* Stat Cards */}
         <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)' }}>
-            <StatCard title="Today's sessions" value="1" icon="fa-solid fa-calendar-day" />
-            <StatCard title="Pending call-offs" value="2" icon="fa-solid fa-hourglass-half" />
-            <StatCard title="Open for fill-ins" value="23" icon="fa-solid fa-right-to-bracket" />
+            <StatCard title="Today's sessions" value="1" icon={iconClass('calendar-day')} />
+            <StatCard title="Pending call-offs" value="2" icon={iconClass('hourglass-half')} />
+            <StatCard title="Open for fill-ins" value="23" icon={iconClass('right-to-bracket')} />
         </div>
 
         {/* Nav Tabs */}

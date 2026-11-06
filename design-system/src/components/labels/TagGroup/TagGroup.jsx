@@ -4,6 +4,7 @@ import Tag, { TagContext, resolveTagKind, useTagContext } from '../Tag';
 import DropdownMenu from '../../forms-and-inputs/DropdownMenu';
 import { ButtonItem, CustomItem } from '@/components/navigation/MenuGroup';
 import './TagGroup.scss';
+import { iconClass } from '../../../lib/icon';
 
 /**
  * The container for a set of tags.
@@ -102,7 +103,7 @@ const menuRowOf = (child) => {
                     key={child.key}
                     component={props.linkComponent || 'a'}
                     href={props.href}
-                    elemAfter={<i className="fa-solid fa-arrow-right" aria-hidden="true" />}
+                    elemAfter={<i className={iconClass('arrow-right')} aria-hidden="true" />}
                     onClick={props.onClick}
                 >
                     {text}

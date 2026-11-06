@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@/components';
 import { RefTable, C, Do, Dont, DoDont } from '@/storybook-docs/foundation-blocks.jsx';
+import { iconClass } from '../lib/icon';
 
 export default {
     title: 'Foundations/Accessibility',
@@ -44,7 +45,7 @@ export const StatusNotColorAlone = () => (
     <DoDont>
         <Do caption="Color, an icon and a word together. The status reads with no color vision.">
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text-danger)' }}>
-                <i className="fa-solid fa-circle-exclamation" aria-hidden="true" />
+                <i className={iconClass('circle-exclamation')} aria-hidden="true" />
                 Payment failed
             </span>
         </Do>

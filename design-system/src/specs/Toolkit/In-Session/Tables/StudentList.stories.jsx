@@ -4,6 +4,7 @@ import StatusTag from '@/components/labels/StatusTag';
 import { AttendanceDropdown } from '../Elements/AttendanceDropdown.jsx';
 import { EngagementDropdown } from '../Elements/EngagementDropdown.jsx';
 import { RoomBadge } from '../Elements/badges/RoomBadge.jsx';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -71,7 +72,7 @@ export const TableHeaderRow = () => (
                 Name
             </span>
             <i
-                className="fa-solid fa-arrow-up"
+                className={iconClass('arrow-up')}
                 style={{
                     fontSize: 'var(--font-size-fa-body2-solid)',
                     color: 'var(--color-outline-variant)'
@@ -93,7 +94,7 @@ export const TableHeaderRow = () => (
                 Status
             </span>
             <i
-                className="fa-solid fa-arrow-up"
+                className={iconClass('arrow-up')}
                 style={{
                     fontSize: 'var(--font-size-fa-body2-solid)',
                     color: 'var(--color-outline-variant)'

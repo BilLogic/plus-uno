@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Button from '@/components/forms-and-inputs/Button';
 import useFieldId from '../useFieldId';
 import './FileUpload.scss';
+import { iconClass } from '../../../lib/icon';
 
 const FileUpload = ({
     id,
@@ -66,9 +67,9 @@ const FileUpload = ({
     };
 
     const validationIcon = state === 'invalid' ? (
-        <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" />
+        <i className={iconClass('triangle-exclamation')} aria-hidden="true" />
     ) : state === 'valid' ? (
-        <i className="fa-solid fa-circle-check" aria-hidden="true" />
+        <i className={iconClass('circle-check')} aria-hidden="true" />
     ) : null;
 
     // Build description text

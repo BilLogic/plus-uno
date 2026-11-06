@@ -4,6 +4,7 @@ import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import Table, { StaticTable, HeadCell } from '@/components/text-and-data-display/Table';
+import { iconClass } from '../../../lib/icon';
 
 export default {
     title: 'Components/Text and data display/Static table',
@@ -175,7 +176,7 @@ export const Cells = {
                     { content: 'Ava Thompson', emphasis: 'title', secondary: 'Grade 7 · Lincoln Middle', leading: <i className="fa-regular fa-circle-user" aria-hidden="true" /> },
                     { content: 'Rescheduled from Oct 22 because of a school assembly', overflow: 'wrap' },
                     { content: '1,240', align: 'number' },
-                    { content: <i className="fa-solid fa-flag" role="img" aria-label="Flagged" />, align: 'icon' }
+                    { content: <i className={iconClass('flag')} role="img" aria-label="Flagged" />, align: 'icon' }
                 ],
                 [
                     { content: 'Marcus Lee', emphasis: 'title' },
@@ -263,8 +264,8 @@ export const HeadCells = {
         <HeadRow>
             <HeadCell label="Student" icon="fa-regular fa-user" width="160px" />
             <HeadCell label="A column name far too long for the width it was given" width="120px" />
-            <HeadCell label="Sessions" align="number" icon="fa-solid fa-hashtag" width="120px" />
-            <HeadCell label="Flagged" align="icon" icon="fa-solid fa-flag" isIconOnlyHeader width="64px" />
+            <HeadCell label="Sessions" align="number" icon={iconClass('hashtag')} width="120px" />
+            <HeadCell label="Flagged" align="icon" icon={iconClass('flag')} isIconOnlyHeader width="64px" />
         </HeadRow>
     ),
     play: async ({ canvasElement }) => {

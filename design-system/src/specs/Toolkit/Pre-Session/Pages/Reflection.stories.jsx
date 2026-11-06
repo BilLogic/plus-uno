@@ -6,6 +6,7 @@ import { ReflectionsTableRow, ReflectionsTableHeaderRow } from '../Tables/Reflec
 import { NavHorizontal } from '../Tables/NavHorizontal.stories';
 import { CompletionFilter } from '../Elements/Filters/CompletionFilter.stories';
 import { SectionTitle } from './_pageHelpers';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -44,9 +45,9 @@ const MainContent = ({
     >
         {/* Stat Cards - using card gap token */}
         <div style={{ display: 'flex', gap: 'var(--size-card-gap-md)' }}>
-            <StatCard title="Today's sessions" value="1" icon="fa-solid fa-calendar-day" />
-            <StatCard title="Pending call-offs" value="2" icon="fa-solid fa-hourglass-half" />
-            <StatCard title="Open for fill-ins" value="23" icon="fa-solid fa-right-to-bracket" />
+            <StatCard title="Today's sessions" value="1" icon={iconClass('calendar-day')} />
+            <StatCard title="Pending call-offs" value="2" icon={iconClass('hourglass-half')} />
+            <StatCard title="Open for fill-ins" value="23" icon={iconClass('right-to-bracket')} />
         </div>
 
         {/* Fill in Button - aligned right */}

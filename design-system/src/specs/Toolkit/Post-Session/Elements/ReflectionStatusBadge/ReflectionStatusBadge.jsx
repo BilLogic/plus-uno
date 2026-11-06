@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { StatusTag } from '@/components';
+import { iconClass } from '../../../../../lib/icon';
 
 const STATUS_CONFIG = {
     'not-started': {
@@ -12,13 +13,13 @@ const STATUS_CONFIG = {
     'in-progress': {
         text: 'In Progress',
         style: 'warning',
-        iconClass: 'fa-solid fa-circle-half-stroke',
+        iconClass: iconClass('circle-half-stroke'),
         title: 'Finish and submit your reflection',
     },
     complete: {
         text: 'Complete',
         style: 'success',
-        iconClass: 'fa-solid fa-circle-check',
+        iconClass: iconClass('circle-check'),
         title: 'Review or edit your submitted reflection',
     },
 };

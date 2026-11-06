@@ -9,6 +9,7 @@ import FieldBox from '../_internal/FieldBox';
 import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import Listbox, { ListboxMessage } from '../_internal/Listbox';
 import './TagInput.scss';
+import { iconClass } from '../../../lib/icon';
 
 /** Every name a tag's `color` accepts. */
 const ACCEPTED_COLORS = TAG_COLORS;
@@ -222,7 +223,7 @@ const TagInput = ({
                 ? (
                     <i
                         aria-hidden="true"
-                        className={`fa-solid fa-grip-vertical plus-tag-input__grip-mark${
+                        className={`${iconClass('grip-vertical')} plus-tag-input__grip-mark${
                             (pinned !== undefined ? option.index === pinned : row === activeRow) ? ' is-covered' : ''
                         }`}
                     />
@@ -386,7 +387,7 @@ const TagInput = ({
             rows.push({
                 value: DELETE,
                 label: 'Delete',
-                leading: <i aria-hidden="true" className="fa-solid fa-trash" />,
+                leading: <i aria-hidden="true" className={iconClass('trash')} />,
             });
         }
         if (onColorChange) {

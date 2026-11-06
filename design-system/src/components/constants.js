@@ -19,10 +19,6 @@ export const BUTTON_CONSTANTS = {
         small: "body3-txt",
         "default": "body2-txt",
         large: "body1-txt"
-    },
-    ICON_STYLES: {
-        solid: "fas",
-        regular: "far"
     }
 };
 

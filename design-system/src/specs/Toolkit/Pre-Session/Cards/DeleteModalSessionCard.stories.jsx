@@ -1,4 +1,5 @@
 import React from 'react';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Cards/Delete Modal Session Card',
@@ -32,7 +33,7 @@ const ColumnHeader = ({ label, showSort = true }) => (
         </span>
         {showSort && (
             <i
-                className="fa-solid fa-arrow-up"
+                className={iconClass('arrow-up')}
                 style={{
                     fontSize: 'var(--font-size-fa-body1-solid)',
                     lineHeight: 'var(--font-line-height-fa-body1-solid)',

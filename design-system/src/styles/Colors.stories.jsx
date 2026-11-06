@@ -8,6 +8,7 @@ import { emulateColorPreferences } from '@/storybook-docs/lib/test-viewport.js';
 import { BRIDGE_TRIPLETS } from '../../../scripts/lib/color/emit.mjs';
 import figmaSpec from '../tokens/color/figma-spec.json';
 import { contrast as contrastOf, parseColor } from '../lib/tokens.mjs';
+import { iconClass } from '../lib/icon';
 
 /**
  * Specimens for Foundations/Color. Every swatch paints a `--ds-*` token, and
@@ -49,7 +50,7 @@ const Swatch = ({ token, kind = 'background', on }) => {
     } else if (kind === 'text') {
         sample = <span style={{ font: 'var(--heading-small)', color: `var(${token})` }}>Aa</span>;
     } else if (kind === 'icon') {
-        sample = <i className="fa-solid fa-calendar-days" aria-hidden="true" style={{ fontSize: 'var(--icon-lg)', color: `var(${token})` }} />;
+        sample = <i className={iconClass('calendar-days')} aria-hidden="true" style={{ fontSize: 'var(--icon-lg)', color: `var(${token})` }} />;
     } else if (kind === 'border') {
         box.boxShadow = `inset 0 0 0 var(--border-selected) var(${token})`;
     }
@@ -272,7 +273,7 @@ export const TextTokenForWords = () => (
         <Do caption={<>A warning written in <C>--ds-text-warning</C> on <C>--ds-background-warning</C>.</>}>
             <div style={{ ...sample, boxShadow: 'none', background: 'var(--ds-background-warning)' }}>
                 <span style={{ display: 'inline-flex', gap: 'var(--inline-md)', alignItems: 'center', font: 'var(--body-default)', color: 'var(--ds-text-warning)' }}>
-                    <i className="fa-solid fa-triangle-exclamation" aria-hidden="true" style={{ color: 'var(--ds-icon-warning)', fontSize: 'var(--icon-md)' }} />
+                    <i className={iconClass('triangle-exclamation')} aria-hidden="true" style={{ color: 'var(--ds-icon-warning)', fontSize: 'var(--icon-md)' }} />
                     Two reflections are due today.
                 </span>
             </div>

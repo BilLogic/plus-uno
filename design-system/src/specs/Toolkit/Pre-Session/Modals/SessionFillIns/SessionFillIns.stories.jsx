@@ -17,6 +17,7 @@ import {
 import { TableRow, TableHeaderRow } from '@/specs/Toolkit/Pre-Session/Tables/FillInSchedule.stories';
 import { TableHeaderRow as MySessionsTableHeaderRow, TableRow as MySessionsTableRow } from '@/specs/Toolkit/Pre-Session/Tables/MySessions.stories';
 import { FillInTableHeaderRow, FillInTableRow } from '@/specs/Toolkit/Pre-Session/Tables/FillInTable.stories';
+import { iconClass } from '../../../../../lib/icon';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Modals/Session Fill-ins',
@@ -55,7 +56,7 @@ export const FillIn_EmptyState = () => (
                     <h4 className="h4 m-0">Session Fill-ins</h4>
                     <div className="d-flex align-items-center ms-auto" style={{ gap: 'var(--stack-md)' }}>
                         <i
-                            className="fa-solid fa-circle-info"
+                            className={iconClass('circle-info')}
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
                                 color: 'var(--ds-icon-subtle)',
@@ -85,7 +86,7 @@ export const FillIn_EmptyState = () => (
                     style={{ gap: 'var(--size-modal-gap-md)', padding: 'var(--size-modal-pad-y-lg) 0' }}
                 >
                     <i
-                        className="fa-solid fa-hourglass-half"
+                        className={iconClass('hourglass-half')}
                         style={{ fontSize: '3rem', color: 'var(--ds-icon-subtle)' }}
                         aria-hidden
                     />
@@ -101,7 +102,7 @@ export const FillIn_EmptyState = () => (
                     <Button
                         text="Refresh Page"
                         shouldFitContainer
-                        iconBefore={<i className="fa-solid fa-arrows-rotate" aria-hidden />}
+                        iconBefore={<i className={iconClass('arrows-rotate')} aria-hidden />}
                     />
                 </div>
             </div>
@@ -148,7 +149,7 @@ export const FillIn = () => (
                     <h4 className="h4 m-0">Session Fill-ins</h4>
                     <div className="d-flex align-items-center ms-auto" style={{ gap: 'var(--stack-md)' }}>
                         <i
-                            className="fa-solid fa-circle-info"
+                            className={iconClass('circle-info')}
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
                                 color: 'var(--ds-icon-subtle)',
@@ -255,7 +256,7 @@ export const ConsentForm = () => (
                     <h4 className="h4 m-0">Session Fill-ins</h4>
                     <div className="d-flex align-items-center ms-auto" style={{ gap: 'var(--stack-md)' }}>
                         <i
-                            className="fa-solid fa-circle-info"
+                            className={iconClass('circle-info')}
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
                                 color: 'var(--ds-icon-subtle)',
@@ -310,7 +311,7 @@ export const ConsentForm = () => (
                                     </span>
                                     <span style={{ color: 'var(--color-danger)', flexShrink: 0 }}>*</span>
                                     <i
-                                        className="fa-solid fa-arrow-up-right-from-square"
+                                        className={iconClass('arrow-up-right-from-square')}
                                         style={{
                                             fontSize: 'var(--font-size-fa-body1-solid)',
                                             color: 'var(--color-primary)',
@@ -367,7 +368,7 @@ export const SessionDetails = () => (
                     <h4 className="h4 m-0">Lincoln High School - 8/14/2025</h4>
                     <div className="d-flex align-items-center" style={{ gap: 'var(--stack-md)' }}>
                         <i
-                            className="fa-solid fa-gear"
+                            className={iconClass('gear')}
                             style={{
                                 fontSize: 'var(--font-size-fa-h4-solid)',
                                 color: 'var(--ds-icon-subtle)',
@@ -413,22 +414,22 @@ export const SessionDetails = () => (
                         title="Time"
                         content="1:30 PM - 2:20 PM (Thursday)"
                     />
-                    <SessionInfoCard icon="fa-solid fa-graduation-cap" title="Teacher" content="Mr. Snape" />
+                    <SessionInfoCard icon={iconClass('graduation-cap')} title="Teacher" content="Mr. Snape" />
                     <SessionInfoCard
-                        icon="fa-solid fa-person"
+                        icon={iconClass('person')}
                         title="Tutor Count"
                         content="5/5 (Leads: 1/1)"
                     />
-                    <SessionInfoCard icon="fa-solid fa-users" title="Student Count" content="25" />
+                    <SessionInfoCard icon={iconClass('users')} title="Student Count" content="25" />
                     <SessionInfoCard
-                        icon="fa-solid fa-video"
+                        icon={iconClass('video')}
                         title="Session Link"
                         content="Zoom"
                         contentLink="https://zoom.us"
                         showCopyButton={true}
                     />
                     <SessionInfoCard
-                        icon="fa-solid fa-key"
+                        icon={iconClass('key')}
                         title="Session Passcode"
                         content="123 456 789"
                         showCopyButton={true}

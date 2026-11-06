@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, within } from 'storybook/test';
 import PromptInput from './PromptInput';
+import { iconClass } from '../../../lib/icon';
 
 /**
  * `PromptInput` — where a person writes to PLUS AI.
@@ -136,9 +137,9 @@ export const WithSlots = () => (
         <PromptInput
             label="Message to PLUS AI"
             placeholder="Ask PLUS AI anything…"
-            startSlot={<i className="fa-solid fa-paperclip" aria-hidden="true" title="Attach a file" />}
+            startSlot={<i className={iconClass('paperclip')} aria-hidden="true" title="Attach a file" />}
             attachments={<span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>session-notes.pdf</span>}
-            actions={<i className="fa-solid fa-microphone" aria-hidden="true" title="Dictate" />}
+            actions={<i className={iconClass('microphone')} aria-hidden="true" title="Dictate" />}
             onSubmit={fn()}
         />
     </div>

@@ -6,6 +6,7 @@ import CountTag from '@/components/labels/CountTag';
 import { SessionInfoCard } from '@/specs/Toolkit/Pre-Session/Cards/SessionInfoCard.stories';
 import { AvailableButton, UnavailableButton } from '@/specs/Toolkit/Pre-Session/Elements/CTATutorsButton.stories';
 import { One_Time_Session } from '@/specs/Toolkit/Pre-Session/Cards/TutorViewSessionManagement.stories';
+import { iconClass } from '../../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -146,33 +147,33 @@ const SessionDetailsOneTimeSessionModalBody = () => (
                 {/* Row 1 */}
                 <TimeCardWithChange />
                 <SessionInfoCard
-                    icon="fa-solid fa-graduation-cap"
+                    icon={iconClass('graduation-cap')}
                     title="Teacher"
                     content="Mr. Snape"
                 />
 
                 {/* Row 2 */}
                 <SessionInfoCard
-                    icon="fa-solid fa-person"
+                    icon={iconClass('person')}
                     title="Tutor Count"
                     content="5/5 (Leads: 1/1)"
                 />
                 <SessionInfoCard
-                    icon="fa-solid fa-users"
+                    icon={iconClass('users')}
                     title="Student Count"
                     content="25"
                 />
 
                 {/* Row 3 */}
                 <SessionInfoCard
-                    icon="fa-solid fa-video"
+                    icon={iconClass('video')}
                     title="Session Link"
                     content="{zoom url}"
                     contentLink="#"
                     showCopyButton={true}
                 />
                 <SessionInfoCard
-                    icon="fa-solid fa-key"
+                    icon={iconClass('key')}
                     title="Session Passcode"
                     content="123 456 789"
                     showCopyButton={true}

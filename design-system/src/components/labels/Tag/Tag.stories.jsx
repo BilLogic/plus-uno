@@ -8,6 +8,7 @@ import Tag, { AVATAR_TAG_TYPES, TAG_COLORS, TagContext } from './Tag';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectFocusRing as expectRing } from '@/storybook-docs/lib/button-states.js';
+import { iconClass } from '../../../lib/icon';
 
 /**
  * `Tag` — a category, outlined: color on the border and swatch, neutral text,
@@ -473,7 +474,7 @@ export const AvatarEdgeCases = {
                         <Tag type="person" data-testid="eszett">ßen Öztürk</Tag>
                         <Tag type="person" data-testid="node"><em>Rosa Chen</em></Tag>
                         <Tag type="person" avatar={PHOTO} data-testid="node-with-avatar"><em>Kai Brooks</em></Tag>
-                        <Tag type="team" elemBefore={<i className="fa-solid fa-star" />} data-testid="elem">Math team</Tag>
+                        <Tag type="team" elemBefore={<i className={iconClass('star')} />} data-testid="elem">Math team</Tag>
                         <Tag type="team" swatchBefore="#ff0000" data-testid="swatch">Science team</Tag>
                         <TagContext.Provider value={{ isDisabled: true }}>
                             <Tag type="person" isLoading data-testid="disabled-saving">Rosa Chen</Tag>

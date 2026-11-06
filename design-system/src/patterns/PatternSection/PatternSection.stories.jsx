@@ -6,6 +6,7 @@ import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { DemoLabel, InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { iconClass } from '../../lib/icon';
 
 const col = { display: 'flex', flexDirection: 'column', gap: 'var(--space-200)' };
 
@@ -29,7 +30,7 @@ const ViewTabs = ({ label = 'Views' }) => {
 
 const DefaultToolbar = () => (
     <PatternSection.Toolbar
-        search={<TextField label="Search students" isLabelHidden placeholder="Search students" elemBeforeInput={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />} type="search" />}
+        search={<TextField label="Search students" isLabelHidden placeholder="Search students" elemBeforeInput={<i className={iconClass('magnifying-glass')} aria-hidden="true" />} type="search" />}
         filters={(
             <>
                 <Button text="Status" appearance="subtle" iconAfter="chevron-down" onClick={() => {}} />

@@ -4,6 +4,7 @@ import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
 import MenuGroup, { ButtonItem, CustomItem, LinkItem, Section } from '@/components/navigation/MenuGroup';
+import { iconClass } from '../../../lib/icon';
 
 export default {
     title: 'Components/Navigation/Menu group',
@@ -21,7 +22,7 @@ export const ButtonAndLinkItems = () => (
             <LinkItem href="#" id="menu-item-recent-link">Recent doc</LinkItem>
         </Section>
         <Section title="Actions" hasSeparator>
-            <ButtonItem elemBefore={<i className="fa-solid fa-plus" aria-hidden="true" />} id="menu-item-create">Create</ButtonItem>
+            <ButtonItem elemBefore={<i className={iconClass('plus')} aria-hidden="true" />} id="menu-item-create">Create</ButtonItem>
             <ButtonItem isDisabled id="menu-item-disabled">Archive (disabled)</ButtonItem>
         </Section>
     </MenuGroup>

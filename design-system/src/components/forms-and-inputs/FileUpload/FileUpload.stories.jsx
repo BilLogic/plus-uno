@@ -3,6 +3,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { expect, userEvent, within } from 'storybook/test';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import FileUpload from './FileUpload';
+import { iconClass } from '../../../lib/icon';
 
 const formats = ['.zip', '.mp4', '.m4a', '.txt'];
 
@@ -204,7 +205,7 @@ export const ReadOnly = () => (
                     color: 'var(--ds-text)',
                 }}
             >
-                <i className="fa-solid fa-file" aria-hidden="true" style={{ color: 'var(--ds-icon-subtle)' }} />
+                <i className={iconClass('file')} aria-hidden="true" style={{ color: 'var(--ds-icon-subtle)' }} />
                 zoom_0.mp4
             </div>
         </FileUpload>
@@ -235,7 +236,7 @@ export const WithFiles = () => (
                         color: 'var(--ds-text)',
                     }}
                 >
-                    <i className="fa-solid fa-file" aria-hidden="true" style={{ color: 'var(--ds-icon-subtle)' }} />
+                    <i className={iconClass('file')} aria-hidden="true" style={{ color: 'var(--ds-icon-subtle)' }} />
                     {file}
                 </div>
             ))}

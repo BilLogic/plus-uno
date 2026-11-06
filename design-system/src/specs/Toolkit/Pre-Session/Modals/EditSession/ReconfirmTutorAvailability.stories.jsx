@@ -2,6 +2,7 @@ import React from 'react';
 import Modal from '@/components/messaging/Modal';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
 import { CancelButton, ConfirmButton } from '@/specs/Toolkit/Pre-Session/Elements/SupervisorManagementButtons.stories';
+import { iconClass } from '../../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -44,7 +45,7 @@ const ReconfirmTutorAvailabilityModalBody = () => (
         >
             {/* Icon */}
             <i
-                className="fa-solid fa-user-check"
+                className={iconClass('user-check')}
                 style={{
                     fontSize: 'var(--font-size-fa-huge-solid, 8rem)',
                     lineHeight: 1,

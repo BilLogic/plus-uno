@@ -59,6 +59,7 @@ import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';
 import { Pronouns } from '../Elements/Pronouns.stories';
+import { iconClass } from '../../../lib/icon';
 
 export default {
     title: 'Specs/Profile/Sections/Basic Information',
@@ -267,7 +268,7 @@ export const BasicInformationSection = ({ changed = false }) => {
                                 }}
                             >
                                 <i
-                                    className="fa-solid fa-circle-info"
+                                    className={iconClass('circle-info')}
                                     style={{
                                         fontSize: '10px',
                                         color: 'var(--color-primary)',

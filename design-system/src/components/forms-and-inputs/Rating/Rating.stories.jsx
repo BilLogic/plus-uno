@@ -195,8 +195,8 @@ PropsRender.play = async ({ canvasElement }) => {
     // icon=thumbs-up: filled for items up to the value, outline after.
     const items = within(numeric).getAllByRole('radio');
     await expect(items[1].querySelector('i').className).toContain('fa-thumbs-up');
-    await expect(items[1].querySelector('i').className).toContain('fas');
-    await expect(items[2].querySelector('i').className).toContain('far');
+    await expect(items[1].querySelector('i').className).toContain('fa-solid');
+    await expect(items[2].querySelector('i').className).toContain('fa-regular');
     await expect(within(comments).getAllByRole('radio')[0].querySelector('i').className).toContain('fa-star');
 
     // isRequired: the mark is announced, and only on the required rating.

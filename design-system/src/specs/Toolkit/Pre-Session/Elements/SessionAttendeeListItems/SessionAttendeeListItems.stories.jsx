@@ -3,6 +3,7 @@ import StatusTag from '@/components/labels/StatusTag';
 import { AttendanceDropdown } from '../AttendanceDropdown.jsx';
 import { AttendanceBadge } from '../badges/AttendanceBadge.jsx';
 import { LeadBadge, CountBadge } from '../badges/TutorBadges.jsx';
+import { iconClass } from '../../../../../lib/icon';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/Session Attendee List Items',
@@ -48,7 +49,7 @@ const SessionAttendeeListItem = ({
             {/* Drag Handle (Edit Mode Only) */}
             {isEditMode && (
                 <i
-                    className="fa-solid fa-grip-vertical"
+                    className={iconClass('grip-vertical')}
                     style={{
                         fontSize: 'var(--font-size-fa-body2-solid)',
                         color: 'var(--ds-icon-subtle)',

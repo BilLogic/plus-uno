@@ -5,6 +5,7 @@ import Modal from './Modal';
 import { Select } from '@/components';
 // The app shell's floating nav: it has to sit under a modal's blanket like any page chrome.
 import NavFab from '../../../../src/components/NavFab/NavFab';
+import { iconClass } from '../../lib/icon';
 
 /**
  * Where a `Modal` sits and how big it is.
@@ -314,7 +315,7 @@ export const HeaderOptions = () => (
             show
             title="Share report"
             description="People with the link can view it."
-            headerActions={<button type="button" aria-label="Copy link"><i className="fa-solid fa-link" aria-hidden="true" /></button>}
+            headerActions={<button type="button" aria-label="Copy link"><i className={iconClass('link')} aria-hidden="true" /></button>}
             dividers
             body={SHORT}
             primaryButton={{ text: 'Done' }}
