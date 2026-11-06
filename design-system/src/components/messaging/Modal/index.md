@@ -9,7 +9,7 @@ Universal modal component for creating dialog windows that overlay the main cont
 
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Sizes, Heights, Options, Content, Layout, Types, Interactive, Overview, ConfirmView, ConfirmViewEscape, TwoOverlayLimit
+**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Sizes, Heights, Options, Content, Layout, Types, Interactive, Overview, ConfirmView, ConfirmViewEscape, TwoOverlayLimit, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 
@@ -58,7 +58,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--blanket-max-height-modal` · `--body-default` · `--content-max-width` · `--content-min-width` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-subtle` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--grid-columns` · `--grid-gutter` · `--heading-medium` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--plus-modal-column` · `--plus-modal-grid` · `--plus-modal-screen` · `--plus-modal-screen-pad` · `--plus-modal-span` · `--radius-md` · `--space-150` · `--stack-md` · `--stack-sm` · `--stroke-1`
+`--blanket-max-height-modal` · `--body-default` · `--content-max-width` · `--content-min-width` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-subtle` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--grid-columns` · `--grid-gutter` · `--heading-medium` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--motion-duration-short` · `--motion-easing-standard` · `--plus-modal-column` · `--plus-modal-grid` · `--plus-modal-screen` · `--plus-modal-screen-pad` · `--plus-modal-span` · `--radius-md` · `--size-spacing-large-space-900` · `--size-spacing-xlarge-space-2000` · `--space-150` · `--stack-md` · `--stack-sm` · `--stroke-1`
 
 From `design-system/src/components/messaging/Modal/Modal.scss`. Override these through the token layer, never with a literal.
 

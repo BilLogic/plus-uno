@@ -9,7 +9,7 @@ What a view shows when it has nothing to show yet: a picture, a short header, on
 
 **Source:** `design-system/src/components/messaging/EmptyState/EmptyState.jsx`
 
-**Stories:** `design-system/src/components/messaging/EmptyState/EmptyState.stories.jsx` — Overview, WithIcon, Compact, InATable, Interactive
+**Stories:** `design-system/src/components/messaging/EmptyState/EmptyState.stories.jsx` — Overview, WithIcon, Compact, InATable, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/EmptyState/EmptyState.mdx`
 

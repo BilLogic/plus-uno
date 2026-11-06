@@ -1,4 +1,5 @@
 import React from 'react';
+import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import InlineMessage, { INLINE_MESSAGE_APPEARANCES } from './InlineMessage';
 
@@ -84,4 +85,47 @@ export const WithSecondaryText = {
 
 export const Interactive = {
     render: (args) => <InlineMessage {...args} />,
+};
+
+/* ------------------------------------------------------------------- states */
+
+const StateTrigger = () => <InlineMessage appearance="info" label="More information" title="Why this matters">Sessions are scored on the rubric agreed at intake.</InlineMessage>;
+const triggerOf = (canvasElement) => within(canvasElement).getByRole('button', { name: 'More information' });
+
+/** Rest: an icon trigger named by `label`, with its popup closed. */
+export const Rest = {
+    render: () => <StateTrigger />,
+    play: async ({ canvasElement }) => {
+        const trigger = triggerOf(canvasElement);
+        await expect(trigger).toBeVisible();
+        await expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    },
+};
+
+/** Hovered: the trigger takes the subtle button's hovered ground. */
+export const Hovered = {
+    render: () => <StateTrigger />,
+    play: async ({ canvasElement }) => {
+        await expectHovered(canvasElement, triggerOf(canvasElement), 'subtle', 'inline message trigger');
+    },
+};
+
+/** Pressed: the subtle button's pressed ground. */
+export const Pressed = {
+    render: () => <StateTrigger />,
+    play: async ({ canvasElement }) => {
+        await expectPressed(canvasElement, triggerOf(canvasElement), 'subtle', 'inline message trigger');
+    },
+};
+
+/** Focused: the 2px ring, 2px off the trigger; Enter opens the popup. */
+export const Focused = {
+    render: () => <StateTrigger />,
+    play: async ({ canvasElement }) => {
+        const trigger = triggerOf(canvasElement);
+        await expectFocusRing(canvasElement, trigger, 'inline message trigger');
+        trigger.focus();
+        await userEvent.keyboard('{Enter}');
+        await waitFor(() => expect(documentOf(canvasElement).getByText('Why this matters')).toBeTruthy());
+    },
 };

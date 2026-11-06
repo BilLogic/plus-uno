@@ -9,7 +9,7 @@ The Popup family's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16: 
 
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
-**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Styles, Overview, Interactive, Dismiss, FlagContent, UnknownAppearance
+**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Styles, Overview, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 
@@ -42,7 +42,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-bold` · `--ds-background-information-bold` · `--ds-background-neutral-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-border` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-warning-inverse` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-radius` · `--popover-stack-flag` · `--popover-width-flag` · `--radius-md` · `--size-spacing-medium-space-400` · `--stack-sm` · `--type-weight-medium`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-bold` · `--ds-background-information-bold` · `--ds-background-neutral-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-border` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-warning-inverse` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-radius` · `--popover-stack-flag` · `--popover-width-flag` · `--radius-md` · `--size-spacing-large-space-1500` · `--size-spacing-medium-space-400` · `--size-spacing-xlarge-space-2000` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/Flag/Flag.scss`. Override these through the token layer, never with a literal.
 

@@ -9,7 +9,7 @@ stripe — the caller mounts and unmounts it, and meaning comes from the fill an
 
 **Source:** `design-system/src/components/messaging/Banner/Banner.jsx`
 
-**Stories:** `design-system/src/components/messaging/Banner/Banner.stories.jsx` — Overview, Appearances, WithoutIcon, Interactive
+**Stories:** `design-system/src/components/messaging/Banner/Banner.stories.jsx` — Overview, Appearances, WithoutIcon, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Banner/Banner.mdx`
 

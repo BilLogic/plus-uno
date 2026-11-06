@@ -9,7 +9,7 @@ drawn on `Popover.Positioner` from `@base-ui/react`.
 
 **Source:** `design-system/src/components/messaging/Spotlight/Spotlight.jsx`
 
-**Stories:** `design-system/src/components/messaging/Spotlight/Spotlight.stories.jsx` — Basic, WithMedia, LinkAction
+**Stories:** `design-system/src/components/messaging/Spotlight/Spotlight.stories.jsx` — Basic, WithMedia, LinkAction, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Spotlight/Spotlight.mdx`
 
@@ -38,7 +38,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-brand-bold` · `--ds-icon-inverse` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-small` · `--popover-width-md` · `--radius-050` · `--radius-100` · `--space-025` · `--space-050` · `--space-075` · `--space-100` · `--space-150`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-brand-bold` · `--ds-icon-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-small` · `--popover-width-md` · `--radius-050` · `--radius-100` · `--radius-md` · `--size-spacing-large-space-1500` · `--size-spacing-medium-space-500` · `--space-025` · `--space-050` · `--space-075` · `--space-100` · `--space-150`
 
 From `design-system/src/components/messaging/Spotlight/Spotlight.scss`. Override these through the token layer, never with a literal.
 

@@ -85,29 +85,23 @@ place without wiring a ref by hand.
 
 <div className="sb-ds-doc-section">
 
-## Properties
+## State
 
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>target</code></td><td>element or function</td><td>The anchor, when not read from a <code>SpotlightTarget</code> in the nearest <code>SpotlightProvider</code>.</td></tr>
-        <tr><td><code>placement</code></td><td>enum</td><td><code>top</code> and <code>bottom</code> (each with <code>-start</code>/<code>-end</code>), plain <code>left</code> and <code>right</code>, or <code>auto</code>. Default <code>bottom</code>.</td></tr>
-        <tr><td><code>headline</code></td><td>node</td><td>The dialog's title, read first by assistive technology.</td></tr>
-        <tr><td><code>children</code></td><td>node</td><td>The body text.</td></tr>
-        <tr><td><code>media</code></td><td>node</td><td>An image or illustration above the body.</td></tr>
-        <tr><td><code>stepCount</code></td><td>node</td><td>A short label like "1 of 3" in the footer.</td></tr>
-        <tr><td><code>primaryAction</code>, <code>secondaryAction</code></td><td>node</td><td>A <code>SpotlightAction</code> each; the secondary renders first, the primary last.</td></tr>
-        <tr><td><code>dismissible</code></td><td>boolean</td><td>Shows the close button in the header. Default <code>true</code>.</td></tr>
-        <tr><td><code>onDismiss</code></td><td>function</td><td>Called when the close button is pressed or an action should end the tour.</td></tr>
-        <tr><td><code>isOpen</code></td><td>boolean</td><td>Controls visibility. Default <code>true</code>.</td></tr>
-    </tbody>
-</DocsTable>
+<DocsCanvasShell description={<>The popup on the brand bold ground with an inverse headline.</>}>
+    <DsCanvasQuiet of={SpotlightStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Dismiss takes the inverse hovered layer.</>}>
+    <DsCanvasQuiet of={SpotlightStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Dismiss takes the inverse pressed layer.</>}>
+    <DsCanvasQuiet of={SpotlightStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Dismiss shows the inverse 2px ring.</>}>
+    <DsCanvasQuiet of={SpotlightStories.Focused} />
+</DocsCanvasShell>
 
 </div>
 
@@ -121,7 +115,7 @@ place without wiring a ref by hand.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Spotlight` to call out one feature the first time someone can use it —
 pointing at a new button, a changed control, a place to start. It is a single
@@ -136,7 +130,48 @@ For a message that stays on the page until resolved, use `SectionMessage` or
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Headline.** The dialog title, read first.
+2. **Dismiss.** A close button in the header.
+3. **Media.** An optional image above the body.
+4. **Body.** The description text.
+5. **Step count.** A short label like "1 of 3".
+6. **Actions.** A secondary and a primary <code>SpotlightAction</code>.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Popup on the brand bold fill with inverse text.</td></tr>
+<tr><td>Hovered, pressed</td><td>Dismiss takes the inverse interaction layers.</td></tr>
+<tr><td>Focused</td><td>Dismiss and actions show the inverse 2px ring.</td></tr>
+<tr><td>Dismissed</td><td>The popup closes and <code>onDismiss</code> fires.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Surface</td><td><code>--ds-background-brand-bold</code>, <code>--ds-shadow-overlay</code>, <code>--popover-width-md</code></td></tr>
+<tr><td>Text</td><td><code>--ds-text-inverse</code>, <code>--heading-small</code>, <code>--body-default</code></td></tr>
+<tr><td>Dismiss</td><td><code>--ds-icon-inverse</code>, <code>--ds-interaction-inverse-hovered</code>, <code>--ds-interaction-inverse-pressed</code></td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused-inverse</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Wrap the target and the callout in one `SpotlightProvider`.
 
@@ -160,6 +195,23 @@ anchor comes from outside that tree.
 `isOpen` is yours to control. Store whatever "seen" state applies — a user
 preference, a session flag — so the same spotlight does not reopen on every
 visit.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the feature in the headline: "Create a new board".</td><td>Write a headline that only says "New".</td></tr>
+<tr><td>Use one or two short lines in the body.</td><td>Explain the whole feature.</td></tr>
+<tr><td>Label actions with verbs: "Next", "Skip", "Got it".</td><td>Use "OK" for every step.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

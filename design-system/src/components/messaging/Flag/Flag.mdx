@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as FlagStories from './Flag.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -61,6 +61,28 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>The flag on the overlay surface with its title and Dismiss.</>}>
+    <DsCanvasQuiet of={FlagStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The flag does not react; Dismiss takes the subtle hovered step.</>}>
+    <DsCanvasQuiet of={FlagStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Dismiss takes the subtle pressed step.</>}>
+    <DsCanvasQuiet of={FlagStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Dismiss and each action show the 2px focus ring.</>}>
+    <DsCanvasQuiet of={FlagStories.Focused} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -85,7 +107,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Flag` to confirm something that has already happened and needs no reply —
 saved, sent, copied. It appears over the page, times out, and takes nothing with
@@ -101,13 +123,57 @@ flag to its appearance's bold fill. `delay` is the timeout in milliseconds and
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Icon.** The appearance glyph, decorative.
+2. **Title.** What happened, in a few words.
+3. **Timestamp.** Optional, subtle, after the title.
+4. **Description.** At most one line.
+5. **Actions.** Link buttons under the description.
+6. **Expand toggle.** Only on a bold flag, which starts collapsed to its title.
+7. **Dismiss.** The shared CloseButton.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The appearance icon color on the overlay surface; a bold flag fills the surface instead.</td></tr>
+<tr><td>Hovered, pressed</td><td>The flag does not react; Dismiss and the toggle take the subtle neutral steps.</td></tr>
+<tr><td>Focused</td><td>Dismiss, the toggle and each action show the 2px ring; the ring is inverse on a bold fill.</td></tr>
+<tr><td>Autohide</td><td>Normal, information and success close after 8 seconds; warning and error stay.</td></tr>
+<tr><td>Dismissed</td><td>The flag leaves the stack.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Surface</td><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td></tr>
+<tr><td>Title, description</td><td><code>--ds-text</code>, <code>--ds-text-subtle</code></td></tr>
+<tr><td>Icon</td><td><code>--ds-icon-information</code>, <code>--ds-icon-success</code>, <code>--ds-icon-warning</code>, <code>--ds-icon-danger</code></td></tr>
+<tr><td>Bold fill</td><td><code>--ds-background-*-bold</code> with <code>--ds-text-inverse</code></td></tr>
+<tr><td>Dismiss</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Nothing important goes only in a flag.
 
 ```jsx
-// Incorrect — five seconds, then gone, and it took the only copy of the error
-// with it. An error the user must act on is not a flag.
+// Incorrect — the user can dismiss it before reading it, and that took the only
+// copy of the error with it. An error the user must act on is not a flag.
 <Flag appearance="error" title="Upload failed" show={failed} onDismiss={dismiss}>
     The file was larger than 10 MB.
 </Flag>
@@ -130,6 +196,23 @@ flag to its appearance's bold fill. `delay` is the timeout in milliseconds and
 
 It is on by default and is the only way to close a flag that is not timing out.
 Turning it off with `autohide={false}` leaves a flag that never goes away.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Say what happened in the title, in a few words.</td><td>Put the only copy of important information in a flag.</td></tr>
+<tr><td>Add one line of description at most.</td><td>Write a paragraph in the description.</td></tr>
+<tr><td>Write actions as verbs: "Undo", "View session".</td><td>Use "Click here" or "OK" as an action.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
