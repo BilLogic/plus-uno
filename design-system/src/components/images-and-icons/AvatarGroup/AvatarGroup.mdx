@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as AvatarGroupStories from './AvatarGroup.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsTable, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -73,6 +73,33 @@ overlap, the ring between neighbors, and how many fit on the row.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>Rest. The <code>+n</code> is the only part of the group that is a control.</>}>
+    <DsCanvasQuiet of={AvatarGroupStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Hovered. The <code>+n</code> steps to the subtle gray fill.</>}>
+    <DsCanvasQuiet of={AvatarGroupStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focused. A 2px ring, 2px off the button, for keyboard focus.</>}>
+    <DsCanvasQuiet of={AvatarGroupStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Pressed. Opens the menu of the people left out; Escape closes it.</>}>
+    <DsCanvasQuiet of={AvatarGroupStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled. With nothing to fold there is no control at all.</>}>
+    <DsCanvasQuiet of={AvatarGroupStories.Disabled} />
+</DocsCanvasShell>
+
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -97,7 +124,7 @@ overlap, the ring between neighbors, and how many fit on the row.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `AvatarGroup` for a short set of people that would crowd a line: the
 attendees of a session, the members of a team. Past `max`, the rest fold into
@@ -110,7 +137,46 @@ each person beside their picture.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Avatars.** Up to `max` minus one, each the group's size and shape, overlapping by a quarter.
+2. **Ring.** A surface-colored ring around each avatar that separates neighbors.
+3. **Overflow.** A gray `+n` button that opens a menu of the people left out, by name.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Overlapping avatars; the <code>+n</code> in <code>--ds-background-accent-gray-subtler</code>.</td></tr>
+<tr><td>Hovered</td><td>The <code>+n</code> takes <code>--ds-background-accent-gray-subtle</code>. The avatars do not change.</td></tr>
+<tr><td>Pressed</td><td>Opens the menu and sets <code>aria-expanded</code>. Escape closes it.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> on the <code>+n</code>, for keyboard focus only.</td></tr>
+<tr><td>Disabled</td><td>None. With nothing to fold there is no <code>+n</code>, only pictures.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Avatar size</td><td><code>--size-media-xxs</code> to <code>--size-media-lg</code>, from the group's <code>size</code>.</td></tr>
+<tr><td>Overlap</td><td>A quarter of the avatar size.</td></tr>
+<tr><td>Overflow fill</td><td><code>--ds-background-accent-gray-subtler</code>; hovered <code>--ds-background-accent-gray-subtle</code>.</td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Let the group set the size and shape.
 
@@ -127,6 +193,27 @@ row stays even even when a child sets its own.
 
 Five people with `max={5}` show all five; a sixth pushes one into `+2` —
 `max` is the most avatars the row ever shows, the `+n` included.
+
+
+### Keep the group short.
+
+Use it for a handful of people. For a roster, link to the list instead of folding sixty names behind `+n`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the group for what it holds: "Session attendees".</td><td>"Avatars" or "People", which names the picture, not the set.</td></tr>
+<tr><td>Let <code>+n</code> count only the people left out.</td><td>Write your own count in the label; it will drift from the menu.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

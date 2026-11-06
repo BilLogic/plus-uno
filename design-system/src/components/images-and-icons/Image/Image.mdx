@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 import * as ImageStories from './Image.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsTable, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -81,7 +81,7 @@ script watching for the change.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Image` for a bitmap — a photo, a screenshot, an illustration exported as
 a raster. For a square picture of a school, a tool or a lesson, use `Tile`
@@ -91,7 +91,41 @@ instead. For a typed glyph standing in for a kind of thing, use `Object`.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Picture.** An `img`, with a `picture` and a dark source when `srcDark` is set.
+2. **Size.** `fluid` fills its container's width and keeps the ratio; `fixed` keeps its natural size.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The only state. An image is not a control.</td></tr>
+<tr><td>Hovered, pressed, focused, disabled</td><td>None. Wrap it in a link or button for a click.</td></tr>
+<tr><td>Dark mode</td><td>The browser swaps in <code>srcDark</code> when the system is dark; no script.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Fluid</td><td>Width 100% of the container, height auto.</td></tr>
+<tr><td>Fixed</td><td>Natural width and height; no max width.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Pass `srcDark` instead of swapping `src` yourself.
 
@@ -108,6 +142,27 @@ flash of the light image on a dark system.
 Set `alt` to real text only when the image carries information nothing else
 on the page already states. A caption beside the image, or a heading above
 it, usually means `alt=""` is correct.
+
+
+### Size the container, not the image.
+
+Use `fluid` and let the container set the width, so one image works from phone to desktop. Reach for `fixed` only for a picture that must stay at its natural size.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Describe what the image shows: "Two tutors reviewing a lesson plan".</td><td>"Image of" or a file name.</td></tr>
+<tr><td>Leave <code>alt</code> empty when the image only decorates.</td><td>A caption copied into <code>alt</code> beside the same text.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

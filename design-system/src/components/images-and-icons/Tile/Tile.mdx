@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TileStories from './Tile.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsTable, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -142,7 +142,7 @@ its size.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Tile` wherever a small square picture stands for a thing: a tool's logo in
 a list of integrations, a school's crest beside its name, a lesson's thumbnail,
@@ -156,7 +156,45 @@ Use an icon on its own when it sits inline with text and needs no frame. Use
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Square.** The Media size of the step, 16 to 48, with a radius of a quarter of its size.
+2. **Content.** An icon, a logo or an image. An icon is inset to the Font Awesome size of the same step; an image covers the square.
+3. **Border.** Optional, drawn inside the square so the tile keeps its size.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The only state. A tile is a picture, not a control.</td></tr>
+<tr><td>Hovered, pressed, focused</td><td>None. Wrap the tile in a button or link that carries the name and the focus.</td></tr>
+<tr><td>Disabled</td><td>None. Dim the control around it.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Square</td><td><code>--size-media-xxs</code> to <code>--size-media-xl</code> for 16 to 48.</td></tr>
+<tr><td>Icon size</td><td><code>--font-size-fa-body3</code> to <code>--font-size-fa-h3</code>, by step.</td></tr>
+<tr><td>Radius</td><td>A quarter of the square; <code>--radius-0625</code> at 40. Logo inset <code>--radius-0125</code>.</td></tr>
+<tr><td>Icon ground and glyph</td><td>Per color: a container and an on-container role, or the neutral pair for gray.</td></tr>
+<tr><td>Border</td><td><code>--border-default</code> in <code>--color-outline-variant</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Pick the content, then the color.
 
@@ -180,6 +218,27 @@ logo keeps its own. Images cover the whole tile, so color does not apply.
 `color` takes the Tag color set from the label spec, where `yellow` replaces
 `orange` (`orange` still works as a deprecated alias): plain names, never a status. Keep one color per kind of
 item across the app, or leave tiles gray.
+
+
+### Give a logo its own ground.
+
+Logos default to white. Set a ground color only to match a surface; never recolor the logo.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Label a tile that stands alone with the thing it shows: "Khan Academy".</td><td>"Logo" or "Icon", which names the picture.</td></tr>
+<tr><td>Leave the label off a tile beside its name.</td><td>Repeat the name in both places.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

@@ -98,7 +98,7 @@ swap it for another kind.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use an `Object` icon beside the name of the thing it represents — a task in a
 list, a bug in a reference, a page in a breadcrumb. For a larger picture of a
@@ -108,7 +108,40 @@ thing (a school, a tool, a lesson), use `Tile`. For a bitmap, use `Image`.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Glyph.** A fixed Font Awesome Free glyph for the kind: task, bug, idea, pull request, project or page.
+2. **Size.** 12 or 16, in `--ds-icon-subtle`.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The only state. An object icon is a picture, not a control.</td></tr>
+<tr><td>Hovered, pressed, focused, disabled</td><td>None. It sits beside the name of the thing, which carries any interaction.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Size</td><td><code>--icon-sm</code> for 12; <code>--icon-md</code> for 16.</td></tr>
+<tr><td>Color</td><td><code>--ds-icon-subtle</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Pick the component for the kind — there is no generic `Object`.
 
@@ -125,6 +158,27 @@ rather than a generic component with a glyph prop.
 Each kind defaults its accessible name to its kind ("Task", "Bug", …). Set
 `label=""` when the kind is already stated in visible text beside it, so
 assistive technology does not hear it twice.
+
+
+### Keep the glyph at its kind.
+
+Each kind has one glyph. Do not change the glyph or the color to say a status; show the status in text or a Status tag.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Keep the visible name beside the glyph: "Fix the broken sync".</td><td>A glyph alone where the kind is not obvious.</td></tr>
+<tr><td>Set <code>label=""</code> when the kind is already written beside it.</td><td>Leave both the label and the visible kind, so it reads twice.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
