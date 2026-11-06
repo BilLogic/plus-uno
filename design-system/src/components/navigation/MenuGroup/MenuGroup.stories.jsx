@@ -149,14 +149,14 @@ export const SelectedRow = {
     },
 };
 
-/** Disabled: disabled ink, no hover fill, skipped by the arrow keys. */
+/** Disabled: disabled ink, no pointer events, skipped by the arrow keys. */
 export const Disabled = {
     render: () => <StateMenu />,
     play: async ({ canvasElement }) => {
         const disabled = itemOf(canvasElement, 'disabled');
         await expect(disabled).toBeDisabled();
         await expectInk(canvasElement, disabled, undefined, '--ds-text-disabled', 'disabled row');
-        await expect(getComputedStyle(disabled).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+        await expect(getComputedStyle(disabled).pointerEvents, 'a pointer never reaches it').toBe('none');
         itemOf(canvasElement, 'selected').focus();
         await userEvent.keyboard('{ArrowDown}');
         await expect(itemOf(canvasElement, 'link'), 'the disabled row is skipped').toHaveFocus();

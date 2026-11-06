@@ -3,7 +3,6 @@ import { expect, userEvent, within } from 'storybook/test';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
-import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
@@ -297,15 +296,16 @@ export const SelectedPill = {
     },
 };
 
-/** Disabled: disabled ink, no hover fill, never selected. */
+/** Disabled: disabled ink, no pointer events (so no hover or press), never selected. */
 export const Disabled = {
     render: () => <StateTabs />,
     play: async ({ canvasElement }) => {
         const disabled = tabOf(canvasElement, 'Reports');
         await expect(disabled).toHaveAttribute('aria-disabled', 'true');
         await expectInk(canvasElement, disabled, undefined, '--ds-text-disabled', 'disabled tab');
-        await expect(withForcedPseudo(disabled, ':hover', () => getComputedStyle(disabled).backgroundColor), 'hovered disabled tab').toBe('rgba(0, 0, 0, 0)');
-        await userEvent.click(disabled);
+        await expect(getComputedStyle(disabled).pointerEvents, 'a pointer never reaches a disabled tab').toBe('none');
+        disabled.focus();
+        await userEvent.keyboard('{Enter}');
         await expect(disabled).toHaveAttribute('aria-selected', 'false');
     },
 };

@@ -332,9 +332,10 @@ export const Disabled = {
         const previous = pageOf(canvasElement, 'Previous');
         await expect(previous).toHaveAttribute('aria-disabled', 'true');
         await expectGroundUnder(canvasElement, previous, undefined, '--ds-background-disabled', 'Previous');
-        await expectGroundUnder(canvasElement, previous, ':hover', '--ds-background-disabled', 'hovered Previous');
         await expectInk(canvasElement, previous, undefined, '--ds-text-disabled', 'Previous');
-        await userEvent.click(previous);
+        await expect(getComputedStyle(previous).pointerEvents, 'a pointer never reaches it').toBe('none');
+        previous.focus();
+        await userEvent.keyboard('{Enter}');
         await expect(pageOf(canvasElement, 'Page 1')).toHaveAttribute('aria-current', 'page');
     },
 };
