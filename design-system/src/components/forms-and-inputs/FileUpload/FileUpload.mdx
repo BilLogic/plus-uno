@@ -119,9 +119,9 @@ Use a file upload where a form needs a document from the user: a report, an avat
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Focused</td><td>The container takes a 2px ring in <code>--ds-border-focused</code>, drawn when either the input or the button has focus.</td></tr>
-<tr><td>Invalid</td><td>A <code>--ds-background-danger-subtler</code> ring; the message takes <code>--ds-text-danger</code>, and the input sets <code>aria-invalid</code>.</td></tr>
-<tr><td>Valid</td><td>A <code>--ds-background-success-subtler</code> ring; the message takes <code>--ds-text-success</code>.</td></tr>
+<tr><td>Focused</td><td>The container takes a <code>--ds-border-focused</code> edge and a 2px ring in the same color, drawn when either the input or the button has focus. On an invalid or valid field the ring stays and the status keeps the edge.</td></tr>
+<tr><td>Invalid</td><td>A <code>--ds-border-danger</code> edge and a <code>--ds-background-danger-subtler</code> ring; the message takes <code>--ds-text-danger</code>, and the input sets <code>aria-invalid</code>.</td></tr>
+<tr><td>Valid</td><td>A <code>--ds-border-success</code> edge and a <code>--ds-background-success-subtler</code> ring; the message takes <code>--ds-text-success</code>.</td></tr>
 <tr><td>Read-only</td><td>The container takes <code>--ds-background-neutral</code> and the button is not drawn.</td></tr>
 <tr><td>Disabled</td><td>The label and description take <code>--ds-text-subtle</code>; the input and button are disabled.</td></tr>
 </tbody>
