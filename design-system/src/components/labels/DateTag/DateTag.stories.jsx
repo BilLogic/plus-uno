@@ -5,6 +5,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { alpha, px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 
 import DateTag, { DATE_TAG_APPEARANCES, DATE_TAG_SPACINGS } from './DateTag';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 
 /**
  * `DateTag` — a due or event date.
@@ -252,4 +253,50 @@ export const Interactive = {
         spacing: { control: 'inline-radio', options: DATE_TAG_SPACINGS },
     },
     render: (args) => <DateTag {...args} />,
+};
+
+/* ------------------------------------------------------------------- states */
+
+/** Rest, the only state: a date tag is a label, not a control. */
+export const Rest = {
+    render: () => <DateTag data-testid="date">Due tomorrow</DateTag>,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByTestId('date');
+        await expect(px(getComputedStyle(el).height), 'default is 20').toBe(20);
+        await expect(el).not.toHaveAttribute('tabindex');
+    },
+};
+
+/** Hovered: nothing changes. */
+export const Hovered = {
+    render: () => <DateTag data-testid="date">Due tomorrow</DateTag>,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(within(canvasElement).getByTestId('date'), ':hover', 'DateTag');
+    },
+};
+
+/** Pressed: nothing changes. */
+export const Pressed = {
+    render: () => <DateTag data-testid="date">Due tomorrow</DateTag>,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(within(canvasElement).getByTestId('date'), ':active', 'DateTag');
+    },
+};
+
+/** Focused: not in the tab order, so Tab skips it. */
+export const Focused = {
+    render: () => <DateTag data-testid="date">Due tomorrow</DateTag>,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(within(canvasElement).getByTestId('date'), 'DateTag');
+    },
+};
+
+/** Disabled: there is none. A label is never dimmed; a disabled thing is described by the control beside it. */
+export const Disabled = {
+    render: () => <DateTag data-testid="date">Due tomorrow</DateTag>,
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByTestId('date');
+        await expect(el).not.toHaveAttribute('aria-disabled');
+        await expect(getComputedStyle(el).opacity, 'never dimmed').toBe('1');
+    },
 };

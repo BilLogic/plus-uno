@@ -7,6 +7,8 @@ import Tag, { TagContext } from '../Tag';
 import TagGroup from '../TagGroup';
 import Suggestion, { SUGGESTION_TYPES } from './Suggestion';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
+import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
+import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 
 /**
  * `Suggestion` — a value the system proposes, as a button that sits in a tag
@@ -368,5 +370,59 @@ export const Interactive = {
         label: { control: 'text' },
         value: { control: 'text' },
         text: { control: 'text' },
+    },
+};
+
+/* ------------------------------------------------------------------- states */
+
+const Chip = (props) => <Suggestion label="Relationships" onAccept={() => {}} {...props} />;
+const chip = (canvasElement) => within(canvasElement).getByRole('button', { name: 'Add Relationships, suggested' });
+
+/** Rest: a dashed discovery edge on a clear ground. */
+export const Rest = {
+    render: () => <Chip />,
+    play: async ({ canvasElement }) => {
+        const el = chip(canvasElement);
+        await expect(getComputedStyle(el).backgroundColor, 'clear ground').toBe(CLEAR);
+        await expect(getComputedStyle(el).borderTopStyle).toBe('dashed');
+        await expect(getComputedStyle(el).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-discovery'));
+    },
+};
+
+/** Hovered: the discovery ground. */
+export const Hovered = {
+    render: () => <Chip />,
+    play: async ({ canvasElement }) => {
+        await expectGroundUnder(canvasElement, chip(canvasElement), ':hover', '--ds-background-discovery', 'suggestion');
+    },
+};
+
+/** Pressed: the next discovery step. */
+export const Pressed = {
+    render: () => <Chip />,
+    play: async ({ canvasElement }) => {
+        await expectGroundUnder(canvasElement, chip(canvasElement), ':active', '--ds-background-discovery-hovered', 'suggestion');
+    },
+};
+
+/** Focused: the 2px ring 2px off the dashed edge; the ground stays clear. */
+export const Focused = {
+    render: () => <Chip />,
+    play: async ({ canvasElement }) => {
+        await expectFocusRing(canvasElement, chip(canvasElement), 'suggestion');
+    },
+};
+
+/** Disabled: a native disabled button on the disabled ground, never accepted. */
+export const Disabled = {
+    args: { onAccept: fn() },
+    render: ({ onAccept }) => <Chip isDisabled onAccept={onAccept} />,
+    play: async ({ canvasElement, args }) => {
+        const el = chip(canvasElement);
+        await expect(el).toBeDisabled();
+        await expectGroundUnder(canvasElement, el, ':hover', '--ds-background-disabled', 'disabled');
+        await expect(getComputedStyle(el).color).toBe(tokenColor(canvasElement, '--ds-text-disabled'));
+        await userEvent.click(el, { pointerEventsCheck: 0 });
+        await expect(args.onAccept).not.toHaveBeenCalled();
     },
 };

@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/labels/SmartTag/SmartTag.jsx`
 
-**Stories:** `design-system/src/components/labels/SmartTag/SmartTag.stories.jsx` — Overview, CustomLabel, PassesThroughTagProps, UnknownSubjectFallsBack, Interactive
+**Stories:** `design-system/src/components/labels/SmartTag/SmartTag.stories.jsx` — Overview, CustomLabel, PassesThroughTagProps, UnknownSubjectFallsBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/SmartTag/SmartTag.mdx`
 

@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/labels/StatusTag/StatusTag.jsx`
 
-**Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — Styles, WithCount, TrailingMetricAppearance, LeadingVisual, Truncation, NarrowContainer, NeverAButton, PinnedWeight, UnknownValuesFallBack, Interactive
+**Stories:** `design-system/src/components/labels/StatusTag/StatusTag.stories.jsx` — Styles, WithCount, TrailingMetricAppearance, LeadingVisual, Truncation, NarrowContainer, NeverAButton, PinnedWeight, UnknownValuesFallBack, Interactive, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/labels/StatusTag/StatusTag.mdx`
 
@@ -35,7 +35,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-information` · `--ds-background-information-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-smart-mastering-content` · `--ds-background-smart-mastering-content-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-background-warning` · `--ds-background-warning-pressed` · `--ds-text` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-smart-mastering-content` · `--ds-text-success` · `--ds-text-warning` · `--icon-md` · `--icon-sm` · `--pad-x-md` · `--pad-x-xs` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--plus-status-max` · `--radius-md` · `--size-border-radius-radius-150` · `--size-spacing-small-space-025` · `--size-spacing-small-space-075` · `--stack-sm` · `--stroke-1`
+`--body-default` · `--body-small` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-information` · `--ds-background-information-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-smart-mastering-content` · `--ds-background-smart-mastering-content-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-background-warning` · `--ds-background-warning-pressed` · `--ds-text` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-smart-mastering-content` · `--ds-text-success` · `--ds-text-warning` · `--icon-md` · `--icon-sm` · `--pad-x-md` · `--pad-x-xs` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--plus-status-max` · `--radius-md` · `--size-border-radius-radius-150` · `--size-media-xs` · `--size-spacing-small-space-025` · `--size-spacing-small-space-075` · `--stack-sm` · `--stroke-1`
 
 From `design-system/src/components/labels/StatusTag/StatusTag.scss`. Override these through the token layer, never with a literal.
 

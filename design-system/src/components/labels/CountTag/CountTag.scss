@@ -15,7 +15,7 @@
 
 .plus-count {
     --plus-count-size: #{label.$count-height};
-    --plus-count-min: var(--control-sm, 24px);
+    --plus-count-min: var(--control-sm);
 
     display: inline-flex;
     align-items: center;
@@ -25,15 +25,15 @@
     height: var(--plus-count-size);
     min-width: var(--plus-count-min);
     margin: 0;
-    padding: 0 var(--pad-x-xs, 4px);
-    border-radius: var(--radius-sm, 2px);
+    padding: 0 var(--pad-x-xs);
+    border-radius: var(--radius-sm);
     white-space: nowrap;
     font-variant-numeric: tabular-nums;
 }
 
 .plus-count--compact {
     --plus-count-size: #{label.$count-height-compact};
-    --plus-count-min: var(--control-sm, 24px);
+    --plus-count-min: var(--control-sm);
 }
 
 /*
@@ -101,12 +101,12 @@ $count-dot: (
 
 /* The dot: 8, solid, no number. Its name comes from `label`. */
 .plus-count--dot {
-    --plus-count-size: var(--size-spacing-small-space-100, 8px);
+    --plus-count-size: var(--size-spacing-small-space-100);
 
     width: var(--plus-count-size);
     min-width: 0;
     padding: 0;
-    border-radius: var(--radius-full, 999px);
+    border-radius: var(--radius-full);
 }
 
 @each $name, $ground in $count-dot {
@@ -120,7 +120,7 @@ $count-dot: (
  * box-shadow outside the box, as in Figma, so the badge keeps its exact height.
  */
 .plus-count--ring {
-    box-shadow: 0 0 0 var(--stroke-2, 2px) var(--ds-surface);
+    box-shadow: 0 0 0 var(--stroke-2) var(--ds-surface);
 }
 
 /*

@@ -14,13 +14,14 @@
  * binds Mastering Content, which now belongs to the SMART subjects alone.
  */
 @use '../../../styles/state' as *;
+@use '../label-heights' as label;
 
 .plus-suggestion {
-    --plus-suggestion-height: 22px;
+    --plus-suggestion-height: #{label.$tag-height};
 
     display: inline-flex;
     align-items: center;
-    gap: var(--stack-sm, 4px);
+    gap: var(--stack-sm);
     box-sizing: border-box;
     height: var(--plus-suggestion-height);
     max-width: 100%;
@@ -29,9 +30,9 @@
 
     /* No margin: TagGroup owns the gaps in a tag row. */
     margin: 0;
-    padding: 0 var(--pad-x-xs, 4px);
-    border: var(--border-default, 1px) dashed var(--ds-border-discovery);
-    border-radius: var(--radius-md, 4px);
+    padding: 0 var(--pad-x-xs);
+    border: var(--border-default) dashed var(--ds-border-discovery);
+    border-radius: var(--radius-md);
     background-color: transparent;
     appearance: none;
 
@@ -72,8 +73,8 @@
  * The ground stays clear, so focus never reads as pressed.
  */
 .plus-suggestion:focus-visible {
-    outline: var(--focus-ring-width, 2px) solid var(--ds-border-focused);
-    outline-offset: var(--focus-ring-width, 2px);
+    outline: var(--focus-ring-width) solid var(--ds-border-focused);
+    outline-offset: var(--focus-ring-width);
 }
 
 /*

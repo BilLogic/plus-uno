@@ -161,7 +161,7 @@ category.
 
 <div className="sb-ds-doc-section">
 
-## States
+## Behavior
 
 <DocsCanvasShell description={<>Focus is a 2px Focus Ring 2px outside the tag, or outside the ×.</>}>
     <DsCanvasQuiet of={TagStories.FocusRing} />
@@ -185,6 +185,32 @@ category.
 
 <DocsCanvasShell description={<>Every tag caps at 180 wide, and narrower in a narrower container. A clipped label ellipsizes, and its full text is a tooltip that hover and keyboard focus both reach.</>}>
     <DsCanvasQuiet of={TagStories.Truncation} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<DocsCanvasShell description={<>Rest. Outlined only, with the hue on the border and neutral text.</>}>
+    <DsCanvasQuiet of={TagStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Hovered. The accent's subtlest step. A selected tag holds its ground.</>}>
+    <DsCanvasQuiet of={TagStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Pressed. The accent's subtlest pressed step.</>}>
+    <DsCanvasQuiet of={TagStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Focused. The 2px focus ring, on the tag and on its ×.</>}>
+    <DsCanvasQuiet of={TagStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled. The disabled ground and words, no ×, out of the tab order.</>}>
+    <DsCanvasQuiet of={TagStories.Disabled} />
 </DocsCanvasShell>
 
 </div>
@@ -215,7 +241,7 @@ category.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 - **Is it a number?** Count tag.
 - **Is it the condition something is in, and can that condition change?** Status tag.
@@ -228,7 +254,49 @@ so a reader tells a category from a meaning without reading the words.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Swatch or avatar.** A 10 swatch in the hue, or a 16 avatar for a person, an agent or a team.
+2. **Label.** Neutral text; the hue never colors the words.
+3. **Trailing metric.** Optional on a selectable tag: a compact Count tag, such as a filter's result count.
+4. **Remove button.** Optional, with the 2px focus ring on the button itself and a name that says what it removes.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Outlined, clear ground, the hue on the border. 22 tall.</td></tr>
+<tr><td>Hovered, pressed</td><td>A link or a selectable tag takes the accent's subtlest and subtlest pressed steps; a link's words underline. On a removable tag only the × reacts.</td></tr>
+<tr><td>Selected</td><td>The subtler ground with a full-hue border, held under hover and press.</td></tr>
+<tr><td>Focused</td><td>A 2px ring 2px off the edge, on the tag or on the ×.</td></tr>
+<tr><td>Disabled</td><td>Disabled ground and words, no ×, no link, no focus; a selected tag keeps a bold edge.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest edge</td><td><code>--ds-border-accent-blue-subtle</code>, and the same step for each hue.</td></tr>
+<tr><td>Hovered, pressed</td><td><code>--ds-background-accent-blue-subtlest</code> and <code>--ds-background-accent-blue-subtlest-pressed</code>.</td></tr>
+<tr><td>Selected</td><td><code>--ds-background-accent-blue-subtler</code> with a <code>--ds-border-accent-blue</code> edge.</td></tr>
+<tr><td>Words</td><td><code>--ds-text</code> on every hue.</td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code>, <code>--ds-text-disabled</code>, <code>--ds-icon-disabled</code>.</td></tr>
+<tr><td>Padding, gap, corner</td><td><code>--pad-x-xs</code>, <code>--stack-sm</code>, <code>--radius-md</code>; a person tag is <code>--radius-full</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Color is a category, not a status.
 
@@ -309,6 +377,24 @@ and every tag inside follows:
 
 `Tag` sets no margin of its own. A row of tags is a `TagGroup`, which sets
 `gap` once for the set.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the thing in a word or two: "Science", "Grade 6".</td><td>Write a sentence or a full instruction.</td></tr>
+<tr><td>Use sentence case and the singular.</td><td>Use ALL CAPS or a trailing punctuation mark.</td></tr>
+<tr><td>Give a × a name that says the value: "Remove Science".</td><td>Leave every × named "Remove".</td></tr>
+<tr><td>Keep one wording for one category across the product.</td><td>Rename the same category per screen.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
