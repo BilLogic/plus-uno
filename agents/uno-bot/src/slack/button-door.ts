@@ -239,7 +239,7 @@ export async function applyPressVerdict(
     const done = reportDone(outcomes);
     const state: ReportItemState =
       request.decision === "cancel"
-        ? { kind: "rejected", by: request.userId, ...(rejected?.reason ? { reason: rejected.reason } : {}), ...as }
+        ? { kind: "rejected", by: request.userId, at, ...(rejected?.reason ? { reason: rejected.reason } : {}), ...as }
         : failed
           ? { kind: "failed", by: request.userId, at, reason: failureReason(failed.message), ...as }
           : { kind: "approved", by: request.userId, at, ...as, ...(done ? { done } : {}) };

@@ -35,6 +35,9 @@
 // card's own buttons carry it in the message they sit on: that ts is the
 // identity, and the decision is resolved against it and nothing else.
 import { textSections } from "./render";
+import { richElements } from "./rich-text";
+import { linkLabel } from "./link-label";
+import { outcomeHead, type DecisionOutcome } from "./decision-head";
 import { CONFIRM_FOOTER, withoutInternalFields } from "./proposal-render";
 import { clip } from "./card-block";
 import { splitDeadline } from "./card-deadline";
@@ -117,8 +120,22 @@ function modal(
     close: { type: "plain_text", text: opts.close ?? "Close" },
     ...(opts.submit ? { submit: { type: "plain_text", text: opts.submit } } : {}),
     private_metadata: reviewMetadata(card),
-    blocks: blocks.slice(0, MAX_VIEW_BLOCKS),
+    blocks: blocks.slice(0, MAX_VIEW_BLOCKS).map(markedLinks),
   };
+}
+
+/** A block with every link button that leaves Slack labeled so (" ↗"), in
+ *  an actions row or as a section's accessory. */
+function markedLinks(block: unknown): unknown {
+  const mark = (el: unknown): unknown => {
+    const e = el as { type?: string; url?: unknown; text?: { text?: unknown } };
+    if (e?.type !== "button" || typeof e.url !== "string" || typeof e.text?.text !== "string") return el;
+    return { ...e, text: { ...e.text, text: linkLabel(e.text.text, e.url) } };
+  };
+  const b = block as { elements?: unknown[]; accessory?: unknown; type?: string };
+  if (b?.type === "actions" && Array.isArray(b.elements)) return { ...b, elements: b.elements.map(mark) };
+  if (b?.accessory) return { ...b, accessory: mark(b.accessory) };
+  return block;
 }
 
 /** What a view has to say about the edits: an alert block, which Slack takes
@@ -141,30 +158,7 @@ const ALERT_CHARS = 200;
 /** Slack's cap on a text element of a rich text line. */
 const RICH_TEXT_CHARS = 3000;
 
-/** A mention, a channel or a link in mrkdwn, as this file and the card write them. */
-const MRKDWN_TOKEN = /<@([UW][A-Z0-9]{6,})>|<#([CG][A-Z0-9]{6,})(?:\|[^>]*)?>|<(https?:\/\/[^|>\s]+)(?:\|([^>]*))?>/g;
-
-/** mrkdwn's entities back to the characters: rich text is read as written. */
-const unescaped = unescapeSlackText;
-
-/** A line of mrkdwn as rich text elements: each `<@U…>` a user pill, each
- *  `<#C…>` a channel pill, each `<url|text>` a link, the rest its words. */
-export function richElements(mrkdwn: string): unknown[] {
-  const out: unknown[] = [];
-  let at = 0;
-  const words = (t: string) => {
-    if (t) out.push({ type: "text", text: clip(unescaped(t), RICH_TEXT_CHARS) });
-  };
-  for (const m of mrkdwn.matchAll(MRKDWN_TOKEN)) {
-    words(mrkdwn.slice(at, m.index));
-    if (m[1]) out.push({ type: "user", user_id: m[1] });
-    else if (m[2]) out.push({ type: "channel", channel_id: m[2] });
-    else out.push({ type: "link", url: m[3]!, ...(m[4] ? { text: unescaped(m[4]) } : {}) });
-    at = m.index + m[0].length;
-  }
-  words(mrkdwn.slice(at));
-  return out;
-}
+export { richElements };
 
 /** One rich text line: what an alert would have said with a pill in it. */
 function richLine(elements: readonly unknown[]): unknown {
@@ -200,6 +194,9 @@ export interface DraftAccess {
    *  when. Drawn read-only under an alert saying so, without its where line
    *  and caveats, which were about a decision now made. */
   decided?: Pick<DecidedProposal, "decision" | "by" | "reason" | "at">;
+  /** What a decided card says at its top, where the caller knows more than
+   *  the kept decision: an item of a report, from its record's state. */
+  outcome?: DecisionOutcome;
 }
 
 /** How `draftView` draws the draft beyond who may decide it. */
@@ -212,6 +209,8 @@ export interface DraftOptions {
   alert?: { level: "error" | "success"; text: string };
   /** Where the Notion databases a create lands in open, for its where line. */
   databases?: NotionDatabaseLinks;
+  /** The view's title in place of its tool's: a report's name. */
+  title?: string;
 }
 
 /**
@@ -245,7 +244,7 @@ export function draftView(
   // A refused edit's alert stays first, above every zone; then, for a view
   // that cannot decide, why not.
   if (opts.alert) head.push(alertBlock(opts.alert.level, opts.alert.text));
-  if (access.decided) head.push(...decidedAlert(access.decided, proposal, reading));
+  if (access.decided) head.push(...(access.outcome ? outcomeHead(access.outcome) : decidedAlert(access.decided, proposal, reading)));
   else if (!mayDecide) head.push(stateAlert("info", "Read-only."), richLine(readOnlyLine(access.confirmers)));
   if (!anatomy) head.push(headlineBlock(operations, editButton), ...edited);
 
@@ -266,7 +265,7 @@ export function draftView(
   return modal(
     { channel: card.channel, ts: card.ts },
     [...head, ...fitted, ...tail],
-    { title: reviewTitle(operations), ...(mayDecide ? { submit: SUBMIT } : {}) },
+    { title: opts.title ?? reviewTitle(operations), ...(mayDecide ? { submit: SUBMIT } : {}) },
   );
 }
 
@@ -637,10 +636,11 @@ function reviewNoteOf(state: unknown): string {
  * read-only, outcome included. Every item closed since keeps its draft, which
  * View draws instead (`draftView` with `decided`).
  */
-export function decidedView(card: ReviewedCard, cardText: string, title?: string): View {
+export function decidedView(card: ReviewedCard, cardText: string, title?: string, outcome?: DecisionOutcome): View {
+  const words = textSections(withoutInternalFields(draftBody(cardText)));
   return modal(
     card,
-    [...textSections(withoutInternalFields(draftBody(cardText))), context("Read-only. This proposal has already been decided.")],
+    outcome ? [...outcomeHead(outcome), ...words] : [...words, context("Read-only. This proposal has already been decided.")],
     title ? { title } : {},
   );
 }

@@ -36,6 +36,7 @@
 // no Workers global, no fetch — so `tests/proposal-review.test.ts` drives it.
 import { proposalOperations, withArgs, type PendingProposal, type ProposalLookup, type ReviewChoice, type ThreadState } from "../thread-state/index";
 import { currentReport, itemText, settleItem } from "./decision-cards";
+import { REPORT_TITLES, reportOutcome } from "./decision-head";
 import type { OperationOutcome } from "../gate/run-batch";
 import type { Delivery } from "../turn/index";
 import { lookAtProposal, resolveSignal, type GateRestage, type GateVerdict, type ReviewDecision } from "../gate/index";
@@ -75,7 +76,7 @@ import {
   type FieldChange,
   type ReviewViewState,
 } from "./review-fields";
-import type { ProposalOperation } from "../thread-state/index";
+import type { ProposalOperation, ReportEntry } from "../thread-state/index";
 import type { NotionDatabaseLinks } from "./review-notion-create";
 
 export type { ReviewViewState } from "./review-fields";
@@ -198,11 +199,14 @@ export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoor
   // An item no longer live: its report redrawn, so one whose time ran out is
   // shown closed on its card from now on — and, when nothing was kept, its
   // words read off the report's record.
-  const item = request.item && look.state !== "live" ? await reportItem(request.channel, request.item, deps, !kept) : null;
+  const entry = request.item && look.state !== "live" ? await reportEntry(request.channel, request.item, deps) : null;
+  // An item of a report leads with its record's outcome, titled for its report.
+  const outcome = entry ? (reportOutcome(entry.entry) ?? undefined) : undefined;
+  const title = entry?.entry.item.kind ? REPORT_TITLES[entry.entry.item.kind] : undefined;
   const view = kept
-    ? draftView(card, kept.proposal, { mayDecide: false, confirmers: [], decided: kept })
-    : item
-    ? decidedView(card, item, look.state === "live" ? undefined : closedTitle(look))
+    ? draftView(card, kept.proposal, { mayDecide: false, confirmers: [], decided: kept, ...(outcome ? { outcome } : {}) }, title ? { title } : {})
+    : entry
+    ? decidedView(card, outcome ? itemWords(entry.entry) : entry.text, title ?? (look.state === "live" ? undefined : closedTitle(look)), outcome)
     :
     look.state === "live" && look.proposal.revising
       ? // Sent back with Needs changes: the revised card is the one to decide.
@@ -234,22 +238,26 @@ async function itemClosesAt(proposal: PendingProposal, deps: ReviewDoorDeps): Pr
   return record && Number.isFinite(postedAt) ? { closesAt: postedAt + record.ttlMs } : {};
 }
 
-/** An item's words for View, off its report's record, when `words` asks for
- *  them: only for an item closed before its record kept the draft. The
- *  report's message is redrawn first either way, so an item whose time ran
- *  out reads as closed. */
-async function reportItem(
+/** An item's entry on its report's record, and its words as View shows them
+ *  when its record kept no draft. The report's message is redrawn first, so
+ *  an item whose time ran out reads as closed. Null when the record is gone. */
+async function reportEntry(
   channel: string,
   item: { messageTs: string; id: string },
   deps: ReviewDoorDeps,
-  words: boolean,
-): Promise<string | null> {
+): Promise<{ entry: ReportEntry; text: string } | null> {
   const now = (deps.now ?? Date.now)();
   const message = await currentReport(deps.threadState, item.messageTs, now).catch(() => null);
   if (message) await deps.updateCard(channel, item.messageTs, message);
-  if (!words) return null;
   const record = await deps.threadState.getReport(item.messageTs).catch(() => null);
-  return record ? itemText(record, item.id) : null;
+  const entry = record?.entries.find((e) => e.id === item.id);
+  const text = record ? itemText(record, item.id) : null;
+  return entry && text ? { entry, text } : null;
+}
+
+/** An item's own words under its outcome: its title, body and detail. */
+function itemWords(entry: ReportEntry): string {
+  return [entry.item.title, entry.item.body, entry.item.detail].filter(Boolean).join("\n");
 }
 
 /** Edit fields, pressed on the draft: the view that holds the fields. */
@@ -504,7 +512,7 @@ async function applyRevise(
   // unlock). Review stays, and opens on "being revised" meanwhile.
   const { item } = verdict.proposal;
   const message = item
-    ? await settleItem(deps.threadState, item, { kind: "changes-asked", by: request.userId }, (deps.now ?? Date.now)())
+    ? await settleItem(deps.threadState, item, { kind: "changes-asked", by: request.userId, at: (deps.now ?? Date.now)() }, (deps.now ?? Date.now)())
     : decidedCard(
         verdict.proposal,
         `Needs changes, asked by <@${request.userId}>. It's being revised, and the new card follows in the thread.`,

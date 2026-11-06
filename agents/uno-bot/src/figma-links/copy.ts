@@ -78,6 +78,7 @@ export function devLinksItem(subject: DevLinksSubject, write: DevLinksWrite): Re
   if (subject.kind === "batch") {
     return {
       id: devLinksItemId(subject),
+      kind: "dev-mode-links",
       title: plural(subject.components.length, "component", "components"),
       subtitle: "Dev Mode links · Code (plus-uno) and Storybook",
       body: devLinksBody(subject, write),
@@ -87,6 +88,7 @@ export function devLinksItem(subject: DevLinksSubject, write: DevLinksWrite): Re
   }
   return {
     id: devLinksItemId(subject),
+    kind: "dev-mode-links",
     title: subject.component,
     subtitle: "Dev Mode links · Code (plus-uno) and Storybook",
     body: devLinksBody(subject, write),

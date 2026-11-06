@@ -119,6 +119,7 @@ export function tidyItem(finding: TidyFinding, likely: { number: number; title: 
   const card = known ? { label: `Card ${known.number}`, url: known.url } : null;
   return {
     id: itemId(finding),
+    kind: "figma-tidy-up",
     title: finding.file.name,
     subtitle: finding.card === null ? SUBTITLE[finding.check] : `${SUBTITLE[finding.check]} · Card ${finding.card}`,
     ...(finding.owner ? { owners: [{ slack: finding.owner, ...(ownerName ? { name: ownerName } : {}) }] } : {}),

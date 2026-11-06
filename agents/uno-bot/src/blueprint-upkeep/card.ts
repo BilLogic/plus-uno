@@ -191,6 +191,7 @@ export function revisionItem(
   const rm = roadmapId(source);
   return {
     id: revisionItemId(source, path),
+    kind: "blueprint-upkeep",
     title: revisionTitle(path),
     subtitle: `${source.number !== null ? code(rm) : esc(rm)} ${moment(source)} · ${status}`,
     ...(people.owners.length ? { owners: [...people.owners] } : {}),

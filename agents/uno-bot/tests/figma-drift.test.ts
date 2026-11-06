@@ -1493,8 +1493,8 @@ describe("a drift card decided in Review", () => {
     // View draws the draft it was decided on, with the reason (#1362).
     await runReviewOpen({ triggerId: "T", channel: DESIGN, messageTs: itemProposalKey(report!.ts, "drift-1"), userId: "U0ADE", item: { messageTs: report!.ts, id: "drift-1" } }, deps);
     const view = JSON.stringify(views.calls.at(-1)!.view);
-    assert.match(view, /"text":"Rejected\."/);
-    assert.match(view, /: Already updated/, "View shows the reason too");
+    assert.match(view, /"text":"Rejected\. Nothing was written\."/);
+    assert.match(view, /"rich_text_quote","elements":\[\{"type":"text","text":"Already updated"\}/, "View quotes the reason");
     assert.doesNotMatch(view, /Nothing written\. Reason/, "from the draft, not the card's words");
   });
 });

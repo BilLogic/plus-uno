@@ -157,6 +157,7 @@ function statusWords(status: string | null): string {
 export function todoItem(input: { id: string; people: readonly string[]; what: string; sourceUrl: string; fromNote: boolean }): ReportItem {
   return {
     id: input.id,
+    kind: "roadmap-check-in",
     title: draftTitle(input.what) || "untitled",
     subtitle: `from ${input.fromNote ? "the running note" : "this thread"}`,
     owners: ownersOf(input.people),
@@ -171,6 +172,7 @@ export function todoItem(input: { id: string; people: readonly string[]; what: s
 export function unownedItem(input: { id: string; creator: string; card: { title: string; url: string; status: string | null } }): ReportItem {
   return {
     id: input.id,
+    kind: "roadmap-check-in",
     title: oneLine(input.card.title),
     subtitle: `${statusWords(input.card.status)} · no Contributor for a week`,
     owners: ownersOf([input.creator]),
@@ -197,6 +199,7 @@ export function staleItem(input: {
   const missing = input.unmatched?.length ? ` · not found in Slack: ${input.unmatched.map((n) => escapeSlackText(oneLine(n))).join(", ")}` : "";
   return {
     id: input.id,
+    kind: "roadmap-check-in",
     title: oneLine(input.card.title),
     subtitle: `${statusWords(input.card.status)} · no comments for 3 weeks${missing}`,
     owners: [...ownersOf(input.people), ...(input.unmatched ?? []).map((n) => ({ name: oneLine(n) }))],
@@ -218,8 +221,8 @@ export function etDay(at: number): string {
  */
 export function unownedChoices(creator: string): ReviewChoice[] {
   return [
-    { value: "assign", label: `Assign <@${creator}>`, past: `Assigned to <@${creator}>`, verdict: "confirm" },
-    { value: "leave", label: "Leave it", past: "Left unassigned", verdict: "cancel", decided: "No Contributor set. Not asked again until the card changes." },
+    { value: "assign", label: `Assign <@${creator}>`, past: `Assigned to <@${creator}>`, verdict: "confirm", decided: "Contributor set on the Roadmap card." },
+    { value: "leave", label: "Leave it", past: "Left unassigned", verdict: "cancel", decided: "I won't ask again until the card changes." },
   ];
 }
 
@@ -233,10 +236,10 @@ export function unownedChoices(creator: string): ReviewChoice[] {
  */
 export function staleChoices(again: number, drop: string | null): ReviewChoice[] {
   return [
-    { value: "done", label: "Done", past: "Marked done", verdict: "confirm" },
-    { value: "still", label: "Still on it", past: "Kept open", verdict: "cancel", decided: `Nothing written. Checked again ${etDay(again)}.` },
+    { value: "done", label: "Done", past: "Marked done", verdict: "confirm", decided: "Design Status moved on the Roadmap card." },
+    { value: "still", label: "Still on it", past: "Kept open", verdict: "cancel", decided: `I'll check this card again on ${etDay(again)}.` },
     ...(drop
-      ? [{ value: "drop", label: "Drop it", past: "Dropped", verdict: "confirm" as const, args: { properties: { "Design Status": drop } }, decided: `Written: moved to ${drop}.` }]
+      ? [{ value: "drop", label: "Drop it", past: "Dropped", verdict: "confirm" as const, args: { properties: { "Design Status": drop } }, decided: `Design Status moved to ${drop}.` }]
       : []),
   ];
 }

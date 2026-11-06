@@ -286,8 +286,8 @@ describe("a DS precedence card in Review", () => {
     assert.deepEqual(
       row.elements.map((b) => [b.text.text, b.url]),
       [
-        ["Code", BADGE_CODE],
-        ["Figma", BADGE_FIGMA],
+        ["Code ↗", BADGE_CODE],
+        ["Figma ↗", BADGE_FIGMA],
       ],
     );
     assert.ok(row.elements.every((b) => b.action_id.startsWith(`${OPEN_ACTION_ID}_`)), "the Open buttons' ids, which the endpoint acks");

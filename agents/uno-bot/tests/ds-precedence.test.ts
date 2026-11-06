@@ -46,7 +46,7 @@ import { sweepHarness } from "./helpers/sweep-harness";
 import { isWeeklyPrecedenceThread } from "../src/ds-precedence/env";
 import { TOOL_TABLE } from "../src/agent/tool-table";
 import type { Env } from "../src/types";
-import { messageBlocksRefusal } from "./helpers/slack-block-rules";
+import { viewRefusal, messageBlocksRefusal } from "./helpers/slack-block-rules";
 import { notified } from "./helpers/notified";
 import { recordingViews } from "./helpers/recording-slack";
 import type { OperationOutcome } from "../src/gate/run-batch";
@@ -890,6 +890,8 @@ describe("the week's intake", () => {
 
 /** When a card closed, as View's line says it (`closedWhen`): "Oct 19 at 9:13 AM ET". */
 const WHEN = String.raw`[A-Z][a-z]{2} \d{1,2} at \d{1,2}:\d{2} [AP]M ET`;
+/** When a decided card's byline says it was decided, in ET. */
+const BYLINE_WHEN = String.raw`[A-Z][a-z]{2} \d{1,2} at \d{1,2}:\d{2} [AP]M`;
 
 /** A rich text block's words, with a user pill as its mention. */
 function richWords(block: unknown): string {
@@ -1000,9 +1002,9 @@ describe("deciding a weekly card in its Review", () => {
 
   it("View on a decided card draws the finding it was decided on, read-only, under how it closed (#1362)", async () => {
     const cases = [
-      ["revise", "ghost is library-only on purpose", "Noted.", String.raw`^Noted by <@U0MEMBER1> on ${WHEN}: ghost is library-only on purpose\.$`],
-      ["confirm", undefined, "Approved.", String.raw`^Approved by <@U0MEMBER1> on ${WHEN}\.$`],
-      ["cancel", "deliberate", "Rejected.", String.raw`^Rejected by <@U0MEMBER1> on ${WHEN}: deliberate\.$`],
+      ["revise", "ghost is library-only on purpose", /^Noted\. Added to the intake as disputed\.$/, String.raw`^Noted by <@U0MEMBER1> on ${BYLINE_WHEN}:$`],
+      ["confirm", undefined, /^Approved\. Added to DS precedence intake #\d+\.$/, String.raw`^Approved by <@U0MEMBER1> on ${BYLINE_WHEN}\.$`],
+      ["cancel", "deliberate", /^Rejected\. Nothing was written\.$/, String.raw`^Rejected by <@U0MEMBER1> on ${BYLINE_WHEN}:$`],
     ] as const;
     for (const [decision, note, alert, line] of cases) {
       const { decide, deps, views, store } = await decided();
@@ -1013,15 +1015,19 @@ describe("deciding a weekly card in its Review", () => {
       assert.equal(look.decided.by, MEMBERS[0]);
       await runReviewOpen({ triggerId: "T", channel: CHANNEL, messageTs: key, userId: MEMBERS[1]!, item: { messageTs: MSG, id: "ds-Button" } }, deps);
       const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; text?: { text: string }; elements?: unknown[] }>; submit?: unknown };
-      assert.equal(view.blocks[0]!.text!.text, alert, decision);
+      assert.match(view.blocks[0]!.text!.text, alert, decision);
       assert.match(richWords(view.blocks[1]), new RegExp(line), decision);
+      if (note) assert.equal(richWords(view.blocks[2]), note, `${decision}: the note, quoted`);
+      assert.equal((view as unknown as { title: { text: string } }).title.text, "DS precedence", decision);
+      assert.equal(view.blocks.findIndex((b) => b.type === "divider"), note ? 3 : 2, `${decision}: the head, then a divider, then the draft`);
+      assert.equal(viewRefusal(view), null, decision);
       const json = JSON.stringify(view);
       // The finding itself: what differs, and its code and library.
       assert.match(json, /What differs/, decision);
       assert.match(json, /"text":"Code has one "/, decision);
       assert.match(json, /the library splits it into 4 components/, decision);
-      assert.match(json, /"text":"Code"/, decision);
-      assert.match(json, /"text":"Figma"/, decision);
+      assert.match(json, /"text":"Code ↗"/, decision);
+      assert.match(json, /"text":"Figma ↗"/, decision);
       // Never the card's after-state words in place of it.
       assert.doesNotMatch(json, /Note: ghost|Written: added/, decision);
       assert.equal(view.submit, undefined, decision);

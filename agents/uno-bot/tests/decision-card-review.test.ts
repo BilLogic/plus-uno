@@ -171,9 +171,9 @@ describe("Review on one item of a report", () => {
     assert.deepEqual([look.decided.decision, look.decided.reason], ["cancel", "the library is ahead on purpose"]);
     await runReviewOpen({ triggerId: "T", channel: CHANNEL, messageTs: itemProposal(MSG, "c2").proposalTs, userId: "U0BILL", item: { messageTs: MSG, id: "c2" } }, deps);
     const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; text?: { text: string } }>; submit?: unknown };
-    assert.equal(view.blocks[0]!.text!.text, "Rejected.");
+    assert.equal(view.blocks[0]!.text!.text, "Rejected. Nothing was written.");
     const json = JSON.stringify(view);
-    assert.match(json, /: the library is ahead on purpose/);
+    assert.match(json, /"rich_text_quote","elements":\[\{"type":"text","text":"the library is ahead on purpose"\}/, "the reason, quoted");
     assert.match(json, /New 2/, "the draft that was decided");
     assert.doesNotMatch(json, /Nothing written/, "not the card's after-state words");
     assert.equal(view.submit, undefined);
@@ -202,7 +202,7 @@ describe("Review on one item of a report", () => {
     const [one] = cards(updates.at(-1)!.message.blocks);
     assert.equal(one!.subtitle!.text, "Expired with no decision");
     assert.deepEqual(one!.actions.map((a) => a.text.text), ["View card"]);
-    assert.match(JSON.stringify(views.calls.at(-1)!.view), /Closed, no decision/);
+    assert.match(JSON.stringify(views.calls.at(-1)!.view), /"level":"warning","text":\{"type":"plain_text","text":"Expired\. Nothing was written\."\}/);
     assert.match(JSON.stringify(views.calls.at(-1)!.view), /New 1/, "the draft it closed on, kept for View (#1362)");
     // Titled for its tool, which the lookup that found it closed named.
     assert.equal((views.calls.at(-1)!.view as { title: { text: string } }).title.text, "Review page update");
@@ -267,7 +267,7 @@ describe("Review on one item of a report", () => {
 describe("a card's own answers in the Review pop-up", () => {
   const OWN: ReviewChoice[] = [
     { value: "done", label: "Done", past: "Marked done", verdict: "confirm" },
-    { value: "still", label: "Still on it", past: "Kept open", verdict: "cancel", decided: "Nothing written. Checked again Oct 30." },
+    { value: "still", label: "Still on it", past: "Kept open", verdict: "cancel", decided: "I'll check this card again on Oct 30." },
     { value: "drop", label: "Drop it", past: "Dropped", verdict: "confirm", args: { replace: [{ block_id: "b1", content: "Archived" }] } },
   ];
 
@@ -337,10 +337,10 @@ describe("a card's own answers in the Review pop-up", () => {
 
   it("keeps the draft an own answer decided, and View draws it read-only as answered, never the card's words (#1362)", async () => {
     const cases = [
-      ["drop", "confirm", /Archived/],
-      ["still", "cancel", /New 1/],
+      ["drop", "confirm", /Archived/, "Dropped."],
+      ["still", "cancel", /New 1/, "Kept open. I'll check this card again on Oct 30."],
     ] as const;
-    for (const [choice, decision, drafted] of cases) {
+    for (const [choice, decision, drafted, alert] of cases) {
       const store = await withOwn();
       const { deps, views } = harness(store);
       await runReviewDecision({ ...decide("c1", "confirm"), choice }, deps);
@@ -348,10 +348,9 @@ describe("a card's own answers in the Review pop-up", () => {
       assert.ok(look.state === "none" && look.decided, `${choice}: kept`);
       assert.equal(look.decided.decision, decision, choice);
       const view = (await openOn(deps, views, "c1")) as { blocks: Array<{ type: string; text?: { text: string } }>; submit?: unknown };
-      assert.equal(view.blocks[0]!.text!.text, "Answered.", choice);
+      assert.equal(view.blocks[0]!.text!.text, alert, choice);
       const json = JSON.stringify(view);
       assert.match(json, drafted, `${choice}: the draft as decided, its answer's args in place`);
-      assert.doesNotMatch(json, /Checked again Oct 30/, `${choice}: not the card's after-state words`);
       assert.equal(view.submit, undefined, choice);
       assert.equal(view.blocks.filter((b) => b.type === "input").length, 0, choice);
     }

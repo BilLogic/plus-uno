@@ -139,12 +139,13 @@ export function driftItem(
   const subtitle = [publisher, when].filter(Boolean).join(" · ");
   return {
     id: input.id,
+    kind: "figma-drift",
     title,
     ...(subtitle ? { subtitle } : {}),
     ...(input.owner ? { owners: [{ slack: input.owner }] } : {}),
     body: `Thread settled "${quoted(input.threadSays, CARD_SAID_CHARS)}" on ${dayWords(input.decidedAt)} · ${sinceWords(file.kind, change)}.`,
     open: { label: openLabel(file.kind), url: file.url },
-    done: `${input.lane === "roadmap" ? "a Roadmap card" : "an intake"} to update ${title}`,
+    done: `${input.lane === "roadmap" ? "the Roadmap card" : "the intake"} asks to update ${title}.`,
   };
 }
 
@@ -188,8 +189,8 @@ export function driftCardWords(): StatedCardWords {
 export function driftChoices(): ReviewChoice[] {
   return [
     { value: "file", label: "File an intake", past: "Intake filed", verdict: "confirm" },
-    { value: "updated", label: "Already updated", past: "Marked updated", verdict: "cancel" },
-    { value: "untouched", label: "Didn't touch this file", past: "Marked not yours", verdict: "cancel" },
+    { value: "updated", label: "Already updated", past: "Marked updated", verdict: "cancel", decided: "Nothing filed." },
+    { value: "untouched", label: "Didn't touch this file", past: "Marked not yours", verdict: "cancel", decided: "Nothing filed." },
   ];
 }
 

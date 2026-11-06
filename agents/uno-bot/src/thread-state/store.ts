@@ -622,9 +622,25 @@ export interface OwnerLine {
   says: string;
 }
 
+/** Which report an item came from: what its pop-up is titled once decided
+ *  (`slack/decision-head.ts` § `REPORT_TITLES`). An item, not its record,
+ *  carries it, since one morning message can hold several reports' cards. */
+export type ReportKind =
+  | "ds-precedence"
+  | "roadmap-check-in"
+  | "figma-tidy-up"
+  | "figma-drift"
+  | "doc-fix"
+  | "dev-mode-links"
+  | "figma-comment"
+  | "blueprint-upkeep";
+
 export interface ReportItem {
   /** Stable within the report. No `#` or `~`: the builder uses both. */
   id: string;
+  /** The report it came from. Absent on an item posted before it was kept:
+   *  its pop-up is titled for its tool. */
+  kind?: ReportKind;
   /** The page, file, component or comment the item is about. Plain text. */
   title: string;
   /** Where it came from, and its state once decided, as mrkdwn. Slack
@@ -648,16 +664,18 @@ export interface ReportItem {
   detail?: string;
 }
 
-/** Where one item of a report stands. `at` is epoch ms. `as` is the card's
- *  own answer, when it was decided by one (`ReviewChoice`). */
+/** Where one item of a report stands. `at` is when it was decided, epoch ms:
+ *  absent on an item decided before every state kept it, whose pop-up names
+ *  no time. `as` is the card's own answer, when it was decided by one
+ *  (`ReviewChoice`). */
 export type ReportItemState =
   | { kind: "open" }
-  | { kind: "changes-asked"; by: string }
+  | { kind: "changes-asked"; by: string; at?: number }
   | { kind: "approved"; by: string; at: number; as?: ChosenAs; done?: string }
   | { kind: "failed"; by: string; at: number; reason: string; as?: ChosenAs }
-  | { kind: "rejected"; by: string; reason?: string; as?: ChosenAs }
+  | { kind: "rejected"; by: string; at?: number; reason?: string; as?: ChosenAs }
   /** A note written to the report's record closes the item. */
-  | { kind: "noted"; by: string; note: string }
+  | { kind: "noted"; by: string; at?: number; note: string }
   | { kind: "expired" }
   /** Shown, but its proposal never staged: nothing to decide. */
   | { kind: "not-staged"; note: string };
