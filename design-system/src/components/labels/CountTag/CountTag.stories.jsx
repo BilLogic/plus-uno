@@ -6,7 +6,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import CountTag, { COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS } from './CountTag';
 
 /**
- * `CountTag` — a number on its own, as a pill.
+ * `CountTag` — a number on its own, as a near-square badge.
  *
  * THE TEST SEAM IS THIS FILE: story `play:` functions run by `check:storybook`
  * in a real browser. Every assertion is something a person could observe —
@@ -86,7 +86,7 @@ Appearances.play = async ({ canvasElement }) => {
     await expect(bold.backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-danger-bold'));
     await expect(bold.color).toBe(tokenColor(canvasElement, '--ds-text-inverse'));
 
-    // Inverse is a solid surface pill with subtle text, on a button and on a
+    // Inverse is a solid surface badge with subtle text, on a button and on a
     // bold neutral fill alike.
     for (const text of ['14', '15']) {
         const inverse = getComputedStyle(pillOf(canvas, text));
@@ -104,9 +104,10 @@ Appearances.play = async ({ canvasElement }) => {
     await expect(px(d.width)).toBe(8);
     await expect(d.backgroundColor).toBe(tokenColor(canvasElement, '--ds-icon-danger'));
     await expect(dot).toHaveTextContent('');
+    await expect(px(d.borderRadius), 'the dot stays round').toBeGreaterThanOrEqual(4);
 };
 
-/** Both spacings: 20 on its own, 16 (compact) inside a Status tag or Tag. Min-width equals height. */
+/** Both spacings: 20 on its own, 16 (compact) inside a Status tag or Tag. Min-width is 24, so a digit is a near-square. */
 export const Spacings = () => (
     <div style={row}>
         <CountTag value={1} />
@@ -121,16 +122,16 @@ Spacings.play = async ({ canvasElement }) => {
         const pill = pillOf(canvas, text);
         const s = getComputedStyle(pill);
         await expect(pill.getBoundingClientRect().height, `${text} is ${size} tall`).toBe(size);
-        await expect(px(s.minWidth), 'min-width equals height').toBe(size);
-        await expect(pill.getBoundingClientRect().width, 'one digit is a circle').toBe(size);
+        await expect(px(s.minWidth), 'min-width is size-150').toBe(24);
+        await expect(pill.getBoundingClientRect().width, 'one digit is 24 wide').toBe(24);
         await expect(px(s.paddingLeft), 'padding is the Element xs token, not 8').toBe(4);
         await expect(px(s.paddingRight)).toBe(4);
-        await expect(px(s.borderRadius), 'fully rounded').toBeGreaterThanOrEqual(size / 2);
+        await expect(px(s.borderRadius), 'corner is radius-0125').toBe(2);
         await expect(px(getComputedStyle(canvas.getByText(text)).fontSize), 'B3 12').toBe(12);
     }
 
     const wide = pillOf(canvas, '99+');
-    await expect(wide.getBoundingClientRect().width, 'grows with its digits').toBeGreaterThan(20);
+    await expect(wide.getBoundingClientRect().width, 'grows with its digits').toBeGreaterThan(24);
     await expect(wide.getBoundingClientRect().height).toBe(20);
 };
 
@@ -165,7 +166,7 @@ Zero.play = async ({ canvasElement }) => {
     await expect(within(canvas.getByTestId('shown')).getByText('0')).toBeInTheDocument();
 };
 
-/** The ring, for a count pinned to an icon or avatar: 2px of surface outside the pill. */
+/** The ring, for a count pinned to an icon or avatar: 2px of surface outside the badge. */
 export const Ring = () => (
     <div style={row}>
         <span style={{ position: 'relative', display: 'inline-flex' }}>
