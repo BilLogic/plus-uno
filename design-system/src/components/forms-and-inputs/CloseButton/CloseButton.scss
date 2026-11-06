@@ -10,7 +10,8 @@
     // @grounds: --color-inverse-surface --color-primary --color-secondary --color-success --color-danger --color-tertiary --color-info --color-warning
     color: var(--ds-text-inverse);
 
-    i {
+    .fa-solid,
+    .fa-regular {
         // @contrast: non-text
         color: var(--ds-icon-inverse);
     }
