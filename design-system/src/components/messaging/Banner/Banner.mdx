@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as BannerStories from './Banner.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={BannerStories} />
 
@@ -47,6 +47,28 @@ and unmounts it once it clears.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>The warning ground and text, from their role tokens.</>}>
+    <DsCanvasQuiet of={BannerStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Not a control, so a pointer over it changes nothing.</>}>
+    <DsCanvasQuiet of={BannerStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>No pressed layer either.</>}>
+    <DsCanvasQuiet of={BannerStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Tab skips it; a link inside takes its own focus ring.</>}>
+    <DsCanvasQuiet of={BannerStories.Focused} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -71,7 +93,7 @@ and unmounts it once it clears.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Banner` for a condition that applies to the whole page, for as long as it
 holds: scheduled maintenance, an outage, an account-wide notice. It has no
@@ -86,7 +108,45 @@ on its own, and `warning` or `error` stays until dismissed.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Icon.** Leading glyph for <code>warning</code> and <code>danger</code>; <code>announcement</code> has none.
+2. **Message.** One or two lines of text, with an optional underlined link.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Fill and text per appearance.</td></tr>
+<tr><td>Hovered, pressed</td><td>Not a control, so nothing changes. A link inside is underlined at rest.</td></tr>
+<tr><td>Focused</td><td>Tab skips the banner; a link inside shows the 2px focus ring.</td></tr>
+<tr><td>Truncated</td><td>Not supported. Keep the message short enough to fit.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Warning</td><td><code>--ds-background-warning</code>, <code>--ds-text-warning</code>, <code>--ds-icon-warning</code></td></tr>
+<tr><td>Danger</td><td><code>--ds-background-danger</code>, <code>--ds-text-danger</code>, <code>--ds-icon-danger</code></td></tr>
+<tr><td>Announcement</td><td><code>--ds-background-neutral</code>, <code>--ds-text</code></td></tr>
+<tr><td>Spacing</td><td><code>--pad-y-md</code>, <code>--pad-x-md</code>, <code>--inline-md</code></td></tr>
+<tr><td>Icon</td><td><code>--icon-md</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Pick the appearance for what is true, not for emphasis.
 
@@ -110,6 +170,23 @@ underlined to stay visible against every fill.
 
 <div className="sb-ds-doc-section">
 
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Use concise, scannable language that states the problem.</td><td>Write a long message; there is no way to expand it.</td></tr>
+<tr><td>Say the severity, what is affected and what to do.</td><td>Leave out what the person should do next.</td></tr>
+<tr><td>Own the problem when it is ours: "We lost the connection."</td><td>Blame the person: "Something is wrong with your connection."</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Accessibility
 
 - **Announced as a status.** The banner's role is `status`, so assistive
@@ -119,6 +196,8 @@ underlined to stay visible against every fill.
   appropriate since it carries no severity.
 - **No focus trap.** A banner never captures focus or keyboard navigation —
   it sits in the page's reading order like any other content.
+- **Severity needs more than color.** Give the warning and danger icons their meaning in the words of the message, since the glyph is decorative.
+- **A banner link takes focus like any link.** It shows the 2px focus ring and its text names the destination.
 
 </div>
 

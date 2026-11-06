@@ -3,7 +3,7 @@ import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as SectionMessageStories from './SectionMessage.stories.jsx';
 import * as SectionMessageSubStories from './SectionMessage.Subcomponents.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -107,6 +107,28 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>The warning ground, with the leading icon in the warning icon token.</>}>
+    <DsCanvasQuiet of={SectionMessageStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The message does not react; Dismiss takes the subtle hovered step.</>}>
+    <DsCanvasQuiet of={SectionMessageStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Dismiss takes the subtle pressed step.</>}>
+    <DsCanvasQuiet of={SectionMessageStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Dismiss and each action show the 2px focus ring.</>}>
+    <DsCanvasQuiet of={SectionMessageStories.Focused} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -131,7 +153,7 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `SectionMessage` for a message that belongs to the page and stays there
 until it is resolved or dismissed — a banner explaining why a session cannot
@@ -164,7 +186,47 @@ every style. Every style has 4px corners.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Leading icon.** The appearance glyph, 20 on the first line, decorative.
+2. **Title.** An optional heading; set <code>headingLevel</code> to fit the outline.
+3. **Description.** What the person needs to act.
+4. **Actions.** Link buttons, separated by a divider.
+5. **Dismiss.** The shared CloseButton, centered on the first line.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The fill and icon of the appearance, text in the default color.</td></tr>
+<tr><td>Hovered, pressed</td><td>The message does not react; Dismiss takes the subtle neutral steps.</td></tr>
+<tr><td>Focused</td><td>Dismiss and each action show the 2px ring.</td></tr>
+<tr><td>Dismissed</td><td>The message is removed and the page keeps no copy.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Ground</td><td><code>--ds-background-brand-subtlest</code>, <code>--ds-background-neutral</code>, <code>--ds-background-success</code>, <code>--ds-background-danger</code>, <code>--ds-background-warning</code>, <code>--ds-background-information</code></td></tr>
+<tr><td>Icon</td><td><code>--ds-icon-brand</code>, <code>--ds-icon-subtle</code>, <code>--ds-icon-success</code>, <code>--ds-icon-danger</code>, <code>--ds-icon-warning</code>, <code>--ds-icon-information</code></td></tr>
+<tr><td>Title</td><td><code>--heading-small</code></td></tr>
+<tr><td>Divider</td><td><code>--ds-border</code>, <code>--border-default</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Field errors go on the field.
 
@@ -223,6 +285,23 @@ every style. Every style has 4px corners.
 // Correct — remount it with a key when the message genuinely changes.
 {hasNews && <SectionMessage key={newsId} appearance="info">Three new sessions this week.</SectionMessage>}
 ```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Write a title that states the issue or the reason for the message.</td><td>Repeat a field's error here; say it once.</td></tr>
+<tr><td>Keep the description to what the person needs to act.</td><td>Explain background the person does not need.</td></tr>
+<tr><td>Write actions as verbs: "Reschedule", "Get help".</td><td>Use "click here" as link text.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
