@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
+import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
@@ -300,4 +302,55 @@ UnknownAppearance.play = async ({ canvasElement }) => {
     await expect(flag).toHaveClass('plus-flag--normal');
     const icon = flag.querySelector('.plus-flag-icon i');
     await expect(getComputedStyle(icon).color).toBe(tokenColor(canvasElement, '--ds-icon-subtle'));
+};
+
+/* ------------------------------------------------------------------- states */
+
+const StateFlag = ({ actions }) => (
+    <Flag title="Plan saved" timestamp="Just now" autohide={false} actions={actions}>
+        Your session plan is saved for Monday.
+    </Flag>
+);
+const flagRoot = (canvasElement) => within(canvasElement).getByRole('status');
+const dismissOf = (canvasElement) => within(canvasElement).getByRole('button', { name: 'Dismiss flag' });
+const actionsList = [{ text: 'View plan', onClick: () => {} }];
+
+/** Rest: the flag on the overlay surface, its title in the default text token. */
+export const Rest = {
+    render: () => <StateFlag />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByText('Plan saved')).toBeVisible();
+        await expect(dismissOf(canvasElement)).toBeVisible();
+    },
+};
+
+/** Hovered: the flag itself does not react; its Dismiss takes the subtle hovered ground. */
+export const Hovered = {
+    render: () => <StateFlag />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(flagRoot(canvasElement), ':hover', 'flag');
+        await expectHovered(canvasElement, dismissOf(canvasElement), 'subtle', 'flag dismiss');
+    },
+};
+
+/** Pressed: Dismiss takes the subtle pressed ground. */
+export const Pressed = {
+    render: () => <StateFlag />,
+    play: async ({ canvasElement }) => {
+        await expectPressed(canvasElement, dismissOf(canvasElement), 'subtle', 'flag dismiss');
+    },
+};
+
+/** Focused: Dismiss and each action show the 2px ring. */
+export const Focused = {
+    render: () => <StateFlag actions={actionsList} />,
+    play: async ({ canvasElement }) => {
+        await expectFocusRing(canvasElement, dismissOf(canvasElement), 'flag dismiss');
+        const action = within(canvasElement).getByRole('button', { name: 'View plan' });
+        action.focus({ focusVisible: true });
+        const style = getComputedStyle(action);
+        await expect(style.outlineStyle).toBe('solid');
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        action.blur();
+    },
 };

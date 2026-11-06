@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Modal from '@/components/messaging/Modal';
@@ -538,5 +539,46 @@ export const TwoOverlayLimit = {
         await userEvent.keyboard('{Escape}');
         await waitFor(() => expect(hiddenDialog('Second')).toBeNull());
         await waitFor(() => expect(dialogNamed(canvasElement, 'First')).not.toBeNull());
+    },
+};
+
+/* ------------------------------------------------------------------- states */
+
+const StateModal = () => (
+    <Modal show width="6-col" title="Settings" body="Changes save when you close." onClose={() => {}} />
+);
+const bodyOf = (canvasElement) => within(canvasElement.ownerDocument.body);
+const closeOf = async (canvasElement) => bodyOf(canvasElement).findByRole('button', { name: 'Close modal' });
+
+/** Rest: an open dialog named by its title, with the close button at rest. */
+export const Rest = {
+    render: () => <StateModal />,
+    play: async ({ canvasElement }) => {
+        await expect(await bodyOf(canvasElement).findByRole('dialog', { name: 'Settings' })).toBeVisible();
+        await expect(await closeOf(canvasElement)).toBeVisible();
+    },
+};
+
+/** Hovered: the close button takes the subtle hovered ground. */
+export const Hovered = {
+    render: () => <StateModal />,
+    play: async ({ canvasElement }) => {
+        await expectHovered(canvasElement, await closeOf(canvasElement), 'subtle', 'modal close');
+    },
+};
+
+/** Pressed: the close button takes the subtle pressed ground. */
+export const Pressed = {
+    render: () => <StateModal />,
+    play: async ({ canvasElement }) => {
+        await expectPressed(canvasElement, await closeOf(canvasElement), 'subtle', 'modal close');
+    },
+};
+
+/** Focused: the 2px ring, 2px off the close button. */
+export const Focused = {
+    render: () => <StateModal />,
+    play: async ({ canvasElement }) => {
+        await expectFocusRing(canvasElement, await closeOf(canvasElement), 'modal close');
     },
 };

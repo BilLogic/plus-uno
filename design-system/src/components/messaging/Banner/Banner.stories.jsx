@@ -1,4 +1,6 @@
 import React from 'react';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { tokenColor as stateTokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expect, within } from 'storybook/test';
 import Banner, { BANNER_APPEARANCES } from './Banner';
 
@@ -60,4 +62,43 @@ export const WithoutIcon = {
 
 export const Interactive = {
     render: (args) => <Banner {...args} />,
+};
+
+/* ------------------------------------------------------------------- states */
+
+const bannerRoot = (canvasElement) => within(canvasElement).getByRole('status');
+const StateBanner = () => <Banner appearance="warning">Scheduled maintenance begins at 9:00 PM EST.</Banner>;
+
+/** Rest: the warning ground and text from their role tokens. */
+export const Rest = {
+    render: () => <StateBanner />,
+    play: async ({ canvasElement }) => {
+        const banner = bannerRoot(canvasElement);
+        await expect(getComputedStyle(banner).backgroundColor).toBe(stateTokenColor(canvasElement, '--ds-background-warning'));
+        await expect(getComputedStyle(banner).color).toBe(stateTokenColor(canvasElement, '--ds-text-warning'));
+    },
+};
+
+/** Hovered: a banner is not a control, so a pointer over it changes nothing. */
+export const Hovered = {
+    render: () => <StateBanner />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(bannerRoot(canvasElement), ':hover', 'banner');
+    },
+};
+
+/** Pressed: no pressed layer either. */
+export const Pressed = {
+    render: () => <StateBanner />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(bannerRoot(canvasElement), ':active', 'banner');
+    },
+};
+
+/** Focused: Tab skips it; a link inside takes its own focus. */
+export const Focused = {
+    render: () => <StateBanner />,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(bannerRoot(canvasElement), 'banner');
+    },
 };

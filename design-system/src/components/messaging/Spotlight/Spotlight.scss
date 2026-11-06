@@ -36,7 +36,12 @@
     cursor: pointer;
     padding: var(--space-025);
 
-    @include plus-state((), $ring-token: --ds-border-focused-inverse);
+    border-radius: var(--radius-md);
+
+    @include plus-state((
+        hovered: (background-color: var(--ds-interaction-inverse-hovered)),
+        pressed: (background-color: var(--ds-interaction-inverse-pressed)),
+    ), $ring-token: --ds-border-focused-inverse);
 }
 
 .plus-spotlight-media {
