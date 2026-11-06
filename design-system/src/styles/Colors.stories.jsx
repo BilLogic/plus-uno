@@ -411,7 +411,7 @@ const SWATCHES = [
     {
         label: 'Text on surface',
         tokens: ['--ds-text', '--ds-surface'],
-        style: { color: 'var(--ds-text)', background: 'var(--ds-surface)', border: '1px solid var(--ds-border)' },
+        style: { color: 'var(--ds-text)', background: 'var(--ds-surface)', border: 'var(--stroke-1) solid var(--ds-border)' },
     },
     {
         label: 'Raised surface',
@@ -431,7 +431,7 @@ const SWATCHES = [
     {
         label: 'Focused border',
         tokens: ['--ds-border-focused'],
-        style: { color: 'var(--ds-text)', background: 'var(--ds-surface)', outline: '2px solid var(--ds-border-focused)', outlineOffset: '2px' },
+        style: { color: 'var(--ds-text)', background: 'var(--ds-surface)', outline: 'var(--stroke-2) solid var(--ds-border-focused)', outlineOffset: 'var(--stroke-2)' },
     },
 ];
 
@@ -854,10 +854,10 @@ const measure = (intent, role, bar) => {
 const Cell = ({ ratio, passes }) => (
     <td
         style={{
-            padding: '6px 10px',
+            padding: 'var(--pad-y-sm) var(--pad-x-md)',
             textAlign: 'right',
             fontVariantNumeric: 'tabular-nums',
-            color: passes ? 'var(--ds-text)' : 'var(--color-danger-text)',
+            color: passes ? 'var(--ds-text)' : 'var(--ds-text-danger)',
             fontWeight: passes ? 400 : 700,
         }}
     >
@@ -867,17 +867,17 @@ const Cell = ({ ratio, passes }) => (
 );
 
 const Matrix = ({ rows, bar, caption }) => (
-    <table style={{ borderCollapse: 'collapse', margin: '0 0 28px' }}>
-        <caption className="body2-txt" style={{ textAlign: 'left', padding: '0 0 8px' }}>
+    <table style={{ borderCollapse: 'collapse', margin: '0 0 var(--stack-lg)' }}>
+        <caption className="body2-txt" style={{ textAlign: 'left', padding: '0 0 var(--stack-md)' }}>
             {caption} — the bar is {bar}:1.
         </caption>
         <thead>
             <tr>
-                <th className="body2-txt" style={{ textAlign: 'left', padding: '6px 10px' }}>
+                <th className="body2-txt" style={{ textAlign: 'left', padding: 'var(--pad-y-sm) var(--pad-x-md)' }}>
                     token
                 </th>
                 {GROUNDS.map(([label]) => (
-                    <th key={label} className="body2-txt" style={{ padding: '6px 10px', textAlign: 'right' }}>
+                    <th key={label} className="body2-txt" style={{ padding: 'var(--pad-y-sm) var(--pad-x-md)', textAlign: 'right' }}>
                         {label}
                     </th>
                 ))}
@@ -885,19 +885,19 @@ const Matrix = ({ rows, bar, caption }) => (
         </thead>
         <tbody>
             {rows.map((row) => (
-                <tr key={`${row.intent}-${row.role}`} style={{ borderTop: '1px solid var(--color-outline-variant)' }}>
+                <tr key={`${row.intent}-${row.role}`} style={{ borderTop: 'var(--stroke-1) solid var(--ds-border)' }}>
                     <th
                         className="body2-txt"
-                        style={{ textAlign: 'left', padding: '6px 10px', fontWeight: 400 }}
+                        style={{ textAlign: 'left', padding: 'var(--pad-y-sm) var(--pad-x-md)', fontWeight: 400 }}
                     >
                         <span
                             aria-hidden="true"
                             style={{
                                 display: 'inline-block',
-                                width: '10px',
-                                height: '10px',
-                                marginRight: '8px',
-                                borderRadius: '2px',
+                                width: 'var(--size-075)',
+                                height: 'var(--size-075)',
+                                marginRight: 'var(--stack-md)',
+                                borderRadius: 'var(--radius-sm)',
                                 background: row.hex,
                             }}
                         />
@@ -924,7 +924,7 @@ export const RolesAndBars = () => {
     const border = INTENTS.map((i) => measure(i, 'border', AA_NON_TEXT)).filter(Boolean);
 
     return (
-        <div style={{ maxWidth: '1000px', padding: '24px' }} data-testid="intent-roles">
+        <div style={{ maxWidth: 'var(--content-max-width)', padding: 'var(--pad-x-lg)' }} data-testid="intent-roles">
             <h2 className="h4">What each intent color is for</h2>
             <p className="body2-txt" style={{ maxWidth: '62ch' }}>
                 Every ratio is computed from the tokens as this page renders them, against the five
@@ -932,7 +932,7 @@ export const RolesAndBars = () => {
                 have no users yet.
             </p>
 
-            <h3 className="h5" style={{ marginTop: '28px' }}>
+            <h3 className="h5" style={{ marginTop: 'var(--stack-lg)' }}>
                 The base, used as text
             </h3>
             <p className="body2-txt" style={{ maxWidth: '62ch' }}>
