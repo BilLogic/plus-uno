@@ -9,7 +9,7 @@ import { tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
 /**
- * Page templates: the page every screen starts from. The frame (a 240
+ * Templates: the page every screen starts from. The frame (a 240
  * sidebar docked from 1024, the Page on a 12-column grid under its breadcrumb) with content
  * in the surface. The stories here are the examples the docs page shows, each
  * built from `PageLayout`, `Frame`, `PatternSection` and `PatternCard`.

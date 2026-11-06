@@ -7,8 +7,8 @@ import { HeadingLevelContext } from '@/lib/headingLevel';
 import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 
 /**
- * The do and don't examples on the Page templates docs page: live
- * compositions of the page template, never pictures.
+ * The do and don't examples on the Templates docs page: live
+ * compositions of the template, never pictures.
  */
 
 const BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions' }];

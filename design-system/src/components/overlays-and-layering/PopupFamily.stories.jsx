@@ -7,7 +7,7 @@ import Popup from './Popup/Popup';
 import Tooltip from './Tooltip/Tooltip';
 
 /**
- * The Popup family: Popup, Flag and Tooltip. Menu's own behavior and size
+ * The Popups pattern: Popup, Flag and Tooltip. Menu's own behavior and size
  * cover lives on `DropdownMenu`'s own stories
  * (`Components/Forms and inputs/Dropdown menu`), since it draws from the
  * Menu family's own tokens rather than this page's older Popover numbers.
@@ -30,7 +30,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'Behavior cover for the Popup family: menu rows and scrolling, popup '
+                    'Behavior cover for the Popups pattern: menu rows and scrolling, popup '
                     + 'and tooltip sizes, flag stacking, and the 8 kept from the screen edge.',
             },
         },

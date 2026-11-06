@@ -3,7 +3,7 @@ import { Button, DropdownMenu, TextField, Popup, ButtonItem, Section } from '@/c
 
 
 /**
- * Live compositions for the Popup family page's do and don't pairs. The
+ * Live compositions for the Popups pattern page's do and don't pairs. The
  * Popup is the real Popup component held open, and the Menu is a real
  * DropdownMenu held open. The heights and flex layouts below are stage
  * geometry: they reserve room for a layer that floats outside the flow.

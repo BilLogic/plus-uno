@@ -30,7 +30,7 @@ A Blanket interrupts the page for one task. It dims everything behind it with on
 - Put a **Modal** in a Blanket when one task blocks the page.
 - Put a **Drawer** in a Blanket, at an edge, when the task needs the page in view.
 - A dialog never opens another Blanket. A follow-up decision inside a modal swaps its content for an inline confirmation in the same Blanket.
-- For a menu, popup, flag or tooltip, use the **Popup family**. These float with no blanket and never take a Blanket.
+- For a menu, popup, flag or tooltip, use the **Popups**. These float with no blanket and never take a Blanket.
 - For a floating sidebar, use the **Sidebar**. It takes a shadow and no blanket.
 
 </div>
@@ -56,6 +56,7 @@ A Blanket interrupts the page for one task. It dims everything behind it with on
 <tbody>
 <tr><td><code>placement</code></td><td>string</td><td><code>center</code>, <code>start</code>, <code>end</code></td><td><code>center</code></td><td>Centers a modal, or holds a drawer full height at the left (<code>start</code>) or right (<code>end</code>) edge, with no pad.</td></tr>
 <tr><td><code>onBlanketClick</code></td><td>function</td><td>none</td><td>none</td><td>Runs for a click on the blanket, not on the layer it holds.</td></tr>
+<tr><td><code>contained</code></td><td>boolean</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td><td>Covers its parent, such as a Frame, instead of the screen, with no pad and nothing inside. The overlay Panel's Blanket over the Page and the Sidebar.</td></tr>
 <tr><td><code>inline</code></td><td>boolean</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td><td>Draws the Blanket in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page.</td></tr>
 <tr><td><code>screenWidth</code></td><td>number</td><td>any pixel width; the playground offers 768, 1024 and 1440</td><td>the page width</td><td>Inline only. The screen width the layer inside takes its width from.</td></tr>
 <tr><td><code>screenHeight</code></td><td>number</td><td>any height in px</td><td>hugs the content</td><td>Inline only. The layer inside caps at this height less the top and bottom pad.</td></tr>
@@ -155,7 +156,7 @@ Figma has no z-index, so the order is written here and lives in code.
 ### Rules
 
 - Pad 16 at the sides and 64 above and below. This is the closest a modal gets to the screen edge.
-- Use one fill, `--ds-blanket`, under every modal and drawer.
+- Use one fill, `--ds-blanket`, under every modal, drawer and overlay Panel.
 - A dialog never opens another dialog. A follow-up decision swaps the dialog's content for an inline confirmation in place.
 - Opening a modal closes a floating sidebar, so the two never stack.
 - A floating sidebar gets a shadow and no blanket.
@@ -214,7 +215,7 @@ The Blanket draws the layer only. It does not trap focus, close on Escape or cou
 
 - [Modal](?path=/docs/patterns-overlays-modal--docs) is the layer a Blanket usually holds, centered, for one task that blocks the page.
 - [Drawer](?path=/docs/patterns-overlays-drawer--docs) is the layer held at an edge, for a task that needs the page in view.
-- [Popup family](?path=/docs/patterns-popups--docs) covers the floating layers that never take a blanket.
+- [Popups](?path=/docs/patterns-popups--docs) covers the floating layers that never take a blanket.
 
 </div>
 

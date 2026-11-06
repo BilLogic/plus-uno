@@ -30,7 +30,7 @@ export const propRows = [
 ];
 
 export const tokens = [
-    ['--screen-width', '768', '1024', '1440', 'The page template frame width. Switching the layout mode resizes the frame.'],
+    ['--screen-width', '768', '1024', '1440', 'The template frame width. Switching the layout mode resizes the frame.'],
     ['--screen-pad-x', '24', '24', '32', 'Pads the screen, a rule of its own so a Modal does not move when the Page pad does. The screen grid is clamp(720, screen minus 2 pads, 1232), centered, and belongs to the Overlay only, not the page grid.'],
     ['--frame-topbar-height', '32', '32', '32', 'The focused page\'s top row.'],
     ['--frame-sidebar-width', '240', '240', '240', 'The Sidebar width, docked, peeking or as an overlay.'],
@@ -91,7 +91,7 @@ The examples on this page follow the **Color mode** switch in the toolbar.
 
 Use Frame for every page of the app. It owns the frame sizes and the sidebar's behavior, so a page only supplies its sidebar, its breadcrumb and its content.
 
-For a whole page with the PLUS sidebar and breadcrumb already filled in, start from a page template. For a bare fill and elevation, use **Page**. For a region inside the content, use **Section**.
+For a whole page with the PLUS sidebar and breadcrumb already filled in, start from a template. For a bare fill and elevation, use **Page**. For a region inside the content, use **Section**.
 
 </div>
 
@@ -302,9 +302,9 @@ Use the reading width for long text. The content caps at 864 instead of 1232 and
 - <a href="?path=/docs/patterns-page-page--docs">Page</a> for the bare fill-and-elevation primitive the content box is built on.
 - <a href="?path=/docs/patterns-sidebar--docs">Sidebar</a> for the part the frame places beside the Page.
 - <a href="?path=/docs/patterns-section-section--docs">Section</a> for a region inside the content.
-- <a href="?path=/docs/patterns-templates--docs">Page templates</a>, with the focused frame, for a page that holds one task and has no sidebar.
+- <a href="?path=/docs/patterns-templates--docs">Templates</a>, with the focused frame, for a page that holds one task and has no sidebar.
 - <a href="?path=/docs/foundations-layout-grid--docs">Layout & grid</a> for the column math the frame is sized by.
-- <a href="?path=/docs/patterns-templates--docs">Page templates</a> for a whole page: Frame with its content slot filled.
+- <a href="?path=/docs/patterns-templates--docs">Templates</a> for a whole page: Frame with its content slot filled.
 
 </div>
 

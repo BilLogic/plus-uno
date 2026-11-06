@@ -7,6 +7,7 @@ import { SidebarControlContext } from './SidebarControl';
 import { PanelControlContext } from './PanelControl';
 import { SplitContext } from './SplitContext';
 import PanelSplitter from './PanelSplitter';
+import Blanket from '../Blanket';
 import { useOwnWidth } from './useOwnWidth';
 import { FRAME_LAYOUT, clamp, dockedPanelMax, resolveFrameLayout } from './frameLayout';
 import './Frame.scss';
@@ -571,7 +572,7 @@ const Frame = ({
                 {raised ? sidebarPanel(true) : null}
 
                 {/* Covers the Page and the Sidebar. A press on it closes the Panel. */}
-                {panelShown && layout.blanket ? <div className="plus-frame__blanket" aria-hidden="true" /> : null}
+                {panelShown && layout.blanket ? <Blanket contained className="plus-frame__blanket" aria-hidden="true" /> : null}
                 {hasPanel && panelPeek && !panelOpen && !panelPeekShown ? (
                     <div className="plus-frame__panel-edge" aria-hidden="true" onPointerEnter={peekPanel} />
                 ) : null}

@@ -50,6 +50,13 @@ describe('Blanket', () => {
         expect(blanket.style.getPropertyValue('--plus-overlay-screen-height')).toBe('520px');
     });
 
+    it('covers its parent instead of the screen when contained, for the overlay Panel', () => {
+        render(<Blanket data-testid="blanket" contained aria-hidden="true" />);
+        const blanket = screen.getByTestId('blanket');
+        expect(blanket).toHaveClass('plus-pattern-blanket', 'plus-pattern-blanket-contained');
+        expect(blanket).not.toHaveClass('plus-pattern-blanket-inline');
+    });
+
     it('ignores the stand-in screen size when it is not inline', () => {
         render(<Blanket data-testid="blanket" screenWidth={1024}>x</Blanket>);
         expect(screen.getByTestId('blanket').style.getPropertyValue('--plus-overlay-screen')).toBe('');

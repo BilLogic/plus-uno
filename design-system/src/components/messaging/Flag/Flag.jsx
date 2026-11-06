@@ -18,7 +18,7 @@ export const FLAG_APPEARANCES = ['normal', 'information', 'warning', 'error', 's
 const URGENT_APPEARANCES = ['warning', 'error'];
 
 /**
- * The Popup family's Flag (Figma Pattern/Flag). One surface, 400 wide,
+ * The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide,
  * padded 16: a 16 icon in the appearance's icon color on the title's first
  * line, the title and its optional description, actions, and the dismiss
  * button. `bold` expands the surface to the appearance's bold fill.

@@ -21,7 +21,7 @@ import { ModeFrame } from '@/storybook-docs/lib/mode-frame.jsx';
 <Meta of={PageTemplatesStories} />
 
 <Title />
-A page template is the whole page every screen starts from: the sidebar and the page that holds the page's content, under its breadcrumb. It sets the screen width, the grid and the content width once, and everything inside moves with it. The default frame is for pages people move among. The focused frame is for one task, with no sidebar.
+A template is the whole page every screen starts from: the sidebar and the page that holds the page's content, under its breadcrumb. It sets the screen width, the grid and the content width once, and everything inside moves with it. The default frame is for pages people move among. The focused frame is for one task, with no sidebar.
 
 The examples on this page follow the toolbar's Color mode and Contrast switches.
 
@@ -46,7 +46,7 @@ The examples on this page follow the toolbar's Color mode and Contrast switches.
 
 ### When to use
 
-Start every page from a page template. Pick the frame by the kind of work the page holds.
+Start every page from a template. Pick the frame by the kind of work the page holds.
 
 - **Default frame.** The person moves among pages: browse, compare, come back. It keeps the sidebar and the breadcrumb.
 - **Focused frame.** One task that takes more than a screen or a few minutes. The person finishes or leaves it, and the rest of the app would only distract. Writing a session note, setting up a session and reviewing an import are focused tasks.
@@ -100,7 +100,7 @@ The sidebar toggle stays 8 from the left, flush to the top at every width and in
 
 ### Properties
 
-In Figma, Page template has the variants `frame` (default or focused) and `content` (blank, dashboard or reading; focused has blank and reading), and the focused frame has a `footer?` boolean. The spacing and layout mode is set on the template instance.
+In Figma, Template has the variants `frame` (default or focused) and `content` (blank, dashboard or reading; focused has blank and reading), and the focused frame has a `footer?` boolean. The spacing and layout mode is set on the template instance.
 
 <DocsTable>
     <thead>
@@ -156,7 +156,7 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
         <tr><th>Token</th><th>Medium</th><th>Large</th><th>X-Large</th><th>Purpose</th></tr>
     </thead>
     <tbody>
-        <tr><td><code>--screen-width</code></td><td>768</td><td>1024</td><td>1440</td><td>The width of the page template frame.</td></tr>
+        <tr><td><code>--screen-width</code></td><td>768</td><td>1024</td><td>1440</td><td>The width of the template frame.</td></tr>
         <tr><td><code>--screen-pad-x</code></td><td>24</td><td>24</td><td>32</td><td>Pads the screen grid on Blanket, not the page grid.</td></tr>
         <tr><td><code>--screen-min-width</code></td><td>768</td><td>1024</td><td>1440</td><td>The narrowest the frame goes within the mode.</td></tr>
         <tr><td><code>--screen-max-width</code></td><td>1023</td><td>1439</td><td>none</td><td>The widest the frame goes within the mode. X-Large has no limit.</td></tr>
@@ -230,15 +230,15 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
 The default frame comes with three contents. **Blank** is one empty slot. **Dashboard** is a page header, metric cards and Sections. **Reading** caps the page at 864 for long-form text. Each is shown at Large, 1024.
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>content=blank</strong>. Keep the slot wrapper and replace what is inside it with Sections.</>}>
-    <ModeFrame storyId="patterns-templates--blank" width={1024} height={560} title="Blank page template at 1024" />
+    <ModeFrame storyId="patterns-templates--blank" width={1024} height={560} title="Blank template at 1024" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>content=dashboard</strong>. Cards reflow to the most per row that keeps their minimum width.</>}>
-    <ModeFrame storyId="patterns-templates--dashboard" width={1024} height={560} title="Dashboard page template at 1024" />
+    <ModeFrame storyId="patterns-templates--dashboard" width={1024} height={560} title="Dashboard template at 1024" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>content=reading</strong>. The content is capped at <code>--content-max-width-reading</code> 864 and centered.</>}>
-    <ModeFrame storyId="patterns-templates--reading" width={1024} height={560} title="Reading page template at 1024" />
+    <ModeFrame storyId="patterns-templates--reading" width={1024} height={560} title="Reading template at 1024" />
 </DocsCanvasShell>
 
 </div>
@@ -250,15 +250,15 @@ The default frame comes with three contents. **Blank** is one empty slot. **Dash
 The mode is set once, on the template. The frame width follows it through `--screen-width`, and everything inside moves with it. The sidebar docks from Large, the page pad stays 24 at every width, and the content lands at 720, 736 and 1152.
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>Medium, 768.</strong> The sidebar is closed and the content is 720. Two medium cards fit in a row.</>}>
-    <ModeFrame storyId="patterns-templates--dashboard" width={768} height={560} title="Dashboard page template at 768" />
+    <ModeFrame storyId="patterns-templates--dashboard" width={768} height={560} title="Dashboard template at 768" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>Large, 1024.</strong> The sidebar docks and the content is 736.</>}>
-    <ModeFrame storyId="patterns-templates--dashboard" width={1024} height={560} title="Dashboard page template at 1024" />
+    <ModeFrame storyId="patterns-templates--dashboard" width={1024} height={560} title="Dashboard template at 1024" />
 </DocsCanvasShell>
 
 <DocsCanvasShell attachSourceBelow={false} description={<><strong>X-Large, 1440.</strong> The page pad is 24 and the content is 1152.</>}>
-    <ModeFrame storyId="patterns-templates--dashboard" width={1440} height={640} title="Dashboard page template at 1440" />
+    <ModeFrame storyId="patterns-templates--dashboard" width={1440} height={640} title="Dashboard template at 1440" />
 </DocsCanvasShell>
 
 #### Sidebar over the page
@@ -306,10 +306,10 @@ Rules for the focused frame:
 
 ### With a drawer
 
-A drawer opens over the page template. The blanket covers the whole frame, the drawer runs the full height at the end edge, and its width is a modal width step. Escape, the close button or a click on the blanket closes it and returns focus to what opened it. The page stays where it was.
+A drawer opens over the template. The blanket covers the whole frame, the drawer runs the full height at the end edge, and its width is a modal width step. Escape, the close button or a click on the blanket closes it and returns focus to what opened it. The page stays where it was.
 
 <DocsCanvasShell attachSourceBelow={false} description={<>A <code>md</code> drawer over the dashboard at 1024: 677 wide. The page opens it from a button and holds its open state, passing it to the template's <code>drawer</code> prop.</>}>
-    <ModeFrame storyId="patterns-templates--with-drawer" width={1024} height={560} title="Page template with a drawer at 1024" />
+    <ModeFrame storyId="patterns-templates--with-drawer" width={1024} height={560} title="Template with a drawer at 1024" />
 </DocsCanvasShell>
 
 </div>
@@ -332,7 +332,7 @@ A slot is a region left open for real content. The pattern owns the layout, the 
 
 - **Keep the slot wrapper** and replace the placeholder inside it. A slot is a place for content, not a placeholder to delete.
 - **Slots, not variants.** If a layout is duplicated to handle a variation, that layout needs a slot.
-- **Slots live in** Card (header, body, footer), Modal (body, footer), Section (content, side, actions, tabs) and the page templates (the page). A table is never a slot shell.
+- **Slots live in** Card (header, body, footer), Modal (body, footer), Section (content, side, actions, tabs) and the Templates (the page). A table is never a slot shell.
 
 #### Build a real page
 
@@ -409,7 +409,7 @@ A page is built from the top down out of patterns. A Sessions page is built on P
 
 ### For developers
 
-The page template is `PageLayout`, which fills `Frame` with the PLUS sidebar and the breadcrumb. `frame="focused"` fills it with the focused topbar, the reading page and the footer. There is no mode prop in code: the layout tokens switch on the viewport width, so the screen picks the mode. A page that needs the reading cap in the default frame composes `Frame` with `width="reading"`. Figma's `drawer?` toggle is the `drawer` prop: pass it the props of `PatternDrawer` and the template renders the Drawer over the page. The page holds the open state and passes it as `open`.
+The template is `PageLayout`, which fills `Frame` with the PLUS sidebar and the breadcrumb. `frame="focused"` fills it with the focused topbar, the reading page and the footer. There is no mode prop in code: the layout tokens switch on the viewport width, so the screen picks the mode. A page that needs the reading cap in the default frame composes `Frame` with `width="reading"`. Figma's `drawer?` toggle is the `drawer` prop: pass it the props of `PatternDrawer` and the template renders the Drawer over the page. The page holds the open state and passes it as `open`.
 
 </div>
 

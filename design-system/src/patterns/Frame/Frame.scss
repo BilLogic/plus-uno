@@ -216,15 +216,10 @@
     }
 }
 
-// The overlay Panel's Blanket: the Page and the Sidebar.
+// The overlay Panel's Blanket: the shared Blanket, contained to the Frame so it
+// covers the Page and the Sidebar. The Frame only picks its layer.
 .plus-frame__blanket {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: var(--frame-layer-blanket);
-    background-color: var(--ds-blanket);
+    --blanket-contained-layer: var(--frame-layer-blanket);
 }
 
 // The hover strip that peeks a closed Panel, when the peek option is on.

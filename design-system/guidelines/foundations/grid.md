@@ -128,7 +128,7 @@ the sidebar at a hairline.
 
 ## Ownership layering
 
-- The **page template** owns width (`Screen/width-screen`) and the `spacing / layout` mode.
+- The **template** owns width (`Screen/width-screen`) and the `spacing / layout` mode.
 - `Pattern/Frame` fills it: the Sidebar beside `Pattern/Page`. The Page carries the content grid and the Content slot.
 - The **sidebar** docks by `Sidebar/sidebar-docked` (false · true · true); behavior below Large is in `../composition/layout.md` § The frame.
 - The **Blanket** sits above the frame and carries the screen grid; the
