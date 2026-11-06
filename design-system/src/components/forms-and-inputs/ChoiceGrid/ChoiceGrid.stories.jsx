@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import ChoiceGrid from './ChoiceGrid';
 
@@ -98,9 +100,9 @@ export const Variants = () => {
     });
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)', maxWidth: '800px' }}>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Radio (one per row)</span>
+                <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Radio (one per row)</span>
                 <ChoiceGrid
                     id="choice-grid-radio"
                     name="choice-grid-radio"
@@ -114,7 +116,7 @@ export const Variants = () => {
                 />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">Checkbox (multiple per row)</span>
+                <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Checkbox (multiple per row)</span>
                 <ChoiceGrid
                     id="choice-grid-checkbox"
                     name="choice-grid-checkbox"
@@ -158,10 +160,10 @@ export const Layout = () => (
 
 /** `size` sets the option-label font and the control width that goes with it. */
 export const Size = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)', maxWidth: '800px' }}>
         {[12, 14, 16].map((size) => (
             <div key={size}>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">{size}</span>
+                <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{size}</span>
                 <ChoiceGrid
                     id={`choice-grid-size-${size}`}
                     name={`choice-grid-size-${size}`}
@@ -205,7 +207,7 @@ export const TwoGridsWithoutIds = () => {
     const [first, setFirst] = useState({});
     const [second, setSecond] = useState({});
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)', maxWidth: '800px' }}>
             <ChoiceGrid
                 type="radio"
                 rows={singleRow}
@@ -342,4 +344,77 @@ Keyboard.play = async ({ canvasElement }) => {
 
     await userEvent.keyboard('{ArrowLeft}');
     await expect(radios[1]).toHaveFocus();
+};
+
+/** One story per state, for the Examples tab. */
+const frame = { maxWidth: '800px' };
+const cell = (canvasElement, name, role = 'radio') => within(canvasElement).getByRole(role, { name });
+
+export const Unselected = {
+    render: () => (
+        <div style={frame}>
+            <ChoiceGrid id="cg-ex-off" type="radio" rows={singleRow} columns={overviewColumns} values={{}} onChange={() => {}} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(cell(canvasElement, 'Row 1 Column 2')).toHaveAttribute('aria-checked', 'false');
+    },
+};
+
+export const Selected = {
+    render: () => (
+        <div style={frame}>
+            <ChoiceGrid id="cg-ex-on" type="radio" rows={singleRow} columns={overviewColumns} values={{ 'row-1': 'col-2' }} onChange={() => {}} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const el = cell(canvasElement, 'Row 1 Column 2');
+        await expect(el).toHaveAttribute('aria-checked', 'true');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected-bold'));
+    },
+};
+
+export const Hovered = {
+    render: () => (
+        <div style={frame}>
+            <ChoiceGrid id="cg-ex-hover" type="radio" rows={singleRow} columns={overviewColumns} values={{}} onChange={() => {}} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const el = cell(canvasElement, 'Row 1 Column 1');
+        el.style.transition = 'none';
+        const border = withForcedPseudo(el, ':hover', () => getComputedStyle(el).borderTopColor);
+        await expect(border).toBe(tokenColor(canvasElement, '--ds-border-brand'));
+    },
+};
+
+export const Focused = {
+    render: () => (
+        <div style={frame}>
+            <ChoiceGrid id="cg-ex-focus" type="checkbox" rows={singleRow} columns={overviewColumns} values={{ 'row-1': { 'col-1': true } }} onChange={() => {}} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const el = cell(canvasElement, 'Row 1 Column 1', 'checkbox');
+        el.style.transition = 'none';
+        el.focus({ focusVisible: true });
+        const style = getComputedStyle(el);
+        await waitFor(() => expect(style.outlineStyle).toBe('solid'));
+        await expect(px(style.outlineWidth)).toBe(2);
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        el.blur();
+    },
+};
+
+export const Disabled = {
+    render: () => (
+        <div style={frame}>
+            <ChoiceGrid id="cg-ex-disabled" type="radio" rows={singleRow} columns={overviewColumns} values={{ 'row-1': 'col-2' }} isDisabled />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const el = cell(canvasElement, 'Row 1 Column 1');
+        await expect(el).toHaveAttribute('data-disabled');
+        await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+    },
 };
