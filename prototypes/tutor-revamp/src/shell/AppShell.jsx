@@ -81,7 +81,7 @@ const AppShell = ({ breadcrumbs = [], children }) => {
             )}
             sidebar={(
                 <PatternSidebar
-                    header={<Logo appearance="colored" size={60} wordmark className="p-0" />}
+                    header={<Logo appearance="colored" size={24} wordmark className="p-0" />}
                     items={HOME_ITEMS}
                     sections={NAV_SECTIONS}
                     activeId={activeIdFor(pathname, tabs)}

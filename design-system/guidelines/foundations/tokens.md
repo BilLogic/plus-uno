@@ -42,6 +42,6 @@ One plan (`scripts/lib/tokens/plan.mjs`'s `TOKEN_LADDER`, ADR-038), most general
 - A token's name says how to use it: foundation, property, modifier. In Figma the parts join with slashes (`color/text/subtle`); in code a color token drops its foundation and gains the `ds` prefix (`--ds-text-subtle`), and a pattern token lowercases the collection and joins with dashes (`Card/radius-sm` is `--card-radius-sm`).
 - Numeric steps are the rem value × 100: `space-050` is 8, `space-100` is 16, `space-0625` is 10.
 - A token is used bare. Never write a fallback: `var(--ds-text)`, not `var(--ds-text, #172b4d)`.
-- Choose by meaning, never by a matching value. Never bind a primitive in a component.
+- Choose by meaning, never by a matching value. Never bind a primitive in a component. The one exception is the Logo, whose brand artwork reads palette primitives so it looks the same on every surface.
 - Themes are variable modes: `color / semantics` (renamed from `color / foundations`) has Light, Dark, Light IC and Dark IC; the breakpoint modes (768, 1024, 1440) now sit on whichever of Semantics or Patterns owns the token, per the four-tier ladder above — `spacing / layout` is dissolved, not a live collection.
 
