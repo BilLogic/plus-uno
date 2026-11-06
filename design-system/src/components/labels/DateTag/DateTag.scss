@@ -17,7 +17,7 @@
 
 .plus-date-tag {
     --plus-date-tag-height: #{label.$status-height};
-    --plus-date-tag-icon-box: var(--size-125);
+    --plus-date-tag-icon-box: var(--size-media-xs);
 
     display: inline-flex;
     align-items: center;
@@ -28,8 +28,8 @@
     /* The cap from `maxWidth` (200 by default), never wider than the container. */
     max-width: min(var(--plus-date-tag-max), 100%);
     margin: 0;
-    padding: 0 var(--space-0125) 0 var(--pad-x-xs);
-    gap: var(--space-0125);
+    padding: 0 var(--size-spacing-small-space-025) 0 var(--pad-x-xs);
+    gap: var(--size-spacing-small-space-025);
     border-radius: var(--radius-md);
     vertical-align: middle;
     white-space: nowrap;
@@ -41,21 +41,21 @@
     display: inline-flex;
     align-items: center;
     min-width: 0;
-    padding-right: var(--space-0125);
+    padding-right: var(--size-spacing-small-space-025);
     gap: var(--stack-sm);
 }
 
 .plus-date-tag--spacious {
     --plus-date-tag-height: #{label.$status-height-spacious};
-    --plus-date-tag-icon-box: calc(var(--size-125) + var(--space-0125));
+    --plus-date-tag-icon-box: calc(var(--size-media-xs) + var(--size-spacing-small-space-025));
 
-    padding: 0 var(--space-0375) 0 var(--pad-x-md);
+    padding: 0 var(--size-spacing-small-space-075) 0 var(--pad-x-md);
     gap: 0;
-    border-radius: var(--radius-0375);
+    border-radius: var(--size-border-radius-radius-150);
 
     .plus-date-tag__content {
-        padding-right: var(--space-0375);
-        gap: var(--space-0375);
+        padding-right: var(--size-spacing-small-space-075);
+        gap: var(--size-spacing-small-space-075);
     }
 
     .plus-date-tag__label {

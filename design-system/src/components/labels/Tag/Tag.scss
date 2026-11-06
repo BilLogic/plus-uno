@@ -232,8 +232,8 @@ $tag-colors: (
     justify-content: center;
     flex: none;
     box-sizing: border-box;
-    width: var(--space-100);
-    height: var(--space-100);
+    width: var(--size-media-xxs);
+    height: var(--size-media-xxs);
     overflow: hidden;
     background-color: var(--plus-tag-avatar);
 }
@@ -244,7 +244,7 @@ $tag-colors: (
 
 /* Radius 2: a primitive, because no Element radius token is 2. */
 .plus-tag__avatar--team {
-    border-radius: var(--radius-0125);
+    border-radius: var(--radius-sm);
 }
 
 /* A hexagon 13.86 wide in the 16 box, pointed top and bottom, as in Figma. */
@@ -290,15 +290,15 @@ $tag-colors: (
 /* The swatch: 10 square, radius 2, in the hue. */
 .plus-tag__swatch {
     flex: none;
-    width: var(--space-0625);
-    height: var(--space-0625);
-    border-radius: var(--radius-0125);
+    width: var(--size-spacing-small-space-150);
+    height: var(--size-spacing-small-space-150);
+    border-radius: var(--radius-sm);
     background-color: var(--plus-tag-hue);
 }
 
 /* A legend swatch carries any series color, which may sit near the ground. */
 .plus-tag__swatch--custom {
-    box-shadow: inset 0 0 0 var(--stroke-1) var(--ds-border);
+    box-shadow: inset 0 0 0 var(--border-default) var(--ds-border);
 }
 
 .plus-tag__elem-before {
@@ -386,12 +386,12 @@ $tag-colors: (
     justify-content: center;
     flex: none;
     box-sizing: border-box;
-    width: var(--space-100);
-    height: var(--space-100);
+    width: var(--size-media-xxs);
+    height: var(--size-media-xxs);
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: var(--radius-0125);
+    border-radius: var(--radius-sm);
     appearance: none;
     background: transparent;
     color: var(--ds-icon-subtle);
@@ -436,8 +436,8 @@ $tag-colors: (
 .plus-tag__spinner {
     flex: none;
     box-sizing: border-box;
-    width: var(--space-0625);
-    height: var(--space-0625);
+    width: var(--size-spacing-small-space-150);
+    height: var(--size-spacing-small-space-150);
     border: var(--size-border-stroke-stroke-150) solid transparent;
     /* Three quarters of the ring: a 270° arc. */
     border-top-color: var(--plus-tag-hue);
@@ -454,8 +454,8 @@ $tag-colors: (
  */
 .plus-tag__avatar-spinner {
     display: block;
-    width: var(--space-075);
-    height: var(--space-075);
+    width: var(--size-icon-sm);
+    height: var(--size-icon-sm);
     color: var(--ds-icon-subtle);
     stroke: currentColor;
     animation: plus-tag-spin 0.8s linear infinite;
