@@ -52,6 +52,28 @@ chip. For several lines, use `CodeBlock`.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>The neutral fill and the code ink.</>}>
+    <DsCanvasQuiet of={CodeStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The chip is text; a pointer changes nothing.</>}>
+    <DsCanvasQuiet of={CodeStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A press changes nothing.</>}>
+    <DsCanvasQuiet of={CodeStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Tab skips the chip and it is never dimmed, so it has no focus or disabled state.</>}>
+    <DsCanvasQuiet of={CodeStories.NotAControl} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -71,20 +93,11 @@ chip. For several lines, use `CodeBlock`.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Code` for a name, command, value or snippet that sits inside a sentence:
 a function, a file path, a flag, a token.
 
-<DocsTable>
-    <thead>
-        <tr><th>Prop</th><th>Type</th><th>What it does</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>children</code></td><td>node</td><td>The code, as text.</td></tr>
-        <tr><td><code>className</code></td><td>string</td><td>Extra classes for placement.</td></tr>
-    </tbody>
-</DocsTable>
 
 The typeface and size are the `--code` text style (0.875em, so the chip scales
 with the text around it). The fill is `--ds-background-neutral` and the ink is
@@ -94,7 +107,45 @@ with the text around it). The fill is `--ds-background-neutral` and the ink is
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Chip.** A <code>code</code> element in the code typeface at 0.875 of the text around it.
+2. **Fill.** The neutral ground, with a small radius.
+3. **Text.** The code ink; long values wrap inside the chip.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Neutral fill with the code ink.</td></tr>
+<tr><td>Hovered, pressed</td><td>The chip does not react.</td></tr>
+<tr><td>Focused</td><td>The chip is not a control; Tab skips it.</td></tr>
+<tr><td>Disabled</td><td>Not applicable; the chip is never dimmed.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Typeface, size</td><td><code>--code</code></td></tr>
+<tr><td>Fill</td><td><code>--ds-background-neutral</code></td></tr>
+<tr><td>Ink</td><td><code>--ds-text-code-default</code></td></tr>
+<tr><td>Padding, radius</td><td><code>--size-spacing-small-space-050</code>, <code>--radius-md</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Use a block for more than a phrase.
 
@@ -115,6 +166,23 @@ with the text around it). The fill is `--ds-background-neutral` and the ink is
 // Correct: bold or a button label for emphasis.
 <p>Press <strong>Continue</strong> to proceed.</p>
 ```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Use it for a name, command, value or flag: <code>getSession()</code>.</td><td>Use it for emphasis or a product name.</td></tr>
+<tr><td>Write the code exactly as the reader would type it.</td><td>Add punctuation or a trailing period inside the chip.</td></tr>
+<tr><td>Keep it to a short phrase.</td><td>Put several lines in it; use a code block.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

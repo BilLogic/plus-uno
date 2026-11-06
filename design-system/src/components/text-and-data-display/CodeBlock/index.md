@@ -9,7 +9,7 @@ A block of code in the code typeface on the code surface, with optional line num
 
 **Source:** `design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.jsx`
 
-**Stories:** `design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.stories.jsx` — Overview, WithoutLineNumbers, HighlightedLines, SeparateHighlights, ScrollsLongLines, WrapsLongLines, BlankLines, Interactive
+**Stories:** `design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.stories.jsx` — Overview, WithoutLineNumbers, HighlightedLines, SeparateHighlights, ScrollsLongLines, WrapsLongLines, BlankLines, Interactive, Rest, Hovered, Pressed, Focused, WrapNotFocusable
 
 **Storybook page:** `design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.mdx`
 

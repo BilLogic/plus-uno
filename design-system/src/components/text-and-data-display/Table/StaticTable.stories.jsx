@@ -2,6 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
+import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import Table, { StaticTable, HeadCell } from '@/components/text-and-data-display/Table';
 
 export default {
@@ -279,4 +280,69 @@ export const HeadCells = {
         await expect(canvas.getByText('Sessions').closest('th')).toHaveClass('plus-table-cell--align-number');
         await expect(px(getComputedStyle(canvasElement.querySelector('.plus-table-head-cell-type')).fontSize)).toBe(tokenLength(canvasElement, '--size-icon-sm'));
     }
+};
+
+const STATE_ROWS = {
+    headers: ['Row', 'Grade'],
+    rows: [['Rest row', 'Grade 7'], ['Selected row', 'Grade 7'], ['Disabled row', 'Grade 7'], ['Error row', { content: 'Grade 7', state: 'error' }]],
+    rowStates: ['rest', 'selected', 'disabled', 'rest'],
+    hover: true,
+};
+
+/** Rest: a row is clear; a selected row is on the selected fill. */
+export const Rest = {
+    args: STATE_ROWS,
+    play: async ({ canvasElement }) => {
+        await expect(getComputedStyle(rowOf(canvasElement, 'Rest row')).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+        await expect(getComputedStyle(rowOf(canvasElement, 'Selected row')).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
+    },
+};
+
+/** Hovered: a rest row takes the subtle hovered step, a selected row its own hovered step. */
+export const Hovered = {
+    args: STATE_ROWS,
+    play: async ({ canvasElement }) => {
+        await expectGroundUnder(canvasElement, rowOf(canvasElement, 'Rest row'), ':hover', '--ds-background-neutral-subtle-hovered', 'rest row');
+        await expectGroundUnder(canvasElement, rowOf(canvasElement, 'Selected row'), ':hover', '--ds-background-selected-hovered', 'selected row');
+    },
+};
+
+/** Pressed: the pressed steps of the same two grounds. */
+export const Pressed = {
+    args: STATE_ROWS,
+    play: async ({ canvasElement }) => {
+        await expectGroundUnder(canvasElement, rowOf(canvasElement, 'Rest row'), ':active', '--ds-background-neutral-subtle-pressed', 'rest row');
+        await expectGroundUnder(canvasElement, rowOf(canvasElement, 'Selected row'), ':active', '--ds-background-selected-pressed', 'selected row');
+    },
+};
+
+/** Focused: a row has no focus stop; the only controls in a table are in its head cells and cells. */
+export const Focused = {
+    args: STATE_ROWS,
+    play: async ({ canvasElement }) => {
+        await userEvent.tab();
+        await expect(rowOf(canvasElement, 'Rest row')).not.toHaveFocus();
+        await expect(canvasElement.ownerDocument.activeElement.closest('tr')).toBeNull();
+    },
+};
+
+/** Disabled: the row takes the disabled ink, ignores the pointer and says so to assistive tech. */
+export const Disabled = {
+    args: STATE_ROWS,
+    play: async ({ canvasElement }) => {
+        const row = rowOf(canvasElement, 'Disabled row');
+        await expect(row).toHaveAttribute('aria-disabled', 'true');
+        await expect(getComputedStyle(row).pointerEvents).toBe('none');
+        await expect(getComputedStyle(row.querySelector('td')).color).toBe(tokenColor(canvasElement, '--ds-text-disabled'));
+    },
+};
+
+/** Invalid: a cell in the error state takes the danger ink. */
+export const Invalid = {
+    args: STATE_ROWS,
+    play: async ({ canvasElement }) => {
+        const cell = canvasElement.querySelector('.plus-table-cell--error');
+        await expect(cell).not.toBeNull();
+        await expect(getComputedStyle(cell).color).toBe(tokenColor(canvasElement, '--ds-text-danger'));
+    },
 };

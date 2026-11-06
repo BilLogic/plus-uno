@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TreeTableStories from './TreeTable.stories.jsx';
-import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, ResourcesBlock, DocsTable, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -55,6 +55,28 @@ Records that nest, up to three levels. No code component owns the nesting yet â€
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## State
+
+<DocsCanvasShell description={<>A row is clear; a branch's title cell carries the chevron.</>}>
+    <DsCanvasQuiet of={TreeTableStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The tree table has no hover class, so a row does not change.</>}>
+    <DsCanvasQuiet of={TreeTableStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A row is not a control, so a press changes nothing.</>}>
+    <DsCanvasQuiet of={TreeTableStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Nothing takes focus yet; the chevron is static.</>}>
+    <DsCanvasQuiet of={TreeTableStories.Focused} />
+</DocsCanvasShell>
+
+</div>
+
 </div>
 
 </DocsTab>
@@ -65,7 +87,7 @@ Records that nest, up to three levels. No code component owns the nesting yet â€
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use a Tree table for records that nest â€” a curriculum of units and lessons, a
 folder of sessions. For a flat list, use the Static or Dynamic table instead.
@@ -74,15 +96,79 @@ folder of sessions. For a flat list, use the Static or Dynamic table instead.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Head cell.** A label, as in the other tables.
+2. **Chevron.** Leading the title cell of a branch; static today.
+3. **Indent.** The title cell's left padding grows with depth, up to three levels.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Clear rows; depth shows as indentation.</td></tr>
+<tr><td>Hovered, pressed</td><td>No change; the tree table does not hover.</td></tr>
+<tr><td>Focused</td><td>Not applicable until expand and collapse are built.</td></tr>
+<tr><td>Disabled</td><td>Not applicable.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Indent per level</td><td><code>--size-table-cell-pad-x</code> plus <code>--space-125</code></td></tr>
+<tr><td>Row height</td><td><code>--size-row-default</code></td></tr>
+<tr><td>Hairlines</td><td><code>--ds-border</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 - **No component yet.** There is no `TreeTable` export. This page composes the
   look from `TableRow` and `TableCell`, the same parts `Table` is built from,
   so a project that needs nesting today builds it the same way.
-- **Depth is a left pad**, `--size-table-cell-pad-x` plus 20px per level, on
+- **Depth is a left pad**, `--size-table-cell-pad-x` plus `--space-125` per level, on
   the row's title cell.
 - **Expand and collapse are unbuilt.** The chevron shown here does not toggle
   anything; building that behavior is open work.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name each node for what it contains: "Linear equations".</td><td>Repeat the parent's name in every child.</td></tr>
+<tr><td>Keep nesting to three levels.</td><td>Nest deeper than three levels.</td></tr>
+<tr><td>Put the count or total in its own column.</td><td>Put counts in the node name.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Depth is visual only.** The rows are plain table rows; the indentation is not announced, so put the level in the label when it matters.
+- **The chevron is decorative.** It is `aria-hidden` and does not toggle anything yet.
+- **Do not use it to hide required content.** Until expand and collapse are built, every row is visible.
 
 </div>
 

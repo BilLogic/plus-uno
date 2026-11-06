@@ -364,6 +364,7 @@ export const FAMILIES = [
   { family: 'option-menu', prefix: '--option-menu-', what: 'the option menu width' },
   { family: 'spinner', prefix: '--spinner-', what: 'Spinner sizes' },
   { family: 'progress-bar', prefix: '--progress-bar-', what: 'Progress bar height' },
+  { family: 'progress-indicator', prefix: '--progress-indicator-', what: 'Progress indicator dot sizes' },
   { family: 'layer', prefix: '--layer-', what: 'the z-index scale, card to tooltip' },
   { family: 'motion', prefix: '--motion-', what: 'motion durations and easings' },
   { family: 'modal', prefix: '--modal-', what: 'modal dialog pad, stack, inline and radius' },

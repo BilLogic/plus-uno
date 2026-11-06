@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as ProgressIndicatorStories from './ProgressIndicator.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet, DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ProgressIndicatorStories} />
 
@@ -56,6 +56,32 @@ A row of dots showing where you are along the steps of a journey. Unlike
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>Dots on the subtlest icon ground; the current dot on the brand ground.</>}>
+    <DsCanvasQuiet of={ProgressIndicatorStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>An unselected dot steps to the subtle icon ground; the current dot keeps its ground.</>}>
+    <DsCanvasQuiet of={ProgressIndicatorStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>An unselected dot steps to the default icon ground.</>}>
+    <DsCanvasQuiet of={ProgressIndicatorStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Tab reaches each dot and draws the 2px ring.</>}>
+    <DsCanvasQuiet of={ProgressIndicatorStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Without <code>onSelect</code> the dots are not buttons and are skipped by Tab.</>}>
+    <DsCanvasQuiet of={ProgressIndicatorStories.Decorative} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -81,7 +107,7 @@ A row of dots showing where you are along the steps of a journey. Unlike
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `ProgressIndicator` for a short sequence where position matters more than
 the name of each step — a carousel, an onboarding flight, a slide deck. When
@@ -91,7 +117,48 @@ each step has its own label people need to see, use `ProgressTracker` instead.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Dot.** One per step: 8 or 12 across, a circle.
+2. **Current dot.** The brand ground (discovery for help, inverse icon for inverted), with <code>aria-current="step"</code>.
+3. **Group.** The row, named by <code>label</code>.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Subtlest icon ground; the current dot is on its appearance ground.</td></tr>
+<tr><td>Hovered</td><td>Interactive only: an unselected dot takes the subtle icon ground.</td></tr>
+<tr><td>Pressed</td><td>Interactive only: an unselected dot takes the default icon ground.</td></tr>
+<tr><td>Focused</td><td>Interactive only: the 2px ring, 2 off the dot.</td></tr>
+<tr><td>Disabled</td><td>A progress indicator has no disabled state; without <code>onSelect</code> it is decorative.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Dot ground</td><td><code>--ds-icon-subtlest</code>, <code>--ds-icon-subtle</code>, <code>--ds-icon</code></td></tr>
+<tr><td>Current dot</td><td><code>--ds-background-brand-bold</code>, <code>--ds-background-discovery-bold</code>, <code>--ds-icon-inverse</code></td></tr>
+<tr><td>Inverted dot</td><td><code>--ds-background-inverse-subtle</code> and its states</td></tr>
+<tr><td>Size</td><td><code>--progress-indicator-dot-size-8</code>, <code>--progress-indicator-dot-size-12</code></td></tr>
+<tr><td>Gap</td><td><code>--inline-md</code>, <code>--inline-sm</code>, <code>--stack-sm</code></td></tr>
+<tr><td>Ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Pass `onSelect` only when jumping ahead makes sense.
 
@@ -113,6 +180,23 @@ must complete in order.
 
 The array's content never renders — only its length becomes the number of
 dots, and each entry becomes a dot's accessible name when `onSelect` is set.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name each dot for its step when the dots are buttons: "Step 2, Reflection".</td><td>Leave interactive dots unnamed or number them only.</td></tr>
+<tr><td>Use it where steps have no labels of their own.</td><td>Use it where each step needs a title; use the progress tracker.</td></tr>
+<tr><td>Keep the number of dots small.</td><td>Show more dots than a person can read at a glance.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

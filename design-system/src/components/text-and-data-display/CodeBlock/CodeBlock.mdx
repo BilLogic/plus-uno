@@ -80,6 +80,32 @@ and long lines that scroll or wrap. The text is one ink: it does not color synta
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>The code surface and ink, with a highlighted line on the highlight fill.</>}>
+    <DsCanvasQuiet of={CodeBlockStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The block does not react to a pointer.</>}>
+    <DsCanvasQuiet of={CodeBlockStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A press changes nothing.</>}>
+    <DsCanvasQuiet of={CodeBlockStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A scrolling block is a named region; keyboard focus draws the 2px ring inset in the block.</>}>
+    <DsCanvasQuiet of={CodeBlockStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A wrapping block has nothing to scroll, so it is not in the tab order.</>}>
+    <DsCanvasQuiet of={CodeBlockStories.WrapNotFocusable} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -99,26 +125,12 @@ and long lines that scroll or wrap. The text is one ink: it does not color synta
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `CodeBlock` for code a reader may copy or follow line by line: an example,
 a command sequence, a config file. For a name or short phrase inside a
 sentence, use `Code`.
 
-<DocsTable>
-    <thead>
-        <tr><th>Prop</th><th>Type</th><th>Default</th><th>What it does</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>text</code></td><td>string</td><td>empty</td><td>The code, lines separated by newlines.</td></tr>
-        <tr><td><code>language</code></td><td>string</td><td>none</td><td>Recorded as a <code>language-*</code> class. It does not color the text.</td></tr>
-        <tr><td><code>showLineNumbers</code></td><td>bool</td><td><code>true</code></td><td>Numbers each line in a gutter screen readers skip.</td></tr>
-        <tr><td><code>highlight</code></td><td>string, number or array</td><td>none</td><td>Lines to mark, such as "2,4-6" or [1, 3].</td></tr>
-        <tr><td><code>wrap</code></td><td>bool</td><td><code>false</code></td><td>Folds long lines instead of scrolling sideways.</td></tr>
-        <tr><td><code>label</code></td><td>string</td><td><code>Code snippet</code></td><td>Names the scrolling region. Unused when <code>wrap</code> is on.</td></tr>
-        <tr><td><code>className</code></td><td>string</td><td>none</td><td>Extra classes for placement.</td></tr>
-    </tbody>
-</DocsTable>
 
 The typeface is the `--code` text style at 0.875rem on a 1.25rem line. The
 surface is `--ds-background-code-default`, the ink `--ds-text-code-default`, the
@@ -129,7 +141,48 @@ highlighted line `--ds-background-code-highlight`.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Surface.** The code ground with a hairline edge and a small radius.
+2. **Gutter.** Optional line numbers, skipped by screen readers.
+3. **Line.** One per line of text; a highlighted line has its own ground.
+4. **Region.** The scrolling block, focusable and named when it does not wrap.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Code ground and ink; highlighted lines on the highlight fill.</td></tr>
+<tr><td>Hovered, pressed</td><td>The block does not react.</td></tr>
+<tr><td>Focused</td><td>A scrolling block shows the 2px ring inset; a wrapping block is not focusable.</td></tr>
+<tr><td>Disabled</td><td>Not applicable.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Typeface</td><td><code>--code</code> at <code>--font-size-0875</code>, line height <code>--line-height-125</code></td></tr>
+<tr><td>Surface, ink</td><td><code>--ds-background-code-default</code>, <code>--ds-text-code-default</code></td></tr>
+<tr><td>Gutter</td><td><code>--ds-background-code-gutter</code>, <code>--ds-text-code-gutter</code></td></tr>
+<tr><td>Highlight</td><td><code>--ds-background-code-highlight</code></td></tr>
+<tr><td>Edge, radius</td><td><code>--ds-border</code>, <code>--radius-md</code></td></tr>
+<tr><td>Ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Choose scroll or wrap by what the code means.
 
@@ -165,6 +218,24 @@ highlighted line `--ds-background-code-highlight`.
 <p>Line 3 sets the timeout.</p>
 <CodeBlock text={snippet} highlight="3" />
 ```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Show the smallest snippet that makes the point.</td><td>Paste a whole file.</td></tr>
+<tr><td>Name the language in prose before the block.</td><td>Leave the reader to guess the language or the file name.</td></tr>
+<tr><td>Highlight the lines the text is about.</td><td>Highlight most of the block.</td></tr>
+<tr><td>Give each block a <code>label</code> when a page has several.</td><td>Leave several blocks with the same name.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

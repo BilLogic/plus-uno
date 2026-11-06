@@ -43,8 +43,8 @@ const ProgressIndicator = ({
                 'plus-progress-indicator',
                 `plus-progress-indicator--${appearance}`,
                 `plus-progress-indicator--${spacing}`,
+                `plus-progress-indicator--size-${size}`,
             ].join(' ')}
-            style={{ '--plus-progress-indicator-dot-size': `${size}px` }}
             role="group"
             aria-label={label}
         >
@@ -73,7 +73,7 @@ ProgressIndicator.propTypes = {
     values: PropTypes.array.isRequired,
     selectedIndex: PropTypes.number.isRequired,
     appearance: PropTypes.oneOf(PROGRESS_INDICATOR_APPEARANCES),
-    size: PropTypes.number,
+    size: PropTypes.oneOf(PROGRESS_INDICATOR_SIZES),
     spacing: PropTypes.oneOf(PROGRESS_INDICATOR_SPACINGS),
     onSelect: PropTypes.func,
     ariaControls: PropTypes.string,
