@@ -1,4 +1,4 @@
 {
   "why": "The floor under the tabbed component docs population. It may rise as a component gains a docs page, and never falls except by a hand edit that names the removal. Re-measure and raise it with `npm run check:docs-tabs -- --update`. Lowered from 80 to 71: Card, Divider, Collapse, Jumbotron, List group, Media object, Scrollspy, Nav pills and Navbar were retired and their docs pages deleted.",
-  "tabbedPages": 80
+  "tabbedPages": 85
 }
