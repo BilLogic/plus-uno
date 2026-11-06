@@ -1,5 +1,7 @@
 import React from 'react';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { expect, userEvent, within } from 'storybook/test';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import FileUpload from './FileUpload';
 
 const formats = ['.zip', '.mp4', '.m4a', '.txt'];
@@ -263,4 +265,100 @@ Interactive.args = {
     readOnly: false,
     validation: 'none',
     validationMessage: '',
+};
+
+/** One story per state, for the Examples tab. */
+const wrap = { maxWidth: '640px' };
+const fileInput = (canvasElement) => canvasElement.querySelector('input[type="file"]');
+const container = (canvasElement) => canvasElement.querySelector('.plus-file-upload-container');
+
+export const Default = {
+    render: () => (
+        <div style={wrap}>
+            <FileUpload id="file-upload-ex-default" label="Upload files" acceptedFormats={formats} buttonText="Choose a file" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(fileInput(canvasElement)).toHaveAttribute('accept', formats.join(','));
+        await expect(within(canvasElement).getByRole('button', { name: 'Choose a file' })).toBeEnabled();
+    },
+};
+
+export const Required = {
+    render: () => (
+        <div style={wrap}>
+            <FileUpload id="file-upload-ex-required" label="Upload files" required acceptedFormats={formats} buttonText="Choose a file" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('[aria-label="required"]')).toBeInTheDocument();
+    },
+};
+
+export const Invalid = {
+    render: () => (
+        <div style={wrap}>
+            <FileUpload
+                id="file-upload-ex-invalid"
+                label="Upload files"
+                acceptedFormats={formats}
+                buttonText="Choose a file"
+                validation="invalid"
+                validationMessage="That file is too large. Choose one under 10 MB."
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(fileInput(canvasElement)).toHaveAttribute('aria-invalid', 'true');
+        const message = within(canvasElement).getByText('That file is too large. Choose one under 10 MB.');
+        await expect(getComputedStyle(message.closest('.plus-file-upload-validation')).color).toBe(tokenColor(canvasElement, '--ds-text-danger'));
+    },
+};
+
+export const Valid = {
+    render: () => (
+        <div style={wrap}>
+            <FileUpload
+                id="file-upload-ex-valid"
+                label="Upload files"
+                acceptedFormats={formats}
+                buttonText="Choose a file"
+                validation="valid"
+                validationMessage="File added."
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const message = within(canvasElement).getByText('File added.');
+        await expect(getComputedStyle(message.closest('.plus-file-upload-validation')).color).toBe(tokenColor(canvasElement, '--ds-text-success'));
+    },
+};
+
+export const Disabled = {
+    render: () => (
+        <div style={wrap}>
+            <FileUpload id="file-upload-ex-disabled" label="Upload files" acceptedFormats={formats} buttonText="Choose a file" disabled />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(fileInput(canvasElement)).toBeDisabled();
+        await expect(within(canvasElement).getByRole('button', { name: 'Choose a file' })).toBeDisabled();
+        await expect(container(canvasElement)).toHaveClass('plus-file-upload-disabled');
+    },
+};
+
+/** Focusing the field outlines the whole container with the focus ring. */
+export const KeyboardFocus = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={wrap}>
+            <FileUpload id="file-upload-ex-focus" label="Upload files" acceptedFormats={formats} buttonText="Choose a file" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        container(canvasElement).style.transition = 'none';
+        await userEvent.tab();
+        await expect(container(canvasElement)).toHaveClass('plus-file-upload-focused');
+        await expect(getComputedStyle(container(canvasElement)).boxShadow).toContain(tokenColor(canvasElement, '--ds-border-focused'));
+    },
 };

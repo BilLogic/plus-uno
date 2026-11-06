@@ -7,16 +7,16 @@
 .plus-file-upload-wrapper {
     display: flex;
     flex-direction: column;
-    gap: var(--stack-sm, 4px);
+    gap: var(--stack-sm);
     width: 100%;
 }
 
 .plus-file-upload-container {
     display: flex;
     flex-direction: column;
-    gap: var(--stack-md, 8px);
-    padding: var(--pad-y-md, 12px) var(--pad-x-md, 16px);
-    border-radius: var(--radius-md, 4px);
+    gap: var(--stack-md);
+    padding: var(--pad-y-md) var(--pad-x-md);
+    border-radius: var(--radius-md);
     transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
     
     // Focus state with border
@@ -26,11 +26,11 @@
     
     // Validation states
     &.plus-file-upload-invalid {
-        box-shadow: 0 0 0 0.2rem var(--ds-background-danger-subtler);
+        box-shadow: 0 0 0 var(--focus-ring-width) var(--ds-background-danger-subtler);
     }
     
     &.plus-file-upload-valid {
-        box-shadow: 0 0 0 0.2rem var(--ds-background-success-subtler);
+        box-shadow: 0 0 0 var(--focus-ring-width) var(--ds-background-success-subtler);
     }
     
     // Disabled state
@@ -53,8 +53,8 @@
     font: var(--body-default);
     
     .plus-file-upload-required {
-        color: var(--color-danger);
-        margin-left: 2px;
+        color: var(--ds-text-danger);
+        margin-left: var(--space-0125);
     }
 }
 
@@ -98,7 +98,7 @@
 .plus-file-upload-validation {
     display: flex;
     align-items: center;
-    gap: var(--stack-sm, 4px);
+    gap: var(--stack-sm);
     font: var(--body-small);
     
     i {
@@ -108,18 +108,18 @@
 }
 
 .plus-file-upload-validation-invalid {
-    color: var(--color-danger);
+    color: var(--ds-text-danger);
     
     i {
-        color: var(--color-danger);
+        color: var(--ds-icon-danger);
     }
 }
 
 .plus-file-upload-validation-valid {
-    color: var(--color-success);
+    color: var(--ds-text-success);
     
     i {
-        color: var(--color-success);
+        color: var(--ds-icon-success);
     }
 }
 
