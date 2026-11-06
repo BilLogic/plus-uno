@@ -9,7 +9,7 @@ Universal element component for navigation breadcrumbs. / /* `items` defaults to
 
 **Source:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.jsx`
 
-**Stories:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.stories.jsx` — Standard, Short, Overview, Interactive
+**Stories:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.stories.jsx` — Standard, Short, Overview, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/navigation/Breadcrumb/Breadcrumb.mdx`
 

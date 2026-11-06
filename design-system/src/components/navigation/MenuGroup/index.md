@@ -9,7 +9,7 @@ MenuGroup: the scrollable list a menu's sections sit in.
 
 **Source:** `design-system/src/components/navigation/MenuGroup/MenuGroup.jsx`
 
-**Stories:** `design-system/src/components/navigation/MenuGroup/MenuGroup.stories.jsx` — ButtonAndLinkItems, KeyboardNavigation, Selected, CustomRowExample, Interactive
+**Stories:** `design-system/src/components/navigation/MenuGroup/MenuGroup.stories.jsx` — ButtonAndLinkItems, KeyboardNavigation, Selected, CustomRowExample, Interactive, Rest, Hovered, Pressed, Focused, SelectedRow, Disabled
 
 **Storybook page:** `design-system/src/components/navigation/MenuGroup/MenuGroup.mdx`
 
@@ -33,7 +33,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-subtlest` · `--heading-xxsmall` · `--radius-050` · `--space-025` · `--space-0375` · `--space-050` · `--space-0625` · `--space-075` · `--space-100` · `--space-150`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-subtlest` · `--heading-xxsmall` · `--pad-y-lg` · `--pad-y-md` · `--radius-lg` · `--size-spacing-medium-space-300` · `--size-spacing-medium-space-500` · `--size-spacing-small-space-150` · `--size-spacing-xlarge-space-2500` · `--stack-lg` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/navigation/MenuGroup/MenuGroup.scss`. Override these through the token layer, never with a literal.
 
