@@ -1,0 +1,25 @@
+/* Logo clear-space drawing (docs only). The zone is half the mark's height on every side. */
+
+.plus-logo-clear {
+    --logo-clear: calc(var(--logo-mark) / 2);
+    position: relative;
+    display: inline-flex;
+    padding: var(--logo-clear);
+    border: var(--border-default) dashed var(--ds-border-danger);
+}
+
+.plus-logo-clear__tag {
+    position: absolute;
+    width: var(--logo-clear);
+    height: var(--logo-clear);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font: var(--code);
+    color: var(--ds-text-subtle);
+}
+
+.plus-logo-clear__tag--top { top: 0; left: var(--logo-clear); }
+.plus-logo-clear__tag--bottom { bottom: 0; left: var(--logo-clear); }
+.plus-logo-clear__tag--left { left: 0; top: var(--logo-clear); }
+.plus-logo-clear__tag--right { right: 0; top: var(--logo-clear); }
