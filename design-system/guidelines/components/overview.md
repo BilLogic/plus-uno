@@ -40,8 +40,7 @@ benchmark for every page, so a name that matches it needs no row.
 | Our name | ADS name | Why different |
 | :--- | :--- | :--- |
 | Frame (pattern) | Root | The app's outer shell, the layout's root area that holds the rest |
-| Topbar (pattern) | Top nav | One word, like Sidebar |
-| Sidebar (pattern) | Side nav | One word, like Topbar |
+| Sidebar (pattern) | Side nav | One word |
 | Page (pattern) | Main | The content area inside the Frame, with the page title |
 | Panel (area) | Panel | Same name; the app-level area at the right of the Frame, holding AI chat first |
 | Frame (informal) | none | "App shell" is an informal alias in talk only; code and docs say Frame |

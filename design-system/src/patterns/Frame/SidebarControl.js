@@ -1,8 +1,8 @@
 import { createContext, useContext } from 'react';
 
 /**
- * The sidebar state a Frame hands its Topbar, so the frame owns the
- * state and the topbar draws the one toggle.
+ * The sidebar state a Frame hands the Sidebar, so the frame owns the
+ * state and the Sidebar draws the one toggle.
  *
  * - `sidebar`: 'open' while docked or floating, 'closed' otherwise.
  * - `docked`: true while the sidebar is in flow beside the surface.
