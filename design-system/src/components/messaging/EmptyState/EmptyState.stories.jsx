@@ -168,6 +168,8 @@ export const Rest = {
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('heading', { name: 'No students yet' })).toBeVisible();
         await expect(canvas.getByText('Add a student to start planning sessions.')).toBeVisible();
+        await expect(getComputedStyle(canvas.getByRole('heading', { name: 'No students yet' })).color).toBe(stateTokenColor(canvasElement, '--ds-text'));
+        await expect(getComputedStyle(canvas.getByText('Add a student to start planning sessions.')).color).toBe(stateTokenColor(canvasElement, '--ds-text-subtle'));
         await expect(emptyRoot(canvasElement).querySelector('.plus-empty-state__icon')).toHaveAttribute('aria-hidden', 'true');
     },
 };

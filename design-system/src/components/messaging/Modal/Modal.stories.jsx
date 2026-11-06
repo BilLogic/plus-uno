@@ -545,16 +545,16 @@ export const TwoOverlayLimit = {
 /* ------------------------------------------------------------------- states */
 
 const StateModal = () => (
-    <Modal show width="6-col" title="Settings" body="Changes save when you close." onClose={() => {}} />
+    <Modal show renderAs="inline" width="6-col" title="Settings" body="Changes save when you close." onClose={() => {}} />
 );
-const bodyOf = (canvasElement) => within(canvasElement.ownerDocument.body);
+const bodyOf = (canvasElement) => within(canvasElement);
 const closeOf = async (canvasElement) => bodyOf(canvasElement).findByRole('button', { name: 'Close modal' });
 
-/** Rest: an open dialog named by its title, with the close button at rest. */
+/** Rest: the panel with its title as the h1 and the close button at rest. Drawn inline so a docs page holds no live overlay; the dialog role is asserted in Overview and ConfirmView. */
 export const Rest = {
     render: () => <StateModal />,
     play: async ({ canvasElement }) => {
-        await expect(await bodyOf(canvasElement).findByRole('dialog', { name: 'Settings' })).toBeVisible();
+        await expect(await bodyOf(canvasElement).findByRole('heading', { level: 1, name: 'Settings' })).toBeVisible();
         await expect(await closeOf(canvasElement)).toBeVisible();
     },
 };

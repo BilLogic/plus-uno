@@ -91,12 +91,12 @@ export function Dismissible() {
 
 /* ------------------------------------------------------------------- states */
 
-const StateSpotlight = () => (
+const StateSpotlight = ({ headline }) => (
     <SpotlightProvider>
         <div style={{ padding: 'var(--space-400)' }}>
             <SpotlightTarget><Button text="Create" /></SpotlightTarget>
             <Spotlight
-                headline="Create a new board"
+                headline={headline}
                 stepCount="1 of 3"
                 primaryAction={<SpotlightAction appearance="primary">Next</SpotlightAction>}
                 secondaryAction={<SpotlightAction appearance="secondary">Skip</SpotlightAction>}
@@ -106,11 +106,12 @@ const StateSpotlight = () => (
         </div>
     </SpotlightProvider>
 );
-// Base UI's Popover.Portal renders into document.body, outside canvasElement.
-const inBody = (selector) => document.querySelector(selector);
-const ready = async (selector) => {
-    await waitFor(() => expect(inBody(selector)).toBeTruthy());
-    return inBody(selector);
+// Base UI's Popover.Portal renders into document.body, outside canvasElement, and
+// every story on a docs page portals its own popup, so each story names its popup
+// by a headline of its own.
+const popupFor = async (headline) => {
+    await waitFor(() => expect([...document.querySelectorAll('.plus-spotlight')].find((el) => el.textContent.includes(headline))).toBeTruthy());
+    return [...document.querySelectorAll('.plus-spotlight')].find((el) => el.textContent.includes(headline));
 };
 const HOVERED = '--ds-interaction-inverse-hovered';
 const PRESSED = '--ds-interaction-inverse-pressed';
@@ -121,37 +122,37 @@ const groundUnderPseudo = (el, pseudo) => {
 
 /** Rest: the popup on the brand bold ground, headline in the inverse text token. */
 export const Rest = {
-    render: () => <StateSpotlight />,
+    render: () => <StateSpotlight headline="Rest: create a new board" />,
     play: async () => {
-        const popup = await ready('.plus-spotlight');
+        const popup = await popupFor('Rest: create a new board');
         await expect(getComputedStyle(popup).backgroundColor).toBe(tokenColor(popup, '--ds-background-brand-bold'));
-        await expect(inBody('.plus-spotlight-headline')).toHaveTextContent('Create a new board');
+        await expect(popup.querySelector('.plus-spotlight-headline')).toHaveTextContent('Rest: create a new board');
     },
 };
 
 /** Hovered: the dismiss button takes the inverse hovered layer. */
 export const Hovered = {
-    render: () => <StateSpotlight />,
+    render: () => <StateSpotlight headline="Hovered: create a new board" />,
     play: async () => {
-        const dismiss = await ready('.plus-spotlight-dismiss-button');
+        const dismiss = (await popupFor('Hovered: create a new board')).querySelector('.plus-spotlight-dismiss-button');
         await expect(groundUnderPseudo(dismiss, ':hover')).toBe(tokenColor(dismiss, HOVERED));
     },
 };
 
 /** Pressed: the dismiss button takes the inverse pressed layer. */
 export const Pressed = {
-    render: () => <StateSpotlight />,
+    render: () => <StateSpotlight headline="Pressed: create a new board" />,
     play: async () => {
-        const dismiss = await ready('.plus-spotlight-dismiss-button');
+        const dismiss = (await popupFor('Pressed: create a new board')).querySelector('.plus-spotlight-dismiss-button');
         await expect(groundUnderPseudo(dismiss, ':active')).toBe(tokenColor(dismiss, PRESSED));
     },
 };
 
 /** Focused: the ring on the dark ground is the inverse focus token, 2px wide. */
 export const Focused = {
-    render: () => <StateSpotlight />,
+    render: () => <StateSpotlight headline="Focused: create a new board" />,
     play: async () => {
-        const dismiss = await ready('.plus-spotlight-dismiss-button');
+        const dismiss = (await popupFor('Focused: create a new board')).querySelector('.plus-spotlight-dismiss-button');
         dismiss.focus({ focusVisible: true });
         const style = getComputedStyle(dismiss);
         await expect(style.outlineStyle).toBe('solid');

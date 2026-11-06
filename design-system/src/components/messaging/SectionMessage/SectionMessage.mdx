@@ -170,7 +170,7 @@ Each style sets the ground to its role's named background token
 (`--ds-background-success` for success, and so on) and a default leading
 icon, drawn in the style's Icon color on the first line of text. There is no
 border or side stripe — the style is carried by the fill and the icon, not an
-edge. The title, the body and any link in it are `--color-on-surface` in
+edge. The title, the body and any link in it are `--ds-text` in
 every style. Every style has 4px corners.
 
 | Style | Default icon |
@@ -318,7 +318,7 @@ every style. Every style has 4px corners.
   ordinary content and make sure the surrounding page still reads correctly.
 - **`title` renders as a real heading**, at `headingLevel` (default `h2`). It
   joins the page's outline, so pick the level that fits where it sits.
-- **The dismiss button is labeled `Dismiss`**, hard-coded. It is the
+- **The dismiss button is labeled `Dismiss message`**, hard-coded. It is the
   shared `CloseButton`: a fixed 24×24 target whose × is `aria-hidden`, centered
   on the title line when there is a title and on the first body line otherwise.
 - **The leading icon is decorative.** It is `aria-hidden`, whether it is the
@@ -326,7 +326,7 @@ every style. Every style has 4px corners.
   is. The icon differs in shape per style, so danger and warning do not rely
   on color alone to look different, but a screen reader hears neither the
   icon nor the style.
-- **Links keep the text color.** A link in the body inherits on-surface and
+- **Links keep the text color.** A link in the body inherits `--ds-text` and
   stays underlined, so it is told from the text by its underline alone.
 - **So say it in the children.** There is no text prefix, so
   `appearance="danger"` on its own does not say "error" to a screen reader.
