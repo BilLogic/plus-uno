@@ -3,6 +3,7 @@ import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import LinkIconButton from './LinkIconButton';
 import { ICON_BUTTON_APPEARANCES } from '../IconButton/IconButton';
+import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
@@ -74,6 +75,51 @@ export const Selected = {
     render: () => <LinkIconButton href="#help" icon="circle-question" label="Open Help Center" isSelected />,
     play: async ({ canvasElement }) => {
         await expect(within(canvasElement).getByRole('link', { name: 'Open Help Center' })).toHaveAttribute('aria-current', 'true');
+    },
+};
+
+/** Hovered takes the appearance's hovered step, laid straight on the container. */
+export const HoveredState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={row}>
+            {ICON_BUTTON_APPEARANCES.map((appearance) => (
+                <LinkIconButton key={appearance} href="#state" icon="plus" label={`${appearance} hover`} appearance={appearance} />
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        for (const appearance of ICON_BUTTON_APPEARANCES) {
+            await expectHovered(canvasElement, canvas.getByRole('link', { name: `${appearance} hover` }), appearance);
+        }
+    },
+};
+
+/** Pressed takes the appearance's pressed step. */
+export const PressedState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={row}>
+            {ICON_BUTTON_APPEARANCES.map((appearance) => (
+                <LinkIconButton key={appearance} href="#state" icon="plus" label={`${appearance} press`} appearance={appearance} />
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        for (const appearance of ICON_BUTTON_APPEARANCES) {
+            await expectPressed(canvasElement, canvas.getByRole('link', { name: `${appearance} press` }), appearance);
+        }
+    },
+};
+
+/** Tabbing onto it draws the 2px focus ring 2px off the edge, and no fill. */
+export const KeyboardFocus = {
+    parameters: { docs: { disable: true } },
+    render: () => <LinkIconButton href="#state" icon="plus" label="Open session" />,
+    play: async ({ canvasElement }) => {
+        await expectFocusRing(canvasElement, within(canvasElement).getByRole('link', { name: 'Open session' }));
     },
 };
 

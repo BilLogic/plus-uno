@@ -3,6 +3,7 @@ import { expect, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import IconButton, { ICON_BUTTON_APPEARANCES } from './IconButton';
+import { expectFocusRing, expectHovered, expectPressed } from '@/storybook-docs/lib/button-states.js';
 
 const row = { display: 'flex', flexWrap: 'wrap', gap: '16px', alignItems: 'center' };
 const title = (name) => name.charAt(0).toUpperCase() + name.slice(1);
@@ -169,6 +170,51 @@ export const Loading = {
     render: () => <IconButton icon="pen" label="Saving" isLoading />,
     play: async ({ canvasElement }) => {
         await expect(within(canvasElement).getByRole('button', { name: 'Saving' })).toHaveAttribute('aria-busy', 'true');
+    },
+};
+
+/** Hovered takes the appearance's hovered step, laid straight on the container. */
+export const HoveredState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={row}>
+            {ICON_BUTTON_APPEARANCES.map((appearance) => (
+                <IconButton key={appearance} icon="plus" label={`${appearance} hover`} appearance={appearance} />
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        for (const appearance of ICON_BUTTON_APPEARANCES) {
+            await expectHovered(canvasElement, canvas.getByRole('button', { name: `${appearance} hover` }), appearance);
+        }
+    },
+};
+
+/** Pressed takes the appearance's pressed step. */
+export const PressedState = {
+    parameters: { docs: { disable: true } },
+    render: () => (
+        <div style={row}>
+            {ICON_BUTTON_APPEARANCES.map((appearance) => (
+                <IconButton key={appearance} icon="plus" label={`${appearance} press`} appearance={appearance} />
+            ))}
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        for (const appearance of ICON_BUTTON_APPEARANCES) {
+            await expectPressed(canvasElement, canvas.getByRole('button', { name: `${appearance} press` }), appearance);
+        }
+    },
+};
+
+/** Tabbing onto it draws the 2px focus ring 2px off the edge, and no fill. */
+export const KeyboardFocus = {
+    parameters: { docs: { disable: true } },
+    render: () => <IconButton icon="plus" label="Add student" />,
+    play: async ({ canvasElement }) => {
+        await expectFocusRing(canvasElement, within(canvasElement).getByRole('button', { name: 'Add student' }));
     },
 };
 
