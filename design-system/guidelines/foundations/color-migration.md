@@ -158,7 +158,7 @@ proposal does (`background.selected` is `color.background.selected`, so
 
 | Pattern | Tokens |
 |---|---|
-| Frame (topbar and docked sidebar) | `elevation.surface.sunken`; topbar has no border |
+| Frame (docked sidebar) | `elevation.surface.sunken` |
 | Sidebar item | hovered `background.neutral.subtle.hovered`; selected `background.selected` + `text.selected` + `icon.selected`, label in the medium weight, no leading bar |
 | Sidebar peek (floating, below 1024) | `elevation.surface.overlay` + `elevation.shadow.overlay` |
 | Page (the inner box) | `elevation.surface`, no border; the docked sidebar ends in `color.border` |
