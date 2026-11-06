@@ -128,7 +128,9 @@ export const Disabled = {
         await expect(el).toHaveAttribute('aria-disabled', 'true');
         await expect(el.hasAttribute('tabindex')).toBe(false);
         await expect(el).toHaveAttribute('role', 'button');
-        await userEvent.click(el);
+        await expect(getComputedStyle(el).pointerEvents).toBe('none');
+        el.focus();
+        await userEvent.keyboard('{Enter}');
         await expect(args.onClick).not.toHaveBeenCalled();
     },
 };
