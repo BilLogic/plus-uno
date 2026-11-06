@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/navigation/Pagination/Pagination.jsx`
 
-**Stories:** `design-system/src/components/navigation/Pagination/Pagination.stories.jsx` — Content, Spacing, InteractionStates, Overview, Interactive, Accessibility
+**Stories:** `design-system/src/components/navigation/Pagination/Pagination.stories.jsx` — Content, Spacing, InteractionStates, Overview, Interactive, Accessibility, Rest, Hovered, Pressed, Focused, Current, Disabled
 
 **Storybook page:** `design-system/src/components/navigation/Pagination/Pagination.mdx`
 

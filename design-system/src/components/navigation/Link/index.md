@@ -9,7 +9,7 @@ Link: an inline navigation anchor.
 
 **Source:** `design-system/src/components/navigation/Link/Link.jsx`
 
-**Stories:** `design-system/src/components/navigation/Link/Link.stories.jsx` — Appearances, OpenInNewWindow, Interactive
+**Stories:** `design-system/src/components/navigation/Link/Link.stories.jsx` — Appearances, OpenInNewWindow, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/navigation/Link/Link.mdx`
 
@@ -33,7 +33,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--ds-link` · `--ds-link-pressed` · `--ds-link-visited` · `--ds-text` · `--ds-text-inverse` · `--icon-sm` · `--radius-050` · `--space-050`
+`--ds-link` · `--ds-link-pressed` · `--ds-link-visited` · `--ds-text` · `--ds-text-inverse` · `--icon-sm` · `--inline-md` · `--radius-lg`
 
 From `design-system/src/components/navigation/Link/Link.scss`. Override these through the token layer, never with a literal.
 

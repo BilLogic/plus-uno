@@ -4,10 +4,10 @@ import classNames from 'classnames';
 import './MenuGroup.scss';
 
 /**
- * Roving tabindex for a `MenuGroup`'s items: only the current item is
- * `tabIndex={0}`, the rest `-1`, and the arrow keys move it — the keyboard
- * behavior ADS's Menu documents, hand-rolled because `MenuGroup` is an
- * always-visible list, not a Base UI popup's menu.
+ * Arrow-key navigation for a `MenuGroup`'s items: ArrowDown and ArrowUp move
+ * focus between enabled items and wrap at the ends. Hand-rolled because
+ * `MenuGroup` is an always-visible list, not a Base UI popup's menu. Every
+ * enabled item is still a tab stop.
  */
 const RovingContext = createContext(null);
 
@@ -29,7 +29,7 @@ export const MenuGroup = ({ density = 'regular', maxHeight, maxWidth, minWidth, 
     }, []);
 
     const moveFocus = useCallback((fromNode, delta) => {
-        const items = itemsRef.current.filter((n) => n && !n.disabled);
+        const items = itemsRef.current.filter((n) => n && !n.disabled && n.getAttribute('aria-disabled') !== 'true');
         const index = items.indexOf(fromNode);
         if (index === -1 || items.length === 0) return;
         const next = items[(index + delta + items.length) % items.length];

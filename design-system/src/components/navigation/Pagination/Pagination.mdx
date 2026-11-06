@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as PaginationStories from './Pagination.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -67,10 +67,30 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## States
+## State
 
-<DocsCanvasShell description={<>Disabled controls on first/last page and enabled controls in middle pages.</>}>
-    <DsCanvasQuiet of={PaginationStories.InteractionStates} />
+<DocsCanvasShell description={<>Pages in subtle ink on the surface; the current page is named by <code>aria-current</code>.</>}>
+    <DsCanvasQuiet of={PaginationStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The subtle neutral hovered fill on a page and on an enabled Previous or Next.</>}>
+    <DsCanvasQuiet of={PaginationStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The subtle neutral pressed fill.</>}>
+    <DsCanvasQuiet of={PaginationStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The 2px ring inside the segment, so a neighbor never covers it.</>}>
+    <DsCanvasQuiet of={PaginationStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The selected fill and ink in semibold; no hover step of its own.</>}>
+    <DsCanvasQuiet of={PaginationStories.Current} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Previous on the first page keeps its tab stop, takes the disabled ground and ink, and does nothing.</>}>
+    <DsCanvasQuiet of={PaginationStories.Disabled} />
 </DocsCanvasShell>
 
 </div>
@@ -101,7 +121,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Pagination` when a list is split into numbered pages and the user needs to
 move between them or jump to a known one — admin tables of sessions, students,
@@ -116,7 +136,53 @@ whenever the window does not reach them.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Navigator.** Previous and Next, as a caret alone (named by its label) or as the label text.
+2. **Page.** A numbered button; the current one is selected.
+3. **Gap.** An ellipsis where the window skips pages; hidden from assistive technology.
+4. **Pill.** One bordered, fully rounded row holding every segment, divided by a hairline.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Subtle ink on the surface.</td></tr>
+<tr><td>Hovered</td><td>The subtle neutral hovered fill.</td></tr>
+<tr><td>Pressed</td><td>The subtle neutral pressed fill.</td></tr>
+<tr><td>Focused</td><td>The 2px ring drawn inside the segment.</td></tr>
+<tr><td>Current</td><td>The selected fill and ink, semibold; hover and press do not change it.</td></tr>
+<tr><td>Disabled</td><td>The disabled ground, ink and caret; the control keeps its tab stop with <code>aria-disabled</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Row height</td><td><code>--item-height-md</code> (default), <code>--item-height-sm</code> (compact)</td></tr>
+<tr><td>Segment padding</td><td><code>--pad-x-md</code>, <code>--pad-x-sm</code></td></tr>
+<tr><td>Ink and ground</td><td><code>--ds-text-subtle</code>, <code>--ds-surface</code></td></tr>
+<tr><td>Pill edge</td><td><code>--ds-border</code>, <code>--border-default</code>, <code>--radius-full</code></td></tr>
+<tr><td>Hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
+<tr><td>Current page</td><td><code>--ds-background-selected</code>, <code>--ds-text-selected</code>, <code>--type-weight-semibold</code></td></tr>
+<tr><td>Disabled</td><td><code>--ds-background-disabled</code>, <code>--ds-text-disabled</code>, <code>--ds-icon-disabled</code></td></tr>
+<tr><td>Caret</td><td><code>--icon-sm</code></td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### It is controlled, so it needs both the page and the handler.
 
@@ -128,32 +194,6 @@ whenever the window does not reach them.
 // Correct.
 <Pagination currentPage={page} totalPages={12} onPageChange={setPage} />
 ```
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Accessibility
-
-- **The structure is right.** A `nav` labeled by `label` (default "Page
-  navigation") wraps a `ul` of `li`s, and the current page carries
-  `aria-current="page"`.
-- **Every page has a name.** Each page button is labeled "Page 3", "Page 4", so
-  a screen reader never reads a bare number. Naming the `nav` says which list
-  the pages belong to.
-- **Parts are buttons.** `Pagination.Page` and `Pagination.Navigator` are
-  `button` elements: Tab reaches each, Enter and Space activate it, and none
-  follows a link.
-- **A disabled Navigator stays reachable.** At the first or last page the
-  Previous or Next control keeps its tab stop and carries `aria-disabled="true"`;
-  activating it does nothing. It is announced as unavailable rather than
-  disappearing, which keeps the row from reflowing.
-- **The ellipsis is hidden.** It is `aria-hidden`: the pinned first and last
-  pages beside it carry the meaning.
-- **Pages are not destinations.** If page numbers should be linkable or
-  shareable, render your own anchors with real URLs.
-- **Focus is a ring inside the segment** (`--focus-ring-width`), and the current page keeps an
-  outline in forced-colors mode.
 
 ### Text mode is the one that labels its arrows.
 
@@ -180,6 +220,58 @@ whenever the window does not reach them.
 <Pagination label="Sessions pages" currentPage={p1} totalPages={4} onPageChange={setP1} />
 <Pagination label="Students pages" currentPage={p2} totalPages={7} onPageChange={setP2} />
 ```
+
+### Show a window, not every page.
+
+`max` keeps the row short. Page one and the last page stay reachable with an ellipsis between, so a long list never pushes the controls off the screen.
+
+### Say how many pages there are.
+
+When the total matters, such as a table of sessions, show it beside the pagination: “Page 3 of 12”. The row alone only shows a window.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Keep the default “Previous” and “Next” in text mode.</td><td>Rename them “Back” and “Forward”, or shorten to arrows with no name.</td></tr>
+<tr><td>Name the navigation after what it pages: “Sessions pages”.</td><td>Leave two paginations on one page with the same name.</td></tr>
+<tr><td>Number pages from 1.</td><td>Start at 0 or show a range such as 1–10.</td></tr>
+<tr><td>Use it for lists with a stable order.</td><td>Use it for a feed that keeps loading.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **The structure is right.** A `nav` labeled by `label` (default "Page
+  navigation") wraps a `ul` of `li`s, and the current page carries
+  `aria-current="page"`.
+- **Every page has a name.** Each page button is labeled "Page 3", "Page 4", so
+  a screen reader never reads a bare number. Naming the `nav` says which list
+  the pages belong to.
+- **Parts are buttons.** `Pagination.Page` and `Pagination.Navigator` are
+  `button` elements: Tab reaches each, Enter and Space activate it, and none
+  follows a link.
+- **A disabled Navigator stays reachable.** At the first or last page the
+  Previous or Next control keeps its tab stop and carries `aria-disabled="true"`;
+  activating it does nothing. It is announced as unavailable rather than
+  disappearing, which keeps the row from reflowing.
+- **The ellipsis is hidden.** It is `aria-hidden`: the pinned first and last
+  pages beside it carry the meaning.
+- **Pages are not destinations.** If page numbers should be linkable or
+  shareable, render your own anchors with real URLs.
+- **Focus is a ring inside the segment** (`--focus-ring-width`), and the current page keeps an
+  outline in forced-colors mode.
 
 </div>
 

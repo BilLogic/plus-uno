@@ -13,7 +13,7 @@
 
         display: flex;
         align-items: center;
-        gap: var(--stack-md); // Figma: 8px gap
+        gap: var(--stack-md);
         flex-wrap: wrap;
     }
 
@@ -40,11 +40,11 @@
                     text-decoration: underline,
                     color: var(--ds-link),
                 ),
-            ), $ring: false);
+            ), $ring: true);
         }
 
         // Current page item
-        &.plus-breadcrumb-current span {
+        &.plus-breadcrumb-current {
             color: var(--ds-text-subtlest);
         }
     }

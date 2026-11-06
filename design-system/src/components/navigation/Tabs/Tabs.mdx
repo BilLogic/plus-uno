@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TabsStories from './Tabs.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -77,20 +77,44 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## States
+## Layout & composition
 
-<DocsCanvasShell description={<>Pseudo hover, focus, pressed and disabled.</>}>
-    <DsCanvasQuiet of={TabsStories.InteractionStates} />
+<DocsCanvasShell description={<>Justified tab distribution.</>}>
+    <DsCanvasQuiet of={TabsStories.Layout} />
 </DocsCanvasShell>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Layout & composition
+## State
 
-<DocsCanvasShell description={<>Justified tab distribution.</>}>
-    <DsCanvasQuiet of={TabsStories.Layout} />
+<DocsCanvasShell description={<>An unselected tab is subtle ink on a clear ground; the selected tab carries the bar and the selected ink.</>}>
+    <DsCanvasQuiet of={TabsStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The subtle neutral hovered fill; the selected tab takes it too and keeps its bar and ink.</>}>
+    <DsCanvasQuiet of={TabsStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The subtle neutral pressed fill.</>}>
+    <DsCanvasQuiet of={TabsStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The 2px ring, 2px off the tab, with no fill; arrow keys move selection with focus.</>}>
+    <DsCanvasQuiet of={TabsStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The selected ink over the selected bar; no fill.</>}>
+    <DsCanvasQuiet of={TabsStories.Selected} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The bold selected fill with inverse ink; its hover and press step the bold fill.</>}>
+    <DsCanvasQuiet of={TabsStories.SelectedPill} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled ink and no pointer events; never selected.</>}>
+    <DsCanvasQuiet of={TabsStories.Disabled} />
 </DocsCanvasShell>
 
 </div>
@@ -121,7 +145,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Tabs` for the tab bar that switches between sibling views of the same
 subject — a student's Overview / Sessions / Progress, or the sections of an
@@ -139,7 +163,53 @@ stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Tab strip.** A `tablist` of buttons, aligned left, center, right or justified.
+2. **Tab.** A button whose label names a view; the selected one is marked by an underline (`default`) or a filled pill (`pill`).
+3. **Baseline.** The hairline under an underline strip that the selected bar sits on.
+4. **Panel.** The content one tab controls, shown below the strip.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Subtle ink on a clear ground.</td></tr>
+<tr><td>Hovered</td><td>The subtle neutral hovered fill.</td></tr>
+<tr><td>Pressed</td><td>The subtle neutral pressed fill.</td></tr>
+<tr><td>Focused</td><td>The 2px ring, 2px off the tab; no fill.</td></tr>
+<tr><td>Selected</td><td>Selected ink with the underline bar, or the bold fill with inverse ink in <code>pill</code>.</td></tr>
+<tr><td>Disabled</td><td>Disabled ink; the tab cannot be pressed or selected.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Tab height</td><td><code>--item-height-md</code> (default), <code>--item-height-sm</code> (compact)</td></tr>
+<tr><td>Tab padding</td><td><code>--pad-x-lg</code>, <code>--pad-x-md</code></td></tr>
+<tr><td>Ink</td><td><code>--ds-text-subtle</code>, selected <code>--ds-text-selected</code>, disabled <code>--ds-text-disabled</code></td></tr>
+<tr><td>Baseline and bar</td><td><code>--ds-border</code>, <code>--border-default</code>; <code>--ds-border-selected</code>, <code>--border-selected</code></td></tr>
+<tr><td>Hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
+<tr><td>Selected pill</td><td><code>--ds-background-selected-bold</code>, <code>--ds-text-inverse</code>; <code>--ds-background-selected-bold-hovered</code>, <code>--ds-background-selected-bold-pressed</code></td></tr>
+<tr><td>Gap</td><td><code>--stack-md</code>, pill strip <code>--stack-sm</code></td></tr>
+<tr><td>Panel offset</td><td><code>--size-section-gap-sm</code></td></tr>
+<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### A controlled bar needs `onSelect`, or it will never move.
 
@@ -171,6 +241,32 @@ stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
   <Tabs.Tab eventKey="overview">Overview</Tabs.Tab>
 </Tabs>
 ```
+
+### Keep the labels short and parallel.
+
+Each label is one or two words naming a view of the same subject: Overview, Sessions, Progress. Parallel wording lets people scan the strip without reading it.
+
+### Choose the appearance by weight, not taste.
+
+The underline suits a strip that sits above page content. The pill suits a strip inside a card or toolbar, where a filled selected tab reads as a control.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Use nouns that name the view: “Sessions”.</td><td>Use verbs or full sentences.</td></tr>
+<tr><td>Write labels in sentence case, one to two words.</td><td>Use Title Case or labels that wrap.</td></tr>
+<tr><td>Keep the same labels across visits.</td><td>Rename a tab to show a count or status.</td></tr>
+<tr><td>Order tabs by how often people open them, most used first.</td><td>Hide the most used view in the last tab.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

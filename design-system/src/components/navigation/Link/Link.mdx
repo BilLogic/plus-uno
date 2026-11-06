@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 import * as LinkStories from './Link.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -57,6 +57,28 @@ sentence of UI copy.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>Default is link-colored and underlined; subtle is body ink with no underline; inverse is inverse ink.</>}>
+    <DsCanvasQuiet of={LinkStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Subtle gains its underline; default is already underlined and keeps its color.</>}>
+    <DsCanvasQuiet of={LinkStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Default and subtle take the pressed link ink.</>}>
+    <DsCanvasQuiet of={LinkStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The 2px ring, 2px off the link; inverse draws the inverse ring color.</>}>
+    <DsCanvasQuiet of={LinkStories.Focused} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -81,7 +103,7 @@ sentence of UI copy.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Link` for navigation inside a sentence or a block of text — "see the
 session report," "read more." For a standalone action styled like a button,
@@ -92,7 +114,47 @@ for a control that stands on its own.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Text.** The link's name, in the appearance's ink.
+2. **Underline.** Always on for `default` and `inverse`; `subtle` shows it on hover.
+3. **New-window glyph.** Added by `isOpenInNewWindow`, with “(opens in a new tab)” appended to the accessible name.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Default in the link ink, underlined; visited in the visited ink.</td></tr>
+<tr><td>Hovered</td><td>Subtle is underlined; default keeps its ink.</td></tr>
+<tr><td>Pressed</td><td>The pressed link ink on default and subtle.</td></tr>
+<tr><td>Focused</td><td>The 2px ring, 2px off the link; the inverse ring on a dark fill.</td></tr>
+<tr><td>Disabled</td><td>Not a state. A link with nowhere to go is plain text, not a dimmed link.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Default</td><td><code>--ds-link</code>, <code>--ds-link-visited</code>, <code>--ds-link-pressed</code></td></tr>
+<tr><td>Subtle</td><td><code>--ds-text</code>, <code>--ds-link-pressed</code></td></tr>
+<tr><td>Inverse</td><td><code>--ds-text-inverse</code>, ring <code>--ds-border-focused-inverse</code></td></tr>
+<tr><td>Corners</td><td><code>--radius-lg</code></td></tr>
+<tr><td>New-window glyph</td><td><code>--icon-sm</code>, <code>--inline-md</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Pick the appearance for the surface it sits on, not for emphasis.
 
@@ -110,6 +172,28 @@ default pairing doesn't fit.
 ```jsx
 <Link href="/report" isOpenInNewWindow>View the full report</Link>
 ```
+
+### Keep the link inside the sentence it finishes.
+
+A link is inline text. When the action stands alone, such as Save or Continue, it is a button, not a link.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Make the text say where it goes: “View the full report”.</td><td>Use “click here” or “read more”.</td></tr>
+<tr><td>Put the link on the words that name the destination.</td><td>Stretch it over a whole sentence.</td></tr>
+<tr><td>Write it in sentence case, without ending punctuation inside the link.</td><td>Add an arrow or “>” to the text; the glyph does that job.</td></tr>
+<tr><td>Warn about a new window with <code>isOpenInNewWindow</code>.</td><td>Say “(opens in new tab)” in the text yourself.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

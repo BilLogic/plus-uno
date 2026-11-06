@@ -56,20 +56,6 @@ menu gets from its own mechanics.
 
 <div className="sb-ds-doc-section">
 
-## States
-
-<DocsCanvasShell description={<>`isSelected` marks the current item; `isDisabled` removes it from the roving tab order.</>}>
-    <DsCanvasQuiet of={MenuGroupStories.Selected} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Arrow Down and Arrow Up move focus between items — only the focused item is a tab stop.</>}>
-    <DsCanvasQuiet of={MenuGroupStories.KeyboardNavigation} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Custom rows
 
 <DocsCanvasShell description={<>`CustomItem`'s `component` prop renders the row as a caller-supplied element — a `label` wrapping a checkbox, for instance — for a row that is neither a button nor a link.</>}>
@@ -80,26 +66,35 @@ menu gets from its own mechanics.
 
 <div className="sb-ds-doc-section">
 
-## Properties
+## State
 
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Component</th>
-            <th>Property</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>MenuGroup</code></td><td><code>density</code></td><td><code>regular</code> (default) or <code>compact</code> row height.</td></tr>
-        <tr><td><code>MenuGroup</code></td><td><code>maxHeight</code>, <code>maxWidth</code>, <code>minWidth</code></td><td>CSS length strings bounding the list.</td></tr>
-        <tr><td><code>Section</code></td><td><code>title</code>, <code>hasSeparator</code></td><td>An optional heading and a divider above the section.</td></tr>
-        <tr><td><code>ButtonItem</code> / <code>LinkItem</code> / <code>CustomItem</code></td><td><code>elemBefore</code>, <code>elemAfter</code>, <code>description</code></td><td>The shared row layout: a leading icon, trailing icon, and a second line under the label.</td></tr>
-        <tr><td><code>ButtonItem</code> / <code>LinkItem</code> / <code>CustomItem</code></td><td><code>isSelected</code>, <code>isDisabled</code></td><td>Current-item and disabled state.</td></tr>
-        <tr><td><code>LinkItem</code></td><td><code>href</code></td><td>Required. Disabled links drop <code>href</code> and the tab stop.</td></tr>
-        <tr><td><code>CustomItem</code></td><td><code>component</code></td><td>The element or component the row renders as. Default <code>div</code>.</td></tr>
-    </tbody>
-</DocsTable>
+<DocsCanvasShell description={<>Body ink on a clear ground; the current row carries <code>aria-current</code>.</>}>
+    <DsCanvasQuiet of={MenuGroupStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The subtle neutral hovered fill, on buttons and links alike.</>}>
+    <DsCanvasQuiet of={MenuGroupStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The subtle neutral pressed fill.</>}>
+    <DsCanvasQuiet of={MenuGroupStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The 2px ring, 2px off the row; Arrow Down moves focus to the next enabled row.</>}>
+    <DsCanvasQuiet of={MenuGroupStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The selected fill marks the current row.</>}>
+    <DsCanvasQuiet of={MenuGroupStories.SelectedRow} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Arrow Down and Arrow Up move focus between enabled items, wrapping at the ends.</>}>
+    <DsCanvasQuiet of={MenuGroupStories.KeyboardNavigation} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Disabled ink, no pointer events, skipped by the arrow keys.</>}>
+    <DsCanvasQuiet of={MenuGroupStories.Disabled} />
+</DocsCanvasShell>
 
 </div>
 
@@ -129,7 +124,7 @@ menu gets from its own mechanics.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `MenuGroup` for an always-visible list of actions or destinations — the
 content of a sidebar section, a settings list, a dropdown's body once it's
@@ -140,7 +135,51 @@ open. For the popup mechanics that open and close a menu, see `Popup`;
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Group.** The scrollable `menu` the sections sit in; `density` sets the row height.
+2. **Section.** A titled run of rows; `hasSeparator` draws a divider above it.
+3. **Row.** A `ButtonItem`, `LinkItem` or `CustomItem` with an optional leading icon, a label, a description and a trailing icon.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Body ink on a clear ground.</td></tr>
+<tr><td>Hovered</td><td>The subtle neutral hovered fill.</td></tr>
+<tr><td>Pressed</td><td>The subtle neutral pressed fill.</td></tr>
+<tr><td>Focused</td><td>The 2px ring, 2px off the row.</td></tr>
+<tr><td>Selected</td><td>The selected fill, with <code>aria-current</code> on the row.</td></tr>
+<tr><td>Disabled</td><td>Disabled ink; a disabled link drops its <code>href</code> and its tab stop.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Row ink</td><td><code>--ds-text</code>, <code>--body-default</code></td></tr>
+<tr><td>Hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
+<tr><td>Selected</td><td><code>--ds-background-selected</code></td></tr>
+<tr><td>Disabled</td><td><code>--ds-text-disabled</code></td></tr>
+<tr><td>Description</td><td><code>--body-small</code>, <code>--ds-text-subtle</code></td></tr>
+<tr><td>Section title</td><td><code>--heading-xxsmall</code>, <code>--ds-text-subtlest</code></td></tr>
+<tr><td>Divider</td><td><code>--border-default</code>, <code>--ds-border</code></td></tr>
+<tr><td>Row corners</td><td><code>--radius-lg</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Pick the item kind for what the row does.
 
@@ -164,15 +203,43 @@ different `component`, that role moves to an unstyled wrapper so the inner
 element keeps its own native semantics (a `label`, for instance) while the
 menu still sees an allowed child.
 
+### Group rows by what they have in common.
+
+Two to five sections of a few rows each scan faster than one long list. Title a section when its purpose is not obvious from its rows, and separate it when it changes kind, such as moving from navigation to actions.
+
+### Keep the description to one line.
+
+A description clarifies a row; it does not carry the row. If it needs two lines, the label is the problem.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Start each label with a verb for an action: “Rename board”.</td><td>Start every label with “Go to” or “Click to”.</td></tr>
+<tr><td>Use sentence case, without ending punctuation.</td><td>Use Title Case or a trailing period.</td></tr>
+<tr><td>Write section titles as short nouns: “Recent”, “Actions”.</td><td>Write a sentence in a section title.</td></tr>
+<tr><td>Pair a leading icon with a label that still reads without it.</td><td>Rely on the icon alone to say what the row does.</td></tr>
+</tbody>
+</DocsTable>
+
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Accessibility
 
-- **A real `menu`, roving tabindex.** `MenuGroup` is `role="menu"`; only the
-  current item is a tab stop, and Arrow Down/Up move it, matching how a
-  native menu's keyboard behavior reads to assistive technology.
+- **A real `menu` with arrow keys.** `MenuGroup` is `role="menu"`; Arrow Down
+  and Arrow Up move focus between enabled items and wrap at the ends. Buttons
+  and links are tab stops; a `CustomItem` rendered as a `div` is reached by the
+  arrow keys only when the caller gives it a tab stop. The group does not yet
+  collapse the items into one tab stop.
 - **Sections are named groups.** A `Section` with a `title` is
   `role="group"` with `aria-labelledby` pointing at that title.
 - **Disabled items leave the tab order.** `isDisabled` removes a `LinkItem`'s

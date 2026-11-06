@@ -76,7 +76,7 @@
     font-weight: var(--type-weight-medium);
     text-decoration: none;
     cursor: pointer;
-    transition: border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+    transition: border-color var(--motion-duration-short) var(--motion-easing-standard), color var(--motion-duration-short) var(--motion-easing-standard), background-color var(--motion-duration-short) var(--motion-easing-standard);
 
     @include plus-state((
         disabled: (color: var(--ds-text-disabled)),
@@ -99,12 +99,12 @@
 
 // Sizing
 .plus-tabs--default .plus-tab {
-    height: var(--item-height-md, 32px);
-    padding: 0 var(--space-100);
+    height: var(--item-height-md);
+    padding: 0 var(--pad-x-lg);
 }
 
 .plus-tabs--compact .plus-tab {
-    height: var(--item-height-sm, 24px);
+    height: var(--item-height-sm);
     padding: 0 var(--pad-x-md);
 }
 
@@ -183,7 +183,7 @@
  * clicking into the panel does not draw one.
  */
 .plus-tabs-panel {
-    padding-top: var(--size-section-gap-sm, 16px);
+    padding-top: var(--size-section-gap-sm);
 
     &:focus-visible {
         outline: var(--border-selected) solid var(--ds-border-focused);
