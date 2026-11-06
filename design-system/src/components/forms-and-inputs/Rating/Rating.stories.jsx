@@ -255,8 +255,9 @@ export const Focused = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        await userEvent.tab();
         const item = within(canvasElement).getByRole('radio', { name: 'Rate 3' });
+        item.style.transition = 'none';
+        await userEvent.tab();
         await expect(document.activeElement).toBe(item);
         const style = getComputedStyle(item);
         await waitFor(() => expect(style.outlineStyle).toBe('solid'));

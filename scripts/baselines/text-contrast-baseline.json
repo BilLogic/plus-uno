@@ -1,11 +1,6 @@
 {
   "measured": "AA 4.5:1, ground from each rule, page fallback --color-surface",
   "findings": {
-    "design-system/src/components/forms-and-inputs/Rating/Rating.scss|--color-outline-variant|--color-surface": {
-      "count": 1,
-      "ratio": 1.62,
-      "why": "EXEMPT, BUT WORTH A LOOK — the UNSELECTED star. It is the track of the rating rather than the value, and WCAG 1.4.11 exempts inactive components; the selected stars carry the meaning. Recorded rather than dismissed because 1.62:1 is faint enough that the empty half of a 2-of-5 rating is nearly invisible, and whether that reads is a design call."
-    },
     "design-system/src/specs/Admin/Session/Tables/SessionBreakdownTable/SessionBreakdownTable.scss|--color-outline-variant|--color-surface": {
       "count": 1,
       "ratio": 1.62,

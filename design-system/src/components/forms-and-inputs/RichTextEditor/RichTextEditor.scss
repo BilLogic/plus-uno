@@ -31,7 +31,7 @@
 
     &.plus-rich-text-editor--full {
         max-width: none;
-        border: var(--stroke-1) solid var(--ds-border-input);
+        border: var(--border-default) solid var(--ds-border-input);
         border-radius: var(--radius-md);
     }
 }
@@ -176,7 +176,7 @@
     color: var(--ds-text);
     background-color: var(--ds-background-input);
     box-sizing: border-box;
-    border: var(--stroke-1) solid var(--ds-border-input);
+    border: var(--border-default) solid var(--ds-border-input);
     font-weight: var(--type-weight-regular);
 
     &:focus {

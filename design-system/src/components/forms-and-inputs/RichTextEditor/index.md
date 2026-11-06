@@ -43,7 +43,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-background-input` · `--ds-background-neutral` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border-input` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-opacity-disabled` · `--ds-surface-container` · `--ds-text` · `--ds-text-selected` · `--ds-text-subtle` · `--ds-text-subtlest` · `--field-min-height-lg` · `--font-line-height-fa-body3` · `--font-size-fa-body3-solid` · `--pad-x-sm` · `--pad-x-xs` · `--radius-md` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--space-0125` · `--space-025` · `--stack-md` · `--stroke-1` · `--type-weight-regular`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-input` · `--ds-background-neutral` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border-input` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-opacity-disabled` · `--ds-surface-container` · `--ds-text` · `--ds-text-selected` · `--ds-text-subtle` · `--ds-text-subtlest` · `--field-min-height-lg` · `--font-line-height-fa-body3` · `--font-size-fa-body3-solid` · `--pad-x-sm` · `--pad-x-xs` · `--radius-md` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--space-0125` · `--space-025` · `--stack-md` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss`. Override these through the token layer, never with a literal.
 

@@ -111,6 +111,13 @@
         background-color: var(--ds-background-selected-bold-hovered);
     }
 
+    // The focused element is the native input inside the thumb, not the thumb,
+    // so the ring reads it through `:has()`; Base UI only sets `data-focused`
+    // on the thumb inside a Field.
+    &:has(input[type="range"]:focus-visible) {
+        @include plus-ring();
+    }
+
     // The real, focusable, `role="slider"` element — Base UI's hidden native
     // `input[type="range"]` — is the accessible and interactive control
     // itself (unlike Checkbox and Radio, there is no separate span). Base UI
