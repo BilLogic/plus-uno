@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
+import { CloseButton } from '@/components';
 import * as CloseButtonStories from './CloseButton.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={CloseButtonStories} />
 
@@ -21,21 +28,11 @@ The one dismiss control for a surface that closes as a whole — a Modal, a Sect
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Layout
 
-<DocsCanvasShell attachSourceBelow description={<>A subtle icon button, fixed to the × glyph.</>}>
-    <Canvas of={CloseButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={CloseButtonStories.Overview} title="Default" description="The one dismiss control for a surface that closes as a whole." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Spacing
-
-<DocsCanvasShell description={<>`default` draws 32; `compact` draws 24.</>}>
-    <DsCanvasQuiet of={CloseButtonStories.Spacing} />
-</DocsCanvasShell>
+<ComponentExample of={CloseButtonStories.Spacing} title="Spacing" description="Default draws 32; compact draws 24." />
 
 </div>
 
@@ -43,23 +40,7 @@ The one dismiss control for a surface that closes as a whole — a Modal, a Sect
 
 ## Tone
 
-<DocsCanvasShell description={<>`default` for neutral surfaces; `inverse` for colored or dark grounds, where the subtle appearance's own hover and pressed states would otherwise read as nearly invisible.</>}>
-    <DsCanvasQuiet of={CloseButtonStories.Tones} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Both tones on a dark ground.</>}>
-    <DsCanvasQuiet of={CloseButtonStories.InverseGrounds} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>Keyboard focus. There is no disabled state — a close control is always available.</>}>
-    <DsCanvasQuiet of={CloseButtonStories.Focus} />
-</DocsCanvasShell>
+<ComponentExample of={CloseButtonStories.Tones} title="Tones" description="Default for neutral surfaces; inverse for the declared colored and dark grounds." />
 
 </div>
 
@@ -89,7 +70,7 @@ The one dismiss control for a surface that closes as a whole — a Modal, a Sect
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `CloseButton` wherever a surface closes as a whole — the corner of a
 Modal, the end of a Section message or a Flag. For an action that
@@ -100,9 +81,52 @@ removes one item from a set rather than closing a surface, use a plain
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Container.** A subtle Icon button, 32 at default spacing and 24 at compact.
+2. **Glyph.** The `xmark` glyph at 16, always drawn.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered</td><td>Default: the neutral subtle hovered fill. Inverse: <code>--ds-interaction-inverse-hovered</code>.</td></tr>
+<tr><td>Pressed</td><td>Default: the neutral subtle pressed fill. Inverse: <code>--ds-interaction-inverse-pressed</code>.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>; <code>--ds-border-focused-inverse</code> for the inverse tone.</td></tr>
+<tr><td>Disabled</td><td>There is none. A close control is always available.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Fill, default tone</td><td><code>--ds-background-neutral-subtle</code>, hovered and pressed steps.</td></tr>
+<tr><td>Glyph, inverse tone</td><td><code>--ds-icon-inverse</code>; text <code>--ds-text-inverse</code>.</td></tr>
+<tr><td>Size</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>. Square.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Write `label` for what closes, not a generic "close."
+
+<DoDontPair
+    doExample={<CloseButton label="Dismiss update" />}
+    doCaption="The label tells a screen reader what goes away."
+    dontExample={<CloseButton label="x" />}
+    dontCaption="A bare label says nothing about what closes."
+/>
 
 "Close" fits a surface that blocks, like a Modal. For a message, name
 what's dismissed: "Dismiss update," "Dismiss warning" — so the accessible

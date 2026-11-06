@@ -141,7 +141,8 @@ export const Button = ({
             {...tagProps}
             aria-disabled={disabled || undefined}
             aria-busy={isLoading || undefined}
-            aria-pressed={isSelected}
+            aria-pressed={role === 'link' ? undefined : isSelected}
+            aria-current={role === 'link' && isSelected ? 'true' : undefined}
         >
             <ButtonContent text={text} iconBefore={leadingIcon} iconAfter={iconAfter}>
                 {children}

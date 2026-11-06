@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
+import { SplitButton, Button, IconButton } from '@/components';
 import * as SplitButtonStories from './SplitButton.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SplitButtonStories} />
 
@@ -21,44 +28,23 @@ A primary action joined to a chevron that opens a menu of related actions.
 
 <div className="sb-ds-doc-section">
 
-## Anatomy
+## Layout
 
-A `SplitButton` composes two children it draws the seam between and groups
-for assistive technology: a `Button` for the primary action, and an
-`IconButton` with a chevron for the menu trigger. Each child keeps its own
-appearance, spacing and state.
+<ComponentExample of={SplitButtonStories.Overview} title="Default" description="A main action beside a chevron that opens related actions." />
 
-<DocsCanvasShell attachSourceBelow description={<>A primary action and its chevron, drawn as one connected control.</>}>
-    <Canvas of={SplitButtonStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={SplitButtonStories.Appearances} title="Appearance" description="Match appearance on both children." />
+
+<ComponentExample of={SplitButtonStories.Spacing} title="Spacing" description="Match spacing on both children." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Appearance and spacing
+## State
 
-<DocsCanvasShell description={<>The action's appearance carries the whole control's look — pass the same appearance to both children.</>}>
-    <DsCanvasQuiet of={SplitButtonStories.Appearances} />
-</DocsCanvasShell>
+<ComponentExample of={SplitButtonStories.MenuState} title="Menu open" description="The chevron shows the menu is open." />
 
-<DocsCanvasShell description={<>Both children share the same `spacing` for an even seam.</>}>
-    <DsCanvasQuiet of={SplitButtonStories.Spacing} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## States
-
-<DocsCanvasShell description={<>The chevron open state.</>}>
-    <DsCanvasQuiet of={SplitButtonStories.MenuState} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Disabled and loading, set independently on each child.</>}>
-    <DsCanvasQuiet of={SplitButtonStories.States} />
-</DocsCanvasShell>
+<ComponentExample of={SplitButtonStories.States} title="States" description="Selected, disabled and loading." />
 
 </div>
 
@@ -88,7 +74,7 @@ appearance, spacing and state.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `SplitButton` when one action is clearly primary and a few related
 actions belong beside it in a menu — "Send" with "Send and close," "Save" as
@@ -98,7 +84,51 @@ a draft. For actions with no clear primary, use `ButtonGroup` instead.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Action.** A Button for the primary action.
+2. **Seam.** The two children meet at a flat edge: inner corners are square, outer corners keep the button radius.
+3. **Menu trigger.** An Icon button with a chevron that opens the related actions.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Hovered, pressed</td><td>Set independently on each child.</td></tr>
+<tr><td>Focused</td><td>The focused child rises above its neighbor so its ring is not covered.</td></tr>
+<tr><td>Disabled, loading</td><td>Set independently on each child.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Seam</td><td>1: <code>--border-default</code>. A primary trigger draws it in <code>--ds-border-inverse</code>.</td></tr>
+<tr><td>Outer corners</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Make both halves look like one control.
+
+<DoDontPair
+    doExample={<SplitButton><Button appearance="primary" text="Send" /><IconButton appearance="primary" icon="chevron-down" label="More send options" /></SplitButton>}
+    doCaption="One primary action with its related options in the menu."
+    dontExample={<SplitButton><Button text="Send" /><IconButton appearance="primary" icon="chevron-down" label="More send options" /></SplitButton>}
+    dontCaption="The two halves disagree on appearance, so they read as two controls."
+/>
 
 ### Match appearance and spacing on both children yourself.
 

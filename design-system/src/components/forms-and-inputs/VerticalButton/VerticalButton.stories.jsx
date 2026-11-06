@@ -73,6 +73,27 @@ export const States = {
     },
 };
 
+export const Selected = {
+    render: () => <VerticalButton icon="user-gear" label="Admin" isSelected />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: 'Admin' })).toHaveAttribute('aria-pressed', 'true');
+    },
+};
+
+export const Disabled = {
+    render: () => <VerticalButton icon="user-gear" label="Admin" isDisabled />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: 'Admin' })).toBeDisabled();
+    },
+};
+
+export const Loading = {
+    render: () => <VerticalButton icon="user-gear" label="Admin" isLoading />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: 'Admin' })).toHaveAttribute('aria-busy', 'true');
+    },
+};
+
 export const Interactive = {
     render: (args) => <VerticalButton {...args} />,
     parameters: { docs: { source: { language: 'jsx', code: webAppSourceSnippets.verticalButton } } },

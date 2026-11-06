@@ -108,6 +108,28 @@ export const States = {
     },
 };
 
+/** Selected sets `aria-pressed`; the filter is on. */
+export const Selected = {
+    render: () => <FilterButton text="Mine" hasChevronDown={false} isSelected />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: 'Mine' })).toHaveAttribute('aria-pressed', 'true');
+    },
+};
+
+export const Disabled = {
+    render: () => <FilterButton text="Status" isDisabled />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: 'Status' })).toBeDisabled();
+    },
+};
+
+export const Loading = {
+    render: () => <FilterButton text="Status" isLoading />,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: 'Status' })).toHaveAttribute('aria-busy', 'true');
+    },
+};
+
 export const Interactive = {
     render: (args) => <FilterButton {...args} />,
     parameters: { docs: { source: { language: 'jsx', code: webAppSourceSnippets.filterButton } } },
