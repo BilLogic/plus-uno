@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
+import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Range from './Range';
 
 export default {
@@ -225,4 +227,82 @@ Keyboard.play = async ({ canvasElement }) => {
 
     await userEvent.keyboard('{Home}');
     await waitFor(() => expect(slider).toHaveAttribute('aria-valuenow', '0'));
+};
+
+/** One story per state, for the Examples tab. */
+const frame = { maxWidth: '600px' };
+const thumbOf = (canvasElement) => canvasElement.querySelector('.plus-form-range-thumb');
+
+export const Rest = {
+    render: () => (
+        <div style={frame}>
+            <Range id="range-ex-rest" label="Zoom" defaultValue={40} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const thumb = thumbOf(canvasElement);
+        await expect(getComputedStyle(thumb).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected-bold'));
+        await expect(within(canvasElement).getByRole('slider', { name: 'Zoom' }).value).toBe('40');
+    },
+};
+
+export const Hovered = {
+    render: () => (
+        <div style={frame}>
+            <Range id="range-ex-hover" label="Zoom" defaultValue={40} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const thumb = thumbOf(canvasElement);
+        thumb.style.transition = 'none';
+        const fill = withForcedPseudo(thumb, ':hover', () => getComputedStyle(thumb).backgroundColor);
+        await expect(fill).toBe(tokenColor(canvasElement, '--ds-background-selected-bold-hovered'));
+    },
+};
+
+/** Dragging reads the same as hover: the thumb is being held. */
+export const Pressed = {
+    render: () => (
+        <div style={frame}>
+            <Range id="range-ex-pressed" label="Zoom" defaultValue={40} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const thumb = thumbOf(canvasElement);
+        thumb.style.transition = 'none';
+        thumb.setAttribute('data-dragging', '');
+        await expect(getComputedStyle(thumb).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected-bold-hovered'));
+        thumb.removeAttribute('data-dragging');
+    },
+};
+
+export const Focused = {
+    render: () => (
+        <div style={frame}>
+            <Range id="range-ex-focus" label="Zoom" defaultValue={40} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const thumb = thumbOf(canvasElement);
+        thumb.style.transition = 'none';
+        within(canvasElement).getByRole('slider', { name: 'Zoom' }).focus({ focusVisible: true });
+        const style = getComputedStyle(thumb);
+        await waitFor(() => expect(style.outlineStyle).toBe('solid'));
+        await expect(px(style.outlineWidth)).toBe(2);
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        document.activeElement.blur();
+    },
+};
+
+export const DisabledState = {
+    render: () => (
+        <div style={frame}>
+            <Range id="range-ex-disabled" label="Zoom" defaultValue={40} isDisabled />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const thumb = thumbOf(canvasElement);
+        await expect(within(canvasElement).getByRole('slider', { name: 'Zoom' }).disabled).toBe(true);
+        await expect(getComputedStyle(thumb).backgroundColor).toBe(tokenColor(canvasElement, '--ds-icon-disabled'));
+    },
 };
