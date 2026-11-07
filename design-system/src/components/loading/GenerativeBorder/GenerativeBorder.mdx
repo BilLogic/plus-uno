@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as GenerativeBorderStories from './GenerativeBorder.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { GenerativeBorder } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={GenerativeBorderStories} />
 
@@ -21,51 +28,35 @@ The border that shows PLUS AI is generating content: a 2px rounded stroke in two
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Size and layout
 
-<DocsCanvasShell attachSourceBelow description={<>Content wrapped in the border while it generates.</>}>
-    <Canvas of={GenerativeBorderStories.Generating} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={GenerativeBorderStories.Radii} title="Radius" description={<><code>radius</code> names the radius token the ring follows; match the content it wraps.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## Behavior
 
-<DocsCanvasShell description={<>`isActive` off: the children render with no ring.</>}>
-    <DsCanvasQuiet of={GenerativeBorderStories.Idle} />
-</DocsCanvasShell>
+<ComponentExample of={GenerativeBorderStories.Generating} title="Generating" description={<>With <code>isActive</code>, the ring lies over the content's edge and turns clockwise.</>} />
 
-<DocsCanvasShell description={<>Under reduced motion the same segments hold still.</>}>
-    <DsCanvasQuiet of={GenerativeBorderStories.ReducedMotion} />
-</DocsCanvasShell>
+<ComponentExample of={GenerativeBorderStories.Idle} title="Idle" description={<>With <code>isActive</code> off, the children render with no ring.</>} />
 
-<DocsCanvasShell description={<>Idle: the content alone, no ring, not busy.</>}>
-    <DsCanvasQuiet of={GenerativeBorderStories.Rest} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>The border has no hover layer, so nothing moves.</>}>
-    <DsCanvasQuiet of={GenerativeBorderStories.Hovered} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>No pressed layer.</>}>
-    <DsCanvasQuiet of={GenerativeBorderStories.Pressed} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Not a control, so Tab skips it.</>}>
-    <DsCanvasQuiet of={GenerativeBorderStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={GenerativeBorderStories.ReducedMotion} title="Reduced motion" description="Under reduced motion the same segments hold still." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Radius
+## State
 
-<DocsCanvasShell description={<>`radius` names the radius token the ring follows. Match the content it wraps.</>}>
-    <DsCanvasQuiet of={GenerativeBorderStories.Radii} />
-</DocsCanvasShell>
+<ComponentExample of={GenerativeBorderStories.Rest} title="Rest" description="Idle: the content alone, no ring, not busy." />
+
+<ComponentExample of={GenerativeBorderStories.Hovered} title="Hovered" description="No change: the border has no hover layer." />
+
+<ComponentExample of={GenerativeBorderStories.Pressed} title="Pressed" description="No change." />
+
+<ComponentExample of={GenerativeBorderStories.Focused} title="Focused" description="Not a control, so Tab skips it." />
 
 </div>
 
@@ -116,10 +107,13 @@ Use `GenerativeBorder` only while PLUS AI is generating into a piece of content,
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Idle</td><td>No ring. <code>aria-busy</code> is false.</td></tr>
-<tr><td>Generating</td><td>The ring is on and turns. <code>aria-busy</code> is true.</td></tr>
+<tr><td>Rest</td><td>Idle: no ring. <code>aria-busy</code> is false.</td></tr>
+<tr><td>Generating</td><td>The ring is on and turns once every 6s. <code>aria-busy</code> is true.</td></tr>
 <tr><td>Reduced motion</td><td>The ring stays at its still frame.</td></tr>
-<tr><td>Hovered, pressed, focused, disabled</td><td>None. It is not a control.</td></tr>
+<tr><td>Hovered</td><td>None. It is not a control.</td></tr>
+<tr><td>Pressed</td><td>None.</td></tr>
+<tr><td>Focused</td><td>None. It is not in the tab order.</td></tr>
+<tr><td>Disabled</td><td>None. The border has no disabled state.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -131,8 +125,9 @@ Use `GenerativeBorder` only while PLUS AI is generating into a piece of content,
 </thead>
 <tbody>
 <tr><td>Segments</td><td><code>--ds-border-brand</code> and <code>--ds-border-discovery</code>.</td></tr>
-<tr><td>Stroke</td><td><code>--size-border-stroke-stroke-200</code>.</td></tr>
-<tr><td>Corner</td><td>The radius token named by <code>radius</code>.</td></tr>
+<tr><td>Stroke</td><td><code>--size-border-stroke-stroke-200</code>, through <code>--generative-border-width</code>.</td></tr>
+<tr><td>Corner</td><td><code>--generative-border-radius</code>, set to the radius token named by <code>radius</code>: <code>--radius-025</code>, <code>--radius-050</code>, <code>--radius-075</code>, <code>--radius-100</code> or <code>--radius-full</code>.</td></tr>
+<tr><td>Turn</td><td><code>--generative-border-angle</code>, from a rest of <code>--generative-border-rest</code>.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -142,17 +137,49 @@ Use `GenerativeBorder` only while PLUS AI is generating into a piece of content,
 
 ## Best practices
 
-### Wrap the content and toggle `isActive`.
+Wrap the content and toggle `isActive` while PLUS AI generates into it.
 
-```jsx
-<GenerativeBorder isActive={isGenerating} radius="radius-100">
-    <Card>{draft}</Card>
-</GenerativeBorder>
-```
+### Animate one thing at a time.
 
-### Match `radius` to the wrapped content.
+The moving border marks where the AI is working; three at once means none of them is the focus.
 
-The wrapper is as wide as its parent, so set the width of the thing it surrounds.
+<DoDontPair
+    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><GenerativeBorder><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Summary</div></GenerativeBorder><GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Goals</div></GenerativeBorder><GenerativeBorder><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Next steps</div></GenerativeBorder></div>}
+    doCaption="One active border."
+    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Summary</div></GenerativeBorder><GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Goals</div></GenerativeBorder><GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Next steps</div></GenerativeBorder></div>}
+    dontCaption="Every border active."
+/>
+
+### Match the radius to the pattern.
+
+The border traces the content's corners; a pill around a rectangular card looks detached.
+
+<DoDontPair
+    doExample={<GenerativeBorder isActive radius="radius-100"><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Drafting the session summary…</div></GenerativeBorder>}
+    doCaption="Radius that matches the content."
+    dontExample={<GenerativeBorder isActive radius="radius-full"><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Drafting the session summary…</div></GenerativeBorder>}
+    dontCaption="A pill around a rectangle."
+/>
+
+### Stop animating when the work ends.
+
+An idle border should read as finished, not as still thinking. Set `isActive` back to false.
+
+<DoDontPair
+    doExample={<GenerativeBorder><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Here is a first draft of the session summary.</div></GenerativeBorder>}
+    doCaption="Inactive once done."
+    dontExample={<GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Here is a first draft of the session summary.</div></GenerativeBorder>}
+    dontCaption="Still animating after completion."
+/>
+
+### Use one ring per piece of content.
+
+<DoDontPair
+    doExample={<GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Drafting the session summary…</div></GenerativeBorder>}
+    doCaption="One ring around the content being generated."
+    dontExample={<GenerativeBorder isActive><div style={{ padding: 'var(--pad-x-sm)' }}><GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Drafting the session summary…</div></GenerativeBorder></div></GenerativeBorder>}
+    dontCaption="Two rings nested around the same content."
+/>
 
 </div>
 
@@ -166,8 +193,6 @@ The wrapper is as wide as its parent, so set the width of the thing it surrounds
 </thead>
 <tbody>
 <tr><td>Say what is being made beside the border: "Drafting the session summary…".</td><td>Show the border with no text about what is happening.</td></tr>
-<tr><td>Use one ring per piece of content.</td><td>Nest two rings.</td></tr>
-<tr><td>End the ring when the content is complete.</td><td>Leave it on after the content arrives.</td></tr>
 </tbody>
 </DocsTable>
 

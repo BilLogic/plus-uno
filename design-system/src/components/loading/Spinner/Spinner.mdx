@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as SpinnerStories from './Spinner.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Button, Spinner } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -40,31 +47,19 @@ An animated ring that says a wait is in progress, with no duration to report.
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>The default 24px ring, inheriting the surrounding text color.</>}>
-    <Canvas of={SpinnerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Sizes
-
-<DocsCanvasShell description={<>16, 24 and 48 — a pixel diameter, nothing in between.</>}>
-    <DsCanvasQuiet of={SpinnerStories.Sizes} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Appearance
 
-<DocsCanvasShell description={<><code>invert</code> is for a bold or colored background.</>}>
-    <DsCanvasQuiet of={SpinnerStories.Invert} />
-</DocsCanvasShell>
+<ComponentExample of={SpinnerStories.Overview} title="Inherit" description="The default: the ring takes the surrounding text color." />
+
+<ComponentExample of={SpinnerStories.Invert} title="Invert" description={<><code>invert</code> is for a bold or colored background.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Size and layout
+
+<ComponentExample of={SpinnerStories.Sizes} title="Sizes" description="16, 24 and 48: a pixel diameter, nothing in between." />
 
 </div>
 
@@ -72,21 +67,13 @@ An animated ring that says a wait is in progress, with no duration to report.
 
 ## State
 
-<DocsCanvasShell description={<>The default 24 ring, inheriting the text color.</>}>
-    <DsCanvasQuiet of={SpinnerStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={SpinnerStories.Rest} title="Rest" description="The default 24 ring, inheriting the text color." />
 
-<DocsCanvasShell description={<>A spinner has no hover layer, so nothing moves.</>}>
-    <DsCanvasQuiet of={SpinnerStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={SpinnerStories.Hovered} title="Hovered" description="No change: a spinner has no hover layer." />
 
-<DocsCanvasShell description={<>No pressed layer.</>}>
-    <DsCanvasQuiet of={SpinnerStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={SpinnerStories.Pressed} title="Pressed" description="No change." />
 
-<DocsCanvasShell description={<>Not a control, so Tab skips it.</>}>
-    <DsCanvasQuiet of={SpinnerStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={SpinnerStories.Focused} title="Focused" description="Not a control, so Tab skips it." />
 
 </div>
 
@@ -119,12 +106,20 @@ An animated ring that says a wait is in progress, with no duration to report.
 ## Usage
 
 Use `Spinner` when the wait is short, indeterminate, and the user has nothing
-to do but wait — a submit in flight, a panel fetching on open. It says
+to do but wait: a submit in flight, a panel fetching on open. It says
 "working", and that is all it says.
 
-`size` is a pixel diameter — 16, 24 or 48 — and nothing in between.
-`appearance="inherit"` takes the surrounding text color; `"invert"` is for a
-bold or colored background.
+### Appearance guidance
+
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Inherit</td><td>The default. The ring takes the surrounding text color, so it matches a label, a panel or a disabled control.</td></tr>
+<tr><td>Invert</td><td>On a bold or colored background.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -132,7 +127,7 @@ bold or colored background.
 
 ## Parts
 
-1. **Ring.** A circle with one side open, turning.
+1. **Ring.** A circle with one side open, turning. Its stroke is an eighth of the diameter.
 2. **Label.** Visually hidden text read as a status, "Loading" unless `label` names more.
 
 ### States
@@ -142,8 +137,11 @@ bold or colored background.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Spinning</td><td>The ring turns at 0.75s. Under reduced motion it slows to 1.5s rather than stopping.</td></tr>
-<tr><td>Hovered, pressed, focused, disabled</td><td>None. It is not a control.</td></tr>
+<tr><td>Rest</td><td>The ring turns at 0.75s. Under reduced motion it slows to 1.5s rather than stopping.</td></tr>
+<tr><td>Hovered</td><td>None. It is not a control.</td></tr>
+<tr><td>Pressed</td><td>None.</td></tr>
+<tr><td>Focused</td><td>None. It is not in the tab order.</td></tr>
+<tr><td>Disabled</td><td>None. Inside a disabled control, <code>inherit</code> takes that control's color.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -155,8 +153,7 @@ bold or colored background.
 </thead>
 <tbody>
 <tr><td>Ring</td><td><code>currentColor</code>; <code>--ds-icon-inverse</code> for <code>invert</code>.</td></tr>
-<tr><td>Size</td><td><code>--spinner-size-sm</code>, <code>--spinner-size-md</code>, <code>--spinner-size-lg</code> (16, 24, 48).</td></tr>
-<tr><td>Stroke</td><td>An eighth of the diameter.</td></tr>
+<tr><td>Size</td><td><code>--spinner-size-sm</code> (16), <code>--spinner-size-md</code> (24), <code>--spinner-size-lg</code> (48), read through <code>--plus-spinner-size</code>.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -166,28 +163,60 @@ bold or colored background.
 
 ## Best practices
 
-### The color comes from `appearance`, not a prop that picks a hue.
+### Size the spinner to its container.
 
-```jsx
-// Incorrect — there is no color prop; a spinner is not a status color.
-<Spinner color="primary" />
+A small control takes the 16 spinner; a large one dwarfs the label it replaces.
 
-// Correct — inherit takes currentColor, so it matches its surroundings.
-<Spinner appearance="inherit" />
-```
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner size={16} /><span>Saving notes</span></div>}
+    doCaption="16 spinner in a small control."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner size={48} /><span>Saving notes</span></div>}
+    dontCaption="48 spinner in a small control."
+/>
 
-### A spinner replaces the thing it is waiting on, or sits beside it.
+### Use invert on dark surfaces.
 
-```jsx
-// Incorrect — the button resizes as the label is swapped for a spinner, and
-// the row jumps.
-<Button appearance="primary">{saving ? <Spinner size={16} /> : 'Save'}</Button>
+Inherit takes the text color around it; on a dark ground use invert so it
+stays visible. There is no color prop: a spinner is not a status color.
 
-// Correct — keep the label, put the spinner beside it, and disable.
-<Button appearance="primary" isDisabled={saving}>
-    {saving && <Spinner size={16} />} Save
-</Button>
-```
+<DoDontPair
+    doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-neutral-bold)' }}><Spinner appearance="invert" /></div>}
+    doCaption="Invert on a dark surface."
+    dontExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-neutral-bold)' }}><Spinner /></div>}
+    dontCaption="Inherit on a dark surface."
+/>
+
+### One spinner per wait.
+
+Several spinners on one view compete for attention; show one for the whole load.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner /></div>}
+    doCaption="A single spinner."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner /><Spinner /><Spinner /></div>}
+    dontCaption="A spinner on every block."
+/>
+
+### Show a busy button with its own loading state.
+
+<DoDontPair
+    doExample={<Button appearance="primary" text="Save notes" isLoading />}
+    doCaption="isLoading puts the spinner inside the button and blocks it."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Button appearance="primary" text="Save notes" /><Spinner size={16} /></div>}
+    dontCaption="A loose spinner beside a button that can still be pressed."
+/>
+
+### Say what is loading when a wait runs long.
+
+After a few seconds a spinner stops reading as "working" and starts reading
+as "stuck".
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner size={16} /><span>Loading session plans</span></div>}
+    doCaption="Text beside the spinner names the wait."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner size={16} /></div>}
+    dontCaption="A bare spinner as the only sign of a long wait."
+/>
 
 </div>
 
@@ -201,7 +230,6 @@ bold or colored background.
 </thead>
 <tbody>
 <tr><td>Say what is loading when it is not obvious: "Loading session plans".</td><td>Leave a bare "Loading" as the only thing on a page.</td></tr>
-<tr><td>Show text with the spinner after a few seconds.</td><td>Leave a spinner as the only sign of a long wait.</td></tr>
 <tr><td>Keep the label to a few words.</td><td>Write a sentence in the label.</td></tr>
 </tbody>
 </DocsTable>
@@ -213,21 +241,18 @@ bold or colored background.
 ## Accessibility
 
 - **It announces itself as a status.** `role="status"` is the default, with a
-  visually hidden label — "Loading" unless `label` names something more
+  visually hidden label: "Loading" unless `label` names something more
   specific.
 - **A status region is only announced when it changes.** A spinner rendered
   into a region that was already on the page is announced; one that arrives
   with a whole new screen usually is not. If the wait matters, put the live
   region where it will still be there afterwards and swap its contents.
 - **Say what is loading, if it is not obvious.** "Loading" beside a form is
-  fine. "Loading" as the only thing on a page is not — override `label` with
+  fine. "Loading" as the only thing on a page is not; override `label` with
   something more specific.
 - **Reduced motion is handled.** The rotation slows under
   `prefers-reduced-motion: reduce` rather than stopping outright, so the ring
   still reads as working.
-- **Never make it the only feedback for a long wait.** After a few seconds a
-  spinner stops reading as "working" and starts reading as "stuck". Pair it
-  with text.
 
 </div>
 
@@ -237,12 +262,11 @@ bold or colored background.
 
 - For a wait whose length is known, use `ProgressBar`. A determinate bar
   answers "how much longer", which a spinner never can.
-- For content loading into a layout that already has a shape, use `Skeleton` —
+- For content loading into a layout that already has a shape, use `Skeleton`:
   it holds the shape and does not flash. A spinner is for when there is no
   shape yet.
 - For a result once the wait ends, use `SectionMessage` or `Flag`.
-- For a control that is busy rather than a region, disable the `Button` and
-  put the spinner inside it.
+- For a button that is busy, set its `isLoading`; the `Button` draws its own spinner.
 - For a wait under about 300ms, show nothing. The spinner appears and
   vanishes as a flicker, which reads as a glitch rather than as work.
 

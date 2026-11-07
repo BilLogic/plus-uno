@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as ProgressBarStories from './ProgressBar.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { ProgressBar } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -49,41 +56,27 @@ A determinate bar for a task whose proportion done is known.
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>A single bar at 50%, the 8px height every bar shares.</>}>
-    <Canvas of={ProgressBarStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Appearance
 
-<DocsCanvasShell description={<><code>success</code> marks completion; <code>inverse</code> reads on a bold or colored background.</>}>
-    <DsCanvasQuiet of={ProgressBarStories.Appearances} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressBarStories.Overview} title="Default" description="A single bar at 50%, the 8 height every bar shares." />
+
+<ComponentExample of={ProgressBarStories.Appearances} title="Default, success and inverse" description={<><code>success</code> marks completion; <code>inverse</code> reads on a bold or colored background.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Content
+## Size and layout
 
-<DocsCanvasShell description={<>The bar's own height has no room for a label — put the text beside it.</>}>
-    <DsCanvasQuiet of={ProgressBarStories.WithACaption} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressBarStories.WithACaption} title="With a caption" description="The bar's own height has no room for a label, so put the text beside it." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Indeterminate
+## Behavior
 
-<DocsCanvasShell description={<>The duration is unknown: a segment sweeps the track instead of a fixed width.</>}>
-    <DsCanvasQuiet of={ProgressBarStories.Indeterminate} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressBarStories.Indeterminate} title="Indeterminate" description="The duration is unknown: a segment sweeps the track instead of a fixed width." />
 
 </div>
 
@@ -91,21 +84,13 @@ A determinate bar for a task whose proportion done is known.
 
 ## State
 
-<DocsCanvasShell description={<>A determinate bar at 50%.</>}>
-    <DsCanvasQuiet of={ProgressBarStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressBarStories.Rest} title="Rest" description="A determinate bar at 50%." />
 
-<DocsCanvasShell description={<>The bar has no hover layer, so nothing moves.</>}>
-    <DsCanvasQuiet of={ProgressBarStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressBarStories.Hovered} title="Hovered" description="No change: the bar has no hover layer." />
 
-<DocsCanvasShell description={<>No pressed layer.</>}>
-    <DsCanvasQuiet of={ProgressBarStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressBarStories.Pressed} title="Pressed" description="No change." />
 
-<DocsCanvasShell description={<>Not a control, so Tab skips it.</>}>
-    <DsCanvasQuiet of={ProgressBarStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressBarStories.Focused} title="Focused" description="Not a control, so Tab skips it." />
 
 </div>
 
@@ -137,12 +122,22 @@ A determinate bar for a task whose proportion done is known.
 
 ## Usage
 
-Use `ProgressBar` when the proportion done is known and worth showing — an
+Use `ProgressBar` when the proportion done is known and worth showing: an
 upload, a course, a multi-step form. If you cannot say how far along it is,
 a `Spinner` is the honest control.
 
-`value` is a percent, 0 to 100, ignored when `isIndeterminate`. `appearance`
-is `default`, `success` or `inverse`.
+### Appearance guidance
+
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Default</td><td>Most bars: a brand fill on a neutral track.</td></tr>
+<tr><td>Success</td><td>Marks completion. Show a finished task at 100 in success.</td></tr>
+<tr><td>Inverse</td><td>On a bold or colored background.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -160,10 +155,12 @@ is `default`, `success` or `inverse`.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Determinate</td><td>The fill width is <code>value</code>, clamped to 0 to 100 together with <code>aria-valuenow</code>.</td></tr>
-<tr><td>Indeterminate</td><td>A segment slides along the track. No value is announced.</td></tr>
-<tr><td>Complete</td><td><code>appearance="success"</code> at 100.</td></tr>
-<tr><td>Hovered, pressed, focused, disabled</td><td>None. It is not a control.</td></tr>
+<tr><td>Rest</td><td>Determinate: the fill width is <code>value</code>, clamped to 0 to 100 together with <code>aria-valuenow</code>.</td></tr>
+<tr><td>Indeterminate</td><td>A segment slides along the track. No value is announced. Under reduced motion the segment holds still.</td></tr>
+<tr><td>Hovered</td><td>None. It is not a control.</td></tr>
+<tr><td>Pressed</td><td>None.</td></tr>
+<tr><td>Focused</td><td>None. It is not in the tab order.</td></tr>
+<tr><td>Disabled</td><td>None. A bar has no disabled state.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -175,8 +172,8 @@ is `default`, `success` or `inverse`.
 </thead>
 <tbody>
 <tr><td>Track</td><td><code>--ds-background-neutral</code>, <code>--progress-bar-height</code> tall, <code>--radius-full</code>.</td></tr>
-<tr><td>Fill</td><td><code>--ds-background-brand-bold</code>; <code>--ds-background-success-bold</code> for <code>success</code>.</td></tr>
-<tr><td>Inverse</td><td><code>--ds-background-inverse-subtle</code> on a bold or colored ground.</td></tr>
+<tr><td>Fill</td><td><code>--ds-background-brand-bold</code> through <code>--plus-progressbar-fill-color</code>; <code>--ds-background-success-bold</code> for <code>success</code>.</td></tr>
+<tr><td>Inverse</td><td>Track <code>--ds-background-inverse-subtle</code>, fill <code>--ds-background-inverse-subtle-pressed</code>.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -186,26 +183,64 @@ is `default`, `success` or `inverse`.
 
 ## Best practices
 
-### `isIndeterminate` drops `value`.
+### Indeterminate when the length is unknown.
 
-```jsx
-// Incorrect — value is announced even though the duration is unknown.
-<ProgressBar value={40} isIndeterminate />
+A bar that fills implies a known total; use the moving bar when the work has
+no measurable end. `isIndeterminate` drops `value` and the value attributes.
 
-// Correct.
-<ProgressBar isIndeterminate ariaLabel="Loading" />
-```
+<DoDontPair
+    doExample={<ProgressBar isIndeterminate ariaLabel="Loading" />}
+    doCaption="Indeterminate for an unknown wait."
+    dontExample={<ProgressBar value={10} ariaLabel="Loading" />}
+    dontCaption="A determinate bar stuck at the start."
+/>
 
-### Keep `value` inside its bounds.
+### Use inverse on bold surfaces.
 
-The drawn width and the announced `aria-valuenow` clamp together, so a
-`value` outside 0–100 never draws a full bar while reporting a number past
-its own maximum.
+The default track disappears on a bold ground; inverse keeps the bar readable.
+
+<DoDontPair
+    doExample={<div style={{ padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-brand-bold)' }}><ProgressBar value={60} appearance="inverse" ariaLabel="Upload" /></div>}
+    doCaption="Inverse appearance on a bold surface."
+    dontExample={<div style={{ padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-brand-bold)' }}><ProgressBar value={60} ariaLabel="Upload" /></div>}
+    dontCaption="Default appearance on a bold surface."
+/>
+
+### One bar per task.
+
+Stacked bars for one task read as separate jobs; show a single bar for the whole.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><ProgressBar value={30} ariaLabel="Upload" /></div>}
+    doCaption="A single bar."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><ProgressBar value={30} ariaLabel="Upload, part 1" /><ProgressBar value={30} ariaLabel="Upload, part 2" /><ProgressBar value={30} ariaLabel="Upload, part 3" /></div>}
+    dontCaption="Three bars for one task."
+/>
+
+### Put the number in text beside the bar.
+
+The bar is 8 tall and carries no text of its own.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><ProgressBar value={68} ariaLabel="68% of goals met" /><span>68% of goals met</span></div>}
+    doCaption="A caption beside the bar says what the fill means."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><ProgressBar value={68} ariaLabel="68% of goals met" /></div>}
+    dontCaption="A bare bar leaves the reader to guess the number."
+/>
+
+### Show a finished task as success.
+
+<DoDontPair
+    doExample={<ProgressBar value={100} appearance="success" ariaLabel="Course complete" />}
+    doCaption="At 100, the success appearance marks the task done."
+    dontExample={<ProgressBar value={100} ariaLabel="Course complete" />}
+    dontCaption="A finished task left as a brand bar."
+/>
 
 ### Name the bar for what it measures.
 
 ```jsx
-// Incorrect — two bars on a page both announce "Progress".
+// Incorrect: two bars on a page both announce "Progress".
 <ProgressBar value={68} />
 
 // Correct.
@@ -224,8 +259,7 @@ its own maximum.
 </thead>
 <tbody>
 <tr><td>Name the bar for what it measures: "68% of goals met".</td><td>Leave the default "Progress" label.</td></tr>
-<tr><td>Put the percent or count in text beside the bar.</td><td>Expect the 8 tall bar to carry text.</td></tr>
-<tr><td>Show 100 as the success appearance when the task is done.</td><td>Leave a finished task as a brand bar.</td></tr>
+<tr><td>Use the same words in the caption and in <code>ariaLabel</code>: "68% of goals met".</td><td>Say one thing on screen and another to a screen reader.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -238,13 +272,10 @@ its own maximum.
 - **The bar is a real progressbar.** `role="progressbar"` with
   `aria-valuenow`, `aria-valuemin` and `aria-valuemax` when determinate, and
   an `aria-label` that defaults to "Progress".
-- **The indeterminate state drops the value attributes rather than faking
-  one.** A screen reader hears that work is under way, not a number that
-  does not mean anything.
 - **Reduced motion is handled.** The indeterminate sweep stops under
   `prefers-reduced-motion: reduce`.
-- **Color is not the message.** `appearance` colors the bar; it carries no
-  text of its own, so pair it with a caption when the value needs to be read.
+- **Color is not the message.** `appearance` colors the bar and says nothing
+  to a screen reader; the `ariaLabel` and a caption carry the meaning.
 
 </div>
 
