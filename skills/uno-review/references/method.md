@@ -33,14 +33,14 @@ Lenses run **in parallel** and stay in-lane — no lens comments outside its own
 
 What each lens applies (the rules live in the docs, not here):
 
-- `reviewers/ds-lens` — components / tokens / layout vs the DS agent-views and `AGENTS.md` § Hard rules. Coded artifacts: also the catch-pattern greps (`references/catch-patterns.md`, automated by `skills/uno-review/scripts/run-review-checks.sh`).
+- `reviewers/ds-lens` — coded artifacts: `check:ds-usage` escapes first, reported by rule ID as the checker gives them; then components, layout and hierarchy vs the DS agent-views and `AGENTS.md` § Hard rules, for what no checker sees.
 - `reviewers/uno-lens` — artifact vs PRD + uno-blueprint constraints, queried live at review time.
 - `reviewers/a11y-lens` — `design-system/guidelines/foundations/accessibility.md`: WCAG AA contrast, 44×44 targets, keyboard reach, focus order + visibility, semantic HTML / screen readers, color-not-alone, reduced motion.
 - `reviewers/design-qa` — the 📐 Specs pages' Dev Mode annotations (`docs/connectors/figma/overview.md`) + the Design QA checklist (Notion 🧩 Templates): components, tokens, spacing, typography, states, interaction behavior.
 
 ## Findings & severity
 
-Every finding carries **severity · lens · evidence (what's in the artifact) · reference (the doc/rule it violates) · suggested re-entry point**. No evidence, no finding; low-confidence findings are omitted, not hedged — 3 strong findings beat 7 mushy ones. "What's working" is mandatory: 1–3 specific strengths with citations, so designers know what to keep. Zero findings is a valid result.
+Every finding carries **severity · lens · evidence (what's in the artifact) · reference (the doc/rule it violates) · suggested re-entry point**. A `check:ds-usage` escape at level fail is a **blocker** (each of its rules is a hard rule broken); one at level warn is a **minor**. No evidence, no finding; low-confidence findings are omitted, not hedged — 3 strong findings beat 7 mushy ones. "What's working" is mandatory: 1–3 specific strengths with citations, so designers know what to keep. Zero findings is a valid result.
 
 | Severity | Meaning | Effect |
 |---|---|---|
