@@ -5,6 +5,8 @@ import { Breadcrumb, Button, Modal, Sidebar } from '@/components';
 import { AiChat, AI_CHAT_STORAGE_KEY, PANEL_STORAGE_KEY } from '@/patterns';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import DocsAiAgent from '@/storybook-docs/chrome/DocsAiAgent';
+import { buildDocsEntries } from '@/storybook-docs/chrome/docsSearch';
 
 /**
  * AI chat — a floating action button at the bottom right of the Page opens
@@ -279,5 +281,69 @@ export const ModalLeavesThePopupOpen = {
         await userEvent.click(within(dialog).getByRole('button', { name: 'Done' }));
         await waitFor(() => expect(within(document.body).queryByRole('dialog', { name: 'Page settings' })).toBeNull());
         await expect(p.popup(), 'still open after the Modal').not.toBeNull();
+    }),
+};
+
+/* ------------------------------------------- the Storybook docs' agent */
+
+const DOCS_ENTRIES = buildDocsEntries({
+    entries: {
+        'button--docs': { id: 'button--docs', title: 'Forms and inputs/Button', type: 'docs' },
+        'modal--docs': { id: 'modal--docs', title: 'Overlays/Modal', type: 'docs' },
+    },
+}, ['Button', 'Modal']);
+
+const docsHrefFor = (id) => `/?path=/docs/${id}`;
+const DOCS_STORAGE_KEY = `${AI_CHAT_STORAGE_KEY}-storybook`;
+const DOCS_PANEL_KEY = 'plus-frame-panel-storybook';
+
+/**
+ * The docs' floating button with the AI agent it opens, answered by a search
+ * of the docs. Open from the button, ask, follow the link, clear, move to the
+ * Panel and back, close.
+ */
+export const DocsAgent = {
+    tags: ['!autodocs'],
+    parameters: { layout: 'fullscreen' },
+    beforeEach: () => {
+        window.sessionStorage.removeItem(DOCS_STORAGE_KEY);
+        window.sessionStorage.removeItem(DOCS_PANEL_KEY);
+    },
+    render: () => <DocsAiAgent loadEntries={async () => DOCS_ENTRIES} hrefFor={docsHrefFor} />,
+    play: async () => withTestViewport(1440, HEIGHT, async () => {
+        const body = within(document.body);
+        const root = () => document.querySelector('.plus-docs-ai');
+        const popup = () => root().querySelector('.plus-ai-chat__floating');
+        const panel = () => root().querySelector('.plus-frame__panel');
+
+        await waitFor(() => expect(root()).not.toBeNull());
+        await userEvent.click(await within(root()).findByRole('button', { name: 'Prototype links' }));
+        await userEvent.click(await body.findByRole('menuitem', { name: 'AI agent' }));
+        await waitFor(() => expect(popup(), 'the AI agent opens the popup').not.toBeNull());
+
+        const input = within(popup()).getByRole('textbox', { name: 'Message to AI agent' });
+        await expect(input, 'focus lands in the input').toHaveFocus();
+        await userEvent.type(input, 'Where is Button?{Enter}');
+        const link = await within(popup()).findByRole('link', { name: 'Button' });
+        await expect(link, 'the answer links the docs page').toHaveAttribute('href', '/?path=/docs/button--docs');
+
+        const names = within(popup()).getAllByRole('button').map((b) => b.getAttribute('aria-label'));
+        await expect(names, 'no full screen, no more menu').toEqual(expect.arrayContaining(['Clear chat', 'Move to Panel', 'Close chat']));
+        await expect(names).not.toContain('Full screen');
+
+        await press(within(popup()), 'Clear chat');
+        await waitFor(() => expect(within(popup()).queryByRole('link', { name: 'Button' })).toBeNull());
+
+        await press(within(popup()), 'Move to Panel');
+        await waitFor(() => expect(panel(), 'the Panel opens').not.toBeNull());
+        await expect(Math.round(panel().getBoundingClientRect().right), 'at the right edge').toBe(window.innerWidth);
+        await expect(popup(), 'the popup is gone').toBeNull();
+        await expect(JSON.parse(window.sessionStorage.getItem(DOCS_STORAGE_KEY))).toEqual({ mode: 'panel', open: true });
+
+        await press(within(panel()), 'Move to popup');
+        await waitFor(() => expect(popup(), 'back in the popup').not.toBeNull());
+
+        await press(within(popup()), 'Close chat');
+        await waitFor(() => expect(popup(), 'Close closes it').toBeNull());
     }),
 };

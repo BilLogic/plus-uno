@@ -42,7 +42,7 @@ export const DocsFab = ({ aiAgent = null }) => (
             <Menu.Portal>
                 <Menu.Positioner side="top" align="center" sideOffset={8} className="plus-docs-fab__positioner">
                     <Menu.Popup className="plus-docs-fab__menu" aria-label="Prototype links">
-                        {aiAgent && <Menu.Item closeOnClick={false} render={aiAgent} />}
+                        {aiAgent && <Menu.Item closeOnClick render={aiAgent} />}
                         <Menu.Item
                             closeOnClick
                             render={(

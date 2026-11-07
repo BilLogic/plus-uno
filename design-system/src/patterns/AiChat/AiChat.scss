@@ -31,6 +31,28 @@
     }
 }
 
+// Without the button, the popup floats where the button would be, raised to clear a host's own button.
+.plus-ai-chat__floating {
+    position: fixed;
+    inset-inline-end: var(--page-pad);
+    inset-block-end: calc(var(--page-pad) + var(--height-300) + var(--stack-md));
+    z-index: calc(var(--layer-navigation) - 1);
+    display: flex;
+    width: calc(var(--height-2000) * 2);
+    max-width: calc(100vw - var(--page-pad) * 2);
+    height: calc(var(--height-2000) * 2);
+    max-height: calc(100vh - var(--height-300) - var(--page-pad) * 3);
+    overflow: hidden;
+    border-radius: var(--popover-radius);
+    background-color: var(--ds-surface-overlay);
+    box-shadow: var(--ds-shadow-overlay);
+}
+
+.plus-ai-chat__links {
+    margin: 0;
+    padding-inline-start: var(--pad-x-md);
+}
+
 // Full screen: the whole window, above the Frame and below a Modal.
 .plus-ai-chat__fullscreen {
     position: fixed;
