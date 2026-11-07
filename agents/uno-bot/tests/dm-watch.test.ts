@@ -14,6 +14,7 @@ import type { ScheduledJob } from "../src/scheduled/runs";
 import { onScheduledFiring, planRun, type ScheduledRun } from "../src/scheduled/runs";
 import { detectorChars, MAX_COMMITMENT_THREAD_CHARS, type CommitmentDetector, type EvidenceJudge } from "../src/commitments/detector";
 import { footerLabels } from "../src/commitments/copy";
+import { reactPromise } from "../src/commitments/promise-door";
 import type { SweepSlackMessage } from "../src/sweep/run";
 import {
   accessOf,
@@ -52,6 +53,13 @@ const THU = at(31, 13);
 const FRI = at(32, 13);
 const READ: ScheduledJob = { key: `dm-promise-read:${MAYA}`, kind: "dm-promise-read", user: MAYA };
 const NUDGE: ScheduledJob = { key: `dm-promise-nudge:${MAYA}`, kind: "dm-promise-nudge", user: MAYA };
+
+type Card = { title: { text: string }; subtitle: { text: string }; body: { text: string }; actions?: Array<{ text: { text: string } }> };
+/** A posted message's promise cards. */
+function cardsOf(blocks: unknown[]): Card[] {
+  return (blocks as Array<{ type: string; elements?: Card[] }>).flatMap((b) => (b.type === "carousel" ? b.elements! : b.type === "card" ? [b as unknown as Card] : []));
+}
+const labels = (c: Card) => (c.actions ?? []).map((a) => a.text.text);
 
 const BEA_PROMISE = ts(29, 17);
 const MAYA_PROMISE = ts(29, 17, 5);
@@ -357,9 +365,12 @@ describe("the morning reminder", () => {
     assert.equal(w.posts.length, 1);
     const post = w.posts[0]!;
     assert.equal(post.channel, `D-UNO-${MAYA}`);
-    assert.match(post.text, /^Bea said they'd send the tokens doc by Wed\. I haven't spotted it yet\. Want to follow up\?/);
-    assert.ok(!post.text.includes(`<@${BEA}>`), "the promiser is named, never mentioned");
-    assert.equal(footerLabels(post.blocks), MADE_TO_CHOICES.map((c) => c.label).join(" · "));
+    const [card] = cardsOf(post.blocks);
+    assert.equal(card!.title.text, "Bea: send the tokens doc");
+    assert.equal(card!.subtitle.text, "Owed to you, was due Wed Sep 30");
+    assert.equal(card!.body.text, `Bea said they'd send the tokens doc. <${permalinkOf(URL, DM_BEA, BEA_PROMISE)}|Your DM with Bea>, on Tue.`);
+    assert.deepEqual(labels(card!), ["Drop it", "Wait", "Got it"]);
+    assert.ok(!JSON.stringify(post).includes(`<@${BEA}>`), "the promiser is named, never mentioned");
     // The only writes the owner's token could make: none — its port has reads only.
     assert.deepEqual(Object.keys(w.slack.api).sort(), ["history", "identity", "ims", "searchPublic"]);
     const row = w.records.rows()[0]!;
@@ -376,13 +387,16 @@ describe("the morning reminder", () => {
     assert.equal((await runDmPromiseNudges(NUDGE, nudgeDeps(w, FRI))).summary, "nothing due");
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(35, 13))); // Mon Oct 5
     assert.equal(w.posts.length, 1);
-    assert.match(w.posts[0]!.text, new RegExp(`^\\*On Tue you said you'd review the PRD\\*\\n<@${MAYA}> `));
+    const [card] = cardsOf(w.posts[0]!.blocks);
+    assert.equal(card!.title.text, "Review the PRD");
+    assert.equal(card!.subtitle.text, "Set a date");
+    assert.match(card!.body.text, /^You told Bea you'd review the PRD\. Pick a date/);
     // One more two working days on: Wednesday.
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 13)));
     assert.equal(w.posts.length, 1);
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(37, 13)));
     assert.equal(w.posts.length, 2);
-    assert.match(w.posts[1]!.text, /Checking in once more/);
+    assert.equal(cardsOf(w.posts[1]!.blocks)[0]!.subtitle.text, "Set a date");
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(42, 13))); // Mon Oct 12
     assert.equal(w.posts.length, 2);
     assert.equal(w.records.rows()[0]!.state, "lapsed");
@@ -510,7 +524,7 @@ describe("evidence beyond the DM", () => {
     const seen: string[][] = [];
     const report = await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU, judgeDoneOn(POSTED, seen)));
     assert.equal(report.summary, "1 nudged");
-    assert.match(w.posts[0]!.text, /I haven't spotted it yet/);
+    assert.equal(cardsOf(w.posts[0]!.blocks).length, 1);
     assert.ok(seen.flat().every((line) => !line.includes("archives/")), "no hit reached the judge");
   });
 
@@ -560,6 +574,9 @@ describe("evidence beyond the DM", () => {
 });
 
 describe("answering a DM reminder", () => {
+  // The legend reminders' own door, which still answers a reminder posted
+  // before the cards: the gate tries the promise cards' door first
+  // (`reactPromise`), and a message with no open card falls through to this.
   async function remindedWorld() {
     const w = world();
     await turnOn(w, ["promises_to_me"]);
@@ -794,32 +811,38 @@ describe("⏳, token refusals and the scopes a switch needs", () => {
     await runDmPromiseRead(READ, readDeps(w, EOD));
     return w;
   }
-  const react = (w: World, glyph: string, when: number) => {
+  /** A reaction on the newest card message, through the promise cards' door,
+   *  which the gate tries first. */
+  const react = async (w: World, glyph: string, when: number) => {
     const row = w.records.rows()[0]!;
-    return answerDmReminder(
-      { channel: `D-UNO-${MAYA}`, messageTs: (row.followupTs ?? row.nudgeTs)!, glyph, userId: MAYA, messageAuthorId: BOT },
-      { records: w.records, reminderBody: async () => "body", update: async () => true, botUserId: async () => BOT, now: () => when },
+    const messageTs = (row.followupTs ?? row.nudgeTs)!;
+    const outcome = await reactPromise(
+      { channel: `D-UNO-${MAYA}`, messageTs, glyph, userId: MAYA, messageAuthorId: BOT },
+      {
+        dmRecords: w.records,
+        message: async (_c, ts) => w.posts.find((p) => p.ts === ts)?.blocks ?? null,
+        update: async () => true,
+        openView: async () => true,
+        now: () => when,
+      },
     );
+    return outcome.claimed && !outcome.refused;
   };
-  const legendOf = (post: { blocks: unknown[] }) => footerLabels(post.blocks);
 
-  it("⏳ on the follow-up brings the check-back it promises, twice at most, and the last post offers no ⏳", async () => {
+  it("⏳ on the follow-up brings the check-back it promises, twice at most", async () => {
     const w = await toBeaReminded();
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU)); // the reminder
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 13))); // Tue Oct 6: the follow-up
     assert.equal(w.posts.length, 2);
-    assert.match(w.posts[1]!.text, /Checking in once more/);
     assert.equal(await react(w, "hourglass_flowing_sand", at(36, 15)), true);
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(39, 13))); // Fri Oct 9: the check-back
     assert.equal(w.posts.length, 3);
-    assert.match(w.posts[2]!.text, /^Bea said they'd send the tokens doc/);
-    assert.equal(legendOf(w.posts[2]!), MADE_TO_CHOICES.map((c) => c.label).join(" · "));
+    assert.equal(cardsOf(w.posts[2]!.blocks)[0]!.subtitle.text, "Owed to you, was due Thu Oct 8");
     await react(w, "hourglass_flowing_sand", at(39, 15));
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(44, 13))); // Wed Oct 14: the second check-back
     assert.equal(w.posts.length, 4);
-    assert.equal(legendOf(w.posts[3]!), MADE_TO_LAST_CHOICES.map((c) => c.label).join(" · "));
     // A third ⏳ changes nothing.
-    await react(w, "hourglass_flowing_sand", at(44, 15));
+    assert.equal(await react(w, "hourglass_flowing_sand", at(44, 15)), false);
     assert.equal(w.records.rows()[0]!.snoozes, 2);
   });
 

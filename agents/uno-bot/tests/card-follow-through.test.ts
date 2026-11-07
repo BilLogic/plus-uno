@@ -196,6 +196,8 @@ function morning(
   };
   const deps: NudgeDeps = {
     slack: {
+      dmChannel: async () => null,
+      userName: async () => null,
       replies: async () => ({ messages: [] }),
       history: async () => ({ messages: [] }),
       permalink: async () => null,
@@ -1360,6 +1362,8 @@ describe("beside \"remind me\"", () => {
     const seen: string[] = [];
     const deps: NudgeDeps = {
       slack: {
+        dmChannel: async () => null,
+        userName: async () => null,
         replies: async () => ({ messages: [] }),
         history: async () => ({ messages: [] }),
         permalink: async () => null,
@@ -1874,6 +1878,8 @@ function quietMorning(store: InMemoryCommitmentStore, now: number, cards?: Nudge
   const posts: Array<{ channel: string; ts: string }> = [];
   const deps: NudgeDeps = {
     slack: {
+      dmChannel: async () => null,
+      userName: async () => null,
       replies: async () => ({ messages: [] }),
       history: async () => ({ messages: [] }),
       permalink: async () => null,

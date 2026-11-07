@@ -126,6 +126,8 @@ function world(opts: {
   });
   const nudgeDeps: NudgeDeps = {
     slack: {
+      dmChannel: async () => null,
+      userName: async () => null,
       replies: async () => assert.fail("a DM ask reads no thread in the morning"),
       history: async () => assert.fail("a DM ask reads no channel in the morning"),
       permalink: async () => null,
@@ -793,6 +795,8 @@ describe("a DM ask waits behind a person's own asks", () => {
     const order: string[] = [];
     const nudges = await runCommitmentNudges(NUDGE, {
       slack: {
+        dmChannel: async () => null,
+        userName: async () => null,
         replies: async () => null,
         history: async () => null,
         permalink: async () => null,

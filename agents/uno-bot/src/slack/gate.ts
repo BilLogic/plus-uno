@@ -30,7 +30,8 @@ import { slackDelivery } from "./slack-delivery";
 import { standingConfirmersOf } from "./standing-confirmers";
 import { reactionRecorderFor } from "../usage/resolution-env";
 import { thanksRecorderFor } from "../usage/appreciation-env";
-import { reminderDoorFor } from "../commitments/env";
+import { promiseDoorFor, reminderDoorFor } from "../commitments/env";
+import { reactPromise } from "../commitments/promise-door";
 import { dmReminderDoorFor } from "../dm-watch/env";
 import type { ReminderOutcome } from "../commitments/copy";
 import { eitherDoor, type ReminderPressDoor } from "../commitments/press";
@@ -103,8 +104,16 @@ function reactionDoorDeps(env: Env): ReactionDoorDeps {
 
     recordThanks: thanksRecorderFor(env),
 
-    ...withReminder(claimedOf(eitherDoor(dmReminderDoorFor(env), reminderDoorFor(env)))),
+    ...withReminder(claimedOf(eitherDoor(promiseReactionDoorFor(env), eitherDoor(dmReminderDoorFor(env), reminderDoorFor(env))))),
   };
+}
+
+/** A reaction on a morning's promise cards, answered as the one open card's
+ *  buttons would answer it; a message with no open card is left to the
+ *  reminders' own doors. */
+function promiseReactionDoorFor(env: Env): ReminderPressDoor | undefined {
+  const deps = promiseDoorFor(env);
+  return deps ? (r) => reactPromise(r, deps) : undefined;
 }
 
 /** A reaction needs only whether a reminder claimed it: one left unanswered is

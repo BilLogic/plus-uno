@@ -18,7 +18,9 @@
 import type { Env } from "../types";
 import { selectProvider } from "../agent/run-agent";
 import { budgetHeadroom } from "../net";
-import { getBotIdentity, getPermalink, postMessage, updateMessage } from "../slack/api";
+import { conversationsOpen, conversationsReplies, getBotIdentity, getPermalink, postMessage, updateMessage, usersInfo, viewsOpen } from "../slack/api";
+import { dmWatchRecordsFor } from "../dm-watch/env";
+import type { PromiseDoorDeps } from "./promise-door";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import { measured, readSource, sweepSlackFor } from "../sweep/env";
 import { markSweepThread } from "../sweep/thread-mark";
@@ -96,6 +98,8 @@ export async function runCommitmentNudgesOnEnv(
         return res.ok && res.ts ? { ok: true, ts: res.ts } : { ok: false };
       },
       update: (channel, ts, message) => updateReminder(env, channel, ts, message),
+      dmChannel: (userId) => measured(() => conversationsOpen(env, userId)),
+      userName: (userId) => measured(() => displayNameOf(env, userId)),
     },
     sources: { read: (url, kind) => measured(() => readSource(env, url, kind)) },
     judge: { judge: (input) => measured(() => judge.judge(input)) },
@@ -146,4 +150,36 @@ async function updateReminder(env: Env, channel: string, ts: string, message: { 
 
 function pick(slack: ReturnType<typeof sweepSlackFor>): Pick<CommitmentDeps["slack"], "replies" | "history"> {
   return { replies: slack.replies, history: slack.history };
+}
+
+/** How a promise card names someone: their display name, or null. */
+async function displayNameOf(env: Env, userId: string): Promise<string | null> {
+  const res = await usersInfo(env, userId);
+  const u = res.ok ? res.user : undefined;
+  return u?.profile?.display_name || u?.real_name || u?.name || null;
+}
+
+/**
+ * The promise cards' door on `Env` (`./promise-door.ts`): both stores, the
+ * message read back with the bot token, its edit, and the pop-up. Undefined
+ * when neither store is bound.
+ *
+ * @param env - Worker bindings
+ */
+export function promiseDoorFor(env: Env): PromiseDoorDeps | undefined {
+  const store = commitmentStoreFor(env);
+  const dmRecords = dmWatchRecordsFor(env);
+  if (!store && !dmRecords) return undefined;
+  return {
+    ...(store ? { store } : {}),
+    ...(dmRecords ? { dmRecords } : {}),
+    async message(channel, ts) {
+      const res = await conversationsReplies(env, channel, ts, 1);
+      const m = res.ok ? res.messages?.find((x) => x.ts === ts) : undefined;
+      return m?.blocks ?? null;
+    },
+    update: (channel, ts, message) => updateReminder(env, channel, ts, message),
+    openView: async (triggerId, view) => (await viewsOpen(env, triggerId, view)) !== null,
+    now: () => Date.now(),
+  };
 }

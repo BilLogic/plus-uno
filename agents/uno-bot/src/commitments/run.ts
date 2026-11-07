@@ -1,6 +1,6 @@
 // Commitment reminders, end to end: read a promise at the end of the day,
-// nudge its promiser in its own thread at a weekday morning run, and take the
-// answer as a reaction.
+// remind its promiser with a card in their DM with uno-bot at a weekday
+// morning run, and take the answer from the card or a reaction.
 //
 // THREE ENTRY POINTS, one module:
 //
@@ -22,8 +22,9 @@
 //   morning. Before any nudge it looks for completion: the thread since the
 //   promise, the promiser's messages in the channel since, and the Notion and
 //   GitHub pages they linked; the judge reading those as done makes the row
-//   `auto_done` and nothing is sent. Otherwise the reminder goes up as a reply
-//   in the promise's thread, mentioning the promiser only: a heads-up before
+//   `auto_done` and nothing is sent. Otherwise the promise is held as a card
+//   (`./promise-cards.ts`), and once every row due has been looked at each
+//   promiser's cards go up as one message in their DM with uno-bot: a heads-up before
 //   the due moment re-arms `due_at` to the check-in; a check-in re-arms it two
 //   working days out for its one follow-up; a follow-up nobody answers makes
 //   the row `lapsed`. Two check-ins per commitment, beside its heads-up: a ⏳
@@ -46,12 +47,10 @@
 // thread with no evidence check, answers to 🙌 and ⏳ only, gets no follow-up,
 // and a ⏳ brings it back once at the morning run two working days out.
 //
-// WHERE IT POSTS. `pickDestination`, as every proactive job: a promise is a
-// message in a thread, so the reminder goes to that thread — back into a
-// private place only when the evidence was there. Never #uno-bot, never the
-// lead by default. A thread a reminder goes into is marked the way a sweep
-// card's is (`sweep/thread-mark.ts`), so the team's replies there don't start
-// turns.
+// WHERE IT POSTS. A promise's cards go to its promiser's DM with uno-bot,
+// never the team's thread. `pickDestination` still decides whether a promise
+// may be reminded at all: one made in #uno-bot, or in no thread, is not. A
+// "remind me" posts where it was asked.
 //
 // THE BUDGET. Each commitment starts only when what is left covers it
 // (`COMMITMENT_COST`); otherwise the job stops as the budget does and the
@@ -83,6 +82,7 @@ import {
   type TapAnswer,
 } from "./copy";
 import type { ReminderPress } from "./press";
+import { MAX_PROMISE_CARDS, promiseMessage, promiseRef, type PromiseCardInput, type PromiseCardKind } from "./promise-cards";
 import { mayHoldPromise, type CommitmentDetector, type EvidenceJudge, type FewShotExample, type PromiseAnswer, type ReleaseReason } from "./detector";
 import {
   checkInAt,
@@ -113,8 +113,9 @@ export const MAX_EVIDENCE_HISTORY_PAGES = 2;
 /** Linked Notion and GitHub pages read looking for completion. */
 export const MAX_EVIDENCE_SOURCES = 2;
 /** Reminders of a person's own asks (promises, "remind me") one promiser gets
- *  in one morning run; the rest wait a morning. */
-export const MAX_REMINDERS_PER_PERSON = 2;
+ *  in one morning run: as many as one message holds cards
+ *  (`MAX_PROMISE_CARDS`). The rest wait a morning. */
+export const MAX_REMINDERS_PER_PERSON = MAX_PROMISE_CARDS;
 /** Card follow-ups one promiser gets in one morning run, a budget of their
  *  own beside `MAX_REMINDERS_PER_PERSON`. */
 export const MAX_CARD_REMINDERS_PER_PERSON = 2;
@@ -140,6 +141,10 @@ export interface CommitmentSlack {
   post(to: { channel: string; threadTs: string | null }, message: ReminderMessage): Promise<{ ok: boolean; ts?: string }>;
   /** Replace a posted reminder's text in place: no new message, no ping. */
   update(channel: string, ts: string, message: ReminderMessage): Promise<boolean>;
+  /** A person's DM with uno-bot, opened: where their promise cards go. */
+  dmChannel(userId: string): Promise<string | null>;
+  /** How a card names someone: their display name, or null. */
+  userName(userId: string): Promise<string | null>;
 }
 
 export interface CommitmentConfig {
@@ -431,13 +436,14 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
   // Card rows held for `flush` keep the D1 writes that hand them back
   // (`release`) in reserve, so a budget stop before they post can still
   // return them to the next run rather than leave them checked for today.
-  const reserved = () => ({ ...COMMITMENT_COST, d1Queries: COMMITMENT_COST.d1Queries + (deps.cards?.held?.() ?? 0) });
+  const promises = promiseMorning(deps);
+  const reserved = () => ({ ...COMMITMENT_COST, d1Queries: COMMITMENT_COST.d1Queries + (deps.cards?.held?.() ?? 0) + promises.held() });
   try {
     for (;;) {
       ensureHeadroom(deps, reserved());
       const c = await deps.store.nextDue(now, runDate, { asked: capped("asked"), cards: capped("cards"), weekly: capped("weekly") });
       if (!c) break;
-      const action = await handleDue(deps, c, now, runDate);
+      const action = await handleDue(deps, c, now, runDate, promises);
       if (action.action === "nudged" || action.action === "followed-up") {
         const counts = reminded[budgetOf(c.kind)];
         counts[c.promiserId] = (counts[c.promiserId] ?? 0) + 1;
@@ -445,6 +451,14 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
       actions.push(action);
       // A rehearsal marks nothing, so the same row would come back: it shows one.
       if (deps.dryRun) break;
+    }
+    if (!deps.dryRun) {
+      ensureHeadroom(deps, reserved());
+      for (const posted of await promises.flush(now, runDate)) {
+        const i = actions.findIndex((a) => a.id === posted.id);
+        if (i >= 0) actions[i] = posted;
+        else actions.push(posted);
+      }
     }
     if (deps.cards?.flush && !deps.dryRun) {
       ensureHeadroom(deps, reserved());
@@ -455,6 +469,9 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
       }
     }
   } catch (err) {
+    await promises.release().catch((e: unknown) => {
+      console.error(`[commitments] held promises not handed back: ${e instanceof Error ? e.message : String(e)}`);
+    });
     if (deps.cards?.release) {
       await deps.cards.release().catch((e: unknown) => {
         console.error(`[commitments] held card rows not handed back: ${e instanceof Error ? e.message : String(e)}`);
@@ -465,7 +482,7 @@ export async function runCommitmentNudges(job: ScheduledJob, deps: NudgeDeps): P
   return report("handled", null);
 }
 
-async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runDate: string): Promise<CommitmentAction> {
+async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runDate: string, promises: PromiseMorning): Promise<CommitmentAction> {
   if (isCardKind(c.kind)) {
     if (deps.cards) return deps.cards.due(c, now, runDate);
     if (!deps.dryRun) await deps.store.update(c.id, { checkedOn: runDate });
@@ -531,40 +548,126 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
   }
 
   // One timeline (`due.ts`): a heads-up before the due moment, a check-in
-  // after it, or the ask for a date when none was named. A heads-up is not
-  // one of the two check-ins a promise gets.
+  // after it, or the ask for a date when none was named — each a card in the
+  // promiser's morning message (`promiseMorning`).
+  const permalink = await deps.slack.permalink(c.channel, c.messageTs);
+  if (!permalink) return hold("its message's link could not be read");
   const phase = reminderPhase(c.deadlineAt, now);
-  const first = c.nudges === 0;
-  const deadlineLabel = c.deadlineAt === null ? null : dayLabel(dueDayOf(c.deadlineAt), etDayOf(now));
-  const body =
-    phase === "heads-up"
-      ? headsUpText({ promiser: c.promiserId, what: text.what, deadlineLabel: deadlineLabel!, permalink: await deps.slack.permalink(c.channel, c.messageTs) })
-      : first
-        ? reminderText({
-            promiser: c.promiserId,
-            what: text.what,
-            deadlineLabel,
-            promisedLabel: dayLabel(etDayOf(c.promisedAt), etDayOf(now)),
-            permalink: await deps.slack.permalink(c.channel, c.messageTs),
-          })
-        : followUpText(c.promiserId);
-  const action = first ? "nudged" : "followed-up";
-  if (deps.dryRun) return { id: c.id, action, text: body };
+  const other = c.requesterId && c.requesterId !== c.promiserId ? await deps.slack.userName(c.requesterId) : null;
+  const card: PromiseCardInput = {
+    ref: promiseRef("thread", c.id),
+    kind: CARD_KIND[phase],
+    what: text.what,
+    ...(other ? { other } : {}),
+    ...(c.deadlineAt !== null ? { dueDay: dueDayOf(c.deadlineAt) } : {}),
+    madeDay: etDayOf(c.promisedAt),
+    today: etDayOf(now),
+    place: { url: permalink, label: THREAD_LABEL },
+  };
+  const action = c.nudges === 0 ? "nudged" : "followed-up";
+  if (deps.dryRun) return { id: c.id, action, text: promiseMessage([card]).text };
+  await promises.hold(c, card, phase);
+  return { id: c.id, action, note: HELD_FOR_MESSAGE };
+}
 
-  const posted = await deps.slack.post(place, { text: body, blocks: reminderBlocks(body, { choices: REMINDER_CHOICES }) });
-  if (!posted.ok || !posted.ts) return hold("Slack refused the post");
-  const slot = c.nudgeTs === null ? { nudgeTs: posted.ts } : { followupTs: posted.ts };
-  await settle(
-    phase === "heads-up"
-      ? { state: "nudged", holds: 0, remindedOn: runDate, dueAt: checkInAt(c.deadlineAt!), ...slot }
-      : { state: "nudged", nudges: c.nudges + 1, holds: 0, remindedOn: runDate, dueAt: followUpAt(now), ...slot },
-  );
-  await keepText(deps, c.id, { ...text, bodies: { ...text.bodies, [posted.ts]: body } }, now);
-  // The promise's thread is the team's, so it is marked; a reminder posted at a
-  // channel's top would start uno-bot's own thread, which stays unmarked, as a
-  // card follow-up's does.
-  if (place.threadTs) await deps.markThread(place.channel, place.threadTs);
-  return { id: c.id, action, text: body, ts: posted.ts };
+/** How a thread promise's card names where it was said. */
+export const THREAD_LABEL = "The thread";
+/** A promise held for its promiser's morning message, until it posts. */
+const HELD_FOR_MESSAGE = "held for the morning message";
+
+/** Each phase's card. */
+const CARD_KIND: Record<ReturnType<typeof reminderPhase>, PromiseCardKind> = {
+  "heads-up": "due-soon",
+  "check-in": "overdue",
+  "ask-date": "no-date",
+};
+
+/** The morning's promise cards, held per promiser until `flush` posts each
+ *  person's in one message in their DM with uno-bot. */
+interface PromiseMorning {
+  hold(c: CommitmentRecord, card: PromiseCardInput, phase: ReturnType<typeof reminderPhase>): Promise<void>;
+  flush(now: number, runDate: string): Promise<CommitmentAction[]>;
+  /** Rows held and not yet posted. */
+  held(): number;
+  /** A stop before `flush` finished: each held row's `checkedOn` goes back to
+   *  what it was, so the next run posts it. */
+  release(): Promise<void>;
+}
+
+function promiseMorning(deps: NudgeDeps): PromiseMorning {
+  type Held = { c: CommitmentRecord; card: PromiseCardInput; phase: ReturnType<typeof reminderPhase> };
+  const byPerson = new Map<string, Held[]>();
+  const before = new Map<string, string | null>();
+  return {
+    async hold(c, card, phase) {
+      // Checked now, so the morning's next look passes it over; `release`
+      // hands it back if the post never happens.
+      before.set(c.id, c.checkedOn);
+      await deps.store.update(c.id, { checkedOn: deps.runDate });
+      byPerson.set(c.promiserId, [...(byPerson.get(c.promiserId) ?? []), { c, card, phase }]);
+    },
+    async flush(now, runDate) {
+      const actions: CommitmentAction[] = [];
+      for (const [person, held] of byPerson) {
+        actions.push(...(await postPromises(deps, person, held, now, runDate)));
+        for (const h of held) before.delete(h.c.id);
+        byPerson.delete(person);
+      }
+      return actions;
+    },
+    held: () => before.size,
+    async release() {
+      for (const [id, checkedOn] of before) {
+        await deps.store.update(id, { checkedOn });
+        before.delete(id);
+      }
+      byPerson.clear();
+    },
+  };
+}
+
+/** One person's promise cards, posted as one message in their DM with
+ *  uno-bot, and each row moved along its timeline. */
+async function postPromises(
+  deps: NudgeDeps,
+  person: string,
+  held: Array<{ c: CommitmentRecord; card: PromiseCardInput; phase: ReturnType<typeof reminderPhase> }>,
+  now: number,
+  runDate: string,
+): Promise<CommitmentAction[]> {
+  const holdAll = async (note: string): Promise<CommitmentAction[]> => {
+    const out: CommitmentAction[] = [];
+    for (const { c } of held) {
+      const holds = c.holds + 1;
+      if (holds < MAX_HOLDS) {
+        await deps.store.update(c.id, { holds });
+        out.push({ id: c.id, action: "held", note: `${note}; tried again tomorrow` });
+      } else {
+        await deps.store.update(c.id, { state: "lapsed", holds, resolvedAt: now });
+        console.warn(`[commitments] ${c.id} lapsed after ${holds} held mornings: ${note}`);
+        out.push({ id: c.id, action: "lapsed", note: `held ${holds} mornings running (${note})` });
+      }
+    }
+    return out;
+  };
+  const dm = await deps.slack.dmChannel(person);
+  if (!dm) return holdAll("the promiser's DM with uno-bot could not be opened");
+  const message = promiseMessage(held.map((h) => h.card));
+  const posted = await deps.slack.post({ channel: dm, threadTs: null }, { text: message.text, blocks: message.blocks });
+  if (!posted.ok || !posted.ts) return holdAll("Slack refused the post");
+  const actions: CommitmentAction[] = [];
+  for (const { c, phase } of held) {
+    const slot = c.nudgeTs === null ? { nudgeTs: posted.ts } : { followupTs: posted.ts };
+    // A heads-up is not one of the two check-ins a promise gets.
+    await deps.store.update(
+      c.id,
+      phase === "heads-up"
+        ? { state: "nudged", holds: 0, remindedOn: runDate, dueAt: checkInAt(c.deadlineAt!), ...slot }
+        : { state: "nudged", nudges: c.nudges + 1, holds: 0, remindedOn: runDate, dueAt: followUpAt(now), ...slot },
+    );
+    actions.push({ id: c.id, action: c.nudges === 0 ? "nudged" : "followed-up", text: message.text, ts: posted.ts });
+  }
+  return actions;
 }
 
 /**
@@ -730,7 +833,9 @@ async function answerOrThrow(r: ReminderReaction, deps: ReminderDoorDeps): Promi
   const bot = await deps.botUserId();
   if (r.messageAuthorId && bot && r.messageAuthorId !== bot) return { claimed: false };
   const c = await deps.store.byReminderTs(r.messageTs);
-  if (!c || c.channel !== r.channel) return { claimed: false };
+  // A promise's reminders post in its promiser's DM with uno-bot now, and a
+  // reminder from before that in the promise's own thread.
+  if (!c || (c.channel !== r.channel && !r.channel.startsWith("D"))) return { claimed: false };
   if (isCardKind(c.kind) || isDmKind(c.kind)) {
     // Whatever the glyph, a card follow-up's own: its ✅ drafts a card, and
     // never reaches the gate. A DM ask's likewise.
