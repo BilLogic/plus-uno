@@ -25,6 +25,8 @@ Task → guidelines/overview.md → locate 2–3 focused docs → read only thos
 
 Do not bulk-load. Two or three documents per task is the budget.
 
+To look a name, prop, token or rule up without reading files, ask the `ds` command or the `plus-ds` MCP: `docs/connectors/ds-mcp.md`.
+
 ## The tree
 
 | Folder | Holds | Start at |

@@ -3,6 +3,11 @@
     "storybook": {
       "type": "http",
       "url": "http://localhost:4200/mcp"
+    },
+    "plus-ds": {
+      "type": "stdio",
+      "command": "node",
+      "args": ["scripts/ds-mcp.mjs"]
     }
   }
 }

@@ -14,7 +14,7 @@ name: check:harness
 # commit GitHub builds from the head and the base, so that pair would have been
 # caught on the second PR rather than on main.
 #
-# TWO INSTALLS, BOTH SCOPED. Neither is a root `npm ci` of every devDependency.
+# THREE INSTALLS, ALL SCOPED. Neither is a root `npm ci` of every devDependency.
 #   1. `npm ci` in `agents/uno-bot` (14–15s), which the step below explains.
 #   2. The stylesheet parser `check:focus-ring` and `check:text-contrast` read
 #      `@grounds` and `@contrast` with: postcss, postcss-scss and
@@ -23,6 +23,8 @@ name: check:harness
 #      linked into `node_modules` (0–1s). What it buys: those two checks and
 #      their tests in `test:scripts` can run at all. sass rides the same
 #      install, for the state-step and elevation tests that compile SCSS.
+#   3. `@modelcontextprotocol/sdk` and its tree, from the root lock, for the
+#      local design-system MCP server's spawn test. Its own step says how.
 # This header read "EXACTLY ONE `npm ci`" and 34–38s until the second install
 # landed, and before that "NO `npm ci`, DELIBERATELY" for three weeks after the
 # first one did — a file arguing for a number forty lines above the step that
@@ -140,6 +142,34 @@ jobs:
               esac
               if [ -e "node_modules/$name" ] || [ -L "node_modules/$name" ]; then
                 echo "::error::node_modules/$name already exists; refusing to replace it with the pinned $name"
+                exit 1
+              fi
+              mkdir -p "$(dirname "node_modules/$name")"
+              ln -s "$pkg" "node_modules/$name"
+            done
+          done
+
+      # The third scoped install: the MCP SDK, for the spawn test of the local
+      # design-system MCP server in `test:scripts` (`scripts/ds.test.mjs`).
+      # Its tree holds two versions of one name (through express), so the flat
+      # pin list above cannot carry it: `lock-closure.mjs --lock` writes the
+      # root lock's own entries for its closure, nested paths kept, and
+      # `npm ci` installs exactly that tree. Linked like the parser, and
+      # refusing to replace anything already in `node_modules`.
+      - name: Install the MCP SDK for the lookup server's test
+        run: |
+          node scripts/lock-closure.mjs --lock "$RUNNER_TEMP/mcp" @modelcontextprotocol/sdk
+          (cd "$RUNNER_TEMP/mcp" && npm ci --no-audit --no-fund --ignore-scripts --omit=optional)
+          for dir in "$RUNNER_TEMP"/mcp/node_modules/*; do
+            case "$(basename "$dir")" in
+              .*) continue ;;
+              @*) set -- "$dir"/* ;;
+              *) set -- "$dir" ;;
+            esac
+            for pkg in "$@"; do
+              name=${pkg#"$RUNNER_TEMP/mcp/node_modules/"}
+              if [ -e "node_modules/$name" ] || [ -L "node_modules/$name" ]; then
+                echo "::error::node_modules/$name already exists; refusing to replace it with the locked $name"
                 exit 1
               fi
               mkdir -p "$(dirname "node_modules/$name")"
