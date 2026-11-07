@@ -42,6 +42,4 @@ From `design-system/src/components/labels/DateTag/DateTag.scss`. Override these 
 
 Same group: `AiLabel` · `AiMessage` · `CountTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

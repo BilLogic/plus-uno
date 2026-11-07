@@ -10,15 +10,15 @@ authored half (#166), counted rather than assumed.
 | [AiLabel](AiLabel/index.md) | 9 | ✅ | ✅ | ✅ |
 | [AiMessage](AiMessage/index.md) | 10 | ✅ | ✅ | ✅ |
 | [CountTag](CountTag/index.md) | 12 | ✅ | ✅ | ✅ |
-| [DateTag](DateTag/index.md) | 6 | ✅ | ✕ | ✅ |
-| [PromptStarters](PromptStarters/index.md) | 4 | ✅ | ✕ | ✅ |
-| [SmartTag](SmartTag/index.md) | 3 | ✅ | ✕ | ✅ |
+| [DateTag](DateTag/index.md) | 6 | ✅ | ✅ | ✅ |
+| [PromptStarters](PromptStarters/index.md) | 4 | ✅ | ✅ | ✅ |
+| [SmartTag](SmartTag/index.md) | 3 | ✅ | ✅ | ✅ |
 | [StatusTag](StatusTag/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Suggestion](Suggestion/index.md) | 9 | ✅ | ✅ | ✅ |
 | [Tag](Tag/index.md) | 22 | ✅ | ✅ | ✅ |
 | [TagGroup](TagGroup/index.md) | 10 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 10/10 (100%) · Correct/incorrect 7/10 (70%) · Accessibility 10/10 (100%)
+**Authored coverage:** When to use 10/10 (100%) · Correct/incorrect 10/10 (100%) · Accessibility 10/10 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says
