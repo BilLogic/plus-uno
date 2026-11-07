@@ -24,8 +24,8 @@ export default {
     argTypes: {
         label: { control: 'text', table: { category: 'Content' } },
         placeholder: { control: 'text', table: { category: 'Content' } },
-        rows: { control: 'number', description: 'Visible text rows. One row is the short text area.', table: { category: 'Layout' } },
-        maxLength: { control: 'number', description: 'Limits the length and shows a count in the caption', table: { category: 'Content' } },
+        rows: { control: 'number', table: { category: 'Layout' } },
+        maxLength: { control: 'number', table: { category: 'Content' } },
         spacing: { control: 'radio', options: ['default', 'compact'], table: { category: 'Design' } },
         appearance: { control: 'radio', options: ['standard', 'subtle'], table: { category: 'Design' } },
         isInvalid: { control: 'boolean', table: { category: 'Validation' } },
@@ -47,11 +47,12 @@ export default {
     },
 };
 
+const fieldWrap = { maxWidth: 'var(--width-2500)' };
 const label = 'text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3';
 const px = (value) => Math.round(parseFloat(value));
 
 export const Overview = () => (
-    <div style={{ maxWidth: '600px' }}>
+    <div style={fieldWrap}>
         <TextArea id="text-area-overview" label="Label" placeholder="Enter text..." rows={3} />
     </div>
 );
@@ -102,43 +103,19 @@ Spacing.play = async ({ canvasElement }) => {
     await expect(px(getComputedStyle(box('compact')).borderTopLeftRadius)).toBe(8);
 };
 
-/** States: every state, drawn the same way as the Text field's. */
-export const States = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '24px', maxWidth: '1000px' }}>
-        <div>
-            <span className={label}>DEFAULT</span>
-            <TextArea aria-label="Text area, default state" placeholder="Enter text..." />
-        </div>
-        <div>
-            <span className={label}>FILLED</span>
-            <TextArea aria-label="Text area, filled state" defaultValue="Some content here" />
-        </div>
-        <div>
-            <span className={label}>SUCCESS</span>
-            <TextArea aria-label="Text area, success state" defaultValue="Looks good" successMessage="Looks good." />
-        </div>
-        <div>
-            <span className={label}>WARNING</span>
-            <TextArea aria-label="Text area, warning state" defaultValue="Short note" warningMessage="This is shorter than most notes." />
-        </div>
-        <div>
-            <span className={label}>ERROR</span>
-            <TextArea aria-label="Text area, error state" defaultValue="Invalid content" isInvalid errorMessage="Say what you covered." />
-        </div>
-        <div>
-            <span className={label}>DISABLED</span>
-            <TextArea aria-label="Text area, disabled state" defaultValue="Disabled content" isDisabled />
-        </div>
-        <div>
-            <span className={label}>READ ONLY</span>
-            <TextArea aria-label="Text area, read only state" defaultValue="Read only content" isReadOnly />
-        </div>
-        <div>
-            <span className={label}>READ ONLY (PLACEHOLDER)</span>
-            <TextArea aria-label="Text area, read only placeholder state" placeholder="Read only placeholder" isReadOnly />
-        </div>
-    </div>
-);
+
+
+/** One story per value, for the Examples tab. */
+export const Rows1 = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="Enter text..." rows={1} /></div>;
+export const Rows3 = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="Enter text..." rows={3} /></div>;
+export const Rows6 = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="Enter text..." rows={6} /></div>;
+
+export const SpacingDefault = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="Enter text..." spacing="default" rows={2} /></div>;
+export const SpacingCompact = () => <div style={fieldWrap}><TextArea label="Notes" placeholder="Enter text..." spacing="compact" rows={2} /></div>;
+
+export const Filled = () => <div style={fieldWrap}><TextArea label="Notes" defaultValue="Worked through slope and intercepts." /></div>;
+export const Success = () => <div style={fieldWrap}><TextArea label="Notes" defaultValue="Worked through slope and intercepts." successMessage="Looks good." /></div>;
+export const Warning = () => <div style={fieldWrap}><TextArea label="Notes" defaultValue="Short note" warningMessage="This is shorter than most notes." /></div>;
 
 /** Focus is a ring only: no fill, border or text color changes. */
 export const FocusRing = () => (
@@ -165,7 +142,7 @@ FocusRing.play = async ({ canvasElement }) => {
 export const Count = () => {
     const [value, setValue] = useState('We covered linear equations.');
     return (
-        <div style={{ maxWidth: '600px' }}>
+        <div style={fieldWrap}>
             <TextArea
                 id="text-area-count"
                 label="Session notes"
@@ -200,7 +177,7 @@ Count.play = async ({ canvasElement }) => {
 export const Subtle = (args) => {
     const [saved, setSaved] = useState('Worked through slope.');
     return (
-        <div style={{ maxWidth: '600px' }}>
+        <div style={fieldWrap}>
             <TextArea
                 id="text-area-subtle"
                 label="Session notes"
@@ -255,7 +232,7 @@ export const Interactive = (args) => {
     const [value, setValue] = useState(args.value || '');
 
     return (
-        <div style={{ maxWidth: '600px', padding: '20px' }}>
+        <div style={fieldWrap}>
             <TextArea {...args} value={value} onChange={(e) => setValue(e.target.value)} />
         </div>
     );

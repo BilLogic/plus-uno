@@ -28,7 +28,7 @@ A `Fieldset` (legend plus grouped fields) holding one real Base UI `RadioGroup`,
 | `leadingText` | node | — | Scale end before the options, e.g. "Not at all". Describes the group. |
 | `trailingText` | node | — | Scale end after the options, e.g. "Very". Describes the group. |
 | `appearance` | enum | `'plain'` | Passed to every Radio. `card` draws each as a bordered tile. |
-| `size` | enum | — | Radio control (dot) width in px. Unset keeps today\'s rendering. No effect on type="checkbox". |
+| `size` | enum | — | Radio control (dot) width, in px; unset keeps today's rendering. |
 | `isRequired` | bool | `false` | The group needs an answer. Marked on the legend. |
 | `isDisabled` | bool | `false` | Overrides every Radio's own `isDisabled`. |
 | `isReadOnly` | bool | `false` | Shown and focusable, not changeable. |

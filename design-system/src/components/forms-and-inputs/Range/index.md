@@ -21,13 +21,13 @@ A range input carries its value, never its meaning: "49" says nothing about what
 | `name` | string | — | — |
 | `label` | node | — | Text that names the slider. Without it the slider has no accessible name. |
 | `showLabel` | bool | `true` | Render the label visually hidden rather than visible. It still names the slider. |
-| `min` | number | `0` | Minimum slider value |
-| `max` | number | `100` | Maximum slider value |
-| `value` | number | — | Current slider value |
+| `min` | number | `0` | The smallest value. Defaults to 0. |
+| `max` | number | `100` | The largest value. Defaults to 100. |
+| `value` | number | — | The current value, for a controlled slider. Pair it with `onChange`, or use `defaultValue` to leave the slider uncontrolled. |
 | `defaultValue` | number | — | — |
-| `step` | number | `1` | Slider increment |
-| `isDisabled` | bool | `false` | Disable the slider |
-| `size` | enum | — | The dot and bar in px; the track follows at 4/6/8. Unset keeps the default rendering. |
+| `step` | number | `1` | How much the value moves per key press or drag step. Defaults to 1. |
+| `isDisabled` | bool | `false` | Prevents interaction and dims the slider. |
+| `size` | enum | — | The dot and bar, in px; the track follows. Unset keeps the default rendering. |
 | `onChange` | func | — | Called with the new value as a number, then the change event. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |

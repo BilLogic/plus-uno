@@ -1,8 +1,9 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as InlineEditStories from './InlineEdit.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Button, InlineEdit, InlineEditableTextfield } from '@/components';
+import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -40,75 +41,43 @@ any edit view; `InlineEditableTextfield` is the one built on `TextField`.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Size and layout
 
-<DocsCanvasShell attachSourceBelow description={<>Press the name to edit it. Enter or the check confirms; Escape or the cross cancels.</>}>
-    <Canvas of={InlineEditStories.Textfield} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={InlineEditStories.SpacingDefault} title="Default" description="The read view is drawn on the field's own box, 40 high, so the text does not move when the editor opens." />
 
-</div>
+<ComponentExample of={InlineEditStories.SpacingCompact} title="Compact" description="`compact` draws both views 32 high." />
 
-<div className="sb-ds-doc-section">
-
-## Same size, both views
-
-<DocsCanvasShell description={<>The read view is drawn on the field's own box, 32 high, with the same side padding, so the text does not move when the editor opens. Compact is 24 in both.</>}>
-    <DsCanvasQuiet of={InlineEditStories.SameHeight} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>The buttons hang under the field over whatever follows it, so showing them does not push the page down.</>}>
-    <DsCanvasQuiet of={InlineEditStories.ButtonsDoNotMoveThePage} />
-</DocsCanvasShell>
+<ComponentExample of={InlineEditStories.ButtonsDoNotMoveThePage} title="Buttons over the page" description="The buttons hang under the field over whatever follows it, so showing them does not push the page down." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Confirming
+## Behavior
 
-<DocsCanvasShell description={<>Leaving the field confirms, as Enter does. Focus goes where the person sent it.</>}>
-    <DsCanvasQuiet of={InlineEditStories.LeavingConfirms} />
-</DocsCanvasShell>
+<ComponentExample of={InlineEditStories.Textfield} title="Edit and confirm" description="Press the name to edit it; Enter or the check confirms, and Escape or the cross cancels." />
 
-<DocsCanvasShell description={<><code>keepEditViewOpenOnBlur</code> makes leaving do nothing, so a click elsewhere cannot publish half a thought. Only Enter and the check confirm.</>}>
-    <DsCanvasQuiet of={InlineEditStories.KeepOpenOnBlur} />
-</DocsCanvasShell>
+<ComponentExample of={InlineEditStories.LeavingConfirms} title="Leaving confirms" description="Leaving the field confirms, as Enter does, and focus goes where the person sent it." />
 
-<DocsCanvasShell description={<><code>hideActionButtons</code> leaves the buttons off. Enter, Escape and leaving still work.</>}>
-    <DsCanvasQuiet of={InlineEditStories.WithoutButtons} />
-</DocsCanvasShell>
+<ComponentExample of={InlineEditStories.KeepOpenOnBlur} title="Keep open on blur" description="keepEditViewOpenOnBlur makes leaving do nothing, so only Enter and the check confirm." />
 
-<DocsCanvasShell description={<><code>startWithEditViewOpen</code> opens in the field with the caret in it.</>}>
-    <DsCanvasQuiet of={InlineEditStories.StartsOpen} />
-</DocsCanvasShell>
+<ComponentExample of={InlineEditStories.WithoutButtons} title="Without buttons" description="hideActionButtons leaves the buttons off; Enter, Escape and leaving still work." />
+
+<ComponentExample of={InlineEditStories.StartsOpen} title="Starts open" description="startWithEditViewOpen opens in the field with the caret in it." />
+
+<ComponentExample of={InlineEditStories.WithAnotherEditView} title="Another edit view" description="InlineEdit takes any edit view as a function, given the value, an onChange and the validation to show." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Validation
+## State
 
-<DocsCanvasShell description={<><code>validate</code> returns a message to refuse a value. The field stays open, marked invalid, with the message in its caption, and typing clears it.</>}>
-    <DsCanvasQuiet of={InlineEditStories.Validation} />
-</DocsCanvasShell>
+<ComponentExample of={InlineEditStories.Placeholder} title="Placeholder" description="With no text the read view shows the placeholder in the subtle color, so there is still something to press." />
 
-<DocsCanvasShell description={<>A <code>onConfirm</code> that throws or rejects shows its message the same way and keeps what was typed.</>}>
-    <DsCanvasQuiet of={InlineEditStories.FailedConfirm} />
-</DocsCanvasShell>
+<ComponentExample of={InlineEditStories.Validation} title="Refused value" description="validate returns a message to refuse a value; the field stays open, marked invalid, and typing clears it." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Other edit views and an empty value
-
-<DocsCanvasShell description={<><code>InlineEdit</code> takes any edit view as a function. It is given the value, an <code>onChange</code> that takes a value or an event, and the validation to show.</>}>
-    <DsCanvasQuiet of={InlineEditStories.WithAnotherEditView} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>With no text the read view shows the placeholder in the subtle color, so there is still something to press.</>}>
-    <DsCanvasQuiet of={InlineEditStories.Placeholder} />
-</DocsCanvasShell>
+<ComponentExample of={InlineEditStories.FailedConfirm} title="Failed confirm" description="An onConfirm that throws or rejects shows its message the same way and keeps what was typed." />
 
 </div>
 
@@ -138,7 +107,7 @@ any edit view; `InlineEditableTextfield` is the one built on `TextField`.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `InlineEdit` for a value that is read far more often than it is changed and
 that can be saved on its own: a title, a name or a short note on a record or a
@@ -153,20 +122,88 @@ leaving the field should save with no buttons at all.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
 
-### Keep the read view to plain text.
+1. **Label** (optional). Shown above both views.
+2. **Read view.** The value as plain text on the field's own box. The whole view is one button.
+3. **Edit view.** The field it opens into: a `TextField` in `InlineEditableTextfield`, or any edit view passed to `InlineEdit`.
+4. **Actions.** The confirm and cancel icon buttons, on an overlay under the field. `hideActionButtons` leaves them off.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The read view: text on a transparent box with a transparent <code>--border-default</code> edge.</td></tr>
+<tr><td>Hovered</td><td>The read view takes <code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
+<tr><td>Pressed</td><td>Pressing the read view opens the edit view in the same box, with the caret in it.</td></tr>
+<tr><td>Focused</td><td>The read view draws a <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, <code>--focus-ring-width</code> off the box.</td></tr>
+<tr><td>Disabled</td><td>None. An inline edit has no disabled state.</td></tr>
+<tr><td>Editing</td><td>The field's fill and <code>--border-default</code> input edge appear; nothing else moves.</td></tr>
+<tr><td>Invalid</td><td>The field stays open with the danger edge and the message in its caption.</td></tr>
+<tr><td>Placeholder</td><td>An empty read view shows the placeholder in <code>--ds-text-subtlest</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Read view height</td><td>40: <code>--height-250</code>. Compact 32: <code>--item-height-md</code>.</td></tr>
+<tr><td>Read view box</td><td><code>--radius-0625</code>, a <code>--border-default</code> transparent edge, <code>--pad-x-md</code> either side.</td></tr>
+<tr><td>Read view text</td><td><code>--body-default</code> in <code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
+<tr><td>Read view hovered</td><td><code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
+<tr><td>Actions</td><td><code>--ds-surface-overlay</code> with <code>--ds-shadow-overlay</code>, <code>--radius-md</code>, <code>--stack-sm</code> padding and gap.</td></tr>
+<tr><td>Gap under the label</td><td><code>--stack-sm</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+The edit view takes the field's own tokens: see Text field.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Keep the read view plain text.
 
 The whole read view is one button. A link or a button inside it cannot be
 reached or pressed, so put those beside it.
 
-```jsx
-// Incorrect: a link inside the read view.
-<InlineEdit readView={() => <a href="/profile">{name}</a>} ... />
+<DoDontPair
+    doExample={<InlineEditableTextfield label="Name" defaultValue="Ada Lovelace" />}
+    doCaption="Plain text in the read view."
+    dontExample={<InlineEdit label="Name" defaultValue="Ada Lovelace" readView={() => <a href="#profile">Ada Lovelace</a>} editView={({ id, value, onChange }) => <input id={id} value={value} onChange={onChange} />} />}
+    dontCaption="A link inside the read view, which cannot be reached or pressed."
+/>
 
-// Correct.
-<InlineEditableTextfield label="Name" value={name} onConfirm={setName} />
-```
+### Confirm on Enter and on leaving.
+
+Both save; Escape cancels. The inline edit saves itself, so it needs no Save button of its own.
+
+<DoDontPair
+    doExample={<InlineEditableTextfield label="Session title" defaultValue="Fractions" />}
+    doCaption="Enter or leaving the field saves the title."
+    dontExample={<div style={{ display: 'flex', alignItems: 'flex-end', gap: 'var(--inline-md)' }}><InlineEditableTextfield label="Session title" defaultValue="Fractions" /><Button text="Save" /></div>}
+    dontCaption="A separate Save step beside an inline edit."
+/>
+
+### Use compact in dense lists.
+
+Compact draws both views 32 high, to sit in a table cell or a dense row.
+
+<DoDontPair
+    doExample={<div><div style={{ borderBottom: 'var(--border-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Ada Lovelace" compact /></div><div style={{ borderBottom: 'var(--border-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Grace Hopper" compact /></div><div style={{ borderBottom: 'var(--border-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Katherine Johnson" compact /></div></div>}
+    doCaption="Compact rows in a dense list."
+    dontExample={<div><div style={{ borderBottom: 'var(--border-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Ada Lovelace" /></div><div style={{ borderBottom: 'var(--border-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Grace Hopper" /></div><div style={{ borderBottom: 'var(--border-default) solid var(--ds-border)' }}><InlineEditableTextfield defaultValue="Katherine Johnson" /></div></div>}
+    dontCaption="The default height spreads a dense list out."
+/>
 
 ### Let the parent hold the value.
 
@@ -182,6 +219,23 @@ value leaves the editor open, so the person can fix it without retyping.
 
 Set `keepEditViewOpenOnBlur` where a stray click would publish an unfinished
 thought, and keep the buttons so there is a clear way out.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Label the value it holds: "Display name".</td><td>Label the action: "Edit name".</td></tr>
+<tr><td>Give an empty value a placeholder that says what to add: "Add a nickname".</td><td>Leave an empty read view blank, with nothing to press.</td></tr>
+<tr><td>Say why a value was refused: "Enter a name."</td><td>"Invalid" or "Error".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

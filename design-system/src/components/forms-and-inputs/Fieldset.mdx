@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
-import { Fieldset, Checkbox } from '@/components';
+import { Fieldset, Checkbox, TextField } from '@/components';
 import * as FieldsetStories from './Fieldset.stories.jsx';
 import {
     ComponentExample,
@@ -138,10 +138,43 @@ Pass `error` on the Fieldset, not on each field inside it, when the validation a
 Radio group already composes Fieldset with Radio children. Reach for Radio group directly for radios, and use Fieldset on its own only for a shape it does not already cover, like a checkbox group.
 
 <DoDontPair
-    doExample={<Fieldset legend="Notify me by" error="Choose at least one."><Checkbox label="Email" /><Checkbox label="Text" /></Fieldset>}
-    doCaption="One legend and one message for the set."
+    doExample={<Fieldset legend="Notify me by"><Checkbox label="Email" /><Checkbox label="Text" /></Fieldset>}
+    doCaption="A fieldset with one legend for the set."
     dontExample={<div><Checkbox label="Email" /><Checkbox label="Text" /></div>}
-    dontCaption="Related boxes with no legend leave a screen reader without the question they answer."
+    dontCaption="Loose boxes in a plain container, with no legend."
+/>
+
+### Group related fields under one legend.
+
+The legend names what the fields have in common. Without it a screen reader hears loose, unrelated fields.
+
+<DoDontPair
+    doExample={<Fieldset legend="Contact details"><TextField label="Email" /><TextField label="Phone" /></Fieldset>}
+    doCaption="The legend names the group."
+    dontExample={<Fieldset legend="Fields"><TextField label="Email" /><TextField label="Phone" /></Fieldset>}
+    dontCaption="A legend that says nothing."
+/>
+
+### Keep the legend to a few words.
+
+A legend is a label, not an instruction. Two or three words stay on one line.
+
+<DoDontPair
+    doExample={<Fieldset legend="Contact"><TextField label="Email" /><TextField label="Phone" /></Fieldset>}
+    doCaption="One short line."
+    dontExample={<Fieldset legend="Please fill in your contact details in the fields below"><TextField label="Email" /><TextField label="Phone" /></Fieldset>}
+    dontCaption="A whole sentence as the legend."
+/>
+
+### Name the group, not the action.
+
+The legend says what the fields are. The button says what to do with them.
+
+<DoDontPair
+    doExample={<Fieldset legend="Contact details"><TextField label="Email" /><TextField label="Phone" /></Fieldset>}
+    doCaption="A noun phrase."
+    dontExample={<Fieldset legend="Fill in below"><TextField label="Email" /><TextField label="Phone" /></Fieldset>}
+    dontCaption="An instruction."
 />
 
 </div>

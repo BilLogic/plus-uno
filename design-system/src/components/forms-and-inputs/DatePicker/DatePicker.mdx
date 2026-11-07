@@ -26,6 +26,8 @@ export const figmaMeta = {
   ]
 };
 
+export const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' };
+
 <Meta of={DatePickerStories} />
 
 <Title />
@@ -126,6 +128,7 @@ Use `DatePicker` for a single date or a date range typed or chosen from a calend
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
+<tr><td>Rest</td><td><code>--ds-background-input</code> fill with a <code>--ds-border-input</code> border.</td></tr>
 <tr><td>Hovered</td><td>The border takes <code>--ds-border-focused</code>.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box.</td></tr>
 <tr><td>Invalid</td><td>The border takes <code>--ds-border-danger</code> and the input sets <code>aria-invalid</code>.</td></tr>
@@ -177,11 +180,37 @@ The first click sets the first day, the second sets the last day, and `onChange`
 
 There is no `label` prop. Pass `aria-label` or `aria-labelledby`; both go straight to the input.
 
+### Show the date format as a hint.
+
+The field says how to type the date before anyone types it. Without a hint people guess the order. The placeholder is MM/DD/YYYY unless you replace it, so leave it.
+
 <DoDontPair
-    doExample={<DatePicker aria-label="Session date" value="2026-10-25" />}
-    doCaption="One field, named, with a value in the format it asks for."
-    dontExample={<DatePicker aria-label="Session date" isInvalid value="10-25" />}
-    dontCaption="A date in another format is kept as typed and marked invalid. Say which format is expected beside the field."
+    doExample={<DatePicker aria-label="Session date" />}
+    doCaption="The format is shown."
+    dontExample={<DatePicker aria-label="Session date" placeholder="Select date" />}
+    dontCaption="No format given."
+/>
+
+### Show dates in one format everywhere.
+
+Use the same order and separators in the field, the calendar and any message. Mixed formats read as different dates.
+
+<DoDontPair
+    doExample={<div style={stack}><DatePicker aria-label="Session date" value="2026-10-21" /><span>Your session is on 10/21/2026.</span></div>}
+    doCaption="One format throughout."
+    dontExample={<div style={stack}><DatePicker aria-label="Session date" value="2026-10-21" /><span>Your session is on 21 Oct 2026.</span></div>}
+    dontCaption="A second format appears in the message."
+/>
+
+### Use one range field, not two dates.
+
+A range picks start and end in one field and one calendar. Two separate fields split one decision in two.
+
+<DoDontPair
+    doExample={<div style={stack}><DatePicker aria-label="Billing period" range value={['2026-10-05', '2026-10-23']} /></div>}
+    doCaption="One range field."
+    dontExample={<div style={stack}><DatePicker aria-label="Billing period start" value="2026-10-05" /><DatePicker aria-label="Billing period end" value="2026-10-23" /></div>}
+    dontCaption="Two separate fields."
 />
 
 </div>

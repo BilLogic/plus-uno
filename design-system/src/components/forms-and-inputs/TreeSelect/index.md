@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.stories.jsx` — Overview, Content, Spacing, InteractionStates, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid
+**Stories:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.stories.jsx` — Overview, SingleSelect, MultiSelect, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.mdx`
 
@@ -23,8 +23,8 @@
 | `value` | string or number or arrayOf | — | — |
 | `options` | arrayOf | `[]` | — |
 | `onChange` | func | — | — |
-| `isMulti` | bool | `false` | Allow selecting multiple nodes with checkboxes |
-| `placeholder` | string | `'Please select'` | Placeholder text when nothing is selected |
+| `isMulti` | bool | `false` | Several values, shown as checkboxes beside the toggle. |
+| `placeholder` | string | `'Please select'` | Hint text shown in the field while nothing is selected. Defaults to `Please select`. |
 | `spacing` | enum | `'default'` | `default` draws 40 and `compact` draws 32. |
 | `isDisabled` | bool | `false` | — |
 | `isRequired` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
@@ -43,6 +43,4 @@ Anything not listed is not a valid value.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

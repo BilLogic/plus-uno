@@ -28,7 +28,6 @@ export default {
         style: { table: { disable: true } },
         label: {
             control: 'text',
-            description: 'Label text for the first radio',
             table: { category: 'Content' },
         },
         secondLabel: {
@@ -43,22 +42,18 @@ export default {
         },
         isInvalid: {
             control: 'boolean',
-            description: 'Marks the unselected radios as failing validation',
             table: { category: 'State' },
         },
         isDisabled: {
             control: 'boolean',
-            description: 'Disable the radios',
             table: { category: 'Behavior' },
         },
         isRequired: {
             control: 'boolean',
-            description: 'Require an answer natively',
             table: { category: 'Behavior' },
         },
         isReadOnly: {
             control: 'boolean',
-            description: 'Shown and focusable, not changeable',
             table: { category: 'Behavior' },
         },
         id: { control: false, table: { disable: true, category: 'Development' } },

@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.stories.jsx` — Overview, Content, Spacing, InteractionStates, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid
+**Stories:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.stories.jsx` — Overview, EmptyPath, PreselectedPath, SpacingDefault, SpacingCompact, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.mdx`
 
@@ -23,7 +23,7 @@
 | `value` | arrayOf | `NO_PATH` | — |
 | `options` | arrayOf | `[]` | — |
 | `onChange` | func | — | — |
-| `placeholder` | string | `'Please select'` | Placeholder text when no options are available |
+| `placeholder` | string | `'Please select'` | Hint text shown in the field while no path is selected. Defaults to `Please select`. |
 | `spacing` | enum | `'default'` | `default` draws 40 and `compact` draws 32. |
 | `isDisabled` | bool | `false` | — |
 | `isRequired` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
@@ -48,6 +48,4 @@ From `design-system/src/components/forms-and-inputs/Cascader/Cascader.scss`. Ove
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

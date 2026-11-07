@@ -37,7 +37,7 @@ const TOPICS = [
     { value: 'dev-coordination', label: 'Dev coordination', color: 'teal' },
 ];
 
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)', maxWidth: '400px' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)', maxWidth: 'var(--width-2500)' };
 
 const bodyOf = (canvasElement) => within(canvasElement.ownerDocument.body);
 const tagsIn = (canvas, label) => within(canvas.getByRole('list', { name: `Selected: ${label}` }));
@@ -729,16 +729,16 @@ export const NoTidyingWithoutHandlers = {
 };
 
 const tidyArgTypes = {
-    menu: { control: 'boolean', description: 'Pass onRename, onDelete and onColorChange.', table: { category: 'Behavior' } },
-    reorder: { control: 'boolean', description: 'Pass onReorder.', table: { category: 'Behavior' } },
-    spacing: { control: 'radio', options: ['default', 'compact'], description: 'Field spacing', table: { category: 'Design' } },
+    menu: { control: 'boolean', table: { disable: true } },
+    reorder: { control: 'boolean', table: { disable: true } },
+    spacing: { control: 'radio', options: ['default', 'compact'], table: { category: 'Design' } },
 };
 
 /** The option menu, open on a row. Controls choose which handlers the field gets. */
 export const OptionMenu = {
     args: { menu: true, reorder: true, spacing: 'default' },
     argTypes: tidyArgTypes,
-    render: (args) => <div style={{ ...stack, minHeight: '480px' }}><Tidy {...args} /></div>,
+    render: (args) => <div style={{ ...stack, minHeight: 'var(--size-3000)' }}><Tidy {...args} /></div>,
     play: async ({ canvasElement, args }) => {
         if (!args.menu) return;
         await userEvent.click(await openMenuButton(canvasElement, 'Decision recall'));
@@ -749,7 +749,7 @@ export const OptionMenu = {
 export const Reordering = {
     args: { menu: true, reorder: true, spacing: 'default' },
     argTypes: tidyArgTypes,
-    render: (args) => <div style={{ ...stack, minHeight: '320px' }}><Tidy {...args} /></div>,
+    render: (args) => <div style={{ ...stack, minHeight: 'var(--size-2000)' }}><Tidy {...args} /></div>,
     play: async ({ canvasElement, args }) => {
         if (!args.reorder) return;
         const canvas = within(canvasElement);
@@ -767,11 +767,15 @@ export const Overview = () => (
     </div>
 );
 
-export const Spacings = () => (
+export const SpacingDefault = () => (
     <div style={stack}>
-        {['default', 'compact'].map((spacing) => (
-            <TagInput key={spacing} label={`Topics, ${spacing}`} spacing={spacing} options={TOPICS} defaultTags={[TOPICS[0], TOPICS[1]]} />
-        ))}
+        <TagInput label="Topics" spacing="default" options={TOPICS} defaultTags={[TOPICS[0], TOPICS[1]]} />
+    </div>
+);
+
+export const SpacingCompact = () => (
+    <div style={stack}>
+        <TagInput label="Topics" spacing="compact" options={TOPICS} defaultTags={[TOPICS[0], TOPICS[1]]} />
     </div>
 );
 
@@ -787,10 +791,10 @@ export const Interactive = {
         errorMessage: 'Pick at least one topic',
     },
     argTypes: {
-        label: { control: 'text', description: 'Names the field.', table: { category: 'Content' } },
-        caption: { control: 'text', description: 'Standing help under the field.', table: { category: 'Content' } },
-        required: { control: 'boolean', description: 'Shows an asterisk and sets aria-required.', table: { category: 'Content' } },
-        spacing: { control: 'radio', options: ['default', 'compact'], description: 'Field spacing', table: { category: 'Design' } },
+        label: { control: 'text', table: { category: 'Content' } },
+        caption: { control: 'text', table: { category: 'Content' } },
+        required: { control: 'boolean', table: { category: 'Content' } },
+        spacing: { control: 'radio', options: ['default', 'compact'], table: { category: 'Design' } },
         disabled: { control: 'boolean', table: { category: 'Behavior' } },
         readOnly: { control: 'boolean', table: { category: 'Behavior' } },
         isInvalid: { control: 'boolean', table: { category: 'Behavior' } },

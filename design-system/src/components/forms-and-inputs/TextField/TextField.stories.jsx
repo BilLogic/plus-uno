@@ -26,13 +26,11 @@ export default {
         spacing: {
             control: 'select',
             options: ['default', 'compact'],
-            description: '`default` is 40 high; `compact` is 32.',
             table: { category: 'Design' }
         },
         appearance: {
             control: 'select',
             options: ['standard', 'subtle'],
-            description: '`subtle` is transparent until it is hovered or edited.',
             table: { category: 'Design' }
         },
         isDisabled: { control: 'boolean', table: { category: 'Behavior' } },
@@ -43,7 +41,6 @@ export default {
         successMessage: { control: 'text', table: { category: 'Validation' } },
         isLabelHidden: {
             control: 'boolean',
-            description: 'Hides the label visually. It is still rendered and still names the input.',
             table: { category: 'Content' }
         },
         label: { control: 'text', table: { category: 'Content' } },
@@ -67,10 +64,11 @@ const caption = 'text-[12px] uppercase tracking-wider text-on-surface-variant fo
 const row = { display: 'flex', flexWrap: 'wrap', gap: 24, alignItems: 'flex-start' };
 const px = (value) => Math.round(parseFloat(value));
 const icon = (name) => <i className={iconClass(name)} aria-hidden="true" />;
+const fieldWrap = { maxWidth: 'var(--width-2500)' };
 
 /** Overview: a labeled field with a placeholder and an element after the control. */
 export const Overview = () => (
-    <div style={{ maxWidth: '600px' }}>
+    <div style={fieldWrap}>
         <TextField
             id="text-field-overview"
             label="Label"
@@ -86,64 +84,33 @@ Overview.parameters = {
     }
 };
 
-/** Content: placeholder and value, label and required marker, elements before and after. */
-export const Content = () => (
-    <div style={{ ...row, gap: 48 }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, minWidth: 260 }}>
-            <div>
-                <span className={caption}>PLACEHOLDER</span>
-                <TextField label="Placeholder" isLabelHidden placeholder="Placeholder" />
-            </div>
-            <div>
-                <span className={caption}>VALUE</span>
-                <TextField label="Value" isLabelHidden defaultValue="Value" />
-            </div>
-            <div>
-                <span className={caption}>ELEMENT BEFORE</span>
-                <TextField label="Search" isLabelHidden placeholder="Search" elemBeforeInput={icon('magnifying-glass')} />
-            </div>
-            <div>
-                <span className={caption}>TEXT AFFIX</span>
-                <TextField label="Amount" isLabelHidden elemBeforeInput="$" elemAfterInput=".00" defaultValue="12" />
-            </div>
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 24, minWidth: 260 }}>
-            <div>
-                <span className={caption}>LABEL</span>
-                <TextField label="Label" placeholder="Placeholder" />
-            </div>
-            <div>
-                <span className={caption}>REQUIRED</span>
-                <TextField label="Label" isRequired placeholder="Placeholder" />
-            </div>
-            <div>
-                <span className={caption}>HELPER TEXT</span>
-                <TextField label="Email" caption="We only use it for reminders." />
-            </div>
-        </div>
-    </div>
+/** One story per value, for the Examples tab. */
+export const ElementBefore = () => (
+    <div style={fieldWrap}><TextField label="Search" placeholder="Search" elemBeforeInput={icon('magnifying-glass')} /></div>
 );
 
-/** Validation: none, error, warning and success, each with its message. */
-export const Validation = () => (
-    <div style={row}>
-        <div>
-            <span className={caption}>NONE</span>
-            <TextField label="No validation" isLabelHidden placeholder="Placeholder" />
-        </div>
-        <div>
-            <span className={caption}>ERROR</span>
-            <TextField label="Error example" isLabelHidden placeholder="Placeholder" isInvalid errorMessage="Enter a 10-digit number" />
-        </div>
-        <div>
-            <span className={caption}>WARNING</span>
-            <TextField label="Warning example" isLabelHidden placeholder="Placeholder" warningMessage="This looks like a school address" />
-        </div>
-        <div>
-            <span className={caption}>SUCCESS</span>
-            <TextField label="Success example" isLabelHidden placeholder="Placeholder" successMessage="Looks good" />
-        </div>
-    </div>
+export const TextAffix = () => (
+    <div style={fieldWrap}><TextField label="Amount" elemBeforeInput="$" elemAfterInput=".00" defaultValue="12" /></div>
+);
+
+export const HelperText = () => (
+    <div style={fieldWrap}><TextField label="Email" caption="We only use it for reminders." /></div>
+);
+
+export const Filled = () => (
+    <div style={fieldWrap}><TextField label="Your name" defaultValue="Maya Johnson" /></div>
+);
+
+export const Success = () => (
+    <div style={fieldWrap}><TextField label="Username" defaultValue="maya_j" successMessage="Looks good" /></div>
+);
+
+export const SpacingDefault = () => (
+    <div style={fieldWrap}><TextField label="Your name" placeholder="Placeholder" spacing="default" elemAfterInput={icon('icons')} /></div>
+);
+
+export const SpacingCompact = () => (
+    <div style={fieldWrap}><TextField label="Your name" placeholder="Placeholder" spacing="compact" elemAfterInput={icon('icons')} /></div>
 );
 
 /** Spacing: 40 by default, 32 compact. */
@@ -173,24 +140,6 @@ Spacing.play = async ({ canvasElement }) => {
     await expect(px(getComputedStyle(box('default')).borderTopLeftRadius)).toBe(10);
     await expect(px(getComputedStyle(box('compact')).borderTopLeftRadius)).toBe(8);
 };
-
-/** States: default, disabled and read-only. Hover and focus are live. */
-export const States = () => (
-    <div style={row}>
-        <div>
-            <span className={caption}>DEFAULT</span>
-            <TextField label="Default" isLabelHidden placeholder="Placeholder" />
-        </div>
-        <div>
-            <span className={caption}>DISABLED</span>
-            <TextField label="Disabled" isLabelHidden placeholder="Placeholder" isDisabled />
-        </div>
-        <div>
-            <span className={caption}>READ ONLY</span>
-            <TextField label="Read only" isLabelHidden defaultValue="Read only" isReadOnly />
-        </div>
-    </div>
-);
 
 /**
  * Focus is a ring and nothing else: the fill, the border and the text stay as
@@ -232,7 +181,7 @@ export const Interactive = (args) => {
     const [value, setValue] = useState(args.value || '');
 
     return (
-        <div style={{ maxWidth: '600px' }}>
+        <div style={fieldWrap}>
             <TextField
                 {...args}
                 id="text-field-interactive"

@@ -120,6 +120,7 @@ Use a rich text editor where the formatting is part of the meaning: session note
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
+<tr><td>Rest</td><td><code>--ds-background-input</code> writing area inside a <code>--ds-border-input</code> edge.</td></tr>
 <tr><td>Hovered</td><td>Toolbar buttons take <code>--ds-background-neutral-subtle-hovered</code>. The writing area has no hover step.</td></tr>
 <tr><td>Pressed</td><td>Toolbar buttons take <code>--ds-background-neutral-subtle-pressed</code>.</td></tr>
 <tr><td>Active format</td><td>The button takes <code>--ds-background-selected</code> with <code>--ds-text-selected</code> and <code>--ds-icon-selected</code>.</td></tr>
@@ -151,6 +152,41 @@ Use a rich text editor where the formatting is part of the meaning: session note
 
 ## Best practices
 
+### Use the compact toolbar for short notes.
+
+Fewer tools keep a short field light.
+
+<DoDontPair
+    doExample={<RichTextEditor label="Quick note" placeholder="Add a note" toolbarPreset="compact" minHeight={96} />}
+    doCaption="The compact toolbar on a short note."
+    dontExample={<RichTextEditor label="Quick note" placeholder="Add a note" toolbarPreset="full" minHeight={96} />}
+    dontCaption="The full toolbar on a short note."
+/>
+
+### Use the full toolbar for long content.
+
+Long-form writing needs the full set of tools.
+
+<DoDontPair
+    doExample={<RichTextEditor label="Session summary" placeholder="What did you cover?" toolbarPreset="full" minHeight={96} />}
+    doCaption="The full toolbar for a long summary."
+    dontExample={<RichTextEditor label="Session summary" placeholder="What did you cover?" toolbarPreset="compact" minHeight={96} />}
+    dontCaption="Long-form writing limited to the compact toolbar."
+/>
+
+### Use read-only for content people read.
+
+Set `readOnly` on content people need to read, and keep `disabled` for an editor that is unavailable. Both draw the same here, so the choice is about what the content is for.
+
+### Use the placeholder for a hint.
+
+<DoDontPair
+    doExample={<RichTextEditor label="Session notes" placeholder="What did you cover?" minHeight={96} />}
+    doCaption="The placeholder hints at what to write."
+    dontExample={<RichTextEditor label="Session notes" placeholder="Session notes" minHeight={96} />}
+    dontCaption="The placeholder repeats the label."
+/>
+
 ### `value` is written to the DOM as HTML.
 
 ```jsx
@@ -175,10 +211,10 @@ Pressing those buttons opens the platform `prompt()` dialog for a URL. It is uns
 ### Label the editor.
 
 <DoDontPair
-    doExample={<RichTextEditor label="Session notes" placeholder="Type something..." minHeight={96} />}
+    doExample={<RichTextEditor label="Session notes" placeholder="What did you cover?" minHeight={96} />}
     doCaption="A label names the editor on screen and for assistive technology."
-    dontExample={<RichTextEditor placeholder="Session notes" minHeight={96} />}
-    dontCaption="A placeholder is not a name. It disappears as soon as someone types, and it is not read as the name."
+    dontExample={<RichTextEditor placeholder="What did you cover?" minHeight={96} />}
+    dontCaption="No label, only a placeholder, which disappears as soon as someone types."
 />
 
 </div>

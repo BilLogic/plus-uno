@@ -169,6 +169,27 @@ ComposingDoesNotSend.play = async ({ canvasElement }) => {
     await expect(field).toHaveValue('日本語');
 };
 
+/* ------------------------------------------------------------------- states */
+
+/** `state="focus"` draws the focus ring still, for documentation. */
+export const Focused = () => (
+    <div style={wrap}>
+        <PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI anything…" state="focus" onSubmit={fn()} />
+    </div>
+);
+
+export const Disabled = () => (
+    <div style={wrap}>
+        <PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI anything…" isDisabled onSubmit={fn()} />
+    </div>
+);
+
+Disabled.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await expect(canvas.getByRole('textbox', { name: 'Message to PLUS AI' })).toBeDisabled();
+    await expect(canvas.getByRole('button', { name: 'Send' })).toBeDisabled();
+};
+
 /* --------------------------------------------------------------- playground */
 
 export const Interactive = (args) => {

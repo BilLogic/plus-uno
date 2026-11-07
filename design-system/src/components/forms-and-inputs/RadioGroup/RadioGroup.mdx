@@ -125,7 +125,8 @@ The group owns the legend, the value and the error, so each option stays a plain
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Hovered, selected</td><td>As Radio: <code>--ds-background-input-hovered</code> with a <code>--ds-border-brand</code> edge; the selected bold fill and its hovered step.</td></tr>
+<tr><td>Hovered</td><td>As Radio. Unselected: <code>--ds-background-input-hovered</code> with a <code>--ds-border-brand</code> edge. Selected: the hovered step of the selected bold fill.</td></tr>
+<tr><td>Selected</td><td>As Radio: <code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge.</td></tr>
 <tr><td>Pressed</td><td>No step of its own. The hovered look holds while the pointer is down.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> on the one tab stop.</td></tr>
 <tr><td>Invalid</td><td>Every unselected option takes <code>--ds-border-danger</code>, with one message for the group.</td></tr>
@@ -154,6 +155,44 @@ The group owns the legend, the value and the error, so each option stays a plain
 
 ## Best practices
 
+### Name the question with a group label.
+
+The `legend` tells people what the options answer. A group with no visible
+legend needs its own `aria-label` or `aria-labelledby`; the caller's wins over
+the legend.
+
+<DoDontPair
+    doExample={<RadioGroup name="do-legend" legend="How often should we send reminders?" options={['Weekly', 'Every two weeks', 'Monthly']} />}
+    doCaption="The group has a visible question."
+    dontExample={<RadioGroup name="dont-legend" aria-label="How often should we send reminders?" options={['Weekly', 'Every two weeks', 'Monthly']} />}
+    dontCaption="Options with no visible question."
+/>
+
+### Stack three or more answers.
+
+A stacked list scans faster than a row once options multiply. Keep `inline`
+for short labels or a scale.
+
+<DoDontPair
+    doExample={<RadioGroup name="do-stack" legend="How often should we send reminders?" options={['Weekly', 'Every two weeks', 'Monthly', 'Never']} />}
+    doCaption="A stacked list for several options."
+    dontExample={<RadioGroup name="dont-stack" legend="How often should we send reminders?" options={['Weekly', 'Every two weeks', 'Monthly', 'Never']} orientation="inline" />}
+    dontCaption="A long row of options."
+/>
+
+### Explain an error under the group.
+
+One message under the group says what went wrong and what to do; a bare error
+state does not. Don't disable the group to block an answer instead: that hides
+why and removes it from the tab order.
+
+<DoDontPair
+    doExample={<RadioGroup name="do-error" legend="Did the session happen?" options={['Yes', 'No']} isRequired error="Choose an answer." />}
+    doCaption="The error is explained in one message."
+    dontExample={<RadioGroup name="dont-error" legend="Did the session happen?" options={['Yes', 'No']} isRequired isInvalid />}
+    dontCaption="The error state with no explanation."
+/>
+
 ### Leave the group unanswered until the person answers.
 
 `value` tells "answered zero" apart from "answered the first option." An unanswered group is `null` or `undefined` and never falls back to the first option. Check for that explicitly before treating the group as answered.
@@ -169,22 +208,9 @@ The group owns the legend, the value and the error, so each option stays a plain
 />
 ```
 
-### Show one error for the group.
-
-<DoDontPair
-    doExample={<RadioGroup name="do-error" legend="Did the session happen?" options={['Yes', 'No']} isRequired error="Choose an answer." />}
-    doCaption="One message under the group says what to do."
-    dontExample={<RadioGroup name="dont-error" legend="Did the session happen?" options={['Yes', 'No']} isDisabled />}
-    dontCaption="Disabling the group hides why it cannot be answered and removes it from the tab order."
-/>
-
 ### Use `reveal` instead of a separate conditional field.
 
 When choosing one option should show an extra field, such as "Other, please specify", pass that field as the option's `reveal` rather than rendering it outside the group. It stays scoped to the option that triggers it and disappears when another option is chosen.
-
-### Name the question in the legend.
-
-A group with no visible legend needs its own `aria-label` or `aria-labelledby`; the caller's wins over the legend.
 
 </div>
 

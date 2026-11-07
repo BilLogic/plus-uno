@@ -18,15 +18,15 @@
 | `id` | string | — | — |
 | `name` | string | — | — |
 | `label` | node | — | The editor's name, rendered above it and pointed at by the region. |
-| `placeholder` | string | — | Placeholder text |
+| `placeholder` | string | — | Hint text shown while the editor is empty. |
 | `value` | string | — | — |
 | `defaultValue` | string | `''` | — |
-| `spacing` | enum | `'default'` | Editor spacing |
-| `readOnly` | bool | `false` | Read-only state |
-| `disabled` | bool | `false` | Disabled state |
-| `minHeight` | number | — | Minimum editor height |
+| `spacing` | enum | `'default'` | `default` or `compact`. |
+| `readOnly` | bool | `false` | Shows the content without letting the user edit it, and disables the toolbar. |
+| `disabled` | bool | `false` | Prevents interaction, disables the toolbar and dims the editor. |
+| `minHeight` | number | — | Minimum height of the editing area, in pixels. |
 | `toolbarButtons` | arrayOf | — | — |
-| `toolbarPreset` | enum | `'compact'` | compact = Figma email/default toolbar; full = extended control set |
+| `toolbarPreset` | enum | `'compact'` | `compact` (default) is the short toolbar for messages; `full` is the extended set of formatting controls. Passing `toolbarButtons` uses the full toolbar with those buttons. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 | `onChange` | func | — | — |

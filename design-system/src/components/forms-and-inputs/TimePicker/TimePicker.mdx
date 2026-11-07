@@ -123,6 +123,7 @@ Use a time picker for a time of day alone: a reminder time, a recurring slot's s
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
+<tr><td>Rest</td><td><code>--ds-background-input</code> fill with a <code>--ds-border-input</code> border.</td></tr>
 <tr><td>Hovered</td><td>The border takes <code>--ds-border-focused</code>.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box.</td></tr>
 <tr><td>Invalid</td><td>The border takes <code>--ds-border-danger</code>.</td></tr>
@@ -159,15 +160,41 @@ Use a time picker for a time of day alone: a reminder time, a recurring slot's s
 <TimePicker value={time} onChange={setTime} />
 ```
 
-### AM/PM is a separate control from the typed text.
+### Type hours and minutes with a colon.
 
-Typing sets the hour and minute; the toggle sets the period independently and reports immediately with whichever half of the time is already set.
+The colon separates hours from minutes. Without it, 330 can be read several ways. The field also accepts bare digits and adds the colon when it loses focus, so the placeholder is where people see the format.
 
 <DoDontPair
-    doExample={<TimePicker aria-label="Reminder time" value="02:30 PM" />}
-    doCaption="Name the field by what the time is for."
-    dontExample={<TimePicker aria-label="Time" isInvalid />}
-    dontCaption="A generic name does not say which time is wanted, and an invalid field needs a message."
+    doExample={<TimePicker aria-label="Session start" />}
+    doCaption="The placeholder shows hours and minutes with a colon."
+    dontExample={<TimePicker aria-label="Session start" placeholder="____" />}
+    dontCaption="The placeholder has no colon."
+/>
+
+### Offer round steps.
+
+Steps of 15 or 30 minutes match how sessions are booked. Odd minutes nobody books only add choices.
+
+<DoDontPair
+    doExample={<TimePicker aria-label="Session start" value="02:30 PM" />}
+    doCaption="A round start time."
+    dontExample={<TimePicker aria-label="Session start" value="02:37 PM" />}
+    dontCaption="An odd minute."
+/>
+
+### Set AM or PM in the menu.
+
+The menu beside the field holds AM or PM. Typing sets the hour and minute; the menu sets the period on its own and reports at once with whichever half of the time is already set. Asking for AM or PM in the field too leaves two places that can disagree, so keep the placeholder to the hour and minute.
+
+### Show a set time as read-only, not disabled.
+
+Read-only shows a time the person may read but not change. Disabled fades the field for a time that does not apply right now, and takes it out of the tab order.
+
+<DoDontPair
+    doExample={<TimePicker aria-label="Session start" value="02:30 PM" isReadOnly />}
+    doCaption="A set time, read-only and easy to read."
+    dontExample={<TimePicker aria-label="Session start" value="02:30 PM" isDisabled />}
+    dontCaption="The same time disabled, faded as if it did not apply."
 />
 
 </div>

@@ -26,8 +26,7 @@ export default {
         contentPreset: {
             control: 'select',
             options: ['empty', 'preselected'],
-            description: 'Preset selection state for the interactive demo',
-            table: { category: 'Content' },
+            table: { disable: true },
         },
         options: {
             table: { disable: true, category: 'Development' },
@@ -41,7 +40,6 @@ export default {
         },
         isMulti: {
             control: 'boolean',
-            description: 'Allow selecting multiple nodes with checkboxes',
             table: { category: 'Design' },
         },
         spacing: {
@@ -62,7 +60,6 @@ export default {
         },
         placeholder: {
             control: 'text',
-            description: 'Placeholder text when nothing is selected',
             table: { category: 'Content' },
         },
     },
@@ -112,7 +109,7 @@ export const Overview = () => {
     const [value, setValue] = useState([]);
 
     return (
-        <div style={{ maxWidth: '600px', minHeight: 48, paddingBottom: 320 }}>
+        <div style={{ maxWidth: 'var(--width-2500)' }}>
             <TreeSelect
                 id="tree-select-overview"
                 aria-label="Topic"
@@ -126,29 +123,37 @@ export const Overview = () => {
     );
 };
 
-export const Content = () => {
-    const [single, setSingle] = useState('');
-    const [multi, setMulti] = useState(['triangles', 'circles', 'geometry']);
+const fieldWrap = { maxWidth: 'var(--width-2500)' };
 
+/** Single select: clicking any node selects it and closes the panel. */
+export const SingleSelect = () => {
+    const [value, setValue] = useState('');
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
-            <TreeSelect id="tree-select-single" label="Single select" caption="Clicking any node selects it and closes the panel." value={single} options={sampleOptions} onChange={setSingle} />
-            <TreeSelect id="tree-select-multi" label="Multiple, pre-selected branch" caption="Checking a parent cascades to its children; partially checked branches show an indeterminate state." value={multi} options={sampleOptions} onChange={setMulti} isMulti />
+        <div style={fieldWrap}>
+            <TreeSelect id="tree-select-single" label="Topic" value={value} options={sampleOptions} onChange={setValue} />
         </div>
     );
 };
 
-export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px' }}>
-        <TreeSelect id="tree-select-default" label="Default" value={[]} options={sampleOptions} onChange={() => {}} isMulti />
-        <TreeSelect id="tree-select-compact" label="Compact" spacing="compact" value={[]} options={sampleOptions} onChange={() => {}} isMulti />
+/** Multi select: a parent's check cascades to its children; a partly checked branch is indeterminate. */
+export const MultiSelect = () => {
+    const [value, setValue] = useState(['triangles', 'circles', 'geometry']);
+    return (
+        <div style={fieldWrap}>
+            <TreeSelect id="tree-select-multi" label="Topics" value={value} options={sampleOptions} onChange={setValue} isMulti />
+        </div>
+    );
+};
+
+export const SpacingDefault = () => (
+    <div style={fieldWrap}>
+        <TreeSelect id="tree-select-default" label="Topics" value={[]} options={sampleOptions} onChange={() => {}} isMulti />
     </div>
 );
 
-export const InteractionStates = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px' }}>
-        <TreeSelect id="tree-select-disabled" label="Disabled" value={[]} options={sampleOptions} onChange={() => {}} isMulti isDisabled />
-        <TreeSelect id="tree-select-invalid" label="Invalid" value={[]} options={sampleOptions} onChange={() => {}} isInvalid errorMessage="Pick a topic" />
+export const SpacingCompact = () => (
+    <div style={fieldWrap}>
+        <TreeSelect id="tree-select-compact" label="Topics" spacing="compact" value={[]} options={sampleOptions} onChange={() => {}} isMulti />
     </div>
 );
 
@@ -169,7 +174,7 @@ export const Interactive = (args) => {
         : (value || '');
 
     return (
-        <div style={{ maxWidth: '600px' }}>
+        <div style={{ maxWidth: 'var(--width-2500)' }}>
             <TreeSelect
                 id="tree-select-interactive"
                 label={args.label}
@@ -177,11 +182,14 @@ export const Interactive = (args) => {
                 options={sampleOptions}
                 onChange={setValue}
                 isMulti={args.isMulti}
+                spacing={args.spacing}
                 isDisabled={args.isDisabled}
+                isInvalid={args.isInvalid}
+                errorMessage={args.isInvalid ? 'Pick a topic.' : undefined}
                 placeholder={args.placeholder}
             />
             {selectionSummary && (
-                <p className="body3-txt" style={{ marginTop: '16px', color: 'var(--ds-text-subtle)' }}>
+                <p style={{ marginTop: 'var(--stack-md)', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
                     Selected: {selectionSummary}
                 </p>
             )}
@@ -193,7 +201,9 @@ Interactive.args = {
     contentPreset: 'empty',
     label: 'Topic',
     isMulti: true,
+    spacing: 'default',
     isDisabled: false,
+    isInvalid: false,
     placeholder: 'Please select',
 };
 

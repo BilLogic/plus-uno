@@ -29,7 +29,6 @@ export default {
         style: { table: { disable: true } },
         placeholder: {
             control: 'text',
-            description: 'Placeholder text',
             table: { category: 'Content' }
         },
         initialContent: {
@@ -40,29 +39,23 @@ export default {
         spacing: {
             control: 'select',
             options: ['default', 'compact'],
-            description: 'Editor spacing',
             table: { category: 'Design' }
         },
         readOnly: {
             control: 'boolean',
-            description: 'Read-only state',
             table: { category: 'Behavior' }
         },
         disabled: {
             control: 'boolean',
-            description: 'Disabled state',
             table: { category: 'Behavior' }
         },
         minHeight: {
             control: 'number',
-            description: 'Minimum editor height',
             table: { category: 'Layout' }
         },
         toolbarPreset: {
             control: 'select',
             options: ['compact', 'full'],
-            description:
-                'compact = Figma email/default toolbar; full = extended control set',
             table: { category: 'Layout' }
         },
         value: {

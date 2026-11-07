@@ -116,8 +116,8 @@ Do not use a range when choosing a specific value matters. A slider is less prec
 ## Parts
 
 1. **Label.** 14/20 text directly above the slider, aligned left. It names the slider.
-2. **Track.** A 4 line showing the span. It fills with the selected bold fill from the start to the handle.
-3. **Handle.** A 20 circle the person moves along the track to change the value.
+2. **Track.** A 4 line showing the span (6 or 8 with `size` 12 or 16). It fills with the selected bold fill from the start to the handle.
+3. **Handle.** A 20 circle, or 8, 12 or 16 when `size` is set, that the person moves along the track to change the value.
 
 ### States
 
@@ -126,6 +126,7 @@ Do not use a range when choosing a specific value matters. A slider is less prec
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
+<tr><td>Rest</td><td>The track fills with <code>--ds-background-selected-bold</code> from the start to the handle.</td></tr>
 <tr><td>Hovered</td><td>The handle takes <code>--ds-background-selected-bold-hovered</code>.</td></tr>
 <tr><td>Pressed</td><td>While the handle is dragged it reads the same as hovered.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the handle, for keyboard focus only.</td></tr>
@@ -143,6 +144,7 @@ Do not use a range when choosing a specific value matters. A slider is less prec
 <tbody>
 <tr><td>Track</td><td><code>--ds-background-neutral</code>; fill <code>--ds-background-selected-bold</code>; height <code>--range-track-height-4</code>.</td></tr>
 <tr><td>Handle</td><td><code>--range-dot-size-default</code> (20), <code>--ds-background-selected-bold</code>, <code>--ds-shadow-raised</code>.</td></tr>
+<tr><td>Size</td><td><code>--range-dot-size-8</code>, <code>-12</code>, <code>-16</code>; track <code>--range-track-height-4</code>, <code>-6</code>, <code>-8</code>.</td></tr>
 <tr><td>Corner</td><td><code>--radius-full</code> on track, fill and handle.</td></tr>
 <tr><td>Hit area</td><td><code>--item-height-md</code> (32), the whole row.</td></tr>
 <tr><td>Label</td><td><code>--ds-text</code>, body default; gap <code>--space-025</code>.</td></tr>
@@ -155,13 +157,48 @@ Do not use a range when choosing a specific value matters. A slider is less prec
 
 ## Best practices
 
+### Use size 12 by default.
+
+The 12 handle and its track are easy to read and to grab in a standard form.
+
+<DoDontPair
+    doExample={<div style={{ width: '100%' }}><Range label="Session length" defaultValue={40} size={12} /></div>}
+    doCaption="Size 12 in a standard form."
+    dontExample={<div style={{ width: '100%' }}><Range label="Session length" defaultValue={40} size={8} /></div>}
+    dontCaption="Size 8 for a primary input."
+/>
+
+### Use one size per form.
+
+Matching sizes keep several ranges aligned.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', width: '100%' }}><Range label="Zoom" defaultValue={40} size={12} /><Range label="Volume" defaultValue={60} size={12} /></div>}
+    doCaption="Every range in the form uses size 12."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', width: '100%' }}><Range label="Zoom" defaultValue={40} size={12} /><Range label="Volume" defaultValue={60} size={8} /></div>}
+    dontCaption="Size 12 and size 8 in the same form."
+/>
+
+### Use size 16 for touch.
+
+A thicker track is a larger target.
+
+<DoDontPair
+    doExample={<div style={{ width: '100%' }}><Range label="Session length" defaultValue={40} size={16} /></div>}
+    doCaption="Size 16 where touch is the main input."
+    dontExample={<div style={{ width: '100%' }}><Range label="Session length" defaultValue={40} size={8} /></div>}
+    dontCaption="Size 8 on a touch screen."
+/>
+
 ### Put the label directly above the slider.
+
+Keep it short and aligned left. Show it unless the layout already names the slider.
 
 <DoDontPair
     doExample={<div style={{ width: '100%' }}><Range label="Zoom" defaultValue={40} /></div>}
-    doCaption="Put the label directly above the slider, aligned left, and keep it short."
-    dontExample={<div style={{ width: '100%' }}><Range label="Choose how far you would like to zoom into the image" showLabel={false} defaultValue={40} /></div>}
-    dontCaption="A hidden label leaves the slider unnamed on screen. Show the label unless the layout names it clearly."
+    doCaption="The label sits above the slider and names it."
+    dontExample={<div style={{ width: '100%' }}><Range label="Zoom" showLabel={false} defaultValue={40} /></div>}
+    dontCaption="The label is hidden, so nothing on screen names the slider."
 />
 
 ### `onChange` reports a number.

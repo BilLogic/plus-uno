@@ -22,24 +22,20 @@ export default {
     argTypes: {
         children: {
             control: false,
-            description: 'The uploaded-file list, shown below the button and outside the frame',
             table: { category: 'Content' },
         },
         onClick: { table: { disable: true } },
         style: { table: { disable: true } },
         label: {
             control: 'text',
-            description: 'Label text for the file upload field',
             table: { category: 'Content' },
         },
         isRequired: {
             control: 'boolean',
-            description: 'Whether the field is required (shows red asterisk)',
             table: { category: 'Content' },
         },
         description: {
             control: 'text',
-            description: 'Description text shown below the label',
             table: { category: 'Content' },
         },
         formatPreset: {
@@ -50,28 +46,23 @@ export default {
         },
         buttonText: {
             control: 'text',
-            description: 'Text displayed on the file selection button',
             table: { category: 'Content' },
         },
         isDisabled: {
             control: 'boolean',
-            description: 'Disable the file upload component',
             table: { category: 'Behavior' },
         },
         isReadOnly: {
             control: 'boolean',
-            description: 'Show the field and its files without a way to choose a file',
             table: { category: 'Behavior' },
         },
         validation: {
             control: 'select',
             options: ['none', 'invalid', 'valid'],
-            description: 'Validation state of the component',
             table: { category: 'Behavior' },
         },
         validationMessage: {
             control: 'text',
-            description: 'Message displayed for validation states',
             table: { category: 'Behavior' },
         },
         id: {

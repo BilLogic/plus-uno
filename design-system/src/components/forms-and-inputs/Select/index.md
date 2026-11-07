@@ -9,7 +9,7 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Content, Modes, Spacing, InteractionStates, DependentFields, LongList, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
@@ -46,7 +46,7 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 | `isValid` | bool | `false` | Draws the confirmation border; `successMessage` takes the caption's place. |
 | `successMessage` | node | — | The caption shown under the field while `isValid` is set. |
 | `commitOnClose` | bool | `false` | With `isMulti`: `onChange` fires once when the list closes, as a filter bar wants, not on each pick. |
-| `clearable` | bool | — | Shows the clear ×. Unset, it is on with `isMulti` and `!isRequired` otherwise. |
+| `clearable` | bool | — | Shows the clear × (Figma `_Field Clear`), and lets Delete empty the field. Defaults to true with `isMulti` and to `!isRequired` otherwise; a sort passes `false`. |
 | `selectAll` | bool | `false` | With `isMulti`: a "Select all" button over the list, hidden past 50 matches. |
 | `maxSelections` | number | — | With `isMulti`: the most values; past it the other rows are disabled and the list says why. |
 | `dependsOn` | shape | — | The field this one depends on: `{ value, label }`. Until `value` is set the field is disabled with "Choose {label} first"; when it changes, this field clears. |
@@ -78,6 +78,4 @@ From `design-system/src/components/forms-and-inputs/Select/Select.scss`. Overrid
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

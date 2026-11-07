@@ -9,7 +9,7 @@ The read view and the edit view are drawn at the same size, so opening the edito
 
 **Source:** `design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.stories.jsx` — Textfield, LeavingConfirms, KeepOpenOnBlur, Validation, FailedConfirm, WithoutButtons, StartsOpen, SameHeight, ButtonsDoNotMoveThePage, WithAnotherEditView, Placeholder, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.stories.jsx` — Textfield, LeavingConfirms, KeepOpenOnBlur, Validation, FailedConfirm, WithoutButtons, StartsOpen, SameHeight, SpacingDefault, SpacingCompact, ButtonsDoNotMoveThePage, WithAnotherEditView, Placeholder, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.mdx`
 

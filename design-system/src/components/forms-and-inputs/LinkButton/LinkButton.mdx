@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
-import { LinkButton, Button } from '@/components';
+import { LinkButton } from '@/components';
 import * as LinkButtonStories from './LinkButton.stories.jsx';
 import {
     ComponentExample,
@@ -192,8 +192,8 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 <tbody>
 <tr><td>Fill, label, icon</td><td>The same named tokens as Button for each appearance, with hovered and pressed steps.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
-<tr><td>Size</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>. Square.</td></tr>
-<tr><td>Radius</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>. Circle 50%.</td></tr>
+<tr><td>Height</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>.</td></tr>
+<tr><td>Radius</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>.</td></tr>
 <tr><td>Padding</td><td>12: <code>--pad-x-md</code>. Compact 8: <code>--pad-x-sm</code>.</td></tr>
 <tr><td>Icon-to-label gap</td><td>4: <code>--inline-sm</code>.</td></tr>
 </tbody>
@@ -205,13 +205,40 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 
 ## Best practices
 
-### A link goes somewhere; a button does something.
+### Keep space between link buttons.
+
+Leave a gap so neighboring link buttons read as separate targets.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><LinkButton href="#sessions" text="View sessions" /><LinkButton href="#students" text="View students" /></div>}
+    doCaption="A clear gap between link buttons."
+    dontExample={<div style={{ display: 'flex', gap: 0 }}><LinkButton href="#sessions" text="View sessions" /><LinkButton href="#students" text="View students" /></div>}
+    dontCaption="Link buttons touching."
+/>
+
+### Use it to go somewhere, not to act.
+
+A link button navigates to a page or an external address, and assistive
+technology announces a link. Actions that save, delete or submit belong on a
+Button.
+
+<DoDontPair
+    doExample={<LinkButton href="#notes" text="Open session notes" />}
+    doCaption="Open session notes goes to the notes page."
+    dontExample={<LinkButton href="#notes" text="Delete session" />}
+    dontCaption="Delete session acts on the page, so it belongs on a button."
+/>
+
+### Let it hug its label.
+
+Keep the natural width. Reserve `shouldFitContainer` for narrow containers,
+such as a mobile sheet.
 
 <DoDontPair
     doExample={<LinkButton href="#sessions" text="View sessions" />}
-    doCaption="Navigation uses a link button, so assistive technology announces a link."
-    dontExample={<Button text="View sessions" />}
-    dontCaption="A button with no destination cannot be opened in a new tab or copied as a link."
+    doCaption="Natural width."
+    dontExample={<LinkButton href="#sessions" text="View sessions" shouldFitContainer />}
+    dontCaption="Stretched across a wide row."
 />
 
 ### Align with the button group.

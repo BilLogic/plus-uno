@@ -138,22 +138,49 @@ applied result.
 
 ## Best practices
 
-### Show the count only once something is applied.
+### Keep space between filter buttons.
+
+Leave a gap so neighboring filter buttons read as separate targets.
 
 <DoDontPair
-    doExample={<div className="d-flex gap-2"><FilterButton text="Subject" trailingMetric={3} /><FilterButton text="Grade" /></div>}
-    doCaption="The count appears when values are applied."
-    dontExample={<div className="d-flex gap-2"><FilterButton text="Subject" trailingMetric={0} /><FilterButton text="Grade" trailingMetric={0} /></div>}
-    dontCaption="A zero on every filter adds noise."
+    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><FilterButton text="Subject" /><FilterButton text="Grade" /><FilterButton text="Status" /></div>}
+    doCaption="A clear gap between filter buttons."
+    dontExample={<div style={{ display: 'flex', gap: 0 }}><FilterButton text="Subject" /><FilterButton text="Grade" /><FilterButton text="Status" /></div>}
+    dontCaption="Filter buttons touching."
 />
 
-Pass `trailingMetric` when at least one option is selected; leave it out
-entirely rather than passing `0` as a placeholder for "none applied" —
-`0` renders as a visible count of zero, not an empty state.
+### Show the active count.
+
+When a filter is applied, the trailing count says how many values are
+active. Pass `trailingMetric` once at least one value is selected, and leave
+it out when none is: `0` renders as a visible count of zero, not an empty
+state.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><FilterButton text="Subject" trailingMetric={3} /><FilterButton text="Grade" /></div>}
+    doCaption="Subject shows its three applied values; Grade, with none, shows no count."
+    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><FilterButton text="Subject" /><FilterButton text="Grade" /></div>}
+    dontCaption="Subject has three values applied but shows no count."
+/>
 
 ```jsx
 <FilterButton text="Status" trailingMetric={selected.length || undefined} />
 ```
+
+### Let it hug its label.
+
+Keep the natural width, so the chevron stays right after the name. Filter
+button has no prop to fill its container; don't stretch it across a wide row
+with your own styles.
+
+### Use the filter's name as the label.
+
+<DoDontPair
+    doExample={<FilterButton text="Status" />}
+    doCaption="The label is the filter's name."
+    dontExample={<FilterButton text="Filter by status" />}
+    dontCaption="A verb phrase repeats what the button already does."
+/>
 
 ### Turn off the chevron only when the button doesn't open a menu.
 

@@ -126,6 +126,7 @@ Use a date time picker when a date and a time are one answer: a session's start,
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
+<tr><td>Rest</td><td><code>--ds-background-input</code> fill with a <code>--ds-border-input</code> border.</td></tr>
 <tr><td>Hovered</td><td>The hovered half's border takes <code>--ds-border-focused</code>.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the focused half.</td></tr>
 <tr><td>Invalid</td><td>Both borders take <code>--ds-border-danger</code>; the caption shows the error message.</td></tr>
@@ -180,11 +181,41 @@ The label's text is read as the group's accessible name, and the date and time i
 
 `otherTimeZone` only changes the caption when it differs from the viewer's own zone, and then it adds the other person's time rather than converting the field. The fields always show the viewer's local time.
 
+### Show the date and the time in one pattern.
+
+Date first, then time with AM or PM. The field already sets that order; write the moment the same way wherever else it appears, "10/21/2026, 3:30 PM" and not "2026-10-21 15:30", so people do not have to reread it.
+
+### Always show AM or PM.
+
+A time without AM or PM can mean two times a day apart. The time field keeps its AM/PM toggle beside the minutes, so the field always shows it; keep it in any message that repeats the time.
+
+### Name the time zone when it can differ.
+
+Tutors and students can sit in different zones. Name the zone next to the time so a session is not missed. `showTimeZone` is on by default.
+
 <DoDontPair
-    doExample={<DateTimePicker id="dt-do" label="Session start" dateValue="2026-10-21" timeValue="04:00 PM" showSectionLabels={false} />}
-    doCaption="One label for the moment, with the time zone named under it."
-    dontExample={<DateTimePicker id="dt-dont" label="Session start" isInvalid errorMessage="Invalid" showSectionLabels={false} />}
-    dontCaption="A bare 'Invalid' does not say what to change. Name the problem."
+    doExample={<DateTimePicker label="Session start" dateValue="2026-10-21" timeValue="03:30 PM" timeZone="America/New_York" />}
+    doCaption="The zone is named under the time."
+    dontExample={<DateTimePicker label="Session start" dateValue="2026-10-21" timeValue="03:30 PM" timeZone="America/New_York" showTimeZone={false} />}
+    dontCaption="The zone is not named."
+/>
+
+### Label the moment by its role.
+
+<DoDontPair
+    doExample={<DateTimePicker label="Session start" dateValue="2026-10-21" timeValue="03:30 PM" showTimeZone={false} />}
+    doCaption="The label says which moment this is."
+    dontExample={<DateTimePicker label="Date and time" dateValue="2026-10-21" timeValue="03:30 PM" showTimeZone={false} />}
+    dontCaption="The label names the two halves, not the moment."
+/>
+
+### Say what to fix in an error.
+
+<DoDontPair
+    doExample={<DateTimePicker label="Session start" isInvalid errorMessage="Choose a start date and time." showTimeZone={false} />}
+    doCaption="The message says what to change."
+    dontExample={<DateTimePicker label="Session start" isInvalid errorMessage="Invalid" showTimeZone={false} />}
+    dontCaption="A bare 'Invalid' does not say what to change."
 />
 
 </div>

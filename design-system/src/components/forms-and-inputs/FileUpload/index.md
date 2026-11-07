@@ -17,21 +17,21 @@
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `name` | string | — | — |
-| `label` | node | — | Label text for the file upload field |
-| `isRequired` | bool | `false` | Whether the field is required (shows red asterisk) |
-| `description` | string | — | Description text shown below the label |
+| `label` | node | — | The visible label above the field. Without one, the file input is named "File upload". |
+| `isRequired` | bool | `false` | Shows an asterisk on the label. |
+| `description` | string | — | Help text inside the field, such as size limits. When omitted, it is built from `acceptedFormats`. |
 | `acceptedFormats` | arrayOf | — | — |
-| `isDisabled` | bool | `false` | Disable the file upload component |
-| `isReadOnly` | bool | `false` | Show the field and its files without a way to choose a file |
-| `validation` | enum | `'none'` | Validation state of the component |
-| `validationMessage` | string | — | Message displayed for validation states |
-| `buttonText` | string | `'Choose a file'` | Text displayed on the file selection button |
+| `isDisabled` | bool | `false` | Disables the button and file input and dims the field. |
+| `isReadOnly` | bool | `false` | Shows the field and its files without a way to choose a file. |
+| `validation` | enum | `'none'` | `none` (default) shows no state, `invalid` draws the error state and `valid` the success state. Pair `invalid` or `valid` with `validationMessage`. |
+| `validationMessage` | string | — | Message shown under the field for the `invalid` or `valid` state. Not shown when `validation` is `none`. |
+| `buttonText` | string | `'Choose a file'` | The label of the choose-file button. Defaults to `Choose a file`. |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 | `onChange` | func | — | — |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
-| `children` | node | — | The uploaded-file list, shown below the button and outside the frame |
+| `children` | node | — | The uploaded-file list, shown below the button and outside the frame. |
 
 ## Variants
 

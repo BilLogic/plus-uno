@@ -127,6 +127,7 @@ Use a rating for a single satisfaction score out of five: the end of a session, 
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
+<tr><td>Rest</td><td><code>--ds-background-neutral</code> circle with the icon outlined in <code>--ds-icon-subtle</code>.</td></tr>
 <tr><td>Hovered</td><td>The item takes <code>--ds-background-neutral-hovered</code>.</td></tr>
 <tr><td>Pressed</td><td>No step of its own. The hovered look holds while the pointer is down.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the item, for keyboard focus only.</td></tr>
@@ -156,6 +157,39 @@ Use a rating for a single satisfaction score out of five: the end of a session, 
 <div className="sb-ds-doc-section">
 
 ## Best practices
+
+### Use stars for quality and thumbs for approval.
+
+Match the icon to the question.
+
+<DoDontPair
+    doExample={<Rating label="How was the session?" icon="star" value={0} onChange={() => {}} />}
+    doCaption="Stars rate the quality of a session."
+    dontExample={<Rating label="How was the session?" icon="thumbs-up" value={0} onChange={() => {}} />}
+    dontCaption="Thumbs on a graded five-point scale."
+/>
+
+### Start empty for new input.
+
+A pre-filled rating biases the answer.
+
+<DoDontPair
+    doExample={<Rating label="How was the session?" value={0} onChange={() => {}} />}
+    doCaption="No rating yet, so the person gives their own."
+    dontExample={<Rating label="How was the session?" value={4} onChange={() => {}} />}
+    dontCaption="Four stars filled before the person has rated."
+/>
+
+### Show a given rating as disabled.
+
+A rating that cannot change reads as a result.
+
+<DoDontPair
+    doExample={<Rating label="How was the session?" value={4} isDisabled onChange={() => {}} />}
+    doCaption="A recorded rating, disabled."
+    dontExample={<Rating label="How was the session?" value={4} onChange={() => {}} />}
+    dontCaption="A recorded rating that still looks editable."
+/>
 
 ### It is always controlled.
 

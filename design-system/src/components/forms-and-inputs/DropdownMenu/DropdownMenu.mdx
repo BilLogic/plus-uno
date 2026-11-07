@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
-import { DropdownMenu, Button, ButtonItem } from '@/components';
+import { ButtonItem, MenuGroup } from '@/components';
 import * as DropdownMenuStories from './DropdownMenu.stories.jsx';
 import {
     ComponentExample,
@@ -21,8 +21,6 @@ A dropdown menu is a trigger that opens a menu of actions or navigation items.
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    sets={figmaMeta.sets}
-    figmaFileKey={figmaMeta.fileKey}
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/DropdownMenu"
 />
 
@@ -161,11 +159,39 @@ A Custom item with no `component` override (its default, `div`) renders a row th
 
 ### Use a menu for actions and a select for a value.
 
+Rows that set a value belong in a Select, which shows the chosen value on its trigger. A dropdown menu's rows do something: rename, archive, share.
+
+### Group related items and keep destructive ones last.
+
+Order items by task and put Delete at the bottom, away from the common actions.
+
 <DoDontPair
-    doExample={<DropdownMenu trigger={<Button text="Actions" />}><ButtonItem onClick={() => {}}>Rename</ButtonItem><ButtonItem onClick={() => {}}>Archive</ButtonItem></DropdownMenu>}
-    doCaption="Rows that do something: rename, archive, share."
-    dontExample={<DropdownMenu trigger={<Button text="Choose a grade" />}><ButtonItem onClick={() => {}}>Grade 3</ButtonItem><ButtonItem onClick={() => {}}>Grade 4</ButtonItem></DropdownMenu>}
-    dontCaption="Rows that set a value belong in a Select, which shows the chosen value."
+    doExample={<div inert aria-hidden="true"><MenuGroup minWidth="var(--width-1500)"><ButtonItem>Rename</ButtonItem><ButtonItem>Duplicate</ButtonItem><ButtonItem>Archive</ButtonItem><ButtonItem>Delete</ButtonItem></MenuGroup></div>}
+    doCaption="Delete sits last, after the common actions."
+    dontExample={<div inert aria-hidden="true"><MenuGroup minWidth="var(--width-1500)"><ButtonItem>Delete</ButtonItem><ButtonItem>Rename</ButtonItem><ButtonItem>Duplicate</ButtonItem><ButtonItem>Archive</ButtonItem></MenuGroup></div>}
+    dontCaption="Delete first puts a risky action at the top."
+/>
+
+### Start each item with a verb, in sentence case.
+
+Verb-first labels read as actions. All caps and noun-only labels slow scanning.
+
+<DoDontPair
+    doExample={<div inert aria-hidden="true"><MenuGroup minWidth="var(--width-1500)"><ButtonItem>Rename</ButtonItem><ButtonItem>Duplicate</ButtonItem><ButtonItem>Archive</ButtonItem></MenuGroup></div>}
+    doCaption="Verb first, sentence case."
+    dontExample={<div inert aria-hidden="true"><MenuGroup minWidth="var(--width-1500)"><ButtonItem>NAME</ButtonItem><ButtonItem>COPY</ButtonItem><ButtonItem>FILE</ButtonItem></MenuGroup></div>}
+    dontCaption="All caps and noun-only labels."
+/>
+
+### Keep item labels short and distinct.
+
+One or two words each. Long, near-identical labels make the choice harder and wrap.
+
+<DoDontPair
+    doExample={<div inert aria-hidden="true"><MenuGroup minWidth="var(--width-1500)"><ButtonItem>Rename</ButtonItem><ButtonItem>Duplicate</ButtonItem><ButtonItem>Archive</ButtonItem></MenuGroup></div>}
+    doCaption="Short, distinct labels."
+    dontExample={<div inert aria-hidden="true"><MenuGroup minWidth="var(--width-1500)"><ButtonItem>Archive this session now</ButtonItem><ButtonItem>Archive this session later</ButtonItem><ButtonItem>Archive this session today</ButtonItem></MenuGroup></div>}
+    dontCaption="Long, near-identical labels."
 />
 
 ### Nested menus are not yet built.

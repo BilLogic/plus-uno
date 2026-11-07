@@ -19,7 +19,7 @@ export default {
         docs: { toc: { title: 'On this page' } },
     },
     argTypes: {
-        icon: { control: 'text', description: 'Font Awesome Free glyph name', table: { category: 'Content' } },
+        icon: { control: 'text', table: { category: 'Content' } },
         label: { control: 'text', table: { category: 'Content' } },
         appearance: { control: 'select', options: VERTICAL_BUTTON_APPEARANCES, table: { category: 'Design' } },
         isSelected: { control: 'boolean', table: { category: 'Behavior' } },

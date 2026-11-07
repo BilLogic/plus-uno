@@ -17,13 +17,13 @@ Icon button: a button that is an icon and nothing else. `label` is required beca
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `icon` | string or node | — | A Font Awesome Free glyph name, or a node. |
-| `label` | string (required) | — | The accessible name and the tooltip. Sentence case; name the object acted on. |
-| `appearance` | enum | `'default'` | The visual style. |
-| `spacing` | enum | `'default'` | Height, width and radius: `default` is 32, `compact` is 24. Compact is for tables and tight toolbars. |
-| `shape` | enum | `'default'` | Square or round. Round is for top navigation. |
-| `isSelected` | bool | — | Marks the button selected and sets `aria-pressed`. |
-| `isDisabled` | bool | — | Prevents interaction. Avoid it; see Accessibility. |
+| `icon` | string or node | — | A Font Awesome Free glyph name (`trash`) or a node. |
+| `label` | string (required) | — | The accessible name and tooltip. Sentence case; name the object acted on ("Edit page"). |
+| `appearance` | enum | `'default'` | The visual style. `default` suits most actions, `subtle` low-emphasis toolbar actions, `primary` the main action and `discovery` something new. |
+| `spacing` | enum | `'default'` | `default` draws 32. `compact` draws 24. |
+| `shape` | enum | `'default'` | Square by default; `circle` is for top navigation. |
+| `isSelected` | bool | — | Marks the button selected and sets `aria-pressed`. Use it for a toggle such as a list or grid view switch. |
+| `isDisabled` | bool | — | Prevents interaction. Avoid it where you can; say why the action is unavailable instead. |
 | `isLoading` | bool | — | Shows a spinner in place of the icon and blocks interaction. |
 | `onClick` | func | — | Called with the click event when the button is activated. It does not fire while `isDisabled` or `isLoading` is set. |
 | `className` | string | — | Extra class names added to the button element beside the component's own. |

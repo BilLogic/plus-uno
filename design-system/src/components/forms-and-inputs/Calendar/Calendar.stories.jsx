@@ -20,59 +20,34 @@ export default {
         size: {
             control: 'select',
             options: [28, 36, 44],
-            description: 'Day cell width in pixels',
             table: { category: 'Design', defaultValue: { summary: '36' } },
         },
         minDate: {
             control: 'text',
-            description: 'Optional minimum allowed date',
             table: { category: 'Behavior' },
         },
         maxDate: {
             control: 'text',
-            description: 'Optional maximum allowed date',
             table: { category: 'Behavior' },
         },
     },
 };
 
-export const Overview = () => {
-    const [viewDate, setViewDate] = useState(new Date(2026, 9, 1));
-    const [selected, setSelected] = useState('2026-10-21');
-    return (
+const sizeStory = (size) => ({
+    render: () => (
         <Calendar
-            viewDate={viewDate}
-            onViewDateChange={setViewDate}
-            selected={selected}
-            onPick={(date) => setSelected(date)}
+            size={size}
+            viewDate={new Date(2026, 9, 1)}
+            onViewDateChange={() => {}}
+            selected="2026-10-21"
+            onPick={() => {}}
         />
-    );
-};
+    ),
+});
 
-export const Sizes = () => (
-    <div style={{ display: 'flex', gap: 'var(--space-150)', flexWrap: 'wrap' }}>
-        {[28, 36, 44].map((size) => (
-            <Calendar
-                key={size}
-                size={size}
-                viewDate={new Date(2026, 9, 1)}
-                onViewDateChange={() => {}}
-                selected="2026-10-21"
-                onPick={() => {}}
-            />
-        ))}
-    </div>
-);
-
-export const Bounds = () => (
-    <Calendar
-        viewDate={new Date(2026, 9, 1)}
-        onViewDateChange={() => {}}
-        minDate="2026-10-12"
-        maxDate="2026-10-25"
-        onPick={() => {}}
-    />
-);
+export const Size28 = sizeStory(28);
+export const Size36 = sizeStory(36);
+export const Size44 = sizeStory(44);
 
 export const PickADay = () => {
     const [viewDate, setViewDate] = useState(new Date(2026, 9, 1));
@@ -190,4 +165,25 @@ export const KeyboardFocus = {
         await expect(dayStyle.outlineColor, 'day ring color').toBe(tokenColor(canvasElement, '--ds-border-focused'));
         picked.blur();
     },
+};
+
+function PlaygroundCalendar(args) {
+    const [viewDate, setViewDate] = useState(october);
+    const [selected, setSelected] = useState('2026-10-21');
+    return (
+        <Calendar
+            {...args}
+            viewDate={viewDate}
+            onViewDateChange={setViewDate}
+            selected={selected}
+            onPick={setSelected}
+        />
+    );
+}
+
+export const Interactive = {
+    args: { size: 36, minDate: '', maxDate: '' },
+    render: ({ minDate, maxDate, ...args }) => (
+        <PlaygroundCalendar {...args} minDate={minDate || undefined} maxDate={maxDate || undefined} />
+    ),
 };

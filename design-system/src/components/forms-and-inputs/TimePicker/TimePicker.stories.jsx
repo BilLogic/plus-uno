@@ -21,32 +21,26 @@ export default {
         spacing: {
             control: 'select',
             options: ['default', 'compact'],
-            description: 'Field height: 40 default, 32 compact',
             table: { category: 'Design', defaultValue: { summary: 'default' } },
         },
         placeholder: {
             control: 'text',
-            description: 'Placeholder text',
             table: { category: 'Content' },
         },
         isDisabled: {
             control: 'boolean',
-            description: 'Disable the picker',
             table: { category: 'Behavior' },
         },
         isReadOnly: {
             control: 'boolean',
-            description: 'Make read-only',
             table: { category: 'Behavior' },
         },
         isInvalid: {
             control: 'boolean',
-            description: 'Draw the field invalid',
             table: { category: 'Validation' },
         },
         isValid: {
             control: 'boolean',
-            description: 'Draw the field valid',
             table: { category: 'Validation' },
         },
     },

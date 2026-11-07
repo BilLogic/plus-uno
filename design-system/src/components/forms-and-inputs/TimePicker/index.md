@@ -19,13 +19,13 @@ Built from the shared parts: the field is `FieldBox`, which owns the box, the bo
 |------|------|---------|-------------|
 | `id` | string | — | — |
 | `name` | string | — | — |
-| `placeholder` | string | `'__ : __'` | Placeholder text |
+| `placeholder` | string | `'__ : __'` | Defaults to `__ : __`. |
 | `value` | string | — | A 12-hour string ("02:30 PM") or a 24-hour one ("14:30"), split on read. |
-| `spacing` | enum | `'default'` | Field height: 40 default, 32 compact |
-| `isDisabled` | bool | `false` | Disable the picker |
-| `isReadOnly` | bool | `false` | Make read-only |
-| `isInvalid` | bool | `false` | Draw the field invalid |
-| `isValid` | bool | `false` | Draw the field valid |
+| `spacing` | enum | `'default'` | `default` is 40; `compact` is 32. |
+| `isDisabled` | bool | `false` | Disables the hour and minute inputs and the period menu. |
+| `isReadOnly` | bool | `false` | Shows the time without letting the user change it. |
+| `isInvalid` | bool | `false` | Draws the field invalid; a typed time outside 1–12 / 0–59 does too. |
+| `isValid` | bool | `false` | Draws the field valid. |
 | `onChange` | func | — | `(value)` — a 12-hour string, or null once either half is cleared. |
 | `onFocus` | func | — | — |
 | `onBlur` | func | — | — |
