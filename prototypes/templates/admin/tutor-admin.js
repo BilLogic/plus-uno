@@ -517,7 +517,7 @@ function addBulkActionsToolbar() {
     toolbar.id = 'bulk-actions-toolbar';
     toolbar.style.display = 'none';
     toolbar.style.padding = `var(--size-section-pad-y-sm) var(--size-section-pad-x-md)`;
-    toolbar.style.backgroundColor = 'var(--color-primary-container)';
+    toolbar.style.backgroundColor = 'var(--ds-background-brand-subtlest)';
     toolbar.style.borderRadius = `var(--size-card-radius-sm)`;
     toolbar.style.marginBottom = `var(--size-section-gap-md)`;
     toolbar.style.display = 'flex';
@@ -533,7 +533,7 @@ function addBulkActionsToolbar() {
     const selectedCount = document.createElement('span');
     selectedCount.id = 'selected-count';
     selectedCount.className = 'body1-txt';
-    selectedCount.style.color = 'var(--color-on-primary-container)';
+    selectedCount.style.color = 'var(--ds-text-brand)';
     leftSection.appendChild(selectedCount);
     
     const clearSelection = createButton({
@@ -548,7 +548,7 @@ function addBulkActionsToolbar() {
             updateBulkActionsToolbar();
         }
     });
-    clearSelection.style.color = 'var(--color-on-primary-container)';
+    clearSelection.style.color = 'var(--ds-text-brand)';
     leftSection.appendChild(clearSelection);
     
     toolbar.appendChild(leftSection);

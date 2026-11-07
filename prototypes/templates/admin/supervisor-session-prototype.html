@@ -33,7 +33,7 @@
             display: flex;
             align-items: center;
             gap: var(--size-surface-container-gap-md);
-            border-bottom: var(--size-surface-border) solid var(--color-outline-variant);
+            border-bottom: var(--size-surface-border) solid var(--ds-border);
         }
         
         .top-bar-left {
@@ -98,7 +98,7 @@
         .alert-box {
             background-color: var(--ds-background-brand-subtlest);
             color: var(--ds-text);
-            border: 1px solid var(--color-primary);
+            border: 1px solid var(--ds-border-brand);
             border-radius: var(--size-modal-radius-md);
             padding: var(--size-modal-pad-x-md) var(--size-modal-pad-y-lg);
             display: flex;
@@ -201,7 +201,7 @@
         
         .nav-tabs {
             display: flex;
-            border-bottom: 1px solid var(--color-outline-variant);
+            border-bottom: 1px solid var(--ds-border);
             margin-bottom: var(--size-section-gap-md);
         }
         
@@ -222,8 +222,8 @@
         }
         
         .nav-tab.active {
-            border-bottom-color: var(--color-secondary);
-            color: var(--color-secondary);
+            border-bottom-color: var(--ds-border);
+            color: var(--ds-text-subtle);
             font-weight: 400;
         }
         
@@ -281,11 +281,11 @@
             font-size: 14px;
             font-weight: 400;
             color: var(--ds-text);
-            border-bottom: 1px solid var(--color-outline-variant);
+            border-bottom: 1px solid var(--ds-border);
         }
         
         .session-table-row {
-            border-bottom: 1px solid var(--color-outline-variant);
+            border-bottom: 1px solid var(--ds-border);
         }
         
         .session-table-row:hover {
@@ -383,32 +383,32 @@
             gap: var(--stack-md);
             margin-bottom: var(--size-modal-gap-md);
             padding-bottom: var(--size-modal-gap-md);
-            border-bottom: 1px solid var(--color-outline-variant);
+            border-bottom: 1px solid var(--ds-border);
         }
         
         .step-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background-color: var(--color-outline-variant);
+            background-color: var(--ds-background-neutral);
         }
         
         .step-dot.active {
-            background-color: var(--color-primary);
+            background-color: var(--ds-background-brand-bold);
         }
         
         .step-dot.completed {
-            background-color: var(--color-primary);
+            background-color: var(--ds-background-brand-bold);
         }
         
         .step-line {
             width: 40px;
             height: 2px;
-            background-color: var(--color-outline-variant);
+            background-color: var(--ds-background-neutral);
         }
         
         .step-line.completed {
-            background-color: var(--color-primary);
+            background-color: var(--ds-background-brand-bold);
         }
         
         .modal-step {
@@ -434,7 +434,7 @@
         
         .form-label.required::after {
             content: " *";
-            color: var(--color-danger);
+            color: var(--ds-text-danger);
         }
         
         .form-row {
@@ -587,8 +587,8 @@
                     <table class="session-table">
                         <thead class="session-table-header">
                             <tr>
-                                <th>Date & time <i class="fas fa-arrow-up" style="margin-left: 8px; color: var(--color-secondary);"></i></th>
-                                <th>School & teacher <i class="fas fa-arrow-up" style="margin-left: 8px; color: var(--color-outline-variant);"></i></th>
+                                <th>Date & time <i class="fas fa-arrow-up" style="margin-left: 8px; color: var(--ds-text-subtle);"></i></th>
+                                <th>School & teacher <i class="fas fa-arrow-up" style="margin-left: 8px; color: var(--ds-text-subtlest);"></i></th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>

@@ -82,8 +82,8 @@ export function CompactChatBar({
               padding: 0,
               border: 'none',
               borderRadius: '50%',
-              background: 'var(--color-primary-container, #d0bcff)',
-              color: 'var(--color-on-primary-container, #381e72)',
+              background: 'var(--ds-background-brand-subtlest)',
+              color: 'var(--ds-text-brand)',
               cursor: 'pointer',
               boxShadow: '0 4px 14px rgba(0,0,0,0.15)',
             }}
@@ -161,7 +161,7 @@ export function CompactChatBar({
                         background:
                           'var(--ds-surface-container)',
                         border:
-                          '1px solid var(--color-outline-variant, #bec8ca)',
+                          '1px solid var(--ds-border)',
                         borderRadius:
                           'var(--size-border-radius-radius-300, 12px)',
                         cursor: 'pointer',
@@ -222,7 +222,7 @@ export function CompactChatBar({
                 minHeight: FAB_SIZE,
                 height: FAB_SIZE,
                 background: 'var(--ds-surface)',
-                border: '1px solid var(--color-outline-variant, #bec8ca)',
+                border: '1px solid var(--ds-border)',
                 borderRadius: 'var(--size-border-radius-radius-300, 12px)',
                 cursor: 'text',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.08)',

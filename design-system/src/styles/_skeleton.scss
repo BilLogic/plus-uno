@@ -22,9 +22,9 @@
     display: block;
     background: linear-gradient(
         90deg,
-        var(--color-outline-variant, #bec8ca) 0%,
-        var(--ds-skeleton) 50%,
-        var(--color-outline-variant, #bec8ca) 100%
+        var(--ds-skeleton) 0%,
+        var(--ds-skeleton-subtle) 50%,
+        var(--ds-skeleton) 100%
     );
     background-size: 200% 100%;
     animation: plus-skeleton-shimmer 2s ease-in-out infinite;
@@ -34,6 +34,6 @@
 @media (prefers-reduced-motion: reduce) {
     .plus-skeleton-block {
         animation: none;
-        background: var(--color-outline-variant, #bec8ca);
+        background: var(--ds-background-neutral);
     }
 }

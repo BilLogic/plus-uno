@@ -133,7 +133,7 @@ export function FloatingChatBubble({
             width: 36,
             height: 36,
             borderRadius: '50%',
-            background: 'var(--color-primary, #0472a8)',
+            background: 'var(--ds-background-brand-bold)',
             border: 'none',
             cursor: 'pointer',
             display: 'flex',

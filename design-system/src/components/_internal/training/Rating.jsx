@@ -75,11 +75,11 @@ const RatingSingle = ({ value, status, onClick }) => {
         rest: {
             backgroundColor: 'transparent',
             borderColor: '#DEE2E6', // gray-300 approx
-            color: 'var(--color-primary-text)'
+            color: 'var(--ds-text-brand)'
         },
         selected: {
-            backgroundColor: 'var(--color-primary)',
-            borderColor: 'var(--color-primary)',
+            backgroundColor: 'var(--ds-background-brand-bold)',
+            borderColor: 'var(--ds-border-brand)',
             color: 'white'
         }
     };

@@ -37,7 +37,7 @@ const HEATMAP_THEMES = {
   light: {
     text: 'var(--ds-text-subtle)',
     quoteBg: 'var(--ds-surface-container)',
-    quoteBorder: 'var(--color-outline-variant, #e0e0e0)'
+    quoteBorder: 'var(--ds-border)'
   },
 };
 

@@ -106,7 +106,7 @@ function AccordionVariantsDemos() {
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                     Borderless accordion for seamless integration with surrounding content.
                 </p>
-                <div style={{ border: '1px dashed var(--color-outline-variant)', padding: '0' }}>
+                <div style={{ border: '1px dashed var(--ds-border)', padding: '0' }}>
                     <Accordion items={flushSampleItems} defaultActiveKey="0" flush />
                 </div>
             </section>

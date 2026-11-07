@@ -39,7 +39,7 @@
         .tutor-admin-sidebar {
             width: 280px;
             background-color: var(--ds-surface-container);
-            border-right: var(--size-surface-border) solid var(--color-outline);
+            border-right: var(--size-surface-border) solid var(--ds-border-bold);
             padding: var(--size-surface-container-pad-y) var(--size-surface-container-pad-x);
             display: flex;
             flex-direction: column;
@@ -54,7 +54,7 @@
             font-family: var(--font-family-header);
             font-weight: var(--font-weight-bold);
             font-size: var(--font-size-h4);
-            color: var(--color-primary);
+            color: var(--ds-text-brand);
         }
         
         .sidebar-section {
@@ -83,7 +83,7 @@
         /* Header - raised surface */
         .tutor-admin-header {
             background-color: var(--ds-surface-container);
-            border-bottom: var(--border-default) solid var(--color-outline-variant);
+            border-bottom: var(--border-default) solid var(--ds-border);
             padding: var(--size-surface-container-pad-y) var(--size-surface-pad-x);
             display: flex;
             align-items: center;
@@ -113,8 +113,8 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background-color: var(--color-primary-container);
-            color: var(--color-on-primary-container);
+            background-color: var(--ds-background-brand-subtlest);
+            color: var(--ds-text-brand);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -134,7 +134,7 @@
             display: flex;
             gap: var(--stack-md);
             margin-bottom: var(--size-section-gap-md);
-            border-bottom: var(--border-default) solid var(--color-outline-variant);
+            border-bottom: var(--border-default) solid var(--ds-border);
         }
         
         .tutor-tab {
@@ -153,13 +153,13 @@
         }
         
         .tutor-tab:hover {
-            color: var(--color-primary);
+            color: var(--ds-text-brand);
             background-color: var(--ds-background-neutral-subtle-hovered);
         }
         
         .tutor-tab.active {
-            color: var(--color-primary);
-            border-bottom-color: var(--color-primary);
+            color: var(--ds-text-brand);
+            border-bottom-color: var(--ds-border-brand);
         }
         
         /* Action Buttons */
@@ -174,7 +174,7 @@
         .tutor-table-container {
             background-color: var(--ds-surface-container);
             border-radius: var(--size-card-radius-sm);
-            border: var(--size-card-border-sm) solid var(--color-outline-variant);
+            border: var(--size-card-border-sm) solid var(--ds-border);
             overflow: hidden;
         }
         
@@ -194,7 +194,7 @@
             font-weight: var(--font-weight-semibold-2);
             font-size: var(--font-size-body2);
             color: var(--ds-text-subtle);
-            border-bottom: var(--border-default) solid var(--color-outline-variant);
+            border-bottom: var(--border-default) solid var(--ds-border);
         }
         
         .tutor-table th.sortable {
@@ -206,12 +206,12 @@
         }
         
         .tutor-table th.sortable:hover {
-            color: var(--color-primary);
+            color: var(--ds-text-brand);
         }
         
         .tutor-table td {
             padding: var(--size-table-cell-y) var(--size-table-cell-x);
-            border-bottom: var(--border-default) solid var(--color-outline-variant);
+            border-bottom: var(--border-default) solid var(--ds-border);
             font-size: var(--font-size-body1);
             color: var(--ds-text);
         }
@@ -241,7 +241,7 @@
         }
         
         .tutor-action-link {
-            color: var(--color-primary);
+            color: var(--ds-link);
             text-decoration: none;
             font-size: var(--font-size-body1);
             cursor: pointer;
@@ -254,7 +254,7 @@
         /* Footer */
         .tutor-admin-footer {
             background-color: var(--ds-surface-container);
-            border-top: var(--border-default) solid var(--color-outline-variant);
+            border-top: var(--border-default) solid var(--ds-border);
             padding: var(--size-section-pad-y-sm) var(--size-surface-pad-x);
             display: flex;
             justify-content: space-between;
@@ -305,7 +305,7 @@
         .plus-select {
             width: 100%;
             padding: var(--pad-y-md) var(--pad-x-md);
-            border: var(--border-default) solid var(--color-outline);
+            border: var(--border-default) solid var(--ds-border-bold);
             border-radius: var(--radius-md);
             background-color: var(--ds-surface);
             color: var(--ds-text);
@@ -317,7 +317,7 @@
         .plus-textarea:focus,
         .plus-select:focus {
             outline: none;
-            border-color: var(--color-primary);
+            border-color: var(--ds-border-brand);
         }
         
         .plus-textarea {

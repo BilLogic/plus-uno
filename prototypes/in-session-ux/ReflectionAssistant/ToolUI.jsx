@@ -55,7 +55,7 @@ export const ParameterSlider = ({
                             onChange={(e) => handleChange(slider.id, parseFloat(e.target.value))}
                             style={{
                                 width: '100%',
-                                accentColor: 'var(--color-primary, #0472a8)',
+                                accentColor: 'var(--ds-background-brand-bold)',
                                 cursor: 'pointer'
                             }}
                         />
@@ -76,9 +76,9 @@ export const ParameterSlider = ({
                                 fontWeight: 500,
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease',
-                                border: action.variant === 'ghost' ? 'none' : '1px solid var(--color-primary, #0472a8)',
-                                background: action.variant === 'ghost' ? 'transparent' : 'var(--color-primary, #0472a8)',
-                                color: action.variant === 'ghost' ? 'var(--color-primary, #0472a8)' : 'white',
+                                border: action.variant === 'ghost' ? 'none' : '1px solid var(--ds-border-brand)',
+                                background: action.variant === 'ghost' ? 'transparent' : 'var(--ds-background-brand-bold)',
+                                color: action.variant === 'ghost' ? 'var(--ds-text-brand)' : 'white',
                             }}
                         >
                             {action.label}
@@ -195,7 +195,7 @@ export const QuestionFlow = ({
                                 textAlign: 'left',
                                 borderRadius: '8px',
                                 border: '1px solid',
-                                borderColor: isSelected ? 'var(--color-primary, #0472a8)' : 'var(--chat-outline, #e5e7eb)',
+                                borderColor: isSelected ? 'var(--ds-border-brand)' : 'var(--chat-outline, #e5e7eb)',
                                 background: isSelected ? 'var(--ds-background-selected)' : 'transparent',
                                 cursor: 'pointer',
                                 transition: 'all 0.2s ease',
@@ -208,7 +208,7 @@ export const QuestionFlow = ({
                                 {option.label}
                             </span>
                             {isSelected && (
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ color: 'var(--color-primary, #0472a8)' }}>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" style={{ color: 'var(--ds-icon-brand)' }}>
                                     <polyline points="20 6 9 17 4 12" />
                                 </svg>
                             )}
@@ -248,7 +248,7 @@ export const QuestionFlow = ({
                                 fontSize: '14px',
                                 fontWeight: 500,
                                 cursor: 'pointer',
-                                background: (answers[currentStep.id]?.length > 0) ? 'var(--color-primary, #0472a8)' : 'var(--chat-outline, #e5e7eb)',
+                                background: (answers[currentStep.id]?.length > 0) ? 'var(--ds-background-brand-bold)' : 'var(--chat-outline, #e5e7eb)',
                                 color: 'white',
                                 border: 'none'
                             }}
