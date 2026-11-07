@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button, ProgressBar, Skeleton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import PatternCard from '@/patterns/PatternCard';
+import { PatternCard } from '@/patterns';
 
 /**
  * The examples of the Card page that compose a card for a job: the size pair

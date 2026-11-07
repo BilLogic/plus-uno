@@ -1,15 +1,13 @@
 import React from 'react';
 
 import { Button } from '@/components';
-import Blanket from '@/patterns/Blanket';
-import PatternModal from '@/patterns/PatternModal';
-import PatternDrawer from '@/patterns/PatternDrawer';
+import { Blanket, PatternDrawer, PatternModal } from '@/patterns';
 import { ScaledPreview } from '@/storybook-docs/lib/scaled-preview.jsx';
 
 /**
  * The do and don't examples on the Drawer docs page: the overlay at a 1024
  * stand-in screen, scaled down to the card. Stage sizes are docs geometry,
- * not design values. The one-overlay pair is the Blanket page's, imported
+ * not design values. The stacking pair is the Blanket page's, imported
  * from `Blanket.examples.jsx`.
  */
 

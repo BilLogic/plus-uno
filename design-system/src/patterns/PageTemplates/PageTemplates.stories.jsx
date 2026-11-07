@@ -97,27 +97,22 @@ export default {
         frame: {
             control: 'select',
             options: ['default', 'focused'],
-            description: 'default: the app frame with the sidebar and the breadcrumb. focused: one task, with no sidebar.',
             table: { category: 'Design', defaultValue: { summary: 'default' } },
         },
         title: {
             control: 'text',
-            description: 'The page title. In a focused page it is the visible title in the Page header row.',
             table: { category: 'Slots' },
         },
         backLabel: {
             control: 'text',
-            description: 'Focused: the Back button label.',
             table: { category: 'Slots', defaultValue: { summary: 'Back' } },
         },
         closeLabel: {
             control: 'text',
-            description: 'Focused: the accessible name of the Close button.',
             table: { category: 'Slots', defaultValue: { summary: 'Close' } },
         },
         sidebarHidden: {
             control: 'boolean',
-            description: 'Leaves out the sidebar and its toggle.',
             table: { category: 'Design', defaultValue: { summary: 'false' } },
         },
         drawer: { table: { disable: true } },

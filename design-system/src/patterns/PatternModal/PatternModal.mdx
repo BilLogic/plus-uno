@@ -9,7 +9,7 @@ import {
     HugShortContent,
     FillShortContent,
 } from './PatternModal.examples.jsx';
-import { OneBlanketDo, OneBlanketDont, ConfirmSmallDo, ConfirmSmallDont } from '../Blanket/Blanket.examples.jsx';
+import { ModalWithConfirm, ThirdOverlay, ConfirmSmallDo, ConfirmSmallDont } from '../Blanket/Blanket.examples.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -189,17 +189,17 @@ A Modal is open or closed, and loading swaps its body for a skeleton. It has no 
 
 ## Best practices
 
-Size the modal to its job; keep to one dialog.
+Size the modal to its job, and stack no more than its confirm.
 
-### Swap the content in place.
+### At most two overlays.
 
-A Modal never opens another Modal. When something inside it needs a follow-up decision, such as confirming a delete, the confirm view replaces the dialog's title, body and footer in the same Blanket. Back returns to the previous view without losing anything typed there.
+At most two overlays: a modal or drawer, and the confirm it raises. Never two unrelated overlays, and never a third. For a confirm about the dialog itself, such as discarding its edits, prefer the Modal's own confirm view: it swaps the title, body and footer in place, and Back returns without losing anything typed. A confirm stacked over the Modal is allowed too.
 
 <DoDontPair
-    doExample={<OneBlanketDo />}
-    doCaption="Swap the content in place: the confirm view replaces the dialog's title, body and footer."
-    dontExample={<OneBlanketDont />}
-    dontCaption="Don't open a confirm dialog from a dialog."
+    doExample={<ModalWithConfirm />}
+    doCaption="A modal and the confirm it raises: two overlays."
+    dontExample={<ThirdOverlay />}
+    dontCaption="A third overlay over a modal and its confirm."
 />
 
 ### Confirm in a small modal.

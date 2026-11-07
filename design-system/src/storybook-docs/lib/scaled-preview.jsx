@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { useFitScale } from './use-fit-scale.js';
 
 /**
  * A whole shell (a Frame, a template, a Blanket at a stand-in screen) drawn at
@@ -22,18 +23,7 @@ import PropTypes from 'prop-types';
  * @param {React.ReactNode} props.children
  */
 export const ScaledPreview = ({ width, height, children }) => {
-    const ref = React.useRef(null);
-    const [scale, setScale] = React.useState(1);
-    React.useLayoutEffect(() => {
-        const el = ref.current;
-        if (!el) return undefined;
-        const read = () => setScale(Math.min(1, el.clientWidth / width));
-        read();
-        if (typeof ResizeObserver === 'undefined') return undefined;
-        const observer = new ResizeObserver(read);
-        observer.observe(el);
-        return () => observer.disconnect();
-    }, [width]);
+    const [ref, scale] = useFitScale(width);
 
     return (
         <div ref={ref} className="not-prose sb-unstyled" inert aria-hidden="true" style={{ width: '100%', height: height * scale, overflow: 'hidden' }}>

@@ -1,15 +1,17 @@
 import React from 'react';
 
 import { Button } from '@/components';
-import Blanket from '@/patterns/Blanket';
-import PatternModal from '@/patterns/PatternModal';
-import PatternDrawer from '@/patterns/PatternDrawer';
+import { Blanket, PatternDrawer, PatternModal } from '@/patterns';
 import { ScaledPreview } from '@/storybook-docs/lib/scaled-preview.jsx';
 
 /**
- * The do and don't examples on the Blanket docs page: the Blanket at a 1024
- * stand-in screen, scaled down to the card. Stage sizes are docs geometry,
- * not design values.
+ * The do and don't examples on the Blanket, Modal and Drawer docs pages: the
+ * overlays at a 1024 stand-in screen, scaled down to the card. Stage sizes are
+ * docs geometry, not design values.
+ *
+ * The stacking rule follows `lib/overlay.js`: at most two overlays, a modal or
+ * drawer and the confirm it raises. A confirm is a second Blanket over the
+ * first, as the `NestedConfirm` story draws it.
  */
 
 const SCREEN = { width: 1024, height: 480 };
@@ -23,51 +25,25 @@ const footer = (primary, appearance = 'primary') => (
     </>
 );
 
+const Stage = ({ children }) => (
+    <ScaledPreview {...SCREEN}>
+        <div style={{ position: 'relative' }}>{children}</div>
+    </ScaledPreview>
+);
+
+/** A second Blanket over the first, as a stacked overlay is drawn. */
+const Over = ({ children }) => (
+    <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height} style={{ position: 'absolute', inset: 0 }}>
+        {children}
+    </Blanket>
+);
+
 const settings = (
-    <PatternModal title="Session settings" width="lg" height="fill" onClose={() => {}} footer={footer('Save')}>
-        {text('Thursday · 4:00–5:00 PM with Ana Ruiz.')}
-    </PatternModal>
-);
-
-const discard = (width) => (
-    <PatternModal title="Discard changes?" width={width} onClose={() => {}} footer={footer('Discard changes', 'danger')}>
-        {text('Your edits to this session plan will be lost.')}
-    </PatternModal>
-);
-
-const Stage = ({ children }) => <ScaledPreview {...SCREEN}>{children}</ScaledPreview>;
-
-/** Do: the confirm takes the modal's place in the one Blanket. */
-export const OneBlanketDo = () => (
-    <Stage>
-        <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>{discard('sm')}</Blanket>
-    </Stage>
-);
-
-/** Don't: a second Blanket over the first, with the confirm on top of the modal. */
-export const OneBlanketDont = () => (
-    <Stage>
-        <div style={{ position: 'relative' }}>
-            <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>{settings}</Blanket>
-            <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height} style={{ position: 'absolute', inset: 0 }}>
-                {discard('sm')}
-            </Blanket>
-        </div>
-    </Stage>
-);
-
-/** Do: a confirm in the small width. */
-export const ConfirmSmallDo = () => (
-    <Stage>
-        <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>{discard('sm')}</Blanket>
-    </Stage>
-);
-
-/** Don't: the same confirm in the large width. */
-export const ConfirmSmallDont = () => (
-    <Stage>
-        <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>{discard('lg')}</Blanket>
-    </Stage>
+    <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>
+        <PatternModal title="Session settings" width="lg" height="fill" onClose={() => {}} footer={footer('Save')}>
+            {text('Thursday · 4:00–5:00 PM with Ana Ruiz.')}
+        </PatternModal>
+    </Blanket>
 );
 
 const drawer = (
@@ -85,19 +61,61 @@ const drawer = (
     </PatternDrawer>
 );
 
-/** Do: one drawer over the page. */
-export const OneOverlayDo = () => <Stage>{drawer}</Stage>;
+const discard = (width = 'sm') => (
+    <PatternModal title="Discard changes?" width={width} onClose={() => {}} footer={footer('Discard changes', 'danger')}>
+        {text('Your edits to this session plan will be lost.')}
+    </PatternModal>
+);
 
-/** Don't: a modal open over the drawer. */
-export const OneOverlayDont = () => (
+const moveSession = (
+    <PatternModal title="Move session" onClose={() => {}} footer={footer('Move session')}>
+        {text('Move Thursday’s session to 4:30 PM?')}
+    </PatternModal>
+);
+
+/** Do: a drawer and the confirm it raises, stacked over it. */
+export const DrawerWithConfirm = () => (
     <Stage>
-        <div style={{ position: 'relative' }}>
-            {drawer}
-            <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <PatternModal title="Move session" onClose={() => {}} footer={footer('Move session')}>
-                    {text('Move Thursday’s session to 4:30 PM?')}
-                </PatternModal>
-            </div>
-        </div>
+        {drawer}
+        <Over>{discard()}</Over>
+    </Stage>
+);
+
+/** Don't: a modal for an unrelated task opened over a drawer. */
+export const DrawerWithUnrelatedModal = () => (
+    <Stage>
+        {drawer}
+        <Over>{moveSession}</Over>
+    </Stage>
+);
+
+/** Do: a modal and the confirm it raises, two overlays. */
+export const ModalWithConfirm = () => (
+    <Stage>
+        {settings}
+        <Over>{discard()}</Over>
+    </Stage>
+);
+
+/** Don't: a third overlay, a drawer, over a modal and its confirm. */
+export const ThirdOverlay = () => (
+    <Stage>
+        {settings}
+        <Over>{discard()}</Over>
+        <div style={{ position: 'absolute', inset: 0 }}>{drawer}</div>
+    </Stage>
+);
+
+/** Do: a confirm on its own in the small width. */
+export const ConfirmSmallDo = () => (
+    <Stage>
+        <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>{discard('sm')}</Blanket>
+    </Stage>
+);
+
+/** Don't: the same confirm in the large width. */
+export const ConfirmSmallDont = () => (
+    <Stage>
+        <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>{discard('lg')}</Blanket>
     </Stage>
 );

@@ -530,6 +530,13 @@ export const Detail = { render: (args) => <ComplianceQueue {...args} />, paramet
 export const DetailWithPanel = { render: (args) => <ComplianceQueue {...args} />, parameters: { layout: 'fullscreen' },
     beforeEach: resetPanel, args: { withPanel: true } };
 
+/** The Panel open without `sectionDetail`: the Frame keeps the Sidebar, so the detail replaces the list. For the Frame page's pair. */
+export const DetailWithPanelNoSectionDetail = {
+    render: (args) => <ComplianceQueue {...args} withPanel sectionDetail={false} />,
+    parameters: { layout: 'fullscreen' },
+    beforeEach: resetPanel,
+};
+
 /** 1440, no Panel: content is 1152, so the split holds with the Sidebar docked. */
 export const DetailSplitAt1440 = {
     render: (args) => <ComplianceQueue {...args} />,

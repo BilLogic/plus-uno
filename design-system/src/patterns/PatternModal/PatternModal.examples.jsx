@@ -1,7 +1,6 @@
 import React from 'react';
-import PatternModal from '@/patterns/PatternModal';
 import { Button, TextField } from '@/components';
-import Blanket from '@/patterns/Blanket';
+import { Blanket, PatternModal } from '@/patterns';
 import { ScaledPreview } from '@/storybook-docs/lib/scaled-preview.jsx';
 
 /**

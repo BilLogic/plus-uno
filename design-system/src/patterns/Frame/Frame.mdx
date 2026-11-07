@@ -2,12 +2,11 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as FrameStories from './Frame.stories.jsx';
 import {
-    InBrowserDo,
-    InBrowserDont,
-    OneBrowserDo,
-    OneBrowserDont,
-    WidthDo,
-    WidthDont,
+    WithSidebar,
+    WithoutSidebar,
+    TitleInHeader,
+    WithSectionDetail,
+    WithoutSectionDetail,
 } from './Frame.examples.jsx';
 import {
     ComponentExample,
@@ -38,7 +37,6 @@ export const tokens = [
     ['Sidebar docked', 'false', 'true', 'true', 'A Figma variable. The sidebar docks from 1024. In code the Frame measures its own width through the layout resolver and has no token for it.'],
     ['--page-stack-sm', '16', '16', '16', 'Related sections.'],
     ['--page-stack-md', '24', '24', '24', 'Sections, and the row gap of the content grid.'],
-    ['--page-stack-lg', '40', '40', '40', 'A new topic.'],
 ];
 
 export const colorTokens = [
@@ -222,33 +220,35 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 
 ## Best practices
 
-These rules are for showing a Frame in a mockup or a docs example. The toolbar's Browser switch draws the window chrome around a story.
+### Give every app page its Sidebar.
 
-### Show a Frame inside a Browser frame.
+A page supplies its Sidebar, its breadcrumb and its content, and the Frame does the rest. Without `sidebar` there is no navigation and no toggle.
 
 <DoDontPair
-    doExample={<InBrowserDo />}
-    doCaption="Show a Frame scenario inside a Browser frame, as people meet it."
-    dontExample={<InBrowserDont />}
-    dontCaption="Present a bare Frame with no browser around it."
+    doExample={<WithSidebar />}
+    doCaption="An app page passes its Sidebar, which docks from 1024."
+    dontExample={<WithoutSidebar />}
+    dontCaption="The same page with no Sidebar: no navigation and no toggle."
 />
 
-### Use one browser across a set.
+### Put the place in the header as a breadcrumb.
+
+The header row is the breadcrumb. A page's title belongs to its content, in a Section with `level="page"`.
 
 <DoDontPair
-    doExample={<OneBrowserDo />}
-    doCaption="Use one browser appearance across a set of scenarios."
-    dontExample={<OneBrowserDont />}
-    dontCaption="Mix Chrome and Safari in one set."
+    doExample={<WithSidebar />}
+    doCaption={'The header row is a breadcrumb: "Home / Dashboard".'}
+    dontExample={<TitleInHeader />}
+    dontCaption="A page title in the header row in place of the breadcrumb."
 />
 
-### Make the Browser frame as wide as the scenario.
+### Pass sectionDetail for a list and its detail.
 
 <DoDontPair
-    doExample={<WidthDo />}
-    doCaption="Make the Browser frame as wide as the scenario so the page fills the Page slot."
-    dontExample={<WidthDont />}
-    dontCaption="Let a narrow page float in a wider Browser frame."
+    doExample={<WithSectionDetail />}
+    doCaption="With sectionDetail and the Panel open at 1440, the Sidebar collapses and the list keeps its detail beside it."
+    dontExample={<WithoutSectionDetail />}
+    dontCaption="Without it, the Sidebar and the Panel both dock, the content drops under 960 and the detail replaces the list."
 />
 
 </div>

@@ -203,9 +203,12 @@ export const FlagSuccess = { name: 'Flag success', render: () => flagOf('success
 export const FlagWarning = { name: 'Flag warning', render: () => flagOf('warning', 'Check your entries') };
 export const FlagError = { name: 'Flag error', render: () => flagOf('error', 'Something went wrong') };
 
+/** Stage geometry for the single Tooltip stories: room above the trigger, and an inset so a wrapped Tooltip stays on screen. */
+const TOOLTIP_STAGE = { height: 136, inset: 120 };
+
 /** One Tooltip per story: one line, and one long enough to wrap. */
 const tooltipOf = (text) => (
-    <Stage height={136} style={{ display: 'flex', alignItems: 'flex-end', paddingLeft: 120 }}>
+    <Stage height={TOOLTIP_STAGE.height} style={{ display: 'flex', alignItems: 'flex-end', paddingLeft: TOOLTIP_STAGE.inset }}>
         {({ open }) => (
             <Tooltip show={open} placement="top" text={text}>
                 <Button text="Share" spacing="compact" />

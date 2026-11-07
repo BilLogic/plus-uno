@@ -66,13 +66,13 @@ const groups = (view) => [
 ];
 
 const SESSION_TABS = [
-    { id: 't-s1', label: '4:00 pm · Ms. Ortiz', tooltip: 'Hillside · Ms. Ortiz', live: true },
-    { id: 't-s2', label: '5:30 pm · Mr. Patel', tooltip: 'Roosevelt · Mr. Patel' },
-    { id: 't-s3', label: 'Tue 3:00 pm · Ms. Ortiz', tooltip: 'Hillside · Ms. Ortiz' },
-    { id: 't-s4', label: 'Wed 4:15 pm · Ms. Chen', tooltip: 'Lincoln · Ms. Chen' },
-    { id: 't-s5', label: 'Thu 2:30 pm · Mr. Patel-Henderson', tooltip: 'Roosevelt Middle School · Mr. Patel-Henderson' },
-    { id: 't-s6', label: 'Fri 1:00 pm · Mr. Adams', tooltip: 'Westview · Mr. Adams' },
-    { id: 't-s7', label: 'Fri 3:30 pm · Ms. Chen', tooltip: 'Lincoln · Ms. Chen' },
+    { id: 't-s1', label: '4:00 PM · Ms. Ortiz', tooltip: 'Hillside · Ms. Ortiz', live: true },
+    { id: 't-s2', label: '5:30 PM · Mr. Patel', tooltip: 'Roosevelt · Mr. Patel' },
+    { id: 't-s3', label: 'Tue 3:00 PM · Ms. Ortiz', tooltip: 'Hillside · Ms. Ortiz' },
+    { id: 't-s4', label: 'Wed 4:15 PM · Ms. Chen', tooltip: 'Lincoln · Ms. Chen' },
+    { id: 't-s5', label: 'Thu 2:30 PM · Mr. Patel-Henderson', tooltip: 'Roosevelt Middle School · Mr. Patel-Henderson' },
+    { id: 't-s6', label: 'Fri 1:00 PM · Mr. Adams', tooltip: 'Westview · Mr. Adams' },
+    { id: 't-s7', label: 'Fri 3:30 PM · Ms. Chen', tooltip: 'Lincoln · Ms. Chen' },
 ];
 const STUDENT_TABS = [
     { id: 't-st1', label: 'Maya R.', tooltip: 'Grade 8 · Hillside' },
@@ -369,7 +369,7 @@ export const TabsFew = {
         const items = list.querySelectorAll(':scope > li');
         await expect(items).toHaveLength(2);
         await expect([...items].map((li) => li.classList.contains('plus-pattern-sidebar__tab--last'))).toEqual([false, true]);
-        await expect(within(list).getByRole('button', { name: /4:00 pm · Ms. Ortiz/ }).querySelector('[aria-label="Live"]'), 'the live dot, named').not.toBeNull();
+        await expect(within(list).getByRole('button', { name: /4:00 PM · Ms. Ortiz/ }).querySelector('[aria-label="Live"]'), 'the live dot, named').not.toBeNull();
     },
 };
 
@@ -394,7 +394,7 @@ export const TabsMany = {
 export const TabRest = {
     args: { activeId: 'home' },
     play: async ({ canvasElement }) => {
-        const tab = tabNamed(canvasElement, /4:00 pm · Ms. Ortiz/).closest('li');
+        const tab = tabNamed(canvasElement, /4:00 PM · Ms. Ortiz/).closest('li');
         await expect(visible(tab.querySelector('.plus-pattern-sidebar__tab-close')), 'no Close at rest').toBe(false);
         await expect(visible(tab.querySelector('.plus-count--dot')), 'the live dot').toBe(true);
     },
@@ -404,7 +404,7 @@ export const TabRest = {
 export const TabHover = {
     args: { activeId: 'home' },
     play: async ({ canvasElement }) => {
-        const tab = tabNamed(canvasElement, /4:00 pm · Ms. Ortiz/).closest('li');
+        const tab = tabNamed(canvasElement, /4:00 PM · Ms. Ortiz/).closest('li');
         const close = tab.querySelector('.plus-pattern-sidebar__tab-close');
         const state = withForcedPseudo(tab, ':hover', () => ({ close: visible(close), dot: visible(tab.querySelector('.plus-pattern-sidebar__end')), x: centerX(canvasElement, close) }));
         await expect(state.close, 'Close on hover').toBe(true);
@@ -417,7 +417,7 @@ export const TabHover = {
 export const TabFocus = {
     args: { activeId: 'home' },
     play: async ({ canvasElement }) => {
-        const row = tabNamed(canvasElement, /4:00 pm · Ms. Ortiz/);
+        const row = tabNamed(canvasElement, /4:00 PM · Ms. Ortiz/);
         row.focus();
         const style = getComputedStyle(row);
         await expect(px(style.outlineWidth), 'a 2px ring').toBeCloseTo(tokenLength(canvasElement, '--focus-ring-width'), 0);
@@ -430,7 +430,7 @@ export const TabFocus = {
 export const TabSelected = {
     args: { activeId: 't-s1' },
     play: async ({ canvasElement }) => {
-        const tab = tabNamed(canvasElement, /4:00 pm · Ms. Ortiz/);
+        const tab = tabNamed(canvasElement, /4:00 PM · Ms. Ortiz/);
         await expect(tab).toHaveAttribute('aria-current', 'page');
         await expect(selectedRows(canvasElement), 'exactly one selected row').toHaveLength(1);
         await expect(getComputedStyle(tab).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
@@ -458,7 +458,7 @@ export const TabsCollapsedWithSelection = {
         await expect(within(sessions).getByText('2')).toBeVisible();
         sessions.focus();
         await userEvent.click(within(nav(canvasElement)).getByRole('button', { name: 'Show Sessions tabs' }));
-        await expect(tabNamed(canvasElement, /5:30 pm · Mr. Patel/)).toHaveAttribute('aria-current', 'page');
+        await expect(tabNamed(canvasElement, /5:30 PM · Mr. Patel/)).toHaveAttribute('aria-current', 'page');
     },
 };
 
@@ -466,10 +466,10 @@ export const TabsCollapsedWithSelection = {
 export const ClosingTabs = {
     args: { activeId: 't-s1', onCloseTab: fn(), onCloseAllTabs: fn() },
     play: async ({ canvasElement, args }) => {
-        await userEvent.click(within(nav(canvasElement)).getByRole('button', { name: 'Close 4:00 pm · Ms. Ortiz' }));
+        await userEvent.click(within(nav(canvasElement)).getByRole('button', { name: 'Close 4:00 PM · Ms. Ortiz' }));
         await expect(args.onCloseTab).toHaveBeenCalledTimes(1);
         await expect(rowNamed(canvasElement, 'Sessions')).toHaveAttribute('aria-current', 'page');
-        const next = tabNamed(canvasElement, /5:30 pm · Mr. Patel/);
+        const next = tabNamed(canvasElement, /5:30 PM · Mr. Patel/);
         next.focus();
         await userEvent.keyboard('{Delete}');
         await expect(args.onCloseTab).toHaveBeenCalledTimes(2);
@@ -544,7 +544,7 @@ const InFrame = ({ width, sidebarDocked }) => {
     const [store] = useState(() => {
         const s = createOpenTabsStore({ key: 'story-sidebar-tabs', storage: window.sessionStorage });
         s.clear();
-        s.open('sessions', { id: 's1', title: '4:00 pm · Ms. Ortiz', tooltip: 'Hillside · Ms. Ortiz', status: 'live' });
+        s.open('sessions', { id: 's1', title: '4:00 PM · Ms. Ortiz', tooltip: 'Hillside · Ms. Ortiz', status: 'live' });
         s.select('sessions');
         return s;
     });

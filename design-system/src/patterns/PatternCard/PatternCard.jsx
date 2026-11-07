@@ -101,6 +101,12 @@ PatternCard.propTypes = {
     gap: PropTypes.oneOf(['sm', 'md', 'lg']),
     /** Minimum width constraint (number of px or any CSS length) */
     minWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    /**
+     * Click handler, passed to the card's root element. Its presence adds the
+     * clickable class: a pointer cursor and the hover lift. It adds no role or
+     * tab stop; pass `role` and `tabIndex` for a card clickable as a whole.
+     */
+    onClick: PropTypes.func,
     /** The card is being dragged: it lifts to the overlay pair */
     dragging: PropTypes.bool,
     className: PropTypes.string,

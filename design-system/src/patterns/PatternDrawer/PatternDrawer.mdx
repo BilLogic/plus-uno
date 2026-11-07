@@ -2,7 +2,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PatternDrawerStories from './PatternDrawer.stories.jsx';
 import { MediumDrawer, WideDrawer, DecisionInModal, DecisionInDrawer } from './PatternDrawer.examples.jsx';
-import { OneOverlayDo, OneOverlayDont } from '../Blanket/Blanket.examples.jsx';
+import { DrawerWithConfirm, DrawerWithUnrelatedModal } from '../Blanket/Blanket.examples.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -153,15 +153,15 @@ A Drawer is open or closed. Closing it returns focus to what had it before it op
 
 Use a drawer for work beside the page, a modal for a short decision.
 
-### One overlay at a time.
+### At most two overlays.
 
-Show one Drawer at a time, and never beside an open Modal. The one stack the code allows is a confirm raised from inside the Drawer, which opens over it; a third overlay is refused.
+At most two overlays: a modal or drawer, and the confirm it raises. Never two unrelated overlays, and never a third; the overlay module keeps a third closed.
 
 <DoDontPair
-    doExample={<OneOverlayDo />}
-    doCaption="One overlay at a time."
-    dontExample={<OneOverlayDont />}
-    dontCaption="Open a drawer and a modal together."
+    doExample={<DrawerWithConfirm />}
+    doCaption="A drawer and the confirm it raises, stacked over it."
+    dontExample={<DrawerWithUnrelatedModal />}
+    dontCaption="A modal for an unrelated task opened over a drawer."
 />
 
 ### Keep the page in view.

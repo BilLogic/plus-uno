@@ -3,7 +3,7 @@ import { Button, Tabs } from '@/components';
 import { Blanket, PatternCard, PatternModal, PatternSection } from '@/patterns';
 import { ScaledPreview } from '@/storybook-docs/lib/scaled-preview.jsx';
 import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { SplitContext } from '../Frame/SplitContext';
+import { ModeFrame } from '@/storybook-docs/lib/mode-frame.jsx';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
@@ -80,7 +80,7 @@ export const SectionFooterCommits = () => (
         <PatternSection
             title="Session notes"
             description="Thursday · Algebra I"
-            footer={<Button text="Save note" appearance="subtle" spacing="compact" onClick={() => {}} />}
+            footer={<Button text="Save note" appearance="primary" spacing="compact" onClick={() => {}} />}
         >
             <PatternCard title="Note for Thursday" description="Visible to the tutor lead">
                 {noteBody}
@@ -128,32 +128,18 @@ export const TabsAboveSectionHeader = () => (
     </InDocs>
 );
 
-/* The detail pair: a section at a stand-in width of 960, scaled to the card. Stage sizes are docs geometry. */
-const QUEUE = { width: 960, height: 320 };
-
-const stepper = { onPrevious: () => {}, onNext: () => {}, previousDisabled: true };
+/* The detail pair. Stage sizes are docs geometry. */
+const QUEUE = { width: 720, height: 280 };
 
 /**
- * The list stays in view beside the selected record. The scaled preview reads
- * narrower than its stage, so the split is held the way a Frame with
- * `sectionDetail` holds it at this width.
+ * The list stays in view beside the selected record: the Detail story, drawn
+ * in an iframe at 1440 so the Section measures its real width. Inert, so the
+ * docs page gains no tab stops.
  */
 export const DetailBesideList = () => (
-    <ScaledPreview {...QUEUE}>
-        <InDocs>
-            <SplitContext.Provider value>
-            <PatternSection
-                title="Compliance queue"
-                description="Flags waiting on a supervisor"
-                detail={slotContent('Record · one flag, its fields and notes')}
-                detailTitle="Flag 1 of 12"
-                {...stepper}
-            >
-                {slotContent('List · table or rows')}
-            </PatternSection>
-            </SplitContext.Provider>
-        </InDocs>
-    </ScaledPreview>
+    <div inert aria-hidden="true" style={{ width: '100%' }}>
+        <ModeFrame storyId="patterns-section-section--detail" width={1440} height={640} title="A list beside its detail" />
+    </div>
 );
 
 /** The record opens as a modal over the list, behind a blanket. */

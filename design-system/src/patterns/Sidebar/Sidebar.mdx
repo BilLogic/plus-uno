@@ -127,12 +127,13 @@ Docked, collapsed, peeking and overlay are the Frame's states, on the <a href="?
 
 ### Tokens
 
+The Sidebar's width, 240, belongs to the Frame: see <a href="?path=/docs/patterns-frame-frame--docs">Frame</a>.
+
 <DocsTable>
 <thead>
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Width</td><td>240: <code>--frame-sidebar-width</code>.</td></tr>
 <tr><td>Pad</td><td>12: <code>--frame-sidebar-pad</code>.</td></tr>
 <tr><td>Row</td><td>32: <code>--item-height-md</code>; radius 6: <code>--frame-sidebar-row-radius</code>; 2 apart: <code>--frame-sidebar-row-gap</code>.</td></tr>
 <tr><td>Groups</td><td>16 apart: <code>--frame-sidebar-group-gap</code>.</td></tr>
@@ -159,7 +160,7 @@ The Sidebar marks one current page. `activeId` takes one id, so exactly one row 
 
 A parent of the current page shows it without competing: when one of a row's tabs is selected, the tab takes the fill and the row goes to ink without it.
 
-### Keep open tabs short.
+### Pass every open tab; the Sidebar folds them.
 
 Past three open tabs the rest go behind Show n more. The Sidebar does this for you; pass every open tab and let it fold them.
 
@@ -203,7 +204,7 @@ Past three open tabs the rest go behind Show n more. The Sidebar does this for y
 <tbody>
 <tr><td>Name a row for its area in a word or two: "Sessions".</td><td>A sentence: "All of my tutoring sessions".</td></tr>
 <tr><td>Title a group in one word, in sentence case: "Training".</td><td>Title case or a phrase.</td></tr>
-<tr><td>Label a tab with its time and the teacher: "4:00 pm · Ms. Ortiz".</td><td>The whole record in the label.</td></tr>
+<tr><td>Label a tab with its time and the teacher: "4:00 PM · Ms. Ortiz".</td><td>The whole record in the label.</td></tr>
 <tr><td>Use Font Awesome Free icons on rows.</td><td>Pro-only icons, which render as blanks.</td></tr>
 </tbody>
 </DocsTable>

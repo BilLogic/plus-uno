@@ -2,12 +2,12 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as BlanketStories from './Blanket.stories.jsx';
 import {
-    OneBlanketDo,
-    OneBlanketDont,
+    DrawerWithConfirm,
+    DrawerWithUnrelatedModal,
+    ModalWithConfirm,
+    ThirdOverlay,
     ConfirmSmallDo,
     ConfirmSmallDont,
-    OneOverlayDo,
-    OneOverlayDont,
 } from './Blanket.examples.jsx';
 import {
     ComponentExample,
@@ -151,17 +151,28 @@ A Blanket has no states. It is shown while its layer is open and gone when it cl
 
 ## Best practices
 
-One blanket, one overlay at a time.
+At most two overlays: a modal or drawer, and the confirm it raises. Never two unrelated overlays, and never a third.
 
-### One blanket per screen.
+### Stack only the confirm a layer raises.
 
-A dialog never opens a second Blanket. When a follow-up decision comes up inside a modal, such as confirming a delete, the modal swaps its title, body and footer for an inline confirmation in the same Blanket.
+A confirm raised from a modal or drawer is a second Blanket over the first. A modal or drawer for another task waits until the first one closes.
 
 <DoDontPair
-    doExample={<OneBlanketDo />}
-    doCaption="One blanket per screen."
-    dontExample={<OneBlanketDont />}
-    dontCaption="Stack a second blanket."
+    doExample={<DrawerWithConfirm />}
+    doCaption="A drawer and the confirm it raises, stacked over it."
+    dontExample={<DrawerWithUnrelatedModal />}
+    dontCaption="A modal for an unrelated task opened over a drawer."
+/>
+
+### Never a third overlay.
+
+The overlay module refuses a third: it stays closed and calls its `onClose`.
+
+<DoDontPair
+    doExample={<ModalWithConfirm />}
+    doCaption="A modal and its confirm: two overlays."
+    dontExample={<ThirdOverlay />}
+    dontCaption="A third overlay over a modal and its confirm."
 />
 
 ### Confirm in a small modal.
@@ -173,16 +184,7 @@ A dialog never opens a second Blanket. When a follow-up decision comes up inside
     dontCaption="Confirm in a large modal."
 />
 
-### One overlay at a time.
-
 Opening a modal closes a floating sidebar, so the two never stack. A floating sidebar gets a shadow and no blanket, and popups, flags and tooltips never bring one.
-
-<DoDontPair
-    doExample={<OneOverlayDo />}
-    doCaption="One overlay at a time."
-    dontExample={<OneOverlayDont />}
-    dontCaption="Open a drawer and a modal together."
-/>
 
 ### Place a modal in the Blanket.
 

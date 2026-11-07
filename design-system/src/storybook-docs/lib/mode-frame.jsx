@@ -1,5 +1,6 @@
 import React from 'react';
 import { DocsCanvasShell } from '../ds-docs-layout.jsx';
+import { useFitScale } from './use-fit-scale.js';
 
 /**
  * A story shown in its own iframe at a fixed screen width, for docs pages that
@@ -41,19 +42,8 @@ const useModes = () => {
  */
 export const ModeFrame = ({ storyId, width, height, title }) => {
     const modes = useModes();
-    const wrapRef = React.useRef(null);
-    const [scale, setScale] = React.useState(1);
     // Read the column width before the first paint, so the frame never shows unscaled.
-    React.useLayoutEffect(() => {
-        const el = wrapRef.current;
-        if (!el) return undefined;
-        const read = () => setScale(Math.min(1, el.clientWidth / width));
-        read();
-        if (typeof ResizeObserver === 'undefined') return undefined;
-        const observer = new ResizeObserver(read);
-        observer.observe(el);
-        return () => observer.disconnect();
-    }, [width]);
+    const [wrapRef, scale] = useFitScale(width);
 
     const globals = `plusColorMode:${modes.color};plusContrastMode:${modes.contrast}`;
     const src = `iframe.html?id=${storyId}&viewMode=story&globals=${globals}`;

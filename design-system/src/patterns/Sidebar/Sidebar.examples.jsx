@@ -1,6 +1,6 @@
 import React from 'react';
 
-import PatternSidebar from '@/patterns/Sidebar';
+import { PatternSidebar } from '@/patterns';
 
 /**
  * The do and don't examples on the Sidebar docs page: the real Sidebar,
@@ -61,7 +61,7 @@ const tab = (label, tooltip) => ({ id: `t-${label}`, label, tooltip });
 export const TabLabelDo = () => sidebar({
     groups: [home, toolkit()],
     activeId: 'home',
-    tabs: { sessions: [tab('4:00 pm · Ms. Ortiz', 'Hillside · Ms. Ortiz'), tab('5:30 pm · Mr. Patel', 'Roosevelt · Mr. Patel')] },
+    tabs: { sessions: [tab('4:00 PM · Ms. Ortiz', 'Hillside · Ms. Ortiz'), tab('5:30 PM · Mr. Patel', 'Roosevelt · Mr. Patel')] },
 });
 
 /** Don't: a tab carries everything, and the time it is found by is cut off. */
@@ -70,8 +70,8 @@ export const TabLabelDont = () => sidebar({
     activeId: 'home',
     tabs: {
         sessions: [
-            tab('Session at Hillside with Ms. Ortiz, 4:00 pm', 'Hillside · Ms. Ortiz'),
-            tab('Session at Roosevelt with Mr. Patel, 5:30 pm', 'Roosevelt · Mr. Patel'),
+            tab('Session at Hillside with Ms. Ortiz, 4:00 PM', 'Hillside · Ms. Ortiz'),
+            tab('Session at Roosevelt with Mr. Patel, 5:30 PM', 'Roosevelt · Mr. Patel'),
         ],
     },
 });

@@ -73,9 +73,10 @@ function useOverflows(el, loading) {
  * shared overlay module (`@/lib/overlay`) alongside `PatternDrawer`: at most
  * two stack, a third stays closed and calls `onClose`.
  *
- * A follow-up that needs confirming — "delete this?" — does not stack a
- * second Modal: the caller swaps `title`, `body` and the footer buttons in
- * place, driven by its own state. One dialog is open at a time.
+ * A follow-up about the dialog itself — "discard these edits?" — is best
+ * shown in place: the caller swaps `title`, `body` and the footer buttons,
+ * driven by its own state. A confirm raised as a second Modal is allowed too;
+ * it is the most that stacks.
  */
 const Modal = ({
     id,

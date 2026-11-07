@@ -316,6 +316,23 @@ export const DocsContentGrid = {
     parameters: { layout: 'padded' },
 };
 
+/*
+ * The do and don't pairs on the docs page draw these in an iframe at a real
+ * screen width (`ModeFrame`), since the Frame sizes itself from its own box.
+ * No play: they are pictures.
+ */
+
+/** Do: an app page supplies its Sidebar, its breadcrumb and its content. */
+export const PairWithSidebar = {};
+
+/** Don't: the same page with no Sidebar, so there is no navigation and no toggle. */
+export const PairWithoutSidebar = { args: { sidebar: undefined } };
+
+/** Don't: a page title in the header row in place of the breadcrumb. */
+export const PairTitleInHeader = {
+    args: { header: <span style={{ font: 'var(--heading-large)', color: 'var(--ds-text)' }}>Dashboard</span> },
+};
+
 /** The playground: the frame at the docs height, with its layout props live. */
 export const Interactive = {
     render: DocsFrame,
