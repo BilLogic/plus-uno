@@ -308,7 +308,7 @@ export const TrustMarks = {
         const rating = within(reply).getByRole('group', { name: 'Rate this answer' });
         await userEvent.click(within(rating).getByRole('button', { name: 'Good answer' }));
         await expect(within(rating).getByRole('button', { name: 'Good answer' })).toHaveAttribute('aria-pressed', 'true');
-        await expect(within(reply).getByRole('status')).toHaveTextContent('Thanks for the feedback.');
+        await expect(within(reply).getByRole('status')).toHaveTextContent('Thanks. Marked as a good answer.');
     }),
 };
 

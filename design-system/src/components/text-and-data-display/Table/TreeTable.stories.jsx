@@ -89,9 +89,9 @@ export const Overview = {
         await expect(left(row(canvas, 'Grade 7 · Math')) - left(school), 'one step per level').toBeCloseTo(step, 0);
         await expect(left(student) - left(school), 'two steps at level 3').toBeCloseTo(step * 2, 0);
         const chevron = school.querySelector('.plus-tree-table-toggle i');
-        await expect(px(getComputedStyle(chevron).fontSize), 'the chevron is 12').toBe(tokenLength(canvasElement, '--size-icon-sm'));
+        await expect(px(getComputedStyle(chevron).fontSize), 'the chevron is 12').toBe(tokenLength(canvasElement, '--icon-sm'));
         const hit = school.querySelector('.plus-tree-table-toggle').getBoundingClientRect();
-        await expect(hit.width, 'in a 24 hit area').toBe(tokenLength(canvasElement, '--height-150'));
+        await expect(hit.width, 'in a 24 hit area').toBe(tokenLength(canvasElement, '--item-height-sm'));
         await expect(canvas.getByText('Nothing in here yet')).toBeVisible();
     }
 };

@@ -34,7 +34,7 @@ describe('AiFeedback', () => {
         const status = screen.getByRole('status');
         expect(status).toHaveTextContent('');
         fireEvent.click(up());
-        expect(status).toHaveTextContent('Thanks for the feedback.');
+        expect(status).toHaveTextContent('Thanks. Marked as a good answer.');
     });
 
     it('offers an optional comment on thumbs down and sends it', async () => {

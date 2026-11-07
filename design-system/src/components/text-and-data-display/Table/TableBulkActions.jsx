@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { SectionToolbar } from '@/patterns/PatternSection/PatternSection';
+import { SectionToolbar } from '@/patterns/PatternSection';
 import Button from '@/components/forms-and-inputs/Button';
 import IconButton from '@/components/forms-and-inputs/IconButton';
 import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu';

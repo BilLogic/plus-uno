@@ -5,12 +5,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 // @ts-expect-error -- the design system is plain JSX, resolved by the Vite alias.
 import { AiMessage, PromptInput } from '@/components';
+// @ts-expect-error -- same.
+import { AI_CHAT_DISCLAIMER as DISCLAIMER } from '@/patterns/AiChat';
 import { AssistantMessageContent } from './components/AssistantMessageContent';
 import { ChatHeader } from './components/ChatHeader';
 import './ResearchAssistantChat.css';
 
-/** The one fallibility line, under the prompt input (the AI trust rules). */
-const DISCLAIMER = 'AI can make mistakes. Check important info.';
 
 type Turn =
   | { role: 'user'; text: string }
@@ -227,7 +227,7 @@ export function ResearchAssistantChat({
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        background: 'var(--chat-bg, #f9fafb)',
+        background: 'var(--ds-surface)',
         overflow: 'hidden',
       }}
     >
@@ -241,7 +241,7 @@ export function ResearchAssistantChat({
           paddingBottom: 'var(--size-section-pad-y-lg)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--space-0625, 10px)',
+          gap: 'var(--stack-md)',
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
         }}
@@ -250,7 +250,7 @@ export function ResearchAssistantChat({
         {toTurns(messages).map((turn, i) => (
           turn.role === 'user' ? (
             <div key={i} className="research-chat-user-turn">
-              <p style={{ margin: 0 }}>{turn.text}</p>
+              <p>{turn.text}</p>
             </div>
           ) : (
             <AiMessage

@@ -119,7 +119,7 @@ export const WithFeedback = {
         const down = within(group).getByRole('button', { name: 'Bad answer' });
         await userEvent.click(up);
         await expect(up).toHaveAttribute('aria-pressed', 'true');
-        await expect(canvas.getByRole('status')).toHaveTextContent('Thanks for the feedback.');
+        await expect(canvas.getByRole('status')).toHaveTextContent('Thanks. Marked as a good answer.');
         await userEvent.click(down);
         await expect(up).toHaveAttribute('aria-pressed', 'false');
         await expect(down).toHaveAttribute('aria-pressed', 'true');

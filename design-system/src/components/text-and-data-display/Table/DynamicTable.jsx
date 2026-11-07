@@ -4,6 +4,7 @@ import PatternTable from '@/patterns/PatternTable';
 import Pagination from '@/components/navigation/Pagination';
 import Spinner from '@/components/loading/Spinner';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
+import VisuallyHidden from '@/components/layout-and-structure/VisuallyHidden';
 import HeadCell from './HeadCell';
 import { TableCell, TableRow, TableFooter } from './TableParts';
 import './Table.scss';
@@ -167,6 +168,8 @@ const DynamicTable = ({
             : [...selected, ...visibleKeys.filter((k) => !isSelected(k))]
     );
 
+    const highlighted = [].concat(highlightedRowIndex ?? []);
+
     const bodyState = deriveState(state, isLoading, rows.length);
     const showsMessage = !['default', 'refreshing'].includes(bodyState);
 
@@ -281,7 +284,7 @@ const DynamicTable = ({
                                 key={key}
                                 state={rowSelected ? 'selected' : 'rest'}
                                 className={classes(
-                                    start + rowIndex === highlightedRowIndex && 'plus-dynamic-table-row--highlighted'
+                                    highlighted.includes(start + rowIndex) && 'plus-dynamic-table-row--highlighted'
                                 )}
                                 onClick={row.onClick}
                             >
@@ -317,6 +320,10 @@ const DynamicTable = ({
                     })}
                 </tbody>
             </PatternTable>
+            {isSelectable && (
+                // Mounted from the start, so the first selection is announced too.
+                <VisuallyHidden role="status">{selected.length > 0 ? `${selected.length} selected` : ''}</VisuallyHidden>
+            )}
             {bodyState === 'refreshing' && (
                 <div className="plus-dynamic-table-overlay">
                     <Spinner size={24} label="Refreshing rows" />
@@ -380,8 +387,8 @@ DynamicTable.propTypes = {
     noResultsView: PropTypes.node,
     /** The message for the `error` state. */
     errorView: PropTypes.node,
-    /** The index (across every page) of the row to highlight. */
-    highlightedRowIndex: PropTypes.number,
+    /** The index (across every page) of the row to highlight, or a list of them. */
+    highlightedRowIndex: PropTypes.oneOfType([PropTypes.number, PropTypes.arrayOf(PropTypes.number)]),
     /** Hold every column to its head cell's `width`. */
     isFixedSize: PropTypes.bool,
     /** Rules between the columns. */

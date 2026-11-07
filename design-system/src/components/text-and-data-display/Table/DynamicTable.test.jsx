@@ -218,3 +218,19 @@ describe('DynamicTable sticky header and frozen column', () => {
         expect(container.querySelector('.plus-dynamic-table')).toHaveClass('plus-dynamic-table--frozen-pair');
     });
 });
+
+describe('DynamicTable announcements and highlights', () => {
+    it('keeps a status mounted, so the first selection is announced', () => {
+        render(<DynamicTable head={head} rows={rows} isSelectable />);
+        const status = screen.getByRole('status');
+        expect(status).toHaveTextContent('');
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select row 1' }));
+        expect(status).toHaveTextContent('1 selected');
+    });
+
+    it('highlights a list of rows', () => {
+        render(<DynamicTable head={head} rows={rows} highlightedRowIndex={[0, 2]} />);
+        const body = within(screen.getByRole('table')).getAllByRole('row').slice(1);
+        expect(body.map((r) => r.classList.contains('plus-dynamic-table-row--highlighted'))).toEqual([true, false, true, false, false]);
+    });
+});

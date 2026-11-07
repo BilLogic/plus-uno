@@ -22,9 +22,9 @@
     flex: none;
     align-items: center;
     justify-content: center;
-    width: var(--height-150);
-    height: var(--height-150);
-    font-size: var(--size-icon-sm);
+    width: var(--item-height-sm);
+    height: var(--item-height-sm);
+    font-size: var(--icon-sm);
     color: var(--ds-text-subtle);
 }
 
@@ -36,7 +36,7 @@
 .plus-tree-table-count {
     margin-inline-start: var(--size-table-cell-inline);
     color: var(--ds-text-subtle);
-    font-weight: normal;
+    font-weight: var(--type-weight-regular);
 }
 
 .plus-tree-table-row--expands {
@@ -53,7 +53,7 @@
     display: inline-flex;
     align-items: center;
     gap: var(--size-table-cell-inline);
-    padding-inline-start: calc(var(--plus-tree-table-level) * var(--table-indent) + var(--height-150));
+    padding-inline-start: calc(var(--plus-tree-table-level) * var(--table-indent) + var(--item-height-sm));
 }
 
 .plus-pattern-table-table.plus-tree-table-table .plus-tree-table-message-row .plus-table-message {

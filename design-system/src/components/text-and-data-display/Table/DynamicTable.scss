@@ -44,10 +44,10 @@
     }
 
     tbody tr.plus-dynamic-table-row--highlighted {
-        --plus-pattern-table-row-state: color-mix(in srgb, var(--ds-background-warning-bold) 8%, transparent);
+        --plus-pattern-table-row-state: var(--ds-background-warning-subtler);
 
         @include plus-state(
-            (hovered: (--plus-pattern-table-row-state: color-mix(in srgb, var(--ds-background-warning-bold) 12%, transparent))),
+            (hovered: (--plus-pattern-table-row-state: var(--ds-background-warning-subtler-hovered))),
             $ring: false
         );
     }

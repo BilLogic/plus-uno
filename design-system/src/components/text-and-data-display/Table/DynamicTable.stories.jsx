@@ -3,7 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
 import { DynamicTable, HeadCell, TableBulkActions } from '@/components/text-and-data-display/Table';
-import PatternSection, { SectionToolbar } from '@/patterns/PatternSection/PatternSection';
+import PatternSection, { SectionToolbar } from '@/patterns/PatternSection';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
@@ -248,13 +248,15 @@ export const Selection = {
         await expect(all).toHaveAttribute('aria-checked', 'false');
         await userEvent.click(canvas.getByRole('checkbox', { name: 'Select row 2' }));
         await expect(all).toHaveAttribute('aria-checked', 'mixed');
-        const count = canvas.getByText('1 selected');
+        const count = canvasElement.querySelector('.plus-section-toolbar__selection');
+        await expect(count).toHaveTextContent('1 selected');
+        await expect(canvas.getByRole('status'), 'announced from the first selection').toHaveTextContent('1 selected');
         await expect(count).toHaveAttribute('aria-live', 'polite');
         await expect(canvas.getByText('Marcus Lee').closest('tr')).toHaveAttribute('aria-selected', 'true');
         await expect(canvas.getByRole('button', { name: 'More actions' })).toBeVisible();
         await userEvent.click(all);
         await expect(all).toHaveAttribute('aria-checked', 'true');
-        await expect(canvas.getByText('8 selected')).toBeVisible();
+        await expect(canvasElement.querySelector('.plus-section-toolbar__selection')).toHaveTextContent('8 selected');
         await userEvent.click(canvas.getByRole('button', { name: 'Clear selection' }));
         await expect(all).toHaveAttribute('aria-checked', 'false');
         await expect(canvas.getByText('8 students')).toBeVisible();

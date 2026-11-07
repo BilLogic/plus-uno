@@ -46,8 +46,9 @@ are optional. `FlagGroup` positions a stack.
 **`Modal`** is the only one that interrupts. `keyboard` and `backdrop` both
 default to `true`, so Escape and an outside click close it. Its width system is
 fixed — `width` (default 340) sets `width`, `minWidth` and `maxWidth` to one
-value — so a modal never adapts to its content; `type="scrollable"` is how long
-content is handled. `renderAs="inline"` returns the chrome as an ordinary block
+value — so a modal never adapts to its content. Long content is handled by
+`height`: a Hug modal (the default) scrolls its body once the content passes the
+cap, and `height="fill"` holds the full height. `renderAs="inline"` returns the chrome as an ordinary block
 with no backdrop, no focus trap and no Escape: it exists for docs and spec
 pages, never for a live dialog.
 

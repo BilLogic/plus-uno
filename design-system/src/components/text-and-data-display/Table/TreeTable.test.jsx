@@ -155,3 +155,19 @@ describe('TreeTable keyboard (treegrid row focus)', () => {
         expect(row('Lincoln Middle')).toHaveAttribute('aria-expanded', 'true');
     });
 });
+
+describe('TreeTable loading that cannot finish', () => {
+    it('opens onto the empty message when the load fails', async () => {
+        const loadChildren = vi.fn(() => Promise.reject(new Error('offline')));
+        render(<TreeTable head={head} items={items} loadChildren={loadChildren} />);
+        fireEvent.click(row('Roosevelt K-8').querySelector('.plus-tree-table-toggle'));
+        await waitFor(() => expect(screen.getByText('Nothing in here yet')).toBeInTheDocument());
+        expect(row('Roosevelt K-8')).not.toHaveAttribute('aria-busy');
+    });
+
+    it('opens onto the empty message when there is nothing to load from', () => {
+        render(<TreeTable head={head} items={items} />);
+        fireEvent.click(row('Roosevelt K-8').querySelector('.plus-tree-table-toggle'));
+        expect(screen.getByText('Nothing in here yet')).toBeInTheDocument();
+    });
+});

@@ -15,7 +15,8 @@ const thumb = (direction, selected) => (
  * pressed: a press reports `{ rating }` through `onFeedback`, a second press
  * on the same thumb clears it (`rating: null`). Thumbs down also opens a
  * popup for an optional comment, sent as `{ rating: 'down', comment }`.
- * A rating is confirmed quietly, in words a screen reader hears.
+ * A rating is confirmed quietly, in words a screen reader hears, and a
+ * change of rating is announced as well.
  */
 export const AiFeedback = ({ value, defaultValue = null, onFeedback, className = '' }) => {
     const controlled = value !== undefined;
@@ -83,7 +84,9 @@ export const AiFeedback = ({ value, defaultValue = null, onFeedback, className =
                 </Popup>
             </div>
             <span role="status" className="plus-ai-feedback__thanks">
-                {rating ? 'Thanks for the feedback.' : ''}
+                {/* Each rating has its own words, so a change of mind is announced too. */}
+                {rating === 'up' && 'Thanks. Marked as a good answer.'}
+                {rating === 'down' && 'Thanks. Marked as a bad answer.'}
             </span>
         </div>
     );

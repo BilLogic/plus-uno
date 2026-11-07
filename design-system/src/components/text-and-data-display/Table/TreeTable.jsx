@@ -50,7 +50,9 @@ const flatten = (items, { isExpanded, childrenOf, loading }, level = 0, parentId
  *   it too, but never a press on a control inside the row, so use it only on
  *   rows without controls. `defaultExpandedIds` seeds the open rows;
  *   `expandedIds` with `onExpandedChange` hands them to the page.
- * - **Keyboard.** The WAI-ARIA treegrid pattern in row-focus mode: the table
+ * - **Keyboard.** The WAI-ARIA treegrid pattern in row-focus mode, written
+ *   here because Base UI has no treegrid part (an ADR-037 exception, like the
+ *   Select keyboard):  the table
  *   is one tab stop; Down and Up move between rows, Home and End to the ends;
  *   Right opens a closed parent, then moves to its first child; Left closes an
  *   open parent, then moves to the parent row; Enter toggles. Every row
@@ -92,10 +94,23 @@ const TreeTable = ({
     };
 
     const load = (item) => {
-        if (!loadChildren || item.children !== undefined || loaded[item.id] || loading.has(item.id)) return;
+        if (item.children !== undefined || loaded[item.id] || loading.has(item.id)) return;
+        // With nothing to load from, or a load that fails, the row opens onto its empty message.
+        if (!loadChildren) {
+            setLoaded((prev) => ({ ...prev, [item.id]: [] }));
+            return;
+        }
         setLoading((prev) => new Set(prev).add(item.id));
-        Promise.resolve(loadChildren(item)).then((children) => {
+        let pending;
+        try {
+            pending = Promise.resolve(loadChildren(item));
+        } catch (error) {
+            pending = Promise.reject(error);
+        }
+        pending.then((children) => {
             setLoaded((prev) => ({ ...prev, [item.id]: children || [] }));
+        }, () => {
+            setLoaded((prev) => ({ ...prev, [item.id]: [] }));
         }).finally(() => {
             setLoading((prev) => {
                 const next = new Set(prev);

@@ -215,6 +215,10 @@
     font: var(--body-default);
 }
 
+.research-chat-user-turn p {
+    margin: 0;
+}
+
 /* The AI's turn: an AiMessage (icon, text, charts, thumbs) at the start. */
 .research-chat-ai-turn {
     align-self: flex-start;
