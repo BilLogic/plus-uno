@@ -49,7 +49,7 @@ export { default as Tile, TILE_APPEARANCES, TILE_COLORS, TILE_CONTENTS, TILE_SIZ
 export { default as UserAvatar } from '@/components/images-and-icons/UserAvatar';
 
 export { default as AiLabel } from '@/components/labels/AiLabel';
-export { default as AiMessage, AI_MESSAGE_STATUSES, TypingText } from '@/components/labels/AiMessage';
+export { default as AiMessage, AI_MESSAGE_STATUSES, AiSources, TypingText } from '@/components/labels/AiMessage';
 export { default as CountTag, COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS, formatCount } from '@/components/labels/CountTag';
 export { default as DateTag, DATE_TAG_APPEARANCES, DATE_TAG_ICONS, DATE_TAG_SPACINGS } from '@/components/labels/DateTag';
 export { default as PromptStarters } from '@/components/labels/PromptStarters';

@@ -66,12 +66,22 @@ AI chat applies the six AI rules from the AI overview.
 1. **One AI identity, unnamed.** The chat is called AI chat and carries the AI icon. It has no persona name or avatar.
 2. **Every answer is marked.** Each reply is an AI message, which leads with the AI icon.
 3. **Fallibility, once.** "AI can make mistakes. Check important info." sits under the prompt input, never on each message.
-4. **Sources when it draws on data.** A reply that used records lists them under the message.
+4. **Sources when it draws on data.** A reply that used records lists them under the message: `respond` returns `{ text, sources }` instead of text.
 5. **People confirm actions.** The chat proposes changes; anything that changes data waits for the person's confirm.
 6. **Feedback on every answer.** Each reply offers thumbs up and thumbs down.
 
 <DocsCanvasShell attachSourceBelow description={<>A reply with the AI icon, and the fallibility line under the prompt input.</>}>
     <Canvas of={AiChatStories.TrustMarks} story={{ inline: true }} layout="padded" sourceState="hidden" />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+### Sources
+
+<DocsCanvasShell attachSourceBelow description={<>A reply that drew on records, with its sources under it.</>}>
+    <Canvas of={AiChatStories.RepliesWithSources} story={{ inline: true }} layout="padded" sourceState="hidden" />
 </DocsCanvasShell>
 
 </div>

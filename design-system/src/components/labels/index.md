@@ -8,7 +8,7 @@ authored half (#166), counted rather than assumed.
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [AiLabel](AiLabel/index.md) | 9 | ✅ | ✅ | ✅ |
-| [AiMessage](AiMessage/index.md) | 6 | ✅ | ✅ | ✅ |
+| [AiMessage](AiMessage/index.md) | 7 | ✅ | ✅ | ✅ |
 | [CountTag](CountTag/index.md) | 12 | ✅ | ✅ | ✅ |
 | [DateTag](DateTag/index.md) | 6 | ✅ | ✕ | ✅ |
 | [PromptStarters](PromptStarters/index.md) | 4 | ✅ | ✕ | ✅ |

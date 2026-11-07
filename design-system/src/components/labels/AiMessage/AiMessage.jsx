@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import AiIcon from '@/components/images-and-icons/AiIcon';
+import AiSources from './AiSources';
 import './AiMessage.scss';
 
 export const AI_MESSAGE_STATUSES = ['complete', 'streaming', 'thinking'];
@@ -71,6 +72,9 @@ const TypingIndicator = () => (
  * - `status="streaming"` is text still arriving: a caret follows the last
  *   character and the message is marked busy for assistive technology.
  * - `status="thinking"` is the typing indicator, before any text exists.
+ *
+ * `sources` lists what a finished answer read, under the message: an answer
+ * that draws on records always shows them.
  */
 const AiMessage = ({
     text,
@@ -78,6 +82,7 @@ const AiMessage = ({
     status = 'complete',
     typeOut = false,
     renderPart,
+    sources,
     className,
     ...rest
 }) => {
@@ -110,6 +115,7 @@ const AiMessage = ({
                     }
                     return <div key={index} className="plus-ai-message__part">{renderPart?.(part, index) ?? null}</div>;
                 })}
+                {status === 'complete' && sources?.length ? <AiSources sources={sources} /> : null}
             </div>
         </div>
     );
@@ -126,6 +132,12 @@ AiMessage.propTypes = {
     typeOut: PropTypes.bool,
     /** Draws a part that is not text: `(part, index) => node`. */
     renderPart: PropTypes.func,
+    /** What a finished answer read: one `{ title, href, type }` per source, listed under the message. */
+    sources: PropTypes.arrayOf(PropTypes.shape({
+        title: PropTypes.string.isRequired,
+        href: PropTypes.string.isRequired,
+        type: PropTypes.string,
+    })),
     className: PropTypes.string,
 };
 

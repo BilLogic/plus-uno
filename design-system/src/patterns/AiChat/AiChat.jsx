@@ -126,7 +126,7 @@ const ChatSurface = ({ presentation }) => {
                     ) : messages.map((m) => (
                         <div key={m.id} className={`plus-ai-chat__message plus-ai-chat__message--${m.role}`}>
                             {m.role === 'ai'
-                                ? <AiMessage className="plus-ai-chat__text" text={m.text} />
+                                ? <AiMessage className="plus-ai-chat__text" text={m.text} sources={m.sources} />
                                 : <p className="plus-ai-chat__text">{m.text}</p>}
                         </div>
                     ))}
@@ -227,7 +227,8 @@ const Launcher = () => {
  * - `variant="storybook"` is the Storybook docs' chat: clear, move to Panel and
  *   close only, with no full screen and no more menu.
  * - The conversation is kept in memory and moves with the mode. There is no
- *   history, and no backend: `respond(text)` returns the reply.
+ *   history, and no backend: `respond(text)` returns the reply, as text or
+ *   as `{ text, sources }` when it drew on records; the sources list under it.
  */
 const AiChat = ({
     variant = 'app',
@@ -289,7 +290,9 @@ const AiChat = ({
         if (pending.current !== ticket) return;
         setLoading(false);
         if (reply == null) return;
-        setMessages((prev) => [...prev, { id: `a${prev.length}-${ticket}`, role: 'ai', text: reply }]);
+        // A reply is its text, or `{ text, sources }` when it drew on records.
+        const { text: replyText, sources } = typeof reply === 'string' ? { text: reply } : reply;
+        setMessages((prev) => [...prev, { id: `a${prev.length}-${ticket}`, role: 'ai', text: replyText, sources }]);
     }, [respond]);
 
     const value = useMemo(() => ({
@@ -323,7 +326,7 @@ AiChat.propTypes = {
     storageKey: PropTypes.string,
     /** Called with the new mode whenever chat moves between popup, Panel and full screen. */
     onModeChange: PropTypes.func,
-    /** Returns the reply (or a promise of it) to a sent message. Without it nothing answers. */
+    /** Returns the reply (or a promise of it) to a sent message: its text, or `{ text, sources }` when it drew on records. Without it nothing answers. */
     respond: PropTypes.func,
     /** `{ id, label, text }` prompts offered while the conversation is empty. */
     starters: PropTypes.arrayOf(PropTypes.shape({

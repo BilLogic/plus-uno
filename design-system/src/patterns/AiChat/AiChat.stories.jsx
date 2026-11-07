@@ -306,3 +306,27 @@ export const TrustMarks = {
         await expect(popup.getAllByText('AI can make mistakes. Check important info.'), 'said once').toHaveLength(1);
     }),
 };
+
+const SOURCES = [
+    { title: 'Session notes, Oct 24', href: '#session-1024', type: 'Session' },
+    { title: 'Ava Thompson', href: '#student-ava', type: 'Student' },
+    { title: 'Attendance report', href: '#report-attendance', type: 'Report' },
+    { title: 'Grade 7 · Math', href: '#class-g7', type: 'Class' },
+];
+
+/** A reply that drew on records lists them under the message. */
+export const RepliesWithSources = {
+    args: { respond: async (text) => ({ text: `About "${text}": Ava attended 12 of 14 sessions.`, sources: SOURCES }) },
+    parameters: { docs: { height: DOCS_HEIGHT } },
+    play: async ({ canvasElement }) => withTestViewport(1440, HEIGHT, async () => {
+        const p = parts(canvasElement);
+        await userEvent.click(p.fab());
+        await waitFor(() => expect(p.popup()).not.toBeNull());
+        const popup = within(p.popup());
+        await userEvent.type(popup.getByRole('textbox', { name: 'Message to AI chat' }), 'Ava{Enter}');
+        const list = await popup.findByRole('list', { name: 'Sources' });
+        await expect(within(list).getAllByRole('link')).toHaveLength(3);
+        await userEvent.click(popup.getByRole('button', { name: 'Show 1 more source' }));
+        await expect(within(list).getAllByRole('link')).toHaveLength(4);
+    }),
+};

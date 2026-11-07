@@ -92,3 +92,44 @@
         animation: none;
     }
 }
+
+/*
+ * The sources an answer read: a quiet heading, one row per source (title
+ * link, type beside it) and the toggle past three.
+ */
+.plus-ai-sources {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--stack-sm);
+    margin-block-start: var(--stack-md);
+
+    &__heading {
+        margin: 0;
+        font: var(--heading-xxsmall);
+        color: var(--ds-text-subtle);
+    }
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--stack-sm);
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    &__item {
+        display: flex;
+        align-items: baseline;
+        gap: var(--stack-sm);
+        font: var(--body-default);
+        min-width: 0;
+    }
+
+    &__type {
+        flex: none;
+        font: var(--body-small);
+        color: var(--ds-text-subtle);
+    }
+}
