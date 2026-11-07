@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PopupStories from './Popup.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet, DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Popup } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -22,6 +29,7 @@ export const figmaMeta = {
 <Meta of={PopupStories} />
 
 <Title />
+A small panel of secondary content that hangs off a control: a definition, a preview or a short list.
 
 <DocsTabs of={PopupStories}>
 
@@ -38,41 +46,43 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Placement
 
-<DocsCanvasShell attachSourceBelow description={<>Popup with title and body in a fixed, non-interactive layout (always visible). Use Interactive for click/hover behavior.</>}>
-    <Canvas of={PopupStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={PopupStories.PlacementTop} title="Top" description={<>The default. The popup opens above its trigger, 4 away.</>} />
 
-</div>
+<ComponentExample of={PopupStories.PlacementBottom} title="Bottom" description={<>Below the trigger.</>} />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={PopupStories.PlacementLeft} title="Left" description={<>To the left of the trigger.</>} />
 
-## Content
-
-<DocsCanvasShell description={<>Body-only popup (no title).</>}>
-    <DsCanvasQuiet of={PopupStories.Content} />
-</DocsCanvasShell>
+<ComponentExample of={PopupStories.PlacementRight} title="Right" description={<>To the right of the trigger.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## Size and content
 
-<DocsCanvasShell description={<>Open on click, hover, or focus.</>}>
-    <DsCanvasQuiet of={PopupStories.InteractionStates} />
-</DocsCanvasShell>
+<ComponentExample of={PopupStories.WidthSmall} title="Small" description={<><code>width="sm"</code> is 320 wide, and the default.</>} />
+
+<ComponentExample of={PopupStories.WidthMedium} title="Medium" description={<><code>width="md"</code> is 400 wide.</>} />
+
+<ComponentExample of={PopupStories.WidthLarge} title="Large" description={<><code>width="lg"</code> is 480 wide.</>} />
+
+<ComponentExample of={PopupStories.BodyOnly} title="Body only" description={<>Leave out <code>title</code> and the body stands alone.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Layout & composition
+## Trigger type
 
-<DocsCanvasShell description={<>Placement around the trigger: top, bottom, left, and right.</>}>
-    <DsCanvasQuiet of={PopupStories.Layout} />
-</DocsCanvasShell>
+<ComponentExample of={PopupStories.TriggerClick} title="Click" description={<>The default. A click opens it and a click away or Escape closes it.</>} />
+
+<ComponentExample of={PopupStories.TriggerHover} title="Hover" description={<>Opens on hover. A keyboard user gets nothing, so give the trigger a click as well.</>} />
+
+<ComponentExample of={PopupStories.TriggerFocus} title="Focus" description={<>The code treats <code>focus</code> as it does <code>hover</code>: the popup opens on pointer hover, not on keyboard focus.</>} />
+
+<ComponentExample of={PopupStories.TriggerHoverAndClick} title="Hover and click" description={<>An array combines types, such as <code>['hover', 'click']</code>.</>} />
 
 </div>
 
@@ -80,25 +90,15 @@ export const figmaMeta = {
 
 ## State
 
-<DocsCanvasShell description={<>One surface on the overlay fill and shadow, with its title over the body.</>}>
-    <DsCanvasQuiet of={PopupStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={PopupStories.Rest} title="Rest" description={<>One surface on the overlay fill, lifted by the overlay shadow, with its title over the body.</>} />
 
-<DocsCanvasShell description={<>The popup does not react to a pointer.</>}>
-    <DsCanvasQuiet of={PopupStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={PopupStories.Hovered} title="Hovered" description={<>The popup does not react to a pointer.</>} />
 
-<DocsCanvasShell description={<>A press changes nothing.</>}>
-    <DsCanvasQuiet of={PopupStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={PopupStories.Pressed} title="Pressed" description={<>A press changes nothing.</>} />
 
-<DocsCanvasShell description={<>The trigger shows the 2px focus ring, and keeps it once focus comes back to it.</>}>
-    <DsCanvasQuiet of={PopupStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={PopupStories.Focused} title="Focused" description={<>The trigger shows the 2px focus ring, and keeps it once focus comes back to it.</>} />
 
-<DocsCanvasShell description={<>The trigger announces the popup with <code>aria-haspopup</code> and <code>aria-expanded</code>.</>}>
-    <DsCanvasQuiet of={PopupStories.Open} />
-</DocsCanvasShell>
+<ComponentExample of={PopupStories.Open} title="Open" description={<>The trigger announces the popup with <code>aria-haspopup</code> and <code>aria-expanded</code>.</>} />
 
 </div>
 
@@ -166,7 +166,7 @@ comes nearer than 8 to the screen's edge.
 <tr><td>Open</td><td>The surface sits 4 from the trigger and never nearer than 8 to the screen edge.</td></tr>
 <tr><td>Hovered, pressed</td><td>The popup does not react; the trigger keeps its own states.</td></tr>
 <tr><td>Focused</td><td>The trigger shows the 2px ring. Opened by a click or a key, the popup takes focus: its first focusable element, or the popup itself.</td></tr>
-<tr><td>Disabled</td><td>A popup has no disabled state; leave the trigger out instead.</td></tr>
+<tr><td>Disabled</td><td>A popup has no disabled state.</td></tr>
 <tr><td>Dismissed</td><td>A click away or Escape closes it, except with the manual trigger type.</td></tr>
 </tbody>
 </DocsTable>
@@ -222,11 +222,36 @@ comes nearer than 8 to the screen's edge.
 <Popup trigger={<div>What is this?</div>}>…</Popup>
 ```
 
+<DoDontPair
+    doExample={<Popup trigger="What is this?">A short definition.</Popup>}
+    doCaption="A string trigger becomes a real button, named by its own text."
+    dontExample={<Popup trigger={<div>What is this?</div>}>A short definition.</Popup>}
+    dontCaption="A div is not a control: it has no role and no keyboard behavior."
+/>
+
 ### Hover alone leaves out the keyboard.
 
 `triggerType="hover"` has no keyboard equivalent. Use `['hover', 'focus']` at
 least, and `click` when the content is more than a sentence — hover content that
 must be read is content that has to stay put while it is read.
+
+### Keep the body short, and keep forms out.
+
+<DoDontPair
+    doExample={<div className="plus-popup" style={{ position: 'static', width: '100%' }}><div className="plus-popup-title">Session 12</div><div className="plus-popup-body">Ran 45 minutes over.</div></div>}
+    doCaption="A short noun phrase for the title and one sentence for the body."
+    dontExample={<div className="plus-popup" style={{ position: 'static', width: '100%' }}><div className="plus-popup-title">Do you want to change the session length?</div><div className="plus-popup-body">Pick a new length for this session and for every session after it, then add a note for the tutor explaining why the change was made.</div></div>}
+    dontCaption="A question for a title and a paragraph for a body."
+/>
+
+### Name the trigger for what it opens.
+
+<DoDontPair
+    doExample={<Popup trigger="What is this?">A short definition.</Popup>}
+    doCaption="Says what is behind it."
+    dontExample={<Popup trigger="Click here">A short definition.</Popup>}
+    dontCaption="Says nothing about what opens, and reads as nothing in a list of links."
+/>
 
 </div>
 

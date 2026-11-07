@@ -206,3 +206,28 @@ export const Disabled = {
         await expect(canvasElement.ownerDocument.querySelector('[role="tooltip"]')).toBeNull();
     },
 };
+
+/** Where the tooltip opens, one story per side. It stays open so the page can show it. */
+const PlacedTooltip = ({ placement }) => (
+    <div style={tooltipPlaygroundPadding}>
+        <Tooltip text="Opens the session notes" placement={placement} show>
+            <Button appearance="default" text="Notes" />
+        </Tooltip>
+    </div>
+);
+
+export const PlacementTop = { render: () => <PlacedTooltip placement="top" /> };
+export const PlacementBottom = { render: () => <PlacedTooltip placement="bottom" /> };
+export const PlacementLeft = { render: () => <PlacedTooltip placement="left" /> };
+export const PlacementRight = { render: () => <PlacedTooltip placement="right" /> };
+
+/** A long line wraps past the maximum width. */
+export const Wrapping = {
+    render: () => (
+        <div style={tooltipPlaygroundPadding}>
+            <Tooltip text="Opens the session notes, with the goals, the topics covered and what to practice before the next lesson" show>
+                <Button appearance="default" text="Notes" />
+            </Tooltip>
+        </div>
+    ),
+};

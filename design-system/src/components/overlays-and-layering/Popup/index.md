@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/overlays-and-layering/Popup/Popup.jsx`
 
-**Stories:** `design-system/src/components/overlays-and-layering/Popup/Popup.stories.jsx` — Layout, Content, InteractionStates, Overview, Interactive, Rest, Hovered, Pressed, Focused, Open
+**Stories:** `design-system/src/components/overlays-and-layering/Popup/Popup.stories.jsx` — Layout, Content, InteractionStates, Overview, Interactive, Rest, Hovered, Pressed, Focused, Open, PlacementTop, PlacementBottom, PlacementLeft, PlacementRight, WidthSmall, WidthMedium, WidthLarge, BodyOnly, TriggerClick, TriggerHover, TriggerFocus, TriggerHoverAndClick
 
 **Storybook page:** `design-system/src/components/overlays-and-layering/Popup/Popup.mdx`
 
@@ -49,6 +49,4 @@ From `design-system/src/components/overlays-and-layering/Popup/Popup.scss`. Over
 
 Same group: `Tooltip`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
