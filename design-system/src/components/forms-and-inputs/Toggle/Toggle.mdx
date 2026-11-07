@@ -173,11 +173,11 @@ The label names the setting, not the switch position. It stays the same whether 
 
 ### Match the label to the state.
 
-The switch and its label never disagree. A label that reads as a state, such as "Reminders on", is wrong the moment the switch is off; a label that names the setting reads right in both positions.
+The switch and its label never disagree. A label that reads as a state, such as "Reminders on", is wrong the moment the switch is off; a noun phrase that names the setting, such as "Session reminders", reads right in both positions.
 
 <DoDontPair
-    doExample={<div><Toggle label="Send reminders" /></div>}
-    doCaption="Off, and the label still reads right."
+    doExample={<div><Toggle label="Session reminders" /></div>}
+    doCaption="Off, and the setting's name still reads right."
     dontExample={<div><Toggle label="Reminders on" /></div>}
     dontCaption="Off, but the label says on."
 />
@@ -220,7 +220,7 @@ The native input is a checkbox with `role="switch"`, the markup the W3C switch p
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Name the setting as a noun phrase: "Send reminders".</td><td>An instruction or a status: "Turn on reminders", "Reminders are on".</td></tr>
+<tr><td>Name the setting as a noun phrase: "Session reminders".</td><td>An instruction or a status: "Turn on reminders", "Reminders are on".</td></tr>
 <tr><td>Use sentence case and no end punctuation.</td><td>Title case, or a period after the label.</td></tr>
 <tr><td>Keep the label to a few words.</td><td>A sentence that explains the setting. Put the explanation in a caption or a Tooltip.</td></tr>
 <tr><td>Write the label so it reads right in both positions.</td><td>"Enable" or "Disable" in the label, which the position already says.</td></tr>

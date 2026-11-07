@@ -108,7 +108,7 @@ from a list or adds, such as the topics a session covers.
 
 <ComponentExample of={TagInputStories.Hovered} title="Hovered" description="The edge turns the focused color." />
 
-<ComponentExample of={TagInputStories.Focused} title="Focused" description="A 2px ring, 2px off the box, with no change of fill." />
+<ComponentExample of={TagInputStories.Focused} title="Focused" description="The focus ring around the box." />
 
 <ComponentExample of={TagInputStories.Invalid} title="Invalid" description="The danger edge with the message under the field, which is announced." />
 
@@ -175,10 +175,10 @@ focusing it opens the list of options under it.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>The input fill with a 1px input edge. Tags past one line collapse into "+n".</td></tr>
+<tr><td>Rest</td><td>The input fill with a <code>--border-default</code> input edge. Tags past one line collapse into "+n".</td></tr>
 <tr><td>Hovered</td><td>The edge turns <code>--ds-border-focused</code>.</td></tr>
 <tr><td>Pressed</td><td>No step of its own. The hovered edge holds while the pointer is down.</td></tr>
-<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box; the tags wrap and the list opens.</td></tr>
+<tr><td>Focused</td><td>A <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, <code>--focus-ring-width</code> off the box; the tags wrap and the list opens.</td></tr>
 <tr><td>Disabled</td><td>The whole field fades to <code>--ds-opacity-disabled</code>; every tag is disabled, with no × and no entry.</td></tr>
 <tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code> and the message <code>--ds-text-danger</code>.</td></tr>
 <tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill, with no × and no list.</td></tr>

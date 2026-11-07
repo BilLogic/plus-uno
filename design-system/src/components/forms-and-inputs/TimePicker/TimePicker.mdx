@@ -184,13 +184,17 @@ Steps of 15 or 30 minutes match how sessions are booked. Odd minutes nobody book
 
 ### Set AM or PM in the menu.
 
-The menu beside the field holds AM or PM. Typing sets the hour and minute; the menu sets the period on its own and reports at once with whichever half of the time is already set. Asking for AM or PM in the field too leaves two places that can disagree.
+The menu beside the field holds AM or PM. Typing sets the hour and minute; the menu sets the period on its own and reports at once with whichever half of the time is already set. Asking for AM or PM in the field too leaves two places that can disagree, so keep the placeholder to the hour and minute.
+
+### Show a set time as read-only, not disabled.
+
+Read-only shows a time the person may read but not change. Disabled fades the field for a time that does not apply right now, and takes it out of the tab order.
 
 <DoDontPair
-    doExample={<TimePicker aria-label="Session start" />}
-    doCaption="The field takes the hour and minute; AM or PM is set in the menu."
-    dontExample={<TimePicker aria-label="Session start" placeholder="__ : __ AM" />}
-    dontCaption="The placeholder asks for AM or PM in the field as well."
+    doExample={<TimePicker aria-label="Session start" value="02:30 PM" isReadOnly />}
+    doCaption="A set time, read-only and easy to read."
+    dontExample={<TimePicker aria-label="Session start" value="02:30 PM" isDisabled />}
+    dontCaption="The same time disabled, faded as if it did not apply."
 />
 
 </div>

@@ -59,7 +59,7 @@ branches in place rather than drilling down one level at a time.
 
 <ComponentExample of={TreeSelectStories.Hovered} title="Hovered" description="The edge turns the focused color." />
 
-<ComponentExample of={TreeSelectStories.Focused} title="Focused" description="A 2px ring, 2px off the box. No fill changes." />
+<ComponentExample of={TreeSelectStories.Focused} title="Focused" description="The focus ring around the box." />
 
 <ComponentExample of={TreeSelectStories.FieldInvalid} title="Invalid" description="The danger edge with the message under the field." />
 
@@ -118,10 +118,10 @@ sequence, use `Cascader` instead. For a flat list, use `Select`.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>The input fill with a 1px input edge; the placeholder until a node is picked.</td></tr>
+<tr><td>Rest</td><td>The input fill with a <code>--border-default</code> input edge; the placeholder until a node is picked.</td></tr>
 <tr><td>Hovered</td><td>The edge turns <code>--ds-border-focused</code>.</td></tr>
 <tr><td>Pressed</td><td>No step of its own. The hovered edge holds while the pointer is down, and the press opens the tree.</td></tr>
-<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box. No fill changes.</td></tr>
+<tr><td>Focused</td><td>A <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, <code>--focus-ring-width</code> off the box. No fill changes.</td></tr>
 <tr><td>Disabled</td><td>The whole field fades to <code>--ds-opacity-disabled</code> and leaves the tab order.</td></tr>
 <tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code> and the message <code>--ds-text-danger</code>.</td></tr>
 </tbody>

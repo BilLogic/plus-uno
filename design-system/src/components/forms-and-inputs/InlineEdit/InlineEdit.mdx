@@ -43,9 +43,9 @@ any edit view; `InlineEditableTextfield` is the one built on `TextField`.
 
 ## Size and layout
 
-<ComponentExample of={InlineEditStories.SizeDefault} title="Default" description="The read view is drawn on the field's own box, 40 high, so the text does not move when the editor opens." />
+<ComponentExample of={InlineEditStories.SpacingDefault} title="Default" description="The read view is drawn on the field's own box, 40 high, so the text does not move when the editor opens." />
 
-<ComponentExample of={InlineEditStories.SizeCompact} title="Compact" description="compact draws both views 32 high." />
+<ComponentExample of={InlineEditStories.SpacingCompact} title="Compact" description="`compact` draws both views 32 high." />
 
 <ComponentExample of={InlineEditStories.ButtonsDoNotMoveThePage} title="Buttons over the page" description="The buttons hang under the field over whatever follows it, so showing them does not push the page down." />
 
@@ -136,12 +136,12 @@ leaving the field should save with no buttons at all.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>The read view: text on a transparent box with a transparent 1px edge.</td></tr>
+<tr><td>Rest</td><td>The read view: text on a transparent box with a transparent <code>--border-default</code> edge.</td></tr>
 <tr><td>Hovered</td><td>The read view takes <code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
 <tr><td>Pressed</td><td>Pressing the read view opens the edit view in the same box, with the caret in it.</td></tr>
-<tr><td>Focused</td><td>The read view draws a 2px ring in <code>--ds-border-focused</code>, 2px off the box.</td></tr>
+<tr><td>Focused</td><td>The read view draws a <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, <code>--focus-ring-width</code> off the box.</td></tr>
 <tr><td>Disabled</td><td>None. An inline edit has no disabled state.</td></tr>
-<tr><td>Editing</td><td>The field's fill and 1px input edge appear; nothing else moves.</td></tr>
+<tr><td>Editing</td><td>The field's fill and <code>--border-default</code> input edge appear; nothing else moves.</td></tr>
 <tr><td>Invalid</td><td>The field stays open with the danger edge and the message in its caption.</td></tr>
 <tr><td>Placeholder</td><td>An empty read view shows the placeholder in <code>--ds-text-subtlest</code>.</td></tr>
 </tbody>

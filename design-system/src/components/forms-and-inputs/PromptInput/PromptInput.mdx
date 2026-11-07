@@ -50,7 +50,7 @@ action after it.
 
 <ComponentExample of={PromptInputStories.Default} title="Rest" description="A growing text area with a send button, held back until there is text." />
 
-<ComponentExample of={PromptInputStories.Focused} title="Focused" description="A 2px ring around the field, drawn here with state focus." />
+<ComponentExample of={PromptInputStories.Focused} title="Focused" description='The focus ring, drawn here with state="focus".' />
 
 <ComponentExample of={PromptInputStories.Loading} title="Loading" description="isLoading turns the send button into Stop and rings the field in a GenerativeBorder." />
 
@@ -109,10 +109,10 @@ no AI behavior (no send-on-Enter, no loading state), use `TextArea` instead.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>The input fill and 1px input edge. Send is held back until there is text.</td></tr>
+<tr><td>Rest</td><td>The input fill and <code>--border-default</code> input edge. Send is held back until there is text.</td></tr>
 <tr><td>Hovered</td><td>The edge turns <code>--ds-border-focused</code>.</td></tr>
 <tr><td>Pressed</td><td>No step of its own on the field; the send button takes its own pressed fill.</td></tr>
-<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box.</td></tr>
+<tr><td>Focused</td><td>A <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, <code>--focus-ring-width</code> off the box.</td></tr>
 <tr><td>Disabled</td><td>The field fades to <code>--ds-opacity-disabled</code>, and nothing sends.</td></tr>
 <tr><td>Loading</td><td>Send becomes Stop, and a GenerativeBorder rings the field and sets <code>aria-busy</code>. Stop is never held back by <code>isDisabled</code>.</td></tr>
 </tbody>
@@ -148,19 +148,21 @@ The loading state shows progress inside the field. Pair `isLoading` with `onStop
 <DoDontPair
     doExample={<PromptInput label="Message to PLUS AI" defaultValue="Summarize Maya's last two sessions" isLoading onStop={() => {}} />}
     doCaption="The loading state shows progress inside the field."
-    dontExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" isDisabled />}
-    dontCaption="A field locked and emptied while generating loses the question."
+    dontExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" isLoading onStop={() => {}} />}
+    dontCaption="A field emptied while generating loses the question."
 />
 
 ### Show focus while typing.
 
-Focus tells the user the field accepts input. The field draws it on its own; never remove the ring.
+Focus tells the user the field accepts input. The field draws its own focus ring; never remove it with custom styles.
+
+### Hint at what can be asked.
 
 <DoDontPair
-    doExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" state="focus" />}
-    doCaption="Focus tells the user the field accepts input."
-    dontExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" />}
-    dontCaption="Without focus the field looks inactive while the user types."
+    doExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" />}
+    doCaption="The placeholder hints at what can be asked."
+    dontExample={<PromptInput label="Message to PLUS AI" placeholder="Type here" />}
+    dontCaption="The placeholder describes the control."
 />
 
 ### Leave the field enabled when idle.

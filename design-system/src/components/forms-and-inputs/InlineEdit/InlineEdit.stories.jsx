@@ -300,13 +300,13 @@ SameHeight.play = async ({ canvasElement }) => {
 };
 
 /** One story per spacing, for the Examples tab. */
-export const SizeDefault = () => (
+export const SpacingDefault = () => (
     <div style={column}>
         <InlineEditableTextfield label="Display name" defaultValue="Ada Lovelace" />
     </div>
 );
 
-export const SizeCompact = () => (
+export const SpacingCompact = () => (
     <div style={column}>
         <InlineEditableTextfield label="Display name" defaultValue="Ada Lovelace" compact />
     </div>

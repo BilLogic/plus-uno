@@ -84,7 +84,6 @@ export default {
         },
         clearable: {
             control: 'boolean',
-            description: 'Shows the clear ×. Unset, it is on with `isMulti` and `!isRequired` otherwise.',
             table: { category: 'Behavior' }
         },
         selectAll: {
