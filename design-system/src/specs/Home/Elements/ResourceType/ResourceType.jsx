@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './ResourceType.scss';
+import { iconClass } from '../../../../lib/icon';
 
 /**
  * ResourceType Component
@@ -35,7 +36,7 @@ export const ResourceType = ({
             aria-label={`Resource type: ${type}`}
         >
             <div className="plus-resource-type-icon">
-                <i className={`fa-solid fa-${iconName}`} aria-hidden="true"></i>
+                <i className={iconClass(iconName)} aria-hidden="true"></i>
             </div>
         </div>
     );

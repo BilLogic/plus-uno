@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { TreeTable } from '@/components/text-and-data-display/Table';
-import { tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
+import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
 
 /**
  * The Tree table: records nested up to three levels, built in Figma from
@@ -151,5 +151,31 @@ export const ExpandOnRowPress = {
         const school = row(canvas, 'Lincoln Middle');
         await userEvent.click(within(school).getByText('School'));
         await expect(school).toHaveAttribute('aria-expanded', 'true');
+    }
+};
+
+/** Rest: rows are clear; a parent carries the chevron and a leaf keeps the empty box. */
+export const Rest = {
+    args: { head, items, label: 'Schools', defaultExpandedIds: ['lincoln'] },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const parent = row(canvas, 'Lincoln Middle');
+        await expect(parent.querySelector('.plus-tree-table-toggle--expanded i')).not.toBeNull();
+        const leafToggle = row(canvas, 'Grade 7 · Math').querySelector('.plus-tree-table-toggle');
+        await expect(leafToggle).not.toBeNull();
+        await expect(getComputedStyle(parent).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+    }
+};
+
+/** Focused: the focused row draws the 2px ring, inset on the row. */
+export const Focused = {
+    args: { head, items, label: 'Schools' },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.tab();
+        const parent = row(canvas, 'Lincoln Middle');
+        await expect(parent).toHaveFocus();
+        await expect(getComputedStyle(parent).outlineStyle).toBe('solid');
+        await expect(getComputedStyle(parent).outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
     }
 };

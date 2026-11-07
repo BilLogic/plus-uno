@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as HeadingStories from './Heading.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet, DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -86,6 +86,28 @@ on any level of the page.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>The default ink in the size's text style.</>}>
+    <DsCanvasQuiet of={HeadingStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A heading does not react to a pointer.</>}>
+    <DsCanvasQuiet of={HeadingStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A press changes nothing.</>}>
+    <DsCanvasQuiet of={HeadingStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>Tab skips a heading and it is never dimmed, so it has no focus or disabled state.</>}>
+    <DsCanvasQuiet of={HeadingStories.NotAControl} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -110,7 +132,7 @@ on any level of the page.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Heading` for every heading in the product — a page title, a section
 header, a card title. Never style plain text to look like a heading: a
@@ -121,7 +143,45 @@ assistive technology.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Text.** Set in the text style of <code>size</code>, from xxlarge to xxsmall.
+2. **Tag.** Follows the ambient heading level, or <code>as</code> when given.
+3. **Color.** Default ink, inverse ink on a dark ground, or the warning inverse ink.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Default ink in the size's style.</td></tr>
+<tr><td>Hovered, pressed</td><td>A heading does not react.</td></tr>
+<tr><td>Focused</td><td>A heading is not a control; Tab skips it.</td></tr>
+<tr><td>Disabled</td><td>Not applicable.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Text style</td><td><code>--heading-xxlarge</code> to <code>--heading-xxsmall</code>, with tracking for xxlarge, xlarge and large</td></tr>
+<tr><td>Default ink</td><td><code>--ds-text</code></td></tr>
+<tr><td>Inverse ink</td><td><code>--ds-text-inverse</code></td></tr>
+<tr><td>Warning inverse ink</td><td><code>--ds-text-warning-inverse</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Let the ambient context pick the tag; choose `size` for the look.
 
@@ -140,6 +200,24 @@ heading, for instance.
 A heading with no declared size is not a heading. Always pass `size`
 explicitly, chosen for the visual weight the spot needs, separate from
 whatever tag the context resolves to.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Write headings that say what the section is about.</td><td>Write headings that repeat the page title.</td></tr>
+<tr><td>Use sentence case.</td><td>Use title case or all caps.</td></tr>
+<tr><td>Keep a heading to a short phrase.</td><td>Write a heading that wraps past two lines.</td></tr>
+<tr><td>Choose <code>size</code> for the look and let the level pick the tag.</td><td>Pick a larger size to make a heading seem more important than its level.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as TreeTableStories from './TreeTable.stories.jsx';
-import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, ResourcesBlock, DocsTable, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -100,6 +100,20 @@ Records that nest, up to three levels. `TreeTable` indents each level one step a
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## State
+
+<DocsCanvasShell description={<>A row is clear; a parent's title cell carries the chevron, a leaf keeps the empty box.</>}>
+    <DsCanvasQuiet of={TreeTableStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The focused row draws the 2px ring inset on the row, never a fill.</>}>
+    <DsCanvasQuiet of={TreeTableStories.Focused} />
+</DocsCanvasShell>
+
+</div>
+
 </div>
 
 </DocsTab>
@@ -110,7 +124,7 @@ Records that nest, up to three levels. `TreeTable` indents each level one step a
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use a Tree table for records that nest — a curriculum of units and lessons, a
 folder of sessions. For a flat list, use the Static or Dynamic table instead.
@@ -119,13 +133,83 @@ folder of sessions. For a flat list, use the Static or Dynamic table instead.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Head cell.** A label, as in the other tables.
+2. **Chevron.** 12 tall in a 24 hit area, leading a parent's title cell; a spinner while children load.
+3. **Indent.** One `--table-indent` step per level, up to three levels.
+4. **Count.** An optional count beside a parent's name.
+5. **Message row.** Under an open parent that is loading or has nothing in it.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Clear rows; depth shows as indentation.</td></tr>
+<tr><td>Hovered, pressed</td><td>The row takes the subtle hovered and pressed steps.</td></tr>
+<tr><td>Focused</td><td>The 2px ring inset on the row; focus is never a fill.</td></tr>
+<tr><td>Expanded, collapsed, loading</td><td>The chevron points down or right, or turns into a spinner.</td></tr>
+<tr><td>Disabled</td><td>Not applicable.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Indent per level</td><td><code>--table-indent</code></td></tr>
+<tr><td>Chevron, hit area</td><td><code>--icon-sm</code>, <code>--item-height-sm</code></td></tr>
+<tr><td>Ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
+<tr><td>Row height</td><td><code>--size-row-default</code></td></tr>
+<tr><td>Hairlines</td><td><code>--ds-border</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 - **Data nests the same shape.** `items` is one `{ id, cells, children, hasChildren, count }` per row, and `children` holds more of the same. Every level keeps every column.
 - **Depth is space.** Each level indents one `--table-indent` step; a leaf keeps an empty toggle box so names at one level line up.
 - **Load children late.** Give a parent `hasChildren` and no `children`, and `loadChildren(item)` returns them, or a promise of them, the first time it opens.
 - **Keep the row press for rows without controls.** `shouldExpandOnClick` never fires from a button or link inside the row, but a row that carries controls reads better with the chevron alone.
 - **Keyboard follows the treegrid pattern.** The table is one tab stop. Every row carries `aria-level`, `aria-posinset` and `aria-setsize`, and a parent `aria-expanded`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name each node for what it contains: "Linear equations".</td><td>Repeat the parent's name in every child.</td></tr>
+<tr><td>Keep nesting to three levels.</td><td>Nest deeper than three levels.</td></tr>
+<tr><td>Put a total in its own column; use <code>count</code> for how many children a row holds.</td><td>Put counts in the node name.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **A treegrid.** Each row carries `aria-level`, `aria-posinset` and `aria-setsize`, and a parent `aria-expanded`, so depth and state are announced.
+- **One tab stop.** Arrow keys move, open and close rows; Home and End jump to the ends; Enter toggles.
+- **The chevron is a pointer target only.** It is `aria-hidden`; the keyboard route is the arrow keys on the row.
+- **Loading is busy.** A parent whose children are loading is `aria-busy`.
 
 </div>
 

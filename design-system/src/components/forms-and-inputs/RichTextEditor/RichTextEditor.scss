@@ -123,11 +123,11 @@
         }
     }
 
-    .plus-btn:not(.active) .fa-solid {
+    .plus-btn:not(.active) :is(.fa-solid, .fa-regular) {
         color: var(--ds-icon-subtle);
     }
 
-    .plus-btn.active .fa-solid {
+    .plus-btn.active :is(.fa-solid, .fa-regular) {
         color: var(--ds-icon-selected);
     }
 }

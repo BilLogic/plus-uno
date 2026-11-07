@@ -2,11 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as StaticTableStories from './StaticTable.stories.jsx';
-import {
-    DocsCanvasShell,
-    DocsInteractivePlayground,
-    ResourcesBlock,
-} from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DocsTable, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -178,6 +174,36 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>A rest row is clear; a selected row is on the selected ground.</>}>
+    <DsCanvasQuiet of={StaticTableStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A row takes the subtle hovered step, a selected row its own hovered step.</>}>
+    <DsCanvasQuiet of={StaticTableStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The pressed steps of the same two grounds.</>}>
+    <DsCanvasQuiet of={StaticTableStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A row has no focus stop; Tab skips it.</>}>
+    <DsCanvasQuiet of={StaticTableStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The row takes the disabled ink, ignores the pointer and is <code>aria-disabled</code>.</>}>
+    <DsCanvasQuiet of={StaticTableStories.Disabled} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A cell in the error state takes the danger ink.</>}>
+    <DsCanvasQuiet of={StaticTableStories.Invalid} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground of={StaticTableStories.Overview} />
@@ -194,7 +220,7 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `StaticTable` for a grid people only read: a record, a summary, a rate
 card. A table people sort, filter, select or page is a Dynamic table.
@@ -203,13 +229,87 @@ card. A table people sort, filter, select or page is a Dynamic table.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Head cell.** A label with an optional type icon.
+2. **Row.** Cells in a band; rest, highlighted, selected or disabled.
+3. **Cell.** Text, a number, an icon or any node, with optional secondary text and a leading slot.
+4. **Summary row.** One calculation per column, muted, with no rule under it.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Clear row; a striped table shades alternate rows.</td></tr>
+<tr><td>Hovered</td><td>With <code>hover</code> on: the subtle hovered ground; selected rows take the selected hovered ground.</td></tr>
+<tr><td>Pressed</td><td>The pressed steps of the same grounds.</td></tr>
+<tr><td>Focused</td><td>Not applicable; a row is not a control.</td></tr>
+<tr><td>Disabled</td><td>Disabled ink, no pointer events, <code>aria-disabled</code>.</td></tr>
+<tr><td>Invalid</td><td>A cell with <code>state: 'error'</code> takes the danger ink.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Row hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
+<tr><td>Selected row</td><td><code>--ds-background-selected</code>, <code>--ds-background-selected-hovered</code>, <code>--ds-background-selected-pressed</code></td></tr>
+<tr><td>Highlighted row</td><td><code>--ds-background-warning-bold</code> washed</td></tr>
+<tr><td>Disabled ink</td><td><code>--ds-text-disabled</code></td></tr>
+<tr><td>Error ink</td><td><code>--ds-text-danger</code></td></tr>
+<tr><td>Hairlines</td><td><code>--ds-border</code></td></tr>
+<tr><td>Row height</td><td><code>--size-row-compact</code>, <code>--size-row-default</code>, <code>--size-row-comfortable</code></td></tr>
+<tr><td>Cell padding</td><td><code>--size-table-cell-pad-x</code>, <code>--size-table-cell-pad-y</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 - **Per-cell control** — pass `{ content, align, emphasis, overflow, secondary, leading, state, loading, colSpan, className }` instead of a bare value. `align` is `text`, `number` or `icon`.
 - **Row size** — `size` is `32`, `40` or `48` (default 40), from the `--size-row-*` tokens. Cell padding is `--size-table-cell-pad-x` and `--size-table-cell-pad-y`.
 - **Long text** truncates to one line with an ellipsis and shows the full text in a tooltip; pass `overflow: 'wrap'` for a cell that should wrap.
 - **One title column** — `titleColumn` is the index of the column that names the record.
 - **No hover, no sort.** `StaticTable` renders `Table` with `hover` forced off. Nothing in it reaches for the Dynamic table's sorting, selection or paging.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Title the one column that names the record.</td><td>Bold several columns.</td></tr>
+<tr><td>Right-align numbers and keep units in the header.</td><td>Left-align numbers or repeat units in every cell.</td></tr>
+<tr><td>Keep a cell to one line; let long text truncate with its tooltip.</td><td>Wrap every cell.</td></tr>
+<tr><td>Use a dash for an empty cell.</td><td>Leave a cell blank or write "N/A".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **It is a real table.** Headers are `th` in a `thead`, so a screen reader announces the column for each cell.
+- **Rows are not controls.** Nothing in a Static table takes focus; a table people interact with is a Dynamic table.
+- **State is not color alone.** A selected row sets `aria-selected`, a disabled row `aria-disabled`.
+- **Truncated text keeps its full value.** A cell that ends in an ellipsis shows the whole text in a tooltip.
 
 </div>
 

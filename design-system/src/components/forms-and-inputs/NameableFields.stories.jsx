@@ -6,6 +6,7 @@ import DatePicker from './DatePicker/DatePicker';
 import TextField from './TextField/TextField';
 import RichTextEditor from './RichTextEditor/RichTextEditor';
 import Select from './Select';
+import { iconClass } from '../../lib/icon';
 
 /**
  * Three fields that could not be named.
@@ -94,7 +95,7 @@ EveryFieldCanBeNamed.play = async ({ canvasElement }) => {
  */
 export const HidingTheLabelKeepsTheName = () => (
     <div style={stack}>
-        <TextField id="nf-hidden" label="Search" isLabelHidden elemAfterInput={<i className="fa-solid fa-plus" aria-hidden="true" />} />
+        <TextField id="nf-hidden" label="Search" isLabelHidden elemAfterInput={<i className={iconClass('plus')} aria-hidden="true" />} />
         <RadioGroup name="unlabeled" aria-label="Pick one" options={['One', 'Two']} />
     </div>
 );

@@ -70,7 +70,7 @@ export const FilledNotEngaged = () => {
 
 /**
  * Disabled State
- * Shows badge at 38% opacity, dropdown is not interactive
+ * The field is disabled: it takes no focus and does not open
  */
 export const Disabled = () => {
     return (
@@ -131,7 +131,6 @@ export const AllStates = () => (
                 <EngagementBadge status="fully-engaged" showDropdown={true} />
                 <EngagementBadge status="partially-engaged" showDropdown={true} />
                 <EngagementBadge status="not-engaged" showDropdown={true} />
-                <EngagementBadge status="unknown" showDropdown={true} disabled={true} />
             </div>
         </div>
     </div>

@@ -90,7 +90,7 @@ AI chat applies the six AI rules from the AI overview.
 
 ### Storybook variant
 
-`variant="storybook"` is the chat in the Storybook docs. Its header shows clear chat, move to Panel and close, with no full screen and no more menu.
+`variant="storybook"` is the chat in the Storybook docs. Its header shows clear chat, move to Panel and close, with no full screen and no more menu. The docs' floating button opens it through its AI agent action, so the chat's own button is left out with `launcher={false}`: the popup floats above the bottom right corner instead. `respond` may return `{ text, links }`, and the links are drawn under the text. The docs' answerer calls a server-side function that answers from the design-system index and holds the credentials, so none reaches the browser; when it errors or is rate limited, the chat searches the site's pages and the component index instead and says so.
 
 <DocsCanvasShell attachSourceBelow description={<>The Storybook variant.</>}>
     <Canvas of={AiChatStories.StorybookVariant} story={{ inline: true }} layout="padded" sourceState="hidden" />

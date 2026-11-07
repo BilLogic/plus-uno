@@ -2,7 +2,9 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
-import { px } from '@/storybook-docs/lib/style-probes.js';
+import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
+
 import CodeBlock from './CodeBlock';
 
 /**
@@ -188,4 +190,56 @@ Interactive.argTypes = {
     highlight: { control: 'text' },
     wrap: { control: 'boolean' },
     label: { control: 'text' },
+};
+
+const blockOf = (canvasElement) => canvasElement.querySelector('.plus-code-block');
+
+/** Rest: the code surface and ink, a hairline edge, and highlighted lines on the highlight fill. */
+export const Rest = {
+    render: () => <CodeBlock text={SNIPPET} highlight="2" />,
+    play: async ({ canvasElement }) => {
+        const block = blockOf(canvasElement);
+        await expect(getComputedStyle(block).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-code-default'));
+        await expect(getComputedStyle(block).color).toBe(tokenColor(canvasElement, '--ds-text-code-default'));
+        const marked = block.querySelector('[data-highlighted]');
+        await expect(getComputedStyle(marked).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-code-highlight'));
+    },
+};
+
+/** Hovered: the block does not react to a pointer. */
+export const Hovered = {
+    render: () => <CodeBlock text={SNIPPET} />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(blockOf(canvasElement), ':hover', 'code block');
+    },
+};
+
+/** Pressed: nothing changes under a press. */
+export const Pressed = {
+    render: () => <CodeBlock text={SNIPPET} />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(blockOf(canvasElement), ':active', 'code block');
+    },
+};
+
+/** Focused: a scrolling block is a named region; keyboard focus draws the 2px ring inset in the block. */
+export const Focused = {
+    render: () => <CodeBlock text={SNIPPET} />,
+    play: async ({ canvasElement }) => {
+        const block = blockOf(canvasElement);
+        block.focus({ focusVisible: true });
+        await expect(block.matches(':focus-visible')).toBe(true);
+        const style = getComputedStyle(block);
+        await expect(style.outlineStyle).toBe('solid');
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        block.blur();
+    },
+};
+
+/** A wrapping block has nothing to scroll, so it is not in the tab order. */
+export const WrapNotFocusable = {
+    render: () => <CodeBlock text={SNIPPET} wrap />,
+    play: async ({ canvasElement }) => {
+        await expect(blockOf(canvasElement)).not.toHaveAttribute('tabindex');
+    },
 };

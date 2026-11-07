@@ -132,6 +132,16 @@ export const SHAPES = [
     sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
   },
   {
+    file: 'scripts/baselines/ds-usage.json',
+    check: 'check:ds-usage',
+    command: 'node scripts/check-ds-usage.mjs --update',
+    prose: 'why',
+    // `<rule> <path>` -> count of fail-level escapes in consumer code. A pair may
+    // fall; one that reaches zero leaves the record, and the stale sweep asks for
+    // a regenerate.
+    sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
+  },
+  {
     file: 'scripts/baselines/no-primitive-reads.json',
     check: 'check:no-primitive-reads',
     command: 'node scripts/check-no-primitive-reads.mjs --update',

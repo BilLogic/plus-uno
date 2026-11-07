@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { iconClass } from '../../../../../lib/icon';
 
 /**
  * RoomBadge — the per-student breakout-room chip shown at the start of the student
@@ -49,7 +50,7 @@ export const RoomBadge = ({ number, outOfRange = false }) => {
         >
             {outOfRange && (
                 <i
-                    className="fa-solid fa-triangle-exclamation"
+                    className={iconClass('triangle-exclamation')}
                     style={{ fontSize: 'var(--font-size-fa-b3-solid, 10px)' }}
                     aria-hidden="true"
                 />

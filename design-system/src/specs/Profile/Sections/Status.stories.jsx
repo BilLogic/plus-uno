@@ -51,11 +51,12 @@
  * - This information determines your eligibility to tutor with PLUS.
  */
 import React from 'react';
-import { Label } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import { Label } from '@/storybook-docs/form-demos.jsx';
 import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';
 import { SemesterAtPLUS } from '../Elements/SemesterAtPLUS.stories';
 import { ClearanceStatus } from '../Elements/ClearanceStatus.stories';
+import { iconClass } from '../../../lib/icon';
 
 export default {
     title: 'Specs/Profile/Sections/Status',
@@ -157,7 +158,7 @@ export const StatusSection = ({ clearanceStatus = 'verified', clearanceDate = 'M
                             }}
                         >
                             <i
-                                className="fa-solid fa-circle-info"
+                                className={iconClass('circle-info')}
                                 style={{
                                     fontSize: '10px',
                                     color: 'var(--color-primary)',

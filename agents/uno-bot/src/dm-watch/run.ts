@@ -36,8 +36,9 @@
 //   promiser's later posts in public channels that match what was promised
 //   (one or two searches on the same token, pinned to public channels; a
 //   failed search holds the row). Otherwise the
-//   reminder goes to the person's DM with uno-bot — never a thread, a card, or
-//   anyone else's DM, and never to the other person. Unanswered, it gets one
+//   reminder is a card (`commitments/promise-cards.ts`), and the morning's
+//   cards go up as one message in the person's DM with uno-bot — never a
+//   thread or anyone else's DM, and never to the other person. Unanswered, it gets one
 //   follow-up two working days later, then lapses. A ⏳ earns a check-back
 //   two working days out, at most twice (`postsAllowed`).
 //
@@ -60,11 +61,12 @@ import { GATE_RESERVED } from "../gate/reactions";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { SweepMessage } from "../sweep/finding";
 import type { SweepSlackMessage } from "../sweep/run";
-import { acknowledgment, REMINDER_CHOICES, reminderAnswer, reminderBlocks, reminderText, TAP_REFUSED, type ReminderOutcome } from "../commitments/copy";
+import { acknowledgment, reminderAnswer, reminderBlocks, TAP_REFUSED, type ReminderOutcome } from "../commitments/copy";
 import { detectorChars, MAX_COMMITMENT_THREAD_CHARS, type CommitmentDetector, type DetectedCommitment, type EvidenceJudge } from "../commitments/detector";
-import { commitmentDueAt, dayLabel, dueDayOf, etDayOf, isMorningRunTime, maySnooze, nudgeAt, rearmedDueAt } from "../commitments/due";
+import { checkInAt, dayLabel, dueDayOf, etDayOf, firstReminderAt, followUpAt, isMorningRunTime, maySnooze, nudgeAt, promiseDueAt, rearmedDueAt, reminderPhase } from "../commitments/due";
 import { LIVE_STATES } from "../commitments/store";
-import { madeFollowUpText, madeToAcknowledgment, MADE_LAST_CHOICES, MADE_TO_LAST_CHOICES, MADE_TO_CHOICES, madeToFollowUpText, madeToText } from "./copy";
+import { MAX_PROMISE_CARDS, PHASE_CARD_KIND, promiseMessage, promiseRef, type PromiseCardInput } from "../commitments/promise-cards";
+import { madeToAcknowledgment } from "./copy";
 import {
   CAPTURE_FEATURE,
   DM_WATCH_FEATURES,
@@ -100,10 +102,15 @@ export const WINDOW_CONTEXT = 2;
 const MAX_MESSAGE_WINDOW_CHARS = 1_200;
 /** Messages up to and including the promise, read again at nudge time. */
 export const CONTEXT_MESSAGES = 8;
-/** Messages after the promise the morning judges for completion. */
-export const EVIDENCE_MESSAGES = 50;
-/** Reminders one person gets from this job in one morning. */
-export const MAX_DM_REMINDERS_PER_MORNING = 2;
+/** Messages after the promise the morning reads for the judge, a page at a
+ *  time; the judge reads them oldest first, as many as fit. */
+export const EVIDENCE_MESSAGES = 200;
+/** Pages of `EVIDENCE_MESSAGES` read after a promise. Past them the oldest
+ *  are still unread, so the judge is not asked and the reminder goes out. */
+export const MAX_EVIDENCE_PAGES = 2;
+/** Reminders one person gets from this job in one morning: as many cards as
+ *  one message holds (`MAX_PROMISE_CARDS`). */
+export const MAX_DM_REMINDERS_PER_MORNING = MAX_PROMISE_CARDS;
 /** Mornings running a row may be held before it lapses. */
 export const MAX_DM_HOLDS = 3;
 /** What one history read may spend, with what a stop saves (the switch
@@ -118,10 +125,10 @@ export const NUDGE_SCOPES = [...REQUIRED_SCOPES, "search:read.public"] as const;
 /** Public-channel searches one reminder may run, one term each, stopping at
  *  the first that finds the promiser's post. */
 export const MAX_EVIDENCE_SEARCHES = 2;
-/** What one reminder may spend: two DM reads, the public searches, the
+/** What one reminder may spend: three DM reads, the public searches, the
  *  detector, the judge, the name, the bot DM and the post, one spare, and
  *  the D1 statements around them. */
-export const DM_NUDGE_COST = { subrequests: 11, d1Queries: 3 };
+export const DM_NUDGE_COST = { subrequests: 12, d1Queries: 3 };
 
 const PROMISE_KINDS: readonly DmCommitmentKind[] = ["made", "made_to"];
 
@@ -527,7 +534,9 @@ function rowFor(
       ownerId: at.user,
       kind,
       permalink: permalinkOf(at.url, at.channel, c.messageTs),
-      dueAt: commitmentDueAt(msOf(c.messageTs), c.deadline).dueAt,
+      // One timeline (`commitments/due.ts`); a promise owed to you gets no
+      // heads-up.
+      dueAt: firstReminderAt(msOf(c.messageTs), promiseDueAt(msOf(c.messageTs), c.deadline), kind === "made_to"),
       state: "open",
       nudges: 0,
       snoozes: 0,
@@ -562,24 +571,114 @@ export async function runDmPromiseNudges(job: ScheduledJob, deps: DmNudgeDeps): 
   let sent = await deps.records.remindedCount(user, runDate);
   let slack: Ready | undefined;
   const tally: Record<string, number> = {};
-  while (sent < MAX_DM_REMINDERS_PER_MORNING) {
-    ensureHeadroom(deps, DM_NUDGE_COST);
-    const c = await deps.records.nextDue(user, now, runDate);
-    if (!c) break;
-    slack ??= await ready(user, deps, NUDGE_SCOPES);
-    // A missing scope skips the whole job, rows untouched (ADR-024). No token,
-    // or a refused one, holds each row, and a row held long enough lapses.
-    if (!slack.ok && slack.reason === "missing-scopes") return report("skipped", slack.note);
-    const action = await remind(deps, c, on, slack.ok ? slack : null, now, runDate);
-    tally[action] = (tally[action] ?? 0) + 1;
-    if (action === "nudged" || action === "followed-up") sent += 1;
-    if (deps.dryRun) break;
+  // The morning's cards, held until every row due has been looked at, then
+  // posted as one message; each held row's `checkedOn` before, so a stop can
+  // hand it back.
+  const held: Held[] = [];
+  const before = new Map<string, string | null>();
+  try {
+    while (sent < MAX_DM_REMINDERS_PER_MORNING) {
+      ensureHeadroom(deps, { ...DM_NUDGE_COST, d1Queries: DM_NUDGE_COST.d1Queries + held.length });
+      const c = await deps.records.nextDue(user, now, runDate);
+      if (!c) break;
+      slack ??= await ready(user, deps, NUDGE_SCOPES);
+      // A missing scope skips the whole job, rows untouched (ADR-024). No token,
+      // or a refused one, holds each row, and a row held long enough lapses.
+      if (!slack.ok && slack.reason === "missing-scopes") {
+        await release(deps, before);
+        return report("skipped", slack.note);
+      }
+      const action = await remind(deps, c, on, slack.ok ? slack : null, now, runDate);
+      if (typeof action !== "string") {
+        before.set(c.id, c.checkedOn);
+        if (!deps.dryRun) await deps.records.update(c.id, { checkedOn: runDate });
+        held.push(action);
+        sent += 1;
+        if (deps.dryRun) {
+          tally[action.action] = (tally[action.action] ?? 0) + 1;
+          break;
+        }
+        continue;
+      }
+      tally[action] = (tally[action] ?? 0) + 1;
+      if (deps.dryRun) break;
+    }
+    if (held.length && !deps.dryRun) {
+      ensureHeadroom(deps, { ...DM_NUDGE_COST, d1Queries: DM_NUDGE_COST.d1Queries + held.length });
+      for (const action of await postCards(deps, user, held, now, runDate)) tally[action] = (tally[action] ?? 0) + 1;
+      before.clear();
+    }
+  } catch (err) {
+    await release(deps, before).catch((e: unknown) => log(deps, `[dm-watch] held rows not handed back: ${e instanceof Error ? e.message : String(e)}`));
+    throw err;
   }
   const summary = Object.entries(tally).map(([a, n]) => `${n} ${a}`).join(", ") || "nothing due";
   return report("handled", null, summary);
 }
 
 type RemindAction = "nudged" | "followed-up" | "auto_done" | "lapsed" | "held";
+
+/** A row whose card waits for the morning's message. */
+interface Held {
+  c: DmCommitmentRecord;
+  card: PromiseCardInput;
+  /** A heads-up is not one of the check-ins a promise gets. */
+  headsUp: boolean;
+  /** Its due moment, for the check-in after a heads-up. */
+  dueAt: number | null;
+  action: "nudged" | "followed-up";
+}
+
+
+/** Held rows handed back to the next run: their `checkedOn` as it was. */
+async function release(deps: Pick<DmNudgeDeps, "records">, before: Map<string, string | null>): Promise<void> {
+  for (const [id, checkedOn] of before) {
+    await deps.records.update(id, { checkedOn });
+    before.delete(id);
+  }
+}
+
+/** The morning's cards, posted as one message in the owner's DM with
+ *  uno-bot — never a thread, never anyone else's DM — and each row moved
+ *  along its timeline. */
+async function postCards(deps: DmNudgeDeps, owner: string, held: Held[], now: number, runDate: string): Promise<RemindAction[]> {
+  const holdAll = async (note: string): Promise<RemindAction[]> => {
+    const out: RemindAction[] = [];
+    for (const { c } of held) {
+      const holds = c.holds + 1;
+      if (holds >= MAX_DM_HOLDS) {
+        log(deps, `[dm-watch] ${c.id} lapsed after ${holds} held mornings: ${note}`);
+        await deps.records.update(c.id, { state: "lapsed", holds, resolvedAt: now });
+        out.push("lapsed");
+      } else {
+        await deps.records.update(c.id, { holds });
+        out.push("held");
+      }
+    }
+    return out;
+  };
+  const dm = await deps.bot.dmChannel(owner);
+  if (!dm) return holdAll("the owner's DM with uno-bot could not be opened");
+  const message = promiseMessage(held.map((h) => h.card));
+  const posted = await deps.bot.post(dm, { text: message.text, blocks: message.blocks });
+  if (!posted.ok || !posted.ts) return holdAll("Slack refused the post");
+  for (const { c, headsUp, dueAt } of held) {
+    const slot =
+      c.nudgeTs === null
+        ? { nudgeTs: posted.ts }
+        : { followupTs: posted.ts, earlierFollowupTs: c.followupTs ? [...c.earlierFollowupTs, c.followupTs] : c.earlierFollowupTs };
+    await deps.records.update(c.id, {
+      state: "nudged",
+      // The check-in follows on the morning after the due moment.
+      ...(headsUp ? { dueAt: checkInAt(dueAt!) } : { nudges: c.nudges + 1, dueAt: followUpAt(now) }),
+      holds: 0,
+      remindedOn: runDate,
+      reminderChannel: dm,
+      ...slot,
+    });
+  }
+  return held.map((h) => h.action);
+}
 
 async function remind(
   deps: DmNudgeDeps,
@@ -588,7 +687,7 @@ async function remind(
   slack: { api: OwnerSlack; url: string } | null,
   now: number,
   runDate: string,
-): Promise<RemindAction> {
+): Promise<RemindAction | Held> {
   const settle = async (patch: DmCommitmentPatch) => {
     if (!deps.dryRun) await deps.records.update(c.id, { checkedOn: runDate, ...patch });
   };
@@ -627,7 +726,7 @@ async function remind(
   // Edited away, or read differently now: silently gone.
   if (!promise || (promise.promiser === c.ownerId) !== (c.kind === "made")) return lapse();
 
-  const later = await slack.api.history(at.channel, { oldest: at.ts, limit: EVIDENCE_MESSAGES });
+  const later = await messagesAfter(slack.api, at.channel, at.ts);
   if (!later) return hold("the DM could not be read");
   const inDm = humans(later.messages, deps.botUserId).filter((m) => Number(m.ts) > Number(at.ts));
   // The work may have been done anywhere public: a channel post by the
@@ -637,56 +736,63 @@ async function remind(
   const elsewhere = await publicEvidence(slack.api, promise, at.ts, nameOf);
   if (!elsewhere) return hold("the public-channel search failed");
   const after = [...inDm, ...elsewhere].sort((a, b) => Number(a.ts) - Number(b.ts));
-  if (after.length) {
-    const verdict = await deps.judge.judge({ promiser: promise.promiser, what: promise.what, promiseTs: at.ts, messages: after, sources: [] });
-    if (!verdict.ok) return hold("the judge did not answer");
-    if (verdict.done) {
-      await settle({ state: "auto_done", resolvedAt: now });
-      return "auto_done";
-    }
+  // Asked even with nothing said since: a call's moment can pass in silence.
+  // Too much since to read from the start: not asked, so Still open.
+  const verdict = later.complete
+    ? await deps.judge.judge({ promiser: promise.promiser, what: promise.what, promiseTs: at.ts, messages: after, sources: [], now })
+    : ({ ok: true, answer: "still-open", evidenceTs: [] } as const);
+  if (!verdict.ok) return hold("the judge did not answer");
+  // Done, or no longer needed: closed silently. Only Still open is reminded.
+  if (verdict.answer !== "still-open") {
+    if (verdict.answer === "no-longer-needed") log(deps, `[dm-watch] ${c.id} no longer needed (${verdict.reason}), closed`);
+    await settle({ state: "auto_done", resolvedAt: now });
+    return "auto_done";
   }
 
-  // The reminder in full the first time and at a ⏳'s check-back; otherwise
-  // the short follow-up.
-  const full = c.nudges === 0 || c.state === "snoozed";
+  // One timeline (`commitments/due.ts`). A date the person set, or a ⏳, is
+  // the row's own `due_at`, at that day's end; otherwise the promise's own.
   const promisedAt = msOf(at.ts);
-  const due = commitmentDueAt(promisedAt, promise.deadline);
-  const byLabel = due.stated ? dayLabel(dueDayOf(due.dueAt), etDayOf(now)) : null;
-  const promisedLabel = dayLabel(etDayOf(promisedAt), etDayOf(now));
-  let body: string;
-  if (c.kind === "made") {
-    body = full
-      ? reminderText({ promiser: c.ownerId, what: promise.what, deadlineLabel: byLabel, promisedLabel, permalink: c.permalink })
-      : madeFollowUpText(c.ownerId, c.permalink);
-  } else {
-    body = full
-      ? madeToText({ name: await nameOf(), what: promise.what, byLabel, promisedLabel, permalink: c.permalink })
-      : madeToFollowUpText(c.ownerId, c.permalink);
-  }
-  const action = c.nudges === 0 ? "nudged" : "followed-up";
-  if (deps.dryRun) return action;
+  const dueAt = c.state === "snoozed" ? c.dueAt : promiseDueAt(promisedAt, promise.deadline);
+  const phase = c.kind === "made_to" && dueAt !== null && now < dueAt ? "check-in" : reminderPhase(dueAt, now);
+  const otherId = c.kind === "made" ? (promise.requester ?? shown.find((m) => m.user !== c.ownerId)?.user ?? null) : promise.promiser;
+  const other = otherId ? (c.kind === "made_to" ? await nameOf() : await deps.bot.userName(otherId)) : null;
+  const card: PromiseCardInput = {
+    ref: promiseRef("dm", c.id),
+    kind: c.kind === "made" ? PHASE_CARD_KIND[phase] : "owed",
+    what: promise.what,
+    ...(other ? { other } : {}),
+    ...(dueAt !== null ? { dueDay: dueDayOf(dueAt) } : {}),
+    madeDay: etDayOf(promisedAt),
+    today: etDayOf(now),
+    place: { url: c.permalink, label: other ? `Your DM with ${other}` : "Your DM" },
+  };
+  return { c, card, headsUp: c.kind === "made" && phase === "heads-up", dueAt, action: c.nudges === 0 ? "nudged" : "followed-up" };
+}
 
-  // ⏳ is offered only while it can still bring a check-back.
-  const choices = maySnooze(c.snoozes)
-    ? c.kind === "made" ? REMINDER_CHOICES : MADE_TO_CHOICES
-    : c.kind === "made" ? MADE_LAST_CHOICES : MADE_TO_LAST_CHOICES;
-  // The owner's DM with uno-bot, top level: never a thread, never anyone else.
-  const dm = await deps.bot.dmChannel(c.ownerId);
-  if (!dm) return hold("the owner's DM with uno-bot could not be opened");
-  const posted = await deps.bot.post(dm, { text: body, blocks: reminderBlocks(body, { choices }) });
-  if (!posted.ok || !posted.ts) return hold("Slack refused the post");
-  await settle({
-    state: "nudged",
-    nudges: c.nudges + 1,
-    holds: 0,
-    remindedOn: runDate,
-    dueAt: rearmedDueAt(now),
-    reminderChannel: dm,
-    ...(c.nudges === 0
-      ? { nudgeTs: posted.ts }
-      : { followupTs: posted.ts, earlierFollowupTs: c.followupTs ? [...c.earlierFollowupTs, c.followupTs] : c.earlierFollowupTs }),
-  });
-  return action;
+/**
+ * Every message in a DM after `ts`, oldest first. Slack pages history newest
+ * first, so a single read with `oldest` and a limit returns the NEWEST of
+ * them — dropping the replies just after the promise, the ones most likely to
+ * settle it. So the pages are walked down to the promise. `complete` is
+ * false when more than `MAX_EVIDENCE_PAGES` pages lie between: a judge shown
+ * only the newest would miss the start, so it is not asked. Null when Slack
+ * would not say.
+ */
+export async function messagesAfter(
+  api: OwnerSlack,
+  channel: string,
+  ts: string,
+): Promise<{ messages: SweepSlackMessage[]; complete: boolean } | null> {
+  const got: SweepSlackMessage[] = [];
+  let cursor: string | undefined;
+  for (let page = 0; page < MAX_EVIDENCE_PAGES; page++) {
+    const res = await api.history(channel, { oldest: ts, limit: EVIDENCE_MESSAGES, ...(cursor ? { cursor } : {}) });
+    if (!res) return null;
+    got.push(...res.messages);
+    if (!res.hasMore || !res.nextCursor) return { messages: got.sort((a, b) => Number(a.ts) - Number(b.ts)), complete: true };
+    cursor = res.nextCursor;
+  }
+  return { messages: [], complete: false };
 }
 
 /** Words too common to find a promised piece of work by. */

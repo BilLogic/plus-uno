@@ -6,3 +6,21 @@
     color: var(--ds-icon);
     vertical-align: middle;
 }
+
+// Each drawn size reads its icon size token, so the box follows the scale. The
+// width and height attributes stay as the SVG's intrinsic size before the
+// stylesheet loads.
+.plus-ai-icon--12 {
+    width: var(--size-icon-sm);
+    height: var(--size-icon-sm);
+}
+
+.plus-ai-icon--16 {
+    width: var(--size-icon-md);
+    height: var(--size-icon-md);
+}
+
+.plus-ai-icon--24 {
+    width: var(--size-icon-lg);
+    height: var(--size-icon-lg);
+}

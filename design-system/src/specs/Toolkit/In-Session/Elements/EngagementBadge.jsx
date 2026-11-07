@@ -26,13 +26,12 @@ const statusConfig = {
 
 export const EngagementBadge = ({
     status = 'unknown',
-    showDropdown = true,
-    disabled = false
+    showDropdown = true
 }) => {
     const config = statusConfig[status] || statusConfig['unknown'];
 
     return (
-        <div className="d-inline-flex align-items-center gap-1" style={{ opacity: disabled ? 0.38 : 1 }}>
+        <div className="d-inline-flex align-items-center gap-1">
             <StatusTag appearance={config.style}>{config.text}</StatusTag>
             {showDropdown && caretIcon}
         </div>

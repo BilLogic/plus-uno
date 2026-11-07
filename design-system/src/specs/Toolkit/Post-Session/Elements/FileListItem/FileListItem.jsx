@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { IconButton } from '@/components';
+import { iconClass } from '../../../../../lib/icon';
 
 /**
  * Uploaded file row (Figma Elements · File List Item `10750:475180`).
@@ -24,7 +25,7 @@ const FileListItem = ({ name, size = '', onRemove }) => (
         }}
     >
         <i
-            className="fa-solid fa-file-circle-check"
+            className={iconClass('file-circle-check')}
             style={{
                 color: 'var(--ds-text-subtle)',
                 fontSize: 'var(--font-size-fa-body2-solid)',

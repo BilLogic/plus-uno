@@ -18,11 +18,11 @@
 | `id` | string | — | — |
 | `name` | string | — | — |
 | `label` | node | — | Label text for the file upload field |
-| `required` | bool | `false` | Whether the field is required (shows red asterisk) |
+| `isRequired` | bool | `false` | Whether the field is required (shows red asterisk) |
 | `description` | string | — | Description text shown below the label |
 | `acceptedFormats` | arrayOf | — | — |
-| `disabled` | bool | `false` | Disable the file upload component |
-| `readOnly` | bool | `false` | Show the field and its files without a way to choose a file |
+| `isDisabled` | bool | `false` | Disable the file upload component |
+| `isReadOnly` | bool | `false` | Show the field and its files without a way to choose a file |
 | `validation` | enum | `'none'` | Validation state of the component |
 | `validationMessage` | string | — | Message displayed for validation states |
 | `buttonText` | string | `'Choose a file'` | Text displayed on the file selection button |

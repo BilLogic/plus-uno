@@ -37,6 +37,8 @@ import { cardWords } from "./helpers/card-message";
 
 /** When a card closed, as View's line says it (`closedWhen`): "Oct 19 at 9:13 AM ET". */
 const WHEN = String.raw`[A-Z][a-z]{2} \d{1,2} at \d{1,2}:\d{2} [AP]M ET`;
+/** When a decided card's byline says it was decided, in ET: "Oct 19 at 9:13 AM". */
+const BYLINE_WHEN = String.raw`[A-Z][a-z]{2} \d{1,2} at \d{1,2}:\d{2} [AP]M`;
 const CHANNEL = "C1";
 const THREAD = "1700000000.000100";
 const CARD_TS = "1700000000.000195";
@@ -189,12 +191,12 @@ describe("the card offers Review", () => {
     assert.match(words, /Ready to \*file a GitHub issue\*: _Badge color drift_/);
     assert.match(words, /Approved by <@U2>/);
     assert.doesNotMatch(words, /review before approving/);
-    assert.deepEqual(cardButtons(blocks), ["View"]);
+    assert.deepEqual(cardButtons(blocks), ["View decision"]);
   });
 
   it("keeps a decided card's draft one press away, as View", () => {
     const blocks = proposalCardBlocks("(card)", "Approved by <@U2>") as CardBlock[];
-    assert.deepEqual(cardButtons(blocks), ["View"]);
+    assert.deepEqual(cardButtons(blocks), ["View decision"]);
     const row = blocks.find((b) => b.type === "actions");
     assert.deepEqual(row?.elements?.map((e) => e.action_id), ["uno_proposal_review"]);
     assert.match(JSON.stringify(blocks), /Approved by <@U2>/);
@@ -320,8 +322,8 @@ describe("Review opens the draft", () => {
     const { deps, views } = harness(threadState);
     await runReviewOpen(open(), deps);
     const view = views.calls[1]!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }>; submit?: unknown };
-    assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level, view.blocks[0]!.text!.text], ["alert", "warning", "Expired."]);
-    assert.match(richWords(view.blocks[1]), new RegExp(String.raw`^Closed on ${WHEN}\. Ask again for a fresh card\.$`));
+    assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level, view.blocks[0]!.text!.text], ["alert", "warning", "Expired. Nothing ran."]);
+    assert.equal(view.blocks[1]!.text!.text, "Ask again in the thread for a fresh card.", "nobody decided it: no byline, what to do");
     assert.match(viewText(view), /Reflection redesign/, "the draft is kept for View (#1362)");
     assert.equal(view.submit, undefined);
     assert.deepEqual(actionIds(view), []);
@@ -333,7 +335,7 @@ describe("Review opens the draft", () => {
     const { deps, views } = harness(threadState);
     await runReviewOpen(open(), deps);
     const view = views.calls[1]!.view;
-    assert.match(viewText(view), /replaced/);
+    assert.match(viewText(view), /Replaced\. Nothing ran\./);
     assert.deepEqual(actionIds(view), []);
   });
 
@@ -556,11 +558,8 @@ describe("Needs changes in the pop-up", () => {
     assert.equal(look.decided.decision, "replaced");
     await runReviewOpen(open("U0OTHER001"), deps);
     const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }>; submit?: unknown };
-    assert.deepEqual([view.blocks[0]!.level, view.blocks[0]!.text!.text], ["warning", "This proposal was replaced by a newer one."]);
-    assert.match(
-      richWords(view.blocks[1]),
-      new RegExp(String.raw`^Replaced on ${WHEN}, after <@U0BILL0001> asked for changes\. Review the newest card in the thread instead\.$`),
-    );
+    assert.deepEqual([view.blocks[0]!.level, view.blocks[0]!.text!.text], ["warning", "Replaced. Nothing ran."]);
+    assert.equal(view.blocks[1]!.text!.text, "Decide on the newest card in this thread.");
     const json = viewText(view);
     assert.match(json, /Reflection redesign/, "the draft it replaced");
     assert.doesNotMatch(json, /Reflection v2/, "not the revision");
@@ -745,7 +744,7 @@ describe("Reject in the pop-up", () => {
     ]);
     assert.deepEqual(
       cardUpdates.map((u) => u.note),
-      ["Rejected by <@U2>: Wrong database"],
+      ["Rejected by <@U2>"],
     );
     assert.match(viewText(views.calls[0]!.view), /Rejected/);
     assert.deepEqual(actionIds(views.calls[0]!.view), []);
@@ -827,7 +826,7 @@ describe("a decided card", () => {
     assert.equal(view.blocks[0]!.type, "alert");
     assert.equal(view.blocks[0]!.level, "success");
     assert.equal(view.blocks[0]!.text!.text, "Approved.");
-    assert.match(richWords(view.blocks[1]), new RegExp(String.raw`^Approved by <@U0BILL0001> on ${WHEN}\.$`), "who decided, and when");
+    assert.match(richWords(view.blocks[1]), new RegExp(String.raw`^Approved by <@U0BILL0001> on ${BYLINE_WHEN}\.$`), "who decided, and when");
     assert.match(viewText(view), /Reflection redesign/, "the draft, not the card's text");
     assert.doesNotMatch(viewText(view), /the decided card/);
     assert.equal(view.submit, undefined);
@@ -842,8 +841,9 @@ describe("a decided card", () => {
     await runReviewOpen(open("U0BILL0001"), deps);
     const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; level?: string; text?: { text: string } }> };
     assert.deepEqual([view.blocks[0]!.type, view.blocks[0]!.level], ["alert", "info"]);
-    assert.equal(view.blocks[0]!.text!.text, "Rejected.");
-    assert.match(richWords(view.blocks[1]), new RegExp(String.raw`^Rejected by <@U0BILL0001> on ${WHEN}: Not this week\.$`));
+    assert.equal(view.blocks[0]!.text!.text, "Rejected. Nothing ran.");
+    assert.match(richWords(view.blocks[1]), new RegExp(String.raw`^Rejected by <@U0BILL0001> on ${BYLINE_WHEN}:$`));
+    assert.equal(richWords(view.blocks[2]), "Not this week", "the reason, quoted");
     assert.match(viewText(view), /Reflection redesign/);
   });
 

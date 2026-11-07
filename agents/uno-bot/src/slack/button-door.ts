@@ -24,7 +24,7 @@
 import type { ThreadState } from "../thread-state/index";
 import { whichQuestionOf, withWorkingSignal, type Delivery } from "../turn/index";
 import { cardOutcomeOf, otherCardWaits, resolveSignal, type GateRestage, type GateVerdict } from "../gate/index";
-import { decidedCardLine, renderGateNote } from "./gate-note";
+import { cutOffCardLine, decidedCardLine, renderGateNote } from "./gate-note";
 // The decided card is built beside `notedCardBlocks`, where the Slack
 // adapter's `closeCard` builds it too: one builder for every door.
 import { decidedCard, type CardMessage } from "./proposal-render";
@@ -106,6 +106,10 @@ export interface ButtonDoorDeps {
   /** After a win, the card is edited to its outcome (`decidedCard`). */
   replaceCard(message: CardMessage): Promise<void>;
 
+  /** Take back a line posted while a run was going — "Got it — kicking that
+   *  off." — once the run's own result is in the thread. Absent, it stays. */
+  takeBack?(channel: string, ts: string): Promise<void>;
+
   /** Stage a fresh card for what a cut-off run never finished — see
    *  `ReactionDoorDeps.restage`. */
   restage(restage: GateRestage, delivery: Delivery): Promise<void>;
@@ -162,7 +166,7 @@ export async function applyPressVerdict(
      *  waits (`otherCardWaits`), and the open "which one?" question the card
      *  decided is dropped from (`dropFromWhichQuestion`). Absent, the thread
      *  settles idle and no question is redrawn. */
-    threadState?: Pick<ThreadState, "getProposalsByThread" | "decideInWhichQuestion">;
+    threadState?: Pick<ThreadState, "getProposalsByThread" | "decideInWhichQuestion"> & Partial<Pick<ThreadState, "getProposalByTs">>;
     /** The decided card's words and outcome line, changed on the way: the
      *  pop-up's approval with edits says what was approved, and by whom, and
      *  `edited` says the draft's values changed (`decidedCard`). */
@@ -212,9 +216,14 @@ export async function applyPressVerdict(
     door,
     async (delivery) => {
       await delivery.setWorking({ status: "is working on that…" });
-      if (!request.quiet) await delivery.postGateNote(post.note);
+      const said = request.quiet ? undefined : await delivery.postGateNote(post.note);
       const ran = await deps.applyVerdict(verdict);
       outcomes = Array.isArray(ran) ? ran : undefined;
+      // "Kicking that off" says only that a run is going. Once a single card's
+      // run reports back, its own reply says what it did, so the line goes.
+      if (!pending.item && said?.ok && said.ts && outcomes?.length && isKickOff(post.note)) {
+        await deps.takeBack?.(pending.channel, said.ts).catch(() => {});
+      }
       return deps.threadState ? otherCardWaits(pending, deps.threadState) : false;
     },
     // What the thread needs afterwards, stated rather than defaulted: this
@@ -239,7 +248,7 @@ export async function applyPressVerdict(
     const done = reportDone(outcomes);
     const state: ReportItemState =
       request.decision === "cancel"
-        ? { kind: "rejected", by: request.userId, ...(rejected?.reason ? { reason: rejected.reason } : {}), ...as }
+        ? { kind: "rejected", by: request.userId, at, ...(rejected?.reason ? { reason: rejected.reason } : {}), ...as }
         : failed
           ? { kind: "failed", by: request.userId, at, reason: failureReason(failed.message), ...as }
           : { kind: "approved", by: request.userId, at, ...as, ...(done ? { done } : {}) };
@@ -262,6 +271,11 @@ export async function applyPressVerdict(
   return null;
 }
 
+/** The note a won Approve says while its run goes, with no words of its own. */
+function isKickOff(note: NonNullable<GateVerdict["post"]>["note"]): boolean {
+  return note.kind === "resolved" && note.decision === "confirm";
+}
+
 /** A single write may return the actual destination for its report receipt.
  * Other writes keep their draft's receipt; failures never use this field. */
 function reportDone(outcomes: readonly OperationOutcome[] | undefined): string | undefined {
@@ -272,6 +286,12 @@ function reportDone(outcomes: readonly OperationOutcome[] | undefined): string |
   } catch {
     return;
   }
+}
+
+/** Who approved a card, as its kept decision says, where the store has it. */
+async function approverOf(proposalTs: string, store: Partial<Pick<ThreadState, "getProposalByTs">> | undefined): Promise<string | undefined> {
+  const look = await store?.getProposalByTs?.(proposalTs).catch(() => null);
+  return look && look.state !== "found" && "decided" in look ? look.decided?.by : undefined;
 }
 
 /**
@@ -288,7 +308,7 @@ async function speakCutOff(
   verdict: GateVerdict,
   pending: NonNullable<GateVerdict["proposal"]>,
   post: NonNullable<GateVerdict["post"]>,
-  deps: Omit<ButtonDoorDeps, "threadState" | "standingConfirmers">,
+  deps: Omit<ButtonDoorDeps, "threadState" | "standingConfirmers"> & { threadState?: Partial<Pick<ThreadState, "getProposalByTs">> },
 ): Promise<void> {
   const door = deps.delivery({
     channel: pending.channel,
@@ -307,7 +327,5 @@ async function speakCutOff(
     },
     () => (verdict.restage ? "waiting-on-person" : "idle"),
   );
-  await deps.replaceCard(
-    decidedCard(pending, ":warning: This run was cut off before it reported back — see the thread for what finished."),
-  );
+  await deps.replaceCard(decidedCard(pending, cutOffCardLine(await approverOf(pending.proposalTs, deps.threadState))));
 }

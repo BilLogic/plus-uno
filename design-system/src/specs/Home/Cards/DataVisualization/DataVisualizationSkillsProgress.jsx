@@ -11,6 +11,7 @@ import { IconButton } from '@/components';
 import chartTheme from '@/dataviz/chartTheme';
 import { RadarChart } from '@/dataviz';
 import './DataVisualization.scss';
+import { iconClass } from '../../../../lib/icon';
 
 /**
  * DataVisualizationSkillsProgress component for Home page
@@ -133,7 +134,7 @@ const DataVisualizationSkillsProgress = ({
                         aria-label="Skills Overview"
                         title="Skills Overview"
                     >
-                        <i className="fa-solid fa-chart-pie" aria-hidden="true"></i>
+                        <i className={iconClass('chart-pie')} aria-hidden="true"></i>
                     </button>
                     <button
                         type="button"
@@ -143,7 +144,7 @@ const DataVisualizationSkillsProgress = ({
                         aria-label="Skills Progress"
                         title="Skills Progress"
                     >
-                        <i className="fa-solid fa-chart-line" aria-hidden="true"></i>
+                        <i className={iconClass('chart-line')} aria-hidden="true"></i>
                     </button>
                 </div>
             ) : (

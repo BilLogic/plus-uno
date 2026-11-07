@@ -827,6 +827,7 @@ export function dmCaptureItem(f: DmCaptureFinding): ReportItem {
       })();
   return {
     id: f.id,
+    kind: "doc-fix",
     title: cardTitle(f.target.title),
     subtitle: `Your DM · ${dayOf(f.driftAt)}`,
     body: change.body,

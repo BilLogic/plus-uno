@@ -9,7 +9,7 @@ An inline chip for a short piece of code inside a sentence. It is a `code` eleme
 
 **Source:** `design-system/src/components/text-and-data-display/Code/Code.jsx`
 
-**Stories:** `design-system/src/components/text-and-data-display/Code/Code.stories.jsx` — Overview, InHeading, WrapsAtTheEdge, Interactive
+**Stories:** `design-system/src/components/text-and-data-display/Code/Code.stories.jsx` — Overview, InHeading, WrapsAtTheEdge, Interactive, Rest, Hovered, Pressed, NotAControl
 
 **Storybook page:** `design-system/src/components/text-and-data-display/Code/Code.mdx`
 

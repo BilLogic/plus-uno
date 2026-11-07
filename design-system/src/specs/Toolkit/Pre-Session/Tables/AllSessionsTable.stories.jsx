@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Button from '@/components/forms-and-inputs/Button/Button';
 import StatusTag from '@/components/labels/StatusTag';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -30,7 +31,7 @@ const ColumnHeader = ({ label, sortable = true, span = 1 }) => (
         </span>
         {sortable && (
             <i
-                className="fa-solid fa-arrow-up"
+                className={iconClass('arrow-up')}
                 style={{
                     fontSize: 'var(--font-size-fa-body1-solid)',
                     color: 'var(--ds-icon-subtle)'
@@ -484,7 +485,7 @@ export const Interactive = () => {
                 <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                     Total Sessions: <strong>{sessions.length}</strong>
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--color-info)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text-information)' }}>
                     In Progress: <strong>{statusCounts['in-progress']}</strong>
                 </span>
                 <span className="body2-txt" style={{ color: 'var(--color-secondary)' }}>

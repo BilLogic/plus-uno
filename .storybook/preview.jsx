@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 // Cascade layers (bootstrap, tokens, components): Bootstrap's CSS goes first,
 // in the lowest-precedence layer.
 import '../design-system/src/styles/bootstrap-layer.css';
@@ -8,68 +8,20 @@ import '../design-system/src/styles/main.scss';
 import '../design-system/src/storybook-docs/storybook-tailwind.css';
 import './storybook-overrides.css';
 import { TocDocsContainer } from './docs-toc.jsx';
-import StorybookAIAgent from '../prototypes/storybook-ai-agent-llm-api/StorybookAIAgent';
 import { mountDocsFab } from '../design-system/src/storybook-docs/chrome/mount-docs-fab.js';
 import ResponsiveFrame from '../design-system/src/specs/Universal/ResponsiveFrame';
+import BrowserFrame from '../design-system/src/storybook-docs/chrome/BrowserFrame';
 import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storybook-docs/lib/color-modes.js';
 
 /**
  * Storybook preview configuration for PLUS Design System
  */
 
-import { createRoot } from 'react-dom/client';
+import { addons } from 'storybook/preview-api';
+import { GLOBALS_UPDATED, SET_GLOBALS } from 'storybook/internal/core-events';
 import { BACKGROUND_OPTIONS, DEFAULT_BACKGROUND } from './backgrounds.js';
 
-// ---- Global AI Agent Setup ---------------------------------
-// Inject only on local Storybook so Netlify static builds never ship the
-// client-side OpenAI key path (VITE_* keys are baked into the bundle).
-// Also skip under Vitest / portable-stories (addon-vitest loads this preview).
-
-/**
- * @returns {boolean} Whether the in-iframe AI agent should mount.
- */
-const shouldMountGlobalAIAgent = () => {
-  if (typeof window === 'undefined') return false;
-  if (import.meta.env?.MODE === 'test' || import.meta.env?.VITEST) return false;
-  // Storybook static builds set CONFIG_TYPE to PRODUCTION
-  if (window.CONFIG_TYPE === 'PRODUCTION') return false;
-  const host = window.location.hostname;
-  return host === 'localhost' || host === '127.0.0.1';
-};
-
-const GlobalAgentWrapper = () => {
-  const [context, setContext] = useState('Storybook Docs');
-  
-  useEffect(() => {
-    window.__setAIContext = setContext;
-  }, []);
-
-  return <StorybookAIAgent pageContext={context} />;
-};
-
-if (shouldMountGlobalAIAgent() && !window.__PLUS_AI_AGENT_ROOT__) {
-  window.__PLUS_AI_AGENT_ROOT__ = true;
-  
-  const injectAgent = () => {
-    let container = document.getElementById('plus-ai-agent-global');
-    if (!container) {
-      container = document.createElement('div');
-      container.id = 'plus-ai-agent-global';
-      document.body.appendChild(container);
-    }
-    const root = createRoot(container);
-    root.render(<GlobalAgentWrapper />);
-  };
-
-  if (document.readyState === 'complete' || document.readyState === 'interactive') {
-    // wait a tick for body to be ready if in interactive
-    setTimeout(injectAgent, 0);
-  } else {
-    window.addEventListener('DOMContentLoaded', injectAgent);
-  }
-}
-
-// ---- Docs floating links (Marketplace, Uno Blueprint) -----------------------
+// ---- Docs floating button (AI agent, Marketplace, Uno Blueprint) -----------------------
 mountDocsFab();
 
 // ---- Console noise filters (Storybook-only) ---------------------------------
@@ -126,6 +78,33 @@ const ColorModes = ({ colorMode, contrastMode, children }) => {
   }, [colorMode, contrastMode]);
   return children;
 };
+
+// The decorator above only runs when a story renders, and a toolbar switch can
+// reach the preview while no story render is there to take it: a docs page whose
+// canvases have not mounted yet or are mid-render, or an MDX page with no story
+// at all. The update then lands in the globals store and never on <html>, and the
+// page keeps the old mode until something else re-renders it. So the preview also
+// applies the modes straight from the channel's globals events. (Inferred from
+// the symptom, a manager URL on dark with the preview on light, and confirmed by
+// the fix: 20 of 20 check:docs-chrome runs against one server, where it had been
+// failing about one in six.)
+//
+// Kept on globalThis and re-attached on every module run, so an HMR edit to this
+// handler replaces the old one instead of leaving it listening.
+const fromChannel = (payload) => {
+  const globals = payload?.globals ?? payload?.userGlobals;
+  if (!globals) return;
+  applyColorModes(globals.plusColorMode || 'light', globals.plusContrastMode || 'no-preference');
+};
+if (addons.hasChannel?.()) {
+  const channel = addons.getChannel();
+  const previous = globalThis.__PLUS_COLOR_MODE_HANDLER__;
+  for (const event of [SET_GLOBALS, GLOBALS_UPDATED]) {
+    if (previous) channel.off(event, previous);
+    channel.on(event, fromChannel);
+  }
+  globalThis.__PLUS_COLOR_MODE_HANDLER__ = fromChannel;
+}
 
 // Cleanup functions - using dummy no-ops as legacy components are being phased out or moved
 const cleanupFunctions = {
@@ -621,6 +600,19 @@ const preview = {
         dynamicTitle: true,
       },
     },
+    plusBrowser: {
+      description: 'Browser window chrome around the Frame and page-template stories (docs only)',
+      toolbar: {
+        title: 'Browser',
+        icon: 'browser',
+        items: [
+          { value: 'none', title: 'No browser' },
+          { value: 'chrome', title: 'Chrome' },
+          { value: 'safari', title: 'Safari' },
+        ],
+        dynamicTitle: true,
+      },
+    },
     plusColorMode: {
       description: 'Color mode, set as data-color-mode on <html>; auto follows the OS',
       toolbar: {
@@ -650,6 +642,17 @@ const preview = {
   },
 
   decorators: [
+    // Browser chrome from the toolbar, around the Frame and page-template
+    // stories. A story can opt in or out with parameters.browserFrame ('chrome' | 'safari' | 'none').
+    (Story, context) => {
+      const framed = /^Patterns\/(Frame\/Frame|Templates)/.test(context.title);
+      const browser = context.parameters.browserFrame || (framed ? context.globals.plusBrowser : 'none');
+      return (
+        <BrowserFrame browser={browser || 'none'}>
+          <Story />
+        </BrowserFrame>
+      );
+    },
     // Color and contrast modes from the toolbar, on <html> (see applyColorModes).
     (Story, context) => (
       <ColorModes
@@ -697,12 +700,6 @@ const preview = {
       return <Story />;
     },
     (Story, context) => {
-      // Provide dynamic context to the AI Agent so the LLM knows which screen/story it's looking at
-      const activeContext = `${context.title} — ${context.name}`;
-      if (typeof window !== 'undefined' && window.__setAIContext) {
-        setTimeout(() => window.__setAIContext(activeContext), 0);
-      }
-
       // Docs-only: disable pointer interaction on static component examples so
       // scroll stays stable. Canvas / Interactive / Overview stay fully usable
       // (Controls, play functions, a11y checks).
@@ -727,6 +724,7 @@ const preview = {
     backgrounds: {
       value: DEFAULT_BACKGROUND
     },
+    plusBrowser: 'none',
     plusColorMode: 'light',
     plusContrastMode: 'no-preference',
   },

@@ -4,6 +4,7 @@ import { RadioGroup as BaseRadioGroup } from '@base-ui/react/radio-group';
 import { Radio as BaseRadio } from '@base-ui/react/radio';
 import useFieldId from '../useFieldId';
 import './Rating.scss';
+import { iconClass } from '../../../lib/icon';
 
 /** The scale, in order. Five is the whole of it — there is no other length. */
 const RATING_VALUES = [1, 2, 3, 4, 5];
@@ -157,7 +158,7 @@ const RatingItem = ({
                 {...props}
             >
                 <i
-                    className={selected ? `fas fa-${icon}` : `far fa-${icon}`}
+                    className={selected ? `fa-solid fa-${icon}` : iconClass(icon)}
                     aria-hidden="true"
                 />
             </BaseRadio.Root>

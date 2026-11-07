@@ -59,7 +59,7 @@ export async function disputePrecedenceItem(
 
   if (written) {
     await deps.store.retireProposal(proposal.proposalTs, { decision: "noted", by: userId, reason: note }).catch(() => {});
-    const message = await settleItem(deps.store, item, { kind: "noted", by: userId, note }, deps.now());
+    const message = await settleItem(deps.store, item, { kind: "noted", by: userId, at: deps.now(), note }, deps.now());
     if (message) await deps.edit(item.messageTs, message).catch(() => {});
     return;
   }

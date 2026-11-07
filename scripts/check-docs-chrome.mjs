@@ -224,8 +224,7 @@ async function measureManager(context, baseUrl) {
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(`${baseUrl}/?path=/docs/${TOC_PAGE}`, { waitUntil: 'load' });
   await page.waitForSelector('.sidebar-container [data-selected="true"]', { timeout: 60_000 });
-  const preview = page.frameLocator('#storybook-preview-iframe');
-  const read = async (step) => {
+  const read = async (step, expectedMode) => {
     const painted = await page.evaluate((s) => {
       const paint = (el) => getComputedStyle(el).backgroundColor;
       return {
@@ -235,26 +234,74 @@ async function measureManager(context, baseUrl) {
         selected: paint(document.querySelector('.sidebar-container [data-selected="true"]')),
       };
     }, step);
-    const tokens = await preview.locator('body').evaluate((body) => {
-      const resolved = (token) => {
-        const probe = document.createElement('div');
-        probe.style.background = `var(${token})`;
-        body.appendChild(probe);
-        const color = getComputedStyle(probe).backgroundColor;
-        probe.remove();
-        return color;
-      };
-      return { dark: document.documentElement.dataset.colorMode, sidebar: resolved('--ds-surface-sunken'), selected: resolved('--ds-background-brand-bold') };
-    });
+    // Read inside the wait: if the dev server reloads the preview between the ready
+    // check and the read, the read waits for the reloaded document to be ready too.
+    const frame = await (await page.waitForSelector('#storybook-preview-iframe')).contentFrame();
+    const handle = await frame.waitForFunction(
+      ([c]) => {
+        const resolved = (token) => {
+          const probe = document.createElement('div');
+          probe.style.background = `var(${token})`;
+          document.body.appendChild(probe);
+          const color = getComputedStyle(probe).backgroundColor;
+          probe.remove();
+          return color;
+        };
+        const out = { mode: document.documentElement.dataset.colorMode, sidebar: resolved('--ds-surface-sunken'), selected: resolved('--ds-background-brand-bold') };
+        const clear = 'rgba(0, 0, 0, 0)';
+        return out.mode === c && out.sidebar !== clear && out.selected !== clear && out;
+      },
+      [expectedMode],
+      { timeout: 60_000, polling: 'raf' },
+    );
+    const tokens = await handle.jsonValue();
     return { painted, tokens };
   };
-  const settle = () => page.waitForTimeout(1500);
-  await settle();
-  const light = await read('light');
+  // Ready signal, not time. The manager repaints the moment the toolbar flips, but
+  // the preview, whose resolved tokens are the expected colors, applies the mode
+  // from its own React effect and loads its token stylesheet later, and the dev
+  // server can reload it mid-switch. So wait for: the manager's mode attribute,
+  // the docs body (a switch sent before it mounts is lost), then in the preview the
+  // target data-color-mode, a resolved token (not the other mode's), loaded fonts
+  // and no finite animation. waitForFunction re-runs after a reload.
+  const settle = async (mode, colorMode, otherModeToken = null) => {
+    await page.waitForFunction(
+      ([m]) => document.documentElement.dataset.plusManagerMode === m,
+      [mode],
+      { timeout: 30_000 },
+    );
+    const frame = await (await page.waitForSelector('#storybook-preview-iframe')).contentFrame();
+    await frame.waitForSelector('.sbdocs-content', { timeout: 60_000 });
+    await frame.waitForFunction(
+      ([c, from]) => {
+        const probe = document.createElement('div');
+        probe.style.background = 'var(--ds-surface-sunken)';
+        document.body.appendChild(probe);
+        const color = getComputedStyle(probe).backgroundColor;
+        probe.remove();
+        return document.documentElement.dataset.colorMode === c
+          && color !== 'rgba(0, 0, 0, 0)' && color !== from
+          && document.fonts.status === 'loaded'
+          && document.getAnimations().every((a) => a.effect?.getTiming().iterations === Infinity);
+      },
+      [colorMode, otherModeToken],
+      { timeout: 60_000, polling: 'raf' },
+    );
+    // The manager's own sidebar transition, then one painted frame.
+    await page.waitForFunction(
+      () => document.fonts.status === 'loaded'
+        && document.querySelector('.sidebar-container').getAnimations({ subtree: true }).every((a) => a.effect?.getTiming().iterations === Infinity),
+      null,
+      { timeout: 30_000 },
+    );
+    await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  };
+  await settle('light-no-preference', 'light');
+  const light = await read('light', 'light');
   await page.getByRole('button', { name: /Color mode/i }).click();
   await page.getByRole('option', { name: 'Dark', exact: true }).or(page.getByText('Dark', { exact: true })).first().click();
-  await settle();
-  const dark = await read('dark');
+  await settle('dark-no-preference', 'dark', light.tokens.sidebar);
+  const dark = await read('dark', 'dark');
   await page.close();
   const want = (r, mode) => ({ mode, sidebar: r.tokens.sidebar, selected: r.tokens.selected });
   return managerFailures([light.painted, dark.painted], {

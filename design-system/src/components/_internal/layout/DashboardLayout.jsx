@@ -1,5 +1,6 @@
 import React from 'react';
 import { Breadcrumb } from '@/components';
+import { iconClass } from '../../../lib/icon';
 
 const DashboardLayout = ({ children }) => {
     return (
@@ -11,10 +12,10 @@ const DashboardLayout = ({ children }) => {
                 </div>
                 <nav className="nav flex-column gap-2">
                     <a href="#" className="nav-link active d-flex align-items-center gap-2" aria-current="page">
-                        <i className="fas fa-home"></i> Home
+                        <i className={iconClass('house')}></i> Home
                     </a>
                     <a href="#" className="nav-link d-flex align-items-center gap-2">
-                        <i className="fas fa-users"></i> Group Admin
+                        <i className={iconClass('users')}></i> Group Admin
                     </a>
                 </nav>
             </div>

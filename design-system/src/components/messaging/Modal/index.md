@@ -36,7 +36,7 @@ Universal modal component for creating dialog windows that overlay the main cont
 | `primaryButton` | buttonShape | — | — |
 | `secondaryButton` | buttonShape | — | — |
 | `onClose` | func | — | — |
-| `width` | enum | `'6-col'` | 6 · 8 · 10 columns of the screen grid plus the modal pad; a number is a fixed width |
+| `width` | enum or number or string | `'6-col'` | 6 · 8 · 10 columns of the screen grid plus the modal pad; a number is a fixed width |
 | `className` | string | `''` | — |
 | `style` | object | — | — |
 | `children` | node | — | — |

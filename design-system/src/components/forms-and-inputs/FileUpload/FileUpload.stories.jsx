@@ -3,6 +3,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { expect, userEvent, within } from 'storybook/test';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import FileUpload from './FileUpload';
+import { iconClass } from '../../../lib/icon';
 
 const formats = ['.zip', '.mp4', '.m4a', '.txt'];
 
@@ -31,7 +32,7 @@ export default {
             description: 'Label text for the file upload field',
             table: { category: 'Content' },
         },
-        required: {
+        isRequired: {
             control: 'boolean',
             description: 'Whether the field is required (shows red asterisk)',
             table: { category: 'Content' },
@@ -52,12 +53,12 @@ export default {
             description: 'Text displayed on the file selection button',
             table: { category: 'Content' },
         },
-        disabled: {
+        isDisabled: {
             control: 'boolean',
             description: 'Disable the file upload component',
             table: { category: 'Behavior' },
         },
-        readOnly: {
+        isReadOnly: {
             control: 'boolean',
             description: 'Show the field and its files without a way to choose a file',
             table: { category: 'Behavior' },
@@ -88,7 +89,7 @@ export default {
 };
 
 export const Overview = () => (
-    <div style={{ maxWidth: '800px' }}>
+    <div style={{ maxWidth: 'var(--size-5400)' }}>
         <FileUpload
             id="file-upload-overview"
             label="Upload files"
@@ -104,14 +105,14 @@ Overview.parameters = {
 };
 
 export const Content = () => (
-    <div style={{ maxWidth: '800px' }}>
+    <div style={{ maxWidth: 'var(--size-5400)' }}>
         <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
             Label, required asterisk, accepted formats, and button copy.
         </p>
         <FileUpload
             id="file-upload-content"
             label="Upload files"
-            required
+            isRequired
             acceptedFormats={formats}
             buttonText="Choose a file"
         />
@@ -119,13 +120,13 @@ export const Content = () => (
 );
 
 export const Styles = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
         <div>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INVALID</span>
             <FileUpload
                 id="file-upload-error"
                 label="Upload files"
-                required
+                isRequired
                 acceptedFormats={formats}
                 buttonText="Choose a file"
                 validation="invalid"
@@ -137,7 +138,7 @@ export const Styles = () => (
             <FileUpload
                 id="file-upload-valid"
                 label="Upload files"
-                required
+                isRequired
                 acceptedFormats={formats}
                 buttonText="Choose a file"
                 validation="valid"
@@ -148,13 +149,13 @@ export const Styles = () => (
 );
 
 export const InteractionStates = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', maxWidth: '800px' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
         <div>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
             <FileUpload
                 id="file-upload-default"
                 label="Upload files"
-                required
+                isRequired
                 acceptedFormats={formats}
                 buttonText="Choose a file"
             />
@@ -164,7 +165,7 @@ export const InteractionStates = () => (
             <FileUpload
                 id="file-upload-focus"
                 label="Upload files"
-                required
+                isRequired
                 acceptedFormats={formats}
                 buttonText="Choose a file"
             />
@@ -174,17 +175,17 @@ export const InteractionStates = () => (
             <FileUpload
                 id="file-upload-disabled"
                 label="Upload files"
-                required
+                isRequired
                 acceptedFormats={formats}
                 buttonText="Choose a file"
-                disabled
+                isDisabled
             />
         </div>
     </div>
 );
 
 export const ReadOnly = () => (
-    <div style={{ maxWidth: '640px' }}>
+    <div style={{ maxWidth: 'var(--size-4000)' }}>
         <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
             Read-only shows the field and the files already chosen, with no button to choose another.
         </p>
@@ -192,7 +193,7 @@ export const ReadOnly = () => (
             id="file-upload-read-only"
             label="Session recording"
             description="Uploaded by the tutor after the session."
-            readOnly
+            isReadOnly
         >
             <div
                 className="body2-txt"
@@ -204,7 +205,7 @@ export const ReadOnly = () => (
                     color: 'var(--ds-text)',
                 }}
             >
-                <i className="fa-solid fa-file" aria-hidden="true" style={{ color: 'var(--ds-icon-subtle)' }} />
+                <i className={iconClass('file')} aria-hidden="true" style={{ color: 'var(--ds-icon-subtle)' }} />
                 zoom_0.mp4
             </div>
         </FileUpload>
@@ -212,14 +213,14 @@ export const ReadOnly = () => (
 );
 
 export const WithFiles = () => (
-    <div style={{ maxWidth: '640px' }}>
+    <div style={{ maxWidth: 'var(--size-4000)' }}>
         <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
             Pass the chosen files as children. They sit below the button, outside the frame, as on the post-session recording upload.
         </p>
         <FileUpload
             id="file-upload-with-files"
             label="Upload session recording"
-            required
+            isRequired
             description="Upload this session’s Zoom recording. Single files and .zip work too."
             buttonText="Choose a file"
         >
@@ -235,7 +236,7 @@ export const WithFiles = () => (
                         color: 'var(--ds-text)',
                     }}
                 >
-                    <i className="fa-solid fa-file" aria-hidden="true" style={{ color: 'var(--ds-icon-subtle)' }} />
+                    <i className={iconClass('file')} aria-hidden="true" style={{ color: 'var(--ds-icon-subtle)' }} />
                     {file}
                 </div>
             ))}
@@ -244,7 +245,7 @@ export const WithFiles = () => (
 );
 
 export const Interactive = (args) => (
-    <div style={{ maxWidth: '600px' }}>
+    <div style={{ maxWidth: 'var(--size-4000)' }}>
         <FileUpload
             {...args}
             acceptedFormats={{
@@ -258,17 +259,17 @@ export const Interactive = (args) => (
 
 Interactive.args = {
     label: 'Upload files',
-    required: true,
+    isRequired: true,
     formatPreset: 'mixed',
     buttonText: 'Choose a file',
-    disabled: false,
-    readOnly: false,
+    isDisabled: false,
+    isReadOnly: false,
     validation: 'none',
     validationMessage: '',
 };
 
 /** One story per state, for the Examples tab. */
-const wrap = { maxWidth: '640px' };
+const wrap = { maxWidth: 'var(--size-4000)' };
 const fileInput = (canvasElement) => canvasElement.querySelector('input[type="file"]');
 const container = (canvasElement) => canvasElement.querySelector('.plus-file-upload-container');
 
@@ -287,7 +288,7 @@ export const Default = {
 export const Required = {
     render: () => (
         <div style={wrap}>
-            <FileUpload id="file-upload-ex-required" label="Upload files" required acceptedFormats={formats} buttonText="Choose a file" />
+            <FileUpload id="file-upload-ex-required" label="Upload files" isRequired acceptedFormats={formats} buttonText="Choose a file" />
         </div>
     ),
     play: async ({ canvasElement }) => {
@@ -337,7 +338,7 @@ export const Valid = {
 export const Disabled = {
     render: () => (
         <div style={wrap}>
-            <FileUpload id="file-upload-ex-disabled" label="Upload files" acceptedFormats={formats} buttonText="Choose a file" disabled />
+            <FileUpload id="file-upload-ex-disabled" label="Upload files" acceptedFormats={formats} buttonText="Choose a file" isDisabled />
         </div>
     ),
     play: async ({ canvasElement }) => {

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';
 import './OptionRow.scss';
+import { iconClass } from '../../../lib/icon';
 
 /** The Figma row's Leading slot holds at most this many items. */
 const MAX_LEADING = 4;
@@ -27,8 +28,8 @@ const Mark = ({ type, checked, indeterminate = false }) => (
             indeterminate && !checked ? 'is-indeterminate' : '',
         ].filter(Boolean).join(' ')}
     >
-        {type === 'checkbox' && checked && <i className="fa-solid fa-check" />}
-        {type === 'checkbox' && indeterminate && !checked && <i className="fa-solid fa-minus" />}
+        {type === 'checkbox' && checked && <i className={iconClass('check')} />}
+        {type === 'checkbox' && indeterminate && !checked && <i className={iconClass('minus')} />}
     </span>
 );
 
@@ -229,7 +230,7 @@ const OptionRow = ({
         >
             {kind === 'create' && (
                 <span className="plus-option-row-leading">
-                    <i aria-hidden="true" className="fa-solid fa-plus" />
+                    <i aria-hidden="true" className={iconClass('plus')} />
                 </span>
             )}
             {kind === 'option' && leadingItems.length > 0 && (
@@ -245,7 +246,7 @@ const OptionRow = ({
                 <span className="plus-option-row-trailing">
                     {trailing}
                     {kind === 'option' && selected && check && (
-                        <i aria-hidden="true" className="fa-solid fa-check plus-option-row-selected-mark" />
+                        <i aria-hidden="true" className={`${iconClass('check')} plus-option-row-selected-mark`} />
                     )}
                 </span>
             )}

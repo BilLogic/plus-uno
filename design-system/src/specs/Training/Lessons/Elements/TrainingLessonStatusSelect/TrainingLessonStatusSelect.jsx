@@ -11,6 +11,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FilterSelect } from '@/specs/Toolkit/Pre-Session/Elements/Filters/FilterSelect';
 import './TrainingLessonStatusSelect.scss';
+import { iconClass } from '../../../../../lib/icon';
 
 /** Each status: its label, icon, color role, and the key of its count. */
 const STATUSES = [
@@ -38,7 +39,7 @@ const TrainingLessonStatusSelect = ({
         label,
         leading: (
             <i
-                className={`fa-solid fa-${icon} training-lesson-status-select__icon training-lesson-status-select__icon--${role}`}
+                className={`${iconClass(icon)} training-lesson-status-select__icon training-lesson-status-select__icon--${role}`}
                 aria-hidden="true"
             />
         ),

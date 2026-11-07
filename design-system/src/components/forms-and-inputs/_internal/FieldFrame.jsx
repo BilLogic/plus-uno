@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Field } from '@base-ui/react/field';
 import Tooltip from '../../overlays-and-layering/Tooltip/Tooltip';
 import './FieldFrame.scss';
+import { iconClass } from '../../../lib/icon';
 
 /**
  * What a caption tone means for the box and the control. One place, so every
@@ -76,7 +77,7 @@ export const FieldLabel = ({
                     className="plus-field-info"
                     aria-label={`About ${name ?? (typeof children === 'string' ? children : 'this field')}`}
                 >
-                    <i className="fa-solid fa-circle-info" aria-hidden="true" />
+                    <i className={iconClass('circle-info')} aria-hidden="true" />
                 </button>
             </Tooltip>
         </div>
@@ -99,9 +100,9 @@ FieldLabel.propTypes = {
 };
 
 const CAPTION_ICON = {
-    invalid: 'fa-solid fa-circle-exclamation',
-    warning: 'fa-solid fa-triangle-exclamation',
-    success: 'fa-solid fa-circle-check',
+    invalid: iconClass('circle-exclamation'),
+    warning: iconClass('triangle-exclamation'),
+    success: iconClass('circle-check'),
 };
 
 /**

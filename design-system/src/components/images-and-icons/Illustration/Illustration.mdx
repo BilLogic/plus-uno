@@ -146,6 +146,16 @@ every character.
 
 <div className="sb-ds-doc-section">
 
+## State
+
+<DocsCanvasShell description={<>Rest. A character is a picture, not a control, so this is its one state.</>}>
+    <DsCanvasQuiet of={IllustrationStories.Rest} />
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -170,7 +180,7 @@ every character.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `Illustration` to give a page or a moment some warmth: the header of Home,
 an empty state, a welcome, or a card that introduces a SMART area. A character
@@ -183,7 +193,43 @@ understand. Use `Tile` for a small square picture of a thing.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Frame.** The square layout box, `size` wide and high. The limbs reach past it and are never clipped.
+2. **Body.** The textured shape, filled from a body token and masked by the stipple.
+3. **Line work.** The face, arms and legs, in one icon token.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The only state. A character is a picture, not a control.</td></tr>
+<tr><td>Hovered, pressed, focused</td><td>None. Wrap the character in a button or link that carries the name and the focus.</td></tr>
+<tr><td>Disabled</td><td>None. Dim the control around it.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Body, SMART characters</td><td>The area's <code>subtle</code> background, such as <code>--ds-background-smart-advocacy-subtle</code>.</td></tr>
+<tr><td>Body, math characters</td><td>An accent <code>subtle</code> background: red, blue, green or purple.</td></tr>
+<tr><td>Line work</td><td><code>--ds-icon-subtle</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 ### Pick a SMART character for a SMART area, and a math character for anything else.
 
@@ -221,6 +267,22 @@ understand. Use `Tile` for a small square picture of a thing.
 // Correct: give it room instead.
 <div style={{ padding: 'var(--size-section-gap-lg)' }}><Illustration character="dot" /></div>
 ```
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Title a character that stands alone with what it stands for: "Advocacy".</td><td>Title it "Illustration" or "Character", which names the picture.</td></tr>
+<tr><td>Leave the title off a character beside a heading that says it.</td><td>Repeat the heading in both places.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

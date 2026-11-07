@@ -1,5 +1,6 @@
 import React from 'react';
-import { Label, Caption } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import { Label, Caption } from '@/storybook-docs/form-demos.jsx';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Elements/New Form Date Input',
@@ -72,7 +73,7 @@ const DateInput = ({
                 {value || placeholder}
             </span>
             <i
-                className="fa-solid fa-calendar"
+                className={iconClass('calendar')}
                 style={{
                     fontSize: 'var(--font-size-fa-body2-solid)',
                     lineHeight: 1.833,

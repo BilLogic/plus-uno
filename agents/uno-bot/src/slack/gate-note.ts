@@ -22,9 +22,10 @@
 //   • AN AGED-OUT CARD is never met with silence. Live 2026-07-10, silence
 //     read as "the bot is broken" to someone who believed they had just
 //     confirmed something. Every card, whoever staged it, ends on the one
-//     line `EXPIRED_CARD` once its deadline passes — edited on by the gesture
-//     that found it or by the store's alarm at the deadline (#1316). The
-//     card showed its deadline all along, so the line names none.
+//     line `EXPIRED_CARD_LINE` once its deadline passes — edited on by the
+//     gesture that found it or by the store's alarm at the deadline (#1316) —
+//     and the gesture itself is told `EXPIRED_CARD`. The card showed its
+//     deadline all along, so neither names one.
 //   • A REPLACED CARD gets its own line rather than the expiry one (#573). The
 //     person did not wait too long, they acted on the card above the one being
 //     held — and unlike an aged-out card there is a live one in the thread to
@@ -88,20 +89,47 @@ export function statedCancelledNote(words: Pick<StatedCardWords, "cancelled">, u
 }
 
 /**
- * A decided card's last line, where its buttons were: who approved it, or who
- * canceled it and how to have it staged again — a stated card in its own
- * words, the pop-up's Reject with its reason. One line whatever the door, so
- * a card decided by a press reads the same as one decided by a reaction or in
- * words (`Delivery.closeCard`).
+ * A decided card's last line, where its buttons were, in the one pattern
+ * report cards use: "<Outcome> by <@who>". "Approved by", "Rejected by" (the
+ * pop-up's Reject; its reason is in View) or "Canceled by" (a ⛔ or a
+ * reaction; how to have it staged again is in View) — a stated card in its
+ * own words. One line whatever the door, so a card decided by a press reads
+ * the same as one decided by a reaction or in words (`Delivery.closeCard`).
  */
 export function decidedCardLine(outcome: CardOutcome): string {
   const by = outcome.by ? ` by <@${outcome.by}>` : "";
   if (outcome.decision === "confirm") return `Approved${by}`;
   if (outcome.cancelled) return statedCancelledNote({ cancelled: outcome.cancelled }, outcome.by ?? "");
-  if (outcome.rejected) {
-    return `Rejected${by}${outcome.rejected.reason ? `: ${escapeSlackText(outcome.rejected.reason)}` : ""}`;
-  }
-  return `Canceled${by} — tell me what to change and I'll stage it again.`;
+  if (outcome.rejected) return `Rejected${by}`;
+  return `Canceled${by}`;
+}
+
+/** The line on a card nobody decided before its deadline. The gesture that
+ *  finds it is answered `EXPIRED_CARD`. */
+export const EXPIRED_CARD_LINE = "Expired with no decision";
+
+/** The line on a card a revision replaced: the new card by its headline, the
+ *  model's input, so escaped. The gesture that finds it is answered
+ *  `SUPERSEDED_POST` or `supersededBy`. */
+export function replacedCardLine(headline?: string): string {
+  return headline ? `Replaced by ${escapeSlackText(headline)}` : "Replaced by a newer card";
+}
+
+/** The line on an approved card whose run was cut off before it reported
+ *  back: who approved it, where known. */
+export function cutOffCardLine(by?: string): string {
+  return `Approved${by && SLACK_USER_ID.test(by) ? ` by <@${by}>` : ""}, cut off`;
+}
+
+/** A closed card's one button: View decision once someone decided it, View
+ *  card when nobody did (expired, replaced). */
+export type ClosedButton = "View decision" | "View card";
+
+/** The button a card keeps under a note: Review while it can still be
+ *  decided, else what a closed card offers. */
+export function cardNoteButton(note: GateNote): "Review" | ClosedButton {
+  if (cardStaysLive(note)) return "Review";
+  return note.kind === "expired" || note.kind === "superseded" ? "View card" : "View decision";
 }
 
 /** The default narrative, when the winning signal brought no words of its own. */
@@ -225,11 +253,14 @@ export function renderGateNote(note: GateNote): string {
  * A verdict as the line edited onto its card (`Delivery.postGateNote` with a
  * card): the same words as in the thread, without the mention of the person
  * whose gesture it answered — a line on the card stays there for everyone,
- * and an edit notifies no one anyway. An expired card says `EXPIRED_CARD`,
- * a stated one too: its own words are for the person who acted.
+ * and an edit notifies no one anyway. An expired card says
+ * `EXPIRED_CARD_LINE` and a replaced one names its replacement, in the
+ * pattern decided cards use; the gesture that found it is told
+ * `EXPIRED_CARD` or `SUPERSEDED_POST` in the thread.
  */
 export function renderCardNote(note: GateNote): string {
-  if (note.kind === "expired") return EXPIRED_CARD;
+  if (note.kind === "expired") return EXPIRED_CARD_LINE;
+  if (note.kind === "superseded") return replacedCardLine(note.stated ? undefined : note.by);
   return note.kind === "not-a-confirmer" ? notAConfirmerLine({ ...note, userId: undefined }) : renderGateNote(note);
 }
 

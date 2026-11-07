@@ -4,6 +4,7 @@ import PatternCard from '@/patterns/PatternCard';
 import Button from '@/components/forms-and-inputs/Button';
 import SmartTag from '@/components/labels/SmartTag';
 import './RecommendedLessons.scss';
+import { iconClass } from '../../../../lib/icon';
 
 /**
  * RecommendedLessons component for Home page
@@ -32,7 +33,7 @@ const RecommendedLessons = ({
 
         return (
             <div className="plus-recommended-lessons-ai-indicator" title="AI recommended">
-                <i className="fa-solid fa-wand-magic-sparkles" aria-hidden="true" />
+                <i className={iconClass('wand-magic-sparkles')} aria-hidden="true" />
             </div>
         );
     };
@@ -109,7 +110,7 @@ const RecommendedLessons = ({
                     <div className="plus-recommended-lessons-indicators">
                         {status === 'in-progress' && (
                             <div className="plus-recommended-lessons-status" title="In progress">
-                                <i className="fa-solid fa-spinner" aria-hidden="true" />
+                                <i className={iconClass('spinner')} aria-hidden="true" />
                             </div>
                         )}
                         {renderAIIndicator()}

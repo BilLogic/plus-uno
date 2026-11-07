@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
 
 import * as DynamicTableStories from './DynamicTable.stories.jsx';
-import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DocsCanvasShell, ResourcesBlock, DocsTable, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -72,7 +72,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 <div className="sb-ds-doc-section">
 
-## States
+## Body states
 
 <DocsCanvasShell
     attachSourceBelow
@@ -160,6 +160,32 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 </div>
 
+<div className="sb-ds-doc-section">
+
+## State
+
+<DocsCanvasShell description={<>A sortable head cell is clear; its arrow shows on hover or focus.</>}>
+    <DsCanvasQuiet of={DynamicTableStories.Rest} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The head cell takes the subtle hovered step.</>}>
+    <DsCanvasQuiet of={DynamicTableStories.Hovered} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The head cell takes the subtle pressed step.</>}>
+    <DsCanvasQuiet of={DynamicTableStories.Pressed} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>The sort button shows the 2px ring inset in the cell, and the arrow appears.</>}>
+    <DsCanvasQuiet of={DynamicTableStories.Focused} />
+</DocsCanvasShell>
+
+<DocsCanvasShell description={<>A row can be disabled and takes the disabled ink.</>}>
+    <DsCanvasQuiet of={DynamicTableStories.DisabledRow} />
+</DocsCanvasShell>
+
+</div>
+
 </div>
 
 </DocsTab>
@@ -170,7 +196,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use the Dynamic table where people act on the data: sort a column, filter the
 rows, select some for a bulk action, or page through a long result. Use
@@ -180,7 +206,54 @@ rows, select some for a bulk action, or page through a long result. Use
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Head cell.** A label with an optional type icon; a sortable one holds a button across the whole cell.
+2. **Sort arrow.** 12 tall; hidden until hover or focus, kept once sorted.
+3. **Row.** Cells in a band, with hover and selected grounds.
+4. **Footer.** States the range on a table that pages.
+5. **Message row.** The empty, no results, loading and error states, spanning every column.
+6. **Checkbox column.** With `isSelectable`: as wide as the row is tall, select-all in the head.
+7. **Bulk bar.** `TableBulkActions`, in the Section header's toolbar while rows are selected.
+8. **Frozen column.** With `isFrozen`: an opaque first column with a stronger divider while scrolled sideways.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Head cells clear; sorted columns keep their arrow.</td></tr>
+<tr><td>Hovered</td><td>A sortable head cell takes the subtle hovered ground and shows its arrow.</td></tr>
+<tr><td>Pressed</td><td>A sortable head cell takes the subtle pressed ground.</td></tr>
+<tr><td>Focused</td><td>The sort button shows the 2px ring inset; focus is never a fill.</td></tr>
+<tr><td>Disabled</td><td>A row takes the disabled ink and ignores the pointer; there is no disabled sort.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Head cell hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
+<tr><td>Row hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
+<tr><td>Selected row</td><td><code>--ds-background-selected</code> and its states</td></tr>
+<tr><td>Disabled row</td><td><code>--ds-text-disabled</code></td></tr>
+<tr><td>Row height</td><td><code>--size-row-compact</code>, <code>--size-row-default</code>, <code>--size-row-comfortable</code></td></tr>
+<tr><td>Cell padding</td><td><code>--size-table-cell-pad-x</code>, <code>--size-table-cell-pad-y</code></td></tr>
+<tr><td>Ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
 
 - **A column sorts by its cells' `key`.** Give a date cell a sortable key (`20261024`) and its readable text as `content`.
 - **Stateful or stateless.** Leave the sort and page alone and the table holds them. Pass `sortKey` and `sortOrder`, or `page`, and the page owns them: the table reports a press through `onSort` or `onSetPage` and draws what it is given.
@@ -191,6 +264,35 @@ rows, select some for a bulk action, or page through a long result. Use
 - **The bulk bar is the Section toolbar's selected state.** Swap the Section's `toolbar` for `TableBulkActions` while rows are selected. The table never draws a toolbar of its own.
 - **Pin the head row with `stickyHeader` and `maxHeight`.** Only a bounded region scrolls, so the head row needs a height to pin within.
 - **Freeze with `isFrozen`.** The first column stays put, and with checkboxes the title column beside them stays put too.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Label a column with the noun it holds: "Session date".</td><td>Label a column with a sentence or an instruction.</td></tr>
+<tr><td>Say what is missing when a table is empty: "No sessions yet".</td><td>Leave an empty table blank.</td></tr>
+<tr><td>Write the footer as a range: "1–3 of 3".</td><td>Write "Showing results".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Sorting is announced.** A sortable header carries `aria-sort` (`none`, `ascending` or `descending`) and holds a real button, so a keyboard reaches it with Tab and a press asks for the next sort.
+- **Focus is a ring.** The ring is inset in the cell and is at least 3:1 on the surface; focus never changes the fill.
+- **The arrow is decorative.** The sort state is in `aria-sort`, so color and the arrow never carry it alone.
+- **A disabled row is announced.** It is `aria-disabled` and takes no pointer events.
+- **Row selection is named and announced.** Each checkbox is "Select row N" and the head's is "Select all rows", mixed when only some rows are selected; a status says how many are selected, from the first one.
 
 </div>
 

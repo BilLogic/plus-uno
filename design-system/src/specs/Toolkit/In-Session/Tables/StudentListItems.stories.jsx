@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Button from '@/components/forms-and-inputs/Button';
 import StatusTag from '@/components/labels/StatusTag';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -44,7 +45,7 @@ A 10-column grid table used to display student information with name, status, pr
  */
 const positiveIcon = (
     <i
-        className="fa-solid fa-circle-check"
+        className={iconClass('circle-check')}
         style={{ color: 'var(--color-success)', fontSize: '10px' }}
     />
 );
@@ -54,7 +55,7 @@ const positiveIcon = (
  */
 const negativeIcon = (
     <i
-        className="fa-solid fa-triangle-exclamation"
+        className={iconClass('triangle-exclamation')}
         style={{ color: 'var(--color-danger)', fontSize: '10px' }}
     />
 );
@@ -64,7 +65,7 @@ const negativeIcon = (
  */
 const SortIcon = () => (
     <i
-        className="fa-solid fa-arrow-up"
+        className={iconClass('arrow-up')}
         style={{
             fontSize: 'var(--font-size-fa-b3-solid, 10px)',
             color: 'var(--ds-icon-subtle)',
@@ -303,10 +304,7 @@ export const ListItemRow = ({
                 ) : (
                     <span
                         className="body3-txt"
-                        style={{
-                            color: 'var(--ds-text)',
-                            opacity: 0.38,
-                        }}
+                        style={{ color: 'var(--ds-text-subtle)' }}
                     >
                         No Insights Available
                     </span>

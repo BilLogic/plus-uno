@@ -59,7 +59,7 @@ describe('FileUpload', () => {
     it('shows the files but offers no way to choose one when read-only', () => {
         const onChange = vi.fn();
         const { container } = render(
-            <FileUpload label="Recording" readOnly onChange={onChange}>
+            <FileUpload label="Recording" isReadOnly onChange={onChange}>
                 <span>zoom_0.mp4</span>
             </FileUpload>
         );

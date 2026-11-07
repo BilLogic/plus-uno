@@ -22,9 +22,17 @@
 // uno-bot's own messages never reach it: the sweep hands over human messages
 // only.
 //
-// WHAT THE JUDGE'S PARSE REFUSES: "done" with no evidence message it was
-// shown, and "done" under the floor. A refusal means "not shown done", and the
-// reminder goes out.
+// THE JUDGE ANSWERS ONE OF THREE: Done (delivered), No longer needed
+// (someone said so — "all good", "no need", "he's aware" — or its moment has
+// passed: a call, review or meeting whose time is gone) or Still open. Only
+// Still open gets a reminder. It reads the messages after the promise oldest
+// first, as many as fit, so the reply most likely to settle it — the next one
+// — is never the one left out.
+//
+// WHAT THE JUDGE'S PARSE REFUSES: Done, or No longer needed because someone
+// said so, with no message it was shown as evidence; any answer under the
+// floor; anything off the shape. A refusal is Still open, and the reminder
+// goes out: better to ask than to be late.
 //
 // PURE: the provider is a parameter, so tests replay recorded replies through
 // the fake adapter (tests/commitment-detector.test.ts, and the eval cases in
@@ -79,13 +87,16 @@ export const COMMITMENT_DETECTOR_SYSTEM = [
 ].join("\n");
 
 export const EVIDENCE_JUDGE_SYSTEM = [
-  "You decide whether a promise made in Slack has been kept, from what was said and linked after it.",
-  "Kept means the messages or sources show the thing delivered: the link shared, the page or file updated, the promiser or the requester saying it is done.",
-  "Not kept: silence, a partial step, a new promise, or talk about the task.",
+  "You decide where a promise made in Slack stands, from everything said and linked after it. Read every message after the promise, oldest first.",
+  "Answer one of three:",
+  "- done: the messages or sources show the thing delivered — the link shared, the page or file updated, the promiser or the requester saying it is done.",
+  "- no_longer_needed: someone said it isn't needed any more (\"all good\", \"no need\", \"he's aware\", \"never mind\", the request called off), or its moment has passed: a call, review or meeting it was for, whose time is now gone.",
+  "- still_open: anything else — silence, a partial step, a new promise, talk about the task, or when you are not sure.",
   "Reply with JSON only, no prose, in exactly this shape:",
-  '{"done":true|false,"evidence_ts":["…"],"confidence":0.0}',
-  "- evidence_ts: the ts of the messages that show it done; empty when not done.",
-  "- confidence: 0 to 1 that it is done.",
+  '{"answer":"done"|"no_longer_needed"|"still_open","reason":"said"|"time_passed"|null,"evidence_ts":["…"],"confidence":0.0}',
+  "- reason: for no_longer_needed, \"said\" when a message says so, \"time_passed\" when its moment is gone; null otherwise.",
+  "- evidence_ts: the ts of the messages that show it done or no longer needed; empty for still_open and for time_passed.",
+  "- confidence: 0 to 1 that your answer is right.",
 ].join("\n");
 
 /** One validated promise. */
@@ -124,9 +135,20 @@ export interface EvidenceInput {
   promiseTs: string;
   messages: SweepMessage[];
   sources: SweepSource[];
+  /** The morning's clock, epoch ms: what a call's or a review's moment is
+   *  measured against. Absent, the prompt names no time. */
+  now?: number;
 }
 
-export type EvidenceVerdict = { ok: true; done: boolean; evidenceTs: string[] } | { ok: false; error: string };
+/** Where a promise stands, as the judge reads it. */
+export type PromiseAnswer = "done" | "no-longer-needed" | "still-open";
+
+/** Why a promise is no longer needed: someone said so, or its moment passed. */
+export type ReleaseReason = "said" | "time-passed";
+
+export type EvidenceVerdict =
+  | { ok: true; answer: PromiseAnswer; reason?: ReleaseReason; evidenceTs: string[] }
+  | { ok: false; error: string };
 
 /** The judge as the morning takes it. */
 export interface EvidenceJudge {
@@ -251,7 +273,7 @@ export function parseCommitmentReply(text: string, shown: readonly SweepMessage[
  * @param input - The promise and what came after it
  */
 export async function judgeEvidence(provider: ModelProvider, input: EvidenceInput): Promise<EvidenceVerdict> {
-  const shown = withinChars(input.messages, null);
+  const shown = firstWithinChars(input.messages);
   const reply = await provider.generate({
     tier: COMMITMENT_TIER,
     system: EVIDENCE_JUDGE_SYSTEM,
@@ -259,17 +281,49 @@ export async function judgeEvidence(provider: ModelProvider, input: EvidenceInpu
     maxTokens: MAX_TOKENS,
   });
   if (!reply.ok) return { ok: false, error: reply.message };
-  const raw = jsonObjectIn(reply.text) as { done?: unknown; evidence_ts?: unknown; confidence?: unknown } | null;
-  const known = new Set(shown.map((m) => m.ts));
-  const evidenceTs = (Array.isArray(raw?.evidence_ts) ? raw.evidence_ts : []).map(str).filter((ts) => known.has(ts));
-  const confidence = typeof raw?.confidence === "number" ? raw.confidence : 0;
-  const done = raw?.done === true && evidenceTs.length > 0 && confidence >= EVIDENCE_CONFIDENCE_FLOOR && confidence <= 1;
-  return { ok: true, done, evidenceTs: done ? evidenceTs : [] };
+  return { ok: true, ...parseJudgeReply(reply.text, shown) };
 }
 
-/** The judge's prompt: the promise, the messages after it, the sources. */
+/** Still open: what the judge answers whenever it is not sure. */
+const STILL_OPEN = { answer: "still-open", evidenceTs: [] } as const;
+
+/**
+ * The judge's reply, validated against the messages it was shown. Done, or
+ * No longer needed because someone said so, must name a message it was shown;
+ * every answer must clear the floor. Anything else is Still open.
+ *
+ * @param text - The model's reply
+ * @param shown - The messages it was shown
+ */
+export function parseJudgeReply(text: string, shown: readonly SweepMessage[]): { answer: PromiseAnswer; reason?: ReleaseReason; evidenceTs: string[] } {
+  const raw = jsonObjectIn(text) as { answer?: unknown; reason?: unknown; evidence_ts?: unknown; confidence?: unknown } | null;
+  if (!raw) return { ...STILL_OPEN, evidenceTs: [] };
+  const known = new Set(shown.map((m) => m.ts));
+  const evidenceTs = (Array.isArray(raw.evidence_ts) ? raw.evidence_ts : []).map(str).filter((ts) => known.has(ts));
+  const confidence = typeof raw.confidence === "number" ? raw.confidence : Number.NaN;
+  if (!(confidence >= EVIDENCE_CONFIDENCE_FLOOR) || confidence > 1) return { ...STILL_OPEN, evidenceTs: [] };
+  if (raw.answer === "done" && evidenceTs.length) return { answer: "done", evidenceTs };
+  if (raw.answer === "no_longer_needed") {
+    if (raw.reason === "said" && evidenceTs.length) return { answer: "no-longer-needed", reason: "said", evidenceTs };
+    if (raw.reason === "time_passed") return { answer: "no-longer-needed", reason: "time-passed", evidenceTs };
+  }
+  return { ...STILL_OPEN, evidenceTs: [] };
+}
+
+/** A time as the judge's prompt names it, in ET: "Wed Oct 14, 12:07 PM ET". */
+function etMoment(at: number): string {
+  return `${new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", weekday: "short", month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }).format(new Date(at))} ET`;
+}
+
+/** The judge's prompt: the promise and when it was made, the time now, the
+ *  messages after it, the sources. */
 export function evidencePrompt(input: EvidenceInput): string {
-  const lines = [`PROMISE: <@${input.promiser}> said they'd ${input.what} (message ${input.promiseTs}).`, "", "SINCE (oldest first):"];
+  const made = Number(input.promiseTs) * 1000;
+  const when = [
+    ...(Number.isFinite(made) ? [`MADE: ${etMoment(made)}`] : []),
+    ...(input.now !== undefined ? [`NOW: ${etMoment(input.now)}`] : []),
+  ];
+  const lines = [`PROMISE: <@${input.promiser}> said they'd ${input.what} (message ${input.promiseTs}).`, ...when, "", "SINCE (oldest first):"];
   for (const m of input.messages) lines.push(`[${m.ts}] <@${m.user}>: ${cap(m.text, MAX_MESSAGE_CHARS)}`);
   input.sources.forEach((s, i) => {
     lines.push("", `SOURCE ${i + 1} — ${s.title}`, `url: ${s.url}`, cap(s.text, MAX_SOURCE_CHARS));
@@ -297,6 +351,20 @@ function withinChars(messages: readonly SweepMessage[], rootTs: string | null): 
     kept.unshift(m);
   }
   return root ? [root, ...kept] : kept;
+}
+
+/** The messages after a promise, oldest first, as many as fit: the first
+ *  replies are the ones most likely to settle it, so the newest are left out. */
+function firstWithinChars(messages: readonly SweepMessage[]): SweepMessage[] {
+  const sorted = [...messages].sort((a, b) => Number(a.ts) - Number(b.ts));
+  let left = MAX_COMMITMENT_THREAD_CHARS;
+  const kept: SweepMessage[] = [];
+  for (const m of sorted) {
+    if (detectorChars(m) > left) break;
+    left -= detectorChars(m);
+    kept.push(m);
+  }
+  return kept;
 }
 
 function isNew(ts: string, since: string): boolean {

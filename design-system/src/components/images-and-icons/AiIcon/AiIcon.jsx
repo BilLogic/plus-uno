@@ -35,7 +35,7 @@ const AiIcon = ({ name = 'generate', size = 16, label, className = '', style, ..
         drawn = 16;
     }
     const { viewBox, paths, fillRule } = bySize[drawn];
-    const classes = ['plus-ai-icon', className].filter(Boolean).join(' ');
+    const classes = ['plus-ai-icon', `plus-ai-icon--${drawn}`, className].filter(Boolean).join(' ');
     // After the spread, so a caller's role or aria-hidden cannot contradict `label`.
     const accessibility = label
         ? { role: 'img', 'aria-label': label, 'aria-hidden': undefined }

@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import StatusTag from '@/components/labels/StatusTag';
+import { iconClass } from '../../../../../lib/icon';
 
 /**
  * StudentTag — a "PLUS Tag": a tonal pill labeling a student on one dimension
@@ -14,8 +15,8 @@ import StatusTag from '@/components/labels/StatusTag';
  * every student tag renders from one place.
  */
 const SIGNAL_ICON = {
-    positive: <i className="fa-solid fa-circle-check" style={{ color: 'var(--color-success)', fontSize: '10px' }} aria-hidden="true"></i>,
-    negative: <i className="fa-solid fa-triangle-exclamation" style={{ color: 'var(--color-danger)', fontSize: '10px' }} aria-hidden="true"></i>,
+    positive: <i className={iconClass('circle-check')} style={{ color: 'var(--color-success)', fontSize: '10px' }} aria-hidden="true"></i>,
+    negative: <i className={iconClass('triangle-exclamation')} style={{ color: 'var(--color-danger)', fontSize: '10px' }} aria-hidden="true"></i>,
     neutral: null,
 };
 

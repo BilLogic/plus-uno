@@ -194,6 +194,22 @@ DefaultSize.play = async ({ canvasElement }) => {
     await expectRendered(within(canvasElement).getByTestId('default'), 'mastering-content', 96);
 };
 
+/* ------------------------------------------------------------------ state */
+
+/** A character is a picture, not a control: its one state is at rest. */
+export const Rest = {
+    render: () => (
+        <div style={{ padding: '48px 96px 96px' }}>
+            <Illustration character="advocacy" title="Advocacy" size={96} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const el = within(canvasElement).getByRole('img', { name: 'Advocacy' });
+        await expect(el).not.toHaveAttribute('tabindex');
+        await expect(getComputedStyle(el).cursor).not.toBe('pointer');
+    },
+};
+
 /* --------------------------------------------------------- accessibility */
 
 export const Decorative = () => <Illustration character="pi" data-testid="pi" />;

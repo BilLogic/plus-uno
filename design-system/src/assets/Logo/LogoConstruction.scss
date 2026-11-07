@@ -1,0 +1,57 @@
+/* Logo construction drawing (docs only). Guides: danger border; labels: subtle text.
+   Label size, halo width and dash opacities are SVG user units of the 560 by 460 drawing, not page pixels. */
+
+.plus-logo-construction {
+    position: relative;
+    width: 100%;
+    max-width: calc(var(--card-min-width-sm) * 2.5);
+    aspect-ratio: 560 / 460;
+}
+
+/* The mark fills its slot in the drawing: 396 of 560 across, inset 80 and 20. */
+.plus-logo-construction__mark {
+    position: absolute;
+    left: calc(80 / 560 * 100%);
+    top: calc(20 / 460 * 100%);
+    width: calc(396 / 560 * 100%);
+    aspect-ratio: 1;
+}
+
+.plus-logo-construction__logo,
+.plus-logo-construction__logo > svg {
+    width: 100%;
+    height: 100%;
+}
+
+.plus-logo-construction__overlay {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+}
+
+.plus-logo-construction__grid,
+.plus-logo-construction__long,
+.plus-logo-construction__short,
+.plus-logo-construction__line {
+    fill: none;
+    stroke: var(--ds-border-danger);
+    stroke-width: var(--border-default);
+    vector-effect: non-scaling-stroke;
+}
+
+.plus-logo-construction__grid { stroke-dasharray: 2 3; opacity: 0.28; }
+.plus-logo-construction__long { stroke-dasharray: 6 4; opacity: 0.75; }
+.plus-logo-construction__short { stroke-dasharray: 2 2; opacity: 0.75; }
+.plus-logo-construction__dot { fill: var(--ds-border-danger); }
+
+.plus-logo-construction__label {
+    fill: var(--ds-text-subtle);
+    font: var(--code);
+    font-size: 11px;
+    paint-order: stroke;
+    stroke: var(--ds-surface);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+}

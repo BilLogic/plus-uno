@@ -1,4 +1,8 @@
 import React from 'react';
+import { expect, waitFor, within } from 'storybook/test';
+import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
+import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Tooltip from '@/components/overlays-and-layering/Tooltip';
 import Button from '@/components/forms-and-inputs/Button';
@@ -41,14 +45,14 @@ export default {
 const containerStyle = {
     display: 'flex',
     flexWrap: 'wrap',
-    padding: '40px 20px',
+    padding: 'var(--space-250) var(--space-125)',
     backgroundColor: 'var(--ds-surface)',
-    borderRadius: '12px',
+    borderRadius: 'var(--radius-075)',
     border: '1px solid var(--ds-border)',
 };
 
 const blockStyle = {
-    margin: '40px 60px',
+    margin: 'var(--space-250) var(--space-400)',
 };
 
 function TooltipVariantsDemos() {
@@ -83,7 +87,7 @@ function TooltipVariantsDemos() {
 }
 
 export const Placements = () => (
-    <div style={{ marginBottom: '60px' }}>
+    <div style={{ marginBottom: 'var(--space-400)' }}>
         <TooltipVariantsDemos />
     </div>
 );
@@ -93,7 +97,7 @@ const tooltipPlaygroundPadding = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    minHeight: '120px',
+    minHeight: 'calc(var(--space-100) * 7.5)',
 };
 
 export const Interactive = {
@@ -131,4 +135,74 @@ export const Overview = {
             source: { language: 'jsx', code: webAppSourceSnippets.tooltip }
         }
     }
+};
+
+/** The tooltip portals out of the canvas, so the state stories read it from the document. */
+const openTooltip = async (canvasElement) => {
+    const doc = canvasElement.ownerDocument;
+    await waitFor(() => expect(doc.querySelector('[role="tooltip"]')).not.toBeNull());
+    return doc.querySelector('[role="tooltip"]');
+};
+
+const StateTooltip = () => (
+    <div style={tooltipPlaygroundPadding}>
+        <Tooltip text="Opens the session notes" show>
+            <Button appearance="default" text="Notes" />
+        </Tooltip>
+    </div>
+);
+
+/** Rest: the inverse neutral fill with inverse text, lifted by the overlay shadow. */
+export const Rest = {
+    render: () => <StateTooltip />,
+    play: async ({ canvasElement }) => {
+        const tip = await openTooltip(canvasElement);
+        const style = getComputedStyle(tip);
+        await expect(style.backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral-bold'));
+        await expect(style.color).toBe(tokenColor(canvasElement, '--ds-text-inverse'));
+        await expect(style.boxShadow).not.toBe('none');
+    },
+};
+
+/** Hovered: the tooltip itself does not react to a pointer. */
+export const Hovered = {
+    render: () => <StateTooltip />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(await openTooltip(canvasElement), ':hover', 'tooltip');
+    },
+};
+
+/** Pressed: nothing changes under a press. */
+export const Pressed = {
+    render: () => <StateTooltip />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(await openTooltip(canvasElement), ':active', 'tooltip');
+    },
+};
+
+/** Focused: the trigger shows the 2px ring; the tooltip is never a focus stop. */
+export const Focused = {
+    render: () => <StateTooltip />,
+    play: async ({ canvasElement }) => {
+        const tip = await openTooltip(canvasElement);
+        await expectFocusRing(canvasElement, within(canvasElement).getByRole('button', { name: 'Notes' }), 'tooltip trigger');
+        await expect(tip.getAttribute('tabindex')).not.toBe('0');
+    },
+};
+
+/** Disabled: an empty `trigger` list turns the tooltip off, so nothing opens. */
+export const Disabled = {
+    render: () => (
+        <div style={tooltipPlaygroundPadding}>
+            <Tooltip text="Never shown" trigger={[]}>
+                <Button appearance="default" text="Notes" />
+            </Tooltip>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const button = within(canvasElement).getByRole('button', { name: 'Notes' });
+        button.focus();
+        await new Promise((resolve) => setTimeout(resolve, 500));
+        await expect(canvasElement.ownerDocument.querySelector('[role="tooltip"]')).toBeNull();
+    },
 };

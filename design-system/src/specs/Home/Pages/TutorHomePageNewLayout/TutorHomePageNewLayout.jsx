@@ -12,6 +12,7 @@ import lessonMindset from '@/assets/images/lessons/training-mindset.svg';
 import lessonPraise from '@/assets/images/lessons/training-praise.svg';
 import { cardsPerRow, useGridMeasure, useTokenLength } from './homeGrid';
 import './TutorHomePageNewLayout.scss';
+import { iconClass } from '../../../../lib/icon';
 
 /** The training lessons with art, each titled as its picture is. */
 const LESSONS = [
@@ -135,7 +136,7 @@ const TabLabel = ({ children, after }) => (
 
 TabLabel.propTypes = { children: PropTypes.node, after: PropTypes.node };
 
-const infoGlyph = <i className="fa-solid fa-circle-info plus-home-new__glyph" aria-hidden="true" />;
+const infoGlyph = <i className={`${iconClass('circle-info')} plus-home-new__glyph`} aria-hidden="true" />;
 
 /**
  * TutorHomePageNewLayout: today's tutor Home (the Specs "Skills (Home Page)"

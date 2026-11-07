@@ -6,6 +6,7 @@ import {
     SeeSessionsFillInButton,
     ViewUpdatedScheduleButton
 } from '@/specs/Toolkit/Pre-Session/Elements/CTATutorViewButtons.stories';
+import { iconClass } from '../../../../../lib/icon';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Modals/Call-Offs',
@@ -64,7 +65,7 @@ export const CallOff_Confirmation = () => (
                 <div className="d-flex flex-column align-items-center text-center" style={{ gap: 'var(--size-modal-gap-md)' }}>
                     {/* Clock Icon - using same size as withdraw request modal */}
                     <i
-                        className="fa-solid fa-clock"
+                        className={iconClass('clock')}
                         style={{
                             fontSize: 'var(--font-size-fa-huge-solid, 8rem)',
                             lineHeight: 1,

@@ -45,6 +45,7 @@
 import React, { useState } from 'react';
 import Range from '@/components/forms-and-inputs/Range';
 import Button from '@/components/forms-and-inputs/Button/Button';
+import { iconClass } from '../../../lib/icon';
 
 export default {
     title: 'Specs/Profile/Modals/Preview Image',
@@ -78,7 +79,7 @@ const ProfileImagePlaceholder = ({ zoom = 50 }) => {
             }}
         >
             <i
-                className="fa-solid fa-user"
+                className={iconClass('user')}
                 style={{
                     fontSize: `${48 * scale}px`,
                     color: 'var(--ds-icon-subtle)',
@@ -263,7 +264,7 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
                     }}
                 >
                     <i
-                        className="fa-solid fa-minus"
+                        className={iconClass('minus')}
                         style={{
                             fontSize: '14px',
                             color: 'var(--color-primary)',
@@ -293,7 +294,7 @@ const PreviewImageModal = ({ zoomValue = 49, isLoading = false, interactive = fa
                             style={{ flex: '1 0 0' }}/>
                     )}
                     <i
-                        className="fa-solid fa-plus"
+                        className={iconClass('plus')}
                         style={{
                             fontSize: '14px',
                             color: 'var(--color-primary)',

@@ -27,6 +27,10 @@ import { documents } from './lib/corpus.mjs';
 import { AUTHORED_SECTIONS, authoredCoverage } from './lib/authored-coverage.mjs';
 import { resolveNamedOneOf } from './doc-identifiers.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
+import { extractExports } from './lib/barrel-exports.js';
+import { buildComponentsManifest, serializeManifest } from './lib/agent-manifests.mjs';
+import { AGENT_ROOT } from './agent-views-paths.js';
+import { enumValuesOf } from './lib/enum-values.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -200,6 +204,7 @@ function parsePropTypes(source, name) {
     const oneOf = type.match(/PropTypes\.oneOf\(\[([\s\S]*?)\]\)/);
     props.push({
       name: m[1],
+      raw: type,
       type: prettyType(type),
       description,
       enumValues: oneOf
@@ -211,11 +216,16 @@ function parsePropTypes(source, name) {
 }
 
 function prettyType(raw) {
-  if (/PropTypes\.oneOf\(\[/.test(raw)) return 'enum';
-  if (/PropTypes\.oneOfType/.test(raw)) {
-    const inner = [...raw.matchAll(/PropTypes\.(\w+)/g)].map((m) => m[1]).filter((t) => t !== 'oneOfType');
+  // A union is read first: `oneOfType([string, oneOf([false])])` holds an
+  // inline oneOf but is not an enum.
+  if (/^PropTypes\.oneOfType/.test(raw)) {
+    const inner = [...raw.matchAll(/PropTypes\.(\w+)/g)]
+      .map((m) => m[1])
+      .filter((t) => t !== 'oneOfType')
+      .map((t) => (t === 'oneOf' ? 'enum' : t));
     return [...new Set(inner)].join(' or ');
   }
+  if (/PropTypes\.oneOf\(\[/.test(raw)) return 'enum';
   const simple = raw.match(/PropTypes\.(\w+)/);
   let t = simple ? simple[1] : raw;
   if (/\.isRequired/.test(raw)) t += ' (required)';
@@ -322,6 +332,9 @@ function discover() {
 }
 
 const readIf = (p) => (fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : '');
+const readOrNull = (p) => (fs.existsSync(p) && fs.statSync(p).isFile() ? fs.readFileSync(p, 'utf8') : null);
+/** The import aliases `vite.config.js` declares for design-system source. */
+const ENUM_ALIAS = { alias: { '@plus-ds': path.join(REPO_ROOT, 'design-system/src'), '@': path.join(REPO_ROOT, 'design-system/src') } };
 const rel = (p) => path.relative(REPO_ROOT, p).replace(/\\/g, '/');
 
 /* ----------------------------------------------------------------- emitting */
@@ -426,7 +439,24 @@ function componentDoc(c, siblings) {
     d += `\n> Authored guidance is partial — missing: ${missing.map((m) => m.label.toLowerCase()).join(', ')} (#166).\n`;
   }
 
-  return { doc: d, coverage, propCount: props.length };
+  const manifestEntry = {
+    name: c.name,
+    group: path.basename(c.flat ? c.dir : path.dirname(c.dir)),
+    source: rel(c.jsx),
+    summary: jsdoc || null,
+    // An enum whose list lives in another file is read there, so a checker can
+    // hold the prop to it (scripts/lib/enum-values.mjs).
+    // A union (`oneOfType([oneOf([...]), number])`) also accepts its other
+    // members, so its listed values are not the whole set: no list is given.
+    props: props.map((p) => {
+      if (/^PropTypes\.oneOfType/.test(p.raw)) return { ...p, enumValues: null };
+      if (p.enumValues && p.enumValues.length) return p;
+      return { ...p, enumValues: enumValuesOf(p.raw, c.jsx, readOrNull, ENUM_ALIAS) };
+    }),
+    defaults,
+    descriptions,
+  };
+  return { doc: d, coverage, propCount: props.length, manifestEntry };
 }
 
 function groupIndex(group, results) {
@@ -464,6 +494,7 @@ function groupIndex(group, results) {
 
 const groups = discover();
 const written = [];
+const manifestEntries = [];
 let stale = 0;
 
 for (const group of groups) {
@@ -476,9 +507,28 @@ for (const group of groups) {
     results[c.name] = built;
     const out = c.flat ? path.join(c.dir, `${c.name}.md`) : path.join(c.dir, 'index.md');
     written.push([out, built.doc]);
+    manifestEntries.push(built.manifestEntry);
   }
 
   written.push([path.join(group.dir, 'index.md'), groupIndex(group, results)]);
+}
+
+/**
+ * The machine copy of the same facts, for checkers and the eval
+ * (`scripts/lib/agent-manifests.mjs`). Keyed to the barrel, so it lists exactly
+ * what `agent-views/components/index.md` lists.
+ */
+{
+  const barrel = path.join(COMPONENTS_ROOT, 'index.js');
+  const exports = extractExports(barrel, {
+    repoRoot: REPO_ROOT,
+    boundary: COMPONENTS_ROOT,
+    onUnresolved: (spec) => fail(`components barrel: cannot resolve \`export * from '${spec}'\``),
+  });
+  // The design system ships from this repo's root package; its version is the one to stamp.
+  const { version } = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
+  const manifest = buildComponentsManifest({ exports, components: manifestEntries, version });
+  written.push([path.join(AGENT_ROOT, 'components.json'), serializeManifest(manifest, 'npm run generate:agent')]);
 }
 
 /**

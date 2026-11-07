@@ -430,8 +430,8 @@ export const Invalid = () => (
             label="Topics"
             options={TOPICS}
             required
-            validation="invalid"
-            validationMessage="Pick at least one topic"
+            isInvalid
+            errorMessage="Pick at least one topic"
         />
     </div>
 );
@@ -783,8 +783,8 @@ export const Interactive = {
         spacing: 'default',
         disabled: false,
         readOnly: false,
-        validation: 'none',
-        validationMessage: 'Pick at least one topic',
+        isInvalid: false,
+        errorMessage: 'Pick at least one topic',
     },
     argTypes: {
         label: { control: 'text', description: 'Names the field.', table: { category: 'Content' } },
@@ -793,8 +793,8 @@ export const Interactive = {
         spacing: { control: 'radio', options: ['default', 'compact'], description: 'Field spacing', table: { category: 'Design' } },
         disabled: { control: 'boolean', table: { category: 'Behavior' } },
         readOnly: { control: 'boolean', table: { category: 'Behavior' } },
-        validation: { control: 'radio', options: ['none', 'invalid'], table: { category: 'Behavior' } },
-        validationMessage: { control: 'text', table: { category: 'Content' } },
+        isInvalid: { control: 'boolean', table: { category: 'Behavior' } },
+        errorMessage: { control: 'text', table: { category: 'Content' } },
         onCreateSpy: { table: { disable: true } },
     },
     render: (args) => <div style={stack}><Owned {...args} caption={args.caption || undefined} /></div>,

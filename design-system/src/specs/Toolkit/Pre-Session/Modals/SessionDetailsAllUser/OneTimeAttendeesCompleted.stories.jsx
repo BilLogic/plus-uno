@@ -9,6 +9,7 @@ import {
     RequestCallOffButton,
     JoinSessionButton,
 } from '@/specs/Toolkit/Pre-Session/Elements/CTATutorViewButtons.stories';
+import { iconClass } from '../../../../../lib/icon';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Modals/Session Details (All User)',
@@ -84,7 +85,7 @@ const TutorPanel = ({ tutorName, studentCount, students = [] }) => (
             >
                 {tutorName}
             </span>
-            <StatusTag appearance="info" leadingVisual={<i className="fa-solid fa-users" />}>{String(studentCount)}</StatusTag>
+            <StatusTag appearance="info" leadingVisual={<i className={iconClass('users')} />}>{String(studentCount)}</StatusTag>
         </div>
 
         {/* Panel Content - Student Rows */}

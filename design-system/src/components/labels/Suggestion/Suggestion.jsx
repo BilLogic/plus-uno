@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { useTagContext } from '../Tag';
 import './Suggestion.scss';
+import { iconClass } from '../../../lib/icon';
 
 /**
  * `Suggestion` — a value the system proposes that a person can accept, such as
@@ -27,8 +28,8 @@ export const SUGGESTION_TYPES = ['insert', 'prompt'];
 
 /** The glyph says which kind of proposal it is; the name says what it does. */
 const ICONS = {
-    insert: 'fa-plus',
-    prompt: 'fa-wand-magic-sparkles',
+    insert: 'plus',
+    prompt: 'wand-magic-sparkles',
 };
 
 export const Suggestion = ({
@@ -76,7 +77,7 @@ export const Suggestion = ({
                 onAccept?.(isPrompt ? (text ?? label) : (value ?? label), e);
             }}
         >
-            <i className={`fa-solid ${ICONS[kind]} plus-suggestion__icon`} aria-hidden="true" />
+            <i className={`${iconClass(ICONS[kind])} plus-suggestion__icon`} aria-hidden="true" />
             <span className="plus-suggestion__label">{label}</span>
         </button>
     );

@@ -4,6 +4,7 @@ import PatternCard from '@/patterns/PatternCard';
 import Button from '@/components/forms-and-inputs/Button';
 import SmartTag from '@/components/labels/SmartTag';
 import './ResourceCard.scss';
+import { iconClass } from '../../../../lib/icon';
 
 /**
  * ResourceCard component for Home page
@@ -45,7 +46,7 @@ const ResourceCard = ({
             {/* Subtitle with type icon */}
             {subtitle && (
                 <div className="plus-resource-card-subtitle">
-                    <i className={`fas fa-${getTypeIcon()}`} aria-hidden="true"></i>
+                    <i className={iconClass(getTypeIcon())} aria-hidden="true"></i>
                     <span className="body3-txt">{subtitle}</span>
                 </div>
             )}
@@ -60,7 +61,7 @@ const ResourceCard = ({
                 </div>
                 {status === 'completed' && (
                     <div className="plus-resource-card-status">
-                        <i className={`fas fa-${getStatusIcon()}`} aria-hidden="true"></i>
+                        <i className={iconClass(getStatusIcon())} aria-hidden="true"></i>
                     </div>
                 )}
             </div>

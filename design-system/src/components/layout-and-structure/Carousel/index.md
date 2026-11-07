@@ -18,7 +18,7 @@ Rotates through a set of slides, with controls, indicators, captions, and a paus
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `slides` | arrayOf or shape or string or node | `[]` | — |
+| `slides` | arrayOf (required) | `[]` | — |
 | `activeIndex` | number | — | — |
 | `onSelect` | func | — | — |
 | `controls` | bool | `true` | Show previous/next navigation controls |

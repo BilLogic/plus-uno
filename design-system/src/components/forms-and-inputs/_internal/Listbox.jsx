@@ -14,6 +14,7 @@ import Spinner from '@/components/loading/Spinner/Spinner';
 import OptionRow from './OptionRow';
 import { popupLayerOf, useAnchoredPopup } from './anchorPlacement';
 import './Listbox.scss';
+import { iconClass } from '../../../lib/icon';
 
 /** Past this many options, only the rows on screen are drawn. */
 export const VIRTUALIZE_ABOVE = 100;
@@ -469,7 +470,7 @@ const Listbox = ({
 export const ListboxMessage = ({ kind, children }) => (
     <div className={`plus-listbox-message plus-listbox-message--${kind}`} role="presentation">
         {kind === 'loading' && <Spinner size={16} label="" />}
-        {kind === 'error' && <i className="fa-solid fa-circle-exclamation" aria-hidden="true" />}
+        {kind === 'error' && <i className={iconClass('circle-exclamation')} aria-hidden="true" />}
         <span>{children}</span>
     </div>
 );

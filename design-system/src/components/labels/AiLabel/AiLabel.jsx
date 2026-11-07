@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './AiLabel.scss';
+import { iconClass } from '../../../lib/icon';
 
 /**
  * `AiLabel` — this came from the agent, and here is how much to trust it (#269).
@@ -114,7 +115,7 @@ export const AiLabel = ({
               * decorative because the words beside it already say what it means
               * — announcing "wand" would add a shape, not information.
               */}
-            <i className="fa-solid fa-wand-magic-sparkles plus-ai-label__mark" aria-hidden="true" />
+            <i className={`${iconClass('wand-magic-sparkles')} plus-ai-label__mark`} aria-hidden="true" />
             <span className="plus-ai-label__text">{label}</span>
             {lowConfidence && (
                 <span className="plus-ai-label__note">

@@ -551,6 +551,16 @@ export const CHECKS = [
       'files reading a retired token name (--size-element-*, --element-*, --layout-*, --overlay-* and the rest of RETIRED_TOKENS in scripts/lib/tokens/plan.mjs), counted per file in design-system/src, prototypes and src. The declarations are gone, so the record is empty and holds at zero; a file that reads one fails, and `npm run check:old-size-tokens -- --update` refuses to write a rise. Reads the record through `scripts/lib/ratchet.mjs`.',
   },
   {
+    name: 'check:ds-usage',
+    script: 'node scripts/check-ds-usage.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-ds-usage.mjs',
+    baseline: 'scripts/baselines/ds-usage.json',
+    guards:
+      'escapes from the design system in consumer code (prototypes/, src/): a component the barrel does not export, a deep import, an unknown prop or enum value, a raw literal, an unknown or primitive token, a Font Awesome Pro icon (ADR-039). Read from the generated manifests in design-system/agent-views/. Each finding names its rule ID and what to write instead (docs/engineering/ds-usage-rules.md). Here it runs as `--all`: a `<rule> <path>` count may fall and never rise, and `npm run check:ds-usage -- --update` records a fall and refuses a rise. Run on changed files or named paths, every file is held to zero.',
+  },
+  {
     name: 'check:no-primitive-reads',
     script: 'node scripts/check-no-primitive-reads.mjs',
     pkg: 'root',
@@ -707,7 +717,7 @@ export const CHECKS = [
   },
   {
     name: 'test:scripts',
-    script: 'node --test scripts/*.test.mjs scripts/lib/*.test.mjs scripts/lib/color/*.test.mjs',
+    script: 'node --test scripts/*.test.mjs scripts/lib/*.test.mjs scripts/lib/color/*.test.mjs netlify/functions/docs-agent/*.test.mjs',
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',

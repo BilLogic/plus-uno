@@ -597,6 +597,13 @@ function viewOnlyRefusal(block: Shape): string | null {
     if (ticked.some((o) => !isShape(o) || !values.has(o.value))) return "checkboxes opening ticked on an option they do not offer";
     return null;
   }
+  if (element.type === "datepicker") {
+    // The date picker reference: initial_date, when given, is YYYY-MM-DD.
+    if (element.initial_date !== undefined && !/^\d{4}-\d{2}-\d{2}$/.test(String(element.initial_date))) {
+      return `a date picker opening on ${String(element.initial_date)}`;
+    }
+    return null;
+  }
   return `an input of ${String(element.type)}`;
 }
 

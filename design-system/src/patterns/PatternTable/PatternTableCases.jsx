@@ -3,6 +3,7 @@ import PatternTable from '@/patterns/PatternTable';
 import PatternSection from '@/patterns/PatternSection';
 import { Checkbox, Pagination, IconButton, DynamicTable, TableBulkActions, TreeTable } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
+import { iconClass } from '../../lib/icon';
 
 /**
  * The examples of "Which table?": one pair per table type, each side built
@@ -21,7 +22,7 @@ const unstyled = (Case) => {
 
 const numeric = { textAlign: 'right' };
 const subtle = { color: 'var(--ds-text-subtle)' };
-const icon = (name) => <i className={`fa-solid fa-${name}`} aria-hidden="true" style={{ fontSize: 'var(--icon-sm)' }} />;
+const icon = (name) => <i className={iconClass(name)} aria-hidden="true" style={{ fontSize: 'var(--icon-sm)' }} />;
 
 const SortHead = ({ children, sort, align }) => (
     <th aria-sort={sort === 'up' ? 'ascending' : undefined} style={align}>

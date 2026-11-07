@@ -94,6 +94,9 @@ import { runTryAgainDoor } from "./try-again";
 import { TRY_AGAIN_ACTION_ID } from "./failure-message";
 import { handleReminderButton } from "./gate";
 import { REMINDER_ACTION_PREFIX, type ReminderOutcome } from "../commitments/copy";
+import { promiseDoorFor } from "../commitments/env";
+import { PROMISE_ACTION_PREFIX } from "../commitments/promise-cards";
+import { isPromiseView, pressPromise, promiseViewErrors, submitPromiseView } from "../commitments/promise-door";
 import { tapReply } from "../commitments/press";
 import { FEEDBACK_ACTION_ID, FEEDBACK_VIEW_CALLBACK_ID, feedbackAckFor, type FeedbackViewState } from "./feedback";
 import { runFeedbackReason, runFeedbackTap, type FeedbackDoorDeps } from "./feedback-door";
@@ -199,6 +202,7 @@ export function handleInteraction(
         return ack ? Response.json(ack) : new Response("", { status: 200 });
       }
       if (isWhichCallback(callbackId)) return submitWhich(env, payload, ctx);
+      if (isPromiseView(callbackId)) return submitPromise(env, payload, ctx);
       return submitReview(env, payload, ctx);
     }
     default:
@@ -240,6 +244,7 @@ async function dispatchAction(env: Env, actionId: string, payload: InteractionPa
   if (actionId === DM_WATCH_ACTION_ID) return saveDmWatch(env, payload);
   if (actionId === FEEDBACK_ACTION_ID) return feedbackFromButton(env, payload);
   if (actionId.startsWith(REMINDER_ACTION_PREFIX)) return answerFromButton(env, payload, actionId);
+  if (actionId.startsWith(PROMISE_ACTION_PREFIX)) return answerPromiseCard(env, payload, actionId);
   // No silent catch-all. This used to fall through to the feedback handler,
   // which meant an action_id nobody had wired reached a function that ignored
   // it — a dead button that looked alive. Say so in the log instead.
@@ -268,6 +273,53 @@ async function answerFromButton(env: Env, payload: InteractionPayload, actionId:
   const line = tapReply(outcome);
   console.log(`[interactive] reminder ${glyph} on ${channel}/${messageTs} by=${userId} outcome=${JSON.stringify(outcome)}`);
   if (line) await replyEphemeral(payload, line);
+}
+
+// A promise card's button (`commitments/promise-door.ts`): an answer, or a
+// pop-up opened on the click's trigger. A press that changed nothing tells the
+// presser why, to them alone, as a reminder's button does.
+async function answerPromiseCard(env: Env, payload: InteractionPayload, actionId: string): Promise<void> {
+  const channel = payload.channel?.id;
+  const messageTs = payload.message?.ts;
+  const userId = payload.user?.id;
+  const deps = promiseDoorFor(env);
+  if (!channel || !messageTs || !userId || !deps) return;
+  const value = payload.actions?.[0]?.value;
+  const outcome = await pressPromise(
+    {
+      channel,
+      messageTs,
+      userId,
+      actionId,
+      ...(value ? { value } : {}),
+      ...(payload.trigger_id ? { triggerId: payload.trigger_id } : {}),
+      ...(payload.message?.blocks ? { blocks: payload.message.blocks } : {}),
+    },
+    deps,
+  );
+  console.log(`[interactive] promise card ${actionId} on ${channel}/${messageTs} by=${userId} outcome=${JSON.stringify(outcome)}`);
+  const line = tapReply(outcome);
+  if (line) await replyEphemeral(payload, line);
+}
+
+/**
+ * A promise pop-up's Save: a day before today is refused under the picker in
+ * the ack; otherwise the pop-up closes and the answer is written after it.
+ */
+function submitPromise(env: Env, payload: InteractionPayload, ctx: ExecutionContext): Response {
+  const view = payload.view;
+  const userId = payload.user?.id;
+  const deps = promiseDoorFor(env);
+  if (!view || !userId || !deps) return new Response("", { status: 200 });
+  const submit = { callbackId: view.callback_id, privateMetadata: view.private_metadata, state: view.state as Parameters<typeof promiseViewErrors>[0]["state"], userId };
+  const errors = promiseViewErrors(submit, Date.now());
+  if (errors) return Response.json({ response_action: "errors", errors });
+  ctx.waitUntil(
+    submitPromiseView(submit, deps)
+      .then((outcome) => console.log(`[interactive] promise ${view.callback_id} by=${userId} outcome=${JSON.stringify(outcome)}`))
+      .catch((err) => console.error(`[interactive] promise ${view.callback_id} failed: ${err instanceof Error ? err.message : String(err)}`)),
+  );
+  return new Response("", { status: 200 });
 }
 
 // ✅ Approve / ⛔ Cancel on a proposal card (2026-08-22).
@@ -523,15 +575,26 @@ async function actOnResults(env: Env, payload: InteractionPayload, action: Resul
  * known until the claim is settled — same reason the reaction door takes a
  * factory rather than an instance.
  */
+/** Subrequests left before a cosmetic delete is spent: the settle's own. */
+const TAKE_BACK_HEADROOM = 4;
+
 function buttonDoorDeps(env: Env, payload: InteractionPayload): ButtonDoorDeps {
   const threadState = threadStateFor(env);
   return {
     threadState,
     standingConfirmers: standingConfirmersOf(env),
     delivery: (target) => slackDelivery(env, target),
-    applyVerdict: (verdict) => executeVerdict(env, verdict),
+    // What the run reports, so a single card's "kicking that off" can go
+    // once its result is in the thread.
+    applyVerdict: (verdict) => runVerdict(env, verdict),
     replyEphemeral: (text) => replyEphemeral(payload, text),
     replaceCard: (message) => replaceCard(payload, message),
+    // Cosmetic, so only while the turn's settle still fits after it.
+    takeBack: async (channel, ts) => {
+      if (budgetHeadroom().subrequests < TAKE_BACK_HEADROOM) return;
+      const res = await deleteMessage(env, channel, ts);
+      if (!res.ok) console.warn(`[interactive] kick-off line ${channel}/${ts} not taken back`);
+    },
     // This door runs inside `waitUntil`, so a re-staged card's preview waits
     // only briefly for the Figma rate budget.
     restage: restageFor(env, threadState),

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import TextField from '@/components/forms-and-inputs/TextField/TextField';
 
 import '../shared/login-field.scss';
+import { iconClass } from '../../../../lib/icon';
 
 /**
  * Institution selection field with caption link for independent registration.
@@ -43,7 +44,7 @@ export function LoginInstitutionField({
             />
 
             <div className="login-field__caption body3-txt">
-                <i className="fa-solid fa-circle-info" aria-hidden="true" />
+                <i className={iconClass('circle-info')} aria-hidden="true" />
                 <span>
                     {captionPrefix}{' '}
                     <button
@@ -107,7 +108,7 @@ export default function InstitutionFormSpec() {
                         color: 'var(--ds-text-subtle)',
                     }}
                 >
-                    <i className="fa-solid fa-circle-info" aria-hidden="true" />
+                    <i className={iconClass('circle-info')} aria-hidden="true" />
                     <span>
                         Are you a new tutor?{' '}
                         <span style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>
@@ -140,7 +141,7 @@ export default function InstitutionFormSpec() {
                         color: 'var(--ds-text-subtle)',
                     }}
                 >
-                    <i className="fa-solid fa-circle-info" aria-hidden="true" />
+                    <i className={iconClass('circle-info')} aria-hidden="true" />
                     <span>
                         Are you a new tutor?{' '}
                         <span style={{ color: 'var(--color-primary)', textDecoration: 'underline' }}>

@@ -97,7 +97,7 @@ describe("an expired card says so", () => {
     assert.equal(notes.length, 1);
     assert.equal(notes[0]!.note.kind, "expired");
     const line = notes[0]!.card ? renderCardNote(notes[0]!.note) : renderGateNote(notes[0]!.note);
-    assert.equal(line, "Expired. Ask again for a fresh card.");
+    assert.equal(line, "Expired with no decision");
     assert.equal(h.ran.length, 0, "nothing ran");
   });
 });
@@ -163,10 +163,10 @@ describe("a card nobody touched says it expired at its deadline", () => {
     assert.equal(edit.channel, CHANNEL);
     assert.equal(edit.ts, CARD_TS);
     const lines = contextLines(edit.blocks);
-    assert.equal(lines.at(-1), "Expired. Ask again for a fresh card.");
+    assert.equal(lines.at(-1), "Expired with no decision");
     assert.ok(!lines.some((l) => l.startsWith("Expires")), "the deadline gives way to the line");
     const buttons = edit.blocks.flatMap((b) => (b.type === "actions" ? b.elements.map((e: Block) => e.text.text) : []));
-    assert.deepEqual(buttons, ["View"]);
+    assert.deepEqual(buttons, ["View card"]);
 
     await onRunnerJob(env(store), job);
     assert.equal(expiryEdits.length, 1, "said once");

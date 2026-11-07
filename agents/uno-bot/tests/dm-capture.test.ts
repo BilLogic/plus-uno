@@ -561,7 +561,7 @@ describe("a DM finding", () => {
       card!.actions.map((a) => [a.text.text, a.action_id ?? a.url]),
       [
         ["Review", `${DECISION_REVIEW_ACTION_PREFIX}${id}`],
-        ["Open page", PAGE.url],
+        ["Open page ↗", PAGE.url],
         ["Open DM", `https://plus.slack.com/archives/${DM_BEA}/p${DECIDED.replace(".", "")}`],
       ],
     );
@@ -598,7 +598,7 @@ describe("a DM finding", () => {
     assert.equal(w.edits.length, 1);
     const [card] = cardsIn(w.edits[0]!.message.blocks);
     assert.equal(card!.subtitle?.text, DM_CARD_NOT_STAGED);
-    assert.deepEqual(card!.actions.map((a) => a.text.text), ["Open page", "Open DM"]);
+    assert.deepEqual(card!.actions.map((a) => a.text.text), ["Open page ↗", "Open DM"]);
     assert.equal(w.kv.get(MAYA)?.[0]?.state, "queued");
   });
 
@@ -856,7 +856,7 @@ describe("the morning post, when Slack or the run falls short", () => {
     assert.equal(report.outcome, "skipped");
     const [card] = cardsIn(w.edits.at(-1)!.message.blocks);
     assert.equal(card!.subtitle?.text, DM_CARD_SWITCHED_OFF);
-    assert.deepEqual(card!.actions.map((a) => a.text.text), ["Open page", "Open DM"]);
+    assert.deepEqual(card!.actions.map((a) => a.text.text), ["Open page ↗", "Open DM"]);
     assert.equal(w.kv.has(MAYA), false);
   });
 
@@ -878,7 +878,7 @@ describe("the morning post, when Slack or the run falls short", () => {
     );
     assert.deepEqual(w.removed, [], "the staged fix stays up");
     const cards = cardsIn(w.edits.at(-1)!.message.blocks);
-    assert.deepEqual(cards.map((c) => c.actions[0]!.text.text), ["Review", "Open page"]);
+    assert.deepEqual(cards.map((c) => c.actions[0]!.text.text), ["Review", "Open page ↗"]);
     assert.equal(cards[1]!.subtitle?.text, DM_CARD_NOT_STAGED);
     assert.deepEqual(w.kv.get(MAYA)?.map((f) => f.state), ["proposed", "queued"]);
   });

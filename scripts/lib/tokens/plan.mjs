@@ -306,6 +306,10 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Calendar', new: '--calendar-day-lg', old: '--layout-calendar-day-lg', ref: '44px' },
   { tier: 'components', group: 'Calendar', new: '--calendar-nav-size', old: '--layout-calendar-nav', ref: '32px' },
 
+  // ─── Components / Progress indicator ──────────────────────────────────
+  { tier: 'components', group: 'Progress indicator', new: '--progress-indicator-dot-size-8', old: null, ref: 'var(--space-050)', note: 'ProgressIndicator size 8' },
+  { tier: 'components', group: 'Progress indicator', new: '--progress-indicator-dot-size-12', old: null, ref: 'var(--size-075)', note: 'ProgressIndicator size 12' },
+
   // ─── Components / Checkbox, Radio ─────────────────────────────────────
   { tier: 'components', group: 'Checkbox', new: '--checkbox-control-size', old: '--layout-control-checkbox', ref: '18px' },
   { tier: 'components', group: 'Radio', new: '--radio-control-size', old: '--layout-control-radio', ref: '12px' },

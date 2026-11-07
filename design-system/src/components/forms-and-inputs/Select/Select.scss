@@ -78,7 +78,8 @@
     line-height: 1;
     cursor: pointer;
 
-    .fa-solid {
+    .fa-solid,
+    .fa-regular {
         // @contrast: non-text
         color: var(--ds-icon-subtlest);
         font-size: var(--font-size-fa-body3-solid);
@@ -89,7 +90,7 @@
             hovered: (color: var(--ds-icon-subtle)),
         ),
         $ring: false,
-        $hovered-selector: '&:hover .fa-solid'
+        $hovered-selector: '&:hover :is(.fa-solid, .fa-regular)'
     );
 }
 

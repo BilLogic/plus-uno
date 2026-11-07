@@ -50,7 +50,7 @@ export const Overview = () => {
 };
 
 export const Sizes = () => (
-    <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
+    <div style={{ display: 'flex', gap: 'var(--space-150)', flexWrap: 'wrap' }}>
         {[28, 36, 44].map((size) => (
             <Calendar
                 key={size}

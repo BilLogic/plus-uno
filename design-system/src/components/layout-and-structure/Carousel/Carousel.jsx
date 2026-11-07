@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './Carousel.scss';
+import { iconClass } from '../../../lib/icon';
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 
@@ -116,8 +117,8 @@ const Carousel = ({
     };
 
     // Default icons matching legacy
-    const defaultPrevIcon = <span aria-hidden="true" className="plus-carousel-control-icon"><i className="fas fa-chevron-left"></i></span>;
-    const defaultNextIcon = <span aria-hidden="true" className="plus-carousel-control-icon"><i className="fas fa-chevron-right"></i></span>;
+    const defaultPrevIcon = <span aria-hidden="true" className="plus-carousel-control-icon"><i className="fa-solid fa-chevron-left"></i></span>;
+    const defaultNextIcon = <span aria-hidden="true" className="plus-carousel-control-icon"><i className="fa-solid fa-chevron-right"></i></span>;
 
     // A slide's title is one level below the section the carousel sits in.
     const SlideTitle = headingTag(useHeadingLevel() + 1);
@@ -263,7 +264,7 @@ const Carousel = ({
                 aria-label={manuallyPaused ? 'Play slideshow' : 'Pause slideshow'}
                 onClick={() => setManuallyPaused((wasPaused) => !wasPaused)}
             >
-                <i className={`fas ${manuallyPaused ? 'fa-play' : 'fa-pause'}`} aria-hidden="true" />
+                <i className={iconClass(manuallyPaused ? 'play' : 'pause')} aria-hidden="true" />
             </button>
         </div>
     );

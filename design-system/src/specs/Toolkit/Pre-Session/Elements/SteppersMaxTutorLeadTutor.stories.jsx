@@ -1,6 +1,6 @@
 import React from 'react';
 import { Stepper } from './Steppers.stories';
-import { Label, Caption } from '@/components/forms-and-inputs/LabelAndCaption.stories';
+import { Label, Caption } from '@/storybook-docs/form-demos.jsx';
 import TextField from '@/components/forms-and-inputs/TextField/TextField';
 
 export default {

@@ -21,7 +21,7 @@ A `Fieldset` (legend plus grouped fields) holding one real Base UI `RadioGroup`,
 | `name` | string | — | The form key the choices submit under. Defaults to the group's id. |
 | `legend` | node | — | The question. Names the group. |
 | `orientation` | enum | `'stacked'` | — |
-| `options` | arrayOf or shape or node or bool or string | `[]` | The answers. A string is its own value and label. An object can add a `description` under the label, `isDisabled`, an `id`, and `reveal`: content shown under the option while it is chosen. |
+| `options` | arrayOf (required) | `[]` | The answers. A string is its own value and label. An object can add a `description` under the label, `isDisabled`, an `id`, and `reveal`: content shown under the option while it is chosen. |
 | `value` | optionValueType | — | The answer: one option value, or `null`/`undefined` while unanswered. |
 | `defaultValue` | optionValueType | — | — |
 | `onChange` | func | — | Receives the next answer's value. |

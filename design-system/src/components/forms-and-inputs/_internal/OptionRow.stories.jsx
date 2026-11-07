@@ -4,6 +4,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import CountTag from '@/components/labels/CountTag/CountTag';
 import OptionRow from './OptionRow';
+import { iconClass } from '../../../lib/icon';
 
 /**
  * The internal option row (Figma `Dropdown list Item`). Every option list
@@ -81,10 +82,10 @@ export const LeadingAndTrailing = () => (
         <OptionRow label="Tuesday" leading={<OptionRow.Radio checked={false} />} />
         <OptionRow
             label="Decision recall"
-            leading={<i className="fa-solid fa-grip-vertical" aria-hidden="true" />}
-            trailing={<i className="fa-solid fa-ellipsis" aria-hidden="true" />}
+            leading={<i className={iconClass('grip-vertical')} aria-hidden="true" />}
+            trailing={<i className={iconClass('ellipsis')} aria-hidden="true" />}
         />
-        <OptionRow label="Unread" leading={<i className="fa-solid fa-inbox" aria-hidden="true" />} trailing={<CountTag value={12} />} />
+        <OptionRow label="Unread" leading={<i className={iconClass('inbox')} aria-hidden="true" />} trailing={<CountTag value={12} />} />
         <OptionRow label="Pennsylvania" trailing={<OptionRow.Chevron />} />
         <OptionRow label="Maria Lopez" description="Grade 7 · Brookfield Middle School" />
     </div>

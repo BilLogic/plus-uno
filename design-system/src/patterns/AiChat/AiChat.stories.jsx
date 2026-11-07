@@ -5,6 +5,8 @@ import { Breadcrumb, Button, Modal, Sidebar } from '@/components';
 import { AiChat, AI_CHAT_STORAGE_KEY, PANEL_STORAGE_KEY } from '@/patterns';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import DocsAiAgent from '@/storybook-docs/chrome/DocsAiAgent';
+import { buildDocsEntries } from '@/storybook-docs/chrome/docsSearch';
 
 /**
  * AI chat — a floating action button at the bottom right of the Page opens
@@ -333,5 +335,100 @@ export const RepliesWithSources = {
         await expect(within(list).getAllByRole('link')).toHaveLength(3);
         await userEvent.click(popup.getByRole('button', { name: 'Show 1 more source' }));
         await expect(within(list).getAllByRole('link')).toHaveLength(4);
+    }),
+};
+
+/* ------------------------------------------- the Storybook docs' agent */
+
+const DOCS_ENTRIES = buildDocsEntries({
+    entries: {
+        'components-forms-and-inputs-button-button--docs': { id: 'components-forms-and-inputs-button-button--docs', title: 'Forms and inputs/Button', type: 'docs' },
+        'modal--docs': { id: 'modal--docs', title: 'Overlays/Modal', type: 'docs' },
+    },
+}, ['Button', 'Modal']);
+
+/** The docs-agent function, faked: an answer, or the status a failure answers with. */
+const fakeAgent = (status = 200) => async (url, init) => ({
+    ok: status < 400,
+    status,
+    json: async () => (status < 400 ? { text: `Button is in the context. (${JSON.parse(init.body).question})` } : {}),
+});
+
+const docsHrefFor = (id) => `/?path=/docs/${id}`;
+const DOCS_STORAGE_KEY = `${AI_CHAT_STORAGE_KEY}-storybook`;
+const DOCS_PANEL_KEY = 'plus-frame-panel-storybook';
+
+/**
+ * The docs' floating button with the AI agent it opens, answered by the
+ * docs-agent function (faked here), with the search's links under the answer.
+ * Open from the button, ask, follow the link, clear, move to the Panel and
+ * back, close.
+ */
+export const DocsAgent = {
+    tags: ['!autodocs'],
+    parameters: { layout: 'fullscreen' },
+    beforeEach: () => {
+        window.sessionStorage.removeItem(DOCS_STORAGE_KEY);
+        window.sessionStorage.removeItem(DOCS_PANEL_KEY);
+    },
+    render: () => <DocsAiAgent loadEntries={async () => DOCS_ENTRIES} hrefFor={docsHrefFor} fetchFn={fakeAgent()} />,
+    play: async () => withTestViewport(1440, HEIGHT, async () => {
+        const body = within(document.body);
+        const root = () => document.querySelector('.plus-docs-ai');
+        const popup = () => root().querySelector('.plus-ai-chat__floating');
+        const panel = () => root().querySelector('.plus-frame__panel');
+
+        await waitFor(() => expect(root()).not.toBeNull());
+        await userEvent.click(await within(root()).findByRole('button', { name: 'Prototype links' }));
+        await userEvent.click(await body.findByRole('menuitem', { name: 'AI agent' }));
+        await waitFor(() => expect(popup(), 'the AI agent opens the popup').not.toBeNull());
+
+        const input = within(popup()).getByRole('textbox', { name: 'Message to AI agent' });
+        await expect(input, 'focus lands in the input').toHaveFocus();
+        await userEvent.type(input, 'Where is Button?{Enter}');
+        const link = await within(popup()).findByRole('link', { name: 'Button' });
+        await within(popup()).findByText(/Button is in the context/);
+        await expect(link, 'the answer links the docs page').toHaveAttribute('href', '/?path=/docs/components-forms-and-inputs-button-button--docs');
+
+        const names = within(popup()).getAllByRole('button').map((b) => b.getAttribute('aria-label'));
+        await expect(names, 'no full screen, no more menu').toEqual(expect.arrayContaining(['Clear chat', 'Move to Panel', 'Close chat']));
+        await expect(names).not.toContain('Full screen');
+
+        await press(within(popup()), 'Clear chat');
+        await waitFor(() => expect(within(popup()).queryByRole('link', { name: 'Button' })).toBeNull());
+
+        await press(within(popup()), 'Move to Panel');
+        await waitFor(() => expect(panel(), 'the Panel opens').not.toBeNull());
+        await expect(Math.round(panel().getBoundingClientRect().right), 'at the right edge').toBe(window.innerWidth);
+        await expect(popup(), 'the popup is gone').toBeNull();
+        await expect(JSON.parse(window.sessionStorage.getItem(DOCS_STORAGE_KEY))).toEqual({ mode: 'panel', open: true });
+
+        await press(within(panel()), 'Move to popup');
+        await waitFor(() => expect(popup(), 'back in the popup').not.toBeNull());
+
+        await press(within(popup()), 'Close chat');
+        await waitFor(() => expect(popup(), 'Close closes it').toBeNull());
+    }),
+};
+
+/** A 429 from the function (Vertex quota or the rate limit): the chat searches the docs and says so. */
+export const DocsAgentFallback = {
+    tags: ['!autodocs'],
+    parameters: { layout: 'fullscreen' },
+    beforeEach: () => {
+        window.sessionStorage.removeItem(DOCS_STORAGE_KEY);
+        window.sessionStorage.removeItem(DOCS_PANEL_KEY);
+    },
+    render: () => <DocsAiAgent loadEntries={async () => DOCS_ENTRIES} hrefFor={docsHrefFor} fetchFn={fakeAgent(429)} />,
+    play: async () => withTestViewport(1440, HEIGHT, async () => {
+        const body = within(document.body);
+        const root = () => document.querySelector('.plus-docs-ai');
+        const popup = () => root().querySelector('.plus-ai-chat__floating');
+        await userEvent.click(await within(root()).findByRole('button', { name: 'Prototype links' }));
+        await userEvent.click(await body.findByRole('menuitem', { name: 'AI agent' }));
+        await waitFor(() => expect(popup()).not.toBeNull());
+        await userEvent.type(within(popup()).getByRole('textbox', { name: 'Message to AI agent' }), 'Where is Button?{Enter}');
+        await within(popup()).findByText(/unavailable right now, so this is a search/);
+        await expect(await within(popup()).findByRole('link', { name: 'Button' })).toHaveAttribute('href', '/?path=/docs/components-forms-and-inputs-button-button--docs');
     }),
 };

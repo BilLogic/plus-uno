@@ -119,6 +119,7 @@ export function tidyItem(finding: TidyFinding, likely: { number: number; title: 
   const card = known ? { label: `Card ${known.number}`, url: known.url } : null;
   return {
     id: itemId(finding),
+    kind: "figma-tidy-up",
     title: finding.file.name,
     subtitle: finding.card === null ? SUBTITLE[finding.check] : `${SUBTITLE[finding.check]} · Card ${finding.card}`,
     ...(finding.owner ? { owners: [{ slack: finding.owner, ...(ownerName ? { name: ownerName } : {}) }] } : {}),
@@ -161,7 +162,7 @@ export function tidyFacts(finding: TidyFinding, likely: { number: number; title:
 /** The two answers. Neither writes to Figma. */
 export function tidyChoices(): ReviewChoice[] {
   return [
-    { value: "moved", label: "Moved it", verdict: "cancel", decided: "Next week's tidy-up checks the file again." },
+    { value: "moved", label: "Moved it", past: "Marked moved", verdict: "cancel", decided: "Next week's tidy-up checks the file again." },
     { value: "leave", label: "Leave as is", past: "Left as is", verdict: "confirm", decided: "Not raised again until the file's cards change." },
   ];
 }

@@ -15,7 +15,7 @@ import assert from "node:assert/strict";
 import { resolveSignal, runReactionDoor } from "../src/gate/index";
 import { runButtonDoor } from "../src/slack/button-door";
 import { deliveryAdapter } from "../src/slack/delivery-adapter";
-import { EXPIRED_CARD, supersededBy } from "../src/slack/gate-note";
+import { EXPIRED_CARD_LINE as EXPIRED_CARD, supersededBy } from "../src/slack/gate-note";
 import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
 import { recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
 
@@ -89,9 +89,9 @@ describe("on the reaction door", () => {
       await s.putProposal(card({ proposalTs: NEW_CARD, proposalText: "Ready to create a Roadmap card: Reflection, tutors only" }));
     });
     const { text, line, button } = edited(slack, OLD_CARD);
-    assert.equal(line, supersededBy("Reflection redesign"), "names the card that replaced it");
+    assert.equal(line, "Replaced by Reflection redesign", "names the card that replaced it");
     assert.equal(text, `${card().proposalText}\n${line}`, "re-rendered from the card's own words, the note as its copy's last line");
-    assert.equal(button, "View", "nothing left to decide on it");
+    assert.equal(button, "View card", "nothing left to decide on it");
     assert.deepEqual(slack.of("message"), []);
     assert.deepEqual(ran, []);
   });
@@ -103,7 +103,7 @@ describe("on the reaction door", () => {
     });
     const { line, button } = edited(slack, OLD_CARD);
     assert.equal(line, EXPIRED_CARD);
-    assert.equal(button, "View");
+    assert.equal(button, "View card");
     assert.deepEqual(slack.of("message"), []);
   });
 

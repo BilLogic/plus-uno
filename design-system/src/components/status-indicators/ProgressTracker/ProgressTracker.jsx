@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './ProgressTracker.scss';
+import { iconClass } from '../../../lib/icon';
 
 export const PROGRESS_TRACKER_SPACINGS = ['comfortable', 'cozy', 'compact'];
 export const PROGRESS_TRACKER_ORIENTATIONS = ['horizontal', 'vertical'];
@@ -14,7 +15,7 @@ const markerFor = (status) => {
     if (status === 'visited') {
         return (
             <i
-                className="fa-solid fa-circle-check plus-progress-tracker__icon plus-progress-tracker__icon--visited"
+                className={`${iconClass('circle-check')} plus-progress-tracker__icon plus-progress-tracker__icon--visited`}
                 aria-hidden="true"
             />
         );

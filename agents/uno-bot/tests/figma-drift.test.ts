@@ -349,7 +349,7 @@ describe("a Figma drift at the morning run", () => {
       one!.body!.text,
       'Thread settled "The recap drops the Share button; tutors see it automatically" on Sep 29 · the file has not changed since Sep 20.',
     );
-    assert.deepEqual(labels(one!), ["Review", "Open in Figma"]);
+    assert.deepEqual(labels(one!), ["Review", "Open in Figma ↗"]);
     assert.equal(one!.actions![1]!.url, FIGMA_A.url, "Open goes to the frame the thread linked");
     assert.doesNotMatch(JSON.stringify(card!.blocks) + card!.text, GATE_WORDS, "no ✅/⛔ footer, no typed answer to teach");
     assert.doesNotMatch(card!.text, /<@bea/, "the publisher is never @-mentioned");
@@ -596,7 +596,7 @@ describe("a Figma drift at the morning run", () => {
     const [card] = cardsOf(m.posted[0]!.blocks);
     assert.equal(card!.subtitle!.text, "<@U0ADE>");
     assert.match(card!.body!.text, / · the code may not show it yet\.$/);
-    assert.deepEqual(labels(card!), ["Review", "Open on GitHub"]);
+    assert.deepEqual(labels(card!), ["Review", "Open on GitHub ↗"]);
     assert.doesNotMatch(m.posted[0]!.text, GATE_WORDS);
     assert.equal(m.figma.calls().length, 0, "code is not Figma's to look at");
     const [proposal] = await h.threadState.getProposalsByChannel(DESIGN);
@@ -772,9 +772,9 @@ describe("two files discussed in one thread", () => {
     assert.deepEqual(approved.execute?.operations.map((op) => op.toolName), ["github_issue_create"], "Approve files that card's intake alone");
     const message = await settleItem(h.threadState, { messageTs: report!.ts, id: "drift-2" }, { kind: "approved", by: "U0ADE", at: h.clock.now }, h.clock.now);
     const cards = cardsOf(message!.blocks);
-    assert.match(cards[1]!.subtitle!.text, /^Approved by <@U0ADE> · written /);
-    assert.equal(cards[1]!.body!.text, "Written: an intake to update Button.jsx");
-    assert.deepEqual(labels(cards[0]!), ["Review", "Open in Figma"], "the other card is still open");
+    assert.equal(cards[1]!.subtitle!.text, "Approved by <@U0ADE>");
+    assert.match(cards[1]!.body!.text, /^(?!Written|Nothing written|Note:)/, "the card keeps its finding");
+    assert.deepEqual(labels(cards[0]!), ["Review", "Open in Figma ↗"], "the other card is still open");
     assert.equal((await h.threadState.getProposalByTs(itemProposalKey(report!.ts, "drift-1"))).state, "found");
   });
 
@@ -1019,7 +1019,7 @@ describe("the drift check, while the report is live (#897)", () => {
     assert.deepEqual(r.edits.map((e) => [e.channel, e.ts]), [[DESIGN, report!.ts]], "the report itself, edited");
     const [card] = cardsOf(r.edits[0]!.blocks);
     assert.equal(card!.subtitle!.text, "Updated Sep 30. Nothing to do.");
-    assert.deepEqual(labels(card!), ["Open in Figma"], "no Review: nothing left to decide");
+    assert.deepEqual(labels(card!), ["Open in Figma ↗"], "no Review: nothing left to decide");
     assert.equal(m.posted.length, 1, "edited, not replied to");
     const look = await h.threadState.getProposalByTs(key);
     assert.notEqual(look.state, "found", "retired: no Approve can file it");
@@ -1107,7 +1107,7 @@ describe("the drift check, while the report is live (#897)", () => {
     await recheckLiveAsks(RECHECK, first.deps);
     const after = cardsOf(first.edits[0]!.blocks);
     assert.deepEqual(after.map((c) => c.subtitle!.text), ["Updated Sep 30. Nothing to do.", "<@U0ADE> · last changed Sep 20"]);
-    assert.deepEqual(labels(after[1]!), ["Review", "Open in Figma"], "the other file's card stays to decide");
+    assert.deepEqual(labels(after[1]!), ["Review", "Open in Figma ↗"], "the other file's card stays to decide");
 
     m.figma.seedFile("ZzOther9", {
       versions: { versions: [{ id: "2", label: null, description: null, created_at: "2026-10-01T10:00:00Z", user: { handle: "bea.designs" } }] },
@@ -1138,7 +1138,7 @@ describe("the drift check, while the report is live (#897)", () => {
     assert.equal(result.checked, 1, "the Figma file alone is looked at");
     const cards = cardsOf(r.edits[0]!.blocks);
     assert.equal(cards[0]!.subtitle!.text, "Updated Sep 30. Nothing to do.");
-    assert.deepEqual(labels(cards[1]!), ["Review", "Open on GitHub"]);
+    assert.deepEqual(labels(cards[1]!), ["Review", "Open on GitHub ↗"]);
     assert.deepEqual((await drifts.liveAsks())[0]!.files.map((f) => f.kind), ["design-system-code"]);
   });
 
@@ -1429,8 +1429,8 @@ describe("a file-change notification (#896)", () => {
 describe("a drift card decided in Review", () => {
   for (const [choice, label, writes] of [
     ["file", "Intake filed", 1],
-    ["updated", "Already updated", 0],
-    ["untouched", "Didn't touch this file", 0],
+    ["updated", "Marked updated", 0],
+    ["untouched", "Marked not yours", 0],
   ] as const) {
     it(`records ${label} and runs ${writes} intake writes`, async () => {
       const { h, m } = await recapMorning();
@@ -1456,9 +1456,9 @@ describe("a drift card decided in Review", () => {
       );
       assert.equal(ran, writes);
       const card = cardsOf(updates[0]!.blocks)[0]!;
-      assert.equal(card.subtitle!.text, `${label} · <@U0BEA>`);
-      assert.match(card.body!.text, writes ? /^Written:/ : /^Nothing written\.$/);
-      assert.deepEqual(labels(card), ["View", "Open in Figma"]);
+      assert.equal(card.subtitle!.text, `${label} by <@U0BEA>`);
+      assert.match(card.body!.text, /^(?!Written|Nothing written|Note:)/, "the card keeps its finding");
+      assert.deepEqual(labels(card), ["View decision"]);
     });
   }
 
@@ -1488,13 +1488,13 @@ describe("a drift card decided in Review", () => {
     assert.deepEqual(updates.map((u) => u.ts), [report!.ts], "the report, redrawn");
     const [card] = cardsOf(updates[0]!.message.blocks);
     assert.equal(card!.subtitle!.text, "Rejected by <@U0BEA>");
-    assert.equal(card!.body!.text, "Nothing written. Reason: Already updated");
-    assert.deepEqual(labels(card!), ["View", "Open in Figma"]);
+    assert.match(card!.body!.text, /^(?!Written|Nothing written|Note:)/, "the card keeps its finding");
+    assert.deepEqual(labels(card!), ["View decision"]);
     // View draws the draft it was decided on, with the reason (#1362).
     await runReviewOpen({ triggerId: "T", channel: DESIGN, messageTs: itemProposalKey(report!.ts, "drift-1"), userId: "U0ADE", item: { messageTs: report!.ts, id: "drift-1" } }, deps);
     const view = JSON.stringify(views.calls.at(-1)!.view);
-    assert.match(view, /"text":"Rejected\."/);
-    assert.match(view, /: Already updated/, "View shows the reason too");
+    assert.match(view, /"text":"Rejected\. Nothing was written\."/);
+    assert.match(view, /"rich_text_quote","elements":\[\{"type":"text","text":"Already updated"\}/, "View quotes the reason");
     assert.doesNotMatch(view, /Nothing written\. Reason/, "from the draft, not the card's words");
   });
 });

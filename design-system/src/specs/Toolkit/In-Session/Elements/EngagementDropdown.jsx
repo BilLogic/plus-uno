@@ -62,7 +62,7 @@ export const EngagementDropdown = ({
                 options={engagementOptions}
                 value={status}
                 onChange={handleStatusChange}
-                disabled={disabled}
+                isDisabled={disabled}
                 tone={toneFor[status]}
             />
             {status === 'partially-engaged' && (
@@ -72,7 +72,7 @@ export const EngagementDropdown = ({
                     options={reasonOptions}
                     value={reason}
                     onChange={handleReasonChange}
-                    disabled={disabled}
+                    isDisabled={disabled}
                 />
             )}
         </div>

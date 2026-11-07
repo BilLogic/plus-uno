@@ -18,7 +18,7 @@ stripe — the caller mounts and unmounts it, and meaning comes from the fill an
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `appearance` | enum | `'warning'` | `warning` (default form), `danger` (critical, needs immediate attention) or `announcement` (general, no icon). |
-| `icon` | enum | — | Font Awesome Free solid glyph name, a node, or `false` to remove it |
+| `icon` | string or node or enum | — | Font Awesome Free solid glyph name, a node, or `false` to remove it |
 | `children` | node (required) | — | Message content. Typically text, optionally with a link. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |

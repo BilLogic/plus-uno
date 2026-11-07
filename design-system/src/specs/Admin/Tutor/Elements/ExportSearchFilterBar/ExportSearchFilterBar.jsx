@@ -14,6 +14,7 @@ import Button from '@/components/forms-and-inputs/Button/Button';
 import TextField from '@/components/forms-and-inputs/TextField/TextField';
 import { FilterSelect } from '@/specs/Toolkit/Pre-Session/Elements/Filters/FilterSelect';
 import './ExportSearchFilterBar.scss';
+import { iconClass } from '../../../../../lib/icon';
 
 const defaultFilters = [
     {
@@ -80,7 +81,7 @@ const ExportSearchFilterBar = ({
                 <TextField
                     placeholder={searchPlaceholder}
                     onChange={(e) => onSearch && onSearch(e.target.value)}
-                    elemBeforeInput={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />}
+                    elemBeforeInput={<i className={iconClass('magnifying-glass')} aria-hidden="true" />}
                     spacing="compact"
                     className="export-search-filter-bar__search-field"
                 />

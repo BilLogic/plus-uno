@@ -2,6 +2,9 @@
 // decide posts in. A plain parent line, then one `card` per item — a carousel
 // when there are several, at most `MAX_REPORT_ITEMS` — each with Review, which
 // opens that item's own proposal in the Review pop-up, and Open, its source.
+// A decided card keeps its title and body, says who decided what in its
+// subtitle ("Approved by <@who>"), and has one button, View decision; its
+// links move into the pop-up.
 //
 // A REPORT SUPPLIES ITS ITEMS, ITS PARENT LINE AND ITS POST. Everything else
 // is here: the clipping to Block Kit's limits, the held-back count, the
@@ -21,6 +24,7 @@
 // No Env, no Slack client: the store-backed helpers take the store as a port.
 
 import { carouselOf, logoFor } from "./answer-cards-block";
+import { linkLabel } from "./link-label";
 import { escapeSlackText, toPlainText } from "./mrkdwn";
 import { cardLead, renderProposalCard } from "./proposal-render";
 import { textSections } from "./render";
@@ -216,11 +220,6 @@ export function reviewPressOf(actionId: string, messageTs: string): { key: strin
 
 // ── Drawing a report ─────────────────────────────────────────────────────────
 
-/** A time as ET's wall clock: "11:26". */
-function etClock(at: number): string {
-  return new Intl.DateTimeFormat("en-US", { timeZone: "America/New_York", hour: "numeric", minute: "2-digit", hourCycle: "h23" }).format(new Date(at));
-}
-
 /**
  * An open card's subtitle: whom it is for, then where it came from. The tag
  * shows whose card it is; Slack notifies nobody from a subtitle, so the
@@ -238,39 +237,63 @@ function openSubtitle(item: ReportItem, channel: string): string | undefined {
   return [who, item.subtitle].filter(Boolean).join(" · ") || undefined;
 }
 
-/** What a card shows in each state: its subtitle and body, and its button. */
-function shownAs(entry: ReportEntry, channel: string): { subtitle?: string; body: string; button: "Review" | "View" | null } {
-  const { item, state } = entry;
+/** What a decided card's one button says: View decision, or View card when
+ *  nobody decided it. */
+type DecidedButton = "View decision" | "View card";
+
+/** What a card shows in each state: its subtitle, its button, and whether
+ *  it keeps its links. The body is always the item's own: a decided card
+ *  stays the card it was, and its pop-up says what the decision did. */
+interface Shown {
+  subtitle?: string;
+  button: "Review" | DecidedButton | null;
+  /** An open card keeps its links; a decided card's live in its pop-up. */
+  links: boolean;
+}
+
+/**
+ * Who decided what, in one pattern: "<Outcome> by <@who>". A card's own
+ * answer names its outcome in the past tense (`ReviewChoice.past`, kept on
+ * the state as `as.label`).
+ */
+export function decidedLine(state: ReportItemState): string | null {
   const by = (id: string) => `<@${id}>`;
+  switch (state.kind) {
+    case "approved":
+      return `${state.as?.label ?? "Approved"} by ${by(state.by)}`;
+    case "failed":
+      return `${state.as?.label ?? "Approved"} by ${by(state.by)}, not written`;
+    case "rejected":
+      return `${state.as?.label ?? "Rejected"} by ${by(state.by)}`;
+    case "noted":
+      return `Noted by ${by(state.by)}`;
+    case "changes-asked":
+      return `Changes asked by ${by(state.by)}`;
+    case "expired":
+      return "Expired with no decision";
+    case "open":
+    case "not-staged":
+      return null;
+  }
+}
+
+function shownAs(entry: ReportEntry, channel: string): Shown {
+  const { item, state } = entry;
   switch (state.kind) {
     case "open": {
       const subtitle = openSubtitle(item, channel);
-      return { ...(subtitle ? { subtitle } : {}), body: item.body, button: "Review" };
+      return { ...(subtitle ? { subtitle } : {}), button: "Review", links: true };
     }
     case "changes-asked":
-      return { subtitle: `Changes asked by ${by(state.by)}`, body: item.body, button: "Review" };
-    // Decided by one of the card's own answers: "<label> · <@who>".
-    case "approved":
-      return state.as
-        ? { subtitle: `${state.as.label} · ${by(state.by)}`, body: state.as.decided ?? `Written: ${state.done ?? item.done ?? item.body}`, button: "View" }
-        : { subtitle: `Approved by ${by(state.by)} · written ${etClock(state.at)}`, body: `Written: ${state.done ?? item.done ?? item.body}`, button: "View" };
-    case "failed":
-      return {
-        subtitle: `${state.as ? `${state.as.label} · ${by(state.by)}` : `Approved by ${by(state.by)}`} · not written: ${state.reason}`,
-        body: "Nothing written.",
-        button: "View",
-      };
-    case "rejected":
-      return state.as
-        ? { subtitle: `${state.as.label} · ${by(state.by)}`, body: state.as.decided ?? "Nothing written.", button: "View" }
-        : { subtitle: `Rejected by ${by(state.by)}`, body: state.reason ? `Nothing written. Reason: ${state.reason}` : "Nothing written.", button: "View" };
-    case "noted":
-      return { subtitle: `Noted by ${by(state.by)}`, body: `Note: ${state.note}`, button: "View" };
-    case "expired":
-      return { subtitle: "Closed, no decision", body: item.body, button: "View" };
+      // Still open: a revised card is on its way.
+      return { subtitle: decidedLine(state)!, button: "Review", links: true };
     case "not-staged":
       // Nothing to review: its proposal never staged.
-      return { subtitle: state.note, body: item.body, button: null };
+      return { subtitle: state.note, button: null, links: true };
+    case "expired":
+      return { subtitle: decidedLine(state)!, button: "View card", links: false };
+    default:
+      return { subtitle: decidedLine(state)!, button: "View decision", links: false };
   }
 }
 
@@ -279,18 +302,20 @@ function entryCard(entry: ReportEntry, channel: string): Record<string, unknown>
   const { item } = entry;
   const shown = shownAs(entry, channel);
   const logo = logoFor(item.open.url);
+  const link = (label: string, url: string) => ({ type: "button", text: plain(linkLabel(label, url)), url });
   return {
     type: "card",
     icon: { type: "image", image_url: logo.url, alt_text: logo.name },
     title: plain(clip(item.title, CARD_TITLE_CHARS) || "untitled"),
     ...(shown.subtitle ? { subtitle: { type: "mrkdwn", text: clip(shown.subtitle, CARD_TITLE_CHARS) } } : {}),
-    body: plain(clip(shown.body, CARD_BODY_CHARS) || " "),
+    body: plain(clip(item.body, CARD_BODY_CHARS) || " "),
     actions: [
       ...(shown.button
         ? [{ type: "button", action_id: `${DECISION_REVIEW_ACTION_PREFIX}${entry.id}`, text: plain(shown.button), value: entry.id }]
         : []),
-      { type: "button", text: plain(item.open.label ?? "Open"), url: item.open.url },
-      ...(item.also ? [{ type: "button", text: plain(item.also.label), url: item.also.url }] : []),
+      ...(shown.links
+        ? [link(item.open.label ?? "Open", item.open.url), ...(item.also ? [link(item.also.label, item.also.url)] : [])]
+        : []),
     ],
   };
 }
@@ -390,7 +415,7 @@ export function reportMessage(record: DecisionReportRecord): ReportMessage {
   // title holding `<!channel>` pings nobody from the notification either.
   const text = [
     head,
-    ...record.entries.map((e) => `• ${escapeSlackText(clip(e.item.title, CARD_TITLE_CHARS))}: ${e.state.kind === "expired" ? "Closed, no decision. " : ""}${escapeSlackText(shownAs(e, record.channel).body)}`),
+    ...record.entries.map((e) => `• ${escapeSlackText(clip(e.item.title, CARD_TITLE_CHARS))}: ${e.state.kind === "expired" ? "Expired with no decision. " : ""}${escapeSlackText(e.item.body)}`),
   ].join("\n");
   return { text, blocks, ...(record.metadata ? { metadata: record.metadata } : {}) };
 }
@@ -443,8 +468,9 @@ export function plainReportBlocks(blocks: readonly unknown[]): unknown[] {
 export function itemText(record: DecisionReportRecord, id: string): string | null {
   const entry = record.entries.find((e) => e.id === id);
   if (!entry) return null;
-  const shown = shownAs(entry, record.channel);
-  return [entry.item.title, shown.subtitle, shown.body, entry.item.detail].filter(Boolean).join("\n");
+  const { state } = entry;
+  const said = state.kind === "rejected" && state.reason ? `Reason: ${state.reason}` : state.kind === "noted" ? `Note: ${state.note}` : undefined;
+  return [entry.item.title, shownAs(entry, record.channel).subtitle, entry.item.body, said, entry.item.detail].filter(Boolean).join("\n");
 }
 
 // ── Changing a report ────────────────────────────────────────────────────────

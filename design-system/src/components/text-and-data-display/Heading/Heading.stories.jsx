@@ -2,6 +2,8 @@ import React from 'react';
 import { expect, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Heading, { HEADING_SIZES, HeadingContextProvider } from './Heading';
 
 /**
@@ -118,3 +120,37 @@ InverseColor.play = async ({ canvasElement }) => {
 
 export const Interactive = (args) => <Heading {...args} />;
 Interactive.args = { size: 'medium', children: 'Interactive heading' };
+
+const headingOf = (canvasElement) => within(canvasElement).getByText('Student progress');
+
+/** Rest: the text color is the default ink. */
+export const Rest = {
+    render: () => <Overview />,
+    play: async ({ canvasElement }) => {
+        await expect(getComputedStyle(headingOf(canvasElement)).color).toBe(tokenColor(canvasElement, '--ds-text'));
+    },
+};
+
+/** Hovered: a heading does not react to a pointer. */
+export const Hovered = {
+    render: () => <Overview />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(headingOf(canvasElement), ':hover', 'heading');
+    },
+};
+
+/** Pressed: nothing changes under a press. */
+export const Pressed = {
+    render: () => <Overview />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(headingOf(canvasElement), ':active', 'heading');
+    },
+};
+
+/** Focused and disabled: a heading is not a control, so Tab skips it and it is never dimmed. */
+export const NotAControl = {
+    render: () => <Overview />,
+    play: async ({ canvasElement }) => {
+        await expectNotAControl(headingOf(canvasElement), 'heading');
+    },
+};

@@ -9,7 +9,8 @@
 #   1. src/App.jsx exists
 #   2. App.jsx has a default export
 #   3. vite.config.js exists
-#   4. Uses @/ or @plus-ds aliases (not deep relative paths)
+#   4. No escapes from the design system (npm run check:ds-usage, every file
+#      held to zero; the rules are docs/engineering/ds-usage-rules.md)
 #   5. package.json has a name field
 
 set -euo pipefail
@@ -54,14 +55,14 @@ else
     fail "vite.config.js is missing"
 fi
 
-# 4. Check for deep relative paths into design-system (should use @ alias instead)
+# 4. Escapes from the design system: one checker owns the definition (ADR-039)
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 if [ -d "$PROJECT_DIR/src" ]; then
-    DEEP_IMPORTS=$(grep -rn 'design-system/src/' "$PROJECT_DIR/src/" --include="*.jsx" --include="*.js" 2>/dev/null || true)
-    if [ -z "$DEEP_IMPORTS" ]; then
-        pass "No deep relative imports into design-system/src/"
+    if ESCAPES=$(node "$REPO_ROOT/scripts/check-ds-usage.mjs" "$(cd "$PROJECT_DIR" && pwd)/src" 2>&1); then
+        pass "No escapes from the design system (check:ds-usage)"
     else
-        warn "Found deep relative imports (use @/ alias instead):"
-        echo "$DEEP_IMPORTS" | head -5
+        fail "Escapes from the design system (check:ds-usage):"
+        echo "$ESCAPES"
     fi
 fi
 

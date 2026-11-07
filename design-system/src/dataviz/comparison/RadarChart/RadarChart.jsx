@@ -4,6 +4,7 @@ import Highcharts from '@/dataviz/highchartsModules';
 import HighchartsReact from 'highcharts-react-official';
 import chartTheme from '@/dataviz/chartTheme';
 import { seriesColor } from '@/dataviz/palette';
+import { iconClass } from '@/lib/icon';
 
 /**
  * RadarChart Component
@@ -84,9 +85,9 @@ const RadarChart = ({
             ...xAxisConfig.labels,
             formatter: function() {
                 const categoryIndex = this.pos;
-                const iconClass = categoryIcons[categoryIndex];
-                if (iconClass) {
-                    return `<i class="fa-solid ${iconClass}" style="font-size: 14px; color: var(--ds-icon-subtle);" aria-hidden="true"></i>`;
+                const glyph = categoryIcons[categoryIndex];
+                if (glyph) {
+                    return `<i class="${iconClass(glyph.replace(/^fa-/, ''))}" style="font-size: 14px; color: var(--ds-icon-subtle);" aria-hidden="true"></i>`;
                 }
                 return this.value ?? '';
             },

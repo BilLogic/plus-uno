@@ -6,6 +6,7 @@
  */
 
 import React from 'react';
+import { Tag } from '@/components';
 
 export default {
     title: 'Specs/Training/Overview',
@@ -111,20 +112,9 @@ export const Overview = () => (
                 <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Training pages are built using these core PLUS Design System components:
                 </p>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
+                <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-050)' }}>
                     {['PageLayout', 'Tabs', 'Card', 'Table', 'StatusTag', 'Button', 'Progress', 'Pagination', 'Alert', 'Select', 'Input'].map(comp => (
-                        <span 
-                            key={comp} 
-                            className="body3-txt"
-                            style={{ 
-                                padding: '4px 12px', 
-                                backgroundColor: 'var(--color-primary-container)', 
-                                color: 'var(--color-primary)',
-                                borderRadius: 'var(--size-element-radius-pill, 20px)' 
-                            }}
-                        >
-                            {comp}
-                        </span>
+                        <Tag key={comp} text={comp} color="teal" />
                     ))}
                 </div>
             </section>

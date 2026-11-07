@@ -1,4 +1,7 @@
 import React from 'react';
+import { expect, waitFor, within } from 'storybook/test';
+import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
+import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Popup from './Popup';
 import Button from '@/components/forms-and-inputs/Button/Button';
@@ -54,11 +57,11 @@ export default {
     }
 };
 
-const col = { display: 'flex', flexDirection: 'column', gap: '64px', padding: '48px', alignItems: 'center' };
+const col = { display: 'flex', flexDirection: 'column', gap: 'var(--space-400)', padding: 'var(--space-300)', alignItems: 'center' };
 
 function PopupLayoutDemos() {
     return (
-        <section style={{ display: 'flex', gap: '32px', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <section style={{ display: 'flex', gap: 'var(--space-200)', flexWrap: 'wrap', justifyContent: 'center' }}>
             <Popup
                 trigger={<Button text="Popup on Top" />}
                 placement="top"
@@ -109,7 +112,7 @@ function PopupInteractionStatesDemos() {
     return (
         <section>
             <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">TRIGGER TYPES</span>
-            <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-100)', flexWrap: 'wrap' }}>
                 <Popup
                     trigger={<Button text="Click (Default)" appearance="primary" />}
                     triggerType="click"
@@ -180,7 +183,7 @@ export const Interactive = {
     render: (args) => {
         const { triggerLabel, ...popupProps } = args;
         return (
-            <div style={{ padding: '48px', display: 'flex', justifyContent: 'center' }}>
+            <div style={{ padding: 'var(--space-300)', display: 'flex', justifyContent: 'center' }}>
                 <Popup
                     {...popupProps}
                     trigger={<Button text={triggerLabel} appearance="primary" />}
@@ -188,4 +191,83 @@ export const Interactive = {
             </div>
         );
     }
+};
+
+/**
+ * The popup portals out of the canvas, so the state stories read it from the
+ * document. Waits for the open popup and for the focus it takes on opening: Base UI
+ * queues that focus on the next animation frame, so a play that moves focus
+ * before the frame runs has it taken back a moment later — on a busy machine,
+ * between two reads of the same style.
+ */
+const openPopup = async (canvasElement) => {
+    const doc = canvasElement.ownerDocument;
+    await waitFor(() => expect(doc.querySelector('.plus-popup')).not.toBeNull());
+    const popup = doc.querySelector('.plus-popup');
+    await waitFor(() => expect(popup.contains(doc.activeElement)).toBe(true));
+    return popup;
+};
+
+const StatePopup = () => (
+    <div style={{ padding: 'var(--space-400)', display: 'flex', justifyContent: 'center' }}>
+        <Popup trigger={<Button appearance="primary" text="Details" />} title="Session 12" triggerType="manual" show>
+            Ran 45 minutes over.
+        </Popup>
+    </div>
+);
+
+/** Rest: one surface on the overlay fill, lifted by the overlay shadow, with no border of its own. */
+export const Rest = {
+    render: () => <StatePopup />,
+    play: async ({ canvasElement }) => {
+        const popup = await openPopup(canvasElement);
+        const style = getComputedStyle(popup);
+        await expect(style.backgroundColor).toBe(tokenColor(canvasElement, '--ds-surface-overlay'));
+        await expect(style.boxShadow).not.toBe('none');
+        await expect(parseFloat(style.borderTopWidth)).toBe(0);
+    },
+};
+
+/** Hovered: the popup does not react to a pointer. */
+export const Hovered = {
+    render: () => <StatePopup />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(await openPopup(canvasElement), ':hover', 'popup');
+    },
+};
+
+/** Pressed: nothing changes under a press. */
+export const Pressed = {
+    render: () => <StatePopup />,
+    play: async ({ canvasElement }) => {
+        await expectNoStateChange(await openPopup(canvasElement), ':active', 'popup');
+    },
+};
+
+/** Focused: focus back on the trigger shows the 2px ring while the popup stays open. */
+export const Focused = {
+    render: () => <StatePopup />,
+    play: async ({ canvasElement }) => {
+        await openPopup(canvasElement);
+        const trigger = within(canvasElement).getByRole('button', { name: 'Details' });
+        trigger.focus({ focusVisible: true });
+        await expect(trigger.matches(':focus-visible')).toBe(true);
+        const style = getComputedStyle(trigger);
+        await waitFor(() => expect(style.outlineStyle).toBe('solid'));
+        await expect(trigger).toHaveFocus();
+        await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        await expect(canvasElement.ownerDocument.querySelector('.plus-popup'), 'the popup stays open').not.toBeNull();
+        trigger.blur();
+    },
+};
+
+/** Open: the trigger announces the popup it controls. */
+export const Open = {
+    render: () => <StatePopup />,
+    play: async ({ canvasElement }) => {
+        await openPopup(canvasElement);
+        const trigger = within(canvasElement).getByRole('button', { name: 'Details' });
+        await expect(trigger).toHaveAttribute('aria-haspopup', 'dialog');
+        await expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    },
 };

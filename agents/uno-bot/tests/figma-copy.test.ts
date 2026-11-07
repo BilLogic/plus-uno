@@ -188,6 +188,7 @@ describe("the weekly precedence report", () => {
     const button = precedenceItem(THREE[0]!);
     assert.deepEqual(button, {
       id: "ds-Button",
+      kind: "ds-precedence",
       title: "Button",
       subtitle: "Library side",
       body: 'Code has size="xs", the library doesn\'t.',
@@ -336,12 +337,13 @@ describe("the drift card (#886 § 3.3)", () => {
     const item = driftItem({ id: "1", ...one, owner: MERYEM, lane: "roadmap" });
     assert.deepEqual(item, {
       id: "1",
+      kind: "figma-drift",
       title: "Goal Setting — Goal states",
       subtitle: "last changed Sep 20",
       owners: [{ slack: "U0MERYEM1" }],
       body: 'Thread settled "tooltips on option chips" on Sep 24 · the file has not changed since Sep 20.',
       open: { label: "Open in Figma", url: FILE.url },
-      done: "a Roadmap card to update Goal Setting — Goal states",
+      done: "the Roadmap card asks to update Goal Setting — Goal states.",
     });
     const changed = driftItem({ id: "2", ...one, change: { kind: "changed", at: Date.UTC(2026, 8, 26, 18) }, owner: null, lane: "roadmap" });
     assert.equal(changed.subtitle, "last changed Sep 26");
@@ -352,7 +354,7 @@ describe("the drift card (#886 § 3.3)", () => {
     assert.deepEqual(code.owners, [{ slack: "U0MERYEM1" }]);
     assert.equal(code.body, 'Thread settled "tooltips on option chips" on Sep 24 · the code may not show it yet.');
     assert.deepEqual(code.open, { label: "Open on GitHub", url: CODE.url });
-    assert.equal(code.done, "an intake to update Button.jsx");
+    assert.equal(code.done, "the intake asks to update Button.jsx.");
     for (const i of [item, changed, code]) assert.doesNotMatch(JSON.stringify(i), GATE_WORDS);
   });
 

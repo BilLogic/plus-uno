@@ -129,14 +129,8 @@ button.plus-avatar--overflow {
     @include plus-state(
         $states: (
             hovered: (background-color: var(--ds-background-accent-gray-subtle)),
-        ),
-        $ring: false
+        )
     );
-
-    &:focus-visible {
-        outline: calc(var(--border-default) * 2) solid var(--ds-border-focused);
-        outline-offset: var(--border-default);
-    }
 }
 
 /* ------------------------------------------------------------------ group */

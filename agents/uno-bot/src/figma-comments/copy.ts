@@ -173,6 +173,7 @@ export function decisionItem(n: number, d: QueuedDecision, commentUrl: string, o
   const target = d.update.kind === "prd" ? { label: "Open page", url: d.update.page.url } : d.update.kind === "card" ? { label: "Open card", url: d.update.url } : null;
   return {
     id: d.commentId,
+    kind: "figma-comment",
     title: `${n} · ${d.quote}`,
     subtitle: `${escapeSlackText(d.by)} · ${d.section} page · ${whenWords(d)}`,
     ...(owners.length ? { owners } : {}),

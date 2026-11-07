@@ -121,6 +121,11 @@ const LessonsTable = ({
                     const isExpanded = expandedRows.has(lessonId);
                     const isCompleted = ['completed', 'complete'].includes(lesson.status);
                     const groupStateClass = lesson.state ? `lessons-table__group--${lesson.state}` : '';
+                    // Disabled is a color, not an opacity: the text drops to the
+                    // subtlest color, which still reads at 4.5:1, its controls are
+                    // disabled, and each row says it is disabled.
+                    const isDisabled = ['disabled', 'disable'].includes(lesson.state);
+                    const subtleText = isDisabled ? 'var(--ds-text-subtlest)' : 'var(--ds-text-subtle)';
 
                     return (
                         <tbody
@@ -129,7 +134,8 @@ const LessonsTable = ({
                         >
                             <tr
                                 className={`lessons-table__row ${isExpanded ? 'lessons-table__row--expanded' : ''}`}
-                                onClick={() => !['disabled', 'disable'].includes(lesson.state) && onLessonClick && onLessonClick(lesson)}
+                                onClick={() => !isDisabled && onLessonClick && onLessonClick(lesson)}
+                                aria-disabled={isDisabled || undefined}
                             >
                                 {/* Lesson Column */}
                                 <td className="lessons-table__cell lessons-table__cell--lesson">
@@ -140,12 +146,16 @@ const LessonsTable = ({
                                                 className="lessons-table__toggle"
                                                 aria-label={`${isExpanded ? 'Hide' : 'Show'} details for ${lesson.title}`}
                                                 aria-expanded={isExpanded}
+                                                disabled={isDisabled}
                                                 onClick={(e) => toggleRow(lessonId, e)}
                                             >
                                                 <i className={`fas fa-chevron-${isExpanded ? 'down' : 'right'}`} aria-hidden="true" />
                                             </button>
                                         )}
-                                        <span className="body3-txt font-weight-semibold lesson-title">
+                                        <span
+                                            className="body3-txt font-weight-semibold lesson-title"
+                                            style={isDisabled ? { color: 'var(--ds-text-subtlest)' } : undefined}
+                                        >
                                             {lesson.title}
                                         </span>
                                         {lesson.showAiIndicator && <AiIndicator />}
@@ -157,7 +167,7 @@ const LessonsTable = ({
                                     {lesson.competencyArea ? (
                                         <SmartTag subject={lesson.competencyArea} />
                                     ) : (
-                                        <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
+                                        <span className="body3-txt" style={{ color: subtleText }}>
                                             {lesson.competency || 'N/A'}
                                         </span>
                                     )}
@@ -170,7 +180,7 @@ const LessonsTable = ({
 
                                 {/* Duration Column */}
                                 <td className="lessons-table__cell">
-                                    <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
+                                    <span className="body3-txt" style={{ color: subtleText }}>
                                         {lesson.duration}
                                     </span>
                                 </td>
@@ -188,7 +198,9 @@ const LessonsTable = ({
                                 <td className="lessons-table__cell">
                                     {usePills ? (
                                         <button
+                                            type="button"
                                             className="lessons-table__action-link"
+                                            disabled={isDisabled}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onLessonAction?.(lesson);
@@ -205,6 +217,7 @@ const LessonsTable = ({
                                             }
                                             appearance="primary"
                                             spacing="compact"
+                                            isDisabled={isDisabled}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onLessonContinue?.(lesson);
@@ -217,10 +230,10 @@ const LessonsTable = ({
                             {/* Expanded Row */}
                             {
                                 isExpanded && lesson.description && (
-                                    <tr className="lessons-table__row-expanded-content">
+                                    <tr className="lessons-table__row-expanded-content" aria-disabled={isDisabled || undefined}>
                                         <td colSpan={headers.length} className="lessons-table__cell--expanded">
                                             <div className="lessons-table__description">
-                                                <p className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
+                                                <p className="body3-txt" style={{ color: subtleText }}>
                                                     {lesson.description}
                                                 </p>
                                             </div>

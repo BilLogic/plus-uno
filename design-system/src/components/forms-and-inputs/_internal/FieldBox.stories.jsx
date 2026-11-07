@@ -2,6 +2,7 @@ import React from 'react';
 import { expect, userEvent, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import FieldBox from './FieldBox';
+import { iconClass } from '../../../lib/icon';
 
 /**
  * _FieldBox — the part behind Text field and Text area.
@@ -38,7 +39,7 @@ const px = (value) => Math.round(parseFloat(value));
 export const Anatomy = () => (
     <div style={row}>
         <FieldBox
-            leading={<i className="fa-solid fa-magnifying-glass" aria-hidden="true" />}
+            leading={<i className={iconClass('magnifying-glass')} aria-hidden="true" />}
             trailing={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
         >
             {control('Search tutors')}

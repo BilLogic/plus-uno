@@ -4,6 +4,7 @@ import Tooltip from '@/components/overlays-and-layering/Tooltip';
 import VisuallyHidden from '@/components/layout-and-structure/VisuallyHidden';
 import { alignName, useClipped } from './TableParts';
 import './Table.scss';
+import { iconClass } from '../../../lib/icon';
 
 const classes = (...names) => names.filter(Boolean).join(' ');
 
@@ -11,9 +12,9 @@ const classes = (...names) => names.filter(Boolean).join(' ');
 const NEXT_SORT = { none: 'ascending', ascending: 'descending', descending: 'none' };
 
 const SORT_GLYPH = {
-    none: 'fa-sort',
-    ascending: 'fa-sort-up',
-    descending: 'fa-sort-down',
+    none: 'sort',
+    ascending: 'sort-up',
+    descending: 'sort-down',
 };
 
 const SORT_STATE_TEXT = {
@@ -99,7 +100,7 @@ const HeadCell = ({
             {isSortable && (
                 <>
                     <i
-                        className={classes('fa-solid', SORT_GLYPH[sortState], 'plus-table-head-cell-sort')}
+                        className={classes(iconClass(SORT_GLYPH[sortState]), 'plus-table-head-cell-sort')}
                         aria-hidden="true"
                     />
                     <VisuallyHidden>{`, ${SORT_STATE_TEXT[sortState]}`}</VisuallyHidden>

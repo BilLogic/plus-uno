@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import StatusTag from '@/components/labels/StatusTag';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
+import { iconClass } from '../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -49,8 +50,13 @@ export const TableRow = ({
         focus: {
             border: 'var(--stroke-2) solid var(--ds-border-focused)'
         },
-        disabled: { opacity: 0.5, pointerEvents: 'none' }
+        // Disabled is a color, not an opacity. The row's text stays readable
+        // at 4.5:1 on the subtlest text color, and its controls are disabled
+        // themselves, which is what a screen reader announces.
+        disabled: { pointerEvents: 'none' }
     };
+    const isDisabled = effectiveState === 'disabled';
+    const textColor = isDisabled ? 'var(--ds-text-subtlest)' : 'var(--ds-text)';
 
     const handleMouseEnter = interactive && !forcedState ? () => setCurrentState('hover') : undefined;
     const handleMouseLeave = interactive && !forcedState ? () => setCurrentState('default') : undefined;
@@ -95,7 +101,7 @@ export const TableRow = ({
                 <Checkbox
                     isChecked={isChecked}
                     onChange={handleCheckboxChange}
-                    isDisabled={effectiveState === 'disabled'}
+                    isDisabled={isDisabled}
                     aria-label={`Select the session on ${date}, ${timeRange}`}/>
             </div>
 
@@ -111,10 +117,10 @@ export const TableRow = ({
                     textOverflow: 'ellipsis'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: textColor }}>
                     {date}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
+                <span className="body2-txt" style={{ color: textColor }}>
                     {timeRange}
                 </span>
             </div>
@@ -131,10 +137,10 @@ export const TableRow = ({
                     textOverflow: 'ellipsis'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: textColor }}>
                     {school}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
+                <span className="body2-txt" style={{ color: textColor }}>
                     {teacher}
                 </span>
             </div>
@@ -150,7 +156,7 @@ export const TableRow = ({
                     padding: 'var(--size-table-cell-y) var(--size-table-cell-x)'
                 }}
             >
-                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
+                <span className="body2-txt" style={{ color: textColor }}>
                     {tutorCount} (Leads: {leadCount})
                 </span>
                 {hasNoLead && (
@@ -198,7 +204,7 @@ export const TableHeaderRow = () => (
                 Date & time
             </span>
             <i
-                className="fa-solid fa-arrow-up"
+                className={iconClass('arrow-up')}
                 style={{
                     fontSize: 'var(--font-size-fa-body1-solid)',
                     color: 'var(--ds-icon)'
@@ -219,7 +225,7 @@ export const TableHeaderRow = () => (
                 School & teacher
             </span>
             <i
-                className="fa-solid fa-arrow-up"
+                className={iconClass('arrow-up')}
                 style={{
                     fontSize: 'var(--font-size-fa-body1-solid)',
                     color: 'var(--color-outline-variant)'

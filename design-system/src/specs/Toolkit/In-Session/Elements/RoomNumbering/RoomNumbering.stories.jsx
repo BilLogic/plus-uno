@@ -8,6 +8,7 @@ import {
     setAbsent,
     studentsOf,
 } from './roomNumbering.js';
+import { iconClass } from '../../../../../lib/icon';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -45,7 +46,7 @@ const StudentRow = ({ s }) => (
             {s.name}{s.absent ? ' (absent)' : ''}
         </span>
         {s.room != null && (
-            <StatusTag appearance={s.outOfRange ? 'warning' : 'neutral'} leadingVisual={<i className="fa-solid fa-door-open" aria-hidden="true"></i>} className="fw-normal" title={s.outOfRange ? `Borrowed from another block — Zoom breakout room: ${s.room}` : `Zoom breakout room: ${s.room}`}>{String(s.room)}</StatusTag>
+            <StatusTag appearance={s.outOfRange ? 'warning' : 'neutral'} leadingVisual={<i className={iconClass('door-open')} aria-hidden="true"></i>} className="fw-normal" title={s.outOfRange ? `Borrowed from another block — Zoom breakout room: ${s.room}` : `Zoom breakout room: ${s.room}`}>{String(s.room)}</StatusTag>
         )}
     </div>
 );
@@ -102,7 +103,7 @@ export const Interactive = () => {
             {/* Header — room count badge (waiting vs active) */}
             <div className="d-flex align-items-center" style={{ gap: 'var(--space-0625)' }}>
                 <span className="body2-txt" style={{ fontWeight: 600 }}>Room count</span>
-                <StatusTag appearance={'neutral'} leadingVisual={<i className="fa-solid fa-door-open" aria-hidden="true"></i>} className="fw-normal" title={assigned ? "Rooms to create in Zoom (includes each tutor's buffer)" : 'Assign students to tutors to size breakout rooms'}>{assigned ? String(roomCount) : '—'}</StatusTag>
+                <StatusTag appearance={'neutral'} leadingVisual={<i className={iconClass('door-open')} aria-hidden="true"></i>} className="fw-normal" title={assigned ? "Rooms to create in Zoom (includes each tutor's buffer)" : 'Assign students to tutors to size breakout rooms'}>{assigned ? String(roomCount) : '—'}</StatusTag>
                 <span className="body3-txt" style={{ color: 'var(--ds-icon-subtle)' }}>
                     {assigned ? `frozen · buffer ${state.buffer}/tutor` : 'waiting — lead has not run assignment'}
                     {outOfRangeCount > 0 ? ` · ${outOfRangeCount} out-of-range` : ''}

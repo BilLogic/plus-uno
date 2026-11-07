@@ -103,15 +103,6 @@ DefaultSize.play = async ({ canvasElement }) => {
 
 /* ------------------------------------------------------------------ icons */
 
-const HUE = {
-    blue: 'technology-tools',
-    green: 'advocacy',
-    purple: 'mastering-content',
-    magenta: 'relationship',
-    yellow: 'social-emotional',
-    teal: 'tertiary',
-};
-
 const ICON_COLORS = TILE_COLORS.filter((c) => c !== 'white');
 
 export const IconSubtle = () => (
@@ -123,8 +114,8 @@ export const IconSubtle = () => (
 );
 
 /**
- * Subtle is the color's Container with its on-container glyph. Gray has no
- * container of its own, so it takes the neutral background and icon roles.
+ * Subtle is the color's subtler accent ground with its accent icon. Gray has no
+ * accent pair of its own, so it takes the neutral background and icon roles.
  */
 IconSubtle.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
@@ -132,7 +123,7 @@ IconSubtle.play = async ({ canvasElement }) => {
         const tile = canvas.getByTestId(`tile-${color}`);
         const [ground, ink] = color === 'gray'
             ? ['--ds-background-neutral', '--ds-icon-subtle']
-            : [`--color-${HUE[color]}-container`, `--color-on-${HUE[color]}-container`];
+            : [`--ds-background-accent-${color}-subtler`, `--ds-icon-accent-${color}`];
         await expect(getComputedStyle(tile).backgroundColor, `${color} ground`).toBe(tokenColor(canvasElement, ground));
         await expect(getComputedStyle(tile.querySelector('i')).color, `${color} glyph`).toBe(tokenColor(canvasElement, ink));
     }
@@ -147,7 +138,7 @@ export const IconBold = () => (
 );
 
 /**
- * Bold is the solid color with its on-color glyph. Gray bold is the bold
+ * Bold is the bolder accent ground with the inverse glyph. Gray bold is the bold
  * neutral fill, so a bold gray tile reads as dark rather than as a darker gray.
  */
 IconBold.play = async ({ canvasElement }) => {
@@ -156,7 +147,7 @@ IconBold.play = async ({ canvasElement }) => {
         const tile = canvas.getByTestId(`tile-${color}`);
         const [ground, ink] = color === 'gray'
             ? ['--ds-background-neutral-bold', '--ds-icon-inverse']
-            : [`--color-${HUE[color]}`, `--color-on-${HUE[color]}`];
+            : [`--ds-background-accent-${color}-bolder`, '--ds-icon-inverse'];
         await expect(getComputedStyle(tile).backgroundColor, `${color} ground`).toBe(tokenColor(canvasElement, ground));
         await expect(getComputedStyle(tile.querySelector('i')).color, `${color} glyph`).toBe(tokenColor(canvasElement, ink));
     }
@@ -207,8 +198,10 @@ Logos.play = async ({ canvasElement }) => {
     const grounds = {
         white: '--ds-surface',
         gray: '--ds-background-neutral',
-        ...Object.fromEntries(Object.entries(HUE).map(([c, h]) => [c, `--color-${h}-container`])),
     };
+    for (const hue of ['blue', 'green', 'purple', 'magenta', 'yellow', 'teal']) {
+        grounds[hue] = `--ds-background-accent-${hue}-subtler`;
+    }
     for (const color of TILE_COLORS) {
         const tile = canvas.getByTestId(`logo-${color}`);
         await expect(getComputedStyle(tile).backgroundColor, `${color} logo ground`).toBe(tokenColor(canvasElement, grounds[color]));
@@ -263,12 +256,12 @@ export const WithBorder = () => (
 );
 
 /**
- * `hasBorder` draws a 1px outline-variant edge inside the tile, so the tile
+ * `hasBorder` draws a 1px border edge inside the tile, so the tile
  * stays exactly its size — and on an image it sits above the picture.
  */
 WithBorder.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const outline = tokenColor(canvasElement, '--color-outline-variant');
+    const outline = tokenColor(canvasElement, '--ds-border');
     for (const id of ['icon', 'logo', 'image']) {
         const tile = canvas.getByTestId(id);
         await expect(box(tile), `${id} keeps its size`).toEqual({ width: 32, height: 32 });

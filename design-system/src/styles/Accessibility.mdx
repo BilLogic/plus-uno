@@ -107,7 +107,7 @@ Focus is shown by the **focus ring**, never by a fill.
 - The ring clears 3:1 against what it sits on, so every interactive element,
   including cards, table rows and list items, has the same visible indicator.
 
-<Canvas of={AccessibilityStories.FocusRing} sourceState="none" />
+See Do and don't for the ring beside the fill-only mistake.
 
 </FoundationSection>
 
@@ -145,6 +145,18 @@ violation, so a component that breaks a rule here is caught before it ships.
 ```bash
 npx vitest --project=storybook --run <path>
 ```
+
+</FoundationSection>
+
+<FoundationSection title="Do and don't">
+
+**Show focus with a ring.** The control's fill stays as it is.
+
+<Canvas of={AccessibilityStories.FocusRing} sourceState="none" />
+
+**Never carry meaning in color alone.** Pair a status color with an icon and a word.
+
+<Canvas of={AccessibilityStories.StatusNotColorAlone} sourceState="none" />
 
 </FoundationSection>
 

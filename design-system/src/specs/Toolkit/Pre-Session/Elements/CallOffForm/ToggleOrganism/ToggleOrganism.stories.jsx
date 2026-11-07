@@ -81,9 +81,10 @@ const CallOffFormOrganism = ({
                                 onChange={handleCheck}
                                 style={{ '--stack-sm': 'var(--stack-md)' }}
                                 label={
-                                    <span className="body2-txt">I have already spoken with my supervisor about dropping this recurring session <span className="text-danger">*</span></span>
+                                    <span className="body2-txt">I have already spoken with my supervisor about dropping this recurring session <span style={{ color: 'var(--ds-text-danger)' }}>*</span></span>
                                 }/>
-                            <div className="text-danger body2-txt" style={{
+                            <div className="body2-txt" style={{
+                                color: 'var(--ds-text-danger)',
                                 paddingLeft: '24px', // Approx alignment without nested checkbox padding
                                 lineHeight: '1.571'
                             }}>
@@ -105,7 +106,7 @@ const CallOffFormOrganism = ({
                                 fontFamily: 'var(--font-family-body)',
                                 marginBottom: 0
                             }}>
-                                Which supervisor did you speak with? <span className="text-danger">*</span>
+                                Which supervisor did you speak with? <span style={{ color: 'var(--ds-text-danger)' }}>*</span>
                             </Form.Label>
                             <Select
                                 id={`supervisor-select-${isInteractive ? 'interactive' : (Math.random() + (isChecked ? 'c' : 'u'))}`}

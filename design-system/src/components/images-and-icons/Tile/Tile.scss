@@ -20,8 +20,8 @@ $tile-sizes: (
 
 /*
  * The color names follow the Tag color set in the label spec, where yellow
- * replaces orange. Each hue name borrows the curriculum hue whose color it
- * names; gray is not a hue, so it names its neutral pairs directly.
+ * replaces orange. Each name reads the accent color of the same name; gray reads
+ * the neutral pairs directly.
  *
  * Per name: subtle icon ground, subtle icon glyph, bold icon ground, bold icon
  * glyph, logo ground. A logo keeps its own colors, so it takes a ground only.
@@ -29,12 +29,12 @@ $tile-sizes: (
  */
 $tile-colors: (
     'gray': (var(--ds-background-neutral), var(--ds-icon-subtle), var(--ds-background-neutral-bold), var(--ds-icon-inverse), var(--ds-background-neutral)),
-    'blue': (var(--color-technology-tools-container), var(--color-on-technology-tools-container), var(--color-technology-tools), var(--color-on-technology-tools), var(--color-technology-tools-container)),
-    'green': (var(--color-advocacy-container), var(--color-on-advocacy-container), var(--color-advocacy), var(--color-on-advocacy), var(--color-advocacy-container)),
-    'purple': (var(--color-mastering-content-container), var(--color-on-mastering-content-container), var(--color-mastering-content), var(--color-on-mastering-content), var(--color-mastering-content-container)),
-    'magenta': (var(--color-relationship-container), var(--color-on-relationship-container), var(--color-relationship), var(--color-on-relationship), var(--color-relationship-container)),
-    'yellow': (var(--color-social-emotional-container), var(--color-on-social-emotional-container), var(--color-social-emotional), var(--color-on-social-emotional), var(--color-social-emotional-container)),
-    'teal': (var(--color-tertiary-container), var(--color-on-tertiary-container), var(--color-tertiary), var(--color-on-tertiary), var(--color-tertiary-container)),
+    'blue': (var(--ds-background-accent-blue-subtler), var(--ds-icon-accent-blue), var(--ds-background-accent-blue-bolder), var(--ds-icon-inverse), var(--ds-background-accent-blue-subtler)),
+    'green': (var(--ds-background-accent-green-subtler), var(--ds-icon-accent-green), var(--ds-background-accent-green-bolder), var(--ds-icon-inverse), var(--ds-background-accent-green-subtler)),
+    'purple': (var(--ds-background-accent-purple-subtler), var(--ds-icon-accent-purple), var(--ds-background-accent-purple-bolder), var(--ds-icon-inverse), var(--ds-background-accent-purple-subtler)),
+    'magenta': (var(--ds-background-accent-magenta-subtler), var(--ds-icon-accent-magenta), var(--ds-background-accent-magenta-bolder), var(--ds-icon-inverse), var(--ds-background-accent-magenta-subtler)),
+    'yellow': (var(--ds-background-accent-yellow-subtler), var(--ds-icon-accent-yellow), var(--ds-background-accent-yellow-bolder), var(--ds-icon-inverse), var(--ds-background-accent-yellow-subtler)),
+    'teal': (var(--ds-background-accent-teal-subtler), var(--ds-icon-accent-teal), var(--ds-background-accent-teal-bolder), var(--ds-icon-inverse), var(--ds-background-accent-teal-subtler)),
 );
 
 .plus-tile {
@@ -153,7 +153,7 @@ $tile-colors: (
     content: '';
     position: absolute;
     inset: 0;
-    border: var(--border-default) solid var(--color-outline-variant);
+    border: var(--border-default) solid var(--ds-border);
     border-radius: inherit;
     pointer-events: none;
 }

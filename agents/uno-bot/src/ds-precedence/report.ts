@@ -115,6 +115,7 @@ export function precedenceItem(finding: ComponentFinding): ReportItem {
   const first = finding.items[0]!;
   return {
     id: componentId(finding.component),
+    kind: "ds-precedence",
     title: finding.component,
     subtitle: SIDE[first.loser],
     body: differs(finding),

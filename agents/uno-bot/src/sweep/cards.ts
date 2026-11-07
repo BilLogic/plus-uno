@@ -269,6 +269,7 @@ export function sweepItem(f: PendingFinding, destination: Destination): ReportIt
   return {
     // Carded findings always name a block (`planSweepCards`).
     id: f.blockId!,
+    kind: "doc-fix",
     title: flat(f.target.title) || "untitled",
     subtitle: where.join(" · "),
     owners: [{ slack: f.owner }],

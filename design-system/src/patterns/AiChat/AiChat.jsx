@@ -58,9 +58,24 @@ const AiChatContext = createContext(null);
 /** The chat's state and actions, for anything inside an `AiChat`. Null outside one. */
 export const useAiChat = () => useContext(AiChatContext);
 
+const textOf = (m) => (m.links?.length ? `${m.text}\n${m.links.map((l) => `${l.label}: ${l.href}`).join('\n')}` : m.text);
+
 const transcriptOf = (messages) => messages
-    .map((m) => `${m.role === 'user' ? 'You' : 'AI'}: ${m.text}`)
+    .map((m) => `${m.role === 'user' ? 'You' : 'AI'}: ${textOf(m)}`)
     .join('\n\n');
+
+/** A reply's links, drawn after its text: `{ label, href }`, opening in the host's `linkTarget`. */
+const renderReplyPart = (part, index) => (
+    <ul key={index} className="plus-ai-chat__links">
+        {part.links.map((l, i) => (
+            <li key={`${i}-${l.href}`}><a href={l.href} target={part.target}>{l.label}</a></li>
+        ))}
+    </ul>
+);
+
+const partsOf = (m, target) => (m.links?.length
+    ? [{ type: 'text', text: m.text }, { type: 'links', links: m.links, target }]
+    : [{ type: 'text', text: m.text }]);
 
 /**
  * One chat surface for every mode: the Panel parts (header, body, footer)
@@ -70,7 +85,7 @@ const transcriptOf = (messages) => messages
 const ChatSurface = ({ presentation }) => {
     const chat = useAiChat();
     const {
-        variant, title, messages, loading, draft, setDraft, starters, dispatch, clear, send, stop, narrow, rate,
+        variant, title, messages, loading, draft, setDraft, starters, dispatch, clear, send, stop, narrow, linkTarget, rate,
     } = chat;
     const storybook = variant === 'storybook';
     const listRef = useRef(null);
@@ -129,7 +144,8 @@ const ChatSurface = ({ presentation }) => {
                                 ? (
                                     <AiMessage
                                         className="plus-ai-chat__text"
-                                        text={m.text}
+                                        parts={partsOf(m, linkTarget)}
+                                        renderPart={renderReplyPart}
                                         sources={m.sources}
                                         feedback={m.feedback ?? null}
                                         onFeedback={(feedback) => rate(m, feedback)}
@@ -170,9 +186,27 @@ const ChatSurface = ({ presentation }) => {
 
 ChatSurface.propTypes = { presentation: PropTypes.oneOf(['popup', 'panel', 'fullscreen']).isRequired };
 
+/** The popup without a button to anchor to: it takes focus on open, as a popup does, and Escape closes it. */
+const FloatingChat = () => {
+    const { title, dispatch } = useAiChat();
+    const ref = useRef(null);
+    useEffect(() => { ref.current?.querySelector('textarea')?.focus(); }, []);
+    return (
+        <div
+            ref={ref}
+            className="plus-ai-chat__floating"
+            role="dialog"
+            aria-label={title}
+            onKeyDown={(event) => { if (event.key === 'Escape' && !event.defaultPrevented) dispatch({ type: 'close' }); }}
+        >
+            <ChatSurface presentation="popup" />
+        </div>
+    );
+};
+
 /** The one entry point: a floating action button at the bottom right of the Page, with the popup anchored to it. */
 const Launcher = () => {
-    const { state, dispatch, title, narrow } = useAiChat();
+    const { state, dispatch, title, narrow, launcher } = useAiChat();
     const fabHidden = isFabHidden(state);
     // Under 768 a popup is shown full screen, the same layer as full screen mode.
     const fullscreenShown = state.open && (state.mode === 'fullscreen' || (state.mode === 'popup' && narrow));
@@ -185,7 +219,8 @@ const Launcher = () => {
 
     return (
         <>
-            {fabHidden || fullscreenShown ? null : (
+            {!launcher && popupShown ? <FloatingChat /> : null}
+            {!launcher || fabHidden || fullscreenShown ? null : (
                 <Popup
                     triggerType="manual"
                     placement="top-end"
@@ -235,14 +270,16 @@ const Launcher = () => {
  * - `variant="storybook"` is the Storybook docs' chat: clear, move to Panel and
  *   close only, with no full screen and no more menu.
  * - The conversation is kept in memory and moves with the mode. There is no
- *   history, and no backend: `respond(text)` returns the reply, as text or
- *   as `{ text, sources }` when it drew on records; the sources list under it.
+ *   history, and no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`.
+ *   A reply is text, or `{ text, links, sources }`: links follow the text, and the sources it drew on list under it.
  */
 const AiChat = ({
     variant = 'app',
     defaultMode = 'popup',
     defaultOpen = false,
     storageKey = variant === 'storybook' ? `${AI_CHAT_STORAGE_KEY}-storybook` : AI_CHAT_STORAGE_KEY,
+    launcher = true,
+    linkTarget,
     onModeChange,
     respond,
     onFeedback,
@@ -258,6 +295,8 @@ const AiChat = ({
         () => initialAiChatState(readAiChatMemory(storageKey), defaultMode, defaultOpen),
     );
     const [messages, setMessages] = useState([]);
+    const messagesRef = useRef(messages);
+    messagesRef.current = messages;
     const [draft, setDraft] = useState('');
     const [loading, setLoading] = useState(false);
     const narrow = useNarrow();
@@ -286,12 +325,13 @@ const AiChat = ({
     const send = useCallback(async (text) => {
         const ticket = pending.current + 1;
         pending.current = ticket;
+        const history = messagesRef.current.map((m) => ({ role: m.role === 'ai' ? 'assistant' : 'user', text: m.text }));
         setMessages((prev) => [...prev, { id: `u${prev.length}-${ticket}`, role: 'user', text }]);
         if (!respond) return;
         setLoading(true);
         let reply;
         try {
-            reply = await respond(text);
+            reply = await respond(text, history);
         } catch {
             reply = null;
         }
@@ -299,9 +339,9 @@ const AiChat = ({
         if (pending.current !== ticket) return;
         setLoading(false);
         if (reply == null) return;
-        // A reply is its text, or `{ text, sources }` when it drew on records.
-        const { text: replyText, sources } = typeof reply === 'string' ? { text: reply } : reply;
-        setMessages((prev) => [...prev, { id: `a${prev.length}-${ticket}`, role: 'ai', text: replyText, sources }]);
+        // A reply is its text, or `{ text, links, sources }`; sources are the records it drew on.
+        const { text: replyText, links, sources } = typeof reply === 'string' ? { text: reply } : reply;
+        setMessages((prev) => [...prev, { id: `a${prev.length}-${ticket}`, role: 'ai', text: replyText, links, sources }]);
     }, [respond]);
 
     // Every answer takes a rating; it stays on the message as chat moves between modes.
@@ -311,8 +351,8 @@ const AiChat = ({
     }, [onFeedback]);
 
     const value = useMemo(() => ({
-        variant, title, messages, loading, draft, setDraft, starters, state, dispatch, clear, send, stop, narrow, rate,
-    }), [variant, title, messages, loading, draft, starters, state, clear, send, stop, narrow, rate]);
+        variant, title, messages, loading, draft, setDraft, starters, state, dispatch, clear, send, stop, narrow, launcher, linkTarget, rate,
+    }), [variant, launcher, linkTarget, title, messages, loading, draft, starters, state, clear, send, stop, narrow, rate]);
 
     return (
         <AiChatContext.Provider value={value}>
@@ -339,9 +379,13 @@ AiChat.propTypes = {
     defaultOpen: PropTypes.bool,
     /** The sessionStorage key the mode is kept under (the Storybook variant has its own); null keeps nothing. */
     storageKey: PropTypes.string,
+    /** `false` leaves out the floating button: the popup then floats above the bottom right corner, and the host opens chat with `useAiChat().dispatch({ type: 'open' })`. */
+    launcher: PropTypes.bool,
+    /** The `target` of links in a reply, such as `_top` from inside a frame. */
+    linkTarget: PropTypes.string,
     /** Called with the new mode whenever chat moves between popup, Panel and full screen. */
     onModeChange: PropTypes.func,
-    /** Returns the reply (or a promise of it) to a sent message: its text, or `{ text, sources }` when it drew on records. Without it nothing answers. */
+    /** Returns the reply (or a promise of it) to a sent message: a string, or `{ text, links: [{ label, href }], sources: [{ title, href, type }] }`. Without it nothing answers. */
     respond: PropTypes.func,
     /** Called with the answer and `{ rating }` (or `{ rating: 'down', comment }`) when a person rates it. Every answer offers thumbs. */
     onFeedback: PropTypes.func,
