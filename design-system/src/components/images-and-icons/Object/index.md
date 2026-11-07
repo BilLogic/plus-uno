@@ -9,7 +9,7 @@
 
 **Source:** `design-system/src/components/images-and-icons/Object/Object.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/Object/Object.stories.jsx` — Kinds, Sizes, Decorative, Rest
+**Stories:** `design-system/src/components/images-and-icons/Object/Object.stories.jsx` — Kinds, Sizes, Decorative, Rest, Interactive
 
 **Storybook page:** `design-system/src/components/images-and-icons/Object/Object.mdx`
 
@@ -38,6 +38,4 @@ From `design-system/src/components/images-and-icons/Object/Object.scss`. Overrid
 
 Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Tile` · `UserAvatar`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -1,8 +1,19 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as DynamicTableStories from './DynamicTable.stories.jsx';
-import { DocsCanvasShell, ResourcesBlock, DocsTable, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DynamicTable } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const sortHead = { cells: [{ key: 'student', content: 'Student', isSortable: true }, { key: 'date', content: 'Date', isSortable: true }] };
+export const keyedRows = [['Ava Thompson', 'Nov 2', 20261102], ['Marcus Lee', 'Oct 24', 20261024], ['Sofia Ramirez', 'Oct 9', 20261009]].map(([s, d, k]) => ({ key: s, cells: [{ key: s, content: s }, { key: k, content: d }] }));
+export const plainRows = [['Ava Thompson', 'Nov 2'], ['Marcus Lee', 'Oct 24'], ['Sofia Ramirez', 'Oct 9']].map(([s, d]) => ({ key: s, cells: [{ content: s }, { content: d }] }));
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -43,14 +54,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Overview
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>Left alone the table holds its own sort and page. A head press sorts by the column's cell keys, and the footer states the range under a pager.</>}
->
-
-<Canvas of={DynamicTableStories.Default} />
-
-</DocsCanvasShell>
+<ComponentExample of={DynamicTableStories.Default} title="Default" description={<>Left alone the table holds its own sort and page. A head press sorts by the column's cell keys, and the footer states the range under a pager.</>} />
 
 </div>
 
@@ -58,14 +62,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Stateless
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>The page owns the sort and the page through `sortKey`, `sortOrder` and `page`. With `totalRows`, the rows are already one page from a server and the footer counts against the total.</>}
->
-
-<Canvas of={DynamicTableStories.Stateless} />
-
-</DocsCanvasShell>
+<ComponentExample of={DynamicTableStories.Stateless} title="Stateless" description={<>The page owns the sort and the page through <code>sortKey</code>, <code>sortOrder</code> and <code>page</code>. With <code>totalRows</code>, the rows are already one page from a server and the footer counts against the total.</>} />
 
 </div>
 
@@ -73,14 +70,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Body states
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>Every state keeps the head row, so the columns still say what will appear. Empty, no results, loading and error swap the body for one message row; refreshing keeps the rows at the loading opacity under a spinner.</>}
->
-
-<Canvas of={DynamicTableStories.States} />
-
-</DocsCanvasShell>
+<ComponentExample of={DynamicTableStories.States} title="Body states" description={<>Every state keeps the head row, so the columns still say what will appear. Empty, no results, loading and error swap the body for one message row; refreshing keeps the rows at the loading opacity under a spinner.</>} />
 
 </div>
 
@@ -88,14 +78,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Empty state
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>With no rows, a cleared filter or a new account, `emptyView` takes the body as one message row.</>}
->
-
-<Canvas of={DynamicTableStories.Empty} />
-
-</DocsCanvasShell>
+<ComponentExample of={DynamicTableStories.Empty} title="Empty" description={<>With no rows, a cleared filter or a new account, <code>emptyView</code> takes the body as one message row.</>} />
 
 </div>
 
@@ -103,14 +86,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Selection and the bulk bar
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>A checkbox column as wide as the row is tall, with select-all in the head. While rows are selected, `TableBulkActions` replaces the Section toolbar with the count, up to three actions, an overflow menu and Clear selection.</>}
->
-
-<Canvas of={DynamicTableStories.Selection} />
-
-</DocsCanvasShell>
+<ComponentExample of={DynamicTableStories.Selection} title="Selection" description={<>A checkbox column as wide as the row is tall, with select-all in the head. While rows are selected, <code>TableBulkActions</code> replaces the Section toolbar with the count, up to three actions, an overflow menu and Clear selection.</>} />
 
 </div>
 
@@ -118,14 +94,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Sticky header and frozen column
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>The head row stays pinned inside the table's own scroll region. The frozen column sits on an opaque surface and draws a stronger divider while the table scrolls sideways.</>}
->
-
-<Canvas of={DynamicTableStories.StickyHeaderAndFrozenColumn} />
-
-</DocsCanvasShell>
+<ComponentExample of={DynamicTableStories.StickyHeaderAndFrozenColumn} title="Sticky header and frozen column" description={<>The head row stays pinned inside the table's own scroll region. The frozen column sits on an opaque surface and draws a stronger divider while the table scrolls sideways.</>} />
 
 </div>
 
@@ -133,14 +102,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Widths
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>Under 720 the table scrolls sideways instead of squeezing. Wider, the first column fills the room and the rest size to their content.</>}
->
-
-<Canvas of={DynamicTableStories.Widths} />
-
-</DocsCanvasShell>
+<ComponentExample of={DynamicTableStories.Widths} title="Widths" description={<>Under 720 the table scrolls sideways instead of squeezing. Wider, the first column fills the room and the rest size to their content.</>} />
 
 </div>
 
@@ -148,14 +110,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Sortable head cells
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>A press asks for ascending, then descending, then no sort. The arrow shows on hover and focus, and a sorted column keeps it.</>}
->
-
-<Canvas of={DynamicTableStories.SortableHeadCells} />
-
-</DocsCanvasShell>
+<ComponentExample of={DynamicTableStories.SortableHeadCells} title="Sortable head cells" description={<>A press asks for ascending, then descending, then no sort. The arrow shows on hover and focus, and a sorted column keeps it.</>} />
 
 </div>
 
@@ -163,25 +118,23 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## State
 
-<DocsCanvasShell description={<>A sortable head cell is clear; its arrow shows on hover or focus.</>}>
-    <DsCanvasQuiet of={DynamicTableStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={DynamicTableStories.Rest} title="Rest" description={<>A sortable head cell is clear; its arrow shows on hover or focus.</>} />
 
-<DocsCanvasShell description={<>The head cell takes the subtle hovered step.</>}>
-    <DsCanvasQuiet of={DynamicTableStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={DynamicTableStories.Hovered} title="Hovered" description={<>The head cell takes the subtle hovered step.</>} />
 
-<DocsCanvasShell description={<>The head cell takes the subtle pressed step.</>}>
-    <DsCanvasQuiet of={DynamicTableStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={DynamicTableStories.Pressed} title="Pressed" description={<>The head cell takes the subtle pressed step.</>} />
 
-<DocsCanvasShell description={<>The sort button shows the 2px ring inset in the cell, and the arrow appears.</>}>
-    <DsCanvasQuiet of={DynamicTableStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={DynamicTableStories.Focused} title="Focused" description={<>The sort button shows the 2px ring inset in the cell, and the arrow appears.</>} />
 
-<DocsCanvasShell description={<>A row can be disabled and takes the disabled ink.</>}>
-    <DsCanvasQuiet of={DynamicTableStories.DisabledRow} />
-</DocsCanvasShell>
+<ComponentExample of={DynamicTableStories.DisabledRow} title="Disabled row" description={<>A row can be disabled and takes the disabled ink.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground of={DynamicTableStories.Interactive} />
 
 </div>
 
@@ -254,15 +207,40 @@ rows, select some for a bulk action, or page through a long result. Use
 
 ## Best practices
 
-- **A column sorts by its cells' `key`.** Give a date cell a sortable key (`20261024`) and its readable text as `content`.
-- **Stateful or stateless.** Leave the sort and page alone and the table holds them. Pass `sortKey` and `sortOrder`, or `page`, and the page owns them: the table reports a press through `onSort` or `onSetPage` and draws what it is given.
-- **Server paging.** With `totalRows`, `rows` is the current page only, and the footer counts against `totalRows`.
-- **States.** `isLoading` and an empty `rows` pick `loading`, `refreshing` and `empty` on their own. Name `no results` and `error` with `state`, and word them with `noResultsView` and `errorView`.
-- **The footer states the range**, `1–25 of 340`, and shows only on a table that pages.
-- **Selection reports keys.** `isSelectable` adds the checkbox column, and `onSelectionChange` returns every selected row's `key`. Select-all covers the rows on the current page.
-- **The bulk bar is the Section toolbar's selected state.** Swap the Section's `toolbar` for `TableBulkActions` while rows are selected. The table never draws a toolbar of its own.
-- **Pin the head row with `stickyHeader` and `maxHeight`.** Only a bounded region scrolls, so the head row needs a height to pin within.
-- **Freeze with `isFrozen`.** The first column stays put, and with checkboxes the title column beside them stays put too.
+A dynamic table is one people sort, page or act on. It holds its own sort and page until the page passes `sortKey` or `page`.
+
+### Give a column a sortable key.
+
+A date needs a key that sorts, such as `20261024`, and its readable text as `content`.
+
+<DoDontPair
+    doExample={<DynamicTable head={sortHead} rows={keyedRows} label="Sessions" defaultSortKey="date" defaultSortOrder="ascending" />}
+    doCaption="A key per cell sorts by date: Oct 9, Oct 24, Nov 2."
+    dontExample={<DynamicTable head={sortHead} rows={plainRows} label="Sessions" defaultSortKey="date" defaultSortOrder="ascending" />}
+    dontCaption="No key, so the text sorts: Nov 2 lands first."
+/>
+
+### Say what an empty table is for.
+
+Every state keeps the head row, so the columns still say what will appear. Word the message with `emptyView`.
+
+<DoDontPair
+    doExample={<DynamicTable head={sortHead} rows={[]} label="Sessions" emptyView="No sessions yet. They appear here once one is booked." />}
+    doCaption="A message that says what is missing and what happens next."
+    dontExample={<DynamicTable head={sortHead} rows={[]} label="Sessions" emptyView="No data" />}
+    dontCaption="No data, with no hint of why."
+/>
+
+### Page on the server when the list is long.
+
+With `totalRows`, `rows` is the current page only, and the footer counts against the total.
+
+<DoDontPair
+    doExample={<DynamicTable head={sortHead} rows={keyedRows} label="Sessions" rowsPerPage={3} totalRows={8500} />}
+    doCaption="One page of rows, counted against the 8500 total."
+    dontExample={<DynamicTable head={sortHead} rows={keyedRows} label="Sessions" rowsPerPage={3} />}
+    dontCaption="The whole list loaded to page on the screen, when it is thousands of rows."
+/>
 
 </div>
 

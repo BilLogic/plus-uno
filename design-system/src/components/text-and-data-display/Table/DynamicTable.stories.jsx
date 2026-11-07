@@ -436,3 +436,8 @@ export const DisabledRow = {
         await expect(row).toHaveAttribute('aria-disabled', 'true');
     },
 };
+
+/** The playground: the default story's args, with every control live. */
+export const Interactive = {
+    args: { ...Default.args }
+};

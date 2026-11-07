@@ -347,3 +347,8 @@ export const Invalid = {
         await expect(getComputedStyle(cell).color).toBe(tokenColor(canvasElement, '--ds-text-danger'));
     },
 };
+
+/** The playground: the overview story's args, with every control live. */
+export const Interactive = {
+    args: { ...Overview.args }
+};

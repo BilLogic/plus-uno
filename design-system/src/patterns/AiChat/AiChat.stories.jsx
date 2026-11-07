@@ -379,6 +379,12 @@ export const DocsAgent = {
         const panel = () => root().querySelector('.plus-frame__panel');
 
         await waitFor(() => expect(root()).not.toBeNull());
+        // The layer covers the whole window over the docs, so every box in it
+        // other than the button and the chat must paint nothing.
+        const painted = [root(), ...root().querySelectorAll('.plus-frame, .plus-frame__row, .plus-frame__surface, .plus-frame__content')]
+            .filter((el) => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
+            .map((el) => el.className);
+        await expect(painted, 'the docs show through the AI agent layer').toEqual([]);
         await userEvent.click(await within(root()).findByRole('button', { name: 'Prototype links' }));
         await userEvent.click(await body.findByRole('menuitem', { name: 'AI agent' }));
         await waitFor(() => expect(popup(), 'the AI agent opens the popup').not.toBeNull());

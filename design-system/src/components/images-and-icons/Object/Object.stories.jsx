@@ -5,6 +5,10 @@ import { BugIcon, IdeaIcon, OBJECT_SIZES, PageIcon, ProjectIcon, PullRequestIcon
 export default {
     title: 'Components/Images and icons/Object',
     tags: ['!dev', '!autodocs'],
+    argTypes: {
+        size: { control: 'select', options: OBJECT_SIZES, table: { category: 'Design' } },
+        label: { control: 'text', table: { category: 'Content' } },
+    },
 };
 
 export const Kinds = () => (
@@ -44,4 +48,9 @@ Rest.play = async ({ canvasElement }) => {
     const node = canvasElement.querySelector('[data-testid="object-rest"]');
     await expect(node).toHaveAttribute('role', 'img');
     await expect(node).not.toHaveAttribute('tabindex');
+};
+
+export const Interactive = {
+    args: { size: 16, label: 'Task' },
+    render: (args) => <TaskIcon {...args} />,
 };

@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as CodeBlockStories from './CodeBlock.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { CodeBlock } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={CodeBlockStories} />
 
@@ -24,9 +31,7 @@ and long lines that scroll or wrap. The text is one ink: it does not color synta
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Line numbers are on by default. The numbers sit in a gutter a screen reader skips.</>}>
-    <Canvas of={CodeBlockStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={CodeBlockStories.Overview} title="Overview" description={<>Line numbers are on by default. The numbers sit in a gutter a screen reader skips.</>} />
 
 </div>
 
@@ -34,9 +39,7 @@ and long lines that scroll or wrap. The text is one ink: it does not color synta
 
 ## Without line numbers
 
-<DocsCanvasShell description={<>Turn the gutter off with <code>showLineNumbers={'{false}'}</code> for short snippets that are not discussed line by line.</>}>
-    <DsCanvasQuiet of={CodeBlockStories.WithoutLineNumbers} />
-</DocsCanvasShell>
+<ComponentExample of={CodeBlockStories.WithoutLineNumbers} title="Without line numbers" description={<>Turn the gutter off with <code>showLineNumbers={'{false}'}</code> for short snippets that are not discussed line by line.</>} />
 
 </div>
 
@@ -44,13 +47,9 @@ and long lines that scroll or wrap. The text is one ink: it does not color synta
 
 ## Highlighted lines
 
-<DocsCanvasShell description={<><code>highlight="2-4"</code> marks lines 2 to 4. A screen reader hears "Highlight start" and "Highlight end" around the run.</>}>
-    <DsCanvasQuiet of={CodeBlockStories.HighlightedLines} />
-</DocsCanvasShell>
+<ComponentExample of={CodeBlockStories.HighlightedLines} title="Highlighted lines" description={<><code>highlight="2-4"</code> marks lines 2 to 4. A screen reader hears "Highlight start" and "Highlight end" around the run.</>} />
 
-<DocsCanvasShell description={<>An array marks separate runs: <code>[1, 3, 4]</code> is line 1, then lines 3 and 4.</>}>
-    <DsCanvasQuiet of={CodeBlockStories.SeparateHighlights} />
-</DocsCanvasShell>
+<ComponentExample of={CodeBlockStories.SeparateHighlights} title="Separate highlights" description={<>An array marks separate runs: <code>[1, 3, 4]</code> is line 1, then lines 3 and 4.</>} />
 
 </div>
 
@@ -58,13 +57,9 @@ and long lines that scroll or wrap. The text is one ink: it does not color synta
 
 ## Long lines
 
-<DocsCanvasShell description={<>By default long lines scroll sideways in a region a keyboard can focus. <code>label</code> names it for screen readers.</>}>
-    <DsCanvasQuiet of={CodeBlockStories.ScrollsLongLines} />
-</DocsCanvasShell>
+<ComponentExample of={CodeBlockStories.ScrollsLongLines} title="Scrolls long lines" description={<>By default long lines scroll sideways in a region a keyboard can focus. <code>label</code> names it for screen readers.</>} />
 
-<DocsCanvasShell description={<>With <code>wrap</code>, lines fold inside the box and nothing scrolls.</>}>
-    <DsCanvasQuiet of={CodeBlockStories.WrapsLongLines} />
-</DocsCanvasShell>
+<ComponentExample of={CodeBlockStories.WrapsLongLines} title="Wraps long lines" description={<>With <code>wrap</code>, lines fold inside the box and nothing scrolls.</>} />
 
 </div>
 
@@ -72,9 +67,7 @@ and long lines that scroll or wrap. The text is one ink: it does not color synta
 
 ## Blank lines
 
-<DocsCanvasShell description={<>A blank line keeps its height and its number.</>}>
-    <DsCanvasQuiet of={CodeBlockStories.BlankLines} />
-</DocsCanvasShell>
+<ComponentExample of={CodeBlockStories.BlankLines} title="Blank lines" description={<>A blank line keeps its height and its number.</>} />
 
 </div>
 
@@ -82,25 +75,15 @@ and long lines that scroll or wrap. The text is one ink: it does not color synta
 
 ## State
 
-<DocsCanvasShell description={<>The code surface and ink, with a highlighted line on the highlight fill.</>}>
-    <DsCanvasQuiet of={CodeBlockStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={CodeBlockStories.Rest} title="Rest" description={<>The code surface and ink, with a highlighted line on the highlight fill.</>} />
 
-<DocsCanvasShell description={<>The block does not react to a pointer.</>}>
-    <DsCanvasQuiet of={CodeBlockStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={CodeBlockStories.Hovered} title="Hovered" description={<>The block does not react to a pointer.</>} />
 
-<DocsCanvasShell description={<>A press changes nothing.</>}>
-    <DsCanvasQuiet of={CodeBlockStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={CodeBlockStories.Pressed} title="Pressed" description={<>A press changes nothing.</>} />
 
-<DocsCanvasShell description={<>A scrolling block is a named region; keyboard focus draws the 2px ring inset in the block.</>}>
-    <DsCanvasQuiet of={CodeBlockStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={CodeBlockStories.Focused} title="Focused" description={<>A scrolling block is a named region; keyboard focus draws the 2px ring inset in the block.</>} />
 
-<DocsCanvasShell description={<>A wrapping block has nothing to scroll, so it is not in the tab order.</>}>
-    <DsCanvasQuiet of={CodeBlockStories.WrapNotFocusable} />
-</DocsCanvasShell>
+<ComponentExample of={CodeBlockStories.WrapNotFocusable} title="Wrap is not focusable" description={<>A wrapping block has nothing to scroll, so it is not in the tab order.</>} />
 
 </div>
 
@@ -184,40 +167,45 @@ highlighted line `--ds-background-code-highlight`.
 
 ## Best practices
 
-### Choose scroll or wrap by what the code means.
+Choose scroll or wrap by what the code means, name each block, and let the text carry what a highlight points at.
 
-```jsx
-// Correct: scroll keeps line structure, which matters for shell commands and
-// config where a fold could read as a new line.
-<CodeBlock text={command} />
+### Scroll commands, wrap prose.
 
-// Correct: wrap suits prose-like output inside a narrow column.
-<CodeBlock text={log} wrap />
-```
+Scroll keeps line structure, which matters for shell commands and config, where a fold could read as a new line. Wrap suits prose-like output in a narrow column.
+
+<DoDontPair
+    doExample={<div style={{ width: 240 }}><CodeBlock text="npm run build -- --mode production --verbose" label="Build command" /></div>}
+    doCaption="A command scrolls, so one line stays one line."
+    dontExample={<div style={{ width: 240 }}><CodeBlock text="npm run build -- --mode production --verbose" wrap /></div>}
+    dontCaption="A command folded onto a second line reads like two commands."
+/>
 
 ### Name each block when there are several on a page.
 
-```jsx
-// Incorrect: two regions both named "Code snippet".
-<CodeBlock text={install} />
-<CodeBlock text={config} />
-
-// Correct: each region says what it holds.
-<CodeBlock text={install} label="Install command" />
-<CodeBlock text={config} label="Config file" />
-```
+<DoDontPair
+    doExample={<div style={{ width: 320 }}><CodeBlock text="npm install" label="Install command" /></div>}
+    doCaption="Each region says what it holds: Install command."
+    dontExample={<div style={{ width: 320 }}><CodeBlock text="npm install" /></div>}
+    dontCaption="Every block named Code snippet."
+/>
 
 ### Do not rely on a highlight alone.
 
-```jsx
-// Incorrect: the fill is the only cue, and the surrounding text never says
-// which line to look at.
-<CodeBlock text={snippet} highlight="3" />
+<DoDontPair
+    doExample={<div style={{ width: 320 }}><p className="plus-body-1" style={{ margin: '0 0 var(--stack-sm)' }}>Line 2 sets the retries.</p><CodeBlock text={'const timeout = 30;\nconst retries = 3;'} highlight="2" /></div>}
+    doCaption="The sentence says which line to read, and the highlight supports it."
+    dontExample={<div style={{ width: 320 }}><CodeBlock text={'const timeout = 30;\nconst retries = 3;'} highlight="2" /></div>}
+    dontCaption="The fill is the only cue."
+/>
 
-// Correct: the highlight supports the sentence that points at it.
-<p>Line 3 sets the timeout.</p>
-<CodeBlock text={snippet} highlight="3" />
-```
+### Keep the numbers for code you discuss.
+
+<DoDontPair
+    doExample={<div style={{ width: 320 }}><CodeBlock text="npm run dev" showLineNumbers={false} /></div>}
+    doCaption="A one-line command with no gutter."
+    dontExample={<div style={{ width: 320 }}><CodeBlock text="npm run dev" /></div>}
+    dontCaption="A line number beside a single command."
+/>
 
 </div>
 

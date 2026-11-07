@@ -44,6 +44,4 @@ From `design-system/src/components/text-and-data-display/Heading/Heading.scss`. 
 
 Same group: `Code` · `CodeBlock` · `Table`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
