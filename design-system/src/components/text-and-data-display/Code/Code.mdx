@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as CodeStories from './Code.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Code, CodeBlock } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={CodeStories} />
 
@@ -24,9 +31,7 @@ chip. For several lines, use `CodeBlock`.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>The chip is a <code>code</code> element. Its size is 0.875 of the sentence it sits in.</>}>
-    <Canvas of={CodeStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={CodeStories.Overview} title="Overview" description={<>The chip is a <code>code</code> element. Its size is 0.875 of the sentence it sits in.</>} />
 
 </div>
 
@@ -34,9 +39,7 @@ chip. For several lines, use `CodeBlock`.
 
 ## In a heading
 
-<DocsCanvasShell description={<>Because the size is relative, the chip stays 0.875 of a heading as well as of body text.</>}>
-    <DsCanvasQuiet of={CodeStories.InHeading} />
-</DocsCanvasShell>
+<ComponentExample of={CodeStories.InHeading} title="In a heading" description={<>Because the size is relative, the chip stays 0.875 of a heading as well as of body text.</>} />
 
 </div>
 
@@ -44,9 +47,7 @@ chip. For several lines, use `CodeBlock`.
 
 ## Long values
 
-<DocsCanvasShell description={<>A token with no spaces breaks inside the chip instead of overflowing the line.</>}>
-    <DsCanvasQuiet of={CodeStories.WrapsAtTheEdge} />
-</DocsCanvasShell>
+<ComponentExample of={CodeStories.WrapsAtTheEdge} title="Wraps at the edge" description={<>A token with no spaces breaks inside the chip instead of overflowing the line.</>} />
 
 </div>
 
@@ -54,21 +55,13 @@ chip. For several lines, use `CodeBlock`.
 
 ## State
 
-<DocsCanvasShell description={<>The neutral fill and the code ink.</>}>
-    <DsCanvasQuiet of={CodeStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={CodeStories.Rest} title="Rest" description={<>The neutral fill and the code ink.</>} />
 
-<DocsCanvasShell description={<>The chip is text; a pointer changes nothing.</>}>
-    <DsCanvasQuiet of={CodeStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={CodeStories.Hovered} title="Hovered" description={<>The chip is text; a pointer changes nothing.</>} />
 
-<DocsCanvasShell description={<>A press changes nothing.</>}>
-    <DsCanvasQuiet of={CodeStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={CodeStories.Pressed} title="Pressed" description={<>A press changes nothing.</>} />
 
-<DocsCanvasShell description={<>Tab skips the chip and it is never dimmed, so it has no focus or disabled state.</>}>
-    <DsCanvasQuiet of={CodeStories.NotAControl} />
-</DocsCanvasShell>
+<ComponentExample of={CodeStories.NotAControl} title="Focused and disabled" description={<>Tab skips the chip and it is never dimmed, so it has no focus or disabled state.</>} />
 
 </div>
 
@@ -147,25 +140,38 @@ with the text around it). The fill is `--ds-background-neutral` and the ink is
 
 ## Best practices
 
-### Use a block for more than a phrase.
+Use `Code` for a name, value or flag inside a sentence. For several lines, use `CodeBlock`.
 
-```jsx
-// Incorrect: a long chip wraps awkwardly and loses its structure.
-<p>Run <Code>{multiLineScript}</Code></p>
+### Keep the chip to a short phrase.
 
-// Correct: a block keeps lines, numbers and scroll.
-<CodeBlock text={multiLineScript} />
-```
+A long chip wraps awkwardly and loses its structure. A block keeps lines and scroll.
+
+<DoDontPair
+    doExample={<CodeBlock text={'npm install\nnpm run dev'} label="Start the app" />}
+    doCaption="Several lines go in a code block."
+    dontExample={<p className="plus-body-1" style={{ margin: 0 }}>Run <Code>npm install and then npm run dev to start the app</Code></p>}
+    dontCaption="A whole instruction in a chip."
+/>
 
 ### Do not use it for emphasis.
 
-```jsx
-// Incorrect: the chip tells readers "this is literal text to type".
-<p>Press <Code>important</Code> to continue.</p>
+The chip tells readers "this is literal text to type". Use bold or a button label for emphasis.
 
-// Correct: bold or a button label for emphasis.
-<p>Press <strong>Continue</strong> to proceed.</p>
-```
+<DoDontPair
+    doExample={<p className="plus-body-1" style={{ margin: 0 }}>Press <strong>Continue</strong> to proceed.</p>}
+    doCaption="Bold for emphasis, in the reader's words."
+    dontExample={<p className="plus-body-1" style={{ margin: 0 }}>Press <Code>important</Code> to continue.</p>}
+    dontCaption="A chip on a word that is not code."
+/>
+
+### Write it as the reader would type it.
+
+<DoDontPair
+    doExample={<p className="plus-body-1" style={{ margin: 0 }}>Call <Code>getSession()</Code> first.</p>}
+    doCaption="The exact name, with its brackets."
+    dontExample={<p className="plus-body-1" style={{ margin: 0 }}>Call <Code>getSession().</Code> first.</p>}
+    dontCaption="A trailing period inside the chip, which the reader may type."
+/>
 
 </div>
 
@@ -193,7 +199,7 @@ with the text around it). The fill is `--ds-background-neutral` and the ink is
 - **Announced as text.** The chip is a `code` element; screen readers read it as
   ordinary text, so write the code so it makes sense spoken.
 - **Contrast.** The ink on the chip fill passes in every color mode, because both
-  come from the code color roles.
+  come from the neutral background and code ink tokens.
 - **It wraps.** Long values break inside the chip, so reflow at narrow widths and
   200% zoom does not scroll the page.
 
