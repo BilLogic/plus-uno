@@ -19,14 +19,14 @@ Controlled with `isChecked` or uncontrolled with `defaultChecked`. Built on Base
 |------|------|---------|-------------|
 | `id` | string | — | Id of the switch, which the label points at. A generated id is used when omitted. |
 | `name` | string | — | Form key sent with the hidden checkbox and reported in `onChange`. |
-| `label` | node | — | Label text for the toggle |
+| `label` | node | — | Visible text beside the track. Where the label sits elsewhere, leave it out and pass `aria-label`. |
 | `value` | string or number | `'on'` | Form value sent when the toggle is on, and reported as `target.value` in `onChange`. Defaults to `on`. |
 | `isChecked` | bool | — | Controlled on or off state. Pair it with `onChange`; when it is set, `defaultChecked` is ignored. |
 | `defaultChecked` | bool | — | Starting state of an uncontrolled toggle. |
-| `size` | enum | `16` | Track height in pixels |
-| `isDisabled` | bool | `false` | Disable the toggle |
-| `isLoading` | bool | `false` | A change is being saved: shows a spinner and ignores input |
-| `isReadOnly` | bool | `false` | Shown and announced, not changeable |
+| `size` | enum | `16` | Track height in pixels: `16` (default) or `20`. |
+| `isDisabled` | bool | `false` | Prevents interaction and dims the toggle. |
+| `isLoading` | bool | `false` | Shows a spinner while a change is being saved and ignores input. |
+| `isReadOnly` | bool | `false` | Shows the state without letting the user switch it. |
 | `onChange` | func | — | Called with `{ target: { name, value, checked } }` when the user switches it. Not called while the toggle is read-only or loading. |
 | `onFocus` | func | — | Called with the focus event when the switch gains focus. |
 | `onBlur` | func | — | Called with the blur event when the switch loses focus. |

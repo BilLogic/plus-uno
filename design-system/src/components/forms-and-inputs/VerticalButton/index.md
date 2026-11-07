@@ -17,7 +17,7 @@ Vertical button: an icon stacked over a short label, one size (60 by 60). For ch
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `icon` | string or node | — | Font Awesome Free glyph name |
+| `icon` | string or node | — | A Font Awesome Free glyph name (`user-gear`) or a node. |
 | `label` | string (required) | — | One or two words, sentence case. |
 | `appearance` | enum | `'default'` | — |
 | `isSelected` | bool | — | — |

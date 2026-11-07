@@ -2997,7 +2997,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Label text for the file upload field",
+          "description": "The visible label above the field. Without one, the file input is named \"File upload\".",
           "deprecated": null
         },
         {
@@ -3006,7 +3006,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Whether the field is required (shows red asterisk)",
+          "description": "Shows an asterisk on the label.",
           "deprecated": null
         },
         {
@@ -3015,7 +3015,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Description text shown below the label",
+          "description": "Help text inside the field, such as size limits. When omitted, it is built from `acceptedFormats`.",
           "deprecated": null
         },
         {
@@ -3033,7 +3033,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Disable the file upload component",
+          "description": "Disables the button and file input and dims the field.",
           "deprecated": null
         },
         {
@@ -3042,7 +3042,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Show the field and its files without a way to choose a file",
+          "description": "Shows the field and its files without a way to choose a file.",
           "deprecated": null
         },
         {
@@ -3055,7 +3055,7 @@
             "invalid",
             "valid"
           ],
-          "description": "Validation state of the component",
+          "description": "`none` (default) shows no state, `invalid` draws the error state and `valid` the success state. Pair `invalid` or `valid` with `validationMessage`.",
           "deprecated": null
         },
         {
@@ -3064,7 +3064,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Message displayed for validation states",
+          "description": "Message shown under the field for the `invalid` or `valid` state. Not shown when `validation` is `none`.",
           "deprecated": null
         },
         {
@@ -3073,7 +3073,7 @@
           "required": false,
           "default": "'Choose a file'",
           "values": null,
-          "description": "Text displayed on the file selection button",
+          "description": "The label of the choose-file button. Defaults to `Choose a file`.",
           "deprecated": null
         },
         {
@@ -3127,7 +3127,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The uploaded-file list, shown below the button and outside the frame",
+          "description": "The uploaded-file list, shown below the button and outside the frame.",
           "deprecated": null
         }
       ]
@@ -3616,7 +3616,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "A Font Awesome Free glyph name, or a node.",
+          "description": "A Font Awesome Free glyph name (`trash`) or a node.",
           "deprecated": null
         },
         {
@@ -3625,7 +3625,7 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": "The accessible name and the tooltip. Sentence case; name the object acted on.",
+          "description": "The accessible name and tooltip. Sentence case; name the object acted on (\"Edit page\").",
           "deprecated": null
         },
         {
@@ -3639,7 +3639,7 @@
             "primary",
             "discovery"
           ],
-          "description": "The visual style.",
+          "description": "The visual style. `default` suits most actions, `subtle` low-emphasis toolbar actions, `primary` the main action and `discovery` something new.",
           "deprecated": null
         },
         {
@@ -3651,7 +3651,7 @@
             "default",
             "compact"
           ],
-          "description": "Height, width and radius: `default` is 32, `compact` is 24. Compact is for tables and tight toolbars.",
+          "description": "`default` draws 32. `compact` draws 24.",
           "deprecated": null
         },
         {
@@ -3663,7 +3663,7 @@
             "default",
             "circle"
           ],
-          "description": "Square or round. Round is for top navigation.",
+          "description": "Square by default; `circle` is for top navigation.",
           "deprecated": null
         },
         {
@@ -3672,7 +3672,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Marks the button selected and sets `aria-pressed`.",
+          "description": "Marks the button selected and sets `aria-pressed`. Use it for a toggle such as a list or grid view switch.",
           "deprecated": null
         },
         {
@@ -3681,7 +3681,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Prevents interaction. Avoid it; see Accessibility.",
+          "description": "Prevents interaction. Avoid it where you can; say why the action is unavailable instead.",
           "deprecated": null
         },
         {
@@ -5871,7 +5871,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Label text for the first radio",
+          "description": "The text that names this option.",
           "deprecated": null
         },
         {
@@ -5907,7 +5907,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Marks the unselected radios as failing validation",
+          "description": "Draws the error state, for an option that fails validation.",
           "deprecated": null
         },
         {
@@ -5916,7 +5916,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Disable the radios",
+          "description": "Prevents interaction and dims this option.",
           "deprecated": null
         },
         {
@@ -5925,7 +5925,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Shown and focusable, not changeable",
+          "description": "Shows the option without letting the user change it.",
           "deprecated": null
         },
         {
@@ -5934,7 +5934,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Require an answer natively",
+          "description": "Shows an asterisk on the label and sets the native `required` attribute.",
           "deprecated": null
         },
         {
@@ -6154,7 +6154,7 @@
             "12",
             "14"
           ],
-          "description": "Radio control (dot) width in px. Unset keeps today\\'s rendering. No effect on type=\"checkbox\".",
+          "description": "Radio control (dot) width, in px; unset keeps today's rendering.",
           "deprecated": null
         },
         {
@@ -6271,7 +6271,7 @@
           "required": false,
           "default": "0",
           "values": null,
-          "description": "Minimum slider value",
+          "description": "The smallest value. Defaults to 0.",
           "deprecated": null
         },
         {
@@ -6280,7 +6280,7 @@
           "required": false,
           "default": "100",
           "values": null,
-          "description": "Maximum slider value",
+          "description": "The largest value. Defaults to 100.",
           "deprecated": null
         },
         {
@@ -6289,7 +6289,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Current slider value",
+          "description": "The current value, for a controlled slider. Pair it with `onChange`, or use `defaultValue` to leave the slider uncontrolled.",
           "deprecated": null
         },
         {
@@ -6307,7 +6307,7 @@
           "required": false,
           "default": "1",
           "values": null,
-          "description": "Slider increment",
+          "description": "How much the value moves per key press or drag step. Defaults to 1.",
           "deprecated": null
         },
         {
@@ -6316,7 +6316,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Disable the slider",
+          "description": "Prevents interaction and dims the slider.",
           "deprecated": null
         },
         {
@@ -6329,7 +6329,7 @@
             "12",
             "16"
           ],
-          "description": "The dot and bar in px; the track follows at 4/6/8. Unset keeps the default rendering.",
+          "description": "The dot and bar, in px; the track follows. Unset keeps the default rendering.",
           "deprecated": null
         },
         {
@@ -6401,7 +6401,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Show required indicator",
+          "description": "Shows an asterisk on the label and marks the group required.",
           "deprecated": null
         },
         {
@@ -6422,7 +6422,7 @@
             "comments",
             "numeric"
           ],
-          "description": "Variant type: comments (label below) or numeric (labels above)",
+          "description": "`comments` (default) shows the icons alone, with an optional comments label under them; `numeric` prints each number above its icon.",
           "deprecated": null
         },
         {
@@ -6449,7 +6449,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Disable the rating component",
+          "description": "Disables every icon so no rating can be picked.",
           "deprecated": null
         },
         {
@@ -6533,7 +6533,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Placeholder text",
+          "description": "Hint text shown while the editor is empty.",
           "deprecated": null
         },
         {
@@ -6563,7 +6563,7 @@
             "default",
             "compact"
           ],
-          "description": "Editor spacing",
+          "description": "`default` or `compact`.",
           "deprecated": null
         },
         {
@@ -6572,7 +6572,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Read-only state",
+          "description": "Shows the content without letting the user edit it, and disables the toolbar.",
           "deprecated": null
         },
         {
@@ -6581,7 +6581,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Disabled state",
+          "description": "Prevents interaction, disables the toolbar and dims the editor.",
           "deprecated": null
         },
         {
@@ -6590,7 +6590,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Minimum editor height",
+          "description": "Minimum height of the editing area, in pixels.",
           "deprecated": null
         },
         {
@@ -6611,7 +6611,7 @@
             "compact",
             "full"
           ],
-          "description": "compact = Figma email/default toolbar; full = extended control set",
+          "description": "`compact` (default) is the short toolbar for messages; `full` is the extended set of formatting controls. Passing `toolbarButtons` uses the full toolbar with those buttons.",
           "deprecated": null
         },
         {
@@ -9572,7 +9572,7 @@
           "required": false,
           "default": "'__ : __'",
           "values": null,
-          "description": "Placeholder text",
+          "description": "Defaults to `__ : __`.",
           "deprecated": null
         },
         {
@@ -9593,7 +9593,7 @@
             "default",
             "compact"
           ],
-          "description": "Field height: 40 default, 32 compact",
+          "description": "`default` is 40; `compact` is 32.",
           "deprecated": null
         },
         {
@@ -9602,7 +9602,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Disable the picker",
+          "description": "Disables the hour and minute inputs and the period menu.",
           "deprecated": null
         },
         {
@@ -9611,7 +9611,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Make read-only",
+          "description": "Shows the time without letting the user change it.",
           "deprecated": null
         },
         {
@@ -9620,7 +9620,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Draw the field invalid",
+          "description": "Draws the field invalid; a typed time outside 1–12 / 0–59 does too.",
           "deprecated": null
         },
         {
@@ -9629,7 +9629,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Draw the field valid",
+          "description": "Draws the field valid.",
           "deprecated": null
         },
         {
@@ -9710,7 +9710,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Label text for the toggle",
+          "description": "Visible text beside the track. Where the label sits elsewhere, leave it out and pass `aria-label`.",
           "deprecated": null
         },
         {
@@ -9749,7 +9749,7 @@
             "16",
             "20"
           ],
-          "description": "Track height in pixels",
+          "description": "Track height in pixels: `16` (default) or `20`.",
           "deprecated": null
         },
         {
@@ -9758,7 +9758,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Disable the toggle",
+          "description": "Prevents interaction and dims the toggle.",
           "deprecated": null
         },
         {
@@ -9767,7 +9767,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "A change is being saved: shows a spinner and ignores input",
+          "description": "Shows a spinner while a change is being saved and ignores input.",
           "deprecated": null
         },
         {
@@ -9776,7 +9776,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Shown and announced, not changeable",
+          "description": "Shows the state without letting the user switch it.",
           "deprecated": null
         },
         {
@@ -10227,7 +10227,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Font Awesome Free glyph name",
+          "description": "A Font Awesome Free glyph name (`user-gear`) or a node.",
           "deprecated": null
         },
         {

@@ -19,14 +19,14 @@ Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage. Bui
 |------|------|---------|-------------|
 | `id` | string | — | Id of the radio button, which the label points at. A generated id is used when omitted. |
 | `name` | string (required) | — | Form key of the radio group. Options that belong together share it, and it is reported in `onChange`. |
-| `label` | node | — | Label text for the first radio |
+| `label` | node | — | The text that names this option. |
 | `value` | string or number | — | Form value of this option, and the `target.value` that `onChange` reports when it is chosen. |
 | `isChecked` | bool | — | Controlled selected state. Pair it with `onChange`; when it is set, `defaultChecked` is ignored. |
 | `defaultChecked` | bool | — | Whether an uncontrolled radio starts selected. |
-| `isInvalid` | bool | `false` | Marks the unselected radios as failing validation |
-| `isDisabled` | bool | `false` | Disable the radios |
-| `isReadOnly` | bool | `false` | Shown and focusable, not changeable |
-| `isRequired` | bool | `false` | Require an answer natively |
+| `isInvalid` | bool | `false` | Draws the error state, for an option that fails validation. |
+| `isDisabled` | bool | `false` | Prevents interaction and dims this option. |
+| `isReadOnly` | bool | `false` | Shows the option without letting the user change it. |
+| `isRequired` | bool | `false` | Shows an asterisk on the label and sets the native `required` attribute. |
 | `description` | node | — | Secondary text under the label. It describes the option; it does not name it. |
 | `appearance` | enum | `'plain'` | `plain` (default) is a radio beside its label; `card` draws the option as a bordered tile. |
 | `grouped` | bool | `false` | Set by `RadioGroup`. Not for direct use. |
