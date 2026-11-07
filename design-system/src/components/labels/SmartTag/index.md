@@ -3,6 +3,8 @@
 
 # SmartTag
 
+A tag for one of the five SMART competency areas. The `subject` fixes its color and leading icon, and the rest is passed to Tag.
+
 **Import:** `import { SmartTag } from '@/components';`
 
 **Source:** `design-system/src/components/labels/SmartTag/SmartTag.jsx`

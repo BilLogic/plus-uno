@@ -17,34 +17,34 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | string | — | — |
+| `id` | string | — | The `id` of the combobox control; the label and the list ids are built from it. Generated when omitted. |
 | `name` | string | — | Submitted with a form through hidden inputs, one per value. |
 | `label` | node | — | The visible label above the field. Without one, pass `aria-label` or `aria-labelledby`. |
 | `caption` | node | — | Help under the field. With `isInvalid`, `errorMessage` takes its place and is announced. |
 | `isMulti` | bool | `false` | Several values, shown as Tags in the field and checkboxes in the list. |
 | `options` | arrayOf (required) | `[]` | Objects: `value` is the id, `label` (or `text`) what is shown. `group` puts consecutive options under a heading. |
 | `value` | arrayOf | — | The picked id, or ids with `isMulti`. Pass it to control the field. |
-| `defaultValue` | arrayOf | — | — |
-| `placeholder` | string | `'Select...'` | — |
+| `defaultValue` | arrayOf | — | The picked id, or ids with `isMulti`, to start with when the field is uncontrolled. |
+| `placeholder` | string | `'Select...'` | The text shown when nothing is picked. It names the field when there is no label. |
 | `isSearchable` | bool | `false` | Typing in the field filters the list. |
 | `isCreatable` | bool | `false` | Offers "Create text " when nothing matches exactly, ignoring case. Implies typing. |
 | `onCreate` | func | — | Called with the text of a created option, which is then picked. |
 | `open` | bool | — | Holds the list open or shut. Controlled: Escape, a press outside and a pick ask through `onOpenChange`, and the list stays as it is until the parent changes `open`. |
-| `defaultOpen` | bool | `false` | — |
+| `defaultOpen` | bool | `false` | Whether the list starts open, when `open` is not controlling it. |
 | `onOpenChange` | func | — | `(open)`: the list asks to open or close. |
-| `defaultSearchTerm` | string | `''` | — |
+| `defaultSearchTerm` | string | `''` | The text the search input starts with, so the list opens already filtered. Used by a searchable field. |
 | `displayMode` | enum | `'tags'` | With `isMulti`: `tags` (Tag chips) or `text` (comma-separated). |
 | `lineWrap` | bool | `true` | `text` display mode only: wrap onto more lines. |
 | `truncate` | bool | `false` | `text` display mode only: clip the row with a fade. |
 | `spacing` | enum | `'default'` | `default` draws 40 and `compact` draws 32. |
-| `isDisabled` | bool | `false` | — |
+| `isDisabled` | bool | `false` | Dims the field and blocks opening and changing it. |
 | `isReadOnly` | bool | `false` | Shows the value, stays focusable, and cannot be changed. |
 | `isRequired` | bool | `false` | Shows an asterisk on the label and sets `aria-required`. |
 | `info` | node | — | Text for the info tooltip beside the label. |
 | `isInvalid` | bool | `false` | Draws the error border, sets `aria-invalid`, and `errorMessage` becomes the announced caption. |
-| `errorMessage` | node | — | — |
+| `errorMessage` | node | — | The caption shown under the field while `isInvalid` is set. It is announced. |
 | `isValid` | bool | `false` | Draws the confirmation border; `successMessage` takes the caption's place. |
-| `successMessage` | node | — | — |
+| `successMessage` | node | — | The caption shown under the field while `isValid` is set. |
 | `commitOnClose` | bool | `false` | With `isMulti`: `onChange` fires once when the list closes, as a filter bar wants, not on each pick. |
 | `clearable` | bool | — | Shows the clear ×. Unset, it is on with `isMulti` and `!isRequired` otherwise. |
 | `selectAll` | bool | `false` | With `isMulti`: a "Select all" button over the list, hidden past 50 matches. |
@@ -57,8 +57,8 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 | `onChange` | func | — | `(next)`: an id, or an array of ids with `isMulti`. |
 | `onFocus` | func | — | Focus entering the field from outside it. |
 | `onBlur` | func | — | Focus leaving the field and its list. |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
+| `className` | string | `''` | Extra class names added to the field wrapper beside the component's own. |
+| `style` | object | — | Inline styles for the field wrapper. |
 
 ## Variants
 

@@ -157,7 +157,9 @@ export const Button = ({
 Button.propTypes = {
     // Content
     text: PropTypes.string,
+    /** The label, used when `text` is not given. Omit both for an icon-only button. */
     children: PropTypes.node,
+    /** The `title` attribute, a native tooltip on hover. */
     title: PropTypes.string,
 
     // Appearance
@@ -165,18 +167,24 @@ Button.propTypes = {
     /** `default` draws 32. `compact` draws 24, for tables and tight toolbars. */
     spacing: PropTypes.oneOf(BUTTON_SPACINGS),
     shouldFitContainer: PropTypes.bool,
+    /** Extra class names added to the button element beside the component's own. */
     className: PropTypes.string,
 
     // Behavior
+    /** Called with the click event when the button is activated by mouse or keyboard. It does not fire while `isDisabled` or `isLoading` is set. */
     onClick: PropTypes.func,
     isDisabled: PropTypes.bool,
     isSelected: PropTypes.bool,
     isLoading: PropTypes.bool,
+    /** The native button `type`: `button` (default), `submit` or `reset`. Used only when the button renders as a `button` element. */
     type: PropTypes.string,
+    /** Renders the button as this element or component instead, such as a router link. Without it the button is an anchor when `href`, `target` or `rel` is set, otherwise a `button`. */
     as: PropTypes.elementType,
     /** Renders as an anchor when set (and no `as` overrides it). */
     href: PropTypes.string,
+    /** The anchor `target` attribute, such as `_blank`. Used only when the button renders as an anchor. */
     target: PropTypes.string,
+    /** The anchor `rel` attribute. Used only when the button renders as an anchor. */
     rel: PropTypes.string,
     /** Overrides the default `"button"` ARIA role an anchor-rendered Button takes (e.g. `LinkButton`'s own `"link"`). */
     role: PropTypes.string,
@@ -185,6 +193,7 @@ Button.propTypes = {
     iconBefore: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     iconAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 
+    /** The `id` attribute of the rendered element. */
     id: PropTypes.string,
     /** Maps to `data-testid`, for test queries. */
     testId: PropTypes.string,

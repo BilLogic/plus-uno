@@ -43,14 +43,19 @@ export const Link = ({
 };
 
 Link.propTypes = {
+    /** The destination URL of the anchor. Required. */
     href: PropTypes.string.isRequired,
+    /** `default` for links in body text; `subtle` for links inside secondary or quiet text; `inverse` for links on dark or colored grounds. */
     appearance: PropTypes.oneOf(LINK_APPEARANCES),
     /** Pass-through to the anchor; `isOpenInNewWindow` sets `_blank` when neither is given. */
     target: PropTypes.string,
+    /** The anchor `rel` attribute. Defaults to `noopener noreferrer` when the link opens in a new tab. */
     rel: PropTypes.string,
     /** Draws the new-window glyph and appends it to the accessible name. Also defaults `target` to `_blank`. */
     isOpenInNewWindow: PropTypes.bool,
+    /** Extra class names added to the anchor beside the component's own. */
     className: PropTypes.string,
+    /** The link text. Required, since it names the link. */
     children: PropTypes.node.isRequired,
 };
 

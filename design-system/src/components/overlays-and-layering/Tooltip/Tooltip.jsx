@@ -72,15 +72,22 @@ const Tooltip = ({
 Tooltip.propTypes = {
     text: PropTypes.node.isRequired,
     placement: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
+    /** An empty array or a falsy value turns the tooltip off, for a caller that wants one only when its trigger is truncated. Any other value leaves hover and focus active. */
     trigger: PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.arrayOf(PropTypes.string),
     ]),
+    /** The single element that triggers the tooltip. Anything that is not an element is wrapped in a span. */
     children: PropTypes.node.isRequired,
+    /** Id set on the tooltip popup. */
     id: PropTypes.string,
+    /** Extra class on the tooltip popup. */
     className: PropTypes.string,
+    /** Opens or closes the tooltip from outside. Leave it out to open on hover and focus. */
     show: PropTypes.bool,
+    /** Milliseconds the pointer or focus must stay before the tooltip shows. Defaults to 250. */
     delayShow: PropTypes.number,
+    /** Milliseconds before the tooltip hides after the pointer or focus leaves. Defaults to 400. */
     delayHide: PropTypes.number,
 };
 

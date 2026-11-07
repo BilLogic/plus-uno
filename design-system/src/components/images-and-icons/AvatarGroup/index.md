@@ -23,7 +23,7 @@ A row of avatars that overlap, with the rest behind a `+n`. The group owns what 
 | `shape` | oneOf | `'circle'` | One shape for the whole row. |
 | `label` | string | — | Names the group for assistive technology: "Session attendees". |
 | `overflowLabel` | func | — | Formats the overflow's visible text. Defaults to `+n`. |
-| `className` | string | `''` | — |
+| `className` | string | `''` | Extra class names added to the group element beside the component's own. |
 
 ## Related
 

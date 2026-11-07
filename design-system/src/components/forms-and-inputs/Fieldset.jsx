@@ -64,16 +64,21 @@ const Fieldset = ({
 };
 
 Fieldset.propTypes = {
+    /** Id of the fieldset. The legend and error ids derive from it. A generated id is used when omitted. */
     id: PropTypes.string,
     /** Labels the fieldset's contents. */
     legend: PropTypes.node,
+    /** Disables the fieldset and every control inside it. */
     isDisabled: PropTypes.bool,
     /** Marked on the legend. */
     isRequired: PropTypes.bool,
     /** One error for the group, announced when it appears. */
     error: PropTypes.node,
+    /** The fields the legend groups. */
     children: PropTypes.node,
+    /** Extra class on the `<fieldset>`, beside `plus-fieldset`. */
     className: PropTypes.string,
+    /** Inline style on the `<fieldset>`. */
     style: PropTypes.object,
 };
 

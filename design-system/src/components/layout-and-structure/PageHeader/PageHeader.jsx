@@ -37,14 +37,19 @@ export const PageHeader = ({
 };
 
 PageHeader.propTypes = {
+    /** The page title. Drawn as an `xlarge` `Heading` unless `disableTitleStyles` is set. `children` is used when it is omitted. */
     title: PropTypes.node,
     /** `children` is the title when `title` is not given. */
     children: PropTypes.node,
+    /** A breadcrumb trail shown above the title row. Pass a `Breadcrumb`. */
     breadcrumbs: PropTypes.node,
+    /** Controls shown at the end of the title row, such as a primary button or a menu. */
     actions: PropTypes.node,
+    /** Content in a bar below the title row, such as tabs or filters. */
     bottomBar: PropTypes.node,
     /** Renders the title as a plain node instead of a `Heading`, for a caller that styles it itself. */
     disableTitleStyles: PropTypes.bool,
+    /** Extra class names added to the header element beside the component's own. */
     className: PropTypes.string,
 };
 

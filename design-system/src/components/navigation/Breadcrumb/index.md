@@ -17,12 +17,12 @@ Universal element component for navigation breadcrumbs. / /* `items` defaults to
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `items` | arrayOf (required) | `[]` | — |
-| `id` | string | — | — |
-| `separator` | node | `'/'` | — |
+| `items` | arrayOf (required) | `[]` | The trail, in order, as `{ text, href, onClick }`. The last item, and any item without `href`, is the current page and is not a link. `onClick` replaces the navigation with a handler. |
+| `id` | string | — | The `id` attribute of the last (current) item. |
+| `separator` | node | `'/'` | What is drawn between items. A string is used as is; the default is `/`. |
 | `label` | string | `'breadcrumb'` | Accessible label for the nav region that wraps the breadcrumbs. |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
+| `className` | string | `''` | Extra class names added to the `nav` element beside the component's own. |
+| `style` | object | — | Inline styles for the `nav` element. |
 
 ## Tokens touched
 

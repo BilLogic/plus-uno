@@ -471,6 +471,7 @@ const Select = ({
 const valueType = PropTypes.oneOfType([PropTypes.string, PropTypes.number]);
 
 Select.propTypes = {
+    /** The `id` of the combobox control; the label and the list ids are built from it. Generated when omitted. */
     id: PropTypes.string,
     /** Submitted with a form through hidden inputs, one per value. */
     name: PropTypes.string,
@@ -491,7 +492,9 @@ Select.propTypes = {
     })),
     /** The picked id, or ids with `isMulti`. Pass it to control the field. */
     value: PropTypes.oneOfType([valueType, PropTypes.arrayOf(valueType)]),
+    /** The picked id, or ids with `isMulti`, to start with when the field is uncontrolled. */
     defaultValue: PropTypes.oneOfType([valueType, PropTypes.arrayOf(valueType)]),
+    /** The text shown when nothing is picked. It names the field when there is no label. */
     placeholder: PropTypes.string,
     /** Typing in the field filters the list. */
     isSearchable: PropTypes.bool,
@@ -505,9 +508,11 @@ Select.propTypes = {
      * parent changes `open`.
      */
     open: PropTypes.bool,
+    /** Whether the list starts open, when `open` is not controlling it. */
     defaultOpen: PropTypes.bool,
     /** `(open)`: the list asks to open or close. */
     onOpenChange: PropTypes.func,
+    /** The text the search input starts with, so the list opens already filtered. Used by a searchable field. */
     defaultSearchTerm: PropTypes.string,
     /** With `isMulti`: `tags` (Tag chips) or `text` (comma-separated). */
     displayMode: PropTypes.oneOf(['tags', 'text']),
@@ -517,6 +522,7 @@ Select.propTypes = {
     truncate: PropTypes.bool,
     /** `default` draws 40 and `compact` draws 32. */
     spacing: PropTypes.oneOf(SELECT_SPACINGS),
+    /** Dims the field and blocks opening and changing it. */
     isDisabled: PropTypes.bool,
     /** Shows the value, stays focusable, and cannot be changed. */
     isReadOnly: PropTypes.bool,
@@ -526,9 +532,11 @@ Select.propTypes = {
     info: PropTypes.node,
     /** Draws the error border, sets `aria-invalid`, and `errorMessage` becomes the announced caption. */
     isInvalid: PropTypes.bool,
+    /** The caption shown under the field while `isInvalid` is set. It is announced. */
     errorMessage: PropTypes.node,
     /** Draws the confirmation border; `successMessage` takes the caption's place. */
     isValid: PropTypes.bool,
+    /** The caption shown under the field while `isValid` is set. */
     successMessage: PropTypes.node,
     /** With `isMulti`: `onChange` fires once when the list closes, as a filter bar wants, not on each pick. */
     commitOnClose: PropTypes.bool,
@@ -568,7 +576,9 @@ Select.propTypes = {
     onFocus: PropTypes.func,
     /** Focus leaving the field and its list. */
     onBlur: PropTypes.func,
+    /** Extra class names added to the field wrapper beside the component's own. */
     className: PropTypes.string,
+    /** Inline styles for the field wrapper. */
     style: PropTypes.object,
 };
 

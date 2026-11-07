@@ -3,6 +3,8 @@
 
 # StatusTag
 
+A filled label for the condition something is in, such as "Needs review" or "Overdue". It is never a button; its appearance carries the meaning.
+
 **Import:** `import { StatusTag } from '@/components';`
 
 **Source:** `design-system/src/components/labels/StatusTag/StatusTag.jsx`
@@ -22,8 +24,8 @@
 | `trailingMetric` | number or string | — | A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. |
 | `trailingMetricAppearance` | oneOf | — | The Count tag's appearance. Defaults to the Status tag's own. |
 | `maxWidth` | number or string | `200` | The widest the Status tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. |
-| `className` | string | `''` | — |
-| `id` | string | — | — |
+| `className` | string | `''` | Extra class names added to the tag element beside the component's own. |
+| `id` | string | — | The `id` attribute of the tag element. |
 
 ## Variants
 

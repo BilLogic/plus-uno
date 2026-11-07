@@ -56,6 +56,7 @@ const BODY_MASKS = {
 /** A position in the 1000 frame as a percentage of the frame. */
 const pct = (units) => `${units / 10}%`;
 
+/** One of the PLUS illustration characters: a textured body with a face, arms and legs in line work. It is decorative unless given a `title`. */
 export const Illustration = ({
     character = 'mastering-content',
     size = 96,
@@ -127,7 +128,9 @@ Illustration.propTypes = {
     size: PropTypes.number,
     /** Makes the character an image with this name. Without it the character is decorative and hidden. */
     title: PropTypes.string,
+    /** Extra class names added to the character's frame element beside the component's own. */
     className: PropTypes.string,
+    /** Inline styles for the frame element. They are applied after its width and height, so they can override `size`. */
     style: PropTypes.object,
 };
 

@@ -20,10 +20,10 @@ A `Fieldset` (legend plus grouped fields) holding one real Base UI `RadioGroup`,
 | `id` | string | — | Base for every id in the group. Generated when omitted. |
 | `name` | string | — | The form key the choices submit under. Defaults to the group's id. |
 | `legend` | node | — | The question. Names the group. |
-| `orientation` | enum | `'stacked'` | — |
+| `orientation` | enum | `'stacked'` | `stacked` (default) puts one option per line; `inline` lays them in a row, for short labels or a scale. |
 | `options` | arrayOf (required) | `[]` | The answers. A string is its own value and label. An object can add a `description` under the label, `isDisabled`, an `id`, and `reveal`: content shown under the option while it is chosen. |
 | `value` | optionValueType | — | The answer: one option value, or `null`/`undefined` while unanswered. |
-| `defaultValue` | optionValueType | — | — |
+| `defaultValue` | optionValueType | — | The option value chosen at the start, when the group is uncontrolled. Leave it out for no answer. |
 | `onChange` | func | — | Receives the next answer's value. |
 | `leadingText` | node | — | Scale end before the options, e.g. "Not at all". Describes the group. |
 | `trailingText` | node | — | Scale end after the options, e.g. "Very". Describes the group. |
@@ -34,8 +34,8 @@ A `Fieldset` (legend plus grouped fields) holding one real Base UI `RadioGroup`,
 | `isReadOnly` | bool | `false` | Shown and focusable, not changeable. |
 | `isInvalid` | bool | — | Marks every Radio as failing validation. Defaults to whether `error` is set. |
 | `error` | node | — | One error for the group, announced when it appears. |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
+| `className` | string | `''` | Extra class names added to the fieldset beside the component's own. |
+| `style` | object | — | Inline styles for the fieldset. |
 
 ## Variants
 

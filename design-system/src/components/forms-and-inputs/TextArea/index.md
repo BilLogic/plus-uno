@@ -17,33 +17,33 @@ Text area — free text over several lines, on `_Field`. The field is 80 high at
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | string | — | — |
-| `name` | string | — | — |
-| `label` | node | — | — |
+| `id` | string | — | The `id` of the `textarea`; the label points at it. Generated when omitted. |
+| `name` | string | — | The form key the text submits under. |
+| `label` | node | — | The visible label above the field. Hide it with `isLabelHidden`. |
 | `isRequired` | bool | `false` | Shows an asterisk and sets `aria-required`. |
 | `isLabelHidden` | bool | `false` | Hides the label without removing it. |
 | `info` | node | — | Text for an info tooltip beside the label. |
 | `caption` | node | — | Standing help under the field. A message takes its place. |
-| `value` | string | — | — |
-| `defaultValue` | string | — | — |
-| `placeholder` | string | — | — |
+| `value` | string | — | The text. Pass it, with `onChange`, to control the field. |
+| `defaultValue` | string | — | The text to start with when the field is uncontrolled. |
+| `placeholder` | string | — | Hint text shown while the field is empty. |
 | `rows` | number | `3` | Visible text rows. One row is the short text area. |
 | `spacing` | enum | `'default'` | `default` starts at 80 high with 10 corners; `compact` has 8 corners, to sit beside a 32 field. |
 | `appearance` | enum | `'standard'` | `subtle` is borderless until hovered or edited, with Save and Cancel while editing. |
-| `isDisabled` | bool | `false` | — |
-| `isReadOnly` | bool | `false` | — |
+| `isDisabled` | bool | `false` | Dims the field and blocks focus and editing. |
+| `isReadOnly` | bool | `false` | Shows the text and keeps it focusable, but it cannot be changed. |
 | `isInvalid` | bool | `false` | Draws the error border and sets `aria-invalid`; `errorMessage` says why. |
-| `errorMessage` | node | — | — |
+| `errorMessage` | node | — | The caption shown under the field while `isInvalid` is set. It replaces `caption`. |
 | `warningMessage` | node | — | Draws the warning border. Does not set `aria-invalid`: the value is accepted. |
 | `successMessage` | node | — | Draws the confirmation border. |
 | `maxLength` | number | — | Limits the length and shows a count in the caption |
 | `onSave` | func | — | Subtle only: called by Save (or Ctrl/⌘+Enter). Throw or reject to keep the field open in `invalid`. |
-| `onChange` | func | — | — |
-| `onFocus` | func | — | — |
-| `onBlur` | func | — | — |
-| `onKeyDown` | func | — | — |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
+| `onChange` | func | — | Called with the change event on each edit. |
+| `onFocus` | func | — | Called with the focus event when the field gains focus. |
+| `onBlur` | func | — | Called with the blur event when the field loses focus. |
+| `onKeyDown` | func | — | Called with the keydown event. Call `preventDefault` to stop the subtle appearance's own key handling. |
+| `className` | string | `''` | Extra class names added to the field wrapper beside the component's own. |
+| `style` | object | — | Inline styles for the field wrapper. |
 
 ## Variants
 

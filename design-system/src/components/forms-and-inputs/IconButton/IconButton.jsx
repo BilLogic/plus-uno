@@ -51,8 +51,11 @@ IconButton.propTypes = {
     isSelected: PropTypes.bool,
     isDisabled: PropTypes.bool,
     isLoading: PropTypes.bool,
+    /** Called with the click event when the button is activated. It does not fire while `isDisabled` or `isLoading` is set. */
     onClick: PropTypes.func,
+    /** Extra class names added to the button element beside the component's own. */
     className: PropTypes.string,
+    /** Sets the native `title` tooltip. Defaults to `label`; `tooltip` or `isTooltipDisabled` suppresses that default. */
     title: PropTypes.string,
     /** Overrides the tooltip content shown on hover/focus; defaults to `label` when set. */
     tooltip: PropTypes.node,

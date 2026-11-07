@@ -19,19 +19,19 @@ floating popup. Positioning and dismissal (outside click, Escape) are Base UI Me
 |------|------|---------|-------------|
 | `trigger` | element (required) | — | The element that opens the menu. A `Button` with a chevron is the default pattern. |
 | `children` | node | — | The menu's rows: `Section`, `ButtonItem`, `LinkItem`, `CustomItem`. |
-| `isOpen` | bool | — | — |
-| `defaultOpen` | bool | `false` | — |
-| `onOpenChange` | func | — | — |
-| `placement` | enum | `'bottom-start'` | — |
+| `isOpen` | bool | — | Controlled open state. Pair it with `onOpenChange`; leave it out for an uncontrolled menu. |
+| `defaultOpen` | bool | `false` | Whether an uncontrolled menu starts open. |
+| `onOpenChange` | func | — | Called with the next open state (a boolean) when the menu opens or closes: trigger press, outside click, Escape or picking a row. |
+| `placement` | enum | `'bottom-start'` | Side and alignment against the trigger, such as `bottom-start` (default), `top-end` or `right`. A bare side centers the menu on that side. |
 | `shouldFlip` | bool | `true` | Flips to the opposite side when there isn't room. |
 | `spacing` | enum | `'cozy'` | `cozy` draws 40px rows (default), `compact` draws 32px. |
 | `loading` | bool | `false` | Draws a spinner in place of the menu's rows while its options load. |
-| `minWidth` | string | — | — |
-| `maxHeight` | string | — | — |
+| `minWidth` | string | — | Minimum width of the menu list, as a CSS length such as `240px`. |
+| `maxHeight` | string | — | Maximum height of the menu list, as a CSS length such as `320px`. |
 | `container` | object | — | Where the menu portals to. Defaults to the page. |
-| `testId` | string | — | — |
-| `id` | string | — | — |
-| `className` | string | `''` | — |
+| `testId` | string | — | Maps to `data-testid` on the menu popup, for test queries. |
+| `id` | string | — | Id set on the menu popup. |
+| `className` | string | `''` | Extra class on the menu popup, beside `plus-dropdown-menu`. |
 
 ## Variants
 

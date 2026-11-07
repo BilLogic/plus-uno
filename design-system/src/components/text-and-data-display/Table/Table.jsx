@@ -154,7 +154,9 @@ const Table = ({
 const cellAlign = PropTypes.oneOf(['text', 'number', 'icon', 'left', 'right', 'center', 'start', 'end']);
 
 Table.propTypes = {
+    /** The `id` of the `table` element. The wrapper takes `{id}-wrapper`. */
     id: PropTypes.string,
+    /** The column headers. A string is the header text; an object adds `width`, `align`, `className` and `style` to `text`. */
     headers: PropTypes.arrayOf(PropTypes.oneOfType([
         PropTypes.string,
         PropTypes.shape({
@@ -165,6 +167,7 @@ Table.propTypes = {
             style: PropTypes.object
         })
     ])),
+    /** The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `leading`, `state`, `loading`, `className`, `colSpan` or `style`. */
     rows: PropTypes.arrayOf(PropTypes.arrayOf(PropTypes.oneOfType([
         PropTypes.node,
         PropTypes.shape({
@@ -181,19 +184,33 @@ Table.propTypes = {
             style: PropTypes.object
         })
     ]))),
+    /** Shades alternate rows. */
     striped: PropTypes.bool,
+    /** Highlights a row on hover. On by default. */
     hover: PropTypes.bool,
+    /** Draws a frame around the table and lines between columns. Shorthand for `frame="framed"` plus `verticalLines`. */
     bordered: PropTypes.bool,
+    /** Draws lines between columns. */
     verticalLines: PropTypes.bool,
+    /** `plain` (default) draws no outer frame; `framed` draws a border around the table. */
     frame: PropTypes.oneOf(['plain', 'framed']),
+    /** Row height in px: 32 for dense tables, 40 (default) or 48 for roomy ones. */
     size: PropTypes.oneOf(SIZES),
+    /** The index of the column drawn in the title emphasis, for the row's main label. */
     titleColumn: PropTypes.number,
+    /** A state per row, by index: `rest`, `highlighted`, `selected` or `disabled`. */
     rowStates: PropTypes.arrayOf(PropTypes.oneOf(['rest', 'highlighted', 'selected', 'disabled'])),
+    /** Cells for a summary row at the bottom of the table, one per column, such as totals. */
     summary: PropTypes.arrayOf(PropTypes.node),
+    /** Content shown in a single row spanning all columns when `rows` is empty. */
     emptyState: PropTypes.node,
+    /** Content drawn under the table inside its wrapper, such as pagination. */
     footer: PropTypes.node,
+    /** Called with the row index when a row is clicked. The row gets no button role or key handling, so put any keyboard action in a control inside a cell. */
     onRowClick: PropTypes.func,
+    /** Extra class names added to the `table` element beside the component's own. */
     className: PropTypes.string,
+    /** Inline styles for the table's wrapper element. */
     style: PropTypes.object,
 };
 

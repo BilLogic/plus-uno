@@ -42,6 +42,7 @@ const renderVisual = (visual) => (typeof visual === 'string'
     ? <i className={iconClass(visual)} aria-hidden="true" />
     : visual);
 
+/** A filled label for the condition something is in, such as "Needs review" or "Overdue". It is never a button; its appearance carries the meaning. */
 export const StatusTag = ({
     children,
     appearance = 'neutral',
@@ -161,7 +162,9 @@ StatusTag.propTypes = {
     trailingMetricAppearance: PropTypes.oneOf(COUNT_TAG_APPEARANCES),
     /** The widest the Status tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. */
     maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    /** Extra class names added to the tag element beside the component's own. */
     className: PropTypes.string,
+    /** The `id` attribute of the tag element. */
     id: PropTypes.string,
 };
 

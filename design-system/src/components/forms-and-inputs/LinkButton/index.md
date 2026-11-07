@@ -18,18 +18,18 @@ Link button: navigates, and looks like a button. It renders an anchor, so it has
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `href` | string (required) | — | Where the link goes. |
-| `target` | string | — | — |
-| `rel` | string | — | — |
-| `text` | string | — | — |
-| `children` | node | — | — |
-| `appearance` | oneOf | — | — |
+| `target` | string | — | The anchor `target` attribute, such as `_blank` to open a new tab. |
+| `rel` | string | — | The anchor `rel` attribute. Defaults to `noopener noreferrer` when `target` is `_blank`. |
+| `text` | string | — | The label as a string. Wins over `children`. |
+| `children` | node | — | The label, used when `text` is not given. |
+| `appearance` | oneOf | — | The button's look, the same seven as Button. Use `primary` for the one main navigation on a view and `default` or `subtle` for the rest. |
 | `spacing` | enum | — | `default` draws 32. `compact` draws 24. |
-| `iconBefore` | string or node | — | — |
-| `iconAfter` | string or node | — | — |
-| `isSelected` | bool | — | — |
-| `shouldFitContainer` | bool | — | — |
-| `onClick` | func | — | — |
-| `className` | string | — | — |
+| `iconBefore` | string or node | — | An icon before the label: a Font Awesome Free glyph name (`calendar`) or a node. |
+| `iconAfter` | string or node | — | An icon after the label: a Font Awesome Free glyph name (`arrow-right`) or a node. |
+| `isSelected` | bool | — | Marks the link as the current page: sets `aria-current` and draws the selected look on `default` and `subtle`. |
+| `shouldFitContainer` | bool | — | Stretches the link to the full width of its container. |
+| `onClick` | func | — | Called with the click event when the link is activated. The link still navigates to `href` unless the handler prevents it. |
+| `className` | string | — | Extra class names added to the anchor beside the component's own. |
 
 ## Variants
 

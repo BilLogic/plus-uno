@@ -18,25 +18,25 @@ Button: triggers an action.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `text` | string | — | The label. Children work too. |
-| `children` | node | — | — |
-| `title` | string | — | — |
+| `children` | node | — | The label, used when `text` is not given. Omit both for an icon-only button. |
+| `title` | string | — | The `title` attribute, a native tooltip on hover. |
 | `appearance` | enum | `'default'` | The visual style. |
 | `spacing` | enum | `'default'` | Height and padding: `default` draws 32, `compact` draws 24. Compact is for tables and tight toolbars. |
 | `shouldFitContainer` | bool | `false` | Stretches the button to the width of its container. |
-| `className` | string | — | — |
-| `onClick` | func | — | — |
+| `className` | string | — | Extra class names added to the button element beside the component's own. |
+| `onClick` | func | — | Called with the click event when the button is activated by mouse or keyboard. It does not fire while `isDisabled` or `isLoading` is set. |
 | `isDisabled` | bool | `false` | Prevents interaction. Avoid it; see Usage. |
 | `isSelected` | bool | — | Marks the button selected and sets `aria-pressed`. |
 | `isLoading` | bool | `false` | Shows a spinner in place of the label and blocks interaction. |
-| `type` | string | `'button'` | — |
-| `as` | elementType | — | — |
+| `type` | string | `'button'` | The native button `type`: `button` (default), `submit` or `reset`. Used only when the button renders as a `button` element. |
+| `as` | elementType | — | Renders the button as this element or component instead, such as a router link. Without it the button is an anchor when `href`, `target` or `rel` is set, otherwise a `button`. |
 | `href` | string | — | Renders as an anchor when set (and no `as` overrides it). |
-| `target` | string | — | — |
-| `rel` | string | — | — |
+| `target` | string | — | The anchor `target` attribute, such as `_blank`. Used only when the button renders as an anchor. |
+| `rel` | string | — | The anchor `rel` attribute. Used only when the button renders as an anchor. |
 | `role` | string | — | Overrides the default `"button"` ARIA role an anchor-rendered Button takes (e.g. `LinkButton`'s own `"link"`). |
 | `iconBefore` | string or node | — | A Font Awesome Free glyph name, or a node, before the label. |
 | `iconAfter` | string or node | — | A Font Awesome Free glyph name, or a node, after the label. |
-| `id` | string | — | — |
+| `id` | string | — | The `id` attribute of the rendered element. |
 | `testId` | string | — | Maps to `data-testid`, for test queries. |
 
 ## Variants

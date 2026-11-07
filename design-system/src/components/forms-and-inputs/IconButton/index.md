@@ -25,9 +25,9 @@ Icon button: a button that is an icon and nothing else. `label` is required beca
 | `isSelected` | bool | — | Marks the button selected and sets `aria-pressed`. |
 | `isDisabled` | bool | — | Prevents interaction. Avoid it; see Accessibility. |
 | `isLoading` | bool | — | Shows a spinner in place of the icon and blocks interaction. |
-| `onClick` | func | — | — |
-| `className` | string | — | — |
-| `title` | string | — | — |
+| `onClick` | func | — | Called with the click event when the button is activated. It does not fire while `isDisabled` or `isLoading` is set. |
+| `className` | string | — | Extra class names added to the button element beside the component's own. |
+| `title` | string | — | Sets the native `title` tooltip. Defaults to `label`; `tooltip` or `isTooltipDisabled` suppresses that default. |
 | `tooltip` | node | — | Overrides the tooltip content shown on hover/focus; defaults to `label` when set. |
 | `isTooltipDisabled` | bool | `false` | Suppresses the tooltip and native title entirely. |
 

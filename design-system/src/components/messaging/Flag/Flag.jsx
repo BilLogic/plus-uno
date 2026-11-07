@@ -154,6 +154,7 @@ export const Flag = ({
 };
 
 Flag.propTypes = {
+    /** Id set on the flag surface. */
     id: PropTypes.string,
     /** `normal` (default), `information`, `warning`, `error` or `success`. */
     appearance: PropTypes.oneOf(FLAG_APPEARANCES),
@@ -172,16 +173,23 @@ Flag.propTypes = {
     bold: PropTypes.bool,
     /** Whether a bold flag starts expanded. */
     defaultExpanded: PropTypes.bool,
+    /** Shows the dismiss button. Defaults to true; set false to leave it out. */
     dismissible: PropTypes.bool,
+    /** Whether the flag renders. Defaults to true; false renders nothing and stops the auto-close timer. */
     show: PropTypes.bool,
+    /** Called with no arguments when the dismiss button is pressed and when the auto-close timer ends. The caller sets `show` to false. */
     onDismiss: PropTypes.func,
     /** How long it stays before closing itself, in ms. 8000 by default. */
     delay: PropTypes.number,
     /** Close itself after `delay`. Defaults to true for normal, information and success, false for warning and error. */
     autohide: PropTypes.bool,
+    /** Extra class on the flag surface. */
     className: PropTypes.string,
+    /** Extra class on the header row that holds the title and timestamp. */
     headerClass: PropTypes.string,
+    /** Extra class on the description container. */
     bodyClass: PropTypes.string,
+    /** Small text beside the title, such as "11 mins ago". */
     timestamp: PropTypes.node
 };
 

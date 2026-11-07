@@ -3,6 +3,8 @@
 
 # Avatar
 
+A person or an agent shown as a picture, initials or an icon. The picture wins when it loads, then the initials, then the icon, then a plain person glyph.
+
 **Import:** `import { Avatar } from '@/components';`
 
 **Source:** `design-system/src/components/images-and-icons/Avatar/Avatar.jsx`
@@ -24,7 +26,7 @@
 | `color` | enum | `'blue'` | The ground of the initials and icon, from the Tag color set. A picture covers it. |
 | `status` | enum | — | A presence dot at the bottom right. It is said in the accessible name. |
 | `label` | string | — | The accessible name when it should differ from `name`. Without a name or a label the avatar is decorative and hidden. |
-| `className` | string | `''` | — |
+| `className` | string | `''` | Extra class names added to the avatar element beside the component's own. |
 
 ## Variants
 

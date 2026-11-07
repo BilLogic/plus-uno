@@ -17,11 +17,11 @@ Universal modal component for creating dialog windows that overlay the main cont
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | string | — | — |
+| `id` | string | — | The `id` attribute of the dialog panel. |
 | `title` | string | — | The dialog's h1, and its accessible name. |
 | `description` | node | — | A line under the title, read as the dialog's description. |
 | `ariaLabel` | string | — | The dialog's accessible name when it has no visible `title`. |
-| `body` | string or node | — | — |
+| `body` | string or node | — | The main content of the dialog. A string is drawn as body text; a node is drawn as given. `children` is rendered after it. |
 | `height` | enum | `'hug'` | Hug grows to the screen less 128, then scrolls its body; Fill sits at that cap |
 | `showBottomButtons` | bool | `true` | Show bottom buttons |
 | `showCloseButton` | bool | `true` | The header's close button. Off for a dialog that has to be answered. |
@@ -29,17 +29,17 @@ Universal modal component for creating dialog windows that overlay the main cont
 | `footer` | node | — | Custom footer actions in place of the two buttons, aligned right. |
 | `dividers` | bool | `false` | A rule under the header and over the footer. |
 | `loading` | bool | `false` | Skeleton bars in place of the body while its content loads. |
-| `show` | bool | `false` | — |
+| `show` | bool | `false` | Whether the dialog is open. Controlled by the parent: set it to false in `onClose` to close. |
 | `backdrop` | enum | `true` | `true` (default): a click on the blanket closes. `static`: the blanket shows but refuses to close on a click. `false`: no close on a click. |
 | `keyboard` | bool | `true` | Escape closes, by default. `false` for a dialog that has to be answered. |
-| `renderAs` | enum | `'modal'` | — |
-| `primaryButton` | buttonShape | — | — |
-| `secondaryButton` | buttonShape | — | — |
-| `onClose` | func | — | — |
+| `renderAs` | enum | `'modal'` | `modal` (default) opens as a real dialog over the page; `inline` draws the same panel in place as a plain block, for docs previews. |
+| `primaryButton` | buttonShape | — | The confirming footer button, drawn on the right. Takes `text` (default "Confirm"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`. |
+| `secondaryButton` | buttonShape | — | The cancelling footer button, drawn left of the primary one. Takes `text` (default "Cancel"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. |
+| `onClose` | func | — | Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `backdrop` blocks it). The parent sets `show` to false. |
 | `width` | enum or number or string | `'6-col'` | 6 · 8 · 10 columns of the screen grid plus the modal pad; a number is a fixed width |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
-| `children` | node | — | — |
+| `className` | string | `''` | Extra class names added to the dialog panel beside the component's own. |
+| `style` | object | — | Inline styles for the dialog panel. A fixed `width` is applied after them. |
+| `children` | node | — | More content rendered in the body after `body`, for composing the dialog contents directly. |
 
 ## Variants
 

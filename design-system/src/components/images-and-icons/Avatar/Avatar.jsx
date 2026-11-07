@@ -40,6 +40,7 @@ const renderIcon = (icon) => {
     return <i className={className} aria-hidden="true" />;
 };
 
+/** A person or an agent shown as a picture, initials or an icon. The picture wins when it loads, then the initials, then the icon, then a plain person glyph. */
 export const Avatar = ({
     src,
     name,
@@ -114,6 +115,7 @@ Avatar.propTypes = {
     status: PropTypes.oneOf(AVATAR_STATUSES),
     /** The accessible name when it should differ from `name`. Without a name or a label the avatar is decorative and hidden. */
     label: PropTypes.string,
+    /** Extra class names added to the avatar element beside the component's own. */
     className: PropTypes.string,
 };
 

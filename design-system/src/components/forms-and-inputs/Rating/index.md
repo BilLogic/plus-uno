@@ -17,19 +17,19 @@ Rating component with 5 stars, supporting two variants: 1. With "Comments" label
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | string | — | — |
-| `name` | string | — | — |
-| `label` | node | — | — |
+| `id` | string | — | Id of the star group, which the label names. A generated id is used when omitted. |
+| `name` | string | — | Form key under which the chosen rating is sent with its form. |
+| `label` | node | — | Visible label above the stars. It names the group; without one the group is named "Rating". |
 | `isRequired` | bool | `false` | Show required indicator |
-| `value` | number | `0` | — |
+| `value` | number | `0` | Current rating, 0 for none up to 5. Every star up to it is filled. Update it from `onChange`. |
 | `variant` | enum | `'comments'` | Variant type: comments (label below) or numeric (labels above) |
-| `showCommentsLabel` | bool | `true` | — |
-| `commentsLabel` | node | `'Comments'` | — |
+| `showCommentsLabel` | bool | `true` | Shows `commentsLabel` under the stars. Applies to the `comments` variant only. |
+| `commentsLabel` | node | `'Comments'` | Text under the stars in the `comments` variant. Defaults to "Comments". |
 | `isDisabled` | bool | `false` | Disable the rating component |
-| `onChange` | func | — | — |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
-| `icon` | enum | `'star'` | — |
+| `onChange` | func | — | Called with the new rating (1 to 5) when the user picks a different star. |
+| `className` | string | `''` | Extra class on the wrapper around the label and stars. |
+| `style` | object | — | Inline style on the wrapper around the label and stars. |
+| `icon` | enum | `'star'` | The glyph used for every choice: `star` (default) or `thumbs-up`. |
 
 ## Variants
 
@@ -53,12 +53,12 @@ Implemented as `RatingItem`.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `value` | number (required) | — | — |
+| `value` | number (required) | — | The rating this item stands for, 1 to 5. It is the value `onChange` reports when the item is picked. |
 | `selected` | bool | — | Filled — true for every item up to the rating. |
-| `variant` | enum | — | — |
-| `icon` | enum | — | — |
-| `disabled` | bool | — | — |
-| `className` | string | — | — |
+| `variant` | enum | — | `numeric` prints the value above the icon; `comments` shows the icon alone. |
+| `icon` | enum | — | The glyph for the item: `star` (default) or `thumbs-up`. |
+| `disabled` | bool | — | Disables the item. Rating passes its `isDisabled` here. |
+| `className` | string | — | Extra class on the item circle, beside `plus-rating-item`. |
 
 ## Related
 

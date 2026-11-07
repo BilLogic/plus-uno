@@ -17,13 +17,13 @@ Link: an inline navigation anchor.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `href` | string (required) | — | — |
-| `appearance` | enum | `'default'` | — |
+| `href` | string (required) | — | The destination URL of the anchor. Required. |
+| `appearance` | enum | `'default'` | `default` for links in body text; `subtle` for links inside secondary or quiet text; `inverse` for links on dark or colored grounds. |
 | `target` | string | — | Pass-through to the anchor; `isOpenInNewWindow` sets `_blank` when neither is given. |
-| `rel` | string | — | — |
+| `rel` | string | — | The anchor `rel` attribute. Defaults to `noopener noreferrer` when the link opens in a new tab. |
 | `isOpenInNewWindow` | bool | `false` | Draws the new-window glyph and appends it to the accessible name. Also defaults `target` to `_blank`. |
-| `className` | string | — | — |
-| `children` | node (required) | — | — |
+| `className` | string | — | Extra class names added to the anchor beside the component's own. |
+| `children` | node (required) | — | The link text. Required, since it names the link. |
 
 ## Variants
 

@@ -20,8 +20,8 @@ The one dismiss control for a surface that closes as a whole — Modal dialog, S
 | `label` | string | `'Close'` | "Close" for a surface that blocks; "Dismiss {what}" for a message |
 | `tone` | enum | `'default'` | `default` on neutral surfaces; `inverse` only on the declared colored and dark grounds |
 | `spacing` | enum | `'default'` | `default` draws 32. `compact` draws 24. |
-| `onClick` | func | — | — |
-| `className` | string | — | — |
+| `onClick` | func | — | Called with the click event. The surface that owns the close button closes itself here. |
+| `className` | string | — | Extra class names added to the button beside the component's own. |
 
 ## Variants
 

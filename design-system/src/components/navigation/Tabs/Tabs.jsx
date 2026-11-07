@@ -40,8 +40,11 @@ const Tab = ({
 Tab.propTypes = {
     /** Identifies this tab; matched against the root's `activeKey`/`defaultActiveKey`. */
     eventKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    /** The tab's label. */
     children: PropTypes.node,
+    /** Disables this tab: it cannot be selected. */
     isDisabled: PropTypes.bool,
+    /** Extra class on the tab, beside `plus-tab`. */
     className: PropTypes.string
 };
 
@@ -71,10 +74,13 @@ const Panel = ({
 Panel.propTypes = {
     /** Matches the `Tab` with the same `eventKey`. */
     eventKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    /** The content shown while the matching tab is selected. */
     children: PropTypes.node,
+    /** Extra class on the panel, beside `plus-tabs-panel`. */
     className: PropTypes.string
 };
 
+/** A tab strip with its panels. Tabs go into the tablist and every other child, usually Panels, renders after it. */
 const Tabs = ({
     children,
     alignment = 'left',
@@ -129,15 +135,20 @@ const Tabs = ({
 };
 
 Tabs.propTypes = {
+    /** `Tabs.Tab` elements, which fill the tablist, and the `Tabs.Panel` elements that follow it. */
     children: PropTypes.node,
     alignment: PropTypes.oneOf(['left', 'center', 'right', 'justified']),
     /** Underline indicator (default) or a pill-shaped selected background. */
     appearance: PropTypes.oneOf(['default', 'pill']),
     /** `default` is 32px tabs; `compact` is 24px. */
     spacing: PropTypes.oneOf(['default', 'compact']),
+    /** Extra class on the tabs root, beside `plus-tabs`. */
     className: PropTypes.string,
+    /** Id set on the tabs root. */
     id: PropTypes.string,
+    /** The `eventKey` of the tab selected at first, for uncontrolled use. */
     defaultActiveKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    /** The `eventKey` of the selected tab, for controlled use. Pair it with `onSelect`. */
     activeKey: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     /** Called with the newly selected `eventKey` whenever selection moves. */
     onSelect: PropTypes.func

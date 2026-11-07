@@ -102,24 +102,37 @@ const Checkbox = ({
 };
 
 Checkbox.propTypes = {
+    /** The `id` of the checkbox; the label points at it. Generated when omitted. */
     id: PropTypes.string,
+    /** The form key the box submits under, and sent in the `onChange` payload. */
     name: PropTypes.string,
     label: PropTypes.node,
+    /** The value submitted with a form when the box is selected, and sent in the `onChange` payload. */
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    /** Whether the box is selected. Pass it, with `onChange`, to control the checkbox. */
     isChecked: PropTypes.bool,
+    /** Whether the box starts selected, when `isChecked` is not controlling it. */
     defaultChecked: PropTypes.bool,
     isIndeterminate: PropTypes.bool,
     isInvalid: PropTypes.bool,
     isDisabled: PropTypes.bool,
     isReadOnly: PropTypes.bool,
     isRequired: PropTypes.bool,
+    /** Secondary text under the label. It describes the box and does not name it. */
     description: PropTypes.node,
+    /** `plain` (default) draws the box and label inline; `card` draws the choice as a bordered tile. */
     appearance: PropTypes.oneOf(['plain', 'card']),
+    /** Called with `{ target: { name, value, checked } }` when the box is toggled. */
     onChange: PropTypes.func,
+    /** Called with the focus event when the checkbox gains focus. */
     onFocus: PropTypes.func,
+    /** Called with the blur event when the checkbox loses focus. */
     onBlur: PropTypes.func,
+    /** Called with the click event on the checkbox. */
     onClick: PropTypes.func,
+    /** Extra class names added to the field wrapper beside the component's own. */
     className: PropTypes.string,
+    /** Inline styles for the field wrapper. */
     style: PropTypes.object,
     /** Maps to `data-testid`, for test queries. */
     testId: PropTypes.string,

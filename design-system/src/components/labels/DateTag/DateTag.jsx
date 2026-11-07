@@ -39,6 +39,7 @@ const warn = (message) => {
     }
 };
 
+/** An outlined label for a due or event date, such as "Due tomorrow". The app picks the appearance from how close the date is; it is never a button. */
 export const DateTag = ({
     children,
     appearance = 'neutral',
@@ -126,7 +127,9 @@ DateTag.propTypes = {
     spacing: PropTypes.oneOf(DATE_TAG_SPACINGS),
     /** The widest the Date tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. */
     maxWidth: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    /** Extra class names added to the tag element beside the component's own. */
     className: PropTypes.string,
+    /** The `id` attribute of the tag element. */
     id: PropTypes.string,
 };
 

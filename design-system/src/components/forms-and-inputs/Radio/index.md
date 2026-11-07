@@ -17,25 +17,25 @@ Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage. Bui
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | string | — | — |
-| `name` | string (required) | — | — |
+| `id` | string | — | Id of the radio button, which the label points at. A generated id is used when omitted. |
+| `name` | string (required) | — | Form key of the radio group. Options that belong together share it, and it is reported in `onChange`. |
 | `label` | node | — | Label text for the first radio |
-| `value` | string or number | — | — |
-| `isChecked` | bool | — | — |
-| `defaultChecked` | bool | — | — |
+| `value` | string or number | — | Form value of this option, and the `target.value` that `onChange` reports when it is chosen. |
+| `isChecked` | bool | — | Controlled selected state. Pair it with `onChange`; when it is set, `defaultChecked` is ignored. |
+| `defaultChecked` | bool | — | Whether an uncontrolled radio starts selected. |
 | `isInvalid` | bool | `false` | Marks the unselected radios as failing validation |
 | `isDisabled` | bool | `false` | Disable the radios |
 | `isReadOnly` | bool | `false` | Shown and focusable, not changeable |
 | `isRequired` | bool | `false` | Require an answer natively |
-| `description` | node | — | — |
-| `appearance` | enum | `'plain'` | — |
+| `description` | node | — | Secondary text under the label. It describes the option; it does not name it. |
+| `appearance` | enum | `'plain'` | `plain` (default) is a radio beside its label; `card` draws the option as a bordered tile. |
 | `grouped` | bool | `false` | Set by `RadioGroup`. Not for direct use. |
-| `onChange` | func | — | — |
-| `onFocus` | func | — | — |
-| `onBlur` | func | — | — |
-| `onClick` | func | — | — |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
+| `onChange` | func | — | Called with `{ target: { name, value, checked: true } }` when the option is chosen. A radio never reports being unchecked. |
+| `onFocus` | func | — | Called with the focus event when the radio gains focus. |
+| `onBlur` | func | — | Called with the blur event when the radio loses focus. |
+| `onClick` | func | — | Called with the click event on the radio button. |
+| `className` | string | `''` | Extra class on the wrapper around the radio and its label. |
+| `style` | object | — | Inline style on the wrapper around the radio and its label. |
 | `testId` | string | — | Maps to `data-testid`, for test queries. |
 
 ## Variants

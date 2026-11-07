@@ -58,6 +58,7 @@ const Breadcrumb = ({ items = [], id, separator = '/', label = 'breadcrumb', cla
 );
 
 Breadcrumb.propTypes = {
+    /** The trail, in order, as `{ text, href, onClick }`. The last item, and any item without `href`, is the current page and is not a link. `onClick` replaces the navigation with a handler. */
     items: PropTypes.arrayOf(
         PropTypes.shape({
             text: PropTypes.string.isRequired,
@@ -65,11 +66,15 @@ Breadcrumb.propTypes = {
             onClick: PropTypes.func,
         })
     ).isRequired,
+    /** The `id` attribute of the last (current) item. */
     id: PropTypes.string,
+    /** What is drawn between items. A string is used as is; the default is `/`. */
     separator: PropTypes.node,
     /** Accessible label for the nav region that wraps the breadcrumbs. */
     label: PropTypes.string,
+    /** Extra class names added to the `nav` element beside the component's own. */
     className: PropTypes.string,
+    /** Inline styles for the `nav` element. */
     style: PropTypes.object,
 };
 

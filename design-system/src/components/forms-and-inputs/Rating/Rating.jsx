@@ -101,18 +101,28 @@ const Rating = ({
 };
 
 Rating.propTypes = {
+    /** Id of the star group, which the label names. A generated id is used when omitted. */
     id: PropTypes.string,
+    /** Form key under which the chosen rating is sent with its form. */
     name: PropTypes.string,
+    /** Visible label above the stars. It names the group; without one the group is named "Rating". */
     label: PropTypes.node,
     isRequired: PropTypes.bool,
+    /** Current rating, 0 for none up to 5. Every star up to it is filled. Update it from `onChange`. */
     value: PropTypes.number,
     variant: PropTypes.oneOf(['comments', 'numeric']),
+    /** Shows `commentsLabel` under the stars. Applies to the `comments` variant only. */
     showCommentsLabel: PropTypes.bool,
+    /** Text under the stars in the `comments` variant. Defaults to "Comments". */
     commentsLabel: PropTypes.node,
     isDisabled: PropTypes.bool,
+    /** Called with the new rating (1 to 5) when the user picks a different star. */
     onChange: PropTypes.func,
+    /** Extra class on the wrapper around the label and stars. */
     className: PropTypes.string,
+    /** Inline style on the wrapper around the label and stars. */
     style: PropTypes.object,
+    /** The glyph used for every choice: `star` (default) or `thumbs-up`. */
     icon: PropTypes.oneOf(['star', 'thumbs-up'])
 };
 
@@ -167,12 +177,17 @@ const RatingItem = ({
 };
 
 RatingItem.propTypes = {
+    /** The rating this item stands for, 1 to 5. It is the value `onChange` reports when the item is picked. */
     value: PropTypes.number.isRequired,
     /** Filled — true for every item up to the rating. */
     selected: PropTypes.bool,
+    /** `numeric` prints the value above the icon; `comments` shows the icon alone. */
     variant: PropTypes.oneOf(['comments', 'numeric']),
+    /** The glyph for the item: `star` (default) or `thumbs-up`. */
     icon: PropTypes.oneOf(['star', 'thumbs-up']),
+    /** Disables the item. Rating passes its `isDisabled` here. */
     disabled: PropTypes.bool,
+    /** Extra class on the item circle, beside `plus-rating-item`. */
     className: PropTypes.string
 };
 

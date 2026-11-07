@@ -173,6 +173,7 @@ const TagAvatar = ({ type, avatar, label, isLoading }) => {
     );
 };
 
+/** A small outlined label that names a category, person, agent or team. It can also act as a link, a toggle or a removable chip, depending on its props. */
 export const Tag = ({
     text,
     children,
@@ -489,8 +490,11 @@ Tag.propTypes = {
     onAfterRemoveAction: PropTypes.func,
     /** Overrides the Remove button's accessible name. Defaults to `Remove <label>`. */
     removeButtonLabel: PropTypes.string,
+    /** Extra class on the tag element. */
     className: PropTypes.string,
+    /** Id set on the tag element. */
     id: PropTypes.string,
+    /** Inline style on the tag element, merged over the `maxWidth` cap. */
     style: PropTypes.object,
 };
 

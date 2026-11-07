@@ -27,8 +27,11 @@ const PaginationPage = ({ page, isCurrent = false, onSelect, label }) => (
 );
 
 PaginationPage.propTypes = {
+    /** The page number, shown as the button text and passed to `onSelect`. */
     page: PropTypes.number.isRequired,
+    /** Marks the current page: sets `aria-current="page"` and the current styling. */
     isCurrent: PropTypes.bool,
+    /** Called with the page number when the button is pressed. */
     onSelect: PropTypes.func,
     /** Accessible name; the number alone when omitted. */
     label: PropTypes.string,
@@ -62,13 +65,19 @@ const PaginationNavigator = ({ direction, navigator = 'icon', label, isDisabled 
 );
 
 PaginationNavigator.propTypes = {
+    /** `previous` draws a left caret and `next` a right caret. */
     direction: PropTypes.oneOf(['previous', 'next']).isRequired,
+    /** `icon` shows a caret named by `label`; `text` shows `label` as visible text. */
     navigator: PropTypes.oneOf(PAGINATION_NAVIGATORS),
+    /** The control's name: its accessible name with `icon`, its visible text with `text`. */
     label: PropTypes.string.isRequired,
+    /** Keeps the control in the tab order with `aria-disabled`, and pressing it does nothing. */
     isDisabled: PropTypes.bool,
+    /** Called with no arguments when the control is pressed and not disabled. */
     onSelect: PropTypes.func,
 };
 
+/** A numbered page trail with Previous and Next controls. It shows a window of pages around the current one and always keeps the first and last reachable. */
 const Pagination = ({
     currentPage,
     totalPages,
@@ -182,7 +191,9 @@ Pagination.propTypes = {
     nextLabel: PropTypes.string,
     /** Accessible label of the navigation region. */
     label: PropTypes.string,
+    /** Id set on the `<nav>` element. */
     id: PropTypes.string,
+    /** Extra class on the page list, beside `plus-pagination`. */
     className: PropTypes.string
 };
 

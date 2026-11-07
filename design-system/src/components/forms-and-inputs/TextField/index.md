@@ -17,23 +17,23 @@ Text field — a labeled single-line field on `_Field`, 40 high and 32 when `spa
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | string | — | — |
-| `name` | string | — | — |
-| `label` | node | — | — |
+| `id` | string | — | Id of the input, which the label points at. A generated id is used when omitted. |
+| `name` | string | — | Form key of the input. Number steppers also report it in the `onChange` event. |
+| `label` | node | — | Visible label above the field. A string label also names the number steppers, as "Increase" and "Decrease" followed by the label. |
 | `isRequired` | bool | `false` | Shows an asterisk and sets `aria-required`. Explain the asterisk once, in the form's legend. |
 | `isLabelHidden` | bool | `false` | Hides the label visually. It is still rendered and still names the input. |
 | `info` | node | — | Text for an info tooltip beside the label. |
 | `caption` | node | — | Standing help under the field. A message takes its place. |
-| `placeholder` | string | — | — |
+| `placeholder` | string | — | Hint text shown while the input is empty. It does not replace a label. |
 | `value` | string or number | — | With `type="number"`, empty (`''` or `null`) stays empty; it is never read as 0. |
-| `defaultValue` | string or number | — | — |
-| `inputRef` | func or shape or any | — | — |
+| `defaultValue` | string or number | — | Starting value of an uncontrolled field. Use `value` to control it instead. |
+| `inputRef` | func or shape or any | — | Ref to the underlying `<input>`, as a callback or a ref object. |
 | `spacing` | enum | `'default'` | `default` is 40 high; `compact` is 32. |
 | `appearance` | enum | `'standard'` | `subtle` is transparent until it is hovered or edited. |
-| `isDisabled` | bool | `false` | — |
+| `isDisabled` | bool | `false` | Disables the input and its number steppers and dims the field. |
 | `isReadOnly` | bool | `false` | With `type="number"`, also hides the steppers; the value can be read and copied. |
 | `isInvalid` | bool | `false` | Draws the error border and sets `aria-invalid`; `errorMessage` says why. |
-| `errorMessage` | node | — | — |
+| `errorMessage` | node | — | Shown in the caption in place of `caption` when `isInvalid` is true. |
 | `warningMessage` | node | — | Draws the warning border. Does not set `aria-invalid`: the value is accepted. |
 | `successMessage` | node | — | Draws the confirmation border. |
 | `elemBeforeInput` | node | — | Before the control. A string is a text affix; a node is rendered as given. |
@@ -45,12 +45,12 @@ Text field — a labeled single-line field on `_Field`, 40 high and 32 when `spa
 | `step` | number | `1` | `type="number"`: how much a stepper changes the value. |
 | `onSave` | func | — | Subtle only: called on blur or Enter with the new value. Throw or reject to keep the field open in `invalid`. |
 | `autoComplete` | string | — | Browser autofill token, e.g. `email`, `current-password`, `one-time-code`. |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
-| `onChange` | func | — | — |
-| `onFocus` | func | — | — |
-| `onBlur` | func | — | — |
-| `onKeyDown` | func | — | — |
+| `className` | string | `''` | Extra class on the outer field wrapper, beside `plus-text-field`. |
+| `style` | object | — | Inline style on the outer field wrapper. |
+| `onChange` | func | — | Called on every edit with the change event. Stepper presses and clamping call it with `{ target: { name, value, type: "number" } }`, the value as text. |
+| `onFocus` | func | — | Called with the focus event when the input gains focus. |
+| `onBlur` | func | — | Called with the blur event when the input loses focus. A number field is clamped to `min` and `max` first. |
+| `onKeyDown` | func | — | Called with the keydown event before the field handles it. Call `event.preventDefault()` to skip a subtle field's own key handling. |
 | `testId` | string | — | Maps to `data-testid`, for test queries. |
 
 ## Variants
