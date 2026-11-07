@@ -54,7 +54,7 @@
       "group": "Overlays",
       "name": "PatternModal",
       "import": "@/patterns",
-      "use": "The modal shell: centered in a Blanket, one task, title, body and footer, width a step of the screen grid.",
+      "use": "The modal's layout, drawn inline: title, body and footer, width a step of the screen grid. For a working dialog (Blanket, focus trap, Escape) use the `Modal` component, which draws the same layers.",
       "doc": "design-system/src/patterns/PatternModal/PatternModal.mdx"
     },
     {
