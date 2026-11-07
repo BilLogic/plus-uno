@@ -16,6 +16,7 @@
  * `scripts/lib/ratchet.mjs` as `check:legacy-colors`; the baseline is at zero.
  */
 
+import { SOURCE_ROOTS } from './lib/ds-facts.mjs';
 import { RETIRED_TOKENS } from './lib/tokens/plan.mjs';
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
@@ -26,7 +27,8 @@ import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 export { REPO_ROOT };
 
 export const BASELINE = 'scripts/baselines/old-size-tokens.json';
-export const SEARCH_ROOTS = ['design-system/src', 'prototypes', 'src'];
+/** The library's own source and consumer code. */
+export const SEARCH_ROOTS = SOURCE_ROOTS;
 export const SEARCHED = /\.(scss|css|jsx|js|mjs|ts|tsx|html|mdx)$/;
 const TEST = /\.test\.[cm]?[jt]sx?$/;
 

@@ -133,6 +133,22 @@ test('real repo: scope is the consumer-code roots, and the barrel reaches across
   assert.ok(names.length > listed.length, 'importable names include parts, constants and @/dataviz');
 });
 
+test('every check that scopes consumer code composes its roots from the facts module', async () => {
+  const facts = await import('./ds-facts.mjs');
+  const { CONSUMER_ROOTS: consumer, SOURCE_ROOTS, LIBRARY_ROOT, STORYBOOK_ROOT, PROTOTYPE_ROOTS, APP_SHELL_ROOT } = facts;
+  assert.deepEqual(SOURCE_ROOTS, [LIBRARY_ROOT, ...consumer]);
+  assert.deepEqual(PROTOTYPE_ROOTS, consumer.filter((root) => root !== APP_SHELL_ROOT));
+  const roots = async (file, name) => (await import(`../${file}`))[name];
+  assert.equal(await roots('check-ds-usage.mjs', 'SCOPE'), consumer);
+  for (const file of ['check-ads-language.mjs', 'check-old-size-tokens.mjs', 'check-react-bootstrap-imports.mjs']) {
+    assert.equal(await roots(file, 'SEARCH_ROOTS'), SOURCE_ROOTS, file);
+  }
+  for (const file of ['check-font-families.mjs', 'check-undefined-tokens.mjs']) {
+    assert.deepEqual(await roots(file, 'ROOTS'), [LIBRARY_ROOT, STORYBOOK_ROOT, ...PROTOTYPE_ROOTS], file);
+  }
+  assert.deepEqual(await roots('check-legacy-colors.mjs', 'SEARCH_ROOTS'), [`${LIBRARY_ROOT}/components`, `${LIBRARY_ROOT}/ai`, ...PROTOTYPE_ROOTS]);
+});
+
 test('an unknown name is answered, not thrown', () => {
   assert.deepEqual(loadFacts(REPO_ROOT).lookup('Frobnicator'), {
     name: 'Frobnicator',

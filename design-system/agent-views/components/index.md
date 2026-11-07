@@ -18,9 +18,21 @@ Names agents reach for that this system does not have, or has retired. Write the
 |---|---|
 | `Alert` | `SectionMessage`, `Flag` (SectionMessage in the page; Flag for a passing notice) |
 | `Toast` | `Flag` (renamed) |
+| `ToastContainer` | `Flag` (renamed with Toast) |
 | `Switch` | `Toggle` (renamed) |
 | `NavTabs` | `Tabs` (one tab component) |
+| `NavPills` | `Tabs` |
 | `Badge` | `StatusTag`, `CountTag` (StatusTag for a state, CountTag for a number) |
+| `BadgeVariants` | `StatusTag`, `CountTag` |
+| `Jumbotron` | `PatternSection`, `SectionMessage` (PatternSection at page level) |
+| `ListGroup` | `MenuGroup`, `Table` |
+| `MediaObject` | `Avatar`, `Tile` |
+| `Navbar` | `PatternSidebar` (a pattern, inside Frame) |
+| `Scrollspy` | `Tabs`, `ProgressTracker` |
+| `Collapse` | `Accordion` |
+| `InputGroup` | `TextField` |
+| `NumberInput` | `TextField` |
+| `CustomThemeButton` | `Button` |
 | `Dialog` | `Modal` |
 | `Input` | `TextField`, `TextArea` |
 | `Dropdown` | `Select`, `DropdownMenu` (Select picks a value; DropdownMenu runs an action) |

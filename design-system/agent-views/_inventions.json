@@ -1,5 +1,5 @@
 {
-  "$about": "Hand-kept, reviewed in PRs. Names agents reach for that do not exist here, and retired names, each with what to use instead. Rendered into the header of agent-views/components/index.md by npm run generate:agent; every target must exist in components.json or tokens.json (scripts/lib/inventions.test.mjs). Seeded 2026-11-07 from the ds-usage eval baseline and the retired-name lists in scripts/check-ads-language.mjs and scripts/lib/tokens/plan.mjs.",
+  "$about": "Hand-kept, reviewed in PRs. Names agents reach for that do not exist here, and retired names, each with what to use instead. The one source of retired component names: a row marked retired is banned by npm run check:ads-language, and inProse also bans it from component doc prose (a rename with no alias), so retiring a component is one row here. Retired token names are the token plan's (scripts/lib/tokens/plan.mjs, ADR-038); the DS facts module lists them beside these rows, and a token row here that covers a retired name may offer only what the plan maps it to (scripts/lib/retired-names.test.mjs). Rendered into the header of agent-views/components/index.md by npm run generate:agent; every target must exist in components.json or tokens.json (scripts/lib/inventions.test.mjs).",
   "components": [
     {
       "not": "Alert",
@@ -7,28 +7,48 @@
         "SectionMessage",
         "Flag"
       ],
-      "why": "SectionMessage in the page; Flag for a passing notice"
+      "why": "SectionMessage in the page; Flag for a passing notice",
+      "retired": true
     },
     {
       "not": "Toast",
       "use": [
         "Flag"
       ],
-      "why": "renamed"
+      "why": "renamed",
+      "retired": true,
+      "inProse": true
+    },
+    {
+      "not": "ToastContainer",
+      "use": [
+        "Flag"
+      ],
+      "why": "renamed with Toast",
+      "retired": true
     },
     {
       "not": "Switch",
       "use": [
         "Toggle"
       ],
-      "why": "renamed"
+      "why": "renamed",
+      "retired": true
     },
     {
       "not": "NavTabs",
       "use": [
         "Tabs"
       ],
-      "why": "one tab component"
+      "why": "one tab component",
+      "retired": true
+    },
+    {
+      "not": "NavPills",
+      "use": [
+        "Tabs"
+      ],
+      "retired": true
     },
     {
       "not": "Badge",
@@ -36,7 +56,85 @@
         "StatusTag",
         "CountTag"
       ],
-      "why": "StatusTag for a state, CountTag for a number"
+      "why": "StatusTag for a state, CountTag for a number",
+      "retired": true
+    },
+    {
+      "not": "BadgeVariants",
+      "use": [
+        "StatusTag",
+        "CountTag"
+      ],
+      "retired": true
+    },
+    {
+      "not": "Jumbotron",
+      "use": [
+        "PatternSection",
+        "SectionMessage"
+      ],
+      "why": "PatternSection at page level",
+      "retired": true
+    },
+    {
+      "not": "ListGroup",
+      "use": [
+        "MenuGroup",
+        "Table"
+      ],
+      "retired": true
+    },
+    {
+      "not": "MediaObject",
+      "use": [
+        "Avatar",
+        "Tile"
+      ],
+      "retired": true
+    },
+    {
+      "not": "Navbar",
+      "use": [
+        "PatternSidebar"
+      ],
+      "why": "a pattern, inside Frame",
+      "retired": true
+    },
+    {
+      "not": "Scrollspy",
+      "use": [
+        "Tabs",
+        "ProgressTracker"
+      ],
+      "retired": true
+    },
+    {
+      "not": "Collapse",
+      "use": [
+        "Accordion"
+      ],
+      "retired": true
+    },
+    {
+      "not": "InputGroup",
+      "use": [
+        "TextField"
+      ],
+      "retired": true
+    },
+    {
+      "not": "NumberInput",
+      "use": [
+        "TextField"
+      ],
+      "retired": true
+    },
+    {
+      "not": "CustomThemeButton",
+      "use": [
+        "Button"
+      ],
+      "retired": true
     },
     {
       "not": "Dialog",

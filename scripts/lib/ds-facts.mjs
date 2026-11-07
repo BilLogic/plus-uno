@@ -10,7 +10,9 @@
  *     .scope                   the consumer-code roots
  *   readBarrel(root, spec)     what a barrel exports, for the generators that
  *                              write the manifests this module reads
- *   CONSUMER_ROOTS             the folders consumer code lives in
+ *   CONSUMER_ROOTS             the folders consumer code lives in; SOURCE_ROOTS,
+ *                              PROTOTYPE_ROOTS and the named roots beside them
+ *                              are the checks' documented extensions of it
  *   BARRELS                    the public barrels: components, patterns, page templates
  *
  * Every reader of these facts is an adapter at this seam: `check:ds-usage`,
@@ -31,11 +33,36 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { tokenMatchers } from './inventions.mjs';
 import { stripComments } from './js-comments.mjs';
 import { retiredRenames } from './tokens/plan.mjs';
 
+/** The prototype gallery's own shell: consumer code, and the newest root. */
+export const APP_SHELL_ROOT = 'src';
+
 /** Where consumer code lives: what the usage checks read and hold to the system. */
-export const CONSUMER_ROOTS = ['prototypes', 'src'];
+export const CONSUMER_ROOTS = ['prototypes', APP_SHELL_ROOT];
+
+/*
+ * A check that reads more or less than consumer code says so by composing
+ * these, never by a list of its own.
+ */
+
+/** The library's own source. */
+export const LIBRARY_ROOT = 'design-system/src';
+
+/** The library and consumer code: what the language and naming bans read. */
+export const SOURCE_ROOTS = [LIBRARY_ROOT, ...CONSUMER_ROOTS];
+
+/** Storybook's config and preview, styled like the library: the style checks read it too. */
+export const STORYBOOK_ROOT = '.storybook';
+
+/**
+ * Consumer code less the app shell, for the style checks that predate the
+ * shell and have not been run over it: its legacy color reads and font
+ * fallbacks would be new findings. Widening one of them is a migration.
+ */
+export const PROTOTYPE_ROOTS = CONSUMER_ROOTS.filter((root) => root !== APP_SHELL_ROOT);
 
 const COMPONENTS_BARREL = '@/components';
 
@@ -146,17 +173,6 @@ function parsePropRow(not) {
   const m = not.match(/^(\w+)\s+(\w+)(.*)$/);
   if (!m) return null;
   return { component: m[1], prop: m[2], values: [...m[3].matchAll(/"([^"]+)"/g)].map((v) => v[1]) };
-}
-
-/** `--space-025 (4px)`, `--radius-<n>`, `--size-element-*, --element-*` → name matchers. */
-function tokenMatchers(not) {
-  return [...not.matchAll(/--[\w<>*-]+/g)].map(([glob]) => {
-    const source = glob
-      .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
-      .replace(/<n>/g, '\\d+')
-      .replace(/\*/g, '[\\w-]*');
-    return new RegExp(`^${source}$`);
-  });
 }
 
 /**

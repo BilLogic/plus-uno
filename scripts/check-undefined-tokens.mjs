@@ -37,13 +37,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
+import { LIBRARY_ROOT, PROTOTYPE_ROOTS, STORYBOOK_ROOT } from './lib/ds-facts.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 import { audit, corpus, ratchetFailures } from './undefined-tokens.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const ROOTS = ['design-system/src', '.storybook', 'prototypes'];
+/** The library, Storybook and the prototypes; the app shell is not held yet (`PROTOTYPE_ROOTS`). */
+export const ROOTS = [LIBRARY_ROOT, STORYBOOK_ROOT, ...PROTOTYPE_ROOTS];
 const BASELINE = 'scripts/baselines/undefined-token-baseline.json';
 
 /**

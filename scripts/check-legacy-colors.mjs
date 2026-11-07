@@ -33,6 +33,7 @@
  * `--update` refuses to record a rise or a new pair.
  */
 
+import { LIBRARY_ROOT, PROTOTYPE_ROOTS } from './lib/ds-facts.mjs';
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
@@ -42,7 +43,8 @@ export { REPO_ROOT };
 /** Repo-relative: this record's key in the shape table, and what the registry row declares. */
 export const BASELINE = 'scripts/baselines/legacy-colors.json';
 
-export const SEARCH_ROOTS = ['design-system/src/components', 'design-system/src/ai', 'prototypes'];
+/** The library's components and AI parts, and the prototypes; the app shell is not held yet (`PROTOTYPE_ROOTS`). */
+export const SEARCH_ROOTS = [`${LIBRARY_ROOT}/components`, `${LIBRARY_ROOT}/ai`, ...PROTOTYPE_ROOTS];
 export const SEARCHED = /\.(scss|css|jsx|js|mjs|ts|tsx|html|mdx)$/;
 const TEST = /\.test\.[cm]?[jt]sx?$/;
 

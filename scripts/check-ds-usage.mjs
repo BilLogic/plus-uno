@@ -42,7 +42,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
-import { CONSUMER_ROOTS, loadFacts } from './lib/ds-facts.mjs';
+import { CONSUMER_ROOTS, SOURCE_ROOTS, loadFacts } from './lib/ds-facts.mjs';
 import { contextFrom, docLink, escapesIn, pagesOf } from './lib/ds-usage.mjs';
 import { byRoot, isEntry } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
@@ -55,7 +55,7 @@ export const BASELINE = 'scripts/baselines/ds-usage.json';
 export const SCOPE = CONSUMER_ROOTS;
 export const SEARCHED = /\.(jsx|js|mjs|tsx|ts|scss|css|html)$/;
 const SKIPPED = /(?:^|\/)(?:node_modules|dist|build)\/|\.(?:test|spec|stories)\.[cm]?[jt]sx?$|\.d\.ts$/;
-const DEFINITION_ROOTS = ['design-system/src', ...SCOPE];
+const DEFINITION_ROOTS = SOURCE_ROOTS;
 const FA_METADATA = 'node_modules/@fortawesome/fontawesome-free/metadata/icons.json';
 const FREE_REGULAR = 'design-system/src/lib/icon-regular.generated.js';
 
