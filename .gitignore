@@ -91,3 +91,4 @@ embed-model-ab.json
 
 # The ds-usage post-edit hook's local run log (docs/engineering/setup.md § The ds-usage post-edit hook)
 .local/
+prototypes/.ds-usage-hook-test-*/

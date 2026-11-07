@@ -6,6 +6,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { editedPath, handle } from './post-edit.mjs';
+import { inScope } from '../../../scripts/check-ds-usage.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
 const finding = (rule, level = 'fail') => ({ rule, level, file: 'prototypes/x/src/App.jsx', line: 3, col: 1, message: 'm', fix: 'f' });
@@ -20,7 +21,7 @@ test('editedPath reads Claude Code and Cursor payloads, repo-relative', () => {
 test('out of scope: no check, no log, exit 0', () => {
   for (const rel of ['docs/engineering/setup.md', 'design-system/src/components/x/X.jsx', 'scripts/a.mjs', 'prototypes/x/App.test.jsx']) {
     let called = false;
-    const out = handle({ tool_input: { file_path: rel } }, { repoRoot: ROOT, check: () => ((called = true), []) });
+    const out = handle({ tool_input: { file_path: rel } }, { repoRoot: ROOT, inScope, check: () => ((called = true), []) });
     assert.deepEqual([out.ran, out.exitCode, called, out.log], [false, 0, false, null], rel);
   }
 });
@@ -28,7 +29,7 @@ test('out of scope: no check, no log, exit 0', () => {
 test('in scope with a fail-level escape: exit 2, findings on stderr, a log line by rule', () => {
   const out = handle(
     { session_id: 's1', tool_input: { file_path: 'prototypes/x/src/App.jsx' } },
-    { repoRoot: ROOT, check: () => [finding('ds/no-deep-import'), finding('ds/no-deep-import'), finding('ds/no-retired-name', 'warn')], now: () => 't' },
+    { repoRoot: ROOT, inScope, check: () => [finding('ds/no-deep-import'), finding('ds/no-deep-import'), finding('ds/no-retired-name', 'warn')], now: () => 't' },
   );
   assert.equal(out.exitCode, 2);
   assert.match(out.stderr, /prototypes\/x\/src\/App\.jsx:3:1  ds\/no-deep-import/);
@@ -37,14 +38,14 @@ test('in scope with a fail-level escape: exit 2, findings on stderr, a log line 
 });
 
 test('in scope and clean (or warnings only): silent, exit 0, still logged', () => {
-  const out = handle({ tool_input: { file_path: 'src/App.jsx' } }, { repoRoot: ROOT, check: () => [finding('ds/no-retired-name', 'warn')], now: () => 't' });
+  const out = handle({ tool_input: { file_path: 'src/App.jsx' } }, { repoRoot: ROOT, inScope, check: () => [finding('ds/no-retired-name', 'warn')], now: () => 't' });
   assert.deepEqual([out.exitCode, out.stderr, out.log.fail], [0, '', 0]);
 });
 
 test('DS_USAGE_HOOK=off, or a checker that throws, never blocks', () => {
   const off = handle({ tool_input: { file_path: 'src/App.jsx' } }, { repoRoot: ROOT, env: { DS_USAGE_HOOK: 'off' }, check: () => [finding('ds/no-deep-import')] });
   assert.deepEqual([off.ran, off.exitCode], [false, 0]);
-  const broken = handle({ tool_input: { file_path: 'src/App.jsx' } }, { repoRoot: ROOT, check: () => { throw new Error('boom'); } });
+  const broken = handle({ tool_input: { file_path: 'src/App.jsx' } }, { repoRoot: ROOT, inScope, check: () => { throw new Error('boom'); } });
   assert.equal(broken.exitCode, 0);
 });
 

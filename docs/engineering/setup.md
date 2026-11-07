@@ -273,14 +273,14 @@ _Avoid_: "the whitelist", "the exceptions file", "the allow-list"
 
 ## The ds-usage post-edit hook
 
-After an agent edits a file in `prototypes/` or `src/`, `.cursor/hooks/ds-usage/post-edit.mjs` runs `check:ds-usage` on that file and hands any fail-level escape back to the agent, with its fix, so the agent corrects it before going on. Edits anywhere else return at once.
+After an agent edits a file in `prototypes/` or `src/`, `.cursor/hooks/ds-usage/post-edit.mjs` runs `check:ds-usage` on that file and hands any fail-level escape back to the agent, with its fix, so the agent corrects it before going on. The file is held to zero, as the checker holds any file a change touches, so escapes recorded in the baseline come back too. Edits anywhere else return at once.
 
 - **Claude Code**: `PostToolUse` on `Edit|Write|MultiEdit` in `.claude/settings.json`. Exit 2 puts the findings in front of the agent; the edit itself has already landed.
 - **Cursor**: `afterFileEdit` in `.cursor/hooks.json`. Cursor takes no reply from this event, so there it only logs.
 
 Each run appends a line to `.local/ds-usage-runs.jsonl` (git-ignored): time, file, session, and finding counts by rule.
 
-To turn it off locally, set `DS_USAGE_HOOK=off` in the environment the editor or `claude` starts from. A checker error leaves the agent undisturbed: the hook exits 0 and says nothing.
+To turn it off locally, set `DS_USAGE_HOOK=off` in the environment the editor or `claude` starts from. A checker that fails to load or throws leaves the agent undisturbed: the hook exits 0 and says nothing.
 
 ## The Worker's own checks
 
