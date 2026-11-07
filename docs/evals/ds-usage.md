@@ -81,3 +81,19 @@ Compare arms within one model, one `judge_sha` and one `scenarios_sha`. A row wi
 | Mean turns / minutes | 17.6 / 1.2 | 20.7 / 1.3 |
 
 Read: the harness as on main barely moves the total. It removes deep imports, unknown tokens and most unknown props, and trades raw literals for primitive reads: agents with the harness reach for tokens, but at the primitive tier. Two runs per cell is enough to see direction, not to rank small differences.
+
+## After phase 1 (2026-11-07)
+
+12 runs of the current arm on `sonnet`, harness at main `f21aa53e2`: the checker and its manifests, the post-edit hook, the ds-lens rewrite, the index's "Not here" header and self-check with the ladder tokens in the token view, and the coded-build retrieval proof with the checker as its gate. No run errored, and no run reached the checkout.
+
+| | current, baseline | current, after phase 1 |
+|---|---|---|
+| Escapes per run | 9.33 | 0 |
+| Raw literals | 49 | 0 |
+| Primitive reads | 62 | 0 |
+| Unknown props or values | 1 | 0 |
+| Trap task, gap named | 2/2 | 2/2 |
+| Layout formula used | 2/11 | 2/12 |
+| Mean turns / minutes | 20.7 / 1.3 | 21.5 / 1.6 |
+
+Read: every build came out clean, and the post-edit hook never had to hand one back, so the escapes stopped at write time rather than at the gate. Builds read the ladder (`--inline-md`, `--page-stack-md`, `--pad-x-lg`) where the baseline read `--space-*` primitives. Eleven of twelve runs ran `check:ds-usage` themselves before finishing. One difference from the baseline setup: there, the checker could not run in a copy without git, so the gate was out of reach; here it runs. Layout is unmoved: ten of twelve outer structures are still hand-made, which is the next lever. The control arm was not re-run, since nothing it reads changed.
