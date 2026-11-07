@@ -128,3 +128,19 @@ Read: every build came out clean, and the post-edit hook never had to hand one b
 | Mean turns / minutes | 21.5 / 1.6 | 19.5 / 1.3 |
 
 Read: every full page now sits in `PageLayout`, and both frame-to-code builds are a `PatternCard`, where the runs before wrote that the system had no card. The one miss is an overlay flow whose outer view was hand-made. An overlay-flow agent also chose the `Modal` component over `PatternModal` because the pattern draws inline with no focus trap, which is right; the row now says so. After this run the review also dropped a wrong "Not here" row for `Section` (a real menu part), renamed the table's first column and named all three barrels in the index header; none of those touch what a page agent reads first.
+
+## Phase 2 baseline (2026-11-07)
+
+The small default run at `45aeeea59`: three arms, four tasks (`page-from-prd`, `trap-missing-component`, `debt-extend`, `forbidden-ask`), two runs a cell, sonnet, on the subscription login. 24 builds, no errors. Two runs a cell show direction, not rank.
+
+| Arm | Escapes per run | Layout from a pattern | Trap passed | Forbidden ask escalated | Debt left (seeded 6) | Mean input tokens | Mean turns |
+|---|---|---|---|---|---|---|---|
+| control | 13.88 | 2/8 | 2/2 | 0/2 | 9 | 467,726 | 16.5 |
+| current | 1.13 | 5/8 | 2/2 | 2/2 | 3 | 688,834 | 17.6 |
+| checker-removed | 1.50 | 4/8 | 2/2 | 2/2 | 4 | 589,324 | 15.8 |
+
+- **The harness earns most of the result, not the checker.** Taking the checker away moves escapes from 1.13 to 1.50 a run; taking the harness away moves them to 13.88. The agent that cannot run the checker still escalates the forbidden ask and still pays down debt.
+- **The harder tasks are not at zero.** The remaining escapes are raw literals and deep imports, mostly in the seeded debt task; the control arm adds to the debt it starts with, the harness arms halve it.
+- **The harness costs input.** About 47% more input tokens than control for about one more turn, which is the reading that buys the drop in escapes. The lookup arms are measured against this.
+- **Accessibility is measured, not good.** Every arm averages 8 to 13 axe violations a build, almost all `region` (content outside a landmark); the harness does not teach landmarks yet.
+- **The read set is thin.** Most of what agents open goes through shell search and is counted as lookups, so "files read" undercounts; treat it as a floor.
