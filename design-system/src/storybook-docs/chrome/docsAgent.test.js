@@ -8,15 +8,15 @@ const history = () => [{ role: 'user', text: 'earlier' }, { role: 'assistant', t
 describe('createAgentResponder', () => {
     it('posts the question and the last turns to the function and returns its text with the search links', async () => {
         const fetchFn = vi.fn(async () => ok({ text: 'Button takes appearance.' }));
-        const respond = createAgentResponder({ fetchFn, search, getHistory: history });
-        const out = await respond('How do I use Button?');
+        const respond = createAgentResponder({ fetchFn, search });
+        const out = await respond('How do I use Button?', history());
         expect(fetchFn).toHaveBeenCalledWith(AGENT_ENDPOINT, expect.objectContaining({ method: 'POST' }));
         expect(JSON.parse(fetchFn.mock.calls[0][1].body)).toEqual({ question: 'How do I use Button?', history: history() });
         expect(out).toEqual({ text: 'Button takes appearance.', links: [{ label: 'Button', href: '/b' }] });
     });
 
     it.each([[429], [500], [502]])('falls back to search and says so on a %i', async (status) => {
-        const respond = createAgentResponder({ fetchFn: async () => ok({}, status), search, getHistory: history });
+        const respond = createAgentResponder({ fetchFn: async () => ok({}, status), search });
         const out = await respond('Button');
         expect(out.links).toEqual([{ label: 'Button', href: '/b' }]);
         expect(out.text).toMatch(/search/i);
@@ -24,9 +24,9 @@ describe('createAgentResponder', () => {
     });
 
     it('falls back when the network fails or the reply has no text', async () => {
-        const down = createAgentResponder({ fetchFn: async () => { throw new Error('offline'); }, search, getHistory: history });
+        const down = createAgentResponder({ fetchFn: async () => { throw new Error('offline'); }, search });
         expect((await down('Button')).text).toMatch(/search/i);
-        const empty = createAgentResponder({ fetchFn: async () => ok({ text: '' }), search, getHistory: history });
+        const empty = createAgentResponder({ fetchFn: async () => ok({ text: '' }), search });
         expect((await empty('Button')).text).toMatch(/search/i);
     });
 });

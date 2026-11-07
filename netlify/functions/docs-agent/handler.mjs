@@ -4,7 +4,8 @@
 const MAX_QUESTION = 2000;
 const MAX_TURN_CHARS = 1000;
 const MAX_TURNS = 6;
-const MAX_OUTPUT_TOKENS = 700;
+// Thinking tokens count against the cap, so it leaves room for a short answer after low thinking.
+const MAX_OUTPUT_TOKENS = 1500;
 const DEFAULT_LIMIT = { max: 20, windowMs: 60_000 };
 
 export const buildSystemPrompt = (grounding) => [
@@ -29,7 +30,7 @@ export const trimHistory = (history) => {
 
 const reply = (status, body) => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
-const clientIp = (req) => (req.headers.get('x-nf-client-connection-ip') ?? req.headers.get('x-forwarded-for') ?? 'unknown').split(',')[0].trim();
+const clientIp = (req) => req.headers.get('x-nf-client-connection-ip') ?? 'unknown';
 
 export const createHandler = ({ getToken, callVertex, grounding, now = Date.now, rateLimit = DEFAULT_LIMIT }) => {
     const hits = new Map(); // ip -> timestamps in the window (per warm instance)
@@ -48,11 +49,11 @@ export const createHandler = ({ getToken, callVertex, grounding, now = Date.now,
         let body;
         try { body = await req.json(); } catch { return reply(400, { error: 'invalid JSON' }); }
         const question = typeof body?.question === 'string' ? body.question.trim() : '';
-        if (!question || question.length > MAX_QUESTION) return reply(400, { error: 'question must be 1 to 2000 characters' });
+        if (!question || question.length > MAX_QUESTION) return reply(400, { error: `question must be 1 to ${MAX_QUESTION} characters` });
         if (limited(clientIp(req))) return reply(429, { error: 'rate limited' });
 
         let token;
-        try { token = await getToken(); } catch { return reply(502, { error: 'agent unavailable' }); }
+        try { token = await getToken(); } catch (error) { console.error('docs-agent token:', error?.message); return reply(502, { error: 'agent unavailable' }); }
         const result = await callVertex({
             token,
             system: buildSystemPrompt(grounding),
@@ -60,6 +61,7 @@ export const createHandler = ({ getToken, callVertex, grounding, now = Date.now,
             maxOutputTokens: MAX_OUTPUT_TOKENS,
         });
         if (result.ok && result.text) return reply(200, { text: result.text });
+        console.error('docs-agent vertex:', result.status ?? '', result.error ?? 'empty reply');
         return result.status === 429 ? reply(429, { error: 'quota' }) : reply(502, { error: 'agent unavailable' });
     };
 };

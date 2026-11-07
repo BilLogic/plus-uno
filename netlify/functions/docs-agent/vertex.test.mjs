@@ -78,6 +78,7 @@ test('callVertex sends system prompt, contents and output cap with a bearer toke
     const body = JSON.parse(seen.init.body);
     assert.equal(body.systemInstruction.parts[0].text, 'SYS');
     assert.equal(body.generationConfig.maxOutputTokens, 300);
+    assert.deepEqual(body.generationConfig.thinkingConfig, { thinkingLevel: 'low' });
     assert.equal(body.contents[0].parts[0].text, 'hi');
 });
 

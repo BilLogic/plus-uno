@@ -1,7 +1,7 @@
 // Google service-account auth and the Vertex generateContent call, ported from
 // agents/uno-bot/src/gemini/auth.ts and client.ts (vertexBase / geminiEndpoint)
 // with Node's built-in crypto. Vertex service account only: no API-key path
-// (docs/adr/ADR-018).
+// (docs/adr/018-gemini-access-is-vertex-only-in-production-ai.md).
 
 import { createSign } from 'node:crypto';
 
@@ -63,7 +63,7 @@ export const callVertex = async ({ env, fetch = globalThis.fetch, token, system,
             body: JSON.stringify({
                 contents,
                 systemInstruction: { parts: [{ text: system }] },
-                generationConfig: { maxOutputTokens },
+                generationConfig: { maxOutputTokens, thinkingConfig: { thinkingLevel: 'low' } },
             }),
         });
         const data = await res.json().catch(() => ({}));

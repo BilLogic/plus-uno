@@ -9,15 +9,15 @@ export const AGENT_ENDPOINT = '/.netlify/functions/docs-agent';
 const FALLBACK_NOTE = 'The AI agent is unavailable right now, so this is a search of the docs instead.';
 
 /**
- * `search(text) => { text, links }`; `getHistory() => [{ role, text }]` is the
- * conversation before this question.
+ * `search(text) => { text, links }`. The returned `(text, history)` takes the
+ * conversation before the question as `[{ role, text }]`.
  */
-export const createAgentResponder = ({ fetchFn = (...args) => fetch(...args), search, getHistory = () => [] }) => async (text) => {
+export const createAgentResponder = ({ fetchFn = (...args) => fetch(...args), search }) => async (text, history = []) => {
     try {
         const res = await fetchFn(AGENT_ENDPOINT, {
             method: 'POST',
             headers: { 'content-type': 'application/json' },
-            body: JSON.stringify({ question: text, history: getHistory() }),
+            body: JSON.stringify({ question: text, history }),
         });
         const data = res.ok ? await res.json() : null;
         if (data?.text) {

@@ -423,7 +423,7 @@ The Storybook docs' AI agent is answered by `netlify/functions/docs-agent`: Gemi
 | `GEMINI_MODEL` | optional, default `gemini-3.8-flash` |
 | `GEMINI_REGION` | optional, default `global` |
 
-The function signs a JWT with Node's `crypto`, exchanges it for an OAuth token and calls `generateContent`. Its grounding is the generated design-system index, bundled through `included_files` in `netlify.toml`. Tests: `npm run test:scripts`. Without the variables the chat falls back to the docs search.
+The function signs a JWT with Node's `crypto`, exchanges it for an OAuth token and calls `generateContent`. Its grounding is the generated design-system index, bundled through `included_files` in `netlify.toml`. Tests: `npm run test:scripts`. The per-IP rate limit is best effort: it is held per warm function instance, so a cold start resets it. Without the variables, or on an error or a 429, the chat falls back to the docs search.
 
 ## Local Preview
 

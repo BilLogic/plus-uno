@@ -51,7 +51,6 @@ const AgentAction = () => {
  */
 const DocsAiAgent = ({ loadEntries = loadDocsEntries, hrefFor = docsHref, fetchFn }) => {
     const loaded = useRef(null);
-    const turns = useRef([]);
     const search = useCallback(async (text) => {
         loaded.current ??= loadEntries();
         try {
@@ -61,10 +60,7 @@ const DocsAiAgent = ({ loadEntries = loadDocsEntries, hrefFor = docsHref, fetchF
             throw error;
         }
     }, [loadEntries, hrefFor]);
-    const respond = useMemo(() => {
-        const answer = createAgentResponder({ fetchFn, search, getHistory: () => turns.current });
-        return (text, history = []) => { turns.current = history; return answer(text); };
-    }, [fetchFn, search]);
+    const respond = useMemo(() => createAgentResponder({ fetchFn, search }), [fetchFn, search]);
 
     return (
         <div className="plus-docs-ai">

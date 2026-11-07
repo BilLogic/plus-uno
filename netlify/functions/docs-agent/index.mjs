@@ -32,5 +32,7 @@ const get = () => {
 };
 
 export default async (req) => {
-    try { return await get()(req); } catch { return new Response(JSON.stringify({ error: 'agent unavailable' }), { status: 502, headers: { 'content-type': 'application/json' } }); }
+    try { return await get()(req); } catch (error) {
+        console.error('docs-agent:', error?.message);
+        return new Response(JSON.stringify({ error: 'agent unavailable' }), { status: 502, headers: { 'content-type': 'application/json' } }); }
 };
