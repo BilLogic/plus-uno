@@ -121,9 +121,9 @@ const LessonsTable = ({
                     const isExpanded = expandedRows.has(lessonId);
                     const isCompleted = ['completed', 'complete'].includes(lesson.status);
                     const groupStateClass = lesson.state ? `lessons-table__group--${lesson.state}` : '';
-                    // Disabled is a color, not an opacity: the text drops to the
-                    // subtlest color, which still reads at 4.5:1, its controls are
-                    // disabled, and each row says it is disabled.
+                    // A locked lesson says so with a Locked status in place of its
+                    // action, rather than a disabled button that cannot say why.
+                    // Its text drops to the subtlest color, still 4.5:1.
                     const isDisabled = ['disabled', 'disable'].includes(lesson.state);
                     const subtleText = isDisabled ? 'var(--ds-text-subtlest)' : 'var(--ds-text-subtle)';
 
@@ -146,7 +146,6 @@ const LessonsTable = ({
                                                 className="lessons-table__toggle"
                                                 aria-label={`${isExpanded ? 'Hide' : 'Show'} details for ${lesson.title}`}
                                                 aria-expanded={isExpanded}
-                                                disabled={isDisabled}
                                                 onClick={(e) => toggleRow(lessonId, e)}
                                             >
                                                 <i className={`fas fa-chevron-${isExpanded ? 'down' : 'right'}`} aria-hidden="true" />
@@ -196,11 +195,12 @@ const LessonsTable = ({
 
                                 {/* Action Column */}
                                 <td className="lessons-table__cell">
-                                    {usePills ? (
+                                    {isDisabled ? (
+                                        <StatusTag appearance="neutral" leadingVisual="lock">Locked</StatusTag>
+                                    ) : usePills ? (
                                         <button
                                             type="button"
                                             className="lessons-table__action-link"
-                                            disabled={isDisabled}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onLessonAction?.(lesson);
@@ -217,7 +217,6 @@ const LessonsTable = ({
                                             }
                                             appearance="primary"
                                             spacing="compact"
-                                            isDisabled={isDisabled}
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 onLessonContinue?.(lesson);

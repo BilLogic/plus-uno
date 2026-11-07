@@ -82,9 +82,15 @@
             }
         }
 
+        // A locked lesson still expands; only its action is replaced. It does
+        // not open on a click, so it does not light up under the pointer.
         &.lessons-table__group--disabled,
         &.lessons-table__group--disable {
-            pointer-events: none;
+            cursor: default;
+
+            &:hover {
+                background-color: transparent;
+            }
         }
 
         .lessons-table__row {

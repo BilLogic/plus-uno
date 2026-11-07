@@ -485,15 +485,10 @@ export const Interactive = () => {
                 <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                     Total Sessions: <strong>{sessions.length}</strong>
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--ds-text-information)' }}>
-                    In Progress: <strong>{statusCounts['in-progress']}</strong>
-                </span>
-                <span className="body2-txt" style={{ color: 'var(--color-secondary)' }}>
-                    Upcoming: <strong>{statusCounts['upcoming']}</strong>
-                </span>
-                <span className="body2-txt" style={{ color: 'var(--color-success)' }}>
-                    Completed: <strong>{statusCounts['completed']}</strong>
-                </span>
+                {/* Each status in the appearance its rows' tags use, its count as the tag's trailing count. */}
+                <StatusTag appearance="info" trailingMetric={statusCounts['in-progress']}>In progress</StatusTag>
+                <StatusTag appearance="neutral" trailingMetric={statusCounts['upcoming']}>Upcoming</StatusTag>
+                <StatusTag appearance="success" trailingMetric={statusCounts['completed']}>Completed</StatusTag>
             </div>
 
             {/* Filter Controls */}
