@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as CountTagStories from './CountTag.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { CountTag } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -50,25 +57,21 @@ own: unread items, results, errors.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>Subtle by default; <code>isBold</code> when it asks for action now; <code>isInverse</code> on filled buttons and dark surfaces; <code>isDot</code> for presence without a number.</>}>
-    <Canvas of={CountTagStories.Appearances} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={CountTagStories.Appearances} title="Subtle, bold, inverse and dot" description={<>Subtle by default; <code>isBold</code> when it asks for action now; <code>isInverse</code> on filled buttons and dark surfaces; <code>isDot</code> for presence without a number.</>} />
+
+<ComponentExample of={CountTagStories.Styles} title="Appearances" description="Neutral, success, warning, danger, info and discovery, subtle and bold. Use an appearance only when the number carries it." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Variants
+## Size and layout
 
-<DocsCanvasShell description={<>Default (20) on its own; compact (16) for use inside a label. Every count has a 2px corner and a minimum width of 24, so one digit is a small rectangle and more digits grow it from the trailing edge. Only the dot is round.</>}>
-    <DsCanvasQuiet of={CountTagStories.Spacings} />
-</DocsCanvasShell>
+<ComponentExample of={CountTagStories.Spacings} title="Spacing" description="Default draws 20 high on its own; compact draws 16, for use inside a label. More digits grow the badge from the trailing edge." />
 
-<DocsCanvasShell description={<>The six appearances, subtle and bold, and the dot. Use an appearance only when the number carries it. Bold warning uses Warning Container.</>}>
-    <DsCanvasQuiet of={CountTagStories.Styles} />
-</DocsCanvasShell>
+<ComponentExample of={CountTagStories.Ring} title="Ring" description={<><code>hasRing</code> adds a 2px ring in the page color, for a count pinned to an icon or an avatar.</>} />
 
 </div>
 
@@ -76,31 +79,13 @@ own: unread items, results, errors.
 
 ## Behavior
 
-<DocsCanvasShell description={<><code>max</code> caps the number with a <code>+</code>; the default is 99.</>}>
-    <DsCanvasQuiet of={CountTagStories.Max} />
-</DocsCanvasShell>
+<ComponentExample of={CountTagStories.Max} title="Max" description={<><code>max</code> caps the number with a <code>+</code>. The default is 99.</>} />
 
-<DocsCanvasShell description={<>A count of 0 renders nothing, unless <code>showZero</code> is set.</>}>
-    <DsCanvasQuiet of={CountTagStories.Zero} />
-</DocsCanvasShell>
+<ComponentExample of={CountTagStories.Zero} title="Zero" description={<>A count of 0 renders nothing, unless <code>showZero</code> is set.</>} />
 
-</div>
+<ComponentExample of={CountTagStories.LabeledNumber} title="Labeled number" description={<>With <code>label</code>, a screen reader reads the number as information rather than a bare digit.</>} />
 
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<><code>hasRing</code> adds a 2px ring in the page color for a count pinned to an icon or avatar, numeric or dot.</>}>
-    <DsCanvasQuiet of={CountTagStories.Ring} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>With <code>label</code>, a number is read as information rather than a bare digit.</>}>
-    <DsCanvasQuiet of={CountTagStories.LabeledNumber} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A dot needs <code>label</code>. Without one it warns in development.</>}>
-    <DsCanvasQuiet of={CountTagStories.DotNeedsALabel} />
-</DocsCanvasShell>
+<ComponentExample of={CountTagStories.DotNeedsALabel} title="Dot label" description={<>A dot needs <code>label</code>. Without one it warns in development.</>} />
 
 </div>
 
@@ -108,25 +93,15 @@ own: unread items, results, errors.
 
 ## State
 
-<DocsCanvasShell description={<>Rest. The only state: a number in a near-square badge.</>}>
-    <DsCanvasQuiet of={CountTagStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={CountTagStories.Rest} title="Rest" description="The only state: a number in a near-square badge." />
 
-<DocsCanvasShell description={<>Hovered. No change: a count is not a control.</>}>
-    <DsCanvasQuiet of={CountTagStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={CountTagStories.Hovered} title="Hovered" description="No change: a count is not a control." />
 
-<DocsCanvasShell description={<>Pressed. No change.</>}>
-    <DsCanvasQuiet of={CountTagStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={CountTagStories.Pressed} title="Pressed" description="No change." />
 
-<DocsCanvasShell description={<>Focused. Not in the tab order.</>}>
-    <DsCanvasQuiet of={CountTagStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={CountTagStories.Focused} title="Focused" description="Not in the tab order." />
 
-<DocsCanvasShell description={<>Disabled. Never dimmed.</>}>
-    <DsCanvasQuiet of={CountTagStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={CountTagStories.Disabled} title="Disabled" description="Never dimmed." />
 
 </div>
 
@@ -217,35 +192,48 @@ tab, errors in a section header, a notification on a bell.
 
 ## Best practices
 
+Use a count for a number on its own, beside the thing it counts or inside a Status tag or Tag. For a condition, use Status tag; for a category, use Tag; for progress toward a total, use Progress bar.
+
 ### Keep most counts quiet.
 
-Subtle neutral is the default. Bold asks for action now, so use at most one bold
-count per area.
+Subtle neutral is the default. Bold asks for action now, so use at most one bold count per area.
 
-```jsx
-// Incorrect — every tab shouts, so none of them does.
-<CountTag value={4} isBold appearance="danger" />
-<CountTag value={12} isBold appearance="info" />
-
-// Correct — quiet by default, bold only where something needs doing now.
-<CountTag value={12} />
-<CountTag value={3} isBold appearance="danger" label="3 errors" />
-```
+<DoDontPair
+    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><CountTag value={12} /><CountTag value={4} /><CountTag value={3} isBold appearance="danger" label="3 errors" /></div>}
+    doCaption="Subtle neutral by default, with bold only where something needs doing now."
+    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><CountTag value={12} isBold appearance="danger" /><CountTag value={4} isBold appearance="info" /><CountTag value={3} isBold appearance="warning" /></div>}
+    dontCaption="Bold on every item in a list: when every count shouts, none of them does."
+/>
 
 ### Let the component decide zero and overflow.
 
-```jsx
-// Incorrect — the caller re-implements what Count tag already does.
-{unread > 0 && <CountTag value={unread > 99 ? '99+' : unread} />}
+It renders nothing at 0 and caps past `max` with a `+`, so pass the raw number.
 
-// Correct — hidden at 0, capped at max.
-<CountTag value={unread} />
-```
+<DoDontPair
+    doExample={<CountTag value={250} label="250 results" />}
+    doCaption="Pass the raw number; past 99 it reads 99+."
+    dontExample={<CountTag value={0} showZero />}
+    dontCaption="Force a zero onto an empty tab, unless the zero is the news."
+/>
+
+### Show the bare number, and put the meaning in the label.
+
+The badge shows 4, never "4 unread"; `label="4 unread messages"` tells a screen reader what it counts.
 
 ### Use inverse on filled buttons and dark surfaces.
 
-Inverse is a solid white badge with dark text, so it passes contrast on any fill.
-On a light surface it barely separates from the page; use subtle there.
+Inverse is a solid white badge with dark text, so it passes contrast on any fill. On a light surface use subtle.
+
+<DoDontPair
+    doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-brand-bold)' }}><CountTag value={4} isInverse /></div>}
+    doCaption="Inverse on a filled, dark ground."
+    dontExample={<CountTag value={4} isInverse />}
+    dontCaption="Inverse on a light surface, where it barely separates from the page."
+/>
+
+### Give a dot a name.
+
+A dot has no number, so `label` is its accessible name; without one it is announced as nothing.
 
 </div>
 
