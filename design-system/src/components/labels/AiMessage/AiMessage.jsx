@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import AiIcon from '@/components/images-and-icons/AiIcon';
 import AiSources from './AiSources';
+import AiFeedback from './AiFeedback';
 import './AiMessage.scss';
 
 export const AI_MESSAGE_STATUSES = ['complete', 'streaming', 'thinking'];
@@ -74,7 +75,9 @@ const TypingIndicator = () => (
  * - `status="thinking"` is the typing indicator, before any text exists.
  *
  * `sources` lists what a finished answer read, under the message: an answer
- * that draws on records always shows them.
+ * that draws on records always shows them. `onFeedback` puts thumbs up and
+ * down under a finished answer; `feedback` holds the rating when the page
+ * owns it.
  */
 const AiMessage = ({
     text,
@@ -83,6 +86,8 @@ const AiMessage = ({
     typeOut = false,
     renderPart,
     sources,
+    onFeedback,
+    feedback,
     className,
     ...rest
 }) => {
@@ -116,6 +121,7 @@ const AiMessage = ({
                     return <div key={index} className="plus-ai-message__part">{renderPart?.(part, index) ?? null}</div>;
                 })}
                 {status === 'complete' && sources?.length ? <AiSources sources={sources} /> : null}
+                {status === 'complete' && onFeedback ? <AiFeedback value={feedback} onFeedback={onFeedback} /> : null}
             </div>
         </div>
     );
@@ -138,6 +144,10 @@ AiMessage.propTypes = {
         href: PropTypes.string.isRequired,
         type: PropTypes.string,
     })),
+    /** Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`. */
+    onFeedback: PropTypes.func,
+    /** The rating, when the page owns it: `up`, `down` or null. */
+    feedback: PropTypes.oneOf(['up', 'down', null]),
     className: PropTypes.string,
 };
 

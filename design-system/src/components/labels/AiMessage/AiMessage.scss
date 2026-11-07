@@ -7,7 +7,7 @@
 .plus-ai-message {
     display: flex;
     align-items: flex-start;
-    gap: var(--stack-sm);
+    gap: var(--inline-md);
     box-sizing: border-box;
     min-width: 0;
     font: var(--body-default);
@@ -122,7 +122,7 @@
     &__item {
         display: flex;
         align-items: baseline;
-        gap: var(--stack-sm);
+        gap: var(--inline-md);
         font: var(--body-default);
         min-width: 0;
     }
@@ -131,5 +131,38 @@
         flex: none;
         font: var(--body-small);
         color: var(--ds-text-subtle);
+    }
+}
+
+/*
+ * Thumbs under an answer: two quiet compact buttons and a calm, subtle
+ * thanks beside them. The comment popup stacks its field over its actions.
+ */
+.plus-ai-feedback {
+    display: flex;
+    align-items: center;
+    gap: var(--inline-md);
+    margin-block-start: var(--stack-sm);
+
+    &__buttons {
+        display: flex;
+        gap: var(--inline-sm);
+    }
+
+    &__thanks {
+        font: var(--body-small);
+        color: var(--ds-text-subtle);
+    }
+
+    &__ask {
+        display: flex;
+        flex-direction: column;
+        gap: var(--stack-sm);
+    }
+
+    &__actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--inline-md);
     }
 }

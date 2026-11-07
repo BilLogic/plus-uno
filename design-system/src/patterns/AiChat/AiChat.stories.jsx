@@ -80,6 +80,7 @@ export default {
         storageKey: { control: false, table: { disable: true } },
         panelLabel: { control: false, table: { disable: true } },
         onModeChange: { control: false, table: { disable: true } },
+        onFeedback: { control: false, table: { disable: true } },
     },
 };
 
@@ -304,6 +305,10 @@ export const TrustMarks = {
         const reply = popup.getByText(/You asked: "Hello there"/).closest('.plus-ai-chat__message');
         await expect(within(reply).getAllByRole('img', { name: 'AI' }), 'one AI icon per answer').toHaveLength(1);
         await expect(popup.getAllByText('AI can make mistakes. Check important info.'), 'said once').toHaveLength(1);
+        const rating = within(reply).getByRole('group', { name: 'Rate this answer' });
+        await userEvent.click(within(rating).getByRole('button', { name: 'Good answer' }));
+        await expect(within(rating).getByRole('button', { name: 'Good answer' })).toHaveAttribute('aria-pressed', 'true');
+        await expect(within(reply).getByRole('status')).toHaveTextContent('Thanks for the feedback.');
     }),
 };
 

@@ -70,7 +70,7 @@ const transcriptOf = (messages) => messages
 const ChatSurface = ({ presentation }) => {
     const chat = useAiChat();
     const {
-        variant, title, messages, loading, draft, setDraft, starters, dispatch, clear, send, stop, narrow,
+        variant, title, messages, loading, draft, setDraft, starters, dispatch, clear, send, stop, narrow, rate,
     } = chat;
     const storybook = variant === 'storybook';
     const listRef = useRef(null);
@@ -126,7 +126,15 @@ const ChatSurface = ({ presentation }) => {
                     ) : messages.map((m) => (
                         <div key={m.id} className={`plus-ai-chat__message plus-ai-chat__message--${m.role}`}>
                             {m.role === 'ai'
-                                ? <AiMessage className="plus-ai-chat__text" text={m.text} sources={m.sources} />
+                                ? (
+                                    <AiMessage
+                                        className="plus-ai-chat__text"
+                                        text={m.text}
+                                        sources={m.sources}
+                                        feedback={m.feedback ?? null}
+                                        onFeedback={(feedback) => rate(m, feedback)}
+                                    />
+                                )
                                 : <p className="plus-ai-chat__text">{m.text}</p>}
                         </div>
                     ))}
@@ -237,6 +245,7 @@ const AiChat = ({
     storageKey = variant === 'storybook' ? `${AI_CHAT_STORAGE_KEY}-storybook` : AI_CHAT_STORAGE_KEY,
     onModeChange,
     respond,
+    onFeedback,
     starters,
     title = 'AI chat',
     panelLabel,
@@ -295,9 +304,15 @@ const AiChat = ({
         setMessages((prev) => [...prev, { id: `a${prev.length}-${ticket}`, role: 'ai', text: replyText, sources }]);
     }, [respond]);
 
+    // Every answer takes a rating; it stays on the message as chat moves between modes.
+    const rate = useCallback((message, feedback) => {
+        setMessages((prev) => prev.map((m) => (m.id === message.id ? { ...m, feedback: feedback.rating } : m)));
+        onFeedback?.(message, feedback);
+    }, [onFeedback]);
+
     const value = useMemo(() => ({
-        variant, title, messages, loading, draft, setDraft, starters, state, dispatch, clear, send, stop, narrow,
-    }), [variant, title, messages, loading, draft, starters, state, clear, send, stop, narrow]);
+        variant, title, messages, loading, draft, setDraft, starters, state, dispatch, clear, send, stop, narrow, rate,
+    }), [variant, title, messages, loading, draft, starters, state, clear, send, stop, narrow, rate]);
 
     return (
         <AiChatContext.Provider value={value}>
@@ -328,7 +343,9 @@ AiChat.propTypes = {
     onModeChange: PropTypes.func,
     /** Returns the reply (or a promise of it) to a sent message: its text, or `{ text, sources }` when it drew on records. Without it nothing answers. */
     respond: PropTypes.func,
-    /** `{ id, label, text }` prompts offered while the conversation is empty. */
+    /** Called with the answer and `{ rating }` (or `{ rating: 'down', comment }`) when a person rates it. Every answer offers thumbs. */
+    onFeedback: PropTypes.func,
+        /** `{ id, label, text }` prompts offered while the conversation is empty. */
     starters: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
         label: PropTypes.string.isRequired,
