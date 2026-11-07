@@ -21,6 +21,7 @@ import { AGENT_ROOT, REPO_ROOT } from './agent-views-paths.js';
 import { extractExports } from './lib/barrel-exports.js';
 import { isEntry } from './lib/findings.mjs';
 import { checkArtifacts, writeArtifacts } from './lib/generated-artifact.js';
+import { renderInventions, renderSelfCheck } from './lib/inventions.mjs';
 
 const COMPONENTS_ROOT = path.join(REPO_ROOT, 'design-system/src/components');
 const COMPONENTS_INDEX = path.join(COMPONENTS_ROOT, 'index.js');
@@ -68,9 +69,10 @@ function renderComponentIndex(components) {
   doc += `<!-- Load when: building UI | Route: design-system/guidelines/overview.md -->\n`;
   doc += `# PLUS DS — Components\n\n`;
   doc += `> **CRITICAL**: Only use components listed here. If it's not listed, it DOES NOT EXIST.\n\n`;
-  doc += `Mirrors \`design-system/src/components/\`. Import via \`@/components/\`.\n\n`;
+  doc += `Mirrors \`design-system/src/components/\`. Import from the barrel: \`import { Button } from '@/components';\`\n\n`;
   doc += `This index is the existence list. Each entry links to its generated doc — `;
   doc += `props, variants, tokens touched — derived from source.\n\n`;
+  doc += renderInventions(readInventions());
   doc += `## UI components (${components.length})\n\n`;
   doc += components
     .map((name) => {
@@ -81,8 +83,14 @@ function renderComponentIndex(components) {
       if (viaAlias) return `- [${name}](${viaAlias}) — alias of \`${target}\`, same props`;
       return `- ${name} — exported here, implemented outside \`src/components/\`; read the source`;
     })
-    .join('\n') + '\n';
+    .join('\n') + '\n\n';
+  doc += renderSelfCheck();
   return doc;
+}
+
+/** The hand-kept list of names agents reach for that do not exist here. */
+function readInventions() {
+  return JSON.parse(fs.readFileSync(path.join(AGENT_ROOT, '_inventions.json'), 'utf8'));
 }
 
 function renderFormsIndex() {
@@ -112,6 +120,7 @@ Nothing here is authored, and nothing here explains a component.
 | \`tokens/tokens.md\` | \`src/tokens/*.scss\` | What is this token called? |
 | \`components.json\` | the barrel, each component's propTypes, defaults and JSDoc | For a program: which components exist, which props each takes, which values an enum prop accepts |
 | \`tokens.json\` | the same token files as \`tokens.md\` | For a program: each token's tier, group and first declared value |
+| \`_inventions.json\` | hand-kept, reviewed in PRs | The names agents reach for that do not exist here; rendered into the header of \`components/index.md\` |
 
 The two JSON files are the machine copy of the facts above, for checkers and
 evals. Read the markdown; let scripts read the JSON. In \`components.json\`,

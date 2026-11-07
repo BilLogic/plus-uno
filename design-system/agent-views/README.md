@@ -10,6 +10,7 @@ Nothing here is authored, and nothing here explains a component.
 | `tokens/tokens.md` | `src/tokens/*.scss` | What is this token called? |
 | `components.json` | the barrel, each component's propTypes, defaults and JSDoc | For a program: which components exist, which props each takes, which values an enum prop accepts |
 | `tokens.json` | the same token files as `tokens.md` | For a program: each token's tier, group and first declared value |
+| `_inventions.json` | hand-kept, reviewed in PRs | The names agents reach for that do not exist here; rendered into the header of `components/index.md` |
 
 The two JSON files are the machine copy of the facts above, for checkers and
 evals. Read the markdown; let scripts read the JSON. In `components.json`,

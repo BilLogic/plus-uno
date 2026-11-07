@@ -1,0 +1,35 @@
+{
+  "$about": "Hand-kept, reviewed in PRs. Names agents reach for that do not exist here, and retired names, each with what to use instead. Rendered into the header of agent-views/components/index.md by npm run generate:agent; every target must exist in components.json or tokens.json (scripts/lib/inventions.test.mjs). Seeded 2026-11-07 from the ds-usage eval baseline and the retired-name lists in scripts/check-ads-language.mjs and scripts/lib/tokens/plan.mjs.",
+  "components": [
+    { "not": "Alert", "use": ["SectionMessage", "Flag"], "why": "SectionMessage in the page; Flag for a passing notice" },
+    { "not": "Toast", "use": ["Flag"], "why": "renamed" },
+    { "not": "Switch", "use": ["Toggle"], "why": "renamed" },
+    { "not": "NavTabs", "use": ["Tabs"], "why": "one tab component" },
+    { "not": "Badge", "use": ["StatusTag", "CountTag"], "why": "StatusTag for a state, CountTag for a number" },
+    { "not": "Dialog", "use": ["Modal"] },
+    { "not": "Input", "use": ["TextField", "TextArea"] },
+    { "not": "Dropdown", "use": ["Select", "DropdownMenu"], "why": "Select picks a value; DropdownMenu runs an action" },
+    { "not": "Chip", "use": ["Tag"] },
+    { "not": "Loader", "use": ["Spinner", "Skeleton"] }
+  ],
+  "props": [
+    { "not": "Button variant", "use": ["Button.appearance"] },
+    { "not": "Button size", "use": ["Button.spacing"], "why": "spacing is default or compact" },
+    { "not": "Button disabled", "use": ["Button.isDisabled"] },
+    { "not": "Button appearance=\"secondary\"", "use": ["Button.appearance=default"] },
+    { "not": "Heading level", "use": ["Heading.as"], "why": "as is the element, h1 to h6" },
+    { "not": "Heading size=\"sm\" / \"lg\"", "use": ["Heading.size=small", "Heading.size=large"], "why": "sizes are words, xxsmall to xxlarge" }
+  ],
+  "tokens": [
+    { "not": "--space-025 (4px)", "use": ["--stack-sm", "--inline-sm", "--pad-x-xs"], "why": "a primitive; read the step for the role" },
+    { "not": "--space-050 (8px)", "use": ["--stack-md", "--inline-md", "--pad-x-sm"] },
+    { "not": "--space-075 (12px)", "use": ["--stack-lg", "--inline-lg", "--pad-x-md"] },
+    { "not": "--space-100 (16px)", "use": ["--pad-x-lg", "--section-stack-md", "--modal-pad"] },
+    { "not": "--space-150 (24px) and up", "use": ["--page-stack-md", "--page-pad"], "why": "large space belongs to a pattern" },
+    { "not": "--radius-<n>", "use": ["--radius-sm", "--radius-md", "--radius-lg", "--card-radius"] },
+    { "not": "--stack-xl", "use": ["--stack-lg", "--section-stack-lg"] },
+    { "not": "--ds-on-surface, --color-on-surface", "use": ["--ds-text", "--ds-text-subtle"] },
+    { "not": "--color-surface-container*", "use": ["--ds-surface", "--ds-surface-sunken", "--ds-surface-raised"] },
+    { "not": "--size-element-*, --element-*", "use": ["--pad-x-md", "--stack-md", "--radius-md"], "why": "retired; check:ds-usage names the exact replacement" }
+  ]
+}

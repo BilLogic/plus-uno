@@ -4,9 +4,54 @@
 
 > **CRITICAL**: Only use components listed here. If it's not listed, it DOES NOT EXIST.
 
-Mirrors `design-system/src/components/`. Import via `@/components/`.
+Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
+
+## Not here → use instead
+
+Names agents reach for that this system does not have, or has retired. Write the right-hand name.
+
+**Components**
+
+| Not here | Use instead |
+|---|---|
+| `Alert` | `SectionMessage`, `Flag` (SectionMessage in the page; Flag for a passing notice) |
+| `Toast` | `Flag` (renamed) |
+| `Switch` | `Toggle` (renamed) |
+| `NavTabs` | `Tabs` (one tab component) |
+| `Badge` | `StatusTag`, `CountTag` (StatusTag for a state, CountTag for a number) |
+| `Dialog` | `Modal` |
+| `Input` | `TextField`, `TextArea` |
+| `Dropdown` | `Select`, `DropdownMenu` (Select picks a value; DropdownMenu runs an action) |
+| `Chip` | `Tag` |
+| `Loader` | `Spinner`, `Skeleton` |
+
+**Props**
+
+| Not here | Use instead |
+|---|---|
+| `Button variant` | `Button appearance` |
+| `Button size` | `Button spacing` (spacing is default or compact) |
+| `Button disabled` | `Button isDisabled` |
+| `Button appearance="secondary"` | `Button appearance="default"` |
+| `Heading level` | `Heading as` (as is the element, h1 to h6) |
+| `Heading size="sm" / "lg"` | `Heading size="small"`, `Heading size="large"` (sizes are words, xxsmall to xxlarge) |
+
+**Tokens**
+
+| Not here | Use instead |
+|---|---|
+| `--space-025 (4px)` | `--stack-sm`, `--inline-sm`, `--pad-x-xs` (a primitive; read the step for the role) |
+| `--space-050 (8px)` | `--stack-md`, `--inline-md`, `--pad-x-sm` |
+| `--space-075 (12px)` | `--stack-lg`, `--inline-lg`, `--pad-x-md` |
+| `--space-100 (16px)` | `--pad-x-lg`, `--section-stack-md`, `--modal-pad` |
+| `--space-150 (24px) and up` | `--page-stack-md`, `--page-pad` (large space belongs to a pattern) |
+| `--radius-<n>` | `--radius-sm`, `--radius-md`, `--radius-lg`, `--card-radius` |
+| `--stack-xl` | `--stack-lg`, `--section-stack-lg` |
+| `--ds-on-surface, --color-on-surface` | `--ds-text`, `--ds-text-subtle` |
+| `--color-surface-container*` | `--ds-surface`, `--ds-surface-sunken`, `--ds-surface-raised` |
+| `--size-element-*, --element-*` | `--pad-x-md`, `--stack-md`, `--radius-md` (retired; check:ds-usage names the exact replacement) |
 
 ## UI components (85)
 
@@ -95,3 +140,14 @@ This index is the existence list. Each entry links to its generated doc — prop
 - [UserAvatar](../../src/components/images-and-icons/UserAvatar/index.md)
 - [VerticalButton](../../src/components/forms-and-inputs/VerticalButton/index.md)
 - [VisuallyHidden](../../src/components/layout-and-structure/VisuallyHidden/index.md)
+
+## Before you finish
+
+Re-read what you wrote, then fix each of these:
+
+1. Every component comes from this list, imported from `@/components`; a deep path becomes the barrel import.
+2. Every prop and value is in the component's generated doc (or `components.json`).
+3. Every color, size, radius and font is a token from `../tokens/tokens.md`, read at the ladder step for its role, in place of a raw value or a `--space-*`, `--radius-<n>` or `--palette-*` primitive.
+4. Every name in the table above is replaced by its right-hand name.
+
+Then run `npm run check:ds-usage -- <your files>` and fix what it reports; its rules are `docs/engineering/ds-usage-rules.md`.
