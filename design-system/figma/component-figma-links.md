@@ -79,10 +79,10 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Flag | Flag | `20095:8275` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-8275) | verified |
 | Components | Heading | Heading | `20626:95` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20626-95) | verified |
 | Components | IconButton | Icon button | `20299:9069` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20299-9069) | verified |
-| Components | Illustration | Illustration |  |  | missing |
+| Components | Illustration | Character | `20095:2033` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-2033) | verified |
 | Components | Image | Image | `20094:220` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-220) | verified |
 | Components | InlineEdit | Inline edit | `21259:523` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21259-523) | verified |
-| Components | LabelAndCaption | Caption |  |  | missing |
+| Components | LabelAndCaption | Field message | `20319:262` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20319-262) | verified |
 | Components | LabelAndCaption | Label | `20319:246` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20319-246) | verified |
 | Components | Link | Link | `20624:87` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20624-87) | verified |
 | Components | LinkButton | Link button | `20303:77826` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20303-77826) | verified |
@@ -115,11 +115,11 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | TextArea | Text area | `20324:924` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20324-924) | verified |
 | Components | TextField | Text field | `20316:150478` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20316-150478) | verified |
 | Components | Tile | Tile | `17878:1928` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17878-1928) | verified |
-| Components | TimePicker | Time picker |  |  | missing |
+| Components | TimePicker | Time picker / Variant matrix | `20009:77903` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20009-77903) | verified |
 | Components | Toggle | Form Switch Button | `20328:89241` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20328-89241) | verified |
-| Components | Tooltip | Tooltip |  |  | missing |
+| Components | Tooltip | Tooltip | `20871:3142` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20871-3142) | verified |
 | Components | TreeTable | Tree table | `20095:15470` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-15470) | verified |
-| Other | Footer | Footer |  |  | missing |
+| Other | Footer | Footer | `20978:1305` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20978-1305) | verified |
 | Other | Logo | Logo | `21004:1217` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21004-1217) | verified |
 | Other | MaintenanceAlert | Maintenance alert |  |  | missing |
 | Other | OverviewCard | Overview card | `20095:6532` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-6532) | verified |
