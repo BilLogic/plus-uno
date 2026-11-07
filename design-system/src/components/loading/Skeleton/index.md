@@ -7,7 +7,7 @@
 
 **Source:** `design-system/src/components/loading/Skeleton/Skeleton.jsx`
 
-**Stories:** `design-system/src/components/loading/Skeleton/Skeleton.stories.jsx` — LabelPresets, PresetWinsOverShape, TagGroupPreset, Shapes, PresetNamesAShape, Paragraph, Shimmer, ReducedMotion, LoadingTable, LoadingCard, IgnoredPropsWarn, Interactive, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/loading/Skeleton/Skeleton.stories.jsx` — LabelPresets, PresetWinsOverShape, TagGroupPreset, Shapes, Rect, Circle, Text, PresetNamesAShape, Paragraph, Shimmer, ReducedMotion, LoadingTable, LoadingCard, IgnoredPropsWarn, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/loading/Skeleton/Skeleton.mdx`
 

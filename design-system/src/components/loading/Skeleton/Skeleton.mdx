@@ -56,7 +56,11 @@ Status tag, Count tag and Tag, so nothing moves when the value arrives.
 
 ## Appearance
 
-<ComponentExample of={SkeletonStories.Shapes} title="Shapes" description={<>Rectangle (the default), circle and text bar, each sized by <code>width</code> and <code>height</code>; a rectangle takes <code>radius</code> as a token name.</>} />
+<ComponentExample of={SkeletonStories.Rect} title="Rect" description={<>The default shape, sized by <code>width</code> and <code>height</code>, with <code>radius</code> as a token name.</>} />
+
+<ComponentExample of={SkeletonStories.Circle} title="Circle" description="For avatars and round counts, 32 unless given a size." />
+
+<ComponentExample of={SkeletonStories.Text} title="Text" description={<>A 16-tall bar that can repeat as <code>lines</code>.</>} />
 
 <ComponentExample of={SkeletonStories.LabelPresets} title="Label presets" description="Each preset beside the label it stands in for, with the label's height and corners and a stand-in width." />
 
@@ -72,9 +76,9 @@ Status tag, Count tag and Tag, so nothing moves when the value arrives.
 
 <ComponentExample of={SkeletonStories.TagGroupPreset} title="Tag group" description={<><code>preset="tag-group"</code> is three tag shapes at the TagGroup gap, for a tag list that loads on its own.</>} />
 
-<ComponentExample of={SkeletonStories.LoadingTable} title="Loading table" description={<>Every label in a loading table is a plain text bar, and the region carries <code>aria-busy</code> with a status beside it.</>} />
+<ComponentExample of={SkeletonStories.LoadingTable} title="Loading table" description={<>The region carries <code>aria-busy</code> with a status beside it; <strong>Finish loading</strong> shows the students arriving.</>} />
 
-<ComponentExample of={SkeletonStories.LoadingCard} title="Loading card" description="The card's skeleton owns everything inside it, its tags included." />
+<ComponentExample of={SkeletonStories.LoadingCard} title="Loading card" description={<>A loading card; <strong>Finish loading</strong> shows the content arriving.</>} />
 
 </div>
 
@@ -82,9 +86,9 @@ Status tag, Count tag and Tag, so nothing moves when the value arrives.
 
 ## Behavior
 
-<ComponentExample of={SkeletonStories.Shimmer} title="Shimmer" description={<>On by default; <code>isShimmering={'{false}'}</code> is a flat fill.</>} />
+<ComponentExample of={SkeletonStories.PresetWinsOverShape} title="Preset wins over shape" description={<>A preset sets shape, height and corners together and wins over <code>shape</code> and <code>lines</code>, with a warning in development.</>} />
 
-<ComponentExample of={SkeletonStories.ReducedMotion} title="Reduced motion" description={<>Under <code>prefers-reduced-motion: reduce</code> the shimmer stops and the fill is flat.</>} />
+<ComponentExample of={SkeletonStories.Shimmer} title="Shimmer" description={<>On by default; <code>isShimmering={'{false}'}</code> is a flat fill.</>} />
 
 </div>
 
@@ -135,8 +139,6 @@ screen and the layout does not jump when it arrives.
 
 - **One label loading on its own** (a status calculated after the row appears, a
   tag list fetched separately): the matching preset.
-- **A whole table or card loading:** plain text bars and shapes, composed to the
-  real content's dimensions.
 - **A thumbnail, avatar or header:** a rectangle or circle with its own size.
 
 </div>
@@ -146,7 +148,7 @@ screen and the layout does not jump when it arrives.
 ## Parts
 
 1. **Bar.** A flat fill in the skeleton color: a rectangle, a circle, a text line or a label shape.
-2. **Shimmer.** A band that sweeps across. Off, or under reduced motion, it is a flat fill.
+2. **Shimmer.** A band that sweeps across. Off, it is a flat fill.
 3. **Group.** Lines and tag groups are columns or rows of bars.
 
 ### States
@@ -175,7 +177,7 @@ screen and the layout does not jump when it arrives.
 <tr><td>Fill</td><td><code>--ds-skeleton</code>.</td></tr>
 <tr><td>Shimmer</td><td>A band of <code>--ds-skeleton-subtle</code>, 1.6s.</td></tr>
 <tr><td>Radius</td><td><code>--radius-md</code> by default; <code>--radius-full</code> for a circle and the person tag; <code>--radius-sm</code> for count; or the token named by <code>radius</code>.</td></tr>
-<tr><td>Label presets</td><td>Heights from the label height roles, so a placeholder is the size of its label.</td></tr>
+<tr><td>Label presets</td><td>Heights from the label height roles, so a placeholder is the size of its label. Count is <code>--control-sm</code> wide; status-spacious takes <code>--size-border-radius-radius-150</code> (6) for its corner.</td></tr>
 <tr><td>Sizes</td><td>Spacing primitives: <code>--size-spacing-large-space-900</code> (64) for the default height, <code>-space-600</code> (32) for the circle, <code>--size-spacing-medium-space-300</code> (16) for the text bar.</td></tr>
 <tr><td>Gap</td><td><code>--stack-md</code> between lines and tags.</td></tr>
 <tr><td>Forced colors</td><td>A <code>--stroke-1</code> outline keeps the shape.</td></tr>
@@ -212,14 +214,8 @@ An avatar placeholder is round; a square one misleads about what will load.
 
 ### Keep the shimmer on while loading.
 
-The shimmer tells the person the content is still coming; a frozen skeleton reads as a broken page.
-
-<DoDontPair
-    doExample={<Skeleton shape="text" lines={3} width={240} />}
-    doCaption="Shimmer on."
-    dontExample={<Skeleton shape="text" lines={3} width={240} isShimmering={false} />}
-    dontCaption="Shimmer off."
-/>
+The shimmer tells the person the content is still coming; a frozen skeleton
+reads as a broken page. Leave `isShimmering` at its default.
 
 ### Use a label preset when one label loads after its row is on screen.
 

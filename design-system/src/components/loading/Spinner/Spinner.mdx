@@ -59,7 +59,11 @@ An animated ring that says a wait is in progress, with no duration to report.
 
 ## Size and layout
 
-<ComponentExample of={SpinnerStories.Sizes} title="Sizes" description="16, 24 and 48: a pixel diameter, nothing in between." />
+<ComponentExample of={SpinnerStories.Size16} title="16" description="For a small control or a line of text." />
+
+<ComponentExample of={SpinnerStories.Size24} title="24" description="The default." />
+
+<ComponentExample of={SpinnerStories.Size48} title="48" description="The largest; size is a pixel diameter with nothing in between." />
 
 </div>
 
@@ -204,18 +208,6 @@ Several spinners on one view compete for attention; show one for the whole load.
     doCaption="isLoading puts the spinner inside the button and blocks it."
     dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Button appearance="primary" text="Save notes" /><Spinner size={16} /></div>}
     dontCaption="A loose spinner beside a button that can still be pressed."
-/>
-
-### Say what is loading when a wait runs long.
-
-After a few seconds a spinner stops reading as "working" and starts reading
-as "stuck".
-
-<DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner size={16} /><span>Loading session plans</span></div>}
-    doCaption="Text beside the spinner names the wait."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Spinner size={16} /></div>}
-    dontCaption="A bare spinner as the only sign of a long wait."
 />
 
 </div>

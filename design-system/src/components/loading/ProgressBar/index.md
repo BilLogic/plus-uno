@@ -9,7 +9,7 @@
 
 **Source:** `design-system/src/components/loading/ProgressBar/ProgressBar.jsx`
 
-**Stories:** `design-system/src/components/loading/ProgressBar/ProgressBar.stories.jsx` — Overview, Appearances, WithACaption, Indeterminate, Interactive, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/loading/ProgressBar/ProgressBar.stories.jsx` — Overview, Appearances, Default, Success, Inverse, WithACaption, Indeterminate, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/loading/ProgressBar/ProgressBar.mdx`
 

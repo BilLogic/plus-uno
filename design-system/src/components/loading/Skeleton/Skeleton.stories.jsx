@@ -233,6 +233,14 @@ Shapes.play = async ({ canvasElement }) => {
 };
 
 
+/** One story per `shape` value. */
+export const Rect = () => <Skeleton width={160} height={64} />;
+
+export const Circle = () => <Skeleton shape="circle" />;
+
+export const Text = () => <Skeleton shape="text" width={160} />;
+
+
 /**
  * Figma's `preset` names the free shapes too: `preset="rect"`, `"circle"` and
  * `"text"` draw exactly what `shape` does, and resize the same way.

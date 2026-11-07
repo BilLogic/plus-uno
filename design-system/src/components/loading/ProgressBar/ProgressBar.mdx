@@ -39,7 +39,8 @@ export const figmaMeta = {
 
 <Title />
 
-A determinate bar for a task whose proportion done is known.
+A bar for progress through a task: determinate when the proportion done is
+known, indeterminate when the task's length is not.
 
 <DocsTabs of={ProgressBarStories}>
 
@@ -58,9 +59,11 @@ A determinate bar for a task whose proportion done is known.
 
 ## Appearance
 
-<ComponentExample of={ProgressBarStories.Overview} title="Default" description="A single bar at 50%, the 8 height every bar shares." />
+<ComponentExample of={ProgressBarStories.Default} title="Default" description="A brand fill on a neutral track, the 8 height every bar shares." />
 
-<ComponentExample of={ProgressBarStories.Appearances} title="Default, success and inverse" description={<><code>success</code> marks completion; <code>inverse</code> reads on a bold or colored background.</>} />
+<ComponentExample of={ProgressBarStories.Success} title="Success" description="Marks completion." />
+
+<ComponentExample of={ProgressBarStories.Inverse} title="Inverse" description="Reads on a bold or colored background." />
 
 </div>
 
@@ -122,9 +125,9 @@ A determinate bar for a task whose proportion done is known.
 
 ## Usage
 
-Use `ProgressBar` when the proportion done is known and worth showing: an
-upload, a course, a multi-step form. If you cannot say how far along it is,
-a `Spinner` is the honest control.
+Use `ProgressBar` for progress through a task: an upload, a course, a
+multi-step form. When the task's length is unknown, set `isIndeterminate`. For
+a short wait with no task to track, use a `Spinner`.
 
 ### Appearance guidance
 
@@ -188,13 +191,6 @@ a `Spinner` is the honest control.
 A bar that fills implies a known total; use the moving bar when the work has
 no measurable end. `isIndeterminate` drops `value` and the value attributes.
 
-<DoDontPair
-    doExample={<ProgressBar isIndeterminate ariaLabel="Loading" />}
-    doCaption="Indeterminate for an unknown wait."
-    dontExample={<ProgressBar value={10} ariaLabel="Loading" />}
-    dontCaption="A determinate bar stuck at the start."
-/>
-
 ### Use inverse on bold surfaces.
 
 The default track disappears on a bold ground; inverse keeps the bar readable.
@@ -236,16 +232,6 @@ The bar is 8 tall and carries no text of its own.
     dontExample={<ProgressBar value={100} ariaLabel="Course complete" />}
     dontCaption="A finished task left as a brand bar."
 />
-
-### Name the bar for what it measures.
-
-```jsx
-// Incorrect: two bars on a page both announce "Progress".
-<ProgressBar value={68} />
-
-// Correct.
-<ProgressBar value={68} ariaLabel="68% of goals met" />
-```
 
 </div>
 

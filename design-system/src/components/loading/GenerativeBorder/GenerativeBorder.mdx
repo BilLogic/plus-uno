@@ -11,6 +11,8 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const card = { padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' };
+
 <Meta of={GenerativeBorderStories} />
 
 <Title />
@@ -39,10 +41,6 @@ The border that shows PLUS AI is generating content: a 2px rounded stroke in two
 ## Behavior
 
 <ComponentExample of={GenerativeBorderStories.Generating} title="Generating" description={<>With <code>isActive</code>, the ring lies over the content's edge and turns clockwise.</>} />
-
-<ComponentExample of={GenerativeBorderStories.Idle} title="Idle" description={<>With <code>isActive</code> off, the children render with no ring.</>} />
-
-<ComponentExample of={GenerativeBorderStories.ReducedMotion} title="Reduced motion" description="Under reduced motion the same segments hold still." />
 
 </div>
 
@@ -144,9 +142,9 @@ Wrap the content and toggle `isActive` while PLUS AI generates into it.
 The moving border marks where the AI is working; three at once means none of them is the focus.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><GenerativeBorder><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Summary</div></GenerativeBorder><GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Goals</div></GenerativeBorder><GenerativeBorder><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Next steps</div></GenerativeBorder></div>}
+    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><GenerativeBorder><div style={card}>Summary</div></GenerativeBorder><GenerativeBorder isActive><div style={card}>Goals</div></GenerativeBorder><GenerativeBorder><div style={card}>Next steps</div></GenerativeBorder></div>}
     doCaption="One active border."
-    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Summary</div></GenerativeBorder><GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Goals</div></GenerativeBorder><GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Next steps</div></GenerativeBorder></div>}
+    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><GenerativeBorder isActive><div style={card}>Summary</div></GenerativeBorder><GenerativeBorder isActive><div style={card}>Goals</div></GenerativeBorder><GenerativeBorder isActive><div style={card}>Next steps</div></GenerativeBorder></div>}
     dontCaption="Every border active."
 />
 
@@ -155,9 +153,9 @@ The moving border marks where the AI is working; three at once means none of the
 The border traces the content's corners; a pill around a rectangular card looks detached.
 
 <DoDontPair
-    doExample={<GenerativeBorder isActive radius="radius-100"><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Drafting the session summary…</div></GenerativeBorder>}
+    doExample={<GenerativeBorder isActive radius="radius-100"><div style={card}>Drafting the session summary…</div></GenerativeBorder>}
     doCaption="Radius that matches the content."
-    dontExample={<GenerativeBorder isActive radius="radius-full"><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Drafting the session summary…</div></GenerativeBorder>}
+    dontExample={<GenerativeBorder isActive radius="radius-full"><div style={card}>Drafting the session summary…</div></GenerativeBorder>}
     dontCaption="A pill around a rectangle."
 />
 
@@ -166,18 +164,18 @@ The border traces the content's corners; a pill around a rectangular card looks 
 An idle border should read as finished, not as still thinking. Set `isActive` back to false.
 
 <DoDontPair
-    doExample={<GenerativeBorder><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Here is a first draft of the session summary.</div></GenerativeBorder>}
+    doExample={<GenerativeBorder><div style={card}>Here is a first draft of the session summary.</div></GenerativeBorder>}
     doCaption="Inactive once done."
-    dontExample={<GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Here is a first draft of the session summary.</div></GenerativeBorder>}
+    dontExample={<GenerativeBorder isActive><div style={card}>Here is a first draft of the session summary.</div></GenerativeBorder>}
     dontCaption="Still animating after completion."
 />
 
 ### Use one ring per piece of content.
 
 <DoDontPair
-    doExample={<GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Drafting the session summary…</div></GenerativeBorder>}
+    doExample={<GenerativeBorder isActive><div style={card}>Drafting the session summary…</div></GenerativeBorder>}
     doCaption="One ring around the content being generated."
-    dontExample={<GenerativeBorder isActive><div style={{ padding: 'var(--pad-x-sm)' }}><GenerativeBorder isActive><div style={{ padding: 'var(--card-pad-default)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-100)', background: 'var(--ds-surface-raised)', color: 'var(--ds-text)' }}>Drafting the session summary…</div></GenerativeBorder></div></GenerativeBorder>}
+    dontExample={<GenerativeBorder isActive><div style={{ padding: 'var(--pad-x-sm)' }}><GenerativeBorder isActive><div style={card}>Drafting the session summary…</div></GenerativeBorder></div></GenerativeBorder>}
     dontCaption="Two rings nested around the same content."
 />
 
