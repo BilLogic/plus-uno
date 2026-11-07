@@ -165,7 +165,7 @@ Without `onSelect` the dots are decorative and only `aria-current` marks the act
 
 ### Keep the number of dots small.
 
-A row of dots reads at a glance. Past about seven, position stops being readable.
+A row of dots reads at a glance. With many dots, position stops being readable.
 
 <DoDontPair
     doExample={<ProgressIndicator values={['a', 'b', 'c', 'd', 'e']} selectedIndex={2} />}
@@ -179,7 +179,7 @@ A row of dots reads at a glance. Past about seven, position stops being readable
 `inverted` is for a dark surface; on a light one use `default`, `primary` or `help`.
 
 <DoDontPair
-    doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-neutral-bold)' }}><ProgressIndicator values={['a', 'b', 'c', 'd']} selectedIndex={1} appearance="inverted" /></div>}
+    doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-inverse-subtle)' }}><ProgressIndicator values={['a', 'b', 'c', 'd']} selectedIndex={1} appearance="inverted" /></div>}
     doCaption="Inverted dots on a dark ground."
     dontExample={<ProgressIndicator values={['a', 'b', 'c', 'd']} selectedIndex={1} appearance="inverted" />}
     dontCaption="Inverted dots on a light surface, where they vanish."

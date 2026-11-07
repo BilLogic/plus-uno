@@ -54,14 +54,14 @@ const STEPS = [
 ];
 
 /** Interactive: pick a step to make it current; earlier steps become visited, later ones unvisited. */
-export const Interactive = () => {
+export const Interactive = (args) => {
     const [current, setCurrent] = useState(1);
     const items = STEPS.map((step, index) => ({
         ...step,
         status: index < current ? 'visited' : index === current ? 'current' : 'unvisited',
         onClick: index === current ? undefined : () => setCurrent(index),
     }));
-    return <ProgressTracker items={items} />;
+    return <ProgressTracker {...args} items={items} />;
 };
 Interactive.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);

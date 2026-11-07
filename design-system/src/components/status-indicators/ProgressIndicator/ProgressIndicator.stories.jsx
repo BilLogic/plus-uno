@@ -43,11 +43,12 @@ Default.play = async ({ canvasElement }) => {
     ).toBe(canvasElement.querySelectorAll('.plus-progress-indicator__dot')[1]);
 };
 
-export const Interactive = () => {
+export const Interactive = (args) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
     return (
         <>
             <ProgressIndicator
+                {...args}
                 values={VALUES}
                 selectedIndex={selectedIndex}
                 onSelect={({ index }) => setSelectedIndex(index)}
