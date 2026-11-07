@@ -179,9 +179,9 @@ Nest content in a `HeadingContextProvider`, or rely on the one a pattern like `S
 `size` is required, and it is separate from the tag the context picks.
 
 <DoDontPair
-    doExample={<Heading size="small">Student progress</Heading>}
+    doExample={<Heading size="xsmall">Student progress</Heading>}
     doCaption="Pass the size the spot needs and let the level pick the tag."
-    dontExample={<Heading as="h5" size="small">Student progress</Heading>}
+    dontExample={<Heading as="h5" size="xsmall">Student progress</Heading>}
     dontCaption="Pick a tag to get a size, which breaks the outline."
 />
 
@@ -197,9 +197,9 @@ Nest content in a `HeadingContextProvider`, or rely on the one a pattern like `S
 ### Let the ground set the ink.
 
 <DoDontPair
-    doExample={<div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-md)' }}><Heading as="div" size="medium" color="color.text.inverse">On a dark ground</Heading></div>}
+    doExample={<div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-md)' }}><Heading as="div" size="xlarge" color="color.text.inverse">On a dark ground</Heading></div>}
     doCaption="The inverse color on a dark ground."
-    dontExample={<div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-md)' }}><Heading as="div" size="medium">On a dark ground</Heading></div>}
+    dontExample={<div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-md)' }}><Heading as="div" size="xlarge">On a dark ground</Heading></div>}
     dontCaption="The default ink on a dark ground, which barely reads."
 />
 
