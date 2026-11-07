@@ -49,38 +49,4 @@ export function madeToAcknowledgment(answer: Exclude<ReminderAnswer, "not_promis
   }
 }
 
-/** A name as plain text: no markup, so it can never become a mention. */
-function plainName(name: string | null): string {
-  const clean = (name ?? "").replace(/[<>@&*_~`|]/g, "").trim();
-  return clean || "Someone";
-}
 
-function original(permalink: string): string {
-  return ` <${permalink}|Original message>`;
-}
-
-/**
- * The reminder about a promise made to the owner.
- *
- * @param input.name - The promiser's display name, as plain text
- * @param input.what - The regenerated summary (`cleanWhat`)
- * @param input.byLabel - The day they named ("Thu"), or null
- * @param input.promisedLabel - The day they said it ("Tue")
- * @param input.permalink - The promising message
- */
-export function madeToText(input: { name: string | null; what: string; byLabel: string | null; promisedLabel: string; permalink: string }): string {
-  const who = plainName(input.name);
-  const said = input.byLabel ? `${who} said they'd ${input.what} by ${input.byLabel}.` : `On ${input.promisedLabel}, ${who} said they'd ${input.what}.`;
-  return `${said} I haven't spotted it yet. Want to follow up?${original(input.permalink)}`;
-}
-
-/** The one follow-up about a promise made to the owner. */
-export function madeToFollowUpText(owner: string, permalink: string): string {
-  return `<@${owner}> Checking in once more. Want to follow up?${original(permalink)}`;
-}
-
-/** The one follow-up about a promise the owner made, with its link — the
- *  reminder above it may be days back in the DM. */
-export function madeFollowUpText(owner: string, permalink: string): string {
-  return `<@${owner}> Checking in once more. Is it done, or does it need more time?${original(permalink)}`;
-}

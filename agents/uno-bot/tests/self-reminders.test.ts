@@ -14,6 +14,7 @@ import {
   createInMemoryCommitmentStore,
   parseReminderWhen,
   runCommitmentNudges,
+  MAX_REMINDERS_PER_PERSON,
   SELF_REMINDER_LAST_CHOICES,
   SELF_REMINDER_CHOICES,
   footerLabels,
@@ -224,6 +225,8 @@ function mornings(store: InMemoryCommitmentStore, now: number) {
   let seq = 0;
   const deps: NudgeDeps = {
     slack: {
+      dmChannel: async () => null,
+      userName: async () => null,
       // A "remind me" reads no evidence: any read is a failure of the test.
       replies: async () => assert.fail("a reminder reads no thread"),
       history: async () => assert.fail("a reminder reads no channel"),
@@ -365,17 +368,18 @@ describe("delivering it", () => {
     assert.equal(m.updates.length, 0);
   });
 
-  it("counts toward the two reminders a person gets in a morning", async () => {
+  it("counts toward the reminders a person gets in a morning", async () => {
     const store = createInMemoryCommitmentStore();
-    for (const n of [1, 2, 3]) {
+    const cap = MAX_REMINDERS_PER_PERSON;
+    for (let n = 1; n <= cap + 1; n++) {
       const t = ts(29, 18, n);
       await asked(store, "Thu", { ...dmPlace, threadTs: t, messageTs: t }, `thing ${n}`);
     }
     const m = mornings(store, at(31, 13, 5));
     await m.run();
-    assert.equal(m.posts.length, 2);
+    assert.equal(m.posts.length, cap);
     m.clock.now = at(32, 13, 5);
     await m.run();
-    assert.equal(m.posts.length, 3);
+    assert.equal(m.posts.length, cap + 1);
   });
 });

@@ -158,11 +158,6 @@ export function reminderText(input: {
   return `*On ${input.promisedLabel} you said you'd ${input.what}*\n<@${input.promiser}> I haven't spotted it yet. Is it done, or still in progress?${link}`;
 }
 
-/** The second and last reminder. */
-export function followUpText(promiser: string): string {
-  return `<@${promiser}> Checking in once more. Is it done, or does it need more time?`;
-}
-
 /** A body whose first line is wholly bold is a heading with a line under it. */
 const HEADED = /^(\*[^*\n]+\*)\n(.+)$/s;
 

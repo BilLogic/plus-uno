@@ -1,10 +1,18 @@
 // When a commitment falls due, and when uno-bot may say so — the arithmetic,
 // as tables. 2026-09-29 is a Tuesday; ET is UTC-4 until 2026-11-01, then UTC-5.
-import { test } from "node:test";
+import { describe, it, test } from "node:test";
 import assert from "node:assert/strict";
 import {
   addWorkingDays,
+  askDateAt,
+  checkInAt,
   commitmentDueAt,
+  deadlineTime,
+  firstReminderAt,
+  followUpAt,
+  headsUpAt,
+  promiseDueAt,
+  reminderPhase,
   dayLabel,
   deadlineDay,
   dueDayOf,
@@ -145,4 +153,73 @@ test("the morning run is 09:00 ET on both sides of the 1 Nov 2026 change", () =>
   assert.equal(iso(nudgeAt(endOfEtDay(day(10, 30)))), "2026-11-02T14:00");
   // One due Thu night is nudged Friday at 09:00 EDT.
   assert.equal(iso(nudgeAt(endOfEtDay(day(10, 29)))), "2026-10-30T13:00");
+});
+
+// ── One promise timeline ─────────────────────────────────────────────────────
+// The worked cases, Made → Due → Heads-up → Check-in, the week of Mon Oct 19
+// 2026 (EDT: 9:00 ET is 13:00 UTC).
+
+/** An ET wall-clock time in October 2026, as epoch ms. */
+const oct = (day: number, h = 9, m = 0) => Date.UTC(2026, 9, day, h + 4, m);
+/** The 9:00 ET morning run on an October day. */
+const morning = (day: number) => oct(day, 9);
+
+describe("one promise timeline", () => {
+  const cases: Array<[string, number, string | null, number | null, number | null, number | null]> = [
+    // name, made, deadline, due moment, heads-up, check-in
+    ['"by Thu": Mon → Thu → Wed → Fri', oct(19, 15), "Thu", oct(23, 0), morning(21), morning(23)],
+    ['"tomorrow": Mon → Tue → Tue → Wed', oct(19, 15), "tomorrow", oct(21, 0), morning(20), morning(21)],
+    ['"by Mon": Fri → Mon → Mon → Tue', oct(23, 15), "Mon", oct(27, 0), morning(26), morning(27)],
+    ['"call at 1:30": Wed 12:07 → Wed 13:30 → none', oct(21, 12, 7), "1:30", oct(21, 13, 30), null, morning(22)],
+    ['"review next Tue": Wed → Tue → Mon', oct(21, 15), "next Tue", oct(28, 0), morning(26), morning(28)],
+    ['"update the PRD": Mon → none', oct(19, 15), null, null, null, null],
+  ];
+  for (const [name, made, deadline, due, headsUp, checkIn] of cases) {
+    it(name, () => {
+      const dueAt = promiseDueAt(made, deadline);
+      assert.equal(dueAt, due, "due moment");
+      if (dueAt === null) return;
+      assert.equal(headsUpAt(made, dueAt), headsUp, "heads-up");
+      assert.equal(checkInAt(dueAt), checkIn, "check-in");
+      assert.equal(firstReminderAt(made, dueAt), headsUp ?? checkIn);
+    });
+  }
+
+  it('"update the PRD": no date, so the next Monday run at least two working days on asks for one', () => {
+    assert.equal(askDateAt(oct(19, 15)), morning(26), "Mon → next Mon");
+    assert.equal(firstReminderAt(oct(19, 15), null), morning(26));
+    assert.equal(askDateAt(oct(22, 15)), morning(26), "Thu: two working days on is Mon, so that Monday");
+    assert.equal(askDateAt(oct(23, 15)), Date.UTC(2026, 10, 2, 14), "Fri: two working days on is Tue, so the Monday after");
+  });
+
+  it("a promise owed to you gets the check-in only, never a heads-up", () => {
+    const dueAt = promiseDueAt(oct(19, 15), "Thu")!;
+    assert.equal(firstReminderAt(oct(19, 15), dueAt, true), morning(23));
+  });
+
+  it("a stored time ends that day's moment at the time, not at the day's end", () => {
+    assert.equal(promiseDueAt(oct(21, 9), "today at 1:30"), oct(21, 13, 30));
+    assert.equal(promiseDueAt(oct(21, 9), "at 2pm"), oct(21, 14));
+    assert.equal(promiseDueAt(oct(21, 9), "Thu at 10:15"), oct(22, 10, 15));
+    assert.equal(promiseDueAt(oct(21, 9), "Thu"), oct(23, 0), "no time: the day's end");
+    assert.deepEqual(deadlineTime("9:30"), { h: 9, m: 30 });
+    assert.deepEqual(deadlineTime("1:30"), { h: 13, m: 30 });
+    assert.equal(deadlineTime("10/3"), null, "a date is not a time");
+    assert.equal(deadlineTime("Oct 3"), null);
+  });
+
+  it("no heads-up on a morning already past the due moment", () => {
+    const dueAt = promiseDueAt(oct(19, 15), "tomorrow at 8am")!;
+    assert.equal(headsUpAt(oct(19, 15), dueAt), null);
+  });
+
+  it("names each reminder by where the row stands: heads-up before its moment, check-in after, ask with none", () => {
+    assert.equal(reminderPhase(oct(23, 0), morning(21)), "heads-up");
+    assert.equal(reminderPhase(oct(23, 0), morning(23)), "check-in");
+    assert.equal(reminderPhase(null, morning(26)), "ask-date");
+  });
+
+  it("an unanswered check-in gets one more, two working days on", () => {
+    assert.equal(followUpAt(morning(23)), morning(27), "Fri → Tue");
+  });
 });

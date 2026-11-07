@@ -19,7 +19,7 @@ import assert from "node:assert/strict";
 
 import { updateMessage } from "../src/slack/api";
 import { ELIDED_LINE } from "../src/slack/split";
-import { EXPIRED_CARD } from "../src/slack/gate-note";
+import { EXPIRED_CARD_LINE as EXPIRED_CARD } from "../src/slack/gate-note";
 import { runReviewDecision, type ReviewDoorDeps } from "../src/slack/review-door";
 import { showExpiredCard } from "../src/slack/card-expiry-edit";
 import { renderProposalCard } from "../src/slack/proposal-render";
@@ -130,7 +130,7 @@ describe("a long card's edits stay inside chat.update's text limit", () => {
     assert.equal(messageBlocksRefusal(edit.blocks as unknown[]), null);
     const { line, buttons } = drawn(edit);
     assert.match(line, /Rejected/);
-    assert.deepEqual(buttons, ["View"]);
+    assert.deepEqual(buttons, ["View decision"]);
     // The copy keeps the card's opening and ends with the outcome: a View
     // pressed once the record is gone reads it off the message
     // (`review-view.ts` § outcomeView), and the model reading the thread back

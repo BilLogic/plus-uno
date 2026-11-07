@@ -1,5 +1,5 @@
 {
-  "_readme": "Eval cases for commitment reminders' detector (agents/uno-bot/src/commitments/detector.ts). Each case is one swept thread, the channel cursor its new messages come after, the detector reply recorded for it, and what the parse must keep. `recording.source` says whether the reply was authored or captured, as the turn recordings do. tests/commitment-detector.test.ts replays every case through the real detector over the fake ModelProvider and fails when what is kept differs from `expect`. The four shapes the detector must tell apart: a real promise, a request answered yes, a hypothetical, and a joke. Plain text, under docs/evals/, so uno-bot's read guard withholds it from the bot being measured (docs/evals/fixtures/README.md).",
+  "_readme": "Eval cases for commitment reminders' detector (agents/uno-bot/src/commitments/detector.ts). Each case is one swept thread, the channel cursor its new messages come after, the detector reply recorded for it, and what the parse must keep. `recording.source` says whether the reply was authored or captured, as the turn recordings do. tests/commitment-detector.test.ts replays every case through the real detector over the fake ModelProvider and fails when what is kept differs from `expect`. The four shapes the detector must tell apart: a real promise, a request answered yes, a hypothetical, and a joke. Plain text, under docs/evals/, so uno-bot's read guard withholds it from the bot being measured (docs/evals/fixtures/README.md). `judgeCases` are the completion judge's: a promise, every message after it, the morning it is judged, the judge's recorded reply and the answer it must come to — Done, No longer needed (with why) or Still open. The two from Oct 14 are false alarms a reminder went out on.",
   "cases": [
     {
       "id": "CM1",
@@ -115,6 +115,68 @@
       },
       "expect": {
         "commitments": []
+      }
+    }
+  ],
+  "judgeCases": [
+    {
+      "id": "CJ1",
+      "name": "\"sure thing\" to a call at 1:30 the same day: its moment has passed",
+      "judgeNote": "Shiv asked Bill to join the second call with Ken at 1:30, and Bill said sure thing at 12:07 the same day. Nothing more was said. Five days later the call is long over, so the promise is no longer needed because its time passed. A reminder asking 'Is it done?' was the false alarm.",
+      "promise": {
+        "promiser": "U0BILL0001",
+        "what": "join the second call with Ken at 1:30",
+        "ts": "1791994020.000200"
+      },
+      "before": [
+        {
+          "ts": "1791993900.000100",
+          "user": "U0SHIV0001",
+          "text": "can you join the second call with ken at 1:30"
+        }
+      ],
+      "after": [],
+      "now": 1792414800000,
+      "recording": {
+        "source": "authored",
+        "reply": "{\"answer\": \"no_longer_needed\", \"reason\": \"time_passed\", \"evidence_ts\": [], \"confidence\": 0.9}"
+      },
+      "expect": {
+        "answer": "no-longer-needed",
+        "reason": "time-passed"
+      }
+    },
+    {
+      "id": "CJ2",
+      "name": "\"I'll text him\", then \"oh all good, he's aware of that\": called off in the next message",
+      "judgeNote": "Shiv said he'd text him; 16 seconds later Bill answered that it was all good, he was already aware. The promise was called off by the person it was made to, so it is no longer needed, said so in that reply, which is the evidence.",
+      "promise": {
+        "promiser": "U0SHIV0001",
+        "what": "text him about it",
+        "ts": "1792002060.000300"
+      },
+      "before": [
+        {
+          "ts": "1792002000.000100",
+          "user": "U0BILL0001",
+          "text": "does he know the session moved?"
+        }
+      ],
+      "after": [
+        {
+          "ts": "1792002076.000400",
+          "user": "U0BILL0001",
+          "text": "oh all good, he's aware of that"
+        }
+      ],
+      "now": 1792414800000,
+      "recording": {
+        "source": "authored",
+        "reply": "{\"answer\": \"no_longer_needed\", \"reason\": \"said\", \"evidence_ts\": [\"1792002076.000400\"], \"confidence\": 0.92}"
+      },
+      "expect": {
+        "answer": "no-longer-needed",
+        "reason": "said"
       }
     }
   ]

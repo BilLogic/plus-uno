@@ -14,7 +14,7 @@
 // is left owed and handed over again on the alarm's next pass, unless the
 // refusal is one no retry can change.
 import type { ThreadState } from "../thread-state/index";
-import { EXPIRED_CARD } from "./gate-note";
+import { EXPIRED_CARD_LINE } from "./gate-note";
 import { notedCardBlocks } from "./proposal-render";
 import { PERMANENT_SLACK_ERRORS } from "./report-expiry";
 
@@ -34,8 +34,8 @@ export async function showExpiredCard(proposalTs: string, deps: {
     await deps.edit(card.channel, proposalTs, {
       // The note as the copy's last line too, as a decision's is
       // (`decidedCard`): an edit cut to Slack's limit keeps that line.
-      text: `${card.text}\n${EXPIRED_CARD}`,
-      blocks: notedCardBlocks({ text: card.text, ...(card.blocks ? { blocks: card.blocks } : {}) }, EXPIRED_CARD, "View"),
+      text: `${card.text}\n${EXPIRED_CARD_LINE}`,
+      blocks: notedCardBlocks({ text: card.text, ...(card.blocks ? { blocks: card.blocks } : {}) }, EXPIRED_CARD_LINE, "View card"),
     });
   } catch (err) {
     const reason = err instanceof Error ? err.message : String(err);

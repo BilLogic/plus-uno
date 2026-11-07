@@ -352,7 +352,7 @@ describe("Submit carries the comment into the update that runs", () => {
     const h = await approve(CLOSE, { "0.comment": "" });
     await runReviewOpen({ triggerId: "T.trigger", channel: CHANNEL, messageTs: CARD_TS, userId: CONFIRMER }, h.deps);
     const view = h.views.calls.at(-1)!.view;
-    assert.equal(blocksOf(view)[2]!.type, "header");
+    assert.deepEqual([blocksOf(view)[2]!.type, blocksOf(view)[3]!.type], ["divider", "header"]);
     assert.doesNotMatch(JSON.stringify(view), /Comments|comments|Fixed in #1294\./);
   });
 

@@ -327,6 +327,7 @@ export function withdrawalItemId(p: Pick<DrawnProposal, "proposalTs">): string {
 export function withdrawalItem(p: DrawnProposal, link: string): ReportItem {
   return {
     id: withdrawalItemId(p),
+    kind: "blueprint-upkeep",
     title: "Remove this proposal from the blueprint?",
     subtitle: `drawn ${day(p.writtenAt)} · no Roadmap card linked in 30 days`,
     owners: [{ slack: p.requesterId }],

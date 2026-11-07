@@ -561,8 +561,8 @@ test("a fix that fails to stage says so on its card and comes back tomorrow; the
   }, "the edit sends the report's tag again");
   const cards = (report.editedBlocks as Array<Record<string, any>>)[1]!.elements as Array<Record<string, any>>;
   assert.equal(cards[0]!.subtitle.text, "Didn't go through, so it comes back in tomorrow's report.");
-  assert.deepEqual(cards[0]!.actions.map((a: Record<string, any>) => a.text.text), ["Open page"], "nothing to review");
-  assert.deepEqual(cards[1]!.actions.map((a: Record<string, any>) => a.text.text), ["Review", "Open page"]);
+  assert.deepEqual(cards[0]!.actions.map((a: Record<string, any>) => a.text.text), ["Open page ↗"], "nothing to review");
+  assert.deepEqual(cards[1]!.actions.map((a: Record<string, any>) => a.text.text), ["Review", "Open page ↗"]);
   assert.equal((await h.threadState.getProposalByTs(itemProposalKey(report.ts, PAGE_A.blocks[1]!.id))).state, "found");
   assert.deepEqual((await h.store.pendingFindings()).map((f) => f.blockId), [PAGE_A.blocks[0]!.id], "the failed fix stays queued");
   assert.match(morning.note ?? "", /1 fix\(es\) posted but not staged/);

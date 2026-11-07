@@ -214,7 +214,7 @@ describe("the checks", () => {
     assert.equal(c!.title.text, "AI Indicator / Card 733 / Sarah");
     assert.equal(c!.subtitle!.text, "<@U0SARAH> · Wrong folder · Card 733");
     assert.equal(c!.body.text, "In ⏳ WIP, but Card 733 is Shipped. Move it to Universal › 📐 Specs.");
-    assert.deepEqual(c!.actions.map((a) => a.text.text), ["Review", "Open file", "Card 733"]);
+    assert.deepEqual(c!.actions.map((a) => a.text.text), ["Review", "Open file ↗", "Card 733 ↗"]);
     assert.equal(c!.actions[1]!.url, "https://www.figma.com/design/F1");
     assert.equal(c!.actions[2]!.url, "https://www.notion.so/card-733");
   });
@@ -273,10 +273,10 @@ describe("the checks, each case", () => {
     assert.deepEqual(out["AI Indicator / Card 9999 / Sarah"], {
       subtitle: "Unknown card · Card 9999",
       body: 'Card 9999 isn\'t on the Roadmap. Likely Card 812, "AI Indicator v2".',
-      buttons: ["Review", "Open file", "Card 812"],
+      buttons: ["Review", "Open file ↗", "Card 812 ↗"],
     });
     assert.equal(out["Mystery / Card 9998 / Sarah"]!.body, "Card 9998 isn't on the Roadmap, and no card's name matches the project.");
-    assert.deepEqual(out["Mystery / Card 9998 / Sarah"]!.buttons, ["Review", "Open file"]);
+    assert.deepEqual(out["Mystery / Card 9998 / Sarah"]!.buttons, ["Review", "Open file ↗"]);
   });
 
   it("a file on no card is told to go to Archive, unless it is a library, template or kit, or already there", async () => {
@@ -290,7 +290,7 @@ describe("the checks, each case", () => {
     assert.deepEqual(out["Old Onboarding / Legacy / flows"], {
       subtitle: "Not on an active card",
       body: "Not on an active card, and not in 🗂️ Archive. Move it to Universal › 🗂️ Archive.",
-      buttons: ["Review", "Open file"],
+      buttons: ["Review", "Open file ↗"],
     });
   });
 
@@ -342,7 +342,7 @@ describe("the title check", () => {
       c!.body.text,
       'Its pages or Cover name Card 812 and Card 1002, which the title leaves out. Rename it to "AI Indicator / Card 733 & 812 & 1002 / Sarah".',
     );
-    assert.deepEqual(c!.actions.map((a) => a.text.text), ["Review", "Open file", "Card 812"]);
+    assert.deepEqual(c!.actions.map((a) => a.text.text), ["Review", "Open file ↗", "Card 812 ↗"]);
   });
 
   it("a title with no designers segment gets one, from its cards' designer Contributors", async () => {
@@ -669,8 +669,7 @@ describe("answering a card in its Review", () => {
     await answer("moved");
     assert.deepEqual(ran, []);
     const [c] = cardsIn(updates.at(-1)!.message.blocks);
-    assert.match(c!.subtitle!.text, /Moved it/);
-    assert.match(c!.subtitle!.text, /<@U0SARAH>/);
+    assert.equal(c!.subtitle!.text, "Marked moved by <@U0SARAH>");
   });
 
   it("Leave as is runs the card's one operation, which keeps the item quiet until the file's cards change", async () => {
@@ -678,8 +677,8 @@ describe("answering a card in its Review", () => {
     await answer("leave");
     assert.deepEqual(ran, [{ toolName: "figma_tidy_up", input: { file_key: "F1", check: "wrong-folder", card: 733, cards: "733" } }]);
     const [c] = cardsIn(updates.at(-1)!.message.blocks);
-    assert.match(c!.subtitle!.text, /Left as is/);
-    assert.equal(c!.body.text, "Not raised again until the file's cards change.");
+    assert.match(c!.subtitle!.text, /^Left as is by /);
+    assert.doesNotMatch(c!.body.text, /Not raised again/, "the card keeps its finding; View says what the answer did");
 
     const skips = box<TidySkips | null>({ "F2|title": "9" });
     const result = JSON.parse(await leaveAsIs(skips.store, (ran[0] as { input: Record<string, unknown> }).input)) as { ok: boolean };

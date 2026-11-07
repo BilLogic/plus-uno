@@ -46,7 +46,7 @@ import { sweepHarness } from "./helpers/sweep-harness";
 import { isWeeklyPrecedenceThread } from "../src/ds-precedence/env";
 import { TOOL_TABLE } from "../src/agent/tool-table";
 import type { Env } from "../src/types";
-import { messageBlocksRefusal } from "./helpers/slack-block-rules";
+import { viewRefusal, messageBlocksRefusal } from "./helpers/slack-block-rules";
 import { notified } from "./helpers/notified";
 import { recordingViews } from "./helpers/recording-slack";
 import type { OperationOutcome } from "../src/gate/run-batch";
@@ -637,7 +637,7 @@ describe("the morning post", () => {
     assert.equal(button!.title.text, "Button");
     assert.equal(button!.subtitle!.text, "Library side");
     assert.match(button!.body.text, /^Code has one fill prop \(/, "plain words, no backticks");
-    assert.deepEqual(button!.actions.map((a) => a.text.text), ["Review", "Code", "Figma"]);
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["Review", "Code ↗", "Figma ↗"]);
     assert.match(button!.actions[1]!.url!, /^https:\/\/github\.com\/BilLogic\/plus-uno\/blob\/main\//);
     assert.match(button!.actions[2]!.url!, /^https:\/\/www\.figma\.com\//);
     assert.equal(tree!.title.text, "TreeSelect");
@@ -759,7 +759,7 @@ describe("the morning post", () => {
     assert.deepEqual(reportBox.box.value!.items.map((i) => i.component), ["TreeSelect"], "it waits for the next morning");
     const [, tree] = cardsIn(edits[0]!.message.blocks!);
     assert.equal(tree!.subtitle!.text, NOT_STAGED);
-    assert.deepEqual(tree!.actions.map((a) => a.text.text), ["Code", "Figma"], "no Review");
+    assert.deepEqual(tree!.actions.map((a) => a.text.text), ["Code ↗", "Figma ↗"], "no Review");
   });
 
   it("keeps the report for tomorrow when the members cannot be read, or the message does not carry it", async () => {
@@ -890,6 +890,8 @@ describe("the week's intake", () => {
 
 /** When a card closed, as View's line says it (`closedWhen`): "Oct 19 at 9:13 AM ET". */
 const WHEN = String.raw`[A-Z][a-z]{2} \d{1,2} at \d{1,2}:\d{2} [AP]M ET`;
+/** When a decided card's byline says it was decided, in ET. */
+const BYLINE_WHEN = String.raw`[A-Z][a-z]{2} \d{1,2} at \d{1,2}:\d{2} [AP]M`;
 
 /** A rich text block's words, with a user pill as its mention. */
 function richWords(block: unknown): string {
@@ -954,19 +956,20 @@ describe("deciding a weekly card in its Review", () => {
     assert.equal(gh.comments.length, 1);
     assert.match(gh.comments[0]!.comment, /^### Button/);
     const [button, tree] = cardsIn(updates.at(-1)!.message.blocks);
-    assert.match(tree!.subtitle!.text, /^Approved by <@U0MEMBER1> · written /);
-    assert.match(button!.subtitle!.text, /^Approved by <@U0MEMBER2> · written /);
-    assert.equal(tree!.body.text, "Written: added to DS precedence intake #1101.");
-    assert.equal(button!.body.text, "Written: added to DS precedence intake #1101.");
-    assert.deepEqual(button!.actions.map((a) => a.text.text), ["View", "Code", "Figma"]);
+    assert.equal(tree!.subtitle!.text, "Approved by <@U0MEMBER1>");
+    assert.equal(button!.subtitle!.text, "Approved by <@U0MEMBER2>");
+    assert.match(tree!.body.text, /^(?!Written|Nothing written|Note:)/, "the card keeps its finding");
+    assert.match(button!.body.text, /^(?!Written|Nothing written|Note:)/, "the card keeps its finding");
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["View decision"]);
   });
 
   it("names the existing intake found at write time, rather than the draft's destination", async () => {
-    const { decide, gh, updates } = await decided([{ number: 1090, url: `https://github.com/${REPO}/issues/1090`, body: precedenceMarker("2026-10-02") }]);
+    const { decide, gh, store } = await decided([{ number: 1090, url: `https://github.com/${REPO}/issues/1090`, body: precedenceMarker("2026-10-02") }]);
     await decide("ds-Button", "confirm", MEMBERS[0]!);
     assert.equal(gh.created.length, 0);
     assert.equal(gh.comments[0]!.issue_number, 1090);
-    assert.equal(cardsIn(updates.at(-1)!.message.blocks)[0]!.body.text, "Written: added to DS precedence intake #1090.");
+    const state = (await store.getReport(MSG))!.entries.find((e) => e.id === "ds-Button")!.state;
+    assert.equal(state.kind === "approved" ? state.done : undefined, "added to DS precedence intake #1090.", "kept for View to say");
   });
 
   it("keeps a failed write as not written even if its result carries a receipt", async () => {
@@ -974,8 +977,8 @@ describe("deciding a weekly card in its Review", () => {
     gh.deps.comment = async () => JSON.stringify({ ok: false, error: "GitHub unavailable", report_done: "added to intake #1090." });
     await decide("ds-Button", "confirm", MEMBERS[0]!);
     const button = cardsIn(updates.at(-1)!.message.blocks)[0]!;
-    assert.match(button.subtitle!.text, /not written/);
-    assert.equal(button.body.text, "Nothing written.");
+    assert.match(button.subtitle!.text, /, not written$/);
+    assert.match(button.body.text, /^(?!Written|Nothing written|Note:)/, "the card keeps its finding");
   });
 
   it("Needs changes disputes the card: its note goes on the week's intake, filing it first, and the card reads Noted by", async () => {
@@ -988,8 +991,8 @@ describe("deciding a weekly card in its Review", () => {
     assert.match(gh.created[0]!.body, /\*\*Button\*\*: disputed by Maya — ghost is library-only on purpose/);
     const [button] = cardsIn(updates.at(-1)!.message.blocks);
     assert.equal(button!.subtitle!.text, "Noted by <@U0MEMBER1>");
-    assert.equal(button!.body.text, "Note: ghost is library-only on purpose");
-    assert.deepEqual(button!.actions.map((a) => a.text.text), ["View", "Code", "Figma"]);
+    assert.match(button!.body.text, /^(?!Written|Nothing written|Note:)/, "the card keeps its finding");
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["View decision"]);
     assert.notEqual((await store.getProposalByTs(itemProposal(MSG, "ds-Button").proposalTs)).state, "found", "nothing else decides it");
 
     await decide("ds-TreeSelect", "revise", MEMBERS[1]!, "the library is right, code is behind");
@@ -999,9 +1002,9 @@ describe("deciding a weekly card in its Review", () => {
 
   it("View on a decided card draws the finding it was decided on, read-only, under how it closed (#1362)", async () => {
     const cases = [
-      ["revise", "ghost is library-only on purpose", "Noted.", String.raw`^Noted by <@U0MEMBER1> on ${WHEN}: ghost is library-only on purpose\.$`],
-      ["confirm", undefined, "Approved.", String.raw`^Approved by <@U0MEMBER1> on ${WHEN}\.$`],
-      ["cancel", "deliberate", "Rejected.", String.raw`^Rejected by <@U0MEMBER1> on ${WHEN}: deliberate\.$`],
+      ["revise", "ghost is library-only on purpose", /^Noted\. Added to the intake as disputed\.$/, String.raw`^Noted by <@U0MEMBER1> on ${BYLINE_WHEN}:$`],
+      ["confirm", undefined, /^Approved\. Added to DS precedence intake #\d+\.$/, String.raw`^Approved by <@U0MEMBER1> on ${BYLINE_WHEN}\.$`],
+      ["cancel", "deliberate", /^Rejected\. Nothing was written\.$/, String.raw`^Rejected by <@U0MEMBER1> on ${BYLINE_WHEN}:$`],
     ] as const;
     for (const [decision, note, alert, line] of cases) {
       const { decide, deps, views, store } = await decided();
@@ -1012,15 +1015,19 @@ describe("deciding a weekly card in its Review", () => {
       assert.equal(look.decided.by, MEMBERS[0]);
       await runReviewOpen({ triggerId: "T", channel: CHANNEL, messageTs: key, userId: MEMBERS[1]!, item: { messageTs: MSG, id: "ds-Button" } }, deps);
       const view = views.calls.at(-1)!.view as { blocks: Array<{ type: string; text?: { text: string }; elements?: unknown[] }>; submit?: unknown };
-      assert.equal(view.blocks[0]!.text!.text, alert, decision);
+      assert.match(view.blocks[0]!.text!.text, alert, decision);
       assert.match(richWords(view.blocks[1]), new RegExp(line), decision);
+      if (note) assert.equal(richWords(view.blocks[2]), note, `${decision}: the note, quoted`);
+      assert.equal((view as unknown as { title: { text: string } }).title.text, "DS precedence", decision);
+      assert.equal(view.blocks.findIndex((b) => b.type === "divider"), note ? 3 : 2, `${decision}: the head, then a divider, then the draft`);
+      assert.equal(viewRefusal(view), null, decision);
       const json = JSON.stringify(view);
       // The finding itself: what differs, and its code and library.
       assert.match(json, /What differs/, decision);
       assert.match(json, /"text":"Code has one "/, decision);
       assert.match(json, /the library splits it into 4 components/, decision);
-      assert.match(json, /"text":"Code"/, decision);
-      assert.match(json, /"text":"Figma"/, decision);
+      assert.match(json, /"text":"Code ↗"/, decision);
+      assert.match(json, /"text":"Figma ↗"/, decision);
       // Never the card's after-state words in place of it.
       assert.doesNotMatch(json, /Note: ghost|Written: added/, decision);
       assert.equal(view.submit, undefined, decision);
@@ -1034,7 +1041,7 @@ describe("deciding a weekly card in its Review", () => {
     await decide("ds-Button", "revise", MEMBERS[0]!, "deliberate");
     const [button] = cardsIn(updates.at(-1)!.message.blocks);
     assert.equal(button!.subtitle!.text, "Library side");
-    assert.deepEqual(button!.actions.map((a) => a.text.text), ["Review", "Code", "Figma"]);
+    assert.deepEqual(button!.actions.map((a) => a.text.text), ["Review", "Code ↗", "Figma ↗"]);
     assert.match(said[0]!, /didn't reach this week's intake/);
     const live = await store.getProposalByTs(itemProposal(MSG, "ds-Button").proposalTs);
     assert.equal(live.state, "found");

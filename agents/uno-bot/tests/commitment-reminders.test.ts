@@ -27,12 +27,29 @@ import {
   footerLabels,
   REMINDER_REACTIONS,
   runCommitmentNudges,
+  eitherDoor,
+  pressPromise,
+  reactPromise,
+  submitPromiseView,
+  promiseViewErrors,
+  PROMISE_DATE_BLOCK,
+  PROMISE_DATE_ACTION,
+  PROMISE_DROP_BLOCK,
+  PROMISE_DROP_ACTION,
+  PROMISE_DATE_CALLBACK_ID,
+  PROMISE_DROP_CALLBACK_ID,
+  THREAD_LABEL,
+  type PromiseDoorDeps,
   type NudgeDeps,
   type CommitmentRecord,
   type InMemoryCommitmentStore,
   type ReminderMessage,
 } from "../src/commitments/index";
 import { at, BOT, DESIGN, msg, sweepHarness, ts, UNO_BOT, utcDay } from "./helpers/sweep-harness";
+
+/** A person's DM with uno-bot, in the fakes. */
+const dmOf = (user: string) => `D${user.slice(1)}`;
+const NAMES: Record<string, string> = { U0BEA: "Bea", U0MAYA: "Maya" };
 
 const NUDGE: ScheduledJob = { key: "commitment-nudge", kind: "commitment-nudge" };
 const EOD: ScheduledJob = { key: `sweep:${DESIGN}`, kind: "sweep-channel", channel: DESIGN };
@@ -59,22 +76,24 @@ const promiseReply = (over: Record<string, unknown> = {}) =>
 
 /** The promise, read by Tuesday's end-of-day sweep. */
 async function sweptPromise(
-  opts: { store?: InMemoryCommitmentStore; channel?: string; reply?: string; later?: SweepSlackMessage[]; now?: number } = {},
+  opts: { store?: InMemoryCommitmentStore; channel?: string; reply?: string; later?: SweepSlackMessage[]; now?: number; promiseTs?: string; rootTs?: string } = {},
 ) {
+  const promiseTs = opts.promiseTs ?? PROMISE;
+  const root = opts.rootTs ?? ROOT;
   const store = opts.store ?? createInMemoryCommitmentStore();
   const channel = opts.channel ?? DESIGN;
   const provider = fakeProvider({ generateReplies: [opts.reply ?? promiseReply()] });
   const later = opts.later ?? [];
-  const latest = later.at(-1)?.ts ?? PROMISE;
+  const latest = later.at(-1)?.ts ?? promiseTs;
   const h = sweepHarness({
     channels: {
       [channel]: {
         kind: "public",
-        history: [msg(BEA, ROOT, "Where are the updated reflection screens?", { reply_count: 1 + later.length, latest_reply: latest })],
+        history: [msg(BEA, root, "Where are the updated reflection screens?", { reply_count: 1 + later.length, latest_reply: latest })],
         threads: {
-          [ROOT]: [
-            msg(BEA, ROOT, "Where are the updated reflection screens?"),
-            msg(MAYA, PROMISE, "Still polishing. I'll share the Figma link by Thu."),
+          [root]: [
+            msg(BEA, root, "Where are the updated reflection screens?"),
+            msg(MAYA, promiseTs, "Still polishing. I'll share the Figma link by Thu."),
             ...later,
           ],
         },
@@ -138,6 +157,8 @@ function mornings(opts: {
         updates.push({ channel, ts: messageTs, ...message });
         return true;
       },
+      dmChannel: async (user) => dmOf(user),
+      userName: async (user) => NAMES[user] ?? null,
     },
     sources: { read: async () => null },
     judge: modelEvidenceJudge(judge),
@@ -162,6 +183,35 @@ const only = (store: InMemoryCommitmentStore): CommitmentRecord => {
 
 const mentions = (text: string) => [...text.matchAll(/<@(U[A-Z0-9]+)>/g)].map((m) => m[1]);
 
+type Card = { title: { text: string }; subtitle: { text: string }; body: { text: string }; actions?: Array<{ action_id: string; text: { text: string }; value: string }> };
+/** A posted message's promise cards, as Slack would show them. */
+function cardsOf(blocks: unknown[]): Card[] {
+  return (blocks as Array<{ type: string; elements?: Card[] }>).flatMap((b) => (b.type === "carousel" ? b.elements! : b.type === "card" ? [b as unknown as Card] : []));
+}
+const labels = (c: Card) => (c.actions ?? []).map((a) => a.text.text);
+const PROMISE_LINK = `https://plus.slack.com/archives/${DESIGN}/p${PROMISE.replace(".", "")}`;
+
+/** The promise door over a morning's fakes: a message read back is the one
+ *  posted, with every edit since. */
+function promiseDoor(m: ReturnType<typeof mornings>, store: InMemoryCommitmentStore, over: Partial<PromiseDoorDeps> = {}) {
+  const opened: Array<Record<string, unknown>> = [];
+  const deps: PromiseDoorDeps = {
+    store,
+    async message(_channel, ts) {
+      const edited = m.updates.filter((u) => u.ts === ts).at(-1);
+      return edited?.blocks ?? m.posts.find((p) => p.ts === ts)?.blocks ?? null;
+    },
+    update: m.deps.slack.update,
+    async openView(_trigger, view) {
+      opened.push(view);
+      return true;
+    },
+    now: () => m.clock.now,
+    ...over,
+  };
+  return { deps, opened };
+}
+
 describe("the end of day reads a promise", () => {
   it("keeps it as an open row due at the end of the day it names, and posts nothing", async () => {
     const { store, provider, h, report } = await sweptPromise();
@@ -172,9 +222,10 @@ describe("the end of day reads a promise", () => {
     assert.equal(row.threadTs, ROOT);
     assert.equal(row.promiserId, MAYA);
     assert.equal(row.requesterId, BEA);
-    // "by Thu", said on Tuesday: the end of Thursday in New York.
-    assert.equal(new Date(row.dueAt).toISOString(), "2026-10-02T04:00:00.000Z");
-    assert.equal(row.deadlineAt, row.dueAt);
+    // "by Thu", said on Tuesday: due at the end of Thursday in New York, and
+    // first reminded by the heads-up on Wednesday's 9:00 ET run.
+    assert.equal(new Date(row.deadlineAt!).toISOString(), "2026-10-02T04:00:00.000Z");
+    assert.equal(new Date(row.dueAt).toISOString(), "2026-09-30T13:00:00.000Z");
     // The summary waits in the text store, never on the row.
     assert.equal(store.texts.get(row.id)?.text.what, "share the Figma link for the reflection screens");
     assert.equal(provider.generated.length, 1);
@@ -201,12 +252,21 @@ describe("the end of day reads a promise", () => {
 });
 
 describe("the morning run", () => {
-  it("does nothing before a commitment is due", async () => {
+  it("gives a heads-up the working day before, then nothing until the morning after it's due", async () => {
     const { store } = await sweptPromise();
-    const m = mornings({ store, now: at(31, 13) }); // Thu 09:00 ET: due tonight
-    const report = await m.run();
-    assert.equal(report.summary, "nothing due");
-    assert.equal(m.posts.length, 0);
+    const m = mornings({ store, now: at(30, 13) }); // Wed 09:00 ET: due Thursday
+    await m.run();
+    assert.equal(m.posts.length, 1);
+    const [card] = cardsOf(m.posts[0]!.blocks);
+    assert.equal(card!.title.text, "Share the Figma link for the reflection screens");
+    assert.equal(card!.subtitle.text, "Due tomorrow, Thu Oct 1");
+    assert.deepEqual(labels(card!), ["New date", "On track", "Done"]);
+    const row = only(store);
+    assert.equal(row.nudges, 0, "a heads-up is not one of the check-ins");
+    assert.equal(new Date(row.dueAt).toISOString(), "2026-10-02T13:00:00.000Z", "the check-in: Friday's run");
+    m.clock.now = at(31, 13); // Thu: due tonight
+    assert.equal((await m.run()).summary, "nothing due");
+    assert.equal(m.posts.length, 1);
   });
 
   it("completion evidence makes it auto_done, and nothing is posted", async () => {
@@ -216,7 +276,7 @@ describe("the morning run", () => {
       store,
       now: at(32, 13), // Fri 2026-10-02 09:00 ET
       thread: [msg(BEA, ROOT, "Where are the screens?"), msg(MAYA, PROMISE, "I'll share it by Thu."), link],
-      judgeReplies: [JSON.stringify({ done: true, evidence_ts: [link.ts], confidence: 0.9 })],
+      judgeReplies: [JSON.stringify({ answer: "done", reason: null, evidence_ts: [link.ts], confidence: 0.9 })],
     });
     const report = await m.run();
     assert.deepEqual(report.actions.map((a) => a.action), ["auto_done"]);
@@ -227,7 +287,7 @@ describe("the morning run", () => {
     assert.ok(m.judge.generated[0]!.prompt.includes(link.ts));
   });
 
-  it("a due commitment gets exactly one nudge, in its thread, mentioning only the promiser", async () => {
+  it("a due commitment gets exactly one card, in its promiser's DM with uno-bot, mentioning no one", async () => {
     const { store } = await sweptPromise();
     const m = mornings({ store, now: at(32, 13) });
     await m.run();
@@ -235,22 +295,22 @@ describe("the morning run", () => {
     await m.run();
     assert.equal(m.posts.length, 1);
     const [nudge] = m.posts;
-    assert.equal(nudge!.channel, DESIGN);
-    assert.equal(nudge!.threadTs, ROOT);
-    assert.deepEqual(mentions(nudge!.text), [MAYA]);
-    assert.equal(
-      nudge!.text,
-      `*You said you'd share the Figma link for the reflection screens by Thu*\n<@${MAYA}> I haven't spotted it yet. Is it done, or does the date need to move? · <https://plus.slack.com/archives/${DESIGN}/p${PROMISE.replace(".", "")}|Original message>`,
-    );
-    assert.deepEqual(footerLabels(nudge!.blocks), REMINDER_CHOICES.map((c) => c.label).join(" · "));
+    // In the promiser's DM with uno-bot, top level: never the team's thread.
+    assert.equal(nudge!.channel, dmOf(MAYA));
+    assert.equal(nudge!.threadTs, null);
+    assert.deepEqual(mentions(nudge!.text), []);
+    assert.equal(nudge!.text, "• 1 promise due or overdue.\n• Share the Figma link for the reflection screens: Overdue, was due Thu Oct 1");
+    const [card] = cardsOf(nudge!.blocks);
+    assert.equal(card!.subtitle.text, "Overdue, was due Thu Oct 1");
+    assert.equal(card!.body.text, `You told Bea you'd share the Figma link for the reflection screens. <${PROMISE_LINK}|${THREAD_LABEL}>, on Tue.`);
+    assert.deepEqual(labels(card!), ["Drop it", "New date", "Done"]);
     const row = only(store);
     assert.equal(row.state, "nudged");
     assert.equal(row.nudges, 1);
     assert.equal(row.nudgeTs, nudge!.ts);
-    // No later messages: no judge call spent.
-    assert.equal(m.judge.generated.length, 0);
-    // The thread is marked, so the team's replies there don't start turns.
-    assert.deepEqual(m.marked, [`${DESIGN}:${ROOT}`]);
+    assert.equal(m.judge.generated.length, 1, "the judge is asked even of silence: a call's moment can pass in it");
+    // Nothing went into the team's thread, so there is nothing to mark.
+    assert.deepEqual(m.marked, []);
   });
 
   it("a promise with no thread to answer in posts nothing at the channel's top, and marks nothing", async () => {
@@ -265,12 +325,16 @@ describe("the morning run", () => {
     assert.deepEqual(m.marked, []);
   });
 
-  it("with no stated deadline, the nudge names the day of the promise", async () => {
+  it("with no stated deadline, the card asks for a date", async () => {
     const { store } = await sweptPromise({ reply: promiseReply({ deadline: null }) });
-    // Tue + two working days: due Thursday night, nudged Friday.
-    const m = mornings({ store, now: at(32, 13) });
+    // No date: the Monday run at least two working days on asks for one.
+    const m = mornings({ store, now: at(35, 13) });
     await m.run();
-    assert.match(m.posts[0]!.text, new RegExp(`^\\*On Tue you said you'd share the Figma link for the reflection screens\\*\\n<@${MAYA}> I haven't spotted it yet\\. Is it done, or still in progress\\?`));
+    const [card] = cardsOf(m.posts[0]!.blocks);
+    assert.equal(card!.subtitle.text, "Set a date");
+    assert.deepEqual(labels(card!), ["Drop it", "Pick a date", "Done"]);
+    assert.match(card!.body.text, /Pick a date and I'll remind you the day before\. <[^>]+>, last Tue\.$/);
+    assert.match(m.posts[0]!.text, /^• 1 promise needs a date\./);
   });
 
   it("no answer brings one follow-up, then the commitment lapses", async () => {
@@ -283,8 +347,8 @@ describe("the morning run", () => {
     m.clock.now = at(37, 13); // Wed: the follow-up
     await m.run();
     assert.equal(m.posts.length, 2);
-    assert.equal(m.posts[1]!.text, `<@${MAYA}> Checking in once more. Is it done, or does it need more time?`);
-    assert.equal(m.posts[1]!.threadTs, ROOT);
+    assert.equal(cardsOf(m.posts[1]!.blocks)[0]!.subtitle.text, "Overdue, was due Thu Oct 1");
+    assert.equal(m.posts[1]!.channel, dmOf(MAYA));
     assert.equal(only(store).followupTs, m.posts[1]!.ts);
     m.clock.now = at(42, 13); // the Monday after: lapsed, silently
     const report = await m.run();
@@ -309,7 +373,7 @@ describe("the morning run", () => {
     const m = mornings({ store, now: at(32, 18), dryRun: true });
     const report = await m.run();
     assert.deepEqual(report.actions.map((a) => a.action), ["nudged"]);
-    assert.match(report.actions[0]!.text ?? "", /You said you'd share the Figma link/);
+    assert.match(report.actions[0]!.text ?? "", /Share the Figma link for the reflection screens: Overdue/);
     assert.equal(m.posts.length, 0);
     assert.equal(only(store).state, "open");
   });
@@ -336,53 +400,67 @@ describe("the morning run", () => {
 });
 
 describe("answers", () => {
-  /** A commitment nudged on Friday morning, and the reaction door's deps. */
+  /** A promise carded on Friday morning, and a reaction through the doors the
+   *  gate tries first: the promise cards', then the thread reminders'. */
   async function nudged() {
     const { store } = await sweptPromise();
     const m = mornings({ store, now: at(32, 13) });
     await m.run();
     const reminderTs = m.posts[0]!.ts;
-    const react = (glyph: string, userId = MAYA, messageTs = reminderTs) =>
-      answerReminder(
-        { channel: DESIGN, messageTs, glyph, userId, messageAuthorId: BOT },
-        {
-          store,
-          update: m.deps.slack.update,
-          botUserId: async () => BOT,
-          now: () => m.clock.now,
-        },
-      );
+    const { deps } = promiseDoor(m, store);
+    const door = eitherDoor(
+      (r) => reactPromise(r, deps),
+      (r) => answerReminderPress(r, { store, update: m.deps.slack.update, botUserId: async () => BOT, now: () => m.clock.now }),
+    )!;
+    const react = async (glyph: string, userId = MAYA, messageTs = reminderTs) =>
+      (await door({ channel: dmOf(MAYA), messageTs, glyph, userId, messageAuthorId: BOT })).claimed;
     return { store, m, reminderTs, react };
   }
 
   const table: Array<[string, string, CommitmentRecord["state"], string]> = [
-    ["🙌", "raised_hands", "done", "Nice, marked done."],
-    ["⏳", "hourglass_flowing_sand", "snoozed", "No problem. I'll check back Wed."],
-    ["🙅", "no_good", "dropped", "Understood. I won't ask again."],
-    ["🤔", "thinking_face", "not_promise", "My mistake, thanks."],
+    ["🙌", "raised_hands", "done", "Done"],
+    ["⏳", "hourglass_flowing_sand", "snoozed", "Moved to Tue Oct 6"],
+    ["🙅", "no_good", "dropped", "Dropped"],
+    ["🤔", "thinking_face", "not_promise", "Not a promise, won't track"],
   ];
-  for (const [glyph, name, state, ack] of table) {
-    it(`${glyph} sets ${state} and replaces the legend in place`, async () => {
+  for (const [glyph, name, state, outcome] of table) {
+    it(`${glyph} on a one-card message sets ${state}, and the card says "${outcome}"`, async () => {
       const { store, m, reminderTs, react } = await nudged();
       assert.equal(await react(name), true);
       assert.equal(only(store).state, state);
       assert.equal(m.updates.length, 1);
       const [edit] = m.updates;
       assert.equal(edit!.ts, reminderTs);
-      // The body stays as posted; only the context line changes, and no new
-      // message is posted.
-      assert.equal(edit!.text, m.posts[0]!.text);
-      assert.deepEqual(edit!.blocks[0], m.posts[0]!.blocks[0]);
-      assert.equal(footerLabels(edit!.blocks), ack);
-      assert.equal(m.posts.length, 1);
+      const [card] = cardsOf(edit!.blocks);
+      assert.equal(card!.subtitle.text, outcome);
+      assert.equal(card!.actions, undefined, "its buttons go");
+      assert.equal(card!.body.text, cardsOf(m.posts[0]!.blocks)[0]!.body.text, "the body keeps the promise");
+      assert.equal(m.posts.length, 1, "no new message");
     });
   }
+
+  it("a reaction on a message of several cards says to use the buttons, and changes nothing", async () => {
+    const { store: swept } = await sweptPromise();
+    const base = only(swept);
+    const store = createInMemoryCommitmentStore();
+    for (const thread of [ts(29, 13, 1), ts(29, 13, 2)]) {
+      await store.addCommitments([{ ...base, id: `${DESIGN}:${thread}`, threadTs: thread, messageTs: thread }]);
+      await store.saveText(`${DESIGN}:${thread}`, { what: `task ${thread}`, bodies: {} }, Infinity);
+    }
+    const m = mornings({ store, now: at(32, 13) });
+    await m.run();
+    assert.equal(cardsOf(m.posts[0]!.blocks).length, 2);
+    const outcome = await reactPromise({ channel: dmOf(MAYA), messageTs: m.posts[0]!.ts, glyph: "raised_hands", userId: MAYA }, promiseDoor(m, store).deps);
+    assert.deepEqual(outcome, { claimed: true, refused: "This message has more than one promise, so use a card's buttons to say which one." });
+    assert.deepEqual([...store.rows.values()].map((r) => r.state), ["nudged", "nudged"]);
+  });
 
   it("⏳ re-arms due_at two working days out, and is capped at two", async () => {
     const { store, m, react } = await nudged();
     await react("hourglass_flowing_sand"); // Fri: due Tuesday night
     let row = only(store);
-    assert.equal(new Date(row.dueAt).toISOString(), "2026-10-07T04:00:00.000Z");
+    assert.equal(new Date(row.deadlineAt!).toISOString(), "2026-10-07T04:00:00.000Z");
+    assert.equal(new Date(row.dueAt).toISOString(), "2026-10-07T13:00:00.000Z");
     assert.equal(row.snoozes, 1);
     m.clock.now = at(37, 13); // Wed
     await m.run();
@@ -400,30 +478,30 @@ describe("answers", () => {
     assert.equal(m.updates.length, edits);
   });
 
-  it("a ⏳ moves the date but adds no ping: the reminder and one follow-up, then lapsed", async () => {
+  it("a ⏳ moves the date but adds no check-in: the reminder and one follow-up, then lapsed", async () => {
     const { store, m, react } = await nudged();
     await react("hourglass_flowing_sand"); // Fri
     m.clock.now = at(37, 13); // Wed: the follow-up, not a second first reminder
-    await m.run();
+    const report = await m.run();
+    assert.deepEqual(report.actions.map((a) => a.action), ["followed-up"]);
     assert.equal(m.posts.length, 2);
-    assert.equal(m.posts[1]!.text, `<@${MAYA}> Checking in once more. Is it done, or does it need more time?`);
+    assert.equal(cardsOf(m.posts[1]!.blocks)[0]!.subtitle.text, "Overdue, was due Tue Oct 6");
     await react("hourglass_flowing_sand", MAYA, m.posts[1]!.ts);
     m.clock.now = at(42, 13); // the Monday after: due again, and spent
-    const report = await m.run();
-    assert.deepEqual(report.actions.map((a) => a.action), ["lapsed"]);
+    const later = await m.run();
+    assert.deepEqual(later.actions.map((a) => a.action), ["lapsed"]);
     assert.equal(m.posts.length, 2);
   });
 
   it("every reminder a commitment posted stays answerable", async () => {
     const { store, m, reminderTs, react } = await nudged();
-    await react("hourglass_flowing_sand"); // Fri, on the first reminder
+    await react("hourglass_flowing_sand"); // Fri, on the first card
     m.clock.now = at(37, 13);
     await m.run(); // the follow-up
     assert.notEqual(m.posts[1]!.ts, reminderTs);
-    // 🙌 on the FIRST reminder still lands.
+    // 🙌 on the FIRST message, its card already answered, still lands.
     assert.equal(await react("raised_hands", MAYA, reminderTs), true);
     assert.equal(only(store).state, "done");
-    assert.equal(m.updates.at(-1)!.ts, reminderTs);
   });
 
   it("✅ on a reminder does nothing, and never reaches the gate", async () => {
@@ -451,81 +529,113 @@ describe("answers", () => {
   });
 });
 
-describe("a tap the door refuses says why", () => {
+describe("a card's buttons and pop-ups", () => {
   // A button press always answers whoever pressed it: a reaction can be left
   // unanswered, a tap that does nothing reads as a broken button.
-  async function tapped() {
+  async function tapped(over: Partial<PromiseDoorDeps> = {}) {
     const { store } = await sweptPromise();
     const m = mornings({ store, now: at(32, 13) });
     await m.run();
     const reminderTs = m.posts[0]!.ts;
-    const press = (glyph: string, userId = MAYA, messageTs = reminderTs) =>
-      answerReminderPress(
-        { channel: DESIGN, messageTs, glyph, userId },
-        { store, update: m.deps.slack.update, botUserId: async () => BOT, now: () => m.clock.now },
-      );
-    return { store, m, reminderTs, press };
+    const { deps, opened } = promiseDoor(m, store, over);
+    const button = (label: string) => cardsOf(m.posts[0]!.blocks)[0]!.actions!.find((a) => a.text.text === label)!;
+    const press = (label: string, userId = MAYA) => {
+      const b = button(label);
+      return pressPromise({ channel: dmOf(MAYA), messageTs: reminderTs, userId, actionId: b.action_id, value: b.value, triggerId: "T1", blocks: m.posts[0]!.blocks }, deps);
+    };
+    const save = (view: Record<string, unknown>, values: Record<string, Record<string, unknown>>, userId = MAYA) =>
+      submitPromiseView({ callbackId: view.callback_id as string, privateMetadata: view.private_metadata as string, state: { values } as never, userId }, deps);
+    return { store, m, reminderTs, press, save, opened, deps };
   }
+
+  it("Done settles it, and the card says so with its buttons gone", async () => {
+    const { store, m, press } = await tapped();
+    assert.deepEqual(await press("Done"), { claimed: true });
+    assert.equal(only(store).state, "done");
+    const [card] = cardsOf(m.updates[0]!.blocks);
+    assert.deepEqual([card!.subtitle.text, card!.actions], ["Done", undefined]);
+  });
+
+  it("New date opens the date picker on the next working day after the due date; Save restarts the timeline", async () => {
+    const { store, m, press, save, opened } = await tapped();
+    assert.deepEqual(await press("New date"), { claimed: true });
+    const view = opened[0]!;
+    const picker = (view.blocks as Array<{ element: { initial_date: string } }>)[0]!.element;
+    // Due Thu Oct 1, overdue on Fri Oct 2: the next working day is Mon Oct 5.
+    assert.equal(picker.initial_date, "2026-10-05");
+    assert.deepEqual(await save(view, { [PROMISE_DATE_BLOCK]: { [PROMISE_DATE_ACTION]: { selected_date: "2026-10-07" } } }), { claimed: true });
+    const row = only(store);
+    assert.equal(row.state, "open");
+    assert.equal(row.nudges, 0, "a new date restarts the timeline");
+    assert.equal(new Date(row.deadlineAt!).toISOString(), "2026-10-08T04:00:00.000Z");
+    assert.equal(new Date(row.dueAt).toISOString(), "2026-10-06T13:00:00.000Z", "the heads-up, the working day before");
+    assert.equal(cardsOf(m.updates.at(-1)!.blocks)[0]!.subtitle.text, "Moved to Wed Oct 7");
+    m.clock.now = at(36, 13); // Tue: the heads-up
+    await m.run();
+    assert.equal(cardsOf(m.posts[1]!.blocks)[0]!.subtitle.text, "Due tomorrow, Wed Oct 7");
+  });
+
+  it("a date before today is refused under the picker", async () => {
+    const { store, m, press, save, opened } = await tapped();
+    await press("New date");
+    const values = { [PROMISE_DATE_BLOCK]: { [PROMISE_DATE_ACTION]: { selected_date: "2026-10-01" } } };
+    assert.deepEqual(promiseViewErrors({ callbackId: PROMISE_DATE_CALLBACK_ID, state: { values } as never }, m.clock.now), { [PROMISE_DATE_BLOCK]: "Pick today or a later day." });
+    const outcome = await save(opened[0]!, values);
+    assert.equal(outcome.claimed && outcome.refused, "Pick today or a later day.");
+    assert.equal(only(store).state, "nudged");
+  });
+
+  it("Drop it offers its two choices; \"It wasn't a promise\" closes it as not a promise", async () => {
+    const { store, m, press, save, opened } = await tapped();
+    assert.deepEqual(await press("Drop it"), { claimed: true });
+    const view = opened[0]!;
+    assert.equal(view.callback_id, PROMISE_DROP_CALLBACK_ID);
+    assert.deepEqual(await save(view, { [PROMISE_DROP_BLOCK]: { [PROMISE_DROP_ACTION]: { selected_option: { value: "not-a-promise" } } } }), { claimed: true });
+    assert.equal(only(store).state, "not_promise", "the detector learns from it, as from 🤔");
+    assert.equal(cardsOf(m.updates.at(-1)!.blocks)[0]!.subtitle.text, "Not a promise, won't track");
+  });
 
   it("someone else's promise names whose it is, and changes nothing", async () => {
     const { store, m, press } = await tapped();
-    const outcome = await press("raised_hands", BEA);
-    assert.equal(outcome.claimed, true);
+    const outcome = await press("Done", BEA);
     assert.equal(outcome.claimed && outcome.refused, `Only <@${MAYA}> can answer this reminder, so that tap changed nothing.`);
     assert.equal(only(store).state, "nudged");
     assert.equal(m.updates.length, 0);
   });
 
-  it("a settled reminder says it is settled", async () => {
+  it("a settled promise says it is settled", async () => {
     const { press } = await tapped();
-    assert.deepEqual(await press("raised_hands"), { claimed: true });
-    const again = await press("no_good");
+    assert.deepEqual(await press("Done"), { claimed: true });
+    const again = await press("Drop it");
     assert.equal(again.claimed && again.refused, "This one's already been answered, so that tap changed nothing.");
-  });
-
-  it("a ⏳ past the cap says it can't be put off again", async () => {
-    const { m, reminderTs, press } = await tapped();
-    await press("hourglass_flowing_sand");
-    m.clock.now = at(37, 13);
-    await m.run();
-    const followUp = m.posts[1]!.ts;
-    assert.deepEqual(await press("hourglass_flowing_sand", MAYA, followUp), { claimed: true });
-    const third = await press("hourglass_flowing_sand", MAYA, reminderTs);
-    assert.equal(third.claimed && third.refused, "This can't be put off again, so that tap changed nothing.");
   });
 
   it("two answers at once: one lands, the other is told it was already answered", async () => {
     const { store, m, press } = await tapped();
-    const [first, second] = await Promise.all([press("raised_hands"), press("no_good")]);
+    const [first, second] = await Promise.all([press("Done"), press("Done")]);
     assert.deepEqual([first, second].filter((o) => o.claimed && !o.refused), [{ claimed: true }]);
     assert.deepEqual([first, second].find((o) => o.claimed && o.refused), { claimed: true, refused: "This one's already been answered, so that tap changed nothing." });
     assert.equal(m.updates.length, 1);
-    assert.notEqual(only(store).state, "nudged");
-  });
-
-  it("an answer whose message could not be edited still lands, and says it was recorded", async () => {
-    const { store, m, reminderTs } = await tapped();
-    const outcome = await answerReminderPress(
-      { channel: DESIGN, messageTs: reminderTs, glyph: "raised_hands", userId: MAYA },
-      { store, update: async () => false, botUserId: async () => BOT, now: () => m.clock.now },
-    );
-    assert.deepEqual(outcome, { claimed: true, unedited: true });
     assert.equal(only(store).state, "done");
   });
 
-  it("a store that fails says so, rather than passing for no reminder", async () => {
-    const { store, m, reminderTs } = await tapped();
-    const broken = { ...store, byReminderTs: async () => { throw new Error("D1 down"); } };
-    const outcome = await answerReminderPress(
-      { channel: DESIGN, messageTs: reminderTs, glyph: "raised_hands", userId: MAYA },
-      { store: broken, update: m.deps.slack.update, botUserId: async () => BOT, now: () => m.clock.now },
-    );
-    assert.deepEqual(outcome, { claimed: false, failed: true });
+  it("an answer whose message could not be redrawn still lands, and says it was recorded", async () => {
+    const { store, press } = await tapped({ update: async () => false });
+    assert.deepEqual(await press("Done"), { claimed: true, unedited: true });
+    assert.equal(only(store).state, "done");
   });
 
-  it("a message no reminder holds is not the door's", async () => {
-    const { press } = await tapped();
-    assert.deepEqual(await press("raised_hands", MAYA, "1790000000.000001"), { claimed: false });
+  it("a store that fails says so, rather than passing for no card", async () => {
+    const { store, press } = await tapped();
+    store.get = async () => {
+      throw new Error("D1 down");
+    };
+    assert.deepEqual(await press("Done"), { claimed: false, failed: true });
+  });
+
+  it("a button that is no promise card's is not the door's", async () => {
+    const { deps, reminderTs } = await tapped();
+    assert.deepEqual(await pressPromise({ channel: dmOf(MAYA), messageTs: reminderTs, userId: MAYA, actionId: "uno_reminder_raised_hands" }, deps), { claimed: false });
   });
 });
 
@@ -547,18 +657,22 @@ describe("a promise said again", () => {
     assert.equal(row.id, `${DESIGN}:${PROMISE}`);
     assert.equal(row.state, "snoozed");
     assert.equal(row.snoozes, 1);
-    // "by Wed", said on Friday: the end of Wednesday the 7th.
-    assert.equal(new Date(row.dueAt).toISOString(), "2026-10-08T04:00:00.000Z");
-    assert.equal(row.deadlineAt, row.dueAt);
-    // One task, two pings at most: Thursday's follow-up, then the lapse.
-    m.clock.now = at(38, 13); // Thu 8th
+    // "by Wed", said on Friday: due at the end of Wednesday the 7th; the new
+    // date restarts the timeline, so Tuesday's run gives the heads-up.
+    assert.equal(new Date(row.deadlineAt!).toISOString(), "2026-10-08T04:00:00.000Z");
+    assert.equal(new Date(row.dueAt).toISOString(), "2026-10-06T13:00:00.000Z");
+    // Two check-ins at most: Friday's, then Thursday's after the heads-up, then the lapse.
+    m.clock.now = at(36, 13); // Tue 6th: the heads-up
+    await m.run();
+    m.clock.now = at(38, 13); // Thu 8th: the check-in
     await m.run();
     m.clock.now = at(42, 13);
     await m.run();
     m.clock.now = at(44, 13);
     await m.run();
-    assert.equal(m.posts.length, 2);
-    assert.equal(m.posts[1]!.text, `<@${MAYA}> Checking in once more. Is it done, or does it need more time?`);
+    assert.equal(m.posts.length, 3);
+    assert.equal(cardsOf(m.posts[1]!.blocks)[0]!.subtitle.text, "Due tomorrow, Wed Oct 7");
+    assert.equal(cardsOf(m.posts[2]!.blocks)[0]!.subtitle.text, "Overdue, was due Wed Oct 7");
     assert.equal(only(store).state, "lapsed");
   });
 
@@ -602,11 +716,11 @@ describe("the morning's limits", () => {
     assert.equal(only(store).holds, 0);
   });
 
-  it("one promiser gets at most two reminders a morning; the rest wait, and waiting is no hold", async () => {
+  it("one promiser gets one message a morning of at most ten cards; the rest wait, and waiting is no hold", async () => {
     const { store: swept } = await sweptPromise();
     const base = only(swept);
     const store = createInMemoryCommitmentStore();
-    const threads = [ts(29, 13, 1), ts(29, 13, 2), ts(29, 13, 3)];
+    const threads = Array.from({ length: 12 }, (_, i) => ts(29, 13, i + 1));
     for (const [i, thread] of threads.entries()) {
       const id = `${DESIGN}:${thread}`;
       await store.addCommitments([{ ...base, id, threadTs: thread, messageTs: thread, dueAt: base.dueAt + i }]);
@@ -614,18 +728,33 @@ describe("the morning's limits", () => {
     }
     const m = mornings({ store, now: at(32, 13) });
     await m.run();
-    assert.equal(m.posts.length, 2);
+    assert.equal(m.posts.length, 1);
+    assert.equal(cardsOf(m.posts[0]!.blocks).length, 10);
+    assert.equal(m.posts[0]!.channel, dmOf(MAYA));
     // A retried alarm the same morning still holds the cap.
     await m.run();
-    assert.equal(m.posts.length, 2);
-    const waiting = store.rows.get(`${DESIGN}:${threads[2]}`)!;
-    assert.equal(waiting.state, "open");
-    assert.equal(waiting.checkedOn, null);
-    assert.equal(waiting.holds, 0);
+    assert.equal(m.posts.length, 1);
+    for (const thread of threads.slice(10)) {
+      const waiting = store.rows.get(`${DESIGN}:${thread}`)!;
+      assert.equal(waiting.state, "open");
+      assert.equal(waiting.checkedOn, null);
+      assert.equal(waiting.holds, 0);
+    }
     m.clock.now = at(35, 13); // Monday
     await m.run();
-    assert.equal(m.posts.length, 3);
-    assert.equal(m.posts[2]!.threadTs, threads[2]);
+    assert.equal(m.posts.length, 2);
+    assert.deepEqual(cardsOf(m.posts[1]!.blocks).map((c) => c.title.text), ["Task 11", "Task 12"]);
+  });
+
+  it("a stop before the message posts hands every held promise back to the next run", async () => {
+    const { store } = await sweptPromise();
+    const m = mornings({ store, now: at(32, 13) });
+    m.deps.slack.dmChannel = async () => {
+      throw new SubrequestBudgetError(1);
+    };
+    await assert.rejects(m.run(), SubrequestBudgetError);
+    assert.equal(only(store).checkedOn, null);
+    assert.equal(m.posts.length, 0);
   });
 });
 
@@ -713,4 +842,43 @@ describe("the reaction door", () => {
     );
     assert.equal((ran[0] as { outcome: string }).outcome, plain.outcome);
   });
+});
+
+// ── One promise timeline, a whole week against fakes ─────────────────────────
+// Each worked case, Made → Due → Heads-up → Check-in: the promise is read at
+// the end of its day, then every weekday morning run for a week and a half,
+// with the judge answering as the case says. Which mornings post is the
+// timeline, with the one more check-in an unanswered one gets two working
+// days on where it falls inside the window. Days are 2026-10-`n`, given as Sep days past 30 (Oct 5 is 35).
+
+describe("one promise timeline, morning by morning", () => {
+  const OPEN = JSON.stringify({ answer: "still_open", reason: null, evidence_ts: [], confidence: 0.9 });
+  const PASSED = JSON.stringify({ answer: "no_longer_needed", reason: "time_passed", evidence_ts: [], confidence: 0.9 });
+  const cases: Array<{ name: string; made: string; deadline: string | null; judge: string[]; posts: number[] }> = [
+    { name: '"by Thu": Mon → Thu → Wed → Fri', made: ts(35, 15), deadline: "Thu", judge: [OPEN, OPEN, OPEN], posts: [37, 39, 43] },
+    { name: '"tomorrow": Mon → Tue → Tue → Wed', made: ts(35, 15), deadline: "tomorrow", judge: [OPEN, OPEN, OPEN], posts: [36, 37, 39] },
+    { name: '"by Mon": Fri → Mon → Mon → Tue', made: ts(39, 15), deadline: "Mon", judge: [OPEN, OPEN, OPEN], posts: [42, 43, 45] },
+    { name: '"call at 1:30": Wed 12:07 → Wed 13:30 → none → none, its time passed', made: ts(37, 16, 7), deadline: "1:30", judge: [PASSED], posts: [] },
+    { name: '"review next Tue": Wed → Tue → Mon → none, its time passed', made: ts(37, 15), deadline: "next Tue", judge: [OPEN, PASSED], posts: [42] },
+    { name: '"update the PRD": Mon → none → none → next Monday, asking for a date', made: ts(35, 15), deadline: null, judge: [OPEN, OPEN], posts: [42, 44] },
+  ];
+  for (const c of cases) {
+    it(c.name, async () => {
+      const madeDay = Math.floor((Number(c.made) * 1000 - Date.UTC(2026, 8, 0)) / 86_400_000);
+      const rootTs = `${Number(c.made) - 3600}.000000`;
+      const { store } = await sweptPromise({ promiseTs: c.made, rootTs, now: at(madeDay, 22), reply: promiseReply({ message_ts: c.made, deadline: c.deadline }) });
+      assert.equal(only(store).state, "open");
+      const m = mornings({ store, now: at(madeDay + 1, 13), judgeReplies: c.judge, thread: [msg(BEA, rootTs, "Where are the updated reflection screens?"), msg(MAYA, c.made, "the promise")] });
+      const posted: number[] = [];
+      for (let day = madeDay + 1; day <= madeDay + 9; day++) {
+        const wd = new Date(Date.UTC(2026, 8, day)).getUTCDay();
+        if (wd === 0 || wd === 6) continue;
+        m.clock.now = at(day, 13);
+        const before = m.posts.length;
+        await m.run();
+        if (m.posts.length > before) posted.push(day);
+      }
+      assert.deepEqual(posted, c.posts);
+    });
+  }
 });
