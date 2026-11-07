@@ -159,6 +159,10 @@ const VISIBILITY = ['show', 'open', 'isOpen', 'visible'];
  */
 const RENDERS_WITH = {
   CountTag: { value: 1 },
+  DynamicTable: {
+    head: { cells: [{ key: 'name', content: 'Name' }] },
+    rows: [{ key: 'ava', cells: [{ key: 'Ava', content: 'Ava' }] }],
+  },
   PromptStarters: { starters: [{ id: 'sample', label: 'Sample' }] },
 };
 

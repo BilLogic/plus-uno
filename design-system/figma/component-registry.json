@@ -512,7 +512,7 @@
         "export": "default",
         "mdxPath": "design-system/src/components/text-and-data-display/Table/DynamicTable.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
-        "source": "design-system/src/components/text-and-data-display/Table/DynamicTable.stories.jsx",
+        "source": "design-system/src/components/text-and-data-display/Table/DynamicTable.jsx",
         "storybookId": "components-text-and-data-display-dynamic-table--docs"
       },
       "figma": {
