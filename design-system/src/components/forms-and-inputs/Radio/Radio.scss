@@ -21,6 +21,9 @@
 }
 
 .plus-form-radio {
+    // Base UI draws the control as a span; inline, it would drop its width and
+    // keep only its edge whenever no flex parent blockifies it (a lone Radio).
+    display: inline-block;
     width: var(--radio-control-size);
     height: var(--radio-control-size);
     min-width: var(--radio-control-size);

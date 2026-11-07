@@ -286,6 +286,11 @@ export const Unselected = {
         const el = radioOf(canvasElement, 'Online');
         await expect(el).toHaveAttribute('aria-checked', 'false');
         await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-input'));
+        // A lone Radio is the full round control, not a squeezed sliver.
+        const box = el.getBoundingClientRect();
+        const size = px(getComputedStyle(el).getPropertyValue('--radio-control-size'));
+        await expect(box.width, 'a lone Radio keeps its control width').toBe(size);
+        await expect(box.width).toBe(box.height);
     },
 };
 
