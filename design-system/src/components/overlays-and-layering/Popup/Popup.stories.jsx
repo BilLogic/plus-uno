@@ -271,3 +271,45 @@ export const Open = {
         await expect(trigger).toHaveAttribute('aria-expanded', 'true');
     },
 };
+
+/** Where the popup opens, one story per side. It stays open so the page can show it. */
+const OpenPopup = ({ placement = 'top', width, title, children = 'Ran 45 minutes over.' }) => (
+    <div style={{ padding: 'calc(var(--space-400) * 4) var(--space-400)', display: 'flex', justifyContent: 'center' }}>
+        <Popup
+            trigger={<Button appearance="primary" text="Details" />}
+            title={title}
+            placement={placement}
+            width={width}
+            triggerType="manual"
+            show
+        >
+            {children}
+        </Popup>
+    </div>
+);
+
+export const PlacementTop = { render: () => <OpenPopup placement="top" title="Session 12" /> };
+export const PlacementBottom = { render: () => <OpenPopup placement="bottom" title="Session 12" /> };
+export const PlacementLeft = { render: () => <OpenPopup placement="left" title="Session 12" /> };
+export const PlacementRight = { render: () => <OpenPopup placement="right" title="Session 12" /> };
+
+/** The width tiers: sm 320 (the default), md 400 and lg 480. */
+export const WidthSmall = { render: () => <OpenPopup width="sm" title="Session 12" /> };
+export const WidthMedium = { render: () => <OpenPopup width="md" title="Session 12" /> };
+export const WidthLarge = { render: () => <OpenPopup width="lg" title="Session 12" /> };
+
+/** Without a title the body stands alone. */
+export const BodyOnly = { render: () => <OpenPopup>Ran 45 minutes over.</OpenPopup> };
+
+const TriggerStory = ({ triggerType, text }) => (
+    <div style={{ padding: 'var(--space-400)', display: 'flex', justifyContent: 'center' }}>
+        <Popup trigger={<Button appearance="primary" text={text} />} title="Session 12" triggerType={triggerType}>
+            Ran 45 minutes over.
+        </Popup>
+    </div>
+);
+
+export const TriggerClick = { render: () => <TriggerStory triggerType="click" text="Click me" /> };
+export const TriggerHover = { render: () => <TriggerStory triggerType="hover" text="Hover me" /> };
+export const TriggerFocus = { render: () => <TriggerStory triggerType="focus" text="Tab to me" /> };
+export const TriggerHoverAndClick = { render: () => <TriggerStory triggerType={['hover', 'click']} text="Hover or click me" /> };

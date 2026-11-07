@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as TooltipStories from './Tooltip.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet, DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Button } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -23,6 +30,7 @@ export const figmaMeta = {
 <Meta of={TooltipStories} />
 
 <Title />
+A short label on a control whose purpose is not obvious from what you can see.
 
 <DocsTabs of={TooltipStories}>
 
@@ -39,21 +47,23 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Placement
 
-<DocsCanvasShell attachSourceBelow description={<>Placement relative to the trigger: top, bottom, left, and right.</>}>
-    <Canvas of={TooltipStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={TooltipStories.PlacementTop} title="Top" description={<>The default. The tooltip opens above its trigger, 4 away.</>} />
+
+<ComponentExample of={TooltipStories.PlacementBottom} title="Bottom" description={<>Below the trigger.</>} />
+
+<ComponentExample of={TooltipStories.PlacementLeft} title="Left" description={<>To the left of the trigger.</>} />
+
+<ComponentExample of={TooltipStories.PlacementRight} title="Right" description={<>To the right of the trigger.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Positioning
+## Size and layout
 
-<DocsCanvasShell description={<>Placement options relative to the trigger: top, bottom, left, and right.</>}>
-    <DsCanvasQuiet of={TooltipStories.Placements} />
-</DocsCanvasShell>
+<ComponentExample of={TooltipStories.Wrapping} title="Wrapping" description={<>Text wraps past the maximum width. Keep it to one line.</>} />
 
 </div>
 
@@ -61,25 +71,15 @@ export const figmaMeta = {
 
 ## State
 
-<DocsCanvasShell description={<>The inverse neutral fill with inverse text, lifted by the overlay shadow.</>}>
-    <DsCanvasQuiet of={TooltipStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={TooltipStories.Rest} title="Rest" description={<>The inverse neutral fill with inverse text, lifted by the overlay shadow.</>} />
 
-<DocsCanvasShell description={<>The tooltip itself does not react to a pointer.</>}>
-    <DsCanvasQuiet of={TooltipStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={TooltipStories.Hovered} title="Hovered" description={<>The tooltip itself does not react to a pointer.</>} />
 
-<DocsCanvasShell description={<>A press changes nothing.</>}>
-    <DsCanvasQuiet of={TooltipStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={TooltipStories.Pressed} title="Pressed" description={<>A press changes nothing.</>} />
 
-<DocsCanvasShell description={<>The trigger shows the 2px focus ring and the tooltip opens with it.</>}>
-    <DsCanvasQuiet of={TooltipStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={TooltipStories.Focused} title="Focused" description={<>The trigger shows the 2px focus ring and the tooltip opens with it.</>} />
 
-<DocsCanvasShell description={<>An empty trigger list turns the tooltip off.</>}>
-    <DsCanvasQuiet of={TooltipStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={TooltipStories.Disabled} title="Disabled" description={<>An empty <code>trigger</code> list turns the tooltip off.</>} />
 
 </div>
 
@@ -182,6 +182,33 @@ and never comes nearer than 8 to the screen's edge.
 <Tooltip text="Save this draft"><Button appearance="primary" text="Save" /></Tooltip>
 ```
 
+### Say what the control does.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-sm)' }}><Button appearance="default" text="Notes" /><div className="plus-tooltip" style={{ display: 'inline-block' }}>Opens the session notes</div></div>}
+    doCaption="A few words on what the control does."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-sm)' }}><Button appearance="default" text="Notes" /><div className="plus-tooltip" style={{ display: 'inline-block' }}>Notes</div></div>}
+    dontCaption="Repeats the label the control already shows."
+/>
+
+### Keep it to one short line.
+
+<DoDontPair
+    doExample={<div className="plus-tooltip" style={{ display: 'inline-block' }}>Moves this session out of the active list</div>}
+    doCaption="One line, sentence case, no closing period."
+    dontExample={<div style={{ display: 'inline-block', maxWidth: '100%' }}><div className="plus-tooltip" style={{ display: 'inline-block' }}>Moves this session out of the active list. You can bring it back later from the archive, and its notes stay with it.</div></div>}
+    dontCaption="Two sentences that wrap, with a closing period."
+/>
+
+### Put anything the user can click in a Popup.
+
+<DoDontPair
+    doExample={<div className="plus-popup" style={{ position: 'static', width: '100%' }}><div className="plus-popup-title">Scheduling</div><div className="plus-popup-body"><a href="#help">Read the guide</a></div></div>}
+    doCaption="A popup holds content the user can reach."
+    dontExample={<div className="plus-tooltip" style={{ display: 'inline-block' }}><a href="#help" style={{ color: 'inherit' }}>Read the guide</a></div>}
+    dontCaption="A link in a tooltip: moving toward it leaves the trigger, and the tooltip hides."
+/>
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -195,7 +222,7 @@ and never comes nearer than 8 to the screen's edge.
 <tbody>
 <tr><td>Say what the control does, in a few words: "Opens the session notes".</td><td>Repeat the label the control already shows.</td></tr>
 <tr><td>Keep it to one line.</td><td>Write two sentences or add a link.</td></tr>
-<tr><td>Use sentence case without a closing period.</td><td>Use a full stop or title case.</td></tr>
+<tr><td>Use sentence case without a closing period.</td><td>Use a closing period or title case.</td></tr>
 <tr><td>Give extra help on the page.</td><td>Hide required information in a tooltip.</td></tr>
 </tbody>
 </DocsTable>
