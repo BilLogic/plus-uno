@@ -1,6 +1,6 @@
 ---
 embodiment: ide
-summary: uno-storybook
+summary: Hi-fi build on the design system — manifests first, retrieval proof, check:ds-usage as the exit gate
 ---
 
 <!-- ~1,100 tokens | Load when: the confirmed route is a hi-fi build on the design system -->
@@ -33,10 +33,15 @@ b. Scaffold: `bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>`
    — copies `prototypes/starter/`, patches the name, picks the next free port
    (details: `docs/engineering/setup.md`; config shape:
    `skills/uno-prototype/examples/vite-config-example.js`).
-c. **Load the DS agent-views before any component or token use** (AGENTS.md
-   § Progressive loading: `design-system/agent-views/components/index.md` +
-   `tokens/tokens.md`); read props, variants and usage from the component's
-   Storybook MDX and `*.stories.jsx` — they are the only source for that half.
+c. **Load the design system before any component or token use, in this
+   order:** `design-system/agent-views/components.json` and `tokens.json` (the
+   exact names, props, enum values and token tiers), then
+   `design-system/agent-views/components/index.md` (what exists, and its
+   *Not here → use instead* table). Usage and intent come from the
+   component's generated doc, its Storybook MDX and `*.stories.jsx`, or the
+   Storybook MCP's `get-documentation`. Every name you write comes from one of
+   these, looked up in this run; read spacing, size and radius at the ladder
+   step for their role (`tokens.md` § Ladder Semantics).
 d. **Gate — DS gap (method §4):** needed component not in
    `design-system/agent-views/components/index.md` → name the gap, propose the
    nearest existing composition, file a uno-maintain intake. Never hand-roll a
@@ -44,10 +49,22 @@ d. **Gate — DS gap (method §4):** needed component not in
 e. Playground or WIP pages in Figma → summon **writers/figma**
    (obeys `docs/connectors/figma/overview.md`).
 
-Hi-fi hard rules (`AGENTS.md` § Hard rules in full): tokens over literals ·
-official layout formulas · PLUS components before generic primitives · no deep
-imports from `design-system/src/` · FA Free icons only. Build only what the
-plan names — never add screens or interactions just because the PRD lists more.
+`AGENTS.md` § Hard rules apply in full; `check:ds-usage` is their gate in code
+(the loop below). Build only what the plan names — never add screens or
+interactions just because the PRD lists more.
+
+f. **Retrieval proof.** The build ends with a short table in the chat: each
+   component, and each token family, the prototype uses, with where its name
+   came from in this run. A name a gate round changes gets its row updated, so
+   the table matches the code that exits.
+
+   | Name | Kind | Source |
+   |---|---|---|
+   | `Button` `appearance="primary"` | component, prop value | `components.json` record |
+   | `--stack-md`, `--pad-x-md` | ladder semantics | `tokens.json` |
+   | `SectionMessage` | component | index line, then its generated doc |
+
+   A name with no source is an escape: look it up, or replace it.
 
 ## Validate & exit (the loop — method §5)
 
@@ -59,13 +76,24 @@ fidelity dials, and contains nothing from the won't-include list — a build tha
 passes every script but violates the brief has NOT converged. If anything
 fails, fix and re-run the FULL set (a fix can break a check that passed).
 
-The interactive-IDE check set — a runtime without Storybook MCP or a browser
-runs the two scripts and records the rest as unavailable, not as failures:
+Each attempt, in order:
+
+1. **Self-check**: apply the closing *Before you finish* list of
+   `design-system/agent-views/components/index.md` to what you wrote.
+2. **The gate**: `npm run check:ds-usage -- prototypes/{project}` until it
+   reports no escapes. The post-edit hook catches most of them as you write;
+   this exit run is the gate of record. Each finding names its fix; the rules
+   are `docs/engineering/ds-usage-rules.md`.
+
+The rest of the check set — a runtime without Storybook MCP or a browser runs
+the two scripts and records the rest as unavailable, not as failures:
 
 - `bash skills/uno-prototype/scripts/validate-prototype.sh prototypes/{project}`
-- `bash skills/uno-review/scripts/run-review-checks.sh prototypes/{project}` —
-  a pre-flight of review's deterministic catches; fixing them here saves a
-  review round-trip (the review lenses still run on exit).
+  — the project's shape (App, export, config, name).
+- `bash skills/uno-review/scripts/run-review-checks.sh prototypes/{project}/src`
+  — the pre-flight review runs: the same checker plus the raw-HTML-controls
+  grep; fixing hits here saves a review round-trip (the review lenses still
+  run on exit).
 - Stories touched → Storybook MCP `run-story-tests` (a11y included).
 - Open the running preview: pages render, key interactions work, console
   clean — scripts can pass while the page is visibly broken; the browser is
@@ -75,5 +103,7 @@ A runtime with a goal-loop primitive may drive this with it (goal = contract +
 checks pass; cap = 3); elsewhere run the loop as written.
 
 **Exit:** summon **reviewers/ds-lens** for the conformance pass · write the
-one-line artifact manifest (fidelity · tools · PRD link · any unresolved check
-failures) · hand to `skills/uno-review` for the stage lens.
+one-line artifact manifest: fidelity · tools · PRD link · checker result
+(`clean`, or the escapes left after the cap, by rule) · retrieval proof (above)
+· any other unresolved check failures · hand to `skills/uno-review` for the
+stage lens.

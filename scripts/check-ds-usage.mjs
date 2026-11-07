@@ -68,6 +68,37 @@ const git = (repoRoot, args) =>
 
 const lines = (out) => out.split('\n').map((l) => l.trim()).filter(Boolean);
 
+/** Whether repoRoot is inside a git work tree (an archive copy is not). */
+function inCheckout(repoRoot) {
+  try {
+    return git(repoRoot, ['rev-parse', '--is-inside-work-tree']).trim() === 'true';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * The files under `roots`, repo-relative: tracked files by `git ls-files`, or,
+ * outside a git checkout (an archive copy, as the usage eval builds in), every
+ * file on disk under them, `node_modules` and dot folders skipped.
+ */
+export function filesUnder(repoRoot, roots) {
+  if (inCheckout(repoRoot)) return lines(git(repoRoot, ['ls-files', ...roots]));
+  const out = [];
+  const walk = (rel) => {
+    const abs = path.join(repoRoot, rel);
+    if (!fs.existsSync(abs)) return;
+    for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
+      if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+      const child = `${rel}/${entry.name}`; // repo-relative paths are POSIX, as git prints them
+      if (entry.isDirectory()) walk(child);
+      else if (entry.isFile()) out.push(child);
+    }
+  };
+  for (const root of roots) walk(root);
+  return out.sort();
+}
+
 /** Whether a repo-relative path is one this check reads. */
 export const inScope = (rel) => SCOPE.some((root) => rel.startsWith(`${root}/`)) && SEARCHED.test(rel) && !SKIPPED.test(rel);
 
@@ -95,7 +126,7 @@ function freeIcons(repoRoot) {
 /** The manifests and every declared custom property, read once per repo root. */
 export const contextOf = byRoot((repoRoot) => {
   const json = (rel) => JSON.parse(fs.readFileSync(path.join(repoRoot, rel), 'utf8'));
-  const declaring = lines(git(repoRoot, ['ls-files', ...DEFINITION_ROOTS]))
+  const declaring = filesUnder(repoRoot, DEFINITION_ROOTS)
     .filter((rel) => /\.(scss|css|jsx|tsx|js)$/.test(rel) && fs.existsSync(path.join(repoRoot, rel)))
     .map((rel) => read(repoRoot, rel));
   return contextFrom({
@@ -111,10 +142,11 @@ export const contextOf = byRoot((repoRoot) => {
 });
 
 /** Every tracked file in scope. */
-export const scopeFiles = (repoRoot) => lines(git(repoRoot, ['ls-files', ...SCOPE])).filter(inScope);
+export const scopeFiles = (repoRoot) => filesUnder(repoRoot, SCOPE).filter(inScope);
 
 /** Files changed against main: committed on this branch, staged, unstaged and untracked. */
 export function changedFiles(repoRoot) {
+  if (!inCheckout(repoRoot)) return []; // no git here: name the paths to check instead
   let base = null;
   for (const ref of ['origin/main', 'main']) {
     try {

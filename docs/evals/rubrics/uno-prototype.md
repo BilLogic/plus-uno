@@ -10,7 +10,7 @@ dimensions:
   - id: prompt-spec-quality
     definition: external-tool generation usable with <=1 regeneration
   - id: ds-compliance
-    definition: components/tokens sourced from BS4 / uno-storybook, >=95%; never invented
+    definition: check:ds-usage clean, then components/tokens sourced (the retrieval proof) >=95%, never invented
   - id: fidelity-appropriateness
     definition: didn't gold-plate a low-fi ask (or under-build a hi-fi one)
 hard_gates:
@@ -29,3 +29,5 @@ summary: Scores prototypes per fidelity tier
 Scores prototypes per fidelity tier. The two gates are the skill's reason to exist: ask when context is missing, escalate when the design system has a gap — never silently invent. Golden scenarios: `docs/evals/scenarios/uno-prototype.md`.
 
 Canonical here (ADR-017): the Notion source is lineage, not law — a conflicting legacy page gets a superseded banner via uno-maintain, never a repo re-sync.
+
+**ds-compliance, coded tier.** Run `npm run check:ds-usage -- prototypes/<project> --json` before the judge. Any fail-level escape caps the dimension at 2, whatever else is true; with none, the judge scores sourcing from the build's retrieval proof.
