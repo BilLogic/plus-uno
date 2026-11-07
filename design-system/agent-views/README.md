@@ -8,6 +8,11 @@ Nothing here is authored, and nothing here explains a component.
 | `components/index.md` | `src/components/index.js` exports | Does this component exist? |
 | `forms/index.md` | static redirect (`src/forms/` is gone) | Where did the form components go? |
 | `tokens/tokens.md` | `src/tokens/*.scss` | What is this token called? |
+| `components.json` | the barrel, each component's propTypes, defaults and JSDoc | For a program: which components exist, which props each takes, which values an enum prop accepts |
+| `tokens.json` | the same token files as `tokens.md` | For a program: each token's tier, group and first declared value |
+
+The two JSON files are the machine copy of the facts above, for checkers and
+evals. Read the markdown; let scripts read the JSON.
 
 For a component's props, variants and usage, read its Storybook MDX and
 `*.stories.jsx`. There is no second corpus: the 56 per-component skeletons that

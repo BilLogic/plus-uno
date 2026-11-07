@@ -27,6 +27,8 @@ import { documents } from './lib/corpus.mjs';
 import { AUTHORED_SECTIONS, authoredCoverage } from './lib/authored-coverage.mjs';
 import { resolveNamedOneOf } from './doc-identifiers.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
+import { extractExports } from './lib/barrel-exports.js';
+import { buildComponentsManifest, serializeManifest } from './lib/agent-manifests.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -426,7 +428,16 @@ function componentDoc(c, siblings) {
     d += `\n> Authored guidance is partial — missing: ${missing.map((m) => m.label.toLowerCase()).join(', ')} (#166).\n`;
   }
 
-  return { doc: d, coverage, propCount: props.length };
+  const record = {
+    name: c.name,
+    group: path.basename(c.flat ? c.dir : path.dirname(c.dir)),
+    source: rel(c.jsx),
+    summary: jsdoc || null,
+    props,
+    defaults,
+    descriptions,
+  };
+  return { doc: d, coverage, propCount: props.length, record };
 }
 
 function groupIndex(group, results) {
@@ -464,6 +475,7 @@ function groupIndex(group, results) {
 
 const groups = discover();
 const written = [];
+const records = [];
 let stale = 0;
 
 for (const group of groups) {
@@ -476,9 +488,28 @@ for (const group of groups) {
     results[c.name] = built;
     const out = c.flat ? path.join(c.dir, `${c.name}.md`) : path.join(c.dir, 'index.md');
     written.push([out, built.doc]);
+    records.push(built.record);
   }
 
   written.push([path.join(group.dir, 'index.md'), groupIndex(group, results)]);
+}
+
+/**
+ * The machine copy of the same facts, for checkers and the eval
+ * (`scripts/lib/agent-manifests.mjs`). Keyed to the barrel, so it lists exactly
+ * what `agent-views/components/index.md` lists.
+ */
+{
+  const barrel = path.join(COMPONENTS_ROOT, 'index.js');
+  const exports = extractExports(barrel, {
+    repoRoot: REPO_ROOT,
+    boundary: COMPONENTS_ROOT,
+    onUnresolved: (spec) => fail(`components barrel: cannot resolve \`export * from '${spec}'\``),
+  });
+  // The design system ships from this repo's root package; its version is the one to stamp.
+  const { version } = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
+  const manifest = buildComponentsManifest({ exports, components: records, version });
+  written.push([path.join(REPO_ROOT, 'design-system/agent-views/components.json'), serializeManifest(manifest, 'npm run generate:agent')]);
 }
 
 /**

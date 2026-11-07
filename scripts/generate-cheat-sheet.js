@@ -18,11 +18,13 @@ import {
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { AGENT_ROOT } from './agent-views-paths.js';
 import { checkArtifacts, writeArtifacts } from './lib/generated-artifact.js';
+import { buildTokensManifest, serializeManifest } from './lib/agent-manifests.mjs';
 
 const ROOT_DIR = path.resolve(import.meta.dirname, '../');
 const TOKENS_DIR = path.join(ROOT_DIR, TOKEN_DIR);
 const COLOR_DIR = path.join(ROOT_DIR, COLOR_TOKEN_DIR);
 const OUTPUT_TOKENS = path.join(AGENT_ROOT, 'tokens/tokens.md');
+const OUTPUT_TOKENS_JSON = path.join(AGENT_ROOT, 'tokens.json');
 
 function extractScssVariables(filePath) {
     if (!fs.existsSync(filePath)) return [];
@@ -43,6 +45,60 @@ function extractScssVariables(filePath) {
     return [...new Set(variables)].sort();
 }
 
+/** Name → its first declared value, in name order. A token written once per mode keeps the first (light) value. */
+function extractScssDeclarations(filePath) {
+    if (!fs.existsSync(filePath)) return [];
+    const content = fs.readFileSync(filePath, 'utf8');
+    const first = new Map();
+    const regex = tokenDeclarationPattern();
+    let match;
+    while ((match = regex.exec(content)) !== null) {
+        if (!first.has(match[1])) first.set(match[1], match[2].trim());
+    }
+    return [...first.keys()].sort().map((name) => ({ name, value: first.get(name) }));
+}
+
+const isScalePrimitive = (name) => /^--(space|radius|stroke|size)-[0-9]/.test(name) || name === '--radius-full';
+
+/**
+ * The token view's sections, in its order, with the tier each sits on
+ * (GLOSSARY § Token tier). The markdown lists names; tokens.json lists the
+ * same names with tier, group and value. Component tokens live in each
+ * component's own SCSS and are not part of this view.
+ */
+function tokenSections() {
+    const t = (file) => extractScssDeclarations(path.join(TOKENS_DIR, file));
+    const c = (file) => extractScssDeclarations(path.join(COLOR_DIR, file));
+    const scales = t('_scales.scss');
+    return [
+        { group: 'Spacing Semantics', tier: 'semantic', tokens: t('_spacing_semantics.scss') },
+        { group: 'Scale Tokens', tier: 'semantic', tokens: scales.filter((d) => !isScalePrimitive(d.name)) },
+        { group: 'Frame and Layer Tokens', tier: 'pattern', tokens: t('_frame_layers.scss') },
+        { group: 'Type Scale', tier: 'semantic', tokens: t('_type.scss') },
+        { group: 'Typography Tokens', tier: 'semantic', tokens: t('_fonts.scss') },
+        { group: 'Color Tokens (--ds-)', tier: 'semantic', tokens: c(COLOR_SEMANTIC_FILE) },
+        { group: 'Elevation and Opacity Tokens (--ds-)', tier: 'semantic', tokens: c(COLOR_ELEVATION_FILE) },
+        { group: 'Legacy Color Tokens', tier: 'semantic', tokens: t('_colors.scss') },
+        { group: 'Elevation Tokens', tier: 'semantic', tokens: t('_elevation.scss') },
+        { group: 'Color Primitives (--palette-)', tier: 'primitive', tokens: c(COLOR_PALETTE_FILE) },
+        { group: 'Primitive Variables', tier: 'primitive', tokens: t('_primitives.scss') },
+        { group: 'Scale Primitives', tier: 'primitive', tokens: scales.filter((d) => isScalePrimitive(d.name)) },
+    ];
+}
+
+function renderTokensManifest(markdown) {
+    const manifest = buildTokensManifest(tokenSections());
+    // The two views must name the same tokens; a drift here is a generator bug.
+    const inDoc = new Set(markdown.split('\n').filter((l) => /^--[a-z0-9-]+$/.test(l)));
+    const inJson = new Set(manifest.tokens.map((x) => x.name));
+    const missing = [...inDoc].filter((n) => !inJson.has(n));
+    const extra = [...inJson].filter((n) => !inDoc.has(n));
+    if (missing.length || extra.length) {
+        throw new Error(`tokens.json and tokens.md disagree — only in md: ${missing.join(', ') || 'none'}; only in json: ${extra.join(', ') || 'none'}`);
+    }
+    return serializeManifest(manifest, 'npm run generate:agent');
+}
+
 function renderTokensDoc() {
     const colorTokens = extractScssVariables(path.join(TOKENS_DIR, '_colors.scss'));
     const spacingTokens = extractScssVariables(path.join(TOKENS_DIR, '_spacing_semantics.scss'));
@@ -54,7 +110,6 @@ function renderTokensDoc() {
     // names (--space-, --radius-, --stroke-, --size-NNN) join the primitives,
     // and its spacing / foundations names get their own section.
     const scaleTokens = extractScssVariables(path.join(TOKENS_DIR, '_scales.scss'));
-    const isScalePrimitive = (name) => /^--(space|radius|stroke|size)-[0-9]/.test(name) || name === '--radius-full';
     const scaleFoundations = scaleTokens.filter((name) => !isScalePrimitive(name));
     const scalePrimitives = scaleTokens.filter(isScalePrimitive);
     const frameLayerTokens = extractScssVariables(path.join(TOKENS_DIR, '_frame_layers.scss'));
@@ -119,7 +174,11 @@ function renderTokensDoc() {
 
 function main() {
     const check = process.argv.includes('--check');
-    const artifacts = [{ file: OUTPUT_TOKENS, content: renderTokensDoc() }];
+    const doc = renderTokensDoc();
+    const artifacts = [
+        { file: OUTPUT_TOKENS, content: doc },
+        { file: OUTPUT_TOKENS_JSON, content: renderTokensManifest(doc) },
+    ];
 
     if (check) {
         if (!checkArtifacts(artifacts)) {
