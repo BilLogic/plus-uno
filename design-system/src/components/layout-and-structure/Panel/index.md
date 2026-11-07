@@ -11,7 +11,7 @@ PanelContainer: the panel's own surface, at a fixed or the provider's width.
 
 **Source:** `design-system/src/components/layout-and-structure/Panel/Panel.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Panel/Panel.stories.jsx` — FullComposition, MinimalHeaderAndBody, WidthFromProvider, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/layout-and-structure/Panel/Panel.stories.jsx` — FullComposition, MinimalHeaderAndBody, WidthFromProvider, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Panel/Panel.mdx`
 
@@ -19,7 +19,7 @@ PanelContainer: the panel's own surface, at a fixed or the provider's width.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `width` | string | — | Falls back to the nearest PanelProvider's width, then `--panel-width-default` (400). Inside the Frame's Panel area it fills the area instead. |
+| `width` | string | — | The panel width, as a CSS length. |
 | `className` | string | — | — |
 | `children` | node | — | — |
 
@@ -33,6 +33,4 @@ From `design-system/src/components/layout-and-structure/Panel/Panel.scss`. Overr
 
 Same group: `Accordion` · `Carousel` · `Footer` · `PageHeader` · `ScrollBar` · `VisuallyHidden`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

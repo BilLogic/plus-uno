@@ -35,6 +35,4 @@ From `design-system/src/components/layout-and-structure/PageHeader/PageHeader.sc
 
 Same group: `Accordion` · `Carousel` · `Footer` · `Panel` · `ScrollBar` · `VisuallyHidden`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

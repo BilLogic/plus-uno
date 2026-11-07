@@ -1,8 +1,21 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as VisuallyHiddenStories from './VisuallyHidden.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Button, Link, VisuallyHidden } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const Heard = ({ children }) => (
+    <p style={{ margin: 'var(--stack-lg) 0 0', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
+        Screen reader: “{children}”
+    </p>
+);
 
 <Meta of={VisuallyHiddenStories} />
 
@@ -22,41 +35,15 @@ span, so it takes no space, paints nothing and needs no tokens.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Behavior
 
-<DocsCanvasShell attachSourceBelow description={<>The sentence reads "Order total: $42.00" on screen. A screen reader also says "including shipping", which is the hidden span.</>}>
-    <Canvas of={VisuallyHiddenStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={VisuallyHiddenStories.Overview} title="Added words" description={<>The sentence reads "Order total: $42.00" on screen; a screen reader also says "including shipping", the hidden span.</>} />
 
-</div>
+<ComponentExample of={VisuallyHiddenStories.NamesAControl} title="Icon-only control" description={<>The trash icon is decorative and the hidden text is the button's name: "Delete session, button".</>} />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={VisuallyHiddenStories.HiddenColumnHeaders} title="Hidden column headers" description="Selection and actions columns have no visible title, but each has a header a screen reader announces with its cells." />
 
-## Naming an icon-only control
-
-<DocsCanvasShell description={<>The trash icon is decorative and the hidden text is the button's name, so it is announced as "Delete session, button".</>}>
-    <DsCanvasQuiet of={VisuallyHiddenStories.NamesAControl} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Hidden column headers
-
-<DocsCanvasShell description={<>Selection and actions columns have no visible title, but each still has a column header a screen reader announces with its cells.</>}>
-    <DsCanvasQuiet of={VisuallyHiddenStories.HiddenColumnHeaders} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Role and id
-
-<DocsCanvasShell description={<><code>role</code> makes the span a live region; <code>id</code> lets a control point at it with <code>aria-describedby</code>.</>}>
-    <DsCanvasQuiet of={VisuallyHiddenStories.RoleAndId} />
-</DocsCanvasShell>
+<ComponentExample of={VisuallyHiddenStories.RoleAndId} title="Role and id" description={<><code>role</code> makes the span a live region; <code>id</code> lets a control point at it with <code>aria-describedby</code>.</>} />
 
 </div>
 
@@ -86,7 +73,7 @@ span, so it takes no space, paints nothing and needs no tokens.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `VisuallyHidden` when the words a screen reader needs are not words a
 sighted person needs: the name of an icon-only button, the title of a table
@@ -113,13 +100,83 @@ to the component as it is touched.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
+
+1. **Span.** The only part: a one-pixel, clipped `span` of text, out of the flow, that stays in the accessibility tree and paints nothing.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The only state. Nothing is drawn; the text is read as part of whatever contains it.</td></tr>
+<tr><td>Hovered, pressed</td><td>None. There is nothing on screen to point at.</td></tr>
+<tr><td>Focused</td><td>None. It is not in the tab order; keep controls out of it.</td></tr>
+<tr><td>Disabled</td><td>None. It has no disabled state.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Span</td><td>None. It paints nothing, so it takes no color, type or spacing tokens.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+Use hidden text to give assistive technology the words the layout already gives a sighted reader. In the examples below, the line under each control spells out what a screen reader announces.
+
+### Name icon-only controls.
+
+A control with no visible words still needs a name a screen reader can say.
+
+<DoDontPair
+    doExample={<div><Button iconBefore="xmark"><VisuallyHidden>Close dialog</VisuallyHidden></Button><Heard>Close dialog, button</Heard></div>}
+    doCaption="Hidden text names the icon."
+    dontExample={<div><Button iconBefore="xmark" /><Heard>button</Heard></div>}
+    dontCaption="An icon-only control left unnamed."
+/>
+
+### Add context the layout implies.
+
+Sighted readers see the heading above a link; others need the words.
+
+<DoDontPair
+    doExample={<div><Link href="#">Read more<VisuallyHidden> about the spring schedule</VisuallyHidden></Link><Heard>Read more about the spring schedule, link</Heard></div>}
+    doCaption="Hidden words complete the link."
+    dontExample={<div><Link href="#">Read more</Link><Heard>Read more, link</Heard></div>}
+    dontCaption="“Read more” repeated with no object."
+/>
+
+### Do not repeat what is visible.
+
+Hidden text that duplicates visible text is read twice.
+
+<DoDontPair
+    doExample={<div><Button appearance="primary" text="Search" /><Heard>Search, button</Heard></div>}
+    doCaption="The visible label speaks for itself."
+    dontExample={<div><Button appearance="primary">Search<VisuallyHidden> Search</VisuallyHidden></Button><Heard>Search Search, button</Heard></div>}
+    dontCaption="The label echoed in hidden text."
+/>
 
 ### Hide with this, not with `display: none`.
 
+`display: none` and the `hidden` attribute remove the text from the
+accessibility tree too, so nothing is announced.
+
 ```jsx
-// Incorrect: display none and the hidden attribute remove the text from the
-// accessibility tree too, so nothing is announced.
+// Incorrect: nothing is announced.
 <span style={{ display: 'none' }}>Delete session</span>
 
 // Correct: drawn nowhere, still read.
@@ -128,26 +185,36 @@ to the component as it is touched.
 
 ### Do not hide what a sighted person also needs.
 
-```jsx
-// Incorrect: the instruction is invisible to people who can see, and they
-// cannot find it.
-<VisuallyHidden>Passwords must be at least 12 characters.</VisuallyHidden>
+An instruction that is invisible to people who can see is one they cannot
+find. Say it to everyone, and let the field point at it.
 
-// Correct: say it to everyone, and let the field point at it.
+```jsx
 <p id="pw-help">Passwords must be at least 12 characters.</p>
 <input aria-describedby="pw-help" />
 ```
 
 ### Keep it out of the focus order.
 
-```jsx
-// Incorrect: a hidden link or button can still be focused, and a keyboard
-// user lands on something they cannot see.
-<VisuallyHidden><a href="/skip">Skip</a></VisuallyHidden>
+A hidden link or button can still be focused, and a keyboard user lands on
+something they cannot see. Hide text, not controls; a skip link needs to
+appear on focus.
 
-// Correct: hide text, not controls. A skip link needs to appear on focus.
-<VisuallyHidden>Skip</VisuallyHidden>
-```
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name what the control does: "Delete session".</td><td>Leave an icon-only control with no name.</td></tr>
+<tr><td>Add only the words the layout implies: "Read more about the spring schedule".</td><td>Repeat words that are already visible.</td></tr>
+<tr><td>Write for the ear: complete words, in the page's language.</td><td>Hide instructions a sighted person also needs.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

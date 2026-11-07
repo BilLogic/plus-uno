@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as FooterStories from './Footer.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Footer } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={FooterStories} />
 
@@ -21,21 +28,11 @@ The page's footnote line: product version, copyright and a terms link, left-alig
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>The default footnote.</>}>
-    <Canvas of={FooterStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={FooterStories.Overview} title="Default" description="The default footnote: version, copyright and the terms link on one line." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Every part is a prop: `version`, `copyright`, `termsText` and `termsUrl`.</>}>
-    <DsCanvasQuiet of={FooterStories.CustomContent} />
-</DocsCanvasShell>
+<ComponentExample of={FooterStories.CustomContent} title="Custom content" description={<>Every part is a prop: <code>version</code>, <code>copyright</code>, <code>termsText</code> and <code>termsUrl</code>.</>} />
 
 </div>
 
@@ -43,21 +40,13 @@ The page's footnote line: product version, copyright and a terms link, left-alig
 
 ## State
 
-<DocsCanvasShell description={<>The line in the default text color, the terms link in the link color.</>}>
-    <DsCanvasQuiet of={FooterStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={FooterStories.Rest} title="Rest" description="The line in the default text color, the terms link in the link color." />
 
-<DocsCanvasShell description={<>The link takes the pressed link color.</>}>
-    <DsCanvasQuiet of={FooterStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={FooterStories.Hovered} title="Hovered" description="The link takes the pressed link color." />
 
-<DocsCanvasShell description={<>The same pressed link color.</>}>
-    <DsCanvasQuiet of={FooterStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={FooterStories.Pressed} title="Pressed" description="The same pressed link color." />
 
-<DocsCanvasShell description={<>The 2px focus ring, 2px off the link.</>}>
-    <DsCanvasQuiet of={FooterStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={FooterStories.Focused} title="Focused" description="The 2px focus ring, 2px off the link." />
 
 </div>
 
@@ -126,6 +115,7 @@ Use `Footer` once, at the bottom of a Page, for the legal and version line. It i
 <tr><td>Line</td><td><code>--body-small</code>, <code>--ds-text</code>.</td></tr>
 <tr><td>Link</td><td><code>--ds-link</code>; <code>--ds-link-pressed</code> on hover and press.</td></tr>
 <tr><td>Padding</td><td><code>--pad-y-lg</code> below the line.</td></tr>
+<tr><td>Link corner</td><td><code>--radius-sm</code>, which shapes the focus ring.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code> wide and offset.</td></tr>
 </tbody>
 </DocsTable>
@@ -135,6 +125,41 @@ Use `Footer` once, at the bottom of a Page, for the legal and version line. It i
 <div className="sb-ds-doc-section">
 
 ## Best practices
+
+Use the footer once, at the bottom of a Page, for the legal and version line.
+
+### One line of copyright.
+
+The footer is a single quiet line; long legal text belongs on its own page.
+
+<DoDontPair
+    doExample={<Footer />}
+    doCaption="Short copyright line."
+    dontExample={<Footer copyright="© 2026 PLUS Tutoring Inc. All rights reserved. Unauthorized reproduction of any material on this site is prohibited without prior written consent." />}
+    dontCaption="A legal paragraph that crowds the bar."
+/>
+
+### Name the link for where it goes.
+
+The terms link is read out of context, so its label has to stand alone.
+
+<DoDontPair
+    doExample={<Footer />}
+    doCaption="“Terms of Use” names where the link goes."
+    dontExample={<Footer termsText="Click here" />}
+    dontCaption="“Click here” says nothing out of context."
+/>
+
+### Version is a short tag.
+
+The version reads like a build stamp, not a sentence.
+
+<DoDontPair
+    doExample={<Footer version="v2.4.0" />}
+    doCaption="A short tag: v2.4.0."
+    dontExample={<Footer version="Version two point four point zero, stable channel build 4812" />}
+    dontCaption="A sentence about the build."
+/>
 
 ### Set `version` and `termsUrl` from the app, not the defaults.
 

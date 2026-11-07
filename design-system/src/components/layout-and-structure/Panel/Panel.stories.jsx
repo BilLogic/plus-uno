@@ -57,6 +57,28 @@ WidthFromProvider.play = async ({ canvasElement }) => {
     await expect(panel.style.width).toBe('480px');
 };
 
+/** Interactive playground: change the width, title and body from the table. */
+export const Interactive = {
+    args: {
+        width: '360px',
+        title: 'Session details',
+        body: 'Panel body content goes here.',
+    },
+    argTypes: {
+        width: { control: 'text', description: 'The panel width, as a CSS length.' },
+        title: { control: 'text', description: 'The title in the panel header.' },
+        body: { control: 'text', description: 'The content of the panel body.' },
+        className: { table: { disable: true } },
+        children: { table: { disable: true } },
+    },
+    render: ({ width, title, body }) => (
+        <PanelContainer width={width}>
+            <PanelHeader title={title} actions={<PanelActionGroup><PanelCloseAction /></PanelActionGroup>} />
+            <PanelBody>{body}</PanelBody>
+        </PanelContainer>
+    ),
+};
+
 /* ------------------------------------------------------------------- states */
 
 
