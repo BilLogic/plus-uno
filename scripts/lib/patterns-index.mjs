@@ -14,7 +14,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { extractExports, publicNames, resolveBarrel } from './barrel-exports.js';
+import { readBarrel } from './ds-facts.mjs';
 
 export const PATTERNS_FILE = 'design-system/agent-views/_patterns.json';
 
@@ -61,12 +61,9 @@ export function checkCommitted(repoRoot) {
   const rows = readPatterns(repoRoot);
   const overview = fs.readFileSync(path.join(repoRoot, OVERVIEW_FILE), 'utf8');
   const unrouted = rows.filter((r) => !overview.includes(`\`${r.name}\``)).map((r) => `${r.name} is missing from ${OVERVIEW_FILE}`);
-  const from = path.join(repoRoot, 'package.json');
   const exportsOf = {};
-  for (const spec of new Set(rows.map((r) => r.import))) {
-    exportsOf[spec] = publicNames(resolveBarrel(spec, from, repoRoot), { repoRoot });
-  }
-  const required = extractExports(resolveBarrel('@/patterns', from, repoRoot), { repoRoot });
+  for (const spec of new Set(rows.map((r) => r.import))) exportsOf[spec] = readBarrel(repoRoot, spec).names;
+  const required = readBarrel(repoRoot, '@/patterns').components;
   return [...checkPatterns(rows, { exportsOf, exists: (doc) => fs.existsSync(path.join(repoRoot, doc)), required }), ...unrouted];
 }
 

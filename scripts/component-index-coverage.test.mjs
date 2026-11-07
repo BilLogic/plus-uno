@@ -14,7 +14,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { stripComments } from './lib/barrel-exports.js';
+import { stripComments } from './lib/js-comments.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BARREL = path.join(REPO_ROOT, 'design-system/src/components/index.js');

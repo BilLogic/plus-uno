@@ -27,7 +27,7 @@ import { documents } from './lib/corpus.mjs';
 import { AUTHORED_SECTIONS, authoredCoverage } from './lib/authored-coverage.mjs';
 import { resolveNamedOneOf } from './doc-identifiers.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
-import { extractExports } from './lib/barrel-exports.js';
+import { readBarrel } from './lib/ds-facts.mjs';
 import { buildComponentsManifest, serializeManifest } from './lib/agent-manifests.mjs';
 import { AGENT_ROOT } from './agent-views-paths.js';
 import { enumValuesOf } from './lib/enum-values.mjs';
@@ -539,10 +539,7 @@ for (const group of groups) {
  * what `agent-views/components/index.md` lists.
  */
 {
-  const barrel = path.join(COMPONENTS_ROOT, 'index.js');
-  const exports = extractExports(barrel, {
-    repoRoot: REPO_ROOT,
-    boundary: COMPONENTS_ROOT,
+  const { components: exports } = readBarrel(REPO_ROOT, '@/components', {
     onUnresolved: (spec) => fail(`components barrel: cannot resolve \`export * from '${spec}'\``),
   });
   // The design system ships from this repo's root package; its version is the one to stamp.

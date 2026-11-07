@@ -42,23 +42,19 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
-import { publicNames } from './lib/barrel-exports.js';
+import { CONSUMER_ROOTS, loadFacts } from './lib/ds-facts.mjs';
 import { contextFrom, docLink, escapesIn } from './lib/ds-usage.mjs';
 import { byRoot, isEntry } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
-import { TOKEN_LADDER, retiredRenames } from './lib/tokens/plan.mjs';
+import { TOKEN_LADDER } from './lib/tokens/plan.mjs';
 import { definitions } from './undefined-tokens.mjs';
 
 export { REPO_ROOT };
 
 export const BASELINE = 'scripts/baselines/ds-usage.json';
-export const SCOPE = ['prototypes', 'src'];
+export const SCOPE = CONSUMER_ROOTS;
 export const SEARCHED = /\.(jsx|js|mjs|tsx|ts|scss|css|html)$/;
 const SKIPPED = /(?:^|\/)(?:node_modules|dist|build)\/|\.(?:test|spec|stories)\.[cm]?[jt]sx?$|\.d\.ts$/;
-const MANIFESTS = {
-  components: 'design-system/agent-views/components.json',
-  tokens: 'design-system/agent-views/tokens.json',
-};
 const DEFINITION_ROOTS = ['design-system/src', ...SCOPE];
 const FA_METADATA = 'node_modules/@fortawesome/fontawesome-free/metadata/icons.json';
 const FREE_REGULAR = 'design-system/src/lib/icon-regular.generated.js';
@@ -123,21 +119,21 @@ function freeIcons(repoRoot) {
   return { solid: of('solid'), brands: of('brands') };
 }
 
-/** The manifests and every declared custom property, read once per repo root. */
+/** The design-system facts and every declared custom property, read once per repo root. */
 export const contextOf = byRoot((repoRoot) => {
-  const json = (rel) => JSON.parse(fs.readFileSync(path.join(repoRoot, rel), 'utf8'));
+  const facts = loadFacts(repoRoot);
   const declaring = filesUnder(repoRoot, DEFINITION_ROOTS)
     .filter((rel) => /\.(scss|css|jsx|tsx|js)$/.test(rel) && fs.existsSync(path.join(repoRoot, rel)))
     .map((rel) => read(repoRoot, rel));
   return contextFrom({
-    components: json(MANIFESTS.components),
-    tokens: json(MANIFESTS.tokens),
+    components: facts.manifests.components,
+    tokens: facts.manifests.tokens,
     defined: definitions(declaring),
     freeRegular: freeRegular(repoRoot),
     freeIcons: freeIcons(repoRoot),
-    retired: retiredRenames(),
+    retired: facts.retired,
     promoted: new Set(TOKEN_LADDER.filter((row) => row.primitive).map((row) => row.new)),
-    exported: new Set(publicNames(path.join(repoRoot, 'design-system/src/components/index.js'), { repoRoot })),
+    exported: facts.importable,
   });
 });
 
