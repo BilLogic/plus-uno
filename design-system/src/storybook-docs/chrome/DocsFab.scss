@@ -12,6 +12,7 @@
     box-shadow: var(--ds-shadow-raised);
 }
 
+// Reduced motion needs no branch here: the --motion-duration-* tokens collapse to 0ms under it.
 // The trigger's glyph turns from a plus into a cross while the menu is open.
 .plus-docs-fab__trigger .plus-btn-visual {
     transition: transform var(--motion-duration-short) var(--motion-easing-standard);
@@ -23,7 +24,7 @@
 
 // The Positioner portals to <body>, so it carries its own layer.
 .plus-docs-fab__positioner {
-    z-index: var(--layer-navigation);
+    z-index: var(--layer-popup);
 }
 
 .plus-docs-fab__menu {
@@ -39,7 +40,7 @@
     &[data-starting-style],
     &[data-ending-style] {
         opacity: 0;
-        transform: translateY(var(--space-050));
+        transform: translateY(var(--stack-sm));
     }
 }
 
@@ -49,11 +50,4 @@
     border-radius: var(--radius-full);
     object-fit: cover;
     display: block;
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .plus-docs-fab__trigger .plus-btn-visual,
-    .plus-docs-fab__menu {
-        transition: none;
-    }
 }
