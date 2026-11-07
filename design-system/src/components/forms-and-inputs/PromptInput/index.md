@@ -3,7 +3,7 @@
 
 # PromptInput
 
-Where a person writes to PLUS AI: a text area that grows from one line up to five, then scrolls, with an optional control before the text and one send action after it. - **value / defaultValue / onChange** control or seed the text. Uncontrolled, the field clears itself after a send; controlled, the owner clears it in `onSubmit`. - **onSubmit(value)** runs on Enter or the send button, with the text as typed. Shift+Enter starts a new line. Nothing sends while the field is empty, disabled, loading, or an input method is mid-composition. - **isLoading** turns the send button into Stop (`onStop`) and rings the field in a `GenerativeBorder`. - **startSlot** is one quiet control before the text, such as an attach button. **attachments** renders a row of staged files above the text. **actions** is a slot for extra controls beside the send button. A PLUS composition of `FieldBox`, `Button` and `GenerativeBorder`.
+Where a person writes to the AI: a text area that grows from one line up to five, then scrolls, with an optional control before the text and one send action after it. - **value / defaultValue / onChange** control or seed the text. Uncontrolled, the field clears itself after a send; controlled, the owner clears it in `onSubmit`. - **onSubmit(value)** runs on Enter or the send button, with the text as typed. Shift+Enter starts a new line. Nothing sends while the field is empty, disabled, loading, or an input method is mid-composition. - **isLoading** turns the send button into Stop (`onStop`) and rings the field in a `GenerativeBorder`. - **startSlot** is one quiet control before the text, such as an attach button. **attachments** renders a row of staged files above the text. **actions** is a slot for extra controls beside the send button. A PLUS composition of `FieldBox`, `Button` and `GenerativeBorder`.
 
 **Import:** `import { PromptInput } from '@/components';`
 
@@ -18,7 +18,7 @@ Where a person writes to PLUS AI: a text area that grows from one line up to fiv
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `label` | string (required) | — | The field's accessible name, such as "Message to PLUS AI". |
+| `label` | string (required) | — | The field's accessible name, such as "Message to AI chat". |
 | `value` | string | — | The text, for a controlled field. |
 | `defaultValue` | string | `''` | The starting text of an uncontrolled field. |
 | `onChange` | func | — | Called with the change event as the text changes. |

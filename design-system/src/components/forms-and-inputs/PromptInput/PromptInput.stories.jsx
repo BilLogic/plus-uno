@@ -4,7 +4,7 @@ import PromptInput from './PromptInput';
 import { iconClass } from '../../../lib/icon';
 
 /**
- * `PromptInput` — where a person writes to PLUS AI.
+ * `PromptInput` — where a person writes to the AI.
  *
  * THE TEST SEAM IS THIS FILE. Story `play:` functions run by `check:storybook`
  * in a real browser: Enter sends, Shift+Enter starts a line, an empty field
@@ -39,13 +39,13 @@ const wrap = { maxWidth: 'var(--width-3000)' };
 
 export const Default = () => (
     <div style={wrap}>
-        <PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI anything…" onSubmit={fn()} />
+        <PromptInput label="Message to AI chat" placeholder="Ask anything" onSubmit={fn()} />
     </div>
 );
 
 Default.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const field = canvas.getByRole('textbox', { name: 'Message to PLUS AI' });
+    const field = canvas.getByRole('textbox', { name: 'Message to AI chat' });
     await expect(field).toBeVisible();
     const send = canvas.getByRole('button', { name: 'Send' });
     await expect(send, 'empty field cannot send').toBeDisabled();
@@ -57,7 +57,7 @@ export const EnterSends = () => {
     const onSubmit = fn();
     return (
         <div style={wrap}>
-            <PromptInput label="Message to PLUS AI" onSubmit={onSubmit} />
+            <PromptInput label="Message to AI chat" onSubmit={onSubmit} />
         </div>
     );
 };
@@ -65,7 +65,7 @@ export const EnterSends = () => {
 /** Enter sends the typed text and, uncontrolled, clears the field. */
 EnterSends.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const field = canvas.getByRole('textbox', { name: 'Message to PLUS AI' });
+    const field = canvas.getByRole('textbox', { name: 'Message to AI chat' });
     await userEvent.type(field, 'Summarize this session');
     await userEvent.keyboard('{Enter}');
     await expect(field).toHaveValue('');
@@ -75,14 +75,14 @@ EnterSends.play = async ({ canvasElement }) => {
 
 export const ShiftEnterStartsALine = () => (
     <div style={wrap}>
-        <PromptInput label="Message to PLUS AI" onSubmit={fn()} />
+        <PromptInput label="Message to AI chat" onSubmit={fn()} />
     </div>
 );
 
 /** Shift+Enter starts a new line instead of sending. */
 ShiftEnterStartsALine.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const field = canvas.getByRole('textbox', { name: 'Message to PLUS AI' });
+    const field = canvas.getByRole('textbox', { name: 'Message to AI chat' });
     await userEvent.type(field, 'Line one');
     await userEvent.keyboard('{Shift>}{Enter}{/Shift}');
     await userEvent.type(field, 'Line two');
@@ -93,7 +93,7 @@ ShiftEnterStartsALine.play = async ({ canvasElement }) => {
 
 export const CannotSendWhenEmpty = () => (
     <div style={wrap}>
-        <PromptInput label="Message to PLUS AI" onSubmit={fn()} />
+        <PromptInput label="Message to AI chat" onSubmit={fn()} />
     </div>
 );
 
@@ -101,7 +101,7 @@ CannotSendWhenEmpty.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const send = canvas.getByRole('button', { name: 'Send' });
     await expect(send).toBeDisabled();
-    const field = canvas.getByRole('textbox', { name: 'Message to PLUS AI' });
+    const field = canvas.getByRole('textbox', { name: 'Message to AI chat' });
     await userEvent.type(field, '   ');
     await expect(send, 'whitespace-only is still empty').toBeDisabled();
 };
@@ -111,7 +111,7 @@ CannotSendWhenEmpty.play = async ({ canvasElement }) => {
 export const Loading = () => (
     <div style={wrap}>
         <PromptInput
-            label="Message to PLUS AI"
+            label="Message to AI chat"
             defaultValue="Drafting a reply…"
             isLoading
             onStop={fn()}
@@ -135,8 +135,8 @@ Loading.play = async ({ canvasElement }) => {
 export const WithSlots = () => (
     <div style={wrap}>
         <PromptInput
-            label="Message to PLUS AI"
-            placeholder="Ask PLUS AI anything…"
+            label="Message to AI chat"
+            placeholder="Ask anything"
             startSlot={<i className={iconClass('paperclip')} aria-hidden="true" title="Attach a file" />}
             attachments={<span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>session-notes.pdf</span>}
             actions={<i className={iconClass('microphone')} aria-hidden="true" title="Dictate" />}
@@ -156,14 +156,14 @@ WithSlots.play = async ({ canvasElement }) => {
 
 export const ComposingDoesNotSend = () => (
     <div style={wrap}>
-        <PromptInput label="Message to PLUS AI" onSubmit={fn()} />
+        <PromptInput label="Message to AI chat" onSubmit={fn()} />
     </div>
 );
 
 /** An input method's own Enter, mid-composition, does not submit. */
 ComposingDoesNotSend.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const field = canvas.getByRole('textbox', { name: 'Message to PLUS AI' });
+    const field = canvas.getByRole('textbox', { name: 'Message to AI chat' });
     await userEvent.type(field, '日本語');
     field.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', keyCode: 229, bubbles: true }));
     await expect(field).toHaveValue('日本語');
@@ -174,19 +174,19 @@ ComposingDoesNotSend.play = async ({ canvasElement }) => {
 /** `state="focus"` draws the focus ring still, for documentation. */
 export const Focused = () => (
     <div style={wrap}>
-        <PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI anything…" state="focus" onSubmit={fn()} />
+        <PromptInput label="Message to AI chat" placeholder="Ask anything" state="focus" onSubmit={fn()} />
     </div>
 );
 
 export const Disabled = () => (
     <div style={wrap}>
-        <PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI anything…" isDisabled onSubmit={fn()} />
+        <PromptInput label="Message to AI chat" placeholder="Ask anything" isDisabled onSubmit={fn()} />
     </div>
 );
 
 Disabled.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    await expect(canvas.getByRole('textbox', { name: 'Message to PLUS AI' })).toBeDisabled();
+    await expect(canvas.getByRole('textbox', { name: 'Message to AI chat' })).toBeDisabled();
     await expect(canvas.getByRole('button', { name: 'Send' })).toBeDisabled();
 };
 
@@ -205,4 +205,4 @@ export const Interactive = (args) => {
         </div>
     );
 };
-Interactive.args = { label: 'Message to PLUS AI', placeholder: 'Ask PLUS AI anything…', isDisabled: false, isLoading: false };
+Interactive.args = { label: 'Message to AI chat', placeholder: 'Ask anything', isDisabled: false, isLoading: false };

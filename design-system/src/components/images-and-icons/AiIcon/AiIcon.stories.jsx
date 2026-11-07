@@ -6,7 +6,7 @@ import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import AiIcon, { AI_ICON_NAMES, AI_ICON_SIZES, AI_ICON_ALL_SIZES } from './AiIcon';
 
 /**
- * `AiIcon` -- icons for PLUS AI actions.
+ * `AiIcon` -- icons for AI actions.
  *
  * One icon per meaning, in
  * a square box exactly its size, filled with the icon color and paired with a
@@ -27,7 +27,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'Icons for PLUS AI actions: generate, ask, rewrite, summarize, plan, suggest and stop generating. '
+                    'Icons for AI actions: generate, ask, rewrite, summarize, plan, suggest and stop generating. '
                     + 'A Font Awesome Free glyph with a sparkle badge, or the sparkle alone.',
             },
         },

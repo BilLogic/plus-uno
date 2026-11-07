@@ -230,7 +230,7 @@ A label for one of the **SMART** competencies, in its curriculum color.
 _Avoid_: "skill tag"
 
 **Suggestion**:
-A label that offers something PLUS AI proposes, which a person accepts or dismisses.
+A label that offers something the AI proposes, which a person accepts or dismisses.
 _Avoid_: "AI chip"
 
 **Fieldset**:
