@@ -32,6 +32,7 @@ const ctx = contextFrom({
   freeRegular: new Set(['bell', 'star']),
   retired: new Map([['--element-radius-full', '--radius-full'], ['--card-pad-md', '--card-pad-default']]),
   promoted: new Set(['--radius-full']),
+  exported: new Set(['Button', 'Logo', 'Modal', 'TableRow', 'FLAG_APPEARANCES']),
 });
 
 const DS = "import { Button, Logo, Modal } from '@/components';\n";
@@ -50,6 +51,10 @@ test('ds/no-unknown-component: a barrel import of a name the manifest lacks', ()
   assert.equal(f.rule, 'ds/no-unknown-component');
   assert.match(f.fix, /Button/);
   assert.deepEqual([f.line, f.col], [1, 10]);
+});
+
+test('ds/no-unknown-component: a part or constant the barrel exports is known, though it has no record', () => {
+  assert.deepEqual(rulesOf('p/App.jsx', "import { TableRow, FLAG_APPEARANCES } from '@/components';\n<TableRow anything=\"x\" />"), []);
 });
 
 test('ds/no-unknown-component: a member of a namespace import', () => {

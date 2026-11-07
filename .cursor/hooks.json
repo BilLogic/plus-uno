@@ -20,6 +20,12 @@
         "command": ".cursor/hooks/uno-prototype/session-end.mjs",
         "timeout": 5
       }
+    ],
+    "afterFileEdit": [
+      {
+        "command": "node .cursor/hooks/ds-usage/post-edit.mjs",
+        "timeout": 15
+      }
     ]
   }
 }

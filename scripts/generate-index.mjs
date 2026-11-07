@@ -39,10 +39,12 @@ const SECTIONS = [
 /**
  * History and raw material, deliberately unrouted: plans record what was
  * decided, `knowledge/` is being dissolved into rules and ADRs (#172), and
- * fixtures are data. Requiring a summary of each would be ceremony.
+ * fixtures are data. Requiring a summary of each would be ceremony. The
+ * ds-usage scenarios are prompts an eval hands an agent verbatim; frontmatter
+ * would change what the agent reads, and `docs/evals/ds-usage.md` routes them.
  */
 const NOT_ROUTABLE = [
-  'docs/plans', 'docs/knowledge', 'docs/evals/fixtures',
+  'docs/plans', 'docs/knowledge', 'docs/evals/fixtures', 'docs/evals/scenarios/ds-usage',
   'skills/uno-prototype/examples', 'skills/uno-review/examples',
   'skills/uno-publish/examples', 'skills/uno-maintain/references/skill-quality/examples',
 ];

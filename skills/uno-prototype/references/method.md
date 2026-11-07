@@ -165,7 +165,8 @@ Before any artifact leaves the skill:
 
 1. **Validation.** Coded artifacts run the validation loop their deliverable
    reference defines (objective: every available machine check passes AND the
-   brief card is honored; capped attempts). Headless codegen faces run the
+   brief card is honored; capped attempts); its gate of record is
+   `check:ds-usage` on the prototype. Headless codegen faces run the
    check set as a deterministic post-step whose results land in the draft PR
    under "Machine checks" — the PR review is their fix loop, and a ❌ there
    blocks review sign-off, not PR creation. Spec deliverables carry their
@@ -174,8 +175,9 @@ Before any artifact leaves the skill:
    fidelity (no token nits on a flow sketch; full rigor on a hi-fi build).
    Major findings loop back to the route decision (§2).
 3. **Artifact manifest** — one line: fidelity · tools used · PRD link, plus
-   any unresolved check failures. Review's mandatory input; **every path exit
-   produces it**.
+   any unresolved check failures. A coded build adds the `check:ds-usage`
+   result (clean, or escapes by rule) and its retrieval proof. Review's
+   mandatory input; **every path exit produces it**.
 4. Hand to **uno-review** for the stage-lens review. Passing review and being
    ready to share are separate gates — iteration by choice re-enters at §2.
 

@@ -9,9 +9,10 @@
 #   1. src/App.jsx exists
 #   2. App.jsx has a default export
 #   3. vite.config.js exists
-#   4. No escapes from the design system (npm run check:ds-usage, every file
-#      held to zero; the rules are docs/engineering/ds-usage-rules.md)
-#   5. package.json has a name field
+#   4. package.json has a name field
+#
+# Escapes from the design system are check:ds-usage's, run as the build's
+# exit gate (skills/uno-prototype/references/deliverables/coded-build.md).
 
 set -euo pipefail
 
@@ -55,18 +56,7 @@ else
     fail "vite.config.js is missing"
 fi
 
-# 4. Escapes from the design system: one checker owns the definition (ADR-039)
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
-if [ -d "$PROJECT_DIR/src" ]; then
-    if ESCAPES=$(node "$REPO_ROOT/scripts/check-ds-usage.mjs" "$(cd "$PROJECT_DIR" && pwd)/src" 2>&1); then
-        pass "No escapes from the design system (check:ds-usage)"
-    else
-        fail "Escapes from the design system (check:ds-usage):"
-        echo "$ESCAPES"
-    fi
-fi
-
-# 5. package.json has a name
+# 4. package.json has a name
 if [ -f "$PROJECT_DIR/package.json" ]; then
     if grep -q '"name"' "$PROJECT_DIR/package.json"; then
         pass "package.json has a name field"

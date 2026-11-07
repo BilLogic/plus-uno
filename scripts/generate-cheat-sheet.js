@@ -44,14 +44,22 @@ const isScalePrimitive = (name) => /^--(space|radius|stroke|size)-[0-9]/.test(na
 /**
  * The token view's sections, in its order, with the tier each sits on
  * (GLOSSARY § Token tier). The markdown lists names; tokens.json lists the
- * same names with tier, group and value. Component tokens live in each
- * component's own SCSS and are not part of this view.
+ * same names with tier, group and value. The ladder's component tokens are
+ * here; a component's private custom properties in its own SCSS are not.
  */
 function tokenSections() {
     const t = (file) => extractScssDeclarations(path.join(TOKENS_DIR, file));
     const c = (file) => extractScssDeclarations(path.join(COLOR_DIR, file));
+    const l = (file) => extractScssDeclarations(path.join(TOKENS_DIR, 'ladder', file));
     const scales = t('_scales.scss');
+    // The ladder (ADR-038) comes first: it is what new code reads, and a name
+    // the older files also declare keeps its ladder tier.
     return [
+        { group: 'Ladder Semantics', tier: 'semantic', tokens: l('_semantics.scss') },
+        { group: 'Ladder Patterns', tier: 'pattern', tokens: l('_patterns.scss') },
+        { group: 'Ladder Components', tier: 'component', tokens: l('_components.scss') },
+        { group: 'Layers', tier: 'semantic', tokens: l('_layers.scss') },
+        { group: 'Motion', tier: 'semantic', tokens: l('_motion.scss') },
         { group: 'Spacing Semantics', tier: 'semantic', tokens: t('_spacing_semantics.scss') },
         { group: 'Scale Tokens', tier: 'semantic', tokens: scales.filter((d) => !isScalePrimitive(d.name)) },
         { group: 'Frame and Layer Tokens', tier: 'pattern', tokens: t('_frame_layers.scss') },
@@ -84,6 +92,11 @@ function renderTokensDoc() {
     // Names come from the same sections tokens.json is built from, so the two
     // views cannot list different tokens.
     const names = Object.fromEntries(tokenSections().map((s) => [s.group, s.tokens.map((d) => d.name)]));
+    const ladderSemantics = names['Ladder Semantics'];
+    const ladderPatterns = names['Ladder Patterns'];
+    const ladderComponents = names['Ladder Components'];
+    const layerTokens = names['Layers'];
+    const motionTokens = names['Motion'];
     const spacingTokens = names['Spacing Semantics'];
     const scaleFoundations = names['Scale Tokens'];
     const frameLayerTokens = names['Frame and Layer Tokens'];
@@ -102,6 +115,26 @@ function renderTokensDoc() {
     tokensDoc += `# PLUS DS — Tokens\n\n`;
     tokensDoc += `> **CRITICAL**: Never hardcode values. Use these exact token strings.\n\n`;
     tokensDoc += `Mirrors \`${TOKEN_DIR}/\`.\n\n`;
+
+    tokensDoc += `## Ladder Semantics\n`;
+    tokensDoc += `Start here for space, size and radius (ADR-038). A component reads its component token, else a pattern token, else one of these steps: \`--pad-x-*\` and \`--pad-y-*\` inside a control, \`--stack-*\` between stacked items, \`--inline-*\` between items in a row, \`--radius-*\` for corners. The primitives at the end of this file are what these resolve to.\n\n`;
+    tokensDoc += "```css\n" + ladderSemantics.join('\n') + "\n```\n\n";
+
+    tokensDoc += `## Ladder Patterns\n`;
+    tokensDoc += `Space owned by a pattern: page, section, card, table, modal, drawer, popover. Inside a pattern, read its token before a semantics step.\n\n`;
+    tokensDoc += "```css\n" + ladderPatterns.join('\n') + "\n```\n\n";
+
+    tokensDoc += `## Ladder Components\n`;
+    tokensDoc += `Tokens one component owns, named for it.\n\n`;
+    tokensDoc += "```css\n" + ladderComponents.join('\n') + "\n```\n\n";
+
+    tokensDoc += `## Layers\n`;
+    tokensDoc += `Stacking order: \`z-index: var(--layer-modal)\`.\n\n`;
+    tokensDoc += "```css\n" + layerTokens.join('\n') + "\n```\n\n";
+
+    tokensDoc += `## Motion\n`;
+    tokensDoc += `Durations and easings; reduced motion is handled at this layer.\n\n`;
+    tokensDoc += "```css\n" + motionTokens.join('\n') + "\n```\n\n";
 
     tokensDoc += `## Spacing Semantics\n`;
     tokensDoc += `Use for padding, margin, and gaps.\n\n`;

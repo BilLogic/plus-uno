@@ -104,9 +104,8 @@ cheaply before the next rung.
   artifact. Direct production is sanctioned only where UNO holds the medium
   (in-chat ASCII, or a gated MCP writer — Figma, image gen); each deliverable
   doc names its own routes.
-- Hi-fi: `AGENTS.md` § Hard rules apply in full — tokens over literals,
-  agent-views are law, no deep imports from `design-system/src/`, PLUS
-  components first, FA Free icons only.
+- Hi-fi: `AGENTS.md` § Hard rules apply in full, and `check:ds-usage` is their
+  gate at exit (`references/deliverables/coded-build.md`).
 - This skill builds; it does not judge (uno-review), share (uno-publish), or
   change the DS library (uno-maintain).
 - New packages, Figma writes, and blueprint writes require explicit approval

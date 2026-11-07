@@ -6,6 +6,165 @@
 
 Mirrors `design-system/src/tokens/`.
 
+## Ladder Semantics
+Start here for space, size and radius (ADR-038). A component reads its component token, else a pattern token, else one of these steps: `--pad-x-*` and `--pad-y-*` inside a control, `--stack-*` between stacked items, `--inline-*` between items in a row, `--radius-*` for corners. The primitives at the end of this file are what these resolve to.
+
+```css
+--content-max-width
+--content-max-width-reading
+--content-min-width
+--content-width
+--control-lg
+--control-md
+--control-sm
+--focus-ring-offset
+--focus-ring-radius
+--focus-ring-width
+--grid-columns
+--grid-gutter
+--grid-width-column
+--grid-width-column-screen
+--inline-lg
+--inline-md
+--inline-sm
+--pad-x-lg
+--pad-x-md
+--pad-x-sm
+--pad-x-xs
+--pad-y-lg
+--pad-y-md
+--pad-y-sm
+--radius-h24
+--radius-h32
+--radius-h40
+--radius-lg
+--radius-md
+--radius-sm
+--screen-max-width
+--screen-min-width
+--screen-pad-x
+--screen-width
+--stack-lg
+--stack-md
+--stack-sm
+```
+
+## Ladder Patterns
+Space owned by a pattern: page, section, card, table, modal, drawer, popover. Inside a pattern, read its token before a semantics step.
+
+```css
+--blanket-fill
+--blanket-max-height-modal
+--blanket-pad-x
+--blanket-pad-y
+--card-pad-compact
+--card-pad-default
+--card-pad-spacious
+--drawer-width-lg
+--drawer-width-md
+--drawer-width-sm
+--frame-sidebar-group-gap
+--frame-sidebar-pad
+--frame-sidebar-row-gap
+--frame-sidebar-row-radius
+--frame-sidebar-width
+--frame-sidebar-width-nav
+--frame-topbar-height
+--modal-pad-x-compact
+--modal-pad-x-default
+--modal-pad-x-spacious
+--modal-pad-y-compact
+--modal-pad-y-default
+--modal-pad-y-spacious
+--modal-width-lg
+--modal-width-md
+--modal-width-sm
+--page-pad-x-compact
+--page-pad-x-default
+--page-pad-x-spacious
+--page-pad-y-compact
+--page-pad-y-default
+--page-pad-y-spacious
+--panel-max-width
+--panel-min-width
+--panel-width-default
+--section-pad-x-compact
+--section-pad-x-default
+--section-pad-x-spacious
+--section-pad-y-compact
+--section-pad-y-default
+--section-pad-y-spacious
+--section-radius
+```
+
+## Ladder Components
+Tokens one component owns, named for it.
+
+```css
+--button-radius-compact
+--button-radius-default
+--calendar-day-lg
+--calendar-day-md
+--calendar-day-sm
+--calendar-nav-size
+--checkbox-control-size
+--choice-grid-control-size-10
+--choice-grid-control-size-12
+--join-row-width
+--listbox-max-height
+--listbox-max-width
+--listbox-min-height
+--option-menu-width
+--progress-bar-height
+--progress-indicator-dot-size-12
+--progress-indicator-dot-size-8
+--radio-control-size
+--radio-control-size-10
+--radio-control-size-14
+--range-dot-size-12
+--range-dot-size-16
+--range-dot-size-8
+--range-dot-size-default
+--range-track-height-4
+--range-track-height-6
+--range-track-height-8
+--spinner-size-lg
+--spinner-size-md
+--spinner-size-sm
+--toggle-pad
+--toggle-track-height-16
+--toggle-track-height-20
+--toggle-track-width-16
+--toggle-track-width-20
+```
+
+## Layers
+Stacking order: `z-index: var(--layer-modal)`.
+
+```css
+--layer-blanket
+--layer-card
+--layer-dialog
+--layer-flag
+--layer-modal
+--layer-navigation
+--layer-popup
+--layer-spotlight
+--layer-tooltip
+```
+
+## Motion
+Durations and easings; reduced motion is handled at this layer.
+
+```css
+--motion-duration-long
+--motion-duration-medium
+--motion-duration-short
+--motion-easing-entrance
+--motion-easing-exit
+--motion-easing-standard
+```
+
 ## Spacing Semantics
 Use for padding, margin, and gaps.
 

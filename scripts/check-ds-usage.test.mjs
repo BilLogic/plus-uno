@@ -4,7 +4,9 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { inScope, tally } from './check-ds-usage.mjs';
+import { filesUnder, inScope, tally } from './check-ds-usage.mjs';
+import fs from 'node:fs';
+import os from 'node:os';
 import { RULES } from './lib/ds-usage.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -56,4 +58,17 @@ test('tally: fail-level findings per rule and file; warnings are not held', () =
     tally([f('ds/no-raw-literal', 'fail', 'a'), f('ds/no-raw-literal', 'fail', 'a'), f('ds/no-retired-name', 'warn', 'a')]),
     { 'ds/no-raw-literal a': 2 },
   );
+});
+
+test('outside a git checkout, the files on disk stand in for the tracked list', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-usage-nogit-'));
+  try {
+    for (const rel of ['prototypes/a/src/App.jsx', 'prototypes/a/node_modules/x.js', 'prototypes/.hidden/b.jsx', 'src/c.scss']) {
+      fs.mkdirSync(path.join(root, path.dirname(rel)), { recursive: true });
+      fs.writeFileSync(path.join(root, rel), '');
+    }
+    assert.deepEqual(filesUnder(root, ['prototypes', 'src']), ['prototypes/a/src/App.jsx', 'src/c.scss']);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
 });

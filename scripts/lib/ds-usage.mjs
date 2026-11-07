@@ -65,11 +65,14 @@ const FONT_WEIGHT = /^font-?weight$/i;
  * @param {{components: {components: object[]}, tokens: {tokens: object[]},
  *   defined?: Set<string>, freeRegular?: Set<string>,
  *   freeIcons?: {solid: Set<string>, brands: Set<string>}|null,
- *   retired?: Map<string, string>, promoted?: Set<string>}} input
+ *   retired?: Map<string, string>, promoted?: Set<string>, exported?: Set<string>}} input
  *
  * `retired` is retired token name -> its replacement (the token plan's
  * `retiredRenames()`); `promoted` holds primitive names a semantic row of the
  * plan uses as its own name (`--radius-full`), which consumer code may read.
+ * `exported` is every name the barrel makes importable (parts such as
+ * `TableRow` and constants included); a name there is never an unknown
+ * component, though only a manifest record holds its props.
  */
 export function contextFrom({
   components,
@@ -79,6 +82,7 @@ export function contextFrom({
   freeIcons = null,
   retired = new Map(),
   promoted = new Set(),
+  exported = new Set(),
 }) {
   const byName = new Map(components.components.map((c) => [c.name, c]));
   const tokenByName = new Map(
@@ -121,6 +125,7 @@ export function contextFrom({
     freeRegular,
     freeIcons,
     retired,
+    exported,
   };
 }
 
@@ -209,7 +214,7 @@ function scriptEscapes(text, ctx, add) {
       for (const { imported, local } of imp.named) {
         const record = ctx.components.get(imported);
         if (record) bound.set(local, record);
-        else {
+        else if (!ctx.exported.has(imported)) {
           add(
             'ds/no-unknown-component',
             nameIndex(text, imp.index, imported),
@@ -254,7 +259,7 @@ function scriptEscapes(text, ctx, add) {
     if (!record && dot > 0 && namespaces.has(el.name.slice(0, dot))) {
       const member = el.name.slice(dot + 1);
       record = ctx.components.get(member);
-      if (!record) {
+      if (!record && !ctx.exported.has(member)) {
         add(
           'ds/no-unknown-component',
           el.index + 1,
