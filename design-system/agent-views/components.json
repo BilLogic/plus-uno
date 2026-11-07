@@ -5237,7 +5237,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "The panel width, as a CSS length.",
+          "description": "Falls back to the nearest PanelProvider's width, then `--panel-width-default` (400). Inside the Frame's Panel area it fills the area instead.",
           "deprecated": null
         },
         {
