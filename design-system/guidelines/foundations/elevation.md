@@ -14,32 +14,27 @@ own fill (`color.md` § Surface Colors).
 
 | Token | Usage |
 |-------|-------|
-| `--elevation-light-1` | Subtle lift |
-| `--elevation-light-2` | Clickable cards on hover or drag |
-| `--elevation-light-3` | Floating layers still on legacy tokens (Specs pages not yet swept) |
+| `--ds-shadow-raised` | Subtle lift; clickable cards on hover or drag |
 | `--elevation-light-4` | Legacy, unused |
 | `--elevation-light-5` | Dialogs |
 | `--ds-surface-overlay` + `--ds-shadow-overlay` | Modals, menus, listboxes, popups, tooltips, flags and the floating sidebar: `elevation.surface.overlay` + `elevation.shadow.overlay` |
 
 ## Shadow Values
 
-Levels 1-3 now point at the generated `elevation.shadow.*` tokens
-(`design-system/src/tokens/color/_legacy-aliases.scss`), which change with the
-color mode: levels 1-2 share the raised shadow and level 3 is the overlay
-shadow. Levels 4 and 5 keep their own values; no modal uses them, since modals
-take the overlay pair like every other floating layer.
+The raised and overlay shadows are the generated `elevation.shadow.*` tokens,
+which change with the color mode. They replaced levels 1-3: levels 1-2 became
+`--ds-shadow-raised` and level 3 became `--ds-shadow-overlay`. Levels 4 and 5
+keep their own values; no modal uses them, since modals take the overlay pair
+like every other floating layer.
 
 ```css
---elevation-light-1: var(--ds-shadow-raised);
---elevation-light-2: var(--ds-shadow-raised);
---elevation-light-3: var(--ds-shadow-overlay);
 --elevation-light-4: 0px 2px 3px 0px rgba(0, 0, 0, 0.3), 0px 6px 10px 4px rgba(0, 0, 0, 0.15);
 --elevation-light-5: 0px 4px 4px 0px rgba(0, 0, 0, 0.3), 0px 8px 12px 6px rgba(0, 0, 0, 0.15);
 ```
 
 ## Usage
 
-A card names the surface role, which pairs the fill with its shadow
+A card names the raised surface role with the raised shadow
 (`design-system/src/tokens/_elevation.scss`). A layer on the new color tokens
 (a modal, menu, popup, tooltip or flag) names the overlay pair directly:
 `--ds-surface-overlay` with `--ds-shadow-overlay`, whose 1px ring is the edge,
@@ -54,7 +49,7 @@ so it draws no border.
 
 .my-card--clickable:hover,
 .my-card--dragging {
-  box-shadow: var(--surface-raised-shadow); /* Light/2 */
+  box-shadow: var(--ds-shadow-raised);
 }
 
 .my-menu {
@@ -73,9 +68,8 @@ so it draws no border.
 | Component Type | Recommended Elevation |
 |----------------|----------------------|
 | Cards at rest | none: a 1px outline-variant border |
-| Clickable cards on hover or drag | `--elevation-light-2` |
+| Clickable cards on hover or drag | `--ds-shadow-raised` |
 | Modals, menus, dropdowns, listboxes, popups, tooltips, flags, the floating sidebar | `--ds-surface-overlay` + `--ds-shadow-overlay` |
-| Floating layers still on legacy tokens, until they move | `--elevation-light-3` |
 | Dialogs | `--elevation-light-5` |
 
 Every floating layer takes the overlay pair, `elevation.surface.overlay` with

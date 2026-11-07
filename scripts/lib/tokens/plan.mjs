@@ -71,7 +71,7 @@ export const MOTION_EASINGS = {
  *  - `color / foundations` -> `color / semantics` and `opacity` -> `color /
  *    opacity`, and Figma's `Element/opacity-disabled` moving into the latter,
  *    are Figma-collection-membership changes only: code already names the one
- *    token involved `--color-disabled-opacity`, outside this ladder's prefix,
+ *    token involved `--ds-opacity-disabled`, outside this ladder's prefix,
  *    so there is no code row for it — recorded in the payload's collection
  *    rename list instead (`build.mjs`'s `COLLECTION_RENAMES`).
  */

@@ -4,7 +4,7 @@ import path from 'path';
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { compare, refusals } from './token-generation.mjs';
-import { ALIASES } from './lib/color/legacy-map.mjs';
+import { RETIRED_LEGACY } from './lib/color/legacy-map.mjs';
 import { FRAME_LAYER_COLLECTIONS, frameLayerFile, frameLayerFolder, frameLayerToken } from './lib/frame-layer-collections.mjs';
 import { dropRetired } from './lib/tokens/retire.mjs';
 import { TYPOGRAPHY_FILE, TYPOGRAPHY_FOLDERS, typographyFolder, typographyToken } from './lib/typography-collection.mjs';
@@ -1017,14 +1017,11 @@ ${block(Object.entries(CODE_ONLY_TYPE_STYLES).map(([name, value]) => ({ token: `
 }
 
 /**
- * Legacy names the color migration map aliases to a `--ds-*` token are
- * redefined by `color/_legacy-aliases.scss`, which loads after this file, so
- * the value written here no longer paints. Say so beside the declaration.
+ * Legacy color names the migration map retired (`RETIRED_LEGACY`): every use
+ * moved to its `--ds-*` token, so the Figma export's declaration is dropped
+ * rather than written back.
  */
-function markOverridden(scss) {
-    return scss.replace(/^(\s*(--[\w-]+):[^;\n]*;)$/gm, (line, decl, name) =>
-        ALIASES[name] ? `${decl} // overridden by color/_legacy-aliases.scss` : line);
-}
+const RETIRED_COLORS = new Set(Object.keys(RETIRED_LEGACY));
 
 // Generate all files
 //
@@ -1040,7 +1037,7 @@ const OUT_DIR = TOKEN_DIR;
 let generated;
 try {
     generated = [
-        { file: '_colors.scss', generated: markOverridden(generateColorsSCSS()) },
+        { file: '_colors.scss', generated: dropRetired(generateColorsSCSS(), RETIRED_COLORS) },
         { file: '_primitives.scss', generated: generatePrimitivesSCSS() },
         { file: '_spacing_semantics.scss', generated: dropRetired(generateSemanticsSCSS()) },
         { file: '_layout.scss', generated: dropRetired(generateLayoutSCSS()) },

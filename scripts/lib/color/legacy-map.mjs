@@ -7,13 +7,15 @@
  * Each row: what it covers as written in the proposal (`today`), a pattern
  * over the CSS name (`match`, null for a row that only describes a second use
  * of a name another row matches), the proposed token(s) (`proposed`), a note,
- * and `aliases` — the legacy names this row gives exactly one target, whatever
- * CSS property they sit on. Only those are aliased; a name whose target
+ * and `retired` — the legacy names this row gave exactly one target, whatever
+ * CSS property they sat on. Those were aliased to their target first; then
+ * every use moved to it and the names were removed (#1402), so no stylesheet
+ * defines them and no alias sheet points them anywhere. A name whose target
  * depends on where it is used (a fill here, an edge or a link there) or on
  * what the element is (state layers) waits for the component sweep, which
  * reads `proposed`.
  *
- * Three rules narrow `aliases` beyond "one target":
+ * Three rules narrowed `retired` beyond "one target":
  *   - Partners move together (`PAIRS`). A foreground and the grounds it is
  *     drawn on — on-X with X, a container with its on-container, the text on
  *     a surface, the text on a state layer — are aliased together, to a pair
@@ -26,12 +28,12 @@
  *     has one target (`--color-danger-text` → `color.text.danger`). Their hues
  *     move under the new ramps, and this step promises a visible change in
  *     brand, neutrals, shadows and the disabled opacity only.
- *   - `--color-disabled-opacity` aliases `opacity.disabled`, the one target of
+ *   - `--color-disabled-opacity` moved to `opacity.disabled`, the one target of
  *     its own kind; the disabled text and background tokens beside it in
  *     `proposed` are what components move to in the sweep.
  *
  * `legacyCoverage()` checks every legacy name used in `design-system/` and
- * `prototypes/` has a row; `aliasScss()` renders `_legacy-aliases.scss`.
+ * `prototypes/` has a row.
  */
 
 import { readFileSync } from 'node:fs';
@@ -39,17 +41,15 @@ import { join } from 'node:path';
 
 import { REPO_ROOT, documents } from '../corpus.mjs';
 
-import { dsName } from './emit.mjs';
-
 const SMART = '(mastering-content|relationship|technology-tools|advocacy|social-emotional)';
 
-/** @type {{today: string, match: RegExp|null, proposed: string, note: string, aliases?: Record<string, string>}[]} */
+/** @type {{today: string, match: RegExp|null, proposed: string, note: string, retired?: Record<string, string>}[]} */
 export const ROWS = [
   { today: '--color-primary (background)', match: /^--color-primary$/, proposed: 'color.background.brand.bold', note: 'One M3 role splits by property: fill here, edge and link below.' },
   { today: '--color-primary (border / text)', match: null, proposed: 'color.border.brand · color.link', note: 'Same name used as an edge or a link color.' },
   { today: '--color-primary-text', match: /^--color-primary-text$/, proposed: 'color.text.brand', note: 'Lagoon 800 for brand text.' },
   { today: '--color-primary-border · -icon', match: /^--color-primary-(border|icon)$/, proposed: 'color.border.brand · color.icon.brand', note: '38 border uses today.',
-    aliases: { '--color-primary-border': 'color.border.brand' } },
+    retired: { '--color-primary-border': 'color.border.brand' } },
   { today: '--color-on-primary', match: /^--color-on-primary$/, proposed: 'color.text.inverse · color.icon.inverse', note: 'Shared by every bold fill, not per intent.' },
   { today: '--color-primary-container', match: /^--color-primary-container$/, proposed: 'color.background.brand.subtlest', note: '' },
   { today: '--color-on-primary-container', match: /^--color-on-primary-container$/, proposed: 'color.text (or color.text.brand)', note: '' },
@@ -81,31 +81,31 @@ export const ROWS = [
     note: 'Split by property; as a text color today it would fall to 1.2:1.' },
   { today: '--color-border (local to a spec page)', match: /^--color-border$/, proposed: 'color.border', note: 'Defined inside one spec page, not in the token set.' },
   { today: '--color-scrim', match: /^--color-scrim$/, proposed: 'color.blanket', note: '',
-    aliases: { '--color-scrim': 'color.blanket' } },
+    retired: { '--color-scrim': 'color.blanket' } },
   { today: '--color-disabled-opacity (0.38)', match: /^--color-disabled-opacity$/, proposed: 'opacity.disabled (0.4) + color.text.disabled · color.background.disabled', note: 'Atlassian value; a visible change.',
-    aliases: { '--color-disabled-opacity': 'opacity.disabled' } },
+    retired: { '--color-disabled-opacity': 'opacity.disabled' } },
   { today: '--color-inverse-surface / inverse-on-surface', match: /^--color-inverse-(surface|on-surface)$/, proposed: 'color.background.neutral.bold / color.text.inverse', note: '',
-    aliases: { '--color-inverse-surface': 'color.background.neutral.bold', '--color-inverse-on-surface': 'color.text.inverse' } },
+    retired: { '--color-inverse-surface': 'color.background.neutral.bold', '--color-inverse-on-surface': 'color.text.inverse' } },
   { today: '--color-focus-ring / -inverse', match: /^--color-focus-ring(-inverse)?$/, proposed: 'color.border.focused / color.border.focused.inverse', note: 'Inverse is a PLUS addition.',
-    aliases: { '--color-focus-ring': 'color.border.focused', '--color-focus-ring-inverse': 'color.border.focused.inverse' } },
+    retired: { '--color-focus-ring': 'color.border.focused', '--color-focus-ring-inverse': 'color.border.focused.inverse' } },
   { today: '--surface-default / raised / overlay / sunken', match: /^--surface-(default|raised|overlay|sunken)$/, proposed: 'elevation.surface / .raised / .overlay / .sunken', note: 'Already Atlassian-shaped.' },
   { today: '--surface-raised-shadow / -overlay-shadow', match: /^--surface-(raised|overlay)-shadow$/, proposed: 'elevation.shadow.raised / .overlay', note: '',
-    aliases: { '--surface-raised-shadow': 'elevation.shadow.raised', '--surface-overlay-shadow': 'elevation.shadow.overlay' } },
+    retired: { '--surface-raised-shadow': 'elevation.shadow.raised', '--surface-overlay-shadow': 'elevation.shadow.overlay' } },
   { today: '--surface-container, -pad, -stack, -radius', match: /^--surface-(container|pad|stack|radius)(-[a-z0-9]+)*$/, proposed: 'unchanged: spacing and radius, not color', note: 'Out of scope for the color set.' },
   { today: '--elevation-light-1 · -2', match: /^--elevation-light-[12]$/, proposed: 'elevation.shadow.raised', note: 'Pair with elevation.surface.raised.',
-    aliases: { '--elevation-light-1': 'elevation.shadow.raised', '--elevation-light-2': 'elevation.shadow.raised' } },
+    retired: { '--elevation-light-1': 'elevation.shadow.raised', '--elevation-light-2': 'elevation.shadow.raised' } },
   { today: '--elevation-light-3 · -4 · -5', match: /^--elevation-light-[345]$/, proposed: 'elevation.shadow.overlay', note: 'Pair with elevation.surface.overlay. Level 3 only for now: the modal levels 4 and 5 keep their own shadow, distinct from floating layers, until the sweep moves modals.',
-    aliases: { '--elevation-light-3': 'elevation.shadow.overlay' } },
+    retired: { '--elevation-light-3': 'elevation.shadow.overlay' } },
   { today: '~15 hard-coded box-shadow literals', match: null, proposed: 'elevation.shadow.raised · .overlay · .overflow', note: 'Swept with the components.' },
 ];
 
-/** Legacy name -> new token name, in row order. */
-export const ALIASES = Object.fromEntries(ROWS.flatMap((row) => Object.entries(row.aliases ?? {})));
+/** Retired legacy name -> the token every use moved to, in row order. */
+export const RETIRED_LEGACY = Object.fromEntries(ROWS.flatMap((row) => Object.entries(row.retired ?? {})));
 
 /**
  * Foregrounds and the grounds they are drawn on, by legacy name or pattern.
- * Within a group, every name in use is aliased or none is; when all are, each
- * foreground clears 4.5:1 on each ground in light (`pairFailures`).
+ * Within a group, every name in use is retired or none is; when all are, each
+ * foreground's replacement clears 4.5:1 on each ground's in light (`pairFailures`).
  *
  * @type {{label: string, fg: (string|RegExp)[], bg: (string|RegExp)[]}[]}
  */
@@ -132,27 +132,27 @@ const members = (specs, names) => names.filter((n) => specs.some((spec) => match
  * @param {{rows: {name: string, light: string}[]}} semantics
  * @param {(a: string, b: string) => number} contrastOf  hex contrast ratio
  * @param {(hex: string, ground: string) => string} compositeOf  alpha over an opaque ground
- * @param {Record<string, string>} [aliases]
+ * @param {Record<string, string>} [retired]
  * @returns {string[]}
  */
-export function pairFailures(names, semantics, contrastOf, compositeOf, aliases = ALIASES) {
-  const all = [...new Set([...names, ...Object.keys(aliases)])];
+export function pairFailures(names, semantics, contrastOf, compositeOf, retired = RETIRED_LEGACY) {
+  const all = [...new Set([...names, ...Object.keys(retired)])];
   const light = Object.fromEntries(semantics.rows.map((r) => [r.name, r.light]));
   const out = [];
   for (const group of PAIRS) {
     const fg = members(group.fg, all);
     const bg = members(group.bg, all);
-    const aliased = [...fg, ...bg].filter((n) => aliases[n]);
-    if (!aliased.length) continue;
-    const bare = [...fg, ...bg].filter((n) => !aliases[n]);
+    const moved = [...fg, ...bg].filter((n) => retired[n]);
+    if (!moved.length) continue;
+    const bare = [...fg, ...bg].filter((n) => !retired[n]);
     if (bare.length) {
-      out.push(`${group.label}: ${aliased.join(', ')} aliased but ${bare.join(', ')} not; alias partners together or not at all`);
+      out.push(`${group.label}: ${moved.join(', ')} retired but ${bare.join(', ')} not; retire partners together or not at all`);
       continue;
     }
     for (const f of fg) {
       for (const b of bg) {
-        const ground = compositeOf(light[aliases[b]], '#ffffff');
-        const ratio = contrastOf(compositeOf(light[aliases[f]], ground), ground);
+        const ground = compositeOf(light[retired[b]], '#ffffff');
+        const ratio = contrastOf(compositeOf(light[retired[f]], ground), ground);
         if (ratio < 4.5) out.push(`${group.label}: ${f} on ${b} is ${ratio.toFixed(2)}:1 in light`);
       }
     }
@@ -164,28 +164,16 @@ export function pairFailures(names, semantics, contrastOf, compositeOf, aliases 
 export const rowFor = (name) => ROWS.find((row) => row.match?.test(name));
 
 /**
- * Every alias target must be a token the generator emits.
+ * Every retired name's replacement must be a token the generator emits.
  *
  * @param {{rows: {name: string}[], shadows: {name: string}[], opacity: {name: string}[]}} semantics
- * @returns {string[]} one message per alias whose target does not exist
+ * @returns {string[]} one message per retired name whose replacement does not exist
  */
 export function missingTargets({ rows, shadows, opacity }) {
   const known = new Set([...rows, ...shadows, ...opacity].map((t) => t.name));
-  return Object.entries(ALIASES)
+  return Object.entries(RETIRED_LEGACY)
     .filter(([, token]) => !known.has(token))
-    .map(([legacy, token]) => `${legacy} aliases ${token}, which the generator does not emit`);
-}
-
-/**
- * `_legacy-aliases.scss`. On `:root` and on any element carrying a mode
- * attribute, so a legacy name resolves against the mode in force there rather
- * than inheriting the value computed at the root.
- *
- * @param {string} header  first line, ending in "\n"
- */
-export function aliasScss(header) {
-  const lines = Object.entries(ALIASES).map(([legacy, token]) => `  ${legacy}: var(${dsName(token)});\n`);
-  return `${header}:root,\n[data-color-mode],\n[data-contrast-mode] {\n${lines.join('')}}\n`;
+    .map(([legacy, token]) => `${legacy} moved to ${token}, which the generator does not emit`);
 }
 
 /** Where legacy names are used: the design system and the prototypes, stylesheets and components. */
@@ -193,7 +181,7 @@ export const SCAN_ROOTS = ['design-system', 'prototypes'];
 const SCAN_EXT = ['.scss', '.css', '.js', '.jsx', '.ts', '.tsx', '.mdx'];
 export const USE = /var\(\s*(--(?:color|surface|elevation)-[a-z0-9-]*[a-z0-9])/g;
 const DEFINE = /(--(?:color|surface|elevation)-[a-z0-9-]*[a-z0-9])\s*:/g;
-/** The generated folder defines the aliases, and tests plant fixture names; neither is a use. */
+/** The generated folder defines the new tokens, and tests plant fixture names; neither is a use. */
 const SKIP = (rel) => rel.startsWith('design-system/src/tokens/color/') || /\.test\.[jt]sx?$/.test(rel);
 
 /**

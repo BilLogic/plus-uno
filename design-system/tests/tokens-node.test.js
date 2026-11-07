@@ -42,6 +42,8 @@ import { describe, it, expect } from 'vitest';
 
 import { documents, text } from '../../scripts/lib/corpus.mjs';
 import { fallbackUsages } from '../../scripts/token-fallbacks.mjs';
+import { dsName } from '../../scripts/lib/color/emit.mjs';
+import { RETIRED_LEGACY } from '../../scripts/lib/color/legacy-map.mjs';
 import { RETIRED_TOKENS, retiredRenames } from '../../scripts/lib/tokens/plan.mjs';
 import { parseColor, toHex } from '../src/lib/tokens.mjs';
 import {
@@ -235,6 +237,15 @@ describe('the corpus — where tokens live, answered once and read through the o
     expect(missing).toEqual([]);
   });
 
+  it('declares none of the retired legacy color names: every use moved to its --ds-* token, which is there', () => {
+    const corpus = tokenCorpus();
+    expect(Object.keys(RETIRED_LEGACY)).toHaveLength(12);
+    const declared = Object.keys(RETIRED_LEGACY).filter((name) => corpus.has(name));
+    expect(declared).toEqual([]);
+    const missing = Object.values(RETIRED_LEGACY).map(dsName).filter((name) => !corpus.has(name));
+    expect(missing).toEqual([]);
+  });
+
   it('follows an alias to the literal at the end of it', () => {
     const corpus = tokenCorpus();
     // `--color-info` IS `var(--color-tertiary)` in `_colors.scss`.
@@ -397,7 +408,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
    * either fallback check makes can reach one. What is counted is the legacy
    * set, which is the set the exposure is about.
    */
-  it('differs from the normalizer on 19 live token pairs', () => {
+  it('differs from the normalizer on 18 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .filter((entry) => !entry.file.startsWith('color/'))
       .map((entry) => entry.value)
@@ -411,7 +422,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
         pairs += 1;
       }
     }
-    expect(pairs).toBe(19);
+    expect(pairs).toBe(18);
   });
 
   /*

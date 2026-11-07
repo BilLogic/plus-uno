@@ -8,7 +8,7 @@
     {
       "from": "opacity",
       "to": "color / opacity",
-      "note": "the disabled-opacity variable moves here; code's --color-disabled-opacity is unaffected"
+      "note": "the disabled-opacity variable moves here; code's --ds-opacity-disabled is unaffected"
     }
   ],
   "collections": [

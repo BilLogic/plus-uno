@@ -63,16 +63,6 @@ const ALLOWED_PATHS = [
   /^design-system\/src\/tokens\/_color_roles\.scss$/,
 ];
 /**
- * The two files that define `--color-scrim` (the generated value and its alias
- * to `--ds-blanket`). Removing a token waits on the token-removal decision, so
- * the word may stay here and only here, and only the `word:` rules are lenient:
- * every other rule still reads these files.
- */
-const TOKEN_NAME_FILES = [
-  /^design-system\/src\/tokens\/_colors\.scss$/,
-  /^design-system\/src\/tokens\/color\/_legacy-aliases\.scss$/,
-];
-/**
  * Decision records that cite the benchmark on purpose, so the citation is the
  * content. Named, not globbed; a new record earns its own line here. None today.
  */
@@ -158,7 +148,6 @@ export function measure(sources) {
     if (ALLOWED_PATHS.some((re) => re.test(file))) continue;
     const live = text.split('\n').map((l) => (ALLOWED_LINE.test(l) ? '' : l));
     for (const [rule, re] of LINE_RULES) {
-      if (rule.startsWith('word:') && TOKEN_NAME_FILES.some((p) => p.test(file))) continue;
       const hits = live.flatMap((l, i) => (re.test(l) ? [i + 1] : []));
       add(rule, file, hits.length, hits[0]);
     }

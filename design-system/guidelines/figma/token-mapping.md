@@ -29,13 +29,13 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 | On Surface Variant | `var(--color-on-surface-variant)` | Secondary text |
 | Outline | `var(--color-outline)` | Borders, dividers |
 | Outline Variant | `var(--color-outline-variant)` | Subtle borders |
-| Focus / Focus Ring | `var(--color-focus-ring)` | Every focus indicator on a neutral ground |
-| Focus / Focus Ring Inverse | `var(--color-focus-ring-inverse)` | Focus indicator on a colored or dark ground; aliases surface |
-| Element/opacity-disabled | `var(--color-disabled-opacity)` | 0.38 on the whole disabled control. Figma files it in size / semantics as 38, because it reads an opacity variable as a percentage |
+| Focus / Focus Ring | `var(--ds-border-focused)` | Every focus indicator on a neutral ground |
+| Focus / Focus Ring Inverse | `var(--ds-border-focused-inverse)` | Focus indicator on a colored or dark ground; aliases surface |
+| Element/opacity-disabled | `var(--ds-opacity-disabled)` | 0.38 on the whole disabled control. Figma files it in size / semantics as 38, because it reads an opacity variable as a percentage |
 | Surface roles/surface-default | `var(--color-surface-default)` | The page; aliases `--surface-default` |
 | Surface roles/surface-sunken | `var(--color-surface-sunken)` | The ground behind grouped things; aliases `--surface-sunken` |
 | Surface roles/surface-raised | `var(--color-surface-raised)` | A card, paired with `--ds-shadow-raised`; a clickable card lifts to `--ds-shadow-overlay` on hover or drag |
-| Surface roles/surface-overlay | `var(--color-surface-overlay)` | Legacy floating layers not yet on the new tokens (pair with `--surface-overlay-shadow`). Modals, menus, popovers, tooltips and toasts take `elevation.surface.overlay` + `elevation.shadow.overlay` (`--ds-surface-overlay`, `--ds-shadow-overlay`) |
+| Surface roles/surface-overlay | `var(--color-surface-overlay)` | Legacy floating layers not yet on the new tokens (pair with `--ds-shadow-overlay`). Modals, menus, popovers, tooltips and toasts take `elevation.surface.overlay` + `elevation.shadow.overlay` (`--ds-surface-overlay`, `--ds-shadow-overlay`) |
 
 ### SMART Competency Colors
 | Figma | PLUS CSS Token |
@@ -138,9 +138,9 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 
 | Figma Elevation Level | PLUS CSS Token |
 |----------------------|----------------|
-| Elevation Light/1 (subtle) | `var(--elevation-light-1)` |
-| Elevation Light/2 (clickable cards on hover or drag) | `var(--elevation-light-2)` |
-| Elevation Light/3 (floating layers still on legacy tokens: Specs pages not yet swept) | `var(--elevation-light-3)` |
+| Elevation Light/1 (subtle) | `var(--ds-shadow-raised)` |
+| Elevation Light/2 (clickable cards on hover or drag) | `var(--ds-shadow-raised)` |
+| Elevation Light/3 (floating layers) | `var(--ds-shadow-overlay)` |
 | Elevation Light/4 (legacy, unused) | `var(--elevation-light-4)` |
 | Elevation Light/5 (dialogs) | `var(--elevation-light-5)` |
 | Overlay surface (modals, menus, listboxes, popovers, tooltips, toasts, the floating sidebar) | `var(--ds-surface-overlay)` |

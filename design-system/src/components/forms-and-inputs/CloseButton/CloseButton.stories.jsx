@@ -11,7 +11,7 @@ const inverseGround = {
     ...row,
     padding: '16px',
     borderRadius: 'var(--radius-md)',
-    background: 'var(--color-inverse-surface)',
+    background: 'var(--ds-background-neutral-bold)',
 };
 const primaryGround = { ...inverseGround, background: 'var(--color-primary)' };
 

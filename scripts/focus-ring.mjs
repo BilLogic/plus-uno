@@ -94,7 +94,7 @@ export const NEGATED = /:not\(\s*:focus[^)]*\)/gi;
 /**
  * Token definitions, from the color file, the role layer that follows it, and
  * the generated `--palette-*` and `--ds-*` sets, so a ring on
- * `--ds-border-focused` is measured the way one on `--color-focus-ring` is.
+ * `--ds-border-focused` is measured the way one on `--color-primary` is.
  *
  * Missing files are skipped rather than thrown: a vanished token directory is
  * the sentinel-floor case, and throwing would report a crash instead of the

@@ -82,7 +82,7 @@ export const Interactive = {
                     padding: '24px',
                     backgroundColor: 'white',
                     borderRadius: '16px',
-                    boxShadow: 'var(--elevation-light-1)'
+                    boxShadow: 'var(--ds-shadow-raised)'
                 }}>
                     <h4 className="h4" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                         Filter Controls

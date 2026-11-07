@@ -52,7 +52,7 @@ const movedRows = () => TOKEN_LADDER.filter((row) => row.old !== row.new);
 /** Figma collection renames, code-side names unchanged (payload documentation only). */
 export const COLLECTION_RENAMES = [
   { from: 'color / foundations', to: 'color / semantics' },
-  { from: 'opacity', to: 'color / opacity', note: "the disabled-opacity variable moves here; code's --color-disabled-opacity is unaffected" },
+  { from: 'opacity', to: 'color / opacity', note: "the disabled-opacity variable moves here; code's --ds-opacity-disabled is unaffected" },
 ];
 
 /** The value one ladder row declares: its `ref`, or a `var()` of the primitive `value` names. */

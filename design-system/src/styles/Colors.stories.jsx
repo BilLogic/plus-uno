@@ -784,7 +784,7 @@ BootstrapBridge.play = async ({ canvasElement }) => keepingModes(async () => {
  * The sweep also found the role that was missing rather than unused. 25 focus
  * rings were left behind because a focus indicator is not a border, and
  * measuring them found 29 rules whose ring could not be seen at all — see
- * Foundations/Border, and `--color-focus-ring` beside these tokens.
+ * Foundations/Border, and `--ds-border-focused` beside these tokens.
  */
 
 /* -------------------------------------------------------------- measuring */
@@ -835,8 +835,15 @@ const GROUNDS = [
 const grounds = () => GROUNDS.map(([label, token]) => [label, readIntentToken(token)]).filter(([, hex]) => hex);
 
 /** `{intent, role, hex, ratios: [{ground, ratio, passes}]}` for one token. */
+/** The token an intent's role is drawn with. Primary's border is the generated brand border; the rest keep their `--color-*` role. */
+const intentToken = (intent, role) => {
+    if (role === 'base') return `--color-${intent}`;
+    if (intent === 'primary' && role === 'border') return '--ds-border-brand';
+    return `--color-${intent}-${role}`;
+};
+
 const measure = (intent, role, bar) => {
-    const hex = readIntentToken(role === 'base' ? `--color-${intent}` : `--color-${intent}-${role}`);
+    const hex = readIntentToken(intentToken(intent, role));
     if (!hex) return null;
     return {
         intent,
@@ -981,7 +988,7 @@ RolesAndBars.play = async ({ canvasElement }) => {
     for (const intent of INTENTS) {
         await expect(readIntentToken(`--color-${intent}`), `--color-${intent} is not defined`).not.toBe(null);
         await expect(readIntentToken(`--color-${intent}-icon`), `--color-${intent}-icon is not defined`).not.toBe(null);
-        await expect(readIntentToken(`--color-${intent}-border`), `--color-${intent}-border is not defined`).not.toBe(null);
+        await expect(readIntentToken(intentToken(intent, 'border')), `${intentToken(intent, 'border')} is not defined`).not.toBe(null);
     }
     await expect(grounds().length, 'the surface ladder must resolve').toBe(GROUNDS.length);
 
@@ -996,7 +1003,7 @@ RolesAndBars.play = async ({ canvasElement }) => {
             for (const { ground, ratio } of row.ratios) {
                 await expect(
                     ratio,
-                    `--color-${intent}-${role} on surface-container-${ground} (${row.hex})`,
+                    `${intentToken(intent, role)} on surface-container-${ground} (${row.hex})`,
                 ).toBeGreaterThanOrEqual(bar);
             }
         }

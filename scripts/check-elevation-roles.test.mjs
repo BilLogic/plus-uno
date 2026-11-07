@@ -1,20 +1,21 @@
 /**
- * The surface ROLES and the elevation mapping table must name the same level.
+ * The elevation mapping table, the retired-name record and the stylesheets
+ * must name the same shadow.
  *
- * WHY THIS EXISTS. `design-system/guidelines/figma/token-mapping.md` has carried
- * a five-row table — Light/1 subtle, Light/2 clickable cards on hover or drag,
- * Light/3 every floating layer without a scrim, Light/4 modals, Light/5
- * dialogs — and the components follow it through the surface roles.
+ * WHY THIS EXISTS. `design-system/guidelines/figma/token-mapping.md` carries a
+ * five-row table — Light/1 subtle, Light/2 clickable cards on hover or drag,
+ * Light/3 floating layers, Light/4 legacy, Light/5 dialogs. The role layer
+ * added for #268 once shipped `--surface-raised-shadow: var(--elevation-light-1)`,
+ * answering "which shadow does a card get?" differently from that table, and
+ * nothing noticed, because the two live in different file types and no check
+ * read both.
  *
- * The role layer added for #268 then shipped `--surface-raised-shadow:
- * var(--elevation-light-1)`. A token whose entire purpose is to answer "which
- * shadow does a card get?" answered it differently from the document that had
- * already answered it, in the same repository, and nothing noticed — because
- * the two live in different file types and no check read both.
+ * Levels 1-3 are now retired: every use moved to the generated shadow the
+ * migration map gives them (`RETIRED_LEGACY` in `scripts/lib/color/legacy-map.mjs`).
  *
- * WHAT IS ASSERTED. The level in the table row for a role is the level the role
- * token points at. Both sides are parsed from source, so this fails whichever
- * side moves: re-pointing the token fails it, and so does editing the table.
+ * WHAT IS ASSERTED. A retired level's row names the shadow the record moved it
+ * to, and a level still in code names itself. Both sides are parsed from
+ * source, so this fails whichever side moves.
  *
  * ─── WHAT IT DELIBERATELY CANNOT SEE ────────────────────────────────────────
  *
@@ -41,45 +42,22 @@ import { fileURLToPath } from 'node:url';
 import * as sass from 'sass';
 import postcss from 'postcss';
 
-import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+import { dsName } from './lib/color/emit.mjs';
+import { RETIRED_LEGACY } from './lib/color/legacy-map.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const ELEVATION = path.join(REPO_ROOT, `${TOKEN_DIR}/_elevation.scss`);
 const MAPPING = path.join(REPO_ROOT, 'design-system/guidelines/figma/token-mapping.md');
 
-/**
- * Which table row each shadow role answers.
- *
- * The role is matched to a row by the row's own words rather than by position,
- * so re-ordering the table is not a failure and re-labeling it is.
- */
-const ROLES = [
-  { token: '--surface-raised-shadow', rowMatches: /cards/i },
-  { token: '--surface-overlay-shadow', rowMatches: /floating layers/i },
-];
-
-/** `Elevation Light/4 (modals) | var(--elevation-light-4)` → level per row. */
+/** `Elevation Light/4 (legacy) | var(--elevation-light-4)` → `{ level, uses, token }` per row. */
 export function mappingLevels(markdown) {
   const rows = [];
   for (const line of markdown.split('\n')) {
-    const match = /^\|\s*Elevation Light\/(\d)\s*\(([^)]*)\)\s*\|\s*`var\(--elevation-light-(\d)\)`/.exec(line.trim());
-    if (!match) continue;
-    // The row states the level twice — once as the Figma style, once as the
-    // CSS token. They disagreeing would be its own bug, so it is asserted here
-    // rather than silently preferring one.
-    assert.equal(match[1], match[3], `token-mapping.md row "${line.trim()}" names two different levels`);
-    rows.push({ level: Number(match[1]), uses: match[2] });
+    const match = /^\|\s*Elevation Light\/(\d)\s*\(([^)]*)\)\s*\|\s*`var\((--[a-z0-9-]+)\)`/.exec(line.trim());
+    if (match) rows.push({ level: Number(match[1]), uses: match[2], token: match[3] });
   }
   return rows;
 }
 
-/** `--surface-raised-shadow: var(--elevation-light-2);` → 2 */
-export function roleLevel(scss, token) {
-  const match = new RegExp(`^\\s*${token}:\\s*var\\(--elevation-light-(\\d)\\);`, 'm').exec(scss);
-  return match ? Number(match[1]) : null;
-}
-
-const scss = fs.readFileSync(ELEVATION, 'utf8');
 const rows = mappingLevels(fs.readFileSync(MAPPING, 'utf8'));
 
 test('the mapping table is still parseable', () => {
@@ -88,21 +66,16 @@ test('the mapping table is still parseable', () => {
   assert.equal(rows.length, 5, `expected 5 elevation rows in token-mapping.md, parsed ${rows.length}`);
 });
 
-for (const role of ROLES) {
-  test(`${role.token} points at the level the mapping table assigns`, () => {
-    const row = rows.find((r) => role.rowMatches.test(r.uses));
-    assert.ok(row, `no row in token-mapping.md matches ${role.rowMatches} — the table was relabeled`);
-
-    const actual = roleLevel(scss, role.token);
-    assert.ok(actual !== null, `${role.token} is not a var(--elevation-light-N) in _elevation.scss`);
-    assert.equal(
-      actual,
-      row.level,
-      `${role.token} points at --elevation-light-${actual}, but token-mapping.md assigns ` +
-        `Light/${row.level} to "${row.uses}". One of the two moved; both are source, so pick which.`,
-    );
-  });
-}
+test('a retired level maps to the shadow its uses moved to; a live level maps to itself', () => {
+  for (const row of rows) {
+    const legacy = `--elevation-light-${row.level}`;
+    const moved = RETIRED_LEGACY[legacy];
+    const expected = moved ? dsName(moved) : legacy;
+    assert.equal(row.token, expected, `token-mapping.md maps Light/${row.level} ("${row.uses}") to ${row.token}, not ${expected}`);
+  }
+  assert.equal(rows.find((r) => /cards/i.test(r.uses))?.token, '--ds-shadow-raised', 'the cards row');
+  assert.equal(rows.find((r) => /floating layers/i.test(r.uses))?.token, '--ds-shadow-overlay', 'the floating-layers row');
+});
 
 test('modals and the migrated layers take the overlay pair, not a Light level', () => {
   // Decision 3 of the color proposal: a modal sits at the overlay level, as
@@ -136,8 +109,7 @@ test('modals and the migrated layers take the overlay pair, not a Light level', 
  * layers on the new color tokens (menus and dropdowns, Listbox, Popover,
  * Tooltip, Toast) and modals take the overlay pair, `--ds-surface-overlay`
  * with `--ds-shadow-overlay`; the Frame's floating sidebar takes the overlay
- * shadow on the nav's sunken fill; a layer still on
- * legacy tokens takes Light/3 through the overlay role. A card is on the
+ * shadow on the nav's sunken fill. A card is on the
  * raised pair or lifts while a clickable card is hovered or dragged. Each row
  * is one surface and the shadow its rule must name; a rule that names another
  * level, or a literal shadow, fails.
@@ -200,11 +172,6 @@ for (const surface of SURFACES) {
 test("elevation.md's hierarchy table says the same steps", () => {
   const doc = fs.readFileSync(path.join(REPO_ROOT, 'design-system/guidelines/foundations/elevation.md'), 'utf8');
   const hierarchy = doc.slice(doc.indexOf('## Elevation Hierarchy'));
-  const levelOf = (words) => {
-    const row = hierarchy.split('\n').find((line) => line.startsWith('|') && words.test(line));
-    assert.ok(row, `elevation.md's hierarchy table has no row matching ${words}`);
-    return Number(/--elevation-light-(\d)/.exec(row)[1]);
-  };
   const rowOf = (words) => hierarchy.split('\n').find((line) => line.startsWith('|') && words.test(line));
   for (const layer of [/modals/i, /menus/i, /dropdowns/i, /listboxes/i, /popups/i, /tooltips/i, /flags/i, /floating sidebar/i]) {
     const row = rowOf(layer);
@@ -212,8 +179,7 @@ test("elevation.md's hierarchy table says the same steps", () => {
     assert.match(row, /--ds-surface-overlay/, `elevation.md does not put ${layer} on the overlay surface`);
     assert.match(row, /--ds-shadow-overlay/, `elevation.md does not put ${layer} on the overlay shadow`);
   }
-  assert.equal(levelOf(/still on legacy tokens/i), 3, 'elevation.md puts the legacy floating layers somewhere other than Light/3');
-  assert.equal(levelOf(/clickable cards on hover or drag/i), 2);
+  assert.match(rowOf(/clickable cards on hover or drag/i) ?? '', /--ds-shadow-raised/, 'elevation.md does not lift a clickable card with the raised shadow');
 });
 
 /**

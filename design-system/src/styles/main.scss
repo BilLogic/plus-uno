@@ -42,11 +42,6 @@
   @include meta.load-css("../tokens/color/semantic");
   @include meta.load-css("../tokens/color/elevation");
   @include meta.load-css("../tokens/color/bootstrap-bridge");
-  // Legacy names the migration map gives one target, pointed at the `--ds-*`
-  // token so untouched components follow the palette and the modes. Must follow
-  // the legacy token files above, so the alias wins; names that split by CSS
-  // property or by element keep their legacy value until the component sweep.
-  @include meta.load-css("../tokens/color/legacy-aliases");
   // The token ladder and motion (ADR-038, #1756): generated from
   // scripts/lib/tokens/plan.mjs, never from Figma. Each tier declares its own
   // values; the retired size, layout and role names are gone. Regenerate,
@@ -196,7 +191,7 @@ time {
 
 // Other Utility Classes
 .shadow-light-2 {
-    box-shadow: var(--elevation-light-2);
+    box-shadow: var(--ds-shadow-raised);
 }
 
 .border-none {

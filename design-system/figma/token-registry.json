@@ -24,9 +24,9 @@
       "On Surface Variant": "var(--color-on-surface-variant)",
       "Outline": "var(--color-outline)",
       "Outline Variant": "var(--color-outline-variant)",
-      "Focus / Focus Ring": "var(--color-focus-ring)",
-      "Focus / Focus Ring Inverse": "var(--color-focus-ring-inverse)",
-      "Element/opacity-disabled": "var(--color-disabled-opacity)",
+      "Focus / Focus Ring": "var(--ds-border-focused)",
+      "Focus / Focus Ring Inverse": "var(--ds-border-focused-inverse)",
+      "Element/opacity-disabled": "var(--ds-opacity-disabled)",
       "Surface roles/surface-default": "var(--color-surface-default)",
       "Surface roles/surface-sunken": "var(--color-surface-sunken)",
       "Surface roles/surface-raised": "var(--color-surface-raised)",
@@ -171,9 +171,9 @@
       "Size roles": "var(--size-icon-md)"
     },
     "elevation": {
-      "Elevation Light/1 (subtle)": "var(--elevation-light-1)",
-      "Elevation Light/2 (clickable cards on hover or drag)": "var(--elevation-light-2)",
-      "Elevation Light/3 (floating layers still on legacy tokens: Specs pages not yet swept)": "var(--elevation-light-3)",
+      "Elevation Light/1 (subtle)": "var(--ds-shadow-raised)",
+      "Elevation Light/2 (clickable cards on hover or drag)": "var(--ds-shadow-raised)",
+      "Elevation Light/3 (floating layers)": "var(--ds-shadow-overlay)",
       "Elevation Light/4 (legacy, unused)": "var(--elevation-light-4)",
       "Elevation Light/5 (dialogs)": "var(--elevation-light-5)",
       "Overlay surface (modals, menus, listboxes, popovers, tooltips, toasts, the floating sidebar)": "var(--ds-surface-overlay)",
@@ -197,8 +197,6 @@
       "Danger/Danger Icon": "var(--color-danger-icon)",
       "Danger/On Danger": "var(--color-on-danger)",
       "Danger/On Danger Container": "var(--color-on-danger-container)",
-      "Focus/Focus Ring": "var(--color-focus-ring)",
-      "Focus/Focus Ring Inverse": "var(--color-focus-ring-inverse)",
       "Info/Info": "var(--color-info)",
       "Info/Info (Text)": "var(--color-info-text)",
       "Info/Info Border": "var(--color-info-border)",
@@ -217,7 +215,6 @@
       "Primary/On Primary Container": "var(--color-on-primary-container)",
       "Primary/Primary": "var(--color-primary)",
       "Primary/Primary (Text)": "var(--color-primary-text)",
-      "Primary/Primary Border": "var(--color-primary-border)",
       "Primary/Primary Container": "var(--color-primary-container)",
       "Primary/Primary Icon": "var(--color-primary-icon)",
       "Relationship/On Relationship": "var(--color-on-relationship)",
@@ -271,9 +268,6 @@
       "Warning/Warning Icon": "var(--color-warning-icon)"
     },
     "colors / neutral": {
-      "Neutral Colors/Alternative/inverse-on-surface": "var(--color-inverse-on-surface)",
-      "Neutral Colors/Alternative/inverse-surface": "var(--color-inverse-surface)",
-      "Neutral Colors/Alternative/scrim": "var(--color-scrim)",
       "Neutral Colors/Alternative/surface-bright": "var(--color-surface-bright)",
       "Neutral Colors/Alternative/surface-dim": "var(--color-surface-dim)",
       "Neutral Colors/Alternative/surface-variant": "var(--color-surface-variant)",
@@ -1140,12 +1134,12 @@
     }
   },
   "validation": {
-    "scssTokenCount": 1480,
+    "scssTokenCount": 1468,
     "unknownTokens": [],
     "figmaVariableCoverage": {
       "total": 1019,
-      "resolved": 935,
-      "percent": 92,
+      "resolved": 929,
+      "percent": 91,
       "unresolved": [
         {
           "collection": "colors / accent",
@@ -1153,6 +1147,30 @@
           "tried": [
             "--color-content",
             "--color-content-content"
+          ]
+        },
+        {
+          "collection": "colors / accent",
+          "figmaVariable": "Focus/Focus Ring",
+          "tried": [
+            "--color-focus-ring",
+            "--color-focus-focus-ring"
+          ]
+        },
+        {
+          "collection": "colors / accent",
+          "figmaVariable": "Focus/Focus Ring Inverse",
+          "tried": [
+            "--color-focus-ring-inverse",
+            "--color-focus-focus-ring-inverse"
+          ]
+        },
+        {
+          "collection": "colors / accent",
+          "figmaVariable": "Primary/Primary Border",
+          "tried": [
+            "--color-primary-border",
+            "--color-primary-primary-border"
           ]
         },
         {
@@ -1194,6 +1212,30 @@
           "tried": [
             "--color-warning-bold-candidate-b",
             "--color-proposal-warning-bold-candidate-b"
+          ]
+        },
+        {
+          "collection": "colors / neutral",
+          "figmaVariable": "Neutral Colors/Alternative/inverse-on-surface",
+          "tried": [
+            "--color-inverse-on-surface",
+            "--color-neutral-colors-inverse-on-surface"
+          ]
+        },
+        {
+          "collection": "colors / neutral",
+          "figmaVariable": "Neutral Colors/Alternative/inverse-surface",
+          "tried": [
+            "--color-inverse-surface",
+            "--color-neutral-colors-inverse-surface"
+          ]
+        },
+        {
+          "collection": "colors / neutral",
+          "figmaVariable": "Neutral Colors/Alternative/scrim",
+          "tried": [
+            "--color-scrim",
+            "--color-neutral-colors-scrim"
           ]
         },
         {

@@ -77,6 +77,7 @@ import {
 } from '../design-system/src/lib/tokens.mjs';
 
 import { AA_TEXT, PAGE_TOKEN, tokenValues } from './button-contrast.mjs';
+import { colors } from './focus-ring.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '..');
@@ -220,7 +221,7 @@ export function findings(uses, values, { threshold = AA_TEXT } = {}) {
 }
 
 export function readValues(root = REPO_ROOT) {
-  return tokenValues(fs.readFileSync(path.join(root, TOKENS_FILE), 'utf8'));
+  return new Map([...colors(root), ...tokenValues(fs.readFileSync(path.join(root, TOKENS_FILE), 'utf8'))]);
 }
 
 /** Where a finding's ground came from, in words, from the origin `textDeclarations` gave it. */

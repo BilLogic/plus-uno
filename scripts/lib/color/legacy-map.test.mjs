@@ -1,5 +1,5 @@
-// The migration map: aliases only where a name has one target, every target
-// exists, the coverage scan catches an unmapped name, and the SCSS follows modes.
+// The migration map: retired only where a name had one target, every target
+// exists, and the coverage scan catches an unmapped name.
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
@@ -8,12 +8,12 @@ import { join } from 'node:path';
 
 import { buildPlan } from './build.mjs';
 import { composite } from './checks.mjs';
-import { ALIASES, PAIRS, ROWS, aliasScss, legacyCoverage, missingTargets, pairFailures, rowFor } from './legacy-map.mjs';
+import { PAIRS, RETIRED_LEGACY, ROWS, legacyCoverage, missingTargets, pairFailures, rowFor } from './legacy-map.mjs';
 import { contrast } from './oklch.mjs';
 
-test('every alias sits on the row that matches its name', () => {
+test('every retired name sits on the row that matches its name', () => {
   for (const row of ROWS) {
-    for (const legacy of Object.keys(row.aliases ?? {})) assert.equal(rowFor(legacy), row, legacy);
+    for (const legacy of Object.keys(row.retired ?? {})) assert.equal(rowFor(legacy), row, legacy);
   }
 });
 
@@ -34,9 +34,9 @@ function proposes(proposed, token) {
   });
 }
 
-test("every alias target is named in its row's proposal, so the aliases cannot drift from the map", () => {
+test("every retired name's target is named in its row's proposal, so the record cannot drift from the map", () => {
   for (const row of ROWS) {
-    for (const [legacy, token] of Object.entries(row.aliases ?? {})) assert.ok(proposes(row.proposed, token), `${legacy} -> ${token} is not in "${row.proposed}"`);
+    for (const [legacy, token] of Object.entries(row.retired ?? {})) assert.ok(proposes(row.proposed, token), `${legacy} -> ${token} is not in "${row.proposed}"`);
   }
 });
 
@@ -47,17 +47,17 @@ test('the proposal check rejects a target the row does not name', () => {
   assert.equal(proposes('color.border.bold (hover edge)', 'color.border'), false);
 });
 
-test('every alias target is a token both plans emit', () => {
+test('every retired name\'s target is a token both plans emit', () => {
   for (const key of ['A', 'B']) assert.deepEqual(missingTargets(buildPlan(key).semantics), [], `Plan ${key}`);
 });
 
 test('a missing target is reported', () => {
   const semantics = structuredClone(buildPlan('A').semantics);
   semantics.rows = semantics.rows.filter((r) => r.name !== 'color.blanket');
-  assert.deepEqual(missingTargets(semantics), ['--color-scrim aliases color.blanket, which the generator does not emit']);
+  assert.deepEqual(missingTargets(semantics), ['--color-scrim moved to color.blanket, which the generator does not emit']);
 });
 
-test('names that split by property and the hue families are not aliased', () => {
+test('names that split by property and the hue families are not retired', () => {
   for (const name of [
     '--color-primary', '--color-on-primary', '--color-outline-variant', '--color-surface', '--color-on-surface',
     '--color-danger-text', '--color-info',
@@ -65,17 +65,8 @@ test('names that split by property and the hue families are not aliased', () => 
     '--color-primary-text', '--color-secondary-text', '--color-primary-container', '--surface-sunken',
   ]) {
     assert.ok(rowFor(name), `${name} has a row`);
-    assert.equal(ALIASES[name], undefined, name);
+    assert.equal(RETIRED_LEGACY[name], undefined, name);
   }
-});
-
-test('the alias sheet resolves on :root and on any element carrying a mode', () => {
-  const css = aliasScss('// header\n');
-  assert.match(css, /^\/\/ header\n:root,\n\[data-color-mode\],\n\[data-contrast-mode\] \{\n/);
-  assert.match(css, /^ {2}--color-disabled-opacity: var\(--ds-opacity-disabled\);$/m);
-  assert.match(css, /^ {2}--surface-raised-shadow: var\(--ds-shadow-raised\);$/m);
-  assert.match(css, /^ {2}--elevation-light-3: var\(--ds-shadow-overlay\);$/m);
-  assert.doesNotMatch(css, /var\(--ds-[^)]*,/, 'no fallbacks');
 });
 
 test('coverage: the repo has a row for every in-use name', () => {
@@ -97,21 +88,21 @@ test('coverage: an unmapped name fails, an undefined one is listed apart, a test
   }
 });
 
-const pairs = (names, aliases) => pairFailures(names, buildPlan('A').semantics, contrast, composite, aliases);
+const pairs = (names, retired) => pairFailures(names, buildPlan('A').semantics, contrast, composite, retired);
 
-test('pairs: the repo aliases partners together or not at all, and passes 4.5:1 where it does', () => {
+test('pairs: the repo retires partners together or not at all, and passes 4.5:1 where it does', () => {
   assert.deepEqual(pairs(legacyCoverage().used.keys()), []);
   for (const key of ['A', 'B']) assert.deepEqual(pairFailures(legacyCoverage().used.keys(), buildPlan(key).semantics, contrast, composite), [], `Plan ${key}`);
 });
 
-test('pairs: brand text aliased alone, against the legacy primary container, fails before Storybook does', () => {
-  const failures = pairs(['--color-primary-text', '--color-primary-container'], { ...ALIASES, '--color-primary-text': 'color.text.brand' });
+test('pairs: brand text retired alone, against the legacy primary container, fails before Storybook does', () => {
+  const failures = pairs(['--color-primary-text', '--color-primary-container'], { ...RETIRED_LEGACY, '--color-primary-text': 'color.text.brand' });
   assert.equal(failures.length, 1);
-  assert.match(failures[0], /--color-primary-text aliased but --color-primary-container not/);
+  assert.match(failures[0], /--color-primary-text retired but --color-primary-container not/);
 });
 
-test('pairs: a fully aliased pair that loses contrast fails', () => {
-  const failures = pairs([], { ...ALIASES, '--color-inverse-on-surface': 'color.text.subtlest' });
+test('pairs: a fully retired pair that loses contrast fails', () => {
+  const failures = pairs([], { ...RETIRED_LEGACY, '--color-inverse-on-surface': 'color.text.subtlest' });
   assert.ok(failures.some((f) => /--color-inverse-on-surface on --color-inverse-surface is \d/.test(f)), failures.join('\n'));
 });
 
