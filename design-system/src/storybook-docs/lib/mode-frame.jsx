@@ -1,4 +1,5 @@
 import React from 'react';
+import { DocsCanvasShell } from '../ds-docs-layout.jsx';
 
 /**
  * A story shown in its own iframe at a fixed screen width, for docs pages that
@@ -76,5 +77,26 @@ export const ModeFrame = ({ storyId, width, height, title }) => {
         </div>
     );
 };
+
+/**
+ * One example of a layout-mode page: an h3 and a one-line description over a
+ * story drawn at a real screen width. The `ComponentExample` of a shell whose
+ * point is the width it is drawn at, which an inline canvas cannot show.
+ *
+ * @param {object} props
+ * @param {string} props.title  the mode or state the frame shows
+ * @param {React.ReactNode} [props.description]  in one sentence
+ * @param {string} props.storyId
+ * @param {number} props.width
+ * @param {number} props.height
+ */
+export const ModeExample = ({ title, description, storyId, width, height }) => (
+    <>
+        <h3>{title}</h3>
+        <DocsCanvasShell attachSourceBelow={false} description={description}>
+            <ModeFrame storyId={storyId} width={width} height={height} title={`${title}, ${width} wide`} />
+        </DocsCanvasShell>
+    </>
+);
 
 export default ModeFrame;

@@ -1,45 +1,24 @@
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PageStories from './Page.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Page, PatternCard } from '@/patterns';
+import { HeadingLevelContext } from '@/lib/headingLevel';
+import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={PageStories} />
 
-export const propRows = [
-    ['level', 'sunken | default | raised | overlay', 'default', 'The elevation level. It sets the fill and its shadow together.'],
-    ['padding', 'none | sm | md | lg', 'md', 'The padding scale. The medium step is the same pad as the frame\'s content box: 16 on every side, 24 from 1440.'],
-    ['radius', 'none | sm | md | lg', 'none', 'The corner radius scale.'],
-    ['border', 'boolean', 'false', 'A bold 2px border in --ds-border-bold. A bordered default Page draws it in place of the edge ring.'],
-    ['title', 'node', 'none', 'The page\'s title, rendered as its one h1 in Heading/large 24 above the content. Leave it unset when this Page is not a whole page.'],
-    ['as', 'element type', 'div', 'The element to render, for example main or section.'],
-    ['children', 'node', 'none', 'The content slot.'],
-];
-
-export const levels = [
-    ['sunken', '--ds-surface-sunken', 'none', 'The frame\'s backdrop.'],
-    ['default', '--ds-surface', 'an edge ring in --ds-border-surface', 'The page.'],
-    ['raised', '--ds-surface-raised', '--ds-shadow-raised', 'A card.'],
-    ['overlay', '--ds-surface-overlay', '--ds-shadow-overlay', 'Anything over the UI: a floating sidebar, a modal.'],
-];
-
-export const scales = [
-    ['sm', '16 top and bottom, 16 sides', '8'],
-    ['md', '16 on every side, 24 from 1440', '12'],
-    ['lg', '36 top and bottom, 36 sides', '16'],
-];
-
-export const tokens = [
-    ['--page-pad', '24', 'The medium padding, matching the Page\'s own pad.'],
-    ['--size-section-pad-y-sm, --size-section-pad-x-sm', '16, 16', 'The small padding.'],
-    ['--size-section-pad-y-lg, --size-section-pad-x-lg', '36, 36', 'The large padding.'],
-    ['--size-section-radius-sm, --size-section-radius-md', '8, 12', 'The small and medium radius.'],
-    ['--size-surface-radius', '16', 'The large radius.'],
-    ['--size-surface-border', '2', 'The width of the edge ring and of the bold border.'],
-    ['--page-stack-md', '24', 'The gap below the title.'],
-];
+export const backdrop = { padding: 'var(--page-pad)', backgroundColor: 'var(--ds-surface-sunken)' };
+export const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' };
 
 <Title>Page</Title>
-Page is the rounded content box of a page: a tokenized container with a fill, an elevation, a pad and a radius, and a slot for your content. A level is a fill and its shadow together, so a Page never wears one without the other. The frame draws its own content box the same way, and you can also use Page alone for any block that needs a level.
+Page is a tokenized container with a fill, an elevation, a pad and a radius, and a slot for your content. A level is a fill and its shadow together, so a Page never wears one without the other. The frame draws its own content box the same way, and you can also use Page alone for any block that needs a level.
 
 The examples on this page follow the **Color mode** switch in the toolbar. In dark, a level gets lighter as it rises.
 
@@ -52,148 +31,39 @@ The examples on this page follow the **Color mode** switch in the toolbar. In da
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>The default Page: <code>--ds-surface</code>, the medium padding (16, 24 from 1440), no shadow, edged by <code>--ds-border-surface</code>.</>}>
-    <Canvas of={PageStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={PageStories.Sunken} title="Sunken" description="The frame's backdrop: --ds-surface-sunken, with no shadow." />
 
-</div>
+<ComponentExample of={PageStories.DefaultLevel} title="Default" description="The page: --ds-surface, with no shadow, edged by --ds-border-surface." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={PageStories.Raised} title="Raised" description="A card: --ds-surface-raised with --ds-shadow-raised." />
 
-### When to use it
+<ComponentExample of={PageStories.Overlay} title="Overlay" description="Anything over the UI, such as a floating sidebar or a modal: --ds-surface-overlay with --ds-shadow-overlay." />
 
-Use Page for a block that needs a fill at one of the four levels.
-
-The frame draws its own content box with the same fill and edge, so a page does not place a Page inside it. For the page frame, use <a href="?path=/docs/patterns-frame-frame--docs">Frame</a>. For one object with a shape agreed, use **Card**, which is raised and ready to fill.
+<ComponentExample of={PageStories.Bordered} title="Bordered" description={<><code>border</code> draws a bold 2px border in <code>--ds-border-bold</code>, in place of the default level's edge ring.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Anatomy
+## Size and layout
 
-1. **Page** is the container. It carries the level's fill and shadow, the pad and the radius.
-2. **Title** is optional. A Page that holds a whole page can carry the page's one h1 above the content.
-3. **Content** is the slot. Sections go here.
+<ComponentExample of={PageStories.StepNone} title="None" description="No padding and no radius: the content runs to the edge." />
 
-In the frame, the content box is a 12-column grid with a 16 gutter, capped at 1232 (reading 864) and never under 720. Sections stack 16, 24 and 40. The <a href="?path=/docs/patterns-frame-frame--docs">Frame</a> page has the tokens.
-</div>
+<ComponentExample of={PageStories.StepSmall} title="Small" description="Padding 16 on every side and radius 8." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={PageStories.StepMedium} title="Medium" description="The frame's own pad, 24 on every side, and radius 12." />
 
-### Properties
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Prop</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>What it does</th>
-        </tr>
-    </thead>
-    <tbody>
-        {propRows.map((row) => (
-            <tr key={row[0]}>
-                <td><code>{row[0]}</code></td>
-                <td>{row[1]}</td>
-                <td>{row[2]}</td>
-                <td>{row[3]}</td>
-            </tr>
-        ))}
-    </tbody>
-</DocsTable>
-
-In Figma the Page part has one property, width, with the values content and reading. Code sets it on the frame.
+<ComponentExample of={PageStories.StepLarge} title="Large" description="Padding 36 on every side and radius 16." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Tokens
+## Behavior
 
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Level</th>
-            <th>Fill</th>
-            <th>Shadow</th>
-            <th>Use</th>
-        </tr>
-    </thead>
-    <tbody>
-        {levels.map((row) => (
-            <tr key={row[0]}>
-                <td><code>{row[0]}</code></td>
-                <td><code>{row[1]}</code></td>
-                <td>{row[2].startsWith('--') ? <code>{row[2]}</code> : row[2]}</td>
-                <td>{row[3]}</td>
-            </tr>
-        ))}
-    </tbody>
-</DocsTable>
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Step</th>
-            <th>Padding</th>
-            <th>Radius</th>
-        </tr>
-    </thead>
-    <tbody>
-        {scales.map((row) => (
-            <tr key={row[0]}>
-                <td><code>{row[0]}</code></td>
-                <td>{row[1]}</td>
-                <td>{row[2]}</td>
-            </tr>
-        ))}
-    </tbody>
-</DocsTable>
-
-These are the tokens the code binds for Page today. The medium padding is the frame's own <code>--page-pad</code> (24 at every width). The frame also uses <code>--page-radius</code> (8), which the Frame page lists.
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Token</th>
-            <th>Value</th>
-            <th>Purpose</th>
-        </tr>
-    </thead>
-    <tbody>
-        {tokens.map((row) => (
-            <tr key={row[0]}>
-                <td><code>{row[0]}</code></td>
-                <td>{row[1]}</td>
-                <td>{row[2]}</td>
-            </tr>
-        ))}
-    </tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Variants and states
-
-#### Elevation levels
-
-The four levels run lowest to highest: sunken, default, raised and overlay. Each pairs its fill with its shadow.
-
-<DocsCanvasShell description={<>Each level on the frame's sunken backdrop, labeled with its fill and shadow.</>}>
-    <DsCanvasQuiet of={PageStories.Levels} />
-</DocsCanvasShell>
-
-#### Padding and radius
-
-<DocsCanvasShell description={<>The small, medium and large steps of padding and radius on a default Page.</>}>
-    <DsCanvasQuiet of={PageStories.Scales} />
-</DocsCanvasShell>
+<ComponentExample of={PageStories.WithTitle} title="Title" description={<><code>title</code> renders the page's one h1 above the content, for a Page that holds a whole page.</>} />
 
 A Page has no interactive states. Hover, pressed and selected belong to the controls placed on it.
 
@@ -201,18 +71,7 @@ A Page has no interactive states. Hover, pressed and selected belong to the cont
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
-
-- A Page has no role of its own. Use <code>as="main"</code> for the page's content box and <code>as="section"</code> for a labeled block.
-- Pass <code>title</code> on the page's own Page only. It renders the page's one h1, and Sections inside it open at h2.
-- Text on a Page uses <code>--ds-text</code> at every level, in every color mode.
-- In light increased contrast the default Page draws its edge ring, so it stays distinct from the frame behind it.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={PageStories.Interactive}
@@ -228,7 +87,131 @@ A Page has no interactive states. Hover, pressed and selected belong to the cont
 
 <div className="sb-ds-doc-section">
 
-### Related
+## Usage
+
+Use Page for a block that needs a fill at one of the four levels. The frame draws its own content box with the same fill and edge, so a page does not place a Page inside it. For the page frame, use <a href="?path=/docs/patterns-frame-frame--docs">Frame</a>.
+
+### Level guidance
+
+<DocsTable>
+<thead>
+<tr><th>Level</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Sunken</td><td>The frame's backdrop, behind everything else.</td></tr>
+<tr><td>Default</td><td>The page.</td></tr>
+<tr><td>Raised</td><td>A card. For one object with a shape agreed, use Card itself.</td></tr>
+<tr><td>Overlay</td><td>Anything over the UI: a floating sidebar, a modal.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Page.** The container. It carries the level's fill and shadow, the pad and the radius.
+2. **Title** (optional). A Page that holds a whole page can carry the page's one h1, at Heading/large 24, above the content.
+3. **Content.** The slot. Sections go here.
+
+In the frame, the content box is a 12-column grid with a 16 gutter, capped at 1232 (reading 864) and never under 720. In Figma the Page part has one property, width, with the values content and reading; code sets it on the Frame.
+
+### States
+
+A Page has no states of its own: it does not respond to hover, press or focus, and it is never disabled.
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Fill and shadow: sunken</td><td><code>--ds-surface-sunken</code>, no shadow.</td></tr>
+<tr><td>Fill and edge: default</td><td><code>--ds-surface</code>, edged by <code>--ds-border-surface</code> at <code>--size-surface-border</code>.</td></tr>
+<tr><td>Fill and shadow: raised</td><td><code>--ds-surface-raised</code>, <code>--ds-shadow-raised</code>.</td></tr>
+<tr><td>Fill and shadow: overlay</td><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>.</td></tr>
+<tr><td>Text</td><td><code>--ds-text</code> at every level.</td></tr>
+<tr><td>Padding</td><td>sm: <code>--size-section-pad-y-sm</code> and <code>--size-section-pad-x-sm</code> (16). md: <code>--page-pad</code> (24). lg: <code>--size-section-pad-y-lg</code> and <code>--size-section-pad-x-lg</code> (36).</td></tr>
+<tr><td>Radius</td><td>sm: <code>--size-section-radius-sm</code> (8). md: <code>--size-section-radius-md</code> (12). lg: <code>--size-surface-radius</code> (16).</td></tr>
+<tr><td>Border</td><td><code>--size-surface-border</code> (2) in <code>--ds-border-bold</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Keep the Page pad on every side.
+
+Content stays 24 from the edge, so nothing touches the chrome.
+
+<DoDontPair
+    doExample={<div style={backdrop}><Page padding="md">{slotContent('Section')}</Page></div>}
+    doCaption="Keep the Page pad on all sides."
+    dontExample={<div style={backdrop}><Page padding="none">{slotContent('Section')}</Page></div>}
+    dontCaption="Run content to the Page edge."
+/>
+
+### Put sections in the content column.
+
+Sections stack inside the column and share its width.
+
+<DoDontPair
+    doExample={<div style={backdrop}><Page padding="md"><div style={stack}>{slotContent('Section')}{slotContent('Section')}</div></Page></div>}
+    doCaption="Stack sections in one column."
+    dontExample={<div style={backdrop}><Page padding="md"><Page padding="md" border>{slotContent('Section')}</Page></Page></div>}
+    dontCaption="Nest a Page inside a Page."
+/>
+
+### Match the width to the content.
+
+Use the reading width for prose and the content width for grids and tables. A Page takes its width from where it sits, so set it on the Frame: `width="reading"`.
+
+### Use Card for one object.
+
+<DoDontPair
+    doExample={<div style={backdrop}><HeadingLevelContext.Provider value={4}><PatternCard title="Next session" padding="sm">{slotContent('Thursday · 4:30 PM')}</PatternCard></HeadingLevelContext.Provider></div>}
+    doCaption="A Card, raised and ready to fill, with its title in the header."
+    dontExample={<div style={backdrop}><Page level="raised" padding="sm" radius="md"><p style={{ margin: 0, font: 'var(--body-default)' }}>Next session</p>{slotContent('Thursday · 4:30 PM')}</Page></div>}
+    dontCaption="A raised Page with a hand-made title drifts from the Card pattern."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Title a whole page with what it holds, in sentence case: "Sessions".</td><td>Title case, or a title on a Page that is only a block.</td></tr>
+<tr><td>Fill the content slot with Sections.</td><td>Loose text and controls straight in the Page.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- A Page has no role of its own. Use `as="main"` for the page's content box and `as="section"` for a labeled block.
+- Pass `title` on the page's own Page only. It renders the page's one h1, and Sections inside it open at h2.
+- Text on a Page uses `--ds-text` at every level, in every color mode.
+- In light increased contrast the default Page draws its edge ring, so it stays distinct from the frame behind it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
 
 - <a href="?path=/docs/patterns-section-card--docs">Card</a> for a content box with a shape already agreed: pad, radius and slots.
 - <a href="?path=/docs/foundations-elevation--docs">Elevation</a> for which shadow goes with which level.

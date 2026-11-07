@@ -627,6 +627,13 @@ export const SidebarFloating = {
     },
 };
 
+/* ------------------------------------------------------------- docs */
+
+/** The playground: a live Sidebar whose view, open tabs and counts follow the table. */
+export const Interactive = {
+    args: { view: 'supervisor', tabSet: 'few', activeId: 'sessions', modulesLeft: 0, lessonsLeft: 0 },
+};
+
 /* ------------------------------------------------------------- color modes */
 
 /** Light: every part on its light token. */

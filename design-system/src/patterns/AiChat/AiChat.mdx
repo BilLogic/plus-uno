@@ -1,7 +1,14 @@
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as AiChatStories from './AiChat.stories.jsx';
-import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { AiMessage, PromptInput } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={AiChatStories} />
 
@@ -18,48 +25,58 @@ The examples on this page follow the **Color mode** switch in the toolbar.
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>Chat closed: the floating action button at the bottom right of the Page.</>}>
-    <Canvas of={AiChatStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={AiChatStories.Overview} title="App" description="Chat closed: the floating action button at the bottom right of the Page." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Modes
-
-1. **Popup** is the default. It opens anchored to the button, over the Page.
-2. **Panel** docks beside the Page, or opens over it on a Blanket when there is no room. The Frame decides.
-3. **Full screen** covers the window.
-
-Under 768 the popup is shown full screen.
-
-<DocsCanvasShell attachSourceBelow description={<>The popup, open.</>}>
-    <Canvas of={AiChatStories.Popup} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-<DocsCanvasShell attachSourceBelow description={<>The same chat in the Panel.</>}>
-    <Canvas of={AiChatStories.PanelMode} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={AiChatStories.StorybookVariant} title="Storybook" description={<><code>variant="storybook"</code> is the chat in these docs: clear chat, move to Panel and close, with no full screen and no more menu.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Behavior
+## Behavior
 
-- **The button is the one way in.** It hides while chat is open in the Panel or full screen, and returns when chat closes.
-- **Header controls** are clear chat, switch mode (popup and Panel trade places), full screen, more and close.
-- **The conversation moves with the mode.** There is no history: clearing chat empties it.
-- **The mode is remembered for the tab.** A Panel left open comes back open. A popup or full screen comes back closed, and the button opens it in the remembered mode.
+<ComponentExample of={AiChatStories.Popup} title="Popup" description="The default mode: the popup opens anchored to the button, over the Page." />
+
+<ComponentExample of={AiChatStories.PanelMode} title="Panel" description="The same chat docked beside the Page, or over it on a Blanket when there is no room." />
+
+Full screen covers the window, so it is not drawn inline here. Under 768 the popup is shown full screen. How a reply carries the AI icon, its sources and its thumbs is under Best practices.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Identity and trust
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={AiChatStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+AI chat is the one way to ask AI about the page in front of you. Pick the mode for the size of the ask.
+
+<DocsTable>
+<thead>
+<tr><th>Mode</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Popup</td><td>The default. A quick ask that keeps the page in view.</td></tr>
+<tr><td>Panel</td><td>Ongoing work beside the page. The Frame docks it, or opens it over the Page on a Blanket when there is no room.</td></tr>
+<tr><td>Full screen</td><td>Long answers that need room. It covers the window.</td></tr>
+</tbody>
+</DocsTable>
 
 AI chat applies the six AI rules from the AI overview.
 
@@ -70,31 +87,147 @@ AI chat applies the six AI rules from the AI overview.
 5. **People confirm actions.** The chat proposes changes; anything that changes data waits for the person's confirm.
 6. **Feedback on every answer.** Each reply offers thumbs up and thumbs down, and `onFeedback` receives the reply with its rating. The rating stays on the reply as chat moves between modes.
 
-<DocsCanvasShell attachSourceBelow description={<>A reply with the AI icon, and the fallibility line under the prompt input.</>}>
-    <Canvas of={AiChatStories.TrustMarks} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Sources
-
-<DocsCanvasShell attachSourceBelow description={<>A reply that drew on records, with its sources under it.</>}>
-    <Canvas of={AiChatStories.RepliesWithSources} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ### Storybook variant
 
-`variant="storybook"` is the chat in the Storybook docs. Its header shows clear chat, move to Panel and close, with no full screen and no more menu. The docs' floating button opens it through its AI agent action, so the chat's own button is left out with `launcher={false}`: the popup floats above the bottom right corner instead. `respond` may return `{ text, sources }`, and the sources list under the answer, opening in `linkTarget`. The docs' answerer calls a server-side function that answers from the design-system index and holds the credentials, so none reaches the browser; when it errors or is rate limited, the chat searches the site's pages and the component index instead and says so.
+`variant="storybook"` is the chat in the Storybook docs. The docs' floating button opens it through its AI agent action, so the chat's own button is left out with `launcher={false}`: the popup floats above the bottom right corner instead. `respond` may return `{ text, sources }`, and the sources list under the answer, opening in `linkTarget`. The docs' answerer calls a server-side function that answers from the design-system index and holds the credentials, so none reaches the browser; when it errors or is rate limited, the chat searches the site's pages and the component index instead and says so.
 
-<DocsCanvasShell attachSourceBelow description={<>The Storybook variant.</>}>
-    <Canvas of={AiChatStories.StorybookVariant} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Button.** A primary circle Icon button with the AI icon, at the bottom right of the Page. It is the one way in, and it hides while chat is open in the Panel or full screen.
+2. **Header.** The AI icon, the title and the controls: clear chat, switch mode (popup and Panel trade places), full screen, more and close. The Storybook variant carries clear chat, move to Panel and close.
+3. **Conversation.** The person's messages on the sunken fill, and each reply as an AI message with its sources and thumbs.
+4. **Prompt starters** (optional). Offered while the conversation is empty, from `starters`.
+5. **Prompt input.** Where the person writes. While a reply is coming, its send button becomes Stop.
+6. **Fallibility line.** One line under the prompt input.
+
+The same surface fills every mode; the mode only changes which header controls show and where the surface sits.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Closed</td><td>Only the button shows.</td></tr>
+<tr><td>Popup</td><td>The popup opens anchored to the button, over the Page. The button stays.</td></tr>
+<tr><td>Panel</td><td>Chat docks in the Frame's Panel, or opens over the Page on a Blanket. The button hides.</td></tr>
+<tr><td>Full screen</td><td>Chat covers the window, in a column capped at the reading width. The button hides.</td></tr>
+<tr><td>Replying</td><td>A typing indicator stands in for the reply, and the prompt input's send button becomes Stop.</td></tr>
+</tbody>
+</DocsTable>
+
+Hover, pressed, focus and disabled belong to the Icon buttons in the header and the button, and are described on the Icon button page. Clear chat is disabled while the conversation is empty.
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Button</td><td><code>--height-300</code> square, <code>--page-pad</code> from the Page's bottom and right edges, <code>--ds-shadow-overlay</code>.</td></tr>
+<tr><td>Popup</td><td>Twice <code>--height-2000</code> wide and high; without the button it floats <code>--stack-md</code> above where the button would be.</td></tr>
+<tr><td>Floating popup fill</td><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>, <code>--popover-radius</code>.</td></tr>
+<tr><td>Full screen</td><td><code>--ds-surface</code>, on <code>--layer-dialog</code>; the conversation is capped at <code>--content-max-width-reading</code>.</td></tr>
+<tr><td>Conversation</td><td><code>--stack-md</code> between messages, <code>--body-default</code> in <code>--ds-text</code>.</td></tr>
+<tr><td>The person's message</td><td><code>--ds-surface-sunken</code>, <code>--pad-y-sm</code> by <code>--pad-x-md</code>, <code>--radius-md</code>.</td></tr>
+<tr><td>Empty state and fallibility line</td><td><code>--ds-text-subtle</code>; the line at <code>--body-small</code>.</td></tr>
+<tr><td>Footer</td><td><code>--stack-sm</code> between the starters, the input and the line.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Use the popup for quick asks.
+
+A popup keeps the page in view. For ongoing work it covers the page and loses context: move it to the Panel.
+
+### Use the Panel beside the page.
+
+The Panel docks next to the work. For a quick ask it takes more room than the question needs.
+
+### Use full screen for long work.
+
+Full screen gives long answers room. A docked Panel squeezes them.
+
+### Mark every answer.
+
+<DoDontPair
+    doExample={<AiMessage text="Ava attended 12 of 14 sessions this term." />}
+    doCaption="Each reply is an AI message, led by the AI icon."
+    dontExample={<p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>Ava attended 12 of 14 sessions this term.</p>}
+    dontCaption="A reply in plain text reads as a person's."
+/>
+
+### Say fallibility once.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><AiMessage text="Ava attended 12 of 14 sessions." /><AiMessage text="Her next session is Thursday at 4:00 PM." /><PromptInput label="Message to AI chat (do example)" placeholder="Ask anything" /><p style={{ margin: 0, font: 'var(--body-small)', color: 'var(--ds-text-subtle)', textAlign: 'center' }}>AI can make mistakes. Check important info.</p></div>}
+    doCaption="One line, under the prompt input."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><AiMessage text="Ava attended 12 of 14 sessions." /><p style={{ margin: 0, font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>AI can make mistakes. Check important info.</p><AiMessage text="Her next session is Thursday at 4:00 PM." /><p style={{ margin: 0, font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>AI can make mistakes. Check important info.</p><PromptInput label="Message to AI chat (don't example)" placeholder="Ask anything" /></div>}
+    dontCaption="The line repeated under every reply turns into noise."
+/>
+
+### List the sources an answer drew on.
+
+<DoDontPair
+    doExample={<div className="sb-unstyled"><AiMessage text="Ava attended 12 of 14 sessions this term." sources={[{ title: 'Attendance report', href: '#report-attendance', type: 'Report' }, { title: 'Ava Thompson', href: '#student-ava', type: 'Student' }]} /></div>}
+    doCaption="The records the answer read, listed under it."
+    dontExample={<AiMessage text="Ava attended 12 of 14 sessions this term." />}
+    dontCaption="An answer from records with nothing to check it against."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Call it AI chat, with the AI icon.</td><td>A persona name or an avatar.</td></tr>
+<tr><td>Short starters that say what they ask: "Summarize this page".</td><td>Starters that are whole paragraphs.</td></tr>
+<tr><td>Say "AI can make mistakes. Check important info." once, under the prompt input.</td><td>A warning on each message.</td></tr>
+<tr><td>Name a source by its record: "Session notes, Oct 24".</td><td>Bare links or ids.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- The button is named by `title`, AI chat by default, and so is the Panel's complementary landmark unless `panelLabel` names it.
+- The conversation is a log that announces new messages politely.
+- Every reply carries one AI icon named "AI", so no answer reads as a person's to a screen reader.
+- The thumbs are a group named "Rate this answer". A rated thumb is pressed, and a status line confirms the rating.
+- The popup without the button (`launcher={false}`) takes focus in its prompt input on open, and Escape closes it.
+- Full screen is a dialog named by `title`, and focus moves into it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a href="?path=/docs/patterns-frame-frame--docs">Frame</a> places the Panel the chat docks in.
+- <a href="?path=/docs/patterns-overlays-blanket--docs">Blanket</a> sits under the Panel when it opens over the Page.
+- For one reply on its own, use `AiMessage`.
+- For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.
+
 
 </div>
 
