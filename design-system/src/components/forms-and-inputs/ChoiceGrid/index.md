@@ -20,8 +20,8 @@ Each cell is the real Checkbox or Radio, named by its row and its column.
 | `id` | string | — | — |
 | `name` | string | — | — |
 | `type` | enum | `'radio'` | Type of selection: radio (single) or checkbox (multiple) |
-| `rows` | arrayOf or shape or string or number or node | `[]` | — |
-| `columns` | arrayOf or shape or string or number or node | `[]` | — |
+| `rows` | arrayOf (required) | `[]` | — |
+| `columns` | arrayOf (required) | `[]` | — |
 | `values` | object | `{}` | Radio: `{ rowId: columnId }`. Checkbox: `{ rowId: { columnId: boolean } }`. |
 | `isDisabled` | bool | `false` | Disable the choice grid |
 | `isReadOnly` | bool | `false` | Shown and focusable, not changeable. |

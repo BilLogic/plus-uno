@@ -20,8 +20,8 @@
 | `label` | node | — | The visible label above the field. Without one, pass `aria-label` or `aria-labelledby`. |
 | `caption` | node | — | Help under the field. With `isInvalid`, `errorMessage` takes its place and is announced. |
 | `info` | node | — | Text for the info tooltip beside the label. |
-| `value` | arrayOf or string or number | `NO_PATH` | — |
-| `options` | arrayOf or string or shape or number or array or bool | `[]` | — |
+| `value` | arrayOf | `NO_PATH` | — |
+| `options` | arrayOf | `[]` | — |
 | `onChange` | func | — | — |
 | `placeholder` | string | `'Please select'` | Placeholder text when no options are available |
 | `spacing` | enum | `'default'` | `default` draws 40 and `compact` draws 32. |

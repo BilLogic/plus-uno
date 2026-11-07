@@ -24,7 +24,7 @@ Notion's multi-select. Focusing the field opens a list of the options. Typing fi
 | `info` | node | — | Text for an info tooltip beside the label. |
 | `caption` | node | — | Standing help under the field. A validation message takes its place. |
 | `placeholder` | string | `'Select or create a tag'` | Shown in the entry while there are no tags. |
-| `options` | arrayOf or string or shape or oneOf | `[]` | The options the list offers: strings, or objects with `value`, `label` (or `text`) and a Tag `color`. Required; the caller owns the list and adds what `onCreate` reports to it. |
+| `options` | arrayOf (required) | `[]` | The options the list offers: strings, or objects with `value`, `label` (or `text`) and a Tag `color`. Required; the caller owns the list and adds what `onCreate` reports to it. |
 | `tags` | arrayOf | — | The picked tags, controlled. Pass `onChange` with it. |
 | `defaultTags` | arrayOf | `[]` | The picked tags at first, uncontrolled. |
 | `spacing` | enum | `'default'` | `default` draws a 40 field and `compact` a 32 one. |

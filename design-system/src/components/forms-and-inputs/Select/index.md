@@ -49,7 +49,7 @@ internal `Listbox` under it. - **The field is the combobox.** Focus stays in it,
 | `clearable` | bool | — | Shows the clear ×. Unset, it is on with `isMulti` and `!isRequired` otherwise. |
 | `selectAll` | bool | `false` | With `isMulti`: a "Select all" button over the list, hidden past 50 matches. |
 | `maxSelections` | number | — | With `isMulti`: the most values; past it the other rows are disabled and the list says why. |
-| `dependsOn` | shape or arrayOf or string | — | The field this one depends on: `{ value, label }`. Until `value` is set the field is disabled with "Choose {label} first"; when it changes, this field clears. |
+| `dependsOn` | shape | — | The field this one depends on: `{ value, label }`. Until `value` is set the field is disabled with "Choose {label} first"; when it changes, this field clears. |
 | `isLoading` | bool | `false` | The options are on their way: the list shows a loading row. |
 | `loadOptions` | func | — | `(text, { offset, limit })` → `Promise<{ options, total }>`. Options load as the list opens, as you type and as you scroll, 50 at a time. |
 | `recent` | arrayOf | — | Ids shown under "Recent" before typing, in a list of more than 50. |

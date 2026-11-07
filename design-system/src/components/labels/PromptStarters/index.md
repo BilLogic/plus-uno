@@ -17,7 +17,7 @@ A few things a person could ask PLUS AI, as a wrapping row of prompt `Suggestion
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `starters` | arrayOf or shape or string or number | `[]` | What to offer: `id` for the key, `label` on the chip, `text` for the prompt it stands for. |
+| `starters` | arrayOf (required) | `[]` | What to offer: `id` for the key, `label` on the chip, `text` for the prompt it stands for. |
 | `onSelect` | func | — | Called with the starter that was pressed. It never sends anything itself. |
 | `label` | string (required) | — | The group's accessible name, such as "Suggested prompts". |
 | `className` | string | `''` | — |
