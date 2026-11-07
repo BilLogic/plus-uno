@@ -63,3 +63,21 @@ node scripts/eval-ds-usage.mjs summary --since 2026-11-06
 prints, per arm: escapes per run, escapes by rule, the trap pass rate, the layout-formula rate, mean turns and minutes. Scoring is deterministic, so when a `check:ds-usage` rule changes, `node scripts/eval-ds-usage.mjs rescore` recomputes every row's escapes from its kept build with this checkout's rules and stamps the row's `scored_at`; the agent fields stay as recorded.
 
 Compare arms within one model, one `judge_sha` and one `scenarios_sha`. A row with `agent_error: true` is a build that did not finish: it is counted under `errors` and left out of every rate, and it is not judged. A judge that returns no JSON sets `judge.judge_error`.
+
+## Baseline (2026-11-07)
+
+24 runs on `sonnet`, harness at main `59481616c`, scored at the commit in each row's `scored_at`. No run errored, and no run reached the checkout.
+
+| | control | current |
+|---|---|---|
+| Escapes per run | 9.75 | 9.33 |
+| Raw literals | 70 | 49 |
+| Primitive reads | 33 | 62 |
+| Deep imports | 6 | 0 |
+| Unknown tokens | 3 | 0 |
+| Unknown props or values | 5 | 1 |
+| Trap task, gap named | 2/2 | 2/2 |
+| Layout formula used | 1/9 | 2/11 |
+| Mean turns / minutes | 17.6 / 1.2 | 20.7 / 1.3 |
+
+Read: the harness as on main barely moves the total. It removes deep imports, unknown tokens and most unknown props, and trades raw literals for primitive reads: agents with the harness reach for tokens, but at the primitive tier. Two runs per cell is enough to see direction, not to rank small differences.
