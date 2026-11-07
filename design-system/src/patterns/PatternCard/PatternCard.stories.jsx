@@ -7,78 +7,11 @@ import PatternCard from '@/patterns/PatternCard';
 import { Skeleton, Button, IconButton } from '@/components';
 import { CardJobs } from './PatternCardCases.jsx';
 
-const cardCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
-
 const bodyCopy = (
     <p className="body1-txt" style={{ margin: 0 }}>
         Some quick example text to fill the body slot of the card shell.
     </p>
 );
-
-/** Slot combinations — docs section only */
-function PatternCardSlotsDemos() {
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BODY ONLY</span>
-                <PatternCard>{bodyCopy}</PatternCard>
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">HEADER + BODY</span>
-                <PatternCard title="Card title" description="A line that says what the card holds.">
-                    {bodyCopy}
-                </PatternCard>
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">HEADER + BODY + FOOTER</span>
-                <PatternCard
-                    title="Card title"
-                    actions={<span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>Actions slot</span>}
-                    footer={<span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>Footer slot</span>}
-                >
-                    {bodyCopy}
-                </PatternCard>
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CUSTOM HEADER</span>
-                <PatternCard header={<span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>Custom header slot: tabs or a toolbar</span>}>
-                    {bodyCopy}
-                </PatternCard>
-            </div>
-        </div>
-    );
-}
-
-/** Padding and width constraints */
-function PatternCardConstraintsDemos() {
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">PADDING SCALE</span>
-                <div style={cardCol}>
-                    {['sm', 'md', 'lg'].map((padding) => (
-                        <PatternCard key={padding} padding={padding}>
-                            <span className="body1-txt">{`padding="${padding}"`}</span>
-                        </PatternCard>
-                    ))}
-                </div>
-            </div>
-            <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MIN WIDTH</span>
-                <div style={{ display: 'flex', gap: '24px', flexWrap: 'wrap' }}>
-                    <PatternCard minWidth={280}>
-                        <span className="body1-txt">minWidth 280px</span>
-                    </PatternCard>
-                    <PatternCard minWidth="360px">
-                        <span className="body1-txt">minWidth 360px</span>
-                    </PatternCard>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-const CARD_SIZES = ['sm', 'md', 'lg'];
 
 const DemoCaption = ({ children }) => (
     <span
@@ -93,35 +26,11 @@ const DemoCaption = ({ children }) => (
     </span>
 );
 
-const wrapRow = { display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap', alignItems: 'flex-start' };
-
 const sessionBody = (
     <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Last note: practice set 4 assigned</p>
 );
 
 const viewSession = <Button text="View session" appearance="subtle" spacing="compact" onClick={() => {}} />;
-
-/** The three sizes: each sets the pad, the radius and the minimum width together. */
-function PatternCardSizesDemo() {
-    return (
-        <div style={wrapRow}>
-            {CARD_SIZES.map((size) => (
-                <div key={size}>
-                    <DemoCaption>{`size=${size}`}</DemoCaption>
-                    <PatternCard
-                        padding={size}
-                        minWidth={`var(--card-min-width-${size})`}
-                        title="Ana Ruiz"
-                        description="Algebra I · Thu 4:00 PM"
-                        footer={viewSession}
-                    >
-                        {sessionBody}
-                    </PatternCard>
-                </div>
-            ))}
-        </div>
-    );
-}
 
 const imagePlaceholder = (ratio) => (
     <div
@@ -140,50 +49,6 @@ const imagePlaceholder = (ratio) => (
         {ratio}
     </div>
 );
-
-/** The image slot at each ratio, edge to edge above the padded content. */
-function PatternCardImageDemo() {
-    return (
-        <div style={wrapRow}>
-            {['16:9', '4:3', '1:1'].map((ratio) => (
-                <PatternCard
-                    key={ratio}
-                    image={imagePlaceholder(ratio)}
-                    title="Ana Ruiz"
-                    description="Algebra I · Thu 4:00 PM"
-                    style={{ width: 'var(--card-min-width-md)' }}
-                >
-                    {sessionBody}
-                </PatternCard>
-            ))}
-        </div>
-    );
-}
-
-/** A loading card: text bars at the text line heights, in a card kept at its final size. */
-function PatternCardLoadingDemo() {
-    return (
-        <div style={wrapRow}>
-            <div>
-                <DemoCaption>Default</DemoCaption>
-                <PatternCard title="Ana Ruiz" description="Algebra I · Thu 4:00 PM" footer={viewSession} style={{ width: 'var(--card-min-width-md)' }}>
-                    {sessionBody}
-                </PatternCard>
-            </div>
-            <div>
-                <DemoCaption>Loading</DemoCaption>
-                <PatternCard aria-busy="true" style={{ width: 'var(--card-min-width-md)' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
-                        <Skeleton shape="text" width="50%" />
-                        <Skeleton shape="text" width="75%" />
-                        <Skeleton shape="text" width="100%" />
-                        <Skeleton shape="text" width="40%" />
-                    </div>
-                </PatternCard>
-            </div>
-        </div>
-    );
-}
 
 /** A row of cards at three content widths: the most that keeps each card at its minimum. */
 function PatternCardRowsDemo() {
@@ -230,49 +95,40 @@ export default {
         style: { table: { disable: true } },
         title: {
             control: 'text',
-            description: 'Card title, in the card title type',
             table: { category: 'Content' },
         },
         description: {
             control: 'text',
-            description: 'Description under the title',
             table: { category: 'Content' },
         },
         actions: {
             control: 'text',
-            description: 'Actions at the end of the header row',
             table: { category: 'Slots' },
         },
         header: {
             control: 'text',
-            description: 'Custom header that replaces title, description and actions',
             table: { category: 'Slots' },
         },
         image: {
             control: false,
-            description: 'Image slot above the content',
             table: { category: 'Slots' },
         },
         footer: {
             control: 'text',
-            description: 'Footer slot',
             table: { category: 'Slots' },
         },
         padding: {
             control: 'select',
             options: ['sm', 'md', 'lg'],
-            description: 'Card padding scale',
             table: { category: 'Design' },
         },
         gap: {
             control: 'select',
             options: ['sm', 'md', 'lg'],
-            description: 'Header-to-body stack',
             table: { category: 'Design' },
         },
         minWidth: {
             control: 'text',
-            description: 'Minimum width constraint',
             table: { category: 'Design' },
         },
         id: {
@@ -287,22 +143,10 @@ export default {
 };
 
 export const Overview = () => (
-    <div style={{ maxWidth: '400px', width: '100%' }}>
+    <div style={{ maxWidth: 'var(--card-min-width-lg)', width: '100%' }}>
         <PatternCard title="Card title" description="A line that says what the card holds.">
             {bodyCopy}
         </PatternCard>
-    </div>
-);
-
-export const Slots = () => (
-    <div style={cardCol}>
-        <PatternCardSlotsDemos />
-    </div>
-);
-
-export const Constraints = () => (
-    <div style={cardCol}>
-        <PatternCardConstraintsDemos />
     </div>
 );
 
@@ -387,15 +231,6 @@ export const Elevation = {
     },
 };
 
-/** A static card, a clickable card and a dragged card, for the docs page. */
-export const ElevationStates = () => (
-    <div style={{ display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap' }}>
-        <PatternCard title="Static" minWidth="var(--card-min-width-sm)">{bodyCopy}</PatternCard>
-        <PatternCard title="Clickable" minWidth="var(--card-min-width-sm)" role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
-        <PatternCard title="Dragging" minWidth="var(--card-min-width-sm)" dragging>{bodyCopy}</PatternCard>
-    </div>
-);
-
 /** Every part of a card: image, header with actions, body and footer. */
 export const Anatomy = () => (
     <div style={{ maxWidth: 'var(--card-min-width-md)' }}>
@@ -411,13 +246,93 @@ export const Anatomy = () => (
     </div>
 );
 
-export const Sizes = () => <PatternCardSizesDemo />;
-
 export const Jobs = () => <CardJobs />;
 
-export const ImageRatios = () => <PatternCardImageDemo />;
+/** One size per story: the pad, the radius and the minimum width move together. */
+const sizedCard = (size) => (
+    <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+    <PatternCard
+        padding={size}
+        minWidth={`var(--card-min-width-${size})`}
+        title="Ana Ruiz"
+        description="Algebra I · Thu 4:00 PM"
+        footer={viewSession}
+    >
+        {sessionBody}
+    </PatternCard>
+    </div>
+);
 
-export const Loading = () => <PatternCardLoadingDemo />;
+export const SizeSmall = { name: 'Small', render: () => sizedCard('sm') };
+export const SizeMedium = { name: 'Medium', render: () => sizedCard('md') };
+export const SizeLarge = { name: 'Large', render: () => sizedCard('lg') };
+
+/** One image ratio per story, edge to edge above the padded content. */
+const imageCard = (ratio) => (
+    <PatternCard image={imagePlaceholder(ratio)} title="Ana Ruiz" description="Algebra I · Thu 4:00 PM" style={{ width: 'var(--card-min-width-md)' }}>
+        {sessionBody}
+    </PatternCard>
+);
+
+export const ImageWide = { name: 'Image 16:9', render: () => imageCard('16:9') };
+export const ImageStandard = { name: 'Image 4:3', render: () => imageCard('4:3') };
+export const ImageSquare = { name: 'Image 1:1', render: () => imageCard('1:1') };
+
+const slotNote = (text) => <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{text}</span>;
+
+/** No header: the body carries its own title, as a metric tile does. */
+export const BodyOnly = () => (
+    <PatternCard style={{ maxWidth: 'var(--card-min-width-lg)' }}>{bodyCopy}</PatternCard>
+);
+
+/** A header with actions over the body, and a footer for actions that commit. */
+export const WithFooter = () => (
+    <PatternCard
+        title="Card title"
+        actions={slotNote('Actions slot')}
+        footer={slotNote('Footer slot')}
+        style={{ maxWidth: 'var(--card-min-width-lg)' }}
+    >
+        {bodyCopy}
+    </PatternCard>
+);
+
+/** `header` replaces the title, description and actions. */
+export const CustomHeader = () => (
+    <PatternCard header={slotNote('Custom header slot: tabs or a toolbar')} style={{ maxWidth: 'var(--card-min-width-lg)' }}>
+        {bodyCopy}
+    </PatternCard>
+);
+
+/** A card at rest on the raised pair. */
+export const Static = () => (
+    <PatternCard title="Static" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }}>{bodyCopy}</PatternCard>
+);
+
+/** A clickable card lifts while hovered and settles while pressed. */
+export const Clickable = () => (
+    <PatternCard title="Clickable" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }} role="button" tabIndex={0} onClick={() => {}}>{bodyCopy}</PatternCard>
+);
+
+/** A dragged card is on the overlay pair. */
+export const Dragging = () => (
+    <PatternCard title="Dragging" minWidth="var(--card-min-width-sm)" style={{ maxWidth: 'var(--card-min-width-md)' }} dragging>{bodyCopy}</PatternCard>
+);
+
+/** Skeleton bars at the text line heights, in a card kept at its final size. */
+export const LoadingCard = {
+    name: 'Loading',
+    render: () => (
+        <PatternCard aria-busy="true" style={{ width: 'var(--card-min-width-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
+                <Skeleton shape="text" width="50%" />
+                <Skeleton shape="text" width="75%" />
+                <Skeleton shape="text" width="100%" />
+                <Skeleton shape="text" width="40%" />
+            </div>
+        </PatternCard>
+    ),
+};
 
 /** At the content widths of the three modes, a md card row holds 2, 2 and 3 cards. */
 export const Rows = {

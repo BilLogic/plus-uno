@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import { Button, Tabs } from '@/components';
-import { PatternCard, PatternSection } from '@/patterns';
+import { Blanket, PatternCard, PatternModal, PatternSection } from '@/patterns';
+import { ScaledPreview } from '@/storybook-docs/lib/scaled-preview.jsx';
+import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { SplitContext } from '../Frame/SplitContext';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
@@ -123,4 +126,52 @@ export const TabsAboveSectionHeader = () => (
             </PatternSection>
         </div>
     </InDocs>
+);
+
+/* The detail pair: a section at a stand-in width of 960, scaled to the card. Stage sizes are docs geometry. */
+const QUEUE = { width: 960, height: 320 };
+
+const stepper = { onPrevious: () => {}, onNext: () => {}, previousDisabled: true };
+
+/**
+ * The list stays in view beside the selected record. The scaled preview reads
+ * narrower than its stage, so the split is held the way a Frame with
+ * `sectionDetail` holds it at this width.
+ */
+export const DetailBesideList = () => (
+    <ScaledPreview {...QUEUE}>
+        <InDocs>
+            <SplitContext.Provider value>
+            <PatternSection
+                title="Compliance queue"
+                description="Flags waiting on a supervisor"
+                detail={slotContent('Record · one flag, its fields and notes')}
+                detailTitle="Flag 1 of 12"
+                {...stepper}
+            >
+                {slotContent('List · table or rows')}
+            </PatternSection>
+            </SplitContext.Provider>
+        </InDocs>
+    </ScaledPreview>
+);
+
+/** The record opens as a modal over the list, behind a blanket. */
+export const DetailAsModal = () => (
+    <ScaledPreview {...QUEUE}>
+        <InDocs>
+            <div style={{ position: 'relative' }}>
+                <PatternSection title="Compliance queue" description="Flags waiting on a supervisor">
+                    {slotContent('List · table or rows')}
+                </PatternSection>
+                <Blanket contained>
+                    <div style={{ display: 'flex', justifyContent: 'center', paddingTop: 'var(--section-stack-md)' }}>
+                        <PatternModal title="Flag 1 of 12" onClose={() => {}}>
+                            {slotContent('Record · one flag, its fields and notes')}
+                        </PatternModal>
+                    </div>
+                </Blanket>
+            </div>
+        </InDocs>
+    </ScaledPreview>
 );

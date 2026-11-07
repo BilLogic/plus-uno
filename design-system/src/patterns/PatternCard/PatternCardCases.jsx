@@ -1,5 +1,6 @@
 import React from 'react';
-import { Button, ProgressBar } from '@/components';
+import { Button, ProgressBar, Skeleton } from '@/components';
+import { HeadingLevelContext } from '@/lib/headingLevel';
 import PatternCard from '@/patterns/PatternCard';
 
 /**
@@ -43,7 +44,7 @@ export const CardJobs = () => (
             {metric}
         </PatternCard>
         <PatternCard title="Math fluency" description="Grade 7 · this term" minWidth="var(--card-min-width-md)">
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                 <ProgressBar value={68} ariaLabel="68% of goals met" />
                 <p style={{ margin: 0, font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>68% of goals met</p>
             </div>
@@ -63,4 +64,75 @@ export const CardJobs = () => (
             </p>
         </PatternCard>
     </div>
+);
+
+const tallies = [['128', 'Completed'], ['12', 'Canceled'], ['4', 'No-shows']];
+
+const tally = ([value, label]) => (
+    <>
+        <p style={{ margin: 0, font: 'var(--metric-medium)', fontVariantNumeric: 'tabular-nums' }}>{value}</p>
+        <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{label}</p>
+    </>
+);
+
+/** Card titles in the do and don't cards sit below the docs page outline. */
+const Outline = ({ children }) => (
+    <InDocs>
+        <HeadingLevelContext.Provider value={4}>{children}</HeadingLevelContext.Provider>
+    </InDocs>
+);
+
+/** One card: three metrics stacked in its body, split by rules. */
+export const MetricsWithDividers = () => (
+    <Outline>
+        <PatternCard title="Sessions this week" style={{ maxWidth: 'var(--card-min-width-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+                {tallies.map((row, i) => (
+                    <div
+                        key={row[1]}
+                        style={{
+                            paddingBlock: 'var(--card-stack-md)',
+                            borderTop: i === 0 ? 'none' : 'var(--border-default) solid var(--ds-border)',
+                        }}
+                    >
+                        {tally(row)}
+                    </div>
+                ))}
+            </div>
+        </PatternCard>
+    </Outline>
+);
+
+/** Three mini cards nested inside the card. */
+export const MetricsAsNestedCards = () => (
+    <Outline>
+        <PatternCard title="Sessions this week" style={{ maxWidth: 'var(--card-min-width-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
+                {tallies.map((row) => (
+                    <PatternCard key={row[1]} padding="sm">{tally(row)}</PatternCard>
+                ))}
+            </div>
+        </PatternCard>
+    </Outline>
+);
+
+/** The card holds its place while it loads: skeleton bars fill the body. */
+export const LoadingInPlace = () => (
+    <InDocs>
+        <PatternCard aria-busy="true" style={{ maxWidth: 'var(--card-min-width-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
+                <Skeleton shape="text" width="50%" />
+                <Skeleton shape="text" width="75%" />
+                <Skeleton shape="text" width="100%" />
+                <Skeleton shape="text" width="40%" />
+            </div>
+        </PatternCard>
+    </InDocs>
+);
+
+/** A bare loading line takes the card away. */
+export const LoadingLine = () => (
+    <InDocs>
+        <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Loading…</p>
+    </InDocs>
 );

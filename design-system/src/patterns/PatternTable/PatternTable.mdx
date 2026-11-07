@@ -1,8 +1,23 @@
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PatternTableStories from './PatternTable.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
-import { StaticSummary, SummaryAsDynamic, DynamicRoster, RosterAsStatic, TreeHierarchy, TreeAsExpandable } from './PatternTableCases.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    DynamicRoster,
+    RosterAsStatic,
+    TreeHierarchy,
+    TreeAsExpandable,
+    PlainTable,
+    FramedTable,
+    SecondToolbar,
+    TwoTables,
+} from './PatternTableCases.jsx';
 
 <Meta of={PatternTableStories} />
 
@@ -22,154 +37,35 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>A table in a Section. The Section header carries the title and the actions, and the pagination slot sits under the rows.</>}>
-    <Canvas of={PatternTableStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={PatternTableStories.Overview} title="Table in a Section" description="The Section header carries the title and the actions, and the pagination slot sits under the rows." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Which table?
+## Behavior
 
-Pick the type from what people do with the rows. Ask the questions in order, and stop at the first yes.
+<ComponentExample of={PatternTableStories.StickyHeader} title="Sticky header" description={<><code>stickyHeader</code> with <code>maxHeight</code> pins the head row; it takes the overflow shadow once rows scroll under it.</>} />
 
-1. **Does any row nest under another?** Use a Tree table. Nesting wins over everything else, even when the table is interactive.
-2. **Can people act on the table?** Sorting, filtering, selecting, paging, expanding rows and row actions all count. If they can, use a Dynamic table.
-3. **Otherwise,** use a Static table. People only read it.
-
-One kind of table per block: a Static, Dynamic or Tree table, never mixed in one Section.
+<ComponentExample of={PatternTableStories.StickyColumn} title="Sticky column" description={<><code>stickyColumn</code> pins the first column while the others scroll sideways.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Anatomy
+## State
 
-<DocsCanvasShell attachSourceBelow description={<>A Section header with a title, then the head row, the rows and the pager.</>}>
-    <DsCanvasQuiet of={PatternTableStories.Overview} />
-</DocsCanvasShell>
+<ComponentExample of={PatternTableStories.RowStates} title="Row states" description="Hover a row to see its layer; the second row is selected, its checkbox checked and the whole row filled." />
 
-1. **Section header** holds the title and, in the toolbar type, search, filters, the count and actions.
-2. **Head row** names the columns. Its rule is the bold border.
-3. **Rows** are the data. Each draws a thin rule, and there is no zebra striping.
-4. **Pagination** is a slot under the rows, aligned to the end.
-5. **Message row** replaces the rows when the table is empty. It sits under the head row and spans every column.
+<ComponentExample of={PatternTableStories.EmptyState} title="Empty" description={<>With <code>empty</code>, the head row stays and <code>emptyState</code> takes the body as one message row; the pager hides.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Composition
-
-- A table sits in a Section and spans it. The default frame is plain: no outer frame, no card around it, and no padding of its own. Its first and last cells sit flush with the section edge.
-- The Section header carries the toolbar and the tabs. Search, filters, the record count and the bulk bar use the toolbar type, and saved views use the tabs type.
-- The table has no toolbar of its own. Nothing sits between the Section header and the head row.
-- Empty, no results, loading and error states happen inside the table, under its header, so the Section header stays usable.
-- Paging stays under the rows, inside the same Section.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Properties
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Values</th>
-            <th>Default</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>children</code></td><td>node</td><td>Your own <code>thead</code>, <code>tbody</code> and <code>tfoot</code></td><td>none</td></tr>
-        <tr><td><code>pagination</code></td><td>node</td><td>The pager under the rows. It hides while the empty state shows.</td><td>none</td></tr>
-        <tr><td><code>empty</code></td><td>boolean</td><td>Swaps the rows for the message row. The head row stays.</td><td><code>false</code></td></tr>
-        <tr><td><code>emptyState</code></td><td>node</td><td>The message row's content. It shows only when <code>empty</code> is also true.</td><td>none</td></tr>
-        <tr><td><code>stickyHeader</code></td><td>boolean</td><td>Pins the head row while the rows scroll under it. It needs <code>maxHeight</code>.</td><td><code>false</code></td></tr>
-        <tr><td><code>stickyColumn</code></td><td>boolean</td><td>Pins the first column while the other columns scroll under it</td><td><code>false</code></td></tr>
-        <tr><td><code>maxHeight</code></td><td>number or CSS length</td><td>Bounds the scroll region's height</td><td>none</td></tr>
-        <tr><td><code>tableProps</code></td><td>object</td><td>Props for the <code>table</code> element: an accessible name, or a class a component built on the shell styles it by</td><td>none</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Tokens
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Token</th>
-            <th>Value</th>
-            <th>Used for</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>--ds-border</code></td><td>color</td><td>The rule under each row</td></tr>
-        <tr><td><code>--ds-border-bold</code></td><td>color</td><td>The rule under the head row</td></tr>
-        <tr><td><code>--ds-text</code></td><td>color</td><td>Body cells, in Body/default 14/20</td></tr>
-        <tr><td><code>--ds-text-subtle</code></td><td>color</td><td>Head cells, in Heading/xxsmall, and the message row</td></tr>
-        <tr><td><code>--ds-background-neutral-subtle-hovered</code></td><td>color</td><td>A hovered row</td></tr>
-        <tr><td><code>--ds-background-neutral-subtle-pressed</code></td><td>color</td><td>A pressed row</td></tr>
-        <tr><td><code>--ds-background-selected</code></td><td>color</td><td>A selected row. Hover and press take <code>-hovered</code> and <code>-pressed</code>.</td></tr>
-        <tr><td><code>--ds-shadow-overflow</code></td><td>shadow</td><td>A sticky edge, only while content is scrolled under it</td></tr>
-        <tr><td><code>--ds-utility-elevation-surface-current</code></td><td>color</td><td>The fill of sticky cells, so they match what the table sits on</td></tr>
-        <tr><td><code>--ds-border-focused</code></td><td>color</td><td>The focus ring of a scroll region</td></tr>
-        <tr><td><code>--table-pad-x-cell</code></td><td>8</td><td>The side pad of the message row</td></tr>
-        <tr><td><code>--row-height-md</code></td><td>40</td><td>The least height of the message row</td></tr>
-        <tr><td><code>--section-stack-md</code></td><td>16</td><td>The space above and below the message</td></tr>
-        <tr><td><code>--stack-sm</code></td><td>4</td><td>Space between the lines of the message</td></tr>
-    </tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Row states
-
-Row states are layered over each cell's fill, never swapped for it. A hovered row takes the neutral subtle hovered step and a pressed row the pressed step. A selected row takes the selected color across the whole row, with no stripe on its leading edge. The checkbox a selectable row carries is the cue that does not rest on color.
-
-<DocsCanvasShell description={<>Hover a row to see its layer. The second row is selected, its checkbox checked and the whole row filled.</>}>
-    <DsCanvasQuiet of={PatternTableStories.RowStates} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Sticky header and column
-
-<code>stickyHeader</code> pins the head row and <code>stickyColumn</code> the first column. Only a bounded region scrolls vertically, so pair <code>stickyHeader</code> with <code>maxHeight</code>. A sticky edge takes the overflow shadow only once content is scrolled under it.
-
-<DocsCanvasShell description={<>Scroll the table: the header and the first column take the overflow shadow once content passes under them.</>}>
-    <DsCanvasQuiet of={PatternTableStories.Sticky} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Empty state
-
-With <code>empty</code>, the head row stays and the empty-state slot takes the body as one message row spanning every column, so the columns still say what will appear and the Section header stays usable. The message row takes no hover state, and the pager hides with the rows. The message shows only when <code>emptyState</code> is also set.
-
-<DocsCanvasShell description={<>An empty table: the head row, then an icon, a title, a line of help and the first action.</>}>
-    <DsCanvasQuiet of={PatternTableStories.EmptyState} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={PatternTableStories.Interactive}
@@ -185,84 +81,173 @@ With <code>empty</code>, the head row stays and the empty-state slot takes the b
 
 <div className="sb-ds-doc-section">
 
-### Do and don't
+## Usage
 
-Each pair builds one case from its own type, beside the mistake it replaces.
+A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the toolbar and the tabs: search, filters, the record count and the bulk bar use the toolbar type, and saved views use the tabs type. Empty, no results, loading and error states happen inside the table, under its header, so the Section header stays usable. Paging stays under the rows, inside the same Section.
 
-#### Static table: a weekly session summary
+### Type guidance
 
-People read the days and compare them. Nothing is sorted, selected or paged, and the total sits in the summary row.
+Pick the type from what people do with the rows. Ask the questions in order, and stop at the first yes.
 
-<DoDontGrid
-    pairs={[
-        {
-            doExample: <StaticSummary />,
-            doCaption: 'Show a read-only summary, in a report or a modal, as a Static table. The total goes in the summary row.',
-            dontExample: <SummaryAsDynamic />,
-            dontCaption: "Don't build the summary as a Dynamic table. Checkboxes, sort arrows and a pager promise actions the summary doesn't have.",
-        },
-    ]}
+<DocsTable>
+<thead>
+<tr><th>Question</th><th>Type</th></tr>
+</thead>
+<tbody>
+<tr><td>Does any row nest under another? Nesting wins, even when the table is interactive.</td><td>Tree table</td></tr>
+<tr><td>Can people act on the table: sort, filter, select, page, expand rows or use row actions?</td><td>Dynamic table</td></tr>
+<tr><td>Otherwise, people only read it.</td><td>Static table</td></tr>
+</tbody>
+</DocsTable>
+
+The `toolbar` slot is deprecated. It still renders above the table, with a one-time warning in development. Put search, filters and actions in the Section header instead: `<PatternSection toolbar={<PatternSection.Toolbar />}>`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Section header.** Not part of the table: the title and, in the toolbar type, search, filters, the count and actions.
+2. **Head row.** Names the columns. Its rule is the bold border.
+3. **Rows.** The data you pass as `tbody`. Each draws a thin rule, and there is no zebra striping.
+4. **Pagination** (optional). A slot under the rows, aligned to the end. It hides while the empty state shows.
+5. **Message row.** The `emptyState` slot, which replaces the rows when `empty` is true. It sits under the head row and spans every column.
+
+### States
+
+Row states are layered over each cell's fill, never swapped for it.
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>No fill of its own: the table shows what it sits on.</td></tr>
+<tr><td>Hovered</td><td>The row takes <code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
+<tr><td>Pressed</td><td>The row takes <code>--ds-background-neutral-subtle-pressed</code>.</td></tr>
+<tr><td>Focused</td><td>A scroll region takes keyboard focus and draws the <code>--ds-border-focused</code> ring.</td></tr>
+<tr><td>Disabled</td><td>A table has no disabled state. Disable the controls in a row.</td></tr>
+<tr><td>Selected</td><td>A row with <code>aria-selected="true"</code> takes <code>--ds-background-selected</code> across the whole row, with <code>-hovered</code> and <code>-pressed</code> steps and no stripe on its leading edge.</td></tr>
+<tr><td>Empty</td><td>The message row replaces the rows and takes no hover state.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--ds-border</code>, <code>--border-default</code></td><td>color, 1</td><td>The rule under each row.</td></tr>
+<tr><td><code>--ds-border-bold</code></td><td>color</td><td>The rule under the head row.</td></tr>
+<tr><td><code>--ds-text</code>, <code>--body-default</code></td><td>14/20</td><td>Body cells.</td></tr>
+<tr><td><code>--ds-text-subtle</code>, <code>--heading-xxsmall</code></td><td>color, type</td><td>Head cells and the message row.</td></tr>
+<tr><td><code>--size-table-cell-x</code>, <code>--size-table-cell-y</code>, <code>--size-table-cell-gap</code></td><td>length</td><td>Cell padding and the gap inside a cell.</td></tr>
+<tr><td><code>--ds-background-neutral-subtle-hovered</code>, <code>-pressed</code></td><td>color</td><td>A hovered and a pressed row.</td></tr>
+<tr><td><code>--ds-background-selected</code>, <code>-hovered</code>, <code>-pressed</code></td><td>color</td><td>A selected row.</td></tr>
+<tr><td><code>--ds-shadow-overflow</code></td><td>shadow</td><td>A sticky edge, only while content is scrolled under it.</td></tr>
+<tr><td><code>--ds-utility-elevation-surface-current</code></td><td>color</td><td>The fill of sticky cells, so they match what the table sits on.</td></tr>
+<tr><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td><td>focus ring</td><td>The ring of a scroll region.</td></tr>
+<tr><td><code>--table-pad-x-cell</code></td><td>8</td><td>The side pad of the message row.</td></tr>
+<tr><td><code>--row-height-md</code></td><td>40</td><td>The least height of the message row.</td></tr>
+<tr><td><code>--section-stack-md</code>, <code>--stack-sm</code></td><td>16, 4</td><td>Space around the message, and between its lines.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Put a plain table in a Section.
+
+<DoDontPair
+    doExample={<PlainTable />}
+    doCaption="The table spans the Section under its header: no frame, no card, no padding of its own."
+    dontExample={<FramedTable />}
+    dontCaption="The table sits inside its own frame with padding. It stops lining up with the Section and the Section header."
 />
 
-#### Dynamic table: a student roster
+### Put nothing between the header and the head row.
 
-Tutors sort students, select several and act on them together, and 340 rows need paging.
-
-<DoDontGrid
-    pairs={[
-        {
-            doExample: <DynamicRoster />,
-            doCaption: 'Build a roster people act on as a Dynamic table: sortable heads, checkboxes, a pager, and bulk actions in the Section header.',
-            dontExample: <RosterAsStatic />,
-            dontCaption: "Don't show a roster people act on as a Static table. With no sort, selection or paging, 340 students become one long scroll.",
-        },
-    ]}
+<DoDontPair
+    doExample={<PlainTable />}
+    doCaption="Search, filters and the record count live in the Section header toolbar. The head row follows directly."
+    dontExample={<SecondToolbar />}
+    dontCaption="A second toolbar sits between the Section header and the head row. The table has no toolbar of its own."
 />
 
-#### Tree table: school, class, student
+### One table per block.
 
-Every row belongs to the row above it, so the level has to show, and every level keeps the same columns.
+Never mix a Static, Dynamic or Tree table in one Section either.
 
-<DoDontGrid
-    pairs={[
-        {
-            doExample: <TreeHierarchy />,
-            doCaption: 'Nest classes under their school and students under their class in a Tree table. Each level indents and keeps the columns.',
-            dontExample: <TreeAsExpandable />,
-            dontCaption: "Don't fake a hierarchy with expandable rows. Expanded content is detail about one row, so the classes and students in it lose their columns and can't be sorted or selected.",
-        },
-    ]}
+<DoDontPair
+    doExample={<PlainTable />}
+    doCaption="One table per Section, with its own header, so people always know which rows a toolbar acts on."
+    dontExample={<TwoTables />}
+    dontCaption="Two tables share one Section and one header. The toolbar no longer says which table it acts on."
+/>
+
+### Use a Dynamic table for rows people act on.
+
+<DoDontPair
+    doExample={<DynamicRoster />}
+    doCaption="A roster people act on as a Dynamic table: sortable heads, checkboxes, a pager, and bulk actions in the Section header."
+    dontExample={<RosterAsStatic />}
+    dontCaption="A roster people act on as a Static table. With no sort, selection or paging, 340 students become one long scroll."
+/>
+
+### Use a Tree table for a hierarchy.
+
+<DoDontPair
+    doExample={<TreeHierarchy />}
+    doCaption="Classes nest under their school and students under their class. Each level indents and keeps the columns."
+    dontExample={<TreeAsExpandable />}
+    dontCaption="A hierarchy faked with expandable rows: the classes and students lose their columns and can't be sorted or selected."
 />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name every column with a short head, in sentence case: "Last session".</td><td>A blank head, or one in all caps.</td></tr>
+<tr><td>Give the count in words in the toolbar: "340 students".</td><td>A count in the head row or under the table.</td></tr>
+<tr><td>An empty message that says what will appear and the first action: "No members yet", "Invite a member".</td><td>An empty table body with no message.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
 
 - Name every column with a head cell. Head cells are labels for a column, so they use Heading/xxsmall rather than a heading level.
-- Mark the sorted column with <code>aria-sort</code>, and give every icon-only control a name, such as "Actions for Ava Thompson".
-- Mark a selected row with <code>aria-selected="true"</code>. That attribute belongs to a row of a table with <code>role="grid"</code>.
+- Mark the sorted column with `aria-sort`, and give every icon-only control a name, such as "Actions for Ava Thompson".
+- Mark a selected row with `aria-selected="true"`. That attribute belongs to a row of a table with `role="grid"`.
 - Selection is never color alone. The row's checkbox is checked, and the toolbar says "2 selected".
-- A region that scrolls takes keyboard focus, so people can scroll it without a pointer. That covers a region with <code>maxHeight</code> and one with a sticky column.
+- A region that scrolls takes keyboard focus, so people can scroll it without a pointer. That covers a region with `maxHeight` and one with a sticky column.
 - The empty message is a row of the table, so assistive technology reads it with the columns it replaces.
+- Name the table through `tableProps`, such as `aria-label`, when no caption names it.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### For developers
-
-The <code>toolbar</code> slot is deprecated. It still renders above the table, with a one-time warning in development. Put search, filters and actions in the Section header instead: <code>{'<PatternSection toolbar={<PatternSection.Toolbar />}>'}</code>.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Related
+## Related
 
 - <a target="_top" href="./?path=/docs/patterns-section-section--docs">Section</a>: the header types, toolbar and tabs, that sit above every table.
-- <a target="_top" href="./?path=/docs/components-text-and-data-display-static-table--docs">Table component</a>: the table component, with a set of headers and rows.
+- <a target="_top" href="./?path=/docs/components-text-and-data-display-static-table--docs">Table component</a>: the table components, with a set of headers and rows.
 - <a target="_top" href="./?path=/docs/components-navigation-pagination--docs">Pagination</a>: the pager that fills the pagination slot.
 - <a target="_top" href="./?path=/docs/patterns-section-card--docs">Card</a>: a table never sits inside a card.
 - <a href="?path=/docs/patterns-templates--docs">Templates</a>: the dashboard content shows a Students table in a Section at every breakpoint.

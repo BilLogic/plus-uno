@@ -92,22 +92,18 @@ export default {
         emptyState: { table: { disable: true } },
         empty: {
             control: 'boolean',
-            description: 'Swap the body rows for the empty-state message row; the head row stays',
             table: { category: 'State' },
         },
         stickyHeader: {
             control: 'boolean',
-            description: 'Pin the head row while the rows scroll under it; set maxHeight too, or there is nothing to scroll',
             table: { category: 'Design' },
         },
         stickyColumn: {
             control: 'boolean',
-            description: 'Pin the first column while the other columns scroll under it',
             table: { category: 'Design' },
         },
         maxHeight: {
             control: 'text',
-            description: 'Bound the scroll region height (e.g. 160px); stickyHeader pins only within it',
             table: { category: 'Design' },
         },
         id: {
@@ -342,4 +338,32 @@ export const StickyHeaderNeedsMaxHeight = {
         await expect(getComputedStyle(within(canvasElement).getByText('Role')).position, 'an unbounded header is not pinned').not.toBe('sticky');
         await expect(scroller.hasAttribute('tabindex'), 'an unbounded region takes no tab stop').toBe(false);
     },
+};
+
+/* ---------------------------------------------------- one value per story */
+
+/** `stickyHeader` with `maxHeight`: the head row stays while the rows scroll. */
+export const StickyHeader = {
+    name: 'Sticky header',
+    render: () => (
+        <PatternSection title="Tutors">
+            <PatternTable stickyHeader maxHeight="var(--card-max-height-sm)">
+                {wideTable}
+            </PatternTable>
+        </PatternSection>
+    ),
+};
+
+/** `stickyColumn`: the first column stays while the others scroll sideways. */
+export const StickyColumn = {
+    name: 'Sticky column',
+    render: () => (
+        <div style={{ maxWidth: 'var(--card-min-width-lg)' }}>
+            <PatternSection title="Tutors">
+                <PatternTable stickyColumn>
+                    {wideTable}
+                </PatternTable>
+            </PatternSection>
+        </div>
+    ),
 };

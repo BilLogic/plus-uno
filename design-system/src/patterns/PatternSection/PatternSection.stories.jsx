@@ -5,7 +5,7 @@ import { PANEL_STORAGE_KEY, PatternCard, PatternSection, SECTION_DETAIL_FLOOR, u
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
-import { DemoLabel, InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { iconClass } from '../../lib/icon';
 
 const col = { display: 'flex', flexDirection: 'column', gap: 'var(--space-200)' };
@@ -63,102 +63,12 @@ const SelectedToolbar = () => (
 
 const description = 'Optional supporting description for this section.';
 
-/** The five `_Section header` types, plus "Add view" on the tabs row. */
-function HeaderTypesDemo() {
-    return (
-        <div style={col}>
-            <div>
-                <DemoLabel>type=default</DemoLabel>
-                <PatternSection title="Section title" description={description} actions={<Actions />}>
-                    {slotContent('Content slot')}
-                </PatternSection>
-            </div>
-            <div>
-                <DemoLabel>type=tabs · onAddView</DemoLabel>
-                <PatternSection title="Students" description={description} actions={<Actions />} tabs={<ViewTabs />} onAddView={() => {}}>
-                    {slotContent('Content slot')}
-                </PatternSection>
-            </div>
-            <div>
-                <DemoLabel>type=toolbar · state=default</DemoLabel>
-                <PatternSection title="Students" description={description} toolbar={<DefaultToolbar />}>
-                    {slotContent('Table')}
-                </PatternSection>
-            </div>
-            <div>
-                <DemoLabel>type=toolbar · state=selected</DemoLabel>
-                <PatternSection title="Students" description={description} toolbar={<SelectedToolbar />}>
-                    {slotContent('Table')}
-                </PatternSection>
-            </div>
-            <div>
-                <DemoLabel>type=custom</DemoLabel>
-                <PatternSection
-                    title="This week"
-                    header={(
-                        <>
-                            <p style={{ margin: 0, font: 'var(--heading-medium)' }}>Week of October 20</p>
-                            <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>12 sessions · 3 tutors out</p>
-                        </>
-                    )}
-                >
-                    {slotContent('Content slot')}
-                </PatternSection>
-            </div>
-            <div>
-                <DemoLabel>type=tabs-only · title visually hidden</DemoLabel>
-                <PatternSection type="tabs-only" title="Students" tabs={<ViewTabs label="Students" />}>
-                    {slotContent('Content slot')}
-                </PatternSection>
-            </div>
-        </div>
-    );
-}
-
 const StatCard = ({ title, body }) => (
-    <PatternCard style={{ flex: 1 }} minWidth={220}>
+    <PatternCard style={{ flex: 1 }} minWidth="var(--card-min-width-sm)">
         <p style={{ margin: 0, font: 'var(--body-default)' }}>{title}</p>
         <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{body}</p>
     </PatternCard>
 );
-
-/** The three body layouts. */
-function LayoutsDemo() {
-    return (
-        <div style={col}>
-            <div>
-                <DemoLabel>layout=single</DemoLabel>
-                <PatternSection title="Section title" description={description} actions={<Actions />}>
-                    <div style={{ display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap' }}>
-                        <StatCard title="Sessions this week" body="12 scheduled · 2 need a tutor" />
-                        <StatCard title="Attendance" body="94% across 38 students" />
-                        <StatCard title="Notes due" body="3 sessions without notes" />
-                    </div>
-                </PatternSection>
-            </div>
-            <div>
-                <DemoLabel>layout=split</DemoLabel>
-                <PatternSection title="Section title" description={description} layout="split" side={slotContent('Side · span 4')}>
-                    {slotContent('Main · span 8')}
-                </PatternSection>
-            </div>
-            <div>
-                <DemoLabel>layout=subsections</DemoLabel>
-                <PatternSection title="Settings" description="Manage your tutor profile, reminders and who can see your availability." layout="subsections">
-                    <PatternSection title="Profile" description="Name, photo and time zone." actions={<Actions />}>
-                        {slotContent('Subsection body')}
-                    </PatternSection>
-                    <PatternSection title="Notifications" description="Email and text reminders.">
-                        {slotContent('Subsection body')}
-                    </PatternSection>
-                    <PatternSection title="Privacy" description="Who can see your availability.">
-                        {slotContent('Subsection body')}
-                    </PatternSection>
-                </PatternSection>
-            </div>
-        </div>
-    );
-}
 
 export default {
     title: 'Patterns/Section/Section',
@@ -177,21 +87,19 @@ export default {
         padding: { table: { disable: true } },
         background: { table: { disable: true } },
         level: { control: false, table: { category: 'Design' } },
-        title: { control: 'text', description: 'Section title', table: { category: 'Slots' } },
-        description: { control: 'text', description: 'Optional description under the title', table: { category: 'Slots' } },
+        title: { control: 'text', table: { category: 'Slots' } },
+        description: { control: 'text', table: { category: 'Slots' } },
         type: {
             control: 'select',
             options: ['default', 'tabs', 'toolbar', 'custom', 'tabs-only'],
-            description: 'Header type; read from the slots when left off',
             table: { category: 'Design' },
         },
         layout: {
             control: 'select',
             options: ['single', 'split', 'subsections'],
-            description: 'Body layout',
             table: { category: 'Design' },
         },
-        loading: { control: 'boolean', description: 'Skeleton bars in place of the header', table: { category: 'State' } },
+        loading: { control: 'boolean', table: { category: 'State' } },
         gap: { control: false, table: { category: 'Design' } },
         id: { control: false, table: { disable: true, category: 'Development' } },
         className: { control: false, table: { disable: true, category: 'Development' } },
@@ -204,9 +112,111 @@ export const Overview = () => (
     </PatternSection>
 );
 
-export const HeaderTypes = () => <HeaderTypesDemo />;
+/* Header types, one per story. The type is read from the slots you fill. */
 
-export const Layouts = () => <LayoutsDemo />;
+export const HeaderDefault = {
+    name: 'Default header',
+    render: () => (
+        <PatternSection title="Section title" description={description} actions={<Actions />}>
+            {slotContent('Content slot')}
+        </PatternSection>
+    ),
+};
+
+export const HeaderTabs = {
+    name: 'Tabs header',
+    render: () => (
+        <PatternSection title="Students" description={description} actions={<Actions />} tabs={<ViewTabs />} onAddView={() => {}}>
+            {slotContent('Content slot')}
+        </PatternSection>
+    ),
+};
+
+export const HeaderToolbar = {
+    name: 'Toolbar header',
+    render: () => (
+        <PatternSection title="Students" description={description} toolbar={<DefaultToolbar />}>
+            {slotContent('Table')}
+        </PatternSection>
+    ),
+};
+
+export const HeaderCustom = {
+    name: 'Custom header',
+    render: () => (
+        <PatternSection
+            title="This week"
+            header={(
+                <>
+                    <p style={{ margin: 0, font: 'var(--heading-medium)' }}>Week of October 20</p>
+                    <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>12 sessions · 3 tutors out</p>
+                </>
+            )}
+        >
+            {slotContent('Content slot')}
+        </PatternSection>
+    ),
+};
+
+export const HeaderTabsOnly = {
+    name: 'Tabs only header',
+    render: () => (
+        <PatternSection type="tabs-only" title="Students" tabs={<ViewTabs label="Students" />}>
+            {slotContent('Content slot')}
+        </PatternSection>
+    ),
+};
+
+/* Body layouts, one per story. */
+
+export const LayoutSingle = {
+    name: 'Single',
+    render: () => (
+        <PatternSection title="Section title" description={description} actions={<Actions />}>
+            <div style={{ display: 'flex', gap: 'var(--grid-gutter)', flexWrap: 'wrap' }}>
+                <StatCard title="Sessions this week" body="12 scheduled · 2 need a tutor" />
+                <StatCard title="Attendance" body="94% across 38 students" />
+                <StatCard title="Notes due" body="3 sessions without notes" />
+            </div>
+        </PatternSection>
+    ),
+};
+
+export const LayoutSplit = {
+    name: 'Split',
+    render: () => (
+        <PatternSection title="Section title" description={description} layout="split" side={slotContent('Side · span 4')}>
+            {slotContent('Main · span 8')}
+        </PatternSection>
+    ),
+};
+
+export const LayoutSubsections = {
+    name: 'Subsections',
+    render: () => (
+        <PatternSection title="Settings" description="Manage your tutor profile, reminders and who can see your availability." layout="subsections">
+            <PatternSection title="Profile" description="Name, photo and time zone." actions={<Actions />}>
+                {slotContent('Subsection body')}
+            </PatternSection>
+            <PatternSection title="Notifications" description="Email and text reminders.">
+                {slotContent('Subsection body')}
+            </PatternSection>
+            <PatternSection title="Privacy" description="Who can see your availability.">
+                {slotContent('Subsection body')}
+            </PatternSection>
+        </PatternSection>
+    ),
+};
+
+/** `fill="subtle"`: the sunken surface with a pad and a radius, for a section that stands apart. */
+export const FillSubtle = {
+    name: 'Subtle fill',
+    render: () => (
+        <PatternSection title="Flag 3 of 12" description={description} fill="subtle">
+            {slotContent('Record')}
+        </PatternSection>
+    ),
+};
 
 export const Footer = () => (
     <PatternSection
@@ -244,46 +254,43 @@ export const Levels = () => (
     </PatternSection>
 );
 
-/** The toolbar row in both states: search, filters, count and actions; then the bulk bar. */
-export const Toolbar = () => (
-    <div style={col}>
-        <div>
-            <DemoLabel>state=default</DemoLabel>
-            <PatternSection title="Students" description={description} toolbar={<DefaultToolbar />}>
-                {slotContent('Table')}
-            </PatternSection>
-        </div>
-        <div>
-            <DemoLabel>state=selected</DemoLabel>
-            <PatternSection title="Students" description={description} toolbar={<SelectedToolbar />}>
-                {slotContent('Table')}
-            </PatternSection>
-        </div>
-    </div>
-);
+/** The toolbar's selected state: the selection, bulk actions and Clear. */
+export const ToolbarSelected = {
+    name: 'Toolbar selected',
+    render: () => (
+        <PatternSection title="Students" description={description} toolbar={<SelectedToolbar />}>
+            {slotContent('Table')}
+        </PatternSection>
+    ),
+};
 
-export const Loading = () => (
-    <div style={col}>
-        <div>
-            <DemoLabel>type=default · loading</DemoLabel>
-            <PatternSection title="Section title" description={description} loading>
-                {slotContent('Content slot')}
-            </PatternSection>
-        </div>
-        <div>
-            <DemoLabel>type=toolbar · loading</DemoLabel>
-            <PatternSection title="Students" description={description} toolbar={<DefaultToolbar />} loading>
-                {slotContent('Table')}
-            </PatternSection>
-        </div>
-        <div>
-            <DemoLabel>type=tabs-only · loading</DemoLabel>
-            <PatternSection type="tabs-only" title="Students" tabs={<ViewTabs label="Students" />} loading>
-                {slotContent('Content slot')}
-            </PatternSection>
-        </div>
-    </div>
-);
+/** Loading: skeleton bars in place of the header. */
+export const LoadingDefault = {
+    name: 'Loading',
+    render: () => (
+        <PatternSection title="Section title" description={description} loading>
+            {slotContent('Content slot')}
+        </PatternSection>
+    ),
+};
+
+export const LoadingToolbar = {
+    name: 'Loading, toolbar',
+    render: () => (
+        <PatternSection title="Students" description={description} toolbar={<DefaultToolbar />} loading>
+            {slotContent('Table')}
+        </PatternSection>
+    ),
+};
+
+export const LoadingTabsOnly = {
+    name: 'Loading, tabs only',
+    render: () => (
+        <PatternSection type="tabs-only" title="Students" tabs={<ViewTabs label="Students" />} loading>
+            {slotContent('Content slot')}
+        </PatternSection>
+    ),
+};
 
 export const Interactive = {
     args: {

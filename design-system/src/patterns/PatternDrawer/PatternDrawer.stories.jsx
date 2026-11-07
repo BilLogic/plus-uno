@@ -70,24 +70,20 @@ export default {
         screenHeight: { table: { disable: true } },
         title: {
             control: 'text',
-            description: 'Drawer title',
             table: { category: 'Slots' },
         },
         description: {
             control: 'text',
-            description: 'One line under the title',
             table: { category: 'Slots' },
         },
         width: {
             control: 'inline-radio',
             options: BLANKET_WIDTHS,
-            description: 'Screen-grid columns: 6 · 8 · 10 plus the drawer pad',
             table: { category: 'Design' },
         },
         placement: {
             control: 'inline-radio',
             options: DRAWER_PLACEMENTS,
-            description: 'The screen edge it sits at',
             table: { category: 'Design' },
         },
         id: { control: false, table: { disable: true, category: 'Development' } },
@@ -340,6 +336,35 @@ export const DrawerSharesTheTwoOverlayLimit = {
         await waitFor(() => expect(body.queryByRole('dialog', { name: 'Session details' })).toBeNull());
         await waitFor(() => expect(canvasElement.ownerDocument.activeElement, 'focus is back on the original opener').toBe(opener));
     },
+};
+
+/* ---------------------------------------------------- one value per story */
+
+/** One width step per story, at the 1024 screen. */
+const atWidth = (width) => <Inline title="Session details" width={width} screenHeight={360}>{details}</Inline>;
+
+export const WidthSmall = { name: 'Small', render: () => atWidth('sm') };
+export const WidthMedium = { name: 'Medium', render: () => atWidth('md') };
+export const WidthLarge = { name: 'Large', render: () => atWidth('lg') };
+
+/** One edge per story. */
+export const PlacementEnd = { name: 'End', render: () => <Inline placement="end" screenHeight={360}>{details}</Inline> };
+export const PlacementStart = { name: 'Start', render: () => <Inline placement="start" screenHeight={360}>{details}</Inline> };
+
+/** No footer: read-only details end at the body. */
+export const NoFooter = { name: 'No footer', render: () => <Inline footer={undefined} screenHeight={360}>{details}</Inline> };
+
+/** Long content, with no play: the body scrolls under a pinned footer. */
+export const LongContentStill = {
+    name: 'Long content',
+    render: () => <Inline title="Session history" description="All 30 sessions this term" width="md">{longBody}</Inline>,
+};
+
+/** The opener for the docs page, with no play: press it to open a real drawer. */
+export const OpenAndClose = {
+    name: 'Open and close',
+    args: { title: 'Session details', description: 'Thursday · 4:00–5:00 PM', width: 'sm', placement: 'end' },
+    render: (args) => <WithTrigger {...args} />,
 };
 
 export const Interactive = {

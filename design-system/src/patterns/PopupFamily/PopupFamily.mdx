@@ -1,8 +1,21 @@
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PopupFamilyStories from './PopupFamily.stories.jsx';
-import { PopupShortList, PopupForm, MenuShortLabels, MenuSentenceLabel } from './PopupFamily.examples.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, DoDontGrid, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    PopupShortList,
+    PopupForm,
+    MenuShortLabels,
+    MenuSentenceLabel,
+    TooltipShort,
+    TooltipParagraph,
+} from './PopupFamily.examples.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={PopupFamilyStories} />
 
@@ -18,166 +31,41 @@ The Popups pattern is the set of floating layers that never block the page: Menu
 
 <div className="sb-ds-doc-section">
 
-### Purpose
+## Appearance
 
-The Popups pattern names the pattern for four floating layers. A **Menu** lists actions. A **Popup** shows a small aside anchored to a control. A **Flag** reports what just happened. A **Tooltip** names a control in one line. In code, the Popup is the `Popup` component and the Flag is the `Flag` component.
+<ComponentExample of={PopupFamilyStories.FlagNormal} title="Flag normal" description={<><code>appearance="normal"</code>, the default, for an outcome that needs no color of its own.</>} />
 
-</div>
+<ComponentExample of={PopupFamilyStories.FlagInformation} title="Flag information" description={<><code>appearance="information"</code>, for something worth knowing.</>} />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={PopupFamilyStories.FlagSuccess} title="Flag success" description={<><code>appearance="success"</code>, for an action that finished.</>} />
 
-### When to use
+<ComponentExample of={PopupFamilyStories.FlagWarning} title="Flag warning" description={<><code>appearance="warning"</code>, for something to check; it stays until dismissed.</>} />
 
-- Use a Menu to choose one action from a short list.
-- Use a Popup for a small aside anchored to a control, such as a definition, a preview or a short list. A Popup is never a form.
-- Use a Flag to report an outcome that does not need a decision.
-- Use a Tooltip for one line of help on a control.
-- For a decision that must be made before going on, use a [Modal](?path=/docs/patterns-overlays-modal--docs). It takes a [Blanket](?path=/docs/patterns-overlays-blanket--docs), and the Popups pattern never does.
-- For a task that needs the page in view, use a [Drawer](?path=/docs/patterns-overlays-drawer--docs).
+<ComponentExample of={PopupFamilyStories.FlagError} title="Flag error" description={<><code>appearance="error"</code>, for something that went wrong; it stays until dismissed.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Anatomy
+## Size and layout
 
-<DocsCanvasShell attachSourceBelow description={<>A Popup: the floating box, padded 16, with a title in Heading/xsmall and a body in Body/default. Menu's own anatomy lives on the [Dropdown menu](?path=/docs/components-forms-and-inputs-dropdown-menu--docs) page.</>}>
-    <Canvas of={PopupFamilyStories.Popups} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={PopupFamilyStories.PopupSmall} title="Popup small" description={<><code>width="sm"</code>, the default: 320, padded 16 and rounded 12.</>} />
 
-</div>
+<ComponentExample of={PopupFamilyStories.PopupMedium} title="Popup medium" description={<><code>width="md"</code>: 400.</>} />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={PopupFamilyStories.PopupLarge} title="Popup large" description={<><code>width="lg"</code>: 480.</>} />
 
-### Properties
+<ComponentExample of={PopupFamilyStories.TooltipOneLine} title="Tooltip" description="Body/small 12/16 in the inverse text on the bold neutral background, 24 tall on one line." />
 
-The four layers are built from existing components. These are the main properties; each component's page lists the rest.
+<ComponentExample of={PopupFamilyStories.TooltipWrapped} title="Tooltip, wrapped" description="A longer Tooltip wraps at 240." />
 
-<DocsTable>
-<thead>
-<tr><th>Layer</th><th>Component</th><th>Properties</th></tr>
-</thead>
-<tbody>
-<tr><td>Menu</td><td><code>DropdownMenu</code></td><td><code>trigger</code>, <code>isOpen</code>/<code>onOpenChange</code>, <code>placement</code>, <code>shouldFlip</code>, <code>spacing</code> (<code>cozy</code> or <code>compact</code>), <code>testId</code>, children as the rows (<code>Section</code>, <code>ButtonItem</code>, <code>LinkItem</code>, <code>CustomItem</code>).</td></tr>
-<tr><td>Popup</td><td><code>Popup</code></td><td><code>width</code> (<code>sm</code>, <code>md</code> or <code>lg</code>, default <code>sm</code>), <code>title</code>, <code>placement</code>, <code>triggerType</code>, <code>trigger</code>, children as the body.</td></tr>
-<tr><td>Flag</td><td><code>Flag</code></td><td><code>appearance</code> (<code>normal</code>, <code>information</code>, <code>warning</code>, <code>error</code> or <code>success</code>), <code>title</code>, children as the description, <code>actions</code>, <code>bold</code>, <code>autohide</code>, <code>delay</code>. <code>FlagGroup</code> places the stack.</td></tr>
-<tr><td>Tooltip</td><td><code>Tooltip</code></td><td><code>text</code>, <code>placement</code> (<code>top</code>, <code>bottom</code>, <code>left</code> or <code>right</code>), <code>trigger</code>, <code>delayShow</code>, <code>delayHide</code>.</td></tr>
-</tbody>
-</DocsTable>
+<ComponentExample of={PopupFamilyStories.Flags} title="Flags stacked" description="Flags are 400 wide and stack 16 apart; in use they sit bottom-left with the newest at the bottom." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Tokens
-
-<DocsTable>
-<thead>
-<tr><th>Token</th><th>Value</th><th>What it is for</th></tr>
-</thead>
-<tbody>
-<tr><td><code>--popover-pad</code></td><td>16</td><td>Pad of a Popup and a Flag.</td></tr>
-<tr><td><code>--popover-width-sm</code>, <code>-md</code>, <code>-lg</code></td><td>320, 400, 480</td><td>The Popup width tiers.</td></tr>
-<tr><td><code>--popover-width-flag</code></td><td>400</td><td>The width of a Flag.</td></tr>
-<tr><td><code>--popover-stack-flag</code></td><td>16</td><td>Space between stacked Flags.</td></tr>
-<tr><td><code>--popover-radius</code></td><td>12</td><td>Corner radius of a Popup and a Flag.</td></tr>
-<tr><td><code>--popover-max-width-menu</code></td><td>320</td><td>The widest a Menu gets.</td></tr>
-<tr><td><code>--popover-max-height-menu</code></td><td>320</td><td>A Menu scrolls past this height.</td></tr>
-<tr><td><code>--popover-radius-menu-md</code></td><td>12</td><td>Menu corner radius.</td></tr>
-<tr><td><code>--popover-pad-y-tooltip</code></td><td>4</td><td>Vertical pad of a Tooltip, so 12/16 text sits in 24. Its horizontal pad is <code>--pad-x-sm</code>, 8.</td></tr>
-<tr><td><code>--popover-max-width-tooltip</code></td><td>240</td><td>A longer Tooltip wraps at this width.</td></tr>
-<tr><td><code>--popover-radius-tooltip</code></td><td>6</td><td>Corner radius of a Tooltip.</td></tr>
-<tr><td><code>--popover-gap-screen</code></td><td>8</td><td>The closest any layer gets to the screen edge.</td></tr>
-<tr><td><code>--popover-offset</code></td><td>4</td><td>The gap from a layer to its trigger.</td></tr>
-</tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Menu
-
-A Menu opens the public Menu family (`Section`, `ButtonItem`, `LinkItem`, `CustomItem`) in a floating box, built on Base UI Menu. Width hugs its rows up to 320, and height hugs up to 320 tall, then scrolls. A row has three states: rest, hover and selected. Selected uses neutral ink on the selected background. The anatomy, sizes and states are the Dropdown menu's own; see the [Dropdown menu](?path=/docs/components-forms-and-inputs-dropdown-menu--docs) page. A Menu sits on layer 400.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Popup
-
-<DocsCanvasShell description={<>A Popup pads 16 and rounds 12. Its width is a tier: <code>sm</code> 320, <code>md</code> 400 or <code>lg</code> 480. The title is Heading/xsmall 14/20 and the body is Body/default. Height hugs up to the room left on screen, then scrolls. The body is text or a short list.</>}>
-    <DsCanvasQuiet of={PopupFamilyStories.Popups} />
-</DocsCanvasShell>
-
-A Popup sits on layer 400, the popup layer. Opened from inside a Modal, it mounts in the Modal and takes layer 510. It never takes a form. A form needs a decision and a way out, so use a [Modal](?path=/docs/patterns-overlays-modal--docs) or a [Drawer](?path=/docs/patterns-overlays-drawer--docs).
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Flag
-
-<DocsCanvasShell description={<>A Flag is 400 wide, pads 16 and rounds 12. It carries a 16 icon in the appearance's icon color, a title in Heading/xsmall, a description in Body/default and a 32 Close button. Flags sit bottom-left and stack 16 apart, with the newest at the bottom.</>}>
-    <DsCanvasQuiet of={PopupFamilyStories.Flags} />
-</DocsCanvasShell>
-
-Normal, information and success close after 8 seconds. Warning and error stay until dismissed. A Flag sits on layer 600.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Tooltip
-
-<DocsCanvasShell description={<>A Tooltip is Body/small 12/16 in the inverse text color on the bold neutral background. It pads 4 above and below and 8 at the sides, so it is 24 tall on one line. It rounds 6 and wraps at 240. A Tooltip sits on layer 800.</>}>
-    <DsCanvasQuiet of={PopupFamilyStories.Tooltips} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Placement
-
-Every layer stays at least 8 from the screen edge and flips when there is no room. It sits 4 from its trigger. Width hugs content inside its tier, and height hugs up to the room left, then scrolls.
-
-<DocsTable>
-<thead>
-<tr><th>Rule</th><th>Token</th><th>Value</th></tr>
-</thead>
-<tbody>
-<tr><td>Closest to the screen edge</td><td><code>--popover-gap-screen</code></td><td>8</td></tr>
-<tr><td>Gap to the trigger</td><td><code>--popover-offset</code></td><td>4</td></tr>
-</tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Layers
-
-The layer numbers are shared with the [Blanket](?path=/docs/patterns-overlays-blanket--docs) page.
-
-<DocsTable>
-<thead>
-<tr><th>Layer</th><th>Number</th><th>Token</th></tr>
-</thead>
-<tbody>
-<tr><td>Menu</td><td>400</td><td><code>--layer-popup</code></td></tr>
-<tr><td>Popup</td><td>400</td><td><code>--layer-popup</code></td></tr>
-<tr><td>Popup from a Modal</td><td>510</td><td><code>--layer-modal</code></td></tr>
-<tr><td>Flag</td><td>600</td><td><code>--layer-flag</code></td></tr>
-<tr><td>Tooltip</td><td>800</td><td><code>--layer-tooltip</code></td></tr>
-</tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Interactive playground
+## Interactive playground
 
 <DocsInteractivePlayground
     of={PopupFamilyStories.Interactive}
@@ -193,48 +81,149 @@ The layer numbers are shared with the [Blanket](?path=/docs/patterns-overlays-bl
 
 <div className="sb-ds-doc-section">
 
-### Rules
+## Usage
 
-- Popup and Flag pad 16. Tooltip pads 4 and 8.
-- Width hugs content inside a tier: Menu up to 320, Tooltip up to 240, Popup 320, 400 or 480, Flag 400.
-- Stack Flags 16 apart, bottom-left.
-- The Popup body is text or a short list, never a form. Anything with inputs, steps or a long scroll belongs in a modal.
-- Give a Menu row a short label. When a row needs more, add a description line and let the row grow. Never put a sentence in the label.
-- A Popup-family layer never brings a blanket and never blocks the page. A Menu and a Popup close on an outside click or Escape.
-- Do not put required content in a Popup. Anything the person must read to finish the task belongs on the page.
+The four layers are built from existing components, and each component's page holds its own props and states.
+
+<DocsTable>
+<thead>
+<tr><th>Layer</th><th>Component</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Menu</td><td><code>DropdownMenu</code></td><td>To choose one action from a short list.</td></tr>
+<tr><td>Popup</td><td><code>Popup</code></td><td>A small aside anchored to a control, such as a definition, a preview or a short list.</td></tr>
+<tr><td>Flag</td><td><code>Flag</code>, placed by <code>FlagGroup</code></td><td>To report an outcome that does not need a decision.</td></tr>
+<tr><td>Tooltip</td><td><code>Tooltip</code></td><td>One line of help on a control.</td></tr>
+</tbody>
+</DocsTable>
+
+For a decision that must be made before going on, use a [Modal](?path=/docs/patterns-overlays-modal--docs), which takes a Blanket. For a task that needs the page in view, use a [Drawer](?path=/docs/patterns-overlays-drawer--docs).
+
+### Placement
+
+Every layer stays at least 8 from the screen edge and flips when there is no room. It sits 4 from its trigger. Width hugs content inside its tier, and height hugs up to the room left, then scrolls. A Menu hugs its rows up to 320 wide and 320 tall, then scrolls.
+
+### Layers
+
+The layer numbers are shared with the [Blanket](?path=/docs/patterns-overlays-blanket--docs) page.
+
+<DocsTable>
+<thead>
+<tr><th>Layer</th><th>Number</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Menu, Popup</td><td>400</td><td><code>--layer-popup</code></td></tr>
+<tr><td>Popup or Menu opened from a Modal</td><td>510</td><td><code>--layer-modal</code></td></tr>
+<tr><td>Flag</td><td>600</td><td><code>--layer-flag</code></td></tr>
+<tr><td>Tooltip</td><td>800</td><td><code>--layer-tooltip</code></td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Do and don't
+## Parts
 
-<DoDontGrid
-    pairs={[
-        {
-            doExample: <PopupShortList />,
-            doCaption: 'Three short rows answer the question without leaving the page.',
-            dontExample: <PopupForm />,
-            dontCaption: 'A form in a popup asks the person to work inside a floating box that closes on a stray click. Use a modal.',
-        },
-        {
-            doExample: <MenuShortLabels />,
-            doCaption: 'Short labels, with a description only on the rows that need one.',
-            dontExample: <MenuSentenceLabel />,
-            dontCaption: 'A whole sentence as the label runs past the menu’s width and crowds the row. Keep the label short and move the detail to the description.',
-        },
-    ]}
+1. **Menu.** A floating box of Menu rows (`Section`, `ButtonItem`, `LinkItem`, `CustomItem`), built on Base UI Menu. Its anatomy lives on the [Dropdown menu](?path=/docs/components-forms-and-inputs-dropdown-menu--docs) page.
+2. **Popup.** A floating box padded 16, with a title in Heading/xsmall and a body in Body/default.
+3. **Flag.** A 16 icon in the appearance's icon color, a title in Heading/xsmall, a description in Body/default, optional actions and a 32 Close button.
+4. **Tooltip.** One line of text, padded 4 above and below and 8 at the sides, rounded 6.
+
+### States
+
+Each layer is open or closed. Normal, information and success Flags close after 8 seconds; warning and error stay until dismissed. A Menu row has rest, hover and selected states, and selected uses neutral ink on the selected background; the full set is on the Dropdown menu page.
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Value</th><th>What it is for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--popover-pad</code></td><td>16</td><td>Pad of a Popup and a Flag.</td></tr>
+<tr><td><code>--popover-width-sm</code>, <code>-md</code>, <code>-lg</code></td><td>320, 400, 480</td><td>The Popup width tiers.</td></tr>
+<tr><td><code>--popover-width-flag</code></td><td>400</td><td>The width of a Flag.</td></tr>
+<tr><td><code>--popover-stack-flag</code></td><td>16</td><td>Space between stacked Flags.</td></tr>
+<tr><td><code>--popover-radius</code></td><td>12</td><td>Corner radius of a Popup and a Flag.</td></tr>
+<tr><td><code>--popover-max-width-menu</code>, <code>--popover-max-height-menu</code></td><td>320, 320</td><td>The widest and tallest a Menu gets before it scrolls.</td></tr>
+<tr><td><code>--popover-radius-menu-md</code></td><td>12</td><td>Menu corner radius.</td></tr>
+<tr><td><code>--popover-pad-y-tooltip</code>, <code>--pad-x-sm</code></td><td>4, 8</td><td>The Tooltip pad, so 12/16 text sits in 24.</td></tr>
+<tr><td><code>--popover-max-width-tooltip</code></td><td>240</td><td>A longer Tooltip wraps at this width.</td></tr>
+<tr><td><code>--popover-radius-tooltip</code></td><td>6</td><td>Corner radius of a Tooltip.</td></tr>
+<tr><td><code>--popover-gap-screen</code></td><td>8</td><td>The closest any layer gets to the screen edge.</td></tr>
+<tr><td><code>--popover-offset</code></td><td>4</td><td>The gap from a layer to its trigger.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+When a popup, a menu row and a tooltip help, and when they get in the way.
+
+### A popup holds text or a short list.
+
+Anything with inputs, steps or a long scroll belongs in a Modal or a Drawer. Never put content the person must read to finish the task in a popup; it belongs on the page.
+
+<DoDontPair
+    doExample={<PopupShortList />}
+    doCaption="Three short rows answer the question without leaving the page."
+    dontExample={<PopupForm />}
+    dontCaption="A form in a popup asks the person to work inside a floating box that closes on a stray click. Use a modal."
 />
 
+### Menu rows: a short label, then a description.
+
+<DoDontPair
+    doExample={<MenuShortLabels />}
+    doCaption="Short labels, with a description only on the rows that need one."
+    dontExample={<MenuSentenceLabel />}
+    dontCaption="A whole sentence as the label runs past the menu’s width and is cut off. Keep the label short and move the detail to the description."
+/>
+
+### A tooltip names a control in a few words.
+
+<DoDontPair
+    doExample={<TooltipShort />}
+    doCaption="A tooltip names its control in a few words."
+    dontExample={<TooltipParagraph />}
+    dontCaption="A tooltip that wraps into a paragraph hides what the person needed to read. Use a popup."
+/>
+
+### Never bring a blanket.
+
+A Popups-family layer never takes a blanket and never blocks the page.
+
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Content guidelines
 
-- A Popup's trigger is a control that announces the Popup: it carries <code>aria-haspopup</code> and an <code>aria-expanded</code> that tracks the open state.
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>A Flag title that says what happened: "Changes saved".</td><td>"Success!"</td></tr>
+<tr><td>A Flag description of one or two sentences on what happened and what to do next.</td><td>A paragraph, or a description that repeats the title.</td></tr>
+<tr><td>A Menu label that starts with the verb: "Reschedule", "Export notes".</td><td>A sentence as the label.</td></tr>
+<tr><td>A Tooltip that names the control: "Copy link".</td><td>A Tooltip that explains a whole flow.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- A Popup's trigger announces it: it carries `aria-haspopup` and an `aria-expanded` that tracks the open state.
 - A Popup is not a dialog. Focus does not move into it, and anything focusable inside it is reached by continuing to Tab.
-- An outside click and Escape close a Popup.
+- An outside click and Escape close a Popup and a Menu.
 - A hover-only Tooltip leaves out the keyboard. Open it on hover and focus.
 - A Flag is announced without taking focus. Normal, information and success are polite, and warning and error interrupt a screen reader.
 
@@ -242,12 +231,13 @@ The layer numbers are shared with the [Blanket](?path=/docs/patterns-overlays-bl
 
 <div className="sb-ds-doc-section">
 
-### Related
+## Related
 
 - [Popup](?path=/docs/components-overlays-and-layering-popup--docs) is the component page for the Popup, with its triggers and dismissal.
 - [Tooltip](?path=/docs/components-overlays-and-layering-tooltip--docs) is the component page for the Tooltip.
 - [Flag](?path=/docs/components-messaging-flag--docs) is the component page for the Flag.
-- [Blanket](?path=/docs/patterns-overlays-blanket--docs) holds the dimmed ground a Modal needs and a Popup-family layer never takes.
+- [Dropdown menu](?path=/docs/components-forms-and-inputs-dropdown-menu--docs) is the component page for the Menu.
+- [Blanket](?path=/docs/patterns-overlays-blanket--docs) holds the dimmed ground a Modal needs and a Popups-family layer never takes.
 - [Modal](?path=/docs/patterns-overlays-modal--docs) is the layer for a decision that blocks the page.
 
 </div>
