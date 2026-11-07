@@ -19,8 +19,8 @@ export default function ReflectionFormPage() {
     if (!reflection) {
         return (
             <div style={{ padding: 'var(--section-stack-md)' }}>
-                <h4 className="h4">Reflection not found</h4>
-                <p className="body1-txt">No draft matches id “{reflectionId}”.</p>
+                <h4 className="heading-large">Reflection not found</h4>
+                <p className="body-large">No draft matches id “{reflectionId}”.</p>
                 <Button text="Back to sessions" onClick={() => navigate('/')} />
             </div>
         );

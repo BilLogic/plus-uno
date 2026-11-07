@@ -204,8 +204,8 @@ const PrototypeMarket = () => {
     <div className="prototype-market">
       {/* Header */}
       <header className="prototype-market__header">
-        <h1 className="prototype-market__title h2">Prototype Market</h1>
-        <p className="prototype-market__subtitle body1-txt">
+        <h1 className="prototype-market__title heading-xxlarge">Prototype Market</h1>
+        <p className="prototype-market__subtitle body-large">
           Browse deployed PLUS prototypes. Each card links to its live deployment or local dev route.
         </p>
       </header>
@@ -224,7 +224,7 @@ const PrototypeMarket = () => {
       {/* Filters */}
       <div className="prototype-market__filters">
         <div className="prototype-market__filter-group">
-          <label className="prototype-market__filter-label body3-txt">Stage</label>
+          <label className="prototype-market__filter-label body-small">Stage</label>
           <Select
             id="market-stage-filter"
             aria-label="Stage"
@@ -237,7 +237,7 @@ const PrototypeMarket = () => {
         </div>
 
         <div className="prototype-market__filter-group">
-          <label className="prototype-market__filter-label body3-txt">Pillar</label>
+          <label className="prototype-market__filter-label body-small">Pillar</label>
           <Select
             id="market-pillar-filter"
             aria-label="Pillar"
@@ -250,7 +250,7 @@ const PrototypeMarket = () => {
         </div>
 
         <div className="prototype-market__filter-group">
-          <label className="prototype-market__filter-label body3-txt">Creator</label>
+          <label className="prototype-market__filter-label body-small">Creator</label>
           <Select
             id="market-creator-filter"
             aria-label="Creator"
@@ -286,7 +286,7 @@ const PrototypeMarket = () => {
 
       {/* Result count + view toggle */}
       <div className="prototype-market__toolbar">
-        <div className="prototype-market__count body2-txt">
+        <div className="prototype-market__count body-default">
           {normalizedSearch ? (
             <>
               Search result:{' '}
@@ -348,7 +348,7 @@ const PrototypeMarket = () => {
           </div>
         ) : (
           <div className="prototype-market__list">
-            <div className="prototype-market__list-header body3-txt">
+            <div className="prototype-market__list-header body-small">
               <span className="prototype-market__list-col--name">Name</span>
               <span className="prototype-market__list-col--pillar">Pillar</span>
               <span className="prototype-market__list-col--stage">Stage</span>
@@ -369,7 +369,7 @@ const PrototypeMarket = () => {
               return (
                 <RowTag
                   key={proto.id}
-                  className="prototype-market__list-row body2-txt"
+                  className="prototype-market__list-row body-default"
                   {...rowProps}
                 >
                   <span className="prototype-market__list-col--name">
@@ -395,7 +395,7 @@ const PrototypeMarket = () => {
       ) : (
         <div className="prototype-market__empty">
           <i className="fa-regular fa-folder-open prototype-market__empty-icon" aria-hidden="true" />
-          <p className="body1-txt">No prototypes match your filters.</p>
+          <p className="body-large">No prototypes match your filters.</p>
         </div>
       )}
 
@@ -426,7 +426,7 @@ const PrototypeMarket = () => {
                     {(PILLAR_META[activePrototype.productPillar] || PILLAR_META.universal).label}
                   </StatusTag>
                 </div>
-                <h3 className="prototype-market__modal-title h3">{activePrototype.title}</h3>
+                <h3 className="prototype-market__modal-title heading-xlarge">{activePrototype.title}</h3>
               </div>
 
               <div className="prototype-market__modal-actions">
@@ -449,12 +449,12 @@ const PrototypeMarket = () => {
               </div>
             </div>
 
-            <div className="prototype-market__modal-meta body2-txt">
+            <div className="prototype-market__modal-meta body-default">
               <span><i className="fa-regular fa-user" /> {activePrototype.creators?.join(', ') || 'User name'}</span>
               <span><i className="fa-regular fa-calendar" /> {formatDate(activePrototype.lastUpdated)}</span>
             </div>
 
-            <div className="prototype-market__modal-links body2-txt">
+            <div className="prototype-market__modal-links body-default">
               {activePrototype.localPath && (
                 <a href={activePrototype.localPath}><i className="fa-solid fa-laptop" /> Local</a>
               )}
@@ -470,11 +470,11 @@ const PrototypeMarket = () => {
               )}
             </div>
 
-            <p className="prototype-market__modal-desc body1-txt">{activePrototype.description}</p>
+            <p className="prototype-market__modal-desc body-large">{activePrototype.description}</p>
 
             {toLoomEmbed(activePrototype.loomVideoUrl) && (
               <>
-                <h5 className="prototype-market__modal-section h5">Walkthrough</h5>
+                <h5 className="prototype-market__modal-section heading-medium">Walkthrough</h5>
                 <div className="prototype-market__modal-loom">
                   <iframe
                     src={toLoomEmbed(activePrototype.loomVideoUrl)}
@@ -486,10 +486,10 @@ const PrototypeMarket = () => {
               </>
             )}
             <div className="prototype-market__divider" role="separator" />
-            <h5 className="prototype-market__modal-section h5">Comments</h5>
+            <h5 className="prototype-market__modal-section heading-medium">Comments</h5>
             <div className="prototype-market__modal-comments">
               {(commentsById[activePrototype.id] || []).map((comment, idx) => (
-                <div key={`${activePrototype.id}-comment-${idx}`} className="prototype-market__modal-comment body2-txt">
+                <div key={`${activePrototype.id}-comment-${idx}`} className="prototype-market__modal-comment body-default">
                   <div className="prototype-market__modal-comment-head">
                     <strong>{comment.author}</strong> <span>{comment.timestamp}</span>
                   </div>
@@ -523,7 +523,7 @@ const PrototypeMarket = () => {
               />
             </div>
             <div className="prototype-market__divider" role="separator" />
-            <h5 className="prototype-market__modal-section h5">Preview</h5>
+            <h5 className="prototype-market__modal-section heading-medium">Preview</h5>
             <div className="prototype-market__modal-preview">
               {getPrototypeOpenUrl(activePrototype) ? (
                 <div
@@ -534,7 +534,7 @@ const PrototypeMarket = () => {
                   onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openPrototypeInNewTab(activePrototype, e); } }}
                 >
                   {missingPreviews.has(activePrototype.id) ? (
-                    <div className="prototype-market__modal-preview-fallback body2-txt">
+                    <div className="prototype-market__modal-preview-fallback body-default">
                       Preview image is generating. Run `npm run generate:previews` to refresh snapshots.
                     </div>
                   ) : (
@@ -554,7 +554,7 @@ const PrototypeMarket = () => {
                   )}
                 </div>
               ) : (
-                <div className="prototype-market__modal-preview-fallback body2-txt">
+                <div className="prototype-market__modal-preview-fallback body-default">
                   No prototype link available for preview.
                 </div>
               )}

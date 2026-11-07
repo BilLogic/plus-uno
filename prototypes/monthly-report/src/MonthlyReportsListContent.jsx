@@ -125,8 +125,8 @@ export default function MonthlyReportsListContent() {
             `}</style>
             <div className="reports-header-row reveal-section" style={{ animationDelay: '0ms' }}>
                 <div className="header-text">
-                    <h1 className="h2">Monthly Reviews</h1>
-                    <p className="body2-txt text-muted" style={{ marginTop: '8px' }}>
+                    <h1 className="heading-xxlarge">Monthly Reviews</h1>
+                    <p className="body-default text-muted" style={{ marginTop: '8px' }}>
                         Overview of your performance and session feedback.
                     </p>
                 </div>
@@ -168,8 +168,8 @@ export default function MonthlyReportsListContent() {
                                 style={{ animationDelay: `${400 + i * 80}ms` }}
                                 onClick={() => handleViewReport(report.id)}
                             >
-                                <td className="body2-txt">{report.month}</td>
-                                <td className="body2-txt">{report.dateRange}</td>
+                                <td className="body-default">{report.month}</td>
+                                <td className="body-default">{report.dateRange}</td>
                                 <td>
                                     <StatusTag appearance={getStatusBadgeStyle(report.status)}>{report.status}</StatusTag>
                                 </td>
@@ -186,7 +186,7 @@ export default function MonthlyReportsListContent() {
                                                 className="completion-progress completion-progress--staged"
                                             />
                                         </div>
-                                        <span className="body3-txt">
+                                        <span className="body-small">
                                             {report.completion.done}/{report.completion.total}
                                         </span>
                                     </div>
@@ -210,7 +210,7 @@ export default function MonthlyReportsListContent() {
             </div>
 
             <footer className="reports-footer reveal-section" style={{ animationDelay: '900ms' }}>
-                <span className="body3-txt text-muted">
+                <span className="body-small text-muted">
                     Showing <strong>{startItem}</strong> to <strong>{endItem}</strong> of <strong>{TOTAL_REPORTS}</strong> results
                 </span>
                 <div className="pagination-wrapper">

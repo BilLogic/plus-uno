@@ -74,7 +74,7 @@ export default function ReflectionsListPage() {
                         gap: 'var(--space-0625)',
                     }}
                 >
-                    <h3 className="h3 m-0" style={{ color: 'var(--ds-text)' }}>Sessions</h3>
+                    <h3 className="heading-xlarge m-0" style={{ color: 'var(--ds-text)' }}>Sessions</h3>
                     <Button appearance="primary" iconBefore="user-plus" text="Fill in" />
                 </div>
 
@@ -108,7 +108,7 @@ export default function ReflectionsListPage() {
                             gap: 'var(--stack-md)',
                         }}
                     >
-                        <h5 className="h5 m-0" style={{ color: 'var(--ds-text)' }}>Your reflections</h5>
+                        <h5 className="heading-medium m-0" style={{ color: 'var(--ds-text)' }}>Your reflections</h5>
                         <FilterSelect
                             aria-label="Completion"
                             clearable={false}

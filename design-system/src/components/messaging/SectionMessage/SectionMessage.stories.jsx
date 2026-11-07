@@ -92,7 +92,7 @@ function SectionMessageContentDemos() {
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CONTENT VARIANTS (PRIMARY STYLE)</span>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH TITLE</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Use when the message benefits from a short heading.
                 </p>
                 <SectionMessage appearance="primary" title="With Title" dismissible>
@@ -101,7 +101,7 @@ function SectionMessageContentDemos() {
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BODY ONLY</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Use when concise copy does not require a heading.
                 </p>
                 <SectionMessage appearance="primary" dismissible>
@@ -110,7 +110,7 @@ function SectionMessageContentDemos() {
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">NON-DISMISSIBLE</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Use for critical information that must remain visible.
                 </p>
                 <SectionMessage appearance="primary" title="Non-dismissible message" dismissible={false}>
@@ -119,7 +119,7 @@ function SectionMessageContentDemos() {
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RICH CONTENT</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Supports inline emphasis and links inside the body.
                 </p>
                 <SectionMessage appearance="info" title="Rich Content">
@@ -129,7 +129,7 @@ function SectionMessageContentDemos() {
             </section>
             <section>
                 <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ACTIONS</span>
-                <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Up to two link-button actions after the body.
                 </p>
                 <SectionMessage

@@ -681,7 +681,7 @@ export default function MonthlyReportContent() {
                                                             <p className="quote-text">"{dim.evidence}"</p>
                                                             {dim.session && (
                                                                 <div style={{ display: 'flex', alignItems: 'center' }}>
-                                                                    <span className="session-info body3-txt text-muted">
+                                                                    <span className="session-info body-small text-muted">
                                                                         <i className="fa-solid fa-video" style={{ marginRight: '8px' }}></i>
                                                                         {dim.session}
                                                                     </span>

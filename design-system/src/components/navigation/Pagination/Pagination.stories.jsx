@@ -118,7 +118,7 @@ function PaginationSpacingDemos() {
         <>
             <section>
                 <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ICON NAVIGATOR SPACINGS</span>
-                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Default and compact icon pagination.
                 </p>
                 <div style={contentVariantCard}>
@@ -130,7 +130,7 @@ function PaginationSpacingDemos() {
             </section>
             <section>
                 <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TEXT NAVIGATOR SPACINGS</span>
-                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Default and compact text pagination with Previous and Next labels.
                 </p>
                 <div style={contentVariantCard}>
@@ -149,7 +149,7 @@ function PaginationInteractionStatesDemos() {
         <>
             <section>
                 <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FIRST PAGE</span>
-                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Previous control is disabled at the first page.
                 </p>
                 <div style={contentVariantCard}>
@@ -165,7 +165,7 @@ function PaginationInteractionStatesDemos() {
             </section>
             <section>
                 <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LAST PAGE</span>
-                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Next control is disabled at the last page.
                 </p>
                 <div style={contentVariantCard}>
@@ -181,7 +181,7 @@ function PaginationInteractionStatesDemos() {
             </section>
             <section>
                 <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MIDDLE PAGE</span>
-                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Both previous and next controls are enabled.
                 </p>
                 <div style={contentVariantCard}>

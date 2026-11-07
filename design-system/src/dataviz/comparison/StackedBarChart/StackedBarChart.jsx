@@ -87,7 +87,7 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
             categories: dates,
             labels: {
                 style: {
-                    fontSize: 'var(--font-size-body3)',
+                    fontSize: 'var(--font-size-075)',
                     color: 'var(--ds-text-subtle)'
                 }
             },
@@ -108,8 +108,8 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
             gridLineColor: 'var(--ds-border)',
             labels: {
                 style: {
-                    fontSize: 'var(--font-size-body3)',
-                    fontFamily: 'var(--font-family-body)',
+                    fontSize: 'var(--font-size-075)',
+                    fontFamily: 'var(--type-family-body)',
                     color: 'var(--ds-text-subtle)'
                 }
             }
@@ -130,8 +130,8 @@ const StackedBarChart = ({ data, dates, yLabels, height = 207, yAxisMax }) => {
                     style: {
                         textOutline: 'none',
                         fontWeight: '300',
-                        fontSize: 'var(--font-size-body3)',
-                        fontFamily: 'var(--font-family-body)'
+                        fontSize: 'var(--font-size-075)',
+                        fontFamily: 'var(--type-family-body)'
                     }
                 },
                 // A gap between stacked segments, as Atlassian separates adjacent chart colors.

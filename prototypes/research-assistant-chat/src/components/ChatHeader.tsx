@@ -23,7 +23,7 @@ export function ChatHeader({
         width: '100%',
         height: 'fit-content',
         borderBottom: '1px solid var(--chat-outline, #d1d5db)',
-        fontFamily: 'var(--font-family-header)',
+        fontFamily: 'var(--type-family-heading)',
         background: 'var(--chat-bg, #f9fafb)',
       }}
     >
@@ -49,8 +49,8 @@ export function ChatHeader({
       <h2
         style={{
           margin: 0,
-          fontSize: 'var(--font-size-h4, 18px)',
-          fontWeight: 'var(--font-weight-semibold-2, 600)',
+          fontSize: 'var(--font-size-150)',
+          fontWeight: 'var(--type-weight-semibold)',
           color: 'var(--chat-on-surface, #111827)',
         }}
       >

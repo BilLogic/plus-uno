@@ -63,7 +63,7 @@ export function TrainingProgressContent(): React.ReactElement {
       <div className="reveal-section">
         <section className="tutor-training-progress-page__overview-section" aria-labelledby="training-progress-overview-title">
           <header className="tutor-training-progress-page__overview-header">
-            <h2 id="training-progress-overview-title" className="h4" style={{ color: 'var(--ds-text)' }}>Training Progress Overview</h2>
+            <h2 id="training-progress-overview-title" className="heading-large" style={{ color: 'var(--ds-text)' }}>Training Progress Overview</h2>
             <ButtonGroup className="tutor-training-progress-page__toggle">
               <Button appearance="primary" text="By Tutor" isSelected={currentViewMode === 'By Tutor'} onClick={() => setCurrentViewMode('By Tutor')} />
               <Button appearance="primary" text="By Lesson" isSelected={currentViewMode === 'By Lesson'} onClick={() => setCurrentViewMode('By Lesson')} />
@@ -119,12 +119,12 @@ export function TrainingProgressContent(): React.ReactElement {
       <div className="reveal-section">
         <div className="tutor-training-progress-page__details-section">
           <div className="tutor-training-progress-page__details-header">
-            <h2 className="h4" style={{ color: 'var(--ds-text)' }}>Training Progress Details</h2>
+            <h2 className="heading-large" style={{ color: 'var(--ds-text)' }}>Training Progress Details</h2>
           </div>
           <ExportSearchFilterBar searchPlaceholder="Search" onSearch={noop} onExport={noop} filters={FILTER_BAR_FILTERS} />
           <TutorsTrainingProgressTable tutors={DEFAULT_TUTORS} onRowClick={noop} />
           <div className="tutor-training-progress-page__pagination">
-            <div className="body2-txt" style={{ fontWeight: 300, color: 'var(--ds-text)' }}>
+            <div className="body-default" style={{ fontWeight: 300, color: 'var(--ds-text)' }}>
               Showing {entriesStart} to {entriesEnd} of {totalEntries} entries
             </div>
             <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={noop} navigator="icon" spacing="compact" />

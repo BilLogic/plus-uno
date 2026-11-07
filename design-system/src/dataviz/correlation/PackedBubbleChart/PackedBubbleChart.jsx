@@ -53,7 +53,7 @@ const PackedBubbleChart = ({
                     },
                     style: {
                         textOutline: 'none',
-                        fontWeight: 'var(--font-weight-normal)'
+                        fontWeight: 'var(--type-weight-regular)'
                     }
                 }
             }

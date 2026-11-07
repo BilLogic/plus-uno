@@ -45,7 +45,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--focus-ring-width` · `--font-weight-semibold-2` · `--heading-xxsmall` · `--icon-md` · `--icon-sm` · `--inline-md` · `--plus-table-cell-max-width` · `--plus-table-row-height` · `--row-height-lg` · `--row-height-md` · `--row-height-sm` · `--space-0625` · `--table-cell-max-width` · `--table-pad-x-cell` · `--table-pad-y-cell` · `--table-radius`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-text` · `--ds-text-danger` · `--ds-text-disabled` · `--ds-text-subtle` · `--focus-ring-width` · `--heading-xxsmall` · `--icon-md` · `--icon-sm` · `--inline-md` · `--plus-table-cell-max-width` · `--plus-table-row-height` · `--row-height-lg` · `--row-height-md` · `--row-height-sm` · `--space-0625` · `--table-cell-max-width` · `--table-pad-x-cell` · `--table-pad-y-cell` · `--table-radius` · `--type-weight-semibold`
 
 From `design-system/src/components/text-and-data-display/Table/Table.scss`. Override these through the token layer, never with a literal.
 

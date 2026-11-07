@@ -61,3 +61,18 @@
     /* Code only (CODE_ONLY_TYPE_STYLES) */
     --code: var(--type-weight-regular) 0.875em / 1 var(--type-family-code);
 }
+
+/* One class per text style, for markup with no stylesheet of its own: <p className="body-default">. */
+.heading-xxlarge { font: var(--heading-xxlarge); letter-spacing: var(--heading-xxlarge-tracking); }
+.heading-xlarge { font: var(--heading-xlarge); letter-spacing: var(--heading-xlarge-tracking); }
+.heading-large { font: var(--heading-large); letter-spacing: var(--heading-large-tracking); }
+.heading-medium { font: var(--heading-medium); }
+.heading-small { font: var(--heading-small); }
+.heading-xsmall { font: var(--heading-xsmall); }
+.heading-xxsmall { font: var(--heading-xxsmall); }
+.body-large { font: var(--body-large); }
+.body-default { font: var(--body-default); }
+.body-small { font: var(--body-small); }
+.metric-large { font: var(--metric-large); }
+.metric-medium { font: var(--metric-medium); }
+.metric-small { font: var(--metric-small); }

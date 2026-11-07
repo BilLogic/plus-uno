@@ -17,8 +17,8 @@ body {
   min-height: 100%;
   display: block;
   overflow: hidden;
-  font-family: var(--font-family-body, "Merriweather Sans", "Open Sans", sans-serif);
-  font-size: var(--font-size-body2, 14px);
+  font-family: var(--type-family-body);
+  font-size: var(--font-size-0875);
   color: var(--ds-text);
   -webkit-font-smoothing: antialiased;
   background-color: var(--ds-surface-container);

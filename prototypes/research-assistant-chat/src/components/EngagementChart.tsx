@@ -76,7 +76,7 @@ export function EngagementChart({
       width: CHART_WIDTH,
       spacingBottom: 20,
       style: {
-        fontFamily: 'var(--font-family-body)',
+        fontFamily: 'var(--type-family-body)',
         color: colors.text,
       },
     },

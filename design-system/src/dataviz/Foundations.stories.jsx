@@ -32,8 +32,8 @@ export const TooltipSurface = () => (
                 boxShadow: 'var(--ds-shadow-overlay)',
                 padding: 'var(--popover-pad)',
                 color: 'var(--ds-text)',
-                fontFamily: 'var(--font-family-body)',
-                fontSize: 'var(--font-size-body2)',
+                fontFamily: 'var(--type-family-body)',
+                fontSize: 'var(--font-size-0875)',
             }}
         >
             Thursday: <b>24 sessions</b>

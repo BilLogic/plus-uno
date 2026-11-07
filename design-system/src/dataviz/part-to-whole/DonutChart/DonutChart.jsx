@@ -29,29 +29,29 @@ const DonutChart = ({
     // Get font size value for the center text using the type ladder
     const getFontSize = () => {
         const sizeMap = {
-            'h1': 'var(--font-size-h1)',
-            'h2': 'var(--font-size-h2)',
-            'h3': 'var(--font-size-h3)',
-            'h4': 'var(--font-size-h4)',
-            'h5': 'var(--font-size-h5)',
-            'body3': 'var(--font-size-body3)'
+            'h1': 'var(--font-size-200)',
+            'h2': 'var(--font-size-200)',
+            'h3': 'var(--font-size-175)',
+            'h4': 'var(--font-size-150)',
+            'h5': 'var(--font-size-125)',
+            'body3': 'var(--font-size-075)'
         };
         return sizeMap[centerTextSize] || sizeMap['h4'];
     };
 
     const getFontWeight = () => {
         // Title tokens use bold weight, body uses normal
-        return centerTextSize === 'body3' ? 'var(--font-weight-normal)' : 'var(--font-weight-bold)';
+        return centerTextSize === 'body3' ? 'var(--type-weight-regular)' : 'var(--type-weight-semibold)';
     };
 
     const getLineHeight = () => {
         const lineHeightMap = {
-            'h1': 'var(--font-line-height-h1)',
-            'h2': 'var(--font-line-height-h2)',
-            'h3': 'var(--font-line-height-h3)',
-            'h4': 'var(--font-line-height-h4)',
-            'h5': 'var(--font-line-height-h5)',
-            'body3': 'var(--font-line-height-body3)'
+            'h1': 'var(--line-height-225)',
+            'h2': 'var(--line-height-225)',
+            'h3': 'var(--line-height-200)',
+            'h4': 'var(--line-height-175)',
+            'h5': 'var(--line-height-150)',
+            'body3': 'var(--line-height-100)'
         };
         return lineHeightMap[centerTextSize] || lineHeightMap['h4'];
     };
@@ -126,7 +126,7 @@ const DonutChart = ({
                 width: '100%'
             }}>
                 <div style={{
-                    fontFamily: centerTextSize === 'body3' ? 'var(--font-family-body)' : 'var(--font-family-header)',
+                    fontFamily: centerTextSize === 'body3' ? 'var(--type-family-body)' : 'var(--type-family-heading)',
                     fontWeight: getFontWeight(),
                     fontSize: getFontSize(),
                     lineHeight: getLineHeight(),
@@ -136,8 +136,8 @@ const DonutChart = ({
                 </div>
                 {label && (
                     <div style={{
-                        fontFamily: 'var(--font-family-body)',
-                        fontSize: 'var(--font-size-body3)',
+                        fontFamily: 'var(--type-family-body)',
+                        fontSize: 'var(--font-size-075)',
                         lineHeight: '1.667',
                         color: 'var(--ds-text-subtle)',
                         marginTop: 'var(--pad-x-xs)'

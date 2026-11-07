@@ -72,7 +72,7 @@ Buttons.play = async ({ canvasElement }) => {
 
 /** A button keeps its size inside a heading, which sizes its own icons. */
 export const ButtonInHeading = () => (
-    <div className="h3" style={row}>
+    <div className="heading-xlarge" style={row}>
         <span>Heading</span>
         <IconButton appearance="subtle" icon="pen" label="Edit" />
     </div>

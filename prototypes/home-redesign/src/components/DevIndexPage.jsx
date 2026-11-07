@@ -7,7 +7,7 @@ const DevIndexPage = () => {
             padding: '40px',
             maxWidth: '800px',
             margin: '0 auto',
-            fontFamily: 'var(--font-family-body, sans-serif)'
+            fontFamily: 'var(--type-family-body)'
         }}>
             <h1 style={{ marginBottom: '24px', color: 'var(--ds-text)' }}>PLUS Application Prototypes</h1>
             <p style={{ marginBottom: '32px', color: 'var(--ds-text-subtle)' }}>

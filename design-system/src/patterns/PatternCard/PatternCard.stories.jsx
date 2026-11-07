@@ -8,7 +8,7 @@ import { Skeleton, Button, IconButton } from '@/components';
 import { CardJobs } from './PatternCardCases.jsx';
 
 const bodyCopy = (
-    <p className="body1-txt" style={{ margin: 0 }}>
+    <p className="body-large" style={{ margin: 0 }}>
         Some quick example text to fill the body slot of the card shell.
     </p>
 );

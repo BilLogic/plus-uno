@@ -26,8 +26,8 @@ html,
 body {
   margin: 0;
   min-height: 100vh;
-  font-family: var(--font-family-body);
-  font-size: var(--font-size-body2, 14px);
+  font-family: var(--type-family-body);
+  font-size: var(--font-size-0875);
   color: var(--ds-text);
   -webkit-font-smoothing: antialiased;
   display: flex;
@@ -113,9 +113,9 @@ body {
 
 /** Overview card titles: b1 bold. */
 #tutor-training-progress-page .plus-overview-card__title {
-  font-size: var(--font-size-body1, 1rem);
-  font-weight: var(--font-weight-body1-bold, 700);
-  line-height: var(--font-line-height-body1, 1.5);
+  font-size: var(--font-size-100);
+  font-weight: var(--type-weight-semibold);
+  line-height: var(--line-height-150);
 }
 
 #tutor-training-progress-page .tutor-training-progress-page__overview-cards .plus-overview-card {

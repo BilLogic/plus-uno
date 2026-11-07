@@ -12,7 +12,7 @@ export function ToolCard({ title, description, children, className = '' }: { tit
                 borderRadius: '12px',
                 overflow: 'hidden',
                 marginBottom: '12px',
-                fontFamily: 'var(--font-family-body)',
+                fontFamily: 'var(--type-family-body)',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
             }}
         >

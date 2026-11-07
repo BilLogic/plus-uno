@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 51,
-    "uses": 196,
+    "names": 50,
+    "uses": 195,
     "bare": 5
   },
   "tokens": {
@@ -46,10 +46,6 @@
     },
     "--element-gap-sm": {
       "uses": 3,
-      "bare": 0
-    },
-    "--font-family-base": {
-      "uses": 1,
       "bare": 0
     },
     "--font-size-fa-b3-solid": {

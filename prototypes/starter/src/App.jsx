@@ -45,11 +45,11 @@ const App = () => {
                     textAlign: 'center',
                 }}
             >
-                <h3 className="h3" style={{ color: 'var(--ds-text)', marginBottom: 'var(--space-0625, 16px)' }}>
+                <h3 className="heading-xlarge" style={{ color: 'var(--ds-text)', marginBottom: 'var(--space-0625, 16px)' }}>
                     <i className="fa-solid fa-rocket" style={{ marginRight: '8px', color: 'var(--ds-icon-brand)' }} />
                     Bryan's Prototype
                 </h3>
-                <p className="body1-txt" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
+                <p className="body-large" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
                     Your prototypes is ready! Edit <code>src/App.jsx</code> to start building.
                 </p>
                 <div
@@ -63,16 +63,16 @@ const App = () => {
                         borderRadius: 'var(--radius-md, 4px)',
                     }}
                 >
-                    <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
+                    <span className="body-default font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
                         Quick start:
                     </span>
-                    <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
+                    <span className="body-default" style={{ color: 'var(--ds-text-subtle)' }}>
                         1. Import components from <code>@/components/</code>
                     </span>
-                    <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
+                    <span className="body-default" style={{ color: 'var(--ds-text-subtle)' }}>
                         2. Use design tokens for all styling
                     </span>
-                    <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
+                    <span className="body-default" style={{ color: 'var(--ds-text-subtle)' }}>
                         3. Reference Figma designs with MCP tools
                     </span>
                 </div>

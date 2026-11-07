@@ -97,7 +97,7 @@ Overview.parameters = {
 
 export const Content = () => (
     <div style={{ maxWidth: 'var(--size-5400)' }}>
-        <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
+        <p className="body-default mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
             Label, required asterisk, accepted formats, and button copy.
         </p>
         <FileUpload
@@ -177,7 +177,7 @@ export const InteractionStates = () => (
 
 export const ReadOnly = () => (
     <div style={{ maxWidth: 'var(--size-4000)' }}>
-        <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
+        <p className="body-default mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
             Read-only shows the field and the files already chosen, with no button to choose another.
         </p>
         <FileUpload
@@ -187,7 +187,7 @@ export const ReadOnly = () => (
             isReadOnly
         >
             <div
-                className="body2-txt"
+                className="body-default"
                 style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -205,7 +205,7 @@ export const ReadOnly = () => (
 
 export const WithFiles = () => (
     <div style={{ maxWidth: 'var(--size-4000)' }}>
-        <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
+        <p className="body-default mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
             Pass the chosen files as children. They sit below the button, outside the frame, as on the post-session recording upload.
         </p>
         <FileUpload
@@ -218,7 +218,7 @@ export const WithFiles = () => (
             {['zoom_0.mp4', 'audio_only.m4a', 'chat.txt'].map((file) => (
                 <div
                     key={file}
-                    className="body2-txt"
+                    className="body-default"
                     style={{
                         display: 'flex',
                         alignItems: 'center',

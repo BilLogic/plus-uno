@@ -409,13 +409,13 @@ export const LoadingTable = () => {
         <div style={{ display: 'grid', gap: '12px', justifyItems: 'start' }}>
             <div role="status" className="visually-hidden" data-testid="live">{message}</div>
             <section aria-labelledby="skeleton-students" aria-busy={loaded ? undefined : 'true'}>
-                <h3 id="skeleton-students" className="h6">Students</h3>
+                <h3 id="skeleton-students" className="heading-small">Students</h3>
                 <div style={{ display: 'grid', gap: '12px' }}>
                     {[['Rosa Chen', 140], ['Kai Brooks', 110], ['Amara Okafor', 160]].map(([name, width]) => (
                         <div key={name} style={{ display: 'flex', gap: '48px', alignItems: 'center' }}>
                             {loaded ? (
                                 <>
-                                    <span className="body2-txt" style={{ width }}>{name}</span>
+                                    <span className="body-default" style={{ width }}>{name}</span>
                                     <StatusTag appearance="success">Active</StatusTag>
                                     <Tag text="Algebra" />
                                 </>
@@ -485,8 +485,8 @@ export const LoadingCard = () => {
             >
                 {loaded ? (
                     <>
-                        <p className="body1-txt" style={{ margin: 0 }}>Unit 3 review</p>
-                        <p className="body3-txt" style={{ margin: 0 }}>Four students worked through ratios and rates.</p>
+                        <p className="body-large" style={{ margin: 0 }}>Unit 3 review</p>
+                        <p className="body-small" style={{ margin: 0 }}>Four students worked through ratios and rates.</p>
                         <span style={{ display: 'flex', gap: '8px' }}>
                             <Tag text="Ratios" />
                             <Tag text="Rates" />

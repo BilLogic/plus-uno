@@ -21,9 +21,9 @@ const DonutChartSVG = ({
     const getTextStyle = () => {
         if (centerTextSize === 'body3') {
             return {
-                fontFamily: 'var(--font-family-body)',
-                fontWeight: 'var(--font-weight-normal)',
-                fontSize: 'var(--font-size-body3)',
+                fontFamily: 'var(--type-family-body)',
+                fontWeight: 'var(--type-weight-regular)',
+                fontSize: 'var(--font-size-075)',
                 lineHeight: '1.4',
                 color: 'var(--ds-text-subtle)',
                 letterSpacing: '0'
@@ -31,9 +31,9 @@ const DonutChartSVG = ({
         }
         // Default to header styles for other sizes
         return {
-            fontFamily: 'var(--font-family-header)',
-            fontWeight: 'var(--font-weight-bold)',
-            fontSize: centerTextSize === 'h1' ? 'var(--font-size-h1)' : 'var(--font-size-h2)',
+            fontFamily: 'var(--type-family-heading)',
+            fontWeight: 'var(--type-weight-semibold)',
+            fontSize: centerTextSize === 'h1' ? 'var(--font-size-200)' : 'var(--font-size-200)',
             lineHeight: '1',
             color: 'var(--ds-text)'
         };
@@ -107,8 +107,8 @@ const DonutChartSVG = ({
                         color: 'var(--ds-text)',
                         padding: 'var(--popover-pad-y-tooltip) var(--pad-x-sm)',
                         borderRadius: 'var(--popover-radius-tooltip)',
-                        fontSize: 'var(--font-size-body3)',
-                        fontFamily: 'var(--font-family-body)',
+                        fontSize: 'var(--font-size-075)',
+                        fontFamily: 'var(--type-family-body)',
                         pointerEvents: 'none',
                         zIndex: 'var(--layer-tooltip)',
                         whiteSpace: 'nowrap',
@@ -117,7 +117,7 @@ const DonutChartSVG = ({
                     }}
                 >
                     {paths[hoveredIndex].label && (
-                        <div style={{ fontWeight: 'var(--font-weight-bold)', marginBottom: 'var(--pad-x-xs)' }}>
+                        <div style={{ fontWeight: 'var(--type-weight-semibold)', marginBottom: 'var(--pad-x-xs)' }}>
                             {paths[hoveredIndex].label}
                         </div>
                     )}
@@ -153,8 +153,8 @@ const DonutChartSVG = ({
                 </p>
                 {label && (
                     <span style={{
-                        fontFamily: 'var(--font-family-body)',
-                        fontSize: 'var(--font-size-body3)',
+                        fontFamily: 'var(--type-family-body)',
+                        fontSize: 'var(--font-size-075)',
                         color: 'var(--ds-text-subtle)',
                         marginTop: 'var(--pad-x-xs)'
                     }}>

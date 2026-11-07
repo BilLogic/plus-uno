@@ -166,21 +166,21 @@ export function CompactChatBar({
                           'var(--radius-075)',
                         cursor: 'pointer',
                         textAlign: 'left',
-                        fontFamily: 'var(--font-family-body)',
+                        fontFamily: 'var(--type-family-body)',
                         color: 'var(--ds-text)',
                       }}
                     >
                       <div
                         style={{
                           fontWeight: 600,
-                          fontSize: 'var(--font-size-body2, 14px)',
+                          fontSize: 'var(--font-size-0875)',
                         }}
                       >
                         {prompt.title}
                       </div>
                       <div
                         style={{
-                          fontSize: 'var(--font-size-body2, 14px)',
+                          fontSize: 'var(--font-size-0875)',
                           color: 'var(--ds-text-subtle)',
                         }}
                       >
@@ -235,8 +235,8 @@ export function CompactChatBar({
               <span
                 style={{
                   flex: 1,
-                  fontFamily: 'var(--font-family-body)',
-                  fontSize: 'var(--font-size-body2, 14px)',
+                  fontFamily: 'var(--type-family-body)',
+                  fontSize: 'var(--font-size-0875)',
                   color: 'var(--ds-text-subtle)',
                 }}
               >

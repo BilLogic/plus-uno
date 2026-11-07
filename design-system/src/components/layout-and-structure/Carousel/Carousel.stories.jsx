@@ -95,7 +95,7 @@ const createSlideContent = (text, bgColor) => (
         alignItems: 'center',
         justifyContent: 'center',
         fontSize: '2rem',
-        fontFamily: 'var(--font-family-header)',
+        fontFamily: 'var(--type-family-heading)',
         color: 'var(--ds-text)'
     }}>
         {text}
@@ -120,7 +120,7 @@ const createLabeledSlideContent = (text, bgColor, label, description) => (
             display: 'flex',
             alignItems: 'center',
             fontSize: '2rem',
-            fontFamily: 'var(--font-family-header)',
+            fontFamily: 'var(--type-family-heading)',
             textAlign: 'center'
         }}>
             {text}
@@ -134,18 +134,18 @@ const createLabeledSlideContent = (text, bgColor, label, description) => (
             paddingBottom: '16px'
         }}>
             <span style={{
-                fontSize: 'var(--font-size-h5)',
-                lineHeight: 'var(--font-line-height-h5)',
-                fontWeight: 'var(--font-weight-semibold-2)',
-                fontFamily: 'var(--font-family-header)'
+                fontSize: 'var(--font-size-125)',
+                lineHeight: 'var(--line-height-150)',
+                fontWeight: 'var(--type-weight-semibold)',
+                fontFamily: 'var(--type-family-heading)'
             }}>
                 {label}
             </span>
             <span style={{
-                fontSize: 'var(--font-size-body1)',
-                lineHeight: 'var(--font-line-height-body1)',
-                fontWeight: 'var(--font-weight-normal)',
-                fontFamily: 'var(--font-family-body)',
+                fontSize: 'var(--font-size-100)',
+                lineHeight: 'var(--line-height-150)',
+                fontWeight: 'var(--type-weight-regular)',
+                fontFamily: 'var(--type-family-body)',
                 color: 'var(--ds-text-subtle)'
             }}>
                 {description}

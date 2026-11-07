@@ -155,7 +155,7 @@ const InSessionContent = () => {
                         <div className="page-reveal-content" style={{ display: 'flex', flexDirection: 'column' }}>
                             {/* Header Section */}
                             <div className="page-content-reveal header-reveal" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px', paddingTop: '16px', animationDelay: '0ms' }}>
-                                <h1 className="h4" style={{ margin: 0 }}>Your Students</h1>
+                                <h1 className="heading-large" style={{ margin: 0 }}>Your Students</h1>
                                 <div style={{ display: 'flex', gap: '8px' }}>
                                     <Button text="Copy assignments" spacing="compact" iconBefore={<i className="fa-solid fa-copy" />} />
                                     <Button text="Manage Session" spacing="compact" iconBefore={<i className="fa-solid fa-gear" />} onClick={() => setIsManageAssignmentOpen(true)} />

@@ -192,12 +192,12 @@ function InteractionStatesDemos() {
     return (
         <section>
             <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INTERACTION STATES</span>
-            <p className="body2-txt" style={{ marginBottom: '24px', color: 'var(--ds-text-subtle)' }}>
+            <p className="body-default" style={{ marginBottom: '24px', color: 'var(--ds-text-subtle)' }}>
                 States below are artificially forced for demonstration.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                 <div>
-                    <p className="body3-txt" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Unselected tab states</p>
+                    <p className="body-small" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Unselected tab states</p>
                     <Tabs defaultActiveKey="none">
                         <Tabs.Tab eventKey="default">Default</Tabs.Tab>
                         <Tabs.Tab eventKey="hover" className="pseudo-hover">Hovered</Tabs.Tab>
@@ -206,7 +206,7 @@ function InteractionStatesDemos() {
                     </Tabs>
                 </div>
                 <div>
-                    <p className="body3-txt" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Disabled</p>
+                    <p className="body-small" style={{ marginBottom: '16px', fontWeight: 'bold' }}>Disabled</p>
                     <Tabs defaultActiveKey="none">
                         <Tabs.Tab eventKey="disabled" isDisabled>Disabled</Tabs.Tab>
                     </Tabs>

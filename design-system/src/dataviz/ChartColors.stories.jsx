@@ -21,7 +21,7 @@ const { BRAND, CATEGORICAL, CHROME, HUES, NEUTRAL, SMART, STATUS, divergingRamp,
  * One of each chart family the theme dresses, so a check can hold every one of
  * them to the tokens in every color mode, and axe can read them in dark.
  */
-const heading = { color: 'var(--ds-text)', fontSize: 'var(--font-size-h5)' };
+const heading = { color: 'var(--ds-text)', fontSize: 'var(--font-size-125)' };
 const heat = [[0, 0, 4], [0, 1, 18], [1, 0, 30], [1, 1, 52], [2, 0, 61], [2, 1, 90]];
 
 /** Every chart's playground story, with the args its docs page shows. */

@@ -36,7 +36,7 @@ export const slotContent = (label) => (
             borderRadius: 'var(--radius-md)',
             color: 'var(--ds-text-subtle)',
         }}
-        className="body1-txt"
+        className="body-large"
     >
         {label}
     </div>

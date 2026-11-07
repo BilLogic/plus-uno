@@ -91,7 +91,7 @@ export const States = () => (
     <div style={row}>
         {STATES.map(([name, props]) => (
             <div key={name}>
-                <span className="body3-txt" style={caption}>{name}</span>
+                <span className="body-small" style={caption}>{name}</span>
                 <FieldBox {...props} data-testid={name}>
                     {control(`${name} field`, { disabled: props.disabled, readOnly: props.readOnly, defaultValue: 'Bill Guo' })}
                 </FieldBox>
@@ -151,7 +151,7 @@ export const Subtle = () => (
     <div style={row}>
         {[['rest', {}], ['hover', { state: 'hover' }], ['focus', { state: 'focus' }]].map(([name, props]) => (
             <div key={name}>
-                <span className="body3-txt" style={caption}>{name}</span>
+                <span className="body-small" style={caption}>{name}</span>
                 <FieldBox
                     subtle
                     {...props}

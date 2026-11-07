@@ -78,11 +78,11 @@ function MonthlyTutoringLoadCard() {
     ], []);
     return (
         <div className="home-redesign-section-card home-redesign-monthly-load-inner">
-            <h4 className="h4 home-redesign-card-title">Monthly Tutoring Load</h4>
+            <h4 className="heading-large home-redesign-card-title">Monthly Tutoring Load</h4>
             <div className="home-redesign-monthly-top">
                 <div className="home-redesign-monthly-summary">
-                    <span className="h1 home-redesign-monthly-value">{SCHEDULED_HOURS} hrs</span>
-                    <span className="body2-txt home-redesign-monthly-of">of {TOTAL_HOURS.toFixed(1)} hrs</span>
+                    <span className="heading-xxlarge home-redesign-monthly-value">{SCHEDULED_HOURS} hrs</span>
+                    <span className="body-default home-redesign-monthly-of">of {TOTAL_HOURS.toFixed(1)} hrs</span>
                 </div>
                 <div className="home-redesign-donut-wrap">
                     <DonutChart
@@ -170,7 +170,7 @@ function StudentMomentumCard() {
     return (
         <div className="home-redesign-section-card home-redesign-student-momentum-inner">
             <div className="home-redesign-card-header-with-nav">
-                <h4 className="h4 home-redesign-card-title">Student Momentum</h4>
+                <h4 className="heading-large home-redesign-card-title">Student Momentum</h4>
                 <div className="home-redesign-nav-buttons">
                     <IconButton
                         spacing="compact"
@@ -194,7 +194,7 @@ function StudentMomentumCard() {
                         key={student.name}
                         className="home-redesign-momentum-cell"
                     >
-                        <span className="body2-txt home-redesign-momentum-name" style={{ transition: 'color 0.2s ease' }}>{student.name}</span>
+                        <span className="body-default home-redesign-momentum-name" style={{ transition: 'color 0.2s ease' }}>{student.name}</span>
                         <MomentumChartCell student={student} delay={MOMENTUM_REVEAL_DELAY + index * 140} />
                     </div>
                 ))}
@@ -308,7 +308,7 @@ export const Dashboard = () => {
 
                         <div className="home-redesign-trainings-section">
                             <div className="home-redesign-trainings-header">
-                                <h4 className="h4">Personalized Trainings</h4>
+                                <h4 className="heading-large">Personalized Trainings</h4>
                                 <div className="home-redesign-trainings-controls">
                                     <IconButton
                                         spacing="compact"

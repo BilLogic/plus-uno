@@ -74,7 +74,7 @@
     padding: 0;
     border: 0;
     background: none;
-    font-size: var(--font-size-fa-body3-solid);
+    font-size: var(--icon-sm);
     line-height: 1;
     cursor: pointer;
 
@@ -82,7 +82,7 @@
     .fa-regular {
         // @contrast: non-text
         color: var(--ds-icon-subtlest);
-        font-size: var(--font-size-fa-body3-solid);
+        font-size: var(--icon-sm);
     }
 
     @include plus-state(
@@ -96,7 +96,7 @@
 
 .plus-select-caret {
     color: var(--ds-icon-subtle);
-    font-size: var(--font-size-fa-body2-solid);
+    font-size: var(--icon-sm);
     cursor: pointer;
 }
 
@@ -133,8 +133,8 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: var(--font-size-body2);
-    height: var(--font-size-body2);
+    width: var(--font-size-0875);
+    height: var(--font-size-0875);
     border: var(--border-default) solid var(--ds-border-input);
     background-color: var(--ds-background-input);
     border-radius: var(--radius-md);
