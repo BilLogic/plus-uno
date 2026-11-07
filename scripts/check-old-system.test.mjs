@@ -22,6 +22,7 @@ test('an old color token fails anywhere outside specs/', () => {
 test('a comment or doc naming an old token fails too: the code explains itself on the current system', () => {
   assert.equal(findings(src('design-system/src/lib/tokens.mjs', ` * e.g. \`${oldColor('primary-text')}\``)).length, 1);
   assert.equal(findings(src('design-system/src/components/A/A.mdx', `Use ${oldColor('primary')}.`)).length, 1);
+  assert.equal(findings(src('prototypes/x/tokens.scss', `/* loads var(${oldColor('*')}) */`)).length, 1, 'the family by its wildcard');
 });
 
 test('inside specs/ the old system is allowed until the specs revamp', () => {

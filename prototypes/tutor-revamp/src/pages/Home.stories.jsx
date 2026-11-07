@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import Home from './Home';
 import { ScreenFrame } from '../storyFrame';
-import { DARK_WITH_LEGACY, LIGHT } from '../kit/storyModes';
+import { DARK, LIGHT } from '../kit/storyModes';
 
 /**
  * Home: the tutor's day at a glance, after the Main board. The play holds the
@@ -81,4 +81,4 @@ export const Light = {
     },
 };
 
-export const Dark = { ...DARK_WITH_LEGACY };
+export const Dark = { ...DARK };

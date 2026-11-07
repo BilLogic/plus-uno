@@ -30,8 +30,7 @@
  * excluded: a story's demo frame is not a component.
  *
  * THE RATCHET. The count of literals per file may fall and never rise, and a
- * file not yet in the baseline starts at zero — the same shape as
- * `check:legacy-colors`. The record is `scripts/baselines/inline-jsx-tokens.json`,
+ * file not yet in the baseline starts at zero. The record is `scripts/baselines/inline-jsx-tokens.json`,
  * read and written through `scripts/lib/ratchet.mjs` (`counts` form).
  *
  * HOW A PR LOWERS THE BASELINE. Move the literal into the component's `.scss`,

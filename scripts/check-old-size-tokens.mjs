@@ -12,8 +12,8 @@
  * exact set, not a prefix: `--card-` and `--modal-` also open live pattern
  * tokens (`--card-stack-md`, `--modal-pad-x-default`).
  *
- * THE RATCHET. A count may fall and never rise, same shape and the same
- * `scripts/lib/ratchet.mjs` as `check:legacy-colors`; the baseline is at zero.
+ * THE RATCHET. A count may fall and never rise, read through
+ * `scripts/lib/ratchet.mjs`; the baseline is at zero.
  */
 
 import { RETIRED_TOKENS } from './lib/tokens/plan.mjs';

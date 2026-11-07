@@ -43,7 +43,7 @@
     width: 4px;
     height: 4px;
     border-radius: var(--radius-full);
-    background: var(--color-outline-variant);
+    background: var(--ds-background-neutral);
 }
 
 .month-badge {
@@ -85,7 +85,7 @@
 
 .impact-hero-card {
     background: var(--ds-surface-raised);
-    border: 1px solid var(--color-outline-variant);
+    border: 1px solid var(--ds-border);
     border-radius: var(--size-card-radius-md);
     padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
     position: relative;
@@ -100,7 +100,7 @@
     width: 180px;
     height: 180px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-mastering-content));
+    background: linear-gradient(135deg, var(--ds-background-brand-bold), var(--ds-background-smart-mastering-content-bold));
     filter: blur(80px);
     opacity: 0.15;
     top: -60px;
@@ -114,7 +114,7 @@
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    background: var(--color-social-emotional);
+    background: var(--ds-background-smart-social-emotional-bold);
     filter: blur(60px);
     opacity: 0.1;
     bottom: -40px;
@@ -182,7 +182,7 @@
 .impact-divider {
     width: 1px;
     height: 100%;
-    background: var(--color-outline-variant);
+    background: var(--ds-border);
     align-self: stretch;
     justify-self: center;
     margin: 0;
@@ -224,12 +224,12 @@
 
 .delta-badge--success {
     background: rgba(16, 185, 129, 0.1);
-    color: var(--color-success);
+    color: var(--ds-text-success);
 }
 
 .delta-badge--rose {
     background: rgba(244, 63, 94, 0.1);
-    color: var(--color-danger);
+    color: var(--ds-text-danger);
 }
 
 .metric-label {
@@ -247,7 +247,7 @@
 
 .stat-card {
     background: var(--ds-surface-raised);
-    border: 1px solid var(--color-outline-variant);
+    border: 1px solid var(--ds-border);
     border-radius: var(--size-card-radius-sm);
     padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
     display: flex;
@@ -273,19 +273,19 @@
 }
 
 .stat-card--blue::before {
-    background: var(--color-primary);
+    background: var(--ds-background-brand-bold);
 }
 
 .stat-card--purple::before {
-    background: var(--color-mastering-content);
+    background: var(--ds-background-smart-mastering-content-bold);
 }
 
 .stat-card--amber::before {
-    background: var(--color-warning);
+    background: var(--ds-background-warning-bold);
 }
 
 .stat-card--emerald::before {
-    background: var(--color-success);
+    background: var(--ds-background-success-bold);
 }
 
 .stat-card-icon {
@@ -313,22 +313,22 @@
 
 .stat-card-icon--blue {
     background: rgba(4, 114, 168, 0.1);
-    color: var(--color-primary);
+    color: var(--ds-text-brand);
 }
 
 .stat-card-icon--purple {
     background: rgba(134, 89, 169, 0.1);
-    color: var(--color-mastering-content);
+    color: var(--ds-text-smart-mastering-content);
 }
 
 .stat-card-icon--amber {
     background: rgba(245, 158, 11, 0.1);
-    color: var(--color-warning);
+    color: var(--ds-text-warning);
 }
 
 .stat-card-icon--emerald {
     background: rgba(16, 185, 129, 0.1);
-    color: var(--color-success);
+    color: var(--ds-text-success);
 }
 
 .metric-value-lg {
@@ -398,7 +398,7 @@
 }
 
 .legend-dot--primary {
-    background: var(--color-success, #3f6f1a);
+    background: var(--ds-background-success-bold);
 }
 
 .legend-dot--amber {
@@ -451,7 +451,7 @@
 }
 
 .time-allocation-segment--primary {
-    background: var(--color-success, #3f6f1a);
+    background: var(--ds-background-success-bold);
 }
 
 .time-allocation-segment--amber {
@@ -509,7 +509,7 @@
     gap: 8px;
     padding: 6px 14px;
     border-radius: var(--radius-full);
-    border: 1px solid var(--color-outline-variant);
+    border: 1px solid var(--ds-border);
     background: var(--ds-surface);
     font-size: 13px;
     font-weight: 500;
@@ -522,7 +522,7 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--color-primary);
+    background: var(--ds-background-brand-bold);
     flex-shrink: 0;
 }
 
@@ -579,7 +579,7 @@
 }
 
 .time-insight-icon {
-    color: var(--color-warning);
+    color: var(--ds-text-warning);
     font-size: 16px;
 }
 
@@ -643,7 +643,7 @@
     top: 48px;
     bottom: 0;
     width: 2px;
-    background: var(--color-outline-variant);
+    background: var(--ds-background-neutral);
 }
 
 .timeline-node {
@@ -659,12 +659,12 @@
 }
 
 .timeline-node--active {
-    background: var(--color-primary);
-    color: var(--color-on-primary);
+    background: var(--ds-background-brand-bold);
+    color: var(--ds-text-inverse);
 }
 
 .timeline-node--reviewed {
-    background: var(--color-success);
+    background: var(--ds-background-success-bold);
     color: white;
 }
 
@@ -677,15 +677,15 @@
 /* Growth Cards */
 .growth-card {
     background: var(--ds-surface-raised);
-    border: 1px solid var(--color-outline-variant);
+    border: 1px solid var(--ds-border);
     border-radius: var(--size-card-radius-sm);
     overflow: hidden;
     transition: box-shadow 0.2s ease;
 }
 
 .growth-card--under_review {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 1px var(--color-primary);
+    border-color: var(--ds-border-brand);
+    box-shadow: 0 0 0 1px var(--ds-border-brand);
 }
 
 .growth-card--reviewed {
@@ -755,7 +755,7 @@
 /* Card Body (Expanded) */
 .growth-card-body {
     padding: 0 var(--size-card-pad-x-sm) var(--size-card-pad-y-sm);
-    border-top: 1px solid var(--color-outline-variant);
+    border-top: 1px solid var(--ds-border);
     display: flex;
     flex-direction: column;
     gap: var(--size-card-gap-sm);
@@ -771,7 +771,7 @@
 
 .quote-block {
     background: var(--ds-surface-container);
-    border-left: 3px solid var(--color-primary);
+    border-left: 3px solid var(--ds-border-brand);
     border-radius: var(--radius-md);
     padding: var(--pad-x-md);
 }
@@ -797,7 +797,7 @@
 
 .feedback-row {
     padding-top: var(--size-card-gap-sm);
-    border-top: 1px dashed var(--color-outline-variant);
+    border-top: 1px dashed var(--ds-border);
     display: flex;
     flex-direction: column;
     gap: var(--space-0625);
@@ -954,7 +954,7 @@
 }
 
 .goal-progress-bar--effort .plus-progressbar-fill {
-    background-color: var(--color-mastering-content, #8659a9) !important;
+    background-color: var(--ds-background-smart-mastering-content-bold) !important;
 }
 
 .goal-value {
@@ -974,11 +974,11 @@
 }
 
 .goal-delta--success {
-    color: var(--color-success, #10b981);
+    color: var(--ds-text-success);
 }
 
 .goal-delta--danger {
-    color: var(--color-danger, #ef4444);
+    color: var(--ds-text-danger);
 }
 
 .goal-delta--neutral {
@@ -991,7 +991,7 @@
 .cta-section {
     background: var(--ds-surface);
     border-radius: var(--size-card-radius-md);
-    border: 1px solid var(--color-outline-variant);
+    border: 1px solid var(--ds-border);
     padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
 }
 
@@ -1075,7 +1075,7 @@
 .impact-title {
     font-size: 16px;
     margin-bottom: var(--size-card-gap-md);
-    color: var(--color-primary);
+    color: var(--ds-text-brand);
 }
 
 .impact-metrics {
@@ -1103,7 +1103,7 @@
 .stat-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-small, 0 2px 8px rgba(0, 0, 0, 0.08));
-    border-color: var(--color-outline);
+    border-color: var(--ds-border-bold);
 }
 
 .metric-value-lg {
@@ -1161,22 +1161,22 @@
     width: 40px;
     height: 40px;
     background-color: #fff;
-    border: 2px solid var(--color-outline-variant);
+    border: 2px solid var(--ds-border);
     color: var(--ds-text-subtle);
     box-shadow: 0 0 0 6px #fff;
 }
 
 .timeline-node--active {
     background-color: #fff;
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-    box-shadow: 0 0 0 4px var(--color-primary-container);
+    border-color: var(--ds-border-brand);
+    color: var(--ds-text-brand);
+    box-shadow: 0 0 0 4px var(--ds-background-brand-subtlest);
 }
 
 .timeline-node--reviewed {
-    border-color: var(--color-success-container);
-    color: var(--color-on-success-container);
-    background-color: var(--color-success-container);
+    border-color: var(--ds-border-success-subtle);
+    color: var(--ds-text-success-bolder);
+    background-color: var(--ds-background-success);
 }
 
 .growth-card {
@@ -1190,18 +1190,18 @@
 .growth-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-small, 0 2px 8px rgba(0, 0, 0, 0.08));
-    border-color: var(--color-outline);
+    border-color: var(--ds-border-bold);
 }
 
 .growth-card--expanded {
-    border-color: var(--color-primary-container);
-    box-shadow: 0 0 0 1px var(--color-primary-container);
+    border-color: var(--ds-border-brand);
+    box-shadow: 0 0 0 1px var(--ds-border-brand);
 }
 
 .growth-card-body {
     margin-top: var(--size-card-gap-md);
     padding-top: var(--size-card-gap-md);
-    border-top: 1px solid var(--color-border, var(--color-outline-variant));
+    border-top: 1px solid var(--ds-border);
 }
 
 .growth-card-summary {
@@ -1255,7 +1255,7 @@
 .insight-alert {
     background: var(--ds-background-accent-teal-subtlest);
     color: var(--ds-text);
-    border-color: var(--color-tertiary-border);
+    border-color: var(--ds-border-accent-teal);
 }
 
 /*
@@ -1263,7 +1263,7 @@
  * alert keeps its own style's Icon color and does not take this class.
  */
 .insight-alert .insight-alert-icon {
-    color: var(--color-tertiary-icon);
+    color: var(--ds-text-accent-teal);
 }
 
 .training-grid {
@@ -1291,7 +1291,7 @@
     top: 48px;
     bottom: 0;
     width: 2px;
-    background: var(--color-outline-variant);
+    background: var(--ds-background-neutral);
 }
 
 /* 2) Keep review progress bar + count on one row */
@@ -1360,7 +1360,7 @@
     top: 44px !important;
     bottom: 28px !important;
     width: 2px !important;
-    background: var(--color-outline-variant, #98a2ad) !important;
+    background: var(--ds-background-neutral) !important;
     z-index: -1 !important;
     /* Move behind everything */
     pointer-events: none !important;
@@ -1393,7 +1393,7 @@
     /* Explicit opaque color matching surface */
     color: var(--ds-text-subtle);
     opacity: 1 !important;
-    border-color: var(--color-outline-variant) !important;
+    border-color: var(--ds-border) !important;
     z-index: 10 !important;
 }
 
@@ -1433,7 +1433,7 @@
 }
 
 .monthly-report .time-allocation-segment--primary {
-    background: var(--color-success, #3f6f1a) !important;
+    background: var(--ds-background-success-bold) !important;
 }
 
 .monthly-report .time-allocation-segment--indigo {
@@ -1455,7 +1455,7 @@
 }
 
 .monthly-report .legend-dot--primary {
-    background: var(--color-success, #3f6f1a) !important;
+    background: var(--ds-background-success-bold) !important;
 }
 
 .monthly-report .legend-dot--indigo {
@@ -1716,7 +1716,7 @@
     top: 44px !important;
     bottom: 24px !important;
     width: 2px !important;
-    background: var(--color-outline-variant) !important;
+    background: var(--ds-background-neutral) !important;
     z-index: 0 !important;
     pointer-events: none !important;
 }
@@ -1743,7 +1743,7 @@
     top: 60px !important;
     bottom: calc(-1 * var(--size-card-gap-md)) !important;
     width: 2px !important;
-    background: var(--color-outline-variant) !important;
+    background: var(--ds-background-neutral) !important;
     z-index: 0 !important;
 }
 
@@ -1820,7 +1820,7 @@
     top: 44px !important;
     bottom: 28px !important;
     width: 2px !important;
-    background: var(--color-outline-variant, #98a2ad) !important;
+    background: var(--ds-background-neutral) !important;
     z-index: 1 !important;
     pointer-events: none !important;
 }

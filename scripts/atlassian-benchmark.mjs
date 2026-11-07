@@ -54,7 +54,7 @@
  */
 import { TOKEN_DIR, tokenCorpus } from '../design-system/src/lib/tokens-node.mjs';
 import { resolveToken, tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
-import { RETIRED_LEGACY, retiredTo } from './lib/color/legacy-map.mjs';
+import { RETIRED_COLORS, retiredTo } from './lib/tokens/retire.mjs';
 import { text as read } from './lib/corpus.mjs';
 
 /**
@@ -135,12 +135,12 @@ export const INTENT = /^--color-(primary|secondary|tertiary|danger|success|warni
 
 /**
  * An intent role counts once in either layer: under its legacy name, or under
- * the `--ds-*` token the legacy name was retired to (`RETIRED_LEGACY`), so
+ * the `--ds-*` token the legacy name was retired to (`RETIRED_COLORS`), so
  * retiring a name is not read as losing the role.
  */
 const intentRoles = (t, suffix) => {
   const names = new Set(t);
-  const moved = Object.keys(RETIRED_LEGACY).filter(
+  const moved = [...RETIRED_COLORS.keys()].filter(
     (legacy) => INTENT.test(legacy) && legacy.endsWith(suffix) && names.has(retiredTo(legacy)),
   );
   return new Set([...t.filter((n) => INTENT.test(n) && n.endsWith(suffix)), ...moved]).size;

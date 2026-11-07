@@ -113,15 +113,6 @@ export const SHAPES = [
     ],
   },
   {
-    file: 'scripts/baselines/legacy-colors.json',
-    check: 'check:legacy-colors',
-    command: 'node scripts/check-legacy-colors.mjs --update',
-    prose: 'why',
-    // `<rule> <path>` -> count of legacy color uses. A pair may fall; one that
-    // reaches zero leaves the record, and the stale sweep asks for a regenerate.
-    sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
-  },
-  {
     file: 'scripts/baselines/state-mixin.json',
     check: 'check:state-mixin',
     command: 'node scripts/check-state-mixin.mjs --update',

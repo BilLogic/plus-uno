@@ -277,14 +277,13 @@ export const CHECKS = [
       'the old component language staying out of the tree, a hard ban with no baseline: the 08 / 12 / 16 state steps, the legacy component tags and imports (Alert, Toast, Switch, NavTabs, Badge and the rest), the `style` x `fill` and small / medium / large props, `plus-btn--` modifier classes, and the words surface container, scrim and Rovo, read in design-system/src, prototypes and src. Any hit is a finding; a decision record that must cite the benchmark is named in the check.',
   },
   {
-    name: 'check:legacy-colors',
-    script: 'node scripts/check-legacy-colors.mjs',
+    name: 'check:old-system',
+    script: 'node scripts/check-old-system.mjs',
     pkg: 'root',
     trigger: 'pull_request',
-    module: 'scripts/check-legacy-colors.mjs',
-    baseline: 'scripts/baselines/legacy-colors.json',
+    module: 'scripts/check-old-system.mjs',
     guards:
-      'components staying on the themed `--ds-*` color tokens: the legacy `--color-*` tokens and hex fallbacks inside `var()` are light-only and stay light in dark mode, so their uses are counted per rule and per file in design-system/src/components, design-system/src/ai and prototypes. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:legacy-colors -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
+      'the code holding only the current design system, a hard ban with no baseline: outside design-system/src/specs/, any name from a token family generated from an archived Figma collection fails, comments and docs included, read in design-system/src, prototypes and src. It starts with the Material `--color-*` roles; each family that moves to the current system adds its row. The token files that still declare the old names for the Specs replica are named in the check until they move into specs/.',
   },
   {
     name: 'check:state-mixin',
@@ -511,7 +510,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-color-system.mjs',
     guards:
-      "the generated color system keeping its promises in BOTH plans and all four modes (light, dark and each with increased contrast): text, icon and edge contrast on the grounds they are drawn on; every accent family's tag text, bold fill and icon; meta text, links, focus and field edges on hovered, selected and overlay grounds, alphas composited first; no base, hovered and pressed triple sharing a value and the selection ladder staying ordered; status tints reading against the page and the sunken frame; categorical chart series 1-4 staying apart under protan and deutan simulation; the accent teal never reading as Lagoon; and PLAN PARITY, every semantic token mapped to the same primitive reference in every plan, because a plan is primitive values only and a mapping that forks per plan is a second semantic layer nobody decided. Builds each plan through the generator's own pipeline (scripts/lib/color/), so it judges what would be emitted, not a copy. Each finding names the check, the plan and the mode. It also holds the LEGACY MAP (scripts/lib/color/legacy-map.mjs): every legacy color name used in design-system/ and prototypes/ has a migration-map row, and every alias the map generates names a token the generator emits, because the alias sheet repaints every untouched component that uses the name.",
+      "the generated color system keeping its promises in BOTH plans and all four modes (light, dark and each with increased contrast): text, icon and edge contrast on the grounds they are drawn on; every accent family's tag text, bold fill and icon; meta text, links, focus and field edges on hovered, selected and overlay grounds, alphas composited first; no base, hovered and pressed triple sharing a value and the selection ladder staying ordered; status tints reading against the page and the sunken frame; categorical chart series 1-4 staying apart under protan and deutan simulation; the accent teal never reading as Lagoon; and PLAN PARITY, every semantic token mapped to the same primitive reference in every plan, because a plan is primitive values only and a mapping that forks per plan is a second semantic layer nobody decided. Builds each plan through the generator's own pipeline (scripts/lib/color/), so it judges what would be emitted, not a copy. Each finding names the check, the plan and the mode.",
   },
   {
     name: 'check:color-tokens',
@@ -521,15 +520,6 @@ export const CHECKS = [
     module: 'scripts/generate-color-tokens.mjs',
     guards:
       'the generated color token files in design-system/src/tokens/color/ (palette, semantic, elevation and Bootstrap bridge SCSS plus the Figma spec) against the active plan and the generator. Drift means a hand edit or a plan change that was never regenerated.',
-  },
-  {
-    name: 'check:legacy-color-list',
-    script: 'node scripts/generate-legacy-color-list.mjs --check',
-    pkg: 'root',
-    trigger: 'pull_request',
-    module: 'scripts/generate-legacy-color-list.mjs',
-    guards:
-      'the list of components, specs and prototype files still on legacy color tokens in design-system/guidelines/foundations/color-migration.md against a scan of design-system/src/components, design-system/src/specs and prototypes (scripts/lib/color/legacy-components.mjs). Interns pick their next row from that list, so a component migrated without regenerating it stays on the list, and one that gains a legacy use is missing from it. Fix: npm run generate:legacy-color-list.',
   },
   {
     name: 'check:design-tokens',

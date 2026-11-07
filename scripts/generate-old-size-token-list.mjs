@@ -3,10 +3,10 @@
  * `npm run generate:old-size-token-list` — the list of files still on the
  * pre-ADR-038 size vocabularies, written into the spacing guide.
  *
- * Mirrors `scripts/generate-legacy-color-list.mjs`: the table between the
- * guide's `gen:OLD-SIZE-TOKENS` markers is generated from the same scan
- * `check:old-size-tokens` ratchets (`scripts/check-old-size-tokens.mjs`), so a
- * file leaves it the moment its last old-prefixed `var()` goes.
+ * The table between the guide's `gen:OLD-SIZE-TOKENS` markers is generated
+ * from the same scan `check:old-size-tokens` ratchets
+ * (`scripts/check-old-size-tokens.mjs`), so a file leaves it the moment its
+ * last old-prefixed `var()` goes.
  *
  * Usage:
  *   node scripts/generate-old-size-token-list.mjs           # write the list

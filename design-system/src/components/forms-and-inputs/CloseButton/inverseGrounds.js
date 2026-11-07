@@ -9,11 +9,9 @@
  */
 export const INVERSE_GROUNDS = [
     '--ds-background-neutral-bold',
-    '--color-primary',
-    '--color-secondary',
-    '--color-success',
-    '--color-danger',
-    '--color-tertiary',
-    '--color-info',
-    '--color-warning',
+    '--ds-background-brand-bold',
+    '--ds-background-success-bold',
+    '--ds-background-danger-bold',
+    '--ds-background-accent-teal-bolder',
+    '--ds-background-information-bold',
 ];

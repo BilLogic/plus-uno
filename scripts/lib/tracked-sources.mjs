@@ -3,7 +3,7 @@
  *
  * A filesystem walk finds a second copy of the tree (a worktree, a build
  * output), so a guard that counts occurrences lists what git tracks and reads
- * only what is still on disk. `check-ads-language`, `check-legacy-colors`,
+ * only what is still on disk. `check-ads-language`, `check-old-system`,
  * `check-inline-jsx-tokens`, `check-old-size-tokens`, `check-react-bootstrap-imports`
  * and `check-state-mixin` read through `trackedSources`; `check-deps` lists
  * through `trackedFiles`.

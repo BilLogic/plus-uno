@@ -361,11 +361,11 @@ Two kinds of failure, two mechanisms:
   props, state steps and words are findings wherever they appear in
   `design-system/src`, `prototypes` and `src`. There is no baseline and no
   `--update`; a citation that must stay is named in the check itself.
-- **Legacy colors are a ratchet** (`check:legacy-colors`): `var(--color-*)` uses
-  and hex fallbacks inside `var()` counted per file in
-  `scripts/baselines/legacy-colors.json`. Both are light-only; components use the
-  themed `--ds-*` tokens, and a new file starts at zero. A migration PR lowers it
-  with `npm run check:legacy-colors -- --update`, which refuses to write a rise.
+- **The old design system is a hard ban** (`check:old-system`): a name from a
+  token family generated from an archived Figma collection fails anywhere in
+  `design-system/src`, `prototypes` and `src` outside `design-system/src/specs/`,
+  comments included. There is no baseline; each family that moves to the current
+  system adds its row to the check.
 - **The harness and docs records read it too** (#601) — the glossary's prose
   count, the negation scopes with their corpus floors, and the benchmark's
   floor. Each words its own findings and reads its record through the module:

@@ -15,8 +15,10 @@
  * teaches it.
  *
  * WHAT IT COUNTS, per family and per file, keyed `<family> <path>`: lines
- * matching one of `FAMILIES`. Each family that moves to the current system
- * adds its row here.
+ * matching one of `FAMILIES`, a family named by its wildcard (`--x-*`) included.
+ * Each family that moves to the current system adds its row here. The docs
+ * outside these roots (guidelines, agent views, `docs/`) join when the docs
+ * purge removes their legacy rows.
  *
  * WHAT IT SKIPS.
  *   - `design-system/src/specs/`: the Storybook Specs replica, not yet
@@ -61,7 +63,7 @@ const NOT_THE_DESIGN_SYSTEM = new Map([
 export const FAMILIES = [
   {
     name: 'color',
-    pattern: /(?<![\w-])--color-[a-z0-9]/,
+    pattern: /(?<![\w-])--color-[a-z0-9*]/,
     remedy: 'the Material `--color-*` roles are old; use the `--ds-*` color token for the role (fill, edge, text, icon)',
   },
 ];

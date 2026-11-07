@@ -125,31 +125,31 @@ time {
 
 // Color Utility Classes
 .color-primary {
-    color: var(--color-primary) !important;
+    color: var(--ds-text-brand) !important;
 }
 
 .color-secondary {
-    color: var(--color-secondary) !important;
+    color: var(--ds-text-subtle) !important;
 }
 
 .color-tertiary {
-    color: var(--color-tertiary) !important;
+    color: var(--ds-text-accent-teal) !important;
 }
 
 .color-success {
-    color: var(--color-success) !important;
+    color: var(--ds-text-success) !important;
 }
 
 .color-danger {
-    color: var(--color-danger) !important;
+    color: var(--ds-text-danger) !important;
 }
 
 .color-warning {
-    color: var(--color-warning-text) !important;
+    color: var(--ds-text-warning) !important;
 }
 
 .color-info {
-    color: var(--color-info) !important;
+    color: var(--ds-text-information) !important;
 }
 
 .color-neutral {
@@ -157,36 +157,36 @@ time {
 }
 
 .color-error {
-    color: var(--color-danger) !important;
+    color: var(--ds-text-danger) !important;
 }
 
 // Background Color Utility Classes
 .bg-color-primary {
-    background-color: var(--color-primary) !important;
+    background-color: var(--ds-background-brand-bold) !important;
 }
 
 .bg-color-secondary {
-    background-color: var(--color-secondary) !important;
+    background-color: var(--ds-background-neutral) !important;
 }
 
 .bg-color-tertiary {
-    background-color: var(--color-tertiary) !important;
+    background-color: var(--ds-background-accent-teal-bolder) !important;
 }
 
 .bg-color-success {
-    background-color: var(--color-success) !important;
+    background-color: var(--ds-background-success-bold) !important;
 }
 
 .bg-color-danger {
-    background-color: var(--color-danger) !important;
+    background-color: var(--ds-background-danger-bold) !important;
 }
 
 .bg-color-warning {
-    background-color: var(--color-warning) !important;
+    background-color: var(--ds-background-warning-bold) !important;
 }
 
 .bg-color-info {
-    background-color: var(--color-info) !important;
+    background-color: var(--ds-background-information-bold) !important;
 }
 
 // Other Utility Classes
@@ -199,11 +199,11 @@ time {
 }
 
 .border-outline {
-    border: 1px solid var(--color-outline);
+    border: 1px solid var(--ds-border-bold);
 }
 
 .border-outline-variant {
-    border: 1px solid var(--color-outline-variant);
+    border: 1px solid var(--ds-border);
 }
 
 .border-radius-sm {
@@ -258,7 +258,7 @@ time {
 // Image Placeholder Utility
 .image-placeholder {
     background-color: var(--ds-surface-container);
-    border: 1px dashed var(--color-outline-variant, #bec8ca);
+    border: 1px dashed var(--ds-border);
     display: flex;
     align-items: center;
     justify-content: center;

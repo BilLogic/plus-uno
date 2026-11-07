@@ -318,7 +318,7 @@ A `--_<name>-*` custom property inside one component's SCSS that wires its state
 _Avoid_: "component token" for it
 
 **Named state token**:
-A color token that names the state it paints, such as `--ds-background-brand-bold-hovered` or `--ds-background-selected`, so a hover, press or selection reads from its name. The mapping is `design-system/guidelines/foundations/color-migration.md`.
+A color token that names the state it paints, such as `--ds-background-brand-bold-hovered` or `--ds-background-selected`, so a hover, press or selection reads from its name.
 _Avoid_: "state layer", "08/12/16"
 
 **Elevation**:

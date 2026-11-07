@@ -29,16 +29,16 @@
 
         // Variants
         &--created {
-            background-color: var(--ds-background-success-bold); // #3e691a
+            background-color: var(--ds-background-success-bold);
         }
 
         &--updated {
-            background-color: var(--ds-background-information-bold); // #0e8175 (Teal)
+            background-color: var(--ds-background-information-bold);
         }
 
         &--canceled {
-            background-color: var(--ds-background-warning-bold); // #9f8205 (Gold/Brown)
-            // White is 3.52:1 on the yellow; the ink is 4.62:1.
+            background-color: var(--ds-background-warning-bold);
+            // A bold warning ground is light yellow, so its ink is the dark warning inverse.
             color: var(--ds-text-warning-inverse);
         }
     }
