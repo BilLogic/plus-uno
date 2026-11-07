@@ -71,7 +71,7 @@ folds the rest into a `+n`.
 
 ## Initials, icons and pictures
 
-<ComponentExample of={AvatarStories.Initials} title="Initials" description={<>Initials are the first letters of the first and last words of the name. A 16 or 20 keeps one.</>} />
+<ComponentExample of={AvatarStories.Initials} title="Initials" description={<>Initials are the first letters of the first and last words of the name. A 16 keeps one.</>} />
 
 <ComponentExample of={AvatarStories.Fallbacks} title="Fallbacks" description={<>The picture wins when it loads. When it fails the initials show, then the icon, then a plain person glyph.</>} />
 
@@ -228,8 +228,8 @@ Keep one color per kind of person, or leave avatars blue. Green, yellow and red 
 <DoDontPair
     doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar name="Jane Park" /><Avatar name="Sam Lee" /></div>}
     doCaption="One color for all people, or one per kind."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar name="Jane Park" color="green" /><Avatar name="Sam Lee" color="red" /></div>}
-    dontCaption="Green and red read as online and busy."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar name="Jane Park" color="green" /><Avatar name="Sam Lee" color="yellow" /></div>}
+    dontCaption="Green and yellow read as online and away."
 />
 
 ### Show presence only where it helps.

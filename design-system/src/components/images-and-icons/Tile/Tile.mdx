@@ -208,21 +208,20 @@ logo keeps its own. Images cover the whole tile, so color does not apply.
 
 <DoDontPair
     doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile icon="book-open" appearance="bold" color="blue" /><Tile icon="book-open" /></div>}
-    doCaption="Icons take appearance and color."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile icon="book-open" appearance="bold" color="green" /><Tile icon="book-open" appearance="bold" color="red" /></div>}
-    dontCaption="A different color for the same kind of item, which reads as a status."
+    doCaption="Icons take appearance and color; logos keep their own."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src="https://placehold.co/48" appearance="bold" /></div>}
+    dontCaption="A bold appearance on a logo, which does nothing."
 />
 
 ### Colors are categories.
 
-`color` takes the Tag color set from the label spec, where `yellow` replaces
-`orange` (`orange` still works as a deprecated alias): plain names, never a status. Keep one color per kind of
+`color` takes the Tag color set: plain names, never a status. Keep one color per kind of
 item across the app, or leave tiles gray.
 
 <DoDontPair
     doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile icon="book-open" color="blue" /><Tile icon="book-open" color="blue" /></div>}
     doCaption="One color for each kind of item, across the app."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile icon="book-open" color="blue" /><Tile icon="book-open" color="red" /></div>}
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile icon="book-open" color="blue" /><Tile icon="book-open" color="magenta" /></div>}
     dontCaption="The same kind of item in two colors."
 />
 

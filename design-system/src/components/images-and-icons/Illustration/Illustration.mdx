@@ -245,12 +245,12 @@ understand. Use `Tile` for a small square picture of a thing.
     dontCaption="A title that repeats the heading, so it is read twice."
 />
 
-### Don't recolor or crop a character.
+### Don't crop a character.
 
 <DoDontPair
     doExample={<div style={{ padding: 'var(--pad-x-md)' }}><Illustration character="dot" size={96} /></div>}
     doCaption="Give it room."
-    dontExample={<div style={{ overflow: 'hidden', height: 48 }}><Illustration character="dot" size={96} /></div>}
+    dontExample={<div style={{ overflow: 'hidden', height: 'var(--size-media-lg)' }}><Illustration character="dot" size={96} /></div>}
     dontCaption="Clipping the box cuts off the limbs."
 />
 
