@@ -35,7 +35,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Button size` | `Button spacing` (spacing is default or compact) |
 | `Button disabled` | `Button isDisabled` |
 | `Button appearance="secondary"` | `Button appearance="default"` |
-| `Heading level` | `Heading as` (as is the element, h1 to h6) |
+| `Heading level` | `Heading as` (the level comes from the surrounding sections; set as only to override the element) |
 | `Heading size="sm" / "lg"` | `Heading size="small"`, `Heading size="large"` (sizes are words, xxsmall to xxlarge) |
 
 **Tokens**
@@ -46,12 +46,13 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `--space-050 (8px)` | `--stack-md`, `--inline-md`, `--pad-x-sm` |
 | `--space-075 (12px)` | `--stack-lg`, `--inline-lg`, `--pad-x-md` |
 | `--space-100 (16px)` | `--pad-x-lg`, `--section-stack-md`, `--modal-pad` |
-| `--space-150 (24px) and up` | `--page-stack-md`, `--page-pad` (large space belongs to a pattern) |
+| `--space-150 (24px)` | `--page-stack-md`, `--page-pad`, `--section-stack-lg` |
+| `--space-200 (32px) and up` | `--page-stack-lg` (space this large belongs to a page; it is rarely right inside a component) |
 | `--radius-<n>` | `--radius-sm`, `--radius-md`, `--radius-lg`, `--card-radius` |
 | `--stack-xl` | `--stack-lg`, `--section-stack-lg` |
 | `--ds-on-surface, --color-on-surface` | `--ds-text`, `--ds-text-subtle` |
 | `--color-surface-container*` | `--ds-surface`, `--ds-surface-sunken`, `--ds-surface-raised` |
-| `--size-element-*, --element-*` | `--pad-x-md`, `--stack-md`, `--radius-md` (retired; check:ds-usage names the exact replacement) |
+| `--size-element-*, --element-*` | `--pad-x-md`, `--stack-md`, `--radius-md` (retired; these are the commonest replacements, and check:ds-usage names the exact one for each old name) |
 
 ## UI components (85)
 
