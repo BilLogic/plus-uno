@@ -9,7 +9,7 @@ A tab strip with its panels. Tabs go into the tablist and every other child, usu
 
 **Source:** `design-system/src/components/navigation/Tabs/Tabs.jsx`
 
-**Stories:** `design-system/src/components/navigation/Tabs/Tabs.stories.jsx` — Overview, Layout, Appearance, WithPanels, InteractionStates, Interactive, Rest, Hovered, Pressed, Focused, Selected, SelectedPill, Disabled
+**Stories:** `design-system/src/components/navigation/Tabs/Tabs.stories.jsx` — Overview, Layout, Alignment, Appearance, WithPanels, InteractionStates, Interactive, Rest, Hovered, Pressed, Focused, Selected, SelectedPill, Disabled
 
 **Storybook page:** `design-system/src/components/navigation/Tabs/Tabs.mdx`
 
