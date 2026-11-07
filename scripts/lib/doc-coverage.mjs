@@ -2,7 +2,9 @@
  * Description coverage of the generated component docs (`check:component-docs`).
  *
  * A prop description is what an agent reads to choose a value, so a prop row
- * with none is a gap, and so is a component with no summary. Gaps are recorded
+ * with none is a gap, and so is a component with no summary. Only the JSDoc in
+ * the component source counts: Storybook reads props through react-docgen, which
+ * sees that comment and not a story's `argTypes` text. Gaps are recorded
  * BY NAME in `scripts/baselines/component-docs.json` and held by
  * `scripts/lib/ratchet.mjs` (`keys` form): a gap the record does not hold
  * fails, and a filled gap leaves the record through `--update`. Names rather

@@ -137,6 +137,7 @@ const Tabs = ({
 Tabs.propTypes = {
     /** `Tabs.Tab` elements, which fill the tablist, and the `Tabs.Panel` elements that follow it. */
     children: PropTypes.node,
+    /** How the tab strip sits in its row: `left` (default), `center` or `right`. Use `justified` to stretch the tabs across the full width. */
     alignment: PropTypes.oneOf(['left', 'center', 'right', 'justified']),
     /** Underline indicator (default) or a pill-shaped selected background. */
     appearance: PropTypes.oneOf(['default', 'pill']),

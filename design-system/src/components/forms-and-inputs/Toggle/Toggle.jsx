@@ -118,9 +118,13 @@ Toggle.propTypes = {
     isChecked: PropTypes.bool,
     /** Starting state of an uncontrolled toggle. */
     defaultChecked: PropTypes.bool,
+    /** Track height in pixels: `16` (default) or `20`. */
     size: PropTypes.oneOf([16, 20]),
+    /** Prevents interaction and dims the toggle. */
     isDisabled: PropTypes.bool,
+    /** Shows a spinner while a change is being saved and ignores input. */
     isLoading: PropTypes.bool,
+    /** Shows the state without letting the user switch it. */
     isReadOnly: PropTypes.bool,
     /** Called with `{ target: { name, value, checked } }` when the user switches it. Not called while the toggle is read-only or loading. */
     onChange: PropTypes.func,

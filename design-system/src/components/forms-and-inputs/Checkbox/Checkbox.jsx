@@ -106,6 +106,7 @@ Checkbox.propTypes = {
     id: PropTypes.string,
     /** The form key the box submits under, and sent in the `onChange` payload. */
     name: PropTypes.string,
+    /** The text that names the checkbox. */
     label: PropTypes.node,
     /** The value submitted with a form when the box is selected, and sent in the `onChange` payload. */
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -113,10 +114,15 @@ Checkbox.propTypes = {
     isChecked: PropTypes.bool,
     /** Whether the box starts selected, when `isChecked` is not controlling it. */
     defaultChecked: PropTypes.bool,
+    /** Shows the mixed state, for a parent whose children are only partly selected. */
     isIndeterminate: PropTypes.bool,
+    /** Draws the error state, for a choice that fails validation. */
     isInvalid: PropTypes.bool,
+    /** Prevents interaction and dims the checkbox. */
     isDisabled: PropTypes.bool,
+    /** Shows the state without letting the user change it. */
     isReadOnly: PropTypes.bool,
+    /** Shows an asterisk on the label and sets the native `required` attribute. */
     isRequired: PropTypes.bool,
     /** Secondary text under the label. It describes the box and does not name it. */
     description: PropTypes.node,

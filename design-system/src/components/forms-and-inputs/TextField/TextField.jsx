@@ -271,6 +271,7 @@ TextField.propTypes = {
     label: PropTypes.node,
     /** Shows an asterisk and sets `aria-required`. Explain the asterisk once, in the form's legend. */
     isRequired: PropTypes.bool,
+    /** Hides the label visually. It is still rendered and still names the input. */
     isLabelHidden: PropTypes.bool,
     /** Text for an info tooltip beside the label. */
     info: PropTypes.node,

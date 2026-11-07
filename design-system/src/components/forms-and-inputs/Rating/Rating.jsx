@@ -107,14 +107,17 @@ Rating.propTypes = {
     name: PropTypes.string,
     /** Visible label above the stars. It names the group; without one the group is named "Rating". */
     label: PropTypes.node,
+    /** Shows an asterisk on the label and marks the group required. */
     isRequired: PropTypes.bool,
     /** Current rating, 0 for none up to 5. Every star up to it is filled. Update it from `onChange`. */
     value: PropTypes.number,
+    /** `comments` (default) shows the icons alone, with an optional comments label under them; `numeric` prints each number above its icon. */
     variant: PropTypes.oneOf(['comments', 'numeric']),
     /** Shows `commentsLabel` under the stars. Applies to the `comments` variant only. */
     showCommentsLabel: PropTypes.bool,
     /** Text under the stars in the `comments` variant. Defaults to "Comments". */
     commentsLabel: PropTypes.node,
+    /** Disables every icon so no rating can be picked. */
     isDisabled: PropTypes.bool,
     /** Called with the new rating (1 to 5) when the user picks a different star. */
     onChange: PropTypes.func,

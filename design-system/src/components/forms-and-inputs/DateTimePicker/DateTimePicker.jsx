@@ -274,22 +274,33 @@ const DateTimePicker = ({
 DateTimePicker.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
+    /** The visible label above the field. */
     label: PropTypes.node,
+    /** Shows an asterisk on the label. */
     isRequired: PropTypes.bool,
     isLabelHidden: PropTypes.bool,
+    /** Shows the Date and Time labels above each input. Defaults to `true`. */
     showSectionLabels: PropTypes.bool,
     showDate: PropTypes.bool,
+    /** Hint text shown while the date input is empty. Defaults to `MM/DD/YY`. */
     datePlaceholder: PropTypes.string,
+    /** Hint text shown while the time input is empty. Defaults to `__ : __`. */
     timePlaceholder: PropTypes.string,
     dateValue: PropTypes.string,
     timeValue: PropTypes.string,
     /** `default` is 40; `compact` is 32. */
     spacing: PropTypes.oneOf(['default', 'compact']),
+    /** Disables both the date and time inputs. */
     isDisabled: PropTypes.bool,
+    /** Shows both values without letting the user change them. */
     isReadOnly: PropTypes.bool,
+    /** Draws both inputs invalid and shows `errorMessage`. */
     isInvalid: PropTypes.bool,
+    /** Draws both inputs valid and shows `successMessage`. */
     isValid: PropTypes.bool,
+    /** Message shown under the field when `isInvalid` is set. */
     errorMessage: PropTypes.string,
+    /** Message shown under the field when `isValid` is set. `isInvalid` takes precedence. */
     successMessage: PropTypes.string,
     minDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     maxDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),

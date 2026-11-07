@@ -48,7 +48,9 @@ const ScrollBar = ({
 
 ScrollBar.propTypes = {
     children: PropTypes.node,
+    /** The height at which vertical scrolling starts, as a CSS length such as `240px` or a number of pixels. Ignored when `horizontal` is set. */
     maxHeight: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    /** Scrolls sideways instead of up and down. `maxHeight` is ignored. */
     horizontal: PropTypes.bool,
     id: PropTypes.string,
     'aria-label': PropTypes.string,

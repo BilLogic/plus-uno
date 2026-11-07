@@ -132,6 +132,7 @@ Radio.propTypes = {
     id: PropTypes.string,
     /** Form key of the radio group. Options that belong together share it, and it is reported in `onChange`. */
     name: PropTypes.string.isRequired,
+    /** The text that names this option. */
     label: PropTypes.node,
     /** Form value of this option, and the `target.value` that `onChange` reports when it is chosen. */
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
@@ -139,9 +140,13 @@ Radio.propTypes = {
     isChecked: PropTypes.bool,
     /** Whether an uncontrolled radio starts selected. */
     defaultChecked: PropTypes.bool,
+    /** Draws the error state, for an option that fails validation. */
     isInvalid: PropTypes.bool,
+    /** Prevents interaction and dims this option. */
     isDisabled: PropTypes.bool,
+    /** Shows the option without letting the user change it. */
     isReadOnly: PropTypes.bool,
+    /** Shows an asterisk on the label and sets the native `required` attribute. */
     isRequired: PropTypes.bool,
     /** Secondary text under the label. It describes the option; it does not name it. */
     description: PropTypes.node,

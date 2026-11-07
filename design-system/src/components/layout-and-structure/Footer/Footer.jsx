@@ -45,9 +45,13 @@ const Footer = ({
 };
 
 Footer.propTypes = {
+    /** The product version, shown first. */
     version: PropTypes.string,
+    /** The copyright line, shown after the version. */
     copyright: PropTypes.string,
+    /** The label of the terms link. */
     termsText: PropTypes.string,
+    /** The `href` of the terms link. */
     termsUrl: PropTypes.string,
     className: PropTypes.string,
     style: PropTypes.object,

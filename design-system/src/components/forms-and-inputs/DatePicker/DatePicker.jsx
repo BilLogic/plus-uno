@@ -293,7 +293,9 @@ DatePicker.propTypes = {
     range: PropTypes.bool,
     /** `default` is 40; `compact` is 32. */
     spacing: PropTypes.oneOf(['default', 'compact']),
+    /** Disables the input and the calendar. */
     isDisabled: PropTypes.bool,
+    /** Shows the date without letting the user change it or open the calendar. */
     isReadOnly: PropTypes.bool,
     /** Draws the field invalid; a typed date outside the allowed span does too. */
     isInvalid: PropTypes.bool,

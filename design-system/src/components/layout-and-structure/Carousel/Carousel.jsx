@@ -280,8 +280,11 @@ Carousel.propTypes = {
     })),
     activeIndex: PropTypes.number,
     onSelect: PropTypes.func,
+    /** Shows the previous and next buttons. They appear only when there is more than one slide. Defaults to `true`. */
     controls: PropTypes.bool,
+    /** Shows a position indicator for each slide. It appears only when there is more than one slide. Defaults to `true`. */
     indicators: PropTypes.bool,
+    /** Milliseconds between automatic advances. Leave it out, or use 0, to turn autoplay off; autoplay is also off when the viewer prefers reduced motion. */
     interval: PropTypes.number,
     pause: PropTypes.oneOf(['hover', false]),
     wrap: PropTypes.bool,

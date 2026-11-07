@@ -235,7 +235,9 @@ TimePicker.propTypes = {
     value: PropTypes.string,
     /** `default` is 40; `compact` is 32. */
     spacing: PropTypes.oneOf(['default', 'compact']),
+    /** Disables the hour and minute inputs and the period menu. */
     isDisabled: PropTypes.bool,
+    /** Shows the time without letting the user change it. */
     isReadOnly: PropTypes.bool,
     /** Draws the field invalid; a typed time outside 1–12 / 0–59 does too. */
     isInvalid: PropTypes.bool,

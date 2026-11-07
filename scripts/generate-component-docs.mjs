@@ -397,7 +397,7 @@ function componentDoc(c, siblings) {
     d += `## Props\n\n| Prop | Type | Default | Description |\n|------|------|---------|-------------|\n`;
     for (const p of props) {
       const def = defaults[p.name] ? `\`${defaults[p.name]}\`` : '—';
-      if (!(descriptions[p.name] || p.description)) gaps.props.push(p.name);
+      if (!p.description) gaps.props.push(p.name); // source JSDoc only (scripts/lib/doc-coverage.mjs)
       d += `| \`${p.name}\` | ${p.type} | ${def} | ${descriptions[p.name] || p.description || '—'} |\n`;
     }
     d += `\n`;

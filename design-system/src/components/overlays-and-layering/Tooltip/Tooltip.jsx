@@ -70,7 +70,9 @@ const Tooltip = ({
 };
 
 Tooltip.propTypes = {
+    /** The tooltip content. Keep it short; do not put actions or essential information in it. */
     text: PropTypes.node.isRequired,
+    /** Which side of the trigger the tooltip appears on. Defaults to `top`. */
     placement: PropTypes.oneOf(['top', 'bottom', 'left', 'right']),
     /** An empty array or a falsy value turns the tooltip off, for a caller that wants one only when its trigger is truncated. Any other value leaves hover and focus active. */
     trigger: PropTypes.oneOfType([

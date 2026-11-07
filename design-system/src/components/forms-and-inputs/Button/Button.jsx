@@ -156,6 +156,7 @@ export const Button = ({
 
 Button.propTypes = {
     // Content
+    /** The label. `children` works too; `text` wins when both are given. */
     text: PropTypes.string,
     /** The label, used when `text` is not given. Omit both for an icon-only button. */
     children: PropTypes.node,
@@ -163,9 +164,11 @@ Button.propTypes = {
     title: PropTypes.string,
 
     // Appearance
+    /** The visual style. `primary` is for the main action on a page, `default` for secondary actions and `subtle` for low-emphasis ones. `warning` and `danger` mark risky or destructive actions, `discovery` points out something new, and `ai` is for AI actions and needs a text label. */
     appearance: PropTypes.oneOf(BUTTON_APPEARANCES),
     /** `default` draws 32. `compact` draws 24, for tables and tight toolbars. */
     spacing: PropTypes.oneOf(BUTTON_SPACINGS),
+    /** Stretches the button to the full width of its container. */
     shouldFitContainer: PropTypes.bool,
     /** Extra class names added to the button element beside the component's own. */
     className: PropTypes.string,
@@ -173,8 +176,11 @@ Button.propTypes = {
     // Behavior
     /** Called with the click event when the button is activated by mouse or keyboard. It does not fire while `isDisabled` or `isLoading` is set. */
     onClick: PropTypes.func,
+    /** Prevents interaction and sets `aria-disabled`. Avoid it where you can; say why the action is unavailable instead. */
     isDisabled: PropTypes.bool,
+    /** Marks the button selected and sets `aria-pressed`. For a link role it sets `aria-current` instead. */
     isSelected: PropTypes.bool,
+    /** Shows a spinner in place of the label, blocks interaction and sets `aria-busy`. */
     isLoading: PropTypes.bool,
     /** The native button `type`: `button` (default), `submit` or `reset`. Used only when the button renders as a `button` element. */
     type: PropTypes.string,
@@ -190,7 +196,9 @@ Button.propTypes = {
     role: PropTypes.string,
 
     // Icons: a Font Awesome Free glyph name (`plus`) or a node.
+    /** A Font Awesome Free glyph name (`plus`) or a node, placed before the label. Ignored when `appearance` is `ai`, which always shows its own sparkle. */
     iconBefore: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    /** A Font Awesome Free glyph name (`arrow-right`) or a node, placed after the label. */
     iconAfter: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 
     /** The `id` attribute of the rendered element. */

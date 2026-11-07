@@ -174,6 +174,7 @@ const ChoiceGrid = ({
 ChoiceGrid.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
+    /** `radio` (default) lets one column be chosen per row; `checkbox` lets any number of columns be chosen per row. */
     type: PropTypes.oneOf(['radio', 'checkbox']),
     rows: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
@@ -185,6 +186,7 @@ ChoiceGrid.propTypes = {
     })).isRequired,
     /** Radio: `{ rowId: columnId }`. Checkbox: `{ rowId: { columnId: boolean } }`. */
     values: PropTypes.object,
+    /** Disables every control in the grid. */
     isDisabled: PropTypes.bool,
     /** Shown and focusable, not changeable. */
     isReadOnly: PropTypes.bool,
