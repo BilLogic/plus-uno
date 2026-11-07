@@ -278,7 +278,7 @@ After an agent edits a file in `prototypes/` or `src/`, `.cursor/hooks/ds-usage/
 - **Claude Code**: `PostToolUse` on `Edit|Write|MultiEdit` in `.claude/settings.json`. Exit 2 puts the findings in front of the agent; the edit itself has already landed.
 - **Cursor**: `afterFileEdit` in `.cursor/hooks.json`. Cursor takes no reply from this event, so there it only logs.
 
-Each run appends a line to `.local/ds-usage-runs.jsonl` (git-ignored): time, file, session, and finding counts by rule.
+Each run appends a line to `.local/ds-usage-runs.jsonl` (git-ignored): time, file, session, finding counts by rule, and `duration_ms`, what the run cost the edit, measured from the hook's start so the checker import counts.
 
 To turn it off locally, set `DS_USAGE_HOOK=off` in the environment the editor or `claude` starts from. A checker that fails to load or throws leaves the agent undisturbed: the hook exits 0 and says nothing.
 

@@ -10,9 +10,8 @@
  * exists to prevent, one level up: not a check that runs nowhere, but a check
  * whose membership is stated four times and agreed nowhere.
  *
- * It stays JS rather than JSON or YAML for two reasons: the `guards` and
- * `reason` prose is the reasoning for the set and comments have to survive
- * beside it, and a row may carry a function (`module`, below, resolves to one).
+ * It stays JS rather than JSON or YAML so comments survive beside the rows and
+ * a row may carry a function (`module`, below, resolves to one).
  *
  * WHO READS IT.
  *   - `scripts/harness-runner.mjs`      runs CHECKS; asserts completeness.
@@ -50,6 +49,8 @@
  *   guards    what goes red when it fails, written for whoever reads the CI log
  *             and did not write the check. Registered rows only.
  *   reason    why the row is NOT composed. `EXCLUDED` rows only.
+ *             `guards`, `reason` and `spawnReason` are each one line of at most
+ *             `PROSE_CAP` characters; the check's own header carries the rest.
  *   baseline  the ratchet file, where the check holds a recorded set rather
  *             than a threshold. Declared so a reader can find the record
  *             without opening the script. The drift check asserts the row
@@ -109,12 +110,8 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',
-    spawnReason:
-      'a composite. It runs the seven generators as sub-processes with inherited stdio so ' +
-      'each names its own failing step; the findings are theirs, and each generator is its ' +
-      'own row in EXCLUDED below. What this row owns is the order they run in.',
-    guards:
-      'seven generated artifacts against the design-system SSOT (cheat sheet, component + forms index, component docs, INDEX.md, Figma component registry, token registry, knowledge audit). Names its own failing step.',
+    spawnReason: 'a composite: it runs the seven generators as sub-processes, in order, so each names its own failing step.',
+    guards: 'the seven generated artifacts (cheat sheet, indexes, component docs, Figma and token registries, knowledge audit) against the design-system source.',
   },
   {
     name: 'check:deps',
@@ -122,8 +119,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-deps.mjs',
-    guards:
-      "the two dependency questions a version bumper cannot ask. Dependabot (.github/dependabot.yml) says what is out of date; this says what is DEAD — declared, upgraded forever, imported nowhere — and what is real but UNDECLARED, because a CDN <link> is invisible to every dependency tool there is. Both were live: two packages with zero references anywhere, and FontAwesome loaded from two CDNs at two different MAJOR versions in one codebase.",
+    guards: 'dependencies that are declared but imported nowhere, and ones used (a CDN <link> included) but never declared.',
   },
   {
     name: 'check:deprecated-apis',
@@ -131,8 +127,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-deprecated-apis.mjs',
-    guards:
-      'dependency ranges against the majors that remove an API this repo still uses. A deprecation is otherwise discovered twice — once when someone reads the warning, once when the upgrade breaks — and only the second one is loud.',
+    guards: 'dependency ranges against the majors that remove an API this repo still uses.',
   },
   {
     name: 'check:docs',
@@ -140,8 +135,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-doc-links.mjs',
-    guards:
-      'every relative markdown link in skills/ agents/ docs/ design-system/guidelines/ + root, and the repo paths inside the JSON indexes.',
+    guards: 'every relative markdown link in skills/, agents/, docs/, design-system/guidelines/ and the root, and the repo paths inside the JSON indexes.',
   },
   {
     name: 'check:doc-identifiers',
@@ -149,8 +143,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-doc-identifiers.mjs',
-    guards:
-      'every prop, variant, size and design token named in a docs page resolving to something in source. This is the #78 / #79 / #98 defect class — three fabricated-name fixes by hand in one day, 2026-08-25.',
+    guards: 'every prop, variant, size and design token a docs page names resolving to something in source.',
   },
   {
     name: 'check:figma-links',
@@ -166,8 +159,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/generate-component-barrel.mjs',
-    guards:
-      "design-system/src/components/index.js against the folder shape it is generated from — a group's own index.js (forms-and-inputs) re-exported wholesale, every other group's component folders picked up by name. A hand edit to the barrel, or a component folder moved without regenerating, shows as drift. `_internal` is excluded from the scan entirely, so a component can never reach the public barrel through it (#1702).",
+    guards: 'design-system/src/components/index.js against the folder shape it is generated from; a hand edit or an unregenerated move shows as drift.',
   },
   {
     name: 'check:figma-node-types',
@@ -176,8 +168,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-figma-node-types.mjs',
     baseline: 'scripts/baselines/figma-node-types.json',
-    guards:
-      "each registry mapping claiming what its Figma node actually IS, against a dated measurement in design-system/figma/node-types.json. The field is called componentSetNodeId and 15 of the 95 mapped nodes are not sets — 3 PAGEs and 12 plain COMPONENTs. `isComponentSet: false` is how an entry says so, and until this check nothing in the repo READ that field, so six entries carried it and seven that needed it did not. Also catches a mapping nobody has measured, a recording for a mapping that no longer exists, an id recorded against the wrong one of the two Figma files, and a link that opens on nothing. The recorded-node floor is a ratchet (`scripts/lib/ratchet.mjs`): it may rise with `npm run check:figma-node-types -- --update` and never falls except by a hand edit that names the deletion.",
+    guards: "each registry mapping's claim about what its Figma node is (set, component or page) against the dated measurement in design-system/figma/node-types.json.",
   },
   {
     name: 'check:figma-snapshots',
@@ -186,8 +177,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-figma-snapshots.mjs',
     floors: { MAX_AGE_DAYS: 180, MIN_VARIABLES: 361, MIN_COMPONENTS: 1347 },
-    guards:
-      "the two Figma snapshots in scripts/ still describing the library: their capture dates against a 180-day ceiling, their declared totals against their own contents, their file key, and a floor under each so a snapshot that shrank silently is loud. #339's finding was that NOTHING watched these — the variables snapshot was five weeks behind a library that had gained seven variables it had never seen, and check:token-registry was green over every one of them, because it validates the snapshot against the SCSS and nothing validated the snapshot against Figma. The age is printed on every run, green or not. Since the #339 refresh pass it also asserts that the REMEDY it prints exists: each snapshot names the npm script that rewrites it, and that script must be in package.json. The component half had quietly lost its writer — the poller moved into the Worker on 2026-07-16 and the legacy script that remained opens a Notion PRD and posts to Slack before writing — so a ceiling that fired would have handed the reader a command nobody would run.",
+    guards: 'the two Figma snapshots in scripts/: capture date under a 180-day ceiling, declared totals against contents, file key, and a floor under each.',
   },
   {
     name: 'check:skill-surfaces',
@@ -195,8 +185,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/generate-uno-skill-surfaces.mjs',
-    guards:
-      'the generated .claude/skills/ stubs against each SKILL.md.',
+    guards: 'the generated .claude/skills/ stubs against each SKILL.md.',
   },
   {
     name: 'check:check-registry',
@@ -204,22 +193,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/generate-check-scripts.mjs',
-    guards:
-      'this registry against the places that state the same set — the `check:*` block of ' +
-      'the root package.json and the check steps of storybook-gate.yml, each written between ' +
-      'markers from these rows. Before #508 nothing compared them, so a check could be registered and missing from a manifest, or run in ' +
-      'a workflow while the registry said it ran nowhere, and every file read as correct from ' +
-      'the inside. It also asserts what a generated block cannot state: that each row\'s command ' +
-      'is the one its package.json holds (including agents/uno-bot/, which is compared rather ' +
-      'than generated), that `trigger` and the workflow steps agree in BOTH directions, and ' +
-      'what a declared `baseline` is — since #602 that the record OPENS on the shape it ' +
-      'declares (every set of it, through `scripts/lib/ratchet.mjs`, which is where a record ' +
-      'that would read as an empty set fails), that the check declaring it reaches it through ' +
-      'its own IMPORTS rather than by naming the file, and that the `--update` its shape row ' +
-      'advertises is a flag the check really offers — or, for the four records maintained by ' +
-      'hand, that it offers none — and since #613 what a declared `floors` is: each sentinel ' +
-      'the check enforces (a minimum file / rule / component / variable count, or a maximum ' +
-      'age) is named on the row, and the number is the one the check compares.',
+    guards: 'this registry against the generated check:* block of the root package.json and the check steps of storybook-gate.yml.',
   },
   {
     name: 'check:skill-overlap',
@@ -227,8 +201,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-skill-overlap.mjs',
-    guards:
-      'one rule, one home — no substantive line living in both an uno skill’s method and its SKILL.md, and none living in two docs the Worker reads (the prompt plus every disclosed reference, the bot skills among them). Reads the bundled set from the bundler, so a stale bundle stops it — and since #234 a SHORT set stops it too, rather than comparing the survivors and printing the narrowed number as the corpus.',
+    guards: "one rule, one home: no line in both an uno skill's method and its SKILL.md, nor in two docs the Worker reads.",
   },
   {
     name: 'check:knowledge-disposition',
@@ -245,8 +218,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-negation-ratchet.mjs',
     baseline: 'scripts/baselines/negation-baseline.json',
-    guards:
-      "the negation ratchet — the density of five imperative-ban tokens (never / don't / do not / cannot / must not) not climbing, over THREE scopes ratcheted separately from one baseline file: the bundled harness docs; since #174, the hand-authored IDE-side docs (the `embodiment: ide` complement of the bundled set within the bundler's own section roots, plus its IDE-only skills/ root, so docs/adr/ and the generated .claude/skills/ surfaces are out by structure); and since #425 the headless prompts under scripts/prompts/ (the shared headless-intake contract), which declare no embodiment: and are never bundled, so they are listed by where they live rather than found through the bundler. It counts PROHIBITION TOKENS, not negation as written: the two differ by roughly 3x and #234 chose the narrow, unarguable one on the evidence. Each scope also refuses to run against fewer docs than its baseline was recorded over — a ratchet only fails on a RISE, so a corpus that vanished otherwise passes with a smaller number. Since #601 the record is read and written through `scripts/lib/ratchet.mjs`: six sets, a counts map and a corpus FLOOR per scope, and a scope's total is the sum of its counts rather than a second number stored beside them. The script header carries the measurement.",
+    guards: "the density of imperative-ban words (never, don't, do not, cannot, must not) not climbing in the bundled, IDE-side and workflow docs.",
   },
   {
     name: 'check:pointers',
@@ -254,8 +226,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-pointers.mjs',
-    guards:
-      "the pointer sweep over the always-loaded router (AGENTS.md) and the agent files it routes into (agents/**/*.md): every backticked repo path resolves, every `path § Heading` names a heading that exists BY ITS WHOLE NAME (a prefix match let a renamed tail pass unread), and every § Progressive loading trigger leads with the word that carries its branch rather than filler. A pointer that does not resolve, or buries its trigger, is a document the agent will not reach — the same rot as a stale schema name in prose (#409), one layer up. Conditional pointers (\"when `path` exists\") and bare shape names (`SKILL.md`) are skipped by rule; the corpus walk skips an installed dependency and the GENERATED harness bundle, whose pointers are the swept sources' own. The rules are mutation-tested in check-pointers.test.mjs (#420, #725).",
+    guards: 'every backticked path and `path § Heading` in AGENTS.md and agents/**/*.md resolving, and each § Progressive loading trigger leading with its trigger.',
   },
   {
     name: 'check:glossary',
@@ -264,8 +235,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-glossary.mjs',
     baseline: 'scripts/baselines/glossary-baseline.json',
-    guards:
-      'GLOSSARY.md staying a glossary in the plugin format: no fenced code, no heading deeper than a `###` cluster, every section and cluster holding `**Term**:` entries and every entry a definition, a table only in § Two vocabularies (ADR-023), and prose lines ratcheted against scripts/baselines/glossary-baseline.json through `scripts/lib/ratchet.mjs` (#601) — the count may fall, never rise, and `--update` merges the one number rather than rewriting the record, so re-recording an unchanged count no longer churns its date. The two sibling repos grew their glossaries to 40k and 18k chars one "just one more section" at a time (#420); this is what stops it here.',
+    guards: 'GLOSSARY.md staying a glossary in the plugin format, with its prose lines ratcheted against scripts/baselines/glossary-baseline.json.',
   },
   {
     name: 'check:ads-language',
@@ -273,8 +243,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-ads-language.mjs',
-    guards:
-      'the old component language staying out of the tree, a hard ban with no baseline: the 08 / 12 / 16 state steps, the legacy component tags and imports (Alert, Toast, Switch, NavTabs, Badge and the rest), the `style` x `fill` and small / medium / large props, `plus-btn--` modifier classes, and the words surface container, scrim and Rovo, read in design-system/src, prototypes and src. Any hit is a finding; a decision record that must cite the benchmark is named in the check.',
+    guards: 'the old component language (state steps, legacy tags, style x fill and small/medium/large props, retired words) staying out of the tree.',
   },
   {
     name: 'check:legacy-colors',
@@ -283,8 +252,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-legacy-colors.mjs',
     baseline: 'scripts/baselines/legacy-colors.json',
-    guards:
-      'components staying on the themed `--ds-*` color tokens: the legacy `--color-*` tokens and hex fallbacks inside `var()` are light-only and stay light in dark mode, so their uses are counted per rule and per file in design-system/src/components, design-system/src/ai and prototypes. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:legacy-colors -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
+    guards: 'uses of light-only legacy `--color-*` tokens and hex fallbacks in components and prototypes, counted per file; a count may fall and never rise.',
   },
   {
     name: 'check:state-mixin',
@@ -293,8 +261,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-state-mixin.mjs',
     baseline: 'scripts/baselines/state-mixin.json',
-    guards:
-      'the state mixin (`design-system/src/styles/_state.scss`) staying the one place hover, press, selection, disabled and the focus ring are drawn: a hand-rolled `outline: none` reset, the legacy `--color-focus-ring` token, a hand-written forced-colors `Highlight` ring, and a `:hover` or `:active` selector written outside the mixin\'s `hovered:`/`pressed:` state keys are counted per rule and per file in design-system/src/components and design-system/src/patterns, excluding the mixin\'s own file. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:state-mixin -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
+    guards: 'the state mixin staying the one place hover, press, selection, disabled and the focus ring are drawn; hand-rolled states may fall, never rise.',
   },
   {
     name: 'check:inline-jsx-tokens',
@@ -303,8 +270,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-inline-jsx-tokens.mjs',
     baseline: 'scripts/baselines/inline-jsx-tokens.json',
-    guards:
-      'a component reading its tokens through its own `.scss`, not a `style={{...}}` literal baked into the JSX (#1698): a quoted-string or bare-number property value inside a `style={{...}}` object, counted per file in design-system/src/components, stories and tests excluded. A count may fall and never rise, and a new file starts at zero; a migration PR moves the literal into the component\'s stylesheet and lowers the record with `npm run check:inline-jsx-tokens -- --update`, which refuses to write a rise, and never by hand. Reads the record through `scripts/lib/ratchet.mjs`.',
+    guards: 'literal values inside `style={{...}}` in components, counted per file; a count may fall and never rise, and a new file starts at zero.',
   },
   {
     name: 'check:react-bootstrap-imports',
@@ -313,8 +279,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-react-bootstrap-imports.mjs',
     baseline: 'scripts/baselines/react-bootstrap-imports.json',
-    guards:
-      'react-bootstrap leaving the tree and not coming back while every component family moves its behavior onto Base UI (#1687): import statements naming `react-bootstrap` or one of its subpaths, counted per file in design-system/src, prototypes and src. A count may fall and never rise, and a new file starts at zero; a migration PR lowers the record with `npm run check:react-bootstrap-imports -- --update`, which refuses to write a rise, and never by hand. At a baseline of zero the final sweep removes the dependency and this becomes a hard ban. Reads the record through `scripts/lib/ratchet.mjs`.',
+    guards: 'imports of react-bootstrap in design-system/src, prototypes and src, counted per file; a count may fall and never rise.',
   },
   {
     name: 'check:retired-spelling',
@@ -322,8 +287,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-retired-spelling.mjs',
-    guards:
-      'the contract of the maintenance-severity rename (#429): "Tier 1 / Tier 2" for a FIX stays retired across every hand-authored doc an agent reads — the constitution, glossary, agents/, skills/, docs/, the DS guidelines, the headless prompts and the workflows — because *Tier* now means the loading tiers and a maintenance "Tier 1" reads as always-loaded. Each shape is anchored on a severity noun (fix, digest, whitelist, pipeline, "suggested tier", the old file names), so the loading uses match nothing. History (docs/plans/, todos/), ADRs, the archive and generated artifacts are left as written by rule; the glossary row that names the old spelling in its Do NOT use cell is the one exemption.',
+    guards: '"Tier 1 / Tier 2" for a maintenance fix staying retired across every hand-authored doc an agent reads; Tier now means the loading tiers.',
   },
   {
     name: 'check:cross-repo',
@@ -331,8 +295,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-cross-repo-duplication.mjs',
-    guards:
-      "one meaning stated in TWO REPOSITORIES. The same rename map, in the same shape, sat in plus-uno-blueprint's glossary and in agentic-service-blueprinting's; nothing compared them and they drifted until each was deleted by its own ticket. This sweep compares the three repos' harness documents by SHINGLE — 12 consecutive normalized words, findings merged into runs of 30+ — because paragraph equality is defeated by one edited table cell and would have found ONE shared block across both of those glossaries, which shared 771 words. It reaches the blueprint the way sync-blueprint-contract.mjs does ($BLUEPRINT_REPO or a sibling checkout) and sb through the pinned development dependency this repo now holds the way the blueprint holds it. A vendored document is exempt by the marker its sync writes; three docs/agents/ files a shared plugin installs are exempt by name; two document pairs already duplicated are RECORDED with a ceiling their shared words may fall below and never rise above, and every exemption fails when it goes stale. WITH A SIBLING MISSING IT SKIPS LOUDLY rather than silently — it names the pairings it did not compare, on stdout and, on CI, as a ::warning:: and a job-summary line, because check:contract spent months exiting 0 on a missing checkout while a header called it a gate (#258).",
+    guards: "one meaning stated in two repositories: a shingle sweep over the three repos' harness documents, held to the recorded pairs.",
   },
   {
     name: 'check:button-contrast',
@@ -341,8 +304,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-button-contrast.mjs',
     baseline: 'scripts/baselines/button-contrast-baseline.json',
-    guards:
-      "every combination Button's `$btn-themes` map GENERATES — 8 styles x 5 fills — rather than the ones a story happens to render. `check:storybook`'s a11y ratchet measures the DOM, and nothing renders a filled `warning` button, so a 3.70:1 label sat in the map unseen for the life of it (#312). It also asserts no two styles resolve to the same filled ground: `--color-info` is `var(--color-tertiary)`, so two names render one appearance, and no accessibility tool compares token values for equality because none knows they were meant to differ. Both current findings are color-token decisions (#268) rather than Button's, so they are ratcheted in `scripts/baselines/button-contrast-baseline.json` — which may shrink and never grow, and reports an entry that has stopped failing. Two sets with one `notes` map beside them, read through `scripts/lib/ratchet.mjs` (#601), which also reports an entry recorded with no reason at all.",
+    guards: "contrast of every combination Button's `$btn-themes` map generates, not only the rendered ones, and no two styles generating the same button.",
   },
   {
     name: 'check:token-collision',
@@ -351,8 +313,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-token-collision.mjs',
     floors: { MIN_FILES: 100 },
-    guards:
-      'no component stylesheet coloring text in the same token as the surface under it. `Navbar` shipped one for the life of the component at 1.00:1 (#219); axe cannot see this class, because the text sits in a transparent box over a painted ancestor.',
+    guards: 'no component stylesheet coloring text in the same token as the surface under it, a clash axe cannot see.',
   },
   {
     name: 'check:color-fallbacks',
@@ -361,8 +322,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-color-fallbacks.mjs',
     baseline: 'scripts/baselines/color-fallback-baseline.json',
-    guards:
-      'the literal beside a color token agreeing with that token (#268). `var(--color-on-surface-variant, #5c5c5c)` reads as one decision and is two — that token is `#3f484a`, and it carries TEN different fallbacks across its uses, none of them the token. 191 of 473 comparable fallbacks disagree, so the recorded set is ratcheted and only a NEW one fails. It also holds 27 `--color-*` names that are referenced and defined nowhere, where the fallback IS the color. It reads the generated `--ds-*` set beside `--color-*`, so a misspelled `--ds-*` name is caught the same way; that a `--ds-*` token carries no fallback at all is the rule of check:ds-fallbacks. Static and sub-second, which is why it composes here while the browser checks do not.',
+    guards: 'the literal fallback beside a color token agreeing with that token; recorded disagreements may fall and never rise.',
   },
   {
     name: 'check:ds-fallbacks',
@@ -371,8 +331,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-ds-fallbacks.mjs',
     floors: { MIN_FILES: 1300 },
-    guards:
-      "no `--ds-*` color token written with a fallback — `var(--ds-text, #172b4d)`, `var(--ds-surface, white)` or `var(--ds-border, var(--color-outline-variant))` alike. The legacy `--color-*` set carries its fallbacks as recorded debt, which check:color-fallbacks can only stop growing; the Atlassian-shaped set (ADR-035) starts with none, so the count starts at zero and every fallback fails. A `--ds-*` token has a value in each of four modes, and a fallback is a fifth, unmoded color that paints only when the token sheet has already failed. Searches what check:color-fallbacks searches, through the same lister and the same capture read over whole files (so a use written across lines counts), skipping the generated color files that define the tokens.",
+    guards: 'no `--ds-*` color token written with a fallback.',
   },
   {
     name: 'check:size-fallbacks',
@@ -381,8 +340,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-size-fallbacks.mjs',
     baseline: 'scripts/baselines/size-fallback-baseline.json',
-    guards:
-      "the same rule as check:color-fallbacks, over the tokens that decide layout rather than color — and it is the bigger half. 454 of 1075 comparable fallbacks disagree with their token: `var(--size-section-gap-sm, 16px)` is written 61 times for a token that is `8px`, and `var(--pad-y-lg, 12px)` 52 times for one that is `8px`. Color's version of this defect paints a wrong shade when the token sheet is late; this one lays out a different page. Ratcheted at 68 distinct pairs. One implementation (`scripts/lib/fallback-check.mjs`) and two entry points, because the families genuinely differ: dimensions have no shared name prefix and are selected by value, and an undefined dimension name is usually a component-local custom property rather than a defect.",
+    guards: 'the literal fallback beside a size, spacing or padding token agreeing with that token; recorded disagreements may fall and never rise.',
   },
   {
     name: 'check:undefined-tokens',
@@ -392,8 +350,7 @@ export const CHECKS = [
     module: 'scripts/check-undefined-tokens.mjs',
     floors: { MIN_FILES: 1300 },
     baseline: 'scripts/baselines/undefined-token-baseline.json',
-    guards:
-      "design tokens that are USED and defined nowhere. A bare `var(--x)` on a token that does not exist DROPS the whole declaration: `var(--font-weight-light)` was in six shipped components against a system that defines `--font-weight-normal: 300`, so text designed at 300 rendered at its inherited weight, and Tooltip's small variant reached for `--font-size-body4`, which does not exist, so its text had no size of its own. Nothing saw either — check:color-fallbacks and check:size-fallbacks only read tokens written WITH a fallback and only in two namespaces, and check:doc-identifiers resolves names in docs pages, not in stylesheets. A ratchet: 145 names over 508 uses when it was written, and the count may fall and never rise, with the BARE count held down separately so converting a fallback into a bare use cannot pass by keeping the total flat.",
+    guards: 'design tokens used and defined nowhere, which silently drop the whole declaration; the recorded set may fall and never rise.',
   },
   {
     name: 'check:font-families',
@@ -402,8 +359,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-font-families.mjs',
     floors: { MIN_FILES: 1300 },
-    guards:
-      "every font stack ending in a CSS generic, and every inline fallback naming the face its token names. A fallback only paints when the token fails to load, so a wrong one is wrong everywhere at once and invisible until then — the reasoning check:color-fallbacks applies to color, which nothing applied to type. Seven findings when it was written and all seven fixed: --font-family-display4 named one face and no generic; three files fell back from --font-family-body to Lato, which is the HEADER face, so body text would have rendered in the heading font; two fell back to a bare `Lato`. It also keeps #267's monospace rule, where --font-family-code fell back to sans-serif and the stack measured 171.13px against monospace's 480.08px.",
+    guards: 'every font stack ending in a CSS generic, and every inline fallback naming the face its token names.',
   },
   {
     name: 'check:font-size-literals',
@@ -412,8 +368,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-font-size-literals.mjs',
     floors: { MIN_FILES: 200 },
-    guards:
-      "no component, pattern or shared style in `design-system/src/styles` setting a raw font size. Text takes a text style (`font: var(--body-default)`) and an icon glyph an icon size (`--icon-md`); a number written in the component is a size the type scale cannot move. Moving to the Atlassian scale found 27: `font-size: 7px` on a tag's initials, 16 / 14 / 12 px in two snackbars, `1.5em` and `0.8em` on icons, and literal fallbacks such as `var(--font-size-body3, 12px)` that paint the old size whenever the token is missing. A `calc()` that scales a token is derived and passes; an identifier in a JSX style is a runtime value and is skipped. Hard gate, no baseline: the count is zero.",
+    guards: 'no component, pattern or shared style setting a raw font size; text takes a text style and an icon glyph an icon size.',
   },
   {
     name: 'check:figma-scopes',
@@ -422,8 +377,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-figma-scopes.mjs',
     floors: { MIN_SCOPED: 75 },
-    guards:
-      "no Figma color variable offering itself for a role its contrast cannot carry. A variable's SCOPES are what the picker offers it FOR, and nothing recorded them — not the name snapshot, not the token registry. The sweep of 2026-08-29 found five variables outside the convention their peers follow, and every one of the five was offerable as a TEXT_FILL: `Primary/Primary` on ALL_SCOPES, which measures 4.31:1 and 4.08:1 on the two darkest surface steps; `Relationship/Relationship` likewise; `Warning/Warning Container` and `Advocacy/Advocacy Container` on ALL_FILLS, which includes text, where #ffe17a is 1.5:1 on white; and `Warning/Warning (Text)` on ALL_SCOPES — the inverse error, the one warning value that PASSES as text also offered as a ground. That is #368's finding reached from the designer's end: picking `Primary/Primary` for a label in Figma is what the 108 CSS declarations do, and the file was inviting it. The convention is DERIVED from the majority across the twelve accent groups rather than declared, so a finding reads 'this one disagrees with its peers' and not 'this one disagrees with me', and a new group that follows the pattern needs no edit. It also asserts that a convention was FOUND for each of the seven roles, since a naming change under classify() would otherwise let the check pass by having nothing to say. Mutation-tested by restoring each of the two worst violations and by emptying the recording.",
+    guards: 'no Figma color variable offering itself, through its scopes, for a role its contrast cannot carry.',
   },
   {
     name: 'check:intent-roles',
@@ -433,8 +387,7 @@ export const CHECKS = [
     module: 'scripts/check-intent-roles.mjs',
     floors: { MIN_FILES: 150 },
     baseline: 'scripts/baselines/intent-role-adoption.json',
-    guards:
-      "the vocabulary of every intent-colored EDGE in the design system. `_color_roles.scss` minted `--color-X-icon` and `--color-X-border` on 2026-08-29 and closed with the sentence that these tokens had no users yet \u2014 111 of the 137 border declarations now name the role, and this is the ratchet that keeps them there. The rename changes no pixel for six of the seven intents, which is the point: `border-color: var(--color-danger)` is a use of the bold FILL color that happens to land on an edge, and `var(--color-danger-border)` is a declaration that an edge was intended and 3:1 was the bar. Only the second can move on its own, and warning must \u2014 #9f8205 is 2.87:1 on the darkest surface step, under even WCAG 1.4.11's non-text bar. It ratchets in BOTH directions: a count below its record is a finding too, because a baseline that describes code that no longer exists has stopped being readable. It also asserts the seven role tokens still EXIST, since a regeneration that removed `_color_roles.scss` would leave 111 call sites resolving to nothing while this check, which counts BASE uses, reported green. Mutation-tested four ways: a reverted call site, a deleted role, a baselined file with its reason removed, and a recorded remainder fixed without lowering the record — each driven through `scripts/lib/ratchet.mjs`, which has owned both directions since #601. 0.1s, measured 2026-08-29. Since 2026-10-24 it holds a second set, `mixedStates`: a hover or pressed color mixed by hand (`color-mix()` with black or white, or a brightness filter) where `foundations/color.md` rule 2 asks for a state layer; Button and Dropdown moved onto `--color-shadow-state-NN` laid over the fill, which composites to the same color, and five uses in three files remain recorded, a reason each.",
+    guards: 'intent-colored edges naming their role token (`--color-X-icon`, `--color-X-border`), ratcheted per file in both directions, and the role tokens existing.',
   },
   {
     name: 'check:focus-ring',
@@ -444,8 +397,7 @@ export const CHECKS = [
     module: 'scripts/check-focus-ring.mjs',
     floors: { MIN_FILES: 150, MIN_RULES: 40 },
     baseline: 'scripts/baselines/focus-ring.json',
-    guards:
-      "the one thing that tells a keyboard user where they are. Of the 84 focus rules in the design system, 29 had NO affordance reaching WCAG 1.4.11's 3:1 \u2014 `.plus-input:focus` announced itself with a #84cfff border at 1.62:1, the AM/PM toggle and the file drop zone with an 8% primary tint at 1.13:1, four textarea states at 2.22:1, and six readonly fields with the same gray they wear at rest. axe cannot catch this: it has no focus-appearance rule, so `check:storybook` swept all 416 story files and reported none of it. A rule is scored on its STRONGEST affordance, which is the correction that made the check right \u2014 eleven rules pair a 1.13:1 glow with a 5.02:1 border, and there the border is the indicator. No ratchet and no exceptions: a ring nobody can see is a defect, not a vocabulary to migrate at leisure. A ring on a ground its caller paints is not an exception either: its rule DECLARES the grounds (`// @grounds: --color-…`, opening the block) and is held to 3:1 on every one, so CloseButton's inverse ring is measured on the eight fills it is for rather than excused; a misplaced, duplicated, empty or unknown declaration is itself a failure. Mutation-tested three ways: one ring reverted, the `--color-focus-ring` role deleted, and a stale exception left behind. 0.2s, measured 2026-08-29.",
+    guards: "every focus rule in the design system drawing an affordance that reaches WCAG 1.4.11's 3:1; recorded exceptions carry a reason.",
   },
   {
     name: 'check:icon-button-name',
@@ -455,8 +407,7 @@ export const CHECKS = [
     module: 'scripts/check-icon-button-name.mjs',
     floors: { MIN_FILES: 400 },
     baseline: 'scripts/baselines/icon-button-name.json',
-    guards:
-      "a button that is only an icon still telling you what it does. 20 of them across the design system had no `aria-label`, no `title` and no text \u2014 a screen reader announces \"button\" and nothing else for a control that dismisses an alert, expands a lesson row or opens the session menu. axe reports 23 of these across the story suite, and the two populations overlap without either containing the other: axe counts RENDERED instances, so one component in a loop is many findings and a component nobody storied is none, where this counts SOURCE sites and sees the page nobody wrote a story for. Two of the 20 were not about names at all \u2014 `LessonsSpec` and `OnboardingSpec` call Button with `btnStyle`, `btnFill`, `label` and `icon`, none of which Button has, so those buttons were rendering EMPTY and the missing name was the symptom that surfaced it. No ratchet: the bar is zero and the exception map is empty. Mutation-tested three ways \u2014 a name removed, a stale exception, and `text=\"\"`, which an attribute-presence test reads as a name and which four real call sites are written with. 0.2s, measured 2026-08-29.",
+    guards: 'every icon-only button carrying an accessible name (aria-label, title or text); recorded exceptions carry a reason.',
   },
   {
     name: 'check:node-floor',
@@ -464,8 +415,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-node-floor.mjs',
-    guards:
-      "one Node major for the whole repo, with the floor READ from wrangler rather than written down twice. The uno-bot cutover wizard died at stage 2 on \"Wrangler requires at least Node.js v22.0.0. You are using v20.19.3\", and nothing in the repo could have said so first: no .nvmrc, no `engines` in either package.json, and nine workflows pinning three different majors as literals \u2014 20 in uno-bot-evals, 22 in the harness gates, 24 in the figma and blueprint jobs. uno-bot-deploy.yml even carried the comment `# wrangler v4.97+ requires Node >= 22`, so the fact was known, written once, and enforced nowhere. The floor now comes from the installed wrangler's own engines.node, which is the only ordering that helps: bumping wrangler past a Node major fails this check instead of failing a deploy. A workflow literal is a finding even when it AGREES with .nvmrc, because the second copy is the defect and not the number it happens to hold. Mutation-tested five ways: an .nvmrc below the floor, a missing .nvmrc, a literal that disagrees, a literal that agrees, and a manifest whose engines drifted.",
+    guards: "one Node major for the whole repo: .nvmrc at the floor read from wrangler's engines, and no workflow pinning its own Node literal.",
   },
   {
     name: 'check:harness-budgets',
@@ -473,8 +423,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-harness-budgets.mjs',
-    guards:
-      "budget numbers having one home. The budgets are decided once, in `BUDGETS` in agents/uno-bot/scripts/bundle-harness.mjs, and a doc that blows one fails the build (the constitution's is soft and warns). Two harness documents used to write a budget down as a number a reader acts on — AGENTS.md § The loading contract and skills/README.md — and a copy goes on saying 7,000 the day the constant moves to 8,000, with the build green, in the sentence a skill author reads before cutting a doc. Since the bot-harness spec a doc cites the constant by key (`BUDGETS.botSkill`) instead, and this check reads every doc under the bundler's section roots, off the manifest `assemble()` returns in-process, for two things: a line about a budget that states a char count, and a `BUDGETS.<key>` citation the bundler does not state — so a renamed budget role cannot leave its citations pointing at nothing. On the findings interface (#508), so the runner calls it in-process. Mutation-tested over a fixture root: a number written down in chars and in k, a stale number no constant holds, and a citation of a missing key.",
+    guards: 'budget numbers having one home, `BUDGETS` in bundle-harness.mjs: a doc cites a budget by its key, never by its number.',
   },
   {
     name: 'check:bot-skills',
@@ -482,8 +431,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-bot-skills.mjs',
-    guards:
-      "every bot skill keeping the authoring rules a check can see. A bot skill is a doc under the bundler's `bot-skills` section — its description ships in the prompt as the skill's pointer line, its body is read by name through `read_reference` — and which docs those are comes from the manifest `assemble()` returns in-process, so the check keeps no folder list. Each one names only tools that exist in agents/uno-bot/tool-definitions.json (every backticked snake_case name), ends in a `## Exit` section whose items each open with answer, file or hand off, and carries a one-line description within `BUDGETS.botSkillDescription`. A skill that tells the bot to call a tool it does not have, or to exit in a way it cannot (open a PR, post a review), is the defect the uno skills' per-skill Slack docs shipped before the bot skills replaced them. A grep guard fails any live file that still names those retired docs (plans, ADRs, todos, the archive and generated files are left as written); `--retired-faces` prints its hits alone. Mutation-tested over a fixture root: a missing tool, a missing or empty Exit, a fourth exit, a long or missing description, a live retired-face line.",
+    guards: 'every bot skill naming only tools that exist, ending in a `## Exit` of answer, file or hand off, with a description within its budget.',
   },
   {
     name: 'check:figma-color-drift',
@@ -492,8 +440,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-figma-color-drift.mjs',
     floors: { MAX_AGE_DAYS: 180, MIN_COMPARED: 90 },
-    guards:
-      "the CSS still painting what Figma says, or the difference being written down and argued. `scripts/figma-variables-snapshot.json` records every variable in the library by NAME and by count, and check:figma-snapshots holds it to a date and a floor — neither records a single VALUE, so a color could move on either side and the names would still line up perfectly. Two had, both found in one sweep of the BS4 library on 2026-08-29. `--color-success-container` is #bdf292 in the CSS and #a1eb83 in Figma, and both sides are internally consistent — the CSS state layers are built from rgba(189, 242, 146, …) and the Figma ones from #a1eb83 — so each looks correct alone and only the comparison shows the split. `--color-scrim` is 0.38 in the CSS against 0.32 in Figma: every Modal and Drawer in the product dims its page 19% harder than designed. Both are exempted rather than fixed because each is a decision and not a repair — whichever side changes, a shipping color moves — and the exemption records what BOTH sides hold, so a change on either fails instead of sliding underneath it. Every non-state-layer color variable maps to a CSS token except the `_Proposal/` candidates, which are reported and not failed. The alias chains are followed on both sides, which is why moving one base reports all three of its dependants. Mutation-tested three ways: a new divergence, a known one that stopped diverging, and a known one that changed shape.",
+    guards: 'the CSS still painting the color values Figma holds, or each difference recorded with its reason.',
   },
   {
     name: 'check:token-generation',
@@ -501,8 +448,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-token-generation.mjs',
-    guards:
-      "`npm run generate:tokens` being unable to silently delete tokens. It opened with `console.warn('WARNING: Source JSON files are incomplete. Token generation is DISABLED to protect existing tokens.')` and then wrote all four token files four lines later — the warning had no return and no exit, so the protection it announced did not exist. One run of that documented one-word command on 2026-08-29 took `_colors.scss` from 195 color tokens to 5, keeping only the five bare intents; `_layout.scss` lost every breakpoint token, `_primitives.scss` 9 and `_spacing_semantics.scss` 3. It reported `✅ All token files generated successfully!` while doing it, and printed `✅ Validation passed` beside a validation that had been commented out. `skills/uno-maintain/references/ds-fix.md` lists the command as the way to regenerate SCSS from source, so an agent following the maintenance skill would have run it. The generator now builds every file in memory, refuses by NAME when any file would lose a token, and writes nothing on that path. This check asserts the conditional rather than the refusal — non-zero exit if and only if it says a file would shrink, and a `--dry-run` that leaves every token file byte-identical — because a gate that goes red on the day the Figma exports are fixed is a gate somebody deletes. Mutation-tested three ways: dropping the exit, letting `--dry-run` write, and reinstating the false validation claim. The first draft of the check MISSED the dropped exit, because the refusal is on stderr and `execFileSync` returns only stdout on a zero exit; it uses `spawnSync` now.",
+    guards: '`npm run generate:tokens` refusing to write when its source JSON is incomplete, so it cannot silently delete tokens.',
   },
   {
     name: 'check:token-intent',
@@ -510,7 +456,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-token-intent.mjs',
-    guards: 'every token a plan defines (the ADR-038 ladder, the ADR-035 `--ds-*` colors) carrying its intent in `tokens.json`, and no primitive carrying the field; unplanned groups are counted, not failed.',
+    guards: 'every token a plan defines carrying its intent in `tokens.json`, and no primitive carrying the field; unplanned groups are counted.',
   },
   {
     name: 'check:color-system',
@@ -518,8 +464,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-color-system.mjs',
-    guards:
-      "the generated color system keeping its promises in BOTH plans and all four modes (light, dark and each with increased contrast): text, icon and edge contrast on the grounds they are drawn on; every accent family's tag text, bold fill and icon; meta text, links, focus and field edges on hovered, selected and overlay grounds, alphas composited first; no base, hovered and pressed triple sharing a value and the selection ladder staying ordered; status tints reading against the page and the sunken frame; categorical chart series 1-4 staying apart under protan and deutan simulation; the accent teal never reading as Lagoon; and PLAN PARITY, every semantic token mapped to the same primitive reference in every plan, because a plan is primitive values only and a mapping that forks per plan is a second semantic layer nobody decided. Builds each plan through the generator's own pipeline (scripts/lib/color/), so it judges what would be emitted, not a copy. Each finding names the check, the plan and the mode. It also holds the LEGACY MAP (scripts/lib/color/legacy-map.mjs): every legacy color name used in design-system/ and prototypes/ has a migration-map row, and every alias the map generates names a token the generator emits, because the alias sheet repaints every untouched component that uses the name.",
+    guards: "the generated color system's contrast promises in both plans and all four modes, for text, icons, edges, accents, links and focus.",
   },
   {
     name: 'check:color-tokens',
@@ -527,8 +472,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/generate-color-tokens.mjs',
-    guards:
-      'the generated color token files in design-system/src/tokens/color/ (palette, semantic, elevation and Bootstrap bridge SCSS plus the Figma spec) against the active plan and the generator. Drift means a hand edit or a plan change that was never regenerated.',
+    guards: 'the generated color token files in design-system/src/tokens/color/ against the active plan; drift is a hand edit or an unregenerated plan change.',
   },
   {
     name: 'check:legacy-color-list',
@@ -536,8 +480,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/generate-legacy-color-list.mjs',
-    guards:
-      'the list of components, specs and prototype files still on legacy color tokens in design-system/guidelines/foundations/color-migration.md against a scan of design-system/src/components, design-system/src/specs and prototypes (scripts/lib/color/legacy-components.mjs). Interns pick their next row from that list, so a component migrated without regenerating it stays on the list, and one that gains a legacy use is missing from it. Fix: npm run generate:legacy-color-list.',
+    guards: 'the legacy-color list in color-migration.md against a scan of components, specs and prototypes; fix with its generator.',
   },
   {
     name: 'check:design-tokens',
@@ -545,8 +488,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/generate-design-tokens.mjs',
-    guards:
-      'the generated token ladder files in design-system/src/tokens/ladder/ (the four tiers, motion SCSS and the Figma payload) against scripts/lib/tokens/plan.mjs (ADR-038). Drift means a hand edit or a plan change that was never regenerated.',
+    guards: 'the generated token ladder files in design-system/src/tokens/ladder/ against scripts/lib/tokens/plan.mjs; drift means a hand edit or an unregenerated plan.',
   },
   {
     name: 'check:old-size-tokens',
@@ -555,8 +497,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-old-size-tokens.mjs',
     baseline: 'scripts/baselines/old-size-tokens.json',
-    guards:
-      'files reading a retired token name (--size-element-*, --element-*, --layout-*, --overlay-* and the rest of RETIRED_TOKENS in scripts/lib/tokens/plan.mjs), counted per file in design-system/src, prototypes and src. The declarations are gone, so the record is empty and holds at zero; a file that reads one fails, and `npm run check:old-size-tokens -- --update` refuses to write a rise. Reads the record through `scripts/lib/ratchet.mjs`.',
+    guards: 'files reading a retired token name (RETIRED_TOKENS in scripts/lib/tokens/plan.mjs), held at zero.',
   },
   {
     name: 'check:ds-usage',
@@ -565,8 +506,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-ds-usage.mjs',
     baseline: 'scripts/baselines/ds-usage.json',
-    guards:
-      'escapes from the design system in consumer code (prototypes/, src/): a component the barrel does not export, a deep import, an unknown prop or enum value, a raw literal, an unknown or primitive token, a Font Awesome Pro icon (ADR-039). Read from the generated manifests in design-system/agent-views/. Each finding names its rule ID and what to write instead (docs/engineering/ds-usage-rules.md). Here it runs as `--all`: a `<rule> <path>` count may fall and never rise, and `npm run check:ds-usage -- --update` records a fall and refuses a rise. Run on changed files or named paths, every file is held to zero.',
+    guards: 'escapes from the design system in prototypes/ and src/: unknown components, props or tokens, deep imports, raw literals, Pro icons.',
   },
   {
     name: 'check:no-primitive-reads',
@@ -575,8 +515,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-no-primitive-reads.mjs',
     baseline: 'scripts/baselines/no-primitive-reads.json',
-    guards:
-      'components and patterns reading a numbered primitive (--space-<n>, --radius-<n>, --size-<n>, --stroke-<n>) instead of a tier token, counted per file in design-system/src/components and design-system/src/patterns (ADR-038). The record holds the residue and only falls; a file that rises or is new fails, and `npm run check:no-primitive-reads -- --update` refuses to write a rise. Reads the record through `scripts/lib/ratchet.mjs`.',
+    guards: 'components and patterns reading a numbered primitive instead of a tier token, counted per file; the residue may fall and never rise.',
   },
   {
     name: 'check:old-size-token-list',
@@ -584,8 +523,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/generate-old-size-token-list.mjs',
-    guards:
-      'the list of files still on old size tokens in design-system/guidelines/foundations/spacing.md against the same scan check:old-size-tokens ratchets. A family PR picks its next row from that list, so a file migrated without regenerating it stays on the list, and one that gains an old use is missing from it. Fix: npm run generate:old-size-token-list.',
+    guards: 'the old-size-token list in spacing.md against the scan check:old-size-tokens ratchets; fix with its generator.',
   },
   {
     name: 'check:atlassian-benchmark',
@@ -595,8 +533,7 @@ export const CHECKS = [
     module: 'scripts/check-atlassian-benchmark.mjs',
     floors: { MAX_AGE_DAYS: 365 },
     baseline: 'scripts/baselines/atlassian-benchmark.json',
-    guards:
-      "the comparison against Atlassian staying a MEASUREMENT rather than a memory, and the three gaps it found staying closed once they close. Their published surface was read live on 2026-08-29: 515 tokens, of which 441 are color, split by role into `background` 208, `text` 49, `border` 39 and `icon` 23. Ours are 479 and 195. The first draft of this check recorded that we have no role split at all, which is false and the correction is the finding: `--color-surface*` (36) IS the background role and `--color-outline*` (8) IS the border role, under Material's names. What is true is sharper. Our FOREGROUND role is undivided — one `--color-on-*` family (32) where they keep text and icon apart because the bars differ, 4.5:1 against 3:1 — so no token records which bar its value was checked against. And all seven intents carry the identical 9-token shape (base, container, -text, six state overlays), naming two roles while using three: there is no `--color-warning-border` and no `--color-warning-icon`, so an intent-colored stroke borrows the fill. That is the gap #312 lived in — `--color-warning` is 3.70:1 on white, legal as an icon and illegal as text, and its name says neither. The type row was ALSO wrong at first and is corrected here: counting `--font-size-*` gave 44 and read as bloat, but 27 of those are FontAwesome icon sizes and five are aliases, leaving TWELVE distinct text sizes against their fourteen steps, which is parity. The defect is the spacing rather than the count — the twelve run 12·14·16·20·24·28·32·40·56·64·72·80, giving seven distinct ratios across eleven steps (1.111, 1.125, 1.143, 1.167, 1.200, 1.250, 1.400), a list and not a scale (#267). Four rows are ratcheted by DIRECTION, never by distance: intent border and icon tokens may only rise from zero, the ratio count and the 46 line-heights (against their zero, since line-height travels inside each step — #346) may only fall. Nine more are recorded and not enforced, because 36 surface tokens against 208 backgrounds is a difference and not a defect. `--update` refuses to record a backwards move — and since #601 it is a MERGE through `scripts/lib/ratchet.mjs`, so Atlassian's whole published half survives a re-record, and a recorded floor no argued row measures any more is itself a finding. The whole thing fails when the recording goes a year unread.",
+    guards: 'the token benchmark against Atlassian staying a dated measurement, and the gaps it found staying closed once they close.',
   },
   {
     name: 'check:unspread-rest',
@@ -605,13 +542,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-unspread-rest.mjs',
     floors: { MIN_FILES: 100 },
-    guards:
-      'no component in the published library collecting a `...rest` and never using it. ' +
-      '`DateAndTimePicker` dropped every prop beyond its signature for the life of the ' +
-      'component (#230) — React allows an unused rest element and propTypes never sees ' +
-      'unknown props, so the props lost are the unwatched ones: aria-describedby, ' +
-      'data-testid. Same shape as check:token-collision — a silent defect no browser run ' +
-      'can observe, decidable from the file.',
+    guards: 'no component in the published library collecting a `...rest` prop and never spreading it.',
   },
   {
     name: 'check:docs-tabs',
@@ -620,20 +551,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-docs-tabs.mjs',
     baseline: 'scripts/baselines/docs-tabs.json',
-    guards:
-      'that the component docs pages keep the tab split ADR-025 gave them. Examples · Code · '
-      + 'Usage · Changelog stopped being Storybook `types.TAB` addons and became part of the '
-      + 'page, so tab membership now lives in each component\'s MDX as `<DocsTab tab="…">` '
-      + 'wrappers — this is what stops them drifting. It asserts the tabbed population against a '
-      + 'recorded floor (a ratchet, `scripts/lib/ratchet.mjs`: it may rise as a component gains a '
-      + 'docs page, via `npm run check:docs-tabs -- --update`, and never falls except by a hand '
-      + 'edit that names the removal), that every `sb-ds-doc-section` sits in a tab rather than '
-      + 'outside all of them, that a section is in the tab its heading assigns it in BOTH '
-      + 'directions, that no page outside the set sprouts a strip — the bug the old mechanism '
-      + 'actually had, since Storybook never filtered the tab list and a Colors foundation page '
-      + 'therefore offered a Usage tab — and that section divs and headings are still '
-      + 'one-to-one. It cannot see whether a tab RENDERS: only a browser knows that, and '
-      + '`check:storybook` runs story tests, not docs pages.',
+    guards: 'component docs pages keeping their Examples, Code, Usage and Changelog tab split, with tabbed pages held to a floor.',
   },
   {
     name: 'check:docs-token-literals',
@@ -642,18 +560,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-docs-token-literals.mjs',
     floors: { MIN_TOKENS: 200 },
-    guards:
-      'that the docs stylesheet stops hand-picking values the design system already '
-      + 'tokenizes. `.storybook/storybook-overrides.css` is the one stylesheet here that '
-      + 'dresses the DOCUMENTATION rather than a component, and nothing watched it: it had '
-      + 'accumulated `clamp(2.5rem, 5vw, 4rem)`, `1.5rem`, `0.625rem` and a `#e4e4e7`, each '
-      + 'a few lines from a `var(--size-…)` doing the same job, and #251 had to sweep some of '
-      + 'them by hand. Every declaration value is read against the live token table in '
-      + `${TOKEN_DIR}/, matched by VALUE and filtered by family so a font-size is `
-      + 'never offered a spacing step. Zero, `100%`, `1px` hairlines, `var()` fallbacks and a '
-      + 'comment against the declaration are allowed, and each allowance has a red twin in the '
-      + 'tests. It cannot see a NEAR miss (13px is not 12px), and it cannot see a fallback that '
-      + 'disagrees with the token it backs — both are written into the script header.',
+    guards: 'the docs stylesheet `.storybook/storybook-overrides.css` using tokens for values the design system already tokenizes.',
   },
   {
     name: 'check:docs-dead-selectors',
@@ -662,20 +569,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-docs-dead-selectors.mjs',
     floors: { MIN_SOURCES: 500 },
-    guards:
-      "that no rule in the docs stylesheet aims at a class nothing puts in the DOM. #250's "
-      + 'R1 asked for exactly this and was satisfied by a hand sweep, which leaked five: '
-      + '`.sb-plus-intro-mini-grid` (named IN the ticket as 0 uses, and still there after '
-      + 'the sweep that named it), `.responsive-frame-toolbar` and '
-      + '`.responsive-frame-root--browser-fullscreen` (ResponsiveFrame emits neither — its '
-      + 'only modifiers are `--native` and `--standalone`), and `.toc-container` / '
-      + '`.toc-title`, written against a guess about "Storybook 8" and absent from both this '
-      + 'repo and the installed packages. Every class in selector position is matched against '
-      + "the repo's own sources; the classes Storybook and its addons emit are listed in "
-      + 'VENDOR with the package file each was verified in. It cannot see a class assembled '
-      + 'from fragments in a template literal, and it reads selectors rather than the cascade '
-      + '— a live class whose declaration is out-`!important`-ed is the other half of R1, and '
-      + 'that half is `check:docs-chrome`, in a browser.',
+    guards: 'no rule in the docs stylesheet aiming at a class nothing puts in the DOM.',
   },
   {
     name: 'check:storybook-categories',
@@ -684,13 +578,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-storybook-categories.mjs',
     floors: { MIN_FILES: 90 },
-    guards:
-      "that component folders and Storybook titles keep Atlassian's categories. Every folder " +
-      'under `design-system/src/components/` is a category in kebab case (or `_internal`), every ' +
-      'component story is titled `Components/<category>/…` with its own folder\'s category, every ' +
-      'segment after it is sentence case, the taxonomy lists the categories in Atlassian\'s order, ' +
-      'and no tracked file names a retired folder. Storybook renders a stale title as a group of ' +
-      'its own, so a story copied from an older file would otherwise bring the old group back.',
+    guards: 'component folders and Storybook titles keeping one category taxonomy, with sentence-case title segments.',
   },
   {
     name: 'check:page-outline',
@@ -699,17 +587,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-page-outline.mjs',
     floors: { MIN_FILES: 100, MIN_PAGE_STORIES: 42, AREA_OVERVIEWS: 3 },
-    guards:
-      'the OTHER half of the page-outline guard — the half a DOM assertion cannot hold. ' +
-      '`.storybook/page-outline.js` asserts in the browser that every page story renders an ' +
-      '`<h1>` and that it comes first; it selects pages by story TITLE, cannot count its own ' +
-      'population (each story file is its own module in browser mode), and goes silent if its ' +
-      'registration in `.storybook/vitest.setup.ts` is deleted. This checks the title selector ' +
-      'still picks out exactly the files under `specs/**/Pages/**` plus the three area ' +
-      'overviews, that the population has not collapsed below its floor, and that the assertion ' +
-      'is still wired in. #243 — the defect neither `heading-order` nor `page-has-heading-one` ' +
-      'can see, because the first heading on a page has no predecessor to skip from and axe ' +
-      'never evaluates page-level rules against a story root.',
+    guards: 'the browser page-outline assertion still selecting every page story, above its floor, and still wired into `.storybook/vitest.setup.ts`.',
   },
   {
     name: 'check:intake-fsm',
@@ -717,10 +595,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',
-    spawnReason:
-      'an assert-based smoke suite over the intake FSM. It throws on the first broken ' +
-      'invariant rather than collecting them, which is what a test suite is for and what a ' +
-      'findings set is not.',
+    spawnReason: 'an assert-based smoke suite that throws on the first broken invariant rather than collecting findings.',
     guards: 'the intake FSM that gates every uno-prototype run.',
   },
   {
@@ -729,11 +604,8 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',
-    spawnReason:
-      '`node --test`. The runner\'s report IS the findings set, in TAP, and re-rendering it ' +
-      'as Finding[] would be a second opinion about a format that already has one.',
-    guards:
-      'the unit tests of the guards themselves. A guard nobody has watched fail is a guard nobody knows works (#191).',
+    spawnReason: "`node --test`: the runner's TAP report is already the findings set.",
+    guards: 'the unit tests of the guards themselves.',
   },
   {
     name: 'check:secrets',
@@ -741,8 +613,7 @@ export const CHECKS = [
     pkg: 'bot',
     trigger: ['pull_request', 'deploy'],
     module: 'agents/uno-bot/scripts/check-secrets.mjs',
-    guards:
-      "the secret declaration against `interface Env` and against [vars]. The [vars] half is the one with teeth: that table is COMMITTED, so a secret assigned there is a secret published to GitHub. The rest keeps wrangler.toml's expected-names list honest — hand-maintained, it drifted in both directions at once (four names not set, two set names missing) and #288's account move works from exactly that list.",
+    guards: "the Worker's secret declarations against `interface Env`, and no secret assigned in the committed [vars] of wrangler.toml.",
   },
   {
     name: 'check:worker-host',
@@ -750,8 +621,7 @@ export const CHECKS = [
     pkg: 'bot',
     trigger: 'pull_request',
     module: 'agents/uno-bot/scripts/check-worker-host.mjs',
-    guards:
-      'the single definition of the Worker\'s hostname. Its inputs are repo-root files — workflows and docs/ — so a PR that never touches agents/uno-bot/ can still break it. A second hardcoded host is silent until a cutover (#288) misses one, and anything pointed at the OLD deployment reads a dead Worker as the live one, which is the shape of failure #249 already cost this repo.',
+    guards: "the single definition of the Worker's hostname across workflows and docs/.",
   },
   {
     name: 'check:typography-classes',
@@ -759,8 +629,7 @@ export const CHECKS = [
     pkg: 'root',
     trigger: 'pull_request',
     module: 'scripts/check-typography-classes.mjs',
-    guards:
-      "every `*-txt` class a page asks for against a rule that actually sets type. `.h1-txt`\u2013`.h6-txt` have never existed \u2014 headings are `.h1`\u2013`.h6` \u2014 and eleven places asked for them anyway, including two prototype pages and a guidelines example teaching it onward. A missing utility class fails silently by definition: the element keeps its own type, one step off the scale, with nothing to notice it. 0.1s, measured 2026-08-29.",
+    guards: 'every `*-txt` class a page asks for against a rule that actually sets type.',
   },
   {
     name: 'check:text-contrast',
@@ -769,8 +638,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-text-contrast.mjs',
     baseline: 'scripts/baselines/text-contrast-baseline.json',
-    guards:
-      "every `color:` declaration in the design system's stylesheets against the ground its own rule puts it on, compositing translucent state layers first. `--color-warning` is 3.52:1 on the page \u2014 below AA \u2014 and was the declared text color in seven places including a `.color-warning` utility anyone could reach for, while `--color-warning-text` (8.24:1) sat in the token file unused. Nothing rendered any of the seven in a story, so `check:storybook`'s axe pass never measured one. Ratchet, because the remaining findings are open #268 token decisions and WCAG's inactive-component exemption, both recorded with a reason \u2014 and since #599 the ratchet itself is `scripts/lib/ratchet.mjs` rather than this check's own read and write, so an absent record now fails loudly instead of throwing ENOENT. Two block annotations, placed as the first thing in their block, teach it what a stylesheet cannot say: `// @grounds: --color-…` names the grounds a caller paints under the rule, each measured instead of the page (the rule's own background still wins), and `// @contrast: non-text` holds an icon glyph to WCAG 1.4.11's 3:1, allowed only on an icon selector. A misplaced, duplicated, empty or unknown annotation is itself a failure. 0.2s, measured 2026-08-29.",
+    guards: "every `color:` declaration in the design system's stylesheets against the ground its rule puts it on, state layers composited first.",
   },
   {
     name: 'check:harness-bundle',
@@ -778,8 +646,7 @@ export const CHECKS = [
     pkg: 'bot',
     trigger: 'pull_request',
     module: 'agents/uno-bot/scripts/check-harness-bundle.mjs',
-    guards:
-      'the Worker prompt bundle against the root docs it is assembled from, and the char budgets in AGENTS.md § The loading contract. This is the artifact #196 had to repair.',
+    guards: 'the Worker prompt bundle against the root docs it is assembled from, and its char budgets.',
   },
   {
     name: 'typecheck',
@@ -787,11 +654,8 @@ export const CHECKS = [
     pkg: 'bot',
     trigger: ['pull_request', 'deploy'],
     kind: 'spawn',
-    spawnReason:
-      '`tsc --noEmit`. The type errors are the compiler\'s, in the compiler\'s format, and ' +
-      'nothing in this repo should paraphrase them.',
-    guards:
-      "the Worker's TypeScript — every file under agents/uno-bot/src/ (tsconfig.json § include). Before it was composed here it ran only inside `npm run deploy`, so a type error reached the one command whose failure is most expensive to discover. It ALSO has its own named pull-request job (.github/workflows/uno-bot-checks.yml § typecheck), because the whole composite shares one GitHub check, so a reviewer reading a red `check:harness` learns a type failure and a test failure as the same line and has to open the log to tell which (#580). 1.2s, measured 2026-09-17.",
+    spawnReason: "`tsc --noEmit`: the type errors are the compiler's, in the compiler's format.",
+    guards: "the Worker's TypeScript, every file under agents/uno-bot/src/.",
   },
   {
     name: 'test:bundle',
@@ -800,8 +664,7 @@ export const CHECKS = [
     trigger: ['pull_request', 'deploy'],
     kind: 'spawn',
     spawnReason: '`node --test`, for the same reason as test:scripts.',
-    guards:
-      "the bot's own script tests \u2014 apply-cutover, secrets, deploy, the harness bundler, and the measurement tools under measurement/ \u2014 which check-harness.yml has run since #266 but check:harness did not, so the local gate was a strict SUBSET of the remote one. That gap cost a red CI on #388: a message reworded in apply-cutover.mjs broke an assertion in apply-cutover.test.mjs, `npm run check:harness` went green locally on all 38 sub-checks, and the failure appeared only after the push. The completeness assertion could not have caught it either, because it scans `check:*` names and this is not one. 0.3s, measured 2026-08-30.",
+    guards: "the bot's own script tests: cutover, secrets, deploy, the harness bundler and the measurement tools.",
   },
   {
     name: 'test',
@@ -809,13 +672,8 @@ export const CHECKS = [
     pkg: 'bot',
     trigger: ['pull_request', 'deploy'],
     kind: 'spawn',
-    spawnReason:
-      '`tsc -p tsconfig.test.json && node --test`, after clearing `.test-build`. A build step ' +
-      'and a test runner; neither half is a comparison this process could make. The clear is ' +
-      'there because `tsc` never deletes the output of a deleted source and the runner globs ' +
-      'every compiled test, so a removed test kept running from its stale copy.',
-    guards:
-      "the Worker's unit suite — the largest in this repository (its run prints the current test and suite counts), and gated by nothing at all until it was composed here: it ran in no workflow, and `npm run deploy` chose `test:bundle` and stopped. 2.2s, measured 2026-09-17. Found while verifying the TypeScript 7 bump (#298), which is exactly the change that needed them. #580 finished the job in both directions: `npm test` is in the deploy chain now, so a direct push to unprotected `main` meets it too, and the suite has its own named pull-request job (.github/workflows/uno-bot-checks.yml § tests) so its red is legible from the check list rather than only from a 40-second log. Among them is the harness name sweep (tests/harness-blueprint-names.test.ts), which reads the assembled prompt, the tool schemas and — since #425 — the Actions prompts under scripts/prompts/ for blueprint identifiers and conventions the schema no longer has; its inputs are repo-root files, which is the rule that composes a sub-package check here.",
+    spawnReason: '`tsc -p tsconfig.test.json && node --test` after clearing `.test-build`: a build and a test runner, neither a comparison this process makes.',
+    guards: "the Worker's unit suite, the largest in this repository.",
   },
 ];
 
@@ -842,11 +700,8 @@ export const EXCLUDED = [
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',
-    spawnReason:
-      'this script — the composite itself. It is the process every other row reports into, ' +
-      'so it has no findings of its own to return.',
-    reason:
-      'this script.',
+    spawnReason: 'the composite itself: every other row reports into it, so it has no findings of its own.',
+    reason: 'this script.',
   },
   {
     name: 'check:component-docs',
@@ -855,12 +710,9 @@ export const EXCLUDED = [
     trigger: 'pull_request',
     kind: 'spawn',
     baseline: 'scripts/baselines/component-docs.json',
-    spawnReason:
-      'a generator. `--check` is its own assembly pass with the writes withheld, and ' +
-      'check:agent spawns it so the step names itself.',
+    spawnReason: 'a generator: `--check` is its assembly pass with the writes withheld, spawned by check:agent so the step names itself.',
     stepOf: 'check:agent',
-    reason:
-      'step 3 of check:agent.',
+    reason: 'step 3 of check:agent.',
   },
   {
     name: 'check:index',
@@ -868,10 +720,9 @@ export const EXCLUDED = [
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',
-    spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
+    spawnReason: 'a generator, spawned as a step of check:agent; see check:component-docs.',
     stepOf: 'check:agent',
-    reason:
-      'step 4 of check:agent.',
+    reason: 'step 4 of check:agent.',
   },
   {
     name: 'check:component-registry',
@@ -879,10 +730,9 @@ export const EXCLUDED = [
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',
-    spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
+    spawnReason: 'a generator, spawned as a step of check:agent; see check:component-docs.',
     stepOf: 'check:agent',
-    reason:
-      'step 5 of check:agent.',
+    reason: 'step 5 of check:agent.',
   },
   {
     name: 'check:token-registry',
@@ -890,10 +740,9 @@ export const EXCLUDED = [
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',
-    spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
+    spawnReason: 'a generator, spawned as a step of check:agent; see check:component-docs.',
     stepOf: 'check:agent',
-    reason:
-      'step 6 of check:agent.',
+    reason: 'step 6 of check:agent.',
   },
   {
     name: 'check:knowledge-audit',
@@ -901,10 +750,9 @@ export const EXCLUDED = [
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',
-    spawnReason: 'a generator, spawned as a step of check:agent — see check:component-docs.',
+    spawnReason: 'a generator, spawned as a step of check:agent; see check:component-docs.',
     stepOf: 'check:agent',
-    reason:
-      'step 7 of check:agent.',
+    reason: 'step 7 of check:agent.',
   },
   {
     name: 'check:storybook',
@@ -912,21 +760,9 @@ export const EXCLUDED = [
     pkg: 'root',
     trigger: 'storybook-gate',
     kind: 'spawn',
-    spawnReason:
-      'it drives a real Chromium over the story suite. The result is a browser run\'s exit ' +
-      'code and a Playwright report, not a set of findings this process could compute.',
+    spawnReason: "it drives a real Chromium over the story suite; the result is a browser run's exit code and a Playwright report.",
     baseline: 'scripts/baselines/a11y-baseline.json',
-    reason:
-'the only sub-check that is not dependency-free: it needs `npm ci` and a Playwright ' +
-    'chromium download, and the browser suite itself is ~130s against this gate\'s ~14s ' +
-    'total (measured 2026-08-26, #169). Composing it would be a 10x rise in the number ' +
-    'people wait on, and the header above says why that is fatal. It runs on the same ' +
-    '`pull_request` trigger as its own job — `.github/workflows/storybook-gate.yml` — so ' +
-    'it is a peer of this gate, not an orphan, and the two run concurrently: a PR waits ' +
-    'one Storybook run, not a Storybook run after a harness run. Reconsidered in #282, ' +
-    'which made it runnable from a worktree at last (it had aborted all 388 story files ' +
-    'there). The answer did not change: measured 166s in a worktree, and being able to ' +
-    'run it by hand is what that ticket was for.',
+    reason: 'it needs `npm ci`, Playwright Chromium and about 130s, so it runs beside this gate as its own storybook-gate job.',
   },
   {
     name: 'check:storybook-links',
@@ -934,13 +770,8 @@ export const EXCLUDED = [
     pkg: 'root',
     trigger: 'storybook-gate',
     kind: 'spawn',
-    spawnReason: 'it builds Storybook to read the index of ids that exist — see check:storybook.',
-    reason:
-      'it needs the built `index.json`, the only authority on which Storybook ids exist, so it ' +
-      'pays a Storybook build that `check:harness` has no budget for. It guards every link to a ' +
-      'Storybook page (MDX, registry, docs map, embeds) against an id a page move or rename ' +
-      'left behind. It is a step in `.github/workflows/storybook-gate.yml`, which already has ' +
-      '`npm ci`.',
+    spawnReason: 'it builds Storybook to read the index of ids that exist; see check:storybook.',
+    reason: 'it needs a Storybook build for the ids in `index.json`, so it is a step of storybook-gate, which already installs.',
   },
   {
     name: 'check:docs-chrome',
@@ -948,13 +779,8 @@ export const EXCLUDED = [
     pkg: 'root',
     trigger: 'storybook-gate',
     kind: 'spawn',
-    spawnReason: 'it starts a Storybook and drives a real Chromium — see check:storybook.',
-    reason:
-'the same reason as check:storybook, and it runs in the same job: it needs `npm ci`, a ' +
-    'Playwright chromium and a Storybook server before it can measure anything. It exists ' +
-    'because `check:storybook` does NOT cover docs pages — that suite tests stories, and #263 ' +
-    'found four chrome defects on docs pages that no check could ever have caught. It is a ' +
-    'step in `.github/workflows/storybook-gate.yml`, which already pays for the browser.',
+    spawnReason: 'it starts a Storybook and drives a real Chromium; see check:storybook.',
+    reason: 'it needs `npm ci`, Playwright Chromium and a Storybook server, so it runs in the storybook-gate job beside check:storybook.',
   },
   {
     name: 'test:design-system',
@@ -963,13 +789,7 @@ export const EXCLUDED = [
     trigger: 'storybook-gate',
     kind: 'spawn',
     spawnReason: '`vitest run` in design-system/, for the same reason as test:scripts.',
-    reason:
-'it needs the root `npm ci` — vitest, jsdom, React and every package the components ' +
-    'import — and this gate installs nothing at the root, deliberately. It is a guard without ' +
-    'the `check:` prefix, so the completeness assertion could not see it, and it ran in no ' +
-    'workflow: the suite could not even start in a clean checkout and nobody was told (#910). ' +
-    'It is its own job, `design-system`, in `.github/workflows/storybook-gate.yml`, which ' +
-    'already pays for that install; no browser.',
+    reason: 'it needs the root `npm ci`, which this gate skips, so it is the `design-system` job of storybook-gate.',
   },
   {
     name: 'check:fetch',
@@ -977,8 +797,7 @@ export const EXCLUDED = [
     pkg: 'bot',
     trigger: 'deploy',
     module: 'agents/uno-bot/scripts/check-fetch.mjs',
-    reason:
-      'reads only agents/uno-bot/src/. A root-only PR cannot break it, and `npm run deploy` gates it at its own boundary.',
+    reason: 'it reads only agents/uno-bot/src/, so a root-only PR cannot break it, and `npm run deploy` gates it at its own boundary.',
   },
   {
     name: 'check:contract',
@@ -986,11 +805,8 @@ export const EXCLUDED = [
     pkg: 'bot',
     trigger: 'deploy',
     kind: 'spawn',
-    spawnReason:
-      'a sync. `--check` is that sync with the write withheld, and a missing sibling ' +
-      'checkout is an exit code by design (see the reason above).',
-    reason:
-      'compares against a sibling checkout of BilLogic/plus-uno-blueprint that no runner has. It exits 1 on a missing source by design, so composing it would make this gate permanently red.',
+    spawnReason: 'a sync: `--check` withholds the write, and a missing sibling checkout is an exit code by design.',
+    reason: 'it compares against a sibling plus-uno-blueprint checkout no runner has, and exits 1 without one, so composed it would stay red.',
   },
   {
     name: 'test:workerd',
@@ -998,29 +814,8 @@ export const EXCLUDED = [
     pkg: 'bot',
     trigger: ['pull_request', 'deploy'],
     kind: 'spawn',
-    spawnReason:
-      'vitest, in a pool that boots workerd. The result is a runtime run\'s exit code, and the ' +
-      'interesting failures are a Durable Object\'s — an RPC that threw, storage that read back ' +
-      'wrong — in vitest\'s own format.',
-    reason:
-      "it boots a RUNTIME, and this gate's whole argument is that it stays seconds long: " +
-      '3.1s warm and 4.5s cold locally, 4s as a step of the harness job and 5s as the ' +
-      'job of its own it became (measured 2026-09-17), against a ~14s composite. The cost is the startup rather than the assertions — vitest ' +
-      "reports 1.7s for the run, of which 1.05s is the import. So it sits beside the composite " +
-      'rather than inside it, on the same `pull_request` trigger, as its OWN NAMED JOB — ' +
-      '`.github/workflows/uno-bot-checks.yml` § conformance — which is also what makes its red ' +
-      'legible: a step of `check-harness.yml` (where it lived from #493 until #587) landed on ' +
-      "the same single `check:harness / harness` check as 48 other sub-checks, so \"the Durable " +
-      'Object broke" and "a doc link broke" arrived as one line. It is in the `npm run deploy` ' +
-      'chain too (#587), because `main` is unprotected and a PR-only gate is a gate a direct ' +
-      'push walks past. WHAT A RED MEANS: the two ThreadState adapters have stopped agreeing. ' +
-      'The suite is the contract between the in-memory store and the Durable Object — 49 cases ' +
-      'over one shared conformance body (tests/helpers/thread-state-conformance.ts), run twice: ' +
-      'here against real DO SQLite through RPC, and inside `npm test` against the in-memory ' +
-      'adapter. Durable Object storage, the input gate that makes "the delete is the claim" ' +
-      'true, and the retirement semantics that keep a replaced proposal card from executing are ' +
-      'all only observable in the runtime, which is why exactly one file pays for workerd and ' +
-      'it is the file whose subject IS the runtime.',
+    spawnReason: "vitest in a pool that boots workerd; its failures are a Durable Object's, in vitest's own format.",
+    reason: 'it boots workerd, so it runs as its own job in uno-bot-checks.yml and in the deploy chain; red means the two ThreadState adapters disagree.',
   },
 ];
 
@@ -1189,6 +984,16 @@ export const ALL = [...CHECKS, ...EXCLUDED];
     seen.add(row.name);
   }
 }
+
+/** The longest a row's prose field may run: one sentence a CI log prints on one line. */
+export const PROSE_CAP = 160;
+
+/** What is wrong with a row's `guards`, `reason` and `spawnReason`: each is one line of at most `PROSE_CAP` characters. */
+export const proseFaults = (row) =>
+  ['guards', 'reason', 'spawnReason']
+    .filter((field) => typeof row[field] === 'string')
+    .filter((field) => row[field].includes('\n') || row[field].length > PROSE_CAP)
+    .map((field) => `${row.name} ${field} is ${row[field].length} characters; write one line of at most ${PROSE_CAP}`);
 
 /** A row's triggers, always as an array. */
 export const triggersOf = (row) => (Array.isArray(row.trigger) ? row.trigger : [row.trigger]);

@@ -23,7 +23,9 @@ import {
   DEPLOY_CHAIN,
   EXCLUDED,
   WORKFLOW_STEPS,
+  PROSE_CAP,
   byName,
+  proseFaults,
   rootCheckRows,
   triggersOf,
 } from './checks.registry.mjs';
@@ -258,6 +260,18 @@ test('every registry row carries the columns its readers need', () => {
   for (const row of EXCLUDED) assert.ok(row.reason, `${row.name} is excluded with no reason`);
   assert.ok(rootCheckRows().length >= CHECKS.length - 6, 'the package.json block looks truncated');
   assert.ok(WORKFLOW_STEPS.length > 0);
+});
+
+test('every row states its guards, reason and spawnReason in one line', () => {
+  assert.deepEqual(ALL.flatMap(proseFaults), []);
+});
+
+test('a multi-line or over-long prose field is a fault', () => {
+  const long = 'x'.repeat(PROSE_CAP + 1);
+  assert.deepEqual(proseFaults({ name: 'check:fine', guards: 'One line.' }), []);
+  assert.equal(proseFaults({ name: 'check:wrapped', guards: 'One line.\nAnd another.' }).length, 1);
+  assert.equal(proseFaults({ name: 'check:long', reason: long }).length, 1);
+  assert.equal(proseFaults({ name: 'check:both', guards: long, spawnReason: 'a\nb' }).length, 2);
 });
 
 test('the generated blocks match the registry', () => {
