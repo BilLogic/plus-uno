@@ -121,10 +121,11 @@ const LessonsTable = ({
                     const isExpanded = expandedRows.has(lessonId);
                     const isCompleted = ['completed', 'complete'].includes(lesson.status);
                     const groupStateClass = lesson.state ? `lessons-table__group--${lesson.state}` : '';
-                    // Disabled is a color, not an opacity: the text takes the
-                    // disabled token and each row says it is disabled.
+                    // Disabled is a color, not an opacity: the text drops to the
+                    // subtlest color, which still reads at 4.5:1, its controls are
+                    // disabled, and each row says it is disabled.
                     const isDisabled = ['disabled', 'disable'].includes(lesson.state);
-                    const subtleText = isDisabled ? 'var(--ds-text-disabled)' : 'var(--ds-text-subtle)';
+                    const subtleText = isDisabled ? 'var(--ds-text-subtlest)' : 'var(--ds-text-subtle)';
 
                     return (
                         <tbody
@@ -153,7 +154,7 @@ const LessonsTable = ({
                                         )}
                                         <span
                                             className="body3-txt font-weight-semibold lesson-title"
-                                            style={isDisabled ? { color: 'var(--ds-text-disabled)' } : undefined}
+                                            style={isDisabled ? { color: 'var(--ds-text-subtlest)' } : undefined}
                                         >
                                             {lesson.title}
                                         </span>

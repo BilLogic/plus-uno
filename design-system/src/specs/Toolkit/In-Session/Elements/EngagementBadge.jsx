@@ -26,19 +26,12 @@ const statusConfig = {
 
 export const EngagementBadge = ({
     status = 'unknown',
-    showDropdown = true,
-    disabled = false
+    showDropdown = true
 }) => {
     const config = statusConfig[status] || statusConfig['unknown'];
 
     return (
-        // Disabled is Figma's 38% badge. It says so too: WCAG holds an inactive
-        // control to no contrast minimum, and the state is what makes it inactive.
-        <div
-            className="d-inline-flex align-items-center gap-1"
-            style={{ opacity: disabled ? 0.38 : 1 }}
-            aria-disabled={disabled || undefined}
-        >
+        <div className="d-inline-flex align-items-center gap-1">
             <StatusTag appearance={config.style}>{config.text}</StatusTag>
             {showDropdown && caretIcon}
         </div>

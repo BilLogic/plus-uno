@@ -256,6 +256,7 @@ export const Focused = {
         await waitFor(() => expect(style.outlineStyle).toBe('solid'));
         await expect(trigger).toHaveFocus();
         await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        await expect(canvasElement.ownerDocument.querySelector('.plus-popup'), 'the popup stays open').not.toBeNull();
         trigger.blur();
     },
 };

@@ -93,7 +93,7 @@ const InfoTooltipContent = () => (
 function TutorProfileInteractiveDemo({ profileState }) {
     // The visible labels here are the caller's `<Label>`, not each Input's own,
     // so the pairing is made with `htmlFor` (#213). `useId` scopes the ids per
-    // instance — the docs page renders several pages at once, and two fields
+    // instance — the docs page renders Overview, Filled and Interactive at once, and two fields
     // sharing `id="bi-first-name"` would send both labels to the first.
     const uid = useId();
     const fieldId = (key) => `${uid}-${key}`;

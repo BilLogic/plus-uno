@@ -109,9 +109,16 @@ const StateSpotlight = ({ headline }) => (
 // Base UI's Popover.Portal renders into document.body, outside canvasElement, and
 // every story on a docs page portals its own popup, so each story names its popup
 // by a headline of its own.
+/**
+ * The open spotlight, once it holds the focus it takes on opening. Base UI
+ * queues that focus on the next animation frame; a play that focuses
+ * something before the frame runs can have it moved a moment later.
+ */
 const popupFor = async (headline) => {
     await waitFor(() => expect([...document.querySelectorAll('.plus-spotlight')].find((el) => el.textContent.includes(headline))).toBeTruthy());
-    return [...document.querySelectorAll('.plus-spotlight')].find((el) => el.textContent.includes(headline));
+    const popup = [...document.querySelectorAll('.plus-spotlight')].find((el) => el.textContent.includes(headline));
+    await waitFor(() => expect(popup.contains(document.activeElement)).toBe(true));
+    return popup;
 };
 const HOVERED = '--ds-interaction-inverse-hovered';
 const PRESSED = '--ds-interaction-inverse-pressed';

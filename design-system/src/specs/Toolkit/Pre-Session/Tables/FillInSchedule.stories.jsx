@@ -50,13 +50,13 @@ export const TableRow = ({
         focus: {
             border: 'var(--stroke-2) solid var(--ds-border-focused)'
         },
-        // Disabled is a color, not an opacity: the text takes the disabled
-        // token and the row says it is disabled, so it reads as inactive to
-        // assistive technology too.
+        // Disabled is a color, not an opacity. The row's text stays readable
+        // at 4.5:1 on the subtlest text color, and its controls are disabled
+        // themselves, which is what a screen reader announces.
         disabled: { pointerEvents: 'none' }
     };
     const isDisabled = effectiveState === 'disabled';
-    const textColor = isDisabled ? 'var(--ds-text-disabled)' : 'var(--ds-text)';
+    const textColor = isDisabled ? 'var(--ds-text-subtlest)' : 'var(--ds-text)';
 
     const handleMouseEnter = interactive && !forcedState ? () => setCurrentState('hover') : undefined;
     const handleMouseLeave = interactive && !forcedState ? () => setCurrentState('default') : undefined;
@@ -83,7 +83,6 @@ export const TableRow = ({
             onMouseLeave={handleMouseLeave}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
-            aria-disabled={isDisabled || undefined}
         >
             {/* Checkbox Cell - uses design system Checkbox component */}
             <div
