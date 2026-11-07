@@ -9,7 +9,7 @@ Text field — a labeled single-line field on `_Field`, 40 high and 32 when `spa
 
 **Source:** `design-system/src/components/forms-and-inputs/TextField/TextField.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TextField/TextField.stories.jsx` — Overview, Content, Validation, Spacing, States, FocusRing, Interactive, Anatomy, ErrorAndCount, Warning, Autofill, Search, ButtonsInside, Subtle, CaptionColors, NumberSteppers, NumberEmptyIsNotZero, NumberClampOnBlur, NumberWheelLeavesTheValue, NumberReadOnly, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/TextField/TextField.stories.jsx` — Overview, ElementBefore, TextAffix, HelperText, Filled, Success, SpacingDefault, SpacingCompact, Spacing, FocusRing, Interactive, Anatomy, ErrorAndCount, Warning, Autofill, Search, ButtonsInside, Subtle, CaptionColors, NumberSteppers, NumberEmptyIsNotZero, NumberClampOnBlur, NumberWheelLeavesTheValue, NumberReadOnly, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TextField/TextField.mdx`
 
@@ -28,8 +28,8 @@ Text field — a labeled single-line field on `_Field`, 40 high and 32 when `spa
 | `value` | string or number | — | With `type="number"`, empty (`''` or `null`) stays empty; it is never read as 0. |
 | `defaultValue` | string or number | — | Starting value of an uncontrolled field. Use `value` to control it instead. |
 | `inputRef` | func or shape or any | — | Ref to the underlying `<input>`, as a callback or a ref object. |
-| `spacing` | enum | `'default'` | `default` is 40 high; `compact` is 32. |
-| `appearance` | enum | `'standard'` | `subtle` is transparent until it is hovered or edited. |
+| `spacing` | enum | `'default'` | `default` is 40; `compact` is 32. |
+| `appearance` | enum | `'standard'` | `subtle` is borderless until hovered or edited, for editing in place. |
 | `isDisabled` | bool | `false` | Disables the input and its number steppers and dims the field. |
 | `isReadOnly` | bool | `false` | With `type="number"`, also hides the steppers; the value can be read and copied. |
 | `isInvalid` | bool | `false` | Draws the error border and sets `aria-invalid`; `errorMessage` says why. |

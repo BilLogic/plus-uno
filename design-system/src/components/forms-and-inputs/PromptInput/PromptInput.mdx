@@ -1,8 +1,9 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PromptInputStories from './PromptInput.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PromptInput } from '@/components';
+import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={PromptInputStories} />
 
@@ -23,79 +24,37 @@ action after it.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Size and layout
 
-<DocsCanvasShell attachSourceBelow description={<>A growing text area with a send button.</>}>
-    <Canvas of={PromptInputStories.Default} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={PromptInputStories.WithSlots} title="Slots" description="startSlot holds a quiet control before the text, attachments a row of staged files above it, and actions extra controls beside send." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Sending
+## Behavior
 
-<DocsCanvasShell description={<>Enter sends; the field clears itself when uncontrolled.</>}>
-    <DsCanvasQuiet of={PromptInputStories.EnterSends} />
-</DocsCanvasShell>
+<ComponentExample of={PromptInputStories.EnterSends} title="Enter sends" description="Enter sends, and an uncontrolled field clears itself." />
 
-<DocsCanvasShell description={<>Shift+Enter starts a new line instead of sending.</>}>
-    <DsCanvasQuiet of={PromptInputStories.ShiftEnterStartsALine} />
-</DocsCanvasShell>
+<ComponentExample of={PromptInputStories.ShiftEnterStartsALine} title="Shift and Enter" description="Shift and Enter start a new line instead of sending." />
 
-<DocsCanvasShell description={<>Nothing sends while the field is empty.</>}>
-    <DsCanvasQuiet of={PromptInputStories.CannotSendWhenEmpty} />
-</DocsCanvasShell>
+<ComponentExample of={PromptInputStories.CannotSendWhenEmpty} title="Empty" description="Nothing sends while the field is empty." />
 
-<DocsCanvasShell description={<>Enter is ignored while an input method is mid-composition, so it doesn't fire while someone is still choosing a character.</>}>
-    <DsCanvasQuiet of={PromptInputStories.ComposingDoesNotSend} />
-</DocsCanvasShell>
+<ComponentExample of={PromptInputStories.ComposingDoesNotSend} title="Composing" description="Enter is ignored while an input method is mid-composition." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Loading
+## State
 
-<DocsCanvasShell description={<>`isLoading` turns the send button into Stop and rings the field in a GenerativeBorder.</>}>
-    <DsCanvasQuiet of={PromptInputStories.Loading} />
-</DocsCanvasShell>
+<ComponentExample of={PromptInputStories.Default} title="Rest" description="A growing text area with a send button, held back until there is text." />
 
-</div>
+<ComponentExample of={PromptInputStories.Focused} title="Focused" description="A 2px ring around the field, drawn here with state focus." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={PromptInputStories.Loading} title="Loading" description="isLoading turns the send button into Stop and rings the field in a GenerativeBorder." />
 
-## Slots
-
-<DocsCanvasShell description={<>`startSlot` for a quiet control before the text, `attachments` for a row of staged files above it, and `actions` for extra controls beside send.</>}>
-    <DsCanvasQuiet of={PromptInputStories.WithSlots} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>label</code></td><td>string</td><td>Required. The field's accessible name, such as "Message to PLUS AI".</td></tr>
-        <tr><td><code>value</code>, <code>defaultValue</code>, <code>onChange</code></td><td>—</td><td>Uncontrolled, the field clears itself after a send; controlled, the owner clears it in <code>onSubmit</code>.</td></tr>
-        <tr><td><code>onSubmit</code></td><td>function</td><td>Called with the text on Enter or the send button.</td></tr>
-        <tr><td><code>isLoading</code>, <code>onStop</code></td><td>—</td><td>Swaps send for Stop. Stop is never held back by <code>isDisabled</code>: a generation must stay cancelable.</td></tr>
-        <tr><td><code>startSlot</code></td><td>node</td><td>One quiet control before the text, such as an attach button.</td></tr>
-        <tr><td><code>attachments</code></td><td>node</td><td>A row of staged files above the text.</td></tr>
-        <tr><td><code>actions</code></td><td>node</td><td>Extra controls beside the send button.</td></tr>
-        <tr><td><code>isDisabled</code></td><td>boolean</td><td>—</td></tr>
-    </tbody>
-</DocsTable>
+<ComponentExample of={PromptInputStories.Disabled} title="Disabled" description="The field and the send button fade and take no input." />
 
 </div>
 
@@ -125,7 +84,7 @@ action after it.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `PromptInput` as the one place a person writes to PLUS AI — a chat panel,
 a feature that drafts from a free-text ask. For a plain multi-line field with
@@ -135,13 +94,89 @@ no AI behavior (no send-on-Enter, no loading state), use `TextArea` instead.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
 
-### `onSubmit` always receives trimmed-nonempty text.
+1. **Attachments** (optional). A row of staged files above the text.
+2. **Start slot** (optional). One quiet control before the text, such as an attach button.
+3. **Text area.** Grows from one line to five, then scrolls. Named by `label`.
+4. **Actions** (optional). Extra controls beside the send button.
+5. **Send.** A compact primary icon button; while loading it becomes Stop.
 
-`canSend` already guards against an empty, disabled or loading field, and
-against a mid-composition Enter — `onSubmit` only fires when there is real
-text to act on.
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The input fill and 1px input edge. Send is held back until there is text.</td></tr>
+<tr><td>Hovered</td><td>The edge turns <code>--ds-border-focused</code>.</td></tr>
+<tr><td>Pressed</td><td>No step of its own on the field; the send button takes its own pressed fill.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box.</td></tr>
+<tr><td>Disabled</td><td>The field fades to <code>--ds-opacity-disabled</code>, and nothing sends.</td></tr>
+<tr><td>Loading</td><td>Send becomes Stop, and a GenerativeBorder rings the field and sets <code>aria-busy</code>. Stop is never held back by <code>isDisabled</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-default</code> edge in <code>--ds-border-input</code>, <code>--radius-0625</code>.</td></tr>
+<tr><td>Height</td><td>Starts at <code>--field-min-height-sm</code> and grows to five lines: <code>--line-height-125</code> × 5 plus <code>--space-0375</code> top and bottom, then scrolls.</td></tr>
+<tr><td>Padding</td><td><code>--pad-y-md</code> top and bottom, <code>--pad-x-md</code> either side.</td></tr>
+<tr><td>Text</td><td><code>--body-default</code> in <code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
+<tr><td>Attachments</td><td><code>--stack-md</code> between files and under the row.</td></tr>
+<tr><td>Actions and send</td><td><code>--stack-sm</code> between them.</td></tr>
+<tr><td>Loading ring</td><td>GenerativeBorder at <code>radius-075</code>.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Keep the field visible while generating.
+
+The loading state shows progress inside the field. Pair `isLoading` with `onStop` rather than disabling the field: the question stays in view, and Stop stays reachable.
+
+<DoDontPair
+    doExample={<PromptInput label="Message to PLUS AI" defaultValue="Summarize Maya's last two sessions" isLoading onStop={() => {}} />}
+    doCaption="The loading state shows progress inside the field."
+    dontExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" isDisabled />}
+    dontCaption="A field locked and emptied while generating loses the question."
+/>
+
+### Show focus while typing.
+
+Focus tells the user the field accepts input. The field draws it on its own; never remove the ring.
+
+<DoDontPair
+    doExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" state="focus" />}
+    doCaption="Focus tells the user the field accepts input."
+    dontExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" />}
+    dontCaption="Without focus the field looks inactive while the user types."
+/>
+
+### Leave the field enabled when idle.
+
+A disabled field blocks follow-up questions.
+
+<DoDontPair
+    doExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" />}
+    doCaption="An idle field takes the next question."
+    dontExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" isDisabled />}
+    dontCaption="A disabled idle field blocks the next question."
+/>
+
+### Send only real text.
+
+`onSubmit` fires only when there is text to act on: never for an empty, disabled or loading field, and never on a mid-composition Enter.
 
 ```jsx
 <PromptInput
@@ -153,11 +188,21 @@ text to act on.
 />
 ```
 
-### Pair `isLoading` with `onStop`, not a disabled field.
+</div>
 
-Disabling the field while a reply generates would also disable Stop, which
-must stay reachable. `isLoading` swaps the send button for Stop instead of
-locking the whole control.
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name the field for what it sends: "Message to PLUS AI".</td><td>A generic name such as "Text" or "Input".</td></tr>
+<tr><td>Hint at what can be asked: "Ask PLUS AI about a student, a session or a lesson".</td><td>Describe the control: "Type here".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

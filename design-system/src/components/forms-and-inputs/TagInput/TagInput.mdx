@@ -1,8 +1,14 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as TagInputStories from './TagInput.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet, ComponentExample, DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
+import { TagInput } from '@/components';
+import { DocsInteractivePlayground, ResourcesBlock, ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const topics = [
+    { value: 'fractions', label: 'Fractions', color: 'blue' },
+    { value: 'geometry', label: 'Geometry', color: 'purple' },
+];
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -62,11 +68,13 @@ from a list or adds, such as the topics a session covers.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Size and layout
 
-<DocsCanvasShell attachSourceBelow description={<>Two tags at rest. Focus the field to type, pick and create.</>}>
-    <Canvas of={TagInputStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={TagInputStories.SpacingDefault} title="Default" description="The field is 40 high with one row of tags, and grows as they wrap." />
+
+<ComponentExample of={TagInputStories.SpacingCompact} title="Compact" description="Compact spacing draws the field 32 high." />
+
+<ComponentExample of={TagInputStories.CollapsesWithoutFocus} title="Collapse" description="Without focus, tags past one line collapse into +n; with focus, they wrap up to three rows, then scroll." />
 
 </div>
 
@@ -74,65 +82,21 @@ from a list or adds, such as the topics a session covers.
 
 ## Behavior
 
-<DocsCanvasShell description={<>Typing filters the list and highlights the first match. Enter or a click adds it.</>}>
-    <DsCanvasQuiet of={TagInputStories.TypingFilters} />
-</DocsCanvasShell>
+<ComponentExample of={TagInputStories.Overview} title="Pick and create" description="Two tags at rest; focus the field to type, pick and create." />
 
-<DocsCanvasShell description={<>When nothing matches, Create is highlighted and Enter adds the text as a new tag in a random Tag color.</>}>
-    <DsCanvasQuiet of={TagInputStories.CreateWhenNothingMatches} />
-</DocsCanvasShell>
+<ComponentExample of={TagInputStories.TypingFilters} title="Typing filters" description="Typing filters the list and highlights the first match, and Enter or a click adds it." />
 
-<DocsCanvasShell description={<>Backspace in an empty entry removes the last tag. Esc closes the list and clears only the typed text.</>}>
-    <DsCanvasQuiet of={TagInputStories.BackspaceRemovesTheLastTag} />
-</DocsCanvasShell>
+<ComponentExample of={TagInputStories.CreateWhenNothingMatches} title="Create" description="When nothing matches, Enter adds the text as a new tag in a random Tag color." />
 
-<DocsCanvasShell description={<>Without focus, tags past one line collapse into "+n". With focus, they wrap up to three rows, then scroll.</>}>
-    <DsCanvasQuiet of={TagInputStories.CollapsesWithoutFocus} />
-</DocsCanvasShell>
+<ComponentExample of={TagInputStories.BackspaceRemovesTheLastTag} title="Backspace" description="Backspace in an empty entry removes the last tag, and Esc clears only the typed text." />
 
-<DocsCanvasShell description={<>At <code>maxTags</code>, Create hides and the list says why.</>}>
-    <DsCanvasQuiet of={TagInputStories.PickLimit} />
-</DocsCanvasShell>
+<ComponentExample of={TagInputStories.PickLimit} title="Pick limit" description="At maxTags, Create hides and the list says why." />
 
-<DocsCanvasShell description={<>Option menu: with <code>onRename</code>, <code>onDelete</code> or <code>onColorChange</code>, the row under the pointer or the highlight shows a "…". It opens a menu to rename the option, delete it, or pick one of Tag's ten colors.</>}>
-    <DsCanvasQuiet of={TagInputStories.OptionMenu} />
-</DocsCanvasShell>
+<ComponentExample of={TagInputStories.OptionMenu} title="Option menu" description="With onRename, onDelete or onColorChange, a row's … opens a menu to rename, delete or recolor the option." />
 
-<DocsCanvasShell description={<>Reordering: with <code>onReorder</code>, each row has a handle. Drag it, or Tab to it and press Space; the arrows move the row and a line marks where it lands.</>}>
-    <DsCanvasQuiet of={TagInputStories.Reordering} />
-</DocsCanvasShell>
+<ComponentExample of={TagInputStories.Reordering} title="Reordering" description="With onReorder, each row has a handle to drag, or to pick up with Space and move with the arrows." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Appearance
-
-<DocsCanvasShell description={<>The field is 40 high at default spacing and 32 at compact, with one row of tags, and grows as they wrap. <code>spacing</code> is <code>default</code> (40) or <code>compact</code> (32).</>}>
-    <DsCanvasQuiet of={TagInputStories.Spacings} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## More states
-
-<DocsCanvasShell description={<>Invalid: the danger border, and the message under the field is announced.</>}>
-    <DsCanvasQuiet of={TagInputStories.Invalid} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Read-only: the tags on the read-only fill, with no × and no list.</>}>
-    <DsCanvasQuiet of={TagInputStories.ReadOnly} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Disabled: every tag is disabled, with no × and no entry.</>}>
-    <DsCanvasQuiet of={TagInputStories.Disabled} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Controlled: with <code>onChange</code> or <code>onRemove</code> the × removes the tag; with neither there is no ×.</>}>
-    <DsCanvasQuiet of={TagInputStories.Controlled} />
-</DocsCanvasShell>
+<ComponentExample of={TagInputStories.Controlled} title="Controlled" description="With onChange or onRemove the × removes the tag; with neither there is no ×." />
 
 </div>
 
@@ -144,13 +108,13 @@ from a list or adds, such as the topics a session covers.
 
 <ComponentExample of={TagInputStories.Hovered} title="Hovered" description="The edge turns the focused color." />
 
-<ComponentExample of={TagInputStories.Focused} title="Focused" description="A 2px ring, 2px off the box. No fill changes." />
+<ComponentExample of={TagInputStories.Focused} title="Focused" description="A 2px ring, 2px off the box, with no change of fill." />
 
 <ComponentExample of={TagInputStories.Invalid} title="Invalid" description="The danger edge with the message under the field, which is announced." />
 
 <ComponentExample of={TagInputStories.ReadOnly} title="Read-only" description="The tags on the read-only fill, with no × and no list." />
 
-<ComponentExample of={TagInputStories.FieldDisabled} title="Disabled" description="The whole field fades and leaves the tab order." />
+<ComponentExample of={TagInputStories.Disabled} title="Disabled" description="Every tag is disabled, with no × and no entry." />
 
 </div>
 
@@ -189,7 +153,7 @@ picked values as `Tag`s in a `TagGroup`, with a text entry after them, and
 focusing it opens the list of options under it.
 
 - For one value from a list, use `Select`.
-- For several values from a fixed list nobody adds to, use `Select mode="multi"`.
+- For several values from a fixed list nobody adds to, use `Select` with `isMulti`.
 - For fewer than 5 options, use a Checkbox group (`Fieldset` + `Checkbox`).
 
 </div>
@@ -204,29 +168,82 @@ focusing it opens the list of options under it.
 4. **List.** The options under the field, with a "Create" row when nothing matches.
 5. **Caption.** Helper text, or the error that replaces it.
 
-### States and tokens
+### States
 
 <DocsTable>
 <thead>
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-default</code> edge in <code>--ds-border-input</code>, <code>--radius-0625</code> (<code>--radius-h32</code> compact).</td></tr>
+<tr><td>Rest</td><td>The input fill with a 1px input edge. Tags past one line collapse into "+n".</td></tr>
 <tr><td>Hovered</td><td>The edge turns <code>--ds-border-focused</code>.</td></tr>
-<tr><td>Focused</td><td>A <code>--focus-ring-width</code> ring in <code>--ds-border-focused</code>, 2px off the box. No fill changes.</td></tr>
-<tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code> and the message <code>--ds-text-danger</code>.</td></tr>
-<tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill.</td></tr>
-<tr><td>Disabled</td><td>The whole field fades to <code>--ds-opacity-disabled</code>.</td></tr>
-<tr><td>Text</td><td>Placeholder <code>--ds-text-subtlest</code>, helper text <code>--ds-text-subtle</code>.</td></tr>
 <tr><td>Pressed</td><td>No step of its own. The hovered edge holds while the pointer is down.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box; the tags wrap and the list opens.</td></tr>
+<tr><td>Disabled</td><td>The whole field fades to <code>--ds-opacity-disabled</code>; every tag is disabled, with no × and no entry.</td></tr>
+<tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code> and the message <code>--ds-text-danger</code>.</td></tr>
+<tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill, with no × and no list.</td></tr>
 </tbody>
 </DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Box</td><td><code>--ds-background-input</code> fill, <code>--border-default</code> edge in <code>--ds-border-input</code>.</td></tr>
+<tr><td>Height</td><td>Starts at 40: <code>--height-250</code>. Compact 32: <code>--item-height-md</code>. Grows as tags wrap.</td></tr>
+<tr><td>Radius</td><td>10: <code>--radius-0625</code>. Compact 8: <code>--radius-h32</code>.</td></tr>
+<tr><td>Tags and entry</td><td><code>--stack-md</code> between them; with focus, up to three rows of tags before the content scrolls.</td></tr>
+<tr><td>Entry text</td><td><code>--body-default</code> in <code>--ds-text</code>; placeholder <code>--ds-text-subtlest</code>.</td></tr>
+<tr><td>List</td><td><code>--ds-surface-overlay</code> with a <code>--ds-border</code> edge, <code>--popover-radius-menu-md</code> and <code>--ds-shadow-overlay</code>.</td></tr>
+<tr><td>List hint</td><td><code>--body-small</code> in <code>--ds-text-subtle</code>, <code>--space-025</code> <code>--pad-x-md</code>.</td></tr>
+<tr><td>Row handle</td><td><code>--ds-icon-subtle</code>.</td></tr>
+<tr><td>Option menu</td><td><code>--option-menu-width</code> wide; the name field <code>--space-025</code> <code>--pad-x-sm</code>; a <code>--border-default</code> rule in <code>--ds-border</code> above the colors.</td></tr>
+</tbody>
+</DocsTable>
+
+The tags take Tag's own tokens.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Best practices
+
+### Label every tag input.
+
+A visible label says what the tags are; tags alone do not.
+
+<DoDontPair
+    doExample={<TagInput label="Topics" options={topics} defaultTags={['Fractions']} />}
+    doCaption="A label names what is being tagged."
+    dontExample={<TagInput options={topics} defaultTags={['Fractions']} />}
+    dontCaption="Tags with no label leave the field unnamed."
+/>
+
+### Show an error on the field itself.
+
+The field carries the error state.
+
+<DoDontPair
+    doExample={<TagInput label="Topics" options={topics} isInvalid errorMessage="Pick at least one topic" />}
+    doCaption="The field shows the error state."
+    dontExample={<TagInput label="Topics" options={topics} />}
+    dontCaption="A default field gives no sign of the problem."
+/>
+
+### Disable instead of hiding.
+
+A disabled field tells people the option exists but is unavailable.
+
+<DoDontPair
+    doExample={<TagInput label="Topics" options={topics} defaultTags={['Fractions']} disabled />}
+    doCaption="Visible but disabled."
+    dontExample={<TagInput label="Topics" options={topics} defaultTags={['Fractions']} />}
+    dontCaption="An enabled field that cannot take tags."
+/>
 
 ### The caller owns the options, and stores what is created.
 
@@ -305,27 +322,37 @@ Tag color.
 
 ### The keys behave as in Notion.
 
-| Key | In the field |
-|-----|--------------|
-| Typing | Filters the list and highlights the first match. |
-| ↑ ↓ | Move the highlight; opens the list when it is closed. |
-| Enter | Adds the highlighted option, or creates the typed text when Create is highlighted. Text matching an option, ignoring case, picks that option. |
-| Backspace | In an empty entry, removes the last tag. |
-| Esc | Closes the list and clears only the typed text. The tags stay. |
-| Paste | Text with commas or line breaks becomes one tag per part, trimmed. |
-| Tab | With a handler for the menu or reordering, moves from the entry to the highlighted row's handle, then its "…". |
+<DocsTable>
+<thead>
+<tr><th>Key</th><th>In the field</th></tr>
+</thead>
+<tbody>
+<tr><td>Typing</td><td>Filters the list and highlights the first match.</td></tr>
+<tr><td>↑ ↓</td><td>Move the highlight; opens the list when it is closed.</td></tr>
+<tr><td>Enter</td><td>Adds the highlighted option, or creates the typed text when Create is highlighted. Text matching an option, ignoring case, picks that option.</td></tr>
+<tr><td>Backspace</td><td>In an empty entry, removes the last tag.</td></tr>
+<tr><td>Esc</td><td>Closes the list and clears only the typed text. The tags stay.</td></tr>
+<tr><td>Paste</td><td>Text with commas or line breaks becomes one tag per part, trimmed.</td></tr>
+<tr><td>Tab</td><td>With a handler for the menu or reordering, moves from the entry to the highlighted row's handle, then its "…".</td></tr>
+</tbody>
+</DocsTable>
 
 On a row's handle and in its menu:
 
-| Key | Does |
-|-----|------|
-| Space or Enter on the handle | Picks the row up. |
-| ↑ ↓ | Move the picked-up row. |
-| Space or Enter | Drops it there. |
-| Esc | Cancels, and the row goes back. |
-| Enter on the "…" | Opens the menu with focus in the name. |
-| Enter in the name | Renames the option. After ↑ ↓, picks the highlighted row instead. |
-| Esc in the menu | Closes it without renaming, and focus goes back to the "…". |
+<DocsTable>
+<thead>
+<tr><th>Key</th><th>Does</th></tr>
+</thead>
+<tbody>
+<tr><td>Space or Enter on the handle</td><td>Picks the row up.</td></tr>
+<tr><td>↑ ↓</td><td>Move the picked-up row.</td></tr>
+<tr><td>Space or Enter</td><td>Drops it there.</td></tr>
+<tr><td>Esc</td><td>Cancels, and the row goes back.</td></tr>
+<tr><td>Enter on the "…"</td><td>Opens the menu with focus in the name.</td></tr>
+<tr><td>Enter in the name</td><td>Renames the option. After ↑ ↓, picks the highlighted row instead.</td></tr>
+<tr><td>Esc in the menu</td><td>Closes it without renaming, and focus goes back to the "…".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -381,7 +408,7 @@ On a row's handle and in its menu:
 
 - For one value rather than a set, use `Tag`.
 - For the set without a field around it, use `TagGroup`.
-- For several values from a fixed list, use `Select mode="multi"`.
+- For several values from a fixed list, use `Select` with `isMulti`.
 
 </div>
 

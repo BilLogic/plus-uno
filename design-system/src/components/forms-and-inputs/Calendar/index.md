@@ -9,7 +9,7 @@
 
 **Source:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.stories.jsx` — Overview, Sizes, Bounds, PickADay, TurnMonths, Default, Selected, Range, Disabled, HoveredState, KeyboardFocus
+**Stories:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.stories.jsx` — Size28, Size36, Size44, PickADay, TurnMonths, Default, Selected, Range, Disabled, HoveredState, KeyboardFocus, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Calendar/Calendar.mdx`
 
@@ -22,9 +22,9 @@
 | `selected` | string or instanceOf | — | The picked day, as ISO `YYYY-MM-DD` or a Date. |
 | `rangeStart` | string or instanceOf | — | A range's first day; with `rangeEnd`, the days between are marked. |
 | `rangeEnd` | string or instanceOf | — | — |
-| `minDate` | string or instanceOf | — | Optional minimum allowed date |
-| `maxDate` | string or instanceOf | — | Optional maximum allowed date |
-| `size` | enum | — | Day cell width in pixels |
+| `minDate` | string or instanceOf | — | The earliest day that can be picked, as ISO `YYYY-MM-DD` or a Date. Earlier days are disabled. |
+| `maxDate` | string or instanceOf | — | The latest day that can be picked, as ISO `YYYY-MM-DD` or a Date. Later days are disabled. |
+| `size` | enum | — | Day width in pixels: 28, 36 or 44. |
 | `onPick` | func (required) | — | `(date)` when an enabled day is pressed. |
 | `className` | string | — | — |
 

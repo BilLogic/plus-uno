@@ -9,7 +9,7 @@ Where a person writes to PLUS AI: a text area that grows from one line up to fiv
 
 **Source:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.stories.jsx` — Default, EnterSends, ShiftEnterStartsALine, CannotSendWhenEmpty, Loading, WithSlots, ComposingDoesNotSend, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.stories.jsx` — Default, EnterSends, ShiftEnterStartsALine, CannotSendWhenEmpty, Loading, WithSlots, ComposingDoesNotSend, Focused, Disabled, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.mdx`
 
@@ -50,6 +50,4 @@ From `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

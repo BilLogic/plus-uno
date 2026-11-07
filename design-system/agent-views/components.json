@@ -1007,7 +1007,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Optional minimum allowed date",
+          "description": "The earliest day that can be picked, as ISO `YYYY-MM-DD` or a Date. Earlier days are disabled.",
           "deprecated": null
         },
         {
@@ -1016,7 +1016,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Optional maximum allowed date",
+          "description": "The latest day that can be picked, as ISO `YYYY-MM-DD` or a Date. Later days are disabled.",
           "deprecated": null
         },
         {
@@ -1029,7 +1029,7 @@
             "36",
             "44"
           ],
-          "description": "Day cell width in pixels",
+          "description": "Day width in pixels: 28, 36 or 44.",
           "deprecated": null
         },
         {
@@ -1292,7 +1292,7 @@
           "required": false,
           "default": "'Please select'",
           "values": null,
-          "description": "Placeholder text when no options are available",
+          "description": "Hint text shown in the field while no path is selected. Defaults to `Please select`.",
           "deprecated": null
         },
         {
@@ -8934,7 +8934,7 @@
           "required": false,
           "default": "3",
           "values": null,
-          "description": "Visible text rows. One row is the short text area.",
+          "description": "Visible lines of text. One row is the short textarea.",
           "deprecated": null
         },
         {
@@ -9021,7 +9021,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Limits the length and shows a count in the caption",
+          "description": "Limits the length and shows a count on the right of the caption.",
           "deprecated": null
         },
         {
@@ -9204,7 +9204,7 @@
             "default",
             "compact"
           ],
-          "description": "`default` is 40 high; `compact` is 32.",
+          "description": "`default` is 40; `compact` is 32.",
           "deprecated": null
         },
         {
@@ -9216,7 +9216,7 @@
             "standard",
             "subtle"
           ],
-          "description": "`subtle` is transparent until it is hovered or edited.",
+          "description": "`subtle` is borderless until hovered or edited, for editing in place.",
           "deprecated": null
         },
         {
@@ -10024,7 +10024,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Allow selecting multiple nodes with checkboxes",
+          "description": "Several values, shown as checkboxes beside the toggle.",
           "deprecated": null
         },
         {
@@ -10033,7 +10033,7 @@
           "required": false,
           "default": "'Please select'",
           "values": null,
-          "description": "Placeholder text when nothing is selected",
+          "description": "Hint text shown in the field while nothing is selected. Defaults to `Please select`.",
           "deprecated": null
         },
         {

@@ -130,33 +130,43 @@ const sampleOptions = [
     { value: 'option-5', label: 'Option #5' },
 ];
 
-const grid = { pointerEvents: 'auto', display: 'grid', gap: 20, gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' };
+const grid = { pointerEvents: 'auto', display: 'grid', gap: 'var(--space-125)', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))' };
 
-/** Content — Placeholder and value in single-select mode. */
-export const Content = {
-    render: () => (
-        <div className="sb-select-interactive-override" style={grid}>
-            <Select label="Closed, empty" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-            <Select label="Closed, filled" defaultValue="option-1" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
-        </div>
-    )
+const field = { maxWidth: 'var(--width-2500)' };
+
+/** One story per value, for the Examples tab. */
+export const Empty = {
+    render: () => <div style={field}><Select label="Subject" options={sampleOptions} placeholder="Select a subject" /></div>,
 };
 
-/** Modes — isMulti with Tags, isSearchable and isCreatable. */
-export const Modes = {
-    render: () => (
-        <div className="sb-select-interactive-override" style={grid}>
-            <Select label="Multi (tags)" isMulti options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select {value(s)} from below" />
-            <Select label="Searchable" isSearchable options={sampleOptions} placeholder="Type to search" />
-            <Select label="Creatable" isMulti isCreatable options={sampleOptions} placeholder="Type to search or create" />
-        </div>
-    )
+export const Filled = {
+    render: () => <div style={field}><Select label="Subject" defaultValue="option-1" options={sampleOptions} placeholder="Select a subject" /></div>,
+};
+
+export const Multi = {
+    render: () => <div style={field}><Select label="Subjects" isMulti options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select subjects" /></div>,
+};
+
+export const Searchable = {
+    render: () => <div style={field}><Select label="Subject" isSearchable options={sampleOptions} placeholder="Type to search" /></div>,
+};
+
+export const Creatable = {
+    render: () => <div style={field}><Select label="Subjects" isMulti isCreatable options={sampleOptions} placeholder="Type to search or create" /></div>,
+};
+
+export const SpacingDefault = {
+    render: () => <div style={field}><Select label="Subject" spacing="default" options={sampleOptions} placeholder="Select a subject" /></div>,
+};
+
+export const SpacingCompact = {
+    render: () => <div style={field}><Select label="Subject" spacing="compact" options={sampleOptions} placeholder="Select a subject" /></div>,
 };
 
 /** Spacing — default (40) and compact (32). */
 export const Spacing = {
     render: () => (
-        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', display: 'flex', flexDirection: 'column', gap: 20 }}>
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', display: 'flex', flexDirection: 'column', gap: 'var(--space-125)' }}>
             <Select label="Default" spacing="default" options={sampleOptions} placeholder="Select..." />
             <Select label="Compact" spacing="compact" options={sampleOptions} placeholder="Select..." />
         </div>
@@ -166,18 +176,6 @@ export const Spacing = {
         await expect(canvas.getByRole('combobox', { name: 'Default' }).closest('.plus-field').getBoundingClientRect().height).toBe(40);
         await expect(canvas.getByRole('combobox', { name: 'Compact' }).closest('.plus-field').getBoundingClientRect().height).toBe(32);
     },
-};
-
-/** InteractionStates — Enabled, invalid, read-only and disabled. */
-export const InteractionStates = {
-    render: () => (
-        <div className="sb-select-interactive-override" style={grid}>
-            <Select label="Enabled" defaultValue="option-1" options={sampleOptions} />
-            <Select label="Invalid" isInvalid caption="Choose an option" options={sampleOptions} />
-            <Select label="Read only" isReadOnly defaultValue="option-1" options={sampleOptions} />
-            <Select label="Disabled" isDisabled defaultValue="option-1" options={sampleOptions} />
-        </div>
-    )
 };
 
 const schools = [
@@ -214,7 +212,7 @@ const people = Array.from({ length: 80 }, (_, i) => ({ value: `p${i + 1}`, label
 /** LongList — past 50 options, Recent and Suggested come first and typing searches the rest. */
 export const LongList = {
     render: () => (
-        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 400, paddingBottom: 320 }}>
+        <div className="sb-select-interactive-override" style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)' }}>
             <Select label="Tutor" options={people} recent={['p3']} suggested={['p8', 'p21']} />
         </div>
     )
@@ -225,13 +223,7 @@ export const Overview = {
     render: () => (
         <div
             className="sb-select-interactive-override"
-            style={{
-                pointerEvents: 'auto',
-                maxWidth: 400,
-                width: '100%',
-                minHeight: 48,
-                paddingBottom: 320,
-            }}
+            style={{ pointerEvents: 'auto', maxWidth: 'var(--width-2500)', width: '100%' }}
         >
             <Select aria-label="Option" options={sampleOptions} placeholder="Select (a/an) {value} from below" />
         </div>
@@ -256,8 +248,8 @@ export const Interactive = {
         }, [args.isMulti]);
 
         return (
-            <div style={{ maxWidth: '400px' }}>
-                <p className="body3-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
+            <div style={{ maxWidth: 'var(--width-2500)' }}>
+                <p style={{ margin: '0 0 var(--stack-md)', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
                     Selected: {args.isMulti
                         ? (value.length > 0 ? value.join(', ') : 'None')
                         : (value || 'None')

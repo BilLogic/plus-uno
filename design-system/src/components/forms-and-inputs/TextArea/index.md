@@ -9,7 +9,7 @@ Text area — free text over several lines, on `_Field`. The field is 80 high at
 
 **Source:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.stories.jsx` — Overview, Rows, Spacing, States, FocusRing, Count, Subtle, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.stories.jsx` — Overview, Rows, Spacing, Rows1, Rows3, Rows6, SpacingDefault, SpacingCompact, Filled, Success, Warning, FocusRing, Count, Subtle, Interactive, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TextArea/TextArea.mdx`
 
@@ -27,7 +27,7 @@ Text area — free text over several lines, on `_Field`. The field is 80 high at
 | `value` | string | — | The text. Pass it, with `onChange`, to control the field. |
 | `defaultValue` | string | — | The text to start with when the field is uncontrolled. |
 | `placeholder` | string | — | Hint text shown while the field is empty. |
-| `rows` | number | `3` | Visible text rows. One row is the short text area. |
+| `rows` | number | `3` | Visible lines of text. One row is the short textarea. |
 | `spacing` | enum | `'default'` | `default` starts at 80 high with 10 corners; `compact` has 8 corners, to sit beside a 32 field. |
 | `appearance` | enum | `'standard'` | `subtle` is borderless until hovered or edited, with Save and Cancel while editing. |
 | `isDisabled` | bool | `false` | Dims the field and blocks focus and editing. |
@@ -36,7 +36,7 @@ Text area — free text over several lines, on `_Field`. The field is 80 high at
 | `errorMessage` | node | — | The caption shown under the field while `isInvalid` is set. It replaces `caption`. |
 | `warningMessage` | node | — | Draws the warning border. Does not set `aria-invalid`: the value is accepted. |
 | `successMessage` | node | — | Draws the confirmation border. |
-| `maxLength` | number | — | Limits the length and shows a count in the caption |
+| `maxLength` | number | — | Limits the length and shows a count on the right of the caption. |
 | `onSave` | func | — | Subtle only: called by Save (or Ctrl/⌘+Enter). Throw or reject to keep the field open in `invalid`. |
 | `onChange` | func | — | Called with the change event on each edit. |
 | `onFocus` | func | — | Called with the focus event when the field gains focus. |

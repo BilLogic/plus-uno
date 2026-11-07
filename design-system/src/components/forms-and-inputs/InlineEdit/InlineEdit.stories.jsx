@@ -31,7 +31,7 @@ export default {
     },
 };
 
-const column = { display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '420px' };
+const column = { display: 'flex', flexDirection: 'column', gap: 'var(--space-200)', maxWidth: 'var(--width-2500)' };
 
 const height = (el) => Math.round(el.getBoundingClientRect().height);
 
@@ -298,6 +298,19 @@ SameHeight.play = async ({ canvasElement }) => {
         await waitFor(() => expect(canvas.queryByRole('textbox')).toBeNull());
     });
 };
+
+/** One story per spacing, for the Examples tab. */
+export const SizeDefault = () => (
+    <div style={column}>
+        <InlineEditableTextfield label="Display name" defaultValue="Ada Lovelace" />
+    </div>
+);
+
+export const SizeCompact = () => (
+    <div style={column}>
+        <InlineEditableTextfield label="Display name" defaultValue="Ada Lovelace" compact />
+    </div>
+);
 
 /* ----------------------------------------------- the buttons add no height */
 

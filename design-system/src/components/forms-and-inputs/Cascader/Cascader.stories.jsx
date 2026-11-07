@@ -27,8 +27,7 @@ export default {
         contentPreset: {
             control: 'select',
             options: ['empty', 'preselected'],
-            description: 'Preset selection state for the interactive demo',
-            table: { category: 'Content' },
+            table: { disable: true },
         },
         options: {
             table: { disable: true, category: 'Development' },
@@ -58,7 +57,6 @@ export default {
         },
         placeholder: {
             control: 'text',
-            description: 'Placeholder text when no options are available',
             table: { category: 'Content' },
         },
     },
@@ -107,7 +105,7 @@ export const Overview = () => {
     const [value, setValue] = useState([]);
 
     return (
-        <div style={{ maxWidth: '600px', minHeight: 48, paddingBottom: 360 }}>
+        <div style={{ maxWidth: 'var(--width-2500)' }}>
             <Cascader
                 id="cascader-overview"
                 aria-label="Region"
@@ -125,35 +123,37 @@ Overview.parameters = {
     }
 };
 
-export const Content = () => {
-    const [value1, setValue1] = useState([]);
-    const [value2, setValue2] = useState(['zhejiang', 'hangzhou', 'westlake']);
-
+/** The menu opens on press: from an empty field it builds the path column by column. */
+export const EmptyPath = () => {
+    const [value, setValue] = useState([]);
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '32px', maxWidth: '800px' }}>
-            <Cascader id="cascader-basic" label="Empty selection" caption="Opens the menu and builds a path from the hierarchy." value={value1} options={sampleOptions} onChange={setValue1} />
-            <Cascader id="cascader-preselected" label="Pre-selected path" caption="Value shown in the field; opening reveals columns up to the current level." value={value2} options={sampleOptions} onChange={setValue2} />
+        <div style={{ maxWidth: 'var(--width-2500)' }}>
+            <Cascader id="cascader-empty" label="Region" value={value} options={sampleOptions} onChange={setValue} />
         </div>
     );
 };
 
-export const Spacing = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px' }}>
-        <Cascader id="cascader-default" label="Default" value={[]} options={sampleOptions} onChange={() => {}} />
-        <Cascader id="cascader-compact" label="Compact" spacing="compact" value={[]} options={sampleOptions} onChange={() => {}} />
+/** A chosen path shows in the field; opening reveals the columns up to its level. */
+export const PreselectedPath = () => {
+    const [value, setValue] = useState(['zhejiang', 'hangzhou', 'westlake']);
+    return (
+        <div style={{ maxWidth: 'var(--width-2500)' }}>
+            <Cascader id="cascader-preselected" label="Region" value={value} options={sampleOptions} onChange={setValue} />
+        </div>
+    );
+};
+
+export const SpacingDefault = () => (
+    <div style={{ maxWidth: 'var(--width-2500)' }}>
+        <Cascader id="cascader-default" label="Region" value={[]} options={sampleOptions} onChange={() => {}} />
     </div>
 );
 
-export const InteractionStates = () => {
-    const [value3, setValue3] = useState([]);
-
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', maxWidth: '400px' }}>
-            <Cascader id="cascader-disabled" label="Disabled" value={value3} options={sampleOptions} onChange={setValue3} isDisabled />
-            <Cascader id="cascader-invalid" label="Invalid" value={[]} options={sampleOptions} onChange={() => {}} isInvalid errorMessage="Pick a region" />
-        </div>
-    );
-};
+export const SpacingCompact = () => (
+    <div style={{ maxWidth: 'var(--width-2500)' }}>
+        <Cascader id="cascader-compact" label="Region" spacing="compact" value={[]} options={sampleOptions} onChange={() => {}} />
+    </div>
+);
 
 export const Interactive = (args) => {
     const [value, setValue] = useState(args.contentPreset === 'preselected'
@@ -167,7 +167,7 @@ export const Interactive = (args) => {
     }, [args.contentPreset]);
 
     return (
-        <div style={{ maxWidth: '600px' }}>
+        <div style={{ maxWidth: 'var(--width-2500)' }}>
             <Cascader
                 id="cascader-interactive"
                 label={args.label}
@@ -176,11 +176,14 @@ export const Interactive = (args) => {
                 onChange={(newValue) => {
                     setValue(newValue);
                 }}
+                spacing={args.spacing}
                 isDisabled={args.isDisabled}
+                isInvalid={args.isInvalid}
+                errorMessage={args.isInvalid ? 'Pick a region.' : undefined}
                 placeholder={args.placeholder}
             />
             {value.length > 0 && (
-                <p className="body3-txt" style={{ marginTop: '16px', color: 'var(--ds-text-subtle)' }}>
+                <p style={{ marginTop: 'var(--stack-md)', font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>
                     Selected path: {value.join(' → ')}
                 </p>
             )}
@@ -191,7 +194,9 @@ export const Interactive = (args) => {
 Interactive.args = {
     contentPreset: 'empty',
     label: 'Region',
+    spacing: 'default',
     isDisabled: false,
+    isInvalid: false,
     placeholder: 'Please select',
 };
 

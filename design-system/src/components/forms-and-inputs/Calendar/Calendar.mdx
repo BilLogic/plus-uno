@@ -5,6 +5,7 @@ import { Calendar } from '@/components';
 import * as CalendarStories from './Calendar.stories.jsx';
 import {
     ComponentExample,
+    DocsInteractivePlayground,
     DocsTable,
     DoDontPair,
     ResourcesBlock,
@@ -44,21 +45,25 @@ A calendar is the month grid that Date picker and Date time picker open, on its 
 
 <div className="sb-ds-doc-section">
 
-## Content
+## Size and layout
 
-<ComponentExample of={CalendarStories.Default} title="Default" description="Always six weeks, 42 cells, so the panel never changes height as months turn. Days outside the month are drawn but cannot be picked." />
+<ComponentExample of={CalendarStories.Size28} title="28" description="The smallest day cell." />
 
-<ComponentExample of={CalendarStories.PickADay} title="Pick a day" description="Pressing a day picks it and marks it with aria-pressed." />
+<ComponentExample of={CalendarStories.Size36} title="36" description="The default day cell." />
 
-<ComponentExample of={CalendarStories.TurnMonths} title="Turn months" description="Previous month and Next month move the grid. The caller holds which month shows." />
+<ComponentExample of={CalendarStories.Size44} title="44" description="The largest day cell." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Size
+## Behavior
 
-<ComponentExample of={CalendarStories.Sizes} title="Sizes" description="The day cell is 28, 36 or 44 wide. 36 is the default." />
+<ComponentExample of={CalendarStories.Default} title="Six weeks" description="Always 42 cells, so the panel never changes height; days outside the month are drawn but cannot be picked." />
+
+<ComponentExample of={CalendarStories.PickADay} title="Pick a day" description="Pressing a day picks it and marks it with aria-pressed." />
+
+<ComponentExample of={CalendarStories.TurnMonths} title="Turn months" description="Previous month and Next month move the grid, and the caller holds which month shows." />
 
 </div>
 
@@ -68,9 +73,28 @@ A calendar is the month grid that Date picker and Date time picker open, on its 
 
 <ComponentExample of={CalendarStories.Selected} title="Selected" description="The picked day takes the selected bold fill." />
 
-<ComponentExample of={CalendarStories.Range} title="Range" description="A range's ends are picked days; the days between take the neutral selection." />
+<ComponentExample of={CalendarStories.Range} title="Range" description="A range's ends are picked days, and the days between take the neutral selection." />
 
 <ComponentExample of={CalendarStories.Disabled} title="Disabled" description="Days before minDate or after maxDate are disabled and take no focus." />
+
+Hover and focus are described under Usage.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={CalendarStories.Interactive}
+    description={
+        <>
+            Use the table in the panel below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> so clicks and focus work while you scroll
+            the docs page.
+        </>
+    }
+/>
 
 </div>
 
@@ -94,7 +118,7 @@ Use a calendar directly only when a date grid needs to be visible on the page wi
 
 ## Parts
 
-1. **Header.** The month and year, with Previous month and Next month buttons.
+1. **Header.** The month and year in full, with Previous month and Next month buttons.
 2. **Weekday row.** Seven short day names.
 3. **Day cells.** Forty-two buttons in six weeks. Days of neighboring months fill the spare cells.
 
@@ -105,13 +129,15 @@ Use a calendar directly only when a date grid needs to be visible on the page wi
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
+<tr><td>Rest</td><td>Day text in <code>--ds-text</code> on no fill.</td></tr>
 <tr><td>Hovered</td><td>An enabled day takes <code>--ds-background-neutral-subtle-hovered</code>. A picked day keeps its fill.</td></tr>
+<tr><td>Pressed</td><td>No look of its own: pressing an enabled day picks it.</td></tr>
 <tr><td>Focused</td><td>The month buttons and the days draw a 2px ring in <code>--ds-border-focused</code>, 2px off the edge.</td></tr>
+<tr><td>Disabled</td><td>Faded to <code>--ds-opacity-disabled</code>; no focus, no <code>onPick</code>.</td></tr>
 <tr><td>Today</td><td>A 1px <code>--ds-border-brand</code> edge and <code>--ds-text-brand</code> text.</td></tr>
 <tr><td>In range</td><td><code>--ds-background-selected</code>.</td></tr>
 <tr><td>Selected</td><td><code>--ds-background-selected-bold</code> with <code>--ds-text-inverse</code>, and <code>aria-pressed</code>.</td></tr>
 <tr><td>Outside the month</td><td><code>--ds-text-subtle</code>; not pickable.</td></tr>
-<tr><td>Disabled</td><td>Faded to <code>--ds-opacity-disabled</code>; no focus, no <code>onPick</code>.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -122,10 +148,14 @@ Use a calendar directly only when a date grid needs to be visible on the page wi
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Day text</td><td><code>--ds-text</code>; weekday names <code>--ds-text-subtle</code>.</td></tr>
-<tr><td>Month buttons</td><td><code>--ds-icon-subtle</code>, hovered <code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
-<tr><td>Day width</td><td><code>--calendar-day-sm</code> (28), <code>--calendar-day-md</code> (36), <code>--calendar-day-lg</code> (44).</td></tr>
+<tr><td>Month</td><td><code>--heading-small</code> in <code>--ds-text</code>.</td></tr>
+<tr><td>Month buttons</td><td><code>--calendar-nav-size</code> square, <code>--ds-icon-subtle</code>, hovered <code>--ds-background-neutral-subtle-hovered</code>.</td></tr>
+<tr><td>Weekday names</td><td><code>--body-small</code> in <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Day text</td><td><code>--body-default</code> in <code>--ds-text</code>.</td></tr>
+<tr><td>Day size</td><td><code>--calendar-day-sm</code> (28), <code>--calendar-day-md</code> (36), <code>--calendar-day-lg</code> (44).</td></tr>
 <tr><td>Day radius</td><td><code>--radius-md</code>.</td></tr>
+<tr><td>Gaps</td><td><code>--stack-md</code> between header, weekdays and days; <code>--stack-sm</code> between cells.</td></tr>
+<tr><td>Padding</td><td><code>--space-025</code> top and bottom, <code>--pad-x-sm</code> either side.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -135,9 +165,46 @@ Use a calendar directly only when a date grid needs to be visible on the page wi
 
 ## Best practices
 
-### `viewDate` and `onViewDateChange` are the component's own navigation state.
+### Name the month in full, with the year.
 
-`Calendar` holds no state of its own. The caller owns which month shows and updates it when `onViewDateChange` fires, the same pattern Date picker uses internally.
+The header says which month the grid shows, such as "October 2026". The calendar writes it this way itself; numbers alone make people count.
+
+### Dim unavailable days, do not hide them.
+
+A dimmed day tells people why a slot is missing; a day that looks pickable but is not wastes a tap. Set `minDate` and `maxDate` to the span that can be chosen.
+
+<DoDontPair
+    doExample={<Calendar viewDate={new Date(2026, 9, 1)} onViewDateChange={() => {}} minDate="2026-10-12" maxDate="2026-10-25" onPick={() => {}} />}
+    doCaption="Days outside the span that can be chosen are dimmed and disabled."
+    dontExample={<Calendar viewDate={new Date(2026, 9, 1)} onViewDateChange={() => {}} onPick={() => {}} />}
+    dontCaption="Every day looks pickable, and the limit is found only after an error."
+/>
+
+### Show the selected date as one filled day.
+
+In single mode one day carries the selected fill. A second fill reads as a range.
+
+<DoDontPair
+    doExample={<Calendar viewDate={new Date(2026, 9, 1)} onViewDateChange={() => {}} selected="2026-10-14" onPick={() => {}} />}
+    doCaption="One picked day carries the fill."
+    dontExample={<Calendar viewDate={new Date(2026, 9, 1)} onViewDateChange={() => {}} rangeStart="2026-10-07" rangeEnd="2026-10-09" onPick={() => {}} />}
+    dontCaption="Two filled ends for a single answer read as a range."
+/>
+
+### Say which dates can be chosen.
+
+Put the limit in text near the calendar, so people do not find it by trying disabled days.
+
+<DoDontPair
+    doExample={<div><p style={{ margin: '0 0 var(--stack-sm)' }}>Pick a day between October 12 and 25.</p><Calendar viewDate={new Date(2026, 9, 1)} onViewDateChange={() => {}} minDate="2026-10-12" maxDate="2026-10-25" onPick={() => {}} /></div>}
+    doCaption="A line above the grid states the span."
+    dontExample={<div><Calendar viewDate={new Date(2026, 9, 1)} onViewDateChange={() => {}} minDate="2026-10-12" maxDate="2026-10-25" onPick={() => {}} /></div>}
+    dontCaption="No text: the limit shows only as dimmed days."
+/>
+
+### Let the caller own the month on show.
+
+`Calendar` holds no state of its own. The caller owns `viewDate` and updates it when `onViewDateChange` fires, the same pattern Date picker uses internally.
 
 ```jsx
 const [viewDate, setViewDate] = useState(new Date());
@@ -150,16 +217,9 @@ const [viewDate, setViewDate] = useState(new Date());
 />
 ```
 
-### A fixed grid, not a shrinking one.
+### Keep the grid at six weeks.
 
-Six weeks render every month, including the days of neighboring months that fill the remaining cells. This keeps the panel's height constant as someone pages through months, at the cost of occasionally showing a mostly-empty week.
-
-<DoDontPair
-    doExample={<Calendar viewDate={new Date(2026, 9, 1)} onViewDateChange={() => {}} minDate="2026-10-12" maxDate="2026-10-25" onPick={() => {}} />}
-    doCaption="Limit the days to the span that can be chosen. Days outside it are disabled."
-    dontExample={<Calendar viewDate={new Date(2026, 9, 1)} onViewDateChange={() => {}} onPick={() => {}} />}
-    dontCaption="Leaving every day open when only a span is valid sends people to an error afterward."
-/>
+Six weeks render every month, including the days of neighboring months that fill the remaining cells. This keeps the panel's height constant as someone pages through months, at the cost of occasionally showing a mostly empty week.
 
 </div>
 

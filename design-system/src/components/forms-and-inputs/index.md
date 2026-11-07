@@ -10,7 +10,7 @@ authored half (#166), counted rather than assumed.
 | [Button](Button/index.md) | 21 | ✅ | ✅ | ✅ |
 | [ButtonGroup](ButtonGroup/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Calendar](Calendar/index.md) | 10 | ✅ | ✅ | ✅ |
-| [Cascader](Cascader/index.md) | 16 | ✅ | ✕ | ✅ |
+| [Cascader](Cascader/index.md) | 16 | ✅ | ✅ | ✅ |
 | [Checkbox](Checkbox/index.md) | 20 | ✅ | ✅ | ✅ |
 | [ChoiceGrid](ChoiceGrid/index.md) | 12 | ✅ | ✅ | ✅ |
 | [CloseButton](CloseButton/index.md) | 5 | ✅ | ✅ | ✅ |
@@ -26,23 +26,23 @@ authored half (#166), counted rather than assumed.
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
 | [LinkButton](LinkButton/index.md) | 13 | ✅ | ✅ | ✅ |
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✅ | ✅ | ✅ |
-| [PromptInput](PromptInput/index.md) | 16 | ✅ | ✕ | ✅ |
+| [PromptInput](PromptInput/index.md) | 16 | ✅ | ✅ | ✅ |
 | [Radio](Radio/index.md) | 20 | ✅ | ✅ | ✅ |
 | [RadioGroup](RadioGroup/index.md) | 19 | ✅ | ✅ | ✅ |
 | [Range](Range/index.md) | 14 | ✅ | ✅ | ✅ |
 | [Rating](Rating/index.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
-| [Select](Select/index.md) | 42 | ✅ | ✕ | ✅ |
+| [Select](Select/index.md) | 42 | ✅ | ✅ | ✅ |
 | [SplitButton](SplitButton/index.md) | 3 | ✅ | ✅ | ✅ |
 | [TagInput](TagInput/index.md) | 27 | ✅ | ✅ | ✅ |
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✅ | ✅ |
 | [TextField](TextField/index.md) | 35 | ✅ | ✅ | ✅ |
 | [TimePicker](TimePicker/index.md) | 14 | ✅ | ✅ | ✅ |
 | [Toggle](Toggle/index.md) | 17 | ✅ | ✅ | ✅ |
-| [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✕ | ✅ |
+| [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✅ | ✅ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 33/34 (97%) · Correct/incorrect 29/34 (85%) · Accessibility 33/34 (97%)
+**Authored coverage:** When to use 33/34 (97%) · Correct/incorrect 33/34 (97%) · Accessibility 33/34 (97%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

@@ -46,24 +46,16 @@ Overview.play = async ({ canvasElement }) => {
     await expect(canvas.getByText('Helper or validation copy beneath the label.')).toBeInTheDocument();
 };
 
-export const LabelContent = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
-        <section>
-            <h6 className="h6 mb-3">With required marker</h6>
-            <Label text="Label" required />
-        </section>
-        <section>
-            <h6 className="h6 mb-3">Without required marker</h6>
-            <Label text="Label" required={false} />
-        </section>
-    </div>
-);
-LabelContent.play = async ({ canvasElement }) => {
-    const labels = canvasElement.querySelectorAll('label');
-    await expect(labels).toHaveLength(2);
-    await expect(labels[0]).toHaveTextContent('Label*');
-    await expect(labels[1]).not.toHaveTextContent('*');
-    await expect(getComputedStyle(labels[0].querySelector('.plus-field-required')).color).toBe(tokenColor(canvasElement, '--ds-text-danger'));
+export const LabelPlain = () => <Label text="Email address" required={false} />;
+LabelPlain.play = async ({ canvasElement }) => {
+    await expect(canvasElement.querySelector('label')).not.toHaveTextContent('*');
+};
+
+export const LabelRequired = () => <Label text="Email address" required />;
+LabelRequired.play = async ({ canvasElement }) => {
+    const label = canvasElement.querySelector('label');
+    await expect(label).toHaveTextContent('Email address*');
+    await expect(getComputedStyle(label.querySelector('.plus-field-required')).color).toBe(tokenColor(canvasElement, '--ds-text-danger'));
 };
 
 export const CaptionVariants = () => (
@@ -100,6 +92,12 @@ CaptionVariants.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(section.querySelector('.plus-field-caption__message')).color, `${heading} caption`).toBe(tokenColor(canvasElement, token));
     }
 };
+
+/** One story per caption tone, for the Examples tab. */
+export const CaptionHelp = () => <Caption text="Include the area code." state="default" />;
+export const CaptionSuccess = () => <Caption text="Number verified." state="success" />;
+export const CaptionDanger = () => <Caption text="Enter a 10-digit number." state="danger" />;
+export const CaptionWarning = () => <Caption text="This number looks like a landline." state="warning" />;
 
 /** Label, control and caption stacked as the fields draw them, one per caption state. */
 export const Layout = () => (
@@ -142,4 +140,14 @@ Layout.play = async ({ canvasElement }) => {
     await expect(canvas.getByLabelText(/Password/)).toHaveAttribute('aria-invalid', 'true');
     await expect(canvas.getByLabelText(/Account type/)).toBeDisabled();
     await expect(canvas.getByRole('alert')).toHaveTextContent('Password must be at least 8 characters long.');
+};
+
+export const Interactive = {
+    args: { text: 'Email address', required: true },
+    render: (args) => (
+        <div style={stack}>
+            <Label {...args} />
+            <Caption text="We'll never share your email." state="default" />
+        </div>
+    ),
 };
