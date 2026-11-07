@@ -49,7 +49,7 @@ export { default as Tile, TILE_APPEARANCES, TILE_COLORS, TILE_CONTENTS, TILE_SIZ
 export { default as UserAvatar } from '@/components/images-and-icons/UserAvatar';
 
 export { default as AiLabel } from '@/components/labels/AiLabel';
-export { default as AiMessage, AI_MESSAGE_STATUSES, TypingText } from '@/components/labels/AiMessage';
+export { default as AiMessage, AI_MESSAGE_STATUSES, AiFeedback, AiSources, TypingText } from '@/components/labels/AiMessage';
 export { default as CountTag, COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS, formatCount } from '@/components/labels/CountTag';
 export { default as DateTag, DATE_TAG_APPEARANCES, DATE_TAG_ICONS, DATE_TAG_SPACINGS } from '@/components/labels/DateTag';
 export { default as PromptStarters } from '@/components/labels/PromptStarters';
@@ -96,7 +96,7 @@ export { default as ProgressTracker, PROGRESS_TRACKER_ORIENTATIONS, PROGRESS_TRA
 export { default as Code } from '@/components/text-and-data-display/Code';
 export { default as CodeBlock, parseHighlight } from '@/components/text-and-data-display/CodeBlock';
 export { default as Heading, HEADING_COLORS, HEADING_SIZES, HeadingContextProvider, useHeadingLevel } from '@/components/text-and-data-display/Heading';
-export { default as Table, HeadCell, StaticTable, TableCell, TableFooter, TableMessageRow, TableRow, TableSummaryRow } from '@/components/text-and-data-display/Table';
+export { default as Table, DynamicTable, HeadCell, StaticTable, TableBulkActions, TableCell, TableFooter, TableMessageRow, TableRow, TableSummaryRow, TreeTable } from '@/components/text-and-data-display/Table';
 
 // A sibling of components/, not a group inside it.
 export * from '@/dataviz';

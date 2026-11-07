@@ -6,7 +6,7 @@ import { DocsCanvasShell, ResourcesBlock, DocsTable, DsCanvasQuiet } from '@/sto
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-  "modelNote": "The Tree table page: records nested up to three levels, built from `_Tree row`. No code component draws it yet; this page composes the indentation from the shared `TableRow`/`TableCell` parts the Static and Dynamic tables already use. Listed here as a docs page, not a set to write back to.",
+  "modelNote": "The Tree table page: records nested up to three levels, built from `_Tree row`. `TreeTable` draws it in code on the `PatternTable` shell with the shared `TableRow`/`TableCell` parts. Listed here as a docs page, not a set to write back to.",
   "sets": [
     {
       "id": "tree-table-page",
@@ -16,7 +16,7 @@ export const figmaMeta = {
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043",
       "source": "manual",
       "status": "docs-page",
-      "notes": "The Tree table page: records nested up to three levels, built from _Tree row. No code component draws it yet."
+      "notes": "The Tree table page: records nested up to three levels, built from _Tree row."
     }
   ]
 };
@@ -25,7 +25,7 @@ export const figmaMeta = {
 
 <Title />
 
-Records that nest, up to three levels. No code component owns the nesting yet â€” this page composes the indentation from the same shared parts the Static and Dynamic tables use.
+Records that nest, up to three levels. `TreeTable` indents each level one step and keeps every column, on the same shell and parts the Dynamic table uses.
 
 <DocsTabs of={TreeTableStories}>
 
@@ -46,7 +46,7 @@ Records that nest, up to three levels. No code component owns the nesting yet â€
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>A branch's title cell carries a chevron; depth sets the cell's left pad. The chevron is static here â€” expand and collapse are not wired up in code.</>}
+    description={<>Each level indents one step and keeps the columns. A parent shows its count, and an open parent with nothing in it shows a message row.</>}
 >
 
 <Canvas of={TreeTableStories.Overview} />
@@ -57,21 +57,58 @@ Records that nest, up to three levels. No code component owns the nesting yet â€
 
 <div className="sb-ds-doc-section">
 
+## Loading children
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>A parent with `hasChildren` and no `children` loads them through `loadChildren` the first time it opens, with a spinner and a loading message row until they arrive.</>}
+>
+
+<Canvas of={TreeTableStories.LoadingChildren} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Keyboard
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>One tab stop. The arrow keys move between rows and open or close them; Home and End jump to the ends; Enter toggles.</>}
+>
+
+<Canvas of={TreeTableStories.Keyboard} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Expand on a row press
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>With `shouldExpandOnClick` a press anywhere on a parent row opens it. Use it only on rows without controls.</>}
+>
+
+<Canvas of={TreeTableStories.ExpandOnRowPress} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## State
 
-<DocsCanvasShell description={<>A row is clear; a branch's title cell carries the chevron.</>}>
+<DocsCanvasShell description={<>A row is clear; a parent's title cell carries the chevron, a leaf keeps the empty box.</>}>
     <DsCanvasQuiet of={TreeTableStories.Rest} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>The tree table has no hover class, so a row does not change.</>}>
-    <DsCanvasQuiet of={TreeTableStories.Hovered} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A row is not a control, so a press changes nothing.</>}>
-    <DsCanvasQuiet of={TreeTableStories.Pressed} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Nothing takes focus yet; the chevron is static.</>}>
+<DocsCanvasShell description={<>The focused row draws the 2px ring inset on the row, never a fill.</>}>
     <DsCanvasQuiet of={TreeTableStories.Focused} />
 </DocsCanvasShell>
 
@@ -99,8 +136,10 @@ folder of sessions. For a flat list, use the Static or Dynamic table instead.
 ## Parts
 
 1. **Head cell.** A label, as in the other tables.
-2. **Chevron.** Leading the title cell of a branch; static today.
-3. **Indent.** The title cell's left padding grows with depth, up to three levels.
+2. **Chevron.** 12 tall in a 24 hit area, leading a parent's title cell; a spinner while children load.
+3. **Indent.** One `--table-indent` step per level, up to three levels.
+4. **Count.** An optional count beside a parent's name.
+5. **Message row.** Under an open parent that is loading or has nothing in it.
 
 ### States
 
@@ -110,8 +149,9 @@ folder of sessions. For a flat list, use the Static or Dynamic table instead.
 </thead>
 <tbody>
 <tr><td>Rest</td><td>Clear rows; depth shows as indentation.</td></tr>
-<tr><td>Hovered, pressed</td><td>No change; the tree table does not hover.</td></tr>
-<tr><td>Focused</td><td>Not applicable until expand and collapse are built.</td></tr>
+<tr><td>Hovered, pressed</td><td>The row takes the subtle hovered and pressed steps.</td></tr>
+<tr><td>Focused</td><td>The 2px ring inset on the row; focus is never a fill.</td></tr>
+<tr><td>Expanded, collapsed, loading</td><td>The chevron points down or right, or turns into a spinner.</td></tr>
 <tr><td>Disabled</td><td>Not applicable.</td></tr>
 </tbody>
 </DocsTable>
@@ -123,7 +163,9 @@ folder of sessions. For a flat list, use the Static or Dynamic table instead.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Indent per level</td><td><code>--size-table-cell-pad-x</code> plus <code>--space-125</code></td></tr>
+<tr><td>Indent per level</td><td><code>--table-indent</code></td></tr>
+<tr><td>Chevron, hit area</td><td><code>--icon-sm</code>, <code>--item-height-sm</code></td></tr>
+<tr><td>Ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
 <tr><td>Row height</td><td><code>--size-row-default</code></td></tr>
 <tr><td>Hairlines</td><td><code>--ds-border</code></td></tr>
 </tbody>
@@ -135,13 +177,11 @@ folder of sessions. For a flat list, use the Static or Dynamic table instead.
 
 ## Best practices
 
-- **No component yet.** There is no `TreeTable` export. This page composes the
-  look from `TableRow` and `TableCell`, the same parts `Table` is built from,
-  so a project that needs nesting today builds it the same way.
-- **Depth is a left pad**, `--size-table-cell-pad-x` plus `--space-125` per level, on
-  the row's title cell.
-- **Expand and collapse are unbuilt.** The chevron shown here does not toggle
-  anything; building that behavior is open work.
+- **Data nests the same shape.** `items` is one `{ id, cells, children, hasChildren, count }` per row, and `children` holds more of the same. Every level keeps every column.
+- **Depth is space.** Each level indents one `--table-indent` step; a leaf keeps an empty toggle box so names at one level line up.
+- **Load children late.** Give a parent `hasChildren` and no `children`, and `loadChildren(item)` returns them, or a promise of them, the first time it opens.
+- **Keep the row press for rows without controls.** `shouldExpandOnClick` never fires from a button or link inside the row, but a row that carries controls reads better with the chevron alone.
+- **Keyboard follows the treegrid pattern.** The table is one tab stop. Every row carries `aria-level`, `aria-posinset` and `aria-setsize`, and a parent `aria-expanded`.
 
 </div>
 
@@ -156,7 +196,7 @@ folder of sessions. For a flat list, use the Static or Dynamic table instead.
 <tbody>
 <tr><td>Name each node for what it contains: "Linear equations".</td><td>Repeat the parent's name in every child.</td></tr>
 <tr><td>Keep nesting to three levels.</td><td>Nest deeper than three levels.</td></tr>
-<tr><td>Put the count or total in its own column.</td><td>Put counts in the node name.</td></tr>
+<tr><td>Put a total in its own column; use <code>count</code> for how many children a row holds.</td><td>Put counts in the node name.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -166,9 +206,10 @@ folder of sessions. For a flat list, use the Static or Dynamic table instead.
 
 ## Accessibility
 
-- **Depth is visual only.** The rows are plain table rows; the indentation is not announced, so put the level in the label when it matters.
-- **The chevron is decorative.** It is `aria-hidden` and does not toggle anything yet.
-- **Do not use it to hide required content.** Until expand and collapse are built, every row is visible.
+- **A treegrid.** Each row carries `aria-level`, `aria-posinset` and `aria-setsize`, and a parent `aria-expanded`, so depth and state are announced.
+- **One tab stop.** Arrow keys move, open and close rows; Home and End jump to the ends; Enter toggles.
+- **The chevron is a pointer target only.** It is `aria-hidden`; the keyboard route is the arrow keys on the row.
+- **Loading is busy.** A parent whose children are loading is `aria-busy`.
 
 </div>
 

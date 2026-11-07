@@ -83,7 +83,6 @@ const Modal = ({
     description,
     body,
     height = 'hug',
-    type = 'default',
     showBottomButtons = true,
     showCloseButton = true,
     headerActions,
@@ -120,7 +119,6 @@ const Modal = ({
     const [placed, trigger] = useOverlaySlot(show && renderAs === 'modal', onClose);
     const visible = renderAs === 'inline' ? show : show && placed;
 
-    const scrollable = type === 'scrollable';
     const hasFooter = showBottomButtons && Boolean(footer || primaryButton || secondaryButton);
     const bodyOnly = !title && !description && !headerActions && !showBottomButtons;
     const overflows = useOverflows(bodyEl, loading);
@@ -154,7 +152,7 @@ const Modal = ({
 
     const classes = [
         'plus-modal',
-        scrollable ? 'plus-modal-scrollable' : 'plus-modal-default',
+        'plus-modal-default',
         GRID_WIDTHS.includes(width) ? `plus-modal-width-${width}` : '',
         `plus-modal-height-${height}`,
         showBottomButtons ? 'plus-modal-with-buttons' : 'plus-modal-no-buttons',
@@ -223,12 +221,12 @@ const Modal = ({
 
                 <div
                     ref={setBodyEl}
-                    className={`plus-modal-body ${scrollable ? 'plus-modal-body-scrollable' : ''}`}
+                    className="plus-modal-body"
                     aria-busy={loading || undefined}
                     // A scrolling region must itself be reachable by keyboard
                     // (axe: scrollable-region-focusable) since its content isn't
                     // otherwise guaranteed to contain a focusable element.
-                    tabIndex={scrollable || overflows ? 0 : undefined}
+                    tabIndex={overflows ? 0 : undefined}
                 >
                     {loading ? (
                         <div className="plus-modal-skeleton">
@@ -240,19 +238,6 @@ const Modal = ({
                         <div className="plus-modal-content">
                             {body && (typeof body === 'string' ? <div className="plus-modal-body-text">{body}</div> : body)}
                             {children}
-                        </div>
-                    )}
-                    {scrollable && (
-                        <div className="plus-modal-scrollbar">
-                            <div className="plus-modal-scrollbar-icon">
-                                <i className="fa-solid fa-caret-up" />
-                            </div>
-                            <div className="plus-modal-scrollbar-track">
-                                <div className="plus-modal-scrollbar-bar" />
-                            </div>
-                            <div className="plus-modal-scrollbar-icon">
-                                <i className="fa-solid fa-caret-down" />
-                            </div>
                         </div>
                     )}
                 </div>
@@ -326,8 +311,6 @@ Modal.propTypes = {
     body: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** `hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap. */
     height: PropTypes.oneOf(['hug', 'fill']),
-    /** Deprecated: `scrollable` draws the old fixed 226 box. Use `height`. */
-    type: PropTypes.oneOf(['default', 'scrollable']),
     /** Show the footer: `footer`, or the secondary and primary buttons. */
     showBottomButtons: PropTypes.bool,
     /** The header's close button. Off for a dialog that has to be answered. */

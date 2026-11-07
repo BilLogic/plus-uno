@@ -1,7 +1,7 @@
 import React from 'react';
 import PatternTable from '@/patterns/PatternTable';
 import PatternSection from '@/patterns/PatternSection';
-import { Checkbox, Pagination, Button, IconButton } from '@/components';
+import { Checkbox, Pagination, IconButton, DynamicTable, TableBulkActions, TreeTable } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { iconClass } from '../../lib/icon';
 
@@ -107,57 +107,58 @@ const roster = [
     ['Emily Chen', 'Daniel Kim', 'Oct 20', 11, '85%'],
 ];
 
-const RosterSection = () => (
-    <PatternSection
-        title="Students"
-        toolbar={(
-            <PatternSection.Toolbar
-                state="selected"
-                selection="2 selected"
-                bulkActions={(
-                    <>
-                        <Button text="Message" appearance="subtle" spacing="compact" onClick={() => {}} />
-                        <Button text="Export" appearance="subtle" spacing="compact" onClick={() => {}} />
-                        <Button text="Remove" appearance="subtle" spacing="compact" onClick={() => {}} />
-                    </>
-                )}
-                onClear={() => {}}
-                clearLabel="Clear selection"
+const rosterHead = {
+    cells: [
+        { key: 'student', content: 'Student', isSortable: true },
+        { key: 'tutor', content: 'Tutor', isSortable: true },
+        { key: 'last', content: 'Last session', isSortable: true },
+        { key: 'sessions', content: 'Sessions', isSortable: true, align: 'number' },
+        { key: 'attendance', content: 'Attendance', isSortable: true, align: 'number' },
+    ],
+};
+
+const rosterRows = roster.map(([student, tutor, last, sessions, attendance]) => ({
+    key: student,
+    cells: [
+        { key: student, content: student },
+        { key: tutor, content: tutor },
+        { key: last, content: last },
+        { key: sessions, content: String(sessions) },
+        { key: parseInt(attendance, 10), content: attendance },
+    ],
+}));
+
+const RosterSection = () => {
+    const [selected, setSelected] = React.useState(['Ava Thompson', 'Marcus Lee']);
+    const toolbar = selected.length > 0 ? (
+        <TableBulkActions
+            count={selected.length}
+            actions={['Message', 'Export', 'Remove'].map((label) => ({ label, onClick: () => {} }))}
+            onClear={() => setSelected([])}
+        />
+    ) : (
+        <PatternSection.Toolbar count="340 students" />
+    );
+    return (
+        <PatternSection title="Students" toolbar={toolbar}>
+            <DynamicTable
+                head={rosterHead}
+                rows={rosterRows}
+                label="Students"
+                defaultSortKey="student"
+                isSelectable
+                selectedRowKeys={selected}
+                onSelectionChange={setSelected}
+                rowsPerPage={25}
+                totalRows={340}
             />
-        )}
-    >
-        <PatternTable pagination={<Pager range="1–25 of 340" pages={14} />}>
-            <thead>
-                <tr>
-                    <th><span className="visually-hidden">Select</span></th>
-                    <SortHead sort="up">Student</SortHead>
-                    <SortHead>Tutor</SortHead>
-                    <SortHead>Last session</SortHead>
-                    <SortHead align={numeric}>Sessions</SortHead>
-                    <SortHead align={numeric}>Attendance</SortHead>
-                    <th><span className="visually-hidden">Actions</span></th>
-                </tr>
-            </thead>
-            <tbody>
-                {roster.map(([student, tutor, last, sessions, attendance], i) => (
-                    <tr key={student} aria-selected={i < 2}>
-                        <td><Checkbox aria-label={`Select ${student}`} isChecked={i < 2} isReadOnly/></td>
-                        <td>{student}</td>
-                        <td>{tutor}</td>
-                        <td>{last}</td>
-                        <td style={numeric}>{sessions}</td>
-                        <td style={numeric}>{attendance}</td>
-                        <td><RowActions label={`Actions for ${student}`} /></td>
-                    </tr>
-                ))}
-            </tbody>
-        </PatternTable>
-    </PatternSection>
-);
+        </PatternSection>
+    );
+};
 
 /**
- * A roster people act on: sortable heads, checkboxes, a pager, and bulk
- * actions in the Section header. It sits inside a docs section, so its title
+ * A roster people act on, as a `DynamicTable`: sortable heads, checkboxes, a
+ * pager, and `TableBulkActions` in the Section header. It sits inside a docs section, so its title
  * stays out of the page outline.
  */
 const DynamicRosterCase = () => (
@@ -186,38 +187,34 @@ const RosterAsStaticCase = () => (
     </PatternTable>
 );
 
-/** A row of a hierarchy: the name indents by level and every level keeps the same columns. */
-const TreeRow = ({ level, open, name, count, type, sessions }) => (
-    <tr>
-        <td>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', paddingInlineStart: `calc(${level} * var(--table-indent))` }}>
-                <span style={{ display: 'inline-flex', width: 'var(--icon-sm)', justifyContent: 'center' }}>
-                    {open === undefined ? null : icon(open ? 'chevron-down' : 'chevron-right')}
-                </span>
-                {name}
-                {count !== undefined && <span style={subtle}>{count}</span>}
-            </span>
-        </td>
-        <td>{type}</td>
-        <td style={numeric}>{sessions}</td>
-    </tr>
-);
+const treeNode = (id, name, type, sessions, more = {}) => ({
+    id,
+    cells: [{ content: name }, { content: type }, { content: String(sessions) }],
+    ...more,
+});
 
-/** School, class, student: each level indents and keeps the columns. */
+const schools = [
+    treeNode('lincoln', 'Lincoln Middle', 'School', 54, {
+        count: 3,
+        children: [
+            treeNode('g7', 'Grade 7 · Math', 'Class', 27, {
+                count: 2,
+                children: [treeNode('ava', 'Ava Thompson', 'Student', 12), treeNode('sofia', 'Sofia Ramirez', 'Student', 15)],
+            }),
+            treeNode('g8', 'Grade 8 · Math', 'Class', 19, { count: 3, children: [] }),
+            treeNode('g6', 'Grade 6 · Reading', 'Class', 8, { count: 4, children: [] }),
+        ],
+    }),
+];
+
+/** School, class, student, as a `TreeTable`: each level indents and keeps the columns. */
 const TreeHierarchyCase = () => (
-    <PatternTable>
-        <thead>
-            <tr><SortHead>Name</SortHead><SortHead>Type</SortHead><SortHead align={numeric}>Sessions</SortHead></tr>
-        </thead>
-        <tbody>
-            <TreeRow level={0} open name="Lincoln Middle" count={3} type="School" sessions={54} />
-            <TreeRow level={1} open name="Grade 7 · Math" count={2} type="Class" sessions={27} />
-            <TreeRow level={2} name="Ava Thompson" type="Student" sessions={12} />
-            <TreeRow level={2} name="Sofia Ramirez" type="Student" sessions={15} />
-            <TreeRow level={1} open={false} name="Grade 8 · Math" count={3} type="Class" sessions={19} />
-            <TreeRow level={1} open={false} name="Grade 6 · Reading" count={4} type="Class" sessions={8} />
-        </tbody>
-    </PatternTable>
+    <TreeTable
+        head={{ cells: [{ key: 'name', content: 'Name' }, { key: 'type', content: 'Type' }, { key: 'sessions', content: 'Sessions', align: 'number' }] }}
+        items={schools}
+        label="Schools"
+        defaultExpandedIds={['lincoln', 'g7']}
+    />
 );
 
 /** A hierarchy faked with expandable rows: the nested rows lose their columns. */

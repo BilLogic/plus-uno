@@ -65,6 +65,7 @@ const PatternTable = ({
     stickyHeader = false,
     stickyColumn = false,
     maxHeight,
+    tableProps,
     className = '',
     style,
     children,
@@ -118,7 +119,11 @@ const PatternTable = ({
                 data-scrolled-x={tracksScroll && scrolled.x ? '' : undefined}
                 data-scrolled-y={tracksScroll && scrolled.y ? '' : undefined}
             >
-                <table ref={tableRef} className="plus-pattern-table-table">
+                <table
+                    {...tableProps}
+                    ref={tableRef}
+                    className={['plus-pattern-table-table', tableProps?.className].filter(Boolean).join(' ')}
+                >
                     {showEmptyState ? (
                         <>
                             {kept}
@@ -154,6 +159,8 @@ PatternTable.propTypes = {
     stickyColumn: PropTypes.bool,
     /** Bound the scroll region's height (number of px or any CSS length); a sticky header pins only within it */
     maxHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    /** Props for the `table` element itself: an accessible name, a class a wrapper styles it by */
+    tableProps: PropTypes.object,
     className: PropTypes.string,
     style: PropTypes.object,
     /** Table content slot — pass thead/tbody elements */

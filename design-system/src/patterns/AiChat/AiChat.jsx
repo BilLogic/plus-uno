@@ -50,29 +50,19 @@ const useNarrow = () => {
     return narrow;
 };
 
+/** The one fallibility line, under the prompt input. */
+export const AI_CHAT_DISCLAIMER = 'AI can make mistakes. Check important info.';
+
 const AiChatContext = createContext(null);
 
 /** The chat's state and actions, for anything inside an `AiChat`. Null outside one. */
 export const useAiChat = () => useContext(AiChatContext);
 
-const textOf = (m) => (m.links?.length ? `${m.text}\n${m.links.map((l) => `${l.label}: ${l.href}`).join('\n')}` : m.text);
+const textOf = (m) => (m.sources?.length ? `${m.text}\n${m.sources.map((s) => `${s.title}: ${s.href}`).join('\n')}` : m.text);
 
 const transcriptOf = (messages) => messages
     .map((m) => `${m.role === 'user' ? 'You' : 'AI'}: ${textOf(m)}`)
     .join('\n\n');
-
-/** A reply's links, drawn after its text: `{ label, href }`, opening in the host's `linkTarget`. */
-const renderReplyPart = (part, index) => (
-    <ul key={index} className="plus-ai-chat__links">
-        {part.links.map((l, i) => (
-            <li key={`${i}-${l.href}`}><a href={l.href} target={part.target}>{l.label}</a></li>
-        ))}
-    </ul>
-);
-
-const partsOf = (m, target) => (m.links?.length
-    ? [{ type: 'text', text: m.text }, { type: 'links', links: m.links, target }]
-    : [{ type: 'text', text: m.text }]);
 
 /**
  * One chat surface for every mode: the Panel parts (header, body, footer)
@@ -82,7 +72,7 @@ const partsOf = (m, target) => (m.links?.length
 const ChatSurface = ({ presentation }) => {
     const chat = useAiChat();
     const {
-        variant, title, messages, loading, draft, setDraft, starters, dispatch, clear, send, stop, narrow, linkTarget,
+        variant, title, messages, loading, draft, setDraft, starters, dispatch, clear, send, stop, narrow, linkTarget, rate,
     } = chat;
     const storybook = variant === 'storybook';
     const listRef = useRef(null);
@@ -137,15 +127,22 @@ const ChatSurface = ({ presentation }) => {
                         <p className="plus-ai-chat__empty">Ask about what you are working on.</p>
                     ) : messages.map((m) => (
                         <div key={m.id} className={`plus-ai-chat__message plus-ai-chat__message--${m.role}`}>
-                            {m.role === 'ai' ? <AiIcon name="generate" label="AI" /> : null}
                             {m.role === 'ai'
-                                ? <AiMessage className="plus-ai-chat__text" parts={partsOf(m, linkTarget)} renderPart={renderReplyPart} />
+                                ? (
+                                    <AiMessage
+                                        className="plus-ai-chat__text"
+                                        text={m.text}
+                                        sources={m.sources}
+                                        linkTarget={linkTarget}
+                                        feedback={m.feedback ?? null}
+                                        onFeedback={(feedback) => rate(m, feedback)}
+                                    />
+                                )
                                 : <p className="plus-ai-chat__text">{m.text}</p>}
                         </div>
                     ))}
                     {loading ? (
                         <div className="plus-ai-chat__message plus-ai-chat__message--ai">
-                            <AiIcon name="generate" label="AI" />
                             <AiMessage className="plus-ai-chat__text" status="thinking" />
                         </div>
                     ) : null}
@@ -164,6 +161,8 @@ const ChatSurface = ({ presentation }) => {
                     isLoading={loading}
                     onStop={stop}
                 />
+                {/* Fallibility, said once under the input, never per message. */}
+                <p className="plus-ai-chat__disclaimer">{AI_CHAT_DISCLAIMER}</p>
             </PanelFooter>
         </PanelContainer>
     );
@@ -259,6 +258,7 @@ const Launcher = () => {
  *   close only, with no full screen and no more menu.
  * - The conversation is kept in memory and moves with the mode. There is no
  *   history, and no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`.
+ *   A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.
  */
 const AiChat = ({
     variant = 'app',
@@ -269,6 +269,7 @@ const AiChat = ({
     linkTarget,
     onModeChange,
     respond,
+    onFeedback,
     starters,
     title = 'AI chat',
     panelLabel,
@@ -325,13 +326,20 @@ const AiChat = ({
         if (pending.current !== ticket) return;
         setLoading(false);
         if (reply == null) return;
-        const { text: replyText, links } = typeof reply === 'string' ? { text: reply } : reply;
-        setMessages((prev) => [...prev, { id: `a${prev.length}-${ticket}`, role: 'ai', text: replyText, links }]);
+        // A reply is its text, or `{ text, sources }`; sources are what it drew on.
+        const { text: replyText, sources } = typeof reply === 'string' ? { text: reply } : reply;
+        setMessages((prev) => [...prev, { id: `a${prev.length}-${ticket}`, role: 'ai', text: replyText, sources }]);
     }, [respond]);
 
+    // Every answer takes a rating; it stays on the message as chat moves between modes.
+    const rate = useCallback((message, feedback) => {
+        setMessages((prev) => prev.map((m) => (m.id === message.id ? { ...m, feedback: feedback.rating } : m)));
+        onFeedback?.(message, feedback);
+    }, [onFeedback]);
+
     const value = useMemo(() => ({
-        variant, title, messages, loading, draft, setDraft, starters, state, dispatch, clear, send, stop, narrow, launcher, linkTarget,
-    }), [variant, launcher, linkTarget, title, messages, loading, draft, starters, state, clear, send, stop, narrow]);
+        variant, title, messages, loading, draft, setDraft, starters, state, dispatch, clear, send, stop, narrow, launcher, linkTarget, rate,
+    }), [variant, launcher, linkTarget, title, messages, loading, draft, starters, state, clear, send, stop, narrow, rate]);
 
     return (
         <AiChatContext.Provider value={value}>
@@ -360,13 +368,15 @@ AiChat.propTypes = {
     storageKey: PropTypes.string,
     /** `false` leaves out the floating button: the popup then floats above the bottom right corner, and the host opens chat with `useAiChat().dispatch({ type: 'open' })`. */
     launcher: PropTypes.bool,
-    /** The `target` of links in a reply, such as `_top` from inside a frame. */
+    /** Where a reply's source links open, such as `_top` from inside a frame. */
     linkTarget: PropTypes.string,
     /** Called with the new mode whenever chat moves between popup, Panel and full screen. */
     onModeChange: PropTypes.func,
-    /** Returns the reply (or a promise of it) to a sent message: a string, or `{ text, links: [{ label, href }] }`. Without it nothing answers. */
+    /** Returns the reply (or a promise of it) to a sent message: a string, or `{ text, sources: [{ title, href, type }] }`. Without it nothing answers. */
     respond: PropTypes.func,
-    /** `{ id, label, text }` prompts offered while the conversation is empty. */
+    /** Called with the answer and `{ rating }` (or `{ rating: 'down', comment }`) when a person rates it. Every answer offers thumbs. */
+    onFeedback: PropTypes.func,
+        /** `{ id, label, text }` prompts offered while the conversation is empty. */
     starters: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
         label: PropTypes.string.isRequired,

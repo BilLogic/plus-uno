@@ -42,6 +42,7 @@ import { describe, it, expect } from 'vitest';
 
 import { documents, text } from '../../scripts/lib/corpus.mjs';
 import { fallbackUsages } from '../../scripts/token-fallbacks.mjs';
+import { RETIRED_TOKENS, retiredRenames } from '../../scripts/lib/tokens/plan.mjs';
 import { parseColor, toHex } from '../src/lib/tokens.mjs';
 import {
   COLOR_PREFIXES,
@@ -223,6 +224,15 @@ describe('the corpus — where tokens live, answered once and read through the o
     const corpus = tokenCorpus();
     expect(corpus.size).toBeGreaterThan(400);
     for (const name of corpus.keys()) expect(name.startsWith('--')).toBe(true);
+  });
+
+  it('declares none of the retired names: every old token is gone, and its replacement is there', () => {
+    const corpus = tokenCorpus();
+    expect(RETIRED_TOKENS.size).toBeGreaterThan(0);
+    const declared = [...RETIRED_TOKENS].filter((name) => corpus.has(name));
+    expect(declared).toEqual([]);
+    const missing = [...retiredRenames()].filter(([, replacement]) => !corpus.has(replacement));
+    expect(missing).toEqual([]);
   });
 
   it('follows an alias to the literal at the end of it', () => {
@@ -559,7 +569,10 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // 164: the Storybook docs chrome stylesheet moved onto --ds- tokens, and its 37
     // color fallbacks went (the ladder migration of the chrome).
     // 162: Rating moved onto --ds- icon tokens, and its two hex fallbacks went.
-    expect(comparable).toBe(162);
+    // 161: the research assistant chat moved onto the AI components, and its
+    // hand-drawn bubble's color fallback went.
+    // 158: its skeleton shimmer moved onto --ds-skeleton-subtle, and three more went.
+    expect(comparable).toBe(158);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

@@ -9,7 +9,7 @@ import { StaticSummary, SummaryAsDynamic, DynamicRoster, RosterAsStatic, TreeHie
 <Title />
 The table pattern is how a table sits on a page. A Section holds the table, and the Section header carries the title and the toolbar. The table spans the section under it, plain, with no card around it and no padding of its own. The shell takes your head and rows, and adds a pagination slot and an empty-state slot.
 
-Static table, Dynamic table and Tree table are planned components, and they have no exports in code yet.
+`StaticTable`, `DynamicTable` and `TreeTable` are the components for the three table types.
 
 The examples on this page follow the toolbar's Color mode switch.
 
@@ -93,6 +93,7 @@ One kind of table per block: a Static, Dynamic or Tree table, never mixed in one
         <tr><td><code>stickyHeader</code></td><td>boolean</td><td>Pins the head row while the rows scroll under it. It needs <code>maxHeight</code>.</td><td><code>false</code></td></tr>
         <tr><td><code>stickyColumn</code></td><td>boolean</td><td>Pins the first column while the other columns scroll under it</td><td><code>false</code></td></tr>
         <tr><td><code>maxHeight</code></td><td>number or CSS length</td><td>Bounds the scroll region's height</td><td>none</td></tr>
+        <tr><td><code>tableProps</code></td><td>object</td><td>Props for the <code>table</code> element: an accessible name, or a class a component built on the shell styles it by</td><td>none</td></tr>
     </tbody>
 </DocsTable>
 

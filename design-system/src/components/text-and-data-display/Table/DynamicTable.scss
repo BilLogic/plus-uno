@@ -1,0 +1,140 @@
+/**
+ * Dynamic table: the shared `_Table` parts on the PatternTable shell.
+ *
+ * PatternTable owns the scroll region and draws row states as a layer over
+ * each cell's fill (so a frozen, opaque cell keeps them); the `_Table` parts
+ * own the cell anatomy. The rules here settle where the two overlap: the
+ * cells take the `_Table` inset and height, and a row's fill comes only from
+ * PatternTable's layer, never from the row itself.
+ */
+
+@use '../../../styles/state' as *;
+
+.plus-dynamic-table {
+    position: relative;
+}
+
+// The cell inset and height are the `_Table` parts', not the pattern's default.
+.plus-pattern-table-table.plus-dynamic-table-table {
+    // Under the content minimum the table scrolls sideways inside its own
+    // region instead of squeezing its columns.
+    min-width: var(--content-min-width);
+
+    :is(th, td) {
+        padding: 0 var(--size-table-cell-pad-x);
+    }
+
+    thead th {
+        height: var(--plus-table-row-height);
+    }
+
+    tbody td {
+        height: var(--plus-table-row-height);
+    }
+
+    // A row's fill is the pattern's layer alone, so a frozen cell keeps it.
+    tbody tr.plus-table-row {
+        background-color: transparent;
+    }
+
+    // The first column fills; the others size to their content.
+    th.plus-dynamic-table-col--fit {
+        width: 1%;
+        white-space: nowrap;
+    }
+
+    tbody tr.plus-dynamic-table-row--highlighted {
+        --plus-pattern-table-row-state: var(--ds-background-warning-subtler);
+
+        @include plus-state(
+            (hovered: (--plus-pattern-table-row-state: var(--ds-background-warning-subtler-hovered))),
+            $ring: false
+        );
+    }
+}
+
+.plus-pattern-table-table.plus-dynamic-table-table--fixed {
+    table-layout: fixed;
+}
+
+.plus-dynamic-table-caption {
+    caption-side: top;
+    padding: 0 var(--size-table-cell-pad-x) var(--stack-sm);
+    font: var(--heading-xxsmall);
+    color: var(--ds-text);
+    text-align: left;
+}
+
+// The footer spans the pagination slot: range at the start, pager at the end.
+.plus-dynamic-table .plus-pattern-table-pagination > .plus-table-footer {
+    flex: 1;
+}
+
+.plus-dynamic-table-message {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-table-cell-inline);
+}
+
+.plus-dynamic-table-message--error {
+    color: var(--ds-text-danger);
+}
+
+// Refreshing: the rows stay at the loading opacity under one spinner.
+.plus-dynamic-table[data-state='refreshing'] .plus-dynamic-table-table tbody {
+    opacity: var(--ds-opacity-loading);
+}
+
+.plus-dynamic-table-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ds-text-subtle);
+    pointer-events: none;
+}
+
+// The checkbox column is as wide as the row is tall, the box centered in it.
+.plus-pattern-table-table.plus-dynamic-table-table .plus-dynamic-table-select {
+    width: var(--plus-table-row-height);
+    padding: 0;
+    text-align: center;
+}
+
+/*
+ * The frozen column. PatternTable pins the first cell of each row on the
+ * current surface, so nothing shows through it. While the table is scrolled
+ * sideways the frozen edge draws a stronger divider beside the overflow
+ * shadow. With checkboxes, the title column beside them freezes too, one
+ * row-height in, and the edge moves to it.
+ */
+$frozen: '.plus-pattern-table--sticky-column .plus-pattern-table-scroll[data-scrolled-x]';
+$edge-shadow: inset calc(-1 * var(--border-default)) 0 0 var(--ds-border-bold), var(--ds-shadow-overflow);
+
+.plus-dynamic-table:not(.plus-dynamic-table--frozen-pair) #{$frozen} :is(th, td):first-child:not(.plus-pattern-table-message) {
+    box-shadow: $edge-shadow;
+}
+
+.plus-dynamic-table--frozen-pair {
+    .plus-pattern-table--sticky-column :is(th, td):nth-child(2):not(.plus-pattern-table-message) {
+        position: sticky;
+        left: var(--plus-table-row-height);
+        z-index: var(--pattern-table-z-sticky);
+        background-color: var(--ds-utility-elevation-surface-current);
+    }
+
+    .plus-pattern-table--sticky-header.plus-pattern-table--sticky-column thead th:nth-child(2) {
+        z-index: var(--pattern-table-z-corner);
+    }
+
+    #{$frozen} :is(th, td):first-child:not(.plus-pattern-table-message) {
+        box-shadow: none;
+        clip-path: none;
+    }
+
+    #{$frozen} :is(th, td):nth-child(2):not(.plus-pattern-table-message) {
+        box-shadow: $edge-shadow;
+        clip-path: inset(0 calc(-1 * var(--pattern-table-overflow-reach)) 0 0);
+    }
+}

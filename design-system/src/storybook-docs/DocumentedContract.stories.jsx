@@ -145,7 +145,7 @@ function probeValue(name, meta) {
  * The minimum that makes a component render at all.
  *
  * `show` and its synonyms are set because a component that starts hidden
- * renders nothing whatever variant you pass it — Modal's `type="scrollable"`
+ * renders nothing whatever variant you pass it — a Modal's `height="fill"`
  * would look like a broken variant when it is simply closed. Everything else is
  * the component's own required props plus a text label and an element child.
  */
@@ -159,6 +159,19 @@ const VISIBILITY = ['show', 'open', 'isOpen', 'visible'];
  */
 const RENDERS_WITH = {
   CountTag: { value: 1 },
+  // A sortable column and two rows out of order, so every sort variant draws differently.
+  DynamicTable: {
+    head: { cells: [{ key: 'name', content: 'Name', isSortable: true }] },
+    rows: [
+      { key: 'bea', cells: [{ key: 'Bea', content: 'Bea' }] },
+      { key: 'ava', cells: [{ key: 'Ava', content: 'Ava' }] },
+    ],
+    defaultSortKey: 'name',
+  },
+  TreeTable: {
+    head: { cells: [{ key: 'name', content: 'Name' }] },
+    items: [{ id: 'ava', cells: [{ content: 'Ava' }] }],
+  },
   PromptStarters: { starters: [{ id: 'sample', label: 'Sample' }] },
 };
 

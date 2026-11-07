@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import AiIcon from '@/components/images-and-icons/AiIcon';
+import AiSources from './AiSources';
+import AiFeedback from './AiFeedback';
 import './AiMessage.scss';
 
 export const AI_MESSAGE_STATUSES = ['complete', 'streaming', 'thinking'];
@@ -60,7 +63,9 @@ const TypingIndicator = () => (
 );
 
 /**
- * An assistant reply. The content is `text`, or `parts` when a reply mixes
+ * An assistant reply, marked as AI by the small AI icon at its start (named
+ * "AI" for assistive technology), so no answer reads as a person's. The
+ * content is `text`, or `parts` when a reply mixes
  * text with other content: a part is `{ type: 'text', text }` or any other
  * `{ type, ... }`, which `renderPart` draws.
  *
@@ -68,6 +73,11 @@ const TypingIndicator = () => (
  * - `status="streaming"` is text still arriving: a caret follows the last
  *   character and the message is marked busy for assistive technology.
  * - `status="thinking"` is the typing indicator, before any text exists.
+ *
+ * `sources` lists what a finished answer read, under the message: an answer
+ * that draws on records always shows them. `onFeedback` puts thumbs up and
+ * down under a finished answer; `feedback` holds the rating when the page
+ * owns it.
  */
 const AiMessage = ({
     text,
@@ -75,6 +85,10 @@ const AiMessage = ({
     status = 'complete',
     typeOut = false,
     renderPart,
+    sources,
+    linkTarget,
+    onFeedback,
+    feedback,
     className,
     ...rest
 }) => {
@@ -87,24 +101,29 @@ const AiMessage = ({
             aria-busy={status === 'streaming' ? true : undefined}
             {...rest}
         >
-            {status === 'thinking' ? <TypingIndicator /> : items.map((part, index) => {
-                if (!part) return null;
-                if (part.type === 'text') {
-                    const streaming = status === 'streaming' && index === lastText;
-                    return (
-                        <p key={index} className="plus-ai-message__text">
-                            {typeOut && status === 'complete' ? (
-                                <>
-                                    <span className="plus-ai-message__sr">{part.text}</span>
-                                    <span aria-hidden="true"><TypingText text={part.text} /></span>
-                                </>
-                            ) : part.text}
-                            {streaming ? <span className="plus-ai-message__caret" aria-hidden="true" /> : null}
-                        </p>
-                    );
-                }
-                return <div key={index} className="plus-ai-message__part">{renderPart?.(part, index) ?? null}</div>;
-            })}
+            <AiIcon name="generate" size={16} label="AI" className="plus-ai-message__icon" />
+            <div className="plus-ai-message__body">
+                {status === 'thinking' ? <TypingIndicator /> : items.map((part, index) => {
+                    if (!part) return null;
+                    if (part.type === 'text') {
+                        const streaming = status === 'streaming' && index === lastText;
+                        return (
+                            <p key={index} className="plus-ai-message__text">
+                                {typeOut && status === 'complete' ? (
+                                    <>
+                                        <span className="plus-ai-message__sr">{part.text}</span>
+                                        <span aria-hidden="true"><TypingText text={part.text} /></span>
+                                    </>
+                                ) : part.text}
+                                {streaming ? <span className="plus-ai-message__caret" aria-hidden="true" /> : null}
+                            </p>
+                        );
+                    }
+                    return <div key={index} className="plus-ai-message__part">{renderPart?.(part, index) ?? null}</div>;
+                })}
+                {status === 'complete' && sources?.length ? <AiSources sources={sources} target={linkTarget} /> : null}
+                {status === 'complete' && onFeedback ? <AiFeedback value={feedback} onFeedback={onFeedback} /> : null}
+            </div>
         </div>
     );
 };
@@ -120,6 +139,18 @@ AiMessage.propTypes = {
     typeOut: PropTypes.bool,
     /** Draws a part that is not text: `(part, index) => node`. */
     renderPart: PropTypes.func,
+    /** What a finished answer read: one `{ title, href, type }` per source, listed under the message. */
+    sources: PropTypes.arrayOf(PropTypes.shape({
+        title: PropTypes.string.isRequired,
+        href: PropTypes.string.isRequired,
+        type: PropTypes.string,
+    })),
+    /** Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`. */
+    /** Where the source links open, such as `_top` from inside a frame. */
+    linkTarget: PropTypes.string,
+    onFeedback: PropTypes.func,
+    /** The rating, when the page owns it: `up`, `down` or null. */
+    feedback: PropTypes.oneOf(['up', 'down', null]),
     className: PropTypes.string,
 };
 

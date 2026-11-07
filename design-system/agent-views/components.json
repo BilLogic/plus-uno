@@ -260,7 +260,7 @@
       "import": "import { AiMessage } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/AiMessage/AiMessage.jsx",
-      "summary": "An assistant reply. The content is `text`, or `parts` when a reply mixes text with other content: a part is `{ type: 'text', text }` or any other `{ type, ... }`, which `renderPart` draws. - `status=\"complete\"` is a finished message. - `status=\"streaming\"` is text still arriving: a caret follows the last character and the message is marked busy for assistive technology. - `status=\"thinking\"` is the typing indicator, before any text exists.",
+      "summary": "An assistant reply, marked as AI by the small AI icon at its start (named \"AI\" for assistive technology), so no answer reads as a person's. The content is `text`, or `parts` when a reply mixes text with other content: a part is `{ type: 'text', text }` or any other `{ type, ... }`, which `renderPart` draws. - `status=\"complete\"` is a finished message. - `status=\"streaming\"` is text still arriving: a caret follows the last character and the message is marked busy for assistive technology. - `status=\"thinking\"` is the typing indicator, before any text exists. `sources` lists what a finished answer read, under the message: an answer that draws on records always shows them. `onFeedback` puts thumbs up and down under a finished answer; `feedback` holds the rating when the page owns it.",
       "props": [
         {
           "name": "text",
@@ -309,6 +309,45 @@
           "default": null,
           "values": null,
           "description": "Draws a part that is not text: `(part, index) => node`.",
+          "deprecated": null
+        },
+        {
+          "name": "sources",
+          "type": "arrayOf",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "What a finished answer read: one `{ title, href, type }` per source, listed under the message.",
+          "deprecated": null
+        },
+        {
+          "name": "linkTarget",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`.",
+          "deprecated": null
+        },
+        {
+          "name": "onFeedback",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "feedback",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "up",
+            "down"
+          ],
+          "description": "The rating, when the page owns it: `up`, `down` or null.",
           "deprecated": null
         },
         {
@@ -4790,20 +4829,6 @@
           ],
           "description": "Hug grows to the screen less 128, then scrolls its body; Fill sits at that cap",
           "deprecated": null
-        },
-        {
-          "name": "type",
-          "type": "enum",
-          "required": false,
-          "default": "'default'",
-          "values": [
-            "default",
-            "scrollable"
-          ],
-          "description": "Deprecated: use height",
-          "deprecated": {
-            "replacement": "height"
-          }
         },
         {
           "name": "showBottomButtons",

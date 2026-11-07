@@ -3,9 +3,33 @@
  * Replicates the "Homepage" pattern of fake chat simulation to avoid runtime errors.
  */
 import React, { useState, useEffect, useRef } from 'react';
+// @ts-expect-error -- the design system is plain JSX, resolved by the Vite alias.
+import { AiMessage, PromptInput } from '@/components';
+// @ts-expect-error -- same.
+import { AI_CHAT_DISCLAIMER as DISCLAIMER } from '@/patterns';
 import { AssistantMessageContent } from './components/AssistantMessageContent';
 import { ChatHeader } from './components/ChatHeader';
 import './ResearchAssistantChat.css';
+
+
+type Turn =
+  | { role: 'user'; text: string }
+  | { role: 'assistant'; parts: MessagePart[] };
+
+/**
+ * The script adds an answer one part at a time; consecutive assistant parts
+ * are one answer, so they draw as one AiMessage with one AI icon.
+ */
+const toTurns = (messages: Message[]): Turn[] => messages.reduce<Turn[]>((turns, msg) => {
+  const last = turns[turns.length - 1];
+  if (msg.role === 'assistant' && last?.role === 'assistant') {
+    last.parts = [...last.parts, ...msg.content];
+    return turns;
+  }
+  if (msg.role === 'assistant') return [...turns, { role: 'assistant', parts: [...msg.content] }];
+  const first = msg.content[0];
+  return [...turns, { role: 'user', text: first?.type === 'text' ? first.text : '' }];
+}, []);
 
 const DEMO_TIMING = {
   THINK_MS: 1500,        // Increased from 1000
@@ -83,14 +107,6 @@ export function ResearchAssistantChat({
   // Helper to add messages
   const addMessage = (role: 'user' | 'assistant', part: MessagePart) => {
     setMessages(prev => [...prev, { role, content: [part] }]);
-  };
-
-  const handleSend = () => {
-    // If auto-typing, we allow empty check to pass if controlled, but checking input.trim() is safer
-    // But for auto-send from script, we might call this with 'valid' input already in state
-    if (!input.trim()) return;
-    addMessage('user', { type: 'text', text: input });
-    setInput('');
   };
 
   const triggerAutoTyping = (text: string) => {
@@ -211,7 +227,7 @@ export function ResearchAssistantChat({
         width: '100%',
         display: 'flex',
         flexDirection: 'column',
-        background: 'var(--chat-bg, #f9fafb)',
+        background: 'var(--ds-surface)',
         overflow: 'hidden',
       }}
     >
@@ -225,74 +241,46 @@ export function ResearchAssistantChat({
           paddingBottom: 'var(--size-section-pad-y-lg)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 'var(--space-0625, 10px)',
+          gap: 'var(--stack-md)',
           scrollbarWidth: 'none',
           msOverflowStyle: 'none',
         }}
         className="hide-scrollbar"
       >
-        {messages.map((msg, i) => (
-          <div
-            key={i}
-            style={{
-              alignSelf: msg.role === 'user' ? 'flex-end' : 'flex-start',
-              maxWidth: msg.role === 'user' ? '80%' : '90%',
-              display: 'flex',
-              flexDirection: 'column',
-            }}
-          >
-            <div
-              style={{
-                padding: msg.role === 'user'
-                  ? '12px 16px'
-                  : '0',
-                background: msg.role === 'user'
-                  ? 'var(--color-primary, #0472a8)'
-                  : 'transparent',
-                color: msg.role === 'user'
-                  ? 'white'
-                  : 'var(--chat-on-surface-muted, #6b7280)',
-                borderRadius: '12px',
-                borderTopRightRadius: msg.role === 'user' ? 4 : 12,
-                borderTopLeftRadius: msg.role === 'assistant' ? 4 : 12,
-                fontFamily: 'var(--font-family-body)',
-                fontSize: 'var(--font-size-body1, 1rem)',
-                lineHeight: '1.5',
-                boxShadow: msg.role === 'user' ? '0 1px 2px rgba(0,0,0,0.1)' : 'none',
-              }}
-            >
-              {msg.role === 'user' ? (
-                <p style={{ margin: 0 }}>{msg.content[0].type === 'text' ? msg.content[0].text : ''}</p>
-              ) : (
-                <AssistantMessageContent parts={msg.content} />
-              )}
+        {toTurns(messages).map((turn, i) => (
+          turn.role === 'user' ? (
+            <div key={i} className="research-chat-user-turn">
+              <p>{turn.text}</p>
             </div>
-          </div>
+          ) : (
+            <AiMessage
+              key={i}
+              className="research-chat-ai-turn"
+              // Text parts type out as they arrive; charts, tools and stats draw through renderPart.
+              typeOut={turn.parts.some((part) => part.type === 'text' && part.shouldType)}
+              parts={turn.parts}
+              renderPart={(part: MessagePart) => <AssistantMessageContent parts={[part]} />}
+              onFeedback={() => {}}
+            />
+          )
         ))}
-        <div ref={messagesEndRef} style={{ height: '120px' }} />
+        <div ref={messagesEndRef} className="research-chat-end" />
       </div>
 
-      <div className="chat-footer">
-        <div className="chat-composer-area">
-          <div className="composer-input-wrapper">
-            <input
-              placeholder="Type your response..."
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !isAutoTyping && handleSend()}
-              onFocus={handleInputFocus}
-              className="composer-input"
-            />
-          </div>
-
-          <button
-            onClick={handleSend}
-            disabled={!input.trim()}
-            className={`composer-send-btn ${input.trim() ? 'active' : ''}`}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-          </button>
-        </div>
+      {/* Focus bubbles up from the prompt, so the footer hears it. */}
+      <div className="chat-footer" onFocus={handleInputFocus}>
+        <PromptInput
+          label="Message to AI"
+          placeholder="Type your response..."
+          value={input}
+          onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setInput(e.target.value)}
+          onSubmit={(text: string) => {
+            if (isAutoTyping || !text.trim()) return;
+            addMessage('user', { type: 'text', text });
+            setInput('');
+          }}
+        />
+        <p className="research-chat-disclaimer">{DISCLAIMER}</p>
       </div>
     </div>
   );

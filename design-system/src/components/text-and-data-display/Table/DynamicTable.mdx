@@ -6,7 +6,7 @@ import { DocsCanvasShell, ResourcesBlock, DocsTable, DsCanvasQuiet } from '@/sto
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-  "modelNote": "The Dynamic table page: sort, filter, selection with bulk actions, paging, expanding rows, a frozen column and the loading, empty and error states. No code component carries the whole set yet — `PatternTable` carries part of it (the sticky header and column, paging and the empty state), and a sortable `HeadCell` plus `TableFooter` on the shared `Table` carry the rest. Listed here as a docs page, not a set to write back to.",
+  "modelNote": "The Dynamic table page: sort, filter, selection with bulk actions, paging, expanding rows, a frozen column and the loading, empty and error states. `DynamicTable` draws it in code on the `PatternTable` shell, with sortable `HeadCell`s and `TableFooter`. Listed here as a docs page, not a set to write back to.",
   "sets": [
     {
       "id": "dynamic-table-page",
@@ -25,7 +25,7 @@ export const figmaMeta = {
 
 <Title />
 
-A table people sort, filter, select, page or act on. Built from the same `Table` the Static table uses, plus a sortable `HeadCell` and `TableFooter`.
+A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` shell, with sortable `HeadCell`s in the head row and the same row and cell parts the Static table uses.
 
 <DocsTabs of={DynamicTableStories}>
 
@@ -42,14 +42,14 @@ A table people sort, filter, select, page or act on. Built from the same `Table`
 
 <div className="sb-ds-doc-section">
 
-## Sortable head cells
+## Overview
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>A press asks for ascending, then descending, then no sort; the page owns the sort. The arrow shows on hover and focus, and a sorted column keeps it.</>}
+    description={<>Left alone the table holds its own sort and page. A head press sorts by the column's cell keys, and the footer states the range under a pager.</>}
 >
 
-<Canvas of={DynamicTableStories.SortableHeadCells} />
+<Canvas of={DynamicTableStories.Default} />
 
 </DocsCanvasShell>
 
@@ -57,14 +57,29 @@ A table people sort, filter, select, page or act on. Built from the same `Table`
 
 <div className="sb-ds-doc-section">
 
-## Footer
+## Stateless
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>The footer states the range, and its inset matches the cells. A Static table never pages, so the footer belongs here.</>}
+    description={<>The page owns the sort and the page through `sortKey`, `sortOrder` and `page`. With `totalRows`, the rows are already one page from a server and the footer counts against the total.</>}
 >
 
-<Canvas of={DynamicTableStories.Footer} />
+<Canvas of={DynamicTableStories.Stateless} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Body states
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Every state keeps the head row, so the columns still say what will appear. Empty, no results, loading and error swap the body for one message row; refreshing keeps the rows at the loading opacity under a spinner.</>}
+>
+
+<Canvas of={DynamicTableStories.States} />
 
 </DocsCanvasShell>
 
@@ -76,10 +91,70 @@ A table people sort, filter, select, page or act on. Built from the same `Table`
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>With no rows — a cleared filter, a new account — the header stays and `emptyState` takes the body as one message row.</>}
+    description={<>With no rows, a cleared filter or a new account, `emptyView` takes the body as one message row.</>}
 >
 
 <Canvas of={DynamicTableStories.Empty} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Selection and the bulk bar
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>A checkbox column as wide as the row is tall, with select-all in the head. While rows are selected, `TableBulkActions` replaces the Section toolbar with the count, up to three actions, an overflow menu and Clear selection.</>}
+>
+
+<Canvas of={DynamicTableStories.Selection} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sticky header and frozen column
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>The head row stays pinned inside the table's own scroll region. The frozen column sits on an opaque surface and draws a stronger divider while the table scrolls sideways.</>}
+>
+
+<Canvas of={DynamicTableStories.StickyHeaderAndFrozenColumn} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Widths
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>Under 720 the table scrolls sideways instead of squeezing. Wider, the first column fills the room and the rest size to their content.</>}
+>
+
+<Canvas of={DynamicTableStories.Widths} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sortable head cells
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>A press asks for ascending, then descending, then no sort. The arrow shows on hover and focus, and a sorted column keeps it.</>}
+>
+
+<Canvas of={DynamicTableStories.SortableHeadCells} />
 
 </DocsCanvasShell>
 
@@ -137,7 +212,10 @@ rows, select some for a bulk action, or page through a long result. Use
 2. **Sort arrow.** 12 tall; hidden until hover or focus, kept once sorted.
 3. **Row.** Cells in a band, with hover and selected grounds.
 4. **Footer.** States the range on a table that pages.
-5. **Message row.** The empty state, spanning every column.
+5. **Message row.** The empty, no results, loading and error states, spanning every column.
+6. **Checkbox column.** With `isSelectable`: as wide as the row is tall, select-all in the head.
+7. **Bulk bar.** `TableBulkActions`, in the Section header's toolbar while rows are selected.
+8. **Frozen column.** With `isFrozen`: an opaque first column with a stronger divider while scrolled sideways.
 
 ### States
 
@@ -177,9 +255,15 @@ rows, select some for a bulk action, or page through a long result. Use
 
 ## Best practices
 
-- **Sorting is not built into `Table`.** A sortable column is a `HeadCell` with `isSortable`, `sort` and `onSort`; the consuming page holds the sort state and passes already-ordered `rows`.
-- **No single component yet.** Selection with bulk actions, a frozen column and expanding rows are documented in Figma but have no code component of their own. `PatternTable` carries the sticky header and column, paging and the empty state.
-- **The footer states the range** — `1–3 of 3` — and sits only on tables that page.
+- **A column sorts by its cells' `key`.** Give a date cell a sortable key (`20261024`) and its readable text as `content`.
+- **Stateful or stateless.** Leave the sort and page alone and the table holds them. Pass `sortKey` and `sortOrder`, or `page`, and the page owns them: the table reports a press through `onSort` or `onSetPage` and draws what it is given.
+- **Server paging.** With `totalRows`, `rows` is the current page only, and the footer counts against `totalRows`.
+- **States.** `isLoading` and an empty `rows` pick `loading`, `refreshing` and `empty` on their own. Name `no results` and `error` with `state`, and word them with `noResultsView` and `errorView`.
+- **The footer states the range**, `1–25 of 340`, and shows only on a table that pages.
+- **Selection reports keys.** `isSelectable` adds the checkbox column, and `onSelectionChange` returns every selected row's `key`. Select-all covers the rows on the current page.
+- **The bulk bar is the Section toolbar's selected state.** Swap the Section's `toolbar` for `TableBulkActions` while rows are selected. The table never draws a toolbar of its own.
+- **Pin the head row with `stickyHeader` and `maxHeight`.** Only a bounded region scrolls, so the head row needs a height to pin within.
+- **Freeze with `isFrozen`.** The first column stays put, and with checkboxes the title column beside them stays put too.
 
 </div>
 
@@ -208,7 +292,7 @@ rows, select some for a bulk action, or page through a long result. Use
 - **Focus is a ring.** The ring is inset in the cell and is at least 3:1 on the surface; focus never changes the fill.
 - **The arrow is decorative.** The sort state is in `aria-sort`, so color and the arrow never carry it alone.
 - **A disabled row is announced.** It is `aria-disabled` and takes no pointer events.
-- **Name a row-select control.** Use a checkbox with its own `aria-label`; the column heading does not name it.
+- **Row selection is named and announced.** Each checkbox is "Select row N" and the head's is "Select all rows", mixed when only some rows are selected; a status says how many are selected, from the first one.
 
 </div>
 
@@ -219,7 +303,7 @@ rows, select some for a bulk action, or page through a long result. Use
 - For a grid people only read, use the Static table.
 - For records that nest, use the Tree table.
 - For splitting a long result set across pages, use `Pagination`.
-- For a row-select control, use `Checkbox` with an `aria-label` — the column heading does not name it.
+- For the bar that acts on selected rows, use `TableBulkActions` in the Section header.
 
 </div>
 

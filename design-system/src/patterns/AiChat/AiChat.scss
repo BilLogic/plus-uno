@@ -48,11 +48,6 @@
     box-shadow: var(--ds-shadow-overlay);
 }
 
-.plus-ai-chat__links {
-    margin: 0;
-    padding-inline-start: var(--pad-x-md);
-}
-
 // Full screen: the whole window, above the Frame and below a Modal.
 .plus-ai-chat__fullscreen {
     position: fixed;
@@ -125,4 +120,11 @@
     display: flex;
     flex-direction: column;
     gap: var(--stack-sm);
+}
+
+.plus-ai-chat__disclaimer {
+    margin: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+    text-align: center;
 }

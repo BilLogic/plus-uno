@@ -82,6 +82,7 @@ export default {
         storageKey: { control: false, table: { disable: true } },
         panelLabel: { control: false, table: { disable: true } },
         onModeChange: { control: false, table: { disable: true } },
+        onFeedback: { control: false, table: { disable: true } },
     },
 };
 
@@ -284,6 +285,59 @@ export const ModalLeavesThePopupOpen = {
     }),
 };
 
+/**
+ * The trust marks: every answer carries the AI icon (once, from AiMessage),
+ * and the fallibility line sits once under the prompt input, not per message.
+ */
+export const TrustMarks = {
+    parameters: { docs: { height: DOCS_HEIGHT } },
+    play: async ({ canvasElement }) => withTestViewport(1440, HEIGHT, async () => {
+        const p = parts(canvasElement);
+        await userEvent.click(p.fab());
+        await waitFor(() => expect(p.popup()).not.toBeNull());
+        const popup = within(p.popup());
+        const line = popup.getByText('AI can make mistakes. Check important info.');
+        const input = popup.getByRole('textbox', { name: 'Message to AI chat' });
+        await expect(
+            input.compareDocumentPosition(line) & Node.DOCUMENT_POSITION_FOLLOWING,
+            'the line sits under the prompt input',
+        ).toBeTruthy();
+        await userEvent.type(input, 'Hello there{Enter}');
+        await waitFor(() => expect(popup.getByText(/You asked: "Hello there"/)).toBeInTheDocument());
+        const reply = popup.getByText(/You asked: "Hello there"/).closest('.plus-ai-chat__message');
+        await expect(within(reply).getAllByRole('img', { name: 'AI' }), 'one AI icon per answer').toHaveLength(1);
+        await expect(popup.getAllByText('AI can make mistakes. Check important info.'), 'said once').toHaveLength(1);
+        const rating = within(reply).getByRole('group', { name: 'Rate this answer' });
+        await userEvent.click(within(rating).getByRole('button', { name: 'Good answer' }));
+        await expect(within(rating).getByRole('button', { name: 'Good answer' })).toHaveAttribute('aria-pressed', 'true');
+        await expect(within(reply).getByRole('status')).toHaveTextContent('Thanks. Marked as a good answer.');
+    }),
+};
+
+const SOURCES = [
+    { title: 'Session notes, Oct 24', href: '#session-1024', type: 'Session' },
+    { title: 'Ava Thompson', href: '#student-ava', type: 'Student' },
+    { title: 'Attendance report', href: '#report-attendance', type: 'Report' },
+    { title: 'Grade 7 · Math', href: '#class-g7', type: 'Class' },
+];
+
+/** A reply that drew on records lists them under the message. */
+export const RepliesWithSources = {
+    args: { respond: async (text) => ({ text: `About "${text}": Ava attended 12 of 14 sessions.`, sources: SOURCES }) },
+    parameters: { docs: { height: DOCS_HEIGHT } },
+    play: async ({ canvasElement }) => withTestViewport(1440, HEIGHT, async () => {
+        const p = parts(canvasElement);
+        await userEvent.click(p.fab());
+        await waitFor(() => expect(p.popup()).not.toBeNull());
+        const popup = within(p.popup());
+        await userEvent.type(popup.getByRole('textbox', { name: 'Message to AI chat' }), 'Ava{Enter}');
+        const list = await popup.findByRole('list', { name: 'Sources' });
+        await expect(within(list).getAllByRole('link')).toHaveLength(3);
+        await userEvent.click(popup.getByRole('button', { name: 'Show 1 more source' }));
+        await expect(within(list).getAllByRole('link')).toHaveLength(4);
+    }),
+};
+
 /* ------------------------------------------- the Storybook docs' agent */
 
 const DOCS_ENTRIES = buildDocsEntries({
@@ -306,7 +360,7 @@ const DOCS_PANEL_KEY = 'plus-frame-panel-storybook';
 
 /**
  * The docs' floating button with the AI agent it opens, answered by the
- * docs-agent function (faked here), with the search's links under the answer.
+ * docs-agent function (faked here), with the search's pages as the answer's sources.
  * Open from the button, ask, follow the link, clear, move to the Panel and
  * back, close.
  */

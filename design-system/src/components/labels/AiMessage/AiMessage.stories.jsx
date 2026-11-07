@@ -1,5 +1,5 @@
 import React from 'react';
-import { expect, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import AiMessage, { AI_MESSAGE_STATUSES } from './AiMessage';
 
@@ -85,4 +85,47 @@ WithParts.play = async ({ canvasElement }) => {
 export const Interactive = {
     args: { text: REPLY, status: 'complete', typeOut: false },
     render: (args) => <AiMessage {...args} />,
+};
+
+const SOURCES = [
+    { title: 'Session notes, Oct 24', href: '#session-1024', type: 'Session' },
+    { title: 'Ava Thompson', href: '#student-ava', type: 'Student' },
+    { title: 'Attendance report', href: '#report-attendance', type: 'Report' },
+    { title: 'Grade 7 · Math', href: '#class-g7', type: 'Class' },
+    { title: 'Tutor handbook', href: 'https://example.com/handbook', type: 'Guide' },
+];
+
+/** What the answer read: title links with their type, folded past three. */
+export const WithSources = {
+    render: () => <AiMessage text="Ava attended 12 of 14 sessions this term, and her last two were in Grade 7 · Math." sources={SOURCES} />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const list = canvas.getByRole('list', { name: 'Sources' });
+        await expect(within(list).getAllByRole('listitem')).toHaveLength(3);
+        const toggle = canvas.getByRole('button', { name: 'Show 2 more sources' });
+        await userEvent.click(toggle);
+        await expect(within(list).getAllByRole('listitem')).toHaveLength(5);
+        await expect(canvas.getByRole('button', { name: 'Show fewer sources' })).toHaveAttribute('aria-expanded', 'true');
+    },
+};
+
+/** Thumbs up and down under a finished answer; thumbs down asks for an optional comment. */
+export const WithFeedback = {
+    render: () => <AiMessage text="Ava attended 12 of 14 sessions this term." onFeedback={() => {}} />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const group = canvas.getByRole('group', { name: 'Rate this answer' });
+        const up = within(group).getByRole('button', { name: 'Good answer' });
+        const down = within(group).getByRole('button', { name: 'Bad answer' });
+        await userEvent.click(up);
+        await expect(up).toHaveAttribute('aria-pressed', 'true');
+        await expect(canvas.getByRole('status')).toHaveTextContent('Thanks. Marked as a good answer.');
+        await userEvent.click(down);
+        await expect(up).toHaveAttribute('aria-pressed', 'false');
+        await expect(down).toHaveAttribute('aria-pressed', 'true');
+        const field = await within(document.body).findByRole('textbox', { name: /What went wrong/ });
+        await expect(field).toBeVisible();
+        await userEvent.click(within(document.body).getByRole('button', { name: 'Skip' }));
+        await waitFor(() => expect(within(document.body).queryByRole('textbox', { name: /What went wrong/ })).toBeNull());
+    },
 };

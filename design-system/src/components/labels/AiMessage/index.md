@@ -3,13 +3,13 @@
 
 # AiMessage
 
-An assistant reply. The content is `text`, or `parts` when a reply mixes text with other content: a part is `{ type: 'text', text }` or any other `{ type, ... }`, which `renderPart` draws. - `status="complete"` is a finished message. - `status="streaming"` is text still arriving: a caret follows the last character and the message is marked busy for assistive technology. - `status="thinking"` is the typing indicator, before any text exists.
+An assistant reply, marked as AI by the small AI icon at its start (named "AI" for assistive technology), so no answer reads as a person's. The content is `text`, or `parts` when a reply mixes text with other content: a part is `{ type: 'text', text }` or any other `{ type, ... }`, which `renderPart` draws. - `status="complete"` is a finished message. - `status="streaming"` is text still arriving: a caret follows the last character and the message is marked busy for assistive technology. - `status="thinking"` is the typing indicator, before any text exists. `sources` lists what a finished answer read, under the message: an answer that draws on records always shows them. `onFeedback` puts thumbs up and down under a finished answer; `feedback` holds the rating when the page owns it.
 
 **Import:** `import { AiMessage } from '@/components';`
 
 **Source:** `design-system/src/components/labels/AiMessage/AiMessage.jsx`
 
-**Stories:** `design-system/src/components/labels/AiMessage/AiMessage.stories.jsx` — Message, Streaming, TypingIndicator, TypedOut, WithParts, Interactive
+**Stories:** `design-system/src/components/labels/AiMessage/AiMessage.stories.jsx` — Message, Streaming, TypingIndicator, TypedOut, WithParts, Interactive, WithSources, WithFeedback
 
 **Storybook page:** `design-system/src/components/labels/AiMessage/AiMessage.mdx`
 
@@ -22,17 +22,23 @@ An assistant reply. The content is `text`, or `parts` when a reply mixes text wi
 | `status` | enum | `'complete'` | `complete` is finished, `streaming` is text still arriving, `thinking` is the typing indicator. |
 | `typeOut` | bool | `false` | Types a finished text out character by character, as a reply that has just arrived. |
 | `renderPart` | func | — | Draws a part that is not text: `(part, index) => node`. |
+| `sources` | arrayOf (required) | — | What a finished answer read: one `{ title, href, type }` per source, listed under the message. |
+| `linkTarget` | string | — | Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`. |
+| `onFeedback` | func | — | — |
+| `feedback` | enum | — | The rating, when the page owns it: `up`, `down` or null. |
 | `className` | string | — | — |
 
 ## Variants
 
 **`status`** — `complete` · `streaming` · `thinking`
 
+**`feedback`** — `up` · `down`
+
 Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-text` · `--ds-text-subtle` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-easing-standard` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-small` · `--ds-text` · `--ds-text-subtle` · `--heading-xxsmall` · `--icon-md` · `--inline-md` · `--inline-sm` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-easing-standard` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/labels/AiMessage/AiMessage.scss`. Override these through the token layer, never with a literal.
 

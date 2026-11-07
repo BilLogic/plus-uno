@@ -1,117 +1,181 @@
 import React from 'react';
-import { expect, within } from 'storybook/test';
-import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
-import { TableRow, TableCell, HeadCell } from '@/components/text-and-data-display/Table';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { TreeTable } from '@/components/text-and-data-display/Table';
+import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
 
 /**
  * The Tree table: records nested up to three levels, built in Figma from
- * `_Tree row`. No code component draws the nesting or the expand/collapse
- * behavior yet — this page composes the indentation from the shared
- * `TableRow`/`TableCell` parts the Static and Dynamic tables already use, so
- * the one real implementation stays one implementation. The chevron here is
- * static; wiring it to actually collapse a branch is unbuilt.
+ * `_Tree row`. `TreeTable` draws it on the `PatternTable` shell with the
+ * shared `TableRow` and `TableCell` parts, and follows the WAI-ARIA treegrid
+ * pattern for the keyboard.
  */
 
 export default {
     title: 'Components/Text and data display/Tree table',
+    component: TreeTable,
     tags: ['!dev', '!autodocs'],
     parameters: {
         docs: {
             description: {
                 component:
-                    'Records that nest, up to three levels. No code component owns the nesting yet — this page shows the indentation composed from the shared `_Table` parts, the same parts the Static and Dynamic tables use.'
+                    'Records that nest, up to three levels. Each level indents one step and keeps every column. The chevron opens a parent; a parent with `hasChildren` and no `children` loads them through `loadChildren`. The table is one tab stop, and the arrow keys move, open and close rows.'
             }
         }
+    },
+    argTypes: {
+        head: { control: 'object', description: 'One `{ key, content, width, align }` per column', table: { category: 'Content' } },
+        items: { control: 'object', description: 'One `{ id, cells, children, hasChildren, count }` per row', table: { category: 'Content' } },
+        label: { control: 'text', table: { category: 'Content' } },
+        emptyMessage: { control: 'text', table: { category: 'Content' } },
+        loadChildren: { control: false, table: { category: 'Behavior' } },
+        shouldExpandOnClick: { control: 'boolean', table: { category: 'Behavior' } },
+        expandedIds: { control: false, table: { category: 'Behavior' } },
+        defaultExpandedIds: { control: 'object', table: { category: 'Behavior' } },
+        onExpandedChange: { control: false, table: { category: 'Behavior' } },
+        size: { control: 'inline-radio', options: [32, 40, 48], table: { category: 'Appearance' } },
+        className: { control: false, table: { disable: true, category: 'Development' } },
+        testId: { control: false, table: { disable: true, category: 'Development' } }
     }
 };
 
-const TreeCell = ({ depth, expandable, children }) => (
-    <TableCell
-        emphasis="title"
-        leading={expandable ? <i className="fa-solid fa-chevron-down" aria-hidden="true" /> : null}
-        style={{ paddingLeft: `calc(var(--size-table-cell-pad-x) + ${depth} * var(--space-125))` }}
-    >
-        {children}
-    </TableCell>
-);
+const head = {
+    cells: [
+        { key: 'name', content: 'Name' },
+        { key: 'type', content: 'Type' },
+        { key: 'sessions', content: 'Sessions', align: 'number' }
+    ]
+};
 
-const ROWS = [
-    { depth: 0, expandable: true, name: 'Algebra I', sessions: '12' },
-    { depth: 1, expandable: true, name: 'Linear equations', sessions: '5' },
-    { depth: 2, expandable: false, name: 'Solving for x', sessions: '2' },
-    { depth: 2, expandable: false, name: 'Graphing a line', sessions: '3' },
-    { depth: 1, expandable: false, name: 'Quadratics', sessions: '7' },
-    { depth: 0, expandable: true, name: 'Geometry', sessions: '9' }
+const node = (id, name, type, sessions, more = {}) => ({
+    id,
+    cells: [{ content: name }, { content: type }, { content: String(sessions) }],
+    ...more
+});
+
+const items = [
+    node('lincoln', 'Lincoln Middle', 'School', 54, {
+        count: 3,
+        children: [
+            node('g7', 'Grade 7 · Math', 'Class', 27, {
+                count: 2,
+                children: [node('ava', 'Ava Thompson', 'Student', 12), node('sofia', 'Sofia Ramirez', 'Student', 15)]
+            }),
+            node('g8', 'Grade 8 · Math', 'Class', 19, { children: [] }),
+            node('g6', 'Grade 6 · Reading', 'Class', 8, {
+                children: [node('marcus', 'Marcus Lee', 'Student', 8)]
+            })
+        ]
+    }),
+    node('roosevelt', 'Roosevelt K-8', 'School', 31, { hasChildren: true })
 ];
 
-export const Overview = () => (
-    <div className="plus-table-wrapper">
-        <div className="plus-table-scroll">
-            <table className="plus-table plus-table-40" data-testid="tree-table">
-                <thead>
-                    <tr>
-                        <HeadCell label="Topic" width="60%" />
-                        <HeadCell label="Sessions" align="number" width="40%" />
-                    </tr>
-                </thead>
-                <tbody>
-                    {ROWS.map((row) => (
-                        <TableRow key={row.name}>
-                            <TreeCell depth={row.depth} expandable={row.expandable}>{row.name}</TreeCell>
-                            <TableCell align="number">{row.sessions}</TableCell>
-                        </TableRow>
-                    ))}
-                </tbody>
-            </table>
-        </div>
-    </div>
-);
+const row = (canvas, name) => canvas.getByText(name).closest('tr');
 
-/** Depth sets indentation; a branch's title cell carries the expand chevron. */
-Overview.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const table = canvas.getByTestId('tree-table');
-    const leaf = within(table).getByText('Solving for x').closest('td');
-    const root = within(table).getByText('Algebra I').closest('td');
-    const leafPad = parseFloat(getComputedStyle(leaf).paddingLeft);
-    const rootPad = parseFloat(getComputedStyle(root).paddingLeft);
-    await expect(leafPad, 'a depth-2 row indents further than depth-0').toBeGreaterThan(rootPad);
-    await expect(root.querySelector('.fa-chevron-down')).not.toBeNull();
-    await expect(leaf.querySelector('.fa-chevron-down')).toBeNull();
+export const Overview = {
+    args: { head, items, label: 'Schools', defaultExpandedIds: ['lincoln', 'g7', 'g8'] },
+    parameters: { docs: { description: { story: 'Each level indents one step and keeps the columns. A parent shows its count; an open parent with nothing in it shows a message row at the child level.' } } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const grid = canvas.getByRole('treegrid', { name: 'Schools' });
+        await expect(grid).toBeVisible();
+        const school = row(canvas, 'Lincoln Middle');
+        const student = row(canvas, 'Ava Thompson');
+        await expect(school).toHaveAttribute('aria-level', '1');
+        await expect(school).toHaveAttribute('aria-expanded', 'true');
+        await expect(student).toHaveAttribute('aria-level', '3');
+        await expect(student).not.toHaveAttribute('aria-expanded');
+        const left = (el) => el.querySelector('.plus-table-cell-text').getBoundingClientRect().left;
+        const step = tokenLength(canvasElement, '--table-indent');
+        await expect(left(row(canvas, 'Grade 7 · Math')) - left(school), 'one step per level').toBeCloseTo(step, 0);
+        await expect(left(student) - left(school), 'two steps at level 3').toBeCloseTo(step * 2, 0);
+        const chevron = school.querySelector('.plus-tree-table-toggle i');
+        await expect(px(getComputedStyle(chevron).fontSize), 'the chevron is 12').toBe(tokenLength(canvasElement, '--icon-sm'));
+        const hit = school.querySelector('.plus-tree-table-toggle').getBoundingClientRect();
+        await expect(hit.width, 'in a 24 hit area').toBe(tokenLength(canvasElement, '--item-height-sm'));
+        await expect(canvas.getByText('Nothing in here yet')).toBeVisible();
+    }
 };
 
-const treeRow = (canvasElement, name) => within(canvasElement).getByText(name).closest('tr');
+const loadChildren = (item) => new Promise((resolve) => {
+    setTimeout(() => resolve([
+        node(`${item.id}-k`, 'Kindergarten · Reading', 'Class', 12),
+        node(`${item.id}-g5`, 'Grade 5 · Math', 'Class', 19)
+    ]), 400);
+});
 
-/** Rest: a row is clear, its title cell is semibold and the chevron sits in the leading slot. */
+export const LoadingChildren = {
+    args: { head, items, label: 'Schools', loadChildren },
+    parameters: { docs: { description: { story: 'A parent with `hasChildren` and no `children` loads them the first time it opens. Until they arrive, the chevron turns into a spinner and a loading message row sits under the parent.' } } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const school = row(canvas, 'Roosevelt K-8');
+        await userEvent.click(school.querySelector('.plus-tree-table-toggle'));
+        await expect(school).toHaveAttribute('aria-busy', 'true');
+        await waitFor(() => expect(row(canvas, 'Grade 5 · Math')).toHaveAttribute('aria-level', '2'), { timeout: 3000 });
+        await expect(school).not.toHaveAttribute('aria-busy');
+    }
+};
+
+export const Keyboard = {
+    args: { head, items, label: 'Schools' },
+    parameters: { docs: { description: { story: 'The treegrid is one tab stop. Down and Up move between rows, Home and End jump to the ends. Right opens a closed parent, then moves into it; Left closes an open parent, then moves out to its parent. Enter toggles. A focused row draws a ring, never a fill.' } } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.tab();
+        const school = row(canvas, 'Lincoln Middle');
+        await expect(school).toHaveFocus();
+        await expect(getComputedStyle(school).outlineStyle, 'focus is a ring').toBe('solid');
+        await userEvent.keyboard('{ArrowRight}');
+        await expect(school).toHaveAttribute('aria-expanded', 'true');
+        await userEvent.keyboard('{ArrowRight}');
+        await expect(row(canvas, 'Grade 7 · Math')).toHaveFocus();
+        await userEvent.keyboard('{End}');
+        await expect(row(canvas, 'Roosevelt K-8')).toHaveFocus();
+        await userEvent.keyboard('{Home}');
+        await userEvent.keyboard('{ArrowDown}');
+        await expect(row(canvas, 'Grade 7 · Math')).toHaveFocus();
+        await userEvent.keyboard('{ArrowLeft}');
+        await expect(school).toHaveFocus();
+        await userEvent.keyboard('{ArrowLeft}');
+        await expect(school).toHaveAttribute('aria-expanded', 'false');
+        await userEvent.keyboard('{Enter}');
+        await expect(school).toHaveAttribute('aria-expanded', 'true');
+    }
+};
+
+export const ExpandOnRowPress = {
+    args: { head, items, label: 'Schools', shouldExpandOnClick: true },
+    parameters: { docs: { description: { story: 'With `shouldExpandOnClick` a press anywhere on a parent row opens it. Use it only on rows without controls: a press on a control inside the row stays the control\'s own.' } } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const school = row(canvas, 'Lincoln Middle');
+        await userEvent.click(within(school).getByText('School'));
+        await expect(school).toHaveAttribute('aria-expanded', 'true');
+    }
+};
+
+/** Rest: rows are clear; a parent carries the chevron and a leaf keeps the empty box. */
 export const Rest = {
-    render: () => <Overview />,
+    args: { head, items, label: 'Schools', defaultExpandedIds: ['lincoln'] },
     play: async ({ canvasElement }) => {
-        const row = treeRow(canvasElement, 'Algebra I');
-        await expect(getComputedStyle(row).backgroundColor).toBe('rgba(0, 0, 0, 0)');
-        await expect(row.querySelector('.fa-chevron-down')).not.toBeNull();
-    },
+        const canvas = within(canvasElement);
+        const parent = row(canvas, 'Lincoln Middle');
+        await expect(parent.querySelector('.plus-tree-table-toggle--expanded i')).not.toBeNull();
+        const leafToggle = row(canvas, 'Grade 7 · Math').querySelector('.plus-tree-table-toggle');
+        await expect(leafToggle).not.toBeNull();
+        await expect(getComputedStyle(parent).backgroundColor).toBe('rgba(0, 0, 0, 0)');
+    }
 };
 
-/** Hovered: the tree table has no `hover` class, so a row under the pointer does not change. */
-export const Hovered = {
-    render: () => <Overview />,
-    play: async ({ canvasElement }) => {
-        await expectNoStateChange(treeRow(canvasElement, 'Linear equations'), ':hover', 'tree row');
-    },
-};
-
-/** Pressed: a row is not a control, so a press does not change it either. */
-export const Pressed = {
-    render: () => <Overview />,
-    play: async ({ canvasElement }) => {
-        await expectNoStateChange(treeRow(canvasElement, 'Linear equations'), ':active', 'tree row');
-    },
-};
-
-/** Focused: nothing in the tree table takes focus yet; the chevron is static. */
+/** Focused: the focused row draws the 2px ring, inset on the row. */
 export const Focused = {
-    render: () => <Overview />,
+    args: { head, items, label: 'Schools' },
     play: async ({ canvasElement }) => {
-        await expectNotAControl(treeRow(canvasElement, 'Algebra I'), 'tree row');
-    },
+        const canvas = within(canvasElement);
+        await userEvent.tab();
+        const parent = row(canvas, 'Lincoln Middle');
+        await expect(parent).toHaveFocus();
+        await expect(getComputedStyle(parent).outlineStyle).toBe('solid');
+        await expect(getComputedStyle(parent).outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+    }
 };
