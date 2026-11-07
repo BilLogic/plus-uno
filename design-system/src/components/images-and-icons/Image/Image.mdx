@@ -1,7 +1,14 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as ImageStories from './Image.stories.jsx';
-import { DocsCanvasShell, DocsTable, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Image } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -39,9 +46,7 @@ script watching for the change.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>`fixed` keeps the image's natural size; `fluid` scales it to fill its container.</>}>
-    <Canvas of={ImageStories.Sizes} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={ImageStories.Sizes} title="Sizes" description={<>`fixed` keeps the image's natural size; `fluid` scales it to fill its container.</>} />
 
 </div>
 
@@ -49,9 +54,7 @@ script watching for the change.
 
 ## Dark mode
 
-<DocsCanvasShell description={<>`srcDark` swaps in a `source` element the OS picks at the media-query level — no re-render, no flash.</>}>
-    <DsCanvasQuiet of={ImageStories.DarkVariant} />
-</DocsCanvasShell>
+<ComponentExample of={ImageStories.DarkVariant} title="Dark variant" description={<>`srcDark` swaps in a `source` element the OS picks at the media-query level — no re-render, no flash.</>} />
 
 </div>
 
@@ -59,9 +62,7 @@ script watching for the change.
 
 ## State
 
-<DocsCanvasShell description={<>Rest. An image is a picture, not a control, so this is its one state.</>}>
-    <DsCanvasQuiet of={ImageStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={ImageStories.Rest} title="Rest" description={<>Rest. An image is a picture, not a control, so this is its one state.</>} />
 
 </div>
 
@@ -143,9 +144,12 @@ The dark variant is a second `<source>` inside a `<picture>`, matched by
 `prefers-color-scheme`. The browser picks it before paint, so there is no
 flash of the light image on a dark system.
 
-```jsx
-<Image src="/hero-light.png" srcDark="/hero-dark.png" alt="" />
-```
+<DoDontPair
+    doExample={<Image src="https://placehold.co/160x90" srcDark="https://placehold.co/160x90/111/eee" alt="" />}
+    doCaption="One image with a dark variant, picked before paint."
+    dontExample={<Image src="https://placehold.co/160x90" alt="" />}
+    dontCaption="A light image alone on a dark surface."
+/>
 
 ### `alt` defaults to empty, which marks the image decorative.
 
@@ -153,10 +157,23 @@ Set `alt` to real text only when the image carries information nothing else
 on the page already states. A caption beside the image, or a heading above
 it, usually means `alt=""` is correct.
 
+<DoDontPair
+    doExample={<div><Image src="https://placehold.co/160x90" alt="" /><p>Week 3 attendance, by session.</p></div>}
+    doCaption="Empty alt where a caption already says it."
+    dontExample={<div><Image src="https://placehold.co/160x90" alt="Image" /><p>Week 3 attendance, by session.</p></div>}
+    dontCaption="Alt text that says nothing, or repeats the caption beside it."
+/>
 
 ### Size the container, not the image.
 
 Use `fluid` and let the container set the width, so one image works from phone to desktop. Reach for `fixed` only for a picture that must stay at its natural size.
+
+<DoDontPair
+    doExample={<div style={{ width: 160 }}><Image src="https://placehold.co/320x180" alt="" /></div>}
+    doCaption="Fluid, so the container sets the width."
+    dontExample={<div style={{ width: 160 }}><Image src="https://placehold.co/320x180" alt="" size="fixed" /></div>}
+    dontCaption="Fixed in a narrow container: the picture overflows it."
+/>
 
 </div>
 

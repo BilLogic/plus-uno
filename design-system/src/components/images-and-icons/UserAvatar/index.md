@@ -48,6 +48,4 @@ From `design-system/src/components/images-and-icons/UserAvatar/UserAvatar.scss`.
 
 Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

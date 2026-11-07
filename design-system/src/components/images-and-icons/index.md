@@ -7,16 +7,16 @@ authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [AiIcon](AiIcon/index.md) | 5 | ✅ | ✕ | ✅ |
+| [AiIcon](AiIcon/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Avatar](Avatar/index.md) | 10 | ✅ | ✅ | ✅ |
-| [AvatarGroup](AvatarGroup/index.md) | 7 | ✅ | ✕ | ✅ |
+| [AvatarGroup](AvatarGroup/index.md) | 7 | ✅ | ✅ | ✅ |
 | [Illustration](Illustration/index.md) | 5 | ✅ | ✅ | ✅ |
-| [Image](Image/index.md) | 7 | ✅ | ✕ | ✅ |
-| [Object](Object/index.md) | 4 | ✅ | ✕ | ✅ |
+| [Image](Image/index.md) | 7 | ✅ | ✅ | ✅ |
+| [Object](Object/index.md) | 4 | ✅ | ✅ | ✅ |
 | [Tile](Tile/index.md) | 10 | ✅ | ✅ | ✅ |
-| [UserAvatar](UserAvatar/index.md) | 10 | ✅ | ✕ | ✅ |
+| [UserAvatar](UserAvatar/index.md) | 10 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 8/8 (100%) · Correct/incorrect 3/8 (38%) · Accessibility 8/8 (100%)
+**Authored coverage:** When to use 8/8 (100%) · Correct/incorrect 8/8 (100%) · Accessibility 8/8 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

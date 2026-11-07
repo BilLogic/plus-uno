@@ -29,6 +29,4 @@ A row of avatars that overlap, with the rest behind a `+n`. The group owns what 
 
 Same group: `AiIcon` · `Avatar` · `Illustration` · `Image` · `Object` · `Tile` · `UserAvatar`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

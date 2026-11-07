@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as UserAvatarStories from './UserAvatar.stories.jsx';
-import { DocsCanvasShell, DocsTable, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { UserAvatar } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={UserAvatarStories} />
 
@@ -23,9 +30,7 @@ The signed-in user: an initial pill, the name, a role tag for a lead tutor and a
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>A regular tutor with a counter.</>}>
-    <Canvas of={UserAvatarStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={UserAvatarStories.Overview} title="Overview" description={<>A regular tutor with a counter.</>} />
 
 </div>
 
@@ -33,9 +38,7 @@ The signed-in user: an initial pill, the name, a role tag for a lead tutor and a
 
 ## Spacing
 
-<DocsCanvasShell description={<>`compact` is 32 high for the topbar. `default` is padded for table rows.</>}>
-    <DsCanvasQuiet of={UserAvatarStories.Spacing} />
-</DocsCanvasShell>
+<ComponentExample of={UserAvatarStories.Spacing} title="Spacing" description={<>`compact` is 32 high for the topbar. `default` is padded for table rows.</>} />
 
 </div>
 
@@ -43,13 +46,9 @@ The signed-in user: an initial pill, the name, a role tag for a lead tutor and a
 
 ## Content
 
-<DocsCanvasShell description={<>`type="lead tutor"` adds a Lead status tag. Regular tutor and admin show none.</>}>
-    <DsCanvasQuiet of={UserAvatarStories.Types} />
-</DocsCanvasShell>
+<ComponentExample of={UserAvatarStories.Types} title="Types" description={<>`type="lead tutor"` adds a Lead status tag. Regular tutor and admin show none.</>} />
 
-<DocsCanvasShell description={<>`counter` shows the notification count beside the name.</>}>
-    <DsCanvasQuiet of={UserAvatarStories.Counter} />
-</DocsCanvasShell>
+<ComponentExample of={UserAvatarStories.Counter} title="Counter" description={<>`counter` shows the notification count beside the name.</>} />
 
 </div>
 
@@ -57,25 +56,15 @@ The signed-in user: an initial pill, the name, a role tag for a lead tutor and a
 
 ## State
 
-<DocsCanvasShell description={<>Rest. A clickable row shows the pointer and takes a tab stop.</>}>
-    <DsCanvasQuiet of={UserAvatarStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={UserAvatarStories.Rest} title="Rest" description={<>Rest. A clickable row shows the pointer and takes a tab stop.</>} />
 
-<DocsCanvasShell description={<>Hovered. The row takes the interaction fill.</>}>
-    <DsCanvasQuiet of={UserAvatarStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={UserAvatarStories.Hovered} title="Hovered" description={<>Hovered. The row takes the interaction fill.</>} />
 
-<DocsCanvasShell description={<>Focused. A 2px ring for keyboard focus.</>}>
-    <DsCanvasQuiet of={UserAvatarStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={UserAvatarStories.Focused} title="Focused" description={<>Focused. A 2px ring for keyboard focus.</>} />
 
-<DocsCanvasShell description={<>Pressed. Click, Enter and Space each call <code>onClick</code>.</>}>
-    <DsCanvasQuiet of={UserAvatarStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={UserAvatarStories.Pressed} title="Pressed" description={<>Pressed. Click, Enter and Space each call <code>onClick</code>.</>} />
 
-<DocsCanvasShell description={<>Disabled. Dimmed, not focusable, ignores clicks.</>}>
-    <DsCanvasQuiet of={UserAvatarStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={UserAvatarStories.Disabled} title="Disabled" description={<>Disabled. Dimmed, not focusable, ignores clicks.</>} />
 
 
 </div>
@@ -161,13 +150,34 @@ Use `UserAvatar` for the current user's identity in the topbar or in a row that 
 
 `compact` fits the 32 topbar. `default` fits table rows. The name truncates with an ellipsis, at the label maximum width in `compact`, and keeps the full name in its `title`.
 
-```jsx
-<UserAvatar spacing={topbar ? 'compact' : 'default'} name={user.name} firstChar={user.name[0]} type="lead tutor" counterValue={3} />
-```
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><UserAvatar spacing="compact" name="Jane Park" firstChar="J" /></div>}
+    doCaption="Compact in the 32 topbar."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><UserAvatar spacing="default" name="Jane Park" firstChar="J" /></div>}
+    dontCaption="Default, which is too tall for the topbar."
+/>
 
 ### Pass `onClick` to make it clickable.
 
 Without it the avatar is a static line. With it, the row shows the pointer, takes focus, and presses on Enter (keydown) and Space (keyup). When the click opens a menu or navigates, wrap the avatar in the button or link that owns that behavior instead, so the control carries its own name and expanded state.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><UserAvatar name="Jane Park" firstChar="J" onClick={() => {}} /></div>}
+    doCaption="An onClick makes the row a control, with focus and press."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><UserAvatar name="Jane Park" firstChar="J" /></div>}
+    dontCaption="A static row where a click is expected."
+/>
+
+### Show the full name.
+
+The name is what tells two people apart.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><UserAvatar name="Jane Park" firstChar="J" /></div>}
+    doCaption="The full name, with its first letter on the avatar."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><UserAvatar name="JP" firstChar="J" /></div>}
+    dontCaption="Initials as the name, which tell nobody apart."
+/>
 
 </div>
 

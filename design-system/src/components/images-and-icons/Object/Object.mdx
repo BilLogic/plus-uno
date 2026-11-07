@@ -1,7 +1,14 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as ObjectStories from './Object.stories.jsx';
-import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { BugIcon, StatusTag, TaskIcon } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -39,9 +46,7 @@ name in a list, a reference or a title.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Each kind is its own component — `TaskIcon`, `BugIcon`, `IdeaIcon`, `PullRequestIcon`, `ProjectIcon`, `PageIcon` — not a shared component taking a glyph name.</>}>
-    <Canvas of={ObjectStories.Kinds} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={ObjectStories.Kinds} title="Kinds" description={<>Each kind is its own component — `TaskIcon`, `BugIcon`, `IdeaIcon`, `PullRequestIcon`, `ProjectIcon`, `PageIcon` — not a shared component taking a glyph name.</>} />
 
 </div>
 
@@ -49,9 +54,7 @@ name in a list, a reference or a title.
 
 ## Size
 
-<DocsCanvasShell description={<>`12` for inline text; `16` (the default) beside a title.</>}>
-    <DsCanvasQuiet of={ObjectStories.Sizes} />
-</DocsCanvasShell>
+<ComponentExample of={ObjectStories.Sizes} title="Sizes" description={<>`12` for inline text; `16` (the default) beside a title.</>} />
 
 </div>
 
@@ -59,9 +62,7 @@ name in a list, a reference or a title.
 
 ## Content
 
-<DocsCanvasShell description={<>`label=""` marks the glyph decorative, for when the kind is already named beside it.</>}>
-    <DsCanvasQuiet of={ObjectStories.Decorative} />
-</DocsCanvasShell>
+<ComponentExample of={ObjectStories.Decorative} title="Decorative" description={<>`label=""` marks the glyph decorative, for when the kind is already named beside it.</>} />
 
 </div>
 
@@ -88,15 +89,29 @@ swap it for another kind.
 
 </div>
 
-</div>
-
 <div className="sb-ds-doc-section">
 
 ## State
 
-<DocsCanvasShell description={<>Rest. An object icon is a picture, not a control, so this is its one state.</>}>
-    <DsCanvasQuiet of={ObjectStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={ObjectStories.Rest} title="Rest" description={<>Rest. An object icon is a picture, not a control, so this is its one state.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ObjectStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
 
 </div>
 
@@ -159,9 +174,12 @@ thing (a school, a tool, a lesson), use `Tile`. For a bitmap, use `Image`.
 `PageIcon` each draw a fixed glyph. Reach for the one that names the thing,
 rather than a generic component with a glyph prop.
 
-```jsx
-<TaskIcon /> Fix the broken sync
-```
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><TaskIcon label="" /><span>Fix the broken sync</span></div>}
+    doCaption="The Task glyph beside the task name."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><BugIcon label="" /><span>Fix the broken sync</span></div>}
+    dontCaption="The Bug glyph on a task."
+/>
 
 ### Override `label` only when the default name does not fit.
 
@@ -169,10 +187,23 @@ Each kind defaults its accessible name to its kind ("Task", "Bug", …). Set
 `label=""` when the kind is already stated in visible text beside it, so
 assistive technology does not hear it twice.
 
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><TaskIcon label="" /><span>Task: fix the sync</span></div>}
+    doCaption="An empty label when the kind is written beside it."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><TaskIcon /><span>Task: fix the sync</span></div>}
+    dontCaption="Both the default name and the visible kind, so it reads twice."
+/>
 
 ### Keep the glyph at its kind.
 
 Each kind has one glyph. Do not change the glyph or the color to say a status; show the status in text or a Status tag.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><TaskIcon /><span>Fix the sync</span><StatusTag appearance="success">Done</StatusTag></div>}
+    doCaption="The kind stays a Task; the status goes in a Status tag."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><TaskIcon /><BugIcon /><span>Fix the sync</span></div>}
+    dontCaption="A second glyph to hint at a status."
+/>
 
 </div>
 
