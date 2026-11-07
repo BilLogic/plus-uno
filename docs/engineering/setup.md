@@ -411,6 +411,20 @@ npm run check:storybook -- --update           # re-record the a11y baseline
 npx vitest run --project=storybook -t "Name"  # one story, for triage
 ```
 
+## Docs AI agent (Netlify function)
+
+The Storybook docs' AI agent is answered by `netlify/functions/docs-agent`: Gemini on Vertex AI, service account only (ADR-018), with no API-key path. Set these in the Netlify site's environment variables; none of them reaches the browser bundle.
+
+| Variable | Value |
+|---|---|
+| `GEMINI_SA_EMAIL` | the service account's email |
+| `GEMINI_SA_PRIVATE_KEY` | its PKCS8 private key (literal `\n` escapes are fine) |
+| `GEMINI_PROJECT_ID` | the Vertex project, `hcii-plus` |
+| `GEMINI_MODEL` | optional, default `gemini-3.8-flash` |
+| `GEMINI_REGION` | optional, default `global` |
+
+The function signs a JWT with Node's `crypto`, exchanges it for an OAuth token and calls `generateContent`. Its grounding is the generated design-system index, bundled through `included_files` in `netlify.toml`. Tests: `npm run test:scripts`. Without the variables the chat falls back to the docs search.
+
 ## Local Preview
 
 ```bash

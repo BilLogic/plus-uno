@@ -1,0 +1,30 @@
+/**
+ * The docs AI agent's answerer: asks the Netlify function (Gemini on Vertex,
+ * credentials server-side) and, on an error, a 429 (quota or the per-IP rate
+ * limit) or an empty reply, falls back to the docs search and says so. The
+ * links under a model answer come from the search, so they are real pages.
+ */
+
+export const AGENT_ENDPOINT = '/.netlify/functions/docs-agent';
+const FALLBACK_NOTE = 'The AI agent is unavailable right now, so this is a search of the docs instead.';
+
+/**
+ * `search(text) => { text, links }`; `getHistory() => [{ role, text }]` is the
+ * conversation before this question.
+ */
+export const createAgentResponder = ({ fetchFn = (...args) => fetch(...args), search, getHistory = () => [] }) => async (text) => {
+    try {
+        const res = await fetchFn(AGENT_ENDPOINT, {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ question: text, history: getHistory() }),
+        });
+        const data = res.ok ? await res.json() : null;
+        if (data?.text) {
+            const found = await search(text);
+            return { text: data.text, links: found.links ?? [] };
+        }
+    } catch { /* fall through to the search */ }
+    const found = await search(text);
+    return { ...found, text: `${FALLBACK_NOTE} ${found.text}` };
+};

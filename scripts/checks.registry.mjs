@@ -707,7 +707,7 @@ export const CHECKS = [
   },
   {
     name: 'test:scripts',
-    script: 'node --test scripts/*.test.mjs scripts/lib/*.test.mjs scripts/lib/color/*.test.mjs',
+    script: 'node --test scripts/*.test.mjs scripts/lib/*.test.mjs scripts/lib/color/*.test.mjs netlify/functions/docs-agent/*.test.mjs',
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',

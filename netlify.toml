@@ -10,6 +10,20 @@
 [context.production]
   ignore = "test -z \"$INCOMING_HOOK_TITLE\""
 
+# The docs AI agent (netlify/functions/docs-agent). Its grounding is the generated
+# design-system index, bundled with the function. Credentials (GEMINI_SA_EMAIL,
+# GEMINI_SA_PRIVATE_KEY, GEMINI_PROJECT_ID, GEMINI_MODEL) are Netlify environment
+# variables: docs/engineering/setup.md.
+[functions]
+  directory = "netlify/functions"
+
+[functions."docs-agent"]
+  included_files = [
+    "design-system/guidelines/overview.md",
+    "design-system/agent-views/components/index.md",
+    "design-system/agent-views/tokens/tokens.md",
+  ]
+
 [build.environment]
   VITE_STORYBOOK_URL = "https://plus-uno.netlify.app/storybook/"
   # Notion Prototype Marketplace (team catalog — replaces in-app /market UI)

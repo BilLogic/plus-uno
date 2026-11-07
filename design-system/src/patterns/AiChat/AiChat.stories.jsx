@@ -293,14 +293,22 @@ const DOCS_ENTRIES = buildDocsEntries({
     },
 }, ['Button', 'Modal']);
 
+/** The docs-agent function, faked: an answer, or the status a failure answers with. */
+const fakeAgent = (status = 200) => async (url, init) => ({
+    ok: status < 400,
+    status,
+    json: async () => (status < 400 ? { text: `Button is in the context. (${JSON.parse(init.body).question})` } : {}),
+});
+
 const docsHrefFor = (id) => `/?path=/docs/${id}`;
 const DOCS_STORAGE_KEY = `${AI_CHAT_STORAGE_KEY}-storybook`;
 const DOCS_PANEL_KEY = 'plus-frame-panel-storybook';
 
 /**
- * The docs' floating button with the AI agent it opens, answered by a search
- * of the docs. Open from the button, ask, follow the link, clear, move to the
- * Panel and back, close.
+ * The docs' floating button with the AI agent it opens, answered by the
+ * docs-agent function (faked here), with the search's links under the answer.
+ * Open from the button, ask, follow the link, clear, move to the Panel and
+ * back, close.
  */
 export const DocsAgent = {
     tags: ['!autodocs'],
@@ -309,7 +317,7 @@ export const DocsAgent = {
         window.sessionStorage.removeItem(DOCS_STORAGE_KEY);
         window.sessionStorage.removeItem(DOCS_PANEL_KEY);
     },
-    render: () => <DocsAiAgent loadEntries={async () => DOCS_ENTRIES} hrefFor={docsHrefFor} />,
+    render: () => <DocsAiAgent loadEntries={async () => DOCS_ENTRIES} hrefFor={docsHrefFor} fetchFn={fakeAgent()} />,
     play: async () => withTestViewport(1440, HEIGHT, async () => {
         const body = within(document.body);
         const root = () => document.querySelector('.plus-docs-ai');
@@ -325,6 +333,7 @@ export const DocsAgent = {
         await expect(input, 'focus lands in the input').toHaveFocus();
         await userEvent.type(input, 'Where is Button?{Enter}');
         const link = await within(popup()).findByRole('link', { name: 'Button' });
+        await within(popup()).findByText(/Button is in the context/);
         await expect(link, 'the answer links the docs page').toHaveAttribute('href', '/?path=/docs/button--docs');
 
         const names = within(popup()).getAllByRole('button').map((b) => b.getAttribute('aria-label'));
@@ -345,5 +354,27 @@ export const DocsAgent = {
 
         await press(within(popup()), 'Close chat');
         await waitFor(() => expect(popup(), 'Close closes it').toBeNull());
+    }),
+};
+
+/** A 429 from the function (Vertex quota or the rate limit): the chat searches the docs and says so. */
+export const DocsAgentFallback = {
+    tags: ['!autodocs'],
+    parameters: { layout: 'fullscreen' },
+    beforeEach: () => {
+        window.sessionStorage.removeItem(DOCS_STORAGE_KEY);
+        window.sessionStorage.removeItem(DOCS_PANEL_KEY);
+    },
+    render: () => <DocsAiAgent loadEntries={async () => DOCS_ENTRIES} hrefFor={docsHrefFor} fetchFn={fakeAgent(429)} />,
+    play: async () => withTestViewport(1440, HEIGHT, async () => {
+        const body = within(document.body);
+        const root = () => document.querySelector('.plus-docs-ai');
+        const popup = () => root().querySelector('.plus-ai-chat__floating');
+        await userEvent.click(await within(root()).findByRole('button', { name: 'Prototype links' }));
+        await userEvent.click(await body.findByRole('menuitem', { name: 'AI agent' }));
+        await waitFor(() => expect(popup()).not.toBeNull());
+        await userEvent.type(within(popup()).getByRole('textbox', { name: 'Message to AI agent' }), 'Where is Button?{Enter}');
+        await within(popup()).findByText(/unavailable right now, so this is a search/);
+        await expect(await within(popup()).findByRole('link', { name: 'Button' })).toHaveAttribute('href', '/?path=/docs/button--docs');
     }),
 };

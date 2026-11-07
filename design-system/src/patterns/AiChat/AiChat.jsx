@@ -258,7 +258,7 @@ const Launcher = () => {
  * - `variant="storybook"` is the Storybook docs' chat: clear, move to Panel and
  *   close only, with no full screen and no more menu.
  * - The conversation is kept in memory and moves with the mode. There is no
- *   history, and no backend: `respond(text)` returns the reply.
+ *   history, and no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`.
  */
 const AiChat = ({
     variant = 'app',
@@ -281,6 +281,8 @@ const AiChat = ({
         () => initialAiChatState(readAiChatMemory(storageKey), defaultMode, defaultOpen),
     );
     const [messages, setMessages] = useState([]);
+    const messagesRef = useRef(messages);
+    messagesRef.current = messages;
     const [draft, setDraft] = useState('');
     const [loading, setLoading] = useState(false);
     const narrow = useNarrow();
@@ -309,12 +311,13 @@ const AiChat = ({
     const send = useCallback(async (text) => {
         const ticket = pending.current + 1;
         pending.current = ticket;
+        const history = messagesRef.current.map((m) => ({ role: m.role === 'ai' ? 'assistant' : 'user', text: m.text }));
         setMessages((prev) => [...prev, { id: `u${prev.length}-${ticket}`, role: 'user', text }]);
         if (!respond) return;
         setLoading(true);
         let reply;
         try {
-            reply = await respond(text);
+            reply = await respond(text, history);
         } catch {
             reply = null;
         }

@@ -1,8 +1,9 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { AiIcon, IconButton } from '@/components';
 import { AiChat, useAiChat } from '@/patterns';
 import DocsFab from './DocsFab';
+import { createAgentResponder } from './docsAgent';
 import { answerDocsQuery, buildDocsEntries, parseComponentNames } from './docsSearch';
 import './DocsAiAgent.scss';
 
@@ -41,15 +42,17 @@ const AgentAction = () => {
 
 /**
  * The Storybook docs' floating button and the AI agent it opens: `AiChat`
- * in its `storybook` variant, answered by a search of the docs themselves
- * (no model and no key). The chat's own button is left out; the AI agent
+ * in its `storybook` variant, answered by the docs-agent Netlify function
+ * (Gemini on Vertex, credentials server-side) and, when that errors or is
+ * rate limited, by a search of the docs themselves. The chat's own button is left out; the AI agent
  * action in the floating button is the way in.
  *
  * The chat sits over the docs: Move to Panel docks it at the right edge.
  */
-const DocsAiAgent = ({ loadEntries = loadDocsEntries, hrefFor = docsHref }) => {
+const DocsAiAgent = ({ loadEntries = loadDocsEntries, hrefFor = docsHref, fetchFn }) => {
     const loaded = useRef(null);
-    const respond = useCallback(async (text) => {
+    const turns = useRef([]);
+    const search = useCallback(async (text) => {
         loaded.current ??= loadEntries();
         try {
             return answerDocsQuery(text, await loaded.current, { href: hrefFor });
@@ -58,6 +61,10 @@ const DocsAiAgent = ({ loadEntries = loadDocsEntries, hrefFor = docsHref }) => {
             throw error;
         }
     }, [loadEntries, hrefFor]);
+    const respond = useMemo(() => {
+        const answer = createAgentResponder({ fetchFn, search, getHistory: () => turns.current });
+        return (text, history = []) => { turns.current = history; return answer(text); };
+    }, [fetchFn, search]);
 
     return (
         <div className="plus-docs-ai">
@@ -81,6 +88,8 @@ DocsAiAgent.propTypes = {
     loadEntries: PropTypes.func,
     /** `(id, type) => href` for a docs page. */
     hrefFor: PropTypes.func,
+    /** The fetch the agent's function call goes through; the default is the browser's. */
+    fetchFn: PropTypes.func,
 };
 
 export default DocsAiAgent;
