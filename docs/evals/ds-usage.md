@@ -159,3 +159,17 @@ The small default run at `45aeeea59`: three arms, four tasks (`page-from-prd`, `
 - **The harness costs input.** About 47% more input tokens than control for about one more turn, which is the reading that buys the drop in escapes. The lookup arms are measured against this.
 - **Accessibility is measured, not good.** Every arm averages 8 to 13 axe violations a build, almost all `region` (content outside a landmark); the harness does not teach landmarks yet.
 - **The read set is thin.** Most of what agents open goes through shell search and is counted as lookups, so "files read" undercounts; treat it as a floor.
+
+## Lookup arms (2026-11-07)
+
+The lookup run at `6cc39f0d7`: `current`, `lookup` (the five MCP tools) and `lookup-min` (`ds_find` and `ds_get` only), the four default tasks, two runs a cell, sonnet, on the subscription login. 24 builds, no errors.
+
+| Arm | Escapes (8 runs) | Layout from a pattern | Debt left (seeded 6) | Mean input tokens | Mean turns | Mean minutes |
+|---|---|---|---|---|---|---|
+| current | 17 | 3/8 | 5.5 | 533,762 | 14.1 | 1.39 |
+| lookup | 0 | 8/8 | 0 | 586,987 | 24.4 | 1.24 |
+| lookup-min | 10 | 6/8 | 5 | 528,228 | 20.0 | 1.47 |
+
+- **`compare` says delete both**, because the keep rule asks for cheaper runs at equal quality, and neither arm is cheaper: `lookup` uses 10% more input and 10 more turns.
+- **The rule's premise did not hold.** It assumed the baseline already sat at zero escapes. Here `current` left 17 and `lookup` left none, laid out every build from a pattern and paid all the seeded debt, in less wall time. That is a quality gain the rule has no column for, so the verdict waits on a decision rather than deleting the adapters.
+- **Two tools are not enough.** `lookup-min` keeps half the escapes; the gain comes with `ds_tokens`, `ds_guide` and `ds_check` in reach.
