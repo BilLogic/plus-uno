@@ -55,7 +55,8 @@ interactions just because the PRD lists more.
 
 f. **Retrieval proof.** The build ends with a short table in the chat: each
    component, and each token family, the prototype uses, with where its name
-   came from in this run.
+   came from in this run. A name a gate round changes gets its row updated, so
+   the table matches the code that exits.
 
    | Name | Kind | Source |
    |---|---|---|
