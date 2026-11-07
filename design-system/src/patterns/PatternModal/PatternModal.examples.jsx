@@ -1,12 +1,13 @@
 import React from 'react';
-import PatternModal from '@/patterns/PatternModal';
 import { Button, TextField } from '@/components';
+import { Blanket, PatternModal } from '@/patterns';
+import { ScaledPreview } from '@/storybook-docs/lib/scaled-preview.jsx';
 
 /**
  * Live compositions for the Modal page's do and don't pairs. Each is a real
  * PatternModal, held to the width of its card instead of the screen's.
  */
-const fit = { width: '100%', maxWidth: 384 };
+const fit = { width: '100%', maxWidth: 'var(--modal-width-sm)' };
 
 /** Keeps the docs page heading styles off the Modal title: the docs fence canvases by the docs-story class. */
 const Plain = ({ children }) => <div className="docs-story sb-unstyled" style={{ width: '100%' }}>{children}</div>;
@@ -43,46 +44,6 @@ export const ButtonsInBody = () => (
                 <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--modal-inline-sm)' }}>
                     {actions('Save')}
                 </div>
-            </>
-        ))}
-    </PatternModal>
-    </Plain>
-);
-
-/** Two groups: stack-md inside a group, stack-lg between groups. */
-export const GroupedFields = () => (
-    <Plain>
-    <PatternModal title="Create session" style={fit} onClose={() => {}} footer={actions('Create')}>
-        {stack('var(--modal-stack-lg)', (
-            <>
-                {stack('var(--modal-stack-md)', (
-                    <>
-                        {field('School', 'Select a school')}
-                        {field('Teacher', 'Select a teacher')}
-                    </>
-                ))}
-                {stack('var(--modal-stack-md)', (
-                    <>
-                        {field('Session date', 'Tuesday, June 3')}
-                        {field('Session time', '11:00 am')}
-                    </>
-                ))}
-            </>
-        ))}
-    </PatternModal>
-    </Plain>
-);
-
-/** Four fields at one gap read as one long list. */
-export const UngroupedFields = () => (
-    <Plain>
-    <PatternModal title="Create session" style={fit} onClose={() => {}} footer={actions('Create')}>
-        {stack('var(--modal-stack-md)', (
-            <>
-                {field('School', 'Select a school')}
-                {field('Teacher', 'Select a teacher')}
-                {field('Session date', 'Tuesday, June 3')}
-                {field('Session time', '11:00 am')}
             </>
         ))}
     </PatternModal>
@@ -130,39 +91,21 @@ export const TabsAsSteps = () => (
     </Plain>
 );
 
-/** Three short labels that fit on one line. */
-export const FewLabels = () => (
-    <Plain>
-    <PatternModal
-        title="Tutor profile"
-        style={fit}
-        onClose={() => {}}
-        footer={<Button text="Close" spacing="compact" onClick={() => {}} />}
-        tabs={[
-            { key: 'overview', label: 'Overview', content: line('24 sessions this term · 96% attendance') },
-            { key: 'sessions', label: 'Sessions', content: line('Session list') },
-            { key: 'notes', label: 'Notes', content: line('Notes') },
-        ]}
-    />
-    </Plain>
+const SCREEN = { width: 1024, height: 480 };
+
+/** A modal in its Blanket at a 1024 stand-in screen, scaled down to the card. Stage sizes are docs geometry. */
+const atScreen = (height) => (
+    <ScaledPreview {...SCREEN}>
+        <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>
+            <PatternModal title="Move session" height={height} onClose={() => {}} footer={actions('Move session')}>
+                {line('Move Thursday’s session with Ana Ruiz to 4:30 PM?')}
+            </PatternModal>
+        </Blanket>
+    </ScaledPreview>
 );
 
-/** Six long labels run past the modal's width. */
-export const CrowdedLabels = () => (
-    <Plain>
-    <PatternModal
-        title="Tutor profile"
-        style={fit}
-        onClose={() => {}}
-        footer={<Button text="Close" spacing="compact" onClick={() => {}} />}
-        tabs={[
-            { key: 'overview', label: 'Overview', content: line('24 sessions this term · 96% attendance') },
-            { key: 'upcoming', label: 'Upcoming sessions', content: line('Upcoming') },
-            { key: 'past', label: 'Past sessions', content: line('Past') },
-            { key: 'training', label: 'Training progress', content: line('Training') },
-            { key: 'notes', label: 'Notes', content: line('Notes') },
-            { key: 'settings', label: 'Settings', content: line('Settings') },
-        ]}
-    />
-    </Plain>
-);
+/** Do: a short body in a hug modal, as tall as its content. */
+export const HugShortContent = () => atScreen('hug');
+
+/** Don't: the same short body in a fill modal, which sits at the cap. */
+export const FillShortContent = () => atScreen('fill');

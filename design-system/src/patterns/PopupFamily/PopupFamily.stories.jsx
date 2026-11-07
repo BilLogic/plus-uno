@@ -21,19 +21,16 @@ export default {
     argTypes: {
         title: {
             control: 'text',
-            description: 'The Popup title, in Heading/xsmall',
             table: { category: 'Slots' },
         },
         width: {
             control: 'inline-radio',
             options: POPUP_WIDTHS,
-            description: 'The Popup width tier: 320 · 400 · 480',
             table: { category: 'Design' },
         },
         placement: {
             control: 'select',
             options: POPUP_PLACEMENTS,
-            description: 'Where the Popup opens around its trigger; it flips when there is no room',
             table: { category: 'Design' },
         },
     },
@@ -167,6 +164,65 @@ export const Tooltips = {
 };
 
 /** The Popup: pick its width and where it opens; click the trigger. */
+/* ---------------------------------------------------- one value per story */
+
+/** One Popup width tier per story, held open. */
+const popupAt = (width) => (
+    <Stage height={240}>
+        {({ open }) => (
+            <Popup
+                width={width}
+                triggerType="manual"
+                show={open}
+                placement="bottom-start"
+                title="Session notes"
+                trigger={<Button text={`Popup ${width}`} spacing="compact" />}
+            >
+                Notes stay with the session.
+            </Popup>
+        )}
+    </Stage>
+);
+
+export const PopupSmall = { name: 'Popup small', render: () => popupAt('sm') };
+export const PopupMedium = { name: 'Popup medium', render: () => popupAt('md') };
+export const PopupLarge = { name: 'Popup large', render: () => popupAt('lg') };
+
+/** One Flag appearance per story. */
+const flagOf = (appearance, title) => (
+    <FlagGroup containerPosition="static">
+        <Flag appearance={appearance} title={title} show autohide={false}>
+            One or two sentences on what happened and what to do next.
+        </Flag>
+    </FlagGroup>
+);
+
+export const FlagNormal = { name: 'Flag normal', render: () => flagOf('normal', 'Session moved') };
+export const FlagInformation = { name: 'Flag information', render: () => flagOf('information', 'Heads up') };
+export const FlagSuccess = { name: 'Flag success', render: () => flagOf('success', 'Changes saved') };
+export const FlagWarning = { name: 'Flag warning', render: () => flagOf('warning', 'Check your entries') };
+export const FlagError = { name: 'Flag error', render: () => flagOf('error', 'Something went wrong') };
+
+/** Stage geometry for the single Tooltip stories: room above the trigger, and an inset so a wrapped Tooltip stays on screen. */
+const TOOLTIP_STAGE = { height: 136, inset: 120 };
+
+/** One Tooltip per story: one line, and one long enough to wrap. */
+const tooltipOf = (text) => (
+    <Stage height={TOOLTIP_STAGE.height} style={{ display: 'flex', alignItems: 'flex-end', paddingLeft: TOOLTIP_STAGE.inset }}>
+        {({ open }) => (
+            <Tooltip show={open} placement="top" text={text}>
+                <Button text="Share" spacing="compact" />
+            </Tooltip>
+        )}
+    </Stage>
+);
+
+export const TooltipOneLine = { name: 'Tooltip', render: () => tooltipOf('Copy link') };
+export const TooltipWrapped = {
+    name: 'Tooltip, wrapped',
+    render: () => tooltipOf("Copies the session link so you can paste it into a message to the student's family"),
+};
+
 export const Interactive = {
     args: { title: 'Session notes', width: 'md', placement: 'bottom-start' },
     render: (args) => (

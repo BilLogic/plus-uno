@@ -97,27 +97,22 @@ export default {
         frame: {
             control: 'select',
             options: ['default', 'focused'],
-            description: 'default: the app frame with the sidebar and the breadcrumb. focused: one task, with no sidebar.',
             table: { category: 'Design', defaultValue: { summary: 'default' } },
         },
         title: {
             control: 'text',
-            description: 'The page title. In a focused page it is the visible title in the Page header row.',
             table: { category: 'Slots' },
         },
         backLabel: {
             control: 'text',
-            description: 'Focused: the Back button label.',
             table: { category: 'Slots', defaultValue: { summary: 'Back' } },
         },
         closeLabel: {
             control: 'text',
-            description: 'Focused: the accessible name of the Close button.',
             table: { category: 'Slots', defaultValue: { summary: 'Close' } },
         },
         sidebarHidden: {
             control: 'boolean',
-            description: 'Leaves out the sidebar and its toggle.',
             table: { category: 'Design', defaultValue: { summary: 'false' } },
         },
         drawer: { table: { disable: true } },
@@ -305,6 +300,13 @@ export const Focused = {
     },
 };
 
+/** The focused page with no play, for the docs page's frames: the play above moves focus and presses Back and Close. Hidden from the sidebar. */
+export const FocusedStill = {
+    args: Focused.args,
+    render: Focused.render,
+    parameters: { docs: { disable: true } },
+};
+
 /** A read-only task drops the footer; with no way back, Close alone leaves the task. */
 export const FocusedReadOnly = {
     args: { title: 'Session report · Jordan · Oct 24', onClose: fn() },
@@ -365,6 +367,12 @@ export const WithDrawer = {
         await userEvent.click(within(canvasElement).getByRole('button', { name: 'Cancel' }));
         await waitFor(() => expect(within(canvasElement).queryByRole('dialog'), 'closed through the page\'s own state').toBeNull());
     },
+};
+
+/** The same open drawer with no play, for the docs page's frame: the play above closes it. Hidden from the sidebar. */
+export const WithDrawerStill = {
+    render: WithDrawer.render,
+    parameters: { docs: { disable: true } },
 };
 
 /** With no `drawer` prop the template draws no drawer. */

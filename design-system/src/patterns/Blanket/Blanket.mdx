@@ -1,7 +1,21 @@
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as BlanketStories from './Blanket.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    DrawerWithConfirm,
+    DrawerWithUnrelatedModal,
+    ModalWithConfirm,
+    ThirdOverlay,
+    ConfirmSmallDo,
+    ConfirmSmallDont,
+} from './Blanket.examples.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={BlanketStories} />
 
@@ -17,120 +31,68 @@ The Blanket is the full-screen layer that holds the blanket fill and the one lay
 
 <div className="sb-ds-doc-section">
 
-### Purpose
+## Appearance
+
+<ComponentExample of={BlanketStories.Inline} title="Modal in a Blanket" description="A modal centered in the blanket at the 768 stand-in screen." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Size and layout
+
+<ComponentExample of={BlanketStories.Pads} title="Pads" description="Pad 16 at the sides and 64 above and below, shaded here; under 640 tall the vertical pad drops to 24." />
+
+<ComponentExample of={BlanketStories.ScreenGrid} title="Screen grid" description="12 columns with a 16 gutter, centered and capped at 1232; a modal spans 6, 8 or 10 of them." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Behavior
+
+<ComponentExample of={BlanketStories.PlacementCenter} title="Center" description={<><code>placement="center"</code>, the default, centers a modal in the pads.</>} />
+
+<ComponentExample of={BlanketStories.PlacementEnd} title="End" description={<><code>placement="end"</code> holds a drawer full height at the right edge, with no pad.</>} />
+
+<ComponentExample of={BlanketStories.PlacementStart} title="Start" description={<><code>placement="start"</code> holds a drawer full height at the left edge, with no pad.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={BlanketStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage
 
 A Blanket interrupts the page for one task. It dims everything behind it with one fill, so the person sees only the layer on top. It never draws content of its own.
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-### When to use
-
-- Put a **Modal** in a Blanket when one task blocks the page.
-- Put a **Drawer** in a Blanket, at an edge, when the task needs the page in view.
-- The overlay **Panel** takes a contained Blanket over its Frame's Page and Sidebar, with the same fill and layer order as a modal's.
-- A dialog never opens another Blanket. A follow-up decision inside a modal swaps its content for an inline confirmation in the same Blanket.
-- For a menu, popup, flag or tooltip, use the **Popups** pattern. These float with no blanket and never take a Blanket.
-- For a floating sidebar, use the **Sidebar**. It takes a shadow and no blanket.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Anatomy
-
-<DocsCanvasShell attachSourceBelow description={<>A Modal at the 768 stand-in screen. <strong>1</strong> Blanket: the screen-size frame with the blanket fill, the screen grid and the pads. <strong>2</strong> Modal: the part, centered. <strong>3</strong> Body: a slot in the Modal. <strong>4</strong> Footer: a slot in the Modal.</>}>
-    <Canvas of={BlanketStories.Inline} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Properties
-
 <DocsTable>
 <thead>
-<tr><th>Property</th><th>Type</th><th>Values</th><th>Default</th><th>What it does</th></tr>
+<tr><th>Layer</th><th>When to use</th></tr>
 </thead>
 <tbody>
-<tr><td><code>placement</code></td><td>string</td><td><code>center</code>, <code>start</code>, <code>end</code></td><td><code>center</code></td><td>Centers a modal, or holds a drawer full height at the left (<code>start</code>) or right (<code>end</code>) edge, with no pad.</td></tr>
-<tr><td><code>onBlanketClick</code></td><td>function</td><td>none</td><td>none</td><td>Runs for a click on the blanket, not on the layer it holds.</td></tr>
-<tr><td><code>contained</code></td><td>boolean</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td><td>Covers its parent, such as a Frame, instead of the screen, with no pad and nothing inside. The overlay Panel's Blanket over the Page and the Sidebar.</td></tr>
-<tr><td><code>inline</code></td><td>boolean</td><td><code>true</code>, <code>false</code></td><td><code>false</code></td><td>Draws the Blanket in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page.</td></tr>
-<tr><td><code>screenWidth</code></td><td>number</td><td>any pixel width; the playground offers 768, 1024 and 1440</td><td>the page width</td><td>Inline only. The screen width the layer inside takes its width from.</td></tr>
-<tr><td><code>screenHeight</code></td><td>number</td><td>any height in px</td><td>hugs the content</td><td>Inline only. The layer inside caps at this height less the top and bottom pad.</td></tr>
+<tr><td>Modal</td><td>One task blocks the page. The Blanket centers it.</td></tr>
+<tr><td>Drawer</td><td>The task needs the page in view. The Blanket holds it at an edge.</td></tr>
+<tr><td>Overlay Panel</td><td>The Frame is too narrow to dock the Panel. A <code>contained</code> Blanket covers the Frame's Page and Sidebar, with the same fill and layer order as a modal's.</td></tr>
 </tbody>
 </DocsTable>
 
-The Blanket has one more property. **Height** (hug or fill) lives on the Modal inside it, shown in the Heights example on the [Modal page](?path=/docs/patterns-overlays-modal--docs).
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Tokens
-
-<DocsTable>
-<thead>
-<tr><th>Token</th><th>Value</th><th>What it is for</th></tr>
-</thead>
-<tbody>
-<tr><td><code>--blanket-pad-x</code></td><td>16</td><td>The closest a modal gets to the sides.</td></tr>
-<tr><td><code>--blanket-pad-y</code></td><td>64</td><td>The closest a modal gets to the top and bottom. It drops to 24 under 640 tall.</td></tr>
-<tr><td><code>--ds-blanket</code></td><td>32% in Light, 60% in Dark</td><td>The fill, under every modal and drawer.</td></tr>
-<tr><td><code>--grid-gutter</code></td><td>16</td><td>The gutter between screen-grid columns.</td></tr>
-<tr><td><code>--grid-width-column-screen</code></td><td>45.33, 66.67, 88</td><td>One screen-grid column at 768, 1024 and 1440.</td></tr>
-<tr><td><code>--content-max-width</code></td><td>1232</td><td>The cap on the screen grid.</td></tr>
-<tr><td><code>--blanket-max-height-modal</code></td><td>screen height less 2 × pad-y: 128, or 48 under 640 tall</td><td>The tallest a modal or confirm gets. Its body scrolls past it.</td></tr>
-</tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Pads
-
-<DocsCanvasShell description={<>Pad 16 at the sides and 64 above and below, shaded here. A modal never comes closer to the screen edge. Under 640 tall, the vertical pad drops to 24 in code, since Figma's modes follow width.</>}>
-    <DsCanvasQuiet of={BlanketStories.Pads} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Screen grid
-
-<DocsCanvasShell description={<>The screen grid has 12 columns with a 16 gutter. It is centered and capped at 1232. A modal spans 6, 8 or 10 of these columns plus 16 on each side. Only the Blanket carries this grid. Page frames carry the content grid. In Figma the screen grid is drawn red, the content grid blue and the Modal column guide purple.</>}>
-    <DsCanvasQuiet of={BlanketStories.ScreenGrid} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Placement
-
-<DocsCanvasShell description={<>A modal is centered. A drawer is held full height at the right edge (<code>end</code>) or the left edge (<code>start</code>), with no pad. A centered layer is always a modal.</>}>
-    <DsCanvasQuiet of={BlanketStories.Placements} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### One dialog at a time
-
-A dialog never opens a second Blanket. When a follow-up decision comes up
-inside a modal — confirming a delete, for example — the modal swaps its
-title, body and footer for an inline confirmation in the same Blanket instead
-of raising another one on top.
-
-</div>
-
-<div className="sb-ds-doc-section">
+The Blanket draws the layer only. It does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and blanket token. The Drawer pattern brings its own focus handling. `inline` draws the Blanket in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
 
 ### Layers
 
@@ -154,30 +116,103 @@ Figma has no z-index, so the order is written here and lives in code.
 
 <div className="sb-ds-doc-section">
 
-### Rules
+## Parts
 
-- Pad 16 at the sides and 64 above and below. This is the closest a modal gets to the screen edge.
-- Use one fill, `--ds-blanket`, under every modal, drawer and overlay Panel.
-- A dialog never opens another dialog. A follow-up decision swaps the dialog's content for an inline confirmation in place.
-- Opening a modal closes a floating sidebar, so the two never stack.
-- A floating sidebar gets a shadow and no blanket.
-- Popovers, flags and tooltips never bring a blanket.
-- A modal and a confirm cap at the screen height less 2 × pad-y (see Tokens) and scroll their body past it.
-- Place a modal in the Blanket. Do not detach it to move things around.
+1. **Blanket.** The screen-size layer with the blanket fill, the screen grid and the pads.
+2. **Layer.** The one modal or drawer it holds, centered or at an edge. The Modal brings its body and footer slots.
+
+The Blanket carries the screen grid; page frames carry the content grid. Height, hug or fill, lives on the Modal inside it.
+
+### States
+
+A Blanket has no states. It is shown while its layer is open and gone when it closes; a click on the blanket, not on the layer, calls `onBlanketClick`.
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Value</th><th>What it is for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--ds-blanket</code></td><td>32% in Light, 60% in Dark</td><td>The fill, under every modal, drawer and overlay Panel.</td></tr>
+<tr><td><code>--blanket-pad-x</code></td><td>16</td><td>The closest a modal gets to the sides.</td></tr>
+<tr><td><code>--blanket-pad-y</code></td><td>64</td><td>The closest a modal gets to the top and bottom. It drops to 24 under 640 tall.</td></tr>
+<tr><td><code>--blanket-max-height-modal</code></td><td>screen height less 2 × pad-y: 128, or 48 under 640 tall</td><td>The tallest a modal or confirm gets. Its body scrolls past it.</td></tr>
+<tr><td><code>--grid-gutter</code></td><td>16</td><td>The gutter between screen-grid columns.</td></tr>
+<tr><td><code>--grid-width-column-screen</code></td><td>45.33, 66.67, 88</td><td>One screen-grid column at 768, 1024 and 1440.</td></tr>
+<tr><td><code>--content-max-width</code></td><td>1232</td><td>The cap on the screen grid.</td></tr>
+<tr><td><code>--layer-blanket</code>, <code>--layer-modal</code></td><td>500, 510</td><td>The Blanket and the layer it holds.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Do and don't
+## Best practices
 
-None. The Blanket has no do and don't pairs of its own. The pairs live on the Modal page.
+At most two overlays: a modal or drawer, and the confirm it raises. Never two unrelated overlays, and never a third.
+
+### Stack only the confirm a layer raises.
+
+A confirm raised from a modal or drawer is a second Blanket over the first. A modal or drawer for another task waits until the first one closes.
+
+<DoDontPair
+    doExample={<DrawerWithConfirm />}
+    doCaption="A drawer and the confirm it raises, stacked over it."
+    dontExample={<DrawerWithUnrelatedModal />}
+    dontCaption="A modal for an unrelated task opened over a drawer."
+/>
+
+### Never a third overlay.
+
+The overlay module refuses a third: it stays closed and calls its `onClose`.
+
+<DoDontPair
+    doExample={<ModalWithConfirm />}
+    doCaption="A modal and its confirm: two overlays."
+    dontExample={<ThirdOverlay />}
+    dontCaption="A third overlay over a modal and its confirm."
+/>
+
+### Confirm in a small modal.
+
+<DoDontPair
+    doExample={<ConfirmSmallDo />}
+    doCaption="Confirm in a small modal."
+    dontExample={<ConfirmSmallDont />}
+    dontCaption="Confirm in a large modal."
+/>
+
+Opening a modal closes a floating sidebar, so the two never stack. A floating sidebar gets a shadow and no blanket, and popups, flags and tooltips never bring one.
+
+### Place a modal in the Blanket.
+
+Let the Blanket place the modal. Do not detach it to move things around: the pads are the closest a modal gets to the screen edge.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Accessibility
+## Content guidelines
+
+The Blanket holds no text of its own. The words belong to the layer it holds.
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Title a confirm with the question: "Discard changes?"</td><td>A second dialog that repeats the first one's title.</td></tr>
+<tr><td>Name the confirm's primary action for what it does: "Discard changes".</td><td>"OK" or "Yes".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
 
 - The Blanket is a layout layer with no role. The Modal or Drawer inside it is the dialog.
 - The blanket is a pointer shortcut, not a control. A keyboard closes a dialog from inside it, so the blanket takes no role and no key handler.
@@ -188,36 +223,13 @@ None. The Blanket has no do and don't pairs of its own. The pairs live on the Mo
 
 <div className="sb-ds-doc-section">
 
-### For developers
-
-The Blanket draws the layer only. It does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and blanket token. The Drawer pattern brings its own focus handling.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={BlanketStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Related
+## Related
 
 - [Modal](?path=/docs/patterns-overlays-modal--docs) is the layer a Blanket usually holds, centered, for one task that blocks the page.
 - [Drawer](?path=/docs/patterns-overlays-drawer--docs) is the layer held at an edge, for a task that needs the page in view.
 - [Panel](?path=/docs/patterns-panel--docs) opens over a contained Blanket when its Frame is too narrow to dock it.
 - [Popups](?path=/docs/patterns-popups--docs) covers the floating layers that never take a blanket.
+- For a floating sidebar, use the [Sidebar](?path=/docs/patterns-sidebar--docs): it takes a shadow and no blanket.
 
 </div>
 

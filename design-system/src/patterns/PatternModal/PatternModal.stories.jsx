@@ -55,19 +55,16 @@ export default {
         footer: { table: { disable: true } },
         title: {
             control: 'text',
-            description: 'Modal title',
             table: { category: 'Slots' },
         },
         width: {
             control: 'inline-radio',
             options: BLANKET_WIDTHS,
-            description: 'Screen-grid columns: 6 · 8 · 10 plus the modal pad',
             table: { category: 'Design' },
         },
         height: {
             control: 'inline-radio',
             options: BLANKET_HEIGHTS,
-            description: 'Hug the content to the screen less 128, or fill to it',
             table: { category: 'Design' },
         },
         id: {
@@ -374,6 +371,55 @@ export const Loading = {
         await expect(body.querySelector('[aria-hidden="true"]'), 'a skeleton stands in').not.toBeNull();
         await expect(within(modal).getByRole('button', { name: 'Move session' }), 'the footer stays').toBeInTheDocument();
     },
+};
+
+/* ---------------------------------------------------- one value per story */
+
+/** One width step per story, at the 1024 screen. */
+const atWidth = (width) => (
+    <InBlanket height={320}>
+        <PatternModal title="Move session" width={width} onClose={() => {}} footer={footerActions}>
+            {bodyCopy}
+        </PatternModal>
+    </InBlanket>
+);
+
+export const WidthSmall = { name: 'Small', render: () => atWidth('sm') };
+export const WidthMedium = { name: 'Medium', render: () => atWidth('md') };
+export const WidthLarge = { name: 'Large', render: () => atWidth('lg') };
+
+/** Hug with long content: it stops at the cap and the body scrolls. */
+export const HugLong = {
+    name: 'Hug, long content',
+    render: () => (
+        <InBlanket>
+            <PatternModal title="Session history" onClose={() => {}} footer={footerActions}>
+                {longBody}
+            </PatternModal>
+        </InBlanket>
+    ),
+};
+
+/** Fill: the modal sits at the cap, however little it holds. */
+export const HeightFill = {
+    name: 'Fill',
+    render: () => (
+        <InBlanket>
+            <PatternModal title="Session settings" height="fill" onClose={() => {}} footer={saveActions}>
+                {bodyCopy}
+            </PatternModal>
+        </InBlanket>
+    ),
+};
+
+/** A tab group under the title, with no play: the docs page shows it at rest. */
+export const TabsStill = {
+    name: 'Tabs',
+    render: () => (
+        <InBlanket>
+            <PatternModal title="Session settings" tabs={sessionTabs} onClose={() => {}} footer={saveActions} />
+        </InBlanket>
+    ),
 };
 
 export const Interactive = {

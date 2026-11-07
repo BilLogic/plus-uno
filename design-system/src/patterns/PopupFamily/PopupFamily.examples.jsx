@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, DropdownMenu, TextField, Popup, ButtonItem, Section } from '@/components';
+import { Button, DropdownMenu, TextField, Popup, ButtonItem, Section, Tooltip } from '@/components';
 
 
 /**
@@ -16,12 +16,15 @@ const Plain = ({ children, height }) => (
 
 const row = { margin: 0, font: 'var(--body-default)' };
 
+/** Stage geometry, not design values: the room each held-open layer needs outside the flow. */
+const STAGE = { popup: 300, menu: 248, tooltip: 136 };
+
 /** Opens a beat after mounting: the placement engine measures the trigger through a ref, attached after the first render. */
 const HeldPopup = ({ title, children }) => {
     const [open, setOpen] = React.useState(false);
     React.useEffect(() => { setOpen(true); }, []);
     return (
-        <div style={{ minHeight: 300 }}>
+        <div style={{ minHeight: STAGE.popup }}>
             <Popup
                 triggerType="manual"
                 show={open}
@@ -63,8 +66,8 @@ export const PopupForm = () => (
 
 /** Short labels, with a description only on the rows that need one. */
 export const MenuShortLabels = () => (
-    <Plain height={248}>
-        <div style={{ display: 'flex', alignItems: 'flex-end', minHeight: 248 }}>
+    <Plain height={STAGE.menu}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', minHeight: STAGE.menu }}>
             <DropdownMenu trigger={<Button text="Actions" spacing="compact" />} placement="top-start" isOpen>
                 <Section title="Group heading">
                     <ButtonItem onClick={() => {}} description="Pick a new time and notify the tutor">Reschedule</ButtonItem>
@@ -77,10 +80,10 @@ export const MenuShortLabels = () => (
     </Plain>
 );
 
-/** A whole sentence as the label wraps and crowds the row. */
+/** A whole sentence as the label runs past the menu and is cut off. */
 export const MenuSentenceLabel = () => (
-    <Plain height={248}>
-        <div style={{ display: 'flex', alignItems: 'flex-end', minHeight: 248 }}>
+    <Plain height={STAGE.menu}>
+        <div style={{ display: 'flex', alignItems: 'flex-end', minHeight: STAGE.menu }}>
             <DropdownMenu trigger={<Button text="Actions" spacing="compact" />} placement="top-start" isOpen>
                 <Section title="Group heading">
                     <ButtonItem onClick={() => {}}>Reschedule this session to a later date and tell the tutor lead why</ButtonItem>
@@ -90,5 +93,30 @@ export const MenuSentenceLabel = () => (
                 </Section>
             </DropdownMenu>
         </div>
+    </Plain>
+);
+
+/** Opens the tooltip a beat after mounting, as `HeldPopup` does. */
+const HeldTooltip = ({ text }) => {
+    const [open, setOpen] = React.useState(false);
+    React.useEffect(() => { setOpen(true); }, []);
+    return (
+        <div style={{ minHeight: STAGE.tooltip, display: 'flex', alignItems: 'flex-end' }}>
+            <Tooltip show={open} placement="top" text={text}>
+                <Button text="Copy" spacing="compact" />
+            </Tooltip>
+        </div>
+    );
+};
+
+/** A tooltip names its control in a few words. */
+export const TooltipShort = () => (
+    <Plain><HeldTooltip text="Copy link" /></Plain>
+);
+
+/** A tooltip that wraps into a paragraph. */
+export const TooltipParagraph = () => (
+    <Plain>
+        <HeldTooltip text="Copies a link to this lesson plan so you can paste it into a message, an email or a shared document, then opens the sharing settings." />
     </Plain>
 );

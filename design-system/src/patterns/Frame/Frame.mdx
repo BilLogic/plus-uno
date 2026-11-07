@@ -1,37 +1,22 @@
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as FrameStories from './Frame.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    WithSidebar,
+    WithoutSidebar,
+    TitleInHeader,
+    WithSectionDetail,
+    WithoutSectionDetail,
+} from './Frame.examples.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={FrameStories} />
-
-export const propRows = [
-    ['header', 'node', 'none', 'The Page\'s header row, on the logo row\'s center line: the breadcrumb. While the Sidebar is closed it follows the toggle.', 'none'],
-    ['onBack', 'function', 'none', 'A focused page: called when Back is pressed. With it the Page header row leads with a Back icon button (`arrow-left`, named Back).', 'none'],
-    ['backHref', 'string', 'none', 'A focused page: where Back goes, as a link.', 'none'],
-    ['backLabel', 'string', 'Back', 'The accessible name of Back.', 'none'],
-    ['onClose', 'function', 'none', 'A focused page: called when Close is pressed. With it the Page header row ends with a Close icon button (`xmark`, named Close).', 'none'],
-    ['closeLabel', 'string', 'Close', 'The accessible name of Close.', 'none'],
-    ['sidebar', 'node', 'none', 'The Sidebar content. Without it there is no Sidebar and no toggle.', 'Sidebar = docked | collapsed'],
-    ['sidebarDocked', 'true | false', 'unset: open where it fits', 'Sets the Sidebar\'s default request. True opens it, false closes it. Under 1024 it never docks.', 'Sidebar = docked | collapsed'],
-    ['panel', 'node', 'none', 'The Panel area content, usually a PanelContainer and its parts. Without it there is no Panel.', 'Panel = none | docked | overlay'],
-    ['panelLabel', 'string', 'AI chat', 'The Panel\'s landmark name, named for its content.', 'none'],
-    ['panelOpen', 'boolean', 'unset: the Frame keeps it', 'Controlled open state. Pair it with onPanelOpenChange.', 'Panel = none | docked | overlay'],
-    ['defaultPanelOpen', 'boolean', 'false', 'Whether the Panel starts open when the tab has nothing remembered.', 'none'],
-    ['onPanelOpenChange', 'function', 'none', 'Called with the next open state whenever the Panel opens or closes.', 'none'],
-    ['panelDefaultWidth', 'number', '400', 'The width the Panel opens at when the tab has nothing remembered, from 320 to 640.', 'Panel width'],
-    ['panelPeek', 'boolean', 'false', 'Hovering the right edge peeks a closed Panel over the Page, with no Blanket.', 'none'],
-    ['panelStorageKey', 'string | null', 'plus-frame-panel', 'The sessionStorage key the Panel\'s width and open state are kept under. Null keeps nothing.', 'none'],
-    ['sectionDetail', 'boolean', 'false', 'A Section detail layout is on the Page, so the Sidebar collapses first to keep the 960 split. If a collapsed Sidebar still leaves under 960, the Panel stays docked and the detail replaces the list. While the split holds, the splitter stops where content would drop under 960.', 'none'],
-    ['width', 'content | reading', 'content', 'The content cap: content 1232, reading 864.', 'Page width = content | reading'],
-    ['surfaceDirect', 'boolean', 'false', 'Renders children straight into the page, with no content box or grid, for full-bleed views.', 'none'],
-    ['contentAs', 'element type', 'main', 'The element for the content box, which is the Page\'s main landmark. Pass div when the page supplies its own main.', 'none'],
-    ['contentClassName', 'string', 'none', 'An extra class on the content box.', 'none'],
-    ['className', 'string', 'none', 'An extra class on the frame.', 'none'],
-    ['style', 'object', 'none', 'Inline style on the frame.', 'none'],
-    ['id', 'string', 'none', 'The frame\'s id.', 'none'],
-    ['children', 'node', 'none', 'The content slot. Each child spans all 12 columns unless it sets its own column span.', 'Page content slot'],
-];
 
 export const tokens = [
     ['--screen-width', '768', '1024', '1440', 'The template frame width. Switching the layout mode resizes the frame.'],
@@ -52,7 +37,6 @@ export const tokens = [
     ['Sidebar docked', 'false', 'true', 'true', 'A Figma variable. The sidebar docks from 1024. In code the Frame measures its own width through the layout resolver and has no token for it.'],
     ['--page-stack-sm', '16', '16', '16', 'Related sections.'],
     ['--page-stack-md', '24', '24', '24', 'Sections, and the row gap of the content grid.'],
-    ['--page-stack-lg', '40', '40', '40', 'A new topic.'],
 ];
 
 export const colorTokens = [
@@ -80,72 +64,111 @@ The examples on this page follow the **Color mode** switch in the toolbar.
 
 <div className="sb-ds-doc-section">
 
-### Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>The frame at the docs page's width. From 1024 the Sidebar docks. Below it, hover the menu control to peek the Sidebar.</>}>
-    <Canvas of={FrameStories.DocsOverview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={FrameStories.DocsOverview} title="Content width" description="The frame at the docs page's width, with the content capped at 1232." />
 
-</div>
+<ComponentExample of={FrameStories.DocsReading} title="Reading width" description={<><code>width="reading"</code> caps the content at 864 and centers it, for long text.</>} />
 
-<div className="sb-ds-doc-section">
-
-### When to use it
-
-Use Frame for every page of the app. It owns the frame sizes and the sidebar's behavior, so a page only supplies its sidebar, its breadcrumb and its content.
-
-For a whole page with the PLUS sidebar and breadcrumb already filled in, start from a template. For a bare fill and elevation, use **Page**. For a region inside the content, use **Section**.
+<ComponentExample of={FrameStories.DocsContentGrid} title="Content grid" description="Children span the whole row by default; a 4 and an 8 split the next row in whole columns." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Anatomy
+## Size and layout
 
-1. **Header** is the Page's first row, 32 high on the Sidebar logo row's center line: the breadcrumb. While the Sidebar is closed, the toggle leads it at the Page's top left.
-2. **Page** is a part. It is the content box on `--ds-surface`, running the full height to the window edges, flush, with no corner radius.
-3. **Content** is the slot where Sections go. It is a 12-column grid, centered and capped at 1232.
-4. **Sidebar** is a part. It holds the logo row with the toggle, the groups and the account row. It docks from 1024 and never docks below that.
-5. **Panel** is an area on the right, full height, holding AI chat first. It is filled with the Panel parts (`PanelContainer`, header, body, footer). Its splitter sits on its left hairline.
+<ComponentExample of={FrameStories.DocsAuto768} title="Medium, 768" description="The Sidebar is collapsed and the toggle shows bars." />
 
-There is no footer row. A page that needs actions at its foot places them inside the Page.
+<ComponentExample of={FrameStories.DocsAuto1024} title="Large, 1024" description="The Sidebar docks, 240 wide." />
 
-The Sidebar and Page have their own pages. This page covers how the frame places them.
+<ComponentExample of={FrameStories.DocsAuto1440} title="X-Large, 1440" description="The Sidebar docks, and the Page pad is 24 as at every width." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Properties
+## Behavior
+
+<ComponentExample of={FrameStories.DocsPeeking768} title="Peeking, 768" description="A collapsed Sidebar peeked over the Page, which does not move." />
+
+<ComponentExample of={FrameStories.DocsPeeking1024} title="Peeking, 1024" description="The same peek at Large: the overlay fill and shadow, and no Blanket." />
+
+<ComponentExample of={FrameStories.DocsPeeking1440} title="Peeking, 1440" description="The same peek at X-Large." />
+
+<ComponentExample of={FrameStories.DocsPanel} title="Panel" description="The Panel open at the docs page's width: docked beside the Page where it fits, otherwise on a Blanket." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={FrameStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page. The
+            Browser switch in the toolbar draws Chrome or Safari window chrome around it; the Sidebar
+            and Page keep the same width and left edge.
+        </>
+    }
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Frame for every page of the app. It owns the frame sizes and the Sidebar's behavior, so a page only supplies its Sidebar, its breadcrumb and its content.
+
+For a whole page with the PLUS Sidebar and breadcrumb already filled in, start from a template. For a bare fill and elevation, use Page. For a region inside the content, use Section.
+
+The Frame decides what docks from its own width, not the window's, through one layout resolver, so the content never drops under 720:
+
+- **Sidebar.** It docks from 1024 and never docks below that. Under 1024, opened by hand, it floats over the Page as an overlay and closes on an outside press or Escape. Hovering the toggle or the left edge peeks a collapsed Sidebar over the Page with no Blanket. Clicking the toggle, or pressing Ctrl+[, closes a docked Sidebar and opens a collapsed one.
+- **Panel.** It opens from anything inside the Frame through `usePanelControl()`. A Sidebar opened by hand stays docked, and the Panel opens as an overlay if both do not fit. Both dock when the Sidebar, the Panel and 720 fit: with a 400 Panel that is from 1408. Otherwise a Sidebar left open by default collapses, and comes back when the Panel closes; with a 400 Panel the Panel docks alone from 1168. Otherwise the Panel opens as an overlay, on a Blanket that covers the Page and the Sidebar.
+- **Under 1024** the Panel is an overlay 320 wide, and only one overlay is open at a time: opening the Sidebar closes the Panel, and opening the Panel closes the Sidebar. Under 768 the Panel is full width.
+- **`sectionDetail`** collapses the Sidebar first, so a list and its detail keep 960 side by side. If a collapsed Sidebar still leaves under 960, the Panel stays docked and the detail replaces the list.
+- **Modals.** Opening a modal closes a peeking or overlay Sidebar, and a docked Sidebar stays. While a modal is open the Sidebar does not peek, and Escape closes the modal only. A modal leaves the Panel open under its Blanket.
+
+Docked, the Panel meets the Page at a hairline. Its splitter resizes it from 320 to 640, but never past what keeps 720 beside a docked Sidebar: a drag resists past the limit and springs back, and it never collapses the Sidebar. The width and whether the Panel is open are kept for the tab in sessionStorage. The `panelPeek` option, off by default, peeks a closed Panel when a pointer rests on the right edge, with no Blanket.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Header.** The Page's first row, 32 high on the Sidebar logo row's center line: the breadcrumb. While the Sidebar is closed, the toggle leads it at the Page's top left. A focused page passes `onBack` or `backHref` and `onClose`, and the row leads with Back and ends with Close.
+2. **Page.** The content box on `--ds-surface`, running the full height to the window edges, flush, with no corner radius. It is the Page's `main` landmark.
+3. **Content.** The slot where Sections go: a 12-column grid, centered and capped at 1232 (864 with `width="reading"`). Each child spans all 12 columns unless it sets its own span.
+4. **Sidebar.** The part passed as `sidebar`: the logo row with the toggle, the groups and the account row. Without it there is no Sidebar and no toggle.
+5. **Panel.** The area on the right, full height, passed as `panel` and filled with the Panel parts (`PanelContainer`, header, body, footer). AI chat goes here first. Its splitter sits on its left hairline.
+
+There is no footer row. A page that needs actions at its foot places them inside the Page. The Sidebar and Page have their own pages.
+
+### States
 
 <DocsTable>
-    <thead>
-        <tr>
-            <th>Prop</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>What it does</th>
-            <th>Figma</th>
-        </tr>
-    </thead>
-    <tbody>
-        {propRows.map((row) => (
-            <tr key={row[0]}>
-                <td><code>{row[0]}</code></td>
-                <td>{row[1]}</td>
-                <td>{row[2]}</td>
-                <td>{row[3]}</td>
-                <td>{row[4]}</td>
-            </tr>
-        ))}
-    </tbody>
+<thead>
+<tr><th>Part</th><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Sidebar</td><td>Docked</td><td>In flow beside the Page, 240 wide, with a 1px <code>--ds-border</code> edge on the Page side. From 1024.</td></tr>
+<tr><td>Sidebar</td><td>Collapsed</td><td>No rail. The toggle sits at the Page's top left and shows bars.</td></tr>
+<tr><td>Sidebar</td><td>Peeking</td><td>A collapsed Sidebar floated over the Page with the overlay fill and shadow, while a pointer rests on the toggle or the left edge. No Blanket.</td></tr>
+<tr><td>Sidebar</td><td>Overlay</td><td>Under 1024, opened by hand: over the Page, closed by an outside press or Escape.</td></tr>
+<tr><td>Panel</td><td>None</td><td>Closed, or no <code>panel</code> passed.</td></tr>
+<tr><td>Panel</td><td>Docked</td><td>Beside the Page, on the Page's fill, meeting it at a hairline, with the splitter on its edge.</td></tr>
+<tr><td>Panel</td><td>Overlay</td><td>Over the Page on a Blanket that covers the Page and the Sidebar.</td></tr>
+<tr><td>Splitter</td><td>Focused, dragged</td><td>The line takes <code>--ds-border-focused</code>.</td></tr>
+</tbody>
 </DocsTable>
 
-The Frame decides what docks from its own width, not the window's, through one layout resolver. The Sidebar is docked, collapsed, peeking or an overlay. Peeking is a collapsed Sidebar floated over the Page, which code draws when a pointer rests on the left edge. An overlay is a Sidebar opened by hand under 1024. Both run the full height, like the Panel.
-
-</div>
-
-<div className="sb-ds-doc-section">
+The Frame has no hover, pressed or disabled state of its own: those belong to the toggle and the controls on the Page.
 
 ### Tokens
 
@@ -195,121 +218,82 @@ Lengths are in pixels. Where the layout mode changes a value, the columns read M
 
 <div className="sb-ds-doc-section">
 
-### Variants and states
+## Best practices
 
-#### Sidebar = docked or collapsed
+### Give every app page its Sidebar.
 
-The Sidebar follows the Frame's width. At Medium (768) it is collapsed and the toggle shows the bars icon. At Large and X-Large it docks, 240 wide, and the toggle shows angles-left. Clicking the toggle, or pressing Ctrl+[, closes a docked Sidebar and opens a collapsed one.
+A page supplies its Sidebar, its breadcrumb and its content, and the Frame does the rest. Without `sidebar` there is no navigation and no toggle.
 
-Under 1024 the Sidebar never docks: opened by hand it floats over the Page as an overlay, closes on an outside press or Escape, and the Page does not move. The Page's top-left corner is rounded only while the Sidebar is docked.
+<DoDontPair
+    doExample={<WithSidebar />}
+    doCaption="An app page passes its Sidebar, which docks from 1024."
+    dontExample={<WithoutSidebar />}
+    dontCaption="The same page with no Sidebar: no navigation and no toggle."
+/>
 
-<DocsCanvasShell description={<>Medium · 768: the Sidebar is collapsed and the toggle shows bars.</>}>
-    <Canvas of={FrameStories.DocsAuto768} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+### Put the place in the header as a breadcrumb.
 
-<DocsCanvasShell description={<>Large · 1024: the Sidebar docks, 240 wide.</>}>
-    <Canvas of={FrameStories.DocsAuto1024} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+The header row is the breadcrumb. A page's title belongs to its content, in a Section with `level="page"`.
 
-<DocsCanvasShell description={<>X-Large · 1440: the Sidebar docks. The Page pad is 24 at every width.</>}>
-    <Canvas of={FrameStories.DocsAuto1440} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<DoDontPair
+    doExample={<WithSidebar />}
+    doCaption={'The header row is a breadcrumb: "Home / Dashboard".'}
+    dontExample={<TitleInHeader />}
+    dontCaption="A page title in the header row in place of the breadcrumb."
+/>
 
-#### Sidebar = peeking
+### Pass sectionDetail for a list and its detail.
 
-Hovering the toggle or the left edge of the frame opens a collapsed Sidebar over the Page. It uses the overlay fill and shadow, has no Blanket, and does not move the page. An outside click, Escape or the pointer leaving closes it.
-
-<DocsCanvasShell description={<>Medium · 768, peeking: a collapsed Sidebar peeked over the Page. The Page does not move.</>}>
-    <Canvas of={FrameStories.DocsPeeking768} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Large · 1024, peeking.</>}>
-    <Canvas of={FrameStories.DocsPeeking1024} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>X-Large · 1440, peeking.</>}>
-    <Canvas of={FrameStories.DocsPeeking1440} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-Opening a modal closes a peeking or overlay Sidebar, and a docked Sidebar stays. While a modal is open the Sidebar does not peek, and Escape closes the modal only.
-
-#### Panel = docked or overlay
-
-The Panel opens from anything inside the Frame through `usePanelControl()`. The layout resolver places it, from the Frame's own width, so the content never drops under 720:
-
-- A Sidebar opened by hand stays docked, and the Panel opens as an overlay if both do not fit.
-- Both dock when the Sidebar, the Panel and 720 fit. With a 400 Panel that is from 1408.
-- Otherwise a Sidebar left open by default collapses, and comes back when the Panel closes. With a 400 Panel the Panel docks alone from 1168.
-- Otherwise the Panel opens as an overlay: over the Page on a Blanket that covers the Page and the Sidebar. A press outside it, or Escape, closes it.
-- Under 1024 the Panel is an overlay 320 wide, and only one overlay is open at a time: opening the Sidebar closes the Panel, and opening the Panel closes the Sidebar. Under 768 the Panel is full width.
-- With `sectionDetail`, the Sidebar collapses first so the list and the detail keep 960 side by side.
-
-Docked, the Panel is the Page's white and meets the Page at a hairline. Its splitter resizes it from 320 to 640, but never past what keeps 720 beside a docked Sidebar: a drag resists past the limit and springs back, and it never collapses the Sidebar. The width and whether the Panel is open are kept for the tab in sessionStorage. A modal leaves the Panel open under its Blanket. The `panelPeek` option, off by default, peeks a closed Panel when a pointer rests on the right edge, with no Blanket.
-
-<DocsCanvasShell description={<>The Panel open at the docs page's width. Wide enough, it docks beside the Page; narrower, it opens on a Blanket.</>}>
-    <Canvas of={FrameStories.DocsPanel} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-#### Content grid
-
-<DocsCanvasShell description={<>Children span the whole row by default. A 4 and an 8 split the next row in whole columns.</>}>
-    <DsCanvasQuiet of={FrameStories.ContentGrid} />
-</DocsCanvasShell>
-
-#### Reading width
-
-Use the reading width for long text. The content caps at 864 instead of 1232 and stays centered.
-
-<DocsCanvasShell description={<>Reading: the content is capped at 864 and centered.</>}>
-    <Canvas of={FrameStories.DocsReading} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Accessibility
-
-- The Page is the `main` landmark, and the `nav` inside the Sidebar is the navigation landmark. The box around that `nav` is not a landmark of its own.
-- The toggle is a button. Open, it ends the Sidebar's logo row as "Close sidebar"; closed, it sits at the Page's top left as "Open sidebar". It reports whether the Sidebar is showing, points at it while it is open, and announces its shortcut, Ctrl+[ (Cmd+[ on a Mac). Focus follows a press to the toggle that is left.
-- A peeking or overlay Sidebar closes on Escape, and focus returns to the toggle. A control that handles its own Escape, such as a menu, keeps it.
-- Opening a modal from the peeking Sidebar returns focus to the toggle when the modal closes, because the trigger left with the Sidebar.
-- Docked or peeking, the Panel is a complementary landmark named by `panelLabel`, after the Page in reading order, and it leaves focus where it is. When opening it collapses the Sidebar that held focus, focus moves into the Panel; closing it returns focus to what opened it.
-- As an overlay, the Panel is a modal dialog named by `panelLabel`. Opening it moves focus to its first control and Tab stays inside it; the Page and the Sidebar under the Blanket are inert, so a keyboard or screen reader cannot reach what a pointer cannot. Closing it, by Escape, a press on the Blanket or its Close button, returns focus to what opened it.
-- The splitter is a vertical separator named "Resize panel" that reports its width as its value. The left arrow widens the Panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
-- The docked Sidebar's edge, its account-row divider and the Panel's edge are `--ds-border`.
-- In light increased contrast the page draws its edge ring in `--ds-border-surface`, so it stays distinct from the frame behind it.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-### Interactive playground
-
-<DocsInteractivePlayground
-    of={FrameStories.DocsOverview}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong className="text-foreground">inline</strong> while you scroll the docs page. The
-            Browser switch in the toolbar draws Chrome or Safari window chrome around it; the Sidebar
-            and Page keep the same width and left edge.
-        </>
-    }
+<DoDontPair
+    doExample={<WithSectionDetail />}
+    doCaption="With sectionDetail and the Panel open at 1440, the Sidebar collapses and the list keeps its detail beside it."
+    dontExample={<WithoutSectionDetail />}
+    dontCaption="Without it, the Sidebar and the Panel both dock, the content drops under 960 and the detail replaces the list."
 />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-### Related
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Put the place in the header as a breadcrumb: "Home / Dashboard".</td><td>A page title in the header row.</td></tr>
+<tr><td>Name the Panel for its content with <code>panelLabel</code>: "AI chat".</td><td>A generic name such as "Panel".</td></tr>
+<tr><td>Keep Back and Close named for what they do; the defaults are "Back" and "Close".</td><td>Icon buttons with no name.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- The Page is the `main` landmark, and the `nav` inside the Sidebar is the navigation landmark. The box around that `nav` is not a landmark of its own. Pass `contentAs="div"` when the page supplies its own `main`.
+- The toggle is a button. Open, it ends the Sidebar's logo row as "Close sidebar"; closed, it sits at the Page's top left as "Open sidebar". It reports whether the Sidebar is showing, points at it while it is open, and announces its shortcut, Ctrl+[ (Cmd+[ on a Mac). Focus follows a press to the toggle that is left.
+- A peeking or overlay Sidebar closes on Escape, and focus returns to the toggle. A control that handles its own Escape, such as a menu, keeps it.
+- Opening a modal from the peeking Sidebar returns focus to the toggle when the modal closes, because the trigger left with the Sidebar.
+- Docked or peeking, the Panel is a complementary landmark named by `panelLabel`, after the Page in reading order, and it leaves focus where it is. When opening it collapses the Sidebar that held focus, focus moves into the Panel; closing it returns focus to what opened it.
+- As an overlay, the Panel is a modal dialog named by `panelLabel`. Opening it moves focus to its first control and Tab stays inside it; the Page and the Sidebar under the Blanket are inert, so a keyboard or screen reader cannot reach what a pointer cannot. Closing it, by Escape, a press on the Blanket or its Close button, returns focus to what opened it.
+- The splitter is a vertical separator named "Resize panel" that reports its width as its value. The left arrow widens the Panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
+- In light increased contrast the page draws its edge ring in `--ds-border-surface`, so it stays distinct from the frame behind it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
 
 - <a href="?path=/docs/patterns-page-page--docs">Page</a> for the bare fill-and-elevation primitive the content box is built on.
 - <a href="?path=/docs/patterns-sidebar--docs">Sidebar</a> for the part the frame places beside the Page.
 - <a href="?path=/docs/patterns-section-section--docs">Section</a> for a region inside the content.
-- <a href="?path=/docs/patterns-templates--docs">Templates</a>, with the focused frame, for a page that holds one task and has no sidebar.
+- <a href="?path=/docs/patterns-templates--docs">Templates</a> for a whole page, Frame with its content slot filled, and the focused frame for one task.
 - <a href="?path=/docs/foundations-layout-grid--docs">Layout & grid</a> for the column math the frame is sized by.
-- <a href="?path=/docs/patterns-templates--docs">Templates</a> for a whole page: Frame with its content slot filled.
 
 </div>
 

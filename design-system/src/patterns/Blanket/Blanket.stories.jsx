@@ -38,13 +38,11 @@ export default {
         placement: {
             control: 'inline-radio',
             options: BLANKET_PLACEMENTS,
-            description: 'center for a modal; start or end holds a drawer full height at that edge',
             table: { category: 'Design' },
         },
         screenWidth: {
             control: 'inline-radio',
             options: [768, 1024, 1440],
-            description: 'The stand-in screen width the layer inside takes its width from',
             table: { category: 'Design' },
         },
     },
@@ -259,6 +257,40 @@ export const Placements = {
         await expect(modal.getBoundingClientRect().width).toBeCloseTo(512, 0);
     },
 };
+
+/** One placement per story, at the 1024 stand-in screen. */
+const drawerAt = (placement) => (
+    <PatternDrawer
+        inline
+        screenWidth={1024}
+        screenHeight={360}
+        placement={placement}
+        title="Session details"
+        description="Thursday · 4:00–5:00 PM"
+        onClose={() => {}}
+        footer={footer('Save changes')}
+    >
+        {body}
+    </PatternDrawer>
+);
+
+/** `center`: a modal, centered in the pads. */
+export const PlacementCenter = {
+    name: 'Center',
+    render: () => (
+        <Blanket inline screenWidth={1024} screenHeight={360}>
+            <PatternModal title="Move session" onClose={() => {}} footer={footer('Move session')}>
+                {body}
+            </PatternModal>
+        </Blanket>
+    ),
+};
+
+/** `end`: a drawer full height at the right edge, with no pad. */
+export const PlacementEnd = { name: 'End', render: () => drawerAt('end') };
+
+/** `start`: a drawer full height at the left edge, with no pad. */
+export const PlacementStart = { name: 'Start', render: () => drawerAt('start') };
 
 export const Interactive = {
     args: { placement: 'center', screenWidth: 1024 },

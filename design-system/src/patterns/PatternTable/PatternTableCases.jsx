@@ -1,13 +1,14 @@
 import React from 'react';
 import PatternTable from '@/patterns/PatternTable';
 import PatternSection from '@/patterns/PatternSection';
-import { Checkbox, Pagination, IconButton, DynamicTable, TableBulkActions, TreeTable } from '@/components';
+import { DynamicTable, TableBulkActions, TreeTable } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { iconClass } from '../../lib/icon';
 
 /**
- * The examples of "Which table?": one pair per table type, each side built
- * from the table pattern and the components a real table would use.
+ * The do and don't examples of the Table page: the composition pairs and the
+ * type pairs, each side built from the table pattern and the components a real
+ * table would use.
  */
 
 /**
@@ -23,81 +24,6 @@ const unstyled = (Case) => {
 const numeric = { textAlign: 'right' };
 const subtle = { color: 'var(--ds-text-subtle)' };
 const icon = (name) => <i className={iconClass(name)} aria-hidden="true" style={{ fontSize: 'var(--icon-sm)' }} />;
-
-const SortHead = ({ children, sort, align }) => (
-    <th aria-sort={sort === 'up' ? 'ascending' : undefined} style={align}>
-        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)' }}>
-            {children}
-            {icon(sort === 'up' ? 'arrow-up' : 'sort')}
-        </span>
-    </th>
-);
-
-const RowActions = ({ label }) => (
-    <IconButton icon="ellipsis" appearance="subtle" spacing="compact" label={label} onClick={() => {}} />
-);
-
-const Pager = ({ range, pages }) => (
-    <>
-        <span style={{ font: 'var(--body-default)', ...subtle }}>{range}</span>
-        <Pagination currentPage={1} totalPages={pages} spacing="compact" onPageChange={() => {}} />
-    </>
-);
-
-const weekdays = [
-    ['Monday', 4, 120],
-    ['Tuesday', 3, 90],
-    ['Wednesday', 5, 150],
-    ['Thursday', 2, 60],
-    ['Friday', 4, 120],
-];
-
-/** A read-only weekly summary: the total sits in the summary row. */
-const StaticSummaryCase = () => (
-    <PatternTable>
-        <thead>
-            <tr><th>Day</th><th style={numeric}>Sessions</th><th style={numeric}>Minutes</th></tr>
-        </thead>
-        <tbody>
-            {weekdays.map(([day, sessions, minutes]) => (
-                <tr key={day}><td>{day}</td><td style={numeric}>{sessions}</td><td style={numeric}>{minutes}</td></tr>
-            ))}
-        </tbody>
-        <tfoot>
-            <tr>
-                <th scope="row" style={{ font: 'var(--heading-xxsmall)' }}>Total</th>
-                <td style={numeric}><strong>18</strong></td>
-                <td style={numeric}><strong>540</strong></td>
-            </tr>
-        </tfoot>
-    </PatternTable>
-);
-
-/** The same summary dressed as a Dynamic table: controls the summary does not have. */
-const SummaryAsDynamicCase = () => (
-    <PatternTable pagination={<Pager range="1–5 of 5" pages={1} />}>
-        <thead>
-            <tr>
-                <th><span className="visually-hidden">Select</span></th>
-                <SortHead sort="up">Day</SortHead>
-                <SortHead align={numeric}>Sessions</SortHead>
-                <SortHead align={numeric}>Minutes</SortHead>
-                <th><span className="visually-hidden">Actions</span></th>
-            </tr>
-        </thead>
-        <tbody>
-            {weekdays.map(([day, sessions, minutes]) => (
-                <tr key={day}>
-                    <td><Checkbox aria-label={`Select ${day}`}/></td>
-                    <td>{day}</td>
-                    <td style={numeric}>{sessions}</td>
-                    <td style={numeric}>{minutes}</td>
-                    <td><RowActions label={`Actions for ${day}`} /></td>
-                </tr>
-            ))}
-        </tbody>
-    </PatternTable>
-);
 
 const roster = [
     ['Ava Thompson', 'Priya Nair', 'Oct 24', 12, '92%'],
@@ -254,9 +180,73 @@ const TreeAsExpandableCase = () => (
     </PatternTable>
 );
 
-export const StaticSummary = unstyled(StaticSummaryCase);
-export const SummaryAsDynamic = unstyled(SummaryAsDynamicCase);
 export const DynamicRoster = unstyled(DynamicRosterCase);
 export const RosterAsStatic = unstyled(RosterAsStaticCase);
 export const TreeHierarchy = unstyled(TreeHierarchyCase);
 export const TreeAsExpandable = unstyled(TreeAsExpandableCase);
+
+/* ---------------------------------------------- composition, as Figma's pairs */
+
+const students = [
+    ['Ava Thompson', 'Priya Nair', 12],
+    ['Marcus Lee', 'Daniel Kim', 9],
+    ['Sofia Ramirez', 'Priya Nair', 15],
+];
+
+const studentTable = (
+    <PatternTable>
+        <thead>
+            <tr><th>Student</th><th>Tutor</th><th style={numeric}>Sessions</th></tr>
+        </thead>
+        <tbody>
+            {students.map(([student, tutor, sessions]) => (
+                <tr key={student}><td>{student}</td><td>{tutor}</td><td style={numeric}>{sessions}</td></tr>
+            ))}
+        </tbody>
+    </PatternTable>
+);
+
+const countToolbar = <PatternSection.Toolbar count="340 students" />;
+
+const InSection = ({ children, toolbar = countToolbar }) => (
+    <HeadingLevelContext.Provider value={5}>
+        <PatternSection title="Students" toolbar={toolbar}>{children}</PatternSection>
+    </HeadingLevelContext.Provider>
+);
+
+/** The table spans the Section under its header: no frame, no padding of its own. */
+const PlainTableCase = () => <InSection>{studentTable}</InSection>;
+
+/** The table in its own padded frame, out of line with the Section header. */
+const FramedTableCase = () => (
+    <InSection>
+        <div style={{ padding: 'var(--pad-x-md)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-md)' }}>
+            {studentTable}
+        </div>
+    </InSection>
+);
+
+/** A second toolbar between the Section header and the head row. */
+const SecondToolbarCase = () => (
+    <InSection>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+            <PatternSection.Toolbar count="12 records" />
+            {studentTable}
+        </div>
+    </InSection>
+);
+
+/** Two tables share one Section and one header. */
+const TwoTablesCase = () => (
+    <InSection>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
+            {studentTable}
+            {studentTable}
+        </div>
+    </InSection>
+);
+
+export const PlainTable = unstyled(PlainTableCase);
+export const FramedTable = unstyled(FramedTableCase);
+export const SecondToolbar = unstyled(SecondToolbarCase);
+export const TwoTables = unstyled(TwoTablesCase);

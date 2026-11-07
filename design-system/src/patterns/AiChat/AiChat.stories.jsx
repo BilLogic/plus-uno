@@ -18,7 +18,8 @@ import { buildDocsEntries } from '@/storybook-docs/chrome/docsSearch';
  */
 
 const HEIGHT = 900;
-const DOCS_HEIGHT = '560px';
+// Tall enough for the open popup (twice --height-2000) over the button and its pads, so it stays inside its canvas.
+const DOCS_HEIGHT = 'calc(var(--height-2000) * 2 + var(--height-300) + var(--page-pad) * 3)';
 
 const STARTERS = [
     { id: 'summarize', label: 'Summarize this page', text: 'Summarize this page for me.' },
@@ -74,6 +75,7 @@ export default {
         variant: { control: 'select', options: ['app', 'storybook'], table: { category: 'Design' } },
         defaultMode: { control: 'select', options: ['popup', 'panel', 'fullscreen'], table: { category: 'Design' } },
         withModal: { table: { disable: true } },
+        height: { table: { disable: true } },
         defaultOpen: { control: 'boolean', table: { category: 'Design' } },
         title: { control: 'text', table: { category: 'Design' } },
         respond: { table: { disable: true } },
@@ -127,6 +129,12 @@ export const Fullscreen = {
 /** Docs: the Storybook variant: clear, move to Panel and close, with nothing else. */
 export const StorybookVariant = {
     args: { variant: 'storybook', defaultOpen: true, storageKey: null, height: DOCS_HEIGHT },
+    parameters: { layout: 'padded' },
+};
+
+/** Docs: the playground. Chat starts open in the Panel, so every control works inline; nothing is remembered. */
+export const Interactive = {
+    args: { variant: 'app', defaultMode: 'panel', defaultOpen: true, title: 'AI chat', storageKey: null, height: DOCS_HEIGHT },
     parameters: { layout: 'padded' },
 };
 

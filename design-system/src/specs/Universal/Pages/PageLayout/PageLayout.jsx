@@ -343,7 +343,9 @@ PageLayout.propTypes = {
     }),
     title: PropTypes.string,
     contentDirect: PropTypes.bool,
+    /** While true, the header row shows a breadcrumb skeleton in place of the breadcrumb, and the header and Sidebar drop the shell-reveal class, holding their entrance. */
     shellLoading: PropTypes.bool,
+    /** Adds `has-entered` to the shell-reveal class on the header and the Sidebar, running their entrance. Read only while `shellLoading` is false. */
     shellEntered: PropTypes.bool,
     sidebarHidden: PropTypes.bool,
     sidebarExpanded: PropTypes.bool,

@@ -78,12 +78,10 @@ export default {
         sidebarDocked: {
             control: 'select',
             options: [undefined, true, false],
-            description: "Sets the Sidebar's default request: true opens it, false closes it. Under 1024 it never docks. Unset opens it where it fits.",
             table: { category: 'Design' },
         },
         surfaceDirect: {
             control: 'boolean',
-            description: 'Renders children straight into the surface, with no content box or grid.',
             table: { category: 'Design' },
         },
         panel: { table: { disable: true } },
@@ -94,17 +92,14 @@ export default {
         panelDefaultWidth: { control: false, table: { disable: true } },
         defaultPanelOpen: {
             control: 'boolean',
-            description: 'Whether the Panel starts open when the tab has nothing remembered.',
             table: { category: 'Design' },
         },
         panelPeek: {
             control: 'boolean',
-            description: 'Hovering the right edge peeks a closed Panel over the Page, with no Blanket. Off by default.',
             table: { category: 'Design' },
         },
         sectionDetail: {
             control: 'boolean',
-            description: 'A Section detail layout is on the Page: the Sidebar collapses first to keep the 960 split.',
             table: { category: 'Design' },
         },
         contentAs: { control: false, table: { disable: true } },
@@ -112,7 +107,6 @@ export default {
         width: {
             control: 'select',
             options: ['content', 'reading'],
-            description: 'Content cap: content 1232, reading 864',
             table: { category: 'Design' },
         },
         id: { control: false, table: { disable: true, category: 'Development' } },
@@ -309,6 +303,42 @@ const DocsFrame = (args) => <FrameWithSlots {...args} height={DOCS_HEIGHT} />;
 export const DocsOverview = { render: DocsFrame, parameters: { layout: 'padded' } };
 
 export const DocsReading = { render: DocsFrame, args: { width: 'reading' }, parameters: { layout: 'padded' } };
+
+/** The content grid at the docs height: a full-width child, then a 4 and an 8. */
+export const DocsContentGrid = {
+    render: (args) => (
+        <InAppFrame {...args} height={DOCS_HEIGHT}>
+            {slot('Full width')}
+            <div style={{ gridColumn: 'span 4' }}>{slot('4 columns')}</div>
+            <div style={{ gridColumn: 'span 8' }}>{slot('8 columns')}</div>
+        </InAppFrame>
+    ),
+    parameters: { layout: 'padded' },
+};
+
+/*
+ * The do and don't pairs on the docs page draw these in an iframe at a real
+ * screen width (`ModeFrame`), since the Frame sizes itself from its own box.
+ * No play: they are pictures.
+ */
+
+/** Do: an app page supplies its Sidebar, its breadcrumb and its content. */
+export const PairWithSidebar = {};
+
+/** Don't: the same page with no Sidebar, so there is no navigation and no toggle. */
+export const PairWithoutSidebar = { args: { sidebar: undefined } };
+
+/** Don't: a page title in the header row in place of the breadcrumb. */
+export const PairTitleInHeader = {
+    args: { header: <span style={{ font: 'var(--heading-large)', color: 'var(--ds-text)' }}>Dashboard</span> },
+};
+
+/** The playground: the frame at the docs height, with its layout props live. */
+export const Interactive = {
+    render: DocsFrame,
+    args: { width: 'content', sectionDetail: false, surfaceDirect: false },
+    parameters: { layout: 'padded' },
+};
 
 /**
  * The sidebar floating: a closed sidebar peeked over the page. The story

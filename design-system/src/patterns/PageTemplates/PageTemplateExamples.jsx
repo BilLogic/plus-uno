@@ -5,16 +5,54 @@ import { Frame, PatternCard } from '@/patterns';
 import { PageLayout } from '@/specs/Universal/Pages';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { ScaledPreview } from '@/storybook-docs/lib/scaled-preview.jsx';
 
 /**
  * The do and don't examples on the Templates docs page: live
- * compositions of the template, never pictures.
+ * compositions of the template, laid out at a 1024 stage and scaled down to
+ * the card, so each frame docks and pads as it does at Large.
  */
 
 const BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions' }];
 const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
 
-const box = { height: 280, width: '100%' };
+// Stage geometry for the docs, not a design value.
+const Stage = ({ children }) => <ScaledPreview width={1024} height={560}>{children}</ScaledPreview>;
+
+const pageProps = {
+    sidebarConfig: { user: 'tutor', activeTabId: 'home' },
+    topBarConfig: { breadcrumbs: BREADCRUMBS, user: { name: 'John Doe', type: 'lead tutor' } },
+    style: { height: '100%' },
+};
+
+/** Do: the template, with its content slot filled. */
+export const FillSlotsDo = () => (
+    <Stage>
+        <PageLayout title="Sessions" {...pageProps}>
+            {slotContent('Content slot: Sections')}
+        </PageLayout>
+    </Stage>
+);
+
+/** Don't: the page chrome rebuilt by hand: a gray block for a sidebar beside the content. */
+export const FillSlotsDont = () => (
+    <Stage>
+        <div style={{ display: 'flex', height: '100%', background: 'var(--ds-surface)' }}>
+            <div
+                style={{
+                    width: 'var(--frame-sidebar-width)',
+                    padding: 'var(--pad-x-md)',
+                    background: 'var(--ds-background-neutral)',
+                    color: 'var(--ds-text-subtle)',
+                    font: 'var(--body-default)',
+                }}
+            >
+                Hand-drawn sidebar
+            </div>
+            <div style={{ flex: 1, padding: 'var(--page-pad)' }}>{slotContent('Content slot: Sections')}</div>
+        </div>
+    </Stage>
+);
 
 const noteActions = (
     <>
@@ -25,34 +63,34 @@ const noteActions = (
 
 /** Do: a focused page names its task and offers Back and Close. */
 export const FocusedHeaderDo = () => (
-    <div style={box}>
+    <Stage>
         <PageLayout frame="focused" title="Add a session note" style={{ height: '100%' }} onBack={() => {}} onClose={() => {}}>
             {slotContent('Content slot: Sections')}
         </PageLayout>
-    </div>
+    </Stage>
 );
 
 /** Don't: the app frame, with the sidebar and a breadcrumb, on a page for one task. */
 export const FocusedHeaderDont = () => (
-    <div style={box}>
+    <Stage>
         <Frame header={<Breadcrumb items={BREADCRUMBS} />} sidebar={<Sidebar user="tutor" account={ACCOUNT} />} style={{ height: '100%' }} width="reading">
             {slotContent('Add a session note')}
         </Frame>
-    </div>
+    </Stage>
 );
 
 /** Do: the actions end-aligned in the footer, one primary, last. */
 export const FocusedActionsDo = () => (
-    <div style={box}>
+    <Stage>
         <PageLayout frame="focused" title="Add a session note" style={{ height: '100%' }} onBack={() => {}} onClose={() => {}} actions={noteActions}>
             {slotContent('Content slot: Sections')}
         </PageLayout>
-    </div>
+    </Stage>
 );
 
 /** Don't: several primary actions, start-aligned in the footer. */
 export const FocusedActionsDont = () => (
-    <div style={box}>
+    <Stage>
         <PageLayout
             frame="focused"
             title="Add a session note"
@@ -70,7 +108,7 @@ export const FocusedActionsDont = () => (
         >
             {slotContent('Content slot: Sections')}
         </PageLayout>
-    </div>
+    </Stage>
 );
 
 const nextSession = (

@@ -51,24 +51,20 @@ export default {
         level: {
             control: 'select',
             options: PAGE_LEVELS,
-            description: 'Elevation level: a fill and its shadow',
             table: { category: 'Design' },
         },
         padding: {
             control: 'select',
             options: ['none', 'sm', 'md', 'lg'],
-            description: 'Padding scale',
             table: { category: 'Design' },
         },
         radius: {
             control: 'select',
             options: ['none', 'sm', 'md', 'lg'],
-            description: 'Radius scale',
             table: { category: 'Design' },
         },
         border: {
             control: 'boolean',
-            description: 'A bold border',
             table: { category: 'Design' },
         },
         id: {
@@ -88,21 +84,62 @@ export const Overview = () => (
     </Page>
 );
 
-export const Levels = () => <PageLevelsDemo />;
-
-/** The padding and radius scales, each step on a bordered default page. */
-export const Scales = () => (
-    <div style={{ ...col, padding: 'var(--page-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
-        {['sm', 'md', 'lg'].map((step) => (
-            <div key={step}>
-                <DemoLabel>{`padding ${step}, radius ${step}`}</DemoLabel>
-                <Page padding={step} radius={step}>
-                    {slotContent('Content slot')}
-                </Page>
-            </div>
-        ))}
+/** One level on the frame's sunken backdrop, labeled with its fill and shadow. */
+const OneLevel = ({ level }) => (
+    <div style={{ padding: 'var(--page-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
+        <Page level={level} padding="sm" radius="md">
+            {slotContent(pairLabel(level))}
+        </Page>
     </div>
 );
+
+/** sunken: the frame's backdrop, with no shadow. */
+export const Sunken = { render: () => <OneLevel level="sunken" /> };
+/** default: the page, edged by `--ds-border-surface`. */
+export const DefaultLevel = { name: 'Default', render: () => <OneLevel level="default" /> };
+/** raised: a card, with the raised shadow. */
+export const Raised = { render: () => <OneLevel level="raised" /> };
+/** overlay: anything over the UI, with the overlay shadow. */
+export const Overlay = { render: () => <OneLevel level="overlay" /> };
+
+/** One padding and radius step on a default Page, on the sunken backdrop. */
+const OneStep = ({ step }) => (
+    <div style={{ padding: 'var(--page-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
+        <Page padding={step} radius={step}>
+            {slotContent(`padding ${step}, radius ${step}`)}
+        </Page>
+    </div>
+);
+
+/** padding and radius none: the content runs to the edge. */
+export const StepNone = { name: 'None', render: () => <OneStep step="none" /> };
+/** padding and radius sm. */
+export const StepSmall = { name: 'Small', render: () => <OneStep step="sm" /> };
+/** padding and radius md: the frame's own pad. */
+export const StepMedium = { name: 'Medium', render: () => <OneStep step="md" /> };
+/** padding and radius lg. */
+export const StepLarge = { name: 'Large', render: () => <OneStep step="lg" /> };
+
+/** border: a bold 2px border, drawn in place of the default level's edge ring. */
+export const Bordered = {
+    render: () => (
+        <div style={{ padding: 'var(--page-pad)', backgroundColor: 'var(--ds-surface-sunken)' }}>
+            <Page padding="md" radius="md" border>
+                {slotContent('border')}
+            </Page>
+        </div>
+    ),
+};
+
+/** title: the page's one h1, above the content. */
+export const WithTitle = {
+    name: 'With title',
+    render: () => (
+        <Page padding="md" radius="lg" title="Sessions">
+            {slotContent('Content slot')}
+        </Page>
+    ),
+};
 
 /** In every color mode, each level draws its fill with its own shadow, and text in the body color. */
 export const ColorModes = {
