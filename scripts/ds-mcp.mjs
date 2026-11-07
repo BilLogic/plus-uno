@@ -9,6 +9,8 @@
  *
  * Built on the SDK's low-level `Server` with plain JSON schemas, so the only
  * package it needs is `@modelcontextprotocol/sdk`.
+ *
+ *   node scripts/ds-mcp.mjs [--tools find,get]   serve only the named tools (the usage eval's lookup-min arm)
  */
 import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
@@ -82,15 +84,35 @@ export const TOOLS = [
   },
 ];
 
-export function createServer(root = REPO_ROOT) {
+/**
+ * The tools a server started with `argv` serves: all five, or the ones
+ * `--tools` names by their `ds` subcommand (`find,get`). An unknown name stops
+ * the server before it starts.
+ */
+export function servedTools(argv) {
+  const i = argv.indexOf('--tools');
+  if (i === -1) return TOOLS;
+  const ops = String(argv[i + 1] ?? '').split(',').filter(Boolean);
+  const unknown = ops.filter((op) => !TOOLS.some((t) => t.op === op));
+  if (!ops.length || unknown.length) throw new Error(`--tools: unknown ${unknown.join(', ') || '(none given)'} (known: ${TOOLS.map((t) => t.op).join(', ')})`);
+  return TOOLS.filter((t) => ops.includes(t.op));
+}
+
+/** The connection instructions for a subset: a missing ds_check is still a shell command away. */
+const instructionsFor = (tools) =>
+  tools.some((t) => t.name === 'ds_check')
+    ? INSTRUCTIONS
+    : `${ORIENTATION}\n\nEvery PLUS UI task starts with ds_find. This server does not serve ${TOOLS.filter((t) => !tools.includes(t)).map((t) => t.name).join(', ')}; \`npm run ds -- <tool> …\` answers all five from a shell, and \`npm run ds -- check <paths…>\` finishes the task at zero failing findings.`;
+
+export function createServer(root = REPO_ROOT, tools = TOOLS) {
   let lookup;
-  const server = new Server({ name: 'plus-ds', version: '1.0.0' }, { capabilities: { tools: {} }, instructions: INSTRUCTIONS });
+  const server = new Server({ name: 'plus-ds', version: '1.0.0' }, { capabilities: { tools: {} }, instructions: instructionsFor(tools) });
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
-    tools: TOOLS.map(({ name, description, inputSchema }) => ({ name, description, inputSchema })),
+    tools: tools.map(({ name, description, inputSchema }) => ({ name, description, inputSchema })),
   }));
   server.setRequestHandler(CallToolRequestSchema, async ({ params }) => {
-    const tool = TOOLS.find((t) => t.name === params.name);
-    if (!tool) return { isError: true, content: [{ type: 'text', text: `No tool ${params.name}. Tools: ${TOOLS.map((t) => t.name).join(', ')}.` }] };
+    const tool = tools.find((t) => t.name === params.name);
+    if (!tool) return { isError: true, content: [{ type: 'text', text: `No tool ${params.name}. Tools: ${tools.map((t) => t.name).join(', ')}.` }] };
     try {
       lookup ??= createLookup(root);
       return { content: [{ type: 'text', text: render(tool.op, tool.call(lookup, params.arguments ?? {})) }] };
@@ -101,4 +123,4 @@ export function createServer(root = REPO_ROOT) {
   return server;
 }
 
-if (isEntry(import.meta.url)) await createServer().connect(new StdioServerTransport());
+if (isEntry(import.meta.url)) await createServer(REPO_ROOT, servedTools(process.argv.slice(2))).connect(new StdioServerTransport());

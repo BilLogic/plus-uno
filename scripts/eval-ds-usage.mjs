@@ -17,12 +17,15 @@
  *                    run the checker.
  *   checker-removed  current without the checker (CHECKER_REMOVED); the
  *                    post-edit hook still runs, from this checkout.
+ *   lookup           current plus the copy's own `plus-ds` MCP, all five tools.
+ *   lookup-min       current plus `plus-ds` serving ds_find and ds_get only.
  *
  * Everything but the agent and judge calls is deterministic: the copies, the
  * scoring, the ledger rows and the summary.
  *
  *   node scripts/eval-ds-usage.mjs run [--arms control,current] [--tasks a,b] [--runs 2] [--allow-metered] [--model sonnet] [--ref origin/main] [--scratch DIR]
  *   node scripts/eval-ds-usage.mjs summary [--since YYYY-MM-DD]
+ *   node scripts/eval-ds-usage.mjs compare [--arms lookup,lookup-min] [--baseline current] [--commit SHA]   the keep rule
  *   node scripts/eval-ds-usage.mjs rescore   re-score every kept build with this checkout's rules
  */
 import { createRequire } from 'node:module';
@@ -59,7 +62,10 @@ export const TASKS = [
  * debt seeded.
  */
 export const SEEDED = ['debt-extend', 'migrate-retired'];
-export const ARMS = ['control', 'current', 'hook-off', 'checker-removed'];
+export const ARMS = ['control', 'current', 'hook-off', 'checker-removed', 'lookup', 'lookup-min'];
+/** The arms that add the design-system lookup to current, and the tools each serves (by `ds` subcommand). */
+export const LOOKUP_ARMS = ['lookup', 'lookup-min'];
+const LOOKUP_TOOLS = { lookup: ['find', 'get', 'tokens', 'guide', 'check'], 'lookup-min': ['find', 'get'] };
 /**
  * The default run is small: three arms, four tasks, two runs, 24 builds. It
  * answers the first question (does the harness or the checker earn the
@@ -399,12 +405,34 @@ export function readSet(stdout, root) {
     } else if (name === 'Grep') lookups.push(`Grep ${input.pattern}${input.path ? ` in ${rel(input.path)}` : ''}`);
     else if (name === 'Glob') lookups.push(`Glob ${input.pattern}${input.path ? ` in ${rel(input.path)}` : ''}`);
     else if (name === 'Bash') lookups.push(`Bash ${String(input.command ?? '').slice(0, 160)}`);
+    else if (name.startsWith('mcp__plus-ds__')) lookups.push(`${name.slice('mcp__plus-ds__'.length)} ${JSON.stringify(input).slice(0, 160)}`);
   }
   return { files, lookups };
 }
 
+/**
+ * An arm's MCP wiring in its copy at `root`: the `--mcp-config` the agent
+ * starts with and the MCP tools it may call. A lookup arm runs the copy's own
+ * `scripts/ds-mcp.mjs`, so the server answers from the commit under test;
+ * every other arm gets no server. The `ds` command stays in every copy that
+ * has it, as an npm script.
+ */
+export function lookupWiring(arm, root) {
+  if (!LOOKUP_ARMS.includes(arm)) return { mcpConfig: '{"mcpServers":{}}', allowed: [] };
+  const at = path.join(root, 'scripts/ds-mcp.mjs');
+  if (!fs.existsSync(at)) throw new Error(`${arm}: the copy has no scripts/ds-mcp.mjs; pick a --ref that has the lookup`);
+  // The real path: the server starts only when argv[1] is its own module URL, and the scratch dir is often a symlink (/var → /private/var).
+  const server = fs.realpathSync(at);
+  const ops = LOOKUP_TOOLS[arm];
+  const args = ops.length === LOOKUP_TOOLS.lookup.length ? [server] : [server, '--tools', ops.join(',')];
+  return {
+    mcpConfig: JSON.stringify({ mcpServers: { 'plus-ds': { type: 'stdio', command: 'node', args } } }),
+    allowed: ops.map((op) => `mcp__plus-ds__ds_${op}`),
+  };
+}
+
 /** One headless agent run in `cwd`; returns its result (tokens, turns, cost), any reach into the checkout, and wall time. */
-function agent({ cwd, prompt, model, readOnly = false, deny = [] }) {
+function agent({ cwd, prompt, model, readOnly = false, deny = [], mcp = lookupWiring('none', cwd) }) {
   const args = [
     '-p',
     prompt,
@@ -421,7 +449,8 @@ function agent({ cwd, prompt, model, readOnly = false, deny = [] }) {
     'project,local',
     '--strict-mcp-config',
     '--mcp-config',
-    '{"mcpServers":{}}',
+    mcp.mcpConfig,
+    ...(mcp.allowed.length ? ['--allowedTools', ...mcp.allowed] : []),
     '--disallowedTools',
     ...(readOnly ? [...DISALLOWED, 'Write', 'Edit', 'NotebookEdit', 'Bash'] : DISALLOWED),
   ];
@@ -687,6 +716,62 @@ export function summarize(rows) {
   );
 }
 
+const KEEP_INPUT_DROP = 0.2;
+const KEEP_TURNS_DROP = 3;
+
+/**
+ * The lookup's keep rule, per lookup arm and model, against a baseline arm at
+ * the same harness commit (by default the latest commit a lookup arm ran at):
+ * keep when mean total input tokens fall by at least 20% or mean turns by at
+ * least 3, with zero fail-level escapes across the arm's completed runs.
+ * Errored runs are left out. An arm is kept only when every model it ran on
+ * keeps it; one delete deletes it; anything else is `no data`.
+ */
+export function compare(rows, { arms = LOOKUP_ARMS, baseline = 'current', commit } = {}) {
+  const at =
+    commit ??
+    rows
+      .filter((r) => arms.includes(r.arm))
+      .reduce((latest, r) => (!latest || r.date > latest.date ? r : latest), null)?.harness_commit ??
+    null;
+  const done = rows.filter((r) => r.harness_commit === at && !r.agent_error);
+  const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
+  const stats = (group) => {
+    const input = group.map((r) => r.total_input_tokens ?? totalInput(r)).filter((n) => n !== null);
+    const m = mean(input);
+    const t = mean(group.map((r) => r.turns ?? 0));
+    return { runs: group.length, mean_input_tokens: m === null ? null : Math.round(m), mean_turns: t === null ? null : Number(t.toFixed(2)), escapes: group.reduce((a, r) => a + r.escapes, 0) };
+  };
+  const models = [...new Set(done.filter((r) => r.arm === baseline || arms.includes(r.arm)).map((r) => r.model ?? 'unknown'))].sort();
+  const verdictOf = (base, arm) => {
+    if (!base.runs || !arm.runs) return { verdict: 'no data', input_drop: null, turns_drop: null, escapes: arm.escapes, reason: `no completed ${base.runs ? 'arm' : 'baseline'} runs` };
+    const inputDrop = base.mean_input_tokens && arm.mean_input_tokens !== null ? Number(((base.mean_input_tokens - arm.mean_input_tokens) / base.mean_input_tokens).toFixed(4)) : null;
+    const turnsDrop = Number((base.mean_turns - arm.mean_turns).toFixed(2));
+    const cheaper = (inputDrop ?? 0) >= KEEP_INPUT_DROP || turnsDrop >= KEEP_TURNS_DROP;
+    const reason =
+      arm.escapes > 0
+        ? `${arm.escapes} fail-level escape(s); the rule holds escapes at 0`
+        : cheaper
+          ? `input ${inputDrop === null ? 'n/a' : `-${Math.round(inputDrop * 100)}%`}, turns -${turnsDrop}`
+          : `input fell ${inputDrop === null ? 'n/a' : `${Math.round(inputDrop * 100)}%`} (< 20%) and turns ${turnsDrop} (< 3)`;
+    return { verdict: arm.escapes === 0 && cheaper ? 'keep' : 'delete', input_drop: inputDrop, turns_drop: turnsDrop, escapes: arm.escapes, reason };
+  };
+  const out = {};
+  for (const arm of arms) {
+    const perModel = {};
+    for (const model of models) {
+      const of = (name) => done.filter((r) => r.arm === name && (r.model ?? 'unknown') === model);
+      const base = stats(of(baseline));
+      const own = stats(of(arm));
+      perModel[model] = { ...verdictOf(base, own), baseline: base, arm: own };
+    }
+    const verdicts = Object.values(perModel).map((m) => m.verdict);
+    const verdict = verdicts.includes('delete') ? 'delete' : verdicts.length && verdicts.every((v) => v === 'keep') ? 'keep' : 'no data';
+    out[arm] = { verdict, models: perModel };
+  }
+  return { commit: at, baseline, rule: 'keep if mean total input tokens fall >= 20% or mean turns fall >= 3, at 0 fail-level escapes, on every model', arms: out };
+}
+
 /** `--name value`, validated; a missing or unknown value stops the run before any agent starts. */
 export function options(argv) {
   const value = (name, fallback) => {
@@ -713,6 +798,8 @@ export function options(argv) {
     ref: value('ref', 'origin/main'),
     scratch: value('scratch', os.tmpdir()),
     since: value('since', ''),
+    baseline: list('baseline', ['current'], ARMS)[0],
+    commit: value('commit', undefined),
   };
 }
 
@@ -729,7 +816,7 @@ async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratc
     const { root, folder } = prepare({ ref: opts.ref, arm, task, into: copy });
     // What the folder held before the agent: zero unless the task seeds code.
     const seed = score({ folder, label: `eval-${task}` });
-    const build = agent({ cwd: root, prompt: BUILD_PROMPT(task), model: opts.model, deny: armDenies(arm, root) });
+    const build = agent({ cwd: root, prompt: BUILD_PROMPT(task), model: opts.model, deny: armDenies(arm, root), mcp: lookupWiring(arm, root) });
     const failed = Boolean(build.result.is_error);
     const scored = score({ folder, label: `eval-${task}` });
     // The judge reads a copy of the build alone, so nothing beside it is in reach.
@@ -817,8 +904,11 @@ if (isEntry(import.meta.url)) {
       const rows = rescore(readLedger(), { scorer: scorerCommit() });
       fs.writeFileSync(path.join(REPO_ROOT, LEDGER), rows.map((r) => `${JSON.stringify(r)}\n`).join(''));
       console.log(JSON.stringify(summarize(rows), null, 2));
+    } else if (command === 'compare') {
+      const arms = rest.includes('--arms') ? opts.arms : LOOKUP_ARMS;
+      console.log(JSON.stringify(compare(readLedger(), { arms, baseline: opts.baseline, commit: opts.commit }), null, 2));
     } else if (command === 'summary') console.log(JSON.stringify(summarize(readLedger().filter((r) => r.date >= opts.since)), null, 2));
-    else throw new Error('usage: node scripts/eval-ds-usage.mjs run|summary|rescore [options] (docs/evals/ds-usage.md)');
+    else throw new Error('usage: node scripts/eval-ds-usage.mjs run|summary|rescore|compare [options] (docs/evals/ds-usage.md)');
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;
