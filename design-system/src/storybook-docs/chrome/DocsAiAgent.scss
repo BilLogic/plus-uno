@@ -1,12 +1,16 @@
 // The docs have no Frame, so the chat's Frame is an invisible full-window
-// layer: it takes no pointer, and only the chat and the floating button do.
+// layer: it paints nothing and takes no pointer, and only the chat and the
+// floating button do.
 .plus-docs-ai {
     position: fixed;
     inset: 0;
     z-index: var(--layer-navigation);
     pointer-events: none;
 
-    .plus-frame__surface {
+    .plus-frame,
+    .plus-frame__row,
+    .plus-frame__surface,
+    .plus-frame__content {
         background: transparent;
     }
 
