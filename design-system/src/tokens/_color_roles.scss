@@ -82,7 +82,8 @@
 :root {
     /* Every -icon but warning's resolves to its -text color: 6.70:1 at worst,
        clearing the 4.5:1 text bar as well as the 3:1 icon one. Every -border
-       but warning's keeps the base, whose worst ratio is noted beside it. */
+       here but warning's keeps the base, whose worst ratio is noted beside it;
+       primary's border is `--ds-border-brand`. */
 
     /* Primary — its border is `--ds-border-brand`. */
     --color-primary-icon: var(--color-primary-text);

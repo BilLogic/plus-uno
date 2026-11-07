@@ -24,7 +24,7 @@
  * A GLOW IS NOT AUTOMATICALLY A DEFECT, and this is the correction that shaped
  * the check. Eleven of the fourteen `box-shadow: 0 0 0 0.2rem
  * an 8% primary tint` declarations sit beside `border-color:
- * var(--color-primary-border)` in the same rule. There the BORDER is the
+ * var(--ds-border-brand)` in the same rule. There the BORDER is the
  * indicator at 5.02:1 and the glow is decoration around it, exactly as
  * Bootstrap intends. Reporting those as failures would be measuring one
  * declaration instead of the rule it lives in. So the rule is scored on its

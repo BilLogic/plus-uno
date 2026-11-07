@@ -42,8 +42,7 @@ import { fileURLToPath } from 'node:url';
 import * as sass from 'sass';
 import postcss from 'postcss';
 
-import { dsName } from './lib/color/emit.mjs';
-import { RETIRED_LEGACY } from './lib/color/legacy-map.mjs';
+import { retiredTo } from './lib/color/legacy-map.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MAPPING = path.join(REPO_ROOT, 'design-system/guidelines/figma/token-mapping.md');
@@ -69,8 +68,7 @@ test('the mapping table is still parseable', () => {
 test('a retired level maps to the shadow its uses moved to; a live level maps to itself', () => {
   for (const row of rows) {
     const legacy = `--elevation-light-${row.level}`;
-    const moved = RETIRED_LEGACY[legacy];
-    const expected = moved ? dsName(moved) : legacy;
+    const expected = retiredTo(legacy) ?? legacy;
     assert.equal(row.token, expected, `token-mapping.md maps Light/${row.level} ("${row.uses}") to ${row.token}, not ${expected}`);
   }
   assert.equal(rows.find((r) => /cards/i.test(r.uses))?.token, '--ds-shadow-raised', 'the cards row');

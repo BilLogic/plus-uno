@@ -54,8 +54,7 @@
  */
 import { TOKEN_DIR, tokenCorpus } from '../design-system/src/lib/tokens-node.mjs';
 import { resolveToken, tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
-import { dsName } from './lib/color/emit.mjs';
-import { RETIRED_LEGACY } from './lib/color/legacy-map.mjs';
+import { RETIRED_LEGACY, retiredTo } from './lib/color/legacy-map.mjs';
 import { text as read } from './lib/corpus.mjs';
 
 /**
@@ -141,9 +140,9 @@ export const INTENT = /^--color-(primary|secondary|tertiary|danger|success|warni
  */
 const intentRoles = (t, suffix) => {
   const names = new Set(t);
-  const moved = Object.entries(RETIRED_LEGACY)
-    .filter(([legacy, token]) => INTENT.test(legacy) && legacy.endsWith(suffix) && names.has(dsName(token)))
-    .map(([legacy]) => legacy);
+  const moved = Object.keys(RETIRED_LEGACY).filter(
+    (legacy) => INTENT.test(legacy) && legacy.endsWith(suffix) && names.has(retiredTo(legacy)),
+  );
   return new Set([...t.filter((n) => INTENT.test(n) && n.endsWith(suffix)), ...moved]).size;
 };
 

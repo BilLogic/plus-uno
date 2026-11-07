@@ -6,8 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 import { INTENT, ROWS, ourTokens, textScale, compare, ageInDays, failures } from './atlassian-benchmark.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
-import { dsName } from './lib/color/emit.mjs';
-import { RETIRED_LEGACY } from './lib/color/legacy-map.mjs';
+import { RETIRED_LEGACY, retiredTo } from './lib/color/legacy-map.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BENCHMARK = JSON.parse(
@@ -119,8 +118,8 @@ test('the seven intents all still carry the same shape', () => {
       (t) => (t.startsWith(`--color-${name}-`) || t === `--color-${name}`) && t !== `--color-${name}-border-subtle`,
     );
     // A role retired to its `--ds-*` token (primary's border is --ds-border-brand) still counts.
-    const moved = Object.entries(RETIRED_LEGACY).filter(
-      ([legacy, token]) => legacy.startsWith(`--color-${name}-`) && tokens.includes(dsName(token)),
+    const moved = Object.keys(RETIRED_LEGACY).filter(
+      (legacy) => legacy.startsWith(`--color-${name}-`) && tokens.includes(retiredTo(legacy)),
     );
     assert.equal(own.length + moved.length, 5, `${name} has ${own.length + moved.length} tokens, not the shared 5`);
     assert.equal(
@@ -130,7 +129,7 @@ test('the seven intents all still carry the same shape', () => {
     );
     for (const role of ['text', 'container', 'icon', 'border']) {
       const legacy = `--color-${name}-${role}`;
-      assert.ok(own.includes(legacy) || moved.some(([n]) => n === legacy), `${name} has no -${role}`);
+      assert.ok(own.includes(legacy) || moved.includes(legacy), `${name} has no -${role}`);
     }
   }
   assert.ok(INTENT.test('--color-warning-text'));

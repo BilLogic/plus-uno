@@ -834,7 +834,6 @@ const GROUNDS = [
 
 const grounds = () => GROUNDS.map(([label, token]) => [label, readIntentToken(token)]).filter(([, hex]) => hex);
 
-/** `{intent, role, hex, ratios: [{ground, ratio, passes}]}` for one token. */
 /** The token an intent's role is drawn with. Primary's border is the generated brand border; the rest keep their `--color-*` role. */
 const intentToken = (intent, role) => {
     if (role === 'base') return `--color-${intent}`;
@@ -842,6 +841,7 @@ const intentToken = (intent, role) => {
     return `--color-${intent}-${role}`;
 };
 
+/** `{intent, role, hex, ratios: [{ground, ratio, passes}]}` for one token. */
 const measure = (intent, role, bar) => {
     const hex = readIntentToken(intentToken(intent, role));
     if (!hex) return null;

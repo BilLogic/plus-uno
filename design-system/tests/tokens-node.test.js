@@ -42,8 +42,7 @@ import { describe, it, expect } from 'vitest';
 
 import { documents, text } from '../../scripts/lib/corpus.mjs';
 import { fallbackUsages } from '../../scripts/token-fallbacks.mjs';
-import { dsName } from '../../scripts/lib/color/emit.mjs';
-import { RETIRED_LEGACY } from '../../scripts/lib/color/legacy-map.mjs';
+import { RETIRED_LEGACY, retiredTo } from '../../scripts/lib/color/legacy-map.mjs';
 import { RETIRED_TOKENS, retiredRenames } from '../../scripts/lib/tokens/plan.mjs';
 import { parseColor, toHex } from '../src/lib/tokens.mjs';
 import {
@@ -242,7 +241,7 @@ describe('the corpus — where tokens live, answered once and read through the o
     expect(Object.keys(RETIRED_LEGACY)).toHaveLength(12);
     const declared = Object.keys(RETIRED_LEGACY).filter((name) => corpus.has(name));
     expect(declared).toEqual([]);
-    const missing = Object.values(RETIRED_LEGACY).map(dsName).filter((name) => !corpus.has(name));
+    const missing = Object.keys(RETIRED_LEGACY).map(retiredTo).filter((name) => !corpus.has(name));
     expect(missing).toEqual([]);
   });
 

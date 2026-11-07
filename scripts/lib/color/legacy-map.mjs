@@ -41,6 +41,8 @@ import { join } from 'node:path';
 
 import { REPO_ROOT, documents } from '../corpus.mjs';
 
+import { dsName } from './emit.mjs';
+
 const SMART = '(mastering-content|relationship|technology-tools|advocacy|social-emotional)';
 
 /** @type {{today: string, match: RegExp|null, proposed: string, note: string, retired?: Record<string, string>}[]} */
@@ -101,6 +103,9 @@ export const ROWS = [
 
 /** Retired legacy name -> the token every use moved to, in row order. */
 export const RETIRED_LEGACY = Object.fromEntries(ROWS.flatMap((row) => Object.entries(row.retired ?? {})));
+
+/** The CSS name a retired legacy name moved to (`--ds-shadow-raised`), or undefined for a live name. */
+export const retiredTo = (legacy) => (RETIRED_LEGACY[legacy] ? dsName(RETIRED_LEGACY[legacy]) : undefined);
 
 /**
  * Foregrounds and the grounds they are drawn on, by legacy name or pattern.
