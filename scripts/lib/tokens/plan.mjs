@@ -256,6 +256,7 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Modal', new: '--modal-width-lg', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' } },
   { tier: 'patterns', group: 'Page', new: '--page-radius-md', old: null, ref: 'var(--radius-075)' },
   { tier: 'patterns', group: 'Page', new: '--page-border-width', old: null, ref: 'var(--stroke-2)' },
+  { tier: 'patterns', group: 'Table', new: '--table-overflow-reach', old: null, ref: 'var(--space-150)' },
   { tier: 'patterns', group: 'Modal', new: '--modal-body-min-height', old: null, ref: 'var(--space-500)' },
 
   // ─── Patterns / Popover ───────────────────────────────────────────────
@@ -343,7 +344,6 @@ export const TOKEN_LADDER = [
   // ─── Components / Join row, Option menu ───────────────────────────────
   { tier: 'components', group: 'Join row', new: '--join-row-width', old: '--layout-width-join-row', ref: '520px' },
   { tier: 'components', group: 'Option menu', new: '--option-menu-width', old: '--layout-width-option-menu', ref: '240px' },
-
 
   // ─── Components / sizes once written with primitives ─────────────────
   { tier: 'components', group: 'Button', new: '--button-vertical-size', old: null, ref: 'var(--size-300)' },

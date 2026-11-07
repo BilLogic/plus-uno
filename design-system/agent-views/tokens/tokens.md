@@ -98,6 +98,7 @@ Space owned by a pattern: page, section, card, table, modal, drawer, popover. In
 --section-pad-y-default
 --section-pad-y-spacious
 --section-radius
+--table-overflow-reach
 ```
 
 ## Ladder Components

@@ -13,7 +13,7 @@
     // mode), so it is a length of its own, with room to spare, rather than a
     // multiple of the cell padding, which a density change would shrink until
     // the shadow clipped. Raise it if the overflow shadow's blur grows.
-    --pattern-table-overflow-reach: var(--section-pad-x-default);
+    --pattern-table-overflow-reach: var(--table-overflow-reach);
     // Sticky cells stack only inside the scroll region (which isolates), so
     // these are local orders on the card layer: a sticky row or column rides
     // over the body, and the corner cell over both.

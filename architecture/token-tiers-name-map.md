@@ -171,6 +171,7 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Modal | `--layout-width-modal-lg` | `--modal-width-lg` |  |
 | Page | *(new)* | `--page-radius-md` |  |
 | Page | *(new)* | `--page-border-width` |  |
+| Table | *(new)* | `--table-overflow-reach` |  |
 | Modal | *(new)* | `--modal-body-min-height` |  |
 | Popover | `--popover-pad` | `--popover-pad` (reclassified, unchanged) |  |
 | Popover | `--popover-width-sm` | `--popover-width-sm` (reclassified, unchanged) |  |

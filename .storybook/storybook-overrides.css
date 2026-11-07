@@ -346,7 +346,7 @@ a.sbdocs-a {
  * `DocsCanvasShell` is not a direct child, is still in block flow, and still
  * collapses normally — that spacing is the shell's business, not this rule's.
  *
- * `--size-section-gap-md` replaces the hand-picked `0.5rem`/`0.625rem` pair. One
+ * `--section-stack-md` replaces the hand-picked `0.5rem`/`0.625rem` pair. One
  * value at every width: a heading sits the same distance from its content as two
  * paragraphs sit from each other, which is the trade of having one authority.
  */
