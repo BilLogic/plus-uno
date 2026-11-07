@@ -34,6 +34,4 @@ From `design-system/src/components/layout-and-structure/Footer/Footer.scss`. Ove
 
 Same group: `Accordion` · `Carousel` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

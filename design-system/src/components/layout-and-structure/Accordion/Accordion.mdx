@@ -1,8 +1,22 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as AccordionStories from './Accordion.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Accordion } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const sessionBody = "Open a session to see the student's goals, your notes from last time and the materials you planned to use.";
+export const sessionItems = [
+    { eventKey: '0', header: 'Session notes', body: sessionBody },
+    { eventKey: '1', header: 'Goals', body: sessionBody },
+    { eventKey: '2', header: 'Materials', body: sessionBody },
+];
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -38,31 +52,11 @@ Accordion component for organizing content into collapsible sections.
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>Composable children instead of the <code>items</code> array.</>}>
-    <Canvas of={AccordionStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Children-based items pattern alongside the <code>items</code> array API.</>}>
-    <DsCanvasQuiet of={AccordionStories.Content} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Appearance
 
-<DocsCanvasShell description={<>Default bordered accordion and flush (borderless) treatment.</>}>
-    <DsCanvasQuiet of={AccordionStories.Styles} />
-</DocsCanvasShell>
+<ComponentExample of={AccordionStories.Overview} title="Default" description="A bordered group of items, with the first one open." />
+
+<ComponentExample of={AccordionStories.Styles} title="Default and flush" description={<>The default bordered accordion, and <code>flush</code>, which drops the outer border and corners.</>} />
 
 </div>
 
@@ -70,43 +64,29 @@ Accordion component for organizing content into collapsible sections.
 
 ## Behavior
 
-<DocsCanvasShell description={<>Disclosure <strong>model</strong>: multiple panels open at once (<code>alwaysOpen</code>) and an initial state where every panel starts collapsed (no default active key).</>}>
-    <DsCanvasQuiet of={AccordionStories.Behavior} />
-</DocsCanvasShell>
+<ComponentExample of={AccordionStories.Content} title="Children" description={<>Items composed as children, beside the <code>items</code> array API.</>} />
+
+<ComponentExample of={AccordionStories.Behavior} title="Always open and all collapsed" description={<><code>alwaysOpen</code> lets several items stay open; with no default active key, every item starts collapsed.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## State
 
-<DocsCanvasShell description={<>Per-header affordances on the trigger (here: <code>disabled</code>). Expanded vs collapsed is <strong>disclosure state</strong> (which keys are open), separate from disabled, hover, focus, or pressed styling on the header.</>}>
-    <DsCanvasQuiet of={AccordionStories.InteractionStates} />
-</DocsCanvasShell>
+<ComponentExample of={AccordionStories.InteractionStates} title="Disabled item" description={<>A single item set to <code>disabled</code>. Which items are open is disclosure state, separate from the header's own states.</>} />
 
-<DocsCanvasShell description={<>A closed trigger on the surface, chevron down.</>}>
-    <DsCanvasQuiet of={AccordionStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={AccordionStories.Rest} title="Rest" description="A closed trigger on the surface, chevron down." />
 
-<DocsCanvasShell description={<>The neutral subtle hovered ground.</>}>
-    <DsCanvasQuiet of={AccordionStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={AccordionStories.Hovered} title="Hovered" description="The neutral subtle hovered ground." />
 
-<DocsCanvasShell description={<>The neutral subtle pressed ground.</>}>
-    <DsCanvasQuiet of={AccordionStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={AccordionStories.Pressed} title="Pressed" description="The neutral subtle pressed ground." />
 
-<DocsCanvasShell description={<>The 2px focus ring, 2px off the edge. The ground stays put.</>}>
-    <DsCanvasQuiet of={AccordionStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={AccordionStories.Focused} title="Focused" description="The 2px focus ring, 2px off the edge. The ground stays put." />
 
-<DocsCanvasShell description={<>The selected ground, chevron turned up. Press again to close.</>}>
-    <DsCanvasQuiet of={AccordionStories.Expanded} />
-</DocsCanvasShell>
+<ComponentExample of={AccordionStories.Expanded} title="Expanded" description="The selected ground, chevron turned up. Press again to close." />
 
-<DocsCanvasShell description={<>Dimmed to the disabled opacity, announced as disabled, and it never opens.</>}>
-    <DsCanvasQuiet of={AccordionStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={AccordionStories.Disabled} title="Disabled" description="Dimmed to the disabled opacity, announced as disabled, and it never opens." />
 
 </div>
 
@@ -181,9 +161,9 @@ lets more than one item stay open at once.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Trigger ground</td><td><code>--ds-surface</code>; selected, <code>--ds-background-selected</code>.</td></tr>
-<tr><td>Trigger and chevron</td><td><code>--ds-text-subtle</code>; title in <code>--heading-small</code>.</td></tr>
-<tr><td>Body</td><td><code>--body-large</code> on <code>--ds-surface</code>, <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Trigger ground</td><td><code>--ds-surface</code>; <code>--ds-background-neutral-subtle-hovered</code> and <code>-pressed</code> under the pointer; open, <code>--ds-background-selected</code> and <code>--ds-background-selected-hovered</code>.</td></tr>
+<tr><td>Trigger and chevron</td><td><code>--ds-text-subtle</code>; title in <code>--heading-small</code>; chevron at <code>--font-size-fa-h6-solid</code>.</td></tr>
+<tr><td>Body</td><td><code>--body-large</code> on <code>--ds-surface</code>, <code>--ds-text-subtle</code>, with a <code>--ds-border</code> rule above it.</td></tr>
 <tr><td>Edge</td><td><code>--ds-border</code> at <code>--size-card-border-sm</code>, corners <code>--size-card-radius-sm</code>.</td></tr>
 <tr><td>Padding</td><td><code>--size-card-pad-y-md</code> and <code>--size-card-pad-x-md</code>.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code> wide and offset.</td></tr>
@@ -196,6 +176,41 @@ lets more than one item stay open at once.
 <div className="sb-ds-doc-section">
 
 ## Best practices
+
+Use an accordion for several long, independent sections where only one matters at a time.
+
+### Open one section at a time.
+
+A stack answers one question at a time; leaving every item open turns it into a long page.
+
+<DoDontPair
+    doExample={<Accordion items={sessionItems} defaultActiveKey="0" />}
+    doCaption="One section open, the rest closed."
+    dontExample={<Accordion items={sessionItems} defaultActiveKey={['0', '1', '2']} alwaysOpen />}
+    dontCaption="Every section open at once."
+/>
+
+### Keep titles to a few words.
+
+The title is the only thing visible when closed, so it has to name the content at a glance.
+
+<DoDontPair
+    doExample={<Accordion items={[{ eventKey: '0', header: 'Billing', body: sessionBody }]} />}
+    doCaption="A short noun title."
+    dontExample={<Accordion items={[{ eventKey: '0', header: 'Everything you need to know about billing, refunds and invoices', body: sessionBody }]} />}
+    dontCaption="A title that runs on and wraps."
+/>
+
+### Stack the items in one accordion.
+
+Items share borders so the group reads as one control. This is not the `flush` prop, which is covered below.
+
+<DoDontPair
+    doExample={<Accordion items={sessionItems} />}
+    doCaption="Items touch, borders shared."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>{sessionItems.map((item) => <Accordion key={item.eventKey} items={[item]} />)}</div>}
+    dontCaption="Items spaced apart like separate cards."
+/>
 
 ### There are two ways to author items, and `children` wins.
 

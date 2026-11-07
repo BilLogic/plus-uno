@@ -1,7 +1,36 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as PanelStories from './Panel.stories.jsx';
-import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import {
+    Button,
+    PanelActionGroup,
+    PanelBackAction,
+    PanelBody,
+    PanelCloseAction,
+    PanelContainer,
+    PanelDisclaimer,
+    PanelFooter,
+    PanelHeader,
+    PanelSubheader,
+} from '@/components';
+import { iconClass } from '@/lib/icon';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const DemoPanel = ({ width, title = 'Session details', titleIcon, backAction, subheader, footer = true }) => (
+    <PanelContainer width={width}>
+        <PanelHeader backAction={backAction} titleIcon={titleIcon} title={title} actions={<PanelActionGroup><PanelCloseAction /></PanelActionGroup>} />
+        {subheader && <PanelSubheader>{subheader}</PanelSubheader>}
+        <PanelBody>Panel body content goes here.</PanelBody>
+        {footer && <PanelFooter><PanelDisclaimer>Changes save automatically.</PanelDisclaimer><Button appearance="primary" text="Done" /></PanelFooter>}
+    </PanelContainer>
+);
+export const panelIcon = <i className={iconClass('calendar')} aria-hidden="true" />;
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -39,62 +68,19 @@ a secondary conversation.
 
 <div className="sb-ds-doc-section">
 
-## Anatomy
+## Appearance
 
-1. **`PanelContainer`** is the outer surface, at a fixed width or the width a
-   `PanelProvider` shares with whatever opened it.
-2. **`PanelHeader`** holds an optional back action, an optional title icon,
-   the title, and an action group (close, more, …).
-3. **`PanelSubheader`** is an optional row of secondary content under the
-   header — tabs, a filter summary.
-4. **`PanelBody`** is the scrollable main content.
-5. **`PanelFooter`**, with an optional **`PanelDisclaimer`**, holds actions
-   that commit a change and small-print beside them.
+<ComponentExample of={PanelStories.FullComposition} title="Full composition" description="Header with back and close actions, subheader, body, and a footer with a disclaimer and an action." />
 
-<DocsCanvasShell attachSourceBelow description={<>Header, subheader, body and footer together.</>}>
-    <Canvas of={PanelStories.FullComposition} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={PanelStories.MinimalHeaderAndBody} title="Header and body" description="The common case: subheader and footer are both optional." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Composition
+## Size and layout
 
-<DocsCanvasShell description={<>A header and a body is the common case — subheader and footer are both optional.</>}>
-    <DsCanvasQuiet of={PanelStories.MinimalHeaderAndBody} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>`PanelProvider` shares one width with every panel inside it, so a page with more than one panel keeps them aligned.</>}>
-    <DsCanvasQuiet of={PanelStories.WidthFromProvider} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Component</th>
-            <th>Property</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>PanelProvider</code></td><td><code>defaultWidth</code></td><td>The starting width shared with every panel inside it. Default <code>var(--panel-width-default)</code>, 400.</td></tr>
-        <tr><td><code>PanelContainer</code></td><td><code>width</code></td><td>Falls back to the nearest <code>PanelProvider</code>'s width, then <code>var(--panel-width-default)</code>, 400. Inside the Frame's Panel area it fills the area instead.</td></tr>
-        <tr><td><code>PanelHeader</code></td><td><code>backAction</code>, <code>titleIcon</code>, <code>title</code>, <code>actions</code></td><td>An optional back control, an optional icon beside the title, the title itself, and a trailing action group.</td></tr>
-        <tr><td><code>PanelFooter</code></td><td><code>children</code></td><td>Actions that commit a change; pair with <code>PanelDisclaimer</code> for small print.</td></tr>
-    </tbody>
-</DocsTable>
-
-Fixed action components cover the common icons: `PanelBackAction`,
-`PanelCloseAction`, `PanelMoreAction`, `PanelUpAction`, `PanelDownAction`,
-`PanelNewTabAction` and `PanelViewSwitcher`, each a labeled `IconButton` with
-its glyph and accessible name already set.
+<ComponentExample of={PanelStories.WidthFromProvider} title="Width from provider" description={<><code>PanelProvider</code> shares one width with every panel inside it, so a page with more than one panel keeps them aligned.</>} />
 
 </div>
 
@@ -102,21 +88,29 @@ its glyph and accessible name already set.
 
 ## State
 
-<DocsCanvasShell description={<>A panel with its header, body and close action.</>}>
-    <DsCanvasQuiet of={PanelStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={PanelStories.Rest} title="Rest" description="A panel with its header, body and close action." />
 
-<DocsCanvasShell description={<>The panel has no hover layer. Only the actions inside it react.</>}>
-    <DsCanvasQuiet of={PanelStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={PanelStories.Hovered} title="Hovered" description="The panel has no hover layer. Only the actions inside it react." />
 
-<DocsCanvasShell description={<>No pressed layer on the panel.</>}>
-    <DsCanvasQuiet of={PanelStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={PanelStories.Pressed} title="Pressed" description="No pressed layer on the panel." />
 
-<DocsCanvasShell description={<>The panel is not a control, so Tab skips it and lands on the close action.</>}>
-    <DsCanvasQuiet of={PanelStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={PanelStories.Focused} title="Focused" description="The panel is not a control, so Tab skips it and lands on the close action." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={PanelStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
 
 </div>
 
@@ -138,16 +132,22 @@ leaving the page behind, as a `Modal` does, would lose that context. For
 something that must be decided before the page continues, use `Modal`
 instead.
 
+Fixed action components cover the common icons: `PanelBackAction`,
+`PanelCloseAction`, `PanelMoreAction`, `PanelUpAction`, `PanelDownAction`,
+`PanelNewTabAction` and `PanelViewSwitcher`, each a labeled `IconButton` with
+its glyph and accessible name already set.
+
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Parts
 
-1. **Header.** Back action, optional title icon, title, and an action group.
-2. **Subheader.** Optional line under the header.
-3. **Body.** The panel's content, which scrolls.
-4. **Footer.** Optional disclaimer and actions.
+1. **Container** (`PanelContainer`). The outer surface. Its `width` falls back to the nearest `PanelProvider`'s width, then to `--panel-width-default` (400); inside the Frame's Panel area it fills the area instead.
+2. **Header** (`PanelHeader`). An optional back action, an optional title icon, the title, and an action group (close, more, …).
+3. **Subheader** (`PanelSubheader`). An optional row of secondary content under the header: tabs, a filter summary.
+4. **Body** (`PanelBody`). The main content, which scrolls.
+5. **Footer** (`PanelFooter`). Actions that commit a change, with an optional `PanelDisclaimer` for small print beside them.
 
 ### States
 
@@ -172,9 +172,11 @@ instead.
 </thead>
 <tbody>
 <tr><td>Ground and edge</td><td><code>--ds-surface-overlay</code>; <code>--ds-border</code> at <code>--border-default</code> on the leading edge.</td></tr>
-<tr><td>Header</td><td>Padding <code>--space-100</code> and <code>--space-150</code>; <code>--border-default</code> rule below.</td></tr>
+<tr><td>Header</td><td>Padding <code>--space-100</code> and <code>--space-150</code>; <code>--space-075</code> between its parts; <code>--border-default</code> rule below.</td></tr>
+<tr><td>Action group</td><td><code>--space-025</code> between actions.</td></tr>
+<tr><td>Subheader</td><td>Padding <code>--space-075</code> and <code>--space-150</code>; <code>--border-default</code> rule below.</td></tr>
 <tr><td>Body</td><td>Padding <code>--space-150</code>.</td></tr>
-<tr><td>Footer</td><td>Padding <code>--space-100</code> and <code>--space-150</code>; rule above; disclaimer in <code>--body-small</code>, <code>--ds-text-subtle</code>.</td></tr>
+<tr><td>Footer</td><td>Padding <code>--space-100</code> and <code>--space-150</code>, <code>--space-100</code> between its parts; rule above; disclaimer in <code>--body-small</code>, <code>--ds-text-subtle</code>.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -183,6 +185,41 @@ instead.
 <div className="sb-ds-doc-section">
 
 ## Best practices
+
+Use a panel for context or a focused task beside the page's main content.
+
+### Give the panel room to read.
+
+Below its default width the title wraps and the body stops being scannable.
+
+<DoDontPair
+    doExample={<DemoPanel />}
+    doCaption="Default width."
+    dontExample={<DemoPanel width="calc(var(--panel-width-default) / 3)" />}
+    dontCaption="Squeezed to a narrow strip."
+/>
+
+### Keep the header to one cue.
+
+An icon, a subheader and a footer together bury the title; pick the one the task needs.
+
+<DoDontPair
+    doExample={<DemoPanel titleIcon={panelIcon} />}
+    doCaption="Title with an icon."
+    dontExample={<DemoPanel titleIcon={panelIcon} subheader="Thursday, 4:00 PM" backAction={<PanelBackAction />} />}
+    dontCaption="Icon, back action and subheader all on, burying the title."
+/>
+
+### Title the panel with the object.
+
+The title names what the panel shows, so someone who opened it from elsewhere still knows.
+
+<DoDontPair
+    doExample={<DemoPanel title="Session notes" />}
+    doCaption="The object it shows: “Session notes”."
+    dontExample={<DemoPanel title="Details" />}
+    dontCaption="A generic “Details” that does not name the object."
+/>
 
 ### Share one width across a page's panels with `PanelProvider`.
 

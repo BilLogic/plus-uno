@@ -1,8 +1,23 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as ScrollBarStories from './ScrollBar.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { ScrollBar } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const Notes = ({ count }) => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', padding: 'var(--pad-y-lg) var(--pad-x-md)' }}>
+        {Array.from({ length: count }, (_, i) => <p key={i} style={{ margin: 0 }}>Note {i + 1}</p>)}
+    </div>
+);
+export const box = { border: 'var(--stroke-1) solid var(--ds-border)', borderRadius: 'var(--radius-md)' };
+export const smallCap = 'calc(var(--size-spacing-xlarge-space-2000) * 0.75)';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -23,6 +38,7 @@ export const figmaMeta = {
 <Meta of={ScrollBarStories} />
 
 <Title />
+A wrapper that caps a region's height and draws the design system's thin scrollbar.
 
 <DocsTabs of={ScrollBarStories}>
 
@@ -39,31 +55,19 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>Vertical scrolling with the tokenized thin scrollbar.</>}>
-    <Canvas of={ScrollBarStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={ScrollBarStories.Overview} title="Default" description="Vertical scrolling with the thin, border-colored scrollbar." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Content
+## Size and layout
 
-<DocsCanvasShell description={<>Typical use: a list panel scrolling inside a bounded container.</>}>
-    <DsCanvasQuiet of={ScrollBarStories.Content} />
-</DocsCanvasShell>
+<ComponentExample of={ScrollBarStories.Layout} title="Vertical and horizontal" description={<>Vertical, capped by <code>maxHeight</code>, and horizontal.</>} />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Layout & composition
-
-<DocsCanvasShell description={<>Vertical (bounded by maxHeight) and horizontal orientations.</>}>
-    <DsCanvasQuiet of={ScrollBarStories.Layout} />
-</DocsCanvasShell>
+<ComponentExample of={ScrollBarStories.Content} title="List panel" description="Typical use: a list scrolling inside a bounded container." />
 
 </div>
 
@@ -71,21 +75,13 @@ export const figmaMeta = {
 
 ## State
 
-<DocsCanvasShell description={<>A region capped at its height, scrolling inside.</>}>
-    <DsCanvasQuiet of={ScrollBarStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={ScrollBarStories.Rest} title="Rest" description="A region capped at its height, scrolling inside." />
 
-<DocsCanvasShell description={<>The region has no hover layer. The thumb darkens under the pointer in the browser.</>}>
-    <DsCanvasQuiet of={ScrollBarStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={ScrollBarStories.Hovered} title="Hovered" description="The region has no hover layer; the thumb darkens under the pointer in the browser." />
 
-<DocsCanvasShell description={<>No pressed layer on the region.</>}>
-    <DsCanvasQuiet of={ScrollBarStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={ScrollBarStories.Pressed} title="Pressed" description="No pressed layer on the region." />
 
-<DocsCanvasShell description={<>Tab lands on the region so the arrow keys can scroll it.</>}>
-    <DsCanvasQuiet of={ScrollBarStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={ScrollBarStories.Focused} title="Focused" description="Tab lands on the region so the arrow keys can scroll it." />
 
 </div>
 
@@ -159,6 +155,7 @@ container.
 </thead>
 <tbody>
 <tr><td>Thumb</td><td><code>--ds-border</code>; <code>--ds-border-bold</code> on hover.</td></tr>
+<tr><td>Track and corner</td><td>Transparent.</td></tr>
 <tr><td>Width</td><td><code>--size-spacing-small-space-075</code>.</td></tr>
 <tr><td>Corner</td><td><code>--radius-md</code>.</td></tr>
 <tr><td>Height cap</td><td>twice <code>--size-spacing-xlarge-space-2000</code> by default.</td></tr>
@@ -171,6 +168,45 @@ container.
 
 ## Best practices
 
+Use a scroll region when a part of the page has to scroll inside a page that does not.
+
+### One scrollbar per region.
+
+Two bars side by side suggest two scrolling areas where there is one. Do not nest one region inside another on the same axis.
+
+<DoDontPair
+    doExample={<div style={box}><ScrollBar maxHeight={smallCap} aria-label="Notes, one region"><Notes count={12} /></ScrollBar></div>}
+    doCaption="A single scrollbar."
+    dontExample={<div style={box}><ScrollBar maxHeight={smallCap} aria-label="Notes, outer region"><div style={{ ...box, margin: 'var(--pad-y-lg) var(--pad-x-md)' }}><ScrollBar maxHeight="calc(var(--size-spacing-xlarge-space-2000) * 1.25)" aria-label="Notes, inner region"><Notes count={20} /></ScrollBar></div></ScrollBar></div>}
+    dontCaption="A region nested in another: two scrollbars on one region."
+/>
+
+### Keep the track thin.
+
+The scrollbar stays at its natural width; stretching it competes with the content. It has no width prop, so leave its styling as shipped.
+
+### Wrap only content that overflows.
+
+A region around content that already fits shows no bar and still adds a tab stop with nothing to scroll.
+
+<DoDontPair
+    doExample={<div style={box}><ScrollBar maxHeight={smallCap} aria-label="Notes, long list"><Notes count={12} /></ScrollBar></div>}
+    doCaption="A region around a list that overflows."
+    dontExample={<div style={box}><ScrollBar maxHeight={smallCap} aria-label="Notes, short list"><Notes count={2} /></ScrollBar></div>}
+    dontCaption="A region around two short items."
+/>
+
+### It caps the height; it does not fill one.
+
+`maxHeight` is a cap. In a taller container, give the region the height you want it to take, such as `maxHeight="100%"`.
+
+<DoDontPair
+    doExample={<div style={{ ...box, height: 'calc(var(--size-spacing-xlarge-space-2000) * 1.5)' }}><ScrollBar maxHeight="100%" aria-label="Notes, filled"><Notes count={16} /></ScrollBar></div>}
+    doCaption="The region fills its container and scrolls."
+    dontExample={<div style={{ ...box, height: 'calc(var(--size-spacing-xlarge-space-2000) * 1.5)' }}><ScrollBar maxHeight={smallCap} aria-label="Notes, capped"><Notes count={16} /></ScrollBar></div>}
+    dontCaption="A smaller cap leaves the space below it empty."
+/>
+
 ### Name each region.
 
 ```jsx
@@ -182,17 +218,6 @@ container.
 // Correct.
 <ScrollBar aria-label="Sessions"><SessionList /></ScrollBar>
 <ScrollBar aria-label="Notes"><NoteList /></ScrollBar>
-```
-
-### It caps the height; it does not fill one.
-
-```jsx
-// Incorrect — maxHeight caps, so in a taller panel the region stops at 320px
-// and leaves the space below it empty.
-<Panel style={{ height: 600 }}><ScrollBar>{rows}</ScrollBar></Panel>
-
-// Correct — give it the height you want it to take.
-<Panel style={{ height: 600 }}><ScrollBar maxHeight="100%">{rows}</ScrollBar></Panel>
 ```
 
 ### One axis, not both.

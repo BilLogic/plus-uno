@@ -1,7 +1,16 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as PageHeaderStories from './PageHeader.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Breadcrumb, Button, PageHeader, Tabs } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const trail = [{ text: 'Students', href: '#' }, { text: 'Ari Patel' }];
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -38,25 +47,19 @@ its side, and a bottom bar below.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>A title on its own.</>}>
-    <Canvas of={PageHeaderStories.Basic} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={PageHeaderStories.Basic} title="Title only" description="A title on its own." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Composition
+## Size and layout
 
-<DocsCanvasShell description={<>Breadcrumbs above the title, actions beside it, and a bottom bar below — tabs, a filter row, anything that belongs to the page as a whole.</>}>
-    <DsCanvasQuiet of={PageHeaderStories.WithBreadcrumbsActionsAndBottomBar} />
-</DocsCanvasShell>
+<ComponentExample of={PageHeaderStories.WithBreadcrumbsActionsAndBottomBar} title="All parts" description="Breadcrumbs above the title, actions beside it, and a bottom bar below for anything that belongs to the whole page." />
 
-<DocsCanvasShell description={<>`disableTitleStyles` renders the title as a plain node, for a caller that styles it itself.</>}>
-    <DsCanvasQuiet of={PageHeaderStories.DisableTitleStyles} />
-</DocsCanvasShell>
+<ComponentExample of={PageHeaderStories.DisableTitleStyles} title="Unstyled title" description={<><code>disableTitleStyles</code> renders the title as a plain node, for a caller that styles it itself.</>} />
 
 </div>
 
@@ -64,21 +67,13 @@ its side, and a bottom bar below.
 
 ## State
 
-<DocsCanvasShell description={<>A title, with the Schedule action beside it.</>}>
-    <DsCanvasQuiet of={PageHeaderStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={PageHeaderStories.Rest} title="Rest" description="A title, with the Schedule action beside it." />
 
-<DocsCanvasShell description={<>The header has no hover layer. Only the action inside it reacts.</>}>
-    <DsCanvasQuiet of={PageHeaderStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={PageHeaderStories.Hovered} title="Hovered" description="The header has no hover layer. Only the action inside it reacts." />
 
-<DocsCanvasShell description={<>No pressed layer on the header.</>}>
-    <DsCanvasQuiet of={PageHeaderStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={PageHeaderStories.Pressed} title="Pressed" description="No pressed layer on the header." />
 
-<DocsCanvasShell description={<>The header is not a control, so Tab skips it and lands on the action.</>}>
-    <DsCanvasQuiet of={PageHeaderStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={PageHeaderStories.Focused} title="Focused" description="The header is not a control, so Tab skips it and lands on the action." />
 
 </div>
 
@@ -149,7 +144,7 @@ pattern's own header instead — `PageHeader` is reserved for the page level.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Title</td><td><code>Heading</code> at the <code>xlarge</code> size.</td></tr>
+<tr><td>Title</td><td><code>Heading</code> at the <code>xlarge</code> size, as an <code>h2</code>.</td></tr>
 <tr><td>Rows</td><td><code>--space-100</code> between breadcrumbs, title row and bottom bar.</td></tr>
 <tr><td>Title row</td><td><code>--space-150</code> between the title and its actions; <code>--space-075</code> between actions.</td></tr>
 <tr><td>Breadcrumbs</td><td><code>--body-small</code>.</td></tr>
@@ -161,6 +156,48 @@ pattern's own header instead — `PageHeader` is reserved for the page level.
 <div className="sb-ds-doc-section">
 
 ## Best practices
+
+Use one page header per page, for the title and the actions that apply to the whole page.
+
+### Show the trail on nested pages.
+
+Breadcrumbs tell the person where they are; on a page two levels down they are the way back.
+
+<DoDontPair
+    doExample={<PageHeader breadcrumbs={<Breadcrumb items={trail} label="Breadcrumbs, nested page" />} title="Session notes" />}
+    doCaption="Breadcrumbs on a nested page."
+    dontExample={<PageHeader title="Session notes" />}
+    dontCaption="Nested page with no way back."
+/>
+
+### Name the page in a word or two.
+
+The title shares a row with actions, so it has to stay on one line.
+
+<DoDontPair
+    doExample={<PageHeader title="Sessions" actions={<Button appearance="primary" text="Schedule" />} />}
+    doCaption="A short noun."
+    dontExample={<PageHeader title="All of the sessions you have scheduled this semester" actions={<Button appearance="primary" text="Schedule" />} />}
+    dontCaption="A title that wraps and pushes actions down."
+/>
+
+### Use only the parts the page needs.
+
+Every extra row pushes content down; add a part only when the page uses it.
+
+<DoDontPair
+    doExample={<PageHeader title="Session plans" actions={<Button appearance="primary" text="New plan" />} />}
+    doCaption="Title and one action."
+    dontExample={
+        <PageHeader
+            breadcrumbs={<Breadcrumb items={[{ text: 'Home', href: '#' }, { text: 'Session plans' }]} label="Breadcrumbs, every part" />}
+            title="Session plans"
+            actions={<Button appearance="primary" text="New plan" />}
+            bottomBar={<Tabs defaultActiveKey="all" spacing="compact"><Tabs.Tab eventKey="all">All</Tabs.Tab><Tabs.Tab eventKey="mine">Mine</Tabs.Tab><Tabs.Tab eventKey="shared">Shared</Tabs.Tab></Tabs>}
+        />
+    }
+    dontCaption="Breadcrumbs, actions and bottom bar all on."
+/>
 
 ### `title` or `children` — not both.
 

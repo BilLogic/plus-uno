@@ -1,8 +1,22 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as CarouselStories from './Carousel.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Carousel } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const DemoSlide = ({ children }) => (
+    <div style={{ height: 'calc(var(--size-spacing-xlarge-space-2000) * 0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ds-background-neutral)', color: 'var(--ds-text)', font: 'var(--heading-small)' }}>
+        {children}
+    </div>
+);
+export const demoSlides = ['First slide', 'Second slide', 'Third slide'].map((text) => ({ content: <DemoSlide>{text}</DemoSlide> }));
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -39,21 +53,11 @@ A slideshow component for cycling through elements—images or slides of text—
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>Bare slides with controls and indicators.</>}>
-    <Canvas of={CarouselStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={CarouselStories.Overview} title="Controls and indicators" description="Slides with the previous and next controls and the indicators, both on by default." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Bare slides, slides with controls and indicators, and the labeled slide variant.</>}>
-    <DsCanvasQuiet of={CarouselStories.Content} />
-</DocsCanvasShell>
+<ComponentExample of={CarouselStories.Content} title="Bare, with controls, and labeled" description="Bare slides, slides with controls and indicators, and the labeled slide variant." />
 
 </div>
 
@@ -61,25 +65,15 @@ A slideshow component for cycling through elements—images or slides of text—
 
 ## State
 
-<DocsCanvasShell description={<>The previous and next controls at 70%, in the subtle text color.</>}>
-    <DsCanvasQuiet of={CarouselStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={CarouselStories.Rest} title="Rest" description="The previous and next controls at 70%, in the subtle text color." />
 
-<DocsCanvasShell description={<>The control at full opacity in the default text color.</>}>
-    <DsCanvasQuiet of={CarouselStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={CarouselStories.Hovered} title="Hovered" description="The control at full opacity in the default text color." />
 
-<DocsCanvasShell description={<>The controls have no pressed layer. Pressing an indicator or a control moves to its slide.</>}>
-    <DsCanvasQuiet of={CarouselStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={CarouselStories.Pressed} title="Pressed" description="No pressed layer; pressing an indicator or a control moves to its slide." />
 
-<DocsCanvasShell description={<>The 2px focus ring, 2px off the control.</>}>
-    <DsCanvasQuiet of={CarouselStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={CarouselStories.Focused} title="Focused" description="The 2px focus ring, 2px off the control." />
 
-<DocsCanvasShell description={<>Without wrap, the first slide has no previous. The control dims to the disabled opacity.</>}>
-    <DsCanvasQuiet of={CarouselStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={CarouselStories.Disabled} title="Disabled" description="Without wrap, the first slide has no previous, and that control dims to the disabled opacity." />
 
 </div>
 
@@ -115,10 +109,10 @@ Use `Carousel` for a small set of equal, browsable panels the user is invited to
 look through — onboarding screens, a few featured items, a gallery. Everything in
 it is one slide away from being unseen, so nothing essential belongs here.
 
-`slides` takes an array of `{ content, alt, title, caption, interval }`, or you
-can compose the items yourself as `children`. `interval` is `null` by default,
-which means it does not advance on its own; `controls` and `indicators` are both
-on. `fade` is accepted and ignored — the transition is always a slide.
+`slides` takes an array of `{ content, alt, title, caption }`, or you can
+compose the items yourself as `children`. `interval` is `null` by default, which
+means it does not advance on its own; `controls` and `indicators` are both on,
+and both appear only when there is more than one slide.
 
 </div>
 
@@ -142,7 +136,7 @@ on. `fade` is accepted and ignored — the transition is always a slide.
 <tr><td>Hovered</td><td>Controls at full opacity in <code>--ds-text</code>.</td></tr>
 <tr><td>Pressed</td><td>No pressed layer. The press moves to the slide.</td></tr>
 <tr><td>Focused</td><td>A 2px ring 2px off the control or indicator.</td></tr>
-<tr><td>Disabled</td><td>At the first or last slide with <code>wrap</code> off, the control is disabled and dimmed to <code>--ds-opacity-disabled</code>. Autoplay pauses while a person hovers or focuses.</td></tr>
+<tr><td>Disabled</td><td>At the first or last slide with <code>wrap</code> off, the control is disabled and dimmed to <code>--ds-opacity-disabled</code>. With <code>pause="hover"</code>, the default, autoplay pauses while the pointer is over the carousel.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -156,7 +150,9 @@ on. `fade` is accepted and ignored — the transition is always a slide.
 <tr><td>Corner</td><td><code>--radius-md</code>.</td></tr>
 <tr><td>Controls</td><td><code>--ds-text-subtle</code>, <code>--ds-text</code> on hover; icon <code>--icon-lg</code>; padding <code>--size-spacing-medium-space-300</code>; touch target <code>--size-spacing-large-space-800</code>.</td></tr>
 <tr><td>Play and pause</td><td><code>--control-md</code> round, <code>--ds-surface</code> ground, inset <code>--size-spacing-small-space-150</code>.</td></tr>
-<tr><td>Indicators</td><td><code>--ds-border</code>, <code>--ds-background-selected-bold</code> when current; <code>--stack-md</code> apart.</td></tr>
+<tr><td>Slide content</td><td>At least <code>--size-spacing-xlarge-space-2500</code> tall, padded <code>--size-section-pad-y-md</code> and <code>--size-section-pad-x-md</code>.</td></tr>
+<tr><td>Caption</td><td>Title in <code>--heading-medium</code>, text in <code>--body-large</code>, both <code>--ds-text-inverse</code> over a gradient to <code>--ds-background-inverse-subtle</code>.</td></tr>
+<tr><td>Indicators</td><td><code>--ds-border</code>, <code>--ds-background-selected-bold</code> when current; <code>--size-column-md</code> wide, <code>--size-spacing-small-space-075</code> tall, corner <code>--radius-lg</code>; <code>--stack-md</code> apart.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code> wide and offset.</td></tr>
 <tr><td>Disabled</td><td><code>--ds-opacity-disabled</code>.</td></tr>
 </tbody>
@@ -167,6 +163,41 @@ on. `fade` is accepted and ignored — the transition is always a slide.
 <div className="sb-ds-doc-section">
 
 ## Best practices
+
+Use a carousel for a few equal, optional panels. Nothing a person must see belongs in one.
+
+### Show controls when there is more than one slide.
+
+Controls and indicators are the only cue that more slides exist.
+
+<DoDontPair
+    doExample={<Carousel aria-label="Lesson highlights" slides={demoSlides} />}
+    doCaption="Controls on a multi-slide carousel."
+    dontExample={<Carousel aria-label="Lesson highlights, no controls" slides={demoSlides} controls={false} indicators={false} />}
+    dontCaption="Slides with no way to move."
+/>
+
+### Give it the column width.
+
+A carousel needs room to show a slide in full; squeezed, it hides what it carries.
+
+<DoDontPair
+    doExample={<Carousel aria-label="Featured lessons" slides={demoSlides} />}
+    doCaption="Full column width."
+    dontExample={<div style={{ width: 'var(--size-spacing-xlarge-space-2000)' }}><Carousel aria-label="Featured lessons, squeezed" slides={demoSlides} /></div>}
+    dontCaption="Squeezed into a sliver."
+/>
+
+### One carousel per view.
+
+Two carousels compete for the same gesture and the same attention.
+
+<DoDontPair
+    doExample={<Carousel aria-label="This week" slides={demoSlides} />}
+    doCaption="A single carousel."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}><Carousel aria-label="This week, first" slides={demoSlides} /><Carousel aria-label="This week, second" slides={demoSlides} /></div>}
+    dontCaption="Two carousels stacked."
+/>
 
 ### A string slide is text, and only text.
 
@@ -229,9 +260,10 @@ on. `fade` is accepted and ignored — the transition is always a slide.
 
 ## Accessibility
 
-- **The controls are named.** The previous and next buttons carry visually
-  hidden "Previous slide" and "Next slide" text; the arrows themselves are
-  `aria-hidden`. That is what keeps them from being unnamed links.
+- **The controls are named.** The previous and next buttons carry
+  `aria-label="Previous slide"` and `"Next slide"`, and each indicator is
+  labeled "Slide 1", "Slide 2" and so on; the arrows themselves are
+  `aria-hidden`. That is what keeps them from being unnamed buttons.
 - **Slides off screen are still in the DOM.** A link or button inside a hidden
   slide can still be reached. Keep controls out of the slides, or accept that
   they are focusable before they are visible.
@@ -247,8 +279,8 @@ on. `fade` is accepted and ignored — the transition is always a slide.
   motion, an `interval` does nothing and the pause control is not drawn. The
   slide transition is instant, and the arrows, dots and arrow keys still move
   between slides.
-- **Captions are an `h5` and a `p`.** The title is a heading at a fixed level,
-  so a page of carousels contributes a flat run of `h5`s to the outline.
+- **Captions are a heading and a `p`.** The title is a heading one level below
+  the section the carousel sits in, so it fits the page's outline.
 
 </div>
 
