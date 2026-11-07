@@ -214,7 +214,7 @@ $btn-appearances: (
     }
 
     // --- VERTICAL LAYOUT ---
-    // Vertical button: one size, 48 by 48, the icon stacked over the label.
+    // Vertical button: one size, 64 by 64, the icon stacked over the label.
     &.plus-btn--vertical {
         width: var(--button-vertical-size);
         height: var(--button-vertical-size);

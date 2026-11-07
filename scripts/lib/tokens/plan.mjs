@@ -346,7 +346,7 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Option menu', new: '--option-menu-width', old: '--layout-width-option-menu', ref: '240px' },
 
   // ─── Components / sizes once written with primitives ─────────────────
-  { tier: 'components', group: 'Button', new: '--button-vertical-size', old: null, ref: 'var(--size-300)' },
+  { tier: 'components', group: 'Button', new: '--button-vertical-size', old: null, ref: 'var(--space-400)' },
   { tier: 'components', group: 'Option row', new: '--option-row-indent-step', old: null, ref: 'var(--space-125)' },
   { tier: 'components', group: 'Option row', new: '--option-row-control-gap', old: null, ref: 'var(--space-0625)' },
   { tier: 'components', group: 'Option row', new: '--option-row-dot-size', old: null, ref: 'var(--space-050)' },
