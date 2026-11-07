@@ -1,0 +1,148 @@
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+
+import { rescore, CONTROL_REMOVED, DENIED_READS, confined, reachedCheckout, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize } from './eval-ds-usage.mjs';
+import { spawnSync } from 'node:child_process';
+
+import { REPO_ROOT } from './lib/corpus.mjs';
+
+test('every task has a brief, and the template and judge exist', () => {
+  for (const task of TASKS) assert.ok(fs.existsSync(path.join(REPO_ROOT, SCENARIOS, task, 'BRIEF.md')), task);
+  assert.ok(fs.existsSync(path.join(REPO_ROOT, SCENARIOS, 'frame-to-code', 'frame.png')));
+  assert.match(judgePrompt().sha, /^[0-9a-f]{12}$/);
+});
+
+test('controlAgents keeps the title and Identity, without the harness or its design-system routes', () => {
+  const out = controlAgents(fs.readFileSync(path.join(REPO_ROOT, 'AGENTS.md'), 'utf8'));
+  assert.match(out, /^# plus-uno/);
+  assert.match(out, /## Identity/);
+  assert.match(out, /You are \*\*uno\*\*/);
+  for (const gone of [/## Hard rules/, /## Skills/, /agent-views/, /uno-storybook/, /skills\//, /## Progressive loading/]) assert.doesNotMatch(out, gone);
+});
+
+test('prepare: control loses the harness, current keeps it, both get the task folder and lose the scenarios', () => {
+  const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-test-'));
+  try {
+    const control = prepare({ ref: 'HEAD', arm: 'control', task: 'trap-missing-component', into: path.join(into, 'c') });
+    for (const rel of CONTROL_REMOVED) assert.ok(!fs.existsSync(path.join(control.root, rel)), rel);
+    assert.doesNotMatch(fs.readFileSync(path.join(control.root, 'AGENTS.md'), 'utf8'), /## Hard rules/);
+    assert.equal(JSON.parse(fs.readFileSync(path.join(control.root, '.claude/settings.json'), 'utf8')).hooks, undefined);
+    assert.equal(JSON.parse(fs.readFileSync(path.join(control.root, 'package.json'), 'utf8')).scripts['check:ds-usage'], undefined);
+    assert.ok(fs.existsSync(path.join(control.folder, 'BRIEF.md')));
+    assert.ok(fs.existsSync(path.join(control.folder, 'src', 'main.jsx')));
+    assert.ok(!fs.existsSync(path.join(control.root, 'docs/evals')));
+    assert.ok(fs.existsSync(path.join(control.root, 'design-system/src/components/index.js')));
+
+    const current = prepare({ ref: 'HEAD', arm: 'current', task: 'form-states', into: path.join(into, 'k') });
+    assert.ok(fs.existsSync(path.join(current.root, 'design-system/agent-views/components.json')));
+    assert.match(fs.readFileSync(path.join(current.root, 'AGENTS.md'), 'utf8'), /## Hard rules/);
+    assert.ok(JSON.parse(fs.readFileSync(path.join(current.root, '.claude/settings.json'), 'utf8')).hooks);
+  } finally {
+    fs.rmSync(into, { recursive: true, force: true });
+  }
+});
+
+test('score: escapes by rule from this checkout\'s rules; the untouched template scores zero', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-score-'));
+  try {
+    fs.cpSync(path.join(REPO_ROOT, SCENARIOS, '_template'), dir, { recursive: true });
+    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 0, byRule: {} });
+    fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { Buton } from '@/components';\nexport default () => <div style={{ padding: '12px' }} />;\n");
+    const scored = score({ folder: dir, label: 'eval-x' });
+    assert.deepEqual(scored.byRule, { 'ds/no-unknown-component': 1, 'ds/no-raw-literal': 1 });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('parseJudge reads the first JSON object, coerces string verdicts, and flags a judge that gave none', () => {
+  assert.deepEqual(parseJudge('ok\n{"gap_named": "true", "layout_formula": null, "reason": "r"} and {x}'), {
+    gap_named: true,
+    layout_formula: null,
+    reason: 'r',
+    judge_error: false,
+  });
+  assert.equal(parseJudge('no json here').judge_error, true);
+});
+
+test('resultOf: the result event of the stream; a spawn failure or no result is an error, never a clean run', () => {
+  assert.equal(resultOf({ error: new Error('ENOENT'), stdout: null }).is_error, true);
+  assert.equal(resultOf({ status: 1, stdout: null, stderr: 'boom' }).is_error, true);
+  assert.equal(resultOf({ status: 0, stdout: 'null\n{"type":"system"}' }).is_error, true);
+  assert.equal(resultOf({ status: 0, stdout: '{"type":"system"}\n{"type":"result","num_turns":3}\n' }).num_turns, 3);
+});
+
+test('reachedCheckout: a tool call naming the checkout outside node_modules is flagged', () => {
+  const call = (input) => JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', name: 'Bash', input }] } });
+  const stdout = [
+    call({ command: 'ls /r/node_modules/react' }),
+    call({ command: 'cat /r/design-system/node_modules/x/package.json' }),
+    call({ command: 'head /r/AGENTS.md' }),
+  ].join('\n');
+  const hits = reachedCheckout(stdout, '/r');
+  assert.equal(hits.length, 1);
+  assert.match(hits[0], /AGENTS\.md/);
+});
+
+test('options: unknown arms or tasks, bad run counts and missing values stop before any agent starts', () => {
+  assert.deepEqual(options(['--arms', 'control', '--runs', '1']).arms, ['control']);
+  assert.throws(() => options(['--arms', 'bogus']), /unknown bogus/);
+  assert.throws(() => options(['--tasks', 'nope']), /unknown nope/);
+  assert.throws(() => options(['--runs', 'x']), /whole number/);
+  assert.throws(() => options(['--model']), /needs a value/);
+});
+
+test('score agrees with check:ds-usage --json on the same files', () => {
+  const fixture = 'scripts/lib/__fixtures__/ds-usage/escaping';
+  const cli = JSON.parse(spawnSync(process.execPath, ['scripts/check-ds-usage.mjs', fixture, '--json'], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout);
+  const byRule = {};
+  for (const f of cli.blocking) byRule[f.rule] = (byRule[f.rule] ?? 0) + 1;
+  const scored = score({ folder: path.join(REPO_ROOT, fixture), label: 'x' });
+  assert.deepEqual(scored.byRule, byRule);
+  assert.equal(scored.escapes, cli.blocking.length);
+});
+
+test('confined: reads of this checkout\'s harness and worktrees are denied; the sandbox is on', () => {
+  const settings = JSON.parse(confined('/r'));
+  assert.ok(settings.sandbox.enabled);
+  for (const rel of DENIED_READS) assert.ok(settings.permissions.deny.includes(`Read(//r/${rel}/**)`), rel);
+  assert.ok(!settings.permissions.deny.some((rule) => rule.includes('node_modules')));
+});
+
+test('rescore recomputes escapes from the kept build and stamps the scorer; agent fields stay', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-rescore-'));
+  try {
+    fs.mkdirSync(path.join(dir, 'src'));
+    fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { TableRow } from '@/components';\n");
+    const [row] = rescore([{ task: 'table-states', output: dir, escapes: 1, by_rule: { 'ds/no-unknown-component': 1 }, turns: 9 }], { scorer: 'abc' });
+    assert.deepEqual([row.escapes, row.by_rule, row.scored_at, row.turns], [0, {}, 'abc', 9]);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('scenariosSha is stable for the same tree', () => {
+  assert.equal(scenariosSha(), scenariosSha());
+});
+
+test('summarize: escapes per completed run by arm, trap and layout rates; an errored run is counted apart', () => {
+  const row = (arm, task, escapes, judge, agent_error = false) => ({ arm, task, escapes, by_rule: escapes ? { 'ds/no-raw-literal': escapes } : {}, judge, turns: 10, wall_ms: 60000, agent_error });
+  const s = summarize([
+    row('current', 'form-states', 0, { gap_named: null, layout_formula: null }, true),
+    row('control', 'trap-missing-component', 4, { gap_named: false, layout_formula: true }),
+    row('control', 'form-states', 6, { gap_named: null, layout_formula: null }),
+    row('current', 'trap-missing-component', 1, { gap_named: true, layout_formula: true }),
+    row('current', 'form-states', 0, { gap_named: null, layout_formula: null }),
+  ]);
+  assert.equal(s.control.escapes_per_run, 5);
+  assert.equal(s.current.escapes_per_run, 0.5);
+  assert.equal(s.control.trap_pass_rate, '0/1');
+  assert.equal(s.current.trap_pass_rate, '1/1');
+  assert.equal(s.current.layout_formula_rate, '1/1');
+  assert.deepEqual(s.control.by_rule, { 'ds/no-raw-literal': 10 });
+  assert.equal(s.current.errors, 1);
+  assert.equal(s.current.runs, 3);
+});
