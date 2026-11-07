@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { rescore, CONTROL_REMOVED, DENIED_READS, confined, reachedCheckout, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize } from './eval-ds-usage.mjs';
+import { rescore, CONTROL_REMOVED, DENIED_READS, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf } from './eval-ds-usage.mjs';
 import { spawnSync } from 'node:child_process';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
@@ -49,23 +49,37 @@ test('score: escapes by rule from this checkout\'s rules; the untouched template
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-score-'));
   try {
     fs.cpSync(path.join(REPO_ROOT, SCENARIOS, '_template'), dir, { recursive: true });
-    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 0, byRule: {} });
+    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 0, byRule: {}, warnByRule: {} });
     fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { Buton } from '@/components';\nexport default () => <div style={{ padding: '12px' }} />;\n");
     const scored = score({ folder: dir, label: 'eval-x' });
     assert.deepEqual(scored.byRule, { 'ds/no-unknown-component': 1, 'ds/no-raw-literal': 1 });
+    assert.deepEqual(scored.warnByRule, {});
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('score: warnings are counted by rule beside the fail-level escapes', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-warn-'));
+  try {
+    fs.mkdirSync(path.join(dir, 'src'));
+    fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { Button } from 'react-bootstrap';\nexport default () => <Button>Hi</Button>;\n");
+    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 1, byRule: {}, warnByRule: { 'ds/prefer-plus-component': 1 } });
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
 
 test('parseJudge reads the first JSON object, coerces string verdicts, and flags a judge that gave none', () => {
-  assert.deepEqual(parseJudge('ok\n{"gap_named": "true", "layout_formula": null, "reason": "r"} and {x}'), {
+  assert.deepEqual(parseJudge('ok\n{"gap_named": "true", "rendered": "false", "layout_formula": null, "reason": "r"} and {x}'), {
     gap_named: true,
+    rendered: false,
     layout_formula: null,
     reason: 'r',
     judge_error: false,
   });
   assert.equal(parseJudge('no json here').judge_error, true);
+  assert.equal(parseJudge('no json here').rendered, null);
 });
 
 test('resultOf: the result event of the stream; a spawn failure or no result is an error, never a clean run', () => {
@@ -85,6 +99,48 @@ test('reachedCheckout: a tool call naming the checkout outside node_modules is f
   const hits = reachedCheckout(stdout, '/r');
   assert.equal(hits.length, 1);
   assert.match(hits[0], /AGENTS\.md/);
+});
+
+test('readSet: the files a run opened in its copy and the lookups it ran, its own task folder left out', () => {
+  const call = (name, input) => JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', name, input }] } });
+  const stdout = [
+    call('Read', { file_path: '/c/AGENTS.md' }),
+    call('Read', { file_path: '/c/prototypes/eval-form-states/BRIEF.md' }),
+    call('Read', { file_path: '/c/design-system/agent-views/components/index.md' }),
+    call('Read', { file_path: '/c/AGENTS.md' }),
+    call('Grep', { pattern: 'PageLayout', path: '/c/design-system/src' }),
+    call('Glob', { pattern: '**/*.md' }),
+    call('Bash', { command: 'npm run check:ds-usage -- prototypes/eval-form-states' }),
+    call('Write', { file_path: '/c/prototypes/eval-form-states/src/App.jsx', content: 'x' }),
+  ].join('\n');
+  assert.deepEqual(readSet(stdout, '/c'), {
+    files: ['AGENTS.md', 'design-system/agent-views/components/index.md'],
+    lookups: ['Grep PageLayout in design-system/src', 'Glob **/*.md', 'Bash npm run check:ds-usage -- prototypes/eval-form-states'],
+  });
+});
+
+test('usageOf: total input is fresh input plus cache reads and writes; the raw fields stay', () => {
+  const u = usageOf({ usage: { input_tokens: 30, output_tokens: 5, cache_read_input_tokens: 1000, cache_creation_input_tokens: 70 }, num_turns: 4, total_cost_usd: 0.1 });
+  assert.equal(u.total_input_tokens, 1100);
+  assert.deepEqual([u.input_tokens, u.cache_read_tokens, u.cache_creation_tokens, u.turns], [30, 1000, 70, 4]);
+  assert.equal(usageOf({}).total_input_tokens, null);
+});
+
+test('a11ySummary: violations counted by affected node, by rule id', () => {
+  assert.deepEqual(a11ySummary({ violations: [{ id: 'color-contrast', nodes: [{}, {}] }, { id: 'label', nodes: [{}] }] }), { count: 3, by_rule: { 'color-contrast': 2, label: 1 } });
+  assert.deepEqual(a11ySummary({ violations: [] }), { count: 0, by_rule: {} });
+});
+
+test('a11y: a missing browser or server is recorded as a11y_error, never thrown', async () => {
+  const out = await a11y({ folder: '/nowhere', load: async () => { throw new Error('no playwright'); } });
+  assert.deepEqual(out, { a11y_violations: null, a11y_error: 'no playwright' });
+});
+
+test('options: runs default to five; one arm and a model are taken as given', () => {
+  assert.equal(options([]).runs, 5);
+  assert.equal(options(['--runs', '2']).runs, 2);
+  const o = options(['run', '--arms', 'control', '--model', 'haiku']);
+  assert.deepEqual([o.arms, o.model], [['control'], 'haiku']);
 });
 
 test('options: unknown arms or tasks, bad run counts and missing values stop before any agent starts', () => {
@@ -128,21 +184,49 @@ test('scenariosSha is stable for the same tree', () => {
   assert.equal(scenariosSha(), scenariosSha());
 });
 
-test('summarize: escapes per completed run by arm, trap and layout rates; an errored run is counted apart', () => {
-  const row = (arm, task, escapes, judge, agent_error = false) => ({ arm, task, escapes, by_rule: escapes ? { 'ds/no-raw-literal': escapes } : {}, judge, turns: 10, wall_ms: 60000, agent_error });
+test('summarize: by arm and model, escapes and warnings per completed run, cost, read set; an errored run is counted apart', () => {
+  const row = (arm, task, escapes, judge, extra = {}) => ({
+    arm,
+    task,
+    model: 'sonnet',
+    escapes,
+    by_rule: escapes ? { 'ds/no-raw-literal': escapes } : {},
+    warnings: 0,
+    warn_by_rule: {},
+    judge,
+    turns: 10,
+    wall_ms: 60000,
+    total_input_tokens: 1000,
+    agent_error: false,
+    ...extra,
+  });
   const s = summarize([
-    row('current', 'form-states', 0, { gap_named: null, layout_formula: null }, true),
-    row('control', 'trap-missing-component', 4, { gap_named: false, layout_formula: true }),
-    row('control', 'form-states', 6, { gap_named: null, layout_formula: null }),
-    row('current', 'trap-missing-component', 1, { gap_named: true, layout_formula: true }),
-    row('current', 'form-states', 0, { gap_named: null, layout_formula: null }),
+    row('current', 'form-states', 0, { gap_named: null, layout_formula: null }, { agent_error: true }),
+    row('control', 'trap-missing-component', 4, { gap_named: false, rendered: true, layout_formula: true }),
+    row('control', 'form-states', 6, { gap_named: null, layout_formula: null }, { warnings: 2, warn_by_rule: { 'ds/no-retired-name': 2 }, read_set: { files: ['AGENTS.md'], lookups: [] } }),
+    row('current', 'trap-missing-component', 1, { gap_named: true, rendered: true, layout_formula: true }, { read_set: { files: ['AGENTS.md', 'x.md'], lookups: ['Bash ls'] }, a11y_violations: { count: 2, by_rule: { label: 2 } } }),
+    row('current', 'trap-missing-component', 0, { gap_named: true, rendered: false, layout_formula: null }, { read_set: { files: ['AGENTS.md'], lookups: [] }, a11y_error: 'boom' }),
+    row('current', 'form-states', 0, { gap_named: null, layout_formula: null }, { model: 'haiku', input_tokens: 10, cache_read_tokens: 90, cache_creation_tokens: 0, total_input_tokens: undefined }),
   ]);
-  assert.equal(s.control.escapes_per_run, 5);
-  assert.equal(s.current.escapes_per_run, 0.5);
-  assert.equal(s.control.trap_pass_rate, '0/1');
-  assert.equal(s.current.trap_pass_rate, '1/1');
-  assert.equal(s.current.layout_formula_rate, '1/1');
-  assert.deepEqual(s.control.by_rule, { 'ds/no-raw-literal': 10 });
-  assert.equal(s.current.errors, 1);
-  assert.equal(s.current.runs, 3);
+  const control = s.control.sonnet;
+  const current = s.current.sonnet;
+  assert.equal(control.escapes_per_run, 5);
+  assert.equal(control.warnings_per_run, 1);
+  assert.deepEqual(control.warn_by_rule, { 'ds/no-retired-name': 2 });
+  assert.deepEqual(control.by_rule, { 'ds/no-raw-literal': 10 });
+  assert.equal(control.trap_pass_rate, '0/1');
+  assert.equal(current.escapes_per_run, 0.5);
+  assert.equal(current.trap_pass_rate, '1/2');
+  assert.equal(current.trap_rendered_rate, '1/2');
+  assert.equal(current.layout_formula_rate, '1/1');
+  assert.equal(current.errors, 1);
+  assert.equal(current.runs, 3);
+  assert.equal(current.mean_input_tokens, 1000);
+  assert.equal(current.mean_turns, 10);
+  assert.deepEqual(current.read_set.most_read, [['AGENTS.md', 2], ['x.md', 1]]);
+  assert.equal(current.read_set.mean_files, 1.5);
+  assert.equal(current.read_set.mean_lookups, 0.5);
+  assert.deepEqual(current.a11y, { measured: 1, errors: 1, violations_per_run: 2, by_rule: { label: 2 } });
+  assert.equal(s.current.haiku.runs, 1);
+  assert.equal(s.current.haiku.mean_input_tokens, 100);
 });

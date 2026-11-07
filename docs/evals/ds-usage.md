@@ -31,7 +31,7 @@ Under `scenarios/ds-usage/`, each a `BRIEF.md` (plus `frame.png` for the frame t
 
   Component source stays: a repo without a harness still has code.
 - **current**: the repo as it is on main (`--ref`, default `origin/main`), project hooks included. The uno-prototype gate passes the eval's build prompt through unchanged (checked 2026-11-07).
-- **upgraded** is not an arm of its own: it is `current` run again on a later commit, and the ledger's `harness_commit` tells the two apart.
+- **upgraded** is not an arm of its own: it is `current` run again on a later commit, and the ledger's `harness_commit` tells the two apart. So a comparison between arms holds only when both ran at the same `harness_commit`: when the harness moves, rerun `control` there too (`--arms control`).
 
 Both arms also lose `docs/evals/`, so no agent reads the scenarios or the judge.
 
@@ -41,28 +41,33 @@ Why not subagents: a subagent inherits the parent session's project instructions
 
 ## Scoring
 
-1. **Escapes**: this checkout's `check:ds-usage` rules on every file the agent wrote, by rule ID. Fail-level only; warnings are counted beside them.
-2. **Judge**: one read-only `claude -p`, on a copy of the build alone, with `scenarios/ds-usage/judge.md` decides only what no checker sees: whether the trap task named the gap, and whether a page used the layout formula. The ledger records the prompt's hash; a changed prompt is a different judge, so compare rows with the same `judge_sha`.
+1. **Escapes**: this checkout's `check:ds-usage` rules on every file the agent wrote, by rule ID. Fail-level only.
+2. **Warnings**: the warn-level findings on the same files (`prefer-plus-component`, `no-retired-name`), by rule ID. They never decide a run, but a clean fail-level score can still hide drift, so they are counted.
+3. **Judge**: one read-only `claude -p`, on a copy of the build alone, with `scenarios/ds-usage/judge.md` decides only what no checker sees: whether the build rendered what the brief asks for at all, whether the trap task named the gap, and whether a page used the layout formula. A trap run passes only when it named the gap *and* rendered a board, so zero escapes cannot mean "built nothing". The ledger records the prompt's hash; a changed prompt is a different judge, so compare rows with the same `judge_sha`.
+4. **Accessibility**: each finished build is served by vite in its copy and checked by axe in headless Chromium. Violations are counted by affected node, by axe rule ID. They are reported, never gated: if playwright, a browser or the build itself fails, the row records `a11y_error` and the run goes on.
 
 ## Run it
 
 ```bash
-node scripts/eval-ds-usage.mjs run --arms control,current --runs 2 --model sonnet
+node scripts/eval-ds-usage.mjs run --arms control,current --model sonnet
 ```
 
-`--tasks` narrows the set, `--ref` picks the commit the arms copy (default `origin/main`), and `--scratch` the folder the throwaway copies go in (removed as each run finishes). A full run is 24 builds and 24 judgements, one at a time, so it takes hours: start it in the background. Each build is copied to `~/Documents/Claude/Projects/PLUS/evals/ds-usage/<run-id>/` with the agent's result JSON.
+Each cell runs five times by default; `--runs` overrides it, and two runs a cell is enough to see direction, not to rank arms. `--model` is the model both the build and the judge run on (default `sonnet`), recorded on every row; run the eval again with `--model haiku` for a second model. `--tasks` narrows the set, `--ref` picks the commit the arms copy (default `origin/main`), and `--scratch` the folder the throwaway copies go in (removed as each run finishes). A full run is 60 builds and 60 judgements, one at a time, so it takes hours: start it in the background. Each build is copied to `~/Documents/Claude/Projects/PLUS/evals/ds-usage/<run-id>/` with the agent's result JSON.
 
 ## Read the ledger
 
-`ds-usage-ledger.jsonl` gains one row per run, losses and agent errors included: date, model, harness commit, `scenarios_sha` (the briefs, template and judge are read from the working tree, so this hash says which ones), arm, task, run, escapes and `by_rule`, judge verdicts and `judge_sha`, tokens (input, output, cache read, cache creation), turns, cost and wall time, `reached_checkout`, and where the build was kept.
+`ds-usage-ledger.jsonl` gains one row per run, losses and agent errors included: date, model, harness commit, `scenarios_sha` (the briefs, template and judge are read from the working tree, so this hash says which ones), arm, task, run, escapes and `by_rule`, warnings and `warn_by_rule`, judge verdicts and `judge_sha`, tokens, turns, cost and wall time, `reached_checkout`, `read_set`, `a11y_violations` or `a11y_error`, and where the build was kept.
+
+- **Tokens**: the raw `input_tokens`, `output_tokens`, `cache_read_tokens` and `cache_creation_tokens`, and `total_input_tokens`, their input sum. Fresh input is a few dozen tokens a run because nearly all of it is cached, so the total is the one that measures cost.
+- **`read_set`**: from the run's own stream, `files` lists what the agent opened with Read, relative to its copy and in first-read order, its own task folder left out; `lookups` lists its Grep, Glob and Bash calls. It shows which harness files and lookups agents actually use.
 
 ```bash
 node scripts/eval-ds-usage.mjs summary --since 2026-11-06
 ```
 
-prints, per arm: escapes per run, escapes by rule, the trap pass rate, the layout-formula rate, mean turns and minutes. Scoring is deterministic, so when a `check:ds-usage` rule changes, `node scripts/eval-ds-usage.mjs rescore` recomputes every row's escapes from its kept build with this checkout's rules and stamps the row's `scored_at`; the agent fields stay as recorded.
+prints, per arm and per model within it: escapes and warnings per run, each by rule; the trap pass rate and how many trap boards rendered; the layout-formula rate; mean input tokens (the total above), turns and minutes; the read set (mean files and lookups per run, and the files most runs read); and axe violations per measured build, by rule. Rows from before a field existed (warnings by rule, `rendered`, `read_set`, axe) leave that part empty, and a trap row with no `rendered` verdict does not count as a pass. Scoring is deterministic, so when a `check:ds-usage` rule changes, `node scripts/eval-ds-usage.mjs rescore` recomputes every row's escapes from its kept build with this checkout's rules and stamps the row's `scored_at`; the agent fields stay as recorded.
 
-Compare arms within one model, one `judge_sha` and one `scenarios_sha`. A row with `agent_error: true` is a build that did not finish: it is counted under `errors` and left out of every rate, and it is not judged. A judge that returns no JSON sets `judge.judge_error`.
+Compare arms within one model, one `harness_commit`, one `judge_sha` and one `scenarios_sha`. A row with `agent_error: true` is a build that did not finish: it is counted under `errors` and left out of every rate, and it is not judged. A judge that returns no JSON sets `judge.judge_error`.
 
 ## Baseline (2026-11-07)
 
