@@ -17,8 +17,8 @@ Built from the shared parts: the field is `FieldBox` with the calendar icon in T
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | string | — | — |
-| `name` | string | — | — |
+| `id` | string | — | Id of the input. Falls back to `name`, then to a generated id. |
+| `name` | string | — | Form key of the input. |
 | `placeholder` | string | — | Placeholder text |
 | `value` | string or arrayOf | — | ISO `YYYY-MM-DD`; with `range`, `[start, end]`, either end may be `null`. |
 | `range` | bool | `false` | Pick a first and a last day |
@@ -31,10 +31,10 @@ Built from the shared parts: the field is `FieldBox` with the calendar icon in T
 | `maxDate` | string or instanceOf | — | Optional maximum allowed date |
 | `calendarAlign` | enum | `'left'` | Calendar dropdown alignment |
 | `onChange` | func | — | `(iso)`, or `([start, end])` with `range`; `\'\'` or nulls when cleared. |
-| `onFocus` | func | — | — |
-| `onBlur` | func | — | — |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
+| `onFocus` | func | — | Called with the focus event when the input gains focus. |
+| `onBlur` | func | — | Called with the blur event when the input loses focus, after any typed text has been checked. |
+| `className` | string | `''` | Extra class on the field frame, beside `plus-date-picker`. |
+| `style` | object | — | Inline style on the field frame. |
 
 ## Variants
 

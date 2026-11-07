@@ -40,7 +40,9 @@ CloseButton.propTypes = {
     tone: PropTypes.oneOf(['default', 'inverse']),
     /** `default` draws 32. `compact` draws 24. */
     spacing: PropTypes.oneOf(['default', 'compact']),
+    /** Called with the click event. The surface that owns the close button closes itself here. */
     onClick: PropTypes.func,
+    /** Extra class names added to the button beside the component's own. */
     className: PropTypes.string,
 };
 

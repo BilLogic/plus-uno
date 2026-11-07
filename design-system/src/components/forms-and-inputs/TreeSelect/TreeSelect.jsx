@@ -566,6 +566,7 @@ TreeSelect.propTypes = {
     onChange: PropTypes.func,
     /** Several values, shown as checkboxes beside the toggle. */
     isMulti: PropTypes.bool,
+    /** Hint text shown in the field while nothing is selected. Defaults to `Please select`. */
     placeholder: PropTypes.string,
     /** `default` draws 40 and `compact` draws 32. */
     spacing: PropTypes.oneOf(TREE_SELECT_SPACINGS),

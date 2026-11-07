@@ -3,6 +3,8 @@
 
 # Illustration
 
+One of the PLUS illustration characters: a textured body with a face, arms and legs in line work. It is decorative unless given a `title`.
+
 **Import:** `import { Illustration } from '@/components';`
 
 **Source:** `design-system/src/components/images-and-icons/Illustration/Illustration.jsx`
@@ -18,8 +20,8 @@
 | `character` | oneOf | `'mastering-content'` | Which character. The first five are the SMART areas; the rest are math characters. |
 | `size` | number | `96` | The frame's width and height in pixels: 48, 96, 160 or 240, or any number. Limbs reach past it. |
 | `title` | string | — | Makes the character an image with this name. Without it the character is decorative and hidden. |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
+| `className` | string | `''` | Extra class names added to the character's frame element beside the component's own. |
+| `style` | object | — | Inline styles for the frame element. They are applied after its width and height, so they can override `size`. |
 
 ## Tokens touched
 

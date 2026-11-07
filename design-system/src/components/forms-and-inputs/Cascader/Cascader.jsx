@@ -487,6 +487,7 @@ Cascader.propTypes = {
         ])
     ),
     onChange: PropTypes.func,
+    /** Hint text shown in the field while no path is selected. Defaults to `Please select`. */
     placeholder: PropTypes.string,
     /** `default` draws 40 and `compact` draws 32. */
     spacing: PropTypes.oneOf(CASCADER_SPACINGS),

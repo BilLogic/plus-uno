@@ -128,25 +128,43 @@ const Radio = ({
 };
 
 Radio.propTypes = {
+    /** Id of the radio button, which the label points at. A generated id is used when omitted. */
     id: PropTypes.string,
+    /** Form key of the radio group. Options that belong together share it, and it is reported in `onChange`. */
     name: PropTypes.string.isRequired,
+    /** The text that names this option. */
     label: PropTypes.node,
+    /** Form value of this option, and the `target.value` that `onChange` reports when it is chosen. */
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    /** Controlled selected state. Pair it with `onChange`; when it is set, `defaultChecked` is ignored. */
     isChecked: PropTypes.bool,
+    /** Whether an uncontrolled radio starts selected. */
     defaultChecked: PropTypes.bool,
+    /** Draws the error state, for an option that fails validation. */
     isInvalid: PropTypes.bool,
+    /** Prevents interaction and dims this option. */
     isDisabled: PropTypes.bool,
+    /** Shows the option without letting the user change it. */
     isReadOnly: PropTypes.bool,
+    /** Shows an asterisk on the label and sets the native `required` attribute. */
     isRequired: PropTypes.bool,
+    /** Secondary text under the label. It describes the option; it does not name it. */
     description: PropTypes.node,
+    /** `plain` (default) is a radio beside its label; `card` draws the option as a bordered tile. */
     appearance: PropTypes.oneOf(['plain', 'card']),
     /** Set by `RadioGroup`. Not for direct use. */
     grouped: PropTypes.bool,
+    /** Called with `{ target: { name, value, checked: true } }` when the option is chosen. A radio never reports being unchecked. */
     onChange: PropTypes.func,
+    /** Called with the focus event when the radio gains focus. */
     onFocus: PropTypes.func,
+    /** Called with the blur event when the radio loses focus. */
     onBlur: PropTypes.func,
+    /** Called with the click event on the radio button. */
     onClick: PropTypes.func,
+    /** Extra class on the wrapper around the radio and its label. */
     className: PropTypes.string,
+    /** Inline style on the wrapper around the radio and its label. */
     style: PropTypes.object,
     /** Maps to `data-testid`, for test queries. */
     testId: PropTypes.string,

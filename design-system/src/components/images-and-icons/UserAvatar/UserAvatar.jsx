@@ -92,10 +92,15 @@ const UserAvatar = ({
 };
 
 UserAvatar.propTypes = {
+    /** The initial shown in the avatar. */
     firstChar: PropTypes.string,
+    /** The user's name beside the avatar. A long name is cut off with an ellipsis, and the full name shows in the `title`. */
     name: PropTypes.string,
+    /** Shows the notification counter. Defaults to `true`. */
     counter: PropTypes.bool,
+    /** The number shown in the counter. */
     counterValue: PropTypes.number,
+    /** `enabled` (default) is the normal look; `hover` forces the hover look, for docs; `disabled` dims the avatar and sets `aria-disabled`. */
     state: PropTypes.oneOf(['enabled', 'hover', 'disabled']),
     /** `lead tutor` shows the "Lead" role indicator; other types show none. */
     type: PropTypes.oneOf(['regular tutor', 'lead tutor', 'admin']),

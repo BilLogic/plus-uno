@@ -326,7 +326,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`.",
+          "description": "Where the source links open, such as `_top` from inside a frame.",
           "deprecated": null
         },
         {
@@ -335,7 +335,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`.",
           "deprecated": null
         },
         {
@@ -366,7 +366,7 @@
       "import": "import { Avatar } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/Avatar/Avatar.jsx",
-      "summary": null,
+      "summary": "A person or an agent shown as a picture, initials or an icon. The picture wins when it loads, then the initials, then the icon, then a plain person glyph.",
       "props": [
         {
           "name": "src",
@@ -478,7 +478,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the avatar element beside the component's own.",
           "deprecated": null
         }
       ]
@@ -560,7 +560,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the group element beside the component's own.",
           "deprecated": null
         }
       ]
@@ -636,7 +636,7 @@
           "required": true,
           "default": "[]",
           "values": null,
-          "description": null,
+          "description": "The trail, in order, as `{ text, href, onClick }`. The last item, and any item without `href`, is the current page and is not a link. `onClick` replaces the navigation with a handler.",
           "deprecated": null
         },
         {
@@ -645,7 +645,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `id` attribute of the last (current) item.",
           "deprecated": null
         },
         {
@@ -654,7 +654,7 @@
           "required": false,
           "default": "'/'",
           "values": null,
-          "description": null,
+          "description": "What is drawn between items. A string is used as is; the default is `/`.",
           "deprecated": null
         },
         {
@@ -672,7 +672,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the `nav` element beside the component's own.",
           "deprecated": null
         },
         {
@@ -681,7 +681,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline styles for the `nav` element.",
           "deprecated": null
         }
       ]
@@ -708,7 +708,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The label, used when `text` is not given. Omit both for an icon-only button.",
           "deprecated": null
         },
         {
@@ -717,7 +717,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `title` attribute, a native tooltip on hover.",
           "deprecated": null
         },
         {
@@ -764,7 +764,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the button element beside the component's own.",
           "deprecated": null
         },
         {
@@ -773,7 +773,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the click event when the button is activated by mouse or keyboard. It does not fire while `isDisabled` or `isLoading` is set.",
           "deprecated": null
         },
         {
@@ -809,7 +809,7 @@
           "required": false,
           "default": "'button'",
           "values": null,
-          "description": null,
+          "description": "The native button `type`: `button` (default), `submit` or `reset`. Used only when the button renders as a `button` element.",
           "deprecated": null
         },
         {
@@ -818,7 +818,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Renders the button as this element or component instead, such as a router link. Without it the button is an anchor when `href`, `target` or `rel` is set, otherwise a `button`.",
           "deprecated": null
         },
         {
@@ -836,7 +836,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The anchor `target` attribute, such as `_blank`. Used only when the button renders as an anchor.",
           "deprecated": null
         },
         {
@@ -845,7 +845,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The anchor `rel` attribute. Used only when the button renders as an anchor.",
           "deprecated": null
         },
         {
@@ -881,7 +881,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `id` attribute of the rendered element.",
           "deprecated": null
         },
         {
@@ -1376,7 +1376,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `id` of the checkbox; the label points at it. Generated when omitted.",
           "deprecated": null
         },
         {
@@ -1385,7 +1385,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The form key the box submits under, and sent in the `onChange` payload.",
           "deprecated": null
         },
         {
@@ -1403,7 +1403,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The value submitted with a form when the box is selected, and sent in the `onChange` payload.",
           "deprecated": null
         },
         {
@@ -1412,7 +1412,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Whether the box is selected. Pass it, with `onChange`, to control the checkbox.",
           "deprecated": null
         },
         {
@@ -1421,7 +1421,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Whether the box starts selected, when `isChecked` is not controlling it.",
           "deprecated": null
         },
         {
@@ -1475,7 +1475,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Secondary text under the label. It describes the box and does not name it.",
           "deprecated": null
         },
         {
@@ -1487,7 +1487,7 @@
             "plain",
             "card"
           ],
-          "description": null,
+          "description": "`plain` (default) draws the box and label inline; `card` draws the choice as a bordered tile.",
           "deprecated": null
         },
         {
@@ -1496,7 +1496,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with `{ target: { name, value, checked } }` when the box is toggled.",
           "deprecated": null
         },
         {
@@ -1505,7 +1505,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the focus event when the checkbox gains focus.",
           "deprecated": null
         },
         {
@@ -1514,7 +1514,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the blur event when the checkbox loses focus.",
           "deprecated": null
         },
         {
@@ -1523,7 +1523,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the click event on the checkbox.",
           "deprecated": null
         },
         {
@@ -1532,7 +1532,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the field wrapper beside the component's own.",
           "deprecated": null
         },
         {
@@ -1541,7 +1541,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline styles for the field wrapper.",
           "deprecated": null
         },
         {
@@ -1725,7 +1725,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the click event. The surface that owns the close button closes itself here.",
           "deprecated": null
         },
         {
@@ -1734,7 +1734,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the button beside the component's own.",
           "deprecated": null
         }
       ]
@@ -2120,7 +2120,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Id of the input. Falls back to `name`, then to a generated id.",
           "deprecated": null
         },
         {
@@ -2129,7 +2129,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Form key of the input.",
           "deprecated": null
         },
         {
@@ -2253,7 +2253,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the focus event when the input gains focus.",
           "deprecated": null
         },
         {
@@ -2262,7 +2262,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the blur event when the input loses focus, after any typed text has been checked.",
           "deprecated": null
         },
         {
@@ -2271,7 +2271,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the field frame, beside `plus-date-picker`.",
           "deprecated": null
         },
         {
@@ -2280,7 +2280,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline style on the field frame.",
           "deprecated": null
         }
       ]
@@ -2290,7 +2290,7 @@
       "import": "import { DateTag } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/DateTag/DateTag.jsx",
-      "summary": null,
+      "summary": "An outlined label for a due or event date, such as \"Due tomorrow\". The app picks the appearance from how close the date is; it is never a button.",
       "props": [
         {
           "name": "children",
@@ -2341,7 +2341,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the tag element beside the component's own.",
           "deprecated": null
         },
         {
@@ -2350,7 +2350,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `id` attribute of the tag element.",
           "deprecated": null
         }
       ]
@@ -2672,7 +2672,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Controlled open state. Pair it with `onOpenChange`; leave it out for an uncontrolled menu.",
           "deprecated": null
         },
         {
@@ -2681,7 +2681,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": null,
+          "description": "Whether an uncontrolled menu starts open.",
           "deprecated": null
         },
         {
@@ -2690,7 +2690,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the next open state (a boolean) when the menu opens or closes: trigger press, outside click, Escape or picking a row.",
           "deprecated": null
         },
         {
@@ -2712,7 +2712,7 @@
             "left",
             "left-end"
           ],
-          "description": null,
+          "description": "Side and alignment against the trigger, such as `bottom-start` (default), `top-end` or `right`. A bare side centers the menu on that side.",
           "deprecated": null
         },
         {
@@ -2751,7 +2751,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Minimum width of the menu list, as a CSS length such as `240px`.",
           "deprecated": null
         },
         {
@@ -2760,7 +2760,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Maximum height of the menu list, as a CSS length such as `320px`.",
           "deprecated": null
         },
         {
@@ -2778,7 +2778,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Maps to `data-testid` on the menu popup, for test queries.",
           "deprecated": null
         },
         {
@@ -2787,7 +2787,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Id set on the menu popup.",
           "deprecated": null
         },
         {
@@ -2796,7 +2796,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the menu popup, beside `plus-dropdown-menu`.",
           "deprecated": null
         }
       ]
@@ -2898,7 +2898,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Id of the fieldset. The legend and error ids derive from it. A generated id is used when omitted.",
           "deprecated": null
         },
         {
@@ -2916,7 +2916,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": null,
+          "description": "Disables the fieldset and every control inside it.",
           "deprecated": null
         },
         {
@@ -2943,7 +2943,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The fields the legend groups.",
           "deprecated": null
         },
         {
@@ -2952,7 +2952,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the `<fieldset>`, beside `plus-fieldset`.",
           "deprecated": null
         },
         {
@@ -2961,7 +2961,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline style on the `<fieldset>`.",
           "deprecated": null
         }
       ]
@@ -3250,7 +3250,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Id set on the flag surface.",
           "deprecated": null
         },
         {
@@ -3319,7 +3319,7 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": null,
+          "description": "Shows the dismiss button. Defaults to true; set false to leave it out.",
           "deprecated": null
         },
         {
@@ -3328,7 +3328,7 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": null,
+          "description": "Whether the flag renders. Defaults to true; false renders nothing and stops the auto-close timer.",
           "deprecated": null
         },
         {
@@ -3337,7 +3337,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with no arguments when the dismiss button is pressed and when the auto-close timer ends. The caller sets `show` to false.",
           "deprecated": null
         },
         {
@@ -3364,7 +3364,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the flag surface.",
           "deprecated": null
         },
         {
@@ -3373,7 +3373,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the header row that holds the title and timestamp.",
           "deprecated": null
         },
         {
@@ -3382,7 +3382,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the description container.",
           "deprecated": null
         },
         {
@@ -3391,7 +3391,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Small text beside the title, such as \"11 mins ago\".",
           "deprecated": null
         }
       ]
@@ -3699,7 +3699,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the click event when the button is activated. It does not fire while `isDisabled` or `isLoading` is set.",
           "deprecated": null
         },
         {
@@ -3708,7 +3708,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the button element beside the component's own.",
           "deprecated": null
         },
         {
@@ -3717,7 +3717,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Sets the native `title` tooltip. Defaults to `label`; `tooltip` or `isTooltipDisabled` suppresses that default.",
           "deprecated": null
         },
         {
@@ -3745,7 +3745,7 @@
       "import": "import { Illustration } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/Illustration/Illustration.jsx",
-      "summary": null,
+      "summary": "One of the PLUS illustration characters: a textured body with a face, arms and legs in line work. It is decorative unless given a `title`.",
       "props": [
         {
           "name": "character",
@@ -3793,7 +3793,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the character's frame element beside the component's own.",
           "deprecated": null
         },
         {
@@ -3802,7 +3802,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline styles for the frame element. They are applied after its width and height, so they can override `size`.",
           "deprecated": null
         }
       ]
@@ -4364,7 +4364,7 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The destination URL of the anchor. Required.",
           "deprecated": null
         },
         {
@@ -4377,7 +4377,7 @@
             "subtle",
             "inverse"
           ],
-          "description": null,
+          "description": "`default` for links in body text; `subtle` for links inside secondary or quiet text; `inverse` for links on dark or colored grounds.",
           "deprecated": null
         },
         {
@@ -4395,7 +4395,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The anchor `rel` attribute. Defaults to `noopener noreferrer` when the link opens in a new tab.",
           "deprecated": null
         },
         {
@@ -4413,7 +4413,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the anchor beside the component's own.",
           "deprecated": null
         },
         {
@@ -4422,7 +4422,7 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The link text. Required, since it names the link.",
           "deprecated": null
         }
       ]
@@ -4449,7 +4449,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The anchor `target` attribute, such as `_blank` to open a new tab.",
           "deprecated": null
         },
         {
@@ -4458,7 +4458,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The anchor `rel` attribute. Defaults to `noopener noreferrer` when `target` is `_blank`.",
           "deprecated": null
         },
         {
@@ -4467,7 +4467,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The label as a string. Wins over `children`.",
           "deprecated": null
         },
         {
@@ -4476,7 +4476,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The label, used when `text` is not given.",
           "deprecated": null
         },
         {
@@ -4493,7 +4493,7 @@
             "discovery",
             "ai"
           ],
-          "description": null,
+          "description": "The button's look, the same seven as Button. Use `primary` for the one main navigation on a view and `default` or `subtle` for the rest.",
           "deprecated": null
         },
         {
@@ -4514,7 +4514,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "An icon before the label: a Font Awesome Free glyph name (`calendar`) or a node.",
           "deprecated": null
         },
         {
@@ -4523,7 +4523,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "An icon after the label: a Font Awesome Free glyph name (`arrow-right`) or a node.",
           "deprecated": null
         },
         {
@@ -4532,7 +4532,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Marks the link as the current page: sets `aria-current` and draws the selected look on `default` and `subtle`.",
           "deprecated": null
         },
         {
@@ -4541,7 +4541,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Stretches the link to the full width of its container.",
           "deprecated": null
         },
         {
@@ -4550,7 +4550,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the click event when the link is activated. The link still navigates to `href` unless the handler prevents it.",
           "deprecated": null
         },
         {
@@ -4559,7 +4559,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the anchor beside the component's own.",
           "deprecated": null
         }
       ]
@@ -4779,7 +4779,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `id` attribute of the dialog panel.",
           "deprecated": null
         },
         {
@@ -4815,7 +4815,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The main content of the dialog. A string is drawn as body text; a node is drawn as given. `children` is rendered after it.",
           "deprecated": null
         },
         {
@@ -4890,7 +4890,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": null,
+          "description": "Whether the dialog is open. Controlled by the parent: set it to false in `onClose` to close.",
           "deprecated": null
         },
         {
@@ -4922,7 +4922,7 @@
             "modal",
             "inline"
           ],
-          "description": null,
+          "description": "`modal` (default) opens as a real dialog over the page; `inline` draws the same panel in place as a plain block, for docs previews.",
           "deprecated": null
         },
         {
@@ -4931,7 +4931,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The confirming footer button, drawn on the right. Takes `text` (default \"Confirm\"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`.",
           "deprecated": null
         },
         {
@@ -4940,7 +4940,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The cancelling footer button, drawn left of the primary one. Takes `text` (default \"Cancel\"), `onClick`, `appearance` (default `default`), `spacing` and `icon`.",
           "deprecated": null
         },
         {
@@ -4949,7 +4949,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `backdrop` blocks it). The parent sets `show` to false.",
           "deprecated": null
         },
         {
@@ -4967,7 +4967,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the dialog panel beside the component's own.",
           "deprecated": null
         },
         {
@@ -4976,7 +4976,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline styles for the dialog panel. A fixed `width` is applied after them.",
           "deprecated": null
         },
         {
@@ -4985,7 +4985,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "More content rendered in the body after `body`, for composing the dialog contents directly.",
           "deprecated": null
         }
       ]
@@ -5051,7 +5051,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The page title. Drawn as an `xlarge` `Heading` unless `disableTitleStyles` is set. `children` is used when it is omitted.",
           "deprecated": null
         },
         {
@@ -5069,7 +5069,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "A breadcrumb trail shown above the title row. Pass a `Breadcrumb`.",
           "deprecated": null
         },
         {
@@ -5078,7 +5078,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Controls shown at the end of the title row, such as a primary button or a menu.",
           "deprecated": null
         },
         {
@@ -5087,7 +5087,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Content in a bar below the title row, such as tabs or filters.",
           "deprecated": null
         },
         {
@@ -5105,7 +5105,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the header element beside the component's own.",
           "deprecated": null
         }
       ]
@@ -5115,7 +5115,7 @@
       "import": "import { Pagination } from '@/components';",
       "group": "navigation",
       "source": "design-system/src/components/navigation/Pagination/Pagination.jsx",
-      "summary": null,
+      "summary": "A numbered page trail with Previous and Next controls. It shows a window of pages around the current one and always keeps the first and last reachable.",
       "props": [
         {
           "name": "currentPage",
@@ -5210,7 +5210,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Id set on the `<nav>` element.",
           "deprecated": null
         },
         {
@@ -5219,7 +5219,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the page list, beside `plus-pagination`.",
           "deprecated": null
         }
       ]
@@ -5853,7 +5853,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Id of the radio button, which the label points at. A generated id is used when omitted.",
           "deprecated": null
         },
         {
@@ -5862,7 +5862,7 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Form key of the radio group. Options that belong together share it, and it is reported in `onChange`.",
           "deprecated": null
         },
         {
@@ -5880,7 +5880,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Form value of this option, and the `target.value` that `onChange` reports when it is chosen.",
           "deprecated": null
         },
         {
@@ -5889,7 +5889,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Controlled selected state. Pair it with `onChange`; when it is set, `defaultChecked` is ignored.",
           "deprecated": null
         },
         {
@@ -5898,7 +5898,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Whether an uncontrolled radio starts selected.",
           "deprecated": null
         },
         {
@@ -5943,7 +5943,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Secondary text under the label. It describes the option; it does not name it.",
           "deprecated": null
         },
         {
@@ -5955,7 +5955,7 @@
             "plain",
             "card"
           ],
-          "description": null,
+          "description": "`plain` (default) is a radio beside its label; `card` draws the option as a bordered tile.",
           "deprecated": null
         },
         {
@@ -5973,7 +5973,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with `{ target: { name, value, checked: true } }` when the option is chosen. A radio never reports being unchecked.",
           "deprecated": null
         },
         {
@@ -5982,7 +5982,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the focus event when the radio gains focus.",
           "deprecated": null
         },
         {
@@ -5991,7 +5991,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the blur event when the radio loses focus.",
           "deprecated": null
         },
         {
@@ -6000,7 +6000,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the click event on the radio button.",
           "deprecated": null
         },
         {
@@ -6009,7 +6009,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the wrapper around the radio and its label.",
           "deprecated": null
         },
         {
@@ -6018,7 +6018,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline style on the wrapper around the radio and its label.",
           "deprecated": null
         },
         {
@@ -6075,7 +6075,7 @@
             "stacked",
             "inline"
           ],
-          "description": null,
+          "description": "`stacked` (default) puts one option per line; `inline` lays them in a row, for short labels or a scale.",
           "deprecated": null
         },
         {
@@ -6102,7 +6102,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The option value chosen at the start, when the group is uncontrolled. Leave it out for no answer.",
           "deprecated": null
         },
         {
@@ -6208,7 +6208,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the fieldset beside the component's own.",
           "deprecated": null
         },
         {
@@ -6217,7 +6217,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline styles for the fieldset.",
           "deprecated": null
         }
       ]
@@ -6374,7 +6374,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Id of the star group, which the label names. A generated id is used when omitted.",
           "deprecated": null
         },
         {
@@ -6383,7 +6383,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Form key under which the chosen rating is sent with its form.",
           "deprecated": null
         },
         {
@@ -6392,7 +6392,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Visible label above the stars. It names the group; without one the group is named \"Rating\".",
           "deprecated": null
         },
         {
@@ -6410,7 +6410,7 @@
           "required": false,
           "default": "0",
           "values": null,
-          "description": null,
+          "description": "Current rating, 0 for none up to 5. Every star up to it is filled. Update it from `onChange`.",
           "deprecated": null
         },
         {
@@ -6431,7 +6431,7 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": null,
+          "description": "Shows `commentsLabel` under the stars. Applies to the `comments` variant only.",
           "deprecated": null
         },
         {
@@ -6440,7 +6440,7 @@
           "required": false,
           "default": "'Comments'",
           "values": null,
-          "description": null,
+          "description": "Text under the stars in the `comments` variant. Defaults to \"Comments\".",
           "deprecated": null
         },
         {
@@ -6458,7 +6458,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the new rating (1 to 5) when the user picks a different star.",
           "deprecated": null
         },
         {
@@ -6467,7 +6467,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the wrapper around the label and stars.",
           "deprecated": null
         },
         {
@@ -6476,7 +6476,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline style on the wrapper around the label and stars.",
           "deprecated": null
         },
         {
@@ -6488,7 +6488,7 @@
             "star",
             "thumbs-up"
           ],
-          "description": null,
+          "description": "The glyph used for every choice: `star` (default) or `thumbs-up`.",
           "deprecated": null
         }
       ]
@@ -6850,7 +6850,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `id` of the combobox control; the label and the list ids are built from it. Generated when omitted.",
           "deprecated": null
         },
         {
@@ -6913,7 +6913,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The picked id, or ids with `isMulti`, to start with when the field is uncontrolled.",
           "deprecated": null
         },
         {
@@ -6922,7 +6922,7 @@
           "required": false,
           "default": "'Select...'",
           "values": null,
-          "description": null,
+          "description": "The text shown when nothing is picked. It names the field when there is no label.",
           "deprecated": null
         },
         {
@@ -6967,7 +6967,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": null,
+          "description": "Whether the list starts open, when `open` is not controlling it.",
           "deprecated": null
         },
         {
@@ -6985,7 +6985,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "The text the search input starts with, so the list opens already filtered. Used by a searchable field.",
           "deprecated": null
         },
         {
@@ -7036,7 +7036,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": null,
+          "description": "Dims the field and blocks opening and changing it.",
           "deprecated": null
         },
         {
@@ -7081,7 +7081,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The caption shown under the field while `isInvalid` is set. It is announced.",
           "deprecated": null
         },
         {
@@ -7099,7 +7099,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The caption shown under the field while `isValid` is set.",
           "deprecated": null
         },
         {
@@ -7216,7 +7216,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the field wrapper beside the component's own.",
           "deprecated": null
         },
         {
@@ -7225,7 +7225,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline styles for the field wrapper.",
           "deprecated": null
         }
       ]
@@ -7516,7 +7516,7 @@
       "import": "import { SmartTag } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/SmartTag/SmartTag.jsx",
-      "summary": null,
+      "summary": "A tag for one of the five SMART competency areas. The `subject` fixes its color and leading icon, and the rest is passed to Tag.",
       "props": [
         {
           "name": "subject",
@@ -7775,7 +7775,7 @@
       "import": "import { StatusTag } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/StatusTag/StatusTag.jsx",
-      "summary": null,
+      "summary": "A filled label for the condition something is in, such as \"Needs review\" or \"Overdue\". It is never a button; its appearance carries the meaning.",
       "props": [
         {
           "name": "children",
@@ -7863,7 +7863,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the tag element beside the component's own.",
           "deprecated": null
         },
         {
@@ -7872,7 +7872,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `id` attribute of the tag element.",
           "deprecated": null
         }
       ]
@@ -7983,7 +7983,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `id` of the `table` element. The wrapper takes `{id}-wrapper`.",
           "deprecated": null
         },
         {
@@ -7992,7 +7992,7 @@
           "required": false,
           "default": "[]",
           "values": null,
-          "description": null,
+          "description": "The column headers. A string is the header text; an object adds `width`, `align`, `className` and `style` to `text`.",
           "deprecated": null
         },
         {
@@ -8004,7 +8004,7 @@
             "default",
             "title"
           ],
-          "description": null,
+          "description": "The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `leading`, `state`, `loading`, `className`, `colSpan` or `style`.",
           "deprecated": null
         },
         {
@@ -8013,7 +8013,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": null,
+          "description": "Shades alternate rows.",
           "deprecated": null
         },
         {
@@ -8022,7 +8022,7 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": null,
+          "description": "Highlights a row on hover. On by default.",
           "deprecated": null
         },
         {
@@ -8031,7 +8031,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": null,
+          "description": "Draws a frame around the table and lines between columns. Shorthand for `frame=\"framed\"` plus `verticalLines`.",
           "deprecated": null
         },
         {
@@ -8040,7 +8040,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": null,
+          "description": "Draws lines between columns.",
           "deprecated": null
         },
         {
@@ -8052,7 +8052,7 @@
             "plain",
             "framed"
           ],
-          "description": null,
+          "description": "`plain` (default) draws no outer frame; `framed` draws a border around the table.",
           "deprecated": null
         },
         {
@@ -8065,7 +8065,7 @@
             "40",
             "48"
           ],
-          "description": null,
+          "description": "Row height in px: 32 for dense tables, 40 (default) or 48 for roomy ones.",
           "deprecated": null
         },
         {
@@ -8074,7 +8074,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The index of the column drawn in the title emphasis, for the row's main label.",
           "deprecated": null
         },
         {
@@ -8088,7 +8088,7 @@
             "selected",
             "disabled"
           ],
-          "description": null,
+          "description": "A state per row, by index: `rest`, `highlighted`, `selected` or `disabled`.",
           "deprecated": null
         },
         {
@@ -8097,7 +8097,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Cells for a summary row at the bottom of the table, one per column, such as totals.",
           "deprecated": null
         },
         {
@@ -8106,7 +8106,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Content shown in a single row spanning all columns when `rows` is empty.",
           "deprecated": null
         },
         {
@@ -8115,7 +8115,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Content drawn under the table inside its wrapper, such as pagination.",
           "deprecated": null
         },
         {
@@ -8124,7 +8124,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the row index when a row is clicked. The row gets no button role or key handling, so put any keyboard action in a control inside a cell.",
           "deprecated": null
         },
         {
@@ -8133,7 +8133,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the `table` element beside the component's own.",
           "deprecated": null
         },
         {
@@ -8142,7 +8142,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline styles for the table's wrapper element.",
           "deprecated": null
         }
       ]
@@ -8152,7 +8152,7 @@
       "import": "import { Tabs } from '@/components';",
       "group": "navigation",
       "source": "design-system/src/components/navigation/Tabs/Tabs.jsx",
-      "summary": null,
+      "summary": "A tab strip with its panels. Tabs go into the tablist and every other child, usually Panels, renders after it.",
       "props": [
         {
           "name": "children",
@@ -8160,7 +8160,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "`Tabs.Tab` elements, which fill the tablist, and the `Tabs.Panel` elements that follow it.",
           "deprecated": null
         },
         {
@@ -8207,7 +8207,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the tabs root, beside `plus-tabs`.",
           "deprecated": null
         },
         {
@@ -8216,7 +8216,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Id set on the tabs root.",
           "deprecated": null
         },
         {
@@ -8225,7 +8225,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `eventKey` of the tab selected at first, for uncontrolled use.",
           "deprecated": null
         },
         {
@@ -8234,7 +8234,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `eventKey` of the selected tab, for controlled use. Pair it with `onSelect`.",
           "deprecated": null
         },
         {
@@ -8253,7 +8253,7 @@
       "import": "import { Tag } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/Tag/Tag.jsx",
-      "summary": null,
+      "summary": "A small outlined label that names a category, person, agent or team. It can also act as a link, a toggle or a removable chip, depending on its props.",
       "props": [
         {
           "name": "text",
@@ -8448,7 +8448,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the tag element.",
           "deprecated": null
         },
         {
@@ -8457,7 +8457,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Id set on the tag element.",
           "deprecated": null
         },
         {
@@ -8466,7 +8466,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline style on the tag element, merged over the `maxWidth` cap.",
           "deprecated": null
         }
       ]
@@ -8844,7 +8844,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `id` of the `textarea`; the label points at it. Generated when omitted.",
           "deprecated": null
         },
         {
@@ -8853,7 +8853,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The form key the text submits under.",
           "deprecated": null
         },
         {
@@ -8862,7 +8862,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The visible label above the field. Hide it with `isLabelHidden`.",
           "deprecated": null
         },
         {
@@ -8907,7 +8907,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The text. Pass it, with `onChange`, to control the field.",
           "deprecated": null
         },
         {
@@ -8916,7 +8916,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The text to start with when the field is uncontrolled.",
           "deprecated": null
         },
         {
@@ -8925,7 +8925,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Hint text shown while the field is empty.",
           "deprecated": null
         },
         {
@@ -8967,7 +8967,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": null,
+          "description": "Dims the field and blocks focus and editing.",
           "deprecated": null
         },
         {
@@ -8976,7 +8976,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": null,
+          "description": "Shows the text and keeps it focusable, but it cannot be changed.",
           "deprecated": null
         },
         {
@@ -8994,7 +8994,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The caption shown under the field while `isInvalid` is set. It replaces `caption`.",
           "deprecated": null
         },
         {
@@ -9039,7 +9039,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the change event on each edit.",
           "deprecated": null
         },
         {
@@ -9048,7 +9048,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the focus event when the field gains focus.",
           "deprecated": null
         },
         {
@@ -9057,7 +9057,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the blur event when the field loses focus.",
           "deprecated": null
         },
         {
@@ -9066,7 +9066,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the keydown event. Call `preventDefault` to stop the subtle appearance's own key handling.",
           "deprecated": null
         },
         {
@@ -9075,7 +9075,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names added to the field wrapper beside the component's own.",
           "deprecated": null
         },
         {
@@ -9084,7 +9084,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline styles for the field wrapper.",
           "deprecated": null
         }
       ]
@@ -9102,7 +9102,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Id of the input, which the label points at. A generated id is used when omitted.",
           "deprecated": null
         },
         {
@@ -9111,7 +9111,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Form key of the input. Number steppers also report it in the `onChange` event.",
           "deprecated": null
         },
         {
@@ -9120,7 +9120,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Visible label above the field. A string label also names the number steppers, as \"Increase\" and \"Decrease\" followed by the label.",
           "deprecated": null
         },
         {
@@ -9165,7 +9165,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Hint text shown while the input is empty. It does not replace a label.",
           "deprecated": null
         },
         {
@@ -9183,7 +9183,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Starting value of an uncontrolled field. Use `value` to control it instead.",
           "deprecated": null
         },
         {
@@ -9192,7 +9192,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Ref to the underlying `<input>`, as a callback or a ref object.",
           "deprecated": null
         },
         {
@@ -9225,7 +9225,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": null,
+          "description": "Disables the input and its number steppers and dims the field.",
           "deprecated": null
         },
         {
@@ -9252,7 +9252,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Shown in the caption in place of `caption` when `isInvalid` is true.",
           "deprecated": null
         },
         {
@@ -9360,7 +9360,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the outer field wrapper, beside `plus-text-field`.",
           "deprecated": null
         },
         {
@@ -9369,7 +9369,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline style on the outer field wrapper.",
           "deprecated": null
         },
         {
@@ -9378,7 +9378,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called on every edit with the change event. Stepper presses and clamping call it with `{ target: { name, value, type: \"number\" } }`, the value as text.",
           "deprecated": null
         },
         {
@@ -9387,7 +9387,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the focus event when the input gains focus.",
           "deprecated": null
         },
         {
@@ -9396,7 +9396,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the blur event when the input loses focus. A number field is clamped to `min` and `max` first.",
           "deprecated": null
         },
         {
@@ -9405,7 +9405,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the keydown event before the field handles it. Call `event.preventDefault()` to skip a subtle field's own key handling.",
           "deprecated": null
         },
         {
@@ -9692,7 +9692,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Id of the switch, which the label points at. A generated id is used when omitted.",
           "deprecated": null
         },
         {
@@ -9701,7 +9701,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Form key sent with the hidden checkbox and reported in `onChange`.",
           "deprecated": null
         },
         {
@@ -9719,7 +9719,7 @@
           "required": false,
           "default": "'on'",
           "values": null,
-          "description": null,
+          "description": "Form value sent when the toggle is on, and reported as `target.value` in `onChange`. Defaults to `on`.",
           "deprecated": null
         },
         {
@@ -9728,7 +9728,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Controlled on or off state. Pair it with `onChange`; when it is set, `defaultChecked` is ignored.",
           "deprecated": null
         },
         {
@@ -9737,7 +9737,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Starting state of an uncontrolled toggle.",
           "deprecated": null
         },
         {
@@ -9785,7 +9785,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with `{ target: { name, value, checked } }` when the user switches it. Not called while the toggle is read-only or loading.",
           "deprecated": null
         },
         {
@@ -9794,7 +9794,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the focus event when the switch gains focus.",
           "deprecated": null
         },
         {
@@ -9803,7 +9803,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the blur event when the switch loses focus.",
           "deprecated": null
         },
         {
@@ -9812,7 +9812,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Called with the click event on the switch.",
           "deprecated": null
         },
         {
@@ -9821,7 +9821,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the wrapper around the track and label.",
           "deprecated": null
         },
         {
@@ -9830,7 +9830,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline style on the wrapper around the track and label.",
           "deprecated": null
         },
         {
@@ -9880,7 +9880,7 @@
           "required": false,
           "default": "['hover'",
           "values": null,
-          "description": null,
+          "description": "An empty array or a falsy value turns the tooltip off, for a caller that wants one only when its trigger is truncated. Any other value leaves hover and focus active.",
           "deprecated": null
         },
         {
@@ -9889,7 +9889,7 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The single element that triggers the tooltip. Anything that is not an element is wrapped in a span.",
           "deprecated": null
         },
         {
@@ -9898,7 +9898,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Id set on the tooltip popup.",
           "deprecated": null
         },
         {
@@ -9907,7 +9907,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class on the tooltip popup.",
           "deprecated": null
         },
         {
@@ -9916,7 +9916,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Opens or closes the tooltip from outside. Leave it out to open on hover and focus.",
           "deprecated": null
         },
         {
@@ -9925,7 +9925,7 @@
           "required": false,
           "default": "250",
           "values": null,
-          "description": null,
+          "description": "Milliseconds the pointer or focus must stay before the tooltip shows. Defaults to 250.",
           "deprecated": null
         },
         {
@@ -9934,7 +9934,7 @@
           "required": false,
           "default": "400",
           "values": null,
-          "description": null,
+          "description": "Milliseconds before the tooltip hides after the pointer or focus leaves. Defaults to 400.",
           "deprecated": null
         }
       ]

@@ -17,25 +17,25 @@ Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage. Bui
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | string | — | — |
-| `name` | string | — | — |
+| `id` | string | — | The `id` of the checkbox; the label points at it. Generated when omitted. |
+| `name` | string | — | The form key the box submits under, and sent in the `onChange` payload. |
 | `label` | node | — | Text that names the checkbox |
-| `value` | string or number | — | — |
-| `isChecked` | bool | — | — |
-| `defaultChecked` | bool | — | — |
+| `value` | string or number | — | The value submitted with a form when the box is selected, and sent in the `onChange` payload. |
+| `isChecked` | bool | — | Whether the box is selected. Pass it, with `onChange`, to control the checkbox. |
+| `defaultChecked` | bool | — | Whether the box starts selected, when `isChecked` is not controlling it. |
 | `isIndeterminate` | bool | `false` | Mixed state, for a parent of partly selected children |
 | `isInvalid` | bool | `false` | Marks the unselected box as failing validation |
 | `isDisabled` | bool | `false` | Disable the checkbox |
 | `isReadOnly` | bool | `false` | Shown and announced, not changeable |
 | `isRequired` | bool | `false` | Show the required marker and require it natively |
-| `description` | node | — | — |
-| `appearance` | enum | `'plain'` | — |
-| `onChange` | func | — | — |
-| `onFocus` | func | — | — |
-| `onBlur` | func | — | — |
-| `onClick` | func | — | — |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
+| `description` | node | — | Secondary text under the label. It describes the box and does not name it. |
+| `appearance` | enum | `'plain'` | `plain` (default) draws the box and label inline; `card` draws the choice as a bordered tile. |
+| `onChange` | func | — | Called with `{ target: { name, value, checked } }` when the box is toggled. |
+| `onFocus` | func | — | Called with the focus event when the checkbox gains focus. |
+| `onBlur` | func | — | Called with the blur event when the checkbox loses focus. |
+| `onClick` | func | — | Called with the click event on the checkbox. |
+| `className` | string | `''` | Extra class names added to the field wrapper beside the component's own. |
+| `style` | object | — | Inline styles for the field wrapper. |
 | `testId` | string | — | Maps to `data-testid`, for test queries. |
 
 ## Variants

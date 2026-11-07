@@ -30,7 +30,9 @@ Calendar.propTypes = {
     /** A range's first day; with `rangeEnd`, the days between are marked. */
     rangeStart: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     rangeEnd: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+    /** The earliest day that can be picked, as ISO `YYYY-MM-DD` or a Date. Earlier days are disabled. */
     minDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
+    /** The latest day that can be picked, as ISO `YYYY-MM-DD` or a Date. Later days are disabled. */
     maxDate: PropTypes.oneOfType([PropTypes.string, PropTypes.instanceOf(Date)]),
     /** Day width in pixels: 28, 36 or 44. */
     size: PropTypes.oneOf([28, 36, 44]),

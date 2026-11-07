@@ -174,15 +174,22 @@ const FileUpload = ({
 FileUpload.propTypes = {
     id: PropTypes.string,
     name: PropTypes.string,
+    /** The visible label above the field. Without one, the file input is named "File upload". */
     label: PropTypes.node,
+    /** Shows an asterisk on the label. */
     isRequired: PropTypes.bool,
+    /** Help text inside the field, such as size limits. When omitted, it is built from `acceptedFormats`. */
     description: PropTypes.string,
     acceptedFormats: PropTypes.arrayOf(PropTypes.string),
+    /** Disables the button and file input and dims the field. */
     isDisabled: PropTypes.bool,
     /** Shows the field and its files without a way to choose a file. */
     isReadOnly: PropTypes.bool,
+    /** `none` (default) shows no state, `invalid` draws the error state and `valid` the success state. Pair `invalid` or `valid` with `validationMessage`. */
     validation: PropTypes.oneOf(['none', 'invalid', 'valid']),
+    /** Message shown under the field for the `invalid` or `valid` state. Not shown when `validation` is `none`. */
     validationMessage: PropTypes.string,
+    /** The label of the choose-file button. Defaults to `Choose a file`. */
     buttonText: PropTypes.string,
     className: PropTypes.string,
     style: PropTypes.object,

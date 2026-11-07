@@ -101,11 +101,16 @@ Range.propTypes = {
     label: PropTypes.node,
     /** Render the label visually hidden rather than visible. It still names the slider. */
     showLabel: PropTypes.bool,
+    /** The smallest value. Defaults to 0. */
     min: PropTypes.number,
+    /** The largest value. Defaults to 100. */
     max: PropTypes.number,
+    /** The current value, for a controlled slider. Pair it with `onChange`, or use `defaultValue` to leave the slider uncontrolled. */
     value: PropTypes.number,
     defaultValue: PropTypes.number,
+    /** How much the value moves per key press or drag step. Defaults to 1. */
     step: PropTypes.number,
+    /** Prevents interaction and dims the slider. */
     isDisabled: PropTypes.bool,
     /** The dot and bar, in px; the track follows. Unset keeps the default rendering. */
     size: PropTypes.oneOf([8, 12, 16]),

@@ -3,6 +3,8 @@
 
 # Tabs
 
+A tab strip with its panels. Tabs go into the tablist and every other child, usually Panels, renders after it.
+
 **Import:** `import { Tabs } from '@/components';`
 
 **Source:** `design-system/src/components/navigation/Tabs/Tabs.jsx`
@@ -15,14 +17,14 @@
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `children` | node | — | — |
+| `children` | node | — | `Tabs.Tab` elements, which fill the tablist, and the `Tabs.Panel` elements that follow it. |
 | `alignment` | enum | `'left'` | Horizontal alignment of the tab strip |
 | `appearance` | enum | `'default'` | Underline indicator (default), or a pill-shaped selected fill. |
 | `spacing` | enum | `'default'` | `default` is a 32px tab; `compact` is 24px. |
-| `className` | string | `''` | — |
-| `id` | string | — | — |
-| `defaultActiveKey` | string or number | — | — |
-| `activeKey` | string or number | — | — |
+| `className` | string | `''` | Extra class on the tabs root, beside `plus-tabs`. |
+| `id` | string | — | Id set on the tabs root. |
+| `defaultActiveKey` | string or number | — | The `eventKey` of the tab selected at first, for uncontrolled use. |
+| `activeKey` | string or number | — | The `eventKey` of the selected tab, for controlled use. Pair it with `onSelect`. |
 | `onSelect` | func | — | Called with the newly selected `eventKey` whenever selection moves. |
 
 ## Variants
@@ -50,9 +52,9 @@ Implemented as `Tab`.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `eventKey` | string or number | — | Identifies this tab; matched against the root's `activeKey`/`defaultActiveKey`. |
-| `children` | node | — | — |
-| `isDisabled` | bool | — | — |
-| `className` | string | — | — |
+| `children` | node | — | The tab's label. |
+| `isDisabled` | bool | — | Disables this tab: it cannot be selected. |
+| `className` | string | — | Extra class on the tab, beside `plus-tab`. |
 
 ### `Tabs.Panel`
 
@@ -61,8 +63,8 @@ Implemented as `Panel`.
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `eventKey` | string or number | — | Matches the `Tab` with the same `eventKey`. |
-| `children` | node | — | — |
-| `className` | string | — | — |
+| `children` | node | — | The content shown while the matching tab is selected. |
+| `className` | string | — | Extra class on the panel, beside `plus-tabs-panel`. |
 
 ## Related
 

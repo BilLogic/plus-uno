@@ -46,6 +46,7 @@ const warn = (message) => {
     console.warn(`[SmartTag] ${message}`);
 };
 
+/** A tag for one of the five SMART competency areas. The `subject` fixes its color and leading icon, and the rest is passed to Tag. */
 export const SmartTag = ({ subject, children, text, ...rest }) => {
     const normalized = SUBJECT_ALIASES[subject] || subject;
     let effectiveSubject = normalized;

@@ -846,6 +846,7 @@ export const EXCLUDED = [
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',
+    baseline: 'scripts/baselines/component-docs.json',
     spawnReason:
       'a generator. `--check` is its own assembly pass with the writes withheld, and ' +
       'check:agent spawns it so the step names itself.',

@@ -3,6 +3,8 @@
 
 # Pagination
 
+A numbered page trail with Previous and Next controls. It shows a window of pages around the current one and always keeps the first and last reachable.
+
 **Import:** `import { Pagination } from '@/components';`
 
 **Source:** `design-system/src/components/navigation/Pagination/Pagination.jsx`
@@ -24,8 +26,8 @@
 | `previousLabel` | string | `'Previous'` | Accessible name of the Previous control. |
 | `nextLabel` | string | `'Next'` | Accessible name of the Next control. |
 | `label` | string | `'Page navigation'` | Accessible label of the navigation region. |
-| `id` | string | — | — |
-| `className` | string | `''` | — |
+| `id` | string | — | Id set on the `<nav>` element. |
+| `className` | string | `''` | Extra class on the page list, beside `plus-pagination`. |
 
 ## Variants
 
@@ -49,9 +51,9 @@ Implemented as `PaginationPage`.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `page` | number (required) | — | — |
-| `isCurrent` | bool | — | — |
-| `onSelect` | func | — | — |
+| `page` | number (required) | — | The page number, shown as the button text and passed to `onSelect`. |
+| `isCurrent` | bool | — | Marks the current page: sets `aria-current="page"` and the current styling. |
+| `onSelect` | func | — | Called with the page number when the button is pressed. |
 | `label` | string | — | Accessible name; the number alone when omitted. |
 
 ### `Pagination.Navigator`
@@ -60,11 +62,11 @@ Implemented as `PaginationNavigator`.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `direction` | enum | — | — |
-| `navigator` | enum | — | — |
-| `label` | string (required) | — | — |
-| `isDisabled` | bool | — | — |
-| `onSelect` | func | — | — |
+| `direction` | enum | — | `previous` draws a left caret and `next` a right caret. |
+| `navigator` | enum | — | `icon` shows a caret named by `label`; `text` shows `label` as visible text. |
+| `label` | string (required) | — | The control's name: its accessible name with `icon`, its visible text with `text`. |
+| `isDisabled` | bool | — | Keeps the control in the tab order with `aria-disabled`, and pressing it does nothing. |
+| `onSelect` | func | — | Called with no arguments when the control is pressed and not disabled. |
 
 ## Related
 

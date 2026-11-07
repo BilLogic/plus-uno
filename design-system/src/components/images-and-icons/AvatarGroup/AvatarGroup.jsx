@@ -93,6 +93,7 @@ AvatarGroup.propTypes = {
     label: PropTypes.string,
     /** Formats the overflow's visible text. Defaults to `+n`. */
     overflowLabel: PropTypes.func,
+    /** Extra class names added to the group element beside the component's own. */
     className: PropTypes.string,
 };
 

@@ -172,6 +172,7 @@ RadioGroup.propTypes = {
     name: PropTypes.string,
     /** The question. Names the group. */
     legend: PropTypes.node,
+    /** `stacked` (default) puts one option per line; `inline` lays them in a row, for short labels or a scale. */
     orientation: PropTypes.oneOf(['stacked', 'inline']),
     /**
      * The answers. A string is its own value and label. An object can add a
@@ -191,6 +192,7 @@ RadioGroup.propTypes = {
     ])).isRequired,
     /** The answer: one option value, or `null`/`undefined` while unanswered. */
     value: optionValueType,
+    /** The option value chosen at the start, when the group is uncontrolled. Leave it out for no answer. */
     defaultValue: optionValueType,
     /** Receives the next answer's value. */
     onChange: PropTypes.func,
@@ -212,7 +214,9 @@ RadioGroup.propTypes = {
     isInvalid: PropTypes.bool,
     /** One error for the group, announced when it appears. */
     error: PropTypes.node,
+    /** Extra class names added to the fieldset beside the component's own. */
     className: PropTypes.string,
+    /** Inline styles for the fieldset. */
     style: PropTypes.object,
 };
 

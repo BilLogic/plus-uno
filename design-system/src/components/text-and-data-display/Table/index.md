@@ -13,23 +13,23 @@ Standard table component for displaying tabular data, built from the shared `_Ta
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | string | — | — |
-| `headers` | arrayOf | `[]` | — |
-| `rows` | enum | `[]` | — |
-| `striped` | bool | `false` | — |
-| `hover` | bool | `true` | — |
-| `bordered` | bool | `false` | — |
-| `verticalLines` | bool | `false` | — |
-| `frame` | enum | `'plain'` | — |
-| `size` | enum | — | — |
-| `titleColumn` | number | — | — |
-| `rowStates` | enum | — | — |
-| `summary` | arrayOf | — | — |
-| `emptyState` | node | — | — |
-| `footer` | node | — | — |
-| `onRowClick` | func | — | — |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
+| `id` | string | — | The `id` of the `table` element. The wrapper takes `{id}-wrapper`. |
+| `headers` | arrayOf | `[]` | The column headers. A string is the header text; an object adds `width`, `align`, `className` and `style` to `text`. |
+| `rows` | enum | `[]` | The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `leading`, `state`, `loading`, `className`, `colSpan` or `style`. |
+| `striped` | bool | `false` | Shades alternate rows. |
+| `hover` | bool | `true` | Highlights a row on hover. On by default. |
+| `bordered` | bool | `false` | Draws a frame around the table and lines between columns. Shorthand for `frame="framed"` plus `verticalLines`. |
+| `verticalLines` | bool | `false` | Draws lines between columns. |
+| `frame` | enum | `'plain'` | `plain` (default) draws no outer frame; `framed` draws a border around the table. |
+| `size` | enum | — | Row height in px: 32 for dense tables, 40 (default) or 48 for roomy ones. |
+| `titleColumn` | number | — | The index of the column drawn in the title emphasis, for the row's main label. |
+| `rowStates` | enum | — | A state per row, by index: `rest`, `highlighted`, `selected` or `disabled`. |
+| `summary` | arrayOf | — | Cells for a summary row at the bottom of the table, one per column, such as totals. |
+| `emptyState` | node | — | Content shown in a single row spanning all columns when `rows` is empty. |
+| `footer` | node | — | Content drawn under the table inside its wrapper, such as pagination. |
+| `onRowClick` | func | — | Called with the row index when a row is clicked. The row gets no button role or key handling, so put any keyboard action in a control inside a cell. |
+| `className` | string | `''` | Extra class names added to the `table` element beside the component's own. |
+| `style` | object | — | Inline styles for the table's wrapper element. |
 
 ## Variants
 

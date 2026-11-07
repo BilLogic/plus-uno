@@ -333,15 +333,20 @@ RichTextEditor.propTypes = {
     name: PropTypes.string,
     /** The editor's name, rendered above it and pointed at by the region. */
     label: PropTypes.node,
+    /** Hint text shown while the editor is empty. */
     placeholder: PropTypes.string,
     value: PropTypes.string,
     defaultValue: PropTypes.string,
     /** `default` or `compact`. */
     spacing: PropTypes.oneOf(['default', 'compact']),
+    /** Shows the content without letting the user edit it, and disables the toolbar. */
     readOnly: PropTypes.bool,
+    /** Prevents interaction, disables the toolbar and dims the editor. */
     disabled: PropTypes.bool,
+    /** Minimum height of the editing area, in pixels. */
     minHeight: PropTypes.number,
     toolbarButtons: PropTypes.arrayOf(PropTypes.string),
+    /** `compact` (default) is the short toolbar for messages; `full` is the extended set of formatting controls. Passing `toolbarButtons` uses the full toolbar with those buttons. */
     toolbarPreset: PropTypes.oneOf(['compact', 'full']),
     className: PropTypes.string,
     style: PropTypes.object,

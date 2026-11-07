@@ -281,7 +281,9 @@ const DatePicker = ({
 };
 
 DatePicker.propTypes = {
+    /** Id of the input. Falls back to `name`, then to a generated id. */
     id: PropTypes.string,
+    /** Form key of the input. */
     name: PropTypes.string,
     /** Defaults to MM/DD/YYYY, or two of them for a range. */
     placeholder: PropTypes.string,
@@ -291,7 +293,9 @@ DatePicker.propTypes = {
     range: PropTypes.bool,
     /** `default` is 40; `compact` is 32. */
     spacing: PropTypes.oneOf(['default', 'compact']),
+    /** Disables the input and the calendar. */
     isDisabled: PropTypes.bool,
+    /** Shows the date without letting the user change it or open the calendar. */
     isReadOnly: PropTypes.bool,
     /** Draws the field invalid; a typed date outside the allowed span does too. */
     isInvalid: PropTypes.bool,
@@ -305,9 +309,13 @@ DatePicker.propTypes = {
     calendarAlign: PropTypes.oneOf(['left', 'center', 'right']),
     /** `(iso)`, or `([start, end])` with `range`; '' or nulls when cleared. */
     onChange: PropTypes.func,
+    /** Called with the focus event when the input gains focus. */
     onFocus: PropTypes.func,
+    /** Called with the blur event when the input loses focus, after any typed text has been checked. */
     onBlur: PropTypes.func,
+    /** Extra class on the field frame, beside `plus-date-picker`. */
     className: PropTypes.string,
+    /** Inline style on the field frame. */
     style: PropTypes.object,
 };
 

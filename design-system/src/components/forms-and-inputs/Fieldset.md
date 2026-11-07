@@ -17,14 +17,14 @@ A thin, token-styled wrap around Base UI's Fieldset: `Root` renders the `<fields
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | string | — | — |
+| `id` | string | — | Id of the fieldset. The legend and error ids derive from it. A generated id is used when omitted. |
 | `legend` | node | — | Labels the fieldset's contents. |
-| `isDisabled` | bool | `false` | — |
+| `isDisabled` | bool | `false` | Disables the fieldset and every control inside it. |
 | `isRequired` | bool | `false` | Marked on the legend. |
 | `error` | node | — | One error for the group, announced when it appears. |
-| `children` | node | — | — |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
+| `children` | node | — | The fields the legend groups. |
+| `className` | string | `''` | Extra class on the `<fieldset>`, beside `plus-fieldset`. |
+| `style` | object | — | Inline style on the `<fieldset>`. |
 
 ## Tokens touched
 

@@ -263,20 +263,27 @@ const TextField = ({
 };
 
 TextField.propTypes = {
+    /** Id of the input, which the label points at. A generated id is used when omitted. */
     id: PropTypes.string,
+    /** Form key of the input. Number steppers also report it in the `onChange` event. */
     name: PropTypes.string,
+    /** Visible label above the field. A string label also names the number steppers, as "Increase" and "Decrease" followed by the label. */
     label: PropTypes.node,
     /** Shows an asterisk and sets `aria-required`. Explain the asterisk once, in the form's legend. */
     isRequired: PropTypes.bool,
+    /** Hides the label visually. It is still rendered and still names the input. */
     isLabelHidden: PropTypes.bool,
     /** Text for an info tooltip beside the label. */
     info: PropTypes.node,
     /** Standing help under the field. A message takes its place. */
     caption: PropTypes.node,
+    /** Hint text shown while the input is empty. It does not replace a label. */
     placeholder: PropTypes.string,
     /** With `type="number"`, empty (`''` or `null`) stays empty; it is never read as 0. */
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    /** Starting value of an uncontrolled field. Use `value` to control it instead. */
     defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    /** Ref to the underlying `<input>`, as a callback or a ref object. */
     inputRef: PropTypes.oneOfType([
         PropTypes.func,
         PropTypes.shape({ current: PropTypes.any })
@@ -285,11 +292,13 @@ TextField.propTypes = {
     spacing: PropTypes.oneOf(TEXT_FIELD_SPACINGS),
     /** `subtle` is borderless until hovered or edited, for editing in place. */
     appearance: PropTypes.oneOf(TEXT_FIELD_APPEARANCES),
+    /** Disables the input and its number steppers and dims the field. */
     isDisabled: PropTypes.bool,
     /** With `type="number"`, also hides the steppers; the value can be read and copied. */
     isReadOnly: PropTypes.bool,
     /** Draws the error border and sets `aria-invalid`; `errorMessage` says why. */
     isInvalid: PropTypes.bool,
+    /** Shown in the caption in place of `caption` when `isInvalid` is true. */
     errorMessage: PropTypes.node,
     /** Draws the warning border. Does not set `aria-invalid`: the value is accepted. */
     warningMessage: PropTypes.node,
@@ -313,11 +322,17 @@ TextField.propTypes = {
     onSave: PropTypes.func,
     /** Browser autofill token, e.g. `email`, `current-password`, `one-time-code`. */
     autoComplete: PropTypes.string,
+    /** Extra class on the outer field wrapper, beside `plus-text-field`. */
     className: PropTypes.string,
+    /** Inline style on the outer field wrapper. */
     style: PropTypes.object,
+    /** Called on every edit with the change event. Stepper presses and clamping call it with `{ target: { name, value, type: "number" } }`, the value as text. */
     onChange: PropTypes.func,
+    /** Called with the focus event when the input gains focus. */
     onFocus: PropTypes.func,
+    /** Called with the blur event when the input loses focus. A number field is clamped to `min` and `max` first. */
     onBlur: PropTypes.func,
+    /** Called with the keydown event before the field handles it. Call `event.preventDefault()` to skip a subtle field's own key handling. */
     onKeyDown: PropTypes.func,
     /** Maps to `data-testid`, for test queries. */
     testId: PropTypes.string,

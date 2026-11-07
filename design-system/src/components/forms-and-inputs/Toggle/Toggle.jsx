@@ -106,21 +106,37 @@ const Toggle = ({
 };
 
 Toggle.propTypes = {
+    /** Id of the switch, which the label points at. A generated id is used when omitted. */
     id: PropTypes.string,
+    /** Form key sent with the hidden checkbox and reported in `onChange`. */
     name: PropTypes.string,
+    /** Visible text beside the track. Where the label sits elsewhere, leave it out and pass `aria-label`. */
     label: PropTypes.node,
+    /** Form value sent when the toggle is on, and reported as `target.value` in `onChange`. Defaults to `on`. */
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    /** Controlled on or off state. Pair it with `onChange`; when it is set, `defaultChecked` is ignored. */
     isChecked: PropTypes.bool,
+    /** Starting state of an uncontrolled toggle. */
     defaultChecked: PropTypes.bool,
+    /** Track height in pixels: `16` (default) or `20`. */
     size: PropTypes.oneOf([16, 20]),
+    /** Prevents interaction and dims the toggle. */
     isDisabled: PropTypes.bool,
+    /** Shows a spinner while a change is being saved and ignores input. */
     isLoading: PropTypes.bool,
+    /** Shows the state without letting the user switch it. */
     isReadOnly: PropTypes.bool,
+    /** Called with `{ target: { name, value, checked } }` when the user switches it. Not called while the toggle is read-only or loading. */
     onChange: PropTypes.func,
+    /** Called with the focus event when the switch gains focus. */
     onFocus: PropTypes.func,
+    /** Called with the blur event when the switch loses focus. */
     onBlur: PropTypes.func,
+    /** Called with the click event on the switch. */
     onClick: PropTypes.func,
+    /** Extra class on the wrapper around the track and label. */
     className: PropTypes.string,
+    /** Inline style on the wrapper around the track and label. */
     style: PropTypes.object,
     /** Maps to `data-testid`, for test queries. */
     testId: PropTypes.string,

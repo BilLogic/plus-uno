@@ -3,6 +3,8 @@
 
 # Tag
 
+A small outlined label that names a category, person, agent or team. It can also act as a link, a toggle or a removable chip, depending on its props.
+
 **Import:** `import { Tag } from '@/components';`
 
 **Source:** `design-system/src/components/labels/Tag/Tag.jsx`
@@ -34,9 +36,9 @@
 | `onClick` | func | — | Fires on a selectable tag and on a link. |
 | `onAfterRemoveAction` | func | — | Called with the tag's text and the event after the Remove button is pressed. The caller removes the tag. |
 | `removeButtonLabel` | string | — | Overrides the Remove button's accessible name. Defaults to `Remove <label>`. |
-| `className` | string | `''` | — |
-| `id` | string | — | — |
-| `style` | object | — | — |
+| `className` | string | `''` | Extra class on the tag element. |
+| `id` | string | — | Id set on the tag element. |
+| `style` | object | — | Inline style on the tag element, merged over the `maxWidth` cap. |
 
 ## Variants
 

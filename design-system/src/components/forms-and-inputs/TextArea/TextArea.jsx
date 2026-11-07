@@ -177,8 +177,11 @@ const TextArea = ({
 };
 
 TextArea.propTypes = {
+    /** The `id` of the `textarea`; the label points at it. Generated when omitted. */
     id: PropTypes.string,
+    /** The form key the text submits under. */
     name: PropTypes.string,
+    /** The visible label above the field. Hide it with `isLabelHidden`. */
     label: PropTypes.node,
     /** Shows an asterisk and sets `aria-required`. */
     isRequired: PropTypes.bool,
@@ -188,8 +191,11 @@ TextArea.propTypes = {
     info: PropTypes.node,
     /** Standing help under the field. A message takes its place. */
     caption: PropTypes.node,
+    /** The text. Pass it, with `onChange`, to control the field. */
     value: PropTypes.string,
+    /** The text to start with when the field is uncontrolled. */
     defaultValue: PropTypes.string,
+    /** Hint text shown while the field is empty. */
     placeholder: PropTypes.string,
     /** Visible lines of text. One row is the short textarea. */
     rows: PropTypes.number,
@@ -197,10 +203,13 @@ TextArea.propTypes = {
     spacing: PropTypes.oneOf(TEXT_AREA_SPACINGS),
     /** `subtle` is borderless until hovered or edited, with Save and Cancel while editing. */
     appearance: PropTypes.oneOf(TEXT_AREA_APPEARANCES),
+    /** Dims the field and blocks focus and editing. */
     isDisabled: PropTypes.bool,
+    /** Shows the text and keeps it focusable, but it cannot be changed. */
     isReadOnly: PropTypes.bool,
     /** Draws the error border and sets `aria-invalid`; `errorMessage` says why. */
     isInvalid: PropTypes.bool,
+    /** The caption shown under the field while `isInvalid` is set. It replaces `caption`. */
     errorMessage: PropTypes.node,
     /** Draws the warning border. Does not set `aria-invalid`: the value is accepted. */
     warningMessage: PropTypes.node,
@@ -210,11 +219,17 @@ TextArea.propTypes = {
     maxLength: PropTypes.number,
     /** Subtle only: called by Save (or Ctrl/⌘+Enter). Throw or reject to keep the field open in `invalid`. */
     onSave: PropTypes.func,
+    /** Called with the change event on each edit. */
     onChange: PropTypes.func,
+    /** Called with the focus event when the field gains focus. */
     onFocus: PropTypes.func,
+    /** Called with the blur event when the field loses focus. */
     onBlur: PropTypes.func,
+    /** Called with the keydown event. Call `preventDefault` to stop the subtle appearance's own key handling. */
     onKeyDown: PropTypes.func,
+    /** Extra class names added to the field wrapper beside the component's own. */
     className: PropTypes.string,
+    /** Inline styles for the field wrapper. */
     style: PropTypes.object
 };
 

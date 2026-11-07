@@ -3,6 +3,8 @@
 
 # DateTag
 
+An outlined label for a due or event date, such as "Due tomorrow". The app picks the appearance from how close the date is; it is never a button.
+
 **Import:** `import { DateTag } from '@/components';`
 
 **Source:** `design-system/src/components/labels/DateTag/DateTag.jsx`
@@ -19,8 +21,8 @@
 | `appearance` | enum | `'neutral'` | `neutral` (not close), `warning` (due soon) or `danger` (overdue). Drives the fixed icon too. |
 | `spacing` | enum | `'default'` | `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. |
 | `maxWidth` | number or string | `200` | The widest the Date tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. |
-| `className` | string | `''` | — |
-| `id` | string | — | — |
+| `className` | string | `''` | Extra class names added to the tag element beside the component's own. |
+| `id` | string | — | The `id` attribute of the tag element. |
 
 ## Variants
 

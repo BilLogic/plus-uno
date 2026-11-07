@@ -17,13 +17,13 @@ actions to its side, and a bottom bar below.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `title` | node | — | — |
+| `title` | node | — | The page title. Drawn as an `xlarge` `Heading` unless `disableTitleStyles` is set. `children` is used when it is omitted. |
 | `children` | node | — | `children` is the title when `title` is not given. |
-| `breadcrumbs` | node | — | — |
-| `actions` | node | — | — |
-| `bottomBar` | node | — | — |
+| `breadcrumbs` | node | — | A breadcrumb trail shown above the title row. Pass a `Breadcrumb`. |
+| `actions` | node | — | Controls shown at the end of the title row, such as a primary button or a menu. |
+| `bottomBar` | node | — | Content in a bar below the title row, such as tabs or filters. |
 | `disableTitleStyles` | bool | `false` | Renders the title as a plain node instead of a `Heading`, for a caller that styles it itself. |
-| `className` | string | — | — |
+| `className` | string | — | Extra class names added to the header element beside the component's own. |
 
 ## Tokens touched
 

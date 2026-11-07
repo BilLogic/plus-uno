@@ -301,6 +301,7 @@ const buttonShape = PropTypes.shape({
 });
 
 Modal.propTypes = {
+    /** The `id` attribute of the dialog panel. */
     id: PropTypes.string,
     /** The dialog's h1, and its accessible name. */
     title: PropTypes.string,
@@ -308,6 +309,7 @@ Modal.propTypes = {
     description: PropTypes.node,
     /** The dialog's accessible name when it has no visible `title`. */
     ariaLabel: PropTypes.string,
+    /** The main content of the dialog. A string is drawn as body text; a node is drawn as given. `children` is rendered after it. */
     body: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** `hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap. */
     height: PropTypes.oneOf(['hug', 'fill']),
@@ -323,14 +325,19 @@ Modal.propTypes = {
     dividers: PropTypes.bool,
     /** Skeleton bars in place of the body while its content loads. */
     loading: PropTypes.bool,
+    /** Whether the dialog is open. Controlled by the parent: set it to false in `onClose` to close. */
     show: PropTypes.bool,
     /** `true` (default): a click on the blanket closes. `static`: the blanket shows but refuses to close on a click. `false`: no close on a click. */
     backdrop: PropTypes.oneOf([true, false, 'static']),
     /** Escape closes, by default. `false` for a dialog that has to be answered. */
     keyboard: PropTypes.bool,
+    /** `modal` (default) opens as a real dialog over the page; `inline` draws the same panel in place as a plain block, for docs previews. */
     renderAs: PropTypes.oneOf(['modal', 'inline']),
+    /** The confirming footer button, drawn on the right. Takes `text` (default "Confirm"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`. */
     primaryButton: buttonShape,
+    /** The cancelling footer button, drawn left of the primary one. Takes `text` (default "Cancel"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. */
     secondaryButton: buttonShape,
+    /** Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `backdrop` blocks it). The parent sets `show` to false. */
     onClose: PropTypes.func,
     /**
      * `6-col` · `8-col` · `10-col`: 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with
@@ -338,8 +345,11 @@ Modal.propTypes = {
      * for the callers that still pass one.
      */
     width: PropTypes.oneOfType([PropTypes.oneOf(GRID_WIDTHS), PropTypes.number, PropTypes.string]),
+    /** Extra class names added to the dialog panel beside the component's own. */
     className: PropTypes.string,
+    /** Inline styles for the dialog panel. A fixed `width` is applied after them. */
     style: PropTypes.object,
+    /** More content rendered in the body after `body`, for composing the dialog contents directly. */
     children: PropTypes.node,
 };
 

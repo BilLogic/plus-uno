@@ -19,13 +19,13 @@ One line of help on hover or focus, built on Base UI.
 |------|------|---------|-------------|
 | `text` | node (required) | — | Tooltip text |
 | `placement` | enum | `'top'` | Tooltip placement |
-| `trigger` | string or arrayOf | `['hover'` | — |
-| `children` | node (required) | — | — |
-| `id` | string | — | — |
-| `className` | string | `''` | — |
-| `show` | bool | — | — |
-| `delayShow` | number | `250` | — |
-| `delayHide` | number | `400` | — |
+| `trigger` | string or arrayOf | `['hover'` | An empty array or a falsy value turns the tooltip off, for a caller that wants one only when its trigger is truncated. Any other value leaves hover and focus active. |
+| `children` | node (required) | — | The single element that triggers the tooltip. Anything that is not an element is wrapped in a span. |
+| `id` | string | — | Id set on the tooltip popup. |
+| `className` | string | `''` | Extra class on the tooltip popup. |
+| `show` | bool | — | Opens or closes the tooltip from outside. Leave it out to open on hover and focus. |
+| `delayShow` | number | `250` | Milliseconds the pointer or focus must stay before the tooltip shows. Defaults to 250. |
+| `delayHide` | number | `400` | Milliseconds before the tooltip hides after the pointer or focus leaves. Defaults to 400. |
 
 ## Variants
 

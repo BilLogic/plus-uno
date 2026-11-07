@@ -170,9 +170,11 @@ Popup.propTypes = {
     trigger: PropTypes.node.isRequired,
     /** The popup's body content. */
     children: PropTypes.node.isRequired,
+    /** Heading shown at the top of the popup. It also names the popup for assistive tech. */
     title: PropTypes.node,
     /** Names the popup for assistive tech when there is no `title`. Falls back to the trigger's own accessible text when neither is given. */
     label: PropTypes.string,
+    /** Where the popup opens relative to its trigger: a side (`top`, `bottom`, `left` or `right`), optionally with `-start` or `-end` alignment such as `bottom-start`. `auto` starts at the bottom and moves to the side that fits. Defaults to `top`. */
     placement: PropTypes.oneOf(PLACEMENTS),
     /** `click` (default), `hover`, `focus`, an array of those, or `manual` for a popup you drive with `show`. */
     triggerType: PropTypes.oneOfType([

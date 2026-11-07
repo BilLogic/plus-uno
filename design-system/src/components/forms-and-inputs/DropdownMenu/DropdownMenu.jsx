@@ -145,9 +145,13 @@ DropdownMenu.propTypes = {
     trigger: PropTypes.element.isRequired,
     /** The menu's rows: `Section`, `ButtonItem`, `LinkItem`, `CustomItem`. */
     children: PropTypes.node,
+    /** Controlled open state. Pair it with `onOpenChange`; leave it out for an uncontrolled menu. */
     isOpen: PropTypes.bool,
+    /** Whether an uncontrolled menu starts open. */
     defaultOpen: PropTypes.bool,
+    /** Called with the next open state (a boolean) when the menu opens or closes: trigger press, outside click, Escape or picking a row. */
     onOpenChange: PropTypes.func,
+    /** Side and alignment against the trigger, such as `bottom-start` (default), `top-end` or `right`. A bare side centers the menu on that side. */
     placement: PropTypes.oneOf(PLACEMENTS),
     /** Flips to the opposite side when there isn't room. */
     shouldFlip: PropTypes.bool,
@@ -155,12 +159,17 @@ DropdownMenu.propTypes = {
     spacing: PropTypes.oneOf(['cozy', 'compact']),
     /** Draws a spinner in place of the menu's rows while its options load. */
     loading: PropTypes.bool,
+    /** Minimum width of the menu list, as a CSS length such as `240px`. */
     minWidth: PropTypes.string,
+    /** Maximum height of the menu list, as a CSS length such as `320px`. */
     maxHeight: PropTypes.string,
     /** Where the menu portals to. Defaults to the page. */
     container: PropTypes.object,
+    /** Maps to `data-testid` on the menu popup, for test queries. */
     testId: PropTypes.string,
+    /** Id set on the menu popup. */
     id: PropTypes.string,
+    /** Extra class on the menu popup, beside `plus-dropdown-menu`. */
     className: PropTypes.string,
 };
 

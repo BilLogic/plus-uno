@@ -17,22 +17,22 @@ The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | string | — | — |
+| `id` | string | — | Id set on the flag surface. |
 | `appearance` | enum | `'normal'` | Normal, information, warning, error or success |
 | `title` | node (required) | — | What happened, in a few words. |
 | `children` | node | — | An optional description under the title. |
 | `actions` | arrayOf (required) | — | Link-button actions under the description, in the order given. Avoid more than two. |
 | `bold` | bool | `false` | Expand to the appearance\'s bold fill |
 | `defaultExpanded` | bool | `false` | Whether a bold flag starts expanded. |
-| `dismissible` | bool | `true` | — |
-| `show` | bool | `true` | — |
-| `onDismiss` | func | — | — |
+| `dismissible` | bool | `true` | Shows the dismiss button. Defaults to true; set false to leave it out. |
+| `show` | bool | `true` | Whether the flag renders. Defaults to true; false renders nothing and stops the auto-close timer. |
+| `onDismiss` | func | — | Called with no arguments when the dismiss button is pressed and when the auto-close timer ends. The caller sets `show` to false. |
 | `delay` | number | `FLAG_AUTO_CLOSE_MS` | How long it stays before closing itself, in ms. 8000 by default. |
 | `autohide` | bool | — | Close itself after `delay`. Defaults to true for normal, information and success, false for warning and error. |
-| `className` | string | `''` | — |
-| `headerClass` | string | `''` | — |
-| `bodyClass` | string | `''` | — |
-| `timestamp` | node | — | — |
+| `className` | string | `''` | Extra class on the flag surface. |
+| `headerClass` | string | `''` | Extra class on the header row that holds the title and timestamp. |
+| `bodyClass` | string | `''` | Extra class on the description container. |
+| `timestamp` | node | — | Small text beside the title, such as "11 mins ago". |
 
 ## Variants
 
