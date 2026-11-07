@@ -22,9 +22,9 @@ Rules at level **fail** block; rules at level **warn** print and let the run pas
 
 ## ds/no-unknown-component
 
-**fail.** A name imported from `@/components` that the barrel does not export, or `<DS.Name>` through a namespace import of it.
+**fail.** A name imported from a public barrel (`@/components`, `@/patterns`, or `@/specs/Universal/Pages` for `PageLayout`) that the barrel does not export, or `<DS.Name>` through a namespace import of one. A real component or pattern imported from the wrong barrel fails too, and its fix is the import line it belongs on.
 
-Write a component listed in `design-system/agent-views/components/index.md`. When none fits, propose a new component instead of naming one.
+Write a component or pattern listed in `design-system/agent-views/components/index.md`. When none fits, propose a new component instead of naming one.
 
 ## ds/no-deep-import
 
@@ -34,9 +34,9 @@ Import from the barrel: `import { Button } from '@/components';`. Stylesheets (`
 
 ## ds/no-unknown-prop
 
-**fail.** On a design-system component, a prop its manifest record does not list, or a literal value for an enum prop outside its list.
+**fail.** On a design-system component or pattern (`PatternCard`, `PageLayout` and the rest), a prop its manifest record does not list, or a literal value for an enum prop outside its list.
 
-Use a prop from the component's record in `components.json` (or its generated doc). Every component also takes `key`, `ref`, `children`, `className`, `style`, `id`, `role`, `title`, `tabIndex`, `aria-*` and `data-*`. A value written as an expression (`appearance={tone}`) is not judged, and neither is a component whose record has `props: null`.
+Use a prop from the record in `components.json` (or the component's generated doc, or the pattern's Storybook page). Every component also takes `key`, `ref`, `children`, `className`, `style`, `id`, `role`, `title`, `tabIndex`, `aria-*` and `data-*`. A value written as an expression (`appearance={tone}`) is not judged, and neither is a component whose record has `props: null`.
 
 ## ds/no-raw-literal
 

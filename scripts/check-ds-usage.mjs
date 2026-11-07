@@ -134,6 +134,7 @@ export const contextOf = byRoot((repoRoot) => {
     retired: facts.retired,
     promoted: new Set(TOKEN_LADDER.filter((row) => row.primitive).map((row) => row.new)),
     exported: facts.importable,
+    barrels: facts.barrels,
   });
 });
 

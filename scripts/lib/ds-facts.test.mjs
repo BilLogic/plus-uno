@@ -68,6 +68,24 @@ test('real repo: a pattern answers with its kind and barrel', () => {
   assert.equal(card.status, 'exists');
   assert.equal(card.kind, 'pattern');
   assert.equal(card.import, "import { PatternCard } from '@/patterns';");
+  assert.equal(card.group, 'Card');
+  const padding = card.props.find((p) => p.name === 'padding');
+  assert.deepEqual(padding.values, ['sm', 'md', 'lg']);
+  assert.equal(loadFacts(REPO_ROOT).lookup('PatternCard.padding=xl').status, 'unknown');
+});
+
+test('real repo: PageLayout and PatternSidebar answer with their props, from source', () => {
+  const facts = loadFacts(REPO_ROOT);
+  const layout = facts.lookup('PageLayout');
+  assert.equal(layout.kind, 'pattern');
+  assert.equal(layout.import, "import { PageLayout } from '@/specs/Universal/Pages';");
+  assert.deepEqual(layout.props.find((p) => p.name === 'frame').values, ['default', 'focused']);
+  const sidebar = facts.lookup('PatternSidebar');
+  assert.equal(sidebar.kind, 'pattern');
+  assert.equal(sidebar.source, 'design-system/src/patterns/Sidebar/Sidebar.jsx');
+  assert.ok(sidebar.props.length > 0);
+  assert.equal(facts.lookup('Button').kind, 'component');
+  assert.ok(facts.barrels['@/patterns'].has('useOpenTabs'));
 });
 
 test('real repo: a prop lookup answers values, and an invented prop names its replacement', () => {
@@ -122,6 +140,7 @@ test('an unknown name is answered, not thrown', () => {
     kind: null,
     import: null,
     group: null,
+    source: null,
     summary: null,
     props: null,
     aliasOf: null,

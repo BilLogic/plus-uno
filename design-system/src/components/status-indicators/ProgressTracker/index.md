@@ -24,8 +24,6 @@ The steps of a journey, each done, current or upcoming. Every item renders as a 
 
 ## Variants
 
-**`items`** — `disabled` · `unvisited` · `current` · `visited`
-
 **`spacing`** — `comfortable` · `cozy` · `compact`
 
 **`orientation`** — `horizontal` · `vertical`

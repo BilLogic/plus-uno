@@ -4,12 +4,14 @@
  *
  *   loadFacts(root)            the facts for a repo root or an installed package
  *     .lookup(name)            a component, pattern, export or prop, by name
+ *     .barrels                 every name each public barrel makes importable
  *     .tokens(nameOrRole)      token records by exact name or by role
  *     .notHere()               invented and retired names, with replacements
  *     .scope                   the consumer-code roots
  *   readBarrel(root, spec)     what a barrel exports, for the generators that
  *                              write the manifests this module reads
  *   CONSUMER_ROOTS             the folders consumer code lives in
+ *   BARRELS                    the public barrels: components, patterns, page templates
  *
  * Every reader of these facts is an adapter at this seam: `check:ds-usage`,
  * the component index generator and the manifest generator today. Each answer
@@ -17,9 +19,11 @@
  * that is missing is answered, never thrown on.
  *
  * WHERE THE FACTS COME FROM. The generated manifests
- * (`agent-views/components.json`, `tokens.json`), the hand-kept lists
- * (`_inventions.json`, `_patterns.json`), the token plan's retired renames, and
- * the `@/components` barrel itself. `root` is either a repo root (facts under
+ * (`agent-views/components.json`, `tokens.json`: components, patterns and
+ * `PageLayout`, each with its kind, import, props and values), the hand-kept
+ * lists (`_inventions.json`; `_patterns.json`, which adds only a pattern's group
+ * and when to reach for it), the token plan's retired renames, and the public
+ * barrels themselves. `root` is either a repo root (facts under
  * `design-system/`) or the design-system folder as a package ships it (facts at
  * its top).
  */
@@ -34,6 +38,9 @@ import { retiredRenames } from './tokens/plan.mjs';
 export const CONSUMER_ROOTS = ['prototypes', 'src'];
 
 const COMPONENTS_BARREL = '@/components';
+
+/** The public barrels consumer code imports the design system from. */
+export const BARRELS = [COMPONENTS_BARREL, '@/patterns', '@/specs/Universal/Pages'];
 
 /** The design-system folder under `root`: `design-system/` in a repo, `root` itself in a package. */
 function dsDir(root) {
@@ -171,7 +178,8 @@ export function loadFacts(root) {
   const inventions = optional('_inventions.json', { components: [], props: [], tokens: [] });
   const patterns = optional('_patterns.json', { patterns: [] }).patterns;
   const barrel = readBarrel(root);
-  const importable = new Set(barrel.names);
+  const barrels = Object.fromEntries(BARRELS.map((spec) => [spec, new Set(spec === COMPONENTS_BARREL ? barrel.names : readBarrel(root, spec).names)]));
+  const importable = barrels[COMPONENTS_BARREL];
   const retired = retiredRenames();
 
   const records = new Map(componentManifest.components.map((c) => [c.name, c]));
@@ -187,6 +195,7 @@ export function loadFacts(root) {
     kind: null,
     import: null,
     group: null,
+    source: null,
     summary: null,
     props: null,
     aliasOf: null,
@@ -196,29 +205,32 @@ export function loadFacts(root) {
   });
   const note = (row) => (row ? { replacement: [...row.use], why: row.why ?? null } : {});
 
-  /** A component, pattern or barrel export, by its exported name. */
+  /**
+   * A component, pattern or barrel export, by its exported name. A pattern's
+   * group and summary are the hand-kept list's: the group it is filed under
+   * and when to reach for it, which source cannot say.
+   */
   function lookupName(name) {
     const invented = inventedComponents.get(name);
     const record = records.get(name);
     if (record) {
-      const aliasOf = barrel.aliases[name] ?? null;
+      const kind = record.kind ?? 'component';
+      const aliasOf = kind === 'component' ? barrel.aliases[name] ?? null : null;
       const props = record.props ?? (aliasOf ? records.get(aliasOf)?.props ?? null : null);
+      const row = kind === 'pattern' ? patternRows.get(name) : undefined;
       return answer(name, 'exists', {
-        kind: 'component',
+        kind,
         import: record.import,
-        group: record.group,
-        summary: record.summary,
+        group: row?.group ?? record.group,
+        source: record.source,
+        summary: row?.use ?? record.summary,
         props,
         aliasOf,
         ...note(invented),
       });
     }
-    const pattern = patternRows.get(name);
-    if (pattern) {
-      // A pattern's props join it when the manifest gains pattern records.
-      return answer(name, 'exists', { kind: 'pattern', import: importLine(name, pattern.import), group: pattern.group, summary: pattern.use, ...note(invented) });
-    }
-    if (importable.has(name)) return answer(name, 'exists', { kind: 'export', import: importLine(name, COMPONENTS_BARREL), ...note(invented) });
+    const from = BARRELS.find((spec) => barrels[spec].has(name));
+    if (from) return answer(name, 'exists', { kind: 'export', import: importLine(name, from), ...note(invented) });
     if (invented) return answer(name, 'not-here', note(invented));
     return answer(name, 'unknown');
   }
@@ -260,6 +272,8 @@ export function loadFacts(root) {
     manifests: { components: componentManifest, tokens: tokenManifest },
     /** Every name the `@/components` barrel makes importable. */
     importable,
+    /** Every name each public barrel makes importable, by its specifier. */
+    barrels,
     /** Retired token name → its replacement. */
     retired,
 

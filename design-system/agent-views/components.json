@@ -4,6 +4,7 @@
   "components": [
     {
       "name": "Accordion",
+      "kind": "component",
       "import": "import { Accordion } from '@/components';",
       "group": "layout-and-structure",
       "source": "design-system/src/components/layout-and-structure/Accordion/Accordion.jsx",
@@ -93,7 +94,142 @@
       ]
     },
     {
+      "name": "AiChat",
+      "kind": "pattern",
+      "import": "import { AiChat } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/AiChat/AiChat.jsx",
+      "summary": "AI chat on a Frame: a floating action button at the bottom right of the Page opens chat as a popup; from there it moves to the Frame's Panel or to full screen. It takes the Frame's props and adds the chat. - The button is the one way in. It hides while chat is open in the Panel or full screen. - The mode is remembered for the tab in sessionStorage (and an open Panel). - Under 768 the popup is shown full screen. - `variant=\"storybook\"` is the Storybook docs' chat: clear, move to Panel and close only, with no full screen and no more menu. - The conversation is kept in memory and moves with the mode. There is no history, and no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`. A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.",
+      "props": [
+        {
+          "name": "variant",
+          "type": "enum",
+          "required": false,
+          "default": "'app'",
+          "values": [
+            "app",
+            "storybook"
+          ],
+          "description": "`app` carries every header control; `storybook` carries clear, move to Panel and close.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultMode",
+          "type": "oneOf",
+          "required": false,
+          "default": "'popup'",
+          "values": [
+            "popup",
+            "panel",
+            "fullscreen"
+          ],
+          "description": "The mode a tab with nothing remembered starts in.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultOpen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Whether chat starts open when the tab has nothing remembered.",
+          "deprecated": null
+        },
+        {
+          "name": "storageKey",
+          "type": "string",
+          "required": false,
+          "default": "variant === 'storybook' ? `${AI_CHAT_STORAGE_KEY}-storybook` : AI_CHAT_STORAGE_KEY",
+          "values": null,
+          "description": "The sessionStorage key the mode is kept under (the Storybook variant has its own); null keeps nothing.",
+          "deprecated": null
+        },
+        {
+          "name": "launcher",
+          "type": "bool",
+          "required": false,
+          "default": "true",
+          "values": null,
+          "description": "`false` leaves out the floating button: the popup then floats above the bottom right corner, and the host opens chat with `useAiChat().dispatch({ type: 'open' })`.",
+          "deprecated": null
+        },
+        {
+          "name": "linkTarget",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Where a reply's source links open, such as `_top` from inside a frame.",
+          "deprecated": null
+        },
+        {
+          "name": "onModeChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the new mode whenever chat moves between popup, Panel and full screen.",
+          "deprecated": null
+        },
+        {
+          "name": "respond",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Returns the reply (or a promise of it) to a sent message: a string, or `{ text, sources: [{ title, href, type }] }`. Without it nothing answers.",
+          "deprecated": null
+        },
+        {
+          "name": "onFeedback",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the answer and `{ rating }` (or `{ rating: 'down', comment }`) when a person rates it. Every answer offers thumbs.",
+          "deprecated": null
+        },
+        {
+          "name": "starters",
+          "type": "arrayOf",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "`{ id, label, text }` prompts offered while the conversation is empty.",
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": false,
+          "default": "'AI chat'",
+          "values": null,
+          "description": "The chat's name: the header title, the button's label and the Panel landmark.",
+          "deprecated": null
+        },
+        {
+          "name": "panelLabel",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Overrides the Panel landmark's name; defaults to `title`.",
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The Page content.",
+          "deprecated": null
+        }
+      ]
+    },
+    {
       "name": "AiIcon",
+      "kind": "component",
       "import": "import { AiIcon } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/AiIcon/AiIcon.jsx",
@@ -160,6 +296,7 @@
     },
     {
       "name": "AiLabel",
+      "kind": "component",
       "import": "import { AiLabel } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/AiLabel/AiLabel.jsx",
@@ -257,6 +394,7 @@
     },
     {
       "name": "AiMessage",
+      "kind": "component",
       "import": "import { AiMessage } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/AiMessage/AiMessage.jsx",
@@ -363,6 +501,7 @@
     },
     {
       "name": "Avatar",
+      "kind": "component",
       "import": "import { Avatar } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/Avatar/Avatar.jsx",
@@ -485,6 +624,7 @@
     },
     {
       "name": "AvatarGroup",
+      "kind": "component",
       "import": "import { AvatarGroup } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/AvatarGroup/AvatarGroup.jsx",
@@ -567,6 +707,7 @@
     },
     {
       "name": "Banner",
+      "kind": "component",
       "import": "import { Banner } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/Banner/Banner.jsx",
@@ -624,7 +765,103 @@
       ]
     },
     {
+      "name": "Blanket",
+      "kind": "pattern",
+      "import": "import { Blanket } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/Blanket/Blanket.jsx",
+      "summary": "The full-screen layer that holds the blanket fill and a modal, so a modal is placed, not drawn. It fills with the blanket, pads 16 at the sides and 64 above and below, centers its child, and sits on the blanket layer (500) with its child on the modal layer (510). With `placement` `start` or `end` it drops the pad and holds its child full height at that edge of the screen, for a drawer. Modal, Drawer and the overlay Panel all draw this one Blanket, so the fill and the layer order are the same under each. The Panel's is `contained`: it covers its Frame, not the screen. It draws the layer only: it does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and blanket token; PatternDrawer brings its own focus handling.",
+      "props": [
+        {
+          "name": "placement",
+          "type": "enum",
+          "required": false,
+          "default": "'center'",
+          "values": [
+            "center",
+            "start",
+            "end"
+          ],
+          "description": "`center` (default) for a modal; `start` or `end` holds the layer full height at that edge, with no pad.",
+          "deprecated": null
+        },
+        {
+          "name": "inline",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page.",
+          "deprecated": null
+        },
+        {
+          "name": "contained",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Cover the nearest positioned parent instead of the screen, with no pad and no layer inside: the overlay Panel's Blanket over a Frame's Page and Sidebar. The fill and the layer order stay the shared ones.",
+          "deprecated": null
+        },
+        {
+          "name": "screenWidth",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440.",
+          "deprecated": null
+        },
+        {
+          "name": "screenHeight",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline only: the screen height (px); a layer inside caps at it less Blanket/pad-y above and below. The pad follows the real viewport (24 under 640 tall), not this height, as Figma's frames do.",
+          "deprecated": null
+        },
+        {
+          "name": "onBlanketClick",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called for a click on the blanket, not on the layer it holds.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The layer it holds: a PatternModal, a confirm over one, or a drawer at an edge.",
+          "deprecated": null
+        }
+      ]
+    },
+    {
       "name": "Breadcrumb",
+      "kind": "component",
       "import": "import { Breadcrumb } from '@/components';",
       "group": "navigation",
       "source": "design-system/src/components/navigation/Breadcrumb/Breadcrumb.jsx",
@@ -688,6 +925,7 @@
     },
     {
       "name": "Button",
+      "kind": "component",
       "import": "import { Button } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Button/Button.jsx",
@@ -897,6 +1135,7 @@
     },
     {
       "name": "ButtonGroup",
+      "kind": "component",
       "import": "import { ButtonGroup } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.jsx",
@@ -951,6 +1190,7 @@
     },
     {
       "name": "Calendar",
+      "kind": "component",
       "import": "import { Calendar } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Calendar/Calendar.jsx",
@@ -1054,6 +1294,7 @@
     },
     {
       "name": "Carousel",
+      "kind": "component",
       "import": "import { Carousel } from '@/components';",
       "group": "layout-and-structure",
       "source": "design-system/src/components/layout-and-structure/Carousel/Carousel.jsx",
@@ -1209,6 +1450,7 @@
     },
     {
       "name": "Cascader",
+      "kind": "component",
       "import": "import { Cascader } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Cascader/Cascader.jsx",
@@ -1365,6 +1607,7 @@
     },
     {
       "name": "Checkbox",
+      "kind": "component",
       "import": "import { Checkbox } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.jsx",
@@ -1557,6 +1800,7 @@
     },
     {
       "name": "ChoiceGrid",
+      "kind": "component",
       "import": "import { ChoiceGrid } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.jsx",
@@ -1681,6 +1925,7 @@
     },
     {
       "name": "CloseButton",
+      "kind": "component",
       "import": "import { CloseButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/CloseButton/CloseButton.jsx",
@@ -1741,6 +1986,7 @@
     },
     {
       "name": "Code",
+      "kind": "component",
       "import": "import { Code } from '@/components';",
       "group": "text-and-data-display",
       "source": "design-system/src/components/text-and-data-display/Code/Code.jsx",
@@ -1768,6 +2014,7 @@
     },
     {
       "name": "CodeBlock",
+      "kind": "component",
       "import": "import { CodeBlock } from '@/components';",
       "group": "text-and-data-display",
       "source": "design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.jsx",
@@ -1840,6 +2087,7 @@
     },
     {
       "name": "Comment",
+      "kind": "component",
       "import": "import { Comment } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Comment/Comment.jsx",
@@ -1982,6 +2230,7 @@
     },
     {
       "name": "CountTag",
+      "kind": "component",
       "import": "import { CountTag } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/CountTag/CountTag.jsx",
@@ -2109,6 +2358,7 @@
     },
     {
       "name": "DatePicker",
+      "kind": "component",
       "import": "import { DatePicker } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx",
@@ -2287,6 +2537,7 @@
     },
     {
       "name": "DateTag",
+      "kind": "component",
       "import": "import { DateTag } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/DateTag/DateTag.jsx",
@@ -2357,6 +2608,7 @@
     },
     {
       "name": "DateTimePicker",
+      "kind": "component",
       "import": "import { DateTimePicker } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.jsx",
@@ -2643,6 +2895,7 @@
     },
     {
       "name": "DropdownMenu",
+      "kind": "component",
       "import": "import { DropdownMenu } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx",
@@ -2803,6 +3056,7 @@
     },
     {
       "name": "EmptyState",
+      "kind": "component",
       "import": "import { EmptyState } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/EmptyState/EmptyState.jsx",
@@ -2887,6 +3141,7 @@
     },
     {
       "name": "Fieldset",
+      "kind": "component",
       "import": "import { Fieldset } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Fieldset.jsx",
@@ -2968,6 +3223,7 @@
     },
     {
       "name": "FileUpload",
+      "kind": "component",
       "import": "import { FileUpload } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/FileUpload/FileUpload.jsx",
@@ -3134,6 +3390,7 @@
     },
     {
       "name": "FilterButton",
+      "kind": "component",
       "import": "import { FilterButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/FilterButton/FilterButton.jsx",
@@ -3239,6 +3496,7 @@
     },
     {
       "name": "Flag",
+      "kind": "component",
       "import": "import { Flag } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/Flag/Flag.jsx",
@@ -3398,6 +3656,7 @@
     },
     {
       "name": "Footer",
+      "kind": "component",
       "import": "import { Footer } from '@/components';",
       "group": "layout-and-structure",
       "source": "design-system/src/components/layout-and-structure/Footer/Footer.jsx",
@@ -3460,7 +3719,246 @@
       ]
     },
     {
+      "name": "Frame",
+      "kind": "pattern",
+      "import": "import { Frame } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/Frame/Frame.jsx",
+      "summary": "There is no top bar: the Page runs the full height, and meets a docked Sidebar at its 1px edge. - The Frame owns the Sidebar state and hands it to the Sidebar through `SidebarControlContext`. Open, the toggle (`angles-left`) ends the Sidebar's logo row; closed, the Frame draws it (`bars`) at the Page's top left, centered on x 32, and the Page's header row (`header`, the breadcrumb) follows it on the same center line from x 56. - What docks is decided by the layout resolver (`./frameLayout`) from the Frame's own width: from 1024 the Sidebar docks (240, in flow); under 1024 it never docks. - Docked, the Sidebar sits on the sunken fill with a 1px `--ds-border` on its Page-facing edge. Floating (a peek, or opened by hand under 1024) it lies over the Page with `--ds-shadow-overlay` and no Blanket. - Hovering the left edge peeks a closed Sidebar. An outside press, Escape, or the pointer leaving closes the peek. - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and opens a closed one; focus follows to the toggle that is left. - Opening a modal (or drawer) closes a floating Sidebar and leaves a docked one alone, and while one is open the Sidebar does not peek. The frame hears it from the shared overlay module (`@/lib/overlay`), so a page does not wire its modals to the frame. A modal opened from inside the floating Sidebar hands focus to the toggle when it closes, since its trigger left with the Sidebar. - The Panel area (`panel`) is the Frame's right-hand area. The resolver docks it beside the Page at a hairline when the content keeps 720, collapsing a default Sidebar first (and restoring it when the Panel closes); otherwise it opens over the Page on a Blanket that covers the Page and the Sidebar, and a press outside or Escape closes it. Under 1024 it is an overlay capped at 320, and only one overlay is open at a time; under 768 it is full width. As an overlay the Panel is modal: focus moves into it and stays there, the Page and the Sidebar under the Blanket are inert, and closing it hands focus back to what opened it. Docked or peeking it is not modal and leaves focus where it is. Its open state, dismissal and focus run on Base UI's `Dialog`, portaled into the Frame's row so a dock or overlay switch never remounts the Panel's content. Its splitter resizes it from 320 to 640 (never past what keeps 720 beside a docked Sidebar) by drag or keys. Width and open state are kept in sessionStorage. A modal leaves it open. Anything inside the Frame opens it through `usePanelControl`. - There is no top bar on any Frame. A focused page (no Sidebar) puts Back (`onBack`, leading) and Close (`onClose`, trailing) in the Page's header row, around the `header` content. - Landmarks: the Page is `main`; the Sidebar's `nav` is the navigation; the Panel is a complementary landmark named by `panelLabel`. - The Page pads `--page-pad` (24 at every width) and caps its content at `--content-max-width` (1232), centered, on a 12-column grid with a 16 gutter. Children span all 12 columns unless they set `grid-column`.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "header",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The Page's header row, 32 high on the logo row's center line: the breadcrumb. While the Sidebar is closed it follows the toggle.",
+          "deprecated": null
+        },
+        {
+          "name": "onBack",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A focused page: called when Back is pressed. With it the header row leads with a Back icon button.",
+          "deprecated": null
+        },
+        {
+          "name": "backHref",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A focused page: where Back goes, as a link.",
+          "deprecated": null
+        },
+        {
+          "name": "backLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Back'",
+          "values": null,
+          "description": "The accessible name of Back.",
+          "deprecated": null
+        },
+        {
+          "name": "onClose",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A focused page: called when Close is pressed. With it the header row ends with a Close icon button.",
+          "deprecated": null
+        },
+        {
+          "name": "closeLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Close'",
+          "values": null,
+          "description": "The accessible name of Close.",
+          "deprecated": null
+        },
+        {
+          "name": "sidebar",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Sidebar content. Without it there is no Sidebar and no toggle.",
+          "deprecated": null
+        },
+        {
+          "name": "sidebarDocked",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Sets the Sidebar's default request: true opens it, false closes it. Under 1024 it never docks. Unset opens it where it fits.",
+          "deprecated": null
+        },
+        {
+          "name": "panel",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Panel area content, usually a `PanelContainer` and its parts. Without it there is no Panel.",
+          "deprecated": null
+        },
+        {
+          "name": "panelLabel",
+          "type": "string",
+          "required": false,
+          "default": "'AI chat'",
+          "values": null,
+          "description": "The Panel's complementary landmark name, named for its content.",
+          "deprecated": null
+        },
+        {
+          "name": "panelOpen",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Controlled open state. Leave unset to let the Frame keep it (and remember it for the tab).",
+          "deprecated": null
+        },
+        {
+          "name": "defaultPanelOpen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Uncontrolled: whether the Panel starts open when the tab has nothing remembered.",
+          "deprecated": null
+        },
+        {
+          "name": "onPanelOpenChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the next open state whenever the Panel opens or closes.",
+          "deprecated": null
+        },
+        {
+          "name": "panelDefaultWidth",
+          "type": "number",
+          "required": false,
+          "default": "FRAME_LAYOUT.panelDefault",
+          "values": null,
+          "description": "The width (px) the Panel opens at when the tab has nothing remembered: 320 to 640, default 400.",
+          "deprecated": null
+        },
+        {
+          "name": "panelPeek",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Hovering the Frame's right edge peeks a closed Panel over the Page, with no Blanket. Off by default.",
+          "deprecated": null
+        },
+        {
+          "name": "panelStorageKey",
+          "type": "string",
+          "required": false,
+          "default": "PANEL_STORAGE_KEY",
+          "values": null,
+          "description": "The sessionStorage key the Panel's width and open state are kept under; null keeps nothing.",
+          "deprecated": null
+        },
+        {
+          "name": "sectionDetail",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "A Section detail layout is on the Page: the Sidebar collapses first to keep the 960 split.",
+          "deprecated": null
+        },
+        {
+          "name": "width",
+          "type": "enum",
+          "required": false,
+          "default": "'content'",
+          "values": [
+            "content",
+            "reading"
+          ],
+          "description": "Content cap: content 1232, reading 864",
+          "deprecated": null
+        },
+        {
+          "name": "contentAs",
+          "type": "elementType",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Element for the content box. `main` by default, the Page's landmark; pass `div` when the page supplies its own `main`.",
+          "deprecated": null
+        },
+        {
+          "name": "contentClassName",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "surfaceDirect",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Render children straight into the page, with no content box or grid (full-bleed views). The Page itself is then the `main`.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Content slot",
+          "deprecated": null
+        }
+      ]
+    },
+    {
       "name": "GenerativeBorder",
+      "kind": "component",
       "import": "import { GenerativeBorder } from '@/components';",
       "group": "loading",
       "source": "design-system/src/components/loading/GenerativeBorder/GenerativeBorder.jsx",
@@ -3521,6 +4019,7 @@
     },
     {
       "name": "Heading",
+      "kind": "component",
       "import": "import { Heading } from '@/components';",
       "group": "text-and-data-display",
       "source": "design-system/src/components/text-and-data-display/Heading/Heading.jsx",
@@ -3605,6 +4104,7 @@
     },
     {
       "name": "IconButton",
+      "kind": "component",
       "import": "import { IconButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/IconButton/IconButton.jsx",
@@ -3742,6 +4242,7 @@
     },
     {
       "name": "Illustration",
+      "kind": "component",
       "import": "import { Illustration } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/Illustration/Illustration.jsx",
@@ -3809,6 +4310,7 @@
     },
     {
       "name": "Image",
+      "kind": "component",
       "import": "import { Image } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/Image/Image.jsx",
@@ -3884,6 +4386,7 @@
     },
     {
       "name": "InlineEdit",
+      "kind": "component",
       "import": "import { InlineEdit } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.jsx",
@@ -4055,6 +4558,7 @@
     },
     {
       "name": "InlineEditableTextfield",
+      "kind": "component",
       "import": "import { InlineEditableTextfield } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/InlineEditableTextfield/InlineEditableTextfield.jsx",
@@ -4253,6 +4757,7 @@
     },
     {
       "name": "InlineMessage",
+      "kind": "component",
       "import": "import { InlineMessage } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/InlineMessage/InlineMessage.jsx",
@@ -4353,6 +4858,7 @@
     },
     {
       "name": "Link",
+      "kind": "component",
       "import": "import { Link } from '@/components';",
       "group": "navigation",
       "source": "design-system/src/components/navigation/Link/Link.jsx",
@@ -4429,6 +4935,7 @@
     },
     {
       "name": "LinkButton",
+      "kind": "component",
       "import": "import { LinkButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/LinkButton/LinkButton.jsx",
@@ -4566,6 +5073,7 @@
     },
     {
       "name": "LinkIconButton",
+      "kind": "component",
       "import": "import { LinkIconButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/LinkIconButton/LinkIconButton.jsx",
@@ -4685,6 +5193,7 @@
     },
     {
       "name": "Logo",
+      "kind": "component",
       "import": "import { Logo } from '@/components';",
       "group": null,
       "source": null,
@@ -4693,6 +5202,7 @@
     },
     {
       "name": "MenuGroup",
+      "kind": "component",
       "import": "import { MenuGroup } from '@/components';",
       "group": "navigation",
       "source": "design-system/src/components/navigation/MenuGroup/MenuGroup.jsx",
@@ -4768,6 +5278,7 @@
     },
     {
       "name": "Modal",
+      "kind": "component",
       "import": "import { Modal } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/Modal/Modal.jsx",
@@ -4992,6 +5503,7 @@
     },
     {
       "name": "Object",
+      "kind": "component",
       "import": "import { Object } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/Object/Object.jsx",
@@ -5039,7 +5551,123 @@
       ]
     },
     {
+      "name": "Page",
+      "kind": "pattern",
+      "import": "import { Page } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/Page/Page.jsx",
+      "summary": "Bare tokenized content box: pick an elevation level, padding scale, radius scale and border — children fill the content slot. The level sets the fill and its shadow together: sunken (the frame's backdrop), default (the page, edged by the surface border), raised (a card) and overlay (anything over the UI). A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "level",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "sunken",
+            "default",
+            "raised",
+            "overlay"
+          ],
+          "description": "Elevation level: its fill and its shadow, as a pair",
+          "deprecated": null
+        },
+        {
+          "name": "padding",
+          "type": "enum",
+          "required": false,
+          "default": "'md'",
+          "values": [
+            "none",
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Padding scale (md is the frame's own pad)",
+          "deprecated": null
+        },
+        {
+          "name": "radius",
+          "type": "enum",
+          "required": false,
+          "default": "'none'",
+          "values": [
+            "none",
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Radius scale",
+          "deprecated": null
+        },
+        {
+          "name": "border",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "A bold border on/off",
+          "deprecated": null
+        },
+        {
+          "name": "as",
+          "type": "elementType",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Render element / component",
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The page's title: its one h1, at Heading/large 24. Leave it unset on a Page that is not a whole page.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Content slot",
+          "deprecated": null
+        }
+      ]
+    },
+    {
       "name": "PageHeader",
+      "kind": "component",
       "import": "import { PageHeader } from '@/components';",
       "group": "layout-and-structure",
       "source": "design-system/src/components/layout-and-structure/PageHeader/PageHeader.jsx",
@@ -5111,7 +5739,237 @@
       ]
     },
     {
+      "name": "PageLayout",
+      "kind": "pattern",
+      "import": "import { PageLayout } from '@/specs/Universal/Pages';",
+      "group": "pages",
+      "source": "design-system/src/specs/Universal/Pages/PageLayout/PageLayout.jsx",
+      "summary": null,
+      "props": [
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "frame",
+          "type": "enum",
+          "required": false,
+          "default": "\"focused\"` it is the visible title in the focused topbar instead. A page",
+          "values": [
+            "default",
+            "focused"
+          ],
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "onBack",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "backHref",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "backLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Back'",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "onClose",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "closeLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Close'",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "actions",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "actionsLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Page actions'",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "sidebarConfig",
+          "type": "object",
+          "required": false,
+          "default": "{}",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "topBarConfig",
+          "type": "object",
+          "required": false,
+          "default": "{}",
+          "values": null,
+          "description": "The page's breadcrumbs, the signed-in user (`{ name, type }`) and `helpHref`: the header row and the Sidebar's account row",
+          "deprecated": null
+        },
+        {
+          "name": "footerConfig",
+          "type": "object",
+          "required": false,
+          "default": "{}",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "mainClassName",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "floatingContent",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "drawer",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The props of PatternDrawer, to draw a drawer over the page. Without it there is no drawer.",
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "contentDirect",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "shellLoading",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "While true, the header row shows a breadcrumb skeleton in place of the breadcrumb, and the header and Sidebar drop the shell-reveal class, holding their entrance.",
+          "deprecated": null
+        },
+        {
+          "name": "shellEntered",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Adds `has-entered` to the shell-reveal class on the header and the Sidebar, running their entrance. Read only while `shellLoading` is false.",
+          "deprecated": null
+        },
+        {
+          "name": "sidebarHidden",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "sidebarExpanded",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        }
+      ]
+    },
+    {
       "name": "Pagination",
+      "kind": "component",
       "import": "import { Pagination } from '@/components';",
       "group": "navigation",
       "source": "design-system/src/components/navigation/Pagination/Pagination.jsx",
@@ -5226,6 +6084,7 @@
     },
     {
       "name": "Panel",
+      "kind": "component",
       "import": "import { Panel } from '@/components';",
       "group": "layout-and-structure",
       "source": "design-system/src/components/layout-and-structure/Panel/Panel.jsx",
@@ -5261,7 +6120,1117 @@
       ]
     },
     {
+      "name": "PatternCard",
+      "kind": "pattern",
+      "import": "import { PatternCard } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/PatternCard/PatternCard.jsx",
+      "summary": "Card pattern for PLUS design system. Mirrors Figma `Pattern/Card`: an optional image, then the content (the `_Card header` over the body), then an optional footer, on Atlassian's raised pair: the raised surface and its shadow, whose 1px ring is the card's edge. - **Header** (`_Card header`): `title` (the card title type, shared with Card in `styles/_card-title.scss`, one heading level below its section) over an optional `description` (Body/default 14), with `actions` at the end of the row. `header` replaces that block with custom content, like the header's `custom` type, for tabs or a toolbar. - **Spacing** comes from the Card tokens: `padding` sets Card/pad-sm · md · lg, the header sits Card/stack-md above the body (`gap` picks the stack step), and the footer sits Card/stack-lg below. The footer is left-aligned. - The card hugs its content; in a row it stretches to the tallest card. - **Elevation**: the raised pair at rest. A card with an `onClick` lifts on hover to the raised surface's hovered step under the overlay shadow, and settles back onto the raised shadow while pressed; `dragging` puts any card on the overlay pair while it moves. The card also sets the current surface, so a sticky table cell inside it matches the card.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The card's title, in the card title type (`styles/_card-title.scss`), tagged one heading level below its section",
+          "deprecated": null
+        },
+        {
+          "name": "description",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Body/default 14 under the title",
+          "deprecated": null
+        },
+        {
+          "name": "actions",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Actions at the end of the header row: buttons, a pager or an overflow",
+          "deprecated": null
+        },
+        {
+          "name": "header",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Custom header that replaces title, description and actions (tabs, a toolbar)",
+          "deprecated": null
+        },
+        {
+          "name": "image",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Image slot above the content, full bleed",
+          "deprecated": null
+        },
+        {
+          "name": "footer",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Footer slot: commit actions, left-aligned, Card/stack-lg below the body",
+          "deprecated": null
+        },
+        {
+          "name": "padding",
+          "type": "enum",
+          "required": false,
+          "default": "'md'",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Padding scale: Card/pad-sm · md · lg (16 · 20 · 24)",
+          "deprecated": null
+        },
+        {
+          "name": "gap",
+          "type": "enum",
+          "required": false,
+          "default": "'md'",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Header-to-body stack: Card/stack-sm · md · lg (4 · 8 · 12)",
+          "deprecated": null
+        },
+        {
+          "name": "minWidth",
+          "type": "number or string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Minimum width constraint (number of px or any CSS length)",
+          "deprecated": null
+        },
+        {
+          "name": "onClick",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Click handler, passed to the card's root element. Its presence adds the clickable class: a pointer cursor and the hover lift. It adds no role or tab stop; pass `role` and `tabIndex` for a card clickable as a whole.",
+          "deprecated": null
+        },
+        {
+          "name": "dragging",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "The card is being dragged: it lifts to the overlay pair",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Body content slot",
+          "deprecated": null
+        }
+      ]
+    },
+    {
+      "name": "PatternDrawer",
+      "kind": "pattern",
+      "import": "import { PatternDrawer } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/PatternDrawer/PatternDrawer.jsx",
+      "summary": "Drawer pattern for PLUS design system. A full-height panel at the edge of the screen, for a task that needs the page in view: the details of a row, a set of filters, a short edit. It places itself in `Blanket` at that edge, over the same blanket a modal takes. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), the Modal width steps. The title, description and close button follow the Modal rules. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), Drawer/pad 16, Drawer/stack-md 16 and Drawer/inline-sm 8, no radius. Mirrors \"Pattern/Drawer\" in the Figma design system file. It is a real dialog: opening it moves focus inside and Tab cycles there, Escape, the close button and a click on the blanket call `onClose`, and closing returns focus to what had it. An `inline` drawer, drawn in the page flow for docs, leaves focus where it is. It takes a stack slot from the shared overlay module (`@/lib/overlay`) alongside `Modal`: at most two stack (a drawer and the confirm it raises), a third stays closed and calls `onClose`, and opening either closes a floating sidebar. An `inline` drawer takes no slot.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "open",
+          "type": "bool",
+          "required": false,
+          "default": "true",
+          "values": null,
+          "description": "Whether the drawer shows. Closing it returns focus to what had it before it opened.",
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The title in the header row: the dialog's h1, at Heading/medium 20, and its name",
+          "deprecated": null
+        },
+        {
+          "name": "description",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "One line under the title, in the subtle text color; it describes the dialog",
+          "deprecated": null
+        },
+        {
+          "name": "onClose",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called by the close button, Escape and a click on the blanket; renders the close button",
+          "deprecated": null
+        },
+        {
+          "name": "footer",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Footer slot, pinned to the bottom edge (typically action buttons, the primary last)",
+          "deprecated": null
+        },
+        {
+          "name": "width",
+          "type": "oneOf",
+          "required": false,
+          "default": "'sm'",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "`sm` · `md` · `lg`: 6 · 8 · 10 columns of the screen grid plus the drawer pad (384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 at 1440), the Modal width steps. Grows with the screen, never shrinks, ignores the sidebar.",
+          "deprecated": null
+        },
+        {
+          "name": "placement",
+          "type": "enum",
+          "required": false,
+          "default": "'end'",
+          "values": [
+            "end",
+            "start"
+          ],
+          "description": "`end` (default) holds it at the right edge of a left-to-right page; `start` at the left.",
+          "deprecated": null
+        },
+        {
+          "name": "inline",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Draw in the page flow at a stand-in screen, for docs and previews; focus stays where it is.",
+          "deprecated": null
+        },
+        {
+          "name": "screenWidth",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline only: the stand-in screen width (px), such as 768, 1024 or 1440.",
+          "deprecated": null
+        },
+        {
+          "name": "screenHeight",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline only: the stand-in screen height (px); the drawer runs its full height.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "onKeyDown",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs before the drawer's own Escape and Tab handling; preventing the default on Escape keeps the drawer open.",
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Body content slot; it scrolls once it outgrows the screen",
+          "deprecated": null
+        }
+      ]
+    },
+    {
+      "name": "PatternModal",
+      "kind": "pattern",
+      "import": "import { PatternModal } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/PatternModal/PatternModal.jsx",
+      "summary": "Modal pattern for PLUS design system. Modal shell rendered inline (no portal, focus trap or Escape): header with title and close button, body slot, footer slot. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and height hugs the content up to the screen less 128 or fills to it, the body scrolling past it. Place it in `Blanket`. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad, Modal/stack-md and Modal/radius. Mirrors \"Pattern/Modal\" in the Figma design system file. For a real overlay dialog (backdrop, focus trap), use the core Modal component. A dialog is its own page: the title is its h1, at Heading/medium 20, and a section inside it opens at h2. `tabs` puts a tab group under the title, as Figma's `_Modal header` type=tabs: `Tabs` in the header, so it stays put while only the body scrolls. The body becomes the tab panel, named by the selected tab, and shows that tab's content in place of `children`. `header` is Figma's `_Modal header` type=custom: a slot that takes the place of the title row (the title and the close button), so the caller owns both and names the dialog with `aria-label` or `aria-labelledby`. `divider` draws a rule under the header and above the footer, as Figma's `divider?`. `loading` swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. The body never draws shorter than Modal/body-min-height 96.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Modal title in the header row: the dialog's h1, at Heading/medium 20, and its name",
+          "deprecated": null
+        },
+        {
+          "name": "header",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Custom header slot, Figma's `_Modal header` type=custom. It replaces the title row (the title and the close button), so name the dialog with `aria-label`.",
+          "deprecated": null
+        },
+        {
+          "name": "divider",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "A rule under the header and above the footer, as Figma's `divider?`. Off by default.",
+          "deprecated": null
+        },
+        {
+          "name": "loading",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Swaps the body for a Skeleton paragraph and marks it busy, as Figma's `loading?`. Off by default.",
+          "deprecated": null
+        },
+        {
+          "name": "onClose",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Close handler — renders the close button when provided",
+          "deprecated": null
+        },
+        {
+          "name": "footer",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Footer slot (typically action buttons)",
+          "deprecated": null
+        },
+        {
+          "name": "width",
+          "type": "oneOf",
+          "required": false,
+          "default": "'sm'",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "`sm` · `md` · `lg`: 6 · 8 · 10 columns of the screen grid plus the modal pad (384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 at 1440). Grows with the screen, never shrinks, ignores the sidebar.",
+          "deprecated": null
+        },
+        {
+          "name": "height",
+          "type": "oneOf",
+          "required": false,
+          "default": "'hug'",
+          "values": [
+            "hug",
+            "fill"
+          ],
+          "description": "`hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap.",
+          "deprecated": null
+        },
+        {
+          "name": "tabs",
+          "type": "arrayOf",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "A tab group under the title: `{ key, label, content, disabled? }` per tab. The tabs stay put in the header and the body, now the tab panel, shows the selected tab's content in place of `children`. Arrow keys move between tabs, Home and End jump to the ends.",
+          "deprecated": null
+        },
+        {
+          "name": "activeTab",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The selected tab's key, when the caller holds it; move it from `onTabChange`.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultActiveTab",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The tab to start on when the modal holds the selection; the first enabled tab by default.",
+          "deprecated": null
+        },
+        {
+          "name": "onTabChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with the key of the tab a person selects.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Body content slot; with `tabs`, the selected tab's `content` takes its place",
+          "deprecated": null
+        }
+      ]
+    },
+    {
+      "name": "PatternSection",
+      "kind": "pattern",
+      "import": "import { PatternSection } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/PatternSection/PatternSection.jsx",
+      "summary": null,
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "title",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Section title: an h2 at Heading/medium 20, or an h3 at Heading/small 16 inside another section",
+          "deprecated": null
+        },
+        {
+          "name": "description",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional description under the title, Body/default",
+          "deprecated": null
+        },
+        {
+          "name": "actions",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Actions slot, aligned to the end of the title row",
+          "deprecated": null
+        },
+        {
+          "name": "tabs",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Tabs row under the title row (header type `tabs`, or `tabs-only`)",
+          "deprecated": null
+        },
+        {
+          "name": "toolbar",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Toolbar row under the title row (header type `toolbar`), usually a `PatternSection.Toolbar`",
+          "deprecated": null
+        },
+        {
+          "name": "header",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Free-form header in place of title and description (header type `custom`)",
+          "deprecated": null
+        },
+        {
+          "name": "type",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "default",
+            "tabs",
+            "toolbar",
+            "custom",
+            "tabs-only"
+          ],
+          "description": "Header type. Read from the slots when left off; pass `tabs-only` to show only the tabs row",
+          "deprecated": null
+        },
+        {
+          "name": "onAddView",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Puts \"Add view\" at the end of the tabs row, and runs when it is pressed",
+          "deprecated": null
+        },
+        {
+          "name": "addViewLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Add view'",
+          "values": null,
+          "description": "The \"Add view\" button's label",
+          "deprecated": null
+        },
+        {
+          "name": "loading",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Swaps the header for skeleton bars and marks the section busy",
+          "deprecated": null
+        },
+        {
+          "name": "layout",
+          "type": "enum",
+          "required": false,
+          "default": "'single'",
+          "values": [
+            "single",
+            "split",
+            "subsections"
+          ],
+          "description": "Body layout: the content alone, content beside `side`, or stacked subsections",
+          "deprecated": null
+        },
+        {
+          "name": "side",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Side column of `layout=\"split\"`",
+          "deprecated": null
+        },
+        {
+          "name": "footer",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Footer, for \"View all\" or paging only; aligned to the end",
+          "deprecated": null
+        },
+        {
+          "name": "detail",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The optional detail region on the right: one record of the content. Pass `null` for the region with nothing open; leave it off for a plain Section",
+          "deprecated": null
+        },
+        {
+          "name": "detailTitle",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The detail's title; also the region's accessible name",
+          "deprecated": null
+        },
+        {
+          "name": "detailDescription",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Optional description under the detail title",
+          "deprecated": null
+        },
+        {
+          "name": "detailFooter",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Detail footer, such as \"Open full review\"",
+          "deprecated": null
+        },
+        {
+          "name": "hasSelection",
+          "type": "bool",
+          "required": false,
+          "default": "Boolean(detail)",
+          "values": null,
+          "description": "Whether a record is open. Defaults to whether `detail` is given",
+          "deprecated": null
+        },
+        {
+          "name": "onBack",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs the back link. The link shows only when this is set and the detail replaces the list",
+          "deprecated": null
+        },
+        {
+          "name": "backLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Back to list'",
+          "values": null,
+          "description": "The back link's label",
+          "deprecated": null
+        },
+        {
+          "name": "onPrevious",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs the previous button; the stepper shows when either handler is set",
+          "deprecated": null
+        },
+        {
+          "name": "onNext",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Runs the next button",
+          "deprecated": null
+        },
+        {
+          "name": "previousDisabled",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Disables the previous button, at the start of the queue",
+          "deprecated": null
+        },
+        {
+          "name": "nextDisabled",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Disables the next button, at the end of the queue",
+          "deprecated": null
+        },
+        {
+          "name": "previousLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Previous'",
+          "values": null,
+          "description": "The previous button's label",
+          "deprecated": null
+        },
+        {
+          "name": "nextLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Next'",
+          "values": null,
+          "description": "The next button's label",
+          "deprecated": null
+        },
+        {
+          "name": "level",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "page"
+          ],
+          "description": "`page` makes the title the page's h1 at Heading/large 24; by default it nests one level down",
+          "deprecated": null
+        },
+        {
+          "name": "gap",
+          "type": "enum",
+          "required": false,
+          "default": "'md'",
+          "values": [
+            "sm",
+            "md",
+            "lg"
+          ],
+          "description": "Gap between the header, the body and the footer (Section/stack tokens); `md` is the Figma value",
+          "deprecated": null
+        },
+        {
+          "name": "fill",
+          "type": "enum",
+          "required": false,
+          "default": "'none'",
+          "values": [
+            "none",
+            "subtle"
+          ],
+          "description": "`subtle` sets the section on the sunken surface with a pad and a radius; `none` (default) draws nothing",
+          "deprecated": null
+        },
+        {
+          "name": "named",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Makes the section a region named by its title, for a section that stands apart as a landmark",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Content slot; with `layout=\"split\"`, the main column",
+          "deprecated": null
+        }
+      ]
+    },
+    {
+      "name": "PatternSidebar",
+      "kind": "pattern",
+      "import": "import { PatternSidebar } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/Sidebar/Sidebar.jsx",
+      "summary": "Sidebar pattern: the app's side navigation, 240 wide, padded 12, on the sunken fill. Every row sits on one grid: rows 32 high from x 12 to 228 with radius 6, a 24 icon slot centered on x 32, the label on x 48, and a trailing slot centered on x 208. - **Logo row**: the PLUS Logo lockup at height 24, a link to Home, and the sidebar toggle (`angles-left`) on the trailing column. Inside a Frame the toggle comes from the Frame; standalone, pass `onToggle`. - **Groups**: the first has no title (Home, Slack). Every other group has a title row, a full 32 row that collapses its group; an `angle-down` shows after the title on hover and focus and turns right while collapsed. Each person's collapsed sections are remembered in localStorage. - **Locked group**: while `modulesLeft` is above 0, a group marked `lockedDuringOnboarding` shows a lock in the title's caret slot, its rows in the subtlest text with no hover, and the tooltip \"Complete your assigned training to unlock the Toolkit\" (no number). It neither collapses nor opens. - **Training counts**: a row with `training: 'lessons'` shows the Count tag of `lessonsLeft` (\"2 assigned lessons left\"); `training: 'modules'` shows `modulesLeft` (\"3 onboarding modules left\"), only while onboarding is in progress. Zero shows nothing. - **Trailing slot**: a count, a dot, the external icon for a link that leaves the app, or a close button. - **Open tabs** (`tabs[item.id]`): records a person opened (a session, a student) list under their row on a thread, one line on the icon column whose last row turns into the label column. Each tab shows a live dot at rest and Close on hover, focus and while selected; Delete or Backspace closes the focused tab. Three show, then \"Show n more\". On hover the row's icon slot turns into a collapse angle and its trailing slot into Close all. Exactly one row is selected: a selected tab takes the fill and its row goes to ink; collapsed, the row takes the fill and shows the tab count. - **Account row**: `SidebarAccount`, under a divider. Content is data. The pattern draws what it is given and never changes the URL; which groups a role sees is the caller's config.",
+      "props": [
+        {
+          "name": "groups",
+          "type": "arrayOf",
+          "required": true,
+          "default": "[]",
+          "values": null,
+          "description": "The groups, in order. The first usually has no title (Home, Slack).",
+          "deprecated": null
+        },
+        {
+          "name": "activeId",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Id of the selected row or tab; it carries `aria-current=\"page\"`",
+          "deprecated": null
+        },
+        {
+          "name": "onSelect",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `(id, item)` when a row other than an external link is pressed",
+          "deprecated": null
+        },
+        {
+          "name": "tabs",
+          "type": "objectOf",
+          "required": false,
+          "default": "{}",
+          "values": null,
+          "description": "Open tabs by row id, in the order they show",
+          "deprecated": null
+        },
+        {
+          "name": "onSelectTab",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `(tab, item)` on a plain click of a tab",
+          "deprecated": null
+        },
+        {
+          "name": "onCloseTab",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `(tab, item)` by a tab's Close and by Delete or Backspace",
+          "deprecated": null
+        },
+        {
+          "name": "onCloseAllTabs",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called with `(item)` by a row's Close all",
+          "deprecated": null
+        },
+        {
+          "name": "modulesLeft",
+          "type": "number",
+          "required": false,
+          "default": "0",
+          "values": null,
+          "description": "Onboarding modules a tutor has left. Above 0, groups marked `lockedDuringOnboarding` lock, and the `modules` row counts it.",
+          "deprecated": null
+        },
+        {
+          "name": "lessonsLeft",
+          "type": "number",
+          "required": false,
+          "default": "0",
+          "values": null,
+          "description": "Assigned lessons a tutor has left; the `lessons` row counts it",
+          "deprecated": null
+        },
+        {
+          "name": "account",
+          "type": "shape",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "The signed-in person, for the account row. Their `id` keys the remembered sections.",
+          "deprecated": null
+        },
+        {
+          "name": "onProfile",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The account menu's Profile",
+          "deprecated": null
+        },
+        {
+          "name": "onSignOut",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The account menu's Sign out",
+          "deprecated": null
+        },
+        {
+          "name": "helpHref",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Help Center, opened in a new tab",
+          "deprecated": null
+        },
+        {
+          "name": "homeHref",
+          "type": "string",
+          "required": false,
+          "default": "'/'",
+          "values": null,
+          "description": "Where the logo goes",
+          "deprecated": null
+        },
+        {
+          "name": "onHome",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Called on a plain click of the logo; the caller goes Home",
+          "deprecated": null
+        },
+        {
+          "name": "onToggle",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Standalone: the toggle's press. Inside a Frame the Frame draws the toggle's state.",
+          "deprecated": null
+        },
+        {
+          "name": "storageKey",
+          "type": "string",
+          "required": false,
+          "default": "SIDEBAR_SECTIONS_STORAGE_KEY",
+          "values": null,
+          "description": "The localStorage key collapsed sections are kept under, per account id; null keeps nothing",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": "'Main'",
+          "values": null,
+          "description": "Accessible name of the `nav` landmark",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        }
+      ]
+    },
+    {
+      "name": "PatternTable",
+      "kind": "pattern",
+      "import": "import { PatternTable } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/PatternTable/PatternTable.jsx",
+      "summary": "Table pattern for PLUS design system. Table shell: table children (consumers pass their own thead/tbody), a pagination slot under the rows, and an empty-state slot. The table has no toolbar of its own: the Section header above it carries the title, search, filters and actions. With `empty`, the header stays and the empty state takes the body as one message row spanning every column, so the columns still say what will appear. The table itself is no-fill (transparent): the surrounding card or surface provides the background, and row states are layered over each cell's fill rather than replacing it. - **Row states**: hovered and pressed rows take the neutral subtle steps; a row with `aria-selected=\"true\"` (in a `role=\"grid\"` table) takes the selected ladder across the whole row, with no stripe on its leading edge; the row's checkbox is the cue that does not rest on color. - **Sticky cells**: `stickyHeader` pins the head row and `stickyColumn` the first column. They paint the current surface, so they match the page or the card they sit in, and take the overflow shadow only while content is scrolled under them. `stickyHeader` pairs with `maxHeight`: only a bounded region scrolls vertically, so without `maxHeight` the header is not pinned. A bounded region, or one with a sticky column, takes keyboard focus so it can be scrolled without a pointer. Mirrors the \"Table\" slot component in the Figma design system file.",
+      "props": [
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "pagination",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Pagination slot under the rows; hidden while the empty state shows",
+          "deprecated": null
+        },
+        {
+          "name": "emptyState",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Empty-state slot: a message row under the head row, spanning every column, when `empty` is true",
+          "deprecated": null
+        },
+        {
+          "name": "empty",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Swap the body rows for the empty-state message row; the head row stays",
+          "deprecated": null
+        },
+        {
+          "name": "stickyHeader",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Pin the head row while the rows scroll under it; needs `maxHeight`, since only a bounded region scrolls vertically",
+          "deprecated": null
+        },
+        {
+          "name": "stickyColumn",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Pin the first column while the other columns scroll under it",
+          "deprecated": null
+        },
+        {
+          "name": "maxHeight",
+          "type": "number or string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Bound the scroll region's height (number of px or any CSS length); a sticky header pins only within it",
+          "deprecated": null
+        },
+        {
+          "name": "tableProps",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Props for the `table` element itself: an accessible name, a class a wrapper styles it by",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": null,
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Table content slot — pass thead/tbody elements",
+          "deprecated": null
+        }
+      ]
+    },
+    {
       "name": "Popup",
+      "kind": "component",
       "import": "import { Popup } from '@/components';",
       "group": "overlays-and-layering",
       "source": "design-system/src/components/overlays-and-layering/Popup/Popup.jsx",
@@ -5424,6 +7393,7 @@
     },
     {
       "name": "ProgressBar",
+      "kind": "component",
       "import": "import { ProgressBar } from '@/components';",
       "group": "loading",
       "source": "design-system/src/components/loading/ProgressBar/ProgressBar.jsx",
@@ -5491,6 +7461,7 @@
     },
     {
       "name": "ProgressIndicator",
+      "kind": "component",
       "import": "import { ProgressIndicator } from '@/components';",
       "group": "status-indicators",
       "source": "design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.jsx",
@@ -5584,6 +7555,7 @@
     },
     {
       "name": "ProgressTracker",
+      "kind": "component",
       "import": "import { ProgressTracker } from '@/components';",
       "group": "status-indicators",
       "source": "design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.jsx",
@@ -5594,12 +7566,7 @@
           "type": "enum",
           "required": false,
           "default": null,
-          "values": [
-            "disabled",
-            "unvisited",
-            "current",
-            "visited"
-          ],
+          "values": null,
           "description": null,
           "deprecated": null
         },
@@ -5641,6 +7608,7 @@
     },
     {
       "name": "PromptInput",
+      "kind": "component",
       "import": "import { PromptInput } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/PromptInput/PromptInput.jsx",
@@ -5797,6 +7765,7 @@
     },
     {
       "name": "PromptStarters",
+      "kind": "component",
       "import": "import { PromptStarters } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/PromptStarters/PromptStarters.jsx",
@@ -5842,6 +7811,7 @@
     },
     {
       "name": "Radio",
+      "kind": "component",
       "import": "import { Radio } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Radio/Radio.jsx",
@@ -6034,6 +8004,7 @@
     },
     {
       "name": "RadioGroup",
+      "kind": "component",
       "import": "import { RadioGroup } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.jsx",
@@ -6224,6 +8195,7 @@
     },
     {
       "name": "Range",
+      "kind": "component",
       "import": "import { Range } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Range/Range.jsx",
@@ -6363,6 +8335,7 @@
     },
     {
       "name": "Rating",
+      "kind": "component",
       "import": "import { Rating } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Rating/Rating.jsx",
@@ -6495,6 +8468,7 @@
     },
     {
       "name": "RichTextEditor",
+      "kind": "component",
       "import": "import { RichTextEditor } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx",
@@ -6663,6 +8637,7 @@
     },
     {
       "name": "ScrollBar",
+      "kind": "component",
       "import": "import { ScrollBar } from '@/components';",
       "group": "layout-and-structure",
       "source": "design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.jsx",
@@ -6726,6 +8701,7 @@
     },
     {
       "name": "SectionMessage",
+      "kind": "component",
       "import": "import { SectionMessage } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/SectionMessage/SectionMessage.jsx",
@@ -6839,6 +8815,7 @@
     },
     {
       "name": "Select",
+      "kind": "component",
       "import": "import { Select } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Select/Select.jsx",
@@ -7232,6 +9209,7 @@
     },
     {
       "name": "Sidebar",
+      "kind": "component",
       "import": "import { Sidebar } from '@/components';",
       "group": "navigation",
       "source": "design-system/src/components/navigation/Sidebar/Sidebar.jsx",
@@ -7397,6 +9375,7 @@
     },
     {
       "name": "Skeleton",
+      "kind": "component",
       "import": "import { Skeleton } from '@/components';",
       "group": "loading",
       "source": "design-system/src/components/loading/Skeleton/Skeleton.jsx",
@@ -7513,6 +9492,7 @@
     },
     {
       "name": "SmartTag",
+      "kind": "component",
       "import": "import { SmartTag } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/SmartTag/SmartTag.jsx",
@@ -7557,6 +9537,7 @@
     },
     {
       "name": "Spinner",
+      "kind": "component",
       "import": "import { Spinner } from '@/components';",
       "group": "loading",
       "source": "design-system/src/components/loading/Spinner/Spinner.jsx",
@@ -7609,6 +9590,7 @@
     },
     {
       "name": "SplitButton",
+      "kind": "component",
       "import": "import { SplitButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/SplitButton/SplitButton.jsx",
@@ -7645,6 +9627,7 @@
     },
     {
       "name": "Spotlight",
+      "kind": "component",
       "import": "import { Spotlight } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/Spotlight/Spotlight.jsx",
@@ -7772,6 +9755,7 @@
     },
     {
       "name": "StatusTag",
+      "kind": "component",
       "import": "import { StatusTag } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/StatusTag/StatusTag.jsx",
@@ -7879,6 +9863,7 @@
     },
     {
       "name": "Suggestion",
+      "kind": "component",
       "import": "import { Suggestion } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/Suggestion/Suggestion.jsx",
@@ -7972,6 +9957,7 @@
     },
     {
       "name": "Table",
+      "kind": "component",
       "import": "import { Table } from '@/components';",
       "group": "text-and-data-display",
       "source": "design-system/src/components/text-and-data-display/Table/Table.jsx",
@@ -8000,10 +9986,7 @@
           "type": "enum",
           "required": false,
           "default": "[]",
-          "values": [
-            "default",
-            "title"
-          ],
+          "values": null,
           "description": "The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `leading`, `state`, `loading`, `className`, `colSpan` or `style`.",
           "deprecated": null
         },
@@ -8082,12 +10065,7 @@
           "type": "enum",
           "required": false,
           "default": null,
-          "values": [
-            "rest",
-            "highlighted",
-            "selected",
-            "disabled"
-          ],
+          "values": null,
           "description": "A state per row, by index: `rest`, `highlighted`, `selected` or `disabled`.",
           "deprecated": null
         },
@@ -8149,6 +10127,7 @@
     },
     {
       "name": "Tabs",
+      "kind": "component",
       "import": "import { Tabs } from '@/components';",
       "group": "navigation",
       "source": "design-system/src/components/navigation/Tabs/Tabs.jsx",
@@ -8250,6 +10229,7 @@
     },
     {
       "name": "Tag",
+      "kind": "component",
       "import": "import { Tag } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/Tag/Tag.jsx",
@@ -8473,6 +10453,7 @@
     },
     {
       "name": "TagGroup",
+      "kind": "component",
       "import": "import { TagGroup } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/TagGroup/TagGroup.jsx",
@@ -8578,6 +10559,7 @@
     },
     {
       "name": "TagInput",
+      "kind": "component",
       "import": "import { TagInput } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/TagInput/TagInput.jsx",
@@ -8833,6 +10815,7 @@
     },
     {
       "name": "TextArea",
+      "kind": "component",
       "import": "import { TextArea } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/TextArea/TextArea.jsx",
@@ -9091,6 +11074,7 @@
     },
     {
       "name": "TextField",
+      "kind": "component",
       "import": "import { TextField } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/TextField/TextField.jsx",
@@ -9421,6 +11405,7 @@
     },
     {
       "name": "Tile",
+      "kind": "component",
       "import": "import { Tile } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/Tile/Tile.jsx",
@@ -9543,6 +11528,7 @@
     },
     {
       "name": "TimePicker",
+      "kind": "component",
       "import": "import { TimePicker } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/TimePicker/TimePicker.jsx",
@@ -9681,6 +11667,7 @@
     },
     {
       "name": "Toggle",
+      "kind": "component",
       "import": "import { Toggle } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Toggle/Toggle.jsx",
@@ -9846,6 +11833,7 @@
     },
     {
       "name": "Tooltip",
+      "kind": "component",
       "import": "import { Tooltip } from '@/components';",
       "group": "overlays-and-layering",
       "source": "design-system/src/components/overlays-and-layering/Tooltip/Tooltip.jsx",
@@ -9941,6 +11929,7 @@
     },
     {
       "name": "TreeSelect",
+      "kind": "component",
       "import": "import { TreeSelect } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.jsx",
@@ -10106,6 +12095,7 @@
     },
     {
       "name": "UserAvatar",
+      "kind": "component",
       "import": "import { UserAvatar } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/UserAvatar/UserAvatar.jsx",
@@ -10216,6 +12206,7 @@
     },
     {
       "name": "VerticalButton",
+      "kind": "component",
       "import": "import { VerticalButton } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/VerticalButton/VerticalButton.jsx",
@@ -10301,6 +12292,7 @@
     },
     {
       "name": "VisuallyHidden",
+      "kind": "component",
       "import": "import { VisuallyHidden } from '@/components';",
       "group": "layout-and-structure",
       "source": "design-system/src/components/layout-and-structure/VisuallyHidden/VisuallyHidden.jsx",

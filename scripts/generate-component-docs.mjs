@@ -211,7 +211,7 @@ function parsePropTypes(source, name) {
     // every element is a literal, it is documented as if written inline. An
     // array that cannot be read (a spread, an import) stays `oneOf(NAME)`.
     const type = resolveNamedOneOf(m[2].replace(/\s+/g, ' ').trim(), source);
-    const oneOf = type.match(/PropTypes\.oneOf\(\[([\s\S]*?)\]\)/);
+    const oneOf = type.match(/^PropTypes\.oneOf\(\[([\s\S]*?)\]\)/);
     props.push({
       name: m[1],
       raw: type,
@@ -454,11 +454,26 @@ function componentDoc(c, siblings) {
     d += `\n> Authored guidance is partial — missing: ${missing.map((m) => m.label.toLowerCase()).join(', ')} (#166).\n`;
   }
 
-  const manifestEntry = {
+  const manifestEntry = manifestEntryOf({
     name: c.name,
     group: path.basename(c.flat ? c.dir : path.dirname(c.dir)),
-    source: rel(c.jsx),
-    summary: jsdoc || null,
+    jsx: c.jsx,
+    summary: jsdoc,
+    props,
+    defaults,
+    descriptions,
+  });
+  gaps.summary = noSummary;
+  return { doc: d, coverage, propCount: props.length, manifestEntry, gaps };
+}
+
+/** The machine record for one parsed component or pattern (`scripts/lib/agent-manifests.mjs`). */
+function manifestEntryOf({ name, group, jsx, summary, props, defaults, descriptions }) {
+  return {
+    name,
+    group,
+    source: rel(jsx),
+    summary: summary || null,
     // An enum whose list lives in another file is read there, so a checker can
     // hold the prop to it (scripts/lib/enum-values.mjs).
     // A union (`oneOfType([oneOf([...]), number])`) also accepts its other
@@ -466,13 +481,62 @@ function componentDoc(c, siblings) {
     props: props.map((p) => {
       if (/^PropTypes\.oneOfType/.test(p.raw)) return { ...p, enumValues: null };
       if (p.enumValues && p.enumValues.length) return p;
-      return { ...p, enumValues: enumValuesOf(p.raw, c.jsx, readOrNull, ENUM_ALIAS) };
+      return { ...p, enumValues: enumValuesOf(p.raw, jsx, readOrNull, ENUM_ALIAS) };
     }),
     defaults,
     descriptions,
   };
-  gaps.summary = noSummary;
-  return { doc: d, coverage, propCount: props.length, manifestEntry, gaps };
+}
+
+/**
+ * The barrels patterns come from: the patterns, and the page templates
+ * `PageLayout` comes from. Their docs are their Storybook pages, so no
+ * `index.md` is written for them; only their manifest record is.
+ */
+const PATTERN_BARRELS = ['@/patterns', '@/specs/Universal/Pages'];
+
+/**
+ * Each pattern barrel's components, parsed from source the way a component
+ * is. A pattern's file is named for the folder its barrel line points at, not
+ * for its export: `PatternSidebar` is `patterns/Sidebar/Sidebar.jsx`.
+ */
+function patternEntries() {
+  const patterns = [];
+  const parsed = [];
+  for (const spec of PATTERN_BARRELS) {
+    const dir = path.join(REPO_ROOT, 'design-system/src', spec.slice(2));
+    const { components, aliases } = readBarrel(REPO_ROOT, spec, {
+      onUnresolved: (star) => fail(`${spec} barrel: cannot resolve \`export * from '${star}'\``),
+    });
+    for (const name of components) {
+      patterns.push({ name, from: spec });
+      const folder = aliases[name] ?? name;
+      const jsx = path.join(dir, folder, `${folder}.jsx`);
+      if (!fs.existsSync(jsx)) {
+        fail(`${spec} exports ${name}, and ${rel(jsx)} is not a file: its props cannot be read`);
+        continue;
+      }
+      const source = fs.readFileSync(jsx, 'utf8');
+      const symbol = implSymbol(source, name);
+      const props = parsePropTypes(source, symbol);
+      if (props === null) {
+        fail(`${rel(jsx)}: ${symbol}.propTypes is present but unbalanced`);
+        continue;
+      }
+      parsed.push(
+        manifestEntryOf({
+          name,
+          group: path.basename(dir).toLowerCase(),
+          jsx,
+          summary: jsdocFor(source, symbol),
+          props,
+          defaults: parseDefaults(source, symbol),
+          descriptions: parseArgTypeDescriptions(readIf(jsx.replace(/\.jsx$/, '.stories.jsx'))),
+        }),
+      );
+    }
+  }
+  return { patterns, parsed };
 }
 
 function groupIndex(group, results) {
@@ -535,8 +599,9 @@ for (const group of groups) {
 
 /**
  * The machine copy of the same facts, for checkers and the eval
- * (`scripts/lib/agent-manifests.mjs`). Keyed to the barrel, so it lists exactly
- * what `agent-views/components/index.md` lists.
+ * (`scripts/lib/agent-manifests.mjs`). Keyed to the barrels, so it lists exactly
+ * what `agent-views/components/index.md` lists: the components, then the
+ * patterns and `PageLayout` from theirs.
  */
 {
   const { components: exports } = readBarrel(REPO_ROOT, '@/components', {
@@ -544,7 +609,8 @@ for (const group of groups) {
   });
   // The design system ships from this repo's root package; its version is the one to stamp.
   const { version } = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
-  const manifest = buildComponentsManifest({ exports, components: manifestEntries, version });
+  const { patterns, parsed: parsedPatterns } = patternEntries();
+  const manifest = buildComponentsManifest({ exports, components: manifestEntries, patterns, parsedPatterns, version });
   written.push([path.join(AGENT_ROOT, 'components.json'), serializeManifest(manifest, 'npm run generate:agent')]);
 }
 

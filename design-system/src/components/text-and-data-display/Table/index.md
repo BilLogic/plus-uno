@@ -33,13 +33,9 @@ Standard table component for displaying tabular data, built from the shared `_Ta
 
 ## Variants
 
-**`rows`** — `default` · `title`
-
 **`frame`** — `plain` · `framed`
 
 **`size`** — `32` · `40` · `48`
-
-**`rowStates`** — `rest` · `highlighted` · `selected` · `disabled`
 
 Anything not listed is not a valid value.
 

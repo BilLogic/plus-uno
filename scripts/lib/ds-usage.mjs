@@ -38,8 +38,15 @@ const SCRIPT = /\.(jsx|js|mjs|cjs|tsx|ts)$/;
 const STYLE = /\.(scss|css)$/;
 const MARKUP = /\.html$/;
 
-/** Specifiers that are the public barrel. */
-const BARREL = /^(?:@|@plus-ds)\/components\/?$/;
+/**
+ * Specifiers that are a public barrel: the components, the patterns, and the
+ * page templates `PageLayout` comes from. The capture is the barrel's canonical
+ * `@/` name, whichever alias wrote it.
+ */
+const BARREL = /^(?:@|@plus-ds)\/(components|patterns|specs\/Universal\/Pages)\/?$/;
+const barrelOf = (source) => `@/${source.match(BARREL)[1]}`;
+/** The barrel a manifest record imports from: its import line's specifier, or `@/components`. */
+const homeOf = (record) => record.import?.match(/from '([^']+)'/)?.[1] ?? '@/components';
 /** Specifiers that reach past a barrel into design-system source. */
 const DEEP = /^(?:@|@plus-ds)\/(?:components|patterns|dataviz)\/.+|(?:^|\/)design-system\/(?:src\/)?components(?:\/|$)|(?:^|\/)design-system\/src\//;
 const BOOTSTRAP = /^react-bootstrap(?:\/([\w]+))?$/;
@@ -70,9 +77,10 @@ const FONT_WEIGHT = /^font-?weight$/i;
  * `retired` is retired token name -> its replacement (the token plan's
  * `retiredRenames()`); `promoted` holds primitive names a semantic row of the
  * plan uses as its own name (`--radius-full`), which consumer code may read.
- * `exported` is every name the barrel makes importable (parts such as
- * `TableRow` and constants included); a name there is never an unknown
- * component, though only a manifest record holds its props.
+ * `exported` is every name the `@/components` barrel makes importable (parts
+ * such as `TableRow` and constants included); a name there is never an unknown
+ * component, though only a manifest record holds its props. `barrels` holds the
+ * same for the other barrels (`@/patterns` → its hooks and constants too).
  */
 export function contextFrom({
   components,
@@ -83,6 +91,7 @@ export function contextFrom({
   retired = new Map(),
   promoted = new Set(),
   exported = new Set(),
+  barrels = {},
 }) {
   const byName = new Map(components.components.map((c) => [c.name, c]));
   const tokenByName = new Map(
@@ -126,6 +135,7 @@ export function contextFrom({
     freeIcons,
     retired,
     exported,
+    barrels: { '@/components': exported, ...barrels },
   };
 }
 
@@ -204,33 +214,51 @@ function nameIndex(text, from, name) {
   return m ? m.index : from;
 }
 
+/**
+ * What `name` from `barrel` is: its record, `true` for an export with no
+ * record, `{wrongBarrel}` for a record another barrel exports, or null.
+ */
+function resolveFrom(ctx, barrel, name) {
+  const record = ctx.components.get(name);
+  if (record && (homeOf(record) === barrel || ctx.barrels[barrel]?.has(name))) return record;
+  if (ctx.barrels[barrel]?.has(name)) return true;
+  return record ? { wrongBarrel: record } : null;
+}
+
 function scriptEscapes(text, ctx, add) {
   const bound = new Map(); // local name -> component record
-  const namespaces = new Set();
+  const namespaces = new Map(); // local name -> barrel
+
+  const unknown = (index, name, barrel, otherwise) => {
+    const found = resolveFrom(ctx, barrel, name);
+    if (found?.wrongBarrel) {
+      add('ds/no-unknown-component', index, `\`${name}\` is not exported from \`${barrel}\``, found.wrongBarrel.import);
+    } else {
+      add('ds/no-unknown-component', index, `\`${name}\` is not a component the design system exports`, didYouMean(name, ctx.componentNames, otherwise));
+    }
+  };
 
   for (const imp of importsOf(text)) {
     if (BARREL.test(imp.source)) {
-      if (imp.namespace) namespaces.add(imp.namespace);
+      const barrel = barrelOf(imp.source);
+      if (imp.namespace) namespaces.set(imp.namespace, barrel);
       for (const { imported, local } of imp.named) {
-        const record = ctx.components.get(imported);
-        if (record) bound.set(local, record);
-        else if (!ctx.exported.has(imported)) {
-          add(
-            'ds/no-unknown-component',
-            nameIndex(text, imp.index, imported),
-            `\`${imported}\` is not a component the design system exports`,
-            didYouMean(imported, ctx.componentNames, 'check design-system/agent-views/components/index.md, or propose a new component'),
-          );
+        const found = resolveFrom(ctx, barrel, imported);
+        if (found && !found.wrongBarrel) {
+          if (found !== true) bound.set(local, found);
+          continue;
         }
+        unknown(nameIndex(text, imp.index, imported), imported, barrel, 'check design-system/agent-views/components/index.md, or propose a new component');
       }
     } else if (DEEP.test(imp.source)) {
       const names = [imp.default, ...imp.named.map((n) => n.imported)].filter(Boolean);
       const shown = names.length ? names.join(', ') : '…';
+      const home = names.map((n) => ctx.components.get(n)).find(Boolean);
       add(
         'ds/no-deep-import',
         imp.index,
         `\`${imp.source}\` reaches past the barrel into design-system source`,
-        `import { ${shown} } from '@/components'`,
+        `import { ${shown} } from '${home ? homeOf(home) : '@/components'}'`,
       );
       for (const { imported, local } of imp.named) {
         const record = ctx.components.get(imported);
@@ -258,16 +286,12 @@ function scriptEscapes(text, ctx, add) {
     const dot = el.name.indexOf('.');
     if (!record && dot > 0 && namespaces.has(el.name.slice(0, dot))) {
       const member = el.name.slice(dot + 1);
-      record = ctx.components.get(member);
-      if (!record && !ctx.exported.has(member)) {
-        add(
-          'ds/no-unknown-component',
-          el.index + 1,
-          `\`${member}\` is not a component the design system exports`,
-          didYouMean(member, ctx.componentNames, 'check design-system/agent-views/components/index.md'),
-        );
+      const found = resolveFrom(ctx, namespaces.get(el.name.slice(0, dot)), member);
+      if (!found || found.wrongBarrel) {
+        unknown(el.index + 1, member, namespaces.get(el.name.slice(0, dot)), 'check design-system/agent-views/components/index.md');
         continue;
       }
+      if (found !== true) record = found;
     }
     if (!record || !record.props) continue;
     const props = new Map(record.props.map((p) => [p.name, p]));

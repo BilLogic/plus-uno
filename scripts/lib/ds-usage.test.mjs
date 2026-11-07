@@ -69,6 +69,71 @@ test('ds/no-deep-import: a path past the barrel', () => {
   assert.deepEqual(rulesOf('p/App.jsx', "import { P } from '@plus-ds/patterns/Card';"), ['ds/no-deep-import']);
 });
 
+// Patterns and PageLayout are held like components: each to its own barrel.
+const patternCtx = contextFrom({
+  components: {
+    components: [
+      { name: 'Button', kind: 'component', import: "import { Button } from '@/components';", props: [{ name: 'appearance', values: ['primary'], deprecated: null }] },
+      {
+        name: 'PatternCard',
+        kind: 'pattern',
+        import: "import { PatternCard } from '@/patterns';",
+        props: [
+          { name: 'title', values: null, deprecated: null },
+          { name: 'padding', values: ['sm', 'md', 'lg'], deprecated: null },
+        ],
+      },
+      {
+        name: 'PageLayout',
+        kind: 'pattern',
+        import: "import { PageLayout } from '@/specs/Universal/Pages';",
+        props: [{ name: 'frame', values: ['default', 'focused'], deprecated: null }],
+      },
+    ],
+  },
+  tokens: { tokens: [] },
+  exported: new Set(['Button']),
+  barrels: { '@/patterns': new Set(['PatternCard', 'useOpenTabs']), '@/specs/Universal/Pages': new Set(['PageLayout']) },
+});
+const patternRules = (text) => escapesIn({ path: 'p/App.jsx', text }, patternCtx).map((f) => f.rule);
+const PATTERNS = "import { PatternCard, useOpenTabs } from '@/patterns';\nimport { PageLayout } from '@/specs/Universal/Pages';\n";
+
+test('patterns: a valid pattern and PageLayout use passes', () => {
+  assert.deepEqual(patternRules(PATTERNS + '<PageLayout frame="focused"><PatternCard title="x" padding="md" /></PageLayout>'), []);
+  assert.deepEqual(patternRules("import { PatternCard } from '@plus-ds/patterns';\n<PatternCard padding=\"lg\" />"), []);
+});
+
+test('patterns: an invented pattern name fails, with the nearest real one', () => {
+  const [f, ...rest] = escapesIn({ path: 'p/App.jsx', text: "import { PatternCrad } from '@/patterns';" }, patternCtx);
+  assert.equal(rest.length, 0);
+  assert.equal(f.rule, 'ds/no-unknown-component');
+  assert.match(f.fix, /PatternCard/);
+  assert.deepEqual(patternRules("import { PageShell } from '@/specs/Universal/Pages';"), ['ds/no-unknown-component']);
+});
+
+test('patterns: a pattern imported from a barrel that does not export it fails, naming its barrel', () => {
+  const [f] = escapesIn({ path: 'p/App.jsx', text: "import { PatternCard } from '@/components';" }, patternCtx);
+  assert.equal(f.rule, 'ds/no-unknown-component');
+  assert.match(f.fix, /@\/patterns/);
+});
+
+test('patterns: a wrong prop or a wrong value on PatternCard or PageLayout fails', () => {
+  assert.deepEqual(patternRules(PATTERNS + '<PatternCard heading="x" />'), ['ds/no-unknown-prop']);
+  assert.deepEqual(patternRules(PATTERNS + '<PatternCard padding="xl" />'), ['ds/no-unknown-prop']);
+  assert.deepEqual(patternRules(PATTERNS + '<PageLayout frame="wide" />'), ['ds/no-unknown-prop']);
+  assert.deepEqual(patternRules(PATTERNS + '<PageLayout layout="focused" />'), ['ds/no-unknown-prop']);
+});
+
+test('patterns: a namespace import of @/patterns holds its members too', () => {
+  assert.deepEqual(patternRules("import * as P from '@/patterns';\n<P.PatternCard padding=\"sm\" /><P.PatternCrad />"), ['ds/no-unknown-component']);
+});
+
+test('patterns: a deep pattern import keeps its rule, and its fix names the pattern barrel', () => {
+  const [f] = escapesIn({ path: 'p/App.jsx', text: "import PatternCard from '@/patterns/PatternCard';" }, patternCtx);
+  assert.equal(f.rule, 'ds/no-deep-import');
+  assert.match(f.fix, /from '@\/patterns'/);
+});
+
 test('ds/no-unknown-prop: an unknown prop and an enum value outside the list', () => {
   assert.deepEqual(rulesOf('p/App.jsx', DS + '<Button appearance="subtle" spacing={\'compact\'} onClick={go} aria-label="x" data-x key={1} className="c" />'), []);
   const found = escapesIn({ path: 'p/App.jsx', text: DS + '<Button variant="primary" appearance="primay" />' }, ctx);
