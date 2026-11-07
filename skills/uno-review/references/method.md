@@ -33,7 +33,7 @@ Lenses run **in parallel** and stay in-lane — no lens comments outside its own
 
 What each lens applies (the rules live in the docs, not here):
 
-- `reviewers/ds-lens` — components / tokens / layout vs the DS agent-views and `AGENTS.md` § Hard rules. Coded artifacts: also the catch-pattern greps (`references/catch-patterns.md`, automated by `skills/uno-review/scripts/run-review-checks.sh`).
+- `reviewers/ds-lens` — coded artifacts: `check:ds-usage` escapes first, reported by rule ID as the checker gives them; then components, layout and hierarchy vs the DS agent-views and `AGENTS.md` § Hard rules, for what no checker sees.
 - `reviewers/uno-lens` — artifact vs PRD + uno-blueprint constraints, queried live at review time.
 - `reviewers/a11y-lens` — `design-system/guidelines/foundations/accessibility.md`: WCAG AA contrast, 44×44 targets, keyboard reach, focus order + visibility, semantic HTML / screen readers, color-not-alone, reduced motion.
 - `reviewers/design-qa` — the 📐 Specs pages' Dev Mode annotations (`docs/connectors/figma/overview.md`) + the Design QA checklist (Notion 🧩 Templates): components, tokens, spacing, typography, states, interaction behavior.

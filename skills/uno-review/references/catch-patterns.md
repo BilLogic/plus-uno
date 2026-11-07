@@ -1,13 +1,13 @@
 ---
 embodiment: ide
-summary: Grep checks for the mechanical share of DS-compliance findings
+summary: The mechanical share of DS-compliance findings — check:ds-usage for escapes, two greps for what it does not cover
 ---
 
-<!-- Load for: reviewing coded artifacts — the grep checks behind ds-lens findings. Automated by scripts/run-review-checks.sh; run individually to localize a hit. -->
+<!-- Load for: reviewing coded artifacts — the mechanical checks behind ds-lens findings. Automated by scripts/run-review-checks.sh. -->
 
 # Catch patterns — coded artifacts
 
-Grep checks for the mechanical share of DS-compliance findings. Each maps to a NAMED rule in `AGENTS.md` § Hard rules — cited by the name that rule carries, never by number, because the list renumbers (2026-07-30); the rule lives there, not here. Output is **evidence for ds-lens findings**, not a verdict: hits still need the severity + reference + re-entry treatment from `method.md`.
+The mechanical share of DS-compliance findings. Output is **evidence for ds-lens**, which turns it into findings in its own shape (`agents/reviewers/ds-lens.md` § Finding shape).
 
 Run all at once:
 
@@ -17,53 +17,21 @@ bash skills/uno-review/scripts/run-review-checks.sh <target-dir>
 
 Sample output: `../examples/review-output-example.md`.
 
-## Hardcoded hex colors (the tokens-over-literals rule)
+## Escapes: `check:ds-usage`
 
 ```bash
-grep -rn '#[0-9a-fA-F]\{3,8\}' --include="*.jsx" --include="*.scss" --include="*.css" <dir>
+npm run check:ds-usage -- <dir> --json
 ```
 
-Use `var(--color-*)` tokens. Exceptions: comments · SVG fills that intentionally override tokens · `var(--token, #hex)` fallback values (the token is the source; the hex is a safety net) · pre-mount crash/error screens that render before the token sheet loads.
+One checker owns every escape (ADR-039): unknown components, deep imports, unknown props and enum values, raw colors, sizes and fonts, unknown and primitive tokens, Font Awesome Pro, react-bootstrap where PLUS has the component, retired names. Each finding names its rule ID and what to write instead; the rules, and what each one passes (a `var()` fallback, `0`, unitless numbers), are `docs/engineering/ds-usage-rules.md`.
 
-## Hardcoded sizes in inline styles (the tokens-over-literals rule)
-
-```bash
-grep -rn "style={{" --include="*.jsx" <dir> | grep -E "(padding|margin|gap|fontSize|borderRadius):\s*['\"]?[0-9]+(px|rem|em)"
-```
-
-Use `var(--size-*)` / `var(--font-*)` tokens.
-
-## Raw HTML elements where DS components exist (the DS-knowledge-is-law and PLUS-components-first rules)
+## Raw HTML controls where DS components exist (the DS-knowledge-is-law and PLUS-components-first rules)
 
 ```bash
 grep -rn '<button\|<input\|<select\|<textarea' --include="*.jsx" <dir>
 ```
 
-Exception: inside DS component source files themselves.
-
-## Deep imports bypassing barrel exports (the no-deep-imports rule)
-
-```bash
-grep -rn "from 'design-system/src/" --include="*.jsx" --include="*.js" <dir>
-```
-
-Use the `@/` / `@plus-ds/` aliases.
-
-## Direct react-bootstrap imports (the PLUS-components-first rule)
-
-```bash
-grep -rn "from 'react-bootstrap" --include="*.jsx" --include="*.js" <dir>
-```
-
-Import the PLUS wrapper from `@/components/` instead.
-
-## Font Awesome Pro icons (the FA-Free-only rule)
-
-```bash
-grep -rn 'fa-light\|fa-thin\|fa-sharp\|fa-duotone' --include="*.jsx" --include="*.html" <dir>
-```
-
-Only FA Free: `fa-solid`, `fa-regular`, `fa-brands`.
+Exception: inside DS component source files themselves. A hit is evidence for judgement: ds-lens checks whether a PLUS component fits.
 
 ## Missing key prop in .map()
 

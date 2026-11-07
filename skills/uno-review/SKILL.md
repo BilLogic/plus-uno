@@ -40,7 +40,7 @@ Suggest proactively when the user says "done", "ready to share", or is about to 
 3. **Dispatch the lenses:**
    - Stage-lens / handoff gate → summon **reviewers/ds-lens + reviewers/uno-lens + reviewers/a11y-lens in parallel**, each with the artifact + manifest. Each stays in-lane at the manifest's depth — no token nits on low-fi work.
    - Design QA → summon **reviewers/design-qa** with the Roadmap card; it resolves the card's Figma file (its number in the title's `Card <n> & <m>`) → its 📐 Specs pages and walks the QA build against them with the Design QA checklist.
-4. **Coded artifacts:** run `bash skills/uno-review/scripts/run-review-checks.sh <dir>` and hand the hits to ds-lens as evidence (patterns: `references/catch-patterns.md`).
+4. **Coded artifacts:** ds-lens runs `npm run check:ds-usage -- <dir> --json` first and reports its escapes by rule ID; `bash skills/uno-review/scripts/run-review-checks.sh <dir>` adds the two greps the checker does not cover (`references/catch-patterns.md`).
 4b. **Figma write-back artifacts:** run `npm run validate:figma-writeback` + `npm run audit:figma-writeback` on the prototype manifest; fail the review if either fails.
 5. **Merge findings** — dedupe cross-lens overlaps, keep each finding's severity · lens · evidence · reference · re-entry point (method.md § Findings & severity).
 6. **Verdict** per method.md § Verdict & re-entry: `Issues? = Yes` only at severity major+; minors travel as advisory; Design QA blockers hold `Ready for Prod`.
