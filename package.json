@@ -113,6 +113,7 @@
     "check:legacy-color-list": "node scripts/generate-legacy-color-list.mjs --check",
     "check:design-tokens": "node scripts/generate-design-tokens.mjs --check",
     "check:old-size-tokens": "node scripts/check-old-size-tokens.mjs",
+    "check:ds-usage": "node scripts/check-ds-usage.mjs",
     "check:no-primitive-reads": "node scripts/check-no-primitive-reads.mjs",
     "check:old-size-token-list": "node scripts/generate-old-size-token-list.mjs --check",
     "check:atlassian-benchmark": "node scripts/check-atlassian-benchmark.mjs",

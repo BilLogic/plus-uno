@@ -592,6 +592,10 @@ _Avoid_: "Tier" for a maintenance severity, or for a model's tier (say "model ti
 Reference pushed out of the always-loaded tier behind a pointer, loaded only when it fires. For uno-bot, a doc declares `disclosure: reference` and is read through `read_reference`.
 _Avoid_: "hidden", "optional"
 
+**Escape**:
+One place where code outside the design system leaves it: a component the barrel does not export, a deep import, an unknown prop or enum value, a raw literal, an unknown token or a primitive read, a Font Awesome Pro icon. Whatever `check:ds-usage` reports, and only that (ADR-039).
+_Avoid_: "violation", "lint error", "DS drift"
+
 ## Two vocabularies — the blueprint speaks service-blueprint, the Roadmap speaks project-management
 
 Ratified in ADR-023; this section is its only statement.
