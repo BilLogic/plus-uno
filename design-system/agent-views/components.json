@@ -7117,7 +7117,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Shows the clear ×. Unset, it is on with `isMulti` and `!isRequired` otherwise.",
+          "description": "Shows the clear × (Figma `_Field Clear`), and lets Delete empty the field. Defaults to true with `isMulti` and to `!isRequired` otherwise; a sort passes `false`.",
           "deprecated": null
         },
         {
