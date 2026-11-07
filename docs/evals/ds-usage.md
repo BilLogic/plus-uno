@@ -4,11 +4,11 @@ summary: The design-system usage eval — whether the harness keeps an agent ins
 
 # Design-system usage eval
 
-Does the harness help? Six coded tasks, built by fresh agents with and without it, scored by the same checker. The deciding number is **escapes per run** (ADR-039): what `check:ds-usage` reports on what the agent built.
+Does the harness help? Ten coded tasks, built by fresh agents with and without it, scored by the same checker. The deciding number is **escapes per run** (ADR-039): what `check:ds-usage` reports on what the agent built.
 
 ## Tasks
 
-Under `scenarios/ds-usage/`, each a `BRIEF.md` (plus `frame.png` for the frame task), started from `_template/`:
+Under `scenarios/ds-usage/`, each a `BRIEF.md` (plus `frame.png` for the frame task), started from `_template/`. A task's own files are copied over the template, so a task that ships `src/` starts with that code in the folder the scorer reads:
 
 | Task | Asks for |
 |---|---|
@@ -18,6 +18,12 @@ Under `scenarios/ds-usage/`, each a `BRIEF.md` (plus `frame.png` for the frame t
 | `overlay-flow` | a confirm-and-notify flow |
 | `frame-to-code` | a component from an exported design frame |
 | `trap-missing-component` | a drag-and-drop board PLUS has no component for: the right answer names the gap |
+| `two-page-flow` | a supervisor's escalation list and detail pages, each with its own address and navigation between them |
+| `debt-extend` | a filter added to a file that already carries recorded debt: a trimmed copy of `prototypes/monthly-report/src/MonthlyReportsListContent.jsx`, with the 4 deep imports and 2 raw literals the baseline holds for it. The post-edit hook hands that debt back on the first edit; the score shows whether it was paid |
+| `migrate-retired` | a call-off confirmation written in retired names (`Alert`, `Toast`, `Badge`, `size`/`fill`/`variant`, `--size-element-*`, `--color-surface-container`) to bring current, as the brief itself asks in those names |
+| `forbidden-ask` | an onboarding checklist whose brief asks for Font Awesome duotone (Pro) icons and a hex color: the right answer names both rules and takes the compliant path |
+
+`debt-extend` and `migrate-retired` are the seeded tasks (`SEEDED`): each row records `seeded_escapes` and `seeded_by_rule`, the folder's score before the agent began, so debt left reads against debt seeded. The scenarios sit under `docs/evals/`, outside every check's scope (`check:ds-usage` and `check:ads-language` read `prototypes/`, `src/` and `design-system/src`), so their deliberate escapes never reach the repo's own gates.
 
 ## Arms
 
@@ -49,7 +55,7 @@ Why not subagents: a subagent inherits the parent session's project instructions
 
 1. **Escapes**: this checkout's `check:ds-usage` rules on every file the agent wrote, by rule ID. Fail-level only.
 2. **Warnings**: the warn-level findings on the same files (`prefer-plus-component`, `no-retired-name`), by rule ID. They never decide a run, but a clean fail-level score can still hide drift, so they are counted.
-3. **Judge**: one read-only `claude -p`, on a copy of the build alone, with `scenarios/ds-usage/judge.md` decides only what no checker sees: whether the build rendered what the brief asks for at all, whether the trap task named the gap, and whether a page used the layout formula. A trap run passes only when it named the gap *and* rendered a board, so zero escapes cannot mean "built nothing". The ledger records the prompt's hash; a changed prompt is a different judge, so compare rows with the same `judge_sha`.
+3. **Judge**: one read-only `claude -p`, on a copy of the build alone, with `scenarios/ds-usage/judge.md` decides only what no checker sees: whether the build rendered what the brief asks for at all, whether the trap task named the gap, whether the forbidden ask was refused or escalated (`escalated`: each forbidden part named by its rule, with the compliant path taken or offered), and whether a page used the layout formula. A trap run passes only when it named the gap *and* rendered a board, so zero escapes cannot mean "built nothing". The ledger records the prompt's hash; a changed prompt is a different judge, so compare rows with the same `judge_sha`. Adding `escalated` and the four scenarios moved it from `36f5464460e9` to `48f9d84d8784`.
 4. **Accessibility**: each finished build is served by vite in its copy and checked by axe in headless Chromium. Violations are counted by affected node, by axe rule ID. They are reported, never gated: if playwright, a browser or the build itself fails, the row records `a11y_error` and the run goes on.
 
 ## Run it
@@ -58,11 +64,11 @@ Why not subagents: a subagent inherits the parent session's project instructions
 node scripts/eval-ds-usage.mjs run --model sonnet
 ```
 
-Every arm runs by default (`--arms control,current` narrows it), and each cell runs five times; `--runs` overrides it, and two runs a cell is enough to see direction, not to rank arms. `--model` is the model both the build and the judge run on (default `sonnet`), recorded on every row; run the eval again with `--model haiku` for a second model. `--tasks` narrows the set, `--ref` picks the commit the arms copy (default `origin/main`), and `--scratch` the folder the throwaway copies go in (removed as each run finishes). A full run is 120 builds and 120 judgements, one at a time, so it takes hours: start it in the background. Each build is copied to `~/Documents/Claude/Projects/PLUS/evals/ds-usage/<run-id>/` with the agent's result JSON.
+Every arm runs by default (`--arms control,current` narrows it), and each cell runs five times; `--runs` overrides it, and two runs a cell is enough to see direction, not to rank arms. `--model` is the model both the build and the judge run on (default `sonnet`), recorded on every row; run the eval again with `--model haiku` for a second model. `--tasks` narrows the set, `--ref` picks the commit the arms copy (default `origin/main`), and `--scratch` the folder the throwaway copies go in (removed as each run finishes). A full run is 200 builds and 200 judgements, one at a time, so it takes hours: start it in the background. Each build is copied to `~/Documents/Claude/Projects/PLUS/evals/ds-usage/<run-id>/` with the agent's result JSON.
 
 ## Read the ledger
 
-`ds-usage-ledger.jsonl` gains one row per run, losses and agent errors included: date, model, harness commit, `scenarios_sha` (the briefs, template and judge are read from the working tree, so this hash says which ones), arm, task, run, escapes and `by_rule`, warnings and `warn_by_rule`, judge verdicts and `judge_sha`, tokens, turns, cost and wall time, `reached_checkout`, `read_set`, `a11y_violations` or `a11y_error`, and where the build was kept.
+`ds-usage-ledger.jsonl` gains one row per run, losses and agent errors included: date, model, harness commit, `scenarios_sha` (the briefs, template and judge are read from the working tree, so this hash says which ones), arm, task, run, escapes and `by_rule`, warnings and `warn_by_rule`, `seeded_escapes` and `seeded_by_rule`, judge verdicts and `judge_sha`, tokens, turns, cost and wall time, `reached_checkout`, `read_set`, `a11y_violations` or `a11y_error`, and where the build was kept.
 
 - **Tokens**: the raw `input_tokens`, `output_tokens`, `cache_read_tokens` and `cache_creation_tokens`, and `total_input_tokens`, their input sum. Fresh input is a few dozen tokens a run because nearly all of it is cached, so the total is the one that measures cost.
 - **`read_set`**: from the run's own stream, `files` lists what the agent opened with Read, relative to its copy and in first-read order, its own task folder left out; `lookups` lists its Grep, Glob and Bash calls. It shows which harness files and lookups agents actually use.
@@ -71,7 +77,7 @@ Every arm runs by default (`--arms control,current` narrows it), and each cell r
 node scripts/eval-ds-usage.mjs summary --since 2026-11-06
 ```
 
-prints, per arm and per model within it: escapes and warnings per run, each by rule; the trap pass rate and how many trap boards rendered; the layout-formula rate; mean input tokens (the total above), turns and minutes; the read set (mean files and lookups per run, and the files most runs read); and axe violations per measured build, by rule. Rows from before a field existed (warnings by rule, `rendered`, `read_set`, axe) leave that part empty, and a trap row with no `rendered` verdict does not count as a pass. Scoring is deterministic, so when a `check:ds-usage` rule changes, `node scripts/eval-ds-usage.mjs rescore` recomputes every row's escapes from its kept build with this checkout's rules and stamps the row's `scored_at`; the agent fields stay as recorded.
+prints, per arm and per model within it: escapes and warnings per run, each by rule; the trap pass rate and how many trap boards rendered; the escalation rate on `forbidden-ask`; per seeded task, the escapes seeded and left per run and their delta, negative when the agent paid debt down; the layout-formula rate; mean input tokens (the total above), turns and minutes; the read set (mean files and lookups per run, and the files most runs read); and axe violations per measured build, by rule. Rows from before a field existed (warnings by rule, `rendered`, `escalated`, `seeded_escapes`, `read_set`, axe) leave that part empty, and a trap row with no `rendered` verdict does not count as a pass. Scoring is deterministic, so when a `check:ds-usage` rule changes, `node scripts/eval-ds-usage.mjs rescore` recomputes every row's escapes from its kept build with this checkout's rules and stamps the row's `scored_at`; a seeded row's seed is re-scored too while the scenarios are still the ones it ran from (`scenarios_sha`). The agent fields stay as recorded.
 
 Compare arms within one model, one `harness_commit`, one `judge_sha` and one `scenarios_sha`. A row with `agent_error: true` is a build that did not finish: it is counted under `errors` and left out of every rate, and it is not judged. A judge that returns no JSON sets `judge.judge_error`.
 

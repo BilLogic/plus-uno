@@ -39,7 +39,25 @@ import { isEntry } from './lib/findings.mjs';
 
 export const SCENARIOS = 'docs/evals/scenarios/ds-usage';
 export const LEDGER = 'docs/evals/ds-usage-ledger.jsonl';
-export const TASKS = ['page-from-prd', 'form-states', 'table-states', 'overlay-flow', 'frame-to-code', 'trap-missing-component'];
+export const TASKS = [
+  'page-from-prd',
+  'form-states',
+  'table-states',
+  'overlay-flow',
+  'frame-to-code',
+  'trap-missing-component',
+  'two-page-flow',
+  'debt-extend',
+  'migrate-retired',
+  'forbidden-ask',
+];
+/**
+ * Tasks whose folder starts with code in it, escapes included: recorded debt
+ * from a prototype, or a component written in retired names. Each row records
+ * what the folder held before the agent began, so debt left reads against
+ * debt seeded.
+ */
+export const SEEDED = ['debt-extend', 'migrate-retired'];
 export const ARMS = ['control', 'current', 'hook-off', 'checker-removed'];
 /** Durable copies of what each agent built, beside the ledger row that scores it. */
 export const OUTPUTS = path.join(os.homedir(), 'Documents/Claude/Projects/PLUS/evals/ds-usage');
@@ -228,6 +246,21 @@ export function score({ repoRoot = REPO_ROOT, folder, label }) {
   }
   const escapes = findings.filter((f) => f.level === 'fail').length;
   return { escapes, warnings: findings.length - escapes, byRule, warnByRule };
+}
+
+/**
+ * The escapes a task's folder holds before any agent touches it: the template
+ * and the task's own files, scored as `score` scores a build.
+ */
+export function seedScore({ repoRoot = REPO_ROOT, task }) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), `ds-eval-seed-${task}-`));
+  try {
+    copyDir(path.join(repoRoot, SCENARIOS, '_template'), dir);
+    copyDir(path.join(repoRoot, SCENARIOS, task), dir);
+    return score({ repoRoot, folder: dir, label: `eval-${task}` });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 const DISALLOWED = ['Skill', 'Agent', 'Task', 'WebFetch', 'WebSearch'];
@@ -447,13 +480,20 @@ export function parseJudge(text) {
     for (let end = s.indexOf('}', start); end !== -1; end = s.indexOf('}', end + 1)) {
       try {
         const j = JSON.parse(s.slice(start, end + 1));
-        return { gap_named: verdict(j.gap_named), rendered: verdict(j.rendered), layout_formula: verdict(j.layout_formula), reason: j.reason ?? '', judge_error: false };
+        return {
+          gap_named: verdict(j.gap_named),
+          escalated: verdict(j.escalated),
+          rendered: verdict(j.rendered),
+          layout_formula: verdict(j.layout_formula),
+          reason: j.reason ?? '',
+          judge_error: false,
+        };
       } catch {
         // keep widening
       }
     }
   }
-  return { gap_named: null, rendered: null, layout_formula: null, reason: 'judge gave no JSON', judge_error: true };
+  return { gap_named: null, escalated: null, rendered: null, layout_formula: null, reason: 'judge gave no JSON', judge_error: true };
 }
 
 /** Append one row; the ledger is append-only and keeps losses. */
@@ -474,17 +514,26 @@ export function readLedger(repoRoot = REPO_ROOT) {
  * fields are untouched.
  */
 export function rescore(rows, { scorer, repoRoot = REPO_ROOT }) {
+  const scenarios = scenariosSha(repoRoot);
   return rows.map((row) => {
     if (!row.output || !fs.existsSync(row.output)) return row;
     const scored = score({ repoRoot, folder: row.output, label: `eval-${row.task}` });
-    return { ...row, escapes: scored.escapes, by_rule: scored.byRule, warnings: scored.warnings, warn_by_rule: scored.warnByRule, scored_at: scorer };
+    const out = { ...row, escapes: scored.escapes, by_rule: scored.byRule, warnings: scored.warnings, warn_by_rule: scored.warnByRule, scored_at: scorer };
+    // The seed is re-scored only from the scenarios the run started from.
+    if (SEEDED.includes(row.task) && row.scenarios_sha === scenarios) {
+      const seed = seedScore({ repoRoot, task: row.task });
+      Object.assign(out, { seeded_escapes: seed.escapes, seeded_by_rule: seed.byRule });
+    }
+    return out;
   });
 }
 
 /**
  * Per arm and model: escapes and warnings per completed run, each by rule;
  * the trap pass rate, where a pass is a named gap on a board that rendered;
- * the layout-formula rate; mean input tokens, turns and minutes; the files
+ * the escalation rate on the forbidden ask; per seeded task, the escapes the
+ * folder started with against those left, the delta negative when debt was
+ * paid down; the layout-formula rate; mean input tokens, turns and minutes; the files
  * runs read most; and axe violations per measured build. A run whose agent
  * errored is counted in `errors` and left out of every rate, so a crash cannot
  * read as a clean run.
@@ -505,6 +554,8 @@ export function summarize(rows) {
       warnings: 0,
       warnByRule: {},
       trap: { runs: 0, passed: 0, rendered: 0 },
+      escalation: { runs: 0, yes: 0 },
+      debt: {},
       layout: { judged: 0, yes: 0 },
       input: { runs: 0, tokens: 0 },
       turns: 0,
@@ -526,6 +577,16 @@ export function summarize(rows) {
       a.trap.runs += 1;
       if (row.judge.rendered === true) a.trap.rendered += 1;
       if (row.judge.rendered === true && row.judge.gap_named === true) a.trap.passed += 1;
+    }
+    if (row.task === 'forbidden-ask') {
+      a.escalation.runs += 1;
+      if (row.judge.escalated === true) a.escalation.yes += 1;
+    }
+    if (SEEDED.includes(row.task) && typeof row.seeded_escapes === 'number') {
+      const d = (a.debt[row.task] ??= { runs: 0, seeded: 0, left: 0 });
+      d.runs += 1;
+      d.seeded += row.seeded_escapes;
+      d.left += row.escapes;
     }
     if (row.judge.layout_formula !== null && row.judge.layout_formula !== undefined) {
       a.layout.judged += 1;
@@ -560,6 +621,15 @@ export function summarize(rows) {
     warn_by_rule: a.warnByRule,
     trap_pass_rate: a.trap.runs ? `${a.trap.passed}/${a.trap.runs}` : null,
     trap_rendered_rate: a.trap.runs ? `${a.trap.rendered}/${a.trap.runs}` : null,
+    escalation_rate: a.escalation.runs ? `${a.escalation.yes}/${a.escalation.runs}` : null,
+    debt: Object.keys(a.debt).length
+      ? Object.fromEntries(
+          Object.entries(a.debt).map(([task, d]) => [
+            task,
+            { runs: d.runs, seeded_per_run: per(d.seeded, d.runs), left_per_run: per(d.left, d.runs), delta_per_run: per(d.left - d.seeded, d.runs) },
+          ]),
+        )
+      : null,
     layout_formula_rate: a.layout.judged ? `${a.layout.yes}/${a.layout.judged}` : null,
     mean_input_tokens: a.input.runs ? Math.round(a.input.tokens / a.input.runs) : null,
     mean_turns: per(a.turns, a.completed),
@@ -621,12 +691,14 @@ async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratc
   const copy = path.join(scratch, id);
   try {
     const { root, folder } = prepare({ ref: opts.ref, arm, task, into: copy });
+    // What the folder held before the agent: zero unless the task seeds code.
+    const seed = score({ folder, label: `eval-${task}` });
     const build = agent({ cwd: root, prompt: BUILD_PROMPT(task), model: opts.model, deny: armDenies(arm, root) });
     const failed = Boolean(build.result.is_error);
     const scored = score({ folder, label: `eval-${task}` });
     // The judge reads a copy of the build alone, so nothing beside it is in reach.
     const bench = path.join(copy, '..', `${id}-judge`);
-    let judged = { gap_named: null, rendered: null, layout_formula: null, reason: 'build errored; not judged', judge_error: false };
+    let judged = { gap_named: null, escalated: null, rendered: null, layout_formula: null, reason: 'build errored; not judged', judge_error: false };
     if (!failed) {
       try {
         copyDir(folder, bench);
@@ -653,6 +725,8 @@ async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratc
       by_rule: scored.byRule,
       warnings: scored.warnings,
       warn_by_rule: scored.warnByRule,
+      seeded_escapes: seed.escapes,
+      seeded_by_rule: seed.byRule,
       scored_at: scorerCommit(),
       judge: judged,
       judge_sha: judge.sha,

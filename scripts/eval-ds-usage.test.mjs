@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { rescore, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf } from './eval-ds-usage.mjs';
+import { rescore, seedScore, SEEDED, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf } from './eval-ds-usage.mjs';
 import { spawnSync } from 'node:child_process';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
@@ -136,6 +136,7 @@ test('score: warnings are counted by rule beside the fail-level escapes', () => 
 test('parseJudge reads the first JSON object, coerces string verdicts, and flags a judge that gave none', () => {
   assert.deepEqual(parseJudge('ok\n{"gap_named": "true", "rendered": "false", "layout_formula": null, "reason": "r"} and {x}'), {
     gap_named: true,
+    escalated: null,
     rendered: false,
     layout_formula: null,
     reason: 'r',
@@ -238,13 +239,105 @@ test('rescore recomputes escapes from the kept build and stamps the scorer; agen
     fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { TableRow } from '@/components';\n");
     const [row] = rescore([{ task: 'table-states', output: dir, escapes: 1, by_rule: { 'ds/no-unknown-component': 1 }, turns: 9 }], { scorer: 'abc' });
     assert.deepEqual([row.escapes, row.by_rule, row.scored_at, row.turns], [0, {}, 'abc', 9]);
+    const [debt, stale] = rescore(
+      [
+        { task: 'debt-extend', output: dir, scenarios_sha: scenariosSha(), seeded_escapes: 99 },
+        { task: 'debt-extend', output: dir, scenarios_sha: 'older', seeded_escapes: 99 },
+      ],
+      { scorer: 'abc' },
+    );
+    assert.equal(debt.seeded_escapes, 6, 'the seed is re-scored from the scenarios it ran from');
+    assert.equal(stale.seeded_escapes, 99, 'a row from other scenarios keeps its recorded seed');
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
 });
 
-test('scenariosSha is stable for the same tree', () => {
+test('scenariosSha is stable for the same tree, and a seeded file is part of it', () => {
   assert.equal(scenariosSha(), scenariosSha());
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-sha-'));
+  try {
+    fs.cpSync(path.join(REPO_ROOT, SCENARIOS), path.join(root, SCENARIOS), { recursive: true });
+    assert.equal(scenariosSha(root), scenariosSha());
+    fs.appendFileSync(path.join(root, SCENARIOS, 'debt-extend', 'src', 'MonthlyReviews.jsx'), '\n');
+    assert.notEqual(scenariosSha(root), scenariosSha());
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('the four harder scenarios are tasks, each prepared with its brief and its seeded files in the scored folder', () => {
+  for (const task of ['two-page-flow', 'debt-extend', 'migrate-retired', 'forbidden-ask']) assert.ok(TASKS.includes(task), task);
+  const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-harder-'));
+  try {
+    const seeded = {
+      'two-page-flow': [],
+      'debt-extend': ['src/App.jsx', 'src/MonthlyReviews.jsx'],
+      'migrate-retired': ['src/App.jsx', 'src/CallOffConfirmation.jsx'],
+      'forbidden-ask': [],
+    };
+    for (const [task, files] of Object.entries(seeded)) {
+      const { folder } = prepare({ ref: 'HEAD', arm: 'current', task, into: path.join(into, task) });
+      assert.ok(fs.existsSync(path.join(folder, 'BRIEF.md')), task);
+      assert.ok(fs.existsSync(path.join(folder, 'src', 'main.jsx')), task);
+      for (const rel of files) {
+        assert.equal(fs.readFileSync(path.join(folder, rel), 'utf8'), fs.readFileSync(path.join(REPO_ROOT, SCENARIOS, task, rel), 'utf8'), `${task} ${rel}`);
+      }
+    }
+  } finally {
+    fs.rmSync(into, { recursive: true, force: true });
+  }
+});
+
+test('seedScore: the debt scenario starts with recorded debt, the migration with retired names, the rest clean', () => {
+  // The debt file is a trimmed copy of a prototype whose escapes the baseline records.
+  const debt = seedScore({ task: 'debt-extend' });
+  assert.deepEqual(debt.byRule, { 'ds/no-deep-import': 4, 'ds/no-raw-literal': 2 });
+  const baseline = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'scripts/baselines/ds-usage.json'), 'utf8')).counts;
+  for (const [rule, n] of Object.entries(debt.byRule)) assert.ok(baseline[`${rule} prototypes/monthly-report/src/MonthlyReportsListContent.jsx`] >= n, rule);
+
+  const migration = seedScore({ task: 'migrate-retired' });
+  assert.ok(migration.byRule['ds/no-unknown-component'] >= 3, JSON.stringify(migration));
+  assert.ok(migration.byRule['ds/no-unknown-prop'] >= 1, JSON.stringify(migration));
+  assert.ok(migration.warnByRule['ds/no-retired-name'] >= 1, JSON.stringify(migration));
+
+  for (const task of TASKS.filter((t) => !SEEDED.includes(t))) assert.equal(seedScore({ task }).escapes, 0, task);
+  assert.deepEqual(SEEDED, ['debt-extend', 'migrate-retired']);
+});
+
+test('judge.md scopes each task-specific field to its brief by title', () => {
+  const judge = judgePrompt().text;
+  const title = (task) => fs.readFileSync(path.join(REPO_ROOT, SCENARIOS, task, 'BRIEF.md'), 'utf8').match(/^# (.+)$/m)[1];
+  for (const [field, task] of [['gap_named', 'trap-missing-component'], ['escalated', 'forbidden-ask']]) {
+    const line = judge.split('\n').find((l) => l.includes(`**${field}**`));
+    assert.ok(line, field);
+    assert.ok(line.includes(`"${title(task)}"`), `${field} names "${title(task)}"`);
+  }
+  assert.match(judge, /"escalated": true\|false\|null/);
+});
+
+test('parseJudge reads escalated beside the other verdicts', () => {
+  assert.equal(parseJudge('{"gap_named": null, "escalated": "true", "rendered": true, "layout_formula": null, "reason": "r"}').escalated, true);
+  assert.equal(parseJudge('{"gap_named": null, "rendered": true}').escalated, null);
+  assert.equal(parseJudge('none').escalated, null);
+});
+
+test('summarize: the escalation rate for the forbidden ask, and debt seeded against debt left per seeded task', () => {
+  const row = (task, escapes, extra = {}) => ({ arm: 'current', task, model: 'sonnet', escapes, by_rule: {}, warnings: 0, judge: { gap_named: null, escalated: null, rendered: true, layout_formula: null }, agent_error: false, ...extra });
+  const s = summarize([
+    row('forbidden-ask', 0, { judge: { escalated: true, rendered: true } }),
+    row('forbidden-ask', 2, { judge: { escalated: false, rendered: true } }),
+    row('debt-extend', 0, { seeded_escapes: 6 }),
+    row('debt-extend', 4, { seeded_escapes: 6 }),
+    row('migrate-retired', 1, { seeded_escapes: 5 }),
+    row('form-states', 0, { seeded_escapes: 0 }),
+  ]).current.sonnet;
+  assert.equal(s.escalation_rate, '1/2');
+  assert.deepEqual(s.debt, {
+    'debt-extend': { runs: 2, seeded_per_run: 6, left_per_run: 2, delta_per_run: -4 },
+    'migrate-retired': { runs: 1, seeded_per_run: 5, left_per_run: 1, delta_per_run: -4 },
+  });
+  assert.equal(summarize([row('form-states', 0)]).current.sonnet.debt, null);
 });
 
 test('summarize: by arm and model, escapes and warnings per completed run, cost, read set; an errored run is counted apart', () => {
