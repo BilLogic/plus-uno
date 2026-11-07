@@ -21,7 +21,7 @@ import { CLOSE_CARD_HEADROOM } from "../src/agent/loop-policy";
 import { runButtonDoor } from "../src/slack/button-door";
 import { deliveryAdapter } from "../src/slack/delivery-adapter";
 import { renderProposalCard } from "../src/slack/proposal-render";
-import { EXPIRED_CARD, renderGateNote } from "../src/slack/gate-note";
+import { EXPIRED_CARD_LINE as EXPIRED_CARD, renderGateNote } from "../src/slack/gate-note";
 import { createInMemoryThreadState, type PendingProposal } from "../src/thread-state/index";
 import { recordingDelivery, runTurn, type ProposalCard } from "../src/turn/index";
 import { recordingSlack, type RecordingSlack } from "./helpers/recording-slack";
@@ -127,7 +127,7 @@ describe("a sweep card keeps its carousel", () => {
     const blocks = edit(slack);
     assert.equal(blocks.filter((b) => b.type === "carousel").length, 1, "the carousel stays");
     assert.equal(lastLine(blocks), EXPIRED_CARD);
-    assert.deepEqual(buttons(blocks), ["View"]);
+    assert.deepEqual(buttons(blocks), ["View card"]);
   });
 
   it("under a gate note that leaves it live", async () => {
@@ -157,7 +157,7 @@ describe("a sweep card keeps its carousel", () => {
     const blocks = replaced[0]!.blocks as Block[];
     assert.equal(blocks.filter((b) => b.type === "carousel").length, 1, "the carousel stays");
     assert.match(lastLine(blocks), new RegExp(`Approved by <@${BEA}>`));
-    assert.deepEqual(buttons(blocks), ["View"]);
+    assert.deepEqual(buttons(blocks), ["View decision"]);
     assert.match(replaced[0]!.text, /Approved by/, "the fallback copy says the outcome too");
   });
 });
@@ -171,8 +171,8 @@ describe("a card decided outside its own buttons", () => {
     await deliveryAdapter(slack.deps(false), target).closeCard({ ts: CARD, ...card }, { decision: "cancel", by: BEA });
     const blocks = edit(slack);
     assert.equal(blocks.filter((b) => b.type === "carousel").length, 1, "the carousel stays");
-    assert.equal(lastLine(blocks), `Canceled by <@${BEA}> — tell me what to change and I'll stage it again.`);
-    assert.deepEqual(buttons(blocks), ["View"]);
+    assert.equal(lastLine(blocks), `Canceled by <@${BEA}>`);
+    assert.deepEqual(buttons(blocks), ["View decision"]);
     assert.match(slack.of("update")[0]!.text, /Canceled by/, "the fallback copy says the outcome too");
   });
 
@@ -211,7 +211,7 @@ describe("a card decided outside its own buttons", () => {
     const slack = await reactOn(async (s) => void (await s.putProposal(proposal())));
     const blocks = edit(slack);
     assert.equal(lastLine(blocks), `Approved by <@${BEA}>`);
-    assert.deepEqual(buttons(blocks), ["View"]);
+    assert.deepEqual(buttons(blocks), ["View decision"]);
   });
 });
 
@@ -289,7 +289,7 @@ describe("the button follows the card's own", () => {
     const blocks = edit(slack);
     assert.match(JSON.stringify(blocks), /DS precedence this week/, "its own words stay");
     assert.equal(lastLine(blocks), EXPIRED_CARD, "the card says the one expired line, whoever staged it");
-    assert.deepEqual(buttons(blocks), ["View"]);
+    assert.deepEqual(buttons(blocks), ["View card"]);
   });
 
   it("a stated card keeps Review under a gate note that leaves it live", async () => {

@@ -523,15 +523,26 @@ async function actOnResults(env: Env, payload: InteractionPayload, action: Resul
  * known until the claim is settled — same reason the reaction door takes a
  * factory rather than an instance.
  */
+/** Subrequests left before a cosmetic delete is spent: the settle's own. */
+const TAKE_BACK_HEADROOM = 4;
+
 function buttonDoorDeps(env: Env, payload: InteractionPayload): ButtonDoorDeps {
   const threadState = threadStateFor(env);
   return {
     threadState,
     standingConfirmers: standingConfirmersOf(env),
     delivery: (target) => slackDelivery(env, target),
-    applyVerdict: (verdict) => executeVerdict(env, verdict),
+    // What the run reports, so a single card's "kicking that off" can go
+    // once its result is in the thread.
+    applyVerdict: (verdict) => runVerdict(env, verdict),
     replyEphemeral: (text) => replyEphemeral(payload, text),
     replaceCard: (message) => replaceCard(payload, message),
+    // Cosmetic, so only while the turn's settle still fits after it.
+    takeBack: async (channel, ts) => {
+      if (budgetHeadroom().subrequests < TAKE_BACK_HEADROOM) return;
+      const res = await deleteMessage(env, channel, ts);
+      if (!res.ok) console.warn(`[interactive] kick-off line ${channel}/${ts} not taken back`);
+    },
     // This door runs inside `waitUntil`, so a re-staged card's preview waits
     // only briefly for the Figma rate budget.
     restage: restageFor(env, threadState),

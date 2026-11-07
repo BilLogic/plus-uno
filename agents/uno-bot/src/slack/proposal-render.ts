@@ -40,6 +40,10 @@ export const CONFIRM_FOOTER = "Press Review to approve it, ask for changes or re
  *  routes both. */
 export const REVIEW_ACTION_ID = "uno_proposal_review";
 
+/** A card's one button: Review while it can be decided, View decision once
+ *  someone decided it, View card when nobody did. */
+export type CardButton = "Review" | "View decision" | "View card";
+
 /**
  * The card's one button: Review, and View once the card is decided.
  *
@@ -53,7 +57,7 @@ export const REVIEW_ACTION_ID = "uno_proposal_review";
  * Quiet default style, no emoji: it decides nothing itself. It carries no
  * payload — the card's message ts is the identity, as with a reaction.
  */
-export function proposalActionBlocks(label: "Review" | "View" = "Review"): unknown[] {
+export function proposalActionBlocks(label: CardButton = "Review"): unknown[] {
   return [
     {
       type: "actions",
@@ -63,7 +67,7 @@ export function proposalActionBlocks(label: "Review" | "View" = "Review"): unkno
           type: "button",
           action_id: REVIEW_ACTION_ID,
           text: { type: "plain_text", text: label },
-          value: label.toLowerCase(),
+          value: label === "Review" ? "review" : "view",
         },
       ],
     },
@@ -83,7 +87,7 @@ export function proposalActionBlocks(label: "Review" | "View" = "Review"): unkno
  * doors re-render from its text, stays short too. Any other card — a stated
  * one with its own footer — shows its text whole, as before.
  */
-export function proposalCardBlocks(posted: string, resolvedNote?: string, button?: "Review" | "View"): unknown[] {
+export function proposalCardBlocks(posted: string, resolvedNote?: string, button?: CardButton): unknown[] {
   // A card posted before cards stopped showing their deadline carries it as
   // its text's last line (`card-deadline.ts`); a redraw drops it.
   const { text } = splitDeadline(posted);
@@ -95,7 +99,7 @@ export function proposalCardBlocks(posted: string, resolvedNote?: string, button
     // A note on a card still live — one waiting on someone else — keeps
     // Review; every other note closes the card, so it offers View.
     blocks.push({ type: "context", elements: [{ type: "mrkdwn", text: resolvedNote }] });
-    blocks.push(...proposalActionBlocks(button ?? "View"));
+    blocks.push(...proposalActionBlocks(button ?? "View decision"));
   } else {
     blocks.push(...proposalActionBlocks());
   }
@@ -125,7 +129,7 @@ export interface PostedCard {
  * @param note - Its last line, mrkdwn
  * @param button - Review while it can still be decided, View once it cannot
  */
-export function notedCardBlocks(card: PostedCard, note: string, button: "Review" | "View" = "View"): unknown[] {
+export function notedCardBlocks(card: PostedCard, note: string, button: CardButton = "View decision"): unknown[] {
   if (!card.blocks) {
     return proposalCardBlocks(card.text, note, button);
   }
@@ -165,9 +169,9 @@ export function decidedCard(
   pending: Pick<PendingProposal, "proposalText" | "proposalBlocks">,
   note: string,
   text: string = pending.proposalText,
-  opts: { edited?: boolean; button?: "Review" | "View" } = {},
+  opts: { edited?: boolean; button?: CardButton } = {},
 ): CardMessage {
-  const button = opts.button ?? "View";
+  const button = opts.button ?? "View decision";
   const stale = opts.edited || text !== pending.proposalText;
   const own = pending.proposalBlocks && !stale ? pending.proposalBlocks : undefined;
   return {

@@ -20,7 +20,7 @@
 
 import { decidedLine } from "./decision-cards";
 import { richElements } from "./rich-text";
-import type { ReportEntry, ReportKind } from "../thread-state/index";
+import type { DecidedProposal, PendingProposal, ReportEntry, ReportKind } from "../thread-state/index";
 
 /** An outcome's alert level. */
 export type OutcomeLevel = "success" | "info" | "warning" | "error";
@@ -38,6 +38,9 @@ export interface DecisionOutcome {
   at?: number;
   /** The note or reason the decision came with, as typed. */
   quote?: string;
+  /** Where an Approve's write went, mrkdwn, said after when: "to post in
+   *  <#C1>". Absent where the draft's reading names no destination. */
+  where?: string;
   /** What to do next, only for an outcome that failed or ran nothing. */
   next?: string;
 }
@@ -136,6 +139,63 @@ export function reportOutcome(entry: ReportEntry): DecisionOutcome | null {
   }
 }
 
+/** What a single card's pop-up says to do next when nothing ran. */
+export const TRY_AGAIN = "To try again, say what to change in the thread.";
+/** What a replaced card's pop-up says to do next. */
+export const DECIDE_NEWEST = "Decide on the newest card in this thread.";
+/** What a cut-off run's pop-up says to do next. */
+export const CHECK_THREAD = "Check the thread for what finished before asking again.";
+
+/**
+ * What a single card — one asked for in a thread — says at the top of its
+ * pop-up, from the decision its record kept and the line its card ends with.
+ * The line tells apart what the kept decision does not: a ⛔ ("Canceled by")
+ * from the pop-up's Reject ("Rejected by"), and an Approve whose run was cut
+ * off.
+ *
+ * @param decided - The kept decision: how it closed, who closed it and when
+ * @param proposal - The card, for a stated card's own expired words and its
+ *   own answers
+ * @param cardLine - The line the card ends with, when the click carried it
+ */
+export function cardOutcome(
+  decided: Pick<DecidedProposal, "decision" | "by" | "reason" | "at">,
+  proposal: Pick<PendingProposal, "choices" | "stated" | "item">,
+  cardLine?: string,
+  where?: string,
+): DecisionOutcome {
+  const who = decided.by && /^[UW][A-Z0-9]+$/.test(decided.by) ? decided.by : undefined;
+  const at = decided.at !== undefined ? { at: decided.at } : {};
+  const byline = (verb: string, tail = "") => (who ? { byline: `${verb} by <@${who}>${tail}`, ...at } : {});
+  const reason = decided.reason?.trim();
+  switch (decided.decision) {
+    case "confirm":
+      if (cardLine && /, cut off$/.test(cardLine.trim())) {
+        return { level: "error", alert: "Cut off before it reported back.", ...byline("Approved", ", cut off"), next: CHECK_THREAD };
+      }
+      return proposal.choices?.length
+        ? { level: "success", alert: "Answered.", ...byline("Answered") }
+        : { level: "success", alert: "Approved.", ...byline("Approved"), ...(who && where ? { where } : {}) };
+    case "cancel": {
+      if (proposal.choices?.length) return { level: "info", alert: "Answered. Nothing ran.", ...byline("Answered") };
+      const rejected = !!reason || (cardLine !== undefined && /^Rejected\b/.test(cardLine.trim()));
+      return rejected
+        ? { level: "info", alert: "Rejected. Nothing ran.", ...byline("Rejected"), ...(reason ? { quote: reason } : {}) }
+        : { level: "info", alert: "Canceled. Nothing ran.", ...byline("Canceled"), next: TRY_AGAIN };
+    }
+    case "noted":
+      return { level: "info", alert: "Noted.", ...byline("Noted"), ...(reason ? { quote: reason } : {}) };
+    case "withdrawn":
+      return { level: "info", alert: "Withdrawn. Nothing ran.", ...byline("Withdrawn") };
+    case "replaced":
+      return { level: "warning", alert: "Replaced. Nothing ran.", next: DECIDE_NEWEST };
+    case "expired":
+      return proposal.item
+        ? { level: "warning", alert: EXPIRED_OUTCOME }
+        : { level: "warning", alert: asSentence(proposal.stated?.expired?.split(/(?<=[.!?])\s/)[0] ?? "Expired. Nothing ran."), next: ASK_AGAIN };
+  }
+}
+
 /**
  * The head's blocks: the alert, the byline, the quote, the next step, then a
  * divider for the draft to follow.
@@ -147,7 +207,8 @@ export function outcomeHead(outcome: DecisionOutcome): unknown[] {
   const quote = outcome.quote?.trim();
   if (outcome.byline) {
     const when = outcome.at !== undefined ? ` on ${decidedWhen(outcome.at)}` : "";
-    const elements = [...richElements(outcome.byline), { type: "text", text: `${when}${quote ? ":" : "."}` }];
+    const where = outcome.where ? [{ type: "text", text: " to " }, ...richElements(outcome.where)] : [];
+    const elements = [...richElements(outcome.byline), { type: "text", text: when }, ...where, { type: "text", text: quote ? ":" : "." }];
     blocks.push({ type: "rich_text", elements: [{ type: "rich_text_section", elements: merged(elements) }] });
   }
   if (quote) {
@@ -162,6 +223,7 @@ export function outcomeHead(outcome: DecisionOutcome): unknown[] {
 function merged(elements: readonly unknown[]): unknown[] {
   const out: Array<Record<string, unknown>> = [];
   for (const e of elements as Array<Record<string, unknown>>) {
+    if (e.type === "text" && !e.text) continue;
     const last = out.at(-1);
     if (last?.type === "text" && e.type === "text" && !last.style && !e.style) last.text = `${String(last.text)}${String(e.text)}`;
     else out.push({ ...e });

@@ -72,7 +72,7 @@ import { SLACK_TS, turnIdOf } from "../usage/record";
 import type { SlackMessageMetadata } from "./api";
 import { decidedCard, notedCardBlocks, proposalCardBlocks, renderProposalCard } from "./proposal-render";
 import { toPlainText } from "./mrkdwn";
-import { cardStaysLive, decidedCardLine, renderCardNote, renderGateNote } from "./gate-note";
+import { cardNoteButton, decidedCardLine, renderCardNote, renderGateNote } from "./gate-note";
 import { keptQuestionMessage, whichCardMessage } from "./which-card";
 import { checkOfferMessage } from "./blueprint-check";
 import { statusTag } from "./status-tag";
@@ -1126,7 +1126,7 @@ export function deliveryAdapter(deps: SlackDeliveryDeps, target: SlackDeliveryTa
           // The note as the copy's last line too, as a decision's is
           // (`decidedCard`): an edit cut to Slack's limit keeps that line.
           text: `${card.text}\n${line}`,
-          blocks: notedCardBlocks(card, line, cardStaysLive(note) ? "Review" : "View"),
+          blocks: notedCardBlocks(card, line, cardNoteButton(note)),
         })
         .catch(() => ({ ok: false }));
       if (updated.ok) return { ok: true, text: line, ts: card.ts };

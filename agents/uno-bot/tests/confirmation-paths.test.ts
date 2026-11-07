@@ -911,6 +911,35 @@ describe("the reaction door", () => {
     return { delivery, ran, targets, reads, threadState, saidBeforeRunning, restaged };
   }
 
+  it("takes back its \"kicking that off\" once the run reports, leaving the run's own reply as the result", async () => {
+    const threadState = createInMemoryThreadState();
+    await threadState.putProposal(PROPOSAL);
+    const delivery = recordingDelivery();
+    const takenBack: Array<[string, string]> = [];
+    const deps = (ok: boolean) => ({
+      threadState,
+      delivery: () => delivery,
+      async applyVerdict() {
+        return ok ? [{ toolName: "notion_create", ok: true, result: "{}", message: "Created the Roadmap card: Reflection redesign." }] : undefined;
+      },
+      async replyEphemeral() {},
+      async replaceCard() {},
+      async restage() {},
+      async takeBack(channel: string, ts: string) {
+        takenBack.push([channel, ts]);
+      },
+    });
+    await runButtonDoor({ channel: CHANNEL, messageTs: CARD_TS, decision: "confirm", userId: "U2" }, deps(true));
+    assert.equal(takenBack.length, 1, "the line that only said a run was going");
+    assert.equal(takenBack[0]![0], CHANNEL);
+    assert.match(takenBack[0]![1], /^note-/);
+
+    // A run that reports nothing leaves the line: it is all the thread has.
+    await threadState.putProposal({ ...PROPOSAL, proposalTs: "1700000000.000197", supersedeKey: "card:1700000000.000197" });
+    await runButtonDoor({ channel: CHANNEL, messageTs: "1700000000.000197", decision: "confirm", userId: "U2" }, deps(false));
+    assert.equal(takenBack.length, 1);
+  });
+
   it("with another card still waiting in the thread, settles as waiting on the person", async () => {
     const threadState = await twoCards();
     const { delivery } = await drive({ threadState });
@@ -1359,7 +1388,7 @@ describe("a stated card answers in its own words", () => {
       delivery.calls.filter((c) => c.kind === "gate-note").map((c) => c.kind === "gate-note" && c.card?.ts),
       [CARD_TS],
     );
-    assert.equal(renderCardNote(delivery.gateNotes[0]!), "Expired. Ask again for a fresh card.");
+    assert.equal(renderCardNote(delivery.gateNotes[0]!), "Expired with no decision");
     assert.deepEqual(delivery.posted, []);
     assert.deepEqual(ephemerals, []);
     assert.deepEqual(notes, []);
@@ -1391,7 +1420,7 @@ describe("a stated card answers in its own words", () => {
 
   it("leaves a turn's card on the generic lines", async () => {
     const { notes } = await press(await staged(), "cancel");
-    assert.deepEqual(notes, [`Canceled by <@${PRESSER}> — tell me what to change and I'll stage it again.`]);
+    assert.deepEqual(notes, [`Canceled by <@${PRESSER}>`]);
     assert.match(renderGateNote({ kind: "superseded" }), /newest card in this thread/);
     assert.equal(renderGateNote({ kind: "expired" }), "Expired. Ask again for a fresh card.");
   });

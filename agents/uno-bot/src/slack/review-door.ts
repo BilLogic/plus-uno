@@ -204,7 +204,7 @@ export async function runReviewOpen(request: ReviewOpenRequest, deps: ReviewDoor
   const outcome = entry ? (reportOutcome(entry.entry) ?? undefined) : undefined;
   const title = entry?.entry.item.kind ? REPORT_TITLES[entry.entry.item.kind] : undefined;
   const view = kept
-    ? draftView(card, kept.proposal, { mayDecide: false, confirmers: [], decided: kept, ...(outcome ? { outcome } : {}) }, title ? { title } : {})
+    ? draftView(card, kept.proposal, { mayDecide: false, confirmers: [], decided: kept, ...(outcome ? { outcome } : {}), ...cardLineOf(request.cardText) }, title ? { title } : {})
     : entry
     ? decidedView(card, outcome ? itemWords(entry.entry) : entry.text, title ?? (look.state === "live" ? undefined : closedTitle(look)), outcome)
     :
@@ -253,6 +253,12 @@ async function reportEntry(
   const entry = record?.entries.find((e) => e.id === item.id);
   const text = record ? itemText(record, item.id) : null;
   return entry && text ? { entry, text } : null;
+}
+
+/** The line a card's message ends with, as the click carried it. */
+function cardLineOf(cardText: string | undefined): { cardLine?: string } {
+  const last = cardText?.split("\n").map((l) => l.trim()).filter(Boolean).at(-1);
+  return last ? { cardLine: last } : {};
 }
 
 /** An item's own words under its outcome: its title, body and detail. */
