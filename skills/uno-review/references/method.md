@@ -40,7 +40,7 @@ What each lens applies (the rules live in the docs, not here):
 
 ## Findings & severity
 
-Every finding carries **severity · lens · evidence (what's in the artifact) · reference (the doc/rule it violates) · suggested re-entry point**. No evidence, no finding; low-confidence findings are omitted, not hedged — 3 strong findings beat 7 mushy ones. "What's working" is mandatory: 1–3 specific strengths with citations, so designers know what to keep. Zero findings is a valid result.
+Every finding carries **severity · lens · evidence (what's in the artifact) · reference (the doc/rule it violates) · suggested re-entry point**. A `check:ds-usage` escape at level fail is a **blocker** (each of its rules is a hard rule broken); one at level warn is a **minor**. No evidence, no finding; low-confidence findings are omitted, not hedged — 3 strong findings beat 7 mushy ones. "What's working" is mandatory: 1–3 specific strengths with citations, so designers know what to keep. Zero findings is a valid result.
 
 | Severity | Meaning | Effect |
 |---|---|---|

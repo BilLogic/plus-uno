@@ -22,8 +22,8 @@ Stays in-lens: product intent belongs to uno-lens, accessibility to a11y-lens.
 
 ## Workflow
 
-1. Confirm the artifact's fidelity tier; depth follows the fidelity table in `skills/uno-review/references/method.md` § Lens dispatch — parallel, in-lane, stage-appropriate. Below coded fidelity there is no code to check, so step 2 is skipped.
-2. **Run the checker on the artifact's code**: `npm run check:ds-usage -- <artifact paths> --json`. Report every `blocking` entry as an escape, unchanged: its `rule`, `file:line`, and `fix` as what to change. `warnings` are minors. The checker's verdict stands: an escape it reports is a finding, and a pattern it passes gets no escape finding from this lens.
+1. **Run the checker on whatever code the artifact has**, at any fidelity: `npm run check:ds-usage -- <artifact paths> --json`. Report every `blocking` entry as an escape, unchanged: its `rule`, `file:line`, and `fix` as what to change; report every `warnings` entry the same way. The checker's verdict stands: what it reports is a finding, and what it passes stays passed. An artifact with no code (a FigJam flow, a Figma frame) goes straight to step 2.
+2. Confirm the artifact's fidelity tier; the depth of judgement follows the fidelity table in `skills/uno-review/references/method.md` § Lens dispatch — parallel, in-lane, stage-appropriate.
 3. **Judge what the checker cannot**, reading `design-system/agent-views/components/index.md`, the component's generated doc and stories, and `design-system/guidelines/composition/layout.md`: component fit, layout formula, hierarchy, intent of variants, Storybook validation, and raw HTML controls where a PLUS component exists. For a chart, `design-system/guidelines/foundations/color.md` § Data-viz color is the rule. Each finding cites the hard-rule name or guideline section it rests on.
 4. Return every finding in one shape. Zero findings is a valid result.
 
@@ -32,12 +32,12 @@ Stays in-lens: product intent belongs to uno-lens, accessibility to a11y-lens.
 `rule or guideline ID · severity · file:line · what to change · re-entry point`
 
 - **Rule or guideline ID**: a checker rule (`ds/no-deep-import`), an `AGENTS.md` hard-rule name (`layout-formulas-first`), or a guideline path with its section.
-- **Severity** (method.md § Findings & severity): a fail-level escape is a **blocker**, since each rule is a hard rule broken; a checker warning is a **minor**; a judgement finding is graded on the method table.
+- **Severity**: graded on `skills/uno-review/references/method.md` § Findings & severity, which also says how the checker's levels map.
 - **What to change**: for an escape, the checker's `fix`; for judgement, the component, formula or guideline to use instead.
 - **Re-entry point**: where in `skills/uno-prototype` the fix belongs (method.md § Verdict & re-entry).
 
 ## Conventions it obeys
 
-- `AGENTS.md` § Hard rules, by name. The checker enforces `DS-knowledge-is-law`, `no-deep-imports`, `no-hallucinated-props`, `tokens-over-literals` and `FA-Free-only` for consumer code; this lens's judgement covers `layout-formulas-first`, `PLUS-components-first`, `no-duplicate-components`, `read-source-first` and `Storybook-validation`.
+- `AGENTS.md` § Hard rules, by name. The checker enforces `DS-knowledge-is-law`, `no-deep-imports`, `no-hallucinated-props`, `tokens-over-literals` and `FA-Free-only` for consumer code; this lens's judgement covers `layout-formulas-first`, `PLUS-components-first`, `no-duplicate-components`, `read-source-first`, `Storybook-validation` and `no-hand-edited-generated-files`.
 - Rules for each escape: `docs/engineering/ds-usage-rules.md`.
 - Scored by: `docs/evals/rubrics/uno-review.md` (recall/precision on the golden defect set)
