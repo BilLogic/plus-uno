@@ -134,9 +134,11 @@ Individual checkboxes have two states, selected and unselected. When checkboxes 
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
+<tr><td>Rest</td><td><code>--ds-background-input</code> fill with a <code>--ds-border-input</code> edge.</td></tr>
 <tr><td>Hovered</td><td>Unselected: <code>--ds-background-input-hovered</code> with a <code>--ds-border-brand</code> edge. Selected: the hovered step of the selected bold fill.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the box, for keyboard focus only.</td></tr>
-<tr><td>Selected, mixed</td><td><code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge; the mark is <code>--ds-icon-inverse</code>.</td></tr>
+<tr><td>Selected</td><td><code>--ds-background-selected-bold</code> fill and <code>--ds-border-selected</code> edge; the check is <code>--ds-icon-inverse</code>.</td></tr>
+<tr><td>Mixed</td><td>The same fill and edge as selected; the mark is a dash in <code>--ds-icon-inverse</code>.</td></tr>
 <tr><td>Invalid</td><td>The unselected box takes <code>--ds-border-danger</code>. A selected or mixed box keeps its fill.</td></tr>
 <tr><td>Read-only</td><td>Full contrast, in the tab order, <code>aria-readonly</code>; ignores clicks and Space.</td></tr>
 <tr><td>Disabled</td><td><code>--ds-background-disabled</code> fill, <code>--ds-border-disabled</code> edge, <code>--ds-icon-disabled</code> mark. Out of the tab order.</td></tr>
@@ -165,22 +167,55 @@ Individual checkboxes have two states, selected and unselected. When checkboxes 
 
 ## Best practices
 
+### Say what is being agreed to.
+
+The label states the commitment in a full phrase. "Yes" or "OK" hides what the person is accepting.
+
+<DoDontPair
+    doExample={<Checkbox label="I agree to the tutor code of conduct" />}
+    doCaption="The label names the agreement."
+    dontExample={<Checkbox label="Yes" />}
+    dontCaption="The label says nothing about what is accepted."
+/>
+
+### Keep the label beside the box, in sentence case.
+
+Sentence case reads as a statement. All caps and a trailing period read as a warning.
+
+<DoDontPair
+    doExample={<Checkbox label="Email me session reminders" />}
+    doCaption="Sentence case, no period."
+    dontExample={<Checkbox label="EMAIL ME SESSION REMINDERS." />}
+    dontCaption="All caps with a period."
+/>
+
+### Keep each label to one line.
+
+A short label sits level with the box. A long one wraps and pushes the box away from its first line.
+
+<DoDontPair
+    doExample={<Checkbox label="Remind me by email" />}
+    doCaption="One short line."
+    dontExample={<Checkbox label="Remind me by email the evening before every session and again an hour before it starts" />}
+    dontCaption="A label that wraps into a paragraph."
+/>
+
 ### Name the choice, not the instruction.
 
 <DoDontPair
     doExample={<Checkbox label="Email me a summary" />}
-    doCaption="Keep the label short and descriptive, with no punctuation after it."
-    dontExample={<Checkbox label="Check this box if you would like to receive an email summary." />}
-    dontCaption="A sentence as a label reads as an instruction and ends in punctuation. Name the choice instead."
+    doCaption="The label names the choice."
+    dontExample={<Checkbox label="Check this box for a summary" />}
+    dontCaption="The label tells the person what to do with the box."
 />
 
 ### Explain an invalid box; do not disable it.
 
 <DoDontPair
     doExample={<Checkbox label="I accept the terms" isInvalid />}
-    doCaption="Pair an invalid checkbox with a message that says what to do."
+    doCaption="The invalid box keeps full contrast and stays in the tab order."
     dontExample={<Checkbox label="I accept the terms" isInvalid isDisabled />}
-    dontCaption="A disabled box cannot take focus, so a screen reader never reaches the reason it is off. Use validation instead."
+    dontCaption="A disabled box cannot take focus, so a screen reader never reaches the reason it is off."
 />
 
 ### Read-only is not disabled.

@@ -1,7 +1,7 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
-import { IconButton, Button } from '@/components';
+import { IconButton, Button, ButtonGroup } from '@/components';
 import * as IconButtonStories from './IconButton.stories.jsx';
 import {
     ComponentExample,
@@ -218,13 +218,48 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 
 ## Best practices
 
-### Name the object acted on.
+### Keep space between icon buttons.
+
+Leave a gap so neighboring icon buttons read as separate targets.
 
 <DoDontPair
-    doExample={<IconButton icon="pen" label="Edit page" />}
-    doCaption="The label names the action and its object."
-    dontExample={<IconButton icon="pen" label="Edit" />}
-    dontCaption="A bare verb does not say what is edited."
+    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><IconButton icon="pen" label="Edit page" /><IconButton icon="link" label="Copy link" /><IconButton icon="trash" label="Delete page" /></div>}
+    doCaption="A clear gap between icon buttons."
+    dontExample={<div style={{ display: 'flex', gap: 0 }}><IconButton icon="pen" label="Edit page" /><IconButton icon="link" label="Copy link" /><IconButton icon="trash" label="Delete page" /></div>}
+    dontCaption="Icon buttons touching."
+/>
+
+### Always give it an accessible name.
+
+Every icon button carries a `label` that is its accessible name and its
+tooltip, such as "Close panel". Name the object acted on: "Edit page", not a
+bare "Edit", which does not say what is edited. The label is never drawn, so
+the difference shows only on hover, on focus and to a screen reader.
+
+```jsx
+// Incorrect: a bare verb.
+<IconButton icon="pen" label="Edit" />
+
+// Correct: the action and its object.
+<IconButton icon="pen" label="Edit page" />
+```
+
+### Keep it square.
+
+Icon buttons stay 32 or 24 square, and round only in top navigation
+(`shape="circle"`). Icon button has no prop to fill its container; never
+stretch one to fill a row.
+
+### Use primary sparingly.
+
+Primary marks the main action of a small area. The other icon buttons beside
+it stay default or subtle.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><IconButton icon="pen" label="Edit comment" appearance="subtle" /><IconButton icon="link" label="Copy link" appearance="subtle" /><IconButton icon="paper-plane" label="Send comment" appearance="primary" /></div>}
+    doCaption="One primary icon button, with the other actions subtle."
+    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><IconButton icon="pen" label="Edit comment" appearance="primary" /><IconButton icon="link" label="Copy link" appearance="primary" /><IconButton icon="paper-plane" label="Send comment" appearance="primary" /></div>}
+    dontCaption="Three primary icon buttons compete for attention."
 />
 
 ### Pick a glyph people know.
@@ -234,6 +269,13 @@ If you cannot find a suitable glyph in five seconds, it probably will not commun
 ### Group icon buttons that act together.
 
 Put related icon buttons in a Button group, and use `isSelected` for a choice between views.
+
+<DoDontPair
+    doExample={<ButtonGroup label="View"><IconButton icon="grip" label="Grid view" isSelected /><IconButton icon="list" label="List view" /></ButtonGroup>}
+    doCaption="Grid and list views joined in one group, with the current view selected."
+    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><IconButton icon="grip" label="Grid view" isSelected /><IconButton icon="list" label="List view" /></div>}
+    dontCaption="The same two views as loose buttons read as unrelated actions."
+/>
 
 </div>
 

@@ -105,7 +105,7 @@ A radio lets a person choose one option from a set.
 
 Use Radio when the options need custom presentation, such as options listed in a table. For a plain list of options, use RadioGroup, which owns the group label, the value and the error.
 
-Make one option the default. Pick the safest and lowest-risk option, and never preselect a high-risk choice such as one about privacy or payment. If a person may decline all options, add a "None" option; if the list cannot be complete, add "Other".
+Make one option the default: the safest and lowest-risk one. If a person may decline all options, add a "None" option; if the list cannot be complete, add "Other".
 
 </div>
 
@@ -155,12 +155,47 @@ Make one option the default. Pick the safest and lowest-risk option, and never p
 
 ## Best practices
 
+### Show one answer selected at a time.
+
+A radio group holds exactly one answer. Never show two selected.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="do-one" label="Email" value="a" defaultChecked /><Radio name="do-one" label="Text message" value="b" /><Radio name="do-one" label="No reminders" value="c" /></div>}
+    doCaption="One radio selected in the group."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="dont-one-a" label="Email" value="a" defaultChecked /><Radio name="dont-one-b" label="Text message" value="b" defaultChecked /><Radio name="dont-one-c" label="No reminders" value="c" /></div>}
+    dontCaption="Two radios selected at once."
+/>
+
+### Never preselect a high-risk answer.
+
+Leave consequential choices, such as ones about privacy or payment, for the
+person to make on purpose. When an option starts selected, make it the safe
+one.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="do-risk" label="Keep my history" value="a" defaultChecked /><Radio name="do-risk" label="Delete my history" value="b" /></div>}
+    doCaption="The safe option, Keep my history, starts selected."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="dont-risk" label="Keep my history" value="a" /><Radio name="dont-risk" label="Delete my history" value="b" defaultChecked /></div>}
+    dontCaption="The high-risk option, Delete my history, starts selected."
+/>
+
+### Keep labels short and parallel.
+
+Short labels scan as a list; long ones wrap and blur the choices.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="do-short" label="Daily" value="a" /><Radio name="do-short" label="Weekly" value="b" /><Radio name="do-short" label="Monthly" value="c" /></div>}
+    doCaption="Short, parallel labels."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="dont-short" label="Every day, before my first session starts" value="a" /><Radio name="dont-short" label="Once a week, on the day I choose in settings" value="b" /><Radio name="dont-short" label="Monthly" value="c" /></div>}
+    dontCaption="Long labels that wrap, beside a one-word one."
+/>
+
 ### Order options by likelihood or risk.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="do-order" label="In person" value="a" defaultChecked /><Radio name="do-order" label="Online" value="b" /><Radio name="do-order" label="Either" value="c" /></div>}
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="do-order" label="In person" value="a" /><Radio name="do-order" label="Online" value="b" /><Radio name="do-order" label="Either" value="c" /></div>}
     doCaption="Order options from most to least likely, or from least to most risk."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="dont-order" label="Online" value="a" /><Radio name="dont-order" label="Either" value="b" /><Radio name="dont-order" label="In person" value="c" /></div>}
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Radio name="dont-order" label="Either" value="a" /><Radio name="dont-order" label="In person" value="b" /><Radio name="dont-order" label="Online" value="c" /></div>}
     dontCaption="Alphabetical order cannot be localized and says nothing about which option fits most people."
 />
 

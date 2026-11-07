@@ -99,6 +99,7 @@ longer list or for actions that read better in a row, use `Button` or
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
+<tr><td>Rest</td><td>The container takes the rest fill of its appearance.</td></tr>
 <tr><td>Hovered</td><td>The container takes the hovered fill of its appearance.</td></tr>
 <tr><td>Pressed</td><td>The container takes the pressed fill of its appearance.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the edge, for keyboard focus only.</td></tr>
@@ -128,7 +129,20 @@ longer list or for actions that read better in a row, use `Button` or
 
 ## Best practices
 
-### Keep the label to one or two words.
+### Use it to pick among two to four big options.
+
+A role at sign-in is the case it is made for. Toolbars and ordinary actions take `Button` or `IconButton`.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><VerticalButton icon="chalkboard-user" label="Tutor" /><VerticalButton icon="user-graduate" label="Student" /><VerticalButton icon="house-user" label="Parent" /></div>}
+    doCaption="Picking a role at sign-in."
+    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><VerticalButton icon="note-sticky" label="Notes" /><VerticalButton icon="pen" label="Edit" /><VerticalButton icon="share" label="Share" /><VerticalButton icon="ellipsis" label="More" /></div>}
+    dontCaption="Ordinary actions lined up as a toolbar."
+/>
+
+### Use one or two words in sentence case.
+
+The label sits under the icon and must fit on one or two lines. The button is a fixed size, so a longer label wraps awkwardly or clips.
 
 <DoDontPair
     doExample={<VerticalButton icon="user-gear" label="Admin" />}
@@ -137,12 +151,20 @@ longer list or for actions that read better in a row, use `Button` or
     dontCaption="A long label wraps and breaks the fixed size."
 />
 
-The button is a fixed size, so a longer label wraps awkwardly or clips. Pick
-a short noun or verb phrase in sentence case, matching the icon's meaning.
-
 ```jsx
 <VerticalButton icon="user-gear" label="Admin" onClick={selectRole} />
 ```
+
+### Pair it with a clear icon.
+
+The icon carries the meaning at a glance; the label confirms it.
+
+<DoDontPair
+    doExample={<VerticalButton icon="chalkboard-user" label="Tutor" />}
+    doCaption="An icon that matches its label."
+    dontExample={<VerticalButton icon="star" label="Tutor" />}
+    dontCaption="A decorative icon unrelated to the label."
+/>
 
 ### `icon` is required — there is no text-only variant.
 

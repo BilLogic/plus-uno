@@ -27,28 +27,23 @@ export default {
         style: { table: { disable: true } },
         label: {
             control: 'text',
-            description: 'Label text for the toggle',
             table: { category: 'Content' },
         },
         size: {
             control: 'inline-radio',
             options: [16, 20],
-            description: 'Track height in pixels',
             table: { category: 'Design' },
         },
         isDisabled: {
             control: 'boolean',
-            description: 'Disable the toggle',
             table: { category: 'Behavior' },
         },
         isLoading: {
             control: 'boolean',
-            description: 'A change is being saved: shows a spinner and ignores input',
             table: { category: 'Behavior' },
         },
         isReadOnly: {
             control: 'boolean',
-            description: 'Shown and announced, not changeable',
             table: { category: 'Behavior' },
         },
         isChecked: { table: { disable: true, category: 'Development' } },

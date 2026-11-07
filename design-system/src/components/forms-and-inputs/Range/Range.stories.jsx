@@ -26,33 +26,27 @@ export default {
         style: { table: { disable: true } },
         value: {
             control: { type: 'range', min: 0, max: 100, step: 1 },
-            description: 'Current slider value',
             table: { category: 'Content' },
         },
         min: {
             control: 'number',
-            description: 'Minimum slider value',
             table: { category: 'Behavior' },
         },
         max: {
             control: 'number',
-            description: 'Maximum slider value',
             table: { category: 'Behavior' },
         },
         step: {
             control: 'number',
-            description: 'Slider increment',
             table: { category: 'Behavior' },
         },
         isDisabled: {
             control: 'boolean',
-            description: 'Disable the slider',
             table: { category: 'Behavior' },
         },
         size: {
             control: 'select',
             options: [8, 12, 16],
-            description: 'The dot and bar in px; the track follows at 4/6/8. Unset keeps the default rendering.',
             table: { category: 'Design' },
         },
         id: { control: false, table: { disable: true, category: 'Development' } },

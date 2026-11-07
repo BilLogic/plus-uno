@@ -1,6 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
-import { Comment } from '@/components';
+import { Button, Comment } from '@/components';
 import * as CommentStories from './Comment.stories.jsx';
 import {
     ComponentExample,
@@ -161,10 +161,43 @@ Passing replies through `nestedReplies` opens a heading context at `headingLevel
 Set `isSaving` rather than conditionally rendering `actions`. It keeps the saving state in one prop instead of two places making the same decision.
 
 <DoDontPair
-    doExample={<Comment author="Ari Patel" time="2h ago" content="Can we move Thursday's session to 5pm?" isSaving savingText="Saving your reply…" />}
-    doCaption="One prop swaps the actions for the saving text."
-    dontExample={<Comment author="Ari Patel" time="2h ago" content="Can we move Thursday's session to 5pm?" actions={<button type="button">Reply</button>} />}
-    dontCaption="Leaving the actions live while a change saves invites a second submit."
+    doExample={<Comment author="Ari Patel" time="2h ago" content="Can we move Thursday's session to 5 pm?" actions={<Button appearance="subtle" spacing="compact" text="Reply" />} isSaving savingText="Saving your reply…" />}
+    doCaption="While the reply saves, the saving text replaces the Reply action."
+    dontExample={<Comment author="Ari Patel" time="2h ago" content="Can we move Thursday's session to 5 pm?" actions={<Button appearance="subtle" spacing="compact" text="Reply" />} />}
+    dontCaption="The Reply action stays live, with nothing to say a reply is saving."
+/>
+
+### Show who wrote it and when.
+
+Every comment names its author and time. Anonymous, undated comments cannot be trusted or followed up.
+
+<DoDontPair
+    doExample={<Comment author="Maya Chen" time="2 h ago" content="Moved your 3 pm session to 4 pm." />}
+    doCaption="Author and time are both present."
+    dontExample={<Comment author="Someone" time="recently" content="Moved your 3 pm session to 4 pm." />}
+    dontCaption="No name, no time."
+/>
+
+### Write the comment as a plain sentence.
+
+Sentence case, normal punctuation. Capitals and stacked marks read as shouting.
+
+<DoDontPair
+    doExample={<Comment author="Maya Chen" time="2 h ago" content="Can you add the due date?" />}
+    doCaption="A plain question."
+    dontExample={<Comment author="Maya Chen" time="2 h ago" content="ADD THE DATE!!!" />}
+    dontCaption="All caps, stacked marks."
+/>
+
+### Ask for one clear thing.
+
+Name the action and the detail. An open "Thoughts?" leaves the reader guessing.
+
+<DoDontPair
+    doExample={<Comment author="Maya Chen" time="2 h ago" content="Can you confirm the 3 pm slot?" />}
+    doCaption="One action, one detail."
+    dontExample={<Comment author="Maya Chen" time="2 h ago" content="Thoughts?" />}
+    dontCaption="No action named."
 />
 
 </div>

@@ -11,6 +11,11 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const surface = { display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 'var(--inline-md)', padding: 'var(--pad-y-md) var(--pad-x-md)', border: 'var(--border-default) solid var(--ds-border)', borderRadius: 'var(--radius-md)', background: 'var(--ds-surface)' };
+export const surfaceStacked = { ...surface, flexDirection: 'column', justifyContent: 'flex-start' };
+export const surfaceList = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', flex: 1 };
+export const itemRow = { display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 'var(--inline-md)' };
+
 <Meta of={CloseButtonStories} />
 
 <Title />
@@ -93,6 +98,7 @@ removes one item from a set rather than closing a surface, use a plain
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
+<tr><td>Rest</td><td>No fill: the glyph alone, in either tone.</td></tr>
 <tr><td>Hovered</td><td>Default: the neutral subtle hovered fill. Inverse: <code>--ds-interaction-inverse-hovered</code>.</td></tr>
 <tr><td>Pressed</td><td>Default: the neutral subtle pressed fill. Inverse: <code>--ds-interaction-inverse-pressed</code>.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>; <code>--ds-border-focused-inverse</code> for the inverse tone.</td></tr>
@@ -119,22 +125,46 @@ removes one item from a set rather than closing a surface, use a plain
 
 ## Best practices
 
-### Write `label` for what closes, not a generic "close."
+### Sit top-right in its container.
+
+The close button anchors the top-right corner of the modal, panel or message it closes.
 
 <DoDontPair
-    doExample={<CloseButton label="Dismiss update" />}
-    doCaption="The label tells a screen reader what goes away."
-    dontExample={<CloseButton label="x" />}
-    dontCaption="A bare label says nothing about what closes."
+    doExample={<div style={surface}><span>Your session moved to 4 pm.</span><CloseButton label="Dismiss update" /></div>}
+    doCaption="Top-right of the message."
+    dontExample={<div style={surfaceStacked}><span>Your session moved to 4 pm.</span><CloseButton label="Dismiss update" /></div>}
+    dontCaption="Bottom-left, under the content."
 />
 
-"Close" fits a surface that blocks, like a Modal. For a message, name
-what's dismissed: "Dismiss update," "Dismiss warning" — so the accessible
-name tells a screen reader user what just went away.
+### Name what it closes.
+
+Use "Close" for a surface that blocks, like a Modal, and "Dismiss" plus what goes away for a message: "Dismiss update", "Dismiss warning". The × glyph is the same either way, so `label` is the only thing that tells a screen reader user what just went away.
 
 ```jsx
 <CloseButton label="Dismiss update" onClick={dismiss} />
 ```
+
+### Use inverse only on colored grounds.
+
+Inverse tone is for the declared colored and dark grounds. Neutral surfaces use default.
+
+<DoDontPair
+    doExample={<div style={surface}><span>Your session moved to 4 pm.</span><CloseButton label="Dismiss update" /></div>}
+    doCaption="Default tone on a neutral surface."
+    dontExample={<div style={surface}><span>Your session moved to 4 pm.</span><CloseButton tone="inverse" label="Dismiss update" /></div>}
+    dontCaption="Inverse tone on a neutral surface: the glyph disappears."
+/>
+
+### Close a whole surface, not one item.
+
+A close button dismisses the surface it sits on. To remove one item from a set, use an `IconButton` with its own icon and label.
+
+<DoDontPair
+    doExample={<div style={surface}><div style={surfaceList}><span>Maya Chen joined your group.</span><span>Sam Lee joined your group.</span></div><CloseButton label="Dismiss update" /></div>}
+    doCaption="One close button for the whole message."
+    dontExample={<div style={surface}><div style={surfaceList}><span style={itemRow}>Maya Chen joined your group.<CloseButton label="Dismiss Maya Chen" /></span><span style={itemRow}>Sam Lee joined your group.<CloseButton label="Dismiss Sam Lee" /></span></div></div>}
+    dontCaption="A close button on each item inside the message."
+/>
 
 ### There is no disabled state.
 

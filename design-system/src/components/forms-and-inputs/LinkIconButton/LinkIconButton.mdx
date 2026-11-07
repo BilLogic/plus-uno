@@ -145,10 +145,10 @@ Use a link icon button when an icon alone opens another page or site and space i
 <tr><th>Appearance</th><th>When to use</th></tr>
 </thead>
 <tbody>
-<tr><td>Default</td><td>Most icon buttons: an action with a clear, familiar glyph. Example: Edit page.</td></tr>
-<tr><td>Subtle</td><td>Icon buttons in toolbars, table rows and headers where it is already clear they are interactive. Example: More actions in a row.</td></tr>
-<tr><td>Primary</td><td>The main action of a small area when space allows no label. Use sparingly. Example: Send comment.</td></tr>
-<tr><td>Discovery</td><td>The call to action for a new experience. Example: Try the new view.</td></tr>
+<tr><td>Default</td><td>Most link icon buttons: a destination with a clear, familiar glyph. Example: Open Help Center.</td></tr>
+<tr><td>Subtle</td><td>Links in toolbars, table rows and headers where it is already clear they are interactive.</td></tr>
+<tr><td>Primary</td><td>The main way forward from a small area when space allows no label. Use sparingly.</td></tr>
+<tr><td>Discovery</td><td>The way into a new experience.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -181,8 +181,8 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 <tbody>
 <tr><td>Fill: default, subtle</td><td><code>--ds-background-neutral-subtle</code>, hovered and pressed steps. Default adds a 1px <code>--ds-border-input</code> edge.</td></tr>
 <tr><td>Fill: primary, discovery</td><td><code>--ds-background-brand-bold</code>, <code>--ds-background-discovery-bold</code>, each with hovered and pressed steps.</td></tr>
-<tr><td>Fill: selected, disabled</td><td><code>--ds-background-selected</code> with hovered and pressed steps; <code>--ds-background-disabled</code>.</td></tr>
-<tr><td>Icon</td><td><code>--ds-icon-subtle</code> (default, subtle), <code>--ds-icon-inverse</code> (primary, discovery); the selected and disabled roles. 16, <code>--icon-md</code>.</td></tr>
+<tr><td>Fill: selected</td><td><code>--ds-background-selected</code> with hovered and pressed steps.</td></tr>
+<tr><td>Icon</td><td><code>--ds-icon-subtle</code> (default, subtle), <code>--ds-icon-inverse</code> (primary, discovery); the selected role. 16, <code>--icon-md</code>.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
 <tr><td>Size</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>. Square.</td></tr>
 <tr><td>Radius</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>. Circle 50%.</td></tr>
@@ -195,14 +195,36 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 
 ## Best practices
 
-### Say where the link goes.
+### Keep space between link icon buttons.
+
+Leave a gap so neighboring link icon buttons read as separate targets.
 
 <DoDontPair
-    doExample={<LinkIconButton href="#help" icon="circle-question" label="Open Help Center" />}
-    doCaption="The label names the destination."
-    dontExample={<LinkIconButton href="#help" icon="circle-question" label="Help" />}
-    dontCaption="A bare noun does not say the link leaves the page."
+    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><LinkIconButton href="#help" icon="circle-question" label="Open Help Center" /><LinkIconButton href="#settings" icon="gear" label="Open settings" /><LinkIconButton href="#notifications" icon="bell" label="Open notifications" /></div>}
+    doCaption="A clear gap between link icon buttons."
+    dontExample={<div style={{ display: 'flex', gap: 0 }}><LinkIconButton href="#help" icon="circle-question" label="Open Help Center" /><LinkIconButton href="#settings" icon="gear" label="Open settings" /><LinkIconButton href="#notifications" icon="bell" label="Open notifications" /></div>}
+    dontCaption="Link icon buttons touching."
 />
+
+### Say where the link goes.
+
+The `label` is the accessible name and the tooltip. Name the destination:
+"Open Help Center", not "Link" or a bare "Help". The label is never drawn, so
+the difference shows only on hover, on focus and to a screen reader.
+
+```jsx
+// Incorrect: says nothing about the destination.
+<LinkIconButton href="/help" icon="circle-question" label="Link" />
+
+// Correct.
+<LinkIconButton href="/help" icon="circle-question" label="Open Help Center" />
+```
+
+### Keep it square.
+
+Link icon buttons stay 32 or 24 square, and round only in top navigation
+(`shape="circle"`). Link icon button has no prop to fill its container; never
+stretch one to fill a row.
 
 ### A link goes somewhere; a button does something.
 
@@ -210,7 +232,25 @@ If the icon acts on the current page, use Icon button. Navigation uses a link ic
 
 ### Pick a glyph people know.
 
-Use the glyph people already read as that destination, and do not reuse one glyph for several links in the same area.
+Use the glyph people already read as that destination.
+
+<DoDontPair
+    doExample={<LinkIconButton href="#help" icon="circle-question" label="Open Help Center" />}
+    doCaption="A question mark reads as help."
+    dontExample={<LinkIconButton href="#help" icon="star" label="Open Help Center" />}
+    dontCaption="A star does not read as the Help Center."
+/>
+
+### Give each destination its own glyph.
+
+Do not reuse one glyph for several links in the same area.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><LinkIconButton href="#help" icon="circle-question" label="Open Help Center" /><LinkIconButton href="#settings" icon="gear" label="Open settings" /></div>}
+    doCaption="Help Center and settings each have their own glyph."
+    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><LinkIconButton href="#help" icon="link" label="Open Help Center" /><LinkIconButton href="#settings" icon="link" label="Open settings" /></div>}
+    dontCaption="One link glyph for two destinations."
+/>
 
 </div>
 

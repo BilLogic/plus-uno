@@ -39,7 +39,6 @@ export default {
         size: {
             control: 'select',
             options: [10, 12, 14],
-            description: 'Radio control (dot) width in px. Unset keeps today\'s rendering. No effect on type="checkbox".',
             table: { category: 'Design' },
         },
         leadingText: { control: 'text', table: { category: 'Content' } },

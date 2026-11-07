@@ -129,11 +129,13 @@ Pick the size by the page. Use 16 where the page has many toggles, such as a set
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
+<tr><td>Rest</td><td>Off: <code>--ds-background-neutral-bold</code>. On: <code>--ds-background-selected-bold</code>.</td></tr>
 <tr><td>Hovered</td><td>Off: <code>--ds-background-neutral-bold-hovered</code>. On: <code>--ds-background-selected-bold-hovered</code>.</td></tr>
 <tr><td>Pressed</td><td>No step of its own. The hovered fill holds while the pointer is down.</td></tr>
 <tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code>, 2px off the track, for keyboard focus only.</td></tr>
 <tr><td>Disabled</td><td><code>--ds-background-disabled</code> track, <code>--ds-icon-disabled</code> thumb, in both positions. Out of the tab order.</td></tr>
 <tr><td>Read-only</td><td>Full contrast, in the tab order, not changeable.</td></tr>
+<tr><td>Loading</td><td>A spinner sits between the track and the label; input is ignored.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -158,13 +160,37 @@ Pick the size by the page. Use 16 where the page has many toggles, such as a set
 
 ## Best practices
 
-### The label names the setting, in both positions.
+### Label what turns on.
+
+The label names the setting, not the switch position. It stays the same whether the toggle is on or off.
 
 <DoDontPair
-    doExample={<div><Toggle label="Send reminders" defaultChecked /></div>}
-    doCaption="The label names the setting and stays the same whether the toggle is on or off."
-    dontExample={<div><Toggle label="Reminders are on" defaultChecked /></div>}
-    dontCaption="A label that changes with the state reads as a status, and a screen reader hears it twice."
+    doExample={<div><Toggle label="Session reminders" defaultChecked /></div>}
+    doCaption="The label names the setting."
+    dontExample={<div><Toggle label="On" defaultChecked /></div>}
+    dontCaption={'"On" says nothing about what is on.'}
+/>
+
+### Match the label to the state.
+
+The switch and its label never disagree. A label that reads as a state, such as "Reminders on", is wrong the moment the switch is off; a label that names the setting reads right in both positions.
+
+<DoDontPair
+    doExample={<div><Toggle label="Send reminders" /></div>}
+    doCaption="Off, and the label still reads right."
+    dontExample={<div><Toggle label="Reminders on" /></div>}
+    dontCaption="Off, but the label says on."
+/>
+
+### Disable instead of hiding.
+
+A disabled toggle tells people the setting exists but is unavailable. Say why next to it.
+
+<DoDontPair
+    doExample={<div><Toggle label="Share notes" isDisabled /></div>}
+    doCaption="Visible but disabled."
+    dontExample={<div><Toggle label="Share notes" /></div>}
+    dontCaption="Enabled, though switching it does nothing."
 />
 
 ### The change lands at once.
@@ -173,7 +199,7 @@ A toggle changes the setting as the person flips it. If the change needs confirm
 
 ### Read-only is not disabled.
 
-`isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast and ignores clicks. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now. Say why next to it.
+`isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast and ignores clicks. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now.
 
 ### Name and id.
 

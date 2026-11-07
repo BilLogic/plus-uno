@@ -33,17 +33,14 @@ export default {
         variant: {
             control: 'select',
             options: ['comments', 'numeric'],
-            description: 'Variant type: comments (label below) or numeric (labels above)',
             table: { category: 'Design' }
         },
         isDisabled: {
             control: 'boolean',
-            description: 'Disable the rating component',
             table: { category: 'Behavior' }
         },
         isRequired: {
             control: 'boolean',
-            description: 'Show required indicator',
             table: { category: 'Content' }
         },
         id: {

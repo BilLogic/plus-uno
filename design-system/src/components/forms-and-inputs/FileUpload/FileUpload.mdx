@@ -1,5 +1,5 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import { FileUpload } from '@/components';
 import * as FileUploadStories from './FileUpload.stories.jsx';
@@ -151,6 +151,43 @@ The button carries its own hovered and pressed steps; the container has none.
 
 ## Best practices
 
+### State the accepted types and the size limit.
+
+Say what the field takes before anyone chooses a file. Finding out from an error wastes an upload.
+
+<DoDontPair
+    doExample={<FileUpload label="Report" description="PDF or PNG, up to 10 MB." />}
+    doCaption="The types and the size limit are stated."
+    dontExample={<FileUpload label="Report" />}
+    dontCaption="No types and no limit."
+/>
+
+### Name the action, not the gesture.
+
+"Choose a file" works for a click, a tap or a keyboard. "Click here" fails on a phone.
+
+<DoDontPair
+    doExample={<FileUpload label="Report" description="PDF or PNG, up to 10 MB." buttonText="Choose a file" />}
+    doCaption="A verb and a noun: Choose a file."
+    dontExample={<FileUpload label="Report" description="PDF or PNG, up to 10 MB." buttonText="Click here" />}
+    dontCaption="A gesture: Click here."
+/>
+
+### Say why an upload failed and what to do.
+
+Name the cause and the fix in one sentence. A bare "Error" sends people back to the start.
+
+<DoDontPair
+    doExample={<FileUpload label="Report" description="PDF or PNG, up to 10 MB." validation="invalid" validationMessage="File is over 10 MB. Choose a smaller file." />}
+    doCaption="The message names the cause and the fix."
+    dontExample={<FileUpload label="Report" description="PDF or PNG, up to 10 MB." validation="invalid" validationMessage="Error" />}
+    dontCaption="No cause and no fix."
+/>
+
+### `accept` is a filter, not a check.
+
+The picker offers the listed types first and every platform lets the user override it. Validate the file after it arrives (type, size and count) and report it through `validation` and `validationMessage`.
+
 ### Nothing shows the chosen file. That is yours to render.
 
 ```jsx
@@ -173,17 +210,6 @@ The button carries its own hovered and pressed steps; the container has none.
 // Correct: put the qualification in the description, which is prose.
 <FileUpload label="Report" description="PDF, up to 10 MB." />
 ```
-
-### `accept` is a filter, not a check.
-
-The picker offers the listed types first and every platform lets the user override it. Validate the file after it arrives (type, size and count) and report it through `validation` and `validationMessage`.
-
-<DoDontPair
-    doExample={<FileUpload label="Report" acceptedFormats={['.pdf']} buttonText="Choose a file" validation="invalid" validationMessage="That file is not a PDF. Choose a .pdf file." />}
-    doCaption="Say what was wrong and what to choose instead."
-    dontExample={<FileUpload label="Report" acceptedFormats={['.pdf']} buttonText="Choose a file" validation="invalid" validationMessage="Error" />}
-    dontCaption="A bare error does not say what to change."
-/>
 
 </div>
 

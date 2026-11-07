@@ -36,6 +36,13 @@ export const figmaMeta = {
   ]
 };
 
+export const sessionRows = [{ id: 'monday', label: 'Monday' }, { id: 'tuesday', label: 'Tuesday' }];
+export const sessionColumns = [{ id: 'morning', label: 'Morning' }, { id: 'afternoon', label: 'Afternoon' }, { id: 'evening', label: 'Evening' }];
+export const toolRows = [{ id: 'maya', label: 'Maya' }, { id: 'sam', label: 'Sam' }];
+export const toolColumns = [{ id: 'zoom', label: 'Zoom' }, { id: 'slack', label: 'Slack' }, { id: 'docs', label: 'Docs' }];
+export const scaleRows = [{ id: 'punctuality', label: 'Punctuality' }, { id: 'preparation', label: 'Preparation' }];
+export const scaleColumns = [{ id: 'rarely', label: 'Rarely' }, { id: 'sometimes', label: 'Sometimes' }, { id: 'often', label: 'Often' }];
+
 <Meta of={ChoiceGridStories} />
 
 <Title />
@@ -142,8 +149,11 @@ It is fully controlled. `values` is `{ rowId: columnId }` in `radio` mode and `{
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Hovered, selected, focused</td><td>As the Radio or Checkbox in the cell: input hovered fill and brand edge, selected bold fill, 2px focus ring in <code>--ds-border-focused</code>.</td></tr>
+<tr><td>Rest</td><td>Each cell shows its Radio or Checkbox at rest, unselected.</td></tr>
+<tr><td>Hovered</td><td>As the Radio or Checkbox in the cell: the input hovered fill and a brand edge.</td></tr>
 <tr><td>Pressed</td><td>No step of its own. The hovered look holds while the pointer is down.</td></tr>
+<tr><td>Focused</td><td>As the control in the cell: a 2px ring in <code>--ds-border-focused</code>.</td></tr>
+<tr><td>Selected</td><td>As the control in the cell: the selected bold fill.</td></tr>
 <tr><td>Read-only</td><td>Full contrast, cells stay in the tab order with <code>aria-readonly</code>; changes are ignored.</td></tr>
 <tr><td>Disabled</td><td>Cells take the disabled fill and edge and leave the tab order; header text uses a solid muted token, not opacity.</td></tr>
 <tr><td>Invalid</td><td>Not drawn by the grid. Put the message above it and mark the question there.</td></tr>
@@ -196,10 +206,43 @@ Every cell is a control, so a six-by-five grid is thirty tab stops. Past that, a
 ### Give the grid a question above it.
 
 <DoDontPair
-    doExample={<div><p>How often did each happen?</p><ChoiceGrid id="do-grid" type="radio" rows={[{ id: 'a', label: 'Punctuality' }]} columns={[{ id: '1', label: 'Rarely' }, { id: '2', label: 'Often' }]} values={{ a: '2' }} onChange={() => {}} /></div>}
-    doCaption="A question above the grid, and the scale named in the column headers."
-    dontExample={<ChoiceGrid id="dont-grid" type="radio" rows={[{ id: 'a', label: 'Punctuality' }]} columns={[{ id: '1', label: '1' }, { id: '2', label: '2' }]} values={{ a: '2' }} onChange={() => {}} />}
-    dontCaption="Bare numbers with no question: the grid has no name of its own, so the scale means nothing."
+    doExample={<div><p>How often did each happen?</p><ChoiceGrid type="radio" rows={scaleRows} columns={scaleColumns} values={{ punctuality: 'often', preparation: 'sometimes' }} onChange={() => {}} /></div>}
+    doCaption="A question above the grid that every row answers."
+    dontExample={<div><ChoiceGrid type="radio" rows={scaleRows} columns={scaleColumns} values={{ punctuality: 'often', preparation: 'sometimes' }} onChange={() => {}} /></div>}
+    dontCaption="The same grid with no question: nothing says what the scale measures."
+/>
+
+### Radio grid for one answer per row.
+
+The control type tells people how many answers a row takes.
+
+<DoDontPair
+    doExample={<ChoiceGrid type="radio" rows={sessionRows} columns={sessionColumns} values={{ monday: 'morning', tuesday: 'evening' }} onChange={() => {}} />}
+    doCaption="Radios, for one preferred time each day."
+    dontExample={<ChoiceGrid type="checkbox" rows={sessionRows} columns={sessionColumns} values={{ monday: { morning: true }, tuesday: { evening: true } }} onChange={() => {}} />}
+    dontCaption="Checkboxes for the same single-answer rows."
+/>
+
+### Checkbox grid for several answers.
+
+Checkboxes signal that a row accepts more than one answer.
+
+<DoDontPair
+    doExample={<ChoiceGrid type="checkbox" rows={toolRows} columns={toolColumns} values={{ maya: { zoom: true, docs: true }, sam: { slack: true } }} onChange={() => {}} />}
+    doCaption="Checkboxes, for every tool each tutor uses."
+    dontExample={<ChoiceGrid type="radio" rows={toolRows} columns={toolColumns} values={{ maya: 'zoom', sam: 'slack' }} onChange={() => {}} />}
+    dontCaption="Radios, where several tools apply to a row."
+/>
+
+### Keep one size per grid.
+
+Mixed control sizes make a grid hard to scan. `size` is set per grid, so grids that sit together in one form share it too.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><ChoiceGrid type="radio" size={14} rows={sessionRows} columns={sessionColumns} values={{ monday: 'morning' }} onChange={() => {}} /><ChoiceGrid type="radio" size={14} rows={scaleRows} columns={scaleColumns} values={{ punctuality: 'often' }} onChange={() => {}} /></div>}
+    doCaption="Size 14 across both grids."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><ChoiceGrid type="radio" size={14} rows={sessionRows} columns={sessionColumns} values={{ monday: 'morning' }} onChange={() => {}} /><ChoiceGrid type="radio" size={12} rows={scaleRows} columns={scaleColumns} values={{ punctuality: 'often' }} onChange={() => {}} /></div>}
+    dontCaption="A size 12 grid under a size 14 one."
 />
 
 </div>
