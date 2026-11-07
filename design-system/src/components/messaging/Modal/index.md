@@ -9,7 +9,7 @@ Universal modal component for creating dialog windows that overlay the main cont
 
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Sizes, Heights, Options, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, TwoOverlayLimit, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, TwoOverlayLimit, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 

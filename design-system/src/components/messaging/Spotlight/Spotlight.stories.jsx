@@ -23,8 +23,8 @@ export default {
         onDismiss: { table: { disable: true } },
         isOpen: { table: { disable: true } },
         className: { table: { disable: true } },
-        primaryActionText: { control: 'text', table: { disable: true } },
-        secondaryActionText: { control: 'text', table: { disable: true } },
+        primaryActionText: { name: 'Primary action (demo)', control: 'text', table: { category: 'Demo' } },
+        secondaryActionText: { name: 'Secondary action (demo)', control: 'text', table: { category: 'Demo' } },
     },
 };
 
@@ -40,7 +40,7 @@ export const Basic = () => (
                 primaryAction={<SpotlightAction appearance="primary">Next</SpotlightAction>}
                 secondaryAction={<SpotlightAction appearance="secondary">Skip</SpotlightAction>}
             >
-                Click here whenever you want to start something new.
+                Start a new board from here.
             </Spotlight>
         </div>
     </SpotlightProvider>
@@ -105,17 +105,34 @@ export function Dismissible() {
     );
 }
 
+/* ----------------------------------------------------- one action per story */
+
+/** A SpotlightAction on the callout's brand bold ground, without opening a popup. */
+const actionStory = (appearance, label) => ({
+    render: () => (
+        <div style={{ display: 'inline-flex', padding: 'var(--space-150)', borderRadius: 'var(--radius-100)', background: 'var(--ds-background-brand-bold)' }}>
+            <SpotlightAction appearance={appearance}>{label}</SpotlightAction>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-spotlight-action')).toHaveClass(`plus-spotlight-action--${appearance}`);
+    },
+});
+
+export const PrimaryAction = actionStory('primary', 'Next');
+export const SecondaryAction = actionStory('secondary', 'Skip');
+
 /* --------------------------------------------------------------- playground */
 
 /**
  * Interactive playground. The actions are SpotlightAction nodes, which a docs
- * control cannot author, so their labels are demo-only args.
+ * control cannot author, so their labels are demo args in the Demo category.
  */
 export const Interactive = {
     args: {
         placement: 'bottom',
         headline: 'Playground: create a new board',
-        children: 'Click here whenever you want to start something new.',
+        children: 'Start a new board from here.',
         stepCount: '1 of 3',
         dismissible: true,
         primaryActionText: 'Next',
@@ -147,7 +164,7 @@ const StateSpotlight = ({ headline }) => (
                 primaryAction={<SpotlightAction appearance="primary">Next</SpotlightAction>}
                 secondaryAction={<SpotlightAction appearance="secondary">Skip</SpotlightAction>}
             >
-                Click here whenever you want to start something new.
+                Start a new board from here.
             </Spotlight>
         </div>
     </SpotlightProvider>

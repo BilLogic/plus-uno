@@ -40,7 +40,6 @@ export default {
         position: {
             control: 'select',
             options: ['top-start', 'top-end', 'bottom-start', 'bottom-end'],
-            description: 'Flag position (for container)',
             table: { category: 'Layout' }
         },
         title: {
@@ -72,37 +71,6 @@ export default {
         }
     }
 };
-
-function FlagVariantsDemos() {
-    return (
-        <FlagGroup className="p-3" containerPosition="static">
-            <Flag title="Normal flag" timestamp="Just now" autohide={false}>
-                A neutral update.
-            </Flag>
-            <Flag appearance="information" title="Information flag" timestamp="Just now" autohide={false}>
-                Something worth knowing.
-            </Flag>
-            <Flag appearance="success" title="Success flag" timestamp="2 mins ago" autohide={false}>
-                It worked.
-            </Flag>
-            <Flag appearance="warning" title="Warning flag" actions={[{ text: 'Review' }]}>
-                Check this before you go on.
-            </Flag>
-            <Flag appearance="error" title="Error flag" timestamp="10 mins ago" actions={[{ text: 'Retry' }, { text: 'Details' }]}>
-                It did not work.
-            </Flag>
-            <Flag appearance="success" bold title="Bold flag" autohide={false}>
-                Expanded to the bold fill.
-            </Flag>
-        </FlagGroup>
-    );
-}
-
-export const Styles = () => (
-    <div className="d-flex flex-column gap-3">
-        <FlagVariantsDemos />
-    </div>
-);
 
 export const Overview = () => (
     <FlagGroup className="p-3" containerPosition="static">

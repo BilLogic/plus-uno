@@ -9,7 +9,7 @@ The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16
 
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
-**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Styles, Overview, Normal, Information, Success, Warning, ErrorAppearance, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 

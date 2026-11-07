@@ -19,9 +19,9 @@ export const popupSurface = {
     boxShadow: 'var(--ds-shadow-overlay)',
 };
 
-{/* The trigger, closed, with its popup's content drawn statically below it, so a pair never opens a real popup over the docs page. */}
+{/* The trigger, closed, with its popup's content drawn statically below it. The preview is inert, so a pair never opens a real popup over the docs page and leaves nothing to tab to. */}
 export const OpenPreview = ({ appearance, label, title, children }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-sm)' }}>
+    <div inert aria-hidden="true" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-sm)' }}>
         <InlineMessage appearance={appearance} label={label} title={title}>{children}</InlineMessage>
         <div style={popupSurface}>
             <div className="plus-inline-message-content">
@@ -172,13 +172,14 @@ detail that most people will never need to open.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Trigger icon</td><td><code>--ds-icon-information</code>, <code>--ds-icon-warning</code>, <code>--ds-icon-danger</code>, <code>--ds-icon-success</code></td></tr>
+<tr><td>Trigger icon</td><td><code>--ds-icon-information</code>, <code>--ds-icon-warning</code>, <code>--ds-icon-danger</code>, <code>--ds-icon-success</code>, set on the icon in the jsx rather than the scss</td></tr>
 <tr><td>Title</td><td><code>--heading-small</code></td></tr>
 <tr><td>Secondary text</td><td><code>--body-default</code>, <code>--ds-text-subtle</code></td></tr>
 <tr><td>Spacing</td><td><code>--stack-sm</code></td></tr>
-<tr><td>Popup surface</td><td>Popup's own: <code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>, <code>--popover-radius</code>, <code>--popover-pad</code>, <code>--popover-width-sm</code></td></tr>
 </tbody>
 </DocsTable>
+
+The popup surface is Popup's; see `Popup`.
 
 </div>
 
@@ -214,9 +215,9 @@ It sits beside a field; long copy pushes the form around.
 Two messages on one field leave no clear next step.
 
 <DoDontPair
-    doExample={<div style={fieldRow}><span>Session length</span><InlineMessage appearance="info" label="About session length" title="Heads up">This setting applies to new sessions only.</InlineMessage></div>}
+    doExample={<div inert aria-hidden="true" style={fieldRow}><span>Session length</span><InlineMessage appearance="info" label="About session length" title="Heads up">This setting applies to new sessions only.</InlineMessage></div>}
     doCaption="A single message."
-    dontExample={<div style={fieldRow}><span>Session length</span><InlineMessage appearance="info" label="About session length" title="Heads up">This setting applies to new sessions only.</InlineMessage><InlineMessage appearance="warning" label="About availability" title="Limited availability">Only 2 slots left this week.</InlineMessage></div>}
+    dontExample={<div inert aria-hidden="true" style={fieldRow}><span>Session length</span><InlineMessage appearance="info" label="About session length" title="Heads up">This setting applies to new sessions only.</InlineMessage><InlineMessage appearance="warning" label="About availability" title="Limited availability">Only 2 slots left this week.</InlineMessage></div>}
     dontCaption="An info note and a warning together."
 />
 

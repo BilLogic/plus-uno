@@ -25,9 +25,9 @@ export const figmaMeta = {
   ]
 };
 
-{/* The callout's content drawn statically with its own classes and real SpotlightActions, so a pair never opens a real popup over the docs page. */}
+{/* The callout's content drawn statically with its own classes and real SpotlightActions, so a pair never opens a real popup over the docs page. The preview is inert: a picture, not a control. */}
 export const StaticSpotlight = ({ headline, children, stepCount, primaryAction, secondaryAction }) => (
-    <div className="plus-spotlight">
+    <div className="plus-spotlight" inert aria-hidden="true">
         <div className="plus-spotlight-header">
             <div className="plus-spotlight-dismiss">
                 <button type="button" className="plus-spotlight-dismiss-button" aria-label="Dismiss">
@@ -48,6 +48,8 @@ export const StaticSpotlight = ({ headline, children, stepCount, primaryAction, 
 );
 
 export const skip = <SpotlightAction appearance="secondary">Skip</SpotlightAction>;
+export const linkAction = <SpotlightAction appearance="secondary" href="#">Learn more</SpotlightAction>;
+
 export const gotIt = <SpotlightAction appearance="primary">Got it</SpotlightAction>;
 
 <Meta of={SpotlightStories} />
@@ -79,6 +81,10 @@ place without wiring a ref by hand.
 
 <ComponentExample of={SpotlightStories.WithMedia} title="With media" description="media adds an image or illustration above the body." />
 
+<ComponentExample of={SpotlightStories.PrimaryAction} title="Primary action" description="SpotlightAction appearance primary: the overlay surface on the brand ground." />
+
+<ComponentExample of={SpotlightStories.SecondaryAction} title="Secondary action" description="SpotlightAction appearance secondary: an inverse outline." />
+
 <ComponentExample of={SpotlightStories.LinkAction} title="Link action" description="A SpotlightAction with href renders as a link; without it, a button." />
 
 </div>
@@ -106,7 +112,7 @@ place without wiring a ref by hand.
     description={
         <>
             Use the table below to change props. The callout opens over the page, anchored to the{' '}
-            <strong className="text-foreground">Create</strong> button.
+            <strong className="text-foreground">Create</strong> button. The Demo rows set the action labels; they are not props.
         </>
     }
 />
@@ -210,14 +216,15 @@ One step alone has nothing to count.
     dontCaption="1 of 1 on a single tip."
 />
 
-### Make the second action secondary.
+### Make the secondary action a link.
 
-The primary action leads; the second one stays quiet.
+The primary action leads; the second one stays quiet. A `SpotlightAction` with
+`href` renders as a link.
 
 <DoDontPair
-    doExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAction={skip} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
-    doCaption="A quiet secondary action."
-    dontExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAction={<SpotlightAction appearance="primary">Skip</SpotlightAction>} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
+    doExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAction={linkAction} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
+    doCaption="Secondary action as a link."
+    dontExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAction={<SpotlightAction appearance="primary">Learn more</SpotlightAction>} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
     dontCaption="Two competing buttons."
 />
 
@@ -233,7 +240,7 @@ anchor comes from outside that tree.
         <Button text="Create" />
     </SpotlightTarget>
     <Spotlight headline="Create a new board" onDismiss={() => setSeen(true)}>
-        Click here whenever you want to start something new.
+        Start a new board from here.
     </Spotlight>
 </SpotlightProvider>
 ```

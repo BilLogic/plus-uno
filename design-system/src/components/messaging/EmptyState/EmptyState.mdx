@@ -42,9 +42,9 @@ line on what goes here, and the one action that fills it.
 
 ## Size and layout
 
-<ComponentExample of={EmptyStateStories.Default} title="Default" description="For a view or panel: the header on Heading/medium 20." />
+<ComponentExample of={EmptyStateStories.Default} title="Default" description="For a view or panel." />
 
-<ComponentExample of={EmptyStateStories.Compact} title="Compact" description="For a table body or a card: Heading/small 16 and a smaller picture." />
+<ComponentExample of={EmptyStateStories.Compact} title="Compact" description="For a table body or a card, with a smaller picture." />
 
 <ComponentExample of={EmptyStateStories.InATable} title="In a table" description="Passed to a Table's emptyState, it takes the body while the header row stays." />
 
@@ -181,7 +181,7 @@ Say what goes here and what to do, in a warm voice. Never apologize.
 <DoDontPair
     doExample={<EmptyState icon="user-group" header="No students yet" description="Add a student to start scheduling." primaryAction={<Button text="Add student" appearance="primary" />} secondaryAction={<Button text="Import a list" />} />}
     doCaption="What goes here and what to do."
-    dontExample={<EmptyState icon="user-group" header="No data" description="Nothing to show." primaryAction={<Button text="Add student" appearance="primary" />} secondaryAction={<Button text="Import a list" />} />}
+    dontExample={<EmptyState icon="user-group" header="No data" description="Nothing to show." />}
     dontCaption="A cold label with no way forward."
 />
 
@@ -192,8 +192,8 @@ The Table keeps its header row and the EmptyState takes the body.
 <DoDontPair
     doExample={<Table headers={['Student', 'Grade']} rows={[]} emptyState={<EmptyState spacing="compact" icon="user-group" header="No students yet" description="Add a student to see them here." />} />}
     doCaption="An EmptyState in the Table's emptyState."
-    dontExample={<Table headers={['Student', 'Grade']} rows={[]} emptyState="No students" />}
-    dontCaption="A bare string in the body."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}><Table headers={['Student', 'Grade']} rows={[]} /><EmptyState spacing="compact" icon="user-group" header="No students yet" description="Add a student to see them here." /></div>}
+    dontCaption="An EmptyState under a Table with an empty body."
 />
 
 </div>

@@ -88,19 +88,6 @@ const GROUND_TOKEN = {
 const sectionMessageCol = { display: 'flex', flexDirection: 'column', gap: '48px' };
 const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: '24px' };
 
-function SectionMessageVariantsDemos() {
-    return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALL STYLES (WITH TITLE, DISMISSIBLE)</span>
-            {['primary', 'secondary', 'success', 'danger', 'warning', 'info'].map(appearance => (
-                <SectionMessage key={appearance} appearance={appearance} title="Title" dismissible>
-                    You have a message here — come check it out!
-                </SectionMessage>
-            ))}
-        </div>
-    );
-}
-
 function SectionMessageContentDemos() {
     return (
         <div style={contentVariantCol}>
@@ -178,12 +165,6 @@ export const Success = appearanceStory('success', 'Goal reached', 'This student 
 export const Danger = appearanceStory('danger', 'Session could not be booked', 'The tutor is no longer available at this time.');
 export const Warning = appearanceStory('warning', 'Schedule is provisional', 'Dates may still change before the term starts.');
 export const Info = appearanceStory('info', 'Times are in your time zone', 'Tutors confirm times by Friday.');
-
-export const Styles = () => (
-    <div style={sectionMessageCol}>
-        <SectionMessageVariantsDemos />
-    </div>
-);
 
 export const Content = () => (
     <div style={sectionMessageCol}>

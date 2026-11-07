@@ -56,11 +56,13 @@ a confirmation, a short form, or a detail view the user closes and returns from.
 
 ## Size and layout
 
-<ComponentExample of={ModalStories.Width6Col} title="Width 6-col" description="Six columns of the screen grid plus the modal pad, for a confirmation. Drawn at the 1024 screen." />
+The width examples are drawn at the 1024 screen.
 
-<ComponentExample of={ModalStories.Width8Col} title="Width 8-col" description="Eight columns, for a short form. Drawn at the 1024 screen." />
+<ComponentExample of={ModalStories.Width6Col} title="Width 6-col" description="Six columns of the screen grid plus the modal pad, for a confirmation." />
 
-<ComponentExample of={ModalStories.Width10Col} title="Width 10-col" description="Ten columns, for a table or an editor. Drawn at the 1024 screen." />
+<ComponentExample of={ModalStories.Width8Col} title="Width 8-col" description="Eight columns, for a short form." />
+
+<ComponentExample of={ModalStories.Width10Col} title="Width 10-col" description="Ten columns, for a table or an editor." />
 
 <ComponentExample of={ModalStories.HeightHug} title="Height hug" description="The default grows with its content to the cap, then its body scrolls. Drawn against a 320 cap." />
 
@@ -288,8 +290,9 @@ and Back returns to the form without losing what was typed.
 
 - **Escape and backdrop click are on by default.** `keyboard` and `backdrop`
   both default to `true`. Turning either off leaves the header close button as
-  the only exit, so keep that button. The header, and its close button, is only
-  rendered when the modal has a title, description, header actions or footer.
+  the only exit, so keep that button. The header, and its close button, is
+  left out only when the modal has no `title`, no `description`, no
+  `headerActions` and `showBottomButtons` is false.
 - **The close button is labeled `Close modal`**, hard-coded. Its icon is
   `aria-hidden`. `showCloseButton={false}` removes it; keep Escape or a footer
   action as a way out.
@@ -304,9 +307,10 @@ and Back returns to the form without losing what was typed.
 - **Opening traps focus inside the dialog and closing returns it to the
   trigger.** Tab cycles within the dialog; a view change (the confirm view
   swapping in) moves focus into the dialog again.
-- **An inline confirmation of a destructive action turns off the Blanket
-  click**, so a stray click outside cannot destroy something by accident;
-  Close, Escape or the footer's Back still work.
+- **Turn off the Blanket click for an inline confirmation of a destructive
+  action.** Set `backdrop="static"` (or `false`) while the confirmation shows,
+  so a stray click outside cannot destroy something by accident; Close, Escape
+  or the footer's Back still work.
 - **Focus order is Close, then the content, then the secondary action, then
   the primary action.**
 - **`renderAs="inline"` is for docs previews only.** It draws the panel with no
