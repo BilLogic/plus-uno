@@ -66,6 +66,7 @@ test('deprecationOf reads the replacement when one is named, and only then', () 
   assert.deepEqual(deprecationOf('@deprecated use `spacing` instead'), { replacement: 'spacing' });
   assert.deepEqual(deprecationOf('@deprecated'), { replacement: null });
   assert.equal(deprecationOf('Deprecated sizes draw like medium'), null);
+  assert.deepEqual(deprecationOf('Deprecated: scrolls the body. Use `height` instead.'), { replacement: 'height' });
 });
 
 test('tokens: one record per name, tier and group from the section, first value kept', () => {
@@ -89,6 +90,11 @@ test('tokens: a name in two sections keeps the first section and is not duplicat
   ]);
   assert.equal(m.tokens.length, 1);
   assert.equal(m.tokens[0].group, 'A');
+});
+
+test('tokens: the component tier is accepted for when component tokens join the view', () => {
+  const m = buildTokensManifest([{ group: 'Button', tier: 'component', tokens: [{ name: '--button-radius', value: 'var(--radius-md)' }] }]);
+  assert.equal(m.tokens[0].tier, 'component');
 });
 
 test('tokens: an unknown tier is refused', () => {

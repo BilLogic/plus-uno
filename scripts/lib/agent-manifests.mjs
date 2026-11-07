@@ -17,15 +17,18 @@ export const TIERS = ['primitive', 'semantic', 'pattern', 'component'];
 const byName = (a, b) => (a.name < b.name ? -1 : a.name > b.name ? 1 : 0);
 
 /**
- * Read a deprecation out of a prop's description. Only the JSDoc tag counts:
- * prose that happens to say "deprecated" is not a machine-readable marker.
+ * Read a deprecation out of a prop's description. Two markers count: the
+ * JSDoc `@deprecated` tag, and a description that opens with "Deprecated:".
+ * Prose that only mentions the word elsewhere is not a marker.
  *
  * @param {string} description
  * @returns {{replacement: string|null} | null}
  */
 export function deprecationOf(description) {
-  if (!description || !/@deprecated\b/.test(description)) return null;
-  const named = description.match(/@deprecated\b[^`]*?\buse\s+`([^`]+)`/i);
+  if (!description) return null;
+  const marked = /@deprecated\b/.test(description) || /^\s*Deprecated:/.test(description);
+  if (!marked) return null;
+  const named = description.match(/\buse\s+`([^`]+)`/i);
   return { replacement: named ? named[1] : null };
 }
 

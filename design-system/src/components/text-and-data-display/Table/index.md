@@ -14,7 +14,7 @@ Standard table component for displaying tabular data, built from the shared `_Ta
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | — |
-| `headers` | arrayOf or string or shape or node or object | `[]` | — |
+| `headers` | arrayOf | `[]` | — |
 | `rows` | enum | `[]` | — |
 | `striped` | bool | `false` | — |
 | `hover` | bool | `true` | — |

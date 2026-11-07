@@ -104,7 +104,15 @@
           "type": "oneOf",
           "required": false,
           "default": "'generate'",
-          "values": null,
+          "values": [
+            "generate",
+            "ask",
+            "rewrite",
+            "summarize",
+            "plan",
+            "suggest",
+            "stop-generating"
+          ],
           "description": "Which action the icon stands for.",
           "deprecated": null
         },
@@ -466,7 +474,14 @@
           "type": "oneOf",
           "required": false,
           "default": "32",
-          "values": null,
+          "values": [
+            "16",
+            "24",
+            "32",
+            "40",
+            "96",
+            "128"
+          ],
           "description": "One size for the whole row; it overrides each avatar's own.",
           "deprecated": null
         },
@@ -475,7 +490,10 @@
           "type": "oneOf",
           "required": false,
           "default": "'circle'",
-          "values": null,
+          "values": [
+            "circle",
+            "square"
+          ],
           "description": "One shape for the whole row.",
           "deprecated": null
         },
@@ -530,7 +548,7 @@
         },
         {
           "name": "icon",
-          "type": "enum",
+          "type": "string or node or enum",
           "required": false,
           "default": null,
           "values": null,
@@ -1013,8 +1031,8 @@
         },
         {
           "name": "slides",
-          "type": "arrayOf or shape or string or node",
-          "required": false,
+          "type": "arrayOf",
+          "required": true,
           "default": "[]",
           "values": null,
           "description": null,
@@ -1204,7 +1222,7 @@
         },
         {
           "name": "value",
-          "type": "arrayOf or string or number",
+          "type": "arrayOf",
           "required": false,
           "default": "NO_PATH",
           "values": null,
@@ -1213,7 +1231,7 @@
         },
         {
           "name": "options",
-          "type": "arrayOf or string or shape or number or array or bool",
+          "type": "arrayOf",
           "required": false,
           "default": "[]",
           "values": null,
@@ -1537,8 +1555,8 @@
         },
         {
           "name": "rows",
-          "type": "arrayOf or shape or string or number or node",
-          "required": false,
+          "type": "arrayOf",
+          "required": true,
           "default": "[]",
           "values": null,
           "description": null,
@@ -1546,8 +1564,8 @@
         },
         {
           "name": "columns",
-          "type": "arrayOf or shape or string or number or node",
-          "required": false,
+          "type": "arrayOf",
+          "required": true,
           "default": "[]",
           "values": null,
           "description": null,
@@ -3695,7 +3713,20 @@
           "type": "oneOf",
           "required": false,
           "default": "'mastering-content'",
-          "values": null,
+          "values": [
+            "mastering-content",
+            "advocacy",
+            "technology",
+            "relationships",
+            "social-emotional",
+            "dot",
+            "approximately-equal",
+            "root",
+            "all",
+            "pi",
+            "equal",
+            "divider"
+          ],
           "description": "Which character. The first five are the SMART areas; the rest are math characters.",
           "deprecated": null
         },
@@ -4414,7 +4445,15 @@
           "type": "oneOf",
           "required": false,
           "default": null,
-          "values": null,
+          "values": [
+            "default",
+            "primary",
+            "subtle",
+            "warning",
+            "danger",
+            "discovery",
+            "ai"
+          ],
           "description": null,
           "deprecated": null
         },
@@ -4543,7 +4582,12 @@
           "type": "oneOf",
           "required": false,
           "default": null,
-          "values": null,
+          "values": [
+            "default",
+            "subtle",
+            "primary",
+            "discovery"
+          ],
           "description": null,
           "deprecated": null
         },
@@ -4564,7 +4608,10 @@
           "type": "oneOf",
           "required": false,
           "default": null,
-          "values": null,
+          "values": [
+            "default",
+            "circle"
+          ],
           "description": null,
           "deprecated": null
         },
@@ -4754,7 +4801,9 @@
             "scrollable"
           ],
           "description": "Deprecated: use height",
-          "deprecated": null
+          "deprecated": {
+            "replacement": "height"
+          }
         },
         {
           "name": "showBottomButtons",
@@ -4880,14 +4929,10 @@
         },
         {
           "name": "width",
-          "type": "enum",
+          "type": "enum or number or string",
           "required": false,
           "default": "'6-col'",
-          "values": [
-            "6-col",
-            "8-col",
-            "10-col"
-          ],
+          "values": null,
           "description": "6 · 8 · 10 columns of the screen grid plus the modal pad; a number is a fixed width",
           "deprecated": null
         },
@@ -5734,8 +5779,8 @@
       "props": [
         {
           "name": "starters",
-          "type": "arrayOf or shape or string or number",
-          "required": false,
+          "type": "arrayOf",
+          "required": true,
           "default": "[]",
           "values": null,
           "description": "What to offer: `id` for the key, `label` on the chip, `text` for the prompt it stands for.",
@@ -6010,8 +6055,8 @@
         },
         {
           "name": "options",
-          "type": "arrayOf or shape or node or bool or string",
-          "required": false,
+          "type": "arrayOf",
+          "required": true,
           "default": "[]",
           "values": null,
           "description": "The answers. A string is its own value and label. An object can add a `description` under the label, `isDisabled`, an `id`, and `reveal`: content shown under the option while it is chosen.",
@@ -7070,7 +7115,7 @@
         },
         {
           "name": "dependsOn",
-          "type": "shape or arrayOf or string",
+          "type": "shape",
           "required": false,
           "default": null,
           "values": null,
@@ -7350,7 +7395,18 @@
           "type": "oneOf",
           "required": false,
           "default": null,
-          "values": null,
+          "values": [
+            "rect",
+            "circle",
+            "text",
+            "status",
+            "status-spacious",
+            "count",
+            "tag",
+            "tag-person",
+            "tag-group",
+            "paragraph"
+          ],
           "description": "Every value of Figma's `preset`. `rect`, `circle` and `text` name a shape and resize freely, exactly as `shape` does. The rest are sized to a label (`status`, `status-spacious`, `count`, `tag`, `tag-person`), a loading TagGroup (`tag-group`) or three lines of text (`paragraph`), set shape, height and corners together, and win over them.",
           "deprecated": null
         },
@@ -7377,7 +7433,18 @@
           "type": "oneOf",
           "required": false,
           "default": null,
-          "values": null,
+          "values": [
+            "none",
+            "element-radius-sm",
+            "element-radius-md",
+            "element-radius-lg",
+            "element-radius-full",
+            "card-radius-sm",
+            "card-radius-md",
+            "section-radius-sm",
+            "section-radius-md",
+            "section-radius-lg"
+          ],
           "description": "A radius token name, such as `element-radius-md` or `card-radius-sm`. Ignored, with a warning, by presets, by `circle` (always round) and by several text `lines`, which keep the text bar's radius.",
           "deprecated": null
         },
@@ -7745,7 +7812,14 @@
           "type": "oneOf",
           "required": false,
           "default": null,
-          "values": null,
+          "values": [
+            "neutral",
+            "success",
+            "warning",
+            "danger",
+            "info",
+            "discovery"
+          ],
           "description": "The Count tag's appearance. Defaults to the Status tag's own.",
           "deprecated": null
         },
@@ -7889,7 +7963,7 @@
         },
         {
           "name": "headers",
-          "type": "arrayOf or string or shape or node or object",
+          "type": "arrayOf",
           "required": false,
           "default": "[]",
           "values": null,
@@ -8199,7 +8273,12 @@
           "type": "oneOf",
           "required": false,
           "default": "'plain'",
-          "values": null,
+          "values": [
+            "plain",
+            "person",
+            "agent",
+            "team"
+          ],
           "description": "What the tag names. `plain` leads with the swatch; `person` (round), `agent` (hexagon) and `team` (square) lead with a 16 avatar.",
           "deprecated": null
         },
@@ -8544,8 +8623,8 @@
         },
         {
           "name": "options",
-          "type": "arrayOf or string or shape or oneOf",
-          "required": false,
+          "type": "arrayOf",
+          "required": true,
           "default": "[]",
           "values": null,
           "description": "The options the list offers: strings, or objects with `value`, `label` (or `text`) and a Tag `color`. Required; the caller owns the list and adds what `onCreate` reports to it.",

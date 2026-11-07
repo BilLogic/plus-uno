@@ -114,7 +114,10 @@ Nothing here is authored, and nothing here explains a component.
 | \`tokens.json\` | the same token files as \`tokens.md\` | For a program: each token's tier, group and first declared value |
 
 The two JSON files are the machine copy of the facts above, for checkers and
-evals. Read the markdown; let scripts read the JSON.
+evals. Read the markdown; let scripts read the JSON. In \`components.json\`,
+\`props: null\` means the component's props were not parsed (it is implemented
+outside \`src/components/\`), and \`values: null\` means the prop is not held to a
+closed list; neither is a statement that nothing is accepted.
 
 For a component's props, variants and usage, read its Storybook MDX and
 \`*.stories.jsx\`. There is no second corpus: the 56 per-component skeletons that
