@@ -3,7 +3,7 @@ embodiment: all
 disclosure: reference
 summary: Every blueprint table and column as the database catalog describes it, and the tables only a service key reads — the schema section of blueprint.md, disclosed
 vendored_from: BilLogic/plus-uno-blueprint docs/agents/blueprint.md
-vendored_revision: db64d530db07
+vendored_revision: 941d52264f6e
 ---
 
 <!-- VENDORED from BilLogic/plus-uno-blueprint docs/agents/blueprint.md by agents/uno-bot/scripts/sync-blueprint-contract.mjs. Edit it there: this copy is overwritten by the sync, and `npm run check:contract` fails on drift. -->
@@ -21,32 +21,38 @@ its description are the same migration.
 ### `agent_messages`
 Transcript events of an agent session, ordered by seq. Payload mirrors the app's TranscriptEvent.
 
+Signed-in only: a signed-in session reads it and the anon key is refused.
+
 0 of 6 columns described.
 
 | Column | Meaning |
 |---|---|
-| `created_at` | — |
 | `id` | — |
+| `session_id` | — |
+| `seq` | — |
 | `kind` | — |
 | `payload` | — |
-| `seq` | — |
-| `session_id` | — |
+| `created_at` | — |
 
 ### `agent_sessions`
 One canvas-agent conversation. Ledger entries reference it via agentSessionId (client-side).
+
+Signed-in only: a signed-in session reads it and the anon key is refused.
 
 1 of 5 columns described.
 
 | Column | Meaning |
 |---|---|
-| `created_at` | — |
-| `created_by` | Who owns this conversation. NULL means the row predates ownership (2026-08-28); those are readable by service accounts only and no new row may be NULL. |
 | `id` | — |
 | `title` | — |
+| `created_at` | — |
 | `updated_at` | — |
+| `created_by` | Who owns this conversation. NULL means the row predates ownership (2026-08-28); those are readable by service accounts only and no new row may be NULL. |
 
 ### `audit_findings`
 Audit / whatif / import-sweep outputs. Written by skills (IDE service key or canvas authenticated agent); humans triage by status. Prefixed on 2026-08-30 because the bare word `findings` gave a reader no clue which process produces the rows; the CONCEPT is still a finding everywhere else.
+
+Signed-in only: a signed-in session reads it and the anon key is refused.
 
 6 of 15 columns described.
 
@@ -70,6 +76,8 @@ Audit / whatif / import-sweep outputs. Written by skills (IDE service key or can
 
 ### `authoring_changes`
 Append-only record of every authoring write. Audit-only: the in-memory stack in src/lib/authoringSession.ts is still the undo affordance, and nothing replays `revert` from here. A row with `deleted_kind` set is a deletion and carries the rows it destroyed; `public.trash` is the view over exactly those.
+
+Signed-in only: a signed-in session reads it and the anon key is refused.
 
 5 of 12 columns described.
 
@@ -152,6 +160,8 @@ Content at lane × step intersection, within one path.
 ### `evidence`
 Provenance rows for cells and proposition questions. A cell with zero rows is an ASSUMPTION (derived, never stored). Restricted SELECT: a note may hold interview content.
 
+Signed-in only: a signed-in session reads it and the anon key is refused.
+
 3 of 13 columns described.
 
 | Column | Meaning |
@@ -171,7 +181,9 @@ Provenance rows for cells and proposition questions. A cell with zero rows is an
 | `updated_at` | — |
 
 ### `evidence_counts`
-cell_id -> evidence row count. Public: powers the assumption lens without exposing evidence content.
+cell_id -> evidence row count, without content. For signed-in readers, like evidence itself: anon holds no SELECT on either.
+
+Signed-in only: a signed-in session reads it and the anon key is refused.
 
 0 of 2 columns described.
 
@@ -409,6 +421,8 @@ Deployment-level catalog of the tools, documents, channels and artifacts the ser
 
 ### `trash`
 The deletions in public.authoring_changes, in the shape the retired deleted_structure table had. A filter over the one log, so the recovery list cannot drift from the record of what happened.
+
+Signed-in only: a signed-in session reads it and the anon key is refused.
 
 0 of 7 columns described.
 
