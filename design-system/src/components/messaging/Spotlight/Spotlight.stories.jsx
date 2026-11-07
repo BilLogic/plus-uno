@@ -4,12 +4,28 @@ import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expect, waitFor } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import Button from '@/components/forms-and-inputs/Button';
-import Spotlight, { SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components/messaging/Spotlight';
+import Spotlight, { SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components/messaging/Spotlight';
 
 export default {
     title: 'Components/Messaging/Spotlight',
     component: Spotlight,
     tags: ['!dev', '!autodocs'],
+    argTypes: {
+        placement: { control: 'select', options: SPOTLIGHT_PLACEMENTS, table: { category: 'Layout' } },
+        headline: { control: 'text', table: { category: 'Content' } },
+        children: { control: 'text', table: { category: 'Content' } },
+        stepCount: { control: 'text', table: { category: 'Content' } },
+        dismissible: { control: 'boolean', table: { category: 'Behavior' } },
+        target: { table: { disable: true } },
+        media: { table: { disable: true } },
+        primaryAction: { table: { disable: true } },
+        secondaryAction: { table: { disable: true } },
+        onDismiss: { table: { disable: true } },
+        isOpen: { table: { disable: true } },
+        className: { table: { disable: true } },
+        primaryActionText: { name: 'Primary action (demo)', control: 'text', table: { category: 'Demo' } },
+        secondaryActionText: { name: 'Secondary action (demo)', control: 'text', table: { category: 'Demo' } },
+    },
 };
 
 export const Basic = () => (
@@ -24,7 +40,7 @@ export const Basic = () => (
                 primaryAction={<SpotlightAction appearance="primary">Next</SpotlightAction>}
                 secondaryAction={<SpotlightAction appearance="secondary">Skip</SpotlightAction>}
             >
-                Click here whenever you want to start something new.
+                Start a new board from here.
             </Spotlight>
         </div>
     </SpotlightProvider>
@@ -89,6 +105,53 @@ export function Dismissible() {
     );
 }
 
+/* ----------------------------------------------------- one action per story */
+
+/** A SpotlightAction on the callout's brand bold ground, without opening a popup. */
+const actionStory = (appearance, label) => ({
+    render: () => (
+        <div style={{ display: 'inline-flex', padding: 'var(--space-150)', borderRadius: 'var(--radius-100)', background: 'var(--ds-background-brand-bold)' }}>
+            <SpotlightAction appearance={appearance}>{label}</SpotlightAction>
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-spotlight-action')).toHaveClass(`plus-spotlight-action--${appearance}`);
+    },
+});
+
+export const PrimaryAction = actionStory('primary', 'Next');
+export const SecondaryAction = actionStory('secondary', 'Skip');
+
+/* --------------------------------------------------------------- playground */
+
+/**
+ * Interactive playground. The actions are SpotlightAction nodes, which a docs
+ * control cannot author, so their labels are demo args in the Demo category.
+ */
+export const Interactive = {
+    args: {
+        placement: 'bottom',
+        headline: 'Playground: create a new board',
+        children: 'Start a new board from here.',
+        stepCount: '1 of 3',
+        dismissible: true,
+        primaryActionText: 'Next',
+        secondaryActionText: 'Skip',
+    },
+    render: ({ primaryActionText, secondaryActionText, ...args }) => (
+        <SpotlightProvider>
+            <div style={{ padding: 'var(--space-400)' }}>
+                <SpotlightTarget><Button text="Create" /></SpotlightTarget>
+                <Spotlight
+                    {...args}
+                    primaryAction={<SpotlightAction appearance="primary">{primaryActionText}</SpotlightAction>}
+                    secondaryAction={secondaryActionText ? <SpotlightAction appearance="secondary">{secondaryActionText}</SpotlightAction> : undefined}
+                />
+            </div>
+        </SpotlightProvider>
+    ),
+};
+
 /* ------------------------------------------------------------------- states */
 
 const StateSpotlight = ({ headline }) => (
@@ -101,7 +164,7 @@ const StateSpotlight = ({ headline }) => (
                 primaryAction={<SpotlightAction appearance="primary">Next</SpotlightAction>}
                 secondaryAction={<SpotlightAction appearance="secondary">Skip</SpotlightAction>}
             >
-                Click here whenever you want to start something new.
+                Start a new board from here.
             </Spotlight>
         </div>
     </SpotlightProvider>

@@ -9,7 +9,7 @@ Universal modal component for creating dialog windows that overlay the main cont
 
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Sizes, Heights, Options, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, TwoOverlayLimit, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, TwoOverlayLimit, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
 
@@ -22,8 +22,8 @@ Universal modal component for creating dialog windows that overlay the main cont
 | `description` | node | — | A line under the title, read as the dialog's description. |
 | `ariaLabel` | string | — | The dialog's accessible name when it has no visible `title`. |
 | `body` | string or node | — | The main content of the dialog. A string is drawn as body text; a node is drawn as given. `children` is rendered after it. |
-| `height` | enum | `'hug'` | Hug grows to the screen less 128, then scrolls its body; Fill sits at that cap |
-| `showBottomButtons` | bool | `true` | Show bottom buttons |
+| `height` | enum | `'hug'` | `hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap. |
+| `showBottomButtons` | bool | `true` | Show the footer: `footer`, or the secondary and primary buttons. |
 | `showCloseButton` | bool | `true` | The header's close button. Off for a dialog that has to be answered. |
 | `headerActions` | node | — | Icon buttons in the header, before the close button. |
 | `footer` | node | — | Custom footer actions in place of the two buttons, aligned right. |
@@ -36,7 +36,7 @@ Universal modal component for creating dialog windows that overlay the main cont
 | `primaryButton` | buttonShape | — | The confirming footer button, drawn on the right. Takes `text` (default "Confirm"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`. |
 | `secondaryButton` | buttonShape | — | The cancelling footer button, drawn left of the primary one. Takes `text` (default "Cancel"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. |
 | `onClose` | func | — | Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `backdrop` blocks it). The parent sets `show` to false. |
-| `width` | enum or number or string | `'6-col'` | 6 · 8 · 10 columns of the screen grid plus the modal pad; a number is a fixed width |
+| `width` | enum or number or string | `'6-col'` | `6-col` · `8-col` · `10-col`: 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept for the callers that still pass one. |
 | `className` | string | `''` | Extra class names added to the dialog panel beside the component's own. |
 | `style` | object | — | Inline styles for the dialog panel. A fixed `width` is applied after them. |
 | `children` | node | — | More content rendered in the body after `body`, for composing the dialog contents directly. |

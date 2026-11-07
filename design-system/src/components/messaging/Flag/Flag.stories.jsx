@@ -31,18 +31,15 @@ export default {
         appearance: {
             control: 'select',
             options: FLAG_APPEARANCES,
-            description: 'Normal, information, warning, error or success',
             table: { category: 'Design' }
         },
         bold: {
             control: 'boolean',
-            description: 'Expand to the appearance\'s bold fill',
             table: { category: 'Design' }
         },
         position: {
             control: 'select',
             options: ['top-start', 'top-end', 'bottom-start', 'bottom-end'],
-            description: 'Flag position (for container)',
             table: { category: 'Layout' }
         },
         title: {
@@ -75,37 +72,6 @@ export default {
     }
 };
 
-function FlagVariantsDemos() {
-    return (
-        <FlagGroup className="p-3" containerPosition="static">
-            <Flag title="Normal flag" timestamp="Just now" autohide={false}>
-                A neutral update.
-            </Flag>
-            <Flag appearance="information" title="Information flag" timestamp="Just now" autohide={false}>
-                Something worth knowing.
-            </Flag>
-            <Flag appearance="success" title="Success flag" timestamp="2 mins ago" autohide={false}>
-                It worked.
-            </Flag>
-            <Flag appearance="warning" title="Warning flag" actions={[{ text: 'Review' }]}>
-                Check this before you go on.
-            </Flag>
-            <Flag appearance="error" title="Error flag" timestamp="10 mins ago" actions={[{ text: 'Retry' }, { text: 'Details' }]}>
-                It did not work.
-            </Flag>
-            <Flag appearance="success" bold title="Bold flag" autohide={false}>
-                Expanded to the bold fill.
-            </Flag>
-        </FlagGroup>
-    );
-}
-
-export const Styles = () => (
-    <div className="d-flex flex-column gap-3">
-        <FlagVariantsDemos />
-    </div>
-);
-
 export const Overview = () => (
     <FlagGroup className="p-3" containerPosition="static">
         <Flag title="Normal flag" timestamp="Just now" autohide={false}>
@@ -118,6 +84,30 @@ Overview.parameters = {
         source: { language: 'jsx', code: webAppSourceSnippets.flag }
     }
 };
+
+/** One appearance per story, for the docs page's Appearance section. */
+const appearanceStory = (appearance, title, message, props = {}) => {
+    const story = () => (
+        <FlagGroup containerPosition="static">
+            <Flag appearance={appearance} title={title} timestamp="Just now" autohide={false} {...props}>
+                {message}
+            </Flag>
+        </FlagGroup>
+    );
+    story.play = async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-flag')).toHaveClass(`plus-flag--${appearance}`);
+    };
+    return story;
+};
+
+export const Normal = appearanceStory('normal', 'Notes copied', 'The session notes are on your clipboard.');
+export const Information = appearanceStory('information', 'Schedule updated', 'Your Monday sessions now start at 4:00 PM.');
+export const Success = appearanceStory('success', 'Plan saved', 'Your session plan is saved for Monday.');
+export const Warning = appearanceStory('warning', 'Connection is slow', 'Some changes may take longer to save.', { actions: [{ text: 'Retry' }] });
+/** Named so the export does not shadow the global `Error`. */
+export const ErrorAppearance = appearanceStory('error', 'Upload failed', 'The file was larger than 10 MB.', { actions: [{ text: 'Try again' }] });
+ErrorAppearance.storyName = 'Error';
+export const Bold = appearanceStory('success', 'Plan saved', 'Your session plan is saved for Monday.', { bold: true, defaultExpanded: true });
 
 const FlagInteractiveWrapper = ({ appearance, bold, position, title, children, show, autohide, delay }) => {
     const [isOpen, setIsOpen] = useState(show);

@@ -1,8 +1,40 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as InlineMessageStories from './InlineMessage.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { InlineMessage } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const popupSurface = {
+    width: 'var(--popover-width-sm)',
+    padding: 'var(--popover-pad)',
+    backgroundColor: 'var(--ds-surface-overlay)',
+    borderRadius: 'var(--popover-radius)',
+    boxShadow: 'var(--ds-shadow-overlay)',
+};
+
+{/* The trigger, closed, with its popup's content drawn statically below it. The preview is inert, so a pair never opens a real popup over the docs page and leaves nothing to tab to. */}
+export const OpenPreview = ({ appearance, label, title, children }) => (
+    <div inert aria-hidden="true" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 'var(--stack-sm)' }}>
+        <InlineMessage appearance={appearance} label={label} title={title}>{children}</InlineMessage>
+        <div style={popupSurface}>
+            <div className="plus-inline-message-content">
+                <div className="plus-inline-message-heading">
+                    <strong className="plus-inline-message-title">{title}</strong>
+                </div>
+                {children}
+            </div>
+        </div>
+    </div>
+);
+
+export const fieldRow = { display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' };
 
 <Meta of={InlineMessageStories} />
 
@@ -15,6 +47,7 @@ secondary note out of the page's reading order until someone asks for it.
 <DocsTab tab="examples">
 
 <ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-4147"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/InlineMessage"
 />
 
@@ -22,31 +55,23 @@ secondary note out of the page's reading order until someone asks for it.
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>Click the icon to open the popup.</>}>
-    <Canvas of={InlineMessageStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Appearance
 
-<DocsCanvasShell description={<>`info`, `warning`, `danger` and `success` set the trigger icon and its color. The popup's content stays the same style in every appearance.</>}>
-    <DsCanvasQuiet of={InlineMessageStories.Appearances} />
-</DocsCanvasShell>
+<ComponentExample of={InlineMessageStories.Info} title="Info" description="The default, for a neutral explanation. Press the icon to open the popup." />
+
+<ComponentExample of={InlineMessageStories.Warning} title="Warning" description="A note that is cautionary, with the warning icon." />
+
+<ComponentExample of={InlineMessageStories.Danger} title="Danger" description="A note about something that is blocked or failed, with the danger icon." />
+
+<ComponentExample of={InlineMessageStories.Success} title="Success" description="A note that confirms something, with the success icon." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Content
+## Behavior
 
-<DocsCanvasShell description={<>`secondaryText` adds a second line under the title, for a short follow-up like what to try instead.</>}>
-    <DsCanvasQuiet of={InlineMessageStories.WithSecondaryText} />
-</DocsCanvasShell>
+<ComponentExample of={InlineMessageStories.WithSecondaryText} title="Secondary text" description="secondaryText adds a second line under the title, such as what to try instead." />
 
 </div>
 
@@ -54,21 +79,13 @@ secondary note out of the page's reading order until someone asks for it.
 
 ## State
 
-<DocsCanvasShell description={<>An icon trigger named by its label, popup closed.</>}>
-    <DsCanvasQuiet of={InlineMessageStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={InlineMessageStories.Rest} title="Rest" description="An icon trigger named by its label, popup closed." />
 
-<DocsCanvasShell description={<>The trigger takes the subtle hovered fill.</>}>
-    <DsCanvasQuiet of={InlineMessageStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={InlineMessageStories.Hovered} title="Hovered" description="The trigger takes the subtle hovered fill." />
 
-<DocsCanvasShell description={<>The trigger takes the subtle pressed fill.</>}>
-    <DsCanvasQuiet of={InlineMessageStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={InlineMessageStories.Pressed} title="Pressed" description="The trigger takes the subtle pressed fill." />
 
-<DocsCanvasShell description={<>The 2px ring, 2px off the trigger; Enter opens the popup.</>}>
-    <DsCanvasQuiet of={InlineMessageStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={InlineMessageStories.Focused} title="Focused" description="The 2px ring, 2px off the trigger; Enter opens the popup." />
 
 </div>
 
@@ -101,13 +118,27 @@ secondary note out of the page's reading order until someone asks for it.
 ## Usage
 
 Use `InlineMessage` for a note that explains or qualifies something right
-beside it — why a field is required, what a score means — without taking up
-space until someone asks. It is built on `Popup`, so placement, dismissal and
-focus return are shared with every other popup in the system.
+beside it, such as why a field is required or what a score means, without
+taking up space until someone asks. It is built on `Popup`, so placement,
+dismissal and focus return are shared with every other popup in the system.
 
 For a message that belongs to a whole page or section and should always be
 visible, use `Banner` or `SectionMessage` instead. `InlineMessage` is for
 detail that most people will never need to open.
+
+### Appearance guidance
+
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Info</td><td>The default, for a neutral explanation.</td></tr>
+<tr><td>Warning</td><td>The note is cautionary: say what happens if they proceed.</td></tr>
+<tr><td>Danger</td><td>The note explains something that failed or is blocked.</td></tr>
+<tr><td>Success</td><td>The note confirms an outcome.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -115,7 +146,7 @@ detail that most people will never need to open.
 
 ## Parts
 
-1. **Trigger.** An icon button in the appearance color, named by <code>label</code>.
+1. **Trigger.** A subtle, compact icon button in the appearance color, named by <code>label</code>.
 2. **Popup.** Opens on press with a title, optional secondary line and body.
 
 ### States
@@ -129,6 +160,7 @@ detail that most people will never need to open.
 <tr><td>Hovered</td><td>The subtle neutral fill behind the icon button.</td></tr>
 <tr><td>Pressed</td><td>A stronger neutral fill.</td></tr>
 <tr><td>Focused</td><td>The 2px ring, 2px off the trigger, for keyboard focus only.</td></tr>
+<tr><td>Disabled</td><td>Not supported.</td></tr>
 <tr><td>Open</td><td>The Popup is shown with its own fill, shadow and radius.</td></tr>
 </tbody>
 </DocsTable>
@@ -140,12 +172,14 @@ detail that most people will never need to open.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Trigger</td><td><code>--ds-icon-information</code>, <code>--ds-icon-warning</code>, <code>--ds-icon-danger</code>, <code>--ds-icon-success</code></td></tr>
+<tr><td>Trigger icon</td><td><code>--ds-icon-information</code>, <code>--ds-icon-warning</code>, <code>--ds-icon-danger</code>, <code>--ds-icon-success</code>, set on the icon in the jsx rather than the scss</td></tr>
 <tr><td>Title</td><td><code>--heading-small</code></td></tr>
 <tr><td>Secondary text</td><td><code>--body-default</code>, <code>--ds-text-subtle</code></td></tr>
 <tr><td>Spacing</td><td><code>--stack-sm</code></td></tr>
 </tbody>
 </DocsTable>
+
+The popup surface is Popup's; see `Popup`.
 
 </div>
 
@@ -153,23 +187,45 @@ detail that most people will never need to open.
 
 ## Best practices
 
-### `label` is the only visible text before the popup opens.
+### Match the tint to the meaning.
+
+Info for a neutral note; danger only when something failed. The icon is a
+second cue, not a style choice.
+
+<DoDontPair
+    doExample={<OpenPreview appearance="info" label="About this setting" title="Heads up">This setting applies to new sessions only.</OpenPreview>}
+    doCaption="Info for a neutral note."
+    dontExample={<OpenPreview appearance="danger" label="About this setting" title="Heads up">This setting applies to new sessions only.</OpenPreview>}
+    dontCaption="Danger for a neutral note."
+/>
+
+### Keep it to one short line.
+
+It sits beside a field; long copy pushes the form around.
+
+<DoDontPair
+    doExample={<OpenPreview appearance="warning" label="About availability" title="Limited availability">Only 2 slots left this week.</OpenPreview>}
+    doCaption="One short sentence."
+    dontExample={<OpenPreview appearance="warning" label="About availability" title="Limited availability">Only 2 slots left this week. Slots open each Monday for the following week, and a slot is held for ten minutes while you book, so the count can change while this page is open.</OpenPreview>}
+    dontCaption="A paragraph beside a field."
+/>
+
+### Show one message per field.
+
+Two messages on one field leave no clear next step.
+
+<DoDontPair
+    doExample={<div inert aria-hidden="true" style={fieldRow}><span>Session length</span><InlineMessage appearance="info" label="About session length" title="Heads up">This setting applies to new sessions only.</InlineMessage></div>}
+    doCaption="A single message."
+    dontExample={<div inert aria-hidden="true" style={fieldRow}><span>Session length</span><InlineMessage appearance="info" label="About session length" title="Heads up">This setting applies to new sessions only.</InlineMessage><InlineMessage appearance="warning" label="About availability" title="Limited availability">Only 2 slots left this week.</InlineMessage></div>}
+    dontCaption="An info note and a warning together."
+/>
+
+### Write the label as the question the popup answers.
 
 The trigger is an icon button with no text of its own, so `label` carries its
-accessible name and its tooltip. Write it as the question the popup answers,
-not as "info" or "more."
-
-### Pick the appearance for what the note says, not for decoration.
-
-`info` is the default for a neutral explanation. Use `warning`, `danger` or
-`success` only when the note itself is cautionary, blocking or confirming
-something — the icon is a second cue, not a style choice.
-
-```jsx
-<InlineMessage label="Why this field is required" title="Required for billing">
-    Your institution uses this to route invoices.
-</InlineMessage>
-```
+accessible name and its tooltip. Write "Why this field is required", not
+"info" or "more".
 
 </div>
 

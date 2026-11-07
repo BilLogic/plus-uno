@@ -591,7 +591,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Font Awesome Free solid glyph name, a node, or `false` to remove it",
+          "description": "A Font Awesome Free solid glyph name or a node. `false` removes the appearance's default icon.",
           "deprecated": null
         },
         {
@@ -3265,7 +3265,7 @@
             "error",
             "success"
           ],
-          "description": "Normal, information, warning, error or success",
+          "description": "`normal` (default), `information`, `warning`, `error` or `success`.",
           "deprecated": null
         },
         {
@@ -3301,7 +3301,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Expand to the appearance\\'s bold fill",
+          "description": "The appearance's bold fill. A bold flag starts collapsed to its title, with a toggle that expands the description and actions.",
           "deprecated": null
         },
         {
@@ -4278,7 +4278,7 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": "Accessible name and tooltip of the trigger",
+          "description": "The trigger icon's accessible name and tooltip. Required: it is the only visible part before the popup opens.",
           "deprecated": null
         },
         {
@@ -4827,7 +4827,7 @@
             "hug",
             "fill"
           ],
-          "description": "Hug grows to the screen less 128, then scrolls its body; Fill sits at that cap",
+          "description": "`hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap.",
           "deprecated": null
         },
         {
@@ -4836,7 +4836,7 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": "Show bottom buttons",
+          "description": "Show the footer: `footer`, or the secondary and primary buttons.",
           "deprecated": null
         },
         {
@@ -4958,7 +4958,7 @@
           "required": false,
           "default": "'6-col'",
           "values": null,
-          "description": "6 · 8 · 10 columns of the screen grid plus the modal pad; a number is a fixed width",
+          "description": "`6-col` · `8-col` · `10-col`: 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept for the callers that still pass one.",
           "deprecated": null
         },
         {
@@ -6762,7 +6762,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Optional message title/heading",
+          "description": "Optional title/heading for the message",
           "deprecated": null
         },
         {
@@ -6796,7 +6796,7 @@
           "required": false,
           "default": "true",
           "values": null,
-          "description": "The leading icon: `true` for the style's default, a Font Awesome solid name or a node to replace it, `false` to remove it",
+          "description": "Leading icon on the first line: `true` for the style's default, a Font Awesome solid name or a node to replace it, `false` to remove it. Always decorative.",
           "deprecated": null
         },
         {
