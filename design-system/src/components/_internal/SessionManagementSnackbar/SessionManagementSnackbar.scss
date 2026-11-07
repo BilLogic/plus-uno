@@ -58,9 +58,10 @@
         gap: var(--stack-md);
     }
 
+    // The header's own color at full strength: on the bold grounds any
+    // dimming drops it under 4.5:1. The smaller type carries the hierarchy.
     &__timestamp {
         font: var(--body-small);
-        opacity: 0.8;
     }
 
     &__close {

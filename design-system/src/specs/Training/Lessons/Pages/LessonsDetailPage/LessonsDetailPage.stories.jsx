@@ -6,6 +6,7 @@
  */
 
 import React, { useState } from 'react';
+import { Select } from '@/components';
 import LessonsDetailPage from './LessonsDetailPage';
 import ResponsiveFrame from '@/specs/Universal/ResponsiveFrame';
 import './LessonsDetailPage.scss';
@@ -165,6 +166,14 @@ export const P5 = {
     }
 };
 
+const VARIANT_OPTIONS = [
+    { value: 'P1', label: 'P1 - Intro/Content with Ratings' },
+    { value: 'P2', label: 'P2 - Research Says' },
+    { value: 'P3', label: 'P3 - Conclusion & Feedback' },
+    { value: 'P4', label: 'P4 - Scenario/Assessment' },
+    { value: 'P5', label: 'P5 - Congratulations' },
+];
+
 /**
  * Interactive - Variant selector with controls
  */
@@ -192,30 +201,18 @@ export const Interactive = {
         return (
             <div>
                 <div style={{
-                    padding: '16px',
+                    padding: 'var(--space-100)',
                     backgroundColor: 'var(--ds-surface-container)',
-                    marginBottom: '16px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px'
+                    marginBottom: 'var(--space-100)',
                 }}>
-                    <label className="body2-txt">Variant:</label>
-                    <select
+                    <Select
+                        label="Variant"
+                        spacing="compact"
+                        clearable={false}
+                        options={VARIANT_OPTIONS}
                         value={variant}
-                        onChange={(e) => setVariant(e.target.value)}
-                        style={{
-                            padding: '8px 12px',
-                            borderRadius: '4px',
-                            border: '1px solid var(--color-outline-variant)',
-                            fontSize: '14px'
-                        }}
-                    >
-                        <option value="P1">P1 - Intro/Content with Ratings</option>
-                        <option value="P2">P2 - Research Says</option>
-                        <option value="P3">P3 - Conclusion & Feedback</option>
-                        <option value="P4">P4 - Scenario/Assessment</option>
-                        <option value="P5">P5 - Congratulations</option>
-                    </select>
+                        onChange={setVariant}
+                    />
                 </div>
                 <LessonsDetailPage
                     variant={variant}

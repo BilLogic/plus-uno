@@ -7,8 +7,8 @@
     "prototypes"
   ],
   "totals": {
-    "names": 52,
-    "uses": 198,
+    "names": 51,
+    "uses": 196,
     "bare": 5
   },
   "tokens": {
@@ -100,10 +100,6 @@
       "uses": 6,
       "bare": 0
     },
-    "--size-element-radius-pill": {
-      "uses": 1,
-      "bare": 0
-    },
     "--size-modal-min-height-md": {
       "uses": 1,
       "bare": 1
@@ -125,7 +121,7 @@
       "bare": 1
     },
     "--size-section-gap-xl": {
-      "uses": 17,
+      "uses": 16,
       "bare": 0
     },
     "--size-small-gap-xs": {

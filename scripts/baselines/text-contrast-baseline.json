@@ -36,11 +36,6 @@
       "ratio": 1.62,
       "why": "EXEMPT — INACTIVE table sort arrow. See the SessionBreakdownTable entry."
     },
-    "design-system/src/specs/Home/Cards/ResourceCard/ResourceCard.scss|--color-outline|--color-surface": {
-      "count": 1,
-      "ratio": 4.26,
-      "why": "LIVE — 4.26:1 on a `span` of real text, the closest miss in the corpus. --color-outline is a BORDER token being used as a text color; --color-on-surface-variant (8.93:1) is what the rest of the system uses for subtle text. Not fixed here only because it is a visible change to a shipped card and belongs with the wider `-text` sweep, not with the seven warning fixes."
-    },
     "design-system/src/specs/Home/Sections/StudentsOverviewSection/StudentsOverviewSection.scss|--color-outline-variant|--color-surface": {
       "count": 1,
       "ratio": 1.62,

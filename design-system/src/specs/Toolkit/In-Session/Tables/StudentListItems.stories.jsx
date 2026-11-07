@@ -304,10 +304,7 @@ export const ListItemRow = ({
                 ) : (
                     <span
                         className="body3-txt"
-                        style={{
-                            color: 'var(--ds-text)',
-                            opacity: 0.38,
-                        }}
+                        style={{ color: 'var(--ds-text-subtlest)' }}
                     >
                         No Insights Available
                     </span>

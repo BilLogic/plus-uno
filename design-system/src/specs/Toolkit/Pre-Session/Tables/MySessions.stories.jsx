@@ -46,8 +46,13 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
         focus: {
             border: 'var(--stroke-2) solid var(--ds-border-focused)'
         },
-        disabled: { opacity: 0.5, pointerEvents: 'none' }
+        // Disabled is a color, not an opacity: the text takes the disabled
+        // token and the row says it is disabled, so it reads as inactive to
+        // assistive technology too.
+        disabled: { pointerEvents: 'none' }
     };
+    const isDisabled = effectiveState === 'disabled';
+    const textColor = isDisabled ? 'var(--ds-text-disabled)' : 'var(--ds-text)';
 
     const handleMouseEnter = interactive && !forcedState ? () => setCurrentState('hover') : undefined;
     const handleMouseLeave = interactive && !forcedState ? () => setCurrentState('default') : undefined;
@@ -69,6 +74,7 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
             onMouseLeave={handleMouseLeave}
             onMouseDown={handleMouseDown}
             onMouseUp={handleMouseUp}
+            aria-disabled={isDisabled || undefined}
         >
             {/* Date & Time Cell - spans columns 1-2 */}
             <div
@@ -83,10 +89,10 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
                     textOverflow: 'ellipsis'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: textColor }}>
                     {date}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
+                <span className="body2-txt" style={{ color: textColor }}>
                     {timeRange}
                 </span>
             </div>
@@ -104,10 +110,10 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
                     textOverflow: 'ellipsis'
                 }}
             >
-                <span className="body2-txt font-weight-semibold" style={{ color: 'var(--ds-text)' }}>
+                <span className="body2-txt font-weight-semibold" style={{ color: textColor }}>
                     {school}
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>
+                <span className="body2-txt" style={{ color: textColor }}>
                     {teacher}
                 </span>
             </div>
@@ -136,6 +142,7 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
                 <Button
                     text="Details"
                     spacing="compact"
+                    isDisabled={isDisabled}
                 />
             </div>
         </div>

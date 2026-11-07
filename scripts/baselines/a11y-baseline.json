@@ -1,71 +1,10 @@
 {
-  "measured": "2026-11-06",
+  "measured": "2026-11-07",
   "suite": {
     "storyFiles": 475,
     "tests": 2272
   },
-  "violatingStories": 18,
-  "rules": {
-    "color-contrast": 16,
-    "landmark-no-duplicate-main": 1,
-    "landmark-unique": 1,
-    "select-name": 1
-  },
-  "stories": {
-    "design-system/src/specs/Home/Cards/ResourceCard/ResourceCard.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Profile/Pages/TutorProfilePage/TutorProfilePage.stories.jsx::Variants": [
-      "landmark-no-duplicate-main",
-      "landmark-unique"
-    ],
-    "design-system/src/specs/Toolkit/In-Session/Elements/EngagementDropdown.stories.jsx::All States": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/In-Session/Elements/EngagementListItems.stories.jsx::Interactive": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/In-Session/Tables/StudentListItems.stories.jsx::Interactive": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/In-Session/Tables/StudentListItems.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/ToggleOrganism/ToggleOrganism.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Elements/SessionManagementSnackbar.stories.jsx::All Variations": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Pages/DeleteSession.stories.jsx::Interactive": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Pages/DeleteSession.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Pages/EditSession.stories.jsx::Interactive": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Pages/EditSession.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Tables/AllSessionsTable.stories.jsx::Interactive": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Tables/FillInSchedule.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Toolkit/Pre-Session/Tables/MySessions.stories.jsx::Row States": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Training/Lessons/Pages/LessonsDetailPage/LessonsDetailPage.stories.jsx::Interactive": [
-      "select-name"
-    ],
-    "design-system/src/specs/Training/Lessons/Tables/LessonsTable/LessonsTable.stories.jsx::Overview": [
-      "color-contrast"
-    ],
-    "design-system/src/specs/Training/Training.stories.jsx::Overview": [
-      "color-contrast"
-    ]
-  }
+  "violatingStories": 0,
+  "rules": {},
+  "stories": {}
 }
