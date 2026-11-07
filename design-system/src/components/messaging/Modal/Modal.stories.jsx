@@ -43,12 +43,6 @@ export default {
             control: 'boolean',
             table: { category: 'Behavior' },
         },
-        type: {
-            control: 'select',
-            options: ['default', 'scrollable'],
-            description: 'Deprecated: use height',
-            table: { category: 'Design' },
-        },
         showBottomButtons: {
             control: 'boolean',
             description: 'Show bottom buttons',
@@ -83,7 +77,7 @@ const contentVariantGrid = {
     width: '100%',
 };
 
-const scrollableBody = `${'Long body copy. '.repeat(24)}Use a scrollable modal when content exceeds the viewport.`;
+const longBody = `${'Long body copy. '.repeat(24)}A Hug modal scrolls its own body once the content runs past the cap.`;
 
 const modalDocsHostStyle = {
     position: 'relative',
@@ -131,7 +125,6 @@ function ModalContentDemos() {
                         renderAs="inline"
                         title="Modal title"
                         body="Modal body text goes here."
-                        type="default"
                         showBottomButtons
                         primaryButton={{
                             text: 'Primary',
@@ -148,7 +141,7 @@ function ModalContentDemos() {
                 }
             />
             <ContentVariantCanvas
-                title="Scrollable + Buttons"
+                title="Long + Buttons"
                 description="Use for longer content that still needs explicit footer actions."
                 minHeight={340}
                 modal={
@@ -156,8 +149,7 @@ function ModalContentDemos() {
                         show
                         renderAs="inline"
                         title="Modal title"
-                        body={scrollableBody}
-                        type="scrollable"
+                        body={longBody}
                         showBottomButtons
                         primaryButton={{
                             text: 'Primary',
@@ -183,14 +175,13 @@ function ModalContentDemos() {
                         renderAs="inline"
                         title="Modal title"
                         body="Modal body text goes here."
-                        type="default"
                         showBottomButtons={false}
                         onClose={() => {}}
                     />
                 }
             />
             <ContentVariantCanvas
-                title="Scrollable + No Buttons"
+                title="Long + No Buttons"
                 description="Use for long read-only content without footer actions."
                 minHeight={360}
                 modal={
@@ -198,8 +189,7 @@ function ModalContentDemos() {
                         show
                         renderAs="inline"
                         title="Modal title"
-                        body={scrollableBody}
-                        type="scrollable"
+                        body={longBody}
                         showBottomButtons={false}
                         onClose={() => {}}
                     />
@@ -220,7 +210,6 @@ function ModalLayoutDemos() {
                         renderAs="inline"
                         title="Modal title"
                         body="Modal body text goes here."
-                        type="default"
                         showBottomButtons={false}
                         onClose={() => {}}
                     />
@@ -235,7 +224,6 @@ function ModalLayoutDemos() {
                         renderAs="inline"
                         title="Modal title"
                         body="Modal body text goes here."
-                        type="default"
                         showBottomButtons
                         primaryButton={{
                             text: 'Confirm',
@@ -250,35 +238,6 @@ function ModalLayoutDemos() {
                 }
             />
         </>
-    );
-}
-
-function ModalScrollableDemo() {
-    return (
-        <InlineModalCanvas
-            minHeight={480}
-            modal={
-                <Modal
-                    show
-                    renderAs="inline"
-                    title="Scrollable modal"
-                    body={scrollableBody}
-                    type="scrollable"
-                    showBottomButtons
-                    primaryButton={{
-                        text: 'Primary',
-                        appearance: 'primary',
-                        onClick: () => console.log('Primary clicked'),
-                    }}
-                    secondaryButton={{
-                        text: 'Secondary',
-                        appearance: 'default',
-                        onClick: () => console.log('Secondary clicked'),
-                    }}
-                    onClose={() => {}}
-                />
-            }
-        />
     );
 }
 
@@ -317,7 +276,7 @@ function ModalHeightDemos() {
     return (
         <div style={frame}>
             <Modal show renderAs="inline" height="hug" title="Hug, short" body="Short content hugs." primaryButton={{ text: 'Done' }} onClose={() => {}} />
-            <Modal show renderAs="inline" height="hug" title="Hug, long" body={scrollableBody.repeat(3)} primaryButton={{ text: 'Done' }} onClose={() => {}} />
+            <Modal show renderAs="inline" height="hug" title="Hug, long" body={longBody.repeat(3)} primaryButton={{ text: 'Done' }} onClose={() => {}} />
             <Modal show renderAs="inline" height="fill" title="Fill" body="Fill sits at the cap." primaryButton={{ text: 'Done' }} onClose={() => {}} />
         </div>
     );
@@ -357,12 +316,6 @@ export const Content = () => (
 );
 
 export const Layout = () => <div style={col}><ModalLayoutDemos /></div>;
-
-export const Types = () => (
-    <div style={col}>
-        <ModalScrollableDemo />
-    </div>
-);
 
 const modalDocsShellStyle = {
     minHeight: 400,

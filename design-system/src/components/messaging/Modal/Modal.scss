@@ -77,11 +77,6 @@
     }
 }
 
-/* Deprecated: the old fixed scrollable box. `height` replaces it. */
-.plus-modal-scrollable {
-    height: calc(var(--size-spacing-xlarge-space-2000) + var(--size-spacing-large-space-900));
-}
-
 .plus-modal-header {
     display: flex;
     align-items: center;
@@ -173,10 +168,6 @@
     overflow-x: hidden;
 }
 
-.plus-modal-body-scrollable {
-    display: flex;
-    scrollbar-gutter: stable;
-}
 
 .plus-modal-content {
     display: flex;

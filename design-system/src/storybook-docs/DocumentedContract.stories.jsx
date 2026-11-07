@@ -145,7 +145,7 @@ function probeValue(name, meta) {
  * The minimum that makes a component render at all.
  *
  * `show` and its synonyms are set because a component that starts hidden
- * renders nothing whatever variant you pass it — Modal's `type="scrollable"`
+ * renders nothing whatever variant you pass it — a Modal's `height="fill"`
  * would look like a broken variant when it is simply closed. Everything else is
  * the component's own required props plus a text label and an element child.
  */

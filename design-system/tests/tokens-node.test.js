@@ -42,6 +42,7 @@ import { describe, it, expect } from 'vitest';
 
 import { documents, text } from '../../scripts/lib/corpus.mjs';
 import { fallbackUsages } from '../../scripts/token-fallbacks.mjs';
+import { RETIRED_TOKENS, retiredRenames } from '../../scripts/lib/tokens/plan.mjs';
 import { parseColor, toHex } from '../src/lib/tokens.mjs';
 import {
   COLOR_PREFIXES,
@@ -223,6 +224,15 @@ describe('the corpus — where tokens live, answered once and read through the o
     const corpus = tokenCorpus();
     expect(corpus.size).toBeGreaterThan(400);
     for (const name of corpus.keys()) expect(name.startsWith('--')).toBe(true);
+  });
+
+  it('declares none of the retired names: every old token is gone, and its replacement is there', () => {
+    const corpus = tokenCorpus();
+    expect(RETIRED_TOKENS.size).toBeGreaterThan(0);
+    const declared = [...RETIRED_TOKENS].filter((name) => corpus.has(name));
+    expect(declared).toEqual([]);
+    const missing = [...retiredRenames()].filter(([, replacement]) => !corpus.has(replacement));
+    expect(missing).toEqual([]);
   });
 
   it('follows an alias to the literal at the end of it', () => {
