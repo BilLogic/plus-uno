@@ -80,17 +80,6 @@ sighted person needs: the name of an icon-only button, the title of a table
 column that holds only checkboxes, the count in a status message, a table
 caption the layout already explains.
 
-<DocsTable>
-    <thead>
-        <tr><th>Prop</th><th>Type</th><th>What it does</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>children</code></td><td>node</td><td>The text screen readers announce.</td></tr>
-        <tr><td><code>id</code></td><td>string</td><td>An id for <code>aria-labelledby</code> or <code>aria-describedby</code> to point at.</td></tr>
-        <tr><td><code>role</code></td><td>string</td><td>An ARIA role for the span, such as <code>status</code>.</td></tr>
-    </tbody>
-</DocsTable>
-
 It renders Bootstrap's `.visually-hidden` on a `span`, which is one pixel
 square, clipped, out of the flow and kept in the accessibility tree. Existing
 markup that writes `className="visually-hidden"` is the same thing and can move
@@ -112,7 +101,8 @@ to the component as it is touched.
 </thead>
 <tbody>
 <tr><td>Rest</td><td>The only state. Nothing is drawn; the text is read as part of whatever contains it.</td></tr>
-<tr><td>Hovered, pressed</td><td>None. There is nothing on screen to point at.</td></tr>
+<tr><td>Hovered</td><td>None. There is nothing on screen to point at.</td></tr>
+<tr><td>Pressed</td><td>None. There is nothing on screen to press.</td></tr>
 <tr><td>Focused</td><td>None. It is not in the tab order; keep controls out of it.</td></tr>
 <tr><td>Disabled</td><td>None. It has no disabled state.</td></tr>
 </tbody>

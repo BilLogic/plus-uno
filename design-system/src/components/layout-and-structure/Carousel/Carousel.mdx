@@ -109,10 +109,10 @@ Use `Carousel` for a small set of equal, browsable panels the user is invited to
 look through — onboarding screens, a few featured items, a gallery. Everything in
 it is one slide away from being unseen, so nothing essential belongs here.
 
-`slides` takes an array of `{ content, alt, title, caption, interval }`, or you
-can compose the items yourself as `children`. `interval` is `null` by default,
-which means it does not advance on its own; `controls` and `indicators` are both
-on. `fade` is accepted and ignored — the transition is always a slide.
+`slides` takes an array of `{ content, alt, title, caption }`, or you can
+compose the items yourself as `children`. `interval` is `null` by default, which
+means it does not advance on its own; `controls` and `indicators` are both on,
+and both appear only when there is more than one slide.
 
 </div>
 
@@ -136,7 +136,7 @@ on. `fade` is accepted and ignored — the transition is always a slide.
 <tr><td>Hovered</td><td>Controls at full opacity in <code>--ds-text</code>.</td></tr>
 <tr><td>Pressed</td><td>No pressed layer. The press moves to the slide.</td></tr>
 <tr><td>Focused</td><td>A 2px ring 2px off the control or indicator.</td></tr>
-<tr><td>Disabled</td><td>At the first or last slide with <code>wrap</code> off, the control is disabled and dimmed to <code>--ds-opacity-disabled</code>. Autoplay pauses while a person hovers or focuses.</td></tr>
+<tr><td>Disabled</td><td>At the first or last slide with <code>wrap</code> off, the control is disabled and dimmed to <code>--ds-opacity-disabled</code>. With <code>pause="hover"</code>, the default, autoplay pauses while the pointer is over the carousel.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -260,9 +260,10 @@ Two carousels compete for the same gesture and the same attention.
 
 ## Accessibility
 
-- **The controls are named.** The previous and next buttons carry visually
-  hidden "Previous slide" and "Next slide" text; the arrows themselves are
-  `aria-hidden`. That is what keeps them from being unnamed links.
+- **The controls are named.** The previous and next buttons carry
+  `aria-label="Previous slide"` and `"Next slide"`, and each indicator is
+  labeled "Slide 1", "Slide 2" and so on; the arrows themselves are
+  `aria-hidden`. That is what keeps them from being unnamed buttons.
 - **Slides off screen are still in the DOM.** A link or button inside a hidden
   slide can still be reached. Keep controls out of the slides, or accept that
   they are focusable before they are visible.
@@ -278,8 +279,8 @@ Two carousels compete for the same gesture and the same attention.
   motion, an `interval` does nothing and the pause control is not drawn. The
   slide transition is instant, and the arrows, dots and arrow keys still move
   between slides.
-- **Captions are an `h5` and a `p`.** The title is a heading at a fixed level,
-  so a page of carousels contributes a flat run of `h5`s to the outline.
+- **Captions are a heading and a `p`.** The title is a heading one level below
+  the section the carousel sits in, so it fits the page's outline.
 
 </div>
 

@@ -60,14 +60,14 @@ WidthFromProvider.play = async ({ canvasElement }) => {
 /** Interactive playground: change the width, title and body from the table. */
 export const Interactive = {
     args: {
-        width: '360px',
+        width: 'var(--panel-width-default)',
         title: 'Session details',
         body: 'Panel body content goes here.',
     },
     argTypes: {
-        width: { control: 'text', description: 'The panel width, as a CSS length.' },
-        title: { control: 'text', description: 'The title in the panel header.' },
-        body: { control: 'text', description: 'The content of the panel body.' },
+        width: { control: 'text' },
+        title: { control: 'text', table: { disable: true } },
+        body: { control: 'text', table: { disable: true } },
         className: { table: { disable: true } },
         children: { table: { disable: true } },
     },

@@ -4,6 +4,7 @@ import * as PanelStories from './Panel.stories.jsx';
 import {
     Button,
     PanelActionGroup,
+    PanelBackAction,
     PanelBody,
     PanelCloseAction,
     PanelContainer,
@@ -21,9 +22,9 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
-export const DemoPanel = ({ width, title = 'Session details', titleIcon, subheader, footer = true }) => (
+export const DemoPanel = ({ width, title = 'Session details', titleIcon, backAction, subheader, footer = true }) => (
     <PanelContainer width={width}>
-        <PanelHeader titleIcon={titleIcon} title={title} actions={<PanelActionGroup><PanelCloseAction /></PanelActionGroup>} />
+        <PanelHeader backAction={backAction} titleIcon={titleIcon} title={title} actions={<PanelActionGroup><PanelCloseAction /></PanelActionGroup>} />
         {subheader && <PanelSubheader>{subheader}</PanelSubheader>}
         <PanelBody>Panel body content goes here.</PanelBody>
         {footer && <PanelFooter><PanelDisclaimer>Changes save automatically.</PanelDisclaimer><Button appearance="primary" text="Done" /></PanelFooter>}
@@ -131,24 +132,6 @@ leaving the page behind, as a `Modal` does, would lose that context. For
 something that must be decided before the page continues, use `Modal`
 instead.
 
-### Properties
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Component</th>
-            <th>Property</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>PanelProvider</code></td><td><code>defaultWidth</code></td><td>The starting width shared with every panel inside it. Default <code>var(--panel-width-default)</code>, 400.</td></tr>
-        <tr><td><code>PanelContainer</code></td><td><code>width</code></td><td>Falls back to the nearest <code>PanelProvider</code>'s width, then <code>var(--panel-width-default)</code>, 400. Inside the Frame's Panel area it fills the area instead.</td></tr>
-        <tr><td><code>PanelHeader</code></td><td><code>backAction</code>, <code>titleIcon</code>, <code>title</code>, <code>actions</code></td><td>An optional back control, an optional icon beside the title, the title itself, and a trailing action group.</td></tr>
-        <tr><td><code>PanelFooter</code></td><td><code>children</code></td><td>Actions that commit a change; pair with <code>PanelDisclaimer</code> for small print.</td></tr>
-    </tbody>
-</DocsTable>
-
 Fixed action components cover the common icons: `PanelBackAction`,
 `PanelCloseAction`, `PanelMoreAction`, `PanelUpAction`, `PanelDownAction`,
 `PanelNewTabAction` and `PanelViewSwitcher`, each a labeled `IconButton` with
@@ -160,7 +143,7 @@ its glyph and accessible name already set.
 
 ## Parts
 
-1. **Container** (`PanelContainer`). The outer surface, at a fixed width or the width a `PanelProvider` shares with whatever opened it.
+1. **Container** (`PanelContainer`). The outer surface. Its `width` falls back to the nearest `PanelProvider`'s width, then to `--panel-width-default` (400); inside the Frame's Panel area it fills the area instead.
 2. **Header** (`PanelHeader`). An optional back action, an optional title icon, the title, and an action group (close, more, …).
 3. **Subheader** (`PanelSubheader`). An optional row of secondary content under the header: tabs, a filter summary.
 4. **Body** (`PanelBody`). The main content, which scrolls.
@@ -188,7 +171,6 @@ its glyph and accessible name already set.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Width</td><td><code>--panel-width-default</code> (400) unless set.</td></tr>
 <tr><td>Ground and edge</td><td><code>--ds-surface-overlay</code>; <code>--ds-border</code> at <code>--border-default</code> on the leading edge.</td></tr>
 <tr><td>Header</td><td>Padding <code>--space-100</code> and <code>--space-150</code>; <code>--space-075</code> between its parts; <code>--border-default</code> rule below.</td></tr>
 <tr><td>Action group</td><td><code>--space-025</code> between actions.</td></tr>
@@ -222,10 +204,10 @@ Below its default width the title wraps and the body stops being scannable.
 An icon, a subheader and a footer together bury the title; pick the one the task needs.
 
 <DoDontPair
-    doExample={<DemoPanel titleIcon={panelIcon} footer={false} />}
+    doExample={<DemoPanel titleIcon={panelIcon} />}
     doCaption="Title with an icon."
-    dontExample={<DemoPanel titleIcon={panelIcon} subheader="Thursday, 4:00 PM" />}
-    dontCaption="Icon, subheader and footer all on."
+    dontExample={<DemoPanel titleIcon={panelIcon} subheader="Thursday, 4:00 PM" backAction={<PanelBackAction />} />}
+    dontCaption="Icon, back action and subheader all on, burying the title."
 />
 
 ### Title the panel with the object.
@@ -235,8 +217,8 @@ The title names what the panel shows, so someone who opened it from elsewhere st
 <DoDontPair
     doExample={<DemoPanel title="Session notes" />}
     doCaption="The object it shows: “Session notes”."
-    dontExample={<DemoPanel title="Everything about this session and what happened in it" />}
-    dontCaption="A sentence that wraps."
+    dontExample={<DemoPanel title="Details" />}
+    dontCaption="A generic “Details” that does not name the object."
 />
 
 ### Share one width across a page's panels with `PanelProvider`.
