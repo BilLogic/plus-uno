@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as SuggestionStories from './Suggestion.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Suggestion, Tag } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -48,29 +55,17 @@ as Tag, so it sits in the tag row where the value will land.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<><code>insert</code> adds a value to the field and leads with a plus. <code>prompt</code> sends or fills text and leads with a sparkle wand.</>}>
-    <Canvas of={SuggestionStories.Types} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={SuggestionStories.Types} title="Insert and prompt" description={<><code>insert</code> adds a value to the field and leads with a plus; <code>prompt</code> sends or fills text and leads with a sparkle wand.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## In a tag row
+## Size and layout
 
-<DocsCanvasShell description={<>The same 22-tall box as Tag, with its words on the same baseline. Suggestions follow the tags already in the field.</>}>
-    <DsCanvasQuiet of={SuggestionStories.InATagRow} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Accepted, an insert suggestion becomes a Tag: the field adds the value and drops the suggestion. Press one to try it.</>}>
-    <DsCanvasQuiet of={SuggestionStories.AcceptIntoTags} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Disabled, beside disabled Tags: the same disabled ground, a dashed neutral edge so it still reads as a suggestion, and disabled words. It follows the field or `isDisabled`, and cannot be focused or accepted.</>}>
-    <DsCanvasQuiet of={SuggestionStories.DisabledBesideTags} />
-</DocsCanvasShell>
+<ComponentExample of={SuggestionStories.InATagRow} title="In a tag row" description="The same 22-tall box as Tag, with its words on the same baseline, after the tags already in the field." />
 
 </div>
 
@@ -78,13 +73,9 @@ as Tag, so it sits in the tag row where the value will land.
 
 ## Behavior
 
-<DocsCanvasShell description={<>Rest is a dashed edge on a clear ground. Hover is the discovery ground and pressed its hovered step.</>}>
-    <DsCanvasQuiet of={SuggestionStories.StateLayers} />
-</DocsCanvasShell>
+<ComponentExample of={SuggestionStories.AcceptIntoTags} title="Accept into tags" description="Accepted, an insert suggestion becomes a Tag: the field adds the value and drops the suggestion." />
 
-<DocsCanvasShell description={<>Keyboard focus is a 2px Focus Ring 2px outside the dashed edge. Press Tab to see it.</>}>
-    <DsCanvasQuiet of={SuggestionStories.FocusRing} />
-</DocsCanvasShell>
+<ComponentExample of={SuggestionStories.DisabledBesideTags} title="Disabled beside tags" description={<>It follows the field or <code>isDisabled</code>: the disabled ground, a dashed neutral edge and disabled words, and it cannot be focused or accepted.</>} />
 
 </div>
 
@@ -92,25 +83,19 @@ as Tag, so it sits in the tag row where the value will land.
 
 ## State
 
-<DocsCanvasShell description={<>Rest. A dashed discovery edge on a clear ground.</>}>
-    <DsCanvasQuiet of={SuggestionStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={SuggestionStories.StateLayers} title="State layers" description="Rest is a dashed edge on a clear ground, hovered the discovery ground and pressed its hovered step." />
 
-<DocsCanvasShell description={<>Hovered. The discovery ground.</>}>
-    <DsCanvasQuiet of={SuggestionStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={SuggestionStories.FocusRing} title="Focus ring" description="Keyboard focus is a 2px focus ring 2px outside the dashed edge." />
 
-<DocsCanvasShell description={<>Pressed. The next discovery step.</>}>
-    <DsCanvasQuiet of={SuggestionStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={SuggestionStories.Rest} title="Rest" description="A dashed discovery edge on a clear ground." />
 
-<DocsCanvasShell description={<>Focused. The 2px focus ring, 2px off the dashed edge.</>}>
-    <DsCanvasQuiet of={SuggestionStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={SuggestionStories.Hovered} title="Hovered" description="The discovery ground." />
 
-<DocsCanvasShell description={<>Disabled. A native disabled button, never accepted.</>}>
-    <DsCanvasQuiet of={SuggestionStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={SuggestionStories.Pressed} title="Pressed" description="The next discovery step." />
+
+<ComponentExample of={SuggestionStories.Focused} title="Focused" description="The 2px focus ring, 2px off the dashed edge." />
+
+<ComponentExample of={SuggestionStories.Disabled} title="Disabled" description="A native disabled button, never accepted." />
 
 </div>
 
@@ -146,6 +131,18 @@ Use `Suggestion` when the system proposes a value and a person decides whether
 to take it: an AI-suggested focus area beside the ones already chosen, or a
 suggested question beside a chat box. Put it in the row where the accepted
 value will land, after the tags already there.
+
+### Type guidance
+
+<DocsTable>
+<thead>
+<tr><th>Type</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Insert</td><td>The default. Adds a value to the field, in place; <code>onAccept</code> hands back the <code>value</code>. Leads with a plus. Example: "Fractions".</td></tr>
+<tr><td>Prompt</td><td>Sends or fills text, starting a conversation; <code>onAccept</code> hands back the <code>text</code>. Leads with a sparkle wand. Example: "Summarize".</td></tr>
+</tbody>
+</DocsTable>
 
 Use `Tag` for a value that is already in the field. Use `Button` for an action
 that is not a proposed value, and `AiLabel` to mark content the agent has
@@ -198,43 +195,56 @@ already produced.
 
 ## Best practices
 
-### The field decides what happens next.
+### Name the action.
+
+A suggestion is a verb people can trust at a glance, not a sentence. It sits in
+a tag row, so its label is a value's name; for a prompt, pass the full words as
+`text` and a short `label`.
+
+<DoDontPair
+    doExample={<Suggestion label="Shorten" onAccept={() => {}} />}
+    doCaption="A short verb."
+    dontExample={<Suggestion label="Please rewrite this paragraph to be shorter" onAccept={() => {}} />}
+    dontCaption="A sentence in the chip."
+/>
+
+### Pick insert or prompt by outcome.
+
+Insert changes the content in place; prompt starts a conversation.
+
+<DoDontPair
+    doExample={<Suggestion label="Summary" onAccept={() => {}} />}
+    doCaption="Insert for an in-place edit."
+    dontExample={<Suggestion type="prompt" label="Summary" onAccept={() => {}} />}
+    dontCaption="Prompt for an in-place edit."
+/>
+
+### Show an unavailable action as disabled.
+
+A disabled suggestion stays visible so people know it exists. `isDisabled`
+disables one suggestion; a disabled field or `TagGroup` disables every
+suggestion in it through `TagContext`, the same value a Tag reads, so a
+suggestion is disabled with the tags beside it.
+
+<DoDontPair
+    doExample={<Suggestion label="Shorten" isDisabled onAccept={() => {}} />}
+    doCaption="Disabled when unavailable."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Suggestion label="Shorten" onAccept={() => {}} /><span>Nothing to shorten</span></div>}
+    dontCaption="Active with nothing to do."
+/>
+
+### Let the field decide what happens next.
 
 `onAccept` hands back the value (insert) or the text (prompt). The suggestion
 does not change itself; the field that owns the value adds a Tag, sends the
 message or fills the text box, and stops offering the suggestion.
 
-```jsx
-// Incorrect: a Tag styled as a suggestion is not a button, so nobody can
-// accept it with a keyboard.
-<Tag color="purple">Relationships</Tag>
-
-// Correct: insert hands back the value; the field turns it into a Tag.
-<Suggestion label="Relationships" value="focus-relationships" onAccept={addFocusArea} />
-
-// Correct: prompt hands back the text to send or fill.
-<Suggestion type="prompt" label="Summarize" text="Summarize this session" onAccept={send} />
-```
-
-### Keep the words short.
-
-A suggestion sits in a tag row, so its label is a value's name, not a
-sentence. For a prompt, pass the full words as `text` and a short `label`.
-
-### Disable one suggestion, or the field.
-
-`isDisabled` disables one suggestion. A disabled field or `TagGroup` disables
-every suggestion in it through `TagContext`, the same value a Tag reads, so a
-suggestion is disabled with the tags beside it.
-
-```jsx
-<Suggestion label="Ratios" isDisabled onAccept={add} />
-
-<TagGroup label="Focus areas" isDisabled={!canEdit}>
-  <Tag color="blue">Fractions</Tag>
-  <Suggestion label="Ratios" onAccept={add} />
-</TagGroup>
-```
+<DoDontPair
+    doExample={<Suggestion label="Relationships" value="focus-relationships" onAccept={() => {}} />}
+    doCaption="Insert hands back the value; the field turns it into a Tag."
+    dontExample={<Tag color="purple">Relationships</Tag>}
+    dontCaption="A Tag styled as a suggestion is not a button, so nobody can accept it with a keyboard."
+/>
 
 </div>
 

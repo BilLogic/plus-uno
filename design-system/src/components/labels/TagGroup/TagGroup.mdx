@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as TagGroupStories from './TagGroup.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Tag, TagGroup } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -50,87 +57,41 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Size and layout
 
-<DocsCanvasShell attachSourceBelow description={<>The default. Tags flow onto as many lines as they need, 8 apart in both directions, and the set announces itself as a list.</>}>
-    <Canvas of={TagGroupStories.Wrapping} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={TagGroupStories.Wrapping} title="Wrap" description="The default: tags flow onto as many lines as they need, 8 apart in both directions, and the set announces itself as a list." />
 
-</div>
+<ComponentExample of={TagGroupStories.Collapse} title="Collapse" description={<>One line: as many tags as fit, then a <code>+n</code> for the rest, with the count following the width of the container.</>} />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={TagGroupStories.MaxVisible} title="Max visible" description={<><code>maxVisible</code> caps the count even when more would fit.</>} />
 
-## Overflow
+<ComponentExample of={TagGroupStories.CapNeverSqueezes} title="Cap never squeezes" description={<><code>maxVisible={'{0}'}</code> puts every tag behind <code>+n</code>, and a cap of 1 with room shows its tag whole.</>} />
 
-<DocsCanvasShell description={<>One line: as many tags as fit, then a <code>+n</code> for the rest. The count follows the width of the container.</>}>
-    <DsCanvasQuiet of={TagGroupStories.Collapse} />
-</DocsCanvasShell>
+<ComponentExample of={TagGroupStories.NoOverflowWhenItFits} title="No overflow when it fits" description="A set short enough to fit shows no overflow tag at all." />
 
-<DocsCanvasShell description={<>Pressing <code>+n</code> opens a menu of the hidden tags. Enter or Space opens it, Tab reaches the tags, Escape closes it.</>}>
-    <DsCanvasQuiet of={TagGroupStories.CollapseMenu} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Suggestions are never counted into <code>+n</code> and never go into its menu. They stay on the row after <code>+n</code>, and the fit reserves their width before counting tags.</>}>
-    <DsCanvasQuiet of={TagGroupStories.CollapseWithSuggestions} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A hidden tag keeps its action in the menu: a selectable tag is led by a checkbox, empty when off and checked and selected when on, and toggles in place; a link tag is a link with a trailing arrow; a tag still saving is a disabled, busy row; and a read-only or removable tag is a static row with nothing to press. Remove stays on the row.</>}>
-    <DsCanvasQuiet of={TagGroupStories.MenuKeepsActions} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>The <code>+n</code> is a gray selectable tag with no swatch, named by its label and count ("+3 more tags"): hover is the gray accent's subtlest step and pressed its pressed step, as any gray tag.</>}>
-    <DsCanvasQuiet of={TagGroupStories.OverflowTag} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<><code>maxVisible</code> caps the count even when more would fit.</>}>
-    <DsCanvasQuiet of={TagGroupStories.MaxVisible} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>The cap never squeezes a tag: <code>maxVisible={'{0}'}</code> puts every tag behind <code>+n</code>, and a cap of 1 with room shows its tag whole.</>}>
-    <DsCanvasQuiet of={TagGroupStories.CapNeverSqueezes} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A set short enough to fit shows no overflow tag at all.</>}>
-    <DsCanvasQuiet of={TagGroupStories.NoOverflowWhenItFits} />
-</DocsCanvasShell>
+<ComponentExample of={TagGroupStories.AlignmentRight} title="End alignment" description={<><code>alignment="end"</code> lines every row, and the <code>+n</code> of a collapsed row, up on the end edge, for a right-aligned table column.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Alignment
+## Behavior
 
-<DocsCanvasShell description={<><code>alignment="end"</code> lines every row, and the <code>+n</code> of a collapsed row, up on the end edge, for a right-aligned table column.</>}>
-    <DsCanvasQuiet of={TagGroupStories.AlignmentRight} />
-</DocsCanvasShell>
+<ComponentExample of={TagGroupStories.CollapseMenu} title="Overflow menu" description={<>Pressing <code>+n</code> opens a menu of the hidden tags: Enter or Space opens it, Tab reaches the tags, Escape closes it.</>} />
 
-</div>
+<ComponentExample of={TagGroupStories.CollapseWithSuggestions} title="Suggestions stay on the row" description={<>Suggestions are never counted into <code>+n</code> or put in its menu; they stay on the row after it.</>} />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={TagGroupStories.MenuKeepsActions} title="Menu keeps actions" description="A hidden tag keeps its action in the menu: a selectable tag toggles, a link is a link, a saving tag is busy, and remove stays on the row." />
 
-## Disabled
+<ComponentExample of={TagGroupStories.OverflowTag} title="Overflow tag" description={<>The <code>+n</code> is a gray selectable tag with no swatch, named by its label and count ("+3 more tags").</>} />
 
-<DocsCanvasShell description={<><code>isDisabled</code> disables every Tag and Suggestion in the group, as a disabled field does: no ×, nothing to focus, nothing to press.</>}>
-    <DsCanvasQuiet of={TagGroupStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={TagGroupStories.ConditionalChildrenAreNotCounted} title="Conditional children" description={<>Conditional children are skipped rather than counted, so <code>+n</code> stays right about the screen.</>} />
 
-</div>
+<ComponentExample of={TagGroupStories.RemovableSet} title="Removable set" description="The group holds the gaps; the tags hold the values." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={TagGroupStories.CustomOverflowAction} title="Custom overflow action" description={<><code>onOverflowClick</code> replaces the menu, for opening a picker instead.</>} />
 
-## Content
-
-<DocsCanvasShell description={<>Conditional children are skipped rather than counted, so <code>+n</code> stays right about the screen and not just about the array.</>}>
-    <DsCanvasQuiet of={TagGroupStories.ConditionalChildrenAreNotCounted} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A removable set: the group holds the gaps, the tags hold the values.</>}>
-    <DsCanvasQuiet of={TagGroupStories.RemovableSet} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<><code>onOverflowClick</code> replaces the menu, for opening a picker instead.</>}>
-    <DsCanvasQuiet of={TagGroupStories.CustomOverflowAction} />
-</DocsCanvasShell>
+<ComponentExample of={TagGroupStories.Disabled} title="Disabled" description={<><code>isDisabled</code> disables every Tag and Suggestion in the group, as a disabled field does: no ×, nothing to focus, nothing to press.</>} />
 
 </div>
 
@@ -138,25 +99,15 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
 
 ## State
 
-<DocsCanvasShell description={<>Rest. A named list; each tag keeps its own state.</>}>
-    <DsCanvasQuiet of={TagGroupStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={TagGroupStories.Rest} title="Rest" description="A named list; each tag keeps its own state." />
 
-<DocsCanvasShell description={<>Hovered. The group has no ground; the tag under the pointer reacts.</>}>
-    <DsCanvasQuiet of={TagGroupStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={TagGroupStories.Hovered} title="Hovered" description="The group has no ground; the tag under the pointer reacts." />
 
-<DocsCanvasShell description={<>Pressed. The group does not react; the tag does.</>}>
-    <DsCanvasQuiet of={TagGroupStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={TagGroupStories.Pressed} title="Pressed" description="The group does not react; the tag does." />
 
-<DocsCanvasShell description={<>Focused. Tab skips the list and lands on the first control inside it.</>}>
-    <DsCanvasQuiet of={TagGroupStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={TagGroupStories.Focused} title="Focused" description="Tab skips the list and lands on the first control inside it." />
 
-<DocsCanvasShell description={<>Disabled. The set's, passed to every tag and suggestion.</>}>
-    <DsCanvasQuiet of={TagGroupStories.DisabledSet} />
-</DocsCanvasShell>
+<ComponentExample of={TagGroupStories.DisabledSet} title="Disabled" description="The set's, passed to every tag and suggestion." />
 
 </div>
 
@@ -190,8 +141,8 @@ wraps or collapses, which edge it lines up on, and whether it is disabled.
 
 Use `TagGroup` wherever more than one `Tag` appears together: the subjects on a
 profile, the filters above a table, the recipients on a message. It is the
-right wrapper even when the set is short, because what it owns — the spacing,
-the wrapping, the alignment and the disabled state — belongs to the set rather
+right wrapper even when the set is short, because what it owns (the spacing,
+the wrapping, the alignment and the disabled state) belongs to the set rather
 than to any tag in it. Suggestions offered for the field go in the same group;
 they always sit at the end of the row, after the tags and `+n`.
 
@@ -240,50 +191,18 @@ A single tag standing alone does not need it.
 
 ## Best practices
 
-### The gap lives here, not on the tag.
+### Collapse long groups in tight rows.
 
-A tag that carries its own margin needs an escape hatch whenever a parent uses
-`gap` — an API that exists only to undo a decision made in the wrong place.
-`Tag` sets `margin: 0` and this sets `gap`, so there is nothing to undo and
-nothing to double up.
+Collapse keeps one line and puts the rest behind `+n`; wrapping grows the row.
 
-```jsx
-// Incorrect — the row's spacing is now defined in two places, and the next
-// change to the rhythm has to find both.
-<div style={{ display: 'flex', gap: '4px' }}>
-  <Tag color="blue">Science</Tag>
-  <Tag color="blue">Mathematics</Tag>
-</div>
+<DoDontPair
+    doExample={<div style={{ width: 'var(--size-1500)' }}><TagGroup label="Skills" overflow="collapse"><Tag color="blue">Algebra</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Geometry</Tag></TagGroup></div>}
+    doCaption="Collapse in a tight row."
+    dontExample={<div style={{ width: 'var(--size-1500)' }}><TagGroup label="Skills"><Tag color="blue">Algebra</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Geometry</Tag></TagGroup></div>}
+    dontCaption="Wrap pushes the row taller."
+/>
 
-// Correct — one owner for the gap.
-<TagGroup label="Subjects">
-  <Tag color="blue">Science</Tag>
-  <Tag color="blue">Mathematics</Tag>
-</TagGroup>
-```
-
-### Disable the group, not each tag.
-
-When the field is disabled, say so once on the group and every Tag and
-Suggestion in it follows.
-
-```jsx
-// Incorrect — one tag disabled, its neighbors live.
-<TagGroup label="Focus areas">
-  <Tag isDisabled color="blue">Fractions</Tag>
-  <Tag color="blue">Ratios</Tag>
-</TagGroup>
-
-// Correct — the group passes it to every member.
-<TagGroup label="Focus areas" isDisabled={!canEdit}>
-  <Tag color="blue">Fractions</Tag>
-  <Suggestion label="Ratios" onAccept={add} />
-</TagGroup>
-```
-
-### Collapse for a fixed-height spot.
-
-`collapse` counts what fits by width, so it suits a table cell or a card
+`overflow="collapse"` counts what fits by width, so it suits a table cell or a card
 header where a second line would break the layout. Give the group a width to
 fit into: a group that can grow shows everything. Use `maxVisible` only to show
 fewer than fit. The cap never squeezes a tag: `maxVisible={0}` puts every tag
@@ -313,10 +232,35 @@ pressed.
 A read-only or removable tag is a static row that only says its words. Remove is only offered on the row, never from the
 menu.
 
-### End-align for a right-aligned column.
+### Align to the surrounding text.
 
-`alignment="end"` belongs in a table column whose other cells are
-right-aligned. Everywhere else, tags read from the start.
+End alignment is for a right-aligned column; elsewhere it drifts from the text. `alignment="end"` belongs in a table column whose other cells are right-aligned. Everywhere else, tags read from the start.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><span>Skills</span><TagGroup label="Skills"><Tag color="blue">Algebra</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Geometry</Tag></TagGroup></div>}
+    doCaption="Start beside left-aligned text."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><span>Skills</span><TagGroup label="Skills" alignment="end"><Tag color="blue">Algebra</Tag><Tag color="lime">Advocacy</Tag><Tag color="purple">Fractions</Tag><Tag color="magenta">Relationships</Tag><Tag color="teal">Geometry</Tag></TagGroup></div>}
+    dontCaption="End beside left-aligned text."
+/>
+
+### Disable the whole group when read-only.
+
+A group disables as a unit, the way a disabled field does. Say so once on the group with `isDisabled`, and every Tag and Suggestion in it follows; never disable one tag and leave its neighbors live.
+
+<DoDontPair
+    doExample={<TagGroup label="Focus areas" isDisabled><Tag color="blue" isRemovable onAfterRemoveAction={() => {}}>Algebra</Tag><Tag color="lime" isRemovable onAfterRemoveAction={() => {}}>Advocacy</Tag><Tag color="purple" isRemovable onAfterRemoveAction={() => {}}>Fractions</Tag><Tag color="magenta" isRemovable onAfterRemoveAction={() => {}}>Relationships</Tag><Tag color="teal" isRemovable onAfterRemoveAction={() => {}}>Geometry</Tag></TagGroup>}
+    doCaption="The whole group disabled."
+    dontExample={<TagGroup label="Focus areas"><Tag color="blue" isRemovable onAfterRemoveAction={() => {}}>Algebra</Tag><Tag color="lime" isRemovable onAfterRemoveAction={() => {}}>Advocacy</Tag><Tag color="purple" isRemovable onAfterRemoveAction={() => {}}>Fractions</Tag><Tag color="magenta" isRemovable onAfterRemoveAction={() => {}}>Relationships</Tag><Tag color="teal" isRemovable onAfterRemoveAction={() => {}}>Geometry</Tag></TagGroup>}
+    dontCaption="A read-only group that looks editable."
+/>
+
+### Let the group own the gap.
+
+A tag that carries its own margin needs an escape hatch whenever a parent uses
+`gap`: an API that exists only to undo a decision made in the wrong place.
+`Tag` sets `margin: 0` and `TagGroup` sets `gap`, so there is nothing to undo
+and nothing to double up. A row of tags in a hand-built flex container defines
+its spacing in two places.
 
 </div>
 

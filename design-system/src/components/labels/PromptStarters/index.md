@@ -9,7 +9,7 @@ A few things a person could ask PLUS AI, as a wrapping row of prompt `Suggestion
 
 **Source:** `design-system/src/components/labels/PromptStarters/PromptStarters.jsx`
 
-**Stories:** `design-system/src/components/labels/PromptStarters/PromptStarters.stories.jsx` — Default, SelectHandsBackTheStarter, EmptyRendersNothing, FillsThePromptInput
+**Stories:** `design-system/src/components/labels/PromptStarters/PromptStarters.stories.jsx` — Default, SelectHandsBackTheStarter, EmptyRendersNothing, FillsThePromptInput, Interactive
 
 **Storybook page:** `design-system/src/components/labels/PromptStarters/PromptStarters.mdx`
 
@@ -32,6 +32,4 @@ From `design-system/src/components/labels/PromptStarters/PromptStarters.scss`. O
 
 Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
