@@ -283,7 +283,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-old-system.mjs',
     guards:
-      'the code holding only the current design system, a hard ban with no baseline: outside design-system/src/specs/, any name from a token family generated from an archived Figma collection fails, comments and docs included, read in design-system/src, prototypes and src. It starts with the Material `--color-*` roles; each family that moves to the current system adds its row. The token files that still declare the old names for the Specs replica are named in the check until they move into specs/.',
+      'the code holding only the current design system, a hard ban with no baseline: outside design-system/src/specs/, any name from a token family generated from an archived Figma collection fails, comments and docs included, read in design-system/src, prototypes and src. Banned so far: the Material `--color-*` roles, and the `--elevation-light-*` shadows and `--surface-*` roles; each family that moves to the current system adds its row. The token files that still declare the old names for the Specs replica are named in the check until they move into specs/.',
   },
   {
     name: 'check:state-mixin',

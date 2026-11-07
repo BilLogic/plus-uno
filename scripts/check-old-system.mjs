@@ -66,6 +66,11 @@ export const FAMILIES = [
     pattern: /(?<![\w-])--color-[a-z0-9*]/,
     remedy: 'the Material `--color-*` roles are old; use the `--ds-*` color token for the role (fill, edge, text, icon)',
   },
+  {
+    name: 'elevation',
+    pattern: /(?<![\w-])--(?:elevation-light|surface)-[a-z0-9*]/,
+    remedy: 'the `--elevation-light-*` shadows and `--surface-*` roles are old; use `--ds-shadow-raised` / `--ds-shadow-overlay` and the `--ds-surface-*` fill they pair with',
+  },
 ];
 
 /**
