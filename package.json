@@ -108,6 +108,7 @@
     "check:bot-skills": "node scripts/check-bot-skills.mjs",
     "check:figma-color-drift": "node scripts/check-figma-color-drift.mjs",
     "check:token-generation": "node scripts/check-token-generation.mjs",
+    "check:token-intent": "node scripts/check-token-intent.mjs",
     "check:color-system": "node scripts/check-color-system.mjs",
     "check:color-tokens": "node scripts/generate-color-tokens.mjs --check",
     "check:legacy-color-list": "node scripts/generate-legacy-color-list.mjs --check",

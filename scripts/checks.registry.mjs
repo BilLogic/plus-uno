@@ -505,6 +505,14 @@ export const CHECKS = [
       "`npm run generate:tokens` being unable to silently delete tokens. It opened with `console.warn('WARNING: Source JSON files are incomplete. Token generation is DISABLED to protect existing tokens.')` and then wrote all four token files four lines later — the warning had no return and no exit, so the protection it announced did not exist. One run of that documented one-word command on 2026-08-29 took `_colors.scss` from 195 color tokens to 5, keeping only the five bare intents; `_layout.scss` lost every breakpoint token, `_primitives.scss` 9 and `_spacing_semantics.scss` 3. It reported `✅ All token files generated successfully!` while doing it, and printed `✅ Validation passed` beside a validation that had been commented out. `skills/uno-maintain/references/ds-fix.md` lists the command as the way to regenerate SCSS from source, so an agent following the maintenance skill would have run it. The generator now builds every file in memory, refuses by NAME when any file would lose a token, and writes nothing on that path. This check asserts the conditional rather than the refusal — non-zero exit if and only if it says a file would shrink, and a `--dry-run` that leaves every token file byte-identical — because a gate that goes red on the day the Figma exports are fixed is a gate somebody deletes. Mutation-tested three ways: dropping the exit, letting `--dry-run` write, and reinstating the false validation claim. The first draft of the check MISSED the dropped exit, because the refusal is on stderr and `execFileSync` returns only stdout on a zero exit; it uses `spawnSync` now.",
   },
   {
+    name: 'check:token-intent',
+    script: 'node scripts/check-token-intent.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-token-intent.mjs',
+    guards: 'every token a plan defines (the ADR-038 ladder, the ADR-035 `--ds-*` colors) carrying its intent in `tokens.json`, and no primitive carrying the field; unplanned groups are counted, not failed.',
+  },
+  {
     name: 'check:color-system',
     script: 'node scripts/check-color-system.mjs',
     pkg: 'root',

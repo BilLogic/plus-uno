@@ -96,9 +96,13 @@ function recordOf(name, c, kind, from) {
  * One record per token name. Sections arrive in the order the token view lists
  * them; a name that appears in two sections keeps its first.
  *
+ * `intent` is present only where a plan gives one (`token-intent.mjs`): a
+ * primitive never carries the field, and neither does a token no plan defines.
+ *
  * @param {{group: string, tier: string, tokens: {name: string, value: string}[]}[]} sections
+ * @param {Map<string, string>} [intents]  token name -> intent
  */
-export function buildTokensManifest(sections) {
+export function buildTokensManifest(sections, intents = new Map()) {
   const seen = new Map();
   for (const { group, tier, tokens } of sections) {
     if (!TIERS.includes(tier)) {
@@ -106,7 +110,10 @@ export function buildTokensManifest(sections) {
     }
     for (const { name, value } of tokens) {
       if (seen.has(name)) continue;
-      seen.set(name, { name, tier, group, value: value.trim(), intent: null });
+      const record = { name, tier, group, value: value.trim() };
+      const intent = tier === 'primitive' ? null : intents.get(name);
+      if (intent) record.intent = intent;
+      seen.set(name, record);
     }
   }
   return { tokens: [...seen.values()].sort(byName) };

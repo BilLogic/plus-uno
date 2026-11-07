@@ -103,7 +103,25 @@ test('tokens: one record per name, tier and group from the section, first value 
   assert.equal(text.tier, 'semantic');
   assert.equal(text.group, 'Color Tokens');
   assert.equal(text.value, 'var(--palette-neutral-1000)');
-  assert.equal(text.intent, null);
+  assert.equal('intent' in text, false);
+});
+
+test('tokens: intent rides on a non-primitive token that has one, and never on a primitive', () => {
+  const intents = new Map([
+    ['--ds-text', 'Primary text.'],
+    ['--palette-neutral-1000', 'A ramp step.'],
+  ]);
+  const m = buildTokensManifest(
+    [
+      { group: 'Color Tokens', tier: 'semantic', tokens: [{ name: '--ds-text', value: '#172b4d' }, { name: '--legacy', value: '#fff' }] },
+      { group: 'Color Primitives', tier: 'primitive', tokens: [{ name: '--palette-neutral-1000', value: '#172b4d' }] },
+    ],
+    intents,
+  );
+  const by = Object.fromEntries(m.tokens.map((t) => [t.name, t]));
+  assert.equal(by['--ds-text'].intent, 'Primary text.');
+  assert.equal('intent' in by['--legacy'], false);
+  assert.equal('intent' in by['--palette-neutral-1000'], false);
 });
 
 test('tokens: a name in two sections keeps the first section and is not duplicated', () => {

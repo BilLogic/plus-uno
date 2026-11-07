@@ -105,7 +105,7 @@ test('real repo: tokens by name, by role, and retired', () => {
   const [stack] = facts.tokens('--stack-md');
   assert.equal(stack.status, 'exists');
   assert.equal(stack.tier, 'semantic');
-  assert.ok('intent' in stack);
+  assert.match(stack.intent, /gap/);
   const role = facts.tokens('stack').map((t) => t.name);
   assert.ok(role.includes('--stack-sm') && role.includes('--stack-lg'));
   assert.ok(role.every((name) => name.startsWith('--stack-')));
