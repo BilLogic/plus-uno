@@ -14,7 +14,7 @@
 
 import { varReferencePattern } from '../../design-system/src/lib/tokens.mjs';
 import { EXTERNAL, isInterpolated } from '../undefined-tokens.mjs';
-import { blankComments, closeOf, importsOf, jsxElementsOf, positionAt, styleObjectsOf } from './jsx-scan.mjs';
+import { blankComments, closeOf, importsOf, jsxElementsOf, literalOf, positionAt, styleObjectsOf } from './jsx-scan.mjs';
 
 export const RULES_DOC = 'docs/engineering/ds-usage-rules.md';
 
@@ -301,26 +301,17 @@ function scriptEscapes(text, ctx, add) {
   for (const obj of styleObjectsOf(text)) {
     for (const { key, value, index } of obj.properties) {
       const reason = rawInJsxStyle(key, value);
-      if (reason) add('ds/no-raw-literal', index, `\`${key}: ${value}\` is a raw ${reason}`, rawFix(reason, literalText(value), ctx));
+      if (reason) add('ds/no-raw-literal', index, `\`${key}: ${value}\` is a raw ${reason}`, rawFix(reason, key, literalOf(value).text, ctx));
     }
   }
 }
 
-/** The text of a JS string literal, else the value as written. */
-const literalText = (value) => {
-  const m = value.match(/^(['"`])([\s\S]*)\1$/);
-  return m ? m[2] : value;
-};
-
 function rawInJsxStyle(key, value) {
-  const str = value.match(/^(['"`])([\s\S]*)\1$/);
-  if (str) {
-    if (str[1] === '`' && str[2].includes('${')) return null;
-    return rawInCss(key, str[2]);
-  }
-  if (/^-?\d+(?:\.\d+)?$/.test(value)) {
+  const literal = literalOf(value);
+  if (literal.kind === 'string') return rawInCss(key, literal.text);
+  if (literal.kind === 'number') {
     if (FONT_WEIGHT.test(key)) return 'font value';
-    if (Number(value) !== 0 && PX_KEYS.test(key)) return 'size';
+    if (Number(literal.text) !== 0 && PX_KEYS.test(key)) return 'size';
   }
   return null;
 }
@@ -355,9 +346,28 @@ const holding = (names) =>
     ? `use var(${names[0]})`
     : `tokens that hold this value: ${names.slice(0, 3).join(', ')}; use the one named for this role`;
 
-function rawFix(reason, literal, ctx) {
+/**
+ * Words a token name carries for the role a CSS property plays, so a value
+ * match prefers a padding token for `padding` over an icon size that happens
+ * to share the value.
+ */
+const ROLE_WORDS = [
+  [/^(?:padding|pad)/i, /pad/],
+  [/^(?:gap|row-?gap|column-?gap|margin)/i, /stack|inline|gap|space/],
+  [/radius/i, /radius/],
+  [/^(?:width|height|min|max|inset|top|right|bottom|left|flex-?basis)/i, /size|width|height/],
+  [/^font|^letter/i, /font|type|text|letter/],
+  [/border|outline|stroke/i, /border|stroke|focus/],
+  [/color|background|fill|shadow/i, /^--ds-/],
+];
+
+function rawFix(reason, property, literal, ctx) {
   const exact = ctx.tokensByValue.get(normalizeValue(literal));
-  if (exact) return holding(exact);
+  if (exact) {
+    const words = ROLE_WORDS.find(([prop]) => prop.test(property))?.[1];
+    const fitting = words ? exact.filter((name) => words.test(name)) : [];
+    return holding(fitting.length ? fitting : exact);
+  }
   if (reason === 'color') return 'use a --ds-* color token (design-system/agent-views/tokens/tokens.md)';
   if (reason === 'size') return 'use a spacing or size token (design-system/agent-views/tokens/tokens.md)';
   return 'use a typography token (design-system/agent-views/tokens/tokens.md)';
@@ -374,7 +384,7 @@ function styleEscapes(text, ctx, add) {
     const [, lead, property, value] = m;
     const reason = rawInCss(property, value);
     if (!reason) continue;
-    add('ds/no-raw-literal', m.index + lead.length, `\`${property}: ${value.trim()}\` is a raw ${reason}`, rawFix(reason, value, ctx));
+    add('ds/no-raw-literal', m.index + lead.length, `\`${property}: ${value.trim()}\` is a raw ${reason}`, rawFix(reason, property, value, ctx));
   }
 }
 

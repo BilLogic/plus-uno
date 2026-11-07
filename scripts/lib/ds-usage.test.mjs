@@ -111,6 +111,27 @@ test('ds/fa-free-only: a Pro family, or a regular icon Free does not ship', () =
   assert.deepEqual(rulesOf('p/App.jsx', '<i className="fa-regular fa-grid-2" />'), ['ds/fa-free-only']);
 });
 
+test('ds/fa-free-only: with Font Awesome metadata, solid and brands names are held to Free too', () => {
+  const withMeta = { ...ctx, freeIcons: { solid: new Set(['house']), brands: new Set(['figma']) } };
+  const rules = (text) => escapesIn({ path: 'p/App.jsx', text }, withMeta).map((f) => f.rule);
+  assert.deepEqual(rules('<i className="fa-solid fa-house" /><i className="fa-brands fa-figma" />'), []);
+  assert.deepEqual(rules('<i className="fa-solid fa-grid-2" />'), ['ds/fa-free-only']);
+});
+
+test('ds/no-raw-literal: a value match prefers tokens named for the property role', () => {
+  const roles = contextFrom({
+    components: { components: [] },
+    tokens: {
+      tokens: [
+        { name: '--icon-size-sm', tier: 'semantic', group: 'Scale Tokens', value: '12px' },
+        { name: '--pad-x-sm', tier: 'semantic', group: 'Spacing Semantics', value: '12px' },
+      ],
+    },
+  });
+  const [f] = escapesIn({ path: 'p/a.scss', text: '.a { padding: 12px; }' }, roles);
+  assert.equal(f.fix, 'use var(--pad-x-sm)');
+});
+
 test('ds/prefer-plus-component: a react-bootstrap name the barrel also exports (warn)', () => {
   const found = escapesIn({ path: 'p/App.jsx', text: "import { Button, Row } from 'react-bootstrap';\nimport Modal from 'react-bootstrap/Modal';" }, ctx);
   assert.deepEqual(found.map((f) => [f.rule, f.level]), [

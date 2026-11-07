@@ -31,13 +31,18 @@
  *   --update     re-record the baseline from `--all`; refuses to write a rise.
  *
  * A warn-level rule prints and never fails, and the baseline does not hold it.
+ *
+ * Its CLI prints its own lines rather than going through `findings.mjs`'s
+ * `main()`: a finding here carries a column, a rule ID, a fix and a doc link,
+ * and the shared renderer prints a file, a line and a message. `run()` is on
+ * the findings interface for the harness.
  */
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
-import { RULES, contextFrom, docLink, escapesIn } from './lib/ds-usage.mjs';
+import { contextFrom, docLink, escapesIn } from './lib/ds-usage.mjs';
 import { byRoot, isEntry } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 import { TOKEN_LADDER, retiredRenames } from './lib/tokens/plan.mjs';
@@ -140,6 +145,7 @@ export function expandPaths(repoRoot, given) {
   for (const p of given) {
     const abs = path.resolve(repoRoot, p);
     if (!fs.existsSync(abs)) throw new Error(`check:ds-usage: no such path: ${p}`);
+    if (path.relative(repoRoot, abs).startsWith('..')) throw new Error(`check:ds-usage: ${p} is outside the repository`);
     if (fs.statSync(abs).isDirectory()) walk(abs);
     else out.add(path.relative(repoRoot, abs).split(path.sep).join('/'));
   }
@@ -219,7 +225,8 @@ function record(repoRoot) {
   const rising = ratchet.absent ? [] : ratchet.failures(counts).filter((f) => f.kind === 'new' || f.kind === 'rose');
   if (rising.length) {
     console.error(`[check:ds-usage] not recorded: ${rising.length} rule/file pair(s) rose or are new. Fix the escapes instead.`);
-    process.exit(1);
+    process.exitCode = 1;
+    return;
   }
   ratchet.update(counts, {
     seed: {
@@ -247,7 +254,8 @@ function cli(argv) {
 
   if (argv.includes('--json')) {
     console.log(JSON.stringify({ files: files.length, blocking: verdict.blocking, warnings: verdict.warnings, stale: verdict.stale, absent: verdict.absent }, null, 2));
-    process.exit(failed ? 1 : 0);
+    process.exitCode = failed ? 1 : 0;
+    return;
   }
 
   for (const f of verdict.blocking) console.error(print(f));
@@ -257,14 +265,15 @@ function cli(argv) {
   if (verdict.absent) console.error(verdict.absent);
 
   const mode = all ? 'whole scope against the baseline' : given.length ? 'named paths, held to zero' : 'changed files, held to zero';
-  const line = `check:ds-usage: ${files.length} file(s), ${mode}: ${verdict.blocking.length} escape(s), ${verdict.warnings.length} warning(s)`;
+  const icons = contextOf(REPO_ROOT).freeIcons ? '' : '; solid and brands icon names unchecked (no Font Awesome metadata here)';
+  const line = `check:ds-usage: ${files.length} file(s), ${mode}: ${verdict.blocking.length} escape(s), ${verdict.warnings.length} warning(s)${icons}`;
   if (failed) {
     console.error(`✗ ${line}\n${REMEDY}`);
-    process.exit(1);
+    process.exitCode = 1;
+    return;
   }
   console.log(`✓ ${line}`);
 }
 
 if (isEntry(import.meta.url)) cli(process.argv.slice(2));
 
-export { RULES };

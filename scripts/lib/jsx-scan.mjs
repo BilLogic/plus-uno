@@ -118,7 +118,7 @@ const ATTR_NAME = /[A-Za-z_$][\w$:.-]*/y;
 const NUMBER = /^-?\d+(?:\.\d+)?$/;
 
 /** A literal written inside `{...}`: `'x'`, `"x"`, a template with no `${}`, or a number. */
-function literalOf(inner) {
+export function literalOf(inner) {
   const s = inner.trim();
   const str = s.match(/^(['"`])((?:(?!\1)[^\\]|\\.)*)\1$/);
   if (str && !(str[1] === '`' && str[2].includes('${'))) return { kind: 'string', text: str[2] };

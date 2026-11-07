@@ -4,7 +4,8 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { RULES, inScope, tally } from './check-ds-usage.mjs';
+import { inScope, tally } from './check-ds-usage.mjs';
+import { RULES } from './lib/ds-usage.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FIXTURES = 'scripts/lib/__fixtures__/ds-usage';
