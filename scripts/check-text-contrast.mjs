@@ -21,7 +21,7 @@
  *                 `--color-secondary`. Not defects; unrecognizable as such from
  *                 a stylesheet.
  *   UNKNOWN       a snackbar header whose background is set by a child modifier
- *                 (`&--created`), and a carousel control on `--color-scrim`
+ *                 (`&--created`), and a carousel control on `--ds-blanket`
  *                 over a photograph. Both real; neither measurable here.
  *   DECISION      `--color-on-warning` on `--color-warning` at 3.7:1 — already
  *                 recorded in `scripts/baselines/button-contrast-baseline.json` as an

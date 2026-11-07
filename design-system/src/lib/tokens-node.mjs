@@ -47,9 +47,9 @@
  * ─── WHY A FAMILY IS A NAME QUESTION AND A KIND IS A VALUE QUESTION ─────────
  *
  * `familyOf` classifies by prefix and stops there; nothing here says a family
- * "is" a color or "is" a dimension, because two of them are not. `--surface-*`
- * holds `--surface-raised` (a color alias) and `--surface-raised-shadow` (an
- * elevation), and `--type-*` holds a whole `font` shorthand. A kind table keyed
+ * "is" a color or "is" a dimension, because two of them are not. `--ds-*`
+ * holds `--ds-text` (a color), `--ds-shadow-raised` (an elevation) and
+ * `--ds-opacity-disabled` (a number), and `--type-*` holds a whole `font` shorthand. A kind table keyed
  * on the family would be wrong for those the day it was written.
  *
  * AND A NAME SUFFIX IS NOT A DERIVATION. `familyOf` reads a prefix, and the

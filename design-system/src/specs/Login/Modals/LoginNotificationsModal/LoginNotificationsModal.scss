@@ -7,7 +7,7 @@
     display: flex;
     flex-direction: column;
     gap: var(--size-modal-gap-sm); // Match Figma: tight stack with subtle separation
-    box-shadow: var(--elevation-light-2);
+    box-shadow: var(--ds-shadow-raised);
     color: var(--ds-text);
 }
 

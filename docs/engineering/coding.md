@@ -82,14 +82,14 @@ Use design tokens everywhere — never hardcode colors, spacing, typography, or 
 | Color | `var(--color-primary)`, `var(--color-on-surface)` | `#3B82F6`, `rgba(0,0,0,0.1)` |
 | Spacing | `var(--size-card-pad-x-md)`, `var(--size-section-gap-lg)` | `16px`, `24px` |
 | Typography | `var(--font-size-body1)`, `var(--font-family-header)` | `14px`, `'Inter'` |
-| Elevation | `var(--elevation-light-2)` | `0 2px 4px rgba(0,0,0,0.1)` |
+| Elevation | `var(--ds-shadow-raised)` | `0 2px 4px rgba(0,0,0,0.1)` |
 
 **Real token examples:**
 
 - Spacing: `--pad-x-lg`, `--size-card-pad-x-md`, `--size-section-gap-lg`, `--size-modal-radius-lg`, `--size-surface-pad-x`
 - Color: `--color-primary`, `--color-on-primary`, `--color-surface`, `--color-surface-container`, `--color-danger`
 - Typography: `--font-family-header`, `--font-family-body`, `--font-size-h1`, `--font-weight-semibold-1`, `--font-line-height-body2`
-- Elevation: `--elevation-light-1` through `--elevation-light-5`
+- Elevation: `--ds-shadow-raised`, `--ds-shadow-overlay`
 - Breakpoints: `--breakpoint-md-min`, `--breakpoint-lg-min`, `--breakpoint-xl-min`
 
 ## Playground

@@ -1138,14 +1138,11 @@ The Material roles, still in use until components move to the `--ds-` set. Use s
 --color-danger-border-subtle
 --color-danger-container
 --color-danger-text
---color-disabled-opacity
 --color-info
 --color-info-border-subtle
 --color-info-container
 --color-info-text
---color-inverse-on-surface
 --color-inverse-primary
---color-inverse-surface
 --color-mastering-content
 --color-mastering-content-border-subtle
 --color-mastering-content-container
@@ -1185,7 +1182,6 @@ The Material roles, still in use until components move to the `--ds-` set. Use s
 --color-relationship-border-subtle
 --color-relationship-container
 --color-relationship-text
---color-scrim
 --color-secondary
 --color-secondary-container
 --color-secondary-text
@@ -1222,17 +1218,12 @@ The Material roles, still in use until components move to the `--ds-` set. Use s
 
 ## Elevation Tokens
 ```css
---elevation-light-1
---elevation-light-2
---elevation-light-3
 --elevation-light-4
 --elevation-light-5
 --surface-container
 --surface-default
 --surface-overlay
---surface-overlay-shadow
 --surface-raised
---surface-raised-shadow
 --surface-sunken
 ```
 

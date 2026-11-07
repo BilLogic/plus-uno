@@ -8,7 +8,7 @@
  * annotation disagree.
  */
 export const INVERSE_GROUNDS = [
-    '--color-inverse-surface',
+    '--ds-background-neutral-bold',
     '--color-primary',
     '--color-secondary',
     '--color-success',

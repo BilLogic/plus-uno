@@ -293,7 +293,7 @@ none for the focus ring, because the code did not have that role either.
 **`_Focus/Focus Ring`** now exists in `colors / accent`
 (`VariableID:17595:28`), aliasing `_Primary/Primary` and scoped to
 `STROKE_COLOR` alone. It is a variable rather than a reuse of `_Primary/Primary`
-for the same reason `--color-focus-ring` is a token rather than a literal: WCAG
+for the same reason `--ds-border-focused` is a token rather than a literal: WCAG
 2.4.11 gives the focus indicator a success criterion of its own, Atlassian keep
 `color.border.focused` apart from `color.border`, and the alias is the part that
 can change — a different hue, a lighter one on dark grounds — without touching

@@ -30,8 +30,8 @@ test('the four Figma surface roles resolve under their color names', () => {
   }
 });
 
-test("Figma's Element/opacity-disabled maps to the existing disabled opacity", () => {
+test("Figma's Element/opacity-disabled maps to the generated disabled opacity", () => {
   const registry = JSON.parse(fs.readFileSync(REGISTRY, 'utf8'));
-  assert.equal(registry.mappings.colors['Element/opacity-disabled'], 'var(--color-disabled-opacity)');
-  assert.equal(corpus.get('--color-disabled-opacity')?.value, '0.38');
+  assert.equal(registry.mappings.colors['Element/opacity-disabled'], 'var(--ds-opacity-disabled)');
+  assert.equal(corpus.get('--ds-opacity-disabled')?.value, '0.4');
 });

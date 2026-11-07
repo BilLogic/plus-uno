@@ -34,7 +34,7 @@ import { buildAllPlans, buildPlan } from './lib/color/build.mjs';
 import { ACTIVE_PLAN } from './lib/color/plans.mjs';
 import { colorFailures } from './lib/color/failures.mjs';
 import { composite } from './lib/color/checks.mjs';
-import { ALIASES, legacyCoverage, missingTargets, pairFailures } from './lib/color/legacy-map.mjs';
+import { RETIRED_LEGACY, legacyCoverage, missingTargets, pairFailures } from './lib/color/legacy-map.mjs';
 import { contrast } from './lib/color/oklch.mjs';
 import { main } from './lib/findings.mjs';
 
@@ -69,7 +69,7 @@ export const summary = ({ repoRoot = REPO_ROOT } = {}) => {
   const { used } = legacyCoverage({ root: repoRoot });
   return (
     `${Object.keys(plans).length} plans x ${tokens} tokens x 4 modes pass every check, and map identically; ` +
-    `${used.size} legacy color names in use all have a migration-map row, ${Object.keys(ALIASES).length} aliased`
+    `${used.size} legacy color names in use all have a migration-map row, ${Object.keys(RETIRED_LEGACY).length} retired`
   );
 };
 

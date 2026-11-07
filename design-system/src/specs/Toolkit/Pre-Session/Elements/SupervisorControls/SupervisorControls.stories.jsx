@@ -174,7 +174,7 @@ export const Overview = () => (
                 backgroundColor: 'var(--ds-surface-overlay)',
                 borderRadius: 'var(--size-modal-radius-sm)',
                 maxWidth: 'var(--size-modal-width-sm)',
-                boxShadow: 'var(--elevation-light-2)'
+                boxShadow: 'var(--ds-shadow-raised)'
             }}>
                 {/* Join session */}
                 <div style={{

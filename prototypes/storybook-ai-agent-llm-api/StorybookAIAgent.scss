@@ -266,12 +266,12 @@
   border-radius: var(--radius-full);
   cursor: pointer;
   transition: box-shadow 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
-  box-shadow: var(--elevation-light-1);
+  box-shadow: var(--ds-shadow-raised);
   text-align: left;
 
   &:hover {
     border-color: var(--color-outline);
-    box-shadow: var(--elevation-light-2);
+    box-shadow: var(--ds-shadow-raised);
     transform: translateY(-1px);
   }
 
@@ -487,7 +487,7 @@
   background: var(--ds-surface);
   border-radius: var(--size-card-radius-md);
   border: none;
-  box-shadow: var(--elevation-light-1);
+  box-shadow: var(--ds-shadow-raised);
 }
 
 .sb-ai-agent__skill-card--prototype {
@@ -804,8 +804,8 @@
   }
 
   &--user {
-    background: var(--color-inverse-surface);
-    color: var(--color-inverse-on-surface);
+    background: var(--ds-background-neutral-bold);
+    color: var(--ds-text-inverse);
     border-radius: 16px 0 16px 16px;
   }
 
@@ -927,14 +927,14 @@
   width: 32px;
   height: 32px;
   border-radius: 12px;
-  background: var(--color-inverse-surface);
+  background: var(--ds-background-neutral-bold);
   border: none;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--color-inverse-on-surface);
-  box-shadow: var(--elevation-light-2);
+  color: var(--ds-text-inverse);
+  box-shadow: var(--ds-shadow-raised);
   transition: all 0.15s ease;
 
   &:hover {

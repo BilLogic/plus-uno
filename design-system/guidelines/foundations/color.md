@@ -130,7 +130,7 @@ take elsewhere. Navigation reads the icon and label as one mark.
 
 ### Exception: the Field hover border
 
-A Field's hover border is `--color-inverse-primary`, not `--color-primary-border`.
+A Field's hover border is `--color-inverse-primary`, not `--ds-border-brand`.
 The border role is the focus ring's color, so a hover border in it would read
 as focus. The hover border is a hint, not an indicator: focus is the 2px focus
 ring.

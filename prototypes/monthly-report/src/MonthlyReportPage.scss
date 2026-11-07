@@ -1400,7 +1400,7 @@
 .monthly-report .time-allocation-section {
     border: none !important;
     border-radius: var(--size-card-radius-md) !important;
-    box-shadow: var(--elevation-light-1, 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3)) !important;
+    box-shadow: var(--ds-shadow-raised) !important;
     margin-bottom: var(--size-spacing-small-space-000) !important;
     margin-left: var(--stack-sm, 8px) !important;
     margin-right: var(--stack-sm, 8px) !important;

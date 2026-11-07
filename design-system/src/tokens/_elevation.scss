@@ -5,16 +5,8 @@
  */
 
 :root {
-    /* Elevation Light - Material Design 3 */
-    /* Elevation 1 - Figma: Elevation Light/1 */
-    --elevation-light-1: 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3); // overridden by color/_legacy-aliases.scss
-
-    /* Elevation 2 - Figma: Elevation Light/2 */
-    --elevation-light-2: 0px 2px 6px 2px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3); // overridden by color/_legacy-aliases.scss
-
-    /* Elevation 3 - Figma: Elevation Light/3 */
-    --elevation-light-3: 0px 1px 3px 0px rgba(0, 0, 0, 0.3), 0px 4px 8px 3px rgba(0, 0, 0, 0.15); // overridden by color/_legacy-aliases.scss
-
+    /* Elevation Light - Material Design 3. Levels 1-3 are retired: their uses
+       moved to --ds-shadow-raised (1, 2) and --ds-shadow-overlay (3). */
     /* Elevation 4 - Figma: Elevation Light/4 */
     --elevation-light-4: 0px 2px 3px 0px rgba(0, 0, 0, 0.3), 0px 6px 10px 4px rgba(0, 0, 0, 0.15);
 
@@ -49,11 +41,10 @@
  * THE PAIRING IS THE WHOLE IDEA. `--surface-raised` is a fill; on its own it is
  * indistinguishable from `--surface-default`, because in this model that is
  * TRUE — a raised card is the same color as the page and is lifted by its
- * shadow. So each raised role ships with the shadow it must be used with, named
- * so the two cannot drift apart:
+ * shadow. Each raised role is used with the generated shadow of its level:
  *
  *   background: var(--surface-raised);
- *   box-shadow: var(--surface-raised-shadow);
+ *   box-shadow: var(--ds-shadow-raised);
  *
  * A rule that sets one without the other is visible in review as a missing
  * line. A card is the deliberate case: it rests flat and names the shadow only
@@ -78,17 +69,15 @@
      * dragged, so a resting card sets this fill with `box-shadow: none` and
      * names the shadow only in its hover and dragging rules.
      *
-     * LIGHT/2, per `design-system/guidelines/figma/token-mapping.md` ("clickable
-     * cards on hover or drag") and `foundations/elevation.md`.
-     * `scripts/check-elevation-roles.test.mjs` reads both.
+     * Its shadow is `--ds-shadow-raised`, per `foundations/elevation.md`
+     * ("clickable cards on hover or drag").
      */
     --surface-raised: var(--color-surface-container-lowest);
-    --surface-raised-shadow: var(--elevation-light-2); // overridden by color/_legacy-aliases.scss
 
     /**
      * Every floating layer that sits ON TOP of the UI without a scrim: menus
-     * and dropdowns, Popover, Tooltip, Toast and Flag, Listbox. Light/3, per
-     * the same mapping table.
+     * and dropdowns, Popover, Tooltip, Toast and Flag, Listbox. Its shadow is
+     * `--ds-shadow-overlay`.
      *
      * A MODAL USES THIS FILL BUT NOT THIS SHADOW. It sits on the white overlay
      * surface over a scrim, lifted by `--elevation-light-4`, which it names
@@ -98,7 +87,6 @@
      * carries the modal shadow.
      */
     --surface-overlay: var(--color-surface-container-lowest);
-    --surface-overlay-shadow: var(--elevation-light-3); // overridden by color/_legacy-aliases.scss
 
     /**
      * A neutral well INSIDE a card — a code block, a quiet panel, a summary

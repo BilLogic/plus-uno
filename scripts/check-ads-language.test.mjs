@@ -102,12 +102,6 @@ test('the live tree holds no old language', () => {
   assert.deepEqual(run(), []);
 });
 
-test('the token files that define the scrim token may name it, and are still read for every other rule', () => {
-  const file = 'design-system/src/tokens/_colors.scss';
-  assert.deepEqual(run({ sources: [src(file, '--color-scrim: #000;\n')] }), []);
-  assert.equal(run({ sources: [src(file, `--color-scrim: var(${step('info', '08')});\n`)] }).length, 1);
-});
-
 test('the AI is unnamed: the old product name for it is counted in the design system only', () => {
   const name = ['PLUS', 'AI'].join(' ');
   const jsx = `<PromptInput label="Message to ${name}" />\n/** Where a person writes to ${name}. */\n`;

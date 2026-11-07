@@ -37,7 +37,7 @@ export const tokenLength = (host, token) => px(probe(host, 'width', `var(${token
 
 /**
  * What a `box-shadow` value resolves to once computed, read through a probe, so
- * a story compares a shadow against its token (`var(--elevation-light-2)`) or
+ * a story compares a shadow against its token (`var(--ds-shadow-raised)`) or
  * a composition of tokens, never against a hand-typed copy of the numbers.
  */
 export const computedShadow = (host, value) => probe(host, 'boxShadow', value);
