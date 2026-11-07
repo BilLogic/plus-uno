@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as AvatarGroupStories from './AvatarGroup.stories.jsx';
-import { DocsCanvasShell, DocsTable, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Avatar, AvatarGroup } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -51,9 +58,7 @@ overlap, the ring between neighbors, and how many fit on the row.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Six sizes, the same as `Avatar`. 16 to 40 are the Media sizes; 96 and 128 are for profiles.</>}>
-    <Canvas of={AvatarGroupStories.Sizes} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={AvatarGroupStories.Sizes} title="Sizes" description={<>Six sizes, the same as `Avatar`. 16 to 40 are the Media sizes; 96 and 128 are for profiles.</>} />
 
 </div>
 
@@ -61,9 +66,7 @@ overlap, the ring between neighbors, and how many fit on the row.
 
 ## Shape and color
 
-<DocsCanvasShell description={<>The group's size and shape win over each avatar's own, so the row stays even.</>}>
-    <DsCanvasQuiet of={AvatarGroupStories.GroupSizeAndShape} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarGroupStories.GroupSizeAndShape} title="Group size and shape" description={<>The group's size and shape win over each avatar's own, so the row stays even.</>} />
 
 </div>
 
@@ -71,13 +74,9 @@ overlap, the ring between neighbors, and how many fit on the row.
 
 ## Group
 
-<DocsCanvasShell description={<><code>max</code> counts the <code>+n</code> in, so seven people with a max of five show four avatars and <code>+3</code>. The <code>+3</code> opens the rest by name.</>}>
-    <DsCanvasQuiet of={AvatarGroupStories.Group} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarGroupStories.Group} title="Group" description={<><code>max</code> counts the <code>+n</code> in, so seven people with a max of five show four avatars and <code>+3</code>. The <code>+3</code> opens the rest by name.</>} />
 
-<DocsCanvasShell description={<>Within <code>max</code> there is no <code>+n</code>.</>}>
-    <DsCanvasQuiet of={AvatarGroupStories.GroupFits} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarGroupStories.GroupFits} title="Group fits" description={<>Within <code>max</code> there is no <code>+n</code>.</>} />
 
 </div>
 
@@ -85,25 +84,15 @@ overlap, the ring between neighbors, and how many fit on the row.
 
 ## State
 
-<DocsCanvasShell description={<>Rest. The <code>+n</code> is the only part of the group that is a control.</>}>
-    <DsCanvasQuiet of={AvatarGroupStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarGroupStories.Rest} title="Rest" description={<>Rest. The <code>+n</code> is the only part of the group that is a control.</>} />
 
-<DocsCanvasShell description={<>Hovered. The <code>+n</code> steps to the subtle gray fill.</>}>
-    <DsCanvasQuiet of={AvatarGroupStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarGroupStories.Hovered} title="Hovered" description={<>Hovered. The <code>+n</code> steps to the subtle gray fill.</>} />
 
-<DocsCanvasShell description={<>Focused. A 2px ring, 1px off the button, for keyboard focus.</>}>
-    <DsCanvasQuiet of={AvatarGroupStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarGroupStories.Focused} title="Focused" description={<>Focused. A 2px ring, 1px off the button, for keyboard focus.</>} />
 
-<DocsCanvasShell description={<>Pressed. Opens the menu of the people left out; Escape closes it.</>}>
-    <DsCanvasQuiet of={AvatarGroupStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarGroupStories.Pressed} title="Pressed" description={<>Pressed. Opens the menu of the people left out; Escape closes it.</>} />
 
-<DocsCanvasShell description={<>Disabled. With nothing to fold there is no control at all.</>}>
-    <DsCanvasQuiet of={AvatarGroupStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarGroupStories.Disabled} title="Disabled" description={<>Disabled. With nothing to fold there is no control at all.</>} />
 
 
 </div>
@@ -193,21 +182,35 @@ each person beside their picture.
 `AvatarGroup` passes its `size` and `shape` to every `Avatar` child, so the
 row stays even even when a child sets its own.
 
-```jsx
-<AvatarGroup label="Session attendees" max={5}>
-    {people.map((p) => <Avatar key={p.id} name={p.name} src={p.photo} />)}
-</AvatarGroup>
-```
+<DoDontPair
+    doExample={<AvatarGroup label="Attendees" max={3}><Avatar name="Jane Park" /><Avatar name="Sam Lee" /><Avatar name="Ana Ruiz" /><Avatar name="Li Wei" /></AvatarGroup>}
+    doCaption="The group sets one size and shape for every child."
+    dontExample={<AvatarGroup label="Attendees" max={3}><Avatar name="Jane Park" size={24} /><Avatar name="Sam Lee" size={40} shape="square" /><Avatar name="Ana Ruiz" /></AvatarGroup>}
+    dontCaption="Children that set their own size and shape, which the group ignores."
+/>
 
 ### `max` counts the `+n` in.
 
 Five people with `max={5}` show all five; a sixth pushes one into `+2` —
 `max` is the most avatars the row ever shows, the `+n` included.
 
+<DoDontPair
+    doExample={<AvatarGroup label="Attendees" max={3}><Avatar name="Jane Park" /><Avatar name="Sam Lee" /><Avatar name="Ana Ruiz" /></AvatarGroup>}
+    doCaption="Three people fit in max 3, with no +n."
+    dontExample={<AvatarGroup label="Attendees" max={3}><Avatar name="Jane Park" /><Avatar name="Sam Lee" /><Avatar name="Ana Ruiz" /><Avatar name="Li Wei" /></AvatarGroup>}
+    dontCaption="A fourth person shows two avatars and +2, because the +n takes a slot."
+/>
 
 ### Keep the group short.
 
 Use it for a handful of people. For a roster, link to the list instead of folding sixty names behind `+n`.
+
+<DoDontPair
+    doExample={<AvatarGroup label="Attendees" max={4}><Avatar name="Jane Park" /><Avatar name="Sam Lee" /><Avatar name="Ana Ruiz" /><Avatar name="Li Wei" /><Avatar name="Max Cho" /><Avatar name="Zoe Tan" /></AvatarGroup>}
+    doCaption="A handful, with the rest behind the +n."
+    dontExample={<AvatarGroup label="Attendees" max={2}><Avatar name="Jane Park" /><Avatar name="Sam Lee" /><Avatar name="Ana Ruiz" /><Avatar name="Li Wei" /><Avatar name="Max Cho" /><Avatar name="Zoe Tan" /></AvatarGroup>}
+    dontCaption="Folding most of a roster behind +n: link to the list instead."
+/>
 
 </div>
 

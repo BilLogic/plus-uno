@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as IllustrationStories from './Illustration.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Illustration } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -49,9 +56,7 @@ and legs drawn in line work, and takes every color from a token.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>All twelve characters. Switch the color mode in the toolbar to see them in Dark: the bodies and the line work change with the tokens.</>}>
-    <Canvas of={IllustrationStories.Gallery} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={IllustrationStories.Gallery} title="Gallery" description={<>All twelve characters. Switch the color mode in the toolbar to see them in Dark: the bodies and the line work change with the tokens.</>} />
 
 </div>
 
@@ -109,9 +114,7 @@ every character.
 
 ## SMART characters
 
-<DocsCanvasShell description={<>Mastering content, advocacy, technology, relationships and social emotional. Each body takes its SMART area's <code>subtle</code> step.</>}>
-    <DsCanvasQuiet of={IllustrationStories.SmartCharacters} />
-</DocsCanvasShell>
+<ComponentExample of={IllustrationStories.SmartCharacters} title="Smart characters" description={<>Mastering content, advocacy, technology, relationships and social emotional. Each body takes its SMART area's <code>subtle</code> step.</>} />
 
 </div>
 
@@ -119,9 +122,7 @@ every character.
 
 ## Math characters
 
-<DocsCanvasShell description={<>Dot, approximately equal, root, all, pi, equal and divider. Each body takes an accent hue at the same strength as the SMART bodies.</>}>
-    <DsCanvasQuiet of={IllustrationStories.MathCharacters} />
-</DocsCanvasShell>
+<ComponentExample of={IllustrationStories.MathCharacters} title="Math characters" description={<>Dot, approximately equal, root, all, pi, equal and divider. Each body takes an accent hue at the same strength as the SMART bodies.</>} />
 
 </div>
 
@@ -129,9 +130,7 @@ every character.
 
 ## Sizes
 
-<DocsCanvasShell description={<>48, 96, 160 and 240 are the named sizes; any number of pixels also works. The size is the frame's width and height, and the limbs reach past it.</>}>
-    <DsCanvasQuiet of={IllustrationStories.Sizes} />
-</DocsCanvasShell>
+<ComponentExample of={IllustrationStories.Sizes} title="Sizes" description={<>48, 96, 160 and 240 are the named sizes; any number of pixels also works. The size is the frame's width and height, and the limbs reach past it.</>} />
 
 - **48, 96, 160, 240.** Below 48 the line work breaks into specks; above 240
   the stipple starts to read as noise.
@@ -147,9 +146,7 @@ every character.
 
 ## State
 
-<DocsCanvasShell description={<>Rest. A character is a picture, not a control, so this is its one state.</>}>
-    <DsCanvasQuiet of={IllustrationStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={IllustrationStories.Rest} title="Rest" description={<>Rest. A character is a picture, not a control, so this is its one state.</>} />
 
 </div>
 
@@ -232,40 +229,30 @@ understand. Use `Tile` for a small square picture of a thing.
 
 ### Pick a SMART character for a SMART area, and a math character for anything else.
 
-```jsx
-// Incorrect: a math character standing in for a SMART area, and a SMART
-// character used as generic decoration on a page about something else.
-<Illustration character="pi" title="Advocacy" />
-<Illustration character="relationships" />  {/* on a billing page */}
-
-// Correct.
-<Illustration character="advocacy" title="Advocacy" />
-<Illustration character="pi" />
-```
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Illustration character="advocacy" title="Advocacy" size={96} /><Illustration character="pi" size={96} /></div>}
+    doCaption="A SMART character for its area; a math character for the rest."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Illustration character="pi" title="Advocacy" size={96} /></div>}
+    dontCaption="A math character standing in for a SMART area."
+/>
 
 ### Keep characters decorative unless they carry meaning.
 
-```jsx
-// Incorrect: a title on a character beside a heading that already says it.
-<h2>Advocacy</h2>
-<Illustration character="advocacy" title="Advocacy" />
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Illustration character="advocacy" size={96} /><strong>Advocacy</strong></div>}
+    doCaption="Decorative beside a heading that already says it."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Illustration character="advocacy" title="Advocacy" size={96} /><strong>Advocacy</strong></div>}
+    dontCaption="A title that repeats the heading, so it is read twice."
+/>
 
-// Correct: decorative beside the heading; titled when it stands alone.
-<h2>Advocacy</h2>
-<Illustration character="advocacy" />
-```
+### Don't crop a character.
 
-### Don't recolor or crop a character.
-
-```jsx
-// Incorrect: the colors come from tokens, so a style override breaks the
-// color modes; and clipping the box cuts the limbs off.
-<Illustration character="dot" style={{ filter: 'hue-rotate(90deg)' }} />
-<div style={{ overflow: 'hidden' }}><Illustration character="dot" /></div>
-
-// Correct: give it room instead.
-<div style={{ padding: 'var(--size-section-gap-lg)' }}><Illustration character="dot" /></div>
-```
+<DoDontPair
+    doExample={<div style={{ padding: 'var(--pad-x-md)' }}><Illustration character="dot" size={96} /></div>}
+    doCaption="Give it room."
+    dontExample={<div style={{ overflow: 'hidden', height: 'var(--size-media-lg)' }}><Illustration character="dot" size={96} /></div>}
+    dontCaption="Clipping the box cuts off the limbs."
+/>
 
 </div>
 

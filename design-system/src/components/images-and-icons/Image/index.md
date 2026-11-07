@@ -35,6 +35,4 @@ Anything not listed is not a valid value.
 
 Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Object` · `Tile` · `UserAvatar`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

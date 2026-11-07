@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as TileStories from './Tile.stories.jsx';
-import { DocsCanvasShell, DocsTable, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Tile } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -66,9 +73,7 @@ its size.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Six sizes, from 16 to 48, for every kind of content. The icon scales with the tile: 10 in a 16 tile, 24 in a 48.</>}>
-    <Canvas of={TileStories.Sizes} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={TileStories.Sizes} title="Sizes" description={<>Six sizes, from 16 to 48, for every kind of content. The icon scales with the tile: 10 in a 16 tile, 24 in a 48.</>} />
 
 </div>
 
@@ -76,13 +81,9 @@ its size.
 
 ## Icon colors
 
-<DocsCanvasShell description={<>Subtle is the color's subtler accent ground with its accent icon. Gray is the neutral ground with the subtle icon.</>}>
-    <DsCanvasQuiet of={TileStories.IconSubtle} />
-</DocsCanvasShell>
+<ComponentExample of={TileStories.IconSubtle} title="Icon subtle" description={<>Subtle is the color's subtler accent ground with its accent icon. Gray is the neutral ground with the subtle icon.</>} />
 
-<DocsCanvasShell description={<>Bold is the bolder accent ground with the inverse icon. Gray bold is the bold neutral fill.</>}>
-    <DsCanvasQuiet of={TileStories.IconBold} />
-</DocsCanvasShell>
+<ComponentExample of={TileStories.IconBold} title="Icon bold" description={<>Bold is the bolder accent ground with the inverse icon. Gray bold is the bold neutral fill.</>} />
 
 </div>
 
@@ -90,9 +91,7 @@ its size.
 
 ## Logos
 
-<DocsCanvasShell description={<>A logo is inset like an icon and keeps its own colors. It sits on white by default, or on gray or a color's subtler accent background when it needs contrast.</>}>
-    <DsCanvasQuiet of={TileStories.Logos} />
-</DocsCanvasShell>
+<ComponentExample of={TileStories.Logos} title="Logos" description={<>A logo is inset like an icon and keeps its own colors. It sits on white by default, or on gray or a color's subtler accent background when it needs contrast.</>} />
 
 </div>
 
@@ -100,9 +99,7 @@ its size.
 
 ## Images
 
-<DocsCanvasShell description={<>An image fills the tile and crops to the square, so a landscape picture is never squashed.</>}>
-    <DsCanvasQuiet of={TileStories.Images} />
-</DocsCanvasShell>
+<ComponentExample of={TileStories.Images} title="Images" description={<>An image fills the tile and crops to the square, so a landscape picture is never squashed.</>} />
 
 </div>
 
@@ -110,9 +107,7 @@ its size.
 
 ## Border
 
-<DocsCanvasShell description={<><code>hasBorder</code> adds a 1px border edge inside the tile, for a logo or image whose own edge fades into the page.</>}>
-    <DsCanvasQuiet of={TileStories.WithBorder} />
-</DocsCanvasShell>
+<ComponentExample of={TileStories.WithBorder} title="With border" description={<><code>hasBorder</code> adds a 1px border edge inside the tile, for a logo or image whose own edge fades into the page.</>} />
 
 </div>
 
@@ -120,9 +115,7 @@ its size.
 
 ## State
 
-<DocsCanvasShell description={<>Rest. A tile is a picture, not a control, so this is its one state.</>}>
-    <DsCanvasQuiet of={TileStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={TileStories.Rest} title="Rest" description={<>Rest. A tile is a picture, not a control, so this is its one state.</>} />
 
 </div>
 
@@ -213,28 +206,35 @@ Use an icon on its own when it sits inline with text and needs no frame. Use
 Icons take `appearance` and `color`. Logos take a ground color only, since the
 logo keeps its own. Images cover the whole tile, so color does not apply.
 
-```jsx
-// Incorrect: a bold appearance on a logo does nothing, and a color on an
-// image is hidden under the picture.
-<Tile content="logo" appearance="bold" src={logoUrl} />
-<Tile content="image" color="blue" src={photoUrl} />
-
-// Correct.
-<Tile icon="book-open" appearance="bold" color="blue" />
-<Tile content="logo" src={logoUrl} />
-<Tile content="image" src={photoUrl} />
-```
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile icon="book-open" appearance="bold" color="blue" /><Tile icon="book-open" /></div>}
+    doCaption="Icons take appearance and color; logos keep their own."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src="https://placehold.co/48" appearance="bold" /></div>}
+    dontCaption="A bold appearance on a logo, which does nothing."
+/>
 
 ### Colors are categories.
 
-`color` takes the Tag color set from the label spec, where `yellow` replaces
-`orange` (`orange` still works as a deprecated alias): plain names, never a status. Keep one color per kind of
+`color` takes the Tag color set: plain names, never a status. Keep one color per kind of
 item across the app, or leave tiles gray.
 
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile icon="book-open" color="blue" /><Tile icon="book-open" color="blue" /></div>}
+    doCaption="One color for each kind of item, across the app."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile icon="book-open" color="blue" /><Tile icon="book-open" color="magenta" /></div>}
+    dontCaption="The same kind of item in two colors."
+/>
 
 ### Give a logo its own ground.
 
 Logos default to white. Set a ground color only to match a surface; never recolor the logo.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src="https://placehold.co/48" /></div>}
+    doCaption="A logo on the default white ground."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Tile content="logo" src="https://placehold.co/48" color="blue" appearance="bold" /></div>}
+    dontCaption="A bold ground on the logo, which keeps its own."
+/>
 
 </div>
 

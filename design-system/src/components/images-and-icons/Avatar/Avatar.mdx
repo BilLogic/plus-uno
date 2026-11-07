@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as AvatarStories from './Avatar.stories.jsx';
-import { DocsCanvasShell, DocsTable, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Avatar } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -56,9 +63,7 @@ folds the rest into a `+n`.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>Six sizes. 16 to 40 are the Media sizes; 96 and 128 are for profiles.</>}>
-    <Canvas of={AvatarStories.Sizes} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={AvatarStories.Sizes} title="Sizes" description={<>Six sizes. 16 to 40 are the Media sizes; 96 and 128 are for profiles.</>} />
 
 </div>
 
@@ -66,13 +71,9 @@ folds the rest into a `+n`.
 
 ## Initials, icons and pictures
 
-<DocsCanvasShell description={<>Initials are the first letters of the first and last words of the name. A 16 or 20 keeps one.</>}>
-    <DsCanvasQuiet of={AvatarStories.Initials} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarStories.Initials} title="Initials" description={<>Initials are the first letters of the first and last words of the name. A 16 keeps one.</>} />
 
-<DocsCanvasShell description={<>The picture wins when it loads. When it fails the initials show, then the icon, then a plain person glyph.</>}>
-    <DsCanvasQuiet of={AvatarStories.Fallbacks} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarStories.Fallbacks} title="Fallbacks" description={<>The picture wins when it loads. When it fails the initials show, then the icon, then a plain person glyph.</>} />
 
 </div>
 
@@ -80,13 +81,9 @@ folds the rest into a `+n`.
 
 ## Shape and color
 
-<DocsCanvasShell description={<>A square takes a quarter of its size as its radius.</>}>
-    <DsCanvasQuiet of={AvatarStories.Shapes} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarStories.Shapes} title="Shapes" description={<>A square takes a quarter of its size as its radius.</>} />
 
-<DocsCanvasShell description={<>Colors are categories from the Tag set, never a status.</>}>
-    <DsCanvasQuiet of={AvatarStories.Colors} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarStories.Colors} title="Colors" description={<>Colors are categories from the Tag set, never a status.</>} />
 
 </div>
 
@@ -94,9 +91,7 @@ folds the rest into a `+n`.
 
 ## Presence
 
-<DocsCanvasShell description={<>A dot a quarter of the avatar's size, at the bottom right. The status is also said in the avatar's accessible name.</>}>
-    <DsCanvasQuiet of={AvatarStories.Status} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarStories.Status} title="Status" description={<>A dot a quarter of the avatar's size, at the bottom right. The status is also said in the avatar's accessible name.</>} />
 
 </div>
 
@@ -104,25 +99,15 @@ folds the rest into a `+n`.
 
 ## State
 
-<DocsCanvasShell description={<>Rest. The only state.</>}>
-    <DsCanvasQuiet of={AvatarStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarStories.Rest} title="Rest" description={<>Rest. The only state.</>} />
 
-<DocsCanvasShell description={<>Hovered. No change: an avatar is not a control.</>}>
-    <DsCanvasQuiet of={AvatarStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarStories.Hovered} title="Hovered" description={<>Hovered. No change: an avatar is not a control.</>} />
 
-<DocsCanvasShell description={<>Pressed. No change.</>}>
-    <DsCanvasQuiet of={AvatarStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarStories.Pressed} title="Pressed" description={<>Pressed. No change.</>} />
 
-<DocsCanvasShell description={<>Focused. Not in the tab order.</>}>
-    <DsCanvasQuiet of={AvatarStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarStories.Focused} title="Focused" description={<>Focused. Not in the tab order.</>} />
 
-<DocsCanvasShell description={<>Disabled. Never dimmed.</>}>
-    <DsCanvasQuiet of={AvatarStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={AvatarStories.Disabled} title="Disabled" description={<>Disabled. Never dimmed.</>} />
 
 </div>
 
@@ -212,15 +197,12 @@ role and notification counter beside the initial.
 Keep one shape per kind within a list, so the shape tells a person from an
 agent at a glance.
 
-```jsx
-// Incorrect: a person in a square, an agent in a circle.
-<Avatar shape="square" name="Jane Park" />
-<Avatar icon="robot" label="Study bot" />
-
-// Correct.
-<Avatar name="Jane Park" />
-<Avatar shape="square" icon="robot" label="Study bot" />
-```
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar name="Jane Park" /><Avatar shape="square" icon="robot" label="Study bot" /></div>}
+    doCaption="A circle for a person, a square for an agent."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar shape="square" name="Jane Park" /><Avatar icon="robot" label="Study bot" /></div>}
+    dontCaption="A person in a square and an agent in a circle."
+/>
 
 ### Keep the name beside bare initials.
 
@@ -243,9 +225,23 @@ even.
 
 Keep one color per kind of person, or leave avatars blue. Green, yellow and red belong to the presence dot, so a green avatar reads as "online".
 
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar name="Jane Park" /><Avatar name="Sam Lee" /></div>}
+    doCaption="One color for all people, or one per kind."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar name="Jane Park" color="green" /><Avatar name="Sam Lee" color="yellow" /></div>}
+    dontCaption="Green and yellow read as online and away."
+/>
+
 ### Show presence only where it helps.
 
 Use the dot in a list a person scans for who is around. Leave it off a byline or a comment, where presence is not the question.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar name="Jane Park" status="online" /><span>Jane Park</span></div>}
+    doCaption="The dot in a list that is scanned for who is around."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Avatar name="Jane Park" status="online" size={16} /></div>}
+    dontCaption="A dot on a tiny byline, where presence is not the question."
+/>
 
 </div>
 
