@@ -288,7 +288,7 @@ export const ModalLeavesThePopupOpen = {
 
 const DOCS_ENTRIES = buildDocsEntries({
     entries: {
-        'button--docs': { id: 'button--docs', title: 'Forms and inputs/Button', type: 'docs' },
+        'components-forms-and-inputs-button-button--docs': { id: 'components-forms-and-inputs-button-button--docs', title: 'Forms and inputs/Button', type: 'docs' },
         'modal--docs': { id: 'modal--docs', title: 'Overlays/Modal', type: 'docs' },
     },
 }, ['Button', 'Modal']);
@@ -334,7 +334,7 @@ export const DocsAgent = {
         await userEvent.type(input, 'Where is Button?{Enter}');
         const link = await within(popup()).findByRole('link', { name: 'Button' });
         await within(popup()).findByText(/Button is in the context/);
-        await expect(link, 'the answer links the docs page').toHaveAttribute('href', '/?path=/docs/button--docs');
+        await expect(link, 'the answer links the docs page').toHaveAttribute('href', '/?path=/docs/components-forms-and-inputs-button-button--docs');
 
         const names = within(popup()).getAllByRole('button').map((b) => b.getAttribute('aria-label'));
         await expect(names, 'no full screen, no more menu').toEqual(expect.arrayContaining(['Clear chat', 'Move to Panel', 'Close chat']));
@@ -375,6 +375,6 @@ export const DocsAgentFallback = {
         await waitFor(() => expect(popup()).not.toBeNull());
         await userEvent.type(within(popup()).getByRole('textbox', { name: 'Message to AI agent' }), 'Where is Button?{Enter}');
         await within(popup()).findByText(/unavailable right now, so this is a search/);
-        await expect(await within(popup()).findByRole('link', { name: 'Button' })).toHaveAttribute('href', '/?path=/docs/button--docs');
+        await expect(await within(popup()).findByRole('link', { name: 'Button' })).toHaveAttribute('href', '/?path=/docs/components-forms-and-inputs-button-button--docs');
     }),
 };
