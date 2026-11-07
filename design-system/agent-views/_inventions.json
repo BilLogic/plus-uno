@@ -80,13 +80,6 @@
       "why": "a pattern, imported from @/patterns"
     },
     {
-      "not": "Section",
-      "use": [
-        "PatternSection"
-      ],
-      "why": "a pattern, imported from @/patterns"
-    },
-    {
       "not": "Drawer",
       "use": [
         "PatternDrawer"

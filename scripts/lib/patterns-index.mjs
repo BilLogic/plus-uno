@@ -41,11 +41,16 @@ export function renderPatterns(rows, { from }) {
   out += `A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leaves you slots to fill. `;
   out += `Build a page or a container from these before writing a \`div\` with its own flex or grid. `;
   out += `Each one's props are on its page (linked) and in its source.\n\n`;
-  out += `| Pattern | Name | Import | Reach for it when |\n|---|---|---|---|\n`;
+  out += `| Group | Name | Import | Reach for it when |\n|---|---|---|---|\n`;
   for (const r of rows) {
     out += `| ${r.group} | [\`${r.name}\`](${link(r.doc)}) | \`import { ${r.name} } from '${r.import}';\` | ${r.use} |\n`;
   }
   return `${out}\n`;
+}
+
+/** The committed list's rows. */
+export function readPatterns(repoRoot) {
+  return JSON.parse(fs.readFileSync(path.join(repoRoot, PATTERNS_FILE), 'utf8')).patterns;
 }
 
 /** The router names every pattern too; this is the line it does so in. */
@@ -65,7 +70,3 @@ export function checkCommitted(repoRoot) {
   return [...checkPatterns(rows, { exportsOf, exists: (doc) => fs.existsSync(path.join(repoRoot, doc)), required }), ...unrouted];
 }
 
-/** The committed list's rows. */
-export function readPatterns(repoRoot) {
-  return JSON.parse(fs.readFileSync(path.join(repoRoot, PATTERNS_FILE), 'utf8')).patterns;
-}

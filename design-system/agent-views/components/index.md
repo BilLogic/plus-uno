@@ -27,7 +27,6 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Chip` | `Tag` |
 | `Loader` | `Spinner`, `Skeleton` |
 | `Card` | `PatternCard` (a pattern, imported from @/patterns) |
-| `Section` | `PatternSection` (a pattern, imported from @/patterns) |
 | `Drawer` | `PatternDrawer` (a pattern, imported from @/patterns) |
 
 **Props**
@@ -61,7 +60,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 
 A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leaves you slots to fill. Build a page or a container from these before writing a `div` with its own flex or grid. Each one's props are on its page (linked) and in its source.
 
-| Pattern | Name | Import | Reach for it when |
+| Group | Name | Import | Reach for it when |
 |---|---|---|---|
 | Templates | [`PageLayout`](../../src/specs/Universal/Pages/PageLayout/PageLayout.mdx) | `import { PageLayout } from '@/specs/Universal/Pages';` | Every full page: wraps it in the Frame with the Sidebar, the breadcrumb row and the Page with its 12-column content grid. `frame="focused"` for one task the person finishes or leaves. |
 | Frame | [`Frame`](../../src/patterns/Frame/Frame.mdx) | `import { Frame } from '@/patterns';` | The app frame under PageLayout: Sidebar, Page and Panel with no top bar. Reach for it directly only for a shell PageLayout does not give. |
