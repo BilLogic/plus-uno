@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShellContext } from '../context/ShellContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import ChatSimulationCard from './ChatSimulationCard';
 import HomeHero from '@/specs/Home/Sections/HomeHero';
 import DataVisualizationSkillsProgress from '@/specs/Home/Cards/DataVisualization/DataVisualizationSkillsProgress';

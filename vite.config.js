@@ -38,7 +38,7 @@ try {
 export default defineConfig({
   plugins: [tailwindcss ? tailwindcss() : null, react()].filter(Boolean),
   resolve: {
-    dedupe: ['react', 'react-dom', 'framer-motion'],
+    dedupe: ['react', 'react-dom', 'motion'],
     alias: {
       '@': path.resolve(__dirname, './design-system/src'),
       '@plus-ds': path.resolve(__dirname, './design-system/src'),
@@ -87,7 +87,8 @@ export default defineConfig({
           if (!id) return undefined;
 
           if (id.includes('node_modules')) {
-            if (id.includes('/framer-motion/')) {
+            // `motion` is a thin entry over framer-motion, motion-dom and motion-utils.
+            if (/\/(framer-)?motion(-dom|-utils)?\//.test(id)) {
               return 'vendor-motion';
             }
             if (id.includes('/highcharts') || id.includes('/highcharts-react-official')) {
@@ -135,8 +136,8 @@ export default defineConfig({
         // so no static scan can see it. The rest are the setup file's own imports,
         // pinned so the first optimize pass is the only one.
         //
-        // `framer-motion` and `react-router-dom` were added after the flake came
-        // back on 2026-08-29 and took three PRs red at once, each naming a
+        // `framer-motion` (now `motion/react`) and `react-router-dom` were added
+        // after the flake came back on 2026-08-29 and took three PRs red at once, each naming a
         // DIFFERENT innocent story file. The log says what the comment above
         // predicted it would:
         //
@@ -163,7 +164,7 @@ export default defineConfig({
             '@storybook/addon-vitest/internal/test-utils',
             '@storybook/react-vite',
             'axe-core',
-            'framer-motion',
+            'motion/react',
             'prop-types',
             'react-dom/client',
             'react-dom/test-utils',

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import { Button } from '../Button/Button';
 import Tooltip from '../../overlays-and-layering/Tooltip/Tooltip';
 
@@ -30,7 +30,7 @@ export const IconButton = ({
             title={isTooltipDisabled ? undefined : (title ?? (tooltip ? undefined : label))}
             appearance={appearance}
             spacing={spacing}
-            className={classNames({ 'plus-btn--circle': shape === 'circle' }, className)}
+            className={clsx({ 'plus-btn--circle': shape === 'circle' }, className)}
             {...props}
         />
     );

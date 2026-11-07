@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { getHeatmapColorByValue, formatCorrelationLabel } from '../utils';
 import { ChartSkeleton } from './ChartSkeleton';
 import type { CorrelationMatrix } from '../types';

@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import './Image.scss';
 
 export const IMAGE_SIZES = ['fixed', 'fluid'];
@@ -24,7 +24,7 @@ export const Image = ({
             src={src}
             alt={alt}
             data-testid={testId}
-            className={classNames('plus-image', `plus-image--${size}`, className)}
+            className={clsx('plus-image', `plus-image--${size}`, className)}
             style={style}
             {...props}
         />

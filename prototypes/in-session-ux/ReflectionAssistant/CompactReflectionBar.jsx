@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 
 const REFLECTION_PROMPTS = [
     { title: "Reflect on student progress", description: "Review Arlene's session performance" },

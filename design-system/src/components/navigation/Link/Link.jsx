@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import VisuallyHidden from '@/components/layout-and-structure/VisuallyHidden';
 import './Link.scss';
 import { iconClass } from '../../../lib/icon';
@@ -28,7 +28,7 @@ export const Link = ({
             href={href}
             target={resolvedTarget}
             rel={resolvedRel}
-            className={classNames('plus-link', `plus-link--${appearance}`, className)}
+            className={clsx('plus-link', `plus-link--${appearance}`, className)}
             {...props}
         >
             {children}

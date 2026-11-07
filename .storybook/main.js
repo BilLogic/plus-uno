@@ -118,7 +118,7 @@ const config = {
     config.resolve.dedupe = config.resolve.dedupe || [];
     config.resolve.dedupe.push('react', 'react-dom');
 
-    // Tailwind (shadcn doc chrome + MDX); must run before other CSS transforms
+    // Tailwind (docs chrome + MDX); must run before other CSS transforms
     const plugins = config.plugins ?? [];
     const hasTailwind = plugins.some(
       (p) => p && (p.name === '@tailwindcss/vite' || p.name === 'tailwindcss')

@@ -9,7 +9,7 @@ import ManageAssignmentModal from './ManageAssignmentModal';
 import StudentInsightsModal from './StudentInsightsModal';
 import { CompactReflectionBar } from './ReflectionAssistant/CompactReflectionBar';
 import { ReflectionAssistantChat } from './ReflectionAssistant/ReflectionAssistantChat';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 
 /**
  * Replicates Design System - Web App Specs node 1687-173829: "Your Students" page.
