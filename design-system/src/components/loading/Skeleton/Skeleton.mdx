@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as SkeletonStories from './Skeleton.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Skeleton } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -30,7 +37,7 @@ export const figmaMeta = {
 <Title />
 A gray placeholder shape while content loads. One component draws every
 placeholder: a rectangle, a circle or a text bar, plus presets the exact size of
-Status, Count and Tag, so nothing moves when the value arrives.
+Status tag, Count tag and Tag, so nothing moves when the value arrives.
 
 <DocsTabs of={SkeletonStories}>
 
@@ -47,77 +54,55 @@ Status, Count and Tag, so nothing moves when the value arrives.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>Each label preset beside the label it stands in for: Status 20 and 32, Count 20 (24 wide, 2 corner), Tag 22 and person Tag 22 (round). The preset has the label's height and corners; its width stands in for the text.</>}>
-    <Canvas of={SkeletonStories.LabelPresets} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={SkeletonStories.Rect} title="Rect" description={<>The default shape, sized by <code>width</code> and <code>height</code>, with <code>radius</code> as a token name.</>} />
 
-</div>
+<ComponentExample of={SkeletonStories.Circle} title="Circle" description="For avatars and round counts, 32 unless given a size." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={SkeletonStories.Text} title="Text" description={<>A 16-tall bar that can repeat as <code>lines</code>.</>} />
 
-## Variants
+<ComponentExample of={SkeletonStories.LabelPresets} title="Label presets" description="Each preset beside the label it stands in for, with the label's height and corners and a stand-in width." />
 
-<DocsCanvasShell description={<>Rectangle (the default), circle and text bar. Each takes <code>width</code> and <code>height</code>; a rectangle takes <code>radius</code> as a token name.</>}>
-    <DsCanvasQuiet of={SkeletonStories.Shapes} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<><code>preset</code> takes the shapes by Figma's names too: <code>preset="rect"</code>, <code>"circle"</code> and <code>"text"</code> draw what <code>shape</code> does and resize the same way.</>}>
-    <DsCanvasQuiet of={SkeletonStories.PresetNamesAShape} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<><code>lines</code> repeats the text bar 8 apart, and the last line is shorter so the block reads as text. <code>preset="paragraph"</code> is three lines.</>}>
-    <DsCanvasQuiet of={SkeletonStories.Paragraph} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<><code>preset="tag-group"</code> is three tag shapes at the TagGroup gap, for a tag list that loads on its own.</>}>
-    <DsCanvasQuiet of={SkeletonStories.TagGroupPreset} />
-</DocsCanvasShell>
+<ComponentExample of={SkeletonStories.PresetNamesAShape} title="Shape presets" description={<><code>preset="rect"</code>, <code>"circle"</code> and <code>"text"</code> draw what <code>shape</code> does and resize the same way.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## Size and layout
 
-<DocsCanvasShell description={<>The shimmer is on by default. <code>isShimmering={'{false}'}</code> is a flat fill.</>}>
-    <DsCanvasQuiet of={SkeletonStories.Shimmer} />
-</DocsCanvasShell>
+<ComponentExample of={SkeletonStories.Paragraph} title="Lines" description={<><code>lines</code> repeats the text bar 8 apart with a shorter last line; <code>preset="paragraph"</code> is three lines.</>} />
 
-<DocsCanvasShell description={<>Under <code>prefers-reduced-motion: reduce</code> the shimmer stops and the fill is flat.</>}>
-    <DsCanvasQuiet of={SkeletonStories.ReducedMotion} />
-</DocsCanvasShell>
+<ComponentExample of={SkeletonStories.TagGroupPreset} title="Tag group" description={<><code>preset="tag-group"</code> is three tag shapes at the TagGroup gap, for a tag list that loads on its own.</>} />
 
-<DocsCanvasShell description={<>A status label placeholder with the shimmer.</>}>
-    <DsCanvasQuiet of={SkeletonStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={SkeletonStories.LoadingTable} title="Loading table" description={<>The region carries <code>aria-busy</code> with a status beside it; <strong>Finish loading</strong> shows the students arriving.</>} />
 
-<DocsCanvasShell description={<>A placeholder has no hover layer, so nothing moves.</>}>
-    <DsCanvasQuiet of={SkeletonStories.Hovered} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>No pressed layer.</>}>
-    <DsCanvasQuiet of={SkeletonStories.Pressed} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Never focusable, so Tab skips it.</>}>
-    <DsCanvasQuiet of={SkeletonStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={SkeletonStories.LoadingCard} title="Loading card" description={<>A loading card; <strong>Finish loading</strong> shows the content arriving.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Content
+## Behavior
 
-<DocsCanvasShell description={<>A loading table. The region carries <code>aria-busy="true"</code>, a visually hidden status beside it says "Loading students…", and every label inside it is a plain text bar: the container owns the skeleton. <strong>Finish loading</strong> shows the students arriving: <code>aria-busy</code> comes off and the status says "Students loaded".</>}>
-    <DsCanvasQuiet of={SkeletonStories.LoadingTable} />
-</DocsCanvasShell>
+<ComponentExample of={SkeletonStories.PresetWinsOverShape} title="Preset wins over shape" description={<>A preset sets shape, height and corners together and wins over <code>shape</code> and <code>lines</code>, with a warning in development.</>} />
 
-<DocsCanvasShell description={<>A loading card. The card's skeleton owns everything inside it, its tags included. When the content arrives, <code>aria-busy</code> comes off and the status beside the card announces it.</>}>
-    <DsCanvasQuiet of={SkeletonStories.LoadingCard} />
-</DocsCanvasShell>
+<ComponentExample of={SkeletonStories.Shimmer} title="Shimmer" description={<>On by default; <code>isShimmering={'{false}'}</code> is a flat fill.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={SkeletonStories.Rest} title="Rest" description="A status label placeholder with the shimmer." />
+
+<ComponentExample of={SkeletonStories.Hovered} title="Hovered" description="No change: a placeholder has no hover layer." />
+
+<ComponentExample of={SkeletonStories.Pressed} title="Pressed" description="No change." />
+
+<ComponentExample of={SkeletonStories.Focused} title="Focused" description="Never focusable, so Tab skips it." />
 
 </div>
 
@@ -152,10 +137,8 @@ Status, Count and Tag, so nothing moves when the value arrives.
 Use `Skeleton` while content loads, so the space it will fill is already on
 screen and the layout does not jump when it arrives.
 
-- **One label loading on its own** (a Status calculated after the row appears, a
+- **One label loading on its own** (a status calculated after the row appears, a
   tag list fetched separately): the matching preset.
-- **A whole table or card loading:** plain text bars and shapes, composed to the
-  real content's dimensions.
 - **A thumbnail, avatar or header:** a rectangle or circle with its own size.
 
 </div>
@@ -165,7 +148,7 @@ screen and the layout does not jump when it arrives.
 ## Parts
 
 1. **Bar.** A flat fill in the skeleton color: a rectangle, a circle, a text line or a label shape.
-2. **Shimmer.** A band that sweeps across. Off, or under reduced motion, it is a flat fill.
+2. **Shimmer.** A band that sweeps across. Off, it is a flat fill.
 3. **Group.** Lines and tag groups are columns or rows of bars.
 
 ### States
@@ -175,9 +158,12 @@ screen and the layout does not jump when it arrives.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Loading</td><td>The fill shimmers.</td></tr>
+<tr><td>Rest</td><td>The fill shimmers.</td></tr>
 <tr><td>Not shimmering</td><td><code>isShimmering={false}</code> is a flat fill, which is also what reduced motion gets.</td></tr>
-<tr><td>Hovered, pressed, focused, disabled</td><td>None. It is <code>aria-hidden</code>, with no role and no tab stop.</td></tr>
+<tr><td>Hovered</td><td>None. It ignores the pointer.</td></tr>
+<tr><td>Pressed</td><td>None.</td></tr>
+<tr><td>Focused</td><td>None. It never takes focus.</td></tr>
+<tr><td>Disabled</td><td>None. A placeholder has no disabled state.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -189,9 +175,12 @@ screen and the layout does not jump when it arrives.
 </thead>
 <tbody>
 <tr><td>Fill</td><td><code>--ds-skeleton</code>.</td></tr>
-<tr><td>Radius</td><td><code>--radius-md</code>, <code>--radius-sm</code>, <code>--radius-full</code> or the named radius token.</td></tr>
-<tr><td>Label presets</td><td>Heights from the label height roles, so a placeholder is the size of its label.</td></tr>
+<tr><td>Shimmer</td><td>A band of <code>--ds-skeleton-subtle</code>, 1.6s.</td></tr>
+<tr><td>Radius</td><td><code>--radius-md</code> by default; <code>--radius-full</code> for a circle and the person tag; <code>--radius-sm</code> for count; or the token named by <code>radius</code>.</td></tr>
+<tr><td>Label presets</td><td>Heights from the label height roles, so a placeholder is the size of its label. Count is <code>--control-sm</code> wide; status-spacious takes <code>--size-border-radius-radius-150</code> (6) for its corner.</td></tr>
+<tr><td>Sizes</td><td>Spacing primitives: <code>--size-spacing-large-space-900</code> (64) for the default height, <code>-space-600</code> (32) for the circle, <code>--size-spacing-medium-space-300</code> (16) for the text bar.</td></tr>
 <tr><td>Gap</td><td><code>--stack-md</code> between lines and tags.</td></tr>
+<tr><td>Forced colors</td><td>A <code>--stroke-1</code> outline keeps the shape.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -201,45 +190,65 @@ screen and the layout does not jump when it arrives.
 
 ## Best practices
 
-The loading rules, as Do and Don't.
+### Shape the placeholder like its content.
 
-### Do: use a label preset when one label loads after its row is on screen.
+A paragraph placeholder promises lines of text; a block promises an image.
 
-```jsx
-<span>Unit 3 review {status ? <StatusTag appearance="success">{status}</StatusTag> : <Skeleton preset="status" />}</span>
-```
+<DoDontPair
+    doExample={<Skeleton preset="paragraph" width={240} />}
+    doCaption="Paragraph preset for a paragraph."
+    dontExample={<Skeleton width={160} />}
+    dontCaption="A rectangle standing in for text."
+/>
 
-### Do: use plain text bars inside a loading table or card.
+### Pair a circle with text for people.
+
+An avatar placeholder is round; a square one misleads about what will load.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Skeleton shape="circle" /><Skeleton shape="text" width={160} /></div>}
+    doCaption="Circle beside a text line."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Skeleton width={32} height={32} /><Skeleton shape="text" width={160} /></div>}
+    dontCaption="Rectangle beside a text line."
+/>
+
+### Keep the shimmer on while loading.
+
+The shimmer tells the person the content is still coming; a frozen skeleton
+reads as a broken page. Leave `isShimmering` at its default.
+
+### Use a label preset when one label loads after its row is on screen.
+
+A preset has the label's height and corners, so nothing moves when the value arrives.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Unit 3 review</span><Skeleton preset="status" /></div>}
+    doCaption="The status preset, the size of the Status tag it stands in for."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Unit 3 review</span><Skeleton /></div>}
+    dontCaption="A free rectangle at its default size, so the row jumps when the status arrives."
+/>
+
+### Use plain text bars inside a loading table or card.
 
 The container owns the skeleton. Labels become the same text bars as the rest,
 so a loading table does not fill with dozens of label shapes.
 
-```jsx
-// Incorrect — label shapes inside a loading container.
-<tr><td><Skeleton shape="text" /></td><td><Skeleton preset="status" /></td><td><Skeleton preset="tag-group" /></td></tr>
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Skeleton shape="text" width={120} /><Skeleton shape="text" width={64} /><Skeleton shape="text" width={64} /></div>}
+    doCaption="Text bars throughout the row."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Skeleton shape="text" width={120} /><Skeleton preset="status" /><Skeleton preset="tag-group" /></div>}
+    dontCaption="Label shapes inside a loading container."
+/>
 
-// Correct — text bars throughout.
-<tr><td><Skeleton shape="text" /></td><td><Skeleton shape="text" width={64} /></td><td><Skeleton shape="text" width={64} /></td></tr>
-```
+### Skip the skeleton on a count in a button, tab or nav item.
 
-### Don't: skeleton a Count on a button, tab or nav item.
+Show nothing until the number arrives; `CountTag` already renders nothing without a value.
 
-Show nothing until the number arrives; `Count` already renders nothing without
-a value.
+### Skeleton the host, not a count inside it.
 
-```jsx
-// Incorrect
-<button type="button">Messages <Skeleton preset="count" /></button>
+For a `CountTag` inside a `StatusTag` or `Tag`, use one `preset="status"` for the whole label.
 
-// Correct
-<button type="button">Messages <CountTag value={unread} /></button>
-```
-
-### Don't: skeleton a Count alone inside a Status or Tag.
-
-Skeleton the host instead: one `preset="status"` for the whole Status.
-
-### Don't: skeleton a flag, modal, menu or spinner.
+### Leave flags, modals, menus and spinners out.
 
 They appear when they have something to say. A Tag saving a change keeps its
 own spinner (`isLoading`), so saving and loading look different.
@@ -255,7 +264,7 @@ own spinner (`isLoading`), so saving and loading look different.
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Match the shape of what is loading: a circle for an avatar, bars for text.</td><td>Draw a placeholder for a layout the page does not have.</td></tr>
+<tr><td>Draw only the layout the page will have.</td><td>Draw a placeholder for a layout the page does not have.</td></tr>
 <tr><td>Keep the surrounding words, such as column headers, on screen.</td><td>Skeleton a heading the person already knows.</td></tr>
 <tr><td>Name the loading region once, in the live region around it.</td><td>Give each placeholder its own label.</td></tr>
 </tbody>
@@ -295,8 +304,8 @@ useEffect(() => {
 ```
 - **Reduced motion.** Under `prefers-reduced-motion: reduce` the shimmer stops
   and the fill is flat.
-- **Contrast in any theme.** The fill is `surface-container` and the shimmer
-  moves toward `surface-container-lowest`, both theme tokens.
+- **Contrast in any theme.** The fill is `--ds-skeleton` and the shimmer
+  `--ds-skeleton-subtle`, both theme tokens.
 
 </div>
 
@@ -304,7 +313,7 @@ useEffect(() => {
 
 ## Related
 
-- `Status`, `Count` and `Tag` are the labels the presets are sized to.
+- `StatusTag`, `CountTag` and `Tag` are the labels the presets are sized to.
 - `Spinner` is for an action in progress and for full-page transitions; a Tag
   saving a change uses its own spinner.
 - The loading guidance in the surfaces guideline points here.

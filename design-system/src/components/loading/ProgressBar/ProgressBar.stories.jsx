@@ -43,6 +43,17 @@ export const Appearances = () => (
     </div>
 );
 
+/** One story per `appearance` value. */
+export const Default = () => <ProgressBar value={60} appearance="default" />;
+
+export const Success = () => <ProgressBar value={100} appearance="success" />;
+
+export const Inverse = () => (
+    <div style={{ padding: 'var(--space-100)', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
+        <ProgressBar value={60} appearance="inverse" />
+    </div>
+);
+
 /** For a visible percent or description, put the text beside the bar — the bar's own 8px height has no room for it. */
 export const WithACaption = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '240px' }}>

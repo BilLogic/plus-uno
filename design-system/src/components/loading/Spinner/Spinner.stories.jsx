@@ -34,6 +34,13 @@ export const Sizes = () => (
     </div>
 );
 
+/** One story per `size` value. */
+export const Size16 = () => <Spinner size={16} />;
+
+export const Size24 = () => <Spinner size={24} />;
+
+export const Size48 = () => <Spinner size={48} />;
+
 export const Invert = () => (
     <div style={{ padding: '16px', background: 'var(--ds-background-brand-bold)', borderRadius: 'var(--radius-md)' }}>
         <Spinner appearance="invert" />

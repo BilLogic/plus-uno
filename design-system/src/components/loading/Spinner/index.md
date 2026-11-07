@@ -9,7 +9,7 @@
 
 **Source:** `design-system/src/components/loading/Spinner/Spinner.jsx`
 
-**Stories:** `design-system/src/components/loading/Spinner/Spinner.stories.jsx` — Overview, Sizes, Invert, Interactive, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/loading/Spinner/Spinner.stories.jsx` — Overview, Sizes, Size16, Size24, Size48, Invert, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/loading/Spinner/Spinner.mdx`
 
