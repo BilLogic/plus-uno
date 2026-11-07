@@ -11,16 +11,16 @@
 // width and height attributes stay as the SVG's intrinsic size before the
 // stylesheet loads.
 .plus-ai-icon--12 {
-    width: var(--size-icon-sm);
-    height: var(--size-icon-sm);
+    width: var(--icon-sm);
+    height: var(--icon-sm);
 }
 
 .plus-ai-icon--16 {
-    width: var(--size-icon-md);
-    height: var(--size-icon-md);
+    width: var(--icon-md);
+    height: var(--icon-md);
 }
 
 .plus-ai-icon--24 {
-    width: var(--size-icon-lg);
-    height: var(--size-icon-lg);
+    width: var(--icon-lg);
+    height: var(--icon-lg);
 }

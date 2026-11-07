@@ -23,6 +23,8 @@
     --page-pad-y-compact: var(--space-100);
     --page-pad-y-default: var(--space-150);
     --page-pad-y-spacious: var(--space-200);
+    --page-radius-md: var(--radius-075);
+    --page-border-width: var(--stroke-2);
 
     /* Panel */
     --panel-min-width: var(--width-2000); /* the narrowest the splitter allows (320) */
@@ -59,6 +61,7 @@
     --modal-width-sm: 384px; /* lifted out of spacing / layout, beside the pattern’s pad/stack tokens */
     --modal-width-md: 507px;
     --modal-width-lg: 629px;
+    --modal-body-min-height: var(--space-500);
 
     /* Drawer */
     --drawer-width-sm: var(--modal-width-sm);

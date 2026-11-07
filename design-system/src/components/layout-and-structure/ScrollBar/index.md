@@ -18,7 +18,7 @@ scrollbar styling (thin width, border-colored thumb, transparent track) to its s
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `children` | node | — | — |
-| `maxHeight` | string or number | `'calc(var(--size-spacing-xlarge-space-2000) * 2)'` | Maximum height before vertical scrolling begins (e.g., "240px") |
+| `maxHeight` | string or number | `'var(--scroll-bar-max-height)'` | Maximum height before vertical scrolling begins (e.g., "240px") |
 | `horizontal` | bool | `false` | Scroll horizontally instead of vertically |
 | `id` | string | — | — |
 | `className` | string | `''` | — |
@@ -26,7 +26,7 @@ scrollbar styling (thin width, border-colored thumb, transparent track) to its s
 
 ## Tokens touched
 
-`--ds-border` · `--ds-border-bold` · `--radius-md` · `--size-spacing-small-space-075`
+`--ds-border` · `--ds-border-bold` · `--radius-md` · `--scroll-bar-size`
 
 From `design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.scss`. Override these through the token layer, never with a literal.
 

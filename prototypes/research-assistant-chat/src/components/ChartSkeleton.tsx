@@ -34,7 +34,7 @@ export function ChartSkeleton({
       style={{
         width,
         height,
-        borderRadius: `var(--size-border-radius-radius-200, ${borderRadius}px)`,
+        borderRadius: `var(--radius-050)`,
         background: bg,
         border: '1px solid var(--chat-outline, #d1d5db)',
         position: 'relative',

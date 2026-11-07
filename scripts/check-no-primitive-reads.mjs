@@ -14,9 +14,9 @@
  * `--radius-<n>`, `--size-<n>`, `--stroke-<n>`. `--radius-full` is not one: the
  * ladder's Radius/full row carries the primitive's own name (plan.mjs).
  *
- * THE RATCHET. A count may fall and never rise, same shape and the same
- * `scripts/lib/ratchet.mjs` as `check:old-size-tokens`; the baseline holds the
- * residue the family PRs have not migrated yet.
+ * THE RATCHET. A count may fall and never rise, read through
+ * `scripts/lib/ratchet.mjs`; the baseline holds the residue the family PRs
+ * have not migrated yet.
  */
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';

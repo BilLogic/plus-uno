@@ -32,6 +32,7 @@
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
+import { RETIRED_TOKENS } from './lib/tokens/plan.mjs';
 import { trackedSources } from './lib/tracked-sources.mjs';
 
 export { REPO_ROOT };
@@ -45,6 +46,9 @@ export const OLD_DEFINITIONS = [
   'design-system/src/tokens/_colors.scss',
   'design-system/src/tokens/_color_roles.scss',
   'design-system/src/tokens/_elevation.scss',
+  'design-system/src/tokens/_primitives.scss',
+  'design-system/src/tokens/_spacing_semantics.scss',
+  'design-system/src/tokens/_layout.scss',
 ];
 
 /** Files whose matches are another tool's names, not the design system's. */
@@ -54,6 +58,12 @@ const NOT_THE_DESIGN_SYSTEM = new Map([
     "Tailwind's theme namespace is `--color-*`; these name the docs chrome's own palette",
   ],
 ]);
+
+/** A name from the archived size collections, or one the token ladder retired (ADR-038). */
+const OLD_SIZE = new RegExp(
+  '(?<![\\w-])(?:--size-(?:spacing|border|column|card|section|modal|surface|table|media|row|icon|indicator)-[a-z0-9*]' +
+    `|(?:${[...RETIRED_TOKENS].join('|')})(?![\\w-]))`,
+);
 
 /**
  * One row per old family: its name, the line pattern, and what to use instead.
@@ -70,6 +80,11 @@ export const FAMILIES = [
     name: 'elevation',
     pattern: /(?<![\w-])--(?:elevation-light|surface)-[a-z0-9*]/,
     remedy: 'the `--elevation-light-*` shadows and `--surface-*` roles are old; use `--ds-shadow-raised` / `--ds-shadow-overlay` and the `--ds-surface-*` fill they pair with',
+  },
+  {
+    name: 'size',
+    pattern: OLD_SIZE,
+    remedy: 'the old size names are gone; use the current token for the role: `--space-*` / `--size-*` / `--radius-*` / `--stroke-*` primitives, the `--pad-*` / `--stack-*` / `--inline-*` semantics, or the pattern tokens (`--card-*`, `--section-*`, `--modal-*`, `--page-*`, `--table-*`, `--icon-*`, `--image-*`, `--row-height-*`)',
   },
 ];
 

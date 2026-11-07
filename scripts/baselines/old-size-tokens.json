@@ -1,4 +1,0 @@
-{
-  "why": "Uses of the retired token names (RETIRED_TOKENS in scripts/lib/tokens/plan.mjs), per file. Their declarations are gone, so the record is empty and stays empty. Regenerate with `npm run check:old-size-tokens -- --update`; never edit by hand.",
-  "counts": {}
-}

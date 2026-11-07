@@ -127,7 +127,7 @@ export function EngagementChart({
         height: CHART_HEIGHT,
         padding: '12px 12px 20px 12px',
         background: colors.bg,
-        borderRadius: 'var(--size-border-radius-radius-200, 8px)',
+        borderRadius: 'var(--radius-050)',
         border: '1px solid var(--chat-outline, #d1d5db)',
       }}
     >

@@ -22,7 +22,7 @@ An inline chip for a short piece of code inside a sentence. It is a `code` eleme
 
 ## Tokens touched
 
-`--code` · `--ds-background-neutral` · `--ds-text-code-default` · `--radius-md` · `--size-spacing-small-space-050`
+`--code` · `--ds-background-neutral` · `--ds-text-code-default` · `--pad-x-xs` · `--radius-md`
 
 From `design-system/src/components/text-and-data-display/Code/Code.scss`. Override these through the token layer, never with a literal.
 

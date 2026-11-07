@@ -15,7 +15,6 @@
     @include screen-grid-width-steps;
 
     /* Modal/body-min-height: Figma holds the body at 96, one step of the space scale. */
-    --modal-body-min-height: var(--size-spacing-large-space-1200);
 
     display: flex;
     flex-direction: column;

@@ -29,16 +29,16 @@ const App = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 minHeight: '100vh',
-                padding: 'var(--size-section-pad-y-lg, 24px)',
+                padding: 'var(--section-pad-y-spacious)',
                 backgroundColor: 'var(--ds-surface-container)',
-                gap: 'var(--size-section-gap-lg, 24px)',
+                gap: 'var(--section-stack-lg)',
             }}
         >
             <div
                 style={{
                     backgroundColor: 'var(--ds-surface)',
-                    borderRadius: 'var(--size-card-radius-md, 12px)',
-                    padding: 'var(--size-section-pad-y-lg, 24px) var(--size-section-pad-x-lg, 24px)',
+                    borderRadius: 'var(--card-radius)',
+                    padding: 'var(--section-pad-y-spacious) var(--section-pad-x-spacious)',
                     border: '1px solid var(--ds-border)',
                     maxWidth: '600px',
                     width: '100%',
@@ -49,7 +49,7 @@ const App = () => {
                     <i className="fa-solid fa-rocket" style={{ marginRight: '8px', color: 'var(--ds-icon-brand)' }} />
                     Bryan's Prototype
                 </h3>
-                <p className="body1-txt" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--size-section-gap-md, 16px)' }}>
+                <p className="body1-txt" style={{ color: 'var(--ds-text-subtle)', marginBottom: 'var(--section-stack-md)' }}>
                     Your prototypes is ready! Edit <code>src/App.jsx</code> to start building.
                 </p>
                 <div

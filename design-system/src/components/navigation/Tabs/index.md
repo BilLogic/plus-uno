@@ -39,7 +39,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--border-selected` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-bold-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-border-selected` · `--ds-text-disabled` · `--ds-text-inverse` · `--ds-text-selected` · `--ds-text-subtle` · `--item-height-md` · `--item-height-sm` · `--motion-duration-short` · `--motion-easing-standard` · `--pad-x-lg` · `--pad-x-md` · `--radius-full` · `--radius-md` · `--size-section-gap-sm` · `--stack-md` · `--stack-sm` · `--type-weight-medium`
+`--body-default` · `--border-default` · `--border-selected` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-bold-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-border-selected` · `--ds-text-disabled` · `--ds-text-inverse` · `--ds-text-selected` · `--ds-text-subtle` · `--item-height-md` · `--item-height-sm` · `--motion-duration-short` · `--motion-easing-standard` · `--pad-x-lg` · `--pad-x-md` · `--radius-full` · `--radius-md` · `--section-stack-sm` · `--stack-md` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/navigation/Tabs/Tabs.scss`. Override these through the token layer, never with a literal.
 

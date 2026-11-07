@@ -1103,9 +1103,9 @@ const picture = {
 const onPicture = {
     ...row,
     position: 'absolute',
-    top: 'var(--size-spacing-small-space-100, 8px)',
-    left: 'var(--size-spacing-small-space-100, 8px)',
-    right: 'var(--size-spacing-small-space-100, 8px)',
+    top: 'var(--space-050)',
+    left: 'var(--space-050)',
+    right: 'var(--space-050)',
 };
 
 /** A state layer over the elevated fill, as it computes: a one-color gradient. */

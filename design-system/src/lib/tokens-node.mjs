@@ -245,9 +245,8 @@ export function tokenCorpus({ root = REPO_ROOT, prefix = '--', precedence = 'fir
   }
 
   // The WHOLE table is read whatever the prefix, because an alias chain leaves
-  // the family: `--size-card-gap-md` is `var(--size-spacing-medium-space-300)`,
-  // and a caller asking only for `--size-card-*` still wants the 16px at the
-  // end of it. The narrowing happens after the walk.
+  // the family: `--card-stack-md` is `var(--space-050)`, and a caller
+  // asking only for `--card-*` still wants the 8px at the end of it. The narrowing happens after the walk.
   const raw = new Map();
   const files = new Map();
   for (const source of tokenSources({ root })) {

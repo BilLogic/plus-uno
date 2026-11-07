@@ -10,6 +10,7 @@
     /* Button */
     --button-radius-default: var(--radius-0375); /* 32-high control, radius 6 */
     --button-radius-compact: var(--radius-025); /* 24-high control, radius 4 */
+    --button-vertical-size: var(--size-300);
 
     /* Calendar */
     --calendar-day-sm: 28px;
@@ -60,11 +61,78 @@
     /* Option menu */
     --option-menu-width: 240px;
 
+    /* Option row */
+    --option-row-indent-step: var(--space-125);
+    --option-row-control-gap: var(--space-0625);
+    --option-row-dot-size: var(--space-050);
+
+    /* Count tag */
+    --count-tag-dot-size: var(--space-050);
+
+    /* Tag */
+    --tag-dot-size: var(--space-0625);
+    --tag-pad-end-compact: var(--space-0125);
+    --tag-gap-compact: var(--space-0125);
+    --tag-pad-end: var(--space-0375);
+    --tag-gap: var(--space-0375);
+
+    /* Carousel */
+    --carousel-control-offset: var(--space-0625);
+    --carousel-control-pad: var(--space-100);
+    --carousel-control-size: var(--space-300);
+    --carousel-slide-min-height-compact: var(--size-1000);
+    --carousel-slide-min-height: var(--size-1400);
+    --carousel-slide-min-height-spacious: var(--size-2500);
+    --carousel-indicator-width-compact: var(--size-300);
+    --carousel-indicator-width: var(--size-750);
+    --carousel-indicator-height-compact: var(--space-025);
+    --carousel-indicator-height: var(--space-0375);
+    --carousel-indicator-height-spacious: var(--space-050);
+
+    /* Scroll bar */
+    --scroll-bar-size: var(--space-0375);
+    --scroll-bar-max-height: calc(var(--size-1000) * 2);
+
+    /* Skeleton */
+    --skeleton-height: var(--space-400);
+    --skeleton-circle-size: var(--space-200);
+    --skeleton-text-height: var(--space-100);
+    --skeleton-status-width: var(--space-400);
+    --skeleton-status-width-spacious: calc(var(--space-500) + var(--space-050));
+    --skeleton-tag-width: calc(var(--space-400) + var(--space-050));
+    --skeleton-tag-width-person: var(--space-500);
+    --skeleton-tag-width-narrow: calc(var(--space-250) + var(--space-100));
+    --skeleton-tag-width-widest: calc(var(--space-500) + var(--space-050));
+
+    /* Flag */
+    --flag-min-height: calc(var(--size-1000) + var(--size-750));
+    --flag-pad: var(--space-125);
+    --flag-offset: var(--space-125);
+
+    /* Spotlight */
+    --spotlight-media-height: calc(var(--size-750) + var(--space-150));
+
+    /* Menu group */
+    --menu-group-min-width: var(--size-1400);
+    --menu-group-pad-x: var(--space-150);
+    --menu-group-gap: var(--space-100);
+    --menu-group-item-pad-y: var(--space-0625);
+
+    /* Popup */
+    --popup-pad: var(--space-125);
+
+    /* Table */
+    --table-cell-max-width: var(--size-300);
+
+    /* Avatar */
+    --avatar-size-96: calc(var(--space-300) * 2);
+    --avatar-size-128: calc(var(--space-400) * 2);
+
     /* Spinner */
-    --spinner-size-sm: var(--space-100); /* matches the old --size-spinner-sm (16px) */
-    --spinner-size-md: var(--space-150); /* matches the old --size-spinner-md (24px) */
-    --spinner-size-lg: var(--space-300); /* matches the old --size-spinner-lg (48px) */
+    --spinner-size-sm: var(--space-100);
+    --spinner-size-md: var(--space-150);
+    --spinner-size-lg: var(--space-300);
 
     /* Progress bar */
-    --progress-bar-height: var(--space-050); /* matches the old --size-progressbar-height (8px) */
+    --progress-bar-height: var(--space-050);
 }

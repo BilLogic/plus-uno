@@ -17,7 +17,7 @@ export const Notes = ({ count }) => (
     </div>
 );
 export const box = { border: 'var(--stroke-1) solid var(--ds-border)', borderRadius: 'var(--radius-md)' };
-export const smallCap = 'calc(var(--size-spacing-xlarge-space-2000) * 0.75)';
+export const smallCap = 'calc(var(--size-1000) * 0.75)';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -156,9 +156,9 @@ container.
 <tbody>
 <tr><td>Thumb</td><td><code>--ds-border</code>; <code>--ds-border-bold</code> on hover.</td></tr>
 <tr><td>Track and corner</td><td>Transparent.</td></tr>
-<tr><td>Width</td><td><code>--size-spacing-small-space-075</code>.</td></tr>
+<tr><td>Width</td><td><code>--space-0375</code>.</td></tr>
 <tr><td>Corner</td><td><code>--radius-md</code>.</td></tr>
-<tr><td>Height cap</td><td>twice <code>--size-spacing-xlarge-space-2000</code> by default.</td></tr>
+<tr><td>Height cap</td><td>twice <code>--size-1000</code> by default.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -177,7 +177,7 @@ Two bars side by side suggest two scrolling areas where there is one. Do not nes
 <DoDontPair
     doExample={<div style={box}><ScrollBar maxHeight={smallCap} aria-label="Notes, one region"><Notes count={12} /></ScrollBar></div>}
     doCaption="A single scrollbar."
-    dontExample={<div style={box}><ScrollBar maxHeight={smallCap} aria-label="Notes, outer region"><div style={{ ...box, margin: 'var(--pad-y-lg) var(--pad-x-md)' }}><ScrollBar maxHeight="calc(var(--size-spacing-xlarge-space-2000) * 1.25)" aria-label="Notes, inner region"><Notes count={20} /></ScrollBar></div></ScrollBar></div>}
+    dontExample={<div style={box}><ScrollBar maxHeight={smallCap} aria-label="Notes, outer region"><div style={{ ...box, margin: 'var(--pad-y-lg) var(--pad-x-md)' }}><ScrollBar maxHeight="calc(var(--size-1000) * 1.25)" aria-label="Notes, inner region"><Notes count={20} /></ScrollBar></div></ScrollBar></div>}
     dontCaption="A region nested in another: two scrollbars on one region."
 />
 
@@ -201,9 +201,9 @@ A region around content that already fits shows no bar and still adds a tab stop
 `maxHeight` is a cap. In a taller container, give the region the height you want it to take, such as `maxHeight="100%"`.
 
 <DoDontPair
-    doExample={<div style={{ ...box, height: 'calc(var(--size-spacing-xlarge-space-2000) * 1.5)' }}><ScrollBar maxHeight="100%" aria-label="Notes, filled"><Notes count={16} /></ScrollBar></div>}
+    doExample={<div style={{ ...box, height: 'calc(var(--size-1000) * 1.5)' }}><ScrollBar maxHeight="100%" aria-label="Notes, filled"><Notes count={16} /></ScrollBar></div>}
     doCaption="The region fills its container and scrolls."
-    dontExample={<div style={{ ...box, height: 'calc(var(--size-spacing-xlarge-space-2000) * 1.5)' }}><ScrollBar maxHeight={smallCap} aria-label="Notes, capped"><Notes count={16} /></ScrollBar></div>}
+    dontExample={<div style={{ ...box, height: 'calc(var(--size-1000) * 1.5)' }}><ScrollBar maxHeight={smallCap} aria-label="Notes, capped"><Notes count={16} /></ScrollBar></div>}
     dontCaption="A smaller cap leaves the space below it empty."
 />
 

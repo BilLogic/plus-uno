@@ -380,7 +380,7 @@
 .sb-ai-agent__skills-router-header {
   width: 100%;
   max-width: 100%;
-  margin: 0 0 var(--size-card-gap-sm);
+  margin: 0 0 var(--card-stack-sm);
   text-align: left;
   box-sizing: border-box;
 }
@@ -399,7 +399,7 @@
   display: block;
   width: 100%;
   max-width: 100%;
-  margin: 0 0 var(--size-card-gap-md);
+  margin: 0 0 var(--card-stack-md);
   padding: 6px 10px;
   border-radius: 6px;
   border: none;
@@ -422,7 +422,7 @@
   max-width: 100%;
   display: flex;
   flex-direction: column;
-  gap: var(--size-card-gap-md);
+  gap: var(--card-stack-md);
   box-sizing: border-box;
 }
 
@@ -433,7 +433,7 @@
   padding-right: 0;
   padding-bottom: 0;
   /* Space between tip and first card (padding: 0 here used to wipe this — keep top padding only) */
-  padding-top: var(--size-section-gap-lg);
+  padding-top: var(--section-stack-lg);
 }
 
 .sb-ai-agent__bubble .sb-ai-agent__skills-router-cards > li.sb-ai-agent__skill-card {
@@ -444,8 +444,8 @@
 .sb-ai-agent__skills-router-pipeline {
   width: 100%;
   max-width: 100%;
-  margin-top: var(--size-card-gap-md);
-  padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+  margin-top: var(--card-stack-md);
+  padding: var(--card-pad-compact) var(--card-pad-compact);
   border-radius: var(--radius-lg);
   border: none;
   background: var(--ds-surface-container);
@@ -485,7 +485,7 @@
   max-width: 100%;
   box-sizing: border-box;
   background: var(--ds-surface);
-  border-radius: var(--size-card-radius-md);
+  border-radius: var(--card-radius);
   border: none;
   box-shadow: var(--ds-shadow-raised);
 }
@@ -536,11 +536,11 @@
   display: flex;
   flex-direction: row;
   align-items: flex-start;
-  gap: var(--size-card-gap-sm);
+  gap: var(--card-inline-sm);
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
-  padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+  padding: var(--card-pad-default) var(--card-pad-default);
 }
 
 .sb-ai-agent__skill-card__badge {
@@ -596,7 +596,7 @@
   gap: var(--stack-md);
   width: auto;
   max-width: 100%;
-  margin: 0 0 var(--size-card-gap-sm);
+  margin: 0 0 var(--card-inline-sm);
   padding: 0;
   border: none;
   background: transparent;

@@ -33,7 +33,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--control-sm` · `--ds-skeleton` · `--ds-skeleton-subtle` · `--plus-skeleton-duration` · `--plus-skeleton-height` · `--plus-skeleton-radius` · `--plus-skeleton-width` · `--radius-full` · `--radius-md` · `--radius-sm` · `--size-border-radius-radius-150` · `--size-spacing-large-space-1000` · `--size-spacing-large-space-600` · `--size-spacing-large-space-700` · `--size-spacing-large-space-900` · `--size-spacing-medium-space-300` · `--size-spacing-small-space-100` · `--stack-md` · `--stroke-1`
+`--border-default` · `--control-sm` · `--ds-skeleton` · `--ds-skeleton-subtle` · `--plus-skeleton-duration` · `--plus-skeleton-height` · `--plus-skeleton-radius` · `--plus-skeleton-width` · `--radius-full` · `--radius-h24` · `--radius-md` · `--radius-sm` · `--skeleton-circle-size` · `--skeleton-height` · `--skeleton-status-width` · `--skeleton-status-width-spacious` · `--skeleton-tag-width` · `--skeleton-tag-width-narrow` · `--skeleton-tag-width-person` · `--skeleton-tag-width-widest` · `--skeleton-text-height` · `--stack-md`
 
 From `design-system/src/components/loading/Skeleton/Skeleton.scss`. Override these through the token layer, never with a literal.
 

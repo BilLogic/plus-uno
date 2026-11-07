@@ -33,15 +33,14 @@
 }
 
 /* Padding scale — md is the frame's own pad, so a Page used alone pads
-   as the one inside the frame does. No sm/lg padding tokens exist
-   yet, so those steps borrow the Sections layer padding tokens (same
-   semantic layer family). */
+   as the one inside the frame does; sm and lg are the Page pattern's
+   compact and spacious pads. */
 .plus-pattern-page-pad-none {
     padding: 0;
 }
 
 .plus-pattern-page-pad-sm {
-    padding: var(--size-section-pad-y-sm) var(--size-section-pad-x-sm);
+    padding: var(--page-pad-y-compact) var(--page-pad-x-compact);
 }
 
 .plus-pattern-page-pad-md {
@@ -49,30 +48,29 @@
 }
 
 .plus-pattern-page-pad-lg {
-    padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg);
+    padding: var(--page-pad-y-spacious) var(--page-pad-x-spacious);
 }
 
-/* Radius scale — lg is the canonical --size-surface-radius token;
-   sm/md reuse the Sections layer radius steps. */
+/* Radius scale: 8, 12 and 16. */
 .plus-pattern-page-radius-none {
     border-radius: 0;
 }
 
 .plus-pattern-page-radius-sm {
-    border-radius: var(--size-section-radius-sm);
+    border-radius: var(--radius-lg);
 }
 
 .plus-pattern-page-radius-md {
-    border-radius: var(--size-section-radius-md);
+    border-radius: var(--page-radius-md);
 }
 
 .plus-pattern-page-radius-lg {
-    border-radius: var(--size-surface-radius);
+    border-radius: var(--section-radius);
 }
 
 /* Border */
 .plus-pattern-page-bordered {
-    border: var(--size-surface-border) solid var(--ds-border-bold);
+    border: var(--page-border-width) solid var(--ds-border-bold);
 }
 
 // A bordered default page draws its border instead of the edge ring, never both.

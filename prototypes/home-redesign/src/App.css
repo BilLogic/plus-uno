@@ -251,7 +251,7 @@
     flex-direction: column;
     padding: var(--home-redesign-section-pad-y) var(--home-redesign-section-pad-x);
     background-color: var(--ds-surface-raised);
-    border-radius: var(--size-surface-radius, 16px);
+    border-radius: var(--section-radius);
     box-sizing: border-box;
     overflow: hidden;
 }
@@ -462,7 +462,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(3, 1fr);
-    gap: var(--space-0625, 16px) var(--size-section-gap-md, 24px);
+    gap: var(--space-0625) var(--section-stack-md);
     align-items: stretch;
     overflow: hidden;
 }
@@ -471,7 +471,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: repeat(4, auto);
-    gap: var(--stack-lg, 24px) var(--size-section-gap-md, 24px);
+    gap: var(--stack-lg) var(--section-stack-md);
 }
 
 .home-redesign-momentum-cell {
@@ -523,11 +523,11 @@
 .home-redesign-trainings-section {
     display: flex;
     flex-direction: column;
-    gap: var(--size-section-gap-md);
+    gap: var(--section-stack-md);
     width: 100%;
     padding: var(--home-redesign-section-pad-y) var(--home-redesign-section-pad-x);
     background-color: var(--ds-surface-container);
-    border-radius: var(--size-surface-radius, 16px);
+    border-radius: var(--section-radius);
     box-sizing: border-box;
 }
 
@@ -549,7 +549,7 @@
 
 .home-redesign-trainings-carousel {
     display: flex;
-    gap: var(--size-card-gap-md, 16px);
+    gap: var(--card-inline-md);
     overflow-x: auto;
     overflow-y: hidden;
     scroll-behavior: smooth;

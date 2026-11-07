@@ -237,8 +237,8 @@ export function ResearchAssistantChat({
         style={{
           flex: 1,
           overflow: 'auto',
-          padding: 'var(--size-section-pad-y-lg) 0',
-          paddingBottom: 'var(--size-section-pad-y-lg)',
+          padding: 'var(--section-pad-y-spacious) 0',
+          paddingBottom: 'var(--section-pad-y-spacious)',
           display: 'flex',
           flexDirection: 'column',
           gap: 'var(--stack-md)',

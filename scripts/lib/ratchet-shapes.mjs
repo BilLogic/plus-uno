@@ -153,16 +153,6 @@ export const SHAPES = [
     sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
   },
   {
-    file: 'scripts/baselines/old-size-tokens.json',
-    check: 'check:old-size-tokens',
-    command: 'node scripts/check-old-size-tokens.mjs --update',
-    prose: 'why',
-    // `<path>` -> count of old-size-token uses (ADR-038). A count may fall;
-    // one that reaches zero leaves the record, and the stale sweep asks for a
-    // regenerate.
-    sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
-  },
-  {
     file: 'scripts/baselines/inline-jsx-tokens.json',
     check: 'check:inline-jsx-tokens',
     command: 'node scripts/check-inline-jsx-tokens.mjs --update',

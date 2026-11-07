@@ -93,7 +93,7 @@ export const Placements = () => (
 );
 
 const tooltipPlaygroundPadding = {
-    padding: 'var(--size-spacing-medium-space-500)',
+    padding: 'var(--space-150)',
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',

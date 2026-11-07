@@ -289,11 +289,11 @@
 .plus-flag-interactive-demo {
     position: relative;
     box-sizing: border-box;
-    min-height: calc(var(--size-spacing-xlarge-space-2000) + var(--size-spacing-large-space-1500));
+    min-height: var(--flag-min-height);
     border: var(--border-default) solid var(--ds-border);
     background-color: var(--ds-surface);
     border-radius: var(--radius-md);
-    padding: var(--size-spacing-medium-space-400);
+    padding: var(--flag-pad);
 }
 
 .plus-flag-interactive-demo .plus-flag-container {
@@ -309,6 +309,6 @@
 .plus-flag-interactive-demo__trigger {
     position: absolute;
     left: 50%;
-    bottom: var(--size-spacing-medium-space-400);
+    bottom: var(--flag-offset);
     transform: translateX(-50%);
 }

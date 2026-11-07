@@ -34,7 +34,7 @@
 }
 
 .plus-tree-table-count {
-    margin-inline-start: var(--size-table-cell-inline);
+    margin-inline-start: var(--inline-md);
     color: var(--ds-text-subtle);
     font-weight: var(--type-weight-regular);
 }
@@ -52,7 +52,7 @@
 .plus-tree-table-message {
     display: inline-flex;
     align-items: center;
-    gap: var(--size-table-cell-inline);
+    gap: var(--inline-md);
     padding-inline-start: calc(var(--plus-tree-table-level) * var(--table-indent) + var(--item-height-sm));
 }
 

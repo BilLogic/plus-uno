@@ -16,7 +16,7 @@
     justify-content: center;
     // The popup sits offset 4 (`--popover-offset`) from its trigger.
     gap: var(--popover-offset);
-    padding: var(--size-spacing-medium-space-400);
+    padding: var(--popup-pad);
 
     .plus-popup {
         position: relative;

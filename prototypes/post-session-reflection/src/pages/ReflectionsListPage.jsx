@@ -61,7 +61,7 @@ export default function ReflectionsListPage() {
                 style={{
                     display: 'flex',
                     flexDirection: 'column',
-                    gap: 'var(--size-section-gap-lg)',
+                    gap: 'var(--section-stack-lg)',
                     width: '100%',
                     minHeight: '100%',
                 }}
@@ -81,7 +81,7 @@ export default function ReflectionsListPage() {
                 <div
                     style={{
                         display: 'flex',
-                        gap: 'var(--size-card-gap-md)',
+                        gap: 'var(--card-inline-md)',
                         width: '100%',
                     }}
                 >
@@ -96,7 +96,7 @@ export default function ReflectionsListPage() {
                     style={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: 'var(--size-section-gap-sm)',
+                        gap: 'var(--section-stack-sm)',
                         width: '100%',
                     }}
                 >

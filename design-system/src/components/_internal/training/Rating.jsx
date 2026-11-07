@@ -10,7 +10,7 @@ const Rating = ({ rating = "rest", onRatingChange }) => {
     // Styling constants from legacy
     const containerStyle = {
         display: 'flex',
-        gap: 'var(--size-section-gap-md)', // space-600 / 32px
+        gap: 'var(--section-stack-md)',
         alignItems: 'flex-start',
         padding: '0 var(--pad-x-md)', // space-300 / 16px
     };

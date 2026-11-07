@@ -54,7 +54,7 @@
   .plus-pattern-card-body {
     display: flex;
     flex-direction: column;
-    gap: var(--size-card-gap-sm, 8px);
+    gap: var(--card-stack-sm);
     flex: 1;
   }
 

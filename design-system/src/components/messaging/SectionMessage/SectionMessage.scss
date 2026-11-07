@@ -8,13 +8,13 @@
 .plus-section-message {
     display: flex;
     align-items: flex-start;
-    border-radius: var(--size-modal-radius-sm);
+    border-radius: var(--radius-md);
     width: 100%;
     max-width: 100%;
     color: var(--ds-text);
     box-sizing: border-box;
-    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
-    gap: var(--size-card-gap-sm);
+    padding: var(--card-pad-compact) var(--card-pad-compact);
+    gap: var(--card-inline-sm);
 }
 
 /* Inner content wrapper */

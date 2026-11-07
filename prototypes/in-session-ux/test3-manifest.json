@@ -55,9 +55,9 @@
     { "codeToken": "var(--color-surface)", "figmaVariableName": "Neutral Colors/surface", "key": "0fa65f9e6b100853fd8e72466c9017e750b32590", "appliedTo": "Test 3 frame fill" },
     { "codeToken": "var(--color-on-surface)", "figmaVariableName": "Neutral Colors/on-surface", "key": "276bd82733cce667bb6b1a9ed355dda43404ed60", "appliedTo": "Title text fill" },
     { "codeToken": "var(--color-on-surface-variant)", "figmaVariableName": "Neutral Colors/on-surface-variant", "key": "5798cab1bf150b4370eb3eab8c0b5478535ee1b8", "appliedTo": "Subtitle text fill" },
-    { "codeToken": "var(--size-surface-pad-x)", "figmaVariableName": "Surface/pad-x", "key": "afd52d7b0bf5852773c860d471f799185d1633b9", "appliedTo": "Test 3 frame paddingLeft/Right" },
-    { "codeToken": "var(--size-surface-pad-y)", "figmaVariableName": "Surface/pad-y", "key": "1c115eedcae8828a31d6bf72be222e9afbfbe0b2", "appliedTo": "Test 3 frame paddingTop/Bottom" },
-    { "codeToken": "var(--size-surface-gap-md)", "figmaVariableName": "Surface/gap-md", "key": "1c2c8e8bfdbcf45bcff6c8e67771ab78af899acd", "appliedTo": "Test 3 frame itemSpacing" },
+    { "codeToken": "var(--page-pad-x-default)", "figmaVariableName": "Surface/pad-x", "key": "afd52d7b0bf5852773c860d471f799185d1633b9", "appliedTo": "Test 3 frame paddingLeft/Right" },
+    { "codeToken": "var(--page-pad-y-default)", "figmaVariableName": "Surface/pad-y", "key": "1c115eedcae8828a31d6bf72be222e9afbfbe0b2", "appliedTo": "Test 3 frame paddingTop/Bottom" },
+    { "codeToken": "var(--section-stack-md)", "figmaVariableName": "Surface/gap-md", "key": "1c2c8e8bfdbcf45bcff6c8e67771ab78af899acd", "appliedTo": "Test 3 frame itemSpacing" },
     { "codeToken": "h3", "figmaTextStyleName": "Headline/H3", "key": "c5a9b4e2a1ae1075ed582a7c3c0d51e8128f9757", "appliedTo": "Title" },
     { "codeToken": "body2-txt", "figmaTextStyleName": "Body/B2/Regular", "key": "74d2f8680d204055ae945e338ec665c74677f078", "appliedTo": "Subtitle" }
   ],

@@ -4,14 +4,14 @@
    CSS Variables & Token Imports
    ============================================ */
 .monthly-report {
-    padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md);
+    padding: var(--section-pad-y-default) var(--section-pad-x-default);
     display: flex;
     flex-direction: column;
-    gap: var(--size-section-gap-lg);
+    gap: var(--section-stack-lg);
     background: var(--ds-surface);
     min-height: 100vh;
     overflow: visible;
-    padding-bottom: var(--size-section-gap-lg);
+    padding-bottom: var(--section-stack-lg);
 }
 
 /* ============================================
@@ -69,13 +69,13 @@
 .impact-section-wrapper {
     display: flex;
     flex-direction: column;
-    gap: var(--size-card-gap-md);
+    gap: var(--card-stack-md);
 }
 
 .impact-section {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--size-card-gap-md);
+    gap: var(--card-stack-md);
 }
 
 /* Hero Card */
@@ -86,8 +86,8 @@
 .impact-hero-card {
     background: var(--ds-surface-raised);
     border: 1px solid var(--ds-border);
-    border-radius: var(--size-card-radius-md);
-    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+    border-radius: var(--card-radius);
+    padding: var(--card-pad-compact) var(--card-pad-compact);
     position: relative;
     overflow: hidden;
     height: 100%;
@@ -136,7 +136,7 @@
     color: var(--ds-text-subtle);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: var(--size-card-gap-md);
+    margin-bottom: var(--card-stack-md);
     display: flex;
     align-items: center;
     gap: var(--stack-md);
@@ -166,7 +166,7 @@
 .impact-metrics {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
-    column-gap: var(--size-card-gap-lg);
+    column-gap: var(--card-inline-lg);
     align-items: center;
     flex: 1 1 auto;
 }
@@ -242,14 +242,14 @@
 .impact-stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--size-card-gap-sm);
+    gap: var(--card-stack-sm);
 }
 
 .stat-card {
     background: var(--ds-surface-raised);
     border: 1px solid var(--ds-border);
-    border-radius: var(--size-card-radius-sm);
-    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+    border-radius: var(--card-radius-sm);
+    padding: var(--card-pad-compact) var(--card-pad-compact);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -365,11 +365,11 @@
 .time-allocation-section {
     background: var(--ds-surface);
     border: none;
-    border-radius: var(--size-card-radius-md);
-    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+    border-radius: var(--card-radius);
+    padding: var(--card-pad-default) var(--card-pad-default);
     display: flex;
     flex-direction: column;
-    gap: var(--size-card-gap-md);
+    gap: var(--card-stack-md);
 }
 
 .time-allocation-title {
@@ -596,7 +596,7 @@
 .growth-insights-section {
     display: flex;
     flex-direction: column;
-    gap: var(--size-card-gap-md);
+    gap: var(--card-stack-md);
 }
 
 .growth-insights-header {
@@ -631,7 +631,7 @@
     display: grid;
     grid-template-columns: 48px 1fr;
     gap: var(--stack-lg);
-    padding-bottom: var(--size-card-gap-md);
+    padding-bottom: var(--card-stack-md);
     position: relative;
 }
 
@@ -678,7 +678,7 @@
 .growth-card {
     background: var(--ds-surface-raised);
     border: 1px solid var(--ds-border);
-    border-radius: var(--size-card-radius-sm);
+    border-radius: var(--card-radius-sm);
     overflow: hidden;
     transition: box-shadow 0.2s ease;
 }
@@ -705,7 +705,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-0625);
-    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+    padding: var(--card-pad-compact) var(--card-pad-compact);
 }
 
 .growth-card-icon {
@@ -754,11 +754,11 @@
 
 /* Card Body (Expanded) */
 .growth-card-body {
-    padding: 0 var(--size-card-pad-x-sm) var(--size-card-pad-y-sm);
+    padding: 0 var(--card-pad-compact) var(--card-pad-compact);
     border-top: 1px solid var(--ds-border);
     display: flex;
     flex-direction: column;
-    gap: var(--size-card-gap-sm);
+    gap: var(--card-stack-sm);
 }
 
 .growth-card-summary {
@@ -796,7 +796,7 @@
 }
 
 .feedback-row {
-    padding-top: var(--size-card-gap-sm);
+    padding-top: var(--card-stack-sm);
     border-top: 1px dashed var(--ds-border);
     display: flex;
     flex-direction: column;
@@ -826,7 +826,7 @@
 .training-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--size-card-gap-sm);
+    gap: var(--card-stack-sm);
 }
 
 /* ============================================
@@ -990,16 +990,16 @@
    ============================================ */
 .cta-section {
     background: var(--ds-surface);
-    border-radius: var(--size-card-radius-md);
+    border-radius: var(--card-radius);
     border: 1px solid var(--ds-border);
-    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+    padding: var(--card-pad-default) var(--card-pad-default);
 }
 
 .cta-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--size-card-gap-lg);
+    gap: var(--card-inline-lg);
 }
 
 .cta-text {
@@ -1034,7 +1034,7 @@
     min-height: 0;
     padding: 0;
     padding-bottom: 80px;
-    gap: var(--size-surface-gap-sm);
+    gap: var(--section-stack-sm);
     font-family: var(--font-family-base, var(--font-family-body));
     color: var(--ds-text);
 }
@@ -1049,13 +1049,13 @@
 }
 
 .impact-section-wrapper {
-    margin-bottom: var(--size-surface-gap-sm);
+    margin-bottom: var(--section-stack-sm);
 }
 
 .impact-section {
     grid-template-columns: 2fr 1fr;
-    gap: var(--size-surface-gap-sm);
-    margin-bottom: var(--size-surface-gap-sm);
+    gap: var(--section-stack-sm);
+    margin-bottom: var(--section-stack-sm);
 }
 
 @media (max-width: 900px) {
@@ -1068,18 +1068,18 @@
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), #fff);
     border: 1px solid rgba(59, 130, 246, 0.2);
     border-radius: 16px;
-    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+    padding: var(--card-pad-compact) var(--card-pad-compact);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .impact-title {
     font-size: 16px;
-    margin-bottom: var(--size-card-gap-md);
+    margin-bottom: var(--card-stack-md);
     color: var(--ds-text-brand);
 }
 
 .impact-metrics {
-    column-gap: var(--size-card-gap-lg);
+    column-gap: var(--card-inline-lg);
 }
 
 .metric-value-xl {
@@ -1097,7 +1097,7 @@
 }
 
 .impact-stats-grid {
-    gap: var(--size-card-gap-sm);
+    gap: var(--card-stack-sm);
 }
 
 .stat-card:hover {
@@ -1117,8 +1117,8 @@
 .time-allocation-section {
     background: #fff;
     border: none;
-    border-radius: var(--size-card-radius-md);
-    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+    border-radius: var(--card-radius);
+    padding: var(--card-pad-default) var(--card-pad-default);
     margin-bottom: 20px;
 }
 
@@ -1182,7 +1182,7 @@
 .growth-card {
     background: #fff;
     border-radius: 12px;
-    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+    padding: var(--card-pad-default) var(--card-pad-default);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -1199,15 +1199,15 @@
 }
 
 .growth-card-body {
-    margin-top: var(--size-card-gap-md);
-    padding-top: var(--size-card-gap-md);
+    margin-top: var(--card-stack-md);
+    padding-top: var(--card-stack-md);
     border-top: 1px solid var(--ds-border);
 }
 
 .growth-card-summary {
     font-size: 15px;
     line-height: 1.6;
-    margin: 0 0 var(--size-card-gap-sm);
+    margin: 0 0 var(--card-stack-sm);
     padding-block: var(--space-025);
 }
 
@@ -1228,8 +1228,8 @@
 }
 
 .feedback-row {
-    margin-top: var(--size-card-gap-md);
-    padding-top: var(--size-card-gap-sm);
+    margin-top: var(--card-stack-md);
+    padding-top: var(--card-stack-sm);
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -1345,9 +1345,9 @@
    Final Enforced Parity (authoritative)
    ============================================ */
 .monthly-report {
-    gap: var(--size-section-gap-md) !important;
-    padding-left: var(--size-spacing-small-space-000) !important;
-    padding-right: var(--size-spacing-small-space-000) !important;
+    gap: var(--section-stack-md) !important;
+    padding-left: var(--space-0) !important;
+    padding-right: var(--space-0) !important;
     overflow: visible !important;
     /* Ensure shadows aren't clipped by the container itself */
 }
@@ -1399,9 +1399,9 @@
 
 .monthly-report .time-allocation-section {
     border: none !important;
-    border-radius: var(--size-card-radius-md) !important;
+    border-radius: var(--card-radius) !important;
     box-shadow: var(--ds-shadow-raised) !important;
-    margin-bottom: var(--size-spacing-small-space-000) !important;
+    margin-bottom: var(--space-0) !important;
     margin-left: var(--stack-sm, 8px) !important;
     margin-right: var(--stack-sm, 8px) !important;
 }
@@ -1508,7 +1508,7 @@
 
 .monthly-report .growth-insights-header {
     align-items: flex-start !important;
-    margin-bottom: var(--size-surface-gap-sm) !important;
+    margin-bottom: var(--section-stack-sm) !important;
 }
 
 .monthly-report .growth-insights-title-column {
@@ -1583,28 +1583,28 @@
    Stabilization Overrides (authoritative)
    ============================================ */
 .monthly-report {
-    padding-bottom: calc(var(--size-section-pad-y-md) + var(--size-section-pad-y-sm)) !important;
+    padding-bottom: calc(var(--section-pad-y-default) + var(--section-pad-y-compact)) !important;
 }
 
 .monthly-report .growth-insights-header {
     align-items: flex-start !important;
-    gap: var(--size-section-gap-lg) !important;
-    margin-bottom: var(--size-surface-gap-sm) !important;
+    gap: var(--section-stack-lg) !important;
+    margin-bottom: var(--section-stack-sm) !important;
     width: 100% !important;
 }
 
 .monthly-report .impact-section-wrapper {
-    margin-bottom: var(--size-section-gap-lg) !important;
+    margin-bottom: var(--section-stack-lg) !important;
 }
 
 .monthly-report .impact-section {
     align-items: stretch !important;
-    gap: var(--size-section-gap-lg) !important;
-    margin-bottom: var(--size-spacing-small-space-000) !important;
+    gap: var(--section-stack-lg) !important;
+    margin-bottom: var(--space-0) !important;
 }
 
 .monthly-report .impact-hero-card-content {
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-stack-md) !important;
 }
 
 .monthly-report .impact-metrics {
@@ -1612,7 +1612,7 @@
 }
 
 .monthly-report .impact-metric {
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-stack-md) !important;
 }
 
 .monthly-report .insight-alert {
@@ -1621,11 +1621,11 @@
 }
 
 .monthly-report .impact-stats-grid {
-    gap: var(--size-card-gap-sm) !important;
+    gap: var(--card-stack-sm) !important;
 }
 
 .monthly-report .impact-title {
-    margin-bottom: var(--size-spacing-small-space-000) !important;
+    margin-bottom: var(--space-0) !important;
     font-size: 13px !important;
     line-height: 1.2 !important;
 }
@@ -1642,8 +1642,8 @@
 }
 
 .monthly-report .growth-insights-section {
-    margin-top: var(--size-surface-gap-md) !important;
-    margin-bottom: calc(var(--size-section-gap-md) + var(--size-surface-gap-md)) !important;
+    margin-top: var(--section-stack-md) !important;
+    margin-bottom: calc(var(--section-stack-md) + var(--section-stack-md)) !important;
 }
 
 .monthly-report .growth-insights-title-column {
@@ -1706,7 +1706,7 @@
     padding-left: 64px !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-stack-md) !important;
 }
 
 .monthly-report .timeline-container::before {
@@ -1741,7 +1741,7 @@
     position: absolute !important;
     left: -32px !important;
     top: 60px !important;
-    bottom: calc(-1 * var(--size-card-gap-md)) !important;
+    bottom: calc(-1 * var(--card-stack-md)) !important;
     width: 2px !important;
     background: var(--ds-background-neutral) !important;
     z-index: 0 !important;
@@ -1890,11 +1890,11 @@
 
 .monthly-report .training-grid {
     display: flex !important;
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-inline-md) !important;
     width: max-content !important;
     min-width: 100% !important;
     overflow: visible !important;
-    padding-bottom: var(--size-spacing-small-space-000) !important;
+    padding-bottom: var(--space-0) !important;
 }
 
 .monthly-report .training-grid>* {
@@ -1907,20 +1907,20 @@
 .monthly-report.reveal-root.has-entered {
     padding-left: 0 !important;
     padding-right: 0 !important;
-    gap: var(--size-section-gap-lg) !important;
+    gap: var(--section-stack-lg) !important;
 }
 
 .monthly-report .impact-section-wrapper {
-    margin-bottom: var(--size-section-gap-md) !important;
+    margin-bottom: var(--section-stack-md) !important;
 }
 
 .monthly-report .impact-section {
-    gap: var(--size-section-gap-lg) !important;
+    gap: var(--section-stack-lg) !important;
     margin-bottom: 0 !important;
 }
 
 .monthly-report .impact-hero-card-content {
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-stack-md) !important;
 }
 
 .monthly-report .impact-metrics {
@@ -1929,11 +1929,11 @@
 
 .monthly-report .impact-metrics {
     align-items: center !important;
-    column-gap: var(--size-card-gap-md) !important;
+    column-gap: var(--card-inline-md) !important;
 }
 
 .monthly-report .impact-metric {
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-stack-md) !important;
 }
 
 .monthly-report .delta-badge {
@@ -1958,18 +1958,18 @@
 }
 
 .monthly-report .time-allocation-section {
-    border-radius: var(--size-card-radius-md) !important;
-    margin-bottom: var(--size-section-gap-md) !important;
+    border-radius: var(--card-radius) !important;
+    margin-bottom: var(--section-stack-md) !important;
     overflow: visible !important;
 }
 
 .monthly-report .impact-stats-grid {
-    row-gap: var(--size-card-gap-sm) !important;
-    column-gap: var(--size-card-gap-sm) !important;
+    row-gap: var(--card-stack-sm) !important;
+    column-gap: var(--card-inline-sm) !important;
 }
 
 .monthly-report .stat-card {
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-stack-md) !important;
 }
 
 /* ============================================

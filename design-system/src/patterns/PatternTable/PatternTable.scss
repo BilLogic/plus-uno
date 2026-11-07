@@ -13,7 +13,7 @@
     // mode), so it is a length of its own, with room to spare, rather than a
     // multiple of the cell padding, which a density change would shrink until
     // the shadow clipped. Raise it if the overflow shadow's blur grows.
-    --pattern-table-overflow-reach: var(--size-spacing-medium-space-500);
+    --pattern-table-overflow-reach: var(--section-pad-x-default);
     // Sticky cells stack only inside the scroll region (which isolates), so
     // these are local orders on the card layer: a sticky row or column rides
     // over the body, and the corner cell over both.
@@ -22,14 +22,14 @@
 
     display: flex;
     flex-direction: column;
-    gap: var(--size-table-cell-gap);
+    gap: var(--stack-md);
     background-color: transparent;
     color: var(--ds-text);
 }
 
 .plus-pattern-table-scroll {
     overflow: auto;
-    border-radius: var(--size-table-radius-sm);
+    border-radius: var(--table-radius);
     // Sticky cells stack inside the table, never over the page around it.
     isolation: isolate;
 
@@ -54,7 +54,7 @@
 
     th,
     td {
-        padding: var(--size-table-cell-y) var(--size-table-cell-x);
+        padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
         text-align: left;
         border-bottom: var(--border-default) solid var(--ds-border);
         font: var(--body-default);

@@ -229,7 +229,7 @@ export const ColorModes = {
         const aside = sidebar();
         await expect(rect(aside).right, 'the sidebar sits flush against the surface').toBeCloseTo(rect(surface).left, 0);
         const edgeLine = 'var(--border-default) 0 0 0 var(--ds-border)';
-        await expect(tokenLength(frame, '--size-surface-border'), 'the surface edge covers the divider')
+        await expect(tokenLength(frame, '--stroke-2'), 'the surface edge covers the divider')
             .toBeGreaterThanOrEqual(tokenLength(frame, '--stroke-1'));
         await inEveryColorMode(async (mode) => {
             const frameStyle = getComputedStyle(frame);
