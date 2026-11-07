@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as DateTagStories from './DateTag.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { DateTag } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={DateTagStories} />
 
@@ -22,31 +29,25 @@ and the due-soon window — never a caller's choice.
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>A neutral date tag, outlined with its fixed calendar icon.</>}>
-    <Canvas of={DateTagStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Appearance
 
-<DocsCanvasShell description={<>`neutral` (calendar) when the date is not close, `warning` (clock) when due soon, `danger` (triangle-exclamation) when overdue. Each appearance's icon is fixed, never a caller's choice.</>}>
-    <DsCanvasQuiet of={DateTagStories.Styles} />
-</DocsCanvasShell>
+<ComponentExample of={DateTagStories.Overview} title="Neutral, warning and danger" description="Neutral (calendar) when the date is not close, warning (clock) when due soon, danger (triangle) when overdue; each icon is fixed, never a caller's choice." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Truncation
+## Size and layout
 
-<DocsCanvasShell description={<>Past `maxWidth` the label ends in an ellipsis, and the full text becomes a tooltip reachable by hover or by Tab.</>}>
-    <DsCanvasQuiet of={DateTagStories.Truncation} />
-</DocsCanvasShell>
+<ComponentExample of={DateTagStories.Styles} title="Spacing" description="Every appearance at default (20) and spacious (32) spacing." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Behavior
+
+<ComponentExample of={DateTagStories.Truncation} title="Truncation" description={<>Past <code>maxWidth</code> the label ends in an ellipsis, and the full text becomes a tooltip reachable by hover or by Tab.</>} />
 
 </div>
 
@@ -54,25 +55,15 @@ and the due-soon window — never a caller's choice.
 
 ## State
 
-<DocsCanvasShell description={<>Rest. The only state: an outlined date with a fixed icon.</>}>
-    <DsCanvasQuiet of={DateTagStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={DateTagStories.Rest} title="Rest" description="The only state: an outlined date with a fixed icon." />
 
-<DocsCanvasShell description={<>Hovered. No change: a date tag is not a control.</>}>
-    <DsCanvasQuiet of={DateTagStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={DateTagStories.Hovered} title="Hovered" description="No change: a date tag is not a control." />
 
-<DocsCanvasShell description={<>Pressed. No change.</>}>
-    <DsCanvasQuiet of={DateTagStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={DateTagStories.Pressed} title="Pressed" description="No change." />
 
-<DocsCanvasShell description={<>Focused. Not in the tab order.</>}>
-    <DsCanvasQuiet of={DateTagStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={DateTagStories.Focused} title="Focused" description="Not in the tab order." />
 
-<DocsCanvasShell description={<>Disabled. Never dimmed.</>}>
-    <DsCanvasQuiet of={DateTagStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={DateTagStories.Disabled} title="Disabled" description="Never dimmed." />
 
 </div>
 
@@ -104,10 +95,25 @@ and the due-soon window — never a caller's choice.
 
 ## Usage
 
-Use `DateTag` for a due or event date beside the thing it belongs to — an
+Use `DateTag` for a due or event date beside the thing it belongs to: an
 assignment, a session, a report. For a status or a category, use `Tag`
 instead; `DateTag`'s outline, icon and three appearances are reserved for
 dates.
+
+### Appearance guidance
+
+The app derives `appearance` from the date and a due-soon window it defines.
+
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Neutral</td><td>The date is not close. Draws a calendar. Example: "Due Oct 14".</td></tr>
+<tr><td>Warning</td><td>The date is near, before it turns overdue. Draws a clock. Example: "Due tomorrow".</td></tr>
+<tr><td>Danger</td><td>The date has passed. Draws a triangle. Example: "2 days overdue".</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -155,20 +161,44 @@ dates.
 
 ## Best practices
 
-### The app picks the appearance, never taste.
+The app picks the appearance from the date and its due-soon window, never from taste. Write `children` as people say the date: "Due tomorrow", "2 days overdue", not a raw timestamp.
 
-Derive `appearance` from the date and a due-soon window the app defines —
-`neutral` while there's time, `warning` as it nears, `danger` once it has
-passed. Write `children` as people say the date: "Due tomorrow," "2 days
-overdue," not a raw timestamp.
+### Reserve danger for overdue dates.
 
-```jsx
-<DateTag appearance="warning">Due in 2 days</DateTag>
-```
+Danger means the date has passed; a far-off date stays neutral.
 
-### A date tag is never a button.
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Overdue</span><DateTag appearance="danger">2 days overdue</DateTag></div>}
+    doCaption="Danger when it is overdue."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Due in 30 days</span><DateTag appearance="danger">Due in 30 days</DateTag></div>}
+    dontCaption="Danger on a date 30 days out."
+/>
 
-It renders a `span` with no role and no click handler — `onClick`, `role` and
+### Use warning for dates that are close.
+
+Warning tells people the date is near, before it turns overdue.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Due tomorrow</span><DateTag appearance="warning">Due tomorrow</DateTag></div>}
+    doCaption="Warning when it is due soon."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Due tomorrow</span><DateTag>Due tomorrow</DateTag></div>}
+    dontCaption="Neutral hides that it is due soon."
+/>
+
+### Show one date tag per row.
+
+A row carries one date; extra tags compete for attention.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Session</span><DateTag>Due Nov 12</DateTag></div>}
+    doCaption="One date per row."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Session</span><DateTag>Due Nov 12</DateTag><DateTag appearance="warning">Due tomorrow</DateTag><DateTag appearance="danger">2 days overdue</DateTag></div>}
+    dontCaption="Several dates in one row."
+/>
+
+### Never make a date tag a button.
+
+It renders a `span` with no role and no click handler: `onClick`, `role` and
 `tabIndex` are dropped with a console warning in development. The one time it
 takes focus is when its text is truncated, so a keyboard user can still reach
 the tooltip holding the full date.
@@ -196,7 +226,7 @@ the tooltip holding the full date.
 
 ## Accessibility
 
-- **Not a control.** No role, no tab stop, no click handler — assistive
+- **Not a control.** No role, no tab stop, no click handler: assistive
   technology reads it as plain text beside whatever it labels.
 - **Truncated text stays reachable.** When the label is clipped, the tag
   takes a tab stop and its full text is available as a tooltip on hover or

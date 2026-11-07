@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PromptStartersStories from './PromptStarters.stories.jsx';
-import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PromptStarters } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={PromptStartersStories} />
 
@@ -22,56 +29,37 @@ A few things a person could ask PLUS AI, as a wrapping row of prompt
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>A row of prompt chips, each a short label standing for a longer prompt.</>}>
-    <Canvas of={PromptStartersStories.Default} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={PromptStartersStories.Default} title="Starters" description="A wrapping row of prompt chips, each a short label standing for a longer prompt." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Content
+## Behavior
 
-<DocsCanvasShell description={<>Pressing a chip calls `onSelect` with the whole starter — `id`, `label` and `text` — and nothing else.</>}>
-    <DsCanvasQuiet of={PromptStartersStories.SelectHandsBackTheStarter} />
-</DocsCanvasShell>
+<ComponentExample of={PromptStartersStories.SelectHandsBackTheStarter} title="Select" description={<>Pressing a chip calls <code>onSelect</code> with the whole starter (<code>id</code>, <code>label</code> and <code>text</code>) and nothing else.</>} />
 
-<DocsCanvasShell description={<>`FillsThePromptInput`: the common pattern — `onSelect` puts the starter's `text` into a `PromptInput` for a person to read and send.</>}>
-    <DsCanvasQuiet of={PromptStartersStories.FillsThePromptInput} />
-</DocsCanvasShell>
+<ComponentExample of={PromptStartersStories.FillsThePromptInput} title="Fills the prompt input" description={<>The common pattern: <code>onSelect</code> puts the starter's <code>text</code> into a <code>PromptInput</code> for a person to read and send.</>} />
+
+<ComponentExample of={PromptStartersStories.EmptyRendersNothing} title="Empty" description={<>An empty <code>starters</code> array renders nothing: no empty group, no placeholder.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## States
+## Interactive playground
 
-<DocsCanvasShell description={<>An empty `starters` array renders nothing — no empty group, no placeholder.</>}>
-    <DsCanvasQuiet of={PromptStartersStories.EmptyRendersNothing} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Properties
-
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Notes</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>starters</code></td><td>array</td><td>Each entry: <code>id</code>, <code>label</code> (shown on the chip) and <code>text</code> (the prompt it stands for).</td></tr>
-        <tr><td><code>onSelect</code></td><td>function</td><td>Called with the pressed starter. Never sends anything itself.</td></tr>
-        <tr><td><code>label</code></td><td>string</td><td>Required. The group's accessible name, such as "Suggested prompts".</td></tr>
-    </tbody>
-</DocsTable>
+<DocsInteractivePlayground
+    of={PromptStartersStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
 
 </div>
 
@@ -85,10 +73,10 @@ A few things a person could ask PLUS AI, as a wrapping row of prompt
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `PromptStarters` to offer a few things a person could ask an AI feature,
-before they've typed anything — an empty chat, a fresh reflection, a blank
+before they've typed anything: an empty chat, a fresh reflection, a blank
 prompt field. Once a conversation is underway, use `Suggestion` directly for
 a single follow-up prompt instead of a full row of starters.
 
@@ -96,29 +84,91 @@ a single follow-up prompt instead of a full row of starters.
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
 
-### `onSelect` decides what happens — the component never sends on its own.
+1. **Group.** A wrapping row with <code>role="group"</code>, named by the required <code>label</code>.
+2. **Starter.** A prompt <code>Suggestion</code> per entry in <code>starters</code>: the sparkle wand, the short <code>label</code> on the chip, and the longer <code>text</code> it stands for.
 
-The common pattern is putting the starter's `text` into a `PromptInput` so a
-person can read and edit it before sending, not sending it immediately on
-their behalf.
+### States
 
-```jsx
-<PromptStarters
-    label="Suggested prompts"
-    starters={[
-        { id: 'summarize', label: 'Summarize this session', text: 'Summarize what happened in this session.' },
-        { id: 'next-steps', label: 'Suggest next steps', text: 'What should the tutor focus on next?' },
-    ]}
-    onSelect={(starter) => setDraft(starter.text)}
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>A row of prompt chips. The group itself has no ground and no state.</td></tr>
+<tr><td>Hovered, pressed, focused</td><td>Each chip reacts as a <code>Suggestion</code> does.</td></tr>
+<tr><td>Empty</td><td>An empty <code>starters</code> array renders nothing.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Gap</td><td><code>--stack-md</code> between chips and between rows, the same gap as a tag row.</td></tr>
+<tr><td>Starter</td><td>A <code>Suggestion</code>, so its edge, words, grounds and focus ring are Suggestion's tokens.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Keep the label short, and put the prompt in `text`.
+
+A chip sits in a row, so its `label` is a few words that read as a request;
+the full prompt it stands for goes in `text`.
+
+<DoDontPair
+    doExample={<PromptStarters label="Suggested prompts" starters={[{ id: 'summarize', label: 'Summarize this session', text: 'Summarize Maya\'s last two sessions and suggest what to practice next.' }]} onSelect={() => {}} />}
+    doCaption="A short label for a longer prompt."
+    dontExample={<PromptStarters label="Suggested prompts" starters={[{ id: 'summarize', label: 'Summarize Maya\'s last two sessions and suggest what to practice next', text: 'Summarize Maya\'s last two sessions and suggest what to practice next.' }]} onSelect={() => {}} />}
+    dontCaption="The whole prompt as the label."
 />
-```
 
-### An empty list renders nothing.
+### Offer a few.
 
-Don't guard the component with your own conditional — passing an empty
+Three to five starters fit a row and can be read at a glance.
+
+<DoDontPair
+    doExample={<PromptStarters label="Suggested prompts" starters={[{ id: 'summarize', label: 'Summarize this session', text: 'Summarize this session for the family.' }, { id: 'plan', label: 'Plan next steps', text: 'What should we cover next session?' }, { id: 'explain', label: 'Explain this concept', text: 'Explain this in simpler terms.' }]} onSelect={() => {}} />}
+    doCaption="A few starters to choose from."
+    dontExample={<PromptStarters label="Suggested prompts" starters={[{ id: 'summarize', label: 'Summarize this session', text: 'Summarize this session for the family.' }, { id: 'plan', label: 'Plan next steps', text: 'What should we cover next session?' }, { id: 'explain', label: 'Explain this concept', text: 'Explain this in simpler terms.' }, { id: 'practice', label: 'Suggest practice', text: 'Suggest what to practice next.' }, { id: 'family', label: 'Draft a family note', text: 'Draft a note to the family.' }, { id: 'compare', label: 'Compare sessions', text: 'Compare the last two sessions.' }, { id: 'goals', label: 'Review goals', text: 'Review the student goals.' }, { id: 'quiz', label: 'Make a quiz', text: 'Make a short quiz on this topic.' }]} onSelect={() => {}} />}
+    dontCaption="So many starters the row becomes a wall."
+/>
+
+### Let `onSelect` decide what happens.
+
+The component never sends on its own. The common pattern is putting the
+starter's `text` into a `PromptInput` so a person can read and edit it before
+sending, not sending it immediately on their behalf.
+
+### Pass an empty list rather than a guard.
+
+Don't guard the component with your own conditional: passing an empty
 `starters` array already renders nothing, with no empty group left behind.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Write a label of a few words that reads as a request: "Summarize this session".</td><td>Put a whole paragraph on the chip.</td></tr>
+<tr><td>Name the group for what it offers: "Suggested prompts".</td><td>Leave the group unnamed.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

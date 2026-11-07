@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as TagStories from './Tag.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Tag } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -61,101 +68,25 @@ category.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>Read-only, removable, selectable and link. Every one is 22 tall, outlined, with neutral text and the color on the border and swatch.</>}>
-    <Canvas of={TagStories.Behaviors} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.Colors} title="Colors" description={<>Ten colors, the accent families, with gray the default; a color is a category, never a status, so there is no <code>success</code> or <code>danger</code>.</>} />
 
-</div>
+<ComponentExample of={TagStories.Types} title="Person, agent and team" description="A person, an agent or a team leads with a 16 avatar in place of the swatch: round, hexagon and square, with the color filling the avatar." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={TagStories.AvatarFallback} title="Avatar fallback" description={<>With no <code>avatar</code>, or one that fails to load, initials stand in the same 16 box, so the tag does not move.</>} />
 
-## Colors
+<ComponentExample of={TagStories.OnImages} title="Elevated" description={<><code>isElevated</code> lifts a read-only or link tag onto a photo, a thumbnail or a video, on the overlay surface with its shadow and no border.</>} />
 
-<DocsCanvasShell description={<>Ten colors, the accent families. A tag's color is a category, never a status, so there is no <code>success</code> or <code>danger</code>. Gray is the default.</>}>
-    <DsCanvasQuiet of={TagStories.Colors} />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.ElevatedAvatarTypes} title="Elevated avatar types" description="A person, agent or team tag takes the same ground, and its avatar keeps its own fill." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Types
+## Size and layout
 
-<DocsCanvasShell description={<>A person, an agent or a team leads with a 16 avatar in place of the swatch. A person is round, and so are its tag and its ×; an agent is a hexagon; a team is a square. The border stays neutral and the color fills the avatar.</>}>
-    <DsCanvasQuiet of={TagStories.Types} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>With no <code>avatar</code>, or one that fails to load, initials stand in, in the same 16 box, so the tag does not move.</>}>
-    <DsCanvasQuiet of={TagStories.AvatarFallback} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Every kind of tag works on every type: removable, selectable, link with a separate ×, saving, and disabled.</>}>
-    <DsCanvasQuiet of={TagStories.TypeBehaviors} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Selection
-
-<DocsCanvasShell description={<>A tag with <code>isSelected</code>, true or false, is a toggle and publishes <code>aria-pressed</code>. Selected is a full-color border as well as a fill.</>}>
-    <DsCanvasQuiet of={TagStories.Selecting} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>States use the accent's own steps: hover is subtlest, pressed subtlest pressed, and selected the subtler step, which a selected tag holds on hover and press. On a removable tag only the × reacts.</>}>
-    <DsCanvasQuiet of={TagStories.StateLayers} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A row of answer chips: each is a selectable tag, toggled with Space, Enter or a click, with the caller holding which are on.</>}>
-    <DsCanvasQuiet of={TagStories.AnswerChips} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<><code>trailingMetric</code> adds a compact neutral Count tag to a selectable tag, such as a filter's result count. On any other tag it is ignored.</>}>
-    <DsCanvasQuiet of={TagStories.CountOnSelectable} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Removing
-
-<DocsCanvasShell description={<>The × is named from the label, so a row of tags does not expose a row of identical controls.</>}>
-    <DsCanvasQuiet of={TagStories.Removing} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A link with <code>isRemovable</code> is two targets: the text is the link, the × is its sibling, and the tab order is link, then ×.</>}>
-    <DsCanvasQuiet of={TagStories.LinkWithRemove} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## On images
-
-<DocsCanvasShell description={<><code>isElevated</code> lifts a read-only or link tag onto a photo, a thumbnail or a video: the overlay surface and its shadow, no border and neutral text, with the hue kept on the swatch. Place it 8 from the image corner, never centered over a face or text.</>}>
-    <DsCanvasQuiet of={TagStories.OnImages} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A person, agent or team tag takes the same ground, and its avatar keeps its own fill.</>}>
-    <DsCanvasQuiet of={TagStories.ElevatedAvatarTypes} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>When disabled, an elevated tag keeps its solid ground and shadow, since the translucent disabled fill would sink into the picture. Only the content turns disabled: the label, the swatch, and the avatar as any disabled avatar. No hover or press.</>}>
-    <DsCanvasQuiet of={TagStories.ElevatedDisabled} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Focus on an elevated link's × has the same 2px surface gap inside its ring as the tag's own focus. A × off the image keeps the plain ring.</>}>
-    <DsCanvasQuiet of={TagStories.ElevatedRemoveFocus} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Editing happens off the image, so a removable or selectable tag ignores <code>isElevated</code> and keeps its outline, with a warning in development.</>}>
-    <DsCanvasQuiet of={TagStories.ElevatedOnlyReadOnlyAndLink} />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.Truncation} title="Truncation" description="Every tag caps at 180 wide, or narrower in a narrower container; a clipped label ellipsizes and its full text is a tooltip on hover and focus." />
 
 </div>
 
@@ -163,29 +94,27 @@ category.
 
 ## Behavior
 
-<DocsCanvasShell description={<>Focus is a 2px Focus Ring 2px outside the tag, or outside the ×.</>}>
-    <DsCanvasQuiet of={TagStories.FocusRing} />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.Behaviors} title="Read-only, removable, selectable and link" description="Every kind is 22 tall and outlined, with neutral text and the color on the border and swatch." />
 
-<DocsCanvasShell description={<>On a person tag the ring follows the round shape, and a focused × is round too.</>}>
-    <DsCanvasQuiet of={TagStories.PersonFocusRing} />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.TypeBehaviors} title="Kinds on every type" description="Removable, selectable, link with a separate ×, saving and disabled all work on every type." />
 
-<DocsCanvasShell description={<>Saving: a spinner replaces the swatch or avatar, so the tag keeps its width, and the × waits for the save.</>}>
-    <DsCanvasQuiet of={TagStories.Saving} />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.Selecting} title="Selectable" description={<>A tag with <code>isSelected</code>, true or false, is a toggle that publishes <code>aria-pressed</code>; selected is a full-color border and a fill.</>} />
 
-<DocsCanvasShell description={<>Disabled comes from the field through <code>TagContext</code>: a neutral fill, no ×, and nothing to focus.</>}>
-    <DsCanvasQuiet of={TagStories.DisabledInField} />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.AnswerChips} title="Answer chips" description="Each chip is a selectable tag, toggled with Space, Enter or a click, with the caller holding which are on." />
 
-<DocsCanvasShell description={<><code>isDisabled</code> disables one tag with no field around it.</>}>
-    <DsCanvasQuiet of={TagStories.IsDisabled} />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.CountOnSelectable} title="Count on a selectable tag" description={<><code>trailingMetric</code> adds a compact neutral Count tag to a selectable tag, such as a filter's result count; on any other tag it is ignored.</>} />
 
-<DocsCanvasShell description={<>Every tag caps at 180 wide, and narrower in a narrower container. A clipped label ellipsizes, and its full text is a tooltip that hover and keyboard focus both reach.</>}>
-    <DsCanvasQuiet of={TagStories.Truncation} />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.Removing} title="Removable" description="The × is named from the label, so a row of tags does not expose a row of identical controls." />
+
+<ComponentExample of={TagStories.LinkWithRemove} title="Link with remove" description={<>A link with <code>isRemovable</code> is two targets: the text is the link, the × its sibling, and the tab order is link, then ×.</>} />
+
+<ComponentExample of={TagStories.ElevatedOnlyReadOnlyAndLink} title="Elevated only for read-only and link" description={<>A removable or selectable tag ignores <code>isElevated</code> and keeps its outline, with a warning in development.</>} />
+
+<ComponentExample of={TagStories.Saving} title="Saving" description="A spinner replaces the swatch or avatar, so the tag keeps its width, and the × waits for the save." />
+
+<ComponentExample of={TagStories.DisabledInField} title="Disabled by the field" description={<>Disabled comes from the field through <code>TagContext</code>: a neutral fill, no ×, and nothing to focus.</>} />
+
+<ComponentExample of={TagStories.IsDisabled} title="Disabled on its own" description={<><code>isDisabled</code> disables one tag with no field around it.</>} />
 
 </div>
 
@@ -193,25 +122,25 @@ category.
 
 ## State
 
-<DocsCanvasShell description={<>Rest. Outlined only, with the hue on the border and neutral text.</>}>
-    <DsCanvasQuiet of={TagStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.StateLayers} title="State layers" description="States use the accent's own steps: hovered the subtlest, pressed the subtlest pressed, selected the subtler; on a removable tag only the × reacts." />
 
-<DocsCanvasShell description={<>Hovered. The accent's subtlest step. A selected tag holds its ground.</>}>
-    <DsCanvasQuiet of={TagStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.FocusRing} title="Focus ring" description="A 2px focus ring 2px outside the tag, or outside the ×." />
 
-<DocsCanvasShell description={<>Pressed. The accent's subtlest pressed step.</>}>
-    <DsCanvasQuiet of={TagStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.PersonFocusRing} title="Person focus ring" description="On a person tag the ring follows the round shape, and a focused × is round too." />
 
-<DocsCanvasShell description={<>Focused. The 2px focus ring, on the tag and on its ×.</>}>
-    <DsCanvasQuiet of={TagStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.ElevatedDisabled} title="Elevated disabled" description="An elevated tag keeps its solid ground and shadow when disabled; only the label, the swatch and the avatar turn disabled." />
 
-<DocsCanvasShell description={<>Disabled. The disabled ground and words, no ×, out of the tab order.</>}>
-    <DsCanvasQuiet of={TagStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={TagStories.ElevatedRemoveFocus} title="Elevated remove focus" description="Focus on an elevated link's × keeps the same 2px surface gap inside its ring as the tag's own focus." />
+
+<ComponentExample of={TagStories.Rest} title="Rest" description="Outlined only, with the hue on the border and neutral text." />
+
+<ComponentExample of={TagStories.Hovered} title="Hovered" description="The accent's subtlest step; a selected tag holds its ground." />
+
+<ComponentExample of={TagStories.Pressed} title="Pressed" description="The accent's subtlest pressed step." />
+
+<ComponentExample of={TagStories.Focused} title="Focused" description="The 2px focus ring, on the tag and on its ×." />
+
+<ComponentExample of={TagStories.Disabled} title="Disabled" description="The disabled ground and words, no ×, out of the tab order." />
 
 </div>
 
@@ -298,16 +227,38 @@ so a reader tells a category from a meaning without reading the words.
 
 ## Best practices
 
-### Color is a category, not a status.
+### Use one color per category.
 
-```jsx
-// Incorrect — green reads as "went well" beside anything red.
-<Tag color="green">Passed</Tag>
+A color names a category; changing it inside one category reads as a different one.
 
-// Correct — pick a color per category and keep it stable, or leave every tag gray.
-<Tag color="blue">Biology</Tag>
-<Tag color="blue">Chemistry</Tag>
-```
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag color="blue">Algebra</Tag><Tag color="blue">Geometry</Tag><Tag color="blue">Fractions</Tag></div>}
+    doCaption="One color for one category."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag color="blue">Algebra</Tag><Tag color="green">Geometry</Tag><Tag color="orange">Fractions</Tag></div>}
+    dontCaption="Rainbow inside one category."
+/>
+
+### Keep color for a category, never a status.
+
+Pick a color per category and keep it stable, or leave every tag gray. A condition that can change is a Status tag.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag color="blue">Biology</Tag><Tag color="blue">Chemistry</Tag></div>}
+    doCaption="A stable color for a category."
+    dontExample={<Tag color="green">Passed</Tag>}
+    dontCaption={'Green reads as "went well" beside anything red.'}
+/>
+
+### Show selection with the selected state.
+
+Selection is a state of the tag, never a new color.
+
+<DoDontPair
+    doExample={<Tag isSelected onClick={() => {}}>Algebra</Tag>}
+    doCaption="Selected state."
+    dontExample={<Tag color="green">Algebra</Tag>}
+    dontCaption="A new color for selected."
+/>
 
 ### Let the props pick the kind of tag.
 
@@ -330,18 +281,16 @@ so a reader tells a category from a meaning without reading the words.
 leaving it out is a tag that is not selectable. `trailingMetric` is for
 selectable tags only; anywhere else it is ignored with a warning.
 
-### Name who owns it with a type.
+### Use the type for who, not for what.
 
-```jsx
-// A person: round, with their photo or their initials.
-<Tag type="person" avatar={user.photoUrl}>Rosa Chen</Tag>
+Person, agent and team tell people who something belongs to; topics stay plain.
 
-// An agent: a hexagon on the accent's subtler step, so it never reads as a person.
-<Tag type="agent" color="purple">PLUS AI</Tag>
-
-// A team: a square avatar.
-<Tag type="team" avatar={<i className="fa-solid fa-users" />}>Math team</Tag>
-```
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag type="person">Ava Reyes</Tag><Tag type="agent" color="purple">Coach</Tag><Tag type="team">Math team</Tag></div>}
+    doCaption="Types name the owner."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><Tag>Ava Reyes</Tag><Tag>Coach</Tag><Tag>Math team</Tag></div>}
+    dontCaption="Plain tags hide the owner."
+/>
 
 `avatar` takes an image source or a node. Leave it out, or let it fail, and
 initials stand in without moving the tag. On a plain tag it is ignored with a
