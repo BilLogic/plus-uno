@@ -1,0 +1,67 @@
+/**
+ * Tree table: the `_Tree row` on the Dynamic table's cells. Depth is space,
+ * one `--table-indent` step per level (the OptionRow.Indent precedent); the
+ * chevron is 12 in a 24 hit area, and a leaf keeps the same empty box so
+ * every name at a level lines up.
+ */
+
+@use '../../../styles/state' as *;
+
+.plus-tree-table-indent {
+    flex: none;
+    width: calc(var(--plus-tree-table-level) * var(--table-indent));
+}
+
+// The leading slot sits flush: indent, then the toggle, then the name.
+.plus-tree-table-table .plus-tree-table-row .plus-table-cell-leading {
+    gap: 0;
+}
+
+.plus-tree-table-toggle {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: var(--height-150);
+    height: var(--height-150);
+    font-size: var(--size-icon-sm);
+    color: var(--ds-text-subtle);
+}
+
+.plus-tree-table-toggle--expanded,
+.plus-tree-table-toggle--collapsed {
+    cursor: pointer;
+}
+
+.plus-tree-table-count {
+    margin-inline-start: var(--size-table-cell-inline);
+    color: var(--ds-text-subtle);
+    font-weight: normal;
+}
+
+.plus-tree-table-row--expands {
+    cursor: pointer;
+}
+
+// A row takes focus in the treegrid; focus is a ring inset on the row, never a fill.
+.plus-tree-table-table tbody tr.plus-tree-table-row {
+    @include plus-state((), $ring-offset: calc(-1 * var(--focus-ring-width)));
+}
+
+// A message under a parent starts at the child level, past the toggle's box.
+.plus-tree-table-message {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--size-table-cell-inline);
+    padding-inline-start: calc(var(--plus-tree-table-level) * var(--table-indent) + var(--height-150));
+}
+
+.plus-pattern-table-table.plus-tree-table-table .plus-tree-table-message-row .plus-table-message {
+    height: var(--plus-table-row-height);
+    padding-block: 0;
+    text-align: left;
+}
+
+.plus-tree-table-table .plus-tree-table-message-row .plus-table-message-body {
+    align-items: flex-start;
+}

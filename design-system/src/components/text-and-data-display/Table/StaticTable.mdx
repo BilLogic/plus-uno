@@ -18,7 +18,7 @@ export const figmaMeta = {
     "hover": { "type": "boolean" },
     "bordered": { "type": "boolean" }
   },
-  "modelNote": "Figma has three table pages under Text and data display: Static table for fixed records, Dynamic table for a table people sort, filter, select, page or act on, and Tree table for rows that nest. Each is a set built from shared _Table parts (head cell, cell, row, footer). This component is the static case, with `headers` + `rows`. `DynamicTable` draws the Dynamic table on the PatternTable shell; the Tree table has no component of its own in code. The three pages are listed here as docs pages, not as sets to write back to. `size`, `frame`, `verticalLines`, `striped`, `hover` and `bordered` are code-only until a set maps them. The shared `_Table` parts are exported as `TableRow`, `TableCell`, `TableMessageRow`, `TableSummaryRow` and `TableFooter`, and `StaticTable` is this table with no hover.",
+  "modelNote": "Figma has three table pages under Text and data display: Static table for fixed records, Dynamic table for a table people sort, filter, select, page or act on, and Tree table for rows that nest. Each is a set built from shared _Table parts (head cell, cell, row, footer). This component is the static case, with `headers` + `rows`. `DynamicTable` and `TreeTable` draw the other two on the PatternTable shell. The three pages are listed here as docs pages, not as sets to write back to. `size`, `frame`, `verticalLines`, `striped`, `hover` and `bordered` are code-only until a set maps them. The shared `_Table` parts are exported as `TableRow`, `TableCell`, `TableMessageRow`, `TableSummaryRow` and `TableFooter`, and `StaticTable` is this table with no hover.",
   "sets": [
     {
       "id": "static-table-page",

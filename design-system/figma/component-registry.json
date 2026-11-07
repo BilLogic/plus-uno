@@ -2097,7 +2097,7 @@
         "export": "default",
         "mdxPath": "design-system/src/components/text-and-data-display/Table/TreeTable.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/Table",
-        "source": "design-system/src/components/text-and-data-display/Table/TreeTable.stories.jsx",
+        "source": "design-system/src/components/text-and-data-display/Table/TreeTable.jsx",
         "storybookId": "components-text-and-data-display-tree-table--docs"
       },
       "figma": {
@@ -2111,7 +2111,7 @@
             "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043",
             "source": "manual",
             "status": "docs-page",
-            "notes": "The Tree table page: records nested up to three levels, built from _Tree row. No code component draws it yet."
+            "notes": "The Tree table page: records nested up to three levels, built from _Tree row."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043"

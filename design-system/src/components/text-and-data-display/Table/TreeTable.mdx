@@ -6,7 +6,7 @@ import { DocsCanvasShell, ResourcesBlock } from '@/storybook-docs/ds-docs-layout
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-  "modelNote": "The Tree table page: records nested up to three levels, built from `_Tree row`. No code component draws it yet; this page composes the indentation from the shared `TableRow`/`TableCell` parts the Static and Dynamic tables already use. Listed here as a docs page, not a set to write back to.",
+  "modelNote": "The Tree table page: records nested up to three levels, built from `_Tree row`. `TreeTable` draws it in code on the `PatternTable` shell with the shared `TableRow`/`TableCell` parts. Listed here as a docs page, not a set to write back to.",
   "sets": [
     {
       "id": "tree-table-page",
@@ -16,7 +16,7 @@ export const figmaMeta = {
       "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043",
       "source": "manual",
       "status": "docs-page",
-      "notes": "The Tree table page: records nested up to three levels, built from _Tree row. No code component draws it yet."
+      "notes": "The Tree table page: records nested up to three levels, built from _Tree row."
     }
   ]
 };
@@ -25,7 +25,7 @@ export const figmaMeta = {
 
 <Title />
 
-Records that nest, up to three levels. No code component owns the nesting yet — this page composes the indentation from the same shared parts the Static and Dynamic tables use.
+Records that nest, up to three levels. `TreeTable` indents each level one step and keeps every column, on the same shell and parts the Dynamic table uses.
 
 <DocsTabs of={TreeTableStories}>
 
@@ -46,10 +46,55 @@ Records that nest, up to three levels. No code component owns the nesting yet �
 
 <DocsCanvasShell
     attachSourceBelow
-    description={<>A branch's title cell carries a chevron; depth sets the cell's left pad. The chevron is static here — expand and collapse are not wired up in code.</>}
+    description={<>Each level indents one step and keeps the columns. A parent shows its count, and an open parent with nothing in it shows a message row.</>}
 >
 
 <Canvas of={TreeTableStories.Overview} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Loading children
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>A parent with `hasChildren` and no `children` loads them through `loadChildren` the first time it opens, with a spinner and a loading message row until they arrive.</>}
+>
+
+<Canvas of={TreeTableStories.LoadingChildren} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Keyboard
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>One tab stop. The arrow keys move between rows and open or close them; Home and End jump to the ends; Enter toggles.</>}
+>
+
+<Canvas of={TreeTableStories.Keyboard} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Expand on a row press
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>With `shouldExpandOnClick` a press anywhere on a parent row opens it. Use it only on rows without controls.</>}
+>
+
+<Canvas of={TreeTableStories.ExpandOnRowPress} />
 
 </DocsCanvasShell>
 
@@ -76,13 +121,11 @@ folder of sessions. For a flat list, use the Static or Dynamic table instead.
 
 ## Usage notes
 
-- **No component yet.** There is no `TreeTable` export. This page composes the
-  look from `TableRow` and `TableCell`, the same parts `Table` is built from,
-  so a project that needs nesting today builds it the same way.
-- **Depth is a left pad**, `--size-table-cell-pad-x` plus 20px per level, on
-  the row's title cell.
-- **Expand and collapse are unbuilt.** The chevron shown here does not toggle
-  anything; building that behavior is open work.
+- **Data nests the same shape.** `items` is one `{ id, cells, children, hasChildren, count }` per row, and `children` holds more of the same. Every level keeps every column.
+- **Depth is space.** Each level indents one `--table-indent` step; a leaf keeps an empty toggle box so names at one level line up.
+- **Load children late.** Give a parent `hasChildren` and no `children`, and `loadChildren(item)` returns them, or a promise of them, the first time it opens.
+- **Keep the row press for rows without controls.** `shouldExpandOnClick` never fires from a button or link inside the row, but a row that carries controls reads better with the chevron alone.
+- **Keyboard follows the treegrid pattern.** The table is one tab stop. Every row carries `aria-level`, `aria-posinset` and `aria-setsize`, and a parent `aria-expanded`.
 
 </div>
 

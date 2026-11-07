@@ -1,7 +1,7 @@
 import React from 'react';
 import PatternTable from '@/patterns/PatternTable';
 import PatternSection from '@/patterns/PatternSection';
-import { Checkbox, Pagination, IconButton, DynamicTable, TableBulkActions } from '@/components';
+import { Checkbox, Pagination, IconButton, DynamicTable, TableBulkActions, TreeTable } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
@@ -186,38 +186,34 @@ const RosterAsStaticCase = () => (
     </PatternTable>
 );
 
-/** A row of a hierarchy: the name indents by level and every level keeps the same columns. */
-const TreeRow = ({ level, open, name, count, type, sessions }) => (
-    <tr>
-        <td>
-            <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', paddingInlineStart: `calc(${level} * var(--table-indent))` }}>
-                <span style={{ display: 'inline-flex', width: 'var(--icon-sm)', justifyContent: 'center' }}>
-                    {open === undefined ? null : icon(open ? 'chevron-down' : 'chevron-right')}
-                </span>
-                {name}
-                {count !== undefined && <span style={subtle}>{count}</span>}
-            </span>
-        </td>
-        <td>{type}</td>
-        <td style={numeric}>{sessions}</td>
-    </tr>
-);
+const treeNode = (id, name, type, sessions, more = {}) => ({
+    id,
+    cells: [{ content: name }, { content: type }, { content: String(sessions) }],
+    ...more,
+});
 
-/** School, class, student: each level indents and keeps the columns. */
+const schools = [
+    treeNode('lincoln', 'Lincoln Middle', 'School', 54, {
+        count: 3,
+        children: [
+            treeNode('g7', 'Grade 7 · Math', 'Class', 27, {
+                count: 2,
+                children: [treeNode('ava', 'Ava Thompson', 'Student', 12), treeNode('sofia', 'Sofia Ramirez', 'Student', 15)],
+            }),
+            treeNode('g8', 'Grade 8 · Math', 'Class', 19, { count: 3, children: [] }),
+            treeNode('g6', 'Grade 6 · Reading', 'Class', 8, { count: 4, children: [] }),
+        ],
+    }),
+];
+
+/** School, class, student, as a `TreeTable`: each level indents and keeps the columns. */
 const TreeHierarchyCase = () => (
-    <PatternTable>
-        <thead>
-            <tr><SortHead>Name</SortHead><SortHead>Type</SortHead><SortHead align={numeric}>Sessions</SortHead></tr>
-        </thead>
-        <tbody>
-            <TreeRow level={0} open name="Lincoln Middle" count={3} type="School" sessions={54} />
-            <TreeRow level={1} open name="Grade 7 · Math" count={2} type="Class" sessions={27} />
-            <TreeRow level={2} name="Ava Thompson" type="Student" sessions={12} />
-            <TreeRow level={2} name="Sofia Ramirez" type="Student" sessions={15} />
-            <TreeRow level={1} open={false} name="Grade 8 · Math" count={3} type="Class" sessions={19} />
-            <TreeRow level={1} open={false} name="Grade 6 · Reading" count={4} type="Class" sessions={8} />
-        </tbody>
-    </PatternTable>
+    <TreeTable
+        head={{ cells: [{ key: 'name', content: 'Name' }, { key: 'type', content: 'Type' }, { key: 'sessions', content: 'Sessions', align: 'number' }] }}
+        items={schools}
+        label="Schools"
+        defaultExpandedIds={['lincoln', 'g7']}
+    />
 );
 
 /** A hierarchy faked with expandable rows: the nested rows lose their columns. */

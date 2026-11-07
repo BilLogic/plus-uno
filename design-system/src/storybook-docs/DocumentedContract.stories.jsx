@@ -163,6 +163,10 @@ const RENDERS_WITH = {
     head: { cells: [{ key: 'name', content: 'Name' }] },
     rows: [{ key: 'ava', cells: [{ key: 'Ava', content: 'Ava' }] }],
   },
+  TreeTable: {
+    head: { cells: [{ key: 'name', content: 'Name' }] },
+    items: [{ id: 'ava', cells: [{ content: 'Ava' }] }],
+  },
   PromptStarters: { starters: [{ id: 'sample', label: 'Sample' }] },
 };
 
