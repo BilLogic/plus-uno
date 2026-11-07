@@ -30,6 +30,16 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.cursor/hooks/ds-usage/post-edit.mjs\"",
+            "timeout": 15
+          }
+        ]
       }
     ],
     "SessionEnd": [
