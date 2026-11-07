@@ -142,6 +142,16 @@ export const SHAPES = [
     sets: [{ name: 'counts', at: 'counts', form: 'counts' }],
   },
   {
+    file: 'scripts/baselines/component-docs.json',
+    check: 'check:component-docs',
+    command: 'npm run generate:component-docs -- --update',
+    prose: 'why',
+    // `<Component> <prop>` or `<Component> (summary)`: a prop row or component
+    // the generated docs leave undescribed. Presence only; a filled gap leaves
+    // the record through `--update` (scripts/lib/doc-coverage.mjs).
+    sets: [{ name: 'gaps', at: 'gaps', form: 'keys' }],
+  },
+  {
     file: 'scripts/baselines/no-primitive-reads.json',
     check: 'check:no-primitive-reads',
     command: 'node scripts/check-no-primitive-reads.mjs --update',
