@@ -158,17 +158,18 @@
   },
   {
     "name": "github_read",
-    "description": "Read-only. Read a GitHub repo on the bot's repo list by repo-relative path: a file's contents (DS agent-views, rule docs, AGENTS.md, a component's source, token values under design-system/src/tokens/) or a directory listing (a directory path returns its entries). Use it for any DS component / token / prop / rule-doc fact, to confirm a component exists under design-system/src/components, and to ground a review in the actual rule docs. `search` finds where something lives when the path is unknown. `repo` picks the repo; omitted, it is plus-uno. For a GitHub URL a designer pasted, source_read reads it directly. 'What's the token for X?' is a token value under design-system/src/tokens/, read here — tokens belong to no component, so no component lookup. Confirm a component exists under design-system/src/components before asserting it; Storybook renders client-side and returns nothing, so link Storybook and read GitHub. A repo off the list is refused — say which ones you can reach. plus-uno-blueprint is read for its code, schema and issues; blueprint content is search_blueprint's. Link github.com under the repo you read; a file not fetched this turn → link its folder. A component's name links to its live Storybook docs page (https://plus-uno.netlify.app/storybook/?path=/docs/components-<name-kebab>--docs; `forms-` prefix for form components; unsure of the id → the Storybook root).",
+    "description": "Read-only. Read a GitHub repo on the bot's repo list by repo-relative path: a file's contents (DS agent-views, rule docs, AGENTS.md, a component's source, token values under design-system/src/tokens/) or a directory listing (a directory path returns its entries). For 'does PLUS have X?', a component's import or props, a prop's values or a token role, `lookup` first: it answers from the design-system facts baked into the Worker, the ones the IDE reads, and fetches nothing; a `not-here` answer names what to use instead, with its import. Read by path for any other DS component / token / prop / rule-doc fact, to confirm a component exists under design-system/src/components, and to ground a review in the actual rule docs. `search` finds where something lives when the path is unknown. `repo` picks the repo; omitted, it is plus-uno. For a GitHub URL a designer pasted, source_read reads it directly. 'What's the token for X?' is a `lookup` of its role or name, or a token value under design-system/src/tokens/ — tokens belong to no component. Confirm a component exists, by `lookup` or under design-system/src/components, before asserting it; Storybook renders client-side and returns nothing, so link Storybook and read GitHub. A repo off the list is refused — say which ones you can reach. plus-uno-blueprint is read for its code, schema and issues; blueprint content is search_blueprint's. Link github.com under the repo you read; a file not fetched this turn → link its folder. A component's name links to its live Storybook docs page (https://plus-uno.netlify.app/storybook/?path=/docs/components-<name-kebab>--docs; `forms-` prefix for form components; unsure of the id → the Storybook root).",
     "input_schema": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "path"
-      ],
       "properties": {
+        "lookup": {
+          "type": "string",
+          "description": "A design-system name, answered from the baked facts with no fetch: a component or pattern ('Card', 'card', 'PatternCard'), a prop ('Button.appearance', 'Button.appearance=primary'), a token ('--stack-md') or a token role ('stack'). When set, 'path' and 'search' are ignored."
+        },
         "path": {
           "type": "string",
-          "description": "Repo-relative path, e.g. 'design-system/src/components', 'docs/conventions/accessibility.md'."
+          "description": "Repo-relative path, e.g. 'design-system/src/components', 'docs/conventions/accessibility.md'. Required unless 'search' or 'lookup' is set."
         },
         "ref": {
           "type": "string",
