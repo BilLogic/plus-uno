@@ -368,7 +368,7 @@ describe("the morning reminder", () => {
     const [card] = cardsOf(post.blocks);
     assert.equal(card!.title.text, "Bea: send the tokens doc");
     assert.equal(card!.subtitle.text, "Owed to you, was due Wed Sep 30");
-    assert.equal(card!.body.text, `Bea said they'd send the tokens doc. <${permalinkOf(URL, DM_BEA, BEA_PROMISE)}|Your DM with Bea>, on Tue.`);
+    assert.equal(card!.body.text, `Bea told you they'd send the tokens doc. <${permalinkOf(URL, DM_BEA, BEA_PROMISE)}|Your DM with Bea>, on Tue.`);
     assert.deepEqual(labels(card!), ["Drop it", "Wait", "Got it"]);
     assert.ok(!JSON.stringify(post).includes(`<@${BEA}>`), "the promiser is named, never mentioned");
     // The only writes the owner's token could make: none — its port has reads only.

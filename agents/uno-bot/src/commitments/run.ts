@@ -67,12 +67,8 @@ import { classifyLink, linksIn, pickDestination, resolveDestination, type SweepM
 import type { SweepSlack, SweepSlackMessage } from "../sweep/run";
 import {
   acknowledgment,
-  followUpText,
-  headsUpText,
-  REMINDER_CHOICES,
   reminderAnswer,
   reminderBlocks,
-  reminderText,
   SELF_REMINDER_LAST_CHOICES,
   SELF_REMINDER_CHOICES,
   selfReminderText,
@@ -82,7 +78,7 @@ import {
   type TapAnswer,
 } from "./copy";
 import type { ReminderPress } from "./press";
-import { MAX_PROMISE_CARDS, promiseMessage, promiseRef, type PromiseCardInput, type PromiseCardKind } from "./promise-cards";
+import { MAX_PROMISE_CARDS, PHASE_CARD_KIND, promiseMessage, promiseRef, type PromiseCardInput } from "./promise-cards";
 import { mayHoldPromise, type CommitmentDetector, type EvidenceJudge, type FewShotExample, type PromiseAnswer, type ReleaseReason } from "./detector";
 import {
   checkInAt,
@@ -556,7 +552,7 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
   const other = c.requesterId && c.requesterId !== c.promiserId ? await deps.slack.userName(c.requesterId) : null;
   const card: PromiseCardInput = {
     ref: promiseRef("thread", c.id),
-    kind: CARD_KIND[phase],
+    kind: PHASE_CARD_KIND[phase],
     what: text.what,
     ...(other ? { other } : {}),
     ...(c.deadlineAt !== null ? { dueDay: dueDayOf(c.deadlineAt) } : {}),
@@ -575,12 +571,6 @@ export const THREAD_LABEL = "The thread";
 /** A promise held for its promiser's morning message, until it posts. */
 const HELD_FOR_MESSAGE = "held for the morning message";
 
-/** Each phase's card. */
-const CARD_KIND: Record<ReturnType<typeof reminderPhase>, PromiseCardKind> = {
-  "heads-up": "due-soon",
-  "check-in": "overdue",
-  "ask-date": "no-date",
-};
 
 /** The morning's promise cards, held per promiser until `flush` posts each
  *  person's in one message in their DM with uno-bot. */

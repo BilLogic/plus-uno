@@ -61,12 +61,12 @@ import { GATE_RESERVED } from "../gate/reactions";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { SweepMessage } from "../sweep/finding";
 import type { SweepSlackMessage } from "../sweep/run";
-import { acknowledgment, headsUpText, REMINDER_CHOICES, reminderAnswer, reminderBlocks, reminderText, TAP_REFUSED, type ReminderOutcome } from "../commitments/copy";
+import { acknowledgment, reminderAnswer, reminderBlocks, TAP_REFUSED, type ReminderOutcome } from "../commitments/copy";
 import { detectorChars, MAX_COMMITMENT_THREAD_CHARS, type CommitmentDetector, type DetectedCommitment, type EvidenceJudge } from "../commitments/detector";
 import { checkInAt, dayLabel, dueDayOf, etDayOf, firstReminderAt, followUpAt, isMorningRunTime, maySnooze, nudgeAt, promiseDueAt, rearmedDueAt, reminderPhase } from "../commitments/due";
 import { LIVE_STATES } from "../commitments/store";
-import { MAX_PROMISE_CARDS, promiseMessage, promiseRef, type PromiseCardInput, type PromiseCardKind } from "../commitments/promise-cards";
-import { madeFollowUpText, madeToAcknowledgment, MADE_LAST_CHOICES, MADE_TO_LAST_CHOICES, MADE_TO_CHOICES, madeToFollowUpText, madeToText } from "./copy";
+import { MAX_PROMISE_CARDS, PHASE_CARD_KIND, promiseMessage, promiseRef, type PromiseCardInput } from "../commitments/promise-cards";
+import { madeToAcknowledgment } from "./copy";
 import {
   CAPTURE_FEATURE,
   DM_WATCH_FEATURES,
@@ -629,12 +629,6 @@ interface Held {
   action: "nudged" | "followed-up";
 }
 
-/** Each phase's card, for a promise the person made. */
-const MADE_CARD: Record<ReturnType<typeof reminderPhase>, PromiseCardKind> = {
-  "heads-up": "due-soon",
-  "check-in": "overdue",
-  "ask-date": "no-date",
-};
 
 /** Held rows handed back to the next run: their `checkedOn` as it was. */
 async function release(deps: Pick<DmNudgeDeps, "records">, before: Map<string, string | null>): Promise<void> {
@@ -764,7 +758,7 @@ async function remind(
   const other = otherId ? (c.kind === "made_to" ? await nameOf() : await deps.bot.userName(otherId)) : null;
   const card: PromiseCardInput = {
     ref: promiseRef("dm", c.id),
-    kind: c.kind === "made" ? MADE_CARD[phase] : "owed",
+    kind: c.kind === "made" ? PHASE_CARD_KIND[phase] : "owed",
     what: promise.what,
     ...(other ? { other } : {}),
     ...(dueAt !== null ? { dueDay: dueDayOf(dueAt) } : {}),

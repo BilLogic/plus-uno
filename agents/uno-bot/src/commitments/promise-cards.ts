@@ -18,7 +18,7 @@
 
 import { carouselOf, logoFor } from "../slack/answer-cards-block";
 import { escapeSlackText } from "../slack/mrkdwn";
-import { etDayOf } from "../sweep/schedule";
+import type { ReminderPhase } from "./due";
 
 /** A message's cards: Slack's carousel holds 1 to 10; the rest wait for the
  *  next morning. */
@@ -54,6 +54,14 @@ export interface PromiseCardInput {
   /** Where it was said: a link to the message, and how to name the place. */
   place: { url: string; label: string };
 }
+
+/** The card each step of a promise's timeline shows, for a promise the
+ *  person made (one owed to them is always `owed`). */
+export const PHASE_CARD_KIND: Record<ReminderPhase, PromiseCardKind> = {
+  "heads-up": "due-soon",
+  "check-in": "overdue",
+  "ask-date": "no-date",
+};
 
 /** Which store a promise's row is in: a thread promise's, or DM watch's. */
 export type PromiseStore = "thread" | "dm";
@@ -170,7 +178,7 @@ export function promiseBody(input: Pick<PromiseCardInput, "kind" | "what" | "oth
   const other = input.other ? escapeSlackText(input.other) : undefined;
   const sentence =
     input.kind === "owed"
-      ? `${other ?? "They"} said they'd ${what}.`
+      ? `${other ?? "They"} told you they'd ${what}.`
       : input.kind === "no-date"
         ? `${other ? `You told ${other}` : "You said"} you'd ${what}. Pick a date and I'll remind you the day before.`
         : `${other ? `You told ${other}` : "You said"} you'd ${what}.`;
@@ -401,10 +409,6 @@ export function droppedAsOf(state: ViewState | undefined): "no-longer-needed" | 
   return value === "no-longer-needed" || value === "not-a-promise" ? value : null;
 }
 
-/** Today's ET day, for a caller that has the clock. */
-export function todayOf(now: number): number {
-  return etDayOf(now);
-}
 
 /** The rows whose cards in this message still carry their buttons. */
 export function openRefs(blocks: readonly unknown[]): string[] {

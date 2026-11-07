@@ -88,7 +88,7 @@ describe("a promise reminder's cards", () => {
     const [c] = cardsOf(promiseMessage([card({})]).blocks);
     assert.equal(c!.body.text, `You told Shiv you'd share the teacher report Figma with Shiv. <${DM}|Your DM with Shiv>, last Thu.`);
     const [owed] = cardsOf(promiseMessage([card({ kind: "owed", other: "Suraj", what: "share the data right after the tech call" })]).blocks);
-    assert.match(owed!.body.text, /^Suraj said they'd share the data right after the tech call\. /);
+    assert.match(owed!.body.text, /^Suraj told you they'd share the data right after the tech call\. /);
   });
 
   it("opens on one bullet per kind", () => {
