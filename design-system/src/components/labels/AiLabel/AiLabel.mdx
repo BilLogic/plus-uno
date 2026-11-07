@@ -190,10 +190,10 @@ declaration.
 Origin names who authored the value; reviewed means a person checked it.
 
 <DoDontPair
-    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Checked by a tutor</span><AiLabel origin="reviewed" /></div>}
-    doCaption="Reviewed after a person checked."
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Draft, not checked</span><AiLabel origin="generated" /></div>}
+    doCaption="An unchecked draft says the AI wrote it."
     dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Draft, not checked</span><AiLabel origin="reviewed" /></div>}
-    dontCaption="Reviewed on an unchecked draft."
+    dontCaption="Reviewed on a draft no person has checked."
 />
 
 ### Mark authorship, not technology.
@@ -247,8 +247,7 @@ The label marks the whole output, not each sentence inside it.
 ### Keep the mark out of controls.
 
 `onExplain` renders one real button inside it. Nesting one interactive element
-inside another is invalid per ARIA, the same rule `Tag` and `Badge` both
-record. To make a whole row pressable, put a `Button` around the content and
+inside another is invalid per ARIA. To make a whole row pressable, put a `Button` around the content and
 this inside it.
 
 </div>
@@ -300,7 +299,7 @@ this inside it.
 ## Related
 
 - For a value a person chose rather than one the agent produced, use `Tag`.
-- For system-generated data with no trust question attached, use `Badge`.
+- For system-generated data with no trust question attached, use `StatusTag` or `CountTag`.
 - For a message about the whole page rather than a mark on one thing, use `SectionMessage`.
 - For work still in progress, use `Spinner` or `ProgressBar`.
 

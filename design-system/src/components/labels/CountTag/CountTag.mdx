@@ -210,9 +210,9 @@ Subtle neutral is the default. Bold asks for action now, so use at most one bold
 It renders nothing at 0 and caps past `max` with a `+`, so pass the raw number.
 
 <DoDontPair
-    doExample={<CountTag value={250} label="250 results" />}
-    doCaption="Pass the raw number; past 99 it reads 99+."
-    dontExample={<CountTag value={0} showZero />}
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}><span>Messages</span><CountTag value={0} /></div>}
+    doCaption="Pass the raw number: at 0 the badge leaves the empty tab bare."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}><span>Messages</span><CountTag value={0} showZero /></div>}
     dontCaption="Force a zero onto an empty tab, unless the zero is the news."
 />
 

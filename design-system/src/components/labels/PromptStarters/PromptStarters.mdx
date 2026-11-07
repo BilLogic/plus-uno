@@ -143,6 +143,17 @@ Three to five starters fit a row and can be read at a glance.
     dontCaption="So many starters the row becomes a wall."
 />
 
+### Write each label as a request.
+
+The label says what the person is asking for, starting with a verb.
+
+<DoDontPair
+    doExample={<PromptStarters label="Suggested prompts" starters={[{ id: 'plan', label: 'Plan next steps', text: 'What should we cover next session?' }, { id: 'explain', label: 'Explain this concept', text: 'Explain this in simpler terms.' }]} onSelect={() => {}} />}
+    doCaption="Labels that read as requests."
+    dontExample={<PromptStarters label="Suggested prompts" starters={[{ id: 'plan', label: 'Next steps', text: 'What should we cover next session?' }, { id: 'explain', label: 'Concepts', text: 'Explain this in simpler terms.' }]} onSelect={() => {}} />}
+    dontCaption="Topic names that don't say what will be asked."
+/>
+
 ### Let `onSelect` decide what happens.
 
 The component never sends on its own. The common pattern is putting the
