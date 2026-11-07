@@ -31,12 +31,10 @@ export default {
         appearance: {
             control: 'select',
             options: FLAG_APPEARANCES,
-            description: 'Normal, information, warning, error or success',
             table: { category: 'Design' }
         },
         bold: {
             control: 'boolean',
-            description: 'Expand to the appearance\'s bold fill',
             table: { category: 'Design' }
         },
         position: {
@@ -118,6 +116,30 @@ Overview.parameters = {
         source: { language: 'jsx', code: webAppSourceSnippets.flag }
     }
 };
+
+/** One appearance per story, for the docs page's Appearance section. */
+const appearanceStory = (appearance, title, message, props = {}) => {
+    const story = () => (
+        <FlagGroup containerPosition="static">
+            <Flag appearance={appearance} title={title} timestamp="Just now" autohide={false} {...props}>
+                {message}
+            </Flag>
+        </FlagGroup>
+    );
+    story.play = async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-flag')).toHaveClass(`plus-flag--${appearance}`);
+    };
+    return story;
+};
+
+export const Normal = appearanceStory('normal', 'Notes copied', 'The session notes are on your clipboard.');
+export const Information = appearanceStory('information', 'Schedule updated', 'Your Monday sessions now start at 4:00 PM.');
+export const Success = appearanceStory('success', 'Plan saved', 'Your session plan is saved for Monday.');
+export const Warning = appearanceStory('warning', 'Connection is slow', 'Some changes may take longer to save.', { actions: [{ text: 'Retry' }] });
+/** Named so the export does not shadow the global `Error`. */
+export const ErrorAppearance = appearanceStory('error', 'Upload failed', 'The file was larger than 10 MB.', { actions: [{ text: 'Try again' }] });
+ErrorAppearance.storyName = 'Error';
+export const Bold = appearanceStory('success', 'Plan saved', 'Your session plan is saved for Monday.', { bold: true, defaultExpanded: true });
 
 const FlagInteractiveWrapper = ({ appearance, bold, position, title, children, show, autohide, delay }) => {
     const [isOpen, setIsOpen] = useState(show);

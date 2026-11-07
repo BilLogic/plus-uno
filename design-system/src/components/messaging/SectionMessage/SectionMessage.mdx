@@ -1,9 +1,16 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as SectionMessageStories from './SectionMessage.stories.jsx';
 import * as SectionMessageSubStories from './SectionMessage.Subcomponents.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { SectionMessage } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -23,7 +30,8 @@ export const figmaMeta = {
 <Meta of={SectionMessageStories} />
 
 <Title />
-Provide contextual feedback messages for typical user actions with the handful of available and flexible section messages.
+A message that belongs to the page and stays there until it is resolved or
+dismissed, with an optional title, a leading icon and up to two actions.
 
 <DocsTabs of={SectionMessageStories}>
 
@@ -40,69 +48,45 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>Title optional, dismissible toggle, and rich body content.</>}>
-    <Canvas of={SectionMessageStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>Title optional, body-only, non-dismissible, rich HTML body and action patterns.</>}>
-    <DsCanvasQuiet of={SectionMessageStories.Content} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Appearance
 
-<DocsCanvasShell description={<>The six styles, each with its default leading icon, a title and the ×.</>}>
-    <DsCanvasQuiet of={SectionMessageStories.Styles} />
-</DocsCanvasShell>
+<ComponentExample of={SectionMessageStories.Primary} title="Primary" description="The default, on the brand's subtlest ground." />
 
-<DocsCanvasShell description={<>Each style's named background ground with on-surface title, body and link, on the darkest surface step.</>}>
-    <DsCanvasQuiet of={SectionMessageStories.GroundAndText} />
-</DocsCanvasShell>
+<ComponentExample of={SectionMessageStories.Secondary} title="Secondary" description="A neutral ground for a plain notice." />
 
-</div>
+<ComponentExample of={SectionMessageStories.Success} title="Success" description="A confirmation, with the circle-check icon." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={SectionMessageStories.Danger} title="Danger" description="Something failed, with the circle-exclamation icon." />
 
-## Leading icon
+<ComponentExample of={SectionMessageStories.Warning} title="Warning" description="A caution, with the triangle-exclamation icon." />
 
-<DocsCanvasShell description={<>Each style's default icon on the first line of text, replaced by name or node, and removed with <code>leadingVisual={'{false}'}</code>.</>}>
-    <DsCanvasQuiet of={SectionMessageStories.LeadingIcon} />
-</DocsCanvasShell>
+<ComponentExample of={SectionMessageStories.Info} title="Info" description="Something worth knowing, with the circle-info icon." />
+
+<ComponentExample of={SectionMessageStories.LeadingIcon} title="Leading icon" description="The style's default icon, replaced by name or node, or removed with leadingVisual={false}." />
+
+<ComponentExample of={SectionMessageStories.GroundAndText} title="Ground and text" description="Each style's ground with the same text color for the title, body and link." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Actions
+## Size and layout
 
-<DocsCanvasShell description={<>Up to two link-button actions after the body, with a divider between them.</>}>
-    <DsCanvasQuiet of={SectionMessageStories.Actions} />
-</DocsCanvasShell>
+<ComponentExample of={SectionMessageSubStories.ContentStructure} title="Content structure" description="The title and message layout inside the shell." />
+
+<ComponentExample of={SectionMessageStories.DismissPlacement} title="Dismiss placement" description="The × centers on the first line of text and stays there when the text wraps." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Anatomy
+## Behavior
 
-<DocsCanvasShell description={<>Internal title and message layout inside the shell.</>}>
-    <DsCanvasQuiet of={SectionMessageSubStories.ContentStructure} />
-</DocsCanvasShell>
+<ComponentExample of={SectionMessageStories.Content} title="Content" description="With a title, body only, non-dismissible, rich content and actions." />
 
-<DocsCanvasShell description={<>Dismiss control — the shared <code>CloseButton</code>, centered on the first line of text.</>}>
-    <DsCanvasQuiet of={SectionMessageSubStories.DismissButton} />
-</DocsCanvasShell>
+<ComponentExample of={SectionMessageStories.Actions} title="Actions" description="Up to two link-button actions after the body, with a divider between them." />
+
+<ComponentExample of={SectionMessageSubStories.DismissButton} title="Dismiss button" description="The shared CloseButton, centered on the first line of text." />
 
 </div>
 
@@ -110,21 +94,13 @@ Provide contextual feedback messages for typical user actions with the handful o
 
 ## State
 
-<DocsCanvasShell description={<>The warning ground, with the leading icon in the warning icon token.</>}>
-    <DsCanvasQuiet of={SectionMessageStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={SectionMessageStories.Rest} title="Rest" description="The warning ground, with the leading icon in the warning icon token." />
 
-<DocsCanvasShell description={<>The message does not react; Dismiss takes the subtle hovered step.</>}>
-    <DsCanvasQuiet of={SectionMessageStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={SectionMessageStories.Hovered} title="Hovered" description="The message does not react; Dismiss takes the subtle hovered step." />
 
-<DocsCanvasShell description={<>Dismiss takes the subtle pressed step.</>}>
-    <DsCanvasQuiet of={SectionMessageStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={SectionMessageStories.Pressed} title="Pressed" description="Dismiss takes the subtle pressed step." />
 
-<DocsCanvasShell description={<>Dismiss and each action show the 2px focus ring.</>}>
-    <DsCanvasQuiet of={SectionMessageStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={SectionMessageStories.Focused} title="Focused" description="Dismiss and each action show the 2px focus ring." />
 
 </div>
 
@@ -157,31 +133,31 @@ Provide contextual feedback messages for typical user actions with the handful o
 ## Usage
 
 Use `SectionMessage` for a message that belongs to the page and stays there
-until it is resolved or dismissed — a banner explaining why a session cannot
-be booked, a notice that a report is out of date, a confirmation that
-survives a scroll. It takes children, so the message can carry a link or
-emphasis, and up to two `actions` after the body.
+until it is resolved or dismissed: why a session cannot be booked, a notice
+that a report is out of date, a confirmation that survives a scroll. It takes
+children, so the message can carry a link or emphasis, and up to two `actions`
+after the body.
 
-Six styles: `primary`, `secondary`, `success`, `danger`, `warning`, `info`. That
-list is shorter than `Button`'s — there is no `tertiary`, no `light` or `dark`,
-and there are no SMART domain colors, because a section message is always
-saying something about state.
+A section message always says something about state, so it has six styles and
+no others. Each style sets the ground to its role's background token and a
+default leading icon in the style's icon color. There is no border or side
+stripe: the fill and the icon carry the style.
 
-Each style sets the ground to its role's named background token
-(`--ds-background-success` for success, and so on) and a default leading
-icon, drawn in the style's Icon color on the first line of text. There is no
-border or side stripe — the style is carried by the fill and the icon, not an
-edge. The title, the body and any link in it are `--ds-text` in
-every style. Every style has 4px corners.
+### Appearance guidance
 
-| Style | Default icon |
-|---|---|
-| `primary` | `circle-info` |
-| `secondary` | `circle-info` |
-| `success` | `circle-check` |
-| `danger` | `circle-exclamation` |
-| `warning` | `triangle-exclamation` |
-| `info` | `circle-info` |
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th><th>Default icon</th></tr>
+</thead>
+<tbody>
+<tr><td>Primary</td><td>The default, for a general message.</td><td><code>circle-info</code></td></tr>
+<tr><td>Secondary</td><td>A plain, neutral notice.</td><td><code>circle-info</code></td></tr>
+<tr><td>Success</td><td>Something went well.</td><td><code>circle-check</code></td></tr>
+<tr><td>Danger</td><td>Something failed and needs attention.</td><td><code>circle-exclamation</code></td></tr>
+<tr><td>Warning</td><td>A caution before something goes wrong.</td><td><code>triangle-exclamation</code></td></tr>
+<tr><td>Info</td><td>Something worth knowing.</td><td><code>circle-info</code></td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -189,9 +165,9 @@ every style. Every style has 4px corners.
 
 ## Parts
 
-1. **Leading icon.** The appearance glyph, 20 on the first line, decorative.
+1. **Leading icon.** The appearance glyph on the first line, decorative.
 2. **Title.** An optional heading; set <code>headingLevel</code> to fit the outline.
-3. **Description.** What the person needs to act.
+3. **Description.** What the person needs to act. A link in it keeps the text color and is underlined.
 4. **Actions.** Link buttons, separated by a divider.
 5. **Dismiss.** The shared CloseButton, centered on the first line.
 
@@ -203,8 +179,10 @@ every style. Every style has 4px corners.
 </thead>
 <tbody>
 <tr><td>Rest</td><td>The fill and icon of the appearance, text in the default color.</td></tr>
-<tr><td>Hovered, pressed</td><td>The message does not react; Dismiss takes the subtle neutral steps.</td></tr>
+<tr><td>Hovered</td><td>The message does not react; Dismiss takes the subtle hovered step.</td></tr>
+<tr><td>Pressed</td><td>Dismiss takes the subtle pressed step.</td></tr>
 <tr><td>Focused</td><td>Dismiss and each action show the 2px ring.</td></tr>
+<tr><td>Disabled</td><td>Not supported.</td></tr>
 <tr><td>Dismissed</td><td>The message is removed and the page keeps no copy.</td></tr>
 </tbody>
 </DocsTable>
@@ -218,8 +196,10 @@ every style. Every style has 4px corners.
 <tbody>
 <tr><td>Ground</td><td><code>--ds-background-brand-subtlest</code>, <code>--ds-background-neutral</code>, <code>--ds-background-success</code>, <code>--ds-background-danger</code>, <code>--ds-background-warning</code>, <code>--ds-background-information</code></td></tr>
 <tr><td>Icon</td><td><code>--ds-icon-brand</code>, <code>--ds-icon-subtle</code>, <code>--ds-icon-success</code>, <code>--ds-icon-danger</code>, <code>--ds-icon-warning</code>, <code>--ds-icon-information</code></td></tr>
-<tr><td>Title</td><td><code>--heading-small</code></td></tr>
+<tr><td>Title, body, link</td><td><code>--heading-small</code>, <code>--body-default</code>, <code>--ds-text</code>; actions at <code>--type-weight-medium</code></td></tr>
 <tr><td>Divider</td><td><code>--ds-border</code>, <code>--border-default</code></td></tr>
+<tr><td>Padding, gaps, corner</td><td><code>--size-card-pad-x-sm</code>, <code>--size-card-pad-y-sm</code>, <code>--size-card-gap-sm</code>, <code>--stack-md</code>, <code>--size-modal-radius-sm</code></td></tr>
+<tr><td>Dismiss</td><td><code>--item-height-md</code></td></tr>
 </tbody>
 </DocsTable>
 
@@ -229,63 +209,61 @@ every style. Every style has 4px corners.
 
 ## Best practices
 
-### Field errors go on the field.
+### Match the appearance to the meaning.
 
-```jsx
-// Incorrect — the error is a hundred pixels away from the input it is about,
-// and nothing connects the two.
-<SectionMessage appearance="danger">Email address is not valid.</SectionMessage>
-<TextField id="email" label="Email" value={email} onChange={onEmail} />
+Warning for a caution; danger only when something failed.
 
-// Correct — the field owns its own error state and message.
-<TextField
-  id="email"
-  label="Email"
-  value={email}
-  onChange={onEmail}
-  isInvalid
-  errorMessage="Enter an email address in the form name@example.com."
-  aria-invalid={true}
+<DoDontPair
+    doExample={<SectionMessage appearance="warning">This term's schedule is provisional.</SectionMessage>}
+    doCaption="Warning for a provisional schedule."
+    dontExample={<SectionMessage appearance="danger">This term's schedule is provisional.</SectionMessage>}
+    dontCaption="Danger for a caution."
 />
-```
 
-### `dismissible` is on by default.
+### Add a title only when the body needs a heading.
 
-```jsx
-// Incorrect — this renders a close button the author never asked for, and the
-// message the page depends on can be dismissed away.
-<SectionMessage appearance="warning">This term's schedule is provisional.</SectionMessage>
+A short body speaks for itself.
 
-// Correct — say so explicitly when the message must stay.
-<SectionMessage appearance="warning" dismissible={false}>This term's schedule is provisional.</SectionMessage>
-```
+<DoDontPair
+    doExample={<SectionMessage appearance="info">Tutors confirm times by Friday.</SectionMessage>}
+    doCaption="A short body, no title."
+    dontExample={<SectionMessage appearance="info" title="Notice">Tutors confirm times by Friday.</SectionMessage>}
+    dontCaption="A title that repeats the body."
+/>
 
-### Replace the icon through `leadingVisual`, not the children.
+### Dismiss only what is optional.
 
-```jsx
-// Incorrect — the style's default icon still renders, so this message has two,
-// and the one in the children sits in the text instead of on the first line.
-<SectionMessage appearance="success"><i className="fa-solid fa-trophy" /> Goal reached.</SectionMessage>
+A blocking message stays until the problem is fixed. `dismissible` is on by
+default, so turn it off when the message must stay.
 
-// Correct — a Font Awesome solid name (or a node) replaces the default.
-<SectionMessage appearance="success" leadingVisual="trophy">Goal reached.</SectionMessage>
+<DoDontPair
+    doExample={<SectionMessage appearance="danger" dismissible={false}>Sign-in didn't complete. Try again.</SectionMessage>}
+    doCaption="A blocking error cannot be dismissed."
+    dontExample={<SectionMessage appearance="danger">Sign-in didn't complete. Try again.</SectionMessage>}
+    dontCaption="A blocking error that can be dismissed."
+/>
 
-// Correct — `false` removes it, for a short one-line message such as the
-// sign-in messages on the Login page.
-<SectionMessage appearance="warning" leadingVisual={false}>Sign-in didn't complete. Please try again.</SectionMessage>
-```
+### Replace the icon through leadingVisual, not the children.
+
+A Font Awesome Free solid name or a node replaces the default; `false` removes
+it. An icon in the children adds a second one, in the text.
+
+<DoDontPair
+    doExample={<SectionMessage appearance="success" leadingVisual="trophy">Goal reached.</SectionMessage>}
+    doCaption="leadingVisual replaces the default icon."
+    dontExample={<SectionMessage appearance="success"><i className="fa-solid fa-trophy" aria-hidden="true" /> Goal reached.</SectionMessage>}
+    dontCaption="An icon in the children, beside the default one."
+/>
+
+### Put field errors on the field.
+
+An error about one input belongs to that input's own error state, such as
+`TextField`'s `isInvalid` and `errorMessage`, not in a section message above it.
 
 ### Dismissal is one-way.
 
-```jsx
-// Incorrect — `show` is not a declared prop, and the component checks its own
-// dismissed state and returns null before any passed-through prop is read.
-// Once the user closes this message, nothing you own brings it back.
-<SectionMessage appearance="info" show={hasNews}>Three new sessions this week.</SectionMessage>
-
-// Correct — remount it with a key when the message genuinely changes.
-{hasNews && <SectionMessage key={newsId} appearance="info">Three new sessions this week.</SectionMessage>}
-```
+The component keeps its own dismissed state, and `show` is not a prop. To bring
+a message back when it genuinely changes, remount it with a new `key`.
 
 </div>
 
@@ -310,27 +288,23 @@ every style. Every style has 4px corners.
 
 ## Accessibility
 
-- **It announces assertively.** The underlying message renders `role="alert"`,
-  which implies `aria-live="assertive"` — a screen reader interrupts to read it.
+- **It announces assertively.** The message renders `role="alert"`, which
+  implies `aria-live="assertive"`, so a screen reader interrupts to read it.
   That is right for something that just went wrong and wrong for ambient
   information; for the latter, prefer plain text on the page.
 - **A message rendered on mount may not be announced at all.** Live regions
-  announce *changes*. If the message is present in the first paint, treat it as
+  announce changes. If the message is present in the first paint, treat it as
   ordinary content and make sure the surrounding page still reads correctly.
 - **`title` renders as a real heading**, at `headingLevel` (default `h2`). It
   joins the page's outline, so pick the level that fits where it sits.
 - **The dismiss button is labeled `Dismiss message`**, hard-coded. It is the
-  shared `CloseButton`: a fixed 24×24 target whose × is `aria-hidden`, centered
-  on the title line when there is a title and on the first body line otherwise.
-- **The leading icon is decorative.** It is `aria-hidden`, whether it is the
-  default or one you pass: the message's role and its text already say what it
-  is. The icon differs in shape per style, so danger and warning do not rely
-  on color alone to look different, but a screen reader hears neither the
-  icon nor the style.
-- **Links keep the text color.** A link in the body inherits `--ds-text` and
-  stays underlined, so it is told from the text by its underline alone.
-- **So say it in the children.** There is no text prefix, so
-  `appearance="danger"` on its own does not say "error" to a screen reader.
+  shared `CloseButton`: a fixed 24×24 target whose × is `aria-hidden`.
+- **Say the meaning in the words.** The leading icon is `aria-hidden` and there
+  is no text prefix, so `appearance="danger"` on its own does not say "error"
+  to a screen reader. The icon differs in shape per style, so danger and
+  warning do not rely on color alone to look different.
+- **Links keep the text color.** A link in the body is told from the text by
+  its underline alone.
 
 </div>
 
@@ -338,7 +312,7 @@ every style. Every style has 4px corners.
 
 ## Related
 
-- For validation on a single field, put the message on the field — see *Form*.
+- For validation on a single field, put the message on the field, as `TextField` does.
 - For a transient confirmation, use `Flag`.
 - For something that must be acknowledged before continuing, use `Modal`.
 - For a status label on a row, use `StatusTag`.

@@ -51,18 +51,15 @@ picks by default.
         appearance: { table: { disable: true } },
         title: {
             control: 'text',
-            description: 'Optional message title/heading',
             table: { category: 'Content' },
         },
         leadingVisual: {
             control: 'select',
             options: [true, false, 'bell', 'circle-question'],
-            description: "The leading icon: `true` for the style's default, a Font Awesome solid name or a node to replace it, `false` to remove it",
             table: { category: 'Content', defaultValue: { summary: 'true' } },
         },
         dismissible: {
             control: 'boolean',
-            description: 'Whether the message can be dismissed',
             table: { category: 'Behavior' },
         },
         id: {
@@ -165,6 +162,22 @@ function SectionMessageContentDemos() {
         </div>
     );
 }
+
+/** One appearance per story, for the docs page's Appearance section. */
+const appearanceStory = (appearance, title, message) => {
+    const story = () => <SectionMessage appearance={appearance} title={title}>{message}</SectionMessage>;
+    story.play = async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('alert')).toHaveClass(appearance);
+    };
+    return story;
+};
+
+export const Primary = appearanceStory('primary', 'New rubric this term', 'Sessions are scored on the rubric agreed at intake.');
+export const Secondary = appearanceStory('secondary', 'Read-only view', 'You can view this plan but not edit it.');
+export const Success = appearanceStory('success', 'Goal reached', 'This student met their attendance goal for the term.');
+export const Danger = appearanceStory('danger', 'Session could not be booked', 'The tutor is no longer available at this time.');
+export const Warning = appearanceStory('warning', 'Schedule is provisional', 'Dates may still change before the term starts.');
+export const Info = appearanceStory('info', 'Times are in your time zone', 'Tutors confirm times by Friday.');
 
 export const Styles = () => (
     <div style={sectionMessageCol}>

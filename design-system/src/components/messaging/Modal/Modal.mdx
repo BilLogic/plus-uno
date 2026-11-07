@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as ModalStories from './Modal.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Modal } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -19,16 +26,24 @@ export const figmaMeta = {
   ]
 };
 
+{/* Pairs draw the inline panel, never a live dialog. A narrow stand-in screen keeps every width inside a pair card. */}
+export const narrowScreen = { '--plus-modal-screen': '480px', width: '100%' };
+// Pair one draws both widths at three quarters, so ten columns fit beside six at the same scale.
+export const scaledScreen = { ...narrowScreen, zoom: 0.75 };
+export const shortCap = { ...narrowScreen, '--blanket-max-height-modal': 'var(--size-2000)' };
+export const longBody = `${'Long body copy. '.repeat(40)}The body scrolls once the content runs past the cap.`;
+
 <Meta of={ModalStories} />
 
 <Title />
-Add dialogs to your site for lightboxes, user notifications, or completely custom content.
+A dialog over the page for a step that has to happen before anything else:
+a confirmation, a short form, or a detail view the user closes and returns from.
 
 <DocsTabs of={ModalStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
+<ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Modal"
     sets={figmaMeta.sets}
@@ -39,61 +54,31 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Size and layout
 
-<DocsCanvasShell attachSourceBelow description={<>Title and body are driven by props; use <code>body</code> for strings or <code>children</code> for custom markup.</>}>
-    <Canvas of={ModalStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={ModalStories.Width6Col} title="Width 6-col" description="Six columns of the screen grid plus the modal pad, for a confirmation. Drawn at the 1024 screen." />
 
-</div>
+<ComponentExample of={ModalStories.Width8Col} title="Width 8-col" description="Eight columns, for a short form. Drawn at the 1024 screen." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={ModalStories.Width10Col} title="Width 10-col" description="Ten columns, for a table or an editor. Drawn at the 1024 screen." />
 
-## Content
+<ComponentExample of={ModalStories.HeightHug} title="Height hug" description="The default grows with its content to the cap, then its body scrolls. Drawn against a 320 cap." />
 
-<DocsCanvasShell description={<>Short and long bodies, with and without footer actions, in inline docs previews.</>}>
-    <DsCanvasQuiet of={ModalStories.Content} />
-</DocsCanvasShell>
+<ComponentExample of={ModalStories.HeightFill} title="Height fill" description="Sits at the cap, for settings, editors and record peeks that should not jump." />
 
-</div>
+<ComponentExample of={ModalStories.Layout} title="Footer" description="Header only, and header with a secondary and a primary action." />
 
-<div className="sb-ds-doc-section">
-
-## Layout & composition
-
-<DocsCanvasShell description={<>Header-only versus header with a primary and secondary action row.</>}>
-    <DsCanvasQuiet of={ModalStories.Layout} />
-</DocsCanvasShell>
+<ComponentExample of={ModalStories.Content} title="Content" description="Short and long bodies, with and without footer actions." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Width
+## Behavior
 
-<DocsCanvasShell description={<>Width is 6 · 8 · 10 columns of the screen grid plus 2 × 16 — 384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 from 1280. It grows with the screen, never shrinks, and ignores the sidebar. Drawn here at the 1024 screen.</>}>
-    <DsCanvasQuiet of={ModalStories.Sizes} />
-</DocsCanvasShell>
+<ComponentExample of={ModalStories.HeaderOptions} title="Header options" description="A description, header icon actions before the close button, and dividers." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Height
-
-<DocsCanvasShell description={<>Hug (the default) grows with its content up to the screen less 2 × 64 (2 × 24 under 640 tall), then its body scrolls. Fill sits at that cap, for settings, editors and record peeks that should not jump. Drawn here against a 320 cap.</>}>
-    <DsCanvasQuiet of={ModalStories.Heights} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Header, dividers and loading
-
-<DocsCanvasShell description={<>The header holds the title, an optional description, optional icon actions and the 32 close button, which a dialog that has to be answered turns off. Dividers are optional. Loading draws skeleton bars where the body will be.</>}>
-    <DsCanvasQuiet of={ModalStories.Options} />
-</DocsCanvasShell>
+<ComponentExample of={ModalStories.WithoutCloseButton} title="Without close button" description="A dialog that has to be answered turns the close button off." />
 
 </div>
 
@@ -101,21 +86,15 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 
 ## State
 
-<DocsCanvasShell description={<>The panel with its title and the close button at rest.</>}>
-    <DsCanvasQuiet of={ModalStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={ModalStories.Loading} title="Loading" description="Skeleton bars stand in for the body while its content loads." />
 
-<DocsCanvasShell description={<>The close button takes the subtle hovered step.</>}>
-    <DsCanvasQuiet of={ModalStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={ModalStories.Rest} title="Rest" description="The panel with its title and the close button at rest." />
 
-<DocsCanvasShell description={<>The close button takes the subtle pressed step.</>}>
-    <DsCanvasQuiet of={ModalStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={ModalStories.Hovered} title="Hovered" description="The close button takes the subtle hovered step." />
 
-<DocsCanvasShell description={<>The 2px ring, 2px off the close button.</>}>
-    <DsCanvasQuiet of={ModalStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={ModalStories.Pressed} title="Pressed" description="The close button takes the subtle pressed step." />
+
+<ComponentExample of={ModalStories.Focused} title="Focused" description="The 2px ring, 2px off the close button." />
 
 </div>
 
@@ -147,21 +126,32 @@ Add dialogs to your site for lightboxes, user notifications, or completely custo
 
 ## Usage
 
-Use `Modal` when the next step has to happen before anything else can — a
+Use `Modal` when the next step has to happen before anything else can: a
 destructive confirmation, a short form that would derail the page, a detail view
 that the user will close and return from. It is the only messaging component
 that takes focus away from the page, so use it when interrupting is the point.
 
 The footer is built in: pass `primaryButton` and `secondaryButton` as objects and
 the component renders the `Button` pair for you, aligned right. Pass `footer` for
-other actions, such as a Delete on the left or a single primary.
+other actions, such as a Delete on the left or a single primary. Opening a modal
+closes a floating sidebar; a docked one stays.
 
-Pick a grid `width` for the content rather than a number: `6-col` for a confirm, `8-col` for a
-short form, `10-col` for a table or an editor. A dialog never opens another dialog.
-When a follow-up decision comes up inside one — confirming a delete, for
-example — swap its content for an inline confirmation in the same dialog
-rather than opening a second one. Opening a modal closes a floating sidebar; a
-docked one stays.
+### Width guidance
+
+<DocsTable>
+<thead>
+<tr><th>Width</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>6-col</td><td>A confirmation or a short question. 384 at 768, 512 at 1024, 640 from 1280.</td></tr>
+<tr><td>8-col</td><td>A short form. 507 at 768, 677 at 1024, 848 from 1280.</td></tr>
+<tr><td>10-col</td><td>A table or an editor. 629 at 768, 843 at 1024, 1056 from 1280.</td></tr>
+</tbody>
+</DocsTable>
+
+The width grows with the screen, never shrinks, and ignores the sidebar. The
+height hugs its content up to the screen less 2 × 64 (2 × 24 under 640 tall);
+`height="fill"` sits at that cap.
 
 </div>
 
@@ -170,9 +160,10 @@ docked one stays.
 ## Parts
 
 1. **Blanket.** Dims the page and holds focus inside.
-2. **Header.** Title, optional description, header actions and the close button.
+2. **Header.** Title, optional description, header actions and the 32 close button.
 3. **Body.** Text or any content; scrolls when it overflows.
-4. **Footer.** Appears only when a button is given: a secondary and a primary.
+4. **Footer.** Appears only when a button or `footer` is given: a secondary and a primary.
+5. **Dividers.** Optional rules under the header and over the footer.
 
 ### States
 
@@ -182,9 +173,11 @@ docked one stays.
 </thead>
 <tbody>
 <tr><td>Rest</td><td>Open, with the title naming the dialog.</td></tr>
-<tr><td>Hovered, pressed</td><td>The close button takes the subtle neutral steps.</td></tr>
+<tr><td>Hovered</td><td>The close button takes the subtle hovered step.</td></tr>
+<tr><td>Pressed</td><td>The close button takes the subtle pressed step.</td></tr>
 <tr><td>Focused</td><td>Focus moves in on open; the close button shows the 2px ring.</td></tr>
-<tr><td>Loading</td><td>The body shows a skeleton and <code>aria-busy</code>.</td></tr>
+<tr><td>Disabled</td><td>Not supported on the dialog; disable a footer button instead.</td></tr>
+<tr><td>Loading</td><td>The body shows a skeleton and sets <code>aria-busy</code>.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -197,8 +190,11 @@ docked one stays.
 <tbody>
 <tr><td>Surface</td><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>, <code>--modal-radius</code></td></tr>
 <tr><td>Title, body</td><td><code>--heading-medium</code>, <code>--body-default</code>, <code>--ds-text</code>, <code>--ds-text-subtle</code></td></tr>
-<tr><td>Close</td><td><code>--ds-icon-subtle</code>, <code>--item-height-md</code>, <code>--ds-border-focused</code></td></tr>
-<tr><td>Width</td><td><code>--grid-columns</code>, <code>--grid-gutter</code></td></tr>
+<tr><td>Close</td><td><code>--ds-icon-subtle</code>, <code>--item-height-md</code>, <code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code>, <code>--ds-border-focused</code></td></tr>
+<tr><td>Dividers</td><td><code>--ds-border</code>, <code>--stroke-1</code></td></tr>
+<tr><td>Width</td><td><code>--grid-columns</code>, <code>--grid-gutter</code>, <code>--modal-pad-x-default</code></td></tr>
+<tr><td>Height</td><td><code>--blanket-max-height-modal</code></td></tr>
+<tr><td>Spacing</td><td><code>--modal-stack-md</code>, <code>--modal-inline-sm</code>, <code>--stack-md</code>, <code>--stack-sm</code></td></tr>
 </tbody>
 </DocsTable>
 
@@ -208,75 +204,60 @@ docked one stays.
 
 ## Best practices
 
-### Size the modal by the grid, not by a number.
+### Size the dialog to its content.
 
-```jsx
-// Incorrect — a fixed width ignores the screen grid, so the dialog keeps one
-// size on every screen. Numbers are kept only for the callers that still pass one.
-<Modal width={480} title="Reschedule" show={open} onClose={close} />
+A short confirmation takes the narrowest width. Pick a grid `width`, never a
+number: a fixed width keeps one size on every screen.
 
-// Correct — a width from the screen grid, which grows with the screen.
-<Modal width="8-col" title="Reschedule" show={open} onClose={close} />
-```
+<DoDontPair
+    doExample={<div style={scaledScreen}><Modal show renderAs="inline" width="6-col" title="Remove this session?" body="The student is told it was canceled." secondaryButton={{ text: 'Cancel' }} primaryButton={{ text: 'Remove' }} onClose={() => {}} /></div>}
+    doCaption="Six columns for a short question."
+    dontExample={<div style={scaledScreen}><Modal show renderAs="inline" width="10-col" title="Remove this session?" body="The student is told it was canceled." secondaryButton={{ text: 'Cancel' }} primaryButton={{ text: 'Remove' }} onClose={() => {}} /></div>}
+    dontCaption="Ten columns around one sentence."
+/>
 
-### The footer only appears when you give it a button.
+### Keep Close unless the dialog must be answered.
 
-```jsx
-// Incorrect — `showBottomButtons` defaults to true, but with neither button
-// nor `footer` supplied the footer is not rendered at all, so the dialog ends
-// with no way to confirm.
-<Modal title="Reschedule" show={open} onClose={close}>{form}</Modal>
+Only a decision the person has to make removes the close button.
 
-// Correct — describe the actions; the component renders the Button pair.
-<Modal
-  title="Reschedule"
-  show={open}
-  onClose={close}
-  secondaryButton={{ text: 'Cancel', onClick: close }}
-  primaryButton={{ text: 'Reschedule', onClick: submit }}
->
-  {form}
-</Modal>
-```
+<DoDontPair
+    doExample={<div style={narrowScreen}><Modal show renderAs="inline" title="Session details" description="Monday, 4:00 PM" body="Algebra with Jordan, 45 minutes." primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
+    doCaption="Close stays on an informational dialog."
+    dontExample={<div style={narrowScreen}><Modal show renderAs="inline" showCloseButton={false} title="Session details" description="Monday, 4:00 PM" body="Algebra with Jordan, 45 minutes." primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
+    dontCaption="No way out of an informational dialog."
+/>
 
-### Inline confirmation
+### Use dividers when the body scrolls.
 
-A follow-up decision — confirming a delete, for example — replaces the
-dialog's title, body and footer in place. It does not open a second dialog.
+The rules mark where the header and footer stay put.
+
+<DoDontPair
+    doExample={<div style={shortCap}><Modal show renderAs="inline" dividers title="Session notes" body={longBody} primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
+    doCaption="Dividers around a scrolling body."
+    dontExample={<div style={shortCap}><Modal show renderAs="inline" dividers title="Session notes" body="One short note." primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
+    dontCaption="Dividers around a short body."
+/>
+
+### Give the footer a button.
+
+`showBottomButtons` defaults to true, but with no `primaryButton`,
+`secondaryButton` or `footer` the footer is not rendered, so the dialog ends
+with no way to confirm. Describe the actions as objects and the component
+renders the Button pair.
 
 ### Confirm a follow-up decision in place, not in a new dialog.
 
-```jsx
-// Incorrect — a second Modal opens on top of the first. Dialogs never stack.
-<Modal title="Session settings" show={open} onClose={close}>
-  {settingsForm}
-  <Modal
-    title="Discard changes?"
-    show={confirmOpen}
-    onClose={closeConfirm}
-    secondaryButton={{ text: 'Back', onClick: closeConfirm }}
-    primaryButton={{ text: 'Discard changes', appearance: 'danger', onClick: discard }}
-  >
-    Your edits to this session are not saved.
-  </Modal>
-</Modal>
+A dialog never opens another dialog. A follow-up decision, such as confirming a
+delete, swaps the same dialog's title, body and footer for the confirmation,
+and Back returns to the form without losing what was typed.
 
-// Correct — the same dialog swaps its title, body and footer for the
-// confirmation, and Back returns to the form without losing what was typed.
+```jsx
 <Modal
   title={confirming ? 'Discard changes?' : 'Session settings'}
   show={open}
   onClose={close}
-  secondaryButton={
-    confirming
-      ? { text: 'Back', onClick: () => setConfirming(false) }
-      : { text: 'Cancel', onClick: close }
-  }
-  primaryButton={
-    confirming
-      ? { text: 'Discard changes', appearance: 'danger', onClick: discard }
-      : { text: 'Save', onClick: save }
-  }
+  secondaryButton={confirming ? { text: 'Back', onClick: () => setConfirming(false) } : { text: 'Cancel', onClick: close }}
+  primaryButton={confirming ? { text: 'Discard changes', appearance: 'danger', onClick: discard } : { text: 'Save', onClick: save }}
 >
   {confirming ? 'Your edits to this session are not saved.' : settingsForm}
 </Modal>
@@ -307,8 +288,8 @@ dialog's title, body and footer in place. It does not open a second dialog.
 
 - **Escape and backdrop click are on by default.** `keyboard` and `backdrop`
   both default to `true`. Turning either off leaves the header close button as
-  the only exit, so keep that button — it is only rendered when the modal is not
-  in body-only mode (`title` absent *and* `showBottomButtons` false).
+  the only exit, so keep that button. The header, and its close button, is only
+  rendered when the modal has a title, description, header actions or footer.
 - **The close button is labeled `Close modal`**, hard-coded. Its icon is
   `aria-hidden`. `showCloseButton={false}` removes it; keep Escape or a footer
   action as a way out.
@@ -317,33 +298,20 @@ dialog's title, body and footer in place. It does not open a second dialog.
   describes it, through `aria-describedby`. A modal with no title takes
   `ariaLabel`.
 - **A body that scrolls is focusable.** Once the content runs past the cap, the
-  body gets `tabIndex={0}` so a keyboard user can scroll it — the axe
-  `scrollable-region-focusable` rule.
+  body gets `tabIndex={0}` so a keyboard user can scroll it.
 - **Loading is announced as busy.** `loading` sets `aria-busy` on the body while
   the skeleton bars stand in for it.
 - **Opening traps focus inside the dialog and closing returns it to the
-  trigger.** Tab cycles within the dialog rather than escaping it; a view
-  change (the confirm view swapping in) moves focus into the dialog again,
-  since the control that raised it is gone from the footer.
-- **Dismiss is Close, Escape, a Blanket click, or an optional Cancel.** An
-  inline confirmation of a destructive action turns off the Blanket click, so a
-  stray click outside the dialog cannot destroy something by accident — Close,
-  Escape or the footer's Back still work.
+  trigger.** Tab cycles within the dialog; a view change (the confirm view
+  swapping in) moves focus into the dialog again.
+- **An inline confirmation of a destructive action turns off the Blanket
+  click**, so a stray click outside cannot destroy something by accident;
+  Close, Escape or the footer's Back still work.
 - **Focus order is Close, then the content, then the secondary action, then
-  the primary action.** Tab follows that order on open, and focus returns to
-  the trigger on close.
-
-### Do not use the inline render for a live dialog.
-
-```jsx
-// Incorrect — no backdrop, no focus trap, no Escape. The page behind stays
-// fully interactive and keyboard users can tab straight past the dialog.
-<Modal renderAs="inline" title="Delete session" show={open} onClose={close} />
-
-// Correct — the default `renderAs="modal"` wraps the content in the real
-// dialog, which handles the backdrop, focus and Escape.
-<Modal title="Delete session" show={open} onClose={close} />
-```
+  the primary action.**
+- **`renderAs="inline"` is for docs previews only.** It draws the panel with no
+  backdrop, no focus trap and no Escape, so a live dialog keeps the default
+  `renderAs="modal"`.
 
 </div>
 
@@ -352,7 +320,7 @@ dialog's title, body and footer in place. It does not open a second dialog.
 ## Related
 
 - For a message the user only has to read, use `SectionMessage` or `Flag`.
-- For long content, use a page rather than a dialog — a modal traps focus, and scrolling inside one is hard to navigate.
+- For long content, use a page rather than a dialog: a modal traps focus, and scrolling inside one is hard to navigate.
 - For a menu or a picker, use `DropdownMenu` or `Select`.
 
 </div>

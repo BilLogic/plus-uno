@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as FlagStories from './Flag.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Flag } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -21,12 +28,14 @@ export const figmaMeta = {
 <Meta of={FlagStories} />
 
 <Title />
+A short confirmation of something that has already happened and needs no
+reply. It appears over the page and goes away on its own or when dismissed.
 
 <DocsTabs of={FlagStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
+<ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Flag"
     sets={figmaMeta.sets}
@@ -37,25 +46,27 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>Semantic styles in a static container for documentation.</>}>
-    <Canvas of={FlagStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={FlagStories.Normal} title="Normal" description="The default: a neutral update in the subtle icon color." />
+
+<ComponentExample of={FlagStories.Information} title="Information" description="Something worth knowing, with the information icon." />
+
+<ComponentExample of={FlagStories.Success} title="Success" description="A finished action, with the success icon." />
+
+<ComponentExample of={FlagStories.Warning} title="Warning" description="Something to check before going on. It stays until dismissed." />
+
+<ComponentExample of={FlagStories.ErrorAppearance} title="Error" description="Something that failed. It stays until dismissed." />
+
+<ComponentExample of={FlagStories.Bold} title="Bold" description="bold fills the flag with the appearance's bold color and adds an expand toggle." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Appearance
+## Behavior
 
-<DocsCanvasShell description={<>Semantic flag styles for success, warning, error, and informational notifications.</>}>
-    <DsCanvasQuiet of={FlagStories.Styles} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Dismiss control — the shared <code>CloseButton</code> in its default tone, last in the flag's row.</>}>
-    <DsCanvasQuiet of={FlagStories.Dismiss} />
-</DocsCanvasShell>
+<ComponentExample of={FlagStories.Dismiss} title="Dismiss" description="The shared CloseButton in its default tone, last in the flag's row." />
 
 </div>
 
@@ -63,21 +74,13 @@ export const figmaMeta = {
 
 ## State
 
-<DocsCanvasShell description={<>The flag on the overlay surface with its title and Dismiss.</>}>
-    <DsCanvasQuiet of={FlagStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={FlagStories.Rest} title="Rest" description="The flag on the overlay surface with its title and Dismiss." />
 
-<DocsCanvasShell description={<>The flag does not react; Dismiss takes the subtle hovered step.</>}>
-    <DsCanvasQuiet of={FlagStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={FlagStories.Hovered} title="Hovered" description="The flag does not react; Dismiss takes the subtle hovered step." />
 
-<DocsCanvasShell description={<>Dismiss takes the subtle pressed step.</>}>
-    <DsCanvasQuiet of={FlagStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={FlagStories.Pressed} title="Pressed" description="Dismiss takes the subtle pressed step." />
 
-<DocsCanvasShell description={<>Dismiss and each action show the 2px focus ring.</>}>
-    <DsCanvasQuiet of={FlagStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={FlagStories.Focused} title="Focused" description="Dismiss and each action show the 2px focus ring." />
 
 </div>
 
@@ -89,7 +92,7 @@ export const figmaMeta = {
     of={FlagStories.Interactive}
     description={
         <>
-            Use the table below to change props. The preview is rendered{' '}
+            Use the table below to change props, then press Trigger Flag. The preview is rendered{' '}
             <strong className="text-foreground">inline</strong> while you scroll the docs page.
         </>
     }
@@ -109,15 +112,25 @@ export const figmaMeta = {
 
 ## Usage
 
-Use `Flag` to confirm something that has already happened and needs no reply —
-saved, sent, copied. It appears over the page, times out, and takes nothing with
-it when it goes.
+Use `Flag` to confirm something that has already happened and needs no reply:
+saved, sent, copied. `show` and `onDismiss` are yours; the component holds no
+state. `FlagGroup` positions a stack of them.
 
-`show` and `onDismiss` are yours; the component holds no state. `appearance` is
-`normal`, `information`, `warning`, `error` or `success`; `title` is required and
-the description is optional. `actions` adds link buttons, and `bold` expands the
-flag to its appearance's bold fill. `delay` is the timeout in milliseconds and
-`autohide` turns it off. `FlagGroup` positions a stack of them.
+### Appearance guidance
+
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Normal</td><td>The default, for a neutral update. Example: "Notes copied".</td></tr>
+<tr><td>Information</td><td>Something worth knowing. Example: "Schedule updated".</td></tr>
+<tr><td>Success</td><td>A finished action. Example: "Plan saved".</td></tr>
+<tr><td>Warning</td><td>Something to check before going on. Stays until dismissed.</td></tr>
+<tr><td>Error</td><td>Something that failed. Stays until dismissed.</td></tr>
+<tr><td>Bold</td><td>Any appearance on its bold fill, for the one message that must be seen.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -131,7 +144,7 @@ flag to its appearance's bold fill. `delay` is the timeout in milliseconds and
 4. **Description.** At most one line.
 5. **Actions.** Link buttons under the description.
 6. **Expand toggle.** Only on a bold flag, which starts collapsed to its title.
-7. **Dismiss.** The shared CloseButton.
+7. **Dismiss.** The shared CloseButton, named "Dismiss flag".
 
 ### States
 
@@ -141,8 +154,11 @@ flag to its appearance's bold fill. `delay` is the timeout in milliseconds and
 </thead>
 <tbody>
 <tr><td>Rest</td><td>The appearance icon color on the overlay surface; a bold flag fills the surface instead.</td></tr>
-<tr><td>Hovered, pressed</td><td>The flag does not react; Dismiss and the toggle take the subtle neutral steps.</td></tr>
+<tr><td>Hovered</td><td>The flag does not react; Dismiss and the toggle take the subtle hovered step.</td></tr>
+<tr><td>Pressed</td><td>Dismiss and the toggle take the subtle pressed step.</td></tr>
 <tr><td>Focused</td><td>Dismiss, the toggle and each action show the 2px ring; the ring is inverse on a bold fill.</td></tr>
+<tr><td>Disabled</td><td>Not supported.</td></tr>
+<tr><td>Expanded</td><td>A bold flag shows its description and actions; collapsed, only the title.</td></tr>
 <tr><td>Autohide</td><td>Normal, information and success close after 8 seconds; warning and error stay.</td></tr>
 <tr><td>Dismissed</td><td>The flag leaves the stack.</td></tr>
 </tbody>
@@ -155,11 +171,13 @@ flag to its appearance's bold fill. `delay` is the timeout in milliseconds and
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Surface</td><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td></tr>
-<tr><td>Title, description</td><td><code>--ds-text</code>, <code>--ds-text-subtle</code></td></tr>
-<tr><td>Icon</td><td><code>--ds-icon-information</code>, <code>--ds-icon-success</code>, <code>--ds-icon-warning</code>, <code>--ds-icon-danger</code></td></tr>
-<tr><td>Bold fill</td><td><code>--ds-background-*-bold</code> with <code>--ds-text-inverse</code></td></tr>
-<tr><td>Dismiss</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
+<tr><td>Surface</td><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>, <code>--popover-radius</code>, <code>--popover-pad</code>, <code>--popover-width-flag</code></td></tr>
+<tr><td>Title, description</td><td><code>--heading-xsmall</code>, <code>--ds-text</code>; <code>--body-default</code>, <code>--ds-text-subtle</code></td></tr>
+<tr><td>Icon</td><td><code>--ds-icon-subtle</code>, <code>--ds-icon-information</code>, <code>--ds-icon-success</code>, <code>--ds-icon-warning</code>, <code>--ds-icon-danger</code>, at <code>--icon-md</code></td></tr>
+<tr><td>Bold fill</td><td><code>--ds-background-neutral-bold</code>, <code>-information-bold</code>, <code>-success-bold</code>, <code>-warning-bold</code>, <code>-danger-bold</code>, with <code>--ds-text-inverse</code> (<code>--ds-text-warning-inverse</code> on warning)</td></tr>
+<tr><td>Dismiss, toggle</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
+<tr><td>Gaps</td><td><code>--inline-lg</code> before Dismiss, <code>--inline-md</code>, <code>--stack-sm</code>; <code>--popover-stack-flag</code> between flags</td></tr>
+<tr><td>Group</td><td><code>--layer-flag</code>, <code>--popover-gap-screen</code></td></tr>
 </tbody>
 </DocsTable>
 
@@ -169,30 +187,50 @@ flag to its appearance's bold fill. `delay` is the timeout in milliseconds and
 
 ## Best practices
 
+### Match the appearance to the outcome.
+
+Success for a finished action; error only when something failed.
+
+<DoDontPair
+    doExample={<Flag appearance="success" title="Session saved" autohide={false}>Changes appear for everyone on the session.</Flag>}
+    doCaption="Success appearance for a saved session."
+    dontExample={<Flag appearance="error" title="Session saved" autohide={false}>Changes appear for everyone on the session.</Flag>}
+    dontCaption="Error appearance on good news."
+/>
+
+### Keep bold for the one message that must be seen.
+
+A bold flag competes with the page; routine news stays quiet.
+
+<DoDontPair
+    doExample={<Flag appearance="information" title="Notes synced" autohide={false}>Changes appear for everyone on the session.</Flag>}
+    doCaption="Quiet flag for routine news."
+    dontExample={<Flag appearance="information" bold title="Notes synced" autohide={false}>Changes appear for everyone on the session.</Flag>}
+    dontCaption="Bold fill on a routine confirmation."
+/>
+
+### Say what happened and what to do next.
+
+A title names the event; the description gives the next step.
+
+<DoDontPair
+    doExample={<Flag appearance="error" title="Couldn't reschedule">Pick another time and try again.</Flag>}
+    doCaption="Event in the title, next step below."
+    dontExample={<Flag appearance="error" title="Error" />}
+    dontCaption="A bare title with no next step."
+/>
+
 ### Nothing important goes only in a flag.
 
-```jsx
-// Incorrect — the user can dismiss it before reading it, and that took the only
-// copy of the error with it. An error the user must act on is not a flag.
-<Flag appearance="error" title="Upload failed" show={failed} onDismiss={dismiss}>
-    The file was larger than 10 MB.
-</Flag>
+The user can dismiss a flag before reading it, and that takes the only copy
+with it. A failure that needs a decision stays on the page, in a
+`SectionMessage`.
 
-// Correct — a failure that needs a decision stays on the page.
-<SectionMessage appearance="danger" title="Upload failed">The file was larger than 10 MB.</SectionMessage>
-```
+### Turn off autohide for anything the user might need to re-read.
 
-### Turn off `autohide` for anything the user might need to re-read.
+With `autohide={false}`, or `delay={0}`, the flag waits for its close button.
 
-```jsx
-// delay is ignored when autohide is false, and setting delay={0} also disables
-// the timer — the flag then waits for its close button.
-<Flag title="Report ready" show={ready} onDismiss={dismiss} autohide={false}>
-    Your export is on the downloads page.
-</Flag>
-```
-
-### Keep `dismissible` on.
+### Keep dismissible on.
 
 It is on by default and is the only way to close a flag that is not timing out.
 Turning it off with `autohide={false}` leaves a flag that never goes away.
@@ -225,23 +263,19 @@ Turning it off with `autohide={false}` leaves a flag that never goes away.
   `aria-live="polite"`, so a success flag waits for the screen reader to finish
   what it is saying. Every appearance is `aria-atomic`, so the flag is read as one
   message.
-- **An eight-second timeout is a timing limit.** Normal, information and success flags
-  close after 8 seconds; warning and error stay until they are dismissed, because
-  they ask for something to be done. Content that disappears on its own has to
+- **The timeout is a timing limit.** Content that disappears on its own has to
   be dismissible or extendable to satisfy WCAG's timing rule. The close button
   is what does that here, which is why it is on by default.
 - **Announcement needs the region to already exist.** A flag mounted at the same
   moment as its container may not be announced at all. Render `FlagGroup`
   with the page and put flags into it.
-- **The dismiss button is named "Dismiss flag".** It is the shared `CloseButton` in its
-  default tone on the flag's surface, with an `aria-hidden` ×. The × and its
-  focus ring are at least 3:1 on that surface.
+- **The dismiss button is the shared `CloseButton`** in its default tone on the
+  flag's surface, with an `aria-hidden` ×. The × and its focus ring are at least
+  3:1 on that surface.
 - **The appearance icon is decorative.** It is `aria-hidden`, so the title beside it
   carries the meaning; the color and icon should never carry it alone.
-- **Every flag is one surface.** The appearance shows in the 16 icon's color
-  alone; the flag is `--ds-surface-overlay` with `--ds-shadow-overlay`, the
-  title `--ds-text` and the message `--ds-text-subtle` on every appearance, so no
-  appearance needs a contrast exception.
+- **Every flag is one surface.** The title and the description keep the same
+  text colors on every appearance, so no appearance needs a contrast exception.
 
 </div>
 

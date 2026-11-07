@@ -9,7 +9,7 @@ it is resolved or dismissed. // Simple message <SectionMessage appearance="warni
 
 **Source:** `design-system/src/components/messaging/SectionMessage/SectionMessage.jsx`
 
-**Stories:** `design-system/src/components/messaging/SectionMessage/SectionMessage.stories.jsx` — Styles, Content, Overview, Interactive, DismissPlacement, LeadingIcon, GroundAndText, Actions, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/SectionMessage/SectionMessage.stories.jsx` — Primary, Secondary, Success, Danger, Warning, Info, Styles, Content, Overview, Interactive, DismissPlacement, LeadingIcon, GroundAndText, Actions, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/SectionMessage/SectionMessage.mdx`
 
@@ -19,10 +19,10 @@ it is resolved or dismissed. // Simple message <SectionMessage appearance="warni
 |------|------|---------|-------------|
 | `id` | string | — | Unique identifier for the section message element |
 | `appearance` | enum | `'primary'` | Visual appearance |
-| `title` | string | — | Optional message title/heading |
+| `title` | string | — | Optional title/heading for the message |
 | `headingLevel` | enum | — | Heading level the title renders as, 1 through 6. Defaults to `h2`. |
 | `children` | node (required) | — | Message content - supports text, JSX, or React components |
-| `leadingVisual` | bool or string or node | `true` | The leading icon: `true` for the style's default, a Font Awesome solid name or a node to replace it, `false` to remove it |
+| `leadingVisual` | bool or string or node | `true` | Leading icon on the first line: `true` for the style's default, a Font Awesome solid name or a node to replace it, `false` to remove it. Always decorative. |
 | `actions` | arrayOf (required) | — | Link-button actions after the body, in the order given. Avoid more than two. |
 | `dismissible` | bool | `true` | Whether the message can be dismissed |
 | `onDismiss` | func | — | Callback when the message is dismissed |

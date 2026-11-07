@@ -28,7 +28,6 @@ export default {
         height: {
             control: 'select',
             options: ['hug', 'fill'],
-            description: 'Hug grows to the screen less 128, then scrolls its body; Fill sits at that cap',
             table: { category: 'Layout' },
         },
         dividers: {
@@ -45,7 +44,6 @@ export default {
         },
         showBottomButtons: {
             control: 'boolean',
-            description: 'Show bottom buttons',
             table: { category: 'Behavior' },
         },
         show: {
@@ -55,7 +53,6 @@ export default {
         width: {
             control: 'select',
             options: ['6-col', '8-col', '10-col'],
-            description: '6 · 8 · 10 columns of the screen grid plus the modal pad; a number is a fixed width',
             table: { category: 'Layout' },
         },
         headerActions: { table: { disable: true, category: 'Development' } },
@@ -302,6 +299,71 @@ function ModalOptionDemos() {
         </div>
     );
 }
+
+/* ------------------------------------------------- one value per story */
+
+/** One grid width, drawn at the 1024 screen. */
+const widthStory = (size) => () => (
+    <div style={{ '--plus-modal-screen': '1024px', width: '100%' }}>
+        <Modal
+            show
+            renderAs="inline"
+            width={size}
+            title={`width="${size}"`}
+            body="Modal body text goes here."
+            secondaryButton={{ text: 'Cancel' }}
+            primaryButton={{ text: 'Save' }}
+            onClose={() => {}}
+        />
+    </div>
+);
+
+export const Width6Col = widthStory('6-col');
+Width6Col.storyName = 'Width 6-col';
+export const Width8Col = widthStory('8-col');
+Width8Col.storyName = 'Width 8-col';
+export const Width10Col = widthStory('10-col');
+Width10Col.storyName = 'Width 10-col';
+
+/** One height against a 320 cap standing in for the screen less 128. */
+const heightStory = (height, title, body) => () => (
+    <div
+        style={{
+            ...modalDocsHostStyle,
+            '--blanket-max-height-modal': 'var(--size-2000)',
+            minHeight: 'calc(var(--size-2000) + 2 * var(--space-100))',
+        }}
+    >
+        <Modal show renderAs="inline" height={height} title={title} body={body} primaryButton={{ text: 'Done' }} onClose={() => {}} />
+    </div>
+);
+
+export const HeightHug = heightStory('hug', 'Hug', longBody.repeat(3));
+HeightHug.storyName = 'Height hug';
+export const HeightFill = heightStory('fill', 'Fill', 'Fill sits at the cap.');
+HeightFill.storyName = 'Height fill';
+
+export const HeaderOptions = () => (
+    <Modal
+        show
+        renderAs="inline"
+        title="Share report"
+        description="People with the link can view it."
+        headerActions={<IconButton appearance="subtle" spacing="compact" icon="link" label="Copy link" />}
+        dividers
+        body="Header actions sit before the close button; dividers rule off the header and footer."
+        primaryButton={{ text: 'Done' }}
+        onClose={() => {}}
+    />
+);
+
+export const WithoutCloseButton = () => (
+    <Modal show renderAs="inline" title="Uploading transcript" showCloseButton={false} body="A dialog that has to be answered drops the close button." primaryButton={{ text: 'Cancel upload' }} onClose={() => {}} />
+);
+
+export const Loading = () => (
+    <Modal show renderAs="inline" loading title="Session details" body="Loaded content" showBottomButtons={false} onClose={() => {}} />
+);
 
 export const Sizes = () => <ModalSizeDemos />;
 

@@ -20,7 +20,7 @@ export default {
     },
     argTypes: {
         appearance: { control: 'select', options: BANNER_APPEARANCES, table: { category: 'Design' } },
-        icon: { control: 'text', description: 'Font Awesome Free solid glyph name, a node, or `false` to remove it', table: { category: 'Content' } },
+        icon: { control: 'text', table: { category: 'Content' } },
         children: { control: 'text', table: { category: 'Content' } },
     },
     args: { appearance: 'warning', children: 'Scheduled maintenance begins at 9:00 PM EST.' },
@@ -51,6 +51,18 @@ export const Appearances = {
         await expect(canvas.getByText('Announcement banner message.').closest('.plus-banner').querySelector('.plus-banner-icon')).toBeNull();
     },
 };
+
+/** One appearance per story, for the docs page's Appearance section. */
+const appearanceStory = (appearance, children) => ({
+    render: () => <Banner appearance={appearance}>{children}</Banner>,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('status')).toHaveClass(`plus-banner--${appearance}`);
+    },
+});
+
+export const Warning = appearanceStory('warning', 'Scheduled maintenance begins at 9:00 PM EST.');
+export const Danger = appearanceStory('danger', 'Session recordings are unavailable. We are working on a fix.');
+export const Announcement = appearanceStory('announcement', 'The new schedule view is here.');
 
 export const WithoutIcon = {
     render: () => <Banner appearance="warning" icon={false}>No icon on this one.</Banner>,

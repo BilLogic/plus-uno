@@ -9,7 +9,7 @@ The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16
 
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
-**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Styles, Overview, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Styles, Overview, Normal, Information, Success, Warning, ErrorAppearance, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 
@@ -18,11 +18,11 @@ The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `id` | string | — | Id set on the flag surface. |
-| `appearance` | enum | `'normal'` | Normal, information, warning, error or success |
+| `appearance` | enum | `'normal'` | `normal` (default), `information`, `warning`, `error` or `success`. |
 | `title` | node (required) | — | What happened, in a few words. |
 | `children` | node | — | An optional description under the title. |
 | `actions` | arrayOf (required) | — | Link-button actions under the description, in the order given. Avoid more than two. |
-| `bold` | bool | `false` | Expand to the appearance\'s bold fill |
+| `bold` | bool | `false` | The appearance's bold fill. A bold flag starts collapsed to its title, with a toggle that expands the description and actions. |
 | `defaultExpanded` | bool | `false` | Whether a bold flag starts expanded. |
 | `dismissible` | bool | `true` | Shows the dismiss button. Defaults to true; set false to leave it out. |
 | `show` | bool | `true` | Whether the flag renders. Defaults to true; false renders nothing and stops the auto-close timer. |

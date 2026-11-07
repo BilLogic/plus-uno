@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as EmptyStateStories from './EmptyState.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Button, EmptyState, Table } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={EmptyStateStories} />
 
@@ -15,6 +22,7 @@ line on what goes here, and the one action that fills it.
 <DocsTab tab="examples">
 
 <ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-3707"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/EmptyState"
 />
 
@@ -22,41 +30,23 @@ line on what goes here, and the one action that fills it.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>Default spacing: an illustration, a header on Heading/medium 20, one line and two actions.</>}>
-    <Canvas of={EmptyStateStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={EmptyStateStories.Overview} title="Illustration" description="An Illustration in the image slot, with a primary and a secondary action." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## With an icon
-
-<DocsCanvasShell description={<>With no <code>image</code>, a Font Awesome Free icon stands in.</>}>
-    <DsCanvasQuiet of={EmptyStateStories.WithIcon} />
-</DocsCanvasShell>
+<ComponentExample of={EmptyStateStories.WithIcon} title="Icon" description="With no image, a Font Awesome Free icon stands in." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Compact
+## Size and layout
 
-<DocsCanvasShell description={<>Compact fits a table body or a card: Heading/small 16 and a smaller picture.</>}>
-    <DsCanvasQuiet of={EmptyStateStories.Compact} />
-</DocsCanvasShell>
+<ComponentExample of={EmptyStateStories.Default} title="Default" description="For a view or panel: the header on Heading/medium 20." />
 
-</div>
+<ComponentExample of={EmptyStateStories.Compact} title="Compact" description="For a table body or a card: Heading/small 16 and a smaller picture." />
 
-<div className="sb-ds-doc-section">
-
-## In a table
-
-<DocsCanvasShell description={<>Pass it to a Table&rsquo;s <code>emptyState</code>. The header row stays and the EmptyState takes the body.</>}>
-    <DsCanvasQuiet of={EmptyStateStories.InATable} />
-</DocsCanvasShell>
+<ComponentExample of={EmptyStateStories.InATable} title="In a table" description="Passed to a Table's emptyState, it takes the body while the header row stays." />
 
 </div>
 
@@ -64,21 +54,13 @@ line on what goes here, and the one action that fills it.
 
 ## State
 
-<DocsCanvasShell description={<>The header and description visible, the icon hidden from assistive technology.</>}>
-    <DsCanvasQuiet of={EmptyStateStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={EmptyStateStories.Rest} title="Rest" description="The header and description visible, the icon hidden from assistive technology." />
 
-<DocsCanvasShell description={<>Not a control, so nothing changes under a pointer.</>}>
-    <DsCanvasQuiet of={EmptyStateStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={EmptyStateStories.Hovered} title="Hovered" description="Not a control, so nothing changes under a pointer." />
 
-<DocsCanvasShell description={<>No pressed layer.</>}>
-    <DsCanvasQuiet of={EmptyStateStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={EmptyStateStories.Pressed} title="Pressed" description="No pressed layer." />
 
-<DocsCanvasShell description={<>Without actions there is nothing to focus; the Buttons carry their own ring.</>}>
-    <DsCanvasQuiet of={EmptyStateStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={EmptyStateStories.Focused} title="Focused" description="Without actions there is nothing to focus; the Buttons carry their own ring." />
 
 </div>
 
@@ -109,8 +91,19 @@ Use `EmptyState` when a view, panel, card or table has no content yet, in place
 of a blank area or a bare "No results". It carries a picture, a header, one line
 and one primary action.
 
-Use `default` for a view or panel and `compact` inside a Table or Card. Use a
-`SectionMessage`, not an `EmptyState`, for a failure.
+Use a `SectionMessage`, not an `EmptyState`, for a failure.
+
+### Spacing guidance
+
+<DocsTable>
+<thead>
+<tr><th>Spacing</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Default</td><td>A whole view or panel. The header is Heading/medium 20.</td></tr>
+<tr><td>Compact</td><td>A table body or a card. The header is Heading/small 16, with a smaller picture.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -131,9 +124,10 @@ Use `default` for a view or panel and `compact` inside a Table or Card. Use a
 </thead>
 <tbody>
 <tr><td>Rest</td><td>Header, description and picture on their text and icon tokens.</td></tr>
-<tr><td>Hovered, pressed</td><td>The message is not a control; its Buttons carry their own states.</td></tr>
+<tr><td>Hovered</td><td>The message is not a control; its Buttons carry their own hovered state.</td></tr>
+<tr><td>Pressed</td><td>The message is not a control; its Buttons carry their own pressed state.</td></tr>
 <tr><td>Focused</td><td>Tab moves through the actions only.</td></tr>
-<tr><td>Compact</td><td><code>spacing="compact"</code> drops to Heading/small with a smaller picture.</td></tr>
+<tr><td>Disabled</td><td>Not supported on the message; disable an action Button instead.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -147,7 +141,8 @@ Use `default` for a view or panel and `compact` inside a Table or Card. Use a
 <tr><td>Header</td><td><code>--heading-medium</code> (default), <code>--heading-small</code> (compact), <code>--ds-text</code></td></tr>
 <tr><td>Description</td><td><code>--body-default</code>, <code>--ds-text-subtle</code></td></tr>
 <tr><td>Icon</td><td><code>--ds-icon-subtle</code></td></tr>
-<tr><td>Spacing</td><td><code>--stack-sm</code>, <code>--inline-md</code>, <code>--section-stack-md</code></td></tr>
+<tr><td>Spacing</td><td><code>--stack-sm</code>, <code>--inline-md</code>, <code>--section-stack-sm</code>, <code>--section-stack-md</code>, <code>--page-stack-sm</code>, <code>--page-stack-md</code>, <code>--page-stack-lg</code></td></tr>
+<tr><td>Width</td><td><code>--section-min-width-main</code></td></tr>
 </tbody>
 </DocsTable>
 
@@ -157,39 +152,49 @@ Use `default` for a view or panel and `compact` inside a Table or Card. Use a
 
 ## Best practices
 
-### Invite; do not apologize.
+### Use default spacing for a whole view.
 
-```jsx
-// Incorrect: apologetic, and no way forward.
-<EmptyState header="Sorry, nothing to show" />
+Compact spacing is for a table body or a card.
 
-// Correct: says what goes here and offers the action.
-<EmptyState
-    header="No students yet"
-    description="Add a student to start planning sessions."
-    primaryAction={<Button text="Add student" appearance="primary" />}
+<DoDontPair
+    doExample={<EmptyState icon="user-group" header="No students yet" description="Add a student to start scheduling sessions." primaryAction={<Button text="Add student" appearance="primary" />} />}
+    doCaption="Default spacing fills a view or panel."
+    dontExample={<EmptyState spacing="compact" icon="user-group" header="No students yet" description="Add a student to start scheduling sessions." primaryAction={<Button text="Add student" appearance="primary" />} />}
+    dontCaption="Compact spacing leaves a full view cramped."
 />
-```
 
-### One primary action.
+### Lead with one filled action.
 
-```jsx
-// Incorrect: two filled buttons compete.
-<EmptyState primaryAction={<Button text="Add" appearance="primary" />} secondaryAction={<Button text="Import" appearance="primary" />} />
+The second action is outlined and never stands alone.
 
-// Correct: the second action is outlined.
-<EmptyState primaryAction={<Button text="Add" appearance="primary" />} secondaryAction={<Button text="Import" />} />
-```
+<DoDontPair
+    doExample={<EmptyState icon="calendar-plus" header="No sessions this week" description="Book a session to fill this view." primaryAction={<Button text="Book a session" appearance="primary" />} />}
+    doCaption="A filled action leads."
+    dontExample={<EmptyState icon="calendar-plus" header="No sessions this week" description="Book a session to fill this view." primaryAction={<Button text="Book a session" />} />}
+    dontCaption="An outlined action with nothing to lead."
+/>
+
+### Invite with the next step.
+
+Say what goes here and what to do, in a warm voice. Never apologize.
+
+<DoDontPair
+    doExample={<EmptyState icon="user-group" header="No students yet" description="Add a student to start scheduling." primaryAction={<Button text="Add student" appearance="primary" />} secondaryAction={<Button text="Import a list" />} />}
+    doCaption="What goes here and what to do."
+    dontExample={<EmptyState icon="user-group" header="No data" description="Nothing to show." primaryAction={<Button text="Add student" appearance="primary" />} secondaryAction={<Button text="Import a list" />} />}
+    dontCaption="A cold label with no way forward."
+/>
 
 ### Fill a Table with it, not around it.
 
-```jsx
-// Incorrect: a bare string.
-<Table headers={headers} rows={[]} emptyState="No students" />
+The Table keeps its header row and the EmptyState takes the body.
 
-// Correct: the header stays and the EmptyState takes the body.
-<Table headers={headers} rows={[]} emptyState={<EmptyState spacing="compact" header="No students yet" />} />
-```
+<DoDontPair
+    doExample={<Table headers={['Student', 'Grade']} rows={[]} emptyState={<EmptyState spacing="compact" icon="user-group" header="No students yet" description="Add a student to see them here." />} />}
+    doCaption="An EmptyState in the Table's emptyState."
+    dontExample={<Table headers={['Student', 'Grade']} rows={[]} emptyState="No students" />}
+    dontCaption="A bare string in the body."
+/>
 
 </div>
 
@@ -221,7 +226,8 @@ Use `default` for a view or panel and `compact` inside a Table or Card. Use a
   words carry the meaning.
 - **Contrast.** Header and description use the text roles, which pass in every
   color mode.
-- **Reflow.** The text wraps inside a 480 wide column, and long words break.
+- **Reflow.** The text wraps inside a column no wider than
+  `--section-min-width-main`.
 
 </div>
 

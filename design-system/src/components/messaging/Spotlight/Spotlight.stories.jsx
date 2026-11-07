@@ -4,12 +4,28 @@ import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expect, waitFor } from 'storybook/test';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import Button from '@/components/forms-and-inputs/Button';
-import Spotlight, { SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components/messaging/Spotlight';
+import Spotlight, { SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components/messaging/Spotlight';
 
 export default {
     title: 'Components/Messaging/Spotlight',
     component: Spotlight,
     tags: ['!dev', '!autodocs'],
+    argTypes: {
+        placement: { control: 'select', options: SPOTLIGHT_PLACEMENTS, table: { category: 'Layout' } },
+        headline: { control: 'text', table: { category: 'Content' } },
+        children: { control: 'text', table: { category: 'Content' } },
+        stepCount: { control: 'text', table: { category: 'Content' } },
+        dismissible: { control: 'boolean', table: { category: 'Behavior' } },
+        target: { table: { disable: true } },
+        media: { table: { disable: true } },
+        primaryAction: { table: { disable: true } },
+        secondaryAction: { table: { disable: true } },
+        onDismiss: { table: { disable: true } },
+        isOpen: { table: { disable: true } },
+        className: { table: { disable: true } },
+        primaryActionText: { control: 'text', table: { disable: true } },
+        secondaryActionText: { control: 'text', table: { disable: true } },
+    },
 };
 
 export const Basic = () => (
@@ -88,6 +104,36 @@ export function Dismissible() {
         </SpotlightProvider>
     );
 }
+
+/* --------------------------------------------------------------- playground */
+
+/**
+ * Interactive playground. The actions are SpotlightAction nodes, which a docs
+ * control cannot author, so their labels are demo-only args.
+ */
+export const Interactive = {
+    args: {
+        placement: 'bottom',
+        headline: 'Playground: create a new board',
+        children: 'Click here whenever you want to start something new.',
+        stepCount: '1 of 3',
+        dismissible: true,
+        primaryActionText: 'Next',
+        secondaryActionText: 'Skip',
+    },
+    render: ({ primaryActionText, secondaryActionText, ...args }) => (
+        <SpotlightProvider>
+            <div style={{ padding: 'var(--space-400)' }}>
+                <SpotlightTarget><Button text="Create" /></SpotlightTarget>
+                <Spotlight
+                    {...args}
+                    primaryAction={<SpotlightAction appearance="primary">{primaryActionText}</SpotlightAction>}
+                    secondaryAction={secondaryActionText ? <SpotlightAction appearance="secondary">{secondaryActionText}</SpotlightAction> : undefined}
+                />
+            </div>
+        </SpotlightProvider>
+    ),
+};
 
 /* ------------------------------------------------------------------- states */
 
