@@ -4,7 +4,9 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { CONTROL_REMOVED, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize } from './eval-ds-usage.mjs';
+import { CONTROL_REMOVED, DENIED_READS, confined, reachedCheckout, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize } from './eval-ds-usage.mjs';
+import { spawnSync } from 'node:child_process';
+
 import { REPO_ROOT } from './lib/corpus.mjs';
 
 test('every task has a brief, and the template and judge exist', () => {
@@ -28,6 +30,7 @@ test('prepare: control loses the harness, current keeps it, both get the task fo
     for (const rel of CONTROL_REMOVED) assert.ok(!fs.existsSync(path.join(control.root, rel)), rel);
     assert.doesNotMatch(fs.readFileSync(path.join(control.root, 'AGENTS.md'), 'utf8'), /## Hard rules/);
     assert.equal(JSON.parse(fs.readFileSync(path.join(control.root, '.claude/settings.json'), 'utf8')).hooks, undefined);
+    assert.equal(JSON.parse(fs.readFileSync(path.join(control.root, 'package.json'), 'utf8')).scripts['check:ds-usage'], undefined);
     assert.ok(fs.existsSync(path.join(control.folder, 'BRIEF.md')));
     assert.ok(fs.existsSync(path.join(control.folder, 'src', 'main.jsx')));
     assert.ok(!fs.existsSync(path.join(control.root, 'docs/evals')));
@@ -65,11 +68,23 @@ test('parseJudge reads the first JSON object, coerces string verdicts, and flags
   assert.equal(parseJudge('no json here').judge_error, true);
 });
 
-test('resultOf: a spawn failure or unparsable output is an error, never a clean run', () => {
+test('resultOf: the result event of the stream; a spawn failure or no result is an error, never a clean run', () => {
   assert.equal(resultOf({ error: new Error('ENOENT'), stdout: null }).is_error, true);
   assert.equal(resultOf({ status: 1, stdout: null, stderr: 'boom' }).is_error, true);
-  assert.equal(resultOf({ status: 0, stdout: 'null' }).is_error, true);
-  assert.equal(resultOf({ status: 0, stdout: '{"num_turns": 3}' }).num_turns, 3);
+  assert.equal(resultOf({ status: 0, stdout: 'null\n{"type":"system"}' }).is_error, true);
+  assert.equal(resultOf({ status: 0, stdout: '{"type":"system"}\n{"type":"result","num_turns":3}\n' }).num_turns, 3);
+});
+
+test('reachedCheckout: a tool call naming the checkout outside node_modules is flagged', () => {
+  const call = (input) => JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', name: 'Bash', input }] } });
+  const stdout = [
+    call({ command: 'ls /r/node_modules/react' }),
+    call({ command: 'cat /r/design-system/node_modules/x/package.json' }),
+    call({ command: 'head /r/AGENTS.md' }),
+  ].join('\n');
+  const hits = reachedCheckout(stdout, '/r');
+  assert.equal(hits.length, 1);
+  assert.match(hits[0], /AGENTS\.md/);
 });
 
 test('options: unknown arms or tasks, bad run counts and missing values stop before any agent starts', () => {
@@ -78,6 +93,23 @@ test('options: unknown arms or tasks, bad run counts and missing values stop bef
   assert.throws(() => options(['--tasks', 'nope']), /unknown nope/);
   assert.throws(() => options(['--runs', 'x']), /whole number/);
   assert.throws(() => options(['--model']), /needs a value/);
+});
+
+test('score agrees with check:ds-usage --json on the same files', () => {
+  const fixture = 'scripts/lib/__fixtures__/ds-usage/escaping';
+  const cli = JSON.parse(spawnSync(process.execPath, ['scripts/check-ds-usage.mjs', fixture, '--json'], { cwd: REPO_ROOT, encoding: 'utf8' }).stdout);
+  const byRule = {};
+  for (const f of cli.blocking) byRule[f.rule] = (byRule[f.rule] ?? 0) + 1;
+  const scored = score({ folder: path.join(REPO_ROOT, fixture), label: 'x' });
+  assert.deepEqual(scored.byRule, byRule);
+  assert.equal(scored.escapes, cli.blocking.length);
+});
+
+test('confined: reads of this checkout\'s harness and worktrees are denied; the sandbox is on', () => {
+  const settings = JSON.parse(confined('/r'));
+  assert.ok(settings.sandbox.enabled);
+  for (const rel of DENIED_READS) assert.ok(settings.permissions.deny.includes(`Read(//r/${rel}/**)`), rel);
+  assert.ok(!settings.permissions.deny.some((rule) => rule.includes('node_modules')));
 });
 
 test('scenariosSha is stable for the same tree', () => {

@@ -25,23 +25,24 @@ Under `scenarios/ds-usage/`, each a `BRIEF.md` (plus `frame.png` for the frame t
   - AGENTS.md is cut to its title and the Identity paragraph: the skills, agents, conventions, loading contract, Hard rules and loading table go, and so do the Identity bullets that route claims to the harness's sources;
   - `design-system/agent-views/`, `design-system/guidelines/` and `design-system/figma/`;
   - `docs/connectors/storybook-mcp.md`, `docs/engineering/coding.md` and `docs/engineering/ds-usage-rules.md`;
+  - the checker itself: `scripts/check-ds-usage.mjs`, `scripts/lib/ds-usage.mjs`, its baseline and its `package.json` script;
   - `skills/`, `.claude/skills/`, `.cursor/` and `.codex/`;
   - the project hooks in `.claude/settings.json` (the uno-prototype gate, whose scripts live in `.cursor/`).
 
   Component source stays: a repo without a harness still has code.
-- **current**: the repo as it is at the commit, project hooks included. The uno-prototype gate passes the eval's build prompt through unchanged (checked 2026-11-07).
+- **current**: the repo as it is on main (`--ref`, default `origin/main`), project hooks included. The uno-prototype gate passes the eval's build prompt through unchanged (checked 2026-11-07).
 - **upgraded** is not an arm of its own: it is `current` run again on a later commit, and the ledger's `harness_commit` tells the two apart.
 
 Both arms also lose `docs/evals/`, so no agent reads the scenarios or the judge.
 
-Each run is a headless `claude -p` on the logged-in subscription (no API key), in a `git archive` copy of the repo outside this checkout, so no parent AGENTS.md or project memory reaches it. User settings and hooks, MCP servers, skills, subagents and web tools are off in both arms. The agent is confined to its copy: edits outside the working directory are refused (`acceptEdits` with no one to approve), and Bash runs in the sandbox, which writes only to the working directory and temp folders (checked 2026-11-07: a `touch` into the checkout failed with "Operation not permitted"). the user's global CLAUDE.md may still reach both arms alike, and it carries no design-system rules. Storybook MCP is unavailable to both, because it needs a running Storybook.
+Each run is a headless `claude -p` on the logged-in subscription (no API key), in a `git archive` copy of the repo outside this checkout, so no parent AGENTS.md or project memory reaches it. User settings and hooks, MCP servers, skills, subagents and web tools are off in both arms. The agent writes only inside its copy: edits outside the working directory are refused (`acceptEdits` with no one to approve), and Bash runs in the sandbox, which writes only to the working directory and temp folders (checked 2026-11-07: a `touch` into the checkout failed with "Operation not permitted"). Reads are held only in part. Permission rules deny the Read, Grep and Glob tools this checkout's harness and worktrees, but a Bash read still succeeds: the copy's `node_modules` link points into the checkout, so an agent that follows it can reach the real harness. So each run's tool calls are recorded (`stream-json`), and a call that names the checkout outside `node_modules` lands in the row's `reached_checkout`; a control run with an entry there saw the harness, and is read as such. the user's global CLAUDE.md may still reach both arms alike, and it carries no design-system rules. Storybook MCP is unavailable to both, because it needs a running Storybook.
 
 Why not subagents: a subagent inherits the parent session's project instructions, and a probe on 2026-11-06 showed plus-uno's AGENTS.md, Hard rules included, in a subagent's context. A control arm run that way would see the rules it is meant to lack.
 
 ## Scoring
 
 1. **Escapes**: this checkout's `check:ds-usage` rules on every file the agent wrote, by rule ID. Fail-level only; warnings are counted beside them.
-2. **Judge**: one read-only `claude -p` with `scenarios/ds-usage/judge.md` decides only what no checker sees: whether the trap task named the gap, and whether a page used the layout formula. The ledger records the prompt's hash; a changed prompt is a different judge, so compare rows with the same `judge_sha`.
+2. **Judge**: one read-only `claude -p`, on a copy of the build alone, with `scenarios/ds-usage/judge.md` decides only what no checker sees: whether the trap task named the gap, and whether a page used the layout formula. The ledger records the prompt's hash; a changed prompt is a different judge, so compare rows with the same `judge_sha`.
 
 ## Run it
 
@@ -49,11 +50,11 @@ Why not subagents: a subagent inherits the parent session's project instructions
 node scripts/eval-ds-usage.mjs run --arms control,current --runs 2 --model sonnet
 ```
 
-`--tasks` narrows the set, `--ref` picks the commit the arms copy, and `--scratch` the folder the throwaway copies go in (removed as each run finishes). A full run is 24 builds and 24 judgements, one at a time, so it takes hours: start it in the background. Each build is copied to `~/Documents/Claude/Projects/PLUS/evals/ds-usage/<run-id>/` with the agent's result JSON.
+`--tasks` narrows the set, `--ref` picks the commit the arms copy (default `origin/main`), and `--scratch` the folder the throwaway copies go in (removed as each run finishes). A full run is 24 builds and 24 judgements, one at a time, so it takes hours: start it in the background. Each build is copied to `~/Documents/Claude/Projects/PLUS/evals/ds-usage/<run-id>/` with the agent's result JSON.
 
 ## Read the ledger
 
-`ds-usage-ledger.jsonl` gains one row per run, losses and agent errors included: date, model, harness commit, `scenarios_sha` (the briefs, template and judge are read from the working tree, so this hash says which ones), arm, task, run, escapes and `by_rule`, judge verdicts and `judge_sha`, tokens, turns, cost and wall time, and where the build was kept.
+`ds-usage-ledger.jsonl` gains one row per run, losses and agent errors included: date, model, harness commit, `scenarios_sha` (the briefs, template and judge are read from the working tree, so this hash says which ones), arm, task, run, escapes and `by_rule`, judge verdicts and `judge_sha`, tokens (input, output, cache read, cache creation), turns, cost and wall time, `reached_checkout`, and where the build was kept.
 
 ```bash
 node scripts/eval-ds-usage.mjs summary --since 2026-11-06

@@ -12,12 +12,12 @@
  *   control  the copy with the harness taken out of reach (CONTROL_REMOVED,
  *            controlAgents, and the project hooks). Component source stays:
  *            a repo without a harness still has code.
- *   current  the copy as it is at the commit, project hooks included.
+ *   current  the copy as it is on main (`--ref`, default origin/main), project hooks included.
  *
  * Everything but the agent and judge calls is deterministic: the copies, the
  * scoring, the ledger rows and the summary.
  *
- *   node scripts/eval-ds-usage.mjs run [--arms control,current] [--tasks a,b] [--runs 2] [--model sonnet] [--ref HEAD] [--scratch DIR]
+ *   node scripts/eval-ds-usage.mjs run [--arms control,current] [--tasks a,b] [--runs 2] [--model sonnet] [--ref origin/main] [--scratch DIR]
  *   node scripts/eval-ds-usage.mjs summary [--since YYYY-MM-DD]
  */
 import { createHash } from 'node:crypto';
@@ -46,6 +46,9 @@ export const CONTROL_REMOVED = [
   'docs/connectors/storybook-mcp.md',
   'docs/engineering/coding.md',
   'docs/engineering/ds-usage-rules.md',
+  'scripts/check-ds-usage.mjs',
+  'scripts/lib/ds-usage.mjs',
+  'scripts/baselines/ds-usage.json',
   'skills',
   '.claude/skills',
   '.cursor',
@@ -127,6 +130,11 @@ export function prepare({ repoRoot = REPO_ROOT, ref, arm, task, into }) {
     for (const rel of CONTROL_REMOVED) fs.rmSync(path.join(into, rel), { recursive: true, force: true });
     const agents = path.join(into, 'AGENTS.md');
     fs.writeFileSync(agents, controlAgents(fs.readFileSync(agents, 'utf8')));
+    // `check:ds-usage` is the harness's definition of an escape; its script is gone.
+    const pkg = path.join(into, 'package.json');
+    const manifest = JSON.parse(fs.readFileSync(pkg, 'utf8'));
+    delete manifest.scripts?.['check:ds-usage'];
+    fs.writeFileSync(pkg, `${JSON.stringify(manifest, null, 2)}\n`);
     // The project hooks are the uno-prototype gate, part of the harness; their
     // scripts went with `.cursor`, so the control arm drops the hooks too.
     const settings = path.join(into, '.claude/settings.json');
@@ -166,33 +174,84 @@ const DISALLOWED = ['Skill', 'Agent', 'Task', 'WebFetch', 'WebSearch'];
  * refused in `acceptEdits` mode with no one to approve them, and Bash runs in
  * the sandbox, which writes only inside the working directory.
  */
-const CONFINED = JSON.stringify({ sandbox: { enabled: true, autoAllowBashIfSandboxed: true, allowUnsandboxedCommands: false } });
+/**
+ * Paths in this checkout an agent could read its way into (the copy's
+ * `node_modules` link points here): the harness, and every worktree under
+ * `.claude/`. Permission rules deny them to the Read, Grep and Glob tools.
+ * A Bash read is not stopped (probed 2026-11-07: `head` on the checkout's
+ * AGENTS.md succeeded under the sandbox), so `reachedCheckout` measures it
+ * from the run's own tool calls instead, and the ledger flags the run.
+ */
+export const DENIED_READS = ['AGENTS.md', 'CLAUDE.md', 'design-system/agent-views', 'design-system/guidelines', 'design-system/figma', 'docs', 'skills', '.claude', '.cursor', '.codex', 'scripts'];
 
-/** The JSON a headless run printed, or an error record when it printed none. */
+export function confined(repoRoot = REPO_ROOT) {
+  const deny = DENIED_READS.flatMap((rel) => {
+    const abs = path.join(repoRoot, rel);
+    return [`Read(/${abs})`, `Read(/${abs}/**)`];
+  });
+  return JSON.stringify({
+    permissions: { deny },
+    sandbox: {
+      enabled: true,
+      autoAllowBashIfSandboxed: true,
+      allowUnsandboxedCommands: false,
+    },
+  });
+}
+
+/** Each JSON line a `stream-json` run printed. */
+const events = (stdout) =>
+  String(stdout ?? '')
+    .split('\n')
+    .map((line) => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    })
+    .filter((e) => e && typeof e === 'object');
+
+/** The run's final result event, or an error record when it printed none. */
 export function resultOf(out) {
   if (out.error) return { is_error: true, result: `spawn failed: ${out.error.message}` };
-  try {
-    const parsed = JSON.parse(out.stdout);
-    if (parsed && typeof parsed === 'object') return parsed;
-  } catch {
-    // fall through
-  }
+  const result = events(out.stdout).findLast((e) => e.type === 'result');
+  if (result) return result;
   return { is_error: true, result: `exit ${out.status}: ${String(out.stderr || out.stdout || '').slice(-2000)}` };
 }
 
-/** One headless agent run in `cwd`; returns its result (tokens, turns, cost) and wall time. */
+/**
+ * The tool calls of a run that name this checkout outside its `node_modules`:
+ * an agent reading past its copy into the real harness. Empty for a clean run.
+ */
+export function reachedCheckout(stdout, repoRoot = REPO_ROOT) {
+  const hits = [];
+  for (const e of events(stdout)) {
+    for (const part of e.type === 'assistant' ? e.message?.content ?? [] : []) {
+      if (part.type !== 'tool_use') continue;
+      const text = JSON.stringify(part.input ?? {});
+      const named = new RegExp(`${repoRoot.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?=[/"\\s']|$)(/[^"\\s']*)?`, 'g');
+      const outside = [...text.matchAll(named)].some(([, rest = '']) => !/^\/(?:design-system\/)?node_modules(?:\/|$)/.test(rest));
+      if (outside) hits.push(`${part.name}: ${text.slice(0, 200)}`);
+    }
+  }
+  return hits;
+}
+
+/** One headless agent run in `cwd`; returns its result (tokens, turns, cost), any reach into the checkout, and wall time. */
 function agent({ cwd, prompt, model, readOnly = false }) {
   const args = [
     '-p',
     prompt,
     '--output-format',
-    'json',
+    'stream-json',
+    '--verbose',
     '--model',
     model,
     '--permission-mode',
     readOnly ? 'default' : 'acceptEdits',
     '--settings',
-    CONFINED,
+    confined(),
     '--setting-sources',
     'project,local',
     '--strict-mcp-config',
@@ -203,13 +262,14 @@ function agent({ cwd, prompt, model, readOnly = false }) {
   ];
   const started = Date.now();
   const out = spawnSync('claude', args, { cwd, encoding: 'utf8', maxBuffer: 1 << 28, timeout: 45 * 60 * 1000 });
-  return { result: resultOf(out), wallMs: Date.now() - started };
+  return { result: resultOf(out), reached: reachedCheckout(out.stdout), wallMs: Date.now() - started };
 }
 
 const usageOf = (r) => ({
   input_tokens: r?.usage?.input_tokens ?? null,
   output_tokens: r?.usage?.output_tokens ?? null,
   cache_read_tokens: r?.usage?.cache_read_input_tokens ?? null,
+  cache_creation_tokens: r?.usage?.cache_creation_input_tokens ?? null,
   turns: r?.num_turns ?? null,
   cost_usd: r?.total_cost_usd ?? null,
 });
@@ -311,7 +371,7 @@ export function options(argv) {
     tasks: list('tasks', TASKS, TASKS),
     runs,
     model: value('model', 'sonnet'),
-    ref: value('ref', 'HEAD'),
+    ref: value('ref', 'origin/main'),
     scratch: value('scratch', os.tmpdir()),
     since: value('since', ''),
   };
@@ -328,9 +388,17 @@ function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch }) {
     const build = agent({ cwd: root, prompt: BUILD_PROMPT(task), model: opts.model });
     const failed = Boolean(build.result.is_error);
     const scored = score({ folder, label: `eval-${task}` });
-    const judged = failed
-      ? { gap_named: null, layout_formula: null, reason: 'build errored; not judged', judge_error: false }
-      : parseJudge(agent({ cwd: folder, prompt: judge.text, model: opts.model, readOnly: true }).result.result);
+    // The judge reads a copy of the build alone, so nothing beside it is in reach.
+    const bench = path.join(copy, '..', `${id}-judge`);
+    let judged = { gap_named: null, layout_formula: null, reason: 'build errored; not judged', judge_error: false };
+    if (!failed) {
+      try {
+        copyDir(folder, bench);
+        judged = parseJudge(agent({ cwd: bench, prompt: judge.text, model: opts.model, readOnly: true }).result.result);
+      } finally {
+        fs.rmSync(bench, { recursive: true, force: true });
+      }
+    }
     const kept = path.join(OUTPUTS, id);
     fs.rmSync(kept, { recursive: true, force: true });
     copyDir(folder, kept);
@@ -351,6 +419,7 @@ function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch }) {
       ...usageOf(build.result),
       wall_ms: build.wallMs,
       agent_error: failed,
+      reached_checkout: build.reached,
       output: kept,
     });
   } finally {
