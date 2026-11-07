@@ -37,7 +37,7 @@ export default {
 const row = { display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' };
 
 /** The inner size each tile size insets its icon or logo to. */
-const INNER = { 16: 10, 20: 12, 24: 14, 32: 16, 40: 20, 48: 24 };
+const INNER = { 16: 12, 20: 12, 24: 16, 32: 16, 40: 24, 48: 24 };
 
 /** A landscape picture, 3:2, so a stretched image would show as a wrong aspect. */
 const LANDSCAPE = 'data:image/svg+xml;utf8,'
@@ -75,7 +75,7 @@ export const Sizes = () => (
 
 /**
  * Every size is square, rounds its corners at a quarter of its size, and scales
- * its icon to the inner size — so a 16 tile holds a 10 icon and a 48 holds a 24.
+ * its icon to the inner size — so a 16 tile holds a 12 icon and a 48 holds a 24.
  */
 Sizes.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);

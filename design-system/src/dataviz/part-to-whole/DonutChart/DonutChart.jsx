@@ -40,7 +40,7 @@ const DonutChart = ({
     };
 
     const getFontWeight = () => {
-        // Title tokens use bold weight, body uses normal
+        // Title steps take the semibold weight, body3 the regular one
         return centerTextSize === 'body3' ? 'var(--type-weight-regular)' : 'var(--type-weight-semibold)';
     };
 

@@ -71,7 +71,7 @@ const OLD_TYPE = new RegExp(
   '(?<![\\w-])--(?:font-size-(?:(?:h[1-6]|body[1-3]|lead|blockquote|code|display[1-4])(?![\\w])|fa-[a-z0-9*])|font-(?:family|weight|line-height|letter-spacing)-[a-z0-9*])' +
     '|(?<![\\w-])(?:body[1-3]|display[1-4]|body-lead|body-blockquote)-txt(?![\\w-])' +
     '|class(?:Name)?=["\'{`][^"\'}`>]*(?<![\\w-])h[1-6](?![\\w-])' +
-    '|(?<![\\w-])\\.h[1-6](?![\\w-])',
+    '|(?<!-)\\.h[1-6](?![\\w-])',
 );
 
 /**

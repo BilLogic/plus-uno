@@ -319,9 +319,9 @@ LeadingIcon.play = async ({ canvasElement }) => {
         await expect(getComputedStyle(icon, '::before').content, `${id} icon is ${SECTION_MESSAGE_ICONS[appearance]}`)
             .toBe(glyphOf(canvasElement, `fa-${SECTION_MESSAGE_ICONS[appearance]}`));
         await expect(getComputedStyle(icon).color, `${id} icon color`).toBe(tokenColor(canvasElement, ICON_TOKEN[appearance]));
-        await expect(px(getComputedStyle(icon).fontSize), `${id} icon size`).toBe(20);
+        await expect(px(getComputedStyle(icon).fontSize), `${id} icon size`).toBe(24);
         const box = icon.getBoundingClientRect();
-        await expect(Math.round(box.width), `${id} icon box is 20 wide, the column's width`).toBe(20);
+        await expect(Math.round(box.width), `${id} icon box is 24 wide, the column's width`).toBe(24);
         await expect(Math.round(box.width), `${id} icon fills its column exactly`)
             .toBe(Math.round(icon.parentElement.getBoundingClientRect().width));
         await expect(icon.closest('[aria-hidden="true"]'), `${id} icon is decorative`).not.toBeNull();
@@ -348,8 +348,8 @@ LeadingIcon.play = async ({ canvasElement }) => {
     const node = leadingIconOf(canvas.getByTestId('icon-node'));
     await expect(getComputedStyle(node, '::before').content).toBe(glyphOf(canvasElement, 'fa-star'));
     await expect(node.closest('[aria-hidden="true"]')).not.toBeNull();
-    await expect(px(getComputedStyle(node).fontSize), 'a passed node is drawn at 20px').toBe(20);
-    await expect(Math.round(node.getBoundingClientRect().width), 'a passed node is a 20-wide box').toBe(20);
+    await expect(px(getComputedStyle(node).fontSize), 'a passed node is drawn at 24px').toBe(24);
+    await expect(Math.round(node.getBoundingClientRect().width), 'a passed node is a 24-wide box').toBe(24);
     await expect(canvas.getByTestId('icon-node').querySelectorAll('i:not(button i)').length, 'the node is the only leading icon').toBe(1);
 
     // `false` removes it: the text starts at the message's padding edge.

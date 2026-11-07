@@ -33,7 +33,7 @@ const DonutChartSVG = ({
         return {
             fontFamily: 'var(--type-family-heading)',
             fontWeight: 'var(--type-weight-semibold)',
-            fontSize: centerTextSize === 'h1' ? 'var(--font-size-200)' : 'var(--font-size-200)',
+            fontSize: 'var(--font-size-200)',
             lineHeight: '1',
             color: 'var(--ds-text)'
         };

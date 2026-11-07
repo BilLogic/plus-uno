@@ -1,5 +1,5 @@
 ---
-summary: Apply these classes to elements for consistent typography
+summary: Text styles, type tokens and the text-style classes
 ---
 
 <!-- Tier: 2 -->
@@ -20,16 +20,14 @@ Component text takes a text style: `font: var(--heading-small)`, `var(--body-def
 
 - **A Jumbotron's title is the page's `h1`**, so a page that has one gives its `Surface` no `title`.
 
-Still on the older layer: the deprecated Badge's `body*-txt` sizes, the `h5` brand mark in `DashboardLayout`, and the `h4` title `createModal` builds. The classes below are that layer, kept until every use moves.
-
 ## Font Families
 
 | Usage | Token | Font |
 |-------|-------|------|
 | Headings 32 to 20 (Heading xxlarge to medium) | `--type-family-heading-serif` | Noto Serif, weight 500 |
-| Headings 16 to 12, metrics (tabular numbers) | `--type-family-heading` (older name `--font-family-header`) | Noto Sans, weight 600 |
-| Body text | `--type-family-body` (older name `--font-family-body`) | Noto Sans, weight 400 and 500 |
-| Code | `--type-family-code` (older name `--font-family-code`) | Noto Sans Mono |
+| Headings 16 to 12, metrics (tabular numbers) | `--type-family-heading` | Noto Sans, weight 600 |
+| Body text | `--type-family-body` | Noto Sans, weight 400 and 500 |
+| Code | `--type-family-code` | Noto Sans Mono |
 | Brand headings and body | `--type-family-brand-heading`, `--type-family-brand-body` | Noto Serif, Noto Sans |
 
 Letter spacing is `-0.02em` at 32 and `-0.01em` at 28 and 24, set beside the
@@ -41,70 +39,29 @@ system. Tuning notes: Foundations/Typography in Storybook.
 
 | Token | Value | Usage |
 |-------|-------|-------|
-| `--font-weight-normal` | 400 | Regular body text |
-| `--font-weight-semibold-1` | 500 | Medium text, badges |
-| `--font-weight-semibold-2` | 600 | Small titles (H6) and Noto Sans headings 16 and under |
-| `--font-weight-bold` | 700 | Emphasis inside body text (`.font-weight-bold`) |
-| `--font-weight-headline`, `--font-weight-title` | 500 | Noto Serif headings (H1-H5) |
+| `--type-weight-regular` | 400 | Body text |
+| `--type-weight-medium` | 500 | Labels, emphasis, Noto Serif headings 20 and up |
+| `--type-weight-semibold` | 600 | Noto Sans headings 16 and under, metrics |
 
-## Typography Classes
+## Text-style classes
 
-Apply these classes to elements for consistent typography:
-
-### Headlines
-| Class | Size | Weight | Usage |
-|-------|------|--------|-------|
-| `.h1` | 40px | 500, Noto Serif | Major headings |
-| `.h2` | 32px | 500, Noto Serif | Section headings |
-| `.h3` | 28px | 500, Noto Serif | Subsection headings |
-| `.h4` | 24px | 500, Noto Serif | Legacy titles; a card title is Heading/xsmall 14 |
-| `.h5` | 20px | 500, Noto Serif | List titles |
-| `.h6` | 16px | 600, Noto Sans | Small titles |
-
-### Body Text
-| Class | Size | Weight | Usage |
-|-------|------|--------|-------|
-| `.body1-txt` | 16px | 400 | Standard body text |
-| `.body2-txt` | 14px | 400 | Secondary text |
-| `.body3-txt` | 12px | 400 | Captions, small text |
-
-### Weight Modifiers
-| Class | Effect |
-|-------|--------|
-| `.font-weight-semibold` | Applies weight 400 |
-| `.font-weight-bold` | Applies weight 700 |
-
-## Component Typography
-
-Components automatically apply appropriate typography based on size prop:
+Markup with no stylesheet of its own takes the text style as a class, one per
+style, generated beside the type tokens: `.heading-xxlarge` … `.heading-xxsmall`,
+`.body-large`, `.body-default`, `.body-small`, and `.metric-large` …
+`.metric-small`. Each sets the `font` shorthand, and the tracked headings their
+letter spacing. A component's own stylesheet sets `font: var(--…)` instead.
 
 ```jsx
-// Headlines use Noto Sans
-<Badge size="h1">Large Badge</Badge>
-
-// Body sizes use Noto Sans medium
-<Badge size="b2">Default Badge</Badge>
-```
-
-## Usage Examples
-
-```jsx
-// Direct class usage
-<p className="body1-txt">Standard paragraph text</p>
-<h2 className="h2">Section Heading</h2>
-
-// Component with size prop
-<Button appearance="primary">Medium Button</Button>  // Uses h6 typography
-<Button appearance="primary" spacing="compact">Small Button</Button>    // Uses body3-txt
+<p className="body-default">Helper text</p>
+<h2 className="heading-medium">Section title</h2>
 ```
 
 ## Rules
 
-1. **Do not hardcode font values** - Always use typography tokens or classes
-2. **Match size to hierarchy** - Use h1-h6 for structural headings, b1-b3 for content
-3. **Body text is regular (400)** - labels and emphasis use medium (500)
-4. **Headings 20 and up are Noto Serif at 500** - `.h1`-`.h5`, `--font-family-headline` and `--font-family-title`; `.h6` and below are Noto Sans at 600
-
+1. **Do not hardcode font values.** Use a text style, a type token, or an icon size.
+2. **Match the style to the hierarchy**, not to the size you want: Heading by nesting level, Body for content, Metric for numbers that are the point.
+3. **Body text is regular (400)**; labels and emphasis use medium (500).
+4. **Headings 20 and up are Noto Serif at 500**; 16 and under are Noto Sans at 600.
 
 ## Figma text styles
 
