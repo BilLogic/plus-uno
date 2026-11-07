@@ -9,7 +9,7 @@ The steps of a journey, each done, current or upcoming. Every item renders as a 
 
 **Source:** `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.jsx`
 
-**Stories:** `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.stories.jsx` — Default, Vertical, Spacing, Clickable, Completed, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.stories.jsx` — Default, Interactive, Vertical, Spacing, Clickable, Completed, Rest, Hovered, Pressed, Focused, Disabled
 
 **Storybook page:** `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.mdx`
 
@@ -42,6 +42,4 @@ From `design-system/src/components/status-indicators/ProgressTracker/ProgressTra
 
 Same group: `ProgressIndicator`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
