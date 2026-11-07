@@ -39,15 +39,15 @@
         .tutor-admin-sidebar {
             width: 280px;
             background-color: var(--ds-surface-container);
-            border-right: var(--size-surface-border) solid var(--ds-border-bold);
-            padding: var(--size-surface-container-pad-y) var(--size-surface-container-pad-x);
+            border-right: var(--border-default) solid var(--ds-border-bold);
+            padding: var(--section-pad-y-default) var(--section-pad-x-default);
             display: flex;
             flex-direction: column;
-            gap: var(--size-surface-container-gap-md);
+            gap: var(--section-stack-md);
         }
         
         .sidebar-logo {
-            margin-bottom: var(--size-section-gap-md);
+            margin-bottom: var(--section-stack-md);
         }
         
         .sidebar-logo-text {
@@ -58,7 +58,7 @@
         }
         
         .sidebar-section {
-            margin-bottom: var(--size-section-gap-md);
+            margin-bottom: var(--section-stack-md);
         }
         
         .sidebar-section-title {
@@ -84,23 +84,23 @@
         .tutor-admin-header {
             background-color: var(--ds-surface-container);
             border-bottom: var(--border-default) solid var(--ds-border);
-            padding: var(--size-surface-container-pad-y) var(--size-surface-pad-x);
+            padding: var(--section-pad-y-default) var(--page-pad-x-default);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: var(--space-0625);
+            gap: var(--inline-lg);
         }
         
         .header-left {
             display: flex;
             align-items: center;
-            gap: var(--space-0625);
+            gap: var(--inline-lg);
         }
         
         .header-right {
             display: flex;
             align-items: center;
-            gap: var(--space-0625);
+            gap: var(--inline-lg);
         }
         
         .user-info {
@@ -125,7 +125,7 @@
         /* Content Area */
         .tutor-admin-content {
             flex: 1;
-            padding: var(--size-surface-pad-y) var(--size-surface-pad-x);
+            padding: var(--page-pad-y-default) var(--page-pad-x-default);
             overflow-y: auto;
         }
         
@@ -133,7 +133,7 @@
         .tutor-tabs {
             display: flex;
             gap: var(--stack-md);
-            margin-bottom: var(--size-section-gap-md);
+            margin-bottom: var(--section-stack-md);
             border-bottom: var(--border-default) solid var(--ds-border);
         }
         
@@ -165,16 +165,16 @@
         /* Action Buttons */
         .action-buttons {
             display: flex;
-            gap: var(--space-0625);
-            margin-bottom: var(--size-section-gap-md);
+            gap: var(--inline-lg);
+            margin-bottom: var(--section-stack-md);
             flex-wrap: wrap;
         }
         
         /* Table */
         .tutor-table-container {
             background-color: var(--ds-surface-container);
-            border-radius: var(--size-card-radius-sm);
-            border: var(--size-card-border-sm) solid var(--ds-border);
+            border-radius: var(--card-radius-sm);
+            border: var(--border-default) solid var(--ds-border);
             overflow: hidden;
         }
         
@@ -188,7 +188,7 @@
         }
         
         .tutor-table th {
-            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
             text-align: left;
             font-family: var(--font-family-header);
             font-weight: var(--font-weight-semibold-2);
@@ -210,7 +210,7 @@
         }
         
         .tutor-table td {
-            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
             border-bottom: var(--border-default) solid var(--ds-border);
             font-size: var(--font-size-body1);
             color: var(--ds-text);
@@ -237,7 +237,7 @@
         
         .tutor-actions {
             display: flex;
-            gap: var(--space-0625);
+            gap: var(--inline-lg);
         }
         
         .tutor-action-link {
@@ -255,7 +255,7 @@
         .tutor-admin-footer {
             background-color: var(--ds-surface-container);
             border-top: var(--border-default) solid var(--ds-border);
-            padding: var(--size-section-pad-y-sm) var(--size-surface-pad-x);
+            padding: var(--section-pad-y-compact) var(--page-pad-x-default);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -269,7 +269,7 @@
             border: none;
             color: var(--ds-text);
             cursor: pointer;
-            padding: var(--space-025) var(--pad-x-sm);
+            padding: var(--pad-y-md) var(--pad-x-sm);
             display: flex;
             align-items: center;
             justify-content: center;

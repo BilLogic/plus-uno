@@ -12,7 +12,7 @@ export const PAGE_LEVELS = ['sunken', 'default', 'raised', 'overlay'];
  * The default page's edge, as the `surface-edge` mixin in
  * `styles/_surface-edge.scss` draws it. For the stories that measure it.
  */
-export const PAGE_EDGE = '0 0 0 var(--size-surface-border) var(--ds-border-surface)';
+export const PAGE_EDGE = '0 0 0 var(--page-border-width) var(--ds-border-surface)';
 
 /**
  * Page pattern for PLUS design system.

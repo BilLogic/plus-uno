@@ -80,10 +80,10 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Pad', new: '--pad-x-xs', old: '--element-pad-x-xs', ref: 'var(--space-025)' },
   { tier: 'semantics', group: 'Pad', new: '--pad-x-sm', old: '--element-pad-x-sm', ref: 'var(--space-050)' },
   { tier: 'semantics', group: 'Pad', new: '--pad-x-md', old: '--element-pad-x-md', ref: 'var(--space-075)' },
-  { tier: 'semantics', group: 'Pad', new: '--pad-x-lg', old: null, value: '--space-100', note: 'new step; matches the old --size-element-pad-x-lg (16px)' },
+  { tier: 'semantics', group: 'Pad', new: '--pad-x-lg', old: null, value: '--space-100', note: 'new step, 16px' },
   { tier: 'semantics', group: 'Pad', new: '--pad-y-sm', old: '--element-pad-y-sm', ref: 'var(--space-0125)' },
   { tier: 'semantics', group: 'Pad', new: '--pad-y-md', old: '--element-pad-y-md', ref: 'var(--space-0375)' },
-  { tier: 'semantics', group: 'Pad', new: '--pad-y-lg', old: null, value: '--space-050', note: 'new step; matches the old --size-element-pad-y-lg (8px)' },
+  { tier: 'semantics', group: 'Pad', new: '--pad-y-lg', old: null, value: '--space-050', note: 'new step, 8px' },
 
   // ─── Semantics / Stack ────────────────────────────────────────────────
   { tier: 'semantics', group: 'Stack', new: '--stack-sm', old: '--element-stack-sm', ref: 'var(--space-025)' },
@@ -110,8 +110,8 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Border', new: '--border-focused', old: '--border-focused' },
 
   // ─── Semantics / Focus (net new) ──────────────────────────────────────
-  { tier: 'semantics', group: 'Focus', new: '--focus-ring-width', old: '--size-element-stroke-lg', ref: 'var(--size-border-stroke-stroke-200)', note: 'matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive' },
-  { tier: 'semantics', group: 'Focus', new: '--focus-ring-offset', old: '--size-element-stroke-lg', ref: 'var(--size-border-stroke-stroke-200)', note: 'defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both' },
+  { tier: 'semantics', group: 'Focus', new: '--focus-ring-width', old: '--size-element-stroke-lg', ref: 'var(--stroke-2)', note: 'matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive' },
+  { tier: 'semantics', group: 'Focus', new: '--focus-ring-offset', old: '--size-element-stroke-lg', ref: 'var(--stroke-2)', note: 'defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both' },
   { tier: 'semantics', group: 'Focus', new: '--focus-ring-radius', old: null, value: '--radius-sm', note: 'first pass, no existing source; a family PR refines it' },
 
   // ─── Semantics / Grid (dissolved from spacing / layout) ──────────────
@@ -254,6 +254,10 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Modal', new: '--modal-width-sm', old: '--layout-width-modal-sm', ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, note: 'lifted out of spacing / layout, beside the pattern’s pad/stack tokens' },
   { tier: 'patterns', group: 'Modal', new: '--modal-width-md', old: '--layout-width-modal-md', ref: '507px', at: { '(min-width: 1024px)': '677px', '(min-width: 1440px)': '848px' } },
   { tier: 'patterns', group: 'Modal', new: '--modal-width-lg', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' } },
+  { tier: 'patterns', group: 'Page', new: '--page-radius-md', old: null, ref: 'var(--radius-075)' },
+  { tier: 'patterns', group: 'Page', new: '--page-border-width', old: null, ref: 'var(--stroke-2)' },
+  { tier: 'patterns', group: 'Table', new: '--table-overflow-reach', old: null, ref: 'var(--space-150)' },
+  { tier: 'patterns', group: 'Modal', new: '--modal-body-min-height', old: null, ref: 'var(--space-500)' },
 
   // ─── Patterns / Popover ───────────────────────────────────────────────
   { tier: 'patterns', group: 'Popover', new: '--popover-pad', old: '--popover-pad' },
@@ -341,6 +345,52 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Join row', new: '--join-row-width', old: '--layout-width-join-row', ref: '520px' },
   { tier: 'components', group: 'Option menu', new: '--option-menu-width', old: '--layout-width-option-menu', ref: '240px' },
 
+  // ─── Components / sizes once written with primitives ─────────────────
+  { tier: 'components', group: 'Button', new: '--button-vertical-size', old: null, ref: 'var(--space-400)' },
+  { tier: 'components', group: 'Option row', new: '--option-row-indent-step', old: null, ref: 'var(--space-125)' },
+  { tier: 'components', group: 'Option row', new: '--option-row-control-gap', old: null, ref: 'var(--space-0625)' },
+  { tier: 'components', group: 'Option row', new: '--option-row-dot-size', old: null, ref: 'var(--space-050)' },
+  { tier: 'components', group: 'Count tag', new: '--count-tag-dot-size', old: null, ref: 'var(--space-050)' },
+  { tier: 'components', group: 'Tag', new: '--tag-dot-size', old: null, ref: 'var(--space-0625)' },
+  { tier: 'components', group: 'Tag', new: '--tag-pad-end-compact', old: null, ref: 'var(--space-0125)' },
+  { tier: 'components', group: 'Tag', new: '--tag-gap-compact', old: null, ref: 'var(--space-0125)' },
+  { tier: 'components', group: 'Tag', new: '--tag-pad-end', old: null, ref: 'var(--space-0375)' },
+  { tier: 'components', group: 'Tag', new: '--tag-gap', old: null, ref: 'var(--space-0375)' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-control-offset', old: null, ref: 'var(--space-0625)' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-control-pad', old: null, ref: 'var(--space-100)' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-control-size', old: null, ref: 'var(--space-300)' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-slide-min-height-compact', old: null, ref: 'var(--size-1000)' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-slide-min-height', old: null, ref: 'var(--size-1400)' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-slide-min-height-spacious', old: null, ref: 'var(--size-2500)' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-indicator-width-compact', old: null, ref: 'var(--size-300)' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-indicator-width', old: null, ref: 'var(--size-750)' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-indicator-height-compact', old: null, ref: 'var(--space-025)' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-indicator-height', old: null, ref: 'var(--space-0375)' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-indicator-height-spacious', old: null, ref: 'var(--space-050)' },
+  { tier: 'components', group: 'Scroll bar', new: '--scroll-bar-size', old: null, ref: 'var(--space-0375)' },
+  { tier: 'components', group: 'Scroll bar', new: '--scroll-bar-max-height', old: null, ref: 'calc(var(--size-1000) * 2)' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-height', old: null, ref: 'var(--space-400)' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-circle-size', old: null, ref: 'var(--space-200)' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-text-height', old: null, ref: 'var(--space-100)' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-status-width', old: null, ref: 'var(--space-400)' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-status-width-spacious', old: null, ref: 'calc(var(--space-500) + var(--space-050))' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-tag-width', old: null, ref: 'calc(var(--space-400) + var(--space-050))' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-tag-width-person', old: null, ref: 'var(--space-500)' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-tag-width-narrow', old: null, ref: 'calc(var(--space-250) + var(--space-100))' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-tag-width-widest', old: null, ref: 'calc(var(--space-500) + var(--space-050))' },
+  { tier: 'components', group: 'Flag', new: '--flag-min-height', old: null, ref: 'calc(var(--size-1000) + var(--size-750))' },
+  { tier: 'components', group: 'Flag', new: '--flag-pad', old: null, ref: 'var(--space-125)' },
+  { tier: 'components', group: 'Flag', new: '--flag-offset', old: null, ref: 'var(--space-125)' },
+  { tier: 'components', group: 'Spotlight', new: '--spotlight-media-height', old: null, ref: 'calc(var(--size-750) + var(--space-150))' },
+  { tier: 'components', group: 'Menu group', new: '--menu-group-min-width', old: null, ref: 'var(--size-1400)' },
+  { tier: 'components', group: 'Menu group', new: '--menu-group-pad-x', old: null, ref: 'var(--space-150)' },
+  { tier: 'components', group: 'Menu group', new: '--menu-group-gap', old: null, ref: 'var(--space-100)' },
+  { tier: 'components', group: 'Menu group', new: '--menu-group-item-pad-y', old: null, ref: 'var(--space-0625)' },
+  { tier: 'components', group: 'Popup', new: '--popup-pad', old: null, ref: 'var(--space-125)' },
+  { tier: 'components', group: 'Table', new: '--table-cell-max-width', old: null, ref: 'var(--size-300)' },
+  { tier: 'components', group: 'Avatar', new: '--avatar-size-96', old: null, ref: 'calc(var(--space-300) * 2)' },
+  { tier: 'components', group: 'Avatar', new: '--avatar-size-128', old: null, ref: 'calc(var(--space-400) * 2)' },
+
   // ─── Components / Tile (reclassified, unchanged names) ───────────────
   { tier: 'components', group: 'Tile', new: '--tile-radius-sm', old: '--tile-radius-sm' },
   { tier: 'components', group: 'Tile', new: '--tile-radius-lg', old: '--tile-radius-lg' },
@@ -348,10 +398,10 @@ export const TOKEN_LADDER = [
   // ─── Components / Spinner, Progress bar (Bill 2026-11-04: one component
   // each, so they move out of SIZE_ROLES in generate-all-tokens.js straight to
   // this tier, not through Semantics' size roles) ───────────────────────
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-sm', old: null, value: '--space-100', note: 'matches the old --size-spinner-sm (16px)' },
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-md', old: null, value: '--space-150', note: 'matches the old --size-spinner-md (24px)' },
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-lg', old: null, value: '--space-300', note: 'matches the old --size-spinner-lg (48px)' },
-  { tier: 'components', group: 'Progress bar', new: '--progress-bar-height', old: null, value: '--space-050', note: 'matches the old --size-progressbar-height (8px)' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-sm', old: null, value: '--space-100' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-md', old: null, value: '--space-150' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-lg', old: null, value: '--space-300' },
+  { tier: 'components', group: 'Progress bar', new: '--progress-bar-height', old: null, value: '--space-050' },
 
   // ─── Layers (own non-spacing family, code only) ───────────────────────
   { tier: 'layers', group: 'Layer', new: '--layer-card', old: '--layout-z-index-card', ref: '100' },
@@ -419,5 +469,5 @@ export function retiredRenames() {
   return map;
 }
 
-/** Every retired name. The generators drop them and `check:old-size-tokens` holds their uses at zero. */
+/** Every retired name. The generators drop them and `check:old-system` bans their uses. */
 export const RETIRED_TOKENS = new Set(retiredRenames().keys());

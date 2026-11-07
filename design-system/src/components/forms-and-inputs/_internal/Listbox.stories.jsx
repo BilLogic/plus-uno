@@ -33,7 +33,7 @@ export default {
 };
 
 const SUBJECTS = ['Algebra', 'Biology', 'Chemistry', 'Economics', 'Geometry', 'History', 'Physics'];
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)', maxWidth: '360px' };
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' };
 
 /**
  * A field with its list: focus stays in the input, which points at the

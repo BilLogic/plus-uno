@@ -4,7 +4,7 @@
     display: flex;
     flex-direction: column;
     overflow: auto;
-    min-width: var(--size-spacing-xlarge-space-2500);
+    min-width: var(--menu-group-min-width);
     padding: var(--pad-y-lg) 0;
 
     &--compact .plus-menu-item {
@@ -25,16 +25,16 @@
     font: var(--heading-xxsmall);
     color: var(--ds-text-subtlest);
     text-transform: uppercase;
-    padding: var(--stack-lg) var(--size-spacing-medium-space-500) var(--stack-sm);
+    padding: var(--stack-lg) var(--menu-group-pad-x) var(--stack-sm);
 }
 
 .plus-menu-item {
     display: flex;
     align-items: center;
     width: 100%;
-    gap: var(--size-spacing-medium-space-300);
+    gap: var(--menu-group-gap);
     // 20px of body-default line-height + 10px top and bottom = a 40px row.
-    padding: var(--size-spacing-small-space-150) var(--size-spacing-medium-space-500);
+    padding: var(--menu-group-item-pad-y) var(--menu-group-pad-x);
     border: none;
     background: none;
     border-radius: var(--radius-lg);

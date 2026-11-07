@@ -29,7 +29,7 @@
         
         /* Page Container */
         .table-example-container {
-            padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg);
+            padding: var(--section-pad-y-spacious) var(--section-pad-x-spacious);
             background-color: var(--ds-surface);
             min-height: 100vh;
         }
@@ -40,7 +40,7 @@
             border-collapse: separate;
             border-spacing: 0;
             background-color: var(--ds-surface-container);
-            border-radius: var(--size-table-radius-md);
+            border-radius: var(--table-radius);
             overflow: hidden;
             border: 1px solid var(--ds-border);
         }
@@ -50,7 +50,7 @@
         }
 
         .plus-table th {
-            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
             text-align: left;
             font-family: var(--font-family-header);
             font-weight: var(--font-weight-semibold-2);
@@ -65,7 +65,7 @@
         }
 
         .plus-table td {
-            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
             font-family: var(--font-family-body);
             font-weight: var(--font-weight-normal);
             font-size: var(--font-size-body2);
@@ -103,8 +103,8 @@
         /* Table Container */
         .table-wrapper {
             background-color: var(--ds-surface-container);
-            border-radius: var(--size-card-radius-md);
-            padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+            border-radius: var(--card-radius);
+            padding: var(--card-pad-default) var(--card-pad-default);
             box-shadow: var(--ds-shadow-raised);
         }
     </style>
@@ -218,22 +218,22 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td><code>--size-table-cell-x</code></td>
+                                <td><code>--table-pad-x-cell</code></td>
                                 <td>10px</td>
                                 <td>Horizontal cell padding</td>
                             </tr>
                             <tr>
-                                <td><code>--size-table-cell-y</code></td>
+                                <td><code>--table-pad-y-cell</code></td>
                                 <td>8px</td>
                                 <td>Vertical cell padding</td>
                             </tr>
                             <tr>
-                                <td><code>--size-table-cell-gap</code></td>
+                                <td><code>--stack-md</code></td>
                                 <td>10px</td>
                                 <td>Gap between cells</td>
                             </tr>
                             <tr>
-                                <td><code>--size-table-radius-md</code></td>
+                                <td><code>--table-radius</code></td>
                                 <td>8px</td>
                                 <td>Table border radius</td>
                             </tr>

@@ -59,3 +59,18 @@ test('the old elevation and surface roles fail outside specs/; the --ds- surface
   assert.deepEqual(findings(src('prototypes/x/x.scss', '.a { background: var(--ds-surface-raised); box-shadow: var(--ds-shadow-raised); }')), []);
   assert.deepEqual(findings(src('design-system/src/specs/x.scss', css)), []);
 });
+
+test('the old size and spacing names fail outside specs/, the retired ladder names too; the current ones pass', () => {
+  const old = (name) => `--${name}`;
+  const css = [
+    `.a { gap: var(${old('size-card-gap-md')}); padding: var(${old('size-spacing-medium-space-300')}); }`,
+    `.b { width: var(${old('layout-width-sidebar')}); }`,
+    `/* the ${old('size-media-*')} steps */`,
+  ].join('\n');
+  const found = findings(src('design-system/src/components/A/A.scss', css));
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /3 x size/);
+  const current = '.a { gap: var(--card-stack-md); padding: var(--space-100); width: var(--size-300); border-radius: var(--radius-075); height: var(--icon-md); }';
+  assert.deepEqual(findings(src('design-system/src/components/A/A.scss', current)), []);
+  assert.deepEqual(findings(src('design-system/src/specs/A.scss', css)), []);
+});

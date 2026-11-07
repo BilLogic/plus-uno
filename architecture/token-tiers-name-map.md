@@ -24,10 +24,10 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Pad | `--element-pad-x-xs` | `--pad-x-xs` |  |
 | Pad | `--element-pad-x-sm` | `--pad-x-sm` |  |
 | Pad | `--element-pad-x-md` | `--pad-x-md` |  |
-| Pad | *(new)* | `--pad-x-lg` | new step; matches the old --size-element-pad-x-lg (16px) |
+| Pad | *(new)* | `--pad-x-lg` | new step, 16px |
 | Pad | `--element-pad-y-sm` | `--pad-y-sm` |  |
 | Pad | `--element-pad-y-md` | `--pad-y-md` |  |
-| Pad | *(new)* | `--pad-y-lg` | new step; matches the old --size-element-pad-y-lg (8px) |
+| Pad | *(new)* | `--pad-y-lg` | new step, 8px |
 | Stack | `--element-stack-sm` | `--stack-sm` |  |
 | Stack | `--element-stack-md` | `--stack-md` |  |
 | Stack | `--element-stack-lg` | `--stack-lg` |  |
@@ -169,6 +169,10 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Modal | `--layout-width-modal-sm` | `--modal-width-sm` | lifted out of spacing / layout, beside the pattern’s pad/stack tokens |
 | Modal | `--layout-width-modal-md` | `--modal-width-md` |  |
 | Modal | `--layout-width-modal-lg` | `--modal-width-lg` |  |
+| Page | *(new)* | `--page-radius-md` |  |
+| Page | *(new)* | `--page-border-width` |  |
+| Table | *(new)* | `--table-overflow-reach` |  |
+| Modal | *(new)* | `--modal-body-min-height` |  |
 | Popover | `--popover-pad` | `--popover-pad` (reclassified, unchanged) |  |
 | Popover | `--popover-width-sm` | `--popover-width-sm` (reclassified, unchanged) |  |
 | Popover | `--popover-width-md` | `--popover-width-md` (reclassified, unchanged) |  |
@@ -240,12 +244,56 @@ Scope calls recorded in `plan.mjs`'s own header comment, repeated here:
 | Listbox | `--layout-max-height-listbox` | `--listbox-max-height` |  |
 | Join row | `--layout-width-join-row` | `--join-row-width` |  |
 | Option menu | `--layout-width-option-menu` | `--option-menu-width` |  |
+| Button | *(new)* | `--button-vertical-size` |  |
+| Option row | *(new)* | `--option-row-indent-step` |  |
+| Option row | *(new)* | `--option-row-control-gap` |  |
+| Option row | *(new)* | `--option-row-dot-size` |  |
+| Count tag | *(new)* | `--count-tag-dot-size` |  |
+| Tag | *(new)* | `--tag-dot-size` |  |
+| Tag | *(new)* | `--tag-pad-end-compact` |  |
+| Tag | *(new)* | `--tag-gap-compact` |  |
+| Tag | *(new)* | `--tag-pad-end` |  |
+| Tag | *(new)* | `--tag-gap` |  |
+| Carousel | *(new)* | `--carousel-control-offset` |  |
+| Carousel | *(new)* | `--carousel-control-pad` |  |
+| Carousel | *(new)* | `--carousel-control-size` |  |
+| Carousel | *(new)* | `--carousel-slide-min-height-compact` |  |
+| Carousel | *(new)* | `--carousel-slide-min-height` |  |
+| Carousel | *(new)* | `--carousel-slide-min-height-spacious` |  |
+| Carousel | *(new)* | `--carousel-indicator-width-compact` |  |
+| Carousel | *(new)* | `--carousel-indicator-width` |  |
+| Carousel | *(new)* | `--carousel-indicator-height-compact` |  |
+| Carousel | *(new)* | `--carousel-indicator-height` |  |
+| Carousel | *(new)* | `--carousel-indicator-height-spacious` |  |
+| Scroll bar | *(new)* | `--scroll-bar-size` |  |
+| Scroll bar | *(new)* | `--scroll-bar-max-height` |  |
+| Skeleton | *(new)* | `--skeleton-height` |  |
+| Skeleton | *(new)* | `--skeleton-circle-size` |  |
+| Skeleton | *(new)* | `--skeleton-text-height` |  |
+| Skeleton | *(new)* | `--skeleton-status-width` |  |
+| Skeleton | *(new)* | `--skeleton-status-width-spacious` |  |
+| Skeleton | *(new)* | `--skeleton-tag-width` |  |
+| Skeleton | *(new)* | `--skeleton-tag-width-person` |  |
+| Skeleton | *(new)* | `--skeleton-tag-width-narrow` |  |
+| Skeleton | *(new)* | `--skeleton-tag-width-widest` |  |
+| Flag | *(new)* | `--flag-min-height` |  |
+| Flag | *(new)* | `--flag-pad` |  |
+| Flag | *(new)* | `--flag-offset` |  |
+| Spotlight | *(new)* | `--spotlight-media-height` |  |
+| Menu group | *(new)* | `--menu-group-min-width` |  |
+| Menu group | *(new)* | `--menu-group-pad-x` |  |
+| Menu group | *(new)* | `--menu-group-gap` |  |
+| Menu group | *(new)* | `--menu-group-item-pad-y` |  |
+| Popup | *(new)* | `--popup-pad` |  |
+| Table | *(new)* | `--table-cell-max-width` |  |
+| Avatar | *(new)* | `--avatar-size-96` |  |
+| Avatar | *(new)* | `--avatar-size-128` |  |
 | Tile | `--tile-radius-sm` | `--tile-radius-sm` (reclassified, unchanged) |  |
 | Tile | `--tile-radius-lg` | `--tile-radius-lg` (reclassified, unchanged) |  |
-| Spinner | *(new)* | `--spinner-size-sm` | matches the old --size-spinner-sm (16px) |
-| Spinner | *(new)* | `--spinner-size-md` | matches the old --size-spinner-md (24px) |
-| Spinner | *(new)* | `--spinner-size-lg` | matches the old --size-spinner-lg (48px) |
-| Progress bar | *(new)* | `--progress-bar-height` | matches the old --size-progressbar-height (8px) |
+| Spinner | *(new)* | `--spinner-size-sm` |  |
+| Spinner | *(new)* | `--spinner-size-md` |  |
+| Spinner | *(new)* | `--spinner-size-lg` |  |
+| Progress bar | *(new)* | `--progress-bar-height` |  |
 
 ## Layers
 

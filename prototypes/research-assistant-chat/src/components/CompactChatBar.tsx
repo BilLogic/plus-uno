@@ -163,7 +163,7 @@ export function CompactChatBar({
                         border:
                           '1px solid var(--ds-border)',
                         borderRadius:
-                          'var(--size-border-radius-radius-300, 12px)',
+                          'var(--radius-075)',
                         cursor: 'pointer',
                         textAlign: 'left',
                         fontFamily: 'var(--font-family-body)',
@@ -223,7 +223,7 @@ export function CompactChatBar({
                 height: FAB_SIZE,
                 background: 'var(--ds-surface)',
                 border: '1px solid var(--ds-border)',
-                borderRadius: 'var(--size-border-radius-radius-300, 12px)',
+                borderRadius: 'var(--radius-075)',
                 cursor: 'text',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.08)',
                 overflow: 'hidden',

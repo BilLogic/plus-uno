@@ -27,7 +27,7 @@ One plan (`scripts/lib/tokens/plan.mjs`'s `TOKEN_LADDER`, ADR-038), most general
 
 **Fallback rule.** Reach for a component token first; if none fits, the pattern collection; failing that, semantics. The test for "is this a pattern token": would the value change if the pattern changed? If yes, it belongs to the pattern (or component); if the value is just a shared step nothing specific owns, it is semantics.
 
-**Retired names.** `--size-element-*`, `--element-*`, the `--layout-*` and `--overlay-*` names the ladder replaced, and the rest of `RETIRED_TOKENS` in `scripts/lib/tokens/plan.mjs` are gone; `architecture/token-tiers-name-map.md` lists each beside its replacement, and `npm run check:old-size-tokens` holds their uses at zero. The older `--size-card-*`, `--size-section-*`, `--size-modal-*`, `--size-surface-*` and `--size-table-*` names still resolve; moving them onto the ladder is a follow-up.
+**Retired names.** Every size name from before the token ladder is gone from the code outside `specs/`, and `npm run check:old-system` keeps it that way.
 
 ## Token References
 

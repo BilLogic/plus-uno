@@ -25,7 +25,6 @@ export default {
         layout: 'padded',
         changelog: [
             { date: '2026-11-03', kind: 'changed', summary: 'Renamed from `Alert` to `SectionMessage`. No left border: meaning is carried by the ground and the icon, never a side stripe. Added `actions` (link buttons after the body) and `headingLevel`.' },
-            { date: '2026-09-29', kind: 'changed', summary: 'The ground is each style\'s container tint instead of its base-color tint, and the corners are 4px (`--size-modal-radius-sm`) instead of 6px, as Figma draws them.' },
             { date: '2026-09-29', kind: 'added', summary: 'A leading icon on the first line of text, with a default per style: success circle-check, danger circle-exclamation, warning triangle-exclamation, and circle-info for primary, secondary and info. `leadingVisual` takes a Font Awesome solid name or a node to replace it, or `false` to remove it.' },
             { date: '2026-09-29', kind: 'changed', summary: 'The × is the shared CloseButton: it stays 24×24 with a 16px icon and centers on the first line of text instead of growing with the title or body.' },
         ],
@@ -378,8 +377,8 @@ export const GroundAndText = () => (
         style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 'var(--size-section-gap-lg)',
-            padding: 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)',
+            gap: 'var(--section-stack-lg)',
+            padding: 'var(--section-pad-y-default) var(--section-pad-x-default)',
             background: 'var(--ds-surface-sunken)',
         }}
     >
@@ -406,8 +405,8 @@ GroundAndText.play = async ({ canvasElement }) => {
             await expect(px(s[`border${side}Width`]), `${id}: no ${side.toLowerCase()} border`).toBe(0);
         }
 
-        // 4px corners (--size-modal-radius-sm) and the role's named background ground.
-        const radius = tokenLength(canvasElement, '--size-modal-radius-sm');
+        // --radius-md corners and the role's named background ground.
+        const radius = tokenLength(canvasElement, '--radius-md');
         await expect(radius, 'the radius token is 4px, as Figma draws it').toBe(4);
         for (const corner of ['TopLeft', 'TopRight', 'BottomRight', 'BottomLeft']) {
             await expect(px(s[`border${corner}Radius`]), `${id}: ${corner} radius is the modal-radius-sm token`).toBe(radius);

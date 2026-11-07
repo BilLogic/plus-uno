@@ -30,7 +30,7 @@
 
 .plus-skeleton {
     --plus-skeleton-width: 100%;
-    --plus-skeleton-height: var(--size-spacing-large-space-900);
+    --plus-skeleton-height: var(--skeleton-height);
     --plus-skeleton-radius: var(--radius-md);
     --plus-skeleton-duration: 1.6s;
 
@@ -51,29 +51,29 @@
 /* ------------------------------------------------------------------ shapes */
 
 .plus-skeleton--circle {
-    --plus-skeleton-width: var(--size-spacing-large-space-600);
-    --plus-skeleton-height: var(--size-spacing-large-space-600);
+    --plus-skeleton-width: var(--skeleton-circle-size);
+    --plus-skeleton-height: var(--skeleton-circle-size);
     --plus-skeleton-radius: var(--radius-full);
 }
 
 /* A text bar: 16 tall, radius 4, filling the line unless given a width. */
 .plus-skeleton--text {
-    --plus-skeleton-height: var(--size-spacing-medium-space-300);
+    --plus-skeleton-height: var(--skeleton-text-height);
     --plus-skeleton-radius: var(--radius-md);
 }
 
 /* ----------------------------------------------------------- label presets */
 
 .plus-skeleton--status {
-    --plus-skeleton-width: var(--size-spacing-large-space-900);
+    --plus-skeleton-width: var(--skeleton-status-width);
     --plus-skeleton-height: #{label.$status-height};
     --plus-skeleton-radius: var(--radius-md);
 }
 
 .plus-skeleton--status-spacious {
-    --plus-skeleton-width: calc(var(--size-spacing-large-space-1000) + var(--size-spacing-small-space-100));
+    --plus-skeleton-width: var(--skeleton-status-width-spacious);
     --plus-skeleton-height: #{label.$status-height-spacious};
-    --plus-skeleton-radius: var(--size-border-radius-radius-150);
+    --plus-skeleton-radius: var(--radius-h24);
 }
 
 .plus-skeleton--count {
@@ -83,13 +83,13 @@
 }
 
 .plus-skeleton--tag {
-    --plus-skeleton-width: calc(var(--size-spacing-large-space-900) + var(--size-spacing-small-space-100));
+    --plus-skeleton-width: var(--skeleton-tag-width);
     --plus-skeleton-height: #{label.$tag-height};
     --plus-skeleton-radius: var(--radius-md);
 }
 
 .plus-skeleton--tag-person {
-    --plus-skeleton-width: var(--size-spacing-large-space-1000);
+    --plus-skeleton-width: var(--skeleton-tag-width-person);
     --plus-skeleton-height: #{label.$tag-height};
     --plus-skeleton-radius: var(--radius-full);
 }
@@ -127,11 +127,11 @@
 }
 
 .plus-skeleton--tag-narrow {
-    --plus-skeleton-width: calc(var(--size-spacing-large-space-700) + var(--size-spacing-medium-space-300));
+    --plus-skeleton-width: var(--skeleton-tag-width-narrow);
 }
 
 .plus-skeleton--tag-widest {
-    --plus-skeleton-width: calc(var(--size-spacing-large-space-1000) + var(--size-spacing-small-space-100));
+    --plus-skeleton-width: var(--skeleton-tag-width-widest);
 }
 
 /* ----------------------------------------------------------------- shimmer */
@@ -164,7 +164,7 @@
 /* Forced colors drop the fill; an outline keeps the shape without changing its size. */
 @media (forced-colors: active) {
     .plus-skeleton {
-        outline: var(--stroke-1) solid GrayText;
-        outline-offset: calc(-1 * var(--stroke-1));
+        outline: var(--border-default) solid GrayText;
+        outline-offset: calc(-1 * var(--border-default));
     }
 }

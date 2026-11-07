@@ -198,7 +198,7 @@ function QuoteBox({ text, theme = 'dark' }: { text: string; theme?: 'light' | 'd
         width: 200,
         minHeight: 60,
         padding: 'var(--pad-y-md, 6px) var(--pad-x-md, 10px)',
-        borderRadius: 'var(--size-border-radius-radius-200, 8px)',
+        borderRadius: 'var(--radius-050)',
         background: t.quoteBg,
         border: `1px solid ${t.quoteBorder}`,
         fontStyle: 'italic',

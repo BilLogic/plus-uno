@@ -29,7 +29,7 @@ html.market-active #root {
   font-family: var(--font-family-body, sans-serif);
   display: flex;
   flex-direction: column;
-  gap: var(--size-section-gap-md, 20px);
+  gap: var(--section-stack-md);
   background: var(--ds-surface);
   box-sizing: border-box;
 
@@ -131,7 +131,7 @@ html.market-active #root {
   &__grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: var(--size-section-gap-md, 20px);
+    gap: var(--section-stack-md);
 
     @media (max-width: 1024px) {
       grid-template-columns: repeat(2, 1fr);
@@ -147,7 +147,7 @@ html.market-active #root {
     display: flex;
     flex-direction: column;
     border: 1px solid var(--ds-border);
-    border-radius: var(--size-surface-radius, 8px);
+    border-radius: var(--section-radius);
     overflow: hidden;
   }
 
@@ -242,7 +242,7 @@ html.market-active #root {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: var(--size-modal-pad-md, 16px);
+    padding: var(--modal-pad);
     z-index: var(--layer-blanket);
   }
 
@@ -250,13 +250,13 @@ html.market-active #root {
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: var(--size-modal-gap-md, 12px);
+    gap: var(--modal-stack-md);
     width: min(980px, 100%);
     max-height: calc(100vh - 32px);
     overflow-y: auto;
     background: var(--ds-surface);
-    border-radius: var(--size-surface-radius, 16px);
-    padding: var(--size-modal-pad-md, 24px);
+    border-radius: var(--section-radius);
+    padding: var(--modal-pad);
     box-shadow: var(--elevation-3, 0 16px 40px rgba(0, 0, 0, 0.2));
   }
 
@@ -268,7 +268,7 @@ html.market-active #root {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
-    gap: var(--size-modal-gap-md, 12px);
+    gap: var(--modal-inline-md);
   }
 
   &__modal-header-main {
@@ -303,7 +303,7 @@ html.market-active #root {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: var(--size-modal-gap-md, 12px);
+    gap: var(--modal-inline-md);
     flex: 0 0 auto;
   }
 
@@ -342,7 +342,7 @@ html.market-active #root {
   &__modal-links {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--size-modal-gap-md, 12px);
+    gap: var(--modal-inline-md);
 
     a {
       color: var(--ds-link);
@@ -382,7 +382,7 @@ html.market-active #root {
 
   // Large gap between major sections (around Dividers)
   &__modal .plus-divider {
-    margin: calc(var(--size-modal-gap-lg, 20px) - var(--size-modal-gap-md, 12px)) 0;
+    margin: calc(var(--modal-stack-lg) - var(--modal-stack-md)) 0;
   }
 
   &__modal-comments {
@@ -462,7 +462,7 @@ html.market-active #root {
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: var(--size-modal-pad-md, 24px);
+    padding: var(--modal-pad);
     color: var(--ds-text-subtle);
   }
 

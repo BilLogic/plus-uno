@@ -7,8 +7,8 @@
 
 .plus-option-row {
     /* Figma Tree/indent and Tree/toggle, which alias these spacing steps. */
-    --plus-option-row-indent-step: var(--size-spacing-medium-space-400);
-    --plus-option-row-toggle-size: var(--size-spacing-medium-space-300);
+    --plus-option-row-indent-step: var(--option-row-indent-step);
+    --plus-option-row-toggle-size: var(--icon-md);
 
     display: flex;
     align-items: center;
@@ -98,7 +98,7 @@
         position: absolute;
         right: 0;
         left: 0;
-        height: var(--stroke-2);
+        height: var(--border-selected);
         background-color: var(--ds-border-selected);
         pointer-events: none;
     }
@@ -143,7 +143,7 @@
     gap: 0;
 
     > * + * {
-        margin-left: var(--space-0625);
+        margin-left: var(--option-row-control-gap);
     }
 
     > .plus-option-row-indent + *,
@@ -206,10 +206,10 @@
     flex-shrink: 0;
     align-items: center;
     justify-content: center;
-    width: var(--size-spacing-medium-space-300);
-    height: var(--size-spacing-medium-space-300);
+    width: var(--icon-md);
+    height: var(--icon-md);
     box-sizing: border-box;
-    border: var(--size-border-stroke-stroke-150) solid var(--ds-border-input);
+    border: var(--border-default) solid var(--ds-border-input);
     background-color: var(--ds-background-input);
     transition: background-color 0.2s, border-color 0.2s;
 
@@ -230,8 +230,8 @@
 
         &.is-checked::before {
             content: '';
-            width: var(--size-spacing-small-space-100);
-            height: var(--size-spacing-small-space-100);
+            width: var(--option-row-dot-size);
+            height: var(--option-row-dot-size);
             border-radius: var(--radius-full);
             background-color: var(--ds-icon-inverse);
         }

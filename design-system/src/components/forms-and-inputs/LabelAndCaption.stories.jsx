@@ -26,7 +26,7 @@ export default {
 };
 
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', maxWidth: 'var(--size-3000)' };
-const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--size-section-gap-md)', alignItems: 'flex-start' };
+const row = { display: 'flex', flexWrap: 'wrap', gap: 'var(--section-stack-md)', alignItems: 'flex-start' };
 const cell = { minWidth: 'var(--size-1000)' };
 
 export const Overview = () => (
@@ -101,7 +101,7 @@ export const CaptionWarning = () => <Caption text="This number looks like a land
 
 /** Label, control and caption stacked as the fields draw them, one per caption state. */
 export const Layout = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
         <section>
             <h6 className="h6 mb-4">Default</h6>
             <div style={stack}>

@@ -140,7 +140,7 @@ function buildSidebarNavigation() {
     const navContainer = document.createElement('div');
     navContainer.style.display = 'flex';
     navContainer.style.flexDirection = 'column';
-    navContainer.style.gap = `var(--size-section-gap-md)`;
+    navContainer.style.gap = `var(--section-stack-md)`;
     
     let currentSection = null;
     
@@ -516,10 +516,10 @@ function addBulkActionsToolbar() {
     const toolbar = document.createElement('div');
     toolbar.id = 'bulk-actions-toolbar';
     toolbar.style.display = 'none';
-    toolbar.style.padding = `var(--size-section-pad-y-sm) var(--size-section-pad-x-md)`;
+    toolbar.style.padding = `var(--section-pad-y-compact) var(--section-pad-x-default)`;
     toolbar.style.backgroundColor = 'var(--ds-background-brand-subtlest)';
-    toolbar.style.borderRadius = `var(--size-card-radius-sm)`;
-    toolbar.style.marginBottom = `var(--size-section-gap-md)`;
+    toolbar.style.borderRadius = `var(--card-radius-sm)`;
+    toolbar.style.marginBottom = `var(--section-stack-md)`;
     toolbar.style.display = 'flex';
     toolbar.style.alignItems = 'center';
     toolbar.style.justifyContent = 'space-between';
@@ -624,7 +624,7 @@ function showBulkEmailModal() {
     const modalBody = document.createElement('div');
     modalBody.style.display = 'flex';
     modalBody.style.flexDirection = 'column';
-    modalBody.style.gap = `var(--size-modal-gap-md)`;
+    modalBody.style.gap = `var(--modal-stack-md)`;
     
     const infoText = document.createElement('p');
     infoText.className = 'body1-txt';
@@ -647,7 +647,7 @@ function showBulkEmailModal() {
     subjectInput.type = 'text';
     subjectInput.className = 'plus-text-field body2-txt';
     subjectInput.placeholder = 'Enter email subject';
-    subjectInput.style.marginBottom = 'var(--size-modal-gap-md)';
+    subjectInput.style.marginBottom = 'var(--modal-stack-md)';
     modalBody.appendChild(subjectInput);
     
     const messageLabel = document.createElement('label');
@@ -704,7 +704,7 @@ function showBulkAssignModal() {
     const modalBody = document.createElement('div');
     modalBody.style.display = 'flex';
     modalBody.style.flexDirection = 'column';
-    modalBody.style.gap = `var(--size-modal-gap-md)`;
+    modalBody.style.gap = `var(--modal-stack-md)`;
     
     const infoText = document.createElement('p');
     infoText.className = 'body1-txt';
@@ -719,7 +719,7 @@ function showBulkAssignModal() {
     
     const groupSelect = document.createElement('select');
     groupSelect.className = 'plus-select body2-txt';
-    groupSelect.style.marginBottom = 'var(--size-modal-gap-md)';
+    groupSelect.style.marginBottom = 'var(--modal-stack-md)';
     groupSelect.style.width = '100%';
     groupSelect.style.padding = `var(--pad-y-md) var(--pad-x-md)`;
     

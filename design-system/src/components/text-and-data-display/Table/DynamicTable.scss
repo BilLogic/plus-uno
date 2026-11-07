@@ -21,7 +21,7 @@
     min-width: var(--content-min-width);
 
     :is(th, td) {
-        padding: 0 var(--size-table-cell-pad-x);
+        padding: 0 var(--table-pad-x-cell);
     }
 
     thead th {
@@ -59,7 +59,7 @@
 
 .plus-dynamic-table-caption {
     caption-side: top;
-    padding: 0 var(--size-table-cell-pad-x) var(--stack-sm);
+    padding: 0 var(--table-pad-x-cell) var(--stack-sm);
     font: var(--heading-xxsmall);
     color: var(--ds-text);
     text-align: left;
@@ -73,7 +73,7 @@
 .plus-dynamic-table-message {
     display: inline-flex;
     align-items: center;
-    gap: var(--size-table-cell-inline);
+    gap: var(--inline-md);
 }
 
 .plus-dynamic-table-message--error {

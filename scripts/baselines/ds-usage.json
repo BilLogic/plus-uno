@@ -32,8 +32,6 @@
     "ds/no-primitive-read prototypes/research-assistant-chat/src/components/StrategyHeatmap.tsx": 3,
     "ds/no-primitive-read prototypes/starter/src/App.jsx": 1,
     "ds/no-primitive-read prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.scss": 6,
-    "ds/no-primitive-read prototypes/templates/admin/supervisor-session-prototype.html": 4,
-    "ds/no-primitive-read prototypes/templates/admin/tutor-admin.html": 6,
     "ds/no-primitive-read prototypes/templates/admin/tutor-admin.js": 3,
     "ds/no-primitive-read prototypes/templates/login/login.html": 1,
     "ds/no-primitive-read prototypes/templates/login/sign-in-portal.html": 1,
@@ -119,6 +117,6 @@
     "ds/no-unknown-prop src/pages/PrototypeMarket/PrototypeMarket.jsx": 1,
     "ds/no-unknown-token prototypes/monthly-report/src/MonthlyReportPage.scss": 3,
     "ds/no-unknown-token prototypes/research-assistant-chat/src/index.css": 1,
-    "ds/no-unknown-token src/pages/PrototypeMarket/PrototypeMarket.scss": 4
+    "ds/no-unknown-token src/pages/PrototypeMarket/PrototypeMarket.scss": 1
   }
 }

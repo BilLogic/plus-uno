@@ -131,7 +131,7 @@ export const InteractionStates = () => (
             <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                 Disabled ratings remain visible but cannot be changed.
             </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-lg)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
                 <Rating id="rating-disabled-comments" value={3} variant="comments" isDisabled />
                 <Rating id="rating-disabled-numeric" value={3} variant="numeric" isDisabled />
             </div>

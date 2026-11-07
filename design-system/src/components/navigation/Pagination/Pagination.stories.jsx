@@ -72,7 +72,7 @@ const Template = (args) => {
     return <Pagination {...args} currentPage={page} onPageChange={setPage} />;
 };
 
-const paginationCanvas = { display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-md)', padding: 'var(--size-card-gap-md)', backgroundColor: 'var(--ds-surface)' };
+const paginationCanvas = { display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)', padding: 'var(--card-stack-md)', backgroundColor: 'var(--ds-surface)' };
 const contentVariantCard = {
     padding: 'var(--pad-x-md)',
     border: 'var(--border-default) solid var(--ds-border)',
@@ -95,7 +95,7 @@ function PaginationContentDemos() {
                     />
                 </div>
             </section>
-            <section style={{ marginTop: 'var(--size-card-gap-md)' }}>
+            <section style={{ marginTop: 'var(--card-stack-md)' }}>
                 <div style={contentVariantCard}>
                     <Pagination
                         currentPage={5}

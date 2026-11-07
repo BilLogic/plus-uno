@@ -399,7 +399,7 @@ const useResolvedTokens = () => {
 };
 
 const swatchBase = {
-    minHeight: 'var(--size-spacing-large-space-800)',
+    minHeight: 'var(--space-300)',
     borderRadius: 'var(--radius-lg)',
     padding: 'var(--pad-x-md)',
     display: 'flex',
@@ -442,9 +442,9 @@ export const Modes = () => {
             style={{
                 background: 'var(--ds-surface)',
                 color: 'var(--ds-text)',
-                padding: 'var(--size-spacing-medium-space-300)',
+                padding: 'var(--space-100)',
                 display: 'grid',
-                gap: 'var(--size-spacing-medium-space-300)',
+                gap: 'var(--space-100)',
                 font: 'var(--body-default)',
             }}
         >
@@ -455,7 +455,7 @@ export const Modes = () => {
                 style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fill, minmax(16rem, 1fr))',
-                    gap: 'var(--size-spacing-medium-space-300)',
+                    gap: 'var(--space-100)',
                 }}
             >
                 {SWATCHES.map(({ label, tokens, style }) => (
@@ -615,10 +615,10 @@ export const BootstrapBridge = () => (
         style={{
             background: 'var(--ds-surface)',
             color: 'var(--ds-text)',
-            padding: 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)',
+            padding: 'var(--card-pad-default) var(--card-pad-default)',
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(18rem, 1fr))',
-            gap: 'var(--size-card-gap-md)',
+            gap: 'var(--card-stack-md)',
             alignItems: 'start',
         }}
     >

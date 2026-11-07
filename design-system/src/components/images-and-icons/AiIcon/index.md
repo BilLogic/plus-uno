@@ -31,7 +31,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--ds-icon` · `--size-icon-lg` · `--size-icon-md` · `--size-icon-sm`
+`--ds-icon` · `--icon-lg` · `--icon-md` · `--icon-sm`
 
 From `design-system/src/components/images-and-icons/AiIcon/AiIcon.scss`. Override these through the token layer, never with a literal.
 

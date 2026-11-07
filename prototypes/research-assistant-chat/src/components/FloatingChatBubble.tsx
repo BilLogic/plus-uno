@@ -75,7 +75,7 @@ export function FloatingChatBubble({
               padding: 'var(--pad-y-md, 6px) var(--pad-x-lg, 16px)',
               background: 'var(--chat-surface, #e5e7eb)',
               border: '1px solid var(--chat-outline, #d1d5db)',
-              borderRadius: 'var(--size-border-radius-radius-300, 12px)',
+              borderRadius: 'var(--radius-075)',
               cursor: 'pointer',
               textAlign: 'left',
               fontFamily: 'var(--font-family-body)',
@@ -102,7 +102,7 @@ export function FloatingChatBubble({
           padding: 'var(--space-025, 4px) var(--pad-x-md, 10px)',
           background: 'var(--chat-surface, #e5e7eb)',
           border: '1px solid var(--chat-outline, #d1d5db)',
-          borderRadius: 'var(--size-border-radius-radius-300, 12px)',
+          borderRadius: 'var(--radius-075)',
           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
         }}
       >

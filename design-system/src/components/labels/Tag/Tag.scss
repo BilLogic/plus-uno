@@ -232,8 +232,8 @@ $tag-colors: (
     justify-content: center;
     flex: none;
     box-sizing: border-box;
-    width: var(--size-media-xxs);
-    height: var(--size-media-xxs);
+    width: var(--image-xxs);
+    height: var(--image-xxs);
     overflow: hidden;
     background-color: var(--plus-tag-avatar);
 }
@@ -290,8 +290,8 @@ $tag-colors: (
 /* The swatch: 10 square, radius 2, in the hue. */
 .plus-tag__swatch {
     flex: none;
-    width: var(--size-spacing-small-space-150);
-    height: var(--size-spacing-small-space-150);
+    width: var(--tag-dot-size);
+    height: var(--tag-dot-size);
     border-radius: var(--radius-sm);
     background-color: var(--plus-tag-hue);
 }
@@ -386,8 +386,8 @@ $tag-colors: (
     justify-content: center;
     flex: none;
     box-sizing: border-box;
-    width: var(--size-media-xxs);
-    height: var(--size-media-xxs);
+    width: var(--image-xxs);
+    height: var(--image-xxs);
     margin: 0;
     padding: 0;
     border: 0;
@@ -436,9 +436,9 @@ $tag-colors: (
 .plus-tag__spinner {
     flex: none;
     box-sizing: border-box;
-    width: var(--size-spacing-small-space-150);
-    height: var(--size-spacing-small-space-150);
-    border: var(--size-border-stroke-stroke-150) solid transparent;
+    width: var(--tag-dot-size);
+    height: var(--tag-dot-size);
+    border: var(--border-default) solid transparent;
     /* Three quarters of the ring: a 270° arc. */
     border-top-color: var(--plus-tag-hue);
     border-right-color: var(--plus-tag-hue);
@@ -454,8 +454,8 @@ $tag-colors: (
  */
 .plus-tag__avatar-spinner {
     display: block;
-    width: var(--size-icon-sm);
-    height: var(--size-icon-sm);
+    width: var(--icon-sm);
+    height: var(--icon-sm);
     color: var(--ds-icon-subtle);
     stroke: currentColor;
     animation: plus-tag-spin 0.8s linear infinite;

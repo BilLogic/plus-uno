@@ -54,7 +54,7 @@ The Modal interrupts the page for one task. It is always centered on the screen 
 
 <ComponentExample of={PatternModalStories.HeightFill} title="Fill" description={<><code>height="fill"</code> always sits at the cap, so a settings or editor Modal never jumps.</>} />
 
-<ComponentExample of={PatternModalStories.BodyMinHeight} title="Body floor" description={<>The body never draws shorter than <code>--modal-body-min-height</code>, 96.</>} />
+<ComponentExample of={PatternModalStories.BodyMinHeight} title="Body floor" description={<>The body never draws shorter than <code>--modal-body-min-height</code>, 80.</>} />
 
 </div>
 
@@ -173,7 +173,7 @@ A Modal is open or closed, and loading swaps its body for a skeleton. It has no 
 <tr><td><code>--modal-stack-md</code></td><td>16</td><td>Between the header, body and footer, and between fields in a group.</td></tr>
 <tr><td><code>--modal-stack-lg</code></td><td>24</td><td>Between groups of fields you place in the body. The Modal does not apply it.</td></tr>
 <tr><td><code>--modal-inline-sm</code>, <code>-md</code>, <code>-lg</code></td><td>8, 16, 24</td><td>Inline space in slot content. The footer spaces its buttons with <code>--stack-md</code>, 8.</td></tr>
-<tr><td><code>--modal-body-min-height</code></td><td>96</td><td>The least height the body draws, so a short body or the skeleton does not collapse.</td></tr>
+<tr><td><code>--modal-body-min-height</code></td><td>80</td><td>The least height the body draws, so a short body or the skeleton does not collapse.</td></tr>
 <tr><td><code>--modal-radius</code></td><td>12</td><td>Corner radius at every width.</td></tr>
 <tr><td><code>--modal-width-sm</code>, <code>-md</code>, <code>-lg</code></td><td>see Width guidance</td><td>The three width steps, per screen size.</td></tr>
 <tr><td><code>--blanket-max-height-modal</code></td><td>screen height less 2 × pad-y</td><td>The cap a hug Modal grows to and a fill Modal sits at.</td></tr>

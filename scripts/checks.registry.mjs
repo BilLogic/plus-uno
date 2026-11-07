@@ -283,7 +283,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-old-system.mjs',
     guards:
-      'the code holding only the current design system, a hard ban with no baseline: outside design-system/src/specs/, any name from a token family generated from an archived Figma collection fails, comments and docs included, read in design-system/src, prototypes and src. Banned so far: the Material `--color-*` roles, and the `--elevation-light-*` shadows and `--surface-*` roles; each family that moves to the current system adds its row. The token files that still declare the old names for the Specs replica are named in the check until they move into specs/.',
+      'the code holding only the current design system, a hard ban with no baseline: outside design-system/src/specs/, any name from a token family generated from an archived Figma collection fails, comments and docs included, read in design-system/src, prototypes and src. Banned so far: the Material `--color-*` roles; the `--elevation-light-*` shadows and `--surface-*` roles; and the old size names, from the archived size collections and the names the token ladder retired; each family that moves to the current system adds its row. The token files that still declare the old names for the Specs replica are named in the check until they move into specs/.',
   },
   {
     name: 'check:state-mixin',
@@ -531,16 +531,6 @@ export const CHECKS = [
       'the generated token ladder files in design-system/src/tokens/ladder/ (the four tiers, motion SCSS and the Figma payload) against scripts/lib/tokens/plan.mjs (ADR-038). Drift means a hand edit or a plan change that was never regenerated.',
   },
   {
-    name: 'check:old-size-tokens',
-    script: 'node scripts/check-old-size-tokens.mjs',
-    pkg: 'root',
-    trigger: 'pull_request',
-    module: 'scripts/check-old-size-tokens.mjs',
-    baseline: 'scripts/baselines/old-size-tokens.json',
-    guards:
-      'files reading a retired token name (--size-element-*, --element-*, --layout-*, --overlay-* and the rest of RETIRED_TOKENS in scripts/lib/tokens/plan.mjs), counted per file in design-system/src, prototypes and src. The declarations are gone, so the record is empty and holds at zero; a file that reads one fails, and `npm run check:old-size-tokens -- --update` refuses to write a rise. Reads the record through `scripts/lib/ratchet.mjs`.',
-  },
-  {
     name: 'check:ds-usage',
     script: 'node scripts/check-ds-usage.mjs',
     pkg: 'root',
@@ -559,15 +549,6 @@ export const CHECKS = [
     baseline: 'scripts/baselines/no-primitive-reads.json',
     guards:
       'components and patterns reading a numbered primitive (--space-<n>, --radius-<n>, --size-<n>, --stroke-<n>) instead of a tier token, counted per file in design-system/src/components and design-system/src/patterns (ADR-038). The record holds the residue and only falls; a file that rises or is new fails, and `npm run check:no-primitive-reads -- --update` refuses to write a rise. Reads the record through `scripts/lib/ratchet.mjs`.',
-  },
-  {
-    name: 'check:old-size-token-list',
-    script: 'node scripts/generate-old-size-token-list.mjs --check',
-    pkg: 'root',
-    trigger: 'pull_request',
-    module: 'scripts/generate-old-size-token-list.mjs',
-    guards:
-      'the list of files still on old size tokens in design-system/guidelines/foundations/spacing.md against the same scan check:old-size-tokens ratchets. A family PR picks its next row from that list, so a file migrated without regenerating it stays on the list, and one that gains an old use is missing from it. Fix: npm run generate:old-size-token-list.',
   },
   {
     name: 'check:atlassian-benchmark',

@@ -16,7 +16,6 @@
     "--size-card-pad-x-sm 12px",
     "--size-card-pad-y-md 16px",
     "--size-card-pad-y-sm 12px",
-    "--size-card-radius-md 12px",
     "--size-card-radius-md 8px",
     "--size-card-radius-sm 4px",
     "--size-card-radius-sm 8px",
@@ -45,12 +44,10 @@
     "--size-spacing-medium-space-400 16px",
     "--size-spacing-small-space-100 4px",
     "--size-surface-gap-md 16px",
-    "--size-surface-radius 8px",
     "--space-025 8px",
     "--space-0625 12px",
     "--space-0625 16px",
     "--space-0625 8px",
-    "--stack-lg 24px",
     "--stack-md 4px",
     "--stack-sm 8px"
   ]

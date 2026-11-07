@@ -245,9 +245,8 @@ export function tokenCorpus({ root = REPO_ROOT, prefix = '--', precedence = 'fir
   }
 
   // The WHOLE table is read whatever the prefix, because an alias chain leaves
-  // the family: `--size-card-gap-md` is `var(--size-spacing-medium-space-300)`,
-  // and a caller asking only for `--size-card-*` still wants the 16px at the
-  // end of it. The narrowing happens after the walk.
+  // the family: `--card-stack-md` is `var(--space-050)`, and a caller
+  // asking only for `--card-*` still wants the 8px at the end of it. The narrowing happens after the walk.
   const raw = new Map();
   const files = new Map();
   for (const source of tokenSources({ root })) {
@@ -301,7 +300,7 @@ export const FAMILIES = [
     prefix: '--surface-',
     what: 'the pre-`--ds-` elevation bridge: a surface\'s color and, separately, its shadow',
   },
-  { family: 'page', prefix: '--page-', what: 'the Page: its pad, stack and radius' },
+  { family: 'page', prefix: '--page-', what: 'the Page: its pad, stack, radius and border width' },
   { family: 'panel', prefix: '--panel-', what: 'the Panel: its minimum, default and maximum width' },
   { family: 'frame', prefix: '--frame-', what: 'the Frame: the topbar height and the sidebar widths' },
   { family: 'font-size', prefix: '--font-size-', what: 'the type scale, icon sizes included' },
@@ -349,9 +348,9 @@ export const FAMILIES = [
   { family: 'layout', prefix: '--layout-', what: 'app-shell measurements' },
   { family: 'section', prefix: '--section-', what: 'a span of the page grid: its stacks and column minimums' },
   { family: 'card', prefix: '--card-', what: 'card pad, stack, inline, minimum width and radius' },
-  { family: 'table', prefix: '--table-', what: 'table cell pad, footer pad-x, tree indent, minimum title width and radius' },
+  { family: 'table', prefix: '--table-', what: 'table cell pad and maximum width, footer pad-x, tree indent, minimum title width, radius and overflow shadow reach' },
   { family: 'blanket', prefix: '--blanket-', what: 'the full-screen layer under a modal: its pad, fill and height limit' },
-  { family: 'button', prefix: '--button-', what: 'Button radius, where a size has no shared radius role' },
+  { family: 'button', prefix: '--button-', what: 'Button radius, where a size has no shared radius role, and the vertical button size' },
   { family: 'calendar', prefix: '--calendar-', what: 'calendar day and navigation button sizes' },
   { family: 'checkbox', prefix: '--checkbox-', what: 'the checkbox box size' },
   { family: 'radio', prefix: '--radio-', what: 'the radio dot size, and the RadioGroup size steps' },
@@ -364,9 +363,20 @@ export const FAMILIES = [
   { family: 'spinner', prefix: '--spinner-', what: 'Spinner sizes' },
   { family: 'progress-bar', prefix: '--progress-bar-', what: 'Progress bar height' },
   { family: 'progress-indicator', prefix: '--progress-indicator-', what: 'Progress indicator dot sizes' },
+  { family: 'option-row', prefix: '--option-row-', what: 'the option row indent step, control gap and radio dot' },
+  { family: 'count-tag', prefix: '--count-tag-', what: 'the Count tag dot' },
+  { family: 'tag', prefix: '--tag-', what: 'the Tag dot, and the Date and Status tag end pad and gap' },
+  { family: 'carousel', prefix: '--carousel-', what: 'Carousel control offset, pad and size, slide minimum heights and indicator sizes' },
+  { family: 'scroll-bar', prefix: '--scroll-bar-', what: 'the scroll bar thumb size and the default maximum height' },
+  { family: 'skeleton', prefix: '--skeleton-', what: 'Skeleton preset heights and widths' },
+  { family: 'flag', prefix: '--flag-', what: 'the Flag minimum height, pad and offset' },
+  { family: 'spotlight', prefix: '--spotlight-', what: 'the Spotlight media height' },
+  { family: 'menu-group', prefix: '--menu-group-', what: 'Menu group minimum width, pad and gap' },
+  { family: 'popup', prefix: '--popup-', what: 'the Popup pad' },
+  { family: 'avatar', prefix: '--avatar-', what: 'the two largest Avatar sizes, 96 and 128' },
   { family: 'layer', prefix: '--layer-', what: 'the z-index scale, card to tooltip' },
   { family: 'motion', prefix: '--motion-', what: 'motion durations and easings' },
-  { family: 'modal', prefix: '--modal-', what: 'modal dialog pad, stack, inline and radius' },
+  { family: 'modal', prefix: '--modal-', what: 'modal dialog pad, stack, inline, radius and body floor' },
   { family: 'drawer', prefix: '--drawer-', what: 'drawer pad, stack and inline (the Modal steps, no radius)' },
   { family: 'focused-page', prefix: '--focused-page-', what: 'the focused page frame: its pad, stacks and inline gaps' },
   { family: 'popover', prefix: '--popover-', what: 'menus, popups, tooltips and flags: pad, widths, radii, placement' },

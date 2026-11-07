@@ -15,7 +15,7 @@ const App = () => {
                         { id: 'admin', label: 'Admin', icon: 'cog' }
                     ]}
                 />
-                <main className="flex-grow-1" style={{ padding: 'var(--size-section-pad-y-md) var(--size-section-pad-x-md)' }}>
+                <main className="flex-grow-1" style={{ padding: 'var(--section-pad-y-default) var(--section-pad-x-default)' }}>
                     <div className="container-fluid">
                         <div className="row mb-4">
                             <div className="col">

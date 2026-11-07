@@ -33,7 +33,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-subtlest` · `--heading-xxsmall` · `--pad-y-lg` · `--pad-y-md` · `--radius-lg` · `--size-spacing-medium-space-300` · `--size-spacing-medium-space-500` · `--size-spacing-small-space-150` · `--size-spacing-xlarge-space-2500` · `--stack-lg` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-disabled` · `--ds-text-subtle` · `--ds-text-subtlest` · `--heading-xxsmall` · `--menu-group-gap` · `--menu-group-item-pad-y` · `--menu-group-min-width` · `--menu-group-pad-x` · `--pad-y-lg` · `--pad-y-md` · `--radius-lg` · `--stack-lg` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/navigation/MenuGroup/MenuGroup.scss`. Override these through the token layer, never with a literal.
 

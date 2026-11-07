@@ -6681,7 +6681,7 @@
           "name": "maxHeight",
           "type": "string or number",
           "required": false,
-          "default": "'calc(var(--size-spacing-xlarge-space-2000) * 2)'",
+          "default": "'var(--scroll-bar-max-height)'",
           "values": null,
           "description": "Maximum height before vertical scrolling begins (e.g., \"240px\")",
           "deprecated": null

@@ -31,7 +31,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--ds-border-brand` · `--ds-border-discovery` · `--generative-border-angle` · `--generative-border-radius` · `--generative-border-rest` · `--generative-border-width` · `--size-border-stroke-stroke-200`
+`--border-selected` · `--ds-border-brand` · `--ds-border-discovery` · `--generative-border-angle` · `--generative-border-radius` · `--generative-border-rest` · `--generative-border-width`
 
 From `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.scss`. Override these through the token layer, never with a literal.
 

@@ -57,7 +57,6 @@ const GENERATORS = [
   'npm run generate:color-tokens',
   'npm run generate:design-tokens',
   'npm run generate:tokens',
-  'npm run generate:old-size-token-list',
   'npm run generate:token-registry',
   'npm run generate:skill-surfaces',
   'npm run generate:check-registry',

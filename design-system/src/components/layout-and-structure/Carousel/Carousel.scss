@@ -17,8 +17,8 @@
      * 12px in and 6px up, asymmetrically, and the literal made it read square.
      * Caught by check:size-fallbacks (#336).
      */
-    left: var(--size-spacing-small-space-150);
-    bottom: var(--size-spacing-small-space-150);
+    left: var(--carousel-control-offset);
+    bottom: var(--carousel-control-offset);
     z-index: 2;
     display: inline-flex;
     align-items: center;
@@ -70,7 +70,7 @@
         align-items: center;
         justify-content: center;
         width: 100%;
-        min-height: var(--size-spacing-xlarge-space-2500); // 200px
+        min-height: var(--carousel-slide-min-height);
 
         // Ensure child content fills width
         >* {
@@ -84,7 +84,7 @@
         bottom: 0;
         left: 0;
         right: 0;
-        padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md);
+        padding: var(--section-pad-y-default) var(--section-pad-x-default);
         background: linear-gradient(transparent, var(--ds-background-inverse-subtle));
         text-align: left;
         color: var(--ds-text-inverse);
@@ -114,9 +114,9 @@
         align-items: center;
         justify-content: center;
 
-        padding: var(--size-spacing-medium-space-300);
-        min-width: var(--size-spacing-large-space-800); // Touch target, 48
-        min-height: var(--size-spacing-large-space-800);
+        padding: var(--carousel-control-pad);
+        min-width: var(--carousel-control-size); // Touch target
+        min-height: var(--carousel-control-size);
 
         color: var(--ds-text-subtle);
         background: none;
@@ -153,7 +153,7 @@
         left: 0;
         right: 0;
         z-index: 2;
-        margin-bottom: var(--size-section-pad-y-sm);
+        margin-bottom: var(--section-pad-y-compact);
         gap: var(--stack-md);
         display: flex;
         justify-content: center;
@@ -161,8 +161,8 @@
     }
 
     .plus-carousel-indicator {
-        width: var(--size-column-md); // 100px
-        height: var(--size-spacing-small-space-075); // 6px
+        width: var(--carousel-indicator-width);
+        height: var(--carousel-indicator-height);
         padding: 0;
         border: none;
         border-radius: var(--radius-lg);
@@ -181,25 +181,25 @@
     // --- SIZE VARIANTS ---
     &--sm {
         .plus-carousel-content {
-            min-height: var(--size-spacing-xlarge-space-2000); // 160px (closest to 150px)
-            padding: var(--size-section-pad-y-sm) var(--size-section-pad-x-sm);
+            min-height: var(--carousel-slide-min-height-compact);
+            padding: var(--section-pad-y-compact) var(--section-pad-x-compact);
         }
 
         .plus-carousel-indicator {
-            width: var(--size-column-xs); // 60px
-            height: var(--size-spacing-small-space-050); // 4px
+            width: var(--carousel-indicator-width-compact);
+            height: var(--carousel-indicator-height-compact);
         }
     }
 
     &--lg {
         .plus-carousel-content {
-            min-height: var(--size-spacing-xlarge-space-5000); // 400px
-            padding: var(--size-section-pad-y-lg) var(--size-section-pad-x-lg);
+            min-height: var(--carousel-slide-min-height-spacious);
+            padding: var(--section-pad-y-spacious) var(--section-pad-x-spacious);
         }
 
         .plus-carousel-indicator {
-            width: var(--size-column-lg); // 120px
-            height: var(--size-spacing-small-space-100); // 8px
+            width: var(--carousel-indicator-width);
+            height: var(--carousel-indicator-height-spacious);
         }
     }
 }
