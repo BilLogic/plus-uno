@@ -106,7 +106,7 @@ export function run({ repoRoot = REPO_ROOT, sources } = {}) {
 export function summary({ repoRoot = REPO_ROOT, sources } = {}) {
   const found = measure(sources ?? sourcesOf(repoRoot), oldSizeTokenNames());
   const now = [...found.values()].reduce((sum, { count }) => sum + count, 0);
-  const recorded = Object.values(ratchetFor(repoRoot).envelope('counts') ?? {}).reduce((a, b) => a + b, 0);
+  const recorded = [...ratchetFor(repoRoot).entries.values()].reduce((sum, { count }) => sum + count, 0);
   const fell = now < recorded ? ` — under the baseline of ${recorded}; record it with --update` : '';
   return `${now} old-size-token uses in ${found.size} file(s)${fell}`;
 }

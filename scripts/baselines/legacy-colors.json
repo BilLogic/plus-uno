@@ -1,70 +1,204 @@
 {
   "why": "Legacy --color-* uses and hex fallbacks inside var(), per rule and per file. They are light-only, so a component reading one stays light in dark mode. A count may fall and never rise; a pair that reaches zero leaves the record; a new file starts at zero. Regenerate with `npm run check:legacy-colors -- --update`; never edit by hand.",
-  "counts": {
-    "color-var design-system/src/components/_internal/LoadingGif/LoadingGif.scss": 1,
-    "color-var design-system/src/components/_internal/SessionAvailabilitySnackbar/SessionAvailabilitySnackbar.scss": 1,
-    "color-var design-system/src/components/_internal/SessionManagementSnackbar/SessionManagementSnackbar.scss": 5,
-    "color-var design-system/src/components/_internal/training/LikertScale.jsx": 1,
-    "color-var design-system/src/components/_internal/training/Rating.jsx": 3,
-    "color-var design-system/src/components/forms-and-inputs/CloseButton/CloseButton.stories.jsx": 2,
-    "color-var design-system/src/components/layout-and-structure/Accordion/Accordion.stories.jsx": 1,
-    "color-var prototypes/home-redesign/src/App.css": 1,
-    "color-var prototypes/home-redesign/src/components/Dashboard.jsx": 6,
-    "color-var prototypes/home-redesign/src/components/DevIndexPage.jsx": 3,
-    "color-var prototypes/home-redesign/src/components/MonthlyReportsContent.scss": 1,
-    "color-var prototypes/home-redesign/src/index.css": 1,
-    "color-var prototypes/in-session-ux/ManageAssignmentModal.jsx": 7,
-    "color-var prototypes/in-session-ux/ReflectionAssistant/CompactReflectionBar.jsx": 4,
-    "color-var prototypes/in-session-ux/ReflectionAssistant/ReflectionAssistantChat.jsx": 3,
-    "color-var prototypes/in-session-ux/ReflectionAssistant/ReflectionWidgets.jsx": 13,
-    "color-var prototypes/in-session-ux/ReflectionAssistant/ToolUI.jsx": 7,
-    "color-var prototypes/in-session-ux/StudentInsightsModal.jsx": 5,
-    "color-var prototypes/in-session-ux/index.css": 1,
-    "color-var prototypes/live-app/src/LiveAppNav.scss": 3,
-    "color-var prototypes/monthly-report/src/MonthlyReportContent.jsx": 3,
-    "color-var prototypes/monthly-report/src/MonthlyReportPage.jsx": 3,
-    "color-var prototypes/monthly-report/src/MonthlyReportPage.scss": 60,
-    "color-var prototypes/monthly-report/src/MonthlyReportsListPage.scss": 1,
-    "color-var prototypes/research-assistant-chat/src/components/AssistantMessageContent.tsx": 1,
-    "color-var prototypes/research-assistant-chat/src/components/ChatHeader.tsx": 1,
-    "color-var prototypes/research-assistant-chat/src/components/CompactChatBar.tsx": 4,
-    "color-var prototypes/research-assistant-chat/src/components/EngagementChart.tsx": 4,
-    "color-var prototypes/research-assistant-chat/src/components/FakeTools.tsx": 2,
-    "color-var prototypes/research-assistant-chat/src/components/FloatingChatBubble.tsx": 1,
-    "color-var prototypes/research-assistant-chat/src/components/StrategyHeatmap.tsx": 1,
-    "color-var prototypes/research-assistant-chat/src/index.css": 3,
-    "color-var prototypes/research-assistant-chat/src/utils.ts": 1,
-    "color-var prototypes/starter/src/App.jsx": 2,
-    "color-var prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.jsx": 26,
-    "color-var prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.scss": 54,
-    "color-var prototypes/templates/admin/supervisor-session-prototype.html": 16,
-    "color-var prototypes/templates/admin/tutor-admin.html": 17,
-    "color-var prototypes/templates/admin/tutor-admin.js": 3,
-    "color-var prototypes/templates/login/login.html": 3,
-    "color-var prototypes/templates/login/sign-in-portal.html": 4,
-    "color-var prototypes/templates/universal/table-example.html": 5,
-    "hex-fallback prototypes/home-redesign/src/App.css": 1,
-    "hex-fallback prototypes/home-redesign/src/components/Dashboard.jsx": 6,
-    "hex-fallback prototypes/home-redesign/src/components/DevIndexPage.jsx": 1,
-    "hex-fallback prototypes/home-redesign/src/index.css": 1,
-    "hex-fallback prototypes/in-session-ux/ReflectionAssistant/CompactReflectionBar.jsx": 4,
-    "hex-fallback prototypes/in-session-ux/ReflectionAssistant/ReflectionAssistantChat.jsx": 7,
-    "hex-fallback prototypes/in-session-ux/ReflectionAssistant/ReflectionWidgets.jsx": 13,
-    "hex-fallback prototypes/in-session-ux/ReflectionAssistant/ToolUI.jsx": 21,
-    "hex-fallback prototypes/in-session-ux/StudentInsightsModal.jsx": 2,
-    "hex-fallback prototypes/in-session-ux/index.css": 1,
-    "hex-fallback prototypes/live-app/src/LiveAppNav.scss": 3,
-    "hex-fallback prototypes/monthly-report/src/MonthlyReportPage.scss": 9,
-    "hex-fallback prototypes/research-assistant-chat/src/components/AssistantMessageContent.tsx": 5,
-    "hex-fallback prototypes/research-assistant-chat/src/components/ChartSkeleton.tsx": 1,
-    "hex-fallback prototypes/research-assistant-chat/src/components/ChatHeader.tsx": 3,
-    "hex-fallback prototypes/research-assistant-chat/src/components/CompactChatBar.tsx": 4,
-    "hex-fallback prototypes/research-assistant-chat/src/components/EngagementChart.tsx": 5,
-    "hex-fallback prototypes/research-assistant-chat/src/components/FakeTools.tsx": 13,
-    "hex-fallback prototypes/research-assistant-chat/src/components/FloatingChatBubble.tsx": 9,
-    "hex-fallback prototypes/research-assistant-chat/src/components/StrategyHeatmap.tsx": 7,
-    "hex-fallback prototypes/research-assistant-chat/src/index.css": 3,
-    "hex-fallback prototypes/starter/src/App.jsx": 1,
-    "hex-fallback prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.jsx": 1
+  "sets": {
+    "main": {
+      "entries": {
+        "color-var design-system/src/components/_internal/LoadingGif/LoadingGif.scss": {
+          "count": 1
+        },
+        "color-var design-system/src/components/_internal/SessionAvailabilitySnackbar/SessionAvailabilitySnackbar.scss": {
+          "count": 1
+        },
+        "color-var design-system/src/components/_internal/SessionManagementSnackbar/SessionManagementSnackbar.scss": {
+          "count": 5
+        },
+        "color-var design-system/src/components/_internal/training/LikertScale.jsx": {
+          "count": 1
+        },
+        "color-var design-system/src/components/_internal/training/Rating.jsx": {
+          "count": 3
+        },
+        "color-var design-system/src/components/forms-and-inputs/CloseButton/CloseButton.stories.jsx": {
+          "count": 2
+        },
+        "color-var design-system/src/components/layout-and-structure/Accordion/Accordion.stories.jsx": {
+          "count": 1
+        },
+        "color-var prototypes/home-redesign/src/App.css": {
+          "count": 1
+        },
+        "color-var prototypes/home-redesign/src/components/Dashboard.jsx": {
+          "count": 6
+        },
+        "color-var prototypes/home-redesign/src/components/DevIndexPage.jsx": {
+          "count": 3
+        },
+        "color-var prototypes/home-redesign/src/components/MonthlyReportsContent.scss": {
+          "count": 1
+        },
+        "color-var prototypes/home-redesign/src/index.css": {
+          "count": 1
+        },
+        "color-var prototypes/in-session-ux/ManageAssignmentModal.jsx": {
+          "count": 7
+        },
+        "color-var prototypes/in-session-ux/ReflectionAssistant/CompactReflectionBar.jsx": {
+          "count": 4
+        },
+        "color-var prototypes/in-session-ux/ReflectionAssistant/ReflectionAssistantChat.jsx": {
+          "count": 3
+        },
+        "color-var prototypes/in-session-ux/ReflectionAssistant/ReflectionWidgets.jsx": {
+          "count": 13
+        },
+        "color-var prototypes/in-session-ux/ReflectionAssistant/ToolUI.jsx": {
+          "count": 7
+        },
+        "color-var prototypes/in-session-ux/StudentInsightsModal.jsx": {
+          "count": 5
+        },
+        "color-var prototypes/in-session-ux/index.css": {
+          "count": 1
+        },
+        "color-var prototypes/live-app/src/LiveAppNav.scss": {
+          "count": 3
+        },
+        "color-var prototypes/monthly-report/src/MonthlyReportContent.jsx": {
+          "count": 3
+        },
+        "color-var prototypes/monthly-report/src/MonthlyReportPage.jsx": {
+          "count": 3
+        },
+        "color-var prototypes/monthly-report/src/MonthlyReportPage.scss": {
+          "count": 60
+        },
+        "color-var prototypes/monthly-report/src/MonthlyReportsListPage.scss": {
+          "count": 1
+        },
+        "color-var prototypes/research-assistant-chat/src/components/AssistantMessageContent.tsx": {
+          "count": 1
+        },
+        "color-var prototypes/research-assistant-chat/src/components/ChatHeader.tsx": {
+          "count": 1
+        },
+        "color-var prototypes/research-assistant-chat/src/components/CompactChatBar.tsx": {
+          "count": 4
+        },
+        "color-var prototypes/research-assistant-chat/src/components/EngagementChart.tsx": {
+          "count": 4
+        },
+        "color-var prototypes/research-assistant-chat/src/components/FakeTools.tsx": {
+          "count": 2
+        },
+        "color-var prototypes/research-assistant-chat/src/components/FloatingChatBubble.tsx": {
+          "count": 1
+        },
+        "color-var prototypes/research-assistant-chat/src/components/StrategyHeatmap.tsx": {
+          "count": 1
+        },
+        "color-var prototypes/research-assistant-chat/src/index.css": {
+          "count": 3
+        },
+        "color-var prototypes/research-assistant-chat/src/utils.ts": {
+          "count": 1
+        },
+        "color-var prototypes/starter/src/App.jsx": {
+          "count": 2
+        },
+        "color-var prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.jsx": {
+          "count": 26
+        },
+        "color-var prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.scss": {
+          "count": 54
+        },
+        "color-var prototypes/templates/admin/supervisor-session-prototype.html": {
+          "count": 16
+        },
+        "color-var prototypes/templates/admin/tutor-admin.html": {
+          "count": 17
+        },
+        "color-var prototypes/templates/admin/tutor-admin.js": {
+          "count": 3
+        },
+        "color-var prototypes/templates/login/login.html": {
+          "count": 3
+        },
+        "color-var prototypes/templates/login/sign-in-portal.html": {
+          "count": 4
+        },
+        "color-var prototypes/templates/universal/table-example.html": {
+          "count": 5
+        },
+        "hex-fallback prototypes/home-redesign/src/App.css": {
+          "count": 1
+        },
+        "hex-fallback prototypes/home-redesign/src/components/Dashboard.jsx": {
+          "count": 6
+        },
+        "hex-fallback prototypes/home-redesign/src/components/DevIndexPage.jsx": {
+          "count": 1
+        },
+        "hex-fallback prototypes/home-redesign/src/index.css": {
+          "count": 1
+        },
+        "hex-fallback prototypes/in-session-ux/ReflectionAssistant/CompactReflectionBar.jsx": {
+          "count": 4
+        },
+        "hex-fallback prototypes/in-session-ux/ReflectionAssistant/ReflectionAssistantChat.jsx": {
+          "count": 7
+        },
+        "hex-fallback prototypes/in-session-ux/ReflectionAssistant/ReflectionWidgets.jsx": {
+          "count": 13
+        },
+        "hex-fallback prototypes/in-session-ux/ReflectionAssistant/ToolUI.jsx": {
+          "count": 21
+        },
+        "hex-fallback prototypes/in-session-ux/StudentInsightsModal.jsx": {
+          "count": 2
+        },
+        "hex-fallback prototypes/in-session-ux/index.css": {
+          "count": 1
+        },
+        "hex-fallback prototypes/live-app/src/LiveAppNav.scss": {
+          "count": 3
+        },
+        "hex-fallback prototypes/monthly-report/src/MonthlyReportPage.scss": {
+          "count": 9
+        },
+        "hex-fallback prototypes/research-assistant-chat/src/components/AssistantMessageContent.tsx": {
+          "count": 5
+        },
+        "hex-fallback prototypes/research-assistant-chat/src/components/ChartSkeleton.tsx": {
+          "count": 1
+        },
+        "hex-fallback prototypes/research-assistant-chat/src/components/ChatHeader.tsx": {
+          "count": 3
+        },
+        "hex-fallback prototypes/research-assistant-chat/src/components/CompactChatBar.tsx": {
+          "count": 4
+        },
+        "hex-fallback prototypes/research-assistant-chat/src/components/EngagementChart.tsx": {
+          "count": 5
+        },
+        "hex-fallback prototypes/research-assistant-chat/src/components/FakeTools.tsx": {
+          "count": 13
+        },
+        "hex-fallback prototypes/research-assistant-chat/src/components/FloatingChatBubble.tsx": {
+          "count": 9
+        },
+        "hex-fallback prototypes/research-assistant-chat/src/components/StrategyHeatmap.tsx": {
+          "count": 7
+        },
+        "hex-fallback prototypes/research-assistant-chat/src/index.css": {
+          "count": 3
+        },
+        "hex-fallback prototypes/starter/src/App.jsx": {
+          "count": 1
+        },
+        "hex-fallback prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.jsx": {
+          "count": 1
+        }
+      }
+    }
   }
 }

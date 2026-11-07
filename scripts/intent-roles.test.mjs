@@ -79,8 +79,7 @@ test('`color:` is not an edge', () => {
 /*
  * The verdicts, worded. Which count rose, which fell, which file the record has
  * never seen and which entry has no reason is `scripts/lib/ratchet.mjs`'s — a
- * record declaring `direction: 'both'`, asserted once against all twelve live
- * records in `scripts/lib/ratchet-conformance.mjs` (#600). What is asserted
+ * record declaring `direction: 'both'`, asserted once in its own tests. What is asserted
  * here is the measured side this check hands it, and what each verdict says.
  */
 
@@ -146,11 +145,14 @@ test('counts group by file and kind', () => {
 const ROLES_SCSS = `:root {\n${INTENTS.map((intent) => `  --color-${intent}-border: var(--color-${intent});`).join('\n')}\n}\n`;
 
 const INTENT_BASELINE = JSON.stringify({
-  note: 'Remaining edge uses of an intent base, recorded so a new one fails.',
+  why: 'Remaining edge uses of an intent base, recorded so a new one fails.',
   recordedAt: '2026-09-18',
   migrated: 0,
-  files: {},
-  mixedStates: {},
+  sets: {
+    border: { direction: 'both', reasons: 'required', entries: {} },
+    outline: { direction: 'both', reasons: 'required', entries: {} },
+    mixedStates: { direction: 'both', reasons: 'required', entries: {} },
+  },
 });
 
 test('an intent base on an edge in a fixture tree is a finding', () => {
@@ -201,7 +203,7 @@ test('a hover color mixed by hand is a use: color-mix with black or white, or a 
   });
   const uses = mixedUses(stylesheets(root), root);
   assert.deepEqual(uses.map((u) => u.line), [1, 2, 3]);
-  assert.deepEqual(mixCounts(uses), { 'design-system/src/a.scss': { mix: 3 } });
+  assert.deepEqual(mixCounts(uses), { 'design-system/src/a.scss': 3 });
 });
 
 test('a mix with transparent is an alpha, not a state color, and a comment is not a use', () => {

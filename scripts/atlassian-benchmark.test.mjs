@@ -13,13 +13,10 @@ const BENCHMARK = JSON.parse(
 );
 /**
  * The recorded floor, read the way the check reads it — through
- * `scripts/lib/ratchet.mjs`, which strips the `note` and `recordedAt` the `ours`
- * container keeps in among its numbers (#601). `failures` is handed the numbers
- * and nothing else, so a test that built the container by hand would be
- * asserting against a shape the check no longer passes.
+ * `scripts/lib/ratchet.mjs` (#601). `failures` is handed the numbers and
+ * nothing else.
  */
-const floorOf = (ratchet) =>
-  Object.fromEntries([...ratchet.entries].map(([key, entry]) => [key, entry.counts.get('count')]));
+const floorOf = (ratchet) => Object.fromEntries([...ratchet.entries].map(([key, entry]) => [key, entry.count]));
 const FLOOR = floorOf(openRatchet({ file: 'scripts/baselines/atlassian-benchmark.json' }));
 
 const NOW = new Date('2026-08-29T00:00:00Z');

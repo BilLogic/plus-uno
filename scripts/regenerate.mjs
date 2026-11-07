@@ -19,11 +19,9 @@
  * one that exits non-zero, so a refused update is reported exactly where it
  * happened rather than swallowed by a later step.
  *
- * THE RATCHET COMMANDS ARE READ FROM `scripts/lib/ratchet-shapes.mjs`, not
- * copied here by hand. That file is the one list of which baseline offers an
- * `--update` and what it is — the same list `scripts/checks.registry.mjs`'s
- * drift check already holds every check to — so a new ratchet is one row
- * there and this script runs it without being told to separately.
+ * THE RATCHET COMMANDS ARE READ FROM `scripts/checks.registry.mjs`, each row's
+ * `update`, not copied here by hand, so a new ratchet is one row there and this
+ * script runs it without being told to separately.
  *
  * Usage:
  *   npm run regenerate
@@ -33,7 +31,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { SHAPES } from './lib/ratchet-shapes.mjs';
+import { ALL } from './checks.registry.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -68,11 +66,8 @@ const GENERATORS = [
 const BOT_DIR = path.join(REPO_ROOT, 'agents/uno-bot');
 const BUNDLE_HARNESS = { cwd: BOT_DIR, command: 'npm run bundle:harness' };
 
-/**
- * Every ratchet this repo can regenerate on its own — `command: null` rows are
- * hand-maintained records with no `--update` to run, and are left out.
- */
-const RATCHET_UPDATES = [...new Set(SHAPES.map((shape) => shape.command).filter(Boolean))];
+/** Every ratchet this repo can regenerate on its own; a record kept by hand has no `update`. */
+const RATCHET_UPDATES = [...new Set(ALL.map((row) => row.update).filter(Boolean))];
 
 /** One step: a shell command, and where to run it from. */
 function step(command, { cwd = REPO_ROOT } = {}) {

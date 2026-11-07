@@ -52,20 +52,14 @@
  *             `guards`, `reason` and `spawnReason` are each one line of at most
  *             `PROSE_CAP` characters; the check's own header carries the rest.
  *   baseline  the ratchet file, where the check holds a recorded set rather
- *             than a threshold. Declared so a reader can find the record
- *             without opening the script. The drift check asserts the row
- *             POINTS AT SOMETHING (#602): the record opens on the shape it
- *             declares, the check reaches it through its imports — a check that
- *             reads its record through the module and never names the file
- *             passes, which is why the assertion is not a filename search —
- *             and the `--update` the shape row advertises is one the check
- *             offers, or, where that row says `command: null`, is offered
- *             nowhere. What SHAPE that record is,
- *             and what reading and writing it means, is `scripts/lib/ratchet.mjs`
- *             and the one-row-per-record survey beside it in
- *             `scripts/lib/ratchet-shapes.mjs` (#599) — the twelve records here
- *             are twelve shapes, and the path declared on this row is the key
- *             they are surveyed under.
+ *             than a threshold. The drift check asserts the record opens
+ *             through `scripts/lib/ratchet.mjs` and that the check reaches it
+ *             through its imports. Every record shares one envelope, described
+ *             in that module's header.
+ *   update    the line that re-records the baseline, ending in the flag the
+ *             check offers. Absent where the record is kept by hand, and then
+ *             the check offers no `--update` at all. `npm run regenerate` runs
+ *             every one.
  *   floors    the sentinel thresholds the check enforces — minimum file / rule /
  *             component / variable counts, and maximum ages. Same class of
  *             datum as a `baseline`, and asserted the same way (#613): the
@@ -168,6 +162,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-figma-node-types.mjs',
     baseline: 'scripts/baselines/figma-node-types.json',
+    update: 'node scripts/check-figma-node-types.mjs --update',
     guards: "each registry mapping's claim about what its Figma node is (set, component or page) against the dated measurement in design-system/figma/node-types.json.",
   },
   {
@@ -218,6 +213,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-negation-ratchet.mjs',
     baseline: 'scripts/baselines/negation-baseline.json',
+    update: 'node scripts/check-negation-ratchet.mjs --update',
     guards: "the density of imperative-ban words (never, don't, do not, cannot, must not) not climbing in the bundled, IDE-side and workflow docs.",
   },
   {
@@ -235,6 +231,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-glossary.mjs',
     baseline: 'scripts/baselines/glossary-baseline.json',
+    update: 'node scripts/check-glossary.mjs --update',
     guards: 'GLOSSARY.md staying a glossary in the plugin format, with its prose lines ratcheted against scripts/baselines/glossary-baseline.json.',
   },
   {
@@ -252,6 +249,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-legacy-colors.mjs',
     baseline: 'scripts/baselines/legacy-colors.json',
+    update: 'node scripts/check-legacy-colors.mjs --update',
     guards: 'uses of light-only legacy `--color-*` tokens and hex fallbacks in components and prototypes, counted per file; a count may fall and never rise.',
   },
   {
@@ -261,6 +259,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-state-mixin.mjs',
     baseline: 'scripts/baselines/state-mixin.json',
+    update: 'node scripts/check-state-mixin.mjs --update',
     guards: 'the state mixin staying the one place hover, press, selection, disabled and the focus ring are drawn; hand-rolled states may fall, never rise.',
   },
   {
@@ -270,6 +269,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-inline-jsx-tokens.mjs',
     baseline: 'scripts/baselines/inline-jsx-tokens.json',
+    update: 'node scripts/check-inline-jsx-tokens.mjs --update',
     guards: 'literal values inside `style={{...}}` in components, counted per file; a count may fall and never rise, and a new file starts at zero.',
   },
   {
@@ -279,6 +279,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-react-bootstrap-imports.mjs',
     baseline: 'scripts/baselines/react-bootstrap-imports.json',
+    update: 'node scripts/check-react-bootstrap-imports.mjs --update',
     guards: 'imports of react-bootstrap in design-system/src, prototypes and src, counted per file; a count may fall and never rise.',
   },
   {
@@ -322,6 +323,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-color-fallbacks.mjs',
     baseline: 'scripts/baselines/color-fallback-baseline.json',
+    update: 'npm run check:color-fallbacks -- --update',
     guards: 'the literal fallback beside a color token agreeing with that token; recorded disagreements may fall and never rise.',
   },
   {
@@ -340,6 +342,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-size-fallbacks.mjs',
     baseline: 'scripts/baselines/size-fallback-baseline.json',
+    update: 'npm run check:size-fallbacks -- --update',
     guards: 'the literal fallback beside a size, spacing or padding token agreeing with that token; recorded disagreements may fall and never rise.',
   },
   {
@@ -350,6 +353,7 @@ export const CHECKS = [
     module: 'scripts/check-undefined-tokens.mjs',
     floors: { MIN_FILES: 1300 },
     baseline: 'scripts/baselines/undefined-token-baseline.json',
+    update: 'npm run check:undefined-tokens -- --update',
     guards: 'design tokens used and defined nowhere, which silently drop the whole declaration; the recorded set may fall and never rise.',
   },
   {
@@ -497,6 +501,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-old-size-tokens.mjs',
     baseline: 'scripts/baselines/old-size-tokens.json',
+    update: 'node scripts/check-old-size-tokens.mjs --update',
     guards: 'files reading a retired token name (RETIRED_TOKENS in scripts/lib/tokens/plan.mjs), held at zero.',
   },
   {
@@ -506,6 +511,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-ds-usage.mjs',
     baseline: 'scripts/baselines/ds-usage.json',
+    update: 'node scripts/check-ds-usage.mjs --update',
     guards: 'escapes from the design system in prototypes/ and src/: unknown components, props or tokens, deep imports, raw literals, Pro icons.',
   },
   {
@@ -515,6 +521,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-no-primitive-reads.mjs',
     baseline: 'scripts/baselines/no-primitive-reads.json',
+    update: 'node scripts/check-no-primitive-reads.mjs --update',
     guards: 'components and patterns reading a numbered primitive instead of a tier token, counted per file; the residue may fall and never rise.',
   },
   {
@@ -533,6 +540,7 @@ export const CHECKS = [
     module: 'scripts/check-atlassian-benchmark.mjs',
     floors: { MAX_AGE_DAYS: 365 },
     baseline: 'scripts/baselines/atlassian-benchmark.json',
+    update: 'npm run benchmark:atlassian -- --update',
     guards: 'the token benchmark against Atlassian staying a dated measurement, and the gaps it found staying closed once they close.',
   },
   {
@@ -551,6 +559,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-docs-tabs.mjs',
     baseline: 'scripts/baselines/docs-tabs.json',
+    update: 'node scripts/check-docs-tabs.mjs --update',
     guards: 'component docs pages keeping their Examples, Code, Usage and Changelog tab split, with tabbed pages held to a floor.',
   },
   {
@@ -638,6 +647,7 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'scripts/check-text-contrast.mjs',
     baseline: 'scripts/baselines/text-contrast-baseline.json',
+    update: 'npm run check:text-contrast -- --update',
     guards: "every `color:` declaration in the design system's stylesheets against the ground its rule puts it on, state layers composited first.",
   },
   {
@@ -710,6 +720,7 @@ export const EXCLUDED = [
     trigger: 'pull_request',
     kind: 'spawn',
     baseline: 'scripts/baselines/component-docs.json',
+    update: 'npm run generate:component-docs -- --update',
     spawnReason: 'a generator: `--check` is its assembly pass with the writes withheld, spawned by check:agent so the step names itself.',
     stepOf: 'check:agent',
     reason: 'step 3 of check:agent.',
@@ -762,6 +773,7 @@ export const EXCLUDED = [
     kind: 'spawn',
     spawnReason: "it drives a real Chromium over the story suite; the result is a browser run's exit code and a Playwright report.",
     baseline: 'scripts/baselines/a11y-baseline.json',
+    update: 'npm run check:storybook -- --update',
     reason: 'it needs `npm ci`, Playwright Chromium and about 130s, so it runs beside this gate as its own storybook-gate job.',
   },
   {

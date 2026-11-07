@@ -128,6 +128,7 @@ function record(repoRoot = REPO_ROOT) {
           'as `npm run audit:figma-registry` records more mappings, and never falls except by a ' +
           'hand edit that explains the deletion. Re-measure and raise it with ' +
           '`npm run check:figma-node-types -- --update`.',
+        'sets.main.direction': 'grow-only',
       },
     },
   );

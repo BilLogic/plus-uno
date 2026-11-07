@@ -1,33 +1,93 @@
 {
   "why": "react-bootstrap import statements, per file, in design-system/src, prototypes and src. Base UI is the single behavior layer (ADR-037, #1687); a count may fall and never rise, a file that reaches zero leaves the record, and a new file starts at zero. At a baseline of zero the final sweep removes the dependency and this check becomes a hard ban. Regenerate with `npm run check:react-bootstrap-imports -- --update`; never edit by hand.",
-  "counts": {
-    "design-system/src/specs/Admin/Group/Tables/GroupTrainingProgressTable/GroupTrainingProgressTable.jsx": 1,
-    "design-system/src/specs/Admin/Group/Tables/GroupsTable/GroupsTable.jsx": 1,
-    "design-system/src/specs/Admin/Session/Modals/SessionModal/SessionModal.jsx": 1,
-    "design-system/src/specs/Admin/Session/Tables/SessionBreakdownTable/SessionBreakdownTable.jsx": 1,
-    "design-system/src/specs/Admin/Session/Tables/SessionsTable/SessionsTable.jsx": 1,
-    "design-system/src/specs/Admin/Student/Modals/StudentModal/StudentModal.jsx": 1,
-    "design-system/src/specs/Admin/Student/Tables/StudentsTable/StudentsTable.jsx": 1,
-    "design-system/src/specs/Admin/Tutor/Elements/BadgeClaimedPill/BadgeClaimedPill.jsx": 1,
-    "design-system/src/specs/Admin/Tutor/Modals/DeleteTutorModal/DeleteTutorModal.jsx": 1,
-    "design-system/src/specs/Admin/Tutor/Modals/TutorModal/TutorModal.jsx": 1,
-    "design-system/src/specs/Admin/Tutor/Tables/TutorSessionsTable/TutorSessionsTable.jsx": 1,
-    "design-system/src/specs/Admin/Tutor/Tables/TutorsPerformanceTable/TutorsPerformanceTable.jsx": 1,
-    "design-system/src/specs/Admin/Tutor/Tables/TutorsToolUsageTable/TutorsToolUsageTable.jsx": 1,
-    "design-system/src/specs/Login/Pages/LoginPage/LoginPage.jsx": 1,
-    "design-system/src/specs/Login/Sections/LoginForm/LoginForm.jsx": 1,
-    "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/ToggleOrganism/ToggleOrganism.stories.jsx": 1,
-    "design-system/src/specs/Training/Lessons/LessonsOverviewPage.jsx": 1,
-    "design-system/src/specs/Training/Lessons/Sections/LessonListSection/LessonListSection.jsx": 1,
-    "design-system/src/specs/Training/Lessons/Tables/LessonsTable/LessonsTable.jsx": 1,
-    "design-system/src/specs/Training/Onboarding/OnboardingInnerPage.jsx": 1,
-    "design-system/src/specs/Training/Onboarding/OnboardingOverviewPage.jsx": 1,
-    "design-system/src/specs/Training/Onboarding/Tables/OnboardingModulesTable/OnboardingModulesTable.jsx": 1,
-    "prototypes/home-redesign/src/main.demo.jsx": 1,
-    "prototypes/home-redesign/src/main.jsx": 1,
-    "prototypes/post-session-reflection/src/main.jsx": 1,
-    "prototypes/research-assistant-chat/src/main.tsx": 1,
-    "prototypes/starter/src/main.jsx": 1,
-    "prototypes/tutor-revamp/src/main.jsx": 1
+  "sets": {
+    "main": {
+      "entries": {
+        "design-system/src/specs/Admin/Group/Tables/GroupTrainingProgressTable/GroupTrainingProgressTable.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Admin/Group/Tables/GroupsTable/GroupsTable.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Admin/Session/Modals/SessionModal/SessionModal.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Admin/Session/Tables/SessionBreakdownTable/SessionBreakdownTable.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Admin/Session/Tables/SessionsTable/SessionsTable.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Admin/Student/Modals/StudentModal/StudentModal.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Admin/Student/Tables/StudentsTable/StudentsTable.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Admin/Tutor/Elements/BadgeClaimedPill/BadgeClaimedPill.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Admin/Tutor/Modals/DeleteTutorModal/DeleteTutorModal.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Admin/Tutor/Modals/TutorModal/TutorModal.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Admin/Tutor/Tables/TutorSessionsTable/TutorSessionsTable.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Admin/Tutor/Tables/TutorsPerformanceTable/TutorsPerformanceTable.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Admin/Tutor/Tables/TutorsToolUsageTable/TutorsToolUsageTable.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Login/Pages/LoginPage/LoginPage.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Login/Sections/LoginForm/LoginForm.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Toolkit/Pre-Session/Elements/CallOffForm/ToggleOrganism/ToggleOrganism.stories.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Training/Lessons/LessonsOverviewPage.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Training/Lessons/Sections/LessonListSection/LessonListSection.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Training/Lessons/Tables/LessonsTable/LessonsTable.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Training/Onboarding/OnboardingInnerPage.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Training/Onboarding/OnboardingOverviewPage.jsx": {
+          "count": 1
+        },
+        "design-system/src/specs/Training/Onboarding/Tables/OnboardingModulesTable/OnboardingModulesTable.jsx": {
+          "count": 1
+        },
+        "prototypes/home-redesign/src/main.demo.jsx": {
+          "count": 1
+        },
+        "prototypes/home-redesign/src/main.jsx": {
+          "count": 1
+        },
+        "prototypes/post-session-reflection/src/main.jsx": {
+          "count": 1
+        },
+        "prototypes/research-assistant-chat/src/main.tsx": {
+          "count": 1
+        },
+        "prototypes/starter/src/main.jsx": {
+          "count": 1
+        },
+        "prototypes/tutor-revamp/src/main.jsx": {
+          "count": 1
+        }
+      }
+    }
   }
 }

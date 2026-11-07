@@ -1,57 +1,165 @@
 {
   "why": "Literal fallbacks that disagree with their own DIMENSION token (#268). The color half is scripts/baselines/color-fallback-baseline.json; this is the bigger one. Keyed on \"<token> <literal>\" rather than file and line, because a line number churns on every edit above it while the pair is the actual decision. The set may shrink and never grow; delete an entry when it is fixed, and the check reports any recorded pair that no longer disagrees. There is no undefinedTokens list here: an undefined name in this family is almost always a component-local custom property with a documented default, which is correct code — see scripts/check-size-fallbacks.mjs.",
-  "disagreements": [
-    "--font-size-h4 18px",
-    "--pad-x-md 10px",
-    "--pad-x-md 16px",
-    "--pad-y-lg 12px",
-    "--pad-y-lg 16px",
-    "--pad-y-md 8px",
-    "--radius-full 999px",
-    "--radius-md 2px",
-    "--radius-md 8px",
-    "--size-card-gap-lg 32px",
-    "--size-card-gap-sm 8px",
-    "--size-card-pad-x-md 16px",
-    "--size-card-pad-x-sm 12px",
-    "--size-card-pad-y-md 16px",
-    "--size-card-pad-y-sm 12px",
-    "--size-card-radius-md 12px",
-    "--size-card-radius-md 8px",
-    "--size-card-radius-sm 4px",
-    "--size-card-radius-sm 8px",
-    "--size-modal-gap-lg 24px",
-    "--size-modal-gap-md 16px",
-    "--size-modal-pad-x-md 20px",
-    "--size-modal-pad-x-sm 12px",
-    "--size-modal-pad-y-lg 24px",
-    "--size-modal-pad-y-md 16px",
-    "--size-modal-radius-lg 16px",
-    "--size-modal-radius-md 12px",
-    "--size-modal-radius-md 16px",
-    "--size-modal-radius-md 8px",
-    "--size-section-gap-lg 32px",
-    "--size-section-gap-md 24px",
-    "--size-section-gap-sm 16px",
-    "--size-section-pad-x-lg 24px",
-    "--size-section-pad-x-lg 32px",
-    "--size-section-pad-x-md 16px",
-    "--size-section-pad-y-lg 24px",
-    "--size-section-pad-y-lg 32px",
-    "--size-section-pad-y-lg 40px",
-    "--size-section-pad-y-md 16px",
-    "--size-section-pad-y-sm 8px",
-    "--size-spacing-large-space-600 24px",
-    "--size-spacing-medium-space-400 16px",
-    "--size-spacing-small-space-100 4px",
-    "--size-surface-gap-md 16px",
-    "--size-surface-radius 8px",
-    "--space-025 8px",
-    "--space-0625 12px",
-    "--space-0625 16px",
-    "--space-0625 8px",
-    "--stack-lg 24px",
-    "--stack-md 4px",
-    "--stack-sm 8px"
-  ]
+  "sets": {
+    "disagreements": {
+      "entries": {
+        "--font-size-h4 18px": {
+          "count": 1
+        },
+        "--pad-x-md 10px": {
+          "count": 1
+        },
+        "--pad-x-md 16px": {
+          "count": 1
+        },
+        "--pad-y-lg 12px": {
+          "count": 1
+        },
+        "--pad-y-lg 16px": {
+          "count": 1
+        },
+        "--pad-y-md 8px": {
+          "count": 1
+        },
+        "--radius-full 999px": {
+          "count": 1
+        },
+        "--radius-md 2px": {
+          "count": 1
+        },
+        "--radius-md 8px": {
+          "count": 1
+        },
+        "--size-card-gap-lg 32px": {
+          "count": 1
+        },
+        "--size-card-gap-sm 8px": {
+          "count": 1
+        },
+        "--size-card-pad-x-md 16px": {
+          "count": 1
+        },
+        "--size-card-pad-x-sm 12px": {
+          "count": 1
+        },
+        "--size-card-pad-y-md 16px": {
+          "count": 1
+        },
+        "--size-card-pad-y-sm 12px": {
+          "count": 1
+        },
+        "--size-card-radius-md 12px": {
+          "count": 1
+        },
+        "--size-card-radius-md 8px": {
+          "count": 1
+        },
+        "--size-card-radius-sm 4px": {
+          "count": 1
+        },
+        "--size-card-radius-sm 8px": {
+          "count": 1
+        },
+        "--size-modal-gap-lg 24px": {
+          "count": 1
+        },
+        "--size-modal-gap-md 16px": {
+          "count": 1
+        },
+        "--size-modal-pad-x-md 20px": {
+          "count": 1
+        },
+        "--size-modal-pad-x-sm 12px": {
+          "count": 1
+        },
+        "--size-modal-pad-y-lg 24px": {
+          "count": 1
+        },
+        "--size-modal-pad-y-md 16px": {
+          "count": 1
+        },
+        "--size-modal-radius-lg 16px": {
+          "count": 1
+        },
+        "--size-modal-radius-md 12px": {
+          "count": 1
+        },
+        "--size-modal-radius-md 16px": {
+          "count": 1
+        },
+        "--size-modal-radius-md 8px": {
+          "count": 1
+        },
+        "--size-section-gap-lg 32px": {
+          "count": 1
+        },
+        "--size-section-gap-md 24px": {
+          "count": 1
+        },
+        "--size-section-gap-sm 16px": {
+          "count": 1
+        },
+        "--size-section-pad-x-lg 24px": {
+          "count": 1
+        },
+        "--size-section-pad-x-lg 32px": {
+          "count": 1
+        },
+        "--size-section-pad-x-md 16px": {
+          "count": 1
+        },
+        "--size-section-pad-y-lg 24px": {
+          "count": 1
+        },
+        "--size-section-pad-y-lg 32px": {
+          "count": 1
+        },
+        "--size-section-pad-y-lg 40px": {
+          "count": 1
+        },
+        "--size-section-pad-y-md 16px": {
+          "count": 1
+        },
+        "--size-section-pad-y-sm 8px": {
+          "count": 1
+        },
+        "--size-spacing-large-space-600 24px": {
+          "count": 1
+        },
+        "--size-spacing-medium-space-400 16px": {
+          "count": 1
+        },
+        "--size-spacing-small-space-100 4px": {
+          "count": 1
+        },
+        "--size-surface-gap-md 16px": {
+          "count": 1
+        },
+        "--size-surface-radius 8px": {
+          "count": 1
+        },
+        "--space-025 8px": {
+          "count": 1
+        },
+        "--space-0625 12px": {
+          "count": 1
+        },
+        "--space-0625 16px": {
+          "count": 1
+        },
+        "--space-0625 8px": {
+          "count": 1
+        },
+        "--stack-lg 24px": {
+          "count": 1
+        },
+        "--stack-md 4px": {
+          "count": 1
+        },
+        "--stack-sm 8px": {
+          "count": 1
+        }
+      }
+    }
+  }
 }

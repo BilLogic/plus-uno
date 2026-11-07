@@ -242,10 +242,9 @@ export const ageInDays = (stamp, now) => {
 /**
  * The gate's findings, over the recorded floor.
  *
- * `recorded` is `{key: number}` — the record's `ours` set as
- * `scripts/lib/ratchet.mjs` reads it (#601), without the `note` and `recordedAt`
- * it keeps in among its numbers. The DIRECTION stays here rather than in the
- * shape table, because it is per ROW and not per set: two of the four argued
+ * `recorded` is `{key: number}` — the record's set as `scripts/lib/ratchet.mjs`
+ * reads it (#601). The DIRECTION stays here rather than in the record, because
+ * it is per ROW and not per set: two of the four argued
  * rows may only rise and two may only fall, each for the reason written beside
  * it in `ROWS`, and a set carries one direction.
  *

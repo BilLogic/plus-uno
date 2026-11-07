@@ -14,8 +14,7 @@
  *
  * The ratchet's WORDING is tested here — the NEW / ROSE / STALE columns this
  * check has always printed. Whether the classification behind them is right is
- * asserted once for the whole repo, against all twelve live baseline records,
- * in `scripts/lib/ratchet-conformance.mjs` (#599).
+ * asserted once for the whole repo, in `scripts/lib/ratchet.test.mjs`.
  *
  * Run: npm run test:scripts
  */
@@ -126,8 +125,7 @@ const KEY = 'a.scss|--color-warning|--color-surface';
 // The four cases below are about the WORDING, which is what stayed with the
 // check when #599 moved the record, the direction and the write into
 // `scripts/lib/ratchet.mjs`. That the classification itself is right is
-// asserted once, against all twelve live records, in
-// `scripts/lib/ratchet-conformance.mjs` — restating it here would be the
+// asserted once, in `scripts/lib/ratchet.test.mjs` — restating it here would be the
 // one-rule-two-homes defect this repo keeps deleting.
 
 test('the ratchet words a NEW finding', () => {

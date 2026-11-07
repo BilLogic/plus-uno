@@ -6,7 +6,7 @@
  * #506, and its tests moved with it to `design-system/tests/tokens.test.js`
  * (run by `npm test`). The ratchet went the same way and then on to
  * `scripts/lib/ratchet.mjs` in #599, where it is asserted against every live
- * baseline record by `scripts/lib/ratchet-conformance.mjs` — and in #600 this
+ * baseline record by its own tests — and in #600 this
  * check's own read of its record went with it. What is tested here is what
  * stayed: reading the `$btn-appearances` map, building a ground per appearance
  * and state, the duplicate-ground assertion, the two sides the record is
@@ -135,7 +135,7 @@ test('findings words a failure the ratchet called new, and says nothing about a 
   assert.match(loud[0], /^bad\/rest: label is 3\.7:1/);
 
   // Nothing new is nothing said. Which keys are new is the ratchet's call and
-  // is asserted once, over all twelve records, in ratchet-conformance.mjs.
+  // is asserted once, in scripts/lib/ratchet.test.mjs.
   assert.deepEqual(findings(FAILING.themes, FAILING.values, {}), []);
 });
 

@@ -49,17 +49,15 @@ const inputs = byRoot((repoRoot) => {
 });
 
 /**
- * The record's two sets, on the shape `scripts/lib/ratchet-shapes.mjs` declares
- * (#600). Both keep their reasons in ONE sibling `notes` map, which is the
- * arrangement that makes a rebuilt record lose them — so the read and the sweep
- * over them are the module's and this file only words what they say.
+ * The record's two sets, read through `scripts/lib/ratchet.mjs` (#600). Each
+ * entry carries its own reason and both sets require one, so the read and the
+ * sweep over them are the module's and this file only words what they say.
  *
  * NO `--update`. The record's value IS the argument for each entry, and it is
  * maintained by hand for that reason: a flag that recorded a new finding and
  * stamped it UNREVIEWED would be exactly the way of making the next 3.70:1
  * label quiet that this check's remedy tells a reader not to take. That is why
- * its row declares `command: null`, and why the absent-record message it
- * inherits says "record it by hand, with a reason per entry".
+ * its registry row declares no `update`.
  */
 const gate = (repoRoot, set) => openRatchet({ file: BASELINE, set, repoRoot });
 

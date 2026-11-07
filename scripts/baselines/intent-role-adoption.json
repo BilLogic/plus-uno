@@ -1,24 +1,49 @@
 {
-  "note": "Remaining border/outline declarations painting an edge from an intent BASE rather than from its -border role. Written by hand, read by check:intent-roles. A count may only fall, and a count that has fallen must be lowered here in the same commit — a baseline that no longer describes the code is a baseline nobody can read.",
+  "why": "Remaining border/outline declarations painting an edge from an intent BASE rather than from its -border role. Written by hand, read by check:intent-roles. A count may only fall, and a count that has fallen must be lowered here in the same commit — a baseline that no longer describes the code is a baseline nobody can read.",
   "recordedAt": "2026-08-29",
   "migrated": 111,
-  "files": {
-    "design-system/src/specs/Home/Cards/DataVisualization/DataVisualization.scss": {
-      "border": 0,
-      "outline": 1,
-      "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
+  "mixedStatesNote": "Hover and pressed colors mixed by hand (color-mix with black or white, or a brightness filter) where foundations/color.md rule 2 asks for a state layer. Read by check:intent-roles as its second set; a count may only fall, and a fallen count is lowered here in the same commit.",
+  "sets": {
+    "border": {
+      "direction": "both",
+      "reasons": "required",
+      "entries": {
+        "design-system/src/specs/Home/Cards/DataVisualization/DataVisualization.scss": {
+          "count": 0,
+          "reason": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
+        },
+        "design-system/src/specs/Training/Lessons/Elements/AiIndicator/AiIndicator.scss": {
+          "count": 0,
+          "reason": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
+        },
+        "design-system/src/specs/Training/Lessons/Elements/RatingSingle/RatingSingle.scss": {
+          "count": 0,
+          "reason": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
+        }
+      }
     },
-    "design-system/src/specs/Training/Lessons/Elements/AiIndicator/AiIndicator.scss": {
-      "border": 0,
-      "outline": 1,
-      "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
+    "outline": {
+      "direction": "both",
+      "reasons": "required",
+      "entries": {
+        "design-system/src/specs/Home/Cards/DataVisualization/DataVisualization.scss": {
+          "count": 1,
+          "reason": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
+        },
+        "design-system/src/specs/Training/Lessons/Elements/AiIndicator/AiIndicator.scss": {
+          "count": 1,
+          "reason": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
+        },
+        "design-system/src/specs/Training/Lessons/Elements/RatingSingle/RatingSingle.scss": {
+          "count": 1,
+          "reason": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
+        }
+      }
     },
-    "design-system/src/specs/Training/Lessons/Elements/RatingSingle/RatingSingle.scss": {
-      "border": 0,
-      "outline": 1,
-      "why": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
+    "mixedStates": {
+      "direction": "both",
+      "reasons": "required",
+      "entries": {}
     }
-  },
-  "mixedStates": {},
-  "mixedStatesNote": "Hover and pressed colors mixed by hand (color-mix with black or white, or a brightness filter) where foundations/color.md rule 2 asks for a state layer. Read by check:intent-roles as its second set; a count may only fall, and a fallen count is lowered here in the same commit."
+  }
 }

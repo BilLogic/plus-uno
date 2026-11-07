@@ -6,15 +6,16 @@ import os from 'node:os';
 import path from 'node:path';
 
 import { BASELINE, REPO_ROOT, measure, run } from './check-legacy-colors.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
 const src = (file, text) => ({ path: file, text });
 const A = 'design-system/src/components/labels/A/A.scss';
 
-/** A scratch repo root holding a baseline record of `counts`. */
+/** A scratch repo root holding a baseline record of `counts`, one entry per key. */
 function scratch(counts) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'legacy-colors-'));
   fs.mkdirSync(path.join(root, path.dirname(BASELINE)), { recursive: true });
-  fs.writeFileSync(path.join(root, BASELINE), JSON.stringify({ why: 'fixture', counts }, null, 2));
+  fs.writeFileSync(path.join(root, BASELINE), JSON.stringify({ why: 'fixture', sets: { main: { entries: Object.fromEntries(Object.entries(counts).map(([k, n]) => [k, { count: n }])) } } }, null, 2));
   return root;
 }
 
@@ -73,6 +74,6 @@ test('a missing baseline fails loudly rather than passing', () => {
 
 test('the labels group holds no legacy color, and the live tree holds its own baseline', () => {
   assert.deepEqual(run(), []);
-  const record = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, BASELINE), 'utf8')).counts;
+  const record = Object.fromEntries([...openRatchet({ file: BASELINE }).entries].map(([k, e]) => [k, e.count]));
   assert.deepEqual(Object.keys(record).filter((k) => k.includes('/components/labels/')), []);
 });

@@ -16,7 +16,7 @@ import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 const BASELINE = JSON.stringify({
   why: 'Literal fallbacks that disagree with their own DIMENSION token.',
-  disagreements: [],
+  sets: { disagreements: { entries: {} } },
 });
 
 test('a disagreeing size fallback in a fixture tree is a finding', () => {

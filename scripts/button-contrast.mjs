@@ -189,9 +189,9 @@ export function duplicateGrounds(themes, values) {
 }
 
 /**
- * The two sides of the record, measured — in the shape
- * `scripts/baselines/button-contrast-baseline.json` holds them, which is two arrays of
- * keys: `"appearance/state"` for contrast and `"a+b"` for a duplicate pair. This is
+ * The two sides of the record, measured — two arrays of keys, one per set of
+ * `scripts/baselines/button-contrast-baseline.json`: `"appearance/state"` for
+ * contrast and `"a+b"` for a duplicate pair. This is
  * what `scripts/lib/ratchet.mjs` is handed (#600), and it is the whole of what
  * this module says about the record.
  */

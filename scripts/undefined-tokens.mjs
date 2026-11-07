@@ -161,12 +161,9 @@ export function audit(files) {
  * entry nothing matches is a claim about code that has gone.
  *
  * NEW, ROSE and STALE ARE ALL `scripts/lib/ratchet.mjs`'s NOW (#600). Both of
- * this record's numbers per name — total uses and bare uses — are declared as
- * ratcheted FIELDS of its entry in `scripts/lib/ratchet-shapes.mjs`, so the
- * module moves them separately and says WHICH one moved, which is the
- * distinction this function used to have to draw for itself and drew as an
- * `else`: a name whose uses and bare uses both rose reported only the first.
- * Now both are reported, which is the direction of the bug.
+ * this record's numbers per name — total uses and bare uses — are sets of their
+ * own, so the module moves them separately and `acrossSets` says WHICH one moved:
+ * a name whose uses and bare uses both rose reports both.
  *
  * A bare use is a dropped declaration where a fallen-back one is only a
  * fiction, and that is why the two are separate rather than summed.

@@ -8,6 +8,7 @@ import { rescore, seedScore, SEEDED, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DEN
 import { spawnSync } from 'node:child_process';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
+import { openRatchet } from './lib/ratchet.mjs';
 
 test('every task has a brief, and the template and judge exist', () => {
   for (const task of TASKS) assert.ok(fs.existsSync(path.join(REPO_ROOT, SCENARIOS, task, 'BRIEF.md')), task);
@@ -293,8 +294,8 @@ test('seedScore: the debt scenario starts with recorded debt, the migration with
   // The debt file is a trimmed copy of a prototype whose escapes the baseline records.
   const debt = seedScore({ task: 'debt-extend' });
   assert.deepEqual(debt.byRule, { 'ds/no-deep-import': 4, 'ds/no-raw-literal': 2 });
-  const baseline = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'scripts/baselines/ds-usage.json'), 'utf8')).counts;
-  for (const [rule, n] of Object.entries(debt.byRule)) assert.ok(baseline[`${rule} prototypes/monthly-report/src/MonthlyReportsListContent.jsx`] >= n, rule);
+  const baseline = openRatchet({ file: 'scripts/baselines/ds-usage.json' }).entries;
+  for (const [rule, n] of Object.entries(debt.byRule)) assert.ok(baseline.get(`${rule} prototypes/monthly-report/src/MonthlyReportsListContent.jsx`)?.count >= n, rule);
 
   const migration = seedScore({ task: 'migrate-retired' });
   assert.ok(migration.byRule['ds/no-unknown-component'] >= 3, JSON.stringify(migration));

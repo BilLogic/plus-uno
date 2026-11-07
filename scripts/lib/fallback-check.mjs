@@ -164,9 +164,8 @@ export function fallbackCheck(family) {
   });
 
   /**
-   * The record, on the shape `scripts/lib/ratchet-shapes.mjs` declares for it
-   * (#600). Both families' records hold their set as a `keys` array, so a
-   * presence-only ratchet is the whole comparison and a rise cannot be
+   * The record, through `scripts/lib/ratchet.mjs` (#600). Both families' sets
+   * are presence only (every entry counts 1), so a presence-only ratchet is the whole comparison and a rise cannot be
    * expressed: every failure of these two is NEW, and the other direction that
    * matters — a recorded pair that has stopped disagreeing — is `stale()`.
    *
@@ -255,7 +254,7 @@ export function fallbackCheck(family) {
   /**
    * `--update` re-records the baseline. A write, so it stays out of `run`, and
    * it is the RATCHET's write and not one of its own (#600): the module reads
-   * the record, replaces the container at the declared path and writes the whole
+   * the record, replaces the set's entries and writes the whole
    * record back, so every key it does not own survives by construction. This
    * function used to rebuild the file from an envelope and a set, which is the
    * defect that sank the first attempt at #599 — for these two records it would
@@ -282,7 +281,7 @@ export function fallbackCheck(family) {
     // ratchet can be opened at all. A seed key is written only where the record
     // has none, so on a record that exists this whole object is inert.
     const written = gate(repoRoot, 'disagreements').update(keys, {
-      seed: { why, ...(undef ? { undefinedTokens: [] } : {}) },
+      seed: { why, ...(undef ? { 'sets.undefinedTokens.entries': {} } : {}) },
     });
     // Opened AFTER that write, never held from before it — see `gate`.
     if (undef) gate(repoRoot, 'undefinedTokens').update(undef, { seed: { why } });

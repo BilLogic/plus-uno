@@ -96,10 +96,8 @@ function slotFlags(source, slot) {
  * @param {object} [opts]
  * @param {string} [opts.repoRoot]
  * @param {string[]} [opts.notEvidence]  files walked for their own imports but
- *        never read as evidence. `scripts/lib/ratchet-shapes.mjs` is the one
- *        the registry passes: it is the survey of ALL TWELVE records, so it
- *        names every one of them by construction and naming one there is no
- *        evidence that THIS check reads THAT record.
+ *        never read as evidence: a file that names every record by
+ *        construction says nothing about which record THIS check reads.
  * @returns {ScriptReach}
  *
  * @typedef {object} ScriptReach

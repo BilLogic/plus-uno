@@ -345,18 +345,14 @@ Two kinds of failure, two mechanisms:
   count that falls does not. Re-record a genuine improvement with
   `npm run check:storybook -- --update` and commit the file in the same PR.
 - **What a ratchet IS, for every check that holds one**, is
-  `scripts/lib/ratchet.mjs`: the record's shape, which direction fails, the
-  stale-entry sweep, the placeholder-reason sweep and the `--update` write, with
-  the invariant asserted once in `scripts/lib/ratchet-conformance.mjs` against
-  all thirteen live records. The thirteen are twelve SHAPES and a counts map, surveyed one row each in
-  `scripts/lib/ratchet-shapes.mjs` — three of them keep the human's reason
-  outside the entry, so `--update` is a merge that leaves every key the module
-  does not own exactly as it found it. A check migrating onto the module adds no
-  row: it opens its record by the path it already names. The design-system
-  checks read it — color fallbacks, size fallbacks, undefined tokens, button
-  contrast, focus ring, icon-button name and intent roles (#600), the first two
-  through `scripts/lib/fallback-check.mjs`, which is where both families reach
-  their record.
+  `scripts/lib/ratchet.mjs`: which direction fails, the stale-entry sweep, the
+  placeholder-reason sweep and the `--update` write. Every record shares one
+  envelope — `why`, any other prose the check reads, then `sets`, each set an
+  optional `direction` and `reasons` and its `entries` of `{count, reason?}` —
+  so a new ratchet needs no table row. `--update` is a merge that leaves every
+  key the module does not own exactly as it found it. `scripts/lib/ratchet.test.mjs`
+  holds every live record to the envelope and to a no-movement `--update` that
+  changes no byte.
 - **The component language is a hard ban** (`check:ads-language`): old names,
   props, state steps and words are findings wherever they appear in
   `design-system/src`, `prototypes` and `src`. There is no baseline and no
@@ -371,21 +367,21 @@ Two kinds of failure, two mechanisms:
   floor. Each words its own findings and reads its record through the module:
   the half the module owns as `entries`, the rest — a recorded reading, a date,
   Atlassian's published surface — through `envelope()`.
-- Several records are maintained by hand and offer no `--update`
-  (`command: null` in their row), because the value of an entry in them IS the
+- Several records are maintained by hand and offer no `--update` (no
+  `update` on their registry row), because the value of an entry in them IS the
   argument for it. `--update` seeds the envelope onto a record written from
   nothing and then leaves it to whoever edits the file, which is why the two
   checks that stamp a date ask for it by hand.
 - **The registry asserts the pointer, not the filename** (#602). A `baseline:`
-  row is checked by `check:check-registry`: every set of the record opens on the
-  shape it declares (an unreadable record fails there rather than reading as an
-  empty set, which is green), the check that declares it reaches the record
+  row is checked by `check:check-registry`: every set of the record opens (an
+  unreadable record fails there rather than reading as an empty set, which is
+  green), the check that declares it reaches the record
   through its own imports — so a check that opens its record through the module
   without naming the file passes, and the fallback pair is credited to
   `scripts/lib/fallback-check.mjs` where the record work actually is — and the
-  `--update` its shape row advertises is a flag the check offers, in whichever
+  `--update` its row's `update` names is a flag the check offers, in whichever
   of `main()`'s two slots the check chose (`check:glossary`'s writes and then
-  still gates). A row with `command: null` must offer none. The a11y baseline is
+  still gates). A row with no `update` must offer none. The a11y baseline is
   the one record its check still parses itself, named as an exemption in
   `scripts/generate-check-scripts.mjs` with the reason: the browser suite's
   migration is its own piece of work.

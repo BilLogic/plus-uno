@@ -1,7 +1,14 @@
 {
-  "measured": "2026-11-03",
   "why": "Color-token decisions Button cannot make for itself. The set may shrink and must never grow: an entry that stops failing is itself reported, so a fix cannot be made and then quietly forgotten here.",
-  "contrast": [],
-  "duplicates": [],
-  "notes": {}
+  "measured": "2026-11-03",
+  "sets": {
+    "contrast": {
+      "reasons": "required",
+      "entries": {}
+    },
+    "duplicates": {
+      "reasons": "required",
+      "entries": {}
+    }
+  }
 }

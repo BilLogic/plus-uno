@@ -19,9 +19,8 @@
  * BARE IS RATCHETED SEPARATELY. `var(--x)` with no fallback drops the whole
  * declaration; `var(--x, 14px)` renders correctly and only lies about the token
  * name. A change that converts the second into the first keeps the total flat
- * and is a regression, so the bare count is held down on its own. Both numbers
- * are declared as ratcheted fields of the record's entry in
- * `scripts/lib/ratchet-shapes.mjs`, which is what holds them apart now (#600).
+ * and is a regression, so the bare count is held down on its own: the record
+ * keeps `uses` and `bare` as two sets keyed by name.
  *
  * THE RECORD IS `scripts/lib/ratchet.mjs`'s. This file reads it through the
  * module rather than parsing it, and `--update` is the module's MERGE rather
@@ -39,7 +38,7 @@ import { fileURLToPath } from 'node:url';
 
 import { LIBRARY_ROOT, PROTOTYPE_ROOTS, STORYBOOK_ROOT } from './lib/ds-facts.mjs';
 import { byRoot, main } from './lib/findings.mjs';
-import { openRatchet } from './lib/ratchet.mjs';
+import { acrossSets, openRatchet } from './lib/ratchet.mjs';
 import { audit, corpus, ratchetFailures } from './undefined-tokens.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -79,40 +78,31 @@ const inputs = byRoot((repoRoot) => {
 });
 
 /**
- * The record, on the shape `scripts/lib/ratchet-shapes.mjs` declares for it
- * (#600). Opened per call rather than memoized with the corpus: `update` merges
- * into the record as it was when the ratchet was opened, and this record holds
- * TWO ratcheted sets — the per-name entries and the census — so one held across
- * the other's write would write the pre-write record back.
+ * The record's three sets — `uses` and `bare` per name, and the census
+ * `totals` — through `scripts/lib/ratchet.mjs` (#600). Opened per call rather
+ * than memoized with the corpus, so no ratchet is held across another set's
+ * write.
  */
 const gate = (repoRoot, set) => openRatchet({ file: BASELINE, set, repoRoot });
 
-/**
- * What the run found, in THE RECORD'S OWN SHAPE — `{ name: { uses, bare } }`,
- * and nothing else. The measurement also carries the files each name appears
- * in, which the record does not hold and `--update` must therefore not write:
- * a ratchet writes back the entry it was handed.
- */
-const measured = (undefinedTokens) =>
-  Object.fromEntries(
-    Object.entries(undefinedTokens).map(([name, entry]) => [name, { uses: entry.uses, bare: entry.bare }]),
-  );
+/** One per-name count of the run, keyed by name: what the `uses` or `bare` set holds. */
+const measured = (undefinedTokens, field) =>
+  Object.fromEntries(Object.entries(undefinedTokens).map(([name, entry]) => [name, entry[field]]));
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
   const { files, undefinedTokens, names, uses, bare } = inputs(repoRoot);
-  const entries = gate(repoRoot, 'tokens');
+  const entries = gate(repoRoot, 'uses');
 
   // ONE stated absent-record error mode, the module's — said once, before the
   // census gate, because with nothing recorded every name would be reported new
   // and bury the only fact that matters.
   if (entries.absent) return entries.failures({}).map(({ message }) => ({ message }));
 
-  const side = measured(undefinedTokens);
-  const found = ratchetFailures(undefinedTokens, {
-    failures: entries.failures(side),
-    stale: entries.stale(side),
-  }).map((message) => ({ message }));
+  const found = ratchetFailures(
+    undefinedTokens,
+    acrossSets(undefinedTokens, { uses: entries, bare: gate(repoRoot, 'bare') }),
+  ).map((message) => ({ message }));
 
   /*
    * The census is a ratcheted set of its own, and it is not the sum of the one
@@ -122,7 +112,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   for (const rise of gate(repoRoot, 'totals').failures({ names: names.length, uses, bare })) {
     found.push({
       message:
-        `ROSE totals.${rise.field} — ${rise.recorded} recorded, ${rise.count} now. ` +
+        `ROSE totals.${rise.key} — ${rise.recorded} recorded, ${rise.count} now. ` +
         'The whole population may fall, never rise.',
     });
   }
@@ -149,16 +139,14 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
 /**
  * `--update` re-records the baseline. A write, which is why it is never inside
  * `run`, and it is the RATCHET's write (#600): the record is read, the container
- * at the declared path is replaced, and the whole record is written back, so
+ * of each set is replaced, and the whole record is written back, so
  * every key the module does not own survives. This function used to rebuild the
  * file from scratch — which is the write that, on three other records in this
  * repo, deleted the reasons a person had written, and is the defect that sank
  * the first attempt at #599.
  *
- * TWO SETS, TWO WRITES, THE SECOND OPENED AFTER THE FIRST. `tokens` and
- * `totals` are separate ratcheted containers of one record; `update` merges into
- * the record it read when it was opened, so a ratchet held from before the first
- * write would undo it.
+ * THREE SETS, THREE WRITES, each opened just before it writes, so no ratchet is
+ * held across another set's write.
  *
  * `seed` is only for a record that does not exist yet. On the one that does, the
  * envelope — its `note`, when it was measured, the roots it was measured over —
@@ -167,7 +155,7 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
 function update(repoRoot = REPO_ROOT) {
   const { undefinedTokens, names, uses, bare } = inputs(repoRoot);
   const seed = {
-    note:
+    why:
       'Token names used in the corpus and defined nowhere in it. A ratchet: counts may ' +
       'FALL and must never RISE, and an entry that stops matching is itself a finding. ' +
       'Regenerate with `npm run check:undefined-tokens -- --update`, and only when the ' +
@@ -175,7 +163,8 @@ function update(repoRoot = REPO_ROOT) {
     measuredAt: new Date().toISOString().slice(0, 10),
     roots: ROOTS,
   };
-  gate(repoRoot, 'tokens').update(measured(undefinedTokens), { seed });
+  gate(repoRoot, 'uses').update(measured(undefinedTokens, 'uses'), { seed });
+  gate(repoRoot, 'bare').update(measured(undefinedTokens, 'bare'), { seed });
   gate(repoRoot, 'totals').update({ names: names.length, uses, bare }, { seed });
   console.log(`[undefined-tokens] wrote ${BASELINE}: ${names.length} names, ${uses} uses, ${bare} bare.`);
 }

@@ -55,10 +55,8 @@ import {
 } from './text-contrast.mjs';
 
 /**
- * The record, named here because this is the check that reads it — and because
- * it is the key its shape is declared under in `scripts/lib/ratchet-shapes.mjs`
- * and the path `scripts/checks.registry.mjs` declares for this row. One
- * spelling, three readers.
+ * The record, named here because this is the check that reads it, and the
+ * path `scripts/checks.registry.mjs` declares for this row.
  */
 const BASELINE = 'scripts/baselines/text-contrast-baseline.json';
 
@@ -89,7 +87,7 @@ const inputs = byRoot((repoRoot) => {
 /**
  * What the run measured, in the record's own shape — one object, because
  * `failures`, `stale` and `--update` are three questions about the same
- * measurement and the ratchet reads both sides on the same declared form.
+ * measurement.
  */
 const measured = byRoot((repoRoot) => {
   const { found, counts } = inputs(repoRoot);
@@ -174,13 +172,19 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
 
 /**
  * `--update` re-records the baseline. A WRITE, so it stays out of `run` — and a
- * MERGE, so the record's envelope survives it: the ratchet replaces the
- * `findings` container and writes the rest of the record back untouched, and a
+ * MERGE, so the record's envelope survives it: the ratchet replaces the set's
+ * entries and writes the rest of the record back untouched, and a
  * reason already recorded is carried across rather than restated.
  */
 function update(repoRoot = REPO_ROOT) {
   const written = ratchetFor(repoRoot).update(measured(repoRoot), {
-    seed: { measured: `AA ${AA_TEXT}:1, ground from each rule, page fallback ${PAGE_TOKEN}` },
+    seed: {
+      why:
+        'Text colors below their contrast bar that are allowed to stand, each with the reason. A count may ' +
+        'fall and never rise; a new finding is fixed, or recorded here with a reason a reader can check.',
+      measured: `AA ${AA_TEXT}:1, ground from each rule, page fallback ${PAGE_TOKEN}`,
+      'sets.main.reasons': 'required',
+    },
   });
   console.log(`[text-contrast] wrote ${written.entries} entries to ${written.file}`);
 }

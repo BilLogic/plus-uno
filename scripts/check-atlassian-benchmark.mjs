@@ -26,8 +26,8 @@
  * of the four argued rows may only rise and two may only fall, each for the
  * reason written beside it in `ROWS`. That is why the directions stay in
  * `scripts/atlassian-benchmark.mjs` and are not read off the set's own
- * `direction` in `scripts/lib/ratchet-shapes.mjs`, which is one word for the
- * whole set and correctly says the set may only grow.
+ * `direction` in the record, which is one word for the whole set and correctly
+ * says the set may only grow.
  *
  * Run: `npm run check:atlassian-benchmark`. `npm run benchmark:atlassian`
  * prints the same table without the gate.
@@ -39,10 +39,8 @@ import { byRoot, main, report } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 
 /**
- * The record, named here because this is the check that reads it — and because
- * it is the key its shape is declared under in `scripts/lib/ratchet-shapes.mjs`
- * and the path `scripts/checks.registry.mjs` declares for this row. One
- * spelling, three readers.
+ * The record, named here because this is the check that reads it, and the
+ * path `scripts/checks.registry.mjs` declares for this row.
  */
 const BENCHMARK = 'scripts/baselines/atlassian-benchmark.json';
 
@@ -69,9 +67,8 @@ export const REMEDY =
 const inputs = byRoot((repoRoot) => {
   const ratchet = openRatchet({ file: BENCHMARK, repoRoot });
   /*
-   * The record has two halves and the module owns one of them. `ours` is the
-   * ratcheted set — four argued rows, a FLOOR, with `note` and `recordedAt`
-   * mixed in among them and preserved across a write. The rest of the record is
+   * The record has two halves and the module owns one of them. Its one set is
+   * OUR side — four argued rows, a FLOOR. The rest of the record is
    * ATLASSIAN'S published surface: a measurement of somebody else's system,
    * read by hand off a rendered page, with no direction to hold it to and
    * nothing for a ratchet to do. So it comes back through `envelope()`, and the
@@ -85,8 +82,7 @@ const inputs = byRoot((repoRoot) => {
 });
 
 /** The recorded floor per argued row: `{key: number}`, the set without its prose. */
-const recordedFloor = (ratchet) =>
-  Object.fromEntries([...ratchet.entries].map(([key, entry]) => [key, entry.counts.get('count')]));
+const recordedFloor = (ratchet) => Object.fromEntries([...ratchet.entries].map(([key, entry]) => [key, entry.count]));
 
 /** The comparison as a table, for `--table` and for `npm run benchmark:atlassian`. */
 function tableFor(rows) {
@@ -211,20 +207,19 @@ function update(repoRoot = REPO_ROOT) {
   if (refused.length) return refused.map((message) => ({ message }));
 
   /*
-   * A MERGE, through the ratchet: the `ours` container is replaced and every
-   * other key on the record survives, Atlassian's whole published surface
-   * included. `note` and `recordedAt` are declared IGNORED in the shape table,
-   * so they are carried across in place rather than counted — which is also
-   * what keeps them first in the container, as they were authored. The date is
-   * not restated by a tool, which is why the line below asks for it by hand.
+   * A MERGE, through the ratchet: the set's entries are replaced and every
+   * other key on the record survives, Atlassian's whole published surface and
+   * our `why` and `recordedAt` included. The date is not restated by a tool,
+   * which is why the line below asks for it by hand.
    */
   ratchet.update(measured, {
     seed: {
-      'ours.note':
+      why:
         'OUR side of the comparison. Only the ARGUED rows are recorded — see ROWS in ' +
         'scripts/atlassian-benchmark.mjs, where each direction carries its reason. Re-record with ' +
         '`npm run benchmark:atlassian -- --update` AFTER a move in the argued direction; it refuses ' +
         'a backwards one.',
+      'sets.main.direction': 'grow-only',
     },
   });
   console.log(moved.length ? `\nRe-recorded:\n  ${moved.join('\n  ')}\n  (set recordedAt by hand)\n` : '\nNothing moved.\n');

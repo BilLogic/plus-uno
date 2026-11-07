@@ -1,118 +1,69 @@
 /**
  * The ratchet — the harness's one reader and writer of a baseline record.
  *
- * WHY IT EXISTS. Twelve rows in `scripts/checks.registry.mjs` declare a
- * `baseline`, and every one of them used to implement the ratchet privately:
- * the read, the comparison, the stale-entry sweep and the `--update` write,
- * spelled twelve times and never the same way twice. `ratchet()` in
- * `design-system/src/lib/tokens.mjs` (#506) already unified the CLASSIFICATION
- * for nine of them, and #599 moved it here, because a baseline record has
- * nothing to do with color maths and because classification was only the
- * middle third of the job. What was still twelve-times-over is the READ (which
- * container in the record holds the set, and where the human's reason lives)
- * and the WRITE.
+ * Every row in `scripts/checks.registry.mjs` that declares a `baseline` reads
+ * and writes its record here. The check keeps the WORDING of its findings; this
+ * module owns the record's envelope, the direction that fails, the stale-entry
+ * report, the unreviewed-reason report and the `--update` write.
  *
- * That shape-agnostic classifier is GONE (#602). It survived #599 because four
- * scripts still worded their findings off a pair of sides they had read
- * themselves; #600 and #601 moved all four onto `openRatchet`, and it sat here
- * for one commit as an export with no importer and a comment that named its
- * callers. `failures()` and `stale()` below are the classification now, and the
- * difference is the whole module: they read a DECLARED shape and throw on a
- * record they cannot read, where the classifier took whatever two sides it was
- * handed and could not tell a mis-read from an empty set.
+ * ONE ENVELOPE, EVERY RECORD. A record describes itself, so a new ratchet needs
+ * no table row anywhere:
  *
- * So the ratchet is a module: it owns the record's ENVELOPE, the direction that
- * fails, the STALE-ENTRY report, the UNREVIEWED-REASON report, and the
- * `--update` write. What stays with the check is the WORDING of its findings —
- * which is what lets a check migrate onto this without a byte of its report
- * changing.
+ *   {
+ *     "why": "what the record holds and why it may stand",
+ *     …any other prose or measurement the check reads through `envelope()`,
+ *     "sets": {
+ *       "<name>": {
+ *         "direction": "grow-only" | "both",   // absent: shrink-only
+ *         "reasons": "required",                // absent: a reason is optional
+ *         "entries": { "<key>": { "count": 3, "reason": "…" } }
+ *       }
+ *     }
+ *   }
  *
- * THE INVARIANT, ENTIRE — stated once here, asserted once in
- * `scripts/lib/ratchet-conformance.mjs`, against all twelve live records:
+ * A record with one set calls it `main`, and a check opens it without naming
+ * it. A presence-only finding is `count: 1`; a single number (a floor, a census
+ * total) is an entry keyed by its name; an entry that ratchets two numbers is
+ * two sets keyed the same way, and `acrossSets` reads them as one.
  *
- *   NEW    a failure the record does not hold. The build fails: fix it, or
- *          record it with a reason.
- *   ROSE   a recorded count the run exceeded. Fails where the set is
- *          shrink-only, which is ten of the twelve records.
- *   FELL   a recorded count the run came in under. Fails where the set is a
- *          FLOOR (atlassian's `ours`, each negation scope's corpus size) or
- *          where the record ratchets in BOTH directions (intent-roles).
- *          Silent everywhere else — a ratchet only fails on a rise.
- *   STALE  a recorded entry the run no longer finds. A failure too, and the
- *          direction most records forget: a ratchet that cannot shrink is a
- *          list.
- *   UNREVIEWED  a recorded entry carrying the placeholder `update` stamps.
- *          `--update` records the finding; only a person can record why it is
- *          allowed to stand.
- *   ABSENT no record on disk. ONE stated error mode, not twelve.
- *   UNREADABLE a record that will not parse, or whose declared container is
- *          missing or the wrong type. AN ERROR, NEVER AN EMPTY SET: an empty
- *          baseline is a green ratchet, so a silent mis-read is an invisible
- *          failure. This is the distinction the first attempt at #599 lost.
+ * THE INVARIANT:
  *
- * `--update` IS A MERGE, NOT A REWRITE. A baseline is a record you must not
- * lose. `update` reads the record, replaces ONLY the container at the declared
- * path, and writes the whole record back — so every key the module does not own
- * survives by construction, `button-contrast`'s sibling `notes` and
- * `focus-ring`'s `measured` sweep included. Three of the twelve records keep
- * their reasons outside the entry, and rebuilding a record from an envelope and
- * a set deletes all three; that is what happened, and it is asserted per shape
- * in the conformance suite.
+ *   NEW    a finding the record does not hold. Fails.
+ *   ROSE   a recorded count the run exceeded. Fails unless the set is
+ *          `grow-only`.
+ *   FELL   a recorded count the run came in under. Fails where the set is
+ *          `grow-only` (a floor) or `both`; silent otherwise.
+ *   STALE  a recorded entry the run no longer finds. The check reports it, so a
+ *          fix cannot leave its exemption behind.
+ *   UNREVIEWED  an entry whose reason says nothing, in a set whose reasons are
+ *          required. `--update` records the finding; only a person records why.
+ *   ABSENT no record on disk: one stated error mode.
+ *   UNREADABLE a record that will not parse, or whose set is missing or the
+ *          wrong type. An error, never an empty set: an empty baseline is a
+ *          green ratchet, so a silent mis-read is an invisible failure.
  *
- * THE RECORD HAS AN UNOWNED HALF, AND `envelope()` IS HOW A CHECK READS IT.
- * The module owns the ratcheted container; a record also carries prose and
- * measurements that are nobody's to ratchet, and three checks GATE on that
- * half. `check:negation` compares each scope's recorded `measuredOn` against
- * the reading its scope takes now, because switching one reading for another
- * moves the number with no doc edited (#238); `check:glossary` prints the date
- * its count was recorded on; `check:atlassian-benchmark` reads Atlassian's
- * published surface out of the same file, which is a measurement of somebody
- * else's system and has no direction at all. Without a read for that half each
- * of them would open the file a second time — and a check that parses its own
- * record is the whole defect this module exists to end, so the read lives here
- * and the file is opened once.
+ * `--update` IS A MERGE. It reads the record on disk now, replaces only the
+ * set's `entries`, and writes the whole record back, so every key the module
+ * does not own survives. A reason is carried across untouched, and an entry the
+ * record has never seen gets `UNREVIEWED` where the set requires one. The write
+ * is `JSON.stringify(record, null, 2)` plus a newline, and the test suite holds
+ * every live record to that encoding, so a no-movement `--update` changes no
+ * byte.
  *
- * `envelope()` is READ-ONLY and hands back a clone. A declared SET is never
- * read through it: the set has a shape, a direction and an error mode, and
- * `entries` is the only reading of it that carries them.
- *
- * THE RECORD IS ENCODED THE WAY THIS MODULE WRITES IT, AND THAT IS ASSERTED.
- * `update` writes `JSON.stringify(record, null, 2)` plus a newline, which emits
- * every non-ASCII character literally. A record hand-edited into any other
- * encoding therefore has a no-movement `--update` that rewrites lines nobody
- * moved: `text-contrast-baseline.json` held its em-dashes as `\u2014` and
- * churned 17 lines, `atlassian-benchmark.json` 2, and the reviewer of #599 and
- * then of #601 reverted the write rather than read past the noise. A baseline
- * diff is the movement it recorded or it is not worth reading, so the encoding
- * is a case per record in `ratchet-conformance.mjs` rather than a convention
- * (#644).
- *
- * A REASON IS NEVER INVENTED BY THE TOOL. `update` carries an existing reason
- * across untouched and stamps `UNREVIEWED` on an entry it has never seen, so a
- * run whose record still holds one is a run where somebody pressed `--update`
- * and skipped the only step that mattered. An entry that LEAVES the set takes
- * its reason with it, whether the reason sat in the entry or beside it — the
- * two homes get the same policy, because a stale exemption is the defect
- * `stale()` exists to report.
- *
- * WHAT IT READS THROUGH. `REPO_ROOT` comes from `scripts/lib/corpus.mjs`, the
- * repo's one reader, rather than being re-derived from this file's own location
- * (#469, #620); the record itself is one named JSON file, which the corpus has
- * no question for. Every function takes a root and never consults the process's
- * working directory, which is what lets the conformance suite drive the real
- * records in a scratch tree instead of planting fixtures in the live one.
+ * `envelope()` reads the record's unowned half — prose, a date, a measurement
+ * of somebody else's system — so a check never opens its record a second time.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { ALL } from '../checks.registry.mjs';
 import { REPO_ROOT } from './corpus.mjs';
-import { setOf, shapeOf } from './ratchet-shapes.mjs';
 
 /**
- * The reason `update` stamps on an entry it has never seen. Deliberately a
- * sentence about the reader's job rather than a blank: a blank field reads like
- * a schema the tool forgot to fill, and this reads like the instruction it is.
+ * The reason `update` stamps on an entry it has never seen. A sentence about
+ * the reader's job rather than a blank, which would read like a field the tool
+ * forgot.
  */
 export const UNREVIEWED =
   'UNREVIEWED — replace with the reason this is not a defect, or fix it.';
@@ -120,8 +71,10 @@ export const UNREVIEWED =
 /** The four words people type instead of thinking, plus a dash and a blank. */
 const EMPTY_REASON = /^(todo|tbd|fixme|n\/?a|\?+|-+|—+)\.?$/i;
 
-/** The synthetic field name for a set whose findings carry no count at all. */
-const PRESENT = 'present';
+/** The set a check opens when it names none: a record with one set calls it this. */
+export const MAIN = 'main';
+
+const DIRECTIONS = new Set(['shrink-only', 'grow-only', 'both']);
 
 /**
  * Whether a recorded reason says nothing.
@@ -135,57 +88,37 @@ export function isUnreviewed(reason) {
   return text === '' || text.startsWith('UNREVIEWED') || EMPTY_REASON.test(text);
 }
 
-/** A reason is carried across untouched, or stamped when there is none to carry. */
-function carry(reason) {
-  return reason !== undefined && !isUnreviewed(reason) ? reason : UNREVIEWED;
-}
-
-/** What the module says when a record cannot be read on its declared shape. */
+/** What the module says when a record cannot be read. */
 class UnreadableRecord extends Error {
   constructor(file, detail) {
     super(
-      `${file} cannot be read as the baseline shape it declares: ${detail}. ` +
-        'Fix the record or its row in scripts/lib/ratchet-shapes.mjs — a record read on the ' +
-        'wrong shape reads as EMPTY, and an empty baseline is a green ratchet.',
+      `${file} cannot be read as a baseline record: ${detail}. A record read wrong reads as ` +
+        'EMPTY, and an empty baseline is a green ratchet.',
     );
     this.name = 'UnreadableRecord';
     this.file = file;
   }
 }
 
-/** Walk a dotted path. `''` is the value itself. */
-function at(value, dotted, { file, whole }) {
-  if (dotted === '') return value;
-  let here = value;
-  for (const step of dotted.split('.')) {
-    if (here === null || typeof here !== 'object' || Array.isArray(here)) {
-      throw new UnreadableRecord(file, `\`${whole}\` runs through \`${step}\`, which is not an object`);
-    }
-    if (!(step in here)) throw new UnreadableRecord(file, `it has no \`${whole}\``);
-    here = here[step];
-  }
-  return here;
-}
+const plainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 
 /** Walk a dotted path without deciding anything: `undefined` where it stops. */
 const soft = (value, dotted) =>
   dotted.split('.').reduce((here, step) => (here === null || typeof here !== 'object' ? undefined : here[step]), value);
 
-/** Set a dotted path on a mutable clone, creating nothing that is not there. */
+/** Set a dotted path on a mutable record, making the objects on the way. */
 function put(target, dotted, value) {
   const steps = dotted.split('.');
   const last = steps.pop();
   let here = target;
   for (const step of steps) {
-    if (here[step] === null || typeof here[step] !== 'object') here[step] = {};
+    if (!plainObject(here[step])) here[step] = {};
     here = here[step];
   }
   here[last] = value;
 }
 
-const plainObject = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
-
-const number = (value, file, where) => {
+const count = (value, file, where) => {
   if (typeof value !== 'number' || !Number.isFinite(value)) {
     throw new UnreadableRecord(file, `\`${where}\` is ${JSON.stringify(value)} rather than a number`);
   }
@@ -193,116 +126,19 @@ const number = (value, file, where) => {
 };
 
 /**
- * Normalize one side of the comparison — the record's container, or what a run
- * just measured — into `Map<key, {counts: Map<field, number>, reason, raw}>`.
- *
- * The SAME function reads both sides, from the SAME declared form. That is what
- * makes the comparison meaningful: a check hands in its findings in the shape
- * its record is written in, and nothing in between has to agree by convention.
- *
- * `raw` is kept because `update` writes the record back in its own shape, and
- * for `entries` and `lists` the payload beside the count is the record's
- * content — a ratio, the rule ids — not something the module may invent.
- *
- * @param {RatchetSetLike} set
- * @param {unknown} container
- * @param {string} file  named in every error, because the message is the only
- *                       thing standing between a mis-read and a green ratchet.
+ * One side of the comparison as `Map<key, number>`. A run hands in an array of
+ * keys (presence, count 1), or an object of key → number, or key → an object
+ * carrying `count`.
  */
-function tally(set, container, file) {
+function measure(found, file) {
   const out = new Map();
-  const where = set.at === '' ? set.name : set.at;
-  const ignore = new Set(set.ignore ?? []);
-
-  if (container === undefined || container === null) {
-    throw new UnreadableRecord(file, `\`${where}\` is ${String(container)}`);
-  }
-
-  if (set.form === 'keys') {
-    if (!Array.isArray(container)) {
-      throw new UnreadableRecord(file, `\`${where}\` is ${typeof container} rather than an array of keys`);
-    }
-    for (const key of container) {
-      if (typeof key !== 'string') {
-        throw new UnreadableRecord(file, `\`${where}\` holds ${JSON.stringify(key)}, which is not a key`);
-      }
-      out.set(key, { counts: new Map([[PRESENT, 1]]), reason: undefined, raw: key });
-    }
+  if (Array.isArray(found)) {
+    for (const key of found) out.set(String(key), 1);
     return out;
   }
-
-  if (!plainObject(container)) {
-    throw new UnreadableRecord(file, `\`${where}\` is ${Array.isArray(container) ? 'an array' : typeof container} rather than an object`);
-  }
-
-  if (set.form === 'scalar') {
-    for (const field of set.fields) {
-      if (!(field in container)) throw new UnreadableRecord(file, `\`${where}\` has no \`${field}\``);
-      out.set(field, {
-        counts: new Map([[field, number(container[field], file, `${where}.${field}`)]]),
-        reason: undefined,
-        raw: container[field],
-      });
-    }
-    return out;
-  }
-
-  for (const [key, value] of Object.entries(container)) {
-    if (ignore.has(key)) continue;
-
-    if (set.form === 'counts') {
-      out.set(key, {
-        counts: new Map([['count', number(value, file, `${where}.${key}`)]]),
-        reason: undefined,
-        raw: value,
-      });
-      continue;
-    }
-
-    if (set.form === 'lists') {
-      if (!Array.isArray(value)) {
-        throw new UnreadableRecord(file, `\`${where}.${key}\` is ${typeof value} rather than a list`);
-      }
-      for (const member of value) {
-        if (typeof member !== 'string') {
-          throw new UnreadableRecord(file, `\`${where}.${key}\` holds ${JSON.stringify(member)}, which is not a member id`);
-        }
-        out.set(`${key}${set.join}${member}`, {
-          counts: new Map([[PRESENT, 1]]),
-          reason: undefined,
-          raw: member,
-        });
-      }
-      continue;
-    }
-
-    if (set.form === 'reasons') {
-      if (typeof value !== 'string') {
-        throw new UnreadableRecord(file, `\`${where}.${key}\` is ${typeof value} rather than the reason it records`);
-      }
-      out.set(key, { counts: new Map([[PRESENT, 1]]), reason: value, raw: value });
-      continue;
-    }
-
-    // `entries`: one or more NAMED numbers, plus whatever else the record keeps
-    // beside them. An entry with no declared field is presence, which is what
-    // an exception map written as an object of objects would be.
-    if (!plainObject(value)) {
-      throw new UnreadableRecord(file, `\`${where}.${key}\` is ${typeof value} rather than an entry object`);
-    }
-    const counts = new Map();
-    for (const field of set.fields ?? []) {
-      if (!(field in value)) {
-        throw new UnreadableRecord(file, `\`${where}.${key}\` has no \`${field}\``);
-      }
-      counts.set(field, number(value[field], file, `${where}.${key}.${field}`));
-    }
-    if (!counts.size) counts.set(PRESENT, 1);
-    out.set(key, {
-      counts,
-      reason: set.reason?.in ? value[set.reason.in] : undefined,
-      raw: value,
-    });
+  if (!plainObject(found)) throw new UnreadableRecord(file, `the run handed in ${typeof found}`);
+  for (const [key, value] of Object.entries(found)) {
+    out.set(key, count(plainObject(value) ? value.count : value, file, key));
   }
   return out;
 }
@@ -322,132 +158,110 @@ function readRecord(absolute, file) {
   } catch (err) {
     throw new UnreadableRecord(file, `it is not JSON (${err.message})`);
   }
-  if (!plainObject(parsed)) {
-    throw new UnreadableRecord(file, `its top level is ${Array.isArray(parsed) ? 'an array' : typeof parsed}`);
-  }
+  if (!plainObject(parsed)) throw new UnreadableRecord(file, 'its top level is not an object');
   return parsed;
 }
 
+/** The named set of a record, checked: its entries, direction and reason rule. */
+function readSet(record, name, file) {
+  const sets = record.sets;
+  if (!plainObject(sets)) throw new UnreadableRecord(file, 'it has no `sets` object');
+  const set = sets[name];
+  if (!plainObject(set)) {
+    throw new UnreadableRecord(file, `it has no set \`${name}\`; it records ${Object.keys(sets).join(', ') || 'none'}`);
+  }
+  const direction = set.direction ?? 'shrink-only';
+  if (!DIRECTIONS.has(direction)) {
+    throw new UnreadableRecord(file, `set \`${name}\` has direction ${JSON.stringify(direction)}`);
+  }
+  if (!plainObject(set.entries)) throw new UnreadableRecord(file, `set \`${name}\` has no \`entries\` object`);
+  const entries = new Map();
+  for (const [key, entry] of Object.entries(set.entries)) {
+    if (!plainObject(entry)) throw new UnreadableRecord(file, `\`${name}.${key}\` is not an entry object`);
+    entries.set(key, { count: count(entry.count, file, `${name}.${key}.count`), reason: entry.reason });
+  }
+  return { direction, required: set.reasons === 'required', entries };
+}
+
 /**
- * The one stated absent-record error mode.
+ * The one stated absent-record error mode, naming the `update` line the
+ * record's registry row declares, or asking for it by hand where it has none.
  *
- * @param {string} file     repo-relative path to the record.
- * @param {string|null} command  the `--update` invocation, or `null` where the
- *                               record is maintained by hand.
+ * @param {string} file repo-relative path to the record.
  */
-export const absentMessage = (file, command) =>
-  `no baseline is recorded at ${file}, so this check has nothing to hold to. ` +
-  (command
-    ? `Run \`${command}\` once and commit the result`
-    : 'Record it by hand, with a reason per entry') +
-  ' — a check whose record is missing must fail loudly, not pass quietly.';
+export function absentMessage(file) {
+  const command = ALL.find((row) => row.baseline === file)?.update;
+  return (
+    `no baseline is recorded at ${file}, so this check has nothing to hold to. ` +
+    (command ? `Run \`${command}\` once and commit the result` : 'Record it by hand, with a reason per entry') +
+    ' — a check whose record is missing must fail loudly, not pass quietly.'
+  );
+}
 
 /**
  * Open the ratchet over one set of one baseline record.
  *
  * @param {object} spec
- * @param {string} spec.file      repo-relative path; also its row's key in
- *                                `scripts/lib/ratchet-shapes.mjs`.
- * @param {string} [spec.set]     which declared set, for a record with more
- *                                than one. Nine of the twelve have exactly one.
+ * @param {string} spec.file        repo-relative path to the record.
+ * @param {string} [spec.set]       which set; `main` where the record has one.
  * @param {string} [spec.repoRoot]  the tree the record lives in.
  * @returns {Ratchet}
  *
  * @typedef {object} RatchetFailure
  * @property {'absent'|'new'|'rose'|'fell'} kind
  * @property {string} [key]
- * @property {string} [field]     which named count moved, for a multi-count entry.
  * @property {number} [count]     what the run found.
  * @property {number} [recorded]  what the record holds.
- * @property {string} [message]   set for `absent` only: the stated error mode.
+ * @property {string} [message]   set for `absent` only.
  *
  * @typedef {object} Ratchet
  * @property {string} file
  * @property {string} set
  * @property {boolean} absent
- * @property {string} why        the record's own explanatory prose, `''` when absent.
- * @property {(dotted?: string) => unknown} envelope  the record's unowned half,
- *           by dotted path; `''` is the whole record. A clone, and read-only.
- * @property {Map<string, {counts: Map<string, number>, reason: string|undefined, raw: unknown}>} entries
+ * @property {string} why        the record's `why`, `''` when absent.
+ * @property {(dotted?: string) => unknown} envelope  the record by dotted path; a clone.
+ * @property {Map<string, {count: number, reason: string|undefined}>} entries
  * @property {(found: unknown) => RatchetFailure[]} failures
  * @property {(found: unknown) => {key: string, recorded: number, reason: string|undefined}[]} stale
  * @property {() => {key: string, reason: string|undefined}[]} unreviewed
- * @property {(found: unknown) => {file: string, entries: number}} update
+ * @property {(found: unknown, opts?: {seed?: Record<string, unknown>}) => {file: string, entries: number}} update
  */
-export function openRatchet({ file, set: name, repoRoot = REPO_ROOT }) {
-  const shape = shapeOf(file);
-  const set = setOf(shape, name);
+export function openRatchet({ file, set: name = MAIN, repoRoot = REPO_ROOT }) {
   const absolute = path.join(repoRoot, file);
   const record = readRecord(absolute, file);
   const absent = record === null;
-
-  const container = absent ? undefined : at(record, set.at, { file, whole: set.at || set.name });
-  const recorded = absent ? new Map() : tally(set, container, file);
-  const reasonsBeside =
-    absent || !set.reason?.beside ? {} : at(record, set.reason.beside, { file, whole: set.reason.beside });
-
-  /** The recorded side with each entry's reason resolved from its own home. */
-  const entries = new Map(
-    [...recorded.entries()].map(([key, entry]) => [
-      key,
-      { ...entry, reason: set.reason?.beside ? reasonsBeside[key] : entry.reason },
-    ]),
-  );
-
-  /** The run's side, read on the same declared form as the record's. */
-  const measured = (found) => tally(set, found, `${file} (measured)`);
-
-  const rises = set.direction !== 'grow-only';
-  const falls = set.direction === 'grow-only' || set.direction === 'both';
+  const { direction, required, entries } = absent
+    ? { direction: 'shrink-only', required: false, entries: new Map() }
+    : readSet(record, name, file);
+  const measured = (found) => measure(found, `${file} (measured)`);
+  const rises = direction !== 'grow-only';
+  const falls = direction !== 'shrink-only';
 
   return {
     file,
-    set: set.name,
+    set: name,
     absent,
-    // The record's own explanatory prose, for a reader. SOFT, unlike everything
-    // else here: `why` decides nothing, and a record written from nothing by
-    // `update` has no envelope yet — refusing to open it over a missing sentence
-    // would make the absent-record path unreachable.
-    why: absent || !shape.prose ? '' : String(soft(record, shape.prose) ?? ''),
+    why: absent ? '' : String(record.why ?? ''),
     entries,
 
-    /**
-     * The record's UNOWNED half, by dotted path — the envelope prose, a date, a
-     * measurement of somebody else's system. `''` is the whole record, the same
-     * convention a set's `at` uses. A CLONE, because a reader of the envelope
-     * must not be able to edit the module's reading of the record; `undefined`
-     * where the path is not there, and where there is no record at all, since
-     * every caller of this is reporting rather than deciding.
-     *
-     * Not for a declared set: `entries` is the only reading that carries the
-     * set's shape, its direction and its error mode.
-     */
+    /** The record by dotted path, `''` for all of it. A clone; `undefined` where absent. */
     envelope(dotted = '') {
       if (absent) return undefined;
-      return dotted === '' ? structuredClone(record) : soft(record, dotted);
+      return structuredClone(dotted === '' ? record : soft(record, dotted));
     },
 
     /**
-     * NEW, ROSE and FELL in the order the run found them — never grouped by
-     * kind, so the list reads like the run. An absent record short-circuits to
-     * the one stated error mode: with nothing recorded, every finding would
-     * otherwise be reported NEW and bury the one fact that matters.
+     * NEW, ROSE and FELL in the order the run found them. An absent record is
+     * the one failure, so it is not buried under every finding reported NEW.
      */
     failures(found) {
-      if (absent) return [{ kind: 'absent', message: absentMessage(file, shape.command) }];
+      if (absent) return [{ kind: 'absent', message: absentMessage(file) }];
       const out = [];
-      for (const [key, entry] of measured(found)) {
-        const was = recorded.get(key);
-        if (!was) {
-          out.push({ kind: 'new', key, count: entry.counts.values().next().value });
-          continue;
-        }
-        for (const [field, count] of entry.counts) {
-          const before = was.counts.get(field);
-          if (before === undefined) continue;
-          if (rises && count > before) out.push({ kind: 'rose', key, field, count, recorded: before });
-          else if (falls && count < before) out.push({ kind: 'fell', key, field, count, recorded: before });
-        }
+      for (const [key, now] of measured(found)) {
+        const was = entries.get(key);
+        if (!was) out.push({ kind: 'new', key, count: now });
+        else if (rises && now > was.count) out.push({ kind: 'rose', key, count: now, recorded: was.count });
+        else if (falls && now < was.count) out.push({ kind: 'fell', key, count: now, recorded: was.count });
       }
       return out;
     },
@@ -456,124 +270,70 @@ export function openRatchet({ file, set: name, repoRoot = REPO_ROOT }) {
     stale(found) {
       if (absent) return [];
       const seen = measured(found);
-      return [...entries.entries()]
+      return [...entries]
         .filter(([key]) => !seen.has(key))
-        .map(([key, entry]) => ({
-          key,
-          recorded: entry.counts.values().next().value,
-          reason: entry.reason,
-        }));
+        .map(([key, entry]) => ({ key, recorded: entry.count, reason: entry.reason }));
     },
 
-    /** Recorded entries whose reason says nothing. Empty where a set records none. */
+    /** Entries whose reason says nothing, where the set requires one. */
     unreviewed() {
-      if (absent || !set.reason) return [];
-      return [...entries.entries()]
+      if (!required) return [];
+      return [...entries]
         .filter(([, entry]) => isUnreviewed(entry.reason))
         .map(([key, entry]) => ({ key, reason: entry.reason }));
     },
 
     /**
-     * Re-record what was just measured. A WRITE, so a check calls it from its
-     * terminal `--update` flag and never from `run`.
+     * Re-record what was just measured: a WRITE, so a check calls it from its
+     * `--update` flag and never from `run`.
      *
-     * A MERGE. The record is read, the container at the declared path is
-     * replaced, and the whole record is written back: every other key survives
-     * because nothing ever rebuilt the record. Where the reasons live BESIDE
-     * the set, that sibling map is rewritten to the surviving keys and nothing
-     * else on the record is touched.
+     * The merge starts from the record on disk now, not the copy read at open:
+     * a record with several sets is written one set at a time, and merging from
+     * the opened copy would have each write undo the last.
      *
-     * `seed` is the envelope prose a check wants a BRAND-NEW record to carry —
-     * what it measured, and where the corpus came from. It is written only
-     * where the record does not already hold that path, because the envelope is
-     * the check's to state once and the reader's to edit afterwards; an
-     * `--update` that restated it would be the rewrite this method exists not
-     * to be. So a date stamp is NOT a seed: `check:glossary` and the benchmark
-     * both say "set it by hand" on the line they print, because the day a count
-     * was argued about is not the day a tool happened to re-record it.
-     *
-     * A seed key is a DOTTED PATH, like a set's `at` — `negation`'s envelope is
-     * one corpus sentence and one reading per SCOPE, three levels in, and a
-     * seed that could only reach the top level would leave a record written
-     * from nothing failing its own reading comparison on the next run.
-     *
-     * @param {unknown} found
-     * @param {{seed?: Record<string, unknown>}} [opts]
+     * `seed` is prose a brand-new record should carry, by dotted path, written
+     * only where the record does not already hold it: the envelope is the
+     * reader's to edit afterwards, so a date is never a seed.
      */
     update(found, { seed = {} } = {}) {
-      /*
-       * THE MERGE STARTS FROM THE RECORD ON DISK NOW, not from the copy this
-       * handle read when it was opened. A record with more than one set is
-       * written one set at a time — `negation` writes six — and every one of
-       * those handles has to be opened BEFORE the first write, because opening a
-       * set whose container a previous write has not created yet is an
-       * UNREADABLE record. Merging from the opened copy would then have each
-       * write undo the last, which is the rewrite this method exists not to be,
-       * one handle over. The RECORDED side stays as it was read: a reason is
-       * carried from the record the comparison was made against.
-       */
-      const current = readRecord(absolute, file);
-      const next = current === null ? {} : current;
+      const next = readRecord(absolute, file) ?? {};
       for (const [key, value] of Object.entries(seed)) {
         if (soft(next, key) === undefined) put(next, key, value);
       }
-      const runs = measured(found);
-
-      if (set.form === 'keys') {
-        put(next, set.at, [...runs.keys()]);
-      } else if (set.form === 'scalar') {
-        for (const [field, entry] of runs) {
-          put(next, set.at === '' ? field : `${set.at}.${field}`, entry.counts.get(field));
-        }
-      } else if (set.form === 'lists') {
-        const grouped = {};
-        for (const [key, entry] of runs) {
-          const head = key.slice(0, key.length - entry.raw.length - set.join.length);
-          (grouped[head] ??= []).push(entry.raw);
-        }
-        put(next, set.at, grouped);
-      } else if (set.form === 'counts') {
-        // Read out of `next` rather than out of `record`: `next` is the record
-        // plus whatever the seed just wrote, and a brand-new record's ignored
-        // keys — the benchmark's `note`, saying whose measurement this half is —
-        // arrive by seed and would otherwise be replaced by the container write.
-        const kept = {};
-        for (const key of set.ignore ?? []) {
-          const before = soft(next, set.at)?.[key];
-          if (before !== undefined) kept[key] = before;
-        }
-        const written = { ...kept };
-        for (const [key, entry] of runs) written[key] = entry.counts.get('count');
-        put(next, set.at, written);
-      } else if (set.form === 'reasons') {
-        const written = {};
-        for (const key of runs.keys()) written[key] = carry(entries.get(key)?.reason);
-        put(next, set.at, written);
-      } else {
-        const written = {};
-        for (const [key, entry] of runs) {
-          written[key] = set.reason?.in
-            ? { ...entry.raw, [set.reason.in]: carry(entries.get(key)?.reason) }
-            : entry.raw;
-        }
-        put(next, set.at, written);
+      const written = {};
+      for (const [key, now] of measured(found)) {
+        const reason = entries.get(key)?.reason;
+        const kept = reason !== undefined && !isUnreviewed(reason) ? reason : required ? UNREVIEWED : reason;
+        written[key] = kept === undefined ? { count: now } : { count: now, reason: kept };
       }
-
-      // The reasons map is MERGED, never rebuilt: `button-contrast` keeps one
-      // `notes` beside BOTH of its sets, so a write that rebuilt the map from
-      // this set's keys would delete the other set's reasons — the same defect
-      // as rebuilding the record, one level in. This set's own lost keys are
-      // pruned, because a stale exemption is what `stale()` exists to report.
-      if (set.reason?.beside) {
-        const notes = { ...(absent ? {} : (soft(record, set.reason.beside) ?? {})) };
-        for (const key of recorded.keys()) if (!runs.has(key)) delete notes[key];
-        for (const key of runs.keys()) notes[key] = carry(entries.get(key)?.reason);
-        put(next, set.reason.beside, notes);
-      }
-
+      put(next, `sets.${name}.entries`, written);
       fs.mkdirSync(path.dirname(absolute), { recursive: true });
       fs.writeFileSync(absolute, `${JSON.stringify(next, null, 2)}\n`);
-      return { file, entries: runs.size };
+      return { file, entries: Object.keys(written).length };
     },
   };
+}
+
+/**
+ * The verdicts of sets keyed alike, where each found entry carries one number
+ * per set — an entry that ratchets two numbers is two sets. One list in the
+ * run's order, each failure tagged with the `field` (set) it moved in. A new or
+ * stale key is in every set, so it is said once, from the first.
+ *
+ * @param {Record<string, Record<string, number>>} found  key → { [set]: count }
+ * @param {Record<string, Ratchet>} sets  set name → its opened ratchet
+ * @returns {{failures: (RatchetFailure & {field: string})[], stale: {key: string, recorded: number, reason: string|undefined}[]}}
+ */
+export function acrossSets(found, sets) {
+  const keys = Object.keys(found);
+  const side = (field) => Object.fromEntries(keys.map((key) => [key, found[key][field]]));
+  const [first, ...rest] = Object.keys(sets);
+  const failures = [first, ...rest].flatMap((field) =>
+    sets[field]
+      .failures(side(field))
+      .filter((f) => field === first || f.kind !== 'new')
+      .map((f) => ({ ...f, field })),
+  );
+  failures.sort((a, b) => keys.indexOf(a.key) - keys.indexOf(b.key));
+  return { failures, stale: sets[first].stale(side(first)) };
 }

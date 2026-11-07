@@ -38,7 +38,7 @@ import {
   themeMapUses,
 } from './intent-roles.mjs';
 import { byRoot, main } from './lib/findings.mjs';
-import { isUnreviewed, openRatchet } from './lib/ratchet.mjs';
+import { acrossSets, isUnreviewed, openRatchet } from './lib/ratchet.mjs';
 
 const BASELINE = 'scripts/baselines/intent-role-adoption.json';
 const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
@@ -74,19 +74,22 @@ const inputs = byRoot((repoRoot) => {
 });
 
 /**
- * The record, through `scripts/lib/ratchet.mjs` (#600). Its row declares an
- * entry of TWO ratcheted counts with the reason in the entry's own `why`, and a
- * direction of BOTH — so the module reports a rise, a fall, a file the record
+ * The record, through `scripts/lib/ratchet.mjs` (#600). The two edge counts
+ * per file are two sets, `border` and `outline`, each entry with its reason and
+ * each set a direction of BOTH — so the module reports a rise, a fall, a file the record
  * has stopped describing, and an entry whose reason says nothing, and this file
  * only words them.
  *
- * NO `--update`, by its row's `command: null`. The record is the document that
+ * NO `--update`: its registry row declares none. The record is the document that
  * says why each remainder is allowed to remain, and every line of that is a
  * person's: a flag that re-recorded the counts and stamped the reasons
  * UNREVIEWED would produce a record the check immediately fails on, which is
  * the honest outcome and still not a thing worth offering.
  */
-const gate = (repoRoot) => openRatchet({ file: BASELINE, set: 'files', repoRoot });
+const gate = (repoRoot) => ({
+  border: openRatchet({ file: BASELINE, set: 'border', repoRoot }),
+  outline: openRatchet({ file: BASELINE, set: 'outline', repoRoot }),
+});
 
 /*
  * THE SECOND SET: state colors mixed by hand. Rule 2 of
@@ -107,10 +110,13 @@ const mixGate = (repoRoot) => openRatchet({ file: BASELINE, set: 'mixedStates', 
  * entry here has to name a decision and nothing that short does. The two are
  * unioned rather than one replacing the other.
  */
-const reasonless = (ratchet) => {
-  const keys = new Set(ratchet.unreviewed().map((entry) => entry.key));
-  for (const [key, entry] of ratchet.entries) {
-    if (isUnreviewed(entry.reason) || entry.reason.length < 40) keys.add(key);
+const reasonless = (...ratchets) => {
+  const keys = new Set();
+  for (const ratchet of ratchets) {
+    for (const { key } of ratchet.unreviewed()) keys.add(key);
+    for (const [key, entry] of ratchet.entries) {
+      if (isUnreviewed(entry.reason) || entry.reason.length < 40) keys.add(key);
+    }
   }
   return [...keys];
 };
@@ -150,15 +156,14 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     }
   }
 
-  const ratchet = gate(repoRoot);
+  const edges = gate(repoRoot);
   const side = counts(uses);
-  if (ratchet.absent) return [...found, ...ratchet.failures(side).map(({ message }) => ({ message }))];
+  if (edges.border.absent) return [...found, ...edges.border.failures(side).map(({ message }) => ({ message }))];
 
   found.push(
     ...failures(uses, {
-      failures: ratchet.failures(side),
-      stale: ratchet.stale(side),
-      unreviewed: reasonless(ratchet),
+      ...acrossSets(side, edges),
+      unreviewed: reasonless(edges.border, edges.outline),
     }).map((message) => ({ message })),
   );
 
@@ -182,7 +187,7 @@ export function summary({ repoRoot = REPO_ROOT } = {}) {
   // them, and `envelope()` is how a check reads the record's unowned half (#601).
   // This line used to open the file a second time, which is the one thing
   // `scripts/lib/ratchet.mjs` says no check does — the record is opened once.
-  const record = gate(repoRoot);
+  const record = gate(repoRoot).border;
   return (
     `${files.length} stylesheets, ${remaining} edge use(s) of an intent base remain, ` +
     `all recorded (${record.envelope('migrated')} migrated ${record.envelope('recordedAt')}); ` +
