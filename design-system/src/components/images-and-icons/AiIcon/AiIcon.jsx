@@ -9,7 +9,7 @@ export { AI_ICON_NAMES, AI_ICON_SIZES } from './aiIconShapes';
 export const AI_ICON_ALL_SIZES = [12, 16, 24];
 
 /**
- * An icon for a PLUS AI action: generate, ask, rewrite, summarize, plan, suggest
+ * An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest
  * or stop generating. Each badged icon is a Font Awesome Free glyph with one
  * four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the
  * sparkle alone, and stop generating has none because stopping is not generative.

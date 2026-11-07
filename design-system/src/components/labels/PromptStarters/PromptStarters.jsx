@@ -4,7 +4,7 @@ import Suggestion from '../Suggestion/Suggestion';
 import './PromptStarters.scss';
 
 /**
- * A few things a person could ask PLUS AI, as a wrapping row of prompt
+ * A few things a person could ask the AI, as a wrapping row of prompt
  * `Suggestion` chips.
  *
  * - **starters** are `{ id, label, text }`: the short `label` on the chip and

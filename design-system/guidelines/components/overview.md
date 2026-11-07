@@ -55,7 +55,7 @@ benchmark for every page, so a name that matches it needs no row.
 | Count tag | Badge | Named for what it shows, a number, in the label family |
 | Tag | Tag | Same name and role |
 | Tag group | Tag group | Same name and role |
-| Suggestion | none | Offers what PLUS AI proposes, accepted or dismissed |
+| Suggestion | none | Offers what the AI proposes, accepted or dismissed |
 | Drawer (pattern) | Drawer | Kept as a PLUS pattern; its docs say it is a PLUS addition |
 | `appearance` | `appearance` | Same prop; values carry meaning (`default`, `subtle`, `primary`) |
 | `spacing` | `spacing` | Density in words: `default`, `compact`, `spacious`; pixel values stay on `size` |

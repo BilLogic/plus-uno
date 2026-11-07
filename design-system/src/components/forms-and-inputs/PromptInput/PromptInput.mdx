@@ -8,7 +8,7 @@ import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, Res
 <Meta of={PromptInputStories} />
 
 <Title />
-Where a person writes to PLUS AI: a text area that grows from one line to
+Where a person writes to the AI: a text area that grows from one line to
 five, then scrolls, with an optional control before the text and one send
 action after it.
 
@@ -86,9 +86,12 @@ action after it.
 
 ## Usage
 
-Use `PromptInput` as the one place a person writes to PLUS AI — a chat panel,
+Use `PromptInput` as the one place a person writes to the AI — a chat panel,
 a feature that drafts from a free-text ask. For a plain multi-line field with
 no AI behavior (no send-on-Enter, no loading state), use `TextArea` instead.
+
+`PromptInput` does not carry the fallibility line. `AiChat` shows it once
+under its input; any other consumer shows the same line under the field itself.
 
 </div>
 
@@ -146,9 +149,9 @@ no AI behavior (no send-on-Enter, no loading state), use `TextArea` instead.
 The loading state shows progress inside the field. Pair `isLoading` with `onStop` rather than disabling the field: the question stays in view, and Stop stays reachable.
 
 <DoDontPair
-    doExample={<PromptInput label="Message to PLUS AI" defaultValue="Summarize Maya's last two sessions" isLoading onStop={() => {}} />}
+    doExample={<PromptInput label="Message to AI chat" defaultValue="Summarize Maya's last two sessions" isLoading onStop={() => {}} />}
     doCaption="The loading state shows progress inside the field."
-    dontExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" isLoading onStop={() => {}} />}
+    dontExample={<PromptInput label="Message to AI chat" placeholder="Ask about a student, a session or a lesson" isLoading onStop={() => {}} />}
     dontCaption="A field emptied while generating loses the question."
 />
 
@@ -159,9 +162,9 @@ Focus tells the user the field accepts input. The field draws its own focus ring
 ### Hint at what can be asked.
 
 <DoDontPair
-    doExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" />}
+    doExample={<PromptInput label="Message to AI chat" placeholder="Ask about a student, a session or a lesson" />}
     doCaption="The placeholder hints at what can be asked."
-    dontExample={<PromptInput label="Message to PLUS AI" placeholder="Type here" />}
+    dontExample={<PromptInput label="Message to AI chat" placeholder="Type here" />}
     dontCaption="The placeholder describes the control."
 />
 
@@ -170,9 +173,9 @@ Focus tells the user the field accepts input. The field draws its own focus ring
 A disabled field blocks follow-up questions.
 
 <DoDontPair
-    doExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" />}
+    doExample={<PromptInput label="Message to AI chat" placeholder="Ask about a student, a session or a lesson" />}
     doCaption="An idle field takes the next question."
-    dontExample={<PromptInput label="Message to PLUS AI" placeholder="Ask PLUS AI about a student, a session or a lesson" isDisabled />}
+    dontExample={<PromptInput label="Message to AI chat" placeholder="Ask about a student, a session or a lesson" isDisabled />}
     dontCaption="A disabled idle field blocks the next question."
 />
 
@@ -182,7 +185,7 @@ A disabled field blocks follow-up questions.
 
 ```jsx
 <PromptInput
-    label="Message to PLUS AI"
+    label="Message to AI chat"
     placeholder="Ask anything about this session…"
     isLoading={isGenerating}
     onSubmit={sendMessage}
@@ -201,8 +204,8 @@ A disabled field blocks follow-up questions.
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Name the field for what it sends: "Message to PLUS AI".</td><td>A generic name such as "Text" or "Input".</td></tr>
-<tr><td>Hint at what can be asked: "Ask PLUS AI about a student, a session or a lesson".</td><td>Describe the control: "Type here".</td></tr>
+<tr><td>Name the field for what it sends: "Message to AI chat".</td><td>A generic name such as "Text" or "Input".</td></tr>
+<tr><td>Hint at what can be asked: "Ask about a student, a session or a lesson".</td><td>Describe the control: "Type here".</td></tr>
 </tbody>
 </DocsTable>
 

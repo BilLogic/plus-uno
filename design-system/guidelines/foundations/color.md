@@ -108,12 +108,12 @@ Light and dark, each with an increased contrast version, make four modes; `auto`
 
 Pick the role by meaning: neutral, brand, information, success, warning, danger, discovery, accent (no meaning), inverse (on a bold ground), input (form fields). Danger, warning, success, information and discovery come in default, subtler, subtle and bold. On a bold fill text and icons take the inverse tokens; a bold warning fill takes `--ds-text-warning-inverse`.
 
-## Disabled, links, selected and PLUS AI
+## Disabled, links, selected and AI
 
 - Disabled is a color, not an opacity: `--ds-text-disabled`, `--ds-background-disabled`, `--ds-border-disabled`. The opacity token is for images only.
 - A link takes `--ds-link`, underlined at rest in running text. The link color has a pressed step and no hovered step. Never use brand, selected or focused colors for a link.
 - Selected is the blue `--ds-background-selected` with `--ds-text-selected` and `--ds-icon-selected`, paired with a second cue such as a check or a border.
-- PLUS AI is the discovery role (purple): "AI recommended" and Suggestion take discovery.
+- AI is the discovery role (purple): "AI recommended" and Suggestion take discovery.
 
 ## Rules
 

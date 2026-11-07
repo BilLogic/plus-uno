@@ -97,7 +97,7 @@
       "import": "import { AiIcon } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/AiIcon/AiIcon.jsx",
-      "summary": "An icon for a PLUS AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each badged icon is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which starts at the icon color; set `color` to change it. Pair every icon with a label unless its meaning is obvious.",
+      "summary": "An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or stop generating. Each badged icon is a Font Awesome Free glyph with one four-point sparkle in its top-right corner and a clean gap cut around it. Generate is the sparkle alone, and stop generating has none because stopping is not generative. - **name** picks the icon. - **size** is 16 (the default) or 24. Generate and stop generating also have 12. Asking another icon for 12 draws it at 16 and warns. - **label** names the icon for assistive technology. Without it the icon is hidden, so pair it with visible text. The shapes fill with `currentColor`, which starts at the icon color; set `color` to change it. Pair every icon with a label unless its meaning is obvious.",
       "props": [
         {
           "name": "name",
@@ -3464,7 +3464,7 @@
       "import": "import { GenerativeBorder } from '@/components';",
       "group": "loading",
       "source": "design-system/src/components/loading/GenerativeBorder/GenerativeBorder.jsx",
-      "summary": "The border that shows PLUS AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments that run clockwise around the edge. - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the children render inside the wrapper with no ring at all. - **radius** names the radius token the ring follows; match the content it wraps. Defaults to `radius-100`. The segments turn slowly while active. The ring is decorative and hidden from assistive technology; `aria-busy` is what says content is changing. Under reduced motion the same segments hold still. Use it only while generating, one ring per piece of content. Do not nest two.",
+      "summary": "The border that shows the AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments that run clockwise around the edge. - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the children render inside the wrapper with no ring at all. - **radius** names the radius token the ring follows; match the content it wraps. Defaults to `radius-100`. The segments turn slowly while active. The ring is decorative and hidden from assistive technology; `aria-busy` is what says content is changing. Under reduced motion the same segments hold still. Use it only while generating, one ring per piece of content. Do not nest two.",
       "props": [
         {
           "name": "isActive",
@@ -5644,7 +5644,7 @@
       "import": "import { PromptInput } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/PromptInput/PromptInput.jsx",
-      "summary": "Where a person writes to PLUS AI: a text area that grows from one line up to five, then scrolls, with an optional control before the text and one send action after it. - **value / defaultValue / onChange** control or seed the text. Uncontrolled, the field clears itself after a send; controlled, the owner clears it in `onSubmit`. - **onSubmit(value)** runs on Enter or the send button, with the text as typed. Shift+Enter starts a new line. Nothing sends while the field is empty, disabled, loading, or an input method is mid-composition. - **isLoading** turns the send button into Stop (`onStop`) and rings the field in a `GenerativeBorder`. - **startSlot** is one quiet control before the text, such as an attach button. **attachments** renders a row of staged files above the text. **actions** is a slot for extra controls beside the send button. A PLUS composition of `FieldBox`, `Button` and `GenerativeBorder`.",
+      "summary": "Where a person writes to the AI: a text area that grows from one line up to five, then scrolls, with an optional control before the text and one send action after it. - **value / defaultValue / onChange** control or seed the text. Uncontrolled, the field clears itself after a send; controlled, the owner clears it in `onSubmit`. - **onSubmit(value)** runs on Enter or the send button, with the text as typed. Shift+Enter starts a new line. Nothing sends while the field is empty, disabled, loading, or an input method is mid-composition. - **isLoading** turns the send button into Stop (`onStop`) and rings the field in a `GenerativeBorder`. - **startSlot** is one quiet control before the text, such as an attach button. **attachments** renders a row of staged files above the text. **actions** is a slot for extra controls beside the send button. A PLUS composition of `FieldBox`, `Button` and `GenerativeBorder`.",
       "props": [
         {
           "name": "id",
@@ -5661,7 +5661,7 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": "The field's accessible name, such as \"Message to PLUS AI\".",
+          "description": "The field's accessible name, such as \"Message to AI chat\".",
           "deprecated": null
         },
         {
@@ -5800,7 +5800,7 @@
       "import": "import { PromptStarters } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/PromptStarters/PromptStarters.jsx",
-      "summary": "A few things a person could ask PLUS AI, as a wrapping row of prompt `Suggestion` chips. - **starters** are `{ id, label, text }`: the short `label` on the chip and the longer `text` it stands for. - **onSelect(starter)** runs when a chip is pressed, with the whole starter and nothing else. A starter suggests; it never sends on its own, so the caller decides what happens — usually putting `text` in a `PromptInput` for a person to read and send. - **label** names the group for assistive technology.",
+      "summary": "A few things a person could ask the AI, as a wrapping row of prompt `Suggestion` chips. - **starters** are `{ id, label, text }`: the short `label` on the chip and the longer `text` it stands for. - **onSelect(starter)** runs when a chip is pressed, with the whole starter and nothing else. A starter suggests; it never sends on its own, so the caller decides what happens — usually putting `text` in a `PromptInput` for a person to read and send. - **label** names the group for assistive technology.",
       "props": [
         {
           "name": "starters",

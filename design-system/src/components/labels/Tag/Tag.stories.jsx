@@ -190,7 +190,7 @@ export const Types = () => (
     <div style={row}>
         <Tag color="blue" data-testid="plain">Algebra</Tag>
         <Tag type="person" isRemovable onAfterRemoveAction={() => {}} data-testid="person">Rosa Chen</Tag>
-        <Tag type="agent" color="purple" isRemovable onAfterRemoveAction={() => {}} data-testid="agent">PLUS AI</Tag>
+        <Tag type="agent" color="purple" isRemovable onAfterRemoveAction={() => {}} data-testid="agent">Grading bot</Tag>
         <Tag type="team" isRemovable onAfterRemoveAction={() => {}} data-testid="team">Math team</Tag>
         <Tag type="person" avatar={PHOTO} data-testid="person-photo">Kai Brooks</Tag>
         <Tag type="agent" avatar={PHOTO} data-testid="agent-photo">Tutor bot</Tag>
@@ -335,14 +335,14 @@ export const TypeBehaviors = {
         return (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 <Row type="person" label="Rosa Chen" />
-                <Row type="agent" label="PLUS AI" />
+                <Row type="agent" label="Tutor bot" />
                 <Row type="team" label="Math team" />
             </div>
         );
     },
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
-        const labels = { person: 'Rosa Chen', agent: 'PLUS AI', team: 'Math team' };
+        const labels = { person: 'Rosa Chen', agent: 'Tutor bot', team: 'Math team' };
 
         for (const [type, label] of Object.entries(labels)) {
             for (const kind of ['removable', 'selectable', 'link', 'disabled']) {
@@ -433,14 +433,14 @@ PersonFocusRing.play = async ({ canvasElement }) => {
  */
 export const RemoveFocusRingOnTypes = () => (
     <div style={row}>
-        <Tag type="agent" isRemovable onAfterRemoveAction={() => {}}>PLUS AI</Tag>
+        <Tag type="agent" isRemovable onAfterRemoveAction={() => {}}>Tutor bot</Tag>
         <Tag type="team" isRemovable onAfterRemoveAction={() => {}}>Math team</Tag>
     </div>
 );
 
 RemoveFocusRingOnTypes.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    for (const name of ['Remove PLUS AI', 'Remove Math team']) {
+    for (const name of ['Remove Tutor bot', 'Remove Math team']) {
         await userEvent.tab();
         const x = canvas.getByRole('button', { name });
         await expect(x).toHaveFocus();

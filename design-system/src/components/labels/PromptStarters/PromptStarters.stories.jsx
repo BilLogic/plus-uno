@@ -4,7 +4,7 @@ import PromptStarters from './PromptStarters';
 import PromptInput from '../../forms-and-inputs/PromptInput/PromptInput';
 
 /**
- * `PromptStarters` — a few things a person could ask PLUS AI, as a wrapping
+ * `PromptStarters` — a few things a person could ask the AI, as a wrapping
  * row of `Suggestion` chips.
  *
  * THE TEST SEAM IS THIS FILE. `play:` functions assert the group role and
@@ -89,7 +89,7 @@ export const FillsThePromptInput = () => {
     const [value, setValue] = useState('');
     return (
         <div style={{ ...wrap, display: 'flex', flexDirection: 'column', gap: 'var(--grid-gutter)' }}>
-            <PromptInput label="Message to PLUS AI" value={value} onChange={(e) => setValue(e.target.value)} onSubmit={fn()} />
+            <PromptInput label="Message to AI chat" value={value} onChange={(e) => setValue(e.target.value)} onSubmit={fn()} />
             <PromptStarters
                 label="Suggested prompts"
                 starters={STARTERS}
@@ -102,7 +102,7 @@ export const FillsThePromptInput = () => {
 FillsThePromptInput.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await userEvent.click(canvas.getByRole('button', { name: 'Summarize this session, suggested' }));
-    const field = canvas.getByRole('textbox', { name: 'Message to PLUS AI' });
+    const field = canvas.getByRole('textbox', { name: 'Message to AI chat' });
     await expect(field).toHaveValue('Summarize this session for the family.');
 };
 
