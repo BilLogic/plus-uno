@@ -216,7 +216,7 @@ describe("the morning run", () => {
       store,
       now: at(32, 13), // Fri 2026-10-02 09:00 ET
       thread: [msg(BEA, ROOT, "Where are the screens?"), msg(MAYA, PROMISE, "I'll share it by Thu."), link],
-      judgeReplies: [JSON.stringify({ done: true, evidence_ts: [link.ts], confidence: 0.9 })],
+      judgeReplies: [JSON.stringify({ answer: "done", reason: null, evidence_ts: [link.ts], confidence: 0.9 })],
     });
     const report = await m.run();
     assert.deepEqual(report.actions.map((a) => a.action), ["auto_done"]);
@@ -247,8 +247,7 @@ describe("the morning run", () => {
     assert.equal(row.state, "nudged");
     assert.equal(row.nudges, 1);
     assert.equal(row.nudgeTs, nudge!.ts);
-    // No later messages: no judge call spent.
-    assert.equal(m.judge.generated.length, 0);
+    assert.equal(m.judge.generated.length, 1, "the judge is asked even of silence: a call's moment can pass in it");
     // The thread is marked, so the team's replies there don't start turns.
     assert.deepEqual(m.marked, [`${DESIGN}:${ROOT}`]);
   });

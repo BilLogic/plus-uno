@@ -100,8 +100,12 @@ export const WINDOW_CONTEXT = 2;
 const MAX_MESSAGE_WINDOW_CHARS = 1_200;
 /** Messages up to and including the promise, read again at nudge time. */
 export const CONTEXT_MESSAGES = 8;
-/** Messages after the promise the morning judges for completion. */
-export const EVIDENCE_MESSAGES = 50;
+/** Messages after the promise the morning reads for the judge, a page at a
+ *  time; the judge reads them oldest first, as many as fit. */
+export const EVIDENCE_MESSAGES = 200;
+/** Pages of `EVIDENCE_MESSAGES` read after a promise. Past them the oldest
+ *  are still unread, so the judge is not asked and the reminder goes out. */
+export const MAX_EVIDENCE_PAGES = 2;
 /** Reminders one person gets from this job in one morning. */
 export const MAX_DM_REMINDERS_PER_MORNING = 2;
 /** Mornings running a row may be held before it lapses. */
@@ -118,10 +122,10 @@ export const NUDGE_SCOPES = [...REQUIRED_SCOPES, "search:read.public"] as const;
 /** Public-channel searches one reminder may run, one term each, stopping at
  *  the first that finds the promiser's post. */
 export const MAX_EVIDENCE_SEARCHES = 2;
-/** What one reminder may spend: two DM reads, the public searches, the
+/** What one reminder may spend: three DM reads, the public searches, the
  *  detector, the judge, the name, the bot DM and the post, one spare, and
  *  the D1 statements around them. */
-export const DM_NUDGE_COST = { subrequests: 11, d1Queries: 3 };
+export const DM_NUDGE_COST = { subrequests: 12, d1Queries: 3 };
 
 const PROMISE_KINDS: readonly DmCommitmentKind[] = ["made", "made_to"];
 
@@ -627,7 +631,7 @@ async function remind(
   // Edited away, or read differently now: silently gone.
   if (!promise || (promise.promiser === c.ownerId) !== (c.kind === "made")) return lapse();
 
-  const later = await slack.api.history(at.channel, { oldest: at.ts, limit: EVIDENCE_MESSAGES });
+  const later = await messagesAfter(slack.api, at.channel, at.ts);
   if (!later) return hold("the DM could not be read");
   const inDm = humans(later.messages, deps.botUserId).filter((m) => Number(m.ts) > Number(at.ts));
   // The work may have been done anywhere public: a channel post by the
@@ -637,13 +641,17 @@ async function remind(
   const elsewhere = await publicEvidence(slack.api, promise, at.ts, nameOf);
   if (!elsewhere) return hold("the public-channel search failed");
   const after = [...inDm, ...elsewhere].sort((a, b) => Number(a.ts) - Number(b.ts));
-  if (after.length) {
-    const verdict = await deps.judge.judge({ promiser: promise.promiser, what: promise.what, promiseTs: at.ts, messages: after, sources: [] });
-    if (!verdict.ok) return hold("the judge did not answer");
-    if (verdict.done) {
-      await settle({ state: "auto_done", resolvedAt: now });
-      return "auto_done";
-    }
+  // Asked even with nothing said since: a call's moment can pass in silence.
+  // Too much since to read from the start: not asked, so Still open.
+  const verdict = later.complete
+    ? await deps.judge.judge({ promiser: promise.promiser, what: promise.what, promiseTs: at.ts, messages: after, sources: [], now })
+    : ({ ok: true, answer: "still-open", evidenceTs: [] } as const);
+  if (!verdict.ok) return hold("the judge did not answer");
+  // Done, or no longer needed: closed silently. Only Still open is reminded.
+  if (verdict.answer !== "still-open") {
+    if (verdict.answer === "no-longer-needed") log(deps, `[dm-watch] ${c.id} no longer needed (${verdict.reason}), closed`);
+    await settle({ state: "auto_done", resolvedAt: now });
+    return "auto_done";
   }
 
   // The reminder in full the first time and at a ⏳'s check-back; otherwise
@@ -687,6 +695,32 @@ async function remind(
       : { followupTs: posted.ts, earlierFollowupTs: c.followupTs ? [...c.earlierFollowupTs, c.followupTs] : c.earlierFollowupTs }),
   });
   return action;
+}
+
+/**
+ * Every message in a DM after `ts`, oldest first. Slack pages history newest
+ * first, so a single read with `oldest` and a limit returns the NEWEST of
+ * them — dropping the replies just after the promise, the ones most likely to
+ * settle it. So the pages are walked down to the promise. `complete` is
+ * false when more than `MAX_EVIDENCE_PAGES` pages lie between: a judge shown
+ * only the newest would miss the start, so it is not asked. Null when Slack
+ * would not say.
+ */
+export async function messagesAfter(
+  api: OwnerSlack,
+  channel: string,
+  ts: string,
+): Promise<{ messages: SweepSlackMessage[]; complete: boolean } | null> {
+  const got: SweepSlackMessage[] = [];
+  let cursor: string | undefined;
+  for (let page = 0; page < MAX_EVIDENCE_PAGES; page++) {
+    const res = await api.history(channel, { oldest: ts, limit: EVIDENCE_MESSAGES, ...(cursor ? { cursor } : {}) });
+    if (!res) return null;
+    got.push(...res.messages);
+    if (!res.hasMore || !res.nextCursor) return { messages: got.sort((a, b) => Number(a.ts) - Number(b.ts)), complete: true };
+    cursor = res.nextCursor;
+  }
+  return { messages: [], complete: false };
 }
 
 /** Words too common to find a promised piece of work by. */

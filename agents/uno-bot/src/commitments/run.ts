@@ -80,7 +80,7 @@ import {
   type TapAnswer,
 } from "./copy";
 import type { ReminderPress } from "./press";
-import { mayHoldPromise, type CommitmentDetector, type EvidenceJudge, type FewShotExample } from "./detector";
+import { mayHoldPromise, type CommitmentDetector, type EvidenceJudge, type FewShotExample, type PromiseAnswer, type ReleaseReason } from "./detector";
 import {
   commitmentDueAt,
   dayLabel,
@@ -512,11 +512,13 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
   }
   if (c.kind === "self_reminder") return remindSelf(deps, c, text, place, now, runDate, settle, hold);
 
-  const evidence = await checkEvidence(deps, c, text);
+  const evidence = await checkEvidence(deps, c, text, now);
   if (evidence === "unknown") return hold("its thread or the judge could not be read");
-  if (evidence === "done") {
+  // Done, or no longer needed: closed silently. Only Still open is reminded.
+  if (evidence.answer !== "still-open") {
     await settle({ state: "auto_done", resolvedAt: now });
-    return { id: c.id, action: "auto_done" };
+    if (evidence.answer === "no-longer-needed") console.log(`[commitments] ${c.id} no longer needed (${evidence.reason}), closed`);
+    return { id: c.id, action: "auto_done", ...(evidence.reason ? { note: `no longer needed: ${evidence.reason}` } : {}) };
   }
 
   const first = c.nudges === 0;
@@ -600,15 +602,20 @@ function destinationOf(c: CommitmentRecord, config: CommitmentConfig): { channel
 }
 
 /**
- * Whether the promise shows as kept: the thread since it, the promiser's own
- * messages in the channel since, and the Notion and GitHub pages those link,
- * read by the judge. `unknown` when the thread or the judge could not be read
- * — a reminder is not sent on a check that never happened.
+ * Where the promise stands — Done, No longer needed or Still open: the thread
+ * since it, the promiser's own messages in the channel since, and the Notion
+ * and GitHub pages those link, read by the judge. `unknown` when the thread or
+ * the judge could not be read — a reminder is not sent on a check that never
+ * happened.
  */
-async function checkEvidence(deps: NudgeDeps, c: CommitmentRecord, text: CommitmentText): Promise<"done" | "not-done" | "unknown"> {
+async function checkEvidence(
+  deps: NudgeDeps,
+  c: CommitmentRecord,
+  text: CommitmentText,
+  now: number,
+): Promise<{ answer: PromiseAnswer; reason?: ReleaseReason } | "unknown"> {
   const later = await laterMessages(deps, c);
   if (!later) return "unknown";
-  if (!later.length) return "not-done";
   const links = [...new Set(later.filter((m) => m.user === c.promiserId).flatMap((m) => linksIn(m.text)))]
     .map((url) => ({ url, kind: classifyLink(url, deps.config.figmaLibraryKey) }))
     .filter((l): l is { url: string; kind: TargetKind } => l.kind !== null && EVIDENCE_KINDS.has(l.kind))
@@ -623,9 +630,10 @@ async function checkEvidence(deps: NudgeDeps, c: CommitmentRecord, text: Commitm
       rethrowIfBudget(err);
     }
   }
-  const verdict = await deps.judge.judge({ promiser: c.promiserId, what: text.what, promiseTs: c.messageTs, messages: later, sources });
+  // Asked even with nothing said since: a call's moment can pass in silence.
+  const verdict = await deps.judge.judge({ promiser: c.promiserId, what: text.what, promiseTs: c.messageTs, messages: later, sources, now });
   if (!verdict.ok) return "unknown";
-  return verdict.done ? "done" : "not-done";
+  return { answer: verdict.answer, ...(verdict.reason ? { reason: verdict.reason } : {}) };
 }
 
 /** Human messages after the promise: its thread's, then the promiser's own at

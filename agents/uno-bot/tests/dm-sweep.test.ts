@@ -803,7 +803,7 @@ describe("a DM ask waits behind a person's own asks", () => {
         update: async () => true,
       },
       sources: { read: async () => null },
-      judge: { judge: async () => ({ ok: true, done: false, evidenceTs: [] }) },
+      judge: { judge: async () => ({ ok: true, answer: "still-open", evidenceTs: [] }) },
       store,
       markThread: async () => {},
       config: { unoBot: "C0UNOBOT", botUserId: BOT },

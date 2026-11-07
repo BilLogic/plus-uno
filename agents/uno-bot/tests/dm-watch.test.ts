@@ -145,7 +145,7 @@ const detector: CommitmentDetector = {
   },
 };
 
-const notDone: EvidenceJudge = { judge: async () => ({ ok: true, done: false, evidenceTs: [] }) };
+const notDone: EvidenceJudge = { judge: async () => ({ ok: true, answer: "still-open", evidenceTs: [] }) };
 
 interface World {
   records: InMemoryDmWatchRecords;
@@ -403,7 +403,7 @@ describe("the morning reminder", () => {
     await turnOn(w, ["promises_to_me"]);
     await runDmPromiseRead(READ, readDeps(w, EOD));
     w.slack.messages.get(DM_BEA)!.push({ ts: ts(30, 15), user: BEA, text: "here it is" });
-    const done: EvidenceJudge = { judge: async () => ({ ok: true, done: true, evidenceTs: [ts(30, 15)] }) };
+    const done: EvidenceJudge = { judge: async () => ({ ok: true, answer: "done", evidenceTs: [ts(30, 15)] }) };
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU, done));
     assert.deepEqual(w.posts, []);
     assert.equal(w.records.rows()[0]!.state, "auto_done");
@@ -439,10 +439,47 @@ describe("evidence beyond the DM", () => {
       judge: async (input) => {
         seen.push(input.messages.map((m) => `${m.ts} ${m.user} ${m.text}`));
         const hit = input.messages.some((m) => m.ts === evidence);
-        return { ok: true, done: hit, evidenceTs: hit ? [evidence] : [] };
+        return hit ? { ok: true, answer: "done", evidenceTs: [evidence] } : { ok: true, answer: "still-open", evidenceTs: [] };
       },
     };
   }
+
+  it("reads every message after the promise, oldest first, so a call-off just after it is seen past 50 later messages", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    await runDmPromiseRead(READ, readDeps(w, EOD));
+    // The settling reply comes first; 120 more follow it, which a single
+    // newest-first read of 50 would have kept in its place.
+    const later: SweepSlackMessage[] = [{ ts: ts(30, 9, 0), user: MAYA, text: "oh all good, no need" }];
+    for (let i = 1; i <= 120; i++) later.push({ ts: ts(30, 10 + Math.floor(i / 60), i % 60), user: i % 2 ? BEA : MAYA, text: `chatter ${i}` });
+    w.slack.messages.get(DM_BEA)!.push(...later);
+    const seen: string[][] = [];
+    const judge: EvidenceJudge = {
+      judge: async (input) => {
+        seen.push(input.messages.map((m) => m.text));
+        const settled = input.messages.find((m) => m.text === "oh all good, no need");
+        return settled ? { ok: true, answer: "no-longer-needed", reason: "said", evidenceTs: [settled.ts] } : { ok: true, answer: "still-open", evidenceTs: [] };
+      },
+    };
+    const report = await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU, judge));
+    // Maya's own promise just after Bea's comes first, then the call-off.
+    assert.equal(seen[0]!.indexOf("oh all good, no need"), 1, "the first reply, read first");
+    assert.equal(seen[0]!.length, 122, "every one of them");
+    assert.equal(report.summary, "1 auto_done");
+    assert.deepEqual(w.posts, [], "no reminder for a promise no longer needed");
+    assert.equal(w.records.rows()[0]!.state, "auto_done");
+  });
+
+  it("asks the judge even when nothing was said since, since a call's moment can pass in silence", async () => {
+    const w = world();
+    await turnOn(w, ["promises_to_me"]);
+    await runDmPromiseRead(READ, readDeps(w, EOD));
+    const asked: Array<number | undefined> = [];
+    const judge: EvidenceJudge = { judge: async (input) => (asked.push(input.now), { ok: true, answer: "no-longer-needed", reason: "time-passed", evidenceTs: [] }) };
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU, judge));
+    assert.deepEqual(asked, [THU], "told the morning's time");
+    assert.deepEqual(w.posts, []);
+  });
 
   it("a promise kept by the promiser's post in a public channel is not nudged", async () => {
     const w = world();
