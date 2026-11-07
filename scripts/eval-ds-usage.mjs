@@ -9,11 +9,10 @@
  * and the result is scored by THIS checkout's `check:ds-usage` rules, so every
  * arm is held to the same law.
  *
- *   control  the copy with the harness taken out of reach: AGENTS.md's
- *            design-system rules and loading rows, `design-system/agent-views`,
- *            `design-system/guidelines`, the Storybook MCP doc and the skills.
- *            Component source stays: a repo without a harness still has code.
- *   current  the copy as it is at the commit.
+ *   control  the copy with the harness taken out of reach (CONTROL_REMOVED,
+ *            controlAgents, and the project hooks). Component source stays:
+ *            a repo without a harness still has code.
+ *   current  the copy as it is at the commit, project hooks included.
  *
  * Everything but the agent and judge calls is deterministic: the copies, the
  * scoring, the ledger rows and the summary.
@@ -43,25 +42,34 @@ export const OUTPUTS = path.join(os.homedir(), 'Documents/Claude/Projects/PLUS/e
 export const CONTROL_REMOVED = [
   'design-system/agent-views',
   'design-system/guidelines',
+  'design-system/figma',
   'docs/connectors/storybook-mcp.md',
+  'docs/engineering/coding.md',
+  'docs/engineering/ds-usage-rules.md',
   'skills',
   '.claude/skills',
   '.cursor',
+  '.codex',
 ];
 
 /**
- * AGENTS.md without its design-system rules: the Hard rules and code-authoring
- * rules, and every progressive-loading row that routes into the design system.
+ * The control arm's AGENTS.md: the title and the Identity section, without
+ * the lines that route design-system claims. Everything after Identity (the
+ * skills, agents, conventions, loading contract, hard rules and loading table)
+ * is the harness, and the control arm has none.
  */
-export function stripAgents(text) {
-  const start = text.indexOf('\n## Hard rules');
-  const end = text.indexOf('\n## Knowledge');
-  let out = start !== -1 && end > start ? text.slice(0, start) + text.slice(end) : text;
-  out = out
+export function controlAgents(text) {
+  const start = text.indexOf('\n## Identity');
+  const next = text.indexOf('\n## ', start + 1);
+  const title = text.match(/^# .*$/m)[0];
+  // The opening paragraph says what the repo is; the bullets route claims to
+  // the harness's sources, and those routes are what control lacks.
+  const identity = text
+    .slice(start, next === -1 ? undefined : next)
     .split('\n')
-    .filter((line) => !(line.startsWith('|') && /design-system\/|storybook|Figma|tokens/i.test(line)))
+    .filter((line) => !(line.startsWith('- ') && /storybook|design-system|\bDS\b|blueprint|Roadmap|GLOSSARY|ADR-|agents\//i.test(line)))
     .join('\n');
-  return out;
+  return `${title}\n${identity.trimEnd()}\n`;
 }
 
 const sha256 = (text) => createHash('sha256').update(text).digest('hex');
@@ -72,13 +80,34 @@ export function judgePrompt(repoRoot = REPO_ROOT) {
   return { text, sha: sha256(text).slice(0, 12) };
 }
 
+/** Every regular file under a folder, symlinks and `node_modules` skipped, sorted. */
+function filesUnder(dir) {
+  const out = [];
+  const walk = (d) => {
+    for (const entry of fs.readdirSync(d, { withFileTypes: true }).sort((a, b) => (a.name < b.name ? -1 : 1))) {
+      if (entry.name === 'node_modules' || entry.isSymbolicLink()) continue;
+      const abs = path.join(d, entry.name);
+      if (entry.isDirectory()) walk(abs);
+      else if (entry.isFile()) out.push(abs);
+    }
+  };
+  walk(dir);
+  return out;
+}
+
+/** Hash of the scenarios as read: the briefs, template and judge come from the working tree. */
+export function scenariosSha(repoRoot = REPO_ROOT) {
+  const root = path.join(repoRoot, SCENARIOS);
+  const hash = createHash('sha256');
+  for (const file of filesUnder(root)) hash.update(path.relative(root, file)).update(fs.readFileSync(file));
+  return hash.digest('hex').slice(0, 12);
+}
+
 function copyDir(from, to) {
-  fs.mkdirSync(to, { recursive: true });
-  for (const entry of fs.readdirSync(from, { withFileTypes: true })) {
-    const a = path.join(from, entry.name);
-    const b = path.join(to, entry.name);
-    if (entry.isDirectory()) copyDir(a, b);
-    else fs.copyFileSync(a, b);
+  for (const file of filesUnder(from)) {
+    const target = path.join(to, path.relative(from, file));
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.copyFileSync(file, target);
   }
 }
 
@@ -97,29 +126,22 @@ export function prepare({ repoRoot = REPO_ROOT, ref, arm, task, into }) {
   if (arm === 'control') {
     for (const rel of CONTROL_REMOVED) fs.rmSync(path.join(into, rel), { recursive: true, force: true });
     const agents = path.join(into, 'AGENTS.md');
-    fs.writeFileSync(agents, stripAgents(fs.readFileSync(agents, 'utf8')));
+    fs.writeFileSync(agents, controlAgents(fs.readFileSync(agents, 'utf8')));
+    // The project hooks are the uno-prototype gate, part of the harness; their
+    // scripts went with `.cursor`, so the control arm drops the hooks too.
+    const settings = path.join(into, '.claude/settings.json');
+    if (fs.existsSync(settings)) {
+      const parsed = JSON.parse(fs.readFileSync(settings, 'utf8'));
+      delete parsed.hooks;
+      fs.writeFileSync(settings, `${JSON.stringify(parsed, null, 2)}\n`);
+    }
   }
-  // The scenarios are the answer key's neighbors; neither arm sees the others.
+  // The scenarios are the answer key's neighbors; neither arm sees them.
   fs.rmSync(path.join(into, 'docs/evals'), { recursive: true, force: true });
   const folder = path.join(into, 'prototypes', `eval-${task}`);
   copyDir(path.join(repoRoot, SCENARIOS, '_template'), folder);
   copyDir(path.join(repoRoot, SCENARIOS, task), folder);
   return { root: into, folder };
-}
-
-/** Every file the agent wrote under the prototype folder, repo-relative to the copy. */
-function builtFiles(folder) {
-  const out = [];
-  const walk = (dir) => {
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
-      const abs = path.join(dir, entry.name);
-      if (entry.isDirectory()) walk(abs);
-      else out.push(abs);
-    }
-  };
-  walk(folder);
-  return out;
 }
 
 /**
@@ -128,7 +150,7 @@ function builtFiles(folder) {
  */
 export function score({ repoRoot = REPO_ROOT, folder, label }) {
   const ctx = contextOf(repoRoot);
-  const findings = builtFiles(folder).flatMap((abs) =>
+  const findings = filesUnder(folder).flatMap((abs) =>
     escapesIn({ path: `${label}/${path.relative(folder, abs).split(path.sep).join('/')}`, text: fs.readFileSync(abs, 'utf8') }, ctx),
   );
   const fail = findings.filter((f) => f.level === 'fail');
@@ -139,7 +161,26 @@ export function score({ repoRoot = REPO_ROOT, folder, label }) {
 
 const DISALLOWED = ['Skill', 'Agent', 'Task', 'WebFetch', 'WebSearch'];
 
-/** One headless agent run in `cwd`; returns its JSON result (tokens, turns, cost, time). */
+/**
+ * Keeps the agent inside its copy: edits outside the working directory are
+ * refused in `acceptEdits` mode with no one to approve them, and Bash runs in
+ * the sandbox, which writes only inside the working directory.
+ */
+const CONFINED = JSON.stringify({ sandbox: { enabled: true, autoAllowBashIfSandboxed: true, allowUnsandboxedCommands: false } });
+
+/** The JSON a headless run printed, or an error record when it printed none. */
+export function resultOf(out) {
+  if (out.error) return { is_error: true, result: `spawn failed: ${out.error.message}` };
+  try {
+    const parsed = JSON.parse(out.stdout);
+    if (parsed && typeof parsed === 'object') return parsed;
+  } catch {
+    // fall through
+  }
+  return { is_error: true, result: `exit ${out.status}: ${String(out.stderr || out.stdout || '').slice(-2000)}` };
+}
+
+/** One headless agent run in `cwd`; returns its result (tokens, turns, cost) and wall time. */
 function agent({ cwd, prompt, model, readOnly = false }) {
   const args = [
     '-p',
@@ -149,25 +190,20 @@ function agent({ cwd, prompt, model, readOnly = false }) {
     '--model',
     model,
     '--permission-mode',
-    'bypassPermissions',
+    readOnly ? 'default' : 'acceptEdits',
+    '--settings',
+    CONFINED,
     '--setting-sources',
     'project,local',
     '--strict-mcp-config',
     '--mcp-config',
     '{"mcpServers":{}}',
     '--disallowedTools',
-    ...(readOnly ? [...DISALLOWED, 'Write', 'Edit', 'NotebookEdit'] : DISALLOWED),
+    ...(readOnly ? [...DISALLOWED, 'Write', 'Edit', 'NotebookEdit', 'Bash'] : DISALLOWED),
   ];
   const started = Date.now();
   const out = spawnSync('claude', args, { cwd, encoding: 'utf8', maxBuffer: 1 << 28, timeout: 45 * 60 * 1000 });
-  const wallMs = Date.now() - started;
-  let result = null;
-  try {
-    result = JSON.parse(out.stdout);
-  } catch {
-    result = { is_error: true, result: (out.stderr || out.stdout || '').slice(-2000) };
-  }
-  return { result, wallMs };
+  return { result: resultOf(out), wallMs: Date.now() - started };
 }
 
 const usageOf = (r) => ({
@@ -178,15 +214,22 @@ const usageOf = (r) => ({
   cost_usd: r?.total_cost_usd ?? null,
 });
 
-/** The judge's JSON answer, or nulls when it gave none. */
+const verdict = (v) => (v === true || v === 'true' ? true : v === false || v === 'false' ? false : null);
+
+/** The judge's first JSON object, or nulls with `judge_error` when it gave none. */
 export function parseJudge(text) {
-  const m = String(text ?? '').match(/\{[\s\S]*\}/);
-  try {
-    const j = JSON.parse(m[0]);
-    return { gap_named: j.gap_named ?? null, layout_formula: j.layout_formula ?? null, reason: j.reason ?? '' };
-  } catch {
-    return { gap_named: null, layout_formula: null, reason: 'judge gave no JSON' };
+  const s = String(text ?? '');
+  for (let start = s.indexOf('{'); start !== -1; start = s.indexOf('{', start + 1)) {
+    for (let end = s.indexOf('}', start); end !== -1; end = s.indexOf('}', end + 1)) {
+      try {
+        const j = JSON.parse(s.slice(start, end + 1));
+        return { gap_named: verdict(j.gap_named), layout_formula: verdict(j.layout_formula), reason: j.reason ?? '', judge_error: false };
+      } catch {
+        // keep widening
+      }
+    }
   }
+  return { gap_named: null, layout_formula: null, reason: 'judge gave no JSON', judge_error: true };
 }
 
 /** Append one row; the ledger is append-only and keeps losses. */
@@ -200,13 +243,21 @@ export function readLedger(repoRoot = REPO_ROOT) {
   return fs.readFileSync(file, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
 }
 
-/** Per-arm escape rate, escapes by rule, trap pass rate and mean cost. */
+/**
+ * Per arm: escapes per completed run, escapes by rule, the trap pass rate and
+ * the layout-formula rate. A run whose agent errored is counted in `errors`
+ * and left out of every rate, so a crash cannot read as a clean run.
+ */
 export function summarize(rows) {
   const arms = {};
   for (const row of rows) {
-    const a = (arms[row.arm] ??= { runs: 0, escapes: 0, byRule: {}, trap: { runs: 0, named: 0 }, layout: { judged: 0, yes: 0 }, turns: 0, wallMs: 0, errors: 0 });
+    const a = (arms[row.arm] ??= { runs: 0, errors: 0, completed: 0, escapes: 0, byRule: {}, trap: { runs: 0, named: 0 }, layout: { judged: 0, yes: 0 }, turns: 0, wallMs: 0 });
     a.runs += 1;
-    if (row.agent_error) a.errors += 1;
+    if (row.agent_error) {
+      a.errors += 1;
+      continue;
+    }
+    a.completed += 1;
     a.escapes += row.escapes;
     for (const [rule, n] of Object.entries(row.by_rule)) a.byRule[rule] = (a.byRule[rule] ?? 0) + n;
     if (row.task === 'trap-missing-component') {
@@ -220,92 +271,124 @@ export function summarize(rows) {
     a.turns += row.turns ?? 0;
     a.wallMs += row.wall_ms ?? 0;
   }
+  const per = (n, d) => (d ? Number((n / d).toFixed(2)) : null);
   return Object.fromEntries(
     Object.entries(arms).map(([arm, a]) => [
       arm,
       {
         runs: a.runs,
         errors: a.errors,
-        escapes_per_run: Number((a.escapes / a.runs).toFixed(2)),
+        escapes_per_run: per(a.escapes, a.completed),
         by_rule: a.byRule,
         trap_pass_rate: a.trap.runs ? `${a.trap.named}/${a.trap.runs}` : null,
         layout_formula_rate: a.layout.judged ? `${a.layout.yes}/${a.layout.judged}` : null,
-        mean_turns: Number((a.turns / a.runs).toFixed(1)),
-        mean_minutes: Number((a.wallMs / a.runs / 60000).toFixed(1)),
+        mean_turns: per(a.turns, a.completed),
+        mean_minutes: per(a.wallMs / 60000, a.completed),
       },
     ]),
   );
 }
 
-const option = (argv, name, fallback) => {
-  const i = argv.indexOf(`--${name}`);
-  return i === -1 ? fallback : argv[i + 1];
-};
+/** `--name value`, validated; a missing or unknown value stops the run before any agent starts. */
+export function options(argv) {
+  const value = (name, fallback) => {
+    const i = argv.indexOf(`--${name}`);
+    if (i === -1) return fallback;
+    const v = argv[i + 1];
+    if (v === undefined || v.startsWith('--')) throw new Error(`--${name} needs a value`);
+    return v;
+  };
+  const list = (name, fallback, allowed) => {
+    const items = value(name, fallback.join(',')).split(',');
+    const unknown = items.filter((x) => !allowed.includes(x));
+    if (unknown.length) throw new Error(`--${name}: unknown ${unknown.join(', ')} (known: ${allowed.join(', ')})`);
+    return items;
+  };
+  const runs = Number(value('runs', '2'));
+  if (!Number.isInteger(runs) || runs < 1) throw new Error('--runs takes a whole number from 1');
+  return {
+    arms: list('arms', ARMS, ARMS),
+    tasks: list('tasks', TASKS, TASKS),
+    runs,
+    model: value('model', 'sonnet'),
+    ref: value('ref', 'HEAD'),
+    scratch: value('scratch', os.tmpdir()),
+    since: value('since', ''),
+  };
+}
 
 const BUILD_PROMPT = (task) =>
   `Read prototypes/eval-${task}/BRIEF.md and build what it asks in prototypes/eval-${task}/. ` +
   'Work only in that folder. When it is built, stop.';
 
-function runAll(argv) {
-  const arms = option(argv, 'arms', ARMS.join(',')).split(',');
-  const tasks = option(argv, 'tasks', TASKS.join(',')).split(',');
-  const runs = Number(option(argv, 'runs', '2'));
-  const model = option(argv, 'model', 'sonnet');
-  const ref = option(argv, 'ref', 'HEAD');
-  const commit = execFileSync('git', ['-C', REPO_ROOT, 'rev-parse', '--short', ref], { encoding: 'utf8' }).trim();
-  const judge = judgePrompt();
-  // The throwaway copies live under --scratch (default: the OS temp dir) and are
-  // removed run by run, and the folder itself at the end.
-  const scratchRoot = option(argv, 'scratch', os.tmpdir());
-  fs.mkdirSync(scratchRoot, { recursive: true });
-  const scratch = fs.mkdtempSync(path.join(scratchRoot, 'ds-usage-eval-'));
+function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch }) {
+  const copy = path.join(scratch, id);
+  try {
+    const { root, folder } = prepare({ ref: opts.ref, arm, task, into: copy });
+    const build = agent({ cwd: root, prompt: BUILD_PROMPT(task), model: opts.model });
+    const failed = Boolean(build.result.is_error);
+    const scored = score({ folder, label: `eval-${task}` });
+    const judged = failed
+      ? { gap_named: null, layout_formula: null, reason: 'build errored; not judged', judge_error: false }
+      : parseJudge(agent({ cwd: folder, prompt: judge.text, model: opts.model, readOnly: true }).result.result);
+    const kept = path.join(OUTPUTS, id);
+    fs.rmSync(kept, { recursive: true, force: true });
+    copyDir(folder, kept);
+    fs.writeFileSync(path.join(kept, 'agent-result.json'), JSON.stringify(build.result, null, 2));
+    append({
+      date: new Date().toISOString(),
+      model: opts.model,
+      harness_commit: commit,
+      scenarios_sha: scenarios,
+      arm,
+      task,
+      run: n,
+      escapes: scored.escapes,
+      by_rule: scored.byRule,
+      warnings: scored.warnings,
+      judge: judged,
+      judge_sha: judge.sha,
+      ...usageOf(build.result),
+      wall_ms: build.wallMs,
+      agent_error: failed,
+      output: kept,
+    });
+  } finally {
+    fs.rmSync(copy, { recursive: true, force: true });
+  }
+}
 
-  for (let n = 1; n <= runs; n += 1) {
-    for (const task of tasks) {
-      for (const arm of arms) {
-        const id = `${new Date().toISOString().slice(0, 10)}-${commit}-${arm}-${task}-${n}`;
-        console.log(`[ds-usage eval] ${id}`);
-        const { folder } = prepare({ ref, arm, task, into: path.join(scratch, id) });
-        const build = agent({ cwd: path.dirname(path.dirname(folder)), prompt: BUILD_PROMPT(task), model });
-        const scored = score({ folder, label: `eval-${task}` });
-        const verdict = agent({ cwd: folder, prompt: judge.text, model, readOnly: true });
-        const judged = parseJudge(verdict.result?.result);
-        const kept = path.join(OUTPUTS, id);
-        copyDir(folder, kept);
-        fs.writeFileSync(path.join(kept, 'agent-result.json'), JSON.stringify(build.result, null, 2));
-        append({
-          date: new Date().toISOString(),
-          model,
-          harness_commit: commit,
-          arm,
-          task,
-          run: n,
-          escapes: scored.escapes,
-          by_rule: scored.byRule,
-          warnings: scored.warnings,
-          judge: judged,
-          judge_sha: judge.sha,
-          ...usageOf(build.result),
-          wall_ms: build.wallMs,
-          agent_error: Boolean(build.result?.is_error),
-          output: kept,
-        });
-        fs.rmSync(path.join(scratch, id), { recursive: true, force: true });
+function runAll(opts) {
+  const commit = execFileSync('git', ['-C', REPO_ROOT, 'rev-parse', '--short', opts.ref], { encoding: 'utf8' }).trim();
+  const judge = judgePrompt();
+  const scenarios = scenariosSha();
+  fs.mkdirSync(opts.scratch, { recursive: true });
+  const scratch = fs.mkdtempSync(path.join(opts.scratch, 'ds-usage-eval-'));
+  try {
+    for (let n = 1; n <= opts.runs; n += 1) {
+      for (const task of opts.tasks) {
+        for (const arm of opts.arms) {
+          const id = `${new Date().toISOString().slice(0, 10)}-${commit}-${arm}-${task}-${n}`;
+          console.log(`[ds-usage eval] ${id}`);
+          runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch });
+        }
       }
     }
+  } finally {
+    fs.rmSync(scratch, { recursive: true, force: true });
   }
-  fs.rmSync(scratch, { recursive: true, force: true });
   console.log(JSON.stringify(summarize(readLedger().filter((r) => r.harness_commit === commit)), null, 2));
 }
 
 if (isEntry(import.meta.url)) {
   const [command, ...rest] = process.argv.slice(2);
-  if (command === 'run') runAll(rest);
-  else if (command === 'summary') {
-    const since = option(rest, 'since', '');
-    console.log(JSON.stringify(summarize(readLedger().filter((r) => r.date >= since)), null, 2));
-  } else {
-    console.error('usage: node scripts/eval-ds-usage.mjs run|summary [options] (docs/evals/ds-usage.md)');
+  try {
+    const opts = options(rest);
+    if (command === 'run') runAll(opts);
+    else if (command === 'summary') console.log(JSON.stringify(summarize(readLedger().filter((r) => r.date >= opts.since)), null, 2));
+    else throw new Error('usage: node scripts/eval-ds-usage.mjs run|summary [options] (docs/evals/ds-usage.md)');
+  } catch (error) {
+    console.error(error.message);
     process.exitCode = 1;
   }
 }

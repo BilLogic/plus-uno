@@ -21,19 +21,20 @@ Under `scenarios/ds-usage/`, each a `BRIEF.md` (plus `frame.png` for the frame t
 
 ## Arms
 
-- **control**: the repo with the harness out of reach. Removed from the copy, exactly (`CONTROL_REMOVED` and `stripAgents` in `scripts/eval-ds-usage.mjs`):
-  - AGENTS.md's `## Hard rules` section, through to `## Knowledge`, and every loading-table row that names `design-system/`, Storybook, Figma or tokens;
-  - `design-system/agent-views/` and `design-system/guidelines/`;
-  - `docs/connectors/storybook-mcp.md`;
-  - `skills/`, `.claude/skills/` and `.cursor/`.
+- **control**: the repo with the harness out of reach. What the copy loses, exactly (`CONTROL_REMOVED` and `controlAgents` in `scripts/eval-ds-usage.mjs`):
+  - AGENTS.md is cut to its title and the Identity paragraph: the skills, agents, conventions, loading contract, Hard rules and loading table go, and so do the Identity bullets that route claims to the harness's sources;
+  - `design-system/agent-views/`, `design-system/guidelines/` and `design-system/figma/`;
+  - `docs/connectors/storybook-mcp.md`, `docs/engineering/coding.md` and `docs/engineering/ds-usage-rules.md`;
+  - `skills/`, `.claude/skills/`, `.cursor/` and `.codex/`;
+  - the project hooks in `.claude/settings.json` (the uno-prototype gate, whose scripts live in `.cursor/`).
 
   Component source stays: a repo without a harness still has code.
-- **current**: the repo as it is at the commit.
-- **upgraded**: the same runner on a later commit, once the index header and the uno-prototype upgrade land.
+- **current**: the repo as it is at the commit, project hooks included. The uno-prototype gate passes the eval's build prompt through unchanged (checked 2026-11-07).
+- **upgraded** is not an arm of its own: it is `current` run again on a later commit, and the ledger's `harness_commit` tells the two apart.
 
 Both arms also lose `docs/evals/`, so no agent reads the scenarios or the judge.
 
-Each run is a headless `claude -p` on the logged-in subscription (no API key), in a `git archive` copy of the repo outside this checkout, so no parent AGENTS.md or project memory reaches it. User settings and hooks, MCP servers, skills, subagents and web tools are off in both arms; the user's global CLAUDE.md may still reach both arms alike, and it carries no design-system rules. Storybook MCP is unavailable to both, because it needs a running Storybook.
+Each run is a headless `claude -p` on the logged-in subscription (no API key), in a `git archive` copy of the repo outside this checkout, so no parent AGENTS.md or project memory reaches it. User settings and hooks, MCP servers, skills, subagents and web tools are off in both arms. The agent is confined to its copy: edits outside the working directory are refused (`acceptEdits` with no one to approve), and Bash runs in the sandbox, which writes only to the working directory and temp folders (checked 2026-11-07: a `touch` into the checkout failed with "Operation not permitted"). the user's global CLAUDE.md may still reach both arms alike, and it carries no design-system rules. Storybook MCP is unavailable to both, because it needs a running Storybook.
 
 Why not subagents: a subagent inherits the parent session's project instructions, and a probe on 2026-11-06 showed plus-uno's AGENTS.md, Hard rules included, in a subagent's context. A control arm run that way would see the rules it is meant to lack.
 
@@ -52,10 +53,10 @@ node scripts/eval-ds-usage.mjs run --arms control,current --runs 2 --model sonne
 
 ## Read the ledger
 
-`ds-usage-ledger.jsonl` gains one row per run, losses and agent errors included: date, model, harness commit, arm, task, run, escapes and `by_rule`, judge verdicts and `judge_sha`, tokens, turns, cost and wall time, and where the build was kept.
+`ds-usage-ledger.jsonl` gains one row per run, losses and agent errors included: date, model, harness commit, `scenarios_sha` (the briefs, template and judge are read from the working tree, so this hash says which ones), arm, task, run, escapes and `by_rule`, judge verdicts and `judge_sha`, tokens, turns, cost and wall time, and where the build was kept.
 
 ```bash
 node scripts/eval-ds-usage.mjs summary --since 2026-11-06
 ```
 
-prints, per arm: escapes per run, escapes by rule, the trap pass rate, the layout-formula rate, mean turns and minutes. Compare arms within one model and one `judge_sha`; a row with `agent_error: true` is a run that did not finish, and stays in the count.
+prints, per arm: escapes per run, escapes by rule, the trap pass rate, the layout-formula rate, mean turns and minutes. Compare arms within one model, one `judge_sha` and one `scenarios_sha`. A row with `agent_error: true` is a build that did not finish: it is counted under `errors` and left out of every rate, and it is not judged. A judge that returns no JSON sets `judge.judge_error`.

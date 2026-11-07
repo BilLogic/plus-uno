@@ -21,4 +21,6 @@ A rubric review returns its scored verdict to the skill that asked for it; nothi
 
 Everything under `docs/evals/` is withheld from uno-bot by `agents/uno-bot/src/integrations/repo-read-guard.ts`, so an answer key can sit here in plain text.
 
+The design-system usage eval (`ds-usage.md`, tasks in `scenarios/ds-usage/`, rows in `ds-usage-ledger.jsonl`) measures whether the harness keeps an agent inside the design system, scored by `check:ds-usage`.
+
 The design-system ratchet baselines live in `scripts/baselines/`, beside the checks that read them.
