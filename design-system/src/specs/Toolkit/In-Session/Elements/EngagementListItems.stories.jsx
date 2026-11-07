@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '@/components';
 import { EngagementListItems, EngagementSubmenuItems } from './EngagementListItems.jsx';
 
 export default {
@@ -235,16 +236,16 @@ export const Interactive = () => {
                         <span className="body2-txt">{selectedReason}</span>
                     </div>
                 )}
-                <button 
-                    className="btn btn-sm btn-outline-secondary ms-auto"
+                <Button
+                    text="Reset"
+                    spacing="compact"
+                    className="ms-auto"
                     onClick={() => {
                         setStatus('unknown');
                         setSelectedReason(null);
                         setShowSubmenu(false);
                     }}
-                >
-                    Reset
-                </button>
+                />
             </div>
 
             {/* Dropdown Menus */}

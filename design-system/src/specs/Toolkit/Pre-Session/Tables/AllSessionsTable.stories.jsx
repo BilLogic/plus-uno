@@ -485,7 +485,7 @@ export const Interactive = () => {
                 <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
                     Total Sessions: <strong>{sessions.length}</strong>
                 </span>
-                <span className="body2-txt" style={{ color: 'var(--color-info)' }}>
+                <span className="body2-txt" style={{ color: 'var(--ds-text-information)' }}>
                     In Progress: <strong>{statusCounts['in-progress']}</strong>
                 </span>
                 <span className="body2-txt" style={{ color: 'var(--color-secondary)' }}>

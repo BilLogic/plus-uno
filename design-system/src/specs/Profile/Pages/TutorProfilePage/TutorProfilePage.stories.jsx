@@ -93,7 +93,7 @@ const InfoTooltipContent = () => (
 function TutorProfileInteractiveDemo({ profileState }) {
     // The visible labels here are the caller's `<Label>`, not each Input's own,
     // so the pairing is made with `htmlFor` (#213). `useId` scopes the ids per
-    // instance — `Variants` renders two pages on one screen, and two fields
+    // instance — the docs page renders Overview, Filled and Interactive at once, and two fields
     // sharing `id="bi-first-name"` would send both labels to the first.
     const uid = useId();
     const fieldId = (key) => `${uid}-${key}`;
@@ -495,26 +495,18 @@ export const Overview = {
     render: (args) => <TutorProfilePage changed={args.changed} profileState={args.profileState} />,
 };
 
-export const Variants = {
+/**
+ * The other end from Overview: a filled photo and unsaved changes, so Save is
+ * ready. One page per story, since a page owns the one `main` landmark.
+ */
+export const Filled = {
     args: {
         breakpoint: 'native',
         pageMode: 'shell',
-        changed: false,
-        profileState: 'unfilled',
+        changed: true,
+        profileState: 'filled',
     },
-    render: () => (
-        <div
-            style={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 'var(--size-section-gap-xl, 32px)',
-                width: '100%',
-            }}
-        >
-            <TutorProfilePage changed={false} profileState="unfilled" />
-            <TutorProfilePage changed={true} profileState="filled" />
-        </div>
-    ),
+    render: (args) => <TutorProfilePage changed={args.changed} profileState={args.profileState} />,
 };
 
 export const Interactive = {

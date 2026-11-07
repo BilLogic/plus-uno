@@ -193,11 +193,19 @@ export const Interactive = {
     }
 };
 
-/** The popup portals out of the canvas, so the state stories read it from the document. */
+/**
+ * The popup portals out of the canvas, so the state stories read it from the
+ * document. Waits for the open popup and for the focus it takes on opening: Base UI
+ * queues that focus on the next animation frame, so a play that moves focus
+ * before the frame runs has it taken back a moment later — on a busy machine,
+ * between two reads of the same style.
+ */
 const openPopup = async (canvasElement) => {
     const doc = canvasElement.ownerDocument;
     await waitFor(() => expect(doc.querySelector('.plus-popup')).not.toBeNull());
-    return doc.querySelector('.plus-popup');
+    const popup = doc.querySelector('.plus-popup');
+    await waitFor(() => expect(popup.contains(doc.activeElement)).toBe(true));
+    return popup;
 };
 
 const StatePopup = () => (
@@ -236,7 +244,7 @@ export const Pressed = {
     },
 };
 
-/** Focused: the trigger shows the 2px ring, and the open popup takes no focus of its own. */
+/** Focused: focus back on the trigger shows the 2px ring while the popup stays open. */
 export const Focused = {
     render: () => <StatePopup />,
     play: async ({ canvasElement }) => {
@@ -246,7 +254,9 @@ export const Focused = {
         await expect(trigger.matches(':focus-visible')).toBe(true);
         const style = getComputedStyle(trigger);
         await waitFor(() => expect(style.outlineStyle).toBe('solid'));
+        await expect(trigger).toHaveFocus();
         await expect(style.outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
+        await expect(canvasElement.ownerDocument.querySelector('.plus-popup'), 'the popup stays open').not.toBeNull();
         trigger.blur();
     },
 };

@@ -91,7 +91,7 @@ export const figmaMeta = {
     <DsCanvasQuiet of={PopupStories.Pressed} />
 </DocsCanvasShell>
 
-<DocsCanvasShell description={<>The trigger shows the 2px focus ring; focus does not move into the popup.</>}>
+<DocsCanvasShell description={<>The trigger shows the 2px focus ring, and keeps it once focus comes back to it.</>}>
     <DsCanvasQuiet of={PopupStories.Focused} />
 </DocsCanvasShell>
 
@@ -164,7 +164,7 @@ comes nearer than 8 to the screen's edge.
 <tr><td>Closed</td><td>Only the trigger shows.</td></tr>
 <tr><td>Open</td><td>The surface sits 4 from the trigger and never nearer than 8 to the screen edge.</td></tr>
 <tr><td>Hovered, pressed</td><td>The popup does not react; the trigger keeps its own states.</td></tr>
-<tr><td>Focused</td><td>The trigger shows the 2px ring; the popup takes no focus.</td></tr>
+<tr><td>Focused</td><td>The trigger shows the 2px ring. Opened by a click or a key, the popup takes focus: its first focusable element, or the popup itself.</td></tr>
 <tr><td>Disabled</td><td>A popup has no disabled state; leave the trigger out instead.</td></tr>
 <tr><td>Dismissed</td><td>A click away or Escape closes it, except with the manual trigger type.</td></tr>
 </tbody>
@@ -260,9 +260,11 @@ must be read is content that has to stay put while it is read.
 - **`aria-controls` is not set.** It needs the rendered panel's id,
   `id` is optional here, and an `aria-controls` pointing at an element that does
   not exist yet is worse than none.
-- **Focus does not move into it, and does not have to.** A popup is not a
-  dialog. But that means anything focusable inside it is reached by continuing to
-  Tab, which for a bottom-placed popup comes after the rest of the row.
+- **Opening it by a click or a key moves focus into it.** Focus lands on the
+  first focusable element inside, or on the popup itself when there is none, so
+  a keyboard or screen reader user starts where the content is. A popup opened
+  by hover leaves focus where it was. Closing it with Escape or a click away
+  returns focus to the trigger.
 - **Escape and a click away both close it.** Both come from the same
   `rootClose` binding, which is on for every trigger but `manual`.
 - **Do not put required content in one.** Anything the user must read to finish
