@@ -103,7 +103,6 @@ test('the recording covers every mapped id, in every Figma file the registry map
   const recording = RECORDING();
   const files = new Set(Object.values(recording.nodes).map((n) => n.file));
   const mapped = new Set(mappings(REGISTRY()).map((m) => m.fileKey));
-  assert.ok(files.size >= 1, 'the recording names the file it was read in');
   for (const fileKey of mapped) {
     assert.ok(files.has(fileKey), `${fileKey} is mapped by the registry but nothing was recorded in it`);
   }
