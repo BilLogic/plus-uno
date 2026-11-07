@@ -38,7 +38,7 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## Navigator
+## Appearance
 
 <ComponentExample of={PaginationStories.Content} title="Icon and text" description={<>Previous and Next as a caret (<code>navigator="icon"</code>) or as their labels (<code>navigator="text"</code>).</>} />
 
@@ -198,6 +198,13 @@ whenever the window does not reach them.
 <Pagination label="Students pages" currentPage={p2} totalPages={7} onPageChange={setP2} />
 ```
 
+<DoDontPair
+    doExample={<div style={{ display: 'grid', gap: 'var(--stack-lg)' }}><div style={{ display: 'grid', gap: 'var(--stack-sm)' }}><Pagination label="Sessions pages" currentPage={3} totalPages={7} onPageChange={() => {}} /><span>Landmark: Sessions pages</span></div><div style={{ display: 'grid', gap: 'var(--stack-sm)' }}><Pagination label="Students pages" currentPage={3} totalPages={7} onPageChange={() => {}} /><span>Landmark: Students pages</span></div></div>}
+    doCaption="Each navigation landmark has its own name."
+    dontExample={<div style={{ display: 'grid', gap: 'var(--stack-lg)' }}><div style={{ display: 'grid', gap: 'var(--stack-sm)' }}><Pagination label="Page navigation" currentPage={3} totalPages={7} onPageChange={() => {}} /><span>Landmark: Page navigation</span></div><div style={{ display: 'grid', gap: 'var(--stack-sm)' }}><Pagination label="Page navigation" currentPage={3} totalPages={7} onPageChange={() => {}} /><span>Landmark: Page navigation</span></div></div>}
+    dontCaption="Two landmarks with the default name are indistinguishable to a screen reader."
+/>
+
 ### Show a window, not every page.
 
 `max` keeps the row short. Page one and the last page stay reachable with an ellipsis between, so a long list never pushes the controls off the screen.
@@ -272,7 +279,7 @@ When the total matters, such as a table of sessions, show it beside the paginati
 ## Related
 
 - For a continuously loading feed, use infinite scroll rather than pages.
-- For a step-by-step flow, use `ProgressBar` with your own step control.
+- For a step-by-step flow, use `ProgressTracker` with your own step control.
 - For a long table, pair pagination with sorting and filtering; on its own it makes a specific row hard to find.
 
 </div>

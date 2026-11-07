@@ -216,9 +216,9 @@ Each label is one or two words naming a view of the same subject: Overview, Sess
 The underline suits a strip that sits above page content. The pill suits a strip inside a card or toolbar, where a filled selected tab reads as a control.
 
 <DoDontPair
-    doExample={<div style={{ border: '1px solid var(--ds-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--pad-x-md)' }}><Tabs defaultActiveKey="0" appearance="pill"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs></div>}
+    doExample={<div style={{ border: 'var(--stroke-1) solid var(--ds-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--pad-y-md) var(--pad-x-md)' }}><Tabs defaultActiveKey="0" appearance="pill"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs></div>}
     doCaption="A pill strip inside a card reads as a control."
-    dontExample={<div style={{ border: '1px solid var(--ds-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--pad-x-md)' }}><Tabs defaultActiveKey="0"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs></div>}
+    dontExample={<div style={{ border: 'var(--stroke-1) solid var(--ds-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--pad-y-md) var(--pad-x-md)' }}><Tabs defaultActiveKey="0"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs></div>}
     dontCaption="The page-level underline inside a card, where it reads as a stray rule."
 />
 
@@ -271,9 +271,6 @@ A label names a view. A count or status in it changes the name and breaks the pa
   matching `Tabs.Panel` gets no pointer at all — an id that is not in the
   document sends assistive technology to nothing, which is worse than pointing
   nowhere.
-- **The bar has no name.** Extra props are spread onto the root element, so
-  `aria-label` is the way to say what this set of tabs is for — especially
-  when a page carries more than one.
 
 </div>
 
