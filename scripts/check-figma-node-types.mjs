@@ -5,7 +5,7 @@
  *
  * See `scripts/figma-node-types.mjs` for what the claim is and why the
  * measurement lives in a file. In short: `componentSetNodeId` asserts a
- * component set, 16 of the 100 mapped nodes are not one, and
+ * component set, some mapped nodes are not one (plain COMPONENTs, a few PAGEs), and
  * `isComponentSet: false` is how an entry says so. Nothing read that field
  * until this check existed, so seven entries that needed it did not have it.
  *
@@ -33,22 +33,10 @@ const RECORDING = 'design-system/figma/node-types.json';
 /**
  * The floor, as a recorded baseline rather than a literal in this file. A
  * comparison over an empty recording agrees with everything, so the size is
- * asserted rather than assumed. The floor has moved down five times before,
- * each time a genuine deletion rather than a regression: 85, when Button
- * group (34:5212) and Close button's two sets (17827:827, 17827:846) left
- * the registry when their MDX dropped Figma references, taking their three
- * nodes out of the recording; 88, when Date tag and Smart tag split out of
- * Status tag with no Figma mapping of their own, taking Status's node
- * 17876:1653 out of the registry; 89, after Select,
- * Cascader and Tree select dropped their Figma mappings when the family moved
- * to ADS props (Phase D backfills Figma from the rebuilt code and the
- * mappings return); 94, when OptionChip left with the answer Tags, taking its
- * node 10661:10292 out of the registry; 95, when Input, Textarea, Number
- * input and Input group left with Text field and Text area, taking their six
- * Figma nodes (`_Field` among them) out of the registry. `--update` refuses
- * that move automatically — raising the floor is the only thing it writes — so
- * a genuine deletion is recorded by hand-editing
- * `scripts/baselines/figma-node-types.json` in the same commit that explains it.
+ * asserted rather than assumed. The floor only falls by a hand edit of
+ * `scripts/baselines/figma-node-types.json` that explains the deletion in its
+ * `why`, in the same commit; that file holds the history. `--update` refuses a
+ * fall automatically — raising the floor is the only thing it writes.
  */
 export const BASELINE = 'scripts/baselines/figma-node-types.json';
 

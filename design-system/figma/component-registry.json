@@ -116,7 +116,17 @@
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": []
+        "sets": [
+          {
+            "id": "avatar",
+            "name": "Avatar",
+            "componentSetNodeId": "20557:1424",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20557-1424",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ]
       }
     },
     "AvatarGroup": {
@@ -150,7 +160,17 @@
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": []
+        "sets": [
+          {
+            "id": "avatar-group",
+            "name": "Avatar group",
+            "componentSetNodeId": "20557:1716",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20557-1716",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ]
       }
     },
     "Breadcrumb": {
@@ -232,14 +252,13 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "storybook-resources",
-            "name": "Button page (Core)",
-            "componentSetNodeId": "3497:19482",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482",
-            "source": "storybook-mdx",
-            "status": "docs-page",
-            "notes": "The Button page in Core: Updated components, Docs and Playground. Read-only from code."
+            "id": "button",
+            "name": "Button",
+            "componentSetNodeId": "19946:4335",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19946-4335",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482"
@@ -259,13 +278,12 @@
         "sets": [
           {
             "id": "calendar",
-            "name": "_Calendar",
-            "componentSetNodeId": "18819:40157",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18819-40157",
+            "name": "Calendar",
+            "componentSetNodeId": "20009:73360",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20009-73360",
             "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "The month grid DatePicker and DateTimePicker open, one variant per size. In code it is the public `Calendar`, wrapping the shared `_internal/Calendar.jsx` the pickers also use."
+            "status": "verified",
+            "isComponentSet": true
           }
         ]
       }
@@ -450,33 +468,12 @@
         "sets": [
           {
             "id": "date-picker",
-            "name": "DatePicker",
-            "componentSetNodeId": "13574:1150",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13574-1150",
+            "name": "Date picker",
+            "componentSetNodeId": "20074:16843",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20074-16843",
             "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "state closed · open · invalid · valid · read-only · disabled × filled? × range? × spacing. A `_Field` trigger with the calendar-day icon in Trailing; the open variants show `_Calendar` in `_Listbox` Body, 4px (`--stack-sm`) below the field, left-aligned, flipping above when there is no room. `range` and `spacing` are the code props of the same names. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`."
-          },
-          {
-            "id": "calendar",
-            "name": "_Calendar",
-            "componentSetNodeId": "18819:40157",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18819-40157",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "The month grid both pickers open, one variant per size. In code it is `_internal/Calendar.jsx`, which is not exported from the barrel. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
-          },
-          {
-            "id": "calendar-day",
-            "name": "_Calendar Day",
-            "componentSetNodeId": "9413:1755",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=9413-1755",
-            "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "One day cell: default, hover, selected, disabled, today, in range and outside the month, at three sizes. In code it is the day button inside `_internal/Calendar.jsx`. The `_` prefix keeps the library from publishing it, so `unpublished` is its settled state."
+            "status": "verified",
+            "isComponentSet": true
           }
         ]
       }
@@ -494,14 +491,13 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "date-and-time-picker",
-            "name": "DateTimePicker",
-            "componentSetNodeId": "18804:38420",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18804-38420",
+            "id": "date-time-picker",
+            "name": "Date time picker",
+            "componentSetNodeId": "20067:8922",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20067-8922",
             "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "A date field and a time field side by side with the time-zone caption beneath: state closed · date open · time open · read-only · disabled × invalid · valid × filled? × spacing. The calendar is the shared `_Calendar` DatePicker opens, 4px (`--stack-sm`) below the date field, left-aligned, flipping above. Signed off; it is `unpublished` until the library is next published, when it can move to `verified`. The time half is the public `Time picker` set — see its own page."
+            "status": "verified",
+            "isComponentSet": true
           }
         ]
       }
@@ -519,14 +515,13 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "dynamic-table-page",
-            "name": "Dynamic table (page)",
-            "componentSetNodeId": "19685:27042",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042",
+            "id": "dynamic-table",
+            "name": "Dynamic table",
+            "componentSetNodeId": "20095:14282",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-14282",
             "source": "manual",
-            "status": "docs-page",
-            "notes": "The Dynamic table page: sort, filter, selection with bulk actions, paging, expanding rows, a frozen column and the loading, empty and error states."
+            "status": "verified",
+            "isComponentSet": true
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27042"
@@ -546,11 +541,12 @@
         "sets": [
           {
             "id": "file-upload",
-            "name": "File Upload",
-            "componentSetNodeId": "13696:8299",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13696-8299",
-            "source": "node-chart",
-            "status": "verified"
+            "name": "File upload",
+            "componentSetNodeId": "20007:4455",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20007-4455",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
           }
         ]
       }
@@ -589,20 +585,16 @@
         "storybookId": "specs-universal-sections-footer--docs"
       },
       "figma": {
-        "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "footnote",
-            "name": "Footnote",
-            "componentSetNodeId": "111:227940",
-            "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227940",
-            "source": "designer-supplied",
-            "status": "verified",
-            "isComponentSet": false,
-            "notes": "Points at the COMPONENT (111:227940), not the instance. It used to name 111:227939, which is an instance of it — the note here asked design to “promote it to a component”, but the component already existed and the registry was simply linking a copy of it. No variants: not a component set."
+            "id": "footer",
+            "name": "Footer",
+            "source": "manual",
+            "status": "missing",
+            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built."
           }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227940"
+        ]
       }
     },
     "Heading": {
@@ -683,7 +675,17 @@
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": []
+        "sets": [
+          {
+            "id": "icon-button",
+            "name": "Icon button",
+            "componentSetNodeId": "20299:9069",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20299-9069",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ]
       }
     },
     "Illustration": {
@@ -718,14 +720,11 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "character",
-            "name": "Character",
-            "componentSetNodeId": "19786:47743",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19786-47743",
+            "id": "illustration",
+            "name": "Illustration",
             "source": "manual",
-            "status": "verified",
-            "isComponentSet": true,
-            "notes": "On the Illustrations page. Figma names each character in words (\"mastering content\"); code takes the same name in kebab-case (\"mastering-content\"). Size is not a Figma property: the set is drawn at 1000 and scaled, and the Docs name 48, 96, 160 and 240."
+            "status": "missing",
+            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built. The old Character set is deprecated."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19785-489"
@@ -766,7 +765,17 @@
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": []
+        "sets": [
+          {
+            "id": "inline-edit",
+            "name": "Inline edit",
+            "componentSetNodeId": "21259:523",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21259-523",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ]
       }
     },
     "LabelAndCaption": {
@@ -790,12 +799,11 @@
             "status": "verified"
           },
           {
-            "id": "form-caption",
-            "name": "_Form Caption",
-            "componentSetNodeId": "20002:68",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20002-68",
-            "source": "node-chart",
-            "status": "verified"
+            "id": "caption",
+            "name": "Caption",
+            "source": "manual",
+            "status": "missing",
+            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built. The old _Form Caption set is deprecated."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52724"
@@ -876,7 +884,17 @@
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": []
+        "sets": [
+          {
+            "id": "link-button",
+            "name": "Link button",
+            "componentSetNodeId": "20303:77826",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20303-77826",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ]
       }
     },
     "LinkIconButton": {
@@ -924,7 +942,17 @@
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": []
+        "sets": [
+          {
+            "id": "link-icon-button",
+            "name": "Link icon button",
+            "componentSetNodeId": "20304:2570",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20304-2570",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ]
       }
     },
     "Logo": {
@@ -970,22 +998,11 @@
           {
             "id": "logo",
             "name": "Logo",
-            "componentSetNodeId": "20094:332",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-332",
-            "variantProps": {
-              "appearance": "style",
-              "size": "size",
-              "wordmark": "text?"
-            },
-            "variantValueMap": {
-              "wordmark": {
-                "true": true,
-                "false": false
-              }
-            },
-            "source": "designer-supplied",
+            "componentSetNodeId": "21004:1217",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21004-1217",
+            "source": "manual",
             "status": "verified",
-            "notes": "appearance is the Figma `style` group; size is the mark height in pixels; wordmark is the Figma `text?` group (with the question mark), whose values are the STRINGS \"true\"/\"false\", while the code prop is a real boolean — convert, do not pass the string through."
+            "isComponentSet": true
           }
         ]
       }
@@ -1000,20 +1017,16 @@
         "storybookId": "specs-universal-elements-maintenance-alert--docs"
       },
       "figma": {
-        "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
             "id": "maintenance-alert",
-            "name": "Maintenance Alert",
-            "componentSetNodeId": "2370:194322",
-            "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=2370-194322",
-            "source": "designer-supplied",
-            "status": "verified",
-            "isComponentSet": false,
-            "notes": "Single component, no variant set."
+            "name": "Maintenance alert",
+            "source": "manual",
+            "status": "missing",
+            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built."
           }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=2370-194322"
+        ]
       }
     },
     "MenuGroup": {
@@ -1054,10 +1067,11 @@
           {
             "id": "modal",
             "name": "Modal",
-            "componentSetNodeId": "53:20229",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=53-20229",
-            "source": "node-chart",
-            "status": "verified"
+            "componentSetNodeId": "20701:48348",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20701-48348",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502"
@@ -1096,39 +1110,19 @@
         "storybookId": "specs-universal-cards-overview-card--docs"
       },
       "figma": {
-        "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
             "id": "overview-card",
-            "name": "Overview Card",
-            "componentSetNodeId": "83:125838",
-            "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=83-125838",
-            "source": "designer-supplied",
+            "name": "Overview card",
+            "componentSetNodeId": "20095:6532",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-6532",
+            "source": "manual",
             "status": "verified",
-            "variantProps": {
-              "type": "type"
-            },
-            "variantValues": {
-              "type": [
-                "relationships",
-                "undefined",
-                "socio-emotional",
-                "mastering",
-                "advocacy",
-                "technology",
-                "status",
-                "completion",
-                "accuracy",
-                "avg-accuracy",
-                "avg-completion",
-                "time-spent",
-                "effort",
-                "progress"
-              ]
-            }
+            "isComponentSet": true
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=83-125838"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-6532"
       }
     },
     "PageHeader": {
@@ -1165,17 +1159,14 @@
         "storybookId": "specs-universal-pages-page-layout--docs"
       },
       "figma": {
-        "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
             "id": "page-layout",
-            "name": "Page Layout",
-            "componentSetNodeId": "111:241933",
-            "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-241933",
-            "source": "designer-supplied",
-            "status": "verified",
-            "isComponentSet": false,
-            "notes": "Single component composing Top Bar + Sidebar + the Frame pattern. The nested Content slot is a real native SLOT; only the instructional copy inside it is stale."
+            "name": "Page layout",
+            "source": "manual",
+            "status": "missing",
+            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=112-597"
@@ -1242,12 +1233,13 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "popover",
-            "name": "Popover",
-            "componentSetNodeId": "49:19534",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=49-19534",
-            "source": "node-chart",
-            "status": "verified"
+            "id": "popup",
+            "name": "Popup",
+            "componentSetNodeId": "20871:3153",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20871-3153",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506"
@@ -1267,14 +1259,24 @@
         "sets": [
           {
             "id": "progress-bar",
-            "name": "Progress Bar",
-            "componentSetNodeId": "20095:7725",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7725",
-            "source": "node-chart",
-            "status": "verified"
+            "name": "Progress bar",
+            "componentSetNodeId": "20117:5127",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5127",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          },
+          {
+            "id": "progress-bar",
+            "name": "_Progress Bar",
+            "componentSetNodeId": "20095:7780",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7780",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7725"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5127"
       }
     },
     "Radio": {
@@ -1412,12 +1414,13 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "alert",
-            "name": "alert",
-            "componentSetNodeId": "20095:8471",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-8471",
-            "source": "node-chart",
-            "status": "verified"
+            "id": "section-message",
+            "name": "Section message",
+            "componentSetNodeId": "20967:3641",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20967-3641",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444"
@@ -1433,27 +1436,19 @@
         "storybookId": "specs-universal-sections-sidebar--docs"
       },
       "figma": {
-        "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
             "id": "sidebar",
             "name": "Sidebar",
-            "componentSetNodeId": "111:227891",
-            "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227891",
-            "source": "designer-supplied",
+            "componentSetNodeId": "19393:46573",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573",
+            "source": "manual",
             "status": "verified",
-            "variantProps": {
-              "user": "user"
-            },
-            "variantValues": {
-              "user": [
-                "tutor",
-                "supervisor"
-              ]
-            }
+            "isComponentSet": true
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227891"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573"
       }
     },
     "Skeleton": {
@@ -1520,42 +1515,16 @@
         "storybookId": "specs-universal-elements-smart-badges--docs"
       },
       "figma": {
-        "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "static-badge-smart",
-            "name": "Static Badge / SMART",
-            "componentSetNodeId": "956:256793",
-            "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=956-256793",
-            "source": "designer-supplied",
-            "status": "verified",
-            "variantProps": {
-              "style": "style",
-              "size": "size"
-            },
-            "variantValues": {
-              "style": [
-                "socio-emotional",
-                "mastering content",
-                "advocacy",
-                "relationships",
-                "technology tools"
-              ],
-              "size": [
-                "h1",
-                "h2",
-                "h3",
-                "h4",
-                "h5",
-                "h6",
-                "b1",
-                "b2",
-                "b3"
-              ]
-            }
+            "id": "smart-badges",
+            "name": "Smart badges",
+            "source": "manual",
+            "status": "missing",
+            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built."
           }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=83-125838"
+        ]
       }
     },
     "Spinner": {
@@ -1571,39 +1540,16 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "spinner-animation",
+            "id": "spinner",
             "name": "Spinner",
-            "componentSetNodeId": "20095:7956",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7956",
-            "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "loading-animations-1-growing",
-            "name": "Spinner Growing",
-            "componentSetNodeId": "20095:7980",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7980",
-            "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "loading-animations-2-rotating",
-            "name": "Spinner Rotating",
-            "componentSetNodeId": "20095:8020",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-8020",
-            "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "loading-animations-3-stacking",
-            "name": "Spinner Stacking",
-            "componentSetNodeId": "20095:8078",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-8078",
-            "source": "node-chart",
-            "status": "verified"
+            "componentSetNodeId": "20117:5249",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5249",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7956"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5249"
       }
     },
     "Spotlight": {
@@ -1672,14 +1618,13 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "static-table-page",
-            "name": "Static table (page)",
-            "componentSetNodeId": "17156:122",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122",
+            "id": "static-table",
+            "name": "Static table",
+            "componentSetNodeId": "20095:12263",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-12263",
             "source": "manual",
-            "status": "docs-page",
-            "notes": "The Static table page: the Static table set and the shared _Table parts it is built from."
+            "status": "verified",
+            "isComponentSet": true
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122"
@@ -1733,22 +1678,13 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "nav-tabs",
-            "name": "Nav Tabs",
-            "componentSetNodeId": "69:16779",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=69-16779",
-            "source": "node-chart",
-            "status": "verified"
-          },
-          {
-            "id": "tab-item",
-            "name": "_Tab Item",
-            "componentSetNodeId": "4209:20411",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=4209-20411",
-            "source": "designer-supplied",
+            "id": "tabs",
+            "name": "Tabs",
+            "componentSetNodeId": "20095:11829",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-11829",
+            "source": "manual",
             "status": "verified",
-            "isComponentSet": true,
-            "notes": "One tab in the strip: Tabs.Tab. state × selected, 9 variants. selected=true is the root's activeKey; state=disabled is isDisabled; hover, pressed and focus are the browser's own :hover, :active and :focus-visible, never a prop. Figma draws no disabled + selected variant."
+            "isComponentSet": true
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503"
@@ -1804,17 +1740,11 @@
           {
             "id": "tag",
             "name": "Tag",
-            "componentSetNodeId": "20095:299",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-299",
+            "componentSetNodeId": "20117:1260",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-1260",
             "source": "manual",
             "status": "verified",
-            "isComponentSet": true,
-            "variantProps": {
-              "isSelected": "selected",
-              "isLoading": "state=saving",
-              "isElevated": "elevated"
-            },
-            "notes": "On the Status, Count & Tag page (docs page: node 17884:2099). Figma values carry a (default) suffix on gray, plain, read-only, rest and false. state=saving is isLoading; state=disabled is isDisabled, or TagContext for a whole field; remove? on a link is href plus isRemovable; count? is trailingMetric. type is the same four values in code (plain, person, agent, team); the avatar slot is the avatar prop, with initials when it is missing. elevated=true is isElevated, drawn for read-only and link on plain, person, agent and team, including disabled and focus × on a link's separate ×; code ignores it on a removable or selectable tag with a warning."
+            "isComponentSet": true
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20454-1324"
@@ -1926,7 +1856,17 @@
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [],
+        "sets": [
+          {
+            "id": "text-area",
+            "name": "Text area",
+            "componentSetNodeId": "20324:924",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20324-924",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/"
       }
     },
@@ -1941,7 +1881,17 @@
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [],
+        "sets": [
+          {
+            "id": "text-field",
+            "name": "Text field",
+            "componentSetNodeId": "20316:150478",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20316-150478",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/"
       }
     },
@@ -2033,12 +1983,9 @@
           {
             "id": "time-picker",
             "name": "Time picker",
-            "componentSetNodeId": "16560:4508",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=16560-4508",
             "source": "manual",
-            "status": "unpublished",
-            "isComponentSet": true,
-            "notes": "Hours, minutes and an AM/PM menu that opens 4px (`--stack-sm`) below: state × filled? × spacing. Same field anatomy as DatePicker. In code it is `TimePicker.jsx`."
+            "status": "missing",
+            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built. The old _Time Field set is deprecated."
           }
         ]
       }
@@ -2082,10 +2029,9 @@
           {
             "id": "tooltip",
             "name": "Tooltip",
-            "componentSetNodeId": "42:6020",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=42-6020",
-            "source": "node-chart",
-            "status": "verified"
+            "source": "manual",
+            "status": "missing",
+            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built. The old Tooltip is on the Archive page."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19486"
@@ -2104,14 +2050,13 @@
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
-            "id": "tree-table-page",
-            "name": "Tree table (page)",
-            "componentSetNodeId": "19685:27043",
-            "isComponentSet": false,
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043",
+            "id": "tree-table",
+            "name": "Tree table",
+            "componentSetNodeId": "20095:15470",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-15470",
             "source": "manual",
-            "status": "docs-page",
-            "notes": "The Tree table page: records nested up to three levels, built from _Tree row."
+            "status": "verified",
+            "isComponentSet": true
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043"
@@ -2127,27 +2072,19 @@
         "storybookId": "specs-universal-elements-user-avatar--docs"
       },
       "figma": {
-        "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
             "id": "user-avatar",
-            "name": "User Avatar",
-            "componentSetNodeId": "111:227876",
-            "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227876",
-            "source": "designer-supplied",
+            "name": "User avatar",
+            "componentSetNodeId": "20979:1397",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20979-1397",
+            "source": "manual",
             "status": "verified",
-            "variantProps": {
-              "state": "state"
-            },
-            "variantValues": {
-              "state": [
-                "enabled (default)",
-                "hover"
-              ]
-            }
+            "isComponentSet": true
           }
         ],
-        "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227876"
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20979-1397"
       }
     },
     "UserTypeIndicator": {
@@ -2160,30 +2097,16 @@
         "storybookId": "specs-universal-elements-user-type-indicator--docs"
       },
       "figma": {
-        "fileKey": "W0qzhXWxFsMwSJzkdV2yal",
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
         "sets": [
           {
             "id": "user-type-indicator",
-            "name": "User Type Indicator",
-            "componentSetNodeId": "2370:191400",
-            "url": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=2370-191400",
-            "source": "designer-supplied",
-            "status": "verified",
-            "variantProps": {
-              "type": "type"
-            },
-            "variantValues": {
-              "type": [
-                "lead tutor",
-                "regular tutor",
-                "tutor supervisors",
-                "system admin",
-                "demo"
-              ]
-            }
+            "name": "User type indicator",
+            "source": "manual",
+            "status": "missing",
+            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built."
           }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=2370-191400"
+        ]
       }
     }
   },
