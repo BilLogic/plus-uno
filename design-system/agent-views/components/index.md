@@ -4,7 +4,7 @@
 
 > **CRITICAL**: Only use components and patterns listed here. If it's not listed, it DOES NOT EXIST.
 
-Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`
+Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`. Patterns import from `@/patterns`, and `PageLayout` from `@/specs/Universal/Pages` (§ Patterns).
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 

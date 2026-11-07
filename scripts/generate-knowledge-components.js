@@ -75,7 +75,8 @@ function renderComponentIndex(components) {
   doc += `<!-- Load when: building UI | Route: design-system/guidelines/overview.md -->\n`;
   doc += `# PLUS DS — Components\n\n`;
   doc += `> **CRITICAL**: Only use components and patterns listed here. If it's not listed, it DOES NOT EXIST.\n\n`;
-  doc += `Mirrors \`design-system/src/components/\`. Import from the barrel: \`import { Button } from '@/components';\`\n\n`;
+  doc += `Mirrors \`design-system/src/components/\`. Import from the barrel: \`import { Button } from '@/components';\`. `;
+  doc += `Patterns import from \`@/patterns\`, and \`PageLayout\` from \`@/specs/Universal/Pages\` (§ Patterns).\n\n`;
   doc += `This index is the existence list. Each entry links to its generated doc — `;
   doc += `props, variants, tokens touched — derived from source.\n\n`;
   doc += renderInventions(readInventions());
