@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as HeadingStories from './Heading.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet, DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Heading } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -44,9 +51,7 @@ on any level of the page.
 
 ## Overview
 
-<DocsCanvasShell attachSourceBelow description={<>A `large` heading.</>}>
-    <Canvas of={HeadingStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={HeadingStories.Overview} title="Overview" description={<>A `large` heading.</>} />
 
 </div>
 
@@ -54,9 +59,7 @@ on any level of the page.
 
 ## Sizes
 
-<DocsCanvasShell description={<>Seven sizes, `xxlarge` to `xxsmall`. Size is a style choice, independent of the tag the heading renders as.</>}>
-    <DsCanvasQuiet of={HeadingStories.Sizes} />
-</DocsCanvasShell>
+<ComponentExample of={HeadingStories.Sizes} title="Sizes" description={<>Seven sizes, `xxlarge` to `xxsmall`. Size is a style choice, independent of the tag the heading renders as.</>} />
 
 </div>
 
@@ -64,13 +67,9 @@ on any level of the page.
 
 ## Tag and context
 
-<DocsCanvasShell description={<>`as` overrides the tag directly — here a `div` carrying `xxsmall` text with no heading semantics.</>}>
-    <DsCanvasQuiet of={HeadingStories.OverridesTheTag} />
-</DocsCanvasShell>
+<ComponentExample of={HeadingStories.OverridesTheTag} title="Overrides the tag" description={<>`as` overrides the tag directly — here a `div` carrying `xxsmall` text with no heading semantics.</>} />
 
-<DocsCanvasShell description={<>Without `as`, the tag tracks the ambient level from `HeadingContextProvider`: a heading nested one level deeper renders one tag level down.</>}>
-    <DsCanvasQuiet of={HeadingStories.NestedContext} />
-</DocsCanvasShell>
+<ComponentExample of={HeadingStories.NestedContext} title="Nested context" description={<>Without `as`, the tag tracks the ambient level from `HeadingContextProvider`: a heading nested one level deeper renders one tag level down.</>} />
 
 </div>
 
@@ -78,9 +77,7 @@ on any level of the page.
 
 ## Color
 
-<DocsCanvasShell description={<>`color.text.inverse` and `color.text.warning.inverse` apply automatically when the ground is dark.</>}>
-    <DsCanvasQuiet of={HeadingStories.InverseColor} />
-</DocsCanvasShell>
+<ComponentExample of={HeadingStories.InverseColor} title="Inverse color" description={<>`color.text.inverse` and `color.text.warning.inverse` apply automatically when the ground is dark.</>} />
 
 </div>
 
@@ -88,21 +85,13 @@ on any level of the page.
 
 ## State
 
-<DocsCanvasShell description={<>The default ink in the size's text style.</>}>
-    <DsCanvasQuiet of={HeadingStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={HeadingStories.Rest} title="Rest" description={<>The default ink in the size's text style.</>} />
 
-<DocsCanvasShell description={<>A heading does not react to a pointer.</>}>
-    <DsCanvasQuiet of={HeadingStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={HeadingStories.Hovered} title="Hovered" description={<>A heading does not react to a pointer.</>} />
 
-<DocsCanvasShell description={<>A press changes nothing.</>}>
-    <DsCanvasQuiet of={HeadingStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={HeadingStories.Pressed} title="Pressed" description={<>A press changes nothing.</>} />
 
-<DocsCanvasShell description={<>Tab skips a heading and it is never dimmed, so it has no focus or disabled state.</>}>
-    <DsCanvasQuiet of={HeadingStories.NotAControl} />
-</DocsCanvasShell>
+<ComponentExample of={HeadingStories.NotAControl} title="Focused and disabled" description={<>Tab skips a heading and it is never dimmed, so it has no focus or disabled state.</>} />
 
 </div>
 
@@ -183,23 +172,36 @@ assistive technology.
 
 ## Best practices
 
-### Let the ambient context pick the tag; choose `size` for the look.
+Nest content in a `HeadingContextProvider`, or rely on the one a pattern like `Section` already provides, and `Heading` picks `h1` to `h6` from how deep it sits. Pass `size` for the look; reach for `as` only to break that link on purpose.
 
-Nest content in a `HeadingContextProvider` (or rely on the one a pattern like
-`Section` already provides) and `Heading` picks `h1`–`h6` from how deep it
-sits, so the document outline stays correct automatically. Reach for `as`
-only to break that link deliberately — a styled label that isn't really a
-heading, for instance.
+### Choose `size` for the look.
 
-```jsx
-<Heading size="xlarge">Student progress</Heading>
-```
+`size` is required, and it is separate from the tag the context picks.
 
-### `size` is required — there is no default.
+<DoDontPair
+    doExample={<Heading size="small">Student progress</Heading>}
+    doCaption="Pass the size the spot needs and let the level pick the tag."
+    dontExample={<Heading as="h5" size="small">Student progress</Heading>}
+    dontCaption="Pick a tag to get a size, which breaks the outline."
+/>
 
-A heading with no declared size is not a heading. Always pass `size`
-explicitly, chosen for the visual weight the spot needs, separate from
-whatever tag the context resolves to.
+### Use `as="div"` for a label that is not a heading.
+
+<DoDontPair
+    doExample={<Heading as="div" size="xxsmall">Section label</Heading>}
+    doCaption="Heading style with no heading meaning."
+    dontExample={<Heading size="xxsmall">Section label</Heading>}
+    dontCaption="A real heading that screen reader users meet in the outline."
+/>
+
+### Let the ground set the ink.
+
+<DoDontPair
+    doExample={<div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-md)' }}><Heading as="div" size="medium" color="color.text.inverse">On a dark ground</Heading></div>}
+    doCaption="The inverse color on a dark ground."
+    dontExample={<div style={{ background: 'var(--ds-text)', padding: 'var(--pad-x-md)' }}><Heading as="div" size="medium">On a dark ground</Heading></div>}
+    dontCaption="The default ink on a dark ground, which barely reads."
+/>
 
 </div>
 

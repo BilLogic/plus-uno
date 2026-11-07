@@ -179,3 +179,8 @@ export const Focused = {
         await expect(getComputedStyle(parent).outlineColor).toBe(tokenColor(canvasElement, '--ds-border-focused'));
     }
 };
+
+/** The playground: the overview story's args, with every control live. */
+export const Interactive = {
+    args: { ...Overview.args }
+};

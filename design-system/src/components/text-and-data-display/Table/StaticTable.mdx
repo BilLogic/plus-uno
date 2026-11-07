@@ -1,8 +1,17 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as StaticTableStories from './StaticTable.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DocsTable, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { StaticTable } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const rosterHeaders = [{ text: 'Session date', width: '30%' }, { text: 'Student', width: '40%' }, { text: 'Amount', align: 'number', width: '30%' }];
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -51,14 +60,7 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 ## Overview
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>Default table with hover enabled and 40 rows.</>}
->
-
-<Canvas of={StaticTableStories.Overview} />
-
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.Overview} title="Overview" description={<>Default table with hover enabled and 40 rows.</>} />
 
 </div>
 
@@ -66,18 +68,11 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 ## Appearance
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>Striped rows and bordered cells are independent switches.</>}
->
+<ComponentExample of={StaticTableStories.Striped} title="Striped" description={<>Alternate rows take a subtle ground. Striped and bordered are independent switches.</>} />
 
-<Canvas of={StaticTableStories.Striped} />
+<ComponentExample of={StaticTableStories.Bordered} title="Bordered" description="A line between every cell, at the 32 row size." />
 
-<Canvas of={StaticTableStories.Bordered} />
-
-<Canvas of={StaticTableStories.FramedAndLines} />
-
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.FramedAndLines} title="Framed and lines" description="Plain is the default. Framed draws its own edge, for a table beside other content or in a modal body; vertical lines add a divider between columns." />
 
 </div>
 
@@ -85,14 +80,7 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 ## Row size
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>Rows are 32, 40 or 48 tall at minimum: pick by how much each row holds, not by screen width.</>}
->
-
-<Canvas of={StaticTableStories.Sizes} />
-
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.Sizes} title="Sizes" description={<>Rows are 32, 40 or 48 tall at minimum: pick by how much each row holds, not by screen width.</>} />
 
 </div>
 
@@ -100,14 +88,7 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 ## Cells
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>Text, a muted second line, wrapping, the title emphasis, text, number and icon alignment, a leading slot, an error and a loading cell.</>}
->
-
-<Canvas of={StaticTableStories.Cells} />
-
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.Cells} title="Cells" description={<>Text, a muted second line, wrapping, the title emphasis, text, number and icon alignment, a leading slot, an error and a loading cell.</>} />
 
 </div>
 
@@ -115,14 +96,7 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 ## Head cells
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>The head cell holds a label and an optional type icon. It aligns as text, number or icon, and a label too long for its width ends in an ellipsis.</>}
->
-
-<Canvas of={StaticTableStories.HeadCells} />
-
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.HeadCells} title="Head cells" description={<>The head cell holds a label and an optional type icon. It aligns as text, number or icon, and a label too long for its width ends in an ellipsis.</>} />
 
 </div>
 
@@ -130,14 +104,7 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 ## Row states
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>A row rests, is highlighted, selected or disabled.</>}
->
-
-<Canvas of={StaticTableStories.RowStates} />
-
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.RowStates} title="Row states" description={<>A row rests, is highlighted, selected or disabled.</>} />
 
 </div>
 
@@ -145,14 +112,7 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 ## Summary
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>The summary row closes the table with one calculation per column.</>}
->
-
-<Canvas of={StaticTableStories.Summary} />
-
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.Summary} title="Summary" description={<>The summary row closes the table with one calculation per column.</>} />
 
 </div>
 
@@ -160,14 +120,7 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 ## The Static table
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>A fixed grid people read: rows rest or are highlighted, and nothing hovers.</>}
->
-
-<Canvas of={StaticTableStories.Static} />
-
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.Static} title="Static" description={<>A fixed grid people read: rows rest or are highlighted, and nothing hovers.</>} />
 
 </div>
 
@@ -175,29 +128,17 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 ## State
 
-<DocsCanvasShell description={<>A rest row is clear; a selected row is on the selected ground.</>}>
-    <DsCanvasQuiet of={StaticTableStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.Rest} title="Rest" description={<>A rest row is clear; a selected row is on the selected ground.</>} />
 
-<DocsCanvasShell description={<>A row takes the subtle hovered step, a selected row its own hovered step.</>}>
-    <DsCanvasQuiet of={StaticTableStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.Hovered} title="Hovered" description={<>A row takes the subtle hovered step, a selected row its own hovered step.</>} />
 
-<DocsCanvasShell description={<>The pressed steps of the same two grounds.</>}>
-    <DsCanvasQuiet of={StaticTableStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.Pressed} title="Pressed" description={<>The pressed steps of the same two grounds.</>} />
 
-<DocsCanvasShell description={<>A row has no focus stop; Tab skips it.</>}>
-    <DsCanvasQuiet of={StaticTableStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.Focused} title="Focused" description={<>A row has no focus stop; Tab skips it.</>} />
 
-<DocsCanvasShell description={<>The row takes the disabled ink, ignores the pointer and is <code>aria-disabled</code>.</>}>
-    <DsCanvasQuiet of={StaticTableStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.Disabled} title="Disabled" description={<>The row takes the disabled ink, ignores the pointer and is <code>aria-disabled</code>.</>} />
 
-<DocsCanvasShell description={<>A cell in the error state takes the danger ink.</>}>
-    <DsCanvasQuiet of={StaticTableStories.Invalid} />
-</DocsCanvasShell>
+<ComponentExample of={StaticTableStories.Invalid} title="Invalid" description={<>A cell in the error state takes the danger ink.</>} />
 
 </div>
 
@@ -205,7 +146,7 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 ## Interactive playground
 
-<DocsInteractivePlayground of={StaticTableStories.Overview} />
+<DocsInteractivePlayground of={StaticTableStories.Interactive} />
 
 </div>
 
@@ -275,11 +216,34 @@ card. A table people sort, filter, select or page is a Dynamic table.
 
 ## Best practices
 
-- **Per-cell control** — pass `{ content, align, emphasis, overflow, secondary, leading, state, loading, colSpan, className }` instead of a bare value. `align` is `text`, `number` or `icon`.
-- **Row size** — `size` is `32`, `40` or `48` (default 40), from the `--size-row-*` tokens. Cell padding is `--size-table-cell-pad-x` and `--size-table-cell-pad-y`.
-- **Long text** truncates to one line with an ellipsis and shows the full text in a tooltip; pass `overflow: 'wrap'` for a cell that should wrap.
-- **One title column** — `titleColumn` is the index of the column that names the record.
-- **No hover, no sort.** `StaticTable` renders `Table` with `hover` forced off. Nothing in it reaches for the Dynamic table's sorting, selection or paging.
+A static table is a fixed grid people read. It has no hover, sort or paging; for those, use the Dynamic table.
+
+### Right-align numbers.
+
+<DoDontPair
+    doExample={<StaticTable headers={rosterHeaders} rows={[['Jul 3', 'Priya Nair', { content: '$32.00', align: 'number' }], ['Jul 9', 'Marcus Lee', { content: '$6.50', align: 'number' }]]} />}
+    doCaption="Numbers align by their digits, so the amounts line up."
+    dontExample={<StaticTable headers={[{ text: 'Session date', width: '30%' }, { text: 'Student', width: '40%' }, { text: 'Amount', width: '30%' }]} rows={[['Jul 3', 'Priya Nair', '$32.00'], ['Jul 9', 'Marcus Lee', '$6.50']]} />}
+    dontCaption="Left-aligned numbers do not line up."
+/>
+
+### Name the record in one column.
+
+<DoDontPair
+    doExample={<StaticTable headers={rosterHeaders} titleColumn={1} rows={[['Jul 3', 'Priya Nair', { content: '$32.00', align: 'number' }], ['Jul 9', 'Marcus Lee', { content: '$6.50', align: 'number' }]]} />}
+    doCaption="`titleColumn` marks the one column that names the row."
+    dontExample={<StaticTable headers={rosterHeaders} rows={[[{ content: 'Jul 3', emphasis: 'title' }, { content: 'Priya Nair', emphasis: 'title' }, { content: '$32.00', align: 'number', emphasis: 'title' }]]} />}
+    dontCaption="Emphasis on every cell, so nothing stands out."
+/>
+
+### Keep a cell to one line.
+
+<DoDontPair
+    doExample={<div style={{ width: 360 }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', 'Needs a longer session on fractions and ratios this week']]} /></div>}
+    doCaption="Long text truncates with an ellipsis and shows in full in a tooltip."
+    dontExample={<div style={{ width: 360 }}><StaticTable headers={[{ text: 'Student' }, { text: 'Note' }]} rows={[['Priya Nair', { content: 'Needs a longer session on fractions and ratios this week', overflow: 'wrap' }]]} /></div>}
+    dontCaption="Every cell wrapped, so rows grow uneven."
+/>
 
 </div>
 

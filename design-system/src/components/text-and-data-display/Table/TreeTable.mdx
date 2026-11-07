@@ -1,8 +1,19 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as TreeTableStories from './TreeTable.stories.jsx';
-import { DocsCanvasShell, ResourcesBlock, DocsTable, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { TreeTable } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+export const treeHead = { cells: [{ key: 'name', content: 'Name' }, { key: 'type', content: 'Type' }] };
+export const treeItems = [{ id: 'a', cells: ['Lincoln Middle', 'School'], children: [{ id: 'a1', cells: ['Grade 7 · Math', 'Class'] }, { id: 'a2', cells: ['Grade 8 · Math', 'Class'] }] }];
+export const lazyItems = [{ id: 'b', cells: ['Roosevelt K-8', 'School'], hasChildren: true }];
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -43,14 +54,7 @@ Records that nest, up to three levels. `TreeTable` indents each level one step a
 
 ## Overview
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>Each level indents one step and keeps the columns. A parent shows its count, and an open parent with nothing in it shows a message row.</>}
->
-
-<Canvas of={TreeTableStories.Overview} />
-
-</DocsCanvasShell>
+<ComponentExample of={TreeTableStories.Overview} title="Overview" description={<>Each level indents one step and keeps the columns. A parent shows its count, and an open parent with nothing in it shows a message row.</>} />
 
 </div>
 
@@ -58,14 +62,7 @@ Records that nest, up to three levels. `TreeTable` indents each level one step a
 
 ## Loading children
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>A parent with `hasChildren` and no `children` loads them through `loadChildren` the first time it opens, with a spinner and a loading message row until they arrive.</>}
->
-
-<Canvas of={TreeTableStories.LoadingChildren} />
-
-</DocsCanvasShell>
+<ComponentExample of={TreeTableStories.LoadingChildren} title="Loading children" description={<>A parent with `hasChildren` and no `children` loads them through `loadChildren` the first time it opens, with a spinner and a loading message row until they arrive.</>} />
 
 </div>
 
@@ -73,14 +70,7 @@ Records that nest, up to three levels. `TreeTable` indents each level one step a
 
 ## Keyboard
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>One tab stop. The arrow keys move between rows and open or close them; Home and End jump to the ends; Enter toggles.</>}
->
-
-<Canvas of={TreeTableStories.Keyboard} />
-
-</DocsCanvasShell>
+<ComponentExample of={TreeTableStories.Keyboard} title="Keyboard" description={<>One tab stop. The arrow keys move between rows and open or close them; Home and End jump to the ends; Enter toggles.</>} />
 
 </div>
 
@@ -88,14 +78,7 @@ Records that nest, up to three levels. `TreeTable` indents each level one step a
 
 ## Expand on a row press
 
-<DocsCanvasShell
-    attachSourceBelow
-    description={<>With `shouldExpandOnClick` a press anywhere on a parent row opens it. Use it only on rows without controls.</>}
->
-
-<Canvas of={TreeTableStories.ExpandOnRowPress} />
-
-</DocsCanvasShell>
+<ComponentExample of={TreeTableStories.ExpandOnRowPress} title="Expand on a row press" description={<>With `shouldExpandOnClick` a press anywhere on a parent row opens it. Use it only on rows without controls.</>} />
 
 </div>
 
@@ -103,13 +86,17 @@ Records that nest, up to three levels. `TreeTable` indents each level one step a
 
 ## State
 
-<DocsCanvasShell description={<>A row is clear; a parent's title cell carries the chevron, a leaf keeps the empty box.</>}>
-    <DsCanvasQuiet of={TreeTableStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={TreeTableStories.Rest} title="Rest" description={<>A row is clear; a parent's title cell carries the chevron, a leaf keeps the empty box.</>} />
 
-<DocsCanvasShell description={<>The focused row draws the 2px ring inset on the row, never a fill.</>}>
-    <DsCanvasQuiet of={TreeTableStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={TreeTableStories.Focused} title="Focused" description={<>The focused row draws the 2px ring inset on the row, never a fill.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground of={TreeTableStories.Interactive} />
 
 </div>
 
@@ -176,11 +163,36 @@ folder of sessions. For a flat list, use the Static or Dynamic table instead.
 
 ## Best practices
 
-- **Data nests the same shape.** `items` is one `{ id, cells, children, hasChildren, count }` per row, and `children` holds more of the same. Every level keeps every column.
-- **Depth is space.** Each level indents one `--table-indent` step; a leaf keeps an empty toggle box so names at one level line up.
-- **Load children late.** Give a parent `hasChildren` and no `children`, and `loadChildren(item)` returns them, or a promise of them, the first time it opens.
-- **Keep the row press for rows without controls.** `shouldExpandOnClick` never fires from a button or link inside the row, but a row that carries controls reads better with the chevron alone.
-- **Keyboard follows the treegrid pattern.** The table is one tab stop. Every row carries `aria-level`, `aria-posinset` and `aria-setsize`, and a parent `aria-expanded`.
+Use a tree table for records that nest, up to three levels, where every level shares the same columns.
+
+### Keep every column at every level.
+
+<DoDontPair
+    doExample={<TreeTable head={treeHead} items={treeItems} label="Schools" defaultExpandedIds={['a']} />}
+    doCaption="Each level indents one step and keeps both columns."
+    dontExample={<TreeTable head={treeHead} items={[{ id: 'a', cells: ['Lincoln Middle'], children: [{ id: 'a1', cells: ['Grade 7 · Math'] }] }]} label="Schools" defaultExpandedIds={['a']} />}
+    dontCaption="Levels that drop a column, so the type column goes ragged."
+/>
+
+### Load children late for a long tree.
+
+<DoDontPair
+    doExample={<TreeTable head={treeHead} items={lazyItems} label="Schools" loadChildren={() => [{ id: 'b1', cells: ['Kindergarten · Reading', 'Class'] }]} />}
+    doCaption="`hasChildren` with `loadChildren` fetches a branch the first time it opens."
+    dontExample={<TreeTable head={treeHead} items={lazyItems} label="Schools" />}
+    dontCaption="`hasChildren` with nothing to load them, so the branch opens onto the empty message."
+/>
+
+### Leave the row press for rows without controls.
+
+`shouldExpandOnClick` never fires from a button or link in the row. A row that carries controls reads better with the chevron alone.
+
+<DoDontPair
+    doExample={<TreeTable head={treeHead} items={treeItems} label="Schools" shouldExpandOnClick />}
+    doCaption="A row of plain text opens on a press anywhere."
+    dontExample={<TreeTable head={treeHead} items={[{ id: 'a', cells: [<a key="l" href="#schools">Lincoln Middle</a>, 'School'], children: [{ id: 'a1', cells: ['Grade 7 · Math', 'Class'] }] }]} label="Schools" shouldExpandOnClick />}
+    dontCaption="A link in the row, where a press means two things."
+/>
 
 </div>
 
