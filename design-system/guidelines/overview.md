@@ -40,14 +40,16 @@ Do not bulk-load. Two or three documents per task is the budget.
 **Build UI with components**
 → `agent-views/components/index.md` (does it exist?) → the component's generated doc, linked from that index (props, variants, tokens touched) → `agent-views/tokens/tokens.md` if styling beyond them
 
+**Start a page or a container from a pattern**: `PageLayout` (from `@/specs/Universal/Pages`) for every full page; `Frame`, `PatternSidebar`, `Page`, `PatternSection`, `PatternCard`, `PatternTable`, `PatternModal`, `PatternDrawer`, `Blanket` and `AiChat` from `@/patterns`; the Popups (`DropdownMenu`, `Popup`, `Flag`, `Tooltip`) from `@/components`. When to reach for each: `agent-views/components/index.md` § Patterns.
+
 **Build a page or dashboard**
-→ `composition/layout.md` → `composition/hierarchy.md` → `foundations/grid.md`
+→ `agent-views/components/index.md` § Patterns (`PageLayout` and the Section, Card and Table shells, with their imports) → `composition/layout.md` → `composition/hierarchy.md` → `foundations/grid.md`
 
 **Build a form**
 → `composition/forms.md` → `agent-views/components/index.md` → `foundations/spacing.md`
 
-**Dialog, modal, card, table, empty or loading state**
-→ `composition/surfaces.md`
+**Dialog, modal, drawer, card, table, empty or loading state**
+→ `agent-views/components/index.md` § Patterns (the shell and its import) → `composition/surfaces.md`
 
 **Style something**
 → `agent-views/tokens/tokens.md` for the name → `foundations/<topic>.md` for the rule

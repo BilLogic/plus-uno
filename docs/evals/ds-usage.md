@@ -97,3 +97,16 @@ Read: the harness as on main barely moves the total. It removes deep imports, un
 | Mean turns / minutes | 20.7 / 1.3 | 21.5 / 1.6 |
 
 Read: every build came out clean, and the post-edit hook never had to hand one back, so the escapes stopped at write time rather than at the gate. Builds read the ladder (`--inline-md`, `--page-stack-md`, `--pad-x-lg`) where the baseline read `--space-*` primitives. Eleven of twelve runs ran `check:ds-usage` themselves before finishing. One difference from the baseline setup: there, the checker could not run in a copy without git, so the gate was out of reach; here it runs. Layout is unmoved: ten of twelve outer structures are still hand-made, which is the next lever. The control arm was not re-run, since nothing it reads changed.
+
+## Patterns in the agent views (2026-11-07)
+
+12 runs of the current arm on `sonnet`, at `a38f37532`: the component index gained a Patterns section (`PageLayout` and the Frame, Page, Section, Card, Table, Overlays, Popups and AI patterns, each with its import line), a "Not here" row sending `Card` to `PatternCard`, and a self-check line, "a page or card starts from its pattern". No run errored, and no run reached the checkout.
+
+| | after phase 1 | with patterns |
+|---|---|---|
+| Escapes per run | 0 | 0 |
+| Trap task, gap named | 2/2 | 2/2 |
+| Layout formula used | 2/12 | 11/12 |
+| Mean turns / minutes | 21.5 / 1.6 | 19.5 / 1.3 |
+
+Read: every full page now sits in `PageLayout`, and both frame-to-code builds are a `PatternCard`, where the runs before wrote that the system had no card. The one miss is an overlay flow whose outer view was hand-made. An overlay-flow agent also chose the `Modal` component over `PatternModal` because the pattern draws inline with no focus trap, which is right; the row now says so. After this run the review also dropped a wrong "Not here" row for `Section` (a real menu part), renamed the table's first column and named all three barrels in the index header; none of those touch what a page agent reads first.

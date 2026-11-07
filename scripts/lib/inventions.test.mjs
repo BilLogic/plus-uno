@@ -10,7 +10,7 @@ const AGENT_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '.
 const read = (name) => JSON.parse(fs.readFileSync(path.join(AGENT_ROOT, name), 'utf8'));
 
 test('every "use instead" target in _inventions.json exists in components.json or tokens.json', () => {
-  assert.deepEqual(checkInventions(read('_inventions.json'), read('components.json'), read('tokens.json')), []);
+  assert.deepEqual(checkInventions(read('_inventions.json'), read('components.json'), read('tokens.json'), read('_patterns.json').patterns.map((r) => r.name)), []);
 });
 
 test('checkInventions names a missing component, prop, value or token', () => {

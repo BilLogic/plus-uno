@@ -1,0 +1,89 @@
+{
+  "_comment": "Hand-kept, reviewed in PRs. The patterns: the shells a page, a card, a section, a table or an overlay is built from. Rendered into components/index.md by npm run generate:agent; scripts/lib/patterns-index.mjs holds every name to its barrel and every doc path to a file.",
+  "patterns": [
+    {
+      "group": "Templates",
+      "name": "PageLayout",
+      "import": "@/specs/Universal/Pages",
+      "use": "Every full page: wraps it in the Frame with the Sidebar, the breadcrumb row and the Page with its 12-column content grid. `frame=\"focused\"` for one task the person finishes or leaves.",
+      "doc": "design-system/src/specs/Universal/Pages/PageLayout/PageLayout.mdx"
+    },
+    {
+      "group": "Frame",
+      "name": "Frame",
+      "import": "@/patterns",
+      "use": "The app frame under PageLayout: Sidebar, Page and Panel with no top bar. Reach for it directly only for a shell PageLayout does not give.",
+      "doc": "design-system/src/patterns/Frame/Frame.mdx"
+    },
+    {
+      "group": "Frame",
+      "name": "PatternSidebar",
+      "import": "@/patterns",
+      "use": "The Frame's Sidebar with its open tabs. PageLayout draws it from the config you pass.",
+      "doc": "design-system/src/patterns/Sidebar/Sidebar.mdx"
+    },
+    {
+      "group": "Page",
+      "name": "Page",
+      "import": "@/patterns",
+      "use": "A tokenized box with a level (fill and shadow together), a pad and a radius. The Frame draws the page's own; use it for any other block that needs a level.",
+      "doc": "design-system/src/patterns/Page/Page.mdx"
+    },
+    {
+      "group": "Section",
+      "name": "PatternSection",
+      "import": "@/patterns",
+      "use": "A span of the page grid under one heading, with its header, toolbar and tabs. No box of its own: the Page supplies the pad. `detail` for a list with a detail region.",
+      "doc": "design-system/src/patterns/PatternSection/PatternSection.mdx"
+    },
+    {
+      "group": "Card",
+      "name": "PatternCard",
+      "import": "@/patterns",
+      "use": "A raised container for one object: a student, a session, a metric. Optional image, a header over the body, optional footer.",
+      "doc": "design-system/src/patterns/PatternCard/PatternCard.mdx"
+    },
+    {
+      "group": "Table",
+      "name": "PatternTable",
+      "import": "@/patterns",
+      "use": "How a table sits on a page: inside a Section whose header carries the title and toolbar, with slots for pagination and the empty state.",
+      "doc": "design-system/src/patterns/PatternTable/PatternTable.mdx"
+    },
+    {
+      "group": "Overlays",
+      "name": "PatternModal",
+      "import": "@/patterns",
+      "use": "The modal's layout, drawn inline: title, body and footer, width a step of the screen grid. For a working dialog (Blanket, focus trap, Escape) use the `Modal` component, which draws the same layers.",
+      "doc": "design-system/src/patterns/PatternModal/PatternModal.mdx"
+    },
+    {
+      "group": "Overlays",
+      "name": "PatternDrawer",
+      "import": "@/patterns",
+      "use": "A full-height panel at the screen edge, for a task that needs the page in view: a row's details, filters, a short edit.",
+      "doc": "design-system/src/patterns/PatternDrawer/PatternDrawer.mdx"
+    },
+    {
+      "group": "Overlays",
+      "name": "Blanket",
+      "import": "@/patterns",
+      "use": "The full-screen layer under a modal or drawer. PatternModal and PatternDrawer bring their own; use it alone only for a new blocking layer.",
+      "doc": "design-system/src/patterns/Blanket/Blanket.mdx"
+    },
+    {
+      "group": "Popups",
+      "name": "Popup",
+      "import": "@/components",
+      "use": "The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control.",
+      "doc": "design-system/src/patterns/PopupFamily/PopupFamily.mdx"
+    },
+    {
+      "group": "AI",
+      "name": "AiChat",
+      "import": "@/patterns",
+      "use": "AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button.",
+      "doc": "design-system/src/patterns/AiChat/AiChat.mdx"
+    }
+  ]
+}

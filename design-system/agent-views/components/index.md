@@ -2,9 +2,9 @@
 <!-- Load when: building UI | Route: design-system/guidelines/overview.md -->
 # PLUS DS — Components
 
-> **CRITICAL**: Only use components listed here. If it's not listed, it DOES NOT EXIST.
+> **CRITICAL**: Only use components and patterns listed here. If it's not listed, it DOES NOT EXIST.
 
-Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`
+Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`. Patterns import from `@/patterns`, and `PageLayout` from `@/specs/Universal/Pages` (§ Patterns).
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
@@ -26,6 +26,8 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `Dropdown` | `Select`, `DropdownMenu` (Select picks a value; DropdownMenu runs an action) |
 | `Chip` | `Tag` |
 | `Loader` | `Spinner`, `Skeleton` |
+| `Card` | `PatternCard` (a pattern, imported from @/patterns) |
+| `Drawer` | `PatternDrawer` (a pattern, imported from @/patterns) |
 
 **Props**
 
@@ -53,6 +55,25 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `--ds-on-surface, --color-on-surface` | `--ds-text`, `--ds-text-subtle` |
 | `--color-surface-container*` | `--ds-surface`, `--ds-surface-sunken`, `--ds-surface-raised` |
 | `--size-element-*, --element-*` | `--pad-x-md`, `--stack-md`, `--radius-md` (retired; these are the commonest replacements, and check:ds-usage names the exact one for each old name) |
+
+## Patterns: start a page, section, card, table or overlay here
+
+A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leaves you slots to fill. Build a page or a container from these before writing a `div` with its own flex or grid. Each one's props are on its page (linked) and in its source.
+
+| Group | Name | Import | Reach for it when |
+|---|---|---|---|
+| Templates | [`PageLayout`](../../src/specs/Universal/Pages/PageLayout/PageLayout.mdx) | `import { PageLayout } from '@/specs/Universal/Pages';` | Every full page: wraps it in the Frame with the Sidebar, the breadcrumb row and the Page with its 12-column content grid. `frame="focused"` for one task the person finishes or leaves. |
+| Frame | [`Frame`](../../src/patterns/Frame/Frame.mdx) | `import { Frame } from '@/patterns';` | The app frame under PageLayout: Sidebar, Page and Panel with no top bar. Reach for it directly only for a shell PageLayout does not give. |
+| Frame | [`PatternSidebar`](../../src/patterns/Sidebar/Sidebar.mdx) | `import { PatternSidebar } from '@/patterns';` | The Frame's Sidebar with its open tabs. PageLayout draws it from the config you pass. |
+| Page | [`Page`](../../src/patterns/Page/Page.mdx) | `import { Page } from '@/patterns';` | A tokenized box with a level (fill and shadow together), a pad and a radius. The Frame draws the page's own; use it for any other block that needs a level. |
+| Section | [`PatternSection`](../../src/patterns/PatternSection/PatternSection.mdx) | `import { PatternSection } from '@/patterns';` | A span of the page grid under one heading, with its header, toolbar and tabs. No box of its own: the Page supplies the pad. `detail` for a list with a detail region. |
+| Card | [`PatternCard`](../../src/patterns/PatternCard/PatternCard.mdx) | `import { PatternCard } from '@/patterns';` | A raised container for one object: a student, a session, a metric. Optional image, a header over the body, optional footer. |
+| Table | [`PatternTable`](../../src/patterns/PatternTable/PatternTable.mdx) | `import { PatternTable } from '@/patterns';` | How a table sits on a page: inside a Section whose header carries the title and toolbar, with slots for pagination and the empty state. |
+| Overlays | [`PatternModal`](../../src/patterns/PatternModal/PatternModal.mdx) | `import { PatternModal } from '@/patterns';` | The modal's layout, drawn inline: title, body and footer, width a step of the screen grid. For a working dialog (Blanket, focus trap, Escape) use the `Modal` component, which draws the same layers. |
+| Overlays | [`PatternDrawer`](../../src/patterns/PatternDrawer/PatternDrawer.mdx) | `import { PatternDrawer } from '@/patterns';` | A full-height panel at the screen edge, for a task that needs the page in view: a row's details, filters, a short edit. |
+| Overlays | [`Blanket`](../../src/patterns/Blanket/Blanket.mdx) | `import { Blanket } from '@/patterns';` | The full-screen layer under a modal or drawer. PatternModal and PatternDrawer bring their own; use it alone only for a new blocking layer. |
+| Popups | [`Popup`](../../src/patterns/PopupFamily/PopupFamily.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
+| AI | [`AiChat`](../../src/patterns/AiChat/AiChat.mdx) | `import { AiChat } from '@/patterns';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
 
 ## UI components (85)
 
@@ -146,9 +167,10 @@ Names agents reach for that this system does not have, or has retired. Write the
 
 Re-read what you wrote, then fix each of these:
 
-1. Every component comes from this list, imported from `@/components`; a deep path becomes the barrel import.
+1. Every component and pattern comes from these lists, imported from its barrel (`@/components`, `@/patterns`, or `@/specs/Universal/Pages` for `PageLayout`); a deep path becomes the barrel import.
 2. Every prop and value is in the component's generated doc (or `components.json`).
 3. Every color, size, radius and font is a token from `../tokens/tokens.md`, read at the ladder step for its role, in place of a raw value or a `--space-*`, `--radius-<n>` or `--palette-*` primitive.
-4. Every name in the table above is replaced by its right-hand name.
+4. Every name in the tables above is replaced by its right-hand name.
+5. A page or card starts from its pattern: a full page sits in `PageLayout`, and a section, card, table or overlay is its pattern from the Patterns table, before any `div` with its own flex or grid.
 
 Then run `npm run check:ds-usage -- <your files>` and fix what it reports; its rules are `docs/engineering/ds-usage-rules.md`.
