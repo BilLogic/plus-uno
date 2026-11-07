@@ -90,8 +90,9 @@ the two scripts and records the rest as unavailable, not as failures:
 - `bash skills/uno-prototype/scripts/validate-prototype.sh prototypes/{project}`
   — the project's shape (App, export, config, name).
 - `bash skills/uno-review/scripts/run-review-checks.sh prototypes/{project}/src`
-  — the raw-HTML-controls grep review would run; fixing hits here saves a
-  review round-trip (the review lenses still run on exit).
+  — the pre-flight review runs: the same checker plus the raw-HTML-controls
+  grep; fixing hits here saves a review round-trip (the review lenses still
+  run on exit).
 - Stories touched → Storybook MCP `run-story-tests` (a11y included).
 - Open the running preview: pages render, key interactions work, console
   clean — scripts can pass while the page is visibly broken; the browser is

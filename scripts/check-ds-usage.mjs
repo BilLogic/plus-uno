@@ -68,29 +68,35 @@ const git = (repoRoot, args) =>
 
 const lines = (out) => out.split('\n').map((l) => l.trim()).filter(Boolean);
 
+/** Whether repoRoot is inside a git work tree (an archive copy is not). */
+function inCheckout(repoRoot) {
+  try {
+    return git(repoRoot, ['rev-parse', '--is-inside-work-tree']).trim() === 'true';
+  } catch {
+    return false;
+  }
+}
+
 /**
  * The files under `roots`, repo-relative: tracked files by `git ls-files`, or,
  * outside a git checkout (an archive copy, as the usage eval builds in), every
  * file on disk under them, `node_modules` and dot folders skipped.
  */
 export function filesUnder(repoRoot, roots) {
-  try {
-    return lines(git(repoRoot, ['ls-files', ...roots]));
-  } catch {
-    const out = [];
-    const walk = (rel) => {
-      const abs = path.join(repoRoot, rel);
-      if (!fs.existsSync(abs)) return;
-      for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
-        if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
-        const child = `${rel}/${entry.name}`;
-        if (entry.isDirectory()) walk(child);
-        else if (entry.isFile()) out.push(child);
-      }
-    };
-    for (const root of roots) walk(root);
-    return out.sort();
-  }
+  if (inCheckout(repoRoot)) return lines(git(repoRoot, ['ls-files', ...roots]));
+  const out = [];
+  const walk = (rel) => {
+    const abs = path.join(repoRoot, rel);
+    if (!fs.existsSync(abs)) return;
+    for (const entry of fs.readdirSync(abs, { withFileTypes: true })) {
+      if (entry.name === 'node_modules' || entry.name.startsWith('.')) continue;
+      const child = `${rel}/${entry.name}`; // repo-relative paths are POSIX, as git prints them
+      if (entry.isDirectory()) walk(child);
+      else if (entry.isFile()) out.push(child);
+    }
+  };
+  for (const root of roots) walk(root);
+  return out.sort();
 }
 
 /** Whether a repo-relative path is one this check reads. */
@@ -140,6 +146,7 @@ export const scopeFiles = (repoRoot) => filesUnder(repoRoot, SCOPE).filter(inSco
 
 /** Files changed against main: committed on this branch, staged, unstaged and untracked. */
 export function changedFiles(repoRoot) {
+  if (!inCheckout(repoRoot)) return []; // no git here: name the paths to check instead
   let base = null;
   for (const ref of ['origin/main', 'main']) {
     try {
@@ -150,8 +157,7 @@ export function changedFiles(repoRoot) {
     }
   }
   const changed = new Set();
-  if (!base) return []; // no git history here: name the paths to check instead
-  for (const f of lines(git(repoRoot, ['diff', '--name-only', '--diff-filter=d', base]))) changed.add(f);
+  if (base) for (const f of lines(git(repoRoot, ['diff', '--name-only', '--diff-filter=d', base]))) changed.add(f);
   for (const f of lines(git(repoRoot, ['ls-files', '--others', '--exclude-standard', ...SCOPE]))) changed.add(f);
   return [...changed].filter((f) => inScope(f) && fs.existsSync(path.join(repoRoot, f))).sort();
 }
