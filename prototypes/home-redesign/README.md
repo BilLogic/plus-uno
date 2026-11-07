@@ -17,9 +17,9 @@ Use Figma MCP to keep the prototype aligned with the design:
 
 Styling uses **PLUS design tokens** from `design-system/src/styles`:
 
-- **Colors**: `--color-primary`, `--color-surface-container-low`, `--color-on-surface`, `--color-outline-variant`, `--color-social-emotional`, `--color-mastering-content`, `--color-advocacy`, `--color-relationship`, etc.
-- **Typography**: `--font-family-header`, `--font-family-body`, `--font-size-title-m4`, `--font-size-body2`, `--font-line-height-title`.
-- **Spacing/layout**: `--size-section-gap-lg`, `--size-section-pad-y-lg`, `--size-surface-radius`, `--size-element-gap-*`.
+- **Colors**: `--ds-text`, `--ds-text-subtle`, `--ds-surface`, `--ds-border`, `--ds-background-brand-bold`, and the SMART subjects `--ds-text-smart-*` / `--ds-background-smart-*`.
+- **Typography**: `--heading-*`, `--body-*`, `--type-family-heading`, `--type-family-body`.
+- **Spacing/layout**: `--section-stack-*`, `--section-pad-*`, `--card-pad-*`, `--stack-*`, `--pad-x-*`.
 
 See `design-system/guidelines/foundations/tokens.md` for the full token set.
 

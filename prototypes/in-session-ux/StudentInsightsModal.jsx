@@ -347,7 +347,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                     max={100}
                                     label="%"
                                     height={180}
-                                    color="var(--color-tertiary, #0e8175)"
+                                    color="var(--ds-text-accent-teal)"
                                 />
                                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '-12px', paddingLeft: '10%', paddingRight: '10%', fontSize: '12px', color: 'var(--ds-text-subtle)' }}>
                                     <span>Low</span>
@@ -383,7 +383,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                     <div key={i} className={`obs-card animate-enter delay-inner-${i + 1}`} style={{
                                         padding: '16px',
                                         borderRadius: '8px',
-                                        border: '1px solid var(--color-outline-variant)',
+                                        border: '1px solid var(--ds-border)',
                                         backgroundColor: 'var(--ds-surface-container)',
                                         flex: 1,
                                         display: 'flex',
@@ -441,7 +441,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                 <div key={i} className={`obs-card animate-enter delay-inner-${i + 1}`} style={{
                                     padding: '16px',
                                     borderRadius: '8px',
-                                    border: '1px solid var(--color-outline-variant)',
+                                    border: '1px solid var(--ds-border)',
                                     backgroundColor: 'var(--ds-surface-container)',
                                     '--base-delay': '0ms'
                                 }}>
@@ -450,8 +450,8 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                         <StatusTag appearance="neutral">{goal.due}</StatusTag>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '12px' }}>
-                                        <div style={{ flex: 1, height: '8px', borderRadius: '4px', backgroundColor: 'var(--color-outline-variant)', overflow: 'hidden' }}>
-                                            <div style={{ width: `${goal.progress}%`, height: '100%', borderRadius: '4px', backgroundColor: 'var(--color-tertiary, #0e8175)' }} />
+                                        <div style={{ flex: 1, height: '8px', borderRadius: '4px', backgroundColor: 'var(--ds-background-neutral)', overflow: 'hidden' }}>
+                                            <div style={{ width: `${goal.progress}%`, height: '100%', borderRadius: '4px', backgroundColor: 'var(--ds-background-accent-teal-bolder)' }} />
                                         </div>
                                         <span className="body3-txt" style={{ fontWeight: 600, color: 'var(--ds-text)' }}>{goal.progress}%</span>
                                     </div>

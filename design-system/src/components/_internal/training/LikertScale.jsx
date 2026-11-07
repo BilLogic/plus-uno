@@ -28,7 +28,7 @@ const LikertScale = ({
         fontSize: 'var(--font-size-125)',
         fontWeight: 'var(--type-weight-regular)',
         lineHeight: 'var(--line-height-200)',
-        color: 'var(--color-primary-text)',
+        color: 'var(--ds-text-brand)',
         minWidth: '198px',
         maxWidth: '198px',
         width: '100%',

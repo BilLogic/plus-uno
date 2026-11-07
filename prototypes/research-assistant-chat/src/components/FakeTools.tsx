@@ -88,7 +88,7 @@ export function ToolTerminal({ title, logs = [] }: { title?: string; logs: strin
 // Pure SVG mini chart with optional fill (for background effect)
 function Sparkline({
     data,
-    color = 'var(--color-primary, #0472a8)',
+    color = 'var(--ds-text-brand)',
     width = 80,
     height = 24,
     showFill = false,
@@ -199,7 +199,7 @@ export function ToolStats({
                     const isPositive = upIsPositive ? (stat.diff?.value ?? 0) > 0 : (stat.diff?.value ?? 0) < 0;
                     const diffColor = isPositive ? '#16a34a' : '#dc2626';
                     const diffBg = isPositive ? '#dcfce7' : '#fee2e2';
-                    const sparklineColor = stat.sparkline?.color || 'var(--color-primary, #0472a8)';
+                    const sparklineColor = stat.sparkline?.color || 'var(--ds-chart-brand)';
 
                     return (
                         <div

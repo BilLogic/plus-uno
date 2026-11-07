@@ -83,7 +83,7 @@ const Icons = {
     /* Avatar A for Ashley */
     Avatar: () => (
         <svg viewBox="0 0 24 24" fill="currentColor" style={{ width: '100%', height: '100%' }}>
-            <text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fontSize="15" fontWeight="bold" fill="var(--color-primary-text)">A</text>
+            <text x="50%" y="54%" dominantBaseline="middle" textAnchor="middle" fontSize="15" fontWeight="bold" fill="var(--ds-icon-brand)">A</text>
         </svg>
     ),
 };
@@ -726,10 +726,10 @@ const buildResponse = (actionId, pageContext) => {
                     document.body.removeChild(textArea);
                 }
                 target.innerHTML = '✅ Copied!';
-                target.style.color = 'var(--color-success, #2e7d32)';
+                target.style.color = 'var(--ds-text-success)';
                 setTimeout(() => {
                     target.innerHTML = originalText;
-                    target.style.color = 'var(--color-primary)';
+                    target.style.color = 'var(--ds-text-brand)';
                 }, 1500);
             };
 
@@ -741,7 +741,7 @@ const buildResponse = (actionId, pageContext) => {
                     </div>
                     <button 
                         onClick={(e) => copyOnboardingPath(path, e)}
-                        style={{ display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 32, fontSize: 11, marginTop: 4, color: 'var(--color-primary)', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, paddingLeft: 32, fontSize: 11, marginTop: 4, color: 'var(--ds-text-brand)', background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left' }}
                         title="Click to copy path"
                         onMouseEnter={(e) => e.currentTarget.style.textDecoration = 'underline'}
                         onMouseLeave={(e) => e.currentTarget.style.textDecoration = 'none'}
@@ -758,10 +758,10 @@ const buildResponse = (actionId, pageContext) => {
                         💡 <strong>Tip:</strong> Click any path below to copy it, then press <strong>⌘ + P</strong> (Mac) or <strong>Ctrl + P</strong> (Win) in your editor to search and open the file.
                     </p>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0, fontSize: '13px' }}>
-                        <OnboardingLinkItem num="1" title={<span>🎨 <strong>DS Knowledge</strong></span>} desc="Components, tokens, patterns" path="design-system/guidelines/overview.md" bg="var(--color-primary-container)" fg="var(--color-on-primary-container)" />
-                        <OnboardingLinkItem num="2" title={<span>📐 <strong>Layout Rules</strong></span>} desc="Page structure & spacing" path="design-system/guidelines/composition/layout.md" bg="var(--color-warning-container)" fg="var(--color-on-warning-container)" />
-                        <OnboardingLinkItem num="3" title={<span>🚢 <strong>Product Context</strong></span>} desc="What is PLUS? User roles" path="docs/product-and-service/plus-app.md" bg="var(--color-relationship-container)" fg="var(--color-on-relationship-container)" />
-                        <OnboardingLinkItem num="4" title={<span>📋 <strong>Conventions</strong></span>} desc="File naming & internal gotchas" path="docs/engineering/coding.md" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" />
+                        <OnboardingLinkItem num="1" title={<span>🎨 <strong>DS Knowledge</strong></span>} desc="Components, tokens, patterns" path="design-system/guidelines/overview.md" bg="var(--ds-background-brand-subtlest)" fg="var(--ds-text-brand)" />
+                        <OnboardingLinkItem num="2" title={<span>📐 <strong>Layout Rules</strong></span>} desc="Page structure & spacing" path="design-system/guidelines/composition/layout.md" bg="var(--ds-background-warning)" fg="var(--ds-text-warning-bolder)" />
+                        <OnboardingLinkItem num="3" title={<span>🚢 <strong>Product Context</strong></span>} desc="What is PLUS? User roles" path="docs/product-and-service/plus-app.md" bg="var(--ds-background-smart-relationship)" fg="var(--ds-text-smart-relationship)" />
+                        <OnboardingLinkItem num="4" title={<span>📋 <strong>Conventions</strong></span>} desc="File naming & internal gotchas" path="docs/engineering/coding.md" bg="var(--ds-background-smart-technology-tools)" fg="var(--ds-text-smart-technology-tools)" />
                     </ul>
                 </div>
             );
@@ -797,7 +797,7 @@ const buildResponse = (actionId, pageContext) => {
                 if (labelEl) {
                     labelEl.textContent = '✅ Copied to clipboard!';
                 }
-                btn.style.color = 'var(--color-success-text)';
+                btn.style.color = 'var(--ds-text-success)';
                 setTimeout(() => {
                     if (labelEl) {
                         labelEl.textContent = prev;
@@ -1185,7 +1185,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
             setIsTyping(false);
 
             if (responseData.error) {
-                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--color-danger)' }}>{responseData.error.message || 'API Error'}</p> }]);
+                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--ds-text-danger)' }}>{responseData.error.message || 'API Error'}</p> }]);
                 return;
             }
 
@@ -1236,7 +1236,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                                 </>
                             )}
                             {data.tip && (
-                                <p style={{ marginTop: 8, padding: '6px 10px', background: 'var(--color-primary-container)', borderRadius: 6, fontSize: 12 }}>
+                                <p style={{ marginTop: 8, padding: '6px 10px', background: 'var(--ds-background-brand-subtlest)', borderRadius: 6, fontSize: 12 }}>
                                     💡 <strong>Tip:</strong> {data.tip}
                                 </p>
                             )}
@@ -1257,7 +1257,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                             <p style={{ fontWeight: 600, marginTop: 8, marginBottom: 4 }}>Components Used:</p>
                             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                                 {Array.isArray(data.components_used) && data.components_used.map((comp, i) => (
-                                    <span key={i} style={{ background: 'var(--color-secondary-container)', color: 'var(--color-on-secondary-container)', padding: '2px 8px', borderRadius: 4, fontSize: 11 }}>
+                                    <span key={i} style={{ background: 'var(--ds-background-neutral)', color: 'var(--ds-text)', padding: '2px 8px', borderRadius: 4, fontSize: 11 }}>
                                         {comp}
                                     </span>
                                 ))}
@@ -1297,14 +1297,14 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                 } else {
                     setMessages(p => [...p, {
                         role: 'bot', content: (
-                            <p style={{ color: 'var(--color-danger)' }}>
+                            <p style={{ color: 'var(--ds-text-danger)' }}>
                                 ⚠️ Could not reach the AI API. Add a key in Mode 1, set <code>VITE_OPENAI_API_KEY</code> or <code>VITE_CHATGPT_API_KEY</code> in <code>.env</code>, and check your network.
                             </p>
                         )
                     }]);
                 }
             } else {
-                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--color-danger)' }}>⚠️ Could not reach the AI API. Check your key, `.env` (<code>VITE_OPENAI_API_KEY</code> / <code>VITE_CHATGPT_API_KEY</code>), and network.</p> }]);
+                setMessages(p => [...p, { role: 'bot', content: <p style={{ color: 'var(--ds-text-danger)' }}>⚠️ Could not reach the AI API. Check your key, `.env` (<code>VITE_OPENAI_API_KEY</code> / <code>VITE_CHATGPT_API_KEY</code>), and network.</p> }]);
             }
         }
     };
@@ -1365,7 +1365,7 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                         if (!entry) entry = findBestMatch(keyword, storyIndex)[0]?.entry;
                         if (entry) navigateToEntry(entry);
                     }}
-                    style={{ display: 'block', width: '100%', textAlign: 'left', background: bg, color: fg, padding: 12, borderRadius: 8, fontSize: 13, border: '1px solid var(--color-outline-variant)', cursor: 'pointer', marginBottom: 8 }}
+                    style={{ display: 'block', width: '100%', textAlign: 'left', background: bg, color: fg, padding: 12, borderRadius: 8, fontSize: 13, border: '1px solid var(--ds-border)', cursor: 'pointer', marginBottom: 8 }}
                     onMouseEnter={(e) => e.currentTarget.style.filter = 'brightness(0.95)'}
                     onMouseLeave={(e) => e.currentTarget.style.filter = 'none'}
                 >
@@ -1379,9 +1379,9 @@ IMPORTANT: Even if you don't know the exact PLUS UNO variant, provide your best 
                     <p style={{ fontWeight: 600, marginBottom: 8, fontSize: 14 }}>🚀 Interactive System Tour</p>
                     <p style={{ marginBottom: 12, fontSize: 13, lineHeight: 1.4 }}>Click each step below to jump through the system and see how tokens become full pages:</p>
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-                        <li><TourStepButton title="Colors & Tokens" desc="See where it all begins. A single change here propagates everywhere." keyword="tokens" category="Tokens" bg="var(--color-primary-container)" fg="var(--color-on-primary-container)" emoji="🎨" /></li>
-                        <li><TourStepButton title="Components" desc="Look at our Button inheriting those precise tokens and properties." keyword="button" category="Components" bg="var(--color-technology-tools-container)" fg="var(--color-on-technology-tools-container)" emoji="🧱" /></li>
-                        <li><TourStepButton title="Pages & Prototypes" desc="Explore how components perfectly assemble into a final layout." keyword="redesign" category="Pages" bg="var(--color-success-container)" fg="var(--color-success)" emoji="✨" /></li>
+                        <li><TourStepButton title="Colors & Tokens" desc="See where it all begins. A single change here propagates everywhere." keyword="tokens" category="Tokens" bg="var(--ds-background-brand-subtlest)" fg="var(--ds-text-brand)" emoji="🎨" /></li>
+                        <li><TourStepButton title="Components" desc="Look at our Button inheriting those precise tokens and properties." keyword="button" category="Components" bg="var(--ds-background-smart-technology-tools)" fg="var(--ds-text-smart-technology-tools)" emoji="🧱" /></li>
+                        <li><TourStepButton title="Pages & Prototypes" desc="Explore how components perfectly assemble into a final layout." keyword="redesign" category="Pages" bg="var(--ds-background-success)" fg="var(--ds-text-success)" emoji="✨" /></li>
                     </ul>
                 </div>
             ) }]);

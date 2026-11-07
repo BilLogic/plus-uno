@@ -39,7 +39,7 @@ function desaturateHex(hex: string, factor: number = SATURATION_FACTOR): string 
 
 /**
  * Returns a background color for a heatmap cell based on correlation value.
- * High (>0.75): Brand Blue shades (aligned with var(--color-primary)). 
+ * High (>0.75): Brand shades, aligned with var(--ds-chart-brand).
  * Medium (0.5–0.75): Neutral/Teal shades. 
  * Low (<0.5): Light Red shades (warning/low correlation).
  * @param value - Correlation value between 0 and 1

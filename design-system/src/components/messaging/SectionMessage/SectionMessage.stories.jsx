@@ -27,7 +27,6 @@ export default {
             { date: '2026-11-03', kind: 'changed', summary: 'Renamed from `Alert` to `SectionMessage`. No left border: meaning is carried by the ground and the icon, never a side stripe. Added `actions` (link buttons after the body) and `headingLevel`.' },
             { date: '2026-09-29', kind: 'changed', summary: 'The ground is each style\'s container tint instead of its base-color tint, and the corners are 4px (`--size-modal-radius-sm`) instead of 6px, as Figma draws them.' },
             { date: '2026-09-29', kind: 'added', summary: 'A leading icon on the first line of text, with a default per style: success circle-check, danger circle-exclamation, warning triangle-exclamation, and circle-info for primary, secondary and info. `leadingVisual` takes a Font Awesome solid name or a node to replace it, or `false` to remove it.' },
-            { date: '2026-09-29', kind: 'changed', summary: 'Title and body text are `--color-on-surface` in every style, instead of the style\'s on-container color. Links in the body inherit it.' },
             { date: '2026-09-29', kind: 'changed', summary: 'The × is the shared CloseButton: it stays 24×24 with a 16px icon and centers on the first line of text instead of growing with the title or body.' },
         ],
         docs: {

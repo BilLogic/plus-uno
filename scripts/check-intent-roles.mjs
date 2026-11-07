@@ -39,7 +39,7 @@ import {
 } from './intent-roles.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { isUnreviewed, openRatchet } from './lib/ratchet.mjs';
-import { RETIRED_LEGACY } from './lib/color/legacy-map.mjs';
+import { RETIRED_COLORS } from './lib/tokens/retire.mjs';
 
 const BASELINE = 'scripts/baselines/intent-role-adoption.json';
 const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
@@ -145,7 +145,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
    */
   for (const intent of INTENTS) {
     // A border retired to its `--ds-*` token (primary's is --ds-border-brand) has no legacy role to define.
-    if (RETIRED_LEGACY[`--color-${intent}-border`]) continue;
+    if (RETIRED_COLORS.has(`--color-${intent}-border`)) continue;
     if (!roles.includes(`--color-${intent}-border:`)) {
       found.push({
         message: `${ROLES_FILE} no longer defines --color-${intent}-border, which ${uses.length ? 'call sites' : 'the migration'} depend on.`,

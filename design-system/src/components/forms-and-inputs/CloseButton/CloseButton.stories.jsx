@@ -13,7 +13,7 @@ const inverseGround = {
     borderRadius: 'var(--radius-md)',
     background: 'var(--ds-background-neutral-bold)',
 };
-const primaryGround = { ...inverseGround, background: 'var(--color-primary)' };
+const primaryGround = { ...inverseGround, background: 'var(--ds-background-brand-bold)' };
 
 export default {
     title: 'Components/Forms and inputs/Button/Close button',
@@ -147,7 +147,7 @@ export const InverseGrounds = {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
             {INVERSE_GROUNDS.map((ground) => (
                 <div key={ground} data-ground={ground} style={{ ...row, padding: '16px', borderRadius: 'var(--radius-md)', background: `var(${ground})` }}>
-                    <CloseButton tone="inverse" label={`Dismiss example on ${ground.replace('--color-', '')}`} />
+                    <CloseButton tone="inverse" label={`Dismiss example on ${ground.replace('--ds-background-', '')}`} />
                 </div>
             ))}
         </div>

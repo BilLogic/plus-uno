@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import AppShell from './AppShell';
 import { ScreenFrame } from '../storyFrame';
-import { DARK_WITH_LEGACY, LIGHT } from '../kit/storyModes';
+import { DARK, LIGHT } from '../kit/storyModes';
 
 /**
  * AppShell: Frame, the breadcrumb and the tutor sidebar with its open tabs. The play
@@ -48,4 +48,4 @@ export const Light = {
     },
 };
 
-export const Dark = { ...DARK_WITH_LEGACY };
+export const Dark = { ...DARK };

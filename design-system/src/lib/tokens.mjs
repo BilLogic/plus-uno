@@ -32,8 +32,8 @@
  * A token name is `--` followed by one or more of: LOWERCASE LETTERS `a-z`,
  * DIGITS `0-9`, and HYPHEN `-`. Nothing else. Uppercase letters, underscores,
  * dots and escapes are rejected, not folded: every token this design system
- * defines is lowercase kebab-case (`--color-primary-text`,
- * `--font-size-body-md`), so a grammar that accepted more would be describing
+ * defines is lowercase kebab-case (`--ds-text-brand`,
+ * `--space-100`), so a grammar that accepted more would be describing
  * tokens that do not exist and would quietly match CSS that is not ours. `--`
  * alone is not a name; a name needs at least one character after the dashes.
  *
@@ -144,9 +144,8 @@ export function readTokens(source, { prefix = '--' } = {}) {
 /**
  * Follow `--a: var(--b)` until a literal value or a dead end.
  *
- * This is not a nicety. `--color-info` IS `var(--color-tertiary)` in the token
- * file — the duplicate #312 measured in a browser is an alias written in one
- * line, and a resolver that stopped at the first `var()` would report it as an
+ * This is not a nicety. `--radius-050` IS `var(--space-050)` in the token
+ * file, and a resolver that stopped at the first `var()` would report it as an
  * unreadable token instead of as the alias it is.
  *
  * The `seen` set is the cycle guard: `--a: var(--b); --b: var(--a);` is a

@@ -88,8 +88,8 @@
  * rounding difference: 315 pairs of color tokens are EQUAL under the old
  * normalizer and UNEQUAL under this key — every one of them a translucent
  * state overlay keyed against a solid of the same channels, such
- * as the secondary 8% overlay (`rgba(68, 92, 106, 0.08)`) against
- * `--color-secondary-border` (`#445c6a`).
+ * as an 8% overlay (`rgba(68, 92, 106, 0.08)`) against the solid
+ * `#445c6a`.
  *
  * A caller migrating on to this key therefore has to MEASURE its own output
  * rather than assume it — which #621 did for both fallback checks, and their
@@ -98,7 +98,7 @@
  * invariant: no comparison either check makes pairs an opaque hex against a
  * translucent token, because `fallbackUsages` captures a fallback with
  * `[^),]+` and then demands the `var()`'s closing `)`, so the 25 sites writing
- * `var(--color-x, rgba(…))` are not matched AT ALL and never reach a
+ * `var(--x, rgba(…))` are not matched AT ALL and never reach a
  * comparison in any form. That is a fact about the capture, not a property of
  * the key — the day a check reads a whole `rgba()` fallback, 315 pairs' worth
  * of behavior changes, and the test says so where an "output unchanged"
@@ -149,10 +149,9 @@ export const COLOR_TOKEN_FILES = [COLOR_PALETTE_FILE, COLOR_SEMANTIC_FILE, COLOR
 export const COLOR_TOKEN_PATHS = COLOR_TOKEN_FILES.map((file) => `${COLOR_TOKEN_DIR}/${file}`);
 
 /**
- * The two color vocabularies, while they coexist: the legacy Material roles
- * (`--color-*`) and the Atlassian-shaped semantic tokens (`--ds-*`). A check
- * that reads color reads both until the legacy set is retired, and names this
- * list rather than spelling the pair itself.
+ * The color prefixes a check reads: the old set the Specs replica still uses,
+ * and the `--ds-*` tokens. The old prefix leaves with the Specs revamp. A check
+ * that reads color names this list rather than spelling the pair itself.
  */
 export const COLOR_PREFIXES = ['--color-', '--ds-'];
 

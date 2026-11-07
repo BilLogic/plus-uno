@@ -11,7 +11,7 @@
  * read both.
  *
  * Levels 1-3 are now retired: every use moved to the generated shadow the
- * migration map gives them (`RETIRED_LEGACY` in `scripts/lib/color/legacy-map.mjs`).
+ * retired-name record gives them (`RETIRED_COLORS` in `scripts/lib/tokens/retire.mjs`).
  *
  * WHAT IS ASSERTED. A retired level's row names the shadow the record moved it
  * to, and a level still in code names itself. Both sides are parsed from
@@ -42,7 +42,7 @@ import { fileURLToPath } from 'node:url';
 import * as sass from 'sass';
 import postcss from 'postcss';
 
-import { retiredTo } from './lib/color/legacy-map.mjs';
+import { retiredTo } from './lib/tokens/retire.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MAPPING = path.join(REPO_ROOT, 'design-system/guidelines/figma/token-mapping.md');

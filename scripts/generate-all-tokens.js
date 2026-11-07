@@ -4,9 +4,8 @@ import path from 'path';
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { compare, refusals } from './token-generation.mjs';
-import { RETIRED_LEGACY } from './lib/color/legacy-map.mjs';
 import { FRAME_LAYER_COLLECTIONS, frameLayerFile, frameLayerFolder, frameLayerToken } from './lib/frame-layer-collections.mjs';
-import { dropRetired } from './lib/tokens/retire.mjs';
+import { dropRetired, RETIRED_COLORS } from './lib/tokens/retire.mjs';
 import { TYPOGRAPHY_FILE, TYPOGRAPHY_FOLDERS, typographyFolder, typographyToken } from './lib/typography-collection.mjs';
 
 /**
@@ -1016,13 +1015,6 @@ ${block(Object.entries(CODE_ONLY_TYPE_STYLES).map(([name, value]) => ({ token: `
 `;
 }
 
-/**
- * Legacy color names the migration map retired (`RETIRED_LEGACY`): every use
- * moved to its `--ds-*` token, so the Figma export's declaration is dropped
- * rather than written back.
- */
-const RETIRED_COLORS = new Set(Object.keys(RETIRED_LEGACY));
-
 // Generate all files
 //
 // EVERY FILE IS BUILT IN MEMORY FIRST. This used to write each one as it was
@@ -1037,7 +1029,7 @@ const OUT_DIR = TOKEN_DIR;
 let generated;
 try {
     generated = [
-        { file: '_colors.scss', generated: dropRetired(generateColorsSCSS(), RETIRED_COLORS) },
+        { file: '_colors.scss', generated: dropRetired(generateColorsSCSS(), new Set(RETIRED_COLORS.keys())) },
         { file: '_primitives.scss', generated: generatePrimitivesSCSS() },
         { file: '_spacing_semantics.scss', generated: dropRetired(generateSemanticsSCSS()) },
         { file: '_layout.scss', generated: dropRetired(generateLayoutSCSS()) },

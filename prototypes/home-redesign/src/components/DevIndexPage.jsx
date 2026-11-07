@@ -14,8 +14,8 @@ const DevIndexPage = () => {
                 Select a prototype to view:
             </p>
 
-            <Link to="/market" style={{ ...linkStyle, marginBottom: '24px', borderColor: 'var(--color-primary)', backgroundColor: 'var(--ds-surface-raised)' }}>
-                <div style={{ fontWeight: 'bold', fontSize: '18px', color: 'var(--color-primary)' }}>Prototype Market</div>
+            <Link to="/market" style={{ ...linkStyle, marginBottom: '24px', borderColor: 'var(--ds-border-brand)', backgroundColor: 'var(--ds-surface-raised)' }}>
+                <div style={{ fontWeight: 'bold', fontSize: '18px', color: 'var(--ds-text-brand)' }}>Prototype Market</div>
                 <div style={{ fontSize: '14px', color: '#666' }}>Browse all prototypes with search, filters, and deployment links.</div>
             </Link>
 
@@ -63,7 +63,7 @@ const linkStyle = {
     display: 'block',
     padding: '24px',
     backgroundColor: 'var(--ds-surface)',
-    border: '1px solid var(--color-outline-variant, #e0e0e0)',
+    border: '1px solid var(--ds-border)',
     borderRadius: '8px',
     textDecoration: 'none',
     color: 'var(--ds-text)',

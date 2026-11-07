@@ -27,8 +27,8 @@ const CHART_THEMES = {
   light: {
     bg: 'var(--ds-surface)',
     text: 'var(--ds-text-subtle)',
-    grid: 'var(--color-outline-variant, #e0e0e0)',
-    axis: 'var(--color-outline, #79747e)',
+    grid: 'var(--ds-border)',
+    axis: 'var(--ds-border-bold)',
   },
 };
 
@@ -65,8 +65,8 @@ export function EngagementChart({
   // Get CSS variable values for series colors if possible, else fallback
   // Note: Highcharts requires resolved colors or rgba strings for some features, 
   // but standard CSS vars work in SVG fill/stroke in modern browsers.
-  const primaryColor = 'var(--color-primary, #0472a8)';
-  const secondaryColor = 'var(--color-tertiary, #c96a6a)'; // Using a contrasting token or fallback
+  const primaryColor = 'var(--ds-chart-brand)';
+  const secondaryColor = 'var(--ds-chart-teal-bold)';
 
   const options: Highcharts.Options = {
     chart: {
