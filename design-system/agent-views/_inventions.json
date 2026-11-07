@@ -71,6 +71,27 @@
         "Spinner",
         "Skeleton"
       ]
+    },
+    {
+      "not": "Card",
+      "use": [
+        "PatternCard"
+      ],
+      "why": "a pattern, imported from @/patterns"
+    },
+    {
+      "not": "Section",
+      "use": [
+        "PatternSection"
+      ],
+      "why": "a pattern, imported from @/patterns"
+    },
+    {
+      "not": "Drawer",
+      "use": [
+        "PatternDrawer"
+      ],
+      "why": "a pattern, imported from @/patterns"
     }
   ],
   "props": [
