@@ -239,6 +239,13 @@ export const RECORDED = [
     why:
       "the agent account's hand-written core, in the kit and in this deployment of it. Five sections are byte-identical — what a blueprint is, how to read a cell, what absence means, what a status licenses you to say, paths and the main route — plus the vocabulary preamble; the rest of each file is rendered by the same `generate-agent-account.mjs` from its own schema, and the deployment's Retrieval section is its own. The pointer shape that closed the interface\u2192schema map (plus-uno-blueprint#672) is NOT available here: this document is SERVED to an agent as `agent.references.blueprint`, and a reader handed a reference cannot follow a link into the kit's copy, so the meaning has to be present in both files. Closing it means the deployment RENDERING the core from the kit it already installs, so one edit reaches both — plus-uno-blueprint#695. Measured at 577 on 2026-09-22, the day the pin moved v1.6.4 \u2192 v1.44.29 (#674) and the two texts met; the ceiling keeps a new hand-written paragraph from joining them.",
   },
+  {
+    a: 'blueprint:docs/engineering/template-relationship.md',
+    b: 'sb:docs/connectors/supabase/database.md',
+    words: 40,
+    why:
+      'one runnable integrity query (cells whose step is missing from their path), which each doc needs verbatim so a reader can paste and run it. Prose around it differs and each repo owns its own copy of the schema it targets. Closing it means the kit\'s database doc points at the blueprint\'s query instead — a kit release and a pin bump, out of proportion to 40 words; the ceiling stops the surrounding prose from joining it.',
+  },
 ];
 
 /**
