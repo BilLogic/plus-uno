@@ -590,9 +590,12 @@
           {
             "id": "footer",
             "name": "Footer",
-            "source": "manual",
-            "status": "missing",
-            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built."
+            "componentSetNodeId": "20978:1305",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20978-1305",
+            "source": "node-chart",
+            "status": "verified",
+            "isComponentSet": false,
+            "notes": "Main component on the Footer page, Updated section. Re-checked in Figma on 2026-11-07."
           }
         ]
       }
@@ -721,10 +724,12 @@
         "sets": [
           {
             "id": "illustration",
-            "name": "Illustration",
-            "source": "manual",
-            "status": "missing",
-            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built. The old Character set is deprecated."
+            "name": "Character",
+            "componentSetNodeId": "20095:2033",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-2033",
+            "source": "node-chart",
+            "status": "verified",
+            "notes": "On the Illustrations page. Figma names each character in words; code takes the same name in kebab-case. Re-checked in Figma on 2026-11-07."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19785-489"
@@ -800,10 +805,12 @@
           },
           {
             "id": "caption",
-            "name": "Caption",
-            "source": "manual",
-            "status": "missing",
-            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built. The old _Form Caption set is deprecated."
+            "name": "Field message",
+            "componentSetNodeId": "20319:262",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20319-262",
+            "source": "node-chart",
+            "status": "verified",
+            "notes": "The caption under a field is the Field message set on the Form page. Re-checked in Figma on 2026-11-07."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=18265-52724"
@@ -1982,10 +1989,12 @@
         "sets": [
           {
             "id": "time-picker",
-            "name": "Time picker",
-            "source": "manual",
-            "status": "missing",
-            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built. The old _Time Field set is deprecated."
+            "name": "Time picker / Variant matrix",
+            "componentSetNodeId": "20009:77903",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20009-77903",
+            "source": "node-chart",
+            "status": "verified",
+            "notes": "The Time picker set on the Time picker page. Re-checked in Figma on 2026-11-07."
           }
         ]
       }
@@ -2029,9 +2038,12 @@
           {
             "id": "tooltip",
             "name": "Tooltip",
-            "source": "manual",
-            "status": "missing",
-            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built. The old Tooltip is on the Archive page."
+            "componentSetNodeId": "20871:3142",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20871-3142",
+            "source": "node-chart",
+            "status": "verified",
+            "isComponentSet": false,
+            "notes": "Main component on the Tooltip page, Updated section. Re-checked in Figma on 2026-11-07."
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19486"

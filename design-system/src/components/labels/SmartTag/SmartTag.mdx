@@ -1,13 +1,20 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as SmartTagStories from './SmartTag.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { SmartTag, Tag } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={SmartTagStories} />
 
 <Title />
-A SMART competency area — one of the five areas tutor training is organized
+A SMART competency area: one of the five areas tutor training is organized
 around. It is a thin wrapper on `Tag`: `subject` fixes the color and the
 leading icon, and every other `Tag` prop passes straight through.
 
@@ -23,51 +30,19 @@ leading icon, and every other `Tag` prop passes straight through.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>All five SMART subjects, each with its own color and icon.</>}>
-    <Canvas of={SmartTagStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={SmartTagStories.Overview} title="Subjects" description="All five SMART subjects, each with its own fixed color and icon." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Subjects
+## Behavior
 
-<DocsTable>
-    <thead>
-        <tr>
-            <th>Subject</th>
-            <th>Icon</th>
-            <th>Default label</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr><td><code>social-emotional</code></td><td>heart</td><td>Social-emotional</td></tr>
-        <tr><td><code>mastering-content</code></td><td>book</td><td>Mastering content</td></tr>
-        <tr><td><code>advocacy</code></td><td>bullhorn</td><td>Advocacy</td></tr>
-        <tr><td><code>relationship</code></td><td>handshake</td><td>Relationship</td></tr>
-        <tr><td><code>technology-tools</code></td><td>laptop-code</td><td>Technology tools</td></tr>
-    </tbody>
-</DocsTable>
+<ComponentExample of={SmartTagStories.CustomLabel} title="Custom label" description={<><code>children</code> or <code>text</code> overrides the default label.</>} />
 
-Each subject's color and icon are fixed — there is no prop to mix a subject's
-meaning with a different color.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>`children` or `text` overrides the default label. Every other `Tag` prop — `isSelected`, `isRemovable`, `href`, `maxWidth` and the rest — passes straight through.</>}>
-    <DsCanvasQuiet of={SmartTagStories.CustomLabel} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A removable, selected smart tag: `isRemovable` and `isSelected` are `Tag`'s own props, unchanged.</>}>
-    <DsCanvasQuiet of={SmartTagStories.PassesThroughTagProps} />
-</DocsCanvasShell>
+<ComponentExample of={SmartTagStories.PassesThroughTagProps} title="Tag props" description={<>Every other <code>Tag</code> prop passes straight through; here <code>isRemovable</code> and <code>isSelected</code>, unchanged.</>} />
 
 </div>
 
@@ -75,25 +50,15 @@ meaning with a different color.
 
 ## State
 
-<DocsCanvasShell description={<>Rest. A span with its subject's hue on the border and a fixed icon.</>}>
-    <DsCanvasQuiet of={SmartTagStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={SmartTagStories.Rest} title="Rest" description="A span with its subject's hue on the border and a fixed icon." />
 
-<DocsCanvasShell description={<>Hovered. Nothing on the plain tag; once selectable, the subject's subtlest step.</>}>
-    <DsCanvasQuiet of={SmartTagStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={SmartTagStories.Hovered} title="Hovered" description="Nothing on the plain tag; once selectable, the subject's subtlest step." />
 
-<DocsCanvasShell description={<>Pressed. Nothing on the plain tag; once selectable, the subtlest pressed step.</>}>
-    <DsCanvasQuiet of={SmartTagStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={SmartTagStories.Pressed} title="Pressed" description="Nothing on the plain tag; once selectable, the subtlest pressed step." />
 
-<DocsCanvasShell description={<>Focused. The plain tag is skipped; a selectable one takes the 2px focus ring.</>}>
-    <DsCanvasQuiet of={SmartTagStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={SmartTagStories.Focused} title="Focused" description="The plain tag is skipped; a selectable one takes the 2px focus ring." />
 
-<DocsCanvasShell description={<>Disabled. The disabled ground and words, as any Tag.</>}>
-    <DsCanvasQuiet of={SmartTagStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={SmartTagStories.Disabled} title="Disabled" description="The disabled ground and words, as any Tag." />
 
 </div>
 
@@ -127,8 +92,30 @@ meaning with a different color.
 
 Use `SmartTag` wherever training content, a tutor's strengths or a feedback
 item is tagged by SMART area. For a category that is not a SMART subject, use
-`Tag` directly — `SmartTag` exists only to fix the color and icon per subject,
+`Tag` directly: `SmartTag` exists only to fix the color and icon per subject,
 not to add new behavior.
+
+### Subject guidance
+
+<DocsTable>
+<thead>
+<tr>
+    <th>Subject</th>
+    <th>Icon</th>
+    <th>Default label</th>
+</tr>
+</thead>
+<tbody>
+<tr><td><code>social-emotional</code></td><td>heart</td><td>Social-emotional</td></tr>
+<tr><td><code>mastering-content</code></td><td>book</td><td>Mastering content</td></tr>
+<tr><td><code>advocacy</code></td><td>bullhorn</td><td>Advocacy</td></tr>
+<tr><td><code>relationship</code></td><td>handshake</td><td>Relationship</td></tr>
+<tr><td><code>technology-tools</code></td><td>laptop-code</td><td>Technology tools</td></tr>
+</tbody>
+</DocsTable>
+
+Each subject's color and icon are fixed: there is no prop to mix a subject's
+meaning with a different color.
 
 </div>
 
@@ -165,6 +152,7 @@ not to add new behavior.
 <tr><td>Hovered, pressed</td><td><code>--ds-background-accent-orange-subtlest</code> and <code>--ds-background-accent-orange-subtlest-pressed</code>.</td></tr>
 <tr><td>Selected</td><td><code>--ds-background-accent-orange-subtler</code> with a <code>--ds-border-accent-orange</code> edge.</td></tr>
 <tr><td>Disabled</td><td><code>--ds-background-disabled</code> with <code>--ds-text-disabled</code>.</td></tr>
+<tr><td>Subject icon</td><td><code>--icon-sm</code>, matching Tag's 12 text.</td></tr>
 <tr><td>Height</td><td>22, as Tag.</td></tr>
 </tbody>
 </DocsTable>
@@ -175,22 +163,44 @@ not to add new behavior.
 
 ## Best practices
 
-### Older spellings still work.
+### Keep the subject's own name.
+
+The label defaults to the subject name; a long rewrite breaks the one-line tag. Override it with `children` or `text` only when the surrounding content needs a shorter or longer phrasing.
+
+<DoDontPair
+    doExample={<SmartTag subject="social-emotional" />}
+    doCaption="The subject name."
+    dontExample={<SmartTag subject="social-emotional">Social-emotional learning and wellbeing</SmartTag>}
+    dontCaption="A long custom label."
+/>
+
+### Show each subject once.
+
+Repeating a subject adds nothing; a row lists the different subjects.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><SmartTag subject="social-emotional" /><SmartTag subject="mastering-content" /></div>}
+    doCaption="Distinct subjects."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><SmartTag subject="social-emotional" /><SmartTag subject="social-emotional" /><SmartTag subject="social-emotional" /></div>}
+    dontCaption="The same subject three times."
+/>
+
+### Keep the icon with its label.
+
+The icon is part of the subject's identity, so it is never dropped. A plain `Tag` in the subject's color loses it.
+
+<DoDontPair
+    doExample={<SmartTag subject="technology-tools" />}
+    doCaption="Icon and label."
+    dontExample={<Tag color="brown">Technology tools</Tag>}
+    dontCaption="Label without the icon."
+/>
+
+### Write the current spelling.
 
 `socio-emotional` and `relationships` are accepted and map to
 `social-emotional` and `relationship`. Write new code with the current
 spelling; the aliases exist for content written before it changed.
-
-```jsx
-<SmartTag subject="advocacy" />
-<SmartTag subject="technology-tools">Tech & tools</SmartTag>
-```
-
-### Let the default label stand unless the context needs different words.
-
-Each subject already has a label people recognize. Override it with
-`children` or `text` only when the surrounding content needs a shorter or
-longer phrasing.
 
 </div>
 
@@ -216,7 +226,7 @@ longer phrasing.
 ## Accessibility
 
 - **Inherits `Tag`'s accessibility.** Selection, removal and link behavior
-  are unchanged — see `Tag`'s own Accessibility section for the full
+  are unchanged; see `Tag`'s own Accessibility section for the full
   contract.
 - **The subject icon is decorative.** It is `aria-hidden`; the subject's name
   is carried by the visible label, not the icon.

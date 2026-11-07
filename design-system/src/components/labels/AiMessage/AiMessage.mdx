@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as AiMessageStories from './AiMessage.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { AiMessage } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={AiMessageStories} />
 
@@ -23,71 +30,33 @@ as a person's.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell description={<>A finished reply: the AI icon, then the text.</>}>
-    <DsCanvasQuiet of={AiMessageStories.Message} />
-</DocsCanvasShell>
+<ComponentExample of={AiMessageStories.Message} title="Message" description="A finished reply: the AI icon, then the text." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Streaming
+## Behavior
 
-<DocsCanvasShell description={<>Text still arriving: a caret follows the last character.</>}>
-    <DsCanvasQuiet of={AiMessageStories.Streaming} />
-</DocsCanvasShell>
+<ComponentExample of={AiMessageStories.TypedOut} title="Typed out" description="A finished reply typed out as it arrives." />
 
-</div>
+<ComponentExample of={AiMessageStories.WithParts} title="With parts" description="Text parts and a part the caller draws." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={AiMessageStories.WithSources} title="With sources" description="What a finished answer read, under it: the title as a link and the type beside it, with the rest folded behind a toggle past three." />
 
-## Typing indicator
-
-<DocsCanvasShell description={<>Three pulsing dots before any text exists.</>}>
-    <DsCanvasQuiet of={AiMessageStories.TypingIndicator} />
-</DocsCanvasShell>
+<ComponentExample of={AiMessageStories.WithFeedback} title="With feedback" description="Thumbs up and down under a finished answer; one stays pressed at a time, and thumbs down asks for an optional comment." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Typed out
+## State
 
-<DocsCanvasShell description={<>A finished reply typed out as it arrives.</>}>
-    <DsCanvasQuiet of={AiMessageStories.TypedOut} />
-</DocsCanvasShell>
+<ComponentExample of={AiMessageStories.Streaming} title="Streaming" description="Text still arriving: a caret follows the last character." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## With parts
-
-<DocsCanvasShell description={<>Text parts and a part the caller draws.</>}>
-    <DsCanvasQuiet of={AiMessageStories.WithParts} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## With sources
-
-<DocsCanvasShell description={<>What a finished answer read, under it: the title as a link and the type beside it. Past three, the rest fold behind a toggle.</>}>
-    <DsCanvasQuiet of={AiMessageStories.WithSources} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## With feedback
-
-<DocsCanvasShell description={<>Thumbs up and down under a finished answer. One stays pressed at a time; thumbs down asks for an optional comment.</>}>
-    <DsCanvasQuiet of={AiMessageStories.WithFeedback} />
-</DocsCanvasShell>
+<ComponentExample of={AiMessageStories.TypingIndicator} title="Thinking" description="Three pulsing dots before any text exists." />
 
 </div>
 
@@ -112,44 +81,88 @@ as a person's.
 
 <div className="sb-ds-doc-section">
 
-## When to use
+## Usage
 
 Use `AiMessage` for every reply an assistant writes: in the AI chat, in a panel,
 anywhere text comes from the model. Show `thinking` from the moment a message is
 sent until the first text arrives, `streaming` while text arrives, then
 `complete`.
 
+### Status guidance
+
 <DocsTable>
-    <thead>
-        <tr><th>Prop</th><th>Type</th><th>What it does</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>text</code></td><td>string</td><td>A single text reply.</td></tr>
-        <tr><td><code>parts</code></td><td>array</td><td>Text parts and other parts, in order.</td></tr>
-        <tr><td><code>status</code></td><td>complete | streaming | thinking</td><td>Which state the reply is in.</td></tr>
-        <tr><td><code>typeOut</code></td><td>boolean</td><td>Types a finished text out character by character.</td></tr>
-        <tr><td><code>renderPart</code></td><td>function</td><td>Draws a part that is not text.</td></tr>
-        <tr><td><code>sources</code></td><td>array</td><td>What a finished answer read: one <code>{'{ title, href, type }'}</code> per source, listed under the message.</td></tr>
-        <tr><td><code>onFeedback</code></td><td>function</td><td>Puts thumbs up and down under a finished answer. Called with <code>{'{ rating }'}</code>, or <code>{"{ rating: 'down', comment }"}</code> when a comment is sent.</td></tr>
-        <tr><td><code>feedback</code></td><td>up | down | null</td><td>The rating, when the page owns it.</td></tr>
-    </tbody>
+<thead>
+<tr><th>Status</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Thinking</td><td>From the moment a message is sent until the first text arrives. The typing indicator, with no text.</td></tr>
+<tr><td>Streaming</td><td>While text arrives. A caret follows the last character, and the message is busy for assistive technology.</td></tr>
+<tr><td>Complete</td><td>The default: a finished reply. Only a complete reply shows its sources and its thumbs.</td></tr>
+</tbody>
 </DocsTable>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Usage notes
+## Parts
 
-### Show the state, not a blank.
+1. **AI icon.** The small AI icon at 16, named "AI", centered on the first line, so no answer reads as a person's.
+2. **Text.** The body style, keeping the reply's line breaks. With <code>parts</code>, text parts and other parts in order; <code>renderPart</code> draws a part that is not text.
+3. **Caret.** Streaming only: a thin bar after the last character, blinking.
+4. **Typing indicator.** Thinking only: three pulsing dots in place of the text.
+5. **Sources** (optional). Complete only: a "Sources" heading, one row per source with its title as a link and its type beside it, and a toggle past three.
+6. **Feedback** (optional). Complete only, with <code>onFeedback</code>: thumbs up and down and a quiet thanks beside them.
 
-```jsx
-// Incorrect: nothing appears until the whole reply is ready.
-{reply ? <AiMessage text={reply} /> : null}
+### States
 
-// Correct: the typing indicator holds the place, then text streams in.
-<AiMessage status={reply ? 'streaming' : 'thinking'} text={reply} />
-```
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Complete</td><td>The text, then the sources and the thumbs when they are passed. With <code>typeOut</code>, the text types out character by character.</td></tr>
+<tr><td>Streaming</td><td>A caret follows the last character, and the message carries <code>aria-busy</code>. No sources and no thumbs yet.</td></tr>
+<tr><td>Thinking</td><td>The typing indicator, a status named "AI is writing", in place of the text.</td></tr>
+<tr><td>Reduced motion</td><td>The caret and dots stop animating, and typed-out text shows at once.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td>Text</td><td><code>--body-default</code> in <code>--ds-text</code>.</td></tr>
+<tr><td>Icon to text</td><td><code>--inline-md</code>; the icon centers on the first line against <code>--icon-md</code>.</td></tr>
+<tr><td>Between parts</td><td><code>--stack-md</code>.</td></tr>
+<tr><td>Typing dots</td><td><code>--ds-text-subtle</code>, <code>--radius-full</code>, <code>--stack-sm</code> apart.</td></tr>
+<tr><td>Caret and dots motion</td><td><code>--motion-duration-long</code>, <code>--motion-duration-medium</code> between dots, <code>--motion-easing-standard</code>.</td></tr>
+<tr><td>Sources</td><td>Heading <code>--heading-xxsmall</code> in <code>--ds-text-subtle</code>; type <code>--body-small</code> in <code>--ds-text-subtle</code>; rows <code>--stack-sm</code> apart.</td></tr>
+<tr><td>Feedback</td><td>Thanks <code>--body-small</code> in <code>--ds-text-subtle</code>; buttons <code>--inline-sm</code> apart.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Stream the answer, then settle.
+
+The streaming state shows the answer arriving. Show the state, never a blank:
+the typing indicator holds the place until the first text, then text streams
+in, then the message settles to `complete`.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}><AiMessage status="thinking" /><AiMessage status="streaming" text="Maya has the steps for adding fractions, but in word" /></div>}
+    doCaption="The typing indicator, then the streaming state, shows the answer arriving."
+    dontExample={<AiMessage text="Maya has the steps for adding fractions, but in word" />}
+    dontCaption="Partial text shown as finished hides that it is still being written."
+/>
 
 ### List the sources whenever an answer draws on records.
 
@@ -157,10 +170,43 @@ An answer built from sessions, students or reports passes them as `sources`,
 so a person can open what the AI read. A general answer that read nothing
 shows no list.
 
-### Offer feedback on every answer.
+<DoDontPair
+    doExample={<AiMessage text="Ava attended 12 of 14 sessions this term." sources={[{ title: 'Session notes, Oct 24', href: '#session-1024', type: 'Session' }, { title: 'Ava Thompson', href: '#student-ava', type: 'Student' }]} />}
+    doCaption="The records the answer read, listed under it."
+    dontExample={<AiMessage text="Ava attended 12 of 14 sessions this term." />}
+    dontCaption="An answer from records with nothing to open."
+/>
 
-Pass `onFeedback` wherever an answer is shown. A second press on the same thumb
-clears it; thumbs down opens an optional comment that can be skipped.
+### Offer feedback on every finished answer.
+
+Pass `onFeedback` wherever an answer is shown. The thumbs appear only once the
+reply is complete, so a streaming answer is never rated on partial text. A
+second press on the same thumb clears it; thumbs down opens an optional comment
+that can be skipped.
+
+<DoDontPair
+    doExample={<AiMessage text="Ava attended 12 of 14 sessions this term." onFeedback={() => {}} />}
+    doCaption="Thumbs under a finished answer."
+    dontExample={<AiMessage text="Ava attended 12 of 14 sessions this term." />}
+    dontCaption="A finished answer with no way to rate it."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Name a source by its record: "Session notes, Oct 24", with its type, "Session".</td><td>Name a source by its address.</td></tr>
+<tr><td>Put a table or a list the reply needs in a part that <code>renderPart</code> draws.</td><td>Draw a table out of characters inside the text.</td></tr>
+<tr><td>Let the AI icon mark the reply.</td><td>Add a second icon beside the message.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 

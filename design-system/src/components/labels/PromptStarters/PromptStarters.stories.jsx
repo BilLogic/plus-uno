@@ -105,3 +105,15 @@ FillsThePromptInput.play = async ({ canvasElement }) => {
     const field = canvas.getByRole('textbox', { name: 'Message to PLUS AI' });
     await expect(field).toHaveValue('Summarize this session for the family.');
 };
+
+/* -------------------------------------------------------------- playground */
+
+/** Interactive playground. */
+export const Interactive = {
+    args: { label: 'Suggested prompts', starters: STARTERS, onSelect: fn() },
+    render: (args) => (
+        <div style={wrap}>
+            <PromptStarters {...args} />
+        </div>
+    ),
+};

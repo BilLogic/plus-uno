@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as StatusTagStories from './StatusTag.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { CountTag, StatusTag } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={StatusTagStories} />
 
@@ -24,11 +31,23 @@ calculated it or a person set it.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>Six appearances, each with a meaning. The fill is the appearance's tinted background, the text its (Text) color, and a 1px inside border its pressed step.</>}>
-    <Canvas of={StatusTagStories.Styles} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={StatusTagStories.Styles} title="Appearances" description="Six appearances, each with a meaning, at default and spacious spacing: a tinted fill, its (Text) color and a 1px inside border one step darker." />
+
+<ComponentExample of={StatusTagStories.LeadingVisual} title="Leading visual" description={<><code>leadingVisual</code> adds one icon before the label, in the text color.</>} />
+
+<ComponentExample of={StatusTagStories.WithCount} title="Trailing metric" description={<><code>trailingMetric</code> nests a Count tag of the same appearance, compact in default and default in spacious; a count of 0 is hidden.</>} />
+
+<ComponentExample of={StatusTagStories.TrailingMetricAppearance} title="Trailing metric appearance" description={<><code>trailingMetricAppearance</code> sets the count's own appearance, which otherwise follows the Status tag.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Size and layout
+
+<ComponentExample of={StatusTagStories.NarrowContainer} title="Narrow container" description="In a column narrower than 200 the Status tag clamps to the column and truncates the same way." />
 
 </div>
 
@@ -36,35 +55,9 @@ calculated it or a person set it.
 
 ## Behavior
 
-<DocsCanvasShell description={<>Past <code>maxWidth</code> (200) the label ends in an ellipsis, and the full text shows in a tooltip on hover and on keyboard focus. A Status tag that fits is not a tab stop.</>}>
-    <DsCanvasQuiet of={StatusTagStories.Truncation} />
-</DocsCanvasShell>
+<ComponentExample of={StatusTagStories.Truncation} title="Truncation" description={<>Past <code>maxWidth</code> (200) the label ends in an ellipsis, and the full text shows in a tooltip on hover and on keyboard focus.</>} />
 
-<DocsCanvasShell description={<>The cap never outgrows the container: in a column narrower than 200 the Status tag clamps to the column and truncates the same way.</>}>
-    <DsCanvasQuiet of={StatusTagStories.NarrowContainer} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<><code>leadingVisual</code> adds one icon before the label, in the text color.</>}>
-    <DsCanvasQuiet of={StatusTagStories.LeadingVisual} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<><code>trailingMetric</code> nests a Count tag of the same appearance: compact (16) in default, default (20) in spacious, inset equally from the top and the right. A count of 0 is hidden.</>}>
-    <DsCanvasQuiet of={StatusTagStories.WithCount} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<><code>trailingMetricAppearance</code> sets the count's own appearance, which otherwise follows the Status tag.</>}>
-    <DsCanvasQuiet of={StatusTagStories.TrailingMetricAppearance} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>A Status tag is never a button. An <code>onClick</code> passed to it is dropped with a development warning.</>}>
-    <DsCanvasQuiet of={StatusTagStories.NeverAButton} />
-</DocsCanvasShell>
+<ComponentExample of={StatusTagStories.NeverAButton} title="Never a button" description={<>An <code>onClick</code> passed to a Status tag is dropped with a development warning.</>} />
 
 </div>
 
@@ -72,25 +65,15 @@ calculated it or a person set it.
 
 ## State
 
-<DocsCanvasShell description={<>Rest. The only state: a filled label for the condition something is in.</>}>
-    <DsCanvasQuiet of={StatusTagStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={StatusTagStories.Rest} title="Rest" description="The only state: a filled label for the condition something is in." />
 
-<DocsCanvasShell description={<>Hovered. No change: a status tag is not a control.</>}>
-    <DsCanvasQuiet of={StatusTagStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={StatusTagStories.Hovered} title="Hovered" description="No change: a status tag is not a control." />
 
-<DocsCanvasShell description={<>Pressed. No change. To edit a status, the field around it becomes a dropdown.</>}>
-    <DsCanvasQuiet of={StatusTagStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={StatusTagStories.Pressed} title="Pressed" description="No change. To edit a status, the field around it becomes a dropdown." />
 
-<DocsCanvasShell description={<>Focused. Not in the tab order, unless the text is truncated.</>}>
-    <DsCanvasQuiet of={StatusTagStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={StatusTagStories.Focused} title="Focused" description="Not in the tab order, unless the text is truncated." />
 
-<DocsCanvasShell description={<>Disabled. Never dimmed.</>}>
-    <DsCanvasQuiet of={StatusTagStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={StatusTagStories.Disabled} title="Disabled" description="Never dimmed." />
 
 </div>
 
@@ -133,6 +116,22 @@ the system calculated the state or a person set it.
 
 Use `spacing="default"` (20) in rows, lists, tables and sentences, and
 `spacing="spacious"` (32) beside a heading.
+
+### Appearance guidance
+
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Neutral</td><td>Not started.</td></tr>
+<tr><td>Success</td><td>Done. Example: "Completed".</td></tr>
+<tr><td>Warning</td><td>Needs attention. Example: "Needs review".</td></tr>
+<tr><td>Danger</td><td>Failed or missed. Example: "Missed".</td></tr>
+<tr><td>Info</td><td>In progress. Example: "In progress".</td></tr>
+<tr><td>Discovery</td><td>New.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -181,39 +180,55 @@ Use `spacing="default"` (20) in rows, lists, tables and sentences, and
 
 ## Best practices
 
-### Let the appearance carry a meaning.
+### Match the appearance to the meaning.
 
-Each appearance means one thing: neutral (not started), success (done), warning
-(needs attention), danger (failed or missed), info (in progress) and discovery
-(new). There is no color prop; a category with a color is a Tag.
+Color carries the verdict, so success never labels a problem. Each appearance
+means one thing (see the guidance above). There is no color prop; a category
+with a color is a Tag.
 
-```jsx
-// Incorrect — a category borrowing a status color.
-<StatusTag appearance="info">Math</StatusTag>
+<DoDontPair
+    doExample={<StatusTag appearance="success">Complete</StatusTag>}
+    doCaption="Success for a finished thing."
+    dontExample={<StatusTag appearance="danger">Complete</StatusTag>}
+    dontCaption="Danger on a finished thing."
+/>
 
-// Correct — a condition that can change.
-<StatusTag appearance="info">In progress</StatusTag>
-```
+### Keep labels to one or two words.
+
+A status is read at a glance; a sentence belongs in the row text.
+
+<DoDontPair
+    doExample={<StatusTag appearance="success">On track</StatusTag>}
+    doCaption="On track."
+    dontExample={<StatusTag appearance="success">Student is on track for the next session</StatusTag>}
+    dontCaption="A sentence in the tag."
+/>
+
+### Show one status per object.
+
+Two statuses on one object force people to decide which is true.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Session 12</span><StatusTag appearance="success">Complete</StatusTag></div>}
+    doCaption="One status per row."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><span>Session 12</span><StatusTag appearance="success">Complete</StatusTag><StatusTag appearance="warning">Needs review</StatusTag></div>}
+    dontCaption="Two competing statuses."
+/>
 
 ### Nest a count instead of placing one beside it.
 
-```jsx
-// Incorrect — two labels that read as unrelated.
-<StatusTag appearance="success">Completed</StatusTag> <CountTag value={38} />
-
-// Correct — one label; the number reads as part of it.
-<StatusTag appearance="success" trailingMetric={38}>Completed</StatusTag>
-```
+<DoDontPair
+    doExample={<StatusTag appearance="success" trailingMetric={38}>Completed</StatusTag>}
+    doCaption="One label; the number reads as part of it."
+    dontExample={<div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'var(--inline-md)' }}><StatusTag appearance="success">Completed</StatusTag><CountTag value={38} /></div>}
+    dontCaption="Two labels that read as unrelated."
+/>
 
 ### Give the metric its own appearance when it means something else.
 
 `trailingMetricAppearance` defaults to the Status tag's own appearance. Set it
 only when the number carries a different meaning from the status, such as a
 success status with a danger count of failures.
-
-```jsx
-<StatusTag appearance="success" trailingMetric={38} trailingMetricAppearance="danger">Completed</StatusTag>
-```
 
 ### Edit in the field, not on the label.
 
