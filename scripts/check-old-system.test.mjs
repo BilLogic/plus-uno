@@ -49,3 +49,13 @@ test('the token files that still declare the old names pass until they move into
   assert.deepEqual(findings(src('design-system/src/tokens/_colors.scss', css)), []);
   assert.equal(findings(src('design-system/src/tokens/_type.scss', css)).length, 1, 'only the named files');
 });
+
+test('the old elevation and surface roles fail outside specs/; the --ds- surfaces and shadows pass', () => {
+  const old = (name) => `--${name}`;
+  const css = `.a { box-shadow: var(${old('elevation-light-4')}); }\n.b { background: var(${old('surface-raised')}); }\n`;
+  const found = findings(src('prototypes/x/x.scss', css));
+  assert.equal(found.length, 1);
+  assert.match(found[0].message, /2 x elevation/);
+  assert.deepEqual(findings(src('prototypes/x/x.scss', '.a { background: var(--ds-surface-raised); box-shadow: var(--ds-shadow-raised); }')), []);
+  assert.deepEqual(findings(src('design-system/src/specs/x.scss', css)), []);
+});
