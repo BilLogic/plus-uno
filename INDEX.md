@@ -138,6 +138,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | Doc | Summary |
 |-----|---------|
 | [`docs/engineering/coding.md`](docs/engineering/coding.md) | How to write code in this repo — barrel imports, tokens over literals, styling conventions, and what not to reach for. |
+| [`docs/engineering/ds-usage-rules.md`](docs/engineering/ds-usage-rules.md) | The escape rules `check:ds-usage` holds consumer code to — one section per rule ID, each saying what fails and what to write instead. |
 | [`docs/engineering/measurement-window.md`](docs/engineering/measurement-window.md) | How to run uno-bot's measurement window each week and close it — the five numbers, where each comes from, where it is recorded, and what stays private. |
 | [`docs/engineering/operations.md`](docs/engineering/operations.md) | THE standing-automation registry — every cron, scheduled Worker job, webhook and PR gate, with its trigger, owner and a link to its home. |
 | [`docs/engineering/setup.md`](docs/engineering/setup.md) | Aliases, package structure, prototype conventions, token workflow, local preview. |
@@ -196,6 +197,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/036-base-ui-for-ai-components.md`](docs/adr/036-base-ui-for-ai-components.md) | PLUS AI components use Base UI (@base-ui/react, pinned) as their headless behavior layer, styled with SCSS on --ds-* tokens; Assistant UI is gone, and the rest of product UI stays on React-Bootstrap (2026-11-03) |
 | [`docs/adr/037-base-ui-is-the-behavior-layer-for-every-component.md`](docs/adr/037-base-ui-is-the-behavior-layer-for-every-component.md) | Base UI (@base-ui/react, pinned per ADR-036) is the headless behavior layer for every interactive PLUS component, not just AI surfaces; supersedes ADR-009, widens ADR-036 (2026-11-03) |
 | [`docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md`](docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md) | Space, size, radius, border width, typography and motion become generated from plans this repo owns, the way ADR-035 generates color — Figma downstream, PLUS ×16 numbering kept, one token ladder with the old vocabulary deleted |
+| [`docs/adr/039-one-checker-defines-an-escape.md`](docs/adr/039-one-checker-defines-an-escape.md) | One deterministic checker, check:ds-usage, defines an escape from the design system; the hook, CI, the prototype exit, ds-lens and the usage eval all call it, and AI review advises while the checker blocks |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -224,6 +226,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-153 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+155 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.
