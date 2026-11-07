@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { rescore, CONTROL_REMOVED, DENIED_READS, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf } from './eval-ds-usage.mjs';
+import { rescore, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf } from './eval-ds-usage.mjs';
 import { spawnSync } from 'node:child_process';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
@@ -43,6 +43,69 @@ test('prepare: control loses the harness, current keeps it, both get the task fo
   } finally {
     fs.rmSync(into, { recursive: true, force: true });
   }
+});
+
+const hookCommands = (root) => {
+  const settings = JSON.parse(fs.readFileSync(path.join(root, '.claude/settings.json'), 'utf8'));
+  return Object.values(settings.hooks ?? {}).flat().flatMap((group) => group.hooks.map((h) => h.command));
+};
+const cursorCommands = (root) => Object.values(JSON.parse(fs.readFileSync(path.join(root, '.cursor/hooks.json'), 'utf8')).hooks).flat().map((h) => h.command);
+const DS_HOOK = /ds-usage\/post-edit\.mjs/;
+
+test('prepare: hook-off is current without the post-edit hook; the checker and the other hooks stay', () => {
+  const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-hookoff-'));
+  try {
+    const { root } = prepare({ ref: 'HEAD', arm: 'hook-off', task: 'form-states', into });
+    assert.ok(!hookCommands(root).some((c) => DS_HOOK.test(c)));
+    assert.ok(!cursorCommands(root).some((c) => DS_HOOK.test(c)));
+    assert.ok(hookCommands(root).some((c) => /uno-prototype/.test(c)), 'the uno-prototype gate stays');
+    for (const rel of CHECKER_REMOVED) assert.ok(fs.existsSync(path.join(root, rel)), rel);
+    assert.ok(JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).scripts['check:ds-usage']);
+    assert.match(fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8'), /## Hard rules/);
+  } finally {
+    fs.rmSync(into, { recursive: true, force: true });
+  }
+});
+
+test('prepare: checker-removed takes the checker out of the copy, and the hook still hands an escape back', () => {
+  const into = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-nochecker-'));
+  try {
+    const { root, folder } = prepare({ ref: 'HEAD', arm: 'checker-removed', task: 'form-states', into });
+    for (const rel of CHECKER_REMOVED) assert.ok(!fs.existsSync(path.join(root, rel)), rel);
+    assert.equal(JSON.parse(fs.readFileSync(path.join(root, 'package.json'), 'utf8')).scripts['check:ds-usage'], undefined);
+    assert.ok(!cursorCommands(root).some((c) => DS_HOOK.test(c)));
+    assert.match(fs.readFileSync(path.join(root, 'AGENTS.md'), 'utf8'), /## Hard rules/);
+    assert.ok(fs.existsSync(path.join(root, 'design-system/agent-views/components.json')));
+
+    const [command] = hookCommands(root).filter((c) => DS_HOOK.test(c));
+    assert.ok(command.includes(REPO_ROOT), 'the hook runs from the eval checkout, outside the copy');
+    const app = path.join(folder, 'src', 'App.jsx');
+    const hook = () =>
+      spawnSync('sh', ['-c', command], {
+        input: JSON.stringify({ tool_name: 'Write', tool_input: { file_path: app } }),
+        env: { ...process.env, CLAUDE_PROJECT_DIR: root },
+        encoding: 'utf8',
+      });
+    fs.writeFileSync(app, "import StatusTag from '@/components/labels/StatusTag';\nexport default () => <StatusTag />;\n");
+    const dirty = hook();
+    assert.equal(dirty.status, 2, dirty.stderr);
+    assert.match(dirty.stderr, /ds\/no-deep-import/);
+    assert.ok(fs.existsSync(path.join(root, '.local/ds-usage-runs.jsonl')), 'the hook logs in the copy');
+    fs.writeFileSync(app, "import { StatusTag } from '@/components';\nexport default () => <StatusTag />;\n");
+    assert.equal(hook().status, 0);
+  } finally {
+    fs.rmSync(into, { recursive: true, force: true });
+  }
+});
+
+test('armDenies: checker-removed denies the checker in the copy to Read and npm; other arms add nothing', () => {
+  assert.deepEqual(armDenies('current', '/c'), []);
+  assert.deepEqual(armDenies('hook-off', '/c'), []);
+  const deny = armDenies('checker-removed', '/c');
+  for (const rel of CHECKER_REMOVED) assert.ok(deny.includes(`Read(//c/${rel})`), rel);
+  assert.ok(deny.includes('Bash(npm run check:ds-usage:*)'));
+  assert.ok(JSON.parse(confined('/r', deny)).permissions.deny.includes('Bash(npm run check:ds-usage:*)'));
+  assert.deepEqual(ARMS, ['control', 'current', 'hook-off', 'checker-removed']);
 });
 
 test('score: escapes by rule from this checkout\'s rules; the untouched template scores zero', () => {

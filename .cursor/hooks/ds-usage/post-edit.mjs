@@ -22,6 +22,10 @@
  * Off switch: `DS_USAGE_HOOK=off` in the environment. A checker that fails to
  * load or throws exits 0 with nothing said: a broken hook must not stall an
  * agent. `DS_USAGE_HOOK_LOG` moves the log (the tests use it).
+ *
+ * `DS_USAGE_ROOT` names another repo to check: its edited files, facts and
+ * log, with this repo's checker. The usage eval's checker-removed arm runs the
+ * hook that way, so its copy keeps the hook and loses the checker.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -84,17 +88,18 @@ async function main() {
   } catch {
     return;
   }
-  if (process.env.DS_USAGE_HOOK === 'off' || !editedPath(input, ROOT)) return;
+  const root = process.env.DS_USAGE_ROOT ? path.resolve(process.env.DS_USAGE_ROOT) : ROOT;
+  if (process.env.DS_USAGE_HOOK === 'off' || !editedPath(input, root)) return;
   let checker;
   try {
     checker = await import(path.join(ROOT, 'scripts/check-ds-usage.mjs'));
   } catch {
     return;
   }
-  const out = handle(input, { check: (rel) => checker.escapes(ROOT, [rel]), inScope: checker.inScope });
+  const out = handle(input, { repoRoot: root, check: (rel) => checker.escapes(root, [rel]), inScope: checker.inScope });
   if (out.log) {
     try {
-      const logFile = path.resolve(ROOT, process.env.DS_USAGE_HOOK_LOG ?? DEFAULT_LOG);
+      const logFile = path.resolve(root, process.env.DS_USAGE_HOOK_LOG ?? DEFAULT_LOG);
       fs.mkdirSync(path.dirname(logFile), { recursive: true });
       fs.appendFileSync(logFile, `${JSON.stringify(out.log)}\n`);
     } catch {

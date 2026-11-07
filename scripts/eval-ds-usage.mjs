@@ -13,6 +13,10 @@
  *            controlAgents, and the project hooks). Component source stays:
  *            a repo without a harness still has code.
  *   current  the copy as it is on main (`--ref`, default origin/main), project hooks included.
+ *   hook-off         current without the post-edit hook; the agent can still
+ *                    run the checker.
+ *   checker-removed  current without the checker (CHECKER_REMOVED); the
+ *                    post-edit hook still runs, from this checkout.
  *
  * Everything but the agent and judge calls is deterministic: the copies, the
  * scoring, the ledger rows and the summary.
@@ -36,7 +40,7 @@ import { isEntry } from './lib/findings.mjs';
 export const SCENARIOS = 'docs/evals/scenarios/ds-usage';
 export const LEDGER = 'docs/evals/ds-usage-ledger.jsonl';
 export const TASKS = ['page-from-prd', 'form-states', 'table-states', 'overlay-flow', 'frame-to-code', 'trap-missing-component'];
-export const ARMS = ['control', 'current'];
+export const ARMS = ['control', 'current', 'hook-off', 'checker-removed'];
 /** Durable copies of what each agent built, beside the ledger row that scores it. */
 export const OUTPUTS = path.join(os.homedir(), 'Documents/Claude/Projects/PLUS/evals/ds-usage');
 
@@ -56,6 +60,13 @@ export const CONTROL_REMOVED = [
   '.cursor',
   '.codex',
 ];
+
+/**
+ * What the checker-removed arm takes out of the copy: the checker, its rules,
+ * its baseline and the copy's own post-edit hook, which could no longer load
+ * a checker. The hook that runs instead lives in this checkout.
+ */
+export const CHECKER_REMOVED = ['scripts/check-ds-usage.mjs', 'scripts/lib/ds-usage.mjs', 'scripts/baselines/ds-usage.json', '.cursor/hooks/ds-usage'];
 
 /**
  * The control arm's AGENTS.md: the title and the Identity section, without
@@ -116,6 +127,43 @@ function copyDir(from, to) {
   }
 }
 
+const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
+const writeJson = (file, value) => fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
+const isDsHook = (hook) => /ds-usage\/post-edit\.mjs/.test(hook.command ?? '');
+
+/** Drop the `check:ds-usage` script from a copy's package.json. */
+function dropCheckerScript(root) {
+  const pkg = path.join(root, 'package.json');
+  const manifest = readJson(pkg);
+  delete manifest.scripts?.['check:ds-usage'];
+  writeJson(pkg, manifest);
+}
+
+/**
+ * Rewrite the post-edit hook in a copy's Claude Code and Cursor wiring:
+ * `swap(hook)` returns the hook to keep in its place, or null to drop it.
+ * Every other hook stays as it was.
+ */
+function rewireDsHook(root, swap) {
+  const settings = path.join(root, '.claude/settings.json');
+  if (fs.existsSync(settings)) {
+    const parsed = readJson(settings);
+    for (const [event, groups] of Object.entries(parsed.hooks ?? {})) {
+      parsed.hooks[event] = groups
+        .map((group) => ({ ...group, hooks: group.hooks.map((h) => (isDsHook(h) ? swap(h) : h)).filter(Boolean) }))
+        .filter((group) => group.hooks.length);
+    }
+    writeJson(settings, parsed);
+  }
+  // Cursor's wiring only logs and no eval run uses Cursor; it goes in both arms, so no copy points at a hook it lacks.
+  const cursor = path.join(root, '.cursor/hooks.json');
+  if (fs.existsSync(cursor)) {
+    const parsed = readJson(cursor);
+    for (const [event, hooks] of Object.entries(parsed.hooks ?? {})) parsed.hooks[event] = hooks.filter((h) => !isDsHook(h));
+    writeJson(cursor, parsed);
+  }
+}
+
 /**
  * A plain copy of the repo at `ref` for one arm, with the task's starting
  * folder at `prototypes/eval-<task>/`. Returns the copy's root and the folder.
@@ -133,10 +181,7 @@ export function prepare({ repoRoot = REPO_ROOT, ref, arm, task, into }) {
     const agents = path.join(into, 'AGENTS.md');
     fs.writeFileSync(agents, controlAgents(fs.readFileSync(agents, 'utf8')));
     // `check:ds-usage` is the harness's definition of an escape; its script is gone.
-    const pkg = path.join(into, 'package.json');
-    const manifest = JSON.parse(fs.readFileSync(pkg, 'utf8'));
-    delete manifest.scripts?.['check:ds-usage'];
-    fs.writeFileSync(pkg, `${JSON.stringify(manifest, null, 2)}\n`);
+    dropCheckerScript(into);
     // The project hooks are the uno-prototype gate, part of the harness; their
     // scripts went with `.cursor`, so the control arm drops the hooks too.
     const settings = path.join(into, '.claude/settings.json');
@@ -145,6 +190,17 @@ export function prepare({ repoRoot = REPO_ROOT, ref, arm, task, into }) {
       delete parsed.hooks;
       fs.writeFileSync(settings, `${JSON.stringify(parsed, null, 2)}\n`);
     }
+  }
+  // hook-off: the checker stays in reach, and nothing runs it after an edit.
+  if (arm === 'hook-off') rewireDsHook(into, () => null);
+  // checker-removed: the agent cannot run the checker, and the hook still scores
+  // each edit. The hook runs from this checkout (whose `scripts` and `.cursor`
+  // are denied to Read) with the copy as the repo it checks.
+  if (arm === 'checker-removed') {
+    for (const rel of CHECKER_REMOVED) fs.rmSync(path.join(into, rel), { recursive: true, force: true });
+    dropCheckerScript(into);
+    const hook = path.join(repoRoot, '.cursor/hooks/ds-usage/post-edit.mjs');
+    rewireDsHook(into, (h) => ({ ...h, command: `DS_USAGE_ROOT="$CLAUDE_PROJECT_DIR" node "${hook}"` }));
   }
   // The scenarios are the answer key's neighbors; neither arm sees them.
   fs.rmSync(path.join(into, 'docs/evals'), { recursive: true, force: true });
@@ -191,11 +247,21 @@ const DISALLOWED = ['Skill', 'Agent', 'Task', 'WebFetch', 'WebSearch'];
  */
 export const DENIED_READS = ['AGENTS.md', 'CLAUDE.md', 'design-system/agent-views', 'design-system/guidelines', 'design-system/figma', 'docs', 'skills', '.claude', '.cursor', '.codex', 'scripts'];
 
-export function confined(repoRoot = REPO_ROOT) {
+/**
+ * An arm's own permission denials in its copy at `root`. checker-removed
+ * denies the checker's paths (gone from the copy already) and its npm script,
+ * so a run that goes looking is refused rather than surprised.
+ */
+export function armDenies(arm, root) {
+  if (arm !== 'checker-removed') return [];
+  return [...CHECKER_REMOVED.flatMap((rel) => [`Read(/${path.join(root, rel)})`, `Read(/${path.join(root, rel)}/**)`]), 'Bash(npm run check:ds-usage:*)'];
+}
+
+export function confined(repoRoot = REPO_ROOT, extra = []) {
   const deny = DENIED_READS.flatMap((rel) => {
     const abs = path.join(repoRoot, rel);
     return [`Read(/${abs})`, `Read(/${abs}/**)`];
-  });
+  }).concat(extra);
   return JSON.stringify({
     permissions: { deny },
     sandbox: {
@@ -279,7 +345,7 @@ export function readSet(stdout, root) {
 }
 
 /** One headless agent run in `cwd`; returns its result (tokens, turns, cost), any reach into the checkout, and wall time. */
-function agent({ cwd, prompt, model, readOnly = false }) {
+function agent({ cwd, prompt, model, readOnly = false, deny = [] }) {
   const args = [
     '-p',
     prompt,
@@ -291,7 +357,7 @@ function agent({ cwd, prompt, model, readOnly = false }) {
     '--permission-mode',
     readOnly ? 'default' : 'acceptEdits',
     '--settings',
-    confined(),
+    confined(REPO_ROOT, deny),
     '--setting-sources',
     'project,local',
     '--strict-mcp-config',
@@ -555,7 +621,7 @@ async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratc
   const copy = path.join(scratch, id);
   try {
     const { root, folder } = prepare({ ref: opts.ref, arm, task, into: copy });
-    const build = agent({ cwd: root, prompt: BUILD_PROMPT(task), model: opts.model });
+    const build = agent({ cwd: root, prompt: BUILD_PROMPT(task), model: opts.model, deny: armDenies(arm, root) });
     const failed = Boolean(build.result.is_error);
     const scored = score({ folder, label: `eval-${task}` });
     // The judge reads a copy of the build alone, so nothing beside it is in reach.
