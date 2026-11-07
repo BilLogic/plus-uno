@@ -326,7 +326,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`.",
+          "description": "Where the source links open, such as `_top` from inside a frame.",
           "deprecated": null
         },
         {
@@ -335,7 +335,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`.",
           "deprecated": null
         },
         {

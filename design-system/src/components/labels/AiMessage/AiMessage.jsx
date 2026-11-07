@@ -145,9 +145,9 @@ AiMessage.propTypes = {
         href: PropTypes.string.isRequired,
         type: PropTypes.string,
     })),
-    /** Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`. */
     /** Where the source links open, such as `_top` from inside a frame. */
     linkTarget: PropTypes.string,
+    /** Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`. */
     onFeedback: PropTypes.func,
     /** The rating, when the page owns it: `up`, `down` or null. */
     feedback: PropTypes.oneOf(['up', 'down', null]),
