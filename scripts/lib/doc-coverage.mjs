@@ -15,9 +15,13 @@
  */
 
 /** The record's key for a component's missing summary. */
-export const SUMMARY = '(summary)';
+const SUMMARY = '(summary)';
 
-/** Every gap as a ratchet key: `<Component> <prop>` or `<Component> (summary)`, sorted. */
+/**
+ * Every gap as a ratchet key: `<Component> <prop>` or `<Component> (summary)`,
+ * sorted. One space separates the two, which holds because neither a component
+ * nor a prop name can contain one.
+ */
 export function gapKeys(gaps) {
   const keys = [];
   for (const [component, g] of Object.entries(gaps)) {

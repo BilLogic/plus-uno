@@ -31,7 +31,7 @@ import { extractExports } from './lib/barrel-exports.js';
 import { buildComponentsManifest, serializeManifest } from './lib/agent-manifests.mjs';
 import { AGENT_ROOT } from './agent-views-paths.js';
 import { enumValuesOf } from './lib/enum-values.mjs';
-import { coverage, describeGap, gapKeys } from './lib/doc-coverage.mjs';
+import { coverage as coverageTotals, describeGap, gapKeys } from './lib/doc-coverage.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -40,6 +40,11 @@ const COMPONENTS_ROOT = path.join(REPO_ROOT, 'design-system/src/components');
 const CHECK = process.argv.includes('--check');
 const UPDATE = process.argv.includes('--update');
 const BASELINE = 'scripts/baselines/component-docs.json';
+/** The record's own explanation, written once when `--update` creates it; the file is its home after that. */
+const RECORD_WHY =
+  'Prop rows and components the generated component docs leave undescribed, as `<Component> <prop>` or `<Component> (summary)`. ' +
+  'A gap may leave the record and none may join it: a new component or prop ships described. ' +
+  'Regenerate with `npm run generate:component-docs -- --update`; never edit by hand.';
 
 /**
  * Groups are the folders directly under components/, minus the barrel files.
@@ -59,6 +64,7 @@ const GROUP_TITLES = {
 const fail = (msg) => {
   console.error(`✗ ${msg}`);
   process.exitCode = 1;
+  failed = true;
 };
 
 /* ------------------------------------------------------------------ parsing */
@@ -505,8 +511,10 @@ function groupIndex(group, results) {
 const groups = discover();
 const written = [];
 const manifestEntries = [];
-const gaps = {};
+const gapsByComponent = {};
 let stale = 0;
+let described = 0;
+let failed = false;
 
 for (const group of groups) {
   const names = group.components.map((c) => c.name);
@@ -519,7 +527,7 @@ for (const group of groups) {
     const out = c.flat ? path.join(c.dir, `${c.name}.md`) : path.join(c.dir, 'index.md');
     written.push([out, built.doc]);
     manifestEntries.push(built.manifestEntry);
-    gaps[c.name] = built.gaps;
+    gapsByComponent[c.name] = built.gaps;
   }
 
   written.push([path.join(group.dir, 'index.md'), groupIndex(group, results)]);
@@ -549,27 +557,22 @@ for (const group of groups) {
  * `--update` takes it off the record; `--update` refuses to record a new gap.
  */
 {
-  const keys = gapKeys(gaps);
+  const keys = gapKeys(gapsByComponent);
   const ratchet = openRatchet({ file: BASELINE, repoRoot: REPO_ROOT });
-  const c = coverage(gaps);
-  console.log(`  prop descriptions: ${c.described}/${c.rows} rows (${c.percent}%) · ${c.summaries} component(s) without a summary`);
+  const totals = coverageTotals(gapsByComponent);
+  console.log(`  prop descriptions: ${totals.described}/${totals.rows} rows (${totals.percent}%) · ${totals.summaries} component(s) without a summary`);
   // `--update` writes a record that is absent; it never writes one a new gap is in.
   const failures = UPDATE && ratchet.absent ? [] : ratchet.failures(keys);
   for (const f of failures) fail(f.kind === 'absent' ? f.message : describeGap(f.key));
   if (UPDATE && !failures.length) {
     ratchet.update(keys, {
-      seed: {
-        why:
-          'Prop rows and components the generated component docs leave undescribed, as `<Component> <prop>` or `<Component> (summary)`. ' +
-          'A gap may leave the record and none may join it: a new component or prop ships described. ' +
-          'Regenerate with `npm run generate:component-docs -- --update`; never edit by hand.',
-      },
+      seed: { why: RECORD_WHY },
     });
   } else if (!UPDATE) {
     for (const { key } of ratchet.stale(keys)) {
       if (CHECK) {
-        console.error(`✗ described now: ${key} — record it with \`npm run generate:component-docs -- --update\``);
-        stale += 1;
+        console.error(`✗ described now: ${key}`);
+        described += 1;
       }
     }
   }
@@ -612,9 +615,9 @@ for (const [out, doc] of written) {
 }
 
 if (CHECK) {
-  if (stale) {
-    fail(`${stale} generated component doc(s) out of date — run \`npm run generate:component-docs\``);
-  } else if (!process.exitCode) {
+  if (stale) fail(`${stale} generated component doc(s) out of date — run \`npm run generate:component-docs\``);
+  if (described) fail(`${described} recorded gap(s) are described now — take them off the record with \`npm run generate:component-docs -- --update\``);
+  if (!failed) {
     console.log(`✓ component docs up to date (${written.length} files across ${groups.length} groups)`);
   }
 } else {
