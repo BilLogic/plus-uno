@@ -5,7 +5,7 @@
  * The old system is every token generated from a Figma collection now under
  * `archived /`, plus the old type classes. It is gone from the code outside
  * `design-system/src/specs/`, and the ban is hard: any hit is a finding, with
- * no baseline and no `--update`. Git history and the `archive/pre-ads-library`
+ * no baseline and no `--update`. Git history and the `archive/deprecated-library`
  * branch keep the past.
  *
  * WHAT IT READS. Every tracked `.scss .css .jsx .js .mjs .ts .tsx .html .mdx
