@@ -46,10 +46,11 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
         focus: {
             border: 'var(--stroke-2) solid var(--ds-border-focused)'
         },
-        // Disabled is a color, not an opacity. The row's text stays readable
-        // at 4.5:1 on the subtlest text color, and its controls are disabled
-        // themselves, which is what a screen reader announces.
-        disabled: { pointerEvents: 'none' }
+        // Disabled is a color, not an opacity: the row's text drops to the
+        // subtlest color, still 4.5:1. Details stays pressable, since reading
+        // a session's details is never blocked and a disabled button cannot
+        // say why it is off.
+        disabled: {}
     };
     const isDisabled = effectiveState === 'disabled';
     const textColor = isDisabled ? 'var(--ds-text-subtlest)' : 'var(--ds-text)';
@@ -141,7 +142,6 @@ export const TableRow = ({ date, timeRange, school, teacher, status, state: forc
                 <Button
                     text="Details"
                     spacing="compact"
-                    isDisabled={isDisabled}
                 />
             </div>
         </div>
