@@ -99,10 +99,14 @@ test('patterns are mapped too, not only components', () => {
   assert.equal(found[0].fileKey, 'FILE');
 });
 
-test('the recording covers every mapped id, in both Figma files', () => {
+test('the recording covers every mapped id, in every Figma file the registry maps', () => {
   const recording = RECORDING();
   const files = new Set(Object.values(recording.nodes).map((n) => n.file));
-  assert.equal(files.size, 2, 'the registry spans two files and both must be represented');
+  const mapped = new Set(mappings(REGISTRY()).map((m) => m.fileKey));
+  assert.ok(files.size >= 1, 'the recording names the file it was read in');
+  for (const fileKey of mapped) {
+    assert.ok(files.has(fileKey), `${fileKey} is mapped by the registry but nothing was recorded in it`);
+  }
   for (const m of mappings(REGISTRY())) {
     assert.ok(recording.nodes[m.nodeId], `${m.nodeId} (${m.component}) has no recorded type`);
   }
