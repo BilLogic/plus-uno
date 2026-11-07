@@ -77,6 +77,18 @@ export const CustomRowExample = () => (
     </MenuGroup>
 );
 
+/** Density: regular rows and compact rows. */
+export const Density = () => (
+    <div style={{ display: 'flex', gap: 'var(--inline-lg)', flexWrap: 'wrap' }}>
+        {['regular', 'compact'].map((density) => (
+            <MenuGroup key={density} density={density} id={`menu-density-${density}`}>
+                <ButtonItem>{density} one</ButtonItem>
+                <ButtonItem>{density} two</ButtonItem>
+            </MenuGroup>
+        ))}
+    </div>
+);
+
 export const Interactive = {
     args: { density: 'regular' },
     render: (args) => (

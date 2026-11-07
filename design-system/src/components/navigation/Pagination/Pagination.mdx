@@ -1,8 +1,9 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PaginationStories from './Pagination.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Pagination } from '@/components';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -37,31 +38,17 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Navigator
 
-<DocsCanvasShell attachSourceBelow description={<>Navigation content patterns: icon controls vs text controls.</>}>
-    <Canvas of={PaginationStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={PaginationStories.Content} title="Icon and text" description={<>Previous and Next as a caret (<code>navigator="icon"</code>) or as their labels (<code>navigator="text"</code>).</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Content
+## Size and layout
 
-<DocsCanvasShell description={<>Icon versus text previous/next patterns.</>}>
-    <DsCanvasQuiet of={PaginationStories.Content} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Spacing
-
-<DocsCanvasShell description={<>Default (32) and compact (24) spacing across icon and text navigators.</>}>
-    <DsCanvasQuiet of={PaginationStories.Spacing} />
-</DocsCanvasShell>
+<ComponentExample of={PaginationStories.Spacing} title="Spacing" description={<>Default draws 32 high; compact draws 24.</>} />
 
 </div>
 
@@ -69,29 +56,19 @@ export const figmaMeta = {
 
 ## State
 
-<DocsCanvasShell description={<>Pages in subtle ink on the surface; the current page is named by <code>aria-current</code>.</>}>
-    <DsCanvasQuiet of={PaginationStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={PaginationStories.Rest} title="Rest" description={<>Pages in subtle ink on the surface; the current page is named by <code>aria-current</code>.</>} />
 
-<DocsCanvasShell description={<>The subtle neutral hovered fill on a page and on an enabled Previous or Next.</>}>
-    <DsCanvasQuiet of={PaginationStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={PaginationStories.Hovered} title="Hovered" description={<>The subtle neutral hovered fill on a page and on an enabled Previous or Next.</>} />
 
-<DocsCanvasShell description={<>The subtle neutral pressed fill.</>}>
-    <DsCanvasQuiet of={PaginationStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={PaginationStories.Pressed} title="Pressed" description={<>The subtle neutral pressed fill.</>} />
 
-<DocsCanvasShell description={<>The 2px ring inside the segment, so a neighbor never covers it.</>}>
-    <DsCanvasQuiet of={PaginationStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={PaginationStories.Focused} title="Focused" description={<>The 2px ring inside the segment, so a neighbor never covers it.</>} />
 
-<DocsCanvasShell description={<>The selected fill and ink in semibold; no hover step of its own.</>}>
-    <DsCanvasQuiet of={PaginationStories.Current} />
-</DocsCanvasShell>
+<ComponentExample of={PaginationStories.Current} title="Current" description={<>The selected fill and ink in semibold; no hover step of its own.</>} />
 
-<DocsCanvasShell description={<>Previous on the first page keeps its tab stop, takes the disabled ground and ink, and does nothing.</>}>
-    <DsCanvasQuiet of={PaginationStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={PaginationStories.Disabled} title="Disabled" description={<>Previous on the first page keeps its tab stop, takes the disabled ground and ink, and does nothing.</>} />
+
+<ComponentExample of={PaginationStories.InteractionStates} title="First, middle and last page" description={<>Previous is disabled on the first page and Next on the last; both are enabled between.</>} />
 
 </div>
 
@@ -225,9 +202,24 @@ whenever the window does not reach them.
 
 `max` keeps the row short. Page one and the last page stay reachable with an ellipsis between, so a long list never pushes the controls off the screen.
 
+<DoDontPair
+    doExample={<Pagination currentPage={6} totalPages={40} max={5} onPageChange={() => {}} />}
+    doCaption="A window of five pages, with the first and last pinned."
+    dontExample={<Pagination currentPage={6} totalPages={14} max={14} onPageChange={() => {}} />}
+    dontCaption="Every page in the row pushes the controls wide."
+/>
+
 ### Say how many pages there are.
 
 When the total matters, such as a table of sessions, show it beside the pagination: “Page 3 of 12”. The row alone only shows a window.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-lg)' }}><span>Page 3 of 12</span><Pagination currentPage={3} totalPages={12} onPageChange={() => {}} /></div>}
+    doCaption="The total beside the row."
+    dontExample={<Pagination currentPage={3} totalPages={12} onPageChange={() => {}} />}
+    dontCaption="Only a window of numbers, with no total."
+/>
+
 
 </div>
 
