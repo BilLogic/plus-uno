@@ -1,0 +1,166 @@
+/*
+ * Compliance monitor: the few rules the patterns and components do not cover.
+ * Layout and chrome come from Frame, Section and Card; this file only places
+ * the page's own pieces, on tokens.
+ */
+
+/* The tabs, then the active tab's sections, one section gap apart. */
+.cm-tab-body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-300);
+    min-width: 0;
+}
+
+.cm-muted {
+    color: var(--ds-text-subtle);
+}
+
+.cm-stack {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-050);
+}
+
+.cm-person {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-100);
+}
+
+.cm-note {
+    margin: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+.cm-note--inline {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-050);
+}
+
+/* Headline numbers: a card each, as many to a row as fit. */
+.cm-tiles {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+    gap: var(--space-200);
+}
+
+.cm-tile__value {
+    margin: 0;
+    font: var(--heading-large);
+    color: var(--ds-text);
+    font-variant-numeric: tabular-nums;
+}
+
+.cm-tile__value--alert {
+    color: var(--ds-text-danger);
+}
+
+.cm-tile__label {
+    margin: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
+
+/* Two cards side by side; they stack when the column gets narrow. */
+.cm-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(22rem, 1fr));
+    gap: var(--space-200);
+}
+
+.cm-grid-2 > * {
+    min-width: 0;
+}
+
+.cm-severe-icon {
+    margin-right: var(--space-050);
+    color: var(--ds-icon-danger);
+}
+
+/* What the AI said: its icon leads the quote. */
+.cm-ai-quote {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: var(--space-075);
+}
+
+.cm-ai-quote > svg {
+    flex: none;
+    margin-top: var(--space-025);
+    color: var(--ds-icon-subtle);
+}
+
+/* AI diagnosis: confusion matrix. */
+.cm-matrix {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: var(--space-050);
+    table-layout: fixed;
+}
+
+.cm-matrix th {
+    font: var(--body-small);
+    font-weight: var(--font-weight-bold);
+    color: var(--ds-text-subtle);
+    text-align: start;
+    padding: var(--space-050);
+}
+
+.cm-matrix__cell {
+    padding: var(--space-150);
+    border-radius: var(--radius-md);
+    font: var(--body-small);
+    text-align: center;
+}
+
+.cm-matrix__cell span {
+    display: block;
+}
+
+.cm-matrix__n {
+    font: var(--heading-large);
+    font-variant-numeric: tabular-nums;
+}
+
+.cm-matrix__cell--good {
+    background-color: var(--ds-background-success);
+    color: var(--ds-text-success);
+}
+
+.cm-matrix__cell--bad {
+    background-color: var(--ds-background-danger);
+    color: var(--ds-text-danger);
+}
+
+.cm-reason-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-150);
+    padding: var(--space-100) var(--space-100) var(--space-150);
+}
+
+.cm-audit-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-050);
+    margin-top: var(--space-150);
+}
+
+.cm-audit-group__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-100);
+    margin: 0;
+    padding: 0 var(--space-100);
+    font: var(--heading-xsmall);
+    color: var(--ds-text);
+}
+
+.cm-audit-group__count {
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+}
