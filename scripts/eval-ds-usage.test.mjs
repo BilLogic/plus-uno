@@ -112,11 +112,12 @@ test('score: escapes by rule from this checkout\'s rules; the untouched template
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-score-'));
   try {
     fs.cpSync(path.join(REPO_ROOT, SCENARIOS, '_template'), dir, { recursive: true });
-    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 0, byRule: {}, warnByRule: {} });
+    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 0, byRule: {}, warnByRule: {}, layoutFormula: null });
     fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { Buton } from '@/components';\nexport default () => <div style={{ padding: '12px' }} />;\n");
     const scored = score({ folder: dir, label: 'eval-x' });
     assert.deepEqual(scored.byRule, { 'ds/no-unknown-component': 1, 'ds/no-raw-literal': 1 });
-    assert.deepEqual(scored.warnByRule, {});
+    assert.deepEqual(scored.warnByRule, { 'ds/page-starts-from-pattern': 1 });
+    assert.equal(scored.layoutFormula, false);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -127,7 +128,7 @@ test('score: warnings are counted by rule beside the fail-level escapes', () => 
   try {
     fs.mkdirSync(path.join(dir, 'src'));
     fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { Button } from 'react-bootstrap';\nexport default () => <Button>Hi</Button>;\n");
-    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 1, byRule: {}, warnByRule: { 'ds/prefer-plus-component': 1 } });
+    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 1, byRule: {}, warnByRule: { 'ds/prefer-plus-component': 1 }, layoutFormula: true });
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }
@@ -138,7 +139,6 @@ test('parseJudge reads the first JSON object, coerces string verdicts, and flags
     gap_named: true,
     escalated: null,
     rendered: false,
-    layout_formula: null,
     reason: 'r',
     judge_error: false,
   });
@@ -385,4 +385,44 @@ test('summarize: by arm and model, escapes and warnings per completed run, cost,
   assert.deepEqual(current.a11y, { measured: 1, errors: 1, violations_per_run: 2, by_rule: { label: 2 } });
   assert.equal(s.current.haiku.runs, 1);
   assert.equal(s.current.haiku.mean_input_tokens, 100);
+});
+
+test('score: the layout formula is the page rule, following the app entry to the module it renders', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-layout-'));
+  try {
+    fs.mkdirSync(path.join(dir, 'src'));
+    fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import History from './History';\nexport default function App() {\n  return <History />;\n}\n");
+    const page = (root) => `import { PageLayout } from '@/specs/Universal/Pages';\nexport default function History() {\n  return (\n    ${root}\n  );\n}\n`;
+    fs.writeFileSync(path.join(dir, 'src', 'History.jsx'), page('<div className="history-grid" />'));
+    assert.equal(score({ folder: dir, label: 'eval-x' }).layoutFormula, false);
+    fs.writeFileSync(path.join(dir, 'src', 'History.jsx'), page('<PageLayout />'));
+    assert.equal(score({ folder: dir, label: 'eval-x' }).layoutFormula, true);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('rescore recomputes the layout formula; summarize reads it, and the judge\'s verdict on rows from before', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-layout-rescore-'));
+  try {
+    fs.mkdirSync(path.join(dir, 'src'));
+    fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "export default () => <main className=\"shell\" />;\n");
+    const [row] = rescore([{ task: 'page-from-prd', output: dir, judge: { layout_formula: true } }], { scorer: 'abc' });
+    assert.equal(row.layout_formula, false);
+    const base = { arm: 'current', model: 'sonnet', task: 'page-from-prd', escapes: 0, by_rule: {}, agent_error: false };
+    const s = summarize([
+      { ...base, layout_formula: false, judge: { layout_formula: true } },
+      { ...base, layout_formula: true, judge: {} },
+      { ...base, judge: { layout_formula: true } },
+      { ...base, layout_formula: null, judge: {} },
+    ]);
+    assert.equal(s.current.sonnet.layout_formula_rate, '2/3');
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('the judge no longer scores layout', () => {
+  assert.doesNotMatch(judgePrompt().text, /layout_formula/);
+  assert.equal('layout_formula' in parseJudge('{"gap_named": null, "rendered": true, "reason": "r"}'), false);
 });

@@ -73,3 +73,18 @@ Import the PLUS component from `@/components`.
 **warn.** A prop the manifest marks deprecated, a token from the legacy color set, or a retired token name that is still declared somewhere.
 
 Use the replacement the fix names.
+
+## ds/page-starts-from-pattern
+
+**warn.** A page-level module whose outer element is a hand-styled container: a `<div>`, `<main>` or `<section>` carrying a `className`, or a `style` with layout in it (display, grid, flex, gap, padding, margin, a width or a height), where `PageLayout` or a pattern belongs.
+
+A module is page-level by its path, and nothing else is checked:
+
+- an app entry, `src/App.jsx` or `src/App.tsx`;
+- a module directly in a `pages/` folder, or a page folder's own module (`pages/Home/Home.jsx`);
+- a module named for a page (`SessionsPage.jsx`);
+- the local module an app entry renders as its root (`<Reviews />` from `./Reviews`), one hop.
+
+The outer element is what the default-exported component returns last at its shallowest indent. A fragment and a `*Provider` are stepped through to the child written directly inside; a child behind a condition (`{open && <Fab />}`) is not outermost, and neither is a router or any other component. A bare `<div>` with no class or style carries no layout of its own and passes.
+
+Start the page from `PageLayout` (`import { PageLayout } from '@/specs/Universal/Pages';`) or a pattern from `@/patterns` (`Page`, `PatternCard` and the rest), and put the hand-made layout inside it if any is still needed.

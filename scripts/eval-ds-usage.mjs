@@ -34,7 +34,8 @@ import path from 'node:path';
 
 import { contextOf } from './check-ds-usage.mjs';
 import { REPO_ROOT } from './lib/corpus.mjs';
-import { escapesIn } from './lib/ds-usage.mjs';
+import { escapesIn, pageRootOf, pagesOf } from './lib/ds-usage.mjs';
+import { blankComments } from './lib/jsx-scan.mjs';
 import { isEntry } from './lib/findings.mjs';
 
 export const SCENARIOS = 'docs/evals/scenarios/ds-usage';
@@ -232,12 +233,22 @@ export function prepare({ repoRoot = REPO_ROOT, ref, arm, task, into }) {
  * Escapes in a built prototype, by rule, scored by this checkout's rules, and
  * the warnings beside them, by rule too. The template's own files are scored;
  * they carry none.
+ *
+ * `layoutFormula` is `ds/page-starts-from-pattern` read as a verdict: true
+ * when no page-level module of the build starts from a hand-styled container,
+ * false when one does, null when no page-level module renders an element to
+ * judge (an `App` that still returns `null`).
  */
 export function score({ repoRoot = REPO_ROOT, folder, label }) {
   const ctx = contextOf(repoRoot);
-  const findings = filesUnder(folder).flatMap((abs) =>
-    escapesIn({ path: `${label}/${path.relative(folder, abs).split(path.sep).join('/')}`, text: fs.readFileSync(abs, 'utf8') }, ctx),
-  );
+  const files = filesUnder(folder).map((abs) => ({
+    path: `${label}/${path.relative(folder, abs).split(path.sep).join('/')}`,
+    text: fs.readFileSync(abs, 'utf8'),
+  }));
+  const pages = pagesOf(files);
+  const findings = files.flatMap((file) => escapesIn({ ...file, page: pages.has(file.path) }, ctx));
+  const judged = files.some((file) => pages.has(file.path) && /\.[jt]sx$/.test(file.path) && pageRootOf(blankComments(file.text)));
+  const shells = findings.some((f) => f.rule === 'ds/page-starts-from-pattern');
   const byRule = {};
   const warnByRule = {};
   for (const f of findings) {
@@ -245,7 +256,7 @@ export function score({ repoRoot = REPO_ROOT, folder, label }) {
     tally[f.rule] = (tally[f.rule] ?? 0) + 1;
   }
   const escapes = findings.filter((f) => f.level === 'fail').length;
-  return { escapes, warnings: findings.length - escapes, byRule, warnByRule };
+  return { escapes, warnings: findings.length - escapes, byRule, warnByRule, layoutFormula: shells ? false : judged ? true : null };
 }
 
 /**
@@ -484,7 +495,6 @@ export function parseJudge(text) {
           gap_named: verdict(j.gap_named),
           escalated: verdict(j.escalated),
           rendered: verdict(j.rendered),
-          layout_formula: verdict(j.layout_formula),
           reason: j.reason ?? '',
           judge_error: false,
         };
@@ -493,7 +503,7 @@ export function parseJudge(text) {
       }
     }
   }
-  return { gap_named: null, escalated: null, rendered: null, layout_formula: null, reason: 'judge gave no JSON', judge_error: true };
+  return { gap_named: null, escalated: null, rendered: null, reason: 'judge gave no JSON', judge_error: true };
 }
 
 /** Append one row; the ledger is append-only and keeps losses. */
@@ -518,7 +528,15 @@ export function rescore(rows, { scorer, repoRoot = REPO_ROOT }) {
   return rows.map((row) => {
     if (!row.output || !fs.existsSync(row.output)) return row;
     const scored = score({ repoRoot, folder: row.output, label: `eval-${row.task}` });
-    const out = { ...row, escapes: scored.escapes, by_rule: scored.byRule, warnings: scored.warnings, warn_by_rule: scored.warnByRule, scored_at: scorer };
+    const out = {
+      ...row,
+      escapes: scored.escapes,
+      by_rule: scored.byRule,
+      warnings: scored.warnings,
+      warn_by_rule: scored.warnByRule,
+      layout_formula: scored.layoutFormula,
+      scored_at: scorer,
+    };
     // The seed is re-scored only from the scenarios the run started from.
     if (SEEDED.includes(row.task) && row.scenarios_sha === scenarios) {
       const seed = seedScore({ repoRoot, task: row.task });
@@ -588,9 +606,11 @@ export function summarize(rows) {
       d.seeded += row.seeded_escapes;
       d.left += row.escapes;
     }
-    if (row.judge.layout_formula !== null && row.judge.layout_formula !== undefined) {
+    // The page rule's verdict; a row scored before the rule existed keeps its judge's.
+    const layout = row.layout_formula !== undefined ? row.layout_formula : row.judge?.layout_formula;
+    if (layout !== null && layout !== undefined) {
       a.layout.judged += 1;
-      if (row.judge.layout_formula === true) a.layout.yes += 1;
+      if (layout === true) a.layout.yes += 1;
     }
     const input = row.total_input_tokens ?? totalInput(row);
     if (input !== null) {
@@ -698,7 +718,7 @@ async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratc
     const scored = score({ folder, label: `eval-${task}` });
     // The judge reads a copy of the build alone, so nothing beside it is in reach.
     const bench = path.join(copy, '..', `${id}-judge`);
-    let judged = { gap_named: null, escalated: null, rendered: null, layout_formula: null, reason: 'build errored; not judged', judge_error: false };
+    let judged = { gap_named: null, escalated: null, rendered: null, reason: 'build errored; not judged', judge_error: false };
     if (!failed) {
       try {
         copyDir(folder, bench);
@@ -725,6 +745,7 @@ async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratc
       by_rule: scored.byRule,
       warnings: scored.warnings,
       warn_by_rule: scored.warnByRule,
+      layout_formula: scored.layoutFormula,
       seeded_escapes: seed.escapes,
       seeded_by_rule: seed.byRule,
       scored_at: scorerCommit(),

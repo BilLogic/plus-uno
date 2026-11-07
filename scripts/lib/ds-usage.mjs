@@ -29,6 +29,7 @@ export const RULES = {
   'ds/fa-free-only': { level: 'fail' },
   'ds/prefer-plus-component': { level: 'warn' },
   'ds/no-retired-name': { level: 'warn' },
+  'ds/page-starts-from-pattern': { level: 'warn' },
 };
 
 /** The rule's section in the rules doc, as a link a terminal can open. */
@@ -185,7 +186,7 @@ const didYouMean = (name, candidates, otherwise) => {
  * @param {ReturnType<typeof contextFrom>} ctx
  * @returns {{rule: string, level: 'fail'|'warn', file: string, line: number, col: number, message: string, fix: string}[]}
  */
-export function escapesIn({ path, text: raw }, ctx) {
+export function escapesIn({ path, text: raw, page = isPageModule(path) }, ctx) {
   const text = blankComments(raw);
   const found = [];
   const add = (rule, index, message, fix) => {
@@ -197,6 +198,7 @@ export function escapesIn({ path, text: raw }, ctx) {
     scriptEscapes(text, ctx, add);
     iconEscapes(text, ctx, add);
     tokenEscapes(text, ctx, add);
+    if (page) pageEscapes(text, add);
   } else if (STYLE.test(path)) {
     styleEscapes(text, ctx, add);
     tokenEscapes(text, ctx, add);
@@ -486,4 +488,139 @@ function iconEscapes(text, ctx, add) {
       }
     }
   }
+}
+
+/**
+ * A page-level module, by its path alone: an app entry (`src/App.jsx`), a
+ * module directly in a `pages/` folder or a page folder's own module
+ * (`pages/Home/Home.jsx`), or a module named for a page (`SessionsPage.jsx`).
+ * `pagesOf` adds the module an app entry renders as its root.
+ */
+const PAGE_MODULE = /(?:^|\/)src\/App\.[jt]sx$|(?:^|\/)pages\/[^/]+\.[jt]sx$|(?:^|\/)pages\/([^/]+)\/\1\.[jt]sx$|Page\.[jt]sx$/;
+export const isPageModule = (path) => PAGE_MODULE.test(path) && !/\.(?:test|spec|stories)\.[jt]sx$/.test(path);
+
+/** The containers a page may not hand-style as its outer element. */
+const SHELL_TAGS = new Set(['div', 'main', 'section']);
+const LAYOUT_KEYS = /\b(?:display|grid\w*|flex\w*|gap|rowGap|columnGap|(?:padding|margin)\w*|(?:min|max)?(?:Width|Height)|width|height|alignItems|justifyContent|placeItems)\s*:/;
+
+/**
+ * The body of the module's default-exported component, as an offset range:
+ * `export default function X() {…}`, `export default () => …`, or
+ * `export default X` naming a function or an arrow. An arrow with an expression body is its own range. Null when
+ * the module exports no component this can read.
+ */
+function defaultComponentOf(text) {
+  const direct = /\bexport\s+default\s+(?:function\s*[\w$]*\s*)?\(/.exec(text);
+  let at = direct ? direct.index + direct[0].length - 1 : -1;
+  if (at === -1) {
+    const named = /\bexport\s+default\s+([A-Z][\w$]*)\s*;?\s*$/m.exec(text);
+    if (!named) return null;
+    const name = named[1];
+    const decl =
+      new RegExp(`\\bfunction\\s+${name}\\s*\\(`).exec(text) ??
+      new RegExp(`\\b(?:const|let)\\s+${name}\\s*(?::[^=]+)?=\\s*(?:async\\s*)?(?:\\(|[\\w$]+\\s*=>)`).exec(text);
+    if (!decl) return null;
+    at = decl.index + decl[0].length - 1;
+  }
+  let arrow = text.slice(at - 1, at + 1) === '=>'; // `name => …`
+  if (arrow) at += 1;
+  else {
+    const end = closeOf(text, at);
+    if (end === -1) return null;
+    const head = /^(?:\s*:[^={]+)?\s*(=>)?/.exec(text.slice(end));
+    arrow = Boolean(head[1]);
+    at = end + head[0].length;
+  }
+  const start = at + /^\s*/.exec(text.slice(at))[0].length;
+  if (text[start] !== '{') return arrow ? { start, end: text.length, expression: true } : null;
+  // A top-level component closes at the first `}` that starts a line.
+  const close = text.indexOf('\n}', start);
+  return { start: start + 1, end: close === -1 ? text.length : close, expression: false };
+}
+
+/** Offset of the JSX a `return` (or an arrow's expression body) at `from` renders, else -1. */
+function jsxAt(text, from) {
+  const m = /^\s*\(?\s*</.exec(text.slice(from));
+  return m ? from + m[0].length - 1 : -1;
+}
+
+/**
+ * The element a page renders outermost: the JSX of its component's last
+ * return at the shallowest indent, a fragment or a `*Provider` stepped
+ * through to its first child. Null when there is none to read.
+ */
+export function pageRootOf(text) {
+  const body = defaultComponentOf(text);
+  if (!body) return null;
+  let at = -1;
+  if (body.expression) at = jsxAt(text, body.start);
+  else {
+    // Returns nested in callbacks or blocks sit deeper; of the shallowest, the last renders.
+    let indent = Infinity;
+    const returns = /^([ \t]*)return\b/gm;
+    returns.lastIndex = body.start;
+    for (let m = returns.exec(text); m && m.index < body.end; m = returns.exec(text)) {
+      if (m[1].length > indent) continue;
+      indent = m[1].length;
+      at = jsxAt(text, m.index + m[0].length);
+    }
+  }
+  if (at === -1) return null;
+  const jsx = text.slice(at, body.end);
+  for (const el of jsxElementsOf(jsx)) {
+    // Only a child written directly inside the wrapper is outermost; one behind `{cond && …}` is not.
+    if (el.index > 0 && !jsx.slice(0, el.index).trimEnd().endsWith('>')) return null;
+    if (!/Provider$/.test(el.name)) return { ...el, index: el.index + at };
+  }
+  return null;
+}
+
+/** A relative import's candidate paths, from the importing module's path. */
+function candidatesOf(from, source) {
+  const parts = from.split('/').slice(0, -1);
+  for (const seg of source.split('/')) {
+    if (seg === '..') parts.pop();
+    else if (seg !== '.') parts.push(seg);
+  }
+  const base = parts.join('/');
+  const ext = ['.jsx', '.tsx', '.js', '.ts'];
+  return [base, ...ext.map((e) => base + e), ...ext.map((e) => `${base}/index${e}`)];
+}
+
+/**
+ * The page-level modules among `files`: those `isPageModule` names, and the
+ * local module each app entry renders as its root (`<Reviews />` from
+ * `./Reviews`), one hop. Pure, like the rules.
+ * @param {{path: string, text: string}[]} files
+ */
+export function pagesOf(files) {
+  const known = new Set(files.map((f) => f.path));
+  const pages = new Set(files.filter((f) => isPageModule(f.path)).map((f) => f.path));
+  for (const file of files) {
+    if (!/(?:^|\/)src\/App\.[jt]sx$/.test(file.path)) continue;
+    const text = blankComments(file.text);
+    const root = pageRootOf(text);
+    if (!root || !/^[A-Z]/.test(root.name)) continue;
+    const imp = importsOf(text).find(
+      (i) => i.source.startsWith('.') && (i.default === root.name || i.named.some((n) => n.local === root.name)),
+    );
+    const target = imp && candidatesOf(file.path, imp.source).find((c) => known.has(c));
+    if (target) pages.add(target);
+  }
+  return pages;
+}
+
+function pageEscapes(text, add) {
+  const root = pageRootOf(text);
+  if (!root || !SHELL_TAGS.has(root.name)) return;
+  const className = root.attributes.find((a) => a.name === 'className');
+  const style = root.attributes.find((a) => a.name === 'style');
+  const laidOut = style && (style.value.kind !== 'expression' || !/^\{/.test(style.value.text) || LAYOUT_KEYS.test(style.value.text));
+  if (!className && !laidOut) return;
+  add(
+    'ds/page-starts-from-pattern',
+    root.index,
+    `the page's outer element is a hand-styled \`<${root.name}>\`, not \`PageLayout\` or a pattern`,
+    "wrap the page in `PageLayout` (import { PageLayout } from '@/specs/Universal/Pages'), or start it from a pattern such as `Page` or `PatternCard` (@/patterns)",
+  );
 }

@@ -43,7 +43,7 @@ import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { CONSUMER_ROOTS, loadFacts } from './lib/ds-facts.mjs';
-import { contextFrom, docLink, escapesIn } from './lib/ds-usage.mjs';
+import { contextFrom, docLink, escapesIn, pagesOf } from './lib/ds-usage.mjs';
 import { byRoot, isEntry } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 import { TOKEN_LADDER } from './lib/tokens/plan.mjs';
@@ -183,10 +183,31 @@ export function expandPaths(repoRoot, given) {
   return [...out].sort();
 }
 
+/**
+ * The app entries (`<root>/src/App.jsx`) beside the files, read but not
+ * checked: a module an entry renders as its root is a page, even when the
+ * entry itself is not among the files (the hook checks one file at a time).
+ */
+function entriesBeside(repoRoot, files) {
+  const given = new Set(files);
+  const entries = new Set();
+  for (const rel of files) {
+    const src = rel.match(/^(.*?(?:^|\/)src)\//)?.[1];
+    if (!src) continue;
+    for (const name of ['App.jsx', 'App.tsx']) {
+      const entry = `${src}/${name}`;
+      if (!given.has(entry) && fs.existsSync(path.join(repoRoot, entry))) entries.add(entry);
+    }
+  }
+  return [...entries].map((rel) => read(repoRoot, rel));
+}
+
 /** Every escape in the files, fail and warn. */
 export function escapes(repoRoot, files) {
   const ctx = contextOf(repoRoot);
-  return files.flatMap((rel) => escapesIn(read(repoRoot, rel), ctx));
+  const texts = files.map((rel) => read(repoRoot, rel));
+  const pages = pagesOf([...texts, ...entriesBeside(repoRoot, files)]);
+  return texts.flatMap((file) => escapesIn({ ...file, page: pages.has(file.path) }, ctx));
 }
 
 const keyOf = (f) => `${f.rule} ${f.file}`;

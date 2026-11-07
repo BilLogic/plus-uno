@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { RULES, closest, contextFrom, escapesIn } from './ds-usage.mjs';
+import { RULES, closest, contextFrom, escapesIn, isPageModule, pagesOf } from './ds-usage.mjs';
 
 const ctx = contextFrom({
   components: {
@@ -231,4 +231,60 @@ test('a retired token name: a warning while it is still declared, an unknown tok
 test('closest: the nearest name within a small edit distance, else null', () => {
   assert.equal(closest('Buton', ['Button', 'Modal']), 'Button');
   assert.equal(closest('Zebra', ['Button', 'Modal']), null);
+});
+
+// A page starts from PageLayout or a pattern, not from a hand-made shell.
+const pageRules = (path, text, page) => escapesIn({ path, text, page }, patternCtx).map((f) => [f.rule, f.level]);
+const SHELL = "export default function App() {\n  return (\n    <div style={{ display: 'grid', gap: 0 }}>\n      <h1>Sessions</h1>\n    </div>\n  );\n}\n";
+
+test('ds/page-starts-from-pattern: a page whose outer element is a hand-styled container warns', () => {
+  const [f, ...rest] = escapesIn({ path: 'p/src/App.jsx', text: SHELL }, patternCtx);
+  assert.equal(rest.length, 0);
+  assert.deepEqual([f.rule, f.level, f.line, f.col], ['ds/page-starts-from-pattern', 'warn', 3, 5]);
+  assert.match(f.fix, /PageLayout/);
+  assert.deepEqual(pageRules('p/pages/Home.jsx', 'const Home = () => (\n  <main className="home-grid"><p>x</p></main>\n);\nexport default Home;\n'), [
+    ['ds/page-starts-from-pattern', 'warn'],
+  ]);
+  assert.deepEqual(pageRules('p/src/SessionsPage.jsx', 'export default function SessionsPage({ rows }) {\n  if (!rows) return null;\n  return <section style={styles.page}>{rows.map((r) => {\n    return <div className="row">{r}</div>;\n  })}</section>;\n}\n'), [
+    ['ds/page-starts-from-pattern', 'warn'],
+  ]);
+});
+
+test('ds/page-starts-from-pattern: a PageLayout or pattern root passes, through a fragment or a provider', () => {
+  const layout = PATTERNS + 'export default function App() {\n  return (\n    <PageLayout frame="focused">\n      <div style={{ display: \'flex\' }} />\n    </PageLayout>\n  );\n}\n';
+  assert.deepEqual(pageRules('p/src/App.jsx', layout), []);
+  const card = PATTERNS + 'export default function Home() {\n  return (\n    <>\n      <PatternCard title="x" />\n    </>\n  );\n}\n';
+  assert.deepEqual(pageRules('p/pages/Home/Home.jsx', card), []);
+  const provided = 'export default function App() {\n  return (\n    <ThemeProvider value={t}>\n      <div className="shell" />\n    </ThemeProvider>\n  );\n}\n';
+  assert.deepEqual(pageRules('p/src/App.jsx', provided), [['ds/page-starts-from-pattern', 'warn']]);
+  assert.deepEqual(pageRules('p/src/App.jsx', 'export default function App() {\n  return <div><PatternCard title="x" /></div>;\n}\n'), [], 'a bare wrapper carries no layout of its own');
+  assert.deepEqual(pageRules('p/src/App.jsx', 'export default function App() {\n  return null;\n}\n'), []);
+  assert.deepEqual(pageRules('p/src/App.jsx', 'export default function App() {\n  return (\n    <>\n      {open && <div className="fab" />}\n    </>\n  );\n}\n'), [], 'a conditional child is not the outer element');
+});
+
+test('ds/page-starts-from-pattern: a module that is not a page is not checked', () => {
+  assert.equal(isPageModule('prototypes/x/src/components/Panel.jsx'), false);
+  assert.deepEqual(pageRules('prototypes/x/src/components/Panel.jsx', SHELL), []);
+  assert.deepEqual(pageRules('p/src/App.jsx', SHELL, false), [], 'the caller may say a module is not a page');
+  assert.deepEqual(pageRules('p/src/Panel.jsx', SHELL, true), [['ds/page-starts-from-pattern', 'warn']], 'or that it is one');
+  for (const page of ['prototypes/x/src/App.jsx', 'src/App.tsx', 'prototypes/x/src/pages/Home.jsx', 'src/pages/Market/Market.jsx', 'eval-x/src/HistoryPage.jsx']) {
+    assert.equal(isPageModule(page), true, page);
+  }
+  for (const other of ['src/pages/Market/MarketCard.jsx', 'src/main.jsx', 'src/pages/Home.stories.jsx', 'src/pages/Home.css']) {
+    assert.equal(isPageModule(other), false, other);
+  }
+});
+
+test('pagesOf: the module an app entry renders as its root is a page too', () => {
+  const files = [
+    { path: 'eval-x/src/App.jsx', text: "import Reviews from './Reviews';\nexport default function App() {\n  return <Reviews />;\n}\n" },
+    { path: 'eval-x/src/Reviews.jsx', text: SHELL },
+    { path: 'eval-x/src/Row.jsx', text: SHELL },
+  ];
+  assert.deepEqual([...pagesOf(files)].sort(), ['eval-x/src/App.jsx', 'eval-x/src/Reviews.jsx']);
+  const provided = [
+    { path: 'p/src/App.jsx', text: "import { Shell } from './shell/index';\nexport default function App() {\n  return (\n    <AppProvider>\n      <Shell />\n    </AppProvider>\n  );\n}\n" },
+    { path: 'p/src/shell/index.jsx', text: SHELL },
+  ];
+  assert.ok(pagesOf(provided).has('p/src/shell/index.jsx'));
 });
