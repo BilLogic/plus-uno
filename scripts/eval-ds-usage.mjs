@@ -21,7 +21,7 @@
  * Everything but the agent and judge calls is deterministic: the copies, the
  * scoring, the ledger rows and the summary.
  *
- *   node scripts/eval-ds-usage.mjs run [--arms control,current] [--tasks a,b] [--runs 5] [--model sonnet] [--ref origin/main] [--scratch DIR]
+ *   node scripts/eval-ds-usage.mjs run [--arms control,current] [--tasks a,b] [--runs 2] [--allow-metered] [--model sonnet] [--ref origin/main] [--scratch DIR]
  *   node scripts/eval-ds-usage.mjs summary [--since YYYY-MM-DD]
  *   node scripts/eval-ds-usage.mjs rescore   re-score every kept build with this checkout's rules
  */
@@ -60,6 +60,21 @@ export const TASKS = [
  */
 export const SEEDED = ['debt-extend', 'migrate-retired'];
 export const ARMS = ['control', 'current', 'hook-off', 'checker-removed'];
+/**
+ * The default run is small: three arms, four tasks, two runs, 24 builds. It
+ * answers the first question (does the harness or the checker earn the
+ * result) at a cost one subscription window absorbs. Widen it by flags only
+ * when a small run leaves the answer unclear.
+ */
+export const DEFAULT_ARMS = ['control', 'current', 'checker-removed'];
+export const DEFAULT_TASKS = ['page-from-prd', 'trap-missing-component', 'debt-extend', 'forbidden-ask'];
+/** Variables that send `claude -p` to metered billing instead of the subscription login. */
+export const METERED = ['ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'CLAUDE_CODE_USE_VERTEX', 'CLAUDE_CODE_USE_BEDROCK'];
+
+/** The metered-billing variables set in `env`; a run refuses to start on any of them unless `--allow-metered`. */
+export function meteredIn(env) {
+  return METERED.filter((name) => env[name]);
+}
 /** Durable copies of what each agent built, beside the ledger row that scores it. */
 export const OUTPUTS = path.join(os.homedir(), 'Documents/Claude/Projects/PLUS/evals/ds-usage');
 
@@ -687,11 +702,12 @@ export function options(argv) {
     if (unknown.length) throw new Error(`--${name}: unknown ${unknown.join(', ')} (known: ${allowed.join(', ')})`);
     return items;
   };
-  const runs = Number(value('runs', '5'));
+  const runs = Number(value('runs', '2'));
   if (!Number.isInteger(runs) || runs < 1) throw new Error('--runs takes a whole number from 1');
   return {
-    arms: list('arms', ARMS, ARMS),
-    tasks: list('tasks', TASKS, TASKS),
+    arms: list('arms', DEFAULT_ARMS, ARMS),
+    tasks: list('tasks', DEFAULT_TASKS, TASKS),
+    allowMetered: argv.includes('--allow-metered'),
     runs,
     model: value('model', 'sonnet'),
     ref: value('ref', 'origin/main'),
@@ -790,7 +806,13 @@ if (isEntry(import.meta.url)) {
   const [command, ...rest] = process.argv.slice(2);
   try {
     const opts = options(rest);
-    if (command === 'run') await runAll(opts);
+    if (command === 'run') {
+      const metered = meteredIn(process.env);
+      if (metered.length && !opts.allowMetered) {
+        throw new Error(`${metered.join(', ')} set: this run would bill per token. Unset it to run on the subscription login, or pass --allow-metered.`);
+      }
+      await runAll(opts);
+    }
     else if (command === 'rescore') {
       const rows = rescore(readLedger(), { scorer: scorerCommit() });
       fs.writeFileSync(path.join(REPO_ROOT, LEDGER), rows.map((r) => `${JSON.stringify(r)}\n`).join(''));

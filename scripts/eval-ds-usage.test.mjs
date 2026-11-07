@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { rescore, seedScore, SEEDED, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf } from './eval-ds-usage.mjs';
+import { meteredIn, rescore, seedScore, SEEDED, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf } from './eval-ds-usage.mjs';
 import { spawnSync } from 'node:child_process';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
@@ -201,8 +201,10 @@ test('a11y: a missing browser or server is recorded as a11y_error, never thrown'
   assert.deepEqual(out, { a11y_violations: null, a11y_error: 'no playwright' });
 });
 
-test('options: runs default to five; one arm and a model are taken as given', () => {
-  assert.equal(options([]).runs, 5);
+test('options: the default run is small; one arm and a model are taken as given', () => {
+  const d = options([]);
+  assert.deepEqual([d.runs, d.arms, d.tasks.length, d.allowMetered], [2, ['control', 'current', 'checker-removed'], 4, false]);
+  assert.equal(options(['--allow-metered']).allowMetered, true);
   assert.equal(options(['--runs', '2']).runs, 2);
   const o = options(['run', '--arms', 'control', '--model', 'haiku']);
   assert.deepEqual([o.arms, o.model], [['control'], 'haiku']);
@@ -426,4 +428,9 @@ test('rescore recomputes the layout formula; summarize reads it, and the judge\'
 test('the judge no longer scores layout', () => {
   assert.doesNotMatch(judgePrompt().text, /layout_formula/);
   assert.equal('layout_formula' in parseJudge('{"gap_named": null, "rendered": true, "reason": "r"}'), false);
+});
+
+test('meteredIn: names the variables that would bill per token', () => {
+  assert.deepEqual(meteredIn({}), []);
+  assert.deepEqual(meteredIn({ ANTHROPIC_API_KEY: 'k', CLAUDE_CODE_USE_VERTEX: '1', HOME: '/x' }), ['ANTHROPIC_API_KEY', 'CLAUDE_CODE_USE_VERTEX']);
 });
