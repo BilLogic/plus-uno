@@ -281,3 +281,28 @@ export const ModalLeavesThePopupOpen = {
         await expect(p.popup(), 'still open after the Modal').not.toBeNull();
     }),
 };
+
+/**
+ * The trust marks: every answer carries the AI icon (once, from AiMessage),
+ * and the fallibility line sits once under the prompt input, not per message.
+ */
+export const TrustMarks = {
+    parameters: { docs: { height: DOCS_HEIGHT } },
+    play: async ({ canvasElement }) => withTestViewport(1440, HEIGHT, async () => {
+        const p = parts(canvasElement);
+        await userEvent.click(p.fab());
+        await waitFor(() => expect(p.popup()).not.toBeNull());
+        const popup = within(p.popup());
+        const line = popup.getByText('AI can make mistakes. Check important info.');
+        const input = popup.getByRole('textbox', { name: 'Message to AI chat' });
+        await expect(
+            input.compareDocumentPosition(line) & Node.DOCUMENT_POSITION_FOLLOWING,
+            'the line sits under the prompt input',
+        ).toBeTruthy();
+        await userEvent.type(input, 'Hello there{Enter}');
+        await waitFor(() => expect(popup.getByText(/You asked: "Hello there"/)).toBeInTheDocument());
+        const reply = popup.getByText(/You asked: "Hello there"/).closest('.plus-ai-chat__message');
+        await expect(within(reply).getAllByRole('img', { name: 'AI' }), 'one AI icon per answer').toHaveLength(1);
+        await expect(popup.getAllByText('AI can make mistakes. Check important info.'), 'said once').toHaveLength(1);
+    }),
+};

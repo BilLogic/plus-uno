@@ -6,6 +6,18 @@ import AiMessage, { TypingText } from '.';
 afterEach(() => vi.useRealTimers());
 
 describe('AiMessage', () => {
+    it('is marked as AI by the small AI icon, named for assistive technology', () => {
+        const { container } = render(<AiMessage text="Here is the plan." />);
+        const icon = screen.getByRole('img', { name: 'AI' });
+        expect(container.firstChild.firstChild).toBe(icon);
+        expect(icon).toHaveClass('plus-ai-message__icon');
+    });
+
+    it('carries the AI icon while thinking too', () => {
+        render(<AiMessage status="thinking" />);
+        expect(screen.getByRole('img', { name: 'AI' })).toBeInTheDocument();
+    });
+
     it('shows a finished message as plain text, not busy', () => {
         const { container } = render(<AiMessage text="Here is the plan." />);
         expect(screen.getByText('Here is the plan.')).toBeInTheDocument();

@@ -3,7 +3,7 @@
 
 # AiMessage
 
-An assistant reply. The content is `text`, or `parts` when a reply mixes text with other content: a part is `{ type: 'text', text }` or any other `{ type, ... }`, which `renderPart` draws. - `status="complete"` is a finished message. - `status="streaming"` is text still arriving: a caret follows the last character and the message is marked busy for assistive technology. - `status="thinking"` is the typing indicator, before any text exists.
+An assistant reply, marked as AI by the small AI icon at its start (named "AI" for assistive technology), so no answer reads as a person's. The content is `text`, or `parts` when a reply mixes text with other content: a part is `{ type: 'text', text }` or any other `{ type, ... }`, which `renderPart` draws. - `status="complete"` is a finished message. - `status="streaming"` is text still arriving: a caret follows the last character and the message is marked busy for assistive technology. - `status="thinking"` is the typing indicator, before any text exists.
 
 **Import:** `import { AiMessage } from '@/components';`
 
@@ -32,7 +32,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-text` · `--ds-text-subtle` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-easing-standard` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--stack-md` · `--stack-sm`
+`--body-default` · `--ds-text` · `--ds-text-subtle` · `--icon-md` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-easing-standard` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/labels/AiMessage/AiMessage.scss`. Override these through the token layer, never with a literal.
 

@@ -50,6 +50,9 @@ const useNarrow = () => {
     return narrow;
 };
 
+/** The one fallibility line, under the prompt input. */
+export const AI_CHAT_DISCLAIMER = 'AI can make mistakes. Check important info.';
+
 const AiChatContext = createContext(null);
 
 /** The chat's state and actions, for anything inside an `AiChat`. Null outside one. */
@@ -122,7 +125,6 @@ const ChatSurface = ({ presentation }) => {
                         <p className="plus-ai-chat__empty">Ask about what you are working on.</p>
                     ) : messages.map((m) => (
                         <div key={m.id} className={`plus-ai-chat__message plus-ai-chat__message--${m.role}`}>
-                            {m.role === 'ai' ? <AiIcon name="generate" label="AI" /> : null}
                             {m.role === 'ai'
                                 ? <AiMessage className="plus-ai-chat__text" text={m.text} />
                                 : <p className="plus-ai-chat__text">{m.text}</p>}
@@ -130,7 +132,6 @@ const ChatSurface = ({ presentation }) => {
                     ))}
                     {loading ? (
                         <div className="plus-ai-chat__message plus-ai-chat__message--ai">
-                            <AiIcon name="generate" label="AI" />
                             <AiMessage className="plus-ai-chat__text" status="thinking" />
                         </div>
                     ) : null}
@@ -149,6 +150,8 @@ const ChatSurface = ({ presentation }) => {
                     isLoading={loading}
                     onStop={stop}
                 />
+                {/* Fallibility, said once under the input, never per message. */}
+                <p className="plus-ai-chat__disclaimer">{AI_CHAT_DISCLAIMER}</p>
             </PanelFooter>
         </PanelContainer>
     );

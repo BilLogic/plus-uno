@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import AiIcon from '@/components/images-and-icons/AiIcon';
 import './AiMessage.scss';
 
 export const AI_MESSAGE_STATUSES = ['complete', 'streaming', 'thinking'];
@@ -60,7 +61,9 @@ const TypingIndicator = () => (
 );
 
 /**
- * An assistant reply. The content is `text`, or `parts` when a reply mixes
+ * An assistant reply, marked as AI by the small AI icon at its start (named
+ * "AI" for assistive technology), so no answer reads as a person's. The
+ * content is `text`, or `parts` when a reply mixes
  * text with other content: a part is `{ type: 'text', text }` or any other
  * `{ type, ... }`, which `renderPart` draws.
  *
@@ -87,24 +90,27 @@ const AiMessage = ({
             aria-busy={status === 'streaming' ? true : undefined}
             {...rest}
         >
-            {status === 'thinking' ? <TypingIndicator /> : items.map((part, index) => {
-                if (!part) return null;
-                if (part.type === 'text') {
-                    const streaming = status === 'streaming' && index === lastText;
-                    return (
-                        <p key={index} className="plus-ai-message__text">
-                            {typeOut && status === 'complete' ? (
-                                <>
-                                    <span className="plus-ai-message__sr">{part.text}</span>
-                                    <span aria-hidden="true"><TypingText text={part.text} /></span>
-                                </>
-                            ) : part.text}
-                            {streaming ? <span className="plus-ai-message__caret" aria-hidden="true" /> : null}
-                        </p>
-                    );
-                }
-                return <div key={index} className="plus-ai-message__part">{renderPart?.(part, index) ?? null}</div>;
-            })}
+            <AiIcon name="generate" size={16} label="AI" className="plus-ai-message__icon" />
+            <div className="plus-ai-message__body">
+                {status === 'thinking' ? <TypingIndicator /> : items.map((part, index) => {
+                    if (!part) return null;
+                    if (part.type === 'text') {
+                        const streaming = status === 'streaming' && index === lastText;
+                        return (
+                            <p key={index} className="plus-ai-message__text">
+                                {typeOut && status === 'complete' ? (
+                                    <>
+                                        <span className="plus-ai-message__sr">{part.text}</span>
+                                        <span aria-hidden="true"><TypingText text={part.text} /></span>
+                                    </>
+                                ) : part.text}
+                                {streaming ? <span className="plus-ai-message__caret" aria-hidden="true" /> : null}
+                            </p>
+                        );
+                    }
+                    return <div key={index} className="plus-ai-message__part">{renderPart?.(part, index) ?? null}</div>;
+                })}
+            </div>
         </div>
     );
 };
