@@ -23,7 +23,8 @@ An assistant reply, marked as AI by the small AI icon at its start (named "AI" f
 | `typeOut` | bool | `false` | Types a finished text out character by character, as a reply that has just arrived. |
 | `renderPart` | func | — | Draws a part that is not text: `(part, index) => node`. |
 | `sources` | arrayOf (required) | — | What a finished answer read: one `{ title, href, type }` per source, listed under the message. |
-| `onFeedback` | func | — | Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`. |
+| `linkTarget` | string | — | Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`. |
+| `onFeedback` | func | — | — |
 | `feedback` | enum | — | The rating, when the page owns it: `up`, `down` or null. |
 | `className` | string | — | — |
 

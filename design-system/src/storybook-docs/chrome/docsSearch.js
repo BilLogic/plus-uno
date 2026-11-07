@@ -1,7 +1,7 @@
 /**
  * The Storybook docs' AI agent's first answerer: no model, no key. It searches
  * the pages Storybook lists (index.json) and the component names the
- * generated component index carries, and replies with links to what matches.
+ * generated component index carries, and replies with the pages that match as its sources.
  * Pure functions, so every rule is tested without a browser.
  */
 
@@ -63,29 +63,30 @@ const score = (entry, tokens, whole) => {
 };
 
 /**
- * `(query, entries, { href }) => { text, links }`. `href(id, type)` builds a
- * link's target, so the caller owns where Storybook lives.
+ * `(query, entries, { href }) => { text, sources }`, one `{ title, href, type }`
+ * per matching page. `href(id, type)` builds a source's address, so the caller owns where Storybook lives.
  */
 export const answerDocsQuery = (query, entries, { href }) => {
     const tokens = normalize(query ?? '').split(' ').filter((t) => t && !STOP_WORDS.has(t));
     if (tokens.length === 0) {
-        return { text: 'Ask me about a component or a docs page by name, such as "Button" or "Color".', links: [] };
+        return { text: 'Ask me about a component or a docs page by name, such as "Button" or "Color".', sources: [] };
     }
     const ranked = entries
         .map((entry) => ({ entry, points: score(entry, tokens, tokens.join(' ')) }))
         .filter((r) => r.points > 0)
         .sort((a, b) => b.points - a.points || a.entry.title.localeCompare(b.entry.title));
     const withPage = ranked.filter((r) => r.entry.id);
-    const links = withPage.slice(0, MAX_LINKS).map(({ entry }) => ({
-        label: entry.name,
+    const sources = withPage.slice(0, MAX_LINKS).map(({ entry }) => ({
+        title: entry.name,
         href: href(entry.id, entry.type),
+        type: entry.type === 'docs' ? 'Docs page' : 'Story',
     }));
-    if (links.length > 0) {
-        return { text: links.length === 1 ? 'This page matches:' : 'These pages match:', links };
+    if (sources.length > 0) {
+        return { text: sources.length === 1 ? 'This page matches.' : 'These pages match.', sources };
     }
     const missing = ranked.find((r) => !r.entry.id);
     if (missing) {
-        return { text: `${missing.entry.name} is in the component index, but it has no docs page here yet.`, links: [] };
+        return { text: `${missing.entry.name} is in the component index, but it has no docs page here yet.`, sources: [] };
     }
-    return { text: 'I found no page for that. Try a component name, such as "Button" or "Modal".', links: [] };
+    return { text: 'I found no page for that. Try a component name, such as "Button" or "Modal".', sources: [] };
 };

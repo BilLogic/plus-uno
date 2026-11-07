@@ -86,6 +86,7 @@ const AiMessage = ({
     typeOut = false,
     renderPart,
     sources,
+    linkTarget,
     onFeedback,
     feedback,
     className,
@@ -120,7 +121,7 @@ const AiMessage = ({
                     }
                     return <div key={index} className="plus-ai-message__part">{renderPart?.(part, index) ?? null}</div>;
                 })}
-                {status === 'complete' && sources?.length ? <AiSources sources={sources} /> : null}
+                {status === 'complete' && sources?.length ? <AiSources sources={sources} target={linkTarget} /> : null}
                 {status === 'complete' && onFeedback ? <AiFeedback value={feedback} onFeedback={onFeedback} /> : null}
             </div>
         </div>
@@ -145,6 +146,8 @@ AiMessage.propTypes = {
         type: PropTypes.string,
     })),
     /** Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`. */
+    /** Where the source links open, such as `_top` from inside a frame. */
+    linkTarget: PropTypes.string,
     onFeedback: PropTypes.func,
     /** The rating, when the page owns it: `up`, `down` or null. */
     feedback: PropTypes.oneOf(['up', 'down', null]),

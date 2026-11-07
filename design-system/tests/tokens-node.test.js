@@ -571,7 +571,8 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // 162: Rating moved onto --ds- icon tokens, and its two hex fallbacks went.
     // 161: the research assistant chat moved onto the AI components, and its
     // hand-drawn bubble's color fallback went.
-    expect(comparable).toBe(161);
+    // 158: its skeleton shimmer moved onto --ds-skeleton-subtle, and three more went.
+    expect(comparable).toBe(158);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

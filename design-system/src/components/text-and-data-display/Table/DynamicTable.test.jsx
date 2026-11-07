@@ -234,3 +234,10 @@ describe('DynamicTable announcements and highlights', () => {
         expect(body.map((r) => r.classList.contains('plus-dynamic-table-row--highlighted'))).toEqual([true, false, true, false, false]);
     });
 });
+
+describe('DynamicTable half-controlled sort', () => {
+    it('takes the order from the page and the key from defaultSortKey', () => {
+        render(<DynamicTable head={head} rows={rows} defaultSortKey="student" sortOrder="descending" />);
+        expect(bodyNames()[0]).toBe('Priya Nair');
+    });
+});

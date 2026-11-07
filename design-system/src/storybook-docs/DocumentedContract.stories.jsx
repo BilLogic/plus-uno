@@ -159,9 +159,14 @@ const VISIBILITY = ['show', 'open', 'isOpen', 'visible'];
  */
 const RENDERS_WITH = {
   CountTag: { value: 1 },
+  // A sortable column and two rows out of order, so every sort variant draws differently.
   DynamicTable: {
-    head: { cells: [{ key: 'name', content: 'Name' }] },
-    rows: [{ key: 'ava', cells: [{ key: 'Ava', content: 'Ava' }] }],
+    head: { cells: [{ key: 'name', content: 'Name', isSortable: true }] },
+    rows: [
+      { key: 'bea', cells: [{ key: 'Bea', content: 'Bea' }] },
+      { key: 'ava', cells: [{ key: 'Ava', content: 'Ava' }] },
+    ],
+    defaultSortKey: 'name',
   },
   TreeTable: {
     head: { cells: [{ key: 'name', content: 'Name' }] },

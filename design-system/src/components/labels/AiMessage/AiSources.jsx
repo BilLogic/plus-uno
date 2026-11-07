@@ -12,7 +12,7 @@ const SHOWN = 3;
  * source with its title as a link and its type beside it. Past three, the
  * rest fold behind "Show N more sources".
  */
-export const AiSources = ({ sources = [], className = '' }) => {
+export const AiSources = ({ sources = [], target, className = '' }) => {
     const [open, setOpen] = useState(false);
     const headingId = useId();
     if (sources.length === 0) return null;
@@ -24,7 +24,7 @@ export const AiSources = ({ sources = [], className = '' }) => {
             <ul className="plus-ai-sources__list" aria-labelledby={headingId}>
                 {shown.map((source) => (
                     <li key={source.href} className="plus-ai-sources__item">
-                        <Link href={source.href} isOpenInNewWindow={/^https?:/.test(source.href)}>{source.title}</Link>
+                        <Link href={source.href} target={target} isOpenInNewWindow={!target && /^https?:/.test(source.href)}>{source.title}</Link>
                         {source.type ? <span className="plus-ai-sources__type">{source.type}</span> : null}
                     </li>
                 ))}
@@ -49,6 +49,8 @@ AiSources.propTypes = {
         href: PropTypes.string.isRequired,
         type: PropTypes.string,
     })),
+    /** Where the source links open, such as `_top` from inside a frame. Without it, outside links open in a new window. */
+    target: PropTypes.string,
     className: PropTypes.string,
 };
 

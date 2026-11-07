@@ -360,7 +360,7 @@ const DOCS_PANEL_KEY = 'plus-frame-panel-storybook';
 
 /**
  * The docs' floating button with the AI agent it opens, answered by the
- * docs-agent function (faked here), with the search's links under the answer.
+ * docs-agent function (faked here), with the search's pages as the answer's sources.
  * Open from the button, ask, follow the link, clear, move to the Panel and
  * back, close.
  */

@@ -50,42 +50,42 @@ describe('buildDocsEntries', () => {
 describe('answerDocsQuery', () => {
     it('links the docs page for an asked component name', () => {
         const reply = ask('How do I use Button?');
-        expect(reply.links[0]).toEqual({ label: 'Button', href: '/?path=/docs/components-forms-and-inputs-button-button--docs' });
+        expect(reply.sources[0]).toEqual({ title: 'Button', href: '/?path=/docs/components-forms-and-inputs-button-button--docs', type: 'Docs page' });
     });
     it('matches case-insensitively', () => {
-        expect(ask('checkbox').links[0].label).toBe('Checkbox');
+        expect(ask('checkbox').sources[0].title).toBe('Checkbox');
     });
     it('links a story when a title has no docs page', () => {
-        expect(ask('checkbox').links[0].href).toBe('/?path=/story/components-forms-and-inputs-checkbox--overview');
+        expect(ask('checkbox').sources[0].href).toBe('/?path=/story/components-forms-and-inputs-checkbox--overview');
     });
     it('finds non-component pages by title words', () => {
-        expect(ask('where is the color page').links.map((l) => l.label)).toContain('Color');
+        expect(ask('where is the color page').sources.map((s) => s.title)).toContain('Color');
     });
     it('says so when a component exists in the index but has no page', () => {
         const reply = ask('tooltip');
-        expect(reply.links).toEqual([]);
+        expect(reply.sources).toEqual([]);
         expect(reply.text).toMatch(/Tooltip/);
         expect(reply.text).toMatch(/no docs page/i);
     });
-    it('answers an unknown question without links', () => {
+    it('answers an unknown question without sources', () => {
         const reply = ask('zzzz qqqq');
-        expect(reply.links).toEqual([]);
+        expect(reply.sources).toEqual([]);
         expect(reply.text).toMatch(/component name/i);
     });
-    it('answers an empty question without links', () => {
-        expect(ask('   ').links).toEqual([]);
+    it('answers an empty question without sources', () => {
+        expect(ask('   ').sources).toEqual([]);
     });
     it('ranks a multi-word name above partial matches', () => {
         const list = buildDocsEntries({ entries: {
             'a--docs': { id: 'a--docs', title: 'Forms/Date', type: 'docs' },
             'b--docs': { id: 'b--docs', title: 'Forms/Date picker', type: 'docs' },
         } }, []);
-        expect(answerDocsQuery('date picker', list, { href }).links[0].label).toBe('Date picker');
+        expect(answerDocsQuery('date picker', list, { href }).sources[0].title).toBe('Date picker');
     });
-    it('caps the links', () => {
+    it('caps the sources', () => {
         const many = buildDocsEntries({ entries: Object.fromEntries(Array.from({ length: 12 }, (_, i) => [
             `x-${i}--docs`, { id: `x-${i}--docs`, title: `Group/Card ${i}`, type: 'docs' },
         ])) }, []);
-        expect(answerDocsQuery('card', many, { href }).links).toHaveLength(5);
+        expect(answerDocsQuery('card', many, { href }).sources).toHaveLength(5);
     });
 });

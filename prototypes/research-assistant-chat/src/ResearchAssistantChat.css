@@ -12,7 +12,7 @@
 .sparkline-bg {
     position: absolute;
     right: 0;
-    bottom: 8px;
+    bottom: var(--pad-x-sm);
     pointer-events: none;
     opacity: 1;
 }
@@ -32,9 +32,9 @@
 .plus-skeleton-block {
     display: block;
     background: linear-gradient(90deg,
-            var(--color-outline-variant, #e0e0e0) 0%,
+            var(--ds-skeleton-subtle) 0%,
             var(--ds-skeleton) 50%,
-            var(--color-outline-variant, #e0e0e0) 100%);
+            var(--ds-skeleton-subtle) 100%);
     background-size: 200% 100%;
     animation: skeleton-shimmer 2s ease-in-out infinite;
     border-radius: var(--size-surface-radius, 8px);
@@ -43,7 +43,7 @@
 @media (prefers-reduced-motion: reduce) {
     .plus-skeleton-block {
         animation: none;
-        background: var(--color-outline-variant, #e0e0e0);
+        background: var(--ds-skeleton-subtle);
     }
 }
 
@@ -51,7 +51,7 @@
 @keyframes revealIn {
     from {
         opacity: 0;
-        transform: translateY(24px);
+        transform: translateY(var(--page-pad));
     }
 
     to {
@@ -62,7 +62,7 @@
 
 .admin-reveal-root .reveal-section {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(var(--page-pad));
 }
 
 .admin-reveal-root.has-entered .reveal-section {
@@ -93,7 +93,7 @@
 :is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-section-title,
 :is(#tutor-training-progress-page, #home-redesign-page) .plus-page-sidebar-wrapper.shell-reveal .plus-sidebar-tab {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(var(--page-pad));
 }
 
 /* TopBar Stagger (Rolls in after skeletons) */
@@ -188,12 +188,7 @@
 
 .chat-footer {
     flex-shrink: 0;
-    padding: 16px 24px;
-    /* border-top: 1px solid #e0e0e0; */
-
-    /* Screenshot shows it floating or sitting at bottom. I'll include border-top for definition but make it subtle if needed. */
-    /* Actually reference screenshot shows just the input on a white background. */
-    padding-bottom: 24px;
+    padding: var(--pad-x-lg) var(--page-pad) var(--page-pad);
     width: 100%;
     margin: 0 auto;
 }
@@ -230,4 +225,9 @@
     font: var(--body-small);
     color: var(--ds-text-subtle);
     text-align: center;
+}
+
+/* Room under the last turn, so it scrolls clear of the footer. */
+.research-chat-end {
+    height: calc(var(--page-pad) * 5);
 }

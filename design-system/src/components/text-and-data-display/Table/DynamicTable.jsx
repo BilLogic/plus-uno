@@ -125,10 +125,12 @@ const DynamicTable = ({
     testId,
     ...props
 }) => {
-    const sortControlled = sortKeyProp !== undefined;
+    // The key and the order are each the page's once it passes them, and the table's until then.
+    const keyControlled = sortKeyProp !== undefined;
+    const orderControlled = sortOrderProp !== undefined;
     const [ownSort, setOwnSort] = useState({ key: defaultSortKey, order: defaultSortKey ? defaultSortOrder : 'none' });
-    const sortKey = sortControlled ? sortKeyProp : ownSort.key;
-    const sortOrder = sortControlled ? (sortOrderProp || 'none') : ownSort.order;
+    const sortKey = keyControlled ? sortKeyProp : ownSort.key;
+    const sortOrder = orderControlled ? sortOrderProp : ownSort.order;
 
     const pageControlled = pageProp !== undefined;
     const [ownPage, setOwnPage] = useState(defaultPage);
@@ -174,7 +176,7 @@ const DynamicTable = ({
     const showsMessage = !['default', 'refreshing'].includes(bodyState);
 
     const handleSort = (key) => (order) => {
-        if (!sortControlled) setOwnSort({ key, order });
+        if (!keyControlled || !orderControlled) setOwnSort({ key, order });
         if (onSort) onSort({ key, sortOrder: order });
     };
 

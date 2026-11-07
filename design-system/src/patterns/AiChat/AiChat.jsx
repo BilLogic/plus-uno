@@ -58,24 +58,11 @@ const AiChatContext = createContext(null);
 /** The chat's state and actions, for anything inside an `AiChat`. Null outside one. */
 export const useAiChat = () => useContext(AiChatContext);
 
-const textOf = (m) => (m.links?.length ? `${m.text}\n${m.links.map((l) => `${l.label}: ${l.href}`).join('\n')}` : m.text);
+const textOf = (m) => (m.sources?.length ? `${m.text}\n${m.sources.map((s) => `${s.title}: ${s.href}`).join('\n')}` : m.text);
 
 const transcriptOf = (messages) => messages
     .map((m) => `${m.role === 'user' ? 'You' : 'AI'}: ${textOf(m)}`)
     .join('\n\n');
-
-/** A reply's links, drawn after its text: `{ label, href }`, opening in the host's `linkTarget`. */
-const renderReplyPart = (part, index) => (
-    <ul key={index} className="plus-ai-chat__links">
-        {part.links.map((l, i) => (
-            <li key={`${i}-${l.href}`}><a href={l.href} target={part.target}>{l.label}</a></li>
-        ))}
-    </ul>
-);
-
-const partsOf = (m, target) => (m.links?.length
-    ? [{ type: 'text', text: m.text }, { type: 'links', links: m.links, target }]
-    : [{ type: 'text', text: m.text }]);
 
 /**
  * One chat surface for every mode: the Panel parts (header, body, footer)
@@ -144,9 +131,9 @@ const ChatSurface = ({ presentation }) => {
                                 ? (
                                     <AiMessage
                                         className="plus-ai-chat__text"
-                                        parts={partsOf(m, linkTarget)}
-                                        renderPart={renderReplyPart}
+                                        text={m.text}
                                         sources={m.sources}
+                                        linkTarget={linkTarget}
                                         feedback={m.feedback ?? null}
                                         onFeedback={(feedback) => rate(m, feedback)}
                                     />
@@ -271,7 +258,7 @@ const Launcher = () => {
  *   close only, with no full screen and no more menu.
  * - The conversation is kept in memory and moves with the mode. There is no
  *   history, and no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`.
- *   A reply is text, or `{ text, links, sources }`: links follow the text, and the sources it drew on list under it.
+ *   A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.
  */
 const AiChat = ({
     variant = 'app',
@@ -339,9 +326,9 @@ const AiChat = ({
         if (pending.current !== ticket) return;
         setLoading(false);
         if (reply == null) return;
-        // A reply is its text, or `{ text, links, sources }`; sources are the records it drew on.
-        const { text: replyText, links, sources } = typeof reply === 'string' ? { text: reply } : reply;
-        setMessages((prev) => [...prev, { id: `a${prev.length}-${ticket}`, role: 'ai', text: replyText, links, sources }]);
+        // A reply is its text, or `{ text, sources }`; sources are what it drew on.
+        const { text: replyText, sources } = typeof reply === 'string' ? { text: reply } : reply;
+        setMessages((prev) => [...prev, { id: `a${prev.length}-${ticket}`, role: 'ai', text: replyText, sources }]);
     }, [respond]);
 
     // Every answer takes a rating; it stays on the message as chat moves between modes.
@@ -381,11 +368,11 @@ AiChat.propTypes = {
     storageKey: PropTypes.string,
     /** `false` leaves out the floating button: the popup then floats above the bottom right corner, and the host opens chat with `useAiChat().dispatch({ type: 'open' })`. */
     launcher: PropTypes.bool,
-    /** The `target` of links in a reply, such as `_top` from inside a frame. */
+    /** Where a reply's source links open, such as `_top` from inside a frame. */
     linkTarget: PropTypes.string,
     /** Called with the new mode whenever chat moves between popup, Panel and full screen. */
     onModeChange: PropTypes.func,
-    /** Returns the reply (or a promise of it) to a sent message: a string, or `{ text, links: [{ label, href }], sources: [{ title, href, type }] }`. Without it nothing answers. */
+    /** Returns the reply (or a promise of it) to a sent message: a string, or `{ text, sources: [{ title, href, type }] }`. Without it nothing answers. */
     respond: PropTypes.func,
     /** Called with the answer and `{ rating }` (or `{ rating: 'down', comment }`) when a person rates it. Every answer offers thumbs. */
     onFeedback: PropTypes.func,

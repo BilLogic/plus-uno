@@ -6,7 +6,7 @@ import React, { useState, useEffect, useRef } from 'react';
 // @ts-expect-error -- the design system is plain JSX, resolved by the Vite alias.
 import { AiMessage, PromptInput } from '@/components';
 // @ts-expect-error -- same.
-import { AI_CHAT_DISCLAIMER as DISCLAIMER } from '@/patterns/AiChat';
+import { AI_CHAT_DISCLAIMER as DISCLAIMER } from '@/patterns';
 import { AssistantMessageContent } from './components/AssistantMessageContent';
 import { ChatHeader } from './components/ChatHeader';
 import './ResearchAssistantChat.css';
@@ -264,10 +264,11 @@ export function ResearchAssistantChat({
             />
           )
         ))}
-        <div ref={messagesEndRef} style={{ height: '120px' }} />
+        <div ref={messagesEndRef} className="research-chat-end" />
       </div>
 
-      <div className="chat-footer">
+      {/* Focus bubbles up from the prompt, so the footer hears it. */}
+      <div className="chat-footer" onFocus={handleInputFocus}>
         <PromptInput
           label="Message to AI"
           placeholder="Type your response..."
@@ -278,7 +279,6 @@ export function ResearchAssistantChat({
             addMessage('user', { type: 'text', text });
             setInput('');
           }}
-          onFocus={handleInputFocus}
         />
         <p className="research-chat-disclaimer">{DISCLAIMER}</p>
       </div>

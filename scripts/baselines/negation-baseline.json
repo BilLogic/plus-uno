@@ -32,7 +32,7 @@
     "ide": {
       "corpus": "hand-authored docs under the bundler section roots declaring embodiment: ide — docs/adr/ and the generated .claude/skills/ surfaces are not section roots and so are out",
       "measuredOn": "whole files, frontmatter included — there is no bundler here, and a SKILL.md's description: is agent-facing routing text that steers exactly as the body does",
-      "docs": 55,
+      "docs": 56,
       "counts": {
         "docs/connectors/notion/marketplace-db.md": 1,
         "docs/conventions/writing.md": 8,
