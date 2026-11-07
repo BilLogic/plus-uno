@@ -60,4 +60,6 @@ node scripts/eval-ds-usage.mjs run --arms control,current --runs 2 --model sonne
 node scripts/eval-ds-usage.mjs summary --since 2026-11-06
 ```
 
-prints, per arm: escapes per run, escapes by rule, the trap pass rate, the layout-formula rate, mean turns and minutes. Compare arms within one model, one `judge_sha` and one `scenarios_sha`. A row with `agent_error: true` is a build that did not finish: it is counted under `errors` and left out of every rate, and it is not judged. A judge that returns no JSON sets `judge.judge_error`.
+prints, per arm: escapes per run, escapes by rule, the trap pass rate, the layout-formula rate, mean turns and minutes. Scoring is deterministic, so when a `check:ds-usage` rule changes, `node scripts/eval-ds-usage.mjs rescore` recomputes every row's escapes from its kept build with this checkout's rules and stamps the row's `scored_at`; the agent fields stay as recorded.
+
+Compare arms within one model, one `judge_sha` and one `scenarios_sha`. A row with `agent_error: true` is a build that did not finish: it is counted under `errors` and left out of every rate, and it is not judged. A judge that returns no JSON sets `judge.judge_error`.

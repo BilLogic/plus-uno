@@ -126,3 +126,39 @@ export function extractExports(indexPath, { repoRoot, boundary, onUnresolved, se
 
   return [...new Set(names)].sort();
 }
+
+/**
+ * Every name a barrel makes importable: each specifier of `export { … }`
+ * (constants and parts such as `TableRow` included, not only the `as`
+ * components the existence index lists), each `export const|function|class`,
+ * and everything an `export *` brings in, across sections (`@/dataviz` too).
+ *
+ * `extractExports` answers "which components exist"; this answers "can this
+ * name be imported from the barrel", which is what a usage checker holds an
+ * import to.
+ *
+ * @param {string} indexPath
+ * @param {{repoRoot: string, seen?: Set<string>}} opts
+ * @returns {string[]}
+ */
+export function publicNames(indexPath, { repoRoot, seen = new Set() } = {}) {
+  if (!fs.existsSync(indexPath) || seen.has(indexPath)) return [];
+  seen.add(indexPath);
+  const content = stripComments(fs.readFileSync(indexPath, 'utf8'));
+  const names = [];
+  for (const m of content.matchAll(/export\s+\{([^}]*)\}/g)) {
+    for (const raw of m[1].split(',')) {
+      const spec = raw.trim().replace(/^type\s+/, '');
+      if (!spec) continue;
+      const parts = spec.split(/\s+as\s+/);
+      const name = (parts[1] ?? parts[0]).trim();
+      if (name !== 'default') names.push(name);
+    }
+  }
+  for (const m of content.matchAll(/export\s+(?:const|let|var|function\*?|class|async\s+function)\s+([A-Za-z_$][\w$]*)/g)) names.push(m[1]);
+  for (const m of content.matchAll(/export\s+\*\s+from\s+['"]([^'"]+)['"]/g)) {
+    const barrel = resolveBarrel(m[1], indexPath, repoRoot);
+    if (barrel) names.push(...publicNames(barrel, { repoRoot, seen }));
+  }
+  return [...new Set(names)].sort();
+}

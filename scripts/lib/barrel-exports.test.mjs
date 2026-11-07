@@ -15,7 +15,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { extractExports, stripComments } from './barrel-exports.js';
+import { extractExports, publicNames, stripComments } from './barrel-exports.js';
 
 const roots = [];
 
@@ -141,5 +141,26 @@ test('a component exported beside its constants is still an export', () => {
     'AiIcon',
     'Panel',
     'Suggestion',
+  ]);
+});
+
+test('publicNames: every importable name, parts and constants included, across export *', () => {
+  const root = fixture({
+    'index.js': [
+      "export { default as Table, TableRow, HeadCell } from './table';",
+      "export { default as Flag, FLAG_APPEARANCES } from './flag';",
+      "// export { default as Gone } from './gone';",
+      "export * from './charts';",
+    ].join('\n'),
+    'charts.js': "export { default as BarChart } from './bar';\nexport const CHART_THEME = {};",
+  });
+  assert.deepEqual(publicNames(path.join(root, 'index.js'), { repoRoot: root }), [
+    'BarChart',
+    'CHART_THEME',
+    'FLAG_APPEARANCES',
+    'Flag',
+    'HeadCell',
+    'Table',
+    'TableRow',
   ]);
 });

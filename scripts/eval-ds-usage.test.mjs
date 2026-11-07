@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { CONTROL_REMOVED, DENIED_READS, confined, reachedCheckout, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize } from './eval-ds-usage.mjs';
+import { rescore, CONTROL_REMOVED, DENIED_READS, confined, reachedCheckout, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize } from './eval-ds-usage.mjs';
 import { spawnSync } from 'node:child_process';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
@@ -110,6 +110,18 @@ test('confined: reads of this checkout\'s harness and worktrees are denied; the 
   assert.ok(settings.sandbox.enabled);
   for (const rel of DENIED_READS) assert.ok(settings.permissions.deny.includes(`Read(//r/${rel}/**)`), rel);
   assert.ok(!settings.permissions.deny.some((rule) => rule.includes('node_modules')));
+});
+
+test('rescore recomputes escapes from the kept build and stamps the scorer; agent fields stay', () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-rescore-'));
+  try {
+    fs.mkdirSync(path.join(dir, 'src'));
+    fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { TableRow } from '@/components';\n");
+    const [row] = rescore([{ task: 'table-states', output: dir, escapes: 1, by_rule: { 'ds/no-unknown-component': 1 }, turns: 9 }], { scorer: 'abc' });
+    assert.deepEqual([row.escapes, row.by_rule, row.scored_at, row.turns], [0, {}, 'abc', 9]);
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('scenariosSha is stable for the same tree', () => {

@@ -42,6 +42,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
+import { publicNames } from './lib/barrel-exports.js';
 import { contextFrom, docLink, escapesIn } from './lib/ds-usage.mjs';
 import { byRoot, isEntry } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
@@ -105,6 +106,7 @@ export const contextOf = byRoot((repoRoot) => {
     freeIcons: freeIcons(repoRoot),
     retired: retiredRenames(),
     promoted: new Set(TOKEN_LADDER.filter((row) => row.primitive).map((row) => row.new)),
+    exported: new Set(publicNames(path.join(repoRoot, 'design-system/src/components/index.js'), { repoRoot })),
   });
 });
 

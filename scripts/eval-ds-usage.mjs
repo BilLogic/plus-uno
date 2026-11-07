@@ -19,6 +19,7 @@
  *
  *   node scripts/eval-ds-usage.mjs run [--arms control,current] [--tasks a,b] [--runs 2] [--model sonnet] [--ref origin/main] [--scratch DIR]
  *   node scripts/eval-ds-usage.mjs summary [--since YYYY-MM-DD]
+ *   node scripts/eval-ds-usage.mjs rescore   re-score every kept build with this checkout's rules
  */
 import { createHash } from 'node:crypto';
 import { execFileSync, spawnSync } from 'node:child_process';
@@ -304,6 +305,20 @@ export function readLedger(repoRoot = REPO_ROOT) {
 }
 
 /**
+ * Every row's escapes recomputed from its kept build with this checkout's
+ * rules: scoring is deterministic, so a fixed rule re-scores the past without
+ * rerunning an agent. Each row records the commit it was scored at; the agent
+ * fields are untouched.
+ */
+export function rescore(rows, { scorer, repoRoot = REPO_ROOT }) {
+  return rows.map((row) => {
+    if (!row.output || !fs.existsSync(row.output)) return row;
+    const scored = score({ repoRoot, folder: row.output, label: `eval-${row.task}` });
+    return { ...row, escapes: scored.escapes, by_rule: scored.byRule, warnings: scored.warnings, scored_at: scorer };
+  });
+}
+
+/**
  * Per arm: escapes per completed run, escapes by rule, the trap pass rate and
  * the layout-formula rate. A run whose agent errored is counted in `errors`
  * and left out of every rate, so a crash cannot read as a clean run.
@@ -381,6 +396,9 @@ const BUILD_PROMPT = (task) =>
   `Read prototypes/eval-${task}/BRIEF.md and build what it asks in prototypes/eval-${task}/. ` +
   'Work only in that folder. When it is built, stop.';
 
+/** The commit whose rules scored a row (this checkout's HEAD). */
+const scorerCommit = () => execFileSync('git', ['-C', REPO_ROOT, 'rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).trim();
+
 function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch }) {
   const copy = path.join(scratch, id);
   try {
@@ -414,6 +432,7 @@ function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch }) {
       escapes: scored.escapes,
       by_rule: scored.byRule,
       warnings: scored.warnings,
+      scored_at: scorerCommit(),
       judge: judged,
       judge_sha: judge.sha,
       ...usageOf(build.result),
@@ -454,8 +473,12 @@ if (isEntry(import.meta.url)) {
   try {
     const opts = options(rest);
     if (command === 'run') runAll(opts);
-    else if (command === 'summary') console.log(JSON.stringify(summarize(readLedger().filter((r) => r.date >= opts.since)), null, 2));
-    else throw new Error('usage: node scripts/eval-ds-usage.mjs run|summary [options] (docs/evals/ds-usage.md)');
+    else if (command === 'rescore') {
+      const rows = rescore(readLedger(), { scorer: scorerCommit() });
+      fs.writeFileSync(path.join(REPO_ROOT, LEDGER), rows.map((r) => `${JSON.stringify(r)}\n`).join(''));
+      console.log(JSON.stringify(summarize(rows), null, 2));
+    } else if (command === 'summary') console.log(JSON.stringify(summarize(readLedger().filter((r) => r.date >= opts.since)), null, 2));
+    else throw new Error('usage: node scripts/eval-ds-usage.mjs run|summary|rescore [options] (docs/evals/ds-usage.md)');
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;
