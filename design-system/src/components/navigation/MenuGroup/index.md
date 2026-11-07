@@ -9,7 +9,7 @@ MenuGroup: the scrollable list a menu's sections sit in.
 
 **Source:** `design-system/src/components/navigation/MenuGroup/MenuGroup.jsx`
 
-**Stories:** `design-system/src/components/navigation/MenuGroup/MenuGroup.stories.jsx` — ButtonAndLinkItems, KeyboardNavigation, Selected, CustomRowExample, Interactive, Rest, Hovered, Pressed, Focused, SelectedRow, Disabled
+**Stories:** `design-system/src/components/navigation/MenuGroup/MenuGroup.stories.jsx` — ButtonAndLinkItems, KeyboardNavigation, Selected, CustomRowExample, Density, Interactive, Rest, Hovered, Pressed, Focused, SelectedRow, Disabled
 
 **Storybook page:** `design-system/src/components/navigation/MenuGroup/MenuGroup.mdx`
 
@@ -41,6 +41,4 @@ From `design-system/src/components/navigation/MenuGroup/MenuGroup.scss`. Overrid
 
 Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar` · `Tabs`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

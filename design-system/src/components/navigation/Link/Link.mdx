@@ -1,7 +1,8 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as LinkStories from './Link.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Link } from '@/components';
+import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -37,21 +38,17 @@ sentence of UI copy.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>`default`, `subtle` and `inverse` appearances.</>}>
-    <Canvas of={LinkStories.Appearances} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={LinkStories.Appearances} title="Default, subtle and inverse" description={<><code>default</code> on the page background, <code>subtle</code> on a muted surface, <code>inverse</code> on a dark or colored fill.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## New window
+## Behavior
 
-<DocsCanvasShell description={<>`isOpenInNewWindow` adds the glyph, appends "(opens in a new tab)" to the accessible name, and defaults `target` to `_blank` with a safe `rel`.</>}>
-    <DsCanvasQuiet of={LinkStories.OpenInNewWindow} />
-</DocsCanvasShell>
+<ComponentExample of={LinkStories.OpenInNewWindow} title="New window" description={<><code>isOpenInNewWindow</code> adds the glyph, appends "(opens in a new tab)" to the accessible name, and defaults <code>target</code> to <code>_blank</code> with a safe <code>rel</code>.</>} />
 
 </div>
 
@@ -59,21 +56,13 @@ sentence of UI copy.
 
 ## State
 
-<DocsCanvasShell description={<>Default is link-colored and underlined; subtle is body ink with no underline; inverse is inverse ink.</>}>
-    <DsCanvasQuiet of={LinkStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={LinkStories.Rest} title="Rest" description="Default is link-colored and underlined; subtle is body ink with no underline; inverse is inverse ink." />
 
-<DocsCanvasShell description={<>Subtle gains its underline; default is already underlined and keeps its color.</>}>
-    <DsCanvasQuiet of={LinkStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={LinkStories.Hovered} title="Hovered" description="Subtle gains its underline; default is already underlined and keeps its color." />
 
-<DocsCanvasShell description={<>Default and subtle take the pressed link ink.</>}>
-    <DsCanvasQuiet of={LinkStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={LinkStories.Pressed} title="Pressed" description="Default and subtle take the pressed link ink." />
 
-<DocsCanvasShell description={<>The 2px ring, 2px off the link; inverse draws the inverse ring color.</>}>
-    <DsCanvasQuiet of={LinkStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={LinkStories.Focused} title="Focused" description="The 2px ring, 2px off the link; inverse draws the inverse ring color." />
 
 </div>
 
@@ -162,20 +151,36 @@ for a control that stands on its own.
 muted surface where less contrast reads better, and `inverse` for a link on a
 dark or colored fill. None of the three changes the link's meaning.
 
+### Make the link text name the destination.
+
+<DoDontPair
+    doExample={<Link href="#">View the full report</Link>}
+    doCaption="The words say where the link goes."
+    dontExample={<Link href="#">Click here</Link>}
+    dontCaption="Link text that means nothing out of context."
+/>
+
 ### Let `isOpenInNewWindow` manage `target` and `rel` together.
 
-Setting `isOpenInNewWindow` adds the external-link glyph, appends spoken text
-to the accessible name, and defaults `target="_blank"` with
-`rel="noopener noreferrer"` — pass `target`/`rel` directly only when the
-default pairing doesn't fit.
+Setting `isOpenInNewWindow` adds the external-link glyph, appends spoken text to the accessible name, and defaults `target="_blank"` with `rel="noopener noreferrer"`. Pass `target` or `rel` directly only when the default pairing does not fit.
 
-```jsx
-<Link href="/report" isOpenInNewWindow>View the full report</Link>
-```
+<DoDontPair
+    doExample={<Link href="#" isOpenInNewWindow>View the full report</Link>}
+    doCaption="The glyph and the spoken warning come with the prop."
+    dontExample={<Link href="#">View the full report (opens in new tab)</Link>}
+    dontCaption="Warning typed into the text: the glyph is missing and it reads twice."
+/>
 
 ### Keep the link inside the sentence it finishes.
 
 A link is inline text. When the action stands alone, such as Save or Continue, it is a button, not a link.
+
+<DoDontPair
+    doExample={<p style={{ margin: 0 }}>Read the <Link href="#">session report</Link> before the call.</p>}
+    doCaption="The link sits on the words that name the destination."
+    dontExample={<Link href="#">Save notes</Link>}
+    dontCaption="A standalone action dressed as a link. Use a button."
+/>
 
 </div>
 

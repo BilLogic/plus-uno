@@ -1,9 +1,10 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as BreadcrumbStories from './Breadcrumb.stories.jsx';
 import * as BreadcrumbSubStories from './Breadcrumb.Subcomponents.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Breadcrumb } from '@/components';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -39,45 +40,21 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Appearance
 
-<DocsCanvasShell attachSourceBelow description={<>Standard multi-level trail (typical page context).</>}>
-    <Canvas of={BreadcrumbStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={BreadcrumbStories.Standard} title="Full trail" description={<>Linked ancestors, then the current page as plain text.</>} />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Default
-
-<DocsCanvasShell description={<>Full trail with linked ancestors and a non-link current page.</>}>
-    <DsCanvasQuiet of={BreadcrumbStories.Standard} />
-</DocsCanvasShell>
-
-<DocsCanvasShell description={<>Minimal two-level trail.</>}>
-    <DsCanvasQuiet of={BreadcrumbStories.Short} />
-</DocsCanvasShell>
+<ComponentExample of={BreadcrumbStories.Short} title="Two levels" description={<>The shortest trail: one ancestor and the current page.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Anatomy
+## Behavior
 
-<DocsCanvasShell description={<>Single breadcrumb item behavior for linked ancestors versus current-page item.</>}>
-    <DsCanvasQuiet of={BreadcrumbSubStories.PageItem} />
-</DocsCanvasShell>
+<ComponentExample of={BreadcrumbSubStories.PageItem} title="Page item" description="A linked ancestor and the current-page item." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Layout & composition
-
-<DocsCanvasShell description={<>Separator between trail segments.</>}>
-    <DsCanvasQuiet of={BreadcrumbSubStories.Divider} />
-</DocsCanvasShell>
+<ComponentExample of={BreadcrumbSubStories.Divider} title="Separator" description={<>A slash between items by default; <code>separator</code> swaps the character.</>} />
 
 </div>
 
@@ -85,21 +62,13 @@ Use breadcrumbs to show navigational context on pages that are many levels deep 
 
 ## State
 
-<DocsCanvasShell description={<>Linked ancestors in the link color; the current page is plain, subtlest text with <code>aria-current="page"</code>.</>}>
-    <DsCanvasQuiet of={BreadcrumbStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={BreadcrumbStories.Rest} title="Rest" description={<>Linked ancestors in the link color; the current page is plain, subtlest text with <code>aria-current="page"</code>.</>} />
 
-<DocsCanvasShell description={<>An ancestor link is underlined and keeps the link color.</>}>
-    <DsCanvasQuiet of={BreadcrumbStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={BreadcrumbStories.Hovered} title="Hovered" description={<>An ancestor link is underlined and keeps the link color.</>} />
 
-<DocsCanvasShell description={<>A link takes no pressed step of its own; the trail does not change under the pointer.</>}>
-    <DsCanvasQuiet of={BreadcrumbStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={BreadcrumbStories.Pressed} title="Pressed" description={<>A link takes no pressed step of its own; the trail does not change under the pointer.</>} />
 
-<DocsCanvasShell description={<>The 2px ring, 2px off an ancestor link. The current page is not focusable.</>}>
-    <DsCanvasQuiet of={BreadcrumbStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={BreadcrumbStories.Focused} title="Focused" description={<>The 2px ring, 2px off an ancestor link. The current page is not focusable.</>} />
 
 </div>
 
@@ -230,13 +199,39 @@ divider custom property, and a custom property holds text. A string is quoted
 for you and works; a React element is stringified by CSS and disappears. Pass
 `'/'`, `'›'`, `'—'`.
 
+<DoDontPair
+    doExample={<Breadcrumb separator="›" items={[{ text: 'Cohorts', href: '#' }, { text: 'Autumn 2026' }]} />}
+    doCaption="A string separator is quoted for you."
+    dontExample={<Breadcrumb separator={<span>›</span>} items={[{ text: 'Cohorts', href: '#' }, { text: 'Autumn 2026' }]} />}
+    dontCaption="A React element is stringified by CSS and disappears."
+/>
+
 ### Show the whole path, root first.
 
 A trail that starts mid-hierarchy leaves people unsure where they are. List every level from the top down to the current page, and let the row wrap rather than dropping a level.
 
+<DoDontPair
+    doExample={<Breadcrumb items={[{ text: 'Cohorts', href: '#' }, { text: 'Autumn 2026', href: '#' }, { text: 'Maya Chen' }]} />}
+    doCaption="Every level from the root to the current page."
+    dontExample={<Breadcrumb items={[{ text: 'Autumn 2026', href: '#' }, { text: 'Maya Chen' }]} />}
+    dontCaption="The trail starts mid-hierarchy, so the top is missing."
+/>
+
 ### Use it for position, not for history.
 
 A breadcrumb shows where a page sits in the hierarchy, never the pages the person happened to visit. The trail for a page is the same whichever way they arrived.
+
+### Name each level literally.
+
+Use the page's own title, not a direction or a pointer.
+
+<DoDontPair
+    doExample={<Breadcrumb items={[{ text: 'Cohorts', href: '#' }, { text: 'Autumn 2026' }]} />}
+    doCaption="Short, literal names that match the page titles."
+    dontExample={<Breadcrumb items={[{ text: 'Back', href: '#' }, { text: 'here' }]} />}
+    dontCaption="Names that mean nothing out of context."
+/>
+
 
 </div>
 
@@ -282,7 +277,7 @@ A breadcrumb shows where a page sits in the hierarchy, never the pages the perso
 
 ## Related
 
-- For progress through a sequence of steps, use `ProgressBar`. A breadcrumb is a
+- For progress through a sequence of steps, use `ProgressTracker`. A breadcrumb is a
   position in a tree, not a position in a flow.
 - For moving between sibling views, use `Tabs`.
 - For a persistent hierarchy the user browses rather than retraces, use the Sidebar pattern.

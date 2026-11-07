@@ -1,7 +1,8 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as MenuGroupStories from './MenuGroup.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { MenuGroup, ButtonItem, LinkItem, Section } from '@/components';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -38,29 +39,19 @@ menu gets from its own mechanics.
 
 <div className="sb-ds-doc-section">
 
-## Anatomy
+## Behavior
 
-1. **`MenuGroup`** is the `role="menu"` container. `density` sets row height;
-   `maxHeight`, `maxWidth` and `minWidth` bound the list.
-2. **`Section`** groups related items under an optional `title`, with
-   `hasSeparator` drawing a divider above it.
-3. **`ButtonItem`**, **`LinkItem`** and **`CustomItem`** are the row kinds —
-   an action, a navigation, or a caller-supplied component — sharing the same
-   `elemBefore`/`elemAfter`/`description` row layout.
+<ComponentExample of={MenuGroupStories.ButtonAndLinkItems} title="Sections, buttons and links" description={<>A group of button and link items, with a titled section and a separator.</>} />
 
-<DocsCanvasShell attachSourceBelow description={<>A group of button and link items.</>}>
-    <Canvas of={MenuGroupStories.ButtonAndLinkItems} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={MenuGroupStories.CustomRowExample} title="Custom row" description={<><code>CustomItem</code>'s <code>component</code> prop renders the row as a caller-supplied element, such as a <code>label</code> around a checkbox.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Custom rows
+## Size and layout
 
-<DocsCanvasShell description={<>`CustomItem`'s `component` prop renders the row as a caller-supplied element — a `label` wrapping a checkbox, for instance — for a row that is neither a button nor a link.</>}>
-    <DsCanvasQuiet of={MenuGroupStories.CustomRowExample} />
-</DocsCanvasShell>
+<ComponentExample of={MenuGroupStories.Density} title="Density" description={<><code>regular</code> and <code>compact</code> row heights.</>} />
 
 </div>
 
@@ -68,33 +59,19 @@ menu gets from its own mechanics.
 
 ## State
 
-<DocsCanvasShell description={<>Body ink on a clear ground; the current row carries <code>aria-current</code>.</>}>
-    <DsCanvasQuiet of={MenuGroupStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={MenuGroupStories.Rest} title="Rest" description={<>Body ink on a clear ground; the current row carries <code>aria-current</code>.</>} />
 
-<DocsCanvasShell description={<>The subtle neutral hovered fill, on buttons and links alike.</>}>
-    <DsCanvasQuiet of={MenuGroupStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={MenuGroupStories.Hovered} title="Hovered" description={<>The subtle neutral hovered fill, on buttons and links alike.</>} />
 
-<DocsCanvasShell description={<>The subtle neutral pressed fill.</>}>
-    <DsCanvasQuiet of={MenuGroupStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={MenuGroupStories.Pressed} title="Pressed" description={<>The subtle neutral pressed fill.</>} />
 
-<DocsCanvasShell description={<>The 2px ring, 2px off the row; Arrow Down moves focus to the next enabled row.</>}>
-    <DsCanvasQuiet of={MenuGroupStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={MenuGroupStories.Focused} title="Focused" description={<>The 2px ring, 2px off the row; Arrow Down moves focus to the next enabled row.</>} />
 
-<DocsCanvasShell description={<>The selected fill marks the current row.</>}>
-    <DsCanvasQuiet of={MenuGroupStories.SelectedRow} />
-</DocsCanvasShell>
+<ComponentExample of={MenuGroupStories.SelectedRow} title="Selected" description={<>The selected fill marks the current row.</>} />
 
-<DocsCanvasShell description={<>Arrow Down and Arrow Up move focus between enabled items, wrapping at the ends.</>}>
-    <DsCanvasQuiet of={MenuGroupStories.KeyboardNavigation} />
-</DocsCanvasShell>
+<ComponentExample of={MenuGroupStories.KeyboardNavigation} title="Keyboard" description={<>Arrow Down and Arrow Up move focus between enabled items, wrapping at the ends.</>} />
 
-<DocsCanvasShell description={<>Disabled ink, no pointer events, skipped by the arrow keys.</>}>
-    <DsCanvasQuiet of={MenuGroupStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={MenuGroupStories.Disabled} title="Disabled" description={<>Disabled ink, no pointer events, skipped by the arrow keys.</>} />
 
 </div>
 
@@ -207,9 +184,33 @@ menu still sees an allowed child.
 
 Two to five sections of a few rows each scan faster than one long list. Title a section when its purpose is not obvious from its rows, and separate it when it changes kind, such as moving from navigation to actions.
 
+<DoDontPair
+    doExample={<MenuGroup><Section title="Recent"><ButtonItem>Recent board</ButtonItem><LinkItem href="#">Recent doc</LinkItem></Section><Section title="Actions" hasSeparator><ButtonItem>Create</ButtonItem><ButtonItem>Rename board</ButtonItem></Section></MenuGroup>}
+    doCaption="Rows grouped by purpose, with titles and a separator where the kind changes."
+    dontExample={<MenuGroup><ButtonItem>Recent board</ButtonItem><LinkItem href="#">Recent doc</LinkItem><ButtonItem>Create</ButtonItem><ButtonItem>Rename board</ButtonItem><ButtonItem>Archive board</ButtonItem><ButtonItem>Share</ButtonItem></MenuGroup>}
+    dontCaption="One long run of mixed rows, with nothing to scan by."
+/>
+
 ### Keep the description to one line.
 
 A description clarifies a row; it does not carry the row. If it needs two lines, the label is the problem.
+
+<DoDontPair
+    doExample={<MenuGroup><ButtonItem description="Rename this board">Rename</ButtonItem></MenuGroup>}
+    doCaption="A short line that clarifies the label."
+    dontExample={<MenuGroup><ButtonItem description="Change the name that appears in the board list and in links shared with other tutors">Rename</ButtonItem></MenuGroup>}
+    dontCaption="A long description does the label's job."
+/>
+
+### Start action labels with a verb.
+
+<DoDontPair
+    doExample={<MenuGroup><ButtonItem>Rename board</ButtonItem><ButtonItem>Archive board</ButtonItem></MenuGroup>}
+    doCaption="A verb and the thing acted on."
+    dontExample={<MenuGroup><ButtonItem>Click to rename board</ButtonItem><ButtonItem>Click to archive board</ButtonItem></MenuGroup>}
+    dontCaption="Filler words in front of every label."
+/>
+
 
 </div>
 

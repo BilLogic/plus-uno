@@ -1,8 +1,9 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as TabsStories from './Tabs.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Tabs } from '@/components';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -38,41 +39,21 @@ export const figmaMeta = {
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>Standard tabs.</>}>
-    <Canvas of={TabsStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Appearance
 
-<DocsCanvasShell description={<>Default (underline), pill, and compact sizing.</>}>
-    <DsCanvasQuiet of={TabsStories.Appearance} />
-</DocsCanvasShell>
+<ComponentExample of={TabsStories.Appearance} title="Underline, pill and compact" description={<><code>default</code> draws an underline, <code>pill</code> a filled selected tab, and <code>spacing="compact"</code> draws 24 high.</>} />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## With panels
+## Size and layout
 
-<DocsCanvasShell description={<>Each tab wired to a panel; a disabled tab is still reachable with the arrow keys.</>}>
-    <DsCanvasQuiet of={TabsStories.WithPanels} />
-</DocsCanvasShell>
+<ComponentExample of={TabsStories.Alignment} title="Alignment" description={<><code>left</code>, <code>center</code> and <code>right</code> place the strip in its container.</>} />
 
-</div>
+<ComponentExample of={TabsStories.Layout} title="Justified" description={<><code>justified</code> stretches the tabs to fill the bar.</>} />
 
-<div className="sb-ds-doc-section">
-
-## Layout & composition
-
-<DocsCanvasShell description={<>Justified tab distribution.</>}>
-    <DsCanvasQuiet of={TabsStories.Layout} />
-</DocsCanvasShell>
+<ComponentExample of={TabsStories.WithPanels} title="With panels" description={<>Each tab wired to a panel; a disabled tab is still reachable with the arrow keys.</>} />
 
 </div>
 
@@ -80,33 +61,19 @@ export const figmaMeta = {
 
 ## State
 
-<DocsCanvasShell description={<>An unselected tab is subtle ink on a clear ground; the selected tab carries the bar and the selected ink.</>}>
-    <DsCanvasQuiet of={TabsStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={TabsStories.Rest} title="Rest" description={<>An unselected tab is subtle ink on a clear ground; the selected tab carries the bar and the selected ink.</>} />
 
-<DocsCanvasShell description={<>The subtle neutral hovered fill; the selected tab takes it too and keeps its bar and ink.</>}>
-    <DsCanvasQuiet of={TabsStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={TabsStories.Hovered} title="Hovered" description={<>The subtle neutral hovered fill; the selected tab takes it too and keeps its bar and ink.</>} />
 
-<DocsCanvasShell description={<>The subtle neutral pressed fill.</>}>
-    <DsCanvasQuiet of={TabsStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={TabsStories.Pressed} title="Pressed" description={<>The subtle neutral pressed fill.</>} />
 
-<DocsCanvasShell description={<>The 2px ring, 2px off the tab, with no fill; arrow keys move selection with focus.</>}>
-    <DsCanvasQuiet of={TabsStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={TabsStories.Focused} title="Focused" description={<>The 2px ring, 2px off the tab, with no fill; arrow keys move selection with focus.</>} />
 
-<DocsCanvasShell description={<>The selected ink over the selected bar; no fill.</>}>
-    <DsCanvasQuiet of={TabsStories.Selected} />
-</DocsCanvasShell>
+<ComponentExample of={TabsStories.Selected} title="Selected" description={<>The selected ink over the selected bar; no fill.</>} />
 
-<DocsCanvasShell description={<>The bold selected fill with inverse ink; its hover and press step the bold fill.</>}>
-    <DsCanvasQuiet of={TabsStories.SelectedPill} />
-</DocsCanvasShell>
+<ComponentExample of={TabsStories.SelectedPill} title="Selected pill" description={<>The bold selected fill with inverse ink; its hover and press step the bold fill.</>} />
 
-<DocsCanvasShell description={<>Disabled ink and no pointer events; never selected.</>}>
-    <DsCanvasQuiet of={TabsStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={TabsStories.Disabled} title="Disabled" description={<>Disabled ink and no pointer events; never selected.</>} />
 
 </div>
 
@@ -237,9 +204,35 @@ stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
 
 Each label is one or two words naming a view of the same subject: Overview, Sessions, Progress. Parallel wording lets people scan the strip without reading it.
 
+<DoDontPair
+    doExample={<Tabs defaultActiveKey="0"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs>}
+    doCaption="Short nouns for views of the same subject."
+    dontExample={<Tabs defaultActiveKey="0"><Tabs.Tab eventKey="0">View the overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions list</Tabs.Tab><Tabs.Tab eventKey="2">Show progress</Tabs.Tab></Tabs>}
+    dontCaption="Mixed verbs and phrases that do not scan."
+/>
+
 ### Choose the appearance by weight, not taste.
 
 The underline suits a strip that sits above page content. The pill suits a strip inside a card or toolbar, where a filled selected tab reads as a control.
+
+<DoDontPair
+    doExample={<div style={{ border: 'var(--stroke-1) solid var(--ds-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--pad-y-md) var(--pad-x-md)' }}><Tabs defaultActiveKey="0" appearance="pill"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs></div>}
+    doCaption="A pill strip inside a card reads as a control."
+    dontExample={<div style={{ border: 'var(--stroke-1) solid var(--ds-border)', borderRadius: 'var(--radius-lg)', padding: 'var(--pad-y-md) var(--pad-x-md)' }}><Tabs defaultActiveKey="0"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs></div>}
+    dontCaption="The page-level underline inside a card, where it reads as a stray rule."
+/>
+
+### Keep labels the same across visits.
+
+A label names a view. A count or status in it changes the name and breaks the parallel wording.
+
+<DoDontPair
+    doExample={<Tabs defaultActiveKey="0"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions</Tabs.Tab><Tabs.Tab eventKey="2">Progress</Tabs.Tab></Tabs>}
+    doCaption="The label names the view."
+    dontExample={<Tabs defaultActiveKey="0"><Tabs.Tab eventKey="0">Overview</Tabs.Tab><Tabs.Tab eventKey="1">Sessions (12)</Tabs.Tab><Tabs.Tab eventKey="2">Progress (new)</Tabs.Tab></Tabs>}
+    dontCaption="Counts and status in the label."
+/>
+
 
 </div>
 
@@ -278,9 +271,6 @@ The underline suits a strip that sits above page content. The pill suits a strip
   matching `Tabs.Panel` gets no pointer at all — an id that is not in the
   document sends assistive technology to nothing, which is worse than pointing
   nowhere.
-- **The bar has no name.** Extra props are spread onto the root element, so
-  `aria-label` is the way to say what this set of tabs is for — especially
-  when a page carries more than one.
 
 </div>
 
