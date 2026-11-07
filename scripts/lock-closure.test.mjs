@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { lockClosure, readLock, resolveIn } from './lock-closure.mjs';
+import { lockClosure, lockSubset, readLock, resolveIn } from './lock-closure.mjs';
 
 const entry = (version, dependencies) => ({ version, ...(dependencies ? { dependencies } : {}) });
 
@@ -71,4 +71,23 @@ test('two versions of one name are refused: the install is flat', () => {
 test('the parser the contrast checks read with closes over this lock', () => {
   const pins = lockClosure(readLock(), ['postcss', 'postcss-scss', 'postcss-selector-parser']);
   for (const name of ['postcss', 'postcss-scss', 'postcss-selector-parser']) assert.ok(pins.has(name), name);
+});
+
+test('a nested closure keeps two versions of one name at their own paths, for npm ci', () => {
+  const lock = {
+    'node_modules/a': { version: '1.0.0', dependencies: { b: '*', c: '*' }, dev: true },
+    'node_modules/b': entry('1.0.0', { c: '*' }),
+    'node_modules/b/node_modules/c': entry('2.0.0'),
+    'node_modules/c': entry('1.0.0'),
+    'node_modules/unrelated': entry('9.0.0'),
+  };
+  assert.throws(() => lockClosure(lock, ['a']), /two versions of c/);
+  const { packageJson, packageLock } = lockSubset(lock, ['a']);
+  assert.deepEqual(packageJson.dependencies, { a: '1.0.0' });
+  assert.deepEqual(Object.keys(packageLock.packages), ['', 'node_modules/a', 'node_modules/b', 'node_modules/b/node_modules/c', 'node_modules/c']);
+  assert.equal(packageLock.packages['node_modules/a'].dev, undefined);
+});
+
+test('the MCP SDK the lookup server runs on resolves as a nested closure', () => {
+  assert.ok(lockSubset(readLock(), ['@modelcontextprotocol/sdk']).packageLock.packages['node_modules/@modelcontextprotocol/sdk']);
 });

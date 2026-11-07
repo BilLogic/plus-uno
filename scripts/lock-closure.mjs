@@ -23,7 +23,13 @@
  * WHAT IT REFUSES: two versions of one name. The scoped step installs flat, so
  * a second version would be silently replaced by the first.
  *
- * Usage: node scripts/lock-closure.mjs <name>…   prints the pins, space-separated
+ * A NESTED CLOSURE, for a package whose tree holds two versions of one name
+ * (the MCP SDK's does, through express): `--lock <dir>` writes a package.json
+ * and the lock's own entries for the closure, at their own nested paths, so
+ * `npm ci` in that folder installs the tree exactly as the root lock has it.
+ *
+ * Usage: node scripts/lock-closure.mjs <name>…              prints the pins, space-separated
+ *        node scripts/lock-closure.mjs --lock <dir> <name>…  writes a lock for `npm ci` in <dir>
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -91,7 +97,50 @@ export function lockClosure(lock, roots) {
   return pinned;
 }
 
+/**
+ * `roots` and their transitive dependencies as the lock's own entries, keyed
+ * by their nested paths: a package lock `npm ci` installs as the root lock
+ * would, two versions of one name included.
+ *
+ * @param {Record<string, object>} lock  a lock's `packages`
+ * @param {string[]} roots  names the root package depends on
+ * @returns {{packageJson: object, packageLock: object}}
+ */
+export function lockSubset(lock, roots) {
+  const packages = {};
+  const queue = roots.map((name) => ({ from: '', name, optional: false }));
+  while (queue.length) {
+    const { from, name, optional } = queue.shift();
+    const key = resolveIn(lock, from, name);
+    if (!key) {
+      if (optional) continue;
+      throw new Error(`${name} is not in package-lock.json (needed from ${from || 'the root'})`);
+    }
+    if (packages[key]) continue;
+    const { dev, devOptional, peer, ...entry } = lock[key];
+    packages[key] = entry;
+    const { dependencies = {}, optionalDependencies = {}, peerDependencies = {}, peerDependenciesMeta = {} } = entry;
+    for (const dep of Object.keys(dependencies)) queue.push({ from: key, name: dep, optional: false });
+    for (const dep of Object.keys(optionalDependencies)) queue.push({ from: key, name: dep, optional: true });
+    for (const dep of Object.keys(peerDependencies)) queue.push({ from: key, name: dep, optional: Boolean(peerDependenciesMeta[dep]?.optional) });
+  }
+  const dependencies = Object.fromEntries(roots.map((name) => [name, packages[`${NM}${name}`].version]));
+  const packageJson = { name: 'scoped-install', private: true, dependencies };
+  const sorted = Object.fromEntries(Object.entries(packages).sort(([a], [b]) => (a < b ? -1 : 1)));
+  return { packageJson, packageLock: { name: 'scoped-install', lockfileVersion: 3, requires: true, packages: { '': packageJson, ...sorted } } };
+}
+
 if (isEntry(import.meta.url)) {
-  const pins = lockClosure(readLock(), process.argv.slice(2));
-  console.log([...pins].map(([name, version]) => `${name}@${version}`).join(' '));
+  const args = process.argv.slice(2);
+  if (args[0] === '--lock') {
+    const [, dir, ...names] = args;
+    const { packageJson, packageLock } = lockSubset(readLock(), names);
+    fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'package.json'), `${JSON.stringify(packageJson, null, 2)}\n`);
+    fs.writeFileSync(path.join(dir, 'package-lock.json'), `${JSON.stringify(packageLock, null, 2)}\n`);
+    console.log(Object.keys(packageLock.packages).filter(Boolean).map((k) => k.slice(NM.length)).join(' '));
+  } else {
+    const pins = lockClosure(readLock(), args);
+    console.log([...pins].map(([name, version]) => `${name}@${version}`).join(' '));
+  }
 }

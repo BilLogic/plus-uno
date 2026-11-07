@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { meteredIn, rescore, seedScore, SEEDED, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf } from './eval-ds-usage.mjs';
+import { compare, DEFAULT_ARMS, LOOKUP_ARMS, lookupWiring, meteredIn, rescore, seedScore, SEEDED, ARMS, CHECKER_REMOVED, CONTROL_REMOVED, DENIED_READS, armDenies, a11y, a11ySummary, confined, reachedCheckout, readSet, SCENARIOS, TASKS, controlAgents, judgePrompt, options, parseJudge, prepare, resultOf, scenariosSha, score, summarize, usageOf } from './eval-ds-usage.mjs';
 import { spawnSync } from 'node:child_process';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
@@ -106,7 +106,8 @@ test('armDenies: checker-removed denies the checker in the copy to Read and npm;
   for (const rel of CHECKER_REMOVED) assert.ok(deny.includes(`Read(//c/${rel})`), rel);
   assert.ok(deny.includes('Bash(npm run check:ds-usage:*)'));
   assert.ok(JSON.parse(confined('/r', deny)).permissions.deny.includes('Bash(npm run check:ds-usage:*)'));
-  assert.deepEqual(ARMS, ['control', 'current', 'hook-off', 'checker-removed']);
+  assert.deepEqual(ARMS, ['control', 'current', 'hook-off', 'checker-removed', 'lookup', 'lookup-min']);
+  for (const arm of ['lookup', 'lookup-min']) assert.deepEqual(armDenies(arm, '/c'), []);
 });
 
 test('score: escapes by rule from this checkout\'s rules; the untouched template scores zero', () => {
@@ -433,4 +434,71 @@ test('the judge no longer scores layout', () => {
 test('meteredIn: names the variables that would bill per token', () => {
   assert.deepEqual(meteredIn({}), []);
   assert.deepEqual(meteredIn({ ANTHROPIC_API_KEY: 'k', CLAUDE_CODE_USE_VERTEX: '1', HOME: '/x' }), ['ANTHROPIC_API_KEY', 'CLAUDE_CODE_USE_VERTEX']);
+});
+
+test('lookup arms: the copy\'s plus-ds server through --mcp-config, all five tools or find and get; other arms get none', () => {
+  assert.deepEqual(LOOKUP_ARMS, ['lookup', 'lookup-min']);
+  for (const arm of LOOKUP_ARMS) assert.ok(ARMS.includes(arm), arm);
+  assert.deepEqual(DEFAULT_ARMS, ['control', 'current', 'checker-removed']);
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-lookup-'));
+  try {
+    for (const arm of ['control', 'current', 'hook-off', 'checker-removed']) assert.deepEqual(lookupWiring(arm, root), { mcpConfig: '{"mcpServers":{}}', allowed: [] });
+    assert.throws(() => lookupWiring('lookup', root), /scripts\/ds-mcp\.mjs/);
+    fs.mkdirSync(path.join(root, 'scripts'));
+    fs.writeFileSync(path.join(root, 'scripts/ds-mcp.mjs'), '');
+    // The real path, since the server starts only when argv[1] is its own module and os.tmpdir() is a symlink on macOS.
+    const server = fs.realpathSync(path.join(root, 'scripts/ds-mcp.mjs'));
+    const full = lookupWiring('lookup', root);
+    assert.deepEqual(JSON.parse(full.mcpConfig), { mcpServers: { 'plus-ds': { type: 'stdio', command: 'node', args: [server] } } });
+    assert.deepEqual(full.allowed, ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check'].map((t) => `mcp__plus-ds__${t}`));
+    const min = lookupWiring('lookup-min', root);
+    assert.deepEqual(JSON.parse(min.mcpConfig).mcpServers['plus-ds'].args, [server, '--tools', 'find,get']);
+    assert.deepEqual(min.allowed, ['mcp__plus-ds__ds_find', 'mcp__plus-ds__ds_get']);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
+test('readSet: a plus-ds tool call is a lookup, by tool name and input', () => {
+  const call = (name, input) => JSON.stringify({ type: 'assistant', message: { content: [{ type: 'tool_use', name, input }] } });
+  const stdout = [call('mcp__plus-ds__ds_find', { query: 'card' }), call('mcp__plus-ds__ds_get', { names: ['PatternCard'] })].join('\n');
+  assert.deepEqual(readSet(stdout, '/c').lookups, ['ds_find {"query":"card"}', 'ds_get {"names":["PatternCard"]}']);
+});
+
+test('compare: keep on a 20% input drop or 3 fewer turns at zero escapes, per model; delete otherwise', () => {
+  const row = (arm, model, input, turns, escapes = 0, extra = {}) => ({ arm, model, harness_commit: 'abc', date: '2026-11-08', total_input_tokens: input, turns, escapes, agent_error: false, ...extra });
+  const rows = [
+    row('current', 'sonnet', 1000, 20),
+    row('current', 'sonnet', 1000, 20),
+    row('lookup', 'sonnet', 790, 19),
+    row('lookup', 'sonnet', 810, 19),
+    row('lookup-min', 'sonnet', 990, 17),
+    row('lookup-min', 'sonnet', 990, 16, 1),
+    row('current', 'opus', 1000, 20),
+    row('lookup', 'opus', 950, 17),
+    row('lookup', 'opus', 1, 1, 0, { agent_error: true }),
+    row('lookup', 'sonnet', 1, 1, 0, { harness_commit: 'old', date: '2026-11-01' }),
+  ];
+  const out = compare(rows);
+  assert.equal(out.commit, 'abc');
+  assert.equal(out.baseline, 'current');
+  const s = out.arms.lookup.models.sonnet;
+  assert.deepEqual([s.verdict, s.input_drop, s.turns_drop, s.escapes], ['keep', 0.2, 1, 0]);
+  assert.deepEqual([s.baseline.mean_input_tokens, s.arm.mean_input_tokens, s.arm.runs], [1000, 800, 2]);
+  assert.equal(out.arms.lookup.models.opus.verdict, 'keep');
+  assert.equal(out.arms.lookup.models.opus.arm.runs, 1);
+  assert.equal(out.arms.lookup.verdict, 'keep');
+  assert.equal(out.arms['lookup-min'].models.sonnet.verdict, 'delete');
+  assert.match(out.arms['lookup-min'].models.sonnet.reason, /escape/);
+  assert.equal(out.arms['lookup-min'].models.opus.verdict, 'no data');
+  assert.equal(out.arms['lookup-min'].verdict, 'delete');
+  assert.equal(compare(rows, { commit: 'old' }).arms.lookup.verdict, 'no data');
+  assert.equal(compare(rows.map((r) => (r.arm === 'lookup' && r.model === 'opus' && !r.agent_error ? { ...r, turns: 18 } : r))).arms.lookup.verdict, 'delete');
+});
+
+test('options: compare reads a baseline arm and a commit', () => {
+  const o = options(['--baseline', 'control', '--commit', 'abc']);
+  assert.deepEqual([o.baseline, o.commit], ['control', 'abc']);
+  assert.equal(options([]).baseline, 'current');
+  assert.throws(() => options(['--baseline', 'bogus']), /unknown bogus/);
 });
