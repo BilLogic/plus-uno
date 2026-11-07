@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import { Popover } from '@base-ui/react/popover';
 import './Spotlight.scss';
 
@@ -62,7 +62,7 @@ const ACTION_CLASS = {
 
 /** SpotlightAction: a footer action, a link when `href` is given and a button otherwise. */
 export const SpotlightAction = ({ appearance = 'primary', href, onClick, children, ...props }) => {
-    const className = classNames('plus-spotlight-action', ACTION_CLASS[appearance]);
+    const className = clsx('plus-spotlight-action', ACTION_CLASS[appearance]);
     if (href) {
         return <a href={href} className={className} onClick={onClick} {...props}>{children}</a>;
     }
@@ -109,7 +109,7 @@ export const Spotlight = ({
         <Popover.Root open={isOpen} onOpenChange={(open) => { if (!open) onDismiss?.(); }}>
             <Popover.Portal>
                 <Popover.Positioner anchor={anchor} side={side} align={align} sideOffset={8}>
-                    <Popover.Popup className={classNames('plus-spotlight', className)}>
+                    <Popover.Popup className={clsx('plus-spotlight', className)}>
                         <SpotlightHeader headline={headline} dismissControl={dismissControl} />
                         {media && <div className="plus-spotlight-media">{media}</div>}
                         <Popover.Description className="plus-spotlight-body">{children}</Popover.Description>

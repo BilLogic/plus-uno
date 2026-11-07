@@ -1,6 +1,6 @@
 import React, { useId, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import Spinner from '@/components/loading/Spinner/Spinner';
 import { MenuGroup } from '@/components/navigation/MenuGroup';
@@ -115,7 +115,7 @@ const DropdownMenu = ({
                     <BaseMenu.Popup
                         id={id}
                         data-testid={testId}
-                        className={classNames('plus-dropdown-menu', className)}
+                        className={clsx('plus-dropdown-menu', className)}
                         aria-labelledby={labelId}
                         aria-busy={loading || undefined}
                         onClick={handleRowPick}

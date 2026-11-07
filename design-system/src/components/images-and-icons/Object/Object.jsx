@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import './Object.scss';
 import { iconClass } from '../../../lib/icon';
 
@@ -27,7 +27,7 @@ export function createObjectIcon(faClass, defaultLabel) {
             aria-label={label || undefined}
             aria-hidden={label ? undefined : true}
             data-testid={testId}
-            className={classNames('plus-object', `plus-object--${size}`, className)}
+            className={clsx('plus-object', `plus-object--${size}`, className)}
             {...props}
         >
             <i className={faClass} aria-hidden="true" />

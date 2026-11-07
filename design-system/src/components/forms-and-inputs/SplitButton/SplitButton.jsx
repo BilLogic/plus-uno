@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import './SplitButton.scss';
 
 /**
@@ -13,7 +13,7 @@ import './SplitButton.scss';
 export const SplitButton = ({ children, className, testId, ...props }) => (
     <div
         role="group"
-        className={classNames('plus-split-btn', className)}
+        className={clsx('plus-split-btn', className)}
         data-testid={testId}
         {...props}
     >

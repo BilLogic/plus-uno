@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import './MenuGroup.scss';
 
 /**
@@ -43,7 +43,7 @@ export const MenuGroup = ({ density = 'regular', maxHeight, maxWidth, minWidth, 
             <div
                 role="menu"
                 data-testid={testId}
-                className={classNames('plus-menu-group', `plus-menu-group--${density}`, className)}
+                className={clsx('plus-menu-group', `plus-menu-group--${density}`, className)}
                 style={{ maxHeight, maxWidth, minWidth }}
                 {...props}
             >
@@ -74,7 +74,7 @@ export const Section = ({ title, hasSeparator = false, className, children, ...p
         <div
             role="group"
             aria-labelledby={titleId}
-            className={classNames('plus-menu-section', { 'plus-menu-section--separated': hasSeparator }, className)}
+            className={clsx('plus-menu-section', { 'plus-menu-section--separated': hasSeparator }, className)}
             {...props}
         >
             {title && <div id={titleId} className="plus-menu-section-title">{title}</div>}
@@ -142,7 +142,7 @@ export const ButtonItem = ({
             onClick={onClick}
             onKeyDown={onKeyDown}
             data-testid={testId}
-            className={classNames('plus-menu-item', { 'plus-menu-item--selected': isSelected }, className)}
+            className={clsx('plus-menu-item', { 'plus-menu-item--selected': isSelected }, className)}
             {...props}
         >
             <ItemRow elemBefore={elemBefore} elemAfter={elemAfter} description={description}>{children}</ItemRow>
@@ -179,7 +179,7 @@ export const LinkItem = ({
             tabIndex={isDisabled ? -1 : undefined}
             onKeyDown={onKeyDown}
             data-testid={testId}
-            className={classNames('plus-menu-item', { 'plus-menu-item--selected': isSelected, 'plus-menu-item--disabled': isDisabled }, className)}
+            className={clsx('plus-menu-item', { 'plus-menu-item--selected': isSelected, 'plus-menu-item--disabled': isDisabled }, className)}
             {...props}
         >
             <ItemRow elemBefore={elemBefore} elemAfter={elemAfter} description={description}>{children}</ItemRow>
@@ -206,7 +206,7 @@ export const CustomItem = ({ component: Component = 'div', elemBefore, elemAfter
     const row = (
         <ItemRow elemBefore={elemBefore} elemAfter={elemAfter} description={description}>{children}</ItemRow>
     );
-    const rowClassName = classNames('plus-menu-item', { 'plus-menu-item--selected': isSelected, 'plus-menu-item--disabled': isDisabled }, className);
+    const rowClassName = clsx('plus-menu-item', { 'plus-menu-item--selected': isSelected, 'plus-menu-item--disabled': isDisabled }, className);
 
     // `menuitem` is only a valid role on elements HTML-AAM allows it on (e.g. `div`); a
     // caller-supplied `component` (a `label`, say) keeps its own native semantics instead,

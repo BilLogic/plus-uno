@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import './CloseButton.scss';
 
@@ -29,7 +29,7 @@ const CloseButton = ({
         spacing={spacing}
         onClick={onClick}
         type="button"
-        className={classNames('plus-close-btn', { 'plus-close-btn--inverse': tone === 'inverse' }, className)}
+        className={clsx('plus-close-btn', { 'plus-close-btn--inverse': tone === 'inverse' }, className)}
     />
 );
 

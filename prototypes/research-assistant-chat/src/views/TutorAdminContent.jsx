@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, useState, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { ShellContext } from '../../../home-redesign/src/context/ShellContext';
 import { TrainingProgressContent } from '../components/TrainingProgressContent';
 import { CompactChatBar } from '../components/CompactChatBar';

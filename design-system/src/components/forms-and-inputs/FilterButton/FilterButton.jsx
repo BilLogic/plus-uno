@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import { Button } from '../Button/Button';
 import './FilterButton.scss';
 
@@ -23,7 +23,7 @@ export const FilterButton = ({
         <Button
             appearance={appearance}
             iconAfter={hasChevronDown ? 'chevron-down' : undefined}
-            className={classNames('plus-filter-btn', className)}
+            className={clsx('plus-filter-btn', className)}
             {...props}
         >
             {text}

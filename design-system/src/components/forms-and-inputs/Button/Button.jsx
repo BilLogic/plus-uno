@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import AiIcon from '../../images-and-icons/AiIcon';
 import './Button.scss';
 import { iconClass } from '../../../lib/icon';
@@ -82,7 +82,7 @@ export const Button = ({
     }
     const leadingIcon = appearance === 'ai' ? <AiIcon name="generate" /> : iconBefore;
 
-    const btnClasses = classNames(
+    const btnClasses = clsx(
         'plus-btn',
         `plus-btn--${appearance}`,
         {

@@ -34,7 +34,8 @@
 
 :root {
   /*
-   * The shadcn names the `ui/` kit reads, aliased onto the design system. Nothing
+   * The theme names the docs Tailwind classes read (`text-foreground`,
+   * `border-input` …), aliased onto the design system. Nothing
    * here is a color of its own: the tokens already switch with `data-color-mode`,
    * so there is no second dark block to keep in step.
    */
