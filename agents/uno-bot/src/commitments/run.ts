@@ -7,8 +7,9 @@
 //   `commitmentThreadHook` — the end-of-day sweep's per-thread hook
 //   (`SweepDeps.onThread`). The sweep reads each active thread once; this asks
 //   the commitment detector about the thread's new messages and keeps each
-//   promise as an `open` row, due at its stated deadline or two working days
-//   out (`commitmentDueAt`). It posts nothing. A thread whose new messages
+//   promise as an `open` row on the one promise timeline (`due.ts`): its due
+//   moment, and its first reminder — a heads-up, a check-in or the Monday it
+//   is asked for a date. It posts nothing. A thread whose new messages
 //   carry no promise words costs no model call. A promise by someone with a
 //   live commitment in the same thread is that task said again: no new row,
 //   and a later day it names moves the due date as a ⏳ would. The detector
@@ -22,9 +23,10 @@
 //   promise, the promiser's messages in the channel since, and the Notion and
 //   GitHub pages they linked; the judge reading those as done makes the row
 //   `auto_done` and nothing is sent. Otherwise the reminder goes up as a reply
-//   in the promise's thread, mentioning the promiser only, and `due_at` is
-//   re-armed two working days out for its one follow-up; a follow-up nobody
-//   answers makes the row `lapsed`. Two posts per commitment in all: a ⏳
+//   in the promise's thread, mentioning the promiser only: a heads-up before
+//   the due moment re-arms `due_at` to the check-in; a check-in re-arms it two
+//   working days out for its one follow-up; a follow-up nobody answers makes
+//   the row `lapsed`. Two check-ins per commitment, beside its heads-up: a ⏳
 //   moves the date and adds none. At most `MAX_REMINDERS_PER_PERSON` a
 //   promiser a morning, and card follow-ups `MAX_CARD_REMINDERS_PER_PERSON`
 //   more on a budget of their own, a person's own asks first — the rest
@@ -67,6 +69,7 @@ import type { SweepSlack, SweepSlackMessage } from "../sweep/run";
 import {
   acknowledgment,
   followUpText,
+  headsUpText,
   REMINDER_CHOICES,
   reminderAnswer,
   reminderBlocks,
@@ -82,14 +85,18 @@ import {
 import type { ReminderPress } from "./press";
 import { mayHoldPromise, type CommitmentDetector, type EvidenceJudge, type FewShotExample, type PromiseAnswer, type ReleaseReason } from "./detector";
 import {
-  commitmentDueAt,
+  checkInAt,
   dayLabel,
   dueDayOf,
   etDayOf,
+  firstReminderAt,
+  followUpAt,
   isMorningRunTime,
   maySnooze,
   nudgeAt,
+  promiseDueAt,
   rearmedDueAt,
+  reminderPhase,
   TEXT_KEEP_MS,
 } from "./due";
 import { snoozedRunAt } from "./remind";
@@ -196,7 +203,8 @@ export async function recordThreadCommitments(
     // no promise row beside it, so its person is asked once.
     if (await deps.store.get(cardTodoId(thread.channel, c.messageTs))) continue;
     const promisedAt = msOf(c.messageTs);
-    const due = commitmentDueAt(promisedAt, c.deadline);
+    // One timeline (`due.ts`): its due moment, and the first reminder on it.
+    const due = promiseDueAt(promisedAt, c.deadline);
     const id = `${thread.channel}:${c.messageTs}`;
     rows.push({
       id,
@@ -207,8 +215,8 @@ export async function recordThreadCommitments(
       messageTs: c.messageTs,
       promiserId: c.promiser,
       requesterId: c.requester,
-      deadlineAt: due.stated ? due.dueAt : null,
-      dueAt: due.dueAt,
+      deadlineAt: due,
+      dueAt: firstReminderAt(promisedAt, due),
       state: "open",
       nudges: 0,
       snoozes: 0,
@@ -258,7 +266,8 @@ async function foldRepromises(
       kept.push(row);
       continue;
     }
-    if (row.deadlineAt === null || row.dueAt <= live.dueAt || deps.dryRun) continue;
+    // A later date restarts the timeline from it.
+    if (row.deadlineAt === null || (live.deadlineAt !== null && row.deadlineAt <= live.deadlineAt) || deps.dryRun) continue;
     if (live.nudges === 0) {
       await deps.store.update(live.id, { dueAt: row.dueAt, deadlineAt: row.deadlineAt });
     } else if (maySnooze(live.snoozes)) {
@@ -521,29 +530,35 @@ async function handleDue(deps: NudgeDeps, c: CommitmentRecord, now: number, runD
     return { id: c.id, action: "auto_done", ...(evidence.reason ? { note: `no longer needed: ${evidence.reason}` } : {}) };
   }
 
+  // One timeline (`due.ts`): a heads-up before the due moment, a check-in
+  // after it, or the ask for a date when none was named. A heads-up is not
+  // one of the two check-ins a promise gets.
+  const phase = reminderPhase(c.deadlineAt, now);
   const first = c.nudges === 0;
-  const body = first
-    ? reminderText({
-        promiser: c.promiserId,
-        what: text.what,
-        deadlineLabel: c.deadlineAt === null ? null : dayLabel(dueDayOf(c.deadlineAt), etDayOf(now)),
-        promisedLabel: dayLabel(etDayOf(c.promisedAt), etDayOf(now)),
-        permalink: await deps.slack.permalink(c.channel, c.messageTs),
-      })
-    : followUpText(c.promiserId);
+  const deadlineLabel = c.deadlineAt === null ? null : dayLabel(dueDayOf(c.deadlineAt), etDayOf(now));
+  const body =
+    phase === "heads-up"
+      ? headsUpText({ promiser: c.promiserId, what: text.what, deadlineLabel: deadlineLabel!, permalink: await deps.slack.permalink(c.channel, c.messageTs) })
+      : first
+        ? reminderText({
+            promiser: c.promiserId,
+            what: text.what,
+            deadlineLabel,
+            promisedLabel: dayLabel(etDayOf(c.promisedAt), etDayOf(now)),
+            permalink: await deps.slack.permalink(c.channel, c.messageTs),
+          })
+        : followUpText(c.promiserId);
   const action = first ? "nudged" : "followed-up";
   if (deps.dryRun) return { id: c.id, action, text: body };
 
   const posted = await deps.slack.post(place, { text: body, blocks: reminderBlocks(body, { choices: REMINDER_CHOICES }) });
   if (!posted.ok || !posted.ts) return hold("Slack refused the post");
-  await settle({
-    state: "nudged",
-    nudges: c.nudges + 1,
-    holds: 0,
-    remindedOn: runDate,
-    dueAt: rearmedDueAt(now),
-    ...(first ? { nudgeTs: posted.ts } : { followupTs: posted.ts }),
-  });
+  const slot = c.nudgeTs === null ? { nudgeTs: posted.ts } : { followupTs: posted.ts };
+  await settle(
+    phase === "heads-up"
+      ? { state: "nudged", holds: 0, remindedOn: runDate, dueAt: checkInAt(c.deadlineAt!), ...slot }
+      : { state: "nudged", nudges: c.nudges + 1, holds: 0, remindedOn: runDate, dueAt: followUpAt(now), ...slot },
+  );
   await keepText(deps, c.id, { ...text, bodies: { ...text.bodies, [posted.ts]: body } }, now);
   // The promise's thread is the team's, so it is marked; a reminder posted at a
   // channel's top would start uno-bot's own thread, which stays unmarked, as a

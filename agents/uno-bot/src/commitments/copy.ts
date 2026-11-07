@@ -158,6 +158,14 @@ export function reminderText(input: {
   return `*On ${input.promisedLabel} you said you'd ${input.what}*\n<@${input.promiser}> I haven't spotted it yet. Is it done, or still in progress?${link}`;
 }
 
+/** A heads-up, the working day before the day a promise names: what was
+ *  promised and when it's due, and that nothing needs doing yet if it's on
+ *  track. */
+export function headsUpText(input: { promiser: string; what: string; deadlineLabel: string; permalink: string | null }): string {
+  const link = input.permalink ? ` · <${input.permalink}|Original message>` : "";
+  return `*You said you'd ${input.what} by ${input.deadlineLabel}*\n<@${input.promiser}> A heads-up before it's due. On track, or does the date need to move?${link}`;
+}
+
 /** The second and last reminder. */
 export function followUpText(promiser: string): string {
   return `<@${promiser}> Checking in once more. Is it done, or does it need more time?`;

@@ -60,9 +60,9 @@ import { GATE_RESERVED } from "../gate/reactions";
 import type { JobContext, ScheduledJob } from "../scheduled/runs";
 import type { SweepMessage } from "../sweep/finding";
 import type { SweepSlackMessage } from "../sweep/run";
-import { acknowledgment, REMINDER_CHOICES, reminderAnswer, reminderBlocks, reminderText, TAP_REFUSED, type ReminderOutcome } from "../commitments/copy";
+import { acknowledgment, headsUpText, REMINDER_CHOICES, reminderAnswer, reminderBlocks, reminderText, TAP_REFUSED, type ReminderOutcome } from "../commitments/copy";
 import { detectorChars, MAX_COMMITMENT_THREAD_CHARS, type CommitmentDetector, type DetectedCommitment, type EvidenceJudge } from "../commitments/detector";
-import { commitmentDueAt, dayLabel, dueDayOf, etDayOf, isMorningRunTime, maySnooze, nudgeAt, rearmedDueAt } from "../commitments/due";
+import { checkInAt, dayLabel, dueDayOf, etDayOf, firstReminderAt, followUpAt, isMorningRunTime, maySnooze, nudgeAt, promiseDueAt, rearmedDueAt, reminderPhase } from "../commitments/due";
 import { LIVE_STATES } from "../commitments/store";
 import { madeFollowUpText, madeToAcknowledgment, MADE_LAST_CHOICES, MADE_TO_LAST_CHOICES, MADE_TO_CHOICES, madeToFollowUpText, madeToText } from "./copy";
 import {
@@ -531,7 +531,9 @@ function rowFor(
       ownerId: at.user,
       kind,
       permalink: permalinkOf(at.url, at.channel, c.messageTs),
-      dueAt: commitmentDueAt(msOf(c.messageTs), c.deadline).dueAt,
+      // One timeline (`commitments/due.ts`); a promise owed to you gets no
+      // heads-up.
+      dueAt: firstReminderAt(msOf(c.messageTs), promiseDueAt(msOf(c.messageTs), c.deadline), kind === "made_to"),
       state: "open",
       nudges: 0,
       snoozes: 0,
@@ -655,17 +657,22 @@ async function remind(
   }
 
   // The reminder in full the first time and at a ⏳'s check-back; otherwise
-  // the short follow-up.
+  // the short follow-up. A heads-up, before the due moment, is in full too,
+  // and is not one of the two check-ins.
   const full = c.nudges === 0 || c.state === "snoozed";
   const promisedAt = msOf(at.ts);
-  const due = commitmentDueAt(promisedAt, promise.deadline);
-  const byLabel = due.stated ? dayLabel(dueDayOf(due.dueAt), etDayOf(now)) : null;
+  const dueAt = promiseDueAt(promisedAt, promise.deadline);
+  const phase = c.kind === "made_to" && dueAt !== null && now < dueAt ? "check-in" : reminderPhase(dueAt, now);
+  const byLabel = dueAt !== null ? dayLabel(dueDayOf(dueAt), etDayOf(now)) : null;
   const promisedLabel = dayLabel(etDayOf(promisedAt), etDayOf(now));
   let body: string;
   if (c.kind === "made") {
-    body = full
-      ? reminderText({ promiser: c.ownerId, what: promise.what, deadlineLabel: byLabel, promisedLabel, permalink: c.permalink })
-      : madeFollowUpText(c.ownerId, c.permalink);
+    body =
+      phase === "heads-up"
+        ? headsUpText({ promiser: c.ownerId, what: promise.what, deadlineLabel: byLabel!, permalink: c.permalink })
+        : full
+          ? reminderText({ promiser: c.ownerId, what: promise.what, deadlineLabel: byLabel, promisedLabel, permalink: c.permalink })
+          : madeFollowUpText(c.ownerId, c.permalink);
   } else {
     body = full
       ? madeToText({ name: await nameOf(), what: promise.what, byLabel, promisedLabel, permalink: c.permalink })
@@ -683,16 +690,19 @@ async function remind(
   if (!dm) return hold("the owner's DM with uno-bot could not be opened");
   const posted = await deps.bot.post(dm, { text: body, blocks: reminderBlocks(body, { choices }) });
   if (!posted.ok || !posted.ts) return hold("Slack refused the post");
+  const slot =
+    c.nudgeTs === null
+      ? { nudgeTs: posted.ts }
+      : { followupTs: posted.ts, earlierFollowupTs: c.followupTs ? [...c.earlierFollowupTs, c.followupTs] : c.earlierFollowupTs };
   await settle({
     state: "nudged",
-    nudges: c.nudges + 1,
+    // A heads-up is not one of the two check-ins: the check-in follows on the
+    // morning after the due moment.
+    ...(phase === "heads-up" ? { dueAt: checkInAt(dueAt!) } : { nudges: c.nudges + 1, dueAt: followUpAt(now) }),
     holds: 0,
     remindedOn: runDate,
-    dueAt: rearmedDueAt(now),
     reminderChannel: dm,
-    ...(c.nudges === 0
-      ? { nudgeTs: posted.ts }
-      : { followupTs: posted.ts, earlierFollowupTs: c.followupTs ? [...c.earlierFollowupTs, c.followupTs] : c.earlierFollowupTs }),
+    ...slot,
   });
   return action;
 }

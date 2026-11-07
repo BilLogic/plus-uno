@@ -367,16 +367,17 @@ describe("the morning reminder", () => {
     assert.ok(row.nudgeTs);
   });
 
-  it("a promise the person made gets the thread reminder's words, when due, and one follow-up, then lapses", async () => {
+  it("a promise the person made with no date waits for the Monday run, then one follow-up, then lapses", async () => {
     const w = world();
     await turnOn(w, ["promises_made"]);
     await runDmPromiseRead(READ, readDeps(w, EOD));
-    // Due at the end of Thu: not yet on Thursday morning.
+    // No date named: asked on the Monday run at least two working days on.
     assert.equal((await runDmPromiseNudges(NUDGE, nudgeDeps(w, THU))).summary, "nothing due");
-    await runDmPromiseNudges(NUDGE, nudgeDeps(w, FRI));
+    assert.equal((await runDmPromiseNudges(NUDGE, nudgeDeps(w, FRI))).summary, "nothing due");
+    await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(35, 13))); // Mon Oct 5
     assert.equal(w.posts.length, 1);
     assert.match(w.posts[0]!.text, new RegExp(`^\\*On Tue you said you'd review the PRD\\*\\n<@${MAYA}> `));
-    // Re-armed to the end of Tue Oct 6: the follow-up goes on Wed.
+    // One more two working days on: Wednesday.
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(36, 13)));
     assert.equal(w.posts.length, 1);
     await runDmPromiseNudges(NUDGE, nudgeDeps(w, at(37, 13)));

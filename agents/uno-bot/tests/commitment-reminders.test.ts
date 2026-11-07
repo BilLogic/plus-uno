@@ -59,22 +59,24 @@ const promiseReply = (over: Record<string, unknown> = {}) =>
 
 /** The promise, read by Tuesday's end-of-day sweep. */
 async function sweptPromise(
-  opts: { store?: InMemoryCommitmentStore; channel?: string; reply?: string; later?: SweepSlackMessage[]; now?: number } = {},
+  opts: { store?: InMemoryCommitmentStore; channel?: string; reply?: string; later?: SweepSlackMessage[]; now?: number; promiseTs?: string; rootTs?: string } = {},
 ) {
+  const promiseTs = opts.promiseTs ?? PROMISE;
+  const root = opts.rootTs ?? ROOT;
   const store = opts.store ?? createInMemoryCommitmentStore();
   const channel = opts.channel ?? DESIGN;
   const provider = fakeProvider({ generateReplies: [opts.reply ?? promiseReply()] });
   const later = opts.later ?? [];
-  const latest = later.at(-1)?.ts ?? PROMISE;
+  const latest = later.at(-1)?.ts ?? promiseTs;
   const h = sweepHarness({
     channels: {
       [channel]: {
         kind: "public",
-        history: [msg(BEA, ROOT, "Where are the updated reflection screens?", { reply_count: 1 + later.length, latest_reply: latest })],
+        history: [msg(BEA, root, "Where are the updated reflection screens?", { reply_count: 1 + later.length, latest_reply: latest })],
         threads: {
-          [ROOT]: [
-            msg(BEA, ROOT, "Where are the updated reflection screens?"),
-            msg(MAYA, PROMISE, "Still polishing. I'll share the Figma link by Thu."),
+          [root]: [
+            msg(BEA, root, "Where are the updated reflection screens?"),
+            msg(MAYA, promiseTs, "Still polishing. I'll share the Figma link by Thu."),
             ...later,
           ],
         },
@@ -172,9 +174,10 @@ describe("the end of day reads a promise", () => {
     assert.equal(row.threadTs, ROOT);
     assert.equal(row.promiserId, MAYA);
     assert.equal(row.requesterId, BEA);
-    // "by Thu", said on Tuesday: the end of Thursday in New York.
-    assert.equal(new Date(row.dueAt).toISOString(), "2026-10-02T04:00:00.000Z");
-    assert.equal(row.deadlineAt, row.dueAt);
+    // "by Thu", said on Tuesday: due at the end of Thursday in New York, and
+    // first reminded by the heads-up on Wednesday's 9:00 ET run.
+    assert.equal(new Date(row.deadlineAt!).toISOString(), "2026-10-02T04:00:00.000Z");
+    assert.equal(new Date(row.dueAt).toISOString(), "2026-09-30T13:00:00.000Z");
     // The summary waits in the text store, never on the row.
     assert.equal(store.texts.get(row.id)?.text.what, "share the Figma link for the reflection screens");
     assert.equal(provider.generated.length, 1);
@@ -201,12 +204,18 @@ describe("the end of day reads a promise", () => {
 });
 
 describe("the morning run", () => {
-  it("does nothing before a commitment is due", async () => {
+  it("gives a heads-up the working day before, then nothing until the morning after it's due", async () => {
     const { store } = await sweptPromise();
-    const m = mornings({ store, now: at(31, 13) }); // Thu 09:00 ET: due tonight
-    const report = await m.run();
-    assert.equal(report.summary, "nothing due");
-    assert.equal(m.posts.length, 0);
+    const m = mornings({ store, now: at(30, 13) }); // Wed 09:00 ET: due Thursday
+    await m.run();
+    assert.equal(m.posts.length, 1);
+    assert.match(m.posts[0]!.text, /^\*You said you'd share the Figma link for the reflection screens by Thu\*\n.+A heads-up before it's due\./s);
+    const row = only(store);
+    assert.equal(row.nudges, 0, "a heads-up is not one of the check-ins");
+    assert.equal(new Date(row.dueAt).toISOString(), "2026-10-02T13:00:00.000Z", "the check-in: Friday's run");
+    m.clock.now = at(31, 13); // Thu: due tonight
+    assert.equal((await m.run()).summary, "nothing due");
+    assert.equal(m.posts.length, 1);
   });
 
   it("completion evidence makes it auto_done, and nothing is posted", async () => {
@@ -266,8 +275,8 @@ describe("the morning run", () => {
 
   it("with no stated deadline, the nudge names the day of the promise", async () => {
     const { store } = await sweptPromise({ reply: promiseReply({ deadline: null }) });
-    // Tue + two working days: due Thursday night, nudged Friday.
-    const m = mornings({ store, now: at(32, 13) });
+    // No date: the Monday run at least two working days on asks for one.
+    const m = mornings({ store, now: at(35, 13) });
     await m.run();
     assert.match(m.posts[0]!.text, new RegExp(`^\\*On Tue you said you'd share the Figma link for the reflection screens\\*\\n<@${MAYA}> I haven't spotted it yet\\. Is it done, or still in progress\\?`));
   });
@@ -546,18 +555,22 @@ describe("a promise said again", () => {
     assert.equal(row.id, `${DESIGN}:${PROMISE}`);
     assert.equal(row.state, "snoozed");
     assert.equal(row.snoozes, 1);
-    // "by Wed", said on Friday: the end of Wednesday the 7th.
-    assert.equal(new Date(row.dueAt).toISOString(), "2026-10-08T04:00:00.000Z");
-    assert.equal(row.deadlineAt, row.dueAt);
-    // One task, two pings at most: Thursday's follow-up, then the lapse.
-    m.clock.now = at(38, 13); // Thu 8th
+    // "by Wed", said on Friday: due at the end of Wednesday the 7th; the new
+    // date restarts the timeline, so Tuesday's run gives the heads-up.
+    assert.equal(new Date(row.deadlineAt!).toISOString(), "2026-10-08T04:00:00.000Z");
+    assert.equal(new Date(row.dueAt).toISOString(), "2026-10-06T13:00:00.000Z");
+    // Two check-ins at most: Friday's, then Thursday's after the heads-up, then the lapse.
+    m.clock.now = at(36, 13); // Tue 6th: the heads-up
+    await m.run();
+    m.clock.now = at(38, 13); // Thu 8th: the check-in
     await m.run();
     m.clock.now = at(42, 13);
     await m.run();
     m.clock.now = at(44, 13);
     await m.run();
-    assert.equal(m.posts.length, 2);
-    assert.equal(m.posts[1]!.text, `<@${MAYA}> Checking in once more. Is it done, or does it need more time?`);
+    assert.equal(m.posts.length, 3);
+    assert.match(m.posts[1]!.text, /A heads-up before it's due/);
+    assert.equal(m.posts[2]!.text, `<@${MAYA}> Checking in once more. Is it done, or does it need more time?`);
     assert.equal(only(store).state, "lapsed");
   });
 
@@ -712,4 +725,43 @@ describe("the reaction door", () => {
     );
     assert.equal((ran[0] as { outcome: string }).outcome, plain.outcome);
   });
+});
+
+// ── One promise timeline, a whole week against fakes ─────────────────────────
+// Each worked case, Made → Due → Heads-up → Check-in: the promise is read at
+// the end of its day, then every weekday morning run for a week and a half,
+// with the judge answering as the case says. Which mornings post is the
+// timeline, with the one more check-in an unanswered one gets two working
+// days on where it falls inside the window. Days are 2026-10-`n`, given as Sep days past 30 (Oct 5 is 35).
+
+describe("one promise timeline, morning by morning", () => {
+  const OPEN = JSON.stringify({ answer: "still_open", reason: null, evidence_ts: [], confidence: 0.9 });
+  const PASSED = JSON.stringify({ answer: "no_longer_needed", reason: "time_passed", evidence_ts: [], confidence: 0.9 });
+  const cases: Array<{ name: string; made: string; deadline: string | null; judge: string[]; posts: number[] }> = [
+    { name: '"by Thu": Mon → Thu → Wed → Fri', made: ts(35, 15), deadline: "Thu", judge: [OPEN, OPEN, OPEN], posts: [37, 39, 43] },
+    { name: '"tomorrow": Mon → Tue → Tue → Wed', made: ts(35, 15), deadline: "tomorrow", judge: [OPEN, OPEN, OPEN], posts: [36, 37, 39] },
+    { name: '"by Mon": Fri → Mon → Mon → Tue', made: ts(39, 15), deadline: "Mon", judge: [OPEN, OPEN, OPEN], posts: [42, 43, 45] },
+    { name: '"call at 1:30": Wed 12:07 → Wed 13:30 → none → none, its time passed', made: ts(37, 16, 7), deadline: "1:30", judge: [PASSED], posts: [] },
+    { name: '"review next Tue": Wed → Tue → Mon → none, its time passed', made: ts(37, 15), deadline: "next Tue", judge: [OPEN, PASSED], posts: [42] },
+    { name: '"update the PRD": Mon → none → none → next Monday, asking for a date', made: ts(35, 15), deadline: null, judge: [OPEN, OPEN], posts: [42, 44] },
+  ];
+  for (const c of cases) {
+    it(c.name, async () => {
+      const madeDay = Math.floor((Number(c.made) * 1000 - Date.UTC(2026, 8, 0)) / 86_400_000);
+      const rootTs = `${Number(c.made) - 3600}.000000`;
+      const { store } = await sweptPromise({ promiseTs: c.made, rootTs, now: at(madeDay, 22), reply: promiseReply({ message_ts: c.made, deadline: c.deadline }) });
+      assert.equal(only(store).state, "open");
+      const m = mornings({ store, now: at(madeDay + 1, 13), judgeReplies: c.judge, thread: [msg(BEA, rootTs, "Where are the updated reflection screens?"), msg(MAYA, c.made, "the promise")] });
+      const posted: number[] = [];
+      for (let day = madeDay + 1; day <= madeDay + 9; day++) {
+        const wd = new Date(Date.UTC(2026, 8, day)).getUTCDay();
+        if (wd === 0 || wd === 6) continue;
+        m.clock.now = at(day, 13);
+        const before = m.posts.length;
+        await m.run();
+        if (m.posts.length > before) posted.push(day);
+      }
+      assert.deepEqual(posted, c.posts);
+    });
+  }
 });
