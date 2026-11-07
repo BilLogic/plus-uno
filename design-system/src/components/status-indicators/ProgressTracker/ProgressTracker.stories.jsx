@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { expect, fireEvent, within } from 'storybook/test';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
@@ -44,6 +44,29 @@ Default.play = async ({ canvasElement }) => {
     const current = canvasElement.querySelector('.plus-progress-tracker__item--current');
     await expect(current).toHaveAttribute('aria-current', 'step');
     await expect(canvas.getByRole('button', { name: /Session information/ })).toBeInTheDocument();
+};
+
+const STEPS = [
+    { id: 'one', label: 'Session information' },
+    { id: 'two', label: 'Student reflection' },
+    { id: 'three', label: 'Session reflection' },
+    { id: 'four', label: 'Form feedback' },
+];
+
+/** Interactive: pick a step to make it current; earlier steps become visited, later ones unvisited. */
+export const Interactive = () => {
+    const [current, setCurrent] = useState(1);
+    const items = STEPS.map((step, index) => ({
+        ...step,
+        status: index < current ? 'visited' : index === current ? 'current' : 'unvisited',
+        onClick: index === current ? undefined : () => setCurrent(index),
+    }));
+    return <ProgressTracker items={items} />;
+};
+Interactive.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    await fireEvent.click(canvas.getByRole('button', { name: /Session reflection/ }));
+    await expect(canvasElement.querySelector('.plus-progress-tracker__item--current')).toHaveTextContent('Session reflection');
 };
 
 export const Vertical = () => <ProgressTracker items={ITEMS} orientation="vertical" />;

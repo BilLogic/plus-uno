@@ -1,8 +1,15 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as ProgressTrackerStories from './ProgressTracker.stories.jsx';
-import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { ProgressTracker } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ProgressTrackerStories} />
 
@@ -22,43 +29,25 @@ Unlike `ProgressIndicator`, every step shows its own name.
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>Four steps: one visited, one current, one unvisited, one disabled.</>}>
-    <Canvas of={ProgressTrackerStories.Default} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Status
 
-A step's status drives its marker and whether it is reachable: `visited`
-shows a check, `current` and `unvisited` show a dot, and `disabled` steps take
-neither `href` nor `onClick`.
+A step's status drives its marker and whether it is reachable: `visited` shows a check, `current` and `unvisited` show a dot, and `disabled` steps take neither `href` nor `onClick`.
 
-<DocsCanvasShell description={<>Clicking a reachable step runs its action. Disabled steps have no control at all.</>}>
-    <DsCanvasQuiet of={ProgressTrackerStories.Clickable} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressTrackerStories.Default} title="Default" description="Four steps: one visited, one current, one unvisited, one disabled." />
 
-<DocsCanvasShell description={<>Every step visited but the last, which is current.</>}>
-    <DsCanvasQuiet of={ProgressTrackerStories.Completed} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressTrackerStories.Clickable} title="Clickable" description="Clicking a reachable step runs its action. Disabled steps have no control at all." />
+
+<ComponentExample of={ProgressTrackerStories.Completed} title="Completed" description="Every step visited but the last, which is current." />
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Layout & composition
+## Size and layout
 
-<DocsCanvasShell description={<>`orientation="vertical"` stacks the steps instead of laying them in a row.</>}>
-    <DsCanvasQuiet of={ProgressTrackerStories.Vertical} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressTrackerStories.Vertical} title="Orientation" description={<><code>orientation="vertical"</code> stacks the steps instead of laying them in a row.</>} />
 
-<DocsCanvasShell description={<>`spacing` sets the gap between steps: `comfortable`, `cozy` or `compact`.</>}>
-    <DsCanvasQuiet of={ProgressTrackerStories.Spacing} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressTrackerStories.Spacing} title="Spacing" description={<><code>spacing</code> sets the gap between steps: <code>comfortable</code>, <code>cozy</code> or <code>compact</code>.</>} />
 
 </div>
 
@@ -66,25 +55,32 @@ neither `href` nor `onClick`.
 
 ## State
 
-<DocsCanvasShell description={<>The current step on the selected ground; a visited step carries the success check.</>}>
-    <DsCanvasQuiet of={ProgressTrackerStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressTrackerStories.Rest} title="Rest" description="The current step on the selected ground; a visited step carries the success check." />
 
-<DocsCanvasShell description={<>A step that can be opened takes the subtle hovered step.</>}>
-    <DsCanvasQuiet of={ProgressTrackerStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressTrackerStories.Hovered} title="Hovered" description="A step that can be opened takes the subtle hovered step." />
 
-<DocsCanvasShell description={<>The same step takes the subtle pressed step.</>}>
-    <DsCanvasQuiet of={ProgressTrackerStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressTrackerStories.Pressed} title="Pressed" description="The same step takes the subtle pressed step." />
 
-<DocsCanvasShell description={<>A step that can be opened shows the 2px ring inset in the step.</>}>
-    <DsCanvasQuiet of={ProgressTrackerStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressTrackerStories.Focused} title="Focused" description="A step that can be opened shows the 2px ring inset in the step." />
 
-<DocsCanvasShell description={<>The step takes the disabled ink and is neither a link nor a button.</>}>
-    <DsCanvasQuiet of={ProgressTrackerStories.Disabled} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressTrackerStories.Disabled} title="Disabled" description="The step takes the disabled ink and is neither a link nor a button." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={ProgressTrackerStories.Interactive}
+    description={
+        <>
+            Click a step to make it current. Use the table below to change props.
+            The preview is rendered{' '}
+            <strong className="text-foreground">inline</strong> while you scroll the docs page.
+        </>
+    }
+/>
 
 </div>
 
@@ -156,9 +152,7 @@ have no names to show, use `ProgressIndicator` instead.
 
 ### An item's status and its action are set separately.
 
-`status` alone decides how a step looks. Give any non-`disabled` item an
-`href` or `onClick` to make it reachable; without either, it renders as plain
-text even if its status says it can be revisited.
+`status` alone decides how a step looks. Give any non-`disabled` item an `href` or `onClick` to make it reachable; without either, it renders as plain text even if its status says it can be revisited.
 
 ```jsx
 <ProgressTracker
@@ -170,10 +164,51 @@ text even if its status says it can be revisited.
 />
 ```
 
+### Let people go back to a step they finished.
+
+Give a `visited` step an action so it can be reopened. Leave a step that cannot be reached yet `disabled`.
+
+<DoDontPair
+    doExample={<ProgressTracker label="Do: reachable visited step" items={[
+        { id: 'a', label: 'Session information', status: 'visited', onClick: () => {} },
+        { id: 'b', label: 'Student reflection', status: 'current' },
+        { id: 'c', label: 'Form feedback', status: 'disabled' },
+    ]} />}
+    doCaption="A finished step opens again; a step not yet reachable is disabled."
+    dontExample={<ProgressTracker label="Don't: visited step with no action" items={[
+        { id: 'a', label: 'Session information', status: 'visited' },
+        { id: 'b', label: 'Student reflection', status: 'current' },
+        { id: 'c', label: 'Form feedback', status: 'unvisited', onClick: () => {} },
+    ]} />}
+    dontCaption="A finished step is plain text, while a step not yet ready can be opened."
+/>
+
+### Keep labels short.
+
+One line per step, a few words. A long label truncates with an ellipsis.
+
+<DoDontPair
+    doExample={<ProgressTracker label="Do: short labels" items={[
+        { id: 'a', label: 'Information', status: 'visited', onClick: () => {} },
+        { id: 'b', label: 'Reflection', status: 'current' },
+        { id: 'c', label: 'Feedback', status: 'unvisited' },
+    ]} />}
+    doCaption="Each label names the task in a word or two."
+    dontExample={<ProgressTracker label="Don't: long labels" items={[
+        { id: 'a', label: 'Information about the session you just taught', status: 'visited', onClick: () => {} },
+        { id: 'b', label: 'Your reflection on how the student did', status: 'current' },
+        { id: 'c', label: 'Feedback on the form you filled out', status: 'unvisited' },
+    ]} />}
+    dontCaption="Sentence-length labels that cut off mid-word."
+/>
+
+### Use the vertical orientation when the row will not fit.
+
+Stack the steps in a narrow column such as a sidebar; keep the row when there is width for it.
+
 ### A `disabled` item takes neither a link nor a button, whatever is passed.
 
-This keeps a step someone cannot reach yet from being focusable or clickable,
-regardless of what `href` or `onClick` the caller supplies.
+This keeps a step someone cannot reach yet from being focusable or clickable, regardless of what `href` or `onClick` the caller supplies.
 
 </div>
 
@@ -189,6 +224,7 @@ regardless of what `href` or `onClick` the caller supplies.
 <tr><td>Name each step for the task it holds: "Student reflection".</td><td>Number the steps in the label or repeat "Step".</td></tr>
 <tr><td>Keep each label to a few words.</td><td>Write labels that truncate.</td></tr>
 <tr><td>Use the same names as the page titles they lead to.</td><td>Rename a step between the tracker and its page.</td></tr>
+<tr><td>Give the nav a <code>label</code> that says what it tracks: "Reflection steps".</td><td>Keep the default when a page holds two trackers.</td></tr>
 </tbody>
 </DocsTable>
 

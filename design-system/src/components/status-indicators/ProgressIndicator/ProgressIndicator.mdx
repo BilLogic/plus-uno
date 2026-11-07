@@ -1,14 +1,21 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as ProgressIndicatorStories from './ProgressIndicator.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, ResourcesBlock, DsCanvasQuiet, DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
+import { ProgressIndicator } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={ProgressIndicatorStories} />
 
 <Title />
 A row of dots showing where you are along the steps of a journey. Unlike
-`ProgressTracker`, each dot carries no label of its own — only a position.
+`ProgressTracker`, each dot carries no label of its own, only a position.
 
 <DocsTabs of={ProgressIndicatorStories}>
 
@@ -22,21 +29,11 @@ A row of dots showing where you are along the steps of a journey. Unlike
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>Four dots, the second one current.</>}>
-    <Canvas of={ProgressIndicatorStories.Default} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Appearance
 
-<DocsCanvasShell description={<>`default`, `primary` and `help` for light surfaces; `inverted` for a dark one.</>}>
-    <DsCanvasQuiet of={ProgressIndicatorStories.Appearances} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressIndicatorStories.Default} title="Default" description="Four dots, the second one current." />
+
+<ComponentExample of={ProgressIndicatorStories.Appearances} title="Appearances" description={<><code>default</code>, <code>primary</code> and <code>help</code> for light surfaces; <code>inverted</code> for a dark one.</>} />
 
 </div>
 
@@ -44,13 +41,9 @@ A row of dots showing where you are along the steps of a journey. Unlike
 
 ## Size and spacing
 
-<DocsCanvasShell description={<>`size` sets the dot diameter, 8 or 12.</>}>
-    <DsCanvasQuiet of={ProgressIndicatorStories.Sizes} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressIndicatorStories.Sizes} title="Size" description={<><code>size</code> sets the dot diameter, 8 or 12.</>} />
 
-<DocsCanvasShell description={<>`spacing` sets the gap between dots: `comfortable`, `cozy` or `compact`.</>}>
-    <DsCanvasQuiet of={ProgressIndicatorStories.Spacing} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressIndicatorStories.Spacing} title="Spacing" description={<><code>spacing</code> sets the gap between dots: <code>comfortable</code>, <code>cozy</code> or <code>compact</code>.</>} />
 
 </div>
 
@@ -58,25 +51,15 @@ A row of dots showing where you are along the steps of a journey. Unlike
 
 ## State
 
-<DocsCanvasShell description={<>Dots on the subtlest icon ground; the current dot on the brand ground.</>}>
-    <DsCanvasQuiet of={ProgressIndicatorStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressIndicatorStories.Rest} title="Rest" description="Dots on the subtlest icon ground; the current dot on the brand ground." />
 
-<DocsCanvasShell description={<>An unselected dot steps to the subtle icon ground; the current dot keeps its ground.</>}>
-    <DsCanvasQuiet of={ProgressIndicatorStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressIndicatorStories.Hovered} title="Hovered" description="An unselected dot steps to the subtle icon ground; the current dot keeps its ground." />
 
-<DocsCanvasShell description={<>An unselected dot steps to the default icon ground.</>}>
-    <DsCanvasQuiet of={ProgressIndicatorStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressIndicatorStories.Pressed} title="Pressed" description="An unselected dot steps to the default icon ground." />
 
-<DocsCanvasShell description={<>Tab reaches each dot and draws the 2px ring.</>}>
-    <DsCanvasQuiet of={ProgressIndicatorStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressIndicatorStories.Focused} title="Focused" description="Tab reaches each dot and draws the 2px ring." />
 
-<DocsCanvasShell description={<>Without <code>onSelect</code> the dots are not buttons and are skipped by Tab.</>}>
-    <DsCanvasQuiet of={ProgressIndicatorStories.Decorative} />
-</DocsCanvasShell>
+<ComponentExample of={ProgressIndicatorStories.Decorative} title="Disabled" description={<>No disabled state. Without <code>onSelect</code> the dots are not buttons and Tab skips them.</>} />
 
 </div>
 
@@ -162,10 +145,14 @@ each step has its own label people need to see, use `ProgressTracker` instead.
 
 ### Pass `onSelect` only when jumping ahead makes sense.
 
-Without `onSelect` the dots are decorative and only `aria-current` marks the
-active one. With it, every dot becomes a button a person can press to jump
-there directly — appropriate for a carousel, not for a linear flow someone
-must complete in order.
+Without `onSelect` the dots are decorative and only `aria-current` marks the active one. With it, every dot becomes a button a person can press to jump there directly. That suits a carousel, not a linear flow someone must complete in order.
+
+<DoDontPair
+    doExample={<ProgressIndicator values={['Slide 1', 'Slide 2', 'Slide 3', 'Slide 4']} selectedIndex={1} onSelect={() => {}} label="Carousel slides" />}
+    doCaption="Interactive dots on a carousel, where any slide can be opened."
+    dontExample={<ProgressIndicator values={['Step 1', 'Step 2', 'Step 3', 'Step 4']} selectedIndex={1} onSelect={() => {}} label="Checkout steps" />}
+    dontCaption="Interactive dots on a flow that must be finished in order."
+/>
 
 ```jsx
 <ProgressIndicator
@@ -176,10 +163,31 @@ must complete in order.
 />
 ```
 
-### `values` only supplies a count and, when interactive, each dot's name.
+### Keep the number of dots small.
 
-The array's content never renders — only its length becomes the number of
-dots, and each entry becomes a dot's accessible name when `onSelect` is set.
+A row of dots reads at a glance. Past about seven, position stops being readable.
+
+<DoDontPair
+    doExample={<ProgressIndicator values={['a', 'b', 'c', 'd', 'e']} selectedIndex={2} />}
+    doCaption="A handful of dots, so the current one is easy to find."
+    dontExample={<ProgressIndicator values={Array.from({ length: 24 }, (_, i) => String(i))} selectedIndex={11} size={8} spacing="compact" />}
+    dontCaption="Two dozen dots, where the current one is lost in the row."
+/>
+
+### Match the appearance to the surface.
+
+`inverted` is for a dark surface; on a light one use `default`, `primary` or `help`.
+
+<DoDontPair
+    doExample={<div style={{ display: 'inline-flex', padding: 'var(--pad-y-lg) var(--pad-x-md)', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--ds-background-neutral-bold)' }}><ProgressIndicator values={['a', 'b', 'c', 'd']} selectedIndex={1} appearance="inverted" /></div>}
+    doCaption="Inverted dots on a dark ground."
+    dontExample={<ProgressIndicator values={['a', 'b', 'c', 'd']} selectedIndex={1} appearance="inverted" />}
+    dontCaption="Inverted dots on a light surface, where they vanish."
+/>
+
+### `values` supplies a count and each dot's name.
+
+The array's content never renders. Its length becomes the number of dots, and when `onSelect` is set each entry becomes a dot's accessible name.
 
 </div>
 
@@ -193,8 +201,8 @@ dots, and each entry becomes a dot's accessible name when `onSelect` is set.
 </thead>
 <tbody>
 <tr><td>Name each dot for its step when the dots are buttons: "Step 2, Reflection".</td><td>Leave interactive dots unnamed or number them only.</td></tr>
+<tr><td>Give the group a <code>label</code> that says what it tracks: "Carousel slides".</td><td>Keep the default "Progress" when a page holds two indicators.</td></tr>
 <tr><td>Use it where steps have no labels of their own.</td><td>Use it where each step needs a title; use the progress tracker.</td></tr>
-<tr><td>Keep the number of dots small.</td><td>Show more dots than a person can read at a glance.</td></tr>
 </tbody>
 </DocsTable>
 

@@ -46,6 +46,4 @@ From `design-system/src/components/status-indicators/ProgressIndicator/ProgressI
 
 Same group: `ProgressTracker`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
