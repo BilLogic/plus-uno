@@ -198,65 +198,32 @@
     margin: 0 auto;
 }
 
-.chat-composer-area {
+.chat-footer {
     display: flex;
-    gap: 12px;
-    align-items: center;
-    width: 100%;
+    flex-direction: column;
+    gap: var(--stack-sm);
 }
 
-.composer-input-wrapper {
-    flex: 1;
-    position: relative;
+/* The person's turn: a quiet bubble at the end of the column. */
+.research-chat-user-turn {
+    align-self: flex-end;
+    max-width: 80%;
+    padding: var(--pad-y-sm) var(--pad-x-md);
+    border-radius: var(--radius-md);
+    background-color: var(--ds-surface-sunken);
+    color: var(--ds-text);
+    font: var(--body-default);
 }
 
-.composer-input {
-    width: 100%;
-    padding: 12px 16px;
-    border: 1px solid #e5e7eb;
-    /* Lighter border as per recent polish */
-    border-radius: 24px;
-    outline: none;
-    font-size: 15px;
-    background: #ffffff;
-    /* White background as preferred */
-    color: #374151;
-    transition: all 0.2s;
-    box-sizing: border-box;
-    font-family: inherit;
+/* The AI's turn: an AiMessage (icon, text, charts, thumbs) at the start. */
+.research-chat-ai-turn {
+    align-self: flex-start;
+    max-width: 90%;
 }
 
-.composer-input:focus {
-    border-color: #0472a8;
-    background: #fff;
-    box-shadow: 0 0 0 3px rgba(4, 114, 168, 0.1);
-}
-
-.composer-input:disabled {
-    background: #f3f4f6;
-    cursor: not-allowed;
-    opacity: 0.7;
-}
-
-.composer-send-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: #e5e7eb;
-    color: #9ca3af;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: default;
-    transition: all 0.2s;
-    flex-shrink: 0;
-}
-
-.composer-send-btn.active {
-    background: #0472a8;
-    color: #fff;
-    cursor: pointer;
-    transform: scale(1.05);
-    box-shadow: 0 2px 4px rgba(4, 114, 168, 0.2);
+.research-chat-disclaimer {
+    margin: 0;
+    font: var(--body-small);
+    color: var(--ds-text-subtle);
+    text-align: center;
 }
