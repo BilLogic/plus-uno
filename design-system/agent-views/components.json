@@ -6235,6 +6235,15 @@
           "deprecated": null
         },
         {
+          "name": "onKeyDown",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Key handler, passed to the card's root element. A card clickable as a whole takes Enter and Space here, beside its `role` and `tabIndex`.",
+          "deprecated": null
+        },
+        {
           "name": "dragging",
           "type": "bool",
           "required": false,
