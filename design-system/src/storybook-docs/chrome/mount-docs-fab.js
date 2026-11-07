@@ -1,5 +1,5 @@
 /**
- * Mounts the stack once into the preview's <body>, outside any story, so it
+ * Mounts the floating button and the AI agent it opens once into the preview's <body>, outside any story, so it
  * stays put as stories change.
  *
  * It is not a manager addon: the manager bundle is built by esbuild with no
@@ -15,15 +15,15 @@ export const mountDocsFab = () => {
     if (import.meta.env?.MODE === 'test' || import.meta.env?.VITEST) return;
     window.__PLUS_DOCS_FAB__ = true;
     const mount = async () => {
-        const [{ createRoot }, { default: DocsFab }, { default: React }] = await Promise.all([
+        const [{ createRoot }, { default: DocsAiAgent }, { default: React }] = await Promise.all([
             import('react-dom/client'),
-            import('./DocsFab'),
+            import('./DocsAiAgent'),
             import('react'),
         ]);
         const container = document.createElement('div');
         container.id = 'plus-docs-fab-root';
         document.body.appendChild(container);
-        createRoot(container).render(React.createElement(DocsFab));
+        createRoot(container).render(React.createElement(DocsAiAgent));
     };
     if (document.readyState === 'loading') window.addEventListener('DOMContentLoaded', mount);
     else mount();

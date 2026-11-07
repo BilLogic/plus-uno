@@ -115,15 +115,18 @@ export const Button = ({
     };
 
     const tagProps = Tag === 'button'
-        ? { type, disabled, onClick: !isLoading ? onClick : undefined }
+        ? { type, disabled, role, onClick: !isLoading ? onClick : undefined }
         : {
             role: role ?? 'button',
-            tabIndex: disabled ? undefined : 0,
+            tabIndex: disabled ? undefined : (props.tabIndex ?? 0),
             href: disabled ? undefined : (href || '#'),
             target: Tag === 'a' ? target : undefined,
             rel: Tag === 'a' ? rel : undefined,
             onClick: handleAnchorClick,
             onKeyDown: (event) => {
+                // A host that composes behavior in (a menu item's roving focus) keeps its own handler.
+                props.onKeyDown?.(event);
+                if (event.defaultPrevented) return;
                 if (event.key === ' ') {
                     event.preventDefault();
                     handleAnchorClick(event);
