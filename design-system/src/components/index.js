@@ -96,7 +96,7 @@ export { default as ProgressTracker, PROGRESS_TRACKER_ORIENTATIONS, PROGRESS_TRA
 export { default as Code } from '@/components/text-and-data-display/Code';
 export { default as CodeBlock, parseHighlight } from '@/components/text-and-data-display/CodeBlock';
 export { default as Heading, HEADING_COLORS, HEADING_SIZES, HeadingContextProvider, useHeadingLevel } from '@/components/text-and-data-display/Heading';
-export { default as Table, DynamicTable, HeadCell, StaticTable, TableCell, TableFooter, TableMessageRow, TableRow, TableSummaryRow } from '@/components/text-and-data-display/Table';
+export { default as Table, DynamicTable, HeadCell, StaticTable, TableBulkActions, TableCell, TableFooter, TableMessageRow, TableRow, TableSummaryRow } from '@/components/text-and-data-display/Table';
 
 // A sibling of components/, not a group inside it.
 export * from '@/dataviz';

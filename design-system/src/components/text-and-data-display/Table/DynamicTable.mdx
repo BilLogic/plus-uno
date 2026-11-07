@@ -102,6 +102,36 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 <div className="sb-ds-doc-section">
 
+## Selection and the bulk bar
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>A checkbox column as wide as the row is tall, with select-all in the head. While rows are selected, `TableBulkActions` replaces the Section toolbar with the count, up to three actions, an overflow menu and Clear selection.</>}
+>
+
+<Canvas of={DynamicTableStories.Selection} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sticky header and frozen column
+
+<DocsCanvasShell
+    attachSourceBelow
+    description={<>The head row stays pinned inside the table's own scroll region. The frozen column sits on an opaque surface and draws a stronger divider while the table scrolls sideways.</>}
+>
+
+<Canvas of={DynamicTableStories.StickyHeaderAndFrozenColumn} />
+
+</DocsCanvasShell>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Widths
 
 <DocsCanvasShell
@@ -157,6 +187,10 @@ rows, select some for a bulk action, or page through a long result. Use
 - **Server paging.** With `totalRows`, `rows` is the current page only, and the footer counts against `totalRows`.
 - **States.** `isLoading` and an empty `rows` pick `loading`, `refreshing` and `empty` on their own. Name `no results` and `error` with `state`, and word them with `noResultsView` and `errorView`.
 - **The footer states the range**, `1–25 of 340`, and shows only on a table that pages.
+- **Selection reports keys.** `isSelectable` adds the checkbox column, and `onSelectionChange` returns every selected row's `key`. Select-all covers the rows on the current page.
+- **The bulk bar is the Section toolbar's selected state.** Swap the Section's `toolbar` for `TableBulkActions` while rows are selected. The table never draws a toolbar of its own.
+- **Pin the head row with `stickyHeader` and `maxHeight`.** Only a bounded region scrolls, so the head row needs a height to pin within.
+- **Freeze with `isFrozen`.** The first column stays put, and with checkboxes the title column beside them stays put too.
 
 </div>
 
@@ -167,7 +201,7 @@ rows, select some for a bulk action, or page through a long result. Use
 - For a grid people only read, use the Static table.
 - For records that nest, use the Tree table.
 - For splitting a long result set across pages, use `Pagination`.
-- For a row-select control, use `Checkbox` with an `aria-label` — the column heading does not name it.
+- For the bar that acts on selected rows, use `TableBulkActions` in the Section header.
 
 </div>
 

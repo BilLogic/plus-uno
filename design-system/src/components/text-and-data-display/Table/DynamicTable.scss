@@ -59,7 +59,7 @@
 
 .plus-dynamic-table-caption {
     caption-side: top;
-    padding: 0 var(--size-table-cell-pad-x) var(--space-0625);
+    padding: 0 var(--size-table-cell-pad-x) var(--stack-sm);
     font: var(--heading-xxsmall);
     color: var(--ds-text);
     text-align: left;
@@ -73,7 +73,7 @@
 .plus-dynamic-table-message {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-0625);
+    gap: var(--size-table-cell-inline);
 }
 
 .plus-dynamic-table-message--error {
@@ -93,4 +93,48 @@
     justify-content: center;
     color: var(--ds-text-subtle);
     pointer-events: none;
+}
+
+// The checkbox column is as wide as the row is tall, the box centered in it.
+.plus-pattern-table-table.plus-dynamic-table-table .plus-dynamic-table-select {
+    width: var(--plus-table-row-height);
+    padding: 0;
+    text-align: center;
+}
+
+/*
+ * The frozen column. PatternTable pins the first cell of each row on the
+ * current surface, so nothing shows through it. While the table is scrolled
+ * sideways the frozen edge draws a stronger divider beside the overflow
+ * shadow. With checkboxes, the title column beside them freezes too, one
+ * row-height in, and the edge moves to it.
+ */
+$frozen: '.plus-pattern-table--sticky-column .plus-pattern-table-scroll[data-scrolled-x]';
+$edge-shadow: inset calc(-1 * var(--border-default)) 0 0 var(--ds-border-bold), var(--ds-shadow-overflow);
+
+.plus-dynamic-table:not(.plus-dynamic-table--frozen-pair) #{$frozen} :is(th, td):first-child:not(.plus-pattern-table-message) {
+    box-shadow: $edge-shadow;
+}
+
+.plus-dynamic-table--frozen-pair {
+    .plus-pattern-table--sticky-column :is(th, td):nth-child(2):not(.plus-pattern-table-message) {
+        position: sticky;
+        left: var(--plus-table-row-height);
+        z-index: var(--pattern-table-z-sticky);
+        background-color: var(--ds-utility-elevation-surface-current);
+    }
+
+    .plus-pattern-table--sticky-header.plus-pattern-table--sticky-column thead th:nth-child(2) {
+        z-index: var(--pattern-table-z-corner);
+    }
+
+    #{$frozen} :is(th, td):first-child:not(.plus-pattern-table-message) {
+        box-shadow: none;
+        clip-path: none;
+    }
+
+    #{$frozen} :is(th, td):nth-child(2):not(.plus-pattern-table-message) {
+        box-shadow: $edge-shadow;
+        clip-path: inset(0 calc(-1 * var(--pattern-table-overflow-reach)) 0 0);
+    }
 }

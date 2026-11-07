@@ -1,8 +1,10 @@
 import React from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { tokenColor, tokenLength, px } from '@/storybook-docs/lib/style-probes.js';
-import { DynamicTable, HeadCell } from '@/components/text-and-data-display/Table';
+import { DynamicTable, HeadCell, TableBulkActions } from '@/components/text-and-data-display/Table';
+import PatternSection, { SectionToolbar } from '@/patterns/PatternSection/PatternSection';
+import { HeadingLevelContext } from '@/lib/headingLevel';
 
 /**
  * The Dynamic table: a table people sort, page or act on. `DynamicTable` is
@@ -47,6 +49,13 @@ export default {
         isFixedSize: { control: 'boolean', table: { category: 'Appearance' } },
         verticalLines: { control: 'boolean', table: { category: 'Appearance' } },
         wrap: { control: 'boolean', table: { category: 'Appearance' } },
+        isSelectable: { control: 'boolean', table: { category: 'Selection' } },
+        selectedRowKeys: { control: false, table: { category: 'Selection' } },
+        defaultSelectedRowKeys: { control: 'object', table: { category: 'Selection' } },
+        onSelectionChange: { control: false, table: { category: 'Selection' } },
+        stickyHeader: { control: 'boolean', table: { category: 'Scrolling' } },
+        maxHeight: { control: 'text', table: { category: 'Scrolling' } },
+        isFrozen: { control: 'boolean', table: { category: 'Scrolling' } },
         className: { control: false, table: { disable: true, category: 'Development' } },
         testId: { control: false, table: { disable: true, category: 'Development' } }
     }
@@ -204,6 +213,93 @@ export const Widths = {
         for (const other of rest) {
             await expect(first.offsetWidth, 'the first column fills').toBeGreaterThan(other.offsetWidth);
         }
+    }
+};
+
+const BULK = ['Message', 'Export', 'Assign tutor', 'Remove'];
+
+const RosterWithBulkBar = (args) => {
+    const [selected, setSelected] = React.useState([]);
+    const toolbar = selected.length > 0 ? (
+        <TableBulkActions
+            count={selected.length}
+            actions={BULK.map((label) => ({ label, onClick: () => {} }))}
+            onClear={() => setSelected([])}
+        />
+    ) : (
+        <SectionToolbar count={`${args.rows.length} students`} />
+    );
+    return (
+        <HeadingLevelContext.Provider value={3}>
+            <PatternSection title="Students" toolbar={toolbar}>
+                <DynamicTable {...args} isSelectable selectedRowKeys={selected} onSelectionChange={setSelected} />
+            </PatternSection>
+        </HeadingLevelContext.Provider>
+    );
+};
+
+export const Selection = {
+    render: (args) => <RosterWithBulkBar {...args} />,
+    args: { head, rows, label: 'Students' },
+    parameters: { docs: { description: { story: 'A checkbox column as wide as the row is tall. Select-all in the head is checked when every row is selected and mixed when only some are. While rows are selected, `TableBulkActions` replaces the Section toolbar: the count, announced politely, up to three actions with an overflow menu, and Clear selection.' } } },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const all = canvas.getByRole('checkbox', { name: 'Select all rows' });
+        await expect(all).toHaveAttribute('aria-checked', 'false');
+        await userEvent.click(canvas.getByRole('checkbox', { name: 'Select row 2' }));
+        await expect(all).toHaveAttribute('aria-checked', 'mixed');
+        const count = canvas.getByText('1 selected');
+        await expect(count).toHaveAttribute('aria-live', 'polite');
+        await expect(canvas.getByText('Marcus Lee').closest('tr')).toHaveAttribute('aria-selected', 'true');
+        await expect(canvas.getByRole('button', { name: 'More actions' })).toBeVisible();
+        await userEvent.click(all);
+        await expect(all).toHaveAttribute('aria-checked', 'true');
+        await expect(canvas.getByText('8 selected')).toBeVisible();
+        await userEvent.click(canvas.getByRole('button', { name: 'Clear selection' }));
+        await expect(all).toHaveAttribute('aria-checked', 'false');
+        await expect(canvas.getByText('8 students')).toBeVisible();
+    }
+};
+
+export const StickyHeaderAndFrozenColumn = {
+    args: {
+        head: {
+            cells: [
+                ...head.cells,
+                { key: 'grade', content: 'Grade' },
+                { key: 'school', content: 'School' },
+                { key: 'attendance', content: 'Attendance', align: 'number' },
+                { key: 'next', content: 'Next session' }
+            ]
+        },
+        rows: ROSTER.map((r) => {
+            const row = toRow(r);
+            return { ...row, cells: [...row.cells, { content: 'Grade 7' }, { content: 'Lincoln Middle School' }, { content: '92%' }, { content: 'Thursday, 4:30 PM' }] };
+        }),
+        label: 'Students',
+        isSelectable: true,
+        isFrozen: true,
+        stickyHeader: true,
+        maxHeight: 200
+    },
+    render: (args) => <div style={{ width: '480px' }}><DynamicTable {...args} /></div>,
+    parameters: { docs: { description: { story: 'The head row stays pinned while the rows scroll under it inside the table\'s own region. The checkboxes and the title column stay frozen on an opaque surface; while the table scrolls sideways their edge draws a stronger divider and the overflow shadow.' } } },
+    play: async ({ canvasElement }) => {
+        const scroll = canvasElement.querySelector('.plus-pattern-table-scroll');
+        const head = canvasElement.querySelector('thead th');
+        await expect(getComputedStyle(head).position).toBe('sticky');
+        const title = canvasElement.querySelector('tbody td:nth-child(2)');
+        await expect(getComputedStyle(title).position).toBe('sticky');
+        await expect(getComputedStyle(title).backgroundColor, 'the frozen cell is opaque').not.toBe('rgba(0, 0, 0, 0)');
+        await expect(getComputedStyle(title).boxShadow, 'no edge before a scroll').toBe('none');
+        scroll.scrollLeft = 200;
+        scroll.dispatchEvent(new Event('scroll'));
+        await waitFor(() => expect(scroll).toHaveAttribute('data-scrolled-x'));
+        await expect(getComputedStyle(title).boxShadow, 'the edge shows while scrolled').not.toBe('none');
+        const before = title.getBoundingClientRect().left;
+        scroll.scrollLeft = 260;
+        scroll.dispatchEvent(new Event('scroll'));
+        await expect(title.getBoundingClientRect().left, 'the frozen column does not move').toBe(before);
     }
 };
 

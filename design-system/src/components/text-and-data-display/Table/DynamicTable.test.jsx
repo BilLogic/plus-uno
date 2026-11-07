@@ -153,3 +153,68 @@ describe('DynamicTable', () => {
         expect(second).toHaveClass('plus-dynamic-table-col--fit');
     });
 });
+
+describe('DynamicTable selection', () => {
+    const selectAll = () => screen.getByRole('checkbox', { name: 'Select all rows' });
+
+    it('adds a checkbox column with "Select row N" labels and a select-all head cell', () => {
+        render(<DynamicTable head={head} rows={rows} isSelectable label="Students" />);
+        expect(selectAll()).not.toBeChecked();
+        expect(screen.getByRole('checkbox', { name: 'Select row 1' })).toBeInTheDocument();
+        expect(screen.getByRole('checkbox', { name: 'Select row 5' })).toBeInTheDocument();
+        expect(screen.getAllByRole('columnheader')).toHaveLength(4);
+    });
+
+    it('selects a row, marks it selected and reports the keys', () => {
+        const onSelectionChange = vi.fn();
+        render(<DynamicTable head={head} rows={rows} isSelectable onSelectionChange={onSelectionChange} />);
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select row 2' }));
+        expect(onSelectionChange).toHaveBeenLastCalledWith(['Ava Thompson']);
+        expect(screen.getByText('Ava Thompson').closest('tr')).toHaveAttribute('aria-selected', 'true');
+        expect(selectAll()).toHaveAttribute('aria-checked', 'mixed');
+    });
+
+    it('select-all is checked when every row is selected, indeterminate when only some are, and toggles them all', () => {
+        const onSelectionChange = vi.fn();
+        render(<DynamicTable head={head} rows={rows} isSelectable onSelectionChange={onSelectionChange} />);
+        fireEvent.click(selectAll());
+        expect(onSelectionChange).toHaveBeenLastCalledWith(people.map(([name]) => name));
+        expect(selectAll()).toBeChecked();
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select row 1' }));
+        expect(selectAll()).toHaveAttribute('aria-checked', 'mixed');
+        fireEvent.click(selectAll());
+        expect(selectAll()).toBeChecked();
+        fireEvent.click(selectAll());
+        expect(onSelectionChange).toHaveBeenLastCalledWith([]);
+        expect(selectAll()).not.toBeChecked();
+    });
+
+    it('is controlled by selectedRowKeys', () => {
+        render(<DynamicTable head={head} rows={rows} isSelectable selectedRowKeys={['Lena Park']} onSelectionChange={() => {}} />);
+        expect(screen.getByRole('checkbox', { name: 'Select row 5' })).toBeChecked();
+        fireEvent.click(screen.getByRole('checkbox', { name: 'Select row 1' }));
+        // Nothing moves until the page passes the new keys.
+        expect(screen.getByRole('checkbox', { name: 'Select row 1' })).not.toBeChecked();
+    });
+
+    it('numbers rows across pages', () => {
+        render(<DynamicTable head={head} rows={rows} isSelectable rowsPerPage={2} defaultPage={2} />);
+        expect(screen.getByRole('checkbox', { name: 'Select row 3' })).toBeInTheDocument();
+    });
+});
+
+describe('DynamicTable sticky header and frozen column', () => {
+    it('pins the head row inside its own bounded scroll region', () => {
+        const { container } = render(<DynamicTable head={head} rows={rows} stickyHeader maxHeight={200} />);
+        expect(container.querySelector('.plus-pattern-table')).toHaveClass('plus-pattern-table--sticky-header');
+        expect(container.querySelector('.plus-pattern-table-scroll')).toHaveStyle({ maxHeight: '200px' });
+    });
+
+    it('freezes the first column, and the title column beside the checkboxes when selectable', () => {
+        const { container, rerender } = render(<DynamicTable head={head} rows={rows} isFrozen />);
+        expect(container.querySelector('.plus-pattern-table')).toHaveClass('plus-pattern-table--sticky-column');
+        expect(container.querySelector('.plus-dynamic-table')).not.toHaveClass('plus-dynamic-table--frozen-pair');
+        rerender(<DynamicTable head={head} rows={rows} isFrozen isSelectable />);
+        expect(container.querySelector('.plus-dynamic-table')).toHaveClass('plus-dynamic-table--frozen-pair');
+    });
+});

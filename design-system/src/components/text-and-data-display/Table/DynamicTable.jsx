@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import PatternTable from '@/patterns/PatternTable';
 import Pagination from '@/components/navigation/Pagination';
 import Spinner from '@/components/loading/Spinner';
+import Checkbox from '@/components/forms-and-inputs/Checkbox';
 import HeadCell from './HeadCell';
 import { TableCell, TableRow, TableFooter } from './TableParts';
 import './Table.scss';
@@ -70,6 +71,18 @@ const deriveState = (state, isLoading, rowCount) => {
  *   loading opacity under a spinner. `isLoading` and an empty `rows` choose
  *   the state on their own; `state` names one outright (`no results` and
  *   `error` are only ever named).
+ * - **Selection.** `isSelectable` adds a checkbox column as wide as the row
+ *   is tall: "Select row N" on each row, "Select all rows" in the head, which
+ *   is checked when every row on the page is selected and mixed when only
+ *   some are. A selected row carries `aria-selected` and the selected fill.
+ *   The keys come back through `onSelectionChange`; pass `selectedRowKeys`
+ *   to own them. The bulk bar is `TableBulkActions`, in the Section header's
+ *   toolbar slot.
+ * - **Sticky header and frozen column.** `stickyHeader` pins the head row
+ *   inside the table's own scroll region, bounded by `maxHeight`. `isFrozen`
+ *   pins the first column (with the checkboxes, the title column beside
+ *   them) on an opaque surface, with a stronger divider and the overflow
+ *   shadow only while the table is scrolled sideways.
  * - **Width.** Under the content minimum the table scrolls sideways instead of
  *   squeezing. The first column fills the room and the rest size to their
  *   content, unless a head cell sets `width`; `isFixedSize` holds every column
@@ -100,6 +113,13 @@ const DynamicTable = ({
     verticalLines = false,
     wrap = false,
     size = 40,
+    isSelectable = false,
+    selectedRowKeys: selectedProp,
+    defaultSelectedRowKeys = [],
+    onSelectionChange,
+    stickyHeader = false,
+    maxHeight,
+    isFrozen = false,
     className = '',
     testId,
     ...props
@@ -124,6 +144,28 @@ const DynamicTable = ({
     const currentPage = Math.min(Math.max(1, page), pages);
     const start = rowsPerPage ? (currentPage - 1) * rowsPerPage : 0;
     const visible = rowsPerPage && !serverPaged ? sorted.slice(start, start + rowsPerPage) : sorted;
+
+    const rowKey = (row, index) => (row.key !== undefined ? row.key : index);
+    const selectionControlled = selectedProp !== undefined;
+    const [ownSelection, setOwnSelection] = useState(defaultSelectedRowKeys);
+    const selected = selectionControlled ? selectedProp : ownSelection;
+    const isSelected = (key) => selected.includes(key);
+    const visibleKeys = visible.map((row, index) => rowKey(row, start + index));
+    const selectedOnPage = visibleKeys.filter(isSelected).length;
+    const allOnPage = visibleKeys.length > 0 && selectedOnPage === visibleKeys.length;
+
+    const setSelection = (next) => {
+        if (!selectionControlled) setOwnSelection(next);
+        if (onSelectionChange) onSelectionChange(next);
+    };
+    const toggleRow = (key) => setSelection(
+        isSelected(key) ? selected.filter((k) => k !== key) : [...selected, key]
+    );
+    const toggleAll = () => setSelection(
+        allOnPage
+            ? selected.filter((k) => !visibleKeys.includes(k))
+            : [...selected, ...visibleKeys.filter((k) => !isSelected(k))]
+    );
 
     const bodyState = deriveState(state, isLoading, rows.length);
     const showsMessage = !['default', 'refreshing'].includes(bodyState);
@@ -168,6 +210,7 @@ const DynamicTable = ({
             className={classes(
                 'plus-dynamic-table',
                 wrap && 'plus-dynamic-table--wrap',
+                isFrozen && isSelectable && 'plus-dynamic-table--frozen-pair',
                 className
             )}
             data-state={bodyState}
@@ -178,6 +221,9 @@ const DynamicTable = ({
             <PatternTable
                 pagination={footer}
                 empty={showsMessage}
+                stickyHeader={stickyHeader}
+                stickyColumn={isFrozen}
+                maxHeight={maxHeight}
                 emptyState={showsMessage ? (
                     <span className={classes('plus-dynamic-table-message', `plus-dynamic-table-message--${bodyState.replace(/\s+/g, '-')}`)}>
                         {message}
@@ -197,6 +243,17 @@ const DynamicTable = ({
                 {caption && <caption className="plus-dynamic-table-caption">{caption}</caption>}
                 <thead>
                     <tr>
+                        {isSelectable && (
+                            <th scope="col" className="plus-table-head-cell plus-table-cell--align-icon plus-dynamic-table-select">
+                                <Checkbox
+                                    aria-label="Select all rows"
+                                    isChecked={allOnPage}
+                                    isIndeterminate={selectedOnPage > 0 && !allOnPage}
+                                    isDisabled={visibleKeys.length === 0}
+                                    onChange={toggleAll}
+                                />
+                            </th>
+                        )}
                         {head.cells.map((cell, index) => (
                             <HeadCell
                                 key={cell.key ?? index}
@@ -216,30 +273,48 @@ const DynamicTable = ({
                     </tr>
                 </thead>
                 <tbody>
-                    {visible.map((row, rowIndex) => (
-                        <TableRow
-                            key={row.key ?? rowIndex}
-                            className={classes(
-                                start + rowIndex === highlightedRowIndex && 'plus-dynamic-table-row--highlighted'
-                            )}
-                            onClick={row.onClick}
-                        >
-                            {row.cells.map((cell, cellIndex) => {
-                                const { key, content, ...rest } = cell || {};
-                                return (
-                                    <TableCell
-                                        key={cellIndex}
-                                        align={head.cells[cellIndex]?.align}
-                                        emphasis={cellIndex === 0 ? 'title' : 'default'}
-                                        overflow={wrap ? 'wrap' : 'truncate'}
-                                        {...rest}
+                    {visible.map((row, rowIndex) => {
+                        const key = rowKey(row, start + rowIndex);
+                        const rowSelected = isSelectable && isSelected(key);
+                        return (
+                            <TableRow
+                                key={key}
+                                state={rowSelected ? 'selected' : 'rest'}
+                                className={classes(
+                                    start + rowIndex === highlightedRowIndex && 'plus-dynamic-table-row--highlighted'
+                                )}
+                                onClick={row.onClick}
+                            >
+                                {isSelectable && (
+                                    <td
+                                        className="plus-table-cell plus-table-cell--align-icon plus-dynamic-table-select"
+                                        // A press on the box selects; it does not open the row.
+                                        onClick={(event) => event.stopPropagation()}
                                     >
-                                        {content}
-                                    </TableCell>
-                                );
-                            })}
-                        </TableRow>
-                    ))}
+                                        <Checkbox
+                                            aria-label={`Select row ${start + rowIndex + 1}`}
+                                            isChecked={rowSelected}
+                                            onChange={() => toggleRow(key)}
+                                        />
+                                    </td>
+                                )}
+                                {row.cells.map((cell, cellIndex) => {
+                                    const { key, content, ...rest } = cell || {};
+                                    return (
+                                        <TableCell
+                                            key={cellIndex}
+                                            align={head.cells[cellIndex]?.align}
+                                            emphasis={cellIndex === 0 ? 'title' : 'default'}
+                                            overflow={wrap ? 'wrap' : 'truncate'}
+                                            {...rest}
+                                        >
+                                            {content}
+                                        </TableCell>
+                                    );
+                                })}
+                            </TableRow>
+                        );
+                    })}
                 </tbody>
             </PatternTable>
             {bodyState === 'refreshing' && (
@@ -315,6 +390,20 @@ DynamicTable.propTypes = {
     wrap: PropTypes.bool,
     /** Row height: 32, 40 or 48. */
     size: PropTypes.oneOf([32, 40, 48]),
+    /** A checkbox column with select-all in the head. */
+    isSelectable: PropTypes.bool,
+    /** The selected rows' keys, owned by the page. */
+    selectedRowKeys: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number])),
+    /** The rows selected at first when the table holds its own selection. */
+    defaultSelectedRowKeys: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number])),
+    /** Called with every selected key when the selection changes. */
+    onSelectionChange: PropTypes.func,
+    /** Pin the head row inside the table's own scroll region; needs `maxHeight`. */
+    stickyHeader: PropTypes.bool,
+    /** Bound the scroll region's height (px or any CSS length). */
+    maxHeight: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    /** Pin the first column (the title column too, beside the checkboxes). */
+    isFrozen: PropTypes.bool,
     className: PropTypes.string,
     /** Maps to `data-testid`, for test queries. */
     testId: PropTypes.string,
