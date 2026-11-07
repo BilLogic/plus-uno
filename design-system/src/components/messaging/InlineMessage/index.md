@@ -9,7 +9,7 @@ message. Built on Popup so placement, dismissal and focus return are shared with
 
 **Source:** `design-system/src/components/messaging/InlineMessage/InlineMessage.jsx`
 
-**Stories:** `design-system/src/components/messaging/InlineMessage/InlineMessage.stories.jsx` — Overview, Appearances, WithSecondaryText, Interactive, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/InlineMessage/InlineMessage.stories.jsx` — Overview, Appearances, Info, Warning, Danger, Success, WithSecondaryText, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/InlineMessage/InlineMessage.mdx`
 
@@ -18,7 +18,7 @@ message. Built on Popup so placement, dismissal and focus return are shared with
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `appearance` | enum | `'info'` | The trigger's icon and tint. |
-| `label` | string (required) | — | Accessible name and tooltip of the trigger |
+| `label` | string (required) | — | The trigger icon's accessible name and tooltip. Required: it is the only visible part before the popup opens. |
 | `title` | node | — | Bolded first line of the popup. |
 | `secondaryText` | node | — | A second line, when the title alone does not say enough. |
 | `placement` | enum | `'bottom-start'` | Where the popup opens relative to the trigger. |
@@ -44,6 +44,4 @@ From `design-system/src/components/messaging/InlineMessage/InlineMessage.scss`. 
 
 Same group: `Banner` · `EmptyState` · `Flag` · `Modal` · `SectionMessage` · `Spotlight`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

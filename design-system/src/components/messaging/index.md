@@ -7,15 +7,15 @@ authored half (#166), counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [Banner](Banner/index.md) | 5 | ✅ | ✕ | ✅ |
+| [Banner](Banner/index.md) | 5 | ✅ | ✅ | ✅ |
 | [EmptyState](EmptyState/index.md) | 8 | ✅ | ✅ | ✅ |
 | [Flag](Flag/index.md) | 16 | ✅ | ✅ | ✅ |
-| [InlineMessage](InlineMessage/index.md) | 8 | ✅ | ✕ | ✅ |
+| [InlineMessage](InlineMessage/index.md) | 8 | ✅ | ✅ | ✅ |
 | [Modal](Modal/index.md) | 23 | ✅ | ✅ | ✅ |
 | [SectionMessage](SectionMessage/index.md) | 10 | ✅ | ✅ | ✅ |
-| [Spotlight](Spotlight/index.md) | 12 | ✅ | ✕ | ✅ |
+| [Spotlight](Spotlight/index.md) | 12 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 7/7 (100%) · Correct/incorrect 4/7 (57%) · Accessibility 7/7 (100%)
+**Authored coverage:** When to use 7/7 (100%) · Correct/incorrect 7/7 (100%) · Accessibility 7/7 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

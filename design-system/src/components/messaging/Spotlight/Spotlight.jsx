@@ -54,9 +54,15 @@ const SpotlightHeader = ({ headline, dismissControl }) => (
 
 SpotlightHeader.propTypes = { headline: PropTypes.node, dismissControl: PropTypes.node };
 
+/** Each appearance's class, spelled out so a search for it finds it. */
+const ACTION_CLASS = {
+    primary: 'plus-spotlight-action--primary',
+    secondary: 'plus-spotlight-action--secondary',
+};
+
 /** SpotlightAction: a footer action, a link when `href` is given and a button otherwise. */
 export const SpotlightAction = ({ appearance = 'primary', href, onClick, children, ...props }) => {
-    const className = classNames('plus-spotlight-action', `plus-spotlight-action--${appearance}`);
+    const className = classNames('plus-spotlight-action', ACTION_CLASS[appearance]);
     if (href) {
         return <a href={href} className={className} onClick={onClick} {...props}>{children}</a>;
     }

@@ -9,7 +9,7 @@ drawn on `Popover.Positioner` from `@base-ui/react`.
 
 **Source:** `design-system/src/components/messaging/Spotlight/Spotlight.jsx`
 
-**Stories:** `design-system/src/components/messaging/Spotlight/Spotlight.stories.jsx` — Basic, WithMedia, LinkAction, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Spotlight/Spotlight.stories.jsx` — Basic, WithMedia, LinkAction, PrimaryAction, SecondaryAction, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Spotlight/Spotlight.mdx`
 
@@ -46,6 +46,4 @@ From `design-system/src/components/messaging/Spotlight/Spotlight.scss`. Override
 
 Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

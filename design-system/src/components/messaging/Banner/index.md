@@ -9,7 +9,7 @@ stripe — the caller mounts and unmounts it, and meaning comes from the fill an
 
 **Source:** `design-system/src/components/messaging/Banner/Banner.jsx`
 
-**Stories:** `design-system/src/components/messaging/Banner/Banner.stories.jsx` — Overview, Appearances, WithoutIcon, Interactive, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Banner/Banner.stories.jsx` — Overview, Appearances, Warning, Danger, Announcement, WithoutIcon, Interactive, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Banner/Banner.mdx`
 
@@ -18,7 +18,7 @@ stripe — the caller mounts and unmounts it, and meaning comes from the fill an
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `appearance` | enum | `'warning'` | `warning` (default form), `danger` (critical, needs immediate attention) or `announcement` (general, no icon). |
-| `icon` | string or node or enum | — | Font Awesome Free solid glyph name, a node, or `false` to remove it |
+| `icon` | string or node or enum | — | A Font Awesome Free solid glyph name or a node. `false` removes the appearance's default icon. |
 | `children` | node (required) | — | Message content. Typically text, optionally with a link. |
 | `className` | string | `''` | — |
 | `id` | string | — | — |
@@ -39,6 +39,4 @@ From `design-system/src/components/messaging/Banner/Banner.scss`. Override these
 
 Same group: `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=no accessibility=yes -->
-
-> Authored guidance is partial — missing: correct/incorrect (#166).
+<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -1,7 +1,14 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as SpotlightStories from './Spotlight.stories.jsx';
-import { DocsCanvasShell, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { SpotlightAction } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -18,6 +25,33 @@ export const figmaMeta = {
   ]
 };
 
+{/* The callout's content drawn statically with its own classes and real SpotlightActions, so a pair never opens a real popup over the docs page. The preview is inert: a picture, not a control. */}
+export const StaticSpotlight = ({ headline, children, stepCount, primaryAction, secondaryAction }) => (
+    <div className="plus-spotlight" inert aria-hidden="true">
+        <div className="plus-spotlight-header">
+            <div className="plus-spotlight-dismiss">
+                <button type="button" className="plus-spotlight-dismiss-button" aria-label="Dismiss">
+                    <i className="fa-solid fa-xmark" aria-hidden="true" />
+                </button>
+            </div>
+            <div className="plus-spotlight-headline">{headline}</div>
+        </div>
+        <div className="plus-spotlight-body">{children}</div>
+        <div className="plus-spotlight-footer">
+            {stepCount && <span className="plus-spotlight-step-count">{stepCount}</span>}
+            <div className="plus-spotlight-actions">
+                {secondaryAction}
+                {primaryAction}
+            </div>
+        </div>
+    </div>
+);
+
+export const skip = <SpotlightAction appearance="secondary">Skip</SpotlightAction>;
+export const linkAction = <SpotlightAction appearance="secondary" href="#">Learn more</SpotlightAction>;
+
+export const gotIt = <SpotlightAction appearance="primary">Got it</SpotlightAction>;
+
 <Meta of={SpotlightStories} />
 
 <Title />
@@ -31,6 +65,7 @@ place without wiring a ref by hand.
 <DocsTab tab="examples">
 
 <ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20630-66"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Spotlight"
@@ -40,46 +75,17 @@ place without wiring a ref by hand.
 
 <div className="sb-ds-doc-section">
 
-## Overview
+## Behavior
 
-<DocsCanvasShell attachSourceBelow description={<>A headline, a step count and two actions, anchored below the target button.</>}>
-    <Canvas of={SpotlightStories.Basic} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
+<ComponentExample of={SpotlightStories.Basic} title="Step in a tour" description="A headline, a step count and two actions, anchored below the target button." />
 
-</div>
+<ComponentExample of={SpotlightStories.WithMedia} title="With media" description="media adds an image or illustration above the body." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={SpotlightStories.PrimaryAction} title="Primary action" description="SpotlightAction appearance primary: the overlay surface on the brand ground." />
 
-## Anatomy
+<ComponentExample of={SpotlightStories.SecondaryAction} title="Secondary action" description="SpotlightAction appearance secondary: an inverse outline." />
 
-1. **`SpotlightTarget`** wraps the element the callout points at and shares its
-   anchor with the `Spotlight` beside it through a `SpotlightProvider`.
-2. **Header** holds the headline and, when `dismissible`, the close button —
-   the dialog's first focusable element.
-3. **Media**, when passed, sits above the body.
-4. **Body** is the `children` text.
-5. **Footer** holds an optional `stepCount` and up to two `SpotlightAction`s,
-   the secondary one first.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content
-
-<DocsCanvasShell description={<>`media` adds an image or illustration above the body.</>}>
-    <DsCanvasQuiet of={SpotlightStories.WithMedia} />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Actions
-
-<DocsCanvasShell description={<>A `SpotlightAction` with `href` renders as a link; without it, a button.</>}>
-    <DsCanvasQuiet of={SpotlightStories.LinkAction} />
-</DocsCanvasShell>
+<ComponentExample of={SpotlightStories.LinkAction} title="Link action" description="A SpotlightAction with href renders as a link; without it, a button." />
 
 </div>
 
@@ -87,21 +93,29 @@ place without wiring a ref by hand.
 
 ## State
 
-<DocsCanvasShell description={<>The popup on the brand bold ground with an inverse headline.</>}>
-    <DsCanvasQuiet of={SpotlightStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={SpotlightStories.Rest} title="Rest" description="The popup on the brand bold ground with an inverse headline." />
 
-<DocsCanvasShell description={<>Dismiss takes the inverse hovered layer.</>}>
-    <DsCanvasQuiet of={SpotlightStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={SpotlightStories.Hovered} title="Hovered" description="Dismiss takes the inverse hovered layer." />
 
-<DocsCanvasShell description={<>Dismiss takes the inverse pressed layer.</>}>
-    <DsCanvasQuiet of={SpotlightStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={SpotlightStories.Pressed} title="Pressed" description="Dismiss takes the inverse pressed layer." />
 
-<DocsCanvasShell description={<>Dismiss shows the inverse 2px ring.</>}>
-    <DsCanvasQuiet of={SpotlightStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={SpotlightStories.Focused} title="Focused" description="Dismiss shows the inverse 2px ring." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SpotlightStories.Interactive}
+    description={
+        <>
+            Use the table below to change props. The callout opens over the page, anchored to the{' '}
+            <strong className="text-foreground">Create</strong> button. The Demo rows set the action labels; they are not props.
+        </>
+    }
+/>
 
 </div>
 
@@ -117,10 +131,9 @@ place without wiring a ref by hand.
 
 ## Usage
 
-Use `Spotlight` to call out one feature the first time someone can use it —
-pointing at a new button, a changed control, a place to start. It is a single
-step or a short, explicit sequence with a `stepCount`, not an ongoing help
-system.
+Use `Spotlight` to call out one feature the first time someone can use it:
+a new button, a changed control, a place to start. It is a single step or a
+short, explicit sequence with a `stepCount`, not an ongoing help system.
 
 For a message that stays on the page until resolved, use `SectionMessage` or
 `Banner` instead. For a short note tied to one field or value, use
@@ -132,12 +145,14 @@ For a message that stays on the page until resolved, use `SectionMessage` or
 
 ## Parts
 
-1. **Headline.** The dialog title, read first.
-2. **Dismiss.** A close button in the header.
-3. **Media.** An optional image above the body.
-4. **Body.** The description text.
-5. **Step count.** A short label like "1 of 3".
-6. **Actions.** A secondary and a primary <code>SpotlightAction</code>.
+1. **Target.** `SpotlightTarget` wraps the element the callout points at and
+   shares its anchor with the `Spotlight` through a `SpotlightProvider`.
+2. **Headline.** The dialog title, read first.
+3. **Dismiss.** A close button in the header, the dialog's first focusable element.
+4. **Media.** An optional image above the body.
+5. **Body.** The `children` text.
+6. **Step count.** A short label like "1 of 3".
+7. **Actions.** A secondary and a primary <code>SpotlightAction</code>, the secondary first.
 
 ### States
 
@@ -147,8 +162,10 @@ For a message that stays on the page until resolved, use `SectionMessage` or
 </thead>
 <tbody>
 <tr><td>Rest</td><td>Popup on the brand bold fill with inverse text.</td></tr>
-<tr><td>Hovered, pressed</td><td>Dismiss takes the inverse interaction layers.</td></tr>
+<tr><td>Hovered</td><td>Dismiss takes the inverse hovered layer.</td></tr>
+<tr><td>Pressed</td><td>Dismiss takes the inverse pressed layer.</td></tr>
 <tr><td>Focused</td><td>Dismiss and actions show the inverse 2px ring.</td></tr>
+<tr><td>Disabled</td><td>Not supported.</td></tr>
 <tr><td>Dismissed</td><td>The popup closes and <code>onDismiss</code> fires.</td></tr>
 </tbody>
 </DocsTable>
@@ -160,9 +177,13 @@ For a message that stays on the page until resolved, use `SectionMessage` or
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Surface</td><td><code>--ds-background-brand-bold</code>, <code>--ds-shadow-overlay</code>, <code>--popover-width-md</code></td></tr>
-<tr><td>Text</td><td><code>--ds-text-inverse</code>, <code>--heading-small</code>, <code>--body-default</code></td></tr>
-<tr><td>Dismiss</td><td><code>--ds-icon-inverse</code>, <code>--ds-interaction-inverse-hovered</code>, <code>--ds-interaction-inverse-pressed</code></td></tr>
+<tr><td>Surface</td><td><code>--ds-background-brand-bold</code>, <code>--ds-shadow-overlay</code>, <code>--popover-width-md</code>, <code>--radius-100</code>, <code>--space-150</code></td></tr>
+<tr><td>Text</td><td><code>--ds-text-inverse</code>, <code>--heading-small</code>, <code>--body-default</code>; step count <code>--body-small</code></td></tr>
+<tr><td>Dismiss</td><td><code>--ds-icon-inverse</code>, <code>--ds-interaction-inverse-hovered</code>, <code>--ds-interaction-inverse-pressed</code>, <code>--radius-md</code></td></tr>
+<tr><td>Primary action</td><td><code>--ds-surface-overlay</code>, <code>--ds-text</code></td></tr>
+<tr><td>Secondary action</td><td><code>--ds-text-inverse</code> text and <code>--border-default</code> edge</td></tr>
+<tr><td>Actions</td><td><code>--radius-050</code>, <code>--space-050</code>, <code>--space-100</code>, <code>--space-075</code> between</td></tr>
+<tr><td>Media</td><td><code>--radius-050</code></td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused-inverse</code></td></tr>
 </tbody>
 </DocsTable>
@@ -173,7 +194,41 @@ For a message that stays on the page until resolved, use `SectionMessage` or
 
 ## Best practices
 
-### Wrap the target and the callout in one `SpotlightProvider`.
+### Name the feature, then say what to do.
+
+A headline names the thing; the body is one sentence.
+
+<DoDontPair
+    doExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAction={skip} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
+    doCaption="Short headline, one-sentence body."
+    dontExample={<StaticSpotlight headline="Welcome!" stepCount="1 of 3" secondaryAction={skip} primaryAction={gotIt}>Click here to learn about the new calendar view and everything else we changed this term.</StaticSpotlight>}
+    dontCaption="A greeting and a paragraph."
+/>
+
+### Show a step count only in a tour.
+
+One step alone has nothing to count.
+
+<DoDontPair
+    doExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAction={skip} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
+    doCaption="1 of 3 in a three-step tour."
+    dontExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 1" secondaryAction={skip} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
+    dontCaption="1 of 1 on a single tip."
+/>
+
+### Make the secondary action a link.
+
+The primary action leads; the second one stays quiet. A `SpotlightAction` with
+`href` renders as a link.
+
+<DoDontPair
+    doExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAction={linkAction} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
+    doCaption="Secondary action as a link."
+    dontExample={<StaticSpotlight headline="Find sessions here" stepCount="1 of 3" secondaryAction={<SpotlightAction appearance="primary">Learn more</SpotlightAction>} primaryAction={gotIt}>Open the calendar to see this week.</StaticSpotlight>}
+    dontCaption="Two competing buttons."
+/>
+
+### Wrap the target and the callout in one SpotlightProvider.
 
 `SpotlightTarget` and `Spotlight` share an anchor through context, so both
 need to sit inside the same provider. Pass `target` directly only when the
@@ -185,16 +240,16 @@ anchor comes from outside that tree.
         <Button text="Create" />
     </SpotlightTarget>
     <Spotlight headline="Create a new board" onDismiss={() => setSeen(true)}>
-        Click here whenever you want to start something new.
+        Start a new board from here.
     </Spotlight>
 </SpotlightProvider>
 ```
 
 ### Dismiss it once, and remember that it was seen.
 
-`isOpen` is yours to control. Store whatever "seen" state applies — a user
-preference, a session flag — so the same spotlight does not reopen on every
-visit.
+`isOpen` is yours to control. Store whatever "seen" state applies, such as a
+user preference or a session flag, so the same spotlight does not reopen on
+every visit.
 
 </div>
 
@@ -219,13 +274,13 @@ visit.
 
 ## Accessibility
 
-- **A dialog, not a tooltip.** The callout is a `Popover.Popup` with a title
-  and a description, read together when it opens.
+- **A dialog, not a tooltip.** The callout is a popover with a title and a
+  description, read together when it opens.
 - **The dismiss control is the first focusable element.** Tab reaches it
   before the body or the actions, so closing never requires finding the
   target again.
 - **Escape closes it.** Dismissing with Escape or the close button calls
-  `onDismiss`, same as pressing it directly.
+  `onDismiss`.
 
 </div>
 

@@ -22,7 +22,7 @@ export default {
     },
     argTypes: {
         appearance: { control: 'select', options: INLINE_MESSAGE_APPEARANCES, table: { category: 'Design' } },
-        label: { control: 'text', description: 'Accessible name and tooltip of the trigger', table: { category: 'Content' } },
+        label: { control: 'text', table: { category: 'Content' } },
         title: { control: 'text', table: { category: 'Content' } },
         secondaryText: { control: 'text', table: { category: 'Content' } },
         placement: { control: 'select', options: ['top', 'bottom', 'left', 'right', 'top-start', 'top-end', 'bottom-start', 'bottom-end'], table: { category: 'Layout' } },
@@ -68,6 +68,19 @@ export const Appearances = {
         await expect(canvas.getAllByRole('button')).toHaveLength(INLINE_MESSAGE_APPEARANCES.length);
     },
 };
+
+/** One appearance per story, for the docs page's Appearance section. */
+const appearanceStory = (appearance, label, heading, message) => ({
+    render: () => <InlineMessage appearance={appearance} label={label} title={heading}>{message}</InlineMessage>,
+    play: async ({ canvasElement }) => {
+        await expect(within(canvasElement).getByRole('button', { name: label })).toBeVisible();
+    },
+});
+
+export const Info = appearanceStory('info', 'What this score means', 'Why this matters', 'Sessions are scored on the rubric agreed at intake.');
+export const Warning = appearanceStory('warning', 'Before you leave this page', 'Changes are not saved', 'Save your notes before you leave.');
+export const Danger = appearanceStory('danger', 'Why this file was rejected', 'File too large', 'The file was larger than 10 MB. Try a smaller one.');
+export const Success = appearanceStory('success', 'Upload status', 'Upload complete', 'The file is attached to the session.');
 
 export const WithSecondaryText = {
     render: () => (

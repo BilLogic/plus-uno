@@ -101,6 +101,21 @@ WithIcon.play = async ({ canvasElement }) => {
 
 /* --------------------------------------------------------------------- size */
 
+/** Default spacing: Compact's content at the view size, Heading/medium 20. */
+export const Default = () => (
+    <EmptyState
+        icon="user-group"
+        header="No students yet"
+        description="Add a student to see them here."
+        primaryAction={<Button text="Add student" appearance="primary" />}
+    />
+);
+
+Default.play = async ({ canvasElement }) => {
+    const heading = within(canvasElement).getByRole('heading', { name: 'No students yet' });
+    await expect(px(getComputedStyle(heading).fontSize), 'size 20').toBe(20);
+};
+
 export const Compact = () => (
     <EmptyState
         spacing="compact"

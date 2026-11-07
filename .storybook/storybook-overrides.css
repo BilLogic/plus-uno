@@ -315,6 +315,16 @@ a.sbdocs-a {
     color: var(--ds-link-pressed) !important;
 }
 
+/* A component that renders its own action as a link keeps that action's
+   color: the rule above would paint Spotlight's link actions in link blue. */
+.sbdocs a.plus-spotlight-action--primary {
+    color: var(--ds-text) !important;
+}
+
+.sbdocs a.plus-spotlight-action--secondary {
+    color: var(--ds-text-inverse) !important;
+}
+
 /*
  * Component MDX: section rhythm.
  *

@@ -1,14 +1,21 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as BannerStories from './Banner.stories.jsx';
-import { DocsCanvasShell, DocsInteractivePlayground, DocsTable, ResourcesBlock, DsCanvasQuiet } from '@/storybook-docs/ds-docs-layout.jsx';
+import { Banner } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
 
 <Meta of={BannerStories} />
 
 <Title />
 A full-width strip at the top of a page for a message every visitor needs to
-see. It carries no dismiss — the caller mounts it while the condition holds
+see. It carries no dismiss: the caller mounts it while the condition holds
 and unmounts it once it clears.
 
 <DocsTabs of={BannerStories}>
@@ -16,6 +23,7 @@ and unmounts it once it clears.
 <DocsTab tab="examples">
 
 <ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-3267"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Banner"
 />
 
@@ -23,25 +31,15 @@ and unmounts it once it clears.
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<DocsCanvasShell attachSourceBelow description={<>A warning banner, flush against the top of the page with no radius.</>}>
-    <Canvas of={BannerStories.Overview} story={{ inline: true }} layout="padded" sourceState="hidden" />
-</DocsCanvasShell>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Appearance
 
-<DocsCanvasShell description={<>`warning` and `danger` carry a leading icon in the role's color. `announcement` has no icon and a neutral fill.</>}>
-    <DsCanvasQuiet of={BannerStories.Appearances} />
-</DocsCanvasShell>
+<ComponentExample of={BannerStories.Warning} title="Warning" description="The default, cautionary form, with a leading icon in the warning color." />
 
-<DocsCanvasShell description={<>`icon={false}` drops the appearance's default icon.</>}>
-    <DsCanvasQuiet of={BannerStories.WithoutIcon} />
-</DocsCanvasShell>
+<ComponentExample of={BannerStories.Danger} title="Danger" description="Something that needs immediate attention, with a leading icon in the danger color." />
+
+<ComponentExample of={BannerStories.Announcement} title="Announcement" description="A general notice on a neutral fill, with no icon." />
+
+<ComponentExample of={BannerStories.WithoutIcon} title="Without icon" description="icon={false} drops the appearance's default icon." />
 
 </div>
 
@@ -49,21 +47,13 @@ and unmounts it once it clears.
 
 ## State
 
-<DocsCanvasShell description={<>The warning ground and text, from their role tokens.</>}>
-    <DsCanvasQuiet of={BannerStories.Rest} />
-</DocsCanvasShell>
+<ComponentExample of={BannerStories.Rest} title="Rest" description="The warning ground and text, from their role tokens." />
 
-<DocsCanvasShell description={<>Not a control, so a pointer over it changes nothing.</>}>
-    <DsCanvasQuiet of={BannerStories.Hovered} />
-</DocsCanvasShell>
+<ComponentExample of={BannerStories.Hovered} title="Hovered" description="Not a control, so a pointer over it changes nothing." />
 
-<DocsCanvasShell description={<>No pressed layer either.</>}>
-    <DsCanvasQuiet of={BannerStories.Pressed} />
-</DocsCanvasShell>
+<ComponentExample of={BannerStories.Pressed} title="Pressed" description="No pressed layer either." />
 
-<DocsCanvasShell description={<>Tab skips it; a link inside takes its own focus ring.</>}>
-    <DsCanvasQuiet of={BannerStories.Focused} />
-</DocsCanvasShell>
+<ComponentExample of={BannerStories.Focused} title="Focused" description="Tab skips it; a link inside takes its own focus ring." />
 
 </div>
 
@@ -101,8 +91,20 @@ timeout and no dismiss, so only mount it while the condition is true.
 
 For something that belongs to one part of the page and stays until resolved
 or dismissed, use `SectionMessage`. For a confirmation that something already
-happened and needs no reply, use `Flag` — a `normal`, `information` or `success` flag times out
-on its own, and `warning` or `error` stays until dismissed.
+happened and needs no reply, use `Flag`.
+
+### Appearance guidance
+
+<DocsTable>
+<thead>
+<tr><th>Appearance</th><th>When to use</th></tr>
+</thead>
+<tbody>
+<tr><td>Warning</td><td>The default, cautionary form. Example: "Scheduled maintenance begins at 9:00 PM EST."</td></tr>
+<tr><td>Danger</td><td>Something that needs immediate attention, such as an outage.</td></tr>
+<tr><td>Announcement</td><td>A general notice with nothing wrong. No icon and no severity.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -111,7 +113,7 @@ on its own, and `warning` or `error` stays until dismissed.
 ## Parts
 
 1. **Icon.** Leading glyph for <code>warning</code> and <code>danger</code>; <code>announcement</code> has none.
-2. **Message.** One or two lines of text, with an optional underlined link.
+2. **Message.** Short text that fits on one line. A link inside inherits the banner's text color and is underlined, so it stays visible on every fill.
 
 ### States
 
@@ -121,8 +123,10 @@ on its own, and `warning` or `error` stays until dismissed.
 </thead>
 <tbody>
 <tr><td>Rest</td><td>Fill and text per appearance.</td></tr>
-<tr><td>Hovered, pressed</td><td>Not a control, so nothing changes. A link inside is underlined at rest.</td></tr>
+<tr><td>Hovered</td><td>Not a control, so nothing changes.</td></tr>
+<tr><td>Pressed</td><td>Nothing changes; there is no pressed layer.</td></tr>
 <tr><td>Focused</td><td>Tab skips the banner; a link inside shows the 2px focus ring.</td></tr>
+<tr><td>Disabled</td><td>Not supported. Unmount the banner once the condition clears.</td></tr>
 <tr><td>Truncated</td><td>Not supported. Keep the message short enough to fit.</td></tr>
 </tbody>
 </DocsTable>
@@ -137,7 +141,8 @@ on its own, and `warning` or `error` stays until dismissed.
 <tr><td>Warning</td><td><code>--ds-background-warning</code>, <code>--ds-text-warning</code>, <code>--ds-icon-warning</code></td></tr>
 <tr><td>Danger</td><td><code>--ds-background-danger</code>, <code>--ds-text-danger</code>, <code>--ds-icon-danger</code></td></tr>
 <tr><td>Announcement</td><td><code>--ds-background-neutral</code>, <code>--ds-text</code></td></tr>
-<tr><td>Spacing</td><td><code>--pad-y-md</code>, <code>--pad-x-md</code>, <code>--inline-md</code></td></tr>
+<tr><td>Message</td><td><code>--body-default</code>; a link at <code>--type-weight-medium</code></td></tr>
+<tr><td>Padding, gap</td><td><code>--pad-y-md</code>, <code>--pad-x-md</code>, <code>--inline-md</code></td></tr>
 <tr><td>Icon</td><td><code>--icon-md</code></td></tr>
 </tbody>
 </DocsTable>
@@ -148,23 +153,38 @@ on its own, and `warning` or `error` stays until dismissed.
 
 ## Best practices
 
-### Pick the appearance for what is true, not for emphasis.
+### Use the danger banner only when action is needed now.
 
-`warning` is the default, cautionary form. `danger` is for something that
-needs immediate attention. `announcement` carries no icon and no severity —
-use it for a general notice with nothing wrong.
+Routine news belongs in an announcement.
 
-### Keep the message to one line where it can fit.
+<DoDontPair
+    doExample={<Banner appearance="danger">Your 4:00 PM session was canceled. Pick a new time.</Banner>}
+    doCaption="Danger for a canceled session."
+    dontExample={<Banner appearance="danger">New: the schedule view is here.</Banner>}
+    dontCaption="Danger for a feature announcement."
+/>
 
-A banner runs the full width of the page, so a short message reads at a
-glance. A link inside the message inherits the banner's text color and is
-underlined to stay visible against every fill.
+### Show one banner at a time.
 
-```jsx
-<Banner appearance="danger">
-    The scheduled call is delayed. <a href="/status">Check status</a>.
-</Banner>
-```
+Stacked banners compete and push the page down.
+
+<DoDontPair
+    doExample={<Banner appearance="announcement">New: the schedule view is here.</Banner>}
+    doCaption="A single announcement."
+    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}><Banner appearance="warning">Finish setting up your account.</Banner><Banner appearance="danger">We could not save your changes. Try again.</Banner></div>}
+    dontCaption="A warning and a danger banner stacked."
+/>
+
+### Keep it to one line.
+
+A banner is read at a glance; long copy belongs on the page.
+
+<DoDontPair
+    doExample={<Banner appearance="warning">Add a payment method to keep your plan active.</Banner>}
+    doCaption="One short sentence."
+    dontExample={<Banner appearance="warning">Add a payment method to keep your plan active. Your plan renews at the start of each term, and without a payment method on file we cannot renew it, so your tutors will lose access to scheduled sessions until one is added.</Banner>}
+    dontCaption="A paragraph in the banner."
+/>
 
 </div>
 
@@ -191,13 +211,14 @@ underlined to stay visible against every fill.
 
 - **Announced as a status.** The banner's role is `status`, so assistive
   technology reports its content without interrupting the current task.
-- **Color is not the only cue.** `warning` and `danger` pair their fill with a
-  leading icon; only `announcement` relies on fill alone, which is
-  appropriate since it carries no severity.
-- **No focus trap.** A banner never captures focus or keyboard navigation —
-  it sits in the page's reading order like any other content.
-- **Severity needs more than color.** Give the warning and danger icons their meaning in the words of the message, since the glyph is decorative.
-- **A banner link takes focus like any link.** It shows the 2px focus ring and its text names the destination.
+- **Severity needs more than color.** `warning` and `danger` pair their fill
+  with a leading icon, but the icon is decorative, so say the severity in the
+  words of the message. Only `announcement` relies on fill alone, which suits
+  a notice with no severity.
+- **No focus trap.** A banner never captures focus or keyboard navigation; it
+  sits in the page's reading order like any other content.
+- **A banner link takes focus like any link.** It shows the 2px focus ring and
+  its text names the destination.
 
 </div>
 
@@ -207,7 +228,7 @@ underlined to stay visible against every fill.
 
 - For a message scoped to one region of the page, use `SectionMessage`.
 - For a timed confirmation that something already happened, use `Flag`.
-- For a short message anchored to one object in a list, use `InlineMessage`.
+- For a short note tied to one object on the page, use `InlineMessage`.
 
 </div>
 

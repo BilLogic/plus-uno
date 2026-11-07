@@ -28,7 +28,6 @@ export default {
         height: {
             control: 'select',
             options: ['hug', 'fill'],
-            description: 'Hug grows to the screen less 128, then scrolls its body; Fill sits at that cap',
             table: { category: 'Layout' },
         },
         dividers: {
@@ -45,7 +44,6 @@ export default {
         },
         showBottomButtons: {
             control: 'boolean',
-            description: 'Show bottom buttons',
             table: { category: 'Behavior' },
         },
         show: {
@@ -55,7 +53,6 @@ export default {
         width: {
             control: 'select',
             options: ['6-col', '8-col', '10-col'],
-            description: '6 · 8 · 10 columns of the screen grid plus the modal pad; a number is a fixed width',
             table: { category: 'Layout' },
         },
         headerActions: { table: { disable: true, category: 'Development' } },
@@ -241,73 +238,70 @@ function ModalLayoutDemos() {
     );
 }
 
-/** Three widths from the screen grid, drawn at the 1024 screen. */
-function ModalSizeDemos() {
-    return (
-        <div style={{ ...col, '--plus-modal-screen': '1024px', width: '100%' }}>
-            {['6-col', '8-col', '10-col'].map((size) => (
-                <Modal
-                    key={size}
-                    show
-                    renderAs="inline"
-                    width={size}
-                    title={`width="${size}"`}
-                    description={`${parseInt(size, 10)} columns of the screen grid plus the modal pad.`}
-                    body="Modal body text goes here."
-                    secondaryButton={{ text: 'Cancel' }}
-                    primaryButton={{ text: 'Save' }}
-                    onClose={() => {}}
-                />
-            ))}
-        </div>
-    );
-}
+/* ------------------------------------------------- one value per story */
 
-/** Hug and Fill against a 320 cap standing in for the screen less 128. */
-function ModalHeightDemos() {
-    const frame = {
-        ...modalDocsHostStyle,
-        '--blanket-max-height-modal': 'var(--size-2000)',
-        display: 'flex',
-        gap: 'var(--space-100)',
-        alignItems: 'flex-start',
-        minHeight: 'calc(var(--size-2000) + 2 * var(--space-100))',
-    };
-    return (
-        <div style={frame}>
-            <Modal show renderAs="inline" height="hug" title="Hug, short" body="Short content hugs." primaryButton={{ text: 'Done' }} onClose={() => {}} />
-            <Modal show renderAs="inline" height="hug" title="Hug, long" body={longBody.repeat(3)} primaryButton={{ text: 'Done' }} onClose={() => {}} />
-            <Modal show renderAs="inline" height="fill" title="Fill" body="Fill sits at the cap." primaryButton={{ text: 'Done' }} onClose={() => {}} />
-        </div>
-    );
-}
+/** One grid width, drawn at the 1024 screen. */
+const widthStory = (size) => () => (
+    <div style={{ '--plus-modal-screen': '1024px', width: '100%' }}>
+        <Modal
+            show
+            renderAs="inline"
+            width={size}
+            title={`width="${size}"`}
+            body="Modal body text goes here."
+            secondaryButton={{ text: 'Cancel' }}
+            primaryButton={{ text: 'Save' }}
+            onClose={() => {}}
+        />
+    </div>
+);
 
-/** Description, header actions, dividers, no close button, loading. */
-function ModalOptionDemos() {
-    return (
-        <div style={contentVariantGrid}>
-            <Modal
-                show
-                renderAs="inline"
-                title="Share report"
-                description="People with the link can view it."
-                headerActions={<IconButton appearance="subtle" spacing="compact" icon="link" label="Copy link" />}
-                dividers
-                body="Header actions sit before the close button; dividers rule off the header and footer."
-                primaryButton={{ text: 'Done' }}
-                onClose={() => {}}
-            />
-            <Modal show renderAs="inline" title="Uploading transcript" showCloseButton={false} body="A dialog that has to be answered drops the close button." primaryButton={{ text: 'Cancel upload' }} onClose={() => {}} />
-            <Modal show renderAs="inline" loading title="Session details" body="Loaded content" showBottomButtons={false} onClose={() => {}} />
-        </div>
-    );
-}
+export const Width6Col = widthStory('6-col');
+Width6Col.storyName = 'Width 6-col';
+export const Width8Col = widthStory('8-col');
+Width8Col.storyName = 'Width 8-col';
+export const Width10Col = widthStory('10-col');
+Width10Col.storyName = 'Width 10-col';
 
-export const Sizes = () => <ModalSizeDemos />;
+/** One height against a 320 cap standing in for the screen less 128. */
+const heightStory = (height, title, body) => () => (
+    <div
+        style={{
+            ...modalDocsHostStyle,
+            '--blanket-max-height-modal': 'var(--size-2000)',
+            minHeight: 'calc(var(--size-2000) + 2 * var(--space-100))',
+        }}
+    >
+        <Modal show renderAs="inline" height={height} title={title} body={body} primaryButton={{ text: 'Done' }} onClose={() => {}} />
+    </div>
+);
 
-export const Heights = () => <ModalHeightDemos />;
+export const HeightHug = heightStory('hug', 'Hug', longBody.repeat(3));
+HeightHug.storyName = 'Height hug';
+export const HeightFill = heightStory('fill', 'Fill', 'Fill sits at the cap.');
+HeightFill.storyName = 'Height fill';
 
-export const Options = () => <ModalOptionDemos />;
+export const HeaderOptions = () => (
+    <Modal
+        show
+        renderAs="inline"
+        title="Share report"
+        description="People with the link can view it."
+        headerActions={<IconButton appearance="subtle" spacing="compact" icon="link" label="Copy link" />}
+        dividers
+        body="Header actions sit before the close button; dividers rule off the header and footer."
+        primaryButton={{ text: 'Done' }}
+        onClose={() => {}}
+    />
+);
+
+export const WithoutCloseButton = () => (
+    <Modal show renderAs="inline" title="Uploading transcript" showCloseButton={false} body="A dialog that has to be answered drops the close button." primaryButton={{ text: 'Cancel upload' }} onClose={() => {}} />
+);
+
+export const Loading = () => (
+    <Modal show renderAs="inline" loading title="Session details" body="Loaded content" showBottomButtons={false} onClose={() => {}} />
+);
 
 export const Content = () => (
     <div style={col}>
