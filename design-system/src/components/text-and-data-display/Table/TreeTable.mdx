@@ -12,8 +12,8 @@ import {
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const treeHead = { cells: [{ key: 'name', content: 'Name' }, { key: 'type', content: 'Type' }] };
-export const treeItems = [{ id: 'a', cells: ['Lincoln Middle', 'School'], children: [{ id: 'a1', cells: ['Grade 7 · Math', 'Class'] }, { id: 'a2', cells: ['Grade 8 · Math', 'Class'] }] }];
-export const lazyItems = [{ id: 'b', cells: ['Roosevelt K-8', 'School'], hasChildren: true }];
+export const treeItems = [{ id: 'a', cells: [{ content: 'Lincoln Middle' }, { content: 'School' }], children: [{ id: 'a1', cells: [{ content: 'Grade 7 · Math' }, { content: 'Class' }] }, { id: 'a2', cells: [{ content: 'Grade 8 · Math' }, { content: 'Class' }] }] }];
+export const lazyItems = [{ id: 'b', cells: [{ content: 'Roosevelt K-8' }, { content: 'School' }], hasChildren: true }];
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -62,7 +62,7 @@ Records that nest, up to three levels. `TreeTable` indents each level one step a
 
 ## Loading children
 
-<ComponentExample of={TreeTableStories.LoadingChildren} title="Loading children" description={<>A parent with `hasChildren` and no `children` loads them through `loadChildren` the first time it opens, with a spinner and a loading message row until they arrive.</>} />
+<ComponentExample of={TreeTableStories.LoadingChildren} title="Loading children" description={<>A parent with <code>hasChildren</code> and no <code>children</code> loads them through <code>loadChildren</code> the first time it opens, with a spinner and a loading message row until they arrive.</>} />
 
 </div>
 
@@ -78,7 +78,7 @@ Records that nest, up to three levels. `TreeTable` indents each level one step a
 
 ## Expand on a row press
 
-<ComponentExample of={TreeTableStories.ExpandOnRowPress} title="Expand on a row press" description={<>With `shouldExpandOnClick` a press anywhere on a parent row opens it. Use it only on rows without controls.</>} />
+<ComponentExample of={TreeTableStories.ExpandOnRowPress} title="Expand on a row press" description={<>With <code>shouldExpandOnClick</code> a press anywhere on a parent row opens it. Use it only on rows without controls.</>} />
 
 </div>
 
@@ -112,7 +112,7 @@ Records that nest, up to three levels. `TreeTable` indents each level one step a
 
 ## Usage
 
-Use a Tree table for records that nest — a curriculum of units and lessons, a
+Use a Tree table for records that nest: a curriculum of units and lessons, a
 folder of sessions. For a flat list, use the Static or Dynamic table instead.
 
 </div>
@@ -170,17 +170,17 @@ Use a tree table for records that nest, up to three levels, where every level sh
 <DoDontPair
     doExample={<TreeTable head={treeHead} items={treeItems} label="Schools" defaultExpandedIds={['a']} />}
     doCaption="Each level indents one step and keeps both columns."
-    dontExample={<TreeTable head={treeHead} items={[{ id: 'a', cells: ['Lincoln Middle'], children: [{ id: 'a1', cells: ['Grade 7 · Math'] }] }]} label="Schools" defaultExpandedIds={['a']} />}
+    dontExample={<TreeTable head={treeHead} items={[{ id: 'a', cells: [{ content: 'Lincoln Middle' }], children: [{ id: 'a1', cells: [{ content: 'Grade 7 · Math' }] }] }]} label="Schools" defaultExpandedIds={['a']} />}
     dontCaption="Levels that drop a column, so the type column goes ragged."
 />
 
 ### Load children late for a long tree.
 
 <DoDontPair
-    doExample={<TreeTable head={treeHead} items={lazyItems} label="Schools" loadChildren={() => [{ id: 'b1', cells: ['Kindergarten · Reading', 'Class'] }]} />}
-    doCaption="`hasChildren` with `loadChildren` fetches a branch the first time it opens."
+    doExample={<TreeTable head={treeHead} items={lazyItems} label="Schools" loadChildren={() => [{ id: 'b1', cells: [{ content: 'Kindergarten · Reading' }, { content: 'Class' }] }]} />}
+    doCaption={<><code>hasChildren</code> with <code>loadChildren</code> fetches a branch the first time it opens.</>}
     dontExample={<TreeTable head={treeHead} items={lazyItems} label="Schools" />}
-    dontCaption="`hasChildren` with nothing to load them, so the branch opens onto the empty message."
+    dontCaption={<><code>hasChildren</code> with nothing to load them, so the branch opens onto the empty message.</>}
 />
 
 ### Leave the row press for rows without controls.
@@ -190,7 +190,7 @@ Use a tree table for records that nest, up to three levels, where every level sh
 <DoDontPair
     doExample={<TreeTable head={treeHead} items={treeItems} label="Schools" shouldExpandOnClick />}
     doCaption="A row of plain text opens on a press anywhere."
-    dontExample={<TreeTable head={treeHead} items={[{ id: 'a', cells: [<a key="l" href="#schools">Lincoln Middle</a>, 'School'], children: [{ id: 'a1', cells: ['Grade 7 · Math', 'Class'] }] }]} label="Schools" shouldExpandOnClick />}
+    dontExample={<TreeTable head={treeHead} items={[{ id: 'a', cells: [{ content: <a key="l" href="#schools">Lincoln Middle</a> }, { content: 'School' }], children: [{ id: 'a1', cells: [{ content: 'Grade 7 · Math' }, { content: 'Class' }] }] }]} label="Schools" shouldExpandOnClick />}
     dontCaption="A link in the row, where a press means two things."
 />
 

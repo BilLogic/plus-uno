@@ -41,7 +41,7 @@ export const figmaMeta = {
 
 <Title />
 
-A fixed grid people read. Cells accept any node, so a row can carry Badges, formatted currency, or an icon. Nothing in a Static table hovers, sorts, selects, pages or expands — see the Dynamic table for that.
+A fixed grid people read. Cells accept any node, so a row can carry Status tags, Count tags, formatted currency, or an icon. Nothing in a Static table hovers, sorts, selects, pages or expands: see the Dynamic table for that.
 
 <DocsTabs of={StaticTableStories}>
 
@@ -60,7 +60,7 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 ## Overview
 
-<ComponentExample of={StaticTableStories.Overview} title="Overview" description={<>Default table with hover enabled and 40 rows.</>} />
+<ComponentExample of={StaticTableStories.Overview} title="Overview" description={<>The default: 40 row size and the title column set.</>} />
 
 </div>
 
@@ -130,9 +130,9 @@ A fixed grid people read. Cells accept any node, so a row can carry Badges, form
 
 <ComponentExample of={StaticTableStories.Rest} title="Rest" description={<>A rest row is clear; a selected row is on the selected ground.</>} />
 
-<ComponentExample of={StaticTableStories.Hovered} title="Hovered" description={<>A row takes the subtle hovered step, a selected row its own hovered step.</>} />
+<ComponentExample of={StaticTableStories.Hovered} title="Hovered" description={<>On <code>Table</code> with <code>hover</code>, a row takes the subtle hovered step and a selected row its own. A Static table never hovers.</>} />
 
-<ComponentExample of={StaticTableStories.Pressed} title="Pressed" description={<>The pressed steps of the same two grounds.</>} />
+<ComponentExample of={StaticTableStories.Pressed} title="Pressed" description={<>On <code>Table</code> with <code>hover</code>, the pressed steps of the same two grounds. A Static table never presses.</>} />
 
 <ComponentExample of={StaticTableStories.Focused} title="Focused" description={<>A row has no focus stop; Tab skips it.</>} />
 
@@ -231,7 +231,7 @@ A static table is a fixed grid people read. It has no hover, sort or paging; for
 
 <DoDontPair
     doExample={<StaticTable headers={rosterHeaders} titleColumn={1} rows={[['Jul 3', 'Priya Nair', { content: '$32.00', align: 'number' }], ['Jul 9', 'Marcus Lee', { content: '$6.50', align: 'number' }]]} />}
-    doCaption="`titleColumn` marks the one column that names the row."
+    doCaption={<><code>titleColumn</code> marks the one column that names the row.</>}
     dontExample={<StaticTable headers={rosterHeaders} rows={[[{ content: 'Jul 3', emphasis: 'title' }, { content: 'Priya Nair', emphasis: 'title' }, { content: '$32.00', align: 'number', emphasis: 'title' }]]} />}
     dontCaption="Emphasis on every cell, so nothing stands out."
 />
@@ -283,7 +283,7 @@ A static table is a fixed grid people read. It has no hover, sort or paging; for
 - For a table people sort, filter, select or page, use the Dynamic table.
 - For records that nest, use the Tree table.
 - For splitting a long result set across pages, use `Pagination`.
-- For a status or a count inside a cell, use `Badge`.
+- For a status or a count inside a cell, use `StatusTag` or `CountTag`.
 
 </div>
 

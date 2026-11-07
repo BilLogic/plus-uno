@@ -62,7 +62,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Stateless
 
-<ComponentExample of={DynamicTableStories.Stateless} title="Stateless" description={<>The page owns the sort and the page through `sortKey`, `sortOrder` and `page`. With `totalRows`, the rows are already one page from a server and the footer counts against the total.</>} />
+<ComponentExample of={DynamicTableStories.Stateless} title="Stateless" description={<>The page owns the sort and the page through <code>sortKey</code>, <code>sortOrder</code> and <code>page</code>. With <code>totalRows</code>, the rows are already one page from a server and the footer counts against the total.</>} />
 
 </div>
 
@@ -78,7 +78,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Empty state
 
-<ComponentExample of={DynamicTableStories.Empty} title="Empty" description={<>With no rows, a cleared filter or a new account, `emptyView` takes the body as one message row.</>} />
+<ComponentExample of={DynamicTableStories.Empty} title="Empty" description={<>With no rows, a cleared filter or a new account, <code>emptyView</code> takes the body as one message row.</>} />
 
 </div>
 
@@ -86,7 +86,7 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 
 ## Selection and the bulk bar
 
-<ComponentExample of={DynamicTableStories.Selection} title="Selection" description={<>A checkbox column as wide as the row is tall, with select-all in the head. While rows are selected, `TableBulkActions` replaces the Section toolbar with the count, up to three actions, an overflow menu and Clear selection.</>} />
+<ComponentExample of={DynamicTableStories.Selection} title="Selection" description={<>A checkbox column as wide as the row is tall, with select-all in the head. While rows are selected, <code>TableBulkActions</code> replaces the Section toolbar with the count, up to three actions, an overflow menu and Clear selection.</>} />
 
 </div>
 
@@ -237,7 +237,7 @@ With `totalRows`, `rows` is the current page only, and the footer counts against
 
 <DoDontPair
     doExample={<DynamicTable head={sortHead} rows={keyedRows} label="Sessions" rowsPerPage={3} totalRows={8500} />}
-    doCaption="One page of rows, counted against the 8,500 total."
+    doCaption="One page of rows, counted against the 8500 total."
     dontExample={<DynamicTable head={sortHead} rows={keyedRows} label="Sessions" rowsPerPage={3} />}
     dontCaption="The whole list loaded to page on the screen, when it is thousands of rows."
 />
