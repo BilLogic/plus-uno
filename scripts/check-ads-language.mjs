@@ -33,7 +33,7 @@
  *   class:plus-btn   lines naming `plus-btn--(filled|tonal|...|large)`.
  *   word:<word>      lines naming `surface container`, `scrim` or `Rovo`.
  *   word:Atlassian   zero allowed: MDX prose, story doc strings and `atlassian.design` links.
- *   word:unnamed-ai  lines under `design-system/src` naming the AI "PLUS AI": the product's
+ *   word:PLUS-AI  lines under `design-system/src` naming the AI "PLUS AI": the product's
  *                    AI is unnamed and shows as AI (decision 1 of #1591). Prototypes keep
  *                    their own recorded copy.
  *   token:surface-layout  a `var(--surface-*)` read of a legacy layout token (#1755).
@@ -183,7 +183,7 @@ export function measure(sources) {
     }
     if (DESIGN_SYSTEM_PATH.test(file)) {
       const hits = live.flatMap((l, i) => (AI_NAME.test(l) ? [i + 1] : []));
-      add('word:unnamed-ai', file, hits.length, hits[0]);
+      add('word:PLUS-AI', file, hits.length, hits[0]);
     }
     if (!ATLASSIAN_RECORDS.some((re) => re.test(file))) {
       const hits = live.flatMap((l, i) => (atlassianShipped(file, l) ? [i + 1] : []));
@@ -217,7 +217,7 @@ const RULE_MESSAGE = new Map([
     'shipped docs state the PLUS rule and do not cite the benchmark (no name, no atlassian.design link); a decision record that must is named in ATLASSIAN_RECORDS',
   ],
   [
-    'word:unnamed-ai',
+    'word:PLUS-AI',
     'the AI is unnamed and shows as AI: say "AI" or "the AI", never a product name for it',
   ],
   [
