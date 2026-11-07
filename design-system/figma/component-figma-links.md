@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-43 docs-page links + 68 style/variant entries across 65 components.
+39 docs-page links + 68 style/variant entries across 65 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -29,7 +29,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Modal | `3497:19502` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19502) |
 | Components | Pagination | `3497:19505` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19505) |
 | Components | Popup | `3497:19506` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19506) |
-| Components | ProgressBar | `20095:7725` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7725) |
+| Components | ProgressBar | `20117:5127` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5127) |
 | Components | Radio | `14876:12005` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12005) |
 | Components | Range | `13611:6622` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13611-6622) |
 | Components | Rating | `13266:7763` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13266-7763) |
@@ -37,7 +37,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | ScrollBar |  | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-) |
 | Components | SectionMessage | `3496:1444` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444) |
 | Components | Skeleton | `20455:854` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-854) |
-| Components | Spinner | `20095:7956` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-7956) |
+| Components | Spinner | `20117:5249` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20117-5249) |
 | Components | StaticTable | `17156:122` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17156-122) |
 | Components | Suggestion | `17867:28` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=17867-28) |
 | Components | Tabs | `3497:19503` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19503) |
@@ -49,14 +49,10 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Toggle | `14876:12006` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006) |
 | Components | Tooltip | `3497:19486` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19486) |
 | Components | TreeTable | `19685:27043` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043) |
-| Other | Footer | `111:227940` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227940) |
-| Other | MaintenanceAlert | `2370:194322` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=2370-194322) |
-| Other | OverviewCard | `83:125838` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=83-125838) |
+| Other | OverviewCard | `20095:6532` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-6532) |
 | Other | PageLayout | `112:597` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=112-597) |
-| Other | Sidebar | `111:227891` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227891) |
-| Other | SmartBadges | `83:125838` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=83-125838) |
-| Other | UserAvatar | `111:227876` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=111-227876) |
-| Other | UserTypeIndicator | `2370:191400` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=2370-191400) |
+| Other | Sidebar | `19393:46573` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573) |
+| Other | UserAvatar | `20979:1397` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20979-1397) |
 
 ## Styles / variants
 
