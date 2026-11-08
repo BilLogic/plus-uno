@@ -18,11 +18,11 @@ topic, which today only `content/` does.
 | [spacing.md](spacing.md) | ✅ | How much padding, margin, gap? |
 | [grid.md](grid.md) | ✅ | Breakpoints and column spans |
 | [Colors.mdx](../../src/styles/Colors.mdx) | ✅ | Which color, and what does it mean? |
-| [typography.md](typography.md) | ✅ | Which type class and weight? |
+| [Typography.mdx](../../src/styles/Typography.mdx) | ✅ | Which type class and weight? |
 | [motion.md](motion.md) | ✕ | Duration, easing, what may animate |
-| [iconography.md](iconography.md) | ✅ | Which icon set, which size |
-| [illustrations.md](illustrations.md) | ✕ | Illustration style and assets |
-| [logos.md](logos.md) | ✕ | The marks, clear space, variants |
+| [Icons.mdx](../../src/styles/Icons.mdx) | ✅ | Which icon set, which size |
+| [Illustrations.mdx](../../src/styles/Illustrations.mdx) | ✅ | Illustration style and assets |
+| [Logos.mdx](../../src/styles/Logos.mdx) | ✅ | The marks, clear space, variants |
 | [Elevation.mdx](../../src/styles/Elevation.mdx) | ✅ | Which shadow step for which surface |
 | [Border.mdx](../../src/styles/Border.mdx) | ✅ | Border widths |
 | [Radius.mdx](../../src/styles/Radius.mdx) | ✅ | Corner radius scale |
@@ -34,7 +34,7 @@ type, motion) take. It is cross-cutting by nature: chart color has its own
 rules on the Color page, so there is no single slot above for "what a chart
 does with every other foundation" to live in instead.
 
-**10 of 14 authored, 1 partial, 3 empty.** ✕ means a named empty slot: the file
+**12 of 14 authored, 1 partial, 1 empty.** ✕ means a named empty slot: the file
 exists, says so, and promises nothing. That is deliberate — a gap you can see
 beats a gap you discover mid-build, and it is not a stub, because there is no
 template inviting someone to fill in a heading with `TODO`.

@@ -9,10 +9,11 @@ import {
     FoundationExample,
 } from '@/storybook-docs/foundation-page.jsx';
 import { Banner } from '@/components';
+import { iconClass } from '@/lib/icon';
 import * as IconsStories from './Icons.stories.jsx';
 
-export const Glyph = ({ name, size = '--icon-md', family = 'fa-solid' }) => (
-    <i className={`${family} fa-${name}`} aria-hidden="true" style={{ fontSize: `var(${size})`, width: `var(${size})`, height: `var(${size})`, color: 'var(--ds-icon)' }} />
+export const Glyph = ({ name, size = '--icon-md', family }) => (
+    <i className={family ? `${family} fa-${name}` : iconClass(name)} aria-hidden="true" style={{ fontSize: `var(${size})`, width: `var(${size})`, height: `var(${size})`, color: 'var(--ds-icon)' }} />
 );
 
 <Meta of={IconsStories} />
@@ -29,7 +30,14 @@ export const Glyph = ({ name, size = '--icon-md', family = 'fa-solid' }) => (
 This page holds the rules every icon follows. The icon component itself lives on Components, Images and icons, next to Avatar, Image, Logo and Tile.
 
 ```jsx
-<i className="fa-solid fa-calendar-days" />
+<i className="fa-regular fa-calendar-days" />
+```
+
+A component that takes an icon takes its name as a string, such as Button's `iconBefore` and `iconAfter`. It renders `fa-regular fa-<name>`, or `fa-solid` where Font Awesome Free has no regular weight; `iconClass` in `design-system/src/lib/icon.js` decides. A node in place of the name renders as given.
+
+```jsx
+<Button appearance="primary" text="Add tutor" iconBefore="plus" />
+<Button appearance="primary" text="Next" iconAfter="arrow-right" />
 ```
 
 Sizes bind to the icon size tokens: 12 is `--icon-sm`, 16 is `--icon-md` and 24 is `--icon-lg`. Figma draws the Icon from the Size/Icon variables.
@@ -80,6 +88,8 @@ Icons come in 12, 16 and 24. 12 is for chevrons, which are always 12, field vali
     ]}
 />
 
+An icon's box is its font size: `--fa-width: 1em` is set globally, so the glyph fills the square it is sized to.
+
 An icon sits in space the way any box does: give it room with the spacing tokens, not with a larger glyph.
 
 </FoundationSection>
@@ -94,7 +104,9 @@ An icon sits in space the way any box does: give it room with the spacing tokens
 
 <FoundationSection title="Font Awesome Free and color tokens">
 
-Use Font Awesome Free only: `fa-solid`, `fa-regular` and `fa-brands`, including brand glyphs such as `fa-brands fa-figma` and `fa-brands fa-github`. Pro families (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) and Pro-only names are not licensed here and render blank. Check a glyph name against the Free set before you use it.
+Use Font Awesome Free 7.2 only: `fa-solid`, `fa-regular` and `fa-brands`, including brand glyphs such as `fa-brands fa-figma` and `fa-brands fa-github`. Pro families (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`) and Pro-only names are not licensed here and render blank. Check a glyph name against the Free set before you use it; the Free names are generated into `design-system/src/lib/icon-free.generated.js` and `icon-regular.generated.js` (`npm run generate:icon-lists`). A glyph Free does not have is replaced by another glyph that is in the Free set.
+
+Regular is the default weight, and solid is used only where Free has no regular. Where one set of icons needs a glyph Free draws only in solid, that one glyph is solid and the rest stay regular. Use a glyph's current name: an alias such as `calendar-alt` is not in the list and draws solid.
 
 <Canvas of={IconsStories.Families} sourceState="none" />
 
@@ -120,17 +132,29 @@ Before a glyph joins the product, check four things. Does a similar icon already
 
 Use the same glyph for the same job everywhere. These cover most of what a tutor sees.
 
-<FoundationExample>
-<ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(var(--card-min-width-sm), 1fr))', gap: 'var(--stack-lg)' }}>
-    {[['Add', 'plus'], ['Remove', 'minus'], ['Confirm', 'check'], ['Close', 'xmark'], ['Delete', 'trash'], ['Edit', 'pen'], ['Search', 'magnifying-glass'], ['Settings', 'gear'], ['Session or schedule', 'calendar-days'], ['Person', 'user'], ['Session note', 'clipboard'], ['Notification', 'bell'], ['Information', 'circle-info']].map(([job, name]) => (
-        <li key={name} style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}>
-            <Glyph name={name} />
-            <span>{job}</span>
-            <C>{name}</C>
-        </li>
-    ))}
-</ul>
-</FoundationExample>
+<RefTable
+    head={['Glyph', 'Name', 'Job']}
+    rows={[
+        [<Glyph name="plus" />, <C>plus</C>, 'Add'],
+        [<Glyph name="minus" />, <C>minus</C>, 'Remove'],
+        [<Glyph name="check" />, <C>check</C>, 'Confirm'],
+        [<Glyph name="xmark" />, <C>xmark</C>, 'Close, cancel or dismiss'],
+        [<Glyph name="trash" />, <C>trash</C>, 'Delete'],
+        [<Glyph name="pen" />, <C>pen</C>, 'Edit'],
+        [<Glyph name="magnifying-glass" />, <C>magnifying-glass</C>, 'Search'],
+        [<Glyph name="gear" />, <C>gear</C>, 'Settings'],
+        [<Glyph name="calendar-days" />, <C>calendar-days</C>, 'Session or schedule'],
+        [<Glyph name="user" />, <C>user</C>, 'Person or profile'],
+        [<Glyph name="clipboard" />, <C>clipboard</C>, 'Session note'],
+        [<Glyph name="bell" />, <C>bell</C>, 'Notification'],
+        [<Glyph name="circle-info" />, <C>circle-info</C>, 'Information'],
+        [<Glyph name="arrow-right" />, <C>arrow-right</C>, 'Next or forward'],
+        [<Glyph name="arrow-left" />, <C>arrow-left</C>, 'Back or previous'],
+        [<Glyph name="chevron-down" />, <C>chevron-down</C>, 'Expand or open a menu'],
+        [<Glyph name="chevron-up" />, <C>chevron-up</C>, 'Collapse'],
+        [<Glyph name="star" />, <C>star</C>, 'Favorite or rating'],
+    ]}
+/>
 
 - Zoom has no Font Awesome Free glyph. A Zoom link is not an icon; partner and tool logos go in a Tile, never in the Logo set.
 
