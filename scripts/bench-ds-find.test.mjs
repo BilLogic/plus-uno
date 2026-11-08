@@ -46,6 +46,19 @@ test('no query without token vocabulary returns a token', () => {
   assert.ok(speaksTokens('purple color token') && speaksTokens('--ds-text') && !speaksTokens('confirm before deleting'));
 });
 
+test('the everyday-word guard queries get neither a token row nor a guide row', () => {
+  const guards = ['fill out a form', 'brand logo', 'copy to clipboard', 'grid of cards', 'an icon for calendar'];
+  const labeled = new Set(loadSet('authored').map((r) => r.q));
+  const { misses } = runBench();
+  for (const q of guards) {
+    assert.ok(labeled.has(q), `"${q}" is not a row of the authored set`);
+    for (const m of misses.filter((x) => x.q === q)) {
+      const stray = m.results.filter((r) => r.kind === 'token' || r.kind === 'guide').map((r) => `${r.kind}:${r.name}`);
+      assert.deepEqual(stray, [], `"${q}" returned ${stray.join(', ')}`);
+    }
+  }
+});
+
 test('rankOf counts a not-here row whose redirect names a wanted component', () => {
   const results = [{ name: 'Switch', use: [{ name: 'Toggle' }] }, { name: 'Other' }];
   assert.equal(rankOf(results, ['Toggle']), 1);

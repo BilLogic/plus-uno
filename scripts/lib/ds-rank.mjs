@@ -9,7 +9,9 @@
  *
  * A doc is `{id, fields}`, each field a string or an array of strings, under
  * the keys of `WEIGHTS`. Related is indexed at zero: its text names what to use
- * instead, so scoring it would rank a component for its alternatives. Aliases
+ * instead, so scoring it would rank a component for its alternatives. It still
+ * counts toward each word's document frequency; taking it out of the index
+ * cost the retrieval bench a hit, so it stays. Aliases
  * are not length-normalized: a component with more synonyms is not a weaker
  * match for any one of them.
  */
@@ -25,14 +27,20 @@ export const FIND_TUNING = Object.freeze({
   /** A pattern that scores at all sits just above a component tied with it. */
   patternLift: 0.3,
   /** An authored alias (four letters or more) the query carries whole: this plus one per word of it. */
-  aliasPhrase: 2,
+  aliasPhrase: 1,
 });
 
 const K1 = 1.2;
 const B = 0.75;
-/** Length normalization per field. An alias list is a set of synonyms, not prose: a longer one is not a weaker match. */
-const LENGTH = { name: B, aliases: 0, summary: B, usage: B, best: B, related: B };
+/** Length normalization per field, `B` for any field not named. An alias list is a set of synonyms, not prose: a longer one is not a weaker match. */
+const LENGTH = { aliases: 0 };
+const lengthOf = (field) => LENGTH[field] ?? B;
 
+/**
+ * Words that carry no meaning in a query, shared by the ranker and the lookup's
+ * lanes. `page` is left out on purpose: it is the word for the page layout
+ * (PageLayout, the Page pattern, the layout guideline), not filler.
+ */
 export const STOPWORDS = new Set(
   (
     'a an and the of for to with in on or my our is it that this which what i we need want use show build make ' +
@@ -40,16 +48,11 @@ export const STOPWORDS = new Set(
   ).split(' '),
 );
 
-/** Folds plurals and a few suffixes. Crude on purpose: both sides of a match stem alike. */
+/** Folds plurals, then a few suffixes when three letters or more stay. Crude on purpose: both sides of a match stem alike. */
 export function stem(word) {
-  const w = word;
-  if (w.length <= 3) return w;
-  return w
-    .replace(/ies$/, 'y')
-    .replace(/sses$/, 'ss')
-    .replace(/([^s])s$/, '$1')
-    .replace(/(ing|ed|ly|ment|ness|tion|ions|ers?)$/, (m) => (w.length - m.length >= 3 ? '' : m))
-    .replace(/e$/, '');
+  if (word.length <= 3) return word;
+  const folded = word.replace(/ies$/, 'y').replace(/sses$/, 'ss').replace(/([^s])s$/, '$1');
+  return folded.replace(/(ing|ed|ly|ment|ness|tion|er)$/, (m) => (folded.length - m.length >= 3 ? '' : m)).replace(/e$/, '');
 }
 
 const splitCamel = (s) => s.replace(/([a-z0-9])([A-Z])/g, '$1 $2').replace(/([A-Z]+)([A-Z][a-z])/g, '$1 $2');
@@ -105,7 +108,7 @@ export function createRanker(docs, weights = {}) {
         for (const f of fields) {
           if (!w[f]) continue;
           const count = d.tf[f].get(word);
-          if (count) tf += (w[f] * count) / (1 - LENGTH[f] + (LENGTH[f] * d.len[f]) / avg[f]);
+          if (count) tf += (w[f] * count) / (1 - lengthOf(f) + (lengthOf(f) * d.len[f]) / avg[f]);
         }
         if (tf) s += idf(word) * ((tf * (K1 + 1)) / (tf + K1));
       }

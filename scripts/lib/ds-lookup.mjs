@@ -20,12 +20,14 @@
  * by a whole word; token steps, only when the query speaks token vocabulary
  * (`speaksTokens`), and then ahead of components; the Pro row and Free icons,
  * only when the query asks for an icon; components and patterns ranked by
- * field-weighted BM25 over their name, summary and the Usage and Best
- * practices sections of their Storybook page and their authored aliases
- * (`agent-views/_aliases.json`, with a bonus when the query carries an
- * alias whole) (`ds-rank.mjs`); other barrel
+ * field-weighted BM25 over their name, the first sentence of their summary
+ * (what it is; the rest of a long JSDoc is implementation notes), the Usage
+ * and Best practices sections of their Storybook page and their authored
+ * aliases (`agent-views/_aliases.json`, with a bonus when the query carries an
+ * alias whole) (`ds-rank.mjs`; the numbers are its `FIND_TUNING`); other barrel
  * exports on a word-start match, constants never; and last, a `guide` row
- * when a query word names a guideline topic. The index is built on the first
+ * when a query word names a guideline topic (`topicsOf`). Each lane is one
+ * function below `find`. The index is built on the first
  * find from the same files `get` reads, so there is no second copy to drift.
  *
  * WHERE THE ANSWERS COME FROM. Names, imports, props and tokens are the facts
@@ -44,7 +46,7 @@ import path from 'node:path';
 
 import { contextOf, escapes, expandPaths } from '../check-ds-usage.mjs';
 import { BARRELS, loadFacts } from './ds-facts.mjs';
-import { FIND_TUNING, createRanker } from './ds-rank.mjs';
+import { FIND_TUNING, STOPWORDS, createRanker } from './ds-rank.mjs';
 import { readIconLists } from './icon-lists.mjs';
 import { RULES, RULES_DOC, docLink, escapesIn } from './ds-usage.mjs';
 
@@ -68,9 +70,15 @@ Hard rules:
 
 const FIND_LIMIT = 10;
 const PER_KIND = { token: 3, icon: 3 };
-/** Words that make a query a token question: a role, a property or a hue. */
+/**
+ * Words that make a query a token question on their own: a property, a hue, or
+ * the word token. The everyday words fill, stroke, surface, brand, space,
+ * neutral and palette are left out on purpose ("fill out a form", "brand
+ * logo"): beside one of these they still narrow which steps lead, but alone
+ * they never open the token lane.
+ */
 const TOKEN_WORDS = new Set(
-  'color colour token tokens background border spacing space radius shadow elevation font palette surface fill stroke opacity red orange yellow lime green teal blue purple magenta gray grey neutral brand'.split(' '),
+  'color colour token tokens background border spacing radius shadow elevation opacity font red orange yellow lime green teal blue purple magenta gray grey'.split(' '),
 );
 /** Token words that name no step: they ask for tokens without narrowing which. */
 const TOKEN_FILLER = new Set(['color', 'colour', 'token', 'tokens', 'ds']);
@@ -78,35 +86,14 @@ const ICON_WORDS = new Set(['icon', 'icons', 'glyph']);
 /** Pro family words that read as plain English too; only `duotone` stands alone without an icon word. */
 const PRO_WORDS = new Set(['light', 'thin', 'sharp']);
 const CONSTANT = /^[A-Z0-9_]+$/;
-/** Query words that name a guideline topic → the topic `ds_guide` answers. */
-const GUIDE_WORDS = {
-  icon: 'iconography',
-  icons: 'iconography',
-  iconography: 'iconography',
-  layout: 'layout',
-  typography: 'typography',
-  color: 'color',
-  colour: 'color',
-  accessibility: 'accessibility',
-  a11y: 'accessibility',
-  grid: 'grid',
-  elevation: 'elevation',
-  content: 'content',
-  copy: 'content',
-};
-
-/** Whether a query speaks token vocabulary: a leading `--`, or a role, property or hue word. */
-export function speaksTokens(query) {
-  const ql = String(query ?? '').trim().toLowerCase();
-  return ql.startsWith('--') || (ql.match(/[a-z0-9]+/g) ?? []).some((w) => TOKEN_WORDS.has(w));
-}
-const SECTIONS = ['props', 'usage', 'examples', 'a11y', 'figma'];
-const MDX_SECTIONS = { usage: ['Usage', 'Content guidelines'], examples: ['Best practices'], a11y: ['Accessibility'] };
-const STOP = new Set('a an and the of for to with in on or my our is it that this which what i we need want use show build make page'.split(' '));
-const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
-const GUIDELINES = 'design-system/guidelines';
-/** Words people ask with, mapped to the guideline file that answers them. */
+/**
+ * Words people ask with → the guideline `ds_guide` answers. `ds_guide` reads
+ * every key; the guide row in `ds_find` reads the one-word keys, and a word in
+ * `GUIDE_WEAK` names its topic there only beside a second signal: a word from
+ * `GUIDE_CUES` or another topic word.
+ */
 const TOPIC_ALIASES = {
+  __proto__: null,
   a11y: 'accessibility',
   'layout formulas': 'layout',
   formulas: 'layout',
@@ -122,8 +109,29 @@ const TOPIC_ALIASES = {
   shadow: 'elevation',
   dataviz: 'data-visualization',
   charts: 'data-visualization',
+  accessibility: 'accessibility',
+  iconography: 'iconography',
+  layout: 'layout',
+  typography: 'typography',
+  color: 'color',
+  elevation: 'elevation',
+  content: 'content',
+  grid: 'grid',
 };
+/** Topic words that are everyday English too ("copy to clipboard", "grid of cards"). */
+const GUIDE_WEAK = new Set('copy content grid icon icons page pages type writing voice shadow charts formulas'.split(' '));
+/** Words that ask for a guideline outright, so a weak topic word beside one counts. */
+const GUIDE_CUES = new Set('guide guides guideline guidelines guidance rule rules convention conventions'.split(' '));
 
+/** Whether a query speaks token vocabulary: a leading `--`, or a strong token word (`TOKEN_WORDS`); a weak one alone does not. */
+export function speaksTokens(query) {
+  const ql = String(query ?? '').trim().toLowerCase();
+  return ql.startsWith('--') || (ql.match(/[a-z0-9]+/g) ?? []).some((w) => TOKEN_WORDS.has(w));
+}
+const SECTIONS = ['props', 'usage', 'examples', 'a11y', 'figma'];
+const MDX_SECTIONS = { usage: ['Usage', 'Content guidelines'], examples: ['Best practices'], a11y: ['Accessibility'] };
+const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
+const GUIDELINES = 'design-system/guidelines';
 const readIf = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
 const firstSentence = (text, max = 160) => {
   if (!text) return null;
@@ -141,7 +149,7 @@ const wordsOf = (q) =>
   q
     .toLowerCase()
     .split(/[^a-z0-9-]+/)
-    .filter((w) => w.length > 1 && !STOP.has(w))
+    .filter((w) => w.length > 1 && !STOPWORDS.has(w))
     .flatMap((w) => (w.length > 3 && w.endsWith('s') ? [w, w.slice(0, -1)] : [w]));
 
 /** Whether `text` carries `phrase` as whole words. */
@@ -244,7 +252,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       const section = (h) => (sectionOf(text, h) ?? '').replace(/^## .*$/m, '').replace(/<[^>]+>/g, ' ');
       return {
         id: r.name,
-        fields: { name: r.name, aliases: aliases ? a.aliases : [], summary: a.summary ?? '', usage: section('Usage'), best: section('Best practices'), related: section('Related') },
+        fields: { name: r.name, aliases: aliases ? a.aliases : [], summary: firstSentence(a.summary, Infinity) ?? '', usage: section('Usage'), best: section('Best practices'), related: section('Related') },
       };
     });
     ranker = createRanker(docs, aliases ? {} : { aliases: 0 });
@@ -330,7 +338,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   function tokenLane({ q, ql, notHere }, top) {
     if (!speaksTokens(q)) return [];
     const t = FIND_TUNING.token;
-    const want = ql.split(/[^a-z0-9]+/).filter((w) => w && !TOKEN_FILLER.has(w));
+    const want = ql.split(/[^a-z0-9]+/).filter((w) => w && !TOKEN_FILLER.has(w) && !STOPWORDS.has(w));
     const bareQuery = ql.replace(/^--/, '');
     const steps = [];
     for (const tok of usableTokens) {
@@ -361,7 +369,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     }
     if (!(iconWord || faPro || barePro || ql.startsWith('fa-') || (singleWord && !ql.startsWith('--') && ql.includes('-')))) return rows;
     const bare = raw
-      .filter((w) => !ICON_WORDS.has(w) && !PRO_WORDS.has(w) && w !== 'duotone' && !/^fa-(?:solid|regular|brands|sharp-duotone|sharp|duotone|light|thin)$/.test(w))
+      .filter((w) => !STOPWORDS.has(w) && !ICON_WORDS.has(w) && !PRO_WORDS.has(w) && w !== 'duotone' && !/^fa-(?:solid|regular|brands|sharp-duotone|sharp|duotone|light|thin)$/.test(w))
       .map((w) => w.replace(/^fa-/, ''))
       .join('-');
     const sets = iconSets();
@@ -393,8 +401,12 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     return rows.sort((a, b) => b.score - a.score || (a.name < b.name ? -1 : 1));
   }
 
-  /** The guideline topics a query names. */
-  const topicsOf = ({ raw }) => [...new Set(raw.map((w) => GUIDE_WORDS[w]).filter(Boolean))];
+  /** The guideline topics a query names: a strong topic word, or a weak one that is the whole query or sits beside a cue or another topic word. */
+  function topicsOf({ raw }) {
+    const named = [...new Set(raw.filter((w) => TOPIC_ALIASES[w]))];
+    const seconded = raw.length === 1 || named.length > 1 || raw.some((w) => GUIDE_CUES.has(w));
+    return [...new Set(named.filter((w) => seconded || !GUIDE_WEAK.has(w)).map((w) => TOPIC_ALIASES[w]))];
+  }
 
   function find(query) {
     const q = String(query ?? '').trim();

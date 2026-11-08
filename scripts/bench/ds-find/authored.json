@@ -304,6 +304,46 @@
   "kind": "intent"
  },
  {
+  "q": "fill out a form",
+  "want": [
+   "TextField",
+   "Fieldset",
+   "TextArea",
+   "Select"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "brand logo",
+  "want": [
+   "Logo"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "copy to clipboard",
+  "want": [
+   "IconButton",
+   "Button"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "grid of cards",
+  "want": [
+   "PatternCard"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "an icon for calendar",
+  "want": [
+   "fa-regular fa-calendar",
+   "fa-solid fa-calendar"
+  ],
+  "kind": "intent"
+ },
+ {
   "q": "Button",
   "want": [
    "Button"

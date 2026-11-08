@@ -6,7 +6,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 
-import { WEIGHTS, createRanker, stem, tokenize } from './ds-rank.mjs';
+import { STOPWORDS, WEIGHTS, createRanker, stem, tokenize } from './ds-rank.mjs';
 
 test('tokenize splits camelCase, lowercases, drops stopwords and one-letter words', () => {
   assert.deepEqual(tokenize('DatePicker'), ['dat', 'pick']);
@@ -30,6 +30,22 @@ test('stem folds plurals and common suffixes, and leaves short words alone', () 
   // both sides of a match stem the same way, so the same word in two forms meets
   assert.equal(stem('pages'), stem('page'));
   assert.equal(stem('paging'), stem('paged'));
+});
+
+test('stem strips a suffix from the plural-folded word, and only when three letters stay', () => {
+  // -tions folds to -tion first, then strips like the singular
+  assert.equal(stem('notifications'), stem('notification'));
+  assert.equal(stem('selections'), 'selec');
+  // the three-letter guard reads the folded word, not the original: "tiers" keeps "tier"
+  assert.equal(stem('tiers'), 'tier');
+  assert.equal(stem('tiers'), stem('tier'));
+  assert.equal(stem('actions'), 'action');
+  assert.equal(stem('riders'), 'rid');
+});
+
+test('one stopword list: the lookup reads the ranker\'s, and "page" is not in it', () => {
+  assert.ok(STOPWORDS.has('the') && STOPWORDS.has('for'));
+  assert.ok(!STOPWORDS.has('page'));
 });
 
 const doc = (id, fields) => ({ id, fields });
