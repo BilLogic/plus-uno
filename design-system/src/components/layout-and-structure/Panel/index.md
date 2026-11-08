@@ -29,14 +29,6 @@ Fixed action components cover the common icons: `PanelBackAction`,
 `PanelNewTabAction` and `PanelViewSwitcher`, each a labeled `IconButton` with
 its glyph and accessible name already set.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Title the panel for its subject: "Session details". | Title it "Panel" or "Details". |
-| Keep the disclaimer to one line. | Put instructions in the footer that belong in the body. |
-| Name the footer action for its result: "Done", "Save". | Use "OK" or "Submit". |
-
 ## Best practices
 
 ### Give the panel room to read. {#give-the-panel-room-to-read}
@@ -92,6 +84,50 @@ job only risks a different icon or label than the rest of the system uses.
   `PanelProvider` ancestor throws, rather than silently falling back, so a
   missing provider is caught during development.
 
+## Related
+
+- For something that must be decided before the page continues, use `Modal`.
+- For the page's persistent navigation rail, see `Sidebar`.
+
+Same group: `Accordion` · `Carousel` · `Footer` · `PageHeader` · `ScrollBar` · `VisuallyHidden`
+
+## Parts
+
+1. **Container** (`PanelContainer`). The outer surface. Its `width` falls back to the nearest `PanelProvider`'s width, then to `--panel-width-default` (400); inside the Frame's Panel area it fills the area instead.
+2. **Header** (`PanelHeader`). An optional back action, an optional title icon, the title, and an action group (close, more, …).
+3. **Subheader** (`PanelSubheader`). An optional row of secondary content under the header: tabs, a filter summary.
+4. **Body** (`PanelBody`). The main content, which scrolls.
+5. **Footer** (`PanelFooter`). Actions that commit a change, with an optional `PanelDisclaimer` for small print beside them.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | An overlay surface with a leading edge. |
+| Hovered | Nothing changes on the panel. |
+| Pressed | Nothing changes on the panel. |
+| Focused | Not focusable. Focus goes to the fixed actions and the content. |
+| Disabled | A panel has no disabled state. Disable the controls in it. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Ground and edge | `--ds-surface-overlay`; `--ds-border` at `--border-default` on the leading edge. |
+| Header | Padding `--space-100` and `--space-150`; `--space-075` between its parts; `--border-default` rule below. |
+| Action group | `--space-025` between actions. |
+| Subheader | Padding `--space-075` and `--space-150`; `--border-default` rule below. |
+| Body | Padding `--space-150`. |
+| Footer | Padding `--space-100` and `--space-150`, `--space-100` between its parts; rule above; disclaimer in `--body-small`, `--ds-text-subtle`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Title the panel for its subject: "Session details". | Title it "Panel" or "Details". |
+| Keep the disclaimer to one line. | Put instructions in the footer that belong in the body. |
+| Name the footer action for its result: "Done", "Save". | Use "OK" or "Submit". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -109,12 +145,5 @@ From `design-system/src/components/layout-and-structure/Panel/Panel.scss`. Overr
 ## Figma
 
 - "Panel" node 20630:52 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For something that must be decided before the page continues, use `Modal`.
-- For the page's persistent navigation rail, see `Sidebar`.
-
-Same group: `Accordion` · `Carousel` · `Footer` · `PageHeader` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

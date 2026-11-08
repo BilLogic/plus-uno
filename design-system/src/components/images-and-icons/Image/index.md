@@ -18,13 +18,6 @@ Use `Image` for a bitmap — a photo, a screenshot, an illustration exported as
 a raster. For a square picture of a school, a tool or a lesson, use `Tile`
 instead. For a typed glyph standing in for a kind of thing, use `Object`.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Describe what the image shows: "Two tutors reviewing a lesson plan". | "Image of" or a file name. |
-| Leave `alt` empty when the image only decorates. | A caption copied into `alt` beside the same text. |
-
 ## Best practices
 
 ### Pass `srcDark` instead of swapping `src` yourself. {#pass-srcdark-instead-of-swapping-src-yourself}
@@ -62,6 +55,41 @@ Don't: Fixed in a narrow container: the picture overflows it.
 - **The dark swap has no accessibility impact.** It is a media query on the
   `<picture>` element, not a state change a screen reader needs to track.
 
+## Related
+
+- For a square picture of a school, a tool or a lesson, use `Tile`.
+- For a typed glyph standing in for a kind of thing, use `Object`.
+- For a person or an agent's picture or initials, use `Avatar`.
+
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Object` · `Tile` · `UserAvatar`
+
+## Parts
+
+1. **Picture.** An `img`, with a `picture` and a dark source when `srcDark` is set.
+2. **Size.** `fluid` fills its container's width and keeps the ratio; `fixed` keeps its natural size.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The only state. An image is not a control. |
+| Hovered, pressed, focused, disabled | None. Wrap it in a link or button for a click. |
+| Dark mode | The browser swaps in `srcDark` when the system is dark; no script. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fluid | Width 100% of the container, height auto. |
+| Fixed | Natural width and height; no max width. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Describe what the image shows: "Two tutors reviewing a lesson plan". | "Image of" or a file name. |
+| Leave `alt` empty when the image only decorates. | A caption copied into `alt` beside the same text. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -78,18 +106,10 @@ Don't: Fixed in a narrow container: the picture overflows it.
 
 **`size`** — `fixed` · `fluid`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Figma
 
 - "Image" node 20094:220 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a square picture of a school, a tool or a lesson, use `Tile`.
-- For a typed glyph standing in for a kind of thing, use `Object`.
-- For a person or an agent's picture or initials, use `Avatar`.
-
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Object` · `Tile` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

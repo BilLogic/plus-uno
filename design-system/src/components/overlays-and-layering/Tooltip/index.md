@@ -26,15 +26,6 @@ It is the Popups pattern's Tooltip: body.small 12/16 in `--ds-text-inverse` on
 padded 4 · 8, wrapping past 240, with no arrow. It opens 4 from its trigger
 and never comes nearer than 8 to the screen's edge.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Say what the control does, in a few words: "Opens the session notes". | Repeat the label the control already shows. |
-| Keep it to one line. | Write two sentences or add a link. |
-| Use sentence case without a closing period. | Use a closing period or title case. |
-| Give extra help on the page. | Hide required information in a tooltip. |
-
 ## Best practices
 
 ### Controlled mode ignores the trigger and the delays. {#controlled-mode-ignores-the-trigger-and-the-delays}
@@ -115,6 +106,49 @@ Don't: A link in a tooltip: moving toward it leaves the trigger, and the tooltip
 </Popup>
 ```
 
+## Related
+
+- For content the user needs in order to complete the task, put it in the page — a tooltip is dismissed by moving the pointer.
+- For anything the user must click or focus, use `Popup`.
+- For the accessible name of an icon-only control, use `aria-label` on the control itself.
+
+Same group: `Popup`
+
+## Parts
+
+1. **Trigger.** The control the tooltip describes.
+2. **Surface.** One line of text on the inverse fill, wrapping past the maximum width. No arrow.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Hidden | Only the trigger shows. |
+| Shown | After 250 ms of hover or focus; it hides 400 ms after both leave. |
+| Hovered, pressed | The tooltip does not react. |
+| Focused | The trigger shows the 2px ring; the tooltip is never a focus stop. |
+| Disabled | An empty `trigger` list turns it off, for a trigger that only needs one when its text is truncated. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill, text | `--ds-background-neutral-bold`, `--ds-text-inverse` |
+| Shadow | `--ds-shadow-overlay` |
+| Padding | `--popover-pad-y-tooltip`, `--pad-x-sm` |
+| Radius | `--popover-radius-tooltip` |
+| Maximum width | `--popover-max-width-tooltip` |
+| Type | `--body-small` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Say what the control does, in a few words: "Opens the session notes". | Repeat the label the control already shows. |
+| Keep it to one line. | Write two sentences or add a link. |
+| Use sentence case without a closing period. | Use a closing period or title case. |
+| Give extra help on the page. | Hide required information in a tooltip. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -133,7 +167,7 @@ Don't: A link in a tooltip: moving toward it leaves the trigger, and the tooltip
 
 **`placement`** — `top` · `bottom` · `left` · `right`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -144,13 +178,5 @@ From `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss`. 
 ## Figma
 
 - "Tooltip" node 20871:3142 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For content the user needs in order to complete the task, put it in the page — a tooltip is dismissed by moving the pointer.
-- For anything the user must click or focus, use `Popup`.
-- For the accessible name of an icon-only control, use `aria-label` on the control itself.
-
-Same group: `Popup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

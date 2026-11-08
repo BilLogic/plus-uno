@@ -23,15 +23,6 @@ surface is `--ds-background-code-default`, the ink `--ds-text-code-default`, the
 gutter `--ds-background-code-gutter` with `--ds-text-code-gutter`, and a
 highlighted line `--ds-background-code-highlight`.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Show the smallest snippet that makes the point. | Paste a whole file. |
-| Name the language in prose before the block. | Leave the reader to guess the language or the file name. |
-| Highlight the lines the text is about. | Highlight most of the block. |
-| Give each block a `label` when a page has several. | Leave several blocks with the same name. |
-
 ## Best practices
 
 ### Scroll commands, wrap prose. {#scroll-commands-wrap-prose}
@@ -69,6 +60,49 @@ Don't: A line number beside a single command.
 - **Contrast.** Ink, gutter and highlight come from the code color roles and keep
   their contrast in every color and contrast mode.
 
+## Related
+
+- For code inside a sentence, `Code`.
+- Syntax coloring is not part of this component.
+
+Same group: `Code` · `Heading` · `Table`
+
+## Parts
+
+1. **Surface.** The code ground with a hairline edge and a small radius.
+2. **Gutter.** Optional line numbers, skipped by screen readers.
+3. **Line.** One per line of text; a highlighted line has its own ground.
+4. **Region.** The scrolling block, focusable and named when it does not wrap.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Code ground and ink; highlighted lines on the highlight fill. |
+| Hovered, pressed | The block does not react. |
+| Focused | A scrolling block shows the 2px ring inset; a wrapping block is not focusable. |
+| Disabled | Not applicable. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Typeface | `--code` at `--font-size-0875`, line height `--line-height-125` |
+| Surface, ink | `--ds-background-code-default`, `--ds-text-code-default` |
+| Gutter | `--ds-background-code-gutter`, `--ds-text-code-gutter` |
+| Highlight | `--ds-background-code-highlight` |
+| Edge, radius | `--ds-border`, `--radius-md` |
+| Ring | `--ds-border-focused`, `--focus-ring-width` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Show the smallest snippet that makes the point. | Paste a whole file. |
+| Name the language in prose before the block. | Leave the reader to guess the language or the file name. |
+| Highlight the lines the text is about. | Highlight most of the block. |
+| Give each block a `label` when a page has several. | Leave several blocks with the same name. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -86,12 +120,5 @@ Don't: A line number beside a single command.
 `--border-default` · `--code` · `--ds-background-code-default` · `--ds-background-code-gutter` · `--ds-background-code-highlight` · `--ds-border` · `--ds-border-focused` · `--ds-text-code-default` · `--ds-text-code-gutter` · `--focus-ring-width` · `--font-size-0875` · `--line-height-125` · `--pad-x-lg` · `--pad-x-md` · `--pad-y-lg` · `--plus-code-block-digits` · `--plus-code-block-gutter` · `--radius-md`
 
 From `design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For code inside a sentence, `Code`.
-- Syntax coloring is not part of this component.
-
-Same group: `Code` · `Heading` · `Table`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

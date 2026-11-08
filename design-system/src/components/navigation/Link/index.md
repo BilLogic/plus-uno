@@ -19,15 +19,6 @@ session report," "read more." For a standalone action styled like a button,
 use `Button` or `LinkButton` instead; `Link`'s appearances are for text, not
 for a control that stands on its own.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Make the text say where it goes: “View the full report”. | Use “click here” or “read more”. |
-| Put the link on the words that name the destination. | Stretch it over a whole sentence. |
-| Write it in sentence case, without ending punctuation inside the link. | Add an arrow or “>” to the text; the glyph does that job. |
-| Warn about a new window with `isOpenInNewWindow`. | Say “(opens in new tab)” in the text yourself. |
-
 ## Best practices
 
 ### Pick the appearance for the surface it sits on, not for emphasis. {#pick-the-appearance-for-the-surface-it-sits-on-not-for-emphasis}
@@ -65,6 +56,48 @@ Don't: A standalone action dressed as a link. Use a button.
 - **`children` is required.** A link always needs visible or accessible text
   — there is no icon-only mode.
 
+## Related
+
+- For a standalone action styled like a button, use `LinkButton`.
+- For a trail of links showing where a page sits, use `Breadcrumb`.
+
+Same group: `Breadcrumb` · `MenuGroup` · `Pagination` · `Sidebar` · `Tabs`
+
+## Parts
+
+1. **Text.** The link's name, in the appearance's ink.
+2. **Underline.** Always on for `default` and `inverse`; `subtle` shows it on hover.
+3. **New-window glyph.** Added by `isOpenInNewWindow`, with “(opens in a new tab)” appended to the accessible name.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Default in the link ink, underlined; visited in the visited ink. |
+| Hovered | Subtle is underlined; default keeps its ink. |
+| Pressed | The pressed link ink on default and subtle. |
+| Focused | The 2px ring, 2px off the link; the inverse ring on a dark fill. |
+| Disabled | Not a state. A link with nowhere to go is plain text, not a dimmed link. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Default | `--ds-link`, `--ds-link-visited`, `--ds-link-pressed` |
+| Subtle | `--ds-text`, `--ds-link-pressed` |
+| Inverse | `--ds-text-inverse`, ring `--ds-border-focused-inverse` |
+| Corners | `--radius-lg` |
+| New-window glyph | `--icon-sm`, `--inline-md` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Make the text say where it goes: “View the full report”. | Use “click here” or “read more”. |
+| Put the link on the words that name the destination. | Stretch it over a whole sentence. |
+| Write it in sentence case, without ending punctuation inside the link. | Add an arrow or “>” to the text; the glyph does that job. |
+| Warn about a new window with `isOpenInNewWindow`. | Say “(opens in new tab)” in the text yourself. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -81,7 +114,7 @@ Don't: A standalone action dressed as a link. Use a button.
 
 **`appearance`** — `default` · `subtle` · `inverse`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -92,12 +125,5 @@ From `design-system/src/components/navigation/Link/Link.scss`. Override these th
 ## Figma
 
 - "Link" node 20624:87 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a standalone action styled like a button, use `LinkButton`.
-- For a trail of links showing where a page sits, use `Breadcrumb`.
-
-Same group: `Breadcrumb` · `MenuGroup` · `Pagination` · `Sidebar` · `Tabs`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

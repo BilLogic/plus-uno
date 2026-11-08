@@ -24,14 +24,6 @@ Use `Tile` for a school, a tool or a lesson: a square picture of a thing, not
 a face. Use `UserAvatar` for the signed-in user in the topbar, with the name,
 role and notification counter beside the initial.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Use the person's full name: "Jane Park". | Initials alone, or a nickname, where a full name is known. |
-| Name an agent by its job: "Study bot". | A generic "Bot" or "AI". |
-| Write a `label` that says who or what it is. | "Avatar" or "Profile picture", which says nothing about whom. |
-
 ## Best practices
 
 ### Circle for people, square for teams and agents. {#circle-for-people-square-for-teams-and-agents}
@@ -86,6 +78,47 @@ Don't: A dot on a tiny byline, where presence is not the question.
 - **Not a control.** An avatar has no hover or focus state of its own. To make
   one clickable, wrap it in a button or link that carries the name.
 
+## Related
+
+- For the signed-in user in the topbar, with a name and a counter, use `UserAvatar`.
+- For a school, a tool or a lesson in a square, use `Tile`.
+- For a role or state beside a name, use `Status`.
+
+Same group: `AiIcon` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile` · `UserAvatar`
+
+## Parts
+
+1. **Face.** The picture when it loads; otherwise the initials, then the icon, then a plain person glyph.
+2. **Frame.** A circle for a person; a square for a team or an agent, with a radius of a quarter of its size.
+3. **Presence dot.** Optional, a quarter of the avatar's size at the bottom right, ringed in the surface color.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The only state. The ground and ink come from the Tag color set; a picture covers them. |
+| Hovered, pressed | None. An avatar is a picture, not a control; wrap it in a button or link for a click. |
+| Focused | None. It is not in the tab order. |
+| Disabled | None. A person is never dimmed; a state for the account belongs in the name or the page. |
+| Presence | The dot takes the success, warning, danger or neutral bold fill for online, away, busy and offline. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Size | `--image-xxs` to `--image-lg` for 16 to 40; 96 and 128 are built from the large spacing primitives. |
+| Ground and ink | `--ds-background-accent-blue-subtler` and `--ds-text-accent-blue` for blue, and the same pair for each other Tag color. |
+| Radius | `--radius-full` for a circle; a quarter of the size for a square. |
+| Presence dot | `--ds-background-success-bold`, `-warning-bold`, `-danger-bold`, `-neutral-bold`; ring `--ds-surface`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Use the person's full name: "Jane Park". | Initials alone, or a nickname, where a full name is known. |
+| Name an agent by its job: "Study bot". | A generic "Bot" or "AI". |
+| Write a `label` that says who or what it is. | "Avatar" or "Profile picture", which says nothing about whom. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -111,7 +144,7 @@ Don't: A dot on a tiny byline, where presence is not the question.
 
 **`status`** — `online` · `away` · `busy` · `offline`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -122,13 +155,5 @@ From `design-system/src/components/images-and-icons/Avatar/Avatar.scss`. Overrid
 ## Figma
 
 - "Avatar" node 20557:1424 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For the signed-in user in the topbar, with a name and a counter, use `UserAvatar`.
-- For a school, a tool or a lesson in a square, use `Tile`.
-- For a role or state beside a name, use `Status`.
-
-Same group: `AiIcon` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

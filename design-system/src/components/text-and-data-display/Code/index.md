@@ -21,14 +21,6 @@ The typeface and size are the `--code` text style (0.875em, so the chip scales
 with the text around it). The fill is `--ds-background-neutral` and the ink is
 `--ds-text-code-default`.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Use it for a name, command, value or flag: `getSession()`. | Use it for emphasis or a product name. |
-| Write the code exactly as the reader would type it. | Add punctuation or a trailing period inside the chip. |
-| Keep it to a short phrase. | Put several lines in it; use a code block. |
-
 ## Best practices
 
 ### Keep the chip to a short phrase. {#keep-the-chip-to-a-short-phrase}
@@ -59,6 +51,44 @@ Don't: A trailing period inside the chip, which the reader may type.
 - **It wraps.** Long values break inside the chip, so reflow at narrow widths and
   200% zoom does not scroll the page.
 
+## Related
+
+- For several lines, `CodeBlock`.
+
+Same group: `CodeBlock` · `Heading` · `Table`
+
+## Parts
+
+1. **Chip.** A `code` element in the code typeface at 0.875 of the text around it.
+2. **Fill.** The neutral ground, with a small radius.
+3. **Text.** The code ink; long values wrap inside the chip.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Neutral fill with the code ink. |
+| Hovered, pressed | The chip does not react. |
+| Focused | The chip is not a control; Tab skips it. |
+| Disabled | Not applicable; the chip is never dimmed. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Typeface, size | `--code` |
+| Fill | `--ds-background-neutral` |
+| Ink | `--ds-text-code-default` |
+| Padding, radius | `--space-025`, `--radius-md` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Use it for a name, command, value or flag: `getSession()`. | Use it for emphasis or a product name. |
+| Write the code exactly as the reader would type it. | Add punctuation or a trailing period inside the chip. |
+| Keep it to a short phrase. | Put several lines in it; use a code block. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -71,11 +101,5 @@ Don't: A trailing period inside the chip, which the reader may type.
 `--code` · `--ds-background-neutral` · `--ds-text-code-default` · `--pad-x-xs` · `--radius-md`
 
 From `design-system/src/components/text-and-data-display/Code/Code.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For several lines, `CodeBlock`.
-
-Same group: `CodeBlock` · `Heading` · `Table`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

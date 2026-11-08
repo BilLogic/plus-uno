@@ -24,15 +24,6 @@ focusing it opens the list of options under it.
 - For several values from a fixed list nobody adds to, use `Select` with `isMulti`.
 - For fewer than 5 options, use a Checkbox group (`Fieldset` + `Checkbox`).
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Write each tag as a short noun phrase: "Fractions". | A sentence as a tag. |
-| Reuse existing tags before creating a new one. | Near-duplicates: "Fraction" and "Fractions". |
-| Say what to do in an error: "Pick at least one topic". | "Required" or "Invalid". |
-| Keep tags to a few words. | A tag that wraps. |
-
 ## Best practices
 
 ### Label every tag input. {#label-every-tag-input}
@@ -178,6 +169,59 @@ On a row's handle and in its menu:
 - **The menu takes focus and gives it back.** Opening it moves focus to the
   name field. Closing it returns focus to the "…".
 
+## Related
+
+- For one value rather than a set, use `Tag`.
+- For the set without a field around it, use `TagGroup`.
+- For several values from a fixed list, use `Select` with `isMulti`.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Field.** The box holding the tags and the text entry.
+2. **Tags.** The picked values, each removable unless the field is read-only or disabled.
+3. **Entry.** The text entry after the tags. Typing filters the list.
+4. **List.** The options under the field, with a "Create" row when nothing matches.
+5. **Caption.** Helper text, or the error that replaces it.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The input fill with a `--border-default` input edge. Tags past one line collapse into "+n". |
+| Hovered | The edge turns `--ds-border-focused`. |
+| Pressed | No step of its own. The hovered edge holds while the pointer is down. |
+| Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box; the tags wrap and the list opens. |
+| Disabled | The whole field fades to `--ds-opacity-disabled`; every tag is disabled, with no × and no entry. |
+| Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
+| Read-only | The `--ds-background-neutral` fill, with no × and no list. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
+| Height | Starts at 40: `--height-250`. Compact 32: `--item-height-md`. Grows as tags wrap. |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Tags and entry | `--stack-md` between them; with focus, up to three rows of tags before the content scrolls. |
+| Entry text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
+| List | `--ds-surface-overlay` with a `--ds-border` edge, `--popover-radius-menu-md` and `--ds-shadow-overlay`. |
+| List hint | `--body-small` in `--ds-text-subtle`, `--space-025` `--pad-x-md`. |
+| Row handle | `--ds-icon-subtle`. |
+| Option menu | `--option-menu-width` wide; the name field `--space-025` `--pad-x-sm`; a `--border-default` rule in `--ds-border` above the colors. |
+
+The tags take Tag's own tokens.
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Write each tag as a short noun phrase: "Fractions". | A sentence as a tag. |
+| Reuse existing tags before creating a new one. | Near-duplicates: "Fraction" and "Fractions". |
+| Say what to do in an error: "Pick at least one topic". | "Required" or "Invalid". |
+| Keep tags to a few words. | A tag that wraps. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -214,7 +258,7 @@ On a row's handle and in its menu:
 
 **`spacing`** — `default` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -226,13 +270,5 @@ From `design-system/src/components/forms-and-inputs/TagInput/TagInput.scss`. Ove
 
 - "TagInput" node 20009:58780 in file zAecJNRdvJzAUOcjV32tRX
 - "_Option menu" node 20009:58762 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For one value rather than a set, use `Tag`.
-- For the set without a field around it, use `TagGroup`.
-- For several values from a fixed list, use `Select` with `isMulti`.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -38,15 +38,6 @@ The section holds the split from 960 of its own width. Below that, the detail re
 
 The Page around a section supplies the pad; for a region with a fill of its own, use a Page or a Card.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Title the section with what it holds, in sentence case: "Upcoming sessions". | A title that repeats the only card inside it. |
-| Keep the description to one line: "Next 7 days". | A paragraph under the title. |
-| View labels of one or two words: "Active", "Paused". | Long labels, or views of different things. |
-| A count in words: "48 students", "3 selected". | A bare number. |
-
 ## Best practices
 
 ### Make a section only when it earns one. {#make-a-section-only-when-it-earns-one}
@@ -86,6 +77,61 @@ Don't: Don't open the detail as a modal over the list: it hides the queue behind
 - A loading section is marked busy, and the skeleton bars are hidden from assistive technology.
 - The selected toolbar announces its selection, such as "3 selected", politely. Selection is never color alone: the count and Clear say it in words.
 - Give the tabs row a label that says what the tabs switch, such as "Views".
+
+## Related
+
+- Card for one object rather than a region.
+- Page for a region that needs a fill or an edge. A section is transparent.
+- Table: the section header above a table carries its toolbar and tabs.
+- Frame sets the pad a section sits in; its `sectionDetail` prop keeps 960 of content for a detail.
+
+Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSidebar` · `PatternTable`
+
+## Parts
+
+1. **Section header.** A part of its own: a title, a description and an actions slot, and an optional bottom row for tabs or a toolbar. Its level sets the heading size.
+2. **Content.** A slot for cards, tables, rows or forms.
+3. **Side** (optional). A second content slot, used only by `layout="split"`.
+4. **Footer** (optional). A slot at the end, for "View all" or paging.
+5. **Detail** (optional). A subtle-fill region on the right with its own title, description, Previous and Next, and footer.
+
+The **toolbar** is its own part, `PatternSection.Toolbar`: search, filters and a count that truncates first, then actions. In its selected state it shows the selection, bulk actions and Clear.
+
+### States
+
+A section has no interactive states: it does not respond to hover, press or focus, and it is never disabled. Those belong to the controls inside it.
+
+| State | What changes |
+| --- | --- |
+| Loading | Skeleton bars replace the header, and the section is marked busy. The body is the content's to load. |
+| Toolbar selected | The toolbar row swaps to the selection, bulk actions and Clear on `--ds-background-selected`. |
+| Detail open | A record shows in the detail region; below 960 it replaces the list. |
+
+### Tokens
+
+| Token | Value | Used for |
+| --- | --- | --- |
+| `--section-stack-sm` | 8 | The title row to the tabs or toolbar row. |
+| `--section-stack-md` | 16 | The header to the body, and the body to the footer. |
+| `--section-stack-lg` | 24 | Between subsections. |
+| `--section-min-width-main`, `-side` | 480, 224 | The main and side columns of a split. |
+| `--section-radius`, `--section-pad-x-default`, `--section-pad-y-default` | radius, pad | A section with `fill="subtle"`. |
+| `--ds-surface-sunken` | color | The subtle fill. |
+| `--stack-sm` | 4 | The title to the description. |
+| `--inline-md` | 8 | Items in the title row and the tabs row. |
+| `--heading-large`, `-medium`, `-small` | 24/28, 20/24, 16/20 | A page title, a section title and a subsection title. |
+| `--body-default` | 14/20 | The description, at every level. |
+| `--ds-text`, `--ds-text-subtle` | color | The title and the description. |
+| `--ds-background-selected` | color | The bulk bar of the selected toolbar. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Title the section with what it holds, in sentence case: "Upcoming sessions". | A title that repeats the only card inside it. |
+| Keep the description to one line: "Next 7 days". | A paragraph under the title. |
+| View labels of one or two words: "Active", "Paused". | Long labels, or views of different things. |
+| A count in words: "48 students", "3 selected". | A bare number. |
 
 ## Props
 
@@ -138,7 +184,7 @@ Don't: Don't open the detail as a modal over the list: it hides the queue behind
 
 **`fill`** — `none` · `subtle`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Sub-components
 
@@ -164,14 +210,5 @@ Implemented as `SectionToolbar`.
 `--body-default` · `--body-small` · `--ds-background-selected` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-large` · `--heading-large-tracking` · `--heading-medium` · `--heading-small` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--item-height-md` · `--radius-lg` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--table-pad-x-cell` · `--width-3000`
 
 From `design-system/src/patterns/PatternSection/PatternSection.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- Card for one object rather than a region.
-- Page for a region that needs a fill or an edge. A section is transparent.
-- Table: the section header above a table carries its toolbar and tabs.
-- Frame sets the pad a section sits in; its `sectionDetail` prop keeps 960 of content for a detail.
-
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSidebar` · `PatternTable`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

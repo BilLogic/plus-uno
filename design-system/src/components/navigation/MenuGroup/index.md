@@ -19,15 +19,6 @@ content of a sidebar section, a settings list, a dropdown's body once it's
 open. For the popup mechanics that open and close a menu, see `Popup`;
 `MenuGroup` is the list inside it, not the popup itself.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Start each label with a verb for an action: “Rename board”. | Start every label with “Go to” or “Click to”. |
-| Use sentence case, without ending punctuation. | Use Title Case or a trailing period. |
-| Write section titles as short nouns: “Recent”, “Actions”. | Write a sentence in a section title. |
-| Pair a leading icon with a label that still reads without it. | Rely on the icon alone to say what the row does. |
-
 ## Best practices
 
 ### Pick the item kind for what the row does. {#pick-the-item-kind-for-what-the-row-does}
@@ -85,6 +76,52 @@ Don't: Filler words in front of every label.
 - **`isSelected` is `aria-current`**, read by assistive technology as the
   active choice, independent of visual selection styling.
 
+## Related
+
+- For the popup that opens and closes around a menu, use `Popup`.
+- For a horizontal row of destinations instead of a vertical list, use `Tabs`.
+
+Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar` · `Tabs`
+
+## Parts
+
+1. **Group.** The scrollable `menu` the sections sit in; `density` sets the row height.
+2. **Section.** A titled run of rows; `hasSeparator` draws a divider above it.
+3. **Row.** A `ButtonItem`, `LinkItem` or `CustomItem` with an optional leading icon, a label, a description and a trailing icon.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Body ink on a clear ground. |
+| Hovered | The subtle neutral hovered fill. |
+| Pressed | The subtle neutral pressed fill. |
+| Focused | The 2px ring, 2px off the row. |
+| Selected | The selected fill, with `aria-current` on the row. |
+| Disabled | Disabled ink; a disabled link drops its `href` and its tab stop. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Row ink | `--ds-text`, `--body-default` |
+| Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
+| Selected | `--ds-background-selected` |
+| Disabled | `--ds-text-disabled` |
+| Description | `--body-small`, `--ds-text-subtle` |
+| Section title | `--heading-xxsmall`, `--ds-text-subtlest` |
+| Divider | `--border-default`, `--ds-border` |
+| Row corners | `--radius-lg` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Start each label with a verb for an action: “Rename board”. | Start every label with “Go to” or “Click to”. |
+| Use sentence case, without ending punctuation. | Use Title Case or a trailing period. |
+| Write section titles as short nouns: “Recent”, “Actions”. | Write a sentence in a section title. |
+| Pair a leading icon with a label that still reads without it. | Rely on the icon alone to say what the row does. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -101,7 +138,7 @@ Don't: Filler words in front of every label.
 
 **`density`** — `regular` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -112,12 +149,5 @@ From `design-system/src/components/navigation/MenuGroup/MenuGroup.scss`. Overrid
 ## Figma
 
 - "Menu item" node 20625:91 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For the popup that opens and closes around a menu, use `Popup`.
-- For a horizontal row of destinations instead of a vertical list, use `Tabs`.
-
-Same group: `Breadcrumb` · `Link` · `Pagination` · `Sidebar` · `Tabs`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

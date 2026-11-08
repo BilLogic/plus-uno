@@ -18,15 +18,6 @@ Use `SplitButton` when one action is clearly primary and a few related
 actions belong beside it in a menu — "Send" with "Send and close," "Save" as
 a draft. For actions with no clear primary, use `ButtonGroup` instead.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Label the main action with a verb and its object: "Publish page". | A bare "Go" or "More". |
-| Name the menu trigger for what it opens: "More publish options". | "Menu", "Arrow" or "Chevron". |
-| Use sentence case on both halves. | Title case or all capitals. |
-| List the alternatives in the menu in the same voice as the main action: "Publish and notify". | Menu items that are not variations of the main action. |
-
 ## Best practices
 
 ### Keep the two halves joined. {#keep-the-two-halves-joined}
@@ -77,6 +68,46 @@ a `Popup` or `MenuGroup` positioned under it.
   own label; the chevron's `IconButton` needs a label describing what its
   menu holds, not a generic "more."
 
+## Related
+
+- For actions with no clear primary, use `ButtonGroup`.
+- For the menu the chevron opens, see `Popup` and `MenuGroup`.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Action.** A Button for the primary action.
+2. **Seam.** The two children meet at a flat edge: inner corners are square, outer corners keep the button radius.
+3. **Menu trigger.** An Icon button with a chevron that opens the related actions.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Each child draws its own rest look; the seam joins them. |
+| Hovered | Set independently on each child. |
+| Pressed | Set independently on each child. |
+| Focused | The focused child rises above its neighbor so its ring is not covered. |
+| Disabled | Set independently on each child. |
+| Loading | Set independently on each child. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Seam | 1: `--border-default`. A primary trigger draws it in `--ds-border-inverse`. |
+| Outer corners | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Label the main action with a verb and its object: "Publish page". | A bare "Go" or "More". |
+| Name the menu trigger for what it opens: "More publish options". | "Menu", "Arrow" or "Chevron". |
+| Use sentence case on both halves. | Title case or all capitals. |
+| List the alternatives in the menu in the same voice as the main action: "Publish and notify". | Menu items that are not variations of the main action. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -90,12 +121,5 @@ a `Popup` or `MenuGroup` positioned under it.
 `--border-default` · `--ds-border-inverse`
 
 From `design-system/src/components/forms-and-inputs/SplitButton/SplitButton.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For actions with no clear primary, use `ButtonGroup`.
-- For the menu the chevron opens, see `Popup` and `MenuGroup`.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

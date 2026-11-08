@@ -221,3 +221,19 @@ test('run: a stale marker fails on any page', () => {
   const found = run({ repoRoot: root, enforceStrict: false });
   assert.deepEqual(found.map((f) => [f.severity, /stale-marker/.test(f.message)]), [['error', true]]);
 });
+
+test('bare-number: on a strict page, a Usage table row with a number and no constant warns; a row naming its constant is silent', () => {
+  const table = '| Width | Pixels |\n| --- | --- |\n| 6-col | 384 at 768. |\n| 8-col | `MODAL_WIDTH_PX` |';
+  const strict = check(mdx({ usage: `Use \`Modal\` when the next step has to happen first.\n\n${table}` }), { strict: true });
+  assert.deepEqual(rulesOf(strict), ['bare-number']);
+  assert.match(strict[0].message, /"384", "768"/);
+  assert.deepEqual(rulesOf(check(mdx({ usage: `Use \`Modal\` first.\n\n${table}` }))), []);
+});
+
+test('run: a stale marker in a guideline markdown file fails', () => {
+  const root = fixtureRepo({ Popup: mdx() });
+  fs.mkdirSync(path.join(root, 'design-system/guidelines/components'), { recursive: true });
+  fs.writeFileSync(path.join(root, 'design-system/guidelines/components/overview.md'), '# Components\n\n## Known stale below this line\n\nNo `TODO` in code is a finding.\n');
+  const found = run({ repoRoot: root, enforceStrict: false });
+  assert.deepEqual(found.map((f) => [f.file, f.line, f.severity, /stale-marker/.test(f.message)]), [['design-system/guidelines/components/overview.md', 3, 'error', true]]);
+});

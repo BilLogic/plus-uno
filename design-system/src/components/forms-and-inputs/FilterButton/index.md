@@ -21,15 +21,6 @@ filter on and off, above a table or a list. For a value already chosen and
 removable, show it as a `Tag` instead; `FilterButton` is the trigger, not the
 applied result.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Use the filter's name as the label: "Status", "Subject". | A verb phrase such as "Filter by status". |
-| Use sentence case: "Grade level". | Title case or all capitals: "Grade Level". |
-| Show the count as a bare number, only once a filter is applied: "Status 2". | "Status (2 selected)", or a "0" when nothing is applied. |
-| Keep the name to one or two words. | A name long enough to wrap or truncate. |
-
 ## Best practices
 
 ### Keep space between filter buttons. {#keep-space-between-filter-buttons}
@@ -77,6 +68,48 @@ toggles directly on click, with nothing to open.
 - **The chevron is decorative.** It signals that a menu opens, but the
   accessible name comes from `text` and, when present, the applied count.
 
+## Related
+
+- For the applied value once chosen, use `Tag`.
+- For a single action that isn't a filter, use `Button`.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Container.** A Button, 32 at default spacing and 24 at compact.
+2. **Label.** The filter's name.
+3. **Metric** (optional). The count of applied values, after the name. `0` shows; leave it out to hide it.
+4. **Chevron** (optional). Drawn by default; turn it off when the button toggles instead of opening a menu.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Hovered | The container takes the hovered fill of its appearance. |
+| Pressed | The container takes the pressed fill of its appearance. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
+| Selected | The selected role fill; the metric takes the label color. Sets `aria-pressed`. |
+| Disabled | The disabled fill, label and icon: a change of color, not of opacity. |
+| Loading | A spinner replaces the label. Blocks interaction and sets `aria-busy`. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill and edge | Those of Button, default and subtle. |
+| Metric | `--ds-text-subtlest`; gap to the label 4: `--inline-sm`. |
+| Height | 32: `--item-height-md`. 24: `--item-height-sm`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Use the filter's name as the label: "Status", "Subject". | A verb phrase such as "Filter by status". |
+| Use sentence case: "Grade level". | Title case or all capitals: "Grade Level". |
+| Show the count as a bare number, only once a filter is applied: "Status 2". | "Status (2 selected)", or a "0" when nothing is applied. |
+| Keep the name to one or two words. | A name long enough to wrap or truncate. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -98,19 +131,12 @@ toggles directly on click, with nothing to open.
 
 **`spacing`** — `default` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--ds-text-subtlest` · `--inline-sm`
 
 From `design-system/src/components/forms-and-inputs/FilterButton/FilterButton.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For the applied value once chosen, use `Tag`.
-- For a single action that isn't a filter, use `Button`.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

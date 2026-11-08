@@ -32,14 +32,6 @@ happened and needs no reply, use `Flag`.
 | Danger | Something that needs immediate attention, such as an outage. |
 | Announcement | A general notice with nothing wrong. No icon and no severity. |
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Use concise, scannable language that states the problem. | Write a long message; there is no way to expand it. |
-| Say the severity, what is affected and what to do. | Leave out what the person should do next. |
-| Own the problem when it is ours: "We lost the connection." | Blame the person: "Something is wrong with your connection." |
-
 ## Best practices
 
 ### Use the danger banner only when action is needed now. {#use-the-danger-banner-only-when-action-is-needed-now}
@@ -76,6 +68,49 @@ Don't: A paragraph in the banner.
 - **A banner link takes focus like any link.** It shows the 2px focus ring and
   its text names the destination.
 
+## Related
+
+- For a message scoped to one region of the page, use `SectionMessage`.
+- For a timed confirmation that something already happened, use `Flag`.
+- For a short note tied to one object on the page, use `InlineMessage`.
+
+Same group: `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
+
+## Parts
+
+1. **Icon.** Leading glyph for `warning` and `danger`; `announcement` has none.
+2. **Message.** Short text that fits on one line. A link inside inherits the banner's text color and is underlined, so it stays visible on every fill.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Fill and text per appearance. |
+| Hovered | Not a control, so nothing changes. |
+| Pressed | Nothing changes; there is no pressed layer. |
+| Focused | Tab skips the banner; a link inside shows the 2px focus ring. |
+| Disabled | Not supported. Unmount the banner once the condition clears. |
+| Truncated | Not supported. Keep the message short enough to fit. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Warning | `--ds-background-warning`, `--ds-text-warning`, `--ds-icon-warning` |
+| Danger | `--ds-background-danger`, `--ds-text-danger`, `--ds-icon-danger` |
+| Announcement | `--ds-background-neutral`, `--ds-text` |
+| Message | `--body-default`; a link at `--type-weight-medium` |
+| Padding, gap | `--pad-y-md`, `--pad-x-md`, `--inline-md` |
+| Icon | `--icon-md` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Use concise, scannable language that states the problem. | Write a long message; there is no way to expand it. |
+| Say the severity, what is affected and what to do. | Leave out what the person should do next. |
+| Own the problem when it is ours: "We lost the connection." | Blame the person: "Something is wrong with your connection." |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -90,20 +125,12 @@ Don't: A paragraph in the banner.
 
 **`appearance`** — `warning` · `danger` · `announcement`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--body-default` · `--ds-background-danger` · `--ds-background-neutral` · `--ds-background-warning` · `--ds-icon-danger` · `--ds-icon-warning` · `--ds-text` · `--ds-text-danger` · `--ds-text-warning` · `--icon-md` · `--inline-md` · `--pad-x-md` · `--pad-y-md` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/Banner/Banner.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For a message scoped to one region of the page, use `SectionMessage`.
-- For a timed confirmation that something already happened, use `Flag`.
-- For a short note tied to one object on the page, use `InlineMessage`.
-
-Same group: `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

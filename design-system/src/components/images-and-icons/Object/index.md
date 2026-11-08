@@ -20,13 +20,6 @@ Use an `Object` icon beside the name of the thing it represents — a task in a
 list, a bug in a reference, a page in a breadcrumb. For a larger picture of a
 thing (a school, a tool, a lesson), use `Tile`. For a bitmap, use `Image`.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Keep the visible name beside the glyph: "Fix the broken sync". | A glyph alone where the kind is not obvious. |
-| Set `label=""` when the kind is already written beside it. | Leave both the label and the visible kind, so it reads twice. |
-
 ## Best practices
 
 ### Pick the component for the kind — there is no generic `Object`. {#pick-the-component-for-the-kind-there-is-no-generic-object}
@@ -62,6 +55,40 @@ Don't: A second glyph to hint at a status.
   and drops the accessible name, for use beside visible text that already
   names the kind.
 
+## Related
+
+- For a larger, square picture of a thing, use `Tile`.
+- For a bitmap, use `Image`.
+- For a person or an agent, use `Avatar`.
+
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Tile` · `UserAvatar`
+
+## Parts
+
+1. **Glyph.** A fixed Font Awesome Free glyph for the kind: task, bug, idea, pull request, project or page.
+2. **Size.** 12 or 16, in `--ds-icon-subtle`.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The only state. An object icon is a picture, not a control. |
+| Hovered, pressed, focused, disabled | None. It sits beside the name of the thing, which carries any interaction. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Size | `--icon-sm` for 12; `--icon-md` for 16. |
+| Color | `--ds-icon-subtle`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Keep the visible name beside the glyph: "Fix the broken sync". | A glyph alone where the kind is not obvious. |
+| Set `label=""` when the kind is already written beside it. | Leave both the label and the visible kind, so it reads twice. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -75,7 +102,7 @@ Don't: A second glyph to hint at a status.
 
 **`size`** — `12` · `16`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -86,13 +113,5 @@ From `design-system/src/components/images-and-icons/Object/Object.scss`. Overrid
 ## Figma
 
 - "Object" node 20630:40 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a larger, square picture of a thing, use `Tile`.
-- For a bitmap, use `Image`.
-- For a person or an agent, use `Avatar`.
-
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Tile` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

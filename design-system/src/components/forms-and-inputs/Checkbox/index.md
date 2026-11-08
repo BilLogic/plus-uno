@@ -16,19 +16,9 @@ Also asked as: multi-select, checklist, tick box.
 
 ## Usage
 
-Use a checkbox when a person needs to select one or more options from a list of related items, or when a setting needs an explicit confirmation before it applies, such as accepting terms or saving a form.
+Use a checkbox when a person needs to select one or more options from a list of related items, or when a setting needs an explicit confirmation before it applies, such as accepting terms or saving a form. A group of checkboxes lets a person choose many options, or none, from a short list they can see whole; a long list goes in a `Select` with `isMulti`.
 
 Individual checkboxes have two states, selected and unselected. When checkboxes are grouped, a parent shows a third, mixed state while some, not all, of its children are selected.
-
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Write the label as the choice: "Email me a summary". | An instruction: "Check this box to receive an email summary." |
-| Use sentence case and no end punctuation. | Title case, or a period after the label. |
-| Phrase every label in the positive: "Send reminders". | A negative that makes selecting mean "no": "Do not send reminders". |
-| Say what to do in an error: "Select an option". | "Required" or "Invalid". |
-| Put extra detail in the description: "Sent the evening before." | Stretch the label into a sentence. |
 
 ## Best practices
 
@@ -97,6 +87,56 @@ The underlying value is still checked or unchecked. Clicking a mixed box resolve
 - **Keyboard focus is a 2px ring on `border.focused`, 2px off the box.** A pointer focus draws none. Space toggles the box; Enter does not.
 - **Group related boxes** in a Fieldset with a `legend`: a Checkbox group.
 
+## Related
+
+- To turn a setting on or off at once, use Toggle.
+- For one answer from several options, use Radio, or Radio group for the whole set.
+- For a group of checkboxes, use a Checkbox group: Checkboxes inside a Fieldset with a legend.
+- For a rows-by-columns matrix of choices, use Choice grid.
+- For choices in a popup, use Select.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Box.** An 18 square with a 2px edge. Selected, it fills with the selected bold fill and draws a check; mixed, it draws a dash.
+2. **Label.** 14/20 text beside the box in a 24 row. It names the checkbox. A required marker follows it.
+3. **Description.** Optional 12/16 text under the label that describes the choice. It does not name it.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | `--ds-background-input` fill with a `--ds-border-input` edge. |
+| Hovered | Unselected: `--ds-background-input-hovered` with a `--ds-border-brand` edge. Selected: the hovered step of the selected bold fill. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the box, for keyboard focus only. |
+| Selected | `--ds-background-selected-bold` fill and `--ds-border-selected` edge; the check is `--ds-icon-inverse`. |
+| Mixed | The same fill and edge as selected; the mark is a dash in `--ds-icon-inverse`. |
+| Invalid | The unselected box takes `--ds-border-danger`. A selected or mixed box keeps its fill. |
+| Read-only | Full contrast, in the tab order, `aria-readonly`; ignores clicks and Space. |
+| Disabled | `--ds-background-disabled` fill, `--ds-border-disabled` edge, `--ds-icon-disabled` mark. Out of the tab order. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Box fill | `--ds-background-input`; selected `--ds-background-selected-bold`. |
+| Box edge | `--ds-border-input`; selected `--ds-border-selected`; invalid `--ds-border-danger`. |
+| Box size, radius | `--checkbox-control-size` (18); `--radius-025`; `--stroke-2` edge. |
+| Row | `--item-height-sm` (24); gap `--space-050`. |
+| Label | `--ds-text`, body default. |
+| Focus ring | `--ds-border-focused`, 2px, 2px offset. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Write the label as the choice: "Email me a summary". | An instruction: "Check this box to receive an email summary." |
+| Use sentence case and no end punctuation. | Title case, or a period after the label. |
+| Phrase every label in the positive: "Send reminders". | A negative that makes selecting mean "no": "Do not send reminders". |
+| Say what to do in an error: "Select an option". | "Required" or "Invalid". |
+| Put extra detail in the description: "Sent the evening before." | Stretch the label into a sentence. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -126,7 +166,7 @@ The underlying value is still checked or unchecked. Clicking a mixed box resolve
 
 **`appearance`** — `plain` · `card`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -137,15 +177,5 @@ From `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss`. Ove
 ## Figma
 
 - "Form Checkbox" node 20328:63229 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- To turn a setting on or off at once, use Toggle.
-- For one answer from several options, use Radio, or Radio group for the whole set.
-- For a group of checkboxes, use a Checkbox group: Checkboxes inside a Fieldset with a legend.
-- For a rows-by-columns matrix of choices, use Choice grid.
-- For choices in a popup, use Select.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

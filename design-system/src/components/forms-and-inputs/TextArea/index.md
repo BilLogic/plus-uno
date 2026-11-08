@@ -20,15 +20,6 @@ Use a Text area for free text over several lines: session notes, feedback, a
 reason. Use a Text field for one short answer, and a Rich text editor only when
 the text needs formatting.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the field with a short noun: "Email address". | An instruction where the name belongs: "Enter your email address here". |
-| Use sentence case and no end punctuation on labels. | Title case, or a period after the label. |
-| Say what to do about an error: "Enter a 10-digit number." | "Invalid" or "Error". |
-| Keep helper text to one short line. | Paragraphs in the caption. Link to help instead. |
-
 ## Best practices
 
 ### Hint at the answer, not the control. {#hint-at-the-answer-not-the-control}
@@ -84,6 +75,56 @@ Set `maxLength` when something downstream truncates; do not add a limit just to 
 - **Save and Cancel are real buttons**, reached in the tab order after the field.
   Esc cancels, and Ctrl or Cmd with Enter saves.
 
+## Related
+
+- For one line of text, see Text field.
+- For formatted text, see Rich text editor.
+- For the label and caption conventions, see Form.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Label.** Names the field. A required marker and an info tooltip sit beside it.
+2. **Box.** 80 high at least, growing with `rows`, and scrolls past it.
+3. **Control.** The native textarea. It resizes vertically.
+4. **Caption.** A message on the left and, with `maxLength`, a count on the right.
+5. **Save and Cancel** (subtle only). Shown below a subtle text area while it is edited.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The input fill with a `--border-default` input edge; the placeholder until there is text. |
+| Hovered | The edge turns `--ds-border-focused`. A subtle text area takes `--ds-background-neutral-subtle-hovered`. |
+| Pressed | No step of its own. The hovered edge holds while the pointer is down. |
+| Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. No fill changes. |
+| Disabled | The whole field fades to `--ds-opacity-disabled` and leaves the tab order. |
+| Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
+| Warning, success | The edge takes `--ds-border-warning` or `--ds-border-success`, with the message in the matching text color. |
+| Read-only | The `--ds-background-neutral` fill. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
+| Height | At least `--field-min-height-sm` (80). |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Padding | `--pad-y-md` top and bottom, `--pad-x-md` either side. |
+| Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
+| Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`; the count `--ds-text-subtle`, over the limit `--ds-text-danger`. |
+| Save and Cancel | `--stack-sm` apart, aligned to the end. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the field with a short noun: "Email address". | An instruction where the name belongs: "Enter your email address here". |
+| Use sentence case and no end punctuation on labels. | Title case, or a period after the label. |
+| Say what to do about an error: "Enter a 10-digit number." | "Invalid" or "Error". |
+| Keep helper text to one short line. | Paragraphs in the caption. Link to help instead. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -122,18 +163,10 @@ Set `maxLength` when something downstream truncates; do not add a limit just to 
 
 **`appearance`** — `standard` · `subtle`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Figma
 
 - "Text area" node 20324:924 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For one line of text, see Text field.
-- For formatted text, see Rich text editor.
-- For the label and caption conventions, see Form.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

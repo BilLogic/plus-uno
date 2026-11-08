@@ -22,14 +22,6 @@ a heading inside a region of the page, use the
 Section
 pattern's own header instead — `PageHeader` is reserved for the page level.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the page for what a person does or sees: "Session plans". | Use the product name or "Page" as the title. |
-| Keep the title to a few words. | Write a sentence with a verb and a full stop. |
-| Put the one main action first in the actions. | Fill the actions with every command the page has. |
-
 ## Best practices
 
 ### Show the trail on nested pages. {#show-the-trail-on-nested-pages}
@@ -82,6 +74,47 @@ wrap — a custom element already carrying its own heading semantics.
   `breadcrumbs` in extra markup — pass a `Breadcrumb` component, which
   carries its own navigation landmark.
 
+## Related
+
+- For a heading inside a region of the page, use the Section pattern.
+- For the trail shown above the title, use `Breadcrumb`.
+
+Same group: `Accordion` · `Carousel` · `Footer` · `Panel` · `ScrollBar` · `VisuallyHidden`
+
+## Parts
+
+1. **Breadcrumbs.** Optional, above the title.
+2. **Title.** A level 2 heading, or any node with `disableTitleStyles`.
+3. **Actions.** Optional, at the end of the title row.
+4. **Bottom bar.** Optional, under the row: tabs, a filter bar or a status line.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | A title row with its actions, no ground of its own. |
+| Hovered | Nothing changes. Hover belongs to the breadcrumbs, actions and tabs inside. |
+| Pressed | Nothing changes. |
+| Focused | Not focusable. Focus goes to the controls in the slots. |
+| Disabled | A header has no disabled state. Disable the controls in it. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Title | `Heading` at the `xlarge` size, as an `h2`. |
+| Rows | `--space-100` between breadcrumbs, title row and bottom bar. |
+| Title row | `--space-150` between the title and its actions; `--space-075` between actions. |
+| Breadcrumbs | `--body-small`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the page for what a person does or sees: "Session plans". | Use the product name or "Page" as the title. |
+| Keep the title to a few words. | Write a sentence with a verb and a full stop. |
+| Put the one main action first in the actions. | Fill the actions with every command the page has. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -103,12 +136,5 @@ From `design-system/src/components/layout-and-structure/PageHeader/PageHeader.sc
 ## Figma
 
 - "Page header" node 20622:81 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a heading inside a region of the page, use the Section pattern.
-- For the trail shown above the title, use `Breadcrumb`.
-
-Same group: `Accordion` · `Carousel` · `Footer` · `Panel` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

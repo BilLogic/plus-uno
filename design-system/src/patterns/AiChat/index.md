@@ -37,15 +37,6 @@ AI chat applies the six AI rules from the AI overview.
 
 `variant="storybook"` is the chat in the Storybook docs. The docs' floating button opens it through its AI agent action, so the chat's own button is left out with `launcher={false}`: the popup floats above the bottom right corner instead. `respond` may return `{ text, sources }`, and the sources list under the answer, opening in `linkTarget`. The docs' answerer calls a server-side function that answers from the design-system index and holds the credentials, so none reaches the browser; when it errors or is rate limited, the chat searches the site's pages and the component index instead and says so.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Call it AI chat, with the AI icon. | A persona name or an avatar. |
-| Short starters that say what they ask: "Summarize this page". | Starters that are whole paragraphs. |
-| Say "AI can make mistakes. Check important info." once, under the prompt input. | A warning on each message. |
-| Name a source by its record: "Session notes, Oct 24". | Bare links or ids. |
-
 ## Best practices
 
 ### Use the popup for quick asks. {#use-the-popup-for-quick-asks}
@@ -84,6 +75,60 @@ Don't: An answer from records with nothing to check it against.
 - The popup without the button (`launcher={false}`) takes focus in its prompt input on open, and Escape closes it.
 - Full screen is a dialog named by `title`, and focus moves into it.
 
+## Related
+
+- Frame places the Panel the chat docks in.
+- Blanket sits under the Panel when it opens over the Page.
+- For one reply on its own, use `AiMessage`.
+- For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.
+
+Same group: `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+
+## Parts
+
+1. **Button.** A primary circle Icon button with the AI icon, at the bottom right of the Page. It is the one way in, and it hides while chat is open in the Panel or full screen.
+2. **Header.** The AI icon, the title and the controls: clear chat, switch mode (popup and Panel trade places), full screen, more and close. The Storybook variant carries clear chat, move to Panel and close.
+3. **Conversation.** The person's messages on the sunken fill, and each reply as an AI message with its sources and thumbs.
+4. **Prompt starters** (optional). Offered while the conversation is empty, from `starters`.
+5. **Prompt input.** Where the person writes. While a reply is coming, its send button becomes Stop.
+6. **Fallibility line.** One line under the prompt input.
+
+The same surface fills every mode; the mode only changes which header controls show and where the surface sits.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Closed | Only the button shows. |
+| Popup | The popup opens anchored to the button, over the Page. The button stays. |
+| Panel | Chat docks in the Frame's Panel, or opens over the Page on a Blanket. The button hides. |
+| Full screen | Chat covers the window, in a column capped at the reading width. The button hides. |
+| Replying | A typing indicator stands in for the reply, and the prompt input's send button becomes Stop. |
+
+Hover, pressed, focus and disabled belong to the Icon buttons in the header and the button, and are described on the Icon button page. Clear chat is disabled while the conversation is empty.
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Button | `--height-300` square, `--page-pad` from the Page's bottom and right edges, `--ds-shadow-overlay`. |
+| Popup | Twice `--height-2000` wide and high; without the button it floats `--stack-md` above where the button would be. |
+| Floating popup fill | `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popover-radius`. |
+| Full screen | `--ds-surface`, on `--layer-dialog`; the conversation is capped at `--content-max-width-reading`. |
+| Conversation | `--stack-md` between messages, `--body-default` in `--ds-text`. |
+| The person's message | `--ds-surface-sunken`, `--pad-y-sm` by `--pad-x-md`, `--radius-md`. |
+| Empty state and fallibility line | `--ds-text-subtle`; the line at `--body-small`. |
+| Footer | `--stack-sm` between the starters, the input and the line. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Call it AI chat, with the AI icon. | A persona name or an avatar. |
+| Short starters that say what they ask: "Summarize this page". | Starters that are whole paragraphs. |
+| Say "AI can make mistakes. Check important info." once, under the prompt input. | A warning on each message. |
+| Name a source by its record: "Session notes, Oct 24". | Bare links or ids. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -108,21 +153,12 @@ Don't: An answer from records with nothing to check it against.
 
 **`defaultMode`** — `popup` · `panel` · `fullscreen`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--body-default` · `--body-small` · `--content-max-width-reading` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--height-2000` · `--height-300` · `--layer-dialog` · `--layer-navigation` · `--pad-x-md` · `--pad-y-sm` · `--page-pad` · `--popover-radius` · `--radius-md` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/patterns/AiChat/AiChat.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- Frame places the Panel the chat docks in.
-- Blanket sits under the Panel when it opens over the Page.
-- For one reply on its own, use `AiMessage`.
-- For the field alone, use `PromptInput`; for suggested prompts, `PromptStarters`.
-
-Same group: `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

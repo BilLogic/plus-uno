@@ -23,14 +23,6 @@ screen and the layout does not jump when it arrives.
   tag list fetched separately): the matching preset.
 - **A thumbnail, avatar or header:** a rectangle or circle with its own size.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Draw only the layout the page will have. | Draw a placeholder for a layout the page does not have. |
-| Keep the surrounding words, such as column headers, on screen. | Skeleton a heading the person already knows. |
-| Name the loading region once, in the live region around it. | Give each placeholder its own label. |
-
 ## Best practices
 
 ### Shape the placeholder like its content. {#shape-the-placeholder-like-its-content}
@@ -113,6 +105,51 @@ useEffect(() => {
 - **Contrast in any theme.** The fill is `--ds-skeleton` and the shimmer
   `--ds-skeleton-subtle`, both theme tokens.
 
+## Related
+
+- `StatusTag`, `CountTag` and `Tag` are the labels the presets are sized to.
+- `Spinner` is for an action in progress and for full-page transitions; a Tag saving a change uses its own spinner.
+- The loading guidance in the surfaces guideline points here.
+
+Same group: `GenerativeBorder` · `ProgressBar` · `Spinner`
+
+## Parts
+
+1. **Bar.** A flat fill in the skeleton color: a rectangle, a circle, a text line or a label shape.
+2. **Shimmer.** A band that sweeps across. Off, it is a flat fill.
+3. **Group.** Lines and tag groups are columns or rows of bars.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The fill shimmers. |
+| Not shimmering | `isShimmering=` is a flat fill, which is also what reduced motion gets. |
+| Hovered | None. It ignores the pointer. |
+| Pressed | None. |
+| Focused | None. It never takes focus. |
+| Disabled | None. A placeholder has no disabled state. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill | `--ds-skeleton`. |
+| Shimmer | A band of `--ds-skeleton-subtle`, 1.6s. |
+| Radius | `--radius-md` by default; `--radius-full` for a circle and the person tag; `--radius-sm` for count; or the token named by `radius`. |
+| Label presets | Heights from the label height roles, so a placeholder is the size of its label. Count is `--control-sm` wide; status-spacious takes `--radius-0375` (6) for its corner. |
+| Sizes | Spacing primitives: `--space-400` (64) for the default height, `--space-200` (32) for the circle, `--space-100` (16) for the text bar. |
+| Gap | `--stack-md` between lines and tags. |
+| Forced colors | A `--stroke-1` outline keeps the shape. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Draw only the layout the page will have. | Draw a placeholder for a layout the page does not have. |
+| Keep the surrounding words, such as column headers, on screen. | Skeleton a heading the person already knows. |
+| Name the loading region once, in the live region around it. | Give each placeholder its own label. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -135,7 +172,7 @@ useEffect(() => {
 
 **`radius`** — `none` · `element-radius-sm` · `element-radius-md` · `element-radius-lg` · `element-radius-full` · `card-radius-sm` · `card-radius-md` · `section-radius-sm` · `section-radius-md` · `section-radius-lg`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -146,13 +183,5 @@ From `design-system/src/components/loading/Skeleton/Skeleton.scss`. Override the
 ## Figma
 
 - "Skeleton" node 20095:8179 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- `StatusTag`, `CountTag` and `Tag` are the labels the presets are sized to.
-- `Spinner` is for an action in progress and for full-page transitions; a Tag saving a change uses its own spinner.
-- The loading guidance in the surfaces guideline points here.
-
-Same group: `GenerativeBorder` · `ProgressBar` · `Spinner`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

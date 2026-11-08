@@ -2,7 +2,7 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as ModalStories from './Modal.stories.jsx';
-import { Modal, MODAL_WIDTHS } from '@/components';
+import { Modal, MODAL_WIDTHS, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS } from '@/components';
 import { MAX_STACKED_OVERLAYS } from '@/lib/overlay';
 import {
     ComponentExample,
@@ -146,12 +146,12 @@ many columns of the screen grid plus the modal pad.
 
 <DocsTable>
 <thead>
-<tr><th>Width</th><th>When to use</th></tr>
+<tr><th>Width</th><th>When to use</th><th><code>MODAL_WIDTH_PX</code> at {MODAL_WIDTH_SCREENS.join(' · ')}</th></tr>
 </thead>
 <tbody>
-<tr><td>6-col</td><td>A confirmation or a short question. 384 at 768, 512 at 1024, 640 from 1280.</td></tr>
-<tr><td>8-col</td><td>A short form. 507 at 768, 677 at 1024, 848 from 1280.</td></tr>
-<tr><td>10-col</td><td>A table or an editor. 629 at 768, 843 at 1024, 1056 from 1280.</td></tr>
+<tr><td>6-col</td><td>A confirmation or a short question.</td><td>{MODAL_WIDTH_PX['6-col'].join(' · ')}</td></tr>
+<tr><td>8-col</td><td>A short form.</td><td>{MODAL_WIDTH_PX['8-col'].join(' · ')}</td></tr>
+<tr><td>10-col</td><td>A table or an editor.</td><td>{MODAL_WIDTH_PX['10-col'].join(' · ')}</td></tr>
 </tbody>
 </DocsTable>
 

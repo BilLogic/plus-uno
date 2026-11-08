@@ -16,7 +16,7 @@ Start with `ds_find`, finish with `ds_check`. Each answer ends with the tool to 
 | Tool | `ds` subcommand | Returns |
 |---|---|---|
 | `ds_find(query)` | `find <query…>` | Ranked matches for a task in words, a name or an alias: patterns, components, tokens, Font Awesome Free icons. Figma component names resolve to their code name; a not-here name (`Alert`, `Card`, a Pro icon) arrives with its replacement. |
-| `ds_get(names, section?)` | `get <Name…> [--section s]` | Full records: import line and props with values (facts), usage, correct and incorrect examples, accessibility (the component's Storybook page), Figma mapping (`design-system/figma/component-registry.json`). `section` is `props`, `usage`, `examples`, `a11y` or `figma`. A retired name returns its replacement. |
+| `ds_get(names, section?)` | `get <Name…> [--section s]` | Full records: import line and props with values (facts), usage, best practices with their rule ids, accessibility (the component's Storybook page), Figma mapping (`design-system/figma/component-registry.json`). `section` is `props`, `usage`, `practices`, `a11y` or `figma`; `examples`, the old name for `practices`, still works. A retired name returns its replacement. |
 | `ds_tokens(role)` | `tokens <role>` | The steps for a role, each with tier, value and intent. Primitives are left out. |
 | `ds_guide(topic?)` | `guide [topic \| rule id]` | A guideline under `design-system/guidelines/`, or a rule's section of `docs/engineering/ds-usage-rules.md`. With no argument, the orientation the server sends at connection. |
 | `ds_check(code \| paths)` | `check <paths…>` or `check --code '<jsx>' [--path f.jsx]` | `check:ds-usage`, in-process: each escape with its rule id, line and fix. |

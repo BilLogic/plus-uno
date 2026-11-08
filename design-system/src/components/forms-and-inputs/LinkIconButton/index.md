@@ -16,13 +16,6 @@ Link icon button: an icon that navigates. It renders an anchor with an accessibl
 
 Use a link icon button when an icon alone opens another page or site and space is limited, such as the Help Center link in the top bar. For an icon that acts on the current page, use Icon button. For a link with a label, use Link button.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Say where the link goes: "Open Help Center". | A bare "Help", or "Link". |
-| Use sentence case. | Title case. |
-
 ## Best practices
 
 ### Keep space between link icon buttons. {#keep-space-between-link-icon-buttons}
@@ -77,6 +70,62 @@ Don't: One link glyph for two destinations.
 - `target="_blank"` adds `rel="noopener noreferrer"`; say so in the label if it opens a new tab.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
 
+## Related
+
+- To act with an icon, use Icon button.
+- To navigate with a label, use Link button.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Container.** An anchor drawn as a square button: 32 at default spacing and 24 at compact. `shape="circle"` rounds it.
+2. **Icon.** A Font Awesome Free glyph at 16.
+3. **Label.** Not drawn. It is the accessible name and the tooltip, and says where the link goes.
+
+### Appearance
+
+| Appearance | When to use |
+| --- | --- |
+| Default | Most link icon buttons: a destination with a clear, familiar glyph. Example: Open Help Center. |
+| Subtle | Links in toolbars, table rows and headers where it is already clear they are interactive. |
+| Primary | The main way forward from a small area when space allows no label. Use sparingly. |
+| Discovery | The way into a new experience. |
+
+### Spacing
+
+Default spacing suits most places. Use compact in table rows and inline toolbars.
+
+### States
+
+Hover, pressed and focus are the browser's own. A link icon button has no disabled or loading state.
+
+| State | What changes |
+| --- | --- |
+| Hovered | The container takes the appearance's hovered fill. |
+| Pressed | The container takes the appearance's pressed fill. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
+| Selected | The selected role fill and icon, with `aria-current`. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill: default, subtle | `--ds-background-neutral-subtle`, hovered and pressed steps. Default adds a 1px `--ds-border-input` edge. |
+| Fill: primary, discovery | `--ds-background-brand-bold`, `--ds-background-discovery-bold`, each with hovered and pressed steps. |
+| Fill: selected | `--ds-background-selected` with hovered and pressed steps. |
+| Icon | `--ds-icon-subtle` (default, subtle), `--ds-icon-inverse` (primary, discovery); the selected role. 16, `--icon-md`. |
+| Focus ring | `--ds-border-focused`, 2px, 2px offset. |
+| Size | 32: `--item-height-md`. 24: `--item-height-sm`. Square. |
+| Radius | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. Circle 50%. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Say where the link goes: "Open Help Center". | A bare "Help", or "Link". |
+| Use sentence case. | Title case. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -101,17 +150,10 @@ Don't: One link glyph for two destinations.
 
 **`shape`** — `default` · `circle`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Figma
 
 - "Link icon button" node 20304:2570 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- To act with an icon, use Icon button.
-- To navigate with a label, use Link button.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

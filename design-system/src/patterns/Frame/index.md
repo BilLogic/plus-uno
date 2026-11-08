@@ -30,14 +30,6 @@ The Frame decides what docks from its own width, not the window's, through one l
 
 Docked, the Panel meets the Page at a hairline. Its splitter resizes it from 320 to 640, but never past what keeps 720 beside a docked Sidebar: a drag resists past the limit and springs back, and it never collapses the Sidebar. The width and whether the Panel is open are kept for the tab in sessionStorage. The `panelPeek` option, off by default, peeks a closed Panel when a pointer rests on the right edge, with no Blanket.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Put the place in the header as a breadcrumb: "Home / Dashboard". | A page title in the header row. |
-| Name the Panel for its content with `panelLabel`: "AI chat". | A generic name such as "Panel". |
-| Keep Back and Close named for what they do; the defaults are "Back" and "Close". | Icon buttons with no name. |
-
 ## Best practices
 
 ### Give every app page its Sidebar. {#give-every-app-page-its-sidebar}
@@ -69,6 +61,59 @@ Don't: Without it, the Sidebar and the Panel both dock, the content drops under 
 - As an overlay, the Panel is a modal dialog named by `panelLabel`. Opening it moves focus to its first control and Tab stays inside it; the Page and the Sidebar under the Blanket are inert, so a keyboard or screen reader cannot reach what a pointer cannot. Closing it, by Escape, a press on the Blanket or its Close button, returns focus to what opened it.
 - The splitter is a vertical separator named "Resize panel" that reports its width as its value. The left arrow widens the Panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
 - In light increased contrast the page draws its edge ring in `--ds-border-surface`, so it stays distinct from the frame behind it.
+
+## Related
+
+- Page for the bare fill-and-elevation primitive the content box is built on.
+- Sidebar for the part the frame places beside the Page.
+- Section for a region inside the content.
+- Templates for a whole page, Frame with its content slot filled, and the focused frame for one task.
+- Layout & grid for the column math the frame is sized by.
+
+Same group: `AiChat` · `Blanket` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+
+## Parts
+
+1. **Header.** The Page's first row, 32 high on the Sidebar logo row's center line: the breadcrumb. While the Sidebar is closed, the toggle leads it at the Page's top left. A focused page passes `onBack` or `backHref` and `onClose`, and the row leads with Back and ends with Close.
+2. **Page.** The content box on `--ds-surface`, running the full height to the window edges, flush, with no corner radius. It is the Page's `main` landmark.
+3. **Content.** The slot where Sections go: a 12-column grid, centered and capped at 1232 (864 with `width="reading"`). Each child spans all 12 columns unless it sets its own span.
+4. **Sidebar.** The part passed as `sidebar`: the logo row with the toggle, the groups and the account row. Without it there is no Sidebar and no toggle.
+5. **Panel.** The area on the right, full height, passed as `panel` and filled with the Panel parts (`PanelContainer`, header, body, footer). AI chat goes here first. Its splitter sits on its left hairline.
+
+There is no footer row. A page that needs actions at its foot places them inside the Page. The Sidebar and Page have their own pages.
+
+### States
+
+| Part | State | What changes |
+| --- | --- | --- |
+| Sidebar | Docked | In flow beside the Page, 240 wide, with a 1px `--ds-border` edge on the Page side. From 1024. |
+| Sidebar | Collapsed | No rail. The toggle sits at the Page's top left and shows bars. |
+| Sidebar | Peeking | A collapsed Sidebar floated over the Page with the overlay fill and shadow, while a pointer rests on the toggle or the left edge. No Blanket. |
+| Sidebar | Overlay | Under 1024, opened by hand: over the Page, closed by an outside press or Escape. |
+| Panel | None | Closed, or no `panel` passed. |
+| Panel | Docked | Beside the Page, on the Page's fill, meeting it at a hairline, with the splitter on its edge. |
+| Panel | Overlay | Over the Page on a Blanket that covers the Page and the Sidebar. |
+| Splitter | Focused, dragged | The line takes `--ds-border-focused`. |
+
+The Frame has no hover, pressed or disabled state of its own: those belong to the toggle and the controls on the Page.
+
+### Tokens
+
+Lengths are in pixels. Where the layout mode changes a value, the columns read Medium (768), Large (1024) and X-Large (1440).
+
+| Token | Medium | Large | X-Large | Purpose |
+| --- | --- | --- | --- | --- |
+
+| Color and elevation token | Purpose |
+| --- | --- |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Put the place in the header as a breadcrumb: "Home / Dashboard". | A page title in the header row. |
+| Name the Panel for its content with `panelLabel`: "AI chat". | A generic name such as "Panel". |
+| Keep Back and Close named for what they do; the defaults are "Back" and "Close". | Icon buttons with no name. |
 
 ## Props
 
@@ -104,22 +149,12 @@ Don't: Without it, the Sidebar and the Panel both dock, the content drops under 
 
 **`width`** — `content` · `reading`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--border-default` · `--content-max-width` · `--content-max-width-reading` · `--content-min-width` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--frame-layer-blanket` · `--frame-layer-docked-edge` · `--frame-layer-edge` · `--frame-layer-panel-peek` · `--frame-layer-sidebar` · `--frame-layer-splitter` · `--frame-panel-width` · `--frame-sidebar-pad` · `--frame-sidebar-width` · `--grid-columns` · `--grid-gutter` · `--inline-md` · `--item-height-md` · `--pad-x-sm` · `--pad-x-xs` · `--page-pad` · `--page-stack-md` · `--page-stack-sm` · `--panel-width-default`
 
 From `design-system/src/patterns/Frame/Frame.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- Page for the bare fill-and-elevation primitive the content box is built on.
-- Sidebar for the part the frame places beside the Page.
-- Section for a region inside the content.
-- Templates for a whole page, Frame with its content slot filled, and the focused frame for one task.
-- Layout & grid for the column math the frame is sized by.
-
-Same group: `AiChat` · `Blanket` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

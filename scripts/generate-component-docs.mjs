@@ -561,7 +561,7 @@ const { rows: aliasRows } = searchAliases(readIf(path.join(REPO_ROOT, 'GLOSSARY.
 });
 const docsOf = (record) => {
   const page = findPage({ name: record.name, source: record.source });
-  return page ? { path: page, page: readDocsPage(fs.readFileSync(path.join(REPO_ROOT, page), 'utf8')) } : null;
+  return page ? { path: page, page: readDocsPage(fs.readFileSync(path.join(REPO_ROOT, page), 'utf8'), { root: REPO_ROOT, file: page }) } : null;
 };
 const rendered = new Map();
 const renderOne = (facts) => {

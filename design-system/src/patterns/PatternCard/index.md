@@ -42,14 +42,6 @@ In a row, place the most cards that keep each card at its minimum width. Each ro
 | Large, 1024 | 736 | 3 | 2 | 1 |
 | X-Large, 1440 | 1152 | 4 | 3 | 2 |
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Title the card with the object it holds, in sentence case: "Ana Ruiz", "Sessions this week". | A generic title such as "Details" or "Info". |
-| Keep the description to one line that adds something, such as "Algebra I · Thu 4:00 PM". | A description that repeats the title. |
-| Name a footer action for what it does: "Save note", "View session". | "OK" or "Submit". |
-
 ## Best practices
 
 ### Size the card to what it holds. {#size-the-card-to-what-it-holds}
@@ -84,6 +76,61 @@ A card that holds actions that commit a change gets a footer, and its actions st
 - Text sits on the raised surface in `--ds-text` and `--ds-text-subtle`, which meet contrast in every color mode.
 - The card sets the current surface to its raised fill, so a sticky table cell inside it matches the card.
 
+## Related
+
+- Section for a region that holds cards under one heading.
+- Table for many objects of the same shape that people compare across columns.
+- Page for a fill and an elevation with no slots.
+- Modal for something that must be decided before the page can continue.
+
+Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+
+## Parts
+
+1. **Image** (optional). A slot above everything else. It runs edge to edge, outside the pad, and the card radius clips its corners. Give the image you pass an aspect ratio of 16:9, 4:3 or 1:1.
+2. **Header.** The title, an optional description and an optional actions slot. A custom `header` replaces all three. In Figma the title truncates to one line and the description's `text` variant truncates at three lines or wraps; code leaves wrapping to CSS.
+3. **Body.** A slot for text, a list or media.
+4. **Footer** (optional). A left-aligned slot for actions that commit a change.
+
+The image sits above a padded frame, and the header, body and footer sit inside it.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The raised pair: `--ds-surface-raised` with `--ds-shadow-raised`. |
+| Hovered | A clickable card only: `--ds-surface-raised-hovered` with `--ds-shadow-overlay`. A card with no `onClick` does not change. |
+| Pressed | A clickable card only: `--ds-surface-raised-pressed` with `--ds-shadow-raised`. |
+| Focused | The card has no focus style of its own. A card made clickable as a whole takes `role` and `tabIndex` from you. |
+| Disabled | A card is never disabled. Disable the controls inside it. |
+| Dragging | `--ds-surface-overlay` with `--ds-shadow-overlay`, held under hover and press. |
+| Loading | Skeleton bars in the body, with `aria-busy` on the card. Figma's `loading?` has no prop in code. |
+
+### Tokens
+
+| Token | Value | Used for |
+| --- | --- | --- |
+| `--card-pad-compact`, `-default`, `-spacious` | 16 · 20 · 24 | The pad of a small, medium and large card. |
+| `--card-radius-sm` | 12 | The radius of a small card. |
+| `--card-radius` | 16 | The radius of medium and large cards. |
+| `--card-stack-sm`, `-md`, `-lg` | 4 · 8 · 12 | Title to description; header to body, set by `gap`; body to footer. |
+| `--card-inline-md` | 8 | Items on a row, such as actions in the header. |
+| `--card-min-width-sm`, `-md`, `-lg` | 224 · 304 · 480 | The minimum width of each size. |
+| `--card-max-height-sm`, `-md`, `-lg` | 304 · 400 · 640 | The height cap of each size. |
+| `--ds-surface-raised`, `--ds-shadow-raised` | color pair | The card at rest. |
+| `--ds-surface-raised-hovered`, `--ds-surface-raised-pressed` | color | A clickable card while hovered and pressed. |
+| `--ds-surface-overlay`, `--ds-shadow-overlay` | color pair | A dragged card, and the hover lift's shadow. |
+| `--heading-xsmall`, `--body-default` | 14/20 | The title and the description. |
+| `--ds-text`, `--ds-text-subtle` | color | The title and the description. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Title the card with the object it holds, in sentence case: "Ana Ruiz", "Sessions this week". | A generic title such as "Details" or "Info". |
+| Keep the description to one line that adds something, such as "Algebra I · Thu 4:00 PM". | A description that repeats the title. |
+| Name a footer action for what it does: "Save note", "View session". | "OK" or "Submit". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -111,21 +158,12 @@ A card that holds actions that commit a change gets a footer, and its actions st
 
 **`gap`** — `sm` · `md` · `lg`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--body-default` · `--card-inline-md` · `--card-pad-compact` · `--card-pad-default` · `--card-pad-spacious` · `--card-radius` · `--card-radius-sm` · `--card-stack-lg` · `--card-stack-md` · `--card-stack-sm` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-raised-hovered` · `--ds-surface-raised-pressed` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current`
 
 From `design-system/src/patterns/PatternCard/PatternCard.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- Section for a region that holds cards under one heading.
-- Table for many objects of the same shape that people compare across columns.
-- Page for a fill and an elevation with no slots.
-- Modal for something that must be decided before the page can continue.
-
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

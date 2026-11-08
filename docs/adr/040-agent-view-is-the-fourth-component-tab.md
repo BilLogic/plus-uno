@@ -44,9 +44,10 @@ screen, and the report link turns a spotted error into an issue in one click.
 **Consequences.**
 
 The rendered view is a reading aid, so its typography is the docs page's, not
-the agent's; the raw view and Copy are the bytes. Heading ids written as
-`{#rule-id}` show as literal text in the rendered view because the renderer has
-no syntax for them, which is accurate to what the agent reads.
+the agent's; the raw view and Copy are the bytes. A rule heading's `{#rule-id}`,
+which the renderer has no syntax for, is drawn as a quiet id label under the
+heading and used as its anchor, so a link to a rule id lands on the rule; the raw
+view keeps the braces.
 
 Pattern pages have the file but no tab strip yet: their MDX does not use
 `<DocsTabs>`, so Agent view reaches them when they adopt it.

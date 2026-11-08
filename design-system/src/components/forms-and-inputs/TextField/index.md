@@ -23,16 +23,6 @@ the right home for an error rather than a Section message at the top of the form
 Use a [Text area](?path=/docs/components-forms-and-inputs-text-area--docs) for several lines, a
 Select for a value chosen from a list, and a Date picker for dates.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the field with a short noun: "Email address". | An instruction where the name belongs: "Enter your email address here". |
-| Use sentence case and no end punctuation on labels. | Title case, or a period after the label. |
-| Say what to do about an error: "Enter a 10-digit number." | "Invalid" or "Error". |
-| Keep helper text to one short line. | Paragraphs in the caption. Link to help instead. |
-| Put the unit in an affix: "kg". | The unit in the label or the value. |
-
 ## Best practices
 
 ### Name the field. {#name-the-field}
@@ -114,6 +104,59 @@ Such as seats. For an ID, a phone number or a ZIP code, use `type="text"` with `
 - **The number field is a text input**, so the scroll wheel never changes the
   value. The steppers are named for the field they change: "Decrease Seats" and "Increase Seats".
 
+## Related
+
+- For several lines of text, see Text area.
+- For a value chosen from a list, see Select.
+- For dates, see Date picker and Date time picker.
+- For the label and caption conventions, see Form.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Label.** Names the field. A required marker and an info tooltip sit beside it.
+2. **Before.** An icon, a text affix or a Button before the control.
+3. **Control.** The native input.
+4. **After.** An icon, a text affix, a Button or the number steppers.
+5. **Caption.** A message on the left and, with `maxLength`, a count on the right.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The input fill with a `--border-default` input edge; the placeholder until there is text. |
+| Hovered | The edge turns `--ds-border-focused`. A subtle field takes `--ds-background-neutral-subtle-hovered`. |
+| Pressed | No step of its own. The hovered edge holds while the pointer is down. |
+| Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. No fill changes. |
+| Disabled | The whole field fades to `--ds-opacity-disabled` and leaves the tab order. |
+| Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
+| Warning, success | The edge takes `--ds-border-warning` or `--ds-border-success`, with the message in the matching text color. |
+| Read-only | The `--ds-background-neutral` fill. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
+| Height | 40: `--height-250`. Compact 32: `--item-height-md`. |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Side padding | `--pad-x-md`; a Button in a slot sits `--pad-x-xs` from the edge. |
+| Slot button | `--item-height-md` in the 40 field, `--item-height-sm` in the 32 field. |
+| Slots | `--ds-text-subtle`, `--stack-sm` apart; `--space-0625` between slot and control. |
+| Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
+| Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`; the count `--ds-text-subtle`, over the limit `--ds-text-danger`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the field with a short noun: "Email address". | An instruction where the name belongs: "Enter your email address here". |
+| Use sentence case and no end punctuation on labels. | Title case, or a period after the label. |
+| Say what to do about an error: "Enter a 10-digit number." | "Invalid" or "Error". |
+| Keep helper text to one short line. | Paragraphs in the caption. Link to help instead. |
+| Put the unit in an affix: "kg". | The unit in the label or the value. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -160,19 +203,10 @@ Such as seats. For an ID, a phone number or a ZIP code, use `type="text"` with `
 
 **`appearance`** — `standard` · `subtle`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Figma
 
 - "Text field" node 20316:150478 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For several lines of text, see Text area.
-- For a value chosen from a list, see Select.
-- For dates, see Date picker and Date time picker.
-- For the label and caption conventions, see Form.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

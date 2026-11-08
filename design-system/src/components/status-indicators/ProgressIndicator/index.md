@@ -20,14 +20,6 @@ Use `ProgressIndicator` for a short sequence where position matters more than
 the name of each step — a carousel, an onboarding flight, a slide deck. When
 each step has its own label people need to see, use `ProgressTracker` instead.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name each dot for its step when the dots are buttons: "Step 2, Reflection". | Leave interactive dots unnamed or number them only. |
-| Give the group a `label` that says what it tracks: "Carousel slides". | Keep the default "Progress" when a page holds two indicators. |
-| Use it where steps have no labels of their own. | Use it where each step needs a title; use the progress tracker. |
-
 ## Best practices
 
 ### Pass `onSelect` only when jumping ahead makes sense. {#pass-onselect-only-when-jumping-ahead-makes-sense}
@@ -73,6 +65,48 @@ The array's content never renders. Its length becomes the number of dots, and wh
 - **Interactive dots are real buttons**, each named from its `values` entry
   and linked to the content it controls with `ariaControls`.
 
+## Related
+
+- For steps with their own visible labels, use `ProgressTracker`.
+- For a single bar showing percent complete, use `ProgressBar`.
+
+Same group: `ProgressTracker`
+
+## Parts
+
+1. **Dot.** One per step: 8 or 12 across, a circle.
+2. **Current dot.** The brand ground (discovery for help, inverse icon for inverted), with `aria-current="step"`.
+3. **Group.** The row, named by `label`.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Subtlest icon ground; the current dot is on its appearance ground. |
+| Hovered | Interactive only: an unselected dot takes the subtle icon ground. |
+| Pressed | Interactive only: an unselected dot takes the default icon ground. |
+| Focused | Interactive only: the 2px ring, 2 off the dot. |
+| Disabled | A progress indicator has no disabled state; without `onSelect` it is decorative. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Dot ground | `--ds-icon-subtlest`, `--ds-icon-subtle`, `--ds-icon` |
+| Current dot | `--ds-background-brand-bold`, `--ds-background-discovery-bold`, `--ds-icon-inverse` |
+| Inverted dot | `--ds-background-inverse-subtle` and its states |
+| Size | `--progress-indicator-dot-size-8`, `--progress-indicator-dot-size-12` |
+| Gap | `--inline-md`, `--inline-sm`, `--stack-sm` |
+| Ring | `--ds-border-focused`, `--focus-ring-width` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name each dot for its step when the dots are buttons: "Step 2, Reflection". | Leave interactive dots unnamed or number them only. |
+| Give the group a `label` that says what it tracks: "Carousel slides". | Keep the default "Progress" when a page holds two indicators. |
+| Use it where steps have no labels of their own. | Use it where each step needs a title; use the progress tracker. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -94,19 +128,12 @@ The array's content never renders. Its length becomes the number of dots, and wh
 
 **`spacing`** — `comfortable` · `cozy` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--ds-background-brand-bold` · `--ds-background-discovery-bold` · `--ds-background-inverse-subtle` · `--ds-background-inverse-subtle-hovered` · `--ds-background-inverse-subtle-pressed` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--focus-ring-width` · `--inline-md` · `--inline-sm` · `--motion-duration-short` · `--motion-easing-standard` · `--progress-indicator-dot-size-12` · `--progress-indicator-dot-size-8` · `--radius-full` · `--stack-sm`
 
 From `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For steps with their own visible labels, use `ProgressTracker`.
-- For a single bar showing percent complete, use `ProgressBar`.
-
-Same group: `ProgressTracker`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

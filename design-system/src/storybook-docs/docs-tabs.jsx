@@ -171,6 +171,9 @@ function CodeTabPanel({ of, importName }) {
   );
 }
 
+/** Only `slugify`: Storybook's block keeps its own overrides beside it. */
+const AGENT_VIEW_MARKDOWN = { slugify: agentViewSlug };
+
 /**
  * The Agent view tab: the component's generated file, exactly as agents read
  * it. Rendered as markdown by default for reading; "Show raw text" shows the
@@ -182,9 +185,6 @@ function CodeTabPanel({ of, importName }) {
  * (`agentViewMarkdown`) and used as that heading's anchor (`agentViewSlug`).
  * The raw view and Copy keep the bytes.
  */
-/** Only `slugify`: Storybook's block keeps its own overrides beside it. */
-const AGENT_VIEW_MARKDOWN = { slugify: agentViewSlug };
-
 function AgentViewPanel({ entry }) {
   const [text, setText] = useState(null);
   const [failed, setFailed] = useState(false);
@@ -264,9 +264,10 @@ function AgentViewPanel({ entry }) {
  * @param {object} props
  * @param {unknown} [props.of] The story meta, as `<DocsTabs of={ButtonStories}>`.
  *   Supplies the props table.
- * @param {string} [props.examplesTitle] Renames the FIRST tab only. Atlassian's
- *   own token page reads "All tokens" where Button reads "Examples"; Code,
- *   Usage and Agent view mean the same thing on every page and are not renameable.
+ * @param {string} [props.examplesTitle] Renames the FIRST tab only, for a page
+ *   whose first face is not examples ("All tokens" where Button reads
+ *   "Examples"); Code, Usage and Agent view mean the same thing on every page
+ *   and are not renameable.
  * @param {React.ReactNode} props.children One `<DocsTab tab="examples">` and, when
  *   the page has usage content, one `<DocsTab tab="usage">`.
  */

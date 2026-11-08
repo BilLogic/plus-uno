@@ -16,14 +16,6 @@ Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar
 
 Use a calendar directly only when a date grid needs to be visible on the page without a field or a popup around it: a scheduling view, an embedded picker. For a single date field, use Date picker; for a date and time together, use Date time picker. Both already use this same grid.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Say which dates can be chosen in text near the calendar: "Pick a day between October 12 and 25." | Leave people to find the limit by trying disabled days. |
-| Name the choice by its role: "Session date". | "Calendar" or "Pick a date". |
-| Write dates in full where text names them: "October 21, 2026". | All-numeric dates that read differently by locale: "10/11/12". |
-
 ## Best practices
 
 ### Name the month in full, with the year. {#name-the-month-in-full-with-the-year}
@@ -77,6 +69,54 @@ Six weeks render every month, including the days of neighboring months that fill
 - **Out-of-range and out-of-month days are truly disabled**, not just dimmed: they take no focus and fire no `onPick`.
 - **The month buttons are named** "Previous month" and "Next month".
 
+## Related
+
+- For a single date field with this grid in a popup, use Date picker.
+- For a date and time together, use Date time picker.
+
+Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Header.** The month and year in full, with Previous month and Next month buttons.
+2. **Weekday row.** Seven short day names.
+3. **Day cells.** Forty-two buttons in six weeks. Days of neighboring months fill the spare cells.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Day text in `--ds-text` on no fill. |
+| Hovered | An enabled day takes `--ds-background-neutral-subtle-hovered`. A picked day keeps its fill. |
+| Pressed | No look of its own: pressing an enabled day picks it. |
+| Focused | The month buttons and the days draw a 2px ring in `--ds-border-focused`, 2px off the edge. |
+| Disabled | Faded to `--ds-opacity-disabled`; no focus, no `onPick`. |
+| Today | A 1px `--ds-border-brand` edge and `--ds-text-brand` text. |
+| In range | `--ds-background-selected`. |
+| Selected | `--ds-background-selected-bold` with `--ds-text-inverse`, and `aria-pressed`. |
+| Outside the month | `--ds-text-subtle`; not pickable. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Month | `--heading-small` in `--ds-text`. |
+| Month buttons | `--calendar-nav-size` square, `--ds-icon-subtle`, hovered `--ds-background-neutral-subtle-hovered`. |
+| Weekday names | `--body-small` in `--ds-text-subtle`. |
+| Day text | `--body-default` in `--ds-text`. |
+| Day size | `--calendar-day-sm` (28), `--calendar-day-md` (36), `--calendar-day-lg` (44). |
+| Day radius | `--radius-md`. |
+| Gaps | `--stack-md` between header, weekdays and days; `--stack-sm` between cells. |
+| Padding | `--space-025` top and bottom, `--pad-x-sm` either side. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Say which dates can be chosen in text near the calendar: "Pick a day between October 12 and 25." | Leave people to find the limit by trying disabled days. |
+| Name the choice by its role: "Session date". | "Calendar" or "Pick a date". |
+| Write dates in full where text names them: "October 21, 2026". | All-numeric dates that read differently by locale: "10/11/12". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -96,17 +136,10 @@ Six weeks render every month, including the days of neighboring months that fill
 
 **`size`** — `28` · `36` · `44`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Figma
 
 - "Calendar" node 20009:73360 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a single date field with this grid in a popup, use Date picker.
-- For a date and time together, use Date time picker.
-
-Same group: `Button` · `ButtonGroup` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -22,13 +22,6 @@ keeps them the same size and shape wherever they appear.
 Use an icon on its own when it sits inline with text and needs no frame. Use
 `UserAvatar` for a person: people are round, and a tile is square.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Label a tile that stands alone with the thing it shows: "Khan Academy". | "Logo" or "Icon", which names the picture. |
-| Leave the label off a tile beside its name. | Repeat the name in both places. |
-
 ## Best practices
 
 ### Pick the content, then the color. {#pick-the-content-then-the-color}
@@ -66,6 +59,46 @@ Don't: A bold ground on the logo, which keeps its own.
 - **Not a control.** A tile has no hover or focus state. To make one clickable,
   wrap it in a button or link that carries the accessible name.
 
+## Related
+
+- For a person, use `UserAvatar`.
+- For a value someone picked, with a label, use `Tag`.
+
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `UserAvatar`
+
+## Parts
+
+1. **Square.** The Media size of the step, 16 to 48, with a radius of a quarter of its size.
+2. **Content.** An icon, a logo or an image. An icon is inset to the Font Awesome size of the same step; an image covers the square.
+3. **Border.** Optional, drawn inside the square so the tile keeps its size.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The only state. A tile is a picture, not a control. |
+| Hovered, pressed, focused | None. Wrap the tile in a button or link that carries the name and the focus. |
+| Disabled | None. Dim the control around it. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Square | `--image-xxs` to `--image-xl` for 16 to 48. |
+| Icon size | `--icon-sm` to `--icon-lg`, by step. |
+| Radius | A quarter of the square; `--tile-radius-lg` at 40. Logo inset `--radius-sm`. |
+| Icon ground and glyph, subtle | Per color: the subtler accent background and the accent icon of that color; gray uses `--ds-background-neutral` and `--ds-icon-subtle`. |
+| Icon ground and glyph, bold | Per color: the bolder accent background and `--ds-icon-inverse`; gray uses `--ds-background-neutral-bold` and `--ds-icon-inverse`. |
+| Logo ground | The color's subtler accent background; white is `--ds-surface`. |
+| Border | `--border-default` in `--ds-border`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Label a tile that stands alone with the thing it shows: "Khan Academy". | "Logo" or "Icon", which names the picture. |
+| Leave the label off a tile beside its name. | Repeat the name in both places. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -91,7 +124,7 @@ Don't: A bold ground on the logo, which keeps its own.
 
 **`color`** — `gray` · `blue` · `green` · `purple` · `magenta` · `yellow` · `teal` · `white`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -102,12 +135,5 @@ From `design-system/src/components/images-and-icons/Tile/Tile.scss`. Override th
 ## Figma
 
 - "Tile" node 17878:1928 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a person, use `UserAvatar`.
-- For a value someone picked, with a label, use `Tag`.
-
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

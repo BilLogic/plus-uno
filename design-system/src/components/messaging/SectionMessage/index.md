@@ -38,14 +38,6 @@ stripe: the fill and the icon carry the style.
 | Warning | A caution before something goes wrong. | `triangle-exclamation` |
 | Info | Something worth knowing. | `circle-info` |
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Write a title that states the issue or the reason for the message. | Repeat a field's error here; say it once. |
-| Keep the description to what the person needs to act. | Explain background the person does not need. |
-| Write actions as verbs: "Reschedule", "Get help". | Use "click here" as link text. |
-
 ## Best practices
 
 ### Match the appearance to the meaning. {#match-the-appearance-to-the-meaning}
@@ -108,6 +100,53 @@ a message back when it genuinely changes, remount it with a new `key`.
 - **Links keep the text color.** A link in the body is told from the text by
   its underline alone.
 
+## Related
+
+- For validation on a single field, put the message on the field, as `TextField` does.
+- For a transient confirmation, use `Flag`.
+- For something that must be acknowledged before continuing, use `Modal`.
+- For a status label on a row, use `StatusTag`.
+
+Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `Spotlight`
+
+## Parts
+
+1. **Leading icon.** The appearance glyph on the first line, decorative.
+2. **Title.** An optional heading; set `headingLevel` to fit the outline.
+3. **Description.** What the person needs to act. A link in it keeps the text color and is underlined.
+4. **Actions.** Link buttons, separated by a divider.
+5. **Dismiss.** The shared CloseButton, centered on the first line.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The fill and icon of the appearance, text in the default color. |
+| Hovered | The message does not react; Dismiss takes the subtle hovered step. |
+| Pressed | Dismiss takes the subtle pressed step. |
+| Focused | Dismiss and each action show the 2px ring. |
+| Disabled | Not supported. |
+| Dismissed | The message is removed and the page keeps no copy. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Ground | `--ds-background-brand-subtlest`, `--ds-background-neutral`, `--ds-background-success`, `--ds-background-danger`, `--ds-background-warning`, `--ds-background-information` |
+| Icon | `--ds-icon-brand`, `--ds-icon-subtle`, `--ds-icon-success`, `--ds-icon-danger`, `--ds-icon-warning`, `--ds-icon-information` |
+| Title, body, link | `--heading-small`, `--body-default`, `--ds-text`; actions at `--type-weight-medium` |
+| Divider | `--ds-border`, `--border-default` |
+| Padding, gaps, corner | `--card-pad-compact`, `--card-stack-sm`, `--stack-md`, `--radius-md` |
+| Dismiss | `--item-height-md` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Write a title that states the issue or the reason for the message. | Repeat a field's error here; say it once. |
+| Keep the description to what the person needs to act. | Explain background the person does not need. |
+| Write actions as verbs: "Reschedule", "Get help". | Use "click here" as link text. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -129,7 +168,7 @@ a message back when it genuinely changes, remount it with a new `key`.
 
 **`headingLevel`** — `1` · `2` · `3` · `4` · `5` · `6`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -140,14 +179,5 @@ From `design-system/src/components/messaging/SectionMessage/SectionMessage.scss`
 ## Figma
 
 - "Section message" node 20967:3641 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For validation on a single field, put the message on the field, as `TextField` does.
-- For a transient confirmation, use `Flag`.
-- For something that must be acknowledged before continuing, use `Modal`.
-- For a status label on a row, use `StatusTag`.
-
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `Spotlight`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

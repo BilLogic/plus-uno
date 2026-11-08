@@ -3,7 +3,7 @@
  * shape, so every reader of a page reads it the same way and a heading rename
  * is a one-place change.
  *
- *   readDocsPage(source, {kind?})   the page model:
+ *   readDocsPage(source, {kind?, root?, file?})   the page model:
  *     { kind, title, intro, sections, alternatives, rules, related, aliases, figmaMeta }
  *       title         a foundation page's FoundationHero title, or the page's `#` heading, or null
  *       sections      [{title, level, text, subsections: [{title, level, text}]}]
@@ -15,6 +15,8 @@
  *   sectionText(page, title)        one section's text, or null
  *   pageText(page)                  the whole page as markdown: `#` title, intro, `##` sections
  *   createPageFinder(root, registry?)  ({name, source}) → the page's repo path, or null
+ *   importedConstants(root, file, source)  the literal constants a page imports: name → value
+ *   exportedValue(root, file, name)        one literal constant a module exports, or undefined
  *
  * TWO ADAPTERS. A component page is markdown under `##` headings (a page with
  * none reads its `###` headings as its sections). A foundation page has no
@@ -30,9 +32,18 @@
  * Layout wrappers (`DocsTabs`, `DocsTab`, `div`, fragments) give up their
  * children; a `Banner` keeps its text, since foundation pages state rules in
  * one; inline tags become markdown (`code` and `C` to backticks, `strong` to
- * bold). Every other element, and every `{expression}`, is dropped. Code
- * fences and code spans are kept as written. ESM (`import`, `export`) is read
- * for figmaMeta and aliases and never reaches the text.
+ * bold). Every other element is dropped. Code fences and code spans are kept
+ * as written. ESM (`import`, `export`) is read for figmaMeta and aliases and
+ * never reaches the text.
+ *
+ * EXPRESSIONS. A string literal is its text (`{' '}` is a space). A constant
+ * the page imports from design-system source, when its export is a literal,
+ * is its value: `` `MAX_STACKED_OVERLAYS`{` (${MAX_STACKED_OVERLAYS})`} `` reads
+ * "`MAX_STACKED_OVERLAYS` (2)", an array joined with ` · `. The reference
+ * grammar is a name, member steps and one `.join()`, read statically; nothing on
+ * the page is evaluated. Constants resolve only when the caller passes `root`
+ * and `file`; `check:ds-writing` passes neither, so a number shown through a
+ * constant never reads as a bare number there. Every other expression is dropped.
  *
  * FINDING A PAGE. A component's page is the page whose `<Meta of>` stories
  * file names it as `component`, matched by the source file the stories import
@@ -247,6 +258,86 @@ function objectFields(raw) {
   return out;
 }
 
+// ── expressions ─────────────────────────────────────────────────────────────
+
+/**
+ * The constants a page's expressions may show, set by `readDocsPage` for the
+ * page it is reading: name → value. Empty when the caller passed no `root`.
+ */
+let scope = new Map();
+
+/**
+ * A literal's value, statically: a number, a string with no `${}`, `true`,
+ * `false`, `null`, or an array or object of these. `undefined` for anything
+ * else, so a computed value is never guessed at.
+ */
+export function literalValue(text) {
+  const t = String(text ?? '').trim();
+  if (/^-?\d+(\.\d+)?$/.test(t)) return Number(t);
+  if (/^(true|false|null)$/.test(t)) return JSON.parse(t);
+  if (isStringLiteral(t)) return t.startsWith('`') && t.includes('${') ? undefined : unquote(t);
+  if (t.startsWith('[') && skipGroup(t, 0) === t.length) {
+    const items = splitTop(t.slice(1, -1)).map(literalValue);
+    return items.includes(undefined) ? undefined : items;
+  }
+  if (t.startsWith('{') && skipGroup(t, 0) === t.length) {
+    const out = {};
+    for (const part of splitTop(t.slice(1, -1))) {
+      const m = part.match(/^(?:["']([^"']+)["']|([A-Za-z_$][\w$]*))\s*:\s*([\s\S]+)$/);
+      const value = m && literalValue(m[3]);
+      if (value === undefined) return undefined;
+      out[m[1] ?? m[2]] = value;
+    }
+    return out;
+  }
+  return undefined;
+}
+
+/**
+ * A reference's value from `scope`: `NAME`, then any of `.key`, `['key']`,
+ * `[0]`, `.length`, and at most one `.join('sep')` at the end. `undefined`
+ * when a step does not resolve. Nothing is evaluated: the grammar is the whole
+ * of what a page may compute.
+ */
+function referenceValue(expr) {
+  const m = expr.trim().match(/^([A-Za-z_$][\w$]*)((?:\.[A-Za-z_$][\w$]*|\[\s*(?:\d+|'[^']*'|"[^"]*")\s*\])*)(?:\.join\(\s*('[^']*'|"[^"]*")\s*\))?$/);
+  if (!m || !scope.has(m[1])) return undefined;
+  let value = scope.get(m[1]);
+  for (const [, dot, idx] of m[2].matchAll(/\.([A-Za-z_$][\w$]*)|\[\s*(\d+|'[^']*'|"[^"]*")\s*\]/g)) {
+    const key = dot ?? (/^\d/.test(idx) ? Number(idx) : unquote(idx));
+    if (value === null || typeof value !== 'object' || !(key in value)) return undefined;
+    value = value[key];
+  }
+  if (m[3] !== undefined) return Array.isArray(value) ? value.join(unquote(m[3])) : undefined;
+  return value;
+}
+
+const shown = (value) => (Array.isArray(value) ? value.join(' · ') : value !== null && typeof value === 'object' ? undefined : String(value));
+
+/**
+ * An `{expression}` as text: a string literal is its value (`{' '}` is a
+ * space), a reference to an imported constant is that constant's value (an
+ * array joined with ` · `), a template literal is its text with each `${}`
+ * filled the same way. Anything else, a comment or a call, is dropped whole.
+ */
+function expressionText(expr) {
+  const t = expr.trim();
+  if (!t || /^\/\*[\s\S]*\*\/$/.test(t)) return '';
+  if (/^["']/.test(t) && isStringLiteral(t)) return unquote(t);
+  if (t.startsWith('`') && isStringLiteral(t)) {
+    let missing = false;
+    const text = t.slice(1, -1).replace(/\$\{([^}]*)\}/g, (_, ref) => {
+      const value = referenceValue(ref);
+      const s = value === undefined ? undefined : shown(value);
+      if (s === undefined) missing = true;
+      return s ?? '';
+    });
+    return missing ? '' : text;
+  }
+  const value = referenceValue(t);
+  return (value !== undefined && shown(value)) || '';
+}
+
 // ── JSX to text ─────────────────────────────────────────────────────────────
 
 const inline = (md) => md.replace(/\s*\n\s*/g, ' ').replace(/\s{2,}/g, ' ').trim();
@@ -363,7 +454,7 @@ function elementText(el) {
   }
 }
 
-/** MDX body text to markdown: elements by `elementText`, expressions and ESM dropped, code kept. */
+/** MDX body text to markdown: elements by `elementText`, expressions by `expressionText`, ESM dropped, code kept. */
 function convert(s) {
   let out = '';
   let j = 0;
@@ -386,7 +477,9 @@ function convert(s) {
       j = text = end === -1 ? s.length : end + 3;
     } else if (s[j] === '{') {
       flush(j);
-      j = text = skipGroup(s, j);
+      const end = skipGroup(s, j);
+      out += expressionText(s.slice(j + 1, end - 1));
+      j = text = end;
     } else if (isTagStart(s, j)) {
       flush(j);
       const el = readElement(s, j);
@@ -504,10 +597,17 @@ function aliasesOf(source) {
 const sectionNamed = (sections, title) => sections.find((s) => s.title.toLowerCase() === title.toLowerCase()) ?? null;
 
 /** One docs page as the page model (see the header). */
-export function readDocsPage(source, { kind } = {}) {
+export function readDocsPage(source, { kind, root, file } = {}) {
   const src = String(source ?? '');
   const pageKind = kind ?? (/<FoundationSection\b/.test(src) ? 'foundation' : 'component');
-  const md = tidy(convert(src));
+  const outer = scope;
+  scope = root && file ? importedConstants(root, file, src) : new Map();
+  let md;
+  try {
+    md = tidy(convert(src));
+  } finally {
+    scope = outer;
+  }
   const heads = headingsOf(md.split('\n'));
   const top = heads.some((h) => h.level === 2) ? 2 : heads.some((h) => h.level === 3) ? 3 : 2;
   const { before, parts } = splitAt(md, top);
@@ -595,6 +695,58 @@ function storiesComponent(root, storiesFile) {
     return file ? { source: file } : { name: named ? named[0] : ident };
   }
   return null;
+}
+
+/** The literal an `export const NAME =` in `text` binds, as text, or null. */
+function exportedLiteral(text, name) {
+  const m = new RegExp(String.raw`^export\s+const\s+${name}\s*=\s*`, 'm').exec(text);
+  if (!m) return null;
+  const start = m.index + m[0].length;
+  const ch = text[start];
+  const end = '[{('.includes(ch) ? skipGroup(text, start) : `'"\``.includes(ch) ? skipString(text, start) : (text.slice(start).search(/[;\n]/) + 1 || text.length - start + 1) - 1 + start;
+  // A literal followed by anything but the statement's end (`[1, 2].map(…)`) is computed: '' reads as no value.
+  return /^[ \t]*;?[ \t]*(\/\/[^\n]*)?(\n|$)/.test(text.slice(end)) ? text.slice(start, end) : '';
+}
+
+/**
+ * The value a module exports under `name`, statically: its own
+ * `export const name = <literal>`, or one it re-exports (`export { name } from`,
+ * `export * from`), a few hops at most. `undefined` when it is computed or not found.
+ */
+export function exportedValue(root, file, name, hops = 0) {
+  if (!file || hops > 4) return undefined;
+  const text = fs.readFileSync(path.join(root, file), 'utf8');
+  const literal = exportedLiteral(text, name);
+  if (literal !== null) return literalValue(literal);
+  for (const m of text.matchAll(/export\s*(\*|\{([^}]*)\})\s*from\s*['"]([^'"]+)['"]/g)) {
+    const names = m[2]?.split(',').map((p) => p.trim().split(/\s+as\s+/));
+    const hit = names?.find(([orig, local]) => (local ?? orig) === name);
+    if (m[1] !== '*' && !hit) continue;
+    const value = exportedValue(root, resolveSpec(root, file, m[3]), hit ? hit[0] : name, hops + 1);
+    if (value !== undefined || hit) return value;
+  }
+  return undefined;
+}
+
+/**
+ * The constants a page imports by name from design-system source (`@/…` or a
+ * relative path), each one whose export is a literal: name → value. A page
+ * shows them through `{NAME}` and template-literal expressions, so an agent
+ * reads the value the code holds, never a copy typed into the prose.
+ */
+export function importedConstants(root, file, source) {
+  const out = new Map();
+  for (const m of String(source).matchAll(/^import\s*\{([^}]*)\}\s*from\s*['"]([^'"]+)['"]/gm)) {
+    const from = resolveSpec(root, file, m[2]);
+    if (!from || !/\.(js|jsx|ts|tsx)$/.test(from)) continue;
+    for (const part of m[1].split(',').map((p) => p.trim()).filter(Boolean)) {
+      const [orig, local = orig] = part.split(/\s+as\s+/);
+      if (!/^[A-Z][A-Z0-9_]*$/.test(orig)) continue;
+      const value = exportedValue(root, from, orig);
+      if (value !== undefined) out.set(local, value);
+    }
+  }
+  return out;
 }
 
 /**

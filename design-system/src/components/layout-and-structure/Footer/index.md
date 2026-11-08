@@ -16,14 +16,6 @@ Per Figma spec: node-id=111-227939 Simple footer with version, copyright, and te
 
 Use `Footer` once, at the bottom of a Page, for the legal and version line. It is a quiet footnote, not navigation: do not put actions or a link list in it.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Write the version as "v5.2.0". | Write "Version 5.2.0 (build 4411)". |
-| Keep the copyright line to the owner and the year. | Add marketing copy or a tagline. |
-| Name the link for where it goes: "Terms of Use". | Name it "Click here". |
-
 ## Best practices
 
 ### One line of copyright. {#one-line-of-copyright}
@@ -64,6 +56,47 @@ The line uses the small body style and `--ds-text`; the terms link uses `--ds-li
 - **A landmark.** It renders a `<footer>`, which assistive technology announces as the page's content information.
 - **A real link.** The terms text is an `<a>` with `termsUrl` as its `href`, so it is keyboard focusable and announced as a link.
 
+## Related
+
+- For the page's top edge, use `PageHeader`.
+- For legal text inside a form or card, use body text, not `Footer`.
+
+Same group: `Accordion` · `Carousel` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
+
+## Parts
+
+1. **Version.** The product version, first.
+2. **Copyright.** The copyright line.
+3. **Terms link.** The only control in the footer.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Small text in `--ds-text`; the link in `--ds-link`, underlined. |
+| Hovered | The link in `--ds-link-pressed`. |
+| Pressed | The link in `--ds-link-pressed`. |
+| Focused | A 2px ring 2px off the link. |
+| Disabled | A footer has no disabled state. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Line | `--body-small`, `--ds-text`. |
+| Link | `--ds-link`; `--ds-link-pressed` on hover and press. |
+| Padding | `--pad-y-lg` below the line. |
+| Link corner | `--radius-sm`, which shapes the focus ring. |
+| Focus ring | `--ds-border-focused`, `--focus-ring-width` wide and offset. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Write the version as "v5.2.0". | Write "Version 5.2.0 (build 4411)". |
+| Keep the copyright line to the owner and the year. | Add marketing copy or a tagline. |
+| Name the link for where it goes: "Terms of Use". | Name it "Click here". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -80,12 +113,5 @@ The line uses the small body style and `--ds-text`; the terms link uses `--ds-li
 `--ds-link` · `--ds-link-pressed` · `--radius-sm`
 
 From `design-system/src/components/layout-and-structure/Footer/Footer.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For the page's top edge, use `PageHeader`.
-- For legal text inside a form or card, use body text, not `Footer`.
-
-Same group: `Accordion` · `Carousel` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

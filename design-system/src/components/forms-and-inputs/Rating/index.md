@@ -20,15 +20,6 @@ Use a rating for a single satisfaction score out of five: the end of a session, 
 
 `variant` chooses what the row says about itself: `comments` puts one caption under the row, `numeric` puts 1 to 5 above each item. `icon` is `star` or `thumbs-up`.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name what is rated, as a question: "How was the session?" | "Rating" alone, or an instruction: "Click a star." |
-| Use sentence case and no end punctuation except a question mark. | Title case. |
-| Keep the comments caption to one short line. | A paragraph under the row. |
-| Pair the rating with a comment box when you need the reason. | Ask for the reason in the label. |
-
 ## Best practices
 
 ### Use stars for quality and thumbs for approval. {#use-stars-for-quality-and-thumbs-for-approval}
@@ -87,6 +78,52 @@ Don't: Without a label the row falls back to the generic name "Rating". `comment
 - **The label is a `span`, deliberately.** There is no form control for a `label` element to point at, so the label has an id and the row is named by `aria-labelledby`.
 - **`isRequired` marks the label and requires the group.** The asterisk follows the label and is read as "required"; the group carries the native required constraint.
 
+## Related
+
+- For a value on a longer scale, use Range.
+- For a choice among labeled options rather than a score, use Radio group or Radio.
+- For the comment that usually accompanies a rating, use Text area.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Label.** Text above the row that names the rating. A required marker follows it.
+2. **Items.** Five 32 circles, each drawing a 16 icon. Items up to the score are filled.
+3. **Number.** In the numeric variant, 1 to 5 above each item.
+4. **Caption.** In the comments variant, one line under the row.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | `--ds-background-neutral` circle with the icon outlined in `--ds-icon-subtle`. |
+| Hovered | The item takes `--ds-background-neutral-hovered`. |
+| Pressed | No step of its own. The hovered look holds while the pointer is down. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the item, for keyboard focus only. |
+| Selected | Icon is filled in `--ds-icon-selected`; unselected items are outlined in `--ds-icon-subtle`. |
+| Disabled | `--ds-background-disabled` fill and `--ds-icon-disabled` icon. Out of the tab order, still announced. |
+| Invalid, read-only | Not drawn. Validate the answer in the form and explain the error beside the rating. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Item | `--item-height-md` (32) circle on `--ds-background-neutral`. |
+| Icon | `--icon-md` (16). |
+| Gaps | `--space-0625` between items; `--stack-sm` inside an item group; `--stack-md` between label and row, plus `--stack-sm` under the label. |
+| Label, number | `--ds-text`, body default. |
+| Required marker | `--ds-text-danger`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name what is rated, as a question: "How was the session?" | "Rating" alone, or an instruction: "Click a star." |
+| Use sentence case and no end punctuation except a question mark. | Title case. |
+| Keep the comments caption to one short line. | A paragraph under the row. |
+| Pair the rating with a comment box when you need the reason. | Ask for the reason in the label. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -111,7 +148,7 @@ Don't: Without a label the row falls back to the generic name "Rating". `comment
 
 **`icon`** — `star` · `thumbs-up`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Sub-components
 
@@ -137,13 +174,5 @@ From `design-system/src/components/forms-and-inputs/Rating/Rating.scss`. Overrid
 ## Figma
 
 - "Rating System (disclosure)" node 20003:2230 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a value on a longer scale, use Range.
-- For a choice among labeled options rather than a score, use Radio group or Radio.
-- For the comment that usually accompanies a rating, use Text area.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

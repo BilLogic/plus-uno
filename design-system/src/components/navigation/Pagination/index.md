@@ -21,18 +21,12 @@ move between them or jump to a known one — admin tables of sessions, students,
 tutors. It is fully controlled: `currentPage` and `totalPages` are required, and
 every click calls `onPageChange` with the target page. It holds no state.
 
+Reach for it to page through results too many for one screen: a table's rows,
+a search's matches, a long history.
+
 The window of numbers is computed for you. `max` (default 5) centers the
 window on the current page, and first and last pages are pinned with an ellipsis
 whenever the window does not reach them.
-
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Keep the default “Previous” and “Next” in text mode. | Rename them “Back” and “Forward”, or shorten to arrows with no name. |
-| Name the navigation after what it pages: “Sessions pages”. | Leave two paginations on one page with the same name. |
-| Number pages from 1. | Start at 0 or show a range such as 1–10. |
-| Use it for lists with a stable order. | Use it for a feed that keeps loading. |
 
 ## Best practices
 
@@ -112,6 +106,55 @@ Don't: Only a window of numbers, with no total.
 - **Focus is a ring inside the segment** (`--focus-ring-width`), and the current page keeps an
   outline in forced-colors mode.
 
+## Related
+
+- For a continuously loading feed, use infinite scroll rather than pages.
+- For a step-by-step flow, use `ProgressTracker` with your own step control.
+- For a long table, pair pagination with sorting and filtering; on its own it makes a specific row hard to find.
+
+Same group: `Breadcrumb` · `Link` · `MenuGroup` · `Sidebar` · `Tabs`
+
+## Parts
+
+1. **Navigator.** Previous and Next, as a caret alone (named by its label) or as the label text.
+2. **Page.** A numbered button; the current one is selected.
+3. **Gap.** An ellipsis where the window skips pages; hidden from assistive technology.
+4. **Pill.** One bordered, fully rounded row holding every segment, divided by a hairline.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Subtle ink on the surface. |
+| Hovered | The subtle neutral hovered fill. |
+| Pressed | The subtle neutral pressed fill. |
+| Focused | The 2px ring drawn inside the segment. |
+| Current | The selected fill and ink, semibold; hover and press do not change it. |
+| Disabled | The disabled ground, ink and caret; the control keeps its tab stop with `aria-disabled`. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Row height | `--item-height-md` (default), `--item-height-sm` (compact) |
+| Segment padding | `--pad-x-md`, `--pad-x-sm` |
+| Ink and ground | `--ds-text-subtle`, `--ds-surface` |
+| Pill edge | `--ds-border`, `--border-default`, `--radius-full` |
+| Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
+| Current page | `--ds-background-selected`, `--ds-text-selected`, `--type-weight-semibold` |
+| Disabled | `--ds-background-disabled`, `--ds-text-disabled`, `--ds-icon-disabled` |
+| Caret | `--icon-sm` |
+| Focus ring | `--ds-border-focused`, `--focus-ring-width` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Keep the default “Previous” and “Next” in text mode. | Rename them “Back” and “Forward”, or shorten to arrows with no name. |
+| Name the navigation after what it pages: “Sessions pages”. | Leave two paginations on one page with the same name. |
+| Number pages from 1. | Start at 0 or show a range such as 1–10. |
+| Use it for lists with a stable order. | Use it for a feed that keeps loading. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -134,7 +177,7 @@ Don't: Only a window of numbers, with no total.
 
 **`spacing`** — `default` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Sub-components
 
@@ -170,13 +213,5 @@ From `design-system/src/components/navigation/Pagination/Pagination.scss`. Overr
 ## Figma
 
 - "Pagination" node 20095:11283 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a continuously loading feed, use infinite scroll rather than pages.
-- For a step-by-step flow, use `ProgressTracker` with your own step control.
-- For a long table, pair pagination with sorting and filtering; on its own it makes a specific row hard to find.
-
-Same group: `Breadcrumb` · `Link` · `MenuGroup` · `Sidebar` · `Tabs`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

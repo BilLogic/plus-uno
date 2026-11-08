@@ -22,15 +22,6 @@ A toggle never waits for a button. For an option that needs a button press to ap
 
 Pick the size by the page. Use 16 where the page has many toggles, such as a settings list. Use 20 to call attention to one setting, such as the single switch in a modal.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the setting as a noun phrase: "Session reminders". | An instruction or a status: "Turn on reminders", "Reminders are on". |
-| Use sentence case and no end punctuation. | Title case, or a period after the label. |
-| Keep the label to a few words. | A sentence that explains the setting. Put the explanation in a caption or a Tooltip. |
-| Write the label so it reads right in both positions. | "Enable" or "Disable" in the label, which the position already says. |
-
 ## Best practices
 
 ### Label what turns on. {#label-what-turns-on}
@@ -77,6 +68,53 @@ The native input is a checkbox with `role="switch"`, the markup the W3C switch p
 - **Explain a disabled toggle.** Put the reason in text beside it, so a person who cannot reach it knows why.
 - **Keyboard focus is a 2px ring on `border.focused`, 2px off the track.** Space flips the toggle.
 
+## Related
+
+- For an option that needs a button press to apply, use Checkbox.
+- To choose one option from a visible set, use Radio.
+- To choose one option from a longer list, use Select.
+- To explain what flipping a toggle does, add a Tooltip.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Track.** A pill, 32 by 16 or 40 by 20. Off it is the neutral bold fill; on it is the selected bold fill.
+2. **Thumb.** An inverse circle inset 2 from the track. It slides to the end when the toggle is on.
+3. **Label.** 14/20 text beside the track in a 24 row. It names the setting and stays the same in both states.
+4. **Spinner.** Optional, between the track and the label while a change is saved.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Off: `--ds-background-neutral-bold`. On: `--ds-background-selected-bold`. |
+| Hovered | Off: `--ds-background-neutral-bold-hovered`. On: `--ds-background-selected-bold-hovered`. |
+| Pressed | No step of its own. The hovered fill holds while the pointer is down. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the track, for keyboard focus only. |
+| Disabled | `--ds-background-disabled` track, `--ds-icon-disabled` thumb, in both positions. Out of the tab order. |
+| Read-only | Full contrast, in the tab order, not changeable. |
+| Loading | A spinner sits between the track and the label; input is ignored. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Track size | `--toggle-track-height-16` and `--toggle-track-width-16`; `-20` for the large size. |
+| Thumb inset | `--toggle-pad`. |
+| Track fill | `--ds-background-neutral-bold` off; `--ds-background-selected-bold` on. |
+| Thumb | `--ds-icon-inverse`; `--ds-icon-disabled` when disabled. |
+| Row | `--item-height-sm`; gap `--stack-md`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the setting as a noun phrase: "Session reminders". | An instruction or a status: "Turn on reminders", "Reminders are on". |
+| Use sentence case and no end punctuation. | Title case, or a period after the label. |
+| Keep the label to a few words. | A sentence that explains the setting. Put the explanation in a caption or a Tooltip. |
+| Write the label so it reads right in both positions. | "Enable" or "Disable" in the label, which the position already says. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -103,7 +141,7 @@ The native input is a checkbox with `role="switch"`, the markup the W3C switch p
 
 **`size`** — `16` · `20`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -114,14 +152,5 @@ From `design-system/src/components/forms-and-inputs/Toggle/Toggle.scss`. Overrid
 ## Figma
 
 - "Form Switch Button" node 20328:89241 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For an option that needs a button press to apply, use Checkbox.
-- To choose one option from a visible set, use Radio.
-- To choose one option from a longer list, use Select.
-- To explain what flipping a toggle does, add a Tooltip.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

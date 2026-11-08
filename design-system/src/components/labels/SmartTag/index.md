@@ -34,14 +34,6 @@ not to add new behavior.
 Each subject's color and icon are fixed: there is no prop to mix a subject's
 meaning with a different color.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Let the default label stand: "Mastering content". | Rename a subject to taste: "Math stuff". |
-| Use a SMART tag only for a SMART subject. | Use one as a general colored label. Use Tag. |
-| Write a custom label only where the context needs it, in the same register. | Shorten it to an abbreviation nobody has met. |
-
 ## Best practices
 
 ### Keep the subject's own name. {#keep-the-subject-s-own-name}
@@ -79,6 +71,47 @@ spelling; the aliases exist for content written before it changed.
 - **The subject icon is decorative.** It is `aria-hidden`; the subject's name
   is carried by the visible label, not the icon.
 
+## Related
+
+- For a category outside the five SMART subjects, use `Tag` directly.
+- For a group of tags, including smart tags, use `TagGroup`.
+
+Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+
+## Parts
+
+1. **Subject icon.** Fixed per subject: a heart, a book, a bullhorn, a handshake, a laptop. It is decoration.
+2. **Label.** The subject's own name unless the context needs other words.
+3. **Edge and ground.** The subject's hue on the border and the swatch, with neutral text, exactly as Tag draws a color.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | A span with no role. The five subjects are the hues orange, teal, lime, magenta and brown. |
+| Hovered, pressed | None until `isSelected` makes it selectable; then the subject's subtlest and subtlest pressed steps, as Tag. |
+| Focused | Only when selectable or removable: the 2px focus ring, 2px off the edge. |
+| Disabled | `isDisabled`, or a disabled field, drops it to the disabled ground and words and removes the ×. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Rest edge | `--ds-border-accent-orange-subtle` for social-emotional, and the same step for each other subject hue. |
+| Hovered, pressed | `--ds-background-accent-orange-subtlest` and `--ds-background-accent-orange-subtlest-pressed`. |
+| Selected | `--ds-background-accent-orange-subtler` with a `--ds-border-accent-orange` edge. |
+| Disabled | `--ds-background-disabled` with `--ds-text-disabled`. |
+| Subject icon | `--icon-sm`, matching Tag's 12 text. |
+| Height | 22, as Tag. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Let the default label stand: "Mastering content". | Rename a subject to taste: "Math stuff". |
+| Use a SMART tag only for a SMART subject. | Use one as a general colored label. Use Tag. |
+| Write a custom label only where the context needs it, in the same register. | Shorten it to an abbreviation nobody has met. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -91,19 +124,12 @@ spelling; the aliases exist for content written before it changed.
 
 **`subject`** — `social-emotional` · `mastering-content` · `advocacy` · `relationship` · `technology-tools` · `socio-emotional` · `relationships`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--icon-sm`
 
 From `design-system/src/components/labels/SmartTag/SmartTag.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For a category outside the five SMART subjects, use `Tag` directly.
-- For a group of tags, including smart tags, use `TagGroup`.
-
-Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

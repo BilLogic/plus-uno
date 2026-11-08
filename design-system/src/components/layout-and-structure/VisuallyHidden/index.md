@@ -26,14 +26,6 @@ square, clipped, out of the flow and kept in the accessibility tree. Existing
 markup that writes `className="visually-hidden"` is the same thing and can move
 to the component as it is touched.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name what the control does: "Delete session". | Leave an icon-only control with no name. |
-| Add only the words the layout implies: "Read more about the spring schedule". | Repeat words that are already visible. |
-| Write for the ear: complete words, in the page's language. | Hide instructions a sighted person also needs. |
-
 ## Best practices
 
 ### Name icon-only controls. {#name-icon-only-controls}
@@ -101,14 +93,6 @@ appear on focus.
   requirement. The text should still be written for the ear: complete words, in
   the page's language.
 
-## Props
-
-| Prop | Type | Default | Description |
-|------|------|---------|-------------|
-| `children` | node | — | The text screen readers announce. |
-| `id` | string | — | An id other elements can point at with `aria-labelledby` or `aria-describedby`. |
-| `role` | string | — | An ARIA role for the span, such as `status` for a live region. |
-
 ## Related
 
 - For an icon-only button, pair it with `Tooltip` so sighted people get the name too.
@@ -116,5 +100,41 @@ appear on focus.
 - For a loading indicator that announces itself, `Spinner` already includes a visually hidden label.
 
 Same group: `Accordion` · `Carousel` · `Footer` · `PageHeader` · `Panel` · `ScrollBar`
+
+## Parts
+
+1. **Span.** The only part: a one-pixel, clipped `span` of text, out of the flow, that stays in the accessibility tree and paints nothing.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The only state. Nothing is drawn; the text is read as part of whatever contains it. |
+| Hovered | None. There is nothing on screen to point at. |
+| Pressed | None. There is nothing on screen to press. |
+| Focused | None. It is not in the tab order; keep controls out of it. |
+| Disabled | None. It has no disabled state. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Span | None. It paints nothing, so it takes no color, type or spacing tokens. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name what the control does: "Delete session". | Leave an icon-only control with no name. |
+| Add only the words the layout implies: "Read more about the spring schedule". | Repeat words that are already visible. |
+| Write for the ear: complete words, in the page's language. | Hide instructions a sighted person also needs. |
+
+## Props
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `children` | node | — | The text screen readers announce. |
+| `id` | string | — | An id other elements can point at with `aria-labelledby` or `aria-describedby`. |
+| `role` | string | — | An ARIA role for the span, such as `status` for a live region. |
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

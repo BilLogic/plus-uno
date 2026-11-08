@@ -19,15 +19,6 @@ or pick at more than one level — a curriculum with units and lessons, a
 category tree. For options that nest but are chosen one level at a time in
 sequence, use `Cascader` instead. For a flat list, use `Select`.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name each node by what it is: "Algebra". | A node that only reads right under its parent. |
-| Keep branches shallow, two or three levels. | A tree deeper than people can hold in mind. |
-| Say what to do in an error: "Pick a topic". | "Required" or "Invalid". |
-| Use the same label form at every level. | Mix a category name with a full sentence. |
-
 ## Best practices
 
 ### Use multi select for several branches. {#use-multi-select-for-several-branches}
@@ -88,6 +79,52 @@ subtree is complete.
 - **Without a visible label, name the field explicitly** with `aria-label`
   or `aria-labelledby` — `label` is optional, but an accessible name isn't.
 
+## Related
+
+- For options chosen one level at a time in sequence, use `Cascader`.
+- For a flat list with no hierarchy, use `Select`.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `VerticalButton`
+
+## Parts
+
+1. **Field.** The box that shows the picks, or the placeholder.
+2. **Label.** Names the field. A required marker follows it.
+3. **Tree.** Rows that expand to their children. A parent checks its descendants.
+4. **Caption.** Helper text, or the error that replaces it.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The input fill with a `--border-default` input edge; the placeholder until a node is picked. |
+| Hovered | The edge turns `--ds-border-focused`. |
+| Pressed | No step of its own. The hovered edge holds while the pointer is down, and the press opens the tree. |
+| Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. No fill changes. |
+| Disabled | The whole field fades to `--ds-opacity-disabled` and leaves the tab order. |
+| Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
+| Height | 40: `--height-250`. Compact 32: `--item-height-md`. |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
+| Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
+| Tree panel | `--ds-surface-overlay` with a `--ds-border` edge, `--popover-radius-menu-md` and `--ds-shadow-overlay`. |
+| Row | `--item-height-md` high; hovered `--ds-background-neutral-subtle-hovered`, picked `--ds-background-selected` with `--ds-text-selected`; the expand toggle `--ds-icon-subtle`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name each node by what it is: "Algebra". | A node that only reads right under its parent. |
+| Keep branches shallow, two or three levels. | A tree deeper than people can hold in mind. |
+| Say what to do in an error: "Pick a topic". | "Required" or "Invalid". |
+| Use the same label form at every level. | Mix a category name with a full sentence. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -114,13 +151,6 @@ subtree is complete.
 
 **`spacing`** — `default` · `compact`
 
-Anything not listed is not a valid value.
-
-## Related
-
-- For options chosen one level at a time in sequence, use `Cascader`.
-- For a flat list with no hierarchy, use `Select`.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `VerticalButton`
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

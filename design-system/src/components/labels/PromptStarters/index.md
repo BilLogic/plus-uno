@@ -19,13 +19,6 @@ before they've typed anything: an empty chat, a fresh reflection, a blank
 prompt field. Once a conversation is underway, use `Suggestion` directly for
 a single follow-up prompt instead of a full row of starters.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Write a label of a few words that reads as a request: "Summarize this session". | Put a whole paragraph on the chip. |
-| Name the group for what it offers: "Suggested prompts". | Leave the group unnamed. |
-
 ## Best practices
 
 ### Keep the label short, and put the prompt in `text`. {#keep-the-label-short-and-put-the-prompt-in-text}
@@ -68,6 +61,40 @@ Don't guard the component with your own conditional: passing an empty
 - **Each chip is `Suggestion`'s own control.** Keyboard reach, focus and the
   accept action all follow `Suggestion`'s accessibility contract.
 
+## Related
+
+- For a single follow-up prompt once a conversation is underway, use `Suggestion` directly.
+- For where a selected starter's text typically lands, see `PromptInput`.
+
+Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+
+## Parts
+
+1. **Group.** A wrapping row with `role="group"`, named by the required `label`.
+2. **Starter.** A prompt `Suggestion` per entry in `starters`: the sparkle wand, the short `label` on the chip, and the longer `text` it stands for.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | A row of prompt chips. The group itself has no ground and no state. |
+| Hovered, pressed, focused | Each chip reacts as a `Suggestion` does. |
+| Empty | An empty `starters` array renders nothing. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Gap | `--stack-md` between chips and between rows, the same gap as a tag row. |
+| Starter | A `Suggestion`, so its edge, words, grounds and focus ring are Suggestion's tokens. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Write a label of a few words that reads as a request: "Summarize this session". | Put a whole paragraph on the chip. |
+| Name the group for what it offers: "Suggested prompts". | Leave the group unnamed. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -82,12 +109,5 @@ Don't guard the component with your own conditional: passing an empty
 `--stack-md`
 
 From `design-system/src/components/labels/PromptStarters/PromptStarters.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For a single follow-up prompt once a conversation is underway, use `Suggestion` directly.
-- For where a selected starter's text typically lands, see `PromptInput`.
-
-Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

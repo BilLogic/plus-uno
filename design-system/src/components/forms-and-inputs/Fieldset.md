@@ -16,16 +16,7 @@ Also asked as: field group.
 
 ## Usage
 
-Use a fieldset wherever a set of fields shares one label and, often, one validation message: a group of radios, a group of checkboxes, related text fields asked together. For a single field with its own label, use the label and captionconvention instead.
-
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Write the legend as the question or topic: "Notify me by". | A generic legend: "Options". |
-| Use sentence case and no end punctuation. | Title case, or a colon after the legend. |
-| Say what to do in the error: "Choose at least one." | "Required" or "Invalid". |
-| Keep the legend short enough to read as a heading. | A paragraph of instructions in the legend. |
+Use a fieldset wherever a set of fields shares one label and, often, one validation message: a group of radios, a group of checkboxes, related text fields asked together. For a single field with its own label, use the label and caption convention instead.
 
 ## Best practices
 
@@ -74,6 +65,46 @@ Don't: An instruction.
 - **The error is announced once.** `role="alert"` on the error message means assistive technology hears it as soon as it appears, without needing focus to move there.
 - **`isRequired` is visual and spoken.** The asterisk is `aria-hidden`, and a visually hidden "(required)" is added to the legend's accessible name.
 
+## Related
+
+- For the ready-made radio composition, use Radio group.
+- For a single field's label and help text, see the label and caption convention.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Legend.** Names the group, in body default. A required marker follows it.
+2. **Fields.** The grouped fields, stacked with `--stack-md` between them.
+3. **Error.** One message under the fields, in body small.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Required | An asterisk in `--ds-text-danger` follows the legend. A visually hidden "(required)" joins its name. |
+| Invalid | The error shows in `--ds-text-danger`, announced with `role="alert"` and linked with `aria-describedby`. |
+| Disabled | The native `disabled` attribute disables every field inside. |
+
+A fieldset has no hover, pressed or focus state of its own. The fields inside carry theirs.
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Legend | `--ds-text`, body default. |
+| Required marker, error | `--ds-text-danger`; the error in body small. |
+| Gap | `--stack-md`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Write the legend as the question or topic: "Notify me by". | A generic legend: "Options". |
+| Use sentence case and no end punctuation. | Title case, or a colon after the legend. |
+| Say what to do in the error: "Choose at least one." | "Required" or "Invalid". |
+| Keep the legend short enough to read as a heading. | A paragraph of instructions in the legend. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -92,12 +123,5 @@ Don't: An instruction.
 `--body-default` · `--body-small` · `--ds-text` · `--ds-text-danger` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/Fieldset.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For the ready-made radio composition, use Radio group.
-- For a single field's label and help text, see the label and caption convention.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

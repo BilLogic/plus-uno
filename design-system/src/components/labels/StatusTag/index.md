@@ -39,15 +39,6 @@ Use `spacing="default"` (20) in rows, lists, tables and sentences, and
 | Info | In progress. Example: "In progress". |
 | Discovery | New. |
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the condition: "In review", "Overdue", "Approved". | Write an action: "Review now". A status is not a button. |
-| Use one or two words, in sentence case. | Write a sentence or end with a period. |
-| Keep one wording for one condition across the product. | Use "Done" here and "Complete" there for the same state. |
-| Let a trailing metric be a plain number. | Put words in the metric. |
-
 ## Best practices
 
 ### Match the appearance to the meaning. {#match-the-appearance-to-the-meaning}
@@ -105,6 +96,50 @@ success · warning · danger).
 - **An edge on any surface.** The 1px inside border keeps a pale fill visible
   on white and on gray; in forced-colors mode it becomes a real border.
 
+## Related
+
+- For a number on its own, use `CountTag`; Status tag nests one through `trailingMetric`.
+- For a due or event date, use `DateTag`.
+- For a category, a subject or a person, use `Tag` (or `SmartTag` for a SMART subject).
+
+Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `Suggestion` · `Tag` · `TagGroup`
+
+## Parts
+
+1. **Leading visual.** Optional: a Font Awesome Free icon by name, or a node.
+2. **Label.** The condition, in a word or two. Past `maxWidth` it ends in an ellipsis and the full text is a tooltip.
+3. **Trailing metric.** Optional: a compact Count tag nested inside, with its own appearance when it means something else.
+4. **Fill.** The appearance's tinted ground with its words and an edge one step darker.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The only state. A status that can change is edited in the field around it. |
+| Hovered, pressed | None. It is a label, not a control; the thing around it is what responds. |
+| Focused | None. It is not in the tab order. A truncated label takes focus only so a keyboard user can reach the tooltip with its full text. |
+| Disabled | None. A label is never dimmed; a disabled thing is described by the control beside it. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Height | `--label-height-md` (20), or `--item-height-md` (32) when spacious. |
+| Padding and gap | `--pad-x-xs` on the leading edge, 2 on the trailing edge and between icon and label, `--stack-sm` inside the text; spacious `--pad-x-md` with 6 behind. |
+| Corner | `--radius-md`; spacious 6. |
+| Neutral | `--ds-background-neutral`, `--ds-text`, edge `--ds-background-neutral-pressed`. |
+| Success, warning, danger | The same three for each: `--ds-background-success`, `--ds-text-success`, edge `--ds-background-success-pressed`. |
+| Info and discovery | `--ds-background-information` and `--ds-background-smart-mastering-content`, with their text and pressed steps. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the condition: "In review", "Overdue", "Approved". | Write an action: "Review now". A status is not a button. |
+| Use one or two words, in sentence case. | Write a sentence or end with a period. |
+| Keep one wording for one condition across the product. | Use "Done" here and "Complete" there for the same state. |
+| Let a trailing metric be a plain number. | Put words in the metric. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -127,20 +162,12 @@ success · warning · danger).
 
 **`trailingMetricAppearance`** — `neutral` · `success` · `warning` · `danger` · `info` · `discovery`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--body-default` · `--body-small` · `--border-default` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-information` · `--ds-background-information-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-smart-mastering-content` · `--ds-background-smart-mastering-content-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-background-warning` · `--ds-background-warning-pressed` · `--ds-text` · `--ds-text-danger` · `--ds-text-information` · `--ds-text-smart-mastering-content` · `--ds-text-success` · `--ds-text-warning` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-status-edge` · `--plus-status-height` · `--plus-status-icon-box` · `--plus-status-max` · `--radius-h24` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-end` · `--tag-pad-end-compact`
 
 From `design-system/src/components/labels/StatusTag/StatusTag.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For a number on its own, use `CountTag`; Status tag nests one through `trailingMetric`.
-- For a due or event date, use `DateTag`.
-- For a category, a subject or a person, use `Tag` (or `SmartTag` for a SMART subject).
-
-Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

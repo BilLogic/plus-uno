@@ -20,15 +20,6 @@ Use a range in a form to let a person choose a value within a minimum and a maxi
 
 Do not use a range when choosing a specific value matters. A slider is less precise than typing a number or picking an option from a list. Do not use it for values that are not numeric, such as weekdays, or for spans that are extremely large (over 100 steps) or very small (1 to 3).
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name what the slider sets: "Zoom", "Volume". | An instruction: "Slide to choose a zoom level." |
-| Keep the label to one or two words. | A sentence that wraps above the slider. |
-| Use one line of helper text under the slider to explain how. | A longer label. |
-| Use sentence case and no end punctuation. | Title case, or a period after the label. |
-
 ## Best practices
 
 ### Use size 12 by default. {#use-size-12-by-default}
@@ -79,6 +70,51 @@ If the slider needs explaining, put one line of helper text under it rather than
 - **Keyboard focus is a 2px ring on `border.focused`, 2px off the handle.** A pointer focus draws none.
 - **Do not use a range where precision matters.** Offer a text field beside it, or use one instead.
 
+## Related
+
+- For a specific numeric value, use Text field.
+- For a choice among a few options, use Radio or Select.
+- For a rating, use Rating.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Label.** 14/20 text directly above the slider, aligned left. It names the slider.
+2. **Track.** A 4 line showing the span (6 or 8 with `size` 12 or 16). It fills with the selected bold fill from the start to the handle.
+3. **Handle.** A 20 circle, or 8, 12 or 16 when `size` is set, that the person moves along the track to change the value.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The track fills with `--ds-background-selected-bold` from the start to the handle. |
+| Hovered | The handle takes `--ds-background-selected-bold-hovered`. |
+| Pressed | While the handle is dragged it reads the same as hovered. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the handle, for keyboard focus only. |
+| Disabled | Track and fill take `--ds-background-disabled`; the handle takes `--ds-icon-disabled` with no shadow. Out of the tab order. |
+| Invalid, read-only | Not drawn. A range always holds a value, so there is nothing to mark invalid. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Track | `--ds-background-neutral`; fill `--ds-background-selected-bold`; height `--range-track-height-4`. |
+| Handle | `--range-dot-size-default` (20), `--ds-background-selected-bold`, `--ds-shadow-raised`. |
+| Size | `--range-dot-size-8`, `-12`, `-16`; track `--range-track-height-4`, `-6`, `-8`. |
+| Corner | `--radius-full` on track, fill and handle. |
+| Hit area | `--item-height-md` (32), the whole row. |
+| Label | `--ds-text`, body default; gap `--space-025`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name what the slider sets: "Zoom", "Volume". | An instruction: "Slide to choose a zoom level." |
+| Keep the label to one or two words. | A sentence that wraps above the slider. |
+| Use one line of helper text under the slider to explain how. | A longer label. |
+| Use sentence case and no end punctuation. | Title case, or a period after the label. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -102,7 +138,7 @@ If the slider needs explaining, put one line of helper text under it rather than
 
 **`size`** — `8` · `12` · `16`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -113,13 +149,5 @@ From `design-system/src/components/forms-and-inputs/Range/Range.scss`. Override 
 ## Figma
 
 - "Form Range Input" node 20003:1536 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a specific numeric value, use Text field.
-- For a choice among a few options, use Radio or Select.
-- For a rating, use Rating.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

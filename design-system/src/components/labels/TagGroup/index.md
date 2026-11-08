@@ -25,14 +25,6 @@ they always sit at the end of the row, after the tags and `+n`.
 
 A single tag standing alone does not need it.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Give the group a `label` that names the set: "Focus areas". | Leave it out, or write "Tags". |
-| Order tags by importance or by the order the person added them. | Sort them arbitrarily. |
-| Name the overflow by what is hidden: "+3 focus areas". | Say "More" with no count. |
-
 ## Best practices
 
 ### Collapse long groups in tight rows. {#collapse-long-groups-in-tight-rows}
@@ -127,6 +119,46 @@ its spacing in two places.
   visually hidden text and is read as "Science, disabled". Nothing in a
   disabled group takes focus.
 
+## Related
+
+- For one value rather than a set, use `Tag`.
+- For a value the system proposes, put a `Suggestion` in the group.
+- For a labeled field where the person picks, creates and removes tags, use `TagInput`.
+- For a long set that needs paging rather than an overflow count, use `Pagination`.
+
+Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag`
+
+## Parts
+
+1. **Tags and suggestions.** The group owns the gaps between them; a tag carries no margin.
+2. **Overflow tag.** A `+n` that opens a menu of the hidden tags, or runs `onOverflowClick`.
+3. **List.** A named `list` of `listitem`s; the `label` is its accessible name.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | A wrapping row, or a collapsed row with a `+n` tag. |
+| Hovered, pressed | None on the group. Each tag reacts as it would alone. |
+| Focused | None on the list. Tab reaches the controls inside it in order: selectable tags, links, ×, suggestions, the overflow tag. |
+| Disabled | `isDisabled` disables every tag and suggestion and the overflow menu, as a disabled field does. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Gap | `--stack-md` (8) between tags, and between rows. |
+| Overflow tag | A selectable Tag, so its ground, ring and disabled tokens are Tag's. |
+| Disabled | `--ds-background-disabled` and `--ds-text-disabled`, from `TagContext`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Give the group a `label` that names the set: "Focus areas". | Leave it out, or write "Tags". |
+| Order tags by importance or by the order the person added them. | Sort them arbitrarily. |
+| Name the overflow by what is hidden: "+3 focus areas". | Say "More" with no count. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -148,7 +180,7 @@ its spacing in two places.
 
 **`alignment`** — `start` · `end`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -159,14 +191,5 @@ From `design-system/src/components/labels/TagGroup/TagGroup.scss`. Override thes
 ## Figma
 
 - "TagGroup" node 20095:1896 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For one value rather than a set, use `Tag`.
-- For a value the system proposes, put a `Suggestion` in the group.
-- For a labeled field where the person picks, creates and removes tags, use `TagInput`.
-- For a long set that needs paging rather than an overflow count, use `Pagination`.
-
-Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

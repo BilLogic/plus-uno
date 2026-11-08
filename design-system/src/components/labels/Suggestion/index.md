@@ -32,14 +32,6 @@ Use `Tag` for a value that is already in the field. Use `Button` for an action
 that is not a proposed value, and `AiLabel` to mark content the agent has
 already produced.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Use the value itself: "Fractions". | Write an instruction: "Click to add Fractions". |
-| Keep a prompt to a few words that read as a request: "Summarize". | Send a whole paragraph as the label. |
-| Offer a few. Three to five fit a row. | Fill a row with suggestions until the real tags are lost. |
-
 ## Best practices
 
 ### Name the action. {#name-the-action}
@@ -91,6 +83,48 @@ Don't: A Tag styled as a suggestion is not a button, so nobody can accept it wit
 - **Focus is a ring, not a fill**: a 2px Focus Ring 2px outside the edge, so
   focus never reads as pressed.
 
+## Related
+
+- For a value already in the field, use `Tag`, inside a `TagGroup`.
+- To mark content the agent produced, use `AiLabel`.
+
+Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Tag` · `TagGroup`
+
+## Parts
+
+1. **Glyph.** A plus for an `insert` suggestion, a sparkles wand for a `prompt`. It says which kind of proposal this is.
+2. **Label.** The proposed value or prompt, short.
+3. **Edge.** Dashed, in the discovery border: the system proposed it, the person has not accepted it.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | A dashed edge on a clear ground. The accessible name is "Add Fractions, suggested" or "Summarize, suggested". |
+| Hovered | `--ds-background-discovery`. |
+| Pressed | `--ds-background-discovery-hovered`. |
+| Focused | A 2px ring 2px off the dashed edge. The ground stays clear, so focus never reads as pressed. |
+| Disabled | Disabled ground and words, no focus, and `onAccept` never fires. A disabled field or tag group disables every suggestion in it. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Edge | `--ds-border-discovery`, dashed, `--border-default` wide. |
+| Words and glyph | `--ds-text-discovery` and `--ds-icon-discovery`. |
+| Hovered, pressed | `--ds-background-discovery` and `--ds-background-discovery-hovered`. |
+| Focus ring | `--ds-border-focused`, `--focus-ring-width` wide and offset. |
+| Disabled | `--ds-background-disabled`, `--ds-text-disabled`, `--ds-icon-disabled`. |
+| Box | 22 tall, `--pad-x-xs` padding, `--radius-md` corner. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Use the value itself: "Fractions". | Write an instruction: "Click to add Fractions". |
+| Keep a prompt to a few words that read as a request: "Summarize". | Send a whole paragraph as the label. |
+| Offer a few. Three to five fit a row. | Fill a row with suggestions until the real tags are lost. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -109,7 +143,7 @@ Don't: A Tag styled as a suggestion is not a button, so nobody can accept it wit
 
 **`type`** — `insert` · `prompt`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -120,12 +154,5 @@ From `design-system/src/components/labels/Suggestion/Suggestion.scss`. Override 
 ## Figma
 
 - "Suggestion" node 20094:1242 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a value already in the field, use `Tag`, inside a `TagGroup`.
-- To mark content the agent produced, use `AiLabel`.
-
-Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

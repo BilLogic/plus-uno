@@ -114,13 +114,14 @@ test('the hosted lookup (readPaths off) ranks the same names as the local one fo
 });
 
 // The best of five cold starts, each on a fresh lookup that builds its own
-// index. `test:scripts` runs its files in parallel processes, and under that
-// load one sample of this find measured 316 to 379 ms on the wall clock while
-// the work itself takes about 185 ms alone: contention only ever adds time, so
-// one sample measures the scheduler as much as the lookup. The fastest of five
-// is the lookup's own cost, and a real regression slows every sample, the
-// fastest included, so the 300 ms budget still goes red on one.
-test('the first find on a fresh lookup, index build included, takes under 300 ms', () => {
+// index. The work takes about 200 ms alone; inside `test:scripts`, whose files
+// run in parallel processes beside the rest of `check:harness`, the fastest of
+// five still measured 320 ms, the scheduler and not the lookup. A wall-clock
+// budget is only honest on a quiet machine, so this test runs only with
+// DS_BENCH_TIMING=1: `npm run bench:ds-find:timing` runs it alone and serially,
+// and CI runs that as its own step after the harness. A regression slows every
+// sample, the fastest included, so the 300 ms budget still goes red on one.
+test('the first find on a fresh lookup, index build included, takes under 300 ms', { skip: process.env.DS_BENCH_TIMING !== '1' && 'timing runs alone: npm run bench:ds-find:timing' }, () => {
   const samples = [];
   for (let i = 0; i < 5; i++) {
     const lookup = createLookup(REPO_ROOT, { readPaths: false });

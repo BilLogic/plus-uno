@@ -27,14 +27,6 @@ sent until the first text arrives, `streaming` while text arrives, then
 | Streaming | While text arrives. A caret follows the last character, and the message is busy for assistive technology. |
 | Complete | The default: a finished reply. Only a complete reply shows its sources and its thumbs. |
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name a source by its record: "Session notes, Oct 24", with its type, "Session". | Name a source by its address. |
-| Put a table or a list the reply needs in a part that `renderPart` draws. | Draw a table out of characters inside the text. |
-| Let the AI icon mark the reply. | Add a second icon beside the message. |
-
 ## Best practices
 
 ### Stream the answer, then settle. {#stream-the-answer-then-settle}
@@ -83,6 +75,52 @@ Don't: A finished answer with no way to rate it.
 - **Reduced motion.** The caret and dots stop animating, and typed-out text
   shows at once.
 
+## Related
+
+- `AiChat`, which shows every reply in an `AiMessage`.
+- `AiLabel`, which marks content the agent produced.
+- `PromptInput`, which sends the message.
+
+Same group: `AiLabel` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+
+## Parts
+
+1. **AI icon.** The small AI icon at 16, named "AI", centered on the first line, so no answer reads as a person's.
+2. **Text.** The body style, keeping the reply's line breaks. With `parts`, text parts and other parts in order; `renderPart` draws a part that is not text.
+3. **Caret.** Streaming only: a thin bar after the last character, blinking.
+4. **Typing indicator.** Thinking only: three pulsing dots in place of the text.
+5. **Sources** (optional). Complete only: a "Sources" heading, one row per source with its title as a link and its type beside it, and a toggle past three.
+6. **Feedback** (optional). Complete only, with `onFeedback`: thumbs up and down and a quiet thanks beside them.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Complete | The text, then the sources and the thumbs when they are passed. With `typeOut`, the text types out character by character. |
+| Streaming | A caret follows the last character, and the message carries `aria-busy`. No sources and no thumbs yet. |
+| Thinking | The typing indicator, a status named "AI is writing", in place of the text. |
+| Reduced motion | The caret and dots stop animating, and typed-out text shows at once. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Text | `--body-default` in `--ds-text`. |
+| Icon to text | `--inline-md`; the icon centers on the first line against `--icon-md`. |
+| Between parts | `--stack-md`. |
+| Typing dots | `--ds-text-subtle`, `--radius-full`, `--stack-sm` apart. |
+| Caret and dots motion | `--motion-duration-long`, `--motion-duration-medium` between dots, `--motion-easing-standard`. |
+| Sources | Heading `--heading-xxsmall` in `--ds-text-subtle`; type `--body-small` in `--ds-text-subtle`; rows `--stack-sm` apart. |
+| Feedback | Thanks `--body-small` in `--ds-text-subtle`; buttons `--inline-sm` apart. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name a source by its record: "Session notes, Oct 24", with its type, "Session". | Name a source by its address. |
+| Put a table or a list the reply needs in a part that `renderPart` draws. | Draw a table out of characters inside the text. |
+| Let the AI icon mark the reply. | Add a second icon beside the message. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -104,20 +142,12 @@ Don't: A finished answer with no way to rate it.
 
 **`feedback`** — `up` · `down`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--body-default` · `--body-small` · `--ds-text` · `--ds-text-subtle` · `--heading-xxsmall` · `--icon-md` · `--inline-md` · `--inline-sm` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-easing-standard` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/labels/AiMessage/AiMessage.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- `AiChat`, which shows every reply in an `AiMessage`.
-- `AiLabel`, which marks content the agent produced.
-- `PromptInput`, which sends the message.
-
-Same group: `AiLabel` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

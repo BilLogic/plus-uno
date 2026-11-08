@@ -30,14 +30,6 @@ Pick the type from what people do with the rows. Ask the questions in order, and
 
 Search, filters and actions sit in the Section header: `<PatternSection toolbar={<PatternSection.Toolbar />}>`.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name every column with a short head, in sentence case: "Last session". | A blank head, or one in all caps. |
-| Give the count in words in the toolbar: "340 students". | A count in the head row or under the table. |
-| An empty message that says what will appear and the first action: "No members yet", "Invite a member". | An empty table body with no message. |
-
 ## Best practices
 
 ### Put a plain table in a Section. {#put-a-plain-table-in-a-section}
@@ -77,6 +69,64 @@ Don't: A hierarchy faked with expandable rows: the classes and students lose the
 - The empty message is a row of the table, so assistive technology reads it with the columns it replaces.
 - Name the table through `tableProps`, such as `aria-label`, when no caption names it.
 
+## Related
+
+- Section: the header types, toolbar and tabs, that sit above every table.
+- Table component: the table components, with a set of headers and rows.
+- Pagination: the pager that fills the pagination slot.
+- Card: a table never sits inside a card.
+- Templates: the dashboard content shows a Students table in a Section at every breakpoint.
+
+Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar`
+
+## Parts
+
+1. **Section header.** Not part of the table: the title and, in the toolbar type, search, filters, the count and actions.
+2. **Head row.** Names the columns. Its rule is the bold border.
+3. **Rows.** The data you pass as `tbody`. Each draws a thin rule, and there is no zebra striping.
+4. **Pagination** (optional). A slot under the rows, aligned to the end. It hides while the empty state shows.
+5. **Message row.** The `emptyState` slot, which replaces the rows when `empty` is true. It sits under the head row and spans every column.
+
+### States
+
+Row states are layered over each cell's fill, never swapped for it.
+
+| State | What changes |
+| --- | --- |
+| Rest | No fill of its own: the table shows what it sits on. |
+| Hovered | The row takes `--ds-background-neutral-subtle-hovered`. |
+| Pressed | The row takes `--ds-background-neutral-subtle-pressed`. |
+| Focused | A scroll region takes keyboard focus and draws the `--ds-border-focused` ring. |
+| Disabled | A table has no disabled state. Disable the controls in a row. |
+| Selected | A row with `aria-selected="true"` takes `--ds-background-selected` across the whole row, with `-hovered` and `-pressed` steps and no stripe on its leading edge. |
+| Empty | The message row replaces the rows and takes no hover state. |
+
+### Tokens
+
+| Token | Value | Used for |
+| --- | --- | --- |
+| `--ds-border`, `--border-default` | color, 1 | The rule under each row. |
+| `--ds-border-bold` | color | The rule under the head row. |
+| `--ds-text`, `--body-default` | 14/20 | Body cells. |
+| `--ds-text-subtle`, `--heading-xxsmall` | color, type | Head cells and the message row. |
+| `--table-pad-x-cell`, `--table-pad-y-cell`, `--stack-md` | length | Cell padding and the gap inside a cell. |
+| `--ds-background-neutral-subtle-hovered`, `-pressed` | color | A hovered and a pressed row. |
+| `--ds-background-selected`, `-hovered`, `-pressed` | color | A selected row. |
+| `--ds-shadow-overflow` | shadow | A sticky edge, only while content is scrolled under it. |
+| `--ds-utility-elevation-surface-current` | color | The fill of sticky cells, so they match what the table sits on. |
+| `--ds-border-focused`, `--focus-ring-width` | focus ring | The ring of a scroll region. |
+| `--table-pad-x-cell` | 8 | The side pad of the message row. |
+| `--row-height-md` | 40 | The least height of the message row. |
+| `--section-stack-md`, `--stack-sm` | 16, 4 | Space around the message, and between its lines. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name every column with a short head, in sentence case: "Last session". | A blank head, or one in all caps. |
+| Give the count in words in the toolbar: "340 students". | A count in the head row or under the table. |
+| An empty message that says what will appear and the first action: "No members yet", "Invite a member". | An empty table body with no message. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -98,15 +148,5 @@ Don't: A hierarchy faked with expandable rows: the classes and students lose the
 `--body-default` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-border-bold` · `--ds-border-focused` · `--ds-shadow-overflow` · `--ds-text` · `--ds-text-subtle` · `--ds-utility-elevation-surface-current` · `--focus-ring-width` · `--heading-xxsmall` · `--layer-card` · `--pattern-table-overflow-reach` · `--pattern-table-z-corner` · `--pattern-table-z-sticky` · `--plus-pattern-table-row-state` · `--row-height-md` · `--section-stack-md` · `--space-0625` · `--stack-md` · `--stack-sm` · `--table-overflow-reach` · `--table-pad-x-cell` · `--table-pad-y-cell` · `--table-radius`
 
 From `design-system/src/patterns/PatternTable/PatternTable.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- Section: the header types, toolbar and tabs, that sit above every table.
-- Table component: the table components, with a set of headers and rows.
-- Pagination: the pager that fills the pagination slot.
-- Card: a table never sits inside a card.
-- Templates: the dashboard content shows a Students table in a Section at every breakpoint.
-
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

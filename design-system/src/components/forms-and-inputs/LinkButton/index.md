@@ -16,14 +16,6 @@ Link button: navigates, and looks like a button. It renders an anchor, so it has
 
 Use a link button to open another page, a site or a place on the page. For an action that stays on the current page, use a Button.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Describe the destination or purpose: "View sessions". | "Click here" or "Go". |
-| Use sentence case, short and without punctuation. | Title case, or a full sentence. |
-| Match the words of the surrounding UI. | Different words for the same destination in one view. |
-
 ## Best practices
 
 ### Keep space between link buttons. {#keep-space-between-link-buttons}
@@ -61,6 +53,66 @@ Right-align in focused tasks and modal dialogs; left-align on full-page forms an
 - `target="_blank"` adds `rel="noopener noreferrer"`. Flag the new tab in the label or with the external-link glyph.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
 
+## Related
+
+- To act on the current page, use Button.
+- To navigate with an icon alone, use Link icon button.
+- To link inside a sentence, use a plain text link.
+- To group related links, use Button group.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Container.** An anchor drawn as a button: 32 high at default spacing and 24 at compact.
+2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
+3. **Label.** Body/default at the medium weight. It describes the destination or purpose.
+4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label, such as the external-link glyph.
+
+### Appearance
+
+| Appearance | When to use |
+| --- | --- |
+| Default | Most links that need button weight. Example: View sessions. |
+| Primary | The main way forward to another page. Example: Start onboarding. |
+| Subtle | Navigation inside toolbars and headers. Example: Back to lessons. |
+| Warning, danger | Rare for a link; a destination that leads to a risky area. Prefer default. |
+| Discovery | The call to action for a new experience. Example: Try the new schedule view. |
+
+### Spacing
+
+Default spacing suits most places. Use compact in table rows and inline toolbars.
+
+### States
+
+Hover, pressed and focus are the browser's own. A link button has no disabled or loading state.
+
+| State | What changes |
+| --- | --- |
+| Hovered | The container takes the appearance's hovered fill. |
+| Pressed | The container takes the appearance's pressed fill. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
+| Selected | The selected role fill, label and icon, with `aria-current`. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill, label, icon | The same named tokens as Button for each appearance, with hovered and pressed steps. |
+| Focus ring | `--ds-border-focused`, 2px, 2px offset. |
+| Height | 32: `--item-height-md`. 24: `--item-height-sm`. |
+| Radius | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. |
+| Padding | 12: `--pad-x-md`. Compact 8: `--pad-x-sm`. |
+| Icon-to-label gap | 4: `--inline-sm`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Describe the destination or purpose: "View sessions". | "Click here" or "Go". |
+| Use sentence case, short and without punctuation. | Title case, or a full sentence. |
+| Match the words of the surrounding UI. | Different words for the same destination in one view. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -85,19 +137,10 @@ Right-align in focused tasks and modal dialogs; left-align on full-page forms an
 
 **`spacing`** — `default` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Figma
 
 - "Link button" node 20303:77826 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- To act on the current page, use Button.
-- To navigate with an icon alone, use Link icon button.
-- To link inside a sentence, use a plain text link.
-- To group related links, use Button group.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -18,15 +18,6 @@ Also asked as: calendar input, date field, date input, date selector.
 
 Use `DatePicker` for a single date or a date range typed or chosen from a calendar: a session date, a billing period. For a time alone, use Time picker; for a date and a time together, use Date time picker.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the date by its role: "Session date", "Start date". | A generic name: "Date", or "Pick a date". |
-| Leave the placeholder as the format, MM/DD/YYYY. | Put an instruction in the placeholder: "Click to choose". |
-| Say how to fix an invalid date: "Enter a date between October 5 and October 23". | "Invalid date". |
-| Use sentence case in labels and messages. | Title case: "Session Date". |
-
 ## Best practices
 
 ### Typing is checked on Enter or on leaving the field. {#typing-is-checked-on-enter-or-on-leaving-the-field}
@@ -79,6 +70,51 @@ Don't: Two separate fields.
 - **An invalid typed date keeps the typed text** rather than silently reverting, so the person can see and correct what they entered.
 - **Invalid is not color alone:** the input sets `aria-invalid`.
 
+## Related
+
+- For a time alone, use Time picker.
+- For a date and a time together, use Date time picker.
+- The month grid itself is the public Calendar component.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Field.** A 40 box (32 at compact) on the input fill, with the date as text.
+2. **Calendar icon.** Opens the calendar. Decoration for assistive technology; the input is the control.
+3. **Calendar.** A month grid in a popup 4px below the field, flipped above when there is no room. A picked day is the selected fill; days between a range's ends are the neutral selection.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | `--ds-background-input` fill with a `--ds-border-input` border. |
+| Hovered | The border takes `--ds-border-focused`. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the box. |
+| Invalid | The border takes `--ds-border-danger` and the input sets `aria-invalid`. |
+| Read-only | The box takes `--ds-background-neutral`. |
+| Disabled | The box fades to `--ds-opacity-disabled` and leaves the tab order. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill | `--ds-background-input`; read-only `--ds-background-neutral`. |
+| Border | `--ds-border-input`; hovered `--ds-border-focused`; invalid `--ds-border-danger`. |
+| Text | `--ds-text`; placeholder `--ds-text-subtlest`. |
+| Icon | `--ds-icon-subtle`. |
+| Focus ring | `--ds-border-focused`, 2px, 2px offset. |
+| Popup gap | `--stack-sm`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the date by its role: "Session date", "Start date". | A generic name: "Date", or "Pick a date". |
+| Leave the placeholder as the format, MM/DD/YYYY. | Put an instruction in the placeholder: "Click to choose". |
+| Say how to fix an invalid date: "Enter a date between October 5 and October 23". | "Invalid date". |
+| Use sentence case in labels and messages. | Title case: "Session Date". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -108,7 +144,7 @@ Don't: Two separate fields.
 
 **`calendarAlign`** — `left` · `center` · `right`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -119,13 +155,5 @@ From `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.scss`.
 ## Figma
 
 - "Date picker" node 20074:16843 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a time alone, use Time picker.
-- For a date and a time together, use Date time picker.
-- The month grid itself is the public Calendar component.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

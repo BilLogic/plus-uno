@@ -21,13 +21,6 @@ a `+n` menu, reachable by name.
 Use plain `Avatar` elements, not `AvatarGroup`, where there is room to name
 each person beside their picture.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the group for what it holds: "Session attendees". | "Avatars" or "People", which names the picture, not the set. |
-| Let `+n` count only the people left out. | Write your own count in the label; it will drift from the menu. |
-
 ## Best practices
 
 ### Let the group set the size and shape. {#let-the-group-set-the-size-and-shape}
@@ -62,6 +55,45 @@ Don't: Folding most of a roster behind +n: link to the list instead.
 - **Every shown avatar keeps its own name.** The group changes `size` and
   `shape`, never an avatar's accessible name.
 
+## Related
+
+- For a single person or agent, use `Avatar`.
+- For the signed-in user in the topbar, with a name and a counter, use `UserAvatar`.
+
+Same group: `AiIcon` · `Avatar` · `Illustration` · `Image` · `Object` · `Tile` · `UserAvatar`
+
+## Parts
+
+1. **Avatars.** Up to `max`; when people overflow, `max` minus one plus the `+n`. Each the group's size and shape, overlapping by a quarter.
+2. **Ring.** A surface-colored ring around each avatar that separates neighbors.
+3. **Overflow.** A gray `+n` button that opens a menu of the people left out, by name.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Overlapping avatars; the `+n` in `--ds-background-accent-gray-subtler`. |
+| Hovered | The `+n` takes `--ds-background-accent-gray-subtle`. The avatars do not change. |
+| Pressed | Opens the menu and sets `aria-expanded`. Escape closes it. |
+| Focused | A 2px ring in `--ds-border-focused` on the `+n`, for keyboard focus only. |
+| Disabled | None. With nothing to fold there is no `+n`, only pictures. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Avatar size | `--image-xxs` to `--image-lg`, from the group's `size`. |
+| Overlap | A quarter of the avatar size. |
+| Overflow fill | `--ds-background-accent-gray-subtler`; hovered `--ds-background-accent-gray-subtle`. |
+| Focus ring | `--ds-border-focused`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the group for what it holds: "Session attendees". | "Avatars" or "People", which names the picture, not the set. |
+| Let `+n` count only the people left out. | Write your own count in the label; it will drift from the menu. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -80,17 +112,10 @@ Don't: Folding most of a roster behind +n: link to the list instead.
 
 **`shape`** — `circle` · `square`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Figma
 
 - "Avatar group" node 20557:1716 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a single person or agent, use `Avatar`.
-- For the signed-in user in the topbar, with a name and a counter, use `UserAvatar`.
-
-Same group: `AiIcon` · `Avatar` · `Illustration` · `Image` · `Object` · `Tile` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

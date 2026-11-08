@@ -31,14 +31,6 @@ state. `FlagGroup` positions a stack of them.
 | Error | Something that failed. Stays until dismissed. |
 | Bold | Any appearance on its bold fill, for the one message that must be seen. |
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Say what happened in the title, in a few words. | Put the only copy of important information in a flag. |
-| Add one line of description at most. | Write a paragraph in the description. |
-| Write actions as verbs: "Undo", "View session". | Use "Click here" or "OK" as an action. |
-
 ## Best practices
 
 ### Match the appearance to the outcome. {#match-the-appearance-to-the-outcome}
@@ -98,6 +90,57 @@ Turning it off with `autohide={false}` leaves a flag that never goes away.
 - **Every flag is one surface.** The title and the description keep the same
   text colors on every appearance, so no appearance needs a contrast exception.
 
+## Related
+
+- For something the user must read or act on, use `SectionMessage`.
+- For a decision that blocks the task, use `Modal`.
+- For help attached to a specific control, use `Tooltip` or `Popup`.
+
+Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
+
+## Parts
+
+1. **Icon.** The appearance glyph, decorative.
+2. **Title.** What happened, in a few words.
+3. **Timestamp.** Optional, subtle, after the title.
+4. **Description.** At most one line.
+5. **Actions.** Link buttons under the description.
+6. **Expand toggle.** Only on a bold flag, which starts collapsed to its title.
+7. **Dismiss.** The shared CloseButton, named "Dismiss flag".
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The appearance icon color on the overlay surface; a bold flag fills the surface instead. |
+| Hovered | The flag does not react; Dismiss and the toggle take the subtle hovered step. |
+| Pressed | Dismiss and the toggle take the subtle pressed step. |
+| Focused | Dismiss, the toggle and each action show the 2px ring; the ring is inverse on a bold fill. |
+| Disabled | Not supported. |
+| Expanded | A bold flag shows its description and actions; collapsed, only the title. |
+| Autohide | Normal, information and success close after 8 seconds; warning and error stay. |
+| Dismissed | The flag leaves the stack. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Surface | `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popover-radius`, `--popover-pad`, `--popover-width-flag` |
+| Title, description | `--heading-xsmall`, `--ds-text`; `--body-default`, `--ds-text-subtle` |
+| Icon | `--ds-icon-subtle`, `--ds-icon-information`, `--ds-icon-success`, `--ds-icon-warning`, `--ds-icon-danger`, at `--icon-md` |
+| Bold fill | `--ds-background-neutral-bold`, `-information-bold`, `-success-bold`, `-warning-bold`, `-danger-bold`, with `--ds-text-inverse` (`--ds-text-warning-inverse` on warning) |
+| Dismiss, toggle | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
+| Gaps | `--inline-lg` before Dismiss, `--inline-md`, `--stack-sm`; `--popover-stack-flag` between flags |
+| Group | `--layer-flag`, `--popover-gap-screen` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Say what happened in the title, in a few words. | Put the only copy of important information in a flag. |
+| Add one line of description at most. | Write a paragraph in the description. |
+| Write actions as verbs: "Undo", "View session". | Use "Click here" or "OK" as an action. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -123,7 +166,7 @@ Turning it off with `autohide={false}` leaves a flag that never goes away.
 
 **`appearance`** — `normal` · `information` · `warning` · `error` · `success`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -134,13 +177,5 @@ From `design-system/src/components/messaging/Flag/Flag.scss`. Override these thr
 ## Figma
 
 - "Flag" node 20095:8275 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For something the user must read or act on, use `SectionMessage`.
-- For a decision that blocks the task, use `Modal`.
-- For help attached to a specific control, use `Tooltip` or `Popup`.
-
-Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

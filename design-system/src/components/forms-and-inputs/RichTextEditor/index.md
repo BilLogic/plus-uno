@@ -18,15 +18,6 @@ Use a rich text editor where the formatting is part of the meaning: session note
 
 `toolbarPreset` is `compact` or `full`; passing `toolbarButtons` selects the buttons by name and implies the full toolbar. `value` and `onChange` are HTML strings. Giving it a `name` also renders a hidden input, so the HTML posts with a plain form.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name what the person writes: "Session notes". | "Editor" or "Text". |
-| Use the placeholder for a hint about the content: "What did you cover?" | Repeat the label in the placeholder. |
-| Offer only the buttons the content needs. | Every button by default. |
-| Use sentence case and no end punctuation on the label. | Title case, or a period after the label. |
-
 ## Best practices
 
 ### Use the compact toolbar for short notes. {#use-the-compact-toolbar-for-short-notes}
@@ -86,6 +77,52 @@ Don't: No label, only a placeholder, which disappears as soon as someone types.
 - **The placeholder is CSS.** It is drawn from a `data-placeholder` attribute, so it is not part of the accessible name and may not be announced at all.
 - **Keep the formatting optional.** Anything that only exists as bold text or a color in the body is invisible to someone hearing the page. Structure it with lists and headings instead.
 
+## Related
+
+- For plain multi-line text, use Text area: smaller, labeled, and with none of the above.
+- For one line, use Text field.
+- For displaying formatted content the user cannot edit, render the HTML yourself after sanitizing it.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Label.** Text above the editor that names it.
+2. **Toolbar.** Formatting buttons: block style, bold, italic, underline, lists, link and more.
+3. **Writing area.** The editable region, with a placeholder while it is empty.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | `--ds-background-input` writing area inside a `--ds-border-input` edge. |
+| Hovered | Toolbar buttons take `--ds-background-neutral-subtle-hovered`. The writing area has no hover step. |
+| Pressed | Toolbar buttons take `--ds-background-neutral-subtle-pressed`. |
+| Active format | The button takes `--ds-background-selected` with `--ds-text-selected` and `--ds-icon-selected`. |
+| Focused | A 2px ring in `--ds-border-focused` wraps the editor while the writing area has focus. |
+| Read-only | `--ds-background-neutral` writing area, `--ds-text-subtle` text, toolbar faded and inert. |
+| Disabled | As read-only: the neutral writing area and subtle text, and the toolbar faded to `--ds-opacity-disabled` and inert. |
+| Invalid | Not drawn. Mark the surrounding field and explain the error beside it. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill, edge | `--ds-background-input`; `--ds-border-input` at `--border-default`; corner `--radius-md`. |
+| Toolbar | `--ds-surface-container`; gap `--stack-md`; padding `--space-025` and `--pad-x-sm`. |
+| Writing area | Body default in `--ds-text`; minimum height `--field-min-height-lg` (120). |
+| Placeholder | `--ds-text-subtlest`. |
+| Focus ring | `--ds-border-focused`, 2px. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name what the person writes: "Session notes". | "Editor" or "Text". |
+| Use the placeholder for a hint about the content: "What did you cover?" | Repeat the label in the placeholder. |
+| Offer only the buttons the content needs. | Every button by default. |
+| Use sentence case and no end punctuation on the label. | Title case, or a period after the label. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -114,7 +151,7 @@ Don't: No label, only a placeholder, which disappears as soon as someone types.
 
 **`toolbarPreset`** — `compact` · `full`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -125,13 +162,5 @@ From `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEdito
 ## Figma
 
 - "Rich Text Editor" node 20009:85516 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For plain multi-line text, use Text area: smaller, labeled, and with none of the above.
-- For one line, use Text field.
-- For displaying formatted content the user cannot edit, render the HTML yourself after sanitizing it.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

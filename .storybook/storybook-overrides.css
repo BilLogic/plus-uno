@@ -1163,15 +1163,16 @@ a.sbdocs-a {
     padding-top: var(--space-200);
 }
 
-/* A rule's id under its heading: the handle agents cite, quiet below the rule. */
+/* A rule's id under its heading: the handle agents cite, quiet below the rule.
+   The class name is RULE_ID_CLASS in design-system/src/storybook-docs/lib/component-tabs-contract.js. */
 .sb-ds-agent-view__rule-id {
     display: block;
     margin-top: var(--space-050);
     color: var(--ds-text-subtlest);
     font-family: var(--type-family-code);
     font-size: var(--font-size-075);
-    font-weight: normal;
-    line-height: normal;
+    font-weight: var(--type-weight-regular);
+    line-height: var(--line-height-100);
 }
 
 

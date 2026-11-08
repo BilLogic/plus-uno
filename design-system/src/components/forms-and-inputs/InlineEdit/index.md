@@ -23,14 +23,6 @@ inline edit saves when it is confirmed and has no say in the form's submit, so
 placing one in a form leaves two ways to save. Use a subtle `TextField` where
 leaving the field should save with no buttons at all.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Label the value it holds: "Display name". | Label the action: "Edit name". |
-| Give an empty value a placeholder that says what to add: "Add a nickname". | Leave an empty read view blank, with nothing to press. |
-| Say why a value was refused: "Enter a name." | "Invalid" or "Error". |
-
 ## Best practices
 
 ### Keep the read view plain text. {#keep-the-read-view-plain-text}
@@ -84,6 +76,55 @@ thought, and keep the buttons so there is a clear way out.
 - **The buttons are named.** The check and the cross are icon-only, named by
   `confirmLabel` and `cancelLabel`.
 
+## Related
+
+- For a field in a form, use `TextField`.
+- For editing in place with no buttons, use `TextField` with `appearance="subtle"`.
+- For several lines edited in place, use `TextArea` with `appearance="subtle"`.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Label** (optional). Shown above both views.
+2. **Read view.** The value as plain text on the field's own box. The whole view is one button.
+3. **Edit view.** The field it opens into: a `TextField` in `InlineEditableTextfield`, or any edit view passed to `InlineEdit`.
+4. **Actions.** The confirm and cancel icon buttons, on an overlay under the field. `hideActionButtons` leaves them off.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The read view: text on a transparent box with a transparent `--border-default` edge. |
+| Hovered | The read view takes `--ds-background-neutral-subtle-hovered`. |
+| Pressed | Pressing the read view opens the edit view in the same box, with the caret in it. |
+| Focused | The read view draws a `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. |
+| Disabled | None. An inline edit has no disabled state. |
+| Editing | The field's fill and `--border-default` input edge appear; nothing else moves. |
+| Invalid | The field stays open with the danger edge and the message in its caption. |
+| Placeholder | An empty read view shows the placeholder in `--ds-text-subtlest`. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Read view height | 40: `--height-250`. Compact 32: `--item-height-md`. |
+| Read view box | `--radius-0625`, a `--border-default` transparent edge, `--pad-x-md` either side. |
+| Read view text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
+| Read view hovered | `--ds-background-neutral-subtle-hovered`. |
+| Actions | `--ds-surface-overlay` with `--ds-shadow-overlay`, `--radius-md`, `--stack-sm` padding and gap. |
+| Gap under the label | `--stack-sm`. |
+
+The edit view takes the field's own tokens: see Text field.
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Label the value it holds: "Display name". | Label the action: "Edit name". |
+| Give an empty value a placeholder that says what to add: "Add a nickname". | Leave an empty read view blank, with nothing to press. |
+| Say why a value was refused: "Enter a name." | "Invalid" or "Error". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -116,13 +157,5 @@ From `design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.scss`.
 ## Figma
 
 - "Inline edit" node 21259:523 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a field in a form, use `TextField`.
-- For editing in place with no buttons, use `TextField` with `appearance="subtle"`.
-- For several lines edited in place, use `TextArea` with `appearance="subtle"`.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -24,14 +24,6 @@ For a message that stays on the page until resolved, use `SectionMessage` or
 `Banner` instead. For a short note tied to one field or value, use
 `InlineMessage`.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the feature in the headline: "Create a new board". | Write a headline that only says "New". |
-| Use one or two short lines in the body. | Explain the whole feature. |
-| Label actions with verbs: "Next", "Skip", "Got it". | Use "OK" for every step. |
-
 ## Best practices
 
 ### Name the feature, then say what to do. {#name-the-feature-then-say-what-to-do}
@@ -89,6 +81,56 @@ every visit.
 - **Escape closes it.** Dismissing with Escape or the close button calls
   `onDismiss`.
 
+## Related
+
+- For a message that explains one field or value inline, use `InlineMessage`.
+- For a message scoped to a page or section, use `Banner` or `SectionMessage`.
+
+Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage`
+
+## Parts
+
+1. **Target.** `SpotlightTarget` wraps the element the callout points at and
+   shares its anchor with the `Spotlight` through a `SpotlightProvider`.
+2. **Headline.** The dialog title, read first.
+3. **Dismiss.** A close button in the header, the dialog's first focusable element.
+4. **Media.** An optional image above the body.
+5. **Body.** The `children` text.
+6. **Step count.** A short label like "1 of 3".
+7. **Actions.** A secondary and a primary `SpotlightAction`, the secondary first.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Popup on the brand bold fill with inverse text. |
+| Hovered | Dismiss takes the inverse hovered layer. |
+| Pressed | Dismiss takes the inverse pressed layer. |
+| Focused | Dismiss and actions show the inverse 2px ring. |
+| Disabled | Not supported. |
+| Dismissed | The popup closes and `onDismiss` fires. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Surface | `--ds-background-brand-bold`, `--ds-shadow-overlay`, `--popover-width-md`, `--radius-100`, `--space-150` |
+| Text | `--ds-text-inverse`, `--heading-small`, `--body-default`; step count `--body-small` |
+| Dismiss | `--ds-icon-inverse`, `--ds-interaction-inverse-hovered`, `--ds-interaction-inverse-pressed`, `--radius-md` |
+| Primary action | `--ds-surface-overlay`, `--ds-text` |
+| Secondary action | `--ds-text-inverse` text and `--border-default` edge |
+| Actions | `--radius-050`, `--space-050`, `--space-100`, `--space-075` between |
+| Media | `--radius-050` |
+| Focus ring | `--ds-border-focused-inverse` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the feature in the headline: "Create a new board". | Write a headline that only says "New". |
+| Use one or two short lines in the body. | Explain the whole feature. |
+| Label actions with verbs: "Next", "Skip", "Got it". | Use "OK" for every step. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -110,7 +152,7 @@ every visit.
 
 **`placement`** — `top` · `top-start` · `top-end` · `bottom` · `bottom-start` · `bottom-end` · `left` · `right` · `auto`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -121,12 +163,5 @@ From `design-system/src/components/messaging/Spotlight/Spotlight.scss`. Override
 ## Figma
 
 - "Spotlight" node 20630:74 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a message that explains one field or value inline, use `InlineMessage`.
-- For a message scoped to a page or section, use `Banner` or `SectionMessage`.
-
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

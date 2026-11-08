@@ -21,15 +21,6 @@ header, a card title. Never style plain text to look like a heading: a
 sighted-only "heading" breaks navigation by heading for anyone using
 assistive technology.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Write headings that say what the section is about. | Write headings that repeat the page title. |
-| Use sentence case. | Use title case or all caps. |
-| Keep a heading to a short phrase. | Write a heading that wraps past two lines. |
-| Choose `size` for the look and let the level pick the tag. | Pick a larger size to make a heading seem more important than its level. |
-
 ## Best practices
 
 ### Choose `size` for the look. {#choose-size-for-the-look}
@@ -62,6 +53,46 @@ Don't: The default ink on a dark ground, which barely reads.
   `color.text.inverse` or `color.text.warning.inverse` when the heading sits
   on a dark ground; the token resolves the right ink in every color mode.
 
+## Related
+
+- For the component that supplies the ambient heading level, see `HeadingContextProvider` in this same module.
+- For a page's own title row, see `PageHeader`, which renders its title in a `Heading` by default.
+
+Same group: `Code` · `CodeBlock` · `Table`
+
+## Parts
+
+1. **Text.** Set in the text style of `size`, from xxlarge to xxsmall.
+2. **Tag.** Follows the ambient heading level, or `as` when given.
+3. **Color.** Default ink, inverse ink on a dark ground, or the warning inverse ink.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Default ink in the size's style. |
+| Hovered, pressed | A heading does not react. |
+| Focused | A heading is not a control; Tab skips it. |
+| Disabled | Not applicable. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Text style | `--heading-xxlarge` to `--heading-xxsmall`, with tracking for xxlarge, xlarge and large |
+| Default ink | `--ds-text` |
+| Inverse ink | `--ds-text-inverse` |
+| Warning inverse ink | `--ds-text-warning-inverse` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Write headings that say what the section is about. | Write headings that repeat the page title. |
+| Use sentence case. | Use title case or all caps. |
+| Keep a heading to a short phrase. | Write a heading that wraps past two lines. |
+| Choose `size` for the look and let the level pick the tag. | Pick a larger size to make a heading seem more important than its level. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -81,7 +112,7 @@ Don't: The default ink on a dark ground, which barely reads.
 
 **`color`** — `color.text` · `color.text.inverse` · `color.text.warning.inverse`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -92,12 +123,5 @@ From `design-system/src/components/text-and-data-display/Heading/Heading.scss`. 
 ## Figma
 
 - "Heading" node 20626:95 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For the component that supplies the ambient heading level, see `HeadingContextProvider` in this same module.
-- For a page's own title row, see `PageHeader`, which renders its title in a `Heading` by default.
-
-Same group: `Code` · `CodeBlock` · `Table`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

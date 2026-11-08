@@ -19,15 +19,6 @@ view toggles, a set of filters. For mutually exclusive options that pick one
 value, consider whether `RadioGroup` fits the data better than buttons
 styled to look selected.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Give the group a label that names the choice: "Date range". | A generic label such as "Buttons" or "Group". |
-| Keep each button label to one or two words in sentence case: "Week", "Month". | Long or sentence-length labels that make the group wrap. |
-| Make the labels parallel: all nouns or all verbs. | A mix such as "Week", "Show all" and "Choose". |
-| Order the buttons the way people read the choice, such as smallest to largest. | An arbitrary order. |
-
 ## Best practices
 
 ### Group related actions only. {#group-related-actions-only}
@@ -73,6 +64,43 @@ that should read as current, and manage which one that is yourself.
 - **Each button keeps its own accessible name and state.** `ButtonGroup`
   adds no roles or attributes beyond the group wrapper.
 
+## Related
+
+- For a single action, use `Button` directly.
+- For two to four big choices with an icon over the label, such as a role at sign-in, use `VerticalButton`.
+
+Same group: `Button` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Container.** Groups its children with `role="group"` and the `label` as its name. It paints nothing of its own.
+2. **Buttons.** Button or Icon button children. Each keeps its own appearance, spacing and state.
+3. **Seam.** Inner corners are square and neighbors overlap by one edge, so the row reads as one control.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Hovered | The hovered button rises above its neighbors so its fill is not covered. |
+| Focused | The focused button rises above its neighbors so its ring is not covered. |
+| Selected | Set on each button with `isSelected`, which sets `aria-pressed`. The group has no selection logic. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Outer corners | 6: `--button-radius-default`. |
+| Seam overlap | 1: `--border-default`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Give the group a label that names the choice: "Date range". | A generic label such as "Buttons" or "Group". |
+| Keep each button label to one or two words in sentence case: "Week", "Month". | Long or sentence-length labels that make the group wrap. |
+| Make the labels parallel: all nouns or all verbs. | A mix such as "Week", "Show all" and "Choose". |
+| Order the buttons the way people read the choice, such as smallest to largest. | An arbitrary order. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -88,12 +116,5 @@ that should read as current, and manage which one that is yourself.
 `--border-default` · `--button-radius-default`
 
 From `design-system/src/components/forms-and-inputs/ButtonGroup/ButtonGroup.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For a single action, use `Button` directly.
-- For two to four big choices with an icon over the label, such as a role at sign-in, use `VerticalButton`.
-
-Same group: `Button` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -18,15 +18,6 @@ Use the Sidebar for the app's main areas. `PageLayout` draws it from the config 
 
 Content is data. The Sidebar draws the `groups` it is given and never changes the URL: the caller handles `onSelect` and decides which groups a role sees.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name a row for its area in a word or two: "Sessions". | A sentence: "All of my tutoring sessions". |
-| Title a group in one word, in sentence case: "Training". | Title case or a phrase. |
-| Label a tab with its time and the teacher: "4:00 PM · Ms. Ortiz". | The whole record in the label. |
-| Use Font Awesome Free icons on rows. | Pro-only icons, which render as blanks. |
-
 ## Best practices
 
 ### One selected tab. {#one-selected-tab}
@@ -66,6 +57,65 @@ Don't: Everything in the label, and the time is cut off.
 - The toggle is named "Close sidebar", announces Ctrl+[ (Cmd+[ on a Mac) and reports that the Sidebar is expanded.
 - The account button is named by the person's name and role, then "account menu".
 
+## Related
+
+- Frame docks, collapses and floats the Sidebar beside the Page.
+- Templates draw the Sidebar from the config you pass.
+- For a count on a row, the Sidebar uses `CountTag`.
+
+Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternTable`
+
+## Parts
+
+1. **Logo row.** The PLUS logo, which goes Home, and the toggle at the end of the row.
+2. **Group.** Rows under an optional section title. A group without a title has no title row and never collapses.
+3. **Section title.** A full 32 row in the subtlest text. On hover and focus the collapse angle shows after it.
+4. **Row.** A 24 icon slot, the label, and a trailing slot for a count, a dot, the external icon or Close.
+5. **Open tabs.** Records a person opened, such as a session or a student, under their row on a thread. Three show, then Show n more.
+6. **Account row.** The avatar, the name and the role, which open the account menu, and Help Center, under a divider.
+
+Every part sits on one grid: icon centers on x 32, labels start on x 48, trailing slots center on x 208, and section titles start on x 20.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The row in `--ds-text-subtle`, with no fill. |
+| Hovered | The neutral hovered fill and ink text. A row with tabs swaps its icon for the collapse angle and its trailing slot for Close all; a tab swaps its live dot for Close. |
+| Pressed | The neutral pressed fill. |
+| Focused | A ring inside the row's edge, in `--ds-border-focused`, and the same swaps as hover. |
+| Disabled | Not used. A row the person cannot reach yet is locked instead. |
+| Selected | The selected fill, ink text and icon and the medium weight, with `aria-current="page"`. A selected tab takes the fill and its row goes to ink without it. |
+| Locked | While `modulesLeft` is above 0, a group marked `lockedDuringOnboarding` shows a lock and its rows take the subtlest text, with no hover and no press. |
+| Collapsed | A collapsed section hides its rows and turns its angle right. Collapsed sections are remembered per person under `storageKey`. |
+
+Docked, collapsed, peeking and overlay are the Frame's states, on the Frame page.
+
+### Tokens
+
+The Sidebar's width, 240, belongs to the Frame: see Frame.
+
+| Part | Token |
+| --- | --- |
+| Pad | 12: `--frame-sidebar-pad`. |
+| Row | 32: `--item-height-md`; radius 6: `--frame-sidebar-row-radius`; 2 apart: `--frame-sidebar-row-gap`. |
+| Groups | 16 apart: `--frame-sidebar-group-gap`. |
+| Row text and icon | `--ds-text-subtle` and `--ds-icon-subtle`, at `--body-default`. |
+| Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `-pressed`. |
+| Selected | `--ds-background-selected` with hovered and pressed steps; `--ds-text-selected`, `--ds-icon-selected`. |
+| Section title and locked rows | `--ds-text-subtlest`, `--ds-icon-subtlest`; titles at `--body-small`. |
+| Focus ring | `--ds-border-focused`, `--focus-ring-width`, inside the row. |
+| Account row divider | `--ds-border`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name a row for its area in a word or two: "Sessions". | A sentence: "All of my tutoring sessions". |
+| Title a group in one word, in sentence case: "Training". | Title case or a phrase. |
+| Label a tab with its time and the teacher: "4:00 PM · Ms. Ortiz". | The whole record in the label. |
+| Use Font Awesome Free icons on rows. | Pro-only icons, which render as blanks. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -97,13 +147,5 @@ Don't: Everything in the label, and the time is cut off.
 `--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-icon` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-text` · `--ds-text-selected` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--frame-sidebar-group-gap` · `--frame-sidebar-pad` · `--frame-sidebar-row-gap` · `--frame-sidebar-row-radius` · `--icon-lg` · `--icon-md` · `--icon-sm` · `--inline-sm` · `--item-height-md` · `--pad-x-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--radius-sm` · `--stack-lg` · `--stack-md` · `--type-weight-medium`
 
 From `design-system/src/patterns/Sidebar/Sidebar.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- Frame docks, collapses and floats the Sidebar beside the Page.
-- Templates draw the Sidebar from the config you pass.
-- For a count on a row, the Sidebar uses `CountTag`.
-
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternTable`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

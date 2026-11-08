@@ -23,13 +23,6 @@ no AI behavior (no send-on-Enter, no loading state), use `TextArea` instead.
 `PromptInput` does not carry the fallibility line. `AiChat` shows it once
 under its input; any other consumer shows the same line under the field itself.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the field for what it sends: "Message to AI chat". | A generic name such as "Text" or "Input". |
-| Hint at what can be asked: "Ask about a student, a session or a lesson". | Describe the control: "Type here". |
-
 ## Best practices
 
 ### Keep the field visible while generating. {#keep-the-field-visible-while-generating}
@@ -79,6 +72,52 @@ Don't: A disabled idle field blocks the next question.
   Shift+Enter inserts a line break, and an in-progress IME composition never
   triggers a send.
 
+## Related
+
+- For a plain multi-line field with no AI behavior, use `TextArea`.
+- For the border treatment shown while loading, see `GenerativeBorder`.
+- For a short, tappable prompt suggestion, use `Suggestion` or `PromptStarters`.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Attachments** (optional). A row of staged files above the text.
+2. **Start slot** (optional). One quiet control before the text, such as an attach button.
+3. **Text area.** Grows from one line to five, then scrolls. Named by `label`.
+4. **Actions** (optional). Extra controls beside the send button.
+5. **Send.** A compact primary icon button; while loading it becomes Stop.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The input fill and `--border-default` input edge. Send is held back until there is text. |
+| Hovered | The edge turns `--ds-border-focused`. |
+| Pressed | No step of its own on the field; the send button takes its own pressed fill. |
+| Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. |
+| Disabled | The field fades to `--ds-opacity-disabled`, and nothing sends. |
+| Loading | Send becomes Stop, and a GenerativeBorder rings the field and sets `aria-busy`. Stop is never held back by `isDisabled`. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`, `--radius-0625`. |
+| Height | Starts at `--field-min-height-sm` and grows to five lines: `--line-height-125` × 5 plus `--space-0375` top and bottom, then scrolls. |
+| Padding | `--pad-y-md` top and bottom, `--pad-x-md` either side. |
+| Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
+| Attachments | `--stack-md` between files and under the row. |
+| Actions and send | `--stack-sm` between them. |
+| Loading ring | GenerativeBorder at `radius-075`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the field for what it sends: "Message to AI chat". | A generic name such as "Text" or "Input". |
+| Hint at what can be asked: "Ask about a student, a session or a lesson". | Describe the control: "Type here". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -104,20 +143,12 @@ Don't: A disabled idle field blocks the next question.
 
 **`state`** — `default` · `focus`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--line-height-125` · `--plus-prompt-input-max-height` · `--space-0375` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For a plain multi-line field with no AI behavior, use `TextArea`.
-- For the border treatment shown while loading, see `GenerativeBorder`.
-- For a short, tappable prompt suggestion, use `Suggestion` or `PromptStarters`.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

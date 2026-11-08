@@ -21,15 +21,6 @@ need to see and, often, jump back to — a multi-page form, a setup flow, a
 reflection with named sections. When position alone is enough and the steps
 have no names to show, use `ProgressIndicator` instead.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name each step for the task it holds: "Student reflection". | Number the steps in the label or repeat "Step". |
-| Keep each label to a few words. | Write labels that truncate. |
-| Use the same names as the page titles they lead to. | Rename a step between the tracker and its page. |
-| Give the nav a `label` that says what it tracks: "Reflection steps". | Keep the default when a page holds two trackers. |
-
 ## Best practices
 
 ### An item's status and its action are set separately. {#an-item-s-status-and-its-action-are-set-separately}
@@ -81,6 +72,51 @@ This keeps a step someone cannot reach yet from being focusable or clickable, re
   step that carries `href` or `onClick`; `disabled` steps are marked
   `aria-disabled` and are not in the tab order.
 
+## Related
+
+- For a short sequence where position matters more than each step's name, use `ProgressIndicator`.
+- For a single bar showing percent complete, use `ProgressBar`.
+
+Same group: `ProgressIndicator`
+
+## Parts
+
+1. **Marker.** A dot for unvisited, current and disabled steps; a success check for a visited step.
+2. **Label.** One line, truncating with an ellipsis.
+3. **Step.** A link, a button or plain text, with `aria-current="step"` on the current one.
+4. **Rule.** A hairline joining horizontal steps.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Subtle text on no ground; the current step is on the selected ground in medium weight. |
+| Hovered | A link or button step takes the subtle neutral hovered ground. |
+| Pressed | A link or button step takes the subtle neutral pressed ground. |
+| Focused | A link or button step shows the 2px ring inset in the step. |
+| Disabled | Disabled ink and icon; neither a link nor a button, and `aria-disabled`. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Step text | `--ds-text-subtle`, `--ds-text-selected`, `--ds-text-disabled` |
+| Current ground | `--ds-background-selected` |
+| Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
+| Visited check | `--ds-icon-success` |
+| Dot, rule | `--ds-icon-subtle`, `--ds-border` |
+| Gap | `--stack-lg`, `--stack-md`, `--stack-sm` |
+| Ring | `--ds-border-focused`, `--focus-ring-width` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name each step for the task it holds: "Student reflection". | Number the steps in the label or repeat "Step". |
+| Keep each label to a few words. | Write labels that truncate. |
+| Use the same names as the page titles they lead to. | Rename a step between the tracker and its page. |
+| Give the nav a `label` that says what it tracks: "Reflection steps". | Keep the default when a page holds two trackers. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -96,19 +132,12 @@ This keeps a step someone cannot reach yet from being focusable or clickable, re
 
 **`orientation`** — `horizontal` · `vertical`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--body-default` · `--border-default` · `--ds-background-brand-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border` · `--ds-border-brand` · `--ds-border-focused` · `--ds-icon-disabled` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--focus-ring-width` · `--icon-sm` · `--inline-sm` · `--item-height-md` · `--pad-x-md` · `--radius-full` · `--radius-h32` · `--space-050` · `--space-150` · `--stack-lg` · `--stack-md` · `--stack-sm` · `--stroke-1` · `--type-weight-medium`
 
 From `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For a short sequence where position matters more than each step's name, use `ProgressIndicator`.
-- For a single bar showing percent complete, use `ProgressBar`.
-
-Same group: `ProgressIndicator`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

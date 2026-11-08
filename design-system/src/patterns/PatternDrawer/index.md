@@ -36,14 +36,6 @@ A Drawer takes the Modal width steps, never the page grid. The width grows with 
 
 A Drawer is placed in the [Blanket](?path=/docs/patterns-overlays-blanket--docs) with an edge placement. The Blanket drops its pad and holds the Drawer at that edge, over the same blanket and layers a [Modal](?path=/docs/patterns-overlays-modal--docs) takes.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| A short title that names what the Drawer holds: "Session details". | A title that repeats the button that opened it word for word. |
-| A description only when it adds something, such as "Thursday · 4:00–5:00 PM". | A description that restates the title. |
-| Name the primary action for what it does: "Save changes". | "OK" or "Submit". |
-
 ## Best practices
 
 ### At most two overlays. {#at-most-two-overlays}
@@ -75,6 +67,50 @@ Hold the Drawer full height at a screen edge, inside a Blanket. Never put it str
 - A body that scrolls is a tab stop, so a keyboard can reach it.
 - An `inline` Drawer, drawn in the page flow for docs, sets `aria-modal` to false and leaves focus where it is.
 
+## Related
+
+- [Modal](?path=/docs/patterns-overlays-modal--docs) is the centered layer for a task that blocks the page.
+- [Blanket](?path=/docs/patterns-overlays-blanket--docs) places the Drawer at an edge and draws the fill.
+- [Section](?path=/docs/patterns-section-section--docs) and [Card](?path=/docs/patterns-section-card--docs) hold content that belongs on the page itself.
+- Templates show a medium Drawer over the page.
+
+Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+
+## Parts
+
+1. **Header.** The title, an optional description and the Close button, which shows whenever `onClose` is set.
+2. **Body.** A slot that takes the height the header and footer leave, and scrolls past it.
+3. **Footer** (optional). A slot pinned to the bottom edge, with actions right-aligned and the primary last.
+
+The Drawer pads 16 on every side and stacks its parts 16 apart. It has no radius, because it meets the screen edge at the top, the bottom and its own side. Figma's custom header, `actions?`, `divider?` and `loading?` have no prop in code; `column guide?` is Figma only and never ships.
+
+### States
+
+A Drawer is open or closed. Closing it returns focus to what had it before it opened. Its parts have no hover, pressed or disabled states of their own; those belong to the controls in the header and footer. When focus lands on the Drawer itself, it draws the focus ring inside its edge.
+
+### Tokens
+
+| Token | Value | What it is for |
+| --- | --- | --- |
+| `--drawer-pad` | 16 | Pad on every side, every size. |
+| `--drawer-stack-md` | 16 | Space between the header, body and footer. |
+| `--drawer-inline-sm` | 8 | Space in the header row and between footer buttons. |
+| `--drawer-stack-sm`, `-lg`; `--drawer-inline-md`, `-lg` | 8, 24; 16, 24 | Spacing for the content you place in the body. The Drawer does not apply them. |
+| `--drawer-width-sm`, `-md`, `-lg` | see Width guidance | The three width steps, the same values as the Modal's. |
+| `--ds-surface-overlay`, `--ds-shadow-overlay` | overlay pair | The Drawer's fill and elevation. |
+| `--heading-medium` | 20/24 | The title. |
+| `--body-default`, `--ds-text-subtle` | 14/20 | The description. |
+| `--ds-border-focused`, `--focus-ring-width` | focus ring | The ring when the Drawer itself holds focus. |
+| `--ds-blanket` | 32% in Light, 60% in Dark | The fill the Blanket draws behind it. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| A short title that names what the Drawer holds: "Session details". | A title that repeats the button that opened it word for word. |
+| A description only when it adds something, such as "Thursday · 4:00–5:00 PM". | A description that restates the title. |
+| Name the primary action for what it does: "Save changes". | "OK" or "Submit". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -101,21 +137,12 @@ Hold the Drawer full height at a screen edge, inside a Blanket. Never put it str
 
 **`placement`** — `end` · `start`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--body-default` · `--drawer-inline-sm` · `--drawer-pad` · `--drawer-stack-md` · `--ds-border-focused` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--heading-medium` · `--stack-sm`
 
 From `design-system/src/patterns/PatternDrawer/PatternDrawer.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- [Modal](?path=/docs/patterns-overlays-modal--docs) is the centered layer for a task that blocks the page.
-- [Blanket](?path=/docs/patterns-overlays-blanket--docs) places the Drawer at an edge and draws the fill.
-- [Section](?path=/docs/patterns-section-section--docs) and [Card](?path=/docs/patterns-section-card--docs) hold content that belongs on the page itself.
-- Templates show a medium Drawer over the page.
-
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

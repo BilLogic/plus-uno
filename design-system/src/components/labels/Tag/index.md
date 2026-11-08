@@ -23,15 +23,6 @@ Also asked as: label, keyword.
 Who set the value no longer decides. A tag is outlined and a status is filled,
 so a reader tells a category from a meaning without reading the words.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the thing in a word or two: "Science", "Grade 6". | Write a sentence or a full instruction. |
-| Use sentence case and the singular. | Use ALL CAPS or a trailing punctuation mark. |
-| Give a × a name that says the value: "Remove Science". | Leave every × named "Remove". |
-| Keep one wording for one category across the product. | Rename the same category per screen. |
-
 ## Best practices
 
 ### Use one color per category. {#use-one-color-per-category}
@@ -152,6 +143,52 @@ and every tag inside follows:
   person, agent or team, so the initials are never read out or folded into the
   ×'s name.
 
+## Related
+
+- For a set of tags, use `TagGroup`: it owns the gaps and the overflow.
+- For a number on its own, use `CountTag`.
+- For a labeled field where the person picks, creates and removes tags, use `TagInput`.
+- For a state, use `StatusTag`.
+
+Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `TagGroup`
+
+## Parts
+
+1. **Swatch or avatar.** A 10 swatch in the hue, or a 16 avatar for a person, an agent or a team.
+2. **Label.** Neutral text; the hue never colors the words.
+3. **Trailing metric.** Optional on a selectable tag: a compact Count tag, such as a filter's result count.
+4. **Remove button.** Optional, with the 2px focus ring on the button itself and a name that says what it removes.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Outlined, clear ground, the hue on the border. 22 tall. |
+| Hovered, pressed | A link or a selectable tag takes the accent's subtlest and subtlest pressed steps; a link's words underline. On a removable tag only the × reacts. |
+| Selected | The subtler ground with a full-hue border, held under hover and press. |
+| Focused | A 2px ring 2px off the edge, on the tag or on the ×. |
+| Disabled | Disabled ground and words, no ×, no link, no focus; a selected tag keeps a bold edge. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Rest edge | `--ds-border-accent-blue-subtle`, and the same step for each hue. |
+| Hovered, pressed | `--ds-background-accent-blue-subtlest` and `--ds-background-accent-blue-subtlest-pressed`. |
+| Selected | `--ds-background-accent-blue-subtler` with a `--ds-border-accent-blue` edge. |
+| Words | `--ds-text` on every hue. |
+| Disabled | `--ds-background-disabled`, `--ds-text-disabled`, `--ds-icon-disabled`. |
+| Padding, gap, corner | `--pad-x-xs`, `--stack-sm`, `--radius-md`; a person tag is `--radius-full`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the thing in a word or two: "Science", "Grade 6". | Write a sentence or a full instruction. |
+| Use sentence case and the singular. | Use ALL CAPS or a trailing punctuation mark. |
+| Give a × a name that says the value: "Remove Science". | Leave every × named "Remove". |
+| Keep one wording for one category across the product. | Rename the same category per screen. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -185,7 +222,7 @@ and every tag inside follows:
 
 **`type`** — `plain` · `person` · `agent` · `team`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -196,14 +233,5 @@ From `design-system/src/components/labels/Tag/Tag.scss`. Override these through 
 ## Figma
 
 - "Tag" node 20117:1260 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a set of tags, use `TagGroup`: it owns the gaps and the overflow.
-- For a number on its own, use `CountTag`.
-- For a labeled field where the person picks, creates and removes tags, use `TagInput`.
-- For a state, use `StatusTag`.
-
-Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

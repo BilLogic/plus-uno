@@ -16,13 +16,6 @@ An icon for an AI action: generate, ask, rewrite, summarize, plan, suggest or st
 
 Use `AiIcon` to mark an action that the AI performs. For any other action, use a Font Awesome Free glyph. Stop generating has no sparkle on purpose, because stopping is not generative.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Pair the icon with the verb: "Summarize". | An icon alone for an action that is not obvious. |
-| Use the icon that names the action. | Reuse one icon for a different action. |
-
 ## Best practices
 
 ### Pair it with visible text, or give it a `label`. {#pair-it-with-visible-text-or-give-it-a-label}
@@ -51,6 +44,40 @@ Don't: The sparkle on an action that is not AI.
 - **Labeled or hidden.** With `label` the icon is `role="img"` named by it. Without, it is `aria-hidden`.
 - **Color follows the text.** It fills with `currentColor`, so it keeps contrast with its surroundings.
 
+## Related
+
+- For any non-AI icon, use a Font Awesome Free glyph.
+- For the border that shows generation in progress, use `GenerativeBorder`.
+
+Same group: `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile` · `UserAvatar`
+
+## Parts
+
+1. **Glyph.** A Font Awesome Free shape for the action: generate, ask, rewrite, summarize, plan, suggest or stop generating.
+2. **Sparkle.** One four-point sparkle at the top right, with a gap cut around it. Generate is the sparkle alone; stop generating has none.
+3. **Size.** 12 (generate and stop generating only), 16 or 24.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The only state. An icon is a picture, not a control. |
+| Hovered, pressed, focused, disabled | None. Put the icon inside a button, which carries them. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill | `currentColor`, starting at `--ds-icon`. |
+| Size | A square box of exactly its size: `--icon-sm` (12), `--icon-md` (16) and `--icon-lg` (24). |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Pair the icon with the verb: "Summarize". | An icon alone for an action that is not obvious. |
+| Use the icon that names the action. | Reuse one icon for a different action. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -67,19 +94,12 @@ Don't: The sparkle on an action that is not AI.
 
 **`size`** — `12` · `16` · `24`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--ds-icon` · `--icon-lg` · `--icon-md` · `--icon-sm`
 
 From `design-system/src/components/images-and-icons/AiIcon/AiIcon.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For any non-AI icon, use a Font Awesome Free glyph.
-- For the border that shows generation in progress, use `GenerativeBorder`.
-
-Same group: `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

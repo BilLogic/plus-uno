@@ -29,15 +29,6 @@ Use a `SectionMessage`, not an `EmptyState`, for a failure.
 | Default | A whole view or panel. The header is Heading/medium 20. |
 | Compact | A table body or a card. The header is Heading/small 16, with a smaller picture. |
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Keep the header short and specific to what is missing. | Apologize or blame: "Oops, nothing here." |
-| Use the description for context that helps someone decide what to do. | Repeat the header in the description. |
-| Make the primary action name the next step: "Add student". | Use a generic label such as "Continue". |
-| Add a secondary action only for a real alternative, such as importing. | Add a second action just to fill space. |
-
 ## Best practices
 
 ### Use default spacing for a whole view. {#use-default-spacing-for-a-whole-view}
@@ -79,6 +70,50 @@ Don't: An EmptyState under a Table with an empty body.
 - **Reflow.** The text wraps inside a column no wider than
   `--section-min-width-main`.
 
+## Related
+
+- `Table`, whose `emptyState` slot takes it.
+- `Illustration`, for the image slot.
+- `SectionMessage`, for a failure rather than an empty view.
+
+Same group: `Banner` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
+
+## Parts
+
+1. **Picture.** An `image` slot or a Font Awesome Free `icon`. Decorative and hidden from assistive technology.
+2. **Header.** A heading one level below the section that holds it.
+3. **Description.** One line on what goes here and what to do.
+4. **Actions.** One primary Button and an optional secondary one.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Header, description and picture on their text and icon tokens. |
+| Hovered | The message is not a control; its Buttons carry their own hovered state. |
+| Pressed | The message is not a control; its Buttons carry their own pressed state. |
+| Focused | Tab moves through the actions only. |
+| Disabled | Not supported on the message; disable an action Button instead. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Header | `--heading-medium` (default), `--heading-small` (compact), `--ds-text` |
+| Description | `--body-default`, `--ds-text-subtle` |
+| Icon | `--ds-icon-subtle` |
+| Spacing | `--stack-sm`, `--inline-md`, `--section-stack-sm`, `--section-stack-md`, `--page-stack-sm`, `--page-stack-md`, `--page-stack-lg` |
+| Width | `--section-min-width-main` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Keep the header short and specific to what is missing. | Apologize or blame: "Oops, nothing here." |
+| Use the description for context that helps someone decide what to do. | Repeat the header in the description. |
+| Make the primary action name the next step: "Add student". | Use a generic label such as "Continue". |
+| Add a secondary action only for a real alternative, such as importing. | Add a second action just to fill space. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -96,20 +131,12 @@ Don't: An EmptyState under a Table with an empty body.
 
 **`spacing`** — `default` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--body-default` · `--ds-icon-subtle` · `--ds-text` · `--ds-text-subtle` · `--font-size-150` · `--font-size-200` · `--heading-medium` · `--heading-small` · `--inline-md` · `--page-stack-lg` · `--page-stack-md` · `--page-stack-sm` · `--screen-pad-x` · `--section-min-width-main` · `--section-stack-md` · `--section-stack-sm` · `--stack-sm`
 
 From `design-system/src/components/messaging/EmptyState/EmptyState.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- `Table`, whose `emptyState` slot takes it.
-- `Illustration`, for the image slot.
-- `SectionMessage`, for a failure rather than an empty view.
-
-Same group: `Banner` · `Flag` · `InlineMessage` · `Modal` · `SectionMessage` · `Spotlight`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

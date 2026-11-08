@@ -8,6 +8,10 @@ InlineEditableTextfield — `InlineEdit` with a Text field for its edit view. It
 
 **Source:** `design-system/src/components/forms-and-inputs/InlineEditableTextfield/InlineEditableTextfield.jsx`
 
+## Related
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -33,10 +37,6 @@ InlineEditableTextfield — `InlineEdit` with a Text field for its edit view. It
 | `confirmLabel` | string | — | — |
 | `cancelLabel` | string | — | — |
 | `className` | string | — | — |
-
-## Related
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

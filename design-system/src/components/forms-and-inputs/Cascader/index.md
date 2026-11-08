@@ -19,15 +19,6 @@ sequence — a region, then a city, then a neighborhood. For a hierarchy where
 someone might pick or see several nodes at once rather than one path, use
 `TreeSelect` instead. For a flat list, use `Select`.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name each level by what it is: "Region", "City". | Names that only make sense at one level. |
-| Keep each level's options short and parallel. | Mixed kinds of option in one column. |
-| Say what to do in an error: "Pick a region". | "Required" or "Invalid". |
-| Label the field with the whole path's subject: "Location". | A label for just the first level. |
-
 ## Best practices
 
 ### Show the path while choosing. {#show-the-path-while-choosing}
@@ -64,6 +55,54 @@ Don't: A failed pick still draws the normal border, so nothing marks the error.
 - **Disabled nodes are skipped, not just dimmed** — they take no focus and
   can't be chosen at any column.
 
+## Related
+
+- For a hierarchy where several nodes can be picked or seen at once, use `TreeSelect`.
+- For a flat list with no hierarchy, use `Select`.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Field.** The box that shows the chosen path, its levels joined with a slash.
+2. **Label.** Names the field. A required marker follows it.
+3. **Columns.** One column per level, opening to the right of the last.
+4. **Caption.** Helper text, or the error that replaces it.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The input fill with a `--border-default` input edge; the placeholder until a path is chosen. |
+| Hovered | The edge turns `--ds-border-focused`. |
+| Pressed | No step of its own. The hovered edge holds while the pointer is down, and the press opens the columns. |
+| Focused | A `--focus-ring-width` ring in `--ds-border-focused`, `--focus-ring-width` off the box. No fill changes. |
+| Disabled | The whole field fades to `--ds-opacity-disabled` and leaves the tab order. |
+| Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
+| Height | 40: `--height-250`. Compact 32: `--item-height-md`. |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Side padding | `--pad-x-md`. |
+| Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
+| Label and caption | `--body-small`; label `--ds-text`, caption `--ds-text-subtle`, error `--ds-text-danger`. |
+| Menu | `--ds-surface-overlay` with a `--ds-border` edge, `--popover-radius-menu-md` and `--ds-shadow-overlay`. |
+| Column rule | `--border-default` in `--ds-border` between columns. |
+| Option | `--item-height-md` high; hovered `--ds-background-neutral-subtle-hovered`, chosen `--ds-background-selected` with `--ds-text-selected`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name each level by what it is: "Region", "City". | Names that only make sense at one level. |
+| Keep each level's options short and parallel. | Mixed kinds of option in one column. |
+| Say what to do in an error: "Pick a region". | "Required" or "Invalid". |
+| Label the field with the whole path's subject: "Location". | A label for just the first level. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -89,19 +128,12 @@ Don't: A failed pick still draws the normal border, so nothing marks the error.
 
 **`spacing`** — `default` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--border-default` · `--ds-border` · `--plus-listbox-viewport-width`
 
 From `design-system/src/components/forms-and-inputs/Cascader/Cascader.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For a hierarchy where several nodes can be picked or seen at once, use `TreeSelect`.
-- For a flat list with no hierarchy, use `Select`.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

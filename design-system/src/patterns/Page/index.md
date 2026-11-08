@@ -27,13 +27,6 @@ Use Page for a block that needs a fill at one of the four levels. The frame draw
 | Raised | A card. For one object with a shape agreed, use Card itself. |
 | Overlay | Anything over the UI: a floating sidebar, a modal. |
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Title a whole page with what it holds, in sentence case: "Sessions". | Title case, or a title on a Page that is only a block. |
-| Fill the content slot with Sections. | Loose text and controls straight in the Page. |
-
 ## Best practices
 
 ### Keep the Page pad on every side. {#keep-the-page-pad-on-every-side}
@@ -66,6 +59,47 @@ Don't: A raised Page with a hand-made title drifts from the Card pattern.
 - Text on a Page uses `--ds-text` at every level, in every color mode.
 - In light increased contrast the default Page draws its edge ring, so it stays distinct from the frame behind it.
 
+## Related
+
+- Card for a content box with a shape already agreed: pad, radius and slots.
+- Elevation for which shadow goes with which level.
+- Color for which fill to reach for, under surface roles.
+- Frame for the page frame, the 12-column grid and the content pad.
+
+Same group: `AiChat` · `Blanket` · `Frame` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+
+## Parts
+
+1. **Page.** The container. It carries the level's fill and shadow, the pad and the radius.
+2. **Title** (optional). A Page that holds a whole page can carry the page's one h1, at Heading/large 24, above the content.
+3. **Content.** The slot. Sections go here.
+
+In the frame, the content box is a 12-column grid with a 16 gutter, capped at 1232 (reading 864) and never under 720. In Figma the Page part has one property, width, with the values content and reading; code sets it on the Frame.
+
+### States
+
+A Page has no states of its own: it does not respond to hover, press or focus, and it is never disabled.
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill and shadow: sunken | `--ds-surface-sunken`, no shadow. |
+| Fill and edge: default | `--ds-surface`, edged by `--ds-border-surface` at `--stroke-2`. |
+| Fill and shadow: raised | `--ds-surface-raised`, `--ds-shadow-raised`. |
+| Fill and shadow: overlay | `--ds-surface-overlay`, `--ds-shadow-overlay`. |
+| Text | `--ds-text` at every level. |
+| Padding | sm: `--page-pad-y-compact` and `--page-pad-x-compact` (16 by 24). md: `--page-pad` (24). lg: `--page-pad-y-spacious` and `--page-pad-x-spacious` (32 by 40). |
+| Radius | sm: `--radius-lg` (8). md: `--radius-075` (12). lg: `--section-radius` (16). |
+| Border | `--stroke-2` (2) in `--ds-border-bold`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Title a whole page with what it holds, in sentence case: "Sessions". | Title case, or a title on a Page that is only a block. |
+| Fill the content slot with Sections. | Loose text and controls straight in the Page. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -89,21 +123,12 @@ Don't: A raised Page with a hand-made title drifts from the Card pattern.
 
 **`radius`** — `none` · `sm` · `md` · `lg`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--ds-border-bold` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-sunken` · `--ds-text` · `--heading-large` · `--heading-large-tracking` · `--page-border-width` · `--page-pad` · `--page-pad-x-compact` · `--page-pad-x-spacious` · `--page-pad-y-compact` · `--page-pad-y-spacious` · `--page-radius-md` · `--page-stack-md` · `--radius-lg` · `--section-radius`
 
 From `design-system/src/patterns/Page/Page.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- Card for a content box with a shape already agreed: pad, radius and slots.
-- Elevation for which shadow goes with which level.
-- Color for which fill to reach for, under surface roles.
-- Frame for the page frame, the 12-column grid and the content pad.
-
-Same group: `AiChat` · `Blanket` · `Frame` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -39,15 +39,6 @@ Figma has no z-index, so the order is written here and lives in code.
 | Flag | 600 | `--layer-flag` | Flags, above a modal. |
 | Tooltip | 800 | `--layer-tooltip` | Tooltips, above everything. |
 
-## Content guidelines
-
-The Blanket holds no text of its own. The words belong to the layer it holds.
-
-| Do | Don't |
-| --- | --- |
-| Title a confirm with the question: "Discard changes?" | A second dialog that repeats the first one's title. |
-| Name the confirm's primary action for what it does: "Discard changes". | "OK" or "Yes". |
-
 ## Best practices
 
 ### Stack only the confirm a layer raises. {#stack-only-the-confirm-a-layer-raises}
@@ -82,6 +73,49 @@ Let the Blanket place the modal. Do not detach it to move things around: the pad
 - The blanket at `--ds-blanket` keeps the dialog legible in Light and Dark. The toolbar's Contrast switch changes it with the rest of the page.
 - A layer wider than a narrow screen keeps its width, and the Blanket scrolls.
 
+## Related
+
+- [Modal](?path=/docs/patterns-overlays-modal--docs) is the layer a Blanket usually holds, centered, for one task that blocks the page.
+- [Drawer](?path=/docs/patterns-overlays-drawer--docs) is the layer held at an edge, for a task that needs the page in view.
+- [Panel](?path=/docs/patterns-panel--docs) opens over a contained Blanket when its Frame is too narrow to dock it.
+- [Popups](?path=/docs/patterns-popups--docs) covers the floating layers that never take a blanket.
+- For a floating sidebar, use the [Sidebar](?path=/docs/patterns-sidebar--docs): it takes a shadow and no blanket.
+
+Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+
+## Parts
+
+1. **Blanket.** The screen-size layer with the blanket fill, the screen grid and the pads.
+2. **Layer.** The one modal or drawer it holds, centered or at an edge. The Modal brings its body and footer slots.
+
+The Blanket carries the screen grid; page frames carry the content grid. Height, hug or fill, lives on the Modal inside it.
+
+### States
+
+A Blanket has no states. It is shown while its layer is open and gone when it closes; a click on the blanket, not on the layer, calls `onBlanketClick`.
+
+### Tokens
+
+| Token | Value | What it is for |
+| --- | --- | --- |
+| `--ds-blanket` | 32% in Light, 60% in Dark | The fill, under every modal, drawer and overlay Panel. |
+| `--blanket-pad-x` | 16 | The closest a modal gets to the sides. |
+| `--blanket-pad-y` | 64 | The closest a modal gets to the top and bottom. It drops to 24 under 640 tall. |
+| `--blanket-max-height-modal` | screen height less 2 × pad-y: 128, or 48 under 640 tall | The tallest a modal or confirm gets. Its body scrolls past it. |
+| `--grid-gutter` | 16 | The gutter between screen-grid columns. |
+| `--grid-width-column-screen` | 45.33, 66.67, 88 | One screen-grid column at 768, 1024 and 1440. |
+| `--content-max-width` | 1232 | The cap on the screen grid. |
+| `--layer-blanket`, `--layer-modal` | 500, 510 | The Blanket and the layer it holds. |
+
+## Content guidelines
+
+The Blanket holds no text of its own. The words belong to the layer it holds.
+
+| Do | Don't |
+| --- | --- |
+| Title a confirm with the question: "Discard changes?" | A second dialog that repeats the first one's title. |
+| Name the confirm's primary action for what it does: "Discard changes". | "OK" or "Yes". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -100,22 +134,12 @@ Let the Blanket place the modal. Do not detach it to move things around: the pad
 
 **`placement`** — `center` · `start` · `end`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--blanket-contained-layer` · `--blanket-pad-x` · `--blanket-pad-y` · `--ds-blanket` · `--layer-blanket` · `--layer-modal` · `--plus-overlay-screen` · `--plus-overlay-screen-height`
 
 From `design-system/src/patterns/Blanket/Blanket.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- [Modal](?path=/docs/patterns-overlays-modal--docs) is the layer a Blanket usually holds, centered, for one task that blocks the page.
-- [Drawer](?path=/docs/patterns-overlays-drawer--docs) is the layer held at an edge, for a task that needs the page in view.
-- [Panel](?path=/docs/patterns-panel--docs) opens over a contained Blanket when its Frame is too narrow to dock it.
-- [Popups](?path=/docs/patterns-popups--docs) covers the floating layers that never take a blanket.
-- For a floating sidebar, use the [Sidebar](?path=/docs/patterns-sidebar--docs): it takes a shadow and no blanket.
-
-Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

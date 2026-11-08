@@ -28,15 +28,6 @@ stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
 `pill` (a filled, rounded selected tab); `spacing` is `default` (32px) or
 `compact` (24px).
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Use nouns that name the view: “Sessions”. | Use verbs or full sentences. |
-| Write labels in sentence case, one to two words. | Use Title Case or labels that wrap. |
-| Keep the same labels across visits. | Rename a tab to show a count or status. |
-| Order tabs by how often people open them, most used first. | Hide the most used view in the last tab. |
-
 ## Best practices
 
 ### A controlled bar needs `onSelect`, or it will never move. {#a-controlled-bar-needs-onselect-or-it-will-never-move}
@@ -107,6 +98,55 @@ Don't: Counts and status in the label.
   document sends assistive technology to nothing, which is worse than pointing
   nowhere.
 
+## Related
+
+- For navigating to a different page, use the Top bar pattern or `Breadcrumb` — tabs imply the content stays in place.
+- For more tabs than fit the width, use `Select` — the strip is `flex-wrap: wrap`, so the overflow becomes a second row of tabs rather than a scroll or an overflow menu, and the row the reader is on stops being obvious.
+- For filtering a list rather than switching between views, use `Select` or `RadioGroup` — filters combine, tabs do not.
+
+Same group: `Breadcrumb` · `Link` · `MenuGroup` · `Pagination` · `Sidebar`
+
+## Parts
+
+1. **Tab strip.** A `tablist` of buttons, aligned left, center, right or justified.
+2. **Tab.** A button whose label names a view; the selected one is marked by an underline (`default`) or a filled pill (`pill`).
+3. **Baseline.** The hairline under an underline strip that the selected bar sits on.
+4. **Panel.** The content one tab controls, shown below the strip.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Subtle ink on a clear ground. |
+| Hovered | The subtle neutral hovered fill. |
+| Pressed | The subtle neutral pressed fill. |
+| Focused | The 2px ring, 2px off the tab; no fill. |
+| Selected | Selected ink with the underline bar, or the bold fill with inverse ink in `pill`. |
+| Disabled | Disabled ink; the tab cannot be pressed or selected. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Tab height | `--item-height-md` (default), `--item-height-sm` (compact) |
+| Tab padding | `--pad-x-lg`, `--pad-x-md` |
+| Ink | `--ds-text-subtle`, selected `--ds-text-selected`, disabled `--ds-text-disabled` |
+| Baseline and bar | `--ds-border`, `--border-default`; `--ds-border-selected`, `--border-selected` |
+| Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
+| Selected pill | `--ds-background-selected-bold`, `--ds-text-inverse`; `--ds-background-selected-bold-hovered`, `--ds-background-selected-bold-pressed` |
+| Gap | `--stack-md`, pill strip `--stack-sm` |
+| Panel offset | `--section-stack-sm` |
+| Focus ring | `--ds-border-focused`, `--focus-ring-width` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Use nouns that name the view: “Sessions”. | Use verbs or full sentences. |
+| Write labels in sentence case, one to two words. | Use Title Case or labels that wrap. |
+| Keep the same labels across visits. | Rename a tab to show a count or status. |
+| Order tabs by how often people open them, most used first. | Hide the most used view in the last tab. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -129,7 +169,7 @@ Don't: Counts and status in the label.
 
 **`spacing`** — `default` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Sub-components
 
@@ -163,13 +203,5 @@ From `design-system/src/components/navigation/Tabs/Tabs.scss`. Override these th
 ## Figma
 
 - "Tabs" node 20095:11829 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For navigating to a different page, use the Top bar pattern or `Breadcrumb` — tabs imply the content stays in place.
-- For more tabs than fit the width, use `Select` — the strip is `flex-wrap: wrap`, so the overflow becomes a second row of tabs rather than a scroll or an overflow menu, and the row the reader is on stops being obvious.
-- For filtering a list rather than switching between views, use `Select` or `RadioGroup` — filters combine, tabs do not.
-
-Same group: `Breadcrumb` · `Link` · `MenuGroup` · `Pagination` · `Sidebar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

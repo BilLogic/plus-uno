@@ -34,15 +34,6 @@ detail that most people will never need to open.
 | Danger | The note explains something that failed or is blocked. |
 | Success | The note confirms an outcome. |
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Warning: say what happens if they proceed and offer an alternative. | Alarm without a next step. |
-| Error: explain the problem and give a next step. | Use technical detail or blame the person. |
-| Confirmation: confirm the outcome and get out of the way. | Add detail the person did not ask for. |
-| Keep the title concise, in sentence case. | Let the message run past five lines. |
-
 ## Best practices
 
 ### Match the tint to the meaning. {#match-the-tint-to-the-meaning}
@@ -82,6 +73,49 @@ accessible name and its tooltip. Write "Why this field is required", not
 - **Focus and dismissal follow `Popup`.** Opening moves focus into the popup;
   Escape or a click outside closes it and returns focus to the trigger.
 
+## Related
+
+- For the popup mechanics this component is built on, see `Popup`.
+- For a message that stays visible without being opened, use `SectionMessage` or `Banner`.
+
+Same group: `Banner` · `EmptyState` · `Flag` · `Modal` · `SectionMessage` · `Spotlight`
+
+## Parts
+
+1. **Trigger.** A subtle, compact icon button in the appearance color, named by `label`.
+2. **Popup.** Opens on press with a title, optional secondary line and body.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The icon in its appearance color; the popup closed. |
+| Hovered | The subtle neutral fill behind the icon button. |
+| Pressed | A stronger neutral fill. |
+| Focused | The 2px ring, 2px off the trigger, for keyboard focus only. |
+| Disabled | Not supported. |
+| Open | The Popup is shown with its own fill, shadow and radius. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Trigger icon | `--ds-icon-information`, `--ds-icon-warning`, `--ds-icon-danger`, `--ds-icon-success`, set on the icon in the jsx rather than the scss |
+| Title | `--heading-small` |
+| Secondary text | `--body-default`, `--ds-text-subtle` |
+| Spacing | `--stack-sm` |
+
+The popup surface is Popup's; see `Popup`.
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Warning: say what happens if they proceed and offer an alternative. | Alarm without a next step. |
+| Error: explain the problem and give a next step. | Use technical detail or blame the person. |
+| Confirmation: confirm the outcome and get out of the way. | Add detail the person did not ask for. |
+| Keep the title concise, in sentence case. | Let the message run past five lines. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -101,19 +135,12 @@ accessible name and its tooltip. Write "Why this field is required", not
 
 **`placement`** — `auto` · `top` · `bottom` · `left` · `right` · `top-start` · `top-end` · `bottom-start` · `bottom-end` · `right-start` · `right-end` · `left-start` · `left-end`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--body-default` · `--ds-text-subtle` · `--heading-small` · `--stack-sm`
 
 From `design-system/src/components/messaging/InlineMessage/InlineMessage.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For the popup mechanics this component is built on, see `Popup`.
-- For a message that stays visible without being opened, use `SectionMessage` or `Banner`.
-
-Same group: `Banner` · `EmptyState` · `Flag` · `Modal` · `SectionMessage` · `Spotlight`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

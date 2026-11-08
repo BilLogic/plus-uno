@@ -10,6 +10,10 @@ Also asked as: left nav, side nav.
 
 **Source:** `design-system/src/components/navigation/Sidebar/Sidebar.jsx`
 
+## Related
+
+Same group: `Breadcrumb` · `Link` · `MenuGroup` · `Pagination` · `Tabs`
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -36,11 +40,7 @@ Also asked as: left nav, side nav.
 
 **`user`** — `tutor` · `supervisor`
 
-Anything not listed is not a valid value.
-
-## Related
-
-Same group: `Breadcrumb` · `Link` · `MenuGroup` · `Pagination` · `Tabs`
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 <!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
 

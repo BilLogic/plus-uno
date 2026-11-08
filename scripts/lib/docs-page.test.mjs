@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { createPageFinder, readDocsPage, sectionText } from './docs-page.mjs';
+import { createPageFinder, exportedValue, importedConstants, literalValue, readDocsPage, sectionText } from './docs-page.mjs';
 
 const COMPONENT_PAGE = `import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import * as ModalStories from './Modal.stories.jsx';
@@ -339,4 +339,65 @@ test('a component with no page at all is null, not an error', () => {
   const find = createPageFinder(root);
   assert.equal(find({ name: 'InlineEditableTextfield', source: `${src}/components/InlineEditableTextfield/InlineEditableTextfield.jsx` }), null);
   assert.equal(find({ name: 'Nothing', source: null }), null);
+});
+
+// ── expressions ─────────────────────────────────────────────────────────────
+
+test("an expression of a string literal is its text: {' '} is a space", () => {
+  const page = readDocsPage(`## Usage\n\nUse the label and{' '}\ncaption convention{" "}here.\n`);
+  assert.equal(sectionText(page, 'Usage'), 'Use the label and\ncaption convention here.');
+});
+
+test('literalValue reads literals and refuses anything computed', () => {
+  assert.deepEqual(literalValue(`{ '6-col': [384, 512], b: "x", c: true }`), { '6-col': [384, 512], b: 'x', c: true });
+  assert.equal(literalValue('2'), 2);
+  assert.equal(literalValue('[...A, 1]'), undefined);
+  assert.equal(literalValue('makeWidths()'), undefined);
+  assert.equal(literalValue('`a${b}`'), undefined);
+});
+
+function constantsRepo() {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'docs-page-constants-'));
+  const write = (rel, text) => {
+    fs.mkdirSync(path.dirname(path.join(root, rel)), { recursive: true });
+    fs.writeFileSync(path.join(root, rel), text);
+  };
+  write('design-system/src/lib/overlay.js', 'export const MAX_STACKED = 2;\nexport const COMPUTED = [1, 2].map((n) => n);\n');
+  write('design-system/src/components/x/Widget/Widget.jsx', "export const WIDTHS = ['6-col', '8-col'];\nexport const PX = { '6-col': [384, 512] };\n");
+  write('design-system/src/components/x/Widget/index.js', "export * from './Widget';\n");
+  write('design-system/src/components/index.js', "export { default as Widget, WIDTHS, PX } from '@/components/x/Widget';\n");
+  return root;
+}
+
+const CONSTANT_PAGE = `import { Widget, WIDTHS, PX } from '@/components';
+import { MAX_STACKED, COMPUTED } from '@/lib/overlay';
+
+## Usage
+
+At most \`MAX_STACKED\`{\` (\${MAX_STACKED})\`} stack; \`WIDTHS\`{\` (\${WIDTHS.join(' · ')})\`}.
+
+| Step | Pixels |
+| --- | --- |
+| 6-col | {PX['6-col'].join(' · ')} |
+
+Dropped: {COMPUTED}{Widget}{fn()}{\`(\${MISSING})\`}.
+`;
+
+test('importedConstants follows the barrel to each literal constant a page imports, and skips a computed one', () => {
+  const root = constantsRepo();
+  const file = 'design-system/src/components/x/Widget/Widget.mdx';
+  const constants = importedConstants(root, file, CONSTANT_PAGE);
+  assert.deepEqual(Object.fromEntries(constants), { WIDTHS: ['6-col', '8-col'], PX: { '6-col': [384, 512] }, MAX_STACKED: 2 });
+  assert.equal(exportedValue(root, 'design-system/src/lib/overlay.js', 'MAX_STACKED'), 2);
+});
+
+test('an imported constant renders its value beside its name; anything else is dropped; without a root, every reference is dropped', () => {
+  const root = constantsRepo();
+  const file = 'design-system/src/components/x/Widget/Widget.mdx';
+  const usage = sectionText(readDocsPage(CONSTANT_PAGE, { root, file }), 'Usage');
+  assert.match(usage, /At most `MAX_STACKED` \(2\) stack; `WIDTHS` \(6-col · 8-col\)\./);
+  assert.match(usage, /\| 6-col \| 384 · 512 \|/);
+  assert.match(usage, /Dropped: \./);
+  const bare = sectionText(readDocsPage(CONSTANT_PAGE), 'Usage');
+  assert.match(bare, /At most `MAX_STACKED` stack; `WIDTHS`\./);
 });

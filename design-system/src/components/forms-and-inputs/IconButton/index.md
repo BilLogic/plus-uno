@@ -18,14 +18,6 @@ Also asked as: icon only button, icon action.
 
 Use an icon button when space is limited and the glyph clearly matches the action: a toolbar, a table row, a card header. Where space allows, or the action is important, use a Button with a text label.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the object acted on: "Edit page", "Delete session". | A bare verb such as "Edit", or a label that repeats the glyph: "Pencil icon". |
-| Use sentence case: "Copy link". | Title case: "Copy Link". |
-| Describe the action, not the picture. | Describe the picture: "Trash can". |
-
 ## Best practices
 
 ### Keep space between icon buttons. {#keep-space-between-icon-buttons}
@@ -83,6 +75,66 @@ Don't: The same two views as loose buttons read as unrelated actions.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
 - The glyph is decoration once the button has a name, so it is hidden from assistive technology.
 
+## Related
+
+- To act with a label, use Button.
+- To navigate with an icon, use Link icon button.
+- To dismiss a surface, use Close button.
+- To group related icon buttons, use Button group.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Container.** A square, 32 at default spacing and 24 at compact. `shape="circle"` rounds it for top navigation.
+2. **Icon.** A Font Awesome Free glyph at 16. Use an existing system glyph; do not draw custom icons.
+3. **Label.** Not drawn. It is the accessible name and the tooltip on hover and focus.
+4. **Spinner** (loading only). Replaces the icon while the button is busy.
+
+### Appearance
+
+| Appearance | When to use |
+| --- | --- |
+| Default | Most icon buttons: an action with a clear, familiar glyph. Example: Edit page. |
+| Subtle | Icon buttons in toolbars, table rows and headers where it is already clear they are interactive. Example: More actions in a row. |
+| Primary | The main action of a small area when space allows no label. Use sparingly. Example: Send comment. |
+| Discovery | The call to action for a new experience. Example: Try the new view. |
+
+### Spacing
+
+Default spacing suits most places. Use compact in table rows and inline toolbars.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Hovered | The container takes the appearance's hovered fill. |
+| Pressed | The container takes the appearance's pressed fill. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
+| Selected | The selected role fill and icon. Applies to default and subtle, and sets `aria-pressed`. |
+| Disabled | The disabled fill and icon. Avoid disabling icon buttons. |
+| Loading | A spinner replaces the icon. The container keeps its fill, blocks interaction and sets `aria-busy`. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill: default, subtle | `--ds-background-neutral-subtle`, hovered and pressed steps. Default adds a 1px `--ds-border-input` edge. |
+| Fill: primary, discovery | `--ds-background-brand-bold`, `--ds-background-discovery-bold`, each with hovered and pressed steps. |
+| Fill: selected, disabled | `--ds-background-selected` with hovered and pressed steps; `--ds-background-disabled`. |
+| Icon | `--ds-icon-subtle` (default, subtle), `--ds-icon-inverse` (primary, discovery); the selected and disabled roles. 16, `--icon-md`. |
+| Focus ring | `--ds-border-focused`, 2px, 2px offset. |
+| Size | 32: `--item-height-md`. 24: `--item-height-sm`. Square. |
+| Radius | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. Circle 50%. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the object acted on: "Edit page", "Delete session". | A bare verb such as "Edit", or a label that repeats the glyph: "Pencil icon". |
+| Use sentence case: "Copy link". | Title case: "Copy Link". |
+| Describe the action, not the picture. | Describe the picture: "Trash can". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -109,19 +161,10 @@ Don't: The same two views as loose buttons read as unrelated actions.
 
 **`shape`** — `default` · `circle`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Figma
 
 - "Icon button" node 20299:9069 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- To act with a label, use Button.
-- To navigate with an icon, use Link icon button.
-- To dismiss a surface, use Close button.
-- To group related icon buttons, use Button group.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

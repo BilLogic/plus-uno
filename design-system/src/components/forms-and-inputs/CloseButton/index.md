@@ -19,14 +19,6 @@ Modal, the end of a Section message or a Flag. For an action that
 removes one item from a set rather than closing a surface, use a plain
 `IconButton` with its own icon and label instead.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Say what closes: "Close filters", "Dismiss alert". | A bare "Close", or a label that repeats the glyph: "X icon". |
-| Use "Close" for a surface people can reopen and "Dismiss" for a message they are done with. | The same word for both, or "Cancel", which names a different action. |
-| Use sentence case. | Title case or all capitals. |
-
 ## Best practices
 
 ### Sit top-right in its container. {#sit-top-right-in-its-container}
@@ -74,6 +66,44 @@ isn't one of `CloseButton`'s props.
   colored ground — pick it when the default subtle hover would be
   invisible there.
 
+## Related
+
+- For a dismiss icon with a different meaning than "close," use `IconButton` directly.
+- For the surfaces this control typically closes, see `Modal`, `SectionMessage` and `Flag`.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Container.** A subtle Icon button, 32 at default spacing and 24 at compact.
+2. **Glyph.** The `xmark` glyph at 16, always drawn.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | No fill: the glyph alone, in either tone. |
+| Hovered | Default: the neutral subtle hovered fill. Inverse: `--ds-interaction-inverse-hovered`. |
+| Pressed | Default: the neutral subtle pressed fill. Inverse: `--ds-interaction-inverse-pressed`. |
+| Focused | A 2px ring in `--ds-border-focused`; `--ds-border-focused-inverse` for the inverse tone. |
+| Disabled | There is none. A close control is always available. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill, default tone | `--ds-background-neutral-subtle`, hovered and pressed steps. |
+| Glyph, inverse tone | `--ds-icon-inverse`; text `--ds-text-inverse`. |
+| Size | 32: `--item-height-md`. 24: `--item-height-sm`. Square. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Say what closes: "Close filters", "Dismiss alert". | A bare "Close", or a label that repeats the glyph: "X icon". |
+| Use "Close" for a surface people can reopen and "Dismiss" for a message they are done with. | The same word for both, or "Cancel", which names a different action. |
+| Use sentence case. | Title case or all capitals. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -90,19 +120,12 @@ isn't one of `CloseButton`'s props.
 
 **`spacing`** — `default` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--ds-border-focused-inverse` · `--ds-icon-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-text-inverse`
 
 From `design-system/src/components/forms-and-inputs/CloseButton/CloseButton.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For a dismiss icon with a different meaning than "close," use `IconButton` directly.
-- For the surfaces this control typically closes, see `Modal`, `SectionMessage` and `Flag`.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

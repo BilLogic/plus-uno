@@ -18,15 +18,6 @@ Also asked as: time input, clock, time field, time selector.
 
 Use a time picker for a time of day alone: a reminder time, a recurring slot's start. For a date alone, use Date picker; for a date and a time together, use Date time picker.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the time by its role: "Reminder time", "Session start". | A generic name: "Time". |
-| Say what is expected when invalid: "Enter a time such as 2:30". | "Invalid time". |
-| Show the period in the toggle, AM or PM. | Ask people to type AM or PM into the text. |
-| Use sentence case in labels and messages. | Title case: "Reminder Time". |
-
 ## Best practices
 
 ### The field always reports a 12-hour value. {#the-field-always-reports-a-12-hour-value}
@@ -68,6 +59,47 @@ Don't: The same time disabled, faded as if it did not apply.
 - **The AM/PM toggle is a real button inside a menu**, reachable and operable by keyboard like any other PLUS dropdown.
 - **An invalid typed time keeps the typed text** rather than silently reverting, so the person can see and correct what they entered.
 
+## Related
+
+- For a date alone, use Date picker.
+- For a date and a time together, use Date time picker.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Field.** A 40 box (32 at compact) on the input fill, holding the hour and minute as text.
+2. **AM/PM toggle.** A button that opens a small menu to set the period. It is a separate control from the typed text.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | `--ds-background-input` fill with a `--ds-border-input` border. |
+| Hovered | The border takes `--ds-border-focused`. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the box. |
+| Invalid | The border takes `--ds-border-danger`. |
+| Read-only | The box takes `--ds-background-neutral`. |
+| Disabled | The box fades to `--ds-opacity-disabled` and leaves the tab order. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill | `--ds-background-input`; read-only `--ds-background-neutral`. |
+| Border | `--ds-border-input`; hovered `--ds-border-focused`; invalid `--ds-border-danger`. |
+| Text | `--ds-text`; placeholder `--ds-text-subtlest`. |
+| Focus ring | `--ds-border-focused`, 2px, 2px offset. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the time by its role: "Reminder time", "Session start". | A generic name: "Time". |
+| Say what is expected when invalid: "Enter a time such as 2:30". | "Invalid time". |
+| Show the period in the toggle, AM or PM. | Ask people to type AM or PM into the text. |
+| Use sentence case in labels and messages. | Title case: "Reminder Time". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -91,7 +123,7 @@ Don't: The same time disabled, faded as if it did not apply.
 
 **`spacing`** — `default` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -102,12 +134,5 @@ From `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.scss`.
 ## Figma
 
 - "Time picker / Variant matrix" node 20009:77903 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a date alone, use Date picker.
-- For a date and a time together, use Date time picker.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -19,15 +19,6 @@ picked at a glance — a role at sign-up, a mode at the start of a flow. For a
 longer list or for actions that read better in a row, use `Button` or
 `ButtonGroup` instead; the fixed 60×60 size only suits a few options.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Use one or two words in sentence case: "Admin", "Tutor". | A sentence-length label such as "Manage account settings". |
-| Name the option, not the action: "Student". | "Click to choose student". |
-| Keep sibling labels parallel and about the same length. | One long label among short ones. |
-| Pick a glyph that matches the label. | A decorative glyph that says something different. |
-
 ## Best practices
 
 ### Use it to pick among two to four big options. {#use-it-to-pick-among-two-to-four-big-options}
@@ -68,6 +59,49 @@ reads better as a plain `Button`.
 - **The label is the accessible name.** The icon is decorative; the visible
   label beneath it is what a screen reader announces.
 
+## Related
+
+- For a single action in a row, use `Button`.
+- For a connected row of related actions, use `ButtonGroup`.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
+
+## Parts
+
+1. **Container.** One size, 64 by 64.
+2. **Icon.** A Font Awesome Free glyph, stacked above the label.
+3. **Label.** One or two words in Body/small at the medium weight.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The container takes the rest fill of its appearance. |
+| Hovered | The container takes the hovered fill of its appearance. |
+| Pressed | The container takes the pressed fill of its appearance. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
+| Selected | The selected role fill. Sets `aria-pressed`. |
+| Disabled | The disabled fill, label and icon: a change of color, not of opacity. |
+| Loading | A spinner replaces the icon and label. Blocks interaction and sets `aria-busy`. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Size | 64 by 64: `--button-vertical-size`. |
+| Padding | `--pad-y-sm` and `--pad-x-xs`. |
+| Icon-to-label gap | 4: `--inline-sm`. |
+| Label | Body/small: `--body-small`, medium weight. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Use one or two words in sentence case: "Admin", "Tutor". | A sentence-length label such as "Manage account settings". |
+| Name the option, not the action: "Student". | "Click to choose student". |
+| Keep sibling labels parallel and about the same length. | One long label among short ones. |
+| Pick a glyph that matches the label. | A decorative glyph that says something different. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -85,13 +119,6 @@ reads better as a plain `Button`.
 
 **`appearance`** — `default` · `subtle` · `primary`
 
-Anything not listed is not a valid value.
-
-## Related
-
-- For a single action in a row, use `Button`.
-- For a connected row of related actions, use `ButtonGroup`.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect`
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

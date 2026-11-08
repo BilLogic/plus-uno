@@ -701,6 +701,15 @@ export const CHECKS = [
  */
 export const EXCLUDED = [
   {
+    name: 'bench:ds-find:timing',
+    script: 'DS_BENCH_TIMING=1 node --test --test-concurrency=1 --test-name-pattern="first find on a fresh lookup" scripts/bench-ds-find.test.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    kind: 'spawn',
+    spawnReason: '`node --test`, for the same reason as test:scripts.',
+    reason: 'a wall-clock budget measures the machine inside the parallel harness, so CI runs it alone, as its own step.',
+  },
+  {
     name: 'check:harness',
     script: 'node scripts/check-harness.mjs',
     pkg: 'root',

@@ -27,13 +27,6 @@ to do but wait: a submit in flight, a panel fetching on open. It says
 | Inherit | The default. The ring takes the surrounding text color, so it matches a label, a panel or a disabled control. |
 | Invert | On a bold or colored background. |
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Say what is loading when it is not obvious: "Loading session plans". | Leave a bare "Loading" as the only thing on a page. |
-| Keep the label to a few words. | Write a sentence in the label. |
-
 ## Best practices
 
 ### Size the spinner to its container. {#size-the-spinner-to-its-container}
@@ -79,6 +72,45 @@ Don't: A loose spinner beside a button that can still be pressed.
   `prefers-reduced-motion: reduce` rather than stopping outright, so the ring
   still reads as working.
 
+## Related
+
+- For a wait whose length is known, use `ProgressBar`. A determinate bar answers "how much longer", which a spinner never can.
+- For content loading into a layout that already has a shape, use `Skeleton`: it holds the shape and does not flash. A spinner is for when there is no shape yet.
+- For a result once the wait ends, use `SectionMessage` or `Flag`.
+- For a button that is busy, set its `isLoading`; the `Button` draws its own spinner.
+- For a wait under about 300ms, show nothing. The spinner appears and vanishes as a flicker, which reads as a glitch rather than as work.
+
+Same group: `GenerativeBorder` · `ProgressBar` · `Skeleton`
+
+## Parts
+
+1. **Ring.** A circle with one side open, turning. Its stroke is an eighth of the diameter.
+2. **Label.** Visually hidden text read as a status, "Loading" unless `label` names more.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The ring turns at 0.75s. Under reduced motion it slows to 1.5s rather than stopping. |
+| Hovered | None. It is not a control. |
+| Pressed | None. |
+| Focused | None. It is not in the tab order. |
+| Disabled | None. Inside a disabled control, `inherit` takes that control's color. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Ring | `currentColor`; `--ds-icon-inverse` for `invert`. |
+| Size | `--spinner-size-sm` (16), `--spinner-size-md` (24), `--spinner-size-lg` (48), read through `--plus-spinner-size`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Say what is loading when it is not obvious: "Loading session plans". | Leave a bare "Loading" as the only thing on a page. |
+| Keep the label to a few words. | Write a sentence in the label. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -94,7 +126,7 @@ Don't: A loose spinner beside a button that can still be pressed.
 
 **`appearance`** — `inherit` · `invert`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -105,15 +137,5 @@ From `design-system/src/components/loading/Spinner/Spinner.scss`. Override these
 ## Figma
 
 - "Spinner" node 20117:5249 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a wait whose length is known, use `ProgressBar`. A determinate bar answers "how much longer", which a spinner never can.
-- For content loading into a layout that already has a shape, use `Skeleton`: it holds the shape and does not flash. A spinner is for when there is no shape yet.
-- For a result once the wait ends, use `SectionMessage` or `Flag`.
-- For a button that is busy, set its `isLoading`; the `Button` draws its own spinner.
-- For a wait under about 300ms, show nothing. The spinner appears and vanishes as a flicker, which reads as a glitch rather than as work.
-
-Same group: `GenerativeBorder` · `ProgressBar` · `Skeleton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

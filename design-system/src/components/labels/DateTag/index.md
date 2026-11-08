@@ -31,14 +31,6 @@ The app derives `appearance` from the date and a due-soon window it defines.
 | Warning | The date is near, before it turns overdue. Draws a clock. Example: "Due tomorrow". |
 | Danger | The date has passed. Draws a triangle. Example: "2 days overdue". |
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Say it in the reader's terms: "Due tomorrow", "Mar 4". | Write a timestamp: "2026-03-04T09:00". |
-| Keep one date to a tag. Use two tags for a range. | Pack a range or a time zone into one tag. |
-| Let the app turn the tag warning or danger from the date. | Pick a color for emphasis. |
-
 ## Best practices
 
 ### Reserve danger for overdue dates. {#reserve-danger-for-overdue-dates}
@@ -79,6 +71,47 @@ the tooltip holding the full date.
 - **The icon is decorative.** It is `aria-hidden`; the appearance's meaning
   lives in the text, not the icon alone.
 
+## Related
+
+- For a status or a category, use `Tag`.
+- For a numeric count, use `CountTag`.
+
+Same group: `AiLabel` · `AiMessage` · `CountTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+
+## Parts
+
+1. **Icon.** Fixed by the appearance: a calendar for neutral, a clock for warning and a triangle for danger. It is decoration; the date says the rest.
+2. **Date.** One short string, set by the app: "Due tomorrow", "Mar 4".
+3. **Outline.** A 1 inside border, so the height stays exact. A date tag has no fill.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The only state. The appearance (neutral, warning, danger) is chosen from the date and the due-soon window. |
+| Hovered, pressed | None. It is a label, not a control; the thing around it is what responds. |
+| Focused | None. It is not in the tab order. A truncated label takes focus only so a keyboard user can reach the tooltip with its full text. |
+| Disabled | None. A label is never dimmed; a disabled thing is described by the control beside it. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Height | `--label-height-md` (20), or `--item-height-md` (32) when spacious. |
+| Padding and gap | `--pad-x-xs` on the leading edge, 2 on the trailing edge and between icon and label, `--stack-sm` inside the text; spacious `--pad-x-md` with 6 behind. |
+| Corner | `--radius-md`; spacious 6. |
+| Neutral | `--ds-border` edge, `--ds-text-subtle` words. |
+| Warning | `--ds-border-warning-subtle` edge, `--ds-text-warning` words. |
+| Danger | `--ds-border-danger-subtle` edge, `--ds-text-danger` words. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Say it in the reader's terms: "Due tomorrow", "Mar 4". | Write a timestamp: "2026-03-04T09:00". |
+| Keep one date to a tag. Use two tags for a range. | Pack a range or a time zone into one tag. |
+| Let the app turn the tag warning or danger from the date. | Pick a color for emphasis. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -96,19 +129,12 @@ the tooltip holding the full date.
 
 **`spacing`** — `default` · `spacious`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--body-default` · `--body-small` · `--border-default` · `--ds-border` · `--ds-border-danger-subtle` · `--ds-border-focused` · `--ds-border-warning-subtle` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-warning` · `--focus-ring-width` · `--icon-md` · `--icon-sm` · `--image-xs` · `--pad-x-md` · `--pad-x-xs` · `--plus-date-tag-edge` · `--plus-date-tag-height` · `--plus-date-tag-icon-box` · `--plus-date-tag-max` · `--radius-h24` · `--radius-md` · `--stack-sm` · `--tag-gap` · `--tag-gap-compact` · `--tag-pad-end` · `--tag-pad-end-compact`
 
 From `design-system/src/components/labels/DateTag/DateTag.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For a status or a category, use `Tag`.
-- For a numeric count, use `CountTag`.
-
-Same group: `AiLabel` · `AiMessage` · `CountTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

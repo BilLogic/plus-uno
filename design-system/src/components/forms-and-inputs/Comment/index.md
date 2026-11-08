@@ -16,15 +16,6 @@ Comment: one entry in a threaded discussion, with slots for the author, time, co
 
 Use a comment for one entry in a threaded discussion: a note on a session, a reply in a review thread. For a single text entry with no author or thread context, use Text area.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Show the author's name as people know them: "Ari Patel". | A username or an id. |
-| Write the time as relative or dated text: "2h ago", "Oct 21". | A raw timestamp: "2026-10-21T14:03:11Z". |
-| State who can see a restricted comment: "Visible to staff only". | A lock icon with no words. |
-| Name the action in the saving text: "Saving your reply…". | A bare "Loading". |
-
 ## Best practices
 
 ### Nest replies through `nestedReplies`, not by composing comments yourself. {#nest-replies-through-nestedreplies-not-by-composing-comments-yourself}
@@ -74,6 +65,49 @@ Don't: No action named.
 - **Replies nest their headings correctly.** Because `nestedReplies` opens its own heading context, a reply thread's headings read in the right outline order rather than all landing at the same level.
 - **Restricted visibility is stated, not just implied.** `restrictedTo` renders as visible text in the header, so who can see the comment is not communicated by color or icon alone.
 
+## Related
+
+- For the person shown beside the comment, use Avatar.
+- For a single text field with no thread context, use Text area.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Avatar.** Sits beside the comment's content.
+2. **Header.** The author, the time, an edited marker and, when restricted, who the comment is visible to.
+3. **Content.** The comment body.
+4. **Actions**, or **saving text** in their place while a change is in flight.
+5. **Nested replies.** Sit below, indented, at one heading level deeper through `headingLevel`.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Saving | The actions give way to the saving text in `--ds-text-subtle`. |
+| Highlighted | The comment takes `--ds-background-selected`. |
+
+A comment has no hover, pressed, focus or disabled state of its own. The actions a caller passes in carry theirs.
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Author | Body default, semibold. |
+| Time, edited, restricted, saving | `--ds-text-subtle`, body small. |
+| Highlight fill | `--ds-background-selected`. |
+| Padding and gaps | `--space-100`, `--space-075`, `--space-050`, `--space-025`. |
+| Replies indent and rule | `--space-150`; `--ds-border`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Show the author's name as people know them: "Ari Patel". | A username or an id. |
+| Write the time as relative or dated text: "2h ago", "Oct 21". | A raw timestamp: "2026-10-21T14:03:11Z". |
+| State who can see a restricted comment: "Visible to staff only". | A lock icon with no words. |
+| Name the action in the saving text: "Saving your reply…". | A bare "Loading". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -97,7 +131,7 @@ Don't: No action named.
 
 **`headingLevel`** — `1` · `2` · `3` · `4` · `5` · `6`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -108,12 +142,5 @@ From `design-system/src/components/forms-and-inputs/Comment/Comment.scss`. Overr
 ## Figma
 
 - "Comment" node 20627:36 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For the person shown beside the comment, use Avatar.
-- For a single text field with no thread context, use Text area.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

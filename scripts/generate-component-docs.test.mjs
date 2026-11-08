@@ -139,6 +139,15 @@ test('the render carries the facts, the Usage spine, Alternatives and rules with
   assert.doesNotMatch(text, /figma\.com|Next:|#\d{2,}/);
 });
 
+test('the render follows the Usage spine, then Parts and Content guidelines, then the facts', () => {
+  const page = readDocsPage(`## Usage\n\nUse it.\n\n## Alternatives\n\n- For a notice, use \`Flag\`.\n\n## Parts\n\n1. **Box.**\n\n### States\n\n| State | What changes |\n| --- | --- |\n| Rest | Nothing. |\n\n## Best practices\n\n### Keep it short.\n\nOne line.\n\n## Content guidelines\n\nSay what happens.\n\n## Accessibility\n\nIt has a name.\n\n## Related\n\n- \`Gadget\`: use when there are two.\n`);
+  const text = renderComponent(componentFacts(FIXTURE_MANIFEST, 'Widget'), { path: 'w.mdx', page });
+  const order = [...text.matchAll(/^## (.*)$/gm)].map((m) => m[1]);
+  assert.deepEqual(order, ['Usage', 'Alternatives', 'Best practices', 'Accessibility', 'Related', 'Parts', 'Content guidelines', 'Props', 'Variants', 'Tokens touched']);
+  assert.match(text, /## Parts\n\n1\. \*\*Box\.\*\*\n\n### States\n\n\| State \| What changes \|/);
+  assert.doesNotMatch(text, /not listed is not a valid value/);
+});
+
 test('a component with no page says its guidance is unwritten, and a pattern is not its sibling', () => {
   const text = renderComponent(componentFacts(FIXTURE_MANIFEST, 'Gadget'), null);
   assert.match(text, /No authored guidance yet/);

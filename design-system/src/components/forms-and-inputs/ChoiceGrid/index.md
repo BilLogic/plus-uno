@@ -20,15 +20,6 @@ Use a choice grid when the same question is asked of several things at once: rat
 
 It is fully controlled. `values` is `{ rowId: columnId }` in `radio` mode and `{ rowId: { columnId: boolean } }` in `checkbox` mode, and the component holds no state of its own.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Write column headers as the scale: "Rarely", "Sometimes", "Often". | Bare numbers with no meaning attached. |
-| Keep row labels short and parallel; they do not wrap. | A sentence per row. |
-| Phrase the question above the grid so every row answers it. | A different question in each row. |
-| Keep column headers short and the same length. | A header the person cannot read at a glance. |
-
 ## Best practices
 
 ### `onChange` has two shapes, and only one of them is the new state. {#onchange-has-two-shapes-and-only-one-of-them-is-the-new-state}
@@ -88,6 +79,53 @@ Don't: A size 12 grid under a size 14 one.
 - **The row-header column is empty on purpose.** It carries a visually hidden "Row" so the header row is not a blank cell.
 - **On a narrow screen this is a wide table.** Put it in a horizontal scroll area rather than letting the columns crush.
 
+## Related
+
+- For one question with several answers, use Radio group.
+- For a rated answer with end labels, use Radio group with `leadingText` and `trailingText`.
+- For data being displayed rather than answered, use Table.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Column headers.** The answer scale. They name every cell in their column.
+2. **Row labels.** The subject of each row. They name every cell in their row.
+3. **Cells.** A real Radio or Checkbox, centered, with no visible label of its own.
+4. **Row-header corner.** Empty on purpose; it carries a visually hidden "Row".
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Each cell shows its Radio or Checkbox at rest, unselected. |
+| Hovered | As the Radio or Checkbox in the cell: the input hovered fill and a brand edge. |
+| Pressed | No step of its own. The hovered look holds while the pointer is down. |
+| Focused | As the control in the cell: a 2px ring in `--ds-border-focused`. |
+| Selected | As the control in the cell: the selected bold fill. |
+| Read-only | Full contrast, cells stay in the tab order with `aria-readonly`; changes are ignored. |
+| Disabled | Cells take the disabled fill and edge and leave the tab order; header text uses a solid muted token, not opacity. |
+| Invalid | Not drawn by the grid. Put the message above it and mark the question there. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Surface | `--ds-surface-container` on the table, headers, labels and cells. |
+| Padding | `--pad-y-md` and `--pad-x-md` on headers, labels and cells. |
+| Corner | `--radius-md`. |
+| Text | `--ds-text`, body default, or the label font `size` picks. |
+| Control | `--checkbox-control-size`, or `--choice-grid-control-size-10` and `-12` through `size`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Write column headers as the scale: "Rarely", "Sometimes", "Often". | Bare numbers with no meaning attached. |
+| Keep row labels short and parallel; they do not wrap. | A sentence per row. |
+| Phrase the question above the grid so every row answers it. | A different question in each row. |
+| Keep column headers short and the same length. | A header the person cannot read at a glance. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -111,7 +149,7 @@ Don't: A size 12 grid under a size 14 one.
 
 **`size`** — `12` · `14` · `16`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -122,13 +160,5 @@ From `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.scss`.
 ## Figma
 
 - "Choice Grid" node 20009:69129 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For one question with several answers, use Radio group.
-- For a rated answer with end labels, use Radio group with `leadingText` and `trailingText`.
-- For data being displayed rather than answered, use Table.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

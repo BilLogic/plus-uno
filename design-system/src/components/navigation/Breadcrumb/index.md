@@ -24,15 +24,6 @@ It takes a single `items` array, ordered root first. Each item is `{ text, href,
 onClick }`. The last item is the current page and is rendered as plain text; every
 item before it is a link.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name each level as the page is titled, in sentence case. | Abbreviate or invent a shorter name that appears nowhere else. |
-| Keep each name to a few words so the trail fits on one line. | Repeat the full page title when it runs long. |
-| End the trail on the current page. | Add a trailing link, arrow or the word “current”. |
-| Use real nouns: “Autumn 2026”, “Lessons”. | Use “here”, “back” or “click”. |
-
 ## Best practices
 
 ### The last item is always the current page, whatever you pass it. {#the-last-item-is-always-the-current-page-whatever-you-pass-it}
@@ -116,6 +107,51 @@ Don't: Names that mean nothing out of context.
 - **`id` lands on the last item.** Not on the `nav`. If you need to point a
   `aria-describedby` or a test at the trail as a whole, use `className`.
 
+## Related
+
+- For progress through a sequence of steps, use `ProgressTracker`. A breadcrumb is a position in a tree, not a position in a flow.
+- For moving between sibling views, use `Tabs`.
+- For a persistent hierarchy the user browses rather than retraces, use the Sidebar pattern.
+- When the hierarchy is one level deep, a single "Back to X" link says the same thing with less furniture.
+
+Same group: `Link` · `MenuGroup` · `Pagination` · `Sidebar` · `Tabs`
+
+## Parts
+
+1. **Landmark and list.** A `nav` named by `label` around an ordered list, one item per level, root first.
+2. **Ancestor link.** Every item before the last, in the link color; an `onClick` intercepts it for a router.
+3. **Separator.** A slash drawn between items; `separator` swaps the character.
+4. **Current page.** The last item, plain text in the subtlest ink, marked `aria-current="page"`.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Ancestors in the link color with no underline; the current page in subtlest ink. |
+| Hovered | Underline on an ancestor link; the ink stays the link color. |
+| Pressed | No change of its own. |
+| Focused | The 2px ring, 2px off the link, for keyboard focus only. |
+| Disabled | Not a state. A level the person cannot open is the current page or is left out, never a dimmed link. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Ancestor link | `--ds-link` |
+| Separator and current page | `--ds-text-subtlest` |
+| Row | `--item-height-md`, `--body-default` |
+| Gap and separator space | `--stack-md` |
+| Focus ring | `--ds-border-focused`, `--focus-ring-width` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name each level as the page is titled, in sentence case. | Abbreviate or invent a shorter name that appears nowhere else. |
+| Keep each name to a few words so the trail fits on one line. | Repeat the full page title when it runs long. |
+| End the trail on the current page. | Add a trailing link, arrow or the word “current”. |
+| Use real nouns: “Autumn 2026”, “Lessons”. | Use “here”, “back” or “click”. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -136,14 +172,5 @@ From `design-system/src/components/navigation/Breadcrumb/Breadcrumb.scss`. Overr
 ## Figma
 
 - "Breadcrumb" node 20095:11156 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For progress through a sequence of steps, use `ProgressTracker`. A breadcrumb is a position in a tree, not a position in a flow.
-- For moving between sibling views, use `Tabs`.
-- For a persistent hierarchy the user browses rather than retraces, use the Sidebar pattern.
-- When the hierarchy is one level deep, a single "Back to X" link says the same thing with less furniture.
-
-Same group: `Link` · `MenuGroup` · `Pagination` · `Sidebar` · `Tabs`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

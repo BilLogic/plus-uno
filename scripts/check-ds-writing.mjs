@@ -14,13 +14,15 @@
  *   alternatives-route  every component a route names is in the generated
  *                       components index, the existence law, so a route never
  *                       sends a reader to a component that is not there.
- *   bare-number         a number in a rule (its heading or its body) with no
- *                       constant behind it. A number shown through an MDX
+ *   bare-number         a number in a rule (its heading or its body), or in a
+ *                       Usage table row on a strict page, with no constant
+ *                       behind it. A number shown through an MDX
  *                       expression (`{MAX_STACK}`) is the constant itself and
  *                       never reaches the page model's text; a sentence that
  *                       names its constant in backticks (`MAX_STACK`) is held
  *                       by it. Code spans and value names like `6-col` are words.
  *   stale-marker        "known stale", "outdated" or `TODO` in a page's text,
+ *                       or in a markdown file under `design-system/guidelines/`,
  *                       outside code. A known gap lives in an issue; the page
  *                       states current behavior.
  *   props-parity        the stories meta's argTypes against the component's
@@ -33,12 +35,13 @@
  * blocking a merge, except `stale-marker`, which fails anywhere: a defect stated
  * as fact is the one finding with no reading in which it is right.
  *
- * THE STRICT LIST, AND ITS SWITCH. `STRICT_PAGES` names the pages held to every
- * rule. While `ENFORCE_STRICT` is false their findings are reported as warnings
- * marked `(strict)`, and `npm run check:ds-writing -- --strict` runs the check as
- * the gate will once enforced, exiting 1 on them. Flipping `ENFORCE_STRICT` to
- * true makes `check:harness` fail on a strict page's finding; a page joins the
- * list when it passes `--strict`, and the list grows from there.
+ * THE STRICT LIST, AND ITS SWITCH. `STRICT_PAGES` (`scripts/lib/ds-strict.mjs`,
+ * shared with `check:ds-vocabulary`) names the pages held to every rule, and on
+ * a strict page `bare-number` also reads the Usage tables' rows. `ENFORCE_STRICT`
+ * is true, so a strict page's finding is an error marked `(strict)` and fails
+ * `check:harness`. Set to false, the same findings report as warnings and
+ * `npm run check:ds-writing -- --strict` runs the check as the gate would. A page
+ * joins the list when it passes `--strict`, and the list grows from there.
  *
  * Usage:
  *   npm run check:ds-writing               strict pages and errors listed, other warnings
@@ -54,18 +57,16 @@ import { fileURLToPath } from 'node:url';
 
 import { byRoot, main, report } from './lib/findings.mjs';
 import { createPageFinder, readDocsPage } from './lib/docs-page.mjs';
+import { ENFORCE_STRICT, STRICT_PAGES } from './lib/ds-strict.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MANIFEST = 'design-system/agent-views/components.json';
 const INDEX = 'design-system/agent-views/components/index.md';
 const REGISTRY = 'design-system/figma/component-registry.json';
+const GUIDELINES = 'design-system/guidelines';
 const NAME = 'check:ds-writing';
 
-/** The pages held to every rule, by component name. */
-export const STRICT_PAGES = ['Modal'];
-
-/** The switch: true makes a strict page's finding fail `check:harness`. */
-export const ENFORCE_STRICT = true;
+export { ENFORCE_STRICT, STRICT_PAGES };
 
 export const RULES = ['usage-spine', 'alternatives-route', 'bare-number', 'stale-marker', 'props-parity'];
 const ALWAYS_ERROR = new Set(['stale-marker']);
@@ -147,8 +148,25 @@ function routeFindings(page, names) {
   return out;
 }
 
-function bareNumberFindings(page) {
+/** The body rows of the tables in a section's text, header and divider rows left out. */
+const tableRowsOf = (text) =>
+  withoutFences(text ?? '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l, k, all) => l.startsWith('|') && !/^\|[\s|:-]+\|$/.test(l) && !/^\|[\s|:-]+\|$/.test(all[k + 1] ?? ''));
+
+function bareNumberFindings(page, { strict = false } = {}) {
   const out = [];
+  if (strict) {
+    const usage = page.sections.find((s) => s.title.toLowerCase() === 'usage');
+    for (const row of tableRowsOf(usage?.text)) {
+      if (CONSTANT.test(row)) continue;
+      const numbers = withoutCode(row).match(NUMBER);
+      if (numbers) {
+        out.push({ rule: 'bare-number', message: `a Usage table row states ${numbers.map((n) => `"${n}"`).join(', ')} with no constant behind it: "${row}"`, anchor: row.split('|')[1]?.trim() || row });
+      }
+    }
+  }
   for (const r of page.rules) {
     for (const sentence of sentencesOf(withoutFences(`${r.sentence}\n${r.text}`))) {
       if (CONSTANT.test(sentence)) continue;
@@ -165,14 +183,30 @@ function bareNumberFindings(page) {
   return out;
 }
 
-function staleFindings(page) {
-  const text = [page.intro, ...page.sections.map((s) => `## ${s.title}\n${s.text}`)].join('\n');
+/** The stale markers in a text, outside code. */
+function staleIn(text) {
   const out = [];
   for (const line of withoutCode(text).split('\n')) {
     const marker = STALE.map((re) => line.match(re)?.[0]).find(Boolean);
     if (marker) out.push({ rule: 'stale-marker', message: `"${marker}" states a defect as fact; fix it, delete it, or file an issue: "${line.trim()}"`, anchor: line.trim() });
   }
   return out;
+}
+
+const staleFindings = (page) => staleIn([page.intro, ...page.sections.map((s) => `## ${s.title}\n${s.text}`)].join('\n'));
+
+/** Every markdown file under the design-system guidelines, repo-relative. */
+function guidelineFiles(root) {
+  const out = [];
+  const walk = (dir) => {
+    for (const e of fs.readdirSync(path.join(root, dir), { withFileTypes: true })) {
+      const rel = `${dir}/${e.name}`;
+      if (e.isDirectory()) walk(rel);
+      else if (e.name.endsWith('.md')) out.push(rel);
+    }
+  };
+  if (fs.existsSync(path.join(root, GUIDELINES))) walk(GUIDELINES);
+  return out.sort();
 }
 
 /** The meta's argTypes: `[{name, options}]`, from the first `argTypes:` object in a stories file outside a string. */
@@ -245,11 +279,11 @@ function parityFindings(props, storiesSource) {
  * `names` is the components index's names; `props` and `storiesSource` feed
  * props-parity, which is skipped without them.
  */
-export function writingFindings({ page, names, props = null, storiesSource = null }) {
+export function writingFindings({ page, names, props = null, storiesSource = null, strict = false }) {
   return [
     ...spineFindings(page),
     ...routeFindings(page, names),
-    ...bareNumberFindings(page),
+    ...bareNumberFindings(page, { strict }),
     ...staleFindings(page),
     ...parityFindings(props, storiesSource),
   ];
@@ -307,21 +341,27 @@ const inputs = byRoot((repoRoot) => {
     }
     const source = readText(repoRoot, file);
     const stories = record.source.replace(/\.[jt]sx?$/, '.stories.jsx');
+    const strict = STRICT_PAGES.includes(record.name);
     const raw = writingFindings({
       page: readDocsPage(source),
       names,
       props: record.props ?? [],
       storiesSource: readText(repoRoot, stories),
+      strict,
     });
     pages.push({
       name: record.name,
       file,
       stories,
-      strict: STRICT_PAGES.includes(record.name),
+      strict,
       raw: raw.map((f) => ({ ...f, line: f.anchor === 'argTypes' ? 1 : lineOf(source, f.anchor) })),
     });
   }
-  return { pages, pageless };
+  const guidelines = guidelineFiles(repoRoot).flatMap((file) => {
+    const source = readText(repoRoot, file);
+    return staleIn(source).map((f) => ({ ...f, file, line: lineOf(source, f.anchor) }));
+  });
+  return { pages, pageless, guidelines };
 });
 
 /**
@@ -332,9 +372,10 @@ const inputs = byRoot((repoRoot) => {
  * @returns {import('./lib/findings.mjs').Finding[]}
  */
 export function run({ repoRoot = REPO_ROOT, enforceStrict = ENFORCE_STRICT, all = false } = {}) {
-  const listed = [];
+  const { pages, guidelines } = inputs(repoRoot);
+  const listed = guidelines.map((f) => ({ file: f.file, line: f.line, severity: 'error', message: `[${f.rule}] ${f.message}` }));
   const rolled = new Map();
-  for (const { file, stories, strict, raw } of inputs(repoRoot).pages) {
+  for (const { file, stories, strict, raw } of pages) {
     for (const f of gradeFindings(raw, { strict, enforce: enforceStrict })) {
       if (!all && !strict && f.severity === 'warning') {
         const entry = rolled.get(f.rule) ?? { findings: 0, pages: new Set() };
@@ -373,8 +414,9 @@ export function counts({ repoRoot = REPO_ROOT } = {}) {
 }
 
 export function summary({ repoRoot = REPO_ROOT } = {}) {
-  const { pages, pageless } = counts({ repoRoot });
-  return `${pages} component page(s) hold the Usage spine (${pageless} component(s) have no page).`;
+  const { pages, pageless } = inputs(repoRoot);
+  const whole = pages.filter(({ raw }) => !raw.some((f) => f.rule === 'usage-spine')).length;
+  return `${whole} of ${pages.length} component page(s) hold the whole Usage spine (${pageless} component(s) have no page).`;
 }
 
 export const REMEDY =

@@ -30,15 +30,6 @@ Use a button for an action on the current page: submit a form, mark attendance, 
 | Discovery | The call to action for a new experience. Example: "Try the new schedule view". |
 | AI | The one primary AI action in a region. Draws the sparkle before its label. Example: "Generate summary". |
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Use sentence case: "Add student". | Title case or all capitals: "Add Student", "ADD STUDENT". |
-| Keep the label short and free of punctuation: "Save notes". | "Save the notes for this session." |
-| Start with a verb and name what is acted on: "Confirm session time". | Vague labels such as "OK", "Yes" or "Submit". |
-| Use the same words as the heading and related text in view. | Different words for the same action within one view. |
-
 ## Best practices
 
 ### One primary action per area. {#one-primary-action-per-area}
@@ -75,6 +66,62 @@ Right-align buttons in focused tasks and modal dialogs, with the primary on the 
 - Selected is not color alone: `isSelected` sets `aria-pressed`.
 - The focus ring is 2px in `--ds-border-focused`. Never remove it.
 
+## Related
+
+- To act with an icon alone, use Icon button.
+- To navigate in the look of text, use Link button.
+- For a set of choices the user picks between, use `RadioGroup`.
+- For a menu of actions behind one trigger, use `DropdownMenu`.
+- To show that work is under way on the page rather than in the control, use `ProgressBar`.
+
+Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Container.** The pressable area, 32 high at default spacing and 24 at compact.
+2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
+3. **Label.** Body/default at the medium weight. It says what the action does.
+4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label.
+5. **Spinner** (loading only). Replaces the label and the icons while the button is busy.
+
+Most buttons need no icon. Add one where the glyph has a clear, established meaning, such as `plus` for add.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Hovered | The container takes the appearance's hovered fill. The label and icon keep their colors. |
+| Pressed | The container takes the appearance's pressed fill. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
+| Selected | The selected role fill, label and icon. Applies to default and subtle, and sets `aria-pressed`. |
+| Disabled | The disabled fill, label and icon: a change of color, not of opacity. Subtle stays transparent. |
+| Loading | A spinner replaces the label and icons. The container keeps its fill, blocks interaction and sets `aria-busy`. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill: default, subtle | `--ds-background-neutral-subtle`, hovered and pressed steps. Default adds a 1px `--ds-border-input` edge. |
+| Fill: primary, warning, danger, discovery | `--ds-background-brand-bold`, `-warning-bold`, `-danger-bold`, `-discovery-bold`, each with hovered and pressed steps. |
+| Fill: AI | `--ds-ai-background-bold`, with hovered and pressed steps. |
+| Fill: selected, disabled | `--ds-background-selected` with hovered and pressed steps; `--ds-background-disabled`. |
+| Label and icon | `--ds-text-subtle` and `--ds-icon-subtle` (default, subtle); `--ds-text-inverse` and `--ds-icon-inverse` (primary, danger, discovery, ai); `--ds-text-warning-inverse` (warning); the selected and disabled roles. |
+| Focus ring | `--ds-border-focused`, 2px, 2px offset. |
+| Height | 32: `--item-height-md`. 24: `--item-height-sm`. |
+| Padding | 12: `--pad-x-md`. Compact 8: `--pad-x-sm`. |
+| Radius | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. |
+| Icon-to-label gap | 4: `--inline-sm`. |
+| Label | Body/default at the medium weight; icons at 16 (`--icon-md`). |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Use sentence case: "Add student". | Title case or all capitals: "Add Student", "ADD STUDENT". |
+| Keep the label short and free of punctuation: "Save notes". | "Save the notes for this session." |
+| Start with a verb and name what is acted on: "Confirm session time". | Vague labels such as "OK", "Yes" or "Submit". |
+| Use the same words as the heading and related text in view. | Different words for the same action within one view. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -107,7 +154,7 @@ Right-align buttons in focused tasks and modal dialogs, with the primary on the 
 
 **`spacing`** — `default` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -118,15 +165,5 @@ From `design-system/src/components/forms-and-inputs/Button/Button.scss`. Overrid
 ## Figma
 
 - "Button" node 19946:4335 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- To act with an icon alone, use Icon button.
-- To navigate in the look of text, use Link button.
-- For a set of choices the user picks between, use `RadioGroup`.
-- For a menu of actions behind one trigger, use `DropdownMenu`.
-- To show that work is under way on the page rather than in the control, use `ProgressBar`.
-
-Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

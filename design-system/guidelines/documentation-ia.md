@@ -108,8 +108,8 @@ added. Five `##` sections carry it, in this order:
 5. **Related:** one bullet per neighbor, each with its "use when": "`SectionMessage`: use when the message stays in the page."
 
 Parts and Content guidelines sit after Usage. Each section states current
-behavior; a known gap lives in a GitHub issue, so the page carries no "TODO",
-"outdated" or "known stale" line.
+behavior; a known gap lives in a GitHub issue, so the page carries no `TODO`,
+`outdated` or `known stale` line.
 
 `npm run check:ds-writing` holds every component page to this shape, and
 `scripts/check-ds-writing.mjs` keeps each rule's reason. It warns on every page,

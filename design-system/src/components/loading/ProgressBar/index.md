@@ -28,13 +28,6 @@ a short wait with no task to track, use a `Spinner`.
 | Success | Marks completion. Show a finished task at 100 in success. |
 | Inverse | On a bold or colored background. |
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the bar for what it measures: "68% of goals met". | Leave the default "Progress" label. |
-| Use the same words in the caption and in `ariaLabel`: "68% of goals met". | Say one thing on screen and another to a screen reader. |
-
 ## Best practices
 
 ### Indeterminate when the length is unknown. {#indeterminate-when-the-length-is-unknown}
@@ -78,6 +71,45 @@ Don't: A finished task left as a brand bar.
 - **Color is not the message.** `appearance` colors the bar and says nothing
   to a screen reader; the `ariaLabel` and a caption carry the meaning.
 
+## Related
+
+- For an indeterminate wait with no track at all, use `Spinner`.
+- For the outcome when it finishes, use `Flag` or `SectionMessage`.
+- For position in a hierarchy rather than progress through a task, use `Breadcrumb`.
+
+Same group: `GenerativeBorder` · `Skeleton` · `Spinner`
+
+## Parts
+
+1. **Track.** The full-width bar the fill runs along, a pill 8 tall.
+2. **Fill.** The done part, a percent of the track. Indeterminate, it is a moving segment.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Determinate: the fill width is `value`, clamped to 0 to 100 together with `aria-valuenow`. |
+| Indeterminate | A segment slides along the track. No value is announced. Under reduced motion the segment holds still. |
+| Hovered | None. It is not a control. |
+| Pressed | None. |
+| Focused | None. It is not in the tab order. |
+| Disabled | None. A bar has no disabled state. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Track | `--ds-background-neutral`, `--progress-bar-height` tall, `--radius-full`. |
+| Fill | `--ds-background-brand-bold` through `--plus-progressbar-fill-color`; `--ds-background-success-bold` for `success`. |
+| Inverse | Track `--ds-background-inverse-subtle`, fill `--ds-background-inverse-subtle-pressed`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the bar for what it measures: "68% of goals met". | Leave the default "Progress" label. |
+| Use the same words in the caption and in `ariaLabel`: "68% of goals met". | Say one thing on screen and another to a screen reader. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -93,7 +125,7 @@ Don't: A finished task left as a brand bar.
 
 **`appearance`** — `default` · `success` · `inverse`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -105,13 +137,5 @@ From `design-system/src/components/loading/ProgressBar/ProgressBar.scss`. Overri
 
 - "Progress bar" node 20117:5127 in file zAecJNRdvJzAUOcjV32tRX
 - "_Progress Bar" node 20095:7780 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For an indeterminate wait with no track at all, use `Spinner`.
-- For the outcome when it finishes, use `Flag` or `SectionMessage`.
-- For position in a hierarchy rather than progress through a task, use `Breadcrumb`.
-
-Same group: `GenerativeBorder` · `Skeleton` · `Spinner`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

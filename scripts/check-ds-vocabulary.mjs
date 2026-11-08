@@ -19,8 +19,8 @@
  *                component's word to this term (`scripts/lib/ds-vocabulary.mjs`).
  *
  * SEVERITY. `avoid-word` warns on every page while the rollout runs, except on
- * `STRICT_PAGES`, held to it once `ENFORCE_STRICT` is on, the same list and
- * switch as `check:ds-writing`. `collision` always fails.
+ * `STRICT_PAGES`, held to it while `ENFORCE_STRICT` is on: the list and switch
+ * `check:ds-writing` reads, from `scripts/lib/ds-strict.mjs`. `collision` always fails.
  *
  * Usage:
  *   npm run check:ds-vocabulary               errors and strict pages listed, other warnings rolled up
@@ -35,6 +35,7 @@ import { fileURLToPath } from 'node:url';
 import { byRoot, main, report } from './lib/findings.mjs';
 import { createPageFinder, readDocsPage } from './lib/docs-page.mjs';
 import { DS_SECTION, componentOf, parseGlossary, vocabularyAliases } from './lib/ds-vocabulary.mjs';
+import { ENFORCE_STRICT, STRICT_PAGES } from './lib/ds-strict.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const GLOSSARY = 'GLOSSARY.md';
@@ -44,11 +45,7 @@ const REGISTRY = 'design-system/figma/component-registry.json';
 const PAGE_ROOTS = ['design-system/src/components', 'design-system/src/patterns', 'design-system/src/styles'];
 const NAME = 'check:ds-vocabulary';
 
-/** The pages held to every rule, by component name: the same list as `check:ds-writing`. */
-export const STRICT_PAGES = ['Modal'];
-
-/** The switch: true makes a strict page's finding fail `check:harness`. */
-export const ENFORCE_STRICT = true;
+export { ENFORCE_STRICT, STRICT_PAGES };
 
 export const RULES = ['avoid-word', 'collision'];
 
@@ -169,7 +166,10 @@ export function run({ repoRoot = REPO_ROOT, enforceStrict = ENFORCE_STRICT, all 
 }
 
 export function summary({ repoRoot = REPO_ROOT } = {}) {
-  return `${inputs(repoRoot).pages.length} design-system docs page(s) use the glossary's terms; no avoid-word collides with a component.`;
+  const { pages, collisionFindings } = inputs(repoRoot);
+  const clean = pages.filter(({ raw }) => !raw.length).length;
+  const collisions = collisionFindings.length ? `${collisionFindings.length} avoid-word(s) collide with a component` : 'no avoid-word collides with a component';
+  return `${clean} of ${pages.length} design-system docs page(s) use only the glossary's terms; ${collisions}.`;
 }
 
 export const REMEDY =

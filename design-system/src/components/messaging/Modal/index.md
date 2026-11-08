@@ -28,26 +28,18 @@ closes a floating Sidebar; a docked one stays.
 
 ### Width guidance
 
-`width` takes a step of `MODAL_WIDTHS`: that
+`width` takes a step of `MODAL_WIDTHS` (6-col · 8-col · 10-col): that
 many columns of the screen grid plus the modal pad.
 
-| Width | When to use |
-| --- | --- |
-| 6-col | A confirmation or a short question. 384 at 768, 512 at 1024, 640 from 1280. |
-| 8-col | A short form. 507 at 768, 677 at 1024, 848 from 1280. |
-| 10-col | A table or an editor. 629 at 768, 843 at 1024, 1056 from 1280. |
+| Width | When to use | `MODAL_WIDTH_PX` at 768 · 1024 · 1280 |
+| --- | --- | --- |
+| 6-col | A confirmation or a short question. | 384 · 512 · 640 |
+| 8-col | A short form. | 507 · 677 · 848 |
+| 10-col | A table or an editor. | 629 · 843 · 1056 |
 
 The width grows with the screen, never shrinks, and ignores the Sidebar. The
 height hugs its content up to the cap the Blanket sets
 (`--blanket-max-height-modal`); `height="fill"` sits at that cap.
-
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Title the Modal with the action or decision: "Delete account?". | Use a vague title such as "Warning". |
-| Say what happens and whether it can be undone. | Hide the consequence in the body. |
-| Label buttons with verbs that match the title: "Delete", "Cancel". | Use "Yes" and "No". |
 
 ## Alternatives
 
@@ -94,7 +86,7 @@ objects and the component renders the Button pair.
 
 The confirm view swaps the same Modal's title, body and footer, and Back returns
 to the form with what was typed. A confirm raised as a second Modal stacks over
-the first: at most `MAX_STACKED_OVERLAYS` overlays
+the first: at most `MAX_STACKED_OVERLAYS` (2) overlays
 stack, a `PatternDrawer` counted among them, and one more stays closed and calls
 its `onClose`.
 
@@ -141,6 +133,44 @@ its `onClose`.
   Blanket, no focus trap and no Escape, so a live dialog keeps the default
   `renderAs="modal"`.
 
+## Related
+
+- `PatternModal`: use when a docs page or a mockup draws the Modal shell inline, with no focus trap.
+- `Blanket`: use when a new blocking layer needs the dimmed screen under it; `Modal` brings its own.
+- `PageLayout`: use when choosing between a Modal and a focused page; its Focused frame section weighs the two.
+
+Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `SectionMessage` · `Spotlight`
+
+## Parts
+
+1. **Blanket.** Dims the page and holds focus inside.
+2. **Header.** Title, optional description, header actions and the close button.
+3. **Body.** Text or any content; scrolls when it overflows.
+4. **Footer.** Appears only when a button or `footer` is given: a secondary and a primary.
+5. **Dividers.** Optional rules under the header and over the footer.
+
+The tokens each part draws are read from `Modal.scss` and listed under Tokens
+touched in the Agent view tab.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Open, with the title naming the dialog. |
+| Hovered | The close button takes the subtle hovered step. |
+| Pressed | The close button takes the subtle pressed step. |
+| Focused | Focus moves in on open; the close button shows the focus ring. |
+| Disabled | The dialog has no disabled state; disable a footer button instead. |
+| Loading | The body shows a skeleton and sets `aria-busy`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Title the Modal with the action or decision: "Delete account?". | Use a vague title such as "Warning". |
+| Say what happens and whether it can be undone. | Hide the consequence in the body. |
+| Label buttons with verbs that match the title: "Delete", "Cancel". | Use "Yes" and "No". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -177,7 +207,7 @@ its `onClose`.
 
 **`renderAs`** — `modal` · `inline`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -188,13 +218,5 @@ From `design-system/src/components/messaging/Modal/Modal.scss`. Override these t
 ## Figma
 
 - "Modal" node 20701:48348 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- `PatternModal`: use when a docs page or a mockup draws the Modal shell inline, with no focus trap.
-- `Blanket`: use when a new blocking layer needs the dimmed screen under it; `Modal` brings its own.
-- `PageLayout`: use when choosing between a Modal and a focused page; its Focused frame section weighs the two.
-
-Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `SectionMessage` · `Spotlight`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

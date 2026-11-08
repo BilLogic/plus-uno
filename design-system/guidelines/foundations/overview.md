@@ -37,7 +37,7 @@ does with every other foundation" to live in instead.
 **8 of 14 authored, 1 partial, 5 empty.** ✕ means a named empty slot: the file
 exists, says so, and promises nothing. That is deliberate — a gap you can see
 beats a gap you discover mid-build, and it is not a stub, because there is no
-template inviting someone to fill in a heading with "TODO".
+template inviting someone to fill in a heading with `TODO`.
 
 ## Page order
 

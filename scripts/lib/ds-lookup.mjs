@@ -31,7 +31,7 @@
  * find from the same files `get` reads, so there is no second copy to drift.
  *
  * WHERE THE ANSWERS COME FROM. Names, imports, props and tokens are the facts
- * module's (`ds-facts.mjs`). Usage, examples and accessibility are the
+ * module's (`ds-facts.mjs`). Usage, best practices and accessibility are the
  * component's authored Storybook page, found and read through the page model
  * (`docs-page.mjs`: the page its stories' meta names, as text with no JSX); the
  * Figma mapping is `design-system/figma/component-registry.json`; guidelines
@@ -54,7 +54,7 @@ import { createPageFinder, pageText, readDocsPage, sectionText } from './docs-pa
 import { FIND_TUNING, STOPWORDS, createRanker } from './ds-rank.mjs';
 import { readIconLists } from './icon-lists.mjs';
 import { RULES, RULES_DOC, docLink, escapesIn } from './ds-usage.mjs';
-import { SECTION_TITLES, componentFacts, docPathOf, renderComponent, sectionsOf } from './component-render.mjs';
+import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, renderComponent, sectionsOf } from './component-render.mjs';
 
 export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check'];
 
@@ -65,7 +65,7 @@ Barrels (import only from these):
 - ${BARRELS[0]}: the components (Button, TextField, SectionMessage...)
 - ${BARRELS[2]}: PageLayout, which every full page starts from
 
-Order: ds_find (what exists for the task) → ds_get (props, usage, examples, a11y, figma) → ds_tokens (steps for a role) → ds_guide (layout, content, a rule) → write → ds_check (findings to zero).
+Order: ds_find (what exists for the task) → ds_get (props, usage, practices, a11y, figma) → ds_tokens (steps for a role) → ds_guide (layout, content, a rule) → write → ds_check (findings to zero).
 
 Hard rules:
 - Patterns first, then components; build new interactive behavior on @base-ui/react styled with tokens.
@@ -135,7 +135,7 @@ export function speaksTokens(query) {
   const ql = String(query ?? '').trim().toLowerCase();
   return ql.startsWith('--') || (ql.match(/[a-z0-9]+/g) ?? []).some((w) => TOKEN_WORDS.has(w));
 }
-const SECTIONS = ['props', 'usage', 'examples', 'a11y', 'figma'];
+const SECTIONS = ['props', 'usage', 'practices', 'a11y', 'figma'];
 /** A page section as `get` prints it: its heading, then its text. */
 const headed = (page, title) => {
   const text = sectionText(page, title);
@@ -198,7 +198,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   const pageOf = (name, source) => {
     if (!pages.has(name)) {
       const rel = findPage({ name, source });
-      pages.set(name, rel ? { path: rel, page: readDocsPage(fs.readFileSync(path.join(root, rel), 'utf8')) } : null);
+      pages.set(name, rel ? { path: rel, page: readDocsPage(fs.readFileSync(path.join(root, rel), 'utf8'), { root, file: rel }) } : null);
     }
     return pages.get(name);
   };
@@ -515,7 +515,8 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     return record;
   }
 
-  function get(names, section) {
+  function get(names, asked) {
+    const section = SECTION_ALIASES[asked] ?? asked;
     const list = (Array.isArray(names) ? names : [names]).flatMap((n) => String(n).split(',')).map((n) => n.trim()).filter(Boolean);
     if (section && !SECTIONS.includes(section)) {
       return { section, records: [], next: `No section "${section}". Sections: ${SECTIONS.join(', ')}; or leave it out for all of them.` };
@@ -567,7 +568,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   /** A topic file's text: a guideline as written, a foundation page as its page model's markdown. */
   const topicText = (rel) => {
     const source = fs.readFileSync(path.join(root, rel), 'utf8');
-    return rel.endsWith('.mdx') ? pageText(readDocsPage(source, { kind: 'foundation' })) : source.trim();
+    return rel.endsWith('.mdx') ? pageText(readDocsPage(source, { kind: 'foundation', root, file: rel })) : source.trim();
   };
 
   function guide(arg) {
@@ -667,7 +668,7 @@ function renderGet(r) {
         out.push(`- ${p.name}${p.required ? ' (required)' : ''}: ${p.type ?? '?'}${values}${def}${dep}${p.description ? `. ${p.description}` : ''}`);
       }
     }
-    for (const s of ['usage', 'examples', 'a11y']) if (s in x) out.push('', x[s] ?? `## ${s}\nNone authored${x.docs ? ` in ${x.docs}` : ''}.`);
+    for (const s of ['usage', 'practices', 'a11y']) if (s in x) out.push('', x[s] ?? `## ${s}\nNone authored${x.docs ? ` in ${x.docs}` : ''}.`);
     if ('figma' in x) {
       out.push('', '## Figma');
       if (!x.figma) out.push('No Figma mapping in design-system/figma/component-registry.json.');

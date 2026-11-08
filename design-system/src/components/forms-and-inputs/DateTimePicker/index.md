@@ -18,15 +18,6 @@ Also asked as: date and time, schedule.
 
 Use a date time picker when a date and a time are one answer: a session's start, a deadline. For a date with no time, use Date picker alone; for a time with no date, use Time picker alone.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Label the moment by its role: "Session start", "Deadline". | A label for each half: "Date and time". |
-| Say what to fix: "Choose a start date and time." | "Invalid". |
-| Keep the placeholders as formats: MM/DD/YY and __ : __. | Instructions in the placeholders. |
-| Name the other person in the time-zone caption: "the student". | A time with no name: "also 1:00 PM". |
-
 ## Best practices
 
 ### `onChange` reports the date, the time and the combined moment. {#onchange-reports-the-date-the-time-and-the-combined-moment}
@@ -85,6 +76,51 @@ Don't: A bare 'Invalid' does not say what to change.
 - **Validation and the time-zone caption are both wired through `aria-describedby`**, composed with anything already passed in rather than overwriting it.
 - **`isLabelHidden` never removes the accessible name**, only its visible text.
 
+## Related
+
+- For a date with no time, use Date picker.
+- For a time with no date, use Time picker.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Label.** Names the whole group. `isLabelHidden` hides it visually and keeps the name.
+2. **Section labels** (optional). "Date" and "Time" captions above each field.
+3. **Date field.** The Date picker, on its own calendar.
+4. **Time field.** The Time picker, with its AM/PM toggle.
+5. **Caption.** One line under the pair: the validation message, or the viewer's time zone and the other person's time.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | `--ds-background-input` fill with a `--ds-border-input` border. |
+| Hovered | The hovered half's border takes `--ds-border-focused`. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the focused half. |
+| Invalid | Both borders take `--ds-border-danger`; the caption shows the error message. |
+| Valid | Both borders take `--ds-border-success`; the caption shows the success message. |
+| Read-only | Both boxes take `--ds-background-neutral`. |
+| Disabled | Both boxes fade to `--ds-opacity-disabled` and leave the tab order. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Fill | `--ds-background-input`; read-only `--ds-background-neutral`. |
+| Border | `--ds-border-input`; hovered `--ds-border-focused`; invalid `--ds-border-danger`; valid `--ds-border-success`. |
+| Caption | `--ds-text-subtle`; error `--ds-text-danger`. |
+| Focus ring | `--ds-border-focused`, 2px, 2px offset. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Label the moment by its role: "Session start", "Deadline". | A label for each half: "Date and time". |
+| Say what to fix: "Choose a start date and time." | "Invalid". |
+| Keep the placeholders as formats: MM/DD/YY and __ : __. | Instructions in the placeholders. |
+| Name the other person in the time-zone caption: "the student". | A time with no name: "also 1:00 PM". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -126,7 +162,7 @@ Don't: A bare 'Invalid' does not say what to change.
 
 **`calendarAlign`** — `left` · `center` · `right`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -137,12 +173,5 @@ From `design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicke
 ## Figma
 
 - "Date time picker" node 20067:8922 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a date with no time, use Date picker.
-- For a time with no date, use Time picker.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

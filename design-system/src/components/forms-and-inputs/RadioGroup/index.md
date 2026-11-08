@@ -20,16 +20,6 @@ Use a radio group for one question with mutually exclusive answers, visible all 
 
 The group owns the legend, the value and the error, so each option stays a plain radio.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Write the legend as the question: "Did the session happen?" | A label for the field: "Session status". |
-| Keep option labels short, parallel and in sentence case. | Mix one word with a full clause, or end labels with periods. |
-| Order options from most to least likely, or from least to most risk. | Alphabetical order. |
-| Label the ends of a scale: "Not at all" and "Very". | Leave a 1 to 5 scale unlabeled. |
-| Say what to do in the error: "Choose an answer." | "Required" or "Invalid". |
-
 ## Best practices
 
 ### Name the question with a group label. {#name-the-question-with-a-group-label}
@@ -84,6 +74,54 @@ When choosing one option should show an extra field, such as "Other, please spec
 - **A caller's own `aria-label` or `aria-labelledby` wins over the legend**, for the rare case where the question is named another way.
 - **One error, announced once.** `error` renders a single message tied to the group via `aria-describedby`, rather than repeating it per option.
 
+## Related
+
+- For a single radio outside a group, use Radio.
+- For a long list of options, use Select.
+- For independent choices instead of one answer among several, use Checkbox.
+- For the legend-and-fields shell this builds on, see Fieldset.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Legend.** The question. It names the group and carries the required marker.
+2. **Options.** Radios in a stacked or inline set. Each has a label and an optional description.
+3. **Scale ends.** Optional `leadingText` and `trailingText` either side of the options.
+4. **Reveal.** Optional content under an option, shown only while that option is chosen.
+5. **Error.** One message under the group, tied to it with `aria-describedby`.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Hovered | As Radio. Unselected: `--ds-background-input-hovered` with a `--ds-border-brand` edge. Selected: the hovered step of the selected bold fill. |
+| Selected | As Radio: `--ds-background-selected-bold` fill and `--ds-border-selected` edge. |
+| Pressed | No step of its own. The hovered look holds while the pointer is down. |
+| Focused | A 2px ring in `--ds-border-focused` on the one tab stop. |
+| Invalid | Every unselected option takes `--ds-border-danger`, with one message for the group. |
+| Read-only | Full contrast, focusable, `aria-readonly` on the group; the answer does not change. |
+| Disabled | Every option takes the disabled fill and edge and leaves the tab order. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Options gap | Stacked `--stack-md`; inline column gap `--space-0625`. |
+| Radio size | `--radio-control-size`, or `--radio-control-size-10` and `-14` through `size`. |
+| Scale ends | `--ds-text`, body default; gap `--space-0625`. |
+| Reveal indent | The radio width plus `--stack-md`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Write the legend as the question: "Did the session happen?" | A label for the field: "Session status". |
+| Keep option labels short, parallel and in sentence case. | Mix one word with a full clause, or end labels with periods. |
+| Order options from most to least likely, or from least to most risk. | Alphabetical order. |
+| Label the ends of a scale: "Not at all" and "Very". | Leave a 1 to 5 scale unlabeled. |
+| Say what to do in the error: "Choose an answer." | "Required" or "Invalid". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -116,21 +154,12 @@ When choosing one option should show an extra field, such as "Other, please spec
 
 **`size`** — `10` · `12` · `14`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--body-default` · `--ds-text` · `--radio-control-size` · `--radio-control-size-10` · `--radio-control-size-14` · `--space-0625` · `--stack-md`
 
 From `design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For a single radio outside a group, use Radio.
-- For a long list of options, use Select.
-- For independent choices instead of one answer among several, use Checkbox.
-- For the legend-and-fields shell this builds on, see Fieldset.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

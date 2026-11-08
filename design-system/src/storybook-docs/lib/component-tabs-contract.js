@@ -36,10 +36,10 @@ export const TAB_IDS = {
  * and the `types.TAB` registrations were deleted with the move — so this is
  * now the only declaration of the tab shape, consumed by `../docs-tabs.jsx`.
  *
- * `title` is the DEFAULT label. A page may rename its first tab, which is how
- * Atlassian's own token page reads "All tokens" where Button reads "Examples".
- * Only the first tab is renameable: Code, Usage and Agent view mean the same
- * thing everywhere.
+ * `title` is the DEFAULT label. A page may rename its first tab when its first
+ * face is not examples, as a token page's would read "All tokens" where Button
+ * reads "Examples". Only the first tab is renameable: Code, Usage and Agent view
+ * mean the same thing everywhere.
  *
  * `id` is `null` for Examples because Examples is the default tab and carries no
  * query param — matching the URLs the addon tabs produced, where
@@ -54,8 +54,8 @@ export const TABS = [
 
 /**
  * The docs pages that get a tab strip: every component, and any page named
- * here BY NAME. Foundations pages sit on the Foundation template with no tabs
- * (Atlassian's own foundation pages have none), so the list is empty; adding a
+ * here BY NAME. Foundations pages sit on the Foundation template, one reading
+ * page with no faces to switch between, so the list is empty; adding a
  * page has to be a deliberate edit, not a heuristic that quietly widens.
  *
  * A rule is what the alternative would have to be, and there is none available:
@@ -236,6 +236,13 @@ export function reportProblemUrl(name, path) {
 const RULE_ID = /^(#{1,6} .*?)[ \t]*\{#([a-z0-9-]+)\}[ \t]*$/gm;
 
 /**
+ * The class of the id label `agentViewMarkdown` draws and `agentViewSlug` reads
+ * back. `.storybook/storybook-overrides.css` styles it under the same name.
+ */
+export const RULE_ID_CLASS = 'sb-ds-agent-view__rule-id';
+const RULE_ID_LABEL = new RegExp(`class="${RULE_ID_CLASS}">#([a-z0-9-]+)<`);
+
+/**
  * The generated file prepared for the rendered Agent view: each rule heading's
  * `{#rule-id}` becomes a quiet id label under the heading text, so the reader
  * sees the rule id agents cite without the literal braces. The raw view and
@@ -245,7 +252,7 @@ const RULE_ID = /^(#{1,6} .*?)[ \t]*\{#([a-z0-9-]+)\}[ \t]*$/gm;
  * @returns {string}
  */
 export function agentViewMarkdown(text) {
-  return String(text).replace(RULE_ID, '$1 <span class="sb-ds-agent-view__rule-id">#$2</span>');
+  return String(text).replace(RULE_ID, `$1 <span class="${RULE_ID_CLASS}">#$2</span>`);
 }
 
 /**
@@ -257,6 +264,6 @@ export function agentViewMarkdown(text) {
  * @returns {string}
  */
 export function agentViewSlug(heading, fallback) {
-  const id = String(heading).match(/class="sb-ds-agent-view__rule-id">#([a-z0-9-]+)</);
+  const id = String(heading).match(RULE_ID_LABEL);
   return id ? id[1] : fallback(heading);
 }

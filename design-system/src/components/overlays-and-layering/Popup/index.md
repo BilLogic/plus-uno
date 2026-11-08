@@ -30,15 +30,6 @@ heading.xsmall over the body, and no arrow. `width` picks the tier, `sm` 320
 (the default), `md` 400 or `lg` 480. It opens 4 from its trigger and never
 comes nearer than 8 to the screen's edge.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Title it with a short noun phrase: "Session 12". | Title it with a sentence or a question. |
-| Write the body in one or two sentences, or a short list. | Write a paragraph or put a form in the body. |
-| Name the trigger for what it opens: "What is this?". | Name the trigger "Click here" or "More". |
-| Keep the popup to supporting detail. | Put the only copy of something the user needs in it. |
-
 ## Best practices
 
 ### Dismissal is on by default, except when you own the state. {#dismissal-is-on-by-default-except-when-you-own-the-state}
@@ -110,6 +101,52 @@ Don't: Says nothing about what opens, and reads as nothing in a list of links.
 - **Do not put required content in one.** Anything the user must read to finish
   the task belongs on the page. A popup is an aside.
 
+## Related
+
+- For one line of help on a control, use `Tooltip`.
+- For a decision that must be made before continuing, use `Modal`.
+- For detail that belongs with the content rather than over it, use `Accordion`.
+
+Same group: `Tooltip`
+
+## Parts
+
+1. **Trigger.** The control the popup hangs off. A string becomes a real button.
+2. **Surface.** One fill, padded, with no arrow and no border of its own.
+3. **Title.** Optional, heading.xsmall. It also names the popup.
+4. **Body.** Text or a short list, body 14/20.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Closed | Only the trigger shows. |
+| Open | The surface sits 4 from the trigger and never nearer than 8 to the screen edge. |
+| Hovered, pressed | The popup does not react; the trigger keeps its own states. |
+| Focused | The trigger shows the 2px ring. Opened by a click or a key, the popup takes focus: its first focusable element, or the popup itself. |
+| Disabled | A popup has no disabled state. |
+| Dismissed | A click away or Escape closes it, except with the manual trigger type. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Surface | `--ds-surface-overlay`, `--ds-shadow-overlay` |
+| Radius, padding | `--popover-radius`, `--popover-pad` |
+| Width | `--popover-width-sm`, `--popover-width-md`, `--popover-width-lg` |
+| Gap between title and body | `--stack-md` |
+| Title, body | `--ds-text`, `--heading-xsmall`, `--body-default` |
+| Offset from the trigger | `--popover-offset` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Title it with a short noun phrase: "Session 12". | Title it with a sentence or a question. |
+| Write the body in one or two sentences, or a short list. | Write a paragraph or put a form in the body. |
+| Name the trigger for what it opens: "What is this?". | Name the trigger "Click here" or "More". |
+| Keep the popup to supporting detail. | Put the only copy of something the user needs in it. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -136,7 +173,7 @@ Don't: Says nothing about what opens, and reads as nothing in a list of links.
 
 **`width`** — `sm` · `md` · `lg`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -147,13 +184,5 @@ From `design-system/src/components/overlays-and-layering/Popup/Popup.scss`. Over
 ## Figma
 
 - "Popup" node 20871:3153 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For one line of help on a control, use `Tooltip`.
-- For a decision that must be made before continuing, use `Modal`.
-- For detail that belongs with the content rather than over it, use `Accordion`.
-
-Same group: `Tooltip`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

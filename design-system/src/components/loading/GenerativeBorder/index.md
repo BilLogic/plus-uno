@@ -16,12 +16,6 @@ The border that shows the AI is generating content: a 2px rounded stroke in two 
 
 Use `GenerativeBorder` only while the AI is generating into a piece of content, one ring per piece. It is never decoration, and two must not nest. For other waits, use `Spinner` or `Skeleton`.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Say what is being made beside the border: "Drafting the session summary…". | Show the border with no text about what is happening. |
-
 ## Best practices
 
 ### Animate one thing at a time. {#animate-one-thing-at-a-time}
@@ -55,6 +49,46 @@ Don't: Two rings nested around the same content.
 - **`aria-busy` says content is changing.** The wrapper sets it from `isActive`; the ring itself is decorative and hidden from assistive technology.
 - **Motion respects the user.** The segments turn slowly while active and hold still under reduced motion.
 
+## Related
+
+- For the icons that start an AI action, use `AiIcon`.
+- For a general wait, use `Spinner`, `Skeleton` or `ProgressBar`.
+
+Same group: `ProgressBar` · `Skeleton` · `Spinner`
+
+## Parts
+
+1. **Content.** What is being generated into, unchanged by the border.
+2. **Ring.** A 2px stroke over the edge while `isActive`, so layout never moves.
+3. **Segments.** Four flat segments, brand and discovery alternating, turning clockwise.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Idle: no ring. `aria-busy` is false. |
+| Generating | The ring is on and turns once every 6s. `aria-busy` is true. |
+| Reduced motion | The ring stays at its still frame. |
+| Hovered | None. It is not a control. |
+| Pressed | None. |
+| Focused | None. It is not in the tab order. |
+| Disabled | None. The border has no disabled state. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Segments | `--ds-border-brand` and `--ds-border-discovery`. |
+| Stroke | `--stroke-2`, through `--generative-border-width`. |
+| Corner | `--generative-border-radius`, set to the radius token named by `radius`: `--radius-025`, `--radius-050`, `--radius-075`, `--radius-100` or `--radius-full`. |
+| Turn | `--generative-border-angle`, from a rest of `--generative-border-rest`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Say what is being made beside the border: "Drafting the session summary…". | Show the border with no text about what is happening. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -69,19 +103,12 @@ Don't: Two rings nested around the same content.
 
 **`radius`** — `radius-025` · `radius-050` · `radius-075` · `radius-100` · `radius-full`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--border-selected` · `--ds-border-brand` · `--ds-border-discovery` · `--generative-border-angle` · `--generative-border-radius` · `--generative-border-rest` · `--generative-border-width`
 
 From `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For the icons that start an AI action, use `AiIcon`.
-- For a general wait, use `Spinner`, `Skeleton` or `ProgressBar`.
-
-Same group: `ProgressBar` · `Skeleton` · `Spinner`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

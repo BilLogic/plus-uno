@@ -26,15 +26,6 @@ tab, errors in a section header, a notification on a bell.
 `spacing="compact"` (16) is for use inside a label: Status tag nests it through its
 `trailingMetric` prop, and Tag nests it on a selectable tag.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Show the bare number: 4, 12, 99+. | Add words or units to the badge: "4 unread". |
-| Put the meaning in `label`, which a screen reader reads: "4 unread messages". | Write "04" or pad with zeros. |
-| Leave a zero out. An empty tab needs no badge. | Show "0" unless the zero is the news. |
-| Give a dot a `label` that says what it marks: "New message". | Ship a dot with no name. |
-
 ## Best practices
 
 ### Keep most counts quiet. {#keep-most-counts-quiet}
@@ -81,6 +72,50 @@ A dot has no number, so `label` is its accessible name; without one it is announ
   is a solid white badge with dark text, so it clears AA on any fill, including
   a primary button.
 
+## Related
+
+- For the condition something is in, use `StatusTag`; its `trailingMetric` nests a Count tag inside it.
+- For a category, a subject or a person, use `Tag`.
+
+Same group: `AiLabel` · `AiMessage` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+
+## Parts
+
+1. **Number.** The count in the body-small size with tabular digits, hidden at 0 unless `showZero`, capped at `max` with a `+`.
+2. **Badge.** 20 tall on its own and 16 inside a label, 24 wide at minimum, with a 2 corner, so one digit is a small rectangle and more digits grow it from the trailing edge.
+3. **Dot.** Presence without a number: an 8 circle that needs a `label` for its name.
+4. **Ring.** Optional, in the surface color, for a count pinned to the corner of an icon or an avatar.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The only state. Subtle neutral by default; bold, inverse and the dot are choices of ground, not states. |
+| Hovered, pressed | None. It is a label, not a control; the thing around it is what responds. |
+| Focused | None. It is not in the tab order. |
+| Disabled | None. A label is never dimmed; a disabled thing is described by the control beside it. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Height | `--label-height-md` (20) on its own, `--label-height-sm` (16) when compact. |
+| Width and padding | `--control-sm` for the minimum, `--pad-x-xs` either side. |
+| Corner | `--radius-sm`; the dot is `--radius-full`. |
+| Subtle | `--ds-background-neutral` with `--ds-text`, and the same pair for each other appearance. |
+| Bold | `--ds-background-neutral-bold` with `--ds-text-inverse`; warning takes `--ds-text-warning-inverse`. |
+| Inverse | `--ds-surface` with `--ds-text-subtle`. |
+| Ring | `--stroke-2` in `--ds-surface`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Show the bare number: 4, 12, 99+. | Add words or units to the badge: "4 unread". |
+| Put the meaning in `label`, which a screen reader reads: "4 unread messages". | Write "04" or pad with zeros. |
+| Leave a zero out. An empty tab needs no badge. | Show "0" unless the zero is the news. |
+| Give a dot a `label` that says what it marks: "New message". | Ship a dot with no name. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -104,7 +139,7 @@ A dot has no number, so `label` is its accessible name; without one it is announ
 
 **`spacing`** — `default` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -115,12 +150,5 @@ From `design-system/src/components/labels/CountTag/CountTag.scss`. Override thes
 ## Figma
 
 - "Count tag" node 20095:199 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For the condition something is in, use `StatusTag`; its `trailingMetric` nests a Count tag inside it.
-- For a category, a subject or a person, use `Tag`.
-
-Same group: `AiLabel` · `AiMessage` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -18,16 +18,6 @@ Use Radio when the options need custom presentation, such as options listed in a
 
 Make one option the default: the safest and lowest-risk one. If a person may decline all options, add a "None" option; if the list cannot be complete, add "Other".
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Write each label as the option: "In person". | A sentence or an instruction: "Choose this if you meet in person." |
-| Use sentence case and no end punctuation. | Title case, or a period after the label. |
-| Keep labels parallel in length and form. | Mix one word with a full clause. |
-| Add "None" when a person may decline every option, "Other" when the list cannot be complete. | Force an answer that does not fit. |
-| Say what to do in an error: "Select an option". | "Required" or "Invalid". |
-
 ## Best practices
 
 ### Show one answer selected at a time. {#show-one-answer-selected-at-a-time}
@@ -78,6 +68,53 @@ For a long list, use Select. Do not write numeric options that overlap ("0-20", 
 - **Do not disable an option that must stay reachable.** Use validation, so a screen reader user hears why it cannot be chosen.
 - **Keyboard focus is a 2px ring on `border.focused`, 2px off the radio.** Arrow keys move between the radios of a group.
 
+## Related
+
+- For several answers from a list, use Checkbox.
+- For a longer list of options, use Select.
+- To turn something on or off, use Toggle.
+- For a whole group with its label, value and error, use RadioGroup.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Radio.** A 12 circle. Selected, it fills with the selected bold fill and draws an inverse dot; unselected, it is an empty circle.
+2. **Label.** 14/20 text beside the radio in a 24 row. It names the option. A required marker follows it.
+3. **Description.** Optional 12/16 text under the label that describes the option. It does not name it.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Hovered | Unselected: `--ds-background-input-hovered` with a `--ds-border-brand` edge. Selected: the hovered step of the selected bold fill. |
+| Pressed | No step of its own. The hovered look holds while the pointer is down. |
+| Focused | A 2px ring in `--ds-border-focused`, 2px off the radio, for keyboard focus only. |
+| Selected | `--ds-background-selected-bold` fill and `--ds-border-selected` edge; the dot is `--ds-icon-inverse`. |
+| Invalid | The unselected radio takes `--ds-border-danger`. A selected radio keeps its fill. |
+| Read-only | Full contrast, in the tab order, not changeable. |
+| Disabled | `--ds-background-disabled` fill, `--ds-border-disabled` edge, `--ds-icon-disabled` dot. Out of the tab order. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Circle fill and edge | `--ds-background-input` and `--ds-border-input`; selected `--ds-background-selected-bold` and `--ds-border-selected`. |
+| Circle size, edge width | `--radio-control-size` (12); `--stroke-2`. |
+| Row | `--item-height-sm` (24); gap `--space-050`. |
+| Label | `--ds-text`, body default. |
+| Card | `--radius-025`, `--stroke-1` edge in `--ds-border`, `--ds-surface` fill. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Write each label as the option: "In person". | A sentence or an instruction: "Choose this if you meet in person." |
+| Use sentence case and no end punctuation. | Title case, or a period after the label. |
+| Keep labels parallel in length and form. | Mix one word with a full clause. |
+| Add "None" when a person may decline every option, "Other" when the list cannot be complete. | Force an answer that does not fit. |
+| Say what to do in an error: "Select an option". | "Required" or "Invalid". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -107,7 +144,7 @@ For a long list, use Select. Do not write numeric options that overlap ("0-20", 
 
 **`appearance`** — `plain` · `card`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -118,14 +155,5 @@ From `design-system/src/components/forms-and-inputs/Radio/Radio.scss`. Override 
 ## Figma
 
 - "Form Radio Button" node 20328:77556 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For several answers from a list, use Checkbox.
-- For a longer list of options, use Select.
-- To turn something on or off, use Toggle.
-- For a whole group with its label, value and error, use RadioGroup.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

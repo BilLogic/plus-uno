@@ -25,14 +25,6 @@ It is uncontrolled by default: give it `defaultActiveKey` and it tracks the open
 item itself. Pass `activeKey` and `onSelect` together to control it. `alwaysOpen`
 lets more than one item stay open at once.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the section with a short noun phrase: "Session notes". | Write a sentence or a question as the header. |
-| Lead the body with the answer or the content itself. | Repeat the header as the first line of the body. |
-| Keep sibling headers parallel: all nouns, all the same case. | Mix "Goals", "How do I set goals?" and "SETTINGS". |
-
 ## Best practices
 
 ### Open one section at a time. {#open-one-section-at-a-time}
@@ -114,6 +106,51 @@ it leaves the accordion with no edge to hold it.
   behavior — the user keeps their place — but it means a tall body opened low
   in the viewport is off-screen until they scroll.
 
+## Related
+
+- For switching between alternative views of the same content, use `Tabs`. Tabs say "one of these"; an accordion says "these, some of which are open".
+- When every section has to be readable at once, use none of them and lay the sections out. Comparing two collapsed items means opening, reading, closing, opening.
+
+Same group: `Carousel` · `Footer` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
+
+## Parts
+
+1. **Trigger.** The full-width button: the section title on the left, the chevron on the right.
+2. **Chevron.** Turns up when the section is open, so the state reads without the body.
+3. **Body.** The content, shown under an open trigger.
+4. **Edge.** One border round the group, with the card corner radius on the first and last item. `flush` drops it for a divider line.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Surface ground, subtle text, chevron down. |
+| Hovered | `--ds-background-neutral-subtle-hovered`. |
+| Pressed | `--ds-background-neutral-subtle-pressed`. |
+| Focused | A 2px ring 2px off the edge; no fill change. |
+| Expanded | `--ds-background-selected`, and `--ds-background-selected-hovered` under the pointer. The chevron turns up. |
+| Disabled | The item is dimmed to `--ds-opacity-disabled`. The trigger is announced as disabled, stays in the tab order, and a press never opens it. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Trigger ground | `--ds-surface`; `--ds-background-neutral-subtle-hovered` and `-pressed` under the pointer; open, `--ds-background-selected` and `--ds-background-selected-hovered`. |
+| Trigger and chevron | `--ds-text-subtle`; title in `--heading-small`; chevron at `--icon-md`. |
+| Body | `--body-large` on `--ds-surface`, `--ds-text-subtle`, with a `--ds-border` rule above it. |
+| Edge | `--ds-border` at `--stroke-1`, corners `--card-radius-sm`. |
+| Padding | `--card-pad-default` on every side. |
+| Focus ring | `--ds-border-focused`, `--focus-ring-width` wide and offset. |
+| Disabled | `--ds-opacity-disabled`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the section with a short noun phrase: "Session notes". | Write a sentence or a question as the header. |
+| Lead the body with the answer or the content itself. | Repeat the header as the first line of the body. |
+| Keep sibling headers parallel: all nouns, all the same case. | Mix "Goals", "How do I set goals?" and "SETTINGS". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -151,12 +188,5 @@ From `design-system/src/components/layout-and-structure/Accordion/Accordion.scss
 ## Figma
 
 - "accordion" node 20095:6341 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For switching between alternative views of the same content, use `Tabs`. Tabs say "one of these"; an accordion says "these, some of which are open".
-- When every section has to be readable at once, use none of them and lay the sections out. Comparing two collapsed items means opening, reading, closing, opening.
-
-Same group: `Carousel` · `Footer` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

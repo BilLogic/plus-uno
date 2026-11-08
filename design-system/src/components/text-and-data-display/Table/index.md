@@ -17,15 +17,6 @@ Also asked as: rows and columns, grid.
 Use `StaticTable` for a grid people only read: a record, a summary, a rate
 card. A table people sort, filter, select or page is a Dynamic table.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Title the one column that names the record. | Bold several columns. |
-| Right-align numbers and keep units in the header. | Left-align numbers or repeat units in every cell. |
-| Keep a cell to one line; let long text truncate with its tooltip. | Wrap every cell. |
-| Use a dash for an empty cell. | Leave a cell blank or write "N/A". |
-
 ## Best practices
 
 ### Right-align numbers. {#right-align-numbers}
@@ -49,6 +40,55 @@ Don't: Every cell wrapped, so rows grow uneven.
 - **Rows are not controls.** Nothing in a Static table takes focus; a table people interact with is a Dynamic table.
 - **State is not color alone.** A selected row sets `aria-selected`, a disabled row `aria-disabled`.
 - **Truncated text keeps its full value.** A cell that ends in an ellipsis shows the whole text in a tooltip.
+
+## Related
+
+- For a table people sort, filter, select or page, use the Dynamic table.
+- For records that nest, use the Tree table.
+- For splitting a long result set across pages, use `Pagination`.
+- For a status or a count inside a cell, use `StatusTag` or `CountTag`.
+
+Same group: `Code` · `CodeBlock` · `Heading`
+
+## Parts
+
+1. **Head cell.** A label with an optional type icon.
+2. **Row.** Cells in a band; rest, highlighted, selected or disabled.
+3. **Cell.** Text, a number, an icon or any node, with optional secondary text and a leading slot.
+4. **Summary row.** One calculation per column, muted, with no rule under it.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Clear row; a striped table shades alternate rows. |
+| Hovered | With `hover` on: the subtle hovered ground; selected rows take the selected hovered ground. |
+| Pressed | The pressed steps of the same grounds. |
+| Focused | Not applicable; a row is not a control. |
+| Disabled | Disabled ink, no pointer events, `aria-disabled`. |
+| Invalid | A cell with `state: 'error'` takes the danger ink. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Row hovered, pressed | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
+| Selected row | `--ds-background-selected`, `--ds-background-selected-hovered`, `--ds-background-selected-pressed` |
+| Highlighted row | `--ds-background-warning-bold` washed |
+| Disabled ink | `--ds-text-disabled` |
+| Error ink | `--ds-text-danger` |
+| Hairlines | `--ds-border` |
+| Row height | `--row-height-sm`, `--row-height-md`, `--row-height-lg` |
+| Cell padding | `--table-pad-x-cell`, `--table-pad-y-cell` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Title the one column that names the record. | Bold several columns. |
+| Right-align numbers and keep units in the header. | Left-align numbers or repeat units in every cell. |
+| Keep a cell to one line; let long text truncate with its tooltip. | Wrap every cell. |
+| Use a dash for an empty cell. | Leave a cell blank or write "N/A". |
 
 ## Props
 
@@ -78,7 +118,7 @@ Don't: Every cell wrapped, so rows grow uneven.
 
 **`size`** — `32` · `40` · `48`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -89,14 +129,5 @@ From `design-system/src/components/text-and-data-display/Table/Table.scss`. Over
 ## Figma
 
 - "Static table" node 20095:12263 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a table people sort, filter, select or page, use the Dynamic table.
-- For records that nest, use the Tree table.
-- For splitting a long result set across pages, use `Pagination`.
-- For a status or a count inside a cell, use `StatusTag` or `CountTag`.
-
-Same group: `Code` · `CodeBlock` · `Heading`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

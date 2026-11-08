@@ -20,16 +20,6 @@ Use a file upload where a form needs a document from the user: a report, an avat
 
 `acceptedFormats` does two jobs from one array: it becomes the input's `accept` filter and, unless you pass your own `description`, the line of help text under the label. `onChange` is the file input's own change event, so the files are at `event.target.files`.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the file by what it is: "Session recording", "Signed form". | "Upload" or "File". |
-| Name the action on the button: "Choose a file". | "Browse" or "Click here". |
-| State the limits in the description: "PDF, up to 10 MB." | Leave the limits to the error message. |
-| Say what to do in an error: "That file is too large. Choose one under 10 MB." | "Error" or "Upload failed". |
-| Use sentence case. | Title case: "Choose A File". |
-
 ## Best practices
 
 ### State the accepted types and the size limit. {#state-the-accepted-types-and-the-size-limit}
@@ -87,6 +77,54 @@ The picker offers the listed types first and every platform lets the user overri
 - **The description and the message are both attached.** The format rules and the validation message each carry an id and the input points at both, in that order: "PDF, up to 10 MB" is heard before "that file was too large" rather than instead of it. An invalid field also carries `aria-invalid`.
 - **`isRequired` marks the label only.** The asterisk is decorative; the input carries no `required` attribute.
 
+## Related
+
+- For text the user types rather than a file they hold, use Text field or Text area.
+- For the outcome of an upload, use Section message for something the user must act on and Flag for something they only need to know.
+- For progress while the file is going up, use Progress bar.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Label.** Names the field. A required marker follows it.
+2. **Description.** Help text, by default the accepted formats.
+3. **Button.** A Button that opens the picker. Absent when read-only.
+4. **Files.** The chosen files, passed as children, below the frame.
+5. **Message.** The validation message, with an icon, under the field.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Focused | The container takes a `--ds-border-focused` edge and a 2px ring in the same color, drawn when either the input or the button has focus. On an invalid or valid field the ring stays and the status keeps the edge. |
+| Invalid | A `--ds-border-danger` edge and a `--ds-background-danger-subtler` ring; the message takes `--ds-text-danger`, and the input sets `aria-invalid`. |
+| Valid | A `--ds-border-success` edge and a `--ds-background-success-subtler` ring; the message takes `--ds-text-success`. |
+| Read-only | The container takes `--ds-background-neutral` and the button is not drawn. |
+| Disabled | The label and description take `--ds-text-subtle`; the input and button are disabled. |
+
+The button carries its own hovered and pressed steps; the container has none.
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Label, description | `--ds-text`, body default; disabled `--ds-text-subtle`. |
+| Required marker, error | `--ds-text-danger`, `--ds-icon-danger`. |
+| Success message | `--ds-text-success`, `--ds-icon-success`. |
+| Container | Padding `--pad-y-md` and `--pad-x-md`; radius `--radius-md`; gap `--stack-md`. |
+| Focus ring | `--ds-border-focused`, `--focus-ring-width`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the file by what it is: "Session recording", "Signed form". | "Upload" or "File". |
+| Name the action on the button: "Choose a file". | "Browse" or "Click here". |
+| State the limits in the description: "PDF, up to 10 MB." | Leave the limits to the error message. |
+| Say what to do in an error: "That file is too large. Choose one under 10 MB." | "Error" or "Upload failed". |
+| Use sentence case. | Title case: "Choose A File". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -113,7 +151,7 @@ The picker offers the listed types first and every platform lets the user overri
 
 **`validation`** — `none` · `invalid` · `valid`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -124,13 +162,5 @@ From `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.scss`.
 ## Figma
 
 - "File upload" node 20007:4455 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For text the user types rather than a file they hold, use Text field or Text area.
-- For the outcome of an upload, use Section message for something the user must act on and Flag for something they only need to know.
-- For progress while the file is going up, use Progress bar.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

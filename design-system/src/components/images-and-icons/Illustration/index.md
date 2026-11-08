@@ -21,13 +21,6 @@ is decoration beside words that already say what the page is about.
 Use an icon, not a character, for anything a person acts on or has to read to
 understand. Use `Tile` for a small square picture of a thing.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Title a character that stands alone with what it stands for: "Advocacy". | Title it "Illustration" or "Character", which names the picture. |
-| Leave the title off a character beside a heading that says it. | Repeat the heading in both places. |
-
 ## Best practices
 
 ### Pick a SMART character for a SMART area, and a math character for anything else. {#pick-a-smart-character-for-a-smart-area-and-a-math-character-for-anything-else}
@@ -60,6 +53,42 @@ Don't: Clipping the box cuts off the limbs.
 - **Every mode.** Bodies and line work take their colors from tokens alone, so
   a character follows Light, Dark and increased contrast with nothing to set.
 
+## Related
+
+- For a small square picture of a thing, use `Tile`.
+- For a person, use `UserAvatar`.
+
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Image` · `Object` · `Tile` · `UserAvatar`
+
+## Parts
+
+1. **Frame.** The square layout box, `size` wide and high. The limbs reach past it and are never clipped.
+2. **Body.** The textured shape, filled from a body token and masked by the stipple.
+3. **Line work.** The face, arms and legs, in one icon token.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | The only state. A character is a picture, not a control. |
+| Hovered, pressed, focused | None. Wrap the character in a button or link that carries the name and the focus. |
+| Disabled | None. Dim the control around it. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Body, SMART characters | The area's `subtle` background, such as `--ds-background-smart-advocacy-subtle`. |
+| Body, math characters | An accent `subtle` background: red, blue, green or purple. |
+| Line work | `--ds-icon-subtle` |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Title a character that stands alone with what it stands for: "Advocacy". | Title it "Illustration" or "Character", which names the picture. |
+| Leave the title off a character beside a heading that says it. | Repeat the heading in both places. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -74,7 +103,7 @@ Don't: Clipping the box cuts off the limbs.
 
 **`character`** — `mastering-content` · `advocacy` · `technology` · `relationships` · `social-emotional` · `dot` · `approximately-equal` · `root` · `all` · `pi` · `equal` · `divider`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -85,12 +114,5 @@ From `design-system/src/components/images-and-icons/Illustration/Illustration.sc
 ## Figma
 
 - "Character" node 20095:2033 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a small square picture of a thing, use `Tile`.
-- For a person, use `UserAvatar`.
-
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Image` · `Object` · `Tile` · `UserAvatar`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

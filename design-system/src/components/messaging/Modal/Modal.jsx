@@ -13,6 +13,20 @@ const SAFE_WIDTH_RE = /^(?:\d+(?:\.\d+)?(?:px|rem|%)|var\(--[a-zA-Z0-9-]+(?:\s*,
 /** The `width` steps, from the screen grid: 6 · 8 · 10 columns plus the modal pad. */
 export const MODAL_WIDTHS = ['6-col', '8-col', '10-col'];
 
+/** The screens `MODAL_WIDTH_PX` is read at: 768 and 1024, and 1280, where the grid reaches its cap and the width stops growing. */
+export const MODAL_WIDTH_SCREENS = [768, 1024, 1280];
+
+/**
+ * Each `width` step in pixels at `MODAL_WIDTH_SCREENS`, as Modal.scss computes
+ * it. The docs page shows these; scripts/frame-layer-tokens.test.mjs holds them
+ * equal to the `--modal-width-*` tokens.
+ */
+export const MODAL_WIDTH_PX = {
+    '6-col': [384, 512, 640],
+    '8-col': [507, 677, 848],
+    '10-col': [629, 843, 1056],
+};
+
 /**
  * Resolves a fixed `width` to CSS lengths, or `null` for a grid width.
  * Numbers (and numeric strings) become px; allowlisted lengths / CSS vars pass through.

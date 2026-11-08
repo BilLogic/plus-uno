@@ -25,14 +25,6 @@ compose the items yourself as `children`. `interval` is `null` by default, which
 means it does not advance on its own; `controls` and `indicators` are both on,
 and both appear only when there is more than one slide.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Give each slide one idea and a short title. | Put a paragraph on a slide that rotates away. |
-| Write alt text that says what the image shows. | Leave `alt` empty on an image that carries the point. |
-| Write a caption that adds to the image. | Repeat the title as the caption. |
-
 ## Best practices
 
 ### Show controls when there is more than one slide. {#show-controls-when-there-is-more-than-one-slide}
@@ -118,6 +110,52 @@ Don't: Two carousels stacked.
 - **Captions are a heading and a `p`.** The title is a heading one level below
   the section the carousel sits in, so it fits the page's outline.
 
+## Related
+
+- For content the user must see, take it out of the carousel and lay it out — a slide that is not on screen is a slide most people never read.
+- For stepping through a sequence with a known end, use `ProgressBar` alongside your own controls.
+- For alternative views of the same thing, use `Tabs`.
+
+Same group: `Accordion` · `Footer` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
+
+## Parts
+
+1. **Slide.** One at a time, sliding across the track.
+2. **Previous and next.** Controls over the left and right edge, each a 48 tall touch target.
+3. **Indicators.** One bar per slide at the bottom; the current slide is the selected one.
+4. **Play and pause.** Only when `interval` is set. It sits outside the track at the bottom-left, so it never scrolls away.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | Controls at 70% opacity in `--ds-text-subtle`. Indicators in `--ds-border`, the current one in `--ds-background-selected-bold`. |
+| Hovered | Controls at full opacity in `--ds-text`. |
+| Pressed | No pressed layer. The press moves to the slide. |
+| Focused | A 2px ring 2px off the control or indicator. |
+| Disabled | At the first or last slide with `wrap` off, the control is disabled and dimmed to `--ds-opacity-disabled`. With `pause="hover"`, the default, autoplay pauses while the pointer is over the carousel. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Corner | `--radius-md`. |
+| Controls | `--ds-text-subtle`, `--ds-text` on hover; icon `--icon-lg`; padding `--space-100`; touch target `--space-300`. |
+| Play and pause | `--control-md` round, `--ds-surface` ground, inset `--space-0625`. |
+| Slide content | At least `--size-1400` tall, padded `--section-pad-y-default` and `--section-pad-x-default`. |
+| Caption | Title in `--heading-medium`, text in `--body-large`, both `--ds-text-inverse` over a gradient to `--ds-background-inverse-subtle`. |
+| Indicators | `--ds-border`, `--ds-background-selected-bold` when current; `--size-750` wide, `--space-0375` tall, corner `--radius-lg`; `--stack-md` apart. |
+| Focus ring | `--ds-border-focused`, `--focus-ring-width` wide and offset. |
+| Disabled | `--ds-opacity-disabled`. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Give each slide one idea and a short title. | Put a paragraph on a slide that rotates away. |
+| Write alt text that says what the image shows. | Leave `alt` empty on an image that carries the point. |
+| Write a caption that adds to the image. | Repeat the title as the caption. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -143,7 +181,7 @@ Don't: Two carousels stacked.
 
 **`pause`** — `hover`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
@@ -154,13 +192,5 @@ From `design-system/src/components/layout-and-structure/Carousel/Carousel.scss`.
 ## Figma
 
 - "Carousel" node 20095:6756 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For content the user must see, take it out of the carousel and lay it out — a slide that is not on screen is a slide most people never read.
-- For stepping through a sequence with a known end, use `ProgressBar` alongside your own controls.
-- For alternative views of the same thing, use `Tabs`.
-
-Same group: `Accordion` · `Footer` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

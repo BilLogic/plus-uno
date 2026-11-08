@@ -44,15 +44,6 @@ Width is a step of the screen grid. It grows with the screen, never shrinks, and
 - Keep each label to one or two words on one line. At width `sm` that is about three tabs. Never wrap or scroll the strip, and never nest a second tab group in the body.
 - One footer serves every tab. Save saves them all, and switching tabs keeps what was typed.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Title a confirm with the question: "Delete this session?" | "Are you sure?" |
-| Give the consequence in one line: "This cannot be undone." | A paragraph that repeats the title. |
-| Name the primary action after the question: "Delete session". It takes the danger appearance when it destroys something. | "OK" or "Yes". |
-| Tab labels of one or two words: "Details", "Students". | Numbered labels, or labels that wrap. |
-
 ## Best practices
 
 ### At most two overlays. {#at-most-two-overlays}
@@ -98,6 +89,59 @@ Pair a control with the field it controls, and group the fields that describe on
 - The Close button's accessible name is "Close".
 - The pattern has no focus trap or Escape handling. The core Modal adds them, returns focus to the trigger on close, and closes a floating sidebar when it opens.
 
+## Related
+
+- [Blanket](?path=/docs/patterns-overlays-blanket--docs) places the Modal and carries the dimmed ground, the pads and the screen grid.
+- [Drawer](?path=/docs/patterns-overlays-drawer--docs) takes the same width steps at a screen edge, for a task that needs the page in view.
+- [Popups](?path=/docs/patterns-popups--docs) holds the floating layers that never block the page, such as a Tooltip for one line of help.
+- [Section](?path=/docs/patterns-section-section--docs) and [Card](?path=/docs/patterns-section-card--docs) hold content that belongs on the page itself.
+
+Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternSection` · `PatternSidebar` · `PatternTable`
+
+## Parts
+
+1. **Header.** The title and the Close button, which shows whenever `onClose` is set. With `tabs`, a tab group sits 8 under the title. A custom `header` replaces the title row.
+2. **Body.** A slot for text, a list, media or fields. It scrolls past the cap.
+3. **Footer** (optional). A slot for actions, right-aligned, with the primary last. Leaving out `footer` removes it.
+
+The Modal pads 16 on every side and rounds 12 at every width, and its parts stack 16 apart. The title is Heading/medium 20/24. Figma's `description?` and `actions?` have no prop in code; put a description line in the body. `column guide?` is Figma only and never ships.
+
+### States
+
+A Modal is open or closed, and loading swaps its body for a skeleton. It has no hover, pressed or disabled states of its own; those belong to the controls inside it.
+
+| State | What changes |
+| --- | --- |
+| Rest | The overlay pair: `--ds-surface-overlay` with `--ds-shadow-overlay`. |
+| Loading | A Skeleton paragraph in the body, with `aria-busy` on it. The header and footer stay. |
+| Scrolling | Once the body outgrows the cap, it scrolls and becomes a tab stop. |
+
+### Tokens
+
+| Token | Value | What it is for |
+| --- | --- | --- |
+| `--modal-pad-x-default` | 16 | Pad on every side, every size. |
+| `--modal-stack-sm` | 8 | The title row to the tab group. |
+| `--modal-stack-md` | 16 | Between the header, body and footer, and between fields in a group. |
+| `--modal-stack-lg` | 24 | Between groups of fields you place in the body. The Modal does not apply it. |
+| `--modal-inline-sm`, `-md`, `-lg` | 8, 16, 24 | Inline space in slot content. The footer spaces its buttons with `--stack-md`, 8. |
+| `--modal-body-min-height` | 80 | The least height the body draws, so a short body or the skeleton does not collapse. |
+| `--modal-radius` | 12 | Corner radius at every width. |
+| `--modal-width-sm`, `-md`, `-lg` | see Width guidance | The three width steps, per screen size. |
+| `--blanket-max-height-modal` | screen height less 2 × pad-y | The cap a hug Modal grows to and a fill Modal sits at. |
+| `--ds-surface-overlay`, `--ds-shadow-overlay` | overlay pair | The Modal's fill and elevation. |
+| `--heading-medium` | 20/24 | The title. |
+| `--ds-border`, `--border-default` | color, 1 | The divider rules. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Title a confirm with the question: "Delete this session?" | "Are you sure?" |
+| Give the consequence in one line: "This cannot be undone." | A paragraph that repeats the title. |
+| Name the primary action after the question: "Delete session". It takes the danger appearance when it destroys something. | "OK" or "Yes". |
+| Tab labels of one or two words: "Details", "Students". | Numbered labels, or labels that wrap. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -125,21 +169,12 @@ Pair a control with the field it controls, and group the fields that describe on
 
 **`height`** — `hug` · `fill`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-icon-subtle` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-medium` · `--modal-body-min-height` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--modal-stack-sm` · `--pad-x-sm` · `--radius-md` · `--space-025` · `--stack-lg` · `--stack-md`
 
 From `design-system/src/patterns/PatternModal/PatternModal.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- [Blanket](?path=/docs/patterns-overlays-blanket--docs) places the Modal and carries the dimmed ground, the pads and the screen grid.
-- [Drawer](?path=/docs/patterns-overlays-drawer--docs) takes the same width steps at a screen edge, for a task that needs the page in view.
-- [Popups](?path=/docs/patterns-popups--docs) holds the floating layers that never block the page, such as a Tooltip for one line of help.
-- [Section](?path=/docs/patterns-section-section--docs) and [Card](?path=/docs/patterns-section-card--docs) hold content that belongs on the page itself.
-
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

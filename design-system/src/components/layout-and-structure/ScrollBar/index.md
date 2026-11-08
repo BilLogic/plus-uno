@@ -23,14 +23,6 @@ the region does not draw the platform's default one.
 axis, and in that mode `maxHeight` is ignored — the width comes from the
 container.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Name the region for what is in it: "Session notes". | Leave the region unnamed. |
-| Give a horizontal region a width its content cannot fit. | Wrap content that already fits. |
-| Keep the label short and specific. | Start it with "Scrollable". |
-
 ## Best practices
 
 ### One scrollbar per region. {#one-scrollbar-per-region}
@@ -92,6 +84,48 @@ the case this handles, and that is one axis each.
 - **Do not hide the last row.** A scroll region whose content ends exactly at the
   cap looks finished. Leave the cut visible, or the user will not know to scroll.
 
+## Related
+
+- For a long list that should page rather than scroll, use `Pagination`.
+- For content the user opens rather than scrolls past, use `Accordion`.
+- For a wide data table, put the table in a horizontal `ScrollBar` rather than shrinking its columns — see `Table`.
+
+Same group: `Accordion` · `Carousel` · `Footer` · `PageHeader` · `Panel` · `VisuallyHidden`
+
+## Parts
+
+1. **Region.** The wrapper that caps the height and scrolls.
+2. **Track.** Transparent, so it never reads as a second edge.
+3. **Thumb.** The border-colored bar, darker under the pointer.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Rest | A thin thumb in the border color on a transparent track. |
+| Hovered | The thumb takes the bold border color. |
+| Pressed | No pressed layer. |
+| Focused | The region takes focus from Tab, named by `aria-label`. |
+| Disabled | A scroll region has no disabled state. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Thumb | `--ds-border`; `--ds-border-bold` on hover. |
+| Track and corner | Transparent. |
+| Width | `--space-0375`. |
+| Corner | `--radius-md`. |
+| Height cap | twice `--size-1000` by default. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Name the region for what is in it: "Session notes". | Leave the region unnamed. |
+| Give a horizontal region a width its content cannot fit. | Wrap content that already fits. |
+| Keep the label short and specific. | Start it with "Scrollable". |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -112,13 +146,5 @@ From `design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.scss
 ## Figma
 
 - "Scrollbar" node 20095:7615 in file zAecJNRdvJzAUOcjV32tRX
-
-## Related
-
-- For a long list that should page rather than scroll, use `Pagination`.
-- For content the user opens rather than scrolls past, use `Accordion`.
-- For a wide data table, put the table in a horizontal `ScrollBar` rather than shrinking its columns — see `Table`.
-
-Same group: `Accordion` · `Carousel` · `Footer` · `PageHeader` · `Panel` · `VisuallyHidden`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

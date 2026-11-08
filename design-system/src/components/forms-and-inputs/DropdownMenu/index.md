@@ -20,16 +20,6 @@ Use a dropdown menu for a trigger that opens a list of actions or navigation lin
 
 `trigger` is the element that opens it, `children` are its rows. `isOpen` and `onOpenChange` make it controlled; left uncontrolled it opens and closes on its own. `placement` and `shouldFlip` govern where it opens and whether it flips when there is no room. `spacing` is `cozy` (40 rows, the default) or `compact` (32). `loading` swaps the rows for a spinner while its options are still being fetched.
 
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Start each row with a verb: "Rename", "Archive". | A noun with no action: "Name". |
-| Use sentence case: "Open report". | Title case: "Open Report". |
-| Name the trigger for what the menu holds: "Actions", "Views". | "Menu" or "Click here". |
-| Keep section titles to one or two words: "Manage", "Go to". | Sentences as section titles. |
-| Put the most common action first. | Order rows alphabetically when use is uneven. |
-
 ## Best practices
 
 ### A row closes the menu unless it opts out. {#a-row-closes-the-menu-unless-it-opts-out}
@@ -88,6 +78,51 @@ The public Menu family has no submenu-trigger row of its own yet. Flatten the ch
 - **A disabled row is out of the tab order** and cannot be picked.
 - **Disabled is not color alone:** the row sets `aria-disabled`.
 
+## Related
+
+- For picking one value from a list, use Select.
+- For the rows themselves, outside a floating menu, use Menu group directly.
+- For a page's title row with its own actions, see Page header.
+
+Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+
+## Parts
+
+1. **Trigger.** Any element that opens the menu, usually a Button with a chevron.
+2. **Menu.** A floating list 4px from the trigger, on the raised surface.
+3. **Rows.** Button items, Link items or Custom items, 40 tall at cozy and 32 at compact.
+4. **Section title and separator** (optional). Group related rows.
+
+### States
+
+| State | What changes |
+| --- | --- |
+| Hovered row | `--ds-background-neutral-subtle-hovered`. |
+| Pressed row | `--ds-background-neutral-subtle-pressed`. |
+| Selected row | `--ds-background-selected`. |
+| Focused trigger | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
+| Disabled row | Text takes `--ds-text-disabled`; out of the tab order. |
+| Loading | A spinner replaces the rows. |
+
+### Tokens
+
+| Part | Token |
+| --- | --- |
+| Row text | `--ds-text`, body default; disabled `--ds-text-disabled`. |
+| Row icon | `--ds-icon-subtle`. |
+| Row padding, radius | `--space-0625` and `--space-150`; `--radius-050`. |
+| Focus ring | `--ds-border-focused`, 2px, 2px offset. |
+
+## Content guidelines
+
+| Do | Don't |
+| --- | --- |
+| Start each row with a verb: "Rename", "Archive". | A noun with no action: "Name". |
+| Use sentence case: "Open report". | Title case: "Open Report". |
+| Name the trigger for what the menu holds: "Actions", "Views". | "Menu" or "Click here". |
+| Keep section titles to one or two words: "Manage", "Go to". | Sentences as section titles. |
+| Put the most common action first. | Order rows alphabetically when use is uneven. |
+
 ## Props
 
 | Prop | Type | Default | Description |
@@ -114,20 +149,12 @@ The public Menu family has no submenu-trigger row of its own yet. Flatten the ch
 
 **`spacing`** — `cozy` · `compact`
 
-Anything not listed is not a valid value.
+The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 
 ## Tokens touched
 
 `--border-default` · `--ds-border` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--layer-popup` · `--popover-max-height-menu` · `--popover-max-width-menu` · `--popover-radius-menu-md` · `--space-200`
 
 From `design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss`. Override these through the token layer, never with a literal.
-
-## Related
-
-- For picking one value from a list, use Select.
-- For the rows themselves, outside a floating menu, use Menu group directly.
-- For a page's title row with its own actions, see Page header.
-
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEdit` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
