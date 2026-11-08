@@ -54,9 +54,6 @@
 }
 
 @layer components {
-  // Shared skeleton/shimmer loading style (Sidebar, prototypes)
-  @include meta.load-css("skeleton");
-
   // Components (using load path - load-path is design-system/components, so imports should be relative to that)
   // Commented lines = no matching .scss in components/ or component lives elsewhere (e.g. forms/).
   // Prototypes and any app that imports main.scss get styles only for uncommented components.
