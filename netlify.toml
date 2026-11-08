@@ -24,10 +24,35 @@
     "design-system/agent-views/tokens/tokens.md",
   ]
 
+# The hosted design-system MCP (netlify/functions/ds-mcp), served at /mcp/ds. Read-only, behind
+# DS_MCP_KEY (a Netlify environment variable). It answers from the repo files below, bundled
+# into the function, so it serves the design system this deploy's Storybook is built from.
+# These are the files the five lookup tools open at runtime (ds-mcp.test.mjs fails when one is
+# missing here). ds_check also reads every custom property declared under the three source
+# roots, hence their style and script globs.
+[functions."ds-mcp"]
+  included_files = [
+    "design-system/agent-views/**",
+    "design-system/guidelines/**",
+    "design-system/figma/component-registry.json",
+    "design-system/src/**/*.{js,jsx,tsx,scss,css,mdx}",
+    "prototypes/**/*.{js,jsx,tsx,scss,css}",
+    "src/**/*.{js,jsx,tsx,scss,css}",
+    "docs/engineering/ds-usage-rules.md",
+    "node_modules/@fortawesome/fontawesome-free/metadata/icons.json",
+  ]
+
 [build.environment]
   VITE_STORYBOOK_URL = "https://plus-uno.netlify.app/storybook/"
   # Notion Prototype Marketplace (team catalog — replaces in-app /market UI)
   VITE_NOTION_MARKETPLACE_URL = "https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f?v=397b7cca4982803893a8000c8fdd359c"
+
+# The hosted design-system MCP (must come before the SPA catch-all)
+[[redirects]]
+  from = "/mcp/ds"
+  to = "/.netlify/functions/ds-mcp"
+  status = 200
+  force = true
 
 # Landing → Storybook docs (must come before SPA catch-all)
 [[redirects]]
