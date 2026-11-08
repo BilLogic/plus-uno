@@ -3,7 +3,7 @@
 # Images and icons
 
 8 components. Each row links to the generated facts; the three columns after it are the
-authored half (#166), counted rather than assumed.
+authored half, counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|

@@ -8,7 +8,7 @@
  *   createLookup(root, {readPaths})
  *     .find(query)               entry point: patterns, components, Figma names,
  *                                not-here names, tokens and icons, ranked
- *     .get(names, section?)      full records: props, usage, examples, a11y, figma
+ *     .get(names, section?)      full records: the generated doc's text, or one section of it
  *     .tokens(role)              the steps for a role, each with its intent
  *     .guide(topic?)             a guideline, a rule's section, or the orientation
  *     .check({code, path} | {paths})   check:ds-usage, in-process
@@ -38,8 +38,11 @@
  * are the files under `design-system/guidelines/`; rule explanations are
  * `docs/engineering/ds-usage-rules.md`. Nothing here is authored content.
  *
- * Every answer carries a `next`: the tool to call after it, or instead of it
- * on a miss.
+ * A component's or pattern's `get` text is its generated doc, byte for byte:
+ * one render (`component-render.mjs`) from its manifest record and its page,
+ * and a `get` section is that text's matching `##` sections. Every other
+ * answer carries a `next`: the tool to call after it, or instead of it on a
+ * miss.
  */
 
 import fs from 'node:fs';
@@ -51,6 +54,7 @@ import { createPageFinder, readDocsPage, sectionText } from './docs-page.mjs';
 import { FIND_TUNING, STOPWORDS, createRanker } from './ds-rank.mjs';
 import { readIconLists } from './icon-lists.mjs';
 import { RULES, RULES_DOC, docLink, escapesIn } from './ds-usage.mjs';
+import { SECTION_TITLES, componentFacts, docPathOf, renderComponent, sectionsOf } from './component-render.mjs';
 
 export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check'];
 
@@ -131,8 +135,6 @@ export function speaksTokens(query) {
   return ql.startsWith('--') || (ql.match(/[a-z0-9]+/g) ?? []).some((w) => TOKEN_WORDS.has(w));
 }
 const SECTIONS = ['props', 'usage', 'examples', 'a11y', 'figma'];
-/** The page sections behind each `get` section, read through the page model (`docs-page.mjs`). */
-const PAGE_SECTIONS = { usage: ['Usage', 'Content guidelines'], examples: ['Best practices'], a11y: ['Accessibility'] };
 /** A page section as `get` prints it: its heading, then its text. */
 const headed = (page, title) => {
   const text = sectionText(page, title);
@@ -495,13 +497,19 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       why: a.why,
       use: a.replacement.map(brief),
     };
+    // The text is the generated doc's: one render (`component-render.mjs`) from the manifest record and the page.
+    const homeName = a.aliasOf ?? a.name;
+    const componentFactsOf = componentFacts(facts.manifests.components, homeName, { [homeName]: facts.lookup(homeName).aliases });
+    const text = componentFactsOf?.source ? renderComponent(componentFactsOf, docs) : null;
+    if (text) record.doc = docPathOf(componentFactsOf);
     const wanted = section ? [section] : SECTIONS;
     for (const s of wanted) {
       if (s === 'props') record.props = (a.props ?? []).map((p) => ({ name: p.name, type: p.type, values: p.values, default: p.default, required: p.required, description: p.description, deprecated: p.deprecated }));
       else if (s === 'figma') record.figma = figmaFor(a.aliasOf ?? a.name);
-      else record[s] = docs ? PAGE_SECTIONS[s].map((h) => headed(docs.page, h)).filter(Boolean).join('\n\n') || null : null;
+      else record[s] = text ? sectionsOf(text, SECTION_TITLES[s]) : null;
     }
-    record.next = 'Next: ds_tokens for the roles you style; ds_check once the code is written.';
+    if (text) record.text = section ? [`# ${a.name}`, a.import, sectionsOf(text, SECTION_TITLES[section]) ?? `## ${section}\n\nNone in the generated doc.`].join('\n\n') + '\n' : text;
+    else record.next = 'Next: ds_tokens for the roles you style; ds_check once the code is written.';
     return record;
   }
 
@@ -630,6 +638,7 @@ function renderGet(r) {
       const use = (x.use ?? x.replacement?.map((n) => ({ name: n })) ?? []).map((u) => `  use ${u.import ?? u.name}`);
       return [head, ...(x.why ? [`  why: ${x.why}`] : []), ...use, ...(x.values ? [`  values: ${x.values.join(' | ')}`] : []), ...(x.next ? [x.next] : [])].join('\n');
     }
+    if (x.text) return x.text;
     const out = [`# ${x.name} (${x.kind})`, x.import, ...(x.aliasOf ? [`Alias of ${x.aliasOf}.`] : []), ...(x.summary ? [x.summary] : []), ...(x.aliases?.length ? [`Also asked as: ${x.aliases.join(', ')}.`] : [])];
     if ('props' in x) {
       out.push('', '## Props');

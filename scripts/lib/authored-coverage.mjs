@@ -43,7 +43,12 @@ function holdsPair(text) {
 
 /** `{ whenToUse, correctIncorrect, accessibility }`, each true when the page carries it, read through the page model. */
 export function authoredCoverage(mdxSource) {
-  const { sections } = readDocsPage(mdxSource ?? '');
+  return coverageOf(readDocsPage(mdxSource ?? ''));
+}
+
+/** The same, for a page already read into the page model; null (no page) carries nothing. */
+export function coverageOf(page) {
+  const sections = page?.sections ?? [];
   const titled = sections.flatMap((s) => [s, ...s.subsections]);
   const found = {};
   for (const s of AUTHORED_SECTIONS) found[s.key] = titled.some((t) => s.match.test(t.title.trim()));

@@ -50,7 +50,8 @@ export function deprecationOf(description) {
  *
  * @typedef {{name: string, group: string, source: string, summary?: string,
  *   props: {name: string, type: string, description: string, enumValues: string[]|null}[],
- *   defaults?: Record<string,string>, descriptions?: Record<string,string>}} ParsedComponent
+ *   defaults?: Record<string,string>, descriptions?: Record<string,string>,
+ *   doc?: {implementedAs?: string, stories?: string[], tokens?: string[], subComponents?: object[]}}} ParsedComponent
  */
 export function buildComponentsManifest({ exports, components, patterns = [], parsedPatterns = [], version }) {
   const componentNames = new Set(exports);
@@ -89,6 +90,8 @@ function recordOf(name, c, kind, from) {
         deprecated: deprecationOf(p.description) || deprecationOf(description),
       };
     }),
+    // What the generated doc carries beyond props (`component-render.mjs`), present when the parse read it.
+    ...(c.doc ?? {}),
   };
 }
 

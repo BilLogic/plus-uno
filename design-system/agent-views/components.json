@@ -91,6 +91,79 @@
           "description": "HTML ID attribute",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Styles",
+        "Behavior",
+        "InteractionStates",
+        "Content",
+        "Overview",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Expanded",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-large",
+        "--border-default",
+        "--card-pad-default",
+        "--card-radius-sm",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-selected",
+        "--ds-background-selected-hovered",
+        "--ds-border",
+        "--ds-opacity-disabled",
+        "--ds-surface",
+        "--ds-text-subtle",
+        "--heading-small",
+        "--icon-md"
+      ],
+      "subComponents": [
+        {
+          "name": "Item",
+          "impl": "AccordionItem",
+          "props": [
+            {
+              "name": "eventKey",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "Unique key for this accordion item"
+            },
+            {
+              "name": "header",
+              "type": "node",
+              "required": true,
+              "default": null,
+              "description": "Header content (title text or node)"
+            },
+            {
+              "name": "children",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "Body content when expanded"
+            },
+            {
+              "name": "disabled",
+              "type": "bool",
+              "required": false,
+              "default": null,
+              "description": "Disable this item"
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "required": false,
+              "default": null,
+              "description": "Additional CSS classes"
+            }
+          ]
+        }
       ]
     },
     {
@@ -225,6 +298,49 @@
           "description": "The Page content.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Popup",
+        "PanelMode",
+        "Fullscreen",
+        "StorybookVariant",
+        "Interactive",
+        "SwitchingModes",
+        "ConversationFollowsTheMode",
+        "RemembersThePanel",
+        "RemembersFullscreenClosed",
+        "PopupIsFullScreenUnder768",
+        "PopupStaysAPopupAt768",
+        "StorybookVariantControls",
+        "AppVariantControls",
+        "ModalLeavesThePopupOpen",
+        "TrustMarks",
+        "RepliesWithSources",
+        "DocsAgent",
+        "DocsAgentFallback"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--content-max-width-reading",
+        "--ds-shadow-overlay",
+        "--ds-surface",
+        "--ds-surface-overlay",
+        "--ds-surface-sunken",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--height-2000",
+        "--height-300",
+        "--layer-dialog",
+        "--layer-navigation",
+        "--pad-x-md",
+        "--pad-y-sm",
+        "--page-pad",
+        "--popover-radius",
+        "--radius-md",
+        "--stack-md",
+        "--stack-sm"
       ]
     },
     {
@@ -292,6 +408,20 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "AllIcons",
+        "CloseUp",
+        "Labeled",
+        "Color",
+        "Interactive",
+        "Rest"
+      ],
+      "tokens": [
+        "--ds-icon",
+        "--icon-lg",
+        "--icon-md",
+        "--icon-sm"
       ]
     },
     {
@@ -390,6 +520,44 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Origins",
+        "TheMarkIsNotAControl",
+        "LowConfidenceCarriesItsAdvice",
+        "ConfidenceIsInTheName",
+        "ExplainIsARealButton",
+        "TheGlyphIsDecoration",
+        "NoBrandHueIsAssumed",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-small",
+        "--border-default",
+        "--ds-background-warning",
+        "--ds-border",
+        "--ds-border-focused",
+        "--ds-border-warning",
+        "--ds-icon-subtle",
+        "--ds-icon-success",
+        "--ds-icon-warning",
+        "--ds-surface",
+        "--ds-text",
+        "--ds-text-warning-bolder",
+        "--focus-ring-width",
+        "--icon-sm",
+        "--pad-x-sm",
+        "--plus-ai-accent",
+        "--radius-md",
+        "--space-025",
+        "--stack-md",
+        "--stack-sm",
+        "--stroke-2"
       ]
     },
     {
@@ -497,6 +665,34 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Message",
+        "Streaming",
+        "TypingIndicator",
+        "TypedOut",
+        "WithParts",
+        "Interactive",
+        "WithSources",
+        "WithFeedback"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--heading-xxsmall",
+        "--icon-md",
+        "--inline-md",
+        "--inline-sm",
+        "--motion-duration-long",
+        "--motion-duration-medium",
+        "--motion-easing-standard",
+        "--plus-ai-message-caret",
+        "--plus-ai-message-dot",
+        "--radius-full",
+        "--stack-md",
+        "--stack-sm"
       ]
     },
     {
@@ -620,6 +816,63 @@
           "description": "Extra class names added to the avatar element beside the component's own.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Initials",
+        "Sizes",
+        "DefaultSize",
+        "Shapes",
+        "Fallbacks",
+        "Colors",
+        "Status",
+        "Naming",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--avatar-font",
+        "--avatar-glyph",
+        "--avatar-size",
+        "--avatar-size-128",
+        "--avatar-size-96",
+        "--border-default",
+        "--ds-background-accent-blue-subtler",
+        "--ds-background-accent-gray-subtle",
+        "--ds-background-accent-gray-subtler",
+        "--ds-background-accent-green-subtler",
+        "--ds-background-accent-magenta-subtler",
+        "--ds-background-accent-purple-subtler",
+        "--ds-background-accent-teal-subtler",
+        "--ds-background-accent-yellow-subtler",
+        "--ds-background-danger-bold",
+        "--ds-background-neutral-bold",
+        "--ds-background-success-bold",
+        "--ds-background-warning-bold",
+        "--ds-surface",
+        "--ds-text-accent-blue",
+        "--ds-text-accent-gray",
+        "--ds-text-accent-green",
+        "--ds-text-accent-magenta",
+        "--ds-text-accent-purple",
+        "--ds-text-accent-teal",
+        "--ds-text-accent-yellow",
+        "--font-size-075",
+        "--font-size-0875",
+        "--font-size-100",
+        "--font-size-200",
+        "--icon-lg",
+        "--icon-md",
+        "--icon-sm",
+        "--image-lg",
+        "--image-md",
+        "--image-sm",
+        "--image-xxs",
+        "--radius-full",
+        "--type-weight-semibold"
       ]
     },
     {
@@ -703,6 +956,18 @@
           "description": "Extra class names added to the group element beside the component's own.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Group",
+        "GroupFits",
+        "Sizes",
+        "GroupSizeAndShape",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
       ]
     },
     {
@@ -762,6 +1027,35 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Appearances",
+        "Warning",
+        "Danger",
+        "Announcement",
+        "WithoutIcon",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--body-default",
+        "--ds-background-danger",
+        "--ds-background-neutral",
+        "--ds-background-warning",
+        "--ds-icon-danger",
+        "--ds-icon-warning",
+        "--ds-text",
+        "--ds-text-danger",
+        "--ds-text-warning",
+        "--icon-md",
+        "--inline-md",
+        "--pad-x-md",
+        "--pad-y-md",
+        "--type-weight-medium"
       ]
     },
     {
@@ -857,6 +1151,28 @@
           "description": "The layer it holds: a PatternModal, a confirm over one, or a drawer at an edge.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Inline",
+        "NestedConfirm",
+        "Layers",
+        "Pads",
+        "ScreenGrid",
+        "Placements",
+        "PlacementCenter",
+        "PlacementEnd",
+        "PlacementStart",
+        "Interactive"
+      ],
+      "tokens": [
+        "--blanket-contained-layer",
+        "--blanket-pad-x",
+        "--blanket-pad-y",
+        "--ds-blanket",
+        "--layer-blanket",
+        "--layer-modal",
+        "--plus-overlay-screen",
+        "--plus-overlay-screen-height"
       ]
     },
     {
@@ -921,6 +1237,24 @@
           "description": "Inline styles for the `nav` element.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Standard",
+        "Short",
+        "Overview",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--body-default",
+        "--ds-link",
+        "--ds-text-subtlest",
+        "--item-height-md",
+        "--plus-breadcrumb-divider",
+        "--stack-md"
       ]
     },
     {
@@ -1131,6 +1465,52 @@
           "description": "Maps to `data-testid`, for test queries.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Appearances",
+        "Spacing",
+        "Icons",
+        "States",
+        "Default",
+        "Primary",
+        "Subtle",
+        "Warning",
+        "Danger",
+        "Discovery",
+        "Ai",
+        "Compact",
+        "Selected",
+        "Disabled",
+        "Loading",
+        "FitContainer",
+        "Truncation",
+        "Interactive",
+        "StateSteps",
+        "KeyboardFocus",
+        "AnchorKeyboard",
+        "AnchorHref"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--button-radius-compact",
+        "--button-radius-default",
+        "--button-vertical-size",
+        "--ds-background-disabled",
+        "--ds-border-disabled",
+        "--ds-icon-disabled",
+        "--ds-text-disabled",
+        "--icon-md",
+        "--inline-sm",
+        "--item-height-md",
+        "--item-height-sm",
+        "--pad-x-md",
+        "--pad-x-sm",
+        "--pad-x-xs",
+        "--pad-y-sm",
+        "--type-weight-medium"
       ]
     },
     {
@@ -1186,6 +1566,21 @@
           "description": "HTML ID attribute.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Appearances",
+        "Spacing",
+        "IconOnly",
+        "Selected",
+        "HoveredState",
+        "PressedState",
+        "KeyboardFocus",
+        "Interactive"
+      ],
+      "tokens": [
+        "--border-default",
+        "--button-radius-default"
       ]
     },
     {
@@ -1290,6 +1685,20 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Size28",
+        "Size36",
+        "Size44",
+        "PickADay",
+        "TurnMonths",
+        "Default",
+        "Selected",
+        "Range",
+        "Disabled",
+        "HoveredState",
+        "KeyboardFocus",
+        "Interactive"
       ]
     },
     {
@@ -1446,6 +1855,50 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Content",
+        "Overview",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-large",
+        "--carousel-control-offset",
+        "--carousel-control-pad",
+        "--carousel-control-size",
+        "--carousel-indicator-height",
+        "--carousel-indicator-height-compact",
+        "--carousel-indicator-height-spacious",
+        "--carousel-indicator-width",
+        "--carousel-indicator-width-compact",
+        "--carousel-slide-min-height",
+        "--carousel-slide-min-height-compact",
+        "--carousel-slide-min-height-spacious",
+        "--control-md",
+        "--ds-background-inverse-subtle",
+        "--ds-background-selected-bold",
+        "--ds-border",
+        "--ds-opacity-disabled",
+        "--ds-surface",
+        "--ds-text",
+        "--ds-text-inverse",
+        "--ds-text-subtle",
+        "--heading-medium",
+        "--icon-lg",
+        "--radius-lg",
+        "--radius-md",
+        "--section-pad-x-compact",
+        "--section-pad-x-default",
+        "--section-pad-x-spacious",
+        "--section-pad-y-compact",
+        "--section-pad-y-default",
+        "--section-pad-y-spacious",
+        "--stack-md"
       ]
     },
     {
@@ -1603,6 +2056,24 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "EmptyPath",
+        "PreselectedPath",
+        "SpacingDefault",
+        "SpacingCompact",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Focused",
+        "FieldDisabled",
+        "FieldInvalid"
+      ],
+      "tokens": [
+        "--border-default",
+        "--ds-border",
+        "--plus-listbox-viewport-width"
       ]
     },
     {
@@ -1796,6 +2267,57 @@
           "description": "Maps to `data-testid`, for test queries.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "States",
+        "Content",
+        "Invalid",
+        "SelectAll",
+        "CheckboxGroup",
+        "Interactive",
+        "ReadOnly",
+        "DescriptionAndCard",
+        "KeyboardFocus",
+        "Keyboard",
+        "HoverStep",
+        "Unselected",
+        "Selected",
+        "Mixed",
+        "Disabled",
+        "Required",
+        "Description",
+        "Card"
+      ],
+      "tokens": [
+        "--body-default",
+        "--checkbox-control-size",
+        "--ds-background-disabled",
+        "--ds-background-input",
+        "--ds-background-input-hovered",
+        "--ds-background-selected-bold",
+        "--ds-background-selected-bold-hovered",
+        "--ds-border",
+        "--ds-border-brand",
+        "--ds-border-danger",
+        "--ds-border-disabled",
+        "--ds-border-input",
+        "--ds-border-selected",
+        "--ds-icon-disabled",
+        "--ds-icon-inverse",
+        "--ds-surface",
+        "--ds-text",
+        "--item-height-sm",
+        "--pad-x-md",
+        "--plus-choice-indent",
+        "--radius-025",
+        "--space-025",
+        "--space-0375",
+        "--space-050",
+        "--stack-sm",
+        "--stroke-1",
+        "--stroke-2",
+        "--type-weight-regular"
       ]
     },
     {
@@ -1921,6 +2443,36 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Variants",
+        "Layout",
+        "Size",
+        "InteractionStates",
+        "TwoGridsWithoutIds",
+        "ReadOnly",
+        "Interactive",
+        "Keyboard",
+        "Unselected",
+        "Selected",
+        "Hovered",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-large",
+        "--body-small",
+        "--checkbox-control-size",
+        "--choice-grid-control-size-10",
+        "--choice-grid-control-size-12",
+        "--ds-surface-container",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--pad-x-md",
+        "--pad-y-md",
+        "--radius-md"
       ]
     },
     {
@@ -1982,6 +2534,21 @@
           "description": "Extra class names added to the button beside the component's own.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Spacing",
+        "Tones",
+        "Focus",
+        "InverseGrounds",
+        "Interactive"
+      ],
+      "tokens": [
+        "--ds-border-focused-inverse",
+        "--ds-icon-inverse",
+        "--ds-interaction-inverse-hovered",
+        "--ds-interaction-inverse-pressed",
+        "--ds-text-inverse"
       ]
     },
     {
@@ -2010,6 +2577,23 @@
           "description": "Extra classes for placement, such as spacing.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "InHeading",
+        "WrapsAtTheEdge",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "NotAControl"
+      ],
+      "tokens": [
+        "--code",
+        "--ds-background-neutral",
+        "--ds-text-code-default",
+        "--pad-x-xs",
+        "--radius-md"
       ]
     },
     {
@@ -2083,6 +2667,41 @@
           "description": "Extra classes for placement, such as spacing.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "WithoutLineNumbers",
+        "HighlightedLines",
+        "SeparateHighlights",
+        "ScrollsLongLines",
+        "WrapsLongLines",
+        "BlankLines",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "WrapNotFocusable"
+      ],
+      "tokens": [
+        "--border-default",
+        "--code",
+        "--ds-background-code-default",
+        "--ds-background-code-gutter",
+        "--ds-background-code-highlight",
+        "--ds-border",
+        "--ds-border-focused",
+        "--ds-text-code-default",
+        "--ds-text-code-gutter",
+        "--focus-ring-width",
+        "--font-size-0875",
+        "--line-height-125",
+        "--pad-x-lg",
+        "--pad-x-md",
+        "--pad-y-lg",
+        "--plus-code-block-digits",
+        "--plus-code-block-gutter",
+        "--radius-md"
       ]
     },
     {
@@ -2226,6 +2845,30 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Basic",
+        "Saving",
+        "Highlighted",
+        "Edited",
+        "Restricted",
+        "WithNestedReplies",
+        "Interactive"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--ds-background-selected",
+        "--ds-border",
+        "--ds-text-subtle",
+        "--radius-050",
+        "--space-025",
+        "--space-050",
+        "--space-075",
+        "--space-100",
+        "--space-150",
+        "--type-weight-semibold"
       ]
     },
     {
@@ -2354,6 +2997,61 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Appearances",
+        "Spacings",
+        "Max",
+        "Zero",
+        "Ring",
+        "Styles",
+        "DotNeedsALabel",
+        "LabeledNumber",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-small",
+        "--control-sm",
+        "--count-tag-dot-size",
+        "--ds-background-danger",
+        "--ds-background-danger-bold",
+        "--ds-background-information",
+        "--ds-background-information-bold",
+        "--ds-background-neutral",
+        "--ds-background-neutral-bold",
+        "--ds-background-smart-mastering-content",
+        "--ds-background-smart-mastering-content-bold",
+        "--ds-background-success",
+        "--ds-background-success-bold",
+        "--ds-background-warning",
+        "--ds-background-warning-bold",
+        "--ds-icon-danger",
+        "--ds-icon-information",
+        "--ds-icon-smart-mastering-content",
+        "--ds-icon-subtle",
+        "--ds-icon-success",
+        "--ds-icon-warning",
+        "--ds-surface",
+        "--ds-text",
+        "--ds-text-danger",
+        "--ds-text-information",
+        "--ds-text-inverse",
+        "--ds-text-smart-mastering-content",
+        "--ds-text-subtle",
+        "--ds-text-success",
+        "--ds-text-warning",
+        "--ds-text-warning-inverse",
+        "--pad-x-xs",
+        "--plus-count-min",
+        "--plus-count-size",
+        "--radius-full",
+        "--radius-sm",
+        "--stroke-2"
       ]
     },
     {
@@ -2533,6 +3231,28 @@
           "description": "Inline style on the field frame.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Spacing",
+        "InteractionStates",
+        "PickDate",
+        "PickRange",
+        "Bounds",
+        "Interactive",
+        "CalendarColors",
+        "Default",
+        "WithValue",
+        "Compact",
+        "Invalid",
+        "ReadOnly",
+        "Disabled",
+        "HoveredState",
+        "KeyboardFocus"
+      ],
+      "tokens": [
+        "--ds-icon-subtle",
+        "--ds-text-subtlest"
       ]
     },
     {
@@ -2604,6 +3324,48 @@
           "description": "The `id` attribute of the tag element.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Styles",
+        "Truncation",
+        "NeverAButton",
+        "UnknownAppearanceFallsBack",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--ds-border",
+        "--ds-border-danger-subtle",
+        "--ds-border-focused",
+        "--ds-border-warning-subtle",
+        "--ds-text-danger",
+        "--ds-text-subtle",
+        "--ds-text-warning",
+        "--focus-ring-width",
+        "--icon-md",
+        "--icon-sm",
+        "--image-xs",
+        "--pad-x-md",
+        "--pad-x-xs",
+        "--plus-date-tag-edge",
+        "--plus-date-tag-height",
+        "--plus-date-tag-icon-box",
+        "--plus-date-tag-max",
+        "--radius-h24",
+        "--radius-md",
+        "--stack-sm",
+        "--tag-gap",
+        "--tag-gap-compact",
+        "--tag-pad-end",
+        "--tag-pad-end-compact"
       ]
     },
     {
@@ -2891,6 +3653,34 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Spacing",
+        "Validation",
+        "InteractionStates",
+        "TimeZones",
+        "Interactive",
+        "Default",
+        "WithValue",
+        "Compact",
+        "Invalid",
+        "Valid",
+        "ReadOnly",
+        "Disabled",
+        "HoveredState",
+        "KeyboardFocus"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--ds-text",
+        "--ds-text-danger",
+        "--ds-text-subtle",
+        "--space-0625",
+        "--stack-md",
+        "--stack-sm",
+        "--type-weight-medium"
       ]
     },
     {
@@ -3052,6 +3842,33 @@
           "description": "Extra class on the menu popup, beside `plus-dropdown-menu`.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Placements",
+        "Spacing",
+        "WithSections",
+        "Loading",
+        "EscapeCloses",
+        "MenuKeyboardNavigation",
+        "Interactive",
+        "Default",
+        "Open",
+        "CompactRows",
+        "DisabledRow",
+        "HoveredState",
+        "KeyboardFocus"
+      ],
+      "tokens": [
+        "--border-default",
+        "--ds-border",
+        "--ds-shadow-overlay",
+        "--ds-surface-overlay",
+        "--layer-popup",
+        "--popover-max-height-menu",
+        "--popover-max-width-menu",
+        "--popover-radius-menu-md",
+        "--space-200"
       ]
     },
     {
@@ -3137,6 +3954,37 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "WithIcon",
+        "Default",
+        "Compact",
+        "InATable",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--body-default",
+        "--ds-icon-subtle",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--font-size-150",
+        "--font-size-200",
+        "--heading-medium",
+        "--heading-small",
+        "--inline-md",
+        "--page-stack-lg",
+        "--page-stack-md",
+        "--page-stack-sm",
+        "--screen-pad-x",
+        "--section-min-width-main",
+        "--section-stack-md",
+        "--section-stack-sm",
+        "--stack-sm"
       ]
     },
     {
@@ -3219,6 +4067,22 @@
           "description": "Inline style on the `<fieldset>`.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Default",
+        "CheckboxGroup",
+        "WithRequiredAndError",
+        "Required",
+        "Invalid",
+        "Disabled",
+        "Interactive"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--ds-text",
+        "--ds-text-danger",
+        "--stack-md"
       ]
     },
     {
@@ -3386,6 +4250,46 @@
           "description": "The uploaded-file list, shown below the button and outside the frame.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Content",
+        "Styles",
+        "InteractionStates",
+        "ReadOnly",
+        "WithFiles",
+        "Interactive",
+        "Default",
+        "Required",
+        "Invalid",
+        "Valid",
+        "Disabled",
+        "KeyboardFocus",
+        "InvalidFocus"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--ds-background-danger-subtler",
+        "--ds-background-neutral",
+        "--ds-background-success-subtler",
+        "--ds-border-danger",
+        "--ds-border-focused",
+        "--ds-border-success",
+        "--ds-icon-danger",
+        "--ds-icon-success",
+        "--ds-text",
+        "--ds-text-danger",
+        "--ds-text-subtle",
+        "--ds-text-success",
+        "--focus-ring-width",
+        "--icon-sm",
+        "--pad-x-md",
+        "--pad-y-md",
+        "--radius-md",
+        "--stack-md",
+        "--stack-sm"
       ]
     },
     {
@@ -3492,6 +4396,24 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Metric",
+        "Appearances",
+        "Spacing",
+        "States",
+        "Selected",
+        "Disabled",
+        "Loading",
+        "HoveredState",
+        "PressedState",
+        "KeyboardFocus",
+        "Interactive"
+      ],
+      "tokens": [
+        "--ds-text-subtlest",
+        "--inline-sm"
       ]
     },
     {
@@ -3652,6 +4574,67 @@
           "description": "Small text beside the title, such as \"11 mins ago\".",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Normal",
+        "Information",
+        "Success",
+        "Warning",
+        "ErrorAppearance",
+        "Bold",
+        "Interactive",
+        "Dismiss",
+        "FlagContent",
+        "UnknownAppearance",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--ds-background-danger-bold",
+        "--ds-background-information-bold",
+        "--ds-background-neutral-bold",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-success-bold",
+        "--ds-background-warning-bold",
+        "--ds-border",
+        "--ds-icon-danger",
+        "--ds-icon-information",
+        "--ds-icon-inverse",
+        "--ds-icon-subtle",
+        "--ds-icon-success",
+        "--ds-icon-warning",
+        "--ds-icon-warning-inverse",
+        "--ds-shadow-overlay",
+        "--ds-surface",
+        "--ds-surface-overlay",
+        "--ds-text",
+        "--ds-text-inverse",
+        "--ds-text-subtle",
+        "--ds-text-warning-inverse",
+        "--flag-min-height",
+        "--flag-offset",
+        "--flag-pad",
+        "--heading-xsmall",
+        "--icon-md",
+        "--inline-lg",
+        "--inline-md",
+        "--label-height-md",
+        "--layer-flag",
+        "--popover-gap-screen",
+        "--popover-pad",
+        "--popover-radius",
+        "--popover-stack-flag",
+        "--popover-width-flag",
+        "--radius-md",
+        "--stack-sm",
+        "--type-weight-medium"
       ]
     },
     {
@@ -3716,6 +4699,20 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "CustomContent",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--ds-link",
+        "--ds-link-pressed",
+        "--radius-sm"
       ]
     },
     {
@@ -3954,6 +4951,93 @@
           "description": "Content slot",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "ColorModes",
+        "Reading",
+        "InBrowserFrame",
+        "DocsOverview",
+        "DocsReading",
+        "DocsContentGrid",
+        "PairWithSidebar",
+        "PairWithoutSidebar",
+        "PairTitleInHeader",
+        "Interactive",
+        "DocsAuto768",
+        "DocsAuto1024",
+        "DocsAuto1440",
+        "DocsPeeking768",
+        "DocsPeeking1024",
+        "DocsPeeking1440",
+        "Floating",
+        "Medium768",
+        "Large1024",
+        "CtrlBracketToggle",
+        "CtrlBracketAt768",
+        "SidebarMeetsPage",
+        "XLarge1440",
+        "Wide1600",
+        "ReadingAt1440",
+        "ContentGrid",
+        "ModalClosesFloatingSidebar",
+        "ModalFromFloatingSidebar",
+        "ModalLeavesDockedSidebar",
+        "ModalClosesOverlaySidebarAt768",
+        "DocsPanel",
+        "PanelDockedAt1440",
+        "PanelAutoCollapsesSidebarAt1200",
+        "PanelOverlayAt1100",
+        "SidebarByHandWinsAt1300",
+        "ModalLeavesPanelOpen",
+        "ModalOverOverlayPanelAt1100",
+        "OverlayPanelIsModalAt1100",
+        "DockedPanelIsNotModalAt1440",
+        "PanelFieldKeepsEscapeAt1100",
+        "DockedPanelLeavesEscapeAt1200",
+        "DockedPanelTakesLostFocusAt1200",
+        "HeaderTriggerTogglesOverlayAt1100",
+        "OverlaySplitterKeepsSidebarAt1100",
+        "OneOverlayAt768",
+        "FullWidthUnder768",
+        "SplitterKeyboardAt1440",
+        "SplitterDragAt1440",
+        "PanelRememberedForTheTab",
+        "PanelPeek",
+        "NoPanelPeekByDefault",
+        "SectionDetailKeepsSplitAt1440",
+        "SectionDetailSplitterKeepsSplitAt1440"
+      ],
+      "tokens": [
+        "--border-default",
+        "--content-max-width",
+        "--content-max-width-reading",
+        "--content-min-width",
+        "--ds-border",
+        "--ds-shadow-overlay",
+        "--ds-surface",
+        "--ds-surface-overlay",
+        "--ds-surface-sunken",
+        "--ds-text",
+        "--frame-layer-blanket",
+        "--frame-layer-docked-edge",
+        "--frame-layer-edge",
+        "--frame-layer-panel-peek",
+        "--frame-layer-sidebar",
+        "--frame-layer-splitter",
+        "--frame-panel-width",
+        "--frame-sidebar-pad",
+        "--frame-sidebar-width",
+        "--grid-columns",
+        "--grid-gutter",
+        "--inline-md",
+        "--item-height-md",
+        "--pad-x-sm",
+        "--pad-x-xs",
+        "--page-pad",
+        "--page-stack-md",
+        "--page-stack-sm",
+        "--panel-width-default"
       ]
     },
     {
@@ -4015,6 +5099,26 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Idle",
+        "Generating",
+        "ReducedMotion",
+        "Radii",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--border-selected",
+        "--ds-border-brand",
+        "--ds-border-discovery",
+        "--generative-border-angle",
+        "--generative-border-radius",
+        "--generative-border-rest",
+        "--generative-border-width"
       ]
     },
     {
@@ -4100,6 +5204,33 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Sizes",
+        "OverridesTheTag",
+        "NestedContext",
+        "InverseColor",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "NotAControl"
+      ],
+      "tokens": [
+        "--ds-text",
+        "--ds-text-inverse",
+        "--ds-text-warning-inverse",
+        "--heading-large",
+        "--heading-large-tracking",
+        "--heading-medium",
+        "--heading-small",
+        "--heading-xlarge",
+        "--heading-xlarge-tracking",
+        "--heading-xsmall",
+        "--heading-xxlarge",
+        "--heading-xxlarge-tracking",
+        "--heading-xxsmall"
       ]
     },
     {
@@ -4238,6 +5369,26 @@
           "description": "Suppresses the tooltip and native title entirely.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Appearances",
+        "Spacing",
+        "Shapes",
+        "States",
+        "Default",
+        "Subtle",
+        "Primary",
+        "Discovery",
+        "Compact",
+        "Circle",
+        "Selected",
+        "Disabled",
+        "Loading",
+        "HoveredState",
+        "PressedState",
+        "KeyboardFocus",
+        "Interactive"
       ]
     },
     {
@@ -4306,6 +5457,41 @@
           "description": "Inline styles for the frame element. They are applied after its width and height, so they can override `size`.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Gallery",
+        "SmartCharacters",
+        "MathCharacters",
+        "Sizes",
+        "DefaultSize",
+        "Rest",
+        "Decorative",
+        "Titled",
+        "MasteringContent",
+        "Advocacy",
+        "Technology",
+        "Relationships",
+        "SocialEmotional",
+        "Dot",
+        "ApproximatelyEqual",
+        "Root",
+        "All",
+        "Pi",
+        "Equal",
+        "Divider",
+        "Interactive"
+      ],
+      "tokens": [
+        "--ds-background-accent-blue-subtle",
+        "--ds-background-accent-green-subtle",
+        "--ds-background-accent-purple-subtle",
+        "--ds-background-accent-red-subtle",
+        "--ds-background-smart-advocacy-subtle",
+        "--ds-background-smart-mastering-content-subtle",
+        "--ds-background-smart-relationship-subtle",
+        "--ds-background-smart-social-emotional-subtle",
+        "--ds-background-smart-technology-tools-subtle",
+        "--ds-icon-subtle"
       ]
     },
     {
@@ -4382,6 +5568,12 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Sizes",
+        "DarkVariant",
+        "Interactive",
+        "Rest"
       ]
     },
     {
@@ -4554,6 +5746,37 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Textfield",
+        "LeavingConfirms",
+        "KeepOpenOnBlur",
+        "Validation",
+        "FailedConfirm",
+        "WithoutButtons",
+        "StartsOpen",
+        "SameHeight",
+        "SpacingDefault",
+        "SpacingCompact",
+        "ButtonsDoNotMoveThePage",
+        "WithAnotherEditView",
+        "Placeholder",
+        "Interactive"
+      ],
+      "tokens": [
+        "--body-default",
+        "--border-default",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-shadow-overlay",
+        "--ds-surface-overlay",
+        "--ds-text",
+        "--ds-text-subtlest",
+        "--height-250",
+        "--item-height-md",
+        "--pad-x-md",
+        "--radius-0625",
+        "--radius-md",
+        "--stack-sm"
       ]
     },
     {
@@ -4854,6 +6077,26 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Appearances",
+        "Info",
+        "Warning",
+        "Danger",
+        "Success",
+        "WithSecondaryText",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--body-default",
+        "--ds-text-subtle",
+        "--heading-small",
+        "--stack-sm"
       ]
     },
     {
@@ -4931,6 +6174,25 @@
           "description": "The link text. Required, since it names the link.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Appearances",
+        "OpenInNewWindow",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--ds-link",
+        "--ds-link-pressed",
+        "--ds-link-visited",
+        "--ds-text",
+        "--ds-text-inverse",
+        "--icon-sm",
+        "--inline-md",
+        "--radius-lg"
       ]
     },
     {
@@ -5069,6 +6331,17 @@
           "description": "Extra class names added to the anchor beside the component's own.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Appearances",
+        "Spacing",
+        "WithIcons",
+        "Selected",
+        "HoveredState",
+        "PressedState",
+        "KeyboardFocus",
+        "Interactive"
       ]
     },
     {
@@ -5189,6 +6462,16 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Appearances",
+        "Spacing",
+        "Selected",
+        "HoveredState",
+        "PressedState",
+        "KeyboardFocus",
+        "Interactive"
       ]
     },
     {
@@ -5250,6 +6533,36 @@
           "description": "Additional CSS classes",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Playground",
+        "Sizes",
+        "SizesDark",
+        "SmallSizeDrawing",
+        "Lockup",
+        "LockupDark",
+        "Appearances",
+        "LightAndDark",
+        "Construction",
+        "ClearSpace"
+      ],
+      "tokens": [
+        "--ds-text",
+        "--palette-dark-neutral-0",
+        "--palette-dark-neutral-1000",
+        "--palette-lagoon-400",
+        "--palette-lagoon-500",
+        "--palette-lagoon-700",
+        "--palette-lagoon-900",
+        "--palette-neutral-0",
+        "--palette-neutral-1000",
+        "--palette-red-200",
+        "--palette-red-300",
+        "--palette-teal-200",
+        "--palette-teal-300",
+        "--palette-yellow-250",
+        "--palette-yellow-300",
+        "--palette-yellow-400"
       ]
     },
     {
@@ -5326,6 +6639,45 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "ButtonAndLinkItems",
+        "KeyboardNavigation",
+        "Selected",
+        "CustomRowExample",
+        "Density",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "SelectedRow",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-selected",
+        "--ds-border",
+        "--ds-icon-subtle",
+        "--ds-text",
+        "--ds-text-disabled",
+        "--ds-text-subtle",
+        "--ds-text-subtlest",
+        "--heading-xxsmall",
+        "--menu-group-gap",
+        "--menu-group-item-pad-y",
+        "--menu-group-min-width",
+        "--menu-group-pad-x",
+        "--pad-y-lg",
+        "--pad-y-md",
+        "--radius-lg",
+        "--stack-lg",
+        "--stack-md",
+        "--stack-sm"
       ]
     },
     {
@@ -5551,6 +6903,66 @@
           "description": "More content rendered in the body after `body`, for composing the dialog contents directly.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Width6Col",
+        "Width8Col",
+        "Width10Col",
+        "HeightHug",
+        "HeightFill",
+        "HeaderOptions",
+        "WithoutCloseButton",
+        "Loading",
+        "Content",
+        "Layout",
+        "Interactive",
+        "Overview",
+        "ConfirmView",
+        "ConfirmViewEscape",
+        "TwoOverlayLimit",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--blanket-max-height-modal",
+        "--body-default",
+        "--content-max-width",
+        "--content-min-width",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-border",
+        "--ds-border-focused",
+        "--ds-icon",
+        "--ds-icon-subtle",
+        "--ds-shadow-overlay",
+        "--ds-surface-overlay",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--focus-ring-width",
+        "--grid-columns",
+        "--grid-gutter",
+        "--heading-medium",
+        "--icon-md",
+        "--inline-sm",
+        "--item-height-md",
+        "--modal-inline-sm",
+        "--modal-pad-x-default",
+        "--modal-radius",
+        "--modal-stack-md",
+        "--motion-duration-short",
+        "--motion-easing-standard",
+        "--plus-modal-column",
+        "--plus-modal-grid",
+        "--plus-modal-screen",
+        "--plus-modal-screen-pad",
+        "--plus-modal-span",
+        "--radius-md",
+        "--space-150",
+        "--stack-md",
+        "--stack-sm",
+        "--stroke-1"
       ]
     },
     {
@@ -5600,6 +7012,19 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "implementedAs": "createObjectIcon",
+      "stories": [
+        "Kinds",
+        "Sizes",
+        "Decorative",
+        "Rest",
+        "Interactive"
+      ],
+      "tokens": [
+        "--ds-icon-subtle",
+        "--icon-md",
+        "--icon-sm"
       ]
     },
     {
@@ -5715,6 +7140,44 @@
           "description": "Content slot",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Sunken",
+        "DefaultLevel",
+        "Raised",
+        "Overlay",
+        "StepNone",
+        "StepSmall",
+        "StepMedium",
+        "StepLarge",
+        "Bordered",
+        "WithTitle",
+        "ColorModes",
+        "MediumPad",
+        "Interactive"
+      ],
+      "tokens": [
+        "--ds-border-bold",
+        "--ds-shadow-overlay",
+        "--ds-shadow-raised",
+        "--ds-surface",
+        "--ds-surface-overlay",
+        "--ds-surface-raised",
+        "--ds-surface-sunken",
+        "--ds-text",
+        "--heading-large",
+        "--heading-large-tracking",
+        "--page-border-width",
+        "--page-pad",
+        "--page-pad-x-compact",
+        "--page-pad-x-spacious",
+        "--page-pad-y-compact",
+        "--page-pad-y-spacious",
+        "--page-radius-md",
+        "--page-stack-md",
+        "--radius-lg",
+        "--section-radius"
       ]
     },
     {
@@ -5788,6 +7251,22 @@
           "description": "Extra class names added to the header element beside the component's own.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Basic",
+        "WithBreadcrumbsActionsAndBottomBar",
+        "DisableTitleStyles",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--body-small",
+        "--space-075",
+        "--space-100",
+        "--space-150"
       ]
     },
     {
@@ -6017,6 +7496,33 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Frame",
+        "WithDrawer",
+        "Interactive",
+        "Focused",
+        "FocusedKeyboardAndLandmarks",
+        "FocusedColorModes",
+        "FocusedLongTitle",
+        "FocusedBare",
+        "FocusedBackAsLink",
+        "FocusedLongBody",
+        "FocusedMedium768",
+        "FocusedLarge1024",
+        "FocusedXLarge1440"
+      ],
+      "tokens": [
+        "--ds-surface",
+        "--ds-text",
+        "--focused-page-inline-sm",
+        "--focused-page-stack-sm",
+        "--frame-sidebar-pad",
+        "--heading-xsmall",
+        "--item-height-md",
+        "--page-pad",
+        "--page-stack-sm"
       ]
     },
     {
@@ -6132,6 +7638,124 @@
           "description": "Extra class on the page list, beside `plus-pagination`.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Content",
+        "Spacing",
+        "InteractionStates",
+        "Overview",
+        "Interactive",
+        "Accessibility",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Current",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-default",
+        "--border-default",
+        "--ds-background-disabled",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-selected",
+        "--ds-border",
+        "--ds-border-focused",
+        "--ds-icon-disabled",
+        "--ds-icon-subtle",
+        "--ds-surface",
+        "--ds-text-disabled",
+        "--ds-text-selected",
+        "--ds-text-subtle",
+        "--focus-ring-width",
+        "--icon-sm",
+        "--item-height-md",
+        "--item-height-sm",
+        "--motion-duration-short",
+        "--motion-easing-standard",
+        "--pad-x-md",
+        "--pad-x-sm",
+        "--radius-full",
+        "--type-weight-medium",
+        "--type-weight-semibold"
+      ],
+      "subComponents": [
+        {
+          "name": "Page",
+          "impl": "PaginationPage",
+          "props": [
+            {
+              "name": "page",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": "The page number, shown as the button text and passed to `onSelect`."
+            },
+            {
+              "name": "isCurrent",
+              "type": "bool",
+              "required": false,
+              "default": null,
+              "description": "Marks the current page: sets `aria-current=\"page\"` and the current styling."
+            },
+            {
+              "name": "onSelect",
+              "type": "func",
+              "required": false,
+              "default": null,
+              "description": "Called with the page number when the button is pressed."
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": false,
+              "default": null,
+              "description": "Accessible name; the number alone when omitted."
+            }
+          ]
+        },
+        {
+          "name": "Navigator",
+          "impl": "PaginationNavigator",
+          "props": [
+            {
+              "name": "direction",
+              "type": "enum",
+              "required": false,
+              "default": null,
+              "description": "`previous` draws a left caret and `next` a right caret."
+            },
+            {
+              "name": "navigator",
+              "type": "enum",
+              "required": false,
+              "default": null,
+              "description": "`icon` shows a caret named by `label`; `text` shows `label` as visible text."
+            },
+            {
+              "name": "label",
+              "type": "string",
+              "required": true,
+              "default": null,
+              "description": "The control's name: its accessible name with `icon`, its visible text with `text`."
+            },
+            {
+              "name": "isDisabled",
+              "type": "bool",
+              "required": false,
+              "default": null,
+              "description": "Keeps the control in the tab order with `aria-disabled`, and pressing it does nothing."
+            },
+            {
+              "name": "onSelect",
+              "type": "func",
+              "required": false,
+              "default": null,
+              "description": "Called with no arguments when the control is pressed and not disabled."
+            }
+          ]
+        }
       ]
     },
     {
@@ -6169,6 +7793,28 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "implementedAs": "PanelContainer",
+      "stories": [
+        "FullComposition",
+        "MinimalHeaderAndBody",
+        "WidthFromProvider",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--body-small",
+        "--border-default",
+        "--ds-border",
+        "--ds-surface-overlay",
+        "--ds-text-subtle",
+        "--space-025",
+        "--space-075",
+        "--space-100",
+        "--space-150"
       ]
     },
     {
@@ -6331,6 +7977,48 @@
           "description": "Body content slot",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Interactive",
+        "Elevation",
+        "Anatomy",
+        "Jobs",
+        "SizeSmall",
+        "SizeMedium",
+        "SizeLarge",
+        "ImageWide",
+        "ImageStandard",
+        "ImageSquare",
+        "BodyOnly",
+        "WithFooter",
+        "CustomHeader",
+        "Static",
+        "Clickable",
+        "Dragging",
+        "LoadingCard",
+        "Rows"
+      ],
+      "tokens": [
+        "--body-default",
+        "--card-inline-md",
+        "--card-pad-compact",
+        "--card-pad-default",
+        "--card-pad-spacious",
+        "--card-radius",
+        "--card-radius-sm",
+        "--card-stack-lg",
+        "--card-stack-md",
+        "--card-stack-sm",
+        "--ds-shadow-overlay",
+        "--ds-shadow-raised",
+        "--ds-surface-overlay",
+        "--ds-surface-raised",
+        "--ds-surface-raised-hovered",
+        "--ds-surface-raised-pressed",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--ds-utility-elevation-surface-current"
       ]
     },
     {
@@ -6483,6 +8171,38 @@
           "description": "Body content slot; it scrolls once it outgrows the screen",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Widths",
+        "Placements",
+        "LongContent",
+        "Footer",
+        "KeyboardAndFocus",
+        "DrawerSharesTheTwoOverlayLimit",
+        "WidthSmall",
+        "WidthMedium",
+        "WidthLarge",
+        "PlacementEnd",
+        "PlacementStart",
+        "NoFooter",
+        "LongContentStill",
+        "OpenAndClose",
+        "Interactive"
+      ],
+      "tokens": [
+        "--body-default",
+        "--drawer-inline-sm",
+        "--drawer-pad",
+        "--drawer-stack-md",
+        "--ds-border-focused",
+        "--ds-shadow-overlay",
+        "--ds-surface-overlay",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--focus-ring-width",
+        "--heading-medium",
+        "--stack-sm"
       ]
     },
     {
@@ -6644,6 +8364,44 @@
           "description": "Body content slot; with `tabs`, the selected tab's `content` takes its place",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Widths",
+        "Heights",
+        "Tabs",
+        "BodyMinHeight",
+        "CustomHeader",
+        "Divider",
+        "Loading",
+        "WidthSmall",
+        "WidthMedium",
+        "WidthLarge",
+        "HugLong",
+        "HeightFill",
+        "TabsStill",
+        "Interactive"
+      ],
+      "tokens": [
+        "--border-default",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-border",
+        "--ds-icon-subtle",
+        "--ds-shadow-overlay",
+        "--ds-surface-overlay",
+        "--ds-text",
+        "--heading-medium",
+        "--modal-body-min-height",
+        "--modal-pad-x-default",
+        "--modal-radius",
+        "--modal-stack-md",
+        "--modal-stack-sm",
+        "--pad-x-sm",
+        "--radius-md",
+        "--space-025",
+        "--stack-lg",
+        "--stack-md"
       ]
     },
     {
@@ -6979,6 +8737,143 @@
           "description": "Content slot; with `layout=\"split\"`, the main column",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "HeaderDefault",
+        "HeaderTabs",
+        "HeaderToolbar",
+        "HeaderCustom",
+        "HeaderTabsOnly",
+        "LayoutSingle",
+        "LayoutSplit",
+        "LayoutSubsections",
+        "FillSubtle",
+        "Footer",
+        "Anatomy",
+        "Levels",
+        "ToolbarSelected",
+        "LoadingDefault",
+        "LoadingToolbar",
+        "LoadingTabsOnly",
+        "Interactive",
+        "ColorModes",
+        "SplitLayout",
+        "Spacing",
+        "Detail",
+        "DetailWithPanel",
+        "DetailWithPanelNoSectionDetail",
+        "DetailSplitAt1440",
+        "DetailSplitHoldsWithPanelAt1440",
+        "DetailReplacesListBelow960"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--ds-background-selected",
+        "--ds-surface-sunken",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--grid-gutter",
+        "--heading-large",
+        "--heading-large-tracking",
+        "--heading-medium",
+        "--heading-small",
+        "--inline-lg",
+        "--inline-md",
+        "--inline-sm",
+        "--item-height-md",
+        "--radius-lg",
+        "--section-min-width-main",
+        "--section-min-width-side",
+        "--section-pad-x-default",
+        "--section-pad-y-default",
+        "--section-radius",
+        "--section-stack-lg",
+        "--section-stack-md",
+        "--section-stack-sm",
+        "--size-300",
+        "--stack-sm",
+        "--table-pad-x-cell",
+        "--width-3000"
+      ],
+      "subComponents": [
+        {
+          "name": "Toolbar",
+          "impl": "SectionToolbar",
+          "props": [
+            {
+              "name": "state",
+              "type": "enum",
+              "required": false,
+              "default": null,
+              "description": "`default`: search, filters, count and actions. `selected`: the selection, bulk actions and Clear."
+            },
+            {
+              "name": "search",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "Search field slot, at the start"
+            },
+            {
+              "name": "filters",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "Filters slot: dropdown buttons"
+            },
+            {
+              "name": "count",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "Count, such as \"48 students\"; truncates first"
+            },
+            {
+              "name": "actions",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "Actions slot, at the end"
+            },
+            {
+              "name": "selection",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "Selected state: the selection, such as \"3 selected\""
+            },
+            {
+              "name": "bulkActions",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "Selected state: bulk action buttons"
+            },
+            {
+              "name": "onClear",
+              "type": "func",
+              "required": false,
+              "default": null,
+              "description": "Selected state: shows Clear, and runs when it is pressed"
+            },
+            {
+              "name": "clearLabel",
+              "type": "string",
+              "required": false,
+              "default": null,
+              "description": "Selected state: the Clear button's label"
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "required": false,
+              "default": null,
+              "description": null
+            }
+          ]
+        }
       ]
     },
     {
@@ -7178,6 +9073,69 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Geometry",
+        "Tutor",
+        "OnboardingInProgress",
+        "OnboardingDone",
+        "SectionsOpen",
+        "SectionsCollapsed",
+        "TabsNone",
+        "TabsFew",
+        "TabsMany",
+        "TabRest",
+        "TabHover",
+        "TabFocus",
+        "TabSelected",
+        "TabsCollapsedWithSelection",
+        "ClosingTabs",
+        "AccountHug",
+        "AccountRow",
+        "SidebarOpen",
+        "SidebarClosed",
+        "SidebarFloating",
+        "Interactive",
+        "Light",
+        "Dark"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-selected",
+        "--ds-background-selected-hovered",
+        "--ds-background-selected-pressed",
+        "--ds-border",
+        "--ds-icon",
+        "--ds-icon-selected",
+        "--ds-icon-subtle",
+        "--ds-icon-subtlest",
+        "--ds-text",
+        "--ds-text-selected",
+        "--ds-text-subtle",
+        "--ds-text-subtlest",
+        "--focus-ring-width",
+        "--frame-sidebar-group-gap",
+        "--frame-sidebar-pad",
+        "--frame-sidebar-row-gap",
+        "--frame-sidebar-row-radius",
+        "--icon-lg",
+        "--icon-md",
+        "--icon-sm",
+        "--inline-sm",
+        "--item-height-md",
+        "--pad-x-lg",
+        "--pad-x-md",
+        "--pad-x-sm",
+        "--pad-x-xs",
+        "--radius-sm",
+        "--stack-lg",
+        "--stack-md",
+        "--type-weight-medium"
       ]
     },
     {
@@ -7287,6 +9245,49 @@
           "description": "Table content slot — pass thead/tbody elements",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "EmptyState",
+        "EmptyWithStickyColumn",
+        "Interactive",
+        "RowStates",
+        "Sticky",
+        "StickyHeaderNeedsMaxHeight",
+        "StickyHeader",
+        "StickyColumn"
+      ],
+      "tokens": [
+        "--body-default",
+        "--border-default",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-selected",
+        "--ds-background-selected-hovered",
+        "--ds-background-selected-pressed",
+        "--ds-border",
+        "--ds-border-bold",
+        "--ds-border-focused",
+        "--ds-shadow-overflow",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--ds-utility-elevation-surface-current",
+        "--focus-ring-width",
+        "--heading-xxsmall",
+        "--layer-card",
+        "--pattern-table-overflow-reach",
+        "--pattern-table-z-corner",
+        "--pattern-table-z-sticky",
+        "--plus-pattern-table-row-state",
+        "--row-height-md",
+        "--section-stack-md",
+        "--space-0625",
+        "--stack-md",
+        "--stack-sm",
+        "--table-overflow-reach",
+        "--table-pad-x-cell",
+        "--table-pad-y-cell",
+        "--table-radius"
       ]
     },
     {
@@ -7450,6 +9451,46 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Layout",
+        "Content",
+        "InteractionStates",
+        "Overview",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Open",
+        "PlacementTop",
+        "PlacementBottom",
+        "PlacementLeft",
+        "PlacementRight",
+        "WidthSmall",
+        "WidthMedium",
+        "WidthLarge",
+        "BodyOnly",
+        "TriggerClick",
+        "TriggerHover",
+        "TriggerFocus",
+        "TriggerHoverAndClick"
+      ],
+      "tokens": [
+        "--body-default",
+        "--ds-shadow-overlay",
+        "--ds-surface-overlay",
+        "--ds-text",
+        "--heading-xsmall",
+        "--layer-popup",
+        "--popover-offset",
+        "--popover-pad",
+        "--popover-radius",
+        "--popover-width-lg",
+        "--popover-width-md",
+        "--popover-width-sm",
+        "--popup-pad",
+        "--stack-md"
       ]
     },
     {
@@ -7518,6 +9559,30 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Appearances",
+        "Default",
+        "Success",
+        "Inverse",
+        "WithACaption",
+        "Indeterminate",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--ds-background-brand-bold",
+        "--ds-background-inverse-subtle",
+        "--ds-background-inverse-subtle-pressed",
+        "--ds-background-neutral",
+        "--ds-background-success-bold",
+        "--plus-progressbar-fill-color",
+        "--progress-bar-height",
+        "--radius-full"
       ]
     },
     {
@@ -7612,6 +9677,40 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Default",
+        "Interactive",
+        "Appearances",
+        "Sizes",
+        "Spacing",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Decorative",
+        "SizeTokens"
+      ],
+      "tokens": [
+        "--ds-background-brand-bold",
+        "--ds-background-discovery-bold",
+        "--ds-background-inverse-subtle",
+        "--ds-background-inverse-subtle-hovered",
+        "--ds-background-inverse-subtle-pressed",
+        "--ds-border-focused",
+        "--ds-icon",
+        "--ds-icon-inverse",
+        "--ds-icon-subtle",
+        "--ds-icon-subtlest",
+        "--focus-ring-width",
+        "--inline-md",
+        "--inline-sm",
+        "--motion-duration-short",
+        "--motion-easing-standard",
+        "--progress-indicator-dot-size-12",
+        "--progress-indicator-dot-size-8",
+        "--radius-full",
+        "--stack-sm"
       ]
     },
     {
@@ -7665,6 +9764,50 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Default",
+        "Interactive",
+        "Vertical",
+        "Spacing",
+        "Clickable",
+        "Completed",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-default",
+        "--border-default",
+        "--ds-background-brand-bold",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-selected",
+        "--ds-border",
+        "--ds-border-brand",
+        "--ds-border-focused",
+        "--ds-icon-disabled",
+        "--ds-icon-subtle",
+        "--ds-icon-success",
+        "--ds-text-disabled",
+        "--ds-text-selected",
+        "--ds-text-subtle",
+        "--focus-ring-width",
+        "--icon-sm",
+        "--inline-sm",
+        "--item-height-md",
+        "--pad-x-md",
+        "--radius-full",
+        "--radius-h32",
+        "--space-050",
+        "--space-150",
+        "--stack-lg",
+        "--stack-md",
+        "--stack-sm",
+        "--stroke-1",
+        "--type-weight-medium"
       ]
     },
     {
@@ -7822,6 +9965,25 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Default",
+        "EnterSends",
+        "ShiftEnterStartsALine",
+        "CannotSendWhenEmpty",
+        "Loading",
+        "WithSlots",
+        "ComposingDoesNotSend",
+        "Focused",
+        "Disabled",
+        "Interactive"
+      ],
+      "tokens": [
+        "--line-height-125",
+        "--plus-prompt-input-max-height",
+        "--space-0375",
+        "--stack-md",
+        "--stack-sm"
       ]
     },
     {
@@ -7868,6 +10030,16 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Default",
+        "SelectHandsBackTheStarter",
+        "EmptyRendersNothing",
+        "FillsThePromptInput",
+        "Interactive"
+      ],
+      "tokens": [
+        "--stack-md"
       ]
     },
     {
@@ -8061,6 +10233,53 @@
           "description": "Maps to `data-testid`, for test queries.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Content",
+        "States",
+        "Invalid",
+        "Interactive",
+        "ReadOnly",
+        "DescriptionAndCard",
+        "KeyboardFocus",
+        "HoverStep",
+        "Unselected",
+        "Selected",
+        "Hovered",
+        "Focused",
+        "Disabled",
+        "Required"
+      ],
+      "tokens": [
+        "--body-default",
+        "--ds-background-disabled",
+        "--ds-background-input",
+        "--ds-background-input-hovered",
+        "--ds-background-selected-bold",
+        "--ds-background-selected-bold-hovered",
+        "--ds-border",
+        "--ds-border-brand",
+        "--ds-border-danger",
+        "--ds-border-disabled",
+        "--ds-border-input",
+        "--ds-border-selected",
+        "--ds-icon-disabled",
+        "--ds-icon-inverse",
+        "--ds-surface",
+        "--ds-text",
+        "--item-height-sm",
+        "--pad-x-md",
+        "--plus-choice-indent",
+        "--radio-control-size",
+        "--radius-025",
+        "--radius-full",
+        "--space-025",
+        "--space-0375",
+        "--space-050",
+        "--stroke-1",
+        "--stroke-2",
+        "--type-weight-regular"
       ]
     },
     {
@@ -8252,6 +10471,36 @@
           "description": "Inline styles for the fieldset.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Keyboard",
+        "Orientation",
+        "Size",
+        "LinearScale",
+        "Descriptions",
+        "Reveal",
+        "States",
+        "Validation",
+        "TwoGroupsWithoutIds",
+        "Interactive",
+        "Unanswered",
+        "Selected",
+        "Hovered",
+        "Focused",
+        "Required",
+        "Invalid",
+        "ReadOnly",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-default",
+        "--ds-text",
+        "--radio-control-size",
+        "--radio-control-size-10",
+        "--radio-control-size-14",
+        "--space-0625",
+        "--stack-md"
       ]
     },
     {
@@ -8392,6 +10641,42 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Labels",
+        "Positions",
+        "Disabled",
+        "Interactive",
+        "Size",
+        "ReportsNumber",
+        "Aria",
+        "Keyboard",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "DisabledState"
+      ],
+      "tokens": [
+        "--body-default",
+        "--ds-background-disabled",
+        "--ds-background-neutral",
+        "--ds-background-selected-bold",
+        "--ds-background-selected-bold-hovered",
+        "--ds-icon-disabled",
+        "--ds-shadow-raised",
+        "--ds-text",
+        "--item-height-md",
+        "--radius-full",
+        "--range-dot-size-12",
+        "--range-dot-size-16",
+        "--range-dot-size-8",
+        "--range-dot-size-default",
+        "--range-track-height-4",
+        "--range-track-height-6",
+        "--range-track-height-8",
+        "--space-025"
       ]
     },
     {
@@ -8524,6 +10809,88 @@
           ],
           "description": "The glyph used for every choice: `star` (default) or `thumbs-up`.",
           "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Content",
+        "Variants",
+        "InteractionStates",
+        "Interactive",
+        "PropsRender",
+        "Unrated",
+        "Rated",
+        "Hovered",
+        "Focused",
+        "Required",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-default",
+        "--ds-background-disabled",
+        "--ds-background-neutral",
+        "--ds-background-neutral-hovered",
+        "--ds-icon-disabled",
+        "--ds-icon-selected",
+        "--ds-icon-subtle",
+        "--ds-text",
+        "--ds-text-danger",
+        "--icon-lg",
+        "--icon-md",
+        "--item-height-md",
+        "--space-0625",
+        "--stack-md",
+        "--stack-sm",
+        "--type-weight-regular"
+      ],
+      "subComponents": [
+        {
+          "name": "Item",
+          "impl": "RatingItem",
+          "props": [
+            {
+              "name": "value",
+              "type": "number",
+              "required": true,
+              "default": null,
+              "description": "The rating this item stands for, 1 to 5. It is the value `onChange` reports when the item is picked."
+            },
+            {
+              "name": "selected",
+              "type": "bool",
+              "required": false,
+              "default": null,
+              "description": "Filled — true for every item up to the rating."
+            },
+            {
+              "name": "variant",
+              "type": "enum",
+              "required": false,
+              "default": null,
+              "description": "`numeric` prints the value above the icon; `comments` shows the icon alone."
+            },
+            {
+              "name": "icon",
+              "type": "enum",
+              "required": false,
+              "default": null,
+              "description": "The glyph for the item: `star` (default) or `thumbs-up`."
+            },
+            {
+              "name": "disabled",
+              "type": "bool",
+              "required": false,
+              "default": null,
+              "description": "Disables the item. Rating passes its `isDisabled` here."
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "required": false,
+              "default": null,
+              "description": "Extra class on the item circle, beside `plus-rating-item`."
+            }
+          ]
         }
       ]
     },
@@ -8694,6 +11061,50 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Interactive",
+        "BlockStyleMenu",
+        "Empty",
+        "Filled",
+        "Focused",
+        "ReadOnly",
+        "DisabledState",
+        "Compact",
+        "FullToolbar",
+        "ToolbarButtonHovered",
+        "ToolbarButtonPressed"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--ds-background-input",
+        "--ds-background-neutral",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-selected",
+        "--ds-border-input",
+        "--ds-icon-selected",
+        "--ds-icon-subtle",
+        "--ds-opacity-disabled",
+        "--ds-surface-container",
+        "--ds-text",
+        "--ds-text-selected",
+        "--ds-text-subtle",
+        "--ds-text-subtlest",
+        "--field-min-height-lg",
+        "--icon-sm",
+        "--pad-x-sm",
+        "--pad-x-xs",
+        "--radius-md",
+        "--rte-content-pad-x",
+        "--rte-content-pad-y",
+        "--space-0125",
+        "--space-025",
+        "--stack-md",
+        "--type-weight-regular"
       ]
     },
     {
@@ -8758,6 +11169,22 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Layout",
+        "Content",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--ds-border",
+        "--ds-border-bold",
+        "--radius-md",
+        "--scroll-bar-size"
       ]
     },
     {
@@ -8872,6 +11299,39 @@
           "description": "Additional CSS classes",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Primary",
+        "Secondary",
+        "Success",
+        "Danger",
+        "Warning",
+        "Info",
+        "Content",
+        "Overview",
+        "Interactive",
+        "DismissPlacement",
+        "LeadingIcon",
+        "GroundAndText",
+        "Actions",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--body-default",
+        "--border-default",
+        "--card-inline-sm",
+        "--card-pad-compact",
+        "--ds-border",
+        "--ds-text",
+        "--heading-small",
+        "--icon-lg",
+        "--item-height-md",
+        "--radius-md",
+        "--stack-md",
+        "--type-weight-medium"
       ]
     },
     {
@@ -9266,6 +11726,53 @@
           "description": "Inline styles for the field wrapper.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Empty",
+        "Filled",
+        "Multi",
+        "Searchable",
+        "Creatable",
+        "SpacingDefault",
+        "SpacingCompact",
+        "Spacing",
+        "DependentFields",
+        "LongList",
+        "Overview",
+        "Interactive",
+        "Colors",
+        "Rest",
+        "Hovered",
+        "Focused",
+        "FieldDisabled",
+        "FieldInvalid",
+        "FieldReadOnly"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--ds-background-input",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-selected-bold",
+        "--ds-border-focused",
+        "--ds-border-input",
+        "--ds-border-selected",
+        "--ds-icon-inverse",
+        "--ds-icon-subtle",
+        "--ds-icon-subtlest",
+        "--ds-text",
+        "--ds-text-subtle",
+        "--ds-text-subtlest",
+        "--focus-ring-width",
+        "--font-size-0875",
+        "--icon-sm",
+        "--pad-x-md",
+        "--pad-y-md",
+        "--radius-md",
+        "--space-025",
+        "--stack-md",
+        "--stack-sm"
       ]
     },
     {
@@ -9549,6 +12056,51 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "LabelPresets",
+        "PresetWinsOverShape",
+        "TagGroupPreset",
+        "Shapes",
+        "Rect",
+        "Circle",
+        "Text",
+        "PresetNamesAShape",
+        "Paragraph",
+        "Shimmer",
+        "ReducedMotion",
+        "LoadingTable",
+        "LoadingCard",
+        "IgnoredPropsWarn",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--border-default",
+        "--control-sm",
+        "--ds-skeleton",
+        "--ds-skeleton-subtle",
+        "--plus-skeleton-duration",
+        "--plus-skeleton-height",
+        "--plus-skeleton-radius",
+        "--plus-skeleton-width",
+        "--radius-full",
+        "--radius-h24",
+        "--radius-md",
+        "--radius-sm",
+        "--skeleton-circle-size",
+        "--skeleton-height",
+        "--skeleton-status-width",
+        "--skeleton-status-width-spacious",
+        "--skeleton-tag-width",
+        "--skeleton-tag-width-narrow",
+        "--skeleton-tag-width-person",
+        "--skeleton-tag-width-widest",
+        "--skeleton-text-height",
+        "--stack-md"
       ]
     },
     {
@@ -9594,6 +12146,21 @@
           "description": "The label (alternative to `children`). Defaults to the subject's own name.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "CustomLabel",
+        "PassesThroughTagProps",
+        "UnknownSubjectFallsBack",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--icon-sm"
       ]
     },
     {
@@ -9647,6 +12214,26 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Sizes",
+        "Size16",
+        "Size24",
+        "Size48",
+        "Invert",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--ds-icon-inverse",
+        "--plus-spinner-size",
+        "--spinner-size-lg",
+        "--spinner-size-md",
+        "--spinner-size-sm"
       ]
     },
     {
@@ -9684,6 +12271,21 @@
           "description": "Maps to `data-testid`, for test queries.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Appearances",
+        "Spacing",
+        "MenuState",
+        "States",
+        "HoveredState",
+        "PressedState",
+        "KeyboardFocus",
+        "Interactive"
+      ],
+      "tokens": [
+        "--border-default",
+        "--ds-border-inverse"
       ]
     },
     {
@@ -9812,6 +12414,42 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Basic",
+        "WithMedia",
+        "LinkAction",
+        "PrimaryAction",
+        "SecondaryAction",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--ds-background-brand-bold",
+        "--ds-icon-inverse",
+        "--ds-interaction-inverse-hovered",
+        "--ds-interaction-inverse-pressed",
+        "--ds-shadow-overlay",
+        "--ds-surface-overlay",
+        "--ds-text",
+        "--ds-text-inverse",
+        "--heading-small",
+        "--popover-width-md",
+        "--radius-050",
+        "--radius-100",
+        "--radius-md",
+        "--space-025",
+        "--space-050",
+        "--space-075",
+        "--space-100",
+        "--space-150",
+        "--spotlight-media-height"
       ]
     },
     {
@@ -9920,6 +12558,62 @@
           "description": "The `id` attribute of the tag element.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Styles",
+        "WithCount",
+        "TrailingMetricAppearance",
+        "LeadingVisual",
+        "Truncation",
+        "NarrowContainer",
+        "NeverAButton",
+        "PinnedWeight",
+        "UnknownValuesFallBack",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--ds-background-danger",
+        "--ds-background-danger-pressed",
+        "--ds-background-information",
+        "--ds-background-information-pressed",
+        "--ds-background-neutral",
+        "--ds-background-neutral-pressed",
+        "--ds-background-smart-mastering-content",
+        "--ds-background-smart-mastering-content-pressed",
+        "--ds-background-success",
+        "--ds-background-success-pressed",
+        "--ds-background-warning",
+        "--ds-background-warning-pressed",
+        "--ds-text",
+        "--ds-text-danger",
+        "--ds-text-information",
+        "--ds-text-smart-mastering-content",
+        "--ds-text-success",
+        "--ds-text-warning",
+        "--icon-md",
+        "--icon-sm",
+        "--image-xs",
+        "--pad-x-md",
+        "--pad-x-xs",
+        "--plus-status-edge",
+        "--plus-status-height",
+        "--plus-status-icon-box",
+        "--plus-status-max",
+        "--radius-h24",
+        "--radius-md",
+        "--stack-sm",
+        "--tag-gap",
+        "--tag-gap-compact",
+        "--tag-pad-end",
+        "--tag-pad-end-compact"
       ]
     },
     {
@@ -10014,6 +12708,41 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Types",
+        "InATagRow",
+        "Callbacks",
+        "StateLayers",
+        "FocusRing",
+        "DisabledBesideTags",
+        "AcceptIntoTags",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-small",
+        "--border-default",
+        "--ds-background-disabled",
+        "--ds-background-discovery",
+        "--ds-background-discovery-hovered",
+        "--ds-border",
+        "--ds-border-discovery",
+        "--ds-border-focused",
+        "--ds-icon-disabled",
+        "--ds-icon-discovery",
+        "--ds-text-disabled",
+        "--ds-text-discovery",
+        "--focus-ring-width",
+        "--icon-sm",
+        "--pad-x-xs",
+        "--plus-suggestion-height",
+        "--radius-md",
+        "--stack-sm"
       ]
     },
     {
@@ -10184,6 +12913,40 @@
           "description": "Inline styles for the table's wrapper element.",
           "deprecated": null
         }
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--border-default",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-selected",
+        "--ds-background-selected-hovered",
+        "--ds-background-selected-pressed",
+        "--ds-background-warning-bold",
+        "--ds-border",
+        "--ds-border-bold",
+        "--ds-border-focused",
+        "--ds-text",
+        "--ds-text-danger",
+        "--ds-text-disabled",
+        "--ds-text-subtle",
+        "--focus-ring-width",
+        "--heading-xxsmall",
+        "--icon-md",
+        "--icon-sm",
+        "--inline-md",
+        "--plus-table-cell-max-width",
+        "--plus-table-row-height",
+        "--row-height-lg",
+        "--row-height-md",
+        "--row-height-sm",
+        "--space-0625",
+        "--table-cell-max-width",
+        "--table-pad-x-cell",
+        "--table-pad-y-cell",
+        "--table-radius",
+        "--type-weight-semibold"
       ]
     },
     {
@@ -10285,6 +13048,114 @@
           "values": null,
           "description": "Called with the newly selected `eventKey` whenever selection moves.",
           "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Layout",
+        "Alignment",
+        "Appearance",
+        "WithPanels",
+        "InteractionStates",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Selected",
+        "SelectedPill",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-default",
+        "--border-default",
+        "--border-selected",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-background-selected-bold",
+        "--ds-background-selected-bold-hovered",
+        "--ds-background-selected-bold-pressed",
+        "--ds-border",
+        "--ds-border-focused",
+        "--ds-border-selected",
+        "--ds-text-disabled",
+        "--ds-text-inverse",
+        "--ds-text-selected",
+        "--ds-text-subtle",
+        "--item-height-md",
+        "--item-height-sm",
+        "--motion-duration-short",
+        "--motion-easing-standard",
+        "--pad-x-lg",
+        "--pad-x-md",
+        "--radius-full",
+        "--radius-md",
+        "--section-stack-sm",
+        "--stack-md",
+        "--stack-sm",
+        "--type-weight-medium"
+      ],
+      "subComponents": [
+        {
+          "name": "Tab",
+          "impl": "Tab",
+          "props": [
+            {
+              "name": "eventKey",
+              "type": "string or number",
+              "required": false,
+              "default": null,
+              "description": "Identifies this tab; matched against the root's `activeKey`/`defaultActiveKey`."
+            },
+            {
+              "name": "children",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "The tab's label."
+            },
+            {
+              "name": "isDisabled",
+              "type": "bool",
+              "required": false,
+              "default": null,
+              "description": "Disables this tab: it cannot be selected."
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "required": false,
+              "default": null,
+              "description": "Extra class on the tab, beside `plus-tab`."
+            }
+          ]
+        },
+        {
+          "name": "Panel",
+          "impl": "Panel",
+          "props": [
+            {
+              "name": "eventKey",
+              "type": "string or number",
+              "required": false,
+              "default": null,
+              "description": "Matches the `Tab` with the same `eventKey`."
+            },
+            {
+              "name": "children",
+              "type": "node",
+              "required": false,
+              "default": null,
+              "description": "The content shown while the matching tab is selected."
+            },
+            {
+              "name": "className",
+              "type": "string",
+              "required": false,
+              "default": null,
+              "description": "Extra class on the panel, beside `plus-tabs-panel`."
+            }
+          ]
         }
       ]
     },
@@ -10510,6 +13381,152 @@
           "description": "Inline style on the tag element, merged over the `maxWidth` cap.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Colors",
+        "NewColorsContrast",
+        "Behaviors",
+        "Types",
+        "AvatarFallback",
+        "TypeBehaviors",
+        "PersonFocusRing",
+        "RemoveFocusRingOnTypes",
+        "AvatarEdgeCases",
+        "AvatarFills",
+        "Selecting",
+        "StateLayers",
+        "Removing",
+        "RemoveNeedsANameForNodeLabels",
+        "FocusRing",
+        "LinkWithRemove",
+        "DisabledInField",
+        "CountOnSelectable",
+        "Saving",
+        "Truncation",
+        "OnImages",
+        "ElevatedAvatarTypes",
+        "ElevatedDisabled",
+        "ElevatedRemoveFocus",
+        "ElevatedOnlyReadOnlyAndLink",
+        "AnswerChips",
+        "IsDisabled",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-small",
+        "--border-default",
+        "--ds-background-accent-blue-subtler",
+        "--ds-background-accent-blue-subtlest",
+        "--ds-background-accent-blue-subtlest-pressed",
+        "--ds-background-accent-brown-subtler",
+        "--ds-background-accent-brown-subtlest",
+        "--ds-background-accent-brown-subtlest-pressed",
+        "--ds-background-accent-gray-subtler",
+        "--ds-background-accent-gray-subtlest",
+        "--ds-background-accent-gray-subtlest-pressed",
+        "--ds-background-accent-green-subtler",
+        "--ds-background-accent-green-subtlest",
+        "--ds-background-accent-green-subtlest-pressed",
+        "--ds-background-accent-lime-subtler",
+        "--ds-background-accent-lime-subtlest",
+        "--ds-background-accent-lime-subtlest-pressed",
+        "--ds-background-accent-magenta-subtler",
+        "--ds-background-accent-magenta-subtlest",
+        "--ds-background-accent-magenta-subtlest-pressed",
+        "--ds-background-accent-orange-subtler",
+        "--ds-background-accent-orange-subtlest",
+        "--ds-background-accent-orange-subtlest-pressed",
+        "--ds-background-accent-purple-subtler",
+        "--ds-background-accent-purple-subtlest",
+        "--ds-background-accent-purple-subtlest-pressed",
+        "--ds-background-accent-teal-subtler",
+        "--ds-background-accent-teal-subtlest",
+        "--ds-background-accent-teal-subtlest-pressed",
+        "--ds-background-accent-yellow-subtler",
+        "--ds-background-accent-yellow-subtlest",
+        "--ds-background-accent-yellow-subtlest-pressed",
+        "--ds-background-disabled",
+        "--ds-background-discovery-subtler",
+        "--ds-background-neutral-subtle-hovered",
+        "--ds-background-neutral-subtle-pressed",
+        "--ds-border",
+        "--ds-border-accent-blue",
+        "--ds-border-accent-blue-subtle",
+        "--ds-border-accent-brown",
+        "--ds-border-accent-brown-subtle",
+        "--ds-border-accent-gray",
+        "--ds-border-accent-gray-subtle",
+        "--ds-border-accent-green",
+        "--ds-border-accent-green-subtle",
+        "--ds-border-accent-lime",
+        "--ds-border-accent-lime-subtle",
+        "--ds-border-accent-magenta",
+        "--ds-border-accent-magenta-subtle",
+        "--ds-border-accent-orange",
+        "--ds-border-accent-orange-subtle",
+        "--ds-border-accent-purple",
+        "--ds-border-accent-purple-subtle",
+        "--ds-border-accent-teal",
+        "--ds-border-accent-teal-subtle",
+        "--ds-border-accent-yellow",
+        "--ds-border-accent-yellow-subtle",
+        "--ds-border-bold",
+        "--ds-border-focused",
+        "--ds-icon-accent-blue",
+        "--ds-icon-accent-brown",
+        "--ds-icon-accent-gray",
+        "--ds-icon-accent-green",
+        "--ds-icon-accent-lime",
+        "--ds-icon-accent-magenta",
+        "--ds-icon-accent-orange",
+        "--ds-icon-accent-purple",
+        "--ds-icon-accent-teal",
+        "--ds-icon-accent-yellow",
+        "--ds-icon-disabled",
+        "--ds-icon-subtle",
+        "--ds-shadow-overlay",
+        "--ds-surface-overlay",
+        "--ds-text",
+        "--ds-text-accent-blue",
+        "--ds-text-accent-brown",
+        "--ds-text-accent-gray",
+        "--ds-text-accent-green",
+        "--ds-text-accent-lime",
+        "--ds-text-accent-magenta",
+        "--ds-text-accent-orange",
+        "--ds-text-accent-purple",
+        "--ds-text-accent-teal",
+        "--ds-text-accent-yellow",
+        "--ds-text-disabled",
+        "--ds-text-discovery",
+        "--focus-ring-width",
+        "--icon-md",
+        "--icon-sm",
+        "--image-xxs",
+        "--pad-x-xs",
+        "--plus-tag-avatar",
+        "--plus-tag-avatar-ink",
+        "--plus-tag-border-rest",
+        "--plus-tag-border-selected",
+        "--plus-tag-height",
+        "--plus-tag-hovered",
+        "--plus-tag-hue",
+        "--plus-tag-max",
+        "--plus-tag-pressed",
+        "--plus-tag-selected",
+        "--radius-full",
+        "--radius-md",
+        "--radius-sm",
+        "--stack-sm",
+        "--stroke-2",
+        "--tag-dot-size",
+        "--type-family-heading",
+        "--type-weight-semibold"
       ]
     },
     {
@@ -10616,6 +13633,36 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Wrapping",
+        "Collapse",
+        "CollapseMenu",
+        "CollapseWithSuggestions",
+        "MenuKeepsActions",
+        "MaxVisible",
+        "OneMoreTag",
+        "CapNeverSqueezes",
+        "WrappedSuggestionsAreNotCounted",
+        "NoOverflowWhenItFits",
+        "ConditionalChildrenAreNotCounted",
+        "OverflowTag",
+        "DigitBoundary",
+        "StableOnParentRender",
+        "SqueezedFirstReplaced",
+        "AlignmentRight",
+        "Disabled",
+        "RemovableSet",
+        "CustomOverflowAction",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "DisabledSet"
+      ],
+      "tokens": [
+        "--stack-md"
       ]
     },
     {
@@ -10872,6 +13919,54 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "TypingFilters",
+        "CreateWhenNothingMatches",
+        "MatchIgnoresCase",
+        "ClickPicks",
+        "BackspaceRemovesTheLastTag",
+        "EscClearsOnlyTheText",
+        "PasteSplitsOnCommas",
+        "PastedTagsGetTagColors",
+        "MaxLength",
+        "PickLimit",
+        "CollapsesWithoutFocus",
+        "SmallFitsItsTags",
+        "TemporaryIdUntilConfirmed",
+        "ReadOnly",
+        "Invalid",
+        "Disabled",
+        "Controlled",
+        "OptionMenuRenames",
+        "OptionMenuDeletes",
+        "OptionMenuChangesColor",
+        "KeyboardReorder",
+        "DragReorder",
+        "NoTidyingWithoutHandlers",
+        "OptionMenu",
+        "Reordering",
+        "Overview",
+        "SpacingDefault",
+        "SpacingCompact",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Focused",
+        "FieldDisabled"
+      ],
+      "tokens": [
+        "--body-small",
+        "--border-default",
+        "--ds-border",
+        "--ds-icon-subtle",
+        "--ds-text-subtle",
+        "--option-menu-width",
+        "--pad-x-md",
+        "--pad-x-sm",
+        "--plus-tag-input-max-height",
+        "--space-025",
+        "--stack-md"
       ]
     },
     {
@@ -11131,6 +14226,29 @@
           "description": "Inline styles for the field wrapper.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Rows",
+        "Spacing",
+        "Rows1",
+        "Rows3",
+        "Rows6",
+        "SpacingDefault",
+        "SpacingCompact",
+        "Filled",
+        "Success",
+        "Warning",
+        "FocusRing",
+        "Count",
+        "Subtle",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Focused",
+        "FieldDisabled",
+        "FieldInvalid",
+        "FieldReadOnly"
       ]
     },
     {
@@ -11462,6 +14580,38 @@
           "description": "Maps to `data-testid`, for test queries.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "ElementBefore",
+        "TextAffix",
+        "HelperText",
+        "Filled",
+        "Success",
+        "SpacingDefault",
+        "SpacingCompact",
+        "Spacing",
+        "FocusRing",
+        "Interactive",
+        "Anatomy",
+        "ErrorAndCount",
+        "Warning",
+        "Autofill",
+        "Search",
+        "ButtonsInside",
+        "Subtle",
+        "CaptionColors",
+        "NumberSteppers",
+        "NumberEmptyIsNotZero",
+        "NumberClampOnBlur",
+        "NumberWheelLeavesTheValue",
+        "NumberReadOnly",
+        "Rest",
+        "Hovered",
+        "Focused",
+        "FieldDisabled",
+        "FieldInvalid",
+        "FieldReadOnly"
       ]
     },
     {
@@ -11585,6 +14735,61 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Sizes",
+        "DefaultSize",
+        "IconSubtle",
+        "IconBold",
+        "Logos",
+        "LogoDefaultsToWhite",
+        "Images",
+        "WithBorder",
+        "Decorative",
+        "Labeled",
+        "Interactive",
+        "Rest"
+      ],
+      "tokens": [
+        "--border-default",
+        "--ds-background-accent-blue-bolder",
+        "--ds-background-accent-blue-subtler",
+        "--ds-background-accent-green-bolder",
+        "--ds-background-accent-green-subtler",
+        "--ds-background-accent-magenta-bolder",
+        "--ds-background-accent-magenta-subtler",
+        "--ds-background-accent-purple-bolder",
+        "--ds-background-accent-purple-subtler",
+        "--ds-background-accent-teal-bolder",
+        "--ds-background-accent-teal-subtler",
+        "--ds-background-accent-yellow-bolder",
+        "--ds-background-accent-yellow-subtler",
+        "--ds-background-neutral",
+        "--ds-background-neutral-bold",
+        "--ds-border",
+        "--ds-icon-accent-blue",
+        "--ds-icon-accent-green",
+        "--ds-icon-accent-magenta",
+        "--ds-icon-accent-purple",
+        "--ds-icon-accent-teal",
+        "--ds-icon-accent-yellow",
+        "--ds-icon-inverse",
+        "--ds-icon-subtle",
+        "--ds-surface",
+        "--icon-lg",
+        "--icon-md",
+        "--icon-sm",
+        "--image-lg",
+        "--image-md",
+        "--image-sm",
+        "--image-xl",
+        "--image-xs",
+        "--image-xxs",
+        "--radius-sm",
+        "--tile-inner",
+        "--tile-radius",
+        "--tile-radius-lg",
+        "--tile-size"
       ]
     },
     {
@@ -11724,6 +14929,34 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Spacing",
+        "InteractionStates",
+        "PickTime",
+        "TwentyFourHourValueIsSplit",
+        "Default",
+        "WithValue",
+        "Compact",
+        "Invalid",
+        "ReadOnly",
+        "Disabled",
+        "HoveredState",
+        "KeyboardFocus",
+        "Interactive"
+      ],
+      "tokens": [
+        "--ds-icon-brand",
+        "--ds-icon-danger",
+        "--ds-icon-success",
+        "--ds-text-brand",
+        "--ds-text-danger",
+        "--ds-text-success",
+        "--item-height-sm",
+        "--radius-md",
+        "--stack-sm",
+        "--type-weight-semibold"
       ]
     },
     {
@@ -11890,6 +15123,43 @@
           "description": "Maps to `data-testid`, for test queries.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Sizes",
+        "States",
+        "Loading",
+        "Content",
+        "Interactive",
+        "ReadOnly",
+        "KeyboardFocus",
+        "TrackColors",
+        "Unchecked",
+        "Checked",
+        "Hovered",
+        "HoveredOn",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-default",
+        "--ds-background-disabled",
+        "--ds-background-neutral-bold",
+        "--ds-background-neutral-bold-hovered",
+        "--ds-background-selected-bold",
+        "--ds-background-selected-bold-hovered",
+        "--ds-icon-disabled",
+        "--ds-icon-inverse",
+        "--ds-opacity-disabled",
+        "--ds-text",
+        "--item-height-sm",
+        "--radius-full",
+        "--stack-md",
+        "--toggle-pad",
+        "--toggle-track-height-16",
+        "--toggle-track-height-20",
+        "--toggle-track-width-16",
+        "--toggle-track-width-20"
       ]
     },
     {
@@ -11986,6 +15256,32 @@
           "description": "Milliseconds before the tooltip hides after the pointer or focus leaves. Defaults to 400.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Placements",
+        "Interactive",
+        "Overview",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled",
+        "PlacementTop",
+        "PlacementBottom",
+        "PlacementLeft",
+        "PlacementRight",
+        "Wrapping"
+      ],
+      "tokens": [
+        "--body-small",
+        "--ds-background-neutral-bold",
+        "--ds-shadow-overlay",
+        "--ds-text-inverse",
+        "--layer-popup",
+        "--pad-x-sm",
+        "--popover-max-width-tooltip",
+        "--popover-pad-y-tooltip",
+        "--popover-radius-tooltip"
       ]
     },
     {
@@ -12152,6 +15448,19 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "SingleSelect",
+        "MultiSelect",
+        "SpacingDefault",
+        "SpacingCompact",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Focused",
+        "FieldDisabled",
+        "FieldInvalid"
       ]
     },
     {
@@ -12263,6 +15572,43 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Spacing",
+        "Types",
+        "Counter",
+        "Interactive",
+        "Rest",
+        "Hovered",
+        "Pressed",
+        "Focused",
+        "Disabled"
+      ],
+      "tokens": [
+        "--body-default",
+        "--body-small",
+        "--ds-background-brand-subtlest",
+        "--ds-background-danger-subtler",
+        "--ds-interaction-hovered",
+        "--ds-opacity-disabled",
+        "--ds-surface",
+        "--ds-text",
+        "--ds-text-brand",
+        "--ds-text-danger",
+        "--image-md",
+        "--image-sm",
+        "--inline-md",
+        "--item-height-md",
+        "--label-height-md",
+        "--label-max-width",
+        "--pad-x-md",
+        "--pad-x-sm",
+        "--pad-y-md",
+        "--radius-full",
+        "--radius-h32",
+        "--radius-md",
+        "--space-0625"
       ]
     },
     {
@@ -12349,6 +15695,18 @@
           "description": null,
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "Appearances",
+        "States",
+        "Selected",
+        "Disabled",
+        "Loading",
+        "HoveredState",
+        "PressedState",
+        "KeyboardFocus",
+        "Interactive"
       ]
     },
     {
@@ -12386,6 +15744,13 @@
           "description": "An ARIA role for the span, such as `status` for a live region.",
           "deprecated": null
         }
+      ],
+      "stories": [
+        "Overview",
+        "NamesAControl",
+        "HiddenColumnHeaders",
+        "RoleAndId",
+        "Interactive"
       ]
     }
   ]

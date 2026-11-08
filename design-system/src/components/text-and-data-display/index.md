@@ -3,16 +3,16 @@
 # Text and data display
 
 4 components. Each row links to the generated facts; the three columns after it are the
-authored half (#166), counted rather than assumed.
+authored half, counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
 | [Code](Code/index.md) | 2 | ✅ | ✅ | ✅ |
 | [CodeBlock](CodeBlock/index.md) | 7 | ✅ | ✅ | ✅ |
 | [Heading](Heading/index.md) | 6 | ✅ | ✅ | ✅ |
-| [Table](Table/index.md) | 17 | ✕ | ✕ | ✕ |
+| [Table](Table/index.md) | 17 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 3/4 (75%) · Correct/incorrect 3/4 (75%) · Accessibility 3/4 (75%)
+**Authored coverage:** When to use 4/4 (100%) · Correct/incorrect 4/4 (100%) · Accessibility 4/4 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

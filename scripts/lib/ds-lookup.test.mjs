@@ -6,6 +6,8 @@
  */
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { REPO_ROOT } from './corpus.mjs';
 import { ORIENTATION, PATHS_REFUSAL, PathsRefused, createLookup, render } from './ds-lookup.mjs';
@@ -179,4 +181,24 @@ test('check runs check:ds-usage in-process on code, with rule ids and fixes', ()
   assert.ok(r.findings.every((f) => f.fix && f.see));
   assert.equal(lookup.check({ code: "import { Button } from '@/components';\nexport const X = () => <Button text=\"Save\" />;" }).failing, 0);
   assert.match(render('check', r), /ds\/no-raw-literal/);
+});
+
+test('get returns the generated doc byte for byte, for a component, a flat component and a pattern', () => {
+  for (const [name, file] of [
+    ['Modal', 'design-system/src/components/messaging/Modal/index.md'],
+    ['Fieldset', 'design-system/src/components/forms-and-inputs/Fieldset.md'],
+    ['PatternCard', 'design-system/src/patterns/PatternCard/index.md'],
+  ]) {
+    const result = lookup.get([name]);
+    assert.equal(render('get', result), fs.readFileSync(path.join(REPO_ROOT, file), 'utf8'), name);
+    assert.equal(result.records[0].doc, file, name);
+  }
+});
+
+test('a get section is that part of the same text', () => {
+  const full = render('get', lookup.get(['Modal']));
+  const a11y = render('get', lookup.get(['Modal'], 'a11y'));
+  assert.match(a11y, /^# Modal\n\nimport \{ Modal \} from '@\/components';\n\n## Accessibility\n/);
+  assert.ok(full.includes(a11y.slice(a11y.indexOf('## Accessibility'))));
+  assert.doesNotMatch(full, /figma\.com|Next:/);
 });
