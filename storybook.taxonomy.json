@@ -10,8 +10,7 @@
     "AI/",
     "Tools/",
     "Data visualizations/",
-    "Specs/",
-    "Deprecated/"
+    "Specs/"
   ],
   "componentGroups": {
     "Forms and inputs": [
@@ -486,7 +485,6 @@
         ]
       ]
     ],
-    "Deprecated",
     "*"
   ],
   "docsSpine": [

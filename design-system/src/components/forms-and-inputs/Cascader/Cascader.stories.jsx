@@ -9,10 +9,6 @@ export default {
     component: Cascader,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'ADS props: `isDisabled`, `isRequired`, `isInvalid`/`errorMessage`, `spacing` (default 40, compact 32); gained `label` and `caption` on the shared `_Field` base.' },
-            { date: '2026-10-23', kind: 'changed', summary: 'A single-line field became 32, its text centered and its side padding 12.' },
-        ],
         docs: {
             description: {
                 component:

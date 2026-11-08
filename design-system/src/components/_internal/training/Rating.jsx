@@ -4,10 +4,8 @@ import PropTypes from 'prop-types';
 /**
  * Rating Component
  * Rating component with 5 rating singles (1-5) showing different selected states.
- * Matches legacy design-system/specs/Training/Lessons/Elements/Rating.js
  */
 const Rating = ({ rating = "rest", onRatingChange }) => {
-    // Styling constants from legacy
     const containerStyle = {
         display: 'flex',
         gap: 'var(--section-stack-md)',
@@ -44,18 +42,10 @@ Rating.propTypes = {
 };
 
 /**
- * Sub-component: RatingSingle
- * Logic derived from legacy createRatingSingle calls
+ * Sub-component: RatingSingle, one numbered circle.
  */
 const RatingSingle = ({ value, status, onClick }) => {
-    // Styles for the single rating item (circle with number)
-    // Legacy mapping:
-    // status=rest: border-neutral-tertiary (??), bg-transparent, text-primary
-    // status=selected: bg-primary, text-white
-
-    // Using standard Bootstrap/plus classes where possible, or inline to match exact legacy flex gaps
-    // The legacy code used `createRatingSingle` which isnt shown but implied specific styling.
-    // We will approximate with standard PLUS tokens.
+    // At rest a bordered circle; selected, the brand fill with inverse text.
 
     const baseStyle = {
         width: '40px',

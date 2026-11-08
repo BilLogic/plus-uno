@@ -21,12 +21,6 @@ export default {
     component: TagInput,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-04', kind: 'changed', summary: '`size` became `spacing` (`default` or `compact`), the name every other field uses; the small and large sizes are gone.' },
-            { date: '2026-10-25', kind: 'changed', summary: 'The color menu and a new tag\'s random color cover Tag\'s ten colors: orange, lime and brown joined.' },
-            { date: '2026-10-23', kind: 'changed', summary: 'The field became 32 with one row of tags, growing as they wrap.' },
-            { date: '2026-10-23', kind: 'deprecated', summary: 'The `small` and `large` sizes were deprecated: they draw like `medium` and warn in development.' },
-        ],
     },
 };
 
@@ -326,7 +320,7 @@ CollapsesWithoutFocus.play = async ({ canvasElement }) => {
 /**
  * The field fits its tags: every tag, "+n" included, is Tag's one height, 22,
  * and sits inside the field's border at any width, and the field stays as tall
- * as an Input. `small` is deprecated and draws like `medium`, so the two match.
+ * as an Input.
  */
 const WIDTHS = [160, 200, 240, 280, 360];
 

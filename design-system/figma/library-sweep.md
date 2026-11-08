@@ -70,15 +70,15 @@ file:
 
 | Figma says | the system says |
 |---|---|
-| `error` | `danger` (`--color-danger`) |
-| `mastering` | `--color-mastering-content` |
-| `social` | `--color-social-emotional` |
-| `technology` | `--color-technology-tools` |
+| `error` | `danger` (`--ds-background-danger-bold`) |
+| `mastering` | `--ds-*-smart-mastering-content` |
+| `social` | `--ds-*-smart-social-emotional` |
+| `technology` | `--ds-*-smart-technology-tools` |
 
 `error` is the one that matters: it is a different word for a semantic the rest
 of the library, the token file and every component call `danger`. The domain
 names are truncations rather than different words, but a designer reading
-`social` in a picker has no route to `--color-social-emotional`.
+`social` in a picker has no route to `--ds-*-smart-social-emotional`.
 
 ### Values that are literals where the system has tokens
 
@@ -271,7 +271,7 @@ frame rather than replacing anything:
 | B — darken the yellow, keep white | #876f04 | #ffffff | 4.88:1 |
 | C — what ships today | #9f8205 | #ffffff | **3.70:1, fails AA** |
 
-And the info defect as three chips: `--color-info` and `--color-tertiary` side
+And the info defect as three chips: the info and tertiary fills side
 by side, which measure **1.00:1 against each other** because one is an alias of
 the other, beside the Info Bold candidate at #203eb6 (8.66:1 on white, and
 1.64:1 against primary where primary against tertiary today is 1.11:1).

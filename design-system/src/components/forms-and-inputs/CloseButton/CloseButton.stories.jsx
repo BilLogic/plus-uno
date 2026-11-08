@@ -21,9 +21,6 @@ export default {
     /** Hide CSF stories from the sidebar; docs live on CloseButton.mdx (Canvas still embeds them). */
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'An Icon button, subtle. `what` is gone: `label` is the required accessible name. `spacing` added (default 32, compact 24).' },
-        ],
         docs: { toc: { title: 'On this page' } },
     },
     argTypes: {

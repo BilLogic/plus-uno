@@ -1,74 +1,56 @@
 ---
-summary: The PLUS Design System follows Material Design 3 color guidance
+summary: Color tokens by role — fills, grounds, text, icons and borders, SMART subjects, modes
 ---
 
 <!-- Tier: 2 -->
 
 # Color Tokens
 
-The PLUS Design System follows Material Design 3 color guidance.
+Every color is a `--ds-*` token named for its job, and the job picks the family:
 
-## Color Token Naming Convention
+- `--ds-background-{role}` (and `-subtler`, `-subtle`, `-bold`) — a fill
+- `--ds-surface`, `--ds-surface-sunken`, `--ds-surface-raised`, `--ds-surface-overlay` — a ground
+- `--ds-text-{role}` — text; `--ds-icon-{role}` — a glyph
+- `--ds-border-{role}` — an edge; `--ds-border-{role}-subtle` — the pale edge of an outlined label (Tag, date Status)
 
-Each color role has multiple variants:
-- `--color-{role}` - Main color (for borders/backgrounds)
-- `--color-{role}-text` - Text-safe version (use for text content)
-- `--color-on-{role}` - Content color on filled backgrounds
-- `--color-{role}-container` - Container/background version
-- `--color-{role}-border-subtle` - The role at 45%: the pale border of an outlined label (Tag, date Status). Figma names it `{Role}/{Role} Border Subtle`, beside the 3:1 `{Role} Border` role, which is `--color-{role}-border`. Success, Warning, Danger, Tertiary and the five SMART hues have one; Info aliases Tertiary's, and Primary and Secondary have none, because no label uses them.
+## Fill and text by role
 
-## Accent Colors
+| Role | Fill | Text | Usage |
+|------|------|------|-------|
+| **Brand** | `--ds-background-brand-bold` | `--ds-text-brand` | Primary actions |
+| **Neutral** | `--ds-background-neutral` | `--ds-text-subtle` | Secondary actions, quiet fills |
+| **Accent teal** | `--ds-background-accent-teal-subtle` | `--ds-text-accent-teal` | Accents with no meaning |
+| **Success** | `--ds-background-success-bold` | `--ds-text-success` | Success states, confirmations |
+| **Warning** | `--ds-background-warning-bold` | `--ds-text-warning` | Warning states, cautions |
+| **Danger** | `--ds-background-danger-bold` | `--ds-text-danger` | Error states, destructive actions |
+| **Information** | `--ds-background-information-bold` | `--ds-text-information` | Informational |
 
-| Role | Main Token | Text Token | Usage |
-|------|------------|------------|-------|
-| **Primary** | `--color-primary` | `--color-primary-text` | Primary actions, focus states |
-| **Secondary** | `--color-secondary` | `--color-secondary-text` | Secondary actions |
-| **Tertiary** | `--color-tertiary` | `--color-tertiary-text` | Accents, highlights |
-| **Success** | `--color-success` | `--color-success-text` | Success states, confirmations |
-| **Warning** | `--color-warning` | `--color-warning-text` | Warning states, cautions |
-| **Danger** | `--color-danger` | `--color-danger-text` | Error states, destructive actions |
-| **Info** | `--color-info` | `--color-info-text` | Informational (aliases to Tertiary) |
+**Warning's bold fill is light.** Text and icons on `--ds-background-warning-bold` take `--ds-text-warning-inverse`, not the white inverse ink the other bold fills take. An edge or glyph that means warning takes `--ds-border-warning` or `--ds-icon-warning`, never the fill.
 
-**Warning is the one intent whose edge and glyph differ from its fill.** The yellow `--color-warning` (#9f8205) is a ground, and it measures 2.87:1 on the darkest surface. So:
+## SMART subjects
 
-- An icon takes `--color-warning-icon` and an edge takes `--color-warning-border`. Both are #715c00, which measures 6.50:1 on white and 5.02:1 on `--color-surface-container-highest`.
-- A label on a filled warning takes `--color-on-warning`, the dark container ink #231b00, at 4.62:1. White on the yellow is 3.70:1.
-- Do: `border-color: var(--color-warning-border)`. Don't: `border-color: var(--color-warning)`.
+| Competency | Token family | Hue |
+|------------|--------------|-----|
+| Social-Emotional | `--ds-*-smart-social-emotional` | Orange |
+| Mastering Content | `--ds-*-smart-mastering-content` | Teal |
+| Advocacy | `--ds-*-smart-advocacy` | Lime |
+| Relationship | `--ds-*-smart-relationship` | Magenta |
+| Technology Tools | `--ds-*-smart-technology-tools` | Brown |
 
-`info` is an alias of `tertiary` on purpose, so the two render the same teal.
+An illustration body takes `--ds-background-smart-<subject>-subtle`, the mid step between the chip fill and the bold fill.
 
-## SMART Framework Colors
-
-| Competency | Token Prefix | Theme |
-|------------|--------------|-------|
-| Social-Emotional | `--color-social-emotional` | Gold/Yellow |
-| Mastering Content | `--color-mastering-content` | Purple |
-| Advocacy | `--color-advocacy` | Green |
-| Relationship | `--color-relationship` | Pink/Magenta |
-| Technology Tools | `--color-technology-tools` | Blue |
-
-On the new tokens, an illustration body takes `--ds-background-smart-<subject>-subtle`, the mid step between the chip fill and the bold fill.
-
-```jsx
-<Badge style="social-emotional">Social-Emotional</Badge>
-<Badge style="mastering-content">Mastering Content</Badge>
-```
-
-## Surface Colors
+## Surfaces
 
 | Token | Usage |
 |-------|-------|
-| `--color-surface` | Main surface background |
-| `--color-on-surface` | Text on surface |
-| `--color-surface-container` | Container backgrounds |
-| `--color-outline` | Borders and dividers |
-| `--color-outline-variant` | Subtle borders |
+| `--ds-surface` | The page |
+| `--ds-surface-sunken` | The ground behind grouped things: a sidebar column, a well inside a card |
+| `--ds-surface-raised` | A card, with `--ds-shadow-raised` |
+| `--ds-surface-overlay` | A modal, menu, popover, tooltip or toast, with `--ds-shadow-overlay` |
+| `--ds-border` | Borders and dividers |
 
-The gray container fills (`--color-surface-container-*`) are for recessed or
-nested regions only: a sidebar column, a well inside a card. A surface lifts by
-shadow, not by a different gray. A raised card or an overlay keeps the page's
-own fill and takes its role's shadow, as the surface roles in
-`design-system/src/tokens/_elevation.scss` and `elevation.md` set out.
+A surface lifts by shadow, not by a different gray: a raised card or an overlay
+takes its role's surface and shadow, as `elevation.md` sets out.
 
 ## Interaction states
 
@@ -117,23 +99,8 @@ Pick the role by meaning: neutral, brand, information, success, warning, danger,
 
 ## Rules
 
-1. **Use `-text` variants for text** - Always use `--color-{role}-text` for text content
-2. **Use the named state tokens for interaction** - Hovered, pressed and selected steps, from the section above; focus is the focus ring, never a fill
-3. **Use `-container` for backgrounds** - Container tokens for subtle background fills
-4. **Info equals Tertiary** - Info colors are aliases to Tertiary tokens
-
-### Exception: the Sidebar's selected icon
-
-A selected SidebarTab draws its icon in `--color-primary`, the same color as its
-label, not in the darker `--color-primary-icon` role that intent glyphs
-take elsewhere. Navigation reads the icon and label as one mark.
-
-### Exception: the Field hover border
-
-A Field's hover border is `--color-inverse-primary`, not `--ds-border-brand`.
-The border role is the focus ring's color, so a hover border in it would read
-as focus. The hover border is a hint, not an indicator: focus is the 2px focus
-ring.
+1. **Pick the family by job** — a fill takes `--ds-background-*`, text `--ds-text-*`, a glyph `--ds-icon-*`, an edge `--ds-border-*`
+2. **Use the named state tokens for interaction** — hovered, pressed and selected steps, from the section above; focus is the focus ring, never a fill
 
 ## Data-viz color
 
@@ -319,8 +286,8 @@ component. A chart never carries a literal pixel value of its own.
   surface, step over step; a diverging ramp's midpoint sits nearer the surface
   than either arm's first step.
 
-`design-system/tests/dataviz-tokens.test.js` fails on any legacy `--color-*`
-name or color literal under `design-system/src/dataviz/`.
+`design-system/tests/dataviz-tokens.test.js` fails on any color
+name outside `--ds-*` or color literal under `design-system/src/dataviz/`.
 
 **Do:**
 - One color by default, and more only to tell categories apart.

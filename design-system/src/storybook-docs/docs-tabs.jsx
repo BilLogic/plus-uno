@@ -1,5 +1,5 @@
 /**
- * The component docs page's tab strip — Examples · Code · Usage · Changelog,
+ * The component docs page's tab strip — Examples · Code · Usage,
  * rendered INSIDE the page, below the title (ADR-025).
  *
  * WHY THIS IS NOT A STORYBOOK ADDON. It was, until #168's `types.TAB`
@@ -32,7 +32,7 @@
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
 import { ArgTypes, useOf } from '@storybook/addon-docs/blocks';
 
-import { CHANGELOG_ADOPTED, TABS, importLineFor, normalizeChangelog } from './lib/component-tabs-contract.js';
+import { TABS, importLineFor } from './lib/component-tabs-contract.js';
 
 /**
  * The window whose query string holds the tab — the manager's, normally.
@@ -89,7 +89,7 @@ function writeTabParam(win, id) {
 
 /**
  * A tab whose content is authored in MDX. Only `examples` and `usage` are ever
- * authored — Code and Changelog are derived, so a page never declares them.
+ * authored — Code is derived, so a page never declares it.
  *
  * This component renders nothing itself; `DocsTabs` reads its props off the
  * element and renders the active one. That is what makes tab membership
@@ -103,9 +103,9 @@ export function DocsTab({ children }) {
 /**
  * The wrapper an authored tab gets from its MDX, applied to the generated ones.
  *
- * Code and Changelog build their own markup, and they used to emit a bare
+ * Code builds its own markup, and it used to emit a bare
  * `.sb-ds-doc-section` with no `.sb-ds-component-docs` ancestor. The section
- * rules are scoped to that ancestor, so those two tabs fell outside them: their
+ * rules are scoped to that ancestor, so that tab fell outside them: its
  * `<h2>` rendered at 32px with a 16px top margin against 28px and zero for the
  * 289 authored ones. Same class, same tag, two appearances — which is precisely
  * what ADR-025 says must not happen.
@@ -148,55 +148,14 @@ function CodeTabPanel({ of, importName }) {
 }
 
 /**
- * A summary is a plain string authored with markdown inline code
- * (`components/changelog.md`), so the backtick spans render as `<code>` here
- * rather than as literal backticks.
- */
-function renderInlineCode(text) {
-  return String(text)
-    .split(/(`[^`]+`)/)
-    .map((part, i) =>
-      part.length > 2 && part.startsWith('`') && part.endsWith('`') ? (
-        <code key={i}>{part.slice(1, -1)}</code>
-      ) : (
-        part
-      ),
-    );
-}
-
-/** The Changelog tab. Entries come from the story meta, newest first. */
-function ChangelogTabPanel({ entries }) {
-  return (
-    <GeneratedTabBody>
-      <h2>Changelog</h2>
-      <dl className="sb-ds-changelog">
-        {entries.map((entry) => (
-          <React.Fragment key={`${entry.date}-${entry.summary}`}>
-            <dt>
-              <time dateTime={entry.date}>{entry.date}</time>
-              {entry.kind ? <span className="sb-ds-changelog__kind">{entry.kind}</span> : null}
-            </dt>
-            <dd>{renderInlineCode(entry.summary)}</dd>
-          </React.Fragment>
-        ))}
-      </dl>
-      <p className="sb-ds-changelog__adopted">
-        Component changelogs start {CHANGELOG_ADOPTED}. Nothing before it is recorded, because
-        nothing produced a component changelog before it.
-      </p>
-    </GeneratedTabBody>
-  );
-}
-
-/**
  * The tab strip and the active panel.
  *
  * @param {object} props
  * @param {unknown} [props.of] The story meta, as `<DocsTabs of={ButtonStories}>`.
- *   Supplies both the props table and the changelog entries.
+ *   Supplies the props table.
  * @param {string} [props.examplesTitle] Renames the FIRST tab only. Atlassian's
- *   own token page reads "All tokens" where Button reads "Examples"; Code, Usage
- *   and Changelog mean the same thing on every page and are not renameable.
+ *   own token page reads "All tokens" where Button reads "Examples"; Code and
+ *   Usage mean the same thing on every page and are not renameable.
  * @param {React.ReactNode} props.children One `<DocsTab tab="examples">` and, when
  *   the page has usage content, one `<DocsTab tab="usage">`.
  */
@@ -210,10 +169,6 @@ export function DocsTabs({ of, examplesTitle, children }) {
   }, [children]);
 
   const resolved = useOf(of || 'meta');
-  const entries = useMemo(
-    () => normalizeChangelog(resolved?.preparedMeta?.parameters?.changelog ?? resolved?.parameters?.changelog),
-    [resolved],
-  );
 
   /**
    * Whether there is a props table to show at all.
@@ -232,20 +187,16 @@ export function DocsTabs({ of, examplesTitle, children }) {
 
   /**
    * Which tabs exist on THIS page. A tab with nothing to show is not rendered
-   * empty, it is absent — 30 of the 48 component pages have no usage content,
-   * and no component has declared a changelog entry yet, so an always-present
-   * Changelog would put a permanently empty tab on every page to prove a
-   * mechanism exists.
+   * empty, it is absent — 30 of the 48 component pages have no usage content.
    */
   const present = useMemo(
     () =>
       TABS.filter(({ key }) => {
         if (key === 'examples') return true;
         if (key === 'code') return argCount > 0;
-        if (key === 'changelog') return entries.length > 0;
         return Boolean(authored[key]);
       }).map((tab) => (tab.key === 'examples' && examplesTitle ? { ...tab, title: examplesTitle } : tab)),
-    [argCount, authored, entries.length, examplesTitle],
+    [argCount, authored, examplesTitle],
   );
 
   const win = useMemo(() => tabWindow(), []);
@@ -341,8 +292,6 @@ export function DocsTabs({ of, examplesTitle, children }) {
       >
         {activeTab.key === 'code' ? (
           <CodeTabPanel of={of} importName={resolved?.preparedMeta?.component?.displayName ?? resolved?.preparedMeta?.component?.name} />
-        ) : activeTab.key === 'changelog' ? (
-          <ChangelogTabPanel entries={entries} />
         ) : (
           (authored[activeTab.key] ?? null)
         )}

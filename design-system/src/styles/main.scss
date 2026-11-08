@@ -7,7 +7,7 @@
 
 @use "sass:meta";
 
-// CSS cascade layers: declares precedence once, so legacy-alias precedence is
+// CSS cascade layers: declares precedence once, so precedence is
 // explicit and Bootstrap's CSS can later be deleted as a layer. The
 // `bootstrap` layer is populated by `bootstrap-layer.scss`, which every entry
 // point imports before this file. Unlayered rules (inline styles, stray

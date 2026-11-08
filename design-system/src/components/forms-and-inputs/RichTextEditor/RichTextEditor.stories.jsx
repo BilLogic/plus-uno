@@ -10,13 +10,6 @@ export default {
     component: RichTextEditor,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-04', kind: 'changed', summary: '`size` became `spacing` (`default` or `compact`), the name every other field uses; the small and large sizes are gone.' },
-            { date: '2026-11-04', kind: 'changed', summary: 'The block-style menu opens on the Dropdown menu and its rows are menu items, so it is keyboard-operable (Enter opens, arrows move, Escape closes) and the editor no longer imports react-bootstrap.' },
-            { date: '2026-10-24', kind: 'changed', summary: 'Toolbar buttons hover at secondary 08 and press at 12, the block toggle at on-surface 08 and 12; focus is the 2px focus ring. The block menu selects at primary 08 and shows keyboard focus as a ring.' },
-            { date: '2026-10-23', kind: 'changed', summary: 'The editing area became 120 high at least, growing with what is typed.' },
-            { date: '2026-10-23', kind: 'deprecated', summary: 'The `small` and `large` sizes were deprecated: they draw like `medium` and warn in development.' },
-        ],
         docs: {
             description: {
                 component: 'Rich text editor component with formatting toolbar. Supports bold, italic, lists, and more.'

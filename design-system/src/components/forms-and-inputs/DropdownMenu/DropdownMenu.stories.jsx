@@ -12,9 +12,6 @@ export default {
     component: DropdownMenu,
     tags: ['!dev', '!autodocs', 'new'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'added', summary: 'DropdownMenu replaced Dropdown: it opens the public Menu family (`MenuGroup`, `ButtonItem`, `LinkItem`, `CustomItem`, `Section`) on Base UI Menu, with `trigger`, `isOpen`/`onOpenChange`, `placement`, `shouldFlip`, `spacing` and `testId`.' },
-        ],
         docs: {
             description: {
                 component: 'A trigger that opens a menu of actions or navigation items.',
