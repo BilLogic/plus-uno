@@ -7,6 +7,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 import { REPO_ROOT } from './corpus.mjs';
@@ -170,6 +171,36 @@ test('guide returns the orientation, a guideline and a rule section', () => {
   assert.equal(lookup.guide('a11y').path, 'design-system/guidelines/foundations/accessibility.md');
   assert.match(lookup.guide('no-raw-literal').text, /^## ds\/no-raw-literal/);
   assert.ok(lookup.guide('nope').topics.includes('layout'));
+});
+
+test('guide answers a foundation topic with no guideline file from its Storybook foundation page, as text', () => {
+  const color = lookup.guide('color');
+  assert.equal(color.path, 'design-system/src/styles/Colors.mdx');
+  assert.match(color.text, /^# Color\n/);
+  assert.match(color.text, /^## Data-viz color$/m);
+  assert.match(color.text, /--ds-chart-categorical-1/);
+  assert.doesNotMatch(color.text, /<[A-Z][A-Za-z]*[\s/>]|import \{/);
+  assert.equal(lookup.guide('colour').path, color.path);
+  assert.equal(lookup.guide('colors').path, color.path);
+  assert.ok(lookup.guide('nope').topics.includes('color'));
+});
+
+test('guide survives a guideline folder that is empty or missing', () => {
+  const tmp = fs.mkdtempSync(path.join(fs.realpathSync(os.tmpdir()), 'ds-guide-'));
+  try {
+    // The repo, linked entry by entry, with design-system/guidelines holding one empty folder.
+    for (const e of fs.readdirSync(REPO_ROOT)) if (e !== 'design-system') fs.symlinkSync(path.join(REPO_ROOT, e), path.join(tmp, e));
+    fs.mkdirSync(path.join(tmp, 'design-system/guidelines/foundations'), { recursive: true });
+    for (const e of fs.readdirSync(path.join(REPO_ROOT, 'design-system'))) {
+      if (e !== 'guidelines') fs.symlinkSync(path.join(REPO_ROOT, 'design-system', e), path.join(tmp, 'design-system', e));
+    }
+    const bare = createLookup(tmp);
+    assert.equal(bare.guide('color').path, 'design-system/src/styles/Colors.mdx');
+    assert.ok(bare.guide('nope').topics.includes('typography'));
+    assert.equal(bare.guide('layout formulas').text, null);
+  } finally {
+    fs.rmSync(tmp, { recursive: true, force: true });
+  }
 });
 
 test('check runs check:ds-usage in-process on code, with rule ids and fixes', () => {

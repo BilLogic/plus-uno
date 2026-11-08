@@ -50,7 +50,7 @@ import path from 'node:path';
 
 import { contextOf, escapes, expandPaths } from '../check-ds-usage.mjs';
 import { BARRELS, loadFacts } from './ds-facts.mjs';
-import { createPageFinder, readDocsPage, sectionText } from './docs-page.mjs';
+import { createPageFinder, pageText, readDocsPage, sectionText } from './docs-page.mjs';
 import { FIND_TUNING, STOPWORDS, createRanker } from './ds-rank.mjs';
 import { readIconLists } from './icon-lists.mjs';
 import { RULES, RULES_DOC, docLink, escapesIn } from './ds-usage.mjs';
@@ -112,6 +112,7 @@ const TOPIC_ALIASES = {
   voice: 'content',
   type: 'typography',
   colour: 'color',
+  colors: 'color',
   shadow: 'elevation',
   dataviz: 'data-visualization',
   charts: 'data-visualization',
@@ -142,6 +143,7 @@ const headed = (page, title) => {
 };
 const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
 const GUIDELINES = 'design-system/guidelines';
+const FOUNDATION_PAGES = 'design-system/src/styles';
 const readIf = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
 const firstSentence = (text, max = 160) => {
   if (!text) return null;
@@ -539,20 +541,33 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
 
   // ── guide ───────────────────────────────────────────────────────────────
 
+  /** A folder's `.md` files other than its overview; none when the folder is empty or gone. */
+  const mdIn = (dir) => (fs.existsSync(path.join(root, dir)) ? fs.readdirSync(path.join(root, dir)).filter((f) => f.endsWith('.md') && f !== 'overview.md') : []);
+  /**
+   * Topic → the file that answers it. A guideline file answers its topic while
+   * it exists; a foundation topic with none is answered by its Storybook
+   * foundation page (`Colors.mdx` → color), read through the page model.
+   */
   const topics = () => {
     const map = {};
     for (const dir of ['foundations', 'composition']) {
-      for (const f of fs.readdirSync(path.join(root, GUIDELINES, dir)).filter((f) => f.endsWith('.md') && f !== 'overview.md')) {
-        map[f.replace(/\.md$/, '')] ??= `${GUIDELINES}/${dir}/${f}`;
-      }
+      for (const f of mdIn(`${GUIDELINES}/${dir}`)) map[f.replace(/\.md$/, '')] ??= `${GUIDELINES}/${dir}/${f}`;
     }
-    map.content = `${GUIDELINES}/foundations/content/overview.md`;
-    for (const f of fs.readdirSync(path.join(root, GUIDELINES, 'foundations/content')).filter((f) => f.endsWith('.md') && f !== 'overview.md')) {
-      map[f.replace(/\.md$/, '')] = `${GUIDELINES}/foundations/content/${f}`;
+    if (fs.existsSync(path.join(root, GUIDELINES, 'foundations/content/overview.md'))) map.content = `${GUIDELINES}/foundations/content/overview.md`;
+    for (const f of mdIn(`${GUIDELINES}/foundations/content`)) map[f.replace(/\.md$/, '')] = `${GUIDELINES}/foundations/content/${f}`;
+    for (const f of fs.existsSync(path.join(root, FOUNDATION_PAGES)) ? fs.readdirSync(path.join(root, FOUNDATION_PAGES)) : []) {
+      const base = f.match(/^([A-Z][A-Za-z]*)\.mdx$/)?.[1]?.toLowerCase();
+      if (base && base !== 'foundationsoverview') map[TOPIC_ALIASES[base] ?? base] ??= `${FOUNDATION_PAGES}/${f}`;
     }
-    map.components = `${GUIDELINES}/components/overview.md`;
-    map.figma = `${GUIDELINES}/figma/overview.md`;
+    for (const [key, file] of [['components', 'components/overview.md'], ['figma', 'figma/overview.md']]) {
+      if (fs.existsSync(path.join(root, GUIDELINES, file))) map[key] = `${GUIDELINES}/${file}`;
+    }
     return map;
+  };
+  /** A topic file's text: a guideline as written, a foundation page as its page model's markdown. */
+  const topicText = (rel) => {
+    const source = fs.readFileSync(path.join(root, rel), 'utf8');
+    return rel.endsWith('.mdx') ? pageText(readDocsPage(source, { kind: 'foundation' })) : source.trim();
   };
 
   function guide(arg) {
@@ -566,7 +581,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     const map = topics();
     const key = map[t] ? t : TOPIC_ALIASES[t] ?? Object.keys(map).find((k) => t.split(/[\s/-]+/).includes(k)) ?? Object.entries(TOPIC_ALIASES).find(([a]) => t.includes(a))?.[1];
     if (key && map[key]) {
-      return { topic: key, path: map[key], text: fs.readFileSync(path.join(root, map[key]), 'utf8').trim(), next: 'Next: ds_find for the parts the guideline names.' };
+      return { topic: key, path: map[key], text: topicText(map[key]), next: 'Next: ds_find for the parts the guideline names.' };
     }
     return {
       topic: t,

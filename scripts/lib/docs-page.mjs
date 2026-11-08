@@ -4,7 +4,8 @@
  * is a one-place change.
  *
  *   readDocsPage(source, {kind?})   the page model:
- *     { kind, intro, sections, alternatives, rules, related, aliases, figmaMeta }
+ *     { kind, title, intro, sections, alternatives, rules, related, aliases, figmaMeta }
+ *       title         a foundation page's FoundationHero title, or the page's `#` heading, or null
  *       sections      [{title, level, text, subsections: [{title, level, text}]}]
  *       alternatives  [{text, routesTo}]  the lines under Alternatives, each with the component it names
  *       rules         [{id, sentence, text}]  one per `###` under Best practices, id from the slug
@@ -12,6 +13,7 @@
  *       aliases       the page's `export const aliases = [...]`, or []
  *       figmaMeta     the page's `export const figmaMeta = {...}`, parsed, or null
  *   sectionText(page, title)        one section's text, or null
+ *   pageText(page)                  the whole page as markdown: `#` title, intro, `##` sections
  *   createPageFinder(root, registry?)  ({name, source}) → the page's repo path, or null
  *
  * TWO ADAPTERS. A component page is markdown under `##` headings (a page with
@@ -513,6 +515,7 @@ export function readDocsPage(source, { kind } = {}) {
   const best = sectionNamed(sections, 'Best practices');
   return {
     kind: pageKind,
+    title: src.match(/<FoundationHero\b[^>]*?\btitle=["']([^"']*)["']/)?.[1] ?? heads.find((h) => h.level === 1)?.title ?? null,
     intro: before.split(/\n\s*\n/).map((p) => p.trim()).filter((p) => p && !p.startsWith('#')).join('\n\n'),
     sections,
     alternatives: linesOf(sectionNamed(sections, 'Alternatives')?.text).map((text) => ({ text, routesTo: routeOf(text) })),
@@ -521,6 +524,12 @@ export function readDocsPage(source, { kind } = {}) {
     aliases: aliasesOf(src),
     figmaMeta: figmaMetaOf(src),
   };
+}
+
+/** The whole page as markdown, by the model: its title, its intro, then each section under its `##` heading. */
+export function pageText(page) {
+  const parts = [page.title ? `# ${page.title}` : null, page.intro || null, ...page.sections.map((s) => `${'#'.repeat(s.level)} ${s.title}\n\n${s.text}`.trim())];
+  return parts.filter(Boolean).join('\n\n');
 }
 
 /** A section's text by title (any case), or null. */

@@ -71,6 +71,13 @@ A name reads from the general to the specific: property, role, emphasis, state. 
     ]}
 />
 
+Pick the family by job:
+
+- A fill takes `--ds-background-<role>`, with `-subtler`, `-subtle` and `-bold` where the role defines them.
+- A ground takes `--ds-surface`, `--ds-surface-sunken`, `--ds-surface-raised` or `--ds-surface-overlay`.
+- Text takes `--ds-text-<role>`, and a glyph `--ds-icon-<role>`.
+- An edge takes `--ds-border-<role>`; `--ds-border-<role>-subtle` is the pale edge of an outlined label, such as a Tag or a date Status.
+
 </FoundationSection>
 
 <FoundationSection title="Modes">
@@ -128,6 +135,21 @@ A role describes the intention behind a color. Pick the role for the job, then t
     ]}
 />
 
+Each role's usual fill and text pair:
+
+<RefTable
+    head={['Role', 'Fill', 'Text', 'Use for']}
+    rows={[
+        ['Brand', <C>--ds-background-brand-bold</C>, <C>--ds-text-brand</C>, 'Primary actions'],
+        ['Neutral', <C>--ds-background-neutral</C>, <C>--ds-text-subtle</C>, 'Secondary actions, quiet fills'],
+        ['Accent teal', <C>--ds-background-accent-teal-subtle</C>, <C>--ds-text-accent-teal</C>, 'Accents with no meaning'],
+        ['Success', <C>--ds-background-success-bold</C>, <C>--ds-text-success</C>, 'Success states, confirmations'],
+        ['Warning', <C>--ds-background-warning-bold</C>, <C>--ds-text-warning</C>, 'Warning states, cautions'],
+        ['Danger', <C>--ds-background-danger-bold</C>, <C>--ds-text-danger</C>, 'Error states, destructive actions'],
+        ['Information', <C>--ds-background-information-bold</C>, <C>--ds-text-information</C>, 'Informational'],
+    ]}
+/>
+
 - Emphasis is how much contrast a color has against the default surface, from subtlest to boldest. Bolder colors draw more attention than subtle ones.
 - Use the inverse tokens (`color/text/inverse`, `color/icon/inverse`, `color/border/inverse`) on bold backgrounds. On a bold warning background, which is yellow, use the warning inverse tokens, which are made to pass WCAG AA.
 - Pick by meaning, never by a matching value. A danger fill, its border and its icon are three tokens even when two of them share a value today.
@@ -148,7 +170,26 @@ Eleven hues decorate: tags, charts, avatars and illustrations. A hue means nothi
 
 The five SMART areas of tutoring each have a role of their own: `background/smart/<subject>` for a chip, with `text/smart/<subject>` and `border/smart/<subject>`; bold for a filled mark; and subtle, a middle step made for illustration bodies. The subjects are social-emotional, mastering-content, advocacy, relationship and technology-tools. Use a SMART color only to name its subject.
 
+Each subject's tokens are the `--ds-*-smart-<subject>` family, on one hue: social-emotional orange, mastering content teal, advocacy lime, relationship magenta, technology tools brown.
+
 <Canvas of={ColorsStories.SmartSubjects} sourceState="none" />
+
+</FoundationSection>
+
+<FoundationSection title="Surfaces">
+
+<RefTable
+    head={['Token', 'Use for']}
+    rows={[
+        [<C>--ds-surface</C>, 'The page'],
+        [<C>--ds-surface-sunken</C>, 'The ground behind grouped things: a sidebar column, a well inside a card'],
+        [<C>--ds-surface-raised</C>, <>A card, with <C>--ds-shadow-raised</C></>],
+        [<C>--ds-surface-overlay</C>, <>A modal, menu, popup, tooltip or flag, with <C>--ds-shadow-overlay</C></>],
+        [<C>--ds-border</C>, 'Borders and dividers'],
+    ]}
+/>
+
+A surface lifts by shadow, never by a different gray: a raised card or an overlay takes its role's surface and shadow, as the Elevation page sets out.
 
 </FoundationSection>
 
@@ -179,6 +220,26 @@ A state steps along the token's own ladder. Hover and press have their own token
 - There are no icon hovered or pressed tokens. Show an icon's state with a subtle neutral background behind it.
 - Keep selected and focused distinct. Selected persists after an interaction to show a current choice; focused shows where keyboard focus is. Use the selected tokens (background, text, icon, border) for selection and `color/border/focused` only for the focus ring. Never use link, brand or focused tokens to show selection. When an element is both, keep the selected treatment and add the ring.
 - Hovered and pressed are temporary: use the matching token for the element's current state, and keep a selected item recognizable while it is hovered or pressed.
+- The focus ring is 2px on `--ds-border-focused`, and its radius is the control's radius plus 2.
+
+```css
+.my-element:hover {
+  background-color: var(--ds-background-neutral-subtle-hovered);
+}
+
+.my-element:active {
+  background-color: var(--ds-background-neutral-subtle-pressed);
+}
+
+.my-element.is-selected {
+  background-color: var(--ds-background-selected);
+}
+
+.my-element:focus-visible {
+  outline: var(--border-focused) solid var(--ds-border-focused);
+  outline-offset: var(--stroke-2);
+}
+```
 
 <Canvas of={ColorsStories.FocusIsARing} sourceState="none" />
 
@@ -223,6 +284,113 @@ Charts take the chart tokens, and every chart color does one job. Never reach fo
 - Use five or six categories at most and group the rest.
 - Never mix categorical and status colors in one chart, and give every color a second cue: a label, a shape or a pattern.
 - Titles, axes and grid lines wear text and border tokens, never a chart color.
+
+In code, never name a chart color by hand. `design-system/src/dataviz/palette.js` (exported as `chartPalette` from `@/components`) says which token does which job, and the Highcharts theme in `chartTheme.js` applies it: `chartPalette.CATEGORICAL` and `chartPalette.SMART` for identity, `chartPalette.sequentialRamp(hue)` for magnitude, `chartPalette.divergingRamp(low, high)` for polarity, `chartPalette.STATUS` for state and `chartPalette.BRAND` for one series. Color is the one foundation with chart rules of its own; a chart takes every other foundation (spacing, radius, elevation, stroke, type, layers, motion) from the same component tokens as the rest of the design system.
+
+A single-series chart takes `--ds-chart-brand`, not slot 1 of categorical, and a de-emphasized comparison or reference line takes `--ds-chart-neutral`. Slot 1 of categorical is tuned to the brand chart hue for this reason: a one-series chart and the first series of a many-series chart read as the same color. The series identity stays put when a second series is added.
+
+State tokens are for a value that means a state. The `-bold` step is the more extreme level of the same state: highest priority on `--ds-chart-danger-bold`, high on `--ds-chart-danger`. State colors are hard to tell apart with a color-vision deficiency, so a state always carries an icon, a label or a signed value too. The state tokens are success, warning, danger, information and discovery.
+
+<FoundationSubsection title="Categorical order">
+
+Assign series in this order, never skipping a slot.
+
+<RefTable
+    head={['Slot', 'Hue', 'Light', 'Dark', 'Light, increased contrast', 'Dark, increased contrast']}
+    rows={[
+        ['1 (brand)', 'lagoon', '600', '500', '850', '300'],
+        ['2', 'orange', '800', '700', '1000', '500'],
+        ['3', 'blue', '500', '500', '800', '300'],
+        ['4', 'magenta', '800', '700', '1000', '500'],
+        ['5', 'lime', '500', '400', '800', '250'],
+        ['6', 'purple', '700', '700', '900', '500'],
+        ['7', 'orange', '500', '500', '800', '300'],
+        ['8', 'blue', '800', '700', '1000', '500'],
+    ]}
+/>
+
+Three rules produced this order, and all three hold at once:
+
+- **Brand leads.** Slot 1 is lagoon, the brand chart color's own hue, so a one-series chart and the first series of a six-series chart look like the same chart.
+- **Neighbors alternate light and dark steps.** Slot 2 (orange-800, dark) sits between slot 1 (lagoon-600, lighter) and slot 3 (blue-500, lighter again), and the sequence keeps alternating through slot 6. That is what makes the order read in grayscale and for a color-blind viewer: two adjacent series on the same lightness would look identical once hue drops out.
+- **Hues spread across the wheel.** No two adjacent slots share a hue family or sit beside each other on the wheel: lagoon, orange, blue, magenta, lime and purple are six stops spread wide.
+
+Three hues stay out of the order, each for a reading reason: yellow reads as warning, red reads as danger, and teal sits too close to the brand hue. Lime and purple-500 double as the success and discovery state colors, so a chart uses categorical colors or state colors, never both.
+
+Slots 7 and 8 reprise 2 (orange) and 3 (blue), for overflow past six series only. The sequence wraps back to slot 1 after 8 and repeats a color, so an eight-series chart is already past the point where it should have grouped its smallest categories into "Other".
+
+Dark mode mostly steps one lighter than light mode: lagoon (1) 600 → 500, orange (2) 800 → 700, magenta (4) 800 → 700, lime (5) 500 → 400, blue (8) 800 → 700. The generated token carries the step, so no chart picks its own. Three slots hold their light step:
+
+- Blue (3) and orange (7) hold at 500: a softer step would lose their place in the lightness alternation.
+- Purple (6) keeps 700, because 600 crowded both of its dark-mode neighbors.
+
+The mapping is by family and step, not by hex, so it is the same in every color plan, and `check:color-system` checks the generated tokens for each plan.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Separators">
+
+A separator, a gap or the `--ds-border-inverse` line `chartTheme.css` draws between adjacent marks, marks where marks touch: an adjacent pair in a stacked bar, a histogram bin boundary, a waterfall step. The lightness alternation marks which series is which. Keep both: a viewer who cannot tell two near-touching hues apart at the seam needs the separator, and a viewer who cannot see hue at all needs the alternation even where two series never touch.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Sequential and diverging ramps">
+
+Both ramps are built from the chart tokens.
+
+- **Sequential** runs `--ds-background-accent-<hue>-subtler`, then `--ds-chart-<hue>-bold`, `-bolder` and `-boldest`. Each step sits further from the surface than the last, so the strongest tone is the biggest value: darker in light mode, lighter in dark.
+- **Diverging** runs one hue's three chart emphases down to `--ds-background-accent-gray-subtler` at the midpoint, then the other hue's back up. The midpoint always sits nearer the surface than either arm's first step. The default pair is orange and blue; red with green is never a pair.
+- A color axis interpolates, so the heatmap and the treemap resolve the ramp's tokens in the current mode (`chartPalette.rampStops`) and again when the mode changes.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="SMART subjects in a chart">
+
+Each subject charts in its accent hue at the emphasis that keeps neighbors in S-M-A-R-T order apart: social-emotional orange (bold), mastering content teal (boldest), advocacy lime (bold), relationship magenta (boldest), technology tools brown (bold). Five subjects is near the categorical limit, so label them directly or keep the legend beside the chart.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Text, hover and chrome">
+
+- A label sits beside its mark, so no foreground and background pair has to clear a contrast ratio. Where a label must sit on a fill anyway, such as a heatmap cell or a stacked segment, it takes `--ds-text` or `--ds-text-inverse`, whichever reads.
+- A shape, a pattern, a direct label or a backing data table carries the same information the color carries, for every series and every state.
+- A hovered mark takes its own `-hovered` token (`--ds-chart-categorical-1-hovered` and so on; every chart token has one). To bring one series forward, fade the others with `--ds-opacity-disabled`.
+- Chart chrome (axis labels, gridlines, the tooltip, threshold lines) wears text and border tokens. The `CHROME` object in `palette.js` is the job-to-token mapping for axis and grid lines, title and legend text, the tooltip surface, a track fill, a separator line and a threshold mark; read it there, since the mapping can move.
+- Spacing and type inside a chart (label size, legend gaps, padding around a plot area) come from the same ladder and type tokens as every other component, so a chart carries no pixel value of its own.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="The checks">
+
+`check:color-system` enforces the chart rules by name:
+
+- **chart color vision**: every pair of neighbors in a chart sequence stays apart, deltaE 15 or more under full color vision and 8 or more under protan and deutan simulation.
+- **chart contrast**: every chart color keeps 3:1 against every surface a chart can sit on (`--ds-surface`, `--ds-surface-raised`, `--ds-surface-overlay`), and 4.5:1 in increased contrast.
+- **chart lightness alternation**: neighbors in the categorical order differ by at least 0.08 OKLCH lightness, and the direction flips from mark to mark.
+- **chart ramps**: a sequential ramp moves away from the surface at every step; a diverging ramp's midpoint sits nearer the surface than either arm's first step.
+
+`design-system/tests/dataviz-tokens.test.js` fails on any color name outside `--ds-*`, and on any color literal, under `design-system/src/dataviz/`.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Chart color do and don't">
+
+Do:
+
+- One color by default, and more only to tell categories apart.
+- Five or six categories at most; group the rest.
+- Keep both a separator and the lightness alternation, since they serve different readers.
+- Text next to the data, in a text token.
+- A second cue beside every color: a label, a shape, a dash or a pattern.
+
+Don't:
+
+- Add a color that carries no meaning.
+- Mix categorical and state colors in one chart.
+- Put text on a chart color without checking the ink.
+- Build a ramp from two unrelated hues, or a rainbow.
+
+</FoundationSubsection>
 
 </FoundationSection>
 

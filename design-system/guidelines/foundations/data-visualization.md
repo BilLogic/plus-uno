@@ -6,8 +6,8 @@ summary: A chart's foundations other than color come from the same component tok
 
 # Data visualization
 
-Atlassian publishes chart guidance for color only (see [Color → Data-viz
-color](color.md)). For every other foundation — spacing, radius, elevation,
+Chart color has rules of its own (the Storybook Color page,
+[`Colors.mdx`](../../src/styles/Colors.mdx) § Data-viz color). For every other foundation — spacing, radius, elevation,
 stroke, type, layers, motion — there is no chart-specific exception: a chart
 takes the same component tokens the rest of the design system does. This page
 names which token does which job, and why, for `design-system/src/dataviz/`

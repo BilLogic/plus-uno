@@ -8,7 +8,7 @@ summary: Elevation creates visual hierarchy through shadows
 
 Elevation creates visual hierarchy through shadows. A surface lifts by its
 shadow, not by a different gray: a raised card and an overlay keep the page's
-own fill (`color.md` § Surfaces).
+own fill ([`Colors.mdx`](../../src/styles/Colors.mdx) § Surfaces).
 
 ## Elevation Levels
 

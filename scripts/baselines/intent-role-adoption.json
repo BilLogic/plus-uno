@@ -2,7 +2,7 @@
   "why": "Remaining border/outline declarations painting an edge from an intent BASE rather than from its -border role. Written by hand, read by check:intent-roles. A count may only fall, and a count that has fallen must be lowered here in the same commit — a baseline that no longer describes the code is a baseline nobody can read.",
   "recordedAt": "2026-08-29",
   "migrated": 111,
-  "mixedStatesNote": "Hover and pressed colors mixed by hand (color-mix with black or white, or a brightness filter) where foundations/color.md rule 2 asks for a state layer. Read by check:intent-roles as its second set; a count may only fall, and a fallen count is lowered here in the same commit.",
+  "mixedStatesNote": "Hover and pressed colors mixed by hand (color-mix with black or white, or a brightness filter) where the Color page (design-system/src/styles/Colors.mdx § States) asks for a named state token. Read by check:intent-roles as its second set; a count may only fall, and a fallen count is lowered here in the same commit.",
   "sets": {
     "border": {
       "direction": "both",
