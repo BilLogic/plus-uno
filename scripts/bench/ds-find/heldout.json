@@ -390,6 +390,7 @@
  {
   "q": "icon",
   "want": [
+   "iconography",
    "IconButton"
   ],
   "kind": "real-intent",
