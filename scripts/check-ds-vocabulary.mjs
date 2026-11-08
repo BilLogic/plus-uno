@@ -9,7 +9,12 @@
  *                component or pattern (`GLOSSARY.md`, any `### Design system: …`
  *                section; the words that also feed `ds_find`) in the prose of a
  *                component, pattern or foundation page, outside code. The
- *                finding names the term to say instead. A qualified avoid-word
+ *                finding names the term to say instead. A hit inside a correct
+ *                name ("dropdown" in "Dropdown menu") is not one. A word the
+ *                glossary avoids "as a name" ("region", "switch") is ordinary
+ *                English elsewhere, so it counts only where it names a thing:
+ *                capitalized mid-sentence, or before "component" or "pattern".
+ *                A qualified avoid-word
  *                ("popup" for a blocking dialog) is avoided in one sense only,
  *                so no text match can tell it apart and it is not checked; a
  *                product term's avoid-words ("alert" for Escalation) are the
@@ -57,7 +62,15 @@ export const RULES = ['avoid-word', 'collision'];
  * `_Avoid_` list cannot scope to one word.
  */
 export function avoidWords(terms, names) {
-  return terms.filter((t) => DS_SECTION.test(t.section) && componentOf(t.term, names)).flatMap((t) => t.avoid.filter((a) => a.plain).map((a) => ({ word: a.word, term: t.term })));
+  return terms
+    .filter((t) => DS_SECTION.test(t.section) && componentOf(t.term, names))
+    .flatMap((t) => t.avoid.filter((a) => a.plain).map((a) => ({ word: a.word, term: t.term, ...(a.named && { named: true }) })));
+}
+
+/** The names a page may say whole: every design-system term and component, camelCase split ("DropdownMenu" reads "Dropdown menu"). */
+export function correctNames(terms, names) {
+  const split = (n) => n.replace(/([a-z0-9])([A-Z])/g, '$1 $2');
+  return [...terms.filter((t) => DS_SECTION.test(t.section)).flatMap((t) => t.term.split(/\s*\/\s*/)), ...names, ...names.map(split)];
 }
 
 const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -68,13 +81,39 @@ const matcherOf = (word) => new RegExp(`(?<![\\w-])${word.split(/\s+/).map(escap
 const withoutCode = (text) =>
   text.replace(/^[ \t]*(`{3,}|~{3,})[\s\S]*?^[ \t]*\1[^\n]*$/gm, '').replace(/`+[^`\n]*`+/g, ' ');
 
-/** Every avoid-word in a page's prose: `[{rule, message, anchor}]`, ungraded. */
-export function vocabularyFindings(text, words) {
+/** UI-kind nouns: an avoid-word right before one is a thing's name ("switch component"). */
+const KIND_AFTER = /^\s+(?:component|pattern)s?\b/i;
+/** What a line holds before its sentence starts: list and table markers, emphasis, quotes, headings. */
+const LEAD = /(?:^|[.!?:;|]|^\s*(?:#+|[-*>]|\d+\.))[\s*_"“(]*$/;
+
+/**
+ * Whether a hit names a thing: capitalized mid-sentence ("an inline Region"),
+ * or followed by component or pattern ("the switch component"). A word at the
+ * start of a sentence, a heading, a list or anatomy label or a table cell is
+ * capitalized by position, and one opening a quote is copy, not a name.
+ */
+function namesAThing(line, hit, at) {
+  if (KIND_AFTER.test(line.slice(at + hit.length))) return true;
+  const before = line.slice(0, at);
+  return /^[A-Z]/.test(hit) && !LEAD.test(before) && !/["“]$/.test(before);
+}
+
+/**
+ * Every avoid-word in a page's prose: `[{rule, message, anchor}]`, ungraded.
+ * A hit inside a correct name (`names`: "dropdown" in "Dropdown menu") is that
+ * name, not the word. A word avoided "as a name" (`named`) is ordinary English
+ * elsewhere, so it is flagged only where it names a thing (`namesAThing`).
+ */
+export function vocabularyFindings(text, words, { names = [] } = {}) {
   const matchers = words.map((w) => ({ ...w, re: matcherOf(w.word) }));
+  const nameRes = names.map(matcherOf);
   const out = [];
   for (const line of withoutCode(String(text)).split('\n')) {
-    for (const { term, re } of matchers) {
-      for (const [hit] of line.matchAll(re)) {
+    const spans = nameRes.flatMap((re) => [...line.matchAll(re)].map((m) => [m.index, m.index + m[0].length]));
+    for (const { term, re, named } of matchers) {
+      for (const { 0: hit, index: at } of line.matchAll(re)) {
+        if (spans.some(([a, b]) => a <= at && at + hit.length <= b && b - a > hit.length)) continue;
+        if (named && !namesAThing(line, hit, at)) continue;
         out.push({ rule: 'avoid-word', message: `"${hit}" is a glossary avoid-word; say ${term}: "${line.trim()}"`, anchor: line.trim() });
       }
     }
@@ -122,12 +161,14 @@ const inputs = byRoot((repoRoot) => {
   const strictFiles = new Set(
     STRICT_PAGES.map((name) => manifest.components.find((c) => c.name === name)).filter((c) => c?.source).map((c) => findPage({ name: c.name, source: c.source })),
   );
-  const words = avoidWords(terms, manifest.components.map((c) => c.name));
+  const componentNames = manifest.components.map((c) => c.name);
+  const words = avoidWords(terms, componentNames);
+  const names = correctNames(terms, componentNames);
   const pages = PAGE_ROOTS.flatMap((rel) => mdxUnder(repoRoot, rel)).sort().map((file) => {
     const source = readText(repoRoot, file);
     const page = readDocsPage(source);
     const text = [page.intro, ...page.sections.map((s) => `## ${s.title}\n${s.text}`)].join('\n');
-    return { file, strict: strictFiles.has(file), raw: vocabularyFindings(text, words).map((f) => ({ ...f, line: lineOf(source, f.anchor) })) };
+    return { file, strict: strictFiles.has(file), raw: vocabularyFindings(text, words, { names }).map((f) => ({ ...f, line: lineOf(source, f.anchor) })) };
   });
   const collisionFindings = collisions.map((c) => ({
     file: GLOSSARY,
