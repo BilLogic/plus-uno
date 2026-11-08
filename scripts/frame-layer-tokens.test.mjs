@@ -17,6 +17,7 @@ import { TOKEN_DIR, tokenCorpus } from '../design-system/src/lib/tokens-node.mjs
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { LAYOUT_MODES, deriveLayout } from './layout-derived.mjs';
 import { retiredRenames } from './lib/tokens/plan.mjs';
+import { exportedValue } from './lib/docs-page.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE_DIR = path.join(REPO_ROOT, TOKEN_DIR, 'source');
@@ -204,6 +205,15 @@ test('no modal width is fractional at any mode', () => {
     for (const mode of Object.keys(LAYOUT_MODES)) {
       assert.match(atMode(`--modal-width-${size}`, mode), /^\d+px$/, `${size} at ${mode}`);
     }
+  }
+});
+
+test('Modal\'s MODAL_WIDTH_PX, which its docs page shows, equals the --modal-width-* tokens at each mode', () => {
+  const px = exportedValue(REPO_ROOT, 'design-system/src/components/messaging/Modal/Modal.jsx', 'MODAL_WIDTH_PX');
+  const steps = { sm: '6-col', md: '8-col', lg: '10-col' };
+  for (const [size, step] of Object.entries(steps)) {
+    // The last mode's screen is past the grid's cap, so its width is the one MODAL_WIDTH_SCREENS reads at 1280.
+    assert.deepEqual(px[step], Object.keys(LAYOUT_MODES).map((mode) => parseInt(atMode(`--modal-width-${size}`, mode), 10)), step);
   }
 });
 

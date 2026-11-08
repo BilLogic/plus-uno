@@ -17,7 +17,7 @@ topic, which today only `content/` does.
 | [content/](content/overview.md) | ◐ | What does this button, error, or empty state say? |
 | [spacing.md](spacing.md) | ✅ | How much padding, margin, gap? |
 | [grid.md](grid.md) | ✅ | Breakpoints and column spans |
-| [color.md](color.md) | ✅ | Which color, and what does it mean? |
+| [Colors.mdx](../../src/styles/Colors.mdx) | ✅ | Which color, and what does it mean? |
 | [typography.md](typography.md) | ✅ | Which type class and weight? |
 | [motion.md](motion.md) | ✕ | Duration, easing, what may animate |
 | [iconography.md](iconography.md) | ✅ | Which icon set, which size |
@@ -30,14 +30,14 @@ topic, which today only `content/` does.
 One file sits outside the fourteen slots on purpose:
 [data-visualization.md](data-visualization.md), which names which component
 token a chart's non-color foundations (spacing, radius, elevation, stroke,
-type, motion) take. It is cross-cutting by nature — Atlassian's own chart
-guidance is color-only, so there is no single slot above for "what a chart
+type, motion) take. It is cross-cutting by nature: chart color has its own
+rules on the Color page, so there is no single slot above for "what a chart
 does with every other foundation" to live in instead.
 
 **8 of 14 authored, 1 partial, 5 empty.** ✕ means a named empty slot: the file
 exists, says so, and promises nothing. That is deliberate — a gap you can see
 beats a gap you discover mid-build, and it is not a stub, because there is no
-template inviting someone to fill in a heading with "TODO".
+template inviting someone to fill in a heading with `TODO`.
 
 ## Page order
 
@@ -55,3 +55,12 @@ foundations say which to reach for and why.
 Several foundations were written ahead of the SCSS and name tokens that do not
 resolve — tracked as `harness-intake` issues (elevation, spacing) and fixed
 there, not silently on a move. Read the token list as the authority on names.
+
+## Retiring a twin
+
+A foundation file here that has a Storybook page (`design-system/src/styles/*.mdx`) is a twin, and the page is where it ends up. Color was the first to go. One twin per ticket:
+
+1. Move every sentence the page lacks into it, in `FoundationSection` and `FoundationSubsection`, with tables as `RefTable` or `TokenTable`. Write PLUS rules only, in current component names; a sentence that no longer matches the code is fixed or dropped, never carried.
+2. Delete the twin. `ds guide <topic>` then reads the page through the page model (`scripts/lib/docs-page.mjs`), locally and on the hosted server alike.
+3. Repoint every reference: `git grep` the file name and its path, including `AGENTS.md`, skills, agent docs, script comments and `netlify.toml`. Edits to `AGENTS.md` go to Bill for review.
+4. Regenerate (`npm run generate:index`, then whatever `npm run check:harness` names) and run `npm run ds -- guide <topic>`: the answer is the page's text with no JSX.

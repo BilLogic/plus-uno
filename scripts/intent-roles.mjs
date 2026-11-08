@@ -136,8 +136,8 @@ export function edgeUses(files, root = REPO_ROOT) {
 }
 
 /**
- * A STATE COLOR MIXED BY HAND (`foundations/color.md` rule 2: "Use state
- * layers for interaction — never hardcode hover/active colors").
+ * A STATE COLOR MIXED BY HAND (`Colors.mdx` § States: hover and press have
+ * their own tokens, never a hand-mixed color).
  *
  * `color-mix(in srgb, var(--color-primary), black 8%)` and
  * `filter: brightness(0.92)` are both a hover color computed at the call site.

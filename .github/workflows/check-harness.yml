@@ -185,6 +185,12 @@ jobs:
       - name: npm run check:harness
         run: npm run check:harness
 
+      # The ds_find cold-start budget, measured alone: inside the harness its
+      # wall clock measures the parallel test processes, not the lookup
+      # (scripts/bench-ds-find.test.mjs says why).
+      - name: ds_find cold-start timing
+        run: npm run bench:ds-find:timing
+
       # The bot's own script tests, which until now ran ONLY inside `npm run
       # deploy` — that is, after merge to main. So a broken detector fixture or a
       # drifted build-stamp derivation was caught while deploying rather than

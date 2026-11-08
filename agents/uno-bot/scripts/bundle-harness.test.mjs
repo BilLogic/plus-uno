@@ -318,10 +318,15 @@ test("an assembled bundle over its char budget fails the build", () => {
 /** An always-loaded doc with a long bundled middle, to take padding back out of. */
 const OFFSET_DOC = "docs/connectors/slack/overview.md";
 
-/** `text` with `n` chars cut from the line break nearest its middle — inside the
- *  bundled body, clear of the frontmatter and of the ide-only blocks at either end. */
+/** `text` with `n` chars cut from the first line break past its middle whose cut
+ *  crosses no `ide-only` marker — inside the bundled body, clear of the
+ *  frontmatter, and never leaving half a marker pair, which the bundler rejects.
+ *  The offset doc has ide-only blocks mid-body, so a cut length that tracks
+ *  AGENTS.md's size would otherwise straddle one whenever that size moved. */
 function withoutChars(text, n) {
-  const at = text.indexOf("\n", Math.floor(text.length / 2));
+  let at = text.indexOf("\n", Math.floor(text.length / 2));
+  while (at !== -1 && /<!-- \/?ide-only -->/.test(text.slice(at, at + n))) at = text.indexOf("\n", at + 1);
+  assert.ok(at !== -1, `no ${n}-char cut in the offset doc avoids an ide-only marker`);
   return text.slice(0, at) + text.slice(at + n);
 }
 

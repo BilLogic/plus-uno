@@ -9,50 +9,51 @@
  * old headings still count, for pages that have not moved.
  */
 
+import { readDocsPage } from './docs-page.mjs';
+
+/** Each authored section, by the section or subsection title that carries it. */
 export const AUTHORED_SECTIONS = [
-  { key: 'whenToUse', label: 'When to use', match: /^#{2,4}\s*(when (to use|not to use)|usage$)/i },
-  { key: 'correctIncorrect', label: 'Correct/incorrect', match: /^#{2,4}\s*(correct|do(s)? and don|usage (do|guidance))/i },
-  { key: 'accessibility', label: 'Accessibility', match: /^#{2,4}\s*accessibility/i },
+  { key: 'whenToUse', label: 'When to use', match: /^(when (to use|not to use)|usage$)/i },
+  { key: 'correctIncorrect', label: 'Correct/incorrect', match: /^(correct|do(s)? and don|usage (do|guidance))/i },
+  { key: 'accessibility', label: 'Accessibility', match: /^accessibility/i },
 ];
 
 /*
  * The labels a pair is written with: a code comment (`// Incorrect —`, also
- * inside JSX as `{/* Correct *\/}`), a ✓ / ✗ glyph, or a bold Do / Don't. Plain
+ * inside JSX as `{/* Correct *\/}`), a ✓ / ✗ glyph, a bold Do / Don't, or the
+ * `Do:` / `Don't:` lines the page model writes for a do/don't pair. Plain
  * prose that happens to open with "Do not" is a sentence, not a label.
  */
 const LEAD = String.raw`^(?:\/\/|\{\/\*|<!--)?\s*`;
-const DONT = new RegExp(`${LEAD}(?:incorrect\\b|✗|\\*\\*don['’]t\\*\\*|dontExample=)`, 'i');
-const DO = new RegExp(`${LEAD}(?:correct\\b|✓|\\*\\*do\\*\\*|doExample=)`, 'i');
+const DONT = new RegExp(`${LEAD}(?:incorrect\\b|✗|\\*\\*don['’]t\\*\\*|don['’]t:)`, 'i');
+const DO = new RegExp(`${LEAD}(?:correct\\b|✓|\\*\\*do\\*\\*|do:)`, 'i');
 
-const RULE = /^###\s/;
-const ANY_HEADING = /^#{1,6}\s/;
-
-/** True when some `###` rule holds both a do and a don't before the next heading. */
-function hasPairUnderRule(lines) {
-  let inRule = false;
+/** True when a rule's text holds both a do and a don't. */
+function holdsPair(text) {
   let sawDo = false;
   let sawDont = false;
-  for (const raw of lines) {
+  for (const raw of text.split('\n')) {
     const line = raw.trim();
-    if (ANY_HEADING.test(line)) {
-      inRule = RULE.test(line);
-      sawDo = false;
-      sawDont = false;
-      continue;
-    }
-    if (!inRule) continue;
+    if (/^#{1,6}\s/.test(line)) break;
     if (DONT.test(line)) sawDont = true;
     else if (DO.test(line)) sawDo = true;
-    if (sawDo && sawDont) return true;
   }
-  return false;
+  return sawDo && sawDont;
 }
 
-/** `{ whenToUse, correctIncorrect, accessibility }`, each true when the MDX carries it. */
+/** `{ whenToUse, correctIncorrect, accessibility }`, each true when the page carries it, read through the page model. */
 export function authoredCoverage(mdxSource) {
-  const lines = mdxSource ? mdxSource.split('\n') : [];
+  return coverageOf(readDocsPage(mdxSource ?? ''));
+}
+
+/** The same, for a page already read into the page model; null (no page) carries nothing. */
+export function coverageOf(page) {
+  const sections = page?.sections ?? [];
+  const titled = sections.flatMap((s) => [s, ...s.subsections]);
   const found = {};
-  for (const s of AUTHORED_SECTIONS) found[s.key] = lines.some((l) => s.match.test(l.trim()));
-  if (!found.correctIncorrect) found.correctIncorrect = hasPairUnderRule(lines);
+  for (const s of AUTHORED_SECTIONS) found[s.key] = titled.some((t) => s.match.test(t.title.trim()));
+  // A rule is a `###` block: a subsection under a `##` section, or a section on a page with no `##`.
+  const rules = titled.filter((t) => t.level === 3);
+  if (!found.correctIncorrect) found.correctIncorrect = rules.some((r) => holdsPair(r.text));
   return found;
 }

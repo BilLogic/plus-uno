@@ -8,7 +8,7 @@
  *   createLookup(root, {readPaths})
  *     .find(query)               entry point: patterns, components, Figma names,
  *                                not-here names, tokens and icons, ranked
- *     .get(names, section?)      full records: props, usage, examples, a11y, figma
+ *     .get(names, section?)      full records: the generated doc's text, or one section of it
  *     .tokens(role)              the steps for a role, each with its intent
  *     .guide(topic?)             a guideline, a rule's section, or the orientation
  *     .check({code, path} | {paths})   check:ds-usage, in-process
@@ -31,14 +31,18 @@
  * find from the same files `get` reads, so there is no second copy to drift.
  *
  * WHERE THE ANSWERS COME FROM. Names, imports, props and tokens are the facts
- * module's (`ds-facts.mjs`). Usage, examples and accessibility are the
- * component's authored Storybook page (the `.mdx` beside its source); the
+ * module's (`ds-facts.mjs`). Usage, best practices and accessibility are the
+ * component's authored Storybook page, found and read through the page model
+ * (`docs-page.mjs`: the page its stories' meta names, as text with no JSX); the
  * Figma mapping is `design-system/figma/component-registry.json`; guidelines
  * are the files under `design-system/guidelines/`; rule explanations are
  * `docs/engineering/ds-usage-rules.md`. Nothing here is authored content.
  *
- * Every answer carries a `next`: the tool to call after it, or instead of it
- * on a miss.
+ * A component's or pattern's `get` text is its generated doc, byte for byte:
+ * one render (`component-render.mjs`) from its manifest record and its page,
+ * and a `get` section is that text's matching `##` sections. Every other
+ * answer carries a `next`: the tool to call after it, or instead of it on a
+ * miss.
  */
 
 import fs from 'node:fs';
@@ -46,9 +50,11 @@ import path from 'node:path';
 
 import { contextOf, escapes, expandPaths } from '../check-ds-usage.mjs';
 import { BARRELS, loadFacts } from './ds-facts.mjs';
+import { createPageFinder, pageText, readDocsPage, sectionText } from './docs-page.mjs';
 import { FIND_TUNING, STOPWORDS, createRanker } from './ds-rank.mjs';
 import { readIconLists } from './icon-lists.mjs';
 import { RULES, RULES_DOC, docLink, escapesIn } from './ds-usage.mjs';
+import { SECTION_ALIASES, SECTION_TITLES, componentFacts, docPathOf, renderComponent, sectionsOf } from './component-render.mjs';
 
 export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check'];
 
@@ -59,7 +65,7 @@ Barrels (import only from these):
 - ${BARRELS[0]}: the components (Button, TextField, SectionMessage...)
 - ${BARRELS[2]}: PageLayout, which every full page starts from
 
-Order: ds_find (what exists for the task) → ds_get (props, usage, examples, a11y, figma) → ds_tokens (steps for a role) → ds_guide (layout, content, a rule) → write → ds_check (findings to zero).
+Order: ds_find (what exists for the task) → ds_get (props, usage, practices, a11y, figma) → ds_tokens (steps for a role) → ds_guide (layout, content, a rule) → write → ds_check (findings to zero).
 
 Hard rules:
 - Patterns first, then components; build new interactive behavior on @base-ui/react styled with tokens.
@@ -106,6 +112,7 @@ const TOPIC_ALIASES = {
   voice: 'content',
   type: 'typography',
   colour: 'color',
+  colors: 'color',
   shadow: 'elevation',
   dataviz: 'data-visualization',
   charts: 'data-visualization',
@@ -128,10 +135,15 @@ export function speaksTokens(query) {
   const ql = String(query ?? '').trim().toLowerCase();
   return ql.startsWith('--') || (ql.match(/[a-z0-9]+/g) ?? []).some((w) => TOKEN_WORDS.has(w));
 }
-const SECTIONS = ['props', 'usage', 'examples', 'a11y', 'figma'];
-const MDX_SECTIONS = { usage: ['Usage', 'Content guidelines'], examples: ['Best practices'], a11y: ['Accessibility'] };
+const SECTIONS = ['props', 'usage', 'practices', 'a11y', 'figma'];
+/** A page section as `get` prints it: its heading, then its text. */
+const headed = (page, title) => {
+  const text = sectionText(page, title);
+  return text === null ? null : `## ${title}\n\n${text}`.trim();
+};
 const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
 const GUIDELINES = 'design-system/guidelines';
+const FOUNDATION_PAGES = 'design-system/src/styles';
 const readIf = (file) => (fs.existsSync(file) ? fs.readFileSync(file, 'utf8') : null);
 const firstSentence = (text, max = 160) => {
   if (!text) return null;
@@ -154,20 +166,6 @@ const wordsOf = (q) =>
 
 /** Whether `text` carries `phrase` as whole words. */
 const hasPhrase = (text, phrase) => new RegExp(`(?:^|[^a-z0-9])${phrase.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}(?:[^a-z0-9]|$)`).test(text);
-
-/** One H2 section of a markdown or MDX file, without its layout wrappers. */
-function sectionOf(text, heading) {
-  const lines = text.split('\n');
-  const start = lines.findIndex((l) => l.trim() === `## ${heading}`);
-  if (start === -1) return null;
-  const end = lines.findIndex((l, i) => i > start && /^## /.test(l));
-  return lines
-    .slice(start, end === -1 ? undefined : end)
-    .filter((l) => !/^\s*<\/?div\b[^>]*>\s*$/.test(l))
-    .join('\n')
-    .replace(/\n{3,}/g, '\n\n')
-    .trim();
-}
 
 /**
  * The lookup for one tree.
@@ -194,6 +192,16 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   const facts = loadFacts(root);
   const registry = JSON.parse(readIf(path.join(root, 'design-system/figma/component-registry.json')) ?? '{"components":{},"patterns":{}}');
   const records = facts.manifests.components.components;
+  const findPage = createPageFinder(root, registry);
+  /** A component's docs page, found by its Storybook meta or the registry: `{path, page}`, or null. Read once. */
+  const pages = new Map();
+  const pageOf = (name, source) => {
+    if (!pages.has(name)) {
+      const rel = findPage({ name, source });
+      pages.set(name, rel ? { path: rel, page: readDocsPage(fs.readFileSync(path.join(root, rel), 'utf8'), { root, file: rel }) } : null);
+    }
+    return pages.get(name);
+  };
 
   /** Figma component and set names → the code name they map to. */
   const figmaAliases = [];
@@ -247,9 +255,8 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     if (ranker) return ranker;
     const docs = records.map((r) => {
       const a = facts.lookup(r.name);
-      const mdx = mdxFor(a.source);
-      const text = mdx ? fs.readFileSync(mdx, 'utf8') : '';
-      const section = (h) => (sectionOf(text, h) ?? '').replace(/^## .*$/m, '').replace(/<[^>]+>/g, ' ');
+      const page = pageOf(r.name, a.source)?.page;
+      const section = (h) => (page && sectionText(page, h)) ?? '';
       return {
         id: r.name,
         fields: { name: r.name, aliases: aliases ? a.aliases : [], summary: firstSentence(a.summary, Infinity) ?? '', usage: section('Usage'), best: section('Best practices'), related: section('Related') },
@@ -444,15 +451,6 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
 
   // ── get ─────────────────────────────────────────────────────────────────
 
-  function mdxFor(source) {
-    if (!source) return null;
-    const dir = path.join(root, path.dirname(source));
-    const own = path.join(dir, `${path.basename(source).replace(/\.[jt]sx?$/, '')}.mdx`);
-    if (fs.existsSync(own)) return own;
-    const any = fs.existsSync(dir) ? fs.readdirSync(dir).find((f) => f.endsWith('.mdx')) : null;
-    return any ? path.join(dir, any) : null;
-  }
-
   function figmaFor(name) {
     const entry = registry.components?.[name];
     if (entry?.figma) {
@@ -487,8 +485,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     }
     if (a.kind === 'prop') return { ...a, next: null };
     const home = a.aliasOf ? facts.lookup(a.aliasOf) : a;
-    const mdx = mdxFor(home.source ?? a.source);
-    const mdxText = mdx ? fs.readFileSync(mdx, 'utf8') : null;
+    const docs = pageOf(a.aliasOf ?? a.name, home.source ?? a.source);
     const record = {
       name: a.name,
       status: a.status,
@@ -498,21 +495,28 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       summary: firstSentence(a.summary, 300),
       aliases: a.aliases,
       source: home.source ?? a.source,
-      docs: mdx ? path.relative(root, mdx).split(path.sep).join('/') : null,
+      docs: docs?.path ?? null,
       why: a.why,
       use: a.replacement.map(brief),
     };
+    // The text is the generated doc's: one render (`component-render.mjs`) from the manifest record and the page.
+    const homeName = a.aliasOf ?? a.name;
+    const componentFactsOf = componentFacts(facts.manifests.components, homeName, { [homeName]: facts.lookup(homeName).aliases });
+    const text = componentFactsOf?.source ? renderComponent(componentFactsOf, docs) : null;
+    if (text) record.doc = docPathOf(componentFactsOf);
     const wanted = section ? [section] : SECTIONS;
     for (const s of wanted) {
       if (s === 'props') record.props = (a.props ?? []).map((p) => ({ name: p.name, type: p.type, values: p.values, default: p.default, required: p.required, description: p.description, deprecated: p.deprecated }));
       else if (s === 'figma') record.figma = figmaFor(a.aliasOf ?? a.name);
-      else record[s] = mdxText ? MDX_SECTIONS[s].map((h) => sectionOf(mdxText, h)).filter(Boolean).join('\n\n') || null : null;
+      else record[s] = text ? sectionsOf(text, SECTION_TITLES[s]) : null;
     }
-    record.next = 'Next: ds_tokens for the roles you style; ds_check once the code is written.';
+    if (text) record.text = section ? [`# ${a.name}`, a.import, sectionsOf(text, SECTION_TITLES[section]) ?? `## ${section}\n\nNone in the generated doc.`].join('\n\n') + '\n' : text;
+    else record.next = 'Next: ds_tokens for the roles you style; ds_check once the code is written.';
     return record;
   }
 
-  function get(names, section) {
+  function get(names, asked) {
+    const section = SECTION_ALIASES[asked] ?? asked;
     const list = (Array.isArray(names) ? names : [names]).flatMap((n) => String(n).split(',')).map((n) => n.trim()).filter(Boolean);
     if (section && !SECTIONS.includes(section)) {
       return { section, records: [], next: `No section "${section}". Sections: ${SECTIONS.join(', ')}; or leave it out for all of them.` };
@@ -538,20 +542,33 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
 
   // ── guide ───────────────────────────────────────────────────────────────
 
+  /** A folder's `.md` files other than its overview; none when the folder is empty or gone. */
+  const mdIn = (dir) => (fs.existsSync(path.join(root, dir)) ? fs.readdirSync(path.join(root, dir)).filter((f) => f.endsWith('.md') && f !== 'overview.md') : []);
+  /**
+   * Topic → the file that answers it. A guideline file answers its topic while
+   * it exists; a foundation topic with none is answered by its Storybook
+   * foundation page (`Colors.mdx` → color), read through the page model.
+   */
   const topics = () => {
     const map = {};
     for (const dir of ['foundations', 'composition']) {
-      for (const f of fs.readdirSync(path.join(root, GUIDELINES, dir)).filter((f) => f.endsWith('.md') && f !== 'overview.md')) {
-        map[f.replace(/\.md$/, '')] ??= `${GUIDELINES}/${dir}/${f}`;
-      }
+      for (const f of mdIn(`${GUIDELINES}/${dir}`)) map[f.replace(/\.md$/, '')] ??= `${GUIDELINES}/${dir}/${f}`;
     }
-    map.content = `${GUIDELINES}/foundations/content/overview.md`;
-    for (const f of fs.readdirSync(path.join(root, GUIDELINES, 'foundations/content')).filter((f) => f.endsWith('.md') && f !== 'overview.md')) {
-      map[f.replace(/\.md$/, '')] = `${GUIDELINES}/foundations/content/${f}`;
+    if (fs.existsSync(path.join(root, GUIDELINES, 'foundations/content/overview.md'))) map.content = `${GUIDELINES}/foundations/content/overview.md`;
+    for (const f of mdIn(`${GUIDELINES}/foundations/content`)) map[f.replace(/\.md$/, '')] = `${GUIDELINES}/foundations/content/${f}`;
+    for (const f of fs.existsSync(path.join(root, FOUNDATION_PAGES)) ? fs.readdirSync(path.join(root, FOUNDATION_PAGES)) : []) {
+      const base = f.match(/^([A-Z][A-Za-z]*)\.mdx$/)?.[1]?.toLowerCase();
+      if (base && base !== 'foundationsoverview') map[TOPIC_ALIASES[base] ?? base] ??= `${FOUNDATION_PAGES}/${f}`;
     }
-    map.components = `${GUIDELINES}/components/overview.md`;
-    map.figma = `${GUIDELINES}/figma/overview.md`;
+    for (const [key, file] of [['components', 'components/overview.md'], ['figma', 'figma/overview.md']]) {
+      if (fs.existsSync(path.join(root, GUIDELINES, file))) map[key] = `${GUIDELINES}/${file}`;
+    }
     return map;
+  };
+  /** A topic file's text: a guideline as written, a foundation page as its page model's markdown. */
+  const topicText = (rel) => {
+    const source = fs.readFileSync(path.join(root, rel), 'utf8');
+    return rel.endsWith('.mdx') ? pageText(readDocsPage(source, { kind: 'foundation', root, file: rel })) : source.trim();
   };
 
   function guide(arg) {
@@ -559,13 +576,13 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     if (!t) return { topic: null, path: null, text: ORIENTATION, next: 'Start with ds_find.' };
     const rule = Object.keys(RULES).find((id) => id === t || id === `ds/${t}`);
     if (rule) {
-      const text = sectionOf(fs.readFileSync(path.join(root, RULES_DOC), 'utf8'), rule);
+      const text = headed(readDocsPage(fs.readFileSync(path.join(root, RULES_DOC), 'utf8')), rule);
       return { topic: rule, path: docLink(rule), text, next: 'Fix the code as the section says, then ds_check again.' };
     }
     const map = topics();
     const key = map[t] ? t : TOPIC_ALIASES[t] ?? Object.keys(map).find((k) => t.split(/[\s/-]+/).includes(k)) ?? Object.entries(TOPIC_ALIASES).find(([a]) => t.includes(a))?.[1];
     if (key && map[key]) {
-      return { topic: key, path: map[key], text: fs.readFileSync(path.join(root, map[key]), 'utf8').trim(), next: 'Next: ds_find for the parts the guideline names.' };
+      return { topic: key, path: map[key], text: topicText(map[key]), next: 'Next: ds_find for the parts the guideline names.' };
     }
     return {
       topic: t,
@@ -602,7 +619,10 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     };
   }
 
-  return { find, get, tokens, guide, check };
+  /** What the glossary's design-system sections add to `find`: aliases per component, and what was left out. */
+  const vocabulary = () => facts.vocabulary;
+
+  return { find, get, tokens, guide, check, vocabulary };
 }
 
 // ── text ──────────────────────────────────────────────────────────────────
@@ -637,6 +657,7 @@ function renderGet(r) {
       const use = (x.use ?? x.replacement?.map((n) => ({ name: n })) ?? []).map((u) => `  use ${u.import ?? u.name}`);
       return [head, ...(x.why ? [`  why: ${x.why}`] : []), ...use, ...(x.values ? [`  values: ${x.values.join(' | ')}`] : []), ...(x.next ? [x.next] : [])].join('\n');
     }
+    if (x.text) return x.text;
     const out = [`# ${x.name} (${x.kind})`, x.import, ...(x.aliasOf ? [`Alias of ${x.aliasOf}.`] : []), ...(x.summary ? [x.summary] : []), ...(x.aliases?.length ? [`Also asked as: ${x.aliases.join(', ')}.`] : [])];
     if ('props' in x) {
       out.push('', '## Props');
@@ -647,7 +668,7 @@ function renderGet(r) {
         out.push(`- ${p.name}${p.required ? ' (required)' : ''}: ${p.type ?? '?'}${values}${def}${dep}${p.description ? `. ${p.description}` : ''}`);
       }
     }
-    for (const s of ['usage', 'examples', 'a11y']) if (s in x) out.push('', x[s] ?? `## ${s}\nNone authored${x.docs ? ` in ${x.docs}` : ''}.`);
+    for (const s of ['usage', 'practices', 'a11y']) if (s in x) out.push('', x[s] ?? `## ${s}\nNone authored${x.docs ? ` in ${x.docs}` : ''}.`);
     if ('figma' in x) {
       out.push('', '## Figma');
       if (!x.figma) out.push('No Figma mapping in design-system/figma/component-registry.json.');

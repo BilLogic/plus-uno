@@ -93,9 +93,9 @@ const gate = (repoRoot) => ({
 });
 
 /*
- * THE SECOND SET: state colors mixed by hand. Rule 2 of
- * `design-system/guidelines/foundations/color.md` — state layers for hover
- * and pressed, never a hand-mixed color — had no gate, and the 2026-10-24
+ * THE SECOND SET: state colors mixed by hand. The States
+ * section of `design-system/src/styles/Colors.mdx` — named state tokens for
+ * hover and pressed, never a hand-mixed color — had no gate, and the 2026-10-24
  * audit of the patterns and the Popups pattern found eleven `color-mix(…,
  * black N%)` and brightness filters in Button and Dropdown. They now lay
  * `--color-shadow-state-NN` over the fill, which composites to the same

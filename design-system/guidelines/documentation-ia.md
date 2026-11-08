@@ -68,28 +68,53 @@ belong there, not in the page;
 foundation pages use its `TokenTable` and `RefTable` wrappers and the `DoDont`
 pair in `design-system/src/storybook-docs/foundation-blocks.jsx`.
 
-## The three tabs
+## The four tabs
 
-A component page has three faces below its title — **Examples · Code · Usage**
-— as tabs inside the page, not sidebar entries. Three entries per component
-would fragment the sidebar, which is the one place the tree above is
+A component page has four faces below its title — **Examples · Code · Usage ·
+Agent view** — as tabs inside the page, not sidebar entries. Four entries per
+component would fragment the sidebar, which is the one place the tree above is
 spoken out loud.
 
-**The component page template.** Every component page fills the same three faces, in this order:
+**The component page template.** Every component page has the same four faces, in this order:
 
 - **Examples:** one story per appearance, state and size, each as a `ComponentExample` (an h3 and a one-line description over the live canvas), then the interactive playground.
 - **Code:** generated. The import line (from the `@/components` barrel) and the props table, derived from the story meta, so neither is authored.
-- **Usage:** parts (anatomy and tokens), the main rules as do and don't pairs, best practices, content guidelines, accessibility, related components.
+- **Usage:** the Usage spine below, with parts (anatomy and tokens) and content guidelines after its Usage section.
+- **Agent view:** generated. The component's generated file, byte for byte — what agents read, with a raw-text view, Copy, and a "Report a problem" link that opens a GitHub issue. Author nothing for it: the page and the source are its inputs.
 
 `Button/Button.mdx` is the reference page.
 
-**The tabs are a human affordance and change nothing for an agent.** The
-agent-facing file stays one flat generated `index.md` per component. An agent
-that had to open three files to answer one question would be paying for a
-navigation aid it cannot see.
+**One generated file per component is the agent's whole answer.** Agents read
+`<Name>/index.md` (`<Name>.md` when filed flat), never the `.mdx`: one file per
+question, the same bytes `ds_get` returns. Agent view shows that file to the
+designer, so a wrong sentence there is fixed on this page or in the source and
+regenerated.
 
 The tabs render inside the page from `design-system/src/storybook-docs/docs-tabs.jsx`
-(ADR-025); a page with no usage content or no props shows fewer.
+(ADR-025, ADR-040), and Agent view reads the generated files through one raw
+glob there; a page with no usage content, no props or no generated file shows
+fewer.
+
+## The Usage spine
+
+The Usage tab holds the text designers and agents share: the page shows it, and
+the generated `index.md` renders the same sentences for agents with rule ids
+added. Five `##` sections carry it, in this order:
+
+1. **Usage:** what the component is for, led by its glossary term: "Use `Modal` when the next step has to happen before anything else can."
+2. **Alternatives:** one route per bullet, each naming a component the components index lists: "For a short notice, use `Flag`." A route names the component to reach for instead.
+3. **Best practices:** one rule per `###` heading, written as one sentence of glossary term, condition and rule. The heading's slug is the rule id (`### Give the Modal footer a button.` is `give-the-modal-footer-a-button`). The body under it explains the rule, and each picture there has its rule sentence. A number in a rule comes from a code constant imported into the page, or names that constant in backticks.
+4. **Accessibility:** keyboard, focus and naming, as the component behaves today.
+5. **Related:** one bullet per neighbor, each with its "use when": "`SectionMessage`: use when the message stays in the page."
+
+Parts and Content guidelines sit after Usage. Each section states current
+behavior; a known gap lives in a GitHub issue, so the page carries no `TODO`,
+`outdated` or `known stale` line.
+
+`npm run check:ds-writing` holds every component page to this shape, and
+`scripts/check-ds-writing.mjs` keeps each rule's reason. It warns on every page,
+fails on a stale marker, and fails a page in its strict list (`STRICT_PAGES`,
+`Modal` first) on every rule.
 
 ## Related
 

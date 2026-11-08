@@ -1,6 +1,6 @@
 /**
- * Generate component-registry.json from per-component MDX `figmaMeta` exports,
- * plus the hand-authored pattern layer.
+ * Generate component-registry.json from per-component MDX `figmaMeta` exports (read
+ * through the page model, `lib/docs-page.mjs`), plus the hand-authored pattern layer.
  *
  * Source of truth (components): each component's MDX file declares
  *   export const figmaMeta = { fileKey, props?, sets: [...] };
@@ -26,6 +26,7 @@ import { fileURLToPath } from 'url';
 import { storybookId } from './lib/storybook-id.mjs';
 
 import { documents } from './lib/corpus.mjs';
+import { readDocsPage } from './lib/docs-page.mjs';
 import { isEntry } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -80,36 +81,6 @@ function walkMdxFiles(dir) {
   return documents('.', { root: dir, ext: ['.mdx'] })
     .filter((rel) => !/ \d+\.mdx$/.test(rel))
     .map((rel) => path.join(dir, rel));
-}
-
-/** Extract the `export const figmaMeta = { ... }` object literal and JSON.parse it. */
-function extractFigmaMeta(content) {
-  const m = content.search(/export\s+const\s+figmaMeta\s*=/);
-  if (m === -1) return null;
-  const braceStart = content.indexOf('{', m);
-  if (braceStart === -1) return null;
-  let depth = 0;
-  let inStr = false;
-  let end = -1;
-  for (let i = braceStart; i < content.length; i++) {
-    const ch = content[i];
-    if (inStr) {
-      if (ch === '\\') i++;
-      else if (ch === '"') inStr = false;
-    } else if (ch === '"') inStr = true;
-    else if (ch === '{') depth++;
-    else if (ch === '}') {
-      depth--;
-      if (depth === 0) { end = i; break; }
-    }
-  }
-  if (end === -1) return null;
-  const literal = content.slice(braceStart, end + 1);
-  try {
-    return JSON.parse(literal);
-  } catch (err) {
-    throw new Error(`Failed to parse figmaMeta object: ${err.message}`);
-  }
 }
 
 /**
@@ -172,7 +143,7 @@ export function deliberateOf(deliberate, name, props) {
 
 function extractFromMdx(mdxPath) {
   const content = fs.readFileSync(mdxPath, 'utf8');
-  const figmaMeta = extractFigmaMeta(content);
+  const { figmaMeta } = readDocsPage(content);
   if (!figmaMeta) return null;
 
   const githubMatch = content.match(GITHUB_URL_RE);

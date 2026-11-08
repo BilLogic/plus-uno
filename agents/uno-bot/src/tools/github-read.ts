@@ -2,9 +2,9 @@
 // (to check what exists, e.g. a DS component folder), or search the code, in any repo on the Worker's repo
 // list. Runs inline in the agent loop (no gate).
 //
-// `lookup` answers a design-system name — a component, pattern, prop or token
-// role — from the facts baked into the Worker (`integrations/ds-facts.ts`),
-// before any repo is resolved, so it fetches nothing.
+// `lookup` answers a design-system question before any repo is resolved: the
+// hosted DS MCP first (`integrations/ds-mcp.ts`, one subrequest), the facts
+// baked into the Worker (`integrations/ds-facts.ts`) when it misses.
 //
 // The model may name a `repo`; it reaches GitHub only as the entry the resolver
 // hands back, so a repo off the list is refused here, naming the list, and
@@ -27,6 +27,8 @@ import {
 import { isWithheldRepoPath, WITHHELD_NOTE } from "../integrations/repo-read-guard";
 import { storybookDocFor, type StorybookDoc } from "../integrations/storybook-docs";
 import { dsFacts } from "../integrations/ds-facts";
+import { DS_SECTIONS, dsMcpClient, type DsMcpClient, type DsMcpMiss, type DsSection } from "../integrations/ds-mcp";
+import { budgetHeadroom, countedFetch } from "../net";
 
 /** A token role can name hundreds (`ds` is every color): the rest are counted, not listed. */
 const TOKEN_LIMIT = 60;
@@ -34,33 +36,66 @@ const TOKEN_LIMIT = 60;
 const LOOKUP_NOTE =
   "From the design system's facts, as the IDE reads them. `exists` is importable with `import`; `not-here` is a name this system does not have — write `use`'s name and its import instead; `unknown` means it does not exist here — say so, and offer `near` if there is one. A prop's description and a component's full doc are read by path.";
 
+const HOSTED_NOTE =
+  "From the released design system, the one the production Storybook shows. Ground the answer in this text and name components as it does; a not-here name in it comes with what to use instead.";
+
+const WORDS_FALLBACK_NOTE =
+  "The hosted lookup did not answer, and the built-in facts match names only, so `unknown` here is not an absence: read design-system/agent-views/components/index.md by path and pick from it, or look up a name you find there.";
+
+export interface DsLookupOptions {
+  /** The hosted DS MCP; absent, the built-in facts answer alone. */
+  ds?: DsMcpClient;
+  /** One part of a named record (`ds_get`'s `section`). */
+  section?: DsSection;
+}
+
 /**
- * A design-system name, answered from the baked facts: `Card`, `card`,
- * `Button.appearance`, `Button.appearance=primary`, `--stack-md`, `stack`.
+ * A design-system question, asked of the hosted MCP first and answered from the
+ * facts baked into the Worker when it misses. A name — `Card`, `card`,
+ * `Button.appearance`, `--stack-md` — is `ds_get`; a task in words is
+ * `ds_find`; a token role (`stack`) is answered from the built-in facts, with
+ * no call. One subrequest at most (`integrations/ds-mcp.ts`).
  */
-export function lookupDesignSystem(query: string): string {
+export async function lookupDesignSystem(query: string, opts: DsLookupOptions = {}): Promise<string> {
   const facts = dsFacts();
-  if (query.startsWith("--")) {
-    return JSON.stringify({ ok: true, lookup: query, tokens: facts.tokens(query), note: LOOKUP_NOTE });
+  const q = query.trim();
+  const found = q.startsWith("--") ? null : facts.find(q);
+  const roleTokens = found && found.answer.status === "unknown" && !q.includes(".") ? facts.tokens(q) : [];
+
+  // Which hosted call the question is: a name the facts know (or a token) is a get, words are a find.
+  const named = q.startsWith("--") || (found !== null && found.answer.status !== "unknown");
+  // `ds_get` takes a prop, not a prop's value: `Button.appearance=primary` asks for `Button.appearance`.
+  const hostedName = (found && found.answer.status !== "unknown" ? found.answer.name : q).split("=")[0]!;
+  let fallback: DsMcpMiss | undefined;
+  if (opts.ds && !roleTokens.length) {
+    const tool = named ? "ds_get" : "ds_find";
+    const hosted = named ? await opts.ds.get(hostedName, opts.section) : await opts.ds.find(q);
+    if (hosted.ok) return JSON.stringify({ ok: true, lookup: query, source: "hosted", tool, text: hosted.text, note: HOSTED_NOTE });
+    fallback = hosted.reason;
   }
-  const found = facts.find(query);
-  const tokens = found.answer.status === "unknown" && !query.includes(".") ? facts.tokens(query.trim()) : [];
-  if (tokens.length) {
+  const builtIn = { source: "built-in", ...(fallback ? { fallback } : {}) };
+
+  if (!found) {
+    return JSON.stringify({ ok: true, lookup: query, ...builtIn, tokens: facts.tokens(q), note: LOOKUP_NOTE });
+  }
+  if (roleTokens.length) {
     return JSON.stringify({
       ok: true,
       lookup: query,
-      tokens: tokens.slice(0, TOKEN_LIMIT),
-      ...(tokens.length > TOKEN_LIMIT ? { more: tokens.length - TOKEN_LIMIT } : {}),
+      ...builtIn,
+      tokens: roleTokens.slice(0, TOKEN_LIMIT),
+      ...(roleTokens.length > TOKEN_LIMIT ? { more: roleTokens.length - TOKEN_LIMIT } : {}),
       note: LOOKUP_NOTE,
     });
   }
   return JSON.stringify({
     ok: true,
     lookup: query,
+    ...builtIn,
     answer: found.answer,
     ...(found.use.length ? { use: found.use } : {}),
     ...(found.near.length ? { near: found.near } : {}),
-    note: LOOKUP_NOTE,
+    note: fallback && !named ? WORDS_FALLBACK_NOTE : LOOKUP_NOTE,
   });
 }
 
@@ -73,6 +108,8 @@ export interface GithubReadDeps {
   /** The Storybook docs page of the component a path in the default repo
    *  belongs to; absent, the baked map (`integrations/storybook-docs.ts`). */
   storybookDoc?(path: string): StorybookDoc | null;
+  /** The hosted DS MCP `lookup` asks first; absent, the built-in facts answer alone. */
+  ds?: DsMcpClient;
 }
 
 export async function readGithub(input: Record<string, unknown>, deps: GithubReadDeps): Promise<string> {
@@ -80,7 +117,10 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
   const ref = typeof input.ref === "string" ? input.ref.trim() : undefined;
   const search = typeof input.search === "string" ? input.search.trim() : "";
   const lookup = typeof input.lookup === "string" ? input.lookup.trim() : "";
-  if (lookup) return lookupDesignSystem(lookup);
+  if (lookup) {
+    const section = DS_SECTIONS.find((s) => s === input.section);
+    return lookupDesignSystem(lookup, { ...(deps.ds ? { ds: deps.ds } : {}), ...(section ? { section } : {}) });
+  }
 
   const target = deps.resolveRepo(input.repo);
   if (!target.ok) {
@@ -183,12 +223,13 @@ function githubLink(repo: string, kind: "blob" | "tree", path: string, ref?: str
 /**
  * The binding: `Env` turned into the resolver and the reader.
  * @param env - Worker bindings
- * @param input - Tool args from the model — `lookup`, `path`, `ref`, `search`, `repo`
+ * @param input - Tool args from the model — `lookup`, `section`, `path`, `ref`, `search`, `repo`
  */
 export async function executeGithubRead(env: Env, input: Record<string, unknown>): Promise<string> {
   return readGithub(input, {
     resolveRepo: (requested) => resolveRepoFor(env, requested),
     readPath: (target, path, ref) => githubReadPath(env, target, path, ref),
     searchCode: (target, query) => githubSearchCode(env, target, query),
+    ds: dsMcpClient({ key: env.DS_MCP_KEY, post: countedFetch, canSpend: () => budgetHeadroom().subrequests >= 1 }),
   });
 }

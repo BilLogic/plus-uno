@@ -82,7 +82,7 @@
       "Empty state",
       "Flag",
       "Inline message",
-      "Modal dialog",
+      "Modal",
       "Section message",
       "Spotlight"
     ],
@@ -245,7 +245,7 @@
         "Empty state",
         "Flag",
         "Inline message",
-        "Modal dialog",
+        "Modal",
         "Section message",
         "Spotlight"
       ],

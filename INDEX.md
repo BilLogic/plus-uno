@@ -111,7 +111,6 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/figma/token-mapping.md`](design-system/guidelines/figma/token-mapping.md) | For quick machine lookups, agents may read token-registry.json (read-only); use this doc for the authoritative tables, extended cases, and notes |
 | [`design-system/guidelines/foundations/accessibility.md`](design-system/guidelines/foundations/accessibility.md) | WCAG 2.1 AA is the minimum bar for all PLUS interfaces |
 | [`design-system/guidelines/foundations/border.md`](design-system/guidelines/foundations/border.md) | Border widths, the focus ring, and how they pair with color tokens |
-| [`design-system/guidelines/foundations/color.md`](design-system/guidelines/foundations/color.md) | Color tokens by role — fills, grounds, text, icons and borders, SMART subjects, modes |
 | [`design-system/guidelines/foundations/content/date-and-time.md`](design-system/guidelines/foundations/content/date-and-time.md) | How dates, times, durations, and time zones are written in the product |
 | [`design-system/guidelines/foundations/content/inclusive-language.md`](design-system/guidelines/foundations/content/inclusive-language.md) | Words to prefer and words to retire, so copy reads as written for everyone |
 | [`design-system/guidelines/foundations/content/language-and-grammar.md`](design-system/guidelines/foundations/content/language-and-grammar.md) | Active voice, contractions, sentence case, and the punctuation conventions product copy follows |
@@ -197,6 +196,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/037-base-ui-is-the-behavior-layer-for-every-component.md`](docs/adr/037-base-ui-is-the-behavior-layer-for-every-component.md) | Base UI (@base-ui/react, pinned per ADR-036) is the headless behavior layer for every interactive PLUS component, not just AI surfaces; supersedes ADR-009, widens ADR-036 (2026-11-03) |
 | [`docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md`](docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md) | Space, size, radius, border width, typography and motion become generated from plans this repo owns, the way ADR-035 generates color — Figma downstream, PLUS ×16 numbering kept, one token ladder with the old vocabulary deleted |
 | [`docs/adr/039-one-checker-defines-an-escape.md`](docs/adr/039-one-checker-defines-an-escape.md) | One deterministic checker, check:ds-usage, defines an escape from the design system; the hook, CI, the prototype exit, ds-lens and the usage eval all call it, and AI review advises while the checker blocks |
+| [`docs/adr/040-agent-view-is-the-fourth-component-tab.md`](docs/adr/040-agent-view-is-the-fourth-component-tab.md) | Component docs pages gain a 4th tab, Agent view, that shows the component's generated file byte for byte through one raw glob in the tabs module; amends ADR-025, whose tabs were a human affordance only (2026-11-08) |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions

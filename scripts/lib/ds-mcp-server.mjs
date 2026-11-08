@@ -35,12 +35,12 @@ export const TOOLS = [
     name: 'ds_get',
     op: 'get',
     description:
-      'Step 2 of 5: full records for names ds_find returned: import line, props with allowed values, usage, do and don\'t examples, accessibility notes and the Figma mapping. Pass section to load one part. A retired or not-here name returns its replacement. Next: ds_tokens for styling.',
+      'Step 2 of 5: full records for names ds_find returned: import line, props with allowed values, usage, best practices with their rule ids, accessibility notes and the Figma mapping. Pass section to load one part. A retired or not-here name returns its replacement. Next: ds_tokens for styling.',
     inputSchema: {
       type: 'object',
       properties: {
         names: { type: 'array', items: { type: 'string' }, description: 'Component, pattern, prop (Button.appearance) or token names.' },
-        section: { type: 'string', enum: ['props', 'usage', 'examples', 'a11y', 'figma'], description: 'One part only; leave out for all.' },
+        section: { type: 'string', enum: ['props', 'usage', 'practices', 'a11y', 'figma', 'examples'], description: 'One part only; leave out for all. practices is Best practices; examples is its old name.' },
       },
       required: ['names'],
     },

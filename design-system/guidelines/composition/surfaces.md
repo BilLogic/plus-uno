@@ -63,8 +63,9 @@ Three variants, one component:
 | Detail panel | Row click in a table | Student detail overlay with tabs |
 | Form overlay | Add or Edit action | Single-column form inside a modal |
 
-All use `<Modal show={bool} onClose={fn} title="…">`. Set an explicit `width` for
-wider content (max 800px). Backdrop click and Escape both close.
+All use `<Modal show={bool} onClose={fn} title="…">`. For wider content, set
+`width` to a wider step of `MODAL_WIDTHS` (`6-col` is the default, then `8-col`
+and `10-col`). A press on the Blanket and Escape both close.
 
 ## Empty states
 

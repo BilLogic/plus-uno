@@ -84,6 +84,7 @@ const MDX_ROOT = 'design-system/src';
 const USAGE_HEADINGS = new Set([
   'When to use',
   'Usage',
+  'Alternatives',
   'Content guidelines',
   'Accessibility',
   'Usage notes',
@@ -193,8 +194,8 @@ export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
   const unknown = read.tabs.filter((t) => t !== 'examples' && t !== 'usage');
   if (unknown.length) {
     found.push(
-      `${file}: only "examples" and "usage" are authored — Code is ` +
-        `generated. Found: ${unknown.join(', ')}.`,
+      `${file}: only "examples" and "usage" are authored — Code and Agent view ` +
+        `are generated. Found: ${unknown.join(', ')}.`,
     );
   }
 

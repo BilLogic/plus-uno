@@ -54,7 +54,7 @@ To look a name, prop, token or rule up without reading files, ask the `ds` comma
 → `agent-views/components/index.md` § Patterns (the shell and its import) → `composition/surfaces.md`
 
 **Style something**
-→ `agent-views/tokens/tokens.md` for the name → `foundations/<topic>.md` for the rule
+→ `agent-views/tokens/tokens.md` for the name → `npm run ds -- guide <topic>` for the rule (a foundation's file here, or its Storybook page once the file is retired)
 
 **Implement from Figma**
 → `figma/registry-load-gate.md` (MANDATORY) → `figma/mcp-guide.md` → `figma/token-mapping.md`

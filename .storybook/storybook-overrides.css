@@ -1145,6 +1145,36 @@ a.sbdocs-a {
     outline-offset: var(--stack-sm);
 }
 
+/* Agent view (ADR-040): a lead line, one row of actions, then the file. */
+.sb-ds-agent-view__lead {
+    color: var(--ds-text-subtle);
+    margin: 0 0 var(--space-150);
+}
+
+.sb-ds-agent-view__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-100);
+    margin: 0 0 var(--space-300);
+}
+
+.sb-ds-agent-view__rendered {
+    border-top: var(--stroke-1) solid var(--ds-border);
+    padding-top: var(--space-200);
+}
+
+/* A rule's id under its heading: the handle agents cite, quiet below the rule.
+   The class name is RULE_ID_CLASS in design-system/src/storybook-docs/lib/component-tabs-contract.js. */
+.sb-ds-agent-view__rule-id {
+    display: block;
+    margin-top: var(--space-050);
+    color: var(--ds-text-subtlest);
+    font-family: var(--type-family-code);
+    font-size: var(--font-size-075);
+    font-weight: var(--type-weight-regular);
+    line-height: var(--line-height-100);
+}
+
 
 /*
  * Color modes: the canvas follows the mode.

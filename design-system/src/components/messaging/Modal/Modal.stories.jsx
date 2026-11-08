@@ -11,7 +11,6 @@ export default {
     tags: ['!dev', '!autodocs'],
     argTypes: {
         children: { table: { disable: true } },
-        onClick: { table: { disable: true } },
         style: { table: { disable: true } }, // Reserved for inline CSS overrides, not a color variant
         title: {
             control: 'text',

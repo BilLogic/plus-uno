@@ -1,18 +1,20 @@
 /**
- * Generate the per-component agent doc and the per-group index.
+ * Generate the per-component agent doc, the per-group index and the
+ * components manifest.
  *
- *   design-system/src/components/<group>/<Name>/index.md   ← per component
+ *   design-system/src/components/<group>/<Name>/index.md   ← per component (`<group>/<Name>.md` when filed flat)
+ *   design-system/src/patterns/<Folder>/index.md           ← per pattern, and PageLayout and the Logo beside their source
  *   design-system/src/components/<group>/index.md          ← group index + coverage
+ *   design-system/agent-views/components.json              ← the manifest
  *
- * Everything here is derived from source that is maintained for its own
- * reasons — propTypes, destructured defaults, JSDoc, story argTypes, SCSS token
- * usage. There is no second corpus to keep in sync, which is why the skeleton
- * pipeline deleted in #156 could not work and this can: nothing has to be
- * written for a component to be documented.
- *
- * The authored half (#166 — when to use, correct/incorrect, accessibility) is
- * NOT written here. It is detected and counted, so a section sitting at 0%
- * coverage is visible in the group index rather than silently absent.
+ * The facts are derived from source that is maintained for its own reasons —
+ * propTypes, destructured defaults, JSDoc, story argTypes, SCSS token usage —
+ * and parsed into the manifest first. Each doc is then rendered from that
+ * in-memory manifest and the component's docs page, by the one render the
+ * DS lookup's `get` returns (`scripts/lib/component-render.mjs`), so the file
+ * and `get` agree byte for byte. The authored half (Usage, Alternatives, rules,
+ * accessibility) is the page's, carried over and never written here; what is
+ * missing is counted in the group index.
  *
  * Usage:
  *   node scripts/generate-component-docs.mjs
@@ -24,10 +26,13 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 
 import { documents } from './lib/corpus.mjs';
-import { AUTHORED_SECTIONS, authoredCoverage } from './lib/authored-coverage.mjs';
+import { AUTHORED_SECTIONS, coverageOf } from './lib/authored-coverage.mjs';
+import { GENERATED_HEADER, componentFacts, docPathOf, renderComponent } from './lib/component-render.mjs';
+import { createPageFinder, readDocsPage } from './lib/docs-page.mjs';
 import { resolveNamedOneOf } from './doc-identifiers.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 import { readBarrel } from './lib/ds-facts.mjs';
+import { searchAliases } from './lib/ds-vocabulary.mjs';
 import { buildComponentsManifest, serializeManifest } from './lib/agent-manifests.mjs';
 import { AGENT_ROOT } from './agent-views-paths.js';
 import { enumValuesOf } from './lib/enum-values.mjs';
@@ -40,6 +45,8 @@ const COMPONENTS_ROOT = path.join(REPO_ROOT, 'design-system/src/components');
 const CHECK = process.argv.includes('--check');
 const UPDATE = process.argv.includes('--update');
 const BASELINE = 'scripts/baselines/component-docs.json';
+/** Every folder a generated doc is written under: the components, the pattern barrels' folders, the assets. */
+const DOC_ROOTS = ['components', 'patterns', 'specs/Universal/Pages', 'assets'].map((d) => path.join(REPO_ROOT, 'design-system/src', d));
 /** The record's own explanation, written once when `--update` creates it; the file is its home after that. */
 const RECORD_WHY =
   'Prop rows and components the generated component docs leave undescribed, as `<Component> <prop>` or `<Component> (summary)`. ' +
@@ -347,124 +354,55 @@ const readOrNull = (p) => (fs.existsSync(p) && fs.statSync(p).isFile() ? fs.read
 const ENUM_ALIAS = { alias: { '@plus-ds': path.join(REPO_ROOT, 'design-system/src'), '@': path.join(REPO_ROOT, 'design-system/src') } };
 const rel = (p) => path.relative(REPO_ROOT, p).replace(/\\/g, '/');
 
-/* ----------------------------------------------------------------- emitting */
+/* ------------------------------------------------------------------ parsing a component */
 
-function componentDoc(c, siblings) {
-  const source = fs.readFileSync(c.jsx, 'utf8');
-  const base = c.flat ? path.join(c.dir, c.name) : path.join(c.dir, c.name);
+/**
+ * One component or pattern parsed from source: its manifest entry, with the
+ * facts its generated doc carries beyond props under `doc`
+ * (`scripts/lib/component-render.mjs`), and its description gaps. Null when
+ * its props cannot be read, after failing the run.
+ */
+function parseEntry({ name, group, jsx }) {
+  const source = fs.readFileSync(jsx, 'utf8');
+  const base = jsx.replace(/\.jsx$/, '');
   const stories = readIf(`${base}.stories.jsx`);
   const scss = readIf(`${base}.scss`);
-  const mdx = readIf(`${base}.mdx`);
 
-  const symbol = implSymbol(source, c.name);
+  const symbol = implSymbol(source, name);
   const props = parsePropTypes(source, symbol);
   if (props === null) {
-    fail(`${rel(c.jsx)}: ${symbol}.propTypes is present but unbalanced — refusing to emit an empty props table`);
+    fail(`${rel(jsx)}: ${symbol}.propTypes is present but unbalanced — refusing to emit an empty props table`);
     return null;
   }
   if (!props.length && /\.propTypes\s*=/.test(source)) {
     fail(
-      `${rel(c.jsx)}: the file declares propTypes but none resolve to \`${symbol}\` — ` +
-        `the props table would be silently empty. Name the implementation ${c.name}, or teach implSymbol() this shape.`
+      `${rel(jsx)}: the file declares propTypes but none resolve to \`${symbol}\` — ` +
+        `the props table would be silently empty. Name the implementation ${name}, or teach implSymbol() this shape.`
     );
     return null;
   }
-  const defaults = parseDefaults(source, symbol);
-  const descriptions = parseArgTypeDescriptions(stories);
-  const tokens = scssTokens(scss);
-  const coverage = authoredCoverage(mdx);
-  const enums = props.filter((p) => p.enumValues && p.enumValues.length);
-
-  let d = `<!-- DO NOT EDIT BY HAND. Generated by npm run generate:component-docs -->\n`;
-  d += `<!-- Every fact below is derived from source. To change one, change the source. -->\n\n`;
-  d += `# ${c.name}\n\n`;
-
-  const jsdoc = jsdocFor(source, symbol);
-  if (jsdoc) d += `${jsdoc}\n\n`;
-  const noSummary = !jsdoc;
-  if (symbol !== c.name) {
-    d += `> Implemented as \`${symbol}\` in the source and exported as \`${c.name}\`. `;
-    d += `Import the exported name; read the source under the implementation name.\n\n`;
-  }
-
-  d += `**Import:** \`import { ${c.name} } from '@/components';\`\n\n`;
-  d += `**Source:** \`${rel(c.jsx)}\`\n\n`;
-  if (stories) d += `**Stories:** \`${rel(`${base}.stories.jsx`)}\` — ${storyExports(stories).join(', ') || 'none exported'}\n\n`;
-  if (mdx) d += `**Storybook page:** \`${rel(`${base}.mdx`)}\`\n\n`;
-
-  const gaps = { rows: props.length, summary: false, props: [] };
-  if (props.length) {
-    d += `## Props\n\n| Prop | Type | Default | Description |\n|------|------|---------|-------------|\n`;
-    for (const p of props) {
-      const def = defaults[p.name] ? `\`${defaults[p.name]}\`` : '—';
-      if (!p.description) gaps.props.push(p.name); // source JSDoc only (scripts/lib/doc-coverage.mjs)
-      d += `| \`${p.name}\` | ${p.type} | ${def} | ${descriptions[p.name] || p.description || '—'} |\n`;
-    }
-    d += `\n`;
-  }
-
-  if (enums.length) {
-    d += `## Variants\n\n`;
-    for (const e of enums) {
-      d += `**\`${e.name}\`** — ${e.enumValues.map((v) => `\`${v}\``).join(' · ')}\n\n`;
-    }
-    d += `Anything not listed is not a valid value.\n\n`;
-  }
-
-  if (tokens.length) {
-    d += `## Tokens touched\n\n`;
-    d += tokens.map((t) => `\`${t}\``).join(' · ') + `\n\n`;
-    d += `From \`${rel(`${base}.scss`)}\`. Override these through the token layer, never with a literal.\n\n`;
-  }
-
-  const subs = subComponents(source, symbol);
-  if (subs.length) {
-    d += `## Sub-components\n\n`;
-    for (const sub of subs) {
-      const subProps = parsePropTypes(source, sub.impl) || [];
-      d += `### \`${c.name}.${sub.name}\`\n\n`;
-      d += `Implemented as \`${sub.impl}\`.\n\n`;
-      if (subProps.length) {
-        d += `| Prop | Type | Default | Description |\n|------|------|---------|-------------|\n`;
-        for (const sp of subProps) {
-          gaps.rows += 1;
-          if (!sp.description) gaps.props.push(`${sub.name}.${sp.name}`);
-          d += `| \`${sp.name}\` | ${sp.type} | — | ${sp.description || '—'} |\n`;
-        }
-        d += `\n`;
-      }
-    }
-  }
-
-  const related = siblings.filter((s) => s !== c.name);
-  if (related.length) {
-    d += `## Related\n\n`;
-    d += `Same group: ${related.map((r) => `\`${r}\``).join(' · ')}\n\n`;
-  }
-
-  const missing = AUTHORED_SECTIONS.filter((s) => !coverage[s.key]);
-  d += `<!-- authored coverage: `;
-  d += AUTHORED_SECTIONS.map((s) => `${s.key}=${coverage[s.key] ? 'yes' : 'no'}`).join(' ');
-  d += ` -->\n`;
-  if (missing.length === AUTHORED_SECTIONS.length) {
-    d += `\n> No authored guidance yet — when to use, correct/incorrect, and accessibility\n`;
-    d += `> are unwritten for this component (#166). Nothing above tells you whether\n`;
-    d += `> reaching for \`${c.name}\` is the right call, only what it accepts.\n`;
-  } else if (missing.length) {
-    d += `\n> Authored guidance is partial — missing: ${missing.map((m) => m.label.toLowerCase()).join(', ')} (#166).\n`;
-  }
-
-  const manifestEntry = manifestEntryOf({
-    name: c.name,
-    group: path.basename(c.flat ? c.dir : path.dirname(c.dir)),
-    jsx: c.jsx,
-    summary: jsdoc,
-    props,
-    defaults,
-    descriptions,
+  const summary = jsdocFor(source, symbol);
+  const gaps = { rows: props.length, summary: !summary, props: props.filter((p) => !p.description).map((p) => p.name) };
+  const subs = subComponents(source, symbol).map((sub) => {
+    const subProps = parsePropTypes(source, sub.impl) || [];
+    gaps.rows += subProps.length;
+    for (const sp of subProps) if (!sp.description) gaps.props.push(`${sub.name}.${sp.name}`);
+    return {
+      name: sub.name,
+      impl: sub.impl,
+      props: subProps.map((sp) => ({ name: sp.name, type: sp.type.replace(/\s*\(required\)$/, ''), required: /\(required\)$/.test(sp.type), default: null, description: sp.description || null })),
+    };
   });
-  gaps.summary = noSummary;
-  return { doc: d, coverage, propCount: props.length, manifestEntry, gaps };
+  const tokens = scssTokens(scss);
+  const entry = manifestEntryOf({ name, group, jsx, summary, props, defaults: parseDefaults(source, symbol), descriptions: parseArgTypeDescriptions(stories) });
+  // Only what is there: the manifest carries no empty field for each of these.
+  entry.doc = {
+    ...(symbol !== name ? { implementedAs: symbol } : {}),
+    ...(stories ? { stories: storyExports(stories) } : {}),
+    ...(tokens.length ? { tokens } : {}),
+    ...(subs.length ? { subComponents: subs } : {}),
+  };
+  return { entry, gaps };
 }
 
 /** The machine record for one parsed component or pattern (`scripts/lib/agent-manifests.mjs`). */
@@ -490,8 +428,8 @@ function manifestEntryOf({ name, group, jsx, summary, props, defaults, descripti
 
 /**
  * The barrels patterns come from: the patterns, and the page templates
- * `PageLayout` comes from. Their docs are their Storybook pages, so no
- * `index.md` is written for them; only their manifest record is.
+ * `PageLayout` comes from. Each gets a generated doc beside its source, as a
+ * component does.
  */
 const PATTERN_BARRELS = ['@/patterns', '@/specs/Universal/Pages'];
 
@@ -516,24 +454,8 @@ function patternEntries() {
         fail(`${spec} exports ${name}, and ${rel(jsx)} is not a file: its props cannot be read`);
         continue;
       }
-      const source = fs.readFileSync(jsx, 'utf8');
-      const symbol = implSymbol(source, name);
-      const props = parsePropTypes(source, symbol);
-      if (props === null) {
-        fail(`${rel(jsx)}: ${symbol}.propTypes is present but unbalanced`);
-        continue;
-      }
-      parsed.push(
-        manifestEntryOf({
-          name,
-          group: path.basename(dir).toLowerCase(),
-          jsx,
-          summary: jsdocFor(source, symbol),
-          props,
-          defaults: parseDefaults(source, symbol),
-          descriptions: parseArgTypeDescriptions(readIf(jsx.replace(/\.jsx$/, '.stories.jsx'))),
-        }),
-      );
+      const built = parseEntry({ name, group: path.basename(dir).toLowerCase(), jsx });
+      if (built) parsed.push(built.entry);
     }
   }
   return { patterns, parsed };
@@ -541,8 +463,7 @@ function patternEntries() {
 
 /**
  * Barrel components implemented outside src/components/, in
- * src/assets/<Name>/<Name>.jsx (the Logo). They have no generated page; the
- * manifest still reads their props and summary from source.
+ * src/assets/<Name>/<Name>.jsx (the Logo), parsed the way a component is.
  */
 function assetEntries(exports, known) {
   const out = [];
@@ -550,24 +471,8 @@ function assetEntries(exports, known) {
     if (known.has(name)) continue;
     const jsx = path.join(REPO_ROOT, 'design-system/src/assets', name, `${name}.jsx`);
     if (!fs.existsSync(jsx)) continue;
-    const source = fs.readFileSync(jsx, 'utf8');
-    const symbol = implSymbol(source, name);
-    const props = parsePropTypes(source, symbol);
-    if (props === null) {
-      fail(`${rel(jsx)}: ${symbol}.propTypes is present but unbalanced`);
-      continue;
-    }
-    out.push(
-      manifestEntryOf({
-        name,
-        group: 'assets',
-        jsx,
-        summary: jsdocFor(source, symbol),
-        props,
-        defaults: parseDefaults(source, symbol),
-        descriptions: parseArgTypeDescriptions(readIf(jsx.replace(/\.jsx$/, '.stories.jsx'))),
-      }),
-    );
+    const built = parseEntry({ name, group: 'assets', jsx });
+    if (built) out.push(built.entry);
   }
   return out;
 }
@@ -578,7 +483,7 @@ function groupIndex(group, results) {
   d += `# ${title}\n\n`;
   d += `${group.components.length} component${group.components.length === 1 ? '' : 's'}. `;
   d += `Each row links to the generated facts; the three columns after it are the\n`;
-  d += `authored half (#166), counted rather than assumed.\n\n`;
+  d += `authored half, counted rather than assumed.\n\n`;
   d += `| Component | Props | ${AUTHORED_SECTIONS.map((s) => s.label).join(' | ')} |\n`;
   d += `|-----------|------:|${AUTHORED_SECTIONS.map(() => ':---:').join('|')}|\n`;
 
@@ -613,21 +518,15 @@ let stale = 0;
 let described = 0;
 let failed = false;
 
+const parsedByName = new Map();
 for (const group of groups) {
-  const names = group.components.map((c) => c.name);
-  const results = {};
-
   for (const c of group.components) {
-    const built = componentDoc(c, names);
+    const built = parseEntry({ name: c.name, group: group.name, jsx: c.jsx });
     if (!built) continue;
-    results[c.name] = built;
-    const out = c.flat ? path.join(c.dir, `${c.name}.md`) : path.join(c.dir, 'index.md');
-    written.push([out, built.doc]);
-    manifestEntries.push(built.manifestEntry);
+    parsedByName.set(c.name, built.entry);
+    manifestEntries.push(built.entry);
     gapsByComponent[c.name] = built.gaps;
   }
-
-  written.push([path.join(group.dir, 'index.md'), groupIndex(group, results)]);
 }
 
 /**
@@ -636,17 +535,47 @@ for (const group of groups) {
  * what `agent-views/components/index.md` lists: the components, then the
  * patterns and `PageLayout` from theirs.
  */
-{
-  const { components: exports } = readBarrel(REPO_ROOT, '@/components', {
-    onUnresolved: (spec) => fail(`components barrel: cannot resolve \`export * from '${spec}'\``),
-  });
-  // The design system ships from this repo's root package; its version is the one to stamp.
-  const { version } = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
-  const { patterns, parsed: parsedPatterns } = patternEntries();
-  manifestEntries.push(...assetEntries(exports, new Set(manifestEntries.map((e) => e.name))));
-  const manifest = buildComponentsManifest({ exports, components: manifestEntries, patterns, parsedPatterns, version });
-  written.push([path.join(AGENT_ROOT, 'components.json'), serializeManifest(manifest, 'npm run generate:agent')]);
+const { components: exports } = readBarrel(REPO_ROOT, '@/components', {
+  onUnresolved: (spec) => fail(`components barrel: cannot resolve \`export * from '${spec}'\``),
+});
+// The design system ships from this repo's root package; its version is the one to stamp.
+const { version } = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'package.json'), 'utf8'));
+const { patterns, parsed: parsedPatterns } = patternEntries();
+manifestEntries.push(...assetEntries(exports, new Set(manifestEntries.map((e) => e.name))));
+const manifest = buildComponentsManifest({ exports, components: manifestEntries, patterns, parsedPatterns, version });
+written.push([path.join(AGENT_ROOT, 'components.json'), serializeManifest(manifest, 'npm run generate:agent')]);
+
+/**
+ * Each doc is rendered from the manifest built above, in memory, never the
+ * one the last run wrote: the same render the lookup's `get` returns
+ * (`scripts/lib/component-render.mjs`). A component the barrel does not export
+ * has no record there; it is rendered from its own parse, with no import.
+ */
+const registry = JSON.parse(readIf(path.join(REPO_ROOT, 'design-system/figma/component-registry.json')) || '{}');
+const findPage = createPageFinder(REPO_ROOT, registry);
+/** The words each component is asked by: `agent-views/_aliases.json`, then the glossary's design-system avoid-words. */
+const { rows: aliasRows } = searchAliases(readIf(path.join(REPO_ROOT, 'GLOSSARY.md')) || '', {
+  names: manifest.components.map((c) => c.name),
+  notHere: (JSON.parse(readIf(path.join(AGENT_ROOT, '_inventions.json')) || '{}').components ?? []).map((r) => r.not),
+  handAliases: JSON.parse(readIf(path.join(AGENT_ROOT, '_aliases.json')) || '{}').components ?? {},
+});
+const docsOf = (record) => {
+  const page = findPage({ name: record.name, source: record.source });
+  return page ? { path: page, page: readDocsPage(fs.readFileSync(path.join(REPO_ROOT, page), 'utf8'), { root: REPO_ROOT, file: page }) } : null;
+};
+const rendered = new Map();
+const renderOne = (facts) => {
+  const docs = docsOf(facts);
+  written.push([path.join(REPO_ROOT, docPathOf(facts)), renderComponent(facts, docs)]);
+  rendered.set(facts.name, { coverage: coverageOf(docs?.page), propCount: (facts.props ?? []).length });
+};
+for (const record of manifest.components) if (record.source) renderOne(componentFacts(manifest, record.name, aliasRows));
+for (const [name, entry] of parsedByName) {
+  if (rendered.has(name)) continue;
+  const [record] = buildComponentsManifest({ exports: [name], components: [entry], version }).components;
+  renderOne({ ...componentFacts({ components: [...manifest.components, record] }, name, aliasRows), import: null });
 }
+for (const group of groups) written.push([path.join(group.dir, 'index.md'), groupIndex(group, Object.fromEntries(rendered))]);
 
 /**
  * Description coverage, held by the ratchet (`scripts/lib/doc-coverage.mjs`).
@@ -680,13 +609,14 @@ for (const group of groups) {
  * this generator's header are ever removed — an authored .md that happens to
  * sit under components/ is not this script's to delete.
  */
-const GENERATED_HEADER = '<!-- DO NOT EDIT BY HAND. Generated by npm run generate:component-docs -->';
 const expected = new Set(written.map(([out]) => out));
 const orphans = [];
-for (const rel of documents('.', { root: COMPONENTS_ROOT })) {
-  const full = path.join(COMPONENTS_ROOT, rel);
-  if (expected.has(full)) continue;
-  if (fs.readFileSync(full, 'utf8').startsWith(GENERATED_HEADER)) orphans.push(full);
+for (const root of DOC_ROOTS) {
+  for (const rel of documents('.', { root })) {
+    const full = path.join(root, rel);
+    if (expected.has(full)) continue;
+    if (fs.readFileSync(full, 'utf8').startsWith(GENERATED_HEADER)) orphans.push(full);
+  }
 }
 
 for (const orphan of orphans) {

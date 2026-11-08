@@ -46,11 +46,11 @@ test('the $about line states the rule a row is reviewed against', () => {
   assert.match(aliases.$about, /_inventions\.json/);
 });
 
-test('the facts module carries a component its aliases, and an empty list otherwise', () => {
+test('the facts module carries a component its aliases, hand-kept first then the glossary\'s, and an empty list otherwise', () => {
   const facts = loadFacts(REPO_ROOT);
   const [key, list] = Object.entries(aliases.components)[0];
-  assert.deepEqual(facts.lookup(key).aliases, list);
-  const bare = names.find((n) => !aliases.components[n]);
+  assert.deepEqual(facts.lookup(key).aliases, [...list, ...(facts.vocabulary.aliases[key] ?? [])]);
+  const bare = names.find((n) => !aliases.components[n] && !facts.vocabulary.aliases[n]);
   assert.deepEqual(facts.lookup(bare).aliases, []);
   assert.deepEqual(facts.lookup('NoSuchThing').aliases, []);
 });
@@ -70,7 +70,7 @@ test('get prints the aliases under the summary', () => {
   const lookup = createLookup(REPO_ROOT);
   const [key, list] = Object.entries(aliases.components)[0];
   const record = lookup.get(key).records[0];
-  assert.deepEqual(record.aliases, list);
+  assert.deepEqual(record.aliases.slice(0, list.length), list);
   const text = render('get', lookup.get(key));
   assert.match(text, new RegExp(`Also asked as: ${list[0]}`));
 });

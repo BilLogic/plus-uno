@@ -10,8 +10,22 @@ import Blanket from '@/patterns/Blanket';
 /** Safe CSS length / custom-property patterns for Modal width. */
 const SAFE_WIDTH_RE = /^(?:\d+(?:\.\d+)?(?:px|rem|%)|var\(--[a-zA-Z0-9-]+(?:\s*,\s*[^)]+)?\))$/;
 
-/** The widths from the screen grid: 6 · 8 · 10 columns plus the modal pad. */
-const GRID_WIDTHS = ['6-col', '8-col', '10-col'];
+/** The `width` steps, from the screen grid: 6 · 8 · 10 columns plus the modal pad. */
+export const MODAL_WIDTHS = ['6-col', '8-col', '10-col'];
+
+/** The screens `MODAL_WIDTH_PX` is read at: 768 and 1024, and 1280, where the grid reaches its cap and the width stops growing. */
+export const MODAL_WIDTH_SCREENS = [768, 1024, 1280];
+
+/**
+ * Each `width` step in pixels at `MODAL_WIDTH_SCREENS`, as Modal.scss computes
+ * it. The docs page shows these; scripts/frame-layer-tokens.test.mjs holds them
+ * equal to the `--modal-width-*` tokens.
+ */
+export const MODAL_WIDTH_PX = {
+    '6-col': [384, 512, 640],
+    '8-col': [507, 677, 848],
+    '10-col': [629, 843, 1056],
+};
 
 /**
  * Resolves a fixed `width` to CSS lengths, or `null` for a grid width.
@@ -21,7 +35,7 @@ const GRID_WIDTHS = ['6-col', '8-col', '10-col'];
  * @returns {{ width: string, minWidth: string, maxWidth: string } | null}
  */
 const resolveModalWidth = (width) => {
-    if (width === undefined || width === null || GRID_WIDTHS.includes(width)) return null;
+    if (width === undefined || width === null || MODAL_WIDTHS.includes(width)) return null;
 
     const fixed = (length) => ({ width: length, minWidth: length, maxWidth: length });
 
@@ -154,7 +168,7 @@ const Modal = ({
     const classes = [
         'plus-modal',
         'plus-modal-default',
-        GRID_WIDTHS.includes(width) ? `plus-modal-width-${width}` : '',
+        MODAL_WIDTHS.includes(width) ? `plus-modal-width-${width}` : '',
         `plus-modal-height-${height}`,
         showBottomButtons ? 'plus-modal-with-buttons' : 'plus-modal-no-buttons',
         bodyOnly ? 'plus-modal-body-only' : '',
@@ -345,7 +359,7 @@ Modal.propTypes = {
      * the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept
      * for the callers that still pass one.
      */
-    width: PropTypes.oneOfType([PropTypes.oneOf(GRID_WIDTHS), PropTypes.number, PropTypes.string]),
+    width: PropTypes.oneOfType([PropTypes.oneOf(MODAL_WIDTHS), PropTypes.number, PropTypes.string]),
     /** Extra class names added to the dialog panel beside the component's own. */
     className: PropTypes.string,
     /** Inline styles for the dialog panel. A fixed `width` is applied after them. */

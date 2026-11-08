@@ -76,7 +76,7 @@ export { default as Banner, BANNER_APPEARANCES, BANNER_ICONS } from '@/component
 export { default as EmptyState, EMPTY_STATE_SPACINGS } from '@/components/messaging/EmptyState';
 export { default as Flag, FLAG_APPEARANCES, FLAG_AUTO_CLOSE_MS, FlagGroup } from '@/components/messaging/Flag';
 export { default as InlineMessage, INLINE_MESSAGE_APPEARANCES } from '@/components/messaging/InlineMessage';
-export { default as Modal } from '@/components/messaging/Modal';
+export { default as Modal, MODAL_WIDTH_PX, MODAL_WIDTH_SCREENS, MODAL_WIDTHS } from '@/components/messaging/Modal';
 export { default as SectionMessage, SECTION_MESSAGE_APPEARANCES, SECTION_MESSAGE_ICONS } from '@/components/messaging/SectionMessage';
 export { default as Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components/messaging/Spotlight';
 

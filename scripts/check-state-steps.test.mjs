@@ -1,6 +1,6 @@
 /**
- * Each interaction state takes the state-layer step `foundations/color.md`
- * assigns it: hover 08, pressed 12, selected or dragged 16, and focus no fill
+ * Each interaction state takes the state step the Color page
+ * (`design-system/src/styles/Colors.mdx` § States) assigns it: hover 08, pressed 12, selected or dragged 16, and focus no fill
  * at all, because the focus ring carries it.
  *
  * WHY THIS EXISTS. The steps were written down as an example that mapped focus
@@ -323,7 +323,7 @@ test('FieldBox: hover turns the border border.focused, subtle hover the neutral 
 /*
  * THE SWEEP. The components below drifted the same way: pressed at 16, focus
  * as a 12 fill, a selected state at 12, or no pressed step at all. Each block
- * pins the steps the table in color.md names.
+ * pins the steps the Color page's States section names.
  */
 
 /* ─── CloseButton ────────────────────────────────────────────────────────── */

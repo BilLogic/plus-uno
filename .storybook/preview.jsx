@@ -283,7 +283,7 @@ const preview = {
               "Empty state",
               "Flag",
               "Inline message",
-              "Modal dialog",
+              "Modal",
               "Section message",
               "Spotlight"
             ],
