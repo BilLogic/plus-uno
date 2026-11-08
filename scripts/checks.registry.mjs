@@ -581,7 +581,7 @@ export const CHECKS = [
   },
   {
     name: 'test:scripts',
-    script: 'node --test .cursor/hooks/ds-usage/*.test.mjs scripts/*.test.mjs scripts/lib/*.test.mjs scripts/lib/color/*.test.mjs netlify/functions/docs-agent/*.test.mjs',
+    script: 'node --test .cursor/hooks/ds-usage/*.test.mjs scripts/*.test.mjs scripts/lib/*.test.mjs scripts/lib/color/*.test.mjs netlify/functions/docs-agent/*.test.mjs netlify/functions/ds-mcp/*.test.mjs',
     pkg: 'root',
     trigger: 'pull_request',
     kind: 'spawn',

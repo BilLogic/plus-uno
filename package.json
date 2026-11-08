@@ -45,7 +45,7 @@
     "regenerate": "node scripts/regenerate.mjs",
     "ds": "node scripts/ds.mjs",
     "ds:mcp": "node scripts/ds-mcp.mjs",
-    "test:scripts": "node --test .cursor/hooks/ds-usage/*.test.mjs scripts/*.test.mjs scripts/lib/*.test.mjs scripts/lib/color/*.test.mjs netlify/functions/docs-agent/*.test.mjs",
+    "test:scripts": "node --test .cursor/hooks/ds-usage/*.test.mjs scripts/*.test.mjs scripts/lib/*.test.mjs scripts/lib/color/*.test.mjs netlify/functions/docs-agent/*.test.mjs netlify/functions/ds-mcp/*.test.mjs",
     "start": "vite",
     "dev:react": "vite",
     "build:react": "vite build",

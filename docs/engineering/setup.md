@@ -432,6 +432,16 @@ The Storybook docs' AI agent is answered by `netlify/functions/docs-agent`: Gemi
 
 The function signs a JWT with Node's `crypto`, exchanges it for an OAuth token and calls `generateContent`. Its grounding is the generated design-system index, bundled through `included_files` in `netlify.toml`. Tests: `npm run test:scripts`. The per-IP rate limit is best effort: it is held per warm function instance, so a cold start resets it. Without the variables, or on an error or a 429, the chat falls back to the docs search.
 
+## Hosted design-system MCP (Netlify function)
+
+The hosted copy of the `plus-ds` lookup is `netlify/functions/ds-mcp`, served at `/mcp/ds` (`docs/connectors/ds-mcp.md` § Hosted). It reads the repo files bundled through `[functions."ds-mcp"] included_files` in `netlify.toml`, so it answers from the same build as that deploy's Storybook; `netlify/functions/ds-mcp/handler.test.mjs` fails when a file the five tools open is missing from that list. Set this in the Netlify site's environment variables:
+
+| Variable | Value |
+|---|---|
+| `DS_MCP_KEY` | the shared key clients send as `Authorization: Bearer <key>` or `x-ds-mcp-key`. Unset or empty, the function refuses every request. |
+
+Tests: `npm run test:scripts`.
+
 ## Local Preview
 
 ```bash

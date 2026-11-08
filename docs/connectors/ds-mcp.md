@@ -26,3 +26,27 @@ Start with `ds_find`, finish with `ds_check`. Each answer ends with the tool to 
 ## Keeping it
 
 The lookup stays while the usage eval's `lookup` arm leaves fewer fail-level escapes than `current`, or, at zero escapes on both sides, cuts input tokens by 20% or turns by 3; when `node scripts/eval-ds-usage.mjs compare` reads delete on any model, both adapters are deleted (`docs/evals/ds-usage.md` § Does the lookup pay off?). It was kept on 2026-11-07: 0 escapes against 17, at 10% more input. Its only package is `@modelcontextprotocol/sdk`, which the harness CI job installs in its own scoped step from the root lock (`scripts/lock-closure.mjs --lock`), so the spawn test in `test:scripts` runs there too.
+
+## Hosted
+
+For people without the checkout, the same five tools are served over HTTPS by the Netlify function `netlify/functions/ds-mcp`, at `/mcp/ds` on the site (`https://plus-uno.netlify.app/mcp/ds`). It is `scripts/lib/ds-mcp-server.mjs` on the SDK's Streamable HTTP transport, stateless: every request is answered on its own, with no session.
+
+- **It serves the released design system.** The function bundles the facts, guidelines and Storybook pages from the same commit the Storybook of that deploy is built from, and production deploys only on a release, so a client of the production URL sees the released system and a deploy preview serves its own branch.
+- **Read-only, behind a shared key.** Send the key as `Authorization: Bearer <key>` or as `x-ds-mcp-key: <key>`. A request without the right key gets 401, and so does every request while the key is not set. The key is the Netlify environment variable `DS_MCP_KEY` (`docs/engineering/setup.md`); ask the design-system owner for it. It is a team key, not a credential for anything else.
+- **`ds_check` takes code only.** The hosted server has no files of yours, so `paths` is not offered and a call that passes it is refused with a message saying so. Pass `code` and the `path` it would have (for its language and page rules). To check files, run the local server or `npm run check:ds-usage`.
+
+Add it to an MCP client (Claude Code reads `.mcp.json`; Cursor reads `.cursor/mcp.json`) with the key from an environment variable rather than written into the file:
+
+```json
+{
+  "mcpServers": {
+    "plus-ds-hosted": {
+      "type": "http",
+      "url": "https://plus-uno.netlify.app/mcp/ds",
+      "headers": { "Authorization": "Bearer ${DS_MCP_KEY}" }
+    }
+  }
+}
+```
+
+In the checkout, keep using the local `plus-ds`: it matches the branch being edited, and the hosted copy does not.
