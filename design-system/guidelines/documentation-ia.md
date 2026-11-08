@@ -79,7 +79,7 @@ spoken out loud.
 
 - **Examples:** one story per appearance, state and size, each as a `ComponentExample` (an h3 and a one-line description over the live canvas), then the interactive playground.
 - **Code:** generated. The import line (from the `@/components` barrel) and the props table, derived from the story meta, so neither is authored.
-- **Usage:** parts (anatomy and tokens), the main rules as do and don't pairs, best practices, content guidelines, accessibility, related components.
+- **Usage:** the Usage spine below, with parts (anatomy and tokens) and content guidelines after its Usage section.
 
 `Button/Button.mdx` is the reference page.
 
@@ -90,6 +90,27 @@ navigation aid it cannot see.
 
 The tabs render inside the page from `design-system/src/storybook-docs/docs-tabs.jsx`
 (ADR-025); a page with no usage content or no props shows fewer.
+
+## The Usage spine
+
+The Usage tab holds the text designers and agents share: the page shows it, and
+the generated `index.md` renders the same sentences for agents with rule ids
+added. Five `##` sections carry it, in this order:
+
+1. **Usage:** what the component is for, led by its glossary term: "Use `Modal` when the next step has to happen before anything else can."
+2. **Alternatives:** one route per bullet, each naming a component the components index lists: "For a short notice, use `Flag`." A route names the component to reach for instead.
+3. **Best practices:** one rule per `###` heading, written as one sentence of glossary term, condition and rule. The heading's slug is the rule id (`### Give the footer a button.` is `give-the-footer-a-button`). The body under it explains the rule, and each picture there has its rule sentence. A number in a rule comes from a code constant imported into the page, or names that constant in backticks.
+4. **Accessibility:** keyboard, focus and naming, as the component behaves today.
+5. **Related:** one bullet per neighbor, each with its "use when": "`SectionMessage`: use when the message stays in the page."
+
+Parts and Content guidelines sit after Usage. Each section states current
+behavior; a known gap lives in a GitHub issue, so the page carries no "TODO",
+"outdated" or "known stale" line.
+
+`npm run check:ds-writing` holds every component page to this shape, and
+`scripts/check-ds-writing.mjs` keeps each rule's reason. It warns on every page,
+fails on a stale marker, and fails a page in its strict list on every rule once
+that list is enforced.
 
 ## Related
 

@@ -118,6 +118,7 @@
     "check:atlassian-benchmark": "node scripts/check-atlassian-benchmark.mjs",
     "check:unspread-rest": "node scripts/check-unspread-rest.mjs",
     "check:docs-tabs": "node scripts/check-docs-tabs.mjs",
+    "check:ds-writing": "node scripts/check-ds-writing.mjs",
     "check:docs-token-literals": "node scripts/check-docs-token-literals.mjs",
     "check:docs-dead-selectors": "node scripts/check-docs-dead-selectors.mjs",
     "check:storybook-categories": "node scripts/check-storybook-categories.mjs",

@@ -543,6 +543,14 @@ export const CHECKS = [
     guards: 'component docs pages keeping their Examples, Code, Usage and Changelog tab split, with tabbed pages held to a floor.',
   },
   {
+    name: 'check:ds-writing',
+    script: 'node scripts/check-ds-writing.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-ds-writing.mjs',
+    guards: 'component docs pages holding the Usage spine and its writing rules; warns on every page, fails on a stale marker.',
+  },
+  {
     name: 'check:docs-token-literals',
     script: 'node scripts/check-docs-token-literals.mjs',
     pkg: 'root',
