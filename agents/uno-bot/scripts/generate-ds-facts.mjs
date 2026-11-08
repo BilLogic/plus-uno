@@ -21,7 +21,8 @@
 // WHEN. The deploy chain runs this before it typechecks, as it runs the
 // Storybook docs map, so the Worker deployed is the facts on main at deploy.
 // The committed copy is there for the typecheck and the tests; `--check` says
-// whether it still matches.
+// whether it still matches. Both fail when the bake is over its byte budget
+// (`DS_FACTS_BYTE_BUDGET`), and `test:bundle` holds the committed copy to it.
 //
 // Run: npm run generate:ds-facts  (`-- --check` to compare only)
 
@@ -99,6 +100,25 @@ export function bakeFacts(facts, { docFor = () => null, inventions }) {
   };
 }
 
+/**
+ * The most bytes the built-in facts may weigh. They ship in the Worker, which
+ * stays on Workers Free and its script-size limit, and since the hosted MCP
+ * answers first they are the fallback, so growth here buys an outage answer
+ * and nothing else. 279,906 bytes on 2026-11-08, grown ~3.7k across the five
+ * bakes that day; 300k leaves ~20k (7%), room for a release's worth of
+ * components and tokens, and fails on a new kind of field arriving unnoticed.
+ * Raise it in a PR that says what the bytes bought.
+ */
+export const DS_FACTS_BYTE_BUDGET = 300_000;
+
+/** Null when `text` fits the budget, else what to say: the overrun in UTF-8 bytes. */
+export function budgetOverrun(text, budget = DS_FACTS_BYTE_BUDGET) {
+  const bytes = Buffer.byteLength(text, "utf8");
+  if (bytes <= budget) return null;
+  const over = bytes - budget;
+  return `${OUT} is ${bytes} bytes, ${over} byte${over === 1 ? "" : "s"} over DS_FACTS_BYTE_BUDGET (${budget}): cut what the bake keeps, or raise the budget in scripts/generate-ds-facts.mjs and say why`;
+}
+
 /** The generated module's text. */
 export function renderDsFacts(baked) {
   return (
@@ -118,6 +138,11 @@ async function main() {
   const text = renderDsFacts(bakeFacts(facts, { docFor: (name) => generatedDocFor(ROOT, name), inventions }));
   const out = resolve(ROOT, OUT);
   const committed = existsSync(out) ? readFileSync(out, "utf8") : null;
+  const overrun = budgetOverrun(text);
+  if (overrun) {
+    console.error(overrun);
+    process.exit(1);
+  }
   if (check) {
     if (committed !== text) {
       console.error(`${OUT} is stale: run npm run generate:ds-facts`);

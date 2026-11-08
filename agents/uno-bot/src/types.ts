@@ -87,6 +87,9 @@ export interface Env {
   /** The passcode Figma echoes in every notification (`POST /figma/events`).
    *  Unset → the route answers 401 to every delivery. */
   FIGMA_WEBHOOK_PASSCODE?: string;
+  /** The hosted DS MCP's shared key (`integrations/ds-mcp.ts`). Unset → DS
+   *  lookups answer from the facts baked into the Worker, with no call. */
+  DS_MCP_KEY?: string;
   /** #uno-bot, the intake channel (`turn/intake-channel.ts`): a top-level post
    *  there engages with no @mention. Unset → there is no intake channel. */
   UNO_BOT_CHANNEL_ID?: string;

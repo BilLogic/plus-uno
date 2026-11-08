@@ -53,6 +53,11 @@ export const SECRETS = [
     why: "the passcode Figma echoes in every notification to POST /figma/events (src/figma-notify/). The same value is the GitHub secret figma-subscriptions.yml subscribes with, and it lives in those two places only. Unset, the route answers 401 to every delivery and queues nothing.",
   },
   {
+    name: "DS_MCP_KEY",
+    required: false,
+    why: "the hosted design-system MCP's shared key, the same value as DS_MCP_KEY on the Netlify site. github_read's lookup asks the released design system with it, one subrequest a question. Unset or wrong, lookups answer from the facts built into the Worker, which follow main at deploy rather than the release.",
+  },
+  {
     name: "NOTION_API_KEY",
     required: true,
     why: "Notion internal integration token — notion_create/update/archive plus every notion_search catalog read. Each database must also be shared with the integration.",

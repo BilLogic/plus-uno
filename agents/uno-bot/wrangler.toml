@@ -408,6 +408,12 @@ DS_OWNER_USER_IDS = "U03FYQJRQHX,U09E652SJ02,U0A6UTECM5Y"
 #       secret figma-subscriptions.yml subscribes with, and it lives in
 #       those two places only. Unset, the route answers 401 to every
 #       delivery and queues nothing.
+#   DS_MCP_KEY [optional]
+#       the hosted design-system MCP's shared key, the same value as
+#       DS_MCP_KEY on the Netlify site. github_read's lookup asks the
+#       released design system with it, one subrequest a question. Unset
+#       or wrong, lookups answer from the facts built into the Worker,
+#       which follow main at deploy rather than the release.
 #   NOTION_API_KEY
 #       Notion internal integration token — notion_create/update/archive
 #       plus every notion_search catalog read. Each database must also be
