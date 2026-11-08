@@ -1,6 +1,6 @@
 /**
- * The component docs page's tab strip — Examples · Code · Usage,
- * rendered INSIDE the page, below the title (ADR-025).
+ * The component docs page's tab strip — Examples · Code · Usage · Agent view,
+ * rendered INSIDE the page, below the title (ADR-025, ADR-040).
  *
  * WHY THIS IS NOT A STORYBOOK ADDON. It was, until #168's `types.TAB`
  * registrations were retired. Storybook's preview toolbar
@@ -30,9 +30,33 @@
  * links keep working after the retirement rather than erroring.
  */
 import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 'react';
-import { ArgTypes, useOf } from '@storybook/addon-docs/blocks';
+import { ArgTypes, Markdown, useOf } from '@storybook/addon-docs/blocks';
 
-import { TABS, importLineFor } from './lib/component-tabs-contract.js';
+import { Button, CodeBlock, LinkButton } from '@/components';
+import { TABS, agentViewEntry, importLineFor, reportProblemUrl } from './lib/component-tabs-contract.js';
+
+/**
+ * Every generated agent file, through ONE raw glob (ADR-040), so no MDX page
+ * carries agent text and the tab cannot show anything but the committed bytes.
+ * Lazy: each file is its own chunk, fetched when its Agent view opens, so the
+ * docs bundle does not carry a hundred files to show one.
+ *
+ * The patterns match what `npm run generate:component-docs` writes: nested
+ * components' `index.md`, flat components' `<Name>.md` (the group index is
+ * excluded — it is a list, not a component), and `index.md` beside a pattern,
+ * the Logo and PageLayout.
+ */
+const AGENT_DOCS = import.meta.glob(
+  [
+    '../components/*/*/index.md',
+    '../components/*/*.md',
+    '!../components/*/index.md',
+    '../patterns/*/index.md',
+    '../assets/*/index.md',
+    '../specs/Universal/Pages/PageLayout/index.md',
+  ],
+  { query: '?raw', import: 'default' },
+);
 
 /**
  * The window whose query string holds the tab — the manager's, normally.
@@ -148,14 +172,95 @@ function CodeTabPanel({ of, importName }) {
 }
 
 /**
+ * The Agent view tab: the component's generated file, exactly as agents read
+ * it. Rendered as markdown by default for reading; "Show raw text" shows the
+ * bytes themselves, and Copy puts them on the clipboard unchanged.
+ *
+ * The markdown renderer is Storybook's own `Markdown` docs block, already in the
+ * docs bundle, so no package was added. It renders the file; it never edits it.
+ */
+function AgentViewPanel({ entry }) {
+  const [text, setText] = useState(null);
+  const [failed, setFailed] = useState(false);
+  const [raw, setRaw] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    let live = true;
+    setText(null);
+    setFailed(false);
+    Promise.resolve(entry.value())
+      .then((value) => live && setText(String(value)))
+      .catch(() => live && setFailed(true));
+    return () => {
+      live = false;
+    };
+  }, [entry]);
+
+  const copy = useCallback(() => {
+    if (text === null || !navigator.clipboard) return;
+    navigator.clipboard.writeText(text).then(
+      () => setCopied(true),
+      () => setCopied(false),
+    );
+  }, [text]);
+
+  useEffect(() => {
+    if (!copied) return undefined;
+    const timer = setTimeout(() => setCopied(false), 2000);
+    return () => clearTimeout(timer);
+  }, [copied]);
+
+  return (
+    <GeneratedTabBody>
+      <p className="sb-ds-agent-view__lead">
+        What agents read about {entry.name}: <code>{entry.path}</code>, generated from this page and the source.
+      </p>
+      <div className="sb-ds-agent-view__actions">
+        <Button
+          appearance="default"
+          spacing="compact"
+          iconBefore={raw ? 'eye' : 'code'}
+          text={raw ? 'Show rendered' : 'Show raw text'}
+          onClick={() => setRaw((value) => !value)}
+        />
+        <Button
+          appearance="subtle"
+          spacing="compact"
+          iconBefore={copied ? 'check' : 'copy'}
+          text={copied ? 'Copied' : 'Copy text'}
+          onClick={copy}
+        />
+        <LinkButton
+          appearance="subtle"
+          spacing="compact"
+          iconBefore="flag"
+          href={reportProblemUrl(entry.name, entry.path)}
+          target="_blank"
+          text="Report a problem"
+        />
+      </div>
+      {failed ? <p>The generated file could not be loaded.</p> : null}
+      {text === null || failed ? null : raw ? (
+        <CodeBlock text={text} language="markdown" wrap showLineNumbers={false} />
+      ) : (
+        <div className="sb-ds-agent-view__rendered">
+          <Markdown>{text}</Markdown>
+        </div>
+      )}
+    </GeneratedTabBody>
+  );
+}
+
+/**
  * The tab strip and the active panel.
  *
  * @param {object} props
  * @param {unknown} [props.of] The story meta, as `<DocsTabs of={ButtonStories}>`.
  *   Supplies the props table.
  * @param {string} [props.examplesTitle] Renames the FIRST tab only. Atlassian's
- *   own token page reads "All tokens" where Button reads "Examples"; Code and
- *   Usage mean the same thing on every page and are not renameable.
+ *   own token page reads "All tokens" where Button reads "Examples"; Code,
+ *   Usage and Agent view mean the same thing on every page and are not renameable.
  * @param {React.ReactNode} props.children One `<DocsTab tab="examples">` and, when
  *   the page has usage content, one `<DocsTab tab="usage">`.
  */
@@ -169,6 +274,16 @@ export function DocsTabs({ of, examplesTitle, children }) {
   }, [children]);
 
   const resolved = useOf(of || 'meta');
+
+  /**
+   * The generated file for this page, found through its Storybook meta:
+   * Storybook records the stories file as the meta's `parameters.fileName`.
+   * No file, no Agent view tab.
+   */
+  const agentEntry = useMemo(() => {
+    const importPath = resolved?.csfFile?.meta?.parameters?.fileName ?? resolved?.preparedMeta?.parameters?.fileName;
+    return agentViewEntry(AGENT_DOCS, { importPath });
+  }, [resolved]);
 
   /**
    * Whether there is a props table to show at all.
@@ -194,9 +309,10 @@ export function DocsTabs({ of, examplesTitle, children }) {
       TABS.filter(({ key }) => {
         if (key === 'examples') return true;
         if (key === 'code') return argCount > 0;
+        if (key === 'agent') return Boolean(agentEntry);
         return Boolean(authored[key]);
       }).map((tab) => (tab.key === 'examples' && examplesTitle ? { ...tab, title: examplesTitle } : tab)),
-    [argCount, authored, examplesTitle],
+    [agentEntry, argCount, authored, examplesTitle],
   );
 
   const win = useMemo(() => tabWindow(), []);
@@ -279,7 +395,7 @@ export function DocsTabs({ of, examplesTitle, children }) {
 
       {/*
         Only the active panel is rendered. Keeping the others behind `display:
-        none` would put three tabs' worth of headings in one document — breaking
+        none` would put every tab's worth of headings in one document — breaking
         the outline, colliding ids between tabs, and filling the "On this page"
         TOC with headings the reader cannot see.
       */}
@@ -292,6 +408,8 @@ export function DocsTabs({ of, examplesTitle, children }) {
       >
         {activeTab.key === 'code' ? (
           <CodeTabPanel of={of} importName={resolved?.preparedMeta?.component?.displayName ?? resolved?.preparedMeta?.component?.name} />
+        ) : activeTab.key === 'agent' ? (
+          <AgentViewPanel entry={agentEntry} />
         ) : (
           (authored[activeTab.key] ?? null)
         )}

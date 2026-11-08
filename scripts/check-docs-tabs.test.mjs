@@ -269,6 +269,12 @@ test('an unknown tab name is caught — Code is generated, never authored', () =
   assert.ok(found.some((f) => /Found: code/.test(f)), found.join('\n'));
 });
 
+test('an authored Agent view is caught — it shows the generated file, so no MDX carries agent text', () => {
+  const broken = page().replace('<DocsTab tab="examples">', '<DocsTab tab="examples">\n\n</DocsTab>\n\n<DocsTab tab="agent">');
+  const found = checkFile(COMPONENT, broken, true);
+  assert.ok(found.some((f) => /Found: agent/.test(f)), found.join('\n'));
+});
+
 test('readTabs attributes a heading to the section div that opened it', () => {
   const { sections } = readTabs(page({ examples: ['Overview'], usage: ['Accessibility'] }));
   assert.deepEqual(

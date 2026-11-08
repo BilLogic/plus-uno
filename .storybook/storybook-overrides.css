@@ -1145,6 +1145,24 @@ a.sbdocs-a {
     outline-offset: var(--stack-sm);
 }
 
+/* Agent view (ADR-040): a lead line, one row of actions, then the file. */
+.sb-ds-agent-view__lead {
+    color: var(--ds-text-subtle);
+    margin: 0 0 var(--space-150);
+}
+
+.sb-ds-agent-view__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-100);
+    margin: 0 0 var(--space-300);
+}
+
+.sb-ds-agent-view__rendered {
+    border-top: var(--stroke-1) solid var(--ds-border);
+    padding-top: var(--space-200);
+}
+
 
 /*
  * Color modes: the canvas follows the mode.

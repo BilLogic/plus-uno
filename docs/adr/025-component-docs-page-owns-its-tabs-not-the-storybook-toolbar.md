@@ -1,11 +1,13 @@
 ---
 embodiment: ide
 summary: Tabs move from Storybook's manager toolbar into the component docs page, below the title — the toolbar sits in a different document and can never render under in-page content (2026-08-26)
-status: active
-verified: 2026-08-26
+status: active-with-correction
+verified: 2026-11-08
 ---
 
 # ADR-025: A component docs page owns its tabs, not the Storybook toolbar (2026-08-26)
+
+**Amended by [ADR-040](040-agent-view-is-the-fourth-component-tab.md) (2026-11-08):** a fourth tab, Agent view, shows the component's generated file, so the tabs are no longer only a human affordance.
 
 **Decision.** Render Examples · Code · Usage · Changelog **inside** the component
 docs page, immediately below the title and one-line description, and retire the
