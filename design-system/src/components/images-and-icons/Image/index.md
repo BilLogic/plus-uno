@@ -3,7 +3,7 @@
 
 # Image
 
-in by the browser rather than by script.
+Image: a decorative or meaningful bitmap, with a dark-mode variant swapped in by the browser rather than by script.
 
 **Import:** `import { Image } from '@/components';`
 

@@ -37,6 +37,7 @@ const NO_PATH = [];
 
 export const CASCADER_SPACINGS = ['default', 'compact'];
 
+/** Cascader: a field that picks one path through nested options, one level at a time. */
 const Cascader = ({
     id,
     name,

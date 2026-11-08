@@ -3,7 +3,7 @@
 
 # Range
 
-A range input carries its value, never its meaning: "49" says nothing about what is being set. `label` is the only thing that names it, so it takes the same pair as `Input` — `label` for the text, `showLabel={false}` to hide that text without taking the name away (#213). Built on Base UI's Slider, wrapped in `FieldFrame` (A7) for the disabled fade. Base UI's Slider has no DOM-query label lookup the way Checkbox and Radio do — `Slider.Thumb`'s accessible name only ever comes from an explicit `aria-label`/`aria-labelledby` or an ambient `Field.Label` registration — so the label here points at the thumb directly via `aria-labelledby` on `Slider.Root`, which `Slider.Root` forwards to every `Slider.Thumb` beneath it.
+Range — slider over a numeric span. A range input carries its value, never its meaning: "49" says nothing about what is being set. `label` is the only thing that names it, so it takes the same pair as `Input` — `label` for the text, `showLabel={false}` to hide that text without taking the name away (#213). Built on Base UI's Slider, wrapped in `FieldFrame` (A7) for the disabled fade. Base UI's Slider has no DOM-query label lookup the way Checkbox and Radio do — `Slider.Thumb`'s accessible name only ever comes from an explicit `aria-label`/`aria-labelledby` or an ambient `Field.Label` registration — so the label here points at the thumb directly via `aria-labelledby` on `Slider.Root`, which `Slider.Root` forwards to every `Slider.Thumb` beneath it.
 
 **Import:** `import { Range } from '@/components';`
 

@@ -124,6 +124,7 @@ const ignoredProps = ({ preset, def, shape, resolvedShape, lines, passed }) => {
     return found;
 };
 
+/** Skeleton: a placeholder shaped like the content that is loading, so the layout does not jump when it arrives. */
 export const Skeleton = ({
     shape,
     preset,

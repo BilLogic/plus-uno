@@ -3,6 +3,8 @@
 
 # AiLabel
 
+AiLabel: marks content the agent had a hand in and says how much to trust it.
+
 **Import:** `import { AiLabel } from '@/components';`
 
 **Source:** `design-system/src/components/labels/AiLabel/AiLabel.jsx`

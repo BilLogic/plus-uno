@@ -3,7 +3,7 @@
 
 # DropdownMenu
 
-floating popup. Positioning and dismissal (outside click, Escape) are Base UI Menu's; the rows are the public Menu family (`MenuGroup`, `ButtonItem`, `LinkItem`, `CustomItem`, `Section`) so a dropdown's menu looks exactly like any other menu in the system.
+DropdownMenu: a trigger that opens a `MenuGroup` of `Menu` items in a floating popup. Positioning and dismissal (outside click, Escape) are Base UI Menu's; the rows are the public Menu family (`MenuGroup`, `ButtonItem`, `LinkItem`, `CustomItem`, `Section`) so a dropdown's menu looks exactly like any other menu in the system.
 
 **Import:** `import { DropdownMenu } from '@/components';`
 

@@ -360,7 +360,7 @@ export default function MonthlyReportPage() {
                                                 <div className="session-row">
                                                     <span className="session-info">{dim.session}</span>
                                                     <Button spacing="compact">
-                                                        <i className="fa-solid fa-play-circle"></i>
+                                                        <i className="fa-solid fa-circle-play"></i>
                                                         View Recording
                                                     </Button>
                                                 </div>
@@ -377,7 +377,7 @@ export default function MonthlyReportPage() {
                                                             <i className="fa-solid fa-thumbs-down"></i> Not Helpful
                                                         </Button>
                                                         <Button spacing="compact" onClick={(e) => { e.stopPropagation(); handleFeedback(); }}>
-                                                            <i className="fa-solid fa-exclamation-triangle"></i> Inaccurate
+                                                            <i className="fa-solid fa-triangle-exclamation"></i> Inaccurate
                                                         </Button>
                                                     </div>
                                                 </div>

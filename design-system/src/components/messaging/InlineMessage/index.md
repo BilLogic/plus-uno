@@ -3,7 +3,7 @@
 
 # InlineMessage
 
-message. Built on Popup so placement, dismissal and focus return are shared with every other popup in the system.
+InlineMessage: a compact icon trigger that opens a Popup carrying the full message. Built on Popup so placement, dismissal and focus return are shared with every other popup in the system.
 
 **Import:** `import { InlineMessage } from '@/components';`
 

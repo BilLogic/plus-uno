@@ -3,7 +3,7 @@
 
 # PageHeader
 
-actions to its side, and a bottom bar below.
+PageHeader: a page's title row, with an optional breadcrumb trail above it, actions to its side, and a bottom bar below.
 
 **Import:** `import { PageHeader } from '@/components';`
 

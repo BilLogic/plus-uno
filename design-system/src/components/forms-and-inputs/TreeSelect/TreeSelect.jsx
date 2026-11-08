@@ -124,6 +124,7 @@ const orderValues = (options, valueSet) => {
 
 export const TREE_SELECT_SPACINGS = ['default', 'compact'];
 
+/** TreeSelect: a field that picks from options that nest, at any level of the tree. */
 const TreeSelect = ({
     id,
     name,

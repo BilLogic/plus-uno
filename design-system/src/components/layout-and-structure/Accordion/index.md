@@ -3,6 +3,8 @@
 
 # Accordion
 
+Accordion: stacked headings that each open to show their content.
+
 **Import:** `import { Accordion } from '@/components';`
 
 **Source:** `design-system/src/components/layout-and-structure/Accordion/Accordion.jsx`

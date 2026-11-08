@@ -162,6 +162,7 @@ test('an unknown name is answered, not thrown', () => {
     aliasOf: null,
     replacement: [],
     why: null,
+    aliases: [],
   });
 });
 

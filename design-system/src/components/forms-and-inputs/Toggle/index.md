@@ -3,7 +3,7 @@
 
 # Toggle
 
-Controlled with `isChecked` or uncontrolled with `defaultChecked`. Built on Base UI's Switch: a `role="switch"` span with a hidden checkbox beside it for form submission. `readOnly` blocks the change at the root, so no hand-rolled click guard is needed. Extra attributes (`aria-label`, `aria-describedby`) go to the switch root.
+Toggle — turns one setting on or off, and the change takes effect at once. Controlled with `isChecked` or uncontrolled with `defaultChecked`. Built on Base UI's Switch: a `role="switch"` span with a hidden checkbox beside it for form submission. `readOnly` blocks the change at the root, so no hand-rolled click guard is needed. Extra attributes (`aria-label`, `aria-describedby`) go to the switch root.
 
 **Import:** `import { Toggle } from '@/components';`
 

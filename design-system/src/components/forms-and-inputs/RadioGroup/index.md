@@ -3,7 +3,7 @@
 
 # RadioGroup
 
-A `Fieldset` (legend plus grouped fields) holding one real Base UI `RadioGroup`, which carries the `role="radiogroup"`, the keyboard roving tabindex across options, and `aria-required`/`aria-readonly`; the Fieldset stays plain grouping and the legend, which the group inherits as its own accessible name. Lays them out stacked or inline, can put scale ends either side (`leadingText`, `trailingText` — see the "Linear scale" story), and shows one error for the group. `isDisabled` on the group overrides every `Radio`'s own. The value is the chosen option's value, or `null`/`undefined` while unanswered — a radio group does not fall back to its first option, so a response of `1` can be told apart from no response.
+RadioGroup — one question and its radio answers. A `Fieldset` (legend plus grouped fields) holding one real Base UI `RadioGroup`, which carries the `role="radiogroup"`, the keyboard roving tabindex across options, and `aria-required`/`aria-readonly`; the Fieldset stays plain grouping and the legend, which the group inherits as its own accessible name. Lays them out stacked or inline, can put scale ends either side (`leadingText`, `trailingText` — see the "Linear scale" story), and shows one error for the group. `isDisabled` on the group overrides every `Radio`'s own. The value is the chosen option's value, or `null`/`undefined` while unanswered — a radio group does not fall back to its first option, so a response of `1` can be told apart from no response.
 
 **Import:** `import { RadioGroup } from '@/components';`
 

@@ -3,7 +3,7 @@
 
 # Comment
 
-author, time, content, actions and replies.
+Comment: one entry in a threaded discussion, with slots for the author, time, content, actions and replies.
 
 **Import:** `import { Comment } from '@/components';`
 

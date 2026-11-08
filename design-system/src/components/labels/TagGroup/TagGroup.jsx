@@ -143,6 +143,7 @@ const countThatFit = (widths, available, gap, overflowWidth, cap) => {
     return { count, squeeze: false };
 };
 
+/** TagGroup: the wrapper for more than one Tag together. It owns their spacing, wrapping, alignment and disabled state. */
 export const TagGroup = ({
     children,
     label,

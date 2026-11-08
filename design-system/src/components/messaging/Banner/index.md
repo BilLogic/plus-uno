@@ -3,7 +3,7 @@
 
 # Banner
 
-stripe — the caller mounts and unmounts it, and meaning comes from the fill and the icon alone.
+Banner: a prominent message at the top of a page. No dismiss and no side stripe — the caller mounts and unmounts it, and meaning comes from the fill and the icon alone.
 
 **Import:** `import { Banner } from '@/components';`
 

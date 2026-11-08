@@ -4,12 +4,6 @@ import { Accordion as BaseAccordion } from '@base-ui/react/accordion';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './Accordion.scss';
 
-/**
- * Accordion Component
- * Collapsible content sections built on Base UI's Accordion.
- * Supports flush mode, always open, and multiple item expansion.
- */
-
 // Base UI's `value` is always an array of open item keys; the public API
 // here keeps the old single-key-or-array shape, so this is the only place
 // that converts between the two.
@@ -18,6 +12,7 @@ const toValueArray = (key) => {
     return Array.isArray(key) ? key : [key];
 };
 
+/** Accordion: stacked headings that each open to show their content. */
 const Accordion = ({
     // Content
     items = [],

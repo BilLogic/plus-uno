@@ -3,6 +3,8 @@
 
 # RichTextEditor
 
+RichTextEditor: a text field with a formatting toolbar, for where the formatting is part of the meaning.
+
 **Import:** `import { RichTextEditor } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx`

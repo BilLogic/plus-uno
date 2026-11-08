@@ -60,7 +60,7 @@ Read the semantic, pattern or component token that holds the value; the fix list
 
 **fail.** A Font Awesome Pro family (`fa-light`, `fa-thin`, `fa-sharp`, `fa-duotone`, `fa-sharp-duotone`), or `fa-regular fa-<name>` for an icon Free draws only solid.
 
-Use `fa-solid`, `fa-regular` or `fa-brands` with an icon Free ships. The regular list is `design-system/src/lib/icon-regular.generated.js`; solid and brands names are checked when the Font Awesome metadata is installed or named by `FA_ICONS_JSON`.
+Use `fa-solid`, `fa-regular` or `fa-brands` with an icon Free ships. The Free names are the committed lists `design-system/src/lib/icon-regular.generated.js` and `icon-free.generated.js` (solid and brands), so every run checks all three families, the hosted `ds_check` included.
 
 ## ds/prefer-plus-component
 

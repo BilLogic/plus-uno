@@ -173,3 +173,21 @@ The lookup run at `6cc39f0d7`: `current`, `lookup` (the five MCP tools) and `loo
 - **The rule's premise did not hold.** It assumed the baseline already sat at zero escapes. Here `current` left 17 and `lookup` left none, laid out every build from a pattern and paid all the seeded debt, in less wall time. That is a quality gain the rule has no column for, so the verdict waits on a decision rather than deleting the adapters.
 - **Two tools are not enough.** `lookup-min` keeps half the escapes; the gain comes with `ds_tokens`, `ds_guide` and `ds_check` in reach.
 - **Decision (2026-11-07): keep all five tools.** Bill kept the lookup on the quality gain. The keep rule now puts escapes first (§ Does the lookup pay off?), and on these rows `compare` reads keep. The `lookup-min` arm and the server's `--tools` flag are gone; its rows stay in the ledger.
+
+## Retrieval bench
+
+Whether `ds_find` puts the right component first is measured apart from the agent runs, in seconds and with no model: `node scripts/bench-ds-find.mjs`. It scores two sets under `scripts/bench/ds-find/`:
+
+- **`authored.json`**: queries written to probe the lookup, each `{q, want[], kind}` with kind `intent` (a need in plain words) or `name` (a component name).
+- **`heldout.json`**: the queries agents really sent to `ds_find` in the ledger, labeled by hand against the task brief (`real-intent`, `real-name`, `real-token`, `real-icon`). A row is never edited to fit the ranker; a wrong label is fixed against the brief.
+
+A row scores its rank: the first result that is a wanted component, where a not-here row counts when its redirect names one. The script prints hit@1, hit@3 and MRR per set and kind, and every miss (rank above 3). Icon rows score against the committed Free icon lists (`design-system/src/lib/icon-free.generated.js` and the regular list beside it).
+
+| Flag | Does |
+|---|---|
+| `--verbose` | prints every row, not only the misses |
+| `--no-aliases` | runs the ranker with the alias field zeroed, so an alias can never paper over a ranker regression (a no-op until aliases exist) |
+| `--ledger` | lists `ds_find` queries in the ledger that no set carries yet; label them (add a row to `heldout.json`) so the held-out set grows with every eval run |
+| `--update` | rewrites `ratchet.json` from this run |
+
+**The ratchet** (`ratchet.json`) records the hit@1 and hit@3 counts per set and kind, for both arms. `scripts/bench-ds-find.test.mjs`, part of `test:scripts`, fails when any count falls below it, when a name row misses rank 1, when an intent query returns a constant, or when a query without token vocabulary returns a token. MRR is reported, not gated, since it moves with ties. A change that earns a gain runs `--update` in the same PR, and the ratchet diff is reviewed like a baseline change; the ratchet only moves up.

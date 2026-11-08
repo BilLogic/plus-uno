@@ -122,6 +122,7 @@ const accountOf = (user, sidebarUser) => {
     return { id: user?.id ?? name.toLowerCase().replace(/\s+/g, '-'), name, role };
 };
 
+/** PageLayout: the template for a full page, wrapping its content in the Frame with the Sidebar and the breadcrumb row. */
 const PageLayout = ({
     children,
     /** `default`: the app frame with the Sidebar and the breadcrumb. `focused`: one task, no sidebar — see FocusedFrame. */

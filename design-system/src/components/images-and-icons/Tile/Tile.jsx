@@ -35,6 +35,7 @@ const renderIcon = (icon) => {
     return <i className={className} aria-hidden="true" />;
 };
 
+/** Tile: a small square frame that holds a logo, thumbnail or icon standing for a thing. */
 export const Tile = ({
     content = 'icon',
     size = 32,

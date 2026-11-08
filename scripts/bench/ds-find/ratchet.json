@@ -1,0 +1,74 @@
+{
+ "with-aliases": {
+  "authored": {
+   "intent": {
+    "hit1": 39,
+    "hit3": 41,
+    "mrr": 0.9
+   },
+   "name": {
+    "hit1": 6,
+    "hit3": 6,
+    "mrr": 1
+   }
+  },
+  "heldout": {
+   "real-name": {
+    "hit1": 4,
+    "hit3": 4,
+    "mrr": 1
+   },
+   "real-intent": {
+    "hit1": 29,
+    "hit3": 31,
+    "mrr": 0.95
+   },
+   "real-token": {
+    "hit1": 4,
+    "hit3": 4,
+    "mrr": 1
+   },
+   "real-icon": {
+    "hit1": 3,
+    "hit3": 5,
+    "mrr": 0.8
+   }
+  }
+ },
+ "no-aliases": {
+  "authored": {
+   "intent": {
+    "hit1": 32,
+    "hit3": 38,
+    "mrr": 0.8
+   },
+   "name": {
+    "hit1": 6,
+    "hit3": 6,
+    "mrr": 1
+   }
+  },
+  "heldout": {
+   "real-name": {
+    "hit1": 4,
+    "hit3": 4,
+    "mrr": 1
+   },
+   "real-intent": {
+    "hit1": 27,
+    "hit3": 31,
+    "mrr": 0.91
+   },
+   "real-token": {
+    "hit1": 4,
+    "hit3": 4,
+    "mrr": 1
+   },
+   "real-icon": {
+    "hit1": 3,
+    "hit3": 5,
+    "mrr": 0.8
+   }
+  }
+ }
+}

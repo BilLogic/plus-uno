@@ -3,7 +3,7 @@
 
 # ScrollBar
 
-scrollbar styling (thin width, border-colored thumb, transparent track) to its scrollable content.
+ScrollBar — a wrapper that applies the Design System's tokenized custom scrollbar styling (thin width, border-colored thumb, transparent track) to its scrollable content.
 
 **Import:** `import { ScrollBar } from '@/components';`
 

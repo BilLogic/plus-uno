@@ -49,7 +49,7 @@ const GENERATORS = [
   'npm run generate:component-docs',
   'npm run generate:component-barrel',
   'npm run generate:figma-links',
-  'npm run generate:icon-regular-list',
+  'npm run generate:icon-lists',
   'npm run generate:knowledge-components',
   'npm run generate:index',
   'npm run generate:color-tokens',

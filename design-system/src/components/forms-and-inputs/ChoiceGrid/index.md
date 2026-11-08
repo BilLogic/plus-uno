@@ -3,7 +3,7 @@
 
 # ChoiceGrid
 
-Each cell is the real Checkbox or Radio, named by its row and its column.
+ChoiceGrid — the same question asked of several rows, as a table. Each cell is the real Checkbox or Radio, named by its row and its column.
 
 **Import:** `import { ChoiceGrid } from '@/components';`
 

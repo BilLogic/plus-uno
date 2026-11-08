@@ -54,6 +54,7 @@ function normalizeBlockTag(raw) {
     return 'p';
 }
 
+/** RichTextEditor: a text field with a formatting toolbar, for where the formatting is part of the meaning. */
 const RichTextEditor = ({
     id,
     name,

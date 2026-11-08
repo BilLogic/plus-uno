@@ -5,6 +5,7 @@ import useFieldId from '../useFieldId';
 import './FileUpload.scss';
 import { iconClass } from '../../../lib/icon';
 
+/** FileUpload: a form field that opens the platform file picker. It chooses files; it does not upload them. */
 const FileUpload = ({
     id,
     name,

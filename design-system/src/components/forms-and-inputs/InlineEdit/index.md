@@ -3,7 +3,7 @@
 
 # InlineEdit
 
-The read view and the edit view are drawn at the same size, so opening the editor does not move anything around it. Enter or leaving the editor confirms; Escape cancels. Confirm and cancel buttons sit under the edit view and can be left off. `validate` can refuse a value with a message, and the editor stays open. The parent holds the value. `defaultValue` is what the edit view starts with each time it opens, and `onConfirm` is where the new value goes. Not for use inside a form: it saves on its own and has no say in the form's submit. Use `Input` there.
+InlineEdit — text that reads as text and becomes a field when it is pressed. The read view and the edit view are drawn at the same size, so opening the editor does not move anything around it. Enter or leaving the editor confirms; Escape cancels. Confirm and cancel buttons sit under the edit view and can be left off. `validate` can refuse a value with a message, and the editor stays open. The parent holds the value. `defaultValue` is what the edit view starts with each time it opens, and `onConfirm` is where the new value goes. Not for use inside a form: it saves on its own and has no say in the form's submit. Use `Input` there.
 
 **Import:** `import { InlineEdit } from '@/components';`
 

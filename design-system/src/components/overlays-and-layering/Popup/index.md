@@ -3,6 +3,8 @@
 
 # Popup
 
+Popup: a small panel of secondary content anchored to a control, text or a short list and never a form.
+
 **Import:** `import { Popup } from '@/components';`
 
 **Source:** `design-system/src/components/overlays-and-layering/Popup/Popup.jsx`

@@ -1,0 +1,399 @@
+[
+ {
+  "q": "avatar",
+  "want": [
+   "Avatar",
+   "UserAvatar"
+  ],
+  "kind": "real-name",
+  "source": "ledger"
+ },
+ {
+  "q": "table",
+  "want": [
+   "Table",
+   "PatternTable"
+  ],
+  "kind": "real-name",
+  "source": "ledger"
+ },
+ {
+  "q": "count tag",
+  "want": [
+   "CountTag"
+  ],
+  "kind": "real-name",
+  "source": "ledger"
+ },
+ {
+  "q": "progress bar",
+  "want": [
+   "ProgressBar"
+  ],
+  "kind": "real-name",
+  "source": "ledger"
+ },
+ {
+  "q": "graduation-cap",
+  "want": [
+   "fa-solid fa-graduation-cap"
+  ],
+  "kind": "real-icon",
+  "source": "ledger"
+ },
+ {
+  "q": "fa-graduation-cap",
+  "want": [
+   "fa-solid fa-graduation-cap"
+  ],
+  "kind": "real-icon",
+  "source": "ledger"
+ },
+ {
+  "q": "graduation cap icon",
+  "want": [
+   "fa-solid fa-graduation-cap"
+  ],
+  "kind": "real-icon",
+  "source": "ledger"
+ },
+ {
+  "q": "graduation-cap duotone icon",
+  "want": [
+   "fa-solid fa-graduation-cap"
+  ],
+  "kind": "real-icon",
+  "source": "ledger"
+ },
+ {
+  "q": "duotone graduation cap icon",
+  "want": [
+   "fa-solid fa-graduation-cap"
+  ],
+  "kind": "real-icon",
+  "source": "ledger"
+ },
+ {
+  "q": "empty state",
+  "want": [
+   "EmptyState"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "empty state with action",
+  "want": [
+   "EmptyState"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "checklist card with progress bar",
+  "want": [
+   "PatternCard",
+   "ProgressBar",
+   "Checkbox"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "checklist card with status",
+  "want": [
+   "PatternCard",
+   "StatusTag",
+   "Checkbox"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "kanban board with draggable cards and columns",
+  "want": [
+   "PatternCard",
+   "PatternSection"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "kanban board draggable cards columns",
+  "want": [
+   "PatternCard",
+   "PatternSection"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "kanban board column drag and drop cards",
+  "want": [
+   "PatternCard",
+   "PatternSection"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "collapsible section / accordion",
+  "want": [
+   "Accordion"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "collapsible column / accordion",
+  "want": [
+   "Accordion"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "collapsible column header with count badge",
+  "want": [
+   "Accordion",
+   "CountTag"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "table of sessions with status, filter, search, pagination",
+  "want": [
+   "PatternTable",
+   "Table"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "table of sessions with filter, search, pagination, status badge",
+  "want": [
+   "PatternTable",
+   "Table"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "status filter tabs / segmented control / chips",
+  "want": [
+   "Tabs",
+   "FilterButton",
+   "Select"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "filter status segmented control tabs",
+  "want": [
+   "Tabs",
+   "FilterButton",
+   "Select"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "filter segmented control tabs for status",
+  "want": [
+   "Tabs",
+   "FilterButton",
+   "Select"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "filter by status segmented control / tabs / select",
+  "want": [
+   "Tabs",
+   "FilterButton",
+   "Select"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "status badge label",
+  "want": [
+   "StatusTag"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "status badge / lozenge",
+  "want": [
+   "StatusTag"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "badge count",
+  "want": [
+   "CountTag"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "select dropdown to filter by status",
+  "want": [
+   "Select",
+   "FilterButton"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "section toolbar search filters record count",
+  "want": [
+   "PatternSection",
+   "PatternTable"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "search text field",
+  "want": [
+   "TextField"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "search field text input",
+  "want": [
+   "TextField"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "search text field, select dropdown, page header title with action button",
+  "want": [
+   "TextField",
+   "Select",
+   "PageHeader"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "search field, pagination, primary button",
+  "want": [
+   "TextField",
+   "Pagination",
+   "Button"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "page layout with title, primary action, table of sessions, filter, search, pagination",
+  "want": [
+   "PageLayout",
+   "PatternTable",
+   "PageHeader"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "page layout with title, actions, and a table list with filter, search, pagination",
+  "want": [
+   "PageLayout",
+   "PatternTable",
+   "PageHeader"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "page layout with title and primary action",
+  "want": [
+   "PageLayout",
+   "PageHeader"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "page header title with actions",
+  "want": [
+   "PageHeader"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "icon button",
+  "want": [
+   "IconButton"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "heading text typography",
+  "want": [
+   "Heading"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ },
+ {
+  "q": "purple",
+  "want": [
+   "--ds-background-accent-purple-subtle",
+   "--ds-text-accent-purple",
+   "--ds-background-accent-purple-bolder"
+  ],
+  "kind": "real-token",
+  "source": "ledger"
+ },
+ {
+  "q": "purple color token",
+  "want": [
+   "--ds-background-accent-purple-subtle",
+   "--ds-text-accent-purple",
+   "--ds-background-accent-purple-bolder"
+  ],
+  "kind": "real-token",
+  "source": "ledger"
+ },
+ {
+  "q": "brand text color",
+  "want": [
+   "--ds-text-brand"
+  ],
+  "kind": "real-token",
+  "source": "ledger"
+ },
+ {
+  "q": "selected border color",
+  "want": [
+   "--ds-border-selected",
+   "--border-selected"
+  ],
+  "kind": "real-token",
+  "source": "ledger"
+ },
+ {
+  "q": "icon",
+  "want": [
+   "iconography",
+   "IconButton"
+  ],
+  "kind": "real-intent",
+  "source": "ledger"
+ }
+]

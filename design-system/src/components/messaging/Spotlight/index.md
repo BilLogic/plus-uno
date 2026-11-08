@@ -3,7 +3,7 @@
 
 # Spotlight
 
-drawn on `Popover.Positioner` from `@base-ui/react`.
+Spotlight: a one-step onboarding callout anchored to a `SpotlightTarget`, drawn on `Popover.Positioner` from `@base-ui/react`.
 
 **Import:** `import { Spotlight } from '@/components';`
 

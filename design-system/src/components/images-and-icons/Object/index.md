@@ -3,6 +3,8 @@
 
 # Object
 
+Object: a fixed Font Awesome glyph that marks the kind of thing a row or reference names, one component per kind (`TaskIcon`, `BugIcon`, …) built by `createObjectIcon`.
+
 > Implemented as `createObjectIcon` in the source and exported as `Object`. Import the exported name; read the source under the implementation name.
 
 **Import:** `import { Object } from '@/components';`

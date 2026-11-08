@@ -19,6 +19,22 @@ test('check refuses paths when built with readPaths off, and still checks code',
   assert.doesNotThrow(() => createLookup(REPO_ROOT).check({ paths: ['package.json'] }));
 });
 
+test('the hosted check reads the committed Free lists, so solid and brands names are checked without Font Awesome installed', () => {
+  const hosted = createLookup(REPO_ROOT, { readPaths: false });
+  const rules = (cls) => hosted.check({ code: `export const X = () => <i className="${cls}" />;`, path: 'prototypes/a.jsx' }).findings.map((f) => f.rule);
+  assert.deepEqual(rules('fa-solid fa-grid-2'), ['ds/fa-free-only']);
+  assert.deepEqual(rules('fa-brands fa-not-a-brand'), ['ds/fa-free-only']);
+  assert.deepEqual(rules('fa-solid fa-house'), []);
+  assert.deepEqual(rules('fa-brands fa-figma'), []);
+});
+
+test('a JSDoc that opens "<Name>: …" or "<Name> — …" keeps that line as its summary', () => {
+  const summary = (n) => lookup.get([n], 'props').records[0].summary;
+  assert.match(summary('PageHeader'), /^PageHeader: a page's title row/);
+  assert.match(summary('Banner'), /^Banner: a prominent message/);
+  assert.match(summary('Checkbox'), /^Checkbox — single boolean control/);
+});
+
 test('find answers "card" with Card as not here and PatternCard with its import', () => {
   const { results, next } = lookup.find('card');
   assert.equal(results[0].kind, 'not-here');
@@ -34,7 +50,82 @@ test('find ranks a task in words, resolves a Figma name, and flags a Pro icon', 
   assert.deepEqual([figma.name, figma.figma], ['Toggle', 'Form Switch Button']);
   const pro = lookup.find('fa-light fa-house').results[0];
   assert.deepEqual([pro.kind, pro.status], ['icon', 'pro']);
-  assert.ok(lookup.find('house').results.some((r) => r.name === 'fa-regular fa-house'));
+  assert.ok(lookup.find('house icon').results.some((r) => r.name === 'fa-regular fa-house'));
+});
+
+test('icons answer only when the query asks for an icon', () => {
+  assert.equal(lookup.find('house').results.some((r) => r.kind === 'icon'), false);
+  assert.equal(lookup.find('check that it saved').results.some((r) => r.kind === 'icon'), false);
+  assert.ok(lookup.find('house icon').results.some((r) => r.kind === 'icon'));
+});
+
+test('the icon lane drops stopwords before it joins the words into a name', () => {
+  const names = lookup.find('an icon for calendar').results.filter((r) => r.kind === 'icon').map((r) => r.name);
+  assert.ok(names.includes('fa-regular fa-calendar') && names.includes('fa-solid fa-calendar'), names.join(', '));
+  assert.equal(lookup.find('an icon for calendar').results[0].name, lookup.find('calendar icon').results[0].name);
+});
+
+test('a bare Pro family word gives the Pro row first, then the Free match on the other words', () => {
+  // Font Awesome metadata may not be installed; a stub set stands in for it.
+  const stubbed = createLookup(REPO_ROOT, { iconMetadata: { 'graduation-cap': { free: ['solid'] }, house: { free: ['solid', 'regular'] } } });
+  const { results } = stubbed.find('duotone graduation cap icon');
+  assert.deepEqual([results[0].kind, results[0].status], ['icon', 'pro']);
+  assert.match(results[0].why, /duotone/);
+  assert.equal(results[1].name, 'fa-solid fa-graduation-cap');
+  assert.equal(stubbed.find('graduation-cap').results[0].name, 'fa-solid fa-graduation-cap');
+  assert.equal(stubbed.find('light background color').results.some((r) => r.status === 'pro'), false);
+});
+
+test('tokens answer only on token vocabulary, and then lead', () => {
+  assert.equal(lookup.find('confirm before deleting').results.some((r) => r.kind === 'token'), false);
+  assert.equal(lookup.find('selected').results.some((r) => r.kind === 'token'), false);
+  assert.equal(lookup.find('purple color token').results[0].kind, 'token');
+  assert.equal(lookup.find('brand text color').results[0].name, '--ds-text-brand');
+  assert.equal(lookup.find('--ds-text-brand').results[0].name, '--ds-text-brand');
+});
+
+test('an everyday token word alone never opens the token lane; beside a strong one it narrows', () => {
+  for (const q of ['fill out a form', 'brand logo', 'surface of the page', 'space between', 'neutral tone', 'stroke width', 'palette']) {
+    assert.equal(lookup.find(q).results.some((r) => r.kind === 'token'), false, q);
+  }
+  assert.equal(lookup.find('brand logo').results[0].name, 'Logo');
+  assert.equal(lookup.find('brand background color').results[0].kind, 'token');
+  assert.match(lookup.find('brand background color').results[0].name, /brand/);
+  // stopwords do not score a step through its intent
+  assert.deepEqual(
+    lookup.find('the color of the brand text').results.filter((r) => r.kind === 'token').map((r) => r.name),
+    lookup.find('brand text color').results.filter((r) => r.kind === 'token').map((r) => r.name),
+  );
+});
+
+test('constants answer only to their exact name; other exports follow the components', () => {
+  assert.equal(lookup.find('BUTTON_APPEARANCES').results[0].name, 'BUTTON_APPEARANCES');
+  assert.equal(lookup.find('button appearances').results.some((r) => /^[A-Z0-9_]+$/.test(r.name)), false);
+  const table = lookup.find('table').results;
+  const firstExport = table.findIndex((r) => r.kind === 'export');
+  const lastRanked = table.findLastIndex((r) => r.kind === 'component' || r.kind === 'pattern');
+  assert.ok(firstExport === -1 || firstExport > lastRanked, table.map((r) => r.name).join(', '));
+});
+
+test('a query that names a guideline topic ends with a guide row', () => {
+  const { results } = lookup.find('icon');
+  assert.deepEqual(results.at(-1), { kind: 'guide', name: 'iconography', next: 'ds_guide("iconography")' });
+  assert.equal(lookup.find('heading text typography').results.at(-1).name, 'typography');
+  assert.equal(lookup.find('confirm before deleting').results.some((r) => r.kind === 'guide'), false);
+  for (const q of ['color palette', 'layout of the page', 'accessibility of a modal', 'a11y']) assert.equal(lookup.find(q).results.at(-1).kind, 'guide', q);
+  assert.match(render('find', { results: [results.at(-1)], next: '' }), /^guide {5}iconography {2}→ ds_guide\("iconography"\)/);
+});
+
+test('an everyday topic word gives a guide row only beside a cue or another topic word', () => {
+  const guide = (q) => lookup.find(q).results.filter((r) => r.kind === 'guide').map((r) => r.name);
+  assert.deepEqual(guide('copy to clipboard'), []);
+  assert.deepEqual(guide('grid of cards'), []);
+  assert.deepEqual(guide('an icon for calendar'), []);
+  assert.deepEqual(guide('copy guidelines'), ['content']);
+  assert.deepEqual(guide('grid rules'), ['grid']);
+  // another topic word seconds it: the row names the first topic the query carries
+  assert.deepEqual(guide('grid layout'), ['grid']);
+  assert.deepEqual(guide('grid'), ['grid']);
 });
 
 test('find names the tool to call instead on a miss', () => {

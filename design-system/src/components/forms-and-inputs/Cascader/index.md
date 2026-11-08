@@ -3,6 +3,8 @@
 
 # Cascader
 
+Cascader: a field that picks one path through nested options, one level at a time.
+
 **Import:** `import { Cascader } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/Cascader/Cascader.jsx`
