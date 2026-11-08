@@ -127,6 +127,17 @@ test('aliases: a not-here name, a qualified word and a shared word are skipped w
   assert.equal(reasons['Panel: side panel'], 'shared');
 });
 
+test('parse: a word avoided "as a name" is plain for search and marked named; the marker is the whole qualifier', () => {
+  const md = `## Language\n\n### Design system: structure\n\n**Card**:\nOne object.\n_Avoid_: "box", "region" as a name, "tile" (Tile is its own component)\n`;
+  const [card] = parseGlossary(md);
+  assert.deepEqual(card.avoid, [
+    { word: 'box', plain: true },
+    { word: 'region', plain: true, named: true },
+    { word: 'tile', plain: false },
+  ]);
+  assert.deepEqual(vocabularyAliases([card], { names: ['PatternCard'] }).aliases, { PatternCard: ['box', 'region'] }, 'a named word still feeds search');
+});
+
 test('collision: an avoid-word that is another component\'s name or alias is a collision, and never an alias', () => {
   const clash = `### Design system: components
 

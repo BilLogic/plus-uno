@@ -2,7 +2,7 @@
  * The glossary's design-system vocabulary, as DS search reads it. Pure: the
  * glossary's text and the design system's names in, terms and aliases out.
  *
- *   parseGlossary(markdown)          [{term, section, avoid: [{word, plain}]}]
+ *   parseGlossary(markdown)          [{term, section, avoid: [{word, plain, named?}]}]
  *   vocabularyAliases(terms, facts)  {aliases, excluded, unmatched, collisions}
  *   componentOf(term, names)        the component or pattern a term names, or null
  *   searchAliases(glossary, facts)   {rows, vocabulary}: the hand-kept aliases with the glossary's appended
@@ -19,6 +19,11 @@
  * ("Card" is `PatternCard`). A term with neither (a prop, a token tier, "Close /
  * Dismiss") is reported as unmatched and feeds nothing.
  *
+ * A WORD AVOIDED "AS A NAME" IS PLAIN. `"region" as a name` is ordinary
+ * English avoided only as the name of the term's thing: it feeds search like a
+ * plain word and carries `named: true`, so `check:ds-vocabulary` flags it only
+ * where it names something.
+ *
  * ONLY A PLAIN AVOID-WORD BECOMES AN ALIAS. A plain word is one quoted word
  * standing alone in the `_Avoid_` list. A qualified one ("popup" for a blocking
  * dialog, bare "dropdown", "tile" (Tile is its own component)) is avoided in one
@@ -31,6 +36,9 @@
  * hand-kept alias would route that component's word to this term. It is never
  * an alias, and `check:ds-vocabulary` fails on it.
  */
+
+/** The qualifier that keeps a word plain but avoids it only as a name: `"region" as a name`. */
+export const NAMED = 'as a name';
 
 /** The `###` headings whose terms feed DS search. */
 export const DS_SECTION = /^Design system\b/i;
@@ -65,6 +73,7 @@ function avoidList(text) {
   return items.flatMap((item) => {
     const m = item.match(/(["`])([^"`]+)\1/);
     if (!m) return [];
+    if (m[1] === '"' && item === `${m[0]} ${NAMED}`) return [{ word: m[2], plain: true, named: true }];
     return [{ word: m[2], plain: m[1] === '"' && item === m[0] }];
   });
 }

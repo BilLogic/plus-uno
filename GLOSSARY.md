@@ -114,11 +114,11 @@ _Avoid_: "resize handle", "drag bar"
 
 **Page**:
 The pattern for the main content area inside a **Frame**: it carries the page title and a body.
-_Avoid_: "surface"
+_Avoid_: "surface" as a name
 
 **Section**:
 The pattern for a span of the page grid that groups content, including **Card**s, under one heading with a `_Section header`. It can carry an optional `detail` region on its right that shows one record of its content: the body takes 7 of the **Page**'s 12 columns and the detail, a Section with a subtle fill, takes 5; the split holds from 960 and below that the detail replaces the list under a back link. A bare "Section" always means this pattern.
-_Avoid_: "block", "region"; "section" for a **Figma section** or a **Menu section**
+_Avoid_: "block" as a name, "region" as a name; "section" for a **Figma section** or a **Menu section**
 
 **Card**:
 The pattern for the container of one object, raised at rest with no border. Related cards group in a **Section**, one card level deep.
@@ -199,11 +199,11 @@ _Avoid_: "alert", "callout"
 
 **Toggle**:
 An on/off control that applies at once.
-_Avoid_: "switch"
+_Avoid_: "switch" as a name
 
 **Status tag**:
 A label that shows the state of one thing, with a color for its meaning.
-_Avoid_: "pill", "lozenge"
+_Avoid_: "pill" as a name, "lozenge"
 
 **Count tag**:
 A label that shows a number.
