@@ -3,7 +3,7 @@
  *
  * Two jobs. The first is #191's rule: a guard nobody has watched fail is a
  * guard nobody knows works, so the centerpiece here is the real defect —
- * `elevation.md` exactly as it stood before `0c454cce`, written into a fixture
+ * the elevation guideline exactly as it stood before `0c454cce`, written into a fixture
  * root that links the real source, with the real check pointed at that root.
  * If that page stops producing findings, this file goes red. (The corpus as it
  * stands is still run as a subprocess, once, to prove the gate exits 0.)
@@ -44,7 +44,7 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const CHECK = path.join(__dirname, 'check-doc-identifiers.mjs');
 
 /**
- * `design-system/guidelines/foundations/elevation.md` at `0c454cce^` — the
+ * The elevation guideline at `0c454cce^` (since retired into the Elevation page) — the
  * document that shipped. Four token names, none of which exist in
  * `_elevation.scss`, in the three positions the page used: a table of code
  * spans, a css fence declaring values, and `var()` calls in usage examples.

@@ -3,13 +3,13 @@
  * must name the same shadow.
  *
  * WHY THIS EXISTS. `design-system/guidelines/figma/token-mapping.md` and
- * `foundations/elevation.md` say which surface and shadow each layer takes, and
+ * the Elevation page (`design-system/src/styles/Elevation.mdx`) say which surface and shadow each layer takes, and
  * the stylesheets draw it. The two live in different file types, and a role
  * once answered "which shadow does a card get?" differently from the table
  * with nothing noticing, because no check read both.
  *
  * WHAT IS ASSERTED. The mapping's overlay rows name the overlay pair for every
- * floating layer, the guideline's hierarchy table agrees, and each surface
+ * floating layer, the Elevation page's pattern table agrees, and each surface
  * below draws the shadow its row names.
  *
  * ─── WHAT IT DELIBERATELY CANNOT SEE ────────────────────────────────────────
@@ -37,8 +37,11 @@ import { fileURLToPath } from 'node:url';
 import * as sass from 'sass';
 import postcss from 'postcss';
 
+import { readDocsPage, sectionText } from './lib/docs-page.mjs';
+
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MAPPING = path.join(REPO_ROOT, 'design-system/guidelines/figma/token-mapping.md');
+const ELEVATION_PAGE = 'design-system/src/styles/Elevation.mdx';
 
 test('modals and every floating layer take the overlay pair', () => {
   // Decision 3 of the color proposal: a modal sits at the overlay level, as
@@ -62,7 +65,7 @@ test('modals and every floating layer take the overlay pair', () => {
 /**
  * THE STEP EACH SURFACE TAKES, read from the stylesheets that draw them.
  *
- * `foundations/elevation.md` assigns the levels by component. The floating
+ * The Elevation page assigns the levels by pattern. The floating
  * layers on the new color tokens (menus and dropdowns, Listbox, Popover,
  * Tooltip, Toast) and modals take the overlay pair, `--ds-surface-overlay`
  * with `--ds-shadow-overlay`; the Frame's floating sidebar takes the overlay
@@ -118,7 +121,7 @@ for (const surface of SURFACES) {
     assert.match(
       shadow,
       new RegExp(`^var\\(${surface.shadow}\\)( !important)?$`),
-      `${surface.file} lifts its surface with "${shadow}"; elevation.md and the role layer say var(${surface.shadow}).`,
+      `${surface.file} lifts its surface with "${shadow}"; the Elevation page and the role layer say var(${surface.shadow}).`,
     );
     if (surface.fill) {
       assert.equal(firstAfter(source, surface.rule, 'background-color'), `var(${surface.fill})`);
@@ -126,17 +129,20 @@ for (const surface of SURFACES) {
   });
 }
 
-test("elevation.md's hierarchy table says the same steps", () => {
-  const doc = fs.readFileSync(path.join(REPO_ROOT, 'design-system/guidelines/foundations/elevation.md'), 'utf8');
-  const hierarchy = doc.slice(doc.indexOf('## Elevation Hierarchy'));
-  const rowOf = (words) => hierarchy.split('\n').find((line) => line.startsWith('|') && words.test(line));
-  for (const layer of [/modals/i, /menus/i, /dropdowns/i, /listboxes/i, /popups/i, /tooltips/i, /flags/i, /floating sidebar/i]) {
+test("the Elevation page's pattern table says the same steps", () => {
+  const page = readDocsPage(fs.readFileSync(path.join(REPO_ROOT, ELEVATION_PAGE), 'utf8'), { kind: 'foundation' });
+  const table = sectionText(page, "Each pattern's level");
+  assert.ok(table, `${ELEVATION_PAGE} has no "Each pattern's level" section`);
+  const rowOf = (words) => table.split('\n').find((line) => line.startsWith('|') && words.test(line));
+  for (const layer of [/modal/i, /menu/i, /DropdownMenu/, /listbox/i, /popup/i, /flag/i, /sidebar, opened over/i]) {
     const row = rowOf(layer);
-    assert.ok(row, `elevation.md's hierarchy table has no row matching ${layer}`);
-    assert.match(row, /--ds-surface-overlay/, `elevation.md does not put ${layer} on the overlay surface`);
-    assert.match(row, /--ds-shadow-overlay/, `elevation.md does not put ${layer} on the overlay shadow`);
+    assert.ok(row, `the Elevation page's pattern table has no row matching ${layer}`);
+    assert.match(row, /--ds-surface-overlay/, `the Elevation page does not put ${layer} on the overlay surface`);
+    assert.match(row, /--ds-shadow-overlay/, `the Elevation page does not put ${layer} on the overlay shadow`);
   }
-  assert.match(rowOf(/clickable cards on hover or drag/i) ?? '', /--ds-shadow-raised/, 'elevation.md does not lift a clickable card with the raised shadow');
+  const card = rowOf(/^\|\s*Card\s*\|/) ?? '';
+  assert.match(card, /--ds-surface-raised` \+ `--ds-shadow-raised/, 'the Elevation page does not rest a card on the raised pair');
+  assert.match(card, /clickable cards lift to `--ds-shadow-overlay`/, 'the Elevation page does not lift a clickable card to the overlay shadow');
 });
 
 /**
@@ -187,7 +193,7 @@ test('PatternCard pairs each surface with its shadow, at rest, lifted, pressed a
 });
 
 test('no pattern or Popover-family stylesheet writes a literal shadow', () => {
-  // elevation.md rule 3: never hardcode shadows.
+  // The Elevation page: a shadow is always a token, never a literal value.
   for (const { file } of SURFACES) {
     const source = fs.readFileSync(path.join(REPO_ROOT, file), 'utf8');
     for (const match of source.matchAll(/box-shadow:\s*([^;]+);/g)) {

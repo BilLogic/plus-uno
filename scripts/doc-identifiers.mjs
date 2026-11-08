@@ -181,7 +181,7 @@ const DECLARATION = new RegExp(`^\\s*(${TOKEN_NAME})\\s*:\\s*\\S`);
 
 /**
  * Every CSS custom property the page claims exists. Three positions count, and
- * they are exactly the three `elevation.md` used before `0c454cce`: a table
+ * they are exactly the three the elevation guideline used before `0c454cce`: a table
  * cell holding `` `--elevation-sm` ``, a `var(--elevation-sm)` reference, and a
  * `--elevation-sm: ...` declaration in a css fence.
  *

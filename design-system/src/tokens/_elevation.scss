@@ -69,8 +69,8 @@
      * dragged, so a resting card sets this fill with `box-shadow: none` and
      * names the shadow only in its hover and dragging rules.
      *
-     * Its shadow is `--ds-shadow-raised`, per `foundations/elevation.md`
-     * ("clickable cards on hover or drag").
+     * Its shadow is `--ds-shadow-raised`, per the Elevation page
+     * (`design-system/src/styles/Elevation.mdx` § Cards).
      */
     --surface-raised: var(--color-surface-container-lowest);
 
