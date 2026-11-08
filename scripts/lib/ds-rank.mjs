@@ -16,6 +16,18 @@
 
 export const WEIGHTS = Object.freeze({ name: 5, aliases: 4, summary: 2, usage: 1, best: 0.5, related: 0 });
 
+/** How `ds_find` weighs its lanes around the ranker (`ds-lookup.mjs`): every tuned number in one place. */
+export const FIND_TUNING = Object.freeze({
+  /** Token step scores: a query word that is a segment of the name, one in its intent, the exact name, a `--` prefix, a state variant; a component scoring above `yield` costs the token lane one step. */
+  token: Object.freeze({ segment: 3, intent: 1, exact: 50, prefix: 10, state: 0.5, yield: 4 }),
+  /** Keep ranked hits within `share` of the best one (and at least `min`), at most `max`, so a long query does not drag in every weak match. */
+  band: Object.freeze({ share: 0.18, min: 0.6, max: 8 }),
+  /** A pattern that scores at all sits just above a component tied with it. */
+  patternLift: 0.3,
+  /** An authored alias (four letters or more) the query carries whole: this plus one per word of it. */
+  aliasPhrase: 2,
+});
+
 const K1 = 1.2;
 const B = 0.75;
 /** Length normalization per field. An alias list is a set of synonyms, not prose: a longer one is not a weaker match. */

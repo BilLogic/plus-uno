@@ -157,10 +157,10 @@ export const CHECKS = [
   },
   {
     name: 'check:icon-lists',
-    script: 'node scripts/generate-icon-regular-list.mjs --check',
+    script: 'node scripts/generate-icon-lists.mjs --check',
     pkg: 'root',
     trigger: 'pull_request',
-    module: 'scripts/generate-icon-regular-list.mjs',
+    module: 'scripts/generate-icon-lists.mjs',
     guards: 'the committed Free icon lists in design-system/src/lib/ against the generator that writes them; a hand edit shows as drift.',
   },
   {

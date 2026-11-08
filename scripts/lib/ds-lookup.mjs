@@ -44,7 +44,8 @@ import path from 'node:path';
 
 import { contextOf, escapes, expandPaths } from '../check-ds-usage.mjs';
 import { BARRELS, loadFacts } from './ds-facts.mjs';
-import { createRanker } from './ds-rank.mjs';
+import { FIND_TUNING, createRanker } from './ds-rank.mjs';
+import { readIconLists } from './icon-lists.mjs';
 import { RULES, RULES_DOC, docLink, escapesIn } from './ds-usage.mjs';
 
 export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check'];
@@ -73,14 +74,6 @@ const TOKEN_WORDS = new Set(
 );
 /** Token words that name no step: they ask for tokens without narrowing which. */
 const TOKEN_FILLER = new Set(['color', 'colour', 'token', 'tokens', 'ds']);
-/** Token step scores: a query word that is a segment of the name, one in its intent, the exact name, a `--` prefix, a state variant. */
-const TOKEN_SEGMENT = 3;
-const TOKEN_INTENT = 1;
-const TOKEN_EXACT = 50;
-const TOKEN_PREFIX = 10;
-const TOKEN_STATE = 0.5;
-/** A component that scores above this costs the token lane one step. */
-const TOKEN_YIELD = 4;
 const ICON_WORDS = new Set(['icon', 'icons', 'glyph']);
 /** Pro family words that read as plain English too; only `duotone` stands alone without an icon word. */
 const PRO_WORDS = new Set(['light', 'thin', 'sharp']);
@@ -111,8 +104,6 @@ const SECTIONS = ['props', 'usage', 'examples', 'a11y', 'figma'];
 const MDX_SECTIONS = { usage: ['Usage', 'Content guidelines'], examples: ['Best practices'], a11y: ['Accessibility'] };
 const STOP = new Set('a an and the of for to with in on or my our is it that this which what i we need want use show build make page'.split(' '));
 const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
-const FREE_REGULAR = 'design-system/src/lib/icon-regular.generated.js';
-const FREE_ICONS = 'design-system/src/lib/icon-free.generated.js';
 const GUIDELINES = 'design-system/guidelines';
 /** Words people ask with, mapped to the guideline file that answers them. */
 const TOPIC_ALIASES = {
@@ -152,15 +143,6 @@ const wordsOf = (q) =>
     .split(/[^a-z0-9-]+/)
     .filter((w) => w.length > 1 && !STOP.has(w))
     .flatMap((w) => (w.length > 3 && w.endsWith('s') ? [w, w.slice(0, -1)] : [w]));
-
-/** Keep ranked hits within this share of the best one, so a long query does not drag in every weak match. */
-const BAND_SHARE = 0.18;
-const BAND_MIN = 0.6;
-const BAND_MAX = 8;
-/** A pattern that scores at all sits just above a component tied with it. */
-const PATTERN_LIFT = 0.3;
-/** An authored alias (four letters or more) the query carries whole: this plus one per word of it. */
-const ALIAS_PHRASE = 2;
 
 /** Whether `text` carries `phrase` as whole words. */
 const hasPhrase = (text, phrase) => new RegExp(`(?:^|[^a-z0-9])${phrase.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}(?:[^a-z0-9]|$)`).test(text);
@@ -225,14 +207,10 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   let icons;
   const iconSets = () => {
     if (icons) return icons;
-    const names = (file, exportName) => {
-      const block = (readIf(path.join(root, file)) ?? '').match(new RegExp(`${exportName} = new Set\\(\\[([^\\]]*)\\]\\)`));
-      return new Set(block ? [...block[1].matchAll(/"([a-z0-9-]+)"/g)].map((m) => m[1]) : []);
-    };
     const of = (style) => new Set(Object.entries(iconMetadata).filter(([, i]) => i.free?.includes(style)).map(([n]) => n));
     icons = iconMetadata
       ? { regular: of('regular'), solid: of('solid'), brands: of('brands') }
-      : { regular: names(FREE_REGULAR, 'FREE_REGULAR_ICONS'), solid: names(FREE_ICONS, 'FREE_SOLID_ICONS'), brands: names(FREE_ICONS, 'FREE_BRANDS_ICONS') };
+      : readIconLists(root);
     icons.complete = icons.solid.size > 0;
     return icons;
   };
@@ -286,14 +264,142 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     return rows.sort((a, b) => b.score - a.score || (a.name < b.name ? -1 : 1));
   }
 
+  /** A component or pattern as a find row. */
+  const item = (name, extra = {}) => {
+    const a = facts.lookup(name);
+    return { kind: a.kind, name, status: 'exists', import: a.import, summary: shortSummary(a.summary), aliasOf: a.aliasOf, ...extra };
+  };
+  /** A not-here row: the name, why, and what to use instead. */
+  const notHereRow = (row) => {
+    const bare = row.not.replace(/\s*\(.*$/, '');
+    return { kind: 'not-here', name: bare, status: row.kind === 'token' && facts.retired.has(bare) ? 'retired' : 'not-here', use: row.use.map(brief), why: row.why };
+  };
+
+  /** The words of one query, in the shapes the lanes read. */
+  function parseQuery(q) {
+    const ql = q.toLowerCase();
+    const recorded = new Set(records.map((r) => r.name));
+    return {
+      q,
+      ql,
+      words: wordsOf(q),
+      raw: ql.match(/[a-z0-9-]+/g) ?? [],
+      joined: ql.replace(/[\s-]+/g, ''),
+      singleWord: !/\s/.test(ql),
+      notHere: facts.notHere().map((row) => ({ row, bl: row.not.replace(/\s*\(.*$/, '').toLowerCase() })),
+      barrelOnly: [...facts.barrels[BARRELS[0]]].filter((n) => !recorded.has(n) && /^[A-Z]/.test(n)),
+    };
+  }
+
+  /** Lane 1: the exact name (a record, a barrel export, a Figma name, a not-here name) or an exact alias. Constants answer only here. */
+  function exactLane({ ql, joined, notHere, barrelOnly }) {
+    const rows = [];
+    for (const r of records) if (r.name.toLowerCase() === ql || r.name.toLowerCase() === joined) rows.push(item(r.name));
+    for (const n of barrelOnly) if (n.toLowerCase() === ql || (!CONSTANT.test(n) && n.toLowerCase() === joined)) rows.push({ kind: 'export', name: n, status: 'exists', import: facts.lookup(n).import });
+    for (const { alias, name } of figmaAliases) if (alias.toLowerCase() === ql) rows.push(item(name, { figma: alias }));
+    for (const { row, bl } of notHere) if (bl === ql) rows.push(notHereRow(row));
+    if (aliases) for (const r of records) if (facts.lookup(r.name).aliases.includes(ql)) rows.push(item(r.name));
+    return rows;
+  }
+
+  /** Lane 2: a not-here component named by a whole word of the query (or, for a one-word query, containing it). */
+  function notHereLane({ ql, words, singleWord, notHere }) {
+    const rows = [];
+    for (const { row, bl } of notHere) if (row.kind === 'component' && words.includes(bl)) rows.push(notHereRow(row));
+    if (singleWord && ql.length > 2) for (const { row, bl } of notHere) if (row.kind === 'component' && bl.includes(ql)) rows.push(notHereRow(row));
+    return rows;
+  }
+
+  /** Components and patterns by BM25, with the alias-phrase bonus and the pattern lift, cut to the band. Returns the band and its best score. */
+  function rankedBand({ q, ql }) {
+    const { band, patternLift, aliasPhrase } = FIND_TUNING;
+    const ranked = rank()
+      .score(q)
+      .map((r) => {
+        const a = facts.lookup(r.id);
+        const phrases = aliases ? a.aliases.filter((al) => al.length > 3 && hasPhrase(ql, al)) : [];
+        const bonus = phrases.reduce((sum, al) => sum + aliasPhrase + al.split(' ').length, 0);
+        return { ...r, score: r.score + bonus + (a.kind === 'pattern' ? patternLift : 0) };
+      })
+      .sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : 1));
+    const top = ranked[0]?.score ?? 0;
+    return { top, band: ranked.filter((x) => x.score >= Math.max(band.share * top, band.min)).slice(0, band.max) };
+  }
+
+  /** Lane 3: token steps, only when the query speaks token vocabulary; one fewer when a component scores above the yield. */
+  function tokenLane({ q, ql, notHere }, top) {
+    if (!speaksTokens(q)) return [];
+    const t = FIND_TUNING.token;
+    const want = ql.split(/[^a-z0-9]+/).filter((w) => w && !TOKEN_FILLER.has(w));
+    const bareQuery = ql.replace(/^--/, '');
+    const steps = [];
+    for (const tok of usableTokens) {
+      const n = tok.name.slice(2);
+      const segs = n.split('-');
+      const intent = (tok.intent ?? '').toLowerCase();
+      let score = 0;
+      for (const w of want) score += segs.includes(w) ? t.segment : intent.includes(w) ? t.intent : 0;
+      if (n === bareQuery) score += t.exact;
+      else if (ql.startsWith('--') && n.startsWith(bareQuery)) score += t.prefix;
+      if (/-(hovered|pressed)$/.test(n)) score -= t.state;
+      if (score > 0) steps.push({ kind: 'token', name: tok.name, status: 'exists', tier: tok.tier, intent: tok.intent ?? null, score });
+    }
+    steps.sort((a, b) => b.score - a.score || (a.name < b.name ? -1 : 1));
+    if (ql.length > 2) for (const { row, bl } of notHere) if (row.kind === 'token' && bl.includes(bareQuery)) steps.push(notHereRow(row));
+    return steps.slice(0, top > t.yield ? PER_KIND.token - 1 : PER_KIND.token);
+  }
+
+  /** Lane 4: icons, only when the query asks for one: the Pro row first, then the Free match on the other words. */
+  function iconLane({ q, ql, raw, singleWord }) {
+    const rows = [];
+    const iconWord = raw.some((w) => ICON_WORDS.has(w));
+    const faPro = ql.match(PRO_FAMILY)?.[0];
+    const barePro = raw.find((w) => w === 'duotone' || (iconWord && PRO_WORDS.has(w)));
+    if (faPro || barePro) {
+      const family = faPro ?? `fa-${barePro}`;
+      rows.push({ kind: 'icon', name: faPro ? q : family, status: 'pro', why: `${family} is a Font Awesome Pro family, not licensed here`, use: [{ name: 'fa-solid, fa-regular or fa-brands', status: 'exists' }] });
+    }
+    if (!(iconWord || faPro || barePro || ql.startsWith('fa-') || (singleWord && !ql.startsWith('--') && ql.includes('-')))) return rows;
+    const bare = raw
+      .filter((w) => !ICON_WORDS.has(w) && !PRO_WORDS.has(w) && w !== 'duotone' && !/^fa-(?:solid|regular|brands|sharp-duotone|sharp|duotone|light|thin)$/.test(w))
+      .map((w) => w.replace(/^fa-/, ''))
+      .join('-');
+    const sets = iconSets();
+    if (!faPro && /^fa-[a-z0-9-]+$/.test(ql.replace(/\bfa-(?:solid|regular|brands)\b/g, '').trim()) && sets.complete && ![sets.solid, sets.regular, sets.brands].some((s) => s.has(bare))) {
+      rows.push({ kind: 'icon', name: `fa-${bare}`, status: 'pro', why: 'not in Font Awesome Free; Pro-only names render blank here' });
+    }
+    return [...rows, ...iconRows(bare).slice(0, PER_KIND.icon)];
+  }
+
+  /** Lane 5: the ranked band, then a Figma name the query is part of. */
+  function meaningLane({ ql, words }, band) {
+    const rows = band.map((r) => item(r.id));
+    for (const { alias, name } of figmaAliases) {
+      const al = alias.toLowerCase();
+      if ((ql.length > 2 && al.includes(ql)) || (words.length && words.every((w) => al.includes(w)))) rows.push(item(name, { figma: alias }));
+    }
+    return rows;
+  }
+
+  /** Lane 6: other barrel exports on a word-start match of a camel part; constants never here. */
+  function exportLane({ ql, words, joined, barrelOnly }) {
+    const rows = [];
+    for (const n of barrelOnly) {
+      if (CONSTANT.test(n)) continue;
+      const parts = n.split(/(?=[A-Z][a-z])/).map((_, i, all) => all.slice(i).join('').toLowerCase());
+      const score = (ql.length > 2 && parts.some((p) => p.startsWith(joined)) ? 2 : 0) + words.filter((w) => w.length > 2 && parts.some((p) => p.startsWith(w))).length;
+      if (score) rows.push({ kind: 'export', name: n, status: 'exists', import: facts.lookup(n).import, score });
+    }
+    return rows.sort((a, b) => b.score - a.score || (a.name < b.name ? -1 : 1));
+  }
+
+  /** The guideline topics a query names. */
+  const topicsOf = ({ raw }) => [...new Set(raw.map((w) => GUIDE_WORDS[w]).filter(Boolean))];
+
   function find(query) {
     const q = String(query ?? '').trim();
-    const ql = q.toLowerCase();
     if (!q) return { query: q, results: [], next: 'Call ds_find with a task in words, a name or an alias; ds_guide() for the orientation.' };
-    const words = wordsOf(q);
-    const raw = ql.match(/[a-z0-9-]+/g) ?? [];
-    const joined = ql.replace(/[\s-]+/g, '');
-    const singleWord = !/\s/.test(ql);
+    const c = parseQuery(q);
 
     const out = [];
     const seen = new Set();
@@ -303,106 +409,21 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       seen.add(key);
       out.push(row);
     };
-    const item = (name, extra = {}) => {
-      const a = facts.lookup(name);
-      return { kind: a.kind, name, status: 'exists', import: a.import, summary: shortSummary(a.summary), aliasOf: a.aliasOf, ...extra };
-    };
-    const notHereRow = (row) => {
-      const bare = row.not.replace(/\s*\(.*$/, '');
-      return { kind: 'not-here', name: bare, status: row.kind === 'token' && facts.retired.has(bare) ? 'retired' : 'not-here', use: row.use.map(brief), why: row.why };
-    };
-    const notHere = facts.notHere().map((row) => ({ row, bl: row.not.replace(/\s*\(.*$/, '').toLowerCase() }));
-    const recorded = new Set(records.map((r) => r.name));
-    const barrelOnly = [...facts.barrels[BARRELS[0]]].filter((n) => !recorded.has(n) && /^[A-Z]/.test(n));
 
-    // 1. The exact name: a record, a barrel export (constants answer only here), a Figma name, a not-here name.
-    for (const r of records) if (r.name.toLowerCase() === ql || r.name.toLowerCase() === joined) push(item(r.name));
-    for (const n of barrelOnly) if (n.toLowerCase() === ql || (!CONSTANT.test(n) && n.toLowerCase() === joined)) push({ kind: 'export', name: n, status: 'exists', import: facts.lookup(n).import });
-    for (const { alias, name } of figmaAliases) if (alias.toLowerCase() === ql) push(item(name, { figma: alias }));
-    for (const { row, bl } of notHere) if (bl === ql) push(notHereRow(row));
-    if (aliases) for (const r of records) if (facts.lookup(r.name).aliases.includes(ql)) push(item(r.name));
+    for (const row of exactLane(c)) push(row);
+    for (const row of notHereLane(c)) push(row);
+    // The band is scored before the token lane: its best score decides how many token steps lead.
+    const { top, band } = rankedBand(c);
+    for (const row of tokenLane(c, top)) push(row);
+    for (const row of iconLane(c)) push(row);
+    for (const row of meaningLane(c, band)) push(row);
+    for (const row of exportLane(c)) push(row);
 
-    // 2. A not-here component named by a whole word of the query (or, for a one-word query, containing it).
-    for (const { row, bl } of notHere) if (row.kind === 'component' && words.includes(bl)) push(notHereRow(row));
-    if (singleWord && ql.length > 2) for (const { row, bl } of notHere) if (row.kind === 'component' && bl.includes(ql)) push(notHereRow(row));
-
-    // The ranked band, scored now: its best score decides how many token steps lead.
-    const ranked = rank()
-      .score(q)
-      .map((r) => {
-        const a = facts.lookup(r.id);
-        const phrases = aliases ? a.aliases.filter((al) => al.length > 3 && hasPhrase(ql, al)) : [];
-        const bonus = phrases.reduce((sum, al) => sum + ALIAS_PHRASE + al.split(' ').length, 0);
-        return { ...r, score: r.score + bonus + (a.kind === 'pattern' ? PATTERN_LIFT : 0) };
-      })
-      .sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : 1));
-    const top = ranked[0]?.score ?? 0;
-    const band = ranked.filter((x) => x.score >= Math.max(BAND_SHARE * top, BAND_MIN)).slice(0, BAND_MAX);
-
-    // 3. Token steps, only when the query speaks token vocabulary, and then ahead of components.
-    if (speaksTokens(q)) {
-      const want = ql.split(/[^a-z0-9]+/).filter((w) => w && !TOKEN_FILLER.has(w));
-      const bareQuery = ql.replace(/^--/, '');
-      const steps = [];
-      for (const t of usableTokens) {
-        const n = t.name.slice(2);
-        const segs = n.split('-');
-        const intent = (t.intent ?? '').toLowerCase();
-        let score = 0;
-        for (const w of want) score += segs.includes(w) ? TOKEN_SEGMENT : intent.includes(w) ? TOKEN_INTENT : 0;
-        if (n === bareQuery) score += TOKEN_EXACT;
-        else if (ql.startsWith('--') && n.startsWith(bareQuery)) score += TOKEN_PREFIX;
-        if (/-(hovered|pressed)$/.test(n)) score -= TOKEN_STATE;
-        if (score > 0) steps.push({ kind: 'token', name: t.name, status: 'exists', tier: t.tier, intent: t.intent ?? null, score });
-      }
-      steps.sort((a, b) => b.score - a.score || (a.name < b.name ? -1 : 1));
-      if (ql.length > 2) for (const { row, bl } of notHere) if (row.kind === 'token' && bl.includes(bareQuery)) steps.push(notHereRow(row));
-      for (const t of steps.slice(0, top > TOKEN_YIELD ? PER_KIND.token - 1 : PER_KIND.token)) push(t);
-    }
-
-    // 4. Icons, only when the query asks for one: the Pro row first, then the Free match on the other words.
-    const iconWord = raw.some((w) => ICON_WORDS.has(w));
-    const faPro = ql.match(PRO_FAMILY)?.[0];
-    const barePro = raw.find((w) => w === 'duotone' || (iconWord && PRO_WORDS.has(w)));
-    if (faPro || barePro) {
-      const family = faPro ?? `fa-${barePro}`;
-      push({ kind: 'icon', name: faPro ? q : family, status: 'pro', why: `${family} is a Font Awesome Pro family, not licensed here`, use: [{ name: 'fa-solid, fa-regular or fa-brands', status: 'exists' }] });
-    }
-    if (iconWord || faPro || barePro || ql.startsWith('fa-') || (singleWord && !ql.startsWith('--') && ql.includes('-'))) {
-      const bare = raw
-        .filter((w) => !ICON_WORDS.has(w) && !PRO_WORDS.has(w) && w !== 'duotone' && !/^fa-(?:solid|regular|brands|sharp-duotone|sharp|duotone|light|thin)$/.test(w))
-        .map((w) => w.replace(/^fa-/, ''))
-        .join('-');
-      const sets = iconSets();
-      if (!faPro && /^fa-[a-z0-9-]+$/.test(ql.replace(/\bfa-(?:solid|regular|brands)\b/g, '').trim()) && sets.complete && ![sets.solid, sets.regular, sets.brands].some((s) => s.has(bare))) {
-        push({ kind: 'icon', name: `fa-${bare}`, status: 'pro', why: 'not in Font Awesome Free; Pro-only names render blank here' });
-      }
-      for (const row of iconRows(bare).slice(0, PER_KIND.icon)) push(row);
-    }
-
-    // 5. Components and patterns by meaning, then a Figma name the query is part of.
-    for (const r of band) push(item(r.id));
-    for (const { alias, name } of figmaAliases) {
-      const al = alias.toLowerCase();
-      if ((ql.length > 2 && al.includes(ql)) || (words.length && words.every((w) => al.includes(w)))) push(item(name, { figma: alias }));
-    }
-
-    // 6. Other barrel exports on a word-start match of a camel part; constants never here.
-    const exports = [];
-    for (const n of barrelOnly) {
-      if (CONSTANT.test(n)) continue;
-      const parts = n.split(/(?=[A-Z][a-z])/).map((_, i, all) => all.slice(i).join('').toLowerCase());
-      const score = (ql.length > 2 && parts.some((p) => p.startsWith(joined)) ? 2 : 0) + words.filter((w) => w.length > 2 && parts.some((p) => p.startsWith(w))).length;
-      if (score) exports.push({ kind: 'export', name: n, status: 'exists', import: facts.lookup(n).import, score });
-    }
-    for (const e of exports.sort((a, b) => b.score - a.score || (a.name < b.name ? -1 : 1))) push(e);
-
-    // 7. A pointer to the guideline a query word names, always kept as the last row.
-    const topic = [...new Set(raw.map((w) => GUIDE_WORDS[w]).filter(Boolean))][0];
-    const guideRow = topic ? [{ kind: 'guide', name: topic, next: `ds_guide("${topic}")` }] : [];
+    // Lane 7: a pointer to the guideline a query word names, always kept as the last row.
+    const topics = topicsOf(c);
+    const guideRow = topics.length ? [{ kind: 'guide', name: topics[0], next: `ds_guide("${topics[0]}")` }] : [];
     const results = [...out.slice(0, FIND_LIMIT - guideRow.length), ...guideRow];
 
-    const topics = [...new Set(raw.map((w) => GUIDE_WORDS[w]).filter(Boolean))];
     const next = out.length
       ? 'Next: ds_get with the names you will use (section "props" first); ds_tokens for a styling role.'
       : `Nothing matches "${q}". Try one plain word (card, table, date); ds_tokens for a token role; ${topics.length ? `ds_guide(${topics.map((t) => `"${t}"`).join(', ')})` : 'ds_guide for a guideline topic'}.`;

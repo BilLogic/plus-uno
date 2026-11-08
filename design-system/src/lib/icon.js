@@ -1,7 +1,7 @@
 /**
  * Regular is the default weight for a PLUS icon; solid is used only where Free
  * has no regular. Which names have a regular is generated from the Font Awesome
- * 7.2 metadata (`npm run generate:icon-regular-list`). An alias name (such as
+ * 7.2 metadata (`npm run generate:icon-lists`). An alias name (such as
  * `calendar-alt`) is not listed, so it draws solid: use the current name.
  */
 import { FREE_REGULAR_ICONS } from './icon-regular.generated';
