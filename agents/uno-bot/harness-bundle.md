@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **117,907 chars from 9 files**, against an assembled budget of 175,500 (57,593 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 97,523 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **117,957 chars from 9 files**, against an assembled budget of 175,500 (57,543 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 97,573 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,364 (−7,873 ide-only) | 10,364 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 28,845 | 39,238 | 20,000 (constitution) ⚠️ **over by 8,845** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,438 | 60,717 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 62,363 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 63,611 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 69,305 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 81,091 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 102,052 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 105,520 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 112,078 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 117,051 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 117,907 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 28,895 | 39,288 | 20,000 (constitution) ⚠️ **over by 8,895** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,438 | 60,767 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 62,413 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 63,661 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 69,355 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 81,141 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 102,102 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 105,570 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 112,128 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 117,101 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 117,957 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -270,11 +270,11 @@ _Avoid_: "resize handle", "drag bar"
 
 **Page**:
 The pattern for the main content area inside a **Frame**: it carries the page title and a body.
-_Avoid_: "surface"
+_Avoid_: "surface" as a name
 
 **Section**:
 The pattern for a span of the page grid that groups content, including **Card**s, under one heading with a `_Section header`. It can carry an optional `detail` region on its right that shows one record of its content: the body takes 7 of the **Page**'s 12 columns and the detail, a Section with a subtle fill, takes 5; the split holds from 960 and below that the detail replaces the list under a back link. A bare "Section" always means this pattern.
-_Avoid_: "block", "region"; "section" for a **Figma section** or a **Menu section**
+_Avoid_: "block" as a name, "region" as a name; "section" for a **Figma section** or a **Menu section**
 
 **Card**:
 The pattern for the container of one object, raised at rest with no border. Related cards group in a **Section**, one card level deep.
@@ -355,11 +355,11 @@ _Avoid_: "alert", "callout"
 
 **Toggle**:
 An on/off control that applies at once.
-_Avoid_: "switch"
+_Avoid_: "switch" as a name
 
 **Status tag**:
 A label that shows the state of one thing, with a color for its meaning.
-_Avoid_: "pill", "lozenge"
+_Avoid_: "pill" as a name, "lozenge"
 
 **Count tag**:
 A label that shows a number.

@@ -110,7 +110,6 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/figma/registry-load-gate.md`](design-system/guidelines/figma/registry-load-gate.md) | Agents MUST read both files below before |
 | [`design-system/guidelines/figma/token-mapping.md`](design-system/guidelines/figma/token-mapping.md) | For quick machine lookups, agents may read token-registry.json (read-only); use this doc for the authoritative tables, extended cases, and notes |
 | [`design-system/guidelines/foundations/accessibility.md`](design-system/guidelines/foundations/accessibility.md) | WCAG 2.1 AA is the minimum bar for all PLUS interfaces |
-| [`design-system/guidelines/foundations/border.md`](design-system/guidelines/foundations/border.md) | Border widths, the focus ring, and how they pair with color tokens |
 | [`design-system/guidelines/foundations/content/date-and-time.md`](design-system/guidelines/foundations/content/date-and-time.md) | How dates, times, durations, and time zones are written in the product |
 | [`design-system/guidelines/foundations/content/inclusive-language.md`](design-system/guidelines/foundations/content/inclusive-language.md) | Words to prefer and words to retire, so copy reads as written for everyone |
 | [`design-system/guidelines/foundations/content/language-and-grammar.md`](design-system/guidelines/foundations/content/language-and-grammar.md) | Active voice, contractions, sentence case, and the punctuation conventions product copy follows |
@@ -118,13 +117,11 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/foundations/content/overview.md`](design-system/guidelines/foundations/content/overview.md) | Product copy rules |
 | [`design-system/guidelines/foundations/content/voice-and-tone.md`](design-system/guidelines/foundations/content/voice-and-tone.md) | Warm, direct, encouraging |
 | [`design-system/guidelines/foundations/data-visualization.md`](design-system/guidelines/foundations/data-visualization.md) | A chart's foundations other than color come from the same component tokens as the rest of the design system |
-| [`design-system/guidelines/foundations/elevation.md`](design-system/guidelines/foundations/elevation.md) | Elevation creates visual hierarchy through shadows |
 | [`design-system/guidelines/foundations/iconography.md`](design-system/guidelines/foundations/iconography.md) | This design system uses FontAwesome Free icons via the string shorthand |
 | [`design-system/guidelines/foundations/illustrations.md`](design-system/guidelines/foundations/illustrations.md) | The PLUS characters, their sizes, and when an illustration earns its place |
 | [`design-system/guidelines/foundations/logos.md`](design-system/guidelines/foundations/logos.md) | The PLUS mark, its sizes, color options and clear space |
 | [`design-system/guidelines/foundations/motion.md`](design-system/guidelines/foundations/motion.md) | Motion tokens (three durations, three easings), patterns and reduced motion |
 | [`design-system/guidelines/foundations/overview.md`](design-system/guidelines/foundations/overview.md) | The fourteen foundations, in the order they are documented |
-| [`design-system/guidelines/foundations/radius.md`](design-system/guidelines/foundations/radius.md) | Corner radius: height ÷ 4 for controls, 6 and 4 for buttons, and container tokens |
 | [`design-system/guidelines/foundations/tokens.md`](design-system/guidelines/foundations/tokens.md) | Tokens — Overview & Decision Tree |
 | [`design-system/guidelines/foundations/typography.md`](design-system/guidelines/foundations/typography.md) | Text styles, type tokens and the text-style classes |
 | [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) | says where design knowledge lives |
@@ -223,6 +220,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-152 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+149 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

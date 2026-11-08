@@ -53,6 +53,39 @@ test('vocabularyFindings: an avoid-word in prose is named with its term; in code
   assert.deepEqual(vocabularyFindings('An alert or a report.', words), [], 'product avoid-words are not DS vocabulary');
 });
 
+test('avoidWords: a word avoided "as a name" carries the marker', () => {
+  const md = `${GLOSSARY}\n**Toggle**:\nAn on/off control.\n_Avoid_: "switch" as a name\n`;
+  assert.deepEqual(avoidWords(parseGlossary(md), [...NAMES, 'Toggle']).at(-1), { word: 'switch', term: 'Toggle', named: true });
+});
+
+test('vocabularyFindings: a word avoided "as a name" is flagged only where it names a thing, never in its ordinary sense', () => {
+  const words = [{ word: 'switch', term: 'Toggle', named: true }, { word: 'region', term: 'Section', named: true }];
+  const msgs = (t) => vocabularyFindings(t, words).map((f) => f.message.split(';')[0]);
+  // Ordinary English: a verb, an ARIA region, a toolbar control, a sentence-initial or labeled use.
+  assert.deepEqual(
+    msgs('Pick the mode and switch the page.\nThe editable region announces itself.\nFollow the **Color mode** switch in the toolbar.\nRegion names come first.\n1. **Region.** The scrolling wrapper.\n| Switch | on |\nSay "Region", "City".'),
+    [],
+  );
+  // Naming position: capitalized mid-sentence, or followed by component or pattern.
+  assert.deepEqual(msgs('Put it in a Region beside the list.\nUse the switch component here.\nThe region pattern groups cards.'), [
+    '"Region" is a glossary avoid-word',
+    '"switch" is a glossary avoid-word',
+    '"region" is a glossary avoid-word',
+  ]);
+});
+
+test('vocabularyFindings: an avoid-word inside a correct name is not a finding; a bare one still is', () => {
+  const words = [{ word: 'dropdown', term: 'Select' }];
+  const msgs = (t) => vocabularyFindings(t, words, { names: ['Dropdown menu', 'DropdownMenu'] }).map((f) => f.message.split(';')[0]);
+  assert.deepEqual(msgs('A dropdown menu opens a Menu.\nSee the [Dropdown menu](?path=x) page.\nUse DropdownMenu for actions.'), []);
+  assert.deepEqual(msgs('An inline Dropdown of statuses.\nLike any other dropdown.'), ['"Dropdown" is a glossary avoid-word', '"dropdown" is a glossary avoid-word']);
+});
+
+test('vocabularyFindings: a jargon avoid-word is flagged in any sense, lowercase and sentence-initial included', () => {
+  const words = [{ word: 'chip', term: 'Tag' }, { word: 'badge', term: 'Count tag' }];
+  assert.equal(vocabularyFindings('A filter chip takes the element layer.\nBadge shows 4.\nthe badge leaves the tab bare.', words).length, 3);
+});
+
 function fixtureRepo({ glossary = GLOSSARY, pages }) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-vocabulary-'));
   const write = (rel, text) => {

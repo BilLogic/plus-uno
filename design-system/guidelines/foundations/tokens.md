@@ -34,7 +34,7 @@ One plan (`scripts/lib/tokens/plan.mjs`'s `TOKEN_LADDER`, ADR-038), most general
 - [Color](../../src/styles/Colors.mdx) — Color roles, SMART framework, surfaces, interaction states
 - [Spacing](../../src/styles/Spacing.mdx) — Spacing on the four-tier ladder
 - [Typography](typography.md) — Font families, weights, classes, sizing
-- [Elevation](elevation.md) — Shadow depth tokens
+- [Elevation](../../src/styles/Elevation.mdx) — Shadow depth tokens
 
 
 ## Reading and binding tokens

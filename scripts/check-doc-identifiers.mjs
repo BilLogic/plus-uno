@@ -9,7 +9,7 @@
  * resolves to nothing. Three of those shipped and were hand-fixed in a single
  * day, 2026-08-25:
  *
- *   #78  elevation.md documented `--elevation-none/-sm/-md/-lg`. The real names
+ *   #78  the elevation guideline documented `--elevation-none/-sm/-md/-lg`. The real names
  *        are `--elevation-light-1..5`.                            (0c454cce)
  *   #79  the spacing guideline's token values contradicted _spacing_semantics.scss. (dbdcf099)
  *   #98  layout.md invented `--size-surface-container-pad-x-sm`.
