@@ -35,28 +35,28 @@
     },
     {
       "name": "card",
-      "token_scope": "--size-card-*",
+      "token_scope": "--card-*",
       "typical_locations": [
         "design-system/src/specs/*/Cards/"
       ]
     },
     {
       "name": "section",
-      "token_scope": "--size-section-*",
+      "token_scope": "--section-*",
       "typical_locations": [
         "design-system/src/specs/*/Sections/"
       ]
     },
     {
       "name": "table",
-      "token_scope": "--size-table-*",
+      "token_scope": "--table-*",
       "typical_locations": [
         "design-system/src/specs/*/Tables/"
       ]
     },
     {
       "name": "modal",
-      "token_scope": "--size-modal-*",
+      "token_scope": "--modal-*",
       "typical_locations": [
         "design-system/src/components/",
         "design-system/src/specs/*/Modals/"
@@ -78,9 +78,13 @@
     "spec": "Higher-level composition in design-system/src/specs."
   },
   "token_prefixes": [
-    "--color-*",
+    "--ds-*",
+    "--space-*",
     "--size-*",
-    "--font-*",
-    "--elevation-*"
+    "--pad-*",
+    "--stack-*",
+    "--inline-*",
+    "--heading-*",
+    "--body-*"
   ]
 }

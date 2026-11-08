@@ -42,10 +42,10 @@ When implementing a design from a Figma link, follow all 7 steps:
 
 | Figma | CSS Token |
 |-------|-----------|
-| `Primary/500` | `var(--color-primary)` |
-| `Display 1` | `var(--font-size-display1)` |
-| Spacing (contextual) | Pick by layer: `var(--size-card-pad-{x\|y}-{sm\|md\|lg})`, `var(--stack-{sm\|md\|lg})`, etc. There is no single `Spacing/N` → one token. |
-| Surface tokens | `var(--color-surface-*)` — use `-container` for elevated surfaces |
+| `color.background.brand.bold` | `var(--ds-background-brand-bold)` — every color variable, dots as dashes |
+| `Heading/large` | `var(--heading-large)` — every text style, as the `font` shorthand |
+| Spacing (contextual) | Pick by layer: `var(--card-pad-{compact\|default\|spacious})`, `var(--stack-{sm\|md\|lg})`, etc. There is no single `Spacing/N` → one token. |
+| Surface tokens | `var(--ds-surface)`, `-sunken`, `-raised`, `-overlay` — a raised or overlay surface pairs with its shadow |
 
 For the full token reference, load `design-system/agent-views/tokens/tokens.md` and `design-system/figma/token-registry.json`.
 

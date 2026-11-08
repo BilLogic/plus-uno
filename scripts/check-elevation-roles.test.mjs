@@ -1,25 +1,20 @@
 /**
- * The elevation mapping table, the retired-name record and the stylesheets
+ * The elevation mapping table, the elevation guideline and the stylesheets
  * must name the same shadow.
  *
- * WHY THIS EXISTS. `design-system/guidelines/figma/token-mapping.md` carries a
- * five-row table — Light/1 subtle, Light/2 clickable cards on hover or drag,
- * Light/3 floating layers, Light/4 legacy, Light/5 dialogs. The role layer
- * added for #268 once shipped `--surface-raised-shadow: var(--elevation-light-1)`,
- * answering "which shadow does a card get?" differently from that table, and
- * nothing noticed, because the two live in different file types and no check
- * read both.
+ * WHY THIS EXISTS. `design-system/guidelines/figma/token-mapping.md` and
+ * `foundations/elevation.md` say which surface and shadow each layer takes, and
+ * the stylesheets draw it. The two live in different file types, and a role
+ * once answered "which shadow does a card get?" differently from the table
+ * with nothing noticing, because no check read both.
  *
- * Levels 1-3 are now retired: every use moved to the generated shadow the
- * retired-name record gives them (`RETIRED_COLORS` in `scripts/lib/tokens/retire.mjs`).
- *
- * WHAT IS ASSERTED. A retired level's row names the shadow the record moved it
- * to, and a level still in code names itself. Both sides are parsed from
- * source, so this fails whichever side moves.
+ * WHAT IS ASSERTED. The mapping's overlay rows name the overlay pair for every
+ * floating layer, the guideline's hierarchy table agrees, and each surface
+ * below draws the shadow its row names.
  *
  * ─── WHAT IT DELIBERATELY CANNOT SEE ────────────────────────────────────────
  *
- *  1. WHETHER THE TABLE IS RIGHT. If Light/2 is the wrong shadow for a card,
+ *  1. WHETHER THE TABLE IS RIGHT. If the raised shadow is wrong for a card,
  *     this passes happily. It checks agreement, not judgment.
  *  2. COMPONENTS THAT USE A LEVEL DIRECTLY. The layers moved to the new color
  *     tokens name `--ds-shadow-overlay` with `--ds-surface-overlay` themselves;
@@ -42,49 +37,13 @@ import { fileURLToPath } from 'node:url';
 import * as sass from 'sass';
 import postcss from 'postcss';
 
-import { retiredTo } from './lib/tokens/retire.mjs';
-
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MAPPING = path.join(REPO_ROOT, 'design-system/guidelines/figma/token-mapping.md');
 
-/** `Elevation Light/4 (legacy) | var(--elevation-light-4)` → `{ level, uses, token }` per row. */
-export function mappingLevels(markdown) {
-  const rows = [];
-  for (const line of markdown.split('\n')) {
-    const match = /^\|\s*Elevation Light\/(\d)\s*\(([^)]*)\)\s*\|\s*`var\((--[a-z0-9-]+)\)`/.exec(line.trim());
-    if (match) rows.push({ level: Number(match[1]), uses: match[2], token: match[3] });
-  }
-  return rows;
-}
-
-const rows = mappingLevels(fs.readFileSync(MAPPING, 'utf8'));
-
-test('the mapping table is still parseable', () => {
-  // A table that stopped matching would make every assertion below vacuous —
-  // the shape of green that means nothing was checked at all.
-  assert.equal(rows.length, 5, `expected 5 elevation rows in token-mapping.md, parsed ${rows.length}`);
-});
-
-test('a retired level maps to the shadow its uses moved to; a live level maps to itself', () => {
-  for (const row of rows) {
-    const legacy = `--elevation-light-${row.level}`;
-    const expected = retiredTo(legacy) ?? legacy;
-    assert.equal(row.token, expected, `token-mapping.md maps Light/${row.level} ("${row.uses}") to ${row.token}, not ${expected}`);
-  }
-  assert.equal(rows.find((r) => /cards/i.test(r.uses))?.token, '--ds-shadow-raised', 'the cards row');
-  assert.equal(rows.find((r) => /floating layers/i.test(r.uses))?.token, '--ds-shadow-overlay', 'the floating-layers row');
-});
-
-test('modals and the migrated layers take the overlay pair, not a Light level', () => {
+test('modals and every floating layer take the overlay pair', () => {
   // Decision 3 of the color proposal: a modal sits at the overlay level, as
   // every floating layer does, and the blanket under it is what sets it apart
-  // from a menu. So no Light row may claim a modal or a migrated layer, and
-  // the mapping names the overlay pair for them instead. A Light/4 modal
-  // coming back is a reversal of that decision, not an edit to slip through.
-  const layers = /modals|menus|listboxes|popovers|tooltips|toasts/i;
-  for (const row of rows) {
-    assert.doesNotMatch(row.uses, layers, `token-mapping.md gives Light/${row.level} to "${row.uses}"; those layers take the overlay pair`);
-  }
+  // from a menu.
   const mapping = fs.readFileSync(MAPPING, 'utf8');
   for (const [half, token] of [['surface', '--ds-surface-overlay'], ['shadow', '--ds-shadow-overlay']]) {
     const row = mapping.split('\n').find((line) => new RegExp(`^\\|\\s*Overlay ${half}\\s*\\(`).test(line.trim()));
@@ -96,7 +55,7 @@ test('modals and the migrated layers take the overlay pair, not a Light level', 
   }
   for (const file of ['design-system/src/components/messaging/Modal/Modal.scss', 'design-system/src/patterns/PatternModal/PatternModal.scss']) {
     const source = fs.readFileSync(path.join(REPO_ROOT, file), 'utf8');
-    assert.doesNotMatch(source, /--elevation-light-[45]/, `${file} names a modal Light level; modals take the overlay pair`);
+    assert.match(source, /--ds-shadow-overlay/, `${file} does not take the overlay shadow`);
   }
 });
 

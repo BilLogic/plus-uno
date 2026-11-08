@@ -73,10 +73,9 @@
         color: var(--ds-text-subtle);
     }
 
-    // The × is the shared CloseButton. Its default tone is still on the legacy
-    // colors, so on the flag the glyph and its steps take the flag's own
-    // partners and flip with the surface in every mode; the ring is its own.
-    // Remove this override when CloseButton moves to the new color tokens.
+    // The × is the shared CloseButton. On the flag the glyph and its steps
+    // take the flag's own partners and flip with the surface in every mode;
+    // the ring is its own.
     .plus-close-btn:not(.plus-close-btn--inverse) {
         flex-shrink: 0;
         color: var(--ds-icon-subtle);

@@ -50,7 +50,7 @@ STATUS: WARN
 ```
 PLUS Review: prototypes/parent-dashboard/src
 ===
-  WARN  Found 5 lines with hardcoded hex colors (use var(--color-*) tokens)
+  WARN  Found 5 lines with hardcoded hex colors (use var(--ds-*) tokens)
     src/components/StatusBadge.jsx:8: color: '#ff4444'
     src/components/StatusBadge.jsx:12: color: '#44bb44'
     ...

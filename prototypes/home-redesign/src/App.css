@@ -431,7 +431,7 @@
     animation-delay: var(--progress-delay, 0ms);
 }
 
-/* Second row: full-width gray track, colored bar on top (legacy) */
+/* Second row: full-width gray track, colored bar on top */
 .home-redesign-breakdown-bar-wrap {
     width: 100%;
     height: 8px;

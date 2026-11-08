@@ -252,7 +252,7 @@ Styles.play = async ({ canvasElement }) => {
     };
 
     // The same mapping holds in dark and at more contrast: every ground and
-    // ink is a themed token, so a legacy light-only color fails here.
+    // ink is a themed token, so a light-only color fails here.
     await inEveryColorModeOf(canvasElement, async (mode, token) => {
         for (const [appearance, styles] of Object.entries(expected)) {
             for (const size of COUNT_TAG_SPACINGS) {

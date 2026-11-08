@@ -11,76 +11,12 @@
   "colorSpec": "design-system/src/tokens/color/figma-spec.json",
   "mappings": {
     "colors": {
-      "Primary / Primary 500": "var(--color-primary)",
-      "Primary Container": "var(--color-primary-container)",
-      "On Primary": "var(--color-on-primary)",
-      "Secondary": "var(--color-secondary)",
-      "Danger / Error": "var(--color-danger)",
-      "Success": "var(--color-success)",
-      "Warning": "var(--color-warning)",
-      "Info": "var(--color-info)",
-      "Surface": "var(--color-surface)",
-      "On Surface": "var(--color-on-surface)",
-      "On Surface Variant": "var(--color-on-surface-variant)",
-      "Outline": "var(--color-outline)",
-      "Outline Variant": "var(--color-outline-variant)",
+      "background.brand.bold": "var(--ds-background-brand-bold)",
       "Focus / Focus Ring": "var(--ds-border-focused)",
       "Focus / Focus Ring Inverse": "var(--ds-border-focused-inverse)",
-      "Element/opacity-disabled": "var(--ds-opacity-disabled)",
-      "Surface roles/surface-default": "var(--color-surface-default)",
-      "Surface roles/surface-sunken": "var(--color-surface-sunken)",
-      "Surface roles/surface-raised": "var(--color-surface-raised)",
-      "Surface roles/surface-overlay": "var(--color-surface-overlay)",
-      "Mastering Content": "var(--color-mastering-content)",
-      "Relationship": "var(--color-relationship)",
-      "Social Emotional": "var(--color-social-emotional)",
-      "Advocacy": "var(--color-advocacy)",
-      "Technology Tools": "var(--color-technology-tools)"
+      "Element/opacity-disabled": "var(--ds-opacity-disabled)"
     },
     "typography": {
-      "Display 1": [
-        "var(--font-size-display1)",
-        "var(--font-weight-display)",
-        "var(--font-line-height-display1)"
-      ],
-      "Display 2": [
-        "var(--font-size-display2)"
-      ],
-      "Display 3": [
-        "var(--font-size-display3)"
-      ],
-      "Display 4": [
-        "var(--font-size-display4)"
-      ],
-      "Headline (H1–H3)": [
-        "var(--font-size-h1)",
-        "var(--font-weight-headline)",
-        "var(--font-family-headline)"
-      ],
-      "Title (H4–H5)": [
-        "var(--font-weight-title)",
-        "var(--font-family-title)",
-        "var(--type-family-heading)",
-        "var(--type-weight-semibold)"
-      ],
-      "H1–H6": [
-        "var(--font-size-h1)",
-        "var(--font-size-h6)"
-      ],
-      "Body 1": [
-        "var(--font-size-body1)",
-        "var(--font-weight-body1-regular)"
-      ],
-      "Body 2": [
-        "var(--font-size-body2)"
-      ],
-      "Body 3": [
-        "var(--font-size-body3)"
-      ],
-      "Code": [
-        "var(--font-size-code)",
-        "var(--font-family-code)"
-      ],
       "Heading/xxlarge": [
         "var(--heading-xxlarge)"
       ],
@@ -158,24 +94,21 @@
       ]
     },
     "spacing": {
-      "Card padding": "var(--size-card-pad-{x|y}-{sm|md|lg})",
-      "Card gap": "var(--size-card-gap-{sm|md|lg})",
-      "Card radius": "var(--size-card-radius-{sm|md|full})",
+      "Card padding": "var(--card-pad-{compact|default|spacious})",
+      "Card gap": "var(--card-stack-{sm|md|lg})",
+      "Card radius": "var(--card-radius)",
       "Element padding": "var(--pad-x-{xs|sm|md|lg})",
       "Element gap": "var(--stack-{sm|md|lg})",
       "Element radius": "var(--radius-{sm|md|lg|full})",
-      "Modal padding": "var(--size-modal-pad-{x|y}-{sm|md|lg})",
-      "Section padding": "var(--size-section-pad-{x|y}-{sm|md|lg})",
-      "Surface padding": "var(--size-surface-pad-{x|y})",
-      "Table cell": "var(--size-table-cell-pad-{x|y})",
-      "Size roles": "var(--size-icon-md)"
+      "Modal padding": "var(--modal-pad-{x|y}-{compact|default|spacious})",
+      "Section padding": "var(--section-pad-{x|y}-{compact|default|spacious})",
+      "Page padding": "var(--page-pad-{x|y}-{compact|default|spacious})",
+      "Table cell": "var(--table-pad-x-cell)",
+      "Size roles": "var(--icon-md)"
     },
     "elevation": {
-      "Elevation Light/1 (subtle)": "var(--ds-shadow-raised)",
-      "Elevation Light/2 (clickable cards on hover or drag)": "var(--ds-shadow-raised)",
-      "Elevation Light/3 (floating layers)": "var(--ds-shadow-overlay)",
-      "Elevation Light/4 (legacy, unused)": "var(--elevation-light-4)",
-      "Elevation Light/5 (dialogs)": "var(--elevation-light-5)",
+      "Raised surface (cards)": "var(--ds-surface-raised)",
+      "Raised shadow (cards; a clickable card lifts to the overlay shadow on hover or drag)": "var(--ds-shadow-raised)",
       "Overlay surface (modals, menus, listboxes, popovers, tooltips, toasts, the floating sidebar)": "var(--ds-surface-overlay)",
       "Overlay shadow (modals, menus, listboxes, popovers, tooltips, toasts, the floating sidebar)": "var(--ds-shadow-overlay)"
     }

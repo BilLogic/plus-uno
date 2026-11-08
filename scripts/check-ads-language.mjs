@@ -127,7 +127,7 @@ function componentCount(text, name, { pattern }) {
 
 /**
  * Is this line shipped doc that names Atlassian? Every MDX line is; in code
- * only a non-comment line of a story is (its `docs` and `changelog` strings);
+ * only a non-comment line of a story is (its `docs` strings);
  * and an `atlassian.design` link is anywhere, because JSDoc flows into the
  * generated agent views.
  */

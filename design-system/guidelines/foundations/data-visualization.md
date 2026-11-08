@@ -88,10 +88,8 @@ chart's `animationDuration`-style prop should default to
 `CHART_ANIMATION_DURATION_MS` (exported from `chartTheme.js`), not a literal
 `900`/`1000`/`1200`; a prop still lets a caller opt into a different value.
 
-## Old names
+## Token checks
 
-None of `--element-*`, `--size-element-*` or `--layout-*` may appear anywhere
-under `design-system/src/dataviz/` — the ratchet stays at 0.
-`foundations.test.js` enforces it, alongside the token-fallback and
-literal-property checks above; `design-system/tests/dataviz-tokens.test.js`
-covers the equivalent ratchet for color.
+`foundations.test.js` holds `design-system/src/dataviz/` to the tier tokens,
+alongside the token-fallback and literal-property checks above;
+`design-system/tests/dataviz-tokens.test.js` does the same for color.

@@ -107,7 +107,7 @@ Styles.play = async ({ canvasElement }) => {
     const token = (name) => tokenColor(canvasElement, name);
 
     // The mapping holds in dark and at more contrast: every fill, text and
-    // edge is a themed token, so a legacy light-only color fails here.
+    // edge is a themed token, so a light-only color fails here.
     await inEveryColorModeOf(canvasElement, async (mode, themed) => {
         for (const size of STATUS_TAG_SPACINGS) {
             for (const [style, [fill, ink, edge]] of Object.entries(STATE_COLORS)) {

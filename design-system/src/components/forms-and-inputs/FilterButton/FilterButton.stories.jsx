@@ -12,9 +12,6 @@ export default {
     /** Hide CSF stories from the sidebar; docs live on FilterButton.mdx (Canvas still embeds them). */
     tags: ['!dev', '!autodocs', 'new'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'added', summary: 'Filter button: a filter\'s name with an optional `trailingMetric` count and chevron, `appearance` (default, subtle), `spacing`, `isSelected`, `isDisabled` and `isLoading`.' },
-        ],
         docs: { toc: { title: 'On this page' } },
     },
     argTypes: {

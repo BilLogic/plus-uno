@@ -12,10 +12,6 @@ export default {
     component: TextField,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'Text field replaces Input, Number input and Input group. It is 40 high, or 32 with `spacing="compact"`; `elemBeforeInput` and `elemAfterInput` take what the group addons did; `type="number"` adds the steppers.' },
-            { date: '2026-11-03', kind: 'added', summary: 'A warning message, with `border.warning` on the field.' },
-        ],
         docs: {
             description: {
                 component: 'A text field is an input that allows a user to write or edit text.'

@@ -32,9 +32,6 @@ export default {
     component: Tag,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'Props: `isRemovable`, `isSelected`, `isDisabled`, `onAfterRemoveAction`, `removeButtonLabel` and `trailingMetric`. A tag is a link with `href`, a toggle when `isSelected` is true or false, and read-only otherwise.' },
-        ],
         docs: {
             description: {
                 component:

@@ -115,7 +115,7 @@ Figma export → design-system/src/tokens/source/*.json → npm run generate:tok
   sit beside the old size files and generate
   `_scales.scss`. Each records `hiddenFromPublishing`, and its variables
   carry `scopes` and `codeSyntax`. A variable's `codeSyntax.WEB`
-  (`var(--element-pad-x-sm)`, in the export) is its CSS name, so the generator refuses a
+  (`var(--pad-x-sm)`, say) is its CSS name, so the generator refuses a
   variable without one instead of deriving a name.
 - The old `sync:tokens` Figma-pull script is deleted (ADR-038): it wrote to a
   `new tokens/` folder nothing read, and resolved only one alias level. These
@@ -131,7 +131,7 @@ Figma export → design-system/src/tokens/source/*.json → npm run generate:tok
   `CODE_ONLY_PRIMITIVES`, `CODE_ONLY_LAYOUT` and their neighbors in
   `scripts/generate-all-tokens.js`). The Info tokens are the one other case:
   `ALIASED_FAMILIES` writes every Info token as an alias of its Tertiary twin,
-  including `--color-info-border-subtle`, which Figma has no variable for. The
+  including its border-subtle token, which Figma has no variable for. The
   generator refuses to write when a constant has gone stale: an override Figma
   now agrees with, or a code-only name Figma now has
 - Token source is Figma; SCSS is generated output
@@ -146,8 +146,8 @@ another step changes `scripts/lib/color/semantics.mjs`, which every plan shares.
 The generator refuses to write while `check:color-system` fails.
 
 The harness checks that read color (`check:focus-ring`, `check:button-contrast`,
-`check:color-fallbacks`, `check:intent-roles`) accept `--ds-*` beside
-`--color-*`. The two that measure contrast, `check:focus-ring` and
+`check:color-fallbacks`, `check:intent-roles`) read the `--ds-*`
+tokens. The two that measure contrast, `check:focus-ring` and
 `check:button-contrast`, measure the LIGHT value only: a token's first
 definition is its light block. Dark and increased-contrast pairs are
 `check:color-system`'s, which holds every plan to them in all four modes.

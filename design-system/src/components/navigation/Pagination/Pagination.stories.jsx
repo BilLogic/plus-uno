@@ -10,10 +10,6 @@ export default {
     component: Pagination,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-04', kind: 'changed', summary: 'Pages and the Previous and Next controls are buttons, exposed as Pagination.Page and Pagination.Navigator, on named tokens. Spacing is default (32) or compact (24). The ellipsis is hidden from assistive technology and a disabled Navigator keeps its tab stop with aria-disabled.' },
-            { date: '2026-10-24', kind: 'changed', summary: 'A pressed page is the secondary 12 step and the current page the 16. Keyboard focus is the 2px focus ring inside the page with no fill; a pointer focus draws none.' },
-        ],
         docs: {
             description: {
                 component: 'Pagination for moving through paginated content: a Navigator to each side of a window of Page parts, on named tokens. Pages are buttons; the current one carries aria-current.'

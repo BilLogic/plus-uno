@@ -79,16 +79,16 @@ Use design tokens everywhere — never hardcode colors, spacing, typography, or 
 
 | Category | Correct | Incorrect |
 |----------|---------|-----------|
-| Color | `var(--color-primary)`, `var(--color-on-surface)` | `#3B82F6`, `rgba(0,0,0,0.1)` |
-| Spacing | `var(--size-card-pad-x-md)`, `var(--size-section-gap-lg)` | `16px`, `24px` |
-| Typography | `var(--font-size-body1)`, `var(--font-family-header)` | `14px`, `'Inter'` |
+| Color | `var(--ds-background-brand-bold)`, `var(--ds-text)` | `#3B82F6`, `rgba(0,0,0,0.1)` |
+| Spacing | `var(--card-pad-default)`, `var(--section-stack-lg)` | `16px`, `24px` |
+| Typography | `font: var(--body-default)`, `var(--type-family-heading)` | `14px`, `'Inter'` |
 | Elevation | `var(--ds-shadow-raised)` | `0 2px 4px rgba(0,0,0,0.1)` |
 
 **Real token examples:**
 
-- Spacing: `--pad-x-lg`, `--size-card-pad-x-md`, `--size-section-gap-lg`, `--size-modal-radius-lg`, `--size-surface-pad-x`
-- Color: `--color-primary`, `--color-on-primary`, `--color-surface`, `--color-surface-container`, `--color-danger`
-- Typography: `--font-family-header`, `--font-family-body`, `--font-size-h1`, `--font-weight-semibold-1`, `--font-line-height-body2`
+- Spacing: `--pad-x-lg`, `--card-pad-default`, `--section-stack-lg`, `--modal-radius`, `--page-pad-x-default`
+- Color: `--ds-background-brand-bold`, `--ds-text-inverse`, `--ds-surface`, `--ds-surface-sunken`, `--ds-text-danger`
+- Typography: `--heading-large`, `--body-default`, `--type-family-heading`, `--type-weight-medium`, `--font-size-0875`
 - Elevation: `--ds-shadow-raised`, `--ds-shadow-overlay`
 - Breakpoints: `--breakpoint-md-min`, `--breakpoint-lg-min`, `--breakpoint-xl-min`
 
