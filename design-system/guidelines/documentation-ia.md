@@ -78,11 +78,18 @@ spoken out loud.
 **The component page template.** Every component page has the same four faces, in this order:
 
 - **Examples:** one story per appearance, state and size, each as a `ComponentExample` (an h3 and a one-line description over the live canvas), then the interactive playground.
-- **Code:** generated. The import line (from the `@/components` barrel) and the props table, derived from the story meta, so neither is authored.
+- **Code:** generated. The import line (from the `@/components` barrel, `@/patterns` on a pattern page) and the props table, derived from the story meta, so neither is authored.
 - **Usage:** the Usage spine below, with parts (anatomy and tokens) and content guidelines after its Usage section.
 - **Agent view:** generated. The component's generated file, byte for byte — what agents read, with a raw-text view, Copy, and a "Report a problem" link that opens a GitHub issue. Author nothing for it: the page and the source are its inputs.
 
 `Button/Button.mdx` is the reference page.
+
+**Pattern pages take the same template.** A pattern in its own folder,
+`patterns/<Name>/<Name>.mdx`, has the same four faces, and its Agent view shows
+the `index.md` the generator writes beside it. A docs-only pattern page with no
+component of its own (Templates, Popups) has no generated file, so it shows
+Examples · Code · Usage. The flat reading pages directly under `patterns/`
+(Introduction, Heading outline) have no Usage spine and stay untabbed.
 
 **One generated file per component is the agent's whole answer.** Agents read
 `<Name>/index.md` (`<Name>.md` when filed flat), never the `.mdx`: one file per

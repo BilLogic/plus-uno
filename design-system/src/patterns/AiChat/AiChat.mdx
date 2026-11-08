@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as AiChatStories from './AiChat.stories.jsx';
@@ -16,6 +17,10 @@ import {
 AI chat sits beside the work or over it, whichever the task needs. One floating action button at the bottom right of the Page opens it as a popup. From there it moves to the Frame's Panel or to full screen, and the app remembers the mode for the tab.
 
 The examples on this page follow the **Color mode** switch in the toolbar.
+
+<DocsTabs of={AiChatStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/AiChat"
@@ -60,6 +65,14 @@ Full screen covers the window, so it is not drawn inline here. Under 768 the pop
 />
 
 </div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -232,3 +245,7 @@ Full screen gives long answers room. A docked Panel squeezes them.
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

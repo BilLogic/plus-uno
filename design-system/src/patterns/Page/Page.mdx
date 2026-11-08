@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PageStories from './Page.stories.jsx';
@@ -21,6 +22,10 @@ export const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--sta
 Page is a tokenized container with a fill, an elevation, a pad and a radius, and a slot for your content. A level is a fill and its shadow together, so a Page never wears one without the other. The frame draws its own content box the same way, and you can also use Page alone for any block that needs a level.
 
 The examples on this page follow the **Color mode** switch in the toolbar. In dark, a level gets lighter as it rises.
+
+<DocsTabs of={PageStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46582"
@@ -84,6 +89,14 @@ A Page has no interactive states. Hover, pressed and selected belong to the cont
 />
 
 </div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -221,3 +234,7 @@ Use the reading width for prose and the content width for grids and tables. A Pa
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

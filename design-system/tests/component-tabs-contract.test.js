@@ -23,6 +23,7 @@ import {
   TAB_IDS,
   componentIdentity,
   importLineFor,
+  importSourceFor,
   generatedDocPathFor,
   repoPathOfGlobKey,
   agentViewEntry,
@@ -109,9 +110,41 @@ describe('the tab contract', () => {
 
 });
 
+describe('which docs pages are tabbed', () => {
+  it('tabs every component page', () => {
+    expect(isTabbedDocsPage('design-system/src/components/messaging/Modal/Modal.mdx')).toBe(true);
+  });
+
+  it('tabs a pattern page in its own folder', () => {
+    expect(isTabbedDocsPage('design-system/src/patterns/PatternModal/PatternModal.mdx')).toBe(true);
+    expect(isTabbedDocsPage('./design-system/src/patterns/PageTemplates/PageTemplates.mdx')).toBe(true);
+  });
+
+  it('leaves the flat pattern reading pages and the foundations untabbed', () => {
+    expect(isTabbedDocsPage('design-system/src/patterns/Introduction.mdx')).toBe(false);
+    expect(isTabbedDocsPage('design-system/src/patterns/HeadingOutline.mdx')).toBe(false);
+    expect(isTabbedDocsPage('design-system/src/styles/Colors.mdx')).toBe(false);
+    expect(TABBED_EXCEPTIONS).toEqual([]);
+  });
+});
+
 describe('importLineFor', () => {
   it('names the component from the barrel, the only public import path', () => {
     expect(importLineFor('Button')).toBe("import { Button } from '@/components';");
+  });
+
+  it('names a pattern from the patterns barrel', () => {
+    const from = importSourceFor({ importPath: './design-system/src/patterns/PatternModal/PatternModal.stories.jsx' });
+    expect(from).toBe('@/patterns');
+    expect(importLineFor('PatternModal', from)).toBe("import { PatternModal } from '@/patterns';");
+    expect(importSourceFor({ importPath: './design-system/src/components/messaging/Modal/Modal.stories.jsx' })).toBe('@/components');
+    expect(importSourceFor(undefined)).toBe('@/components');
+  });
+
+  it('shows no import line on a docs-only pattern page, whose props are not its own export', () => {
+    const from = importSourceFor({ importPath: './design-system/src/patterns/PageTemplates/PageTemplates.stories.jsx' }, false);
+    expect(from).toBeNull();
+    expect(importLineFor('PageLayout', from)).toBeNull();
   });
 
   it('falls back to nothing when the meta carries no component', () => {
@@ -163,6 +196,13 @@ describe('the Agent view tab', () => {
     });
     expect(entry).toMatchObject({ path: PATTERN, name: 'PatternModal' });
     expect(entry.value).toBe(read(PATTERN));
+  });
+
+  it('is absent for a pattern page with no generated file beside it', () => {
+    expect(fs.existsSync(path.join(REPO_ROOT, 'design-system/src/patterns/PageTemplates/index.md'))).toBe(false);
+    expect(
+      agentViewEntry(modules, { importPath: './design-system/src/patterns/PageTemplates/PageTemplates.stories.jsx' }),
+    ).toBeNull();
   });
 
   it('is absent when the page has no generated file', () => {

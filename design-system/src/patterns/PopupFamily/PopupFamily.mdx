@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PopupFamilyStories from './PopupFamily.stories.jsx';
@@ -21,6 +22,10 @@ import {
 
 <Title />
 The Popups pattern is the set of floating layers that never block the page: Menu, Popup, Flag and Tooltip. They float with no blanket. A Menu and a Popup close on an outside click or Escape. A Flag closes on its timer or its Close button, and a Tooltip closes when hover or focus leaves its trigger. Each takes a fixed width tier. The examples on this page follow the toolbar's Color mode switch.
+
+<DocsTabs of={PopupFamilyStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19422-3043"
@@ -78,6 +83,14 @@ The Popups pattern is the set of floating layers that never block the page: Menu
 />
 
 </div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -243,3 +256,7 @@ A Popups-family layer never takes a blanket and never blocks the page.
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

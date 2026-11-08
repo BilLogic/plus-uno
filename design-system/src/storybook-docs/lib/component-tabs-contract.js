@@ -53,10 +53,17 @@ export const TABS = [
 ];
 
 /**
- * The docs pages that get a tab strip: every component, and any page named
- * here BY NAME. Foundations pages sit on the Foundation template, one reading
- * page with no faces to switch between, so the list is empty; adding a
- * page has to be a deliberate edit, not a heuristic that quietly widens.
+ * The docs pages that get a tab strip: every component, every pattern that
+ * has a folder of its own, and any page named here BY NAME. Foundations pages
+ * sit on the Foundation template, one reading page with no faces to switch
+ * between, so the list is empty; adding a page has to be a deliberate edit,
+ * not a heuristic that quietly widens.
+ *
+ * A pattern page is held by its PLACE, `patterns/<Name>/<Name>.mdx`, the same
+ * way a component page is: those pages carry the component page's Usage spine
+ * and props, and the generator writes their agent file beside them. The flat
+ * pages directly under `patterns/` (Introduction, Heading outline) are reading
+ * pages with no usage spine, so they stay untabbed.
  *
  * A rule is what the alternative would have to be, and there is none available:
  * all MDX pages in `design-system/src/` share the same `sb-ds-component-docs`
@@ -64,6 +71,8 @@ export const TABS = [
  * tell a component page from a foundation page.
  */
 export const TABBED_EXCEPTIONS = [];
+
+const PATTERNS_ROOT = 'design-system/src/patterns';
 
 /**
  * Whether a repo-relative MDX path is a docs page that gets a tab strip.
@@ -73,10 +82,10 @@ export const TABBED_EXCEPTIONS = [];
 export function isTabbedDocsPage(file) {
   const path = repoPath(file);
   if (TABBED_EXCEPTIONS.includes(path)) return true;
-  return path.startsWith(`${COMPONENTS_ROOT}/`) && path.endsWith('.mdx');
+  if (!path.endsWith('.mdx')) return false;
+  if (path.startsWith(`${COMPONENTS_ROOT}/`)) return true;
+  return path.startsWith(`${PATTERNS_ROOT}/`) && path.slice(PATTERNS_ROOT.length + 1).split('/').length === 2;
 }
-
-
 
 /** `Button.stories.jsx`, `Button.mdx` and `Button.jsx` all name the component `Button`. */
 const componentNameOf = (file) => file.replace(/\.(stories|test)\.[jt]sx?$/, '').replace(/\.(mdx|[jt]sx?)$/, '');
@@ -141,15 +150,36 @@ export function componentIdentity(entry) {
 
 
 /**
- * The import line the Code tab shows. Public components come from the
- * `@/components` barrel and never from a deep path.
+ * The barrel a docs page's component is imported from: `@/components` for a
+ * component page, `@/patterns` for a pattern page. Public code never imports
+ * from a deep path.
+ *
+ * A pattern page names its barrel only when the pattern is its own export,
+ * which is exactly when the generator wrote an agent file beside it. A
+ * docs-only pattern page (Templates, Popups) documents something else's props,
+ * PageLayout or none, so it shows the props table with no import line rather
+ * than an import that does not resolve.
+ *
+ * @param {{importPath?: string}} [entry] The page's meta entry.
+ * @param {boolean} [hasGeneratedDoc] Whether the page has an Agent view.
+ * @returns {'@/patterns' | '@/components' | null}
+ */
+export function importSourceFor(entry, hasGeneratedDoc = true) {
+  const file = entry && typeof entry.importPath === 'string' ? repoPath(entry.importPath) : '';
+  if (!file.startsWith(`${PATTERNS_ROOT}/`)) return '@/components';
+  return hasGeneratedDoc ? '@/patterns' : null;
+}
+
+/**
+ * The import line the Code tab shows, from the barrel that exports it.
  *
  * @param {string | undefined} name The component's export name.
- * @returns {string | null} The line, or null when the meta names no component.
+ * @param {string | null} [from] The barrel, as `importSourceFor` names it.
+ * @returns {string | null} The line, or null when there is no name or no barrel.
  */
-export function importLineFor(name) {
-  if (!name || typeof name !== 'string') return null;
-  return `import { ${name} } from '@/components';`;
+export function importLineFor(name, from = '@/components') {
+  if (!name || typeof name !== 'string' || !from) return null;
+  return `import { ${name} } from '${from}';`;
 }
 
 /**
