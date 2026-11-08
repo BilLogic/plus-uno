@@ -45,10 +45,10 @@ To look a name, prop, token or rule up without reading files, ask the `ds` comma
 **Start a page or a container from a pattern**: `PageLayout` (from `@/specs/Universal/Pages`) for every full page; `Frame`, `PatternSidebar`, `Page`, `PatternSection`, `PatternCard`, `PatternTable`, `PatternModal`, `PatternDrawer`, `Blanket` and `AiChat` from `@/patterns`; the Popups (`DropdownMenu`, `Popup`, `Flag`, `Tooltip`) from `@/components`. When to reach for each: `agent-views/components/index.md` § Patterns.
 
 **Build a page or dashboard**
-→ `agent-views/components/index.md` § Patterns (`PageLayout` and the Section, Card and Table shells, with their imports) → `composition/layout.md` → `composition/hierarchy.md` → `foundations/grid.md`
+→ `agent-views/components/index.md` § Patterns (`PageLayout` and the Section, Card and Table shells, with their imports) → `composition/layout.md` → `composition/hierarchy.md` → `src/styles/Grid.mdx`
 
 **Build a form**
-→ `composition/forms.md` → `agent-views/components/index.md` → `foundations/spacing.md`
+→ `composition/forms.md` → `agent-views/components/index.md` → `src/styles/Spacing.mdx`
 
 **Dialog, modal, drawer, card, table, empty or loading state**
 → `agent-views/components/index.md` § Patterns (the shell and its import) → `composition/surfaces.md`

@@ -12,7 +12,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
  *
  * Column widths come from the measured element, not the `--col-*` spans: those
  * are per viewport and assume the older 8 gutter, and a column is relative to
- * its container (grid.md, Grid rules), which moves when the sidebar docks.
+ * its container (the Grid foundation page, Two grids), which moves when the sidebar docks.
  */
 
 /** The page's blocks, in reading order: the content grid's children, top to bottom. */

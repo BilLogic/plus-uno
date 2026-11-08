@@ -75,7 +75,7 @@ export default function MyPageWithModal() {
 
 ## Applying spacing
 
-When filling in the content blocks, use only semantic CSS variables — the names are in `design-system/agent-views/tokens/tokens.md`, the scales in `../foundations/spacing.md`:
+When filling in the content blocks, use only semantic CSS variables — the names are in `design-system/agent-views/tokens/tokens.md`, the scales in `../../src/styles/Spacing.mdx`:
 *   `gap: 'var(--section-stack-md)'` -> Spacing between major page blocks (like two Cards).
 *   `gap: 'var(--card-stack-md)'` -> Spacing between elements inside a Card (like headers and text).
 *   Never use raw string pixels like `gap: '16px'`.
@@ -118,10 +118,10 @@ The content never drops under 720, so the Frame, not the page, decides what dock
 
 For a queue a person works through (Admin › Compliance, Admin › Reflections), give the Section a `detail` (`PatternSection`, `@/patterns`): the body is the list and takes 7 columns, the detail region, a subtle-fill Section, takes 5, with next and previous in its header. Pass `sectionDetail` to the Frame so opening the Panel collapses the Sidebar first and the split keeps 960 of content. Below 960 the detail replaces the list under a back link. Heavy work, such as the recording review, gets its own page: "Open full review" in the detail's footer.
 
-Column spans and breakpoint tokens: `../foundations/grid.md`.
+Column spans and breakpoint tokens: `../../src/styles/Grid.mdx`.
 
 ## Related
 
 - `surfaces.md` — cards, tables, modals, empty and loading states
 - `hierarchy.md` — the four context levels these skeletons compose
-- `../foundations/grid.md` — breakpoints and column spans
+- `../../src/styles/Grid.mdx` — breakpoints and column spans

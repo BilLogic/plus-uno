@@ -11,7 +11,7 @@
  *
  *   #78  elevation.md documented `--elevation-none/-sm/-md/-lg`. The real names
  *        are `--elevation-light-1..5`.                            (0c454cce)
- *   #79  spacing.md's token values contradicted _spacing_semantics.scss. (dbdcf099)
+ *   #79  the spacing guideline's token values contradicted _spacing_semantics.scss. (dbdcf099)
  *   #98  layout.md invented `--size-surface-container-pad-x-sm`.
  *
  * All three are the same defect: a name in prose with no referent in source. An

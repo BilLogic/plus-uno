@@ -15,8 +15,8 @@ topic, which today only `content/` does.
 | [tokens.md](tokens.md) | ✅ | Which semantic layer does this value come from? |
 | [accessibility.md](accessibility.md) | ✅ | What does WCAG 2.1 AA require here? |
 | [content/](content/overview.md) | ◐ | What does this button, error, or empty state say? |
-| [spacing.md](spacing.md) | ✅ | How much padding, margin, gap? |
-| [grid.md](grid.md) | ✅ | Breakpoints and column spans |
+| [Spacing.mdx](../../src/styles/Spacing.mdx) | ✅ | How much padding, margin, gap? |
+| [Grid.mdx](../../src/styles/Grid.mdx) | ✅ | Breakpoints and column spans |
 | [Colors.mdx](../../src/styles/Colors.mdx) | ✅ | Which color, and what does it mean? |
 | [typography.md](typography.md) | ✅ | Which type class and weight? |
 | [motion.md](motion.md) | ✕ | Duration, easing, what may animate |
