@@ -1,6 +1,6 @@
 ---
 embodiment: ide
-summary: The design-system lookup — the `ds` command and the local `plus-ds` MCP, five tools over the DS facts module, run from the checkout.
+summary: The design-system lookup — the `ds` command, the local `plus-ds` MCP run from the checkout, and the hosted read-only `/mcp/ds` door, five tools over the DS facts module.
 ---
 
 # Design-system lookup: `ds` and the `plus-ds` MCP
@@ -33,6 +33,7 @@ For people without the checkout, the same five tools are served over HTTPS by th
 
 - **It serves the released design system.** The function bundles the facts, guidelines and Storybook pages from the same commit the Storybook of that deploy is built from, and production deploys only on a release, so a client of the production URL sees the released system and a deploy preview serves its own branch.
 - **Read-only, behind a shared key.** Send the key as `Authorization: Bearer <key>` or as `x-ds-mcp-key: <key>`. A request without the right key gets 401, and so does every request while the key is not set. The key is the Netlify environment variable `DS_MCP_KEY` (`docs/engineering/setup.md`); ask the design-system owner for it. It is a team key, not a credential for anything else.
+- **The key is read on every request.** Rotate `DS_MCP_KEY` in Netlify and the next request uses it; no redeploy of the function's code is needed.
 - **`ds_check` takes code only.** The hosted server has no files of yours, so `paths` is not offered and a call that passes it is refused with a message saying so. Pass `code` and the `path` it would have (for its language and page rules). To check files, run the local server or `npm run check:ds-usage`.
 
 Add it to an MCP client (Claude Code reads `.mcp.json`; Cursor reads `.cursor/mcp.json`) with the key from an environment variable rather than written into the file:

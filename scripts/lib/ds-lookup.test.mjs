@@ -8,9 +8,16 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 
 import { REPO_ROOT } from './corpus.mjs';
-import { ORIENTATION, createLookup, render } from './ds-lookup.mjs';
+import { ORIENTATION, PATHS_REFUSAL, PathsRefused, createLookup, render } from './ds-lookup.mjs';
 
 const lookup = createLookup(REPO_ROOT);
+
+test('check refuses paths when built with readPaths off, and still checks code', () => {
+  const closed = createLookup(REPO_ROOT, { readPaths: false });
+  assert.throws(() => closed.check({ paths: ['package.json'] }), (err) => err instanceof PathsRefused && err.message === PATHS_REFUSAL);
+  assert.ok(Array.isArray(closed.check({ code: '<div />', path: 'prototypes/a.jsx' }).findings));
+  assert.doesNotThrow(() => createLookup(REPO_ROOT).check({ paths: ['package.json'] }));
+});
 
 test('find answers "card" with Card as not here and PatternCard with its import', () => {
   const { results, next } = lookup.find('card');

@@ -146,6 +146,7 @@ test('every check that scopes consumer code composes its roots from the facts mo
   for (const file of ['check-font-families.mjs', 'check-undefined-tokens.mjs']) {
     assert.deepEqual(await roots(file, 'ROOTS'), [LIBRARY_ROOT, STORYBOOK_ROOT, ...PROTOTYPE_ROOTS], file);
   }
+  assert.deepEqual((await import('./fallback-check.mjs')).SEARCH_ROOTS, [LIBRARY_ROOT, STORYBOOK_ROOT, ...PROTOTYPE_ROOTS]);
 });
 
 test('an unknown name is answered, not thrown', () => {

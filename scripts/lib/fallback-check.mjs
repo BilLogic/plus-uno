@@ -43,6 +43,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { TOKEN_DIR, tokenCorpus } from '../../design-system/src/lib/tokens-node.mjs';
+import { LIBRARY_ROOT, PROTOTYPE_ROOTS, STORYBOOK_ROOT } from './ds-facts.mjs';
 import { byRoot } from './findings.mjs';
 import { openRatchet } from './ratchet.mjs';
 import {
@@ -57,7 +58,7 @@ export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url
 
 /** Which of the tree is searched for USES. Where the tokens are is `TOKEN_DIR`. */
 export const SEARCHED = /\.(scss|css|jsx|tsx|mdx|html)$/;
-export const SEARCH_ROOTS = ['design-system/src', '.storybook', 'prototypes'];
+export const SEARCH_ROOTS = [LIBRARY_ROOT, STORYBOOK_ROOT, ...PROTOTYPE_ROOTS];
 
 /**
  * Every searched file under `SEARCH_ROOTS`, read: `{ path, text }`, path

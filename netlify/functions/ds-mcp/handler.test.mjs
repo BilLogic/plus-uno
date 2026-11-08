@@ -6,12 +6,12 @@ import path from 'node:path';
 import { REPO_ROOT } from '../../../scripts/lib/corpus.mjs';
 import { createLookup } from '../../../scripts/lib/ds-lookup.mjs';
 import { HOSTED_PATHS_REFUSAL, createServer } from '../../../scripts/lib/ds-mcp-server.mjs';
-import { createHandler } from './handler.mjs';
+import { MAX_BODY_BYTES, createHandler } from './handler.mjs';
 
 const KEY = 'test-key-123';
 const URL_ = 'https://x.test/mcp/ds';
-const lookup = createLookup(REPO_ROOT);
-const make = (...args) => createHandler({ key: args.length ? args[0] : KEY, createServer: () => createServer(REPO_ROOT, { hosted: true, lookup }) });
+const lookup = createLookup(REPO_ROOT, { readPaths: false });
+const make = (...args) => createHandler({ getKey: () => (args.length ? args[0] : KEY), createServer: () => createServer(REPO_ROOT, { hosted: true, lookup: () => lookup }) });
 
 const rpc = (method, params, headers = { authorization: `Bearer ${KEY}` }, id = 1) =>
   new Request(URL_, {
@@ -79,6 +79,28 @@ test('ds_check with paths is refused, and says why', async () => {
   assert.equal(out.isError, true);
   assert.equal(out.content[0].text, HOSTED_PATHS_REFUSAL);
   assert.match(out.content[0].text, /code only/i);
+});
+
+test('the key is read on every request, so a rotated key works at once', async () => {
+  let key = 'first';
+  const handler = createHandler({ getKey: () => key, createServer: () => createServer(REPO_ROOT, { hosted: true, lookup: () => lookup }) });
+  const as = (k) => rpc('tools/list', {}, { authorization: `Bearer ${k}` });
+  assert.equal((await handler(as('first'))).status, 200);
+  key = 'second';
+  assert.equal((await handler(as('first'))).status, 401);
+  assert.equal((await handler(as('second'))).status, 200);
+  key = '';
+  assert.equal((await handler(as('second'))).status, 401);
+});
+
+test('a body over the cap is refused 413, by header and by size, after auth', async () => {
+  const handler = make();
+  const big = JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'tools/list', params: { pad: 'x'.repeat(MAX_BODY_BYTES) } });
+  const send = (headers) => new Request(URL_, { method: 'POST', headers: { 'content-type': 'application/json', accept: 'application/json, text/event-stream', ...headers }, body: big });
+  assert.equal((await handler(send({ authorization: `Bearer ${KEY}` }))).status, 413);
+  assert.equal((await handler(send({ authorization: `Bearer ${KEY}`, 'content-length': '10' }))).status, 413);
+  assert.equal((await handler(send({}))).status, 401);
+  assert.equal((await handler(new Request(URL_, { method: 'POST', headers: { authorization: `Bearer ${KEY}`, 'content-type': 'application/json', 'content-length': String(MAX_BODY_BYTES + 1) }, body: '{}' }))).status, 413);
 });
 
 test('stateless: no session id is issued and a second request needs no session', async () => {

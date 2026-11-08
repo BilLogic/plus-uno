@@ -24,21 +24,47 @@ export const sameKey = (given, expected) => {
     return timingSafeEqual(a, b);
 };
 
+/** The largest request body served: a tool call is a few lines, so this is generous. */
+export const MAX_BODY_BYTES = 256 * 1024;
+
+/** The request body as text, or null when it is over `MAX_BODY_BYTES` (read as it arrives, not trusted from the header). */
+async function readCapped(req) {
+    if (Number(req.headers.get('content-length')) > MAX_BODY_BYTES) return null;
+    if (!req.body) return '';
+    const chunks = [];
+    let size = 0;
+    for await (const chunk of req.body) {
+        size += chunk.byteLength;
+        if (size > MAX_BODY_BYTES) return null;
+        chunks.push(chunk);
+    }
+    return Buffer.concat(chunks).toString('utf8');
+}
+
 /**
- * @param {{key?: string, createServer: () => import('@modelcontextprotocol/sdk/server/index.js').Server}} deps
- *   key: the shared key. Unset or empty refuses every request.
+ * @param {{getKey: () => string | undefined, createServer: () => import('@modelcontextprotocol/sdk/server/index.js').Server}} deps
+ *   getKey: the shared key, read on every request so a rotated key works at once. Unset or empty refuses every request.
  */
-export function createHandler({ key, createServer }) {
+export function createHandler({ getKey, createServer }) {
     return async (req) => {
         // Auth first, before the method or the body: an unauthenticated caller learns nothing else.
+        const key = getKey();
         if (!key || !sameKey(keyOf(req), key)) {
             return json(401, { error: 'unauthorized' }, { 'www-authenticate': 'Bearer' });
+        }
+        let parsedBody;
+        if (req.method === 'POST') {
+            const text = await readCapped(req);
+            if (text === null) return json(413, { error: 'request too large' });
+            try { parsedBody = JSON.parse(text); } catch {
+                return json(400, { jsonrpc: '2.0', error: { code: -32700, message: 'Parse error' }, id: null });
+            }
         }
         const server = createServer();
         const transport = new WebStandardStreamableHTTPServerTransport({ sessionIdGenerator: undefined, enableJsonResponse: true });
         try {
             await server.connect(transport);
-            return await transport.handleRequest(req);
+            return await transport.handleRequest(req, { parsedBody });
         } finally {
             await server.close().catch(() => {});
         }

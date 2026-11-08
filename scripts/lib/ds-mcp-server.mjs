@@ -13,7 +13,7 @@ import { Server } from '@modelcontextprotocol/sdk/server/index.js';
 import { CallToolRequestSchema, ListToolsRequestSchema } from '@modelcontextprotocol/sdk/types.js';
 
 import { REPO_ROOT } from './corpus.mjs';
-import { ORIENTATION, createLookup, render } from './ds-lookup.mjs';
+import { ORIENTATION, PATHS_REFUSAL, PathsRefused, createLookup, render } from './ds-lookup.mjs';
 
 export const INSTRUCTIONS = `${ORIENTATION}
 
@@ -79,9 +79,8 @@ export const TOOLS = [
   },
 ];
 
-/** What the hosted server says when `ds_check` is given `paths`: it never reads the caller's files, and has none of theirs. */
-export const HOSTED_PATHS_REFUSAL =
-  'The hosted ds_check checks code only: pass code (and path, the file name it would have). It does not read paths on the server. To check files, run the local plus-ds server or npm run check:ds-usage in the checkout.';
+/** What the hosted server says when `ds_check` is given `paths` (the lookup's refusal). */
+export const HOSTED_PATHS_REFUSAL = PATHS_REFUSAL;
 
 /** The tool as a hosted client sees it: `paths` is not offered, and the description says so. */
 function hostedTool({ name, description, inputSchema }) {
@@ -96,11 +95,15 @@ function hostedTool({ name, description, inputSchema }) {
 
 /**
  * @param {string} [root]  the repo root the facts are read from
- * @param {{hosted?: boolean, lookup?: object}} [options]
- *   hosted: read-only for callers who are not in the checkout; `ds_check` takes code, never paths.
- *   lookup: a lookup made earlier for this root, shared across servers (the facts load once).
+ * @param {{hosted?: boolean, lookup?: () => object}} [options]
+ *   hosted: read-only for callers who are not in the checkout; the tools it offers and the lookup it makes
+ *     leave `ds_check` code only, never paths.
+ *   lookup: a factory for a lookup owned by the caller and shared across servers (the facts load once).
+ *     Left out, this server makes its own on the first call.
  */
-export function createServer(root = REPO_ROOT, { hosted = false, lookup } = {}) {
+export function createServer(root = REPO_ROOT, { hosted = false, lookup: getLookup } = {}) {
+  let own;
+  const lookupFor = getLookup ?? (() => (own ??= createLookup(root, { readPaths: !hosted })));
   const server = new Server({ name: 'plus-ds', version: '1.0.0' }, { capabilities: { tools: {} }, instructions: INSTRUCTIONS });
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: TOOLS.map((tool) => (hosted ? hostedTool(tool) : { name: tool.name, description: tool.description, inputSchema: tool.inputSchema })),
@@ -108,13 +111,10 @@ export function createServer(root = REPO_ROOT, { hosted = false, lookup } = {}) 
   server.setRequestHandler(CallToolRequestSchema, async ({ params }) => {
     const tool = TOOLS.find((t) => t.name === params.name);
     if (!tool) return { isError: true, content: [{ type: 'text', text: `No tool ${params.name}. Tools: ${TOOLS.map((t) => t.name).join(', ')}.` }] };
-    if (hosted && tool.name === 'ds_check' && params.arguments?.paths?.length) {
-      return { isError: true, content: [{ type: 'text', text: HOSTED_PATHS_REFUSAL }] };
-    }
     try {
-      lookup ??= createLookup(root);
-      return { content: [{ type: 'text', text: render(tool.op, tool.call(lookup, params.arguments ?? {})) }] };
+      return { content: [{ type: 'text', text: render(tool.op, tool.call(lookupFor(), params.arguments ?? {})) }] };
     } catch (err) {
+      if (err instanceof PathsRefused) return { isError: true, content: [{ type: 'text', text: err.message }] };
       return { isError: true, content: [{ type: 'text', text: `${params.name} failed: ${err.message}` }] };
     }
   });

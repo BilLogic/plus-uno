@@ -5,7 +5,7 @@
  * parsing; every answer is made here, so the command and the MCP cannot
  * disagree.
  *
- *   createLookup(root)
+ *   createLookup(root, {readPaths})
  *     .find(query)               entry point: patterns, components, Figma names,
  *                                not-here names, tokens and icons, ranked
  *     .get(names, section?)      full records: props, usage, examples, a11y, figma
@@ -111,7 +111,19 @@ function sectionOf(text, heading) {
  *
  * @param {string} root  the repo root
  */
-export function createLookup(root) {
+/** What `check` says when it is built not to read paths (the hosted server): it never reads the caller's files, and has none of theirs. */
+export const PATHS_REFUSAL =
+  'The hosted ds_check checks code only: pass code (and path, the file name it would have). It does not read paths on the server. To check files, run the local plus-ds server or npm run check:ds-usage in the checkout.';
+
+/** Thrown by `check` for `paths` when `readPaths` is off; the message is `PATHS_REFUSAL`. */
+export class PathsRefused extends Error {
+  constructor() {
+    super(PATHS_REFUSAL);
+    this.name = 'PathsRefused';
+  }
+}
+
+export function createLookup(root, { readPaths = true } = {}) {
   const facts = loadFacts(root);
   const registry = JSON.parse(readIf(path.join(root, 'design-system/figma/component-registry.json')) ?? '{"components":{},"patterns":{}}');
   const records = facts.manifests.components.components;
@@ -390,6 +402,7 @@ export function createLookup(root) {
     if (typeof code === 'string' && code.trim()) {
       found = escapesIn({ path: file ?? 'prototypes/snippet.jsx', text: code }, contextOf(root));
     } else if (paths?.length) {
+      if (!readPaths) throw new PathsRefused();
       found = escapes(root, expandPaths(root, paths));
     } else {
       return { findings: [], next: 'Pass code (with a file name for its language) or paths.' };

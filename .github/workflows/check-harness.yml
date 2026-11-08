@@ -24,7 +24,8 @@ name: check:harness
 #      their tests in `test:scripts` can run at all. sass rides the same
 #      install, for the state-step and elevation tests that compile SCSS.
 #   3. `@modelcontextprotocol/sdk` and its tree, from the root lock, for the
-#      local design-system MCP server's spawn test. Its own step says how.
+#      design-system MCP server's tests: the local server's spawn test and the
+#      hosted function's handler test. Its own step says how.
 # This header read "EXACTLY ONE `npm ci`" and 34–38s until the second install
 # landed, and before that "NO `npm ci`, DELIBERATELY" for three weeks after the
 # first one did — a file arguing for a number forty lines above the step that
@@ -149,8 +150,9 @@ jobs:
             done
           done
 
-      # The third scoped install: the MCP SDK, for the spawn test of the local
-      # design-system MCP server in `test:scripts` (`scripts/ds.test.mjs`).
+      # The third scoped install: the MCP SDK, for the design-system MCP tests
+      # in `test:scripts`: the local server's spawn test (`scripts/ds.test.mjs`)
+      # and the hosted function's handler test (`netlify/functions/ds-mcp`).
       # Its tree holds two versions of one name (through express), so the flat
       # pin list above cannot carry it: `lock-closure.mjs --lock` writes the
       # root lock's own entries for its closure, nested paths kept, and
