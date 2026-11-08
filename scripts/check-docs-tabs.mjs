@@ -84,6 +84,7 @@ const MDX_ROOT = 'design-system/src';
 const USAGE_HEADINGS = new Set([
   'When to use',
   'Usage',
+  'Alternatives',
   'Content guidelines',
   'Accessibility',
   'Usage notes',

@@ -33,7 +33,7 @@ import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 
 import { ArgTypes, Markdown, useOf } from '@storybook/addon-docs/blocks';
 
 import { Button, CodeBlock, LinkButton } from '@/components';
-import { TABS, agentViewEntry, importLineFor, reportProblemUrl } from './lib/component-tabs-contract.js';
+import { TABS, agentViewEntry, agentViewMarkdown, agentViewSlug, importLineFor, reportProblemUrl } from './lib/component-tabs-contract.js';
 
 /**
  * Every generated agent file, through ONE raw glob (ADR-040), so no MDX page
@@ -177,8 +177,14 @@ function CodeTabPanel({ of, importName }) {
  * bytes themselves, and Copy puts them on the clipboard unchanged.
  *
  * The markdown renderer is Storybook's own `Markdown` docs block, already in the
- * docs bundle, so no package was added. It renders the file; it never edits it.
+ * docs bundle, so no package was added. It renders the file; the one change for
+ * reading is a rule heading's `{#rule-id}`, drawn as a quiet id label
+ * (`agentViewMarkdown`) and used as that heading's anchor (`agentViewSlug`).
+ * The raw view and Copy keep the bytes.
  */
+/** Only `slugify`: Storybook's block keeps its own overrides beside it. */
+const AGENT_VIEW_MARKDOWN = { slugify: agentViewSlug };
+
 function AgentViewPanel({ entry }) {
   const [text, setText] = useState(null);
   const [failed, setFailed] = useState(false);
@@ -245,7 +251,7 @@ function AgentViewPanel({ entry }) {
         <CodeBlock text={text} language="markdown" wrap showLineNumbers={false} />
       ) : (
         <div className="sb-ds-agent-view__rendered">
-          <Markdown>{text}</Markdown>
+          <Markdown options={AGENT_VIEW_MARKDOWN}>{agentViewMarkdown(text)}</Markdown>
         </div>
       )}
     </GeneratedTabBody>

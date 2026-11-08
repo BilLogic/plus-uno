@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **117,988 chars from 9 files**, against an assembled budget of 175,500 (57,512 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 97,604 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **117,873 chars from 9 files**, against an assembled budget of 175,500 (57,627 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 97,489 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,364 (−7,912 ide-only) | 10,364 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 28,926 | 39,319 | 20,000 (constitution) ⚠️ **over by 8,926** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,438 | 60,798 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 62,444 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 63,692 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 69,386 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 81,172 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 102,133 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 105,601 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 112,159 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 117,132 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 117,988 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 28,811 | 39,204 | 20,000 (constitution) ⚠️ **over by 8,811** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,438 | 60,683 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 62,329 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 63,577 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 69,271 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 81,057 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 102,018 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 105,486 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 112,044 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 117,017 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 117,873 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -285,8 +285,8 @@ The pattern for the layer that dims what sits behind it: full screen for a **Mod
 _Avoid_: "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
 
 **Modal**:
-The pattern for content that takes over the screen until it is closed: one at a time, so a follow-up decision swaps the same Modal's content for its confirm view. **Modal dialog** is the component built on it.
-_Avoid_: bare "modal" for the component, "stacked modals"
+The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, or opens as a second Modal stacked over it, up to the overlay limit `MAX_STACKED_OVERLAYS`. `Modal` is the component; `PatternModal` draws its shell inline.
+_Avoid_: "Modal dialog", "ModalDialog", "popup" for a blocking dialog
 
 **Drawer**:
 A PLUS pattern: a panel docked to one edge of the screen on a **Blanket**, for work that leaves the **Page** visible behind it.
@@ -322,10 +322,6 @@ _Avoid_: "data table", "interactive table"
 A table whose rows nest under parent rows.
 _Avoid_: "table tree", "nested table"
 
-**Modal dialog**:
-The component built on the **Modal** pattern, with a title, body, actions and a `view` of default or confirm. Its Close button is always shown.
-_Avoid_: "popup" for a blocking dialog, "ModalDialog" in prose
-
 **Popup**:
 A floating layer anchored to its trigger, closed by clicking outside: one member of the **Popover** pattern.
 _Avoid_: "popover", "inline dialog"
@@ -347,7 +343,7 @@ A form field for picking a value from a list of options.
 _Avoid_: "dropdown", "Dropdown menu" for a value picker
 
 **Close / Dismiss**:
-Close ends a blocking layer (**Modal dialog**, **Drawer**); Dismiss removes a message (Flag, Banner, Section message).
+Close ends a blocking layer (**Modal**, **Drawer**); Dismiss removes a message (Flag, Banner, Section message).
 
 **Flag**:
 A short message that appears at the screen corner and leaves on its own or on Dismiss.

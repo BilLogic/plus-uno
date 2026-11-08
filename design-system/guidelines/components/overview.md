@@ -50,7 +50,7 @@ benchmark for every page, so a name that matches it needs no row.
 | Splitter | Splitter | Same name; the draggable edge that resizes the docked Panel |
 | Blanket (pattern) | Blanket | Same name; here it also sets the width of what sits on it, in screen-grid columns |
 | Modal (pattern) | none | The pattern is the blanket plus a layer; ADS has only the dialog component |
-| ModalDialog (component) | Modal dialog | Built on the Modal pattern |
+| Modal (component) | Modal dialog | Built on the Modal pattern |
 | Status tag | Lozenge | Named for what it shows, a state, in the label family |
 | Count tag | Badge | Named for what it shows, a number, in the label family |
 | Tag | Tag | Same name and role |

@@ -129,8 +129,8 @@ The pattern for the layer that dims what sits behind it: full screen for a **Mod
 _Avoid_: "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
 
 **Modal**:
-The pattern for content that takes over the screen until it is closed: one at a time, so a follow-up decision swaps the same Modal's content for its confirm view. **Modal dialog** is the component built on it.
-_Avoid_: bare "modal" for the component, "stacked modals"
+The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, or opens as a second Modal stacked over it, up to the overlay limit `MAX_STACKED_OVERLAYS`. `Modal` is the component; `PatternModal` draws its shell inline.
+_Avoid_: "Modal dialog", "ModalDialog", "popup" for a blocking dialog
 
 **Drawer**:
 A PLUS pattern: a panel docked to one edge of the screen on a **Blanket**, for work that leaves the **Page** visible behind it.
@@ -166,10 +166,6 @@ _Avoid_: "data table", "interactive table"
 A table whose rows nest under parent rows.
 _Avoid_: "table tree", "nested table"
 
-**Modal dialog**:
-The component built on the **Modal** pattern, with a title, body, actions and a `view` of default or confirm. Its Close button is always shown.
-_Avoid_: "popup" for a blocking dialog, "ModalDialog" in prose
-
 **Popup**:
 A floating layer anchored to its trigger, closed by clicking outside: one member of the **Popover** pattern.
 _Avoid_: "popover", "inline dialog"
@@ -191,7 +187,7 @@ A form field for picking a value from a list of options.
 _Avoid_: "dropdown", "Dropdown menu" for a value picker
 
 **Close / Dismiss**:
-Close ends a blocking layer (**Modal dialog**, **Drawer**); Dismiss removes a message (Flag, Banner, Section message).
+Close ends a blocking layer (**Modal**, **Drawer**); Dismiss removes a message (Flag, Banner, Section message).
 
 **Flag**:
 A short message that appears at the screen corner and leaves on its own or on Dismiss.

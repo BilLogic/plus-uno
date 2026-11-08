@@ -166,9 +166,14 @@ test('gradeFindings: warnings everywhere, a stale marker always an error, a stri
   assert.deepEqual(gradeFindings(raw, { strict: true, enforce: true }).map((f) => f.severity), ['error', 'error']);
 });
 
-test('the strict list starts with Modal, and is not yet enforced in the gate', () => {
+test('the strict list starts with Modal, enforced in the gate', () => {
   assert.deepEqual(STRICT_PAGES, ['Modal']);
-  assert.equal(ENFORCE_STRICT, false);
+  assert.equal(ENFORCE_STRICT, true);
+});
+
+test('run: the committed Modal page passes every rule, strict', () => {
+  const modal = run({ enforceStrict: true }).filter((f) => /\/Modal\/Modal\.(mdx|stories\.jsx)$/.test(f.file ?? ''));
+  assert.deepEqual(modal, []);
 });
 
 // ── the whole check, over a fixture repo ───────────────────────────────────

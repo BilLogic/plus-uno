@@ -18,15 +18,18 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window.
 
 Use `Modal` when the next step has to happen before anything else can: a
 destructive confirmation, a short form that would derail the page, a detail view
-that the user will close and return from. It is the only messaging component
-that takes focus away from the page, so use it when interrupting is the point.
+the person closes and returns from. It is the one messaging component that takes
+focus from the page, so it fits when interrupting is the point.
 
 The footer is built in: pass `primaryButton` and `secondaryButton` as objects and
-the component renders the `Button` pair for you, aligned right. Pass `footer` for
-other actions, such as a Delete on the left or a single primary. Opening a modal
-closes a floating sidebar; a docked one stays.
+the component renders the `Button` pair, aligned right. Pass `footer` for other
+actions, such as a Delete on the left or a single primary. Opening a Modal
+closes a floating Sidebar; a docked one stays.
 
 ### Width guidance
+
+`width` takes a step of `MODAL_WIDTHS`: that
+many columns of the screen grid plus the modal pad.
 
 | Width | When to use |
 | --- | --- |
@@ -34,54 +37,66 @@ closes a floating sidebar; a docked one stays.
 | 8-col | A short form. 507 at 768, 677 at 1024, 848 from 1280. |
 | 10-col | A table or an editor. 629 at 768, 843 at 1024, 1056 from 1280. |
 
-The width grows with the screen, never shrinks, and ignores the sidebar. The
-height hugs its content up to the screen less 2 × 64 (2 × 24 under 640 tall);
-`height="fill"` sits at that cap.
+The width grows with the screen, never shrinks, and ignores the Sidebar. The
+height hugs its content up to the cap the Blanket sets
+(`--blanket-max-height-modal`); `height="fill"` sits at that cap.
 
 ## Content guidelines
 
 | Do | Don't |
 | --- | --- |
-| Title the modal with the action or decision: "Delete account?". | Use a vague title such as "Warning". |
+| Title the Modal with the action or decision: "Delete account?". | Use a vague title such as "Warning". |
 | Say what happens and whether it can be undone. | Hide the consequence in the body. |
 | Label buttons with verbs that match the title: "Delete", "Cancel". | Use "Yes" and "No". |
 
+## Alternatives
+
+- For a message the person only reads, use `SectionMessage` in the page or `Flag` at the screen corner.
+- For a task that takes more than a screen or has sections, use `PageLayout` with `frame="focused"`.
+- For a task that keeps the page in view, use `PatternDrawer`: a row's details, filters, a short edit.
+- For a small aside anchored to a control, use `Popup`.
+- For a list of actions or a value to pick, use `DropdownMenu` or `Select`.
+
 ## Best practices
 
-### Size the dialog to its content. {#size-the-dialog-to-its-content}
+### Size the Modal to its content with a step of `MODAL_WIDTHS`. {#size-the-modal-to-its-content-with-a-step-of-modalwidths}
 
-A short confirmation takes the narrowest width. Pick a grid `width`, never a
-number: a fixed width keeps one size on every screen.
+A short confirmation takes `6-col`, a short form `8-col`, a table or an editor
+`10-col`. A step grows with the screen; a fixed number keeps one size on every
+screen.
 
-Do: Six columns for a short question.
-Don't: Ten columns around one sentence.
+Do: The narrowest step for a short question.
+Don't: The widest step around one sentence.
 
-### Keep Close unless the dialog must be answered. {#keep-close-unless-the-dialog-must-be-answered}
+### Keep Close on a Modal unless the person has to answer it. {#keep-close-on-a-modal-unless-the-person-has-to-answer-it}
 
-Only a decision the person has to make removes the close button.
+An informational Modal keeps its close button; `showCloseButton={false}` is for
+a decision that has to be answered from the footer.
 
 Do: Close stays on an informational dialog.
 Don't: No way out of an informational dialog.
 
-### Use dividers when the body scrolls. {#use-dividers-when-the-body-scrolls}
+### Add `dividers` when the Modal body scrolls. {#add-dividers-when-the-modal-body-scrolls}
 
-The rules mark where the header and footer stay put.
+The rules mark where the header and footer stay put while the body scrolls; a
+short body reads cleaner without them.
 
 Do: Dividers around a scrolling body.
 Don't: Dividers around a short body.
 
-### Give the footer a button. {#give-the-footer-a-button}
+### Give the Modal footer a button. {#give-the-modal-footer-a-button}
 
-`showBottomButtons` defaults to true, but with no `primaryButton`,
-`secondaryButton` or `footer` the footer is not rendered, so the dialog ends
-with no way to confirm. Describe the actions as objects and the component
-renders the Button pair.
+`showBottomButtons` defaults to true, and the footer renders only when
+`primaryButton`, `secondaryButton` or `footer` is given; describe the actions as
+objects and the component renders the Button pair.
 
-### Confirm a follow-up decision in place, not in a new dialog. {#confirm-a-follow-up-decision-in-place-not-in-a-new-dialog}
+### Show a follow-up decision in the same Modal, or stack its confirm as a second Modal. {#show-a-follow-up-decision-in-the-same-modal-or-stack-its-confirm-as-a-second-modal}
 
-A dialog never opens another dialog. A follow-up decision, such as confirming a
-delete, swaps the same dialog's title, body and footer for the confirmation,
-and Back returns to the form without losing what was typed.
+The confirm view swaps the same Modal's title, body and footer, and Back returns
+to the form with what was typed. A confirm raised as a second Modal stacks over
+the first: at most `MAX_STACKED_OVERLAYS` overlays
+stack, a `PatternDrawer` counted among them, and one more stays closed and calls
+its `onClose`.
 
 ```jsx
 <Modal
@@ -97,17 +112,17 @@ and Back returns to the form without losing what was typed.
 
 ## Accessibility
 
-- **Escape and backdrop click are on by default.** `keyboard` and `backdrop`
-  both default to `true`. Turning either off leaves the header close button as
-  the only exit, so keep that button. The header, and its close button, is
-  left out only when the modal has no `title`, no `description`, no
+- **Escape and a press on the Blanket close the Modal by default.** `keyboard`
+  and `backdrop` both default to `true`. Turning either off leaves the close
+  button as the exit, so keep that button. The header, and its close button, is
+  left out only when the Modal has no `title`, no `description`, no
   `headerActions` and `showBottomButtons` is false.
 - **The close button is labeled `Close modal`**, hard-coded. Its icon is
   `aria-hidden`. `showCloseButton={false}` removes it; keep Escape or a footer
   action as a way out.
 - **The title is the dialog's h1 and its accessible name**, through
   `aria-labelledby`: the dialog reads as its own page. The `description`
-  describes it, through `aria-describedby`. A modal with no title takes
+  describes it, through `aria-describedby`. A Modal with no title takes
   `ariaLabel`.
 - **A body that scrolls is focusable.** Once the content runs past the cap, the
   body gets `tabIndex={0}` so a keyboard user can scroll it.
@@ -123,7 +138,7 @@ and Back returns to the form without losing what was typed.
 - **Focus order is Close, then the content, then the secondary action, then
   the primary action.**
 - **`renderAs="inline"` is for docs previews only.** It draws the panel with no
-  backdrop, no focus trap and no Escape, so a live dialog keeps the default
+  Blanket, no focus trap and no Escape, so a live dialog keeps the default
   `renderAs="modal"`.
 
 ## Props
@@ -176,9 +191,9 @@ From `design-system/src/components/messaging/Modal/Modal.scss`. Override these t
 
 ## Related
 
-- For a message the user only has to read, use `SectionMessage` or `Flag`.
-- For long content, use a page rather than a dialog: a modal traps focus, and scrolling inside one is hard to navigate.
-- For a menu or a picker, use `DropdownMenu` or `Select`.
+- `PatternModal`: use when a docs page or a mockup draws the Modal shell inline, with no focus trap.
+- `Blanket`: use when a new blocking layer needs the dimmed screen under it; `Modal` brings its own.
+- `PageLayout`: use when choosing between a Modal and a focused page; its Focused frame section weighs the two.
 
 Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `SectionMessage` · `Spotlight`
 

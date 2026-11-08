@@ -60,7 +60,7 @@ export default function MyPageWithModal() {
                 show={showModal}
                 onClose={() => setShowModal(false)}
                 title="Modal Title"
-                width={800} // Set explicit width if needed
+                width="8-col" // a step of MODAL_WIDTHS; 6-col is the default
             >
                 {/* ⬇️ YOUR MODAL CONTENT GOES HERE ⬇️ */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' }}>

@@ -2,7 +2,7 @@
 
 # CloseButton
 
-The one dismiss control for a surface that closes as a whole — Modal dialog, Section message, Flag. An Icon button, subtle, fixed to the × glyph. `label` is required: "Close" for a surface that blocks (Modal dialog), "Dismiss {what}" for a message. `tone="inverse"` is for colored or dark grounds, where the subtle appearance's own hover and pressed read as nearly invisible. There is no disabled state: a close control is always available.
+The one dismiss control for a surface that closes as a whole — Modal, Section message, Flag. An Icon button, subtle, fixed to the × glyph. `label` is required: "Close" for a surface that blocks (Modal), "Dismiss {what}" for a message. `tone="inverse"` is for colored or dark grounds, where the subtle appearance's own hover and pressed read as nearly invisible. There is no disabled state: a close control is always available.
 
 **Import:** `import { CloseButton } from '@/components';`
 

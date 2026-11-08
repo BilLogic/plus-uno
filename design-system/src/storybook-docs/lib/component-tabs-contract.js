@@ -231,3 +231,32 @@ export function reportProblemUrl(name, path) {
   const query = new URLSearchParams({ title, body });
   return `https://github.com/BilLogic/plus-uno/issues/new?${query.toString()}`;
 }
+
+/** A rule heading's trailing id, `{#rule-id}`, as the generated file writes it. */
+const RULE_ID = /^(#{1,6} .*?)[ \t]*\{#([a-z0-9-]+)\}[ \t]*$/gm;
+
+/**
+ * The generated file prepared for the rendered Agent view: each rule heading's
+ * `{#rule-id}` becomes a quiet id label under the heading text, so the reader
+ * sees the rule id agents cite without the literal braces. The raw view and
+ * Copy keep the file's own bytes; only this rendering changes.
+ *
+ * @param {string} text The generated file.
+ * @returns {string}
+ */
+export function agentViewMarkdown(text) {
+  return String(text).replace(RULE_ID, '$1 <span class="sb-ds-agent-view__rule-id">#$2</span>');
+}
+
+/**
+ * The heading anchor for the rendered Agent view: a rule heading's anchor is
+ * its rule id, the one agents cite; any other heading keeps the renderer's own.
+ *
+ * @param {string} heading The heading's source text.
+ * @param {(input: string) => string} fallback The renderer's own slug.
+ * @returns {string}
+ */
+export function agentViewSlug(heading, fallback) {
+  const id = String(heading).match(/class="sb-ds-agent-view__rule-id">#([a-z0-9-]+)</);
+  return id ? id[1] : fallback(heading);
+}

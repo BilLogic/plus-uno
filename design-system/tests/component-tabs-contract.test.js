@@ -27,6 +27,8 @@ import {
   repoPathOfGlobKey,
   agentViewEntry,
   reportProblemUrl,
+  agentViewMarkdown,
+  agentViewSlug,
 } from '../src/storybook-docs/lib/component-tabs-contract.js';
 
 describe('componentIdentity', () => {
@@ -179,5 +181,27 @@ describe('the Agent view tab', () => {
     expect([...url.searchParams.keys()].sort()).toEqual(['body', 'title']);
     expect(url.searchParams.get('title')).toContain('Modal');
     expect(url.searchParams.get('body')).toContain(MODAL);
+  });
+
+  it('renders a rule id as a label and leaves every other line as written', () => {
+    const text = '## Best practices\n\n### Give the footer a button. {#give-the-footer-a-button}\n\nBody with {braces}.\n';
+    expect(agentViewMarkdown(text)).toBe(
+      '## Best practices\n\n### Give the footer a button. <span class="sb-ds-agent-view__rule-id">#give-the-footer-a-button</span>\n\nBody with {braces}.\n',
+    );
+  });
+
+  it('renders every rule id in the Modal file and nothing else', () => {
+    const text = read(MODAL);
+    const ids = text.match(/\{#[a-z0-9-]+\}$/gm) ?? [];
+    expect(ids.length).toBeGreaterThan(0);
+    const rendered = agentViewMarkdown(text);
+    expect(rendered).not.toMatch(/\{#[a-z0-9-]+\}$/m);
+    expect(rendered.split('\n').length).toBe(text.split('\n').length);
+  });
+
+  it('anchors a rule heading at its rule id and leaves other headings to the renderer', () => {
+    const heading = agentViewMarkdown('### Give the footer a button. {#give-the-footer-a-button}').replace(/^### /, '');
+    expect(agentViewSlug(heading, () => 'fallback')).toBe('give-the-footer-a-button');
+    expect(agentViewSlug('Best practices', (s) => s.toLowerCase().replace(/ /g, '-'))).toBe('best-practices');
   });
 });

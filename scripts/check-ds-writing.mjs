@@ -65,7 +65,7 @@ const NAME = 'check:ds-writing';
 export const STRICT_PAGES = ['Modal'];
 
 /** The switch: true makes a strict page's finding fail `check:harness`. */
-export const ENFORCE_STRICT = false;
+export const ENFORCE_STRICT = true;
 
 export const RULES = ['usage-spine', 'alternatives-route', 'bare-number', 'stale-marker', 'props-parity'];
 const ALWAYS_ERROR = new Set(['stale-marker']);

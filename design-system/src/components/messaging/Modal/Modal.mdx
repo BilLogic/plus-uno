@@ -2,7 +2,8 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as ModalStories from './Modal.stories.jsx';
-import { Modal } from '@/components';
+import { Modal, MODAL_WIDTHS } from '@/components';
+import { MAX_STACKED_OVERLAYS } from '@/lib/overlay';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -130,15 +131,18 @@ The width examples are drawn at the 1024 screen.
 
 Use `Modal` when the next step has to happen before anything else can: a
 destructive confirmation, a short form that would derail the page, a detail view
-that the user will close and return from. It is the only messaging component
-that takes focus away from the page, so use it when interrupting is the point.
+the person closes and returns from. It is the one messaging component that takes
+focus from the page, so it fits when interrupting is the point.
 
 The footer is built in: pass `primaryButton` and `secondaryButton` as objects and
-the component renders the `Button` pair for you, aligned right. Pass `footer` for
-other actions, such as a Delete on the left or a single primary. Opening a modal
-closes a floating sidebar; a docked one stays.
+the component renders the `Button` pair, aligned right. Pass `footer` for other
+actions, such as a Delete on the left or a single primary. Opening a Modal
+closes a floating Sidebar; a docked one stays.
 
 ### Width guidance
+
+`width` takes a step of `MODAL_WIDTHS`{` (${MODAL_WIDTHS.join(' · ')})`}: that
+many columns of the screen grid plus the modal pad.
 
 <DocsTable>
 <thead>
@@ -151,9 +155,21 @@ closes a floating sidebar; a docked one stays.
 </tbody>
 </DocsTable>
 
-The width grows with the screen, never shrinks, and ignores the sidebar. The
-height hugs its content up to the screen less 2 × 64 (2 × 24 under 640 tall);
-`height="fill"` sits at that cap.
+The width grows with the screen, never shrinks, and ignores the Sidebar. The
+height hugs its content up to the cap the Blanket sets
+(`--blanket-max-height-modal`); `height="fill"` sits at that cap.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a message the person only reads, use `SectionMessage` in the page or `Flag` at the screen corner.
+- For a task that takes more than a screen or has sections, use `PageLayout` with `frame="focused"`.
+- For a task that keeps the page in view, use `PatternDrawer`: a row's details, filters, a short edit.
+- For a small aside anchored to a control, use `Popup`.
+- For a list of actions or a value to pick, use `DropdownMenu` or `Select`.
 
 </div>
 
@@ -162,10 +178,13 @@ height hugs its content up to the screen less 2 × 64 (2 × 24 under 640 tall);
 ## Parts
 
 1. **Blanket.** Dims the page and holds focus inside.
-2. **Header.** Title, optional description, header actions and the 32 close button.
+2. **Header.** Title, optional description, header actions and the close button.
 3. **Body.** Text or any content; scrolls when it overflows.
 4. **Footer.** Appears only when a button or `footer` is given: a secondary and a primary.
 5. **Dividers.** Optional rules under the header and over the footer.
+
+The tokens each part draws are read from `Modal.scss` and listed under Tokens
+touched in the Agent view tab.
 
 ### States
 
@@ -177,26 +196,9 @@ height hugs its content up to the screen less 2 × 64 (2 × 24 under 640 tall);
 <tr><td>Rest</td><td>Open, with the title naming the dialog.</td></tr>
 <tr><td>Hovered</td><td>The close button takes the subtle hovered step.</td></tr>
 <tr><td>Pressed</td><td>The close button takes the subtle pressed step.</td></tr>
-<tr><td>Focused</td><td>Focus moves in on open; the close button shows the 2px ring.</td></tr>
-<tr><td>Disabled</td><td>Not supported on the dialog; disable a footer button instead.</td></tr>
+<tr><td>Focused</td><td>Focus moves in on open; the close button shows the focus ring.</td></tr>
+<tr><td>Disabled</td><td>The dialog has no disabled state; disable a footer button instead.</td></tr>
 <tr><td>Loading</td><td>The body shows a skeleton and sets <code>aria-busy</code>.</td></tr>
-</tbody>
-</DocsTable>
-
-### Tokens
-
-<DocsTable>
-<thead>
-<tr><th>Part</th><th>Token</th></tr>
-</thead>
-<tbody>
-<tr><td>Surface</td><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code>, <code>--modal-radius</code></td></tr>
-<tr><td>Title, body</td><td><code>--heading-medium</code>, <code>--body-default</code>, <code>--ds-text</code>, <code>--ds-text-subtle</code></td></tr>
-<tr><td>Close</td><td><code>--ds-icon-subtle</code>, <code>--item-height-md</code>, <code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code>, <code>--ds-border-focused</code></td></tr>
-<tr><td>Dividers</td><td><code>--ds-border</code>, <code>--stroke-1</code></td></tr>
-<tr><td>Width</td><td><code>--grid-columns</code>, <code>--grid-gutter</code>, <code>--modal-pad-x-default</code></td></tr>
-<tr><td>Height</td><td><code>--blanket-max-height-modal</code></td></tr>
-<tr><td>Spacing</td><td><code>--modal-stack-md</code>, <code>--modal-inline-sm</code>, <code>--stack-md</code>, <code>--stack-sm</code></td></tr>
 </tbody>
 </DocsTable>
 
@@ -206,21 +208,23 @@ height hugs its content up to the screen less 2 × 64 (2 × 24 under 640 tall);
 
 ## Best practices
 
-### Size the dialog to its content.
+### Size the Modal to its content with a step of `MODAL_WIDTHS`.
 
-A short confirmation takes the narrowest width. Pick a grid `width`, never a
-number: a fixed width keeps one size on every screen.
+A short confirmation takes `6-col`, a short form `8-col`, a table or an editor
+`10-col`. A step grows with the screen; a fixed number keeps one size on every
+screen.
 
 <DoDontPair
     doExample={<div style={scaledScreen}><Modal show renderAs="inline" width="6-col" title="Remove this session?" body="The student is told it was canceled." secondaryButton={{ text: 'Cancel' }} primaryButton={{ text: 'Remove' }} onClose={() => {}} /></div>}
-    doCaption="Six columns for a short question."
+    doCaption="The narrowest step for a short question."
     dontExample={<div style={scaledScreen}><Modal show renderAs="inline" width="10-col" title="Remove this session?" body="The student is told it was canceled." secondaryButton={{ text: 'Cancel' }} primaryButton={{ text: 'Remove' }} onClose={() => {}} /></div>}
-    dontCaption="Ten columns around one sentence."
+    dontCaption="The widest step around one sentence."
 />
 
-### Keep Close unless the dialog must be answered.
+### Keep Close on a Modal unless the person has to answer it.
 
-Only a decision the person has to make removes the close button.
+An informational Modal keeps its close button; `showCloseButton={false}` is for
+a decision that has to be answered from the footer.
 
 <DoDontPair
     doExample={<div style={narrowScreen}><Modal show renderAs="inline" title="Session details" description="Monday, 4:00 PM" body="Algebra with Jordan, 45 minutes." primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
@@ -229,9 +233,10 @@ Only a decision the person has to make removes the close button.
     dontCaption="No way out of an informational dialog."
 />
 
-### Use dividers when the body scrolls.
+### Add `dividers` when the Modal body scrolls.
 
-The rules mark where the header and footer stay put.
+The rules mark where the header and footer stay put while the body scrolls; a
+short body reads cleaner without them.
 
 <DoDontPair
     doExample={<div style={shortCap}><Modal show renderAs="inline" dividers title="Session notes" body={longBody} primaryButton={{ text: 'Done' }} onClose={() => {}} /></div>}
@@ -240,18 +245,19 @@ The rules mark where the header and footer stay put.
     dontCaption="Dividers around a short body."
 />
 
-### Give the footer a button.
+### Give the Modal footer a button.
 
-`showBottomButtons` defaults to true, but with no `primaryButton`,
-`secondaryButton` or `footer` the footer is not rendered, so the dialog ends
-with no way to confirm. Describe the actions as objects and the component
-renders the Button pair.
+`showBottomButtons` defaults to true, and the footer renders only when
+`primaryButton`, `secondaryButton` or `footer` is given; describe the actions as
+objects and the component renders the Button pair.
 
-### Confirm a follow-up decision in place, not in a new dialog.
+### Show a follow-up decision in the same Modal, or stack its confirm as a second Modal.
 
-A dialog never opens another dialog. A follow-up decision, such as confirming a
-delete, swaps the same dialog's title, body and footer for the confirmation,
-and Back returns to the form without losing what was typed.
+The confirm view swaps the same Modal's title, body and footer, and Back returns
+to the form with what was typed. A confirm raised as a second Modal stacks over
+the first: at most `MAX_STACKED_OVERLAYS`{` (${MAX_STACKED_OVERLAYS})`} overlays
+stack, a `PatternDrawer` counted among them, and one more stays closed and calls
+its `onClose`.
 
 ```jsx
 <Modal
@@ -276,7 +282,7 @@ and Back returns to the form without losing what was typed.
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Title the modal with the action or decision: "Delete account?".</td><td>Use a vague title such as "Warning".</td></tr>
+<tr><td>Title the Modal with the action or decision: "Delete account?".</td><td>Use a vague title such as "Warning".</td></tr>
 <tr><td>Say what happens and whether it can be undone.</td><td>Hide the consequence in the body.</td></tr>
 <tr><td>Label buttons with verbs that match the title: "Delete", "Cancel".</td><td>Use "Yes" and "No".</td></tr>
 </tbody>
@@ -288,17 +294,17 @@ and Back returns to the form without losing what was typed.
 
 ## Accessibility
 
-- **Escape and backdrop click are on by default.** `keyboard` and `backdrop`
-  both default to `true`. Turning either off leaves the header close button as
-  the only exit, so keep that button. The header, and its close button, is
-  left out only when the modal has no `title`, no `description`, no
+- **Escape and a press on the Blanket close the Modal by default.** `keyboard`
+  and `backdrop` both default to `true`. Turning either off leaves the close
+  button as the exit, so keep that button. The header, and its close button, is
+  left out only when the Modal has no `title`, no `description`, no
   `headerActions` and `showBottomButtons` is false.
 - **The close button is labeled `Close modal`**, hard-coded. Its icon is
   `aria-hidden`. `showCloseButton={false}` removes it; keep Escape or a footer
   action as a way out.
 - **The title is the dialog's h1 and its accessible name**, through
   `aria-labelledby`: the dialog reads as its own page. The `description`
-  describes it, through `aria-describedby`. A modal with no title takes
+  describes it, through `aria-describedby`. A Modal with no title takes
   `ariaLabel`.
 - **A body that scrolls is focusable.** Once the content runs past the cap, the
   body gets `tabIndex={0}` so a keyboard user can scroll it.
@@ -314,7 +320,7 @@ and Back returns to the form without losing what was typed.
 - **Focus order is Close, then the content, then the secondary action, then
   the primary action.**
 - **`renderAs="inline"` is for docs previews only.** It draws the panel with no
-  backdrop, no focus trap and no Escape, so a live dialog keeps the default
+  Blanket, no focus trap and no Escape, so a live dialog keeps the default
   `renderAs="modal"`.
 
 </div>
@@ -323,9 +329,9 @@ and Back returns to the form without losing what was typed.
 
 ## Related
 
-- For a message the user only has to read, use `SectionMessage` or `Flag`.
-- For long content, use a page rather than a dialog: a modal traps focus, and scrolling inside one is hard to navigate.
-- For a menu or a picker, use `DropdownMenu` or `Select`.
+- `PatternModal`: use when a docs page or a mockup draws the Modal shell inline, with no focus trap.
+- `Blanket`: use when a new blocking layer needs the dimmed screen under it; `Modal` brings its own.
+- `PageLayout`: use when choosing between a Modal and a focused page; its Focused frame section weighs the two.
 
 </div>
 
