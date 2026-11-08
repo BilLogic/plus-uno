@@ -40,6 +40,7 @@
     "src/**/*.{js,jsx,tsx,scss,css}",
     "docs/engineering/ds-usage-rules.md",
     "node_modules/@fortawesome/fontawesome-free/metadata/icons.json",
+    "design-system/node_modules/@fortawesome/fontawesome-free/metadata/icons.json",
   ]
 
 [build.environment]
