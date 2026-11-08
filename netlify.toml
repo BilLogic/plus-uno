@@ -39,6 +39,7 @@
     "prototypes/**/*.{js,jsx,tsx,scss,css}",
     "src/**/*.{js,jsx,tsx,scss,css}",
     "docs/engineering/ds-usage-rules.md",
+    "GLOSSARY.md",
   ]
 
 [build.environment]

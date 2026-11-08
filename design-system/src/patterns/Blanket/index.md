@@ -4,6 +4,8 @@
 
 The full-screen layer that holds the blanket fill and a modal, so a modal is placed, not drawn. It fills with the blanket, pads 16 at the sides and 64 above and below, centers its child, and sits on the blanket layer (500) with its child on the modal layer (510). With `placement` `start` or `end` it drops the pad and holds its child full height at that edge of the screen, for a drawer. Modal, Drawer and the overlay Panel all draw this one Blanket, so the fill and the layer order are the same under each. The Panel's is `contained`: it covers its Frame, not the screen. It draws the layer only: it does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and blanket token; PatternDrawer brings its own focus handling.
 
+Also asked as: scrim.
+
 **Import:** `import { Blanket } from '@/patterns';`
 
 **Source:** `design-system/src/patterns/Blanket/Blanket.jsx`

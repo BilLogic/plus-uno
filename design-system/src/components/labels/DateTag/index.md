@@ -4,6 +4,8 @@
 
 An outlined label for a due or event date, such as "Due tomorrow". The app picks the appearance from how close the date is; it is never a button.
 
+Also asked as: date pill.
+
 **Import:** `import { DateTag } from '@/components';`
 
 **Source:** `design-system/src/components/labels/DateTag/DateTag.jsx`

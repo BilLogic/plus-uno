@@ -603,7 +603,10 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     };
   }
 
-  return { find, get, tokens, guide, check };
+  /** What the glossary's design-system sections add to `find`: aliases per component, and what was left out. */
+  const vocabulary = () => facts.vocabulary;
+
+  return { find, get, tokens, guide, check, vocabulary };
 }
 
 // ── text ──────────────────────────────────────────────────────────────────

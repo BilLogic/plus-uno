@@ -4,7 +4,7 @@
 
 Universal modal component for creating dialog windows that overlay the main content. It is a real dialog on Base UI's `Dialog`, placed in `Blanket`: opening it moves focus inside and keeps it there, the page behind is hidden from assistive tech and stops scrolling, Escape and a press on the blanket close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`) alongside `PatternDrawer`: at most two stack, a third stays closed and calls `onClose`. A follow-up about the dialog itself — "discard these edits?" — is best shown in place: the caller swaps `title`, `body` and the footer buttons, driven by its own state. A confirm raised as a second Modal is allowed too; it is the most that stacks.
 
-Also asked as: confirm, confirmation dialog, destructive confirm, popup window.
+Also asked as: confirm, confirmation dialog, destructive confirm, popup window, modal dialog.
 
 **Import:** `import { Modal } from '@/components';`
 

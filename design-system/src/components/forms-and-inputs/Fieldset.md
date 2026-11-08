@@ -4,6 +4,8 @@
 
 Fieldset — a legend plus the fields it groups. A thin, token-styled wrap around Base UI's Fieldset: `Root` renders the `<fieldset>`, `Legend` renders a `<div>` already wired to `aria-labelledby` the fieldset. `RadioGroup` builds on this; a "Checkbox group" is the same composition with `Checkbox` instead.
 
+Also asked as: field group.
+
 **Import:** `import { Fieldset } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/Fieldset.jsx`

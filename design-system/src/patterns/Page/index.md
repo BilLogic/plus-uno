@@ -4,6 +4,8 @@
 
 Bare tokenized content box: pick an elevation level, padding scale, radius scale and border — children fill the content slot. The level sets the fill and its shadow together: sunken (the frame's backdrop), default (the page, edged by the surface border), raised (a card) and overlay (anything over the UI). A Page can carry its `title`: the page's one h1, at Heading/large 24, above the content. Sections inside it open at h2.
 
+Also asked as: surface.
+
 **Import:** `import { Page } from '@/patterns';`
 
 **Source:** `design-system/src/patterns/Page/Page.jsx`

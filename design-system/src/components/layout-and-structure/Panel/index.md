@@ -4,7 +4,7 @@
 
 PanelContainer: the panel's own surface, at a fixed or the provider's width.
 
-Also asked as: right panel, detail panel, side pane.
+Also asked as: right panel, detail panel, side pane, right sidebar, inspector.
 
 > Implemented as `PanelContainer` in the source and exported as `Panel`. Import the exported name; read the source under the implementation name.
 

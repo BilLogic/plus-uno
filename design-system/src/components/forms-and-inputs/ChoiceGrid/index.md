@@ -4,6 +4,8 @@
 
 ChoiceGrid — the same question asked of several rows, as a table. Each cell is the real Checkbox or Radio, named by its row and its column.
 
+Also asked as: matrix question.
+
 **Import:** `import { ChoiceGrid } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.jsx`

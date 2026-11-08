@@ -4,7 +4,7 @@
 
 PatternSection: a span of the page grid under one heading, with its header, toolbar and tabs.
 
-Also asked as: page section, toolbar, section header.
+Also asked as: page section, toolbar, section header, block, region.
 
 **Import:** `import { PatternSection } from '@/patterns';`
 

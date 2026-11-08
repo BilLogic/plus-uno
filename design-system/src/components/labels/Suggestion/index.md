@@ -4,6 +4,8 @@
 
 Suggestion: a chip for a value or question the system proposes, which a person accepts or leaves.
 
+Also asked as: ai chip.
+
 **Import:** `import { Suggestion } from '@/components';`
 
 **Source:** `design-system/src/components/labels/Suggestion/Suggestion.jsx`

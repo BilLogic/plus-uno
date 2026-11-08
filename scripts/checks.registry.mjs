@@ -551,6 +551,14 @@ export const CHECKS = [
     guards: 'component docs pages holding the Usage spine and its writing rules; warns on every page, fails on a stale marker.',
   },
   {
+    name: 'check:ds-vocabulary',
+    script: 'node scripts/check-ds-vocabulary.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-ds-vocabulary.mjs',
+    guards: 'DS docs pages using glossary terms over avoid-words (warns; strict pages fail), and no avoid-word colliding with a DS name.',
+  },
+  {
     name: 'check:docs-token-literals',
     script: 'node scripts/check-docs-token-literals.mjs',
     pkg: 'root',

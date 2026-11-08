@@ -4,7 +4,7 @@
 
 Popup: a small panel of secondary content anchored to a control, text or a short list and never a form.
 
-Also asked as: popover, flyout.
+Also asked as: popover, flyout, inline dialog.
 
 **Import:** `import { Popup } from '@/components';`
 

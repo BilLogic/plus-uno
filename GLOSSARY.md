@@ -122,7 +122,7 @@ _Avoid_: "block", "region"; "section" for a **Figma section** or a **Menu sectio
 
 **Card**:
 The pattern for the container of one object, raised at rest with no border. Related cards group in a **Section**, one card level deep.
-_Avoid_: "tile" (Tile is its own component), "panel"
+_Avoid_: "tile" (Tile is its own component), "panel" (Panel is the Frame's right area)
 
 **Blanket**:
 The pattern for the layer that dims what sits behind it: full screen for a **Modal** or **Drawer**, which it also holds and sizes; under an **overlay** **Panel** it covers the **Page** and **Sidebar** but not the **Topbar**.
