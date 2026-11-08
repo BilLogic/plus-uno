@@ -2,9 +2,9 @@
  "with-aliases": {
   "authored": {
    "intent": {
-    "hit1": 20,
-    "hit3": 23,
-    "mrr": 0.56
+    "hit1": 27,
+    "hit3": 32,
+    "mrr": 0.76
    },
    "name": {
     "hit1": 6,
@@ -19,23 +19,23 @@
     "mrr": 1
    },
    "real-intent": {
-    "hit1": 22,
+    "hit1": 26,
     "hit3": 30,
-    "mrr": 0.82
+    "mrr": 0.88
    },
    "real-token": {
-    "hit1": 2,
-    "hit3": 3,
-    "mrr": 0.67
+    "hit1": 1,
+    "hit3": 1,
+    "mrr": 0.33
    }
   }
  },
  "no-aliases": {
   "authored": {
    "intent": {
-    "hit1": 20,
-    "hit3": 23,
-    "mrr": 0.56
+    "hit1": 27,
+    "hit3": 32,
+    "mrr": 0.76
    },
    "name": {
     "hit1": 6,
@@ -50,14 +50,14 @@
     "mrr": 1
    },
    "real-intent": {
-    "hit1": 22,
+    "hit1": 26,
     "hit3": 30,
-    "mrr": 0.82
+    "mrr": 0.88
    },
    "real-token": {
-    "hit1": 2,
-    "hit3": 3,
-    "mrr": 0.67
+    "hit1": 1,
+    "hit3": 1,
+    "mrr": 0.33
    }
   }
  }

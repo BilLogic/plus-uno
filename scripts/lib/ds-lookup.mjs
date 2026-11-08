@@ -15,6 +15,12 @@
  *   render(op, result)           the same answer as text
  *   ORIENTATION, TOOL_ORDER      what the server sends at connection
  *
+ * HOW FIND RANKS. An exact name first; then the not-here, Figma-name, token
+ * and icon lanes; components and patterns rank by field-weighted BM25 over
+ * their name, summary and the Usage and Best practices sections of their
+ * Storybook page (`ds-rank.mjs`). The index is built on the first find from
+ * the same files `get` reads, so there is no second copy to drift.
+ *
  * WHERE THE ANSWERS COME FROM. Names, imports, props and tokens are the facts
  * module's (`ds-facts.mjs`). Usage, examples and accessibility are the
  * component's authored Storybook page (the `.mdx` beside its source); the
@@ -31,6 +37,7 @@ import path from 'node:path';
 
 import { contextOf, escapes, expandPaths } from '../check-ds-usage.mjs';
 import { BARRELS, loadFacts } from './ds-facts.mjs';
+import { createRanker } from './ds-rank.mjs';
 import { RULES, RULES_DOC, docLink, escapesIn } from './ds-usage.mjs';
 
 export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check'];
@@ -92,6 +99,16 @@ const wordsOf = (q) =>
     .filter((w) => w.length > 1 && !STOP.has(w))
     .flatMap((w) => (w.length > 3 && w.endsWith('s') ? [w, w.slice(0, -1)] : [w]));
 
+/** Search scores for the ranked band: above a token or export word match, below a not-here word. */
+const BAND_FLOOR = 60;
+const BAND_SPAN = 19;
+/** Keep ranked hits within this share of the best one, so a long query does not drag in every weak match. */
+const BAND_SHARE = 0.18;
+const BAND_MIN = 0.6;
+const BAND_MAX = 8;
+/** A pattern that scores at all sits just above a component tied with it. */
+const PATTERN_LIFT = 0.3;
+
 /** One H2 section of a markdown or MDX file, without its layout wrappers. */
 function sectionOf(text, heading) {
   const lines = text.split('\n');
@@ -123,7 +140,8 @@ export class PathsRefused extends Error {
   }
 }
 
-export function createLookup(root, { readPaths = true } = {}) {
+/** `readPaths: false` is the hosted server's; `aliases: false` zeroes the alias field (the retrieval bench's second arm). */
+export function createLookup(root, { readPaths = true, aliases = true } = {}) {
   const facts = loadFacts(root);
   const registry = JSON.parse(readIf(path.join(root, 'design-system/figma/component-registry.json')) ?? '{"components":{},"patterns":{}}');
   const records = facts.manifests.components.components;
@@ -174,6 +192,24 @@ export function createLookup(root, { readPaths = true } = {}) {
 
   // ── find ────────────────────────────────────────────────────────────────
 
+  /** The ranker over every component and pattern, built on the first find. */
+  let ranker;
+  const rank = () => {
+    if (ranker) return ranker;
+    const docs = records.map((r) => {
+      const a = facts.lookup(r.name);
+      const mdx = mdxFor(a.source);
+      const text = mdx ? fs.readFileSync(mdx, 'utf8') : '';
+      const section = (h) => (sectionOf(text, h) ?? '').replace(/^## .*$/m, '').replace(/<[^>]+>/g, ' ');
+      return {
+        id: r.name,
+        fields: { name: r.name, aliases: [], summary: a.summary ?? '', usage: section('Usage'), best: section('Best practices'), related: section('Related') },
+      };
+    });
+    ranker = createRanker(docs, aliases ? {} : { aliases: 0 });
+    return ranker;
+  };
+
   function find(query) {
     const q = String(query ?? '').trim();
     const ql = q.toLowerCase();
@@ -194,11 +230,19 @@ export function createLookup(root, { readPaths = true } = {}) {
     };
     if (!q) return { query: q, results: [], next: 'Call ds_find with a task in words, a name or an alias; ds_guide() for the orientation.' };
 
-    for (const r of records) {
-      const a = facts.lookup(r.name);
-      const summaryHits = words.filter((w) => (a.summary ?? '').toLowerCase().includes(w)).length;
-      const score = nameScore(r.name) + Math.min(summaryHits * 6, 24) + (a.kind === 'pattern' ? 2 : 0);
-      hit(`name:${r.name}`, score > 2 ? score : 0, { kind: a.kind, name: r.name, status: 'exists', import: a.import, summary: firstSentence(a.summary), aliasOf: a.aliasOf });
+    const joined = ql.replace(/[\s-]+/g, '');
+    const item = (name) => {
+      const a = facts.lookup(name);
+      return { kind: a.kind, name, status: 'exists', import: a.import, summary: firstSentence(a.summary), aliasOf: a.aliasOf };
+    };
+    for (const r of records) if (r.name.toLowerCase() === ql || r.name.toLowerCase() === joined) hit(`name:${r.name}`, 100, item(r.name));
+    const ranked = rank()
+      .score(q)
+      .map((r) => ({ ...r, score: r.score + (facts.lookup(r.id).kind === 'pattern' ? PATTERN_LIFT : 0) }))
+      .sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : 1));
+    const top = ranked[0]?.score ?? 0;
+    for (const r of ranked.filter((x) => x.score >= Math.max(BAND_SHARE * top, BAND_MIN)).slice(0, BAND_MAX)) {
+      hit(`name:${r.id}`, BAND_FLOOR + (BAND_SPAN * r.score) / top, item(r.id));
     }
     const recorded = new Set(records.map((r) => r.name));
     for (const name of facts.barrels[BARRELS[0]]) {
