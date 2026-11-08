@@ -144,17 +144,16 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   }
 
   /*
-   * The record, through `scripts/lib/ratchet.mjs` (#600). Its exception map
-   * keys a rule to THE REASON ITSELF, which is the shape declared for it in
-   * `scripts/lib/ratchet-shapes.mjs` — so the module reports a recorded rule
-   * that is no longer invisible as stale, and a recorded rule whose reason says
-   * nothing as unreviewed. It is maintained BY HAND and offers no `--update`:
+   * The record, through `scripts/lib/ratchet.mjs` (#600). Each exception is a
+   * rule with the reason it stands, and the set requires one — so the module
+   * reports a recorded rule that is no longer invisible as stale, and a
+   * recorded rule whose reason says nothing as unreviewed. It is maintained BY HAND and offers no `--update`:
    * the bar here is zero, and a flag that recorded an invisible focus ring for
    * you would be the leisurely migration this check exists not to allow.
    */
   const gate = openRatchet({ file: RECORD, repoRoot });
   const under = invisible(rules);
-  const side = Object.fromEntries([...under.keys()].map((key) => [key, '']));
+  const side = [...under.keys()];
   if (gate.absent) return [...found, ...gate.failures(side).map(({ message }) => ({ message }))];
 
   found.push(

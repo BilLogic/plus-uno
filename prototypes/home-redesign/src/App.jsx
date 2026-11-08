@@ -60,7 +60,7 @@ const ShellLayout = () => {
 
 
     // Admin frame mode: 'focused' (900px, sidebar hidden) or 'desktop' (1280px, sidebar visible)
-    const [adminFrameMode, setAdminFrameMode] = useState('focused');
+    const [adminFrameMode] = useState('focused');
 
     // Dynamic config from child pages via context
     const [breadcrumbs, setBreadcrumbs] = useState([{ text: 'Home', href: '/home' }]);
@@ -171,11 +171,6 @@ const ShellLayout = () => {
                 contentDirect={contentDirect}
                 floatingContent={floatingContent}
                 sidebarHidden={isAdminRoute && adminFrameMode === 'focused'}
-                onSidebarToggle={(mode) => {
-                    if (isAdminRoute) {
-                        setAdminFrameMode(mode === 'expanded' ? 'desktop' : 'focused');
-                    }
-                }}
             >
                 <Outlet key={location.pathname} />
             </PageLayout>

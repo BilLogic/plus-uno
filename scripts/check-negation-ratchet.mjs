@@ -170,9 +170,8 @@
  * ── THE RECORD IS THE RATCHET MODULE'S (#601) ───────────────────────────────
  *
  * `scripts/lib/ratchet.mjs` owns the read, the direction, the absent-record
- * error mode and the `--update` write; the six sets this record declares — a
- * `counts` map and a `docs` FLOOR per scope — are surveyed one row each in
- * `scripts/lib/ratchet-shapes.mjs`. Three consequences worth knowing before
+ * error mode and the `--update` write; the record holds six sets — the counts
+ * per document and a `docs` FLOOR per scope. Three consequences worth knowing before
  * reading `compare`:
  *
  *   A SCOPE'S TOTAL IS SUMMED, never stored. The record held a `total` beside
@@ -188,8 +187,7 @@
  *   the ruler comparison below could be silenced by re-recording (#238).
  *
  *   A SCOPE THE RECORD DOES NOT HOLD is an UNREADABLE record and throws, rather
- *   than being reported per scope here. One stated error mode for twelve
- *   records, because a record read on a shape it does not have reads as EMPTY
+ *   than being reported per scope here: a record read wrong reads as EMPTY,
  *   and an empty baseline is a green ratchet.
  *
  * Usage:
@@ -204,10 +202,8 @@ import { byRoot, main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 
 /**
- * The record, named here because this is the check that reads it — and because
- * it is the key its shape is declared under in `scripts/lib/ratchet-shapes.mjs`
- * and the path `scripts/checks.registry.mjs` declares for this row. One
- * spelling, three readers.
+ * The record, named here because this is the check that reads it, and the
+ * path `scripts/checks.registry.mjs` declares for this row.
  */
 export const BASELINE = 'scripts/baselines/negation-baseline.json';
 
@@ -508,7 +504,7 @@ export function compare(measured, records) {
 
 /** One scope's recorded per-doc counts, as the record writes them. */
 const recordedCounts = (ratchet) =>
-  Object.fromEntries([...ratchet.entries].map(([key, entry]) => [key, entry.counts.get('count')]));
+  Object.fromEntries([...ratchet.entries].map(([key, entry]) => [key, entry.count]));
 
 /**
  * A scope's recorded total: the SUM of its per-doc counts, never a number
@@ -643,6 +639,7 @@ function recordBaseline(measured, repoRoot = REPO_ROOT) {
    * says so.
    */
   const seed = {
+    why: 'NOT a count of negative statements — see scripts/check-negation-ratchet.mjs § What is counted.',
     metric: {
       counts: METRIC,
       tokens: PROHIBITION_TOKENS,
@@ -652,12 +649,12 @@ function recordBaseline(measured, repoRoot = REPO_ROOT) {
       // them, which is how the old "frontmatter included" outlived being true
       // of the bundled half.
       measuredOn: 'outside quoted speech and code spans; how much of each file, per scope below',
-      note: 'NOT a count of negative statements — see scripts/check-negation-ratchet.mjs § What is counted.',
     },
   };
   for (const m of measured) {
     seed[`scopes.${m.scope.key}.corpus`] = m.scope.corpus;
     seed[`scopes.${m.scope.key}.measuredOn`] = m.scope.measuredOn;
+    seed[`sets.${m.scope.key}-corpus.direction`] = 'grow-only';
   }
 
   const opened = records(repoRoot);

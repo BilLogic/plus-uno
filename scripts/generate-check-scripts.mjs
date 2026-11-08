@@ -67,7 +67,6 @@ import {
 } from './checks.registry.mjs';
 import { isEntry, report } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
-import { shapeOf } from './lib/ratchet-shapes.mjs';
 import { reachOf } from './lib/script-reach.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -212,12 +211,6 @@ const manifestScripts = (pkg) =>
 // ---------------------------------------------------------------------------
 
 /**
- * The file the shape table is, so the reach walk does not take it as evidence.
- * It surveys ALL TWELVE records, so it names every one of them by construction.
- */
-const SHAPE_TABLE = 'scripts/lib/ratchet-shapes.mjs';
-
-/**
  * The check that still parses its own record, and the argument for naming it
  * here rather than letting a weaker assertion pass all twelve quietly.
  *
@@ -233,6 +226,8 @@ const SHAPE_TABLE = 'scripts/lib/ratchet-shapes.mjs';
  * record — and a row named here that has since migrated is itself a finding, so
  * the exemption cannot outlive the defect.
  */
+const REGISTRY_FILE = 'scripts/checks.registry.mjs';
+
 const PARSES_ITS_OWN_RECORD = new Map([
   [
     'check:storybook',
@@ -246,13 +241,10 @@ const PARSES_ITS_OWN_RECORD = new Map([
  * than by searching the owning script for a filename.
  *
  * THE RECORD'S SHAPE IS FREE THROUGH THE MODULE, so nothing here re-implements
- * a schema. `shapeOf` refuses a record it has no row for, and `openRatchet`
- * throws `UnreadableRecord` on a record that will not parse on the shape it
- * declares — including one whose declared container is missing or the wrong
- * type, which is the failure that would otherwise read as an EMPTY set and an
- * empty baseline is a green ratchet. Opening every declared set of every
- * declared record is therefore the whole of "the file is a well-formed ratchet
- * record", said in the module's own words.
+ * a schema: `openRatchet` throws on a set that will not read, which is the
+ * failure that would otherwise read as an EMPTY set, and an empty baseline is a
+ * green ratchet. Opening every set the record holds is the whole of "the file
+ * is a well-formed ratchet record".
  *
  * THE REACH, NOT THE FILE (#602). The question "does the check that declares
  * this record actually read it" used to be a basename search of the entry
@@ -267,14 +259,12 @@ const PARSES_ITS_OWN_RECORD = new Map([
  * names the file passes — which is the point, because the alternative is
  * eleven checks carrying a header line naming a file they no longer open.
  *
- * `--update` IS ASSERTED PER ROW, FROM THE SHAPE ROW'S `command`. Four of the
- * twelve declare `command: null` and offer no flag, correctly: their records
- * are maintained by hand because the value of an entry in them IS the argument
- * for it, and `check:button-contrast`'s own remedy ends "and never as a way to
- * make a new one quiet". An unconditional assertion would fail those four, and
- * "fixing" them would put a footgun on three checks whose bar is zero. So the
- * two directions are both asserted: a row with a command offers exactly the
- * flag that command ends in, and a row with `command: null` offers none.
+ * `--update` IS ASSERTED PER ROW, FROM ITS `update`. A row kept by hand
+ * declares none and offers no flag, correctly: the value of an entry in its
+ * record IS the argument for it, and a flag that recorded one would make a new
+ * finding quiet on a record whose bar is zero. So both directions are asserted:
+ * a row with an `update` offers exactly the flag it ends in, and a row without
+ * one offers none.
  *
  * WHAT IS NOT ASSERTED IS WHICH SLOT. #610 gave `main()` two — `flags` is
  * terminal, `fallThrough` prints and then still gates — and which one a flag
@@ -302,27 +292,18 @@ export function baselineFindings(
     return [{ message: `${row.name} declares baseline ${row.baseline}, which does not exist.` }];
   }
 
-  /** @type {import('./lib/ratchet-shapes.mjs').RatchetShape} */
-  let shape;
+  // Well-formedness, in the module's words: every set the record holds opens,
+  // or says why it cannot.
+  let sets = [];
   try {
-    shape = shapeOf(row.baseline);
+    sets = Object.keys(JSON.parse(fs.readFileSync(path.join(repoRoot, row.baseline), 'utf8')).sets ?? {});
   } catch (error) {
-    return [{ file: SHAPE_TABLE, message: error.message }];
+    found.push({ file: row.baseline, message: error.message });
   }
-  if (shape.check !== row.name) {
-    found.push({
-      file: SHAPE_TABLE,
-      message:
-        `${row.baseline} is surveyed as ${shape.check}'s record, but ${row.name} is the row ` +
-        'that declares it. One record, one owner, one spelling of the path.',
-    });
-  }
-
-  // Well-formedness, in the module's words: every declared set of the record
-  // opens, or says why it cannot.
-  for (const set of shape.sets) {
+  if (!sets.length) found.push({ file: row.baseline, message: `${row.baseline} records no \`sets\`.` });
+  for (const set of sets) {
     try {
-      openRatchet({ file: row.baseline, set: set.name, repoRoot });
+      openRatchet({ file: row.baseline, set, repoRoot });
     } catch (error) {
       found.push({ file: row.baseline, message: error.message });
     }
@@ -330,7 +311,7 @@ export function baselineFindings(
 
   const entry = /(scripts\/[\w.-]+\.(?:mjs|js))/.exec(row.script)?.[1];
   if (!entry || !fs.existsSync(path.join(repoRoot, entry))) return found;
-  const reach = reachOf(entry, { repoRoot, notEvidence: [SHAPE_TABLE] });
+  const reach = reachOf(entry, { repoRoot });
   const hops = `${entry} and the ${reach.files.length - 1} file(s) it imports`;
   const exempt = exemptions.get(row.name);
 
@@ -361,21 +342,21 @@ export function baselineFindings(
     });
   }
 
-  const flag = shape.command ? /(--[a-z][\w-]*)\s*$/.exec(shape.command)?.[1] : null;
-  if (shape.command && !flag) {
+  const flag = row.update ? /(--[a-z][\w-]*)\s*$/.exec(row.update)?.[1] : null;
+  if (row.update && !flag) {
     found.push({
-      file: SHAPE_TABLE,
+      file: REGISTRY_FILE,
       message:
-        `${row.name}'s record declares command ${JSON.stringify(shape.command)}, which ends in ` +
+        `${row.name} declares update ${JSON.stringify(row.update)}, which ends in ` +
         'no flag. It is the line a person is told to run to re-record; it ends in the flag.',
     });
   } else if (flag) {
-    const named = /^npm run ([\w:-]+)/.exec(shape.command)?.[1];
+    const named = /^npm run ([\w:-]+)/.exec(row.update)?.[1];
     if (named && manifest[named] === undefined) {
       found.push({
-        file: SHAPE_TABLE,
+        file: REGISTRY_FILE,
         message:
-          `${row.name}'s record says to run ${JSON.stringify(shape.command)}, but no ${named} ` +
+          `${row.name} says to run ${JSON.stringify(row.update)}, but no ${named} ` +
           'script exists to run. A remedy nobody can type is worse than none.',
       });
     }
@@ -383,7 +364,7 @@ export function baselineFindings(
       found.push({
         file: entry,
         message:
-          `${row.name}'s record is re-recorded with ${JSON.stringify(shape.command)}, but ` +
+          `${row.name} is re-recorded with ${JSON.stringify(row.update)}, but ` +
           `nothing in ${hops} offers ${flag} — in either of main()'s flag slots or off argv. ` +
           'The table is telling a reader to type a flag the check ignores.',
       });
@@ -392,9 +373,9 @@ export function baselineFindings(
     found.push({
       file: entry,
       message:
-        `${row.baseline} is surveyed with \`command: null\` — maintained by hand — yet ` +
+        `${row.name} declares no update — its record is kept by hand — yet ` +
         `${hops} offers --update in its ${reach.slotOf('--update')} slot. Either the record has ` +
-        'a re-record line and the table should say so, or the check is offering a way to make ' +
+        'a re-record line and the row should say so, or the check is offering a way to make ' +
         'a new finding quiet on a record whose bar is zero.',
     });
   }

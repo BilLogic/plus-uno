@@ -1,34 +1,96 @@
 {
   "why": "Reads of a numbered primitive (--space-<n>, --radius-<n>, --size-<n>, --stroke-<n>) in design-system/src/components and design-system/src/patterns, per file. The record only falls. Regenerate with `npm run check:no-primitive-reads -- --update`; never edit by hand.",
-  "counts": {
-    "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss": 8,
-    "design-system/src/components/forms-and-inputs/Comment/Comment.scss": 11,
-    "design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.scss": 1,
-    "design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss": 1,
-    "design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.scss": 1,
-    "design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss": 1,
-    "design-system/src/components/forms-and-inputs/Radio/Radio.scss": 7,
-    "design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.scss": 2,
-    "design-system/src/components/forms-and-inputs/Range/Range.scss": 1,
-    "design-system/src/components/forms-and-inputs/Rating/Rating.scss": 1,
-    "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss": 4,
-    "design-system/src/components/forms-and-inputs/Select/Select.scss": 1,
-    "design-system/src/components/forms-and-inputs/TagInput/TagInput.scss": 2,
-    "design-system/src/components/forms-and-inputs/_internal/Calendar.scss": 2,
-    "design-system/src/components/forms-and-inputs/_internal/FieldBox.scss": 2,
-    "design-system/src/components/images-and-icons/UserAvatar/UserAvatar.scss": 1,
-    "design-system/src/components/labels/AiLabel/AiLabel.scss": 3,
-    "design-system/src/components/labels/CountTag/CountTag.scss": 1,
-    "design-system/src/components/labels/Tag/Tag.scss": 2,
-    "design-system/src/components/layout-and-structure/PageHeader/PageHeader.scss": 3,
-    "design-system/src/components/layout-and-structure/Panel/Panel.scss": 10,
-    "design-system/src/components/messaging/Modal/Modal.scss": 2,
-    "design-system/src/components/messaging/Spotlight/Spotlight.scss": 14,
-    "design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss": 4,
-    "design-system/src/components/text-and-data-display/Table/Table.scss": 2,
-    "design-system/src/patterns/PageTemplates/PageTemplateExamples.jsx": 6,
-    "design-system/src/patterns/PatternModal/PatternModal.scss": 1,
-    "design-system/src/patterns/PatternSection/PatternSection.scss": 1,
-    "design-system/src/patterns/PatternTable/PatternTable.scss": 1
+  "sets": {
+    "main": {
+      "entries": {
+        "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.scss": {
+          "count": 8
+        },
+        "design-system/src/components/forms-and-inputs/Comment/Comment.scss": {
+          "count": 11
+        },
+        "design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.scss": {
+          "count": 1
+        },
+        "design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss": {
+          "count": 1
+        },
+        "design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.scss": {
+          "count": 1
+        },
+        "design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss": {
+          "count": 1
+        },
+        "design-system/src/components/forms-and-inputs/Radio/Radio.scss": {
+          "count": 7
+        },
+        "design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.scss": {
+          "count": 2
+        },
+        "design-system/src/components/forms-and-inputs/Range/Range.scss": {
+          "count": 1
+        },
+        "design-system/src/components/forms-and-inputs/Rating/Rating.scss": {
+          "count": 1
+        },
+        "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss": {
+          "count": 4
+        },
+        "design-system/src/components/forms-and-inputs/Select/Select.scss": {
+          "count": 1
+        },
+        "design-system/src/components/forms-and-inputs/TagInput/TagInput.scss": {
+          "count": 2
+        },
+        "design-system/src/components/forms-and-inputs/_internal/Calendar.scss": {
+          "count": 2
+        },
+        "design-system/src/components/forms-and-inputs/_internal/FieldBox.scss": {
+          "count": 2
+        },
+        "design-system/src/components/images-and-icons/UserAvatar/UserAvatar.scss": {
+          "count": 1
+        },
+        "design-system/src/components/labels/AiLabel/AiLabel.scss": {
+          "count": 3
+        },
+        "design-system/src/components/labels/CountTag/CountTag.scss": {
+          "count": 1
+        },
+        "design-system/src/components/labels/Tag/Tag.scss": {
+          "count": 2
+        },
+        "design-system/src/components/layout-and-structure/PageHeader/PageHeader.scss": {
+          "count": 3
+        },
+        "design-system/src/components/layout-and-structure/Panel/Panel.scss": {
+          "count": 10
+        },
+        "design-system/src/components/messaging/Modal/Modal.scss": {
+          "count": 2
+        },
+        "design-system/src/components/messaging/Spotlight/Spotlight.scss": {
+          "count": 14
+        },
+        "design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss": {
+          "count": 4
+        },
+        "design-system/src/components/text-and-data-display/Table/Table.scss": {
+          "count": 2
+        },
+        "design-system/src/patterns/PageTemplates/PageTemplateExamples.jsx": {
+          "count": 6
+        },
+        "design-system/src/patterns/PatternModal/PatternModal.scss": {
+          "count": 1
+        },
+        "design-system/src/patterns/PatternSection/PatternSection.scss": {
+          "count": 1
+        },
+        "design-system/src/patterns/PatternTable/PatternTable.scss": {
+          "count": 1
+        }
+      }
+    }
   }
 }

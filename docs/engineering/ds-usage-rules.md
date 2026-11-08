@@ -22,9 +22,9 @@ Rules at level **fail** block; rules at level **warn** print and let the run pas
 
 ## ds/no-unknown-component
 
-**fail.** A name imported from `@/components` that the barrel does not export, or `<DS.Name>` through a namespace import of it.
+**fail.** A name imported from a public barrel (`@/components`, `@/patterns`, or `@/specs/Universal/Pages` for `PageLayout`) that the barrel does not export, or `<DS.Name>` through a namespace import of one. A real component or pattern imported from the wrong barrel fails too, and its fix is the import line it belongs on.
 
-Write a component listed in `design-system/agent-views/components/index.md`. When none fits, propose a new component instead of naming one.
+Write a component or pattern listed in `design-system/agent-views/components/index.md`. When none fits, propose a new component instead of naming one.
 
 ## ds/no-deep-import
 
@@ -34,9 +34,9 @@ Import from the barrel: `import { Button } from '@/components';`. Stylesheets (`
 
 ## ds/no-unknown-prop
 
-**fail.** On a design-system component, a prop its manifest record does not list, or a literal value for an enum prop outside its list.
+**fail.** On a design-system component or pattern (`PatternCard`, `PageLayout` and the rest), a prop its manifest record does not list, or a literal value for an enum prop outside its list.
 
-Use a prop from the component's record in `components.json` (or its generated doc). Every component also takes `key`, `ref`, `children`, `className`, `style`, `id`, `role`, `title`, `tabIndex`, `aria-*` and `data-*`. A value written as an expression (`appearance={tone}`) is not judged, and neither is a component whose record has `props: null`.
+Use a prop from the record in `components.json` (or the component's generated doc, or the pattern's Storybook page). Every component also takes `key`, `ref`, `children`, `className`, `style`, `id`, `role`, `title`, `tabIndex`, `aria-*` and `data-*`. A value written as an expression (`appearance={tone}`) is not judged, and neither is a component whose record has `props: null`.
 
 ## ds/no-raw-literal
 
@@ -73,3 +73,18 @@ Import the PLUS component from `@/components`.
 **warn.** A prop the manifest marks deprecated, or a retired token name that is still declared somewhere.
 
 Use the replacement the fix names.
+
+## ds/page-starts-from-pattern
+
+**warn.** A page-level module whose outer element is a hand-styled container: a `<div>`, `<main>` or `<section>` carrying a `className`, or a `style` with layout in it (display, grid, flex, gap, padding, margin, a width or a height), where `PageLayout` or a pattern belongs.
+
+A module is page-level by its path, and nothing else is checked:
+
+- an app entry, `src/App.jsx` or `src/App.tsx`;
+- a module directly in a `pages/` folder, or a page folder's own module (`pages/Home/Home.jsx`);
+- a module named for a page (`SessionsPage.jsx`);
+- the local module an app entry renders as its root (`<Reviews />` from `./Reviews`), one hop.
+
+The outer element is what the default-exported component returns last at its shallowest indent. A fragment and a `*Provider` are stepped through to the child written directly inside; a child behind a condition (`{open && <Fab />}`) is not outermost, and neither is a router or any other component. A bare `<div>` with no class or style carries no layout of its own and passes.
+
+Start the page from `PageLayout` (`import { PageLayout } from '@/specs/Universal/Pages';`) or a pattern from `@/patterns` (`Page`, `PatternCard` and the rest), and put the hand-made layout inside it if any is still needed.

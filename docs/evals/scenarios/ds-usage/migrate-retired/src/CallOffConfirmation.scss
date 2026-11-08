@@ -1,0 +1,15 @@
+.call-off {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-element-gap-md);
+    padding: var(--size-element-pad-y-lg) var(--size-element-pad-x-lg);
+    border-radius: var(--size-element-radius-lg);
+    background: var(--color-surface-container);
+}
+
+.call-off__header,
+.call-off__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--size-element-gap-sm);
+}

@@ -301,10 +301,13 @@ const READOUTS: { readonly [K in CardTool]: TaskCardReadout } = {
     },
   },
   github_read: {
-    details: arg("search", "path"),
+    details: arg("lookup", "search", "path"),
     output: (result) => {
       const p = succeeded(result);
       if (!p) return null;
+      // A lookup answers from the baked design-system facts and reads no file.
+      const lookup = str(p.lookup);
+      if (lookup) return `Looked up ${lookup}`;
       if (Array.isArray(p.hits)) return countOutput("hits", "file")(result);
       if (p.kind === "dir" && Array.isArray(p.entries)) return counted(p.entries.length, "entry", "entries");
       const path = str(p.path);

@@ -66,6 +66,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
+| [`docs/connectors/ds-mcp.md`](docs/connectors/ds-mcp.md) | The design-system lookup — the `ds` command, the local `plus-ds` MCP run from the checkout, and the hosted read-only `/mcp/ds` door, five tools over the DS facts module. |
 | [`docs/connectors/figma/annotations.md`](docs/connectors/figma/annotations.md) | Figma's five annotation category labels, disclosed — what each holds, the Logic / data vs Development test, where status, construction notes and analytics go instead, and why a file's list drifts |
 | [`docs/connectors/figma/overview.md`](docs/connectors/figma/overview.md) | Figma's connector overview, always loaded — what uno-bot can reach over REST, canvas vs comments, How We Fig's stage folders, file titles and page sections, and an agent's duties; the five annotation labels are annotations.md beside it, and the bot's long-form access doc is uno-bot-access.md |
 | [`docs/connectors/figma/uno-bot-access.md`](docs/connectors/figma/uno-bot-access.md) | What uno-bot can read and write in Figma over REST, and where it stops — frame renders, comment reads and @uno replies, the library and comment pipelines, a Figma ask's public scope, and each limit with its cause and next route |
@@ -224,6 +225,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-153 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+154 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

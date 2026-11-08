@@ -13,10 +13,11 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { openRatchet } from './lib/ratchet.mjs';
+import { acrossSets, openRatchet } from './lib/ratchet.mjs';
 import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 import { run } from './check-undefined-tokens.mjs';
 import {
@@ -104,8 +105,7 @@ test('definitions and usages read the shapes they claim to', () => {
 /*
  * WHAT MOVED OUT OF HERE IN #600. Which names are new, which counts rose and
  * which entries have gone stale is `scripts/lib/ratchet.mjs`'s, and the whole
- * invariant is asserted once, against all twelve live records, in
- * `scripts/lib/ratchet-conformance.mjs`. What is still this module's is what a
+ * invariant is asserted once, in its own tests. What is still this module's is what a
  * verdict SAYS — and the last case below drives the real record through the
  * real ratchet, which is the assertion that the two still fit.
  */
@@ -152,6 +152,26 @@ test('a fixed entry left in the record is itself a finding', () => {
   assert.match(found[0], /^STALE --gone/);
 });
 
+test('uses and bare are judged apart, and a new name is said once', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'undefined-tokens-'));
+  try {
+    const file = 'scripts/baselines/undefined-token-baseline.json';
+    fs.mkdirSync(path.join(root, 'scripts/baselines'), { recursive: true });
+    const set = (n) => ({ entries: { '--x': { count: n } } });
+    fs.writeFileSync(path.join(root, file), JSON.stringify({ why: 'w', sets: { uses: set(3), bare: set(0) } }));
+    const open = (name) => openRatchet({ file, set: name, repoRoot: root });
+    const found = { '--new': { uses: 1, bare: 1, files: ['b.scss'] }, '--x': { uses: 3, bare: 1, files: ['a.scss'] } };
+    const { failures, stale } = acrossSets(found, { uses: open('uses'), bare: open('bare') });
+    assert.deepEqual(
+      failures.map((f) => `${f.kind} ${f.key} ${f.field}`),
+      ['new --new uses', 'rose --x bare'],
+    );
+    assert.deepEqual(stale, []);
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true });
+  }
+});
+
 /* ------------------------------------------------------------- the corpus */
 
 test('the real corpus is walked, and the real baseline matches it', () => {
@@ -160,16 +180,11 @@ test('the real corpus is walked, and the real baseline matches it', () => {
     text: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8'),
   }));
   assert.ok(files.length > 1300, `${files.length} files — the walk must not narrow silently`);
-  // Through the real ratchet, on the shape the record declares: the measured
-  // side is `{ name: { uses, bare } }` and nothing else, which is also what
-  // `--update` writes back.
+  // Through the real ratchet: the record's `uses` and `bare` sets, keyed by name.
   const { undefinedTokens } = audit(files);
-  const entries = openRatchet({ file: 'scripts/baselines/undefined-token-baseline.json', set: 'tokens', repoRoot: REPO_ROOT });
-  const side = Object.fromEntries(
-    Object.entries(undefinedTokens).map(([name, entry]) => [name, { uses: entry.uses, bare: entry.bare }]),
-  );
+  const open = (set) => openRatchet({ file: 'scripts/baselines/undefined-token-baseline.json', set, repoRoot: REPO_ROOT });
   assert.deepEqual(
-    ratchetFailures(undefinedTokens, { failures: entries.failures(side), stale: entries.stale(side) }),
+    ratchetFailures(undefinedTokens, acrossSets(undefinedTokens, { uses: open('uses'), bare: open('bare') })),
     [],
   );
 });
@@ -224,11 +239,14 @@ test('only five bare uses remain, and each is a token the system does not have',
  */
 
 const UNDEFINED_BASELINE = JSON.stringify({
-  note: 'Token names used and defined nowhere. Counts may fall, never rise.',
+  why: 'Token names used and defined nowhere. Counts may fall, never rise.',
   measuredAt: '2026-09-18',
   roots: ['design-system/src', '.storybook', 'prototypes'],
-  totals: { names: 0, uses: 0, bare: 0 },
-  tokens: {},
+  sets: {
+    uses: { entries: {} },
+    bare: { entries: {} },
+    totals: { entries: { names: { count: 0 }, uses: { count: 0 }, bare: { count: 0 } } },
+  },
 });
 
 test('a used-and-undefined token in a fixture tree is a finding', () => {

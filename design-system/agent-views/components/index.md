@@ -18,9 +18,21 @@ Names agents reach for that this system does not have, or has retired. Write the
 |---|---|
 | `Alert` | `SectionMessage`, `Flag` (SectionMessage in the page; Flag for a passing notice) |
 | `Toast` | `Flag` (renamed) |
+| `ToastContainer` | `Flag` (renamed with Toast) |
 | `Switch` | `Toggle` (renamed) |
 | `NavTabs` | `Tabs` (one tab component) |
+| `NavPills` | `Tabs` |
 | `Badge` | `StatusTag`, `CountTag` (StatusTag for a state, CountTag for a number) |
+| `BadgeVariants` | `StatusTag`, `CountTag` |
+| `Jumbotron` | `PatternSection`, `SectionMessage` (PatternSection at page level) |
+| `ListGroup` | `MenuGroup`, `Table` |
+| `MediaObject` | `Avatar`, `Tile` |
+| `Navbar` | `PatternSidebar` (a pattern, inside Frame) |
+| `Scrollspy` | `Tabs`, `ProgressTracker` |
+| `Collapse` | `Accordion` |
+| `InputGroup` | `TextField` |
+| `NumberInput` | `TextField` |
+| `CustomThemeButton` | `Button` |
 | `Dialog` | `Modal` |
 | `Input` | `TextField`, `TextArea` |
 | `Dropdown` | `Select`, `DropdownMenu` (Select picks a value; DropdownMenu runs an action) |
@@ -72,7 +84,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 | Overlays | [`PatternModal`](../../src/patterns/PatternModal/PatternModal.mdx) | `import { PatternModal } from '@/patterns';` | The modal's layout, drawn inline: title, body and footer, width a step of the screen grid. For a working dialog (Blanket, focus trap, Escape) use the `Modal` component, which draws the same layers. |
 | Overlays | [`PatternDrawer`](../../src/patterns/PatternDrawer/PatternDrawer.mdx) | `import { PatternDrawer } from '@/patterns';` | A full-height panel at the screen edge, for a task that needs the page in view: a row's details, filters, a short edit. |
 | Overlays | [`Blanket`](../../src/patterns/Blanket/Blanket.mdx) | `import { Blanket } from '@/patterns';` | The full-screen layer under a modal or drawer. PatternModal and PatternDrawer bring their own; use it alone only for a new blocking layer. |
-| Popups | [`Popup`](../../src/patterns/PopupFamily/PopupFamily.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
+| Popups | [`Popup`](../../src/components/overlays-and-layering/Popup/Popup.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
 | AI | [`AiChat`](../../src/patterns/AiChat/AiChat.mdx) | `import { AiChat } from '@/patterns';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
 
 ## UI components (85)

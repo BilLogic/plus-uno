@@ -1,4 +1,8 @@
 {
   "why": "Hand-rolled focus-ring patterns the state mixin (design-system/src/styles/_state.scss) exists to replace: a raw `outline: none` reset, the legacy `--color-focus-ring` token, and a hand-written forced-colors `Highlight` ring. Counted per rule and per file in design-system/src/components and design-system/src/patterns. A count may fall and never rise; a new file starts at zero. Regenerate with `npm run check:state-mixin -- --update`; never edit by hand.",
-  "counts": {}
+  "sets": {
+    "main": {
+      "entries": {}
+    }
+  }
 }

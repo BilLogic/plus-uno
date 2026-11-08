@@ -18,7 +18,8 @@ const gaps = {
 function recorded(keys) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'doc-coverage-'));
   fs.mkdirSync(path.join(root, 'scripts/baselines'), { recursive: true });
-  fs.writeFileSync(path.join(root, FILE), `${JSON.stringify({ why: 'test', gaps: keys }, null, 2)}\n`);
+  const entries = Object.fromEntries(keys.map((key) => [key, { count: 1 }]));
+  fs.writeFileSync(path.join(root, FILE), `${JSON.stringify({ why: 'test', sets: { main: { entries } } }, null, 2)}\n`);
   return { ratchet: openRatchet({ file: FILE, repoRoot: root }), root };
 }
 
@@ -49,5 +50,8 @@ test('a filled gap leaves the record on --update, and nothing else moves', () =>
   assert.deepEqual(ratchet.failures(gapKeys(gaps)), []);
   ratchet.update(gapKeys(gaps));
   const written = JSON.parse(fs.readFileSync(path.join(root, FILE), 'utf8'));
-  assert.deepEqual(written, { why: 'test', gaps: ['Button onClick', 'Tag (summary)'] });
+  assert.deepEqual(written, {
+    why: 'test',
+    sets: { main: { entries: { 'Button onClick': { count: 1 }, 'Tag (summary)': { count: 1 } } } },
+  });
 });

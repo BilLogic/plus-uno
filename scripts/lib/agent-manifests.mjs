@@ -33,59 +33,76 @@ export function deprecationOf(description) {
 }
 
 /**
- * One record per barrel export. A component the barrel does not export is not
- * part of the public surface and is left out; an export with no parsed
- * component (a hook, a constant) is still listed, with `props: null`, so the
- * manifest and the existence index agree name for name.
+ * One record per barrel export, each with its `kind`: a `component` from
+ * `@/components`, or a `pattern` from `@/patterns` or the page templates
+ * (`PageLayout`). A component the barrel does not export is not part of the
+ * public surface and is left out; an export with no parsed component (a hook,
+ * a constant) is still listed, with `props: null`, so the manifest and the
+ * existence index agree name for name.
  *
  * @param {{
  *   exports: string[],
- *   components: {name: string, group: string, source: string, summary?: string,
- *     props: {name: string, type: string, description: string, enumValues: string[]|null}[],
- *     defaults?: Record<string,string>, descriptions?: Record<string,string>}[],
+ *   components: ParsedComponent[],
+ *   patterns?: {name: string, from: string}[],
+ *   parsedPatterns?: ParsedComponent[],
  *   version: string,
  * }} input
+ *
+ * @typedef {{name: string, group: string, source: string, summary?: string,
+ *   props: {name: string, type: string, description: string, enumValues: string[]|null}[],
+ *   defaults?: Record<string,string>, descriptions?: Record<string,string>}} ParsedComponent
  */
-export function buildComponentsManifest({ exports, components, version }) {
-  const parsed = new Map(components.map((c) => [c.name, c]));
-  const records = [...new Set(exports)].map((name) => {
-    const c = parsed.get(name);
-    if (!c) return { name, import: importLine(name), group: null, source: null, summary: null, props: null };
-    return {
-      name,
-      import: importLine(name),
-      group: c.group,
-      source: c.source,
-      summary: c.summary || null,
-      props: c.props.map((p) => {
-        const description = (c.descriptions && c.descriptions[p.name]) || p.description || '';
-        const required = /\(required\)$/.test(p.type);
-        return {
-          name: p.name,
-          type: p.type.replace(/\s*\(required\)$/, ''),
-          required,
-          default: (c.defaults && c.defaults[p.name]) || null,
-          values: p.enumValues && p.enumValues.length ? [...p.enumValues] : null,
-          description: description.replace(/@deprecated\b\s*/g, '').trim() || null,
-          deprecated: deprecationOf(p.description) || deprecationOf(description),
-        };
-      }),
-    };
-  });
+export function buildComponentsManifest({ exports, components, patterns = [], parsedPatterns = [], version }) {
+  const componentNames = new Set(exports);
+  for (const { name, from } of patterns) {
+    if (componentNames.has(name)) throw new Error(`${name} is exported from both @/components and ${from}: one name, one record`);
+  }
+  const parsedComponents = new Map(components.map((c) => [c.name, c]));
+  const parsedPattern = new Map(parsedPatterns.map((c) => [c.name, c]));
+  const records = [
+    ...[...componentNames].map((name) => recordOf(name, parsedComponents.get(name), 'component', '@/components')),
+    ...patterns.map(({ name, from }) => recordOf(name, parsedPattern.get(name), 'pattern', from)),
+  ];
   return { version, components: records.sort(byName) };
 }
 
-function importLine(name) {
-  return `import { ${name} } from '@/components';`;
+function recordOf(name, c, kind, from) {
+  const line = `import { ${name} } from '${from}';`;
+  if (!c) return { name, kind, import: line, group: null, source: null, summary: null, props: null };
+  return {
+    name,
+    kind,
+    import: line,
+    group: c.group,
+    source: c.source,
+    summary: c.summary || null,
+    props: c.props.map((p) => {
+      const description = (c.descriptions && c.descriptions[p.name]) || p.description || '';
+      const required = /\(required\)$/.test(p.type);
+      return {
+        name: p.name,
+        type: p.type.replace(/\s*\(required\)$/, ''),
+        required,
+        default: (c.defaults && c.defaults[p.name]) || null,
+        values: p.enumValues && p.enumValues.length ? [...p.enumValues] : null,
+        description: description.replace(/@deprecated\b\s*/g, '').trim() || null,
+        deprecated: deprecationOf(p.description) || deprecationOf(description),
+      };
+    }),
+  };
 }
 
 /**
  * One record per token name. Sections arrive in the order the token view lists
  * them; a name that appears in two sections keeps its first.
  *
+ * `intent` is present only where a plan gives one (`token-intent.mjs`): a
+ * primitive never carries the field, and neither does a token no plan defines.
+ *
  * @param {{group: string, tier: string, tokens: {name: string, value: string}[]}[]} sections
+ * @param {Map<string, string>} [intents]  token name -> intent
  */
-export function buildTokensManifest(sections) {
+export function buildTokensManifest(sections, intents = new Map()) {
   const seen = new Map();
   for (const { group, tier, tokens } of sections) {
     if (!TIERS.includes(tier)) {
@@ -93,7 +110,10 @@ export function buildTokensManifest(sections) {
     }
     for (const { name, value } of tokens) {
       if (seen.has(name)) continue;
-      seen.set(name, { name, tier, group, value: value.trim(), intent: null });
+      const record = { name, tier, group, value: value.trim() };
+      const intent = tier === 'primitive' ? null : intents.get(name);
+      if (intent) record.intent = intent;
+      seen.set(name, record);
     }
   }
   return { tokens: [...seen.values()].sort(byName) };

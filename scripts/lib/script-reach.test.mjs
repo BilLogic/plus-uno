@@ -154,8 +154,8 @@ test('the walk stops at the edge of scripts/, and a missing import is not a cras
 test('a file the caller calls no evidence is walked for its imports and read for nothing else', () => {
   const root = tree({
     'scripts/check-example.mjs': "import { SHAPES } from './lib/table.mjs';",
-    // The shape table's shape: it names every record in the repo, so naming one
-    // there says nothing about which record THIS check reads.
+    // A table that names every record in the repo says nothing about which
+    // record THIS check reads.
     'scripts/lib/table.mjs': `
       import { helper } from './helper.mjs';
       export const SHAPES = [{ file: '${RECORD}', command: 'npm run x -- --update' }];

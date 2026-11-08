@@ -29,6 +29,29 @@ test('one record per barrel export, in name order, with the import path', () => 
   assert.equal(m.components[0].import, "import { Button } from '@/components';");
 });
 
+test('a pattern is a record of kind pattern, imported from its own barrel, with props from source', () => {
+  const card = { ...button, name: 'PatternCard', group: 'patterns', source: 'design-system/src/patterns/PatternCard/PatternCard.jsx' };
+  const m = buildComponentsManifest({
+    exports: ['Button'],
+    patterns: [{ name: 'PatternCard', from: '@/patterns' }],
+    components: [button],
+    parsedPatterns: [card],
+    version: '0',
+  });
+  const [b, p] = m.components;
+  assert.equal(b.kind, 'component');
+  assert.equal(p.kind, 'pattern');
+  assert.equal(p.import, "import { PatternCard } from '@/patterns';");
+  assert.deepEqual(p.props.find((x) => x.name === 'appearance').values, ['primary', 'subtle']);
+});
+
+test('a name both a component and a pattern is refused', () => {
+  assert.throws(
+    () => buildComponentsManifest({ exports: ['Button'], patterns: [{ name: 'Button', from: '@/patterns' }], components: [button], version: '0' }),
+    /Button is exported from both @\/components and @\/patterns/,
+  );
+});
+
 test('a barrel export with no parsed component is still listed, with props unknown', () => {
   const m = buildComponentsManifest({ exports: ['Button', 'useToast'], components: [button], version: '0' });
   const hook = m.components.find((c) => c.name === 'useToast');
@@ -80,7 +103,25 @@ test('tokens: one record per name, tier and group from the section, first value 
   assert.equal(text.tier, 'semantic');
   assert.equal(text.group, 'Color Tokens');
   assert.equal(text.value, 'var(--palette-neutral-1000)');
-  assert.equal(text.intent, null);
+  assert.equal('intent' in text, false);
+});
+
+test('tokens: intent rides on a non-primitive token that has one, and never on a primitive', () => {
+  const intents = new Map([
+    ['--ds-text', 'Primary text.'],
+    ['--palette-neutral-1000', 'A ramp step.'],
+  ]);
+  const m = buildTokensManifest(
+    [
+      { group: 'Color Tokens', tier: 'semantic', tokens: [{ name: '--ds-text', value: '#172b4d' }, { name: '--legacy', value: '#fff' }] },
+      { group: 'Color Primitives', tier: 'primitive', tokens: [{ name: '--palette-neutral-1000', value: '#172b4d' }] },
+    ],
+    intents,
+  );
+  const by = Object.fromEntries(m.tokens.map((t) => [t.name, t]));
+  assert.equal(by['--ds-text'].intent, 'Primary text.');
+  assert.equal('intent' in by['--legacy'], false);
+  assert.equal('intent' in by['--palette-neutral-1000'], false);
 });
 
 test('tokens: a name in two sections keeps the first section and is not duplicated', () => {

@@ -29,12 +29,12 @@ test('out of scope: no check, no log, exit 0', () => {
 test('in scope with a fail-level escape: exit 2, findings on stderr, a log line by rule', () => {
   const out = handle(
     { session_id: 's1', tool_input: { file_path: 'prototypes/x/src/App.jsx' } },
-    { repoRoot: ROOT, inScope, check: () => [finding('ds/no-deep-import'), finding('ds/no-deep-import'), finding('ds/no-retired-name', 'warn')], now: () => 't' },
+    { repoRoot: ROOT, inScope, check: () => [finding('ds/no-deep-import'), finding('ds/no-deep-import'), finding('ds/no-retired-name', 'warn')], now: () => 't', startedAt: 100, clock: () => 142.6 },
   );
   assert.equal(out.exitCode, 2);
   assert.match(out.stderr, /prototypes\/x\/src\/App\.jsx:3:1  ds\/no-deep-import/);
   assert.doesNotMatch(out.stderr, /no-retired-name/);
-  assert.deepEqual(out.log, { time: 't', file: 'prototypes/x/src/App.jsx', session: 's1', fail: 2, warn: 1, by_rule: { 'ds/no-deep-import': 2 } });
+  assert.deepEqual(out.log, { time: 't', file: 'prototypes/x/src/App.jsx', session: 's1', fail: 2, warn: 1, by_rule: { 'ds/no-deep-import': 2 }, duration_ms: 43 });
 });
 
 test('in scope and clean (or warnings only): silent, exit 0, still logged', () => {
@@ -68,7 +68,9 @@ test('end to end: a deep import in a prototype comes back to the agent; removing
     fs.writeFileSync(file, "import { StatusTag } from '@/components';\n");
     const clean = run();
     assert.deepEqual([clean.status, clean.stderr], [0, '']);
-    assert.equal(fs.readFileSync(log, 'utf8').trim().split('\n').length, 2);
+    const lines = fs.readFileSync(log, 'utf8').trim().split('\n').map((line) => JSON.parse(line));
+    assert.equal(lines.length, 2);
+    for (const line of lines) assert.ok(Number.isInteger(line.duration_ms) && line.duration_ms >= 0, `duration_ms is ${line.duration_ms}`);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
     fs.rmSync(log, { force: true });

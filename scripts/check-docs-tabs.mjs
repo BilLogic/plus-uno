@@ -385,6 +385,7 @@ function record(repoRoot = REPO_ROOT) {
           'The floor under the tabbed component docs population. It may rise as a component ' +
           'gains a docs page, and never falls except by a hand edit that names the removal. ' +
           'Re-measure and raise it with `npm run check:docs-tabs -- --update`.',
+        'sets.main.direction': 'grow-only',
       },
     },
   );

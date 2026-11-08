@@ -23,11 +23,13 @@ import { fileURLToPath } from 'node:url';
 
 import { corpus } from './undefined-tokens.mjs';
 import { failures, familyFallbacks, familyTokens } from './font-families.mjs';
+import { LIBRARY_ROOT, PROTOTYPE_ROOTS, STORYBOOK_ROOT } from './lib/ds-facts.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-const ROOTS = ['design-system/src', '.storybook', 'prototypes'];
+/** The library, Storybook and the prototypes; the app shell is not held yet (`PROTOTYPE_ROOTS`). */
+export const ROOTS = [LIBRARY_ROOT, STORYBOOK_ROOT, ...PROTOTYPE_ROOTS];
 
 /** The floor, measured 2026-08-29. A walk that stopped matching finds nothing. */
 export const MIN_FILES = 1300;

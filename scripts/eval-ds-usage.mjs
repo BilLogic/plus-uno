@@ -13,14 +13,21 @@
  *            controlAgents, and the project hooks). Component source stays:
  *            a repo without a harness still has code.
  *   current  the copy as it is on main (`--ref`, default origin/main), project hooks included.
+ *   hook-off         current without the post-edit hook; the agent can still
+ *                    run the checker.
+ *   checker-removed  current without the checker (CHECKER_REMOVED); the
+ *                    post-edit hook still runs, from this checkout.
+ *   lookup           current plus the copy's own `plus-ds` MCP, all five tools.
  *
  * Everything but the agent and judge calls is deterministic: the copies, the
  * scoring, the ledger rows and the summary.
  *
- *   node scripts/eval-ds-usage.mjs run [--arms control,current] [--tasks a,b] [--runs 2] [--model sonnet] [--ref origin/main] [--scratch DIR]
+ *   node scripts/eval-ds-usage.mjs run [--arms control,current] [--tasks a,b] [--runs 2] [--allow-metered] [--model sonnet] [--ref origin/main] [--scratch DIR]
  *   node scripts/eval-ds-usage.mjs summary [--since YYYY-MM-DD]
+ *   node scripts/eval-ds-usage.mjs compare [--baseline current] [--commit SHA]   the keep rule
  *   node scripts/eval-ds-usage.mjs rescore   re-score every kept build with this checkout's rules
  */
+import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 import { execFileSync, spawnSync } from 'node:child_process';
 import fs from 'node:fs';
@@ -29,13 +36,50 @@ import path from 'node:path';
 
 import { contextOf } from './check-ds-usage.mjs';
 import { REPO_ROOT } from './lib/corpus.mjs';
-import { escapesIn } from './lib/ds-usage.mjs';
+import { escapesIn, pageRootOf, pagesOf } from './lib/ds-usage.mjs';
+import { blankComments } from './lib/jsx-scan.mjs';
 import { isEntry } from './lib/findings.mjs';
 
 export const SCENARIOS = 'docs/evals/scenarios/ds-usage';
 export const LEDGER = 'docs/evals/ds-usage-ledger.jsonl';
-export const TASKS = ['page-from-prd', 'form-states', 'table-states', 'overlay-flow', 'frame-to-code', 'trap-missing-component'];
-export const ARMS = ['control', 'current'];
+export const TASKS = [
+  'page-from-prd',
+  'form-states',
+  'table-states',
+  'overlay-flow',
+  'frame-to-code',
+  'trap-missing-component',
+  'two-page-flow',
+  'debt-extend',
+  'migrate-retired',
+  'forbidden-ask',
+];
+/**
+ * Tasks whose folder starts with code in it, escapes included: recorded debt
+ * from a prototype, or a component written in retired names. Each row records
+ * what the folder held before the agent began, so debt left reads against
+ * debt seeded.
+ */
+export const SEEDED = ['debt-extend', 'migrate-retired'];
+export const ARMS = ['control', 'current', 'hook-off', 'checker-removed', 'lookup'];
+/** The arms that add the design-system lookup to current, and the tools each serves (by `ds` subcommand). */
+export const LOOKUP_ARMS = ['lookup'];
+const LOOKUP_TOOLS = ['find', 'get', 'tokens', 'guide', 'check'];
+/**
+ * The default run is small: three arms, four tasks, two runs, 24 builds. It
+ * answers the first question (does the harness or the checker earn the
+ * result) at a cost one subscription window absorbs. Widen it by flags only
+ * when a small run leaves the answer unclear.
+ */
+export const DEFAULT_ARMS = ['control', 'current', 'checker-removed'];
+export const DEFAULT_TASKS = ['page-from-prd', 'trap-missing-component', 'debt-extend', 'forbidden-ask'];
+/** Variables that send `claude -p` to metered billing instead of the subscription login. */
+export const METERED = ['ANTHROPIC_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'CLAUDE_CODE_USE_VERTEX', 'CLAUDE_CODE_USE_BEDROCK'];
+
+/** The metered-billing variables set in `env`; a run refuses to start on any of them unless `--allow-metered`. */
+export function meteredIn(env) {
+  return METERED.filter((name) => env[name]);
+}
 /** Durable copies of what each agent built, beside the ledger row that scores it. */
 export const OUTPUTS = path.join(os.homedir(), 'Documents/Claude/Projects/PLUS/evals/ds-usage');
 
@@ -55,6 +99,13 @@ export const CONTROL_REMOVED = [
   '.cursor',
   '.codex',
 ];
+
+/**
+ * What the checker-removed arm takes out of the copy: the checker, its rules,
+ * its baseline and the copy's own post-edit hook, which could no longer load
+ * a checker. The hook that runs instead lives in this checkout.
+ */
+export const CHECKER_REMOVED = ['scripts/check-ds-usage.mjs', 'scripts/lib/ds-usage.mjs', 'scripts/baselines/ds-usage.json', '.cursor/hooks/ds-usage'];
 
 /**
  * The control arm's AGENTS.md: the title and the Identity section, without
@@ -115,6 +166,43 @@ function copyDir(from, to) {
   }
 }
 
+const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
+const writeJson = (file, value) => fs.writeFileSync(file, `${JSON.stringify(value, null, 2)}\n`);
+const isDsHook = (hook) => /ds-usage\/post-edit\.mjs/.test(hook.command ?? '');
+
+/** Drop the `check:ds-usage` script from a copy's package.json. */
+function dropCheckerScript(root) {
+  const pkg = path.join(root, 'package.json');
+  const manifest = readJson(pkg);
+  delete manifest.scripts?.['check:ds-usage'];
+  writeJson(pkg, manifest);
+}
+
+/**
+ * Rewrite the post-edit hook in a copy's Claude Code and Cursor wiring:
+ * `swap(hook)` returns the hook to keep in its place, or null to drop it.
+ * Every other hook stays as it was.
+ */
+function rewireDsHook(root, swap) {
+  const settings = path.join(root, '.claude/settings.json');
+  if (fs.existsSync(settings)) {
+    const parsed = readJson(settings);
+    for (const [event, groups] of Object.entries(parsed.hooks ?? {})) {
+      parsed.hooks[event] = groups
+        .map((group) => ({ ...group, hooks: group.hooks.map((h) => (isDsHook(h) ? swap(h) : h)).filter(Boolean) }))
+        .filter((group) => group.hooks.length);
+    }
+    writeJson(settings, parsed);
+  }
+  // Cursor's wiring only logs and no eval run uses Cursor; it goes in both arms, so no copy points at a hook it lacks.
+  const cursor = path.join(root, '.cursor/hooks.json');
+  if (fs.existsSync(cursor)) {
+    const parsed = readJson(cursor);
+    for (const [event, hooks] of Object.entries(parsed.hooks ?? {})) parsed.hooks[event] = hooks.filter((h) => !isDsHook(h));
+    writeJson(cursor, parsed);
+  }
+}
+
 /**
  * A plain copy of the repo at `ref` for one arm, with the task's starting
  * folder at `prototypes/eval-<task>/`. Returns the copy's root and the folder.
@@ -132,10 +220,7 @@ export function prepare({ repoRoot = REPO_ROOT, ref, arm, task, into }) {
     const agents = path.join(into, 'AGENTS.md');
     fs.writeFileSync(agents, controlAgents(fs.readFileSync(agents, 'utf8')));
     // `check:ds-usage` is the harness's definition of an escape; its script is gone.
-    const pkg = path.join(into, 'package.json');
-    const manifest = JSON.parse(fs.readFileSync(pkg, 'utf8'));
-    delete manifest.scripts?.['check:ds-usage'];
-    fs.writeFileSync(pkg, `${JSON.stringify(manifest, null, 2)}\n`);
+    dropCheckerScript(into);
     // The project hooks are the uno-prototype gate, part of the harness; their
     // scripts went with `.cursor`, so the control arm drops the hooks too.
     const settings = path.join(into, '.claude/settings.json');
@@ -144,6 +229,17 @@ export function prepare({ repoRoot = REPO_ROOT, ref, arm, task, into }) {
       delete parsed.hooks;
       fs.writeFileSync(settings, `${JSON.stringify(parsed, null, 2)}\n`);
     }
+  }
+  // hook-off: the checker stays in reach, and nothing runs it after an edit.
+  if (arm === 'hook-off') rewireDsHook(into, () => null);
+  // checker-removed: the agent cannot run the checker, and the hook still scores
+  // each edit. The hook runs from this checkout (whose `scripts` and `.cursor`
+  // are denied to Read) with the copy as the repo it checks.
+  if (arm === 'checker-removed') {
+    for (const rel of CHECKER_REMOVED) fs.rmSync(path.join(into, rel), { recursive: true, force: true });
+    dropCheckerScript(into);
+    const hook = path.join(repoRoot, '.cursor/hooks/ds-usage/post-edit.mjs');
+    rewireDsHook(into, (h) => ({ ...h, command: `DS_USAGE_ROOT="$CLAUDE_PROJECT_DIR" node "${hook}"` }));
   }
   // The scenarios are the answer key's neighbors; neither arm sees them.
   fs.rmSync(path.join(into, 'docs/evals'), { recursive: true, force: true });
@@ -154,18 +250,48 @@ export function prepare({ repoRoot = REPO_ROOT, ref, arm, task, into }) {
 }
 
 /**
- * Escapes in a built prototype, by rule, scored by this checkout's rules.
- * The template's own files are scored too; they carry none.
+ * Escapes in a built prototype, by rule, scored by this checkout's rules, and
+ * the warnings beside them, by rule too. The template's own files are scored;
+ * they carry none.
+ *
+ * `layoutFormula` is `ds/page-starts-from-pattern` read as a verdict: true
+ * when no page-level module of the build starts from a hand-styled container,
+ * false when one does, null when no page-level module renders an element to
+ * judge (an `App` that still returns `null`).
  */
 export function score({ repoRoot = REPO_ROOT, folder, label }) {
   const ctx = contextOf(repoRoot);
-  const findings = filesUnder(folder).flatMap((abs) =>
-    escapesIn({ path: `${label}/${path.relative(folder, abs).split(path.sep).join('/')}`, text: fs.readFileSync(abs, 'utf8') }, ctx),
-  );
-  const fail = findings.filter((f) => f.level === 'fail');
+  const files = filesUnder(folder).map((abs) => ({
+    path: `${label}/${path.relative(folder, abs).split(path.sep).join('/')}`,
+    text: fs.readFileSync(abs, 'utf8'),
+  }));
+  const pages = pagesOf(files);
+  const findings = files.flatMap((file) => escapesIn({ ...file, page: pages.has(file.path) }, ctx));
+  const judged = files.some((file) => pages.has(file.path) && /\.[jt]sx$/.test(file.path) && pageRootOf(blankComments(file.text)));
+  const shells = findings.some((f) => f.rule === 'ds/page-starts-from-pattern');
   const byRule = {};
-  for (const f of fail) byRule[f.rule] = (byRule[f.rule] ?? 0) + 1;
-  return { escapes: fail.length, warnings: findings.length - fail.length, byRule };
+  const warnByRule = {};
+  for (const f of findings) {
+    const tally = f.level === 'fail' ? byRule : warnByRule;
+    tally[f.rule] = (tally[f.rule] ?? 0) + 1;
+  }
+  const escapes = findings.filter((f) => f.level === 'fail').length;
+  return { escapes, warnings: findings.length - escapes, byRule, warnByRule, layoutFormula: shells ? false : judged ? true : null };
+}
+
+/**
+ * The escapes a task's folder holds before any agent touches it: the template
+ * and the task's own files, scored as `score` scores a build.
+ */
+export function seedScore({ repoRoot = REPO_ROOT, task }) {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), `ds-eval-seed-${task}-`));
+  try {
+    copyDir(path.join(repoRoot, SCENARIOS, '_template'), dir);
+    copyDir(path.join(repoRoot, SCENARIOS, task), dir);
+    return score({ repoRoot, folder: dir, label: `eval-${task}` });
+  } finally {
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 }
 
 const DISALLOWED = ['Skill', 'Agent', 'Task', 'WebFetch', 'WebSearch'];
@@ -185,11 +311,21 @@ const DISALLOWED = ['Skill', 'Agent', 'Task', 'WebFetch', 'WebSearch'];
  */
 export const DENIED_READS = ['AGENTS.md', 'CLAUDE.md', 'design-system/agent-views', 'design-system/guidelines', 'design-system/figma', 'docs', 'skills', '.claude', '.cursor', '.codex', 'scripts'];
 
-export function confined(repoRoot = REPO_ROOT) {
+/**
+ * An arm's own permission denials in its copy at `root`. checker-removed
+ * denies the checker's paths (gone from the copy already) and its npm script,
+ * so a run that goes looking is refused rather than surprised.
+ */
+export function armDenies(arm, root) {
+  if (arm !== 'checker-removed') return [];
+  return [...CHECKER_REMOVED.flatMap((rel) => [`Read(/${path.join(root, rel)})`, `Read(/${path.join(root, rel)}/**)`]), 'Bash(npm run check:ds-usage:*)'];
+}
+
+export function confined(repoRoot = REPO_ROOT, extra = []) {
   const deny = DENIED_READS.flatMap((rel) => {
     const abs = path.join(repoRoot, rel);
     return [`Read(/${abs})`, `Read(/${abs}/**)`];
-  });
+  }).concat(extra);
   return JSON.stringify({
     permissions: { deny },
     sandbox: {
@@ -239,8 +375,61 @@ export function reachedCheckout(stdout, repoRoot = REPO_ROOT) {
   return hits;
 }
 
+/** The tool calls of a run, in order: `{name, input}`. */
+const toolCalls = (stdout) =>
+  events(stdout).flatMap((e) => (e.type === 'assistant' ? e.message?.content ?? [] : []).filter((part) => part.type === 'tool_use'));
+
+/**
+ * What a run read: the files it opened with Read, relative to its copy, in
+ * first-read order, and the lookups it ran (Grep, Glob, Bash). Its own task
+ * folder is left out of `files`; the brief and the build are not the harness.
+ */
+export function readSet(stdout, root) {
+  const roots = [root];
+  try {
+    roots.push(fs.realpathSync(root));
+  } catch {
+    // a root that is gone (a test, or a copy already removed) is matched as given
+  }
+  const rel = (p = '') => {
+    for (const r of roots) if (p === r || p.startsWith(`${r}/`)) return p.slice(r.length + 1) || '.';
+    return p;
+  };
+  const files = [];
+  const lookups = [];
+  for (const { name, input = {} } of toolCalls(stdout)) {
+    if (name === 'Read') {
+      const file = rel(input.file_path);
+      if (!/^prototypes\/eval-/.test(file) && !files.includes(file)) files.push(file);
+    } else if (name === 'Grep') lookups.push(`Grep ${input.pattern}${input.path ? ` in ${rel(input.path)}` : ''}`);
+    else if (name === 'Glob') lookups.push(`Glob ${input.pattern}${input.path ? ` in ${rel(input.path)}` : ''}`);
+    else if (name === 'Bash') lookups.push(`Bash ${String(input.command ?? '').slice(0, 160)}`);
+    else if (name.startsWith('mcp__plus-ds__')) lookups.push(`${name.slice('mcp__plus-ds__'.length)} ${JSON.stringify(input).slice(0, 160)}`);
+  }
+  return { files, lookups };
+}
+
+/**
+ * An arm's MCP wiring in its copy at `root`: the `--mcp-config` the agent
+ * starts with and the MCP tools it may call. A lookup arm runs the copy's own
+ * `scripts/ds-mcp.mjs`, so the server answers from the commit under test;
+ * every other arm gets no server. The `ds` command stays in every copy that
+ * has it, as an npm script.
+ */
+export function lookupWiring(arm, root) {
+  if (!LOOKUP_ARMS.includes(arm)) return { mcpConfig: '{"mcpServers":{}}', allowed: [] };
+  const at = path.join(root, 'scripts/ds-mcp.mjs');
+  if (!fs.existsSync(at)) throw new Error(`${arm}: the copy has no scripts/ds-mcp.mjs; pick a --ref that has the lookup`);
+  // The real path: the server starts only when argv[1] is its own module URL, and the scratch dir is often a symlink (/var → /private/var).
+  const server = fs.realpathSync(at);
+  return {
+    mcpConfig: JSON.stringify({ mcpServers: { 'plus-ds': { type: 'stdio', command: 'node', args: [server] } } }),
+    allowed: LOOKUP_TOOLS.map((op) => `mcp__plus-ds__ds_${op}`),
+  };
+}
+
 /** One headless agent run in `cwd`; returns its result (tokens, turns, cost), any reach into the checkout, and wall time. */
-function agent({ cwd, prompt, model, readOnly = false }) {
+function agent({ cwd, prompt, model, readOnly = false, deny = [], mcp = lookupWiring('none', cwd) }) {
   const args = [
     '-p',
     prompt,
@@ -252,28 +441,87 @@ function agent({ cwd, prompt, model, readOnly = false }) {
     '--permission-mode',
     readOnly ? 'default' : 'acceptEdits',
     '--settings',
-    confined(),
+    confined(REPO_ROOT, deny),
     '--setting-sources',
     'project,local',
     '--strict-mcp-config',
     '--mcp-config',
-    '{"mcpServers":{}}',
+    mcp.mcpConfig,
+    ...(mcp.allowed.length ? ['--allowedTools', ...mcp.allowed] : []),
     '--disallowedTools',
     ...(readOnly ? [...DISALLOWED, 'Write', 'Edit', 'NotebookEdit', 'Bash'] : DISALLOWED),
   ];
   const started = Date.now();
   const out = spawnSync('claude', args, { cwd, encoding: 'utf8', maxBuffer: 1 << 28, timeout: 45 * 60 * 1000 });
-  return { result: resultOf(out), reached: reachedCheckout(out.stdout), wallMs: Date.now() - started };
+  return { result: resultOf(out), reached: reachedCheckout(out.stdout), read: readSet(out.stdout, cwd), wallMs: Date.now() - started };
 }
 
-const usageOf = (r) => ({
-  input_tokens: r?.usage?.input_tokens ?? null,
-  output_tokens: r?.usage?.output_tokens ?? null,
-  cache_read_tokens: r?.usage?.cache_read_input_tokens ?? null,
-  cache_creation_tokens: r?.usage?.cache_creation_input_tokens ?? null,
-  turns: r?.num_turns ?? null,
-  cost_usd: r?.total_cost_usd ?? null,
-});
+/**
+ * Every input the model saw: fresh input plus cache reads and cache writes.
+ * Fresh input alone is a few dozen tokens a run, since nearly all of it is
+ * cached, so it says nothing about cost.
+ */
+const totalInput = (fields) => {
+  const parts = [fields.input_tokens, fields.cache_read_tokens, fields.cache_creation_tokens];
+  return parts.every((n) => n == null) ? null : parts.reduce((sum, n) => sum + (n ?? 0), 0);
+};
+
+/** A result event's usage as ledger fields: the raw counts and their total. */
+export function usageOf(r) {
+  const raw = {
+    input_tokens: r?.usage?.input_tokens ?? null,
+    output_tokens: r?.usage?.output_tokens ?? null,
+    cache_read_tokens: r?.usage?.cache_read_input_tokens ?? null,
+    cache_creation_tokens: r?.usage?.cache_creation_input_tokens ?? null,
+  };
+  return { ...raw, total_input_tokens: totalInput(raw), turns: r?.num_turns ?? null, cost_usd: r?.total_cost_usd ?? null };
+}
+
+/** An axe result as ledger fields: affected nodes in all, and by rule id. */
+export function a11ySummary(results) {
+  const by_rule = {};
+  for (const v of results.violations ?? []) by_rule[v.id] = (by_rule[v.id] ?? 0) + (v.nodes?.length ?? 0);
+  return { count: Object.values(by_rule).reduce((a, b) => a + b, 0), by_rule };
+}
+
+const loadBrowserTools = async () => ({ chromium: (await import('playwright')).chromium, vite: await import('vite') });
+
+/**
+ * The prototype served by vite and checked by axe in a headless browser.
+ * Reported, never gated: anything missing or failing (no playwright, no
+ * browser, a build that does not compile) becomes `a11y_error`, and the run
+ * goes on. `folder` must still sit in its copy, where the vite config's
+ * relative design-system and node_modules paths resolve.
+ */
+export async function a11y({ folder, load = loadBrowserTools }) {
+  let server;
+  let browser;
+  try {
+    const { chromium, vite } = await load();
+    server = await vite.createServer({
+      configFile: path.join(folder, 'vite.config.js'),
+      root: folder,
+      logLevel: 'silent',
+      server: { port: 0, strictPort: false },
+      // The design system's own Sass deprecations are not the build's; keep them out of the run log.
+      css: { preprocessorOptions: { scss: { logger: { warn() {}, debug() {} } } } },
+    });
+    await server.listen();
+    const url = server.resolvedUrls?.local?.[0];
+    if (!url) throw new Error('vite gave no local URL');
+    browser = await chromium.launch();
+    const page = await browser.newPage();
+    await page.goto(url, { waitUntil: 'networkidle', timeout: 60_000 });
+    await page.addScriptTag({ path: createRequire(import.meta.url).resolve('axe-core/axe.min.js') });
+    const results = await page.evaluate(() => globalThis.axe.run(document));
+    return { a11y_violations: a11ySummary(results), a11y_error: null };
+  } catch (error) {
+    return { a11y_violations: null, a11y_error: String(error?.message ?? error).slice(0, 500) };
+  } finally {
+    await browser?.close().catch(() => {});
+    await server?.close().catch(() => {});
+  }
+}
 
 const verdict = (v) => (v === true || v === 'true' ? true : v === false || v === 'false' ? false : null);
 
@@ -284,13 +532,19 @@ export function parseJudge(text) {
     for (let end = s.indexOf('}', start); end !== -1; end = s.indexOf('}', end + 1)) {
       try {
         const j = JSON.parse(s.slice(start, end + 1));
-        return { gap_named: verdict(j.gap_named), layout_formula: verdict(j.layout_formula), reason: j.reason ?? '', judge_error: false };
+        return {
+          gap_named: verdict(j.gap_named),
+          escalated: verdict(j.escalated),
+          rendered: verdict(j.rendered),
+          reason: j.reason ?? '',
+          judge_error: false,
+        };
       } catch {
         // keep widening
       }
     }
   }
-  return { gap_named: null, layout_formula: null, reason: 'judge gave no JSON', judge_error: true };
+  return { gap_named: null, escalated: null, rendered: null, reason: 'judge gave no JSON', judge_error: true };
 }
 
 /** Append one row; the ledger is append-only and keeps losses. */
@@ -311,22 +565,63 @@ export function readLedger(repoRoot = REPO_ROOT) {
  * fields are untouched.
  */
 export function rescore(rows, { scorer, repoRoot = REPO_ROOT }) {
+  const scenarios = scenariosSha(repoRoot);
   return rows.map((row) => {
     if (!row.output || !fs.existsSync(row.output)) return row;
     const scored = score({ repoRoot, folder: row.output, label: `eval-${row.task}` });
-    return { ...row, escapes: scored.escapes, by_rule: scored.byRule, warnings: scored.warnings, scored_at: scorer };
+    const out = {
+      ...row,
+      escapes: scored.escapes,
+      by_rule: scored.byRule,
+      warnings: scored.warnings,
+      warn_by_rule: scored.warnByRule,
+      layout_formula: scored.layoutFormula,
+      scored_at: scorer,
+    };
+    // The seed is re-scored only from the scenarios the run started from.
+    if (SEEDED.includes(row.task) && row.scenarios_sha === scenarios) {
+      const seed = seedScore({ repoRoot, task: row.task });
+      Object.assign(out, { seeded_escapes: seed.escapes, seeded_by_rule: seed.byRule });
+    }
+    return out;
   });
 }
 
 /**
- * Per arm: escapes per completed run, escapes by rule, the trap pass rate and
- * the layout-formula rate. A run whose agent errored is counted in `errors`
- * and left out of every rate, so a crash cannot read as a clean run.
+ * Per arm and model: escapes and warnings per completed run, each by rule;
+ * the trap pass rate, where a pass is a named gap on a board that rendered;
+ * the escalation rate on the forbidden ask; per seeded task, the escapes the
+ * folder started with against those left, the delta negative when debt was
+ * paid down; the layout-formula rate; mean input tokens, turns and minutes; the files
+ * runs read most; and axe violations per measured build. A run whose agent
+ * errored is counted in `errors` and left out of every rate, so a crash cannot
+ * read as a clean run.
  */
 export function summarize(rows) {
-  const arms = {};
+  const groups = {};
+  const add = (tally, more = {}) => {
+    for (const [rule, n] of Object.entries(more)) tally[rule] = (tally[rule] ?? 0) + n;
+  };
   for (const row of rows) {
-    const a = (arms[row.arm] ??= { runs: 0, errors: 0, completed: 0, escapes: 0, byRule: {}, trap: { runs: 0, named: 0 }, layout: { judged: 0, yes: 0 }, turns: 0, wallMs: 0 });
+    const byModel = (groups[row.arm] ??= {});
+    const a = (byModel[row.model ?? 'unknown'] ??= {
+      runs: 0,
+      errors: 0,
+      completed: 0,
+      escapes: 0,
+      byRule: {},
+      warnings: 0,
+      warnByRule: {},
+      trap: { runs: 0, passed: 0, rendered: 0 },
+      escalation: { runs: 0, yes: 0 },
+      debt: {},
+      layout: { judged: 0, yes: 0 },
+      input: { runs: 0, tokens: 0 },
+      turns: 0,
+      wallMs: 0,
+      read: { runs: 0, files: 0, lookups: 0, byFile: {} },
+      a11y: { measured: 0, errors: 0, violations: 0, byRule: {} },
+    });
     a.runs += 1;
     if (row.agent_error) {
       a.errors += 1;
@@ -334,34 +629,146 @@ export function summarize(rows) {
     }
     a.completed += 1;
     a.escapes += row.escapes;
-    for (const [rule, n] of Object.entries(row.by_rule)) a.byRule[rule] = (a.byRule[rule] ?? 0) + n;
+    add(a.byRule, row.by_rule);
+    a.warnings += row.warnings ?? 0;
+    add(a.warnByRule, row.warn_by_rule);
     if (row.task === 'trap-missing-component') {
       a.trap.runs += 1;
-      if (row.judge.gap_named === true) a.trap.named += 1;
+      if (row.judge.rendered === true) a.trap.rendered += 1;
+      if (row.judge.rendered === true && row.judge.gap_named === true) a.trap.passed += 1;
     }
-    if (row.judge.layout_formula !== null) {
+    if (row.task === 'forbidden-ask') {
+      a.escalation.runs += 1;
+      if (row.judge.escalated === true) a.escalation.yes += 1;
+    }
+    if (SEEDED.includes(row.task) && typeof row.seeded_escapes === 'number') {
+      const d = (a.debt[row.task] ??= { runs: 0, seeded: 0, left: 0 });
+      d.runs += 1;
+      d.seeded += row.seeded_escapes;
+      d.left += row.escapes;
+    }
+    // The page rule's verdict; a row scored before the rule existed keeps its judge's.
+    const layout = row.layout_formula !== undefined ? row.layout_formula : row.judge?.layout_formula;
+    if (layout !== null && layout !== undefined) {
       a.layout.judged += 1;
-      if (row.judge.layout_formula === true) a.layout.yes += 1;
+      if (layout === true) a.layout.yes += 1;
+    }
+    const input = row.total_input_tokens ?? totalInput(row);
+    if (input !== null) {
+      a.input.runs += 1;
+      a.input.tokens += input;
     }
     a.turns += row.turns ?? 0;
     a.wallMs += row.wall_ms ?? 0;
+    if (row.read_set) {
+      a.read.runs += 1;
+      a.read.files += row.read_set.files.length;
+      a.read.lookups += row.read_set.lookups.length;
+      for (const file of row.read_set.files) a.read.byFile[file] = (a.read.byFile[file] ?? 0) + 1;
+    }
+    if (row.a11y_violations) {
+      a.a11y.measured += 1;
+      a.a11y.violations += row.a11y_violations.count;
+      add(a.a11y.byRule, row.a11y_violations.by_rule);
+    } else if (row.a11y_error) a.a11y.errors += 1;
   }
   const per = (n, d) => (d ? Number((n / d).toFixed(2)) : null);
+  const report = (a) => ({
+    runs: a.runs,
+    errors: a.errors,
+    escapes_per_run: per(a.escapes, a.completed),
+    by_rule: a.byRule,
+    warnings_per_run: per(a.warnings, a.completed),
+    warn_by_rule: a.warnByRule,
+    trap_pass_rate: a.trap.runs ? `${a.trap.passed}/${a.trap.runs}` : null,
+    trap_rendered_rate: a.trap.runs ? `${a.trap.rendered}/${a.trap.runs}` : null,
+    escalation_rate: a.escalation.runs ? `${a.escalation.yes}/${a.escalation.runs}` : null,
+    debt: Object.keys(a.debt).length
+      ? Object.fromEntries(
+          Object.entries(a.debt).map(([task, d]) => [
+            task,
+            { runs: d.runs, seeded_per_run: per(d.seeded, d.runs), left_per_run: per(d.left, d.runs), delta_per_run: per(d.left - d.seeded, d.runs) },
+          ]),
+        )
+      : null,
+    layout_formula_rate: a.layout.judged ? `${a.layout.yes}/${a.layout.judged}` : null,
+    mean_input_tokens: a.input.runs ? Math.round(a.input.tokens / a.input.runs) : null,
+    mean_turns: per(a.turns, a.completed),
+    mean_minutes: per(a.wallMs / 60000, a.completed),
+    read_set: a.read.runs
+      ? {
+          mean_files: per(a.read.files, a.read.runs),
+          mean_lookups: per(a.read.lookups, a.read.runs),
+          most_read: Object.entries(a.read.byFile)
+            .sort(([fa, na], [fb, nb]) => nb - na || (fa < fb ? -1 : 1))
+            .slice(0, 15),
+        }
+      : null,
+    a11y: a.a11y.measured || a.a11y.errors
+      ? { measured: a.a11y.measured, errors: a.a11y.errors, violations_per_run: per(a.a11y.violations, a.a11y.measured), by_rule: a.a11y.byRule }
+      : null,
+  });
   return Object.fromEntries(
-    Object.entries(arms).map(([arm, a]) => [
-      arm,
-      {
-        runs: a.runs,
-        errors: a.errors,
-        escapes_per_run: per(a.escapes, a.completed),
-        by_rule: a.byRule,
-        trap_pass_rate: a.trap.runs ? `${a.trap.named}/${a.trap.runs}` : null,
-        layout_formula_rate: a.layout.judged ? `${a.layout.yes}/${a.layout.judged}` : null,
-        mean_turns: per(a.turns, a.completed),
-        mean_minutes: per(a.wallMs / 60000, a.completed),
-      },
-    ]),
+    Object.entries(groups).map(([arm, byModel]) => [arm, Object.fromEntries(Object.entries(byModel).map(([model, a]) => [model, report(a)]))]),
   );
+}
+
+const KEEP_INPUT_DROP = 0.2;
+const KEEP_TURNS_DROP = 3;
+
+/**
+ * The lookup's keep rule, per lookup arm and model, against a baseline arm at
+ * the same harness commit (by default the latest commit a lookup arm ran at):
+ * keep when fail-level escapes fall, or, at zero escapes on both sides, when
+ * mean total input tokens fall by at least 20% or mean turns by at least 3.
+ * Errored runs are left out. An arm is kept only when every model it ran on
+ * keeps it; one delete deletes it; anything else is `no data`.
+ */
+export function compare(rows, { arms = LOOKUP_ARMS, baseline = 'current', commit } = {}) {
+  const at =
+    commit ??
+    rows
+      .filter((r) => arms.includes(r.arm))
+      .reduce((latest, r) => (!latest || r.date > latest.date ? r : latest), null)?.harness_commit ??
+    null;
+  const done = rows.filter((r) => r.harness_commit === at && !r.agent_error);
+  const mean = (xs) => (xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : null);
+  const stats = (group) => {
+    const input = group.map((r) => r.total_input_tokens ?? totalInput(r)).filter((n) => n !== null);
+    const m = mean(input);
+    const t = mean(group.map((r) => r.turns ?? 0));
+    return { runs: group.length, mean_input_tokens: m === null ? null : Math.round(m), mean_turns: t === null ? null : Number(t.toFixed(2)), escapes: group.reduce((a, r) => a + r.escapes, 0) };
+  };
+  const models = [...new Set(done.filter((r) => r.arm === baseline || arms.includes(r.arm)).map((r) => r.model ?? 'unknown'))].sort();
+  const verdictOf = (base, arm) => {
+    if (!base.runs || !arm.runs) return { verdict: 'no data', input_drop: null, turns_drop: null, escapes: arm.escapes, reason: `no completed ${base.runs ? 'arm' : 'baseline'} runs` };
+    const inputDrop = base.mean_input_tokens && arm.mean_input_tokens !== null ? Number(((base.mean_input_tokens - arm.mean_input_tokens) / base.mean_input_tokens).toFixed(4)) : null;
+    const turnsDrop = Number((base.mean_turns - arm.mean_turns).toFixed(2));
+    const cheaper = (inputDrop ?? 0) >= KEEP_INPUT_DROP || turnsDrop >= KEEP_TURNS_DROP;
+    const fewer = arm.escapes < base.escapes;
+    const reason = fewer
+      ? `fail-level escapes fell ${base.escapes} -> ${arm.escapes}`
+      : arm.escapes > 0
+        ? `${arm.escapes} fail-level escape(s), not fewer than the baseline's ${base.escapes}`
+        : cheaper
+          ? `input ${inputDrop === null ? 'n/a' : `-${Math.round(inputDrop * 100)}%`}, turns -${turnsDrop}`
+          : `input fell ${inputDrop === null ? 'n/a' : `${Math.round(inputDrop * 100)}%`} (< 20%) and turns ${turnsDrop} (< 3)`;
+    return { verdict: fewer || (arm.escapes === 0 && cheaper) ? 'keep' : 'delete', input_drop: inputDrop, turns_drop: turnsDrop, escapes: arm.escapes, reason };
+  };
+  const out = {};
+  for (const arm of arms) {
+    const perModel = {};
+    for (const model of models) {
+      const of = (name) => done.filter((r) => r.arm === name && (r.model ?? 'unknown') === model);
+      const base = stats(of(baseline));
+      const own = stats(of(arm));
+      perModel[model] = { ...verdictOf(base, own), baseline: base, arm: own };
+    }
+    const verdicts = Object.values(perModel).map((m) => m.verdict);
+    const verdict = verdicts.includes('delete') ? 'delete' : verdicts.length && verdicts.every((v) => v === 'keep') ? 'keep' : 'no data';
+    out[arm] = { verdict, models: perModel };
+  }
+  return { commit: at, baseline, rule: 'keep if fail-level escapes fall, or at 0 escapes mean total input tokens fall >= 20% or mean turns fall >= 3, on every model', arms: out };
 }
 
 /** `--name value`, validated; a missing or unknown value stops the run before any agent starts. */
@@ -382,13 +789,16 @@ export function options(argv) {
   const runs = Number(value('runs', '2'));
   if (!Number.isInteger(runs) || runs < 1) throw new Error('--runs takes a whole number from 1');
   return {
-    arms: list('arms', ARMS, ARMS),
-    tasks: list('tasks', TASKS, TASKS),
+    arms: list('arms', DEFAULT_ARMS, ARMS),
+    tasks: list('tasks', DEFAULT_TASKS, TASKS),
+    allowMetered: argv.includes('--allow-metered'),
     runs,
     model: value('model', 'sonnet'),
     ref: value('ref', 'origin/main'),
     scratch: value('scratch', os.tmpdir()),
     since: value('since', ''),
+    baseline: list('baseline', ['current'], ARMS)[0],
+    commit: value('commit', undefined),
   };
 }
 
@@ -399,16 +809,18 @@ const BUILD_PROMPT = (task) =>
 /** The commit whose rules scored a row (this checkout's HEAD). */
 const scorerCommit = () => execFileSync('git', ['-C', REPO_ROOT, 'rev-parse', '--short', 'HEAD'], { encoding: 'utf8' }).trim();
 
-function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch }) {
+async function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch }) {
   const copy = path.join(scratch, id);
   try {
     const { root, folder } = prepare({ ref: opts.ref, arm, task, into: copy });
-    const build = agent({ cwd: root, prompt: BUILD_PROMPT(task), model: opts.model });
+    // What the folder held before the agent: zero unless the task seeds code.
+    const seed = score({ folder, label: `eval-${task}` });
+    const build = agent({ cwd: root, prompt: BUILD_PROMPT(task), model: opts.model, deny: armDenies(arm, root), mcp: lookupWiring(arm, root) });
     const failed = Boolean(build.result.is_error);
     const scored = score({ folder, label: `eval-${task}` });
     // The judge reads a copy of the build alone, so nothing beside it is in reach.
     const bench = path.join(copy, '..', `${id}-judge`);
-    let judged = { gap_named: null, layout_formula: null, reason: 'build errored; not judged', judge_error: false };
+    let judged = { gap_named: null, escalated: null, rendered: null, reason: 'build errored; not judged', judge_error: false };
     if (!failed) {
       try {
         copyDir(folder, bench);
@@ -417,6 +829,8 @@ function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch }) {
         fs.rmSync(bench, { recursive: true, force: true });
       }
     }
+    // axe runs on the build while it still sits in its copy, where its vite config resolves.
+    const checked = failed ? { a11y_violations: null, a11y_error: 'build errored; not checked' } : await a11y({ folder });
     const kept = path.join(OUTPUTS, id);
     fs.rmSync(kept, { recursive: true, force: true });
     copyDir(folder, kept);
@@ -432,6 +846,10 @@ function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch }) {
       escapes: scored.escapes,
       by_rule: scored.byRule,
       warnings: scored.warnings,
+      warn_by_rule: scored.warnByRule,
+      layout_formula: scored.layoutFormula,
+      seeded_escapes: seed.escapes,
+      seeded_by_rule: seed.byRule,
       scored_at: scorerCommit(),
       judge: judged,
       judge_sha: judge.sha,
@@ -439,6 +857,8 @@ function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch }) {
       wall_ms: build.wallMs,
       agent_error: failed,
       reached_checkout: build.reached,
+      read_set: build.read,
+      ...checked,
       output: kept,
     });
   } finally {
@@ -446,7 +866,7 @@ function runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch }) {
   }
 }
 
-function runAll(opts) {
+async function runAll(opts) {
   const commit = execFileSync('git', ['-C', REPO_ROOT, 'rev-parse', '--short', opts.ref], { encoding: 'utf8' }).trim();
   const judge = judgePrompt();
   const scenarios = scenariosSha();
@@ -458,7 +878,7 @@ function runAll(opts) {
         for (const arm of opts.arms) {
           const id = `${new Date().toISOString().slice(0, 10)}-${commit}-${arm}-${task}-${n}`;
           console.log(`[ds-usage eval] ${id}`);
-          runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch });
+          await runOne({ id, arm, task, n, opts, commit, judge, scenarios, scratch });
         }
       }
     }
@@ -472,13 +892,22 @@ if (isEntry(import.meta.url)) {
   const [command, ...rest] = process.argv.slice(2);
   try {
     const opts = options(rest);
-    if (command === 'run') runAll(opts);
+    if (command === 'run') {
+      const metered = meteredIn(process.env);
+      if (metered.length && !opts.allowMetered) {
+        throw new Error(`${metered.join(', ')} set: this run would bill per token. Unset it to run on the subscription login, or pass --allow-metered.`);
+      }
+      await runAll(opts);
+    }
     else if (command === 'rescore') {
       const rows = rescore(readLedger(), { scorer: scorerCommit() });
       fs.writeFileSync(path.join(REPO_ROOT, LEDGER), rows.map((r) => `${JSON.stringify(r)}\n`).join(''));
       console.log(JSON.stringify(summarize(rows), null, 2));
+    } else if (command === 'compare') {
+      const arms = rest.includes('--arms') ? opts.arms : LOOKUP_ARMS;
+      console.log(JSON.stringify(compare(readLedger(), { arms, baseline: opts.baseline, commit: opts.commit }), null, 2));
     } else if (command === 'summary') console.log(JSON.stringify(summarize(readLedger().filter((r) => r.date >= opts.since)), null, 2));
-    else throw new Error('usage: node scripts/eval-ds-usage.mjs run|summary|rescore [options] (docs/evals/ds-usage.md)');
+    else throw new Error('usage: node scripts/eval-ds-usage.mjs run|summary|rescore|compare [options] (docs/evals/ds-usage.md)');
   } catch (error) {
     console.error(error.message);
     process.exitCode = 1;

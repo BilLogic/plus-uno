@@ -86,9 +86,8 @@ test('the committed glossary is a glossary and within its baseline', () => {
   const text = readFileSync(path.join(REPO_ROOT, SUBJECT), 'utf8');
   const { failures, prose } = measure(text);
   assert.deepEqual(failures, []);
-  // Read through the ratchet, the way the check reads it (#601): the record is
-  // a `scalar` set — one number, keyed by its field name — and a test that
-  // parsed the file itself would be the second reader the module exists to end.
-  const recorded = openRatchet({ file: BASELINE }).entries.get('proseLines').counts.get('proseLines');
+  // Read through the ratchet, the way the check reads it: a test that parsed
+  // the file itself would be the second reader the module exists to end.
+  const recorded = openRatchet({ file: BASELINE }).entries.get('proseLines').count;
   assert.ok(prose <= recorded, `${prose} prose lines against a baseline of ${recorded}`);
 });

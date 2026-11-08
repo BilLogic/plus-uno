@@ -137,6 +137,14 @@ const ROWS: Row[] = [
   // github_read
   {
     name: "github_read",
+    args: { lookup: "card" },
+    details: "card",
+    result: ok({ lookup: "card", answer: { name: "Card", status: "not-here", replacement: ["PatternCard"] } }),
+    output: "Looked up card",
+    sources: [],
+  },
+  {
+    name: "github_read",
     args: { search: "ButtonGroup" },
     details: "ButtonGroup",
     result: ok({ repo: "BilLogic/plus-uno", search: "ButtonGroup", count: 1, hits: [{ path: "src/ButtonGroup.jsx", url: "https://github.com/BilLogic/plus-uno/blob/main/src/ButtonGroup.jsx" }] }),

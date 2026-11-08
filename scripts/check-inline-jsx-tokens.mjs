@@ -48,7 +48,7 @@ import { openRatchet } from './lib/ratchet.mjs';
 import { trackedSources } from './lib/tracked-sources.mjs';
 
 export { REPO_ROOT };
-/** Repo-relative: this record's key in the shape table, and what the registry row declares. */
+/** Repo-relative: what the registry row declares. */
 export const BASELINE = 'scripts/baselines/inline-jsx-tokens.json';
 
 export const SEARCH_ROOTS = ['design-system/src/components'];
@@ -209,7 +209,7 @@ export function run({ repoRoot = REPO_ROOT, sources } = {}) {
 export function summary({ repoRoot = REPO_ROOT, sources } = {}) {
   const found = measure(sources ?? sourcesOf(repoRoot));
   const now = [...found.values()].reduce((sum, { count }) => sum + count, 0);
-  const recorded = Object.values(ratchetFor(repoRoot).envelope('counts') ?? {}).reduce((a, b) => a + b, 0);
+  const recorded = [...ratchetFor(repoRoot).entries.values()].reduce((sum, { count }) => sum + count, 0);
   const fell = now < recorded ? ` — under the baseline of ${recorded}; record it with --update` : '';
   return `${now} inline JSX token literals in ${found.size} file(s)${fell}`;
 }

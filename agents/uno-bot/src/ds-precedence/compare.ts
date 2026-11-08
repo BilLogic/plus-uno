@@ -10,7 +10,8 @@
 //
 // SCOPE: component existence and variant axes only. Token values are left
 // out, because token names are Enterprise-gated on the Figma REST API.
-//   • Code: the generated component index (the existence law) and each
+//   • Code: the components of the design-system facts baked into the Worker
+//     (`integrations/ds-facts.ts`, the existence law the IDE reads too) and each
 //     component's props as `component-registry.json` carries them, beside the
 //     registry's mapping to Figma sets (`variantProps`, `codeDefaults`,
 //     `variantValueMap`).
@@ -45,6 +46,9 @@
 import type { FigmaComponentsResponse } from "../figma/client";
 import { namesInWords } from "../slack/copy-words";
 import { figmaFileUrl } from "../figma/links";
+import type { IndexEntry } from "../integrations/ds-facts";
+
+export type { IndexEntry };
 
 /** The three DS sources, in precedence order: the first wins. */
 export type DsSource = "code" | "library" | "spec-pages";
@@ -79,13 +83,6 @@ export interface Disagreement {
   figmaUrl: string;
   winner: DsSource;
   loser: DsSource;
-}
-
-/** One entry of the component index. */
-export interface IndexEntry {
-  name: string;
-  /** The component's generated doc, repo-relative. */
-  docPath: string;
 }
 
 /** The slice of component-registry.json the check reads. */
@@ -132,37 +129,8 @@ export interface LiveLibrary {
   nodeIds: string[];
 }
 
-/** The folder the index sits in; its links are relative to it. */
-const INDEX_DIR = "design-system/agent-views/components/";
-const INDEX_ENTRY = /^- \[([^\]]+)\]\(([^)]+)\)(.*)$/;
 /** Registry sets that are not a component's Figma counterpart. */
 const NOT_A_COUNTERPART = new Set(["docs-page", "no-code-equivalent"]);
-
-/**
- * The index's entries — its bullet links — with the doc path resolved against
- * the index's own folder. An alias ("— alias of `X`") is the same component
- * under a second name, so it is left out.
- *
- * @param markdown - design-system/agent-views/components/index.md
- */
-export function parseComponentIndex(markdown: string): IndexEntry[] {
-  const entries: IndexEntry[] = [];
-  for (const line of markdown.split("\n")) {
-    const m = INDEX_ENTRY.exec(line.trim());
-    if (!m || /alias of/i.test(m[3]!)) continue;
-    entries.push({ name: m[1]!.trim(), docPath: resolvePath(INDEX_DIR, m[2]!.trim()) });
-  }
-  return entries;
-}
-
-function resolvePath(base: string, relative: string): string {
-  const parts = base.split("/").filter(Boolean);
-  for (const seg of relative.split("/")) {
-    if (seg === "..") parts.pop();
-    else if (seg && seg !== ".") parts.push(seg);
-  }
-  return parts.join("/");
-}
 
 /** Variant props out of a variant's name, or null when it is not one. */
 function variantProps(name: string): Record<string, string> | null {

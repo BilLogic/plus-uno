@@ -62,17 +62,16 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   }
 
   /*
-   * The record, through `scripts/lib/ratchet.mjs` (#600). Its exception map
-   * keys a call site to THE REASON ITSELF, the shape declared for it in
-   * `scripts/lib/ratchet-shapes.mjs` — so a recorded site that now has a name
-   * is reported stale, and a recorded site whose reason says nothing is
+   * The record, through `scripts/lib/ratchet.mjs` (#600). Each exception is a
+   * call site with the reason it stands, and the set requires one — so a
+   * recorded site that now has a name is reported stale, and a recorded site whose reason says nothing is
    * reported unreviewed. Maintained BY HAND, with no `--update`: the bar is
    * zero, and a flag that recorded a nameless control for you would be a way of
    * agreeing that "button" is enough.
    */
   const gate = openRatchet({ file: RECORD, repoRoot });
   const hits = sites(nameless(files));
-  const side = Object.fromEntries([...hits.keys()].map((key) => [key, '']));
+  const side = [...hits.keys()];
   if (gate.absent) return [...found, ...gate.failures(side).map(({ message }) => ({ message }))];
 
   found.push(
