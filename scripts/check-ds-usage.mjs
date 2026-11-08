@@ -44,6 +44,7 @@ import path from 'node:path';
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { CONSUMER_ROOTS, SOURCE_ROOTS, loadFacts } from './lib/ds-facts.mjs';
 import { contextFrom, docLink, escapesIn, pagesOf } from './lib/ds-usage.mjs';
+import { readIconLists } from './lib/icon-lists.mjs';
 import { byRoot, isEntry } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 import { TOKEN_LADDER } from './lib/tokens/plan.mjs';
@@ -56,8 +57,6 @@ export const SCOPE = CONSUMER_ROOTS;
 export const SEARCHED = /\.(jsx|js|mjs|tsx|ts|scss|css|html)$/;
 const SKIPPED = /(?:^|\/)(?:node_modules|dist|build)\/|\.(?:test|spec|stories)\.[cm]?[jt]sx?$|\.d\.ts$/;
 const DEFINITION_ROOTS = SOURCE_ROOTS;
-const FA_METADATA = 'node_modules/@fortawesome/fontawesome-free/metadata/icons.json';
-const FREE_REGULAR = 'design-system/src/lib/icon-regular.generated.js';
 
 const git = (repoRoot, args) =>
   execFileSync('git', ['-C', repoRoot, ...args], { encoding: 'utf8', maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'ignore'] });
@@ -101,22 +100,13 @@ export const inScope = (rel) => SCOPE.some((root) => rel.startsWith(`${root}/`))
 const read = (repoRoot, rel) => ({ path: rel, text: fs.readFileSync(path.join(repoRoot, rel), 'utf8') });
 
 /**
- * The regular-weight icons Font Awesome Free ships, read from the generated
- * list as text: `design-system/` is not an ES-module package, so importing
- * the file from Node warns on every run.
+ * The Free icon names, from the committed lists (`npm run generate:icon-lists`),
+ * so a checkout, CI and the hosted server check every family alike. Solid and
+ * brands read as null only when their list is missing.
  */
-function freeRegular(repoRoot) {
-  const text = fs.readFileSync(path.join(repoRoot, FREE_REGULAR), 'utf8');
-  return new Set([...text.matchAll(/"([a-z0-9-]+)"/g)].map((m) => m[1]));
-}
-
-/** Font Awesome Free's solid and brands names, when its metadata is installed or named. */
-function freeIcons(repoRoot) {
-  const source = process.env.FA_ICONS_JSON ?? path.join(repoRoot, FA_METADATA);
-  if (!fs.existsSync(source)) return null;
-  const icons = JSON.parse(fs.readFileSync(source, 'utf8'));
-  const of = (style) => new Set(Object.entries(icons).filter(([, i]) => i.free?.includes(style)).map(([n]) => n));
-  return { solid: of('solid'), brands: of('brands') };
+function freeIconLists(repoRoot) {
+  const { regular, solid, brands } = readIconLists(repoRoot);
+  return { freeRegular: regular, freeIcons: solid.size ? { solid, brands } : null };
 }
 
 /** The design-system facts and every declared custom property, read once per repo root. */
@@ -129,8 +119,7 @@ export const contextOf = byRoot((repoRoot) => {
     components: facts.manifests.components,
     tokens: facts.manifests.tokens,
     defined: definitions(declaring),
-    freeRegular: freeRegular(repoRoot),
-    freeIcons: freeIcons(repoRoot),
+    ...freeIconLists(repoRoot),
     retired: facts.retired,
     promoted: new Set(TOKEN_LADDER.filter((row) => row.primitive).map((row) => row.new)),
     exported: facts.importable,
@@ -317,7 +306,7 @@ function cli(argv) {
   if (verdict.absent) console.error(verdict.absent);
 
   const mode = all ? 'whole scope against the baseline' : given.length ? 'named paths, held to zero' : 'changed files, held to zero';
-  const icons = contextOf(REPO_ROOT).freeIcons ? '' : '; solid and brands icon names unchecked (no Font Awesome metadata here)';
+  const icons = contextOf(REPO_ROOT).freeIcons ? '' : '; solid and brands icon names unchecked (design-system/src/lib/icon-free.generated.js is missing; run npm run generate:icon-lists)';
   const line = `check:ds-usage: ${files.length} file(s), ${mode}: ${verdict.blocking.length} escape(s), ${verdict.warnings.length} warning(s)${icons}`;
   if (failed) {
     console.error(`✗ ${line}\n${REMEDY}`);

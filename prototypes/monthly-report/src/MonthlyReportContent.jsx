@@ -712,7 +712,7 @@ export default function MonthlyReportContent() {
                                                                     isSelected={feedbackSelections[dim.id] === 'inaccurate'}
                                                                     onClick={(e) => { e.stopPropagation(); handleFeedback(dim.id, 'inaccurate'); }}
                                                                 >
-                                                                    <i className="fa-solid fa-exclamation-triangle"></i> Inaccurate
+                                                                    <i className="fa-solid fa-triangle-exclamation"></i> Inaccurate
                                                                 </Button>
                                                             </div>
                                                         </div>
