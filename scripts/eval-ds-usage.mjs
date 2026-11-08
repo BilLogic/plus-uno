@@ -18,14 +18,13 @@
  *   checker-removed  current without the checker (CHECKER_REMOVED); the
  *                    post-edit hook still runs, from this checkout.
  *   lookup           current plus the copy's own `plus-ds` MCP, all five tools.
- *   lookup-min       current plus `plus-ds` serving ds_find and ds_get only.
  *
  * Everything but the agent and judge calls is deterministic: the copies, the
  * scoring, the ledger rows and the summary.
  *
  *   node scripts/eval-ds-usage.mjs run [--arms control,current] [--tasks a,b] [--runs 2] [--allow-metered] [--model sonnet] [--ref origin/main] [--scratch DIR]
  *   node scripts/eval-ds-usage.mjs summary [--since YYYY-MM-DD]
- *   node scripts/eval-ds-usage.mjs compare [--arms lookup,lookup-min] [--baseline current] [--commit SHA]   the keep rule
+ *   node scripts/eval-ds-usage.mjs compare [--baseline current] [--commit SHA]   the keep rule
  *   node scripts/eval-ds-usage.mjs rescore   re-score every kept build with this checkout's rules
  */
 import { createRequire } from 'node:module';
@@ -62,10 +61,10 @@ export const TASKS = [
  * debt seeded.
  */
 export const SEEDED = ['debt-extend', 'migrate-retired'];
-export const ARMS = ['control', 'current', 'hook-off', 'checker-removed', 'lookup', 'lookup-min'];
+export const ARMS = ['control', 'current', 'hook-off', 'checker-removed', 'lookup'];
 /** The arms that add the design-system lookup to current, and the tools each serves (by `ds` subcommand). */
-export const LOOKUP_ARMS = ['lookup', 'lookup-min'];
-const LOOKUP_TOOLS = { lookup: ['find', 'get', 'tokens', 'guide', 'check'], 'lookup-min': ['find', 'get'] };
+export const LOOKUP_ARMS = ['lookup'];
+const LOOKUP_TOOLS = ['find', 'get', 'tokens', 'guide', 'check'];
 /**
  * The default run is small: three arms, four tasks, two runs, 24 builds. It
  * answers the first question (does the harness or the checker earn the
@@ -423,11 +422,9 @@ export function lookupWiring(arm, root) {
   if (!fs.existsSync(at)) throw new Error(`${arm}: the copy has no scripts/ds-mcp.mjs; pick a --ref that has the lookup`);
   // The real path: the server starts only when argv[1] is its own module URL, and the scratch dir is often a symlink (/var → /private/var).
   const server = fs.realpathSync(at);
-  const ops = LOOKUP_TOOLS[arm];
-  const args = ops.length === LOOKUP_TOOLS.lookup.length ? [server] : [server, '--tools', ops.join(',')];
   return {
-    mcpConfig: JSON.stringify({ mcpServers: { 'plus-ds': { type: 'stdio', command: 'node', args } } }),
-    allowed: ops.map((op) => `mcp__plus-ds__ds_${op}`),
+    mcpConfig: JSON.stringify({ mcpServers: { 'plus-ds': { type: 'stdio', command: 'node', args: [server] } } }),
+    allowed: LOOKUP_TOOLS.map((op) => `mcp__plus-ds__ds_${op}`),
   };
 }
 
@@ -722,8 +719,8 @@ const KEEP_TURNS_DROP = 3;
 /**
  * The lookup's keep rule, per lookup arm and model, against a baseline arm at
  * the same harness commit (by default the latest commit a lookup arm ran at):
- * keep when mean total input tokens fall by at least 20% or mean turns by at
- * least 3, with zero fail-level escapes across the arm's completed runs.
+ * keep when fail-level escapes fall, or, at zero escapes on both sides, when
+ * mean total input tokens fall by at least 20% or mean turns by at least 3.
  * Errored runs are left out. An arm is kept only when every model it ran on
  * keeps it; one delete deletes it; anything else is `no data`.
  */
@@ -748,13 +745,15 @@ export function compare(rows, { arms = LOOKUP_ARMS, baseline = 'current', commit
     const inputDrop = base.mean_input_tokens && arm.mean_input_tokens !== null ? Number(((base.mean_input_tokens - arm.mean_input_tokens) / base.mean_input_tokens).toFixed(4)) : null;
     const turnsDrop = Number((base.mean_turns - arm.mean_turns).toFixed(2));
     const cheaper = (inputDrop ?? 0) >= KEEP_INPUT_DROP || turnsDrop >= KEEP_TURNS_DROP;
-    const reason =
-      arm.escapes > 0
-        ? `${arm.escapes} fail-level escape(s); the rule holds escapes at 0`
+    const fewer = arm.escapes < base.escapes;
+    const reason = fewer
+      ? `fail-level escapes fell ${base.escapes} -> ${arm.escapes}`
+      : arm.escapes > 0
+        ? `${arm.escapes} fail-level escape(s), not fewer than the baseline's ${base.escapes}`
         : cheaper
           ? `input ${inputDrop === null ? 'n/a' : `-${Math.round(inputDrop * 100)}%`}, turns -${turnsDrop}`
           : `input fell ${inputDrop === null ? 'n/a' : `${Math.round(inputDrop * 100)}%`} (< 20%) and turns ${turnsDrop} (< 3)`;
-    return { verdict: arm.escapes === 0 && cheaper ? 'keep' : 'delete', input_drop: inputDrop, turns_drop: turnsDrop, escapes: arm.escapes, reason };
+    return { verdict: fewer || (arm.escapes === 0 && cheaper) ? 'keep' : 'delete', input_drop: inputDrop, turns_drop: turnsDrop, escapes: arm.escapes, reason };
   };
   const out = {};
   for (const arm of arms) {
@@ -769,7 +768,7 @@ export function compare(rows, { arms = LOOKUP_ARMS, baseline = 'current', commit
     const verdict = verdicts.includes('delete') ? 'delete' : verdicts.length && verdicts.every((v) => v === 'keep') ? 'keep' : 'no data';
     out[arm] = { verdict, models: perModel };
   }
-  return { commit: at, baseline, rule: 'keep if mean total input tokens fall >= 20% or mean turns fall >= 3, at 0 fail-level escapes, on every model', arms: out };
+  return { commit: at, baseline, rule: 'keep if fail-level escapes fall, or at 0 escapes mean total input tokens fall >= 20% or mean turns fall >= 3, on every model', arms: out };
 }
 
 /** `--name value`, validated; a missing or unknown value stops the run before any agent starts. */

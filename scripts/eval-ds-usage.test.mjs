@@ -106,8 +106,8 @@ test('armDenies: checker-removed denies the checker in the copy to Read and npm;
   for (const rel of CHECKER_REMOVED) assert.ok(deny.includes(`Read(//c/${rel})`), rel);
   assert.ok(deny.includes('Bash(npm run check:ds-usage:*)'));
   assert.ok(JSON.parse(confined('/r', deny)).permissions.deny.includes('Bash(npm run check:ds-usage:*)'));
-  assert.deepEqual(ARMS, ['control', 'current', 'hook-off', 'checker-removed', 'lookup', 'lookup-min']);
-  for (const arm of ['lookup', 'lookup-min']) assert.deepEqual(armDenies(arm, '/c'), []);
+  assert.deepEqual(ARMS, ['control', 'current', 'hook-off', 'checker-removed', 'lookup']);
+  assert.deepEqual(armDenies('lookup', '/c'), []);
 });
 
 test('score: escapes by rule from this checkout\'s rules; the untouched template scores zero', () => {
@@ -436,8 +436,8 @@ test('meteredIn: names the variables that would bill per token', () => {
   assert.deepEqual(meteredIn({ ANTHROPIC_API_KEY: 'k', CLAUDE_CODE_USE_VERTEX: '1', HOME: '/x' }), ['ANTHROPIC_API_KEY', 'CLAUDE_CODE_USE_VERTEX']);
 });
 
-test('lookup arms: the copy\'s plus-ds server through --mcp-config, all five tools or find and get; other arms get none', () => {
-  assert.deepEqual(LOOKUP_ARMS, ['lookup', 'lookup-min']);
+test('lookup arm: the copy\'s plus-ds server through --mcp-config, all five tools; other arms get none', () => {
+  assert.deepEqual(LOOKUP_ARMS, ['lookup']);
   for (const arm of LOOKUP_ARMS) assert.ok(ARMS.includes(arm), arm);
   assert.deepEqual(DEFAULT_ARMS, ['control', 'current', 'checker-removed']);
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-lookup-'));
@@ -451,9 +451,6 @@ test('lookup arms: the copy\'s plus-ds server through --mcp-config, all five too
     const full = lookupWiring('lookup', root);
     assert.deepEqual(JSON.parse(full.mcpConfig), { mcpServers: { 'plus-ds': { type: 'stdio', command: 'node', args: [server] } } });
     assert.deepEqual(full.allowed, ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check'].map((t) => `mcp__plus-ds__${t}`));
-    const min = lookupWiring('lookup-min', root);
-    assert.deepEqual(JSON.parse(min.mcpConfig).mcpServers['plus-ds'].args, [server, '--tools', 'find,get']);
-    assert.deepEqual(min.allowed, ['mcp__plus-ds__ds_find', 'mcp__plus-ds__ds_get']);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
@@ -465,17 +462,15 @@ test('readSet: a plus-ds tool call is a lookup, by tool name and input', () => {
   assert.deepEqual(readSet(stdout, '/c').lookups, ['ds_find {"query":"card"}', 'ds_get {"names":["PatternCard"]}']);
 });
 
-test('compare: keep on a 20% input drop or 3 fewer turns at zero escapes, per model; delete otherwise', () => {
+test('compare: keep when escapes fall, or at zero escapes on a 20% input drop or 3 fewer turns, per model; delete otherwise', () => {
   const row = (arm, model, input, turns, escapes = 0, extra = {}) => ({ arm, model, harness_commit: 'abc', date: '2026-11-08', total_input_tokens: input, turns, escapes, agent_error: false, ...extra });
   const rows = [
     row('current', 'sonnet', 1000, 20),
     row('current', 'sonnet', 1000, 20),
     row('lookup', 'sonnet', 790, 19),
     row('lookup', 'sonnet', 810, 19),
-    row('lookup-min', 'sonnet', 990, 17),
-    row('lookup-min', 'sonnet', 990, 16, 1),
-    row('current', 'opus', 1000, 20),
-    row('lookup', 'opus', 950, 17),
+    row('current', 'opus', 1000, 20, 5),
+    row('lookup', 'opus', 1200, 26, 1),
     row('lookup', 'opus', 1, 1, 0, { agent_error: true }),
     row('lookup', 'sonnet', 1, 1, 0, { harness_commit: 'old', date: '2026-11-01' }),
   ];
@@ -485,15 +480,17 @@ test('compare: keep on a 20% input drop or 3 fewer turns at zero escapes, per mo
   const s = out.arms.lookup.models.sonnet;
   assert.deepEqual([s.verdict, s.input_drop, s.turns_drop, s.escapes], ['keep', 0.2, 1, 0]);
   assert.deepEqual([s.baseline.mean_input_tokens, s.arm.mean_input_tokens, s.arm.runs], [1000, 800, 2]);
-  assert.equal(out.arms.lookup.models.opus.verdict, 'keep');
-  assert.equal(out.arms.lookup.models.opus.arm.runs, 1);
+  const o = out.arms.lookup.models.opus;
+  assert.equal(o.verdict, 'keep', 'fewer escapes keeps it at a higher cost');
+  assert.match(o.reason, /escapes fell 5 -> 1/);
+  assert.equal(o.arm.runs, 1);
   assert.equal(out.arms.lookup.verdict, 'keep');
-  assert.equal(out.arms['lookup-min'].models.sonnet.verdict, 'delete');
-  assert.match(out.arms['lookup-min'].models.sonnet.reason, /escape/);
-  assert.equal(out.arms['lookup-min'].models.opus.verdict, 'no data');
-  assert.equal(out.arms['lookup-min'].verdict, 'delete');
   assert.equal(compare(rows, { commit: 'old' }).arms.lookup.verdict, 'no data');
-  assert.equal(compare(rows.map((r) => (r.arm === 'lookup' && r.model === 'opus' && !r.agent_error ? { ...r, turns: 18 } : r))).arms.lookup.verdict, 'delete');
+  const sonnetCostlier = rows.map((r) => (r.arm === 'lookup' && r.model === 'sonnet' ? { ...r, total_input_tokens: 990 } : r));
+  assert.equal(compare(sonnetCostlier).arms.lookup.models.sonnet.verdict, 'delete', 'equal escapes and not cheaper');
+  assert.equal(compare(sonnetCostlier).arms.lookup.verdict, 'delete', 'one delete deletes it');
+  const opusWorse = rows.map((r) => (r.arm === 'lookup' && r.model === 'opus' && !r.agent_error ? { ...r, escapes: 5 } : r));
+  assert.match(compare(opusWorse).arms.lookup.models.opus.reason, /not fewer/);
 });
 
 test('options: compare reads a baseline arm and a commit', () => {

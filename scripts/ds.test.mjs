@@ -14,7 +14,6 @@ import test from 'node:test';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
-import { servedTools } from './ds-mcp.mjs';
 import { REPO_ROOT } from './lib/corpus.mjs';
 
 test('the ds command answers find with PatternCard and its import', () => {
@@ -36,20 +35,4 @@ test('the MCP server lists exactly the five tools, in order, and answers ds_find
   } finally {
     await client.close();
   }
-});
-
-test('the MCP server serves only the tools --tools names, and refuses an unknown one', async () => {
-  const client = new Client({ name: 'ds-test', version: '0.0.0' });
-  await client.connect(new StdioClientTransport({ command: process.execPath, args: [path.join(REPO_ROOT, 'scripts/ds-mcp.mjs'), '--tools', 'find,get'], cwd: REPO_ROOT, stderr: 'pipe' }));
-  try {
-    const { tools } = await client.listTools();
-    assert.deepEqual(tools.map((t) => t.name), ['ds_find', 'ds_get']);
-    assert.match(client.getInstructions(), /npm run ds -- check/);
-    const refused = await client.callTool({ name: 'ds_check', arguments: { code: '<div />' } });
-    assert.equal(refused.isError, true);
-  } finally {
-    await client.close();
-  }
-  assert.deepEqual(servedTools([]).map((t) => t.name), ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_check']);
-  assert.throws(() => servedTools(['--tools', 'find,lint']), /unknown lint/);
 });
