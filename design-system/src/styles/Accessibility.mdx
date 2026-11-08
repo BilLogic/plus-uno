@@ -23,6 +23,8 @@ import * as AccessibilityStories from './Accessibility.stories.jsx';
 
 <FoundationSection title="Overview">
 
+WCAG 2.1 AA is the minimum bar for every PLUS screen. Tutors use PLUS on laptops during live sessions, often while sharing their screen with a student, so a screen stays legible at any zoom level and works under assistive technology.
+
 These are the accessibility rules every PLUS screen meets. Most of them are built into the tokens and the patterns, so a screen built from them meets the rules by default. Each component page adds the rules for its own name, role and keyboard behavior. Each foundation page owns the rules for its own subject: contrast in Color, heading order in Typography, the focus ring in Border and Radius, reduced motion in Motion.
 
 </FoundationSection>
@@ -108,6 +110,38 @@ Focus is shown by the **focus ring**, never by a fill.
 
 See Do and don't for the ring beside the fill-only mistake.
 
+<FoundationSubsection title="Focus in overlays">
+
+Opening a `Modal` or a `PatternDrawer` moves focus inside it and keeps Tab
+there; closing it returns focus to the control that opened it. Both do this
+themselves, and a new overlay gets the same behavior by building on Base UI.
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Keyboard">
+
+Every interactive element can be reached and operated from the keyboard.
+
+- Tab order follows the visual reading order: left to right, top to bottom.
+- A widget follows its keyboard pattern: arrow keys move through a menu, and
+  Escape closes a `Modal`.
+- New interactive behavior (open and closed state, focus, keyboard) is built
+  on Base UI (`@base-ui/react`), which supplies these patterns.
+
+</FoundationSection>
+
+<FoundationSection title="Screen readers">
+
+- Reach for the semantic element first (`button`, `nav`, `main`, `table`),
+  and for ARIA only when no element fits.
+- A control with no visible text is named with `aria-label` or
+  `aria-labelledby`.
+- Content that changes without a page load is announced through a live
+  region (`role="status"` with `aria-live="polite"`), as the `Table` bulk-action
+  count is.
+
 </FoundationSection>
 
 <FoundationSection title="Disabled">
@@ -115,6 +149,21 @@ See Do and don't for the ring beside the fill-only mistake.
 A disabled component is dimmed as a whole to `--ds-opacity-disabled` (0.4),
 rather than recoloring its parts. Disabled elements are not focus targets, and
 they keep their label, so people can still tell what is unavailable.
+
+</FoundationSection>
+
+<FoundationSection title="Forms">
+
+- Every field has a visible label tied to its control. A field that renders
+  its own label wires the label's `htmlFor` to the control's `id` itself;
+  `Select` and `DatePicker` render none, so the form supplies it.
+- An error says what went wrong and how to fix it, on the field, through its
+  `errorMessage`.
+- A required field takes `required`, which draws the asterisk, and the form
+  puts one line above its first field: "Required fields are marked with an
+  asterisk (*)."
+- Related fields are grouped in a `Fieldset`, which renders a `fieldset` and
+  its `legend`.
 
 </FoundationSection>
 

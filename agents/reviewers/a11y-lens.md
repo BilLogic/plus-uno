@@ -22,5 +22,5 @@ Judges an artifact's accessibility: color contrast, focus order, accessible labe
 
 ## Conventions it obeys
 
-- `design-system/guidelines/` a11y foundation docs (the rules live there)
+- `design-system/src/styles/Accessibility.mdx` (`npm run ds -- guide accessibility`): the DS a11y rules
 - Scored by: `docs/evals/rubrics/uno-review.md`

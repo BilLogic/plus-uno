@@ -30,7 +30,7 @@ If a Figma link is provided:
 - Color contrast and readable state communication
 - Screen-reader-friendly labels and content order
 
-See also `design-system/guidelines/foundations/accessibility.md`.
+See also `design-system/src/styles/Accessibility.mdx`.
 
 ## Before Finishing
 
