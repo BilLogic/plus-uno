@@ -3,7 +3,7 @@
 
 # InlineEditableTextfield
 
-It reads as the text, or the placeholder when there is none, and opens as the standard text field at the same size. Validation shows under the field through the field's own caption, and a failed `onConfirm` shows there too. With `value` the parent holds the text; without it, the field keeps what was last confirmed.
+InlineEditableTextfield — `InlineEdit` with a Text field for its edit view. It reads as the text, or the placeholder when there is none, and opens as the standard text field at the same size. Validation shows under the field through the field's own caption, and a failed `onConfirm` shows there too. With `value` the parent holds the text; without it, the field keeps what was last confirmed.
 
 **Import:** `import { InlineEditableTextfield } from '@/components';`
 

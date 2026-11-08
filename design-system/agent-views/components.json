@@ -711,7 +711,7 @@
       "import": "import { Banner } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/Banner/Banner.jsx",
-      "summary": "stripe — the caller mounts and unmounts it, and meaning comes from the fill and the icon alone.",
+      "summary": "Banner: a prominent message at the top of a page. No dismiss and no side stripe — the caller mounts and unmounts it, and meaning comes from the fill and the icon alone.",
       "props": [
         {
           "name": "appearance",
@@ -1194,7 +1194,7 @@
       "import": "import { Calendar } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Calendar/Calendar.jsx",
-      "summary": "`_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Days of the months either side are drawn and can't be picked. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current=\"date\"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** a pixel width, 28, 36 or 44, drawn from the `--calendar-day-*` tokens.",
+      "summary": "Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Days of the months either side are drawn and can't be picked. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current=\"date\"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** a pixel width, 28, 36 or 44, drawn from the `--calendar-day-*` tokens.",
       "props": [
         {
           "name": "viewDate",
@@ -1611,7 +1611,7 @@
       "import": "import { Checkbox } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Checkbox/Checkbox.jsx",
-      "summary": "Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage. Built on Base UI's Checkbox: a `role=\"checkbox\"` span with a hidden native input beside it for form submission, wrapped in `FieldFrame` (A7) for the label and the description caption. `isInvalid` marks the unselected box only, through `data-invalid` scoped off `data-checked` in the stylesheet.",
+      "summary": "Checkbox — single boolean control with optional indeterminate state. Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage. Built on Base UI's Checkbox: a `role=\"checkbox\"` span with a hidden native input beside it for form submission, wrapped in `FieldFrame` (A7) for the label and the description caption. `isInvalid` marks the unselected box only, through `data-invalid` scoped off `data-checked` in the stylesheet.",
       "props": [
         {
           "name": "id",
@@ -1804,7 +1804,7 @@
       "import": "import { ChoiceGrid } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.jsx",
-      "summary": "Each cell is the real Checkbox or Radio, named by its row and its column.",
+      "summary": "ChoiceGrid — the same question asked of several rows, as a table. Each cell is the real Checkbox or Radio, named by its row and its column.",
       "props": [
         {
           "name": "id",
@@ -2091,7 +2091,7 @@
       "import": "import { Comment } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Comment/Comment.jsx",
-      "summary": "author, time, content, actions and replies.",
+      "summary": "Comment: one entry in a threaded discussion, with slots for the author, time, content, actions and replies.",
       "props": [
         {
           "name": "avatar",
@@ -2362,7 +2362,7 @@
       "import": "import { DatePicker } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/DatePicker/DatePicker.jsx",
-      "summary": "Built from the shared parts: the field is `FieldBox` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: DatePicker has no `label` prop, so that is how a caller names it.",
+      "summary": "DatePicker — a date field that opens a month calendar (Figma `DatePicker`). Built from the shared parts: the field is `FieldBox` with the calendar icon in Trailing, and the calendar is the shared `Calendar` on the `_Listbox` surface, which DateTimePicker opens too. - **Typing:** the field takes MM/DD/YYYY (and, with `range`, two dates joined by a dash). It is checked when you press Enter or leave the field: a real day inside `minDate`…`maxDate` is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Range:** the first click sets the first day, the second the last; a click before the first day starts again. `onChange` receives `[start, end]`. - **Popup:** opens 4px (`--stack-sm`) below the field, left-aligned (or as `calendarAlign` asks), and flips above with the same gap when there is no room below. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: DatePicker has no `label` prop, so that is how a caller names it.",
       "props": [
         {
           "name": "id",
@@ -2612,7 +2612,7 @@
       "import": "import { DateTimePicker } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/DateTimePicker/DateTimePicker.jsx",
-      "summary": "Composed from DatePicker and TimePicker, laid out as labeled sections with a shared time-zone caption under the time.",
+      "summary": "DateTimePicker — a date field and a time field read as one moment. Composed from DatePicker and TimePicker, laid out as labeled sections with a shared time-zone caption under the time.",
       "props": [
         {
           "name": "id",
@@ -2899,7 +2899,7 @@
       "import": "import { DropdownMenu } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.jsx",
-      "summary": "floating popup. Positioning and dismissal (outside click, Escape) are Base UI Menu's; the rows are the public Menu family (`MenuGroup`, `ButtonItem`, `LinkItem`, `CustomItem`, `Section`) so a dropdown's menu looks exactly like any other menu in the system.",
+      "summary": "DropdownMenu: a trigger that opens a `MenuGroup` of `Menu` items in a floating popup. Positioning and dismissal (outside click, Escape) are Base UI Menu's; the rows are the public Menu family (`MenuGroup`, `ButtonItem`, `LinkItem`, `CustomItem`, `Section`) so a dropdown's menu looks exactly like any other menu in the system.",
       "props": [
         {
           "name": "trigger",
@@ -3145,7 +3145,7 @@
       "import": "import { Fieldset } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Fieldset.jsx",
-      "summary": "A thin, token-styled wrap around Base UI's Fieldset: `Root` renders the `<fieldset>`, `Legend` renders a `<div>` already wired to `aria-labelledby` the fieldset. `RadioGroup` builds on this; a \"Checkbox group\" is the same composition with `Checkbox` instead.",
+      "summary": "Fieldset — a legend plus the fields it groups. A thin, token-styled wrap around Base UI's Fieldset: `Root` renders the `<fieldset>`, `Legend` renders a `<div>` already wired to `aria-labelledby` the fieldset. `RadioGroup` builds on this; a \"Checkbox group\" is the same composition with `Checkbox` instead.",
       "props": [
         {
           "name": "id",
@@ -4314,7 +4314,7 @@
       "import": "import { Image } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/Image/Image.jsx",
-      "summary": "in by the browser rather than by script.",
+      "summary": "Image: a decorative or meaningful bitmap, with a dark-mode variant swapped in by the browser rather than by script.",
       "props": [
         {
           "name": "src",
@@ -4390,7 +4390,7 @@
       "import": "import { InlineEdit } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.jsx",
-      "summary": "The read view and the edit view are drawn at the same size, so opening the editor does not move anything around it. Enter or leaving the editor confirms; Escape cancels. Confirm and cancel buttons sit under the edit view and can be left off. `validate` can refuse a value with a message, and the editor stays open. The parent holds the value. `defaultValue` is what the edit view starts with each time it opens, and `onConfirm` is where the new value goes. Not for use inside a form: it saves on its own and has no say in the form's submit. Use `Input` there.",
+      "summary": "InlineEdit — text that reads as text and becomes a field when it is pressed. The read view and the edit view are drawn at the same size, so opening the editor does not move anything around it. Enter or leaving the editor confirms; Escape cancels. Confirm and cancel buttons sit under the edit view and can be left off. `validate` can refuse a value with a message, and the editor stays open. The parent holds the value. `defaultValue` is what the edit view starts with each time it opens, and `onConfirm` is where the new value goes. Not for use inside a form: it saves on its own and has no say in the form's submit. Use `Input` there.",
       "props": [
         {
           "name": "id",
@@ -4562,7 +4562,7 @@
       "import": "import { InlineEditableTextfield } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/InlineEditableTextfield/InlineEditableTextfield.jsx",
-      "summary": "It reads as the text, or the placeholder when there is none, and opens as the standard text field at the same size. Validation shows under the field through the field's own caption, and a failed `onConfirm` shows there too. With `value` the parent holds the text; without it, the field keeps what was last confirmed.",
+      "summary": "InlineEditableTextfield — `InlineEdit` with a Text field for its edit view. It reads as the text, or the placeholder when there is none, and opens as the standard text field at the same size. Validation shows under the field through the field's own caption, and a failed `onConfirm` shows there too. With `value` the parent holds the text; without it, the field keeps what was last confirmed.",
       "props": [
         {
           "name": "id",
@@ -4761,7 +4761,7 @@
       "import": "import { InlineMessage } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/InlineMessage/InlineMessage.jsx",
-      "summary": "message. Built on Popup so placement, dismissal and focus return are shared with every other popup in the system.",
+      "summary": "InlineMessage: a compact icon trigger that opens a Popup carrying the full message. Built on Popup so placement, dismissal and focus return are shared with every other popup in the system.",
       "props": [
         {
           "name": "appearance",
@@ -5723,7 +5723,7 @@
       "import": "import { PageHeader } from '@/components';",
       "group": "layout-and-structure",
       "source": "design-system/src/components/layout-and-structure/PageHeader/PageHeader.jsx",
-      "summary": "actions to its side, and a bottom bar below.",
+      "summary": "PageHeader: a page's title row, with an optional breadcrumb trail above it, actions to its side, and a bottom bar below.",
       "props": [
         {
           "name": "title",
@@ -7876,7 +7876,7 @@
       "import": "import { Radio } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Radio/Radio.jsx",
-      "summary": "Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage. Built on Base UI's Radio, wrapped in `FieldFrame` (A7) for the label and the description caption. Base UI's Radio has no standalone `checked` prop — selection lives on a `RadioGroup` ancestor. `RadioGroup` renders one real, shared Base UI `RadioGroup` around all of its options and passes each one `grouped`, so the group gets Base UI's native roving-tabindex keyboard nav across options for free, same as `ChoiceGrid`'s radio-type rows. A `Radio` used on its own (no `grouped`, the default) — a lone question, a `ChoiceGrid` cell, or sibling Radios sharing a bare `name` the way the \"Group\" story composes them — owns a private, single-item group instead, so it stays independently controllable exactly like the native input it replaces. That private group keeps its own `role=\"radiogroup\"` (axe rejects `aria-readonly`/ `aria-required` on a role-less `div`) but drops the `aria-labelledby` it would otherwise inherit from an ambient Fieldset legend it has no business naming itself after.",
+      "summary": "Radio — single option within a named radio group. Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage. Built on Base UI's Radio, wrapped in `FieldFrame` (A7) for the label and the description caption. Base UI's Radio has no standalone `checked` prop — selection lives on a `RadioGroup` ancestor. `RadioGroup` renders one real, shared Base UI `RadioGroup` around all of its options and passes each one `grouped`, so the group gets Base UI's native roving-tabindex keyboard nav across options for free, same as `ChoiceGrid`'s radio-type rows. A `Radio` used on its own (no `grouped`, the default) — a lone question, a `ChoiceGrid` cell, or sibling Radios sharing a bare `name` the way the \"Group\" story composes them — owns a private, single-item group instead, so it stays independently controllable exactly like the native input it replaces. That private group keeps its own `role=\"radiogroup\"` (axe rejects `aria-readonly`/ `aria-required` on a role-less `div`) but drops the `aria-labelledby` it would otherwise inherit from an ambient Fieldset legend it has no business naming itself after.",
       "props": [
         {
           "name": "id",
@@ -8069,7 +8069,7 @@
       "import": "import { RadioGroup } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/RadioGroup/RadioGroup.jsx",
-      "summary": "A `Fieldset` (legend plus grouped fields) holding one real Base UI `RadioGroup`, which carries the `role=\"radiogroup\"`, the keyboard roving tabindex across options, and `aria-required`/`aria-readonly`; the Fieldset stays plain grouping and the legend, which the group inherits as its own accessible name. Lays them out stacked or inline, can put scale ends either side (`leadingText`, `trailingText` — see the \"Linear scale\" story), and shows one error for the group. `isDisabled` on the group overrides every `Radio`'s own. The value is the chosen option's value, or `null`/`undefined` while unanswered — a radio group does not fall back to its first option, so a response of `1` can be told apart from no response.",
+      "summary": "RadioGroup — one question and its radio answers. A `Fieldset` (legend plus grouped fields) holding one real Base UI `RadioGroup`, which carries the `role=\"radiogroup\"`, the keyboard roving tabindex across options, and `aria-required`/`aria-readonly`; the Fieldset stays plain grouping and the legend, which the group inherits as its own accessible name. Lays them out stacked or inline, can put scale ends either side (`leadingText`, `trailingText` — see the \"Linear scale\" story), and shows one error for the group. `isDisabled` on the group overrides every `Radio`'s own. The value is the chosen option's value, or `null`/`undefined` while unanswered — a radio group does not fall back to its first option, so a response of `1` can be told apart from no response.",
       "props": [
         {
           "name": "id",
@@ -8260,7 +8260,7 @@
       "import": "import { Range } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Range/Range.jsx",
-      "summary": "A range input carries its value, never its meaning: \"49\" says nothing about what is being set. `label` is the only thing that names it, so it takes the same pair as `Input` — `label` for the text, `showLabel={false}` to hide that text without taking the name away (#213). Built on Base UI's Slider, wrapped in `FieldFrame` (A7) for the disabled fade. Base UI's Slider has no DOM-query label lookup the way Checkbox and Radio do — `Slider.Thumb`'s accessible name only ever comes from an explicit `aria-label`/`aria-labelledby` or an ambient `Field.Label` registration — so the label here points at the thumb directly via `aria-labelledby` on `Slider.Root`, which `Slider.Root` forwards to every `Slider.Thumb` beneath it.",
+      "summary": "Range — slider over a numeric span. A range input carries its value, never its meaning: \"49\" says nothing about what is being set. `label` is the only thing that names it, so it takes the same pair as `Input` — `label` for the text, `showLabel={false}` to hide that text without taking the name away (#213). Built on Base UI's Slider, wrapped in `FieldFrame` (A7) for the disabled fade. Base UI's Slider has no DOM-query label lookup the way Checkbox and Radio do — `Slider.Thumb`'s accessible name only ever comes from an explicit `aria-label`/`aria-labelledby` or an ambient `Field.Label` registration — so the label here points at the thumb directly via `aria-labelledby` on `Slider.Root`, which `Slider.Root` forwards to every `Slider.Thumb` beneath it.",
       "props": [
         {
           "name": "id",
@@ -8702,7 +8702,7 @@
       "import": "import { ScrollBar } from '@/components';",
       "group": "layout-and-structure",
       "source": "design-system/src/components/layout-and-structure/ScrollBar/ScrollBar.jsx",
-      "summary": "scrollbar styling (thin width, border-colored thumb, transparent track) to its scrollable content.",
+      "summary": "ScrollBar — a wrapper that applies the Design System's tokenized custom scrollbar styling (thin width, border-colored thumb, transparent track) to its scrollable content.",
       "props": [
         {
           "name": "children",
@@ -8766,7 +8766,7 @@
       "import": "import { SectionMessage } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/SectionMessage/SectionMessage.jsx",
-      "summary": "it is resolved or dismissed. // Simple message <SectionMessage appearance=\"warning\">Warning message here</SectionMessage> // With title <SectionMessage appearance=\"info\" title=\"Info\">This is an info message.</SectionMessage> // Rich content <SectionMessage appearance=\"danger\"> <strong>Error:</strong> Something went wrong. <a href=\"/help\">Get help</a> </SectionMessage> // Leading icon: each style has a default; a name or a node replaces it, false removes it <SectionMessage appearance=\"info\" leadingVisual=\"bell\">Reminders are on.</SectionMessage> <SectionMessage appearance=\"warning\" leadingVisual={false}>Sign-in didn't complete. Please try again.</SectionMessage> // Actions: link buttons after the body, in the order given <SectionMessage appearance=\"warning\" actions={[{ text: 'Reschedule', onClick: onReschedule }]}> This term's schedule is provisional. </SectionMessage>",
+      "summary": "SectionMessage: a message that belongs to the page and stays there until it is resolved or dismissed. // Simple message <SectionMessage appearance=\"warning\">Warning message here</SectionMessage> // With title <SectionMessage appearance=\"info\" title=\"Info\">This is an info message.</SectionMessage> // Rich content <SectionMessage appearance=\"danger\"> <strong>Error:</strong> Something went wrong. <a href=\"/help\">Get help</a> </SectionMessage> // Leading icon: each style has a default; a name or a node replaces it, false removes it <SectionMessage appearance=\"info\" leadingVisual=\"bell\">Reminders are on.</SectionMessage> <SectionMessage appearance=\"warning\" leadingVisual={false}>Sign-in didn't complete. Please try again.</SectionMessage> // Actions: link buttons after the body, in the order given <SectionMessage appearance=\"warning\" actions={[{ text: 'Reschedule', onClick: onReschedule }]}> This term's schedule is provisional. </SectionMessage>",
       "props": [
         {
           "name": "id",
@@ -8880,7 +8880,7 @@
       "import": "import { Select } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Select/Select.jsx",
-      "summary": "internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. A searchable field is a text input: typing in it filters the list. A plain one is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode=\"tags\"`), which collapse into \"+n\" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.",
+      "summary": "Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. A searchable field is a text input: typing in it filters the list. A plain one is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode=\"tags\"`), which collapse into \"+n\" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.",
       "props": [
         {
           "name": "id",
@@ -9692,7 +9692,7 @@
       "import": "import { Spotlight } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/Spotlight/Spotlight.jsx",
-      "summary": "drawn on `Popover.Positioner` from `@base-ui/react`.",
+      "summary": "Spotlight: a one-step onboarding callout anchored to a `SpotlightTarget`, drawn on `Popover.Positioner` from `@base-ui/react`.",
       "props": [
         {
           "name": "target",
@@ -10624,7 +10624,7 @@
       "import": "import { TagInput } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/TagInput/TagInput.jsx",
-      "summary": "Notion's multi-select. Focusing the field opens a list of the options. Typing filters it and highlights the first match; Enter or a click adds the highlighted option. A \"Create *text*\" row is offered when no option matches the text exactly, ignoring case. It previews the new tag as the Tag it will be, in the random Tag color it will get, and creating reports that color once through `onCreate`. Backspace in an empty entry removes the last tag, and Esc closes the list and clears only the typed text. People can tidy the options where they pick them, as in Notion. With `onRename`, `onDelete` or `onColorChange`, the highlighted row shows a \"…\" that opens the option's menu: its name, Delete, and Tag's ten colors. With `onReorder`, each row has a handle to drag, or to pick up with Space and move with the arrows. Without these handlers neither appears. Built on the shared parts: `_Field` is the box, `Listbox` the list and its rows, and the chips are Tags in a TagGroup. Without focus the tags collapse into \"+n\"; with focus they wrap, up to three rows, then scroll.",
+      "summary": "TagInput — a field of Tags with a text entry after them, modeled on Notion's multi-select. Focusing the field opens a list of the options. Typing filters it and highlights the first match; Enter or a click adds the highlighted option. A \"Create *text*\" row is offered when no option matches the text exactly, ignoring case. It previews the new tag as the Tag it will be, in the random Tag color it will get, and creating reports that color once through `onCreate`. Backspace in an empty entry removes the last tag, and Esc closes the list and clears only the typed text. People can tidy the options where they pick them, as in Notion. With `onRename`, `onDelete` or `onColorChange`, the highlighted row shows a \"…\" that opens the option's menu: its name, Delete, and Tag's ten colors. With `onReorder`, each row has a handle to drag, or to pick up with Space and move with the arrows. Without these handlers neither appears. Built on the shared parts: `_Field` is the box, `Listbox` the list and its rows, and the chips are Tags in a TagGroup. Without focus the tags collapse into \"+n\"; with focus they wrap, up to three rows, then scroll.",
       "props": [
         {
           "name": "id",
@@ -11593,7 +11593,7 @@
       "import": "import { TimePicker } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/TimePicker/TimePicker.jsx",
-      "summary": "Built from the shared parts: the field is `FieldBox`, which owns the box, the border, the fill, the size and every state, same as DatePicker; the AM/PM menu in Trailing is the PLUS DropdownMenu. - **Typing:** the field takes an hour and a minute, with or without a colon. It is checked when you press Enter or leave the field: a real time (hour 1–12, minute 0–59) is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Value:** a 12-hour string, \"02:30 PM\". A 24-hour value given through `value` is split into the hour this control can show and the period that says which half of the day it is. - **AM/PM:** a separate toggle, since the field itself has no notion of one. Changing it reports immediately, with whichever half of the time is already set. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: TimePicker has no `label` prop, so that is how a caller names it.",
+      "summary": "TimePicker — a time field with an AM/PM toggle (Figma `Time picker`). Built from the shared parts: the field is `FieldBox`, which owns the box, the border, the fill, the size and every state, same as DatePicker; the AM/PM menu in Trailing is the PLUS DropdownMenu. - **Typing:** the field takes an hour and a minute, with or without a colon. It is checked when you press Enter or leave the field: a real time (hour 1–12, minute 0–59) is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Value:** a 12-hour string, \"02:30 PM\". A 24-hour value given through `value` is split into the hour this control can show and the period that says which half of the day it is. - **AM/PM:** a separate toggle, since the field itself has no notion of one. Changing it reports immediately, with whichever half of the time is already set. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: TimePicker has no `label` prop, so that is how a caller names it.",
       "props": [
         {
           "name": "id",
@@ -11732,7 +11732,7 @@
       "import": "import { Toggle } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Toggle/Toggle.jsx",
-      "summary": "Controlled with `isChecked` or uncontrolled with `defaultChecked`. Built on Base UI's Switch: a `role=\"switch\"` span with a hidden checkbox beside it for form submission. `readOnly` blocks the change at the root, so no hand-rolled click guard is needed. Extra attributes (`aria-label`, `aria-describedby`) go to the switch root.",
+      "summary": "Toggle — turns one setting on or off, and the change takes effect at once. Controlled with `isChecked` or uncontrolled with `defaultChecked`. Built on Base UI's Switch: a `role=\"switch\"` span with a hidden checkbox beside it for form submission. `readOnly` blocks the change at the root, so no hand-rolled click guard is needed. Extra attributes (`aria-label`, `aria-describedby`) go to the switch root.",
       "props": [
         {
           "name": "id",

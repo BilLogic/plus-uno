@@ -88,8 +88,8 @@ function jsdocFor(source, name) {
     .split('\n')
     .map((l) => l.replace(/^\s*\*\s?/, '').trim())
     .filter((l) => l && !l.startsWith('@'));
-  // The first line is almost always "<Name> Component" — a title, not a description.
-  if (lines[0] && new RegExp(`^${name}\\b`, 'i').test(lines[0]) && lines.length > 1) lines.shift();
+  // A first line that is only a title ("<Name> Component") is not a description; one that goes on ("<Name>: a …", "<Name> — …") is.
+  if (lines[0] && new RegExp(`^${name}\\b`, 'i').test(lines[0]) && !new RegExp(`^${name}\\s*[:—–-]\\s`, 'i').test(lines[0]) && lines.length > 1) lines.shift();
   return lines.join(' ').trim();
 }
 

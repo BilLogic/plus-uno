@@ -3,7 +3,7 @@
 
 # Fieldset
 
-A thin, token-styled wrap around Base UI's Fieldset: `Root` renders the `<fieldset>`, `Legend` renders a `<div>` already wired to `aria-labelledby` the fieldset. `RadioGroup` builds on this; a "Checkbox group" is the same composition with `Checkbox` instead.
+Fieldset — a legend plus the fields it groups. A thin, token-styled wrap around Base UI's Fieldset: `Root` renders the `<fieldset>`, `Legend` renders a `<div>` already wired to `aria-labelledby` the fieldset. `RadioGroup` builds on this; a "Checkbox group" is the same composition with `Checkbox` instead.
 
 **Import:** `import { Fieldset } from '@/components';`
 

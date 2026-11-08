@@ -3,7 +3,7 @@
 
 # Calendar
 
-`_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Days of the months either side are drawn and can't be picked. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current="date"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** a pixel width, 28, 36 or 44, drawn from the `--calendar-day-*` tokens.
+Calendar — the month grid DatePicker and DateTimePicker open (Figma `_Calendar`), public for a caller who wants the grid on its own rather than behind a field's popup. It is the same component the pickers use. - **Grid:** always six weeks, 42 cells, so the panel never changes height. Days of the months either side are drawn and can't be picked. - **Days:** each is a button named with its full date. `aria-pressed` marks the picked day, or both ends of a range; `data-in-range` marks the days between; `aria-current="date"` marks today. - **Bounds:** days before `minDate` or after `maxDate` are disabled. - **Size:** a pixel width, 28, 36 or 44, drawn from the `--calendar-day-*` tokens.
 
 **Import:** `import { Calendar } from '@/components';`
 

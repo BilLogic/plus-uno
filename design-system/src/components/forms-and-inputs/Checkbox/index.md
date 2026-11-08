@@ -3,7 +3,7 @@
 
 # Checkbox
 
-Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage. Built on Base UI's Checkbox: a `role="checkbox"` span with a hidden native input beside it for form submission, wrapped in `FieldFrame` (A7) for the label and the description caption. `isInvalid` marks the unselected box only, through `data-invalid` scoped off `data-checked` in the stylesheet.
+Checkbox — single boolean control with optional indeterminate state. Supports controlled (`isChecked`) and uncontrolled (`defaultChecked`) usage. Built on Base UI's Checkbox: a `role="checkbox"` span with a hidden native input beside it for form submission, wrapped in `FieldFrame` (A7) for the label and the description caption. `isInvalid` marks the unselected box only, through `data-invalid` scoped off `data-checked` in the stylesheet.
 
 **Import:** `import { Checkbox } from '@/components';`
 

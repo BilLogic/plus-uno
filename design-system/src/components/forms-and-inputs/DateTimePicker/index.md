@@ -3,7 +3,7 @@
 
 # DateTimePicker
 
-Composed from DatePicker and TimePicker, laid out as labeled sections with a shared time-zone caption under the time.
+DateTimePicker — a date field and a time field read as one moment. Composed from DatePicker and TimePicker, laid out as labeled sections with a shared time-zone caption under the time.
 
 **Import:** `import { DateTimePicker } from '@/components';`
 
