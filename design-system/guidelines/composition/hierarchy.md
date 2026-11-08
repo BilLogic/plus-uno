@@ -54,5 +54,5 @@ A doc or a class name that invents a fifth word makes the token layer unguessabl
 ## Related
 
 - `layout.md` — the page skeletons these levels compose into
-- `../foundations/spacing.md` — the values behind each layer
-- `../foundations/grid.md` — column spans a Page composes against
+- `../../src/styles/Spacing.mdx` — the values behind each layer
+- `../../src/styles/Grid.mdx` — column spans a Page composes against

@@ -117,13 +117,11 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/foundations/content/overview.md`](design-system/guidelines/foundations/content/overview.md) | Product copy rules |
 | [`design-system/guidelines/foundations/content/voice-and-tone.md`](design-system/guidelines/foundations/content/voice-and-tone.md) | Warm, direct, encouraging |
 | [`design-system/guidelines/foundations/data-visualization.md`](design-system/guidelines/foundations/data-visualization.md) | A chart's foundations other than color come from the same component tokens as the rest of the design system |
-| [`design-system/guidelines/foundations/grid.md`](design-system/guidelines/foundations/grid.md) | PLUS lays pages on two 12-column grids with gutter 16 — the screen grid on the Blanket layer for modals and drawers, the content grid inside the Page and the only grid a page frame carries |
 | [`design-system/guidelines/foundations/iconography.md`](design-system/guidelines/foundations/iconography.md) | This design system uses FontAwesome Free icons via the string shorthand |
 | [`design-system/guidelines/foundations/illustrations.md`](design-system/guidelines/foundations/illustrations.md) | The PLUS characters, their sizes, and when an illustration earns its place |
 | [`design-system/guidelines/foundations/logos.md`](design-system/guidelines/foundations/logos.md) | The PLUS mark, its sizes, color options and clear space |
 | [`design-system/guidelines/foundations/motion.md`](design-system/guidelines/foundations/motion.md) | Motion tokens (three durations, three easings), patterns and reduced motion |
 | [`design-system/guidelines/foundations/overview.md`](design-system/guidelines/foundations/overview.md) | The fourteen foundations, in the order they are documented |
-| [`design-system/guidelines/foundations/spacing.md`](design-system/guidelines/foundations/spacing.md) | Spacing, size and radius tokens on the four-tier ladder — which tier to read, the fallback rule, and private wiring |
 | [`design-system/guidelines/foundations/tokens.md`](design-system/guidelines/foundations/tokens.md) | Tokens — Overview & Decision Tree |
 | [`design-system/guidelines/foundations/typography.md`](design-system/guidelines/foundations/typography.md) | Text styles, type tokens and the text-style classes |
 | [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) | says where design knowledge lives |
@@ -222,6 +220,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-151 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+149 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

@@ -74,13 +74,17 @@ changes breakpoint by switching its mode, never by hand-editing its grid.
 Both grids are 12 columns with a 16 gutter.
 
 - **The screen grid** spans the screen inside the screen pad, centered and
-  capped at 1232. It ignores the sidebar, so a modal sits in the same place
-  whether the sidebar is docked or closed. Modals and drawers size from it.
-  In Figma it lives on the Blanket layer only, and shows and hides with it.
+  capped at 1232: `clamp(720, screen − 2 × 24, 1232)`, which is 720 · 976 · 1232
+  at the three modes. From 1440 the screen pad is 32, but there the grid is
+  already at its cap with either pad, so its width depends on the screen alone;
+  past a 1280 screen it stops growing and centers. It ignores the sidebar, so a
+  modal sits in the same place whether the sidebar is docked or closed. Modals
+  and drawers size from it. In Figma it lives on the Blanket layer only, and
+  shows and hides with it; code draws no grid at all.
 - **The content grid** sits inside the Page, after the sidebar and the
   Page pad take their share. Cards, tables, forms and text blocks align to
   it, and it is the only grid a page frame carries. At X-Large:
-  1440 − 240 sidebar − 2 × 24 = 1152. The Frame has no seams, so only a docked Panel takes another share: content = Frame width − Sidebar (240 if docked) − Panel (if docked) − 48, never under 720, which is a 1408 Frame for a 400 Panel beside a docked Sidebar and 1168 with the Sidebar collapsed. A A Section with a detail region keeps its split from 960.
+  1440 − 240 sidebar − 2 × 24 = 1152. The Frame has no seams, so only a docked Panel takes another share: content = Frame width − Sidebar (240 if docked) − Panel (if docked) − 48, never under 720, which is a 1408 Frame for a 400 Panel beside a docked Sidebar and 1168 with the Sidebar collapsed. A Section with a detail region keeps its 7 + 5 split from 960 of content. At Medium the sidebar is closed, so the Page starts at the window edge and content is 768 − 2 × 24 = 720, exactly its minimum.
 
 These tokens change with the screen, so the table gives the value at each
 breakpoint: Medium · Large · X-Large.
@@ -101,6 +105,8 @@ breakpoint: Medium · Large · X-Large.
 
 The screen pad is its own rule, not the Page pad: it stays 24 · 24 · 32 so a Modal or Drawer keeps its width when the Page pad changes.
 
+These per-mode widths step at each breakpoint rather than follow the screen. Code that needs the exact width at any screen lays out on the grid itself, as in the Overview, instead of reading `--grid-width-column`. The values are generated from the `spacing / layout` collection into `design-system/src/tokens/_frame_layers.scss`; the breakpoints live in `design-system/src/tokens/_layout.scss`.
+
 </FoundationSection>
 
 <FoundationSection title="Grid in Figma">
@@ -117,6 +123,13 @@ Two patterns carry the grids. Take the grid by using the pattern and setting its
 />
 
 Shift + G (Mac) or Control + G (Windows) shows and hides the grid.
+
+Each layer owns one part of the layout:
+
+- The **template** owns the width (`Screen/width-screen`) and the `spacing / layout` mode.
+- **Frame** fills it: the Sidebar beside the Page. The Page carries the content grid and the Content slot.
+- The **Sidebar** docks by `Sidebar/sidebar-docked` (false · true · true across Medium · Large · X-Large).
+- The **Blanket** sits above the Frame and carries the screen grid, which shows and hides with it.
 
 </FoundationSection>
 
@@ -148,10 +161,13 @@ row with the sidebar and the Page.
         { token: '--frame-sidebar-width', figma: 'Sidebar/width-sidebar', value: '240 · 240 · 240' },
         { token: '--page-pad', figma: 'Page/pad', value: '24 · 24 · 24' },
         { token: '--page-radius', figma: 'Page/radius', value: '8 · 8 · 8' },
+        { token: '--panel-min-width', value: '320 · 320 · 320', use: 'The narrowest the splitter allows a Panel' },
+        { token: '--panel-width-default', value: '400 · 400 · 400', use: 'The width a Panel opens at' },
+        { token: '--panel-max-width', value: '640 · 640 · 640', use: 'The widest the splitter allows a Panel' },
     ]}
 />
 
-The Frame has no seams: the Page runs to the window edges, with no pad or gap around it or between it and the topbar. The topbar is 32 with no vertical pad. Below
+The Frame has no seams, no pad and no stack: the Page runs to the window edges, with no pad or gap around it or between it and the topbar, and meets the sidebar at a hairline. A Panel opens at 400, and its splitter holds it between 320 and 640. The topbar is 32 with no vertical pad. Below
 1024 the sidebar opens over the page: 240 wide, full height, with a shadow and
 no Blanket. An outside click closes it, and the page never reflows. The dock is a
 step: at 1023 the content is 975 wide, and at 1024 the sidebar docks and it is
@@ -189,10 +205,14 @@ at least 224 (`--section-min-width-side`); below those, they stack.
 <FoundationSection title="Modal widths">
 
 A modal spans 6, 8 or 10 screen-grid columns, the gutters between them, and its
-own pad of 16 on each side: width = n × column + (n − 1) × 16 + 2 × 16. It
+own pad of 16 on each side. It
 grows with the screen between breakpoints, stops past a 1280 screen, never
 shrinks below its Medium width, ignores the sidebar, and never comes closer
 than 16 to the side of the screen.
+
+`width = n × --grid-width-column-screen + (n − 1) × --grid-gutter + 2 × --modal-pad-x-default`
+
+Pass `width="6-col"`, `"8-col"` or `"10-col"` to Modal; a fixed pixel width ignores the screen grid. The tokens below are each mode's width rounded to a whole pixel: `6-col` 384 · 512 · 640, `8-col` 507 · 677 · 848 and `10-col` 629 · 843 · 1056 at Medium · Large · X-Large. `Modal.scss` works the same formula out continuously from the screen width, and the frame and layer token test pins it to `--grid-width-column-screen` at 768, 1024 and 1440.
 
 <TokenTable
     valueHeader="MD · LG · XL"
@@ -342,7 +362,7 @@ side. Content never bleeds into a gutter or into the Page pad.
 
 <Canvas of={GridStories.SpanWholeColumns} sourceState="none" />
 
-**Size modals from the screen grid.** Pass `sm`, `md` or `lg`. The width comes
+**Size modals from the screen grid.** Pass `6-col`, `8-col` or `10-col`. The width comes
 from screen-grid columns, so a modal lines up with the page whenever the
 sidebar is closed.
 

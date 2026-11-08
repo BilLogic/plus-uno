@@ -114,7 +114,7 @@ Finished work leaves behind a **rule** in the doc that already owns the subject,
 | Building UI, using components or tokens, or a component's facts (usage, rules, props, variants) | `design-system/agent-views/components/index.md` (existence) + `tokens/tokens.md` (names), then the component's generated file, `design-system/src/components/<group>/<Name>/index.md` (`<Name>.md` when filed flat): one read answers it, the same text `ds_get` returns and Storybook's Agent view shows |
 | Verifying a component's API, or writing a story's code | `docs/connectors/storybook-mcp.md` |
 | Building new pages, dashboards, layouts | `design-system/guidelines/composition/layout.md` (MANDATORY) |
-| Laying out on the grid, or matching a Figma frame's breakpoint modes | `design-system/guidelines/foundations/grid.md` |
+| Laying out on the grid, or matching a Figma frame's breakpoint modes | `design-system/src/styles/Grid.mdx` (`npm run ds -- guide grid`) |
 | Titling a story, renaming a docs folder, or authoring an MDX page | `design-system/guidelines/documentation-ia.md` |
 | Designer knowledge verification status | `design-system/figma/knowledge-audit.md` |
 | Implementation setup (aliases, prototypes, Vite) | `docs/engineering/setup.md` |
