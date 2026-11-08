@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as SidebarStories from './Sidebar.stories.jsx';
@@ -15,6 +16,10 @@ import {
 <Title>Sidebar</Title>
 
 The app's side navigation: the logo row, the groups with their section titles, open tabs under Sessions and Students, and the account row at the foot. The Frame places it beside the Page.
+
+<DocsTabs of={SidebarStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Sidebar"
@@ -81,6 +86,14 @@ Hover and focus are the browser's own states and are described under Usage.
 />
 
 </div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -236,3 +249,7 @@ Past three open tabs the rest go behind Show n more. The Sidebar does this for y
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

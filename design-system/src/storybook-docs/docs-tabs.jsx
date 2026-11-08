@@ -1,5 +1,5 @@
 /**
- * The component docs page's tab strip — Examples · Code · Usage · Agent view,
+ * The component and pattern docs pages' tab strip — Examples · Code · Usage · Agent view,
  * rendered INSIDE the page, below the title (ADR-025, ADR-040).
  *
  * WHY THIS IS NOT A STORYBOOK ADDON. It was, until #168's `types.TAB`
@@ -33,7 +33,15 @@ import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from 
 import { ArgTypes, Markdown, useOf } from '@storybook/addon-docs/blocks';
 
 import { Button, CodeBlock, LinkButton } from '@/components';
-import { TABS, agentViewEntry, agentViewMarkdown, agentViewSlug, importLineFor, reportProblemUrl } from './lib/component-tabs-contract.js';
+import {
+  TABS,
+  agentViewEntry,
+  agentViewMarkdown,
+  agentViewSlug,
+  importLineFor,
+  importSourceFor,
+  reportProblemUrl,
+} from './lib/component-tabs-contract.js';
 
 /**
  * Every generated agent file, through ONE raw glob (ADR-040), so no MDX page
@@ -153,8 +161,8 @@ function GeneratedTabBody({ children }) {
  * deliberately NOT inlined: it would put every component file into the docs
  * bundle to duplicate something GitHub already renders better, with history.
  */
-function CodeTabPanel({ of, importName }) {
-  const importLine = importLineFor(importName);
+function CodeTabPanel({ of, importName, importFrom }) {
+  const importLine = importLineFor(importName, importFrom);
   return (
     <GeneratedTabBody>
       {importLine ? (
@@ -287,10 +295,8 @@ export function DocsTabs({ of, examplesTitle, children }) {
    * Storybook records the stories file as the meta's `parameters.fileName`.
    * No file, no Agent view tab.
    */
-  const agentEntry = useMemo(() => {
-    const importPath = resolved?.csfFile?.meta?.parameters?.fileName ?? resolved?.preparedMeta?.parameters?.fileName;
-    return agentViewEntry(AGENT_DOCS, { importPath });
-  }, [resolved]);
+  const importPath = resolved?.csfFile?.meta?.parameters?.fileName ?? resolved?.preparedMeta?.parameters?.fileName;
+  const agentEntry = useMemo(() => agentViewEntry(AGENT_DOCS, { importPath }), [importPath]);
 
   /**
    * Whether there is a props table to show at all.
@@ -414,7 +420,11 @@ export function DocsTabs({ of, examplesTitle, children }) {
         className="sb-ds-docs-tabs__panel"
       >
         {activeTab.key === 'code' ? (
-          <CodeTabPanel of={of} importName={resolved?.preparedMeta?.component?.displayName ?? resolved?.preparedMeta?.component?.name} />
+          <CodeTabPanel
+            of={of}
+            importName={resolved?.preparedMeta?.component?.displayName ?? resolved?.preparedMeta?.component?.name}
+            importFrom={importSourceFor({ importPath }, Boolean(agentEntry))}
+          />
         ) : activeTab.key === 'agent' ? (
           <AgentViewPanel entry={agentEntry} />
         ) : (

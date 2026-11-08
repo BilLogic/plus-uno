@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as BlanketStories from './Blanket.stories.jsx';
@@ -21,6 +22,10 @@ import {
 
 <Title />
 The Blanket is the full-screen layer that holds the blanket fill and the one layer above it, a modal or a drawer, or, contained to a Frame, the overlay Panel, so that layer is placed, not drawn. It fills with the blanket, pads 16 at the sides and 64 above and below, and centers a modal or holds a drawer at the screen edge. The examples on this page follow the toolbar's Color mode switch.
+
+<DocsTabs of={BlanketStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19422-3021"
@@ -74,6 +79,14 @@ The Blanket is the full-screen layer that holds the blanket fill and the one lay
 />
 
 </div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -234,3 +247,7 @@ The Blanket holds no text of its own. The words belong to the layer it holds.
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

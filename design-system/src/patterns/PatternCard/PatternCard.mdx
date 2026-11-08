@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PatternCardStories from './PatternCard.stories.jsx';
@@ -23,6 +24,10 @@ import {
 A card is a raised container for one object on a page, such as a student, a session or a metric. It holds an optional image, a header over a body, and an optional footer, and it rests on the raised pair with no border. The pad and the radius follow the card size, and the stack between parts follows use.
 
 The examples on this page follow the toolbar's Color mode switch.
+
+<DocsTabs of={PatternCardStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19422-3003"
@@ -98,6 +103,14 @@ The examples on this page follow the toolbar's Color mode switch.
 />
 
 </div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -276,3 +289,7 @@ A card that holds actions that commit a change gets a footer, and its actions st
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

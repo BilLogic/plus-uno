@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as FrameStories from './Frame.stories.jsx';
@@ -54,6 +55,10 @@ export const colorTokens = [
 Frame is the app frame: the Sidebar beside the Page and the Panel, with no top bar. It has no seams: the Page runs to the window edges and meets the Sidebar and the Panel at hairlines. Every value is a token, and values read Medium, Large and X-Large where the layout mode changes them.
 
 The examples on this page follow the **Color mode** switch in the toolbar.
+
+<DocsTabs of={FrameStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19422-2971"
@@ -117,6 +122,14 @@ The examples on this page follow the **Color mode** switch in the toolbar.
 />
 
 </div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -298,3 +311,7 @@ The header row is the breadcrumb. A page's title belongs to its content, in a Se
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

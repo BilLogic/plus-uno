@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PatternDrawerStories from './PatternDrawer.stories.jsx';
@@ -15,6 +16,10 @@ import {
 
 <Title />
 The Drawer is a full-height panel at the edge of the screen, for a task that needs the page in view: the details of a row, a set of filters or a short edit. It sits in a Blanket at the right edge or the left edge, over the same blanket a Modal takes. It carries a title, a description, a body and a footer, like a Modal. The examples on this page follow the toolbar's Color mode switch.
+
+<DocsTabs of={PatternDrawerStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19844-125964"
@@ -74,6 +79,14 @@ The Drawer is a full-height panel at the edge of the screen, for a task that nee
 />
 
 </div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -229,3 +242,7 @@ Hold the Drawer full height at a screen edge, inside a Blanket. Never put it str
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PatternModalStories from './PatternModal.stories.jsx';
@@ -22,6 +23,10 @@ import {
 
 <Title />
 The Modal interrupts the page for one task. It is always centered on the screen inside a Blanket, and it carries a title, a body and a footer. Its width is a step of the screen grid, its height hugs or fills, and it sits on the overlay level. The examples on this page follow the toolbar's Color mode switch.
+
+<DocsTabs of={PatternModalStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19422-3031"
@@ -91,6 +96,14 @@ The Modal interrupts the page for one task. It is always centered on the screen 
 />
 
 </div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -290,3 +303,7 @@ Pair a control with the field it controls, and group the fields that describe on
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

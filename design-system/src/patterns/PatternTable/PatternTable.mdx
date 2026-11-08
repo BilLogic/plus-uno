@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PatternTableStories from './PatternTable.stories.jsx';
@@ -27,6 +28,10 @@ The table pattern is how a table sits on a page. A Section holds the table, and 
 `StaticTable`, `DynamicTable` and `TreeTable` are the components for the three table types.
 
 The examples on this page follow the toolbar's Color mode switch.
+
+<DocsTabs of={PatternTableStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19620-139700"
@@ -78,6 +83,14 @@ The examples on this page follow the toolbar's Color mode switch.
 />
 
 </div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -255,3 +268,7 @@ Never mix a Static, Dynamic or Tree table in one Section either.
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>

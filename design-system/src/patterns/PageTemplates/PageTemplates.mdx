@@ -1,3 +1,4 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PageTemplatesStories from './PageTemplates.stories.jsx';
@@ -25,6 +26,10 @@ import { ModeExample } from '@/storybook-docs/lib/mode-frame.jsx';
 A template is the whole page every screen starts from: the sidebar and the page that holds the page's content, under its breadcrumb. It sets the screen width, the grid and the content width once, and everything inside moves with it. The default frame is for pages people move among. The focused frame is for one task, with no sidebar.
 
 The examples on this page follow the toolbar's Color mode and Contrast switches. Each is drawn at a real screen width, so the layout mode is the one named.
+
+<DocsTabs of={PageTemplatesStories}>
+
+<DocsTab tab="examples">
 
 <ResourcesBlock
     figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19422-2958"
@@ -90,6 +95,14 @@ The examples on this page follow the toolbar's Color mode and Contrast switches.
 />
 
 </div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
@@ -323,3 +336,7 @@ If Back and Close would go to the same place, keep Close only.
 </div>
 
 </div>
+
+</DocsTab>
+
+</DocsTabs>
