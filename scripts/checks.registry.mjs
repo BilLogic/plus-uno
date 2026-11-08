@@ -156,6 +156,14 @@ export const CHECKS = [
     guards: 'design-system/src/components/index.js against the folder shape it is generated from; a hand edit or an unregenerated move shows as drift.',
   },
   {
+    name: 'check:icon-lists',
+    script: 'node scripts/generate-icon-regular-list.mjs --check',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/generate-icon-regular-list.mjs',
+    guards: 'the committed Free icon lists in design-system/src/lib/ against the generator that writes them; a hand edit shows as drift.',
+  },
+  {
     name: 'check:figma-node-types',
     script: 'node scripts/check-figma-node-types.mjs',
     pkg: 'root',

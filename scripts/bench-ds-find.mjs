@@ -19,14 +19,11 @@ import { createLookup } from './lib/ds-lookup.mjs';
 export const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 export const BENCH_DIR = path.join(REPO_ROOT, 'scripts/bench/ds-find');
 const LEDGER = 'docs/evals/ds-usage-ledger.jsonl';
-const FA_METADATA = ['node_modules/@fortawesome/fontawesome-free/metadata/icons.json', 'design-system/node_modules/@fortawesome/fontawesome-free/metadata/icons.json'];
 const SETS = ['authored', 'heldout'];
 
 const readJson = (file) => JSON.parse(fs.readFileSync(file, 'utf8'));
 export const loadSet = (name) => readJson(path.join(BENCH_DIR, `${name}.json`));
 export const loadRatchet = () => readJson(path.join(BENCH_DIR, 'ratchet.json'));
-export const iconsInstalled = (root = REPO_ROOT) => FA_METADATA.some((f) => fs.existsSync(path.join(root, f)));
-const isIcon = (kind) => kind.endsWith('icon');
 export const isName = (kind) => kind === 'name' || kind === 'real-name';
 
 // Rank of the first result that is a wanted component. A not-here row counts
@@ -36,16 +33,14 @@ export function rankOf(results, want) {
   return results.findIndex((r) => names(r).some((n) => want.includes(n))) + 1;
 }
 
-// Scores both sets. Returns { scores: {set: {kind: {n, hit1, hit3, mrr}}}, misses, skipped };
+// Scores both sets. Returns { scores: {set: {kind: {n, hit1, hit3, mrr}}}, misses };
 // `misses` holds every scored row (rank, top four, and each result's kind and name).
 export function runBench({ root = REPO_ROOT, aliases = true } = {}) {
   const lookup = createLookup(root, { aliases });
-  const withIcons = iconsInstalled(root);
-  const scores = {}; const misses = []; const skipped = {};
+  const scores = {}; const misses = [];
   for (const set of SETS) {
     scores[set] = {};
     for (const row of loadSet(set)) {
-      if (isIcon(row.kind) && !withIcons) { skipped[row.kind] = (skipped[row.kind] ?? 0) + 1; continue; }
       const results = lookup.find(row.q).results;
       const rank = rankOf(results, row.want);
       const a = (scores[set][row.kind] ??= { n: 0, hit1: 0, hit3: 0, rr: 0 });
@@ -55,7 +50,7 @@ export function runBench({ root = REPO_ROOT, aliases = true } = {}) {
     }
     for (const a of Object.values(scores[set])) { a.mrr = Number((a.rr / a.n).toFixed(2)); delete a.rr; }
   }
-  return { scores, misses, skipped };
+  return { scores, misses };
 }
 
 // The unlabeled part of the ledger: ds_find queries no set carries yet.
@@ -85,11 +80,10 @@ function main() {
     return;
   }
   const aliases = !args.includes('--no-aliases');
-  const { scores, misses, skipped } = runBench({ aliases });
+  const { scores, misses } = runBench({ aliases });
   for (const m of misses) if (args.includes('--verbose') || !m.rank || m.rank > 3) console.log(`${m.set.padEnd(8)} ${String(m.rank || '-').padStart(2)}  ${m.q.padEnd(44)} → ${m.top.join(', ')}`);
   console.log(`\narm: ${aliases ? 'with-aliases' : 'no-aliases'}`);
   for (const set of SETS) for (const [kind, a] of Object.entries(scores[set])) console.log(`${set.padEnd(8)} ${kind.padEnd(12)} hit@1 ${a.hit1}/${a.n}  hit@3 ${a.hit3}/${a.n}  MRR ${a.mrr.toFixed(2)}`);
-  for (const [kind, n] of Object.entries(skipped)) console.log(`skipped ${n} ${kind} rows: Font Awesome metadata is not installed`);
   if (args.includes('--update')) {
     const file = path.join(BENCH_DIR, 'ratchet.json');
     const ratchet = loadRatchet();

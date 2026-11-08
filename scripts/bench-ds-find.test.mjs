@@ -1,18 +1,16 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { REPO_ROOT, iconsInstalled, isName, loadRatchet, loadSet, rankOf, runBench } from './bench-ds-find.mjs';
+import { REPO_ROOT, isName, loadRatchet, loadSet, rankOf, runBench } from './bench-ds-find.mjs';
 import { createLookup, render, speaksTokens } from './lib/ds-lookup.mjs';
 
 const ratchet = loadRatchet();
-const withIcons = iconsInstalled();
 
 for (const arm of Object.keys(ratchet)) {
   test(`${arm}: no hit@1 or hit@3 count falls below the ratchet`, () => {
     const { scores } = runBench({ aliases: arm === 'with-aliases' });
     for (const [set, kinds] of Object.entries(ratchet[arm])) {
       for (const [kind, floor] of Object.entries(kinds)) {
-        if (kind.endsWith('icon') && !withIcons) continue; // Font Awesome metadata absent: icon rows are not scored
         const got = scores[set]?.[kind];
         assert.ok(got, `${set}/${kind} was not scored`);
         assert.ok(got.hit1 >= floor.hit1, `${arm} ${set}/${kind} hit@1 ${got.hit1} fell below the ratchet ${floor.hit1}`);
@@ -91,4 +89,22 @@ test('a miss names the guideline topics the query carried', () => {
   const lookup = createLookup(REPO_ROOT);
   assert.match(lookup.find('zzzqq typography').next, /ds_guide\("typography"\)/);
   assert.doesNotMatch(lookup.find('zzzqq').next, /ds_guide\("/);
+});
+
+test('the hosted lookup (readPaths off) ranks the same names as the local one for every bench query', () => {
+  const local = createLookup(REPO_ROOT);
+  const hosted = createLookup(REPO_ROOT, { readPaths: false });
+  const names = (lookup, q) => lookup.find(q).results.map((r) => `${r.kind}:${r.name}`);
+  const queries = ['authored', 'heldout'].flatMap((set) => loadSet(set).map((row) => row.q));
+  assert.ok(queries.length > 70);
+  for (const q of queries) assert.deepEqual(names(hosted, q), names(local, q), `"${q}" ranks differently when hosted`);
+});
+
+test('the first find on a fresh lookup, index build included, takes under 300 ms', () => {
+  const lookup = createLookup(REPO_ROOT, { readPaths: false });
+  const start = performance.now();
+  const { results } = lookup.find('confirm before deleting');
+  const ms = performance.now() - start;
+  assert.equal(results[0].name, 'Modal');
+  assert.ok(ms < 300, `the first find took ${ms.toFixed(0)} ms`);
 });

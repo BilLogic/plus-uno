@@ -111,8 +111,8 @@ const SECTIONS = ['props', 'usage', 'examples', 'a11y', 'figma'];
 const MDX_SECTIONS = { usage: ['Usage', 'Content guidelines'], examples: ['Best practices'], a11y: ['Accessibility'] };
 const STOP = new Set('a an and the of for to with in on or my our is it that this which what i we need want use show build make page'.split(' '));
 const PRO_FAMILY = /\bfa-(?:sharp-duotone|sharp|duotone|light|thin)\b/;
-const FA_METADATA = ['node_modules/@fortawesome/fontawesome-free/metadata/icons.json', 'design-system/node_modules/@fortawesome/fontawesome-free/metadata/icons.json'];
 const FREE_REGULAR = 'design-system/src/lib/icon-regular.generated.js';
+const FREE_ICONS = 'design-system/src/lib/icon-free.generated.js';
 const GUIDELINES = 'design-system/guidelines';
 /** Words people ask with, mapped to the guideline file that answers them. */
 const TOPIC_ALIASES = {
@@ -198,7 +198,7 @@ export class PathsRefused extends Error {
 
 /**
  * `readPaths: false` is the hosted server's; `aliases: false` zeroes the alias field (the retrieval bench's second arm);
- * `iconMetadata` stands in for the Font Awesome metadata file (its `icons.json` shape) where the package is not installed.
+ * `iconMetadata` stands in for the committed Free icon lists (the `icons.json` shape), for a test that needs a small set.
  */
 export function createLookup(root, { readPaths = true, aliases = true, iconMetadata = null } = {}) {
   const facts = loadFacts(root);
@@ -225,11 +225,15 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
   let icons;
   const iconSets = () => {
     if (icons) return icons;
-    const regular = new Set([...(readIf(path.join(root, FREE_REGULAR)) ?? '').matchAll(/"([a-z0-9-]+)"/g)].map((m) => m[1]));
-    const meta = iconMetadata ? null : FA_METADATA.map((f) => readIf(path.join(root, f))).find(Boolean);
-    const all = iconMetadata ?? (meta ? JSON.parse(meta) : null);
-    const of = (style) => new Set(all ? Object.entries(all).filter(([, i]) => i.free?.includes(style)).map(([n]) => n) : []);
-    icons = { regular, solid: of('solid'), brands: of('brands'), complete: Boolean(all) };
+    const names = (file, exportName) => {
+      const block = (readIf(path.join(root, file)) ?? '').match(new RegExp(`${exportName} = new Set\\(\\[([^\\]]*)\\]\\)`));
+      return new Set(block ? [...block[1].matchAll(/"([a-z0-9-]+)"/g)].map((m) => m[1]) : []);
+    };
+    const of = (style) => new Set(Object.entries(iconMetadata).filter(([, i]) => i.free?.includes(style)).map(([n]) => n));
+    icons = iconMetadata
+      ? { regular: of('regular'), solid: of('solid'), brands: of('brands') }
+      : { regular: names(FREE_REGULAR, 'FREE_REGULAR_ICONS'), solid: names(FREE_ICONS, 'FREE_SOLID_ICONS'), brands: names(FREE_ICONS, 'FREE_BRANDS_ICONS') };
+    icons.complete = icons.solid.size > 0;
     return icons;
   };
 

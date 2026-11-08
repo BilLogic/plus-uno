@@ -181,7 +181,7 @@ Whether `ds_find` puts the right component first is measured apart from the agen
 - **`authored.json`**: queries written to probe the lookup, each `{q, want[], kind}` with kind `intent` (a need in plain words) or `name` (a component name).
 - **`heldout.json`**: the queries agents really sent to `ds_find` in the ledger, labeled by hand against the task brief (`real-intent`, `real-name`, `real-token`, `real-icon`). A row is never edited to fit the ranker; a wrong label is fixed against the brief.
 
-A row scores its rank: the first result that is a wanted component, where a not-here row counts when its redirect names one. The script prints hit@1, hit@3 and MRR per set and kind, and every miss (rank above 3). Icon rows score only where Font Awesome's metadata is installed; without it they are skipped with a note.
+A row scores its rank: the first result that is a wanted component, where a not-here row counts when its redirect names one. The script prints hit@1, hit@3 and MRR per set and kind, and every miss (rank above 3). Icon rows score against the committed Free icon lists (`design-system/src/lib/icon-free.generated.js` and the regular list beside it).
 
 | Flag | Does |
 |---|---|
