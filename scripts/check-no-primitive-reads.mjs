@@ -79,7 +79,7 @@ const ratchetFor = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
 export const REMEDY =
   '  -> read the tier token: a component token if the component has one, else the pattern token, else a\n' +
   '     semantics step. When none holds the value, add a row to scripts/lib/tokens/plan.mjs and regenerate\n' +
-  '     (design-system/guidelines/foundations/spacing.md, ADR-038).';
+  '     (design-system/src/styles/Spacing.mdx § Fallback rule, ADR-038).';
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT, sources } = {}) {

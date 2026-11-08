@@ -26,6 +26,6 @@ up with three different gutters.
 
 ## Related
 
-- `../foundations/grid.md` — the breakpoints and column spans these skeletons sit on
-- `../foundations/spacing.md` — the scales behind every gap named here
+- `../../src/styles/Grid.mdx` — the breakpoints and column spans these skeletons sit on
+- `../../src/styles/Spacing.mdx` — the scales behind every gap named here
 - `../components/overview.md` — what each component is for
