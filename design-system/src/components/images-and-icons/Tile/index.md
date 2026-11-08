@@ -3,6 +3,8 @@
 
 # Tile
 
+Tile: a small square frame that holds a logo, thumbnail or icon standing for a thing.
+
 **Import:** `import { Tile } from '@/components';`
 
 **Source:** `design-system/src/components/images-and-icons/Tile/Tile.jsx`

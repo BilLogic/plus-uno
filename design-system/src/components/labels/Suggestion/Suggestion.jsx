@@ -32,6 +32,7 @@ const ICONS = {
     prompt: 'wand-magic-sparkles',
 };
 
+/** Suggestion: a chip for a value or question the system proposes, which a person accepts or leaves. */
 export const Suggestion = ({
     label,
     type = 'insert',

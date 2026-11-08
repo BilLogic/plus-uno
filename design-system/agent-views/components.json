@@ -8,7 +8,7 @@
       "import": "import { Accordion } from '@/components';",
       "group": "layout-and-structure",
       "source": "design-system/src/components/layout-and-structure/Accordion/Accordion.jsx",
-      "summary": null,
+      "summary": "Accordion: collapsible sections of content, each closed until asked for.",
       "props": [
         {
           "name": "items",
@@ -300,7 +300,7 @@
       "import": "import { AiLabel } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/AiLabel/AiLabel.jsx",
-      "summary": null,
+      "summary": "AiLabel: marks content the agent had a hand in and says how much to trust it.",
       "props": [
         {
           "name": "children",
@@ -1454,7 +1454,7 @@
       "import": "import { Cascader } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/Cascader/Cascader.jsx",
-      "summary": null,
+      "summary": "Cascader: a field that picks one path through nested options, one level at a time.",
       "props": [
         {
           "name": "id",
@@ -2234,7 +2234,7 @@
       "import": "import { CountTag } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/CountTag/CountTag.jsx",
-      "summary": null,
+      "summary": "CountTag: a number on its own, as a near-square badge.",
       "props": [
         {
           "name": "value",
@@ -3227,7 +3227,7 @@
       "import": "import { FileUpload } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/FileUpload/FileUpload.jsx",
-      "summary": null,
+      "summary": "FileUpload: a form field that opens the platform file picker. It chooses files; it does not upload them.",
       "props": [
         {
           "name": "id",
@@ -5195,10 +5195,62 @@
       "name": "Logo",
       "kind": "component",
       "import": "import { Logo } from '@/components';",
-      "group": null,
-      "source": null,
-      "summary": null,
-      "props": null
+      "group": "assets",
+      "source": "design-system/src/assets/Logo/Logo.jsx",
+      "summary": "The PLUS logo: the mark, or the lockup of mark and wordmark. Seven sizes, six appearances. At 24 and below the mark uses its small-size drawing, and below 24 the lockup gives way to the mark alone.",
+      "props": [
+        {
+          "name": "appearance",
+          "type": "enum",
+          "required": false,
+          "default": "'colored'",
+          "values": [
+            "colored",
+            "colored-dark",
+            "filled",
+            "dark",
+            "outlined",
+            "outlined-reversed"
+          ],
+          "description": "One of six appearances",
+          "deprecated": null
+        },
+        {
+          "name": "size",
+          "type": "enum",
+          "required": false,
+          "default": "32",
+          "values": [
+            "16",
+            "20",
+            "24",
+            "32",
+            "48",
+            "64",
+            "96"
+          ],
+          "description": "Height of the mark in pixels",
+          "deprecated": null
+        },
+        {
+          "name": "wordmark",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Show the lockup. From size 24; below that the mark stands alone",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Additional CSS classes",
+          "deprecated": null
+        }
+      ]
     },
     {
       "name": "MenuGroup",
@@ -5507,7 +5559,7 @@
       "import": "import { Object } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/Object/Object.jsx",
-      "summary": null,
+      "summary": "Object: a fixed Font Awesome glyph that marks the kind of thing a row or reference names, one component per kind (`TaskIcon`, `BugIcon`, …) built by `createObjectIcon`.",
       "props": [
         {
           "name": "size",
@@ -5744,7 +5796,7 @@
       "import": "import { PageLayout } from '@/specs/Universal/Pages';",
       "group": "pages",
       "source": "design-system/src/specs/Universal/Pages/PageLayout/PageLayout.jsx",
-      "summary": null,
+      "summary": "PageLayout: the template for a full page, wrapping its content in the Frame with the Sidebar and the breadcrumb row.",
       "props": [
         {
           "name": "children",
@@ -6600,7 +6652,7 @@
       "import": "import { PatternSection } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/PatternSection/PatternSection.jsx",
-      "summary": null,
+      "summary": "PatternSection: a span of the page grid under one heading, with its header, toolbar and tabs.",
       "props": [
         {
           "name": "id",
@@ -7243,7 +7295,7 @@
       "import": "import { Popup } from '@/components';",
       "group": "overlays-and-layering",
       "source": "design-system/src/components/overlays-and-layering/Popup/Popup.jsx",
-      "summary": null,
+      "summary": "Popup: a small panel of secondary content anchored to a control, text or a short list and never a form.",
       "props": [
         {
           "name": "trigger",
@@ -8481,7 +8533,7 @@
       "import": "import { RichTextEditor } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.jsx",
-      "summary": null,
+      "summary": "RichTextEditor: a text field with a formatting toolbar, for where the formatting is part of the meaning.",
       "props": [
         {
           "name": "id",
@@ -9388,7 +9440,7 @@
       "import": "import { Skeleton } from '@/components';",
       "group": "loading",
       "source": "design-system/src/components/loading/Skeleton/Skeleton.jsx",
-      "summary": null,
+      "summary": "Skeleton: a placeholder shaped like the content that is loading, so the layout does not jump when it arrives.",
       "props": [
         {
           "name": "shape",
@@ -9876,7 +9928,7 @@
       "import": "import { Suggestion } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/Suggestion/Suggestion.jsx",
-      "summary": null,
+      "summary": "Suggestion: a chip for a value or question the system proposes, which a person accepts or leaves.",
       "props": [
         {
           "name": "label",
@@ -10466,7 +10518,7 @@
       "import": "import { TagGroup } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/TagGroup/TagGroup.jsx",
-      "summary": null,
+      "summary": "TagGroup: the wrapper for more than one Tag together. It owns their spacing, wrapping, alignment and disabled state.",
       "props": [
         {
           "name": "children",
@@ -11418,7 +11470,7 @@
       "import": "import { Tile } from '@/components';",
       "group": "images-and-icons",
       "source": "design-system/src/components/images-and-icons/Tile/Tile.jsx",
-      "summary": null,
+      "summary": "Tile: a small square frame that holds a logo, thumbnail or icon standing for a thing.",
       "props": [
         {
           "name": "content",
@@ -11942,7 +11994,7 @@
       "import": "import { TreeSelect } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.jsx",
-      "summary": null,
+      "summary": "TreeSelect: a field that picks from options that nest, at any level of the tree.",
       "props": [
         {
           "name": "id",

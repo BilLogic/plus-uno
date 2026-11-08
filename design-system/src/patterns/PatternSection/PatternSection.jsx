@@ -183,6 +183,7 @@ SectionToolbar.propTypes = {
     className: PropTypes.string,
 };
 
+/** PatternSection: a span of the page grid under one heading, with its header, toolbar and tabs. */
 const PatternSection = ({
     id,
     title,

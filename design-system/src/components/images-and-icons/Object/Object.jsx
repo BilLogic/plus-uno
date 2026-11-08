@@ -15,11 +15,7 @@ const objectPropTypes = {
     className: PropTypes.string,
 };
 
-/**
- * Builds one typed object-kind component — `TaskIcon`, `BugIcon`, … — each a
- * fixed Font Awesome glyph at the Object sizes, named for the kind it draws
- * rather than taking a glyph name.
- */
+/** Object: a fixed Font Awesome glyph that marks the kind of thing a row or reference names, one component per kind (`TaskIcon`, `BugIcon`, …) built by `createObjectIcon`. */
 export function createObjectIcon(faClass, defaultLabel) {
     const ObjectIcon = ({ size = 16, label = defaultLabel, testId, className, ...props }) => (
         <span

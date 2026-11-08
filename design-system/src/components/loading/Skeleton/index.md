@@ -3,6 +3,8 @@
 
 # Skeleton
 
+Skeleton: a placeholder shaped like the content that is loading, so the layout does not jump when it arrives.
+
 **Import:** `import { Skeleton } from '@/components';`
 
 **Source:** `design-system/src/components/loading/Skeleton/Skeleton.jsx`

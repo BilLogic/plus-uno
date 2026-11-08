@@ -70,6 +70,7 @@ const CONFIDENCE_SUFFIX = {
     low: ' — low confidence, check before relying on it',
 };
 
+/** AiLabel: marks content the agent had a hand in and says how much to trust it. */
 export const AiLabel = ({
     children,
     text,

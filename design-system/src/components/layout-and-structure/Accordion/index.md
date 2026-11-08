@@ -3,6 +3,8 @@
 
 # Accordion
 
+Accordion: collapsible sections of content, each closed until asked for.
+
 **Import:** `import { Accordion } from '@/components';`
 
 **Source:** `design-system/src/components/layout-and-structure/Accordion/Accordion.jsx`

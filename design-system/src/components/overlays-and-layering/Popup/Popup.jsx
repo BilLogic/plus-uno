@@ -59,6 +59,7 @@ export function acceptsExpandedState(element) {
 /** Dismiss attempts Base UI reports through `onOpenChange`'s event detail. */
 const DISMISS_REASONS = new Set(['outside-press', 'escape-key', 'focus-out']);
 
+/** Popup: a small panel of secondary content anchored to a control, text or a short list and never a form. */
 const Popup = ({
     trigger,
     children,

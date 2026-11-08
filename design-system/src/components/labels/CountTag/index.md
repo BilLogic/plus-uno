@@ -3,6 +3,8 @@
 
 # CountTag
 
+CountTag: a number on its own, as a near-square badge.
+
 **Import:** `import { CountTag } from '@/components';`
 
 **Source:** `design-system/src/components/labels/CountTag/CountTag.jsx`

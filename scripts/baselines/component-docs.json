@@ -3,16 +3,10 @@
   "sets": {
     "main": {
       "entries": {
-        "Accordion (summary)": {
-          "count": 1
-        },
         "AiIcon className": {
           "count": 1
         },
         "AiIcon style": {
-          "count": 1
-        },
-        "AiLabel (summary)": {
           "count": 1
         },
         "AiLabel className": {
@@ -73,9 +67,6 @@
           "count": 1
         },
         "Carousel wrap": {
-          "count": 1
-        },
-        "Cascader (summary)": {
           "count": 1
         },
         "Cascader className": {
@@ -159,9 +150,6 @@
         "Comment type": {
           "count": 1
         },
-        "CountTag (summary)": {
-          "count": 1
-        },
         "CountTag className": {
           "count": 1
         },
@@ -211,9 +199,6 @@
           "count": 1
         },
         "EmptyState className": {
-          "count": 1
-        },
-        "FileUpload (summary)": {
           "count": 1
         },
         "FileUpload acceptedFormats": {
@@ -417,9 +402,6 @@
         "MenuGroup testId": {
           "count": 1
         },
-        "Object (summary)": {
-          "count": 1
-        },
         "Object className": {
           "count": 1
         },
@@ -430,9 +412,6 @@
           "count": 1
         },
         "Panel className": {
-          "count": 1
-        },
-        "Popup (summary)": {
           "count": 1
         },
         "Popup className": {
@@ -528,9 +507,6 @@
         "Range style": {
           "count": 1
         },
-        "RichTextEditor (summary)": {
-          "count": 1
-        },
         "RichTextEditor className": {
           "count": 1
         },
@@ -618,9 +594,6 @@
         "Sidebar visible": {
           "count": 1
         },
-        "Skeleton (summary)": {
-          "count": 1
-        },
         "Skeleton className": {
           "count": 1
         },
@@ -663,16 +636,10 @@
         "Spotlight stepCount": {
           "count": 1
         },
-        "Suggestion (summary)": {
-          "count": 1
-        },
         "Suggestion className": {
           "count": 1
         },
         "Suggestion id": {
-          "count": 1
-        },
-        "TagGroup (summary)": {
           "count": 1
         },
         "TagGroup className": {
@@ -696,9 +663,6 @@
         "TagInput style": {
           "count": 1
         },
-        "Tile (summary)": {
-          "count": 1
-        },
         "Tile className": {
           "count": 1
         },
@@ -718,9 +682,6 @@
           "count": 1
         },
         "TimePicker style": {
-          "count": 1
-        },
-        "TreeSelect (summary)": {
           "count": 1
         },
         "TreeSelect className": {

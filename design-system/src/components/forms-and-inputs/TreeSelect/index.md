@@ -3,6 +3,8 @@
 
 # TreeSelect
 
+TreeSelect: a field that picks from options that nest, at any level of the tree.
+
 **Import:** `import { TreeSelect } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/TreeSelect/TreeSelect.jsx`

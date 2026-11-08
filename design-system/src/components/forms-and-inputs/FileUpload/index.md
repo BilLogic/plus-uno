@@ -3,6 +3,8 @@
 
 # FileUpload
 
+FileUpload: a form field that opens the platform file picker. It chooses files; it does not upload them.
+
 **Import:** `import { FileUpload } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/FileUpload/FileUpload.jsx`

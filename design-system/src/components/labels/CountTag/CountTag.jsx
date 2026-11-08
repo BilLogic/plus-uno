@@ -34,6 +34,7 @@ export const formatCount = (value, { max = 99, showZero = false } = {}) => {
     return n > max ? `${max}+` : String(n);
 };
 
+/** CountTag: a number on its own, as a near-square badge. */
 export const CountTag = ({
     value,
     max = 99,

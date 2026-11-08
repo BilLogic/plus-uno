@@ -3,6 +3,8 @@
 
 # TagGroup
 
+TagGroup: the wrapper for more than one Tag together. It owns their spacing, wrapping, alignment and disabled state.
+
 **Import:** `import { TagGroup } from '@/components';`
 
 **Source:** `design-system/src/components/labels/TagGroup/TagGroup.jsx`
