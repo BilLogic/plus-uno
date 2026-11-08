@@ -24,7 +24,8 @@
  * (`agent-views/components.json`, `tokens.json`: components, patterns and
  * `PageLayout`, each with its kind, import, props and values), the hand-kept
  * lists (`_inventions.json`; `_patterns.json`, which adds only a pattern's group
- * and when to reach for it), the token plan's retired renames, and the public
+ * and when to reach for it; `_aliases.json`, the other words a component is
+ * asked by, as `lookup(name).aliases`), the token plan's retired renames, and the public
  * barrels themselves. `root` is either a repo root (facts under
  * `design-system/`) or the design-system folder as a package ships it (facts at
  * its top).
@@ -193,6 +194,7 @@ export function loadFacts(root) {
   const tokenManifest = optional('tokens.json', { tokens: [] });
   const inventions = optional('_inventions.json', { components: [], props: [], tokens: [] });
   const patterns = optional('_patterns.json', { patterns: [] }).patterns;
+  const aliasRows = optional('_aliases.json', { components: {} }).components;
   const barrel = readBarrel(root);
   const barrels = Object.fromEntries(BARRELS.map((spec) => [spec, new Set(spec === COMPONENTS_BARREL ? barrel.names : readBarrel(root, spec).names)]));
   const importable = barrels[COMPONENTS_BARREL];
@@ -217,6 +219,7 @@ export function loadFacts(root) {
     aliasOf: null,
     replacement: [],
     why: null,
+    aliases: [...(aliasRows[name] ?? [])],
     ...fields,
   });
   const note = (row) => (row ? { replacement: [...row.use], why: row.why ?? null } : {});

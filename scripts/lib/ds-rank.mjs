@@ -9,13 +9,17 @@
  *
  * A doc is `{id, fields}`, each field a string or an array of strings, under
  * the keys of `WEIGHTS`. Related is indexed at zero: its text names what to use
- * instead, so scoring it would rank a component for its alternatives.
+ * instead, so scoring it would rank a component for its alternatives. Aliases
+ * are not length-normalized: a component with more synonyms is not a weaker
+ * match for any one of them.
  */
 
 export const WEIGHTS = Object.freeze({ name: 5, aliases: 4, summary: 2, usage: 1, best: 0.5, related: 0 });
 
 const K1 = 1.2;
 const B = 0.75;
+/** Length normalization per field. An alias list is a set of synonyms, not prose: a longer one is not a weaker match. */
+const LENGTH = { name: B, aliases: 0, summary: B, usage: B, best: B, related: B };
 
 export const STOPWORDS = new Set(
   (
@@ -89,7 +93,7 @@ export function createRanker(docs, weights = {}) {
         for (const f of fields) {
           if (!w[f]) continue;
           const count = d.tf[f].get(word);
-          if (count) tf += (w[f] * count) / (1 - B + (B * d.len[f]) / avg[f]);
+          if (count) tf += (w[f] * count) / (1 - LENGTH[f] + (LENGTH[f] * d.len[f]) / avg[f]);
         }
         if (tf) s += idf(word) * ((tf * (K1 + 1)) / (tf + K1));
       }

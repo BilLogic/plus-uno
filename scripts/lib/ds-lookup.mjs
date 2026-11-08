@@ -16,12 +16,14 @@
  *   ORIENTATION, TOOL_ORDER      what the server sends at connection
  *
  * HOW FIND RANKS. In lanes, in this order: the exact name (a record, a barrel
- * export, a Figma name, a not-here name); not-here components the query names
+ * export, a Figma name, a not-here name) or an exact alias; not-here components the query names
  * by a whole word; token steps, only when the query speaks token vocabulary
  * (`speaksTokens`), and then ahead of components; the Pro row and Free icons,
  * only when the query asks for an icon; components and patterns ranked by
  * field-weighted BM25 over their name, summary and the Usage and Best
- * practices sections of their Storybook page (`ds-rank.mjs`); other barrel
+ * practices sections of their Storybook page and their authored aliases
+ * (`agent-views/_aliases.json`, with a bonus when the query carries an
+ * alias whole) (`ds-rank.mjs`); other barrel
  * exports on a word-start match, constants never; and last, a `guide` row
  * when a query word names a guideline topic. The index is built on the first
  * find from the same files `get` reads, so there is no second copy to drift.
@@ -150,6 +152,11 @@ const BAND_MIN = 0.6;
 const BAND_MAX = 8;
 /** A pattern that scores at all sits just above a component tied with it. */
 const PATTERN_LIFT = 0.3;
+/** An authored alias (four letters or more) the query carries whole: this plus one per word of it. */
+const ALIAS_PHRASE = 2;
+
+/** Whether `text` carries `phrase` as whole words. */
+const hasPhrase = (text, phrase) => new RegExp(`(?:^|[^a-z0-9])${phrase.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')}(?:[^a-z0-9]|$)`).test(text);
 
 /** One H2 section of a markdown or MDX file, without its layout wrappers. */
 function sectionOf(text, heading) {
@@ -248,7 +255,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       const section = (h) => (sectionOf(text, h) ?? '').replace(/^## .*$/m, '').replace(/<[^>]+>/g, ' ');
       return {
         id: r.name,
-        fields: { name: r.name, aliases: [], summary: a.summary ?? '', usage: section('Usage'), best: section('Best practices'), related: section('Related') },
+        fields: { name: r.name, aliases: aliases ? a.aliases : [], summary: a.summary ?? '', usage: section('Usage'), best: section('Best practices'), related: section('Related') },
       };
     });
     ranker = createRanker(docs, aliases ? {} : { aliases: 0 });
@@ -302,6 +309,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     for (const n of barrelOnly) if (n.toLowerCase() === ql || (!CONSTANT.test(n) && n.toLowerCase() === joined)) push({ kind: 'export', name: n, status: 'exists', import: facts.lookup(n).import });
     for (const { alias, name } of figmaAliases) if (alias.toLowerCase() === ql) push(item(name, { figma: alias }));
     for (const { row, bl } of notHere) if (bl === ql) push(notHereRow(row));
+    if (aliases) for (const r of records) if (facts.lookup(r.name).aliases.includes(ql)) push(item(r.name));
 
     // 2. A not-here component named by a whole word of the query (or, for a one-word query, containing it).
     for (const { row, bl } of notHere) if (row.kind === 'component' && words.includes(bl)) push(notHereRow(row));
@@ -310,7 +318,12 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     // The ranked band, scored now: its best score decides how many token steps lead.
     const ranked = rank()
       .score(q)
-      .map((r) => ({ ...r, score: r.score + (facts.lookup(r.id).kind === 'pattern' ? PATTERN_LIFT : 0) }))
+      .map((r) => {
+        const a = facts.lookup(r.id);
+        const phrases = aliases ? a.aliases.filter((al) => al.length > 3 && hasPhrase(ql, al)) : [];
+        const bonus = phrases.reduce((sum, al) => sum + ALIAS_PHRASE + al.split(' ').length, 0);
+        return { ...r, score: r.score + bonus + (a.kind === 'pattern' ? PATTERN_LIFT : 0) };
+      })
       .sort((a, b) => b.score - a.score || (a.id < b.id ? -1 : 1));
     const top = ranked[0]?.score ?? 0;
     const band = ranked.filter((x) => x.score >= Math.max(BAND_SHARE * top, BAND_MIN)).slice(0, BAND_MAX);
@@ -438,6 +451,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
       import: a.import,
       aliasOf: a.aliasOf,
       summary: firstSentence(a.summary, 300),
+      aliases: a.aliases,
       source: home.source ?? a.source,
       docs: mdx ? path.relative(root, mdx).split(path.sep).join('/') : null,
       why: a.why,
@@ -578,7 +592,7 @@ function renderGet(r) {
       const use = (x.use ?? x.replacement?.map((n) => ({ name: n })) ?? []).map((u) => `  use ${u.import ?? u.name}`);
       return [head, ...(x.why ? [`  why: ${x.why}`] : []), ...use, ...(x.values ? [`  values: ${x.values.join(' | ')}`] : []), ...(x.next ? [x.next] : [])].join('\n');
     }
-    const out = [`# ${x.name} (${x.kind})`, x.import, ...(x.aliasOf ? [`Alias of ${x.aliasOf}.`] : []), ...(x.summary ? [x.summary] : [])];
+    const out = [`# ${x.name} (${x.kind})`, x.import, ...(x.aliasOf ? [`Alias of ${x.aliasOf}.`] : []), ...(x.summary ? [x.summary] : []), ...(x.aliases?.length ? [`Also asked as: ${x.aliases.join(', ')}.`] : [])];
     if ('props' in x) {
       out.push('', '## Props');
       for (const p of x.props) {

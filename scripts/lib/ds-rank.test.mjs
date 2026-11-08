@@ -80,3 +80,14 @@ test('weights can be overridden per ranker', () => {
   assert.equal(createRanker(docs).score('grid')[0].id, 'Name');
   assert.equal(createRanker(docs, { name: 0 }).score('grid')[0].id, 'Usage');
 });
+
+test('a longer alias list is not a weaker match: the alias field is not length-normalized', () => {
+  const ranker = createRanker([
+    doc('Few', { aliases: ['slider'] }),
+    doc('Many', { aliases: ['slider', 'range control', 'value picker', 'scrubber'] }),
+  ]);
+  const [a, b] = ranker.score('slider');
+  assert.equal(a.score, b.score);
+  const prose = createRanker([doc('Few', { usage: 'slider' }), doc('Many', { usage: 'slider with range control and value picker and scrubber' })]);
+  assert.equal(prose.score('slider')[0].id, 'Few');
+});

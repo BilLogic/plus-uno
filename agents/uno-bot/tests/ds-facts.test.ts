@@ -31,10 +31,15 @@ async function rootFacts(): Promise<RootFacts> {
   return mod.loadFacts(ROOT);
 }
 
-/** Prop descriptions are not baked: they stay in the generated docs. */
+/**
+ * Prop descriptions are not baked: they stay in the generated docs. Nor are a
+ * component's aliases: they are ds_find's ranking vocabulary, and the Worker
+ * has no find.
+ */
 function withoutDescriptions(answer: Record<string, unknown>): Record<string, unknown> {
   const props = answer.props as Array<Record<string, unknown>> | null | undefined;
-  const out: Record<string, unknown> = { ...answer, description: null };
+  const { aliases: _aliases, ...rest } = answer;
+  const out: Record<string, unknown> = { ...rest, description: null };
   if (props) out.props = props.map((p) => ({ ...p, description: null }));
   return out;
 }
