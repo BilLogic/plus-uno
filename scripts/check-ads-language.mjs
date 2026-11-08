@@ -22,7 +22,8 @@
  * WHAT IT COUNTS, per rule and per file, keyed `<rule> <path>`:
  *   state-step       lines naming a `--*-state-NN` custom property, NN being 08, 12 or 16.
  *   component:<Name> JSX tags `<Name` plus import statements binding `Name`,
- *                    for the legacy names. `Overlay` and `Surface` count only
+ *                    for the retired names: the Not-here rows marked `retired`
+ *                    (`design-system/agent-views/_inventions.json`). `Overlay` and `Surface` count only
  *                    where they are the pattern, not React-Bootstrap's Overlay.
  *   prop:style|fill|size   lines with the retired prop values: `style="primary"`
  *                    (a bare identifier, which no inline CSS is), `fill="filled"`,
@@ -44,12 +45,18 @@
  * layer name, a decision record) goes into the allowlist below, named.
  */
 
+import fs from 'node:fs';
+import path from 'node:path';
+
 import { REPO_ROOT } from './lib/corpus.mjs';
+import { SOURCE_ROOTS } from './lib/ds-facts.mjs';
 import { main } from './lib/findings.mjs';
+import { renamedInProse, retiredComponents } from './lib/inventions.mjs';
 import { trackedSources } from './lib/tracked-sources.mjs';
 
 export { REPO_ROOT };
-export const SEARCH_ROOTS = ['design-system/src', 'prototypes', 'src'];
+/** The library's own source and consumer code: the language binds both. */
+export const SEARCH_ROOTS = SOURCE_ROOTS;
 export const SEARCHED = /\.(scss|css|jsx|js|mjs|html|mdx)$/;
 /**
  * Files that record the old words on purpose: history, decisions, or — for the
@@ -74,16 +81,16 @@ const COMMENT_LINE = /^\s*(?:\/\/|\/\*|\*)/;
 /** A glossary line saying what not to say. */
 const ALLOWED_LINE = /^\s*_Avoid_:/;
 
-export const LEGACY_COMPONENTS = [
-  'Alert', 'Toast', 'ToastContainer', 'Switch', 'NavTabs', 'NavPills', 'Badge', 'BadgeVariants',
-  'Jumbotron', 'ListGroup', 'MediaObject', 'Navbar', 'Scrollspy', 'Collapse', 'InputGroup',
-  'NumberInput', 'CustomThemeButton',
-];
+/** The Not-here table: the one list of retired names, each with its replacement. */
+const NOT_HERE = JSON.parse(fs.readFileSync(path.join(REPO_ROOT, 'design-system/agent-views/_inventions.json'), 'utf8'));
+
+/** The retired component names: the Not-here rows marked `retired`. Retire one there, not here. */
+export const LEGACY_COMPONENTS = retiredComponents(NOT_HERE);
 /** Patterns whose old names collide with React-Bootstrap's: counted only when not imported from it. */
 const PATTERN_COMPONENTS = ['Overlay', 'Surface'];
 
-/** A component renamed with no alias (ADR-037 "clean replace"): the old name may not survive in doc prose either. */
-const RENAMED_NO_ALIAS = { Toast: 'Flag' };
+/** A component renamed with no alias (ADR-037 "clean replace"), the Not-here rows marked `inProse`: the old name may not survive in doc prose either. */
+export const RENAMED_NO_ALIAS = renamedInProse(NOT_HERE);
 /** Where doc prose is checked for a stale renamed-away name — component docs, not specs or prototypes. */
 const DOC_PATH = /^design-system\/src\/components\/.*\.mdx$/;
 /** The AI's old product name; the AI is unnamed (decision 1 of #1591), held to zero in the design system. */
@@ -127,7 +134,7 @@ function componentCount(text, name, { pattern }) {
 
 /**
  * Is this line shipped doc that names Atlassian? Every MDX line is; in code
- * only a non-comment line of a story is (its `docs` and `changelog` strings);
+ * only a non-comment line of a story is (its `docs` strings);
  * and an `atlassian.design` link is anywhere, because JSDoc flows into the
  * generated agent views.
  */

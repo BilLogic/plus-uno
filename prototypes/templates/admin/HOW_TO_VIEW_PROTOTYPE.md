@@ -12,5 +12,5 @@ Then open the route/path used by this template in your local Vite server.
 
 ## Notes
 
-- Do not use legacy `build:css` workflows in this repository.
+- Styles build through Vite; there is no separate `build:css` step.
 - Use `AGENTS.md` and `skills/*/references/` for current implementation guidance.

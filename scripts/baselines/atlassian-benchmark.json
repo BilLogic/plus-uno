@@ -1,4 +1,6 @@
 {
+  "why": "OUR side of the comparison, recorded 2026-08-29 so the enforced rows have a starting point. Only the four ARGUED rows are recorded — see ROWS in scripts/atlassian-benchmark.mjs, where each direction carries its reason. Re-record with `npm run benchmark:atlassian -- --update` AFTER a move in the argued direction; it refuses a backwards one.",
+  "recordedAt": "2026-08-29",
   "note": "Atlassian's published token surface, MEASURED rather than remembered. Not derived from anything in this repository. Re-measure with `npm run benchmark:atlassian -- --how` and record the date; check:atlassian-benchmark holds our own numbers to the directions below.",
   "source": "https://atlassian.design/components/tokens/all-tokens",
   "measuredAt": "2026-08-29",
@@ -45,12 +47,23 @@
     ],
     "note": "Each of these is ONE token carrying size, line-height and weight together. There is no separate `font.lineHeight.*` namespace on the page at all — the 23 `font.*` tokens are these 14 steps plus 4 weights and 5 families."
   },
-  "ours": {
-    "note": "OUR side of the comparison, recorded 2026-08-29 so the enforced rows have a starting point. Only the four ARGUED rows are recorded — see ROWS in scripts/atlassian-benchmark.mjs, where each direction carries its reason. Re-record with `npm run benchmark:atlassian -- --update` AFTER a move in the argued direction; it refuses a backwards one.",
-    "recordedAt": "2026-08-29",
-    "intent.borderTokens": 7,
-    "intent.iconTokens": 7,
-    "type.scaleSpread": 1.26,
-    "type.lineHeights": 46
+  "sets": {
+    "main": {
+      "direction": "grow-only",
+      "entries": {
+        "intent.borderTokens": {
+          "count": 7
+        },
+        "intent.iconTokens": {
+          "count": 7
+        },
+        "type.scaleSpread": {
+          "count": 1.26
+        },
+        "type.lineHeights": {
+          "count": 46
+        }
+      }
+    }
   }
 }

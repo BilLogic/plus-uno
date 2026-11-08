@@ -31,12 +31,13 @@
  */
 
 import { REPO_ROOT } from './lib/corpus.mjs';
+import { SOURCE_ROOTS } from './lib/ds-facts.mjs';
 import { main } from './lib/findings.mjs';
 import { RETIRED_TOKENS } from './lib/tokens/plan.mjs';
 import { trackedSources } from './lib/tracked-sources.mjs';
 
 export { REPO_ROOT };
-export const SEARCH_ROOTS = ['design-system/src', 'prototypes', 'src'];
+export const SEARCH_ROOTS = SOURCE_ROOTS;
 export const SEARCHED = /\.(scss|css|jsx|js|mjs|ts|tsx|html|mdx|md)$/;
 
 const SPECS = /^design-system\/src\/specs\//;

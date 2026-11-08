@@ -5,6 +5,14 @@
  * The data is hand-kept; the rendering is generated, and `checkInventions`
  * holds every target to the manifests so a row can never point at a name
  * that does not exist.
+ *
+ * The table is the one source of retired component names. A row marked
+ * `retired` is a name this library once had, and `check:ads-language` bans it
+ * (`retiredComponents`); `inProse` also bans it from component doc prose, for a
+ * rename with no alias (`renamedInProse`). Retiring a component is one row.
+ * Retired token names are the token plan's (ADR-038): the facts module lists
+ * them beside these rows, and `tokenRowConflicts` holds a hand-kept token row
+ * to what the plan maps the names it covers to.
  */
 
 /** A target as written: `Name`, `Name.prop`, `Name.prop=value`, or `--token`. */
@@ -44,6 +52,48 @@ export function checkInventions(inventions, components, tokens, patterns = []) {
       const prop = record.props?.find((p) => p.name === t.prop);
       if (!prop) problems.push(`${row.not}: ${t.component} has no prop ${t.prop}`);
       else if (t.value && !(prop.values ?? []).includes(t.value)) problems.push(`${row.not}: ${t.component}.${t.prop} does not accept ${t.value}`);
+    }
+  }
+  return problems;
+}
+
+/** The component names `check:ads-language` bans: the rows marked retired, in table order. */
+export function retiredComponents(inventions) {
+  return inventions.components.filter((r) => r.retired).map((r) => r.not);
+}
+
+/** Old name → new, for a rename with no alias: the old name may not survive in doc prose either. */
+export function renamedInProse(inventions) {
+  return Object.fromEntries(inventions.components.filter((r) => r.retired && r.inProse).map((r) => [r.not, r.use[0]]));
+}
+
+/** `--space-025 (4px)`, `--radius-<n>`, `--size-element-*, --element-*` → name matchers. */
+export function tokenMatchers(not) {
+  return [...not.matchAll(/--[\w<>*-]+/g)].map(([glob]) => {
+    const source = glob
+      .replace(/[.+?^${}()|[\]\\]/g, '\\$&')
+      .replace(/<n>/g, '\\d+')
+      .replace(/\*/g, '[\\w-]*');
+    return new RegExp(`^${source}$`);
+  });
+}
+
+/**
+ * Hand-kept token rows that disagree with the plan, as messages: a row that
+ * covers a retired name may offer only what the plan maps a covered name to.
+ *
+ * @param {{tokens: {not: string, use: string[]}[]}} inventions
+ * @param {Map<string, string>} retired  the plan's retired name → replacement
+ */
+export function tokenRowConflicts(inventions, retired) {
+  const problems = [];
+  for (const row of inventions.tokens) {
+    const matchers = tokenMatchers(row.not);
+    const covered = [...retired].filter(([old]) => matchers.some((re) => re.test(old)));
+    if (!covered.length) continue;
+    const mapped = new Set(covered.map(([, replacement]) => replacement));
+    for (const target of row.use) {
+      if (!mapped.has(target)) problems.push(`${row.not}: ${target} is not what the plan maps any name it covers to`);
     }
   }
   return problems;

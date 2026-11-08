@@ -1,5 +1,6 @@
 // The weekly DS precedence check bound to `Env` — the only file in the folder
-// that names it. The code side is read from `GITHUB_REPO`, the harness repo,
+// that names it. The code side is the design-system facts baked into the
+// Worker and the registry read from `GITHUB_REPO`, the harness repo,
 // where the intake is filed too; the library is `FIGMA_FILE_KEY` over REST;
 // the report goes up in #plus-universal (`PLUS_UNIVERSAL_CHANNEL_ID`) as a
 // section of the sweep's morning message there, tagging the week's DS owner
@@ -26,6 +27,7 @@ import { kvJson } from "../figma-poll";
 import { figmaClientFor } from "../figma/production";
 import { channelMembers } from "../slack/channel-members";
 import { REGISTRY_PATH } from "../figma/registry";
+import { precedenceIndex } from "../integrations/ds-facts";
 import type { JobContext } from "../scheduled/runs";
 import type { PrecedenceRegistry } from "./compare";
 import { precedenceRuleUrl } from "./report";
@@ -49,7 +51,6 @@ const THREAD_KV_PREFIX = "ds-precedence:thread:";
 /** How long a report's thread stays one: well past its cards' 24 weekday hours, so
  *  the replies people still add to it are not taken as turns. */
 const THREAD_RECORD_TTL_S = 30 * 24 * 60 * 60;
-const INDEX_FILE = "design-system/agent-views/components/index.md";
 
 /**
  * The check job on `Env`.
@@ -68,8 +69,8 @@ export async function runDsPrecedenceCheck(env: Env, opts: JobContext): Promise<
   const fileKey = env.FIGMA_FILE_KEY;
   return runPrecedenceCheck(
     {
+      index: precedenceIndex(),
       github: {
-        indexMarkdown: () => reads.rawFile(INDEX_FILE),
         registry: async () => JSON.parse(await reads.rawFile(REGISTRY_PATH)) as PrecedenceRegistry,
       },
       figma,

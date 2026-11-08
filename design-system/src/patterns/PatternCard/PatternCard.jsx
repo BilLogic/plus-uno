@@ -107,6 +107,11 @@ PatternCard.propTypes = {
      * tab stop; pass `role` and `tabIndex` for a card clickable as a whole.
      */
     onClick: PropTypes.func,
+    /**
+     * Key handler, passed to the card's root element. A card clickable as a
+     * whole takes Enter and Space here, beside its `role` and `tabIndex`.
+     */
+    onKeyDown: PropTypes.func,
     /** The card is being dragged: it lifts to the overlay pair */
     dragging: PropTypes.bool,
     className: PropTypes.string,

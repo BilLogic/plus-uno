@@ -2,6 +2,10 @@
 // (to check what exists, e.g. a DS component folder), or search the code, in any repo on the Worker's repo
 // list. Runs inline in the agent loop (no gate).
 //
+// `lookup` answers a design-system name — a component, pattern, prop or token
+// role — from the facts baked into the Worker (`integrations/ds-facts.ts`),
+// before any repo is resolved, so it fetches nothing.
+//
 // The model may name a `repo`; it reaches GitHub only as the entry the resolver
 // hands back, so a repo off the list is refused here, naming the list, and
 // never fetched.
@@ -22,6 +26,44 @@ import {
 } from "../integrations/github";
 import { isWithheldRepoPath, WITHHELD_NOTE } from "../integrations/repo-read-guard";
 import { storybookDocFor, type StorybookDoc } from "../integrations/storybook-docs";
+import { dsFacts } from "../integrations/ds-facts";
+
+/** A token role can name hundreds (`ds` is every color): the rest are counted, not listed. */
+const TOKEN_LIMIT = 60;
+
+const LOOKUP_NOTE =
+  "From the design system's facts, as the IDE reads them. `exists` is importable with `import`; `not-here` is a name this system does not have — write `use`'s name and its import instead; `unknown` means it does not exist here — say so, and offer `near` if there is one. A prop's description and a component's full doc are read by path.";
+
+/**
+ * A design-system name, answered from the baked facts: `Card`, `card`,
+ * `Button.appearance`, `Button.appearance=primary`, `--stack-md`, `stack`.
+ */
+export function lookupDesignSystem(query: string): string {
+  const facts = dsFacts();
+  if (query.startsWith("--")) {
+    return JSON.stringify({ ok: true, lookup: query, tokens: facts.tokens(query), note: LOOKUP_NOTE });
+  }
+  const found = facts.find(query);
+  const tokens = found.answer.status === "unknown" && !query.includes(".") ? facts.tokens(query.trim()) : [];
+  if (tokens.length) {
+    return JSON.stringify({
+      ok: true,
+      lookup: query,
+      tokens: tokens.slice(0, TOKEN_LIMIT),
+      ...(tokens.length > TOKEN_LIMIT ? { more: tokens.length - TOKEN_LIMIT } : {}),
+      note: LOOKUP_NOTE,
+    });
+  }
+  return JSON.stringify({
+    ok: true,
+    lookup: query,
+    answer: found.answer,
+    ...(found.use.length ? { use: found.use } : {}),
+    ...(found.near.length ? { near: found.near } : {}),
+    note: LOOKUP_NOTE,
+  });
+}
+
 
 export interface GithubReadDeps {
   /** The model's `repo` input, resolved against the repo list. */
@@ -37,6 +79,8 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
   const path = typeof input.path === "string" ? input.path.trim() : "";
   const ref = typeof input.ref === "string" ? input.ref.trim() : undefined;
   const search = typeof input.search === "string" ? input.search.trim() : "";
+  const lookup = typeof input.lookup === "string" ? input.lookup.trim() : "";
+  if (lookup) return lookupDesignSystem(lookup);
 
   const target = deps.resolveRepo(input.repo);
   if (!target.ok) {
@@ -80,7 +124,7 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
     }
   }
 
-  if (!path) return JSON.stringify({ ok: false, error: "missing 'path' (or use 'search')" });
+  if (!path) return JSON.stringify({ ok: false, error: "missing 'path' (or use 'search', or 'lookup' for a design-system name)" });
   if (withheldHere(path)) {
     return JSON.stringify({ ok: false, error: `${path} is withheld`, note: WITHHELD_NOTE });
   }
@@ -139,7 +183,7 @@ function githubLink(repo: string, kind: "blob" | "tree", path: string, ref?: str
 /**
  * The binding: `Env` turned into the resolver and the reader.
  * @param env - Worker bindings
- * @param input - Tool args from the model — `path`, `ref`, `search`, `repo`
+ * @param input - Tool args from the model — `lookup`, `path`, `ref`, `search`, `repo`
  */
 export async function executeGithubRead(env: Env, input: Record<string, unknown>): Promise<string> {
   return readGithub(input, {

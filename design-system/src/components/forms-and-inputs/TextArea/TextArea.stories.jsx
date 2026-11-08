@@ -10,10 +10,6 @@ export default {
     component: TextArea,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'Text area takes the Text field props: `appearance`, `spacing`, `isInvalid`, `isDisabled`, `isReadOnly`, `isRequired`.' },
-            { date: '2026-11-03', kind: 'added', summary: 'A warning message, with `border.warning` on the field.' },
-        ],
         docs: {
             description: {
                 component:

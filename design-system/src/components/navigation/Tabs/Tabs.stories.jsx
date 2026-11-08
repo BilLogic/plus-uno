@@ -14,13 +14,6 @@ export default {
     component: Tabs,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-04', kind: 'changed', summary: 'Rebuilt on Base UI\'s Tabs: always a real `role="tablist"` (the old `mode="navigation"`/`mode="tabs"` split is gone), with `appearance` (default underline, or pill) and `spacing` (default, or compact) added.' },
-            { date: '2026-10-25', kind: 'changed', summary: 'Colors moved to the --ds- tokens: an unselected tab is `text.subtle`, the selected one `text.selected` over the `border.selected` bar (Lagoon), hover and press the neutral subtle steps on every tab, and disabled `text.disabled` instead of a faded opacity.' },
-            { date: '2026-10-24', kind: 'changed', summary: 'Pressed is the 12 state layer, not 16. Keyboard focus is a 2px focus ring inside the tab, with no fill.' },
-            { date: '2026-10-23', kind: 'changed', summary: 'Tabs and dropdown tabs are 32, with Body/default labels at the medium weight.' },
-            { date: '2026-10-23', kind: 'changed', summary: 'The selected tab keeps the medium weight; the underline and the color mark it.' },
-        ],
         docs: {
             description: {
                 component: 'Tabs is a WAI-ARIA tab strip built on Base UI\'s Tabs: a `role="tablist"` of buttons with roving tabindex, arrow-key navigation and a labelled panel per tab.'

@@ -13,7 +13,8 @@
  * Only consumer code is checked (the same scope as the checker: `prototypes/`
  * and `src/`); any other edit returns at once without reading a file. Every
  * run appends one line to `.local/ds-usage-runs.jsonl` (git-ignored): time,
- * file, session, and the count of findings by rule.
+ * file, session, the count of findings by rule, and `duration_ms` from the
+ * start of `main()`, so the checker's import is in the cost of an edit.
  *
  * The edited file is held to zero, the same rule `check:ds-usage` applies to a
  * file a change touches: recorded debt in it comes back too, so an edit to an
@@ -22,9 +23,14 @@
  * Off switch: `DS_USAGE_HOOK=off` in the environment. A checker that fails to
  * load or throws exits 0 with nothing said: a broken hook must not stall an
  * agent. `DS_USAGE_HOOK_LOG` moves the log (the tests use it).
+ *
+ * `DS_USAGE_ROOT` names another repo to check: its edited files, facts and
+ * log, with this repo's checker. The usage eval's checker-removed arm runs the
+ * hook that way, so its copy keeps the hook and loses the checker.
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { performance } from 'node:perf_hooks';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
@@ -43,10 +49,14 @@ const print = (f) => `${f.file}:${f.line}:${f.col}  ${f.rule}  ${f.message}\n   
 
 /**
  * Decide what one hook call does. `check(rel)` returns the file's findings;
- * `inScope(rel)` says whether the checker reads it.
+ * `inScope(rel)` says whether the checker reads it. `startedAt` is a `clock()`
+ * reading from when the run began; the log's `duration_ms` runs from it.
  * @returns {{ran: boolean, exitCode: 0|2, stderr: string, log: object|null}}
  */
-export function handle(input, { repoRoot = ROOT, check, inScope, env = process.env, now = () => new Date().toISOString() }) {
+export function handle(
+  input,
+  { repoRoot = ROOT, check, inScope, env = process.env, now = () => new Date().toISOString(), clock = () => performance.now(), startedAt = clock() },
+) {
   const quiet = { ran: false, exitCode: 0, stderr: '', log: null };
   if (env.DS_USAGE_HOOK === 'off') return quiet;
   const rel = editedPath(input, repoRoot);
@@ -67,6 +77,7 @@ export function handle(input, { repoRoot = ROOT, check, inScope, env = process.e
     fail: fail.length,
     warn: findings.length - fail.length,
     by_rule: byRule,
+    duration_ms: Math.round(clock() - startedAt),
   };
   if (!fail.length) return { ran: true, exitCode: 0, stderr: '', log };
   const stderr =
@@ -76,6 +87,7 @@ export function handle(input, { repoRoot = ROOT, check, inScope, env = process.e
 }
 
 async function main() {
+  const startedAt = performance.now();
   let raw = '';
   for await (const chunk of process.stdin) raw += chunk;
   let input;
@@ -84,17 +96,18 @@ async function main() {
   } catch {
     return;
   }
-  if (process.env.DS_USAGE_HOOK === 'off' || !editedPath(input, ROOT)) return;
+  const root = process.env.DS_USAGE_ROOT ? path.resolve(process.env.DS_USAGE_ROOT) : ROOT;
+  if (process.env.DS_USAGE_HOOK === 'off' || !editedPath(input, root)) return;
   let checker;
   try {
     checker = await import(path.join(ROOT, 'scripts/check-ds-usage.mjs'));
   } catch {
     return;
   }
-  const out = handle(input, { check: (rel) => checker.escapes(ROOT, [rel]), inScope: checker.inScope });
+  const out = handle(input, { repoRoot: root, check: (rel) => checker.escapes(root, [rel]), inScope: checker.inScope, startedAt });
   if (out.log) {
     try {
-      const logFile = path.resolve(ROOT, process.env.DS_USAGE_HOOK_LOG ?? DEFAULT_LOG);
+      const logFile = path.resolve(root, process.env.DS_USAGE_HOOK_LOG ?? DEFAULT_LOG);
       fs.mkdirSync(path.dirname(logFile), { recursive: true });
       fs.appendFileSync(logFile, `${JSON.stringify(out.log)}\n`);
     } catch {

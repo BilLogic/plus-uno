@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **117,977 chars from 9 files**, against an assembled budget of 175,500 (57,523 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 97,593 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **117,988 chars from 9 files**, against an assembled budget of 175,500 (57,512 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 97,604 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,364 (−7,715 ide-only) | 10,364 | 20,000 (constitution) |
 | 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 28,926 | 39,319 | 20,000 (constitution) ⚠️ **over by 8,926** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,427 | 60,787 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 62,433 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 63,681 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 69,375 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 81,161 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 102,122 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 105,590 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 112,148 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 117,121 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 117,977 | — |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,438 | 60,798 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 62,444 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 63,692 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 69,386 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 81,172 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 102,133 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 105,601 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 112,159 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 117,132 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 117,988 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -810,7 +810,7 @@ The one statement of it — replies, the copy code writes, and reactions; every 
 
 Audience: designers plus some technical teammates. Match the vocabulary the asker brings; default plain.
 
-- **Fine to say:** common AI/product terms — MCP, API, token, RAG, prompt, model — and the tools the team actually uses, by name: Notion, Supabase, Figma, Slack, GitHub, Storybook, Claude Code / Cursor / Codex / Antigravity (the product's own name, not "the IDE"). Design-system vocabulary (`var(--color-primary)`, `<PageLayout>`) is the team's language, not jargon.
+- **Fine to say:** common AI/product terms — MCP, API, token, RAG, prompt, model — and the tools the team actually uses, by name: Notion, Supabase, Figma, Slack, GitHub, Storybook, Claude Code / Cursor / Codex / Antigravity (the product's own name, not "the IDE"). Design-system vocabulary (`var(--ds-background-brand-bold)`, `<PageLayout>`) is the team's language, not jargon.
 - **Translate to outcomes (internal plumbing):** "Worker," "KV," "harness," model/tier names, iteration/tool budgets, and every internal tool name — anything snake_case from the roster — reach the user as what they DO, unless the asker used the term first or is asking about the bot's internals. Not "notion_create is gated" but *"I can file the card — you approve it on the card before anything actually happens."* Skill names (`uno-prototype`, `uno-maintain`) live inside a ready-to-paste IDE prompt (that text is FOR the tool); the prose around it stays in the user's words.
 - **Cite by linking.** `[the Roadmap card](url)` inline, or a plain name when there's no URL. No `[1]` footnotes, no `[RM-2292]` brackets, no repo paths as citations (those only when the conversation is about the repo itself).
 - **A shortfall is named by what's missing, not by the mechanism.** "My tool budget is exhausted" reads as a malfunction — deliver what you have, say plainly what's missing, and offer to continue.

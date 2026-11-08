@@ -1,122 +1,360 @@
 {
   "why": "Escapes already in consumer code (prototypes/, src/) when check:ds-usage landed, as `<rule> <path>` -> count of fail-level findings. The record only falls; a file a change touches is held to zero when the check runs on changed files or named paths. Regenerate with `npm run check:ds-usage -- --update`; never edit by hand.",
-  "counts": {
-    "ds/no-deep-import prototypes/home-redesign/src/components/ChatSimulationCard.jsx": 1,
-    "ds/no-deep-import prototypes/home-redesign/src/components/Dashboard.jsx": 2,
-    "ds/no-deep-import prototypes/home-redesign/src/components/MonthlyReportsListPage.jsx": 4,
-    "ds/no-deep-import prototypes/in-session-ux/InSessionContent.jsx": 2,
-    "ds/no-deep-import prototypes/in-session-ux/InSessionPage.jsx": 2,
-    "ds/no-deep-import prototypes/in-session-ux/ManageAssignmentModal.jsx": 3,
-    "ds/no-deep-import prototypes/in-session-ux/StudentInsightsModal.jsx": 4,
-    "ds/no-deep-import prototypes/monthly-report/src/MonthlyReportContent.jsx": 6,
-    "ds/no-deep-import prototypes/monthly-report/src/MonthlyReportPage.jsx": 3,
-    "ds/no-deep-import prototypes/monthly-report/src/MonthlyReportsListContent.jsx": 4,
-    "ds/no-deep-import prototypes/monthly-report/src/MonthlyReportsListPage.jsx": 4,
-    "ds/no-deep-import prototypes/research-assistant-chat/src/components/TrainingProgressContent.tsx": 3,
-    "ds/no-deep-import prototypes/templates/admin/tutor-admin.js": 1,
-    "ds/no-deep-import prototypes/templates/login/login.js": 1,
-    "ds/no-deep-import prototypes/templates/login/sign-in-portal.js": 1,
-    "ds/no-deep-import src/components/NavFab/NavFab.jsx": 1,
-    "ds/no-deep-import src/pages/PrototypeMarket/PrototypeCard.jsx": 3,
-    "ds/no-deep-import src/pages/PrototypeMarket/PrototypeMarket.jsx": 4,
-    "ds/no-primitive-read prototypes/home-redesign/src/App.css": 5,
-    "ds/no-primitive-read prototypes/in-session-ux/ReflectionAssistant/CompactReflectionBar.jsx": 4,
-    "ds/no-primitive-read prototypes/monthly-report/src/MonthlyReportContent.jsx": 1,
-    "ds/no-primitive-read prototypes/monthly-report/src/MonthlyReportPage.scss": 17,
-    "ds/no-primitive-read prototypes/post-session-reflection/src/pages/ReflectionsListPage.jsx": 1,
-    "ds/no-primitive-read prototypes/research-assistant-chat/src/components/ChartSkeleton.tsx": 1,
-    "ds/no-primitive-read prototypes/research-assistant-chat/src/components/ChatHeader.tsx": 1,
-    "ds/no-primitive-read prototypes/research-assistant-chat/src/components/CompactChatBar.tsx": 4,
-    "ds/no-primitive-read prototypes/research-assistant-chat/src/components/EngagementChart.tsx": 1,
-    "ds/no-primitive-read prototypes/research-assistant-chat/src/components/FloatingChatBubble.tsx": 3,
-    "ds/no-primitive-read prototypes/research-assistant-chat/src/components/StrategyHeatmap.tsx": 3,
-    "ds/no-primitive-read prototypes/starter/src/App.jsx": 1,
-    "ds/no-primitive-read prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.scss": 6,
-    "ds/no-primitive-read prototypes/templates/admin/tutor-admin.js": 3,
-    "ds/no-primitive-read prototypes/templates/login/login.html": 1,
-    "ds/no-primitive-read prototypes/templates/login/sign-in-portal.html": 1,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/Agenda/Agenda.css": 2,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/AnimatedCheckbox/AnimatedCheckbox.css": 1,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/Avatar/Avatar.css": 4,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/Delta/Delta.css": 2,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/Disclosure/Disclosure.css": 7,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/GoalMeter/GoalMeter.css": 9,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/HintTooltip/HintTooltip.css": 7,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/PageHeader/PageHeader.css": 7,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/Phases/Phases.css": 8,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/ProgressSteps/ProgressSteps.css": 2,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/ReadOnlyQuote/ReadOnlyQuote.css": 7,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/RevealRows/RevealRows.css": 6,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/StatTile/StatTile.css": 10,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/kit/storyModes.jsx": 1,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/pages/Home.css": 25,
-    "ds/no-primitive-read prototypes/tutor-revamp/src/shell/AppShell.css": 1,
-    "ds/no-primitive-read src/components/NavFab/NavFab.scss": 2,
-    "ds/no-primitive-read src/pages/PrototypeMarket/PrototypeCard.scss": 1,
-    "ds/no-primitive-read src/pages/PrototypeMarket/PrototypeMarket.scss": 1,
-    "ds/no-raw-literal prototypes/home-redesign/src/App.css": 30,
-    "ds/no-raw-literal prototypes/home-redesign/src/components/ChatSimulationCard.scss": 99,
-    "ds/no-raw-literal prototypes/home-redesign/src/components/Dashboard.jsx": 1,
-    "ds/no-raw-literal prototypes/home-redesign/src/components/DevIndexPage.jsx": 38,
-    "ds/no-raw-literal prototypes/home-redesign/src/components/MonthlyReportsContent.scss": 33,
-    "ds/no-raw-literal prototypes/home-redesign/src/components/MonthlyReportsListPage.jsx": 2,
-    "ds/no-raw-literal prototypes/home-redesign/src/demo.css": 6,
-    "ds/no-raw-literal prototypes/home-redesign/src/index.css": 18,
-    "ds/no-raw-literal prototypes/in-session-ux/InSessionContent.jsx": 31,
-    "ds/no-raw-literal prototypes/in-session-ux/InSessionPage.jsx": 43,
-    "ds/no-raw-literal prototypes/in-session-ux/ManageAssignmentModal.jsx": 32,
-    "ds/no-raw-literal prototypes/in-session-ux/ReflectionAssistant/CompactReflectionBar.jsx": 7,
-    "ds/no-raw-literal prototypes/in-session-ux/ReflectionAssistant/ReflectionAssistantChat.jsx": 38,
-    "ds/no-raw-literal prototypes/in-session-ux/ReflectionAssistant/ReflectionWidgets.jsx": 48,
-    "ds/no-raw-literal prototypes/in-session-ux/ReflectionAssistant/ToolUI.jsx": 45,
-    "ds/no-raw-literal prototypes/in-session-ux/StudentInsightsModal.jsx": 55,
-    "ds/no-raw-literal prototypes/in-session-ux/index.css": 8,
-    "ds/no-raw-literal prototypes/live-app/src/LiveAppNav.scss": 29,
-    "ds/no-raw-literal prototypes/monthly-report/src/MonthlyReportContent.jsx": 3,
-    "ds/no-raw-literal prototypes/monthly-report/src/MonthlyReportPage.scss": 320,
-    "ds/no-raw-literal prototypes/monthly-report/src/MonthlyReportsListContent.jsx": 2,
-    "ds/no-raw-literal prototypes/monthly-report/src/MonthlyReportsListPage.jsx": 2,
-    "ds/no-raw-literal prototypes/monthly-report/src/MonthlyReportsListPage.scss": 33,
-    "ds/no-raw-literal prototypes/post-session-reflection/src/App.css": 4,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/ErrorBoundary.tsx": 5,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/components/AdminSkeletons.tsx": 13,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/components/AssistantMessageContent.tsx": 1,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/components/ChartSkeleton.tsx": 1,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/components/ChatHeader.tsx": 2,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/components/CompactChatBar.tsx": 7,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/components/EngagementChart.tsx": 2,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/components/FakeTools.tsx": 76,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/components/FloatingChatBubble.tsx": 9,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/components/StrategyHeatmap.tsx": 12,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/components/TrainingProgressContent.tsx": 1,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/index.css": 23,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/views/TutorAdminContent.jsx": 1,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/views/TutorAdminView.tsx": 1,
-    "ds/no-raw-literal prototypes/research-assistant-chat/src/views/TutorAdminWithChatView.tsx": 1,
-    "ds/no-raw-literal prototypes/starter/src/App.css": 4,
-    "ds/no-raw-literal prototypes/starter/src/App.jsx": 3,
-    "ds/no-raw-literal prototypes/starter/src/index.css": 2,
-    "ds/no-raw-literal prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.jsx": 138,
-    "ds/no-raw-literal prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.scss": 126,
-    "ds/no-raw-literal prototypes/tutor-revamp/src/kit/Agenda/Agenda.css": 12,
-    "ds/no-raw-literal prototypes/tutor-revamp/src/kit/AnimatedCheckbox/AnimatedCheckbox.css": 10,
-    "ds/no-raw-literal prototypes/tutor-revamp/src/kit/Avatar/Avatar.css": 2,
-    "ds/no-raw-literal prototypes/tutor-revamp/src/kit/Disclosure/Disclosure.css": 5,
-    "ds/no-raw-literal prototypes/tutor-revamp/src/kit/GoalMeter/GoalMeter.css": 5,
-    "ds/no-raw-literal prototypes/tutor-revamp/src/kit/PageHeader/PageHeader.css": 1,
-    "ds/no-raw-literal prototypes/tutor-revamp/src/kit/Phases/Phases.css": 4,
-    "ds/no-raw-literal prototypes/tutor-revamp/src/kit/ProgressSteps/ProgressSteps.css": 1,
-    "ds/no-raw-literal prototypes/tutor-revamp/src/kit/RevealRows/RevealRows.css": 1,
-    "ds/no-raw-literal prototypes/tutor-revamp/src/kit/StatTile/StatTile.css": 5,
-    "ds/no-raw-literal prototypes/tutor-revamp/src/kit/kit.css": 3,
-    "ds/no-raw-literal prototypes/tutor-revamp/src/pages/Home.css": 6,
-    "ds/no-raw-literal src/components/NavFab/NavFab.scss": 17,
-    "ds/no-raw-literal src/pages/PrototypeMarket/PrototypeCard.scss": 12,
-    "ds/no-raw-literal src/pages/PrototypeMarket/PrototypeMarket.scss": 37,
-    "ds/no-unknown-prop prototypes/monthly-report/src/MonthlyReportContent.jsx": 4,
-    "ds/no-unknown-prop src/pages/PrototypeMarket/PrototypeMarket.jsx": 1,
-    "ds/no-unknown-token prototypes/monthly-report/src/MonthlyReportPage.scss": 3,
-    "ds/no-unknown-token prototypes/research-assistant-chat/src/index.css": 1,
-    "ds/no-unknown-token src/pages/PrototypeMarket/PrototypeMarket.scss": 1
+  "sets": {
+    "main": {
+      "entries": {
+        "ds/no-deep-import prototypes/home-redesign/src/components/ChatSimulationCard.jsx": {
+          "count": 1
+        },
+        "ds/no-deep-import prototypes/home-redesign/src/components/Dashboard.jsx": {
+          "count": 2
+        },
+        "ds/no-deep-import prototypes/home-redesign/src/components/MonthlyReportsListPage.jsx": {
+          "count": 4
+        },
+        "ds/no-deep-import prototypes/in-session-ux/InSessionContent.jsx": {
+          "count": 2
+        },
+        "ds/no-deep-import prototypes/in-session-ux/InSessionPage.jsx": {
+          "count": 2
+        },
+        "ds/no-deep-import prototypes/in-session-ux/ManageAssignmentModal.jsx": {
+          "count": 3
+        },
+        "ds/no-deep-import prototypes/in-session-ux/StudentInsightsModal.jsx": {
+          "count": 4
+        },
+        "ds/no-deep-import prototypes/monthly-report/src/MonthlyReportContent.jsx": {
+          "count": 6
+        },
+        "ds/no-deep-import prototypes/monthly-report/src/MonthlyReportPage.jsx": {
+          "count": 3
+        },
+        "ds/no-deep-import prototypes/monthly-report/src/MonthlyReportsListContent.jsx": {
+          "count": 4
+        },
+        "ds/no-deep-import prototypes/monthly-report/src/MonthlyReportsListPage.jsx": {
+          "count": 4
+        },
+        "ds/no-deep-import prototypes/research-assistant-chat/src/components/TrainingProgressContent.tsx": {
+          "count": 3
+        },
+        "ds/no-deep-import prototypes/templates/admin/tutor-admin.js": {
+          "count": 1
+        },
+        "ds/no-deep-import prototypes/templates/login/login.js": {
+          "count": 1
+        },
+        "ds/no-deep-import prototypes/templates/login/sign-in-portal.js": {
+          "count": 1
+        },
+        "ds/no-deep-import src/components/NavFab/NavFab.jsx": {
+          "count": 1
+        },
+        "ds/no-deep-import src/pages/PrototypeMarket/PrototypeCard.jsx": {
+          "count": 3
+        },
+        "ds/no-deep-import src/pages/PrototypeMarket/PrototypeMarket.jsx": {
+          "count": 4
+        },
+        "ds/no-primitive-read prototypes/home-redesign/src/App.css": {
+          "count": 5
+        },
+        "ds/no-primitive-read prototypes/in-session-ux/ReflectionAssistant/CompactReflectionBar.jsx": {
+          "count": 4
+        },
+        "ds/no-primitive-read prototypes/monthly-report/src/MonthlyReportContent.jsx": {
+          "count": 1
+        },
+        "ds/no-primitive-read prototypes/monthly-report/src/MonthlyReportPage.scss": {
+          "count": 17
+        },
+        "ds/no-primitive-read prototypes/post-session-reflection/src/pages/ReflectionsListPage.jsx": {
+          "count": 1
+        },
+        "ds/no-primitive-read prototypes/research-assistant-chat/src/components/ChartSkeleton.tsx": {
+          "count": 1
+        },
+        "ds/no-primitive-read prototypes/research-assistant-chat/src/components/ChatHeader.tsx": {
+          "count": 1
+        },
+        "ds/no-primitive-read prototypes/research-assistant-chat/src/components/CompactChatBar.tsx": {
+          "count": 4
+        },
+        "ds/no-primitive-read prototypes/research-assistant-chat/src/components/EngagementChart.tsx": {
+          "count": 1
+        },
+        "ds/no-primitive-read prototypes/research-assistant-chat/src/components/FloatingChatBubble.tsx": {
+          "count": 3
+        },
+        "ds/no-primitive-read prototypes/research-assistant-chat/src/components/StrategyHeatmap.tsx": {
+          "count": 3
+        },
+        "ds/no-primitive-read prototypes/starter/src/App.jsx": {
+          "count": 1
+        },
+        "ds/no-primitive-read prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.scss": {
+          "count": 6
+        },
+        "ds/no-primitive-read prototypes/templates/admin/tutor-admin.js": {
+          "count": 3
+        },
+        "ds/no-primitive-read prototypes/templates/login/login.html": {
+          "count": 1
+        },
+        "ds/no-primitive-read prototypes/templates/login/sign-in-portal.html": {
+          "count": 1
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/Agenda/Agenda.css": {
+          "count": 2
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/AnimatedCheckbox/AnimatedCheckbox.css": {
+          "count": 1
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/Avatar/Avatar.css": {
+          "count": 4
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/Delta/Delta.css": {
+          "count": 2
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/Disclosure/Disclosure.css": {
+          "count": 7
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/GoalMeter/GoalMeter.css": {
+          "count": 9
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/HintTooltip/HintTooltip.css": {
+          "count": 7
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/PageHeader/PageHeader.css": {
+          "count": 7
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/Phases/Phases.css": {
+          "count": 8
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/ProgressSteps/ProgressSteps.css": {
+          "count": 2
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/ReadOnlyQuote/ReadOnlyQuote.css": {
+          "count": 7
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/RevealRows/RevealRows.css": {
+          "count": 6
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/StatTile/StatTile.css": {
+          "count": 10
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/kit/storyModes.jsx": {
+          "count": 1
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/pages/Home.css": {
+          "count": 25
+        },
+        "ds/no-primitive-read prototypes/tutor-revamp/src/shell/AppShell.css": {
+          "count": 1
+        },
+        "ds/no-primitive-read src/components/NavFab/NavFab.scss": {
+          "count": 2
+        },
+        "ds/no-primitive-read src/pages/PrototypeMarket/PrototypeCard.scss": {
+          "count": 1
+        },
+        "ds/no-primitive-read src/pages/PrototypeMarket/PrototypeMarket.scss": {
+          "count": 1
+        },
+        "ds/no-raw-literal prototypes/home-redesign/src/App.css": {
+          "count": 30
+        },
+        "ds/no-raw-literal prototypes/home-redesign/src/components/ChatSimulationCard.scss": {
+          "count": 99
+        },
+        "ds/no-raw-literal prototypes/home-redesign/src/components/Dashboard.jsx": {
+          "count": 1
+        },
+        "ds/no-raw-literal prototypes/home-redesign/src/components/DevIndexPage.jsx": {
+          "count": 38
+        },
+        "ds/no-raw-literal prototypes/home-redesign/src/components/MonthlyReportsContent.scss": {
+          "count": 33
+        },
+        "ds/no-raw-literal prototypes/home-redesign/src/components/MonthlyReportsListPage.jsx": {
+          "count": 2
+        },
+        "ds/no-raw-literal prototypes/home-redesign/src/demo.css": {
+          "count": 6
+        },
+        "ds/no-raw-literal prototypes/home-redesign/src/index.css": {
+          "count": 18
+        },
+        "ds/no-raw-literal prototypes/in-session-ux/InSessionContent.jsx": {
+          "count": 31
+        },
+        "ds/no-raw-literal prototypes/in-session-ux/InSessionPage.jsx": {
+          "count": 43
+        },
+        "ds/no-raw-literal prototypes/in-session-ux/ManageAssignmentModal.jsx": {
+          "count": 32
+        },
+        "ds/no-raw-literal prototypes/in-session-ux/ReflectionAssistant/CompactReflectionBar.jsx": {
+          "count": 7
+        },
+        "ds/no-raw-literal prototypes/in-session-ux/ReflectionAssistant/ReflectionAssistantChat.jsx": {
+          "count": 38
+        },
+        "ds/no-raw-literal prototypes/in-session-ux/ReflectionAssistant/ReflectionWidgets.jsx": {
+          "count": 48
+        },
+        "ds/no-raw-literal prototypes/in-session-ux/ReflectionAssistant/ToolUI.jsx": {
+          "count": 45
+        },
+        "ds/no-raw-literal prototypes/in-session-ux/StudentInsightsModal.jsx": {
+          "count": 55
+        },
+        "ds/no-raw-literal prototypes/in-session-ux/index.css": {
+          "count": 8
+        },
+        "ds/no-raw-literal prototypes/live-app/src/LiveAppNav.scss": {
+          "count": 29
+        },
+        "ds/no-raw-literal prototypes/monthly-report/src/MonthlyReportContent.jsx": {
+          "count": 3
+        },
+        "ds/no-raw-literal prototypes/monthly-report/src/MonthlyReportPage.scss": {
+          "count": 320
+        },
+        "ds/no-raw-literal prototypes/monthly-report/src/MonthlyReportsListContent.jsx": {
+          "count": 2
+        },
+        "ds/no-raw-literal prototypes/monthly-report/src/MonthlyReportsListPage.jsx": {
+          "count": 2
+        },
+        "ds/no-raw-literal prototypes/monthly-report/src/MonthlyReportsListPage.scss": {
+          "count": 33
+        },
+        "ds/no-raw-literal prototypes/post-session-reflection/src/App.css": {
+          "count": 4
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/ErrorBoundary.tsx": {
+          "count": 5
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/components/AdminSkeletons.tsx": {
+          "count": 13
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/components/AssistantMessageContent.tsx": {
+          "count": 1
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/components/ChartSkeleton.tsx": {
+          "count": 1
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/components/ChatHeader.tsx": {
+          "count": 2
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/components/CompactChatBar.tsx": {
+          "count": 7
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/components/EngagementChart.tsx": {
+          "count": 2
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/components/FakeTools.tsx": {
+          "count": 76
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/components/FloatingChatBubble.tsx": {
+          "count": 9
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/components/StrategyHeatmap.tsx": {
+          "count": 12
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/components/TrainingProgressContent.tsx": {
+          "count": 1
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/index.css": {
+          "count": 23
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/views/TutorAdminContent.jsx": {
+          "count": 1
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/views/TutorAdminView.tsx": {
+          "count": 1
+        },
+        "ds/no-raw-literal prototypes/research-assistant-chat/src/views/TutorAdminWithChatView.tsx": {
+          "count": 1
+        },
+        "ds/no-raw-literal prototypes/starter/src/App.css": {
+          "count": 4
+        },
+        "ds/no-raw-literal prototypes/starter/src/App.jsx": {
+          "count": 3
+        },
+        "ds/no-raw-literal prototypes/starter/src/index.css": {
+          "count": 2
+        },
+        "ds/no-raw-literal prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.jsx": {
+          "count": 138
+        },
+        "ds/no-raw-literal prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.scss": {
+          "count": 126
+        },
+        "ds/no-raw-literal prototypes/tutor-revamp/src/kit/Agenda/Agenda.css": {
+          "count": 12
+        },
+        "ds/no-raw-literal prototypes/tutor-revamp/src/kit/AnimatedCheckbox/AnimatedCheckbox.css": {
+          "count": 10
+        },
+        "ds/no-raw-literal prototypes/tutor-revamp/src/kit/Avatar/Avatar.css": {
+          "count": 2
+        },
+        "ds/no-raw-literal prototypes/tutor-revamp/src/kit/Disclosure/Disclosure.css": {
+          "count": 5
+        },
+        "ds/no-raw-literal prototypes/tutor-revamp/src/kit/GoalMeter/GoalMeter.css": {
+          "count": 5
+        },
+        "ds/no-raw-literal prototypes/tutor-revamp/src/kit/PageHeader/PageHeader.css": {
+          "count": 1
+        },
+        "ds/no-raw-literal prototypes/tutor-revamp/src/kit/Phases/Phases.css": {
+          "count": 4
+        },
+        "ds/no-raw-literal prototypes/tutor-revamp/src/kit/ProgressSteps/ProgressSteps.css": {
+          "count": 1
+        },
+        "ds/no-raw-literal prototypes/tutor-revamp/src/kit/RevealRows/RevealRows.css": {
+          "count": 1
+        },
+        "ds/no-raw-literal prototypes/tutor-revamp/src/kit/StatTile/StatTile.css": {
+          "count": 5
+        },
+        "ds/no-raw-literal prototypes/tutor-revamp/src/kit/kit.css": {
+          "count": 3
+        },
+        "ds/no-raw-literal prototypes/tutor-revamp/src/pages/Home.css": {
+          "count": 6
+        },
+        "ds/no-raw-literal src/components/NavFab/NavFab.scss": {
+          "count": 17
+        },
+        "ds/no-raw-literal src/pages/PrototypeMarket/PrototypeCard.scss": {
+          "count": 12
+        },
+        "ds/no-raw-literal src/pages/PrototypeMarket/PrototypeMarket.scss": {
+          "count": 37
+        },
+        "ds/no-unknown-prop prototypes/monthly-report/src/MonthlyReportContent.jsx": {
+          "count": 4
+        },
+        "ds/no-unknown-prop src/pages/PrototypeMarket/PrototypeMarket.jsx": {
+          "count": 1
+        },
+        "ds/no-unknown-token prototypes/monthly-report/src/MonthlyReportPage.scss": {
+          "count": 3
+        },
+        "ds/no-unknown-token prototypes/research-assistant-chat/src/index.css": {
+          "count": 1
+        },
+        "ds/no-unknown-token src/pages/PrototypeMarket/PrototypeMarket.scss": {
+          "count": 1
+        }
+      }
+    }
   }
 }

@@ -23,7 +23,9 @@ import {
   DEPLOY_CHAIN,
   EXCLUDED,
   WORKFLOW_STEPS,
+  PROSE_CAP,
   byName,
+  proseFaults,
   rootCheckRows,
   triggersOf,
 } from './checks.registry.mjs';
@@ -260,6 +262,18 @@ test('every registry row carries the columns its readers need', () => {
   assert.ok(WORKFLOW_STEPS.length > 0);
 });
 
+test('every row states its guards, reason and spawnReason in one line', () => {
+  assert.deepEqual(ALL.flatMap(proseFaults), []);
+});
+
+test('a multi-line or over-long prose field is a fault', () => {
+  const long = 'x'.repeat(PROSE_CAP + 1);
+  assert.deepEqual(proseFaults({ name: 'check:fine', guards: 'One line.' }), []);
+  assert.equal(proseFaults({ name: 'check:wrapped', guards: 'One line.\nAnd another.' }).length, 1);
+  assert.equal(proseFaults({ name: 'check:long', reason: long }).length, 1);
+  assert.equal(proseFaults({ name: 'check:both', guards: long, spawnReason: 'a\nb' }).length, 2);
+});
+
 test('the generated blocks match the registry', () => {
   const found = registryGenerator.run();
   assert.deepEqual(
@@ -271,10 +285,10 @@ test('the generated blocks match the registry', () => {
 // ---------------------------------------------------------------------------
 // the `baseline` column (#602)
 //
-// The registry asserts three things about a `baseline:` row: the record parses
-// on the shape it declares, the check that declares it reaches it THROUGH ITS
-// IMPORTS, and the `--update` its shape row advertises is a flag the check
-// really offers — or, where the row says `command: null`, that it offers none.
+// The registry asserts three things about a `baseline:` row: every set of the
+// record opens, the check that declares it reaches it THROUGH ITS IMPORTS, and
+// the `--update` its row's `update` names is a flag the check really offers —
+// or, where the row has no `update`, that it offers none.
 // Each is watched failing below, because the live tree passes all three.
 // ---------------------------------------------------------------------------
 
@@ -318,7 +332,7 @@ test('a hand-maintained record whose check offers --update fails, and the four t
   for (const name of ['check:button-contrast', 'check:focus-ring', 'check:icon-button-name', 'check:intent-roles']) {
     assert.deepEqual(registryGenerator.baselineFindings(byName(name), rootScripts()), [], name);
   }
-  // `focus-ring.json` is surveyed `command: null` — the value of an entry in it
+  // `focus-ring.json` has no `update` on its row — the value of an entry in it
   // IS the argument for it. Read by a check that does offer the flag, that is a
   // finding: a `--update` on a record whose bar is zero is a way to make a new
   // failure quiet.
@@ -349,18 +363,18 @@ test('a re-record line naming an npm script nobody has is a remedy nobody can ty
   assert.ok(messages.some((m) => /no check:color-fallbacks script exists/.test(m)), messages.join('\n'));
 });
 
-test('a record that will not parse on its declared shape is reported, never read as empty', () => {
+test('a record that will not read is reported, never read as empty', () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'baseline-shape-'));
   try {
     const row = byName('check:focus-ring');
     fs.mkdirSync(path.join(root, 'scripts/baselines'), { recursive: true });
-    // The declared container is an object of reasons. As an array it reads as
-    // no entries at all, and an empty baseline is a green ratchet.
-    fs.writeFileSync(path.join(root, row.baseline), JSON.stringify({ note: 'x', exceptions: [] }));
+    // A set's entries are an object. As an array they read as no entries at
+    // all, and an empty baseline is a green ratchet.
+    fs.writeFileSync(path.join(root, row.baseline), JSON.stringify({ why: 'x', sets: { main: { entries: [] } } }));
     const messages = registryGenerator
       .baselineFindings(row, rootScripts(), { repoRoot: root })
       .map((f) => f.message);
-    assert.ok(messages.some((m) => /cannot be read as the baseline shape it declares/.test(m)), messages.join('\n'));
+    assert.ok(messages.some((m) => /cannot be read as a baseline record/.test(m)), messages.join('\n'));
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

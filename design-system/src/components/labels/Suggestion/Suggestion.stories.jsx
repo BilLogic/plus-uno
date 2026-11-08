@@ -33,9 +33,6 @@ export default {
     component: Suggestion,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: '`isDisabled` disables one suggestion; a disabled field or TagGroup still disables all of them through `TagContext`.' },
-        ],
         docs: {
             description: {
                 component:

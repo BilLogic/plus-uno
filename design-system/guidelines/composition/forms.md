@@ -55,7 +55,7 @@ function ExampleForm() {
       </div>
       <div
         className="d-flex justify-content-end"
-        style={{ gap: 'var(--space-0625)', marginTop: 'var(--size-card-gap-md)' }}
+        style={{ gap: 'var(--inline-lg)', marginTop: 'var(--card-stack-md)' }}
       >
         <Button text="Cancel" onClick={onCancel} />
         <Button text="Save" appearance="primary" type="submit" onClick={onSave} />
@@ -69,9 +69,9 @@ function ExampleForm() {
 
 | Gap | Token | Apply between |
 |-----|-------|----------------|
-| Fields in one group | `--space-0625` | Stacked `TextField` / `Select` |
-| Label to section | `--size-card-gap-md` | Field group → button row |
-| Card internal | `--size-card-pad-x-md`, `--size-card-pad-y-md` | Via `Card` `paddingSize` |
+| Fields in one group | `--stack-lg` | Stacked `TextField` / `Select` |
+| Label to section | `--card-stack-md` | Field group → button row |
+| Card internal | `--card-pad-default` | Via `Card` `paddingSize` |
 
 Never hardcode `padding: 16px` between fields.
 

@@ -17,8 +17,7 @@ import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 const BASELINE = JSON.stringify({
   why: 'Literal fallbacks that disagree with their own token.',
-  disagreements: [],
-  undefinedTokens: [],
+  sets: { disagreements: { entries: {} }, undefinedTokens: { entries: {} } },
 });
 
 test('a disagreeing color fallback in a fixture tree is a finding', () => {

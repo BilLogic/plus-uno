@@ -4,10 +4,10 @@ import { spawnSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { filesUnder, inScope, tally } from './check-ds-usage.mjs';
+import { REPO_ROOT, contextOf, filesUnder, inScope, tally } from './check-ds-usage.mjs';
 import fs from 'node:fs';
 import os from 'node:os';
-import { RULES } from './lib/ds-usage.mjs';
+import { RULES, escapesIn } from './lib/ds-usage.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const FIXTURES = 'scripts/lib/__fixtures__/ds-usage';
@@ -71,4 +71,15 @@ test('outside a git checkout, the files on disk stand in for the tracked list', 
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }
+});
+
+test('the real facts hold patterns: invented name, wrong prop and wrong value fail; valid use passes', () => {
+  const ctx = contextOf(REPO_ROOT);
+  const rules = (text) => escapesIn({ path: 'prototypes/x/src/App.jsx', text }, ctx).map((f) => f.rule);
+  const head = "import { PatternCard, PatternSection } from '@/patterns';\nimport { PageLayout } from '@/specs/Universal/Pages';\n";
+  assert.deepEqual(rules(head + '<PageLayout frame="focused"><PatternSection><PatternCard title="x" padding="md" /></PatternSection></PageLayout>'), []);
+  assert.deepEqual(rules("import { PatternCardd } from '@/patterns';"), ['ds/no-unknown-component']);
+  assert.deepEqual(rules(head + '<PatternCard heading="x" />'), ['ds/no-unknown-prop']);
+  assert.deepEqual(rules(head + '<PatternCard padding="xl" />'), ['ds/no-unknown-prop']);
+  assert.deepEqual(rules(head + '<PageLayout frame="wide" />'), ['ds/no-unknown-prop']);
 });

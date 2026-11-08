@@ -263,7 +263,7 @@ test('8c. a Usage tab with no `##` section is still asked for `Related`', () => 
   assert.equal(found.length, 1, found.join('\n'));
 });
 
-test('an unknown tab name is caught — Code and Changelog are generated, never authored', () => {
+test('an unknown tab name is caught — Code is generated, never authored', () => {
   const broken = page().replace('<DocsTab tab="examples">', '<DocsTab tab="code">');
   const found = checkFile(COMPONENT, broken, true);
   assert.ok(found.some((f) => /Found: code/.test(f)), found.join('\n'));

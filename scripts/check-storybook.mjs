@@ -257,16 +257,44 @@ export function ratchet(a11y, baselineStories) {
   return { regressions, cleared };
 }
 
-/** The committed baseline's serialized shape, in one place so the writer and the reader agree. */
+/** What the record says it holds, kept across every re-record. */
+const A11Y_WHY =
+  'Accessibility rules each story violated when the record was measured. A story may stop violating a ' +
+  "rule and never start: a new violation is fixed, or argued in that story's own parameters.a11y.";
+
+/** A story's finding is a RULE it violates, so the `stories` set is keyed `story|rule`. */
+const JOIN = '|';
+
+/**
+ * The committed baseline, in the envelope every ratchet record shares and in
+ * one place so the writer and the reader agree.
+ */
 export function baselineRecord({ a11y, totals }) {
+  const stories = {};
+  for (const [story, rules] of Object.entries(a11y).sort(([a], [b]) => a.localeCompare(b))) {
+    for (const rule of rules) stories[`${story}${JOIN}${rule}`] = { count: 1 };
+  }
   return {
+    why: A11Y_WHY,
     // What the numbers describe, so a reader does not have to re-derive them.
     measured: new Date().toISOString().slice(0, 10),
     suite: { storyFiles: totals.files, tests: totals.tests },
     violatingStories: Object.keys(a11y).length,
-    rules: ruleCounts(a11y),
-    stories: Object.fromEntries(Object.entries(a11y).sort(([a], [b]) => a.localeCompare(b))),
+    sets: {
+      rules: { entries: Object.fromEntries(Object.entries(ruleCounts(a11y)).map(([rule, n]) => [rule, { count: n }])) },
+      stories: { entries: stories },
+    },
   };
+}
+
+/** The record's `stories` set read back as story → the rules it violated. */
+export function storiesOf(record) {
+  const out = {};
+  for (const key of Object.keys(record?.sets?.stories?.entries ?? {})) {
+    const at = key.lastIndexOf(JOIN);
+    (out[key.slice(0, at)] ??= []).push(key.slice(at + 1));
+  }
+  return out;
 }
 
 
@@ -411,7 +439,7 @@ export function verdict(report, baseline, { root = REPO_ROOT, update = false, se
     );
     return { status: 1, lines };
   }
-  const { regressions, cleared } = ratchet(a11y, base.stories ?? {});
+  const { regressions, cleared } = ratchet(a11y, storiesOf(base));
 
   if (regressions.length) {
     failed = true;

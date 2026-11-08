@@ -36,16 +36,18 @@
  * nothing in the record to excuse it.
  */
 
+import { SOURCE_ROOTS } from './lib/ds-facts.mjs';
 import { REPO_ROOT } from './lib/corpus.mjs';
 import { main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 import { trackedSources } from './lib/tracked-sources.mjs';
 
 export { REPO_ROOT };
-/** Repo-relative: this record's key in the shape table, and what the registry row declares. */
+/** Repo-relative: what the registry row declares. */
 export const BASELINE = 'scripts/baselines/react-bootstrap-imports.json';
 
-export const SEARCH_ROOTS = ['design-system/src', 'prototypes', 'src'];
+/** The library's own source and consumer code. */
+export const SEARCH_ROOTS = SOURCE_ROOTS;
 export const SEARCHED = /\.(jsx|js|mjs|ts|tsx)$/;
 
 /** An import statement whose source is `react-bootstrap` or one of its subpaths. */
@@ -123,7 +125,7 @@ export function run({ repoRoot = REPO_ROOT, sources } = {}) {
 export function summary({ repoRoot = REPO_ROOT, sources } = {}) {
   const found = measure(sources ?? sourcesOf(repoRoot));
   const now = [...found.values()].reduce((sum, { count }) => sum + count, 0);
-  const recorded = Object.values(ratchetFor(repoRoot).envelope('counts') ?? {}).reduce((a, b) => a + b, 0);
+  const recorded = [...ratchetFor(repoRoot).entries.values()].reduce((sum, { count }) => sum + count, 0);
   const fell = now < recorded ? ` — under the baseline of ${recorded}; record it with --update` : '';
   return `${now} react-bootstrap imports in ${found.size} file(s)${fell}`;
 }

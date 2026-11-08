@@ -10,11 +10,11 @@ import { BASELINE, isLiteralValue, literalStyleProps, measure, run } from './che
 const src = (file, text) => ({ path: file, text });
 const A = 'design-system/src/components/A/A.jsx';
 
-/** A scratch repo root holding a baseline record of `counts`. */
+/** A scratch repo root holding a baseline record of `counts`, one entry per key. */
 function scratch(counts) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'inline-jsx-tokens-'));
   fs.mkdirSync(path.join(root, path.dirname(BASELINE)), { recursive: true });
-  fs.writeFileSync(path.join(root, BASELINE), JSON.stringify({ why: 'fixture', counts }, null, 2));
+  fs.writeFileSync(path.join(root, BASELINE), JSON.stringify({ why: 'fixture', sets: { main: { entries: Object.fromEntries(Object.entries(counts).map(([k, n]) => [k, { count: n }])) } } }, null, 2));
   return root;
 }
 

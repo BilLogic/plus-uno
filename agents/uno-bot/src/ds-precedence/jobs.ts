@@ -31,9 +31,9 @@
 //     so the engagement gate knows its thread whichever week it is.
 //
 // Subrequest math (each job an alarm with a fresh 50; lookups stop at 38):
-//   check:     the index + the registry from GitHub + the library's
-//              /components from Figma = 3 external; the report is KV, the
-//              internal bucket.
+//   check:     the registry from GitHub + the library's /components from
+//              Figma = 2 external; the components come from the facts baked
+//              into the Worker, and the report is KV, the internal bucket.
 //   hand-over: members (at most 3 pages); the report, who is active and the
 //              hand-off are internal.
 //   section:   an edit when a card did not stage (1), on the sweep's post's
@@ -55,8 +55,8 @@ import {
   findDisagreements,
   indexedInLibrary,
   liveLibraryFrom,
-  parseComponentIndex,
   type Disagreement,
+  type IndexEntry,
   type PrecedenceRegistry,
 } from "./compare";
 import {
@@ -146,9 +146,9 @@ interface Store<T> {
 }
 
 export interface CheckDeps extends Pick<JobContext, "runDate"> {
+  /** The components code has: the baked design-system facts' (`precedenceIndex`). */
+  index: readonly IndexEntry[];
   github: {
-    /** design-system/agent-views/components/index.md */
-    indexMarkdown(): Promise<string>;
     /** design-system/figma/component-registry.json */
     registry(): Promise<PrecedenceRegistry>;
   };
@@ -172,13 +172,12 @@ export interface CheckResult {
  * @param opts - `dryRun` compares and writes nothing
  */
 export async function runPrecedenceCheck(deps: CheckDeps, opts: { dryRun?: boolean } = {}): Promise<CheckResult> {
-  const [markdown, registry, components] = await Promise.all([
-    deps.github.indexMarkdown(),
+  const [registry, components] = await Promise.all([
     deps.github.registry(),
     deps.figma.components(deps.fileKey),
   ]);
-  const index = parseComponentIndex(markdown);
-  if (!index.length) throw new Error("the component index listed no components — refusing to report every one missing");
+  const { index } = deps;
+  if (!index.length) throw new Error("the design-system facts listed no components — refusing to report every one missing");
   const library = liveLibraryFrom(components);
   const present = indexedInLibrary(index, registry, library);
   if (present < index.length * MIN_LIBRARY_RATIO) {

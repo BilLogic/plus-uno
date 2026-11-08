@@ -1,216 +1,332 @@
 {
-  "note": "Token names used in the corpus and defined nowhere in it. A ratchet: counts may FALL and must never RISE, and an entry that stops matching is itself a finding. Regenerate with `npm run check:undefined-tokens -- --update`, and only when the numbers went DOWN.",
+  "why": "Token names used in the corpus and defined nowhere in it. A ratchet: counts may FALL and must never RISE, and an entry that stops matching is itself a finding. Regenerate with `npm run check:undefined-tokens -- --update`, and only when the numbers went DOWN.",
   "measuredAt": "2026-08-29",
   "roots": [
     "design-system/src",
     ".storybook",
     "prototypes"
   ],
-  "totals": {
-    "names": 50,
-    "uses": 195,
-    "bare": 5
-  },
-  "tokens": {
-    "--body3-size": {
-      "uses": 2,
-      "bare": 0
+  "sets": {
+    "uses": {
+      "entries": {
+        "--body3-size": {
+          "count": 2
+        },
+        "--card-gap-md": {
+          "count": 1
+        },
+        "--card-pad-x-lg": {
+          "count": 2
+        },
+        "--card-pad-y-lg": {
+          "count": 2
+        },
+        "--columns-col-5": {
+          "count": 1
+        },
+        "--columns-col-8": {
+          "count": 1
+        },
+        "--element-gap-lg": {
+          "count": 2
+        },
+        "--element-gap-md": {
+          "count": 1
+        },
+        "--element-gap-sm": {
+          "count": 3
+        },
+        "--font-size-fa-b3-solid": {
+          "count": 2
+        },
+        "--font-size-fa-huge-solid": {
+          "count": 8
+        },
+        "--font-weight-light": {
+          "count": 1
+        },
+        "--line-height-h4": {
+          "count": 1
+        },
+        "--shadow-modal": {
+          "count": 3
+        },
+        "--shadow-small": {
+          "count": 2
+        },
+        "--size-border-radius-large": {
+          "count": 1
+        },
+        "--size-border-radius-radius-4-5": {
+          "count": 1
+        },
+        "--size-button-min-height-md": {
+          "count": 1
+        },
+        "--size-button-min-width-md": {
+          "count": 1
+        },
+        "--size-card-gap": {
+          "count": 2
+        },
+        "--size-ele-gap-xs": {
+          "count": 6
+        },
+        "--size-modal-min-height-md": {
+          "count": 1
+        },
+        "--size-modal-min-height-sm": {
+          "count": 1
+        },
+        "--size-modal-pad": {
+          "count": 3
+        },
+        "--size-modal-radius": {
+          "count": 3
+        },
+        "--size-modal-width-sm": {
+          "count": 1
+        },
+        "--size-section-gap-xl": {
+          "count": 16
+        },
+        "--size-small-gap-xs": {
+          "count": 30
+        },
+        "--size-space-medium": {
+          "count": 1
+        },
+        "--size-spacing-between-components-spacer-2": {
+          "count": 1
+        },
+        "--size-spacing-medium-space-600": {
+          "count": 5
+        },
+        "--size-spacing-medium-space-800": {
+          "count": 2
+        },
+        "--size-spacing-small-space-200": {
+          "count": 3
+        },
+        "--size-spacing-small-space-400": {
+          "count": 1
+        },
+        "--size-spacing-space-050": {
+          "count": 3
+        },
+        "--size-spacing-within-component-spacer-2": {
+          "count": 1
+        },
+        "--size-spacing-within-component-spacer-3": {
+          "count": 2
+        },
+        "--size-spacing-within-component-spacer-4": {
+          "count": 2
+        },
+        "--size-spacing-within-component-spacer-4-5": {
+          "count": 1
+        },
+        "--size-spacing-within-component-spacer-5": {
+          "count": 1
+        },
+        "--size-table-row-radius": {
+          "count": 2
+        },
+        "--spacing-large-space-300": {
+          "count": 15
+        },
+        "--spacing-large-space-400": {
+          "count": 4
+        },
+        "--spacing-medium-space-200": {
+          "count": 7
+        },
+        "--spacing-small-space-100": {
+          "count": 3
+        },
+        "--spacing-xxlarge-space-500": {
+          "count": 2
+        },
+        "--table-cell-gap": {
+          "count": 7
+        },
+        "--table-cell-x": {
+          "count": 14
+        },
+        "--table-cell-y": {
+          "count": 14
+        },
+        "--table-row-radius": {
+          "count": 5
+        }
+      }
     },
-    "--card-gap-md": {
-      "uses": 1,
-      "bare": 0
+    "bare": {
+      "entries": {
+        "--body3-size": {
+          "count": 0
+        },
+        "--card-gap-md": {
+          "count": 0
+        },
+        "--card-pad-x-lg": {
+          "count": 0
+        },
+        "--card-pad-y-lg": {
+          "count": 0
+        },
+        "--columns-col-5": {
+          "count": 0
+        },
+        "--columns-col-8": {
+          "count": 0
+        },
+        "--element-gap-lg": {
+          "count": 0
+        },
+        "--element-gap-md": {
+          "count": 0
+        },
+        "--element-gap-sm": {
+          "count": 0
+        },
+        "--font-size-fa-b3-solid": {
+          "count": 0
+        },
+        "--font-size-fa-huge-solid": {
+          "count": 0
+        },
+        "--font-weight-light": {
+          "count": 0
+        },
+        "--line-height-h4": {
+          "count": 0
+        },
+        "--shadow-modal": {
+          "count": 0
+        },
+        "--shadow-small": {
+          "count": 0
+        },
+        "--size-border-radius-large": {
+          "count": 0
+        },
+        "--size-border-radius-radius-4-5": {
+          "count": 0
+        },
+        "--size-button-min-height-md": {
+          "count": 1
+        },
+        "--size-button-min-width-md": {
+          "count": 1
+        },
+        "--size-card-gap": {
+          "count": 0
+        },
+        "--size-ele-gap-xs": {
+          "count": 0
+        },
+        "--size-modal-min-height-md": {
+          "count": 1
+        },
+        "--size-modal-min-height-sm": {
+          "count": 1
+        },
+        "--size-modal-pad": {
+          "count": 0
+        },
+        "--size-modal-radius": {
+          "count": 0
+        },
+        "--size-modal-width-sm": {
+          "count": 1
+        },
+        "--size-section-gap-xl": {
+          "count": 0
+        },
+        "--size-small-gap-xs": {
+          "count": 0
+        },
+        "--size-space-medium": {
+          "count": 0
+        },
+        "--size-spacing-between-components-spacer-2": {
+          "count": 0
+        },
+        "--size-spacing-medium-space-600": {
+          "count": 0
+        },
+        "--size-spacing-medium-space-800": {
+          "count": 0
+        },
+        "--size-spacing-small-space-200": {
+          "count": 0
+        },
+        "--size-spacing-small-space-400": {
+          "count": 0
+        },
+        "--size-spacing-space-050": {
+          "count": 0
+        },
+        "--size-spacing-within-component-spacer-2": {
+          "count": 0
+        },
+        "--size-spacing-within-component-spacer-3": {
+          "count": 0
+        },
+        "--size-spacing-within-component-spacer-4": {
+          "count": 0
+        },
+        "--size-spacing-within-component-spacer-4-5": {
+          "count": 0
+        },
+        "--size-spacing-within-component-spacer-5": {
+          "count": 0
+        },
+        "--size-table-row-radius": {
+          "count": 0
+        },
+        "--spacing-large-space-300": {
+          "count": 0
+        },
+        "--spacing-large-space-400": {
+          "count": 0
+        },
+        "--spacing-medium-space-200": {
+          "count": 0
+        },
+        "--spacing-small-space-100": {
+          "count": 0
+        },
+        "--spacing-xxlarge-space-500": {
+          "count": 0
+        },
+        "--table-cell-gap": {
+          "count": 0
+        },
+        "--table-cell-x": {
+          "count": 0
+        },
+        "--table-cell-y": {
+          "count": 0
+        },
+        "--table-row-radius": {
+          "count": 0
+        }
+      }
     },
-    "--card-pad-x-lg": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--card-pad-y-lg": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--columns-col-5": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--columns-col-8": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--element-gap-lg": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--element-gap-md": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--element-gap-sm": {
-      "uses": 3,
-      "bare": 0
-    },
-    "--font-size-fa-b3-solid": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--font-size-fa-huge-solid": {
-      "uses": 8,
-      "bare": 0
-    },
-    "--font-weight-light": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--line-height-h4": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--shadow-modal": {
-      "uses": 3,
-      "bare": 0
-    },
-    "--shadow-small": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--size-border-radius-large": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--size-border-radius-radius-4-5": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--size-button-min-height-md": {
-      "uses": 1,
-      "bare": 1
-    },
-    "--size-button-min-width-md": {
-      "uses": 1,
-      "bare": 1
-    },
-    "--size-card-gap": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--size-ele-gap-xs": {
-      "uses": 6,
-      "bare": 0
-    },
-    "--size-modal-min-height-md": {
-      "uses": 1,
-      "bare": 1
-    },
-    "--size-modal-min-height-sm": {
-      "uses": 1,
-      "bare": 1
-    },
-    "--size-modal-pad": {
-      "uses": 3,
-      "bare": 0
-    },
-    "--size-modal-radius": {
-      "uses": 3,
-      "bare": 0
-    },
-    "--size-modal-width-sm": {
-      "uses": 1,
-      "bare": 1
-    },
-    "--size-section-gap-xl": {
-      "uses": 16,
-      "bare": 0
-    },
-    "--size-small-gap-xs": {
-      "uses": 30,
-      "bare": 0
-    },
-    "--size-space-medium": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--size-spacing-between-components-spacer-2": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--size-spacing-medium-space-600": {
-      "uses": 5,
-      "bare": 0
-    },
-    "--size-spacing-medium-space-800": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--size-spacing-small-space-200": {
-      "uses": 3,
-      "bare": 0
-    },
-    "--size-spacing-small-space-400": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--size-spacing-space-050": {
-      "uses": 3,
-      "bare": 0
-    },
-    "--size-spacing-within-component-spacer-2": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--size-spacing-within-component-spacer-3": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--size-spacing-within-component-spacer-4": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--size-spacing-within-component-spacer-4-5": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--size-spacing-within-component-spacer-5": {
-      "uses": 1,
-      "bare": 0
-    },
-    "--size-table-row-radius": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--spacing-large-space-300": {
-      "uses": 15,
-      "bare": 0
-    },
-    "--spacing-large-space-400": {
-      "uses": 4,
-      "bare": 0
-    },
-    "--spacing-medium-space-200": {
-      "uses": 7,
-      "bare": 0
-    },
-    "--spacing-small-space-100": {
-      "uses": 3,
-      "bare": 0
-    },
-    "--spacing-xxlarge-space-500": {
-      "uses": 2,
-      "bare": 0
-    },
-    "--table-cell-gap": {
-      "uses": 7,
-      "bare": 0
-    },
-    "--table-cell-x": {
-      "uses": 14,
-      "bare": 0
-    },
-    "--table-cell-y": {
-      "uses": 14,
-      "bare": 0
-    },
-    "--table-row-radius": {
-      "uses": 5,
-      "bare": 0
+    "totals": {
+      "entries": {
+        "names": {
+          "count": 50
+        },
+        "uses": {
+          "count": 195
+        },
+        "bare": {
+          "count": 5
+        }
+      }
     }
   }
 }

@@ -85,8 +85,7 @@ test('a focus style nested under a focus parent counts', () => {
 /*
  * The three verdicts, worded. Which rule is NEW, which recorded one has gone
  * STALE and which reason says nothing is `scripts/lib/ratchet.mjs`'s, asserted
- * once against all twelve live records in `scripts/lib/ratchet-conformance.mjs`
- * (#600). What is asserted here is the measured side this check hands it, and
+ * in its own tests. What is asserted here is the measured side this check hands it, and
  * what each verdict says.
  */
 
@@ -126,10 +125,10 @@ test('a stale exception and a reasonless one are each their own finding', () => 
  */
 
 const FOCUS_BASELINE = JSON.stringify({
-  note: 'Focus rules whose strongest visible affordance is under 3:1.',
+  why: 'Focus rules whose strongest visible affordance is under 3:1.',
   recordedAt: '2026-09-18',
   measured: { focusRules: 0, wereUnder3to1: 0, fixedBy: '--color-focus-ring' },
-  exceptions: {},
+  sets: { main: { reasons: 'required', entries: {} } },
 });
 
 test('an invisible focus ring in a fixture tree is a finding', () => {

@@ -84,8 +84,7 @@ test('nested buttons of the same name do not confuse the body scan', () => {
 /*
  * The three verdicts, worded. Which site is NEW, which recorded one has gone
  * STALE and which reason says nothing is `scripts/lib/ratchet.mjs`'s, asserted
- * once against all twelve live records in `scripts/lib/ratchet-conformance.mjs`
- * (#600). What is asserted here is the measured side this check hands it, and
+ * in its own tests. What is asserted here is the measured side this check hands it, and
  * what each verdict says.
  */
 

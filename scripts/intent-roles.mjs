@@ -170,13 +170,10 @@ export function mixedUses(files, root = REPO_ROOT) {
   return uses;
 }
 
-/** `{ [file]: { mix } }` — what the `mixedStates` record is compared against. */
+/** `{ [file]: count }` — what the `mixedStates` set is compared against. */
 export function mixCounts(uses) {
   const out = {};
-  for (const use of uses) {
-    out[use.file] = out[use.file] ?? { mix: 0 };
-    out[use.file].mix += 1;
-  }
+  for (const use of uses) out[use.file] = (out[use.file] ?? 0) + 1;
   return out;
 }
 
@@ -253,7 +250,7 @@ export function themeMapUses(files, root = REPO_ROOT) {
   return uses;
 }
 
-/** `{ [file]: { border, outline } }` — what the baseline is compared against. */
+/** `{ [file]: { border, outline } }` — one count per set of the baseline, read by `acrossSets`. */
 export function counts(uses) {
   const out = {};
   for (const use of uses) {
@@ -268,9 +265,8 @@ export function counts(uses) {
  * after the record shrinks with it: a count BELOW its baseline is a finding in
  * its own right, because a baseline that no longer describes the code is a
  * baseline nobody can read. That is the BOTH-directions ratchet this record's
- * row declares in `scripts/lib/ratchet-shapes.mjs`, and since #600 the module
- * decides it — per named count, `border` and `outline` separately — while what
- * a verdict says stays here.
+ * sets declare, and since #600 the module decides it — `border` and `outline`
+ * as two sets — while what a verdict says stays here.
  *
  * THE ORDER IS THE RUN'S. It used to be a walk over the union of the two sides
  * in filename order; the module reports in the order the run met each file, and

@@ -24,9 +24,6 @@ export default {
     component: TagGroup,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: '`alignment` takes `start` or `end`, and `isDisabled` disables every Tag and Suggestion in the group through `TagContext`.' },
-        ],
         docs: {
             description: {
                 component:

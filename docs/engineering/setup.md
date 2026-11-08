@@ -115,7 +115,7 @@ Figma export → design-system/src/tokens/source/*.json → npm run generate:tok
   sit beside the old size files and generate
   `_scales.scss`. Each records `hiddenFromPublishing`, and its variables
   carry `scopes` and `codeSyntax`. A variable's `codeSyntax.WEB`
-  (`var(--element-pad-x-sm)`, in the export) is its CSS name, so the generator refuses a
+  (`var(--pad-x-sm)`, say) is its CSS name, so the generator refuses a
   variable without one instead of deriving a name.
 - The old `sync:tokens` Figma-pull script is deleted (ADR-038): it wrote to a
   `new tokens/` folder nothing read, and resolved only one alias level. These
@@ -131,7 +131,7 @@ Figma export → design-system/src/tokens/source/*.json → npm run generate:tok
   `CODE_ONLY_PRIMITIVES`, `CODE_ONLY_LAYOUT` and their neighbors in
   `scripts/generate-all-tokens.js`). The Info tokens are the one other case:
   `ALIASED_FAMILIES` writes every Info token as an alias of its Tertiary twin,
-  including `--color-info-border-subtle`, which Figma has no variable for. The
+  including its border-subtle token, which Figma has no variable for. The
   generator refuses to write when a constant has gone stale: an override Figma
   now agrees with, or a code-only name Figma now has
 - Token source is Figma; SCSS is generated output
@@ -146,8 +146,8 @@ another step changes `scripts/lib/color/semantics.mjs`, which every plan shares.
 The generator refuses to write while `check:color-system` fails.
 
 The harness checks that read color (`check:focus-ring`, `check:button-contrast`,
-`check:color-fallbacks`, `check:intent-roles`) accept `--ds-*` beside
-`--color-*`. The two that measure contrast, `check:focus-ring` and
+`check:color-fallbacks`, `check:intent-roles`) read the `--ds-*`
+tokens. The two that measure contrast, `check:focus-ring` and
 `check:button-contrast`, measure the LIGHT value only: a token's first
 definition is its light block. Dark and increased-contrast pairs are
 `check:color-system`'s, which holds every plan to them in all four modes.
@@ -278,7 +278,7 @@ After an agent edits a file in `prototypes/` or `src/`, `.cursor/hooks/ds-usage/
 - **Claude Code**: `PostToolUse` on `Edit|Write|MultiEdit` in `.claude/settings.json`. Exit 2 puts the findings in front of the agent; the edit itself has already landed.
 - **Cursor**: `afterFileEdit` in `.cursor/hooks.json`. Cursor takes no reply from this event, so there it only logs.
 
-Each run appends a line to `.local/ds-usage-runs.jsonl` (git-ignored): time, file, session, and finding counts by rule.
+Each run appends a line to `.local/ds-usage-runs.jsonl` (git-ignored): time, file, session, finding counts by rule, and `duration_ms`, what the run cost the edit, measured from the hook's start so the checker import counts.
 
 To turn it off locally, set `DS_USAGE_HOOK=off` in the environment the editor or `claude` starts from. A checker that fails to load or throws leaves the agent undisturbed: the hook exits 0 and says nothing.
 
@@ -345,18 +345,14 @@ Two kinds of failure, two mechanisms:
   count that falls does not. Re-record a genuine improvement with
   `npm run check:storybook -- --update` and commit the file in the same PR.
 - **What a ratchet IS, for every check that holds one**, is
-  `scripts/lib/ratchet.mjs`: the record's shape, which direction fails, the
-  stale-entry sweep, the placeholder-reason sweep and the `--update` write, with
-  the invariant asserted once in `scripts/lib/ratchet-conformance.mjs` against
-  all thirteen live records. The thirteen are twelve SHAPES and a counts map, surveyed one row each in
-  `scripts/lib/ratchet-shapes.mjs` — three of them keep the human's reason
-  outside the entry, so `--update` is a merge that leaves every key the module
-  does not own exactly as it found it. A check migrating onto the module adds no
-  row: it opens its record by the path it already names. The design-system
-  checks read it — color fallbacks, size fallbacks, undefined tokens, button
-  contrast, focus ring, icon-button name and intent roles (#600), the first two
-  through `scripts/lib/fallback-check.mjs`, which is where both families reach
-  their record.
+  `scripts/lib/ratchet.mjs`: which direction fails, the stale-entry sweep, the
+  placeholder-reason sweep and the `--update` write. Every record shares one
+  envelope — `why`, any other prose the check reads, then `sets`, each set an
+  optional `direction` and `reasons` and its `entries` of `{count, reason?}` —
+  so a new ratchet needs no table row. `--update` is a merge that leaves every
+  key the module does not own exactly as it found it. `scripts/lib/ratchet.test.mjs`
+  holds every live record to the envelope and to a no-movement `--update` that
+  changes no byte.
 - **The component language is a hard ban** (`check:ads-language`): old names,
   props, state steps and words are findings wherever they appear in
   `design-system/src`, `prototypes` and `src`. There is no baseline and no
@@ -371,21 +367,21 @@ Two kinds of failure, two mechanisms:
   floor. Each words its own findings and reads its record through the module:
   the half the module owns as `entries`, the rest — a recorded reading, a date,
   Atlassian's published surface — through `envelope()`.
-- Several records are maintained by hand and offer no `--update`
-  (`command: null` in their row), because the value of an entry in them IS the
+- Several records are maintained by hand and offer no `--update` (no
+  `update` on their registry row), because the value of an entry in them IS the
   argument for it. `--update` seeds the envelope onto a record written from
   nothing and then leaves it to whoever edits the file, which is why the two
   checks that stamp a date ask for it by hand.
 - **The registry asserts the pointer, not the filename** (#602). A `baseline:`
-  row is checked by `check:check-registry`: every set of the record opens on the
-  shape it declares (an unreadable record fails there rather than reading as an
-  empty set, which is green), the check that declares it reaches the record
+  row is checked by `check:check-registry`: every set of the record opens (an
+  unreadable record fails there rather than reading as an empty set, which is
+  green), the check that declares it reaches the record
   through its own imports — so a check that opens its record through the module
   without naming the file passes, and the fallback pair is credited to
   `scripts/lib/fallback-check.mjs` where the record work actually is — and the
-  `--update` its shape row advertises is a flag the check offers, in whichever
+  `--update` its row's `update` names is a flag the check offers, in whichever
   of `main()`'s two slots the check chose (`check:glossary`'s writes and then
-  still gates). A row with `command: null` must offer none. The a11y baseline is
+  still gates). A row with no `update` must offer none. The a11y baseline is
   the one record its check still parses itself, named as an exemption in
   `scripts/generate-check-scripts.mjs` with the reason: the browser suite's
   migration is its own piece of work.
@@ -435,6 +431,16 @@ The Storybook docs' AI agent is answered by `netlify/functions/docs-agent`: Gemi
 | `GEMINI_REGION` | optional, default `global` |
 
 The function signs a JWT with Node's `crypto`, exchanges it for an OAuth token and calls `generateContent`. Its grounding is the generated design-system index, bundled through `included_files` in `netlify.toml`. Tests: `npm run test:scripts`. The per-IP rate limit is best effort: it is held per warm function instance, so a cold start resets it. Without the variables, or on an error or a 429, the chat falls back to the docs search.
+
+## Hosted design-system MCP (Netlify function)
+
+The hosted copy of the `plus-ds` lookup is `netlify/functions/ds-mcp`, served at `/mcp/ds` (`docs/connectors/ds-mcp.md` § Hosted). It reads the repo files bundled through `[functions."ds-mcp"] included_files` in `netlify.toml`, so it answers from the same build as that deploy's Storybook; `netlify/functions/ds-mcp/handler.test.mjs` fails when a file the five tools open is missing from that list. Set this in the Netlify site's environment variables:
+
+| Variable | Value |
+|---|---|
+| `DS_MCP_KEY` | the shared key clients send as `Authorization: Bearer <key>` or `x-ds-mcp-key`. Unset or empty, the function refuses every request. |
+
+Tests: `npm run test:scripts`.
 
 ## Local Preview
 

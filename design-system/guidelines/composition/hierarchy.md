@@ -26,14 +26,14 @@ Element -> Card / Table -> Section / Modal -> Page
 ## Token naming follows the level
 
 - Element → the semantics steps: `--pad-x-*`, `--pad-y-*`, `--stack-*`, `--inline-*`, `--radius-*`
-- Card → `--size-card-*`
-- Section → `--size-section-*`
-- Table → `--size-table-*`
-- Modal → `--size-modal-*`
+- Card → `--card-*`
+- Section → `--section-*`
+- Table → `--table-*`
+- Modal → `--modal-*`
 
 ```jsx
 /* correct — a card's padding comes from the card layer */
-<div className="student-card" style={{ padding: 'var(--size-card-pad-x-sm)' }} />
+<div className="student-card" style={{ padding: 'var(--card-pad-compact)' }} />
 
 /* incorrect — element padding on a card surface; the two layers drift apart
    the moment the card scale is retuned */

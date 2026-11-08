@@ -27,14 +27,11 @@
  *     rise. A one-line pointer to where a convention now lives is prose and is
  *     allowed; the ratchet keeps it to one line.
  *
- * THE RECORD IS THE ONE WITH NO KEYED SET AT ALL — a single number on the
- * record, which is the `scalar` form in `scripts/lib/ratchet-shapes.mjs`. It is
- * read and written through `scripts/lib/ratchet.mjs` like every other baseline
- * in the repo (#601), so the direction, the absent-record error mode and the
- * `--update` write are the module's and the wording is this check's. There is
- * no keyed set, so there is no stale entry to report and no reason to require:
- * a number cannot go missing, and the argument for it is the note on the record
- * and the PR that moved it.
+ * THE RECORD HOLDS ONE NUMBER — the entry `proseLines` — read and written
+ * through `scripts/lib/ratchet.mjs` like every other baseline, so the
+ * direction, the absent-record error mode and the `--update` write are the
+ * module's and the wording is this check's. The argument for the number is the
+ * record's `why` and the PR that moved it.
  *
  * Run: npm run check:glossary            (--update records the current prose count)
  */
@@ -49,7 +46,7 @@ export { REPO_ROOT };
 export const SUBJECT = 'GLOSSARY.md';
 /** The one section that holds a table rather than term entries (ADR-023). Matched on its name, before the dash gloss. */
 export const TWO_VOCABULARIES = 'Two vocabularies';
-/** Repo-relative: also this record's key in the shape table, and what the registry row declares. */
+/** Repo-relative: what the registry row declares. */
 export const BASELINE = 'scripts/baselines/glossary-baseline.json';
 
 export const REMEDY =
@@ -134,8 +131,8 @@ const measured = byRoot((repoRoot) => measure(readFileSync(path.join(repoRoot, S
  */
 const ratchetFor = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
 
-/** The record's one number. `scalar` keys its entries by field name. */
-const recordedProse = (ratchet) => ratchet.entries.get('proseLines')?.counts.get('proseLines');
+/** The record's one number. */
+const recordedProse = (ratchet) => ratchet.entries.get('proseLines')?.count;
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
@@ -187,7 +184,7 @@ function record() {
       seed: {
         subject: SUBJECT,
         recorded: new Date().toISOString().slice(0, 10),
-        note: 'Ratchet: the count may fall, never rise. Re-record with --update, set `recorded` to the day it was argued, and say why in the PR.',
+        why: 'Ratchet: the count may fall, never rise. Re-record with --update, set `recorded` to the day it was argued, and say why in the PR.',
       },
     },
   );

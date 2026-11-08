@@ -1145,36 +1145,6 @@ a.sbdocs-a {
     outline-offset: var(--stack-sm);
 }
 
-.sb-ds-changelog {
-    display: grid;
-    grid-template-columns: max-content minmax(0, 1fr);
-    gap: var(--stack-md) var(--section-stack-lg);
-    margin: 0 0 var(--section-stack-lg);
-}
-
-.sb-ds-changelog dt {
-    display: flex;
-    gap: var(--stack-md);
-    align-items: baseline;
-    white-space: nowrap;
-    color: var(--ds-text-subtle);
-}
-
-.sb-ds-changelog dd {
-    margin: 0;
-    min-width: 0;
-}
-
-.sb-ds-changelog__kind {
-    font-size: var(--font-size-075);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.sb-ds-changelog__adopted {
-    color: var(--ds-text-subtle);
-    font-size: var(--font-size-0875);
-}
 
 /*
  * Color modes: the canvas follows the mode.

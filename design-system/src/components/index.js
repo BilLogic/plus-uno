@@ -76,14 +76,14 @@ export { default as Banner, BANNER_APPEARANCES, BANNER_ICONS } from '@/component
 export { default as EmptyState, EMPTY_STATE_SPACINGS } from '@/components/messaging/EmptyState';
 export { default as Flag, FLAG_APPEARANCES, FLAG_AUTO_CLOSE_MS, FlagGroup } from '@/components/messaging/Flag';
 export { default as InlineMessage, INLINE_MESSAGE_APPEARANCES } from '@/components/messaging/InlineMessage';
-export { default as Modal, createModal } from '@/components/messaging/Modal';
+export { default as Modal } from '@/components/messaging/Modal';
 export { default as SectionMessage, SECTION_MESSAGE_APPEARANCES, SECTION_MESSAGE_ICONS } from '@/components/messaging/SectionMessage';
 export { default as Spotlight, SPOTLIGHT_PLACEMENTS, SpotlightAction, SpotlightProvider, SpotlightTarget } from '@/components/messaging/Spotlight';
 
 export { default as Breadcrumb } from '@/components/navigation/Breadcrumb';
 export { default as Link, LINK_APPEARANCES } from '@/components/navigation/Link';
 export { default as MenuGroup, ButtonItem, CustomItem, LinkItem, Section } from '@/components/navigation/MenuGroup';
-export { default as Pagination, createPagination, PAGINATION_NAVIGATORS, PAGINATION_SPACINGS } from '@/components/navigation/Pagination';
+export { default as Pagination, PAGINATION_NAVIGATORS, PAGINATION_SPACINGS } from '@/components/navigation/Pagination';
 export { default as Sidebar } from '@/components/navigation/Sidebar';
 export { default as Tabs } from '@/components/navigation/Tabs';
 

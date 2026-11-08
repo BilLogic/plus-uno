@@ -47,7 +47,7 @@ describe('Table feel', () => {
 });
 
 describe('cell alignment', () => {
-    it('maps text, number and icon, and the legacy names', () => {
+    it('maps text, number and icon, and the edge names', () => {
         inBody(
             <TableRow>
                 <TableCell align="text">a</TableCell>

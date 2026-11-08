@@ -2136,7 +2136,7 @@
         ]
       },
       "tokenFamily": "Card",
-      "tokenPrefix": "--size-card-",
+      "tokenPrefix": "--card-",
       "source": "designer-supplied",
       "status": "verified"
     },
@@ -2152,7 +2152,7 @@
         ]
       },
       "tokenFamily": "Section",
-      "tokenPrefix": "--size-section-",
+      "tokenPrefix": "--section-",
       "source": "designer-supplied",
       "status": "verified"
     },
@@ -2168,7 +2168,7 @@
         ]
       },
       "tokenFamily": "Modal",
-      "tokenPrefix": "--size-modal-",
+      "tokenPrefix": "--modal-",
       "source": "designer-supplied",
       "status": "verified"
     },
@@ -2180,7 +2180,7 @@
         "Content"
       ],
       "tokenFamily": "Surface Container",
-      "tokenPrefix": "--size-surface-container-",
+      "tokenPrefix": "--section-",
       "source": "designer-supplied",
       "status": "verified",
       "notes": "Content is a real native SLOT (verified via the Plugin API: type === 'SLOT'). The '◇ Content — convert this frame to a slot' line still sitting inside it is stale instructional copy, not an unconverted frame — cosmetic cleanup only, it does not block write-back."
@@ -2195,7 +2195,7 @@
         "Pagination"
       ],
       "tokenFamily": "Table",
-      "tokenPrefix": "--size-table-",
+      "tokenPrefix": "--table-",
       "source": "designer-supplied",
       "status": "verified",
       "notes": "All three are real native SLOTs (verified via the Plugin API: type === 'SLOT'). The '◇ … — convert this frame to a slot' lines inside them are stale instructional copy, not unconverted frames — cosmetic cleanup only, they do not block write-back."

@@ -203,11 +203,8 @@ test('an incomparable pair is counted rather than silently dropped', () => {
 /*
  * WHAT MOVED OUT OF HERE IN #600. The classification these tests used to drive
  * — what is new, what has gone stale, what an absent record does — is
- * `scripts/lib/ratchet.mjs`'s, and it is asserted once, against all twelve live
- * records, in `scripts/lib/ratchet-conformance.mjs`. Asserting it a thirteenth
- * time over a hand-built baseline object would be asserting the shape this
- * module would have chosen rather than the one on disk, which is the mistake the
- * first attempt at #599 made. What is still this module's, and tested here, is
+ * `scripts/lib/ratchet.mjs`'s, and it is asserted once, in its own tests.
+ * What is still this module's, and tested here, is
  * the SHAPE it hands the ratchet and what a finding SAYS.
  */
 

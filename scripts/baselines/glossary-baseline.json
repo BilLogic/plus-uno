@@ -1,6 +1,14 @@
 {
+  "why": "Ratchet: the count may fall, never rise. Re-record with --update, set `recorded` to the day it was argued, and say why in the PR.",
   "subject": "GLOSSARY.md",
-  "proseLines": 8,
   "recorded": "2026-10-13",
-  "note": "Ratchet: the count may fall, never rise. Re-record with --update, set `recorded` to the day it was argued, and say why in the PR."
+  "sets": {
+    "main": {
+      "entries": {
+        "proseLines": {
+          "count": 8
+        }
+      }
+    }
+  }
 }

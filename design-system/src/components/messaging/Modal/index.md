@@ -49,8 +49,6 @@ Universal modal component for creating dialog windows that overlay the main cont
 
 **`renderAs`** — `modal` · `inline`
 
-**`width`** — `6-col` · `8-col` · `10-col`
-
 Anything not listed is not a valid value.
 
 ## Tokens touched

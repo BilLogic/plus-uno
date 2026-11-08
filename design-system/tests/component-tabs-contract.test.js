@@ -4,8 +4,8 @@
  * The tabs themselves are React and only exist inside a running
  * Storybook. Everything that can be wrong without a browser is in
  * `../src/storybook-docs/lib/component-tabs-contract.js`: which entries count as
- * components, where their files sit, and what a changelog entry has to look
- * like before it is rendered. That is what this file holds to.
+ * components, where their files sit, and the tab shape. That is what this file
+ * holds to.
  *
  * It lives in the design-system package because `npm test` is the only test
  * command the repo has; it asserts properties of a ROOT-level module, the same
@@ -14,14 +14,11 @@
 import { describe, it, expect } from 'vitest';
 
 import {
-  CHANGELOG_ADOPTED,
-  CHANGELOG_KINDS,
   TABS,
   TABBED_EXCEPTIONS,
   isTabbedDocsPage,
   TAB_IDS,
   componentIdentity,
-  normalizeChangelog,
   importLineFor,
 } from '../src/storybook-docs/lib/component-tabs-contract.js';
 
@@ -90,54 +87,16 @@ describe('componentIdentity', () => {
   });
 });
 
-describe('normalizeChangelog', () => {
-  it('is empty for a component that has declared nothing', () => {
-    expect(normalizeChangelog(undefined)).toEqual([]);
-    expect(normalizeChangelog([])).toEqual([]);
-    expect(normalizeChangelog('2026-08-26 shipped')).toEqual([]);
-  });
-
-  it('orders entries newest first', () => {
-    const entries = normalizeChangelog([
-      { date: '2026-08-01', kind: 'added', summary: 'first' },
-      { date: '2026-09-01', kind: 'fixed', summary: 'second' },
-    ]);
-    expect(entries.map((e) => e.summary)).toEqual(['second', 'first']);
-  });
-
-  it('drops an entry that is missing a date or a summary', () => {
-    expect(
-      normalizeChangelog([
-        { kind: 'added', summary: 'no date' },
-        { date: 'last Tuesday', summary: 'no ISO date' },
-        { date: '2026-08-26', summary: '   ' },
-        { date: '2026-08-26', summary: 'kept' },
-      ]).map((e) => e.summary),
-    ).toEqual(['kept']);
-  });
-
-  it('leaves an unrecognized kind off rather than inventing one', () => {
-    const [entry] = normalizeChangelog([
-      { date: '2026-08-26', kind: 'refactored', summary: 'moved' },
-    ]);
-    expect(entry.kind).toBeNull();
-    expect(CHANGELOG_KINDS).toContain('added');
-  });
-});
-
 describe('the tab contract', () => {
-  it('declares four tabs, in Atlassian order, with Examples first and unparameterized', () => {
-    expect(TABS.map((t) => t.key)).toEqual(['examples', 'code', 'usage', 'changelog']);
-    expect(TABS.map((t) => t.title)).toEqual(['Examples', 'Code', 'Usage', 'Changelog']);
+  it('declares three tabs, with Examples first and unparameterized', () => {
+    expect(TABS.map((t) => t.key)).toEqual(['examples', 'code', 'usage']);
+    expect(TABS.map((t) => t.title)).toEqual(['Examples', 'Code', 'Usage']);
     // Examples is the DEFAULT tab, so it carries no query param — the addon tabs
     // behaved the same way, and those URLs are still in circulation.
     expect(TABS[0].id).toBeNull();
-    expect(TABS.slice(1).map((t) => t.id)).toEqual(['plus-code', 'plus-usage', 'plus-changelog']);
+    expect(TABS.slice(1).map((t) => t.id)).toEqual(['plus-code', 'plus-usage']);
   });
 
-  it('states the adoption date once, as an ISO date', () => {
-    expect(CHANGELOG_ADOPTED).toMatch(/^\d{4}-\d{2}-\d{2}$/);
-  });
 });
 
 describe('importLineFor', () => {

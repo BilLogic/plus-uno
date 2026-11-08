@@ -1,262 +1,780 @@
 {
   "why": "Prop rows and components the generated component docs leave undescribed, as `<Component> <prop>` or `<Component> (summary)`. A gap may leave the record and none may join it: a new component or prop ships described. Regenerate with `npm run generate:component-docs -- --update`; never edit by hand.",
-  "gaps": [
-    "Accordion (summary)",
-    "AiIcon className",
-    "AiIcon style",
-    "AiLabel (summary)",
-    "AiLabel className",
-    "AiLabel id",
-    "AiMessage className",
-    "Banner className",
-    "Banner id",
-    "Calendar className",
-    "Calendar rangeEnd",
-    "Carousel activeIndex",
-    "Carousel children",
-    "Carousel className",
-    "Carousel id",
-    "Carousel keyboard",
-    "Carousel nextIcon",
-    "Carousel onSelect",
-    "Carousel pause",
-    "Carousel prevIcon",
-    "Carousel slide",
-    "Carousel slides",
-    "Carousel style",
-    "Carousel wrap",
-    "Cascader (summary)",
-    "Cascader className",
-    "Cascader errorMessage",
-    "Cascader id",
-    "Cascader isDisabled",
-    "Cascader onChange",
-    "Cascader options",
-    "Cascader style",
-    "Cascader value",
-    "ChoiceGrid className",
-    "ChoiceGrid columns",
-    "ChoiceGrid id",
-    "ChoiceGrid name",
-    "ChoiceGrid onChange",
-    "ChoiceGrid rows",
-    "ChoiceGrid style",
-    "Comment actions",
-    "Comment author",
-    "Comment avatar",
-    "Comment className",
-    "Comment content",
-    "Comment edited",
-    "Comment isHighlighted",
-    "Comment nestedReplies",
-    "Comment restrictedTo",
-    "Comment savingText",
-    "Comment time",
-    "Comment type",
-    "CountTag (summary)",
-    "CountTag className",
-    "CountTag id",
-    "DateTimePicker calendarAlign",
-    "DateTimePicker className",
-    "DateTimePicker dateValue",
-    "DateTimePicker id",
-    "DateTimePicker isLabelHidden",
-    "DateTimePicker maxDate",
-    "DateTimePicker minDate",
-    "DateTimePicker name",
-    "DateTimePicker onBlur",
-    "DateTimePicker onChange",
-    "DateTimePicker onFocus",
-    "DateTimePicker showDate",
-    "DateTimePicker style",
-    "DateTimePicker timeValue",
-    "EmptyState className",
-    "FileUpload (summary)",
-    "FileUpload acceptedFormats",
-    "FileUpload className",
-    "FileUpload id",
-    "FileUpload name",
-    "FileUpload onBlur",
-    "FileUpload onChange",
-    "FileUpload onFocus",
-    "FileUpload style",
-    "FilterButton appearance",
-    "FilterButton className",
-    "FilterButton isDisabled",
-    "FilterButton isLoading",
-    "FilterButton isSelected",
-    "FilterButton onClick",
-    "Footer className",
-    "Footer style",
-    "GenerativeBorder className",
-    "GenerativeBorder style",
-    "Heading children",
-    "Heading id",
-    "Heading testId",
-    "Image className",
-    "Image src",
-    "Image style",
-    "Image testId",
-    "InlineEdit cancelLabel",
-    "InlineEdit className",
-    "InlineEdit confirmLabel",
-    "InlineEditableTextfield cancelLabel",
-    "InlineEditableTextfield className",
-    "InlineEditableTextfield compact",
-    "InlineEditableTextfield confirmLabel",
-    "InlineEditableTextfield editLabel",
-    "InlineEditableTextfield hideActionButtons",
-    "InlineEditableTextfield id",
-    "InlineEditableTextfield keepEditViewOpenOnBlur",
-    "InlineEditableTextfield maxLength",
-    "InlineEditableTextfield onCancel",
-    "InlineEditableTextfield onEdit",
-    "InlineEditableTextfield readViewFitContainerWidth",
-    "InlineEditableTextfield required",
-    "InlineEditableTextfield startWithEditViewOpen",
-    "InlineEditableTextfield type",
-    "InlineMessage className",
-    "InlineMessage id",
-    "LinkIconButton appearance",
-    "LinkIconButton className",
-    "LinkIconButton href",
-    "LinkIconButton icon",
-    "LinkIconButton isSelected",
-    "LinkIconButton onClick",
-    "LinkIconButton rel",
-    "LinkIconButton shape",
-    "LinkIconButton spacing",
-    "LinkIconButton target",
-    "LoadingGif (summary)",
-    "LoadingGif className",
-    "LoadingGif id",
-    "LoadingGif label",
-    "LoadingGif size",
-    "LoadingGif type",
-    "MenuGroup children",
-    "MenuGroup className",
-    "MenuGroup maxHeight",
-    "MenuGroup maxWidth",
-    "MenuGroup minWidth",
-    "MenuGroup testId",
-    "Object (summary)",
-    "Object className",
-    "Object testId",
-    "Panel children",
-    "Panel className",
-    "Popup (summary)",
-    "Popup className",
-    "Popup defaultShow",
-    "Popup id",
-    "Popup offset",
-    "Popup onToggle",
-    "Popup show",
-    "ProgressBar className",
-    "ProgressBar id",
-    "ProgressIndicator appearance",
-    "ProgressIndicator ariaControls",
-    "ProgressIndicator label",
-    "ProgressIndicator onSelect",
-    "ProgressIndicator selectedIndex",
-    "ProgressIndicator size",
-    "ProgressIndicator spacing",
-    "ProgressIndicator values",
-    "ProgressTracker items",
-    "ProgressTracker label",
-    "ProgressTracker orientation",
-    "ProgressTracker spacing",
-    "PromptInput className",
-    "PromptInput id",
-    "PromptInput isDisabled",
-    "PromptInput onKeyDown",
-    "PromptInput placeholder",
-    "PromptStarters className",
-    "Range className",
-    "Range defaultValue",
-    "Range id",
-    "Range name",
-    "Range style",
-    "RichTextEditor (summary)",
-    "RichTextEditor className",
-    "RichTextEditor defaultValue",
-    "RichTextEditor id",
-    "RichTextEditor name",
-    "RichTextEditor onBlur",
-    "RichTextEditor onChange",
-    "RichTextEditor onFocus",
-    "RichTextEditor style",
-    "RichTextEditor toolbarButtons",
-    "RichTextEditor value",
-    "ScrollBar children",
-    "ScrollBar className",
-    "ScrollBar id",
-    "ScrollBar style",
-    "SessionAvailabilitySnackbar (summary)",
-    "SessionAvailabilitySnackbar available",
-    "SessionAvailabilitySnackbar className",
-    "SessionAvailabilitySnackbar onClose",
-    "SessionAvailabilitySnackbar timestamp",
-    "SessionAvailabilitySnackbar type",
-    "SessionManagementSnackbar (summary)",
-    "SessionManagementSnackbar className",
-    "SessionManagementSnackbar onClose",
-    "SessionManagementSnackbar timestamp",
-    "SessionManagementSnackbar type",
-    "Sidebar className",
-    "Sidebar style",
-    "Sidebar user",
-    "Sidebar visible",
-    "Skeleton (summary)",
-    "Skeleton className",
-    "Skeleton style",
-    "Spinner className",
-    "SplitButton className",
-    "Spotlight children",
-    "Spotlight className",
-    "Spotlight dismissible",
-    "Spotlight headline",
-    "Spotlight isOpen",
-    "Spotlight media",
-    "Spotlight onDismiss",
-    "Spotlight placement",
-    "Spotlight secondaryAction",
-    "Spotlight stepCount",
-    "Suggestion (summary)",
-    "Suggestion className",
-    "Suggestion id",
-    "TagGroup (summary)",
-    "TagGroup className",
-    "TagGroup id",
-    "TagInput className",
-    "TagInput id",
-    "TagInput isInvalid",
-    "TagInput name",
-    "TagInput style",
-    "Tile (summary)",
-    "Tile className",
-    "TimePicker className",
-    "TimePicker id",
-    "TimePicker name",
-    "TimePicker onBlur",
-    "TimePicker onFocus",
-    "TimePicker style",
-    "TreeSelect (summary)",
-    "TreeSelect className",
-    "TreeSelect errorMessage",
-    "TreeSelect id",
-    "TreeSelect isDisabled",
-    "TreeSelect onChange",
-    "TreeSelect options",
-    "TreeSelect style",
-    "TreeSelect value",
-    "UserAvatar className",
-    "UserAvatar id",
-    "UserAvatar onClick",
-    "VerticalButton appearance",
-    "VerticalButton className",
-    "VerticalButton isDisabled",
-    "VerticalButton isLoading",
-    "VerticalButton isSelected",
-    "VerticalButton onClick"
-  ]
+  "sets": {
+    "main": {
+      "entries": {
+        "Accordion (summary)": {
+          "count": 1
+        },
+        "AiIcon className": {
+          "count": 1
+        },
+        "AiIcon style": {
+          "count": 1
+        },
+        "AiLabel (summary)": {
+          "count": 1
+        },
+        "AiLabel className": {
+          "count": 1
+        },
+        "AiLabel id": {
+          "count": 1
+        },
+        "AiMessage className": {
+          "count": 1
+        },
+        "Banner className": {
+          "count": 1
+        },
+        "Banner id": {
+          "count": 1
+        },
+        "Calendar className": {
+          "count": 1
+        },
+        "Calendar rangeEnd": {
+          "count": 1
+        },
+        "Carousel activeIndex": {
+          "count": 1
+        },
+        "Carousel children": {
+          "count": 1
+        },
+        "Carousel className": {
+          "count": 1
+        },
+        "Carousel id": {
+          "count": 1
+        },
+        "Carousel keyboard": {
+          "count": 1
+        },
+        "Carousel nextIcon": {
+          "count": 1
+        },
+        "Carousel onSelect": {
+          "count": 1
+        },
+        "Carousel pause": {
+          "count": 1
+        },
+        "Carousel prevIcon": {
+          "count": 1
+        },
+        "Carousel slide": {
+          "count": 1
+        },
+        "Carousel slides": {
+          "count": 1
+        },
+        "Carousel style": {
+          "count": 1
+        },
+        "Carousel wrap": {
+          "count": 1
+        },
+        "Cascader (summary)": {
+          "count": 1
+        },
+        "Cascader className": {
+          "count": 1
+        },
+        "Cascader errorMessage": {
+          "count": 1
+        },
+        "Cascader id": {
+          "count": 1
+        },
+        "Cascader isDisabled": {
+          "count": 1
+        },
+        "Cascader onChange": {
+          "count": 1
+        },
+        "Cascader options": {
+          "count": 1
+        },
+        "Cascader style": {
+          "count": 1
+        },
+        "Cascader value": {
+          "count": 1
+        },
+        "ChoiceGrid className": {
+          "count": 1
+        },
+        "ChoiceGrid columns": {
+          "count": 1
+        },
+        "ChoiceGrid id": {
+          "count": 1
+        },
+        "ChoiceGrid name": {
+          "count": 1
+        },
+        "ChoiceGrid onChange": {
+          "count": 1
+        },
+        "ChoiceGrid rows": {
+          "count": 1
+        },
+        "ChoiceGrid style": {
+          "count": 1
+        },
+        "Comment actions": {
+          "count": 1
+        },
+        "Comment author": {
+          "count": 1
+        },
+        "Comment avatar": {
+          "count": 1
+        },
+        "Comment className": {
+          "count": 1
+        },
+        "Comment content": {
+          "count": 1
+        },
+        "Comment edited": {
+          "count": 1
+        },
+        "Comment isHighlighted": {
+          "count": 1
+        },
+        "Comment nestedReplies": {
+          "count": 1
+        },
+        "Comment restrictedTo": {
+          "count": 1
+        },
+        "Comment savingText": {
+          "count": 1
+        },
+        "Comment time": {
+          "count": 1
+        },
+        "Comment type": {
+          "count": 1
+        },
+        "CountTag (summary)": {
+          "count": 1
+        },
+        "CountTag className": {
+          "count": 1
+        },
+        "CountTag id": {
+          "count": 1
+        },
+        "DateTimePicker calendarAlign": {
+          "count": 1
+        },
+        "DateTimePicker className": {
+          "count": 1
+        },
+        "DateTimePicker dateValue": {
+          "count": 1
+        },
+        "DateTimePicker id": {
+          "count": 1
+        },
+        "DateTimePicker isLabelHidden": {
+          "count": 1
+        },
+        "DateTimePicker maxDate": {
+          "count": 1
+        },
+        "DateTimePicker minDate": {
+          "count": 1
+        },
+        "DateTimePicker name": {
+          "count": 1
+        },
+        "DateTimePicker onBlur": {
+          "count": 1
+        },
+        "DateTimePicker onChange": {
+          "count": 1
+        },
+        "DateTimePicker onFocus": {
+          "count": 1
+        },
+        "DateTimePicker showDate": {
+          "count": 1
+        },
+        "DateTimePicker style": {
+          "count": 1
+        },
+        "DateTimePicker timeValue": {
+          "count": 1
+        },
+        "EmptyState className": {
+          "count": 1
+        },
+        "FileUpload (summary)": {
+          "count": 1
+        },
+        "FileUpload acceptedFormats": {
+          "count": 1
+        },
+        "FileUpload className": {
+          "count": 1
+        },
+        "FileUpload id": {
+          "count": 1
+        },
+        "FileUpload name": {
+          "count": 1
+        },
+        "FileUpload onBlur": {
+          "count": 1
+        },
+        "FileUpload onChange": {
+          "count": 1
+        },
+        "FileUpload onFocus": {
+          "count": 1
+        },
+        "FileUpload style": {
+          "count": 1
+        },
+        "FilterButton appearance": {
+          "count": 1
+        },
+        "FilterButton className": {
+          "count": 1
+        },
+        "FilterButton isDisabled": {
+          "count": 1
+        },
+        "FilterButton isLoading": {
+          "count": 1
+        },
+        "FilterButton isSelected": {
+          "count": 1
+        },
+        "FilterButton onClick": {
+          "count": 1
+        },
+        "Footer className": {
+          "count": 1
+        },
+        "Footer style": {
+          "count": 1
+        },
+        "GenerativeBorder className": {
+          "count": 1
+        },
+        "GenerativeBorder style": {
+          "count": 1
+        },
+        "Heading children": {
+          "count": 1
+        },
+        "Heading id": {
+          "count": 1
+        },
+        "Heading testId": {
+          "count": 1
+        },
+        "Image className": {
+          "count": 1
+        },
+        "Image src": {
+          "count": 1
+        },
+        "Image style": {
+          "count": 1
+        },
+        "Image testId": {
+          "count": 1
+        },
+        "InlineEdit cancelLabel": {
+          "count": 1
+        },
+        "InlineEdit className": {
+          "count": 1
+        },
+        "InlineEdit confirmLabel": {
+          "count": 1
+        },
+        "InlineEditableTextfield cancelLabel": {
+          "count": 1
+        },
+        "InlineEditableTextfield className": {
+          "count": 1
+        },
+        "InlineEditableTextfield compact": {
+          "count": 1
+        },
+        "InlineEditableTextfield confirmLabel": {
+          "count": 1
+        },
+        "InlineEditableTextfield editLabel": {
+          "count": 1
+        },
+        "InlineEditableTextfield hideActionButtons": {
+          "count": 1
+        },
+        "InlineEditableTextfield id": {
+          "count": 1
+        },
+        "InlineEditableTextfield keepEditViewOpenOnBlur": {
+          "count": 1
+        },
+        "InlineEditableTextfield maxLength": {
+          "count": 1
+        },
+        "InlineEditableTextfield onCancel": {
+          "count": 1
+        },
+        "InlineEditableTextfield onEdit": {
+          "count": 1
+        },
+        "InlineEditableTextfield readViewFitContainerWidth": {
+          "count": 1
+        },
+        "InlineEditableTextfield required": {
+          "count": 1
+        },
+        "InlineEditableTextfield startWithEditViewOpen": {
+          "count": 1
+        },
+        "InlineEditableTextfield type": {
+          "count": 1
+        },
+        "InlineMessage className": {
+          "count": 1
+        },
+        "InlineMessage id": {
+          "count": 1
+        },
+        "LinkIconButton appearance": {
+          "count": 1
+        },
+        "LinkIconButton className": {
+          "count": 1
+        },
+        "LinkIconButton href": {
+          "count": 1
+        },
+        "LinkIconButton icon": {
+          "count": 1
+        },
+        "LinkIconButton isSelected": {
+          "count": 1
+        },
+        "LinkIconButton onClick": {
+          "count": 1
+        },
+        "LinkIconButton rel": {
+          "count": 1
+        },
+        "LinkIconButton shape": {
+          "count": 1
+        },
+        "LinkIconButton spacing": {
+          "count": 1
+        },
+        "LinkIconButton target": {
+          "count": 1
+        },
+        "LoadingGif (summary)": {
+          "count": 1
+        },
+        "LoadingGif className": {
+          "count": 1
+        },
+        "LoadingGif id": {
+          "count": 1
+        },
+        "LoadingGif label": {
+          "count": 1
+        },
+        "LoadingGif size": {
+          "count": 1
+        },
+        "LoadingGif type": {
+          "count": 1
+        },
+        "MenuGroup children": {
+          "count": 1
+        },
+        "MenuGroup className": {
+          "count": 1
+        },
+        "MenuGroup maxHeight": {
+          "count": 1
+        },
+        "MenuGroup maxWidth": {
+          "count": 1
+        },
+        "MenuGroup minWidth": {
+          "count": 1
+        },
+        "MenuGroup testId": {
+          "count": 1
+        },
+        "Object (summary)": {
+          "count": 1
+        },
+        "Object className": {
+          "count": 1
+        },
+        "Object testId": {
+          "count": 1
+        },
+        "Panel children": {
+          "count": 1
+        },
+        "Panel className": {
+          "count": 1
+        },
+        "Popup (summary)": {
+          "count": 1
+        },
+        "Popup className": {
+          "count": 1
+        },
+        "Popup defaultShow": {
+          "count": 1
+        },
+        "Popup id": {
+          "count": 1
+        },
+        "Popup offset": {
+          "count": 1
+        },
+        "Popup onToggle": {
+          "count": 1
+        },
+        "Popup show": {
+          "count": 1
+        },
+        "ProgressBar className": {
+          "count": 1
+        },
+        "ProgressBar id": {
+          "count": 1
+        },
+        "ProgressIndicator appearance": {
+          "count": 1
+        },
+        "ProgressIndicator ariaControls": {
+          "count": 1
+        },
+        "ProgressIndicator label": {
+          "count": 1
+        },
+        "ProgressIndicator onSelect": {
+          "count": 1
+        },
+        "ProgressIndicator selectedIndex": {
+          "count": 1
+        },
+        "ProgressIndicator size": {
+          "count": 1
+        },
+        "ProgressIndicator spacing": {
+          "count": 1
+        },
+        "ProgressIndicator values": {
+          "count": 1
+        },
+        "ProgressTracker items": {
+          "count": 1
+        },
+        "ProgressTracker label": {
+          "count": 1
+        },
+        "ProgressTracker orientation": {
+          "count": 1
+        },
+        "ProgressTracker spacing": {
+          "count": 1
+        },
+        "PromptInput className": {
+          "count": 1
+        },
+        "PromptInput id": {
+          "count": 1
+        },
+        "PromptInput isDisabled": {
+          "count": 1
+        },
+        "PromptInput onKeyDown": {
+          "count": 1
+        },
+        "PromptInput placeholder": {
+          "count": 1
+        },
+        "PromptStarters className": {
+          "count": 1
+        },
+        "Range className": {
+          "count": 1
+        },
+        "Range defaultValue": {
+          "count": 1
+        },
+        "Range id": {
+          "count": 1
+        },
+        "Range name": {
+          "count": 1
+        },
+        "Range style": {
+          "count": 1
+        },
+        "RichTextEditor (summary)": {
+          "count": 1
+        },
+        "RichTextEditor className": {
+          "count": 1
+        },
+        "RichTextEditor defaultValue": {
+          "count": 1
+        },
+        "RichTextEditor id": {
+          "count": 1
+        },
+        "RichTextEditor name": {
+          "count": 1
+        },
+        "RichTextEditor onBlur": {
+          "count": 1
+        },
+        "RichTextEditor onChange": {
+          "count": 1
+        },
+        "RichTextEditor onFocus": {
+          "count": 1
+        },
+        "RichTextEditor style": {
+          "count": 1
+        },
+        "RichTextEditor toolbarButtons": {
+          "count": 1
+        },
+        "RichTextEditor value": {
+          "count": 1
+        },
+        "ScrollBar children": {
+          "count": 1
+        },
+        "ScrollBar className": {
+          "count": 1
+        },
+        "ScrollBar id": {
+          "count": 1
+        },
+        "ScrollBar style": {
+          "count": 1
+        },
+        "SessionAvailabilitySnackbar (summary)": {
+          "count": 1
+        },
+        "SessionAvailabilitySnackbar available": {
+          "count": 1
+        },
+        "SessionAvailabilitySnackbar className": {
+          "count": 1
+        },
+        "SessionAvailabilitySnackbar onClose": {
+          "count": 1
+        },
+        "SessionAvailabilitySnackbar timestamp": {
+          "count": 1
+        },
+        "SessionAvailabilitySnackbar type": {
+          "count": 1
+        },
+        "SessionManagementSnackbar (summary)": {
+          "count": 1
+        },
+        "SessionManagementSnackbar className": {
+          "count": 1
+        },
+        "SessionManagementSnackbar onClose": {
+          "count": 1
+        },
+        "SessionManagementSnackbar timestamp": {
+          "count": 1
+        },
+        "SessionManagementSnackbar type": {
+          "count": 1
+        },
+        "Sidebar className": {
+          "count": 1
+        },
+        "Sidebar style": {
+          "count": 1
+        },
+        "Sidebar user": {
+          "count": 1
+        },
+        "Sidebar visible": {
+          "count": 1
+        },
+        "Skeleton (summary)": {
+          "count": 1
+        },
+        "Skeleton className": {
+          "count": 1
+        },
+        "Skeleton style": {
+          "count": 1
+        },
+        "Spinner className": {
+          "count": 1
+        },
+        "SplitButton className": {
+          "count": 1
+        },
+        "Spotlight children": {
+          "count": 1
+        },
+        "Spotlight className": {
+          "count": 1
+        },
+        "Spotlight dismissible": {
+          "count": 1
+        },
+        "Spotlight headline": {
+          "count": 1
+        },
+        "Spotlight isOpen": {
+          "count": 1
+        },
+        "Spotlight media": {
+          "count": 1
+        },
+        "Spotlight onDismiss": {
+          "count": 1
+        },
+        "Spotlight placement": {
+          "count": 1
+        },
+        "Spotlight secondaryAction": {
+          "count": 1
+        },
+        "Spotlight stepCount": {
+          "count": 1
+        },
+        "Suggestion (summary)": {
+          "count": 1
+        },
+        "Suggestion className": {
+          "count": 1
+        },
+        "Suggestion id": {
+          "count": 1
+        },
+        "TagGroup (summary)": {
+          "count": 1
+        },
+        "TagGroup className": {
+          "count": 1
+        },
+        "TagGroup id": {
+          "count": 1
+        },
+        "TagInput className": {
+          "count": 1
+        },
+        "TagInput id": {
+          "count": 1
+        },
+        "TagInput isInvalid": {
+          "count": 1
+        },
+        "TagInput name": {
+          "count": 1
+        },
+        "TagInput style": {
+          "count": 1
+        },
+        "Tile (summary)": {
+          "count": 1
+        },
+        "Tile className": {
+          "count": 1
+        },
+        "TimePicker className": {
+          "count": 1
+        },
+        "TimePicker id": {
+          "count": 1
+        },
+        "TimePicker name": {
+          "count": 1
+        },
+        "TimePicker onBlur": {
+          "count": 1
+        },
+        "TimePicker onFocus": {
+          "count": 1
+        },
+        "TimePicker style": {
+          "count": 1
+        },
+        "TreeSelect (summary)": {
+          "count": 1
+        },
+        "TreeSelect className": {
+          "count": 1
+        },
+        "TreeSelect errorMessage": {
+          "count": 1
+        },
+        "TreeSelect id": {
+          "count": 1
+        },
+        "TreeSelect isDisabled": {
+          "count": 1
+        },
+        "TreeSelect onChange": {
+          "count": 1
+        },
+        "TreeSelect options": {
+          "count": 1
+        },
+        "TreeSelect style": {
+          "count": 1
+        },
+        "TreeSelect value": {
+          "count": 1
+        },
+        "UserAvatar className": {
+          "count": 1
+        },
+        "UserAvatar id": {
+          "count": 1
+        },
+        "UserAvatar onClick": {
+          "count": 1
+        },
+        "VerticalButton appearance": {
+          "count": 1
+        },
+        "VerticalButton className": {
+          "count": 1
+        },
+        "VerticalButton isDisabled": {
+          "count": 1
+        },
+        "VerticalButton isLoading": {
+          "count": 1
+        },
+        "VerticalButton isSelected": {
+          "count": 1
+        },
+        "VerticalButton onClick": {
+          "count": 1
+        }
+      }
+    }
+  }
 }

@@ -523,7 +523,6 @@ const preview = {
               ]
             ]
           ],
-          "Deprecated",
           "*"
         ],
         /* IA-SORT-END */

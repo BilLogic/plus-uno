@@ -2,7 +2,7 @@
 /**
  * check:docs-tabs — the component docs pages' tab split holds its shape (ADR-025).
  *
- * WHAT MOVED, AND WHY THIS EXISTS. Examples · Code · Usage · Changelog used to be
+ * WHAT MOVED, AND WHY THIS EXISTS. Examples · Code · Usage used to be
  * Storybook `types.TAB` addons drawn in the manager's preview toolbar. That
  * toolbar is in a different document from `<Title />`, so it could never render
  * below the title; the tabs are now part of the docs page itself. Tab membership
@@ -20,7 +20,7 @@
  * recorded by hand in the baseline, with the reason in the commit.
  *
  * WHY NOT THE VITEST CONTRACT TEST. `design-system/tests/component-tabs-contract.test.js`
- * holds the pure half — ids, order, changelog shape — and still does. It cannot
+ * holds the pure half — ids and order — and still does. It cannot
  * hold THIS half: it runs under the design-system's vitest project, which cannot
  * execute inside a `.claude/worktrees/` checkout at all (module paths resolve to
  * the parent's `node_modules`). An assertion that cannot be run locally cannot be
@@ -193,7 +193,7 @@ export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
   const unknown = read.tabs.filter((t) => t !== 'examples' && t !== 'usage');
   if (unknown.length) {
     found.push(
-      `${file}: only "examples" and "usage" are authored — Code and Changelog are ` +
+      `${file}: only "examples" and "usage" are authored — Code is ` +
         `generated. Found: ${unknown.join(', ')}.`,
     );
   }
@@ -385,6 +385,7 @@ function record(repoRoot = REPO_ROOT) {
           'The floor under the tabbed component docs population. It may rise as a component ' +
           'gains a docs page, and never falls except by a hand edit that names the removal. ' +
           'Re-measure and raise it with `npm run check:docs-tabs -- --update`.',
+        'sets.main.direction': 'grow-only',
       },
     },
   );

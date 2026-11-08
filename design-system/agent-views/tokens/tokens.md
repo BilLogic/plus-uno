@@ -6,199 +6,201 @@
 
 Mirrors `design-system/src/tokens/`.
 
+A token a plan defines carries its intent as a comment: the place or situation it is for. Pick the token whose intent names your case. A hovered or pressed color variant follows its base. A bare token has no plan yet.
+
 ## Ladder Semantics
 Start here for space, size and radius (ADR-038). A component reads its component token, else a pattern token, else one of these steps: `--pad-x-*` and `--pad-y-*` inside a control, `--stack-*` between stacked items, `--inline-*` between items in a row, `--radius-*` for corners. The primitives at the end of this file are what these resolve to.
 
 ```css
---content-max-width
---content-max-width-reading
---content-min-width
---content-width
---control-lg
---control-md
---control-sm
---focus-ring-offset
---focus-ring-radius
---focus-ring-width
---grid-columns
---grid-gutter
---grid-width-column
---grid-width-column-screen
---inline-lg
---inline-md
---inline-sm
---pad-x-lg
---pad-x-md
---pad-x-sm
---pad-x-xs
---pad-y-lg
---pad-y-md
---pad-y-sm
---radius-h24
---radius-h32
---radius-h40
---radius-lg
---radius-md
---radius-sm
---screen-max-width
---screen-min-width
---screen-pad-x
---screen-width
---stack-lg
---stack-md
---stack-sm
+--content-max-width  /* Widest a page's main content column may grow. */
+--content-max-width-reading  /* Widest a column of running text may grow, to keep lines readable. */
+--content-min-width  /* Narrowest a page's main content column may shrink. */
+--content-width  /* Width of the main content column at the current breakpoint. */
+--control-lg  /* Height of a large control: 40px high. */
+--control-md  /* Height of a default control: 32px high. */
+--control-sm  /* Height of a small control: 24px high. */
+--focus-ring-offset  /* Gap between an element and its focus ring, when it must differ from the ring width. */
+--focus-ring-radius  /* Corner rounding of the keyboard focus ring. */
+--focus-ring-width  /* Width of the keyboard focus ring; also its offset unless the offset must differ. */
+--grid-columns  /* Column count of the page grid. */
+--grid-gutter  /* Gap between columns of the page grid. */
+--grid-width-column  /* Width of one column of the content grid at the current breakpoint. */
+--grid-width-column-screen  /* Width of one column of the full-screen grid at the current breakpoint. */
+--inline-lg  /* Horizontal gap between loosely related items in a row. */
+--inline-md  /* Horizontal gap between items in a row, such as buttons in a ButtonGroup. */
+--inline-sm  /* Horizontal gap between an icon and its label inside a control. */
+--pad-x-lg  /* Horizontal padding inside a large control or a roomy row. */
+--pad-x-md  /* Horizontal padding inside a default control: a Button, a field, a menu item. */
+--pad-x-sm  /* Horizontal padding inside a compact control, such as a Button with compact spacing. */
+--pad-x-xs  /* Horizontal padding inside the tightest controls: a CountTag, StatusTag or DateTag. */
+--pad-y-lg  /* Vertical padding inside a large control or a roomy row. */
+--pad-y-md  /* Vertical padding inside a default control: a Button, a field, a menu item. */
+--pad-y-sm  /* Vertical padding inside a compact control, such as a compact Button or a Sidebar tab. */
+--radius-h24  /* Corner rounding for a control 24px high. */
+--radius-h32  /* Corner rounding for a control 32px high. */
+--radius-h40  /* Corner rounding for a control 40px high. */
+--radius-lg  /* Corner rounding for larger containers that are not a pattern, such as a tile or image. */
+--radius-md  /* Corner rounding for controls and small containers. */
+--radius-sm  /* Corner rounding for small marks: a checkbox, a focus ring, a small tag. */
+--screen-max-width  /* Widest the screen frame gets at the current breakpoint. */
+--screen-min-width  /* Narrowest the screen frame gets at the current breakpoint. */
+--screen-pad-x  /* Horizontal padding between the screen edge and the page content. */
+--screen-width  /* Width of the screen frame at the current breakpoint. */
+--stack-lg  /* Vertical gap between groups inside one control or component. */
+--stack-md  /* Vertical gap between items in a list or a group of fields. */
+--stack-sm  /* Vertical gap between tightly related items, such as a label and its control. */
 ```
 
 ## Ladder Patterns
 Space owned by a pattern: page, section, card, table, modal, drawer, popover. Inside a pattern, read its token before a semantics step.
 
 ```css
---blanket-fill
---blanket-max-height-modal
---blanket-pad-x
---blanket-pad-y
---card-pad-compact
---card-pad-default
---card-pad-spacious
---drawer-width-lg
---drawer-width-md
---drawer-width-sm
---frame-sidebar-group-gap
---frame-sidebar-pad
---frame-sidebar-row-gap
---frame-sidebar-row-radius
---frame-sidebar-width
---frame-sidebar-width-nav
---frame-topbar-height
---modal-body-min-height
---modal-pad-x-compact
---modal-pad-x-default
---modal-pad-x-spacious
---modal-pad-y-compact
---modal-pad-y-default
---modal-pad-y-spacious
---modal-width-lg
---modal-width-md
---modal-width-sm
---page-border-width
---page-pad-x-compact
---page-pad-x-default
---page-pad-x-spacious
---page-pad-y-compact
---page-pad-y-default
---page-pad-y-spacious
---page-radius-md
---panel-max-width
---panel-min-width
---panel-width-default
---section-pad-x-compact
---section-pad-x-default
---section-pad-x-spacious
---section-pad-y-compact
---section-pad-y-default
---section-pad-y-spacious
---section-radius
---table-overflow-reach
+--blanket-fill  /* Fill of the Blanket that dims the page behind a Modal. */
+--blanket-max-height-modal  /* Tallest a Modal may grow inside its Blanket. */
+--blanket-pad-x  /* Horizontal space between the screen edge and a Modal on its Blanket. */
+--blanket-pad-y  /* Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens. */
+--card-pad-compact  /* Padding inside a PatternCard with compact spacing. */
+--card-pad-default  /* Padding inside a PatternCard with default spacing. */
+--card-pad-spacious  /* Padding inside a PatternCard with spacious spacing. */
+--drawer-width-lg  /* Width of a wide PatternDrawer. */
+--drawer-width-md  /* Width of a default PatternDrawer. */
+--drawer-width-sm  /* Width of a narrow PatternDrawer. */
+--frame-sidebar-group-gap  /* Vertical gap between two groups of rows in the Sidebar. */
+--frame-sidebar-pad  /* Padding on every side inside the Sidebar. */
+--frame-sidebar-row-gap  /* Vertical gap between two rows in the Sidebar. */
+--frame-sidebar-row-radius  /* Corner rounding of a Sidebar row. */
+--frame-sidebar-width  /* Width of the Frame's Sidebar at the current breakpoint. */
+--frame-sidebar-width-nav  /* Fixed width of the side navigation inside the Frame. */
+--frame-topbar-height  /* Height of the Frame's top bar. */
+--modal-body-min-height  /* Minimum height of a Modal's body, so a short body does not collapse the dialog. */
+--modal-pad-x-compact  /* Horizontal padding of a Modal with compact spacing. */
+--modal-pad-x-default  /* Horizontal padding of a Modal with default spacing. */
+--modal-pad-x-spacious  /* Horizontal padding of a Modal with spacious spacing. */
+--modal-pad-y-compact  /* Vertical padding of a Modal with compact spacing. */
+--modal-pad-y-default  /* Vertical padding of a Modal with default spacing. */
+--modal-pad-y-spacious  /* Vertical padding of a Modal with spacious spacing. */
+--modal-width-lg  /* Width of a large Modal, such as a table or a long form. */
+--modal-width-md  /* Width of a default Modal, such as a short form. */
+--modal-width-sm  /* Width of a small Modal, such as a confirmation. */
+--page-border-width  /* Width of the edge drawn around a Page frame. */
+--page-pad-x-compact  /* Horizontal padding of a Page with compact spacing. */
+--page-pad-x-default  /* Horizontal padding of a Page with default spacing. */
+--page-pad-x-spacious  /* Horizontal padding of a Page with spacious spacing. */
+--page-pad-y-compact  /* Vertical padding of a Page with compact spacing. */
+--page-pad-y-default  /* Vertical padding of a Page with default spacing. */
+--page-pad-y-spacious  /* Vertical padding of a Page with spacious spacing. */
+--page-radius-md  /* Corner rounding of a Page frame. */
+--panel-max-width  /* Widest the Panel may be dragged. */
+--panel-min-width  /* Narrowest the Panel may be dragged. */
+--panel-width-default  /* Width the Panel opens at. */
+--section-pad-x-compact  /* Horizontal padding of a PatternSection with compact spacing. */
+--section-pad-x-default  /* Horizontal padding of a PatternSection with default spacing. */
+--section-pad-x-spacious  /* Horizontal padding of a PatternSection with spacious spacing. */
+--section-pad-y-compact  /* Vertical padding of a PatternSection with compact spacing. */
+--section-pad-y-default  /* Vertical padding of a PatternSection with default spacing. */
+--section-pad-y-spacious  /* Vertical padding of a PatternSection with spacious spacing. */
+--section-radius  /* Corner rounding of a PatternSection that has a fill. */
+--table-overflow-reach  /* How far a PatternTable lets a row's overflow, such as a focus ring, reach past its clip. */
 ```
 
 ## Ladder Components
 Tokens one component owns, named for it.
 
 ```css
---avatar-size-128
---avatar-size-96
---button-radius-compact
---button-radius-default
---button-vertical-size
---calendar-day-lg
---calendar-day-md
---calendar-day-sm
---calendar-nav-size
---carousel-control-offset
---carousel-control-pad
---carousel-control-size
---carousel-indicator-height
---carousel-indicator-height-compact
---carousel-indicator-height-spacious
---carousel-indicator-width
---carousel-indicator-width-compact
---carousel-slide-min-height
---carousel-slide-min-height-compact
---carousel-slide-min-height-spacious
---checkbox-control-size
---choice-grid-control-size-10
---choice-grid-control-size-12
---count-tag-dot-size
---flag-min-height
---flag-offset
---flag-pad
---join-row-width
---listbox-max-height
---listbox-max-width
---listbox-min-height
---menu-group-gap
---menu-group-item-pad-y
---menu-group-min-width
---menu-group-pad-x
---option-menu-width
---option-row-control-gap
---option-row-dot-size
---option-row-indent-step
---popup-pad
---progress-bar-height
---progress-indicator-dot-size-12
---progress-indicator-dot-size-8
---radio-control-size
---radio-control-size-10
---radio-control-size-14
---range-dot-size-12
---range-dot-size-16
---range-dot-size-8
---range-dot-size-default
---range-track-height-4
---range-track-height-6
---range-track-height-8
---scroll-bar-max-height
---scroll-bar-size
---skeleton-circle-size
---skeleton-height
---skeleton-status-width
---skeleton-status-width-spacious
---skeleton-tag-width
---skeleton-tag-width-narrow
---skeleton-tag-width-person
---skeleton-tag-width-widest
---skeleton-text-height
---spinner-size-lg
---spinner-size-md
---spinner-size-sm
---spotlight-media-height
---table-cell-max-width
---tag-dot-size
---tag-gap
---tag-gap-compact
---tag-pad-end
---tag-pad-end-compact
---toggle-pad
---toggle-track-height-16
---toggle-track-height-20
---toggle-track-width-16
---toggle-track-width-20
+--avatar-size-128  /* Size of the largest UserAvatar, such as on a profile page. */
+--avatar-size-96  /* Size of an extra-large UserAvatar, such as in a profile header. */
+--button-radius-compact  /* Corner rounding of a Button with compact spacing. */
+--button-radius-default  /* Corner rounding of a Button with default spacing. */
+--button-vertical-size  /* Height of a Button laid out vertically, with its icon above its label. */
+--calendar-day-lg  /* Size of a day cell in a large Calendar. */
+--calendar-day-md  /* Size of a day cell in a default Calendar. */
+--calendar-day-sm  /* Size of a day cell in a compact Calendar. */
+--calendar-nav-size  /* Size of the Calendar's previous and next month buttons. */
+--carousel-control-offset  /* Distance between a Carousel's previous and next controls and its edge. */
+--carousel-control-pad  /* Padding inside a Carousel's previous and next controls. */
+--carousel-control-size  /* Size of a Carousel's previous and next controls. */
+--carousel-indicator-height  /* Height of a Carousel's slide indicator with default spacing. */
+--carousel-indicator-height-compact  /* Height of a Carousel's slide indicator with compact spacing. */
+--carousel-indicator-height-spacious  /* Height of a Carousel's slide indicator with spacious spacing. */
+--carousel-indicator-width  /* Width of a Carousel's slide indicator with default spacing. */
+--carousel-indicator-width-compact  /* Width of a Carousel's slide indicator with compact spacing. */
+--carousel-slide-min-height  /* Minimum height of a Carousel slide with default spacing. */
+--carousel-slide-min-height-compact  /* Minimum height of a Carousel slide with compact spacing. */
+--carousel-slide-min-height-spacious  /* Minimum height of a Carousel slide with spacious spacing. */
+--checkbox-control-size  /* Size of the Checkbox box. */
+--choice-grid-control-size-10  /* Size of the control in a ChoiceGrid with size 12. */
+--choice-grid-control-size-12  /* Size of the control in a ChoiceGrid with size 14 or 16. */
+--count-tag-dot-size  /* Size of the dot in a CountTag. */
+--flag-min-height  /* Minimum height of a Flag. */
+--flag-offset  /* Distance between a Flag and the edge of the screen. */
+--flag-pad  /* Padding inside a Flag. */
+--join-row-width  /* Width of the Home page join row: the Join button with its session Select beside it. */
+--listbox-max-height  /* Tallest a Select or Cascader listbox may grow before it scrolls. */
+--listbox-max-width  /* Widest a Select or Cascader listbox may grow. */
+--listbox-min-height  /* Shortest a Select or Cascader listbox may be. */
+--menu-group-gap  /* Vertical gap between groups in a menu. */
+--menu-group-item-pad-y  /* Vertical padding of an item in a menu group. */
+--menu-group-min-width  /* Minimum width of a menu group. */
+--menu-group-pad-x  /* Horizontal padding of a menu group. */
+--option-menu-width  /* Width of a fixed-width option menu. */
+--option-row-control-gap  /* Horizontal gap between an option row's control and its label. */
+--option-row-dot-size  /* Size of the dot in an option row, such as a radio's selected mark. */
+--option-row-indent-step  /* Indent added for each level of a nested option row. */
+--popup-pad  /* Padding inside a Popup. */
+--progress-bar-height  /* Height of a ProgressBar track. */
+--progress-indicator-dot-size-12  /* Dot size of a ProgressIndicator with size 12. */
+--progress-indicator-dot-size-8  /* Dot size of a ProgressIndicator with size 8. */
+--radio-control-size  /* Size of the Radio circle. */
+--radio-control-size-10  /* Size of the circle in a RadioGroup with size 10. */
+--radio-control-size-14  /* Size of the circle in a RadioGroup with size 14. */
+--range-dot-size-12  /* Thumb size of a Range with size 12. */
+--range-dot-size-16  /* Thumb size of a Range with size 16. */
+--range-dot-size-8  /* Thumb size of a Range with size 8. */
+--range-dot-size-default  /* Thumb size of a Range with no size set. */
+--range-track-height-4  /* Track height of a Range with size 8 or no size set. */
+--range-track-height-6  /* Track height of a Range with size 12. */
+--range-track-height-8  /* Track height of a Range with size 16. */
+--scroll-bar-max-height  /* Maximum height of a scrolling area that shows a scroll bar. */
+--scroll-bar-size  /* Thickness of a scroll bar. */
+--skeleton-circle-size  /* Size of a round Skeleton, such as an avatar placeholder. */
+--skeleton-height  /* Height of a block Skeleton. */
+--skeleton-status-width  /* Width of a Skeleton standing in for a status tag. */
+--skeleton-status-width-spacious  /* Width of a Skeleton standing in for a status tag with spacious spacing. */
+--skeleton-tag-width  /* Width of a Skeleton standing in for a tag. */
+--skeleton-tag-width-narrow  /* Width of a Skeleton standing in for a short tag. */
+--skeleton-tag-width-person  /* Width of a Skeleton standing in for a person tag. */
+--skeleton-tag-width-widest  /* Width of a Skeleton standing in for the longest tag. */
+--skeleton-text-height  /* Height of a Skeleton standing in for one line of text. */
+--spinner-size-lg  /* Size of a large Spinner, such as one loading a whole section. */
+--spinner-size-md  /* Size of a default Spinner. */
+--spinner-size-sm  /* Size of a small Spinner, such as one inside a Button. */
+--spotlight-media-height  /* Height of the media area in a Spotlight. */
+--table-cell-max-width  /* Maximum width of a table cell before its text truncates. */
+--tag-dot-size  /* Size of the dot in a Tag. */
+--tag-gap  /* Horizontal gap between a Tag's parts with default spacing. */
+--tag-gap-compact  /* Horizontal gap between a Tag's parts with compact spacing. */
+--tag-pad-end  /* Padding at the end of a Tag with default spacing. */
+--tag-pad-end-compact  /* Padding at the end of a Tag with compact spacing. */
+--toggle-pad  /* Gap between a Toggle's track and its knob, at both sizes. */
+--toggle-track-height-16  /* Track height of a Toggle with size 16. */
+--toggle-track-height-20  /* Track height of a Toggle with size 20. */
+--toggle-track-width-16  /* Track width of a Toggle with size 16. */
+--toggle-track-width-20  /* Track width of a Toggle with size 20. */
 ```
 
 ## Layers
 Stacking order: `z-index: var(--layer-modal)`.
 
 ```css
---layer-blanket
---layer-card
---layer-dialog
---layer-flag
---layer-modal
---layer-navigation
---layer-popup
---layer-spotlight
---layer-tooltip
+--layer-blanket  /* Stacking order of the Blanket behind a Modal. */
+--layer-card  /* Stacking order of a card raised above page content, such as a sticky table part. */
+--layer-dialog  /* Stacking order of a non-modal dialog over the page, below popups. */
+--layer-flag  /* Stacking order of a Flag, above any Modal. */
+--layer-modal  /* Stacking order of a Modal, above its Blanket. */
+--layer-navigation  /* Stacking order of the Frame's top bar and Sidebar. */
+--layer-popup  /* Stacking order of a Popup, DropdownMenu or listbox. */
+--layer-spotlight  /* Stacking order of a Spotlight, above Flags. */
+--layer-tooltip  /* Stacking order of a Tooltip, above everything else. */
 ```
 
 ## Motion
@@ -300,16 +302,16 @@ Use for padding, margin, and gaps.
 The new Size, Element and Border scales (spacing / foundations), beside the spacing semantics above until every use moves.
 
 ```css
---border-default
---border-focused
---border-selected
---field-min-height-lg
---field-min-height-sm
---field-width-lg
---field-width-md
---field-width-sm
---field-width-xl
---field-width-xs
+--border-default  /* Width of an ordinary border or divider line. */
+--border-focused  /* Width of the border on a field that has focus. */
+--border-selected  /* Width of the border that marks a selected item. */
+--field-min-height-lg  /* Shortest a multi-line field may be by default, such as a TextArea. */
+--field-min-height-sm  /* Shortest a multi-line field may be in its compact form. */
+--field-width-lg  /* Width of a field for a long value, such as an email address. */
+--field-width-md  /* Width of a field for a typical value, such as a name. */
+--field-width-sm  /* Width of a field for a short value, such as a date. */
+--field-width-xl  /* Width of a field for the longest single-line values. */
+--field-width-xs  /* Width of a field for a very short value, such as a number or a time. */
 --height-100
 --height-125
 --height-150
@@ -319,23 +321,23 @@ The new Size, Element and Border scales (spacing / foundations), beside the spac
 --height-300
 --height-500
 --height-750
---icon-lg
---icon-md
---icon-sm
---image-lg
---image-md
---image-sm
---image-xl
---image-xs
---image-xxs
---item-height-md
---item-height-sm
---label-height-md
---label-height-sm
---label-max-width
---row-height-lg
---row-height-md
---row-height-sm
+--icon-lg  /* Size of a large icon, such as one in an EmptyState or a Tile. */
+--icon-md  /* Size of a default icon beside body text or in a control. */
+--icon-sm  /* Size of a small icon, such as one inside a compact control. */
+--image-lg  /* Size of a large image or avatar, such as one in a profile header. */
+--image-md  /* Size of a default image or avatar. */
+--image-sm  /* Size of a small image or avatar, such as one in a list row. */
+--image-xl  /* Size of the largest image or avatar, such as an Illustration. */
+--image-xs  /* Size of an extra-small image or avatar, such as one in a dense row. */
+--image-xxs  /* Size of the smallest image or avatar, such as one inline with text. */
+--item-height-md  /* Height of a default control or item: a Button, a field, a menu item. */
+--item-height-sm  /* Height of a compact control or item: a compact Button, a menu item. */
+--label-height-md  /* Height of a default label row, such as a tag. */
+--label-height-sm  /* Height of a compact label row, such as a small tag. */
+--label-max-width  /* Widest a single-line label may grow before it truncates. */
+--row-height-lg  /* Height of a roomy table or list row. */
+--row-height-md  /* Height of a default table or list row. */
+--row-height-sm  /* Height of a compact table or list row. */
 --width-1000
 --width-1400
 --width-1500
@@ -350,34 +352,34 @@ The new Size, Element and Border scales (spacing / foundations), beside the spac
 The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, section, card, table, overlay, modal, popover. These sit beside the spacing semantics above while uses move to them.
 
 ```css
---card-inline-lg
---card-inline-md
---card-inline-sm
---card-max-height-lg
---card-max-height-md
---card-max-height-sm
---card-min-width-lg
---card-min-width-md
---card-min-width-sm
---card-radius
---card-radius-sm
---card-stack-lg
---card-stack-md
---card-stack-sm
---drawer-inline-lg
---drawer-inline-md
---drawer-inline-sm
---drawer-pad
---drawer-stack-lg
---drawer-stack-md
---drawer-stack-sm
---focused-page-inline-md
---focused-page-inline-sm
---focused-page-pad-x
---focused-page-pad-y
---focused-page-stack-lg
---focused-page-stack-md
---focused-page-stack-sm
+--card-inline-lg  /* Horizontal gap between columns inside a PatternCard. */
+--card-inline-md  /* Horizontal gap between items in a PatternCard row, such as actions. */
+--card-inline-sm  /* Horizontal gap between small items in a PatternCard row, such as tags. */
+--card-max-height-lg  /* Tallest a tall scrolling PatternCard may grow. */
+--card-max-height-md  /* Tallest a default scrolling PatternCard may grow. */
+--card-max-height-sm  /* Tallest a short scrolling PatternCard may grow. */
+--card-min-width-lg  /* Narrowest a large PatternCard may shrink in a grid. */
+--card-min-width-md  /* Narrowest a default PatternCard may shrink in a grid. */
+--card-min-width-sm  /* Narrowest a small PatternCard may shrink in a grid. */
+--card-radius  /* Corner rounding of a PatternCard. */
+--card-radius-sm  /* Corner rounding of a small PatternCard or a card nested in another container. */
+--card-stack-lg  /* Vertical gap between a PatternCard's header, body and footer. */
+--card-stack-md  /* Vertical gap between blocks in a PatternCard. */
+--card-stack-sm  /* Vertical gap between tightly related lines in a PatternCard, such as a title and its meta. */
+--drawer-inline-lg  /* Horizontal gap between columns in a PatternDrawer. */
+--drawer-inline-md  /* Horizontal gap between the actions in a PatternDrawer footer. */
+--drawer-inline-sm  /* Horizontal gap between small items in a PatternDrawer row. */
+--drawer-pad  /* Padding inside a PatternDrawer. */
+--drawer-stack-lg  /* Vertical gap between a PatternDrawer's header, body and footer. */
+--drawer-stack-md  /* Vertical gap between blocks in a PatternDrawer's body. */
+--drawer-stack-sm  /* Vertical gap between a PatternDrawer's title and its description. */
+--focused-page-inline-md  /* Horizontal gap between the actions on a focused page. */
+--focused-page-inline-sm  /* Horizontal gap between small items in a focused page row. */
+--focused-page-pad-x  /* Horizontal padding of a focused page: a single task with no Sidebar, such as a wizard step. */
+--focused-page-pad-y  /* Vertical padding of a focused page. */
+--focused-page-stack-lg  /* Vertical gap between a focused page's header, body and actions. */
+--focused-page-stack-md  /* Vertical gap between blocks on a focused page. */
+--focused-page-stack-sm  /* Vertical gap between a focused page's title and its description. */
 --frame-layer-blanket
 --frame-layer-docked-edge
 --frame-layer-edge
@@ -385,51 +387,51 @@ The page frame (`--layout-*`, per breakpoint) and the patterns on it: surface, s
 --frame-layer-sidebar
 --frame-layer-splitter
 --frame-layer-topbar-start
---modal-inline-lg
---modal-inline-md
---modal-inline-sm
---modal-pad
---modal-radius
---modal-stack-lg
---modal-stack-md
---modal-stack-sm
---page-pad
---page-radius
---page-stack-lg
---page-stack-md
---page-stack-sm
---popover-gap-screen
---popover-max-height-menu
---popover-max-width-menu
---popover-max-width-tooltip
---popover-min-width-menu
---popover-offset
---popover-pad
---popover-pad-menu
---popover-pad-y-tooltip
---popover-radius
---popover-radius-menu-md
---popover-radius-menu-sm
---popover-radius-tooltip
---popover-stack-flag
---popover-width-flag
---popover-width-lg
---popover-width-md
---popover-width-sm
---section-min-width-main
---section-min-width-side
---section-stack-lg
---section-stack-md
---section-stack-sm
---table-indent
---table-min-width-title
---table-pad-x-cell
---table-pad-x-footer
---table-pad-y-cell
---table-radius
---table-stack
---tile-radius-lg
---tile-radius-sm
+--modal-inline-lg  /* Horizontal gap between columns in a Modal. */
+--modal-inline-md  /* Horizontal gap between the actions in a Modal footer. */
+--modal-inline-sm  /* Horizontal gap between small items in a Modal row. */
+--modal-pad  /* Padding inside a Modal at the current breakpoint. */
+--modal-radius  /* Corner rounding of a Modal. */
+--modal-stack-lg  /* Vertical gap between a Modal's header, body and footer. */
+--modal-stack-md  /* Vertical gap between blocks in a Modal's body. */
+--modal-stack-sm  /* Vertical gap between a Modal's title and its description. */
+--page-pad  /* Padding around a Page's content at the current breakpoint. */
+--page-radius  /* Corner rounding of a Page inside the Frame. */
+--page-stack-lg  /* Vertical gap between major regions of a Page. */
+--page-stack-md  /* Vertical gap between sections on a Page. */
+--page-stack-sm  /* Vertical gap between closely related blocks on a Page, such as a header and its subtitle. */
+--popover-gap-screen  /* Space a floating layer keeps from the screen edge, such as a Flag or a listbox. */
+--popover-max-height-menu  /* Tallest a DropdownMenu or listbox may grow before it scrolls. */
+--popover-max-width-menu  /* Widest a DropdownMenu or listbox may grow. */
+--popover-max-width-tooltip  /* Widest a Tooltip may grow before its text wraps. */
+--popover-min-width-menu  /* Narrowest a DropdownMenu or listbox may shrink. */
+--popover-offset  /* Gap between a Popup, menu or Tooltip and the element that opened it. */
+--popover-pad  /* Padding inside a Popup. */
+--popover-pad-menu  /* Padding inside a DropdownMenu or listbox. */
+--popover-pad-y-tooltip  /* Vertical padding inside a Tooltip. */
+--popover-radius  /* Corner rounding of a Popup. */
+--popover-radius-menu-md  /* Corner rounding of a default DropdownMenu. */
+--popover-radius-menu-sm  /* Corner rounding of a compact DropdownMenu. */
+--popover-radius-tooltip  /* Corner rounding of a Tooltip. */
+--popover-stack-flag  /* Vertical gap between stacked Flags. */
+--popover-width-flag  /* Width of a Flag. */
+--popover-width-lg  /* Width of a large Popup. */
+--popover-width-md  /* Width of a default Popup. */
+--popover-width-sm  /* Width of a small Popup. */
+--section-min-width-main  /* Narrowest the main column of a two-column PatternSection may shrink. */
+--section-min-width-side  /* Narrowest the side column of a two-column PatternSection may shrink. */
+--section-stack-lg  /* Vertical gap between groups of blocks inside a PatternSection. */
+--section-stack-md  /* Vertical gap between blocks inside a PatternSection. */
+--section-stack-sm  /* Vertical gap between a section header and its content. */
+--table-indent  /* Indent of each nested level in a tree table. */
+--table-min-width-title  /* Narrowest a PatternTable's title column may shrink. */
+--table-pad-x-cell  /* Horizontal padding inside a PatternTable cell. */
+--table-pad-x-footer  /* Horizontal padding of a PatternTable footer, such as its Pagination row. */
+--table-pad-y-cell  /* Vertical padding inside a PatternTable cell. */
+--table-radius  /* Corner rounding of a PatternTable. */
+--table-stack  /* Vertical gap between a PatternTable and its toolbar or footer. */
+--tile-radius-lg  /* Corner rounding of a large Tile. */
+--tile-radius-sm  /* Corner rounding of a small Tile. */
 ```
 
 ## Type Scale
@@ -623,555 +625,555 @@ Use for font sizes, weights, and line heights.
 The Atlassian-shaped color set, generated from a plan into `design-system/src/tokens/color/` with a value per mode (light, dark, and each with increased contrast). Name a token `color.property.role.emphasis.state` without `color.`: `var(--ds-background-brand-bold)`, `var(--ds-text-subtle)`, `var(--ds-border-focused)`. Never write one with a fallback (`check:ds-fallbacks`).
 
 ```css
---ds-ai-background-bold
---ds-ai-background-bold-hovered
---ds-ai-background-bold-pressed
---ds-background-accent-blue-bolder
+--ds-ai-background-bold  /* Ground of the one primary AI action in a region (Button, AI appearance). Pair its label with --ds-text-inverse. */
+--ds-ai-background-bold-hovered  /* Hovered ground of an AI action. */
+--ds-ai-background-bold-pressed  /* Pressed ground of an AI action. */
+--ds-background-accent-blue-bolder  /* Blue backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements */
 --ds-background-accent-blue-bolder-hovered
 --ds-background-accent-blue-bolder-pressed
---ds-background-accent-blue-subtle
+--ds-background-accent-blue-subtle  /* Vibrant blue backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-blue-subtle-hovered
 --ds-background-accent-blue-subtle-pressed
---ds-background-accent-blue-subtler
+--ds-background-accent-blue-subtler  /* Blue backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-blue-subtler-hovered
 --ds-background-accent-blue-subtler-pressed
---ds-background-accent-blue-subtlest
+--ds-background-accent-blue-subtlest  /* Blue backgrounds when there is no meaning tied to the color. Reserved for when you only want a hint of color */
 --ds-background-accent-blue-subtlest-hovered
 --ds-background-accent-blue-subtlest-pressed
---ds-background-accent-brown-bolder
+--ds-background-accent-brown-bolder  /* Brown backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements */
 --ds-background-accent-brown-bolder-hovered
 --ds-background-accent-brown-bolder-pressed
---ds-background-accent-brown-subtle
+--ds-background-accent-brown-subtle  /* Vibrant brown backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-brown-subtle-hovered
 --ds-background-accent-brown-subtle-pressed
---ds-background-accent-brown-subtler
+--ds-background-accent-brown-subtler  /* Brown backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-brown-subtler-hovered
 --ds-background-accent-brown-subtler-pressed
---ds-background-accent-brown-subtlest
+--ds-background-accent-brown-subtlest  /* Brown backgrounds when there is no meaning tied to the color. Reserved for when you only want a hint of color */
 --ds-background-accent-brown-subtlest-hovered
 --ds-background-accent-brown-subtlest-pressed
---ds-background-accent-gray-bolder
+--ds-background-accent-gray-bolder  /* Gray backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements */
 --ds-background-accent-gray-bolder-hovered
 --ds-background-accent-gray-bolder-pressed
---ds-background-accent-gray-subtle
+--ds-background-accent-gray-subtle  /* Vibrant gray backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-gray-subtle-hovered
 --ds-background-accent-gray-subtle-pressed
---ds-background-accent-gray-subtler
+--ds-background-accent-gray-subtler  /* Gray backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-gray-subtler-hovered
 --ds-background-accent-gray-subtler-pressed
---ds-background-accent-gray-subtlest
+--ds-background-accent-gray-subtlest  /* Gray backgrounds when there is no meaning tied to the color. Reserved for when you only want a hint of color */
 --ds-background-accent-gray-subtlest-hovered
 --ds-background-accent-gray-subtlest-pressed
---ds-background-accent-green-bolder
+--ds-background-accent-green-bolder  /* Green backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements */
 --ds-background-accent-green-bolder-hovered
 --ds-background-accent-green-bolder-pressed
---ds-background-accent-green-subtle
+--ds-background-accent-green-subtle  /* Vibrant green backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-green-subtle-hovered
 --ds-background-accent-green-subtle-pressed
---ds-background-accent-green-subtler
+--ds-background-accent-green-subtler  /* Green backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-green-subtler-hovered
 --ds-background-accent-green-subtler-pressed
---ds-background-accent-green-subtlest
+--ds-background-accent-green-subtlest  /* Green backgrounds when there is no meaning tied to the color. Reserved for when you only want a hint of color */
 --ds-background-accent-green-subtlest-hovered
 --ds-background-accent-green-subtlest-pressed
---ds-background-accent-lime-bolder
+--ds-background-accent-lime-bolder  /* Backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements */
 --ds-background-accent-lime-bolder-hovered
 --ds-background-accent-lime-bolder-pressed
---ds-background-accent-lime-subtle
+--ds-background-accent-lime-subtle  /* Vibrant backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-lime-subtle-hovered
 --ds-background-accent-lime-subtle-pressed
---ds-background-accent-lime-subtler
+--ds-background-accent-lime-subtler  /* Backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-lime-subtler-hovered
 --ds-background-accent-lime-subtler-pressed
---ds-background-accent-lime-subtlest
+--ds-background-accent-lime-subtlest  /* Backgrounds when there is no meaning tied to the color. Reserved for when you only want a hint of color */
 --ds-background-accent-lime-subtlest-hovered
 --ds-background-accent-lime-subtlest-pressed
---ds-background-accent-magenta-bolder
+--ds-background-accent-magenta-bolder  /* Magenta backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements */
 --ds-background-accent-magenta-bolder-hovered
 --ds-background-accent-magenta-bolder-pressed
---ds-background-accent-magenta-subtle
+--ds-background-accent-magenta-subtle  /* Vibrant magenta backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-magenta-subtle-hovered
 --ds-background-accent-magenta-subtle-pressed
---ds-background-accent-magenta-subtler
+--ds-background-accent-magenta-subtler  /* Magenta backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-magenta-subtler-hovered
 --ds-background-accent-magenta-subtler-pressed
---ds-background-accent-magenta-subtlest
+--ds-background-accent-magenta-subtlest  /* Magenta backgrounds when there is no meaning tied to the color. Reserved for when you only want a hint of color */
 --ds-background-accent-magenta-subtlest-hovered
 --ds-background-accent-magenta-subtlest-pressed
---ds-background-accent-orange-bolder
+--ds-background-accent-orange-bolder  /* Orange backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements */
 --ds-background-accent-orange-bolder-hovered
 --ds-background-accent-orange-bolder-pressed
---ds-background-accent-orange-subtle
+--ds-background-accent-orange-subtle  /* Vibrant orange backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-orange-subtle-hovered
 --ds-background-accent-orange-subtle-pressed
---ds-background-accent-orange-subtler
+--ds-background-accent-orange-subtler  /* Orange backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-orange-subtler-hovered
 --ds-background-accent-orange-subtler-pressed
---ds-background-accent-orange-subtlest
+--ds-background-accent-orange-subtlest  /* Orange backgrounds when there is no meaning tied to the color. Reserved for when you only want a hint of color */
 --ds-background-accent-orange-subtlest-hovered
 --ds-background-accent-orange-subtlest-pressed
---ds-background-accent-purple-bolder
+--ds-background-accent-purple-bolder  /* Purple backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements */
 --ds-background-accent-purple-bolder-hovered
 --ds-background-accent-purple-bolder-pressed
---ds-background-accent-purple-subtle
+--ds-background-accent-purple-subtle  /* Vibrant purple backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-purple-subtle-hovered
 --ds-background-accent-purple-subtle-pressed
---ds-background-accent-purple-subtler
+--ds-background-accent-purple-subtler  /* Purple backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-purple-subtler-hovered
 --ds-background-accent-purple-subtler-pressed
---ds-background-accent-purple-subtlest
+--ds-background-accent-purple-subtlest  /* Purple backgrounds when there is no meaning tied to the color. Reserved for when you only want a hint of color */
 --ds-background-accent-purple-subtlest-hovered
 --ds-background-accent-purple-subtlest-pressed
---ds-background-accent-red-bolder
+--ds-background-accent-red-bolder  /* Red backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements */
 --ds-background-accent-red-bolder-hovered
 --ds-background-accent-red-bolder-pressed
---ds-background-accent-red-subtle
+--ds-background-accent-red-subtle  /* Vibrant red backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-red-subtle-hovered
 --ds-background-accent-red-subtle-pressed
---ds-background-accent-red-subtler
+--ds-background-accent-red-subtler  /* Red backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-red-subtler-hovered
 --ds-background-accent-red-subtler-pressed
---ds-background-accent-red-subtlest
+--ds-background-accent-red-subtlest  /* Red backgrounds when there is no meaning tied to the color. Reserved for when you only want a hint of color */
 --ds-background-accent-red-subtlest-hovered
 --ds-background-accent-red-subtlest-pressed
---ds-background-accent-teal-bolder
+--ds-background-accent-teal-bolder  /* Teal backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements */
 --ds-background-accent-teal-bolder-hovered
 --ds-background-accent-teal-bolder-pressed
---ds-background-accent-teal-subtle
+--ds-background-accent-teal-subtle  /* Vibrant teal backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-teal-subtle-hovered
 --ds-background-accent-teal-subtle-pressed
---ds-background-accent-teal-subtler
+--ds-background-accent-teal-subtler  /* Teal backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-teal-subtler-hovered
 --ds-background-accent-teal-subtler-pressed
---ds-background-accent-teal-subtlest
+--ds-background-accent-teal-subtlest  /* Teal backgrounds when there is no meaning tied to the color. Reserved for when you only want a hint of color */
 --ds-background-accent-teal-subtlest-hovered
 --ds-background-accent-teal-subtlest-pressed
---ds-background-accent-yellow-bolder
+--ds-background-accent-yellow-bolder  /* Yellow backgrounds when there is no meaning tied to the color, and the background needs to pass min 3:1 contrast requirements */
 --ds-background-accent-yellow-bolder-hovered
 --ds-background-accent-yellow-bolder-pressed
---ds-background-accent-yellow-subtle
+--ds-background-accent-yellow-subtle  /* Vibrant yellow backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-yellow-subtle-hovered
 --ds-background-accent-yellow-subtle-pressed
---ds-background-accent-yellow-subtler
+--ds-background-accent-yellow-subtler  /* Yellow backgrounds when there is no meaning tied to the color, such as colored tags */
 --ds-background-accent-yellow-subtler-hovered
 --ds-background-accent-yellow-subtler-pressed
---ds-background-accent-yellow-subtlest
+--ds-background-accent-yellow-subtlest  /* Yellow backgrounds when there is no meaning tied to the color. Reserved for when you only want a hint of color */
 --ds-background-accent-yellow-subtlest-hovered
 --ds-background-accent-yellow-subtlest-pressed
---ds-background-brand-bold
+--ds-background-brand-bold  /* The background of elements used to reinforce our brand, but with more emphasis */
 --ds-background-brand-bold-hovered
 --ds-background-brand-bold-pressed
---ds-background-brand-boldest
+--ds-background-brand-boldest  /* The background of elements used to reinforce our brand, that need to stand out a lot */
 --ds-background-brand-boldest-hovered
 --ds-background-brand-boldest-pressed
---ds-background-brand-subtlest
+--ds-background-brand-subtlest  /* The background of elements used to reinforce our brand, but with less emphasis */
 --ds-background-brand-subtlest-hovered
 --ds-background-brand-subtlest-pressed
---ds-background-code-added-highlight
---ds-background-code-added-line
---ds-background-code-default
---ds-background-code-gutter
---ds-background-code-highlight
---ds-background-code-removed-highlight
---ds-background-code-removed-line
---ds-background-danger
---ds-background-danger-bold
+--ds-background-code-added-highlight  /* Highlighted added code lines */
+--ds-background-code-added-line  /* Added code lines */
+--ds-background-code-default  /* The default background of code blocks and code diffs */
+--ds-background-code-gutter  /* The background of code gutters */
+--ds-background-code-highlight  /* Highlighted unchanged code lines */
+--ds-background-code-removed-highlight  /* Highlighted removed code lines */
+--ds-background-code-removed-line  /* Removed code lines */
+--ds-background-danger  /* Backgrounds communicating critical information, such as in error section messages */
+--ds-background-danger-bold  /* A vibrant background option for communicating critical information, such as in danger buttons and error banners */
 --ds-background-danger-bold-hovered
 --ds-background-danger-bold-pressed
 --ds-background-danger-hovered
 --ds-background-danger-pressed
---ds-background-danger-subtle
---ds-background-danger-subtler
+--ds-background-danger-subtle  /* Background color for non-interactive elements communicating critical danger information (e.g. a StatusTag or CountTag). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see --ds-background-danger-bold or --ds-background-danger-subtler for interactive states */
+--ds-background-danger-subtler  /* Backgrounds of danger status tags and count tags to ensure accessibility and desired visual appearance */
 --ds-background-danger-subtler-hovered
 --ds-background-danger-subtler-pressed
---ds-background-disabled
---ds-background-discovery
---ds-background-discovery-bold
+--ds-background-disabled  /* Backgrounds of elements in a disabled state */
+--ds-background-discovery  /* Backgrounds communicating change or something new, such as in discovery section messages */
+--ds-background-discovery-bold  /* A vibrant background option communicating change or something new, such as in onboarding spotlights */
 --ds-background-discovery-bold-hovered
 --ds-background-discovery-bold-pressed
 --ds-background-discovery-hovered
 --ds-background-discovery-pressed
---ds-background-discovery-subtle
---ds-background-discovery-subtler
+--ds-background-discovery-subtle  /* Background color for non-interactive elements communicating discovery (e.g. a StatusTag or CountTag). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see --ds-background-discovery-bold or --ds-background-discovery-subtler for interactive states */
+--ds-background-discovery-subtler  /* Backgrounds of discovery status tags and count tags to ensure accessibility and desired visual appearance */
 --ds-background-discovery-subtler-hovered
 --ds-background-discovery-subtler-pressed
---ds-background-information
---ds-background-information-bold
+--ds-background-information  /* Backgrounds communicating information or something in-progress, such as in information section messages */
+--ds-background-information-bold  /* A vibrant background option for communicating information or something in-progress */
 --ds-background-information-bold-hovered
 --ds-background-information-bold-pressed
 --ds-background-information-hovered
 --ds-background-information-pressed
---ds-background-information-subtle
---ds-background-information-subtler
+--ds-background-information-subtle  /* Background color for non-interactive elements communicating information (e.g. a StatusTag or CountTag). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see --ds-background-information-bold or --ds-background-information-subtler for interactive states */
+--ds-background-information-subtler  /* Backgrounds of information status tags and count tags to ensure accessibility and desired visual appearance */
 --ds-background-information-subtler-hovered
 --ds-background-information-subtler-pressed
---ds-background-input
+--ds-background-input  /* Background of form UI elements, such as text fields, checkboxes, and radio buttons */
 --ds-background-input-hovered
 --ds-background-input-pressed
---ds-background-inverse-subtle
+--ds-background-inverse-subtle  /* Backgrounds of elements on a bold background, such as in the buttons on spotlight cards */
 --ds-background-inverse-subtle-hovered
 --ds-background-inverse-subtle-pressed
---ds-background-neutral
---ds-background-neutral-bold
+--ds-background-neutral  /* The default background for neutral elements, such as default buttons */
+--ds-background-neutral-bold  /* A vibrant background option for neutral UI elements, such as announcement banners */
 --ds-background-neutral-bold-hovered
 --ds-background-neutral-bold-pressed
 --ds-background-neutral-hovered
 --ds-background-neutral-pressed
---ds-background-neutral-subtle
+--ds-background-neutral-subtle  /* The background of elements that appear to have no background in a resting state, such as subtle buttons and menu items */
 --ds-background-neutral-subtle-hovered
 --ds-background-neutral-subtle-pressed
---ds-background-selected
---ds-background-selected-bold
---ds-background-selected-bold-hovered
---ds-background-selected-bold-pressed
---ds-background-selected-hovered
---ds-background-selected-pressed
---ds-background-smart-advocacy
---ds-background-smart-advocacy-bold
---ds-background-smart-advocacy-bold-hovered
---ds-background-smart-advocacy-bold-pressed
---ds-background-smart-advocacy-hovered
---ds-background-smart-advocacy-pressed
---ds-background-smart-advocacy-subtle
---ds-background-smart-mastering-content
---ds-background-smart-mastering-content-bold
---ds-background-smart-mastering-content-bold-hovered
---ds-background-smart-mastering-content-bold-pressed
---ds-background-smart-mastering-content-hovered
---ds-background-smart-mastering-content-pressed
---ds-background-smart-mastering-content-subtle
---ds-background-smart-relationship
---ds-background-smart-relationship-bold
---ds-background-smart-relationship-bold-hovered
---ds-background-smart-relationship-bold-pressed
---ds-background-smart-relationship-hovered
---ds-background-smart-relationship-pressed
---ds-background-smart-relationship-subtle
---ds-background-smart-social-emotional
---ds-background-smart-social-emotional-bold
---ds-background-smart-social-emotional-bold-hovered
---ds-background-smart-social-emotional-bold-pressed
---ds-background-smart-social-emotional-hovered
---ds-background-smart-social-emotional-pressed
---ds-background-smart-social-emotional-subtle
---ds-background-smart-technology-tools
---ds-background-smart-technology-tools-bold
---ds-background-smart-technology-tools-bold-hovered
---ds-background-smart-technology-tools-bold-pressed
---ds-background-smart-technology-tools-hovered
---ds-background-smart-technology-tools-pressed
---ds-background-smart-technology-tools-subtle
---ds-background-success
---ds-background-success-bold
+--ds-background-selected  /* The background of an element that communicates selection, such as a selected navigation item, or the opened state of a dropdown trigger. Use --ds-background-selected-hovered or --ds-background-selected-pressed when interacting with a selected element. Selection is distinct from keyboard focus and hover alone */
+--ds-background-selected-bold  /* The bold background of selected controls, such as checked checkboxes and selected radio buttons. Pair with --ds-text-inverse or --ds-icon-inverse for foreground content. Do not use for primary actions or keyboard focus alone */
+--ds-background-selected-bold-hovered  /* The background of a selected control that uses --ds-background-selected-bold while it is hovered, such as a checked checkbox. Pair with --ds-text-inverse or --ds-icon-inverse for foreground content. Do not use for an unselected control or keyboard focus alone */
+--ds-background-selected-bold-pressed  /* The background of a selected control that uses --ds-background-selected-bold while it is being pressed, such as a checked checkbox. Pair with --ds-text-inverse or --ds-icon-inverse for foreground content. Do not use for an unselected control or keyboard focus alone */
+--ds-background-selected-hovered  /* The background of an element that is selected and hovered. This preserves selection while showing pointer hover; do not use for an unselected element or keyboard focus alone */
+--ds-background-selected-pressed  /* The background of an element that is selected and being pressed. Return to --ds-background-selected or --ds-background-selected-hovered when the press ends and the element remains selected. Do not use for an unselected element or keyboard focus alone */
+--ds-background-smart-advocacy  /* Subject tag fill. Aliases the lime accent. */
+--ds-background-smart-advocacy-bold  /* Bold subject fill (art, a filled tag). Aliases the lime accent. */
+--ds-background-smart-advocacy-bold-hovered  /* Hovered bold subject fill. Aliases the lime accent. */
+--ds-background-smart-advocacy-bold-pressed  /* Pressed bold subject fill. Aliases the lime accent. */
+--ds-background-smart-advocacy-hovered  /* Hovered subject tag. Aliases the lime accent. */
+--ds-background-smart-advocacy-pressed  /* Pressed subject tag. Aliases the lime accent. */
+--ds-background-smart-advocacy-subtle  /* Illustration bodies and other mid-strength SMART fills. Aliases the lime accent. */
+--ds-background-smart-mastering-content  /* Subject tag fill. Aliases the teal accent. */
+--ds-background-smart-mastering-content-bold  /* Bold subject fill (art, a filled tag). Aliases the teal accent. */
+--ds-background-smart-mastering-content-bold-hovered  /* Hovered bold subject fill. Aliases the teal accent. */
+--ds-background-smart-mastering-content-bold-pressed  /* Pressed bold subject fill. Aliases the teal accent. */
+--ds-background-smart-mastering-content-hovered  /* Hovered subject tag. Aliases the teal accent. */
+--ds-background-smart-mastering-content-pressed  /* Pressed subject tag. Aliases the teal accent. */
+--ds-background-smart-mastering-content-subtle  /* Illustration bodies and other mid-strength SMART fills. Aliases the teal accent. */
+--ds-background-smart-relationship  /* Subject tag fill. Aliases the magenta accent. */
+--ds-background-smart-relationship-bold  /* Bold subject fill (art, a filled tag). Aliases the magenta accent. */
+--ds-background-smart-relationship-bold-hovered  /* Hovered bold subject fill. Aliases the magenta accent. */
+--ds-background-smart-relationship-bold-pressed  /* Pressed bold subject fill. Aliases the magenta accent. */
+--ds-background-smart-relationship-hovered  /* Hovered subject tag. Aliases the magenta accent. */
+--ds-background-smart-relationship-pressed  /* Pressed subject tag. Aliases the magenta accent. */
+--ds-background-smart-relationship-subtle  /* Illustration bodies and other mid-strength SMART fills. Aliases the magenta accent. */
+--ds-background-smart-social-emotional  /* Subject tag fill. Aliases the orange accent. */
+--ds-background-smart-social-emotional-bold  /* Bold subject fill (art, a filled tag). Aliases the orange accent. */
+--ds-background-smart-social-emotional-bold-hovered  /* Hovered bold subject fill. Aliases the orange accent. */
+--ds-background-smart-social-emotional-bold-pressed  /* Pressed bold subject fill. Aliases the orange accent. */
+--ds-background-smart-social-emotional-hovered  /* Hovered subject tag. Aliases the orange accent. */
+--ds-background-smart-social-emotional-pressed  /* Pressed subject tag. Aliases the orange accent. */
+--ds-background-smart-social-emotional-subtle  /* Illustration bodies and other mid-strength SMART fills. Aliases the orange accent. */
+--ds-background-smart-technology-tools  /* Subject tag fill. Aliases the brown accent. */
+--ds-background-smart-technology-tools-bold  /* Bold subject fill (art, a filled tag). Aliases the brown accent. */
+--ds-background-smart-technology-tools-bold-hovered  /* Hovered bold subject fill. Aliases the brown accent. */
+--ds-background-smart-technology-tools-bold-pressed  /* Pressed bold subject fill. Aliases the brown accent. */
+--ds-background-smart-technology-tools-hovered  /* Hovered subject tag. Aliases the brown accent. */
+--ds-background-smart-technology-tools-pressed  /* Pressed subject tag. Aliases the brown accent. */
+--ds-background-smart-technology-tools-subtle  /* Illustration bodies and other mid-strength SMART fills. Aliases the brown accent. */
+--ds-background-success  /* Backgrounds communicating a favorable outcome, such as in success section messages */
+--ds-background-success-bold  /* A vibrant background option for communicating a favorable outcome, such as in checked toggles */
 --ds-background-success-bold-hovered
 --ds-background-success-bold-pressed
 --ds-background-success-hovered
 --ds-background-success-pressed
---ds-background-success-subtle
---ds-background-success-subtler
+--ds-background-success-subtle  /* Background color for non-interactive elements communicating success (e.g. a StatusTag or CountTag). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see --ds-background-success-bold or --ds-background-success-subtler for interactive states */
+--ds-background-success-subtler  /* Backgrounds of success status tags and count tags to ensure accessibility and desired visual appearance */
 --ds-background-success-subtler-hovered
 --ds-background-success-subtler-pressed
---ds-background-warning
---ds-background-warning-bold
+--ds-background-warning  /* Backgrounds communicating caution, such as in warning section messages */
+--ds-background-warning-bold  /* A vibrant background option for communicating caution, such as in warning buttons and warning banners */
 --ds-background-warning-bold-hovered
 --ds-background-warning-bold-pressed
 --ds-background-warning-hovered
 --ds-background-warning-pressed
---ds-background-warning-subtle
---ds-background-warning-subtler
+--ds-background-warning-subtle  /* Background color for non-interactive elements communicating caution (e.g. a StatusTag). Sits between subtler and bold in visual emphasis. Not for interactive surfaces — see --ds-background-warning-bold or --ds-background-warning-subtler for interactive states */
+--ds-background-warning-subtler  /* Backgrounds of warning status tags and count tags to ensure accessibility and desired visual appearance */
 --ds-background-warning-subtler-hovered
 --ds-background-warning-subtler-pressed
---ds-blanket
---ds-blanket-danger
---ds-blanket-selected
---ds-border
---ds-border-accent-blue
---ds-border-accent-blue-subtle
---ds-border-accent-brown
---ds-border-accent-brown-subtle
---ds-border-accent-gray
---ds-border-accent-gray-subtle
---ds-border-accent-green
---ds-border-accent-green-subtle
---ds-border-accent-lime
---ds-border-accent-lime-subtle
---ds-border-accent-magenta
---ds-border-accent-magenta-subtle
---ds-border-accent-orange
---ds-border-accent-orange-subtle
---ds-border-accent-purple
---ds-border-accent-purple-subtle
---ds-border-accent-red
---ds-border-accent-red-subtle
---ds-border-accent-teal
---ds-border-accent-teal-subtle
---ds-border-accent-yellow
---ds-border-accent-yellow-subtle
---ds-border-bold
---ds-border-brand
---ds-border-code
---ds-border-danger
---ds-border-danger-subtle
---ds-border-disabled
---ds-border-discovery
---ds-border-discovery-subtle
---ds-border-focused
---ds-border-focused-inverse
---ds-border-information
---ds-border-information-subtle
---ds-border-input
---ds-border-input-search
---ds-border-inverse
---ds-border-selected
---ds-border-smart-advocacy
---ds-border-smart-mastering-content
---ds-border-smart-relationship
---ds-border-smart-social-emotional
---ds-border-smart-technology-tools
---ds-border-success
---ds-border-success-subtle
---ds-border-surface
---ds-border-warning
---ds-border-warning-subtle
---ds-chart-blue-bold
+--ds-blanket  /* The screen overlay that appears with a Modal */
+--ds-blanket-danger  /* An overlay to communicate danger states when a simple background color change isn't possible, such as deleting a block in a RichTextEditor */
+--ds-blanket-selected  /* A translucent blanket to communicate selection when changing the background of the selected content is not possible, such as selected blocks in a RichTextEditor. The content beneath remains visible. Do not use to indicate keyboard focus or hover alone */
+--ds-border  /* Visually group or separate UI elements, such as flat cards or side panel dividers */
+--ds-border-accent-blue  /* Blue borders on non-bold backgrounds when there is no meaning tied to the color */
+--ds-border-accent-blue-subtle  /* Decorative blue borders that do not need to meet 3:1 contrast requirements */
+--ds-border-accent-brown  /* Brown borders on non-bold backgrounds when there is no meaning tied to the color */
+--ds-border-accent-brown-subtle  /* Decorative brown borders that do not need to meet 3:1 contrast requirements */
+--ds-border-accent-gray  /* Borders on non-bold gray accent backgrounds */
+--ds-border-accent-gray-subtle  /* Decorative gray borders that do not need to meet 3:1 contrast requirements */
+--ds-border-accent-green  /* Green borders on non-bold backgrounds when there is no meaning tied to the color */
+--ds-border-accent-green-subtle  /* Decorative green borders that do not need to meet 3:1 contrast requirements */
+--ds-border-accent-lime  /* Lime borders on non-bold backgrounds when there is no meaning tied to the color */
+--ds-border-accent-lime-subtle  /* Decorative lime borders that do not need to meet 3:1 contrast requirements */
+--ds-border-accent-magenta  /* Magenta borders on non-bold backgrounds when there is no meaning tied to the color */
+--ds-border-accent-magenta-subtle  /* Decorative magenta borders that do not need to meet 3:1 contrast requirements */
+--ds-border-accent-orange  /* Orange borders on non-bold backgrounds when there is no meaning tied to the color */
+--ds-border-accent-orange-subtle  /* Decorative orange borders that do not need to meet 3:1 contrast requirements */
+--ds-border-accent-purple  /* Purple borders on non-bold backgrounds when there is no meaning tied to the color */
+--ds-border-accent-purple-subtle  /* Decorative purple borders that do not need to meet 3:1 contrast requirements */
+--ds-border-accent-red  /* Red borders on non-bold backgrounds when there is no meaning tied to the color */
+--ds-border-accent-red-subtle  /* Decorative red borders that do not need to meet 3:1 contrast requirements */
+--ds-border-accent-teal  /* Teal borders on non-bold backgrounds when there is no meaning tied to the color */
+--ds-border-accent-teal-subtle  /* Decorative teal borders that do not need to meet 3:1 contrast requirements */
+--ds-border-accent-yellow  /* Yellow borders on non-bold backgrounds when there is no meaning tied to the color */
+--ds-border-accent-yellow-subtle  /* Decorative yellow borders that do not need to meet 3:1 contrast requirements */
+--ds-border-bold  /* A neutral border option that passes min 3:1 contrast ratios */
+--ds-border-brand  /* Borders or visual indicators of elements that reinforce our brand, such as logos or primary buttons */
+--ds-border-code  /* Code block and code diff borders */
+--ds-border-danger  /* Borders communicating critical information, such as the borders on invalid text fields */
+--ds-border-danger-subtle  /* Decorative danger borders that do not need to meet 3:1 contrast requirements */
+--ds-border-disabled  /* Borders of elements in a disabled state */
+--ds-border-discovery  /* Borders communicating change or something new, such as the borders in onboarding spotlights */
+--ds-border-discovery-subtle  /* Decorative discovery borders that do not need to meet 3:1 contrast requirements */
+--ds-border-focused  /* The focus ring or border of an element that currently has keyboard or input focus. Do not use to indicate selection or hover alone. When an element is both selected and focused, keep its selected treatment and add a separate focus indicator */
+--ds-border-focused-inverse  /* Focus ring drawn inside a bold or colored fill. */
+--ds-border-information  /* Borders communicating information or something in-progress */
+--ds-border-information-subtle  /* Decorative information borders that do not need to meet 3:1 contrast requirements */
+--ds-border-input  /* Borders of form UI elements, such as text fields, checkboxes, and radio buttons */
+--ds-border-input-search  /* The border of search inputs */
+--ds-border-inverse  /* Borders on bold backgrounds */
+--ds-border-selected  /* Borders or visual indicators that communicate selection, such as the active tab or a selected menu item, or the opened state of a dropdown trigger. Do not use as a keyboard focus indicator; use --ds-border-focused for focus and preserve the selected treatment when both states apply */
+--ds-border-smart-advocacy  /* Subject edge. Aliases the lime accent. */
+--ds-border-smart-mastering-content  /* Subject edge. Aliases the teal accent. */
+--ds-border-smart-relationship  /* Subject edge. Aliases the magenta accent. */
+--ds-border-smart-social-emotional  /* Subject edge. Aliases the orange accent. */
+--ds-border-smart-technology-tools  /* Subject edge. Aliases the brown accent. */
+--ds-border-success  /* Borders communicating a favorable outcome, such as the borders on validated text fields */
+--ds-border-success-subtle  /* Decorative success borders that do not need to meet 3:1 contrast requirements */
+--ds-border-surface  /* A container's 1px edge. Invisible except in light increased contrast, where the sunken frame turns white. */
+--ds-border-warning  /* Borders communicating caution */
+--ds-border-warning-subtle  /* Decorative warning borders that do not need to meet 3:1 contrast requirements */
+--ds-chart-blue-bold  /* For data visualization only */
 --ds-chart-blue-bold-hovered
---ds-chart-blue-bolder
+--ds-chart-blue-bolder  /* For data visualization only */
 --ds-chart-blue-bolder-hovered
---ds-chart-blue-boldest
+--ds-chart-blue-boldest  /* For data visualization only */
 --ds-chart-blue-boldest-hovered
---ds-chart-brand
+--ds-chart-brand  /* Our primary color for data visualization. Use when only one color is required */
 --ds-chart-brand-hovered
---ds-chart-brown-bold
+--ds-chart-brown-bold  /* For data visualization only */
 --ds-chart-brown-bold-hovered
---ds-chart-brown-bolder
+--ds-chart-brown-bolder  /* For data visualization only */
 --ds-chart-brown-bolder-hovered
---ds-chart-brown-boldest
+--ds-chart-brown-boldest  /* For data visualization only */
 --ds-chart-brown-boldest-hovered
---ds-chart-categorical-1
+--ds-chart-categorical-1  /* For data visualization only. Follow numbered sequence */
 --ds-chart-categorical-1-hovered
---ds-chart-categorical-2
+--ds-chart-categorical-2  /* For data visualization only. Follow numbered sequence */
 --ds-chart-categorical-2-hovered
---ds-chart-categorical-3
+--ds-chart-categorical-3  /* For data visualization only. Follow numbered sequence */
 --ds-chart-categorical-3-hovered
---ds-chart-categorical-4
+--ds-chart-categorical-4  /* For data visualization only. Follow numbered sequence */
 --ds-chart-categorical-4-hovered
---ds-chart-categorical-5
+--ds-chart-categorical-5  /* For data visualization only. Follow numbered sequence */
 --ds-chart-categorical-5-hovered
---ds-chart-categorical-6
+--ds-chart-categorical-6  /* For data visualization only. Follow numbered sequence */
 --ds-chart-categorical-6-hovered
---ds-chart-categorical-7
+--ds-chart-categorical-7  /* For data visualization only. Follow numbered sequence */
 --ds-chart-categorical-7-hovered
---ds-chart-categorical-8
+--ds-chart-categorical-8  /* For data visualization only. Follow numbered sequence */
 --ds-chart-categorical-8-hovered
---ds-chart-danger
---ds-chart-danger-bold
+--ds-chart-danger  /* For data visualization communicating negative information, such as 'off track' */
+--ds-chart-danger-bold  /* A stronger emphasis option of --ds-chart-danger */
 --ds-chart-danger-bold-hovered
 --ds-chart-danger-hovered
---ds-chart-discovery
---ds-chart-discovery-bold
+--ds-chart-discovery  /* For data visualization communicating 'new' statuses */
+--ds-chart-discovery-bold  /* A stronger emphasis option of --ds-chart-discovery */
 --ds-chart-discovery-bold-hovered
 --ds-chart-discovery-hovered
---ds-chart-gray-bold
+--ds-chart-gray-bold  /* For data visualization only */
 --ds-chart-gray-bold-hovered
---ds-chart-gray-bolder
+--ds-chart-gray-bolder  /* For data visualization only */
 --ds-chart-gray-bolder-hovered
---ds-chart-gray-boldest
+--ds-chart-gray-boldest  /* For data visualization only */
 --ds-chart-gray-boldest-hovered
---ds-chart-green-bold
+--ds-chart-green-bold  /* For data visualization only */
 --ds-chart-green-bold-hovered
---ds-chart-green-bolder
+--ds-chart-green-bolder  /* For data visualization only */
 --ds-chart-green-bolder-hovered
---ds-chart-green-boldest
+--ds-chart-green-boldest  /* For data visualization only */
 --ds-chart-green-boldest-hovered
---ds-chart-information
---ds-chart-information-bold
+--ds-chart-information  /* For data visualization communicating low priority or in-progress statuses */
+--ds-chart-information-bold  /* A stronger emphasis option of --ds-chart-information */
 --ds-chart-information-bold-hovered
 --ds-chart-information-hovered
---ds-chart-lime-bold
+--ds-chart-lime-bold  /* For data visualization only */
 --ds-chart-lime-bold-hovered
---ds-chart-lime-bolder
+--ds-chart-lime-bolder  /* For data visualization only */
 --ds-chart-lime-bolder-hovered
---ds-chart-lime-boldest
+--ds-chart-lime-boldest  /* For data visualization only */
 --ds-chart-lime-boldest-hovered
---ds-chart-magenta-bold
+--ds-chart-magenta-bold  /* For data visualization only */
 --ds-chart-magenta-bold-hovered
---ds-chart-magenta-bolder
+--ds-chart-magenta-bolder  /* For data visualization only */
 --ds-chart-magenta-bolder-hovered
---ds-chart-magenta-boldest
+--ds-chart-magenta-boldest  /* For data visualization only */
 --ds-chart-magenta-boldest-hovered
---ds-chart-neutral
+--ds-chart-neutral  /* A secondary color for data visualization or to communicate 'to-do' statuses */
 --ds-chart-neutral-hovered
---ds-chart-orange-bold
+--ds-chart-orange-bold  /* For data visualization only */
 --ds-chart-orange-bold-hovered
---ds-chart-orange-bolder
+--ds-chart-orange-bolder  /* For data visualization only */
 --ds-chart-orange-bolder-hovered
---ds-chart-orange-boldest
+--ds-chart-orange-boldest  /* For data visualization only */
 --ds-chart-orange-boldest-hovered
---ds-chart-purple-bold
+--ds-chart-purple-bold  /* For data visualization only */
 --ds-chart-purple-bold-hovered
---ds-chart-purple-bolder
+--ds-chart-purple-bolder  /* For data visualization only */
 --ds-chart-purple-bolder-hovered
---ds-chart-purple-boldest
+--ds-chart-purple-boldest  /* For data visualization only */
 --ds-chart-purple-boldest-hovered
---ds-chart-red-bold
+--ds-chart-red-bold  /* For data visualization only */
 --ds-chart-red-bold-hovered
---ds-chart-red-bolder
+--ds-chart-red-bolder  /* For data visualization only */
 --ds-chart-red-bolder-hovered
---ds-chart-red-boldest
+--ds-chart-red-boldest  /* For data visualization only */
 --ds-chart-red-boldest-hovered
---ds-chart-smart-advocacy
+--ds-chart-smart-advocacy  /* Chart series for the advocacy subject. Aliases --ds-chart-lime-bold. */
 --ds-chart-smart-advocacy-hovered
---ds-chart-smart-mastering-content
+--ds-chart-smart-mastering-content  /* Chart series for the mastering-content subject. Aliases --ds-chart-teal-boldest. */
 --ds-chart-smart-mastering-content-hovered
---ds-chart-smart-relationship
+--ds-chart-smart-relationship  /* Chart series for the relationship subject. Aliases --ds-chart-magenta-boldest. */
 --ds-chart-smart-relationship-hovered
---ds-chart-smart-social-emotional
+--ds-chart-smart-social-emotional  /* Chart series for the social-emotional subject. Aliases --ds-chart-orange-bold. */
 --ds-chart-smart-social-emotional-hovered
---ds-chart-smart-technology-tools
+--ds-chart-smart-technology-tools  /* Chart series for the technology-tools subject. Aliases --ds-chart-brown-bold. */
 --ds-chart-smart-technology-tools-hovered
---ds-chart-success
---ds-chart-success-bold
+--ds-chart-success  /* For data visualization communicating positive information, such as 'on track' */
+--ds-chart-success-bold  /* A stronger emphasis option of --ds-chart-success */
 --ds-chart-success-bold-hovered
 --ds-chart-success-hovered
---ds-chart-teal-bold
+--ds-chart-teal-bold  /* For data visualization only */
 --ds-chart-teal-bold-hovered
---ds-chart-teal-bolder
+--ds-chart-teal-bolder  /* For data visualization only */
 --ds-chart-teal-bolder-hovered
---ds-chart-teal-boldest
+--ds-chart-teal-boldest  /* For data visualization only */
 --ds-chart-teal-boldest-hovered
---ds-chart-warning
---ds-chart-warning-bold
+--ds-chart-warning  /* For data visualization communicating caution, such as 'at risk' statuses */
+--ds-chart-warning-bold  /* A stronger emphasis option of --ds-chart-warning */
 --ds-chart-warning-bold-hovered
 --ds-chart-warning-hovered
---ds-chart-yellow-bold
+--ds-chart-yellow-bold  /* For data visualization only */
 --ds-chart-yellow-bold-hovered
---ds-chart-yellow-bolder
+--ds-chart-yellow-bolder  /* For data visualization only */
 --ds-chart-yellow-bolder-hovered
---ds-chart-yellow-boldest
+--ds-chart-yellow-boldest  /* For data visualization only */
 --ds-chart-yellow-boldest-hovered
---ds-icon
---ds-icon-accent-blue
---ds-icon-accent-brown
---ds-icon-accent-gray
---ds-icon-accent-green
---ds-icon-accent-lime
---ds-icon-accent-magenta
---ds-icon-accent-orange
---ds-icon-accent-purple
---ds-icon-accent-red
---ds-icon-accent-teal
---ds-icon-accent-yellow
---ds-icon-brand
---ds-icon-danger
---ds-icon-disabled
---ds-icon-discovery
---ds-icon-information
---ds-icon-inverse
---ds-icon-selected
---ds-icon-smart-advocacy
---ds-icon-smart-mastering-content
---ds-icon-smart-relationship
---ds-icon-smart-social-emotional
---ds-icon-smart-technology-tools
---ds-icon-subtle
---ds-icon-subtlest
---ds-icon-success
---ds-icon-warning
---ds-icon-warning-inverse
---ds-interaction-dragged
---ds-interaction-hovered
---ds-interaction-inverse-hovered
---ds-interaction-inverse-pressed
---ds-interaction-pressed
---ds-link
---ds-link-pressed
---ds-link-visited
---ds-link-visited-pressed
---ds-skeleton
---ds-skeleton-subtle
---ds-surface
---ds-surface-container
+--ds-icon  /* Icon-only buttons, or icons paired with --ds-text */
+--ds-icon-accent-blue  /* Blue icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
+--ds-icon-accent-brown  /* Brown icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
+--ds-icon-accent-gray  /* Icons on non-bold gray accent backgrounds, such as file type icons */
+--ds-icon-accent-green  /* Green icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
+--ds-icon-accent-lime  /* Lime icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
+--ds-icon-accent-magenta  /* Magenta icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
+--ds-icon-accent-orange  /* Orange icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
+--ds-icon-accent-purple  /* Purple icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
+--ds-icon-accent-red  /* Red icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
+--ds-icon-accent-teal  /* Teal icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
+--ds-icon-accent-yellow  /* Yellow icons on non-bold backgrounds when there is no meaning tied to the color, such as file type icons */
+--ds-icon-brand  /* Icons that reinforce our brand */
+--ds-icon-danger  /* Icons communicating critical information, such as those used in error handling */
+--ds-icon-disabled  /* Icons in a disabled state */
+--ds-icon-discovery  /* Icons communicating change or something new, such as discovery section messages */
+--ds-icon-information  /* Icons communicating information or something in-progress, such as information section messages */
+--ds-icon-inverse  /* Icons on bold backgrounds */
+--ds-icon-selected  /* Icons that communicate selection, such as icons in selected navigation items, or the opened state of a dropdown trigger. On bold selected backgrounds, use --ds-icon-inverse instead. Do not use for brand emphasis or hover alone. Keep the selected icon treatment when the element also has focus */
+--ds-icon-smart-advocacy  /* Subject icon. Aliases the lime accent. */
+--ds-icon-smart-mastering-content  /* Subject icon. Aliases the teal accent. */
+--ds-icon-smart-relationship  /* Subject icon. Aliases the magenta accent. */
+--ds-icon-smart-social-emotional  /* Subject icon. Aliases the orange accent. */
+--ds-icon-smart-technology-tools  /* Subject icon. Aliases the brown accent. */
+--ds-icon-subtle  /* Icons paired with --ds-text-subtle */
+--ds-icon-subtlest  /* Icons paired with --ds-text-subtlest */
+--ds-icon-success  /* Icons communicating a favorable outcome, such as those used in success section messages */
+--ds-icon-warning  /* Icons communicating caution, such as those used in warning section messages */
+--ds-icon-warning-inverse  /* Icons when on bold warning backgrounds */
+--ds-interaction-dragged  /* Overlay on an item while it is dragged. */
+--ds-interaction-hovered  /* A background overlay for elements in a hovered state when their background color cannot change, such as avatars */
+--ds-interaction-inverse-hovered  /* Hover overlay on a dark or colored ground (close buttons on flags, tags on bold fills). */
+--ds-interaction-inverse-pressed  /* Pressed overlay on a dark or colored ground. */
+--ds-interaction-pressed  /* A background overlay for elements in a pressed state when their background color cannot change, such as avatars */
+--ds-link  /* Links in a default or hovered state. Add an underline for hovered states */
+--ds-link-pressed  /* Links in a pressed state */
+--ds-link-visited  /* Visited links */
+--ds-link-visited-pressed  /* Visited links in a pressed state */
+--ds-skeleton  /* Skeleton loading states */
+--ds-skeleton-subtle  /* The pulse or shimmer effect in skeleton loading states */
+--ds-surface  /* The primary background for the UI */
+--ds-surface-container  /* A neutral container surface background */
 --ds-surface-container-hovered
 --ds-surface-container-pressed
 --ds-surface-hovered
---ds-surface-overlay
+--ds-surface-overlay  /* The background of elements that sit on top of the UI, such as modals, dropdown menus, floating toolbars, and floating single-action buttons. Also use for the background of raised cards in a dragged state. Combine with --ds-shadow-overlay */
 --ds-surface-overlay-hovered
 --ds-surface-overlay-pressed
 --ds-surface-pressed
---ds-surface-raised
+--ds-surface-raised  /* The background of cards that can be moved, such as cards on a board. Combine with --ds-shadow-raised */
 --ds-surface-raised-hovered
 --ds-surface-raised-pressed
---ds-surface-sunken
---ds-text
---ds-text-accent-blue
---ds-text-accent-blue-bolder
---ds-text-accent-brown
---ds-text-accent-brown-bolder
---ds-text-accent-gray
---ds-text-accent-gray-bolder
---ds-text-accent-green
---ds-text-accent-green-bolder
---ds-text-accent-lime
---ds-text-accent-lime-bolder
---ds-text-accent-magenta
---ds-text-accent-magenta-bolder
---ds-text-accent-orange
---ds-text-accent-orange-bolder
---ds-text-accent-purple
---ds-text-accent-purple-bolder
---ds-text-accent-red
---ds-text-accent-red-bolder
---ds-text-accent-teal
---ds-text-accent-teal-bolder
---ds-text-accent-yellow
---ds-text-accent-yellow-bolder
---ds-text-brand
---ds-text-code-accent-1
---ds-text-code-accent-2
---ds-text-code-comments
---ds-text-code-default
---ds-text-code-functions
---ds-text-code-gutter
---ds-text-code-keywords
---ds-text-code-numbers
---ds-text-code-operators
---ds-text-code-strings
---ds-text-code-tags
---ds-text-danger
---ds-text-danger-bolder
---ds-text-disabled
---ds-text-discovery
---ds-text-discovery-bolder
---ds-text-information
---ds-text-information-bolder
---ds-text-inverse
---ds-text-selected
---ds-text-smart-advocacy
---ds-text-smart-mastering-content
---ds-text-smart-relationship
---ds-text-smart-social-emotional
---ds-text-smart-technology-tools
---ds-text-subtle
---ds-text-subtlest
---ds-text-success
---ds-text-success-bolder
---ds-text-warning
---ds-text-warning-bolder
---ds-text-warning-inverse
---ds-utility-elevation-surface-current
+--ds-surface-sunken  /* A secondary background for the UI commonly used for grouping items, such as cards in board columns */
+--ds-text  /* Primary text, such as body copy, sentence case headers, and buttons */
+--ds-text-accent-blue  /* Blue text on subtlest and subtler blue accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-blue-bolder  /* Blue text on subtle blue accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-brown  /* Brown text on subtlest and subtler brown accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-brown-bolder  /* Brown text on subtle brown accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-gray  /* Text on non-bold gray accent backgrounds, such as colored tags */
+--ds-text-accent-gray-bolder  /* Text and icons on gray subtle accent backgrounds */
+--ds-text-accent-green  /* Green text on subtlest and subtler green accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-green-bolder  /* Green text on subtle green accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-lime  /* Lime text on subtlest and subtler lime accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-lime-bolder  /* Lime text on subtle lime accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-magenta  /* Magenta text on subtlest and subtler magenta accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-magenta-bolder  /* Magenta text on subtle magenta accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-orange  /* Orange text on subtlest and subtler orange accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-orange-bolder  /* Orange text on subtle orange accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-purple  /* Purple text on subtlest and subtler purple accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-purple-bolder  /* Purple text on subtle purple accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-red  /* Red text on subtlest and subtler red accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-red-bolder  /* Red text on subtle red accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-teal  /* Teal text on subtlest and subtler teal accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-teal-bolder  /* Teal text on subtle teal accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-yellow  /* Yellow text on subtlest and subtler yellow accent backgrounds when there is no meaning tied to the color */
+--ds-text-accent-yellow-bolder  /* Yellow text on subtle yellow accent backgrounds when there is no meaning tied to the color */
+--ds-text-brand  /* Text that reinforces our brand */
+--ds-text-code-accent-1  /* An additional syntax-highlighting text color */
+--ds-text-code-accent-2  /* An additional syntax-highlighting text color */
+--ds-text-code-comments  /* Comments in syntax-highlighted code */
+--ds-text-code-default  /* Default text in code blocks and code diffs */
+--ds-text-code-functions  /* Functions in syntax-highlighted code */
+--ds-text-code-gutter  /* Line numbers and other code gutter text */
+--ds-text-code-keywords  /* Language keywords in syntax-highlighted code */
+--ds-text-code-numbers  /* Numeric values in syntax-highlighted code */
+--ds-text-code-operators  /* Operators and punctuation in syntax-highlighted code */
+--ds-text-code-strings  /* String values in syntax-highlighted code */
+--ds-text-code-tags  /* Tags in syntax-highlighted code */
+--ds-text-danger  /* Critical text, such as input field error messaging */
+--ds-text-danger-bolder  /* Text on top of danger semantic labels to ensure accessibility and desired visual appearance */
+--ds-text-disabled  /* Text in a disabled state */
+--ds-text-discovery  /* Text to emphasize change or something new, such as in new status tags */
+--ds-text-discovery-bolder  /* Text on top of discovery semantic labels to ensure accessibility and desired visual appearance */
+--ds-text-information  /* Informative text or to communicate something is in progress, such as in-progress status tags */
+--ds-text-information-bolder  /* Text on top of information semantic labels to ensure accessibility and desired visual appearance */
+--ds-text-inverse  /* Text on bold backgrounds */
+--ds-text-selected  /* Text that communicates selection, such as the active tab or a selected navigation item, or the opened state of a dropdown trigger. On bold selected backgrounds, use --ds-text-inverse instead. Do not use for unselected links, brand emphasis, or hover alone. Keep the selected text treatment when the element also has focus */
+--ds-text-smart-advocacy  /* Text on the subject fill. Aliases the lime accent. */
+--ds-text-smart-mastering-content  /* Text on the subject fill. Aliases the teal accent. */
+--ds-text-smart-relationship  /* Text on the subject fill. Aliases the magenta accent. */
+--ds-text-smart-social-emotional  /* Text on the subject fill. Aliases the orange accent. */
+--ds-text-smart-technology-tools  /* Text on the subject fill. Aliases the brown accent. */
+--ds-text-subtle  /* Secondary text, such as navigation, subtle button links, input field labels, and all caps subheadings */
+--ds-text-subtlest  /* Tertiary text, such as meta-data, breadcrumbs, input field placeholder and helper text */
+--ds-text-success  /* Text to communicate a favorable outcome, such as input field success messaging */
+--ds-text-success-bolder  /* Text on top of success semantic labels to ensure accessibility and desired visual appearance */
+--ds-text-warning  /* Text to emphasize caution, such as in moved status tags */
+--ds-text-warning-bolder  /* Text on top of warning semantic labels to ensure accessibility and desired visual appearance */
+--ds-text-warning-inverse  /* Text when on bold warning backgrounds */
+--ds-utility-elevation-surface-current  /* The surface the element sits on; containers reassign it, sticky cells and overflow fades read it. */
 ```
 
 ## Elevation and Opacity Tokens (`--ds-`)
 Shadows pair with the surface of the same level (`--ds-shadow-raised` with `--ds-surface-raised`); opacity dims a whole element.
 
 ```css
---ds-opacity-disabled
---ds-opacity-loading
---ds-shadow-overflow
---ds-shadow-overflow-perimeter
---ds-shadow-overflow-spread
---ds-shadow-overlay
---ds-shadow-raised
+--ds-opacity-disabled  /* Images and whole elements in a disabled state. */
+--ds-opacity-loading  /* Content under a loading spinner. */
+--ds-shadow-overflow  /* Shadow where content scrolls under other content, such as a table's sticky column. */
+--ds-shadow-overflow-perimeter  /* Fallback for overflow when a box shadow is not feasible; pair with .spread. */
+--ds-shadow-overflow-spread  /* Fallback for overflow when a box shadow is not feasible; pair with .perimeter. */
+--ds-shadow-overlay  /* Box shadow of anything over the UI: menus, popups, tooltips, flags, modals, dragged items. Pair with --ds-surface-overlay. */
+--ds-shadow-raised  /* Box shadow of a raised card. Pair with --ds-surface-raised. */
 ```
 
 ## Legacy Color Tokens

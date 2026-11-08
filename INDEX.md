@@ -66,6 +66,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
+| [`docs/connectors/ds-mcp.md`](docs/connectors/ds-mcp.md) | The design-system lookup — the `ds` command, the local `plus-ds` MCP run from the checkout, and the hosted read-only `/mcp/ds` door, five tools over the DS facts module. |
 | [`docs/connectors/figma/annotations.md`](docs/connectors/figma/annotations.md) | Figma's five annotation category labels, disclosed — what each holds, the Logic / data vs Development test, where status, construction notes and analytics go instead, and why a file's list drifts |
 | [`docs/connectors/figma/overview.md`](docs/connectors/figma/overview.md) | Figma's connector overview, always loaded — what uno-bot can reach over REST, canvas vs comments, How We Fig's stage folders, file titles and page sections, and an agent's duties; the five annotation labels are annotations.md beside it, and the bot's long-form access doc is uno-bot-access.md |
 | [`docs/connectors/figma/uno-bot-access.md`](docs/connectors/figma/uno-bot-access.md) | What uno-bot can read and write in Figma over REST, and where it stops — frame renders, comment reads and @uno replies, the library and comment pipelines, a Figma ask's public scope, and each limit with its cause and next route |
@@ -86,7 +87,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`design-system/guidelines/components/changelog.md`](design-system/guidelines/components/changelog.md) | How a component records what changed about it — starting empty on 2026-08-26, never backfilled |
 | [`design-system/guidelines/components/forms-and-inputs.md`](design-system/guidelines/components/forms-and-inputs.md) | Which input or button to use, sorted by the shape of the answer, plus the id, validation and required rules that apply across the group |
 | [`design-system/guidelines/components/labels.md`](design-system/guidelines/components/labels.md) | The label family — Status tag, Date tag, Count tag, Tag, Smart tag, TagGroup, Suggestion and AI label — and how to choose between them |
 | [`design-system/guidelines/components/layout-and-structure.md`](design-system/guidelines/components/layout-and-structure.md) | The remaining container components sorted by what is being contained |
@@ -111,7 +111,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/figma/token-mapping.md`](design-system/guidelines/figma/token-mapping.md) | For quick machine lookups, agents may read token-registry.json (read-only); use this doc for the authoritative tables, extended cases, and notes |
 | [`design-system/guidelines/foundations/accessibility.md`](design-system/guidelines/foundations/accessibility.md) | WCAG 2.1 AA is the minimum bar for all PLUS interfaces |
 | [`design-system/guidelines/foundations/border.md`](design-system/guidelines/foundations/border.md) | Border widths, the focus ring, and how they pair with color tokens |
-| [`design-system/guidelines/foundations/color.md`](design-system/guidelines/foundations/color.md) | The PLUS Design System follows Material Design 3 color guidance |
+| [`design-system/guidelines/foundations/color.md`](design-system/guidelines/foundations/color.md) | Color tokens by role — fills, grounds, text, icons and borders, SMART subjects, modes |
 | [`design-system/guidelines/foundations/content/date-and-time.md`](design-system/guidelines/foundations/content/date-and-time.md) | How dates, times, durations, and time zones are written in the product |
 | [`design-system/guidelines/foundations/content/inclusive-language.md`](design-system/guidelines/foundations/content/inclusive-language.md) | Words to prefer and words to retire, so copy reads as written for everyone |
 | [`design-system/guidelines/foundations/content/language-and-grammar.md`](design-system/guidelines/foundations/content/language-and-grammar.md) | Active voice, contractions, sentence case, and the punctuation conventions product copy follows |

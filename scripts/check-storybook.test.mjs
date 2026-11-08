@@ -25,6 +25,7 @@ import {
   ratchet,
   reoptimizationFailures,
   ruleCounts,
+  storiesOf,
   verdict,
 } from './check-storybook.mjs';
 
@@ -199,8 +200,8 @@ test('the recorded baseline round-trips through the ratchet it feeds', () => {
   const record = JSON.parse(JSON.stringify(baselineRecord(parsed)));
 
   assert.equal(record.violatingStories, 2);
-  assert.deepEqual(record.rules, { 'color-contrast': 1, label: 1 });
-  assert.deepEqual(ratchet(parsed.a11y, record.stories), { regressions: [], cleared: [] });
+  assert.deepEqual(record.sets.rules.entries, { 'color-contrast': { count: 1 }, label: { count: 1 } });
+  assert.deepEqual(ratchet(parsed.a11y, storiesOf(record)), { regressions: [], cleared: [] });
 });
 
 test('rule counts are ordered heaviest first', () => {
@@ -253,13 +254,11 @@ test('the flake is reported alongside the real failures, never instead of them',
  */
 
 /** A committed baseline, in the shape `baselineRecord` writes. */
-const baseline = (stories, suite = {}) => ({
-  measured: '2026-08-26',
-  suite: { storyFiles: Object.keys(stories).length, ...suite },
-  violatingStories: Object.keys(stories).length,
-  rules: ruleCounts(stories),
-  stories,
-});
+const baseline = (stories, suite = {}) => {
+  const totals = { files: Object.keys(stories).length, tests: 0 };
+  const record = baselineRecord({ a11y: stories, totals });
+  return { ...record, measured: '2026-08-26', suite: { storyFiles: totals.files, ...suite } };
+};
 
 /** Everything the verdict would print, joined, for matching against. */
 const printed = (lines, stream) =>
@@ -353,7 +352,7 @@ test('--update hands the record back to the caller, and still reports blocking f
   ]);
   const { status, lines, record } = decide(rep, null, { update: true });
   assert.equal(status, 1, 'the baseline covers accessibility only');
-  assert.deepEqual(record.stories, { 'a.stories.jsx::Default': ['label'] });
+  assert.deepEqual(storiesOf(record), { 'a.stories.jsx::Default': ['label'] });
   assert.equal(record.suite.tests, 2);
   assert.match(printed(lines, 'err'), /NON-a11y failure\(s\) were present during --update/);
 });
