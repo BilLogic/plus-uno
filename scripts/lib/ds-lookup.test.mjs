@@ -34,7 +34,49 @@ test('find ranks a task in words, resolves a Figma name, and flags a Pro icon', 
   assert.deepEqual([figma.name, figma.figma], ['Toggle', 'Form Switch Button']);
   const pro = lookup.find('fa-light fa-house').results[0];
   assert.deepEqual([pro.kind, pro.status], ['icon', 'pro']);
-  assert.ok(lookup.find('house').results.some((r) => r.name === 'fa-regular fa-house'));
+  assert.ok(lookup.find('house icon').results.some((r) => r.name === 'fa-regular fa-house'));
+});
+
+test('icons answer only when the query asks for an icon', () => {
+  assert.equal(lookup.find('house').results.some((r) => r.kind === 'icon'), false);
+  assert.equal(lookup.find('check that it saved').results.some((r) => r.kind === 'icon'), false);
+  assert.ok(lookup.find('house icon').results.some((r) => r.kind === 'icon'));
+});
+
+test('a bare Pro family word gives the Pro row first, then the Free match on the other words', () => {
+  // Font Awesome metadata may not be installed; a stub set stands in for it.
+  const stubbed = createLookup(REPO_ROOT, { iconMetadata: { 'graduation-cap': { free: ['solid'] }, house: { free: ['solid', 'regular'] } } });
+  const { results } = stubbed.find('duotone graduation cap icon');
+  assert.deepEqual([results[0].kind, results[0].status], ['icon', 'pro']);
+  assert.match(results[0].why, /duotone/);
+  assert.equal(results[1].name, 'fa-solid fa-graduation-cap');
+  assert.equal(stubbed.find('graduation-cap').results[0].name, 'fa-solid fa-graduation-cap');
+  assert.equal(stubbed.find('light background color').results.some((r) => r.status === 'pro'), false);
+});
+
+test('tokens answer only on token vocabulary, and then lead', () => {
+  assert.equal(lookup.find('confirm before deleting').results.some((r) => r.kind === 'token'), false);
+  assert.equal(lookup.find('selected').results.some((r) => r.kind === 'token'), false);
+  assert.equal(lookup.find('purple color token').results[0].kind, 'token');
+  assert.equal(lookup.find('brand text color').results[0].name, '--ds-text-brand');
+  assert.equal(lookup.find('--ds-text-brand').results[0].name, '--ds-text-brand');
+});
+
+test('constants answer only to their exact name; other exports follow the components', () => {
+  assert.equal(lookup.find('BUTTON_APPEARANCES').results[0].name, 'BUTTON_APPEARANCES');
+  assert.equal(lookup.find('button appearances').results.some((r) => /^[A-Z0-9_]+$/.test(r.name)), false);
+  const table = lookup.find('table').results;
+  const firstExport = table.findIndex((r) => r.kind === 'export');
+  const lastRanked = table.findLastIndex((r) => r.kind === 'component' || r.kind === 'pattern');
+  assert.ok(firstExport === -1 || firstExport > lastRanked, table.map((r) => r.name).join(', '));
+});
+
+test('a query that names a guideline topic ends with a guide row', () => {
+  const { results } = lookup.find('icon');
+  assert.deepEqual(results.at(-1), { kind: 'guide', name: 'iconography', next: 'ds_guide("iconography")' });
+  assert.equal(lookup.find('heading text typography').results.at(-1).name, 'typography');
+  assert.equal(lookup.find('confirm before deleting').results.some((r) => r.kind === 'guide'), false);
+  assert.match(render('find', { results: [results.at(-1)], next: '' }), /^guide {5}iconography {2}→ ds_guide\("iconography"\)/);
 });
 
 test('find names the tool to call instead on a miss', () => {

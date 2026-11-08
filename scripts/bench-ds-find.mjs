@@ -36,7 +36,8 @@ export function rankOf(results, want) {
   return results.findIndex((r) => names(r).some((n) => want.includes(n))) + 1;
 }
 
-// Scores both sets. Returns { scores: {set: {kind: {n, hit1, hit3, mrr}}}, misses, skipped }.
+// Scores both sets. Returns { scores: {set: {kind: {n, hit1, hit3, mrr}}}, misses, skipped };
+// `misses` holds every scored row (rank, top four, and each result's kind and name).
 export function runBench({ root = REPO_ROOT, aliases = true } = {}) {
   const lookup = createLookup(root, { aliases });
   const withIcons = iconsInstalled(root);
@@ -50,7 +51,7 @@ export function runBench({ root = REPO_ROOT, aliases = true } = {}) {
       const a = (scores[set][row.kind] ??= { n: 0, hit1: 0, hit3: 0, rr: 0 });
       a.n++; if (rank === 1) a.hit1++; if (rank && rank <= 3) a.hit3++; if (rank) a.rr += 1 / rank;
       const top = results.slice(0, 4).map((r) => r.name + (r.use ? `→${r.use.map((u) => u.name ?? u).join('|')}` : ''));
-      misses.push({ set, kind: row.kind, q: row.q, rank, top });
+      misses.push({ set, kind: row.kind, q: row.q, rank, top, results: results.map((r) => ({ kind: r.kind, name: r.name })) });
     }
     for (const a of Object.values(scores[set])) { a.mrr = Number((a.rr / a.n).toFixed(2)); delete a.rr; }
   }

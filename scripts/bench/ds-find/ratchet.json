@@ -19,14 +19,14 @@
     "mrr": 1
    },
    "real-intent": {
-    "hit1": 26,
+    "hit1": 27,
     "hit3": 30,
-    "mrr": 0.88
+    "mrr": 0.89
    },
    "real-token": {
-    "hit1": 1,
-    "hit3": 1,
-    "mrr": 0.33
+    "hit1": 4,
+    "hit3": 4,
+    "mrr": 1
    }
   }
  },
@@ -50,14 +50,14 @@
     "mrr": 1
    },
    "real-intent": {
-    "hit1": 26,
+    "hit1": 27,
     "hit3": 30,
-    "mrr": 0.88
+    "mrr": 0.89
    },
    "real-token": {
-    "hit1": 1,
-    "hit3": 1,
-    "mrr": 0.33
+    "hit1": 4,
+    "hit3": 4,
+    "mrr": 1
    }
   }
  }
