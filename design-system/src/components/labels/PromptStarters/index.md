@@ -3,7 +3,7 @@
 
 # PromptStarters
 
-A few things a person could ask PLUS AI, as a wrapping row of prompt `Suggestion` chips. - **starters** are `{ id, label, text }`: the short `label` on the chip and the longer `text` it stands for. - **onSelect(starter)** runs when a chip is pressed, with the whole starter and nothing else. A starter suggests; it never sends on its own, so the caller decides what happens — usually putting `text` in a `PromptInput` for a person to read and send. - **label** names the group for assistive technology.
+A few things a person could ask the AI, as a wrapping row of prompt `Suggestion` chips. - **starters** are `{ id, label, text }`: the short `label` on the chip and the longer `text` it stands for. - **onSelect(starter)** runs when a chip is pressed, with the whole starter and nothing else. A starter suggests; it never sends on its own, so the caller decides what happens — usually putting `text` in a `PromptInput` for a person to read and send. - **label** names the group for assistive technology.
 
 **Import:** `import { PromptStarters } from '@/components';`
 

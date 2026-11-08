@@ -2,8 +2,8 @@
  * The component tabs' contract — everything the tabs know that does not need a
  * browser to be true (#168, moved in-page by ADR-025).
  *
- * Four tabs over one component docs page, in Atlassian's order: Examples · Code
- * · Usage · Changelog. All four are now rendered by `../docs-tabs.jsx` INSIDE
+ * Three tabs over one component docs page: Examples · Code · Usage. All three
+ * are rendered by `../docs-tabs.jsx` INSIDE
  * the docs page, below the title. They used to be Storybook `types.TAB` addons
  * in the manager's preview toolbar; that toolbar lives in a different document
  * from `<Title />`, so it could never sit below the title, which is the whole
@@ -28,18 +28,17 @@ const repoPath = (p) => String(p).replace(/\\/g, '/').replace(/^\.\//, '');
 export const TAB_IDS = {
   code: 'plus-code',
   usage: 'plus-usage',
-  changelog: 'plus-changelog',
 };
 
 /**
  * Titles and order, declared once. Storybook no longer reads this — `previewTabs`
  * and the three `types.TAB` registrations were deleted with the move — so this is
- * now the only declaration of the four-tab shape, consumed by `../docs-tabs.jsx`.
+ * now the only declaration of the three-tab shape, consumed by `../docs-tabs.jsx`.
  *
  * `title` is the DEFAULT label. A page may rename its first tab, which is how
  * Atlassian's own token page reads "All tokens" where Button reads "Examples".
- * Only the first tab is renameable: Code, Usage and Changelog mean the same
- * thing everywhere.
+ * Only the first tab is renameable: Code and Usage mean the same thing
+ * everywhere.
  *
  * `id` is `null` for Examples because Examples is the default tab and carries no
  * query param — matching the URLs the addon tabs produced, where
@@ -49,7 +48,6 @@ export const TABS = [
   { key: 'examples', id: null, title: 'Examples' },
   { key: 'code', id: TAB_IDS.code, title: 'Code' },
   { key: 'usage', id: TAB_IDS.usage, title: 'Usage' },
-  { key: 'changelog', id: TAB_IDS.changelog, title: 'Changelog' },
 ];
 
 /**
@@ -76,16 +74,6 @@ export function isTabbedDocsPage(file) {
   return path.startsWith(`${COMPONENTS_ROOT}/`) && path.endsWith('.mdx');
 }
 
-/**
- * The date component changelogs start. Nothing before it is recorded, because
- * nothing produced a component changelog before it — no `CHANGELOG.md`, no
- * changesets, no per-component history convention. An empty changelog is a
- * true statement about this repo; a backfilled one would not be.
- */
-export const CHANGELOG_ADOPTED = '2026-08-26';
-
-/** Keep-a-Changelog's categories, minus `security`, which this system has no use for. */
-export const CHANGELOG_KINDS = ['added', 'changed', 'deprecated', 'removed', 'fixed'];
 
 
 /** `Button.stories.jsx`, `Button.mdx` and `Button.jsx` all name the component `Button`. */
@@ -149,35 +137,6 @@ export function componentIdentity(entry) {
   return null;
 }
 
-/**
- * The entries a component declares, newest first. Anything without an ISO date
- * and a summary is dropped rather than rendered half-formed, and an
- * unrecognized `kind` becomes `null` rather than being coerced into one of the
- * five — a changelog that guesses is the failure this mechanism is meant to
- * avoid.
- *
- * @param {unknown} raw The story meta's `parameters.changelog`.
- * @returns {{date: string, kind: string|null, summary: string}[]}
- */
-export function normalizeChangelog(raw) {
-  if (!Array.isArray(raw)) return [];
-
-  return raw
-    .filter(
-      (e) =>
-        e &&
-        typeof e.date === 'string' &&
-        /^\d{4}-\d{2}-\d{2}$/.test(e.date) &&
-        typeof e.summary === 'string' &&
-        e.summary.trim() !== '',
-    )
-    .map((e) => ({
-      date: e.date,
-      kind: CHANGELOG_KINDS.includes(e.kind) ? e.kind : null,
-      summary: e.summary.trim(),
-    }))
-    .sort((a, b) => b.date.localeCompare(a.date));
-}
 
 /**
  * The import line the Code tab shows. Public components come from the

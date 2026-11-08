@@ -8,7 +8,7 @@
     display: flex;
     flex-direction: column;
     background-color: var(--ds-surface-overlay);
-    border-radius: var(--size-modal-radius-md); // 6px
+    border-radius: var(--popover-radius); // a Flag's corner
     box-shadow: 0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px 0px rgba(0, 0, 0, 0.3); // Elevation Light/3
     overflow: hidden;
     width: 300px;
@@ -19,7 +19,7 @@
         align-items: center;
         justify-content: space-between;
         padding: var(--pad-y-lg) var(--pad-x-lg); // 8px 16px
-        background-color: var(--color-success);
+        background-color: var(--ds-background-success-bold);
         color: var(--ds-text-inverse);
 
         &-content {
@@ -46,7 +46,6 @@
 
     &__timestamp {
         font: var(--body-small);
-        opacity: 0.8;
     }
 
     &__close {

@@ -99,8 +99,6 @@ Danger, warning, success, information and discovery each come in four emphasis l
 
 <Canvas of={ColorsStories.StatusRoles} sourceState="none" />
 
-<Canvas of={ColorsStories.RolesAndBars} sourceState="none" />
-
 Tokens: `color/background/<role>/subtler` or `bold`, `color/text/<role>`, `color/border/<role>` and `color/icon/<role>`. A neutral border that bounds a control takes `color/border/bold`; `color/border/default` is a divider. A bold warning ground is a light yellow, so its text is the dark `color/text/warning/inverse`.
 
 <Canvas of={ColorsStories.TextRoles} sourceState="none" />
@@ -418,17 +416,17 @@ Beyond the surfaces, each pattern takes its colors from these tokens. Use them a
 
 </FoundationSection>
 
-<FoundationSection title="Selected and PLUS AI">
+<FoundationSection title="Selected and AI">
 
 Selected stays blue: use `background.selected` with `text.selected` and `icon.selected`, and pair it with a second cue such as a check or a border.
 
-PLUS AI uses the discovery role (purple). "AI recommended" and Suggestion take discovery, and the AI generative border is lagoon plus discovery purple.
+AI uses the discovery role (purple). "AI recommended" and Suggestion take discovery, and the AI generative border is lagoon plus discovery purple.
 
 <TokenSwatches
     items={[
         { token: '--ds-background-selected', text: '--ds-text-selected', label: 'Selected' },
-        { token: '--ds-background-discovery-subtler', text: '--ds-text-discovery', label: 'PLUS AI, subtler' },
-        { token: '--ds-background-discovery-bold', text: '--ds-text-inverse', label: 'PLUS AI, bold' },
+        { token: '--ds-background-discovery-subtler', text: '--ds-text-discovery', label: 'AI, subtler' },
+        { token: '--ds-background-discovery-bold', text: '--ds-text-inverse', label: 'AI, bold' },
     ]}
 />
 

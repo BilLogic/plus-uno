@@ -5,7 +5,6 @@ import Rating from './Rating';
 /**
  * LikertScale Component
  * Labeled rating scale for surveys.
- * Matches legacy design-system/specs/Training/Lessons/Elements/LikertScale.js
  */
 const LikertScale = ({
     leftLabel = "Not at all confident",
@@ -13,7 +12,6 @@ const LikertScale = ({
     rating = "rest",
     onRatingChange
 }) => {
-    // Styles matching legacy createLikertScale
     const containerStyle = {
         display: 'flex',
         gap: 'var(--stack-lg)', // 12px
@@ -28,7 +26,7 @@ const LikertScale = ({
         fontSize: 'var(--font-size-125)',
         fontWeight: 'var(--type-weight-regular)',
         lineHeight: 'var(--line-height-200)',
-        color: 'var(--color-primary-text)',
+        color: 'var(--ds-text-brand)',
         minWidth: '198px',
         maxWidth: '198px',
         width: '100%',
@@ -50,9 +48,6 @@ const LikertScale = ({
         textAlign: 'left'
     };
 
-    // Inner p tags style (optional, if needed to match exact DOM structure or just put text in div)
-    // Legacy put text in a <p> inside the div. We can simplify unless strict DOM match needed.
-    // We'll put text directly in div with flex styles for simplicity unless layout breaks.
 
     return (
         <div className="plus-likert-scale" style={containerStyle}>

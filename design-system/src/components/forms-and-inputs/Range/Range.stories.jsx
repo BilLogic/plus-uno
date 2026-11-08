@@ -10,9 +10,6 @@ export default {
     component: Range,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'Props: `isDisabled`, and `onChange` receives the new value as a number, then the event. One size, a 32 control with a 4 track and a 20 thumb. The fill, thumb and disabled state use the named tokens; focus is the 2px ring on `border.focused`.' },
-        ],
         docs: {
             description: {
                 component:

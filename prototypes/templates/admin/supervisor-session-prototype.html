@@ -29,24 +29,24 @@
         
         .top-bar {
             background-color: var(--ds-surface-container);
-            padding: var(--size-surface-container-pad-y) var(--size-surface-container-pad-x);
+            padding: var(--section-pad-y-default) var(--section-pad-x-default);
             display: flex;
             align-items: center;
-            gap: var(--size-surface-container-gap-md);
-            border-bottom: var(--size-surface-border) solid var(--color-outline-variant);
+            gap: var(--section-stack-md);
+            border-bottom: var(--border-default) solid var(--ds-border);
         }
         
         .top-bar-left {
             display: flex;
             align-items: center;
-            gap: var(--space-0625);
+            gap: var(--inline-lg);
         }
         
         .top-bar-right {
             margin-left: auto;
             display: flex;
             align-items: center;
-            gap: var(--space-0625);
+            gap: var(--inline-lg);
         }
         
         .user-avatar {
@@ -81,16 +81,16 @@
         }
         
         .main-container {
-            padding: var(--size-section-pad-x-md) var(--size-section-pad-y-md);
+            padding: var(--section-pad-y-default) var(--section-pad-x-default);
             max-width: 1400px;
             margin: 0 auto;
         }
         
         .content-container {
             background-color: var(--ds-surface);
-            border-radius: var(--size-surface-radius);
-            padding: var(--size-section-pad-x-lg) var(--size-section-pad-y-lg);
-            gap: var(--size-section-gap-lg);
+            border-radius: var(--section-radius);
+            padding: var(--section-pad-y-spacious) var(--section-pad-x-spacious);
+            gap: var(--section-stack-lg);
             display: flex;
             flex-direction: column;
         }
@@ -98,13 +98,13 @@
         .alert-box {
             background-color: var(--ds-background-brand-subtlest);
             color: var(--ds-text);
-            border: 1px solid var(--color-primary);
-            border-radius: var(--size-modal-radius-md);
-            padding: var(--size-modal-pad-x-md) var(--size-modal-pad-y-lg);
+            border: 1px solid var(--ds-border-brand);
+            border-radius: var(--modal-radius);
+            padding: var(--modal-pad-y-spacious) var(--modal-pad-x-default);
             display: flex;
             align-items: flex-start;
-            gap: var(--size-modal-gap-md);
-            margin-bottom: var(--size-section-gap-md);
+            gap: var(--modal-inline-md);
+            margin-bottom: var(--section-stack-md);
         }
         
         .alert-content {
@@ -141,7 +141,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--size-section-gap-md);
+            margin-bottom: var(--section-stack-md);
         }
         
         .page-title {
@@ -155,14 +155,14 @@
         .summary-cards {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: var(--size-card-gap-md);
-            margin-bottom: var(--size-section-gap-lg);
+            gap: var(--card-stack-md);
+            margin-bottom: var(--section-stack-lg);
         }
         
         .summary-card {
             background-color: var(--ds-surface-raised);
-            border-radius: var(--size-card-radius-sm);
-            padding: var(--size-card-pad-x-lg) var(--size-card-pad-y-lg);
+            border-radius: var(--card-radius-sm);
+            padding: var(--card-pad-spacious) var(--card-pad-spacious);
             display: flex;
             flex-direction: column;
             gap: var(--stack-sm);
@@ -201,8 +201,8 @@
         
         .nav-tabs {
             display: flex;
-            border-bottom: 1px solid var(--color-outline-variant);
-            margin-bottom: var(--size-section-gap-md);
+            border-bottom: 1px solid var(--ds-border);
+            margin-bottom: var(--section-stack-md);
         }
         
         .nav-tab {
@@ -222,8 +222,8 @@
         }
         
         .nav-tab.active {
-            border-bottom-color: var(--color-secondary);
-            color: var(--color-secondary);
+            border-bottom-color: var(--ds-border);
+            color: var(--ds-text-subtle);
             font-weight: 400;
         }
         
@@ -249,7 +249,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: var(--size-section-gap-sm);
+            margin-bottom: var(--section-stack-sm);
         }
         
         .section-title {
@@ -262,7 +262,7 @@
         
         .filters {
             display: flex;
-            gap: var(--space-0625);
+            gap: var(--inline-lg);
         }
         
         .session-table {
@@ -275,17 +275,17 @@
         }
         
         .session-table-header th {
-            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
             text-align: left;
             font-family: var(--font-family-body);
             font-size: 14px;
             font-weight: 400;
             color: var(--ds-text);
-            border-bottom: 1px solid var(--color-outline-variant);
+            border-bottom: 1px solid var(--ds-border);
         }
         
         .session-table-row {
-            border-bottom: 1px solid var(--color-outline-variant);
+            border-bottom: 1px solid var(--ds-border);
         }
         
         .session-table-row:hover {
@@ -293,7 +293,7 @@
         }
         
         .session-table-row td {
-            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
             font-family: var(--font-family-body);
             font-size: 14px;
             color: var(--ds-text);
@@ -381,34 +381,34 @@
             align-items: center;
             justify-content: center;
             gap: var(--stack-md);
-            margin-bottom: var(--size-modal-gap-md);
-            padding-bottom: var(--size-modal-gap-md);
-            border-bottom: 1px solid var(--color-outline-variant);
+            margin-bottom: var(--modal-stack-md);
+            padding-bottom: var(--modal-stack-md);
+            border-bottom: 1px solid var(--ds-border);
         }
         
         .step-dot {
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background-color: var(--color-outline-variant);
+            background-color: var(--ds-background-neutral);
         }
         
         .step-dot.active {
-            background-color: var(--color-primary);
+            background-color: var(--ds-background-brand-bold);
         }
         
         .step-dot.completed {
-            background-color: var(--color-primary);
+            background-color: var(--ds-background-brand-bold);
         }
         
         .step-line {
             width: 40px;
             height: 2px;
-            background-color: var(--color-outline-variant);
+            background-color: var(--ds-background-neutral);
         }
         
         .step-line.completed {
-            background-color: var(--color-primary);
+            background-color: var(--ds-background-brand-bold);
         }
         
         .modal-step {
@@ -420,7 +420,7 @@
         }
         
         .form-group {
-            margin-bottom: var(--size-section-gap-sm);
+            margin-bottom: var(--section-stack-sm);
         }
         
         .form-label {
@@ -434,17 +434,17 @@
         
         .form-label.required::after {
             content: " *";
-            color: var(--color-danger);
+            color: var(--ds-text-danger);
         }
         
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: var(--space-0625);
+            gap: var(--stack-lg);
         }
         
         .review-section {
-            margin-bottom: var(--size-section-gap-md);
+            margin-bottom: var(--section-stack-md);
         }
         
         .review-label {
@@ -587,8 +587,8 @@
                     <table class="session-table">
                         <thead class="session-table-header">
                             <tr>
-                                <th>Date & time <i class="fas fa-arrow-up" style="margin-left: 8px; color: var(--color-secondary);"></i></th>
-                                <th>School & teacher <i class="fas fa-arrow-up" style="margin-left: 8px; color: var(--color-outline-variant);"></i></th>
+                                <th>Date & time <i class="fas fa-arrow-up" style="margin-left: 8px; color: var(--ds-icon-subtle);"></i></th>
+                                <th>School & teacher <i class="fas fa-arrow-up" style="margin-left: 8px; color: var(--ds-icon-subtlest);"></i></th>
                                 <th>Status</th>
                                 <th>Actions</th>
                             </tr>

@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 // @ts-ignore – plus-ds
 import { PageLayout } from '@plus-ds/specs/Universal/Pages';
 import { TrainingProgressContent } from '../components/TrainingProgressContent';

@@ -17,7 +17,7 @@ and regenerate rather than touching the literal.
 
 ## The tree
 
-- **Top level:** Get started · Foundations · Components · Patterns · AI · Tools, then our own Data visualizations · Specs · Deprecated. The first six are the benchmark site's sections in its order, with Patterns as our addition; `npm run check:storybook-categories` holds the sort to that order and fails any page under `design-system/src/` titled under a root the sort does not list.
+- **Top level:** Get started · Foundations · Components · Patterns · AI · Tools, then our own Data visualizations · Specs. The first six are the benchmark site's sections in its order, with Patterns as our addition; `npm run check:storybook-categories` holds the sort to that order and fails any page under `design-system/src/` titled under a root the sort does not list.
 - **Get started:** Design · Develop · With AI · Content design · About. About is the old Introduction page; the other four are short landing pages that point into the tree (`design-system/src/storybook-docs/landing/`).
 - **Foundations:** source still lives in `design-system/src/styles/` + `design-system/src/assets/`. Patterns no longer sit under Foundations.
 - **Patterns:** Introduction · Frame · Sidebar · Page (Page, Heading outline) · Panel · Section (Section, Card, Table) · Overlays (Blanket, Modal, Drawer) · Popups · Templates. Source lives in `design-system/src/patterns/`. The Panel's docs are the Panel component's: a component whose docs read as a layout area is listed in the taxonomy's `patternComponents` and titled `Patterns/<name>`, while its folder stays under its category.
@@ -68,11 +68,11 @@ belong there, not in the page;
 foundation pages use its `TokenTable` and `RefTable` wrappers and the `DoDont`
 pair in `design-system/src/storybook-docs/foundation-blocks.jsx`.
 
-## The four tabs
+## The three tabs
 
-A component page has four faces above the canvas — **Examples · Code · Usage ·
-Changelog** — as real Storybook tabs, not sidebar entries. Four entries per
-component would fragment the sidebar, which is the one place the tree above is
+A component page has three faces below its title — **Examples · Code · Usage**
+— as tabs inside the page, not sidebar entries. Three entries per component
+would fragment the sidebar, which is the one place the tree above is
 spoken out loud.
 
 **The component page template.** Every component page fills the same three faces, in this order:
@@ -85,16 +85,13 @@ spoken out loud.
 
 **The tabs are a human affordance and change nothing for an agent.** The
 agent-facing file stays one flat generated `index.md` per component. An agent
-that had to open four files to answer one question would be paying for a
+that had to open three files to answer one question would be paying for a
 navigation aid it cannot see.
 
-`Examples` is Storybook's canvas tab, renamed. The other three are registered by
-the local manager addon in `.storybook/addons/component-tabs/`, whose README
-states the mechanism, the Storybook 11 deprecation it rides on, and what
-replaces it.
+The tabs render inside the page from `design-system/src/storybook-docs/docs-tabs.jsx`
+(ADR-025); a page with no usage content or no props shows fewer.
 
 ## Related
 
 - `overview.md` — where design knowledge lives
-- `components/changelog.md` — what a component records about itself, and when it does not
 - `docs/connectors/storybook-mcp.md` — reading the docs tree through the MCP endpoint

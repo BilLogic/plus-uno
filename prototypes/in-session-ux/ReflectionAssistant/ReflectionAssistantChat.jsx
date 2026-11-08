@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { QuestionFlow, ParameterSlider } from './ToolUI';
 
 /**
@@ -60,7 +60,7 @@ const ChatHeader = ({ onBack }) => (
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
-                    color: 'var(--color-primary)'
+                    color: 'var(--ds-text-brand)'
                 }}
             >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -385,7 +385,7 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
                                 style={{
                                     padding: '12px 16px',
                                     borderRadius: '16px',
-                                    background: msg.role === 'user' ? 'var(--color-primary, #0472a8)' : 'white',
+                                    background: msg.role === 'user' ? 'var(--ds-background-brand-bold)' : 'white',
                                     color: msg.role === 'user' ? 'white' : 'var(--chat-on-surface, #111)',
                                     borderTopRightRadius: msg.role === 'user' ? '4px' : '16px',
                                     borderTopLeftRadius: msg.role === 'assistant' ? '4px' : '16px',
@@ -469,7 +469,7 @@ export function ReflectionAssistantChat({ onBack, initialPrompt = '' }) {
                         onClick={() => handleSend()}
                         disabled={!input.trim()}
                         style={{
-                            background: input.trim() ? 'var(--color-primary, #0472a8)' : '#d1d5db',
+                            background: input.trim() ? 'var(--ds-background-brand-bold)' : '#d1d5db',
                             color: 'white',
                             border: 'none',
                             width: '32px',

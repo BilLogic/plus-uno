@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect, useContext, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ShellContext } from '../context/ShellContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import ChatSimulationCard from './ChatSimulationCard';
 import HomeHero from '@/specs/Home/Sections/HomeHero';
 import DataVisualizationSkillsProgress from '@/specs/Home/Cards/DataVisualization/DataVisualizationSkillsProgress';
@@ -54,12 +54,12 @@ const MONTHLY_REVEAL_DELAY = 640;
 const MOMENTUM_REVEAL_DELAY = 960;
 
 const STUDENT_MOMENTUM_DATA = [
-    { name: 'Alex P.', color: 'var(--color-social-emotional, #8c6600)', data: [3, 4, 5, 6, 7, 8, 8] },
-    { name: 'Priya J.', color: 'var(--color-primary, #0472a8)', data: [6, 6, 7, 7, 6, 7, 7] },
-    { name: 'Maya L.', color: 'var(--color-mastering-content, #8659a9)', data: [7, 8, 6, 5, 6, 7, 8] },
-    { name: 'Sam K.', color: 'var(--color-relationship, #c70b77)', data: [0, 1, 4, 5, 6, 7, 7] },
-    { name: 'Jordan K.', color: 'var(--color-advocacy, #167745)', data: [7, 8, 6, 5, 5, 6, 5] },
-    { name: 'Nina Z.', color: 'var(--color-tertiary, #0e8175)', data: [6, 6, 7, 7, 6, 6, 7] },
+    { name: 'Alex P.', color: 'var(--ds-chart-categorical-1)', data: [3, 4, 5, 6, 7, 8, 8] },
+    { name: 'Priya J.', color: 'var(--ds-chart-categorical-2)', data: [6, 6, 7, 7, 6, 7, 7] },
+    { name: 'Maya L.', color: 'var(--ds-chart-categorical-3)', data: [7, 8, 6, 5, 6, 7, 8] },
+    { name: 'Sam K.', color: 'var(--ds-chart-categorical-4)', data: [0, 1, 4, 5, 6, 7, 7] },
+    { name: 'Jordan K.', color: 'var(--ds-chart-categorical-5)', data: [7, 8, 6, 5, 5, 6, 5] },
+    { name: 'Nina Z.', color: 'var(--ds-chart-categorical-6)', data: [6, 6, 7, 7, 6, 6, 7] },
     { name: 'Luis L.', color: '#a81a5c', data: [3, 4, 5, 6, 7, 8, 8] },
     { name: 'Ethan M.', color: '#6b9b6b', data: [4, 5, 5, 6, 8, 6, 7] },
 ];

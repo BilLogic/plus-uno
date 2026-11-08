@@ -37,7 +37,7 @@ const Playground = ({ mod }) => {
 };
 
 const Gallery = () => (
-    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--size-section-gap-md)', color: 'var(--ds-text)' }}>
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: 'var(--section-stack-md)', color: 'var(--ds-text)' }}>
         <section data-chart="bar">
             <h3 style={heading}>Bar, two series</h3>
             <BarChart height={220} categories={['A', 'B', 'C']} series={[{ name: 'This term', data: [45, 72, 58] }, { name: 'Last term', data: [32, 55, 48] }]} />

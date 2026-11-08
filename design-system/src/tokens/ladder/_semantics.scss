@@ -11,10 +11,10 @@
     --pad-x-xs: var(--space-025);
     --pad-x-sm: var(--space-050);
     --pad-x-md: var(--space-075);
-    --pad-x-lg: var(--space-100); /* new step; matches the old --size-element-pad-x-lg (16px) */
+    --pad-x-lg: var(--space-100); /* new step, 16px */
     --pad-y-sm: var(--space-0125);
     --pad-y-md: var(--space-0375);
-    --pad-y-lg: var(--space-050); /* new step; matches the old --size-element-pad-y-lg (8px) */
+    --pad-y-lg: var(--space-050); /* new step, 8px */
 
     /* Stack */
     --stack-sm: var(--space-025);
@@ -35,8 +35,8 @@
     --radius-h40: var(--radius-0625); /* new step; control height 40; 40÷4 = 10 */
 
     /* Focus */
-    --focus-ring-width: var(--size-border-stroke-stroke-200); /* matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive */
-    --focus-ring-offset: var(--size-border-stroke-stroke-200); /* defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both */
+    --focus-ring-width: var(--stroke-2); /* matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive */
+    --focus-ring-offset: var(--stroke-2); /* defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both */
     --focus-ring-radius: var(--radius-sm); /* first pass, no existing source; a family PR refines it */
 
     /* Grid */

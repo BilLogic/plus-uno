@@ -10,10 +10,6 @@ export default {
     component: Pagination,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-04', kind: 'changed', summary: 'Pages and the Previous and Next controls are buttons, exposed as Pagination.Page and Pagination.Navigator, on named tokens. Spacing is default (32) or compact (24). The ellipsis is hidden from assistive technology and a disabled Navigator keeps its tab stop with aria-disabled.' },
-            { date: '2026-10-24', kind: 'changed', summary: 'A pressed page is the secondary 12 step and the current page the 16. Keyboard focus is the 2px focus ring inside the page with no fill; a pointer focus draws none.' },
-        ],
         docs: {
             description: {
                 component: 'Pagination for moving through paginated content: a Navigator to each side of a window of Page parts, on named tokens. Pages are buttons; the current one carries aria-current.'
@@ -72,7 +68,7 @@ const Template = (args) => {
     return <Pagination {...args} currentPage={page} onPageChange={setPage} />;
 };
 
-const paginationCanvas = { display: 'flex', flexDirection: 'column', gap: 'var(--size-card-gap-md)', padding: 'var(--size-card-gap-md)', backgroundColor: 'var(--ds-surface)' };
+const paginationCanvas = { display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)', padding: 'var(--card-stack-md)', backgroundColor: 'var(--ds-surface)' };
 const contentVariantCard = {
     padding: 'var(--pad-x-md)',
     border: 'var(--border-default) solid var(--ds-border)',
@@ -95,7 +91,7 @@ function PaginationContentDemos() {
                     />
                 </div>
             </section>
-            <section style={{ marginTop: 'var(--size-card-gap-md)' }}>
+            <section style={{ marginTop: 'var(--card-stack-md)' }}>
                 <div style={contentVariantCard}>
                     <Pagination
                         currentPage={5}

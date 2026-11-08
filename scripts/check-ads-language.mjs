@@ -34,6 +34,9 @@
  *   class:plus-btn   lines naming `plus-btn--(filled|tonal|...|large)`.
  *   word:<word>      lines naming `surface container`, `scrim` or `Rovo`.
  *   word:Atlassian   zero allowed: MDX prose, story doc strings and `atlassian.design` links.
+ *   word:PLUS-AI  lines under `design-system/src` naming the AI "PLUS AI": the product's
+ *                    AI is unnamed and shows as AI (decision 1 of #1591). Prototypes keep
+ *                    their own recorded copy.
  *   token:surface-layout  a `var(--surface-*)` read of a legacy layout token (#1755).
  *   token:color-surface   a `var(--color-surface*)` or `var(--color-on-surface*)` read (#1755).
  *
@@ -70,16 +73,6 @@ const ALLOWED_PATHS = [
   /^design-system\/src\/tokens\/_color_roles\.scss$/,
 ];
 /**
- * The two files that define `--color-scrim` (the generated value and its alias
- * to `--ds-blanket`). Removing a token waits on the token-removal decision, so
- * the word may stay here and only here, and only the `word:` rules are lenient:
- * every other rule still reads these files.
- */
-const TOKEN_NAME_FILES = [
-  /^design-system\/src\/tokens\/_colors\.scss$/,
-  /^design-system\/src\/tokens\/color\/_legacy-aliases\.scss$/,
-];
-/**
  * Decision records that cite the benchmark on purpose, so the citation is the
  * content. Named, not globbed; a new record earns its own line here. None today.
  */
@@ -100,6 +93,9 @@ const PATTERN_COMPONENTS = ['Overlay', 'Surface'];
 export const RENAMED_NO_ALIAS = renamedInProse(NOT_HERE);
 /** Where doc prose is checked for a stale renamed-away name — component docs, not specs or prototypes. */
 const DOC_PATH = /^design-system\/src\/components\/.*\.mdx$/;
+/** The AI's old product name; the AI is unnamed (decision 1 of #1591), held to zero in the design system. */
+const AI_NAME = /\bPLUS AI\b/;
+const DESIGN_SYSTEM_PATH = /^design-system\/src\//;
 
 const LINE_RULES = [
   ['state-step', /--[a-z0-9-]*-state-(?:08|12|16)(?![0-9])/],
@@ -138,7 +134,7 @@ function componentCount(text, name, { pattern }) {
 
 /**
  * Is this line shipped doc that names Atlassian? Every MDX line is; in code
- * only a non-comment line of a story is (its `docs` and `changelog` strings);
+ * only a non-comment line of a story is (its `docs` strings);
  * and an `atlassian.design` link is anywhere, because JSDoc flows into the
  * generated agent views.
  */
@@ -165,7 +161,6 @@ export function measure(sources) {
     if (ALLOWED_PATHS.some((re) => re.test(file))) continue;
     const live = text.split('\n').map((l) => (ALLOWED_LINE.test(l) ? '' : l));
     for (const [rule, re] of LINE_RULES) {
-      if (rule.startsWith('word:') && TOKEN_NAME_FILES.some((p) => p.test(file))) continue;
       const hits = live.flatMap((l, i) => (re.test(l) ? [i + 1] : []));
       add(rule, file, hits.length, hits[0]);
     }
@@ -181,6 +176,10 @@ export function measure(sources) {
         const hits = live.flatMap((l, i) => (re.test(l) ? [i + 1] : []));
         add(`stale-name:${oldName}`, file, hits.length, hits[0]);
       }
+    }
+    if (DESIGN_SYSTEM_PATH.test(file)) {
+      const hits = live.flatMap((l, i) => (AI_NAME.test(l) ? [i + 1] : []));
+      add('word:PLUS-AI', file, hits.length, hits[0]);
     }
     if (!ATLASSIAN_RECORDS.some((re) => re.test(file))) {
       const hits = live.flatMap((l, i) => (atlassianShipped(file, l) ? [i + 1] : []));
@@ -212,6 +211,10 @@ const RULE_MESSAGE = new Map([
   [
     'word:Atlassian',
     'shipped docs state the PLUS rule and do not cite the benchmark (no name, no atlassian.design link); a decision record that must is named in ATLASSIAN_RECORDS',
+  ],
+  [
+    'word:PLUS-AI',
+    'the AI is unnamed and shows as AI: say "AI" or "the AI", never a product name for it',
   ],
   [
     'state-step',

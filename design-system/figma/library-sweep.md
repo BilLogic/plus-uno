@@ -70,15 +70,15 @@ file:
 
 | Figma says | the system says |
 |---|---|
-| `error` | `danger` (`--color-danger`) |
-| `mastering` | `--color-mastering-content` |
-| `social` | `--color-social-emotional` |
-| `technology` | `--color-technology-tools` |
+| `error` | `danger` (`--ds-background-danger-bold`) |
+| `mastering` | `--ds-*-smart-mastering-content` |
+| `social` | `--ds-*-smart-social-emotional` |
+| `technology` | `--ds-*-smart-technology-tools` |
 
 `error` is the one that matters: it is a different word for a semantic the rest
 of the library, the token file and every component call `danger`. The domain
 names are truncations rather than different words, but a designer reading
-`social` in a picker has no route to `--color-social-emotional`.
+`social` in a picker has no route to `--ds-*-smart-social-emotional`.
 
 ### Values that are literals where the system has tokens
 
@@ -271,7 +271,7 @@ frame rather than replacing anything:
 | B — darken the yellow, keep white | #876f04 | #ffffff | 4.88:1 |
 | C — what ships today | #9f8205 | #ffffff | **3.70:1, fails AA** |
 
-And the info defect as three chips: `--color-info` and `--color-tertiary` side
+And the info defect as three chips: the info and tertiary fills side
 by side, which measure **1.00:1 against each other** because one is an alias of
 the other, beside the Info Bold candidate at #203eb6 (8.66:1 on white, and
 1.64:1 against primary where primary against tertiary today is 1.11:1).
@@ -293,7 +293,7 @@ none for the focus ring, because the code did not have that role either.
 **`_Focus/Focus Ring`** now exists in `colors / accent`
 (`VariableID:17595:28`), aliasing `_Primary/Primary` and scoped to
 `STROKE_COLOR` alone. It is a variable rather than a reuse of `_Primary/Primary`
-for the same reason `--color-focus-ring` is a token rather than a literal: WCAG
+for the same reason `--ds-border-focused` is a token rather than a literal: WCAG
 2.4.11 gives the focus indicator a success criterion of its own, Atlassian keep
 `color.border.focused` apart from `color.border`, and the alias is the part that
 can change — a different hue, a lighter one on dark grounds — without touching

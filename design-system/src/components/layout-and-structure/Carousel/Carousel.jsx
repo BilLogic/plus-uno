@@ -116,7 +116,7 @@ const Carousel = ({
         }
     };
 
-    // Default icons matching legacy
+    // Default icons
     const defaultPrevIcon = <span aria-hidden="true" className="plus-carousel-control-icon"><i className="fa-solid fa-chevron-left"></i></span>;
     const defaultNextIcon = <span aria-hidden="true" className="plus-carousel-control-icon"><i className="fa-solid fa-chevron-right"></i></span>;
 

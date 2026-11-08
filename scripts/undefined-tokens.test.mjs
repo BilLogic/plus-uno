@@ -204,13 +204,10 @@ test('the tokens this pass repointed are gone from the corpus', () => {
   );
 });
 
-test('an externally-defined property is not a finding', () => {
-  // `--spacing` is Tailwind v4's own theme variable, read by a vendored shadcn
-  // component. Reporting it would send a reader to "fix" it into a design
-  // token, which would break the component.
-  const { undefinedTokens } = audit([file('alert.tsx', 'const c = "calc(var(--spacing)*4)";')]);
-  assert.deepEqual(undefinedTokens, {});
-  assert.ok(EXTERNAL.has('--spacing'));
+test('a property no file defines is a finding, with nothing allowlisted as external', () => {
+  const { undefinedTokens } = audit([file('docs.jsx', 'const c = "calc(var(--spacing)*4)";')]);
+  assert.deepEqual(Object.keys(undefinedTokens), ['--spacing']);
+  assert.equal(EXTERNAL.size, 0);
 });
 
 test('only five bare uses remain, and each is a token the system does not have', () => {

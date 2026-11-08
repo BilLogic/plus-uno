@@ -22,7 +22,7 @@ export const QuestionFlow = ({ steps, onComplete }) => {
     return (
         <div className="reflection-widget question-flow" style={{
             background: 'var(--ds-surface)',
-            border: '1px solid var(--color-outline-variant, #bec8ca)',
+            border: '1px solid var(--ds-border)',
             borderRadius: '16px',
             padding: '20px',
             maxWidth: '500px',
@@ -40,7 +40,7 @@ export const QuestionFlow = ({ steps, onComplete }) => {
                         top: 0,
                         height: '100%',
                         width: `${((currentStep + 1) / steps.length) * 100}%`,
-                        background: 'var(--color-primary, #0472a8)',
+                        background: 'var(--ds-background-brand-bold)',
                         borderRadius: '2px',
                         transition: 'width 0.3s ease'
                     }} />
@@ -58,8 +58,8 @@ export const QuestionFlow = ({ steps, onComplete }) => {
                         style={{
                             padding: '12px 16px',
                             textAlign: 'left',
-                            background: selectedOption === option.id ? 'var(--color-primary-container, #e0f2fe)' : 'transparent',
-                            border: `1px solid ${selectedOption === option.id ? 'var(--color-primary, #0472a8)' : 'var(--color-outline-variant, #bec8ca)'}`,
+                            background: selectedOption === option.id ? 'var(--ds-background-brand-subtlest)' : 'transparent',
+                            border: `1px solid ${selectedOption === option.id ? 'var(--ds-border-brand)' : 'var(--ds-border)'}`,
                             borderRadius: '12px',
                             cursor: 'pointer',
                             display: 'flex',
@@ -72,12 +72,12 @@ export const QuestionFlow = ({ steps, onComplete }) => {
                             width: '18px',
                             height: '18px',
                             borderRadius: '50%',
-                            border: `2px solid ${selectedOption === option.id ? 'var(--color-primary, #0472a8)' : 'var(--color-outline-variant, #bec8ca)'}`,
+                            border: `2px solid ${selectedOption === option.id ? 'var(--ds-border-brand)' : 'var(--ds-border)'}`,
                             display: 'flex',
                             alignItems: 'center',
                             justifyContent: 'center'
                         }}>
-                            {selectedOption === option.id && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--color-primary, #0472a8)' }} />}
+                            {selectedOption === option.id && <div style={{ width: '10px', height: '10px', borderRadius: '50%', background: 'var(--ds-background-brand-bold)' }} />}
                         </div>
                         <span style={{ fontSize: '14px', fontWeight: selectedOption === option.id ? 600 : 400 }}>{option.label}</span>
                     </button>
@@ -90,7 +90,7 @@ export const QuestionFlow = ({ steps, onComplete }) => {
                     disabled={!selectedOption}
                     style={{
                         padding: '8px 24px',
-                        background: 'var(--color-primary, #0472a8)',
+                        background: 'var(--ds-background-brand-bold)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',
@@ -123,7 +123,7 @@ export const ParameterSlider = ({ sliders: initialSliders, onApply }) => {
     return (
         <div className="reflection-widget parameter-slider" style={{
             background: 'var(--ds-surface)',
-            border: '1px solid var(--color-outline-variant, #bec8ca)',
+            border: '1px solid var(--ds-border)',
             borderRadius: '16px',
             padding: '24px',
             maxWidth: '500px',
@@ -135,7 +135,7 @@ export const ParameterSlider = ({ sliders: initialSliders, onApply }) => {
                     <div key={slider.id}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                             <span style={{ fontSize: '14px', fontWeight: 600 }}>{slider.label}</span>
-                            <span style={{ fontSize: '14px', color: 'var(--color-primary, #0472a8)', fontWeight: 700 }}>
+                            <span style={{ fontSize: '14px', color: 'var(--ds-text-brand)', fontWeight: 700 }}>
                                 {slider.value}{slider.unit || ''}
                             </span>
                         </div>
@@ -149,7 +149,7 @@ export const ParameterSlider = ({ sliders: initialSliders, onApply }) => {
                             style={{
                                 width: '100%',
                                 cursor: 'pointer',
-                                accentColor: 'var(--color-primary, #0472a8)'
+                                accentColor: 'var(--ds-background-brand-bold)'
                             }}
                         />
                     </div>
@@ -174,7 +174,7 @@ export const ParameterSlider = ({ sliders: initialSliders, onApply }) => {
                     onClick={() => onApply && onApply(sliders)}
                     style={{
                         padding: '8px 24px',
-                        background: 'var(--color-primary, #0472a8)',
+                        background: 'var(--ds-background-brand-bold)',
                         color: 'white',
                         border: 'none',
                         borderRadius: '8px',

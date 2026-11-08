@@ -347,7 +347,7 @@ export const SortableHeadCells = {
         await userEvent.tab();
         await expect(button, 'the button takes focus from the keyboard').toHaveFocus();
         await expect(getComputedStyle(arrow).opacity, 'and the arrow shows on focus').toBe('1');
-        await expect(px(getComputedStyle(arrow).fontSize)).toBe(tokenLength(canvasElement, '--size-icon-sm'));
+        await expect(px(getComputedStyle(arrow).fontSize)).toBe(tokenLength(canvasElement, '--icon-sm'));
         button.blur();
 
         await userEvent.click(button);

@@ -54,6 +54,7 @@
  */
 import { TOKEN_DIR, tokenCorpus } from '../design-system/src/lib/tokens-node.mjs';
 import { resolveToken, tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
+import { RETIRED_COLORS, retiredTo } from './lib/tokens/retire.mjs';
 import { text as read } from './lib/corpus.mjs';
 
 /**
@@ -133,6 +134,19 @@ export function textScale(repoRoot) {
 export const INTENT = /^--color-(primary|secondary|tertiary|danger|success|warning|info)-/;
 
 /**
+ * An intent role counts once in either layer: under its legacy name, or under
+ * the `--ds-*` token the legacy name was retired to (`RETIRED_COLORS`), so
+ * retiring a name is not read as losing the role.
+ */
+const intentRoles = (t, suffix) => {
+  const names = new Set(t);
+  const moved = [...RETIRED_COLORS.keys()].filter(
+    (legacy) => INTENT.test(legacy) && legacy.endsWith(suffix) && names.has(retiredTo(legacy)),
+  );
+  return new Set([...t.filter((n) => INTENT.test(n) && n.endsWith(suffix)), ...moved]).size;
+};
+
+/**
  * The rows worth comparing, and the direction each one may move.
  *
  * `direction` is the only thing the check enforces:
@@ -146,7 +160,7 @@ export const INTENT = /^--color-(primary|secondary|tertiary|danger|success|warni
 export const ROWS = [
   {
     key: 'intent.borderTokens',
-    ours: (t) => t.filter((n) => INTENT.test(n) && n.endsWith('-border')).length,
+    ours: (t) => intentRoles(t, '-border'),
     theirs: (b) => b.colorByRole['color.border'],
     direction: 'up',
     why:
@@ -157,7 +171,7 @@ export const ROWS = [
   },
   {
     key: 'intent.iconTokens',
-    ours: (t) => t.filter((n) => INTENT.test(n) && n.endsWith('-icon')).length,
+    ours: (t) => intentRoles(t, '-icon'),
     theirs: (b) => b.colorByRole['color.icon'],
     direction: 'up',
     why:

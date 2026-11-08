@@ -14,10 +14,6 @@ export default {
     component: Select,
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'ADS props: `isMulti` replaces `mode`, `isInvalid`/`errorMessage` replace `validation`/`invalid`, `spacing` (default 40, compact 32) replaces `size`, and every boolean is `is…`-named.' },
-            { date: '2026-10-23', kind: 'changed', summary: 'A single-line field became 32, its text centered and its side padding 12, and a multi Select whose tags wrap grows from 32.' },
-        ],
         docs: {
             description: {
                 component: 'Pick one value, or several, from a list. Type in the field to filter it.'

@@ -7,7 +7,7 @@
 
 @use "sass:meta";
 
-// CSS cascade layers: declares precedence once, so legacy-alias precedence is
+// CSS cascade layers: declares precedence once, so precedence is
 // explicit and Bootstrap's CSS can later be deleted as a layer. The
 // `bootstrap` layer is populated by `bootstrap-layer.scss`, which every entry
 // point imports before this file. Unlayered rules (inline styles, stray
@@ -42,11 +42,6 @@
   @include meta.load-css("../tokens/color/semantic");
   @include meta.load-css("../tokens/color/elevation");
   @include meta.load-css("../tokens/color/bootstrap-bridge");
-  // Legacy names the migration map gives one target, pointed at the `--ds-*`
-  // token so untouched components follow the palette and the modes. Must follow
-  // the legacy token files above, so the alias wins; names that split by CSS
-  // property or by element keep their legacy value until the component sweep.
-  @include meta.load-css("../tokens/color/legacy-aliases");
   // The token ladder and motion (ADR-038, #1756): generated from
   // scripts/lib/tokens/plan.mjs, never from Figma. Each tier declares its own
   // values; the retired size, layout and role names are gone. Regenerate,
@@ -59,9 +54,6 @@
 }
 
 @layer components {
-  // Shared skeleton/shimmer loading style (Sidebar, prototypes)
-  @include meta.load-css("skeleton");
-
   // Components (using load path - load-path is design-system/components, so imports should be relative to that)
   // Commented lines = no matching .scss in components/ or component lives elsewhere (e.g. forms/).
   // Prototypes and any app that imports main.scss get styles only for uncommented components.
@@ -130,31 +122,31 @@ time {
 
 // Color Utility Classes
 .color-primary {
-    color: var(--color-primary) !important;
+    color: var(--ds-text-brand) !important;
 }
 
 .color-secondary {
-    color: var(--color-secondary) !important;
+    color: var(--ds-text-subtle) !important;
 }
 
 .color-tertiary {
-    color: var(--color-tertiary) !important;
+    color: var(--ds-text-accent-teal) !important;
 }
 
 .color-success {
-    color: var(--color-success) !important;
+    color: var(--ds-text-success) !important;
 }
 
 .color-danger {
-    color: var(--color-danger) !important;
+    color: var(--ds-text-danger) !important;
 }
 
 .color-warning {
-    color: var(--color-warning-text) !important;
+    color: var(--ds-text-warning) !important;
 }
 
 .color-info {
-    color: var(--color-info) !important;
+    color: var(--ds-text-information) !important;
 }
 
 .color-neutral {
@@ -162,41 +154,41 @@ time {
 }
 
 .color-error {
-    color: var(--color-danger) !important;
+    color: var(--ds-text-danger) !important;
 }
 
 // Background Color Utility Classes
 .bg-color-primary {
-    background-color: var(--color-primary) !important;
+    background-color: var(--ds-background-brand-bold) !important;
 }
 
 .bg-color-secondary {
-    background-color: var(--color-secondary) !important;
+    background-color: var(--ds-background-neutral) !important;
 }
 
 .bg-color-tertiary {
-    background-color: var(--color-tertiary) !important;
+    background-color: var(--ds-background-accent-teal-bolder) !important;
 }
 
 .bg-color-success {
-    background-color: var(--color-success) !important;
+    background-color: var(--ds-background-success-bold) !important;
 }
 
 .bg-color-danger {
-    background-color: var(--color-danger) !important;
+    background-color: var(--ds-background-danger-bold) !important;
 }
 
 .bg-color-warning {
-    background-color: var(--color-warning) !important;
+    background-color: var(--ds-background-warning-bold) !important;
 }
 
 .bg-color-info {
-    background-color: var(--color-info) !important;
+    background-color: var(--ds-background-information-bold) !important;
 }
 
 // Other Utility Classes
 .shadow-light-2 {
-    box-shadow: var(--elevation-light-2);
+    box-shadow: var(--ds-shadow-raised);
 }
 
 .border-none {
@@ -204,11 +196,11 @@ time {
 }
 
 .border-outline {
-    border: 1px solid var(--color-outline);
+    border: 1px solid var(--ds-border-bold);
 }
 
 .border-outline-variant {
-    border: 1px solid var(--color-outline-variant);
+    border: 1px solid var(--ds-border);
 }
 
 .border-radius-sm {
@@ -263,7 +255,7 @@ time {
 // Image Placeholder Utility
 .image-placeholder {
     background-color: var(--ds-surface-container);
-    border: 1px dashed var(--color-outline-variant, #bec8ca);
+    border: 1px dashed var(--ds-border);
     display: flex;
     align-items: center;
     justify-content: center;

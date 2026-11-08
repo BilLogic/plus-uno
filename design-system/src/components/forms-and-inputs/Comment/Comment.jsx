@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import { HeadingContextProvider } from '@/components/text-and-data-display/Heading';
 import './Comment.scss';
 
@@ -26,7 +26,7 @@ export const Comment = ({
     ...props
 }) => (
     <article
-        className={classNames('plus-comment', { 'plus-comment--highlighted': isHighlighted }, className)}
+        className={clsx('plus-comment', { 'plus-comment--highlighted': isHighlighted }, className)}
         data-type={type}
         {...props}
     >

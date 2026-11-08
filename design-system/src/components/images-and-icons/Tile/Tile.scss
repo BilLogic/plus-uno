@@ -5,17 +5,17 @@
  * inner size an icon or a logo is inset to; the radius is a quarter of the
  * square, computed, so every size gets the same proportion.
  *
- * The square is the Media size of the same step (--size-media-*). The inner
+ * The square is the Media size of the same step (--image-*). The inner
  * size is the Font Awesome size of the same step, so an icon and a logo in the
  * same tile are the same size.
  */
 $tile-sizes: (
-    16: (var(--size-media-xxs), var(--font-size-fa-body3)),
-    20: (var(--size-media-xs), var(--font-size-fa-body2)),
-    24: (var(--size-media-sm), var(--font-size-fa-body1)),
-    32: (var(--size-media-md), var(--font-size-fa-h5)),
-    40: (var(--size-media-lg), var(--font-size-fa-h4)),
-    48: (var(--size-media-xl), var(--font-size-fa-h3)),
+    16: (var(--image-xxs), var(--font-size-fa-body3)),
+    20: (var(--image-xs), var(--font-size-fa-body2)),
+    24: (var(--image-sm), var(--font-size-fa-body1)),
+    32: (var(--image-md), var(--font-size-fa-h5)),
+    40: (var(--image-lg), var(--font-size-fa-h4)),
+    48: (var(--image-xl), var(--font-size-fa-h3)),
 );
 
 /*
@@ -44,9 +44,9 @@ $tile-colors: (
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    inline-size: var(--tile-size, var(--size-media-md));
-    block-size: var(--tile-size, var(--size-media-md));
-    border-radius: var(--tile-radius, calc(var(--tile-size, var(--size-media-md)) / 4));
+    inline-size: var(--tile-size, var(--image-md));
+    block-size: var(--tile-size, var(--image-md));
+    border-radius: var(--tile-radius, calc(var(--tile-size, var(--image-md)) / 4));
     overflow: hidden;
     vertical-align: middle;
     background-color: var(--ds-background-neutral);

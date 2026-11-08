@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import { Button } from '../Button/Button';
 
 export const VERTICAL_BUTTON_APPEARANCES = ['default', 'subtle', 'primary'];
@@ -14,7 +14,7 @@ export const VerticalButton = ({ icon, label, appearance = 'default', className,
         iconBefore={icon}
         text={label}
         appearance={appearance}
-        className={classNames('plus-btn--vertical', className)}
+        className={clsx('plus-btn--vertical', className)}
         {...props}
     />
 );

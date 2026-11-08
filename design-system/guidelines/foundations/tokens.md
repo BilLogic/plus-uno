@@ -14,7 +14,7 @@ summary: Tokens — Overview & Decision Tree
 
 ## The four-tier ladder (#1756)
 
-One plan (`scripts/lib/tokens/plan.mjs`'s `TOKEN_LADDER`, ADR-038), most general to most specific. Figma collection on the left, code prefix on the right; the full old-to-new name list is `architecture/token-tiers-name-map.md`.
+One plan (`scripts/lib/tokens/plan.mjs`'s `TOKEN_LADDER`, ADR-038), most general to most specific. Figma collection on the left, code prefix on the right; every token, by tier, is listed in `architecture/token-tiers-name-map.md`.
 
 | Tier | Figma collection | Holds | Code |
 |---|---|---|---|
@@ -27,7 +27,7 @@ One plan (`scripts/lib/tokens/plan.mjs`'s `TOKEN_LADDER`, ADR-038), most general
 
 **Fallback rule.** Reach for a component token first; if none fits, the pattern collection; failing that, semantics. The test for "is this a pattern token": would the value change if the pattern changed? If yes, it belongs to the pattern (or component); if the value is just a shared step nothing specific owns, it is semantics.
 
-**Retired names.** `--size-element-*`, `--element-*`, the `--layout-*` and `--overlay-*` names the ladder replaced, and the rest of `RETIRED_TOKENS` in `scripts/lib/tokens/plan.mjs` are gone; `architecture/token-tiers-name-map.md` lists each beside its replacement, and `npm run check:old-size-tokens` holds their uses at zero. The older `--size-card-*`, `--size-section-*`, `--size-modal-*`, `--size-surface-*` and `--size-table-*` names still resolve; moving them onto the ladder is a follow-up.
+**Current names only.** Outside `specs/` the code reads only the names above, and `npm run check:old-system` keeps it that way.
 
 ## Token References
 

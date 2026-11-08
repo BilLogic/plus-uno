@@ -42,6 +42,7 @@ import { describe, it, expect } from 'vitest';
 
 import { documents, text } from '../../scripts/lib/corpus.mjs';
 import { fallbackUsages } from '../../scripts/token-fallbacks.mjs';
+import { RETIRED_COLORS, retiredTo } from '../../scripts/lib/tokens/retire.mjs';
 import { RETIRED_TOKENS, retiredRenames } from '../../scripts/lib/tokens/plan.mjs';
 import { parseColor, toHex } from '../src/lib/tokens.mjs';
 import {
@@ -235,6 +236,15 @@ describe('the corpus — where tokens live, answered once and read through the o
     expect(missing).toEqual([]);
   });
 
+  it('declares none of the retired legacy color names: every use moved to its --ds-* token, which is there', () => {
+    const corpus = tokenCorpus();
+    expect(RETIRED_COLORS.size).toBe(12);
+    const declared = [...RETIRED_COLORS.keys()].filter((name) => corpus.has(name));
+    expect(declared).toEqual([]);
+    const missing = [...RETIRED_COLORS.keys()].map(retiredTo).filter((name) => !corpus.has(name));
+    expect(missing).toEqual([]);
+  });
+
   it('follows an alias to the literal at the end of it', () => {
     const corpus = tokenCorpus();
     // `--color-info` IS `var(--color-tertiary)` in `_colors.scss`.
@@ -397,7 +407,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
    * either fallback check makes can reach one. What is counted is the legacy
    * set, which is the set the exposure is about.
    */
-  it('differs from the normalizer on 19 live token pairs', () => {
+  it('differs from the normalizer on 18 live token pairs', () => {
     const readable = [...tokenCorpus().values()]
       .filter((entry) => !entry.file.startsWith('color/'))
       .map((entry) => entry.value)
@@ -411,7 +421,7 @@ describe('the color key is finer than the normalizer it replaces', () => {
         pairs += 1;
       }
     }
-    expect(pairs).toBe(19);
+    expect(pairs).toBe(18);
   });
 
   /*
@@ -572,7 +582,9 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // 161: the research assistant chat moved onto the AI components, and its
     // hand-drawn bubble's color fallback went.
     // 158: its skeleton shimmer moved onto --ds-skeleton-subtle, and three more went.
-    expect(comparable).toBe(158);
+    // 86: every --color-* use outside specs/ moved onto the --ds- tokens, and
+    // 72 color fallbacks went with the old names; the rest are in specs/.
+    expect(comparable).toBe(86);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

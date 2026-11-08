@@ -44,7 +44,7 @@
 
 .plus-spotlight-media {
     width: 100%;
-    height: calc(var(--size-spacing-large-space-1500) + var(--size-spacing-medium-space-500));
+    height: var(--spotlight-media-height);
     margin: var(--space-100) auto;
     border-radius: var(--radius-050);
     overflow: hidden;

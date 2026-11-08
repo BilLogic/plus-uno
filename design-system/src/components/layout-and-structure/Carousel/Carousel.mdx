@@ -12,7 +12,7 @@ import {
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const DemoSlide = ({ children }) => (
-    <div style={{ height: 'calc(var(--size-spacing-xlarge-space-2000) * 0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ds-background-neutral)', color: 'var(--ds-text)', font: 'var(--heading-small)' }}>
+    <div style={{ height: 'calc(var(--size-1000) * 0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ds-background-neutral)', color: 'var(--ds-text)', font: 'var(--heading-small)' }}>
         {children}
     </div>
 );
@@ -148,11 +148,11 @@ and both appear only when there is more than one slide.
 </thead>
 <tbody>
 <tr><td>Corner</td><td><code>--radius-md</code>.</td></tr>
-<tr><td>Controls</td><td><code>--ds-text-subtle</code>, <code>--ds-text</code> on hover; icon <code>--icon-lg</code>; padding <code>--size-spacing-medium-space-300</code>; touch target <code>--size-spacing-large-space-800</code>.</td></tr>
-<tr><td>Play and pause</td><td><code>--control-md</code> round, <code>--ds-surface</code> ground, inset <code>--size-spacing-small-space-150</code>.</td></tr>
-<tr><td>Slide content</td><td>At least <code>--size-spacing-xlarge-space-2500</code> tall, padded <code>--size-section-pad-y-md</code> and <code>--size-section-pad-x-md</code>.</td></tr>
+<tr><td>Controls</td><td><code>--ds-text-subtle</code>, <code>--ds-text</code> on hover; icon <code>--icon-lg</code>; padding <code>--space-100</code>; touch target <code>--space-300</code>.</td></tr>
+<tr><td>Play and pause</td><td><code>--control-md</code> round, <code>--ds-surface</code> ground, inset <code>--space-0625</code>.</td></tr>
+<tr><td>Slide content</td><td>At least <code>--size-1400</code> tall, padded <code>--section-pad-y-default</code> and <code>--section-pad-x-default</code>.</td></tr>
 <tr><td>Caption</td><td>Title in <code>--heading-medium</code>, text in <code>--body-large</code>, both <code>--ds-text-inverse</code> over a gradient to <code>--ds-background-inverse-subtle</code>.</td></tr>
-<tr><td>Indicators</td><td><code>--ds-border</code>, <code>--ds-background-selected-bold</code> when current; <code>--size-column-md</code> wide, <code>--size-spacing-small-space-075</code> tall, corner <code>--radius-lg</code>; <code>--stack-md</code> apart.</td></tr>
+<tr><td>Indicators</td><td><code>--ds-border</code>, <code>--ds-background-selected-bold</code> when current; <code>--size-750</code> wide, <code>--space-0375</code> tall, corner <code>--radius-lg</code>; <code>--stack-md</code> apart.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code> wide and offset.</td></tr>
 <tr><td>Disabled</td><td><code>--ds-opacity-disabled</code>.</td></tr>
 </tbody>
@@ -184,7 +184,7 @@ A carousel needs room to show a slide in full; squeezed, it hides what it carrie
 <DoDontPair
     doExample={<Carousel aria-label="Featured lessons" slides={demoSlides} />}
     doCaption="Full column width."
-    dontExample={<div style={{ width: 'var(--size-spacing-xlarge-space-2000)' }}><Carousel aria-label="Featured lessons, squeezed" slides={demoSlides} /></div>}
+    dontExample={<div style={{ width: 'var(--size-1000)' }}><Carousel aria-label="Featured lessons, squeezed" slides={demoSlides} /></div>}
     dontCaption="Squeezed into a sliver."
 />
 

@@ -126,9 +126,9 @@ export const Bordered = {
 };
 
 export const Sizes = {
-    parameters: { docs: { description: { story: 'Rows are 32, 40 or 48 tall at minimum, from `--size-row-compact`, `--size-row-default` and `--size-row-comfortable`.' } } },
+    parameters: { docs: { description: { story: 'Rows are 32, 40 or 48 tall at minimum, from `--row-height-sm`, `--row-height-md` and `--row-height-lg`.' } } },
     render: () => (
-        <div style={{ display: 'grid', gap: 'var(--size-spacing-medium-space-300)' }}>
+        <div style={{ display: 'grid', gap: 'var(--space-100)' }}>
             {[32, 40, 48].map((size) => (
                 <Table
                     key={size}
@@ -140,7 +140,7 @@ export const Sizes = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const expected = { 32: '--size-row-compact', 40: '--size-row-default', 48: '--size-row-comfortable' };
+        const expected = { 32: '--row-height-sm', 40: '--row-height-md', 48: '--row-height-lg' };
         for (const [size, token] of Object.entries(expected)) {
             await expect(
                 rowOf(canvasElement, `Student ${size}`).getBoundingClientRect().height,
@@ -279,7 +279,7 @@ export const HeadCells = {
         await expect(canvas.getByRole('columnheader', { name: 'Flagged' })).toBeVisible();
         await expect(canvasElement.querySelector('.plus-table-head-cell-type.fa-flag')).toBeVisible();
         await expect(canvas.getByText('Sessions').closest('th')).toHaveClass('plus-table-cell--align-number');
-        await expect(px(getComputedStyle(canvasElement.querySelector('.plus-table-head-cell-type')).fontSize)).toBe(tokenLength(canvasElement, '--size-icon-sm'));
+        await expect(px(getComputedStyle(canvasElement.querySelector('.plus-table-head-cell-type')).fontSize)).toBe(tokenLength(canvasElement, '--icon-sm'));
     }
 };
 

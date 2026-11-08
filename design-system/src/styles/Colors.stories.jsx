@@ -7,7 +7,6 @@ import { applyColorModes } from '@/storybook-docs/lib/color-modes.js';
 import { emulateColorPreferences } from '@/storybook-docs/lib/test-viewport.js';
 import { BRIDGE_TRIPLETS } from '../../../scripts/lib/color/emit.mjs';
 import figmaSpec from '../tokens/color/figma-spec.json';
-import { contrast as contrastOf, parseColor } from '../lib/tokens.mjs';
 import { iconClass } from '../lib/icon';
 
 /**
@@ -400,7 +399,7 @@ const useResolvedTokens = () => {
 };
 
 const swatchBase = {
-    minHeight: 'var(--size-spacing-large-space-800)',
+    minHeight: 'var(--space-300)',
     borderRadius: 'var(--radius-lg)',
     padding: 'var(--pad-x-md)',
     display: 'flex',
@@ -443,9 +442,9 @@ export const Modes = () => {
             style={{
                 background: 'var(--ds-surface)',
                 color: 'var(--ds-text)',
-                padding: 'var(--size-spacing-medium-space-300)',
+                padding: 'var(--space-100)',
                 display: 'grid',
-                gap: 'var(--size-spacing-medium-space-300)',
+                gap: 'var(--space-100)',
                 font: 'var(--body-default)',
             }}
         >
@@ -456,7 +455,7 @@ export const Modes = () => {
                 style={{
                     display: 'grid',
                     gridTemplateColumns: 'repeat(auto-fill, minmax(16rem, 1fr))',
-                    gap: 'var(--size-spacing-medium-space-300)',
+                    gap: 'var(--space-100)',
                 }}
             >
                 {SWATCHES.map(({ label, tokens, style }) => (
@@ -616,10 +615,10 @@ export const BootstrapBridge = () => (
         style={{
             background: 'var(--ds-surface)',
             color: 'var(--ds-text)',
-            padding: 'var(--size-card-pad-y-md) var(--size-card-pad-x-md)',
+            padding: 'var(--card-pad-default) var(--card-pad-default)',
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(18rem, 1fr))',
-            gap: 'var(--size-card-gap-md)',
+            gap: 'var(--card-stack-md)',
             alignItems: 'start',
         }}
     >
@@ -730,290 +729,3 @@ BootstrapBridge.play = async ({ canvasElement }) => keepingModes(async () => {
         probe.remove();
     }
 });
-
-/**
- * What each intent color is FOR — the role layer, and the measurement it came
- * from.
- *
- * WHAT THIS PAGE IS. The evidence behind
- * `design-system/src/tokens/_color_roles.scss`, laid out so the argument can be
- * checked rather than taken. Every ratio below is computed from the tokens as
- * this page renders them, so it cannot describe a palette that has moved on.
- *
- * THE FINDING. All seven intents carry the same nine tokens — a base, a
- * container, a `-text`, six state overlays — which names two roles and uses
- * three. There is no `--color-warning-border` and no `--color-warning-icon`, so
- * an intent-colored stroke or glyph reaches for the BASE, which is also the
- * ground. `_colors.scss` says as much in a comment beside the value ("for
- * borders/backgrounds"); a comment cannot enforce anything, and 108
- * declarations in this repository set a foreground from an intent base.
- *
- * WHY IT MATTERS MORE THAN #312 SUGGESTED. #312 found one failure, warning
- * filled at 3.70:1. Measured across the five surface steps this system actually
- * ships, the base is worse than that: `--color-warning` fails 4.5:1 on every
- * ground including white, `--color-tertiary` and `--color-info` fail on four of
- * five, and `--color-primary` fails on the two darkest. Every `--color-*-text`
- * token clears 4.5:1 on all five.
- *
- * THE ROLE LAYER: `color.text` 49 tokens, `color.icon` 23 and
- * `color.border` 39 — three namespaces, because an icon and a
- * border are held to 3:1 under WCAG 1.4.11 where text is held to 4.5:1. Naming
- * the role is what lets a value be chosen against the right bar.
- *
- * AND 3:1 IS A FLOOR, NOT A VALUE. The first version of the role layer gave
- * every `-icon` the base, since the base already clears 3:1. Binding the tokens
- * to the real Alert component set in Figma showed what that would do: four of
- * its six variants already draw their icon from the `-text` color, and the
- * base-valued token would have LIGHTENED them — danger 6.7:1 down to 5.0:1,
- * warning 8.7:1 down to 5.0:1. Clearing the icon bar is not a reason to stop
- * clearing the text one, so `-icon` resolves to `-text` and exists as its own
- * name so an icon can be lightened DELIBERATELY later, against a written bar.
- * `-border` keeps the base, where 3:1 is the right bar: a border as dark as its
- * own label reads as a heavier component than it is.
- *
- * THE BORDERS ARE REPOINTED NOW. 111 of the 137 border declarations moved onto
- * `-border` on 2026-08-29, and `npm run check:intent-roles` keeps them there;
- * the warning edges followed on 2026-10-24, when warning's icon and border were
- * settled on #715c00, and what remains is recorded with a reason in
- * `scripts/baselines/intent-role-adoption.json`. Six of the seven roles alias their
- * base, so those 111 changed no pixel — what changed is that an edge now says
- * it is an edge, and the value can move for edges alone. The `-icon` roles
- * still have no users: an icon color is usually set by `color:` on a glyph,
- * which `check:text-contrast` already measures against the 4.5:1 bar.
- *
- * The sweep also found the role that was missing rather than unused. 25 focus
- * rings were left behind because a focus indicator is not a border, and
- * measuring them found 29 rules whose ring could not be seen at all — see
- * Foundations/Border, and `--color-focus-ring` beside these tokens.
- */
-
-/* -------------------------------------------------------------- measuring */
-
-const channels = (hex) => [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
-
-/**
- * The SAME contrast the checks fail the build on — `check:text-contrast`,
- * `check:button-contrast` and `check:focus-ring` all call this function, from
- * `design-system/src/lib/tokens.mjs` (#507). This story used to carry its own
- * copy of WCAG luminance, so the number a designer read here was computed by
- * different code from the number that gated the PR. One import, one answer.
- *
- * The adapter is only about SHAPE: everything below speaks in `#rrggbb`, the
- * module in `{r, g, b, a}`.
- */
-const contrast = (a, b) => contrastOf(parseColor(a), parseColor(b));
-
-/** Read a token as it renders, following aliases the way the browser does. */
-const readIntentToken = (name) => {
-    const raw = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-    if (!raw) return null;
-    if (raw.startsWith('#')) {
-        return raw.length === 4
-            ? `#${raw[1]}${raw[1]}${raw[2]}${raw[2]}${raw[3]}${raw[3]}`
-            : raw;
-    }
-    const rgb = /rgba?\(\s*([\d.]+)[,\s]+([\d.]+)[,\s]+([\d.]+)/.exec(raw);
-    if (!rgb) return null;
-    return `#${rgb.slice(1, 4).map((n) => Math.round(Number(n)).toString(16).padStart(2, '0')).join('')}`;
-};
-
-/** WCAG: text 4.5:1 (1.4.3); icons, borders and other non-text 3:1 (1.4.11). */
-const AA_TEXT = 4.5;
-const AA_NON_TEXT = 3;
-
-const INTENTS = ['primary', 'secondary', 'tertiary', 'danger', 'success', 'warning', 'info'];
-
-/** The surface ladder every one of these colors has to survive. */
-const GROUNDS = [
-    ['lowest', '--color-surface-container-lowest'],
-    ['low', '--color-surface-container-low'],
-    ['container', '--color-surface-container'],
-    ['high', '--color-surface-container-high'],
-    ['highest', '--color-surface-container-highest'],
-];
-
-const grounds = () => GROUNDS.map(([label, token]) => [label, readIntentToken(token)]).filter(([, hex]) => hex);
-
-/** `{intent, role, hex, ratios: [{ground, ratio, passes}]}` for one token. */
-const measure = (intent, role, bar) => {
-    const hex = readIntentToken(role === 'base' ? `--color-${intent}` : `--color-${intent}-${role}`);
-    if (!hex) return null;
-    return {
-        intent,
-        role,
-        hex,
-        bar,
-        ratios: grounds().map(([ground, bg]) => {
-            const ratio = contrast(hex, bg);
-            return { ground, ratio, passes: ratio >= bar };
-        }),
-    };
-};
-
-/* ---------------------------------------------------------------- drawing */
-
-const Cell = ({ ratio, passes }) => (
-    <td
-        style={{
-            padding: 'var(--pad-y-sm) var(--pad-x-md)',
-            textAlign: 'right',
-            fontVariantNumeric: 'tabular-nums',
-            color: passes ? 'var(--ds-text)' : 'var(--ds-text-danger)',
-            fontWeight: passes ? 400 : 700,
-        }}
-    >
-        {ratio.toFixed(2)}
-        {passes ? '' : ' ✗'}
-    </td>
-);
-
-const Matrix = ({ rows, bar, caption }) => (
-    <table style={{ borderCollapse: 'collapse', margin: '0 0 var(--stack-lg)' }}>
-        <caption className="body2-txt" style={{ textAlign: 'left', padding: '0 0 var(--stack-md)' }}>
-            {caption} — the bar is {bar}:1.
-        </caption>
-        <thead>
-            <tr>
-                <th className="body2-txt" style={{ textAlign: 'left', padding: 'var(--pad-y-sm) var(--pad-x-md)' }}>
-                    token
-                </th>
-                {GROUNDS.map(([label]) => (
-                    <th key={label} className="body2-txt" style={{ padding: 'var(--pad-y-sm) var(--pad-x-md)', textAlign: 'right' }}>
-                        {label}
-                    </th>
-                ))}
-            </tr>
-        </thead>
-        <tbody>
-            {rows.map((row) => (
-                <tr key={`${row.intent}-${row.role}`} style={{ borderTop: 'var(--stroke-1) solid var(--ds-border)' }}>
-                    <th
-                        className="body2-txt"
-                        style={{ textAlign: 'left', padding: 'var(--pad-y-sm) var(--pad-x-md)', fontWeight: 400 }}
-                    >
-                        <span
-                            aria-hidden="true"
-                            style={{
-                                display: 'inline-block',
-                                width: 'var(--size-075)',
-                                height: 'var(--size-075)',
-                                marginRight: 'var(--stack-md)',
-                                borderRadius: 'var(--radius-sm)',
-                                background: row.hex,
-                            }}
-                        />
-                        <code>
-                            --color-{row.intent}
-                            {row.role === 'base' ? '' : `-${row.role}`}
-                        </code>
-                    </th>
-                    {row.ratios.map((r) => (
-                        <Cell key={r.ground} {...r} />
-                    ))}
-                </tr>
-            ))}
-        </tbody>
-    </table>
-);
-
-/* ----------------------------------------------------------------- story */
-
-export const RolesAndBars = () => {
-    const base = INTENTS.map((i) => measure(i, 'base', AA_TEXT)).filter(Boolean);
-    const text = INTENTS.map((i) => measure(i, 'text', AA_TEXT)).filter(Boolean);
-    const icon = INTENTS.map((i) => measure(i, 'icon', AA_NON_TEXT)).filter(Boolean);
-    const border = INTENTS.map((i) => measure(i, 'border', AA_NON_TEXT)).filter(Boolean);
-
-    return (
-        <div style={{ maxWidth: 'var(--content-max-width)', padding: 'var(--pad-x-lg)' }} data-testid="intent-roles">
-            <h2 className="h4">What each intent color is for</h2>
-            <p className="body2-txt" style={{ maxWidth: '62ch' }}>
-                Every ratio is computed from the tokens as this page renders them, against the five
-                surface steps the system ships. Nothing here has been repointed — the role tokens
-                have no users yet.
-            </p>
-
-            <h3 className="h5" style={{ marginTop: 'var(--stack-lg)' }}>
-                The base, used as text
-            </h3>
-            <p className="body2-txt" style={{ maxWidth: '62ch' }}>
-                108 declarations in this repository set a foreground from a base token today.
-                <code> --color-warning</code> fails on every ground including white;
-                <code> --color-tertiary</code> and <code>--color-info</code> fail on four of five;
-                <code> --color-primary</code> fails on the two darkest.
-            </p>
-            <Matrix rows={base} bar={AA_TEXT} caption="Base token as a foreground" />
-
-            <h3 className="h5">The `-text` role</h3>
-            <p className="body2-txt" style={{ maxWidth: '62ch' }}>
-                Already in the system, and already correct: every one clears 4.5:1 on all five.
-            </p>
-            <Matrix rows={text} bar={AA_TEXT} caption="`-text` as a foreground" />
-
-            <h3 className="h5">The new `-icon` and `-border` roles</h3>
-            <p className="body2-txt" style={{ maxWidth: '62ch' }}>
-                Held to 3:1 rather than 4.5:1 — WCAG 1.4.11, non-text contrast — but 3:1 is the
-                floor an icon must reach, not the value it should take. Every <code>-icon</code>
-                resolves to its <code>-text</code> color, which clears both bars on all five
-                grounds; it exists as its own name so an icon can be lightened deliberately later,
-                against a bar that is written down. Every <code>-border</code> keeps the base, where
-                3:1 is the right bar.
-                <strong> Warning is the exception</strong>: its base falls to 2.87:1 on the darkest
-                ground, under even the border bar, so its <em>border</em> and its <em>icon</em> take
-                <code> #715c00</code> — the value Figma records as <code>Warning/Warning Border</code>,
-                which <code>Warning/Warning Icon</code> aliases. It measures 6.50:1 on white and
-                5.02:1 on the darkest ground.
-            </p>
-            <Matrix rows={icon} bar={AA_NON_TEXT} caption="`-icon`" />
-            <Matrix rows={border} bar={AA_NON_TEXT} caption="`-border`" />
-        </div>
-    );
-};
-
-RolesAndBars.play = async ({ canvasElement }) => {
-    await expect(canvasElement.querySelector('[data-testid="intent-roles"]')).not.toBe(null);
-
-    /*
-     * The page must be reading the real tokens. A page that fell back to
-     * literals would keep rendering a palette that had moved on, which is the
-     * failure mode this whole file exists to avoid.
-     */
-    for (const intent of INTENTS) {
-        await expect(readIntentToken(`--color-${intent}`), `--color-${intent} is not defined`).not.toBe(null);
-        await expect(readIntentToken(`--color-${intent}-icon`), `--color-${intent}-icon is not defined`).not.toBe(null);
-        await expect(readIntentToken(`--color-${intent}-border`), `--color-${intent}-border is not defined`).not.toBe(null);
-    }
-    await expect(grounds().length, 'the surface ladder must resolve').toBe(GROUNDS.length);
-
-    /*
-     * The bars the role layer claims. These are the assertions that make the
-     * file a promise rather than a description: an `-icon` or `-border` that
-     * drops below 3:1 on ANY ground, or a `-text` below 4.5:1, fails here.
-     */
-    for (const intent of INTENTS) {
-        for (const [role, bar] of [['icon', AA_NON_TEXT], ['border', AA_NON_TEXT], ['text', AA_TEXT]]) {
-            const row = measure(intent, role, bar);
-            for (const { ground, ratio } of row.ratios) {
-                await expect(
-                    ratio,
-                    `--color-${intent}-${role} on surface-container-${ground} (${row.hex})`,
-                ).toBeGreaterThanOrEqual(bar);
-            }
-        }
-    }
-
-    /*
-     * And the marks on the base table have to be honest. Not "warning fails" —
-     * that would go red on the day somebody fixes it, and a page that fails when
-     * its subject is fixed is a page nobody keeps. This asserts only that what
-     * is drawn as a failure IS one, in both directions.
-     */
-    for (const intent of INTENTS) {
-        for (const { ground, ratio, passes } of measure(intent, 'base', AA_TEXT).ratios) {
-            await expect(
-                passes,
-                `--color-${intent} on surface-container-${ground} is ${ratio.toFixed(2)} but marked ${passes ? 'passing' : 'failing'}`,
-            ).toBe(ratio >= AA_TEXT);
-        }
-    }
-};

@@ -183,7 +183,7 @@
  * clicking into the panel does not draw one.
  */
 .plus-tabs-panel {
-    padding-top: var(--size-section-gap-sm);
+    padding-top: var(--section-stack-sm);
 
     &:focus-visible {
         outline: var(--border-selected) solid var(--ds-border-focused);

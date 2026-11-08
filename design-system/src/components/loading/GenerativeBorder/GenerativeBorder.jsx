@@ -6,7 +6,7 @@ import './GenerativeBorder.scss';
 export const GENERATIVE_BORDER_RADII = ['radius-025', 'radius-050', 'radius-075', 'radius-100', 'radius-full'];
 
 /**
- * The border that shows PLUS AI is generating content: a 2px rounded stroke in
+ * The border that shows the AI is generating content: a 2px rounded stroke in
  * two flat colors, in hard-edged segments that run clockwise around the edge.
  *
  * - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the

@@ -332,7 +332,6 @@ test('the old tokens the new ones sit beside still resolve, unchanged', () => {
     '--frame-sidebar-width-nav': '164px',
     '--layout-grid-gap': '8px',
     '--col-1': '48.67px',
-    '--color-scrim': 'rgba(0, 0, 0, 0.32)',
     '--size-modal-pad-x-sm': '10px',
     '--size-card-pad-x-sm': '16px',
     '--size-section-gap-md': '16px',

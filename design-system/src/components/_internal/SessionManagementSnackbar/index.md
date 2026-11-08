@@ -24,7 +24,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--color-info` · `--color-on-warning` · `--color-success` · `--color-success-text` · `--color-warning` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--heading-xsmall` · `--icon-md` · `--modal` · `--pad-x-lg` · `--pad-y-lg` · `--size-modal-radius-md` · `--stack-md`
+`--body-default` · `--body-small` · `--ds-background-information-bold` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-success` · `--ds-text-warning-inverse` · `--heading-xsmall` · `--icon-md` · `--pad-x-lg` · `--pad-y-lg` · `--popover-radius` · `--stack-md`
 
 From `design-system/src/components/_internal/SessionManagementSnackbar/SessionManagementSnackbar.scss`. Override these through the token layer, never with a literal.
 

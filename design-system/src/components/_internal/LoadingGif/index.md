@@ -27,7 +27,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--color-primary`
+`--ds-background-brand-bold`
 
 From `design-system/src/components/_internal/LoadingGif/LoadingGif.scss`. Override these through the token layer, never with a literal.
 

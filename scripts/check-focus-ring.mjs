@@ -29,10 +29,9 @@
  *
  * Run: `npm run check:focus-ring`.
  */
-import fs from 'node:fs';
 import path from 'node:path';
 
-import { COLOR_TOKEN_DIR, TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+import { COLOR_TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import {
   REPO_ROOT,
   colors,
@@ -47,18 +46,14 @@ import { byRoot, main } from './lib/findings.mjs';
 import { openRatchet } from './lib/ratchet.mjs';
 
 const RECORD = 'scripts/baselines/focus-ring.json';
-const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
 
 /**
- * The focus roles a ring resolves through, and how each is known to be
- * defined. The legacy role is asserted always — 29 call sites resolve through
- * it — and from its own roles file. The `--ds-*` role (ADR-035) is asserted
- * once a rule names it, because the generated color set is wired in separately
- * from this check and a tree no rule has moved onto it yet is not broken.
+ * The focus role a ring resolves through, and how it is known to be defined.
+ * `--ds-border-focused` (ADR-035) is the one ring token since the legacy ring
+ * names were retired, so it is asserted always.
  */
 const FOCUS_ROLES = [
-  { token: '--color-focus-ring', file: ROLES_FILE, always: true, defined: ({ roles }) => roles.includes('--color-focus-ring:') },
-  { token: '--ds-border-focused', file: `${COLOR_TOKEN_DIR}/`, always: false, defined: ({ values }) => values.has('--ds-border-focused') },
+  { token: '--ds-border-focused', file: `${COLOR_TOKEN_DIR}/`, always: true, defined: ({ values }) => values.has('--ds-border-focused') },
 ];
 
 /*
@@ -91,7 +86,7 @@ export const MIN_RULES = 40;
 export const REMEDY =
   `  -> A focus indicator is held to ${NON_TEXT}:1 against what it sits on (WCAG 1.4.11),\n` +
   '     and it is the only thing telling a keyboard user where they are. Use\n' +
-  '     `var(--ds-border-focused)` (or, until it is retired, `var(--color-focus-ring)`)\n' +
+  '     `var(--ds-border-focused)`\n' +
   '     rather than a state tint or an inverse color meant for dark grounds. A ring\n' +
   '     drawn on a ground its caller paints declares that ground\n' +
   '     (`// @grounds: --ds-…` or `--color-…` in its block) and is measured on each one.';
@@ -101,7 +96,6 @@ export const REMEDY =
 const inputs = byRoot((repoRoot) => {
   const files = stylesheets(repoRoot);
   const values = colors(repoRoot);
-  const rolesPath = path.join(repoRoot, ROLES_FILE);
   const raw = focusRules(files, repoRoot);
   return {
     files,
@@ -109,14 +103,12 @@ const inputs = byRoot((repoRoot) => {
     values,
     rules: indicators(raw, values),
     declarations: declarationErrors(files, repoRoot, values),
-    // A vanished roles file is the floor case, not a crash (#611).
-    roles: fs.existsSync(rolesPath) ? fs.readFileSync(rolesPath, 'utf8') : '',
   };
 });
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { files, rules, roles, declarations, values, raw } = inputs(repoRoot);
+  const { files, rules, declarations, values, raw } = inputs(repoRoot);
   const found = [];
 
   // A `@grounds` list that names nothing, or a token nobody defines, measures
@@ -142,7 +134,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
    */
   for (const role of FOCUS_ROLES) {
     const uses = raw.filter((rule) => rule.tokens.includes(role.token));
-    if ((role.always || uses.length) && !role.defined({ roles, values })) {
+    if ((role.always || uses.length) && !role.defined({ values })) {
       found.push({
         message:
           `${role.file} no longer defines ${role.token}, which ${uses.length} focus rule(s) resolve through` +

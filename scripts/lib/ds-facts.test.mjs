@@ -140,13 +140,12 @@ test('every check that scopes consumer code composes its roots from the facts mo
   assert.deepEqual(PROTOTYPE_ROOTS, consumer.filter((root) => root !== APP_SHELL_ROOT));
   const roots = async (file, name) => (await import(`../${file}`))[name];
   assert.equal(await roots('check-ds-usage.mjs', 'SCOPE'), consumer);
-  for (const file of ['check-ads-language.mjs', 'check-old-size-tokens.mjs', 'check-react-bootstrap-imports.mjs']) {
+  for (const file of ['check-ads-language.mjs', 'check-old-system.mjs', 'check-react-bootstrap-imports.mjs']) {
     assert.equal(await roots(file, 'SEARCH_ROOTS'), SOURCE_ROOTS, file);
   }
   for (const file of ['check-font-families.mjs', 'check-undefined-tokens.mjs']) {
     assert.deepEqual(await roots(file, 'ROOTS'), [LIBRARY_ROOT, STORYBOOK_ROOT, ...PROTOTYPE_ROOTS], file);
   }
-  assert.deepEqual(await roots('check-legacy-colors.mjs', 'SEARCH_ROOTS'), [`${LIBRARY_ROOT}/components`, `${LIBRARY_ROOT}/ai`, ...PROTOTYPE_ROOTS]);
 });
 
 test('an unknown name is answered, not thrown', () => {

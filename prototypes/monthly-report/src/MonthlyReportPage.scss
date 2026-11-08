@@ -4,14 +4,14 @@
    CSS Variables & Token Imports
    ============================================ */
 .monthly-report {
-    padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md);
+    padding: var(--section-pad-y-default) var(--section-pad-x-default);
     display: flex;
     flex-direction: column;
-    gap: var(--size-section-gap-lg);
+    gap: var(--section-stack-lg);
     background: var(--ds-surface);
     min-height: 100vh;
     overflow: visible;
-    padding-bottom: var(--size-section-gap-lg);
+    padding-bottom: var(--section-stack-lg);
 }
 
 /* ============================================
@@ -43,7 +43,7 @@
     width: 4px;
     height: 4px;
     border-radius: var(--radius-full);
-    background: var(--color-outline-variant);
+    background: var(--ds-background-neutral);
 }
 
 .month-badge {
@@ -69,13 +69,13 @@
 .impact-section-wrapper {
     display: flex;
     flex-direction: column;
-    gap: var(--size-card-gap-md);
+    gap: var(--card-stack-md);
 }
 
 .impact-section {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: var(--size-card-gap-md);
+    gap: var(--card-stack-md);
 }
 
 /* Hero Card */
@@ -85,9 +85,9 @@
 
 .impact-hero-card {
     background: var(--ds-surface-raised);
-    border: 1px solid var(--color-outline-variant);
-    border-radius: var(--size-card-radius-md);
-    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+    border: 1px solid var(--ds-border);
+    border-radius: var(--card-radius);
+    padding: var(--card-pad-compact) var(--card-pad-compact);
     position: relative;
     overflow: hidden;
     height: 100%;
@@ -100,7 +100,7 @@
     width: 180px;
     height: 180px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--color-primary), var(--color-mastering-content));
+    background: linear-gradient(135deg, var(--ds-background-brand-bold), var(--ds-background-smart-mastering-content-bold));
     filter: blur(80px);
     opacity: 0.15;
     top: -60px;
@@ -114,7 +114,7 @@
     width: 120px;
     height: 120px;
     border-radius: 50%;
-    background: var(--color-social-emotional);
+    background: var(--ds-background-smart-social-emotional-bold);
     filter: blur(60px);
     opacity: 0.1;
     bottom: -40px;
@@ -136,7 +136,7 @@
     color: var(--ds-text-subtle);
     text-transform: uppercase;
     letter-spacing: 0.05em;
-    margin-bottom: var(--size-card-gap-md);
+    margin-bottom: var(--card-stack-md);
     display: flex;
     align-items: center;
     gap: var(--stack-md);
@@ -166,7 +166,7 @@
 .impact-metrics {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr);
-    column-gap: var(--size-card-gap-lg);
+    column-gap: var(--card-inline-lg);
     align-items: center;
     flex: 1 1 auto;
 }
@@ -182,7 +182,7 @@
 .impact-divider {
     width: 1px;
     height: 100%;
-    background: var(--color-outline-variant);
+    background: var(--ds-border);
     align-self: stretch;
     justify-self: center;
     margin: 0;
@@ -224,12 +224,12 @@
 
 .delta-badge--success {
     background: rgba(16, 185, 129, 0.1);
-    color: var(--color-success);
+    color: var(--ds-text-success);
 }
 
 .delta-badge--rose {
     background: rgba(244, 63, 94, 0.1);
-    color: var(--color-danger);
+    color: var(--ds-text-danger);
 }
 
 .metric-label {
@@ -242,14 +242,14 @@
 .impact-stats-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--size-card-gap-sm);
+    gap: var(--card-stack-sm);
 }
 
 .stat-card {
     background: var(--ds-surface-raised);
-    border: 1px solid var(--color-outline-variant);
-    border-radius: var(--size-card-radius-sm);
-    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+    border: 1px solid var(--ds-border);
+    border-radius: var(--card-radius-sm);
+    padding: var(--card-pad-compact) var(--card-pad-compact);
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -273,19 +273,19 @@
 }
 
 .stat-card--blue::before {
-    background: var(--color-primary);
+    background: var(--ds-background-brand-bold);
 }
 
 .stat-card--purple::before {
-    background: var(--color-mastering-content);
+    background: var(--ds-background-smart-mastering-content-bold);
 }
 
 .stat-card--amber::before {
-    background: var(--color-warning);
+    background: var(--ds-background-warning-bold);
 }
 
 .stat-card--emerald::before {
-    background: var(--color-success);
+    background: var(--ds-background-success-bold);
 }
 
 .stat-card-icon {
@@ -313,22 +313,22 @@
 
 .stat-card-icon--blue {
     background: rgba(4, 114, 168, 0.1);
-    color: var(--color-primary);
+    color: var(--ds-text-brand);
 }
 
 .stat-card-icon--purple {
     background: rgba(134, 89, 169, 0.1);
-    color: var(--color-mastering-content);
+    color: var(--ds-text-smart-mastering-content);
 }
 
 .stat-card-icon--amber {
     background: rgba(245, 158, 11, 0.1);
-    color: var(--color-warning);
+    color: var(--ds-text-warning);
 }
 
 .stat-card-icon--emerald {
     background: rgba(16, 185, 129, 0.1);
-    color: var(--color-success);
+    color: var(--ds-text-success);
 }
 
 .metric-value-lg {
@@ -365,11 +365,11 @@
 .time-allocation-section {
     background: var(--ds-surface);
     border: none;
-    border-radius: var(--size-card-radius-md);
-    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+    border-radius: var(--card-radius);
+    padding: var(--card-pad-default) var(--card-pad-default);
     display: flex;
     flex-direction: column;
-    gap: var(--size-card-gap-md);
+    gap: var(--card-stack-md);
 }
 
 .time-allocation-title {
@@ -398,7 +398,7 @@
 }
 
 .legend-dot--primary {
-    background: var(--color-success, #3f6f1a);
+    background: var(--ds-background-success-bold);
 }
 
 .legend-dot--amber {
@@ -451,7 +451,7 @@
 }
 
 .time-allocation-segment--primary {
-    background: var(--color-success, #3f6f1a);
+    background: var(--ds-background-success-bold);
 }
 
 .time-allocation-segment--amber {
@@ -509,7 +509,7 @@
     gap: 8px;
     padding: 6px 14px;
     border-radius: var(--radius-full);
-    border: 1px solid var(--color-outline-variant);
+    border: 1px solid var(--ds-border);
     background: var(--ds-surface);
     font-size: 13px;
     font-weight: 500;
@@ -522,7 +522,7 @@
     width: 8px;
     height: 8px;
     border-radius: 50%;
-    background: var(--color-primary);
+    background: var(--ds-background-brand-bold);
     flex-shrink: 0;
 }
 
@@ -579,7 +579,7 @@
 }
 
 .time-insight-icon {
-    color: var(--color-warning);
+    color: var(--ds-text-warning);
     font-size: 16px;
 }
 
@@ -596,7 +596,7 @@
 .growth-insights-section {
     display: flex;
     flex-direction: column;
-    gap: var(--size-card-gap-md);
+    gap: var(--card-stack-md);
 }
 
 .growth-insights-header {
@@ -631,7 +631,7 @@
     display: grid;
     grid-template-columns: 48px 1fr;
     gap: var(--stack-lg);
-    padding-bottom: var(--size-card-gap-md);
+    padding-bottom: var(--card-stack-md);
     position: relative;
 }
 
@@ -643,7 +643,7 @@
     top: 48px;
     bottom: 0;
     width: 2px;
-    background: var(--color-outline-variant);
+    background: var(--ds-background-neutral);
 }
 
 .timeline-node {
@@ -659,12 +659,12 @@
 }
 
 .timeline-node--active {
-    background: var(--color-primary);
-    color: var(--color-on-primary);
+    background: var(--ds-background-brand-bold);
+    color: var(--ds-text-inverse);
 }
 
 .timeline-node--reviewed {
-    background: var(--color-success);
+    background: var(--ds-background-success-bold);
     color: white;
 }
 
@@ -677,15 +677,15 @@
 /* Growth Cards */
 .growth-card {
     background: var(--ds-surface-raised);
-    border: 1px solid var(--color-outline-variant);
-    border-radius: var(--size-card-radius-sm);
+    border: 1px solid var(--ds-border);
+    border-radius: var(--card-radius-sm);
     overflow: hidden;
     transition: box-shadow 0.2s ease;
 }
 
 .growth-card--under_review {
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 1px var(--color-primary);
+    border-color: var(--ds-border-brand);
+    box-shadow: 0 0 0 1px var(--ds-border-brand);
 }
 
 .growth-card--reviewed {
@@ -705,7 +705,7 @@
     display: flex;
     align-items: center;
     gap: var(--space-0625);
-    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+    padding: var(--card-pad-compact) var(--card-pad-compact);
 }
 
 .growth-card-icon {
@@ -754,11 +754,11 @@
 
 /* Card Body (Expanded) */
 .growth-card-body {
-    padding: 0 var(--size-card-pad-x-sm) var(--size-card-pad-y-sm);
-    border-top: 1px solid var(--color-outline-variant);
+    padding: 0 var(--card-pad-compact) var(--card-pad-compact);
+    border-top: 1px solid var(--ds-border);
     display: flex;
     flex-direction: column;
-    gap: var(--size-card-gap-sm);
+    gap: var(--card-stack-sm);
 }
 
 .growth-card-summary {
@@ -771,7 +771,7 @@
 
 .quote-block {
     background: var(--ds-surface-container);
-    border-left: 3px solid var(--color-primary);
+    border-left: 3px solid var(--ds-border-brand);
     border-radius: var(--radius-md);
     padding: var(--pad-x-md);
 }
@@ -796,8 +796,8 @@
 }
 
 .feedback-row {
-    padding-top: var(--size-card-gap-sm);
-    border-top: 1px dashed var(--color-outline-variant);
+    padding-top: var(--card-stack-sm);
+    border-top: 1px dashed var(--ds-border);
     display: flex;
     flex-direction: column;
     gap: var(--space-0625);
@@ -826,7 +826,7 @@
 .training-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--size-card-gap-sm);
+    gap: var(--card-stack-sm);
 }
 
 /* ============================================
@@ -954,7 +954,7 @@
 }
 
 .goal-progress-bar--effort .plus-progressbar-fill {
-    background-color: var(--color-mastering-content, #8659a9) !important;
+    background-color: var(--ds-background-smart-mastering-content-bold) !important;
 }
 
 .goal-value {
@@ -974,11 +974,11 @@
 }
 
 .goal-delta--success {
-    color: var(--color-success, #10b981);
+    color: var(--ds-text-success);
 }
 
 .goal-delta--danger {
-    color: var(--color-danger, #ef4444);
+    color: var(--ds-text-danger);
 }
 
 .goal-delta--neutral {
@@ -990,16 +990,16 @@
    ============================================ */
 .cta-section {
     background: var(--ds-surface);
-    border-radius: var(--size-card-radius-md);
-    border: 1px solid var(--color-outline-variant);
-    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+    border-radius: var(--card-radius);
+    border: 1px solid var(--ds-border);
+    padding: var(--card-pad-default) var(--card-pad-default);
 }
 
 .cta-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: var(--size-card-gap-lg);
+    gap: var(--card-inline-lg);
 }
 
 .cta-text {
@@ -1034,7 +1034,7 @@
     min-height: 0;
     padding: 0;
     padding-bottom: 80px;
-    gap: var(--size-surface-gap-sm);
+    gap: var(--section-stack-sm);
     font-family: var(--font-family-base, var(--font-family-body));
     color: var(--ds-text);
 }
@@ -1049,13 +1049,13 @@
 }
 
 .impact-section-wrapper {
-    margin-bottom: var(--size-surface-gap-sm);
+    margin-bottom: var(--section-stack-sm);
 }
 
 .impact-section {
     grid-template-columns: 2fr 1fr;
-    gap: var(--size-surface-gap-sm);
-    margin-bottom: var(--size-surface-gap-sm);
+    gap: var(--section-stack-sm);
+    margin-bottom: var(--section-stack-sm);
 }
 
 @media (max-width: 900px) {
@@ -1068,18 +1068,18 @@
     background: linear-gradient(135deg, rgba(59, 130, 246, 0.05), #fff);
     border: 1px solid rgba(59, 130, 246, 0.2);
     border-radius: 16px;
-    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
+    padding: var(--card-pad-compact) var(--card-pad-compact);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
 }
 
 .impact-title {
     font-size: 16px;
-    margin-bottom: var(--size-card-gap-md);
-    color: var(--color-primary);
+    margin-bottom: var(--card-stack-md);
+    color: var(--ds-text-brand);
 }
 
 .impact-metrics {
-    column-gap: var(--size-card-gap-lg);
+    column-gap: var(--card-inline-lg);
 }
 
 .metric-value-xl {
@@ -1097,13 +1097,13 @@
 }
 
 .impact-stats-grid {
-    gap: var(--size-card-gap-sm);
+    gap: var(--card-stack-sm);
 }
 
 .stat-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-small, 0 2px 8px rgba(0, 0, 0, 0.08));
-    border-color: var(--color-outline);
+    border-color: var(--ds-border-bold);
 }
 
 .metric-value-lg {
@@ -1117,8 +1117,8 @@
 .time-allocation-section {
     background: #fff;
     border: none;
-    border-radius: var(--size-card-radius-md);
-    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+    border-radius: var(--card-radius);
+    padding: var(--card-pad-default) var(--card-pad-default);
     margin-bottom: 20px;
 }
 
@@ -1161,28 +1161,28 @@
     width: 40px;
     height: 40px;
     background-color: #fff;
-    border: 2px solid var(--color-outline-variant);
+    border: 2px solid var(--ds-border);
     color: var(--ds-text-subtle);
     box-shadow: 0 0 0 6px #fff;
 }
 
 .timeline-node--active {
     background-color: #fff;
-    border-color: var(--color-primary);
-    color: var(--color-primary);
-    box-shadow: 0 0 0 4px var(--color-primary-container);
+    border-color: var(--ds-border-brand);
+    color: var(--ds-text-brand);
+    box-shadow: 0 0 0 4px var(--ds-background-brand-subtlest);
 }
 
 .timeline-node--reviewed {
-    border-color: var(--color-success-container);
-    color: var(--color-on-success-container);
-    background-color: var(--color-success-container);
+    border-color: var(--ds-border-success-subtle);
+    color: var(--ds-text-success-bolder);
+    background-color: var(--ds-background-success);
 }
 
 .growth-card {
     background: #fff;
     border-radius: 12px;
-    padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+    padding: var(--card-pad-default) var(--card-pad-default);
     cursor: pointer;
     transition: all 0.2s ease;
 }
@@ -1190,24 +1190,24 @@
 .growth-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--shadow-small, 0 2px 8px rgba(0, 0, 0, 0.08));
-    border-color: var(--color-outline);
+    border-color: var(--ds-border-bold);
 }
 
 .growth-card--expanded {
-    border-color: var(--color-primary-container);
-    box-shadow: 0 0 0 1px var(--color-primary-container);
+    border-color: var(--ds-border-brand);
+    box-shadow: 0 0 0 1px var(--ds-border-brand);
 }
 
 .growth-card-body {
-    margin-top: var(--size-card-gap-md);
-    padding-top: var(--size-card-gap-md);
-    border-top: 1px solid var(--color-border, var(--color-outline-variant));
+    margin-top: var(--card-stack-md);
+    padding-top: var(--card-stack-md);
+    border-top: 1px solid var(--ds-border);
 }
 
 .growth-card-summary {
     font-size: 15px;
     line-height: 1.6;
-    margin: 0 0 var(--size-card-gap-sm);
+    margin: 0 0 var(--card-stack-sm);
     padding-block: var(--space-025);
 }
 
@@ -1228,8 +1228,8 @@
 }
 
 .feedback-row {
-    margin-top: var(--size-card-gap-md);
-    padding-top: var(--size-card-gap-sm);
+    margin-top: var(--card-stack-md);
+    padding-top: var(--card-stack-sm);
     display: flex;
     flex-direction: row;
     align-items: center;
@@ -1255,7 +1255,7 @@
 .insight-alert {
     background: var(--ds-background-accent-teal-subtlest);
     color: var(--ds-text);
-    border-color: var(--color-tertiary-border);
+    border-color: var(--ds-border-accent-teal);
 }
 
 /*
@@ -1263,7 +1263,7 @@
  * alert keeps its own style's Icon color and does not take this class.
  */
 .insight-alert .insight-alert-icon {
-    color: var(--color-tertiary-icon);
+    color: var(--ds-text-accent-teal);
 }
 
 .training-grid {
@@ -1291,7 +1291,7 @@
     top: 48px;
     bottom: 0;
     width: 2px;
-    background: var(--color-outline-variant);
+    background: var(--ds-background-neutral);
 }
 
 /* 2) Keep review progress bar + count on one row */
@@ -1345,9 +1345,9 @@
    Final Enforced Parity (authoritative)
    ============================================ */
 .monthly-report {
-    gap: var(--size-section-gap-md) !important;
-    padding-left: var(--size-spacing-small-space-000) !important;
-    padding-right: var(--size-spacing-small-space-000) !important;
+    gap: var(--section-stack-md) !important;
+    padding-left: var(--space-0) !important;
+    padding-right: var(--space-0) !important;
     overflow: visible !important;
     /* Ensure shadows aren't clipped by the container itself */
 }
@@ -1360,7 +1360,7 @@
     top: 44px !important;
     bottom: 28px !important;
     width: 2px !important;
-    background: var(--color-outline-variant, #98a2ad) !important;
+    background: var(--ds-background-neutral) !important;
     z-index: -1 !important;
     /* Move behind everything */
     pointer-events: none !important;
@@ -1393,15 +1393,15 @@
     /* Explicit opaque color matching surface */
     color: var(--ds-text-subtle);
     opacity: 1 !important;
-    border-color: var(--color-outline-variant) !important;
+    border-color: var(--ds-border) !important;
     z-index: 10 !important;
 }
 
 .monthly-report .time-allocation-section {
     border: none !important;
-    border-radius: var(--size-card-radius-md) !important;
-    box-shadow: var(--elevation-light-1, 0px 1px 3px 1px rgba(0, 0, 0, 0.15), 0px 1px 2px 0px rgba(0, 0, 0, 0.3)) !important;
-    margin-bottom: var(--size-spacing-small-space-000) !important;
+    border-radius: var(--card-radius) !important;
+    box-shadow: var(--ds-shadow-raised) !important;
+    margin-bottom: var(--space-0) !important;
     margin-left: var(--stack-sm, 8px) !important;
     margin-right: var(--stack-sm, 8px) !important;
 }
@@ -1433,7 +1433,7 @@
 }
 
 .monthly-report .time-allocation-segment--primary {
-    background: var(--color-success, #3f6f1a) !important;
+    background: var(--ds-background-success-bold) !important;
 }
 
 .monthly-report .time-allocation-segment--indigo {
@@ -1455,7 +1455,7 @@
 }
 
 .monthly-report .legend-dot--primary {
-    background: var(--color-success, #3f6f1a) !important;
+    background: var(--ds-background-success-bold) !important;
 }
 
 .monthly-report .legend-dot--indigo {
@@ -1508,7 +1508,7 @@
 
 .monthly-report .growth-insights-header {
     align-items: flex-start !important;
-    margin-bottom: var(--size-surface-gap-sm) !important;
+    margin-bottom: var(--section-stack-sm) !important;
 }
 
 .monthly-report .growth-insights-title-column {
@@ -1583,28 +1583,28 @@
    Stabilization Overrides (authoritative)
    ============================================ */
 .monthly-report {
-    padding-bottom: calc(var(--size-section-pad-y-md) + var(--size-section-pad-y-sm)) !important;
+    padding-bottom: calc(var(--section-pad-y-default) + var(--section-pad-y-compact)) !important;
 }
 
 .monthly-report .growth-insights-header {
     align-items: flex-start !important;
-    gap: var(--size-section-gap-lg) !important;
-    margin-bottom: var(--size-surface-gap-sm) !important;
+    gap: var(--section-stack-lg) !important;
+    margin-bottom: var(--section-stack-sm) !important;
     width: 100% !important;
 }
 
 .monthly-report .impact-section-wrapper {
-    margin-bottom: var(--size-section-gap-lg) !important;
+    margin-bottom: var(--section-stack-lg) !important;
 }
 
 .monthly-report .impact-section {
     align-items: stretch !important;
-    gap: var(--size-section-gap-lg) !important;
-    margin-bottom: var(--size-spacing-small-space-000) !important;
+    gap: var(--section-stack-lg) !important;
+    margin-bottom: var(--space-0) !important;
 }
 
 .monthly-report .impact-hero-card-content {
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-stack-md) !important;
 }
 
 .monthly-report .impact-metrics {
@@ -1612,7 +1612,7 @@
 }
 
 .monthly-report .impact-metric {
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-stack-md) !important;
 }
 
 .monthly-report .insight-alert {
@@ -1621,11 +1621,11 @@
 }
 
 .monthly-report .impact-stats-grid {
-    gap: var(--size-card-gap-sm) !important;
+    gap: var(--card-stack-sm) !important;
 }
 
 .monthly-report .impact-title {
-    margin-bottom: var(--size-spacing-small-space-000) !important;
+    margin-bottom: var(--space-0) !important;
     font-size: 13px !important;
     line-height: 1.2 !important;
 }
@@ -1642,8 +1642,8 @@
 }
 
 .monthly-report .growth-insights-section {
-    margin-top: var(--size-surface-gap-md) !important;
-    margin-bottom: calc(var(--size-section-gap-md) + var(--size-surface-gap-md)) !important;
+    margin-top: var(--section-stack-md) !important;
+    margin-bottom: calc(var(--section-stack-md) + var(--section-stack-md)) !important;
 }
 
 .monthly-report .growth-insights-title-column {
@@ -1706,7 +1706,7 @@
     padding-left: 64px !important;
     display: flex !important;
     flex-direction: column !important;
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-stack-md) !important;
 }
 
 .monthly-report .timeline-container::before {
@@ -1716,7 +1716,7 @@
     top: 44px !important;
     bottom: 24px !important;
     width: 2px !important;
-    background: var(--color-outline-variant) !important;
+    background: var(--ds-background-neutral) !important;
     z-index: 0 !important;
     pointer-events: none !important;
 }
@@ -1741,9 +1741,9 @@
     position: absolute !important;
     left: -32px !important;
     top: 60px !important;
-    bottom: calc(-1 * var(--size-card-gap-md)) !important;
+    bottom: calc(-1 * var(--card-stack-md)) !important;
     width: 2px !important;
-    background: var(--color-outline-variant) !important;
+    background: var(--ds-background-neutral) !important;
     z-index: 0 !important;
 }
 
@@ -1820,7 +1820,7 @@
     top: 44px !important;
     bottom: 28px !important;
     width: 2px !important;
-    background: var(--color-outline-variant, #98a2ad) !important;
+    background: var(--ds-background-neutral) !important;
     z-index: 1 !important;
     pointer-events: none !important;
 }
@@ -1890,11 +1890,11 @@
 
 .monthly-report .training-grid {
     display: flex !important;
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-inline-md) !important;
     width: max-content !important;
     min-width: 100% !important;
     overflow: visible !important;
-    padding-bottom: var(--size-spacing-small-space-000) !important;
+    padding-bottom: var(--space-0) !important;
 }
 
 .monthly-report .training-grid>* {
@@ -1907,20 +1907,20 @@
 .monthly-report.reveal-root.has-entered {
     padding-left: 0 !important;
     padding-right: 0 !important;
-    gap: var(--size-section-gap-lg) !important;
+    gap: var(--section-stack-lg) !important;
 }
 
 .monthly-report .impact-section-wrapper {
-    margin-bottom: var(--size-section-gap-md) !important;
+    margin-bottom: var(--section-stack-md) !important;
 }
 
 .monthly-report .impact-section {
-    gap: var(--size-section-gap-lg) !important;
+    gap: var(--section-stack-lg) !important;
     margin-bottom: 0 !important;
 }
 
 .monthly-report .impact-hero-card-content {
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-stack-md) !important;
 }
 
 .monthly-report .impact-metrics {
@@ -1929,11 +1929,11 @@
 
 .monthly-report .impact-metrics {
     align-items: center !important;
-    column-gap: var(--size-card-gap-md) !important;
+    column-gap: var(--card-inline-md) !important;
 }
 
 .monthly-report .impact-metric {
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-stack-md) !important;
 }
 
 .monthly-report .delta-badge {
@@ -1958,18 +1958,18 @@
 }
 
 .monthly-report .time-allocation-section {
-    border-radius: var(--size-card-radius-md) !important;
-    margin-bottom: var(--size-section-gap-md) !important;
+    border-radius: var(--card-radius) !important;
+    margin-bottom: var(--section-stack-md) !important;
     overflow: visible !important;
 }
 
 .monthly-report .impact-stats-grid {
-    row-gap: var(--size-card-gap-sm) !important;
-    column-gap: var(--size-card-gap-sm) !important;
+    row-gap: var(--card-stack-sm) !important;
+    column-gap: var(--card-inline-sm) !important;
 }
 
 .monthly-report .stat-card {
-    gap: var(--size-card-gap-md) !important;
+    gap: var(--card-stack-md) !important;
 }
 
 /* ============================================

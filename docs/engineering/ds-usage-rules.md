@@ -70,7 +70,7 @@ Import the PLUS component from `@/components`.
 
 ## ds/no-retired-name
 
-**warn.** A prop the manifest marks deprecated, a token from the legacy color set, or a retired token name that is still declared somewhere.
+**warn.** A prop the manifest marks deprecated, or a retired token name that is still declared somewhere.
 
 Use the replacement the fix names.
 

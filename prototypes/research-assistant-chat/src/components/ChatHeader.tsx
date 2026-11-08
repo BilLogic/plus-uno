@@ -34,7 +34,7 @@ export function ChatHeader({
           aria-label="Back to Tutors"
           style={{
             padding: 'var(--space-025, 4px) var(--pad-x-sm, 8px)',
-            color: 'var(--color-primary)',
+            color: 'var(--ds-text-brand)',
             background: 'transparent',
             border: 'none',
             cursor: 'pointer',

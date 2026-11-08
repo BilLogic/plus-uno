@@ -48,7 +48,7 @@ export const AuthProviders = () => {
                         backgroundColor: 'var(--ds-surface-raised)',
                         borderRadius: '12px',
                         padding: '24px',
-                        border: '1px solid var(--color-outline-variant)',
+                        border: '1px solid var(--ds-border)',
                         display: 'flex',
                         flexDirection: 'column',
                         gap: '16px',
@@ -62,7 +62,7 @@ export const AuthProviders = () => {
                             height: '80px',
                             backgroundColor: 'var(--ds-surface-container)',
                             borderRadius: '8px',
-                            border: '1px solid var(--color-outline-variant)'
+                            border: '1px solid var(--ds-border)'
                         }}>
                             <img src={asset.src} alt={asset.name} style={{ maxWidth: '100%', maxHeight: '100%' }} />
                         </div>
@@ -169,7 +169,7 @@ export const TutorBadges = () => {
                                     backgroundColor: 'var(--ds-surface-raised)',
                                     borderRadius: '12px',
                                     padding: '24px',
-                                    border: '1px solid var(--color-outline-variant)',
+                                    border: '1px solid var(--ds-border)',
                                     display: 'flex',
                                     flexDirection: 'column',
                                     gap: '16px',
@@ -183,7 +183,7 @@ export const TutorBadges = () => {
                                         minHeight: '150px',
                                         backgroundColor: 'var(--ds-surface-container)',
                                         borderRadius: '8px',
-                                        border: '1px solid var(--color-outline-variant)',
+                                        border: '1px solid var(--ds-border)',
                                         padding: '16px'
                                     }}>
                                         <img 

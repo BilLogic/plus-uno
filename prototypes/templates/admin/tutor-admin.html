@@ -39,26 +39,26 @@
         .tutor-admin-sidebar {
             width: 280px;
             background-color: var(--ds-surface-container);
-            border-right: var(--size-surface-border) solid var(--color-outline);
-            padding: var(--size-surface-container-pad-y) var(--size-surface-container-pad-x);
+            border-right: var(--border-default) solid var(--ds-border-bold);
+            padding: var(--section-pad-y-default) var(--section-pad-x-default);
             display: flex;
             flex-direction: column;
-            gap: var(--size-surface-container-gap-md);
+            gap: var(--section-stack-md);
         }
         
         .sidebar-logo {
-            margin-bottom: var(--size-section-gap-md);
+            margin-bottom: var(--section-stack-md);
         }
         
         .sidebar-logo-text {
             font-family: var(--font-family-header);
             font-weight: var(--font-weight-bold);
             font-size: var(--font-size-h4);
-            color: var(--color-primary);
+            color: var(--ds-text-brand);
         }
         
         .sidebar-section {
-            margin-bottom: var(--size-section-gap-md);
+            margin-bottom: var(--section-stack-md);
         }
         
         .sidebar-section-title {
@@ -83,24 +83,24 @@
         /* Header - raised surface */
         .tutor-admin-header {
             background-color: var(--ds-surface-container);
-            border-bottom: var(--border-default) solid var(--color-outline-variant);
-            padding: var(--size-surface-container-pad-y) var(--size-surface-pad-x);
+            border-bottom: var(--border-default) solid var(--ds-border);
+            padding: var(--section-pad-y-default) var(--page-pad-x-default);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: var(--space-0625);
+            gap: var(--inline-lg);
         }
         
         .header-left {
             display: flex;
             align-items: center;
-            gap: var(--space-0625);
+            gap: var(--inline-lg);
         }
         
         .header-right {
             display: flex;
             align-items: center;
-            gap: var(--space-0625);
+            gap: var(--inline-lg);
         }
         
         .user-info {
@@ -113,8 +113,8 @@
             width: 32px;
             height: 32px;
             border-radius: 50%;
-            background-color: var(--color-primary-container);
-            color: var(--color-on-primary-container);
+            background-color: var(--ds-background-brand-subtlest);
+            color: var(--ds-text-brand);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -125,7 +125,7 @@
         /* Content Area */
         .tutor-admin-content {
             flex: 1;
-            padding: var(--size-surface-pad-y) var(--size-surface-pad-x);
+            padding: var(--page-pad-y-default) var(--page-pad-x-default);
             overflow-y: auto;
         }
         
@@ -133,8 +133,8 @@
         .tutor-tabs {
             display: flex;
             gap: var(--stack-md);
-            margin-bottom: var(--size-section-gap-md);
-            border-bottom: var(--border-default) solid var(--color-outline-variant);
+            margin-bottom: var(--section-stack-md);
+            border-bottom: var(--border-default) solid var(--ds-border);
         }
         
         .tutor-tab {
@@ -153,28 +153,28 @@
         }
         
         .tutor-tab:hover {
-            color: var(--color-primary);
+            color: var(--ds-text-brand);
             background-color: var(--ds-background-neutral-subtle-hovered);
         }
         
         .tutor-tab.active {
-            color: var(--color-primary);
-            border-bottom-color: var(--color-primary);
+            color: var(--ds-text-brand);
+            border-bottom-color: var(--ds-border-brand);
         }
         
         /* Action Buttons */
         .action-buttons {
             display: flex;
-            gap: var(--space-0625);
-            margin-bottom: var(--size-section-gap-md);
+            gap: var(--inline-lg);
+            margin-bottom: var(--section-stack-md);
             flex-wrap: wrap;
         }
         
         /* Table */
         .tutor-table-container {
             background-color: var(--ds-surface-container);
-            border-radius: var(--size-card-radius-sm);
-            border: var(--size-card-border-sm) solid var(--color-outline-variant);
+            border-radius: var(--card-radius-sm);
+            border: var(--border-default) solid var(--ds-border);
             overflow: hidden;
         }
         
@@ -188,13 +188,13 @@
         }
         
         .tutor-table th {
-            padding: var(--size-table-cell-y) var(--size-table-cell-x);
+            padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
             text-align: left;
             font-family: var(--font-family-header);
             font-weight: var(--font-weight-semibold-2);
             font-size: var(--font-size-body2);
             color: var(--ds-text-subtle);
-            border-bottom: var(--border-default) solid var(--color-outline-variant);
+            border-bottom: var(--border-default) solid var(--ds-border);
         }
         
         .tutor-table th.sortable {
@@ -206,12 +206,12 @@
         }
         
         .tutor-table th.sortable:hover {
-            color: var(--color-primary);
+            color: var(--ds-text-brand);
         }
         
         .tutor-table td {
-            padding: var(--size-table-cell-y) var(--size-table-cell-x);
-            border-bottom: var(--border-default) solid var(--color-outline-variant);
+            padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
+            border-bottom: var(--border-default) solid var(--ds-border);
             font-size: var(--font-size-body1);
             color: var(--ds-text);
         }
@@ -237,11 +237,11 @@
         
         .tutor-actions {
             display: flex;
-            gap: var(--space-0625);
+            gap: var(--inline-lg);
         }
         
         .tutor-action-link {
-            color: var(--color-primary);
+            color: var(--ds-link);
             text-decoration: none;
             font-size: var(--font-size-body1);
             cursor: pointer;
@@ -254,8 +254,8 @@
         /* Footer */
         .tutor-admin-footer {
             background-color: var(--ds-surface-container);
-            border-top: var(--border-default) solid var(--color-outline-variant);
-            padding: var(--size-section-pad-y-sm) var(--size-surface-pad-x);
+            border-top: var(--border-default) solid var(--ds-border);
+            padding: var(--section-pad-y-compact) var(--page-pad-x-default);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -269,7 +269,7 @@
             border: none;
             color: var(--ds-text);
             cursor: pointer;
-            padding: var(--space-025) var(--pad-x-sm);
+            padding: var(--pad-y-md) var(--pad-x-sm);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -305,7 +305,7 @@
         .plus-select {
             width: 100%;
             padding: var(--pad-y-md) var(--pad-x-md);
-            border: var(--border-default) solid var(--color-outline);
+            border: var(--border-default) solid var(--ds-border-bold);
             border-radius: var(--radius-md);
             background-color: var(--ds-surface);
             color: var(--ds-text);
@@ -317,7 +317,7 @@
         .plus-textarea:focus,
         .plus-select:focus {
             outline: none;
-            border-color: var(--color-primary);
+            border-color: var(--ds-border-brand);
         }
         
         .plus-textarea {

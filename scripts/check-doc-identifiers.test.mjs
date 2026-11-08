@@ -101,7 +101,7 @@ test('0c454cce: the four fabricated elevation tokens are absent from _elevation.
     'utf8',
   );
   const defined = new Set(definedTokens(scss));
-  assert.ok(defined.has('--elevation-light-1'), 'the real names must still be there');
+  assert.ok(defined.has('--elevation-light-4'), 'the real names must still be there');
   assert.ok(defined.has('--elevation-light-5'));
   for (const name of FABRICATED) {
     assert.equal(defined.has(name), false, `${name} must not exist — that was the defect`);

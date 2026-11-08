@@ -251,5 +251,5 @@ test("CloseButton's exported inverse grounds match the @grounds on its inverse t
   );
   const tokens = groundsOfSelector(fs.readFileSync(scss, 'utf8'), '.plus-close-btn.plus-close-btn--inverse');
   assert.deepEqual(tokens, INVERSE_GROUNDS);
-  assert.ok(INVERSE_GROUNDS.includes('--color-warning'));
+  assert.ok(INVERSE_GROUNDS.every((token) => token.startsWith('--ds-')), 'every ground is a current token');
 });

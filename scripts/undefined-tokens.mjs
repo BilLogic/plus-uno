@@ -113,17 +113,13 @@ export const isInterpolated = (name) => name.endsWith('-');
 /**
  * Properties something OUTSIDE this repository defines.
  *
- * `--spacing` is Tailwind v4's own theme variable, set by Tailwind's generated
- * stylesheet, and `design-system/src/storybook-docs/ui/alert.tsx` is a vendored
- * shadcn component that reads it. Undefined here and defined at runtime — so
- * reporting it would be reporting a fact about this repo's boundary rather than
- * a defect, and the fix a reader would attempt (point it at a design token)
- * would break the component.
+ * Empty today. Each entry names the outside owner that defines it at runtime,
+ * so a reader is not sent to "fix" it into a design token.
  *
  * Keep this list short and give every entry its owner. An allowlist is where a
  * check goes to stop being true.
  */
-export const EXTERNAL = new Set(['--spacing']);
+export const EXTERNAL = new Set();
 
 /**
  * `{name: {uses, bare, files}}` for every used-and-undefined token, plus the

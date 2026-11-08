@@ -29,9 +29,9 @@ export default function MyDashboard() {
             }}
         >
             {/* ⬇️ YOUR PAGE CONTENT GOES HERE ⬇️ */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
                 {/* Example Content */}
-                <h1 className="h3">Dashboard Overview</h1>
+                <h1 className="heading-large">Dashboard Overview</h1>
             </div>
             {/* ⬆️ YOUR PAGE CONTENT ENDS HERE ⬆️ */}
         </PageLayout>
@@ -76,8 +76,8 @@ export default function MyPageWithModal() {
 ## Applying spacing
 
 When filling in the content blocks, use only semantic CSS variables — the names are in `design-system/agent-views/tokens/tokens.md`, the scales in `../foundations/spacing.md`:
-*   `gap: 'var(--size-section-gap-md)'` -> Spacing between major page blocks (like two diff Cards).
-*   `gap: 'var(--space-0625)'` -> Spacing between elements inside a Card (like headers and text).
+*   `gap: 'var(--section-stack-md)'` -> Spacing between major page blocks (like two Cards).
+*   `gap: 'var(--card-stack-md)'` -> Spacing between elements inside a Card (like headers and text).
 *   Never use raw string pixels like `gap: '16px'`.
 
 ## Navigation

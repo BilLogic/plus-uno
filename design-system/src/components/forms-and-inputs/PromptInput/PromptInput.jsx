@@ -8,7 +8,7 @@ import GenerativeBorder from '@/components/loading/GenerativeBorder';
 import './PromptInput.scss';
 
 /**
- * Where a person writes to PLUS AI: a text area that grows from one line up to
+ * Where a person writes to the AI: a text area that grows from one line up to
  * five, then scrolls, with an optional control before the text and one send
  * action after it.
  *
@@ -150,7 +150,7 @@ const PromptInput = ({
 
 PromptInput.propTypes = {
     id: PropTypes.string,
-    /** The field's accessible name, such as "Message to PLUS AI". */
+    /** The field's accessible name, such as "Message to AI chat". */
     label: PropTypes.string.isRequired,
     /** The text, for a controlled field. */
     value: PropTypes.string,

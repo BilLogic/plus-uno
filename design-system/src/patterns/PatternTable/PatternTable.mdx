@@ -100,7 +100,7 @@ Pick the type from what people do with the rows. Ask the questions in order, and
 </tbody>
 </DocsTable>
 
-The `toolbar` slot is deprecated. It still renders above the table, with a one-time warning in development. Put search, filters and actions in the Section header instead: `<PatternSection toolbar={<PatternSection.Toolbar />}>`.
+Search, filters and actions sit in the Section header: `<PatternSection toolbar={<PatternSection.Toolbar />}>`.
 
 </div>
 
@@ -144,7 +144,7 @@ Row states are layered over each cell's fill, never swapped for it.
 <tr><td><code>--ds-border-bold</code></td><td>color</td><td>The rule under the head row.</td></tr>
 <tr><td><code>--ds-text</code>, <code>--body-default</code></td><td>14/20</td><td>Body cells.</td></tr>
 <tr><td><code>--ds-text-subtle</code>, <code>--heading-xxsmall</code></td><td>color, type</td><td>Head cells and the message row.</td></tr>
-<tr><td><code>--size-table-cell-x</code>, <code>--size-table-cell-y</code>, <code>--size-table-cell-gap</code></td><td>length</td><td>Cell padding and the gap inside a cell.</td></tr>
+<tr><td><code>--table-pad-x-cell</code>, <code>--table-pad-y-cell</code>, <code>--stack-md</code></td><td>length</td><td>Cell padding and the gap inside a cell.</td></tr>
 <tr><td><code>--ds-background-neutral-subtle-hovered</code>, <code>-pressed</code></td><td>color</td><td>A hovered and a pressed row.</td></tr>
 <tr><td><code>--ds-background-selected</code>, <code>-hovered</code>, <code>-pressed</code></td><td>color</td><td>A selected row.</td></tr>
 <tr><td><code>--ds-shadow-overflow</code></td><td>shadow</td><td>A sticky edge, only while content is scrolled under it.</td></tr>

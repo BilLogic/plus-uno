@@ -480,7 +480,7 @@ export const LoadingCard = () => {
                     width: '294px',
                     padding: '16px',
                     border: '1px solid var(--ds-border)',
-                    borderRadius: 'var(--size-card-radius-sm)',
+                    borderRadius: 'var(--card-radius-sm)',
                 }}
             >
                 {loaded ? (

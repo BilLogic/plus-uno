@@ -155,7 +155,7 @@ const REPO_ROOT = path.resolve(__dirname, '..');
  *
  * `design-system/src/storybook-docs/storybook-tailwind.css` is docs-only too and
  * is still NOT here: it contains no declarations at all, only custom-property
- * definitions for the shadcn theme layer. It is a token sheet, and the paragraph
+ * definitions for the docs Tailwind theme layer. It is a token sheet, and the paragraph
  * above about the DS SCSS applies to it word for word.
  */
 const docsStyleDir = (root = REPO_ROOT) => path.join(root, '.storybook');

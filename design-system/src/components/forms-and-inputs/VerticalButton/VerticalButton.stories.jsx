@@ -13,9 +13,6 @@ export default {
     /** Hide CSF stories from the sidebar; docs live on VerticalButton.mdx (Canvas still embeds them). */
     tags: ['!dev', '!autodocs', 'new'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'added', summary: 'Vertical button: an icon over a label at one size (60 by 60), with `appearance` (default, subtle, primary), `isSelected`, `isDisabled` and `isLoading`.' },
-        ],
         docs: { toc: { title: 'On this page' } },
     },
     argTypes: {
@@ -35,8 +32,8 @@ export const Overview = {
     render: (args) => <VerticalButton {...args} />,
     play: async ({ canvasElement }) => {
         const button = within(canvasElement).getByRole('button', { name: 'Admin' });
-        await expect(button.getBoundingClientRect().width).toBe(60);
-        await expect(button.getBoundingClientRect().height).toBe(60);
+        await expect(button.getBoundingClientRect().width).toBe(64);
+        await expect(button.getBoundingClientRect().height).toBe(64);
         const icon = button.querySelector('.plus-btn-visual');
         const text = button.querySelector('.plus-btn-text');
         await expect(icon.getBoundingClientRect().bottom).toBeLessThanOrEqual(text.getBoundingClientRect().top);

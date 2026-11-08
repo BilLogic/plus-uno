@@ -37,7 +37,7 @@ test('the ring is measured against a translucent ground composited over the page
 test('the tokens the sweep found are still the values it found them at', () => {
   assert.ok(ratio('--color-inverse-primary', '--color-surface', VALUES) < 2);
   assert.ok(ratio('--tint-primary-08', '--color-surface', VALUES) < 1.3);
-  assert.ok(ratio('--color-focus-ring', '--color-surface', VALUES) >= 4.5);
+  assert.ok(ratio('--ds-border-focused', '--color-surface', VALUES) >= 4.5);
 });
 
 test('a rule is scored on its strongest affordance, not its weakest', () => {
@@ -163,7 +163,7 @@ test('an empty token directory fires the sentinel floor, not a clean sweep', () 
       `expected the stylesheet floor, got:\n${found.join('\n')}`,
     );
     assert.ok(
-      found.some((message) => /no longer defines --color-focus-ring/.test(message)),
+      found.some((message) => /no longer defines --ds-border-focused/.test(message)),
       `expected the vanished role, got:\n${found.join('\n')}`,
     );
   } finally {
@@ -187,10 +187,10 @@ const inverseRing = (grounds) => [
 const A = 'design-system/src/a.scss';
 
 test('@grounds: a ring is measured on each declared ground and passes when every one clears 3:1', () => {
-  const root = corpus({ [A]: inverseRing('--color-inverse-surface --color-primary') });
+  const root = corpus({ [A]: inverseRing('--ds-background-neutral-bold --color-primary') });
   const entries = indicators(focusRules([A], root), VALUES);
   assert.equal(entries.length, 1);
-  assert.deepEqual(entries[0].grounds.map((g) => g.ground).sort(), ['--color-inverse-surface', '--color-primary']);
+  assert.deepEqual(entries[0].grounds.map((g) => g.ground).sort(), ['--color-primary', '--ds-background-neutral-bold']);
   // `best` is the WEAKEST ground: the rule is only as visible as that.
   assert.equal(entries[0].best.ground, '--color-primary');
   assert.ok(entries[0].best.ratio >= 3);

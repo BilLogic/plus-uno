@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import IconButton from '@/components/forms-and-inputs/IconButton';
 import Heading from '@/components/text-and-data-display/Heading';
 import './Panel.scss';
@@ -47,7 +47,7 @@ export const PanelContainer = ({ width, className, children, ...props }) => {
 
     return (
         <section
-            className={classNames('plus-panel', hosted && 'plus-panel--hosted', className)}
+            className={clsx('plus-panel', hosted && 'plus-panel--hosted', className)}
             style={{ width: resolvedWidth }}
             {...props}
         >
@@ -65,7 +65,7 @@ PanelContainer.propTypes = {
 
 /** PanelHeader: back action, optional title icon, title, and an action group. */
 export const PanelHeader = ({ backAction, titleIcon, title, actions, className, ...props }) => (
-    <header className={classNames('plus-panel-header', className)} {...props}>
+    <header className={clsx('plus-panel-header', className)} {...props}>
         {backAction && <div className="plus-panel-header-back">{backAction}</div>}
         {titleIcon && <div className="plus-panel-header-icon">{titleIcon}</div>}
         <div className="plus-panel-header-title"><Heading size="xsmall">{title}</Heading></div>
@@ -83,35 +83,35 @@ PanelHeader.propTypes = {
 
 /** PanelActionGroup: the row an action-component family (Close, More, …) sits in. */
 export const PanelActionGroup = ({ className, children, ...props }) => (
-    <div className={classNames('plus-panel-action-group', className)} {...props}>{children}</div>
+    <div className={clsx('plus-panel-action-group', className)} {...props}>{children}</div>
 );
 
 PanelActionGroup.propTypes = { className: PropTypes.string, children: PropTypes.node };
 
 /** PanelSubheader: a row of secondary content under the header. */
 export const PanelSubheader = ({ className, children, ...props }) => (
-    <div className={classNames('plus-panel-subheader', className)} {...props}>{children}</div>
+    <div className={clsx('plus-panel-subheader', className)} {...props}>{children}</div>
 );
 
 PanelSubheader.propTypes = { className: PropTypes.string, children: PropTypes.node };
 
 /** PanelBody: the panel's scrollable main content. */
 export const PanelBody = ({ className, children, ...props }) => (
-    <div className={classNames('plus-panel-body', className)} {...props}>{children}</div>
+    <div className={clsx('plus-panel-body', className)} {...props}>{children}</div>
 );
 
 PanelBody.propTypes = { className: PropTypes.string, children: PropTypes.node };
 
 /** PanelFooter: actions and an optional disclaimer line. */
 export const PanelFooter = ({ className, children, ...props }) => (
-    <footer className={classNames('plus-panel-footer', className)} {...props}>{children}</footer>
+    <footer className={clsx('plus-panel-footer', className)} {...props}>{children}</footer>
 );
 
 PanelFooter.propTypes = { className: PropTypes.string, children: PropTypes.node };
 
 /** PanelDisclaimer: the small-print line a PanelFooter carries beside its actions. */
 export const PanelDisclaimer = ({ className, children, ...props }) => (
-    <p className={classNames('plus-panel-disclaimer', className)} {...props}>{children}</p>
+    <p className={clsx('plus-panel-disclaimer', className)} {...props}>{children}</p>
 );
 
 PanelDisclaimer.propTypes = { className: PropTypes.string, children: PropTypes.node };

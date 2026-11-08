@@ -1,6 +1,6 @@
 /**
  * PLUS design tokens for Research Assistant Chat prototype.
- * Loads token files from plus-ds so var(--color-*), var(--font-*) are available.
+ * Loads the design-system token files so the --ds-* and type tokens are available.
  */
 @use '../../../../design-system/src/tokens/colors' as *;
 // Role layer — must follow colors; see design-system/src/tokens/_color_roles.scss.

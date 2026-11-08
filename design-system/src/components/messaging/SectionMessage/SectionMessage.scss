@@ -8,13 +8,13 @@
 .plus-section-message {
     display: flex;
     align-items: flex-start;
-    border-radius: var(--size-modal-radius-sm);
+    border-radius: var(--radius-md);
     width: 100%;
     max-width: 100%;
     color: var(--ds-text);
     box-sizing: border-box;
-    padding: var(--size-card-pad-y-sm) var(--size-card-pad-x-sm);
-    gap: var(--size-card-gap-sm);
+    padding: var(--card-pad-compact) var(--card-pad-compact);
+    gap: var(--card-inline-sm);
 }
 
 /* Inner content wrapper */
@@ -33,7 +33,7 @@
 
 /* A section message's title: Heading/small 16/20, over Body/default 14/20.
  * Color is set explicitly: the bare `h2` rule in _fonts.scss otherwise wins
- * over this class with its own `--color-on-surface`, since neither selector
+ * over this class with its own color, since neither selector
  * declares a competing color and the class carries no color of its own. */
 .plus-section-message-title {
     margin: 0;

@@ -8,7 +8,7 @@ import { emulateReducedMotion } from '@/storybook-docs/lib/test-viewport.js';
 import GenerativeBorder, { GENERATIVE_BORDER_RADII } from './GenerativeBorder';
 
 /**
- * `GenerativeBorder` -- the border that shows PLUS AI is generating content.
+ * `GenerativeBorder` -- the border that shows the AI is generating content.
  *
  * The ring
  * appears while content is being generated and goes away when generation ends.
@@ -29,7 +29,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'The border that shows PLUS AI is generating content: a 2px rounded stroke in two flat colors, '
+                    'The border that shows the AI is generating content: a 2px rounded stroke in two flat colors, '
                     + 'in hard-edged segments running clockwise. Generation in progress only; never decoration.',
             },
         },

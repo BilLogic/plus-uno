@@ -26,7 +26,7 @@
 
 /* Subtle fill: the sunken surface, padded and rounded, for a section beside a list. */
 .plus-pattern-section-fill-subtle {
-    padding: var(--size-section-pad-y-md) var(--size-section-pad-x-md);
+    padding: var(--section-pad-y-default) var(--section-pad-x-default);
     border-radius: var(--section-radius);
     background-color: var(--ds-surface-sunken);
 }

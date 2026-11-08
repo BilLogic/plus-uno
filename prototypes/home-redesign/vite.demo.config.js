@@ -44,7 +44,7 @@ export default defineConfig(({ command }) => ({
             react: path.resolve(repoRoot, 'node_modules/react'),
             'react-dom': path.resolve(repoRoot, 'node_modules/react-dom'),
         },
-        dedupe: ['react', 'react-dom', 'framer-motion'],
+        dedupe: ['react', 'react-dom', 'motion'],
     },
     server: {
         port: 3011,

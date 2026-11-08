@@ -285,7 +285,7 @@ export const Tabs = {
 };
 
 /**
- * The body never draws shorter than Modal/body-min-height 96, however little
+ * The body never draws shorter than Modal/body-min-height 80, however little
  * it holds, as Figma holds it.
  */
 export const BodyMinHeight = {
@@ -299,8 +299,8 @@ export const BodyMinHeight = {
     play: async ({ canvasElement }) => {
         const [modal] = dialogs(canvasElement);
         const body = modal.querySelector('.plus-pattern-modal-body');
-        await expect(getComputedStyle(body).minHeight, 'Modal/body-min-height').toBe('96px');
-        await expect(body.getBoundingClientRect().height).toBeGreaterThanOrEqual(96);
+        await expect(getComputedStyle(body).minHeight, 'Modal/body-min-height').toBe('80px');
+        await expect(body.getBoundingClientRect().height).toBeGreaterThanOrEqual(80);
     },
 };
 

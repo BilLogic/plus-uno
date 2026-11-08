@@ -16,54 +16,15 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 
 | Figma Variable / Style | PLUS CSS Token | Notes |
 |------------------------|----------------|-------|
-| Primary / Primary 500 | `var(--color-primary)` | Main brand color |
-| Primary Container | `var(--color-primary-container)` | Elevated or filled surfaces |
-| On Primary | `var(--color-on-primary)` | Text/icons on primary backgrounds |
-| Secondary | `var(--color-secondary)` | |
-| Danger / Error | `var(--color-danger)` | |
-| Success | `var(--color-success)` | |
-| Warning | `var(--color-warning)` | |
-| Info | `var(--color-info)` | |
-| Surface | `var(--color-surface)` | Base surface |
-| On Surface | `var(--color-on-surface)` | Primary text color |
-| On Surface Variant | `var(--color-on-surface-variant)` | Secondary text |
-| Outline | `var(--color-outline)` | Borders, dividers |
-| Outline Variant | `var(--color-outline-variant)` | Subtle borders |
-| Focus / Focus Ring | `var(--color-focus-ring)` | Every focus indicator on a neutral ground |
-| Focus / Focus Ring Inverse | `var(--color-focus-ring-inverse)` | Focus indicator on a colored or dark ground; aliases surface |
-| Element/opacity-disabled | `var(--color-disabled-opacity)` | 0.38 on the whole disabled control. Figma files it in size / semantics as 38, because it reads an opacity variable as a percentage |
-| Surface roles/surface-default | `var(--color-surface-default)` | The page; aliases `--surface-default` |
-| Surface roles/surface-sunken | `var(--color-surface-sunken)` | The ground behind grouped things; aliases `--surface-sunken` |
-| Surface roles/surface-raised | `var(--color-surface-raised)` | A card, paired with `--ds-shadow-raised`; a clickable card lifts to `--ds-shadow-overlay` on hover or drag |
-| Surface roles/surface-overlay | `var(--color-surface-overlay)` | Legacy floating layers not yet on the new tokens (pair with `--surface-overlay-shadow`). Modals, menus, popovers, tooltips and toasts take `elevation.surface.overlay` + `elevation.shadow.overlay` (`--ds-surface-overlay`, `--ds-shadow-overlay`) |
-
-### SMART Competency Colors
-| Figma | PLUS CSS Token |
-|-------|----------------|
-| Mastering Content | `var(--color-mastering-content)` |
-| Relationship | `var(--color-relationship)` |
-| Social Emotional | `var(--color-social-emotional)` |
-| Advocacy | `var(--color-advocacy)` |
-| Technology Tools | `var(--color-technology-tools)` |
-
-### Label Border Convention
-`<Hue>/<Hue> Border Subtle` is the hue at 45%, the border of an outlined label (Tag, date Status), and maps to `var(--color-<hue>-border-subtle)`. It is not `<Hue> Border`, the 3:1 role that maps to `var(--color-<hue>-border)`. Success, Warning, Danger, Tertiary and the five SMART hues have one.
+| background.brand.bold | `var(--ds-background-brand-bold)` | Every `color / semantics` variable maps this way: the CSS name is the variable path with dots as dashes, under `--ds-` |
+| Focus / Focus Ring | `var(--ds-border-focused)` | Every focus indicator on a neutral ground |
+| Focus / Focus Ring Inverse | `var(--ds-border-focused-inverse)` | Focus indicator on a colored or dark ground; aliases surface |
+| Element/opacity-disabled | `var(--ds-opacity-disabled)` | 0.38 on the whole disabled control. Figma files it in size / semantics as 38, because it reads an opacity variable as a percentage |
 
 ## Typography Tokens
 
 | Figma Text Style | PLUS CSS Token |
 |-----------------|----------------|
-| Display 1 | `var(--font-size-display1)`, `var(--font-weight-display)`, `var(--font-line-height-display1)` |
-| Display 2 | `var(--font-size-display2)` |
-| Display 3 | `var(--font-size-display3)` |
-| Display 4 | `var(--font-size-display4)` |
-| Headline (H1–H3) | `var(--font-size-h1)`, `var(--font-weight-headline)`, `var(--font-family-headline)` (Noto Serif, 500) — Headline has no single size token; use the H-scale |
-| Title (H4–H5) | `var(--font-weight-title)`, `var(--font-family-title)` (Noto Serif, 500); H6 is `var(--type-family-heading)` at `var(--type-weight-semibold)` — Title has no dedicated size token; pair with an H-scale size |
-| H1–H6 | `var(--font-size-h1)` through `var(--font-size-h6)` |
-| Body 1 | `var(--font-size-body1)`, `var(--font-weight-body1-regular)` |
-| Body 2 | `var(--font-size-body2)` |
-| Body 3 | `var(--font-size-body3)` |
-| Code | `var(--font-size-code)`, `var(--font-family-code)` |
 | Heading/xxlarge | `var(--heading-xxlarge)` |
 | Heading/xlarge | `var(--heading-xlarge)` |
 | Heading/large | `var(--heading-large)` |
@@ -92,7 +53,7 @@ Use this reference when encoding PLUS token conventions into Figma via `create_d
 
 A variable bound to letter spacing renders in pixels in Figma, so `Heading/xxlarge`, `xlarge` and `large` hold their tracking as an explicit percent (-2%, -1%, -1%) on the style, and the `Letter spacing/*` variables (-1, -2) read as percent of font size. The token generator matches a style's percent to the variable of the same value.
 
-The `Heading/*`, `Body/*` and `Metric/*` styles are the type scale: each binds its family, size, line height and weight to the `typography` collection, and each CSS token is the matching `font` shorthand (`font: var(--heading-large)`). A button or tab label is `Body/default` with `Weight/medium`. The rows above them are the older styles, which sit under `Legacy/` in Figma where their folder collided (`Legacy/Body/B1/…`), kept until every use moves.
+The `Heading/*`, `Body/*` and `Metric/*` styles are the type scale: each binds its family, size, line height and weight to the `typography` collection, and each CSS token is the matching `font` shorthand (`font: var(--heading-large)`). A button or tab label is `Body/default` with `Weight/medium`.
 
 ### Text that carries no style
 
@@ -105,26 +66,26 @@ Two kinds of text node carry no text style, and each binds its type variables di
 
 | Figma Spacing Context | PLUS CSS Token Pattern |
 |----------------------|----------------------|
-| Card padding | `var(--size-card-pad-{x\|y}-{sm\|md\|lg})` |
-| Card gap | `var(--size-card-gap-{sm\|md\|lg})` |
-| Card radius | `var(--size-card-radius-{sm\|md\|full})` |
+| Card padding | `var(--card-pad-{compact\|default\|spacious})` |
+| Card gap | `var(--card-stack-{sm\|md\|lg})`, `var(--card-inline-{sm\|md\|lg})` |
+| Card radius | `var(--card-radius)`, `var(--card-radius-sm)` |
 | Element padding | `var(--pad-x-{xs\|sm\|md\|lg})`, `var(--pad-y-{sm\|md\|lg})` (ADR-038) |
 | Element gap | `var(--stack-{sm\|md\|lg})`, `var(--inline-{sm\|md\|lg})`; the 10px step reads `var(--space-0625)` |
 | Element radius | `var(--radius-{sm\|md\|lg\|full})` |
-| Modal padding | `var(--size-modal-pad-{x\|y}-{sm\|md\|lg})` |
-| Section padding | `var(--size-section-pad-{x\|y}-{sm\|md\|lg})` |
-| Surface padding | `var(--size-surface-pad-{x\|y})` |
-| Table cell | `var(--size-table-cell-pad-{x\|y})` 12 · 8 and `var(--size-table-cell-inline)` 12; the older `--size-table-cell-{x\|y\|gap}` resolve to the same |
-| Size roles | `var(--size-icon-md)`, `var(--size-row-default)`: Icon sm · md · lg 12 · 16 · 24, Indicator sm · md 16 · 20, Control sm · md · lg 24 · 32 · 40, Row compact · default · comfortable 32 · 40 · 48, Media xxs … xl 16 · 20 · 24 · 32 · 40 · 48. Code only until Figma has the variables |
+| Modal padding | `var(--modal-pad-{x\|y}-{compact\|default\|spacious})` |
+| Section padding | `var(--section-pad-{x\|y}-{compact\|default\|spacious})` |
+| Page padding | `var(--page-pad-{x\|y}-{compact\|default\|spacious})` |
+| Table cell | `var(--table-pad-x-cell)` 8 · `var(--table-pad-y-cell)` 4 |
+| Size roles | `var(--icon-md)`, `var(--control-md)`, `var(--row-height-md)`, `var(--image-sm)`: Icon sm · md · lg 12 · 16 · 24, Control sm · md · lg 24 · 32 · 40, Row sm · md · lg 32 · 40 · 48, Image xxs … xl 16 · 20 · 24 · 32 · 40 · 48 |
 
 ### Scale Tokens
 
-The spacing / primitives and spacing / foundations collections (Foundations holds the Size, Element and Border folders), beside the old `--size-*` tokens until every use moves. Each Figma variable's code syntax is its CSS name.
+The spacing / primitives and spacing / foundations collections (Foundations holds the Size, Element and Border folders). Each Figma variable's code syntax is its CSS name.
 
 | Figma Variable | PLUS CSS Token | Notes |
 |----------------|----------------|-------|
 | spacing / primitives `Space/space-*`, `Radius/radius-*`, `Stroke/stroke-*`, `Size/size-*` | `var(--space-025)`, `var(--radius-050)`, `var(--stroke-1)`, `var(--size-200)` | Named by rem × 100 (`space-025` is 4). Hidden in Figma; semantic tokens point at them |
-| Foundations `Element/pad-x-{xs\|sm\|md}`, `pad-y-{sm\|md}` | `var(--pad-x-sm)` | 4 · 8 · 12 and 2 · 6. The old Figma vertical pad step was 4; `--pad-y-sm` is 2 |
+| Foundations `Element/pad-x-{xs\|sm\|md}`, `pad-y-{sm\|md}` | `var(--pad-x-sm)` | 4 · 8 · 12 · 16 and 2 · 6 · 8 |
 | Foundations `Element/stack-*`, `inline-*` | `var(--stack-md)`, `var(--inline-sm)` | 4 · 8 · 12 |
 | Foundations `Element/radius-{sm\|md\|lg}`, `radius-item-{sm\|md}`, `radius-full` | `var(--radius-h32)` | 2 · 4 · 8, items 6 · 8 |
 | Foundations `Size/Height/*`, `Width/*` | `var(--height-200)`, `var(--width-1400)` | Common scales, named by rem × 100 |
@@ -136,13 +97,10 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 
 ## Elevation Tokens
 
-| Figma Elevation Level | PLUS CSS Token |
+| Figma Elevation | PLUS CSS Token |
 |----------------------|----------------|
-| Elevation Light/1 (subtle) | `var(--elevation-light-1)` |
-| Elevation Light/2 (clickable cards on hover or drag) | `var(--elevation-light-2)` |
-| Elevation Light/3 (floating layers still on legacy tokens: Specs pages not yet swept) | `var(--elevation-light-3)` |
-| Elevation Light/4 (legacy, unused) | `var(--elevation-light-4)` |
-| Elevation Light/5 (dialogs) | `var(--elevation-light-5)` |
+| Raised surface (cards) | `var(--ds-surface-raised)` |
+| Raised shadow (cards; a clickable card lifts to the overlay shadow on hover or drag) | `var(--ds-shadow-raised)` |
 | Overlay surface (modals, menus, listboxes, popovers, tooltips, toasts, the floating sidebar) | `var(--ds-surface-overlay)` |
 | Overlay shadow (modals, menus, listboxes, popovers, tooltips, toasts, the floating sidebar) | `var(--ds-shadow-overlay)` |
 
@@ -165,7 +123,7 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 When encoding rules via `create_design_system_rules`, include these conventions:
 
 1. **Never hardcode** — all visual values must map to the tokens above
-2. **Container for filled surfaces** — use `-container` tokens for filled surfaces
-3. **Semantic context** — choose token by context (card → `--size-card-*`, element → the semantics `--pad-*`, `--stack-*`, `--inline-*`, `--radius-*`)
+2. **Color by role** — `--ds-background-*` for fills, `--ds-surface-*` for grounds, `--ds-text-*`, `--ds-icon-*` and `--ds-border-*` for the rest
+3. **Semantic context** — choose token by context (card → `--card-*`, element → the semantics `--pad-*`, `--stack-*`, `--inline-*`, `--radius-*`)
 4. **Font Awesome Free only** — `fa-solid`, `fa-regular`, `fa-brands`. No Pro icons
 5. **React-Bootstrap base** — components extend Bootstrap 5.3, not alternative frameworks

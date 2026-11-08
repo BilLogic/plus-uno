@@ -74,7 +74,7 @@ export const MOTION_EASINGS = {
  *  - `color / foundations` -> `color / semantics` and `opacity` -> `color /
  *    opacity`, and Figma's `Element/opacity-disabled` moving into the latter,
  *    are Figma-collection-membership changes only: code already names the one
- *    token involved `--color-disabled-opacity`, outside this ladder's prefix,
+ *    token involved `--ds-opacity-disabled`, outside this ladder's prefix,
  *    so there is no code row for it — recorded in the payload's collection
  *    rename list instead (`build.mjs`'s `COLLECTION_RENAMES`).
  */
@@ -83,10 +83,10 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Pad', new: '--pad-x-xs', old: '--element-pad-x-xs', ref: 'var(--space-025)', use: 'Horizontal padding inside the tightest controls: a CountTag, StatusTag or DateTag.' },
   { tier: 'semantics', group: 'Pad', new: '--pad-x-sm', old: '--element-pad-x-sm', ref: 'var(--space-050)', use: 'Horizontal padding inside a compact control, such as a Button with compact spacing.' },
   { tier: 'semantics', group: 'Pad', new: '--pad-x-md', old: '--element-pad-x-md', ref: 'var(--space-075)', use: 'Horizontal padding inside a default control: a Button, a field, a menu item.' },
-  { tier: 'semantics', group: 'Pad', new: '--pad-x-lg', old: null, value: '--space-100', note: 'new step; matches the old --size-element-pad-x-lg (16px)', use: 'Horizontal padding inside a large control or a roomy row.' },
+  { tier: 'semantics', group: 'Pad', new: '--pad-x-lg', old: null, value: '--space-100', note: 'new step, 16px', use: 'Horizontal padding inside a large control or a roomy row.' },
   { tier: 'semantics', group: 'Pad', new: '--pad-y-sm', old: '--element-pad-y-sm', ref: 'var(--space-0125)', use: 'Vertical padding inside a compact control, such as a compact Button or a Sidebar tab.' },
   { tier: 'semantics', group: 'Pad', new: '--pad-y-md', old: '--element-pad-y-md', ref: 'var(--space-0375)', use: 'Vertical padding inside a default control: a Button, a field, a menu item.' },
-  { tier: 'semantics', group: 'Pad', new: '--pad-y-lg', old: null, value: '--space-050', note: 'new step; matches the old --size-element-pad-y-lg (8px)', use: 'Vertical padding inside a large control or a roomy row.' },
+  { tier: 'semantics', group: 'Pad', new: '--pad-y-lg', old: null, value: '--space-050', note: 'new step, 8px', use: 'Vertical padding inside a large control or a roomy row.' },
 
   // ─── Semantics / Stack ────────────────────────────────────────────────
   { tier: 'semantics', group: 'Stack', new: '--stack-sm', old: '--element-stack-sm', ref: 'var(--space-025)', use: 'Vertical gap between tightly related items, such as a label and its control.' },
@@ -113,8 +113,8 @@ export const TOKEN_LADDER = [
   { tier: 'semantics', group: 'Border', new: '--border-focused', old: '--border-focused', use: 'Width of the border on a field that has focus.' },
 
   // ─── Semantics / Focus (net new) ──────────────────────────────────────
-  { tier: 'semantics', group: 'Focus', new: '--focus-ring-width', old: '--size-element-stroke-lg', ref: 'var(--size-border-stroke-stroke-200)', note: 'matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive', use: 'Width of the keyboard focus ring; also its offset unless the offset must differ.' },
-  { tier: 'semantics', group: 'Focus', new: '--focus-ring-offset', old: '--size-element-stroke-lg', ref: 'var(--size-border-stroke-stroke-200)', note: 'defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both', use: 'Gap between an element and its focus ring, when it must differ from the ring width.' },
+  { tier: 'semantics', group: 'Focus', new: '--focus-ring-width', old: '--size-element-stroke-lg', ref: 'var(--stroke-2)', note: 'matches the outline width repeated across Tag, DateTag, Suggestion and Tabs; reads the 2px stroke primitive', use: 'Width of the keyboard focus ring; also its offset unless the offset must differ.' },
+  { tier: 'semantics', group: 'Focus', new: '--focus-ring-offset', old: '--size-element-stroke-lg', ref: 'var(--stroke-2)', note: 'defined for a caller whose ring offset genuinely needs to move independently of its width; every current caller reads --focus-ring-width for both', use: 'Gap between an element and its focus ring, when it must differ from the ring width.' },
   { tier: 'semantics', group: 'Focus', new: '--focus-ring-radius', old: null, value: '--radius-sm', note: 'first pass, no existing source; a family PR refines it', use: 'Corner rounding of the keyboard focus ring.' },
 
   // ─── Semantics / Grid (dissolved from spacing / layout) ──────────────
@@ -257,6 +257,10 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Modal', new: '--modal-width-sm', old: '--layout-width-modal-sm', ref: '384px', at: { '(min-width: 1024px)': '512px', '(min-width: 1440px)': '640px' }, note: 'lifted out of spacing / layout, beside the pattern’s pad/stack tokens', use: 'Width of a small Modal, such as a confirmation.' },
   { tier: 'patterns', group: 'Modal', new: '--modal-width-md', old: '--layout-width-modal-md', ref: '507px', at: { '(min-width: 1024px)': '677px', '(min-width: 1440px)': '848px' }, use: 'Width of a default Modal, such as a short form.' },
   { tier: 'patterns', group: 'Modal', new: '--modal-width-lg', old: '--layout-width-modal-lg', ref: '629px', at: { '(min-width: 1024px)': '843px', '(min-width: 1440px)': '1056px' }, use: 'Width of a large Modal, such as a table or a long form.' },
+  { tier: 'patterns', group: 'Page', new: '--page-radius-md', old: null, ref: 'var(--radius-075)', use: 'Corner rounding of a Page frame.' },
+  { tier: 'patterns', group: 'Page', new: '--page-border-width', old: null, ref: 'var(--stroke-2)', use: 'Width of the edge drawn around a Page frame.' },
+  { tier: 'patterns', group: 'Table', new: '--table-overflow-reach', old: null, ref: 'var(--space-150)', use: 'How far a PatternTable lets a row\'s overflow, such as a focus ring, reach past its clip.' },
+  { tier: 'patterns', group: 'Modal', new: '--modal-body-min-height', old: null, ref: 'var(--space-500)', use: 'Minimum height of a Modal\'s body, so a short body does not collapse the dialog.' },
 
   // ─── Patterns / Popover ───────────────────────────────────────────────
   { tier: 'patterns', group: 'Popover', new: '--popover-pad', old: '--popover-pad', use: 'Padding inside a Popup.' },
@@ -344,6 +348,52 @@ export const TOKEN_LADDER = [
   { tier: 'components', group: 'Join row', new: '--join-row-width', old: '--layout-width-join-row', ref: '520px', use: 'Width of the Home page join row: the Join button with its session Select beside it.' },
   { tier: 'components', group: 'Option menu', new: '--option-menu-width', old: '--layout-width-option-menu', ref: '240px', use: 'Width of a fixed-width option menu.' },
 
+  // ─── Components / sizes once written with primitives ─────────────────
+  { tier: 'components', group: 'Button', new: '--button-vertical-size', old: null, ref: 'var(--space-400)', use: 'Height of a Button laid out vertically, with its icon above its label.' },
+  { tier: 'components', group: 'Option row', new: '--option-row-indent-step', old: null, ref: 'var(--space-125)', use: 'Indent added for each level of a nested option row.' },
+  { tier: 'components', group: 'Option row', new: '--option-row-control-gap', old: null, ref: 'var(--space-0625)', use: 'Horizontal gap between an option row\'s control and its label.' },
+  { tier: 'components', group: 'Option row', new: '--option-row-dot-size', old: null, ref: 'var(--space-050)', use: 'Size of the dot in an option row, such as a radio\'s selected mark.' },
+  { tier: 'components', group: 'Count tag', new: '--count-tag-dot-size', old: null, ref: 'var(--space-050)', use: 'Size of the dot in a CountTag.' },
+  { tier: 'components', group: 'Tag', new: '--tag-dot-size', old: null, ref: 'var(--space-0625)', use: 'Size of the dot in a Tag.' },
+  { tier: 'components', group: 'Tag', new: '--tag-pad-end-compact', old: null, ref: 'var(--space-0125)', use: 'Padding at the end of a Tag with compact spacing.' },
+  { tier: 'components', group: 'Tag', new: '--tag-gap-compact', old: null, ref: 'var(--space-0125)', use: 'Horizontal gap between a Tag\'s parts with compact spacing.' },
+  { tier: 'components', group: 'Tag', new: '--tag-pad-end', old: null, ref: 'var(--space-0375)', use: 'Padding at the end of a Tag with default spacing.' },
+  { tier: 'components', group: 'Tag', new: '--tag-gap', old: null, ref: 'var(--space-0375)', use: 'Horizontal gap between a Tag\'s parts with default spacing.' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-control-offset', old: null, ref: 'var(--space-0625)', use: 'Distance between a Carousel\'s previous and next controls and its edge.' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-control-pad', old: null, ref: 'var(--space-100)', use: 'Padding inside a Carousel\'s previous and next controls.' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-control-size', old: null, ref: 'var(--space-300)', use: 'Size of a Carousel\'s previous and next controls.' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-slide-min-height-compact', old: null, ref: 'var(--size-1000)', use: 'Minimum height of a Carousel slide with compact spacing.' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-slide-min-height', old: null, ref: 'var(--size-1400)', use: 'Minimum height of a Carousel slide with default spacing.' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-slide-min-height-spacious', old: null, ref: 'var(--size-2500)', use: 'Minimum height of a Carousel slide with spacious spacing.' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-indicator-width-compact', old: null, ref: 'var(--size-300)', use: 'Width of a Carousel\'s slide indicator with compact spacing.' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-indicator-width', old: null, ref: 'var(--size-750)', use: 'Width of a Carousel\'s slide indicator with default spacing.' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-indicator-height-compact', old: null, ref: 'var(--space-025)', use: 'Height of a Carousel\'s slide indicator with compact spacing.' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-indicator-height', old: null, ref: 'var(--space-0375)', use: 'Height of a Carousel\'s slide indicator with default spacing.' },
+  { tier: 'components', group: 'Carousel', new: '--carousel-indicator-height-spacious', old: null, ref: 'var(--space-050)', use: 'Height of a Carousel\'s slide indicator with spacious spacing.' },
+  { tier: 'components', group: 'Scroll bar', new: '--scroll-bar-size', old: null, ref: 'var(--space-0375)', use: 'Thickness of a scroll bar.' },
+  { tier: 'components', group: 'Scroll bar', new: '--scroll-bar-max-height', old: null, ref: 'calc(var(--size-1000) * 2)', use: 'Maximum height of a scrolling area that shows a scroll bar.' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-height', old: null, ref: 'var(--space-400)', use: 'Height of a block Skeleton.' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-circle-size', old: null, ref: 'var(--space-200)', use: 'Size of a round Skeleton, such as an avatar placeholder.' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-text-height', old: null, ref: 'var(--space-100)', use: 'Height of a Skeleton standing in for one line of text.' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-status-width', old: null, ref: 'var(--space-400)', use: 'Width of a Skeleton standing in for a status tag.' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-status-width-spacious', old: null, ref: 'calc(var(--space-500) + var(--space-050))', use: 'Width of a Skeleton standing in for a status tag with spacious spacing.' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-tag-width', old: null, ref: 'calc(var(--space-400) + var(--space-050))', use: 'Width of a Skeleton standing in for a tag.' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-tag-width-person', old: null, ref: 'var(--space-500)', use: 'Width of a Skeleton standing in for a person tag.' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-tag-width-narrow', old: null, ref: 'calc(var(--space-250) + var(--space-100))', use: 'Width of a Skeleton standing in for a short tag.' },
+  { tier: 'components', group: 'Skeleton', new: '--skeleton-tag-width-widest', old: null, ref: 'calc(var(--space-500) + var(--space-050))', use: 'Width of a Skeleton standing in for the longest tag.' },
+  { tier: 'components', group: 'Flag', new: '--flag-min-height', old: null, ref: 'calc(var(--size-1000) + var(--size-750))', use: 'Minimum height of a Flag.' },
+  { tier: 'components', group: 'Flag', new: '--flag-pad', old: null, ref: 'var(--space-125)', use: 'Padding inside a Flag.' },
+  { tier: 'components', group: 'Flag', new: '--flag-offset', old: null, ref: 'var(--space-125)', use: 'Distance between a Flag and the edge of the screen.' },
+  { tier: 'components', group: 'Spotlight', new: '--spotlight-media-height', old: null, ref: 'calc(var(--size-750) + var(--space-150))', use: 'Height of the media area in a Spotlight.' },
+  { tier: 'components', group: 'Menu group', new: '--menu-group-min-width', old: null, ref: 'var(--size-1400)', use: 'Minimum width of a menu group.' },
+  { tier: 'components', group: 'Menu group', new: '--menu-group-pad-x', old: null, ref: 'var(--space-150)', use: 'Horizontal padding of a menu group.' },
+  { tier: 'components', group: 'Menu group', new: '--menu-group-gap', old: null, ref: 'var(--space-100)', use: 'Vertical gap between groups in a menu.' },
+  { tier: 'components', group: 'Menu group', new: '--menu-group-item-pad-y', old: null, ref: 'var(--space-0625)', use: 'Vertical padding of an item in a menu group.' },
+  { tier: 'components', group: 'Popup', new: '--popup-pad', old: null, ref: 'var(--space-125)', use: 'Padding inside a Popup.' },
+  { tier: 'components', group: 'Table', new: '--table-cell-max-width', old: null, ref: 'var(--size-300)', use: 'Maximum width of a table cell before its text truncates.' },
+  { tier: 'components', group: 'Avatar', new: '--avatar-size-96', old: null, ref: 'calc(var(--space-300) * 2)', use: 'Size of an extra-large UserAvatar, such as in a profile header.' },
+  { tier: 'components', group: 'Avatar', new: '--avatar-size-128', old: null, ref: 'calc(var(--space-400) * 2)', use: 'Size of the largest UserAvatar, such as on a profile page.' },
+
   // ─── Components / Tile (reclassified, unchanged names) ───────────────
   { tier: 'components', group: 'Tile', new: '--tile-radius-sm', old: '--tile-radius-sm', use: 'Corner rounding of a small Tile.' },
   { tier: 'components', group: 'Tile', new: '--tile-radius-lg', old: '--tile-radius-lg', use: 'Corner rounding of a large Tile.' },
@@ -351,10 +401,10 @@ export const TOKEN_LADDER = [
   // ─── Components / Spinner, Progress bar (Bill 2026-11-04: one component
   // each, so they move out of SIZE_ROLES in generate-all-tokens.js straight to
   // this tier, not through Semantics' size roles) ───────────────────────
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-sm', old: null, value: '--space-100', note: 'matches the old --size-spinner-sm (16px)', use: 'Size of a small Spinner, such as one inside a Button.' },
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-md', old: null, value: '--space-150', note: 'matches the old --size-spinner-md (24px)', use: 'Size of a default Spinner.' },
-  { tier: 'components', group: 'Spinner', new: '--spinner-size-lg', old: null, value: '--space-300', note: 'matches the old --size-spinner-lg (48px)', use: 'Size of a large Spinner, such as one loading a whole section.' },
-  { tier: 'components', group: 'Progress bar', new: '--progress-bar-height', old: null, value: '--space-050', note: 'matches the old --size-progressbar-height (8px)', use: 'Height of a ProgressBar track.' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-sm', old: null, value: '--space-100', use: 'Size of a small Spinner, such as one inside a Button.' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-md', old: null, value: '--space-150', use: 'Size of a default Spinner.' },
+  { tier: 'components', group: 'Spinner', new: '--spinner-size-lg', old: null, value: '--space-300', use: 'Size of a large Spinner, such as one loading a whole section.' },
+  { tier: 'components', group: 'Progress bar', new: '--progress-bar-height', old: null, value: '--space-050', use: 'Height of a ProgressBar track.' },
 
   // ─── Layers (own non-spacing family, code only) ───────────────────────
   { tier: 'layers', group: 'Layer', new: '--layer-card', old: '--layout-z-index-card', ref: '100', use: 'Stacking order of a card raised above page content, such as a sticky table part.' },
@@ -422,5 +472,5 @@ export function retiredRenames() {
   return map;
 }
 
-/** Every retired name. The generators drop them and `check:old-size-tokens` holds their uses at zero. */
+/** Every retired name. The generators drop them and `check:old-system` bans their uses. */
 export const RETIRED_TOKENS = new Set(retiredRenames().keys());

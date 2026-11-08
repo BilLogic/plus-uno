@@ -101,7 +101,7 @@ function DataPartRenderer({
             format: { kind: 'percent', decimals: 0, basis: 'unit' },
             sparkline: {
               data: [72, 74, 76, 75, 77, 78, 79, 78, 80, 79, 78, 78],
-              color: 'var(--color-primary, #0472a8)'
+              color: 'var(--ds-text-brand)'
             },
             diff: { value: 4.2, decimals: 1 }
           },

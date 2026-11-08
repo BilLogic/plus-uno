@@ -101,7 +101,7 @@ $count-dot: (
 
 /* The dot: 8, solid, no number. Its name comes from `label`. */
 .plus-count--dot {
-    --plus-count-size: var(--size-spacing-small-space-100);
+    --plus-count-size: var(--count-tag-dot-size);
 
     width: var(--plus-count-size);
     min-width: 0;

@@ -18,9 +18,9 @@ const ManageAssignmentModal = ({ onClose }) => {
     const tabStyle = (id) => ({
         padding: '10px 16px',
         border: 'none',
-        borderBottom: activeTab === id ? '2px solid var(--color-primary)' : '2px solid transparent',
+        borderBottom: activeTab === id ? '2px solid var(--ds-border-brand)' : '2px solid transparent',
         backgroundColor: 'transparent',
-        color: activeTab === id ? 'var(--color-primary)' : 'var(--ds-text-subtle)',
+        color: activeTab === id ? 'var(--ds-text-brand)' : 'var(--ds-text-subtle)',
         fontWeight: 600,
         cursor: 'pointer',
         fontSize: '14px'
@@ -73,7 +73,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                     justifyContent: 'space-between',
                     alignItems: 'flex-start',
                     padding: '20px 24px',
-                    borderBottom: '1px solid var(--color-outline-variant)'
+                    borderBottom: '1px solid var(--ds-border)'
                 }}>
                     <div>
                         <h2 id="manage-assignment-title" className="h5" style={{ margin: 0, marginBottom: '4px' }}>Manage Assignment</h2>
@@ -92,7 +92,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                 </div>
 
                 {/* Tabs: Attendance (active, 20), Assignment */}
-                <div style={{ display: 'flex', gap: 0, paddingLeft: '24px', borderBottom: '1px solid var(--color-outline-variant)' }}>
+                <div style={{ display: 'flex', gap: 0, paddingLeft: '24px', borderBottom: '1px solid var(--ds-border)' }}>
                     <button type="button" style={tabStyle('attendance')} onClick={() => setActiveTab('attendance')}>
                         Attendance <CountTag value={20} className="ms-1" />
                     </button>
@@ -106,7 +106,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                     margin: '16px 24px',
                     padding: '12px 16px',
                     backgroundColor: 'var(--ds-background-warning)',
-                    border: '1px solid var(--color-outline-variant)',
+                    border: '1px solid var(--ds-border)',
                     borderRadius: '8px',
                     fontSize: '14px',
                     color: 'var(--ds-text)'
@@ -122,7 +122,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                                 <div
                                     key={tutor.id}
                                     style={{
-                                        border: '1px solid var(--color-outline-variant)',
+                                        border: '1px solid var(--ds-border)',
                                         borderRadius: '12px',
                                         padding: '16px',
                                         backgroundColor: 'var(--ds-surface-container)'
@@ -162,7 +162,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                     justifyContent: 'flex-end',
                     gap: '12px',
                     padding: '16px 24px',
-                    borderTop: '1px solid var(--color-outline-variant)'
+                    borderTop: '1px solid var(--ds-border)'
                 }}>
                     <Button text="Close" onClick={onClose} />
                     <Button text="Update Assignments" appearance="primary" onClick={() => {}} />

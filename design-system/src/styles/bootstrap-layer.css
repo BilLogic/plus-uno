@@ -9,7 +9,14 @@
  * AFTER this file, in a later stylesheet. CSS layer priority is set by each
  * name's FIRST mention anywhere in the document, so without this, Tailwind's
  * layers would register after (and so outrank) `tokens`/`components`, and its
- * `--color-primary` etc. would beat ours on every `:root`-level token name
- * Tailwind's theme also happens to define. */
+ * theme variables would beat ours on every `:root`-level token name
+ * Tailwind's theme also happens to define.
+ *
+ * Kept on purpose, for now. Bootstrap's CSS stays until a sweep removes its
+ * utility classes (`d-flex`, `mb-*` …) from components and patterns; then this
+ * import and the `bootstrap` layer go. The `react-bootstrap` package is a
+ * separate leftover with the same fate: it stays only for the legacy Specs
+ * screens (`design-system/src/specs/Admin`, `Training`, `Login`, `Toolkit`) and
+ * a few prototypes, and goes once those are rebuilt on PLUS components. */
 @layer bootstrap, theme, base, utilities, tokens, components;
 @import "bootstrap/dist/css/bootstrap.min.css" layer(bootstrap);

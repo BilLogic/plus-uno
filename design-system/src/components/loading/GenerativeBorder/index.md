@@ -3,7 +3,7 @@
 
 # GenerativeBorder
 
-The border that shows PLUS AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments that run clockwise around the edge. - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the children render inside the wrapper with no ring at all. - **radius** names the radius token the ring follows; match the content it wraps. Defaults to `radius-100`. The segments turn slowly while active. The ring is decorative and hidden from assistive technology; `aria-busy` is what says content is changing. Under reduced motion the same segments hold still. Use it only while generating, one ring per piece of content. Do not nest two.
+The border that shows the AI is generating content: a 2px rounded stroke in two flat colors, in hard-edged segments that run clockwise around the edge. - **isActive** shows the ring and sets `aria-busy` on the wrapper. Off, the children render inside the wrapper with no ring at all. - **radius** names the radius token the ring follows; match the content it wraps. Defaults to `radius-100`. The segments turn slowly while active. The ring is decorative and hidden from assistive technology; `aria-busy` is what says content is changing. Under reduced motion the same segments hold still. Use it only while generating, one ring per piece of content. Do not nest two.
 
 **Import:** `import { GenerativeBorder } from '@/components';`
 
@@ -31,7 +31,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--ds-border-brand` · `--ds-border-discovery` · `--generative-border-angle` · `--generative-border-radius` · `--generative-border-rest` · `--generative-border-width` · `--size-border-stroke-stroke-200`
+`--border-selected` · `--ds-border-brand` · `--ds-border-discovery` · `--generative-border-angle` · `--generative-border-radius` · `--generative-border-rest` · `--generative-border-width`
 
 From `design-system/src/components/loading/GenerativeBorder/GenerativeBorder.scss`. Override these through the token layer, never with a literal.
 

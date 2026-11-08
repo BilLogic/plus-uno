@@ -41,7 +41,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xsmall` · `--layer-popup` · `--popover-offset` · `--popover-pad` · `--popover-radius` · `--popover-width-lg` · `--popover-width-md` · `--popover-width-sm` · `--size-spacing-medium-space-400` · `--stack-md`
+`--body-default` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--heading-xsmall` · `--layer-popup` · `--popover-offset` · `--popover-pad` · `--popover-radius` · `--popover-width-lg` · `--popover-width-md` · `--popover-width-sm` · `--popup-pad` · `--stack-md`
 
 From `design-system/src/components/overlays-and-layering/Popup/Popup.scss`. Override these through the token layer, never with a literal.
 

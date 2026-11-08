@@ -196,7 +196,7 @@
     .plus-modal.plus-user-feedback-modal-shell {
         /* Undo Modal body-only chrome strip — the modal's own overlay fill + pad-md */
         background-color: var(--ds-surface-overlay) !important;
-        box-shadow: var(--elevation-light-2) !important;
+        box-shadow: var(--ds-shadow-raised) !important;
         border-radius: var(--size-modal-radius-md, 6px) !important;
         overflow: hidden;
 

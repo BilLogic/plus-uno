@@ -4,7 +4,7 @@ import React, { useEffect } from 'react';
 import '../design-system/src/styles/bootstrap-layer.css';
 // Design system: tokens, .plus-modal, and other globals for stories that import @/ components
 import '../design-system/src/styles/main.scss';
-// Docs-only Tailwind + shadcn (no Preflight; see storybook-tailwind.css)
+// Docs-only Tailwind (no Preflight; see storybook-tailwind.css)
 import '../design-system/src/storybook-docs/storybook-tailwind.css';
 import './storybook-overrides.css';
 import { TocDocsContainer } from './docs-toc.jsx';
@@ -523,7 +523,6 @@ const preview = {
               ]
             ]
           ],
-          "Deprecated",
           "*"
         ],
         /* IA-SORT-END */

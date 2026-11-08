@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import AiIcon from '@/components/images-and-icons/AiIcon';
 import AiSources from './AiSources';
 import AiFeedback from './AiFeedback';
@@ -97,7 +97,7 @@ const AiMessage = ({
 
     return (
         <div
-            className={classNames('plus-ai-message', `plus-ai-message--${status}`, className)}
+            className={clsx('plus-ai-message', `plus-ai-message--${status}`, className)}
             aria-busy={status === 'streaming' ? true : undefined}
             {...rest}
         >

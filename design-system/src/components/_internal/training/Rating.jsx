@@ -4,13 +4,11 @@ import PropTypes from 'prop-types';
 /**
  * Rating Component
  * Rating component with 5 rating singles (1-5) showing different selected states.
- * Matches legacy design-system/specs/Training/Lessons/Elements/Rating.js
  */
 const Rating = ({ rating = "rest", onRatingChange }) => {
-    // Styling constants from legacy
     const containerStyle = {
         display: 'flex',
-        gap: 'var(--size-section-gap-md)', // space-600 / 32px
+        gap: 'var(--section-stack-md)',
         alignItems: 'flex-start',
         padding: '0 var(--pad-x-md)', // space-300 / 16px
     };
@@ -44,18 +42,10 @@ Rating.propTypes = {
 };
 
 /**
- * Sub-component: RatingSingle
- * Logic derived from legacy createRatingSingle calls
+ * Sub-component: RatingSingle, one numbered circle.
  */
 const RatingSingle = ({ value, status, onClick }) => {
-    // Styles for the single rating item (circle with number)
-    // Legacy mapping:
-    // status=rest: border-neutral-tertiary (??), bg-transparent, text-primary
-    // status=selected: bg-primary, text-white
-
-    // Using standard Bootstrap/plus classes where possible, or inline to match exact legacy flex gaps
-    // The legacy code used `createRatingSingle` which isnt shown but implied specific styling.
-    // We will approximate with standard PLUS tokens.
+    // At rest a bordered circle; selected, the brand fill with inverse text.
 
     const baseStyle = {
         width: '40px',
@@ -75,11 +65,11 @@ const RatingSingle = ({ value, status, onClick }) => {
         rest: {
             backgroundColor: 'transparent',
             borderColor: '#DEE2E6', // gray-300 approx
-            color: 'var(--color-primary-text)'
+            color: 'var(--ds-text-brand)'
         },
         selected: {
-            backgroundColor: 'var(--color-primary)',
-            borderColor: 'var(--color-primary)',
+            backgroundColor: 'var(--ds-background-brand-bold)',
+            borderColor: 'var(--ds-border-brand)',
             color: 'white'
         }
     };

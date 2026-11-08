@@ -1,19 +1,19 @@
 /*
  * Avatar and AvatarGroup: a person or an agent as a picture, initials or icon.
  *
- * 16 to 40 are the Media sizes (--size-media-*). 96 and 128 are profile sizes
+ * 16 to 40 are the Media sizes (--image-*). 96 and 128 are profile sizes
  * no role names yet, so they sit here, built from the spacing primitives. A
  * circle rounds fully; a square takes a quarter of its size, like Tile.
  */
 @use '../../../styles/state' as *;
 
 $avatar-sizes: (
-    16: (var(--size-media-xxs), var(--font-size-fa-body3), var(--font-size-fa-body3)),
-    24: (var(--size-media-sm), var(--font-size-body3), var(--font-size-fa-body1)),
-    32: (var(--size-media-md), var(--font-size-body2), var(--font-size-fa-h5)),
-    40: (var(--size-media-lg), var(--font-size-body1), var(--font-size-fa-h4)),
-    96: (var(--size-spacing-large-space-1200), var(--font-size-h2), var(--font-size-fa-h1)),
-    128: (calc(var(--size-spacing-large-space-900) * 2), var(--font-size-h1), var(--font-size-fa-h1)),
+    16: (var(--image-xxs), var(--font-size-fa-body3), var(--font-size-fa-body3)),
+    24: (var(--image-sm), var(--font-size-body3), var(--font-size-fa-body1)),
+    32: (var(--image-md), var(--font-size-body2), var(--font-size-fa-h5)),
+    40: (var(--image-lg), var(--font-size-body1), var(--font-size-fa-h4)),
+    96: (var(--avatar-size-96), var(--font-size-h2), var(--font-size-fa-h1)),
+    128: (var(--avatar-size-128), var(--font-size-h1), var(--font-size-fa-h1)),
 );
 
 // The initials and icon grounds, per Tag color: ground, ink.
@@ -34,8 +34,8 @@ $avatar-colors: (
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    inline-size: var(--avatar-size, var(--size-media-md));
-    block-size: var(--avatar-size, var(--size-media-md));
+    inline-size: var(--avatar-size, var(--image-md));
+    block-size: var(--avatar-size, var(--image-md));
     margin: 0;
     padding: 0;
     border: 0;
@@ -51,7 +51,7 @@ $avatar-colors: (
 }
 
 .plus-avatar--square {
-    border-radius: calc(var(--avatar-size, var(--size-media-md)) / 4);
+    border-radius: calc(var(--avatar-size, var(--image-md)) / 4);
 }
 
 @each $size, $values in $avatar-sizes {
@@ -100,8 +100,8 @@ $avatar-colors: (
     position: absolute;
     inset-inline-end: 0;
     inset-block-end: 0;
-    inline-size: calc(var(--avatar-size, var(--size-media-md)) / 4);
-    block-size: calc(var(--avatar-size, var(--size-media-md)) / 4);
+    inline-size: calc(var(--avatar-size, var(--image-md)) / 4);
+    block-size: calc(var(--avatar-size, var(--image-md)) / 4);
     min-inline-size: calc(var(--border-default) * 6);
     min-block-size: calc(var(--border-default) * 6);
     box-sizing: border-box;
@@ -112,8 +112,8 @@ $avatar-colors: (
 
 // A circle's edge curves in, so its dot sits on the curve, not the corner.
 .plus-avatar--circle > .plus-avatar__status {
-    inset-inline-end: calc(var(--avatar-size, var(--size-media-md)) / 20);
-    inset-block-end: calc(var(--avatar-size, var(--size-media-md)) / 20);
+    inset-inline-end: calc(var(--avatar-size, var(--image-md)) / 20);
+    inset-block-end: calc(var(--avatar-size, var(--image-md)) / 20);
 }
 
 .plus-avatar__status--online { background-color: var(--ds-background-success-bold); }
@@ -139,12 +139,12 @@ button.plus-avatar--overflow {
     display: inline-flex;
     align-items: center;
     // The first item's negative margin is given back, so the row starts at its edge.
-    padding-inline-start: calc(var(--avatar-size, var(--size-media-md)) / 4);
+    padding-inline-start: calc(var(--avatar-size, var(--image-md)) / 4);
 }
 
 .plus-avatar-group__item {
     display: inline-flex;
-    margin-inline-start: calc(var(--avatar-size, var(--size-media-md)) / -4);
+    margin-inline-start: calc(var(--avatar-size, var(--image-md)) / -4);
 }
 
 // A ring separates neighbors, in the surface color the group sits on.

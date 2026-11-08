@@ -346,7 +346,7 @@ a.sbdocs-a {
  * `DocsCanvasShell` is not a direct child, is still in block flow, and still
  * collapses normally — that spacing is the shell's business, not this rule's.
  *
- * `--size-section-gap-md` replaces the hand-picked `0.5rem`/`0.625rem` pair. One
+ * `--section-stack-md` replaces the hand-picked `0.5rem`/`0.625rem` pair. One
  * value at every width: a heading sits the same distance from its content as two
  * paragraphs sit from each other, which is the trade of having one authority.
  */
@@ -1146,36 +1146,6 @@ a.sbdocs-a {
     outline-offset: var(--stack-sm);
 }
 
-.sb-ds-changelog {
-    display: grid;
-    grid-template-columns: max-content minmax(0, 1fr);
-    gap: var(--stack-md) var(--section-stack-lg);
-    margin: 0 0 var(--section-stack-lg);
-}
-
-.sb-ds-changelog dt {
-    display: flex;
-    gap: var(--stack-md);
-    align-items: baseline;
-    white-space: nowrap;
-    color: var(--ds-text-subtle);
-}
-
-.sb-ds-changelog dd {
-    margin: 0;
-    min-width: 0;
-}
-
-.sb-ds-changelog__kind {
-    font-size: var(--font-size-075);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-}
-
-.sb-ds-changelog__adopted {
-    color: var(--ds-text-subtle);
-    font-size: var(--font-size-0875);
-}
 
 /*
  * Color modes: the canvas follows the mode.

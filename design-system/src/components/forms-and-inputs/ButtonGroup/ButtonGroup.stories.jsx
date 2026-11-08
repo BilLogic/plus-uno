@@ -15,9 +15,6 @@ export default {
     /** Hide CSF stories from the sidebar; docs live on ButtonGroup.mdx (Canvas still embeds them). */
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'A plain container for Button children, each keeping its own appearance and spacing. `appearance`, `spacing`, the `buttons` config array and `vertical` are gone; `ariaLabel` is `label`.' },
-        ],
         docs: { toc: { title: 'On this page' } },
     },
     argTypes: {

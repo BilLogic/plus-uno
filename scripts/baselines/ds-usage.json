@@ -96,12 +96,6 @@
         "ds/no-primitive-read prototypes/storybook-ai-agent-llm-api/StorybookAIAgent.scss": {
           "count": 6
         },
-        "ds/no-primitive-read prototypes/templates/admin/supervisor-session-prototype.html": {
-          "count": 4
-        },
-        "ds/no-primitive-read prototypes/templates/admin/tutor-admin.html": {
-          "count": 6
-        },
         "ds/no-primitive-read prototypes/templates/admin/tutor-admin.js": {
           "count": 3
         },
@@ -358,7 +352,7 @@
           "count": 1
         },
         "ds/no-unknown-token src/pages/PrototypeMarket/PrototypeMarket.scss": {
-          "count": 4
+          "count": 1
         }
       }
     }

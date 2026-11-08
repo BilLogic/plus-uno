@@ -48,9 +48,6 @@
         "--size-card-pad-y-sm 12px": {
           "count": 1
         },
-        "--size-card-radius-md 12px": {
-          "count": 1
-        },
         "--size-card-radius-md 8px": {
           "count": 1
         },
@@ -135,9 +132,6 @@
         "--size-surface-gap-md 16px": {
           "count": 1
         },
-        "--size-surface-radius 8px": {
-          "count": 1
-        },
         "--space-025 8px": {
           "count": 1
         },
@@ -148,9 +142,6 @@
           "count": 1
         },
         "--space-0625 8px": {
-          "count": 1
-        },
-        "--stack-lg 24px": {
           "count": 1
         },
         "--stack-md 4px": {

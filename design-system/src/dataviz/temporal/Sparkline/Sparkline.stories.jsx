@@ -60,7 +60,7 @@ const caption = { color: 'var(--ds-text-subtle)', fontSize: 'var(--font-size-bod
  * Overview: a sparkline beside its number, and one per status
  */
 export const Overview = () => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
         <section>
             <h3 style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text)' }}>Beside a stat</h3>
             <div style={row}>

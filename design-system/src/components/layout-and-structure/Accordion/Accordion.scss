@@ -14,30 +14,30 @@
 
 .plus-accordion {
     width: 100%;
-    border-radius: var(--size-card-radius-sm);
+    border-radius: var(--card-radius-sm);
 
     // --- ACCORDION ITEM ---
     .plus-accordion-item {
         background-color: var(--ds-surface);
-        border: var(--size-card-border-sm) solid var(--ds-border);
+        border: var(--border-default) solid var(--ds-border);
 
         &:first-of-type {
-            border-top-left-radius: var(--size-card-radius-sm);
-            border-top-right-radius: var(--size-card-radius-sm);
+            border-top-left-radius: var(--card-radius-sm);
+            border-top-right-radius: var(--card-radius-sm);
 
             .plus-accordion-trigger {
-                border-top-left-radius: var(--size-card-radius-sm);
-                border-top-right-radius: var(--size-card-radius-sm);
+                border-top-left-radius: var(--card-radius-sm);
+                border-top-right-radius: var(--card-radius-sm);
             }
         }
 
         &:last-of-type {
-            border-bottom-left-radius: var(--size-card-radius-sm);
-            border-bottom-right-radius: var(--size-card-radius-sm);
+            border-bottom-left-radius: var(--card-radius-sm);
+            border-bottom-right-radius: var(--card-radius-sm);
 
             .plus-accordion-trigger:not([data-panel-open]) {
-                border-bottom-left-radius: var(--size-card-radius-sm);
-                border-bottom-right-radius: var(--size-card-radius-sm);
+                border-bottom-left-radius: var(--card-radius-sm);
+                border-bottom-right-radius: var(--card-radius-sm);
             }
         }
 
@@ -57,7 +57,7 @@
     // --- ACCORDION TRIGGER ---
     .plus-accordion-trigger {
         width: 100%;
-        padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+        padding: var(--card-pad-default) var(--card-pad-default);
         background-color: var(--ds-surface);
         color: var(--ds-text-subtle);
         font: var(--heading-small);
@@ -108,11 +108,11 @@
 
     // --- ACCORDION BODY ---
     .plus-accordion-body {
-        padding: var(--size-card-pad-y-md) var(--size-card-pad-x-md);
+        padding: var(--card-pad-default) var(--card-pad-default);
         background-color: var(--ds-surface);
         color: var(--ds-text-subtle);
         font: var(--body-large);
-        border-top: var(--size-card-border-sm) solid var(--ds-border);
+        border-top: var(--border-default) solid var(--ds-border);
         text-align: left;
     }
 
@@ -123,7 +123,7 @@
             border: none;
             border-radius: 0 !important;
             background: transparent;
-            border-bottom: var(--size-card-border-sm) solid var(--ds-border);
+            border-bottom: var(--border-default) solid var(--ds-border);
 
             .plus-accordion-trigger,
             .plus-accordion-body {

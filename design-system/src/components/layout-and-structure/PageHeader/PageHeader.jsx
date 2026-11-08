@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import { clsx } from 'clsx';
 import Heading from '@/components/text-and-data-display/Heading';
 import './PageHeader.scss';
 
@@ -21,7 +21,7 @@ export const PageHeader = ({
     const titleContent = title ?? children;
 
     return (
-        <header className={classNames('plus-page-header', className)} {...props}>
+        <header className={clsx('plus-page-header', className)} {...props}>
             {breadcrumbs && <div className="plus-page-header-breadcrumbs">{breadcrumbs}</div>}
             <div className="plus-page-header-row">
                 <div className="plus-page-header-title">

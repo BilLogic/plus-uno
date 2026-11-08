@@ -48,9 +48,6 @@
         "design-system/src/components/forms-and-inputs/_internal/FieldBox.scss": {
           "count": 2
         },
-        "design-system/src/components/forms-and-inputs/_internal/OptionRow.scss": {
-          "count": 2
-        },
         "design-system/src/components/images-and-icons/UserAvatar/UserAvatar.scss": {
           "count": 1
         },
@@ -60,12 +57,6 @@
         "design-system/src/components/labels/CountTag/CountTag.scss": {
           "count": 1
         },
-        "design-system/src/components/labels/DateTag/DateTag.scss": {
-          "count": 2
-        },
-        "design-system/src/components/labels/StatusTag/StatusTag.scss": {
-          "count": 2
-        },
         "design-system/src/components/labels/Tag/Tag.scss": {
           "count": 2
         },
@@ -74,9 +65,6 @@
         },
         "design-system/src/components/layout-and-structure/Panel/Panel.scss": {
           "count": 10
-        },
-        "design-system/src/components/loading/Skeleton/Skeleton.scss": {
-          "count": 2
         },
         "design-system/src/components/messaging/Modal/Modal.scss": {
           "count": 2

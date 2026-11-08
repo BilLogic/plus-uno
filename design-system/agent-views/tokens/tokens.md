@@ -72,6 +72,7 @@ Space owned by a pattern: page, section, card, table, modal, drawer, popover. In
 --frame-sidebar-width  /* Width of the Frame's Sidebar at the current breakpoint. */
 --frame-sidebar-width-nav  /* Fixed width of the side navigation inside the Frame. */
 --frame-topbar-height  /* Height of the Frame's top bar. */
+--modal-body-min-height  /* Minimum height of a Modal's body, so a short body does not collapse the dialog. */
 --modal-pad-x-compact  /* Horizontal padding of a Modal with compact spacing. */
 --modal-pad-x-default  /* Horizontal padding of a Modal with default spacing. */
 --modal-pad-x-spacious  /* Horizontal padding of a Modal with spacious spacing. */
@@ -81,12 +82,14 @@ Space owned by a pattern: page, section, card, table, modal, drawer, popover. In
 --modal-width-lg  /* Width of a large Modal, such as a table or a long form. */
 --modal-width-md  /* Width of a default Modal, such as a short form. */
 --modal-width-sm  /* Width of a small Modal, such as a confirmation. */
+--page-border-width  /* Width of the edge drawn around a Page frame. */
 --page-pad-x-compact  /* Horizontal padding of a Page with compact spacing. */
 --page-pad-x-default  /* Horizontal padding of a Page with default spacing. */
 --page-pad-x-spacious  /* Horizontal padding of a Page with spacious spacing. */
 --page-pad-y-compact  /* Vertical padding of a Page with compact spacing. */
 --page-pad-y-default  /* Vertical padding of a Page with default spacing. */
 --page-pad-y-spacious  /* Vertical padding of a Page with spacious spacing. */
+--page-radius-md  /* Corner rounding of a Page frame. */
 --panel-max-width  /* Widest the Panel may be dragged. */
 --panel-min-width  /* Narrowest the Panel may be dragged. */
 --panel-width-default  /* Width the Panel opens at. */
@@ -97,26 +100,53 @@ Space owned by a pattern: page, section, card, table, modal, drawer, popover. In
 --section-pad-y-default  /* Vertical padding of a PatternSection with default spacing. */
 --section-pad-y-spacious  /* Vertical padding of a PatternSection with spacious spacing. */
 --section-radius  /* Corner rounding of a PatternSection that has a fill. */
+--table-overflow-reach  /* How far a PatternTable lets a row's overflow, such as a focus ring, reach past its clip. */
 ```
 
 ## Ladder Components
 Tokens one component owns, named for it.
 
 ```css
+--avatar-size-128  /* Size of the largest UserAvatar, such as on a profile page. */
+--avatar-size-96  /* Size of an extra-large UserAvatar, such as in a profile header. */
 --button-radius-compact  /* Corner rounding of a Button with compact spacing. */
 --button-radius-default  /* Corner rounding of a Button with default spacing. */
+--button-vertical-size  /* Height of a Button laid out vertically, with its icon above its label. */
 --calendar-day-lg  /* Size of a day cell in a large Calendar. */
 --calendar-day-md  /* Size of a day cell in a default Calendar. */
 --calendar-day-sm  /* Size of a day cell in a compact Calendar. */
 --calendar-nav-size  /* Size of the Calendar's previous and next month buttons. */
+--carousel-control-offset  /* Distance between a Carousel's previous and next controls and its edge. */
+--carousel-control-pad  /* Padding inside a Carousel's previous and next controls. */
+--carousel-control-size  /* Size of a Carousel's previous and next controls. */
+--carousel-indicator-height  /* Height of a Carousel's slide indicator with default spacing. */
+--carousel-indicator-height-compact  /* Height of a Carousel's slide indicator with compact spacing. */
+--carousel-indicator-height-spacious  /* Height of a Carousel's slide indicator with spacious spacing. */
+--carousel-indicator-width  /* Width of a Carousel's slide indicator with default spacing. */
+--carousel-indicator-width-compact  /* Width of a Carousel's slide indicator with compact spacing. */
+--carousel-slide-min-height  /* Minimum height of a Carousel slide with default spacing. */
+--carousel-slide-min-height-compact  /* Minimum height of a Carousel slide with compact spacing. */
+--carousel-slide-min-height-spacious  /* Minimum height of a Carousel slide with spacious spacing. */
 --checkbox-control-size  /* Size of the Checkbox box. */
 --choice-grid-control-size-10  /* Size of the control in a ChoiceGrid with size 12. */
 --choice-grid-control-size-12  /* Size of the control in a ChoiceGrid with size 14 or 16. */
+--count-tag-dot-size  /* Size of the dot in a CountTag. */
+--flag-min-height  /* Minimum height of a Flag. */
+--flag-offset  /* Distance between a Flag and the edge of the screen. */
+--flag-pad  /* Padding inside a Flag. */
 --join-row-width  /* Width of the Home page join row: the Join button with its session Select beside it. */
 --listbox-max-height  /* Tallest a Select or Cascader listbox may grow before it scrolls. */
 --listbox-max-width  /* Widest a Select or Cascader listbox may grow. */
 --listbox-min-height  /* Shortest a Select or Cascader listbox may be. */
+--menu-group-gap  /* Vertical gap between groups in a menu. */
+--menu-group-item-pad-y  /* Vertical padding of an item in a menu group. */
+--menu-group-min-width  /* Minimum width of a menu group. */
+--menu-group-pad-x  /* Horizontal padding of a menu group. */
 --option-menu-width  /* Width of a fixed-width option menu. */
+--option-row-control-gap  /* Horizontal gap between an option row's control and its label. */
+--option-row-dot-size  /* Size of the dot in an option row, such as a radio's selected mark. */
+--option-row-indent-step  /* Indent added for each level of a nested option row. */
+--popup-pad  /* Padding inside a Popup. */
 --progress-bar-height  /* Height of a ProgressBar track. */
 --progress-indicator-dot-size-12  /* Dot size of a ProgressIndicator with size 12. */
 --progress-indicator-dot-size-8  /* Dot size of a ProgressIndicator with size 8. */
@@ -130,9 +160,27 @@ Tokens one component owns, named for it.
 --range-track-height-4  /* Track height of a Range with size 8 or no size set. */
 --range-track-height-6  /* Track height of a Range with size 12. */
 --range-track-height-8  /* Track height of a Range with size 16. */
+--scroll-bar-max-height  /* Maximum height of a scrolling area that shows a scroll bar. */
+--scroll-bar-size  /* Thickness of a scroll bar. */
+--skeleton-circle-size  /* Size of a round Skeleton, such as an avatar placeholder. */
+--skeleton-height  /* Height of a block Skeleton. */
+--skeleton-status-width  /* Width of a Skeleton standing in for a status tag. */
+--skeleton-status-width-spacious  /* Width of a Skeleton standing in for a status tag with spacious spacing. */
+--skeleton-tag-width  /* Width of a Skeleton standing in for a tag. */
+--skeleton-tag-width-narrow  /* Width of a Skeleton standing in for a short tag. */
+--skeleton-tag-width-person  /* Width of a Skeleton standing in for a person tag. */
+--skeleton-tag-width-widest  /* Width of a Skeleton standing in for the longest tag. */
+--skeleton-text-height  /* Height of a Skeleton standing in for one line of text. */
 --spinner-size-lg  /* Size of a large Spinner, such as one loading a whole section. */
 --spinner-size-md  /* Size of a default Spinner. */
 --spinner-size-sm  /* Size of a small Spinner, such as one inside a Button. */
+--spotlight-media-height  /* Height of the media area in a Spotlight. */
+--table-cell-max-width  /* Maximum width of a table cell before its text truncates. */
+--tag-dot-size  /* Size of the dot in a Tag. */
+--tag-gap  /* Horizontal gap between a Tag's parts with default spacing. */
+--tag-gap-compact  /* Horizontal gap between a Tag's parts with compact spacing. */
+--tag-pad-end  /* Padding at the end of a Tag with default spacing. */
+--tag-pad-end-compact  /* Padding at the end of a Tag with compact spacing. */
 --toggle-pad  /* Gap between a Toggle's track and its knob, at both sizes. */
 --toggle-track-height-16  /* Track height of a Toggle with size 16. */
 --toggle-track-height-20  /* Track height of a Toggle with size 20. */
@@ -1140,14 +1188,11 @@ The Material roles, still in use until components move to the `--ds-` set. Use s
 --color-danger-border-subtle
 --color-danger-container
 --color-danger-text
---color-disabled-opacity
 --color-info
 --color-info-border-subtle
 --color-info-container
 --color-info-text
---color-inverse-on-surface
 --color-inverse-primary
---color-inverse-surface
 --color-mastering-content
 --color-mastering-content-border-subtle
 --color-mastering-content-container
@@ -1187,7 +1232,6 @@ The Material roles, still in use until components move to the `--ds-` set. Use s
 --color-relationship-border-subtle
 --color-relationship-container
 --color-relationship-text
---color-scrim
 --color-secondary
 --color-secondary-container
 --color-secondary-text
@@ -1224,17 +1268,12 @@ The Material roles, still in use until components move to the `--ds-` set. Use s
 
 ## Elevation Tokens
 ```css
---elevation-light-1
---elevation-light-2
---elevation-light-3
 --elevation-light-4
 --elevation-light-5
 --surface-container
 --surface-default
 --surface-overlay
---surface-overlay-shadow
 --surface-raised
---surface-raised-shadow
 --surface-sunken
 ```
 

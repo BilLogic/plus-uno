@@ -146,10 +146,10 @@ export default function MonthlyReportPage() {
 
     const getIconColor = (bg) => {
         const colors = {
-            emerald: 'var(--color-success)',
-            amber: 'var(--color-warning)',
+            emerald: 'var(--ds-chart-success)',
+            amber: 'var(--ds-chart-warning)',
             stone: 'var(--ds-icon-accent-gray)',
-            rose: 'var(--color-danger)'
+            rose: 'var(--ds-chart-danger)'
         };
         return colors[bg] || colors.emerald;
     };

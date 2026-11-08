@@ -30,7 +30,7 @@ import { Button, Modal, StatusTag, Alert } from '@/components';
 import { PageLayout } from '@/specs/Universal/Pages';
 ```
 
-Design tokens are available as CSS variables (`--color-primary`, `--size-section-gap-lg`, etc.).
+Design tokens are available as CSS variables (`--ds-text-brand`, `--section-stack-lg`, etc.).
 
 ## Creating New Prototypes
 

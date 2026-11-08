@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { getHeatmapColorByValue, formatCorrelationLabel } from '../utils';
 import { ChartSkeleton } from './ChartSkeleton';
 import type { CorrelationMatrix } from '../types';
@@ -37,7 +37,7 @@ const HEATMAP_THEMES = {
   light: {
     text: 'var(--ds-text-subtle)',
     quoteBg: 'var(--ds-surface-container)',
-    quoteBorder: 'var(--color-outline-variant, #e0e0e0)'
+    quoteBorder: 'var(--ds-border)'
   },
 };
 
@@ -198,7 +198,7 @@ function QuoteBox({ text, theme = 'dark' }: { text: string; theme?: 'light' | 'd
         width: 200,
         minHeight: 60,
         padding: 'var(--pad-y-md, 6px) var(--pad-x-md, 10px)',
-        borderRadius: 'var(--size-border-radius-radius-200, 8px)',
+        borderRadius: 'var(--radius-050)',
         background: t.quoteBg,
         border: `1px solid ${t.quoteBorder}`,
         fontStyle: 'italic',

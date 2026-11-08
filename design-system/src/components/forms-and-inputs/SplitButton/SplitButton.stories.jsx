@@ -15,9 +15,6 @@ export default {
     /** Hide CSF stories from the sidebar; docs live on SplitButton.mdx (Canvas still embeds them). */
     tags: ['!dev', '!autodocs'],
     parameters: {
-        changelog: [
-            { date: '2026-11-03', kind: 'changed', summary: 'Split button is now children-slot composition: two Button-family children (an action and a menu trigger), each carrying its own appearance, spacing and state. There is no flat-prop API.' },
-        ],
         docs: { toc: { title: 'On this page' } },
     },
     argTypes: {
