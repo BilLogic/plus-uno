@@ -70,10 +70,10 @@ const ChatHeader = ({ onBack }) => (
         )}
         <h1 style={{
             margin: 0,
-            fontSize: 'var(--font-size-h4, 18px)',
+            fontSize: 'var(--font-size-150)',
             fontWeight: 600,
             color: 'var(--chat-on-surface, #111827)',
-            fontFamily: 'var(--font-family-header)'
+            fontFamily: 'var(--type-family-heading)'
         }}>
             Tutor Reflection Assistant
         </h1>

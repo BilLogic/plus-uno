@@ -24,7 +24,7 @@
 import { CATEGORICAL, CHROME } from '@/dataviz/palette';
 import '@/dataviz/chartTheme.css';
 
-const BODY = 'var(--font-family-body)';
+const BODY = 'var(--type-family-body)';
 
 /**
  * Highcharts' numeric chart options (spacing, animation duration) do SVG
@@ -83,8 +83,8 @@ const axis = (gridLineWidth, gridLineDashStyle) => ({
         style: {
             color: CHROME.textSubtle,
             fontFamily: BODY,
-            fontSize: 'var(--font-size-body3)',
-            fontWeight: 'var(--font-weight-semibold-1)'
+            fontSize: 'var(--font-size-075)',
+            fontWeight: 'var(--type-weight-medium)'
         }
     },
     title: {
@@ -147,16 +147,16 @@ const chartTheme = {
     title: {
         style: {
             color: CHROME.text,
-            fontFamily: 'var(--font-family-headline)',
-            fontWeight: 'var(--font-weight-headline)',
-            fontSize: 'var(--font-size-h4)'
+            fontFamily: 'var(--type-family-heading-serif)',
+            fontWeight: 'var(--type-weight-medium)',
+            fontSize: 'var(--font-size-150)'
         }
     },
     subtitle: {
         style: {
             color: CHROME.textSubtle,
             fontFamily: BODY,
-            fontSize: 'var(--font-size-body2)'
+            fontSize: 'var(--font-size-0875)'
         }
     },
     xAxis: axis(0),
@@ -169,7 +169,7 @@ const chartTheme = {
         itemStyle: {
             color: CHROME.text,
             fontFamily: BODY,
-            fontWeight: 'var(--font-weight-semibold-1)'
+            fontWeight: 'var(--type-weight-medium)'
         },
         itemHoverStyle: {
             color: CHROME.text
@@ -197,7 +197,7 @@ const chartTheme = {
         style: {
             color: CHROME.text,
             fontFamily: BODY,
-            fontSize: 'var(--font-size-body2)'
+            fontSize: 'var(--font-size-0875)'
         }
     },
     credits: {

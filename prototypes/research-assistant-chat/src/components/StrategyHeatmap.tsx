@@ -76,7 +76,7 @@ export function StrategyHeatmap({
         display: 'flex',
         flexDirection: 'column',
         gap: 0,
-        fontFamily: 'var(--font-family-body)',
+        fontFamily: 'var(--type-family-body)',
       }}
     >
       <div style={{ display: 'flex', alignItems: 'stretch' }}>
@@ -90,7 +90,7 @@ export function StrategyHeatmap({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: 'var(--font-size-body2, 14px)',
+              fontSize: 'var(--font-size-0875)',
               fontWeight: 600,
               color: t.text,
               borderBottom: '1px solid var(--chat-outline, #d1d5db)',
@@ -112,7 +112,7 @@ export function StrategyHeatmap({
               display: 'flex',
               alignItems: 'center',
               padding: 'var(--space-025, 4px) var(--pad-x-sm, 8px)',
-              fontSize: 'var(--font-size-body2, 14px)',
+              fontSize: 'var(--font-size-0875)',
               fontWeight: 600,
               color: t.text,
               borderBottom: '1px solid var(--chat-outline, #d1d5db)',
@@ -144,7 +144,7 @@ export function StrategyHeatmap({
                   justifyContent: 'center',
                   background: getHeatmapColorByValue(value),
                   color: '#fff',
-                  fontSize: 'var(--font-size-body2, 14px)',
+                  fontSize: 'var(--font-size-0875)',
                   fontWeight: 500,
                   borderBottom: '1px solid var(--chat-outline, #d1d5db)',
                   borderLeft: '1px solid var(--chat-outline, #d1d5db)',
@@ -202,7 +202,7 @@ function QuoteBox({ text, theme = 'dark' }: { text: string; theme?: 'light' | 'd
         background: t.quoteBg,
         border: `1px solid ${t.quoteBorder}`,
         fontStyle: 'italic',
-        fontSize: 'var(--font-size-body2, 14px)',
+        fontSize: 'var(--font-size-0875)',
         color: t.text,
       }}
     >

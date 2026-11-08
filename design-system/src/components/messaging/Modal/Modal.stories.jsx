@@ -101,7 +101,7 @@ function ContentVariantCanvas({ title, description, minHeight, modal }) {
             <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">
                 {title}
             </span>
-            <p className="body2-txt" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
+            <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                 {description}
             </p>
             <InlineModalCanvas minHeight={minHeight} modal={modal} />

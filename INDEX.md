@@ -129,7 +129,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/foundations/radius.md`](design-system/guidelines/foundations/radius.md) | Corner radius: height ÷ 4 for controls, 6 and 4 for buttons, and container tokens |
 | [`design-system/guidelines/foundations/spacing.md`](design-system/guidelines/foundations/spacing.md) | Spacing, size and radius tokens on the four-tier ladder — which tier to read, the fallback rule, and private wiring |
 | [`design-system/guidelines/foundations/tokens.md`](design-system/guidelines/foundations/tokens.md) | Tokens — Overview & Decision Tree |
-| [`design-system/guidelines/foundations/typography.md`](design-system/guidelines/foundations/typography.md) | Apply these classes to elements for consistent typography |
+| [`design-system/guidelines/foundations/typography.md`](design-system/guidelines/foundations/typography.md) | Text styles, type tokens and the text-style classes |
 | [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) | says where design knowledge lives |
 
 ## Engineering

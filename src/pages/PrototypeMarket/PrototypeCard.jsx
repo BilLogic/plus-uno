@@ -66,20 +66,20 @@ const PrototypeCard = ({
           </div>
 
           {/* Title */}
-          <div className="prototype-card__title h5">{title}</div>
+          <div className="prototype-card__title heading-medium">{title}</div>
         </div>
       </div>
 
       {/* Description */}
-      <p className="prototype-card__desc body2-txt">{description}</p>
+      <p className="prototype-card__desc body-default">{description}</p>
 
       {/* Meta row */}
       <div className="prototype-card__meta">
-        <div className="prototype-card__meta-item body2-txt">
+        <div className="prototype-card__meta-item body-default">
           <i className="fa-regular fa-user" />
           <span>{allPeople.join(', ')}</span>
         </div>
-        <div className="prototype-card__meta-item body2-txt">
+        <div className="prototype-card__meta-item body-default">
           <i className="fa-regular fa-calendar" />
           <span>{formatDate(lastUpdated)}</span>
         </div>
@@ -92,7 +92,7 @@ const PrototypeCard = ({
             href={deploymentUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="prototype-card__link body2-txt"
+            className="prototype-card__link body-default"
             onClick={(e) => e.stopPropagation()}
           >
             <i className="fa-solid fa-arrow-up-right-from-square" />
@@ -102,7 +102,7 @@ const PrototypeCard = ({
         {localPath && !deploymentUrl && (
           <a
             href={localPath}
-            className="prototype-card__link body2-txt"
+            className="prototype-card__link body-default"
             onClick={(e) => e.stopPropagation()}
           >
             <i className="fa-solid fa-laptop" />
@@ -114,7 +114,7 @@ const PrototypeCard = ({
             href={notionCardUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="prototype-card__link body2-txt"
+            className="prototype-card__link body-default"
             onClick={(e) => e.stopPropagation()}
           >
             <i className="fa-brands fa-notion" />
@@ -122,7 +122,7 @@ const PrototypeCard = ({
           </a>
         )}
         {!deploymentUrl && !localPath && (
-          <span className="prototype-card__link prototype-card__link--disabled body2-txt">
+          <span className="prototype-card__link prototype-card__link--disabled body-default">
             <i className="fa-solid fa-circle-minus" />
             Not deployed
           </span>

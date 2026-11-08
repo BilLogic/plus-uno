@@ -61,19 +61,19 @@ LabelRequired.play = async ({ canvasElement }) => {
 export const CaptionVariants = () => (
     <div style={row}>
         <section style={cell}>
-            <h6 className="h6 mb-3">Default</h6>
+            <h6 className="heading-small mb-3">Default</h6>
             <Caption text="caption" state="default" />
         </section>
         <section style={cell}>
-            <h6 className="h6 mb-3">Success</h6>
+            <h6 className="heading-small mb-3">Success</h6>
             <Caption text="caption" state="success" />
         </section>
         <section style={cell}>
-            <h6 className="h6 mb-3">Danger</h6>
+            <h6 className="heading-small mb-3">Danger</h6>
             <Caption text="caption" state="danger" />
         </section>
         <section style={cell}>
-            <h6 className="h6 mb-3">Warning</h6>
+            <h6 className="heading-small mb-3">Warning</h6>
             <Caption text="caption" state="warning" />
         </section>
     </div>
@@ -103,31 +103,31 @@ export const CaptionWarning = () => <Caption text="This number looks like a land
 export const Layout = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
         <section>
-            <h6 className="h6 mb-4">Default</h6>
+            <h6 className="heading-small mb-4">Default</h6>
             <div style={stack}>
                 <TextField id="layout-email" type="email" label="Email address" isRequired placeholder="Enter your email" caption="We'll never share your email with anyone else." />
             </div>
         </section>
         <section>
-            <h6 className="h6 mb-4">Success</h6>
+            <h6 className="heading-small mb-4">Success</h6>
             <div style={stack}>
                 <TextField id="layout-username" label="Username" isRequired defaultValue="john_doe" successMessage="Username is available." />
             </div>
         </section>
         <section>
-            <h6 className="h6 mb-4">Error</h6>
+            <h6 className="heading-small mb-4">Error</h6>
             <div style={stack}>
                 <TextField id="layout-password" type="password" label="Password" isRequired defaultValue="123" isInvalid errorMessage="Password must be at least 8 characters long." />
             </div>
         </section>
         <section>
-            <h6 className="h6 mb-4">Warning</h6>
+            <h6 className="heading-small mb-4">Warning</h6>
             <div style={stack}>
                 <TextField id="layout-phone" type="tel" label="Phone number" defaultValue="555-0123" warningMessage="Include a country code for international numbers." />
             </div>
         </section>
         <section>
-            <h6 className="h6 mb-4">Disabled</h6>
+            <h6 className="heading-small mb-4">Disabled</h6>
             <div style={stack}>
                 <TextField id="layout-account-type" label="Account type" isRequired defaultValue="Premium" isDisabled />
             </div>

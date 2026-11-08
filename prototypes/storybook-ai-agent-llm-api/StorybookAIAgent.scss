@@ -13,7 +13,7 @@
   /* Not inherited: without this, the container (and its large layout box for the closed panel)
      still receives pointer events and blocks clicks on Storybook docs / inline Canvas below. */
   pointer-events: none;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   /* Soften saturation by ~6% so token colors feel slightly muted */
   filter: saturate(0.94);
 }
@@ -151,7 +151,7 @@
 
 .sb-ai-agent__header-name {
   margin: 0;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-weight: 700;
   font-size: 13.5px;
   line-height: 20px;
@@ -160,7 +160,7 @@
 }
 
 .sb-ai-agent__header-sub {
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-weight: 500;
   font-size: 9.8px;
   line-height: 15px;
@@ -324,10 +324,10 @@
 }
 
 .sb-ai-agent__quick-label {
-  font-family: var(--font-family-body);
-  font-size: var(--font-size-body3);
-  line-height: var(--font-line-height-body3);
-  font-weight: var(--font-weight-body3-bold);
+  font-family: var(--type-family-body);
+  font-size: var(--font-size-075);
+  line-height: var(--line-height-100);
+  font-weight: var(--type-weight-semibold);
   color: var(--ds-text);
   text-align: left;
   flex: 1;
@@ -387,7 +387,7 @@
 
 .sb-ai-agent__skills-router-heading {
   margin: 0;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-weight: 700;
   font-size: 15px;
   line-height: 1.3;
@@ -405,7 +405,7 @@
   border: none;
   background: var(--ds-surface-container);
   box-shadow: none;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-size: 11px;
   /* Same as .sb-ai-agent__bubble line-height so multi-line tip matches New Starter Kit */
   line-height: 22.75px;
@@ -450,7 +450,7 @@
   border: none;
   background: var(--ds-surface-container);
   box-shadow: none;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-size: 12px;
   line-height: 1.5;
   color: var(--ds-text-subtle);
@@ -468,7 +468,7 @@
 .sb-ai-agent__skills-router-pipeline-flow {
   margin: 0;
   word-break: break-word;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
 }
 
 /* ── Skill card (reusable block; theme = prototype | review | post | compound) ── */
@@ -553,7 +553,7 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-weight: 700;
   font-size: 14px;
   line-height: 1;
@@ -576,7 +576,7 @@
   flex-wrap: wrap;
   gap: var(--stack-sm);
   margin: 0 0 var(--stack-md);
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-size: 14px;
   font-weight: 400;
   line-height: 1.35;
@@ -601,7 +601,7 @@
   border: none;
   background: transparent;
   cursor: pointer;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-size: 12px;
   font-weight: 400;
   line-height: 1.4;
@@ -636,7 +636,7 @@
 .sb-ai-agent__skill-card__label {
   display: block;
   margin-bottom: var(--stack-sm);
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-size: 12px;
   font-weight: 600;
   line-height: 1.3;
@@ -655,7 +655,7 @@
   padding: var(--space-025) var(--pad-x-md);
   border-radius: var(--radius-full);
   border: none;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-size: 12px;
   font-weight: 600;
   line-height: 1.2;
@@ -665,7 +665,7 @@
 
 .sb-ai-agent__skill-card__sideeffects {
   margin: 0;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-size: 12px;
   line-height: 1.45;
   color: var(--ds-text-subtle);
@@ -791,7 +791,7 @@
 .sb-ai-agent__bubble {
   max-width: 415.3949890136719px;
   padding: 14px;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-weight: 400;
   font-size: 13px;
   line-height: 22.75px;
@@ -838,7 +838,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-weight: 400;
   font-size: 18.667px;
   line-height: 1.571;
@@ -903,7 +903,7 @@
   background: transparent;
   border: none;
   outline: none;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-weight: 400;
   font-size: 13px;
   line-height: normal;

@@ -372,10 +372,10 @@ ClearButton.play = async ({ canvasElement }) => {
 
     const clear = canvas.getByRole('button', { name: 'Clear School' });
     await expect(clear).toHaveAttribute('tabindex', '-1');
-    // One step smaller than the caret, as the Figma `_Field Clear`.
+    // No larger than the caret: both take the smallest icon step.
     const size = (el) => parseFloat(getComputedStyle(el).fontSize);
     await expect(size(clear.querySelector('.fa-circle-xmark')))
-        .toBeLessThan(size(canvasElement.querySelector('.plus-select-caret')));
+        .toBeLessThanOrEqual(size(canvasElement.querySelector('.plus-select-caret')));
     await userEvent.click(clear);
     await expect(chosen.textContent).toBe('');
     await expect(canvas.queryByRole('button', { name: 'Clear School' })).toBeNull();

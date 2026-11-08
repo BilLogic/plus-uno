@@ -45,11 +45,10 @@ size.
 - Removing a heading can create a skip: `h2, h3, h4` with the `h3` taken out
   becomes `h2` → `h4`. Read the outline before you remove or re-tag one.
 
-**For developers.** The legacy `h1`–`h6` classes are declared against the tag and the class at
-once (`h4, .h4 { … }`), so `<h2 className="h4">` draws exactly like an `h4`.
-Re-tagging a heading keeps its look only if it keeps its class, and CSS that
-selects a heading by its tag stops applying when the tag changes: match the
-class as well. New work sets `font: var(--heading-*)` and needs neither.
+**For developers.** A heading's look comes from its text style, not its tag:
+`<h2 className="heading-large">` draws the same at any level, and so does a
+rule that sets `font: var(--heading-large)`. Re-tag a heading for the outline
+and keep its style, and select it by its class, not its tag.
 
 In the docs, the `.sbdocs hN` rules apply to MDX prose only: each is fenced
 with `:not(:where(.docs-story *))`, so a story's own headings draw at their

@@ -113,7 +113,7 @@ export const Spacing = () => (
 
 export const InteractionStates = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', paddingBottom: 'var(--size-1900)' }}>
-        <p className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
+        <p className="body-default" style={{ color: 'var(--ds-text-subtle)' }}>
             Empty, with value, disabled, and read-only.
         </p>
         <div style={{ display: 'flex', gap: 'var(--space-150)', alignItems: 'flex-start', flexWrap: 'wrap' }}>

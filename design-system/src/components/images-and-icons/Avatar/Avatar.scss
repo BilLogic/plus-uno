@@ -8,12 +8,12 @@
 @use '../../../styles/state' as *;
 
 $avatar-sizes: (
-    16: (var(--image-xxs), var(--font-size-fa-body3), var(--font-size-fa-body3)),
-    24: (var(--image-sm), var(--font-size-body3), var(--font-size-fa-body1)),
-    32: (var(--image-md), var(--font-size-body2), var(--font-size-fa-h5)),
-    40: (var(--image-lg), var(--font-size-body1), var(--font-size-fa-h4)),
-    96: (var(--avatar-size-96), var(--font-size-h2), var(--font-size-fa-h1)),
-    128: (var(--avatar-size-128), var(--font-size-h1), var(--font-size-fa-h1)),
+    16: (var(--image-xxs), var(--icon-sm), var(--icon-sm)),
+    24: (var(--image-sm), var(--font-size-075), var(--icon-md)),
+    32: (var(--image-md), var(--font-size-0875), var(--icon-md)),
+    40: (var(--image-lg), var(--font-size-100), var(--icon-lg)),
+    96: (var(--avatar-size-96), var(--font-size-200), var(--icon-lg)),
+    128: (var(--avatar-size-128), var(--font-size-200), var(--icon-lg)),
 );
 
 // The initials and icon grounds, per Tag color: ground, ink.
@@ -43,11 +43,11 @@ $avatar-colors: (
     background-color: var(--ds-background-accent-blue-subtler);
     color: var(--ds-text-accent-blue);
     font-family: inherit;
-    font-size: var(--avatar-font, var(--font-size-body2));
-    font-weight: var(--font-weight-semibold-2);
+    font-size: var(--avatar-font, var(--font-size-0875));
+    font-weight: var(--type-weight-semibold);
     line-height: 1;
     border-radius: var(--radius-full);
-    --avatar-glyph: var(--font-size-fa-h5);
+    --avatar-glyph: var(--icon-md);
 }
 
 .plus-avatar--square {

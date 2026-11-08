@@ -280,7 +280,7 @@ export function tokenCorpus({ root = REPO_ROOT, prefix = '--', precedence = 'fir
  * Every family this design system mints, by name prefix.
  *
  * The order here is not the matching order — `familyOf` takes the LONGEST
- * prefix, so `--font-size-h1` cannot be read as `--font-` — but it is the order
+ * prefix, so `--font-size-100` cannot be read as `--font-` — but it is the order
  * a reader wants: color, then type, then space, then the app shell.
  *
  * A family absent from this list is a token name nothing in the harness can

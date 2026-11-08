@@ -34,7 +34,7 @@ export const AuthProviders = () => {
 
     return (
         <div style={{ padding: '24px', maxWidth: '1200px', margin: '0 auto' }}>
-            <p className="body1-txt" style={{ marginBottom: '32px' }}>
+            <p className="body-large" style={{ marginBottom: '32px' }}>
                 Static image assets for authentication providers.
             </p>
 
@@ -66,9 +66,9 @@ export const AuthProviders = () => {
                         }}>
                             <img src={asset.src} alt={asset.name} style={{ maxWidth: '100%', maxHeight: '100%' }} />
                         </div>
-                        <div className="body1-txt">{asset.name}</div>
+                        <div className="body-large">{asset.name}</div>
                         <code>{asset.file}</code>
-                        <p className="body2-txt">{asset.description}</p>
+                        <p className="body-default">{asset.description}</p>
                     </div>
                 ))}
             </div>
@@ -150,7 +150,7 @@ export const TutorBadges = () => {
 
     return (
         <div style={{ padding: '24px', maxWidth: '1400px', margin: '0 auto' }}>
-            <p className="body1-txt" style={{ marginBottom: '32px' }}>
+            <p className="body-large" style={{ marginBottom: '32px' }}>
                 Badge images for tutor certification status. These are used to display tutor certification badges in various contexts (thumbnail, modal, and full-size).
             </p>
 
@@ -158,7 +158,7 @@ export const TutorBadges = () => {
                 const categoryAssets = assets.filter(asset => asset.category === category);
                 return (
                     <div key={category} style={{ marginBottom: '48px' }}>
-                        <h4 className="h4" style={{ marginBottom: '24px' }}>{category} Badges</h4>
+                        <h4 className="heading-large" style={{ marginBottom: '24px' }}>{category} Badges</h4>
                         <div style={{
                             display: 'grid',
                             gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
@@ -200,9 +200,9 @@ export const TutorBadges = () => {
                                             }}
                                         />
                                     </div>
-                                    <div className="body1-txt">{asset.name}</div>
+                                    <div className="body-large">{asset.name}</div>
                                     <code style={{ fontSize: '12px', wordBreak: 'break-all' }}>{asset.file}</code>
-                                    <p className="body2-txt">{asset.description}</p>
+                                    <p className="body-default">{asset.description}</p>
                                 </div>
                             ))}
                         </div>

@@ -18,17 +18,17 @@ const tableContent = (
     <>
         <thead>
             <tr>
-                <th className="body3-txt">Name</th>
-                <th className="body3-txt">Role</th>
-                <th className="body3-txt">Status</th>
+                <th className="body-small">Name</th>
+                <th className="body-small">Role</th>
+                <th className="body-small">Status</th>
             </tr>
         </thead>
         <tbody>
             {sampleRows.map((row) => (
                 <tr key={row.name}>
-                    <td className="body1-txt">{row.name}</td>
-                    <td className="body1-txt">{row.role}</td>
-                    <td className="body1-txt">{row.status}</td>
+                    <td className="body-large">{row.name}</td>
+                    <td className="body-large">{row.role}</td>
+                    <td className="body-large">{row.status}</td>
                 </tr>
             ))}
         </tbody>
@@ -41,7 +41,7 @@ const sectionActions = (
 );
 
 const paginationSlot = (
-    <span className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>
+    <span className="body-small" style={{ color: 'var(--ds-text-subtle)' }}>
         Pagination slot — 1 of 4
     </span>
 );

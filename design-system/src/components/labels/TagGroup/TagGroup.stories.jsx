@@ -361,7 +361,7 @@ export const MenuKeepsActions = {
                     <Tag isSelected={false} color="blue" isLoading onClick={onSaving}>Art</Tag>
                     <Tag color="blue" isLoading>Latin</Tag>
                 </TagGroup>
-                <p className="body2-txt">{picked ? 'Mathematics picked' : 'Nothing picked'}</p>
+                <p className="body-default">{picked ? 'Mathematics picked' : 'Nothing picked'}</p>
             </div>
         );
     },
@@ -915,7 +915,7 @@ export const CustomOverflowAction = () => {
             >
                 {SUBJECTS.map((s) => <Tag key={s} color="yellow">{s}</Tag>)}
             </TagGroup>
-            <p className="body2-txt">Picker opened {opened} time(s)</p>
+            <p className="body-default">Picker opened {opened} time(s)</p>
         </div>
     );
 };

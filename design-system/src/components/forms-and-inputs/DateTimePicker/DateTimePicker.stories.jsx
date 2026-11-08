@@ -209,7 +209,7 @@ export const Interactive = (args) => {
                         borderRadius: 'var(--radius-025)',
                     }}
                 >
-                    <p className="body2-txt" style={{ margin: 0 }}>
+                    <p className="body-default" style={{ margin: 0 }}>
                         <strong>Selected:</strong> {value.date} {value.time || ''}
                     </p>
                 </div>

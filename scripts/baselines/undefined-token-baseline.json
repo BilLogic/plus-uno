@@ -36,9 +36,6 @@
         "--element-gap-sm": {
           "count": 3
         },
-        "--font-family-base": {
-          "count": 1
-        },
         "--font-size-fa-b3-solid": {
           "count": 2
         },
@@ -193,9 +190,6 @@
         "--element-gap-sm": {
           "count": 0
         },
-        "--font-family-base": {
-          "count": 0
-        },
         "--font-size-fa-b3-solid": {
           "count": 0
         },
@@ -324,10 +318,10 @@
     "totals": {
       "entries": {
         "names": {
-          "count": 51
+          "count": 50
         },
         "uses": {
-          "count": 196
+          "count": 195
         },
         "bare": {
           "count": 5

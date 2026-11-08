@@ -50,6 +50,7 @@ export const OLD_DEFINITIONS = [
   'design-system/src/tokens/_primitives.scss',
   'design-system/src/tokens/_spacing_semantics.scss',
   'design-system/src/tokens/_layout.scss',
+  'design-system/src/tokens/_fonts.scss',
 ];
 
 /** Files whose matches are another tool's names, not the design system's. */
@@ -64,6 +65,14 @@ const NOT_THE_DESIGN_SYSTEM = new Map([
 const OLD_SIZE = new RegExp(
   '(?<![\\w-])(?:--size-(?:spacing|border|column|card|section|modal|surface|table|media|row|icon|indicator)-[a-z0-9*]' +
     `|(?:${[...RETIRED_TOKENS].join('|')})(?![\\w-]))`,
+);
+
+/** An old type token, or an old type class: the `*-txt` utilities and the `h1` … `h6` title classes. */
+const OLD_TYPE = new RegExp(
+  '(?<![\\w-])--(?:font-size-(?:(?:h[1-6]|body[1-3]|lead|blockquote|code|display[1-4])(?![\\w])|fa-[a-z0-9*])|font-(?:family|weight|line-height|letter-spacing)-[a-z0-9*])' +
+    '|(?<![\\w-])(?:body[1-3]|display[1-4]|body-lead|body-blockquote)-txt(?![\\w-])' +
+    '|class(?:Name)?=["\'{`][^"\'}`>]*(?<![\\w-])h[1-6](?![\\w-])' +
+    '|(?<!-)\\.h[1-6](?![\\w-])',
 );
 
 /**
@@ -86,6 +95,11 @@ export const FAMILIES = [
     name: 'size',
     pattern: OLD_SIZE,
     remedy: 'the old size names are gone; use the current token for the role: `--space-*` / `--size-*` / `--radius-*` / `--stroke-*` primitives, the `--pad-*` / `--stack-*` / `--inline-*` semantics, or the pattern tokens (`--card-*`, `--section-*`, `--modal-*`, `--page-*`, `--table-*`, `--icon-*`, `--image-*`, `--row-height-*`)',
+  },
+  {
+    name: 'type',
+    pattern: OLD_TYPE,
+    remedy: 'the old type tokens and classes are gone; use a text style (`font: var(--heading-*)`, `var(--body-*)`, `var(--metric-*)`, `var(--code)`), the `--font-size-NNNN` / `--line-height-NNNN` steps, `--type-family-*` and `--type-weight-*`, or `--icon-*` for a glyph',
   },
 ];
 

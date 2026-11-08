@@ -42,7 +42,7 @@ const SmartBarChart = ({ data, height = 200 }) => {
             categories: categories,
             labels: {
                 style: {
-                    fontSize: 'var(--font-size-body3)',
+                    fontSize: 'var(--font-size-075)',
                     color: 'var(--ds-text-subtle)'
                 }
             },

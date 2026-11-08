@@ -121,15 +121,14 @@
 }
 
 /*
- * The leading icon is Figma's 20px solid icon (Icon size=h4). There is no
- * icon-size token, so it borrows `--font-size-fa-h4-solid`, and the column is
- * as wide as the icon. Its color is the style's Icon role, set per style below.
+ * The leading icon is a solid icon at `--icon-lg`, and the column is as wide
+ * as the icon. Its color is the style's Icon role, set per style below.
  * The icon's 1 line height and 1em width are raw on purpose: the box is
  * centered on the first line and fills the column, so it must be exactly the
- * 20px square the glyph is drawn in.
+ * square the glyph is drawn in.
  */
 .plus-section-message-leading {
-    width: var(--font-size-fa-h4-solid);
+    width: var(--icon-lg);
 }
 
 // Two classes deep, to beat the typography classes' `body .fa-solid` icon
@@ -145,7 +144,7 @@
     :is(.fa-solid, .fa-regular, .fas, .far) {
         --fa-width: 1em;
         width: 1em;
-        font-size: var(--font-size-fa-h4-solid);
+        font-size: var(--icon-lg);
         line-height: 1;
     }
 }

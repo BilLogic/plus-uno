@@ -81,7 +81,7 @@ export const Content = () => {
         <div style={ratingCol}>
             <section>
                 <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>BASELINE RATING</span>
-                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Labeled comments-style rating with a required indicator.
                 </p>
                 <Rating
@@ -105,14 +105,14 @@ export const Variants = () => {
         <div style={ratingCol}>
             <section>
                 <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>COMMENTS</span>
-                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Label appears below the stars for open-ended feedback flows.
                 </p>
                 <Rating id="rating-comments-variant" value={commentsValue} variant="comments" onChange={setCommentsValue} />
             </section>
             <section>
                 <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>NUMERIC</span>
-                <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
+                <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Numeric labels above each star for more explicit scales.
                 </p>
                 <Rating id="rating-numeric-variant" value={numericValue} variant="numeric" onChange={setNumericValue} />
@@ -125,7 +125,7 @@ export const InteractionStates = () => (
     <div style={ratingCol}>
         <section>
             <span style={{ display: 'block', marginBottom: 'var(--space-050)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>DISABLED</span>
-            <p className="body2-txt" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
+            <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                 Disabled ratings remain visible but cannot be changed.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>

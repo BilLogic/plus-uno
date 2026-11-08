@@ -3,9 +3,6 @@
   "sets": {
     "disagreements": {
       "entries": {
-        "--font-size-h4 18px": {
-          "count": 1
-        },
         "--pad-x-md 10px": {
           "count": 1
         },

@@ -26,7 +26,7 @@ export const QuestionFlow = ({ steps, onComplete }) => {
             borderRadius: '16px',
             padding: '20px',
             maxWidth: '500px',
-            fontFamily: 'var(--font-family-body)',
+            fontFamily: 'var(--type-family-body)',
             boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
         }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px', alignItems: 'center' }}>
@@ -127,7 +127,7 @@ export const ParameterSlider = ({ sliders: initialSliders, onApply }) => {
             borderRadius: '16px',
             padding: '24px',
             maxWidth: '500px',
-            fontFamily: 'var(--font-family-body)',
+            fontFamily: 'var(--type-family-body)',
             boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
         }}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px', marginBottom: '24px' }}>

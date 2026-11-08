@@ -221,7 +221,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                 <div style={{ padding: '16px 24px', boxSizing: 'content-box' }}>
                     <div className="modal-header-reveal" style={{ animationDelay: '100ms' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                            <h2 id="student-insights-modal-title" className="h4" style={{ margin: 0 }}>{currentStudent?.name}</h2>
+                            <h2 id="student-insights-modal-title" className="heading-large" style={{ margin: 0 }}>{currentStudent?.name}</h2>
                             <Button text="Update goals" appearance="primary" iconAfter={<i className="fa-solid fa-pencil" aria-hidden />} onClick={() => setActiveContentTab('goals')} />
                         </div>
                         <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '12px' }}>
@@ -339,7 +339,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                             className="animate-enter delay-1"
                             style={{ minHeight: 0, display: 'flex', flexDirection: 'column', '--base-delay': '100ms' }}
                         >
-                            <h3 className="body1-txt" style={{ fontWeight: 600, marginBottom: '8px' }}>Student Momentum</h3>
+                            <h3 className="body-large" style={{ fontWeight: 600, marginBottom: '8px' }}>Student Momentum</h3>
                             <div className="animate-enter delay-inner-1" style={{ position: 'relative', marginBottom: '0px', '--base-delay': '100ms' }}>
                                 <GaugeChart
                                     value={momentumPercent}
@@ -354,7 +354,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                     <span>High</span>
                                 </div>
                             </div>
-                            <h4 className="body2-txt animate-enter delay-inner-2" style={{ fontWeight: 600, marginTop: '12px', marginBottom: '4px', '--base-delay': '100ms' }}>Practice Activity (Last 4 Weeks)</h4>
+                            <h4 className="body-default animate-enter delay-inner-2" style={{ fontWeight: 600, marginTop: '12px', marginBottom: '4px', '--base-delay': '100ms' }}>Practice Activity (Last 4 Weeks)</h4>
                             <div ref={heatmapWrapRef} className="animate-enter delay-inner-3" style={{ '--base-delay': '100ms', flex: 1, minHeight: 120, display: 'flex', flexDirection: 'column' }}>
                                 <HeatmapChart
                                     xCategories={practiceHeatmapX}
@@ -377,7 +377,7 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                             className="animate-enter delay-2"
                             style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, '--base-delay': '200ms' }}
                         >
-                            <h3 className="body1-txt" style={{ fontWeight: 600, marginBottom: '12px' }}>Key Observations</h3>
+                            <h3 className="body-large" style={{ fontWeight: 600, marginBottom: '12px' }}>Key Observations</h3>
                             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', flex: 1, minHeight: 0, overflowY: 'hidden', width: '100%' }}>
                                 {keyObservations.map((obs, i) => (
                                     <div key={i} className={`obs-card animate-enter delay-inner-${i + 1}`} style={{
@@ -391,12 +391,12 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                         justifyContent: 'center',
                                         '--base-delay': '200ms'
                                     }}>
-                                        <div className="body2-txt" style={{ fontWeight: 600, color: 'var(--ds-text)' }}>{obs.title}</div>
-                                        <div className="body3-txt" style={{ color: 'var(--ds-text-subtlest)', marginTop: '4px' }}>{obs.subtitle}</div>
+                                        <div className="body-default" style={{ fontWeight: 600, color: 'var(--ds-text)' }}>{obs.title}</div>
+                                        <div className="body-small" style={{ color: 'var(--ds-text-subtlest)', marginTop: '4px' }}>{obs.subtitle}</div>
                                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginTop: '12px', flexWrap: 'wrap' }}>
-                                            <span className="body1-txt" style={{ fontWeight: 600 }}>{obs.value}</span>
+                                            <span className="body-large" style={{ fontWeight: 600 }}>{obs.value}</span>
                                             <StatusTag appearance={obs.badgeStyle}>{obs.badge}</StatusTag>
-                                            <span className="body3-txt" style={{ color: 'var(--ds-text-subtlest)', marginLeft: 'auto' }}>{obs.comparison}</span>
+                                            <span className="body-small" style={{ color: 'var(--ds-text-subtlest)', marginLeft: 'auto' }}>{obs.comparison}</span>
                                         </div>
                                     </div>
                                 ))}
@@ -408,21 +408,21 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                             className="animate-enter delay-3"
                             style={{ display: 'flex', flexDirection: 'column', height: '100%', minHeight: 0, width: '100%', '--base-delay': '300ms' }}
                         >
-                            <h3 className="body1-txt" style={{ fontWeight: 600, marginBottom: '12px' }}>Talking Points</h3>
+                            <h3 className="body-large" style={{ fontWeight: 600, marginBottom: '12px' }}>Talking Points</h3>
                             <div className="no-scrollbar" style={{ flex: 1, minHeight: 0, overflowY: 'auto', width: '100%', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
                                 <div className="animate-enter delay-inner-1" style={{ '--base-delay': '300ms' }}>
                                     <Accordion
                                         items={talkingPoints.map((tp, i) => ({
                                             eventKey: String(i),
-                                            header: <span className="body2-txt" style={{ fontWeight: 600, color: 'var(--ds-text)' }}>{tp.title}</span>,
-                                            body: <span className="body2-txt" style={{ color: 'var(--ds-text)' }}>{tp.content}</span>
+                                            header: <span className="body-default" style={{ fontWeight: 600, color: 'var(--ds-text)' }}>{tp.title}</span>,
+                                            body: <span className="body-default" style={{ color: 'var(--ds-text)' }}>{tp.content}</span>
                                         }))}
                                         activeKey={activeAccordionKey}
                                         onSelect={(k) => setActiveAccordionKey(k === activeAccordionKey ? null : k)}
                                     />
                                 </div>
                                 <div className="animate-enter delay-inner-2" style={{ '--base-delay': '300ms' }}>
-                                    <p className="body3-txt" style={{ marginTop: '16px', color: 'var(--ds-text-subtle)', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
+                                    <p className="body-small" style={{ marginTop: '16px', color: 'var(--ds-text-subtle)', display: 'flex', alignItems: 'flex-start', gap: '8px' }}>
                                         <i className="fas fa-circle-info" style={{ flexShrink: 0, marginTop: '2px' }} aria-hidden />
                                         <span>LLM-synthesized insights from 38 rows of reflection form data across 6 tutors, Last updated in Jan 2026.</span>
                                     </p>
@@ -446,21 +446,21 @@ const StudentInsightsModal = ({ student, allStudents = [], onClose, onSelectStud
                                     '--base-delay': '0ms'
                                 }}>
                                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-                                        <span className="body2-txt" style={{ fontWeight: 600, color: 'var(--ds-text)' }}>{goal.title}</span>
+                                        <span className="body-default" style={{ fontWeight: 600, color: 'var(--ds-text)' }}>{goal.title}</span>
                                         <StatusTag appearance="neutral">{goal.due}</StatusTag>
                                     </div>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginTop: '12px' }}>
                                         <div style={{ flex: 1, height: '8px', borderRadius: '4px', backgroundColor: 'var(--ds-background-neutral)', overflow: 'hidden' }}>
                                             <div style={{ width: `${goal.progress}%`, height: '100%', borderRadius: '4px', backgroundColor: 'var(--ds-background-accent-teal-bolder)' }} />
                                         </div>
-                                        <span className="body3-txt" style={{ fontWeight: 600, color: 'var(--ds-text)' }}>{goal.progress}%</span>
+                                        <span className="body-small" style={{ fontWeight: 600, color: 'var(--ds-text)' }}>{goal.progress}%</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     )}
                     {activeContentTab === 'notes' && (
-                        <div className="body1-txt" style={{ padding: '16px 0', color: 'var(--ds-text-subtle)' }}>
+                        <div className="body-large" style={{ padding: '16px 0', color: 'var(--ds-text-subtle)' }}>
                             No notes have been added for this student yet.
                         </div>
                     )}

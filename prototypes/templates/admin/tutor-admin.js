@@ -164,7 +164,7 @@ function buildSidebarNavigation() {
             
             const navItem = document.createElement('a');
             navItem.href = item.href || '#';
-            navItem.className = 'body1-txt';
+            navItem.className = 'body-large';
             navItem.style.display = 'flex';
             navItem.style.alignItems = 'center';
             navItem.style.gap = `var(--stack-md)`;
@@ -382,7 +382,7 @@ function buildTutorTable() {
         
         const nameWrapper = document.createElement('div');
         const name = document.createElement('div');
-        name.className = 'body1-txt';
+        name.className = 'body-large';
         name.textContent = tutor.name;
         nameWrapper.appendChild(name);
         
@@ -532,7 +532,7 @@ function addBulkActionsToolbar() {
     
     const selectedCount = document.createElement('span');
     selectedCount.id = 'selected-count';
-    selectedCount.className = 'body1-txt';
+    selectedCount.className = 'body-large';
     selectedCount.style.color = 'var(--ds-text-brand)';
     leftSection.appendChild(selectedCount);
     
@@ -627,37 +627,37 @@ function showBulkEmailModal() {
     modalBody.style.gap = `var(--modal-stack-md)`;
     
     const infoText = document.createElement('p');
-    infoText.className = 'body1-txt';
+    infoText.className = 'body-large';
     infoText.textContent = `Send email to ${selectedTutors.size} selected tutor${selectedTutors.size > 1 ? 's' : ''}:`;
     modalBody.appendChild(infoText);
     
     const tutorList = document.createElement('div');
-    tutorList.className = 'body2-txt';
+    tutorList.className = 'body-default';
     tutorList.style.color = 'var(--ds-text-subtle)';
     tutorList.textContent = selectedTutorNames;
     modalBody.appendChild(tutorList);
     
     const subjectLabel = document.createElement('label');
-    subjectLabel.className = 'body2-txt';
+    subjectLabel.className = 'body-default';
     subjectLabel.textContent = 'Subject';
     subjectLabel.style.marginBottom = 'var(--stack-sm)';
     modalBody.appendChild(subjectLabel);
     
     const subjectInput = document.createElement('input');
     subjectInput.type = 'text';
-    subjectInput.className = 'plus-text-field body2-txt';
+    subjectInput.className = 'plus-text-field body-default';
     subjectInput.placeholder = 'Enter email subject';
     subjectInput.style.marginBottom = 'var(--modal-stack-md)';
     modalBody.appendChild(subjectInput);
     
     const messageLabel = document.createElement('label');
-    messageLabel.className = 'body2-txt';
+    messageLabel.className = 'body-default';
     messageLabel.textContent = 'Message';
     messageLabel.style.marginBottom = 'var(--stack-sm)';
     modalBody.appendChild(messageLabel);
     
     const messageTextarea = document.createElement('textarea');
-    messageTextarea.className = 'plus-textarea body2-txt';
+    messageTextarea.className = 'plus-textarea body-default';
     messageTextarea.rows = 5;
     messageTextarea.placeholder = 'Enter email message';
     modalBody.appendChild(messageTextarea);
@@ -707,18 +707,18 @@ function showBulkAssignModal() {
     modalBody.style.gap = `var(--modal-stack-md)`;
     
     const infoText = document.createElement('p');
-    infoText.className = 'body1-txt';
+    infoText.className = 'body-large';
     infoText.textContent = `Assign ${selectedTutors.size} selected tutor${selectedTutors.size > 1 ? 's' : ''} to a group:`;
     modalBody.appendChild(infoText);
     
     const groupLabel = document.createElement('label');
-    groupLabel.className = 'body2-txt';
+    groupLabel.className = 'body-default';
     groupLabel.textContent = 'Select Group';
     groupLabel.style.marginBottom = 'var(--stack-sm)';
     modalBody.appendChild(groupLabel);
     
     const groupSelect = document.createElement('select');
-    groupSelect.className = 'plus-select body2-txt';
+    groupSelect.className = 'plus-select body-default';
     groupSelect.style.marginBottom = 'var(--modal-stack-md)';
     groupSelect.style.width = '100%';
     groupSelect.style.padding = `var(--pad-y-md) var(--pad-x-md)`;

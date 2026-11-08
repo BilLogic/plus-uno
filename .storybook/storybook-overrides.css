@@ -33,9 +33,8 @@ body,
  * `.docs-story` is a descendant of `.sbdocs`, so an unfenced
  * `.sbdocs h3 { font-size: … !important }` outranks a story's own `hN` size
  * class and flattens every heading a component renders into one of three docs
- * sizes. Measured on the PageLayout docs page: `<h3 className="h6">Card 1</h3>`
- * drew at 28px, not the 16px its class asks for, and `<h1 className="h2">Page
- * Title</h1>` at 56px, not 32px. The docs preview was not showing the component.
+ * sizes. Measured on the PageLayout docs page: a heading with a
+ * text-style class drew at the docs size, not the size its class asks for. The docs preview was not showing the component.
  * The tag is the outline position and the class is the appearance
  * (design-system/src/styles/Accessibility.mdx § Heading levels), so a canvas
  * heading has to be free to take its size from its class whatever tag it carries.
@@ -54,7 +53,7 @@ body,
 .sbdocs h1:not(:where(.docs-story *, .sb-ds-dodont-card *)),
 .sbdocs-title {
     font-family: var(--type-family-heading-serif) !important;
-    font-size: var(--font-size-display4) !important;
+    font-size: var(--font-size-200) !important;
     font-weight: var(--type-weight-medium) !important;
     color: var(--ds-text) !important;
 }
@@ -103,11 +102,11 @@ body,
  * own is ours to type; prose that carries one — the Tailwind captions authored
  * in Get started/About — is that page's own decision, and this must
  * not overrule it. The fence keeps the rule out of story canvases, where it
- * would smash DS utilities (body3-txt captions, h6 titles); `:where()` costs the
+ * would smash DS utilities (text-style captions and titles); `:where()` costs the
  * rule no specificity.
  *
  * WHAT WAS TRIED AND DROPPED: `parameters.docs.components`, mapping `p`/`li` to
- * components carrying `.body1-txt`. It is the approach the ticket decided on,
+ * components carrying a body text-style class. It is the approach the ticket decided on,
  * and measured against a running Storybook it changed nothing — the same 34
  * prose elements rendered identically with and without it, because an element
  * the map does not class is an element this rule already catches. A second
@@ -409,7 +408,7 @@ a.sbdocs-a {
 
 .sbdocs .sb-plus-intro-page .sb-plus-intro-overview-title {
   font-family: var(--type-family-heading-serif);
-  font-size: var(--font-size-display4);
+  font-size: var(--font-size-200);
   font-weight: var(--type-weight-medium);
   line-height: 1.1;
   margin: 0 0 var(--stack-lg);
@@ -753,17 +752,17 @@ a.sbdocs-a {
  * Differentiates from normal headers by using a subtle body-copy typography token feel.
  *
  * Matched by SIZE CLASS as well as by tag. The tag is the outline position and the
- * `hN` class is the appearance (see design-system/src/styles/Accessibility.mdx §
+ * text-style class is the appearance (see design-system/src/styles/Accessibility.mdx §
  * Heading levels), so a subheading that has to sit at level 3 in its page's
- * outline is written `<h3 className="h6">` and still has to look like the rest of
+ * outline is written `<h3 className="heading-small">` and still has to look like the rest of
  * them. Keying this rule to the tag alone made the docs treatment fall off the
  * moment a story's outline was corrected. The tag selectors stay for headings
  * that carry no size class.
  */
 .docs-story section > h5,
 .docs-story section > h6,
-.docs-story section > .h5,
-.docs-story section > .h6 {
+.docs-story section > .heading-medium,
+.docs-story section > .heading-small {
     font-family: var(--type-family-body) !important;
     font-size: var(--font-size-0875) !important;
     font-weight: 600 !important;

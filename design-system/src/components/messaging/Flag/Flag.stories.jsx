@@ -194,7 +194,7 @@ export const Dismiss = () => {
                 children: 'Press the × to close it.',
             })}
         >
-            <span className="body2-txt" data-testid="dismiss-closed">{closed.join(' ')}</span>
+            <span className="body-default" data-testid="dismiss-closed">{closed.join(' ')}</span>
         </FlagPerStyle>
     );
 };

@@ -31,7 +31,7 @@ export const ParameterSlider = ({
                 borderRadius: '12px',
                 padding: '20px',
                 width: '100%',
-                fontFamily: 'var(--font-family-body)',
+                fontFamily: 'var(--type-family-body)',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
             }}
         >
@@ -165,7 +165,7 @@ export const QuestionFlow = ({
                 borderRadius: '12px',
                 padding: '24px',
                 width: '100%',
-                fontFamily: 'var(--font-family-body)',
+                fontFamily: 'var(--type-family-body)',
                 boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
             }}
         >

@@ -76,8 +76,8 @@ const ManageAssignmentModal = ({ onClose }) => {
                     borderBottom: '1px solid var(--ds-border)'
                 }}>
                     <div>
-                        <h2 id="manage-assignment-title" className="h5" style={{ margin: 0, marginBottom: '4px' }}>Manage Assignment</h2>
-                        <p className="body2-txt" style={{ margin: 0, color: 'var(--ds-text-subtle)' }}>
+                        <h2 id="manage-assignment-title" className="heading-medium" style={{ margin: 0, marginBottom: '4px' }}>Manage Assignment</h2>
+                        <p className="body-default" style={{ margin: 0, color: 'var(--ds-text-subtle)' }}>
                             Review and adjust how students are paired with tutors for optimal learning.
                         </p>
                     </div>
@@ -129,8 +129,8 @@ const ManageAssignmentModal = ({ onClose }) => {
                                     }}
                                 >
                                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
-                                        <span className="body1-txt" style={{ fontWeight: 600 }}>{tutor.name}</span>
-                                        <span className="body2-txt" style={{ color: 'var(--ds-text-subtle)' }}>
+                                        <span className="body-large" style={{ fontWeight: 600 }}>{tutor.name}</span>
+                                        <span className="body-default" style={{ color: 'var(--ds-text-subtle)' }}>
                                             <i className="fas fa-users" style={{ marginRight: '6px' }} aria-hidden />
                                             {tutor.count}
                                         </span>
@@ -139,12 +139,12 @@ const ManageAssignmentModal = ({ onClose }) => {
                                         {tutor.students.map((name, i) => (
                                             <li key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
                                                 <i className="fas fa-grip-vertical" style={{ color: 'var(--ds-icon-subtle)', cursor: 'grab' }} aria-hidden />
-                                                <span className="body2-txt">{name}</span>
+                                                <span className="body-default">{name}</span>
                                                 <StatusTag appearance="success">Joined</StatusTag>
                                             </li>
                                         ))}
                                         {tutor.students.length === 0 && (
-                                            <li className="body3-txt" style={{ color: 'var(--ds-text-subtle)' }}>No students assigned</li>
+                                            <li className="body-small" style={{ color: 'var(--ds-text-subtle)' }}>No students assigned</li>
                                         )}
                                     </ul>
                                 </div>
@@ -152,7 +152,7 @@ const ManageAssignmentModal = ({ onClose }) => {
                         </div>
                     )}
                     {activeTab === 'assignment' && (
-                        <div className="body2-txt" style={{ padding: '16px 0' }}>Assignment tab content.</div>
+                        <div className="body-default" style={{ padding: '16px 0' }}>Assignment tab content.</div>
                     )}
                 </div>
 

@@ -22,9 +22,9 @@ function PartRenderer({ part }: { part: any }): React.ReactElement | null {
         style={{
           margin: 0,
           marginBottom: 'var(--stack-md, 8px)',
-          fontFamily: 'var(--font-family-body)',
-          fontSize: 'var(--font-size-body1, 1rem)',
-          lineHeight: 'var(--font-line-height-body1, 1.5)',
+          fontFamily: 'var(--type-family-body)',
+          fontSize: 'var(--font-size-100)',
+          lineHeight: 'var(--line-height-150)',
           color: 'var(--chat-on-surface-muted, #6b7280)',
           whiteSpace: 'pre-line',
         }}
@@ -188,9 +188,9 @@ export function AssistantMessageContent({ parts }: { parts: any[] }): React.Reac
   return (
     <div
       style={{
-        fontFamily: 'var(--font-family-body)',
-        fontSize: 'var(--font-size-body1, 1rem)',
-        lineHeight: 'var(--font-line-height-body1, 1.5)',
+        fontFamily: 'var(--type-family-body)',
+        fontSize: 'var(--font-size-100)',
+        lineHeight: 'var(--line-height-150)',
         color: 'var(--chat-on-surface-muted, #6b7280)',
       }}
     >

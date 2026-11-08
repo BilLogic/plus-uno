@@ -1035,7 +1035,7 @@
     padding: 0;
     padding-bottom: 80px;
     gap: var(--section-stack-sm);
-    font-family: var(--font-family-base, var(--font-family-body));
+    font-family: var(--type-family-body);
     color: var(--ds-text);
 }
 
@@ -1528,7 +1528,7 @@
     gap: var(--stack-sm) !important;
     margin-top: 2px !important;
     color: var(--ds-text-subtle) !important;
-    font-size: var(--font-size-body2, 14px) !important;
+    font-size: var(--font-size-0875) !important;
     line-height: 1.25 !important;
 }
 
@@ -1566,7 +1566,7 @@
 .monthly-report .review-label {
     margin: 0 !important;
     color: var(--ds-text-subtle) !important;
-    font-size: var(--font-size-body2, 14px) !important;
+    font-size: var(--font-size-0875) !important;
     font-weight: 500 !important;
     line-height: 1.2 !important;
 }
@@ -1664,7 +1664,7 @@
     align-items: center !important;
     gap: 6px !important;
     color: var(--ds-text-subtle) !important;
-    font-size: var(--font-size-body2, 14px) !important;
+    font-size: var(--font-size-0875) !important;
 }
 
 .monthly-report .review-progress-container {

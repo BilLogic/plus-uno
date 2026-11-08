@@ -180,7 +180,7 @@ export const CheckboxGroup = () => {
                     />
                 ))}
             </Fieldset>
-            <p className="body2-txt m-0" data-testid="checkbox-group-value">Picked: {picked.join(', ') || 'none'}</p>
+            <p className="body-default m-0" data-testid="checkbox-group-value">Picked: {picked.join(', ') || 'none'}</p>
         </div>
     );
 };

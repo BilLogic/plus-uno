@@ -58,7 +58,7 @@ export const Inverse = () => (
 export const WithACaption = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '240px' }}>
         <ProgressBar value={68} ariaLabel="68% of goals met" />
-        <span className="body3-txt">68% of goals met</span>
+        <span className="body-small">68% of goals met</span>
     </div>
 );
 

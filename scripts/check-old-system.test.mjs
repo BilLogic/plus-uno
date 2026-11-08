@@ -74,3 +74,25 @@ test('the old size and spacing names fail outside specs/, the retired ladder nam
   assert.deepEqual(findings(src('design-system/src/components/A/A.scss', current)), []);
   assert.deepEqual(findings(src('design-system/src/specs/A.scss', css)), []);
 });
+
+test('the old type tokens and classes fail outside specs/; the current text styles and steps pass', () => {
+  const old = (name) => `--${name}`;
+  const txt = (n) => `body${n}-${'txt'}`;
+  const css = [
+    `.a { font-size: var(${old('font-size-body2')}); font-weight: var(${old('font-weight-semibold-1')}); }`,
+    `.b { font-size: var(${old('font-size-fa-h4-solid')}); }`,
+    `.c${'.'}h4 { margin: 0; }`,
+  ].join('\n');
+  const jsx = `<p className="${txt(2)} mb-2">a</p>\n<h2 className="mb-0 ${'h'}4">b</h2>\n`;
+  const found = findings(src('design-system/src/components/A/A.scss', css), src('prototypes/x/A.jsx', jsx));
+  assert.equal(found.length, 2);
+  assert.match(found.find((f) => f.file.endsWith('.scss')).message, /3 x type/);
+  assert.match(found.find((f) => f.file.endsWith('.jsx')).message, /2 x type/);
+  const current = [
+    '.a { font: var(--body-default); font-size: var(--font-size-0875); font-weight: var(--type-weight-medium); }',
+    '.b { font-size: var(--icon-lg); }',
+    '<p className="body-default">a</p><h2 className="heading-large">b</h2><h4>c</h4>',
+  ].join('\n');
+  assert.deepEqual(findings(src('design-system/src/components/A/A.jsx', current)), []);
+  assert.deepEqual(findings(src('design-system/src/specs/A.scss', css)), []);
+});

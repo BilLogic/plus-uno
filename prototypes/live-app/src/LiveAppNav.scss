@@ -7,7 +7,7 @@
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   font-size: 12px;
   line-height: 1.35;
   color: var(--ds-text);
@@ -100,7 +100,7 @@
   justify-content: center;
   height: 100%;
   min-height: 100%;
-  font-family: var(--font-family-body);
+  font-family: var(--type-family-body);
   color: var(--ds-text-subtle);
 }
 

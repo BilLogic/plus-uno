@@ -83,8 +83,8 @@
 }
 
 .plus-rich-text-editor-block-toggle-caret .fa-solid {
-    font-size: var(--font-size-fa-body3-solid);
-    line-height: var(--font-line-height-fa-body3);
+    font-size: var(--icon-sm);
+    line-height: 1;
     color: var(--ds-icon-subtle);
 }
 
@@ -147,7 +147,7 @@
     gap: var(--stack-md);
 }
 
-/* Compact row: icon-only buttons use FA B3 via .body3-txt on parent scope — inherit from Button small */
+/* Compact row: icon-only buttons use FA B3 via .body-small on parent scope — inherit from Button small */
 
 .plus-rich-text-editor-readonly .plus-rich-text-editor-toolbar,
 .plus-rich-text-editor-disabled .plus-rich-text-editor-toolbar {

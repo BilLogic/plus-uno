@@ -112,7 +112,7 @@
         }
         
         .alert-title {
-            font-family: var(--font-family-header);
+            font-family: var(--type-family-heading);
             font-size: 16px;
             font-weight: 600;
             line-height: 1.5;
@@ -121,7 +121,7 @@
         }
         
         .alert-text {
-            font-family: var(--font-family-body);
+            font-family: var(--type-family-body);
             font-size: 14px;
             font-weight: 300;
             line-height: 1.571;
@@ -145,7 +145,7 @@
         }
         
         .page-title {
-            font-family: var(--font-family-header);
+            font-family: var(--type-family-heading);
             font-size: 28px;
             font-weight: 700;
             line-height: 1.429;
@@ -176,7 +176,7 @@
         }
         
         .summary-card-title {
-            font-family: var(--font-family-header);
+            font-family: var(--type-family-heading);
             font-size: 16px;
             font-weight: 600;
             line-height: 1.5;
@@ -192,7 +192,7 @@
         }
         
         .summary-card-value {
-            font-family: var(--font-family-header);
+            font-family: var(--type-family-heading);
             font-size: 40px;
             font-weight: 700;
             line-height: 1.6;
@@ -215,7 +215,7 @@
             display: flex;
             align-items: center;
             gap: var(--stack-lg);
-            font-family: var(--font-family-body);
+            font-family: var(--type-family-body);
             font-size: 16px;
             color: var(--ds-text);
             position: relative;
@@ -253,7 +253,7 @@
         }
         
         .section-title {
-            font-family: var(--font-family-header);
+            font-family: var(--type-family-heading);
             font-size: 24px;
             font-weight: 600;
             line-height: 1.333;
@@ -277,7 +277,7 @@
         .session-table-header th {
             padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
             text-align: left;
-            font-family: var(--font-family-body);
+            font-family: var(--type-family-body);
             font-size: 14px;
             font-weight: 400;
             color: var(--ds-text);
@@ -294,7 +294,7 @@
         
         .session-table-row td {
             padding: var(--table-pad-y-cell) var(--table-pad-x-cell);
-            font-family: var(--font-family-body);
+            font-family: var(--type-family-body);
             font-size: 14px;
             color: var(--ds-text);
         }
@@ -426,7 +426,7 @@
         .form-label {
             display: block;
             margin-bottom: var(--stack-sm);
-            font-family: var(--font-family-body);
+            font-family: var(--type-family-body);
             font-size: 14px;
             font-weight: 400;
             color: var(--ds-text);
@@ -448,7 +448,7 @@
         }
         
         .review-label {
-            font-family: var(--font-family-body);
+            font-family: var(--type-family-body);
             font-size: 12px;
             font-weight: 400;
             color: var(--ds-text-subtle);
@@ -456,7 +456,7 @@
         }
         
         .review-value {
-            font-family: var(--font-family-body);
+            font-family: var(--type-family-body);
             font-size: 14px;
             font-weight: 400;
             color: var(--ds-text);
@@ -469,7 +469,7 @@
         <div class="top-bar">
             <div class="top-bar-left">
                 <button class="pbtn pbtn-tonal pbtn-secondary" style="border: none; background: var(--ds-background-brand-subtlest);">
-                    <div class="pbtn-content body2-txt">
+                    <div class="pbtn-content body-default">
                         <span><i class="fas fa-square-plus"></i></span>
                     </div>
                 </button>
@@ -482,7 +482,7 @@
             <div class="top-bar-right">
                 <div class="user-avatar">
                     <div class="avatar-initial">J</div>
-                    <span class="body2-txt" style="color: var(--ds-text);">John Doe</span>
+                    <span class="body-default" style="color: var(--ds-text);">John Doe</span>
                     <div class="notification-badge">2</div>
                 </div>
             </div>
@@ -507,7 +507,7 @@
                     <h1 class="page-title">Your Sessions</h1>
                     <div>
                         <button id="create-session-btn" class="pbtn pbtn-filled pbtn-primary">
-                            <div class="pbtn-content body2-txt">
+                            <div class="pbtn-content body-default">
                                 <span><i class="fas fa-calendar-plus"></i></span>
                                 <span>Fill in</span>
                             </div>
@@ -571,12 +571,12 @@
                     <div class="section-header">
                         <h2 class="section-title">My Sessions</h2>
                         <div class="filters">
-                            <select class="plus-form-select plus-form-select-medium body2-txt" style="min-width: 150px;">
+                            <select class="plus-form-select plus-form-select-medium body-default" style="min-width: 150px;">
                                 <option>All schools</option>
                                 <option>Hogwarts</option>
                                 <option>Beauxbatons</option>
                             </select>
-                            <select class="plus-form-select plus-form-select-medium body2-txt" style="min-width: 150px;">
+                            <select class="plus-form-select plus-form-select-medium body-default" style="min-width: 150px;">
                                 <option>This week</option>
                                 <option>This month</option>
                                 <option>All time</option>
@@ -615,7 +615,7 @@
                                 </td>
                                 <td>
                                     <button class="pbtn pbtn-outline pbtn-primary">
-                                        <div class="pbtn-content body2-txt">
+                                        <div class="pbtn-content body-default">
                                             <span>Details</span>
                                         </div>
                                     </button>
@@ -642,7 +642,7 @@
                                 </td>
                                 <td>
                                     <button class="pbtn pbtn-outline pbtn-primary">
-                                        <div class="pbtn-content body2-txt">
+                                        <div class="pbtn-content body-default">
                                             <span>Details</span>
                                         </div>
                                     </button>
@@ -669,7 +669,7 @@
                                 </td>
                                 <td>
                                     <button class="pbtn pbtn-outline pbtn-primary">
-                                        <div class="pbtn-content body2-txt">
+                                        <div class="pbtn-content body-default">
                                             <span>Details</span>
                                         </div>
                                     </button>
@@ -696,7 +696,7 @@
                                 </td>
                                 <td>
                                     <button class="pbtn pbtn-outline pbtn-primary">
-                                        <div class="pbtn-content body2-txt">
+                                        <div class="pbtn-content body-default">
                                             <span>Details</span>
                                         </div>
                                     </button>
@@ -804,7 +804,7 @@
             startTimeInput.type = 'time';
             startTimeInput.id = 'start-time';
             startTimeInput.name = 'start-time';
-            startTimeInput.className = 'plus-text-field body2-txt';
+            startTimeInput.className = 'plus-text-field body-default';
             startTimeInput.style.width = '100%';
             startTimeInput.addEventListener('change', (e) => {
                 sessionData.startTime = e.target.value;
@@ -823,7 +823,7 @@
             endTimeInput.type = 'time';
             endTimeInput.id = 'end-time';
             endTimeInput.name = 'end-time';
-            endTimeInput.className = 'plus-text-field body2-txt';
+            endTimeInput.className = 'plus-text-field body-default';
             endTimeInput.style.width = '100%';
             endTimeInput.addEventListener('change', (e) => {
                 sessionData.endTime = e.target.value;

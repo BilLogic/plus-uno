@@ -281,7 +281,7 @@ export function ResourcesBlock({ figmaLink, githubLink, sets, figmaFileKey }) {
     if (!figmaLink && !githubLink && (!sets || sets.length === 0)) return null;
     return (
         <div style={{ marginTop: '48px', marginBottom: '40px' }}>
-            <h3 className="h3 mb-4 mt-0">Resources</h3>
+            <h3 className="heading-xlarge mb-4 mt-0">Resources</h3>
             <div className="sb-ds-resources-block flex flex-wrap gap-5">
                 {figmaLink && (
                     <ResourcesCard 

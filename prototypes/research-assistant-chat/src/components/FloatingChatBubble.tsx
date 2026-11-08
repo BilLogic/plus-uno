@@ -78,15 +78,15 @@ export function FloatingChatBubble({
               borderRadius: 'var(--radius-075)',
               cursor: 'pointer',
               textAlign: 'left',
-              fontFamily: 'var(--font-family-body)',
+              fontFamily: 'var(--type-family-body)',
               color: 'var(--chat-on-surface, #111827)',
               boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.3)',
             }}
           >
-            <div style={{ fontWeight: 600, fontSize: 'var(--font-size-body2, 14px)' }}>
+            <div style={{ fontWeight: 600, fontSize: 'var(--font-size-0875)' }}>
               {prompt.title}
             </div>
-            <div style={{ fontSize: 'var(--font-size-body2, 14px)', color: 'var(--chat-on-surface-muted, #6b7280)' }}>
+            <div style={{ fontSize: 'var(--font-size-0875)', color: 'var(--chat-on-surface-muted, #6b7280)' }}>
               {prompt.description}
             </div>
           </button>
@@ -117,8 +117,8 @@ export function FloatingChatBubble({
           style={{
             flex: 1,
             padding: 'var(--pad-y-md, 6px) 0',
-            fontFamily: 'var(--font-family-body)',
-            fontSize: 'var(--font-size-body2, 14px)',
+            fontFamily: 'var(--type-family-body)',
+            fontSize: 'var(--font-size-0875)',
             color: 'var(--chat-on-surface, #f9fafb)',
             background: 'transparent',
             border: 'none',

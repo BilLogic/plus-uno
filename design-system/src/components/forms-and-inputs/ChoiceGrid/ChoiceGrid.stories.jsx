@@ -135,7 +135,7 @@ export const Variants = () => {
 
 export const Layout = () => (
     <div style={{ maxWidth: 'var(--size-5400)' }}>
-        <p className="body2-txt mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
+        <p className="body-default mb-3" style={{ color: 'var(--ds-text-subtle)' }}>
             Multiple rows share the same columns; each row tracks its own selection.
         </p>
         <ChoiceGrid

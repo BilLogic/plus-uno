@@ -10,12 +10,12 @@
  * same tile are the same size.
  */
 $tile-sizes: (
-    16: (var(--image-xxs), var(--font-size-fa-body3)),
-    20: (var(--image-xs), var(--font-size-fa-body2)),
-    24: (var(--image-sm), var(--font-size-fa-body1)),
-    32: (var(--image-md), var(--font-size-fa-h5)),
-    40: (var(--image-lg), var(--font-size-fa-h4)),
-    48: (var(--image-xl), var(--font-size-fa-h3)),
+    16: (var(--image-xxs), var(--icon-sm)),
+    20: (var(--image-xs), var(--icon-sm)),
+    24: (var(--image-sm), var(--icon-md)),
+    32: (var(--image-md), var(--icon-md)),
+    40: (var(--image-lg), var(--icon-lg)),
+    48: (var(--image-xl), var(--icon-lg)),
 );
 
 /*
@@ -52,7 +52,7 @@ $tile-colors: (
     background-color: var(--ds-background-neutral);
     color: var(--ds-icon-subtle);
     // The 32 tile's inner size, for a tile with no size class.
-    --tile-inner: var(--font-size-fa-h5);
+    --tile-inner: var(--icon-md);
 }
 
 @each $size, $values in $tile-sizes {
@@ -112,8 +112,8 @@ $tile-colors: (
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    inline-size: var(--tile-inner, var(--font-size-fa-body3));
-    block-size: var(--tile-inner, var(--font-size-fa-body3));
+    inline-size: var(--tile-inner, var(--icon-sm));
+    block-size: var(--tile-inner, var(--icon-sm));
     font-size: var(--tile-inner);
     line-height: 1;
     border-radius: var(--radius-sm);

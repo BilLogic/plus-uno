@@ -56,8 +56,8 @@ export default function MonthlyReportsListPage() {
         <>
             <div className="reports-header-row page-content-reveal" style={{ animationDelay: '0ms' }}>
                 <div className="header-text">
-                    <h1 className="h2">Monthly Reports</h1>
-                    <p className="body2-txt text-muted" style={{ marginTop: '8px' }}>
+                    <h1 className="heading-xxlarge">Monthly Reports</h1>
+                    <p className="body-default text-muted" style={{ marginTop: '8px' }}>
                         Overview of your performance and session feedback.
                     </p>
                 </div>
@@ -92,8 +92,8 @@ export default function MonthlyReportsListPage() {
                     <tbody>
                         {REPORTS_DATA.map((report) => (
                             <tr key={report.id} onClick={handleViewReport}>
-                                <td className="body2-txt">{report.month}</td>
-                                <td className="body2-txt">{report.dateRange}</td>
+                                <td className="body-default">{report.month}</td>
+                                <td className="body-default">{report.dateRange}</td>
                                 <td>
                                     <StatusTag appearance={getStatusBadgeStyle(report.status)}>{report.status}</StatusTag>
                                 </td>
@@ -105,7 +105,7 @@ export default function MonthlyReportsListPage() {
                                             ariaLabel="Report completion"
                                             className="completion-progress"
                                         />
-                                        <span className="body3-txt">
+                                        <span className="body-small">
                                             {report.completion.done}/{report.completion.total}
                                         </span>
                                     </div>
@@ -129,7 +129,7 @@ export default function MonthlyReportsListPage() {
             </div>
 
             <footer className="reports-footer page-content-reveal" style={{ animationDelay: '200ms' }}>
-                <span className="body3-txt text-muted">
+                <span className="body-small text-muted">
                     Showing <strong>{startItem}</strong> to <strong>{endItem}</strong> of <strong>{TOTAL_REPORTS}</strong> results
                 </span>
                 <div className="pagination-wrapper">

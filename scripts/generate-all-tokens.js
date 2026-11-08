@@ -1012,7 +1012,23 @@ ${block(bySize(tracking))}
 ${block([...styles].sort((a, b) => a.group - b.group))}
     /* Code only (CODE_ONLY_TYPE_STYLES) */
 ${block(Object.entries(CODE_ONLY_TYPE_STYLES).map(([name, value]) => ({ token: `--${slug(name)}`, value })))}}
-`;
+
+/* One class per text style, for markup with no stylesheet of its own: <p className="body-default">. */
+${textStyleClasses(styles)}`;
+}
+
+/** A `.name { font: var(--name) }` rule per text style; a style with tracking carries it too. */
+function textStyleClasses(styles) {
+    const tracked = new Set(styles.filter((s) => s.token.endsWith('-tracking')).map((s) => s.token.replace(/-tracking$/, '')));
+    return [...styles]
+        .filter((s) => !s.token.endsWith('-tracking'))
+        .sort((a, b) => a.group - b.group)
+        .map(({ token }) => {
+            const name = token.slice(2);
+            const spacing = tracked.has(token) ? ` letter-spacing: var(${token}-tracking);` : '';
+            return `.${name} { font: var(${token});${spacing} }\n`;
+        })
+        .join('');
 }
 
 // Generate all files

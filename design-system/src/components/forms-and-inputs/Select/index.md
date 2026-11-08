@@ -70,7 +70,7 @@ Anything not listed is not a valid value.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-input` · `--ds-background-neutral-subtle-hovered` · `--ds-background-selected-bold` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--font-size-body2` · `--font-size-fa-body2-solid` · `--font-size-fa-body3-solid` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-md` · `--space-025` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-input` · `--ds-background-neutral-subtle-hovered` · `--ds-background-selected-bold` · `--ds-border-focused` · `--ds-border-input` · `--ds-border-selected` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--font-size-0875` · `--icon-sm` · `--pad-x-md` · `--pad-y-md` · `--radius-md` · `--space-025` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/Select/Select.scss`. Override these through the token layer, never with a literal.
 

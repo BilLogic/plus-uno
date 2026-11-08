@@ -125,7 +125,7 @@ export const ExplainIsARealButton = () => {
     return (
         <div style={{ ...row, flexDirection: 'column', alignItems: 'flex-start' }}>
             <AiLabel origin="generated" onExplain={() => setAsked(true)} />
-            <span className="body3-txt">{asked ? 'Explained' : 'Not asked'}</span>
+            <span className="body-small">{asked ? 'Explained' : 'Not asked'}</span>
         </div>
     );
 };

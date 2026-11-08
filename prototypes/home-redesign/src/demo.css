@@ -24,8 +24,8 @@ body {
   width: 100%;
   height: 100%;
   min-height: 100vh;
-  font-family: var(--font-family-body);
-  font-size: var(--font-size-body2, 14px);
+  font-family: var(--type-family-body);
+  font-size: var(--font-size-0875);
   color: var(--ds-text);
   -webkit-font-smoothing: antialiased;
   /* No centering / no gray matte: the app fills the whole window. */
