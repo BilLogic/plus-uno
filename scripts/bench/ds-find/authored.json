@@ -1,0 +1,349 @@
+[
+ {
+  "q": "confirm before deleting",
+  "want": [
+   "Modal",
+   "PatternModal"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "are you sure dialog",
+  "want": [
+   "Modal",
+   "PatternModal"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "show an error message",
+  "want": [
+   "SectionMessage",
+   "InlineMessage",
+   "Banner",
+   "Flag"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "field validation error under an input",
+  "want": [
+   "InlineMessage",
+   "TextField"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "notify user it saved",
+  "want": [
+   "Flag"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "toast notification",
+  "want": [
+   "Flag"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "site-wide warning across the top",
+  "want": [
+   "Banner"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "loading state",
+  "want": [
+   "Spinner",
+   "Skeleton",
+   "ProgressBar"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "placeholder while content loads",
+  "want": [
+   "Skeleton"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "progress of a multi-step form",
+  "want": [
+   "ProgressTracker",
+   "ProgressIndicator"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "pick a date",
+  "want": [
+   "DatePicker",
+   "Calendar"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "choose a time",
+  "want": [
+   "TimePicker",
+   "DateTimePicker"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "upload a file",
+  "want": [
+   "FileUpload"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "on off switch for a setting",
+  "want": [
+   "Toggle"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "choose one of several options",
+  "want": [
+   "RadioGroup",
+   "Radio",
+   "Select"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "choose many options from a list",
+  "want": [
+   "Checkbox",
+   "Select",
+   "TagInput"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "dropdown to pick a value",
+  "want": [
+   "Select"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "menu of actions behind a button",
+  "want": [
+   "DropdownMenu"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "nothing to show yet",
+  "want": [
+   "EmptyState"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "empty state when no results",
+  "want": [
+   "EmptyState"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "list of students with filters",
+  "want": [
+   "PatternTable",
+   "Table",
+   "FilterButton"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "data grid with sorting and paging",
+  "want": [
+   "Table",
+   "PatternTable"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "page through results",
+  "want": [
+   "Pagination"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "switch between views on the same page",
+  "want": [
+   "Tabs"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "show where the user is in the site hierarchy",
+  "want": [
+   "Breadcrumb"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "hint text on hover",
+  "want": [
+   "Tooltip"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "floating panel anchored to a trigger",
+  "want": [
+   "Popup"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "side panel that slides in",
+  "want": [
+   "PatternDrawer",
+   "Panel"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "collapsible sections of content",
+  "want": [
+   "Accordion"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "profile picture",
+  "want": [
+   "Avatar",
+   "UserAvatar"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "status label like active or overdue",
+  "want": [
+   "StatusTag",
+   "Tag"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "number badge on an item",
+  "want": [
+   "CountTag"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "multi-line text input",
+  "want": [
+   "TextArea",
+   "RichTextEditor"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "star rating",
+  "want": [
+   "Rating"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "slider to pick a number",
+  "want": [
+   "Range"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "chat with the assistant",
+  "want": [
+   "AiChat",
+   "PromptInput"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "page title with actions",
+  "want": [
+   "PageHeader"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "start a new full page layout",
+  "want": [
+   "PageLayout",
+   "Page"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "text only screen readers hear",
+  "want": [
+   "VisuallyHidden"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "highlight a new feature for onboarding",
+  "want": [
+   "Spotlight"
+  ],
+  "kind": "intent"
+ },
+ {
+  "q": "Button",
+  "want": [
+   "Button"
+  ],
+  "kind": "name"
+ },
+ {
+  "q": "modal",
+  "want": [
+   "Modal"
+  ],
+  "kind": "name"
+ },
+ {
+  "q": "table",
+  "want": [
+   "Table",
+   "PatternTable"
+  ],
+  "kind": "name"
+ },
+ {
+  "q": "date picker",
+  "want": [
+   "DatePicker"
+  ],
+  "kind": "name"
+ },
+ {
+  "q": "tag",
+  "want": [
+   "Tag"
+  ],
+  "kind": "name"
+ },
+ {
+  "q": "spinner",
+  "want": [
+   "Spinner"
+  ],
+  "kind": "name"
+ }
+]

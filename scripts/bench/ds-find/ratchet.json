@@ -1,0 +1,64 @@
+{
+ "with-aliases": {
+  "authored": {
+   "intent": {
+    "hit1": 20,
+    "hit3": 23,
+    "mrr": 0.56
+   },
+   "name": {
+    "hit1": 6,
+    "hit3": 6,
+    "mrr": 1
+   }
+  },
+  "heldout": {
+   "real-name": {
+    "hit1": 4,
+    "hit3": 4,
+    "mrr": 1
+   },
+   "real-intent": {
+    "hit1": 22,
+    "hit3": 30,
+    "mrr": 0.82
+   },
+   "real-token": {
+    "hit1": 2,
+    "hit3": 3,
+    "mrr": 0.67
+   }
+  }
+ },
+ "no-aliases": {
+  "authored": {
+   "intent": {
+    "hit1": 20,
+    "hit3": 23,
+    "mrr": 0.56
+   },
+   "name": {
+    "hit1": 6,
+    "hit3": 6,
+    "mrr": 1
+   }
+  },
+  "heldout": {
+   "real-name": {
+    "hit1": 4,
+    "hit3": 4,
+    "mrr": 1
+   },
+   "real-intent": {
+    "hit1": 22,
+    "hit3": 30,
+    "mrr": 0.82
+   },
+   "real-token": {
+    "hit1": 2,
+    "hit3": 3,
+    "mrr": 0.67
+   }
+  }
+ }
+}
