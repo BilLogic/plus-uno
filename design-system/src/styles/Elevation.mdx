@@ -140,7 +140,7 @@ Every pattern takes exactly one level, so nobody picks a shadow by eye.
         ['Page (the box that holds the content)', <><C>--ds-surface</C>, no border</>],
         ['Section, Table', 'No fill of their own: they sit on the page'],
         ['Card', <><C>--ds-surface-raised</C> + <C>--ds-shadow-raised</C>; clickable cards lift to <C>--ds-shadow-overlay</C></>],
-        ['Menu, Popup, Flag', <><C>--ds-surface-overlay</C> + <C>--ds-shadow-overlay</C></>],
+        ['Menu (DropdownMenu and a Select\'s listbox), Popup, Flag', <><C>--ds-surface-overlay</C> + <C>--ds-shadow-overlay</C></>],
         ['Sidebar, opened over the page below 1024', <><C>--ds-surface-overlay</C> + <C>--ds-shadow-overlay</C>, no Blanket</>],
         ['Tooltip', <><C>--ds-background-neutral-bold</C> with <C>--ds-text-inverse</C></>],
         ['Modal', <><C>--ds-surface-overlay</C> + <C>--ds-shadow-overlay</C>, over the <C>--ds-blanket</C> Blanket</>],
@@ -211,7 +211,7 @@ Surfaces that overlap need a stacking order. A higher layer covers a lower one, 
         { token: '--layer-card', use: 'Cards and sticky headers.' },
         { token: '--layer-navigation', use: 'Sidebars and floating page navigation.' },
         { token: '--layer-popup', use: 'Popups and menus.' },
-        { token: '--layout-z-index-blanket', use: 'The Blanket under a modal.' },
+        { token: '--layer-blanket', use: 'The Blanket under a modal.' },
         { token: '--layer-modal', use: 'A modal, over its Blanket.' },
         { token: '--layer-flag', use: 'Flags, above a modal.' },
         { token: '--layer-spotlight', use: 'Onboarding spotlights.' },
@@ -279,6 +279,8 @@ How to lift a surface, and what not to do.
 **No border on a card.** The ring in the raised shadow is the edge. Adding a border doubles it and makes the card look outlined rather than lifted.
 
 <Canvas of={ElevationStories.NoCardBorder} sourceState="none" />
+
+**Name the shadow token.** A shadow is always one of the `--ds-shadow-*` tokens, never a literal value, so it follows the color mode and the contrast setting.
 
 **Always pair the surface with its shadow.** A surface and its shadow travel together. A menu on the overlay surface with no shadow melts into the page behind it.
 

@@ -23,9 +23,9 @@ topic, which today only `content/` does.
 | [iconography.md](iconography.md) | ✅ | Which icon set, which size |
 | [illustrations.md](illustrations.md) | ✕ | Illustration style and assets |
 | [logos.md](logos.md) | ✕ | The marks, clear space, variants |
-| [elevation.md](elevation.md) | ✅ | Which shadow step for which surface |
-| [border.md](border.md) | ✕ | Border widths |
-| [radius.md](radius.md) | ✕ | Corner radius scale |
+| [Elevation.mdx](../../src/styles/Elevation.mdx) | ✅ | Which shadow step for which surface |
+| [Border.mdx](../../src/styles/Border.mdx) | ✅ | Border widths |
+| [Radius.mdx](../../src/styles/Radius.mdx) | ✅ | Corner radius scale |
 
 One file sits outside the fourteen slots on purpose:
 [data-visualization.md](data-visualization.md), which names which component
@@ -34,7 +34,7 @@ type, motion) take. It is cross-cutting by nature: chart color has its own
 rules on the Color page, so there is no single slot above for "what a chart
 does with every other foundation" to live in instead.
 
-**8 of 14 authored, 1 partial, 5 empty.** ✕ means a named empty slot: the file
+**10 of 14 authored, 1 partial, 3 empty.** ✕ means a named empty slot: the file
 exists, says so, and promises nothing. That is deliberate — a gap you can see
 beats a gap you discover mid-build, and it is not a stub, because there is no
 template inviting someone to fill in a heading with `TODO`.
@@ -58,7 +58,7 @@ there, not silently on a move. Read the token list as the authority on names.
 
 ## Retiring a twin
 
-A foundation file here that has a Storybook page (`design-system/src/styles/*.mdx`) is a twin, and the page is where it ends up. Color was the first to go. One twin per ticket:
+A foundation file here that has a Storybook page (`design-system/src/styles/*.mdx`) is a twin, and the page is where it ends up. Color, Elevation, Border and Radius have gone. One twin per ticket:
 
 1. Move every sentence the page lacks into it, in `FoundationSection` and `FoundationSubsection`, with tables as `RefTable` or `TokenTable`. Write PLUS rules only, in current component names; a sentence that no longer matches the code is fixed or dropped, never carried.
 2. Delete the twin. `ds guide <topic>` then reads the page through the page model (`scripts/lib/docs-page.mjs`), locally and on the hosted server alike.
