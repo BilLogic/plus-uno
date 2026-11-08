@@ -12,7 +12,7 @@ const toValueArray = (key) => {
     return Array.isArray(key) ? key : [key];
 };
 
-/** Accordion: collapsible sections of content, each closed until asked for. */
+/** Accordion: stacked headings that each open to show their content. */
 const Accordion = ({
     // Content
     items = [],

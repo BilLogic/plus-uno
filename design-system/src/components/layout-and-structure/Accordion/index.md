@@ -3,7 +3,7 @@
 
 # Accordion
 
-Accordion: collapsible sections of content, each closed until asked for.
+Accordion: stacked headings that each open to show their content.
 
 **Import:** `import { Accordion } from '@/components';`
 

@@ -1,8 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 
-import { iconsInstalled, isName, loadRatchet, loadSet, rankOf, runBench } from './bench-ds-find.mjs';
-import { speaksTokens } from './lib/ds-lookup.mjs';
+import { REPO_ROOT, iconsInstalled, isName, loadRatchet, loadSet, rankOf, runBench } from './bench-ds-find.mjs';
+import { createLookup, render, speaksTokens } from './lib/ds-lookup.mjs';
 
 const ratchet = loadRatchet();
 const withIcons = iconsInstalled();
@@ -61,4 +61,34 @@ test('the sets are well formed', () => {
       assert.ok(row.q && row.kind && Array.isArray(row.want) && row.want.length, `${set}: malformed row ${JSON.stringify(row)}`);
     }
   }
+});
+
+test('every text line of ds_find stays within 160 characters for every bench query', () => {
+  const lookup = createLookup(REPO_ROOT);
+  for (const set of ['authored', 'heldout']) {
+    for (const row of loadSet(set)) {
+      for (const line of render('find', lookup.find(row.q)).split('\n')) {
+        assert.ok(line.length <= 160, `"${row.q}" printed a ${line.length}-character line: ${line}`);
+      }
+    }
+  }
+});
+
+test('a row summary is cut at a word boundary within 90 characters', () => {
+  const lookup = createLookup(REPO_ROOT);
+  let seen = 0;
+  for (const row of [...loadSet('authored'), ...loadSet('heldout')]) {
+    for (const r of lookup.find(row.q).results.filter((x) => x.summary)) {
+      seen++;
+      assert.ok(r.summary.length <= 90, `${r.name} summary is ${r.summary.length} characters`);
+      assert.doesNotMatch(r.summary, /\s…$/);
+    }
+  }
+  assert.ok(seen > 0);
+});
+
+test('a miss names the guideline topics the query carried', () => {
+  const lookup = createLookup(REPO_ROOT);
+  assert.match(lookup.find('zzzqq typography').next, /ds_guide\("typography"\)/);
+  assert.doesNotMatch(lookup.find('zzzqq').next, /ds_guide\("/);
 });

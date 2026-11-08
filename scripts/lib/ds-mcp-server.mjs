@@ -27,7 +27,7 @@ export const TOOLS = [
     name: 'ds_find',
     op: 'find',
     description:
-      'Step 1 of 5, the entry point: what PLUS has for a task, a name or an alias. Returns short ranked matches across patterns, components, tokens and Font Awesome Free icons; Figma component names resolve to their code name; a not-here name (Alert, Card, a Pro icon) comes back with its replacement. Next: ds_get for the names you will use.',
+      'Step 1 of 5, the entry point: what PLUS has for a task, a name or an alias. Returns short ranked matches across patterns, components, tokens and Font Awesome Free icons; Figma component names resolve to their code name; a not-here name (Alert, Card, a Pro icon) comes back with its replacement. Ranks on name, aliases, summary and the Usage text; a token or icon query says so in its words. Next: ds_get for the names you will use.',
     inputSchema: { type: 'object', properties: { query: str('A task in words ("a table of students"), a name ("PatternCard"), a Figma name or an icon.') }, required: ['query'] },
     call: (l, a) => l.find(a.query),
   },

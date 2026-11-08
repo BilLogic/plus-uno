@@ -8,7 +8,7 @@
       "import": "import { Accordion } from '@/components';",
       "group": "layout-and-structure",
       "source": "design-system/src/components/layout-and-structure/Accordion/Accordion.jsx",
-      "summary": "Accordion: collapsible sections of content, each closed until asked for.",
+      "summary": "Accordion: stacked headings that each open to show their content.",
       "props": [
         {
           "name": "items",

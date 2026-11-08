@@ -23,6 +23,12 @@ Start with `ds_find`, finish with `ds_check`. Each answer ends with the tool to 
 
 `--json` prints any answer as data. `ds check` exits 1 on a fail-level escape.
 
+## How `ds_find` ranks
+
+It scores each component and pattern on its name first, then its aliases, its one-line summary and the Usage text of its page, so a task in words lands on the part whose docs say it. An exact name or alias comes first. Other kinds appear when the query asks for them: a token when it speaks token vocabulary (`--ds-text`, a role or a hue), a Font Awesome Free icon when it names an icon (a Pro family arrives with its Free neighbor), a constant on its exact name, and a guideline pointer last when a word names a topic (`icon`, `layout`, `color`). Rows carry a summary cut to 90 characters.
+
+A word people use that the docs leave unsaid belongs in `design-system/agent-views/_aliases.json`, reviewed like code. `node scripts/bench-ds-find.mjs` is the gate: it scores real queries against labeled targets, and `test:scripts` fails when a count falls below `scripts/bench/ds-find/ratchet.json`.
+
 ## Keeping it
 
 The lookup stays while the usage eval's `lookup` arm leaves fewer fail-level escapes than `current`, or, at zero escapes on both sides, cuts input tokens by 20% or turns by 3; when `node scripts/eval-ds-usage.mjs compare` reads delete on any model, both adapters are deleted (`docs/evals/ds-usage.md` § Does the lookup pay off?). It was kept on 2026-11-07: 0 escapes against 17, at 10% more input. Its only package is `@modelcontextprotocol/sdk`, which the harness CI job installs in its own scoped step from the root lock (`scripts/lock-closure.mjs --lock`), so the spawn test in `test:scripts` runs there too.

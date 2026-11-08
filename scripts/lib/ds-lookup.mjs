@@ -139,6 +139,13 @@ const firstSentence = (text, max = 160) => {
   const s = text.replace(/\s+/g, ' ').trim().match(/^.*?[.!?](?=\s|$)/)?.[0] ?? text.trim();
   return s.length > max ? `${s.slice(0, max - 1)}…` : s;
 };
+/** The first sentence, cut at a word boundary so the whole stays within `max`. */
+const shortSummary = (text, max = 90) => {
+  const s = firstSentence(text, Infinity);
+  if (!s || s.length <= max) return s;
+  const cut = s.slice(0, max - 1);
+  return `${cut.slice(0, cut.lastIndexOf(' ') > 0 ? cut.lastIndexOf(' ') : max - 1).replace(/[\s,;:.-]+$/, '')}…`;
+};
 const wordsOf = (q) =>
   q
     .toLowerCase()
@@ -294,7 +301,7 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     };
     const item = (name, extra = {}) => {
       const a = facts.lookup(name);
-      return { kind: a.kind, name, status: 'exists', import: a.import, summary: firstSentence(a.summary), aliasOf: a.aliasOf, ...extra };
+      return { kind: a.kind, name, status: 'exists', import: a.import, summary: shortSummary(a.summary), aliasOf: a.aliasOf, ...extra };
     };
     const notHereRow = (row) => {
       const bare = row.not.replace(/\s*\(.*$/, '');
@@ -391,9 +398,10 @@ export function createLookup(root, { readPaths = true, aliases = true, iconMetad
     const guideRow = topic ? [{ kind: 'guide', name: topic, next: `ds_guide("${topic}")` }] : [];
     const results = [...out.slice(0, FIND_LIMIT - guideRow.length), ...guideRow];
 
-    const next = results.length
+    const topics = [...new Set(raw.map((w) => GUIDE_WORDS[w]).filter(Boolean))];
+    const next = out.length
       ? 'Next: ds_get with the names you will use (section "props" first); ds_tokens for a styling role.'
-      : `Nothing matches "${q}". Try one plain word (card, table, date); ds_tokens for a token role; ds_guide for a guideline topic.`;
+      : `Nothing matches "${q}". Try one plain word (card, table, date); ds_tokens for a token role; ${topics.length ? `ds_guide(${topics.map((t) => `"${t}"`).join(', ')})` : 'ds_guide for a guideline topic'}.`;
     return { query: q, results, next };
   }
 
@@ -570,7 +578,7 @@ function renderFind(r) {
       const use = x.use.map((u) => u.import ?? u.name).join(' | ');
       return `${pad(x.status, 10)}${x.name} → ${use}${x.why ? `  (${x.why})` : ''}`;
     }
-    if (x.kind === 'token') return `${pad('token', 10)}${x.name}  ${x.intent ?? ''}`.trimEnd();
+    if (x.kind === 'token') return `${pad('token', 10)}${x.name}  ${shortSummary(x.intent) ?? ''}`.trimEnd();
     if (x.kind === 'guide') return `${pad('guide', 10)}${x.name}  → ${x.next}`;
     if (x.kind === 'icon') return `${pad('icon', 10)}${x.name}${x.status === 'pro' ? `  PRO: ${x.why}` : ''}`;
     const via = x.figma ? `  (Figma "${x.figma}")` : x.aliasOf ? `  (alias of ${x.aliasOf})` : '';
