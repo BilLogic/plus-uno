@@ -58,7 +58,7 @@ Don't: The default ink on a dark ground, which barely reads.
 - For the component that supplies the ambient heading level, see `HeadingContextProvider` in this same module.
 - For a page's own title row, see `PageHeader`, which renders its title in a `Heading` by default.
 
-Same group: `Code` · `CodeBlock` · `Table`
+Same group: `Code` · `CodeBlock` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 ## Parts
 

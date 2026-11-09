@@ -79,6 +79,7 @@ Don't: A finished answer with no way to rate it.
 
 - `AiChat`, which shows every reply in an `AiMessage`.
 - `PromptInput`, which sends the message.
+- AI sources and AI feedback, which sit under a finished reply.
 
 Same group: `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 

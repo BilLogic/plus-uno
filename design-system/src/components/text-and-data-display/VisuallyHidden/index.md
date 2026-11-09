@@ -8,11 +8,11 @@ Also asked as: screen reader only, sr-only, assistive text, screen reader text.
 
 **Import:** `import { VisuallyHidden } from '@/components';`
 
-**Source:** `design-system/src/components/layout-and-structure/VisuallyHidden/VisuallyHidden.jsx`
+**Source:** `design-system/src/components/text-and-data-display/VisuallyHidden/VisuallyHidden.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/VisuallyHidden/VisuallyHidden.stories.jsx` — Overview, NamesAControl, HiddenColumnHeaders, RoleAndId, Interactive
+**Stories:** `design-system/src/components/text-and-data-display/VisuallyHidden/VisuallyHidden.stories.jsx` — Overview, NamesAControl, HiddenColumnHeaders, RoleAndId, Interactive
 
-**Storybook page:** `design-system/src/components/layout-and-structure/VisuallyHidden/VisuallyHidden.mdx`
+**Storybook page:** `design-system/src/components/text-and-data-display/VisuallyHidden/VisuallyHidden.mdx`
 
 ## Usage
 
@@ -99,7 +99,7 @@ appear on focus.
 - For a visible label on a field, see Form.
 - For a loading indicator that announces itself, `Spinner` already includes a visually hidden label.
 
-Same group: `Accordion` · `Carousel` · `PageHeader` · `Panel` · `ScrollBar`
+Same group: `Code` · `CodeBlock` · `Heading` · `InlineEdit` · `Table`
 
 ## Parts
 

@@ -18,7 +18,6 @@ export { default as Fieldset } from '@/components/forms-and-inputs/Fieldset';
 export { default as FileUpload } from '@/components/forms-and-inputs/FileUpload';
 export { default as FilterButton, FILTER_BUTTON_APPEARANCES } from '@/components/forms-and-inputs/FilterButton';
 export { default as IconButton, ICON_BUTTON_APPEARANCES, ICON_BUTTON_SHAPES } from '@/components/forms-and-inputs/IconButton';
-export { default as InlineEdit } from '@/components/forms-and-inputs/InlineEdit';
 export { default as InlineEditableTextfield } from '@/components/forms-and-inputs/InlineEditableTextfield';
 export { default as LinkButton } from '@/components/forms-and-inputs/LinkButton';
 export { default as LinkIconButton } from '@/components/forms-and-inputs/LinkIconButton';
@@ -62,7 +61,6 @@ export { default as Carousel } from '@/components/layout-and-structure/Carousel'
 export { default as PageHeader } from '@/components/layout-and-structure/PageHeader';
 export { default as Panel, PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelDownAction, PanelFooter, PanelHeader, PanelHostContext, PanelMoreAction, PanelNewTabAction, PanelProvider, PanelSubheader, PanelUpAction, PanelViewSwitcher, usePanelManager } from '@/components/layout-and-structure/Panel';
 export { default as ScrollBar } from '@/components/layout-and-structure/ScrollBar';
-export { default as VisuallyHidden } from '@/components/layout-and-structure/VisuallyHidden';
 
 export { default as GenerativeBorder, GENERATIVE_BORDER_RADII } from '@/components/loading/GenerativeBorder';
 export { default as ProgressBar, PROGRESS_BAR_APPEARANCES } from '@/components/loading/ProgressBar';
@@ -93,7 +91,9 @@ export { default as ProgressTracker, PROGRESS_TRACKER_ORIENTATIONS, PROGRESS_TRA
 export { default as Code } from '@/components/text-and-data-display/Code';
 export { default as CodeBlock, parseHighlight } from '@/components/text-and-data-display/CodeBlock';
 export { default as Heading, HEADING_COLORS, HEADING_SIZES, HeadingContextProvider, useHeadingLevel } from '@/components/text-and-data-display/Heading';
+export { default as InlineEdit } from '@/components/text-and-data-display/InlineEdit';
 export { default as Table, DynamicTable, HeadCell, StaticTable, TableBulkActions, TableCell, TableFooter, TableMessageRow, TableRow, TableSummaryRow, TreeTable } from '@/components/text-and-data-display/Table';
+export { default as VisuallyHidden } from '@/components/text-and-data-display/VisuallyHidden';
 
 // A sibling of components/, not a group inside it.
 export * from '@/dataviz';

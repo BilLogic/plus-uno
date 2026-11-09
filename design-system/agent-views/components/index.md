@@ -120,7 +120,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 - [IconButton](../../src/components/forms-and-inputs/IconButton/index.md)
 - [Illustration](../../src/components/images-and-icons/Illustration/index.md)
 - [Image](../../src/components/images-and-icons/Image/index.md)
-- [InlineEdit](../../src/components/forms-and-inputs/InlineEdit/index.md)
+- [InlineEdit](../../src/components/text-and-data-display/InlineEdit/index.md)
 - [InlineEditableTextfield](../../src/components/forms-and-inputs/InlineEditableTextfield/index.md)
 - [InlineMessage](../../src/components/messaging/InlineMessage/index.md)
 - [Link](../../src/components/navigation/Link/index.md)
@@ -168,7 +168,7 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 - [Tooltip](../../src/components/overlays-and-layering/Tooltip/index.md)
 - [TreeSelect](../../src/components/forms-and-inputs/TreeSelect/index.md)
 - [VerticalButton](../../src/components/forms-and-inputs/VerticalButton/index.md)
-- [VisuallyHidden](../../src/components/layout-and-structure/VisuallyHidden/index.md)
+- [VisuallyHidden](../../src/components/text-and-data-display/VisuallyHidden/index.md)
 
 ## Before you finish
 

@@ -34,7 +34,7 @@ The type is read from the slots you fill: `header` makes it custom, `toolbar` ma
 
 Use `detail` for a queue a person works through, such as Admin › Compliance or Admin › Reflections. The detail is for a decision that takes a glance or a short form. Heavy work, such as the recording review, gets its own page: put "Open full review" in `detailFooter`.
 
-The section holds the split from 960 of its own width. Below that, the detail replaces the list and a back link returns to it; with no record open, the list fills the row. Inside a Frame, pass `sectionDetail` and the Frame decides instead: it collapses the Sidebar first so the content keeps 960 beside a docked Panel, and dragging the Panel's splitter stops at the width that keeps 960.
+The section holds the split from 960 of its own width. Below that, the detail replaces the list and a back link returns to it; with no record open, the list fills the row. Inside a Frame, pass `sectionDetail` and the Frame keeps the split instead, as Frame shows.
 
 The Page around a section supplies the pad; for a region with a fill of its own, use a Page or a Card.
 

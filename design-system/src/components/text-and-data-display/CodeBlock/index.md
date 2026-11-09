@@ -65,7 +65,7 @@ Don't: A line number beside a single command.
 - For code inside a sentence, `Code`.
 - Syntax coloring is not part of this component.
 
-Same group: `Code` · `Heading` · `Table`
+Same group: `Code` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 ## Parts
 
