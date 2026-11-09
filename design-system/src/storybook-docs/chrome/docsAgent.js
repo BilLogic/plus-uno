@@ -6,7 +6,7 @@
  */
 
 export const AGENT_ENDPOINT = '/.netlify/functions/docs-agent';
-const FALLBACK_NOTE = 'The AI agent is unavailable right now, so this is a search of the docs instead.';
+const FALLBACK_NOTE = 'AI chat is unavailable right now, so this is a search of the docs instead.';
 
 /**
  * `search(text) => { text, sources }`. The returned `(text, history)` takes the

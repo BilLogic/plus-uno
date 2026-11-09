@@ -34,7 +34,7 @@ The examples on this page follow the **Color mode** switch in the toolbar.
 
 <ComponentExample of={AiChatStories.Overview} title="App" description="Chat closed: the floating action button at the bottom right of the Page." />
 
-<ComponentExample of={AiChatStories.StorybookVariant} title="Storybook" description={<><code>variant="storybook"</code> is the chat in these docs: clear chat, move to Panel and close, with no full screen and no more menu.</>} />
+<ComponentExample of={AiChatStories.StorybookVariant} title="Storybook" description={<><code>variant="storybook"</code> is the chat in these docs: the same controls, its mode remembered under its own key.</>} />
 
 </div>
 
@@ -102,7 +102,7 @@ AI chat applies the six AI rules from the AI overview.
 
 ### Storybook variant
 
-`variant="storybook"` is the chat in the Storybook docs. The docs' floating button opens it through its AI agent action, so the chat's own button is left out with `launcher={false}`: the popup floats above the bottom right corner instead. `respond` may return `{ text, sources }`, and the sources list under the answer, opening in `linkTarget`. The docs' answerer calls a server-side function that answers from the design-system index and holds the credentials, so none reaches the browser; when it errors or is rate limited, the chat searches the site's pages and the component index instead and says so.
+`variant="storybook"` is the chat in the Storybook docs. The docs' floating button opens it through its AI chat action, so the chat's own button is left out with `launcher={false}`: the popup floats above the bottom right corner instead. `respond` may return `{ text, sources }`, and the sources list under the answer, opening in `linkTarget`. The docs' answerer calls a server-side function that answers from the design-system index and holds the credentials, so none reaches the browser; when it errors or is rate limited, the chat searches the site's pages and the component index instead and says so.
 
 </div>
 

@@ -172,7 +172,7 @@
       "import": "import { AiChat } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/AiChat/AiChat.jsx",
-      "summary": "AI chat on a Frame: a floating action button at the bottom right of the Page opens chat as a popup; from there it moves to the Frame's Panel or to full screen. It takes the Frame's props and adds the chat. - The button is the one way in. It hides while chat is open in the Panel or full screen. - The mode is remembered for the tab in sessionStorage (and an open Panel). - Under 768 the popup is shown full screen. - `variant=\"storybook\"` is the Storybook docs' chat: clear, move to Panel and close only, with no full screen and no more menu. - The conversation is kept in memory and moves with the mode. There is no history, and no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`. A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.",
+      "summary": "AI chat on a Frame: a floating action button at the bottom right of the Page opens chat as a popup; from there it moves to the Frame's Panel or to full screen. It takes the Frame's props and adds the chat. - The button is the one way in. It hides while chat is open in the Panel or full screen. - The mode is remembered for the tab in sessionStorage (and an open Panel). - Under 768 the popup is shown full screen. - `variant=\"storybook\"` is the Storybook docs' chat: the same chat, with its mode remembered under its own key. - The conversation is kept in memory and moves with the mode. There is no history, and no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`. A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.",
       "props": [
         {
           "name": "variant",
@@ -183,7 +183,7 @@
             "app",
             "storybook"
           ],
-          "description": "`app` carries every header control; `storybook` carries clear, move to Panel and close.",
+          "description": "`storybook` is the docs' chat, which remembers its mode under its own key; the controls are the same.",
           "deprecated": null
         },
         {
@@ -281,6 +281,15 @@
           "deprecated": null
         },
         {
+          "name": "placeholder",
+          "type": "string",
+          "required": false,
+          "default": "'Ask anything'",
+          "values": null,
+          "description": "The prompt input's placeholder: what this chat can be asked about.",
+          "deprecated": null
+        },
+        {
           "name": "panelLabel",
           "type": "string",
           "required": false,
@@ -338,7 +347,9 @@
         "--pad-y-sm",
         "--page-pad",
         "--popover-radius",
+        "--popover-width-md",
         "--radius-md",
+        "--section-stack-md",
         "--stack-md",
         "--stack-sm"
       ]

@@ -126,7 +126,7 @@ export const Fullscreen = {
     args: { defaultMode: 'fullscreen', defaultOpen: true, storageKey: null, height: DOCS_HEIGHT },
 };
 
-/** Docs: the Storybook variant: clear, move to Panel and close, with nothing else. */
+/** Docs: the Storybook variant: the same chat, its mode remembered under its own key. */
 export const StorybookVariant = {
     args: { variant: 'storybook', defaultOpen: true, storageKey: null, height: DOCS_HEIGHT },
     parameters: { layout: 'padded' },
@@ -254,7 +254,7 @@ export const PopupStaysAPopupAt768 = {
     }),
 };
 
-/** The Storybook variant carries clear, move to Panel and close only. */
+/** The Storybook variant carries the same header controls as the app. */
 export const StorybookVariantControls = {
     args: { variant: 'storybook', defaultOpen: true },
     play: async ({ canvasElement }) => withTestViewport(1440, HEIGHT, async () => {
@@ -262,7 +262,7 @@ export const StorybookVariantControls = {
         await waitFor(() => expect(p.popup()).not.toBeNull());
         const names = within(p.popup()).getAllByRole('button').map((b) => b.getAttribute('aria-label'))
             .filter((n) => ['Clear chat', 'Move to Panel', 'Move to popup', 'Full screen', 'More actions', 'Close chat'].includes(n));
-        await expect(names).toEqual(['Clear chat', 'Move to Panel', 'Close chat']);
+        await expect(names).toEqual(['Clear chat', 'Move to Panel', 'Full screen', 'More actions', 'Close chat']);
     }),
 };
 
@@ -367,7 +367,7 @@ const DOCS_STORAGE_KEY = `${AI_CHAT_STORAGE_KEY}-storybook`;
 const DOCS_PANEL_KEY = 'plus-frame-panel-storybook';
 
 /**
- * The docs' floating button with the AI agent it opens, answered by the
+ * The docs' floating button with the AI chat it opens, answered by the
  * docs-agent function (faked here), with the search's pages as the answer's sources.
  * Open from the button, ask, follow the link, clear, move to the Panel and
  * back, close.
@@ -392,12 +392,12 @@ export const DocsAgent = {
         const painted = [root(), ...root().querySelectorAll('.plus-frame, .plus-frame__row, .plus-frame__surface, .plus-frame__content')]
             .filter((el) => getComputedStyle(el).backgroundColor !== 'rgba(0, 0, 0, 0)')
             .map((el) => el.className);
-        await expect(painted, 'the docs show through the AI agent layer').toEqual([]);
+        await expect(painted, 'the docs show through the AI chat layer').toEqual([]);
         await userEvent.click(await within(root()).findByRole('button', { name: 'Prototype links' }));
-        await userEvent.click(await body.findByRole('menuitem', { name: 'AI agent' }));
-        await waitFor(() => expect(popup(), 'the AI agent opens the popup').not.toBeNull());
+        await userEvent.click(await body.findByRole('menuitem', { name: 'AI chat' }));
+        await waitFor(() => expect(popup(), 'the AI chat action opens the popup').not.toBeNull());
 
-        const input = within(popup()).getByRole('textbox', { name: 'Message to AI agent' });
+        const input = within(popup()).getByRole('textbox', { name: 'Message to AI chat' });
         await expect(input, 'focus lands in the input').toHaveFocus();
         await userEvent.type(input, 'Where is Button?{Enter}');
         const link = await within(popup()).findByRole('link', { name: 'Button' });
@@ -405,8 +405,7 @@ export const DocsAgent = {
         await expect(link, 'the answer links the docs page').toHaveAttribute('href', '/?path=/docs/components-forms-and-inputs-button-button--docs');
 
         const names = within(popup()).getAllByRole('button').map((b) => b.getAttribute('aria-label'));
-        await expect(names, 'no full screen, no more menu').toEqual(expect.arrayContaining(['Clear chat', 'Move to Panel', 'Close chat']));
-        await expect(names).not.toContain('Full screen');
+        await expect(names, 'the app chat\'s header controls').toEqual(expect.arrayContaining(['Clear chat', 'Move to Panel', 'Full screen', 'More actions', 'Close chat']));
 
         await press(within(popup()), 'Clear chat');
         await waitFor(() => expect(within(popup()).queryByRole('link', { name: 'Button' })).toBeNull());
@@ -439,9 +438,9 @@ export const DocsAgentFallback = {
         const root = () => document.querySelector('.plus-docs-ai');
         const popup = () => root().querySelector('.plus-ai-chat__floating');
         await userEvent.click(await within(root()).findByRole('button', { name: 'Prototype links' }));
-        await userEvent.click(await body.findByRole('menuitem', { name: 'AI agent' }));
+        await userEvent.click(await body.findByRole('menuitem', { name: 'AI chat' }));
         await waitFor(() => expect(popup()).not.toBeNull());
-        await userEvent.type(within(popup()).getByRole('textbox', { name: 'Message to AI agent' }), 'Where is Button?{Enter}');
+        await userEvent.type(within(popup()).getByRole('textbox', { name: 'Message to AI chat' }), 'Where is Button?{Enter}');
         await within(popup()).findByText(/unavailable right now, so this is a search/);
         await expect(await within(popup()).findByRole('link', { name: 'Button' })).toHaveAttribute('href', '/?path=/docs/components-forms-and-inputs-button-button--docs');
     }),

@@ -2,7 +2,7 @@
 
 # AiChat
 
-AI chat on a Frame: a floating action button at the bottom right of the Page opens chat as a popup; from there it moves to the Frame's Panel or to full screen. It takes the Frame's props and adds the chat. - The button is the one way in. It hides while chat is open in the Panel or full screen. - The mode is remembered for the tab in sessionStorage (and an open Panel). - Under 768 the popup is shown full screen. - `variant="storybook"` is the Storybook docs' chat: clear, move to Panel and close only, with no full screen and no more menu. - The conversation is kept in memory and moves with the mode. There is no history, and no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`. A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.
+AI chat on a Frame: a floating action button at the bottom right of the Page opens chat as a popup; from there it moves to the Frame's Panel or to full screen. It takes the Frame's props and adds the chat. - The button is the one way in. It hides while chat is open in the Panel or full screen. - The mode is remembered for the tab in sessionStorage (and an open Panel). - Under 768 the popup is shown full screen. - `variant="storybook"` is the Storybook docs' chat: the same chat, with its mode remembered under its own key. - The conversation is kept in memory and moves with the mode. There is no history, and no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`. A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.
 
 Also asked as: chat, assistant, chatbot, conversation.
 
@@ -35,7 +35,7 @@ AI chat applies the six AI rules from the AI overview.
 
 ### Storybook variant
 
-`variant="storybook"` is the chat in the Storybook docs. The docs' floating button opens it through its AI agent action, so the chat's own button is left out with `launcher={false}`: the popup floats above the bottom right corner instead. `respond` may return `{ text, sources }`, and the sources list under the answer, opening in `linkTarget`. The docs' answerer calls a server-side function that answers from the design-system index and holds the credentials, so none reaches the browser; when it errors or is rate limited, the chat searches the site's pages and the component index instead and says so.
+`variant="storybook"` is the chat in the Storybook docs. The docs' floating button opens it through its AI chat action, so the chat's own button is left out with `launcher={false}`: the popup floats above the bottom right corner instead. `respond` may return `{ text, sources }`, and the sources list under the answer, opening in `linkTarget`. The docs' answerer calls a server-side function that answers from the design-system index and holds the credentials, so none reaches the browser; when it errors or is rate limited, the chat searches the site's pages and the component index instead and says so.
 
 ## Best practices
 
@@ -133,7 +133,7 @@ Hover, pressed, focus and disabled belong to the Icon buttons in the header and 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `variant` | enum | `'app'` | `app` carries every header control; `storybook` carries clear, move to Panel and close. |
+| `variant` | enum | `'app'` | `storybook` is the docs' chat, which remembers its mode under its own key; the controls are the same. |
 | `defaultMode` | oneOf | `'popup'` | The mode a tab with nothing remembered starts in. |
 | `defaultOpen` | bool | `false` | Whether chat starts open when the tab has nothing remembered. |
 | `storageKey` | string | `variant === 'storybook' ? `${AI_CHAT_STORAGE_KEY}-storybook` : AI_CHAT_STORAGE_KEY` | The sessionStorage key the mode is kept under (the Storybook variant has its own); null keeps nothing. |
@@ -144,6 +144,7 @@ Hover, pressed, focus and disabled belong to the Icon buttons in the header and 
 | `onFeedback` | func | — | Called with the answer and `{ rating }` (or `{ rating: 'down', comment }`) when a person rates it. Every answer offers thumbs. |
 | `starters` | arrayOf (required) | — | `{ id, label, text }` prompts offered while the conversation is empty. |
 | `title` | string | `'AI chat'` | The chat's name: the header title, the button's label and the Panel landmark. |
+| `placeholder` | string | `'Ask anything'` | The prompt input's placeholder: what this chat can be asked about. |
 | `panelLabel` | string | — | Overrides the Panel landmark's name; defaults to `title`. |
 | `children` | node | — | The Page content. |
 
@@ -157,7 +158,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--content-max-width-reading` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--height-2000` · `--height-300` · `--layer-dialog` · `--layer-navigation` · `--pad-x-md` · `--pad-y-sm` · `--page-pad` · `--popover-radius` · `--radius-md` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-small` · `--content-max-width-reading` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--height-2000` · `--height-300` · `--layer-dialog` · `--layer-navigation` · `--pad-x-md` · `--pad-y-sm` · `--page-pad` · `--popover-radius` · `--popover-width-md` · `--radius-md` · `--section-stack-md` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/patterns/AiChat/AiChat.scss`. Override these through the token layer, never with a literal.
 

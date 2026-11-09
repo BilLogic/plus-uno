@@ -21,7 +21,7 @@ export const docsHref = (id, type) => (
     new URL(`./?path=/${type === 'docs' ? 'docs' : 'story'}/${id}`, window.location.href).href
 );
 
-/** The floating button's AI agent action: opens chat in the popup. */
+/** The floating button's AI chat action: opens chat in the popup. */
 const AgentAction = () => {
     const { dispatch } = useAiChat();
     return (
@@ -31,8 +31,8 @@ const AgentAction = () => {
                 appearance="primary"
                 className="plus-docs-fab__button"
                 icon={<AiIcon name="ask" size={24} />}
-                label="AI agent"
-                tooltip="AI agent"
+                label="AI chat"
+                tooltip="AI chat"
                 onClick={() => dispatch({ type: 'open' })}
             />
         )}
@@ -44,7 +44,7 @@ const AgentAction = () => {
  * The Storybook docs' floating button and the AI agent it opens: `AiChat`
  * in its `storybook` variant, answered by the docs-agent Netlify function
  * (Gemini on Vertex, credentials server-side) and, when that errors or is
- * rate limited, by a search of the docs themselves. The chat's own button is left out; the AI agent
+ * rate limited, by a search of the docs themselves. The chat's own button is left out; the AI chat
  * action in the floating button is the way in.
  *
  * The chat sits over the docs: Move to Panel docks it at the right edge.
@@ -68,7 +68,8 @@ const DocsAiAgent = ({ loadEntries = loadDocsEntries, hrefFor = docsHref, fetchF
                 variant="storybook"
                 launcher={false}
                 linkTarget="_top"
-                title="AI agent"
+                title="AI chat"
+                placeholder="Ask about a component, a token or a pattern"
                 panelStorageKey="plus-frame-panel-storybook"
                 respond={respond}
                 starters={[{ id: 'button', label: 'Where is Button?', text: 'Where is Button?' }]}

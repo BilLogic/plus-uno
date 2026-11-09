@@ -72,9 +72,8 @@ const transcriptOf = (messages) => messages
 const ChatSurface = ({ presentation }) => {
     const chat = useAiChat();
     const {
-        variant, title, messages, loading, draft, setDraft, starters, dispatch, clear, send, stop, narrow, linkTarget, rate,
+        title, placeholder, messages, loading, draft, setDraft, starters, dispatch, clear, send, stop, narrow, linkTarget, rate,
     } = chat;
-    const storybook = variant === 'storybook';
     const listRef = useRef(null);
 
     useEffect(() => {
@@ -89,7 +88,7 @@ const ChatSurface = ({ presentation }) => {
     const inPanel = presentation === 'panel';
     const actions = (
         <>
-            <IconButton icon="broom" label="Clear chat" spacing="compact" appearance="subtle" isDisabled={messages.length === 0} onClick={clear} />
+            <IconButton icon="eraser" label="Clear chat" spacing="compact" appearance="subtle" isDisabled={messages.length === 0} onClick={clear} />
             <IconButton
                 icon={inPanel ? 'window-restore' : 'table-columns'}
                 label={inPanel ? 'Move to popup' : 'Move to Panel'}
@@ -97,7 +96,7 @@ const ChatSurface = ({ presentation }) => {
                 appearance="subtle"
                 onClick={() => dispatch({ type: 'switchMode' })}
             />
-            {storybook || narrow ? null : (
+            {narrow ? null : (
                 <IconButton
                     icon={presentation === 'fullscreen' ? 'compress' : 'expand'}
                     label={presentation === 'fullscreen' ? 'Exit full screen' : 'Full screen'}
@@ -106,14 +105,12 @@ const ChatSurface = ({ presentation }) => {
                     onClick={() => dispatch({ type: 'toggleFullscreen' })}
                 />
             )}
-            {storybook ? null : (
-                <DropdownMenu
-                    placement="bottom-end"
-                    trigger={<IconButton icon="ellipsis" label="More actions" spacing="compact" appearance="subtle" />}
-                >
-                    <ButtonItem isDisabled={messages.length === 0} onClick={copy}>Copy conversation</ButtonItem>
-                </DropdownMenu>
-            )}
+            <DropdownMenu
+                placement="bottom-end"
+                trigger={<IconButton icon="ellipsis" label="More actions" spacing="compact" appearance="subtle" />}
+            >
+                <ButtonItem isDisabled={messages.length === 0} onClick={copy}>Copy conversation</ButtonItem>
+            </DropdownMenu>
             <IconButton icon="xmark" label="Close chat" spacing="compact" appearance="subtle" onClick={() => dispatch({ type: 'close' })} />
         </>
     );
@@ -149,18 +146,20 @@ const ChatSurface = ({ presentation }) => {
                 </div>
             </PanelBody>
             <PanelFooter className="plus-ai-chat__footer">
-                {messages.length === 0 && starters?.length ? (
-                    <PromptStarters label="Suggested prompts" starters={starters} onSelect={(s) => setDraft(s.text ?? s.label)} />
-                ) : null}
-                <PromptInput
-                    label={`Message to ${title}`}
-                    placeholder="Ask anything"
-                    value={draft}
-                    onChange={(event) => setDraft(event.target.value)}
-                    onSubmit={(text) => { setDraft(''); send(text); }}
-                    isLoading={loading}
-                    onStop={stop}
-                />
+                <div className="plus-ai-chat__compose">
+                    {messages.length === 0 && starters?.length ? (
+                        <PromptStarters label="Suggested prompts" starters={starters} onSelect={(s) => setDraft(s.text ?? s.label)} />
+                    ) : null}
+                    <PromptInput
+                        label={`Message to ${title}`}
+                        placeholder={placeholder}
+                        value={draft}
+                        onChange={(event) => setDraft(event.target.value)}
+                        onSubmit={(text) => { setDraft(''); send(text); }}
+                        isLoading={loading}
+                        onStop={stop}
+                    />
+                </div>
                 {/* Fallibility, said once under the input, never per message. */}
                 <p className="plus-ai-chat__disclaimer">{AI_CHAT_DISCLAIMER}</p>
             </PanelFooter>
@@ -254,8 +253,8 @@ const Launcher = () => {
  *   full screen.
  * - The mode is remembered for the tab in sessionStorage (and an open Panel).
  * - Under 768 the popup is shown full screen.
- * - `variant="storybook"` is the Storybook docs' chat: clear, move to Panel and
- *   close only, with no full screen and no more menu.
+ * - `variant="storybook"` is the Storybook docs' chat: the same chat, with
+ *   its mode remembered under its own key.
  * - The conversation is kept in memory and moves with the mode. There is no
  *   history, and no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`.
  *   A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.
@@ -272,6 +271,7 @@ const AiChat = ({
     onFeedback,
     starters,
     title = 'AI chat',
+    placeholder = 'Ask anything',
     panelLabel,
     children,
     ...frameProps
@@ -338,8 +338,8 @@ const AiChat = ({
     }, [onFeedback]);
 
     const value = useMemo(() => ({
-        variant, title, messages, loading, draft, setDraft, starters, state, dispatch, clear, send, stop, narrow, launcher, linkTarget, rate,
-    }), [variant, launcher, linkTarget, title, messages, loading, draft, starters, state, clear, send, stop, narrow, rate]);
+        variant, title, placeholder, messages, loading, draft, setDraft, starters, state, dispatch, clear, send, stop, narrow, launcher, linkTarget, rate,
+    }), [variant, launcher, linkTarget, title, placeholder, messages, loading, draft, starters, state, clear, send, stop, narrow, rate]);
 
     return (
         <AiChatContext.Provider value={value}>
@@ -358,7 +358,7 @@ const AiChat = ({
 };
 
 AiChat.propTypes = {
-    /** `app` carries every header control; `storybook` carries clear, move to Panel and close. */
+    /** `storybook` is the docs' chat, which remembers its mode under its own key; the controls are the same. */
     variant: PropTypes.oneOf(['app', 'storybook']),
     /** The mode a tab with nothing remembered starts in. */
     defaultMode: PropTypes.oneOf(AI_CHAT_MODES),
@@ -384,6 +384,8 @@ AiChat.propTypes = {
     })),
     /** The chat's name: the header title, the button's label and the Panel landmark. */
     title: PropTypes.string,
+    /** The prompt input's placeholder: what this chat can be asked about. */
+    placeholder: PropTypes.string,
     /** Overrides the Panel landmark's name; defaults to `title`. */
     panelLabel: PropTypes.string,
     /** The Page content. */
