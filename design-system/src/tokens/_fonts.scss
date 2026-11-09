@@ -45,7 +45,8 @@ body :is(.fa-solid, .fa-regular, .fas, .far) {
     line-height: var(--line-height-150);
 }
 
-/* Bare heading elements take the heading text styles, a step per level; a
+/* Bare heading elements take the heading text style that matches their level
+   (h1 xxlarge through h6 xsmall), the same pairing the Heading component uses; a
    component that names its own text style wins. A glyph in a heading takes the
    heading's size. */
 h1,
@@ -58,28 +59,31 @@ h6 {
     color: var(--ds-text);
 }
 
-h1,
-h2 {
+h1 {
     font: var(--heading-xxlarge);
     letter-spacing: var(--heading-xxlarge-tracking);
 }
 
-h3 {
+h2 {
     font: var(--heading-xlarge);
     letter-spacing: var(--heading-xlarge-tracking);
 }
 
-h4 {
+h3 {
     font: var(--heading-large);
     letter-spacing: var(--heading-large-tracking);
 }
 
-h5 {
+h4 {
     font: var(--heading-medium);
 }
 
-h6 {
+h5 {
     font: var(--heading-small);
+}
+
+h6 {
+    font: var(--heading-xsmall);
 }
 
 :is(h1, h2, h3, h4, h5, h6) :is(.fa-solid, .fa-regular, .fas, .far) {
