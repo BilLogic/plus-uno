@@ -85,6 +85,7 @@ CardTitles.play = async ({ canvasElement }) => {
 export const ModalTitle = () => (
     <Modal
         show
+        renderAs="inline"
         title="Edit session"
         description="Changes apply to every session in the series."
         onClose={() => {}}
@@ -97,9 +98,10 @@ export const ModalTitle = () => (
     </Modal>
 );
 
-ModalTitle.play = async () => {
-    // The dialog is portaled to the body, outside the canvas.
-    const dialog = await within(document.body).findByRole('dialog', { name: 'Edit session' });
+ModalTitle.play = async ({ canvasElement }) => {
+    // Inline: the modal sits in the canvas, not over the docs page (and is no dialog there).
+    const dialog = canvasElement.querySelector('.plus-modal');
+    await expect(dialog, 'the modal renders inside the canvas').not.toBeNull();
     const inside = within(dialog);
     await expectStyle(inside.getByRole('heading', { level: 1, name: 'Edit session' }), 'modal title', HEADING_MEDIUM);
     await expectStyle(inside.getByText('Changes apply to every session in the series.'), 'modal description', BODY_DEFAULT);
