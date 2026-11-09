@@ -75,10 +75,10 @@ const buildTheme = (key) =>
     brandImage: brandFor(key),
     brandUrl: './',
     ...THEMES[key]?.theme,
-    // Colors only. Type and radius stay literal until the Inter / Noto Sans call is made.
-    fontBase:
-      '"Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-    fontCode: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+    // The app's families: --type-family-body and --type-family-code (the manager
+    // cannot read custom properties, so the stacks are written out).
+    fontBase: '"Noto Sans", "Noto Sans Fallback", sans-serif',
+    fontCode: '"Noto Sans Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace',
     appBorderRadius: 8,
     inputBorderRadius: 8,
   });

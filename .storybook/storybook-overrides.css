@@ -235,14 +235,14 @@ body,
 html {
     /* Literal on purpose — see the block above: this mirrors
        `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
-    scroll-padding-top: 5rem;
+    scroll-padding-top: var(--space-500);
 }
 
 @media (min-width: 768px) {
     html {
         /* Literal on purpose — see the block above: this mirrors
            `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
-        scroll-padding-top: 6rem;
+        scroll-padding-top: calc(var(--space-500) + var(--section-stack-md));
     }
 }
 
@@ -253,21 +253,21 @@ html {
 .sbdocs-wrapper {
     /* Literal on purpose — see the block above: this mirrors
        `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
-    scroll-padding-top: 5rem;
+    scroll-padding-top: var(--space-500);
     box-sizing: border-box;
     width: 100%;
-    max-width: 82rem;
+    max-width: calc(var(--content-max-width) + var(--page-pad) * 2);
     margin-left: auto;
     margin-right: auto;
-    padding-left: clamp(var(--section-pad-x-default), 3vw, 2.75rem) !important;
-    padding-right: clamp(var(--section-pad-x-default), 3vw, 2.75rem) !important;
+    padding-left: var(--page-pad) !important;
+    padding-right: var(--page-pad) !important;
 }
 
 @media (min-width: 768px) {
     .sbdocs-wrapper {
         /* Literal on purpose — see the block above: this mirrors
            `unsafeTocbotOptions.headingsOffset` in preview.jsx, a plain integer. */
-        scroll-padding-top: 6rem;
+        scroll-padding-top: calc(var(--space-500) + var(--section-stack-md));
     }
 }
 
@@ -340,10 +340,10 @@ a.sbdocs-a {
 }
 
 .sbdocs .sb-plus-intro-page .sb-plus-intro-mini-card {
-  border: 1px solid color-mix(in srgb, var(--ds-border) 70%, transparent);
   border-radius: var(--card-radius-sm);
-  background: color-mix(in srgb, var(--ds-surface-sunken) 28%, transparent);
-  padding: var(--space-0875);
+  background: var(--ds-surface-raised);
+  box-shadow: var(--ds-shadow-raised);
+  padding: var(--card-pad-default);
 }
 
 .sbdocs .sb-plus-intro-page .sb-plus-intro-mini-title {
@@ -483,7 +483,7 @@ a.sbdocs-a {
   overflow: hidden;
   width: 100%;
   margin: var(--stack-md) 0 0;
-  border: 1px solid var(--ds-border);
+  border: var(--border-default) solid var(--ds-border);
   border-radius: var(--card-radius-sm);
   background: var(--ds-surface);
 }
@@ -492,19 +492,14 @@ a.sbdocs-a {
   width: 100%;
   margin: 0 !important;
   border-collapse: collapse;
-  font-size: 13px; /* props-table code sits between --font-size-075 and --font-size-0875 */
-  line-height: 1.45;
+  font: var(--body-small);
   color: var(--ds-text);
-}
-
-.sbdocs .sb-ds-doc-table thead tr {
-  background: color-mix(in srgb, var(--ds-surface-sunken) 40%, transparent);
 }
 
 .sbdocs .sb-ds-doc-table th,
 .sbdocs .sb-ds-doc-table td {
   padding: var(--pad-y-lg) var(--pad-x-md);
-  border-bottom: 1px solid var(--ds-border);
+  border-bottom: var(--border-default) solid var(--ds-border);
   text-align: left;
   vertical-align: top;
 }
@@ -555,8 +550,6 @@ a.sbdocs-a {
 .toc-wrapper h2,
 .sbdocs-wrapper aside h2 {
   font: var(--heading-xsmall) !important;
-  letter-spacing: 0.05em !important;
-  text-transform: uppercase !important;
   margin-top: 0 !important;
   margin-bottom: var(--section-stack-lg) !important;
   color: var(--ds-text-subtle) !important;
@@ -585,7 +578,7 @@ a.sbdocs-a {
  * active; measured and set by `.storybook/docs-toc.jsx`, 0 when the page is long enough.
  */
 :root {
-  --docs-toc-end-space: 0px;
+  --docs-toc-end-space: 0;
 }
 
 .sbdocs-content::after {
@@ -633,12 +626,8 @@ a.sbdocs-a {
 .docs-story section > h6,
 .docs-story section > .heading-medium,
 .docs-story section > .heading-small {
-    font-family: var(--type-family-body) !important;
-    font-size: var(--font-size-0875) !important;
-    font-weight: 600 !important;
+    font: var(--heading-xsmall) !important;
     color: var(--ds-text-subtle) !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
     margin-bottom: var(--stack-lg) !important;
     margin-top: 0 !important;
 }
@@ -677,7 +666,7 @@ a.sbdocs-a {
  */
 .sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .innerZoomElementWrapper {
     width: 100% !important;
-    max-width: min(100%, 112rem) !important;
+    max-width: 100% !important;
     min-width: 0 !important;
     margin-left: auto !important;
     margin-right: auto !important;
@@ -702,10 +691,10 @@ a.sbdocs-a {
     width: 100% !important;
     max-width: none !important;
     box-sizing: border-box !important;
-    padding: var(--space-250) clamp(var(--section-pad-x-default), 4vw, 3.5rem) !important;
+    padding: var(--section-pad-y-spacious) var(--section-pad-x-spacious) !important;
     border-radius: var(--card-radius-sm) var(--card-radius-sm) 0 0;
     background: var(--ds-surface-raised) !important;
-    border: 1px solid var(--ds-border) !important;
+    border: var(--border-default) solid var(--ds-border) !important;
     border-bottom: none !important;
     box-shadow: none !important;
 }
@@ -750,7 +739,7 @@ a.sbdocs-a {
     padding: var(--pad-y-md) var(--pad-x-sm) !important;
     background: var(--ds-surface) !important;
     border: none !important;
-    border-top: 1px solid color-mix(in srgb, var(--ds-border) 50%, transparent) !important;
+    border-top: var(--border-default) solid var(--ds-border) !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     z-index: 1;
@@ -764,9 +753,9 @@ a.sbdocs-a {
 
 /* ActionBar strip under attached previews: match card sides + bottom radius when code collapsed */
 .sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > *:last-child:not(:only-child) {
-    border-left: 1px solid var(--ds-border) !important;
-    border-right: 1px solid var(--ds-border) !important;
-    border-top: 1px solid var(--ds-border) !important;
+    border-left: var(--border-default) solid var(--ds-border) !important;
+    border-right: var(--border-default) solid var(--ds-border) !important;
+    border-top: var(--border-default) solid var(--ds-border) !important;
     background: var(--ds-surface-raised) !important;
 }
 
@@ -786,8 +775,8 @@ a.sbdocs-a {
     margin: 0 !important;
     margin-left: 0 !important;
     border-radius: var(--radius-md) !important;
-    border: 1px solid color-mix(in srgb, var(--ds-border) 55%, transparent) !important;
-    border-top: 1px solid color-mix(in srgb, var(--ds-border) 55%, transparent) !important;
+    border: var(--border-default) solid var(--ds-border) !important;
+    border-top: var(--border-default) solid var(--ds-border) !important;
     box-shadow: none !important;
 }
 
@@ -813,7 +802,7 @@ a.sbdocs-a {
 
 /* Default Storybook canvas padding for unscoped docs stories. */
 .sbdocs .docs-story > div[scale="1"] {
-  padding: var(--space-250) clamp(var(--section-pad-x-default), 4vw, 3.5rem) !important;
+  padding: var(--section-pad-y-spacious) var(--section-pad-x-spacious) !important;
 }
 
 /* Flush / custom wells: zero Storybook’s own padding (outer card supplies it). */
@@ -827,9 +816,9 @@ a.sbdocs-a {
  * from the first-child rule above — do NOT zero it (that caused flush widgets).
  */
 .sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > div[scale="1"] {
-  padding: var(--space-250) clamp(var(--section-pad-x-default), 4vw, 3.5rem) !important;
+  padding: var(--section-pad-y-spacious) var(--section-pad-x-spacious) !important;
   background: var(--ds-surface-raised) !important;
-  border: 1px solid var(--ds-border) !important;
+  border: var(--border-default) solid var(--ds-border) !important;
   border-bottom: none !important;
   border-radius: var(--card-radius-sm) var(--card-radius-sm) 0 0;
   box-sizing: border-box !important;
@@ -904,7 +893,7 @@ a.sbdocs-a {
   .sb-ds-docs-canvas-attached-root:not(:has(.docblock-code-toggle--expanded))
   .docs-story
   > div[scale="1"] {
-  border-bottom-width: 1px !important;
+  border-bottom-width: var(--border-default) !important;
   border-bottom-style: solid !important;
   border-bottom-color: var(--ds-border) !important;
   border-radius: var(--card-radius-sm);
@@ -983,7 +972,7 @@ a.sbdocs-a {
        the rail paints inside the strip's padding box, which is where this
        border already is. See the strip rule above for what the negative margin
        used to cost. */
-    border-bottom: 2px solid transparent;
+    border-bottom: var(--border-selected) solid transparent;
     padding: var(--stack-lg) 0;
     color: var(--ds-text-subtle);
     font-family: var(--type-family-heading);
@@ -1098,14 +1087,14 @@ html[data-color-mode="dark"] .docs-story {
 .sbdocs .sb-ds-docs-source pre {
     margin: 0 !important;
     border-radius: var(--card-radius-sm);
-    border: 1px solid var(--ds-border);
+    border: var(--border-default) solid var(--ds-border);
     box-shadow: none;
 }
 
 .sbdocs .sb-ds-docs-props .docblock-argstable-head th {
     font-weight: var(--type-weight-semibold) !important;
     color: var(--ds-text);
-    background: color-mix(in srgb, var(--ds-surface-sunken) 40%, transparent);
+    background: transparent;
 }
 
 .sbdocs .sb-ds-docs-props .docblock-argstable td,
@@ -1155,21 +1144,69 @@ html[data-color-mode="dark"] .docs-story {
   padding: var(--page-stack-lg);
 }
 
-/* The Resources block under a page's title: links out, then the page begins. */
-.sbdocs .sb-ds-resources {
-  margin-top: var(--page-stack-lg);
-  margin-bottom: var(--page-stack-lg);
-}
-
-/* The block carries the space above it, so its heading adds none of its own. */
-.sbdocs .sb-ds-resources > h2 {
-  margin-top: 0 !important;
-}
-
+/* The Resources block: a docs section (docs-rhythm.css sets its spacing). */
 .sbdocs .sb-ds-resources-block {
   display: flex;
   flex-wrap: wrap;
   gap: var(--section-stack-md);
+}
+
+/* A link card: its edge comes from elevation, as a card's does (Border foundation). */
+.sbdocs a.sb-ds-resource-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: var(--card-stack-lg);
+  width: calc(var(--control-lg) * 5);
+  padding: var(--card-pad-default);
+  border-radius: var(--card-radius-sm);
+  background: var(--ds-surface-raised);
+  box-shadow: var(--ds-shadow-raised);
+  color: var(--ds-text);
+  text-decoration: none;
+  transition: background-color var(--motion-duration-short) var(--motion-easing-standard);
+}
+
+.sbdocs a.sb-ds-resource-card:hover {
+  background: var(--ds-surface-raised-hovered);
+}
+
+.sbdocs a.sb-ds-resource-card:active {
+  background: var(--ds-surface-raised-pressed);
+}
+
+.sb-ds-resource-card__icon {
+  font-size: var(--icon-lg);
+  line-height: 1;
+  color: var(--ds-icon);
+}
+
+.sb-ds-resource-card__title {
+  font: var(--heading-xsmall);
+  color: var(--ds-text);
+}
+
+.sb-ds-resource-card__external {
+  position: absolute;
+  inset-block-start: var(--card-pad-default);
+  inset-inline-end: var(--card-pad-default);
+  font-size: var(--icon-sm);
+  color: var(--ds-icon-subtle);
+}
+
+.sb-ds-figma-nodes__label {
+  font: var(--heading-xxsmall);
+  color: var(--ds-text-subtle);
+}
+
+.sbdocs .sb-ds-figma-nodes {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-stack-sm);
+}
+
+.sbdocs .sb-ds-figma-nodes .sb-ds-doc-table-wrap {
+  margin: 0;
 }
 
 /*

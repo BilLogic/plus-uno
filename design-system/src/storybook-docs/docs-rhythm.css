@@ -98,8 +98,18 @@
 }
 
 /* Component pages: the tabs row to the tab's first section is heading to body. */
+.sbdocs .sb-ds-docs-tabs__panel {
+    padding-block-start: var(--section-stack-md);
+}
+
 .sbdocs .sb-ds-component-docs.sb-ds-component-docs--page {
-    margin-block-start: var(--section-stack-md) !important;
+    margin-block-start: 0 !important;
+}
+
+/* Storybook parks the Show code bar with -40 above and +40 below; the +40 left
+   dead space under every example. The block ends where its card does. */
+.sbdocs .sb-ds-docs-canvas-attached-root .sbdocs-preview-actions {
+    margin-block-end: 0 !important;
 }
 
 /* MDX prose pages: bare headings in the page's own flow. */
@@ -113,4 +123,11 @@
 
 .sbdocs .sbdocs-content > :is(h4, h5, h6) {
     margin-block: var(--section-stack-lg) var(--section-stack-md) !important;
+}
+
+/* Resources opens a component page's Examples tab; the sections after it sit in
+   their own wrapper, whose first child takes no top margin, so Resources keeps
+   the section gap beneath itself. */
+.sbdocs .sb-ds-resources.sb-docs-section {
+    margin-block-end: var(--page-stack-lg) !important;
 }

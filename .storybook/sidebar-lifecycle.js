@@ -42,6 +42,7 @@ export const COLLAPSED_ROOTS = ['foundations', 'patterns', 'components', 'ai-ui'
 // radius stay literal for the same reason (manager.js).
 export const badgeRules = (vars = {}) =>
   [
+    // docs-literal: the manager has no token stylesheet (above).
     `.plus-lifecycle-badge { display: inline-flex; align-items: center; box-sizing: border-box; height: 16px; margin-left: 6px; padding: 0 4px; border: 1px solid; border-radius: 4px; font-size: 10px; font-weight: 600; line-height: 1; letter-spacing: 0.02em; text-transform: lowercase; white-space: nowrap; color: ${vars['--plus-manager-badge-text']}; }`,
     // On the selected row the brand ground is dark: the badge takes the row's own ink.
     `.sidebar-container [data-selected='true'] .plus-lifecycle-badge { color: inherit; border-color: currentColor; }`,

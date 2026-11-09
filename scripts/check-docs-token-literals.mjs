@@ -28,6 +28,12 @@
  *              `--line-height-*` for a `line-height`, and the size, space,
  *              radius and stroke primitives and spacing semantics otherwise.
  *
+ * THE DOCS CHROME IS STRICTER. In `.storybook/` and `design-system/src/storybook-docs/`
+ * (tests excepted), any raw px/rem/em size or `rgb()`/`hsl()`/`color-mix()` is a
+ * finding, matched or not: the docs are styled from the app's tokens only. Media
+ * conditions are exempt (they cannot read custom properties); anything else with
+ * no token carries a `docs-literal:` comment saying why.
+ *
  * The token table is `tokenCorpus` (#620): one read, aliases followed, family
  * from the name, color and dimension keys from the same module. This check
  * used to carry its own copies of all four; they disagreed with `parseColor`
@@ -419,12 +425,32 @@ export function blankProse(source) {
 }
 
 /** @returns {{line:number, literal:string, kind:'hex'|'old-token'}[]} */
+// The docs chrome is styled from the app's tokens only: a raw size or a color
+// function is a finding wherever it appears, whether or not a token shares its
+// value. Media queries cannot read custom properties, so their conditions are
+// exempt; anything else that genuinely has no token says why in a
+// `docs-literal:` comment on its line or the line above.
+const CHROME_DIMENSION = /(?<![\w.#-])\d*\.?\d+(?:px|rem|em)\b/g;
+const CHROME_COLOR_FN = /\b(?:rgba?|hsla?|color-mix)\(/g;
+const DOCS_LITERAL = /docs-literal:/;
+
 export function chromeFindings(source, { css }) {
   const text = blankProse(source);
   const found = [];
   const lineOf = (offset) => text.slice(0, offset).split('\n').length;
+  const sourceLines = source.split('\n');
+  const textLines = text.split('\n');
+  const justified = (line) => DOCS_LITERAL.test(sourceLines[line - 1] ?? '') || DOCS_LITERAL.test(sourceLines[line - 2] ?? '');
+  const inMedia = (line) => /^\s*@media\b/.test(textLines[line - 1] ?? '');
   for (const m of text.matchAll(css ? CHROME_HEX_CSS : CHROME_HEX_STRING)) {
     found.push({ line: lineOf(m.index), literal: m[0], kind: 'hex' });
+  }
+  for (const re of [CHROME_DIMENSION, CHROME_COLOR_FN]) {
+    for (const m of text.matchAll(re)) {
+      const line = lineOf(m.index);
+      if (inMedia(line) || justified(line)) continue;
+      found.push({ line, literal: m[0], kind: re === CHROME_DIMENSION ? 'dimension' : 'color-fn' });
+    }
   }
   for (const m of text.matchAll(OLD_VOCABULARY)) {
     found.push({ line: lineOf(m.index), literal: m[1], kind: 'old-token' });
@@ -438,6 +464,8 @@ const chromeFiles = (repoRoot) =>
     .flatMap((dir) => documents(dir, { root: repoRoot, ext: CHROME_EXT }))
     .filter((rel) => !/\.storybook\/(manager|preview)\.jsx?$/.test(rel))
     .filter((rel) => !/storybook-docs\/lib\/contrast\.js$/.test(rel))
+    // Tests build fixtures with literal geometry; they style nothing.
+    .filter((rel) => !/\.test\.[jt]sx?$/.test(rel))
     .map((rel) => path.join(repoRoot, rel));
 
 // ── the runner ──────────────────────────────────────────────────────────────
@@ -527,7 +555,11 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
         message:
           f.kind === 'hex'
             ? `raw hex ${f.literal}  -> a --ds-* color token`
-            : `retired token ${f.literal}  -> its current name (--ds-* color, --section-*/--stack-*/--pad-* spacing, --type-* type)`,
+            : f.kind === 'dimension'
+              ? `raw size ${f.literal}  -> the token whose role fits (--page-*/--section-*/--card-*/--stack-* spacing, --border-*, --radius-*, --icon-*, a type token), or a docs-literal: comment saying why none does`
+              : f.kind === 'color-fn'
+                ? `color function ${f.literal}  -> a --ds-* color token (a tint is a token too: --ds-background-*-subtle, --ds-surface-*)`
+                : `retired token ${f.literal}  -> its current name (--ds-* color, --section-*/--stack-*/--pad-* spacing, --type-* type)`,
       });
     }
   }
