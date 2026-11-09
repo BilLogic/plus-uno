@@ -4,30 +4,15 @@ import test from 'node:test';
 
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { tokenSources } from '../design-system/src/lib/tokens-node.mjs';
-import { COLOR_SPEC, deriveCandidates, specCodeSyntax } from './generate-token-registry.mjs';
+import { ARCHIVED_COLLECTION, COLOR_SPEC, deriveCandidates, specCodeSyntax } from './generate-token-registry.mjs';
 
-const COLLECTION = 'colors / accent';
-
-test('a Border Subtle variable maps to its -border-subtle token first', () => {
-  assert.equal(deriveCandidates(COLLECTION, 'Success/Success Border Subtle')[0], '--color-success-border-subtle');
-});
-
-test('a Border Subtle variable never falls back to the 3:1 -border role', () => {
-  // Primary has no -border-subtle token. If a candidate ever named
-  // --color-primary-border, the pale label border would silently bind to the
-  // 3:1 role instead of being reported as unresolved.
-  const candidates = deriveCandidates(COLLECTION, 'Primary/Primary Border Subtle');
-  assert.equal(candidates.includes('--color-primary-border'), false, candidates.join(', '));
-});
-
-test('the 3:1 Border role still maps to -border', () => {
-  assert.equal(deriveCandidates(COLLECTION, 'Success/Success Border')[0], '--color-success-border');
-});
-
-test('a layout min or max height maps to its --layout-*-height-* token', () => {
-  assert.equal(deriveCandidates('size / layout', 'Min Heights/listbox')[0], '--layout-min-height-listbox');
-  assert.equal(deriveCandidates('size / layout', 'Max Heights/listbox')[0], '--layout-max-height-listbox');
-  assert.equal(deriveCandidates('size / layout', 'Min Heights/card-body')[0], '--layout-min-height-card-body');
+test('the archived color and size collections are not mapped', () => {
+  for (const collection of ['colors / accent', 'colors / neutral', 'size / layout', 'size / primitive', 'size / semantics']) {
+    assert.equal(ARCHIVED_COLLECTION.test(collection), true, collection);
+  }
+  for (const collection of ['color / foundations', 'spacing / primitives', 'spacing / layout', 'typography']) {
+    assert.equal(ARCHIVED_COLLECTION.test(collection), false, collection);
+  }
 });
 
 test('a typography variable maps by its folder: the same rule the type generator uses', () => {
@@ -40,7 +25,7 @@ test('a typography variable maps by its folder: the same rule the type generator
 /*
  * THE COLOR FOUNDATIONS CARRY THEIR CODE NAME. The generated Figma spec writes
  * each `--ds-*` variable's code syntax beside it, so the registry reads that
- * rather than deriving a `--color-${slug}` name the new set does not use.
+ * rather than deriving a name from the path.
  */
 const SPEC = {
   collections: [
@@ -65,18 +50,13 @@ test('the spec code syntax is read per collection, and a variable without one is
   ]);
 });
 
-test('a color foundations variable maps to its code syntax, not a derived --color- name', () => {
+test('a color foundations variable maps to its code syntax, not a derived name', () => {
   const codeSyntax = specCodeSyntax(SPEC).get('color / foundations');
   assert.deepEqual(deriveCandidates('color / foundations', 'color/text/brand', { codeSyntax }), ['--ds-text-brand']);
   assert.deepEqual(
     deriveCandidates('color / foundations', 'elevation/surface/raised/default', { codeSyntax }),
     ['--ds-surface-raised'],
   );
-});
-
-test('the legacy color collections still derive their --color- names', () => {
-  const codeSyntax = specCodeSyntax(SPEC).get('color / foundations');
-  assert.equal(deriveCandidates(COLLECTION, 'Success/Success Border', { codeSyntax })[0], '--color-success-border');
 });
 
 test('the live spec maps every --ds- semantic token, and every one exists in the token sheets', () => {

@@ -300,7 +300,7 @@ test('seedScore: the debt scenario starts with recorded debt, the migration with
   const migration = seedScore({ task: 'migrate-retired' });
   assert.ok(migration.byRule['ds/no-unknown-component'] >= 3, JSON.stringify(migration));
   assert.ok(migration.byRule['ds/no-unknown-prop'] >= 1, JSON.stringify(migration));
-  assert.ok(migration.warnByRule['ds/no-retired-name'] >= 1, JSON.stringify(migration));
+  assert.ok(migration.byRule['ds/no-unknown-token'] >= 1, JSON.stringify(migration));
 
   for (const task of TASKS.filter((t) => !SEEDED.includes(t))) assert.equal(seedScore({ task }).escapes, 0, task);
   assert.deepEqual(SEEDED, ['debt-extend', 'migrate-retired']);

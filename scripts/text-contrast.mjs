@@ -3,68 +3,48 @@
  *
  * WHAT THIS MEASURES, AND WHY IT IS NOT `check:button-contrast`. That check
  * reads the Button theme MAP — a generator — and sweeps everything it can
- * produce. This reads arbitrary `color:` declarations in the design system's
- * stylesheets, which no generator produces and no story necessarily renders.
- * `--color-warning` is 3.52:1 on the page ground, below AA's 4.5:1, and it was
- * the declared text color in seven places: a form tag, two status icons, a
- * table cell, a select, a button-container message and a `.color-warning`
- * utility class anyone can reach for. The token file has carried
- * `--color-warning-text` (#5b4a00, 8.24:1) the whole time.
- *
- * WHY THE PAIR EXISTS AT ALL, benchmarked: `@atlaskit/tokens` 16.9.0 separates
- * `color.text.warning` from `color.background.warning.bold` and the two are not
- * the same value — the split exists precisely so a bold fill color cannot be
- * used as body text. We have the same split (`--color-X` / `--color-X-text`)
- * for all twelve semantics. Nothing enforced it, so 123 `color:` declarations
- * name the bold half. Most of those pass AA; this check is about the ones that
- * do not, because that is the part that is a defect rather than a preference.
+ * produce. This reads arbitrary `color:` declarations naming a `--ds-text*`
+ * token in the design system's stylesheets, which no generator produces and no
+ * story necessarily renders, and measures each against the ground its rule
+ * puts it on. A text token is chosen for the 4.5:1 bar on its intended ground;
+ * this catches the one used on a ground it was not chosen for.
  *
  * ─── WHAT IT DELIBERATELY CANNOT SEE ────────────────────────────────────────
  *
- *  1. THE REAL GROUND, BEYOND ONE BLOCK. If the declaration's own rule also
- *     sets a `background-color`, that is the ground and it is what gets
- *     measured — `color: var(--color-surface)` beside
- *     `background-color: var(--color-success)` is white-on-green at 6.17:1, not
- *     white-on-white at 1:1, and the first draft of this check reported three
- *     of those as failures. What it still cannot see is a ground set by an
- *     ANCESTOR rule or by a parent component. Those fall back to the page,
- *     which is the right default — the overwhelming majority of `color:` in
- *     this repository is text on a page or on a near-white container — but it
- *     is an assumption, and a finding that contradicts it is the check being
- *     wrong rather than the code. The ground is now resolved STRUCTURALLY
+ *  1. THE REAL GROUND, BEYOND ITS RULES. The ground is resolved STRUCTURALLY
  *     (`scripts/lib/declared-grounds.mjs`, postcss-scss): walking out from the
- *     declaration's rule, the first rule with a `--color-*` background or a
+ *     declaration's rule, the first rule with a `--ds-*` background or a
  *     `// @grounds: …` annotation decides, and the page if none does. So a
- *     nested rule on a parent's fill is measured on that fill, and a rule on
- *     a ground its caller paints declares it and is measured on each one.
- *  2. INLINE STYLES. `style={{ color: 'var(--color-warning)' }}` in JSX is
+ *     nested rule on a parent's fill is measured on that fill, and a rule on a
+ *     ground its caller paints declares it and is measured on each one. A
+ *     ground painted by a parent COMPONENT is invisible; it falls back to the
+ *     page, which is the right default, and a finding that contradicts it is
+ *     the check being wrong rather than the code.
+ *  2. INLINE STYLES. `style={{ color: 'var(--ds-text-warning)' }}` in JSX is
  *     invisible here. The corpus is stylesheets.
- *  3. `--color-on-*` AND `--color-inverse-*`. Skipped by design: they exist to
- *     be drawn on a colored or dark ground, so measuring them against a light
- *     page would report a wall of failures that are not failures.
+ *  3. THE INVERSE TEXT. `--ds-text-inverse` and `--ds-text-warning-inverse`
+ *     exist to be drawn on a bold or dark ground, so they are skipped where the
+ *     page is only assumed; where a rule names its ground they are measured.
  *  4. GRAPHIC-ONLY CONTRAST, AND THE INACTIVE EXEMPTION. WCAG asks 3:1 of a
  *     graphical object, 4.5:1 of text, and NOTHING AT ALL of an inactive
- *     component (1.4.11's own exception). Eight of the first run's findings
- *     were inactive table sort arrows at 1.62:1 whose `&--active` state is
- *     `--color-secondary` — exempt, and this check cannot tell that from a
- *     defect. It applies the text threshold to everything and lets the baseline
- *     carry the exemptions with a reason each, because a checker that tried to
- *     infer "is this an inactive graphic?" from a stylesheet would be guessing
- *     about the thing that matters most. A graphic can instead be DECLARED:
- *     `// @contrast: non-text` opening a rule holds that rule's own colors —
- *     never a nested rule's — to 3:1, and only if every resolved selector's
- *     subject is an icon glyph (a selector the `icon-glyph` mixin lists, in
+ *     component (1.4.11's own exception). The check applies the text threshold
+ *     to everything and lets the baseline carry the exemptions with a reason
+ *     each, because a checker that tried to infer "is this an inactive
+ *     graphic?" from a stylesheet would be guessing about the thing that
+ *     matters most. A graphic can instead be DECLARED: `// @contrast: non-text`
+ *     opening a rule holds that rule's own colors — never a nested rule's — to
+ *     3:1, and only if every resolved selector's subject is an icon glyph (a
+ *     selector the `icon-glyph` mixin lists, in
  *     `design-system/src/styles/_icon-glyph.scss`). Otherwise it is an error,
  *     not a lower bar.
  *  5. WHETHER THE REPLACEMENT IS RIGHT. It reports that a token is unreadable
- *     on the page and names the `-text` sibling where one exists. Whether that
- *     sibling is the correct color for the role is a design question.
+ *     on its ground and names the `-bolder` sibling where one exists. Whether
+ *     that sibling is the correct color for the role is a design question.
  */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { documents } from './lib/corpus.mjs';
 import { NON_TEXT, analyzeSheet, groundAt, isNonText } from './lib/declared-grounds.mjs';
 
@@ -82,13 +62,11 @@ import { colors } from './focus-ring.mjs';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const REPO_ROOT = path.resolve(__dirname, '..');
 
-export const TOKENS_FILE = `${TOKEN_DIR}/_colors.scss`;
-
 /** Stylesheets that consume tokens. The files that DEFINE them are not scanned. */
 export const CORPUS = 'design-system/src';
 
 /** Roles that are meant to sit on a color, not on the page. See blind spot 3. */
-export const OFF_PAGE = /^--color-(on|inverse)-/;
+export const OFF_PAGE = /^--ds-(?:text|icon)-(?:inverse|warning-inverse)$/;
 
 export function stylesheets(root = REPO_ROOT, dir = CORPUS) {
   // `tokens/` DEFINES the colors; a definition is not a use of one.
@@ -98,7 +76,7 @@ export function stylesheets(root = REPO_ROOT, dir = CORPUS) {
 }
 
 /**
- * Every `color:` declaration naming a `--color-*` token, with the ground its
+ * Every `color:` declaration naming a `--ds-text*` token, with the ground its
  * own rule puts it on.
  *
  * Anchored on `(^|[\s;{])color\s*:` so `background-color` and `border-color` —
@@ -134,7 +112,7 @@ export function textDeclarations(files, root = REPO_ROOT) {
         // declaration's own rule and only with an icon subject. Anywhere else
         // it is an error and the declaration keeps the text bar.
         const nonText = isNonText(sheet, at);
-        for (const match of declaration[2].matchAll(varReferencePattern('--color-'))) {
+        for (const match of declaration[2].matchAll(varReferencePattern('--ds-text'))) {
           for (const ground of grounds) {
             uses.push({ token: match[1], file, line: index + 1, source: line.trim(), ground, origin, declared, nonText });
           }
@@ -147,7 +125,7 @@ export function textDeclarations(files, root = REPO_ROOT) {
 }
 
 /**
- * The `-text` sibling of a semantic token, if the token file defines one.
+ * The `-bolder` sibling of a text token, if the token file defines one.
  *
  * `values` is the Map that `tokenValues` returns, not a plain object. The first
  * version of this used `Object.hasOwn`, which is always false on a Map — so the
@@ -155,7 +133,7 @@ export function textDeclarations(files, root = REPO_ROOT) {
  * name the fix. It failed silently and looked like "no sibling exists".
  */
 export function textSibling(token, values) {
-  const sibling = `${token}-text`;
+  const sibling = `${token}-bolder`;
   return values.has(sibling) ? sibling : null;
 }
 
@@ -164,7 +142,7 @@ export function textSibling(token, values) {
  *
  * TRANSLUCENT TINTS ARE NOT GROUNDS. An 8% tint of primary is
  * `rgba(4, 114, 168, 0.08)` — a wash over whatever is beneath. Reading it
- * as if it were solid gives `--color-primary-text` at 1.27:1 and a page of
+ * as if it were solid gives brand text at 1.27:1 and a page of
  * failures that are not there. That is the same arithmetic mistake #268's audit
  * made and had to correct, and the first draft of this check made it again: 34
  * of its 48 findings were state layers read as paint. So a translucent ground
@@ -199,7 +177,7 @@ export function findings(uses, values, { threshold = AA_TEXT } = {}) {
   const out = [];
   for (const use of uses) {
     const ground = use.ground || PAGE_TOKEN;
-    // `--color-on-*` and `--color-inverse-*` exist to be drawn on a color. If
+    // The inverse text tokens exist to be drawn on a color. If
     // the rule names its ground they are measured like anything else; only the
     // page-assumption case is skipped, because that is the one that would be
     // measuring them against a surface they were never for.
@@ -221,7 +199,7 @@ export function findings(uses, values, { threshold = AA_TEXT } = {}) {
 }
 
 export function readValues(root = REPO_ROOT) {
-  return new Map([...colors(root), ...tokenValues(fs.readFileSync(path.join(root, TOKENS_FILE), 'utf8'))]);
+  return colors(root);
 }
 
 /** Where a finding's ground came from, in words, from the origin `textDeclarations` gave it. */
@@ -248,7 +226,7 @@ export function report(found, { threshold = AA_TEXT } = {}) {
     `[text-contrast] ${found.length} text color${found.length === 1 ? '' : 's'} below AA:\n\n` +
     `${lines.join('\n\n')}\n\n` +
     `  A ground is resolved outward from the declaration's rule: the first rule with a\n` +
-    `  --color-* background or a @grounds decides, and the page if none does. If the\n` +
+    `  --ds-* background or a @grounds decides, and the page if none does. If the\n` +
     `  real ground is painted somewhere this cannot see, the check is wrong and should\n` +
     `  learn the ground; do not silence it by moving the declaration.`
   );

@@ -40,10 +40,10 @@ test("Tailwind's own --color-* theme namespace in the docs chrome is not the des
   assert.equal(findings(src('design-system/src/storybook-docs/Other.css', css)).length, 1, 'only that one file');
 });
 
-test('the token files that still declare the old names pass until the components move off them', () => {
+test('a token file that declares an old name fails, and so does a doc that teaches one', () => {
   const css = `:root {\n  ${oldColor('primary')}: #0b7b8b;\n}\n`;
-  assert.deepEqual(findings(src('design-system/src/tokens/_colors.scss', css)), []);
-  assert.equal(findings(src('design-system/src/tokens/_type.scss', css)).length, 1, 'only the named files');
+  assert.equal(findings(src('design-system/src/tokens/_type.scss', css)).length, 1);
+  assert.equal(findings(src('design-system/guidelines/x.md', `Use \`${oldColor('primary')}\`.\n`)).length, 1);
 });
 
 test('the old elevation and surface roles fail; the --ds- surfaces and shadows pass', () => {

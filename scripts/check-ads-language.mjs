@@ -14,10 +14,7 @@
  * walk finds a second copy of the tree under `.claude/worktrees/`), the token
  * files included. `docs/knowledge/archive/`, `docs/adr/` and
  * `_Avoid_:` glossary lines are allowlisted: they record the old words on
- * purpose, as history or as what not to say. `tokens/_elevation.scss` and
- * `tokens/_color_roles.scss` are also allowlisted: they are the legacy
- * `--surface-*`/`--color-surface*` alias chain itself (the shadow-or-
- * lightness decision is still open), not a component using it.
+ * purpose, as history or as what not to say.
  *
  * WHAT IT COUNTS, per rule and per file, keyed `<rule> <path>`:
  *   state-step       lines naming a `--*-state-NN` custom property, NN being 08, 12 or 16.
@@ -38,8 +35,8 @@
  *   word:PLUS-AI  lines under `design-system/src` naming the AI "PLUS AI": the product's
  *                    AI is unnamed and shows as AI (decision 1 of #1591). Prototypes keep
  *                    their own recorded copy.
- *   token:surface-layout  a `var(--surface-*)` read of a legacy layout token (#1755).
- *   token:color-surface   a `var(--color-surface*)` or `var(--color-on-surface*)` read (#1755).
+ *
+ * The old token names are `check:old-system`'s.
  *
  * EVERY RULE ALLOWS ZERO. A hit is a finding; there is no baseline to hold it
  * and no `--update` to record it. A word that is legitimately cited (a Figma
@@ -59,19 +56,10 @@ export { REPO_ROOT };
 /** The library's own source and consumer code: the language binds both. */
 export const SEARCH_ROOTS = SOURCE_ROOTS;
 export const SEARCHED = /\.(scss|css|jsx|js|mjs|html|mdx)$/;
-/**
- * Files that record the old words on purpose: history, decisions, or — for the
- * two legacy token files below — the alias chain that keeps `--surface-*` and
- * `--color-surface*`/`--color-on-surface*` resolvable while the shadow-or-
- * lightness decision is still open (`_elevation.scss` "THE ROLE LAYER"). The
- * surface-to-zero sweep (#1755) moved every component off these names; their
- * own definitions are not a component, so they stay while that decision is open.
- */
+/** Files that record the old words on purpose: history and decisions. */
 const ALLOWED_PATHS = [
   /^docs\/knowledge\/archive\//,
   /^docs\/adr\//,
-  /^design-system\/src\/tokens\/_elevation\.scss$/,
-  /^design-system\/src\/tokens\/_color_roles\.scss$/,
 ];
 /**
  * Decision records that cite the benchmark on purpose, so the citation is the
@@ -108,8 +96,6 @@ const LINE_RULES = [
   ['word:surface-container', /surface container/i],
   ['word:scrim', /\bscrim/i],
   ['word:Rovo', /\bRovo\b/],
-  ['token:surface-layout', /var\(--surface-[a-z-]+\)/i],
-  ['token:color-surface', /var\(--color-(?:on-)?surface(?:-[a-z]+)*\)/i],
 ];
 
 /**
@@ -242,14 +228,6 @@ const RULE_MESSAGE = new Map([
   [
     'state-step',
     'the 08 / 12 / 16 state steps are gone (use the named hovered, pressed and selected tokens)',
-  ],
-  [
-    'token:surface-layout',
-    'every component moved off the legacy `--surface-*` layout tokens; use the `--ds-surface-*` family',
-  ],
-  [
-    'token:color-surface',
-    'every component moved off `--color-surface*`/`--color-on-surface*`; use `--ds-surface-*`, `--ds-text`/`--ds-text-subtle` or `--ds-icon`/`--ds-icon-subtle`',
   ],
 ]);
 

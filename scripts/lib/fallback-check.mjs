@@ -92,11 +92,9 @@ export function searchedSources(repoRoot) {
  * @property {string} [census]   the word before `token(s)` in the green line.
  *           Absent for the family whose whole namespace is its own name.
  * @property {string|string[]} prefix  the name `tokenCorpus` narrows to, and
- *           the one `fallbackUsages` scans for — or a list of them, which is
- *           how the color family reads `--color-*` and `--ds-*` at once. Stated by both families rather than
- *           defaulted: `--color-` used to be the default of two separate
- *           functions, which made the color family's most load-bearing fact
- *           the one thing its descriptor did not say.
+ *           the one `fallbackUsages` scans for — or a list of them. Stated by
+ *           both families rather than defaulted, so the color family's most
+ *           load-bearing fact is the one thing its descriptor says.
  * @property {(value: string) => unknown} [normalize]  how two values of this
  *           family are compared. Defaults to color's.
  * @property {(tokens: Map<string, string>) => Map<string, string>} [select]
@@ -131,20 +129,16 @@ export function fallbackCheck(family) {
    * dimension half is the bigger one, at 1093 comparable fallbacks.
    */
   const inputs = byRoot((repoRoot) => {
-    // Aliases are resolved by `tokenCorpus`, so `--color-x: var(--color-y)`
-    // compares as `--color-y`'s value rather than as an incomparable `var()`.
-    // Load-bearing for dimensions (124 of 207 tokens are aliases) and measured,
-    // not assumed, for color: adding it found two more `--color-info-*`
-    // disagreements, one alias hop from `--color-tertiary-*` and so invisible to
-    // the check that shipped in #313. Both were fixed rather than recorded;
-    // color's set is still 191.
+    // Aliases are resolved by `tokenCorpus`, so `--ds-x: var(--palette-y)`
+    // compares as `--palette-y`'s value rather than as an incomparable `var()`.
+    // Load-bearing for dimensions (most size tokens are aliases) and measured,
+    // not assumed, for color: adding it found two more disagreements one alias
+    // hop away, invisible to the check that shipped in #313.
     //
     // The corpus resolves the WHOLE table before narrowing to the prefix, where
     // the walk this replaced resolved inside the narrowed map — so a color
-    // token aliased to a name outside `--color-*` now resolves where it used to
-    // come back as a `var()`. Measured over this tree: no such token exists, and
-    // both families' maps are byte-identical across the move (210 color, 231
-    // dimension, no differing value).
+    // token aliased to a name outside its prefix (a `--ds-*` token on a
+    // `--palette-*` ramp) resolves rather than coming back as a `var()`.
     const resolved = new Map(
       [...tokenCorpus({ root: repoRoot, prefix, precedence: 'last' })].map(([name, entry]) => [
         name,

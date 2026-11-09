@@ -28,10 +28,10 @@ const file = (p, text) => ({ path: p, text });
 const TOKENS = file(
   'tokens.scss',
   ':root {\n' +
-    '  --font-family-header: "Lato", sans-serif;\n' +
-    '  --font-family-body: "Merriweather Sans", "Open Sans", sans-serif;\n' +
-    '  --font-family-title: var(--font-family-header);\n' +
-    '  --font-family-code: "Source Code Pro", monospace;\n' +
+    '  --type-family-heading: "Lato", sans-serif;\n' +
+    '  --type-family-body: "Merriweather Sans", "Open Sans", sans-serif;\n' +
+    '  --type-family-heading-serif: var(--type-family-heading);\n' +
+    '  --type-family-code: "Source Code Pro", monospace;\n' +
     '}\n',
 );
 
@@ -43,8 +43,8 @@ test('the tree as it stands has no findings', () => {
   assert.deepEqual(failures(files), []);
 });
 
-test('display4: a token that names a face and no generic', () => {
-  const found = failures([file('t.scss', ':root { --font-family-display4: "Open Sans"; }')]);
+test('a token that names a face and no generic', () => {
+  const found = failures([file('t.scss', ':root { --type-family-brand-body: "Open Sans"; }')]);
   assert.equal(found.length, 1);
   assert.match(found[0], /ends in "Open Sans", not a CSS generic/);
 });
@@ -52,27 +52,27 @@ test('display4: a token that names a face and no generic', () => {
 test('the wrong face: a body fallback that names the header face', () => {
   const found = failures([
     TOKENS,
-    file('App.scss', ".a { font-family: var(--font-family-body, 'Lato', sans-serif); }"),
+    file('App.scss', ".a { font-family: var(--type-family-body, 'Lato', sans-serif); }"),
   ]);
   assert.equal(found.length, 1);
   assert.match(found[0], /names "Lato" where the token is "Merriweather Sans"/);
 });
 
 test("#267's measurement: a monospace token that falls back to sans-serif", () => {
-  const found = failures([file('t.scss', ':root { --font-family-code: "Source Code Pro", sans-serif; }')]);
+  const found = failures([file('t.scss', ':root { --type-family-code: "Source Code Pro", sans-serif; }')]);
   assert.equal(found.length, 1);
   assert.match(found[0], /monospace token and falls back to "sans-serif"/);
   assert.match(found[0], /171\.13px/, 'the message carries the measurement, not an opinion');
 });
 
 test('a bare face name as the whole fallback is a finding', () => {
-  const found = failures([TOKENS, file('a.jsx', "s = 'var(--font-family-header, Lato)'")]);
+  const found = failures([TOKENS, file('a.jsx', "s = 'var(--type-family-heading, Lato)'")]);
   assert.equal(found.length, 1);
   assert.match(found[0], /ends in "Lato", not a CSS generic/);
 });
 
 test('`inherit` is not a family', () => {
-  const found = failures([TOKENS, file('a.jsx', "s = 'var(--font-family-body, inherit)'")]);
+  const found = failures([TOKENS, file('a.jsx', "s = 'var(--type-family-body, inherit)'")]);
   assert.equal(found.length, 1);
   assert.match(found[0], /ends in "inherit"/);
 });
@@ -84,35 +84,35 @@ test('a SHORTER stack is fine — a fallback is a safety net, not a duplicate', 
   // ends in a generic. 13 files in the tree do exactly this.
   const found = failures([
     TOKENS,
-    file('a.scss', '.a { font-family: var(--font-family-body, "Merriweather Sans", sans-serif); }'),
+    file('a.scss', '.a { font-family: var(--type-family-body, "Merriweather Sans", sans-serif); }'),
   ]);
   assert.deepEqual(found, []);
 });
 
 test('a fallback of nothing but a generic claims no face, so it claims nothing wrong', () => {
-  const found = failures([TOKENS, file('a.scss', '.a { font-family: var(--font-family-body, sans-serif); }')]);
+  const found = failures([TOKENS, file('a.scss', '.a { font-family: var(--type-family-body, sans-serif); }')]);
   assert.deepEqual(found, []);
 });
 
 test('a fallback that is another family token cannot disagree with anything', () => {
   const found = failures([
     TOKENS,
-    file('a.scss', '.a { font-family: var(--font-family-title, var(--font-family-header)); }'),
+    file('a.scss', '.a { font-family: var(--type-family-heading-serif, var(--type-family-heading)); }'),
   ]);
   assert.deepEqual(found, []);
 });
 
 test('an alias resolves to the stack it points at', () => {
   const tokens = familyTokens([TOKENS]);
-  assert.deepEqual(resolve('--font-family-title', tokens), ['Lato', 'sans-serif']);
-  assert.equal(resolve('--font-family-nope', tokens), null);
+  assert.deepEqual(resolve('--type-family-heading-serif', tokens), ['Lato', 'sans-serif']);
+  assert.equal(resolve('--type-family-nope', tokens), null);
 });
 
 test('a cycle resolves to null rather than hanging', () => {
   const tokens = familyTokens([
-    file('t.scss', ':root { --font-family-a: var(--font-family-b); --font-family-b: var(--font-family-a); }'),
+    file('t.scss', ':root { --type-family-a: var(--type-family-b); --type-family-b: var(--type-family-a); }'),
   ]);
-  assert.equal(resolve('--font-family-a', tokens), null);
+  assert.equal(resolve('--type-family-a', tokens), null);
 });
 
 test('quotes are not part of a family name, and the generics are the CSS ones', () => {
@@ -133,7 +133,7 @@ test('quotes are not part of a family name, and the generics are the CSS ones', 
 
 test('a font stack with no generic in a fixture tree is a finding', () => {
   const { root, done } = policyTree({
-    'design-system/src/tokens/_fonts.scss': ':root { --font-family-display4: "Open Sans"; }\n',
+    'design-system/src/tokens/_type.scss': ':root { --type-family-brand-body: "Open Sans"; }\n',
   });
   try {
     const found = messagesOf(run, root);

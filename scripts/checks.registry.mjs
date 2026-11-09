@@ -453,15 +453,6 @@ export const CHECKS = [
     guards: 'every bot skill naming only tools that exist, ending in a `## Exit` of answer, file or hand off, with a description within its budget.',
   },
   {
-    name: 'check:figma-color-drift',
-    script: 'node scripts/check-figma-color-drift.mjs',
-    pkg: 'root',
-    trigger: 'pull_request',
-    module: 'scripts/check-figma-color-drift.mjs',
-    floors: { MAX_AGE_DAYS: 180, MIN_COMPARED: 90 },
-    guards: 'the CSS still painting the color values Figma holds, or each difference recorded with its reason.',
-  },
-  {
     name: 'check:token-generation',
     script: 'node scripts/check-token-generation.mjs',
     pkg: 'root',
@@ -520,17 +511,6 @@ export const CHECKS = [
     baseline: 'scripts/baselines/no-primitive-reads.json',
     update: 'node scripts/check-no-primitive-reads.mjs --update',
     guards: 'components and patterns reading a numbered primitive instead of a tier token, counted per file; the residue may fall and never rise.',
-  },
-  {
-    name: 'check:atlassian-benchmark',
-    script: 'node scripts/check-atlassian-benchmark.mjs',
-    pkg: 'root',
-    trigger: 'pull_request',
-    module: 'scripts/check-atlassian-benchmark.mjs',
-    floors: { MAX_AGE_DAYS: 365 },
-    baseline: 'scripts/baselines/atlassian-benchmark.json',
-    update: 'npm run benchmark:atlassian -- --update',
-    guards: 'the token benchmark against Atlassian staying a dated measurement, and the gaps it found staying closed once they close.',
   },
   {
     name: 'check:unspread-rest',
@@ -627,14 +607,6 @@ export const CHECKS = [
     trigger: 'pull_request',
     module: 'agents/uno-bot/scripts/check-worker-host.mjs',
     guards: "the single definition of the Worker's hostname across workflows and docs/.",
-  },
-  {
-    name: 'check:typography-classes',
-    script: 'node scripts/check-typography-classes.mjs',
-    pkg: 'root',
-    trigger: 'pull_request',
-    module: 'scripts/check-typography-classes.mjs',
-    guards: 'every `*-txt` class a page asks for against a rule that actually sets type.',
   },
   {
     name: 'check:text-contrast',

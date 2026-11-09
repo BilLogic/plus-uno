@@ -49,7 +49,7 @@ describe("the eval corpus is withheld from the bot", () => {
     // the evals would trade a real capability for a measurement.
     for (const path of [
       "design-system/src/components/Badge/Badge.tsx",
-      "design-system/src/tokens/_colors.scss",
+      "design-system/src/tokens/_type.scss",
       "agents/uno-bot/AGENT.md",
       "docs/adr/020-requester-scoped-slack-visibility-per-user-tokens-own.md",
       "docs/connectors/figma/overview.md",

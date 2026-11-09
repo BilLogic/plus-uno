@@ -9,16 +9,15 @@
  * map has existed. A theme map is a generator; the thing worth checking is
  * everything it generates, whether or not someone wrote a story for it.
  *
- * The duplicate assertion has no accessibility rule behind it at all. `info` is
- * `var(--color-tertiary)` — one line in the token file that makes two style
- * names render one appearance. No tool compares token values for equality,
- * because no tool knows they were meant to differ.
+ * The duplicate assertion has no accessibility rule behind it at all. Two style
+ * names whose tokens alias one value render one appearance, and no tool
+ * compares token values for equality, because no tool knows they were meant to
+ * differ.
  *
- * WHY IT IS A RATCHET AND NOT A THRESHOLD. Both findings are color-token
- * decisions (#268): does `--color-warning` need a darker filled variant, and
- * should `info` be re-pointed or merged? Neither is Button's to make, and
- * failing the build on someone else's open question would get the check turned
- * off. Recording them means the NEXT one fails loudly, which is the whole value.
+ * WHY IT IS A RATCHET AND NOT A THRESHOLD. A finding can be a color-token
+ * decision (#268) rather than Button's to make, and failing the build on
+ * someone else's open question would get the check turned off. Recording it
+ * means the NEXT one fails loudly, which is the whole value.
  *
  * The baseline may shrink and must never grow. An entry that no longer fails is
  * reported, so a fix cannot be made and the entry quietly left behind.

@@ -3,21 +3,17 @@
  * `npm run check:ds-fallbacks` — no `--ds-*` color token is written with a
  * fallback.
  *
- * WHY THE RECORD IS EMPTY. The legacy `--color-*` tokens carry their
- * fallbacks as debt: well over a hundred disagree with their own token, and
- * `check:color-fallbacks` can only stop that set growing. The `--ds-*` tokens
- * start with none, so this ratchet starts at zero and has nowhere lower to go:
- * every fallback is new, and every one fails. A fallback only paints when the
+ * WHY THE RECORD IS EMPTY. The `--ds-*` tokens carry no fallbacks, so this
+ * ratchet starts at zero and has nowhere lower to go: every fallback is new,
+ * and every one fails. A fallback only paints when the
  * token fails to load, and every `--ds-*` token has four values (light, dark and
  * each with increased contrast) where a literal has one — so a fallback is not
  * a safety net but a fifth, unmoded color that shows up only when something
- * else has already broken. Atlassian's own `token(path, fallback)` writes one;
- * the color migration's house rules do not.
+ * else has already broken.
  *
  * WHAT COUNTS. Any `var(--ds-…, …)`: a literal (`#fff`, `rgba(…)`, `white`) and
- * a nested `var()` alike. A `var(--ds-x, var(--color-y))` reads as a bridge to
- * the legacy name, and it is the same unmoded fallback one hop later, so it is
- * not an exception either. A use written across lines counts: the capture is
+ * a nested `var()` alike. A `var(--ds-x, var(--y))` is the same unmoded
+ * fallback one hop later, so it is not an exception either. A use written across lines counts: the capture is
  * `fallbackUsages` from `scripts/token-fallbacks.mjs`, the one the fallback
  * checks share, read over the whole file. Its one blind spot is theirs too — a
  * fallback nested more than one `var()` deep is not matched.

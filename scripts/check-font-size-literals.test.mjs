@@ -31,8 +31,8 @@ test('a calc() that scales a token is derived, not a literal', () => {
 });
 
 test('a literal fallback is a literal: it is the size the text draws when the token is missing', () => {
-  const [finding] = at('.a { font-size: var(--font-size-fa-body2, 12px); }');
-  assert.equal(finding.value, 'var(--font-size-fa-body2, 12px)');
+  const [finding] = at('.a { font-size: var(--icon-font-sm, 12px); }');
+  assert.equal(finding.value, 'var(--icon-font-sm, 12px)');
 });
 
 test('a font shorthand with a number in it is a literal', () => {

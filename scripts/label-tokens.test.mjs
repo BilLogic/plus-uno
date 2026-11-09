@@ -1,12 +1,7 @@
 /**
- * The tokens the label components (Status, Count, Tag) draw with, pinned to
- * the values the BS4 Foundation variables hold.
- *
- * - `Pad/pad-x-xs` aliases `space-025` (4): the trailing padding of a pill
- *   that ends in a Remove button, beside the other Pad steps.
- * - `<Hue> Border Subtle` is the hue at 45% alpha, the border of every outlined
- *   label. A paint opacity on a bound color does not carry into Figma
- *   instances, so the alpha lives in the token rather than at the use site.
+ * The pad the label components (Status, Count, Tag) draw with: `Pad/pad-x-xs`
+ * aliases `space-025` (4), the trailing padding of a pill that ends in a
+ * Remove button, beside the other Pad steps.
  */
 import assert from 'node:assert/strict';
 import path from 'node:path';
@@ -14,39 +9,11 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 import { tokenCorpus } from '../design-system/src/lib/tokens-node.mjs';
-import { cssColors, normalize } from './figma-color-drift.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-
-const HUES = [
-  'success',
-  'warning',
-  'danger',
-  'tertiary',
-  'mastering-content',
-  'advocacy',
-  'relationship',
-  'social-emotional',
-  'technology-tools',
-];
 
 test('--pad-x-xs resolves to 4px, the space-025 step', () => {
   const entry = tokenCorpus({ root: REPO_ROOT, prefix: '--pad-x-' }).get('--pad-x-xs');
   assert.ok(entry, '--pad-x-xs is not declared');
   assert.equal(entry.value, '4px');
 });
-
-test('--color-info-border-subtle is the tertiary one, as every info token is', () => {
-  const colors = cssColors(REPO_ROOT);
-  assert.equal(colors.get('--color-info-border-subtle'), colors.get('--color-tertiary-border-subtle'));
-});
-
-for (const hue of HUES) {
-  test(`--color-${hue}-border-subtle is --color-${hue} at 45%`, () => {
-    const colors = cssColors(REPO_ROOT);
-    const token = `--color-${hue}-border-subtle`;
-    assert.equal(colors.has(token), true, `${token} is not declared`);
-    const [base] = normalize(colors.get(`--color-${hue}`)).split('@');
-    assert.equal(normalize(colors.get(token)), `${base}@0.45`);
-  });
-}

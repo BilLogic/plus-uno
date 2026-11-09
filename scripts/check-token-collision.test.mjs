@@ -5,8 +5,8 @@
  * A guard nobody has watched fail is a guard nobody knows works (#191), and for
  * this one the harder half is the opposite: a guard that fires on the FIXED file
  * gets switched off within a week. The `Navbar` fix (#219) does not delete the
- * `--color-primary` link color — the light bar still wants it — it overrides it
- * inside the primary variant. So the exoneration cases below are as load-bearing
+ * brand link color — the light bar still wants it — it overrides it inside the
+ * primary variant. So the exoneration cases below are as load-bearing
  * as the detection case.
  *
  * The SCSS in each fixture is the real shape from
@@ -27,12 +27,12 @@ const lineOf = (src, needle) => src.slice(0, src.indexOf(needle)).split('\n').le
 const DEFECT = `
 .plus-navbar {
     &.plus-navbar-bg-primary {
-        background-color: var(--color-primary);
+        background-color: var(--ds-background-brand-bold);
     }
 }
 
 .plus-navbar .nav-link {
-    color: var(--color-primary);
+    color: var(--ds-background-brand-bold);
 }
 `;
 
@@ -40,28 +40,28 @@ const DEFECT = `
 const FIXED = `
 .plus-navbar {
     &.plus-navbar-bg-primary {
-        background-color: var(--color-primary);
+        background-color: var(--ds-background-brand-bold);
 
         .nav-link,
         .nav-link:hover {
-            color: var(--color-on-primary);
+            color: var(--ds-text-inverse);
         }
     }
 }
 
 .plus-navbar .nav-link {
-    color: var(--color-primary);
+    color: var(--ds-background-brand-bold);
 }
 
 .plus-navbar .nav-link:hover {
-    color: var(--color-primary);
+    color: var(--ds-background-brand-bold);
 }
 `;
 
 test('the #219 pair is reported', () => {
   const found = collisions(DEFECT);
   assert.equal(found.length, 1);
-  assert.equal(found[0].bg.token, '--color-primary');
+  assert.equal(found[0].bg.token, '--ds-background-brand-bold');
   assert.equal(found[0].fg.selector, '.plus-navbar .nav-link');
 });
 
@@ -76,15 +76,15 @@ test('an override that does not name `:hover` leaves the hover state exposed', (
   // why the real override spells out every state.
   const partial = `
 .plus-navbar.plus-navbar-bg-primary {
-    background-color: var(--color-primary);
+    background-color: var(--ds-background-brand-bold);
 }
 
 .plus-navbar.plus-navbar-bg-primary .nav-link {
-    color: var(--color-on-primary);
+    color: var(--ds-text-inverse);
 }
 
 .plus-navbar .nav-link:hover {
-    color: var(--color-primary);
+    color: var(--ds-background-brand-bold);
 }
 `;
   const found = collisions(partial);
@@ -95,23 +95,23 @@ test('an override that does not name `:hover` leaves the hover state exposed', (
 test('at equal specificity the later rule wins, here and in the browser', () => {
   const earlier = `
 .plus-navbar.plus-navbar-bg-primary {
-    background-color: var(--color-primary);
+    background-color: var(--ds-background-brand-bold);
 }
 
 .plus-navbar .nav-link {
-    color: var(--color-on-primary);
+    color: var(--ds-text-inverse);
 }
 
 .plus-navbar .nav-link {
-    color: var(--color-primary);
+    color: var(--ds-background-brand-bold);
 }
 `;
   assert.equal(collisions(earlier).length, 1, 'the earlier override does not save it');
 
   const later = earlier.split('\n').join('\n'); // same text, order swapped below
   const swapped = later.replace(
-    /color: var\(--color-on-primary\);([\s\S]*?)color: var\(--color-primary\);/,
-    'color: var(--color-primary);$1color: var(--color-on-primary);',
+    /color: var\(--ds-text-inverse\);([\s\S]*?)color: var\(--ds-background-brand-bold\);/,
+    'color: var(--ds-background-brand-bold);$1color: var(--ds-text-inverse);',
   );
   assert.deepEqual(collisions(swapped), [], 'the later override does');
 });
@@ -119,11 +119,11 @@ test('at equal specificity the later rule wins, here and in the browser', () => 
 test('sibling variants never co-apply, so they are not compared', () => {
   const siblings = `
 .plus-navbar.plus-navbar-bg-primary {
-    background-color: var(--color-primary);
+    background-color: var(--ds-background-brand-bold);
 }
 
 .plus-navbar.plus-navbar-bg-light .nav-link {
-    color: var(--color-primary);
+    color: var(--ds-background-brand-bold);
 }
 `;
   assert.deepEqual(collisions(siblings), []);
@@ -134,12 +134,12 @@ test('an element that paints its own background is left to axe', () => {
   // same box. Reporting it here would be a second opinion, not a second gate.
   const selfPainted = `
 .card {
-    background-color: var(--color-surface);
+    background-color: var(--ds-surface);
 }
 
 .card .badge {
-    background-color: var(--color-primary);
-    color: var(--color-surface);
+    background-color: var(--ds-background-brand-bold);
+    color: var(--ds-surface);
 }
 `;
   assert.deepEqual(collisions(selfPainted), []);
@@ -148,20 +148,20 @@ test('an element that paints its own background is left to axe', () => {
 test('a foreground outside the painted subtree is not a pair', () => {
   const elsewhere = `
 .plus-navbar.plus-navbar-bg-primary {
-    background-color: var(--color-primary);
+    background-color: var(--ds-background-brand-bold);
 }
 
 .plus-footer .link {
-    color: var(--color-primary);
+    color: var(--ds-background-brand-bold);
 }
 `;
   assert.deepEqual(collisions(elsewhere), []);
 });
 
 test('only a raw var() is a token — literals and layered values are not', () => {
-  assert.equal(tokenOf('var(--color-primary)'), '--color-primary');
+  assert.equal(tokenOf('var(--ds-background-brand-bold)'), '--ds-background-brand-bold');
   assert.equal(tokenOf('#0472a8'), null);
-  assert.equal(tokenOf('linear-gradient(var(--color-primary), #fff)'), null);
+  assert.equal(tokenOf('linear-gradient(var(--ds-background-brand-bold), #fff)'), null);
 });
 
 test('reachability walks the selector chain position by position', () => {
@@ -195,7 +195,7 @@ test('a brace inside a string does not swallow the rest of the file', () => {
   const quotedBrace = `
 .plus-navbar {
     &.plus-navbar-bg-primary {
-        background-color: var(--color-primary);
+        background-color: var(--ds-background-brand-bold);
     }
 
     .nav-link::after {
@@ -203,14 +203,14 @@ test('a brace inside a string does not swallow the rest of the file', () => {
     }
 
     .nav-link {
-        color: var(--color-primary);
+        color: var(--ds-background-brand-bold);
     }
 }
 `;
   const found = collisions(quotedBrace);
   assert.equal(found.length, 1, 'the collision under the quoted brace is still found');
   assert.equal(found[0].fg.selector, '.plus-navbar .nav-link');
-  assert.equal(found[0].fg.line, lineOf(quotedBrace, '        color: var(--color-primary);'));
+  assert.equal(found[0].fg.line, lineOf(quotedBrace, '        color: var(--ds-background-brand-bold);'));
 });
 
 test('a semicolon inside a string does not split the declaration it sits in', () => {
@@ -241,11 +241,11 @@ test('blanking keeps every line, so a reported line is the line in the file', ()
  * must not move.
  */
 .plus-navbar.plus-navbar-bg-primary {
-    background-color: var(--color-primary);
+    background-color: var(--ds-background-brand-bold);
 }
 
 .plus-navbar .nav-link {
-    color: var(--color-primary);
+    color: var(--ds-background-brand-bold);
 }
 `;
   assert.equal(
@@ -255,8 +255,8 @@ test('blanking keeps every line, so a reported line is the line in the file', ()
   );
 
   const [{ bg, fg }] = collisions(commented);
-  assert.equal(bg.line, lineOf(commented, 'background-color: var(--color-primary);'));
-  assert.equal(fg.line, lineOf(commented, '    color: var(--color-primary);'));
+  assert.equal(bg.line, lineOf(commented, 'background-color: var(--ds-background-brand-bold);'));
+  assert.equal(fg.line, lineOf(commented, '    color: var(--ds-background-brand-bold);'));
 });
 
 test('an override that only reaches part of the painted subtree exonerates nothing', () => {
@@ -267,15 +267,15 @@ test('an override that only reaches part of the painted subtree exonerates nothi
   // real collision — the wrong direction for a check to be wrong in.
   const partialReach = `
 .plus-navbar.plus-navbar-bg-primary {
-    background-color: var(--color-primary);
+    background-color: var(--ds-background-brand-bold);
 }
 
 .plus-navbar .nav-link {
-    color: var(--color-primary);
+    color: var(--ds-background-brand-bold);
 }
 
 .plus-navbar .plus-navbar-search .nav-link {
-    color: var(--color-on-primary);
+    color: var(--ds-text-inverse);
 }
 `;
   const found = collisions(partialReach);
@@ -291,15 +291,15 @@ test('an override whose whole chain is guaranteed still exonerates', () => {
   // off inside a week.
   const nested = `
 .plus-navbar.plus-navbar-bg-primary .plus-navbar-inner {
-    background-color: var(--color-primary);
+    background-color: var(--ds-background-brand-bold);
 }
 
 .plus-navbar .plus-navbar-inner .nav-link {
-    color: var(--color-primary);
+    color: var(--ds-background-brand-bold);
 }
 
 .plus-navbar.plus-navbar-bg-primary .plus-navbar-inner .nav-link {
-    color: var(--color-on-primary);
+    color: var(--ds-text-inverse);
 }
 `;
   assert.deepEqual(collisions(nested), []);
@@ -313,8 +313,8 @@ test('an interpolated selector is not a block, and does not eat the rule it name
 $themes: 'primary';
 
 .plus-alert-#{$theme} {
-    background-color: var(--color-surface);
-    color: var(--color-surface);
+    background-color: var(--ds-surface);
+    color: var(--ds-surface);
 }
 `;
   const declarations = flatten(interpolated);

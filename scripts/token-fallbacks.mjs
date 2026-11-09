@@ -1,12 +1,11 @@
 /**
  * What a color token says, and what the literal beside it says (#268).
  *
- * `var(--color-on-surface-variant, #5c5c5c)` reads as one decision. It is two,
- * and in this repository they disagree 191 times out of 473 comparable uses —
- * that token resolves to `#3f484a` and carries TEN different fallbacks across
- * its uses, not one of which is the token. `--color-primary` is `#0472a8` and
- * falls back in one place to `#6750a4`, which is Material's default purple and
- * appears nowhere else in this system.
+ * `var(--token, #5c5c5c)` reads as one decision. It is two, and when this was
+ * first measured they disagreed 191 times out of 473 comparable uses — one
+ * token carried TEN different fallbacks across its uses, not one of which was
+ * the token, and another fell back in one place to Material's default purple,
+ * which appears nowhere else in this system.
  *
  * A wrong emergency color is invisible until the token fails to load, and then
  * it is wrong everywhere at once — and, as that spread shows, wrong DIFFERENTLY
@@ -17,7 +16,7 @@
  * THREE DEFECTS, NOT ONE, and they need different treatment:
  *
  *   1. a literal that disagrees with its token   — 191, ratcheted
- *   2. a `var(--color-*)` for a token that is
+ *   2. a color `var()` for a token that is
  *      never defined anywhere                    —  31, must be zero
  *   3. a light-mode literal inside a dark rule    — can only ever paint wrong
  *
@@ -25,10 +24,9 @@
  * undefined tokens should fail outright rather than ratchet, on the grounds that
  * they are cheap to triage — a name is either a typo or a token somebody meant to
  * add. That turned out to be wrong about this corpus. There are 27, and they are
- * not aliases waiting for a definition: `--color-border` is used with three
- * different fallbacks (`#e5e7eb`, `#c4c7c5`, and a nested
- * `var(--color-outline-variant)`), so defining it means DECIDING a value, not
- * recording one. A check that cannot pass until someone makes 27 color
+ * not aliases waiting for a definition: one undefined name was used with three
+ * different fallbacks (two hexes and a nested `var()`), so defining it means
+ * DECIDING a value, not recording one. A check that cannot pass until someone makes 27 color
  * decisions is a check that ships red and gets switched off.
  *
  * They are kept in their own section of the baseline rather than merged with the
@@ -41,8 +39,8 @@
  * disagrees with its token", unqualified, and the color half turned out to be
  * the SMALLER half. The same measurement over dimension tokens finds 546
  * disagreements inside `design-system/src` alone, against 191 for color, and
- * they are worse: `var(--size-section-gap-sm, 16px)` appears 61 times and that
- * token is `8px`. A wrong emergency color is wrong; a gap that doubles when
+ * they are worse: one 8px gap token was written with a `16px` fallback 61
+ * times. A wrong emergency color is wrong; a gap that doubles when
  * the token sheet is late is a different layout.
  *
  * So the machinery below is parameterized by FAMILY — which tokens it looks at,
@@ -50,14 +48,14 @@
  * exactly three ways, each of which is a fact about the corpus rather than a
  * preference:
  *
- *   which tokens      color matches `--color-*` by name. Dimensions have no
- *                     single prefix (`--size-*`, `--spacing-*`, `--font-size-*`,
- *                     `--font-line-height-*` and more), so that family is
+ *   which tokens      color matches `--ds-*` by name. Dimensions have no
+ *                     single prefix (`--space-*`, `--size-*`, `--font-size-*`,
+ *                     `--line-height-*` and more), so that family is
  *                     defined by VALUE: a token counts if its resolved value is
  *                     a length. Nothing has to be added here when a new
  *                     dimension family is minted.
  *
- *   undefined names   reported for color, ignored for dimensions. `--color-border`
+ *   undefined names   reported for color, ignored for dimensions. A color name
  *                     with no definition is a real defect: the fallback IS the
  *                     color. `var(--table-cell-x, 10px)` is not — it is a
  *                     component-local custom property, defined in the component's
@@ -93,7 +91,7 @@
  * where the `normalizeColor` it replaced (`parseColor` then `toHex`) dropped
  * it. For a long time that reached no comparison here, because the fallback
  * literal was captured with `[^),]+` alone: it admits neither a comma nor a
- * `)`, so a whole `var(--color-x, rgba(…))` was not matched at all — not
+ * `)`, so a whole `var(--x, rgba(…))` was not matched at all — not
  * captured, not counted incomparable, simply not seen. Every state-layer wash
  * is written that way, so when the state-layer bases were re-mixed the stale
  * washes beside them went unreported.
@@ -131,7 +129,7 @@ const NESTED_VAR = 'var\\((?:[^()]|\\([^()]*\\))*\\)';
 const FALLBACK = `(?<literal>${NESTED_VAR}|${COLOR_FUNCTION_SOURCE}|[^),]+)`;
 
 /**
- * Every `var(--color-*, …)` in the given files, with the file and line.
+ * Every `var(--ds-*, …)` in the given files (or another prefix), with the file and line.
  *
  * A nested `var()` fallback is captured with that inner `var()` as its
  * literal, which the audit counts as not comparable rather than dropping: a
@@ -158,7 +156,7 @@ const FALLBACK = `(?<literal>${NESTED_VAR}|${COLOR_FUNCTION_SOURCE}|[^),]+)`;
  * @param {{prefix?: string|string[], multiline?: boolean}} [options] one prefix
  *        or a list of them; and whether a use may span lines
  */
-export function fallbackUsages(files, { prefix = '--color-', multiline = false } = {}) {
+export function fallbackUsages(files, { prefix = '--ds-', multiline = false } = {}) {
   const uses = [];
   const call = new RegExp(`${varReferencePattern(prefix).source}\\s*(?:,\\s*${FALLBACK})?\\s*\\)`, 'g');
   const scan = (path, first, text) => {

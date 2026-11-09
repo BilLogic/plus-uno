@@ -28,16 +28,16 @@ test('the ring is measured against a translucent ground composited over the page
   // A 12% tint of primary is a near-white ground, so a primary ring on it is
   // legible. Read as raw rgba its channels are primary's own and the check
   // compares primary against primary — four false findings in the first run.
-  const onTint = ratio('--color-primary', '--tint-primary-12', VALUES);
+  const onTint = ratio('--ds-border-brand', '--tint-primary-12', VALUES);
   assert.ok(onTint > 4, `primary on a 12% primary tint measured ${onTint}`);
-  const onPage = ratio('--color-primary', '--color-surface', VALUES);
+  const onPage = ratio('--ds-border-brand', '--ds-surface', VALUES);
   assert.ok(Math.abs(onTint - onPage) < 1, 'a 12% tint is not far from the page');
 });
 
 test('the tokens the sweep found are still the values it found them at', () => {
-  assert.ok(ratio('--color-inverse-primary', '--color-surface', VALUES) < 2);
-  assert.ok(ratio('--tint-primary-08', '--color-surface', VALUES) < 1.3);
-  assert.ok(ratio('--ds-border-focused', '--color-surface', VALUES) >= 4.5);
+  assert.ok(ratio('--ds-background-brand-subtlest', '--ds-surface', VALUES) < 2);
+  assert.ok(ratio('--tint-primary-08', '--ds-surface', VALUES) < 1.3);
+  assert.ok(ratio('--ds-border-focused', '--ds-surface', VALUES) >= 4.5);
 });
 
 test('a rule is scored on its strongest affordance, not its weakest', () => {
@@ -47,20 +47,20 @@ test('a rule is scored on its strongest affordance, not its weakest', () => {
     'design-system/src/a.scss': [
       '.a:focus {',
       '  outline: none;',
-      '  border-color: var(--color-primary);',
+      '  border-color: var(--ds-border-brand);',
       '  box-shadow: 0 0 0 0.2rem var(--tint-primary-08);',
       '}',
     ].join('\n'),
   });
   const entries = indicators(focusRules(['design-system/src/a.scss'], root), VALUES);
   assert.equal(entries.length, 1);
-  assert.equal(entries[0].best.token, '--color-primary');
+  assert.equal(entries[0].best.token, '--ds-border-brand');
   assert.deepEqual([...invisible(entries).keys()], []);
 });
 
 test('`:not(:focus)` is the unfocused state and is not a focus rule', () => {
   const root = corpus({
-    'design-system/src/a.scss': '.a:hover:not(:focus) { border-color: var(--color-inverse-primary); }',
+    'design-system/src/a.scss': '.a:hover:not(:focus) { border-color: var(--ds-background-brand-subtlest); }',
   });
   assert.deepEqual(focusRules(['design-system/src/a.scss'], root), []);
   assert.match('.a:not(:focus-visible)'.replace(NEGATED, ''), /^\.a$/);
@@ -70,12 +70,12 @@ test('a background is a ground, never an indicator', () => {
   // Scored as an affordance it is measured against itself and returns 1.00:1
   // for every rule that sets one — four findings, all the check misreading its
   // own input.
-  assert.equal([...'.a:focus { background-color: var(--color-primary); }'.matchAll(AFFORDANCE)].length, 0);
+  assert.equal([...'.a:focus { background-color: var(--ds-border-brand); }'.matchAll(AFFORDANCE)].length, 0);
 });
 
 test('a focus style nested under a focus parent counts', () => {
   const root = corpus({
-    'design-system/src/a.scss': '.range:focus {\n  &::-webkit-slider-thumb {\n    box-shadow: 0 0 0 2px var(--color-inverse-primary);\n  }\n}\n',
+    'design-system/src/a.scss': '.range:focus {\n  &::-webkit-slider-thumb {\n    box-shadow: 0 0 0 2px var(--ds-background-brand-subtlest);\n  }\n}\n',
   });
   const entries = indicators(focusRules(['design-system/src/a.scss'], root), VALUES);
   assert.equal(entries.length, 1);
@@ -93,7 +93,7 @@ const ENTRY = {
   file: 'a.scss',
   line: 3,
   selector: '.a:focus',
-  best: { token: '--color-inverse-primary', ratio: 1.62, property: 'border-color', ground: '--color-surface' },
+  best: { token: '--ds-background-brand-subtlest', ratio: 1.62, property: 'border-color', ground: '--ds-surface' },
 };
 
 test('the measured side is keyed the way the record is, and holds only rules under the bar', () => {
@@ -127,22 +127,22 @@ test('a stale exception and a reasonless one are each their own finding', () => 
 const FOCUS_BASELINE = JSON.stringify({
   why: 'Focus rules whose strongest visible affordance is under 3:1.',
   recordedAt: '2026-09-18',
-  measured: { focusRules: 0, wereUnder3to1: 0, fixedBy: '--color-focus-ring' },
+  measured: { focusRules: 0, wereUnder3to1: 0, fixedBy: '--ds-border-focused' },
   sets: { main: { reasons: 'required', entries: {} } },
 });
 
 test('an invisible focus ring in a fixture tree is a finding', () => {
   const { root, done } = policyTree({
-    'design-system/src/tokens/_colors.scss':
-      ':root { --color-surface: #f9f9fc; --color-inverse-primary: #84cfff; --color-focus-ring: #0472a8; }\n',
-    'design-system/src/tokens/_color_roles.scss': ':root { --color-focus-ring: var(--color-primary); }\n',
-    'design-system/src/a.scss': '.a:focus { outline: 2px solid var(--color-inverse-primary); }\n',
+    'design-system/src/tokens/color/_semantic.scss':
+      ':root { --ds-surface: #f9f9fc; --ds-background-brand-subtlest: #84cfff; --ds-border-focused: #0472a8; }\n',
+    'design-system/src/tokens/color/_elevation.scss': ':root { --ds-border-focused: var(--ds-border-brand); }\n',
+    'design-system/src/a.scss': '.a:focus { outline: 2px solid var(--ds-background-brand-subtlest); }\n',
     'scripts/baselines/focus-ring.json': FOCUS_BASELINE,
   });
   try {
     const found = messagesOf(run, root);
     assert.ok(
-      found.some((message) => /strongest focus affordance/.test(message) && /--color-inverse-primary/.test(message)),
+      found.some((message) => /strongest focus affordance/.test(message) && /--ds-background-brand-subtlest/.test(message)),
       `expected an invisible-ring finding, got:\n${found.join('\n')}`,
     );
   } finally {
@@ -152,7 +152,7 @@ test('an invisible focus ring in a fixture tree is a finding', () => {
 
 test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
   const { root, done } = policyTree({
-    'design-system/src/a.scss': '.a:focus { outline: 2px solid var(--color-inverse-primary); }\n',
+    'design-system/src/a.scss': '.a:focus { outline: 2px solid var(--ds-background-brand-subtlest); }\n',
     'scripts/baselines/focus-ring.json': FOCUS_BASELINE,
   });
   try {
@@ -179,7 +179,7 @@ const inverseRing = (grounds) => [
   '.x--inverse {',
   `  // @grounds: ${grounds}`,
   '  &:focus-visible::after {',
-  '    border-color: var(--color-surface);',
+  '    border-color: var(--ds-surface);',
   '  }',
   '}',
 ].join('\n');
@@ -187,12 +187,12 @@ const inverseRing = (grounds) => [
 const A = 'design-system/src/a.scss';
 
 test('@grounds: a ring is measured on each declared ground and passes when every one clears 3:1', () => {
-  const root = corpus({ [A]: inverseRing('--ds-background-neutral-bold --color-primary') });
+  const root = corpus({ [A]: inverseRing('--ds-background-neutral-bold --ds-border-brand') });
   const entries = indicators(focusRules([A], root), VALUES);
   assert.equal(entries.length, 1);
-  assert.deepEqual(entries[0].grounds.map((g) => g.ground).sort(), ['--color-primary', '--ds-background-neutral-bold']);
+  assert.deepEqual(entries[0].grounds.map((g) => g.ground).sort(), ['--ds-background-neutral-bold', '--ds-border-brand']);
   // `best` is the WEAKEST ground: the rule is only as visible as that.
-  assert.equal(entries[0].best.ground, '--color-primary');
+  assert.equal(entries[0].best.ground, '--ds-border-brand');
   assert.ok(entries[0].best.ratio >= 3);
   assert.deepEqual([...invisible(entries).keys()], []);
   assert.deepEqual(declarationErrors([A], root, VALUES), []);
@@ -200,24 +200,24 @@ test('@grounds: a ring is measured on each declared ground and passes when every
 
 test('@grounds: a single declared ground under 3:1 fails the rule, naming that ground', () => {
   // Surface on the light surface-container is the ring on a ground it was never for.
-  const root = corpus({ [A]: inverseRing('--color-primary --color-surface-container') });
+  const root = corpus({ [A]: inverseRing('--ds-border-brand --ds-surface-sunken') });
   const under = invisible(indicators(focusRules([A], root), VALUES));
   assert.equal(under.size, 1);
-  assert.equal([...under.values()][0].best.ground, '--color-surface-container');
-  assert.match(failures(under, { fresh: [...under.keys()] })[0], /on --color-surface-container/);
+  assert.equal([...under.values()][0].best.ground, '--ds-surface-sunken');
+  assert.match(failures(under, { fresh: [...under.keys()] })[0], /on --ds-surface-sunken/);
 });
 
 test('@grounds: an unknown token or an empty list is an error, not a pass', () => {
-  const unknown = corpus({ [A]: inverseRing('--color-primary --color-nope') });
-  assert.match(declarationErrors([A], unknown, VALUES).join('\n'), /--color-nope/);
+  const unknown = corpus({ [A]: inverseRing('--ds-border-brand --ds-nope') });
+  assert.match(declarationErrors([A], unknown, VALUES).join('\n'), /--ds-nope/);
   const empty = corpus({ [A]: inverseRing('') });
   assert.match(declarationErrors([A], empty, VALUES).join('\n'), /declares no grounds/);
 });
 
 test('@grounds: an undeclared ring is still measured on the page, unchanged', () => {
-  const root = corpus({ [A]: '.x:focus-visible { outline: 2px solid var(--color-surface); }\n' });
+  const root = corpus({ [A]: '.x:focus-visible { outline: 2px solid var(--ds-surface); }\n' });
   const entries = indicators(focusRules([A], root), VALUES);
-  assert.equal(entries[0].best.ground, '--color-surface');
+  assert.equal(entries[0].best.ground, '--ds-surface');
   assert.equal(invisible(entries).size, 1);
 });
 
@@ -228,44 +228,43 @@ test('@grounds: a rule whose OWN background is the page token keeps it over an a
   const root = corpus({
     [A]: [
       '.x--inverse {',
-      '  // @grounds: --color-primary',
+      '  // @grounds: --ds-border-brand',
       '  &:focus-visible {',
-      '    background-color: var(--color-surface);',
-      '    outline: 2px solid var(--color-surface);',
+      '    background-color: var(--ds-surface);',
+      '    outline: 2px solid var(--ds-surface);',
       '  }',
       '}',
     ].join('\n'),
   });
   const entries = indicators(focusRules([A], root), VALUES);
-  assert.deepEqual(entries[0].grounds.map((g) => g.ground), ['--color-surface']);
+  assert.deepEqual(entries[0].grounds.map((g) => g.ground), ['--ds-surface']);
   assert.equal(invisible(entries).size, 1);
 });
 
 test('@grounds: a bad declaration fails the whole check', () => {
   const { root, done } = policyTree({
-    'design-system/src/tokens/_colors.scss':
-      ':root { --color-surface: #f9f9fc; --color-primary: #0472a8; --color-focus-ring: #0472a8; }\n',
-    'design-system/src/tokens/_color_roles.scss': ':root { --color-focus-ring: var(--color-primary); }\n',
-    [A]: inverseRing('--color-primary --color-nope'),
+    'design-system/src/tokens/color/_semantic.scss':
+      ':root { --ds-surface: #f9f9fc; --ds-border-brand: #0472a8; --ds-border-focused: #0472a8; }\n',
+    'design-system/src/tokens/color/_elevation.scss': ':root { --ds-border-focused: var(--ds-border-brand); }\n',
+    [A]: inverseRing('--ds-border-brand --ds-nope'),
     'scripts/baselines/focus-ring.json': FOCUS_BASELINE,
   });
   try {
     const found = messagesOf(run, root);
-    assert.ok(found.some((m) => /@grounds/.test(m) && /--color-nope/.test(m)), found.join('\n'));
+    assert.ok(found.some((m) => /@grounds/.test(m) && /--ds-nope/.test(m)), found.join('\n'));
   } finally {
     done();
   }
 });
 
 /*
- * THE `--ds-` PREFIX. The Atlassian-shaped tokens live in `tokens/color/` and a
- * ring written with them is measured the way a `--color-*` one is: the token is
- * followed through its `--palette-*` alias to a value, on the ground its rule
+ * THE `--ds-` PREFIX. The color tokens live in `tokens/color/`: a ring's token
+ * is followed through its `--palette-*` alias to a value, on the ground its rule
  * paints, which may itself be a `--ds-*` token.
  */
 test('a --ds-border-focused ring is read and measured, and clears 3:1 on the page', () => {
   assert.ok(VALUES.has('--ds-border-focused'), 'the --ds- tokens are part of what the check reads');
-  assert.ok(ratio('--ds-border-focused', '--color-surface', VALUES) >= 3);
+  assert.ok(ratio('--ds-border-focused', '--ds-surface', VALUES) >= 3);
   const root = corpus({ [A]: '.x:focus-visible { outline: 2px solid var(--ds-border-focused); }\n' });
   const entries = indicators(focusRules([A], root), VALUES);
   assert.equal(entries.length, 1);
@@ -281,11 +280,11 @@ test('a --ds- background is a ground, and a --ds- token is a valid @grounds entr
   assert.equal(entries[0].best.ground, '--ds-background-brand-bold');
   assert.equal(invisible(entries).size, 0);
 
-  const declared = corpus({ [A]: inverseRing('--ds-background-brand-bold --color-primary') });
+  const declared = corpus({ [A]: inverseRing('--ds-background-brand-bold --ds-border-brand') });
   assert.deepEqual(declarationErrors([A], declared, VALUES), []);
   assert.deepEqual(
     indicators(focusRules([A], declared), VALUES)[0].grounds.map((g) => g.ground).sort(),
-    ['--color-primary', '--ds-background-brand-bold'],
+    ['--ds-background-brand-bold', '--ds-border-brand'],
   );
 });
 
@@ -293,10 +292,8 @@ const DS_SEMANTIC =
   ':root { --ds-border-focused: var(--palette-lagoon-700); --ds-border-input: var(--palette-lagoon-100); }\n';
 
 const dsFocusTree = (ring, semantic = DS_SEMANTIC) => ({
-  'design-system/src/tokens/_colors.scss': ':root { --color-surface: #f9f9fc; --color-primary: #0472a8; }\n',
-  'design-system/src/tokens/_color_roles.scss': ':root { --color-focus-ring: var(--color-primary); }\n',
   'design-system/src/tokens/color/_palette.scss':
-    ':root { --palette-lagoon-700: #147b84; --palette-lagoon-100: #e6f4f5; }\n',
+    ':root { --palette-lagoon-700: #147b84; --palette-lagoon-100: #e6f4f5; --ds-surface: #f9f9fc; }\n',
   'design-system/src/tokens/color/_semantic.scss': semantic,
   [A]: `.a:focus { outline: 2px solid var(${ring}); }\n`,
   'scripts/baselines/focus-ring.json': FOCUS_BASELINE,

@@ -204,15 +204,8 @@ test('every scale variable has explicit scopes for its property', () => {
   }
 });
 
-test('the retired size names are gone and the primitives under them still resolve', () => {
+test('the retired size names are gone', () => {
   for (const name of ['--size-element-pad-x-xs', '--size-element-pad-y-sm', '--size-element-radius-sm', '--size-element-border', '--element-pad-x-xs']) {
     assert.equal(corpus.get(name), undefined, `${name} is retired`);
   }
-  const primitives = {
-    '--size-spacing-small-space-050': '4px',
-    '--size-spacing-small-space-100': '8px',
-    '--size-border-radius-radius-200': '8px',
-    '--size-border-stroke-stroke-100': '1px',
-  };
-  for (const [name, value] of Object.entries(primitives)) assert.equal(corpus.get(name)?.value, value, name);
 });

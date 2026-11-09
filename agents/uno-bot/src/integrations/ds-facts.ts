@@ -145,7 +145,7 @@ export interface IndexEntry {
 const COMPONENTS_BARREL = "@/components";
 const NEAR_LIMIT = 10;
 
-/** The facts module's `tokenMatchers`: `--radius-<n>`, `--color-surface-container*`. */
+/** The facts module's `tokenMatchers`: `--radius-<n>`, `--stack-*`. */
 function tokenMatchers(not: string): RegExp[] {
   return [...not.matchAll(/--[\w<>*-]+/g)].map(([glob]) => {
     const source = glob

@@ -40,9 +40,7 @@ import { join, resolve } from 'node:path';
 
 import { describe, it, expect } from 'vitest';
 
-import { documents, text } from '../../scripts/lib/corpus.mjs';
-import { fallbackUsages } from '../../scripts/token-fallbacks.mjs';
-import { RETIRED_COLORS, retiredTo } from '../../scripts/lib/tokens/retire.mjs';
+import { text } from '../../scripts/lib/corpus.mjs';
 import { RETIRED_TOKENS, retiredRenames } from '../../scripts/lib/tokens/plan.mjs';
 import { parseColor, toHex } from '../src/lib/tokens.mjs';
 import {
@@ -149,7 +147,7 @@ describe('the corpus — where tokens live, answered once and read through the o
     const sources = tokenSources();
     expect(sources.length).toBeGreaterThan(4);
     expect(sources.map((s) => s.file)).toEqual([...sources.map((s) => s.file)].sort());
-    expect(sources.map((s) => s.file)).toContain('_colors.scss');
+    expect(sources.map((s) => s.file)).toContain('_scales.scss');
     for (const source of sources) {
       expect(source.path.startsWith(`${TOKEN_DIR}/`)).toBe(true);
       expect(source.text.length).toBeGreaterThan(0);
@@ -175,7 +173,7 @@ describe('the corpus — where tokens live, answered once and read through the o
     expect(corpus.get('--ds-border-focused').raw).toMatch(/^var\(--palette-/);
     expect(corpus.get('--ds-border-focused').value).toMatch(/^#[0-9a-f]{6}$/);
     expect(corpus.get('--ds-border-focused').file).toBe('color/_semantic.scss');
-    expect(corpus.has('--color-primary')).toBe(true);
+    expect([...corpus.keys()].every((name) => name.startsWith('--ds-'))).toBe(true);
     expect([...corpus.keys()].some((name) => name.startsWith('--bs-'))).toBe(false);
     expect(tokenCorpus({ prefix: '--palette-' }).values().next().value.primitive).toBe(true);
   });
@@ -203,7 +201,7 @@ describe('the corpus — where tokens live, answered once and read through the o
     mkdirSync(join(root, TOKEN_DIR, 'source'), { recursive: true });
     writeFileSync(
       join(root, TOKEN_DIR, '_fixture.scss'),
-      ':root { --color-fixture: #abc; --color-alias: var(--color-fixture); }',
+      ':root { --ds-fixture: #abc; --ds-alias: var(--ds-fixture); }',
     );
     writeFileSync(join(root, TOKEN_DIR, 'source', 'colors.json'), '{"not":"read"}');
 
@@ -211,8 +209,8 @@ describe('the corpus — where tokens live, answered once and read through the o
     expect(sources.map((s) => s.file)).toEqual(['_fixture.scss']);
 
     const corpus = tokenCorpus({ root });
-    expect([...corpus.keys()]).toEqual(['--color-fixture', '--color-alias']);
-    expect(corpus.get('--color-alias').value).toBe('#abc');
+    expect([...corpus.keys()]).toEqual(['--ds-fixture', '--ds-alias']);
+    expect(corpus.get('--ds-alias').value).toBe('#abc');
   });
 
   it('comes back empty rather than throwing for a tree with no token directory', () => {
@@ -236,35 +234,27 @@ describe('the corpus — where tokens live, answered once and read through the o
     expect(missing).toEqual([]);
   });
 
-  it('declares none of the retired legacy color names: every use moved to its --ds-* token, which is there', () => {
-    const corpus = tokenCorpus();
-    expect(RETIRED_COLORS.size).toBe(12);
-    const declared = [...RETIRED_COLORS.keys()].filter((name) => corpus.has(name));
-    expect(declared).toEqual([]);
-    const missing = [...RETIRED_COLORS.keys()].map(retiredTo).filter((name) => !corpus.has(name));
-    expect(missing).toEqual([]);
-  });
-
   it('follows an alias to the literal at the end of it', () => {
     const corpus = tokenCorpus();
-    // `--color-info` IS `var(--color-tertiary)` in `_colors.scss`.
-    expect(corpus.get('--color-info').raw).toBe('var(--color-tertiary)');
-    expect(corpus.get('--color-info').value).toBe(corpus.get('--color-tertiary').value);
-    expect(corpus.get('--color-info').resolved).toBe(true);
+    // `--icon-sm` IS `var(--size-075)`, which is `var(--space-075)`, in `_scales.scss`.
+    expect(corpus.get('--icon-sm').raw).toBe('var(--size-075)');
+    expect(corpus.get('--icon-sm').value).toBe('12px');
+    expect(corpus.get('--icon-sm').resolved).toBe(true);
   });
 
   it('records which file a token was defined in, and whether that file is the primitives', () => {
     const corpus = tokenCorpus();
-    const entry = corpus.get('--color-tertiary');
-    expect(entry.file).toBe('_colors.scss');
+    const entry = corpus.get('--pad-x-md');
+    expect(entry.file).toBe('ladder/_semantics.scss');
     expect(entry.primitive).toBe(false);
+    expect(corpus.get('--space-100').primitive).toBe(true);
     expect([...corpus.values()].some((e) => e.primitive)).toBe(true);
   });
 
   it('narrows to a prefix when a caller asks for one', () => {
-    const colors = tokenCorpus({ prefix: '--color-' });
+    const colors = tokenCorpus({ prefix: '--ds-' });
     expect(colors.size).toBeGreaterThan(100);
-    for (const name of colors.keys()) expect(name.startsWith('--color-')).toBe(true);
+    for (const name of colors.keys()) expect(name.startsWith('--ds-')).toBe(true);
   });
 
   it('takes the first definition by default and the last on request', () => {
@@ -279,11 +269,12 @@ describe('the corpus — where tokens live, answered once and read through the o
 
 describe('the family map — one statement of which family a name is in', () => {
   it('reads the longest prefix, not the first that matches', () => {
-    expect(familyOf('--font-size-body1')).toBe('font-size');
-    expect(familyOf('--font-line-height-body1')).toBe('font-line-height');
-    expect(familyOf('--font-weight-bold')).toBe('font-weight');
-    expect(familyOf('--color-primary')).toBe('color');
-    expect(familyOf('--size-spacing-medium-space-300')).toBe('size');
+    expect(familyOf('--font-size-0875')).toBe('font-size');
+    expect(familyOf('--line-height-125')).toBe('line-height');
+    expect(familyOf('--type-weight-medium')).toBe('type');
+    expect(familyOf('--ds-text')).toBe('ds');
+    expect(familyOf('--row-height-sm')).toBe('row');
+    expect(familyOf('--size-200')).toBe('size');
   });
 
   it('answers null rather than guessing for a name in no family', () => {
@@ -336,7 +327,7 @@ describe('the color key — every form the checks accept', () => {
     expect(colorKey('currentColor')).toBe(null);
     expect(colorKey('#ab')).toBe(null);
     expect(colorKey('rgb(300, 0, 0)')).toBe(null);
-    expect(colorKey('var(--color-primary)')).toBe(null);
+    expect(colorKey('var(--ds-text)')).toBe(null);
     expect(colorKey(undefined)).toBe(null);
   });
 
@@ -392,205 +383,6 @@ describe('the color key is finer than the normalizer it replaces', () => {
     expect(colorKey(overlay)).toBe(`${colorKey(solid)}14`);
     expect(sameValue(solid, overlay)).toBe(false);
   });
-
-  /*
-   * AND HOW MANY OF THEM THERE ARE, counted rather than recalled: every
-   * unordered pair of live color tokens the old normalizer could read, where
-   * it says equal and this key says unequal. The number is asserted rather
-   * than logged because a migrating caller's exposure is this number, and a
-   * drift in it is news either way.
-   *
-   * THE GENERATED COLOR SET IS LEFT OUT. When `tokens/color/` joined the corpus
-   * its `--ds-` and `--palette-` tokens took the count to 1543, and that number
-   * moves with every plan regenerated. Their exposure is nil: a `--ds-` token
-   * is never written with a fallback (`check:ds-fallbacks`), so no comparison
-   * either fallback check makes can reach one. What is counted is the legacy
-   * set, which is the set the exposure is about.
-   */
-  it('differs from the normalizer on 18 live token pairs', () => {
-    const readable = [...tokenCorpus().values()]
-      .filter((entry) => !entry.file.startsWith('color/'))
-      .map((entry) => entry.value)
-      .filter((value) => normalizeColor(value) !== null);
-
-    let pairs = 0;
-    for (let i = 0; i < readable.length; i += 1) {
-      for (let j = i + 1; j < readable.length; j += 1) {
-        if (normalizeColor(readable[i]) !== normalizeColor(readable[j])) continue;
-        if (colorKey(readable[i]) === colorKey(readable[j])) continue;
-        pairs += 1;
-      }
-    }
-    expect(pairs).toBe(18);
-  });
-
-  /*
-   * WHAT `check:color-fallbacks` COMPARES WITH ALPHA — and it is a fact about
-   * the CAPTURE, not a property of the key, which is why it is pinned with its
-   * mechanism over the whole live corpus rather than asserted as "output
-   * unchanged".
-   *
-   * THE MECHANISM. `fallbackUsages` tries a whole color function —
-   * `rgba(…)`, `rgb(…)`, `hsla(…)`, commas and all — before the plain
-   * `[^),]+` literal. Until it did, the plain literal was the only branch: it
-   * admits no comma and no `)`, so a `var(--color-x, rgba(4, 114, 168, 0.08))`
-   * was not matched AT ALL — not captured, not counted incomparable, simply
-   * not seen. That is how every state-layer wash was written, so a re-mixed
-   * base left its washes stale and nothing said so.
-   *
-   * Measured over the live tree: 0 `var(--color-*, rgba(…))` sites. All 0
-   * agree (1 until 2026-11-04, when the Onboarding completion blanket's
-   * `var(--color-scrim, rgba(0, 0, 0, 0.32))` fallback moved onto
-   * `--ds-blanket`, which carries no fallback; 3 until the Status tag's date borders moved onto --ds- tokens; 16 until the Admin, Training, Home, Login and Universal state washes moved onto --ds- tokens; 18 until 2026-11-03, when the prototypes moved onto the --ds- tokens; 34 until 2026-11-03, when the Labels state steps moved onto --ds- tokens; 38 until the Range thumb sweep; 81 until 2026-10-24, when a Dropdown
-   * fallback that duplicated its token was dropped and Tag's × lost its focus
-   * fill; 78 until 2026-10-25, when Tag and Suggestion moved onto the --ds-
-   * tokens, which carry no fallbacks), because the disagreeing washes were
-   * fixed when the capture widened, and the test asserts it: a stale wash
-   * here is a failure, not a recount.
-   */
-  it('compares every live rgba() color fallback with its alpha, because the capture reads a whole color function', () => {
-    const roots = ['design-system/src', '.storybook', 'prototypes'];
-    const extensions = ['.scss', '.css', '.jsx', '.tsx', '.mdx', '.html'];
-    const root = resolve('..');
-    const sources = roots.flatMap((dir) =>
-      documents(dir, { root, ext: extensions }).map((rel) => ({
-        path: rel,
-        text: text(rel, { root }),
-      })),
-    );
-
-    // The population this test is about: every wash written beside a color
-    // token. Counted per SITE, not per file.
-    const washes = sources.reduce(
-      (n, s) => n + (s.text.match(/var\(\s*--color-[a-z0-9-]+\s*,\s*rgba\(/g) ?? []).length,
-      0,
-    );
-    expect(washes).toBe(0);
-
-    const tokens = new Map(
-      [...tokenCorpus({ prefix: '--color-', precedence: 'last' })].map(([name, entry]) => [
-        name,
-        entry.value,
-      ]),
-    );
-    const usages = fallbackUsages(sources, { prefix: '--color-' });
-
-    // Every one of them is captured, whole.
-    const captured = usages.filter((use) => /^rgba\(/i.test(use.literal ?? ''));
-    expect(captured.length).toBe(washes);
-
-    // And compared with alpha. The counts are asserted because a DROP in
-    // either is how a capture quietly stops reading fallbacks at all. A new
-    // stylesheet whose fallbacks agree with their tokens raises them.
-    let comparable = 0;
-    let withAlpha = 0;
-    for (const use of usages) {
-      if (use.literal === null || !tokens.has(use.token)) continue;
-      const literal = colorKey(use.literal);
-      const tokenValue = colorKey(tokens.get(use.token));
-      if (literal === null || tokenValue === null) continue;
-      comparable += 1;
-      if (literal.length !== 9 && tokenValue.length !== 9) continue;
-      withAlpha += 1;
-      expect(literal, `${use.path}:${use.line} ${use.token}`).toBe(tokenValue);
-    }
-    // 82: the old Dropdown option list and its rows' state washes were
-    // deleted when value pickers moved to Select and the shared option row.
-    // 85: the last three washes that named undefined tokens
-    // (`surface-container-hover`, `surface-container-active`,
-    // `primary-state-04`) now name the on-surface and primary state layers,
-    // so they are compared here rather than skipped.
-    // 81: UserAvatar moved its inline styles into its stylesheet, on the
-    // tokens alone, and the Specs copy became an adapter over it, so four
-    // state-layer washes went with them.
-    // 80: the Dropdown item's pressed wash dropped a fallback that repeated
-    // its own token, verbatim.
-    // 78: Tag's × shows focus as the ring alone, so its two 12 focus fills
-    // (plain and elevated) went.
-    // 38: Tag and Suggestion moved onto the --ds- tokens, and their 40 state
-    // and border washes went with the legacy names.
-    // 34: Range's thumb took the brand bold steps, and its four state washes went.
-    // 18: Badge, Status and Count moved their tints onto the --ds- tokens, and
-    // their 16 state-layer washes went with the legacy names.
-    // 16: two prototype tints (the Manage Assignment banner, the Reflection
-    // option) took --ds- tokens, and their rgba fallbacks went.
-    // 3: the Admin, Training, Home, Login and Universal state washes moved onto
-    // the --ds- tokens.
-    // 1: Status tag's date borders moved onto the --ds- tokens, and two washes went.
-    // 0: the Onboarding completion blanket's scrim fallback moved onto --ds-blanket.
-    expect(withAlpha).toBe(0);
-    // 403: Divider was retired and its `.plus-divider-line` hex fallback went
-    // with it.
-    // 1711: ProgressRing's `--color-progress-ring-fill`, once undefined, was
-    // pointed at `--color-warning-container` (the only token matching its
-    // #FFE17A fallback), and became comparable.
-    // 404: the Labels moved onto the --ds- tokens, and their color fallbacks went.
-    // 643: MultipleChoice.scss left with ChoiceGroup, and its three hex
-    // fallbacks with it. 620: the date pickers moved onto the shared field and
-    // calendar, and the old Dropdown option list went, each with its fallbacks.
-    // 623: the same three washes, now naming defined tokens, became comparable.
-    // 615: the Popover took the Popup pattern's tokens, and its eight hex
-    // fallbacks went with the dark header.
-    // 614: PageLayout moved onto the Frame pattern, and its surface
-    // fill's hex fallback went with the inline styles.
-    // 607: Modal.scss moved onto the modal pattern tokens and dropped its seven
-    // color fallbacks.
-    // 600: UserAvatar and its Specs copy dropped their inline styles, and
-    // seven color fallbacks (four washes, three hex) with them.
-    // 597: the 2026-10-24 color-rules audit dropped three fallbacks that sat
-    // beside a defined token — Switch's disagreeing `#a8d1ed` twice and the
-    // Dropdown item's pressed wash.
-    // 595: the state-steps sweep dropped the two focus fills on Tag's ×.
-    // 514: Tag and Suggestion moved onto the --ds- tokens, which carry no
-    // fallbacks, so their 81 color fallbacks (40 washes) went.
-    // 486: the charts moved onto the --ds-chart tokens, and their 28 hex
-    // fallbacks went with the legacy names.
-    // 481: the Foundations docs moved onto the --ds- tokens, and the old Grid
-    // stories' five color fallbacks went with them.
-    // 477: Range's thumb took the brand bold steps, and its four washes went.
-    // 451: Badge, Status and Count moved their tinted backgrounds and text onto
-    // the --ds- tokens, and their color fallbacks went with the legacy names.
-    // 448: two prototype tints and the Reflection option text color took --ds-
-    // tokens, and their three color fallbacks went.
-    // 435: the Admin, Training, Home, Login and Universal state washes moved onto
-    // the --ds- tokens, and their 13 color fallbacks went with the legacy names.
-    // 431: the reflection prototype's base styles took --ds- tokens, and their four
-    // color fallbacks went.
-    // 404: the Labels moved onto the --ds- tokens, and their 27 color fallbacks went.
-    // 402: Skeleton's fill and shimmer moved onto color.skeleton tokens, and
-    // their two hex fallbacks went.
-    // 402 (again, 2026-11-04): the Onboarding completion blanket's scrim
-    // fallback moved onto --ds-blanket, which has none.
-    // 401: Divider was retired and its `.plus-divider-line` hex fallback went
-    // with it.
-    // 392: the surface-to-zero Material color sweep moved Tile, Rating,
-    // main.scss, the skeleton shimmer and a Pagination story canvas off
-    // `--color-surface*`/`--color-on-surface*`, and their nine hex fallbacks
-    // went with the legacy names.
-    // 264: the same sweep's specs batch moved all 233 `design-system/src/specs`
-    // files off `--color-surface*`/`--color-on-surface*`, and their 128 hex
-    // fallbacks went with the legacy names.
-    // 205: the same sweep's prototypes + root `src/` batch (35 files) moved
-    // off `--color-surface*`/`--color-on-surface*`, and their 59 hex
-    // fallbacks went with the legacy names.
-    // 201: Flag moved off react-bootstrap's Toast (#1627), and the deleted
-    // `specs/Training/Lessons/Elements/Toast/Toast.scss` took its four color
-    // fallbacks with it.
-    // 164: the Storybook docs chrome stylesheet moved onto --ds- tokens, and its 37
-    // color fallbacks went (the ladder migration of the chrome).
-    // 162: Rating moved onto --ds- icon tokens, and its two hex fallbacks went.
-    // 161: the research assistant chat moved onto the AI components, and its
-    // hand-drawn bubble's color fallback went.
-    // 158: its skeleton shimmer moved onto --ds-skeleton-subtle, and three more went.
-    // 86: every --color-* use outside specs/ moved onto the --ds- tokens, and
-    // 72 color fallbacks went with the old names; the rest were in specs/.
-    // 0: the Specs code and the root app left main (kept on archive/legacy-ds),
-    // and the last 86 comparable fallbacks with them.
-    expect(comparable).toBe(0);
-    // The default 5s is not enough under a loaded runner: this is the one test
-    // in the file that reads three source trees rather than the token
-    // directory, and a timeout here would read as a finding it never made.
-  }, 30_000);
 });
 
 describe('the dimension key — one normalizer, rem at 16px', () => {

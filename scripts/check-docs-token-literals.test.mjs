@@ -36,18 +36,18 @@ import { messagesOf, policyTree } from './lib/policy-tree.mjs';
 
 /** A token table small enough to hold in your head, shaped like the real one. */
 const defs = new Map([
-  ['--color-outline-variant', { value: '#bec8ca', file: '_colors.scss' }],
-  ['--color-scrim', { value: 'rgba(0, 0, 0, 0.38)', file: '_colors.scss' }],
-  ['--size-spacing-medium-space-300', { value: '16px', file: '_primitives.scss' }],
-  ['--size-section-gap-md', { value: 'var(--size-spacing-medium-space-300)', file: '_spacing_semantics.scss' }],
-  ['--size-element-gap-lg', { value: '12px', file: '_spacing_semantics.scss' }],
-  ['--size-element-stroke-sm', { value: '1px', file: '_spacing_semantics.scss' }],
+  ['--ds-border', { value: '#bec8ca', file: 'color/_semantic.scss' }],
+  ['--ds-blanket', { value: 'rgba(0, 0, 0, 0.38)', file: 'color/_semantic.scss' }],
+  ['--space-100', { value: '16px', file: '_scales.scss' }],
+  ['--pad-x-lg', { value: 'var(--space-100)', file: 'ladder/_semantics.scss' }],
+  ['--stack-lg', { value: '12px', file: 'ladder/_semantics.scss' }],
+  ['--stroke-1', { value: '1px', file: '_scales.scss' }],
   ['--size-page-full', { value: '100%', file: '_layout-ish.scss' }],
-  ['--size-nothing', { value: '0px', file: '_primitives.scss' }],
+  ['--size-nothing', { value: '0px', file: '_scales.scss' }],
   ['--size-breakpoint-ish', { value: '768px', file: '_layout-ish.scss' }],
-  ['--font-size-body1', { value: '1rem', file: '_fonts.scss' }],
+  ['--font-size-100', { value: '1rem', file: '_type.scss' }],
   // A family this check does not offer, holding a value the docs might use.
-  ['--layout-sidebar-width', { value: '164px', file: '_layout.scss' }],
+  ['--frame-sidebar-width-nav', { value: '164px', file: 'ladder/_patterns.scss' }],
 ]);
 const index = buildTokenIndex(defs);
 
@@ -57,9 +57,9 @@ const literals = (css, table = index) => findings(css, table).map((f) => f.liter
 test('a stylesheet that names every value in a token is silent — the green twin every case below needs', () => {
   const clean = rule(
     [
-      '  gap: var(--size-section-gap-md);',
-      '  margin: 0 0 var(--size-element-gap-lg);',
-      '  border-bottom: 1px solid var(--color-outline-variant);',
+      '  gap: var(--pad-x-lg);',
+      '  margin: 0 0 var(--stack-lg);',
+      '  border-bottom: 1px solid var(--ds-border);',
       '  width: 100%;',
       '  padding: 0;',
     ].join('\n'),
@@ -73,14 +73,14 @@ test('1. a hand-planted hex color is caught, and named with the token that alrea
   const found = findings(rule('  border-bottom: 1px solid #bec8ca;'), index);
   assert.equal(found.length, 1);
   assert.equal(found[0].literal, '#bec8ca');
-  assert.deepEqual(found[0].tokens, ['--color-outline-variant']);
+  assert.deepEqual(found[0].tokens, ['--ds-border']);
 });
 
 test('1b. shorthand hex is the same color — `#BCA` is `#bbccaa`, and case does not hide it', () => {
-  const short = buildTokenIndex(new Map([['--color-x', { value: '#bbccaa', file: '_colors.scss' }]]));
+  const short = buildTokenIndex(new Map([['--ds-x', { value: '#bbccaa', file: 'color/_semantic.scss' }]]));
   const found = findings(rule('  color: #BCA;'), short);
   assert.equal(found.length, 1, 'a three-digit hex must expand before it is compared');
-  assert.deepEqual(found[0].tokens, ['--color-x']);
+  assert.deepEqual(found[0].tokens, ['--ds-x']);
   // Green twin: an unrelated color, correctly spelled, is not a finding.
   assert.deepEqual(literals(rule('  color: #123456;'), short), []);
 });
@@ -88,25 +88,25 @@ test('1b. shorthand hex is the same color — `#BCA` is `#bbccaa`, and case does
 test('1c. `rgba()` is compared by value, not by spelling', () => {
   const found = findings(rule('  background: rgba(0,0,0,.38);'), index);
   assert.equal(found.length, 1);
-  assert.deepEqual(found[0].tokens, ['--color-scrim']);
+  assert.deepEqual(found[0].tokens, ['--ds-blanket']);
 });
 
 test('2. a hand-planted px with a token equivalent is caught', () => {
   const found = findings(rule('  padding: 12px;'), index);
   assert.equal(found.length, 1);
   assert.equal(found[0].literal, '12px');
-  assert.deepEqual(found[0].tokens, ['--size-element-gap-lg']);
+  assert.deepEqual(found[0].tokens, ['--stack-lg']);
 });
 
 test('2b. rem and px are one scale — `1rem` is the 16px token, or the check misses half the file', () => {
   const found = findings(rule('  gap: 1rem;'), index);
   assert.equal(found.length, 1);
-  assert.deepEqual(found[0].tokens, ['--size-section-gap-md', '--size-spacing-medium-space-300']);
+  assert.deepEqual(found[0].tokens, ['--pad-x-lg', '--space-100']);
 });
 
 test('2c. the semantic name is offered before the primitive `_primitives.scss` bans direct use of', () => {
   const [found] = findings(rule('  gap: 16px;'), index);
-  assert.equal(found.tokens[0], '--size-section-gap-md');
+  assert.equal(found.tokens[0], '--pad-x-lg');
 });
 
 test('2d. every literal in a shorthand is reported, not just the first', () => {
@@ -114,12 +114,12 @@ test('2d. every literal in a shorthand is reported, not just the first', () => {
 });
 
 test('3. a `font-size` is never offered a spacing token, and vice versa', () => {
-  // `--font-size-body1` is 16px and so is `--size-section-gap-md`. Offering a
+  // `--font-size-100` is 16px and so is `--pad-x-lg`. Offering a
   // spacing step for a type size is the noise that gets a report ignored.
   const [size] = findings(rule('  font-size: 16px;'), index);
-  assert.deepEqual(size.tokens, ['--font-size-body1']);
+  assert.deepEqual(size.tokens, ['--font-size-100']);
   const [gap] = findings(rule('  gap: 16px;'), index);
-  assert.ok(!gap.tokens.includes('--font-size-body1'));
+  assert.ok(!gap.tokens.includes('--font-size-100'));
 });
 
 test('4. ALLOWANCE — zero, in any unit', () => {
@@ -142,25 +142,25 @@ test('5. ALLOWANCE — `100%`, even when a token happens to carry it', () => {
   assert.deepEqual(literals(rule('  width: 100%;'), pct), []);
 });
 
-test('6. ALLOWANCE — the `1px` hairline, even though `--size-element-stroke-sm` is 1px', () => {
+test('6. ALLOWANCE — the `1px` hairline, even though `--stroke-1` is 1px', () => {
   assert.deepEqual(literals(rule('  border: 1px solid #bec8ca;')), ['#bec8ca']);
   assert.deepEqual(literals(rule('  margin-bottom: -1px;')), []);
   // Red twin: 2px is a thickness somebody chose, and is not a hairline.
-  const two = buildTokenIndex(new Map([['--size-element-stroke-lg', { value: '2px', file: '_x.scss' }]]));
+  const two = buildTokenIndex(new Map([['--size-two', { value: '2px', file: '_x.scss' }]]));
   assert.deepEqual(literals(rule('  border: 2px solid red;'), two), ['2px']);
 });
 
 test('7. ALLOWANCE — a fallback inside `var(--token, fallback)` is the token being used correctly', () => {
-  assert.deepEqual(literals(rule('  color: var(--color-outline-variant, #bec8ca);')), []);
+  assert.deepEqual(literals(rule('  color: var(--ds-border, #bec8ca);')), []);
   // Nested fallbacks go with the outer one — this is the shape the real file uses.
   assert.deepEqual(
-    literals(rule('  color: var(--color-a, var(--color-outline-variant, #bec8ca));')),
+    literals(rule('  color: var(--ds-a, var(--ds-border, #bec8ca));')),
     [],
   );
   // Not everything in parentheses is a fallback: `color-mix()` keeps its own
   // arguments, so a literal alongside a guarded token is still seen.
   assert.deepEqual(
-    literals(rule('  background: color-mix(in srgb, var(--color-a, #bec8ca) 70%, #bec8ca);')),
+    literals(rule('  background: color-mix(in srgb, var(--ds-a, #bec8ca) 70%, #bec8ca);')),
     ['#bec8ca'],
   );
   // Red twin: the same color written bare is a finding.
@@ -209,7 +209,7 @@ test('10. a NEAR MISS is invisible, and that is written into the check', () => {
 });
 
 test('11. token families outside color / font-size / line-height / size are not offered', () => {
-  // `--layout-sidebar-width` is 164px. A docs-chrome pixel equal to an app-shell
+  // `--frame-sidebar-width-nav` is 164px. A docs-chrome pixel equal to an app-shell
   // grid measurement is a coincidence, not a token being ignored.
   assert.deepEqual(literals(rule('  width: 164px;')), []);
 });
@@ -234,22 +234,22 @@ test('unit — the allowances and the fallback blanker', () => {
  * @returns {string}
  */
 function tokenSheet() {
-  const decls = ['  --color-outline-variant: #bec8ca;'];
+  const decls = ['  --ds-border: #bec8ca;'];
   for (let i = 0; i < 200; i += 1) {
-    decls.push(`  --color-n${i}: #${(i + 1).toString(16).padStart(6, '0')};`);
+    decls.push(`  --ds-n${i}: #${(i + 1).toString(16).padStart(6, '0')};`);
   }
   return `:root {\n${decls.join('\n')}\n}\n`;
 }
 
 test('a hand-planted hex in a fixture docs stylesheet is a finding', () => {
   const { root, done } = policyTree({
-    'design-system/src/tokens/_colors.scss': tokenSheet(),
+    'design-system/src/tokens/color/_semantic.scss': tokenSheet(),
     '.storybook/storybook-overrides.css': '.sb-ds-doc-section { border-bottom: 1px solid #bec8ca; }\n',
   });
   try {
     const found = messagesOf(run, root);
     assert.ok(
-      found.some((message) => /#bec8ca/.test(message) && /--color-outline-variant/.test(message)),
+      found.some((message) => /#bec8ca/.test(message) && /--ds-border/.test(message)),
       `expected a token-literal finding, got:\n${found.join('\n')}`,
     );
   } finally {
@@ -286,26 +286,26 @@ test('chrome 1b. green twin: a token, and a hex that only a comment mentions', (
 });
 
 test('chrome 2. a pre-ladder token name is caught, in a stylesheet and in a component style', () => {
-  const css = '.a { color: var(--color-on-surface); margin: var(--size-section-gap-md); }';
+  const css = '.a { color: var(--color-gone); margin: var(--size-gone); }';
   assert.deepEqual(
     chromeFindings(css, { css: true }).map((f) => f.literal),
-    ['--color-on-surface', '--size-section-gap-md'],
+    ['--color-gone', '--size-gone'],
   );
-  const jsx = "const s = { borderRadius: 'var(--size-card-radius-sm)', gap: 'var(--element-stack-md)' };";
+  const jsx = "const s = { borderRadius: 'var(--size-gone)', gap: 'var(--element-stack-md)' };";
   assert.deepEqual(
     chromeFindings(jsx, { css: false }).map((f) => f.literal),
-    ['--size-card-radius-sm', '--element-stack-md'],
+    ['--size-gone', '--element-stack-md'],
   );
   assert.deepEqual(
-    chromeFindings('.a { font-family: var(--font-family-headline); font-weight: var(--font-weight-medium); }', { css: true }).map((f) => f.literal),
-    ['--font-family-headline', '--font-weight-medium'],
+    chromeFindings('.a { font-family: var(--font-family-h9); font-weight: var(--font-weight-semibold-9); }', { css: true }).map((f) => f.literal),
+    ['--font-family-h9', '--font-weight-semibold-9'],
   );
 });
 
 test('chrome 2b. green twin: the current vocabulary, and a definition that is not a use', () => {
   const clean =
     '@theme inline { --color-card: var(--card); }\n' +
-    '.a { color: var(--ds-text); gap: var(--section-stack-md); font-size: var(--font-size-100); font-size: var(--font-size-display4); font-family: var(--type-family-body); }';
+    '.a { color: var(--ds-text); gap: var(--section-stack-md); font-size: var(--font-size-100); font-size: var(--font-size-display9); font-family: var(--type-family-body); }';
   assert.deepEqual(chromeFindings(clean, { css: true }), []);
 });
 
@@ -316,15 +316,15 @@ test('chrome 3. a hex string in a component is caught; an anchor like "#top" is 
 
 test('chrome 4. run() reports the planted hex and the retired token in the live corpus layout', () => {
   const { root, done } = policyTree({
-    'design-system/src/tokens/_colors.scss': tokenSheet(),
-    '.storybook/storybook-overrides.css': '.a { color: #123456; margin: var(--size-section-gap-md); }\n',
-    'design-system/src/storybook-docs/x.jsx': "export const s = { borderRadius: 'var(--size-card-radius-sm)' };\n",
+    'design-system/src/tokens/color/_semantic.scss': tokenSheet(),
+    '.storybook/storybook-overrides.css': '.a { color: #123456; margin: var(--size-gone-too); }\n',
+    'design-system/src/storybook-docs/x.jsx': "export const s = { borderRadius: 'var(--size-gone)' };\n",
   });
   try {
     const found = messagesOf(run, root);
     assert.ok(found.some((m) => /raw hex #123456/.test(m)), found.join('\n'));
-    assert.ok(found.some((m) => /retired token --size-section-gap-md/.test(m)), found.join('\n'));
-    assert.ok(found.some((m) => /retired token --size-card-radius-sm/.test(m)), found.join('\n'));
+    assert.ok(found.some((m) => /retired token --size-gone-too/.test(m)), found.join('\n'));
+    assert.ok(found.some((m) => /retired token --size-gone/.test(m)), found.join('\n'));
   } finally {
     done();
   }
@@ -333,6 +333,6 @@ test('chrome 4. run() reports the planted hex and the retired token in the live 
 test('chrome 5. a hex inside a class or a shorthand string is caught, and so is a retired line-height', () => {
   assert.deepEqual(chromeFindings('<i className="bg-[#fff0aa]" />', { css: false }).map((f) => f.literal.trim()), ['[#fff0aa']);
   assert.deepEqual(chromeFindings("const b = '1px solid #ccc123';", { css: false }).map((f) => f.kind), ['hex']);
-  assert.deepEqual(chromeFindings('.a { line-height: var(--font-line-height-body1); }', { css: true }).map((f) => f.literal), ['--font-line-height-body1']);
+  assert.deepEqual(chromeFindings('.a { line-height: var(--font-line-height-x); }', { css: true }).map((f) => f.literal), ['--font-line-height-x']);
   assert.deepEqual(chromeFindings('<a href="#add">x</a>', { css: false }), []);
 });

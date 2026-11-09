@@ -2,9 +2,8 @@
  * `npm run check:token-collision` — no component painting text in the same
  * token as the surface under it.
  *
- * WHY IT EXISTS. `Navbar` shipped a `primary` variant whose background was
- * `var(--color-primary)` and whose links were `var(--color-primary)`: one
- * token, both sides, 1.00:1 — text that is not low-contrast but absent (#219).
+ * WHY IT EXISTS. `Navbar` shipped a `primary` variant whose background and
+ * links were the same brand token: one token, both sides, 1.00:1 — text that is not low-contrast but absent (#219).
  * It had been on `main` since the component was written, through #153's
  * contrast sweep and through #198's fix to the twenty lines above it.
  *
@@ -26,8 +25,8 @@
  *
  * IT MODELS THE CASCADE, because the fix for #219 does not delete the offending
  * pair — it overrides it. `.plus-navbar .nav-link` still says
- * `color: var(--color-primary)` (the light bar wants it); the primary variant
- * re-states the same links at higher specificity in `--color-on-primary`. A
+ * `color: var(--ds-text-brand)` (the light bar wants it); the primary variant
+ * re-states the same links at higher specificity in `--ds-text-inverse`. A
  * check that stopped at "both tokens appear in this file" would fail the fixed
  * file, so it would be turned off. So each candidate pair is exonerated when
  * another rule re-colors the same target in a different token, is guaranteed

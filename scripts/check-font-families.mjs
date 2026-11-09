@@ -3,13 +3,10 @@
  * `npm run check:font-families` — every font stack ends where somebody chose,
  * and every fallback names the face its token names.
  *
- * See `scripts/font-families.mjs` for the three shapes and what each one cost.
- * In short: `--font-family-display4` named one face and no generic, so a
- * missing Open Sans fell through to the browser's default; three files fell
- * back from `--font-family-body` to Lato, which is the HEADER face, so body
- * text would have rendered in the heading font the one time the fallback was
- * needed; and `--font-family-code` once fell back to `sans-serif`, measured at
- * 171.13px where `monospace` is 480.08px.
+ * See `scripts/font-families.mjs` for the three shapes and what each one cost:
+ * a stack that names one face and no generic, a body fallback that names the
+ * heading face, and a code stack that once fell back to `sans-serif`, measured
+ * at 171.13px where `monospace` is 480.08px.
  *
  * WHY THIS IS A HARD GATE AND NOT A RATCHET. There were seven findings and all
  * seven are fixed. A ratchet exists for a population too large to repair in one

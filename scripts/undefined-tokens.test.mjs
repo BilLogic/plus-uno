@@ -3,8 +3,8 @@
  *
  * #191's rule: a guard nobody has watched fail is a guard nobody knows works.
  * The first case here is the defect as it actually shipped — six components
- * asking for `--font-weight-light` against a system that defines
- * `--font-weight-normal: 300` — and each of the rest is one way the scanner
+ * asking for `--type-weight-light` against a system that defines
+ * `--type-weight-regular: 300` — and each of the rest is one way the scanner
  * would report something untrue if it were naive.
  *
  * Run: npm run test:scripts
@@ -38,11 +38,11 @@ const file = (p, text) => ({ path: p, text });
 
 test('the shipped defect: a used-and-undefined token is found, and counted as bare', () => {
   const { undefinedTokens } = audit([
-    file('tokens.scss', ':root { --font-weight-normal: 300; }'),
-    file('Select.scss', '.x { font-weight: var(--font-weight-light); }'),
+    file('tokens.scss', ':root { --type-weight-regular: 300; }'),
+    file('Select.scss', '.x { font-weight: var(--type-weight-light); }'),
   ]);
-  assert.deepEqual(Object.keys(undefinedTokens), ['--font-weight-light']);
-  assert.equal(undefinedTokens['--font-weight-light'].bare, 1);
+  assert.deepEqual(Object.keys(undefinedTokens), ['--type-weight-light']);
+  assert.equal(undefinedTokens['--type-weight-light'].bare, 1);
 });
 
 test('a fallback is a different defect from a bare use, and is counted apart', () => {
@@ -88,7 +88,7 @@ test('a name SCSS interpolation produced is reported apart, never counted', () =
   assert.deepEqual(result.undefinedTokens, {});
   assert.deepEqual(result.interpolated, ['--color-']);
   assert.ok(isInterpolated('--color-'));
-  assert.ok(!isInterpolated('--color-primary'));
+  assert.ok(!isInterpolated('--ds-text-brand'));
 });
 
 test('definitions and usages read the shapes they claim to', () => {
@@ -244,14 +244,14 @@ const UNDEFINED_BASELINE = JSON.stringify({
 
 test('a used-and-undefined token in a fixture tree is a finding', () => {
   const { root, done } = policyTree({
-    'design-system/src/tokens/_fonts.scss': ':root { --font-weight-normal: 300; }\n',
-    'design-system/src/Select.scss': '.x { font-weight: var(--font-weight-light); }\n',
+    'design-system/src/tokens/_type.scss': ':root { --type-weight-regular: 300; }\n',
+    'design-system/src/Select.scss': '.x { font-weight: var(--type-weight-light); }\n',
     'scripts/baselines/undefined-token-baseline.json': UNDEFINED_BASELINE,
   });
   try {
     const found = messagesOf(run, root);
     assert.ok(
-      found.some((message) => /NEW\s+--font-weight-light/.test(message)),
+      found.some((message) => /NEW\s+--type-weight-light/.test(message)),
       `expected a NEW undefined-token finding, got:\n${found.join('\n')}`,
     );
   } finally {

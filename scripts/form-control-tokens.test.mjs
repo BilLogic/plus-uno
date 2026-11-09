@@ -16,20 +16,6 @@ test('the medium radius stays 4px: Storybook won the conflict with Figma', () =>
   assert.equal(token?.value, '4px');
 });
 
-test('the four Figma surface roles resolve under their color names', () => {
-  // Figma's `Surface roles/*` alias Surface Container Lowest (#ffffff), except
-  // sunken, which aliases Surface (#f9f9fc).
-  const expected = {
-    '--color-surface-default': '#ffffff',
-    '--color-surface-overlay': '#ffffff',
-    '--color-surface-raised': '#ffffff',
-    '--color-surface-sunken': '#f9f9fc',
-  };
-  for (const [name, value] of Object.entries(expected)) {
-    assert.equal(corpus.get(name)?.value?.toLowerCase(), value, name);
-  }
-});
-
 test("Figma's Element/opacity-disabled maps to the generated disabled opacity", () => {
   const registry = JSON.parse(fs.readFileSync(REGISTRY, 'utf8'));
   assert.equal(registry.mappings.colors['Element/opacity-disabled'], 'var(--ds-opacity-disabled)');

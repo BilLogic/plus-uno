@@ -11,27 +11,25 @@
  *
  * THREE SHAPES, EACH MEASURED 2026-08-29.
  *
- * 1. A STACK WITH NO GENERIC. `--font-family-display4: "Open Sans"` names one
- *    face and nothing after it, so if Open Sans is missing the browser falls
- *    back to ITS default rather than to a family anyone chose. Every other
- *    family token in the file ends in a generic. Inline,
- *    `var(--font-family-header, Lato)` is the same defect one level down.
+ * 1. A STACK WITH NO GENERIC. A family token that names one face and nothing
+ *    after it: if the face is missing the browser falls back to ITS default
+ *    rather than to a family anyone chose. Inline,
+ *    `var(--type-family-heading, "Noto Sans")` is the same defect one level
+ *    down.
  *
  * 2. A MONOSPACE TOKEN THAT DOES NOT FALL BACK TO `monospace`. This one shipped
- *    and was fixed in #267: `--font-family-code` fell back to `sans-serif`, and
- *    the stack resolved 171.13px where `monospace` is 480.08px — not a
- *    different mono face, not monospaced at all. The rule is kept so it cannot
- *    come back.
+ *    and was fixed in #267: the code stack fell back to `sans-serif`, and it
+ *    resolved 171.13px where `monospace` is 480.08px — not a different mono
+ *    face, not monospaced at all. The rule is kept so it cannot come back.
  *
- * 3. A FALLBACK NAMING THE WRONG FACE. `var(--font-family-body, 'Lato', …)` is
- *    in three files. `--font-family-body` is Merriweather Sans; Lato is the
- *    HEADER face. If the token ever fails to load, body text renders in the
+ * 3. A FALLBACK NAMING THE WRONG FACE. A body-family fallback that names the
+ *    heading face. If the token ever fails to load, body text renders in the
  *    heading font — the fallback is not a copy of the token, it is a different
  *    decision.
  *
- * WHAT IS NOT A FINDING. A shorter stack is fine: `var(--font-family-body,
- * "Merriweather Sans", sans-serif)` drops `"Open Sans"` from the middle and
- * still starts with the right face and ends in a generic. The rule is about the
+ * WHAT IS NOT A FINDING. A shorter stack is fine: `var(--type-family-body,
+ * "Noto Sans", sans-serif)` drops the fallback face from the middle and still
+ * starts with the right face and ends in a generic. The rule is about the
  * FIRST named family and the LAST entry, not about the whole list — a fallback
  * is a safety net, not a duplicate.
  */
@@ -67,14 +65,10 @@ export function stack(value) {
     .filter(Boolean);
 }
 
-/**
- * The two names a family token goes by: `--type-family-*` is the type token
- * set generated from Figma's `Type/family-*`, and `--font-family-*` the older
- * names, most of which alias it.
- */
-export const FAMILY_PREFIXES = ['--font-family-', '--type-family-'];
+/** A family token: the type token set generated from Figma's `Family/*`. */
+export const FAMILY_PREFIXES = ['--type-family-'];
 
-/** Every `--font-family-*: …` or `--type-family-*: …` declaration in the token files. */
+/** Every `--type-family-*: …` declaration in the token files. */
 export function familyTokens(files) {
   const out = new Map();
   for (const { path: file, text } of files) {
@@ -86,7 +80,7 @@ export function familyTokens(files) {
 }
 
 /**
- * Every `var(--font-family-*, …)` or `var(--type-family-*, …)` in the corpus. The name is the module's
+ * Every `var(--type-family-*, …)` in the corpus. The name is the module's
  * `varReferencePattern`; the fallback is the rest of that `var()` call, so a
  * nested `var()` inside it is one allowance and not a truncated name.
  *

@@ -17,8 +17,8 @@
 const EPSILON = 1;
 
 /**
- * What docs prose must be, from the design system's own tokens: `body1-txt`
- * reads `--font-size-100` (16px) and `--type-family-body`, and
+ * What docs prose must be, from the design system's own tokens: it reads
+ * `--font-size-100` (16px) and `--type-family-body`, and
  * `--ds-text` in light mode is `#2c2c2b`. They are literals here because this file is
  * asserting the rendered result, and reading the token to compare against the
  * token would assert nothing.
@@ -199,7 +199,7 @@ export function measureScript(page) {
       tables,
       prose,
       tokens: {
-        fontFamily: getComputedStyle(document.documentElement).getPropertyValue('--font-family-body').trim(),
+        fontFamily: getComputedStyle(document.documentElement).getPropertyValue('--type-family-body').trim(),
         color: getComputedStyle(document.body).getPropertyValue('color'),
       },
     };

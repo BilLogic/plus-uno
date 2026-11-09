@@ -17,10 +17,9 @@
  * ever drifted apart again — it runs the SAME token pair through both paths and
  * asserts one number.
  *
- * THE PAIR is the focus ring: `--color-primary` on `--color-surface`.
- * `scripts/focus-ring.mjs` documents it as the 5.02:1 that most of the design
- * system's focus declarations already use, and `FocusRing.stories.jsx` renders
- * the same swatch. It is the one pair a check and a story both actually show.
+ * THE PAIR is the focus ring: `--ds-border-focused` on `--ds-surface`, the ring
+ * the design system's focus declarations use. It is the one pair a check and a
+ * story both actually show.
  *
  * THE TWO PATHS are not the same code, which is the point:
  *
@@ -46,11 +45,11 @@ import { describe, it, expect } from 'vitest';
 import { ratio } from '../../scripts/focus-ring.mjs';
 import { contrast, parseColor, readTokens, resolveToken, toHex } from '../src/lib/tokens.mjs';
 
-/** The two files `colors()` in the check reads, in the order it reads them. */
-const TOKEN_FILES = ['src/tokens/_colors.scss', 'src/tokens/_color_roles.scss'];
+/** The files `colors()` in the check reads, in the order it reads them. */
+const TOKEN_FILES = ['src/tokens/color/_palette.scss', 'src/tokens/color/_semantic.scss', 'src/tokens/color/_elevation.scss'];
 
-const RING = '--color-primary';
-const PAGE = '--color-surface';
+const RING = '--ds-border-focused';
+const PAGE = '--ds-surface';
 
 /** `readToken` in `FocusRing.stories.jsx`, for an opaque token: hex, or null. */
 const storyReadToken = (value) => {
@@ -63,7 +62,7 @@ const storyContrast = (a, b) => contrast(parseColor(a), parseColor(b));
 
 describe('a story and a check agree about one pair of colors', () => {
   const source = TOKEN_FILES.map((file) => readFileSync(resolve(file), 'utf8')).join('\n');
-  const values = readTokens(source, { prefix: '--color-' });
+  const values = readTokens(source, { prefix: ['--ds-', '--palette-'] });
 
   it('finds both tokens in the stylesheet', () => {
     // Without this the assertion below can pass on two nulls, which is the way

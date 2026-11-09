@@ -22,7 +22,7 @@
  *     sets it apart from a menu. The surfaces listed below are pinned one by
  *     one; auditing every `box-shadow` against the table is a different check
  *     with a much larger corpus.
- *  3. ROLES WITH NO ROW. `--surface-container` carries no shadow and appears in
+ *  3. ROLES WITH NO ROW. `--ds-surface-sunken` carries no shadow and appears in
  *     no elevation row; it is simply not covered here.
  *
  * Run: npm run test:scripts

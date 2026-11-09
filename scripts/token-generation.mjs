@@ -10,12 +10,10 @@
  * and then, four lines later, wrote all four token files anyway. The warning was
  * a `console.warn` and nothing else — no return, no exit — so the protection it
  * announced did not exist. Measured on 2026-08-29: one run of the documented,
- * one-word command took `_colors.scss` from 195 color tokens to 5, keeping only
- * `--color-primary`, `--color-secondary`, `--color-tertiary`, `--color-danger`
- * and `--color-success`, and reported `✅ All token files generated
- * successfully!` while doing it. `--color-warning-text` — the token that carries
- * the one warning value passing 4.5:1, and the fix for #312 — was among the 190
- * it deleted.
+ * one-word command took the color token file from 195 tokens to 5 and
+ * reported `✅ All token files generated successfully!` while doing it. The
+ * warning text token — the one warning value passing 4.5:1, and the fix for
+ * #312 — was among the 190 it deleted.
  *
  * It is reachable from a skill: `skills/uno-maintain/references/ds-fix.md` lists
  * `npm run generate:tokens` as the way to "regenerate SCSS from token source".
@@ -41,7 +39,7 @@ export function tokenNames(scss) {
  * and `after` is what the generator produced in memory.
  *
  * `lost` is the NAMES, not the count: "190 fewer" is a number to argue with,
- * and `--color-warning-text` is not.
+ * and the name of the token that went is not.
  */
 export function compare(files) {
   return files.map(({ file, generated, committed }) => {

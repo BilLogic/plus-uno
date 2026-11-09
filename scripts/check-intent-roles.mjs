@@ -1,31 +1,23 @@
 #!/usr/bin/env node
 /**
  * `npm run check:intent-roles` — an edge painted from an intent color names the
- * `-border` ROLE, not the base (#368).
+ * edge ROLE (`--ds-border-danger`), not the bold fill
+ * (`--ds-background-danger-bold`) (#368).
  *
- * See `scripts/intent-roles.mjs` for what is scanned and for the three things
- * the scan cannot see. The short version: `--color-danger` and
- * `--color-danger-border` are the same bytes today and not the same statement,
- * and the role is what lets warning's border move on its own — which it must,
- * since #9f8205 falls to 2.87:1 on the darkest surface step, under even the
- * 3:1 bar WCAG 1.4.11 sets for a non-text edge.
+ * See `scripts/intent-roles.mjs` for what is scanned and for what the scan
+ * cannot see.
  *
- * A RATCHET, IN BOTH DIRECTIONS. 111 of the 137 uses were migrated on
- * 2026-08-29; the 26 that remain are recorded in
- * `scripts/baselines/intent-role-adoption.json` with a reason each. A count above its
- * record is a regression. A count BELOW its record is also a finding: the
- * baseline is the document that says why a remainder is allowed to remain, and
- * one that describes code that no longer exists has stopped being readable.
+ * A RATCHET, IN BOTH DIRECTIONS. Remainders are recorded in
+ * `scripts/baselines/intent-role-adoption.json` with a reason each. A count
+ * above its record is a regression. A count BELOW its record is also a finding:
+ * the baseline is the document that says why a remainder is allowed to remain,
+ * and one that describes code that no longer exists has stopped being readable.
  *
  * EVERY ENTRY CARRIES A `why`. A baseline is a list of exceptions, and an
  * exception without a reason is just a number nobody can argue with.
  *
  * Run: `npm run check:intent-roles`.
  */
-import fs from 'node:fs';
-import path from 'node:path';
-
-import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import {
   REPO_ROOT,
   counts,
@@ -39,10 +31,8 @@ import {
 } from './intent-roles.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { acrossSets, isUnreviewed, openRatchet } from './lib/ratchet.mjs';
-import { RETIRED_COLORS } from './lib/tokens/retire.mjs';
 
 const BASELINE = 'scripts/baselines/intent-role-adoption.json';
-const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
 
 /*
  * An empty corpus agrees with everything. The floor is the number of
@@ -52,26 +42,20 @@ const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
 // Lowered from 150 to 100 when the Specs code, the root app and the specs prototypes left main (kept on archive/legacy-ds).
 export const MIN_FILES = 100;
 
-const INTENTS = ['primary', 'secondary', 'tertiary', 'danger', 'success', 'warning', 'info'];
-
 export const REMEDY =
-  '  -> An intent color on an edge names the role: `var(--color-danger-border)`,\n' +
-  `     not \`var(--color-danger)\`. The roles are defined in ${ROLES_FILE}.\n` +
-  '     In the --ds- words: `var(--ds-border-danger)`, not `var(--ds-background-danger-bold)`.\n' +
+  '  -> An intent color on an edge names the edge role: `var(--ds-border-danger)`,\n' +
+  '     not the bold fill `var(--ds-background-danger-bold)`.\n' +
   `     If a call site genuinely needs the base, record it in ${BASELINE} with a reason.`;
 
-// The corpus walk, the edge uses and the roles file are the same read for both
-// questions, so they happen once per root.
+// The corpus walk and the edge uses are the same read for both questions, so
+// they happen once per root.
 const inputs = byRoot((repoRoot) => {
   const files = stylesheets(repoRoot);
-  const rolesPath = path.join(repoRoot, ROLES_FILE);
   return {
     files,
     uses: edgeUses(files, repoRoot),
     mixed: mixedUses(files, repoRoot),
     mapped: themeMapUses(files, repoRoot),
-    // A vanished roles file is the floor case, not a crash (#611).
-    roles: fs.existsSync(rolesPath) ? fs.readFileSync(rolesPath, 'utf8') : '',
   };
 });
 
@@ -98,9 +82,8 @@ const gate = (repoRoot) => ({
  * section of `design-system/src/styles/Colors.mdx` — named state tokens for
  * hover and pressed, never a hand-mixed color — had no gate, and the 2026-10-24
  * audit of the patterns and the Popups pattern found eleven `color-mix(…,
- * black N%)` and brightness filters in Button and Dropdown. They now lay
- * `--color-shadow-state-NN` over the fill, which composites to the same
- * color. The remainder is recorded under `mixedStates`, a reason each, and
+ * black N%)` and brightness filters in Button and Dropdown. They now take the
+ * role's named hovered and pressed tokens. The remainder is recorded under `mixedStates`, a reason each, and
  * ratchets in both directions like the edges.
  */
 const mixGate = (repoRoot) => openRatchet({ file: BASELINE, set: 'mixedStates', repoRoot });
@@ -125,7 +108,7 @@ const reasonless = (...ratchets) => {
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT } = {}) {
-  const { files, uses, mixed, mapped, roles } = inputs(repoRoot);
+  const { files, uses, mixed, mapped } = inputs(repoRoot);
   const found = [];
 
   // A theme-map row that hands its edge slot the base. Held at zero, no record.
@@ -143,21 +126,6 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
         `only ${files.length} stylesheets scanned (floor ${MIN_FILES}). ` +
         'A corpus that shrank silently reports every remaining use as fixed.',
     });
-  }
-
-  /*
-   * The roles must EXIST. If `_color_roles.scss` were regenerated away — the
-   * thing its own header warns about — every migrated call site would resolve to
-   * nothing, and this check would still pass, because it counts base uses.
-   */
-  for (const intent of INTENTS) {
-    // A border retired to its `--ds-*` token (primary's is --ds-border-brand) has no legacy role to define.
-    if (RETIRED_COLORS.has(`--color-${intent}-border`)) continue;
-    if (!roles.includes(`--color-${intent}-border:`)) {
-      found.push({
-        message: `${ROLES_FILE} no longer defines --color-${intent}-border, which ${uses.length ? 'call sites' : 'the migration'} depend on.`,
-      });
-    }
   }
 
   const edges = gate(repoRoot);

@@ -24,7 +24,6 @@ const ctx = contextFrom({
       { name: '--ds-text', tier: 'semantic', group: 'Color Tokens (--ds-)', value: 'var(--palette-neutral-1000)' },
       { name: '--palette-neutral-1000', tier: 'primitive', group: 'Color Primitives (--palette-)', value: '#172b4d' },
       { name: '--space-200', tier: 'semantic', group: 'Spacing Semantics', value: '16px' },
-      { name: '--color-advocacy', tier: 'semantic', group: 'Legacy Color Tokens', value: '#167745' },
       { name: '--radius-full', tier: 'primitive', group: 'Scale Primitives', value: '9999px' },
     ],
   },
@@ -210,11 +209,15 @@ test('ds/prefer-plus-component: a react-bootstrap name the barrel also exports (
   ]);
 });
 
-test('ds/no-retired-name: a deprecated prop or a legacy token (warn)', () => {
+test('ds/no-retired-name: a deprecated prop (warn)', () => {
   const found = escapesIn({ path: 'p/App.jsx', text: DS + '<Button size="small" />' }, ctx);
   assert.deepEqual(found.map((f) => [f.rule, f.level]), [['ds/no-retired-name', 'warn']]);
   assert.match(found[0].fix, /spacing/);
-  assert.deepEqual(rulesOf('p/a.scss', '.a { color: var(--color-advocacy); }'), ['ds/no-retired-name']);
+});
+
+test('ds/no-unknown-token: a name from a deleted token set is not a token (fail)', () => {
+  const gone = ['--', 'color', '-advocacy'].join('');
+  assert.deepEqual(rulesOf('p/a.scss', `.a { color: var(${gone}); }`), ['ds/no-unknown-token']);
 });
 
 test('ds/no-primitive-read: a primitive the token plan names as a semantic step is readable', () => {

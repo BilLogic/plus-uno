@@ -97,7 +97,7 @@ export function contextFrom({
   const tokenByName = new Map(
     tokens.tokens.map((t) => [t.name, promoted.has(t.name) && t.tier === 'primitive' ? { ...t, tier: 'semantic' } : t]),
   );
-  const usable = [...tokenByName.values()].filter((t) => t.tier !== 'primitive' && !isLegacy(t));
+  const usable = [...tokenByName.values()].filter((t) => t.tier !== 'primitive');
   // Each usable token's chain of `var(--x)` hops to its literal: what lets a
   // primitive read or a raw literal be answered with the token that holds it,
   // however many tiers sit between.
@@ -139,7 +139,6 @@ export function contextFrom({
   };
 }
 
-const isLegacy = (token) => /^Legacy\b/.test(token.group);
 const normalizeValue = (v) => String(v).trim().toLowerCase().replace(/\s+/g, ' ');
 
 /** Levenshtein distance, capped for speed. */
@@ -443,8 +442,6 @@ function tokenEscapes(text, ctx, add) {
         `\`${name}\` is a primitive; consumer code reads a semantic, pattern or component token`,
         tiers.length ? holding(tiers) : 'read the semantic token that holds this value (design-system/agent-views/tokens/tokens.md)',
       );
-    } else if (token && isLegacy(token)) {
-      add('ds/no-retired-name', index, `\`${name}\` is a legacy token`, 'use the --ds-* token for the same role (design-system/agent-views/tokens/tokens.md)');
     } else if (!token && !ctx.defined.has(name)) {
       add(
         'ds/no-unknown-token',

@@ -9,17 +9,12 @@
  * rule puts it on.
  *
  * WHAT THE SWEEP FOUND, 2026-08-29. 53 focus-affordance declarations across the
- * design system, written **20 different ways** — six width tokens (`2px`,
- * `0.2rem`, `--size-element-stroke-sm|md|lg`, `--size-border-stroke-stroke-150`,
- * `--size-card-border-lg`) and seven colors. Three of those colors cannot be
- * seen against the page:
- *
- *   an 8% tint of primary       1.13:1
- *   --color-inverse-primary     1.62:1     a light tint meant for DARK grounds
- *   a 12% tint of on-surface    1.28:1
- *
- * against `--color-primary` at 5.02:1, which is what the majority of the
- * declarations already use.
+ * design system, written **20 different ways** — six widths and seven colors.
+ * Three of those colors could not be seen against the page: an 8% tint of
+ * brand at 1.13:1, a light tint meant for DARK grounds at 1.62:1, and a 12%
+ * tint of the text color at 1.28:1, against the brand ring at 5.02:1. Every
+ * ring now takes `--ds-border-focused` (or its inverse on a bold ground) and
+ * `--focus-ring-width`.
  *
  * A GLOW IS NOT AUTOMATICALLY A DEFECT, and this is the correction that shaped
  * the check. Eleven of the fourteen `box-shadow: 0 0 0 0.2rem
@@ -61,7 +56,7 @@ import {
   resolveToken,
   varReferencePattern,
 } from '../design-system/src/lib/tokens.mjs';
-import { COLOR_PREFIXES, COLOR_TOKEN_PATHS, TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+import { COLOR_PREFIXES, COLOR_TOKEN_PATHS } from '../design-system/src/lib/tokens-node.mjs';
 import { PAGE_TOKEN, tokenValues } from './button-contrast.mjs';
 import { NON_TEXT, analyzeSheet, groundAt } from './lib/declared-grounds.mjs';
 import { REPO_ROOT, stylesheets } from './text-contrast.mjs';
@@ -92,9 +87,8 @@ export const AFFORDANCE = new RegExp(
 export const NEGATED = /:not\(\s*:focus[^)]*\)/gi;
 
 /**
- * Token definitions, from the color file, the role layer that follows it, and
- * the generated `--palette-*` and `--ds-*` sets, so a ring on
- * `--ds-border-focused` is measured the way one on `--color-primary` is.
+ * Token definitions: the generated `--palette-*` and `--ds-*` sets, so a ring
+ * on `--ds-border-focused` is measured through to its ramp value.
  *
  * Missing files are skipped rather than thrown: a vanished token directory is
  * the sentinel-floor case, and throwing would report a crash instead of the
@@ -104,7 +98,7 @@ export const NEGATED = /:not\(\s*:focus[^)]*\)/gi;
  * @returns {Map<string, string>}
  */
 export function colors(root = REPO_ROOT) {
-  const source = [`${TOKEN_DIR}/_colors.scss`, `${TOKEN_DIR}/_color_roles.scss`, ...COLOR_TOKEN_PATHS]
+  const source = COLOR_TOKEN_PATHS
     .map((file) => path.join(root, file))
     .filter((file) => fs.existsSync(file))
     .map((file) => fs.readFileSync(file, 'utf8'))
@@ -172,7 +166,7 @@ export function selectorChain(source, offset) {
  * on BOTH sides.
  *
  * The ground needs compositing too, and the first draft forgot it. Four
- * findings came back at 1.22:1 for `outline: 2px solid var(--color-primary)` on
+ * findings came back at 1.22:1 for `outline: 2px solid var(--ds-border-focused)` on
  * a 12% primary tint as `background-color`: a 12% tint of primary is a
  * near-white ground where the ring measures 5.02:1, but read as a raw rgba its
  * channels are primary's own, so the check was comparing primary against

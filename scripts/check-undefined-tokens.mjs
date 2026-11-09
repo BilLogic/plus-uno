@@ -4,10 +4,10 @@
  * nowhere.
  *
  * See `scripts/undefined-tokens.mjs` for the defect and why no existing check
- * saw it. In short: `var(--font-weight-light)` is in six shipped components and
- * no such token exists, so text designed at 300 renders at its inherited
- * weight; `Tooltip` reaches for `--font-size-body4`, which does not exist
- * either, so its text has no size of its own.
+ * saw it. In short: a `light` weight token was read in six shipped components
+ * and no such token existed, so text designed at 300 rendered at its inherited
+ * weight; `Tooltip` reached for a fourth body size that did not exist either,
+ * so its text had no size of its own.
  *
  * WHY A RATCHET AND NOT A THRESHOLD. 145 names across 508 uses were already
  * there when this was written. Failing the build on all of them would have made

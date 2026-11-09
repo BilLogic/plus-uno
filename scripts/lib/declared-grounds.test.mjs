@@ -28,9 +28,9 @@ import {
 const REPO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
 const VALUES = new Map([
-  ['--color-primary', '#0472a8'],
-  ['--color-success', '#3e691a'],
-  ['--color-danger', '#ba1a1a'],
+  ['--ds-background-brand-bold', '#0472a8'],
+  ['--ds-background-success-bold', '#3e691a'],
+  ['--ds-background-danger-bold', '#ba1a1a'],
 ]);
 
 const ground = (source, needle) => groundAt(analyzeSheet(source), source.indexOf(needle));
@@ -40,26 +40,26 @@ const errors = (source) => annotationErrors('a.scss', source, VALUES, { contrast
 /* ------------------------------------------------------------- placement */
 
 test('a multi-line block comment keeps every token', () => {
-  const source = '.x {\n  /* @grounds: --color-primary\n   *   --color-success\n   *   --color-danger */\n  color: red;\n}\n';
-  assert.deepEqual(ground(source, 'color: red').tokens, ['--color-primary', '--color-success', '--color-danger']);
+  const source = '.x {\n  /* @grounds: --ds-background-brand-bold\n   *   --ds-background-success-bold\n   *   --ds-background-danger-bold */\n  color: red;\n}\n';
+  assert.deepEqual(ground(source, 'color: red').tokens, ['--ds-background-brand-bold', '--ds-background-success-bold', '--ds-background-danger-bold']);
   assert.deepEqual(errors(source), []);
 });
 
 test('a line comment is one line; the next comment is not part of it', () => {
-  const source = '.x {\n  // @grounds: --color-primary --color-success\n  // not part of it: --color-danger\n  color: red;\n}\n';
-  assert.deepEqual(ground(source, 'color: red').tokens, ['--color-primary', '--color-success']);
+  const source = '.x {\n  // @grounds: --ds-background-brand-bold --ds-background-success-bold\n  // not part of it: --ds-background-danger-bold\n  color: red;\n}\n';
+  assert.deepEqual(ground(source, 'color: red').tokens, ['--ds-background-brand-bold', '--ds-background-success-bold']);
 });
 
 test('a second @grounds in one rule is an error, and the first one stands', () => {
-  const source = '.x {\n  // @grounds: --color-primary\n  // @grounds: --color-success\n  color: red;\n}\n';
+  const source = '.x {\n  // @grounds: --ds-background-brand-bold\n  // @grounds: --ds-background-success-bold\n  color: red;\n}\n';
   assert.match(errors(source).join('\n'), /a\.scss:3 — a second @grounds in one block/);
-  assert.deepEqual(ground(source, 'color: red').tokens, ['--color-primary']);
+  assert.deepEqual(ground(source, 'color: red').tokens, ['--ds-background-brand-bold']);
 });
 
 test('an annotation after a declaration or a nested rule does not open its block', () => {
   for (const source of [
-    '.x {\n  color: red;\n  // @grounds: --color-primary\n}\n',
-    '.x {\n  .a { color: red; }\n  // @grounds: --color-primary\n  .b { color: green; }\n}\n',
+    '.x {\n  color: red;\n  // @grounds: --ds-background-brand-bold\n}\n',
+    '.x {\n  .a { color: red; }\n  // @grounds: --ds-background-brand-bold\n  .b { color: green; }\n}\n',
   ]) {
     assert.match(errors(source).join('\n'), /@grounds must open its block/);
     assert.deepEqual(ground(source, 'color: red'), { kind: 'page' });
@@ -67,49 +67,49 @@ test('an annotation after a declaration or a nested rule does not open its block
 });
 
 test('an annotation at the top level or inside an at-rule belongs to no rule: an error', () => {
-  assert.match(errors('// @grounds: --color-primary\n.x { color: red; }\n').join('\n'), /must open its block/);
-  assert.match(errors('@media (min-width: 1px) {\n  // @grounds: --color-primary\n  .x { color: red; }\n}\n').join('\n'), /must open its block/);
+  assert.match(errors('// @grounds: --ds-background-brand-bold\n.x { color: red; }\n').join('\n'), /must open its block/);
+  assert.match(errors('@media (min-width: 1px) {\n  // @grounds: --ds-background-brand-bold\n  .x { color: red; }\n}\n').join('\n'), /must open its block/);
 });
 
 /* ------------------------------------------------------- ground resolution */
 
 test('a nearer background beats a farther @grounds', () => {
-  const source = '.x {\n  // @grounds: --color-primary\n  .y {\n    background-color: var(--color-success);\n    .z { color: red; }\n  }\n}\n';
-  assert.deepEqual(ground(source, 'color: red'), { kind: 'background', token: '--color-success', line: 3, own: false });
+  const source = '.x {\n  // @grounds: --ds-background-brand-bold\n  .y {\n    background-color: var(--ds-background-success-bold);\n    .z { color: red; }\n  }\n}\n';
+  assert.deepEqual(ground(source, 'color: red'), { kind: 'background', token: '--ds-background-success-bold', line: 3, own: false });
 });
 
 test('a nearer @grounds beats a farther background', () => {
-  const source = '.x {\n  background-color: var(--color-success);\n  .y {\n    // @grounds: --color-primary\n    color: red;\n  }\n}\n';
-  assert.deepEqual(ground(source, 'color: red').tokens, ['--color-primary']);
+  const source = '.x {\n  background-color: var(--ds-background-success-bold);\n  .y {\n    // @grounds: --ds-background-brand-bold\n    color: red;\n  }\n}\n';
+  assert.deepEqual(ground(source, 'color: red').tokens, ['--ds-background-brand-bold']);
 });
 
 test('a rule that paints the page token itself keeps it over an ancestor @grounds', () => {
-  const source = '.x {\n  // @grounds: --color-primary\n  .y {\n    background-color: var(--color-surface);\n    color: red;\n  }\n}\n';
-  assert.equal(ground(source, 'color: red').token, '--color-surface');
+  const source = '.x {\n  // @grounds: --ds-background-brand-bold\n  .y {\n    background-color: var(--ds-surface);\n    color: red;\n  }\n}\n';
+  assert.equal(ground(source, 'color: red').token, '--ds-surface');
 });
 
 test('one-line and multi-line blocks resolve the same', () => {
-  const oneLine = '.x { // @grounds: --color-primary\n .y { color: red; } }\n';
-  const multi = '.x {\n  // @grounds: --color-primary\n  .y {\n    color: red;\n  }\n}\n';
+  const oneLine = '.x { // @grounds: --ds-background-brand-bold\n .y { color: red; } }\n';
+  const multi = '.x {\n  // @grounds: --ds-background-brand-bold\n  .y {\n    color: red;\n  }\n}\n';
   assert.deepEqual(ground(oneLine, 'color: red').tokens, ground(multi, 'color: red').tokens);
-  const bgOne = '.x { background-color: var(--color-success); .y { color: red; } }\n';
-  const bgMulti = '.x {\n  background-color: var(--color-success);\n  .y {\n    color: red;\n  }\n}\n';
+  const bgOne = '.x { background-color: var(--ds-background-success-bold); .y { color: red; } }\n';
+  const bgMulti = '.x {\n  background-color: var(--ds-background-success-bold);\n  .y {\n    color: red;\n  }\n}\n';
   assert.equal(ground(bgOne, 'color: red').token, ground(bgMulti, 'color: red').token);
 });
 
 test('@grounds covers every rule nested in the one it opens — siblings included, by design', () => {
   // Children of a block on primary are on primary. This is attached to `.zz`
   // structurally, so it is scope, not a leak.
-  const source = '.zz {\n  // @grounds: --color-primary\n  .a { color: red; }\n  .b { color: green; }\n}\n.other { color: blue; }\n';
-  assert.deepEqual(ground(source, 'color: red').tokens, ['--color-primary']);
-  assert.deepEqual(ground(source, 'color: green').tokens, ['--color-primary']);
+  const source = '.zz {\n  // @grounds: --ds-background-brand-bold\n  .a { color: red; }\n  .b { color: green; }\n}\n.other { color: blue; }\n';
+  assert.deepEqual(ground(source, 'color: red').tokens, ['--ds-background-brand-bold']);
+  assert.deepEqual(ground(source, 'color: green').tokens, ['--ds-background-brand-bold']);
   assert.deepEqual(ground(source, 'color: blue'), { kind: 'page' });
 });
 
 test('the innermost @grounds wins', () => {
-  const source = '.x {\n  // @grounds: --color-primary\n  color: red;\n  .y {\n    // @grounds: --color-success\n    color: green;\n  }\n}\n';
-  assert.deepEqual(ground(source, 'color: red').tokens, ['--color-primary']);
-  assert.deepEqual(ground(source, 'color: green').tokens, ['--color-success']);
+  const source = '.x {\n  // @grounds: --ds-background-brand-bold\n  color: red;\n  .y {\n    // @grounds: --ds-background-success-bold\n    color: green;\n  }\n}\n';
+  assert.deepEqual(ground(source, 'color: red').tokens, ['--ds-background-brand-bold']);
+  assert.deepEqual(ground(source, 'color: green').tokens, ['--ds-background-success-bold']);
 });
 
 /* ----------------------------------------------------- @contrast: non-text */
