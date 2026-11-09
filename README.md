@@ -8,7 +8,7 @@ summary: The front page — what plus-uno is, every surface it ships (Storybook,
 
 The agentic design-ops workspace of the [PLUS](https://tutors.plus/) design team. PLUS is a nonprofit tutoring program: 500+ college tutors working with 3,000+ K-12 students. One repo holds the design system, the prototypes built from it, and **uno**, the agent that researches, prototypes, reviews and maintains that work, in the IDE and in Slack.
 
-It is a prototype estate, not a production app: nothing here serves tutors or students.
+It is a prototype estate, not a production app.
 
 | | |
 |---|---|
@@ -30,7 +30,7 @@ People ask for work in **skills**. Skills summon **agents**. Agents follow **con
 | Vibe app and demo | The product's screens, and the recorded walkthrough | `prototypes/live-app/`, `prototypes/home-redesign/` | [`prototypes/README.md`](prototypes/README.md) |
 | Prototypes and marketplace | Branch experiments, cataloged in Notion | `prototypes/`, `skills/uno-publish/` | [`docs/connectors/notion/marketplace-db.md`](docs/connectors/notion/marketplace-db.md) |
 | uno skills and agents | Six IDE workflows and the agents they summon | `skills/`, `agents/` | [`skills/README.md`](skills/README.md) · [`agents/README.md`](agents/README.md) |
-| uno-bot | uno in Slack, a Cloudflare Worker | `agents/uno-bot/` | [`agents/uno-bot/README.md`](agents/uno-bot/README.md) |
+| uno-bot | uno in Slack as `@le goat`, a Cloudflare Worker | `agents/uno-bot/` | [`agents/uno-bot/README.md`](agents/uno-bot/README.md) |
 | uno-blueprint | The current service journey, in Supabase | [BilLogic/uno-blueprint](https://github.com/BilLogic/uno-blueprint) | [`docs/connectors/supabase/overview.md`](docs/connectors/supabase/overview.md) |
 
 ## Quick start
@@ -48,7 +48,7 @@ Storybook opens at [localhost:4200](http://localhost:4200) and the Vibe app at [
 
 ## Storybook
 
-The design system's documentation, published at [plus-uno.netlify.app/storybook](https://plus-uno.netlify.app/storybook/). It is also where a component's behavior is decided: a story and its tests are the spec.
+The design system's documentation, published at [plus-uno.netlify.app/storybook](https://plus-uno.netlify.app/storybook/).
 
 - **Get started**: design, develop, working with AI, content design.
 - **Foundations**: tokens, color, typography, spacing, layout and grid, elevation, motion, iconography, accessibility.
@@ -58,7 +58,7 @@ The design system's documentation, published at [plus-uno.netlify.app/storybook]
 - **Data visualizations**: Highcharts-based charts by question type: comparison, distribution, part-to-whole, temporal and more.
 - **Specs**: the product's screens, area by area.
 
-The docs pages carry an AI assistant that answers from the design-system index (`netlify/functions/docs-agent/`). The existence rule for agents is the generated index, [`design-system/agent-views/components/index.md`](design-system/agent-views/components/index.md): a component missing from it does not exist.
+The docs pages carry an AI assistant that answers from the design-system index (`netlify/functions/docs-agent/`).
 
 ## Design-system lookup: CLI and MCP
 
@@ -71,7 +71,7 @@ npm run ds -- tokens stack                # the token steps for a role, with int
 npm run ds -- check --code '<Button appearance="primary">Save</Button>' --path f.jsx
 ```
 
-**Local MCP.** `plus-ds` is registered in [`.mcp.json`](.mcp.json), so Claude Code and Cursor start it from the checkout (`npm run ds:mcp`) and it matches the branch being edited. Its tools are `ds_find`, `ds_get`, `ds_tokens`, `ds_guide` and `ds_check`.
+**Local MCP.** `plus-ds` is registered in [`.mcp.json`](.mcp.json), so Claude Code and Cursor start it from the checkout (`npm run ds:mcp`). Its tools are `ds_find`, `ds_get`, `ds_tokens`, `ds_guide` and `ds_check`.
 
 **Hosted MCP.** For people without the checkout, the same tools are served read-only at `https://plus-uno.netlify.app/mcp/ds`, behind a team key (`DS_MCP_KEY`; ask the design-system owner). It serves the released design system. With the key in your environment, add it to Claude Code:
 
@@ -83,7 +83,7 @@ Cursor config and key handling: [`docs/connectors/ds-mcp.md`](docs/connectors/ds
 
 **Storybook MCP.** `npm run storybook` also serves the Storybook MCP at `localhost:4200/mcp`, for component docs and story previews ([`docs/connectors/storybook-mcp.md`](docs/connectors/storybook-mcp.md)).
 
-**No npm package.** The design system is not published to a registry. Code in this repo imports it from the barrel, `import { Button } from '@/components'`; another project reaches it through the hosted MCP or Storybook, not an install.
+**No npm package.** The design system is not published to npm. Code in this repo imports it from the barrel, `import { Button } from '@/components'`; other projects use the hosted MCP or Storybook.
 
 ## uno skills
 
@@ -102,16 +102,16 @@ Each skill is `skills/<name>/SKILL.md` over its `references/method.md`. The agen
 
 ## uno-bot
 
-uno in Slack, as `@uno-bot`. It answers grounded questions across Notion, the blueprint, GitHub and Slack, and stages anything with a side effect (filing a PRD or an issue, a share-out, a workflow run) on a proposal card that a person approves first. Scheduled runs post a morning sweep and check the Figma library against the code.
+uno in Slack, mentioned as `@le goat`. It answers grounded questions across Notion, the blueprint, GitHub and Slack, and stages anything with a side effect (filing a PRD or an issue, a share-out, a workflow run) on a proposal card that a person approves first. Scheduled runs post a morning sweep and check the Figma library against the code.
 
-- **Runtime:** a Cloudflare Worker, with Durable Objects for per-thread state. It is self-hosted on purpose; the reasons and what would reopen the question are [ADR-027](docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md).
-- **Brain:** `AGENTS.md`, its persona ([`agents/uno-bot/AGENT.md`](agents/uno-bot/AGENT.md)) and its bot skills (`agents/uno-bot/skills/`) are baked into the bundle at build time, so a guidance change reaches Slack only when the Worker deploys.
+- **Runtime:** a Cloudflare Worker, with Durable Objects for per-thread state.
+- **Brain:** `AGENTS.md`, its persona ([`agents/uno-bot/AGENT.md`](agents/uno-bot/AGENT.md)) and its bot skills (`agents/uno-bot/skills/`) are baked into the bundle at build time. A guidance change reaches Slack when the Worker deploys.
 - **Deploy:** every push to `main` runs [`uno-bot-deploy.yml`](.github/workflows/uno-bot-deploy.yml), which runs `npm run deploy` in `agents/uno-bot/`: the checks and tests, then the harness bake, then `wrangler deploy`.
 - **Docs:** [`agents/uno-bot/README.md`](agents/uno-bot/README.md) for architecture, local dev, config and smoke tests.
 
 ## uno-blueprint
 
-The source of truth for how the PLUS service runs today: phases, scenarios, steps and who does each, stored in Supabase and rendered at [plus-uno.netlify.app/blueprint](https://plus-uno.netlify.app/blueprint/). Its toolkit is its own repo, [BilLogic/uno-blueprint](https://github.com/BilLogic/uno-blueprint). Agents cite the blueprint for current-state claims and Roadmap cards and PRDs for planned work, and surface a conflict between them rather than blending it ([`docs/connectors/supabase/overview.md`](docs/connectors/supabase/overview.md)).
+The source of truth for how the PLUS service runs today: phases, scenarios, steps and who does each, stored in Supabase and rendered at [plus-uno.netlify.app/blueprint](https://plus-uno.netlify.app/blueprint/). Its toolkit is its own repo, [BilLogic/uno-blueprint](https://github.com/BilLogic/uno-blueprint). Agents cite it for current-state claims, and Roadmap cards and PRDs for planned work ([`docs/connectors/supabase/overview.md`](docs/connectors/supabase/overview.md)).
 
 ## Prototypes and the marketplace
 
@@ -141,7 +141,7 @@ plus-uno/
 
 ## Deployment
 
-Netlify hosts the site. Every PR gets a free deploy preview at `deploy-preview-<PR>--plus-uno.netlify.app`. A merge to `main` does not publish: production deploys only when a release is called, by running [`netlify-production-deploy.yml`](.github/workflows/netlify-production-deploy.yml) by hand; `netlify.toml` skips every other production build. uno-bot deploys separately, on every push to `main` (above).
+Netlify hosts the site. Every PR gets a free deploy preview at `deploy-preview-<PR>--plus-uno.netlify.app`. A merge to `main` does not publish: production deploys only when a release is called, by running [`netlify-production-deploy.yml`](.github/workflows/netlify-production-deploy.yml) by hand. uno-bot deploys separately, on every push to `main` (above).
 
 ## Documentation
 
