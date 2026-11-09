@@ -128,6 +128,41 @@ export const FewSlides = {
 
 /* Reduced motion is the viewer's setting, so the story fakes the query for
    as long as it is on screen. */
+/*
+ * The clock stories share one browser page with every other story file, so
+ * they set their own ground: full motion (another file may have emulated
+ * reduced motion), the carousel counted as in view, and the pointer off the
+ * stage (it may rest wherever the last file left it).
+ */
+const clockReady = () => {
+    const realMatch = window.matchMedia;
+    const realObserver = window.IntersectionObserver;
+    window.matchMedia = (query) => ({
+        ...realMatch.call(window, query),
+        matches: query.includes('prefers-reduced-motion') ? false : realMatch.call(window, query).matches,
+        media: query,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+    });
+    window.IntersectionObserver = class {
+        constructor(callback) { this.callback = callback; }
+        observe(target) {
+            this.callback([{ isIntersecting: true, intersectionRatio: 1, intersectionRect: target.getBoundingClientRect(), target }]);
+        }
+        unobserve() {}
+        disconnect() {}
+        takeRecords() { return []; }
+    };
+    return () => {
+        window.matchMedia = realMatch;
+        window.IntersectionObserver = realObserver;
+    };
+};
+
+const pointerOffStage = async (canvasElement) => {
+    await userEvent.unhover(canvasElement.querySelector('.plus-carousel-stage'));
+};
+
 const fakeReducedMotion = () => {
     const real = window.matchMedia;
     window.matchMedia = (query) => ({
@@ -198,7 +233,9 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 /** The pause button stops the clock where it is; Play picks it up from there. */
 export const PauseStopsProgress = {
     render: () => <CarouselFrame interval={3000} />,
+    beforeEach: clockReady,
     play: async ({ canvasElement }) => {
+        await pointerOffStage(canvasElement);
         const canvas = within(canvasElement);
         await waitFor(() => expect(progressOf(canvasElement)).toBeGreaterThan(0.03));
 
@@ -221,7 +258,9 @@ export const PauseStopsProgress = {
 /** Choosing a pill moves to its slide and starts that slide's clock over; it does not pause. */
 export const DotRestartsClock = {
     render: () => <CarouselFrame interval={3000} />,
+    beforeEach: clockReady,
     play: async ({ canvasElement }) => {
+        await pointerOffStage(canvasElement);
         const canvas = within(canvasElement);
         await waitFor(() => expect(progressOf(canvasElement)).toBeGreaterThan(0.1));
 
@@ -252,7 +291,9 @@ export const ArrowKeysMove = {
 /** The pointer resting on the stage holds the clock; leaving lets it run on. */
 export const HoverHolds = {
     render: () => <CarouselFrame interval={3000} />,
+    beforeEach: clockReady,
     play: async ({ canvasElement }) => {
+        await pointerOffStage(canvasElement);
         await waitFor(() => expect(progressOf(canvasElement)).toBeGreaterThan(0.03));
         const stage = canvasElement.querySelector('.plus-carousel-stage');
 
@@ -325,7 +366,9 @@ const pillFillScale = (pill) => new DOMMatrixReadOnly(
 /** The active slide is a 32px pill whose fill grows on the ring's clock; the others are 8px dots. */
 export const PillFills = {
     render: () => <CarouselFrame interval={3000} />,
+    beforeEach: clockReady,
     play: async ({ canvasElement }) => {
+        await pointerOffStage(canvasElement);
         const pills = [...canvasElement.querySelectorAll('.plus-carousel-pill')];
         await expect(pills).toHaveLength(5);
         await expect(pills[0]).toHaveAttribute('aria-current', 'true');
