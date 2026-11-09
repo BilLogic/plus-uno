@@ -19,6 +19,7 @@ import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storyb
 import { addons } from 'storybook/preview-api';
 import { GLOBALS_UPDATED, SET_GLOBALS } from 'storybook/internal/core-events';
 import { BACKGROUND_OPTIONS, DEFAULT_BACKGROUND } from './backgrounds.js';
+import { assertContained } from '../design-system/src/storybook-docs/lib/contained-demos';
 
 // ---- Docs floating button (AI agent, Marketplace, Uno Blueprint) -----------------------
 mountDocsFab();
@@ -545,7 +546,11 @@ const preview = {
     plusContrastMode: 'no-preference',
   },
 
-  tags: ['autodocs']
+  tags: ['autodocs'],
+
+  // A demo shown in the docs stays inside its canvas: no modal, Blanket or
+  // fixed Flag stack over the docs page (test-only `!dev` stories are exempt).
+  afterEach: assertContained,
 };
 
 export default preview;
