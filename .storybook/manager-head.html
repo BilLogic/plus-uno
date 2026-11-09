@@ -1,16 +1,18 @@
-<!-- Google Fonts: Inter for docs chrome -->
+<!-- The app's families (--type-family-body, --type-family-code), as the preview loads them. -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400..700&family=Noto+Sans+Mono:wght@400..500&display=swap" rel="stylesheet">
 
 <style>
   /* Active story/docs row: its colors are the brand token pair, written per mode by manager.js. */
   .sidebar-container [data-selected='true'] {
+    /* docs-literal: the manager has no token stylesheet; 6 and 4 are --radius-md and --radius-sm. */
     border-radius: 0.375rem;
   }
 
   .sidebar-container a[href]:hover,
   .sidebar-container button[role='treeitem']:hover {
+    /* docs-literal: see above. */
     border-radius: 0.25rem;
   }
 

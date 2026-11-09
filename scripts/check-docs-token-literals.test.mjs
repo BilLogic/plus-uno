@@ -332,7 +332,20 @@ test('chrome 4. run() reports the planted hex and the retired token in the live 
 
 test('chrome 5. a hex inside a class or a shorthand string is caught, and so is a retired line-height', () => {
   assert.deepEqual(chromeFindings('<i className="bg-[#fff0aa]" />', { css: false }).map((f) => f.literal.trim()), ['[#fff0aa']);
-  assert.deepEqual(chromeFindings("const b = '1px solid #ccc123';", { css: false }).map((f) => f.kind), ['hex']);
+  assert.deepEqual(chromeFindings("const b = '1px solid #ccc123';", { css: false }).map((f) => f.kind).sort(), ['dimension', 'hex']);
   assert.deepEqual(chromeFindings('.a { line-height: var(--font-line-height-x); }', { css: true }).map((f) => f.literal), ['--font-line-height-x']);
   assert.deepEqual(chromeFindings('<a href="#add">x</a>', { css: false }), []);
+});
+
+test('chrome 6. any raw size or color function is caught, token or not', () => {
+  assert.deepEqual(chromeFindings('.a { font-size: 13px; padding: 1.5rem; }', { css: true }).map((f) => f.literal), ['13px', '1.5rem']);
+  assert.deepEqual(chromeFindings('.a { background: color-mix(in srgb, var(--ds-border) 50%, transparent); }', { css: true }).map((f) => f.kind), ['color-fn']);
+  assert.deepEqual(chromeFindings("<div style={{ minHeight: '96px' }} />", { css: false }).map((f) => f.literal), ['96px']);
+});
+
+test('chrome 7. media conditions, prose and a docs-literal: reason pass', () => {
+  assert.deepEqual(chromeFindings('@media (min-width: 768px) {\n  .a { gap: var(--stack-sm); }\n}', { css: true }), []);
+  assert.deepEqual(chromeFindings('/* the 200px card */\n.a { gap: var(--stack-sm); }', { css: true }), []);
+  assert.deepEqual(chromeFindings('.a {\n  /* docs-literal: the manager has no tokens. */\n  border-radius: 0.375rem;\n}', { css: true }), []);
+  assert.deepEqual(chromeFindings("const s = 'var(--x)'; // tokens only", { css: false }), []);
 });

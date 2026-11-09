@@ -10,9 +10,12 @@
 
 @theme inline {
   --font-sans: var(--type-family-body);
+  /* docs-literal: Tailwind theme math; it goes when Tailwind is removed. */
   --radius-sm: calc(var(--radius) - 4px);
+  /* docs-literal: Tailwind theme math; it goes when Tailwind is removed. */
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
+  /* docs-literal: Tailwind theme math; it goes when Tailwind is removed. */
   --radius-xl: calc(var(--radius) + 4px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -65,5 +68,6 @@
    * this is documentation chrome rather than a product surface — which is what
    * this file is for.
    */
+  /* docs-literal: Tailwind theme math; it goes when Tailwind is removed. */
   --shadow-docs-card: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
