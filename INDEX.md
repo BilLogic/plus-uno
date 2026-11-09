@@ -119,7 +119,6 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/foundations/data-visualization.md`](design-system/guidelines/foundations/data-visualization.md) | A chart's foundations other than color come from the same component tokens as the rest of the design system |
 | [`design-system/guidelines/foundations/motion.md`](design-system/guidelines/foundations/motion.md) | Motion tokens (three durations, three easings), patterns and reduced motion |
 | [`design-system/guidelines/foundations/overview.md`](design-system/guidelines/foundations/overview.md) | The fourteen foundations, in the order they are documented |
-| [`design-system/guidelines/foundations/tokens.md`](design-system/guidelines/foundations/tokens.md) | Tokens — Overview & Decision Tree |
 | [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) | says where design knowledge lives |
 
 ## Engineering
@@ -216,6 +215,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+144 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

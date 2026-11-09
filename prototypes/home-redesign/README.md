@@ -21,7 +21,7 @@ Styling uses **PLUS design tokens** from `design-system/src/styles`:
 - **Typography**: `--heading-*`, `--body-*`, `--type-family-heading`, `--type-family-body`.
 - **Spacing/layout**: `--section-stack-*`, `--section-pad-*`, `--card-pad-*`, `--stack-*`, `--pad-x-*`.
 
-See `design-system/guidelines/foundations/tokens.md` for the full token set.
+See `design-system/agent-views/tokens/tokens.md` for the full token set.
 
 ## Data visualization framework
 

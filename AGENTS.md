@@ -89,7 +89,7 @@ The name in parentheses is how the rest of the harness cites each rule, so renum
 
 Each rule is one line here and its body lives in the document it names; the leading word is the trigger.
 
-6. **Tokens** (`tokens-over-literals`) style everything — color, spacing, typography, radius, elevation: `design-system/guidelines/foundations/tokens.md` § Non-negotiable rules.
+6. **Tokens** (`tokens-over-literals`) style everything — color, spacing, typography, radius, elevation: `design-system/src/styles/Tokens.mdx` § Non-negotiable rules.
 7. **Layout** (`layout-formulas-first`) starts from the structural formulas: `design-system/guidelines/composition/layout.md`, loaded before a new page, dashboard or layout.
 8. **Figma input** (`Figma-registries-are-law`) means registries first, then the implement-design workflow: `design-system/guidelines/figma/registry-load-gate.md`, then `design-system/guidelines/figma/mcp-guide.md`.
 9. **Packages** (`never-install-without-approval`) are the user's call: ask before installing one.
