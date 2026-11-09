@@ -282,7 +282,7 @@ The ring that shows keyboard focus, drawn in the focused border color rather tha
 _Avoid_: "focus outline", "focus state color"
 
 **Icon**:
-The component that draws one Font Awesome Free glyph at a token size and an icon color, with an accessible name or marked decorative. Components that take an icon name render it. **Iconography** is the foundation page with the guidance; Icon is the component.
+The component that draws one Font Awesome Free glyph at a token size and an icon color, with an accessible name or marked decorative. Components that take an icon name render it. Its **style** is regular or solid (`iconStyle` in code, `style` in Figma); regular is the default where Font Awesome Free has one. Brand logos are a separate family, chosen by name. **Iconography** is the foundation page with the guidance; Icon is the component.
 _Avoid_: "glyph" for the component, a bare `<i>` with Font Awesome classes
 
 **Illustration**:

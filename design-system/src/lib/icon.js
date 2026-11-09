@@ -9,11 +9,13 @@ import { FREE_REGULAR_ICONS } from './icon-regular.generated';
 export { FREE_REGULAR_ICONS };
 
 /**
- * The Font Awesome classes for a Free icon name: `fa-regular fa-<name>` where
- * Free has a regular weight, `fa-solid fa-<name>` where it does not. A string
+ * The Font Awesome classes for a Free icon name and an optional style.
+ * Unset or `regular`: `fa-regular fa-<name>` where Free has a regular,
+ * `fa-solid fa-<name>` where it does not. `solid`: always `fa-solid`. A string
  * that already carries a family (`fa-brands fa-figma`) is returned as given.
  */
-export const iconClass = (name) => {
+export const iconClass = (name, style) => {
     if (name.includes("fa-")) return name;
-    return `${FREE_REGULAR_ICONS.has(name) ? "fa-regular" : "fa-solid"} fa-${name}`;
+    const regular = style !== "solid" && FREE_REGULAR_ICONS.has(name);
+    return `${regular ? "fa-regular" : "fa-solid"} fa-${name}`;
 };

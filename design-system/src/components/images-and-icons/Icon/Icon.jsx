@@ -3,6 +3,9 @@ import PropTypes from 'prop-types';
 import { iconClass } from '../../../lib/icon';
 import './Icon.scss';
 
+/** The Font Awesome styles. `fa-brands` is a family, not a style: it rides in the name. */
+export const ICON_STYLES = ['regular', 'solid'];
+
 /** The token sizes in px: 12 (`--icon-sm`), 16 (`--icon-md`) and 24 (`--icon-lg`). */
 export const ICON_SIZES = [12, 16, 24];
 
@@ -28,16 +31,20 @@ export const ICON_COLORS = [
  *
  * - **name** is a Free name: regular where Free has a regular weight, solid where
  *   it does not. A name that carries its family (`fa-brands fa-slack`) is kept.
+ * - **iconStyle** is `regular` or `solid`. Unset, the glyph is regular where
+ *   Free has a regular and solid where it does not; `regular` falls back to
+ *   solid the same way. `solid` always draws solid. A name that carries its
+ *   family ignores it.
  * - **size** is 12, 16 or 24, each bound to its icon size token. Without it the
  *   glyph is the small icon size, or the size the component around it sets.
  * - **color** is an icon color role. Without it the glyph takes the color around it.
  * - **label** names the icon for assistive technology. Without it the icon is
  *   hidden, so the words beside it carry the meaning.
  */
-const Icon = ({ name, size, color, label, className, ...props }) => {
+const Icon = ({ name, iconStyle, size, color, label, className, ...props }) => {
     if (!name) return null;
     const classes = [
-        iconClass(name),
+        iconClass(name, iconStyle),
         'plus-icon',
         size && `plus-icon--size-${size}`,
         color && `plus-icon--color-${color}`,
@@ -53,6 +60,8 @@ const Icon = ({ name, size, color, label, className, ...props }) => {
 Icon.propTypes = {
     /** A Font Awesome Free name, such as `calendar-days`, or a name with its family. */
     name: PropTypes.string.isRequired,
+    /** `regular` or `solid`. Unset, regular where Font Awesome Free has a regular and solid where it does not; `regular` falls back to solid where Free has none. Ignored when the name carries its family. */
+    iconStyle: PropTypes.oneOf(ICON_STYLES),
     /** The size in px, bound to an icon size token. Unset, the glyph is the small icon size, or the size the component around it sets. */
     size: PropTypes.oneOf(ICON_SIZES),
     /** An icon color role. Unset, the glyph takes the color around it. */

@@ -19,6 +19,35 @@ describe('Icon', () => {
         expect(glyph(container)).not.toHaveClass('fa-regular');
     });
 
+    it('draws solid when its style is solid, even where Free has a regular', () => {
+        const { container } = render(<Icon name="star" iconStyle="solid" />);
+        expect(glyph(container)).toHaveClass('fa-solid', 'fa-star');
+        expect(glyph(container)).not.toHaveClass('fa-regular');
+    });
+
+    it('draws regular when its style is regular', () => {
+        const { container } = render(<Icon name="star" iconStyle="regular" />);
+        expect(glyph(container)).toHaveClass('fa-regular', 'fa-star');
+    });
+
+    it('falls back to solid when its style is regular but Free has no regular', () => {
+        const { container } = render(<Icon name="gear" iconStyle="regular" />);
+        expect(glyph(container)).toHaveClass('fa-solid', 'fa-gear');
+        expect(glyph(container)).not.toHaveClass('fa-regular');
+    });
+
+    it('ignores its style when the name carries a family', () => {
+        const { container } = render(<Icon name="fa-brands fa-figma" iconStyle="solid" />);
+        expect(glyph(container)).toHaveClass('fa-brands', 'fa-figma');
+        expect(glyph(container)).not.toHaveClass('fa-solid');
+    });
+
+    it('does not pass its style to the glyph as an attribute', () => {
+        const { container } = render(<Icon name="star" iconStyle="solid" />);
+        expect(glyph(container)).not.toHaveAttribute('iconStyle');
+        expect(glyph(container)).not.toHaveAttribute('iconstyle');
+    });
+
     it('is hidden from assistive technology without a label', () => {
         const { container } = render(<Icon name="bell" />);
         expect(glyph(container)).toHaveAttribute('aria-hidden', 'true');

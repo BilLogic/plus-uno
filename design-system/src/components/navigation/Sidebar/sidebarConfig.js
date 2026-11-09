@@ -18,7 +18,7 @@ export const SIDEBAR_GROUPS = [
     {
         id: 'home',
         items: [
-            { id: 'home', text: 'Home', icon: 'fa-regular fa-house' },
+            { id: 'home', text: 'Home', icon: 'house' },
             { id: 'slack', text: 'Slack', icon: 'fa-brands fa-slack', href: SLACK_URL, external: true },
         ],
     },
@@ -26,8 +26,8 @@ export const SIDEBAR_GROUPS = [
         id: 'training',
         title: 'Training',
         items: [
-            { id: 'lessons', text: 'Lessons', icon: 'fa-regular fa-lightbulb', training: 'lessons' },
-            { id: 'onboarding', text: 'Onboarding', icon: 'fa-regular fa-compass', training: 'modules' },
+            { id: 'lessons', text: 'Lessons', icon: 'lightbulb', training: 'lessons' },
+            { id: 'onboarding', text: 'Onboarding', icon: 'compass', training: 'modules' },
         ],
     },
     {
@@ -35,8 +35,8 @@ export const SIDEBAR_GROUPS = [
         title: 'Toolkit',
         lockedDuringOnboarding: true,
         items: [
-            { id: 'sessions', text: 'Sessions', icon: 'fa-regular fa-calendar' },
-            { id: 'toolkit-students', text: 'Students', icon: 'fa-regular fa-user' },
+            { id: 'sessions', text: 'Sessions', icon: 'calendar' },
+            { id: 'toolkit-students', text: 'Students', icon: 'user' },
         ],
     },
     {
@@ -44,12 +44,12 @@ export const SIDEBAR_GROUPS = [
         title: 'Admin',
         roles: ['supervisor'],
         items: [
-            { id: 'compliance-monitor', text: 'Compliance', icon: 'fa-regular fa-flag' },
-            { id: 'reflections', text: 'Reflections', icon: 'fa-regular fa-comment-dots' },
-            { id: 'tutors', text: 'Tutors', icon: 'fa-regular fa-id-badge' },
-            { id: 'admin-sessions', text: 'Sessions', icon: 'fa-regular fa-calendar-check' },
-            { id: 'students', text: 'Students', icon: 'fa-regular fa-address-book' },
-            { id: 'groups', text: 'Groups', icon: 'fa-regular fa-object-group' },
+            { id: 'compliance-monitor', text: 'Compliance', icon: 'flag' },
+            { id: 'reflections', text: 'Reflections', icon: 'comment-dots' },
+            { id: 'tutors', text: 'Tutors', icon: 'id-badge' },
+            { id: 'admin-sessions', text: 'Sessions', icon: 'calendar-check' },
+            { id: 'students', text: 'Students', icon: 'address-book' },
+            { id: 'groups', text: 'Groups', icon: 'object-group' },
         ],
     },
 ];

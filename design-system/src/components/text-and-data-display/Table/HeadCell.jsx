@@ -36,8 +36,8 @@ const SORT_ACTION_TEXT = {
  *
  * - `label`: the column name. Required, since it names the column for
  *   assistive technology even when `isIconOnlyHeader` hides it.
- * - `icon`: Font Awesome Free classes for the column's data type, such as
- *   `fa-regular fa-calendar`. Drawn at the small icon size.
+ * - `icon`: Font Awesome Free name for the column's data type, such as
+ *   `calendar`. Drawn at the small icon size.
  * - `isSortable`: renders the sort button. `sort` is `none` | `ascending` |
  *   `descending`; the page owns it and gets the requested direction from
  *   `onSort`. The unsorted arrow shows on hover and focus; a sorted column
@@ -155,7 +155,7 @@ const HeadCell = ({
 HeadCell.propTypes = {
     /** The column name. Read by assistive technology even when only the icon shows. */
     label: PropTypes.string.isRequired,
-    /** Font Awesome Free classes for the column's data type, such as `fa-regular fa-calendar`. */
+    /** Font Awesome Free name for the column's data type, such as `calendar`. */
     icon: PropTypes.string,
     /** Renders the sort button and sets `aria-sort` on the header. */
     isSortable: PropTypes.bool,

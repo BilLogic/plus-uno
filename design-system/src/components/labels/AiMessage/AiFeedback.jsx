@@ -8,7 +8,7 @@ import Icon from '../../images-and-icons/Icon';
 import './AiMessage.scss';
 
 const thumb = (direction, selected) => (
-    <Icon name={`${selected ? 'fa-solid' : 'fa-regular'} fa-thumbs-${direction}`} />
+    <Icon name={`thumbs-${direction}`} iconStyle={selected ? 'solid' : 'regular'} />
 );
 
 /**

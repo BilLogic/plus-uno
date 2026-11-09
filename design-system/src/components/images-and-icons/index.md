@@ -10,7 +10,7 @@ authored half, counted rather than assumed.
 | [AiIcon](AiIcon/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Avatar](Avatar/index.md) | 10 | ✅ | ✅ | ✅ |
 | [AvatarGroup](AvatarGroup/index.md) | 7 | ✅ | ✅ | ✅ |
-| [Icon](Icon/index.md) | 6 | ✅ | ✅ | ✅ |
+| [Icon](Icon/index.md) | 7 | ✅ | ✅ | ✅ |
 | [Illustration](Illustration/index.md) | 5 | ✅ | ✅ | ✅ |
 | [Image](Image/index.md) | 7 | ✅ | ✅ | ✅ |
 | [Object](Object/index.md) | 4 | ✅ | ✅ | ✅ |
