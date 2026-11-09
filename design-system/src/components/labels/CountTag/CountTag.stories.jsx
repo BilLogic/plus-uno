@@ -99,6 +99,18 @@ Appearances.play = async ({ canvasElement }) => {
         await expect(contrast(inverse.color, inverse.backgroundColor), 'AA on any fill').toBeGreaterThanOrEqual(4.5);
     }
 
+    // The figures are tabular and sit in the middle of the badge, in a button too.
+    for (const text of ['12', '14']) {
+        const value = canvas.getByText(text);
+        const badge = pillOf(canvas, text).getBoundingClientRect();
+        await expect(getComputedStyle(value).fontVariantNumeric, `${text}: tabular figures`).toBe('tabular-nums');
+        const v = value.getBoundingClientRect();
+        await expect(Math.abs((v.left + v.right) / 2 - (badge.left + badge.right) / 2), `${text}: centered across`).toBeLessThanOrEqual(0.5);
+    }
+    const inButton = pillOf(canvas, '14').getBoundingClientRect();
+    const button = canvas.getByRole('button', { name: /Review/ }).getBoundingClientRect();
+    await expect(Math.abs((inButton.top + inButton.bottom) / 2 - (button.top + button.bottom) / 2), 'the badge is centered in the button').toBeLessThanOrEqual(0.5);
+
     const dot = canvas.getByRole('img', { name: 'New activity' });
     const d = getComputedStyle(dot);
     await expect(px(d.height)).toBe(8);
