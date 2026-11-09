@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '@/components';
 import { expect } from 'storybook/test';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import Avatar from '@/components/images-and-icons/Avatar';
@@ -17,7 +18,7 @@ export const Basic = () => (
         author="Ari Patel"
         time="2h ago"
         content="Can we move Thursday's session to 5pm?"
-        actions={<button type="button">Reply</button>}
+        actions={<Button>Reply</Button>}
     />
 );
 
@@ -32,7 +33,7 @@ export const Saving = () => (
         id="comment-saving"
         author="Ari Patel"
         content="Can we move Thursday's session to 5pm?"
-        actions={<button type="button">Reply</button>}
+        actions={<Button>Reply</Button>}
         isSaving
         savingText="Saving your reply…"
     />

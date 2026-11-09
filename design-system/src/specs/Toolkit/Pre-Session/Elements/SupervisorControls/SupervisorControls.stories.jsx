@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DropdownMenu, ButtonItem } from '@/components';
+import { DropdownMenu, ButtonItem, IconButton } from '@/components';
 import { iconClass } from '../../../../../lib/icon';
 
 export default {
@@ -11,9 +11,7 @@ export default {
 };
 
 const gearTrigger = (
-    <button type="button" className="plus-btn plus-btn--default" aria-label="Session actions" style={{ border: 'none', background: 'none' }}>
-        <i className={iconClass('gear')} style={{ fontSize: 'var(--font-size-fa-h6-solid)', color: 'var(--ds-icon-subtle)' }} />
-    </button>
+    <IconButton icon="gear" label="Session actions" appearance="subtle" />
 );
 
 /**

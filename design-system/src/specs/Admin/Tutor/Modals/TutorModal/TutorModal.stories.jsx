@@ -3,6 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Button } from '@/components';
 import TutorModal from './TutorModal';
 
 // Mock Data
@@ -56,7 +57,7 @@ export const EditTutor = {
         }, [args.show]);
         return (
             <>
-                <button onClick={() => setShow(true)}>Open Edit Modal</button>
+                <Button onClick={() => setShow(true)}>Open Edit Modal</Button>
                 <TutorModal
                     {...args}
                     show={show}
@@ -82,7 +83,7 @@ export const EditTutorSessions = {
         }, [args.show]);
         return (
             <>
-                <button onClick={() => setShow(true)}>Open Sessions Modal</button>
+                <Button onClick={() => setShow(true)}>Open Sessions Modal</Button>
                 <TutorModal
                     {...args}
                     show={show}
@@ -108,7 +109,7 @@ export const AddNewTutor = {
         }, [args.show]);
         return (
             <>
-                <button onClick={() => setShow(true)}>Open Add Modal</button>
+                <Button onClick={() => setShow(true)}>Open Add Modal</Button>
                 <TutorModal
                     {...args}
                     show={show}

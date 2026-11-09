@@ -3,6 +3,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { Button } from '@/components';
 import DeleteTutorModal from './DeleteTutorModal';
 
 export default {
@@ -37,7 +38,7 @@ export const Default = {
         }, [args.show]);
         return (
             <>
-                <button onClick={() => setShow(true)}>Open Delete Tutor Modal</button>
+                <Button onClick={() => setShow(true)}>Open Delete Tutor Modal</Button>
                 <DeleteTutorModal
                     {...args}
                     show={show}
