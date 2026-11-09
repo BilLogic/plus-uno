@@ -7,11 +7,12 @@
  *
  * Returns one line per escape; empty when the demo is contained.
  */
+/** Visible and bigger than a visually hidden 1px box (Base UI parks its hidden inputs that way). */
 const isShown = (el, win) => {
     const style = win.getComputedStyle(el);
     if (style.display === 'none' || style.visibility === 'hidden' || Number(style.opacity) === 0) return false;
     const box = el.getBoundingClientRect();
-    return box.width > 0 && box.height > 0;
+    return box.width > 2 && box.height > 2;
 };
 
 const describe = (el) => {
@@ -37,9 +38,13 @@ export const findEscapes = (canvasElement, doc = canvasElement.ownerDocument) =>
     return escapes;
 };
 
-/** Storybook `afterEach`: a story shown in the docs (no `!dev` tag) fails when its demo escapes. */
+/**
+ * Storybook `afterEach`: a story shown in the docs fails when its demo escapes.
+ * Storybook resolves a `!dev` tag by removing `dev`, so a test-only story is one
+ * whose resolved tags lack `dev`.
+ */
 export const assertContained = async ({ canvasElement, tags = [] }) => {
-    if (tags.includes('!dev') || !canvasElement) return;
+    if (!tags.includes('dev') || !canvasElement) return;
     const escapes = findEscapes(canvasElement);
     if (escapes.length) {
         throw new Error(`This docs demo leaves its canvas; render it in place (Modal renderAs="inline", FlagGroup containerPosition="static", or a frame):\n${escapes.join('\n')}`);

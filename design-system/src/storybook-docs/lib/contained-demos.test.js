@@ -40,6 +40,11 @@ describe('findEscapes', () => {
         expect(findEscapes(canvas)[0]).toMatch(/fixed to the screen/);
     });
 
+    it('ignores a visually hidden 1px input', () => {
+        const canvas = mount('<div id="canvas"><input style="position:fixed;width:1px;height:1px"></div>');
+        expect(findEscapes(canvas)).toEqual([]);
+    });
+
     it('ignores a hidden overlay', () => {
         const canvas = mount('<div id="canvas"></div><div role="dialog" aria-modal="true" style="display:none"></div>');
         expect(findEscapes(canvas)).toEqual([]);
@@ -47,13 +52,13 @@ describe('findEscapes', () => {
 });
 
 describe('assertContained', () => {
-    it('skips test-only stories', async () => {
+    it('skips test-only stories, whose resolved tags lack dev', async () => {
         const canvas = mount('<div id="canvas"></div><div role="dialog" aria-modal="true" style="width:10px;height:10px"></div>');
-        await expect(assertContained({ canvasElement: canvas, tags: ['!dev'] })).resolves.toBeUndefined();
+        await expect(assertContained({ canvasElement: canvas, tags: ['test'] })).resolves.toBeUndefined();
     });
 
     it('throws for a docs story that escapes', async () => {
         const canvas = mount('<div id="canvas"></div><div role="dialog" aria-modal="true" style="width:10px;height:10px"></div>');
-        await expect(assertContained({ canvasElement: canvas, tags: ['autodocs'] })).rejects.toThrow(/leaves its canvas/);
+        await expect(assertContained({ canvasElement: canvas, tags: ['dev', 'test'] })).rejects.toThrow(/leaves its canvas/);
     });
 });
