@@ -5,6 +5,7 @@ import FieldBox from '../_internal/FieldBox';
 import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import OptionRow from '../_internal/OptionRow';
 import { useAnchoredPopup } from '../_internal/anchorPlacement';
+import Icon from '../../images-and-icons/Icon';
 import '../_internal/Listbox.scss';
 import './TreeSelect.scss';
 
@@ -484,7 +485,7 @@ const TreeSelect = ({
                     {...tones.field}
                     onClick={handleInputClick}
                     trailing={(
-                        <i className={`fa-solid fa-caret-down plus-tree-select-arrow ${isOpen ? 'plus-tree-select-arrow-open' : ''}`} aria-hidden="true" />
+                        <Icon name="caret-down" className={`plus-tree-select-arrow ${isOpen ? 'plus-tree-select-arrow-open' : ''}`} />
                     )}
                 >
                     <input

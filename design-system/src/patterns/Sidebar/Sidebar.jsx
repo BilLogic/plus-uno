@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useId, useState } from 'react';
 import PropTypes from 'prop-types';
-import { CountTag, IconButton, Logo, Tooltip } from '@/components';
+import { CountTag, Icon, IconButton, Logo, Tooltip } from '@/components';
 import { useSidebarControl } from '../Frame/SidebarControl';
 import SidebarAccount, { ACCOUNT_ROLES } from './SidebarAccount';
 import { SIDEBAR_RECENT_TABS } from './openTabs';
@@ -184,7 +184,7 @@ const PatternSidebar = ({
         if (item.external) {
             return (
                 <span className="plus-pattern-sidebar__end plus-pattern-sidebar__end--icon" aria-hidden="true">
-                    <i className="fa-solid fa-arrow-up-right-from-square" />
+                    <Icon name="arrow-up-right-from-square" />
                 </span>
             );
         }
@@ -194,7 +194,7 @@ const PatternSidebar = ({
     const rowContent = (item, extra) => (
         <>
             <span className="plus-pattern-sidebar__slot" aria-hidden="true">
-                {item.icon ? <i className={faClass(item.icon)} /> : null}
+                {item.icon ? <Icon name={faClass(item.icon)} /> : null}
             </span>
             <span className="plus-pattern-sidebar__label">{item.text}</span>
             {item.external ? <span className="visually-hidden">(opens in a new tab)</span> : null}
@@ -401,7 +401,7 @@ const PatternSidebar = ({
                         {/* The lock is focusable so a keyboard reaches its message. */}
                         {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
                         <span className="plus-pattern-sidebar__caret plus-pattern-sidebar__caret--lock" tabIndex={0} role="img" aria-label={`Locked. ${message}`}>
-                            <i className="fa-solid fa-lock" aria-hidden="true" />
+                            <Icon name="lock" />
                         </span>
                     </Tooltip>
                 </div>
@@ -417,7 +417,7 @@ const PatternSidebar = ({
                 >
                     <span id={titleId} className="plus-pattern-sidebar__title-text">{group.title}</span>
                     <span className="plus-pattern-sidebar__caret" aria-hidden="true">
-                        <i className="fa-solid fa-angle-down" />
+                        <Icon name="angle-down" />
                     </span>
                 </button>
             );

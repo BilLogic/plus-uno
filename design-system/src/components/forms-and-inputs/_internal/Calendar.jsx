@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { formatMonthYear, outOfBounds, parseDate, sameDay } from './dates';
+import Icon from '../../images-and-icons/Icon';
 import './Calendar.scss';
 
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -95,11 +96,11 @@ const Calendar = ({
         >
             <div className="plus-calendar-header">
                 <button type="button" className="plus-calendar-nav" onClick={() => turn(-1)} aria-label="Previous month">
-                    <i className="fa-solid fa-chevron-left" aria-hidden="true" />
+                    <Icon name="chevron-left" />
                 </button>
                 <div className="plus-calendar-month" aria-live="polite">{formatMonthYear(viewDate)}</div>
                 <button type="button" className="plus-calendar-nav" onClick={() => turn(1)} aria-label="Next month">
-                    <i className="fa-solid fa-chevron-right" aria-hidden="true" />
+                    <Icon name="chevron-right" />
                 </button>
             </div>
             <div className="plus-calendar-weekdays" aria-hidden="true">

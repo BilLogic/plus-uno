@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import Tooltip from '@/components/overlays-and-layering/Tooltip';
 import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
 import { alignName, useClipped } from './TableParts';
+import Icon from '../../images-and-icons/Icon';
 import './Table.scss';
-import { iconClass } from '../../../lib/icon';
 
 const classes = (...names) => names.filter(Boolean).join(' ');
 
@@ -78,7 +78,7 @@ const HeadCell = ({
     };
 
     const typeIcon = icon ? (
-        <i className={classes(icon, 'plus-table-head-cell-type')} aria-hidden="true" />
+        <Icon name={icon} className="plus-table-head-cell-type" />
     ) : null;
 
     const labelNode = showLabel ? (
@@ -99,10 +99,7 @@ const HeadCell = ({
             {labelNode}
             {isSortable && (
                 <>
-                    <i
-                        className={classes(iconClass(SORT_GLYPH[sortState]), 'plus-table-head-cell-sort')}
-                        aria-hidden="true"
-                    />
+                    <Icon name={SORT_GLYPH[sortState]} className="plus-table-head-cell-sort" />
                     <VisuallyHidden>{`, ${SORT_STATE_TEXT[sortState]}`}</VisuallyHidden>
                 </>
             )}

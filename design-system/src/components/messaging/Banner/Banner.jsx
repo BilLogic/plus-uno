@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { messageIcon } from '../messageAppearance';
+import Icon from '../../images-and-icons/Icon';
 import './Banner.scss';
-import { iconClass } from '../../../lib/icon';
 
 /** The three appearances. Announcement carries no icon. */
 export const BANNER_APPEARANCES = ['warning', 'danger', 'announcement'];
@@ -37,7 +37,7 @@ const Banner = ({
         >
             {resolvedIcon && (
                 typeof resolvedIcon === 'string'
-                    ? <i className={`plus-banner-icon ${iconClass(resolvedIcon)}`} aria-hidden="true" />
+                    ? <Icon name={resolvedIcon} className="plus-banner-icon" />
                     : <span className="plus-banner-icon" aria-hidden="true">{resolvedIcon}</span>
             )}
             <div className="plus-banner-content">{children}</div>

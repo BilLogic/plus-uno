@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import CountTag from '../CountTag';
 import Tooltip from '../../overlays-and-layering/Tooltip';
 import { useIsTruncated } from '../../../lib/useIsTruncated';
+import Icon from '../../images-and-icons/Icon';
 import './Tag.scss';
 
 /**
@@ -344,7 +345,7 @@ export const Tag = ({
                 onAfterRemoveAction?.(typeof label === 'string' ? label : undefined, e);
             }}
         >
-            <i className="fa-solid fa-xmark" aria-hidden="true" />
+            <Icon name="xmark" />
         </button>
     ) : null;
 

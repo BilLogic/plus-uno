@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 
 import Tooltip from '../../overlays-and-layering/Tooltip';
 import { useIsTruncated } from '../../../lib/useIsTruncated';
+import Icon from '../../images-and-icons/Icon';
 import './DateTag.scss';
-import { iconClass } from '../../../lib/icon';
 
 /**
  * `DateTag` — a due or event date.
@@ -104,7 +104,7 @@ export const DateTag = ({
             >
                 <span className="plus-date-tag__content">
                     <span className="plus-date-tag__visual" aria-hidden="true">
-                        <i className={iconClass(icon)} aria-hidden="true" />
+                        <Icon name={icon} />
                     </span>
                     <span
                         ref={labelRef}

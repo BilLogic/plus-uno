@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Icon from '../../images-and-icons/Icon';
 import './Pagination.scss';
 
 export const PAGINATION_SPACINGS = ['default', 'compact'];
@@ -58,7 +59,7 @@ const PaginationNavigator = ({ direction, navigator = 'icon', label, isDisabled 
             }}
         >
             {navigator === 'icon'
-                ? <i className={`fa-solid fa-caret-${direction === 'previous' ? 'left' : 'right'}`} aria-hidden="true"></i>
+                ? <Icon name={`caret-${direction === 'previous' ? 'left' : 'right'}`} />
                 : label}
         </button>
     </li>

@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { useTagContext } from '../Tag';
+import Icon from '../../images-and-icons/Icon';
 import './Suggestion.scss';
-import { iconClass } from '../../../lib/icon';
 
 /**
  * `Suggestion` — a value the system proposes that a person can accept, such as
@@ -78,7 +78,7 @@ export const Suggestion = ({
                 onAccept?.(isPrompt ? (text ?? label) : (value ?? label), e);
             }}
         >
-            <i className={`${iconClass(ICONS[kind])} plus-suggestion__icon`} aria-hidden="true" />
+            <Icon name={ICONS[kind]} className="plus-suggestion__icon" />
             <span className="plus-suggestion__label">{label}</span>
         </button>
     );

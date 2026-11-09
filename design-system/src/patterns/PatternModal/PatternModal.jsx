@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Tabs, Skeleton } from '@/components';
+import { Icon, Tabs, Skeleton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { BLANKET_HEIGHTS, BLANKET_WIDTHS } from '../Blanket';
 import './PatternModal.scss';
@@ -102,7 +102,7 @@ const PatternModal = ({
                     aria-label="Close"
                     onClick={onClose}
                 >
-                    <i className="fa-solid fa-xmark" aria-hidden="true"></i>
+                    <Icon name="xmark" />
                 </button>
             )}
         </div>

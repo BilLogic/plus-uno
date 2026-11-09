@@ -4,6 +4,7 @@ import {
     Avatar,
     ButtonItem,
     DropdownMenu,
+    Icon,
     IconButton,
     LinkIconButton,
     Section,
@@ -60,8 +61,8 @@ const SidebarAccount = ({
 
     const help = (
         <span className="plus-sidebar-account__help-glyphs" aria-hidden="true">
-            <i className="fa-regular fa-circle-question plus-sidebar-account__help-rest" />
-            <i className="fa-solid fa-arrow-up-right-from-square plus-sidebar-account__help-go" />
+            <Icon name="circle-question" className="plus-sidebar-account__help-rest" />
+            <Icon name="arrow-up-right-from-square" className="plus-sidebar-account__help-go" />
         </span>
     );
 
@@ -76,10 +77,10 @@ const SidebarAccount = ({
                     spacing="compact"
                 >
                     <Section title={full}>
-                        <ButtonItem elemBefore={<i className="fa-regular fa-user" aria-hidden="true" />} onClick={onProfile}>
+                        <ButtonItem elemBefore={<Icon name="user" />} onClick={onProfile}>
                             Profile
                         </ButtonItem>
-                        <ButtonItem elemBefore={<i className="fa-solid fa-arrow-right-from-bracket" aria-hidden="true" />} onClick={onSignOut}>
+                        <ButtonItem elemBefore={<Icon name="arrow-right-from-bracket" />} onClick={onSignOut}>
                             Sign out
                         </ButtonItem>
                     </Section>

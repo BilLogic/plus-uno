@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Icon from '../Icon';
 import './Tile.scss';
-import { iconClass } from '../../../lib/icon';
 
 /**
  * A square that frames an icon, a logo or an image.
@@ -31,8 +31,7 @@ export const TILE_COLORS = ['gray', 'blue', 'green', 'purple', 'magenta', 'yello
  */
 const renderIcon = (icon) => {
     if (typeof icon !== 'string') return icon;
-    const className = iconClass(icon);
-    return <i className={className} aria-hidden="true" />;
+    return <Icon name={icon} />;
 };
 
 /** Tile: a small square frame that holds a logo, thumbnail or icon standing for a thing. */
