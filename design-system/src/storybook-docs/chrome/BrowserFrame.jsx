@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import './BrowserFrame.scss';
 
 /**
- * BrowserFrame: docs-only window chrome (Chrome or Safari) drawn around a
- * story, so a Frame or page template reads as an app in a browser window.
+ * BrowserFrame: docs-only window chrome (Chrome, Safari or Edge) drawn around
+ * a story, so a page template reads as an app in a browser window.
  *
  * The chrome sits above the story and the outline is drawn outside the
  * content box, so the page inside keeps the width and left edge it has with
@@ -12,7 +12,8 @@ import './BrowserFrame.scss';
  * Not part of the component library; it is not exported from `@/components`.
  */
 
-export const BROWSER_OPTIONS = ['none', 'chrome', 'safari'];
+export const BROWSER_OPTIONS = ['none', 'chrome', 'safari', 'edge'];
+const DRAWN = new Set(['chrome', 'safari', 'edge']);
 
 const BrowserContext = createContext(false);
 
@@ -27,10 +28,11 @@ const Lights = () => (
     <span className="plus-browser-frame__lights" aria-hidden="true"><b /><b /><b /></span>
 );
 
-const ChromeBar = () => (
+const ChromeBar = ({ edge = false }) => (
     <>
         <div className="plus-browser-frame__tabs">
             <Lights />
+            {edge && <Glyph name="table-columns" />}
             <div className="plus-browser-frame__tab">
                 <span className="plus-browser-frame__favicon" />
                 <span className="plus-browser-frame__tab-title">Sessions · PLUS</span>
@@ -47,10 +49,17 @@ const ChromeBar = () => (
                 <span>plus-uno.netlify.app<em>{URL_PATH}</em></span>
             </div>
             <Glyph name="star" regular />
-            <Glyph name="ellipsis-vertical" />
+            {edge ? (
+                <>
+                    <Glyph name="clone" regular />
+                    <Glyph name="circle-user" regular />
+                    <Glyph name="ellipsis" />
+                </>
+            ) : <Glyph name="ellipsis-vertical" />}
         </div>
     </>
 );
+ChromeBar.propTypes = { edge: PropTypes.bool };
 
 const SafariBar = () => (
     <div className="plus-browser-frame__toolbar plus-browser-frame__toolbar--safari">
@@ -73,17 +82,17 @@ const SafariBar = () => (
 
 /**
  * @param {object} props
- * @param {'none' | 'chrome' | 'safari'} [props.browser]  the window chrome; none renders the children bare
+ * @param {'none' | 'chrome' | 'safari' | 'edge'} [props.browser]  the window chrome; none renders the children bare
  * @param {React.ReactNode} props.children
  */
 const BrowserFrame = ({ browser = 'none', children }) => {
     const nested = useContext(BrowserContext);
-    if (nested || (browser !== 'chrome' && browser !== 'safari')) return <>{children}</>;
+    if (nested || !DRAWN.has(browser)) return <>{children}</>;
     return (
         <BrowserContext.Provider value>
             <div className={`plus-browser-frame plus-browser-frame--${browser}`} data-browser={browser}>
                 <div className="plus-browser-frame__chrome" aria-hidden="true">
-                    {browser === 'chrome' ? <ChromeBar /> : <SafariBar />}
+                    {browser === 'safari' ? <SafariBar /> : <ChromeBar edge={browser === 'edge'} />}
                 </div>
                 <div className="plus-browser-frame__page">{children}</div>
             </div>

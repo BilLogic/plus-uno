@@ -608,6 +608,7 @@ const preview = {
           { value: 'none', title: 'No browser' },
           { value: 'chrome', title: 'Chrome' },
           { value: 'safari', title: 'Safari' },
+          { value: 'edge', title: 'Edge' },
         ],
         dynamicTitle: true,
       },

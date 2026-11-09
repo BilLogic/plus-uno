@@ -23,6 +23,15 @@ describe('BrowserFrame', () => {
         expect(container.querySelector('.plus-browser-frame__tab')).toBeNull();
     });
 
+    it('draws Edge as tabs, a pill address bar and Edge tools', () => {
+        const { container } = render(<BrowserFrame browser="edge"><p>page</p></BrowserFrame>);
+        expect(container.querySelector('[data-browser="edge"]')).not.toBeNull();
+        expect(container.querySelector('.plus-browser-frame__tab')).not.toBeNull();
+        expect(container.querySelector('.plus-browser-frame__omnibox')).not.toBeNull();
+        expect(container.querySelector('.fa-circle-user')).not.toBeNull();
+        expect(container.querySelector('.fa-ellipsis-vertical')).toBeNull();
+    });
+
     it('collapses when nested', () => {
         const { container } = render(
             <BrowserFrame browser="chrome"><BrowserFrame browser="safari"><p>page</p></BrowserFrame></BrowserFrame>,

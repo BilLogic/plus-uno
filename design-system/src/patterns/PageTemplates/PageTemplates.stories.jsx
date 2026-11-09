@@ -150,7 +150,7 @@ export const InBrowserFrame = {
     render: () => (
         <div>
             <div data-case="bare">{fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>)}</div>
-            {['chrome', 'safari'].map((browser) => (
+            {['chrome', 'safari', 'edge'].map((browser) => (
                 <div key={browser} data-case={browser}>
                     <BrowserFrame browser={browser}>
                         {fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>)}
@@ -174,7 +174,7 @@ export const InBrowserFrame = {
         await inEveryColorMode(async (mode) => {
             const bare = measure('bare');
             await expect(bare.box.querySelector('[data-browser]'), `no chrome without the browser (${mode})`).toBeNull();
-            for (const name of ['chrome', 'safari']) {
+            for (const name of ['chrome', 'safari', 'edge']) {
                 const framed = measure(name);
                 await expect(framed.box.querySelector('[data-browser]'), `${name} chrome is drawn (${mode})`).not.toBeNull();
                 await expect(framed.sidebarLeft, `${name}: sidebar left edge (${mode})`).toBeCloseTo(bare.sidebarLeft, 0);

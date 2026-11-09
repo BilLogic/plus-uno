@@ -136,3 +136,10 @@
     display: flex;
     gap: var(--space-100);
 }
+
+// Edge: Chrome's layout with rounder tabs and a pill address bar.
+.plus-browser-frame--edge {
+    .plus-browser-frame__tab {
+        border-radius: var(--radius-075) var(--radius-075) 0 0;
+    }
+}
