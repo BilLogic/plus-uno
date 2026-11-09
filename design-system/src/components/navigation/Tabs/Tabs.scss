@@ -159,10 +159,11 @@
     }
 }
 
-// Pill appearance: the selected tab carries a filled, fully-rounded ground
-// instead of an underline; unselected tabs carry no border at all.
+// Pill appearance: the selected tab sits on a neutral, fully rounded fill with
+// the default ink (Figma `Tabs`, appearance=pill); unselected tabs carry no fill
+// and no border, and the strip has no baseline. Tabs sit 12 apart.
 .plus-tabs--appearance-pill .plus-tabs-list {
-    gap: var(--stack-sm);
+    gap: var(--inline-lg);
 }
 
 .plus-tabs--appearance-pill .plus-tab {
@@ -172,17 +173,16 @@
         hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
         pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
         selected: (
-            color: var(--ds-text-inverse),
-            background-color: var(--ds-background-selected-bold),
+            color: var(--ds-text),
+            background-color: var(--ds-background-neutral),
         ),
     ), $ring: false);
 
-    // The selected pill's own hover/press: the bold fill steps, not the
-    // neutral ones an unselected pill takes.
+    // The selected pill's own hover/press: the neutral fill's own steps.
     &[data-active] {
         @include plus-state((
-            hovered: (background-color: var(--ds-background-selected-bold-hovered)),
-            pressed: (background-color: var(--ds-background-selected-bold-pressed)),
+            hovered: (background-color: var(--ds-background-neutral-hovered)),
+            pressed: (background-color: var(--ds-background-neutral-pressed)),
         ), $ring: false, $hovered-selector: '&:hover', $pressed-selector: '&:active');
     }
 }

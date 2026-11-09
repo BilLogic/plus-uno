@@ -330,15 +330,15 @@ export const Selected = {
     },
 };
 
-/** Selected, pill: the bold selected fill with inverse ink; its hover and press step the bold fill. */
+/** Selected, pill: the neutral fill with the default ink; its hover and press step the neutral fill. */
 export const SelectedPill = {
     render: () => <StateTabs appearance="pill" />,
     play: async ({ canvasElement }) => {
         const selected = tabOf(canvasElement, 'Overview');
-        await expectGroundUnder(canvasElement, selected, undefined, '--ds-background-selected-bold', 'selected pill');
-        await expectInk(canvasElement, selected, undefined, '--ds-text-inverse', 'selected pill');
-        await expectGroundUnder(canvasElement, selected, ':hover', '--ds-background-selected-bold-hovered', 'hovered selected pill');
-        await expectGroundUnder(canvasElement, selected, ':active', '--ds-background-selected-bold-pressed', 'pressed selected pill');
+        await expectGroundUnder(canvasElement, selected, undefined, '--ds-background-neutral', 'selected pill');
+        await expectInk(canvasElement, selected, undefined, '--ds-text', 'selected pill');
+        await expectGroundUnder(canvasElement, selected, ':hover', '--ds-background-neutral-hovered', 'hovered selected pill');
+        await expectGroundUnder(canvasElement, selected, ':active', '--ds-background-neutral-pressed', 'pressed selected pill');
     },
 };
 

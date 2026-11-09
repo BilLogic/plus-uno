@@ -71,7 +71,7 @@ export const figmaMeta = {
 
 <ComponentExample of={TabsStories.Selected} title="Selected" description={<>The selected ink over the selected bar; no fill.</>} />
 
-<ComponentExample of={TabsStories.SelectedPill} title="Selected pill" description={<>The bold selected fill with inverse ink; its hover and press step the bold fill.</>} />
+<ComponentExample of={TabsStories.SelectedPill} title="Selected pill" description={<>The neutral fill with the default ink; its hover and press step the neutral fill.</>} />
 
 <ComponentExample of={TabsStories.Disabled} title="Disabled" description={<>Disabled ink and no pointer events; never selected.</>} />
 
@@ -139,7 +139,7 @@ stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
 <tr><td>Hovered</td><td>The subtle neutral hovered fill.</td></tr>
 <tr><td>Pressed</td><td>The subtle neutral pressed fill.</td></tr>
 <tr><td>Focused</td><td>The 2px ring, 2px off the tab; no fill.</td></tr>
-<tr><td>Selected</td><td>Selected ink with the underline bar, or the bold fill with inverse ink in <code>pill</code>.</td></tr>
+<tr><td>Selected</td><td>Selected ink with the underline bar, or the neutral fill with the default ink in <code>pill</code>.</td></tr>
 <tr><td>Disabled</td><td>Disabled ink; the tab cannot be pressed or selected.</td></tr>
 </tbody>
 </DocsTable>
@@ -156,8 +156,8 @@ stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
 <tr><td>Ink</td><td><code>--ds-text-subtle</code>, selected <code>--ds-text-selected</code>, disabled <code>--ds-text-disabled</code></td></tr>
 <tr><td>Baseline and bar</td><td><code>--ds-border</code>, <code>--border-default</code>; <code>--ds-border-selected</code>, <code>--border-selected</code></td></tr>
 <tr><td>Hovered, pressed</td><td><code>--ds-background-neutral-subtle-hovered</code>, <code>--ds-background-neutral-subtle-pressed</code></td></tr>
-<tr><td>Selected pill</td><td><code>--ds-background-selected-bold</code>, <code>--ds-text-inverse</code>; <code>--ds-background-selected-bold-hovered</code>, <code>--ds-background-selected-bold-pressed</code></td></tr>
-<tr><td>Gap</td><td><code>--stack-md</code>, pill strip <code>--stack-sm</code></td></tr>
+<tr><td>Selected pill</td><td><code>--ds-background-neutral</code>, <code>--ds-text</code>; <code>--ds-background-neutral-hovered</code>, <code>--ds-background-neutral-pressed</code></td></tr>
+<tr><td>Gap</td><td><code>--stack-md</code>, pill strip <code>--inline-lg</code> (12)</td></tr>
 <tr><td>Panel offset</td><td><code>--section-stack-sm</code></td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
 </tbody>
