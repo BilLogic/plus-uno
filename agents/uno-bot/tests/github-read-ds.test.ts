@@ -4,7 +4,8 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 
-import { lookupDesignSystem } from "../src/tools/github-read";
+import { classifyDsQuery, lookupDesignSystem, readGithub, type GithubReadDeps } from "../src/tools/github-read";
+import { dsFacts } from "../src/integrations/ds-facts";
 import type { DsMcpClient, DsMcpResult, DsSection } from "../src/integrations/ds-mcp";
 
 function fakeClient(answer: DsMcpResult) {
@@ -84,4 +85,28 @@ test("with no client the built-in facts answer, as before", async () => {
   assert.equal(out.source, "built-in");
   assert.equal(out.fallback, undefined);
   assert.equal(out.answer.status, "not-here");
+});
+
+test("the query is classified from the built-in facts alone: a token role, a get or a find", () => {
+  const facts = dsFacts();
+  assert.equal(classifyDsQuery("stack", facts).kind, "token-role");
+  assert.deepEqual(classifyDsQuery("Button.appearance=primary", facts), {
+    kind: "get",
+    q: "Button.appearance=primary",
+    found: facts.find("Button.appearance=primary"),
+    name: "Button.appearance",
+  });
+  assert.equal(classifyDsQuery("--stack-md", facts).kind, "get");
+  assert.equal(classifyDsQuery("choose many options from a list", facts).kind, "find");
+});
+
+test("a section reaches ds_get as practices, under its old name examples too", async () => {
+  const { calls, client } = fakeClient({ ok: true, text: "x" });
+  const deps = { ds: client } as unknown as GithubReadDeps;
+  await readGithub({ lookup: "Modal", section: "practices" }, deps);
+  await readGithub({ lookup: "Modal", section: "examples" }, deps);
+  assert.deepEqual(calls, [
+    { tool: "get", arg: "Modal", section: "practices" },
+    { tool: "get", arg: "Modal", section: "practices" },
+  ]);
 });

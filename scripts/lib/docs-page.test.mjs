@@ -11,7 +11,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
-import { createPageFinder, exportedValue, importedConstants, literalValue, readDocsPage, sectionText } from './docs-page.mjs';
+import { createPageFinder, exportedValue, importedConstants, literalValue, pagesUnder, readDocsPage, sectionText, topLevelEntries } from './docs-page.mjs';
 
 const COMPONENT_PAGE = `import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import * as ModalStories from './Modal.stories.jsx';
@@ -400,4 +400,23 @@ test('an imported constant renders its value beside its name; anything else is d
   assert.match(usage, /Dropped: \./);
   const bare = sectionText(readDocsPage(CONSTANT_PAGE), 'Usage');
   assert.match(bare, /At most `MAX_STACKED` stack; `WIDTHS`\./);
+});
+
+test('topLevelEntries splits a literal group at its top-level commas, keeping strings, comments and nested groups whole', () => {
+  const src = `const meta = { argTypes: {\n  // a comment, with a comma and an apostrophe: don't\n  size: { options: ['sm', 'md'] },\n  "label": { control: 'text' }, /* one, more */ tone: {} } };`;
+  assert.deepEqual(topLevelEntries(src, src.indexOf('{', src.indexOf('argTypes'))), [
+    "// a comment, with a comma and an apostrophe: don't\n  size: { options: ['sm', 'md'] }",
+    '"label": { control: \'text\' }',
+    '/* one, more */ tone: {}',
+  ]);
+});
+
+test('pagesUnder lists the authored pages under one folder, Finder copies left out', () => {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'pages-under-'));
+  for (const f of ['a/One.mdx', 'a/One 2.mdx', 'a/b/Two.mdx', 'c/Three.mdx']) {
+    fs.mkdirSync(path.dirname(path.join(root, f)), { recursive: true });
+    fs.writeFileSync(path.join(root, f), '');
+  }
+  assert.deepEqual(pagesUnder(root, 'a'), ['a/One.mdx', 'a/b/Two.mdx']);
+  assert.deepEqual(pagesUnder(root, 'missing'), []);
 });

@@ -33,13 +33,13 @@
  *   npm run check:ds-vocabulary -- --strict   the strict list enforced; exit 1 on its findings
  */
 
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { byRoot, main, report } from './lib/findings.mjs';
-import { createPageFinder, readDocsPage } from './lib/docs-page.mjs';
-import { DS_SECTION, componentOf, parseGlossary, vocabularyAliases } from './lib/ds-vocabulary.mjs';
+import { createPageFinder, pagesUnder, readDocsPage } from './lib/docs-page.mjs';
+import { lineOf, readJson, readText, withoutCode } from './lib/ds-check-helpers.mjs';
+import { DS_SECTION, aliasInputs, componentOf, parseGlossary, vocabularyAliases } from './lib/ds-vocabulary.mjs';
 import { ENFORCE_STRICT, STRICT_PAGES } from './lib/ds-strict.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -76,10 +76,6 @@ export function correctNames(terms, names) {
 const escape = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 /** A word as a whole-word, case-blind match: no letter, digit or hyphen joined to either end, any run of spaces inside. */
 const matcherOf = (word) => new RegExp(`(?<![\\w-])${word.split(/\s+/).map(escape).join('\\s+')}(?![\\w-])`, 'gi');
-
-/** Text with fenced code blocks and code spans blanked, so code never reads as prose. */
-const withoutCode = (text) =>
-  text.replace(/^[ \t]*(`{3,}|~{3,})[\s\S]*?^[ \t]*\1[^\n]*$/gm, '').replace(/`+[^`\n]*`+/g, ' ');
 
 /** UI-kind nouns: an avoid-word right before one is a thing's name ("switch component"). */
 const KIND_AFTER = /^\s+(?:component|pattern)s?\b/i;
@@ -121,42 +117,11 @@ export function vocabularyFindings(text, words, { names = [] } = {}) {
   return out;
 }
 
-const readText = (root, rel) => (fs.existsSync(path.join(root, rel)) ? fs.readFileSync(path.join(root, rel), 'utf8') : null);
-const readJson = (root, rel, fallback) => JSON.parse(readText(root, rel) ?? 'null') ?? fallback;
-
-function mdxUnder(root, rel) {
-  const out = [];
-  const walk = (dir) => {
-    if (!fs.existsSync(dir)) return;
-    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, e.name);
-      if (e.isDirectory()) walk(full);
-      else if (e.name.endsWith('.mdx')) out.push(path.relative(root, full).split(path.sep).join('/'));
-    }
-  };
-  walk(path.join(root, rel));
-  return out;
-}
-
-/** The 1-based line of the first source line containing `anchor` (or its first words), else 1. */
-function lineOf(source, anchor) {
-  const lines = source.split('\n');
-  for (const probe of [anchor, anchor.slice(0, 40), anchor.slice(0, 24)].filter((p) => p.length > 3)) {
-    const k = lines.findIndex((l) => l.includes(probe));
-    if (k !== -1) return k + 1;
-  }
-  return 1;
-}
-
 const inputs = byRoot((repoRoot) => {
   const glossary = readText(repoRoot, GLOSSARY) ?? '';
   const terms = parseGlossary(glossary);
   const manifest = readJson(repoRoot, `${VIEWS}/components.json`, { components: [] });
-  const { collisions } = vocabularyAliases(terms, {
-    names: manifest.components.map((c) => c.name),
-    notHere: readJson(repoRoot, `${VIEWS}/_inventions.json`, { components: [] }).components.map((r) => r.not),
-    handAliases: readJson(repoRoot, `${VIEWS}/_aliases.json`, { components: {} }).components,
-  });
+  const { collisions } = vocabularyAliases(terms, aliasInputs(path.join(repoRoot, VIEWS), manifest.components.map((c) => c.name)));
   const findPage = createPageFinder(repoRoot, readJson(repoRoot, REGISTRY, null));
   const strictFiles = new Set(
     STRICT_PAGES.map((name) => manifest.components.find((c) => c.name === name)).filter((c) => c?.source).map((c) => findPage({ name: c.name, source: c.source })),
@@ -164,7 +129,7 @@ const inputs = byRoot((repoRoot) => {
   const componentNames = manifest.components.map((c) => c.name);
   const words = avoidWords(terms, componentNames);
   const names = correctNames(terms, componentNames);
-  const pages = PAGE_ROOTS.flatMap((rel) => mdxUnder(repoRoot, rel)).sort().map((file) => {
+  const pages = PAGE_ROOTS.flatMap((rel) => pagesUnder(repoRoot, rel)).sort().map((file) => {
     const source = readText(repoRoot, file);
     const page = readDocsPage(source);
     const text = [page.intro, ...page.sections.map((s) => `## ${s.title}\n${s.text}`)].join('\n');

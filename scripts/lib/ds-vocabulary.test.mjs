@@ -6,11 +6,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { createLookup } from './ds-lookup.mjs';
-import { DS_SECTION, parseGlossary, vocabularyAliases } from './ds-vocabulary.mjs';
+import { DS_SECTION, aliasInputs, parseGlossary, vocabularyAliases } from './ds-vocabulary.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -169,4 +170,12 @@ test('find: a product avoid-word does not route to a design-system term through 
   const all = Object.values(lookup.vocabulary().aliases).flat();
   for (const word of ['alert', 'report', 'incident', 'class', 'meeting']) assert.ok(!all.includes(word), word);
   assert.ok(fs.existsSync(path.join(REPO_ROOT, 'GLOSSARY.md')));
+});
+
+test('aliasInputs reads the not-here names and hand-kept aliases from an agent-views folder, empty when a file is missing', () => {
+  const views = fs.mkdtempSync(path.join(os.tmpdir(), 'alias-inputs-'));
+  assert.deepEqual(aliasInputs(views, ['Card']), { names: ['Card'], notHere: [], handAliases: {} });
+  fs.writeFileSync(path.join(views, '_inventions.json'), JSON.stringify({ components: [{ not: 'Toast', use: ['Flag'] }] }));
+  fs.writeFileSync(path.join(views, '_aliases.json'), JSON.stringify({ components: { Card: ['tile'] } }));
+  assert.deepEqual(aliasInputs(views, ['Card']), { names: ['Card'], notHere: ['Toast'], handAliases: { Card: ['tile'] } });
 });
