@@ -12,11 +12,17 @@ import {
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const DemoSlide = ({ children }) => (
-    <div style={{ height: 'calc(var(--size-1000) * 0.75)', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ds-background-neutral)', color: 'var(--ds-text)', font: 'var(--heading-small)' }}>
+    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--ds-background-accent-blue-subtlest)', color: 'var(--ds-text-subtle)', font: 'var(--heading-xsmall)' }}>
         {children}
     </div>
 );
-export const demoSlides = ['First slide', 'Second slide', 'Third slide'].map((text) => ({ content: <DemoSlide>{text}</DemoSlide> }));
+export const titled = [
+    { title: 'Prep a session in two minutes', description: "See a student's goals and your last notes before you join." },
+    { title: 'Reflect while it is fresh', description: 'Record what worked and what to try next time.' },
+    { title: 'Training between sessions', description: 'Lessons run ten minutes or less.' },
+].map((slide, k) => ({ ...slide, media: <DemoSlide>{`Feature ${k + 1}`}</DemoSlide> }));
+export const untitled = titled.map(({ media }) => ({ media }));
+export const many = Array.from({ length: 10 }, (_, k) => ({ title: `Feature ${k + 1}`, media: <DemoSlide>{`Feature ${k + 1}`}</DemoSlide> }));
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -36,14 +42,14 @@ export const figmaMeta = {
 <Meta of={CarouselStories} />
 
 <Title />
-A slideshow component for cycling through elements—images or slides of text—like a carousel.
+A centered stage of slides in a flat row: the active one full size, a smaller, faded neighbor peeking on each side. A pill per slide shows where you are: the active one stretches and fills over the slide's time, on the same clock as the ring round the play button.
 
 <DocsTabs of={CarouselStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock 
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19498"
+<ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21734-21493"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Carousel"
     sets={figmaMeta.sets}
     figmaFileKey={figmaMeta.fileKey}
@@ -53,27 +59,17 @@ A slideshow component for cycling through elements—images or slides of text—
 
 <div className="sb-ds-doc-section">
 
-## Appearance
+## Examples
 
-<ComponentExample of={CarouselStories.Overview} title="Controls and indicators" description="Slides with the previous and next controls and the indicators, both on by default." />
+<ComponentExample of={CarouselStories.Overview} title="Autoplay" description="The default. The ring round the play button fills over each slide's time, then the next slide comes to the front." />
 
-<ComponentExample of={CarouselStories.Content} title="Bare, with controls, and labeled" description="Bare slides, slides with controls and indicators, and the labeled slide variant." />
+<ComponentExample of={CarouselStories.Static} title="Autoplay off" description={<>With <code>autoplay={'{false}'}</code>, arrows sit either side of the pills and the slides wait to be chosen.</>} />
 
-</div>
+<ComponentExample of={CarouselStories.NoLoop} title="No loop" description={<>Without <code>loop</code>, the arrows stop at the first and last slide.</>} />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={CarouselStories.FewSlides} title="Two slides" description="With two slides nothing wraps round, so one side of the stage stays open." />
 
-## State
-
-<ComponentExample of={CarouselStories.Rest} title="Rest" description="The previous and next controls at 70%, in the subtle text color." />
-
-<ComponentExample of={CarouselStories.Hovered} title="Hovered" description="The control at full opacity in the default text color." />
-
-<ComponentExample of={CarouselStories.Pressed} title="Pressed" description="No pressed layer; pressing an indicator or a control moves to its slide." />
-
-<ComponentExample of={CarouselStories.Focused} title="Focused" description="The 2px focus ring, 2px off the control." />
-
-<ComponentExample of={CarouselStories.Disabled} title="Disabled" description="Without wrap, the first slide has no previous, and that control dims to the disabled opacity." />
+<ComponentExample of={CarouselStories.ReducedMotion} title="Reduced motion" description="When the viewer asks for less motion: no autoplay, no play button, arrows shown, and every move in one step." />
 
 </div>
 
@@ -105,14 +101,16 @@ A slideshow component for cycling through elements—images or slides of text—
 
 ## Usage
 
-Use `Carousel` for a small set of equal, browsable panels the user is invited to
-look through — onboarding screens, a few featured items, a gallery. Everything in
-it is one slide away from being unseen, so nothing essential belongs here.
+Use `Carousel` for a few equal panels a person is invited to look through: what is
+new, a short tour, a handful of featured items. Every slide but one is hidden at
+any moment, so nothing a person must read or act on belongs in it.
 
-`slides` takes an array of `{ content, alt, title, caption }`, or you can
-compose the items yourself as `children`. `interval` is `null` by default, which
-means it does not advance on its own; `controls` and `indicators` are both on,
-and both appear only when there is more than one slide.
+`slides` takes `{ media, title, description }`. `media` is the card; `title`
+and `description` fill the caption under the controls and name each pill.
+Autoplay is on, at `interval` 5000 ms a slide, and loops. `peek` shows the
+neighbors; turn it off to show the current slide alone. `onSlideChange` gets
+the new index. Give the region a name
+with `aria-label` or `aria-labelledby`.
 
 </div>
 
@@ -120,10 +118,12 @@ and both appear only when there is more than one slide.
 
 ## Parts
 
-1. **Slide.** One at a time, sliding across the track.
-2. **Previous and next.** Controls over the left and right edge, each a 48 tall touch target.
-3. **Indicators.** One bar per slide at the bottom; the current slide is the selected one.
-4. **Play and pause.** Only when `interval` is set. It sits outside the track at the bottom-left, so it never scrolls away.
+1. **Stage.** Full width, with the edges fading out.
+2. **Slide.** A card, centered. A neighbor on each side sits in the same row, scaled down and faded; clicking one brings it to the front.
+3. **Play button.** A subtle circle `IconButton`, Pause while playing and Play while paused, inside a ring whose arc fills over the slide's time.
+4. **Pills.** One per slide. Inactive slides are 8px dots; the active one stretches to a 32px pill whose fill grows left to right over the slide's time. When it fills, the next slide comes up and its pill starts. Choosing a pill moves to its slide and starts its clock over.
+5. **Arrows.** Circle `IconButton`s, only when the carousel does not autoplay, in place of the play button.
+6. **Caption.** The active slide's title as a `Heading` and one line of body text, centered under the controls.
 
 ### States
 
@@ -132,11 +132,12 @@ and both appear only when there is more than one slide.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td>Controls at 70% opacity in <code>--ds-text-subtle</code>. Indicators in <code>--ds-border</code>, the current one in <code>--ds-background-selected-bold</code>.</td></tr>
-<tr><td>Hovered</td><td>Controls at full opacity in <code>--ds-text</code>.</td></tr>
-<tr><td>Pressed</td><td>No pressed layer. The press moves to the slide.</td></tr>
-<tr><td>Focused</td><td>A 2px ring 2px off the control or indicator.</td></tr>
-<tr><td>Disabled</td><td>At the first or last slide with <code>wrap</code> off, the control is disabled and dimmed to <code>--ds-opacity-disabled</code>. With <code>pause="hover"</code>, the default, autoplay pauses while the pointer is over the carousel.</td></tr>
+<tr><td>Playing</td><td>The ring arc and the active pill fill together in <code>--ds-background-brand-bold</code>.</td></tr>
+<tr><td>Paused</td><td>The play icon shows. The arc and the pill fill hold where they stopped.</td></tr>
+<tr><td>Held</td><td>The clock stops while the pointer rests on the stage, keyboard focus is inside, the carousel is out of view or the tab is hidden. It resumes where it held. Pressing Play starts it again even with focus inside.</td></tr>
+<tr><td>Hovered, pressed, focused</td><td>The play button and the arrows keep the states of <code>IconButton</code>. A hovered or pressed pill's track turns <code>--ds-border-bold</code>; a focused one takes the focus ring.</td></tr>
+<tr><td>Reduced motion or no autoplay</td><td>No ring; the active pill shows full.</td></tr>
+<tr><td>Disabled arrow</td><td>Without <code>loop</code>, at the first or last slide.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -147,14 +148,13 @@ and both appear only when there is more than one slide.
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Corner</td><td><code>--radius-md</code>.</td></tr>
-<tr><td>Controls</td><td><code>--ds-text-subtle</code>, <code>--ds-text</code> on hover; icon <code>--icon-lg</code>; padding <code>--space-100</code>; touch target <code>--space-300</code>.</td></tr>
-<tr><td>Play and pause</td><td><code>--control-md</code> round, <code>--ds-surface</code> ground, inset <code>--space-0625</code>.</td></tr>
-<tr><td>Slide content</td><td>At least <code>--size-1400</code> tall, padded <code>--section-pad-y-default</code> and <code>--section-pad-x-default</code>.</td></tr>
-<tr><td>Caption</td><td>Title in <code>--heading-medium</code>, text in <code>--body-large</code>, both <code>--ds-text-inverse</code> over a gradient to <code>--ds-background-inverse-subtle</code>.</td></tr>
-<tr><td>Indicators</td><td><code>--ds-border</code>, <code>--ds-background-selected-bold</code> when current; <code>--size-750</code> wide, <code>--space-0375</code> tall, corner <code>--radius-lg</code>; <code>--stack-md</code> apart.</td></tr>
-<tr><td>Focus ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code> wide and offset.</td></tr>
-<tr><td>Disabled</td><td><code>--ds-opacity-disabled</code>.</td></tr>
+<tr><td>Card</td><td><code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code>, corners <code>--card-radius</code>.</td></tr>
+<tr><td>Neighbors</td><td>Faded under <code>--ds-surface</code> at 45%, <code>--section-stack-lg</code> apart (<code>--inline-lg</code> on a narrow stage).</td></tr>
+<tr><td>Ring</td><td><code>--control-lg</code> across, <code>--border-selected</code> wide. Track <code>--ds-border</code>; progress <code>--ds-background-brand-bold</code>.</td></tr>
+<tr><td>Pills</td><td>Dot <code>--progress-indicator-dot-size-8</code>, active pill <code>--control-md</code> long, both <code>--radius-full</code>. Track <code>--ds-border</code>; fill <code>--ds-background-brand-bold</code>. Each sits in a <code>--control-sm</code> target with <code>--inline-md</code> either side.</td></tr>
+<tr><td>Motion</td><td>A move takes <code>--motion-duration-long</code> on <code>--motion-easing-standard</code>. The caption lifts out over <code>--motion-duration-short</code> and rises in over <code>--motion-duration-medium</code>.</td></tr>
+<tr><td>Caption</td><td><code>Heading</code> size small; line in <code>--body-default</code> and <code>--ds-text-subtle</code>; at most <code>--content-max-width-reading</code> wide.</td></tr>
+<tr><td>Spacing</td><td><code>--section-stack-md</code> between the stage, the controls and the caption; <code>--inline-md</code> between controls.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -164,95 +164,35 @@ and both appear only when there is more than one slide.
 
 ## Best practices
 
-Use a carousel for a few equal, optional panels. Nothing a person must see belongs in one.
+### Keep it to three to six slides.
 
-### Show controls when there is more than one slide.
-
-Controls and indicators are the only cue that more slides exist.
+The pills are the map. Past six, nobody gets to the end.
 
 <DoDontPair
-    doExample={<Carousel aria-label="Lesson highlights" slides={demoSlides} />}
-    doCaption="Controls on a multi-slide carousel."
-    dontExample={<Carousel aria-label="Lesson highlights, no controls" slides={demoSlides} controls={false} indicators={false} />}
-    dontCaption="Slides with no way to move."
+    doExample={<Carousel aria-label="Features" slides={titled} autoplay={false} />}
+    doCaption="Three slides, each worth seeing."
+    dontExample={<Carousel aria-label="Features" slides={many} autoplay={false} />}
+    dontCaption="Ten slides and a row of pills to match."
 />
 
-### Give it the column width.
+### Give every slide a title.
 
-A carousel needs room to show a slide in full; squeezed, it hides what it carries.
+The title is the caption a sighted reader sees and the name a screen reader hears on each pill.
 
 <DoDontPair
-    doExample={<Carousel aria-label="Featured lessons" slides={demoSlides} />}
-    doCaption="Full column width."
-    dontExample={<div style={{ width: 'var(--size-1000)' }}><Carousel aria-label="Featured lessons, squeezed" slides={demoSlides} /></div>}
-    dontCaption="Squeezed into a sliver."
+    doExample={<Carousel aria-label="Features" slides={titled} autoplay={false} />}
+    doCaption="A title and one line for each slide."
+    dontExample={<Carousel aria-label="Features" slides={untitled} autoplay={false} />}
+    dontCaption="No titles: the pills say only Slide 1 of 3."
 />
 
-### One carousel per view.
+### Keep the caption to one line.
 
-Two carousels compete for the same gesture and the same attention.
+The caption holds two lines of room so the page does not jump. A paragraph pushes the page down every time the slide changes.
 
-<DoDontPair
-    doExample={<Carousel aria-label="This week" slides={demoSlides} />}
-    doCaption="A single carousel."
-    dontExample={<div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}><Carousel aria-label="This week, first" slides={demoSlides} /><Carousel aria-label="This week, second" slides={demoSlides} /></div>}
-    dontCaption="Two carousels stacked."
-/>
+### Leave autoplay to slides that can be missed.
 
-### A string slide is text, and only text.
-
-```jsx
-// A string that is not an image path renders escaped. Markup in it appears as
-// characters on the slide rather than as elements, which is what makes it safe
-// to pass content you did not write.
-<Carousel slides={[{ content: review.body }]} />
-
-// Prefer an element anyway — it is the only way to style a slide.
-<Carousel slides={[{ content: <Review body={review.body} /> }]} />
-
-// And if you genuinely hold trusted HTML, say so explicitly. The component will
-// render the element you pass; the decision is yours and it is visible.
-<Carousel slides={[{ content: <div dangerouslySetInnerHTML={{ __html: trusted }} /> }]} />
-```
-
-### Give every image slide an `alt`.
-
-```jsx
-// Incorrect — the fallback is "Slide 0", "Slide 1", zero-based and meaningless.
-<Carousel slides={[{ content: '/hero/autumn.png' }]} />
-
-// Correct.
-<Carousel slides={[{ content: '/hero/autumn.png', alt: 'Students in a workshop' }]} />
-```
-
-### Autoplay is off, and turning it on adds a control.
-
-```jsx
-// Setting an interval starts the rotation AND renders a play/pause button, so
-// the movement can be stopped without a mouse. Leaving it off is still
-// the better default — a carousel nobody asked to move is a carousel people
-// read half of.
-<Carousel interval={4000} slides={slides} />
-
-<Carousel slides={slides} />
-```
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content guidelines
-
-<DocsTable>
-<thead>
-<tr><th>Do</th><th>Don't</th></tr>
-</thead>
-<tbody>
-<tr><td>Give each slide one idea and a short title.</td><td>Put a paragraph on a slide that rotates away.</td></tr>
-<tr><td>Write alt text that says what the image shows.</td><td>Leave `alt` empty on an image that carries the point.</td></tr>
-<tr><td>Write a caption that adds to the image.</td><td>Repeat the title as the caption.</td></tr>
-</tbody>
-</DocsTable>
+Autoplay moves on whether or not a person finished. Turn it off with `autoplay={false}` when a slide asks someone to read closely.
 
 </div>
 
@@ -260,27 +200,27 @@ Two carousels compete for the same gesture and the same attention.
 
 ## Accessibility
 
-- **The controls are named.** The previous and next buttons carry
-  `aria-label="Previous slide"` and `"Next slide"`, and each indicator is
-  labeled "Slide 1", "Slide 2" and so on; the arrows themselves are
-  `aria-hidden`. That is what keeps them from being unnamed buttons.
-- **Slides off screen are still in the DOM.** A link or button inside a hidden
-  slide can still be reached. Keep controls out of the slides, or accept that
-  they are focusable before they are visible.
-- **`keyboard` is on by default.** Left and right arrows move between slides when
-  the carousel has focus. Leaving it on is what makes the component operable
-  without a mouse.
-- **Autoplay comes with its pause control.** Anything that moves for more than
-  five seconds must be pausable, and `pause="hover"` covers a mouse and nothing
-  else. Setting an `interval` renders a play/pause button, named for what
-  pressing it will do and reachable by keyboard. It appears only when
-  there is autoplay to pause.
-- **Reduced motion turns autoplay off.** When a person has asked for reduced
-  motion, an `interval` does nothing and the pause control is not drawn. The
-  slide transition is instant, and the arrows, dots and arrow keys still move
-  between slides.
-- **Captions are a heading and a `p`.** The title is a heading one level below
-  the section the carousel sits in, so it fits the page's outline.
+- **The region needs a name.** It is a `region` announced as a carousel; pass
+  `aria-label` or `aria-labelledby`.
+- **The pause control comes first.** Autoplay can always be stopped from the
+  play button, which is the first control in the row. Its name says what a
+  press will do: Pause, then Play.
+- **Each pill is a button.** The pills are a group named "Choose a slide"; each
+  is named "Slide 2 of 5" and the slide's title, and the current one carries
+  `aria-current="true"`. Each pill is its own tab stop, with a 24px target.
+- **Only the active slide is read.** Each slide is a group named "2 of 5";
+  the others are `aria-hidden` and inert, so focus never lands behind the
+  front card.
+- **Keyboard focus holds the clock.** Tabbing into the carousel stops
+  autoplay so nothing moves under a keyboard user; pressing Play starts it
+  again. A mouse click on a control does not hold it.
+- **Arrow keys move the stage.** With focus on the region or a control,
+  ArrowLeft and ArrowRight move a slide either way.
+- **The caption speaks only when asked.** It is a polite live region while the
+  carousel is paused or does not autoplay, and silent while it plays, so it
+  never talks over a screen reader on its own.
+- **Reduced motion is respected.** When the viewer asks for less motion, the
+  carousel does not autoplay, shows arrows and moves in one step.
 
 </div>
 
@@ -288,11 +228,10 @@ Two carousels compete for the same gesture and the same attention.
 
 ## Related
 
-- For content the user must see, take it out of the carousel and lay it out —
-  a slide that is not on screen is a slide most people never read.
-- For stepping through a sequence with a known end, use `ProgressBar` alongside
-  your own controls.
-- For alternative views of the same thing, use `Tabs`.
+- To show a few items side by side, all at once, lay them out as cards in a
+  grid. Nothing is hidden and nothing moves.
+- For switching between alternative views of the same content, use `Tabs`.
+- For a short guided tour of a new feature, use `Spotlight`.
 
 </div>
 

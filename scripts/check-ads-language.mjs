@@ -27,7 +27,8 @@
  *                    where they are the pattern, not React-Bootstrap's Overlay.
  *   prop:style|fill|size   lines with the retired prop values: `style="primary"`
  *                    (a bare identifier, which no inline CSS is), `fill="filled"`,
- *                    `size="small|medium|large|sm|md|lg"`.
+ *                    `size="small|medium|large|sm|md|lg"`. A `<Heading>`'s size is the type
+ *                    scale (xxlarge to xxsmall), current vocabulary, so it is exempt.
  *   proptype:size    lines declaring `size: PropTypes.oneOf(['small', ...])`, the prop-type
  *                    side of `prop:size`: a component that declares the old vocabulary
  *                    never writes it as JSX, so only the declaration shows it.
@@ -111,6 +112,28 @@ const LINE_RULES = [
   ['token:color-surface', /var\(--color-(?:on-)?surface(?:-[a-z]+)*\)/i],
 ];
 
+/**
+ * Components whose `size` is the type scale (xxlarge to xxsmall), the current
+ * vocabulary, not the retired small / medium / large control sizes.
+ */
+const TYPE_SCALE_TAGS = new Set(['Heading']);
+
+/**
+ * Is every retired `size="…"` on line `i` on a type-scale tag? Each one is
+ * owned by the nearest `<Tag` before it that no `>` has closed yet.
+ */
+function typeScaleSize(lines, i) {
+  const prior = lines.slice(Math.max(0, i - 20), i).join('\n');
+  const line = lines[i];
+  const owner = (head) => {
+    const open = [...head.matchAll(/<([A-Za-z][\w.]*)/g)].pop();
+    if (!open || /(?<!=)>/.test(head.slice(open.index + 1))) return null;
+    return open[1];
+  };
+  const bad = [...line.matchAll(/\bsize="(?:small|medium|large|sm|md|lg)"/g)];
+  return bad.length > 0 && bad.every((m) => TYPE_SCALE_TAGS.has(owner(`${prior}\n${line.slice(0, m.index)}`)));
+}
+
 /** An import statement that binds `name`; capture 1 is where it comes from. */
 const importOf = (name) =>
   new RegExp(
@@ -161,7 +184,7 @@ export function measure(sources) {
     if (ALLOWED_PATHS.some((re) => re.test(file))) continue;
     const live = text.split('\n').map((l) => (ALLOWED_LINE.test(l) ? '' : l));
     for (const [rule, re] of LINE_RULES) {
-      const hits = live.flatMap((l, i) => (re.test(l) ? [i + 1] : []));
+      const hits = live.flatMap((l, i) => (re.test(l) && !(rule === 'prop:size' && typeScaleSize(live, i)) ? [i + 1] : []));
       add(rule, file, hits.length, hits[0]);
     }
     // `size: PropTypes.oneOf(SIZES)` with `const SIZES = ['sm', ...]` in the same file.
