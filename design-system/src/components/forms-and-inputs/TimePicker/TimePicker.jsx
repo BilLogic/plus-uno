@@ -181,9 +181,13 @@ TimePicker.propTypes = {
     isValid: PropTypes.bool,
     /** `(value)` — a 12-hour string, "02:30 PM", or null once cleared. */
     onChange: PropTypes.func,
+    /** Focus entering the field from outside it. */
     onFocus: PropTypes.func,
+    /** Focus leaving the field and its list. */
     onBlur: PropTypes.func,
+    /** Extra class names on the field's wrapper, beside its own. */
     className: PropTypes.string,
+    /** Inline style on the field's wrapper. */
     style: PropTypes.object,
 };
 

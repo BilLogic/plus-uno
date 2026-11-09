@@ -116,10 +116,10 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `isInvalid` | bool | `false` | Draws the field invalid; a typed text that is not a time does too. |
 | `isValid` | bool | `false` | Draws the field valid. |
 | `onChange` | func | — | `(value)` — a 12-hour string, "02:30 PM", or null once cleared. |
-| `onFocus` | func | — | — |
-| `onBlur` | func | — | — |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
+| `onFocus` | func | — | Focus entering the field from outside it. |
+| `onBlur` | func | — | Focus leaving the field and its list. |
+| `className` | string | `''` | Extra class names on the field's wrapper, beside its own. |
+| `style` | object | — | Inline style on the field's wrapper. |
 
 ## Variants
 

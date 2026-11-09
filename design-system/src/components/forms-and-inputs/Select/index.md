@@ -46,7 +46,7 @@ Don't: The same words as plain help, in a default field.
 
 ### Pick the mode by the answer. {#pick-the-mode-by-the-answer}
 
-`isMulti` shows picks as Tags and checkboxes in the list; `selectAll` and `maxSelections` apply to it only. `isSearchable` filters by typing, and `isCreatable` adds a "Create" row when nothing matches. `clearable` defaults to on with `isMulti` and off for a required single select.
+`isMulti` shows picks as Tags and checkboxes in the list; `selectAll` and `maxSelections` apply to it only. `isSearchable` filters by typing, and `isCreatable` adds a "Create" row when nothing matches. `createOption` turns the typed text into the option it creates, or refuses it with null; Time picker uses it to read "1430" as 2:30 PM. `clearable` defaults to on with `isMulti` and off for a required single select.
 
 ### Show picks as text when Tags crowd the field. {#show-picks-as-text-when-tags-crowd-the-field}
 

@@ -298,8 +298,13 @@ const Listbox = ({
             setScrollTop(body.scrollTop);
             return;
         }
+        // Scroll the list's own body only, never the page behind it.
         const row = surfaceRef.current?.querySelector(`#${CSS.escape(resolvedActive)}`);
-        if (row && row.scrollIntoView) row.scrollIntoView({ block: 'nearest' });
+        if (!row) return;
+        const r = row.getBoundingClientRect();
+        const b = body.getBoundingClientRect();
+        if (r.top < b.top) body.scrollTop -= b.top - r.top;
+        else if (r.bottom > b.bottom) body.scrollTop += r.bottom - b.bottom;
     });
 
     /* ---------- live announcements ---------- */

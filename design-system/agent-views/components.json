@@ -14925,7 +14925,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Focus entering the field from outside it.",
           "deprecated": null
         },
         {
@@ -14934,7 +14934,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Focus leaving the field and its list.",
           "deprecated": null
         },
         {
@@ -14943,7 +14943,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names on the field's wrapper, beside its own.",
           "deprecated": null
         },
         {
@@ -14952,7 +14952,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline style on the field's wrapper.",
           "deprecated": null
         }
       ],

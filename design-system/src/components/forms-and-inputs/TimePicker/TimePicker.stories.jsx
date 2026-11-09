@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import TimePicker from './TimePicker';
@@ -12,7 +12,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'A time field with an AM/PM toggle. It is checked when you press Enter or leave the field: a real time (hour 1–12, minute 0–59) is picked, anything else is kept as typed and marked invalid.',
+                    'A time field: type a time, or pick one from the day\'s times, every half hour by default. Each time carries its period. A typed time that is not in the list is read on Enter; text that is not a time is refused and marked invalid.',
             },
         },
     },
@@ -179,6 +179,17 @@ export const WithValue = {
     render: () => <div style={wrap}><TimePicker aria-label="Reminder time" value="02:30 PM" /></div>,
     play: async ({ canvasElement }) => {
         await expect(input(canvasElement)).toHaveValue('2:30 PM');
+        // Opening the list brings the picked time into view, without scrolling the page.
+        const pageTop = window.scrollY;
+        await userEvent.click(input(canvasElement));
+        const picked = await within(document.body).findByRole('option', { name: '2:30 PM' });
+        const surface = picked.closest('.plus-listbox').getBoundingClientRect();
+        await waitFor(() => {
+            const row = picked.getBoundingClientRect();
+            expect(row.top >= surface.top && row.bottom <= surface.bottom, 'the picked row is in view').toBe(true);
+        });
+        await expect(window.scrollY, 'the page did not move').toBe(pageTop);
+        await userEvent.keyboard('{Escape}');
     },
 };
 
