@@ -2,6 +2,7 @@ import React from 'react';
 import { expect, userEvent } from 'storybook/test';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import ScrollBar from '@/components/layout-and-structure/ScrollBar';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
     title: 'Components/Layout and structure/Scrollbar',
@@ -92,7 +93,7 @@ export const Overview = () => (
 export const Layout = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px', width: '100%', maxWidth: '600px' }}>
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VERTICAL (DEFAULT)</span>
+            <DemoLabel>VERTICAL (DEFAULT)</DemoLabel>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                 Content scrolls vertically once it exceeds maxHeight.
             </p>
@@ -103,7 +104,7 @@ export const Layout = () => (
             </div>
         </section>
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">HORIZONTAL</span>
+            <DemoLabel>HORIZONTAL</DemoLabel>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                 Wide content scrolls sideways with the same thin, tokenized scrollbar.
             </p>
@@ -118,7 +119,7 @@ export const Layout = () => (
 
 export const Content = () => (
     <div style={{ width: '100%', maxWidth: '600px' }}>
-        <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">USE CASE EXAMPLE</span>
+        <DemoLabel>USE CASE EXAMPLE</DemoLabel>
         <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
             A list panel with the Design System scrollbar instead of the browser default.
         </p>

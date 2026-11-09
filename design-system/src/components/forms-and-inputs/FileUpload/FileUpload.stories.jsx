@@ -4,6 +4,7 @@ import { expect, userEvent, within } from 'storybook/test';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import FileUpload from './FileUpload';
 import { iconClass } from '../../../lib/icon';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 const formats = ['.zip', '.mp4', '.m4a', '.txt'];
 
@@ -113,7 +114,7 @@ export const Content = () => (
 export const Styles = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INVALID</span>
+            <DemoLabel>INVALID</DemoLabel>
             <FileUpload
                 id="file-upload-error"
                 label="Upload files"
@@ -125,7 +126,7 @@ export const Styles = () => (
             />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VALID</span>
+            <DemoLabel>VALID</DemoLabel>
             <FileUpload
                 id="file-upload-valid"
                 label="Upload files"
@@ -142,7 +143,7 @@ export const Styles = () => (
 export const InteractionStates = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
+            <DemoLabel>DEFAULT</DemoLabel>
             <FileUpload
                 id="file-upload-default"
                 label="Upload files"
@@ -152,7 +153,7 @@ export const InteractionStates = () => (
             />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FOCUS</span>
+            <DemoLabel>FOCUS</DemoLabel>
             <FileUpload
                 id="file-upload-focus"
                 label="Upload files"
@@ -162,7 +163,7 @@ export const InteractionStates = () => (
             />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+            <DemoLabel>DISABLED</DemoLabel>
             <FileUpload
                 id="file-upload-disabled"
                 label="Upload files"

@@ -6,6 +6,7 @@ import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Tooltip from '@/components/overlays-and-layering/Tooltip';
 import Button from '@/components/forms-and-inputs/Button';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
     title: 'Components/Overlays and layering/Tooltip',
@@ -59,25 +60,25 @@ function TooltipVariantsDemos() {
     return (
         <div style={containerStyle}>
             <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">TOP</span>
+                <DemoLabel>TOP</DemoLabel>
                 <Tooltip text="Tooltip on top" placement="top" show={true}>
                     <Button appearance="primary" text="Top" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">BOTTOM</span>
+                <DemoLabel>BOTTOM</DemoLabel>
                 <Tooltip text="Tooltip on bottom" placement="bottom" show={true}>
                     <Button appearance="primary" text="Bottom" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">LEFT</span>
+                <DemoLabel>LEFT</DemoLabel>
                 <Tooltip text="Tooltip on left" placement="left" show={true}>
                     <Button appearance="primary" text="Left" />
                 </Tooltip>
             </div>
             <div style={blockStyle}>
-                <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">RIGHT</span>
+                <DemoLabel>RIGHT</DemoLabel>
                 <Tooltip text="Tooltip on right" placement="right" show={true}>
                     <Button appearance="primary" text="Right" />
                 </Tooltip>

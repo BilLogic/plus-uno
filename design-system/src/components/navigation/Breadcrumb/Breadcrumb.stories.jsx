@@ -5,6 +5,7 @@ import { decorationUnder, expectInk } from '@/storybook-docs/lib/navigation-stat
 import { expectNoStateChange } from '@/storybook-docs/lib/label-states.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Breadcrumb from './Breadcrumb';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 const sampleItems = [
     { text: 'Home', href: '/' },
@@ -58,7 +59,7 @@ const breadcrumbBlock = { display: 'flex', flexDirection: 'column', gap: 'var(--
 function BreadcrumbStandardDemo() {
     return (
         <div style={breadcrumbBlock}>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">STANDARD BREADCRUMB</span>
+            <DemoLabel>STANDARD BREADCRUMB</DemoLabel>
             <Breadcrumb items={sampleItems} />
         </div>
     );
@@ -67,7 +68,7 @@ function BreadcrumbStandardDemo() {
 function BreadcrumbShortDemo() {
     return (
         <div style={breadcrumbBlock}>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">SHORT BREADCRUMB (2 LEVELS)</span>
+            <DemoLabel>SHORT BREADCRUMB (2 LEVELS)</DemoLabel>
             <Breadcrumb items={[
                 { text: 'Home', href: '/' },
                 { text: 'Current Page' }

@@ -5,6 +5,7 @@ import { expect, userEvent, within } from 'storybook/test';
 import Accordion from './Accordion';
 import { expectHovered, expectPressed, expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { probe, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
     title: 'Components/Layout and structure/Accordion',
@@ -96,14 +97,14 @@ function AccordionVariantsDemos() {
     return (
         <>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT ACCORDION</span>
+                <DemoLabel>DEFAULT ACCORDION</DemoLabel>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                     Standard accordion with borders and one item open at a time.
                 </p>
                 <Accordion items={sampleItems} defaultActiveKey="0" />
             </section>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FLUSH ACCORDION</span>
+                <DemoLabel>FLUSH ACCORDION</DemoLabel>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                     Borderless accordion for seamless integration with surrounding content.
                 </p>
@@ -119,14 +120,14 @@ function AccordionBehaviorDemos() {
     return (
         <>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALWAYS OPEN (MULTIPLE EXPANDED)</span>
+                <DemoLabel>ALWAYS OPEN (MULTIPLE EXPANDED)</DemoLabel>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                     Multiple accordion items can be open simultaneously.
                 </p>
                 <Accordion items={sampleItems} defaultActiveKey={['0', '1']} alwaysOpen />
             </section>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ALL COLLAPSED</span>
+                <DemoLabel>ALL COLLAPSED</DemoLabel>
                 <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                     Accordion with no default expanded item.
                 </p>
@@ -139,7 +140,7 @@ function AccordionBehaviorDemos() {
 function AccordionInteractionDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH DISABLED ITEM</span>
+            <DemoLabel>WITH DISABLED ITEM</DemoLabel>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                 Individual items can be disabled to prevent interaction.
             </p>
@@ -158,7 +159,7 @@ function AccordionInteractionDemos() {
 function AccordionContentDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">USING CHILDREN (ALTERNATIVE PATTERN)</span>
+            <DemoLabel>USING CHILDREN (ALTERNATIVE PATTERN)</DemoLabel>
             <p className="plus-body-2" style={{ marginBottom: '16px', color: 'var(--ds-text)' }}>
                 Accordion supports both the <code>items</code> array prop and direct child components.
             </p>

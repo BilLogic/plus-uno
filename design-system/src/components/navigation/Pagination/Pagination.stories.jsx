@@ -4,6 +4,7 @@ import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectInk, expectInsetRing } from '@/storybook-docs/lib/navigation-states.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Pagination from './Pagination';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
     title: 'Components/Navigation/Pagination',
@@ -113,7 +114,7 @@ function PaginationSpacingDemos() {
     return (
         <>
             <section>
-                <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ICON NAVIGATOR SPACINGS</span>
+                <DemoLabel>ICON NAVIGATOR SPACINGS</DemoLabel>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Default and compact icon pagination.
                 </p>
@@ -125,7 +126,7 @@ function PaginationSpacingDemos() {
                 </div>
             </section>
             <section>
-                <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">TEXT NAVIGATOR SPACINGS</span>
+                <DemoLabel>TEXT NAVIGATOR SPACINGS</DemoLabel>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Default and compact text pagination with Previous and Next labels.
                 </p>
@@ -144,7 +145,7 @@ function PaginationInteractionStatesDemos() {
     return (
         <>
             <section>
-                <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">FIRST PAGE</span>
+                <DemoLabel>FIRST PAGE</DemoLabel>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Previous control is disabled at the first page.
                 </p>
@@ -160,7 +161,7 @@ function PaginationInteractionStatesDemos() {
                 </div>
             </section>
             <section>
-                <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">LAST PAGE</span>
+                <DemoLabel>LAST PAGE</DemoLabel>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Next control is disabled at the last page.
                 </p>
@@ -176,7 +177,7 @@ function PaginationInteractionStatesDemos() {
                 </div>
             </section>
             <section>
-                <span className="uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">MIDDLE PAGE</span>
+                <DemoLabel>MIDDLE PAGE</DemoLabel>
                 <p className="body-default" style={{ marginBottom: 'var(--stack-lg)', color: 'var(--ds-text-subtle)' }}>
                     Both previous and next controls are enabled.
                 </p>

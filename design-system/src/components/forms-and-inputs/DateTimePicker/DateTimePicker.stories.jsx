@@ -3,6 +3,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { expect, within } from 'storybook/test';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import DateTimePicker from './DateTimePicker';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
     title: 'Components/Forms and inputs/Date time picker',
@@ -106,11 +107,11 @@ Overview.parameters = {
 export const Spacing = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT (40)</span>
+            <DemoLabel>DEFAULT (40)</DemoLabel>
             <DateTimePicker id="dt-default" label="Month" isRequired spacing="default" showSectionLabels={false} />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COMPACT (32)</span>
+            <DemoLabel>COMPACT (32)</DemoLabel>
             <DateTimePicker id="dt-compact" label="Month" isRequired spacing="compact" showSectionLabels={false} />
         </div>
     </div>
@@ -119,7 +120,7 @@ export const Spacing = () => (
 export const Validation = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INVALID</span>
+            <DemoLabel>INVALID</DemoLabel>
             <DateTimePicker
                 id="datetime-error"
                 label="Month"
@@ -130,7 +131,7 @@ export const Validation = () => (
             />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">VALID</span>
+            <DemoLabel>VALID</DemoLabel>
             <DateTimePicker
                 id="datetime-success"
                 label="Month"
@@ -146,15 +147,15 @@ export const Validation = () => (
 export const InteractionStates = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-5400)' }}>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
+            <DemoLabel>DEFAULT</DemoLabel>
             <DateTimePicker id="datetime-default" label="Month" isRequired showSectionLabels={false} />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+            <DemoLabel>DISABLED</DemoLabel>
             <DateTimePicker id="datetime-disabled" label="Month" isRequired isDisabled showSectionLabels={false} />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
+            <DemoLabel>READ ONLY</DemoLabel>
             <DateTimePicker id="datetime-readonly" label="Month" isRequired isReadOnly showSectionLabels={false} />
         </div>
     </div>

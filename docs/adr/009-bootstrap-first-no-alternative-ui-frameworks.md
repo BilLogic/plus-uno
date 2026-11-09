@@ -14,6 +14,8 @@ verified: 2026-11-03
 > no-other-frameworks half of this decision (no Material UI, no Ant Design,
 > FA Free only) stands; only the Bootstrap-fallback half is replaced.
 
+> **Update 2026-11-09:** Tailwind is removed; the docs chrome is styled on the app's tokens, so the Tailwind half of the ban holds again.
+>
 > **Verified against code 2026-08-24 (#171) — the ban on Tailwind is contradicted by the code.**
 >
 > `package.json` declares `tailwindcss`, `@tailwindcss/vite` and `tailwind-merge`,

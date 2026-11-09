@@ -7,6 +7,7 @@ import { contrastRatio, paintedOver } from '@/storybook-docs/lib/contrast.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import SectionMessage, { SECTION_MESSAGE_ICONS, SECTION_MESSAGE_APPEARANCES } from './SectionMessage';
 import { iconClass } from '../../../lib/icon';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 const ICON_TOKEN = {
     primary: '--ds-icon-brand',
@@ -84,9 +85,9 @@ const contentVariantCol = { display: 'flex', flexDirection: 'column', gap: '24px
 function SectionMessageContentDemos() {
     return (
         <div style={contentVariantCol}>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">CONTENT VARIANTS (PRIMARY STYLE)</span>
+            <DemoLabel>CONTENT VARIANTS (PRIMARY STYLE)</DemoLabel>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH TITLE</span>
+                <DemoLabel>WITH TITLE</DemoLabel>
                 <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Use when the message benefits from a short heading.
                 </p>
@@ -95,7 +96,7 @@ function SectionMessageContentDemos() {
                 </SectionMessage>
             </section>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">BODY ONLY</span>
+                <DemoLabel>BODY ONLY</DemoLabel>
                 <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Use when concise copy does not require a heading.
                 </p>
@@ -104,7 +105,7 @@ function SectionMessageContentDemos() {
                 </SectionMessage>
             </section>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">NON-DISMISSIBLE</span>
+                <DemoLabel>NON-DISMISSIBLE</DemoLabel>
                 <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Use for critical information that must remain visible.
                 </p>
@@ -113,7 +114,7 @@ function SectionMessageContentDemos() {
                 </SectionMessage>
             </section>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">RICH CONTENT</span>
+                <DemoLabel>RICH CONTENT</DemoLabel>
                 <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Supports inline emphasis and links inside the body.
                 </p>
@@ -123,7 +124,7 @@ function SectionMessageContentDemos() {
                 </SectionMessage>
             </section>
             <section>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">ACTIONS</span>
+                <DemoLabel>ACTIONS</DemoLabel>
                 <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                     Up to two link-button actions after the body.
                 </p>

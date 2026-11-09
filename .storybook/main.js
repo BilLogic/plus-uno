@@ -2,7 +2,6 @@
 import path, { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fs from 'fs';
-import tailwindcss from '@tailwindcss/vite';
 
 import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { resolveManagerThemes } from '../scripts/lib/manager-theme.mjs';
@@ -114,15 +113,6 @@ const config = {
     // Deduplicate React to avoid invalid hook call errors
     config.resolve.dedupe = config.resolve.dedupe || [];
     config.resolve.dedupe.push('react', 'react-dom');
-
-    // Tailwind (docs chrome + MDX); must run before other CSS transforms
-    const plugins = config.plugins ?? [];
-    const hasTailwind = plugins.some(
-      (p) => p && (p.name === '@tailwindcss/vite' || p.name === 'tailwindcss')
-    );
-    if (!hasTailwind) {
-      config.plugins = [tailwindcss(), ...plugins];
-    }
 
     // Config css
     config.css = config.css || {};
