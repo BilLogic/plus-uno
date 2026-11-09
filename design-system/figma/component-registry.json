@@ -630,7 +630,7 @@
         "mdxPath": "design-system/src/components/images-and-icons/Illustration/Illustration.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Illustration",
         "source": "design-system/src/components/images-and-icons/Illustration/Illustration.jsx",
-        "storybookId": "components-images-and-icons-illustrations--docs",
+        "storybookId": "components-images-and-icons-illustration--docs",
         "props": {
           "character": {
             "type": "enum",
@@ -692,12 +692,12 @@
     },
     "InlineEdit": {
       "code": {
-        "import": "@/components/forms-and-inputs",
+        "import": "@/components/text-and-data-display",
         "export": "default",
-        "mdxPath": "design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/forms-and-inputs/InlineEdit",
-        "source": "design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.jsx",
-        "storybookId": "components-forms-and-inputs-inline-edit--docs",
+        "mdxPath": "design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/text-and-data-display/InlineEdit",
+        "source": "design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.jsx",
+        "storybookId": "components-text-and-data-display-inline-edit--docs",
         "props": {}
       },
       "figma": {
@@ -953,7 +953,7 @@
         "mdxPath": "design-system/src/components/navigation/MenuGroup/MenuGroup.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/navigation/MenuGroup",
         "source": "design-system/src/components/navigation/MenuGroup/MenuGroup.jsx",
-        "storybookId": "components-navigation-menu-group--docs"
+        "storybookId": "components-navigation-menu--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1072,7 +1072,7 @@
         "mdxPath": "design-system/src/components/layout-and-structure/Panel/Panel.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/layout-and-structure/Panel",
         "source": "design-system/src/components/layout-and-structure/Panel/Panel.jsx",
-        "storybookId": "patterns-panel--docs"
+        "storybookId": "components-layout-and-structure-panel--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1302,7 +1302,7 @@
         "mdxPath": "design-system/src/patterns/Sidebar/Sidebar.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Sidebar",
         "source": "design-system/src/patterns/Sidebar/Sidebar.jsx",
-        "storybookId": "patterns-sidebar--docs"
+        "storybookId": "components-navigation-navigation-system--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1485,7 +1485,7 @@
         "mdxPath": "design-system/src/components/labels/Suggestion/Suggestion.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Suggestion",
         "source": "design-system/src/components/labels/Suggestion/Suggestion.jsx",
-        "storybookId": "ai-ui-components-for-ai-suggestion--docs",
+        "storybookId": "ai-ui-components-suggestion--docs",
         "props": {
           "type": {
             "type": "enum",

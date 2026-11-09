@@ -18,7 +18,7 @@ import { iconClass } from '../../../lib/icon';
  */
 
 export default {
-    title: 'Components/Layout and structure/Visually hidden',
+    title: 'Components/Text and data display/Visually hidden',
     component: VisuallyHidden,
     tags: ['!dev', '!autodocs'],
     parameters: {

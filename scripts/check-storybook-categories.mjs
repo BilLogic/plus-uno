@@ -33,11 +33,9 @@
  *      root (`Getting started/…`, `Foundations/Patterns/…`) cannot open a
  *      stray top-level entry of its own.
  *
- * A component whose docs read as a layout area rather than a component (the
- * Panel) is listed in the taxonomy's `patternComponents` and titled
- * `Patterns/<name>`; an AI component (Icon, Prompt input) is listed in
- * `aiComponents` and titled `AI UI/Components for AI/<name>`. Either way its
- * folder stays under its category.
+ * An AI component (Icon, Prompt input) is listed in the taxonomy's
+ * `aiComponents` and titled `AI UI/Components/<name>`, while its folder stays
+ * under its category.
  *
  * The categories are Atlassian's, read live from atlassian.design/components on
  * 2026-10-24. Only the ones with members are used; adding a member to another
@@ -82,9 +80,9 @@ export const ATLASSIAN_CATEGORIES = [
   'Text and data display',
 ];
 
-/** Where an AI component is titled: `AI UI/Components for AI/<name>`. */
+/** Where an AI component is titled: `AI UI/Components/<name>`. */
 export const AI_ROOT = 'AI UI';
-export const AI_COMPONENTS = 'Components for AI';
+export const AI_COMPONENTS = 'Components';
 
 /** The sidebar's leading sections, in order: the benchmark site's, with our Patterns before Components. */
 export const SITE_SECTIONS = ['Get started', 'Foundations', 'Patterns', 'Components', 'AI UI'];
@@ -207,7 +205,6 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     const [root, category, ...rest] = title.split('/');
     const parts = rel.split('/');
     const folder = parts.length > 4 ? parts[3] : '_internal';
-    if (root === 'Patterns' && (taxonomy.patternComponents ?? []).includes(category)) continue;
     if (root === AI_ROOT && category === AI_COMPONENTS && (taxonomy.aiComponents ?? []).includes(rest[0])) continue;
     if (root !== 'Components' || !groups.includes(category)) {
       found.push(

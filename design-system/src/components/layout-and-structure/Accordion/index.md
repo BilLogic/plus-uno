@@ -111,7 +111,7 @@ it leaves the accordion with no edge to hold it.
 - For switching between alternative views of the same content, use `Tabs`. Tabs say "one of these"; an accordion says "these, some of which are open".
 - When every section has to be readable at once, use none of them and lay the sections out. Comparing two collapsed items means opening, reading, closing, opening.
 
-Same group: `Carousel` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
+Same group: `Carousel` · `PageHeader` · `Panel` · `ScrollBar`
 
 ## Parts
 

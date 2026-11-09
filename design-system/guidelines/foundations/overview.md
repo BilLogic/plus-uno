@@ -41,7 +41,7 @@ template inviting someone to fill in a heading with `TODO`.
 
 ## Page order
 
-Storybook and Figma list the foundations in the same order: Foundations overview, Tokens, Color, Typography, Spacing, Layout & grid, Elevation, Border, Radius, Iconography, Illustrations, Logos, Motion, then Accessibility. Each page follows one shape: hero, contents, the foundation's sections, Accessibility, Related.
+Storybook and Figma list the foundations in the same order: Overview, Tokens, Accessibility, Spacing, Grid, Color, Typography, Motion, Iconography, Illustrations, Logos, Elevation, Border, then Radius. Each page follows one shape: hero, contents, the foundation's sections, Accessibility, Related.
 
 ## Reading order
 

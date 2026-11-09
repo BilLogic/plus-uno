@@ -4,12 +4,12 @@ import { PatternCard } from '@/patterns';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 
 /**
- * Specimens for Foundations/Layout & grid: the 12 columns and the 16 gutter, and the
+ * Specimens for Foundations/Grid: the 12 columns and the 16 gutter, and the
  * grid rules as Do and Don't pairs. Columns are drawn with the layout tokens,
  * so they follow the docs page's own width.
  */
 export default {
-    title: 'Foundations/Layout & grid',
+    title: 'Foundations/Grid',
     tags: ['!dev', '!autodocs'],
 };
 

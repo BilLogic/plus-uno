@@ -8,7 +8,7 @@ import PanelContainer, {
 } from '@/components/layout-and-structure/Panel';
 
 export default {
-    title: 'Patterns/Panel',
+    title: 'Components/Layout and structure/Panel',
     component: PanelContainer,
     tags: ['!dev', '!autodocs'],
 };

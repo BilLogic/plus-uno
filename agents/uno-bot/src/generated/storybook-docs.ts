@@ -53,11 +53,6 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-forms-and-inputs-button-icon-button--docs"
   ],
   [
-    "design-system/src/components/forms-and-inputs/InlineEdit/",
-    "InlineEdit",
-    "components-forms-and-inputs-inline-edit--docs"
-  ],
-  [
     "design-system/src/components/forms-and-inputs/LabelAndCaption.stories.",
     "LabelAndCaption",
     "components-forms-and-inputs-form--docs"
@@ -130,7 +125,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/images-and-icons/Illustration/",
     "Illustration",
-    "components-images-and-icons-illustrations--docs"
+    "components-images-and-icons-illustration--docs"
   ],
   [
     "design-system/src/components/images-and-icons/Image/",
@@ -155,7 +150,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/labels/Suggestion/",
     "Suggestion",
-    "ai-ui-components-for-ai-suggestion--docs"
+    "ai-ui-components-suggestion--docs"
   ],
   [
     "design-system/src/components/labels/Tag/",
@@ -185,7 +180,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/layout-and-structure/Panel/",
     "Panel",
-    "patterns-panel--docs"
+    "components-layout-and-structure-panel--docs"
   ],
   [
     "design-system/src/components/layout-and-structure/ScrollBar/",
@@ -240,7 +235,7 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/components/navigation/MenuGroup/",
     "MenuGroup",
-    "components-navigation-menu-group--docs"
+    "components-navigation-menu--docs"
   ],
   [
     "design-system/src/components/navigation/Pagination/",
@@ -268,6 +263,11 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "components-text-and-data-display-heading--docs"
   ],
   [
+    "design-system/src/components/text-and-data-display/InlineEdit/",
+    "InlineEdit",
+    "components-text-and-data-display-inline-edit--docs"
+  ],
+  [
     "design-system/src/components/text-and-data-display/Table/DynamicTable.",
     "DynamicTable",
     "components-text-and-data-display-dynamic-table--docs"
@@ -285,6 +285,6 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
   [
     "design-system/src/patterns/Sidebar/",
     "Sidebar",
-    "patterns-sidebar--docs"
+    "components-navigation-navigation-system--docs"
   ]
 ];

@@ -88,8 +88,9 @@ job only risks a different icon or label than the rest of the system uses.
 
 - For something that must be decided before the page continues, use `Modal`.
 - For the page's persistent navigation rail, see `Sidebar`.
+- Frame for where the Panel docks, peeks or opens as an overlay at each width.
 
-Same group: `Accordion` · `Carousel` · `PageHeader` · `ScrollBar` · `VisuallyHidden`
+Same group: `Accordion` · `Carousel` · `PageHeader` · `ScrollBar`
 
 ## Parts
 

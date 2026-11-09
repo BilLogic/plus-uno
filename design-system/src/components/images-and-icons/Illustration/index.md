@@ -21,6 +21,10 @@ is decoration beside words that already say what the page is about.
 Use an icon, not a character, for anything a person acts on or has to read to
 understand. Use `Tile` for a small square picture of a thing.
 
+When to use a character, which one and how it sits on a page are on
+Illustrations. This
+page is the component's API.
+
 ## Best practices
 
 ### Pick a SMART character for a SMART area, and a math character for anything else. {#pick-a-smart-character-for-a-smart-area-and-a-math-character-for-anything-else}
@@ -55,6 +59,7 @@ Don't: Clipping the box cuts off the limbs.
 
 ## Related
 
+- Illustrations for when to use a character and which one.
 - For a small square picture of a thing, use `Tile`.
 - For a person, use `Avatar`.
 

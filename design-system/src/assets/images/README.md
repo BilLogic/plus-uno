@@ -4,7 +4,6 @@ This directory contains all static image assets for the PLUS Design System, orga
 
 ## Directory Structure
 
-- `auth-providers/` - Authentication provider images (Clever, Google, etc.)
 - `icons/` - Custom icon images (if not using Font Awesome)
 - `lessons/` - Training lesson illustrations for lesson card thumbnails (decorative, used with `alt=""`)
 
@@ -22,17 +21,13 @@ All images should be referenced using relative paths from the component or templ
 
 ```javascript
 // From prototypes/<slug>/src/
-const cleverImage = "../../../design-system/src/assets/images/auth-providers/clever-image.png";
+const lessonImage = "../../../design-system/src/assets/images/lessons/training-praise.svg";
 ```
-
-## Special Cases
-
-- **Clever Image**: Uses PNG file from `auth-providers/clever-image.png`
 
 ## Adding New Images
 
 1. Place images in the appropriate category directory
-2. Use descriptive, kebab-case filenames (e.g., `clever-image.png`, `google-icon.svg`)
+2. Use descriptive, kebab-case filenames (e.g., `training-praise.svg`)
 3. Update this README if adding a new category
 4. Document any special usage requirements
 

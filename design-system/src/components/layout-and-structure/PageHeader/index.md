@@ -79,7 +79,7 @@ wrap — a custom element already carrying its own heading semantics.
 - For a heading inside a region of the page, use the Section pattern.
 - For the trail shown above the title, use `Breadcrumb`.
 
-Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar` · `VisuallyHidden`
+Same group: `Accordion` · `Carousel` · `Panel` · `ScrollBar`
 
 ## Parts
 

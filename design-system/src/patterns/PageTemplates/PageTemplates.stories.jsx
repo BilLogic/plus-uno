@@ -166,6 +166,12 @@ export const InBrowserFrame = {
     }),
 };
 
+/** The dashboard in the Chrome window: a template is the container the app is dropped into. */
+export const InBrowser = {
+    parameters: { browserFrame: 'chrome', docs: { disable: true } },
+    render: () => fullHeight(<AppPage><DashboardContent /></AppPage>),
+};
+
 /** content=dashboard: a page header, metric cards that reflow, and a section. */
 export const Dashboard = {
     render: () => fullHeight(<AppPage><DashboardContent /></AppPage>),

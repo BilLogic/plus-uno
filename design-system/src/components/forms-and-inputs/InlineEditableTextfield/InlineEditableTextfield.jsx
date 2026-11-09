@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import TextField from '../TextField/TextField';
-import InlineEdit from '../InlineEdit';
+import InlineEdit from '@/components/text-and-data-display/InlineEdit';
 
 /**
  * InlineEditableTextfield — `InlineEdit` with a Text field for its edit view.

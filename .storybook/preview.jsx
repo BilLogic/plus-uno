@@ -174,33 +174,30 @@ const preview = {
           ],
           "Foundations",
           [
-            "Foundations overview",
+            "Overview",
             "Tokens",
+            "Accessibility",
+            "Spacing",
+            "Grid",
             "Color",
             "Typography",
-            "Spacing",
-            "Layout & grid",
-            "Elevation",
-            "Border",
-            "Radius",
+            "Motion",
             "Iconography",
             "Illustrations",
             "Logos",
-            "Motion",
-            "Accessibility",
-            "Imagery"
+            "Elevation",
+            "Border",
+            "Radius"
           ],
           "Patterns",
           [
             "Templates",
             "Frame",
-            "Sidebar",
             "Page",
             [
               "Page",
               "Heading outline"
             ],
-            "Panel",
             "Section",
             [
               "Section",
@@ -231,13 +228,19 @@ const preview = {
                 "Close button",
                 "Vertical button"
               ],
+              "Calendar",
               "Checkbox",
               "Comment",
               "Date time picker",
-              "Date picker",
+              [
+                "Date time picker",
+                "Date picker",
+                "Time picker"
+              ],
               "Dropdown menu",
+              "Fieldset",
               "File upload",
-              "Label & caption",
+              "Form",
               "Radio",
               [
                 "Radio",
@@ -256,17 +259,18 @@ const preview = {
               "Tag input",
               "Text area",
               "Text field",
-              "Toggle",
-              "Inline edit"
+              "Toggle"
             ],
             "Images and icons",
             [
               "Avatar",
+              "Avatar group",
+              "Icon",
+              "Illustration",
+              "Image",
               "Logo",
               "Object",
-              "Tile",
-              "Illustrations",
-              "Image"
+              "Tile"
             ],
             "Labels",
             [
@@ -285,8 +289,8 @@ const preview = {
               "Accordion",
               "Carousel",
               "Page header",
-              "Scrollbar",
-              "Visually hidden"
+              "Panel",
+              "Scrollbar"
             ],
             "Loading",
             [
@@ -308,9 +312,13 @@ const preview = {
             [
               "Breadcrumbs",
               "Link",
-              "Menu group",
+              "Menu",
+              "Navigation system",
+              [
+                "Navigation system",
+                "Sidebar tab"
+              ],
               "Pagination",
-              "Sidebar tab",
               "Tabs"
             ],
             "Overlays and layering",
@@ -330,33 +338,43 @@ const preview = {
                 "Code",
                 "Code block"
               ],
-              "Table"
+              "Heading",
+              "Inline edit",
+              "Static table",
+              "Dynamic table",
+              "Tree table",
+              "Visually hidden"
             ]
           ],
           "AI UI",
           [
             "About AI UI",
             "AI interaction guidelines",
-            "Foundations for AI",
+            "Foundations",
             [
               "Color",
               "Elevation",
               "Motion",
               "Voice and tone"
             ],
-            "Components for AI",
+            "Components",
             [
               "Button",
-              "Generative border",
               "Icon",
               "Illustration",
-              "Skills tag",
-              "AI message",
+              "Generative border",
               "Prompt input",
               "Prompt starters",
-              "Suggestion"
+              "Suggestion",
+              "Skills tag",
+              "AI message",
+              [
+                "AI message",
+                "AI sources",
+                "AI feedback"
+              ]
             ],
-            "Patterns for AI",
+            "Patterns",
             [
               "AI chat"
             ]

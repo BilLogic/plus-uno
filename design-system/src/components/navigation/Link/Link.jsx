@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
-import VisuallyHidden from '@/components/layout-and-structure/VisuallyHidden';
+import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
 import './Link.scss';
 import { iconClass } from '../../../lib/icon';
 

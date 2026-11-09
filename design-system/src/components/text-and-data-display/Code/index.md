@@ -55,7 +55,7 @@ Don't: A trailing period inside the chip, which the reader may type.
 
 - For several lines, `CodeBlock`.
 
-Same group: `CodeBlock` · `Heading` · `Table`
+Same group: `CodeBlock` · `Heading` · `InlineEdit` · `Table` · `VisuallyHidden`
 
 ## Parts
 

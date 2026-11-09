@@ -10,7 +10,7 @@ Also asked as: page template, page shell, page layout, full page, new page, surf
 
 **Source:** `design-system/src/patterns/Frame/Frame.jsx`
 
-**Stories:** `design-system/src/patterns/Frame/Frame.stories.jsx` — Overview, ColorModes, Reading, DocsOverview, DocsReading, DocsContentGrid, PairWithSidebar, PairWithoutSidebar, PairTitleInHeader, Interactive, DocsAuto768, DocsAuto1024, DocsAuto1440, DocsPeeking768, DocsPeeking1024, DocsPeeking1440, Floating, Medium768, Large1024, CtrlBracketToggle, CtrlBracketAt768, SidebarMeetsPage, XLarge1440, Wide1600, ReadingAt1440, ContentGrid, ModalClosesFloatingSidebar, ModalFromFloatingSidebar, ModalLeavesDockedSidebar, ModalClosesOverlaySidebarAt768, DocsPanel, PanelDockedAt1440, PanelAutoCollapsesSidebarAt1200, PanelOverlayAt1100, SidebarByHandWinsAt1300, ModalLeavesPanelOpen, ModalOverOverlayPanelAt1100, OverlayPanelIsModalAt1100, DockedPanelIsNotModalAt1440, PanelFieldKeepsEscapeAt1100, DockedPanelLeavesEscapeAt1200, DockedPanelTakesLostFocusAt1200, HeaderTriggerTogglesOverlayAt1100, OverlaySplitterKeepsSidebarAt1100, OneOverlayAt768, FullWidthUnder768, SplitterKeyboardAt1440, SplitterDragAt1440, PanelRememberedForTheTab, PanelPeek, NoPanelPeekByDefault, SectionDetailKeepsSplitAt1440, SectionDetailSplitterKeepsSplitAt1440
+**Stories:** `design-system/src/patterns/Frame/Frame.stories.jsx` — Overview, ColorModes, Reading, DocsOverview, DocsReading, DocsContentGrid, PairWithSidebar, PairWithoutSidebar, PairTitleInHeader, Interactive, Floating, Medium768, Large1024, CtrlBracketToggle, CtrlBracketAt768, SidebarMeetsPage, XLarge1440, Wide1600, ReadingAt1440, ContentGrid, ModalClosesFloatingSidebar, ModalFromFloatingSidebar, ModalLeavesDockedSidebar, ModalClosesOverlaySidebarAt768, PanelDockedAt1440, PanelAutoCollapsesSidebarAt1200, PanelOverlayAt1100, SidebarByHandWinsAt1300, ModalLeavesPanelOpen, ModalOverOverlayPanelAt1100, OverlayPanelIsModalAt1100, DockedPanelIsNotModalAt1440, PanelFieldKeepsEscapeAt1100, DockedPanelLeavesEscapeAt1200, DockedPanelTakesLostFocusAt1200, HeaderTriggerTogglesOverlayAt1100, OverlaySplitterKeepsSidebarAt1100, OneOverlayAt768, FullWidthUnder768, SplitterKeyboardAt1440, SplitterDragAt1440, PanelRememberedForTheTab, PanelPeek, NoPanelPeekByDefault, SectionDetailKeepsSplitAt1440, SectionDetailSplitterKeepsSplitAt1440, StateSidebarDocked, StateSidebarClosed, StateSidebarPeek, StateSidebarFloating, StatePanelDocked, StatePanelPeek, StatePanelOverlay, StatePanelFullWidth, StatePanelNarrowest, StatePanelWidest, StateSidebarAndPanel, StatePanelCollapsesSidebar, StatePanelOnBlanket, StateWithModal, StateModalClosesFloating, StateWithDrawer, StateAt768, StateAt1024, StateAt1440
 
 **Storybook page:** `design-system/src/patterns/Frame/Frame.mdx`
 
@@ -68,7 +68,7 @@ Don't: Without it, the Sidebar and the Panel both dock, the content drops under 
 - Sidebar for the part the frame places beside the Page.
 - Section for a region inside the content.
 - Templates for a whole page, Frame with its content slot filled, and the focused frame for one task.
-- Layout & grid for the column math the frame is sized by.
+- Grid for the column math the frame is sized by.
 
 Same group: `AiChat` · `Blanket` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 

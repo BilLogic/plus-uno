@@ -48,7 +48,7 @@ Don't: Every cell wrapped, so rows grow uneven.
 - For splitting a long result set across pages, use `Pagination`.
 - For a status or a count inside a cell, use `StatusTag` or `CountTag`.
 
-Same group: `Code` · `CodeBlock` · `Heading`
+Same group: `Code` · `CodeBlock` · `Heading` · `InlineEdit` · `VisuallyHidden`
 
 ## Parts
 

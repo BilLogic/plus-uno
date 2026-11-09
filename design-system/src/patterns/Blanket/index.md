@@ -60,7 +60,7 @@ Don't: A third overlay over a modal and its confirm.
 Do: Confirm in a small modal.
 Don't: Confirm in a large modal.
 
-Opening a modal closes a floating sidebar, so the two never stack. A floating sidebar gets a shadow and no blanket, and popups, flags and tooltips never bring one.
+Popups, flags and tooltips never bring a blanket. How a modal meets the Sidebar is on Frame.
 
 ### Place a modal in the Blanket. {#place-a-modal-in-the-blanket}
 
@@ -77,9 +77,9 @@ Let the Blanket place the modal. Do not detach it to move things around: the pad
 
 - [Modal](?path=/docs/patterns-overlays-modal--docs) is the layer a Blanket usually holds, centered, for one task that blocks the page.
 - [Drawer](?path=/docs/patterns-overlays-drawer--docs) is the layer held at an edge, for a task that needs the page in view.
-- [Panel](?path=/docs/patterns-panel--docs) opens over a contained Blanket when its Frame is too narrow to dock it.
+- [Panel](?path=/docs/components-layout-and-structure-panel--docs) opens over a contained Blanket when its Frame is too narrow to dock it.
 - [Popups](?path=/docs/patterns-popups--docs) covers the floating layers that never take a blanket.
-- For a floating sidebar, use the [Sidebar](?path=/docs/patterns-sidebar--docs): it takes a shadow and no blanket.
+- [Frame](?path=/docs/patterns-frame-frame--docs) shows the floating Sidebar, which takes a shadow and no blanket, and the overlay Panel on its contained Blanket.
 
 Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 

@@ -7,7 +7,7 @@ import MenuGroup, { ButtonItem, CustomItem, LinkItem, Section } from '@/componen
 import { iconClass } from '../../../lib/icon';
 
 export default {
-    title: 'Components/Navigation/Menu group',
+    title: 'Components/Navigation/Menu',
     component: MenuGroup,
     tags: ['!dev', '!autodocs'],
     argTypes: {

@@ -72,7 +72,7 @@ Hold the Drawer full height at a screen edge, inside a Blanket. Never put it str
 - [Modal](?path=/docs/patterns-overlays-modal--docs) is the centered layer for a task that blocks the page.
 - [Blanket](?path=/docs/patterns-overlays-blanket--docs) places the Drawer at an edge and draws the fill.
 - [Section](?path=/docs/patterns-section-section--docs) and [Card](?path=/docs/patterns-section-card--docs) hold content that belongs on the page itself.
-- Templates show a medium Drawer over the page.
+- Frame shows a Drawer open over the app frame, and how it meets the Sidebar.
 
 Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 

@@ -2,7 +2,7 @@
 
 # Text and data display
 
-4 components. Each row links to the generated facts; the three columns after it are the
+6 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -10,9 +10,11 @@ authored half, counted rather than assumed.
 | [Code](Code/index.md) | 2 | ✅ | ✅ | ✅ |
 | [CodeBlock](CodeBlock/index.md) | 7 | ✅ | ✅ | ✅ |
 | [Heading](Heading/index.md) | 6 | ✅ | ✅ | ✅ |
+| [InlineEdit](InlineEdit/index.md) | 18 | ✅ | ✅ | ✅ |
 | [Table](Table/index.md) | 17 | ✅ | ✅ | ✅ |
+| [VisuallyHidden](VisuallyHidden/index.md) | 3 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 4/4 (100%) · Correct/incorrect 4/4 (100%) · Accessibility 4/4 (100%)
+**Authored coverage:** When to use 6/6 (100%) · Correct/incorrect 6/6 (100%) · Accessibility 6/6 (100%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

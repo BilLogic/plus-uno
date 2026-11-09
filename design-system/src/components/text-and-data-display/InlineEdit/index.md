@@ -6,11 +6,11 @@ InlineEdit — text that reads as text and becomes a field when it is pressed. T
 
 **Import:** `import { InlineEdit } from '@/components';`
 
-**Source:** `design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.jsx`
+**Source:** `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.stories.jsx` — Textfield, LeavingConfirms, KeepOpenOnBlur, Validation, FailedConfirm, WithoutButtons, StartsOpen, SameHeight, SpacingDefault, SpacingCompact, ButtonsDoNotMoveThePage, WithAnotherEditView, Placeholder, Interactive
+**Stories:** `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.stories.jsx` — Textfield, LeavingConfirms, KeepOpenOnBlur, Validation, FailedConfirm, WithoutButtons, StartsOpen, SameHeight, SpacingDefault, SpacingCompact, ButtonsDoNotMoveThePage, WithAnotherEditView, Placeholder, Interactive
 
-**Storybook page:** `design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.mdx`
+**Storybook page:** `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.mdx`
 
 ## Usage
 
@@ -82,7 +82,7 @@ thought, and keep the buttons so there is a clear way out.
 - For editing in place with no buttons, use `TextField` with `appearance="subtle"`.
 - For several lines edited in place, use `TextArea` with `appearance="subtle"`.
 
-Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
+Same group: `Code` · `CodeBlock` · `Heading` · `Table` · `VisuallyHidden`
 
 ## Parts
 
@@ -152,7 +152,7 @@ The edit view takes the field's own tokens: see Text field.
 
 `--body-default` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-shadow-overlay` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtlest` · `--height-250` · `--item-height-md` · `--pad-x-md` · `--radius-0625` · `--radius-md` · `--stack-sm`
 
-From `design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.scss`. Override these through the token layer, never with a literal.
+From `design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.scss`. Override these through the token layer, never with a literal.
 
 ## Figma
 
