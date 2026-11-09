@@ -7,26 +7,8 @@
  */
 @use '../../../styles/state' as *;
 
-.plus-date-picker__input {
-    flex: 1 1 auto;
-    min-width: 0;
-    width: 100%;
-    padding: 0;
-    margin: 0;
-    border: none;
-    background: transparent;
-    font: inherit;
-    color: inherit;
-
-    &:focus {
-        @include plus-ring-reset;
-    }
-
-    &::placeholder {
-        color: var(--ds-text-subtlest);
-        opacity: 1;
-    }
-}
+// The input is `.plus-field__control` (FieldBox.scss): it fills the content
+// slot and draws nothing of its own. Nothing else is set here.
 
 .plus-date-picker__icon {
     display: flex;
