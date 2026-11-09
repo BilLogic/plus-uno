@@ -84,8 +84,12 @@ A Zoom sub-room for one-on-one tutoring.
 A reusable layout of components with named slots, which the patterns overview in Storybook lists. A component is one control in a **Category**; a pattern arranges components.
 _Avoid_: "layout component"
 
+**Template**:
+The page every screen starts from, and the container the app is dropped into: the browser window with the **Frame** inside it, its content already filled (blank, dashboard or reading; default or focused). The browser belongs to the Template.
+_Avoid_: "page template" for the Frame alone, "browser frame" as a pattern
+
 **Frame**:
-The pattern for the app's outer shell: the Topbar, Sidebar and **Panel** that stay put while the **Page** inside changes. "App shell" is an informal alias for talk; code and docs say Frame.
+The pattern for the app's outer shell: the Topbar, Sidebar and **Panel** that stay put while the **Page** inside changes. The **Template** adds the browser around it. "App shell" is an informal alias for talk; code and docs say Frame.
 _Avoid_: "surface container", bare "shell"
 
 **Topbar**:
