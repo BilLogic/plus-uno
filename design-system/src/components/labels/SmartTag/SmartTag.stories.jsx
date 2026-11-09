@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '@/components';
 import { expect, spyOn, userEvent, within } from 'storybook/test';
 
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
@@ -143,7 +144,7 @@ export const UnknownSubjectFallsBack = () => {
     return (
         <div style={row}>
             <SmartTag subject="social-emotional" data-testid="default" />
-            <button type="button" onClick={() => setMounted(true)}>Mount an unknown subject</button>
+            <Button onClick={() => setMounted(true)}>Mount an unknown subject</Button>
             {mounted && <SmartTag subject="chemistry" data-testid="unknown" />}
         </div>
     );

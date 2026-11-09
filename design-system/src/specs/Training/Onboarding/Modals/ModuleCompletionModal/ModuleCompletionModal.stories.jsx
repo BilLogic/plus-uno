@@ -6,6 +6,7 @@
  */
 
 import React, { useState } from 'react';
+import { Button } from '@/components';
 import ModuleCompletionModal from './ModuleCompletionModal';
 import './ModuleCompletionModal.scss';
 
@@ -89,20 +90,9 @@ export const Interactive = {
         return (
             <div style={{ padding: 'var(--size-section-pad-y-lg)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                 {!show && (
-                    <button 
-                        onClick={() => setShow(true)}
-                        style={{
-                            padding: '8px 16px',
-                            backgroundColor: 'var(--color-primary)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            width: 'fit-content'
-                        }}
-                    >
+                    <Button appearance="primary" onClick={() => setShow(true)}>
                         Show Modal
-                    </button>
+                    </Button>
                 )}
                 <ModuleCompletionModal 
                     {...args}

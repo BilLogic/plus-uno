@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, within } from 'storybook/test';
 
-import { DropdownMenu, Modal, Popup, Table, Flag, ButtonItem, Section } from '@/components';
+import { DropdownMenu, Modal, Popup, Table, Flag, ButtonItem, Section, Button } from '@/components';
 import { PatternCard, PatternSection, Page } from '@/patterns';
 
 /**
@@ -114,7 +114,7 @@ export const PopupAndFlagTitles = () => (
             triggerType="manual"
             show
             placement="right"
-            trigger={<button type="button">Notes</button>}
+            trigger={<Button>Notes</Button>}
         >
             Shared with the student.
         </Popup>
@@ -131,7 +131,7 @@ PopupAndFlagTitles.play = async ({ canvasElement }) => {
 /** Group labels are 12 semibold: a menu group's label, and a table's column headers. */
 export const GroupLabels = () => (
     <div style={{ display: 'flex', gap: 'var(--section-stack-lg)', alignItems: 'flex-start' }}>
-        <DropdownMenu isOpen trigger={<button type="button">Sort</button>}>
+        <DropdownMenu isOpen trigger={<Button>Sort</Button>}>
             <Section title="Order">
                 <ButtonItem onClick={() => {}}>Newest</ButtonItem>
                 <ButtonItem onClick={() => {}}>Oldest</ButtonItem>

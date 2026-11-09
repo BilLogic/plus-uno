@@ -122,7 +122,7 @@ export const ButtonInside = () => (
         <div data-field="Steppers">
             <TextField type="number" label="Sessions" defaultValue={3} />
         </div>
-        <div data-field="AM/PM">
+        <div data-field="Time">
             <DateTimePicker label="Starts" showDate={false} />
         </div>
     </div>
@@ -151,11 +151,11 @@ ButtonInside.play = async ({ canvasElement }) => {
         }
     }
 
-    // The AM/PM menu is centered in the time field.
-    const timeBox = fieldIn(canvasElement, 'AM/PM');
-    const period = rect(timeBox.querySelector('.plus-time-picker__period-toggle'));
+    // The time field is the same 40 as every field, its text centered in it.
+    const timeBox = fieldIn(canvasElement, 'Time');
+    const timeText = rect(timeBox.querySelector('.plus-field__control'));
     await expect(heightOf(timeBox), 'Time field height').toBe(40);
-    await expect(Math.abs(middle(period) - middle(rect(timeBox))), 'AM/PM centered').toBeLessThanOrEqual(0.5);
+    await expect(Math.abs(middle(timeText) - middle(rect(timeBox))), 'time text centered').toBeLessThanOrEqual(0.5);
 
     // Steppers are square.
     for (const stepper of fieldIn(canvasElement, 'Steppers').querySelectorAll('.plus-field-stepper')) {

@@ -1,0 +1,23 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="AI UI/Foundations for AI/Motion" />
+
+<FoundationHero
+    title="Motion"
+    summary="AI motion uses the same motion tokens as the rest of PLUS. Its one motion of its own shows that the AI is generating."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Generating">
+
+The <DocsLink id="ai-ui-components-for-ai-generative-border">Generative border</DocsLink> turns its segments once every 6 seconds, at a steady speed, while the AI generates into the content it surrounds. It stops when the content is ready. With reduced motion set, the border holds still and keeps its colors, so the state still shows.
+
+</FoundationSection>
+
+<FoundationSection title="Everything else">
+
+Panels, popups and messages move as they do elsewhere: see <DocsLink id="foundations-motion">Motion</DocsLink>. Streaming text in an <DocsLink id="ai-ui-components-for-ai-ai-message">AI message</DocsLink> appears as it arrives, with no motion added.
+
+</FoundationSection>

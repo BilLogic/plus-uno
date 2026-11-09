@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '@/components';
 import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
@@ -670,8 +671,8 @@ export const StableOnParentRender = () => {
             <TagGroup label="Subjects" overflow="collapse">
                 {tags.map((s) => <Tag key={s} color="green">{s}</Tag>)}
             </TagGroup>
-            <button type="button" onClick={() => setRenders((n) => n + 1)}>Re-render ({renders})</button>
-            <button type="button" onClick={() => setExtra(true)}>Add Latin</button>
+            <Button onClick={() => setRenders((n) => n + 1)}>Re-render ({renders})</Button>
+            <Button onClick={() => setExtra(true)}>Add Latin</Button>
         </div>
     );
 };
@@ -723,7 +724,7 @@ export const SqueezedFirstReplaced = () => {
                     {[first, ...SUBJECTS.slice(1)].map((s) => <Tag key={s} color="green">{s}</Tag>)}
                 </TagGroup>
             </div>
-            <button type="button" onClick={() => setFirst('Art history and visual culture')}>Replace first</button>
+            <Button onClick={() => setFirst('Art history and visual culture')}>Replace first</Button>
         </div>
     );
 };
@@ -794,7 +795,7 @@ export const Disabled = {
     args: { onAccept: fn(), onSelect: fn() },
     render: ({ onAccept, onSelect }) => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '360px' }}>
-            <button type="button">Before</button>
+            <Button>Before</Button>
             <TagGroup label="Focus areas" isDisabled>
                 <Tag color="blue" data-testid="read-only">Read only</Tag>
                 <Tag isRemovable color="blue" onAfterRemoveAction={() => {}} data-testid="removable">Removable</Tag>
@@ -809,7 +810,7 @@ export const Disabled = {
                     <Suggestion label="Latin" onAccept={onAccept} />
                 </TagGroup>
             </div>
-            <button type="button">After</button>
+            <Button>After</Button>
         </div>
     ),
     play: async ({ canvasElement, args }) => {

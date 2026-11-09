@@ -20,7 +20,7 @@ or an icon marking the kind of item in a row. Putting all of them in one frame
 keeps them the same size and shape wherever they appear.
 
 Use an icon on its own when it sits inline with text and needs no frame. Use
-`UserAvatar` for a person: people are round, and a tile is square.
+`Avatar` for a person: people are round, and a tile is square.
 
 ## Best practices
 
@@ -61,10 +61,10 @@ Don't: A bold ground on the logo, which keeps its own.
 
 ## Related
 
-- For a person, use `UserAvatar`.
+- For a person, use `Avatar`.
 - For a value someone picked, with a label, use `Tag`.
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `UserAvatar`
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object`
 
 ## Parts
 

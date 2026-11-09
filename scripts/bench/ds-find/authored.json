@@ -224,8 +224,7 @@
  {
   "q": "profile picture",
   "want": [
-   "Avatar",
-   "UserAvatar"
+   "Avatar"
   ],
   "kind": "intent"
  },

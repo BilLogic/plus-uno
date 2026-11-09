@@ -99,7 +99,7 @@ appear on focus.
 - For a visible label on a field, see Form.
 - For a loading indicator that announces itself, `Spinner` already includes a visually hidden label.
 
-Same group: `Accordion` · `Carousel` · `Footer` · `PageHeader` · `Panel` · `ScrollBar`
+Same group: `Accordion` · `Carousel` · `PageHeader` · `Panel` · `ScrollBar`
 
 ## Parts
 

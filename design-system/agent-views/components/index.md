@@ -87,11 +87,10 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 | Popups | [`Popup`](../../src/components/overlays-and-layering/Popup/Popup.mdx) | `import { Popup } from '@/components';` | The Popups pattern is four floating layers that never block the page, each a component: `DropdownMenu` lists actions, `Popup` holds a small aside anchored to a control, `Flag` reports what just happened, `Tooltip` names a control. |
 | AI | [`AiChat`](../../src/patterns/AiChat/AiChat.mdx) | `import { AiChat } from '@/patterns';` | AI chat as a popup, in the Frame's Panel or full screen, opened from one floating button. |
 
-## UI components (85)
+## UI components (82)
 
 - [Accordion](../../src/components/layout-and-structure/Accordion/index.md)
 - [AiIcon](../../src/components/images-and-icons/AiIcon/index.md)
-- [AiLabel](../../src/components/labels/AiLabel/index.md)
 - [AiMessage](../../src/components/labels/AiMessage/index.md)
 - [Avatar](../../src/components/images-and-icons/Avatar/index.md)
 - [AvatarGroup](../../src/components/images-and-icons/AvatarGroup/index.md)
@@ -118,7 +117,6 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 - [FileUpload](../../src/components/forms-and-inputs/FileUpload/index.md)
 - [FilterButton](../../src/components/forms-and-inputs/FilterButton/index.md)
 - [Flag](../../src/components/messaging/Flag/index.md)
-- [Footer](../../src/components/layout-and-structure/Footer/index.md)
 - [GenerativeBorder](../../src/components/loading/GenerativeBorder/index.md)
 - [Heading](../../src/components/text-and-data-display/Heading/index.md)
 - [IconButton](../../src/components/forms-and-inputs/IconButton/index.md)
@@ -171,7 +169,6 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 - [Toggle](../../src/components/forms-and-inputs/Toggle/index.md)
 - [Tooltip](../../src/components/overlays-and-layering/Tooltip/index.md)
 - [TreeSelect](../../src/components/forms-and-inputs/TreeSelect/index.md)
-- [UserAvatar](../../src/components/images-and-icons/UserAvatar/index.md)
 - [VerticalButton](../../src/components/forms-and-inputs/VerticalButton/index.md)
 - [VisuallyHidden](../../src/components/layout-and-structure/VisuallyHidden/index.md)
 

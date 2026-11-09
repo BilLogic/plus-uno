@@ -90,9 +90,11 @@ export function ResourcesCard({ href, icon, title, description }) {
             href={href || '#'} 
             target={isExternalLink ? "_blank" : undefined}
             rel={isExternalLink ? "noreferrer noopener" : undefined}
-            className="group block p-4 border border-border bg-card shadow-[var(--shadow-docs-card)] hover:shadow-md no-underline transition-all relative text-left"
+            className="group block border border-border bg-card shadow-[var(--shadow-docs-card)] hover:shadow-md no-underline transition-all relative text-left"
             style={{
-                width: '200px',
+                // Five 40px control heights: the 200px card, on the size ladder.
+                width: 'calc(var(--control-lg) * 5)',
+                padding: 'var(--card-pad-compact)',
                 textDecoration: 'none',
                 borderRadius: 'var(--card-radius-sm)',
             }}
@@ -101,7 +103,7 @@ export function ResourcesCard({ href, icon, title, description }) {
             <div className="mb-3 flex justify-start ml-[-2px]">
                 {icon}
             </div>
-            <strong className="text-[15px] leading-tight text-foreground font-semibold m-0 p-0 block">{title}</strong>
+            <strong className="text-foreground m-0 p-0 block" style={{ font: 'var(--heading-xsmall)' }}>{title}</strong>
         </a>
     );
 }
@@ -147,29 +149,26 @@ export function FigmaNodesTable({ sets, fileKey }) {
     // the two column dividers are added back explicitly.
     const lineColor = 'var(--ds-border)';
     const cellStyle = {
-        padding: '8px 12px',
+        padding: 'var(--pad-y-md) var(--pad-x-md)',
         borderTop: 'none',
         borderBottom: `1px solid ${lineColor}`,
         borderLeft: 'none',
         borderRight: 'none',
         textAlign: 'left',
         verticalAlign: 'top',
-        fontSize: '13px',
-        lineHeight: 1.4,
+        font: 'var(--body-default)',
     };
-    const headStyle = { ...cellStyle, fontWeight: 600, whiteSpace: 'nowrap' };
+    const headStyle = { ...cellStyle, fontWeight: 'var(--type-weight-semibold)', whiteSpace: 'nowrap' };
     const dividerRight = { borderRight: `1px solid ${lineColor}` };
 
     return (
-        <div className="sb-ds-figma-nodes not-prose" style={{ marginTop: '24px' }}>
+        <div className="sb-ds-figma-nodes not-prose" style={{ marginTop: 'var(--section-stack-lg)' }}>
             <div
                 style={{
-                    fontSize: '12px',
-                    fontWeight: 600,
+                    font: 'var(--heading-xxsmall)',
                     textTransform: 'uppercase',
-                    letterSpacing: '0.04em',
                     color: 'var(--ds-text-subtle)',
-                    margin: '0 0 8px',
+                    margin: '0 0 var(--section-stack-sm)',
                 }}
             >
                 Figma nodes
@@ -193,7 +192,7 @@ export function FigmaNodesTable({ sets, fileKey }) {
                     style={{
                         margin: 0,
                         width: '100%',
-                        fontSize: '13px',
+                        font: 'var(--body-default)',
                         // separate: collapsed cell borders paint across the
                         // wrapper's rounded corners — the "cut corner" artifact.
                         borderCollapse: 'separate',
@@ -224,7 +223,7 @@ export function FigmaNodesTable({ sets, fileKey }) {
                                         {set.name || set.id || '—'}
                                     </td>
                                     <td style={{ ...rowCell, ...dividerRight, whiteSpace: 'nowrap' }}>
-                                        <code style={{ fontSize: '12px' }} className="text-muted-foreground">{nodeId}</code>
+                                        <code style={{ font: 'var(--code)' }} className="text-muted-foreground">{nodeId}</code>
                                     </td>
                                     <td style={{ ...rowCell, whiteSpace: 'nowrap' }}>
                                         {href ? (
@@ -280,9 +279,9 @@ export function DocsTable({ children, className = '' }) {
 export function ResourcesBlock({ figmaLink, githubLink, sets, figmaFileKey }) {
     if (!figmaLink && !githubLink && (!sets || sets.length === 0)) return null;
     return (
-        <div style={{ marginTop: '48px', marginBottom: '40px' }}>
-            <h3 className="heading-xlarge mb-4 mt-0">Resources</h3>
-            <div className="sb-ds-resources-block flex flex-wrap gap-5">
+        <div className="sb-ds-resources">
+            <h2>Resources</h2>
+            <div className="sb-ds-resources-block">
                 {figmaLink && (
                     <ResourcesCard 
                         href={figmaLink}
@@ -316,7 +315,7 @@ export function DocsPreviewCard({ children, innerClassName = '' }) {
             }}
         >
             <div
-                className={['min-h-[100px] p-10 md:p-12 lg:p-14', innerClassName].filter(Boolean).join(' ')}
+                className={['sb-ds-docs-preview-well__inner', innerClassName].filter(Boolean).join(' ')}
             >
                 {children}
             </div>
@@ -331,7 +330,7 @@ export function DocsPreviewCard({ children, innerClassName = '' }) {
  */
 export function DocsDemoBlock({ description, children, previewClassName = '', chrome = 'card' }) {
     return (
-        <div className="sb-docs-demo not-prose space-y-6 md:space-y-8">
+        <div className="sb-docs-demo not-prose">
             {description ? (
                 <p className="sb-ds-canvas-description">{description}</p>
             ) : null}
@@ -354,8 +353,6 @@ export function DocsCanvasShell({ description, children, attachSourceBelow = tru
     const shellClass = [
         'sb-docs-demo',
         'not-prose',
-        'space-y-6',
-        'md:space-y-8',
         attachSourceBelow && 'sb-ds-docs-canvas-shell--source-attached'
     ]
         .filter(Boolean)
@@ -429,11 +426,11 @@ export function DoDontCard({ tone, children, caption }) {
                 style={{
                     display: 'flex',
                     alignItems: 'center',
-                    gap: '8px',
-                    padding: '8px 16px',
+                    gap: 'var(--inline-md)',
+                    padding: 'var(--pad-y-md) var(--pad-x-lg)',
                     backgroundColor: isDo ? 'var(--ds-background-success-subtler)' : 'var(--ds-background-danger-subtler)',
                     color: 'var(--ds-text)',
-                    fontWeight: 700,
+                    font: 'var(--heading-xsmall)',
                 }}
             >
                 <i
@@ -446,7 +443,7 @@ export function DoDontCard({ tone, children, caption }) {
             <div
                 style={{
                     flex: 1,
-                    padding: '24px 16px',
+                    padding: 'var(--section-stack-lg) var(--pad-x-lg)',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
@@ -455,7 +452,7 @@ export function DoDontCard({ tone, children, caption }) {
             >
                 <div style={{ width: '100%' }}>{children}</div>
             </div>
-            <figcaption style={{ padding: '12px 16px', color: 'var(--ds-text)' }}>{caption}</figcaption>
+            <figcaption style={{ padding: 'var(--stack-lg) var(--pad-x-lg)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>{caption}</figcaption>
         </figure>
     );
 }
@@ -465,7 +462,7 @@ export function DoDontPair({ doExample, doCaption, dontExample, dontCaption }) {
     return (
         <div
             className="sb-ds-dodont-pair"
-            style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: '16px', alignItems: 'stretch' }}
+            style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 'var(--section-stack-md)', alignItems: 'stretch' }}
         >
             <DoDontCard tone="do" caption={doCaption}>{doExample}</DoDontCard>
             <DoDontCard tone="dont" caption={dontCaption}>{dontExample}</DoDontCard>
@@ -473,10 +470,10 @@ export function DoDontPair({ doExample, doCaption, dontExample, dontCaption }) {
     );
 }
 
-/** Several pairs, one under another, 24 apart. `pairs` is an array of `DoDontPair` props. */
+/** Several pairs, one under another, a Section group apart. `pairs` is an array of `DoDontPair` props. */
 export function DoDontGrid({ pairs }) {
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-lg)' }}>
             {pairs.map((pair, i) => (
                 <DoDontPair key={i} {...pair} />
             ))}
@@ -557,7 +554,7 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
         };
     }, [ofStory]);
     return (
-        <div className="sb-docs-demo not-prose space-y-6 md:space-y-8">
+        <div className="sb-docs-demo not-prose">
             {description ? (
                 <p className="sb-ds-canvas-description">{description}</p>
             ) : null}
@@ -571,7 +568,7 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
             >
                 <div
                     ref={canvasRef}
-                    className="min-h-[100px] p-10 md:p-12 lg:p-14"
+                    className="sb-ds-docs-preview-well__inner"
                     style={
                         canvasMinHeight != null
                             ? { minHeight: `calc(${canvasMinHeight}px + ${CANVAS_OVERLAY_GAP})` }
@@ -586,8 +583,9 @@ export function DocsInteractivePlayground({ description, of: ofStory }) {
                     />
                 </div>
                 <div
-                    className="sb-ds-docs-interactive-panel__controls border-t px-10 pb-8 pt-6 md:px-12 md:pb-10 md:pt-7 lg:px-14"
+                    className="sb-ds-docs-interactive-panel__controls border-t"
                     style={{
+                        padding: 'var(--page-stack-md) var(--page-stack-lg)',
                         borderColor: 'var(--ds-border)',
                         backgroundColor: 'var(--ds-surface-container)',
                         // The panel is overflow-visible (Controls popovers), so this

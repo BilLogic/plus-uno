@@ -29,8 +29,7 @@ value will land, after the tags already there.
 | Prompt | Sends or fills text, starting a conversation; `onAccept` hands back the `text`. Leads with a sparkle wand. Example: "Summarize". |
 
 Use `Tag` for a value that is already in the field. Use `Button` for an action
-that is not a proposed value, and `AiLabel` to mark content the agent has
-already produced.
+that is not a proposed value.
 
 ## Best practices
 
@@ -86,9 +85,8 @@ Don't: A Tag styled as a suggestion is not a button, so nobody can accept it wit
 ## Related
 
 - For a value already in the field, use `Tag`, inside a `TagGroup`.
-- To mark content the agent produced, use `AiLabel`.
 
-Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Tag` · `TagGroup`
+Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Tag` · `TagGroup`
 
 ## Parts
 

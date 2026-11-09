@@ -90,7 +90,7 @@ export const SelectFocusAndBlur = () => {
 
     return (
         <div style={stack}>
-            <button type="button">Before</button>
+            <Button>Before</Button>
             <Select
                 id="dapi-focus"
                 options={schoolOptions}
@@ -99,7 +99,7 @@ export const SelectFocusAndBlur = () => {
                 onFocus={() => setLog((prev) => [...prev, 'focus'])}
                 onBlur={() => setLog((prev) => [...prev, 'blur'])}
             />
-            <button type="button">After</button>
+            <Button>After</Button>
             <p data-testid="focus-log">{log.join(',')}</p>
         </div>
     );

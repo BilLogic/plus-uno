@@ -78,10 +78,9 @@ Don't: A finished answer with no way to rate it.
 ## Related
 
 - `AiChat`, which shows every reply in an `AiMessage`.
-- `AiLabel`, which marks content the agent produced.
 - `PromptInput`, which sends the message.
 
-Same group: `AiLabel` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 

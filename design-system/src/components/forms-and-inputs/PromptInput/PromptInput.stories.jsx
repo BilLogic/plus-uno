@@ -13,7 +13,7 @@ import { iconClass } from '../../../lib/icon';
  */
 
 export default {
-    title: 'Components/Forms and inputs/Prompt input',
+    title: 'AI UI/Components for AI/Prompt input',
     component: PromptInput,
     tags: ['!dev', '!autodocs'],
     parameters: {

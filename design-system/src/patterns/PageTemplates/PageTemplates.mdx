@@ -20,6 +20,18 @@ import {
 } from '@/storybook-docs/ds-docs-layout.jsx';
 import { ModeExample } from '@/storybook-docs/lib/mode-frame.jsx';
 
+export const patterns = [
+    ['Templates', 'A template holds Frame with its content slot.', 'Start here for any new page.', 'PageLayout', null],
+    ['Frame', 'The page frame: the Sidebar beside the Page, with no top bar. Its parts are Sidebar and Page.', 'Every page in the app sits inside one.', 'Frame', 'patterns-frame-frame'],
+    ['Section', 'A span of the page grid that groups content under one heading, with a Section header.', 'A heading with content under it.', 'PatternSection', 'patterns-section-section'],
+    ['Card', 'The container for one object, raised at rest with no border.', 'One object with a shape agreed.', 'PatternCard', 'patterns-section-card'],
+    ['Table', 'Records in rows and columns, with its own header and pagination slots.', 'Many objects of the same shape.', 'PatternTable', 'patterns-section-table'],
+    ['Blanket', 'The shared layer under a modal, a drawer or an overlay Panel.', 'Anything that blocks the page behind it.', 'Blanket', 'patterns-overlays-blanket'],
+    ['Modal', 'Interrupts the page for one task, centered on the screen.', 'A step that must happen before the page continues.', 'PatternModal', 'patterns-overlays-modal'],
+    ['Drawer', 'A full-height panel at the screen edge, over the blanket.', 'Details or a task that keeps the page in view.', 'PatternDrawer', 'patterns-overlays-drawer'],
+    ['Popups', 'The floating layers: Menu, Popup, Flag and Tooltip, with no blanket.', 'Something anchored to a trigger.', 'Popup (component)', 'patterns-popups'],
+];
+
 <Meta of={PageTemplatesStories} />
 
 <Title />
@@ -142,6 +154,57 @@ A page is built from the top down out of patterns. A Sessions page is built on P
 ### For developers
 
 The template is `PageLayout`, which fills `Frame` with the PLUS sidebar and the breadcrumb. `frame="focused"` fills it with the reading page, whose header row carries Back and Close, and the actions at its foot. There is no mode prop in code: the layout tokens switch on the viewport width, so the screen picks the mode. A page that needs the reading cap in the default frame composes `Frame` with `width="reading"`. Figma's `drawer?` toggle is the `drawer` prop: pass it the props of `PatternDrawer` and the template renders the Drawer over the page. Figma's `footer?` is `actions`: without them there are no actions at the foot. `contentDirect` puts the children straight in the page with no content grid, for a full-width page such as chat.
+
+### The patterns
+
+A pattern is a page-level shell with its layout rules built in. It sets the fill, radius, padding, elevation and width for one layer of the page, and leaves the content to slots. A page starts from a template. Frame holds the sidebar beside the Page, Page pads the content and gives it the 12-column grid, and Sections, Cards and Tables fill it. Overlays and Popups sit above the page.
+
+In Figma the layout mode (Medium 768, Large 1024 or X-Large 1440) is a variable mode, set once on the template. In code the tokens follow the viewport width.
+
+<DocsTable>
+    <thead>
+        <tr>
+            <th>Pattern</th>
+            <th>What it is</th>
+            <th>Use it for</th>
+            <th>In code</th>
+        </tr>
+    </thead>
+    <tbody>
+        {patterns.map((row) => (
+            <tr key={row[0]}>
+                <td>{row[4] ? <a href={'?path=/docs/' + row[4] + '--docs'}>{row[0]}</a> : row[0]}</td>
+                <td>{row[1]}</td>
+                <td>{row[2]}</td>
+                <td><code>{row[3]}</code></td>
+            </tr>
+        ))}
+    </tbody>
+</DocsTable>
+
+### A pattern or a component
+
+Use a pattern to build a layer of a page: the frame, a region, a container for one object, a table, or a layer above the page. A pattern gives you the layer, never the content inside it. For a finished piece of UI such as a button, a field or an avatar, use the component. A pattern holds components in its slots, and a component never rebuilds a pattern's frame.
+
+### How a page layers
+
+Each layer has one fill and one elevation. A state such as hover or selected is drawn over the fill, never in place of it.
+
+<DocsTable>
+    <thead>
+        <tr><th>Layer</th><th>Fill</th><th>Elevation</th></tr>
+    </thead>
+    <tbody>
+        <tr><td>Frame</td><td><code>--ds-surface-sunken</code></td><td>none</td></tr>
+        <tr><td>Page</td><td><code>--ds-surface</code></td><td>none; an edge ring in <code>--ds-border-surface</code></td></tr>
+        <tr><td>Section</td><td>none; the page shows through</td><td>none</td></tr>
+        <tr><td>Card</td><td><code>--ds-surface-raised</code></td><td><code>--ds-shadow-raised</code>, no border</td></tr>
+        <tr><td>Table</td><td>none; its container owns the fill</td><td>none</td></tr>
+        <tr><td>Floating sidebar, Modal</td><td><code>--ds-surface-overlay</code></td><td><code>--ds-shadow-overlay</code></td></tr>
+    </tbody>
+</DocsTable>
+
+Patterns nest by layer, and each layer's tokens belong to it. A Section holds a Card, and the Card holds the object's content. A Table is never wrapped in a Card.
 
 </div>
 
@@ -292,6 +355,26 @@ If Back and Close would go to the same place, keep Close only.
     dontCaption="Several primary actions, start-aligned: the person cannot tell which one finishes the task."
 />
 
+### Let the content pick the size.
+
+Choose the smallest step of a sized pattern (Card, Modal, Drawer) that holds the content without clipping. Never pick a size to make the content look a certain way.
+
+### No card in a card, no modal over a modal.
+
+A Card never holds a Card: group related cards in a Section instead. A Modal never opens a second Modal: a follow-up decision swaps the same Modal's content for an inline confirmation.
+
+### Draw states as overlays.
+
+Hover, pressed and selected take their own token steps: <code>--ds-background-neutral-subtle-hovered</code> and <code>-pressed</code>, then <code>--ds-background-selected</code> and <code>-hovered</code>. Focus is the focus ring in <code>--ds-border-focused</code>, never a fill.
+
+### Keep filled versions as local components.
+
+A spec that fills Frame keeps its own component built from the pattern, so usage traces back to the pattern.
+
+### Note every optical nudge.
+
+Spacing tokens set the structure. Where the eye needs a nudge, such as an icon beside text, an all-caps label or a round shape, nudge for optical balance and note it where you make it. Never leave it as an unexplained hard-coded value.
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -334,6 +417,9 @@ If Back and Close would go to the same place, keep Close only.
 - [**Modal**](?path=/docs/patterns-overlays-modal--docs). A short decision over the page, instead of the focused frame.
 - [**Drawer**](?path=/docs/patterns-overlays-drawer--docs). A panel over the page that keeps it in view.
 - [**Blanket**](?path=/docs/patterns-overlays-blanket--docs). The screen grid and the fill a drawer or a modal sits in.
+- [**Elevation**](?path=/docs/foundations-elevation--docs). The shadows of the floating sidebar, floating layers and a lifted clickable card.
+- [**Spacing**](?path=/docs/foundations-spacing--docs). The layout and pattern variables these patterns bind.
+- [**Layout & grid**](?path=/docs/foundations-layout-grid--docs). The 12-column grid, the content caps and sidebar docking.
 
 </div>
 

@@ -35,14 +35,14 @@ function fixture(files) {
   const taxonomy = {
     componentGroups: { 'Forms and inputs': [], Labels: [] },
     patternComponents: ['Panel'],
+    aiComponents: ['AI message'],
     storySortOrder: [
       'Get started',
       'Foundations',
+      'Patterns',
       'Components',
       ['Forms and inputs', [], 'Labels', []],
-      'Patterns',
-      'AI',
-      'Tools',
+      'AI UI',
       'Specs',
       '*',
     ],
@@ -126,7 +126,7 @@ test('a group that is not an Atlassian category, and a sort that disagrees, go r
     path.join(root, 'storybook.taxonomy.json'),
     JSON.stringify({
       componentGroups: { 'Forms and inputs': [], Actions: [], Labels: [] },
-      storySortOrder: [...SITE_SECTIONS.slice(0, 3), ['Forms and inputs', [], 'Labels', []], ...SITE_SECTIONS.slice(3)],
+      storySortOrder: [...SITE_SECTIONS.slice(0, 4), ['Forms and inputs', [], 'Labels', []], ...SITE_SECTIONS.slice(4)],
     }),
   );
   const found = messages(root);
@@ -183,4 +183,19 @@ test('a pattern-backed component may sit under Patterns, and only one the taxono
   const found = messages(root);
   assert.ok(!found.some((m) => m.includes('Panel.stories.jsx')));
   assert.ok(found.some((m) => m.includes('Tag.stories.jsx')));
+});
+
+test('an AI component may sit under AI UI, and only one the taxonomy names', () => {
+  const root = fixture({
+    'design-system/src/components/labels/AiMessage.stories.jsx': story('AI UI/Components for AI/AI message'),
+    'design-system/src/components/labels/Tag.stories.jsx': story('AI UI/Components for AI/Tag'),
+  });
+  const found = messages(root);
+  assert.ok(!found.some((m) => m.includes('AiMessage.stories.jsx')));
+  assert.ok(found.some((m) => m.includes('Tag.stories.jsx')));
+});
+
+test('Patterns sit above Components, and there is no Tools section', () => {
+  assert.ok(SITE_SECTIONS.indexOf('Patterns') < SITE_SECTIONS.indexOf('Components'));
+  assert.ok(!SITE_SECTIONS.includes('Tools'));
 });

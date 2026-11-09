@@ -61,7 +61,7 @@ Don't: Fixed in a narrow container: the picture overflows it.
 - For a typed glyph standing in for a kind of thing, use `Object`.
 - For a person or an agent's picture or initials, use `Avatar`.
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Object` · `Tile` · `UserAvatar`
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Object` · `Tile`
 
 ## Parts
 

@@ -191,6 +191,31 @@ const preview = {
             "Accessibility",
             "Imagery"
           ],
+          "Patterns",
+          [
+            "Templates",
+            "Frame",
+            "Sidebar",
+            "Page",
+            [
+              "Page",
+              "Heading outline"
+            ],
+            "Panel",
+            "Section",
+            [
+              "Section",
+              "Card",
+              "Table"
+            ],
+            "Overlays",
+            [
+              "Blanket",
+              "Modal",
+              "Drawer"
+            ],
+            "Popups"
+          ],
           "Components",
           [
             "Forms and inputs",
@@ -241,7 +266,6 @@ const preview = {
               "Logo",
               "Object",
               "Tile",
-              "AI icon",
               "Illustrations",
               "Image"
             ],
@@ -255,12 +279,7 @@ const preview = {
                 "Tag",
                 "Smart tag"
               ],
-              "Tag group",
-              "AI label",
-              [
-                "AI label",
-                "Suggestion"
-              ]
+              "Tag group"
             ],
             "Layout and structure",
             [
@@ -274,8 +293,7 @@ const preview = {
             [
               "Progress bar",
               "Skeleton",
-              "Spinner",
-              "Generative border"
+              "Spinner"
             ],
             "Messaging",
             [
@@ -283,7 +301,7 @@ const preview = {
               "Empty state",
               "Flag",
               "Inline message",
-              "Modal",
+              "Modal dialog",
               "Section message",
               "Spotlight"
             ],
@@ -316,46 +334,33 @@ const preview = {
               "Table"
             ]
           ],
-          "Patterns",
+          "AI UI",
           [
-            "Introduction",
-            "Frame",
+            "About AI UI",
+            "AI interaction guidelines",
+            "Foundations for AI",
             [
-              "Frame",
-              "Topbar"
+              "Color",
+              "Elevation",
+              "Motion",
+              "Voice and tone"
             ],
-            "Sidebar",
-            "Page",
+            "Components for AI",
             [
-              "Page",
-              "Heading outline"
+              "Button",
+              "Generative border",
+              "Icon",
+              "Illustration",
+              "Skills tag",
+              "AI message",
+              "Prompt input",
+              "Prompt starters",
+              "Suggestion"
             ],
-            "Panel",
-            "Section",
+            "Patterns for AI",
             [
-              "Section",
-              "Card",
-              "Table"
-            ],
-            "Overlays",
-            [
-              "Blanket",
-              "Modal",
-              "Drawer"
-            ],
-            "Popups",
-            "Templates"
-          ],
-          "AI",
-          [
-            "Overview",
-            "AI chat",
-            "AI identity candidates"
-          ],
-          "Tools",
-          [
-            "Overview",
-            "Documented contract"
+              "AI chat"
+            ]
           ],
           "Data visualizations",
           [
@@ -366,162 +371,6 @@ const preview = {
             "Flow & relationships",
             "Part-to-whole",
             "Temporal"
-          ],
-          "Specs",
-          [
-            "Universal",
-            [
-              "Overview",
-              "Elements",
-              [
-                "Smart Badges"
-              ],
-              "Cards",
-              "Tables",
-              "Modals",
-              "Sections",
-              "Pages"
-            ],
-            "Login",
-            [
-              "Overview",
-              "Elements",
-              "Cards",
-              "Tables",
-              "Modals",
-              "Sections",
-              "Pages"
-            ],
-            "Home",
-            [
-              "Overview",
-              "Elements",
-              "Cards",
-              "Tables",
-              "Modals",
-              "Sections",
-              "Pages"
-            ],
-            "Profile",
-            [
-              "Overview",
-              "Elements",
-              "Cards",
-              "Tables",
-              "Modals",
-              "Sections",
-              "Pages"
-            ],
-            "Training",
-            [
-              "Overview",
-              "Onboarding",
-              [
-                "Overview",
-                "Elements",
-                "Cards",
-                "Tables",
-                "Modals",
-                "Sections",
-                "Pages"
-              ],
-              "Lessons",
-              [
-                "Overview",
-                "Elements",
-                "Cards",
-                "Tables",
-                "Modals",
-                "Sections",
-                "Pages"
-              ]
-            ],
-            "Toolkit",
-            [
-              "Overview",
-              "Pre-Session",
-              [
-                "Overview",
-                "Elements",
-                "Cards",
-                "Tables",
-                "Modals",
-                "Sections",
-                "Pages"
-              ],
-              "In-Session",
-              [
-                "Overview",
-                "Elements",
-                "Cards",
-                "Tables",
-                "Modals",
-                "Sections",
-                "Pages"
-              ],
-              "Post-Session",
-              [
-                "Overview",
-                "Elements",
-                "Cards",
-                "Tables",
-                "Modals",
-                "Sections",
-                "Pages",
-                [
-                  "Session Info",
-                  "Student Reflection",
-                  "Session Reflection",
-                  "Self Reflection",
-                  "Form Feedback",
-                  "Reflection Flow"
-                ]
-              ]
-            ],
-            "Admin",
-            [
-              "Overview",
-              "Tutor",
-              [
-                "Overview",
-                "Elements",
-                "Cards",
-                "Tables",
-                "Modals",
-                "Sections",
-                "Pages"
-              ],
-              "Session",
-              [
-                "Overview",
-                "Elements",
-                "Cards",
-                "Tables",
-                "Modals",
-                "Sections",
-                "Pages"
-              ],
-              "Student",
-              [
-                "Overview",
-                "Elements",
-                "Cards",
-                "Tables",
-                "Modals",
-                "Sections",
-                "Pages"
-              ],
-              "Group",
-              [
-                "Overview",
-                "Elements",
-                "Cards",
-                "Tables",
-                "Modals",
-                "Sections",
-                "Pages"
-              ]
-            ]
           ],
           "*"
         ],

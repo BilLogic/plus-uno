@@ -46,6 +46,7 @@ const Select = ({
     isSearchable = false,
     isCreatable = false,
     onCreate,
+    createOption,
     open,
     defaultOpen = false,
     onOpenChange,
@@ -151,9 +152,13 @@ const Select = ({
     };
 
     const create = (text) => {
-        source.addCreated({ value: text, label: text });
         if (onCreate) onCreate(text);
-        choose(multi ? [...current, text] : text);
+        // A host can turn the typed text into its own option (a time picker
+        // reads "1430" as 2:30 PM), or refuse it with null.
+        const option = createOption ? createOption(text) : { value: text, label: text };
+        if (!option) return;
+        if (!source.optionFor(option.value)) source.addCreated(option);
+        choose(multi ? [...current, option.value] : option.value);
     };
 
     const removeValue = (optionValue) => {
@@ -502,6 +507,8 @@ Select.propTypes = {
     isCreatable: PropTypes.bool,
     /** Called with the text of a created option, which is then picked. */
     onCreate: PropTypes.func,
+    /** `(text)` → the option a typed text creates, `{ value, label }`, or null to create nothing. Defaults to the text itself. */
+    createOption: PropTypes.func,
     /**
      * Holds the list open or shut. Controlled: Escape, a press outside and a
      * pick ask through `onOpenChange`, and the list stays as it is until the

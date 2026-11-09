@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import StatusTag from '@/components/labels/StatusTag';
 import Button from '@/components/forms-and-inputs/Button/Button';
+import { ButtonGroup } from '@/components';
 
 export default {
     tags: ['!dev', '!autodocs'],
@@ -239,7 +240,7 @@ export const Interactive = () => {
 
                 <div className="d-flex flex-column gap-2">
                     <span className="small text-muted fw-bold">Show Dropdown:</span>
-                    <div className="btn-group" role="group" aria-label="Show dropdown toggle">
+                    <ButtonGroup label="Show dropdown toggle">
                         <Button
                             text="Yes"
                             spacing="compact"
@@ -252,7 +253,7 @@ export const Interactive = () => {
                             isSelected={!showDropdown}
                             onClick={() => setShowDropdown(false)}
                         />
-                    </div>
+                    </ButtonGroup>
                 </div>
             </div>
 

@@ -87,30 +87,31 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Label.** Text above the editor that names it.
-2. **Toolbar.** Formatting buttons: block style, bold, italic, underline, lists, link and more.
-3. **Writing area.** The editable region, with a placeholder while it is empty.
+1. **Label.** Text above the box that names it.
+2. **Box.** One edge around the toolbar and the writing area together.
+3. **Toolbar.** Flat formatting buttons along the top of the box: block style, bold, italic, underline, lists, link and more. A keyline separates it from the writing area.
+4. **Writing area.** The editable region, with a placeholder at the start of its first line while it is empty.
 
 ### States
 
 | State | What changes |
 | --- | --- |
-| Rest | `--ds-background-input` writing area inside a `--ds-border-input` edge. |
+| Rest | A `--ds-background-input` box inside one `--ds-border-input` edge. |
 | Hovered | Toolbar buttons take `--ds-background-neutral-subtle-hovered`. The writing area has no hover step. |
 | Pressed | Toolbar buttons take `--ds-background-neutral-subtle-pressed`. |
 | Active format | The button takes `--ds-background-selected` with `--ds-text-selected` and `--ds-icon-selected`. |
-| Focused | A 2px ring in `--ds-border-focused` wraps the editor while the writing area has focus. |
-| Read-only | `--ds-background-neutral` writing area, `--ds-text-subtle` text, toolbar faded and inert. |
-| Disabled | As read-only: the neutral writing area and subtle text, and the toolbar faded to `--ds-opacity-disabled` and inert. |
+| Focused | A 2px ring in `--ds-border-focused` wraps the box while the writing area has focus. |
+| Read-only | `--ds-background-neutral` box, `--ds-text-subtle` text, toolbar faded and inert. |
+| Disabled | As read-only: the neutral box and subtle text, and the toolbar faded to `--ds-opacity-disabled` and inert. |
 | Invalid | Not drawn. Mark the surrounding field and explain the error beside it. |
 
 ### Tokens
 
 | Part | Token |
 | --- | --- |
-| Fill, edge | `--ds-background-input`; `--ds-border-input` at `--border-default`; corner `--radius-md`. |
-| Toolbar | `--ds-surface-container`; gap `--stack-md`; padding `--space-025` and `--pad-x-sm`. |
-| Writing area | Body default in `--ds-text`; minimum height `--field-min-height-lg` (120). |
+| Fill, edge | `--ds-background-input`; `--ds-border-input` at `--border-default`; corner `--radius-0625`, the Text area's. |
+| Toolbar | Subtle icon buttons; gap `--stack-md` between clusters, `--stack-sm` inside one; padding `--pad-x-xs`; keyline `--ds-border`. |
+| Writing area | Body default in `--ds-text`; padding `--pad-y-lg` and `--pad-x-md`; minimum height `--field-min-height-lg` (120). |
 | Placeholder | `--ds-text-subtlest`. |
 | Focus ring | `--ds-border-focused`, 2px. |
 
@@ -155,7 +156,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-input` · `--ds-background-neutral` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-border-input` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-opacity-disabled` · `--ds-surface-container` · `--ds-text` · `--ds-text-selected` · `--ds-text-subtle` · `--ds-text-subtlest` · `--field-min-height-lg` · `--icon-sm` · `--pad-x-sm` · `--pad-x-xs` · `--radius-md` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--space-0125` · `--space-025` · `--stack-md` · `--type-weight-regular`
+`--body-default` · `--border-default` · `--ds-background-input` · `--ds-background-neutral` · `--ds-border` · `--ds-border-input` · `--ds-opacity-disabled` · `--ds-text` · `--ds-text-subtle` · `--ds-text-subtlest` · `--field-min-height-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-lg` · `--pad-y-md` · `--radius-0625` · `--rte-content-pad-x` · `--rte-content-pad-y` · `--stack-md` · `--stack-sm` · `--type-weight-regular`
 
 From `design-system/src/components/forms-and-inputs/RichTextEditor/RichTextEditor.scss`. Override these through the token layer, never with a literal.
 

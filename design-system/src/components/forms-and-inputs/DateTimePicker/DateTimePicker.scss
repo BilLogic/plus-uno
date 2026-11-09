@@ -66,7 +66,7 @@
    ============================================ */
 
 .plus-datetime-wrapper:has(.plus-datetime-date-field .plus-date-picker__input:disabled),
-.plus-datetime-wrapper:has(.plus-datetime-time-field .plus-time-picker__input:disabled) {
+.plus-datetime-wrapper:has(.plus-datetime-time-field .plus-field__control:disabled) {
     .plus-datetime-label {
         color: var(--ds-text-subtle);
     }

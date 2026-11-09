@@ -182,7 +182,8 @@ export const Focused = {
     render: () => <RichTextEditor label="Session notes" placeholder="Type something..." minHeight={150} />,
     play: async ({ canvasElement }) => {
         const area = writing(canvasElement);
-        const editor = canvasElement.querySelector('.plus-rich-text-editor');
+        // The ring wraps the box that holds the toolbar and the writing area.
+        const editor = canvasElement.querySelector('.plus-rich-text-editor-box');
         editor.style.transition = 'none';
         area.focus({ focusVisible: true });
         const style = getComputedStyle(editor);
@@ -199,7 +200,8 @@ export const ReadOnly = {
         const area = writing(canvasElement);
         await expect(area).toHaveAttribute('aria-readonly', 'true');
         await expect(area).toHaveAttribute('contenteditable', 'false');
-        await expect(getComputedStyle(area).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        // The box takes the read-only fill; the writing area is clear on it.
+        await expect(getComputedStyle(area.closest('.plus-rich-text-editor-box')).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
     },
 };
 
@@ -208,7 +210,8 @@ export const DisabledState = {
     play: async ({ canvasElement }) => {
         const area = writing(canvasElement);
         await expect(area).toHaveAttribute('contenteditable', 'false');
-        await expect(getComputedStyle(area).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
+        // The box takes the read-only fill; the writing area is clear on it.
+        await expect(getComputedStyle(area.closest('.plus-rich-text-editor-box')).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
         await expect(within(canvasElement).getAllByRole('button').every((b) => b.disabled)).toBe(true);
     },
 };

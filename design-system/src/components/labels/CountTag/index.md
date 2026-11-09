@@ -77,7 +77,7 @@ A dot has no number, so `label` is its accessible name; without one it is announ
 - For the condition something is in, use `StatusTag`; its `trailingMetric` nests a Count tag inside it.
 - For a category, a subject or a person, use `Tag`.
 
-Same group: `AiLabel` · `AiMessage` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiMessage` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 

@@ -1,11 +1,11 @@
 {
-  "why": "The floor under the tabbed component docs population. It may rise as a component gains a docs page, and never falls except by a hand edit that names the removal. Re-measure and raise it with `npm run check:docs-tabs -- --update`. Lowered from 80 to 71: Card, Divider, Collapse, Jumbotron, List group, Media object, Scrollspy, Nav pills and Navbar were retired and their docs pages deleted.",
+  "why": "The floor under the tabbed component docs population. It may rise as a component gains a docs page, and never falls except by a hand edit that names the removal. Re-measure and raise it with `npm run check:docs-tabs -- --update`. Lowered from 80 to 71: Card, Divider, Collapse, Jumbotron, List group, Media object, Scrollspy, Nav pills and Navbar were retired and their docs pages deleted. Lowered from 97 to 95: Footer was deleted (no such component in the benchmark system) and User avatar left the components (the new nav draws the signed-in person in the Sidebar's account row; its code now lives in the Specs element), each taking its docs page with it. Lowered from 95 to 94: AiLabel was deleted, unused and replaced by the AI UI section.",
   "sets": {
     "main": {
       "direction": "grow-only",
       "entries": {
         "tabbedPages": {
-          "count": 97
+          "count": 94
         }
       }
     }

@@ -4,7 +4,7 @@
 
 A person or an agent shown as a picture, initials or an icon. The picture wins when it loads, then the initials, then the icon, then a plain person glyph.
 
-Also asked as: user photo, initials, profile image.
+Also asked as: user photo, initials, profile image, user picture, tutor photo, student photo.
 
 **Import:** `import { Avatar } from '@/components';`
 
@@ -21,8 +21,8 @@ list of attendees. Use `AvatarGroup` for a short set of people that would crowd
 a line: the attendees of a session, the members of a team.
 
 Use `Tile` for a school, a tool or a lesson: a square picture of a thing, not
-a face. Use `UserAvatar` for the signed-in user in the topbar, with the name,
-role and notification counter beside the initial.
+a face. The signed-in person is shown by the Sidebar's account row, with the
+name and role beside the avatar.
 
 ## Best practices
 
@@ -80,11 +80,11 @@ Don't: A dot on a tiny byline, where presence is not the question.
 
 ## Related
 
-- For the signed-in user in the topbar, with a name and a counter, use `UserAvatar`.
+- For the signed-in person, with a name and a role, use the Sidebar's account row.
 - For a school, a tool or a lesson in a square, use `Tile`.
 - For a role or state beside a name, use `Status`.
 
-Same group: `AiIcon` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile` · `UserAvatar`
+Same group: `AiIcon` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile`
 
 ## Parts
 
