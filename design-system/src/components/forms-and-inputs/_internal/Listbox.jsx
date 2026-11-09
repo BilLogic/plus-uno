@@ -278,6 +278,12 @@ const Listbox = ({
         if (bodyRef.current.clientHeight) setViewport(bodyRef.current.clientHeight);
     });
 
+    // Opening the list brings the picked row into view, so a long list (a
+    // day of times) opens at the value rather than at its top.
+    useLayoutEffect(() => {
+        if (open) scrollOnMove.current = true;
+    }, [open]);
+
     // Keep the cursor's row on screen after a keyboard move.
     useLayoutEffect(() => {
         if (!scrollOnMove.current || !bodyRef.current || !resolvedActive) return;
