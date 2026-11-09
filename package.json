@@ -153,7 +153,7 @@
     "storybook": "^10.5.0",
     "tailwindcss": "^4.2.2",
     "typescript": "^7.0.2",
-    "uno-blueprint": "github:BilLogic/uno-blueprint#v2.8.11",
+    "uno-blueprint": "github:BilLogic/uno-blueprint#v2.10.1",
     "vite": "^8.3.5",
     "vitest": "^5.0.4"
   },
