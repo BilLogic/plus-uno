@@ -27,7 +27,7 @@
  *   6. The sidebar's roots lead with the benchmark site's sections plus our
  *      Patterns, in order: Get started, Foundations, Patterns, Components, AI UI.
  *      Patterns come before Components because a page is composed from them
- *      first. Our own extras (Data visualizations, Specs) follow.
+ *      first. Our own extra (Data visualizations) follows.
  *   7. Every docs page and story file under `design-system/src/` is titled
  *      under a root the sidebar sort lists, so a page left under a retired
  *      root (`Getting started/…`, `Foundations/Patterns/…`) cannot open a
@@ -132,8 +132,10 @@ const inputs = byRoot((repoRoot) => {
   const stories = tracked
     .filter((rel) => rel.startsWith('design-system/src/components/') && /\.stories\.[jt]sx?$/.test(rel))
     .map((rel) => ({ rel, title: metaTitle(fs.readFileSync(path.join(repoRoot, rel), 'utf8')) }));
+  // specs/ is out of Storybook until its rebuild (.storybook/main.js), so its titles open no entry.
   const pages = tracked
-    .filter((rel) => rel.startsWith('design-system/src/') && /(\.stories\.[jt]sx?|\.mdx)$/.test(rel))
+    .filter((rel) => rel.startsWith('design-system/src/') && !rel.startsWith('design-system/src/specs/'))
+    .filter((rel) => /(\.stories\.[jt]sx?|\.mdx)$/.test(rel))
     .map((rel) => ({ rel, title: docsTitle(fs.readFileSync(path.join(repoRoot, rel), 'utf8')) }));
   return { taxonomy, folders, tracked, stories, pages };
 });

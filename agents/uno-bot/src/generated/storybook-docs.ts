@@ -281,40 +281,5 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/text-and-data-display/Table/TreeTable.",
     "TreeTable",
     "components-text-and-data-display-tree-table--docs"
-  ],
-  [
-    "design-system/src/specs/Universal/Cards/OverviewCard/",
-    "OverviewCard",
-    "specs-universal-cards-overview-card--docs"
-  ],
-  [
-    "design-system/src/specs/Universal/Elements/MaintenanceAlert/",
-    "MaintenanceAlert",
-    "specs-universal-elements-maintenance-alert--docs"
-  ],
-  [
-    "design-system/src/specs/Universal/Elements/SmartBadges/SmartBadges.stories.",
-    "SmartBadges",
-    "specs-universal-elements-smart-badges--docs"
-  ],
-  [
-    "design-system/src/specs/Universal/Elements/UserAvatar/",
-    "UserAvatar",
-    "specs-universal-elements-user-avatar--docs"
-  ],
-  [
-    "design-system/src/specs/Universal/Elements/UserTypeIndicator/",
-    "UserTypeIndicator",
-    "specs-universal-elements-user-type-indicator--docs"
-  ],
-  [
-    "design-system/src/specs/Universal/Pages/PageLayout/",
-    "PageLayout",
-    "specs-universal-pages-page-layout--docs"
-  ],
-  [
-    "design-system/src/specs/Universal/Sections/Sidebar/",
-    "Sidebar",
-    "specs-universal-sections-sidebar--docs"
   ]
 ];

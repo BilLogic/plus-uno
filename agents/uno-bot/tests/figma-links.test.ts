@@ -318,7 +318,7 @@ describe("only registry components", () => {
     assert.equal((await w.figma.comments(LIB)).comments.length, 68);
   });
 
-  it("the registry carries a source file and a Storybook id for every component, and each source file exists", () => {
+  it("the registry carries a source file for every component and a Storybook id for every one Storybook serves, and each source file exists", () => {
     const root = join(process.cwd(), "..", "..");
     const registry = JSON.parse(readFileSync(join(root, "design-system", "figma", "component-registry.json"), "utf8")) as DevLinkRegistry;
     const names = Object.keys(registry.components);
@@ -359,7 +359,9 @@ describe("only registry components", () => {
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);
-      assert.match(code.storybookId ?? "", /^[a-z0-9-]+--[a-z0-9-]+$/, name);
+      // The Specs replica is out of Storybook until its rebuild: its pages have no id to link.
+      if (code.source.startsWith("design-system/src/specs/")) assert.equal(code.storybookId, undefined, name);
+      else assert.match(code.storybookId ?? "", /^[a-z0-9-]+--[a-z0-9-]+$/, name);
     }
     assert.equal(registry.components.Button!.code!.storybookId, "components-forms-and-inputs-button-button--docs");
   });

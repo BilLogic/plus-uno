@@ -952,8 +952,7 @@
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Elements/MaintenanceAlert/MaintenanceAlert.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/MaintenanceAlert",
-        "source": "design-system/src/specs/Universal/Elements/MaintenanceAlert/MaintenanceAlert.jsx",
-        "storybookId": "specs-universal-elements-maintenance-alert--docs"
+        "source": "design-system/src/specs/Universal/Elements/MaintenanceAlert/MaintenanceAlert.jsx"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1045,8 +1044,7 @@
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Cards/OverviewCard/OverviewCard.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Cards/OverviewCard",
-        "source": "design-system/src/specs/Universal/Cards/OverviewCard/OverviewCard.jsx",
-        "storybookId": "specs-universal-cards-overview-card--docs"
+        "source": "design-system/src/specs/Universal/Cards/OverviewCard/OverviewCard.jsx"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1094,8 +1092,7 @@
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Pages/PageLayout/PageLayout.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Pages/PageLayout",
-        "source": "design-system/src/specs/Universal/Pages/PageLayout/PageLayout.jsx",
-        "storybookId": "specs-universal-pages-page-layout--docs"
+        "source": "design-system/src/specs/Universal/Pages/PageLayout/PageLayout.jsx"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1371,8 +1368,7 @@
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Sections/Sidebar/Sidebar.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Sections/Sidebar",
-        "source": "design-system/src/specs/Universal/Sections/Sidebar/Sidebar.jsx",
-        "storybookId": "specs-universal-sections-sidebar--docs"
+        "source": "design-system/src/specs/Universal/Sections/Sidebar/Sidebar.jsx"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1450,8 +1446,7 @@
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Elements/SmartBadges/SmartBadges.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/SmartBadges",
-        "source": "design-system/src/specs/Universal/Elements/SmartBadges/SmartBadges.stories.jsx",
-        "storybookId": "specs-universal-elements-smart-badges--docs"
+        "source": "design-system/src/specs/Universal/Elements/SmartBadges/SmartBadges.stories.jsx"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -2013,8 +2008,7 @@
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Elements/UserAvatar/UserAvatar.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/UserAvatar",
-        "source": "design-system/src/specs/Universal/Elements/UserAvatar/UserAvatar.jsx",
-        "storybookId": "specs-universal-elements-user-avatar--docs"
+        "source": "design-system/src/specs/Universal/Elements/UserAvatar/UserAvatar.jsx"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -2038,8 +2032,7 @@
         "export": "default",
         "mdxPath": "design-system/src/specs/Universal/Elements/UserTypeIndicator/UserTypeIndicator.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/UserTypeIndicator",
-        "source": "design-system/src/specs/Universal/Elements/UserTypeIndicator/UserTypeIndicator.jsx",
-        "storybookId": "specs-universal-elements-user-type-indicator--docs"
+        "source": "design-system/src/specs/Universal/Elements/UserTypeIndicator/UserTypeIndicator.jsx"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
