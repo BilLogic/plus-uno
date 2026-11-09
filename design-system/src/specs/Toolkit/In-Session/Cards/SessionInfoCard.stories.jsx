@@ -1,4 +1,5 @@
 import React from 'react';
+import { IconButton } from '@/components';
 import { iconClass } from '../../../../lib/icon';
 
 export default {
@@ -95,22 +96,7 @@ export const SessionInfoCard = ({
 
                 {/* Copy Button */}
                 {showCopyButton && (
-                    <button
-                        type="button"
-                        className="btn p-0 border-0 bg-transparent"
-                        style={{ lineHeight: 1 }}
-                        onClick={() => navigator.clipboard?.writeText(content)}
-                        aria-label="Copy to clipboard"
-                    >
-                        <i
-                            className="fa-regular fa-copy"
-                            style={{
-                                fontSize: 'var(--font-size-fa-body3-regular)',
-                                color: 'var(--color-primary)',
-                                cursor: 'pointer',
-                            }}
-                        />
-                    </button>
+                    <IconButton icon="copy" label="Copy to clipboard" appearance="subtle" spacing="compact" onClick={() => navigator.clipboard?.writeText(content)} />
                 )}
             </div>
         </div>

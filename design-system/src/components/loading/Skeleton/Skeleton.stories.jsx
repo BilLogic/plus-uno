@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Button } from '@/components';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
@@ -430,9 +431,9 @@ export const LoadingTable = () => {
                     ))}
                 </div>
             </section>
-            <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => setLoaded((v) => !v)}>
+            <Button spacing="compact" onClick={() => setLoaded((v) => !v)}>
                 {loaded ? 'Show loading' : 'Finish loading'}
-            </button>
+            </Button>
         </div>
     );
 };
@@ -503,9 +504,9 @@ export const LoadingCard = () => {
                     </>
                 )}
             </div>
-            <button type="button" className="btn btn-outline-secondary btn-sm" onClick={() => setLoaded((v) => !v)}>
+            <Button spacing="compact" onClick={() => setLoaded((v) => !v)}>
                 {loaded ? 'Show loading' : 'Finish loading'}
-            </button>
+            </Button>
         </div>
     );
 };
@@ -556,7 +557,7 @@ export const IgnoredPropsWarn = () => {
         <div style={{ display: 'grid', gap: '12px' }}>
             <div style={row}>
                 {Object.keys(cases).map((name) => (
-                    <button key={name} type="button" onClick={() => setMounted(name)}>{name}</button>
+                    <Button key={name} onClick={() => setMounted(name)}>{name}</Button>
                 ))}
             </div>
             <div data-testid="mounted">{mounted && cases[mounted]}</div>

@@ -221,7 +221,7 @@ test('Menu item: neutral hovered and pressed, selected neutral ink, focus ring o
 /* ─── Tabs ───────────────────────────────────────────────────────────────── */
 
 const TABS = 'components/navigation/Tabs/Tabs.scss';
-const DEFAULT_TAB = '.plus-tabs--default .plus-tab';
+const DEFAULT_TAB = '.plus-tabs--appearance-default .plus-tab';
 
 test('Tabs: neutral subtle hovered and pressed on every tab, focus a ring with no fill', () => {
   const hovered = layer('--ds-background-neutral-subtle-hovered');
@@ -384,20 +384,15 @@ test("Tag: the accent's hovered, pressed and selected steps; the × on the neutr
 
 /* ─── RichTextEditor toolbar ─────────────────────────────────────────────── */
 
-test('RichTextEditor: toolbar buttons and the block toggle step neutral subtle and select', () => {
-  const file = 'components/forms-and-inputs/RichTextEditor/RichTextEditor.scss';
-  const btn = '.plus-rich-text-editor:not(.plus-rich-text-editor--full) .plus-rich-text-editor-toolbar .plus-btn';
-  expectRule(file, `${btn}:hover:not(:disabled):not(.active)`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
-  expectRule(file, `${btn}:active:not(:disabled):not(.active)`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
-  expectRule(file, `${btn}.active`, { 'background-color': layer('--ds-background-selected') });
-  expectRule(file, `${btn}:focus-visible`, RING_OUTSIDE);
-  expectNoFill(file, `${btn}:focus-visible`);
-
-  const toggle = '.plus-rich-text-editor-block-toggle';
-  expectRule(file, `${toggle}:hover:not(:disabled)`, { 'background-color': layer('--ds-background-neutral-subtle-hovered') });
-  expectRule(file, `${toggle}:active:not(:disabled)`, { 'background-color': layer('--ds-background-neutral-subtle-pressed') });
-  expectRule(file, `${toggle}:focus-visible`, RING_OUTSIDE);
-  expectNoFill(file, `${toggle}:focus-visible`);
+test('RichTextEditor: the toolbar draws no button state of its own — its subtle Icon buttons and Button keep theirs', () => {
+  const root = sheet('components/forms-and-inputs/RichTextEditor/RichTextEditor.scss');
+  const overrides = [];
+  root.walkRules((rule) => {
+    if (/\.plus-btn|block-toggle/.test(rule.selector) && /:hover|:active|:focus-visible|\.active/.test(rule.selector)) {
+      overrides.push(rule.selector);
+    }
+  });
+  assert.deepEqual(overrides, [], 'hover, press, focus and selected come from Button, not from the editor');
 });
 
 /* ─── PatternTable rows ──────────────────────────────────────────────────── */
