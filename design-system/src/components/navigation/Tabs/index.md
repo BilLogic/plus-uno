@@ -109,7 +109,7 @@ Same group: `Breadcrumb` · `Link` · `MenuGroup` · `Pagination` · `Sidebar`
 ## Parts
 
 1. **Tab strip.** A `tablist` of buttons, aligned left, center, right or justified.
-2. **Tab.** A button whose label names a view; the selected one is marked by an underline (`default`) or a filled pill (`pill`).
+2. **Tab.** A button whose label names a view, on one line; the selected one is marked by an underline on the strip's baseline (`default`) or a filled pill (`pill`), whose strip has no baseline.
 3. **Baseline.** The hairline under an underline strip that the selected bar sits on.
 4. **Panel.** The content one tab controls, shown below the strip.
 

@@ -115,6 +115,19 @@ export const Layout = () => (
     </div>
 );
 
+/** Justified tabs split the whole row equally, each label on one line. */
+Layout.play = async ({ canvasElement }) => {
+    const list = canvasElement.querySelector('.plus-tabs-list');
+    const row = list.closest('section').getBoundingClientRect().width;
+    await expect(Math.round(list.getBoundingClientRect().width), 'the strip fills the row').toBe(Math.round(row));
+    const tabs = [...list.querySelectorAll('.plus-tab')];
+    const widths = tabs.map((tab) => Math.round(tab.getBoundingClientRect().width));
+    await expect(new Set(widths).size, `equal shares: ${widths.join(', ')}`).toBe(1);
+    for (const tab of tabs) {
+        await expect(getComputedStyle(tab).whiteSpace, `${tab.textContent} stays on one line`).toBe('nowrap');
+    }
+};
+
 export const Alignment = () => (
     <div style={col}>
         {['left', 'center', 'right'].map((alignment) => (
@@ -158,6 +171,18 @@ export const Appearance = () => (
         </section>
     </div>
 );
+
+/** A pill strip has no baseline: neither the list nor any tab draws a bottom border. */
+Appearance.play = async ({ canvasElement }) => {
+    const pill = canvasElement.querySelector('.plus-tabs--appearance-pill');
+    const list = pill.querySelector('.plus-tabs-list');
+    await expect(px(getComputedStyle(list).borderBottomWidth), 'no strip baseline').toBe(0);
+    for (const tab of pill.querySelectorAll('.plus-tab')) {
+        const t = getComputedStyle(tab);
+        await expect(px(t.borderBottomWidth), `${tab.textContent}: no underline`).toBe(0);
+        await expect(px(t.marginBottom), `${tab.textContent}: not pulled onto a baseline`).toBe(0);
+    }
+};
 
 /**
  * A tab wired to a panel: `aria-controls`/`aria-labelledby` are handled by

@@ -4,8 +4,8 @@
  * Tabs Component Styles
  *
  * Underline indicator by default (`appearance="default"`); `appearance="pill"`
- * swaps the underline for a pill-shaped selected fill. `size="default"` is a
- * 32px tab (`--item-height-md`), matching a medium button; `size="compact"`
+ * swaps the underline for a pill-shaped selected fill. `spacing="default"` is a
+ * 32px tab (`--item-height-md`), matching a medium button; `spacing="compact"`
  * is 24px (`--item-height-sm`).
  *
  * Colors: an unselected tab is text.subtle on a clear ground; hover and press
@@ -29,6 +29,14 @@
     align-items: flex-start;
 }
 
+// Justified tabs share the full row: the root takes the row's width rather
+// than shrinking to its tabs, so the list's 100% is the row.
+.plus-tabs--justified {
+    display: flex;
+    width: 100%;
+    align-items: stretch;
+}
+
 .plus-tabs-list {
     display: flex;
     flex-wrap: wrap;
@@ -46,15 +54,18 @@
     }
 
     &--justified {
+        flex-wrap: nowrap;
+
         .plus-tab {
             flex: 1 1 0;
+            min-width: 0;
         }
     }
 }
 
 // Default (underline) appearance: a shared bottom border across the strip,
 // each tab's own bottom border serving as its selected indicator.
-.plus-tabs--default .plus-tabs-list {
+.plus-tabs--appearance-default .plus-tabs-list {
     border-bottom: var(--border-default) solid var(--ds-border);
     width: fit-content;
 
@@ -75,6 +86,8 @@
     font: var(--body-default);
     font-weight: var(--type-weight-medium);
     text-decoration: none;
+    // One line, always: a tab label never wraps into a two-line tab.
+    white-space: nowrap;
     cursor: pointer;
     transition: border-color var(--motion-duration-short) var(--motion-easing-standard), color var(--motion-duration-short) var(--motion-easing-standard), background-color var(--motion-duration-short) var(--motion-easing-standard);
 
@@ -98,18 +111,18 @@
 }
 
 // Sizing
-.plus-tabs--default .plus-tab {
+.plus-tabs--spacing-default .plus-tab {
     height: var(--item-height-md);
     padding: 0 var(--pad-x-lg);
 }
 
-.plus-tabs--compact .plus-tab {
+.plus-tabs--spacing-compact .plus-tab {
     height: var(--item-height-sm);
     padding: 0 var(--pad-x-md);
 }
 
 // Default (underline) appearance
-.plus-tabs--default .plus-tab {
+.plus-tabs--appearance-default .plus-tab {
     margin-bottom: calc(-1 * var(--border-default));
     border-bottom: var(--border-default) solid var(--ds-border);
     border-radius: var(--radius-md) var(--radius-md) 0 0;
@@ -148,11 +161,11 @@
 
 // Pill appearance: the selected tab carries a filled, fully-rounded ground
 // instead of an underline; unselected tabs carry no border at all.
-.plus-tabs--pill .plus-tabs-list {
+.plus-tabs--appearance-pill .plus-tabs-list {
     gap: var(--stack-sm);
 }
 
-.plus-tabs--pill .plus-tab {
+.plus-tabs--appearance-pill .plus-tab {
     border-radius: var(--radius-full);
 
     @include plus-state((
