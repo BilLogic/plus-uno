@@ -50,7 +50,19 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { byRoot, main } from './lib/findings.mjs';
-import { metaTitle } from './check-page-outline.mjs';
+
+/**
+ * The `title:` of a story file's default export. Anchored on `export default {`
+ * rather than the first `title:` in the file: story files are full of `title`
+ * props on sample data.
+ * @returns {string | null}
+ */
+export function metaTitle(src) {
+  const start = src.indexOf('export default {');
+  if (start === -1) return null;
+  const m = /(?:^|\n)\s*title:\s*['"]([^'"]+)['"]/.exec(src.slice(start));
+  return m ? m[1] : null;
+}
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
@@ -132,9 +144,8 @@ const inputs = byRoot((repoRoot) => {
   const stories = tracked
     .filter((rel) => rel.startsWith('design-system/src/components/') && /\.stories\.[jt]sx?$/.test(rel))
     .map((rel) => ({ rel, title: metaTitle(fs.readFileSync(path.join(repoRoot, rel), 'utf8')) }));
-  // specs/ is out of Storybook until its rebuild (.storybook/main.js), so its titles open no entry.
   const pages = tracked
-    .filter((rel) => rel.startsWith('design-system/src/') && !rel.startsWith('design-system/src/specs/'))
+    .filter((rel) => rel.startsWith('design-system/src/'))
     .filter((rel) => /(\.stories\.[jt]sx?|\.mdx)$/.test(rel))
     .map((rel) => ({ rel, title: docsTitle(fs.readFileSync(path.join(repoRoot, rel), 'utf8')) }));
   return { taxonomy, folders, tracked, stories, pages };

@@ -621,6 +621,6 @@ function pageEscapes(text, add) {
     'ds/page-starts-from-pattern',
     root.index,
     `the page's outer element is a hand-styled \`<${root.name}>\`, not \`PageLayout\` or a pattern`,
-    "wrap the page in `PageLayout` (import { PageLayout } from '@/specs/Universal/Pages'), or start it from a pattern such as `Page` or `PatternCard` (@/patterns)",
+    "wrap the page in `PageLayout` (import { PageLayout } from '@/patterns'), or start it from a pattern such as `Page` or `PatternCard` (@/patterns)",
   );
 }

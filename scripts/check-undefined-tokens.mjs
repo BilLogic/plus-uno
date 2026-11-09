@@ -36,15 +36,15 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { LIBRARY_ROOT, PROTOTYPE_ROOTS, STORYBOOK_ROOT } from './lib/ds-facts.mjs';
+import { CONSUMER_ROOTS, LIBRARY_ROOT, STORYBOOK_ROOT } from './lib/ds-facts.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 import { acrossSets, openRatchet } from './lib/ratchet.mjs';
 import { audit, corpus, ratchetFailures } from './undefined-tokens.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-/** The library, Storybook and the prototypes; the app shell is not held yet (`PROTOTYPE_ROOTS`). */
-export const ROOTS = [LIBRARY_ROOT, STORYBOOK_ROOT, ...PROTOTYPE_ROOTS];
+/** The library, Storybook and the prototypes. */
+export const ROOTS = [LIBRARY_ROOT, STORYBOOK_ROOT, ...CONSUMER_ROOTS];
 const BASELINE = 'scripts/baselines/undefined-token-baseline.json';
 
 /**
@@ -53,7 +53,8 @@ const BASELINE = 'scripts/baselines/undefined-token-baseline.json';
  * failure #234 found in the negation ratchet and `check:unspread-rest` found in
  * its own corpus walk.
  */
-export const MIN_FILES = 1300;
+// Lowered from 1300 to 700 when the Specs code, the root app and the specs prototypes left main (kept on archive/legacy-ds).
+export const MIN_FILES = 700;
 
 export const REMEDY =
   '  -> A bare `var(--x)` on a token that does not exist DROPS the declaration.\n' +

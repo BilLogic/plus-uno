@@ -86,17 +86,17 @@ const patternCtx = contextFrom({
       {
         name: 'PageLayout',
         kind: 'pattern',
-        import: "import { PageLayout } from '@/specs/Universal/Pages';",
+        import: "import { PageLayout } from '@/patterns';",
         props: [{ name: 'frame', values: ['default', 'focused'], deprecated: null }],
       },
     ],
   },
   tokens: { tokens: [] },
   exported: new Set(['Button']),
-  barrels: { '@/patterns': new Set(['PatternCard', 'useOpenTabs']), '@/specs/Universal/Pages': new Set(['PageLayout']) },
+  barrels: { '@/patterns': new Set(['PatternCard', 'useOpenTabs', 'PageLayout']) },
 });
 const patternRules = (text) => escapesIn({ path: 'p/App.jsx', text }, patternCtx).map((f) => f.rule);
-const PATTERNS = "import { PatternCard, useOpenTabs } from '@/patterns';\nimport { PageLayout } from '@/specs/Universal/Pages';\n";
+const PATTERNS = "import { PatternCard, useOpenTabs } from '@/patterns';\nimport { PageLayout } from '@/patterns';\n";
 
 test('patterns: a valid pattern and PageLayout use passes', () => {
   assert.deepEqual(patternRules(PATTERNS + '<PageLayout frame="focused"><PatternCard title="x" padding="md" /></PageLayout>'), []);
@@ -108,7 +108,7 @@ test('patterns: an invented pattern name fails, with the nearest real one', () =
   assert.equal(rest.length, 0);
   assert.equal(f.rule, 'ds/no-unknown-component');
   assert.match(f.fix, /PatternCard/);
-  assert.deepEqual(patternRules("import { PageShell } from '@/specs/Universal/Pages';"), ['ds/no-unknown-component']);
+  assert.deepEqual(patternRules("import { PageShell } from '@/patterns';"), ['ds/no-unknown-component']);
 });
 
 test('patterns: a pattern imported from a barrel that does not export it fails, naming its barrel', () => {

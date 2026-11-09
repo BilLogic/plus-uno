@@ -38,14 +38,14 @@ test('in scope with a fail-level escape: exit 2, findings on stderr, a log line 
 });
 
 test('in scope and clean (or warnings only): silent, exit 0, still logged', () => {
-  const out = handle({ tool_input: { file_path: 'src/App.jsx' } }, { repoRoot: ROOT, inScope, check: () => [finding('ds/no-retired-name', 'warn')], now: () => 't' });
+  const out = handle({ tool_input: { file_path: 'prototypes/x/src/App.jsx' } }, { repoRoot: ROOT, inScope, check: () => [finding('ds/no-retired-name', 'warn')], now: () => 't' });
   assert.deepEqual([out.exitCode, out.stderr, out.log.fail], [0, '', 0]);
 });
 
 test('DS_USAGE_HOOK=off, or a checker that throws, never blocks', () => {
-  const off = handle({ tool_input: { file_path: 'src/App.jsx' } }, { repoRoot: ROOT, env: { DS_USAGE_HOOK: 'off' }, check: () => [finding('ds/no-deep-import')] });
+  const off = handle({ tool_input: { file_path: 'prototypes/x/src/App.jsx' } }, { repoRoot: ROOT, env: { DS_USAGE_HOOK: 'off' }, check: () => [finding('ds/no-deep-import')] });
   assert.deepEqual([off.ran, off.exitCode], [false, 0]);
-  const broken = handle({ tool_input: { file_path: 'src/App.jsx' } }, { repoRoot: ROOT, inScope, check: () => { throw new Error('boom'); } });
+  const broken = handle({ tool_input: { file_path: 'prototypes/x/src/App.jsx' } }, { repoRoot: ROOT, inScope, check: () => { throw new Error('boom'); } });
   assert.equal(broken.exitCode, 0);
 });
 

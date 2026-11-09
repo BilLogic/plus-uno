@@ -116,14 +116,9 @@ function developerLinks(mdxPath, content, name) {
   const source = own ?? stories?.file;
   return {
     ...(source ? { source: path.relative(REPO_ROOT, source).replace(/\\/g, '/') } : {}),
-    // specs/ is out of Storybook until its rebuild, so a page there has no live id to link.
-    ...(title && !isSpecsPage(mdxPath) ? { storybookId: storybookId(title[1], stories.docsName) } : {}),
+    ...(title ? { storybookId: storybookId(title[1], stories.docsName) } : {}),
   };
 }
-
-/** A page in the Specs replica, which `.storybook/main.js` leaves out of Storybook. */
-const isSpecsPage = (mdxPath) =>
-  path.relative(REPO_ROOT, mdxPath).replace(/\\/g, '/').startsWith('design-system/src/specs/');
 
 /**
  * `figmaMeta.deliberate`, checked: an object of code prop → a non-empty

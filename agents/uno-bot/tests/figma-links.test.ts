@@ -70,10 +70,10 @@ const REGISTRY: DevLinkRegistry = {
       code: { source: "design-system/src/components/labels/Badge/Badge.jsx", storybookId: "components-labels-deprecated-badge--docs" },
       figma: { fileKey: LIB, sets: [{ componentSetNodeId: "25:568", status: "verified" }] },
     },
-    OptionChip: {
+    PatternCard: {
       code: {
-        source: "design-system/src/specs/Toolkit/Post-Session/Elements/OptionChip/OptionChip.jsx",
-        storybookId: "specs-toolkit-post-session-elements-option-chip--toolkit-docs-optionchip",
+        source: "design-system/src/patterns/PatternCard/PatternCard.jsx",
+        storybookId: "patterns-section-card--docs",
       },
       figma: { fileKey: SPECS, sets: [{ componentSetNodeId: "10661:10292" }] },
     },
@@ -265,16 +265,16 @@ describe("only registry components", () => {
     assert.deepEqual(
       chip.map((l) => [l.name, l.url]),
       [
-        ["Code (plus-uno): OptionChip", "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/specs/Toolkit/Post-Session/Elements/OptionChip/OptionChip.jsx"],
-        ["Storybook: OptionChip", "https://plus-uno.netlify.app/storybook/?path=/docs/specs-toolkit-post-session-elements-option-chip--toolkit-docs-optionchip"],
+        ["Code (plus-uno): PatternCard", "https://github.com/BilLogic/plus-uno/blob/main/design-system/src/patterns/PatternCard/PatternCard.jsx"],
+        ["Storybook: PatternCard", "https://plus-uno.netlify.app/storybook/?path=/docs/patterns-section-card--docs"],
       ],
     );
     assert.equal(linksOf(card).length, 8);
     assert.deepEqual(
       (card.operations![0]!.input as { introduce: Array<{ component: string }> }).introduce.map((i) => i.component),
-      ["Button", "Badge", "OptionChip"],
+      ["Button", "Badge", "PatternCard"],
     );
-    for (const name of ["Button", "Badge", "OptionChip"]) assert.ok(card.proposalText.includes(`*${name}*`), name);
+    for (const name of ["Button", "Badge", "PatternCard"]) assert.ok(card.proposalText.includes(`*${name}*`), name);
     assert.ok(card.proposalText.includes(`<${BUTTON_CODE}|Code (plus-uno)>`), card.proposalText);
   });
 
@@ -355,13 +355,13 @@ describe("only registry components", () => {
     // TopBar left when the Sidebar refresh removed the top bar (-1 net).
     // 63: Footer was deleted from code and AiLabel was deleted when the AI UI
     // section replaced it, and their registry rows went with them (-2 net).
-    assert.equal(names.length, 63);
+    // 56: the Specs code left main for the archive/legacy-ds branch, and the
+    // seven rows its docs pages carried went with it (-7 net).
+    assert.equal(names.length, 56);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);
-      // The Specs replica is out of Storybook until its rebuild: its pages have no id to link.
-      if (code.source.startsWith("design-system/src/specs/")) assert.equal(code.storybookId, undefined, name);
-      else assert.match(code.storybookId ?? "", /^[a-z0-9-]+--[a-z0-9-]+$/, name);
+      assert.match(code.storybookId ?? "", /^[a-z0-9-]+--[a-z0-9-]+$/, name);
     }
     assert.equal(registry.components.Button!.code!.storybookId, "components-forms-and-inputs-button-button--docs");
   });

@@ -64,9 +64,8 @@ export function dropRetired(scss, retired = RETIRED_TOKENS) {
 /**
  * The color names already retired from the old color collections, each with
  * the `--ds-*` token its uses moved to. The generator still reads those
- * archived Figma exports for the Specs replica, so it drops these from what it
- * writes; the rest of the old color set stays only until the Specs replica
- * carries its own copy.
+ * archived Figma exports, so it drops these from what it writes; the rest of
+ * the old color set stays only until the components move off it.
  */
 export const RETIRED_COLORS = new Map([
   ['--color-primary-border', '--ds-border-brand'],

@@ -9,7 +9,7 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 
 /** What the facts answer for each name: a pattern, a component, or nothing. */
 const ANSWERS = {
-  PageLayout: { status: 'exists', kind: 'pattern', import: "import { PageLayout } from '@/specs/Universal/Pages';", source: 'p/PageLayout.jsx' },
+  PageLayout: { status: 'exists', kind: 'pattern', import: "import { PageLayout } from '@/patterns';", source: 'p/PageLayout.jsx' },
   Frame: { status: 'exists', kind: 'pattern', import: "import { Frame } from '@/patterns';", source: 'p/Frame.jsx' },
   PatternCard: { status: 'exists', kind: 'pattern', import: "import { PatternCard } from '@/patterns';", source: 'p/PatternCard.jsx' },
   Popup: { status: 'exists', kind: 'component', import: "import { Popup } from '@/components';", source: 'c/Popup.jsx' },
@@ -45,7 +45,7 @@ test('a pattern the facts hold and the list leaves out fails', () => {
 test('rendering takes the import line and the doc from the facts', () => {
   const out = renderPatterns([row('PageLayout', 'Templates'), row('PatternCard')], { from: 'design-system/agent-views/components', lookup });
   assert.match(out, /^## Patterns: start a page, section, card, table or overlay here/m);
-  assert.match(out, /\| Templates \| \[`PageLayout`\]\(\.\.\/\.\.\/\.\.\/p\/PageLayout\.mdx\) \| `import \{ PageLayout \} from '@\/specs\/Universal\/Pages';` \| x \|/);
+  assert.match(out, /\| Templates \| \[`PageLayout`\]\(\.\.\/\.\.\/\.\.\/p\/PageLayout\.mdx\) \| `import \{ PageLayout \} from '@\/patterns';` \| x \|/);
   assert.match(out, /\| Card \| \[`PatternCard`\]/);
 });
 

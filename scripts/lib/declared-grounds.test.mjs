@@ -228,22 +228,6 @@ test('an `@include` of any other mixin is an at-rule: an annotation in it opens 
   assert.equal(nonText(source, 'color: red'), false);
 });
 
-/* ------------------------------------------------------------- drift guard */
-
-test('OverviewCard names no glyph by hand: each non-text color opens an icon-glyph include', () => {
-  const file = path.join(REPO, 'design-system/src/specs/Universal/Cards/OverviewCard/OverviewCard.scss');
-  const sheet = analyzeSheet(fs.readFileSync(file, 'utf8'));
-  const annotated = [...sheet.annotations].filter(([, own]) => own.contrast).map(([rule]) => rule);
-  assert.equal(annotated.length, 5, 'one per SMART type');
-  for (const rule of annotated) assert.ok(sheet.glyphRules.has(rule), `line ${rule.source.start.line}`);
-  sheet.root.walkRules((rule) => {
-    if (sheet.glyphRules.has(rule)) return;
-    for (const selector of rule.selectors) {
-      assert.equal(hasIconSubject(selector), false, `line ${rule.source.start.line}: \`${selector}\` lists a glyph by hand`);
-    }
-  });
-});
-
 test("CloseButton's exported inverse grounds match the @grounds on its inverse tone", () => {
   const scss = path.resolve(
     path.dirname(fileURLToPath(import.meta.url)),

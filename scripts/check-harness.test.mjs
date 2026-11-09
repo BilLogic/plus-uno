@@ -413,11 +413,11 @@ test('a sentinel the check enforces but the row does not declare is a finding', 
   delete row.floors;
   const messages = registryGenerator.floorFindings(row).map((f) => f.message);
   assert.ok(
-    messages.some((m) => /MIN_FILES = 150 as a private constant/.test(m)),
+    messages.some((m) => /MIN_FILES = 100 as a private constant/.test(m)),
     messages.join('\n'),
   );
   assert.ok(
-    messages.some((m) => /MIN_RULES = 39 as a private constant/.test(m)),
+    messages.some((m) => /MIN_RULES = 34 as a private constant/.test(m)),
     messages.join('\n'),
   );
 });
@@ -435,7 +435,7 @@ test('a declared floor that disagrees with the number the check enforces is a fi
   const row = { ...byName('check:focus-ring'), floors: { MIN_FILES: 1, MIN_RULES: 50 } };
   const messages = registryGenerator.floorFindings(row).map((f) => f.message);
   assert.ok(
-    messages.some((m) => /floors\.MIN_FILES = 1, but .+ enforces 150/.test(m)),
+    messages.some((m) => /floors\.MIN_FILES = 1, but .+ enforces 100/.test(m)),
     messages.join('\n'),
   );
 });

@@ -117,7 +117,7 @@ describe('which docs pages are tabbed', () => {
 
   it('tabs a pattern page in its own folder', () => {
     expect(isTabbedDocsPage('design-system/src/patterns/PatternModal/PatternModal.mdx')).toBe(true);
-    expect(isTabbedDocsPage('./design-system/src/patterns/PageTemplates/PageTemplates.mdx')).toBe(true);
+    expect(isTabbedDocsPage('./design-system/src/patterns/PageLayout/PageLayout.mdx')).toBe(true);
   });
 
   it('leaves the flat pattern reading pages and the foundations untabbed', () => {
@@ -142,9 +142,9 @@ describe('importLineFor', () => {
   });
 
   it('shows no import line on a docs-only pattern page, whose props are not its own export', () => {
-    const from = importSourceFor({ importPath: './design-system/src/patterns/PageTemplates/PageTemplates.stories.jsx' }, false);
+    const from = importSourceFor({ importPath: './design-system/src/patterns/PopupFamily/PopupFamily.stories.jsx' }, false);
     expect(from).toBeNull();
-    expect(importLineFor('PageLayout', from)).toBeNull();
+    expect(importLineFor('Popup', from)).toBeNull();
   });
 
   it('falls back to nothing when the meta carries no component', () => {
@@ -199,9 +199,9 @@ describe('the Agent view tab', () => {
   });
 
   it('is absent for a pattern page with no generated file beside it', () => {
-    expect(fs.existsSync(path.join(REPO_ROOT, 'design-system/src/patterns/PageTemplates/index.md'))).toBe(false);
+    expect(fs.existsSync(path.join(REPO_ROOT, 'design-system/src/patterns/PopupFamily/index.md'))).toBe(false);
     expect(
-      agentViewEntry(modules, { importPath: './design-system/src/patterns/PageTemplates/PageTemplates.stories.jsx' }),
+      agentViewEntry(modules, { importPath: './design-system/src/patterns/PopupFamily/PopupFamily.stories.jsx' }),
     ).toBeNull();
   });
 

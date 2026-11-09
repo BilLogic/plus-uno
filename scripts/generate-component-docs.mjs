@@ -431,7 +431,7 @@ function manifestEntryOf({ name, group, jsx, summary, props, defaults, descripti
  * `PageLayout` comes from. Each gets a generated doc beside its source, as a
  * component does.
  */
-const PATTERN_BARRELS = ['@/patterns', '@/specs/Universal/Pages'];
+const PATTERN_BARRELS = ['@/patterns'];
 
 /**
  * Each pattern barrel's components, parsed from source the way a component

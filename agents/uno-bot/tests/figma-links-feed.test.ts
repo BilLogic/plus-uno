@@ -11,7 +11,7 @@ const REGISTRY: DevLinkRegistry = {
   components: {
     Button: { code: { source: "design-system/src/components/forms-and-inputs/Button/Button.jsx" } },
     Checkbox: { code: { source: "design-system/src/components/forms-and-inputs/Checkbox.jsx" } },
-    Footer: { code: { source: "design-system/src/specs/Universal/Sections/Footer/Footer.jsx" } },
+    Footer: { code: { source: "design-system/src/patterns/Footer/Footer.jsx" } },
   },
 };
 
@@ -72,7 +72,7 @@ describe("the merged-PR feed", () => {
   it("a merged PR touching nothing under components names nothing, and the mark may move past it", async () => {
     const w = world({
       pulls: [pull(1301, "2026-10-14T10:00:00Z")],
-      files: { 1301: ["agents/uno-bot/src/index.ts", "design-system/src/specs/Universal/Sections/Footer/Footer.jsx"] },
+      files: { 1301: ["agents/uno-bot/src/index.ts", "design-system/src/patterns/Footer/Footer.jsx"] },
     });
     const fed = await readMergedPrs(w.deps);
     assert.deepEqual(fed.components, []);

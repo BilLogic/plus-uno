@@ -61,7 +61,8 @@ const FOCUS_ROLES = [
  * stopped recognizing `:focus`, would report a clean sweep — which is the one
  * result this check must never give by accident.
  */
-export const MIN_FILES = 150;
+// Lowered from 150 to 100 when the Specs code, the root app and the specs prototypes left main (kept on archive/legacy-ds).
+export const MIN_FILES = 100;
 // Lowered from 50 to 49: Collapse, Divider, NavPills, Navbar and Scrollspy
 // were retired, taking their own focus rules with them.
 // Lowered from 49 to 48: Dropdown was retired for DropdownMenu, whose
@@ -83,7 +84,8 @@ export const MIN_FILES = 150;
 // does not see.
 // Lowered from 40 to 39: AiLabel was deleted, and its explain button's ring
 // rule went with it.
-export const MIN_RULES = 39;
+// Lowered from 39 to 34 when the Specs code, the root app and the specs prototypes left main (kept on archive/legacy-ds).
+export const MIN_RULES = 34;
 
 export const REMEDY =
   `  -> A focus indicator is held to ${NON_TEXT}:1 against what it sits on (WCAG 1.4.11),\n` +

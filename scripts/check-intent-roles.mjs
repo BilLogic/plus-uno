@@ -49,7 +49,8 @@ const ROLES_FILE = `${TOKEN_DIR}/_color_roles.scss`;
  * stylesheets found on 2026-08-29; a resolver change that stopped finding them
  * would otherwise read as a clean sweep.
  */
-export const MIN_FILES = 150;
+// Lowered from 150 to 100 when the Specs code, the root app and the specs prototypes left main (kept on archive/legacy-ds).
+export const MIN_FILES = 100;
 
 const INTENTS = ['primary', 'secondary', 'tertiary', 'danger', 'success', 'warning', 'info'];
 

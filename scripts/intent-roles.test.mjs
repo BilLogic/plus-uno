@@ -181,7 +181,7 @@ test('an empty token directory fires the sentinel floor, not a clean sweep', () 
     const found = messagesOf(run, root);
     assert.ok(found.length > 0, 'an empty token directory must not report a clean sweep');
     assert.ok(
-      found.some((message) => /only \d+ stylesheets scanned \(floor 150\)/.test(message)),
+      found.some((message) => /only \d+ stylesheets scanned \(floor 100\)/.test(message)),
       `expected the stylesheet floor, got:\n${found.join('\n')}`,
     );
     assert.ok(

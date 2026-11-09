@@ -583,8 +583,10 @@ describe('the color key is finer than the normalizer it replaces', () => {
     // hand-drawn bubble's color fallback went.
     // 158: its skeleton shimmer moved onto --ds-skeleton-subtle, and three more went.
     // 86: every --color-* use outside specs/ moved onto the --ds- tokens, and
-    // 72 color fallbacks went with the old names; the rest are in specs/.
-    expect(comparable).toBe(86);
+    // 72 color fallbacks went with the old names; the rest were in specs/.
+    // 0: the Specs code and the root app left main (kept on archive/legacy-ds),
+    // and the last 86 comparable fallbacks with them.
+    expect(comparable).toBe(0);
     // The default 5s is not enough under a loaded runner: this is the one test
     // in the file that reads three source trees rather than the token
     // directory, and a timeout here would read as a finding it never made.

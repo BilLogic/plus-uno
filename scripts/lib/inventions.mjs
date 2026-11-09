@@ -124,7 +124,7 @@ export function renderSelfCheck() {
   return (
     `## Before you finish\n\n` +
     `Re-read what you wrote, then fix each of these:\n\n` +
-    `1. Every component and pattern comes from these lists, imported from its barrel (\`@/components\`, \`@/patterns\`, or \`@/specs/Universal/Pages\` for \`PageLayout\`); a deep path becomes the barrel import.\n` +
+    `1. Every component and pattern comes from these lists, imported from its barrel (\`@/components\` or \`@/patterns\`); a deep path becomes the barrel import.\n` +
     `2. Every prop and value is in the component's generated doc (or \`components.json\`).\n` +
     `3. Every color, size, radius and font is a token from \`../tokens/tokens.md\`, read at the ladder step for its role, in place of a raw value or a \`--space-*\`, \`--radius-<n>\` or \`--palette-*\` primitive.\n` +
     `4. Every name in the tables above is replaced by its right-hand name.\n` +

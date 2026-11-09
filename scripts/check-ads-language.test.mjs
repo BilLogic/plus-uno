@@ -81,7 +81,7 @@ test('a renamed-with-no-alias component surviving in doc prose fails with zero a
 });
 
 test('a renamed-with-no-alias name outside component docs is not flagged', () => {
-  assert.equal(measure([src('design-system/src/specs/Training/Lessons/Elements/Toast/Toast.jsx', '<Toast />')]).get('stale-name:Toast design-system/src/specs/Training/Lessons/Elements/Toast/Toast.jsx'), undefined);
+  assert.equal(measure([src('prototypes/x/src/Toast.jsx', '<Toast />')]).get('stale-name:Toast prototypes/x/src/Toast.jsx'), undefined);
 });
 
 test('the word Atlassian is zero allowed in MDX, in story doc strings and as a URL, a code comment is not shipped unless it carries a link', () => {

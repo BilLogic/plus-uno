@@ -40,7 +40,8 @@ export { REPO_ROOT };
 export const SEARCH_ROOTS = ['design-system/src'];
 export const SEARCHED = /\.(stories\.jsx|mdx)$/;
 /** A corpus smaller than this means the glob broke, not that the docs are clean. */
-export const MIN_FILES = 500;
+// Lowered from 500 to 300 when the Specs code, the root app and the specs prototypes left main (kept on archive/legacy-ds).
+export const MIN_FILES = 300;
 
 const EXEMPT = /raw-button:/;
 const RAW_TAG = /<button\b/g;
