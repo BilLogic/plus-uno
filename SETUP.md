@@ -59,7 +59,9 @@ first. Changes to what agents read go through `skills/uno-maintain`.
 
 ## Deploying
 
-The app and Storybook deploy from `main` via Netlify. uno-bot deploys
-separately with `npm run deploy` from `agents/uno-bot/` — that command runs the
-typecheck, the fetch and contract checks, the bundle tests and the harness
-bundle before it ships anything.
+A PR gets a Netlify deploy preview; a merge to `main` does not publish. The
+app and Storybook reach production only when a release is called, through
+`.github/workflows/netlify-production-deploy.yml` run by hand. uno-bot deploys
+separately, on every push to `main`: `.github/workflows/uno-bot-deploy.yml`
+runs `npm run deploy` in `agents/uno-bot/`, which runs its checks, tests and
+the harness bake before it ships anything.
