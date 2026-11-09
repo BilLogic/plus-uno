@@ -2,7 +2,7 @@
 
 # TimePicker
 
-TimePicker — a time field with an AM/PM toggle (Figma `Time picker`). Built from the shared parts: the field is `FieldBox`, which owns the box, the border, the fill, the size and every state, same as DatePicker; the AM/PM menu in Trailing is the PLUS DropdownMenu. - **Typing:** the field takes an hour and a minute, with or without a colon. It is checked when you press Enter or leave the field: a real time (hour 1–12, minute 0–59) is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Value:** a 12-hour string, "02:30 PM". A 24-hour value given through `value` is split into the hour this control can show and the period that says which half of the day it is. - **AM/PM:** a separate toggle, since the field itself has no notion of one. Changing it reports immediately, with whichever half of the time is already set. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: TimePicker has no `label` prop, so that is how a caller names it.
+TimePicker — a time field: type a time, or pick one from the list of the day's times under it (Figma `Time picker`). It is the PLUS Select, searchable: the field is the shared `FieldBox`, the list is the shared `Listbox`, so the box, the list, the keyboard and every state are Select's. There is no separate AM/PM control: each time in the list carries its own period, and typing "2:30p" or "1430" finds it. - **List:** `times`, 24-hour `HH:mm` strings, every half hour by default, shown as "2:30 PM". Typing filters it. - **Typing a time that is not in the list** (`timeIsEditable`, on by default): Enter on the "Create" row reads it — "9:05", "905a", "21:05" — and picks it. Text that is not a real time is refused and the field is marked invalid. - **Value:** a 12-hour string, "02:30 PM", or null once cleared. A 24-hour `value` ("14:30") is accepted and read the same way. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the combobox, which is the control a screen reader lands on: TimePicker has no `label` prop, so that is how a caller names it.
 
 Also asked as: time input, clock, time field, time selector.
 
@@ -22,29 +22,29 @@ Use a time picker for a time of day alone: a reminder time, a recurring slot's s
 
 ### The field always reports a 12-hour value. {#the-field-always-reports-a-12-hour-value}
 
-`onChange` fires with a string like `"02:30 PM"` regardless of how `value` was given. A 24-hour `value` is accepted and split into the hour and period this control shows, but what it hands back is always 12-hour.
+`onChange` fires with a string like `"02:30 PM"` regardless of how `value` was given, or `null` once the field is cleared. A 24-hour `value` is accepted and read as the same time, but what it hands back is always 12-hour.
 
 ```jsx
 <TimePicker value={time} onChange={setTime} />
 ```
 
-### Type hours and minutes with a colon. {#type-hours-and-minutes-with-a-colon}
+### Show the format in the placeholder. {#show-the-format-in-the-placeholder}
 
-The colon separates hours from minutes. Without it, 330 can be read several ways. The field also accepts bare digits and adds the colon when it loses focus, so the placeholder is where people see the format.
+The placeholder shows hours and minutes with a colon, so an empty field says what it holds. The field also reads bare digits, 1430 or 930a, and shows the time it picked.
 
 Do: The placeholder shows hours and minutes with a colon.
 Don't: The placeholder has no colon.
 
 ### Offer round steps. {#offer-round-steps}
 
-Steps of 15 or 30 minutes match how sessions are booked. Odd minutes nobody books only add choices.
+Steps of 15 or 30 minutes match how sessions are booked; pass them as `times`. Odd minutes nobody books only add choices.
 
 Do: A round start time.
 Don't: An odd minute.
 
-### Set AM or PM in the menu. {#set-am-or-pm-in-the-menu}
+### Pick the period with the time. {#pick-the-period-with-the-time}
 
-The menu beside the field holds AM or PM. Typing sets the hour and minute; the menu sets the period on its own and reports at once with whichever half of the time is already set. Asking for AM or PM in the field too leaves two places that can disagree, so keep the placeholder to the hour and minute.
+Every time in the list carries its period, so 9:30 AM and 9:30 PM are two rows, not one time and a separate switch. A typed time without AM or PM is read on the 24-hour clock: 9:30 is morning, 21:30 evening.
 
 ### Show a set time as read-only, not disabled. {#show-a-set-time-as-read-only-not-disabled}
 
@@ -55,9 +55,9 @@ Don't: The same time disabled, faded as if it did not apply.
 
 ## Accessibility
 
-- **There is no `label` prop.** Name the field with `aria-label` or `aria-labelledby`, forwarded straight to the input a screen reader lands on, same as `aria-describedby` and `data-*`.
-- **The AM/PM toggle is a real button inside a menu**, reachable and operable by keyboard like any other PLUS dropdown.
-- **An invalid typed time keeps the typed text** rather than silently reverting, so the person can see and correct what they entered.
+- **There is no `label` prop.** Name the field with `aria-label` or `aria-labelledby`, forwarded straight to the combobox a screen reader lands on, same as `aria-describedby` and `data-*`.
+- **It is a combobox with a listbox**, the same as Select: arrow keys move through the times, Enter picks, Escape closes the list.
+- **A refused typed time marks the field invalid** with `aria-invalid`, so the person hears that it was not taken.
 
 ## Related
 
@@ -68,8 +68,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Parts
 
-1. **Field.** A 40 box (32 at compact) on the input fill, holding the hour and minute as text.
-2. **AM/PM toggle.** A button that opens a small menu to set the period. It is a separate control from the typed text.
+1. **Field.** A 40 box (32 at compact) on the input fill. It holds the chosen time, and takes typing.
+2. **List.** The day's times, every half hour by default (`times` changes them), each with its period. It opens under the field and filters as you type.
 
 ### States
 
@@ -97,39 +97,35 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Name the time by its role: "Reminder time", "Session start". | A generic name: "Time". |
 | Say what is expected when invalid: "Enter a time such as 2:30". | "Invalid time". |
-| Show the period in the toggle, AM or PM. | Ask people to type AM or PM into the text. |
+| Show the period with every time: "2:30 PM". | A bare "2:30" that could be either half of the day. |
 | Use sentence case in labels and messages. | Title case: "Reminder Time". |
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | string | — | — |
-| `name` | string | — | — |
+| `id` | string | — | The `id` of the combobox input. |
+| `name` | string | — | Submitted with a form, as the 12-hour value. |
 | `placeholder` | string | `'__ : __'` | Defaults to `__ : __`. |
-| `value` | string | — | A 12-hour string ("02:30 PM") or a 24-hour one ("14:30"), split on read. |
+| `value` | string | — | A 12-hour string ("02:30 PM") or a 24-hour one ("14:30"). |
+| `times` | arrayOf | `DEFAULT_TIMES` | The times the list offers, as 24-hour `HH:mm`. Every half hour of the day by default. |
+| `timeIsEditable` | bool | `true` | Lets a typed time that is not in the list be picked. On by default. |
 | `spacing` | enum | `'default'` | `default` is 40; `compact` is 32. |
-| `isDisabled` | bool | `false` | Disables the hour and minute inputs and the period menu. |
+| `isDisabled` | bool | `false` | Dims the field and blocks opening and changing it. |
 | `isReadOnly` | bool | `false` | Shows the time without letting the user change it. |
-| `isInvalid` | bool | `false` | Draws the field invalid; a typed time outside 1–12 / 0–59 does too. |
+| `isInvalid` | bool | `false` | Draws the field invalid; a typed text that is not a time does too. |
 | `isValid` | bool | `false` | Draws the field valid. |
-| `onChange` | func | — | `(value)` — a 12-hour string, or null once either half is cleared. |
-| `onFocus` | func | — | — |
-| `onBlur` | func | — | — |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
+| `onChange` | func | — | `(value)` — a 12-hour string, "02:30 PM", or null once cleared. |
+| `onFocus` | func | — | Focus entering the field from outside it. |
+| `onBlur` | func | — | Focus leaving the field and its list. |
+| `className` | string | `''` | Extra class names on the field's wrapper, beside its own. |
+| `style` | object | — | Inline style on the field's wrapper. |
 
 ## Variants
 
 **`spacing`** — `default` · `compact`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
-
-## Tokens touched
-
-`--ds-icon-brand` · `--ds-icon-danger` · `--ds-icon-success` · `--ds-text-brand` · `--ds-text-danger` · `--ds-text-success` · `--item-height-sm` · `--radius-md` · `--stack-sm` · `--type-weight-semibold`
-
-From `design-system/src/components/forms-and-inputs/TimePicker/TimePicker.scss`. Override these through the token layer, never with a literal.
 
 ## Figma
 

@@ -202,13 +202,14 @@ HiddenLabels.play = async ({ canvasElement }) => {
 
     // Every text control in the story, and the one name each must answer to.
     // `getByRole` throws on a second match, so this fails both when a name is
-    // missing and when two controls share one. The date half is a combobox,
-    // like DatePicker's own; the rest are plain text boxes.
+    // missing and when two controls share one. Both halves of the date time
+    // picker are comboboxes (a calendar and a list of times); the rest are
+    // plain text boxes.
     const named = [
         ['textbox', 'Email address'],
         ['combobox', 'Session start Date'],
-        ['textbox', 'Session start Time'],
-        ['textbox', 'Session end'],
+        ['combobox', 'Session start Time'],
+        ['combobox', 'Session end'],
         ['textbox', 'Sessions'],
     ].map(([role, name]) => canvas.getByRole(role, { name }));
 
@@ -283,9 +284,9 @@ ForwardedProps.play = async ({ canvasElement }) => {
     await expect(doc.querySelectorAll('[data-testid="session-start-field"]')).toHaveLength(1);
 
     // Not copied onto the two inputs — "spread onto both and hope" is the thing
-    // the rule exists to rule out. The date half is a combobox, like
-    // DatePicker's own; the time half is a plain text box.
-    const inputs = [...within(group).getAllByRole('textbox'), ...within(group).getAllByRole('combobox')];
+    // the rule exists to rule out. Both halves are comboboxes: the date opens
+    // a calendar, the time a list of times.
+    const inputs = within(group).getAllByRole('combobox');
     await expect(inputs).toHaveLength(2);
     for (const input of inputs) {
         await expect(input.hasAttribute('aria-describedby')).toBe(false);
@@ -296,7 +297,7 @@ ForwardedProps.play = async ({ canvasElement }) => {
     // generated one still names the group and both inputs still resolve.
     await expectNoDanglingLabels(canvasElement);
     await expect(within(group).getByRole('combobox', { name: 'Session start Date' })).toBeTruthy();
-    await expect(within(group).getByRole('textbox', { name: 'Session start Time' })).toBeTruthy();
+    await expect(within(group).getByRole('combobox', { name: 'Session start Time' })).toBeTruthy();
 };
 
 /**

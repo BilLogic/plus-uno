@@ -32,12 +32,12 @@ authored half, counted rather than assumed.
 | [Range](Range/index.md) | 14 | ✅ | ✅ | ✅ |
 | [Rating](Rating/index.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
-| [Select](Select/index.md) | 42 | ✅ | ✅ | ✅ |
+| [Select](Select/index.md) | 43 | ✅ | ✅ | ✅ |
 | [SplitButton](SplitButton/index.md) | 3 | ✅ | ✅ | ✅ |
 | [TagInput](TagInput/index.md) | 27 | ✅ | ✅ | ✅ |
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✅ | ✅ |
 | [TextField](TextField/index.md) | 35 | ✅ | ✅ | ✅ |
-| [TimePicker](TimePicker/index.md) | 14 | ✅ | ✅ | ✅ |
+| [TimePicker](TimePicker/index.md) | 16 | ✅ | ✅ | ✅ |
 | [Toggle](Toggle/index.md) | 17 | ✅ | ✅ | ✅ |
 | [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✅ | ✅ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✅ | ✅ |

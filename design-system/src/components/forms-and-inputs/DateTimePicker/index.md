@@ -51,7 +51,7 @@ Date first, then time with AM or PM. The field already sets that order; write th
 
 ### Always show AM or PM. {#always-show-am-or-pm}
 
-A time without AM or PM can mean two times a day apart. The time field keeps its AM/PM toggle beside the minutes, so the field always shows it; keep it in any message that repeats the time.
+A time without AM or PM can mean two times a day apart. Every time in the time field's list carries its period, so the field always shows it; keep it in any message that repeats the time.
 
 ### Name the time zone when it can differ. {#name-the-time-zone-when-it-can-differ}
 
@@ -88,7 +88,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 1. **Label.** Names the whole group. `isLabelHidden` hides it visually and keeps the name.
 2. **Section labels** (optional). "Date" and "Time" captions above each field.
 3. **Date field.** The Date picker, on its own calendar.
-4. **Time field.** The Time picker, with its AM/PM toggle.
+4. **Time field.** The Time picker: a list of the day's times, each with its period.
 5. **Caption.** One line under the pair: the validation message, or the viewer's time zone and the other person's time.
 
 ### States
