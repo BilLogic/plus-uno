@@ -12,7 +12,7 @@ Reusable prototype starters organized by product area.
 
 - Agent router: `AGENTS.md`
 - Skill references: `skills/*/references/*.md`
-- Token reference: `design-system/guidelines/foundations/tokens.md`
+- Token reference: `design-system/src/styles/Tokens.mdx`
 - DS component docs: `design-system/guidelines/components/overview.md`
 - DS token docs: `design-system/guidelines/foundations/`
 

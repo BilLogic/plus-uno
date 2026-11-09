@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **117,957 chars from 9 files**, against an assembled budget of 175,500 (57,543 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 97,573 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **118,006 chars from 9 files**, against an assembled budget of 175,500 (57,494 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 97,622 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,364 (−7,873 ide-only) | 10,364 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 28,895 | 39,288 | 20,000 (constitution) ⚠️ **over by 8,895** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,438 | 60,767 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 62,413 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 63,661 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 69,355 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 81,141 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 102,102 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 105,570 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 112,128 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 117,101 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 117,957 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,364 (−7,862 ide-only) | 10,364 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 28,944 | 39,337 | 20,000 (constitution) ⚠️ **over by 8,944** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,438 | 60,816 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 62,462 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 63,710 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 69,404 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 81,190 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 102,151 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 105,619 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 112,177 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 117,150 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 118,006 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -446,7 +446,7 @@ A design value: color, spacing, typography, elevation, radius.
 A fundamental design primitive (color palette, type scale, grid), and the Figma and Storybook pages that document one. A docs word: the token collections say semantics.
 
 **Token tier**:
-The four levels every spacing token sits on, one Figma collection each and the same in code: `spacing / primitives` → `spacing / semantics` → `spacing / patterns` → `spacing / components`, read as **Primitive** → **Semantic** → **Pattern token** → **Component token**. Color mirrors it with `color / primitives`, `color / semantics` and `color / opacity`; the fallback rule for picking a tier is in `tokens.md`.
+The four levels every spacing token sits on, one Figma collection each and the same in code: `spacing / primitives` → `spacing / semantics` → `spacing / patterns` → `spacing / components`, read as **Primitive** → **Semantic** → **Pattern token** → **Component token**. Color mirrors it with `color / primitives`, `color / semantics` and `color / opacity`; the fallback rule for picking a tier is in `design-system/src/styles/Tokens.mdx` § The four-tier ladder.
 _Avoid_: "token layer", "level", "foundations" for a collection
 
 **Primitive**:
