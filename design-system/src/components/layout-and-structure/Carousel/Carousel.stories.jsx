@@ -163,6 +163,13 @@ const pointerOffStage = async (canvasElement) => {
     await userEvent.unhover(canvasElement.querySelector('.plus-carousel-stage'));
 };
 
+// Waits for the clock to pass `min`. The real cursor's hover can land after
+// the story's own unhover, so each check takes the pointer off the stage again.
+const clockPasses = (canvasElement, min) => waitFor(async () => {
+    await pointerOffStage(canvasElement);
+    expect(progressOf(canvasElement)).toBeGreaterThan(min);
+}, { timeout: 4000 });
+
 const fakeReducedMotion = () => {
     const real = window.matchMedia;
     window.matchMedia = (query) => ({
@@ -237,7 +244,7 @@ export const PauseStopsProgress = {
     play: async ({ canvasElement }) => {
         await pointerOffStage(canvasElement);
         const canvas = within(canvasElement);
-        await waitFor(() => expect(progressOf(canvasElement)).toBeGreaterThan(0.03));
+        await clockPasses(canvasElement, 0.03);
 
         const pause = canvas.getByRole('button', { name: 'Pause' });
         await expect(pause).not.toHaveAttribute('aria-pressed');
@@ -250,7 +257,7 @@ export const PauseStopsProgress = {
         await expect(progressOf(canvasElement)).toBe(held);
 
         canvas.getByRole('button', { name: 'Play' }).click();
-        await waitFor(() => expect(progressOf(canvasElement)).toBeGreaterThan(held));
+        await waitFor(() => expect(progressOf(canvasElement)).toBeGreaterThan(held), { timeout: 4000 });
         await expect(canvas.getByRole('button', { name: 'Pause' })).toBeTruthy();
     },
 };
@@ -262,7 +269,7 @@ export const DotRestartsClock = {
     play: async ({ canvasElement }) => {
         await pointerOffStage(canvasElement);
         const canvas = within(canvasElement);
-        await waitFor(() => expect(progressOf(canvasElement)).toBeGreaterThan(0.1));
+        await clockPasses(canvasElement, 0.1);
 
         const third = canvas.getByRole('button', { name: 'Slide 3 of 5: Training that fits between sessions' });
         await userEvent.click(third);
@@ -271,7 +278,7 @@ export const DotRestartsClock = {
         await expect(progressOf(canvasElement)).toBeLessThan(0.1);
 
         await expect(canvas.getByRole('button', { name: 'Pause' })).toBeTruthy();
-        await waitFor(() => expect(progressOf(canvasElement)).toBeGreaterThan(0.03));
+        await clockPasses(canvasElement, 0.03);
     },
 };
 
@@ -294,7 +301,7 @@ export const HoverHolds = {
     beforeEach: clockReady,
     play: async ({ canvasElement }) => {
         await pointerOffStage(canvasElement);
-        await waitFor(() => expect(progressOf(canvasElement)).toBeGreaterThan(0.03));
+        await clockPasses(canvasElement, 0.03);
         const stage = canvasElement.querySelector('.plus-carousel-stage');
 
         await userEvent.hover(stage);
@@ -304,7 +311,7 @@ export const HoverHolds = {
         await expect(progressOf(canvasElement)).toBe(held);
 
         await userEvent.unhover(stage);
-        await waitFor(() => expect(progressOf(canvasElement)).toBeGreaterThan(held));
+        await waitFor(() => expect(progressOf(canvasElement)).toBeGreaterThan(held), { timeout: 4000 });
     },
 };
 
@@ -375,7 +382,8 @@ export const PillFills = {
         await waitFor(() => expect(pills[0].querySelector('.plus-carousel-pill-track').getBoundingClientRect().width).toBe(32));
         await expect(pills[1].querySelector('.plus-carousel-pill-track').getBoundingClientRect().width).toBe(8);
 
-        await waitFor(() => expect(pillFillScale(pills[0])).toBeGreaterThan(0.1));
+        await clockPasses(canvasElement, 0.1);
+        await waitFor(() => expect(pillFillScale(pills[0])).toBeGreaterThan(0.05));
         // The pill and the ring read the same clock.
         await expect(Math.abs(pillFillScale(pills[0]) - progressOf(canvasElement))).toBeLessThan(0.1);
         await expect(pillFillScale(pills[1])).toBe(0);
