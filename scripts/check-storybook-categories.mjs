@@ -25,8 +25,9 @@
  *      not "Text Field". An all-caps acronym (AI, API) is allowed.
  *   5. No tracked file names a retired folder path.
  *   6. The sidebar's roots lead with the benchmark site's sections plus our
- *      Patterns, in order: Get started, Foundations, Components, Patterns, AI,
- *      Tools. Our own extras (Data visualizations, Specs, Deprecated) follow.
+ *      Patterns, in order: Get started, Foundations, Patterns, Components, AI UI.
+ *      Patterns come before Components because a page is composed from them
+ *      first. Our own extras (Data visualizations, Specs) follow.
  *   7. Every docs page and story file under `design-system/src/` is titled
  *      under a root the sidebar sort lists, so a page left under a retired
  *      root (`Getting started/…`, `Foundations/Patterns/…`) cannot open a
@@ -34,7 +35,9 @@
  *
  * A component whose docs read as a layout area rather than a component (the
  * Panel) is listed in the taxonomy's `patternComponents` and titled
- * `Patterns/<name>`; its folder stays under its category.
+ * `Patterns/<name>`; an AI component (Icon, Prompt input) is listed in
+ * `aiComponents` and titled `AI UI/Components for AI/<name>`. Either way its
+ * folder stays under its category.
  *
  * The categories are Atlassian's, read live from atlassian.design/components on
  * 2026-10-24. Only the ones with members are used; adding a member to another
@@ -67,8 +70,12 @@ export const ATLASSIAN_CATEGORIES = [
   'Text and data display',
 ];
 
-/** The sidebar's leading sections, in order: the benchmark site's five, with our Patterns after Components. */
-export const SITE_SECTIONS = ['Get started', 'Foundations', 'Components', 'Patterns', 'AI', 'Tools'];
+/** Where an AI component is titled: `AI UI/Components for AI/<name>`. */
+export const AI_ROOT = 'AI UI';
+export const AI_COMPONENTS = 'Components for AI';
+
+/** The sidebar's leading sections, in order: the benchmark site's, with our Patterns before Components. */
+export const SITE_SECTIONS = ['Get started', 'Foundations', 'Patterns', 'Components', 'AI UI'];
 
 /**
  * Folders that held components before the move, as the repo path or the `@/`
@@ -188,6 +195,7 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
     const parts = rel.split('/');
     const folder = parts.length > 4 ? parts[3] : '_internal';
     if (root === 'Patterns' && (taxonomy.patternComponents ?? []).includes(category)) continue;
+    if (root === AI_ROOT && category === AI_COMPONENTS && (taxonomy.aiComponents ?? []).includes(rest[0])) continue;
     if (root !== 'Components' || !groups.includes(category)) {
       found.push(
         `${rel}  is titled "${title}", outside every component category.\n` +

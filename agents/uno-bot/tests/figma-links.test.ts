@@ -353,7 +353,9 @@ describe("only registry components", () => {
     // 66: Dropdown was retired for DropdownMenu, which has no figmaMeta of
     // its own yet (-1 net); Phase D backfills Figma for it. 65: the Specs
     // TopBar left when the Sidebar refresh removed the top bar (-1 net).
-    assert.equal(names.length, 65);
+    // 63: Footer was deleted from code and AiLabel was deleted when the AI UI
+    // section replaced it, and their registry rows went with them (-2 net).
+    assert.equal(names.length, 63);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);

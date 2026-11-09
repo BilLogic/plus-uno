@@ -11,7 +11,7 @@ import PropTypes from 'prop-types';
 import Table from '@/components/text-and-data-display/Table/Table';
 import { StatusSelect } from '@/specs/Toolkit/In-Session/Elements/StatusSelect';
 import StatusTag from '@/components/labels/StatusTag';
-import UserAvatar from '@/components/images-and-icons/UserAvatar/UserAvatar';
+import UserAvatar from '@/specs/Universal/Elements/UserAvatar/UserAvatar';
 import './TutorsStatusAndWarningsTable.scss';
 import { iconClass } from '../../../../../lib/icon';
 

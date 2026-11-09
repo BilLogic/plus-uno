@@ -64,7 +64,6 @@ export const Overview = () => (
                 <ul className="body2-txt mb-0 ps-4">
                     <li><strong>Sidebar</strong> - Navigation sidebar (tutor/supervisor variants)</li>
                     <li><strong>TopBar</strong> - Breadcrumb + user avatar header</li>
-                    <li><strong>Footer</strong> - Version, copyright, and terms</li>
                 </ul>
             </div>
 
@@ -80,7 +79,7 @@ export const Overview = () => (
                 <h2 className="h4 mb-2">Pages</h2>
                 <p className="body2-txt mb-2">Complete page layouts:</p>
                 <ul className="body2-txt mb-0 ps-4">
-                    <li><strong>PageLayout</strong> - Standard layout with Sidebar, TopBar, Content, Footer</li>
+                    <li><strong>PageLayout</strong> - Standard layout with Sidebar, TopBar and Content</li>
                 </ul>
             </div>
         </div>

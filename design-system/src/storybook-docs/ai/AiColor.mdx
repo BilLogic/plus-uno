@@ -1,0 +1,38 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection, TokenSwatches, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="AI UI/Foundations for AI/Color" />
+
+<FoundationHero
+    title="Color"
+    summary="Color marks the AI at work: one ground for the primary AI action, and two hues on the generative border."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="AI action">
+
+The ground of the one primary AI action in a region, the <DocsLink id="ai-ui-components-for-ai-button">Button</DocsLink>'s AI appearance. Its label and icon take `--ds-text-inverse` and `--ds-icon-inverse`. Use it for actions that call the AI, never to emphasize an ordinary action.
+
+<TokenSwatches
+    items={[
+        { token: '--ds-ai-background-bold', text: '--ds-text-inverse' },
+        { token: '--ds-ai-background-bold-hovered', text: '--ds-text-inverse' },
+        { token: '--ds-ai-background-bold-pressed', text: '--ds-text-inverse' },
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="Generative border">
+
+The <DocsLink id="ai-ui-components-for-ai-generative-border">Generative border</DocsLink> draws hard-edged segments of the brand and discovery border colors. Color here is a signal that the AI is generating, so it appears only while it is.
+
+<TokenSwatches
+    items={[
+        { token: '--ds-border-brand', sample: ' ' },
+        { token: '--ds-border-discovery', sample: ' ' },
+    ]}
+/>
+
+</FoundationSection>

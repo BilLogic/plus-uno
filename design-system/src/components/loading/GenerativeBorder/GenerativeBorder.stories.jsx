@@ -22,7 +22,7 @@ import GenerativeBorder, { GENERATIVE_BORDER_RADII } from './GenerativeBorder';
  */
 
 export default {
-    title: 'Components/Loading/Generative border',
+    title: 'AI UI/Components for AI/Generative border',
     component: GenerativeBorder,
     tags: ['!dev', '!autodocs'],
     parameters: {

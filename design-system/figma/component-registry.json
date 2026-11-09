@@ -33,49 +33,6 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813"
       }
     },
-    "AiLabel": {
-      "code": {
-        "import": "@/components/labels",
-        "export": "default",
-        "mdxPath": "design-system/src/components/labels/AiLabel/AiLabel.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/AiLabel",
-        "source": "design-system/src/components/labels/AiLabel/AiLabel.jsx",
-        "storybookId": "components-labels-ai-label-ai-label--docs",
-        "props": {
-          "origin": {
-            "type": "enum",
-            "values": [
-              "generated",
-              "assisted",
-              "reviewed"
-            ]
-          },
-          "confidence": {
-            "type": "enum",
-            "values": [
-              "high",
-              "low"
-            ]
-          }
-        }
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "ai-label",
-            "name": "AI label",
-            "componentSetNodeId": "20094:1214",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-1214",
-            "source": "manual",
-            "status": "verified",
-            "isComponentSet": true,
-            "notes": "Created 2026-08-29 on the Badge page, BESIDE the four AI surfaces the product invented locally rather than instead of them. No brand hue is picked: the ground is achromatic and the accent is a border and a glyph, so the branding decision lands on one value. Published: all 6 variants (origin × confidence) present in the 2026-09-15 components snapshot."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-1214"
-      }
-    },
     "Avatar": {
       "code": {
         "import": "@/components/images-and-icons",
@@ -575,31 +532,6 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3548-245993"
       }
     },
-    "Footer": {
-      "code": {
-        "import": "@/specs/Universal/Sections/Footer/Footer",
-        "export": "default",
-        "mdxPath": "design-system/src/specs/Universal/Sections/Footer/Footer.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Sections/Footer",
-        "source": "design-system/src/specs/Universal/Sections/Footer/Footer.jsx",
-        "storybookId": "specs-universal-sections-footer--docs"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "footer",
-            "name": "Footer",
-            "componentSetNodeId": "20978:1305",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20978-1305",
-            "source": "node-chart",
-            "status": "verified",
-            "isComponentSet": false,
-            "notes": "Main component on the Footer page, Updated section. Re-checked in Figma on 2026-11-07."
-          }
-        ]
-      }
-    },
     "Heading": {
       "code": {
         "import": "@/components/text-and-data-display",
@@ -1066,7 +998,7 @@
         "mdxPath": "design-system/src/components/messaging/Modal/Modal.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/messaging/Modal",
         "source": "design-system/src/components/messaging/Modal/Modal.jsx",
-        "storybookId": "components-messaging-modal--docs"
+        "storybookId": "components-messaging-modal-dialog--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1645,7 +1577,7 @@
         "mdxPath": "design-system/src/components/labels/Suggestion/Suggestion.mdx",
         "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/Suggestion",
         "source": "design-system/src/components/labels/Suggestion/Suggestion.jsx",
-        "storybookId": "components-labels-ai-label-suggestion--docs",
+        "storybookId": "ai-ui-components-for-ai-suggestion--docs",
         "props": {
           "type": {
             "type": "enum",

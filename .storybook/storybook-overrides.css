@@ -50,31 +50,69 @@ body,
  * selectors that used to sit alongside these were deleted: they were never
  * emitted, so they had never once applied. `.sbdocs-title` IS emitted and stays.
  */
-.sbdocs h1:not(:where(.docs-story *, .sb-ds-dodont-card *)),
+/*
+ * THE DOCS TYPE SCALE: one heading token per outline level, as in the app.
+ *
+ * Each level takes its whole type token through the `font` shorthand: family,
+ * weight, size AND line height together. Setting only `font-size` left the line
+ * height to Storybook's own emotion rules, which are smaller than our sizes, so a
+ * 28px heading sat on a 20px line and its descender ran into the meta text
+ * under it (the type specimen titles on Foundations/Typography). It also gave
+ * h1 and h2 the same 32px, and h3 and h4 the same 28px, so the outline had no
+ * visible steps.
+ *
+ *   h1 page title     --heading-xxlarge   32 / 36 serif
+ *   h2 section        --heading-large     24 / 28 serif
+ *   h3 example, sub   --heading-medium    20 / 24 serif
+ *   h4                --heading-small     16 / 20 sans semibold
+ *   h5, h6            --heading-xsmall    14 / 20 sans semibold
+ *
+ * The space above a heading is the Page pattern's: `--page-stack-lg` before a
+ * section, `--page-stack-md` before a sub-heading, `--section-stack-sm` between
+ * a heading and what it heads.
+ *
+ * `aside *` leaves the On this page rail to its own rule below.
+ *
+ * `:not([style])`: a docs block that draws its own heading (the type specimens
+ * in foundation-blocks.jsx set `font` and `margin` inline) keeps what it asked
+ * for. These rules are `!important` to beat Storybook's emotion classes, and
+ * that also beat the inline style, which is how a specimen title once took the
+ * 28px size on its block's 20px line.
+ */
+.sbdocs h1:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)),
 .sbdocs-title {
-    font-family: var(--type-family-heading-serif) !important;
-    font-size: var(--font-size-200) !important;
-    font-weight: var(--type-weight-medium) !important;
+    font: var(--heading-xxlarge) !important;
+    letter-spacing: var(--heading-xxlarge-tracking) !important;
     color: var(--ds-text) !important;
 }
 
-.sbdocs h2:not(:where(.docs-story *, .sb-ds-dodont-card *)) {
-    font-family: var(--type-family-heading-serif) !important;
-    font-size: var(--font-size-200) !important;
-    font-weight: var(--type-weight-medium) !important;
+.sbdocs h2:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
+    font: var(--heading-large) !important;
+    color: var(--ds-text) !important;
+    margin-top: var(--page-stack-lg) !important;
+    margin-bottom: var(--section-stack-sm) !important;
+}
+
+.sbdocs h3:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
+    font: var(--heading-medium) !important;
+    color: var(--ds-text) !important;
+    margin-top: var(--page-stack-md) !important;
+    margin-bottom: var(--section-stack-sm) !important;
+}
+
+.sbdocs h4:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
+    font: var(--heading-small) !important;
+    color: var(--ds-text) !important;
+    margin-top: var(--section-stack-lg) !important;
+    margin-bottom: var(--section-stack-sm) !important;
+}
+
+.sbdocs h5:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)),
+.sbdocs h6:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
+    font: var(--heading-xsmall) !important;
     color: var(--ds-text) !important;
     margin-top: var(--section-stack-md) !important;
-}
-
-.sbdocs h3:not(:where(.docs-story *, .sb-ds-dodont-card *)),
-.sbdocs h4:not(:where(.docs-story *, .sb-ds-dodont-card *)),
-.sbdocs h5:not(:where(.docs-story *, .sb-ds-dodont-card *)),
-.sbdocs h6:not(:where(.docs-story *, .sb-ds-dodont-card *)) {
-    font-family: var(--type-family-heading-serif) !important;
-    font-size: var(--font-size-175) !important;
-    font-weight: var(--type-weight-medium) !important;
-    color: var(--ds-text) !important;
-    margin-top: var(--space-0625) !important;
+    margin-bottom: var(--section-stack-sm) !important;
 }
 
 /*
@@ -350,13 +388,7 @@ a.sbdocs-a {
  * paragraphs sit from each other, which is the trade of having one authority.
  */
 .sbdocs .sb-ds-component-docs.sb-ds-component-docs--page {
-  margin-top: var(--space-400);
-}
-
-@media (min-width: 768px) {
-  .sbdocs .sb-ds-component-docs.sb-ds-component-docs--page {
-    margin-top: calc(var(--space-400) * 1.5);
-  }
+  margin-top: var(--page-stack-lg);
 }
 
 .sbdocs .sb-ds-component-docs .sb-ds-doc-section {
@@ -380,8 +412,8 @@ a.sbdocs-a {
  * above were unreachable, and are deleted rather than reinstated.
  */
 .sbdocs .sb-ds-doc-section {
-  margin-top: clamp(var(--space-250), 5vw, var(--space-400)) !important;
-  margin-bottom: clamp(var(--space-250), 5vw, var(--space-400)) !important;
+  margin-top: var(--page-stack-lg) !important;
+  margin-bottom: var(--page-stack-lg) !important;
 }
 
 /*
@@ -582,11 +614,19 @@ a.sbdocs-a {
  * four-selector list did.
  */
 .sbdocs .sb-ds-component-docs .sb-ds-doc-section > :is(h2, h3, h4) {
-  /* The h3 step, whatever the tag: the promotion was for the outline, and it is
-     not allowed to change what the page looks like. */
-  font-size: var(--font-size-175) !important;
+  /* The size is the tag's, from the type scale at the top of this file; inside a
+     section the gap is the only space between children. */
   margin-top: 0 !important;
   margin-bottom: 0 !important;
+}
+
+/*
+ * An example's heading starts a new block: more room above it than the section's
+ * gap gives between a description and its canvas, so each example reads as one
+ * heading, one line and one canvas. The first child needs none.
+ */
+.sbdocs .sb-ds-component-docs .sb-ds-doc-section > :is(h3, h4):not(:first-child) {
+  margin-top: var(--page-stack-sm) !important;
 }
 
 /*
@@ -673,8 +713,7 @@ a.sbdocs-a {
 .sbdocs .sbdocs-toc h2,
 .toc-wrapper h2,
 .sbdocs-wrapper aside h2 {
-  font-size: var(--font-size-0875) !important;
-  font-weight: 700 !important;
+  font: var(--heading-xsmall) !important;
   letter-spacing: 0.05em !important;
   text-transform: uppercase !important;
   margin-top: 0 !important;
@@ -1260,4 +1299,57 @@ html[data-color-mode="dark"] .docs-story {
 
 .sbdocs .sb-ds-docs-stories .docs-story {
     margin-block: var(--stack-lg);
+}
+
+/*
+ * The docs layout blocks (ds-docs-layout.jsx), on the Page and Section tokens.
+ *
+ * An example block is a column: its one-line description, then the canvas, with
+ * the Section's gap between them. The description reads as the page's prose
+ * does, from the body type token; before this it carried a class and no style,
+ * so Storybook's own 14px gray paragraph rule drew it in another font.
+ */
+.sbdocs .sb-docs-demo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-stack-md);
+}
+
+.sbdocs .sb-docs-demo > * {
+  margin: 0 !important;
+}
+
+.sbdocs p.sb-ds-canvas-description {
+  font: var(--body-large);
+  color: var(--ds-text-subtle);
+  max-width: 55ch;
+  margin: 0;
+}
+
+/* A preview well's inner padding: one value at every width, from the Page pattern. */
+.sbdocs .sb-ds-docs-preview-well__inner {
+  min-height: calc(var(--control-lg) * 2.5);
+  padding: var(--page-stack-lg);
+}
+
+/* The Resources block under a page's title: links out, then the page begins. */
+.sbdocs .sb-ds-resources {
+  margin-top: var(--page-stack-lg);
+  margin-bottom: var(--page-stack-lg);
+}
+
+.sbdocs .sb-ds-resources-block {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--section-stack-md);
+}
+
+/*
+ * Storybook's Typeset block brings their own 25px / 40px
+ * margins, so a type specimen sat 25 under its token line and 40 over the next
+ * specimen's title. The Section gap is the only space here, as in an example.
+ */
+.sbdocs .docblock-typeset {
+  margin-top: var(--section-stack-md) !important;
+  margin-bottom: 0 !important;
 }

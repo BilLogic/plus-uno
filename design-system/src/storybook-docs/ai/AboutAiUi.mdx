@@ -1,0 +1,50 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="AI UI/About AI UI" />
+
+<FoundationHero
+    title="About AI UI"
+    summary="How AI looks, moves and behaves in PLUS, and the parts it is built from."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="What AI UI is">
+
+AI UI is the layer of the design system for moments where the AI is at work: a tutor asking for a session summary, a draft being written, a suggested focus area. It uses the same tokens, type and components as the rest of PLUS, and adds a small set of its own so a person can always tell what the AI made and what a person made.
+
+</FoundationSection>
+
+<FoundationSection title="Guidelines">
+
+- <DocsLink id="ai-ui-ai-interaction-guidelines">AI interaction guidelines</DocsLink>: the rules every AI surface follows, for tutors and students alike.
+
+</FoundationSection>
+
+<FoundationSection title="Foundations for AI">
+
+- <DocsLink id="ai-ui-foundations-for-ai-color">Color</DocsLink>: the AI action ground and the generative border's colors.
+- <DocsLink id="ai-ui-foundations-for-ai-motion">Motion</DocsLink>: the generative border's turn, and what reduced motion keeps.
+- <DocsLink id="ai-ui-foundations-for-ai-elevation">Elevation</DocsLink> and <DocsLink id="ai-ui-foundations-for-ai-voice-and-tone">Voice and tone</DocsLink>: not yet defined.
+
+</FoundationSection>
+
+<FoundationSection title="Components for AI">
+
+- <DocsLink id="ai-ui-components-for-ai-button">Button</DocsLink>: the AI appearance, for the one primary AI action in a region.
+- <DocsLink id="ai-ui-components-for-ai-generative-border">Generative border</DocsLink>: shows where the AI is generating.
+- <DocsLink id="ai-ui-components-for-ai-icon">Icon</DocsLink>: the icons for AI actions.
+- <DocsLink id="ai-ui-components-for-ai-ai-message">AI message</DocsLink>: one message in a conversation, with streaming and the typing indicator.
+- <DocsLink id="ai-ui-components-for-ai-prompt-input">Prompt input</DocsLink>: where a person writes to the AI.
+- <DocsLink id="ai-ui-components-for-ai-prompt-starters">Prompt starters</DocsLink>: suggested first prompts.
+- <DocsLink id="ai-ui-components-for-ai-suggestion">Suggestion</DocsLink>: a value the AI proposes for a field.
+- <DocsLink id="ai-ui-components-for-ai-illustration">Illustration</DocsLink> and <DocsLink id="ai-ui-components-for-ai-skills-tag">Skills tag</DocsLink>: not yet defined.
+
+</FoundationSection>
+
+<FoundationSection title="Patterns for AI">
+
+- <DocsLink id="ai-ai-chat">AI chat</DocsLink>: the conversation with the AI, as a popup, in the Panel or full screen. The Panel that holds it is on <DocsLink id="patterns-panel">Panel</DocsLink>.
+
+</FoundationSection>

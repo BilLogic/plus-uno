@@ -5,10 +5,9 @@
   "titlePrefixes": [
     "Get started/",
     "Foundations/",
-    "Components/",
     "Patterns/",
-    "AI/",
-    "Tools/",
+    "Components/",
+    "AI UI/",
     "Data visualizations/",
     "Specs/"
   ],
@@ -50,7 +49,6 @@
       "Logo",
       "Object",
       "Tile",
-      "AI icon",
       "Illustrations",
       "Image"
     ],
@@ -60,9 +58,7 @@
       "Status tag",
       "Tag",
       "Smart tag",
-      "Tag group",
-      "AI label",
-      "Suggestion"
+      "Tag group"
     ],
     "Layout and structure": [
       "Accordion",
@@ -74,15 +70,14 @@
     "Loading": [
       "Progress bar",
       "Skeleton",
-      "Spinner",
-      "Generative border"
+      "Spinner"
     ],
     "Messaging": [
       "Banner",
       "Empty state",
       "Flag",
       "Inline message",
-      "Modal",
+      "Modal dialog",
       "Section message",
       "Spotlight"
     ],
@@ -111,6 +106,15 @@
   "$patternComponentsComment": "Components whose docs read as a layout area: titled Patterns/<name>, folder stays under its category (check:storybook-categories).",
   "patternComponents": [
     "Panel"
+  ],
+  "$aiComponentsComment": "AI components: titled AI UI/Components for AI/<name>, folder stays under its category (check:storybook-categories).",
+  "aiComponents": [
+    "Icon",
+    "Generative border",
+    "AI message",
+    "Prompt input",
+    "Prompt starters",
+    "Suggestion"
   ],
   "specTypeOrder": [
     "Overview",
@@ -152,6 +156,36 @@
       "Motion",
       "Accessibility",
       "Imagery"
+    ],
+    "Patterns",
+    [
+      "Introduction",
+      "Frame",
+      [
+        "Frame",
+        "Topbar"
+      ],
+      "Sidebar",
+      "Page",
+      [
+        "Page",
+        "Heading outline"
+      ],
+      "Panel",
+      "Section",
+      [
+        "Section",
+        "Card",
+        "Table"
+      ],
+      "Overlays",
+      [
+        "Blanket",
+        "Modal",
+        "Drawer"
+      ],
+      "Popups",
+      "Templates"
     ],
     "Components",
     [
@@ -203,7 +237,6 @@
         "Logo",
         "Object",
         "Tile",
-        "AI icon",
         "Illustrations",
         "Image"
       ],
@@ -217,12 +250,7 @@
           "Tag",
           "Smart tag"
         ],
-        "Tag group",
-        "AI label",
-        [
-          "AI label",
-          "Suggestion"
-        ]
+        "Tag group"
       ],
       "Layout and structure",
       [
@@ -236,8 +264,7 @@
       [
         "Progress bar",
         "Skeleton",
-        "Spinner",
-        "Generative border"
+        "Spinner"
       ],
       "Messaging",
       [
@@ -245,7 +272,7 @@
         "Empty state",
         "Flag",
         "Inline message",
-        "Modal",
+        "Modal dialog",
         "Section message",
         "Spotlight"
       ],
@@ -278,46 +305,33 @@
         "Table"
       ]
     ],
-    "Patterns",
+    "AI UI",
     [
-      "Introduction",
-      "Frame",
+      "About AI UI",
+      "AI interaction guidelines",
+      "Foundations for AI",
       [
-        "Frame",
-        "Topbar"
+        "Color",
+        "Elevation",
+        "Motion",
+        "Voice and tone"
       ],
-      "Sidebar",
-      "Page",
+      "Components for AI",
       [
-        "Page",
-        "Heading outline"
+        "Button",
+        "Generative border",
+        "Icon",
+        "Illustration",
+        "Skills tag",
+        "AI message",
+        "Prompt input",
+        "Prompt starters",
+        "Suggestion"
       ],
-      "Panel",
-      "Section",
+      "Patterns for AI",
       [
-        "Section",
-        "Card",
-        "Table"
-      ],
-      "Overlays",
-      [
-        "Blanket",
-        "Modal",
-        "Drawer"
-      ],
-      "Popups",
-      "Templates"
-    ],
-    "AI",
-    [
-      "Overview",
-      "AI chat",
-      "AI identity candidates"
-    ],
-    "Tools",
-    [
-      "Overview",
-      "Documented contract"
+        "AI chat"
+      ]
     ],
     "Data visualizations",
     [

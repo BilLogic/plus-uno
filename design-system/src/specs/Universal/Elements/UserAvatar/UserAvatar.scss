@@ -2,7 +2,7 @@
  * UserAvatar: an initial pill, the name, the role indicator and a counter.
  * `compact` is the 32 topbar spacing; `default` is the padded table row.
  */
-@use '../../../styles/state' as *;
+@use '../../../../styles/state' as *;
 
 .plus-user-avatar {
     display: flex;

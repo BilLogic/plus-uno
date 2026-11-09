@@ -48,12 +48,6 @@
         "design-system/src/components/forms-and-inputs/_internal/FieldBox.scss": {
           "count": 2
         },
-        "design-system/src/components/images-and-icons/UserAvatar/UserAvatar.scss": {
-          "count": 1
-        },
-        "design-system/src/components/labels/AiLabel/AiLabel.scss": {
-          "count": 3
-        },
         "design-system/src/components/labels/CountTag/CountTag.scss": {
           "count": 1
         },

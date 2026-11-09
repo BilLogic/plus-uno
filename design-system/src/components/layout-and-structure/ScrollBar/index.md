@@ -90,7 +90,7 @@ the case this handles, and that is one axis each.
 - For content the user opens rather than scrolls past, use `Accordion`.
 - For a wide data table, put the table in a horizontal `ScrollBar` rather than shrinking its columns — see `Table`.
 
-Same group: `Accordion` · `Carousel` · `Footer` · `PageHeader` · `Panel` · `VisuallyHidden`
+Same group: `Accordion` · `Carousel` · `PageHeader` · `Panel` · `VisuallyHidden`
 
 ## Parts
 

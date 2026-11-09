@@ -1,8 +1,8 @@
 /**
  * User Avatar - Universal Element
  * 
- * User avatar with name, role indicator or notification counter, on the
- * design system's UserAvatar.
+ * User avatar with name, role indicator or notification counter: the Specs
+ * screens' own element.
  */
 
 import React from 'react';
