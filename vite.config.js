@@ -12,7 +12,8 @@ const require = createRequire(import.meta.url);
 /** #282 — see scripts/node-modules-dir.mjs, where this is explained and tested. */
 const nodeModulesDir = () => nodeModulesDirFrom((id) => require.resolve(id));
 
-// Conditionally load Tailwind CSS vite plugin (used by Storybook docs, not required for prototype app)
+// This is Storybook's and Vitest's Vite config: the repo builds no root app.
+// Conditionally load Tailwind CSS vite plugin (used by Storybook docs)
 let tailwindcss;
 try {
   tailwindcss = require('@tailwindcss/vite').default;
@@ -46,9 +47,6 @@ export default defineConfig({
     }
   },
   server: {
-    port: 4100,
-    open: true,
-    strictPort: false,
     fs: {
       // #282. This repo does its work in git worktrees under `.claude/worktrees/`,
       // which carry no `node_modules` of their own — Node resolves every
@@ -76,12 +74,11 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: 'dist',
     sourcemap: true,
     chunkSizeWarningLimit: 1200,
     rolldownOptions: {
       output: {
-        // Vendor splitting to avoid a single oversized app chunk.
+        // Vendor splitting, so Storybook's build has no single oversized chunk.
         // manualChunks is deprecated in Vite 8 — migrate to codeSplitting when stable.
         manualChunks(id) {
           if (!id) return undefined;

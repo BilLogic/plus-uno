@@ -77,10 +77,7 @@ Adding the `h1` moves everything under it: a page that ran `h4 → h4` becomes
 **For developers.** axe's `heading-order` rule cannot see a missing top, because the first heading
 has no predecessor, and its `page-has-heading-one` rule does not run when the
 check is scoped to a story. `PageLayout` renders a page's hidden `h1` from
-its `title`. The browser suite asserts the rule instead: every
-page story renders an `h1`, and no other heading precedes it. The page stories
-are the spec pages plus the area overviews, and `npm run check:page-outline`
-holds that list.
+its `title`.
 
 </FoundationSection>
 

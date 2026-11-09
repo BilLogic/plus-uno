@@ -253,87 +253,6 @@ html {
     padding-right: clamp(var(--section-pad-x-default), 3vw, 2.75rem) !important;
 }
 
-/*
- * Any docs page that embeds a `ResponsiveFrame` (every Specs *Page*) goes FULL-WIDTH,
- * responsive to the iframe edge (minus the comfortable side padding inherited from
- * `.sbdocs-wrapper`). The featured screen inside is width-constrained to the selected
- * breakpoint by ResponsiveFrame itself; when that width exceeds the well, the WELL scrolls
- * horizontally — the docs page itself never does. This is what makes the Breakpoint toolbar
- * actually simulate MD/LG/XL instead of the page just filling whatever space it's given.
- *
- * `:has()` is Chrome 105+ / Safari 15.4+ / Firefox 121+ — Storybook is typically viewed in Chromium.
- */
-.sbdocs-wrapper:has(.responsive-frame-root),
-.sbdocs-wrapper:has(.sb-ds-component-docs--page-fullbleed) {
-    max-width: none !important;
-}
-
-/*
- * A `.responsive-frame-toolbar` rule sat here, unpinning a sticky breakpoint switcher so
- * that several ResponsiveFrames on one docs page would not pile their toolbars on top of
- * each other. `ResponsiveFrame.jsx` emits `responsive-frame-root`, `-wrapper`, `-inner`
- * and `-open-btn`, and has no toolbar element at all — so the rule had never once applied
- * and the pile-up it describes cannot happen. Deleted rather than rewritten: there is no
- * element to aim a rewrite at. `check:docs-dead-selectors` is what found it, after #251's
- * hand sweep of this file did not.
- */
-
-/* ResponsiveFrame: Fullscreen API — fill the physical display */
-.responsive-frame-root:fullscreen,
-.responsive-frame-root:-webkit-full-screen {
-    width: 100% !important;
-    height: 100% !important;
-    min-height: 100% !important;
-    max-width: 100vw;
-    max-height: 100vh;
-    box-sizing: border-box;
-    background: var(--ds-surface-container);
-}
-
-/*
- * A `.responsive-frame-root--browser-fullscreen` rule sat here, letting the wrapper grow
- * inside a browser-fullscreen frame. `ResponsiveFrame.jsx` builds its class list from
- * exactly two modifiers — `--native` and `--standalone` — so `--browser-fullscreen` names
- * a state the component has never had. The `:fullscreen` rule directly above is the one
- * that does this job, and it works because it reads the browser's own state rather than a
- * class nobody writes.
- */
-
-/* Page layouts in docs: keep the ResponsiveFrame height definite so PageLayout's
-   height:100% fills the well (instead of hugging / clipping mid-content). */
-.sbdocs .docs-story:has(.responsive-frame-root) {
-    display: flex !important;
-    flex-direction: column !important;
-    min-height: 720px !important; /* the docs well height, not a design-system size */
-}
-
-.sbdocs .docs-story:has(.responsive-frame-root) > div[scale="1"] {
-    height: 720px !important; /* the docs well height */
-    min-height: 720px !important; /* the docs well height */
-    max-height: 720px !important; /* the docs well height */
-    padding: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    flex: 1 1 auto !important;
-}
-
-.sbdocs .docs-story:has(.responsive-frame-root) .innerZoomElementWrapper,
-.sbdocs .docs-story:has(.responsive-frame-root) .innerZoomElementWrapper > * {
-    flex: 1 1 auto !important;
-    min-height: 0 !important;
-    width: 100% !important;
-    display: flex !important;
-    flex-direction: column !important;
-}
-
-/* Attached preview wells that host a page frame: flush page surface (no card padding). */
-.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story:has(.responsive-frame-root) > *:first-child {
-    padding: 0 !important;
-    background: transparent !important;
-    border: none !important;
-    border-radius: var(--card-radius-sm) var(--card-radius-sm) 0 0;
-}
-
 @media (min-width: 768px) {
     .sbdocs-wrapper {
         /* Literal on purpose — see the block above: this mirrors
@@ -753,16 +672,6 @@ a.sbdocs-a {
   height: var(--docs-toc-end-space);
 }
 
-/* Hide scrollbar while maintaining scroll functionality */
-.hide-scrollbar::-webkit-scrollbar {
-    display: none;
-}
-
-/* Hide the AI agent's own floating button in Storybook preview because we use the NavFab */
-.sb-ai-agent__fab-wrapper {
-  display: none !important;
-}
-
 /* 
  * FIX: Tailwind and Bootstrap Class Collision for '.collapse'
  * Tailwind's `collapse` utility sets `visibility: collapse`, which hides 
@@ -994,9 +903,8 @@ a.sbdocs-a {
 /*
  * Attached component canvases: first-child IS often div[scale=1]. Keep the card padding
  * from the first-child rule above — do NOT zero it (that caused flush widgets).
- * Page frames stay flush via the :has(.responsive-frame-root) rules.
  */
-.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story:not(:has(.responsive-frame-root)) > div[scale="1"] {
+.sbdocs .sb-ds-docs-canvas-shell--source-attached .sb-ds-docs-canvas-attached-root .docs-story > div[scale="1"] {
   padding: var(--space-250) clamp(var(--section-pad-x-default), 4vw, 3.5rem) !important;
   background: var(--ds-surface-raised) !important;
   border: 1px solid var(--ds-border) !important;
@@ -1072,7 +980,7 @@ a.sbdocs-a {
 .sbdocs
   .sb-ds-docs-canvas-shell--source-attached
   .sb-ds-docs-canvas-attached-root:not(:has(.docblock-code-toggle--expanded))
-  .docs-story:not(:has(.responsive-frame-root))
+  .docs-story
   > div[scale="1"] {
   border-bottom-width: 1px !important;
   border-bottom-style: solid !important;
@@ -1088,7 +996,7 @@ a.sbdocs-a {
 .sbdocs
   .sb-ds-docs-canvas-shell--source-attached
   .sb-ds-docs-canvas-attached-root:has(.sbdocs-preview-actions)
-  .docs-story:not(:has(.responsive-frame-root))
+  .docs-story
   > div[scale="1"] {
   padding-bottom: calc(var(--space-250) * 2) !important;
 }

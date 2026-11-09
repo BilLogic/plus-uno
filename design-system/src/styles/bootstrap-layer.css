@@ -15,8 +15,7 @@
  * Kept on purpose, for now. Bootstrap's CSS stays until a sweep removes its
  * utility classes (`d-flex`, `mb-*` …) from components and patterns; then this
  * import and the `bootstrap` layer go. The `react-bootstrap` package is a
- * separate leftover with the same fate: it stays only for the legacy Specs
- * screens (`design-system/src/specs/Admin`, `Training`, `Login`, `Toolkit`) and
- * a few prototypes, and goes once those are rebuilt on PLUS components. */
+ * separate leftover with the same fate: it stays only for the tutor revamp
+ * prototype's `ThemeProvider`, and goes once that is rebuilt on PLUS components. */
 @layer bootstrap, theme, base, utilities, tokens, components;
 @import "bootstrap/dist/css/bootstrap.min.css" layer(bootstrap);

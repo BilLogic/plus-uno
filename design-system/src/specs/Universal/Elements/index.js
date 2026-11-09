@@ -1,7 +1,0 @@
-/**
- * @fileoverview Universal Organism - Elements Index
- * Element-level components for universal organisms.
- */
-
-export { default as UserAvatar } from './UserAvatar/UserAvatar';
-export { default as SmartTag } from '@/components/labels/SmartTag';

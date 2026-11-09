@@ -7,9 +7,8 @@ import Modal from './Modal';
 /**
  * Getting a `Modal` shut again.
  *
- * WHY THIS FILE EXISTS (#209). `Modal` is the third most-used component in the
- * repo — 33 files under `design-system/src/specs/` and `prototypes/` render it —
- * and it is controlled: the caller owns `show` and the component only reports
+ * WHY THIS FILE EXISTS (#209). `Modal` is one of the most-used components, and
+ * it is controlled: the caller owns `show` and the component only reports
  * that a dismissal happened, through `onClose`. Every dismissal path is
  * therefore a callback that has to fire, and each one is a separate wire:
  * the header's close button, Escape (via `keyboard`), the blanket (via

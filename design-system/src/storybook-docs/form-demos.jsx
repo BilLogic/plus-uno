@@ -4,11 +4,10 @@ import PropTypes from 'prop-types';
 import { FieldCaption, FieldLabel } from '@/components/forms-and-inputs/_internal/FieldFrame';
 
 /**
- * Label and Caption demos shared by the Form page and the Specs stories.
+ * Label and Caption demos for the Form page.
  *
  * Both draw on the field's own label and caption rows, so a demo shows the
- * same type, color and icon a real field shows. They stand apart from a
- * control, which is what the Specs layouts need.
+ * same type, color and icon a real field shows, apart from a control.
  */
 
 /** The caption tone each demo state draws. */

@@ -3,8 +3,6 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import Modal from './Modal';
 import { IconButton, Select } from '@/components';
-// The app shell's floating nav: it has to sit under a modal's blanket like any page chrome.
-import NavFab from '../../../../src/components/NavFab/NavFab';
 
 /**
  * Where a `Modal` sits and how big it is.
@@ -256,9 +254,21 @@ MenuInsideModal.play = async ({ canvasElement }) => {
 
 /**
  * Page chrome sits under the blanket: a sticky table header (Bootstrap's
- * `.sticky-top`, on the card layer) and the app's floating nav (navigation).
- * Bootstrap had them at 1020 and 1100, above a modal at 510.
+ * `.sticky-top`, on the card layer) and a floating control on the navigation
+ * layer, as an app's floating nav sits. Bootstrap had them at 1020 and 1100,
+ * above a modal at 510.
  */
+
+/** A floating control pinned to the corner of the screen, on the navigation layer. */
+const FLOATING_NAV = {
+    position: 'fixed',
+    bottom: 'var(--section-stack-sm)',
+    right: 'var(--section-stack-sm)',
+    zIndex: 'var(--layer-navigation)',
+    width: 'var(--item-height-md)',
+    height: 'var(--item-height-md)',
+    background: 'var(--ds-background-brand-subtlest)',
+};
 export const ChromeUnderTheBlanket = () => (
     <div>
         <div style={{ height: 'var(--size-2000)', overflow: 'auto' }}>
@@ -272,7 +282,7 @@ export const ChromeUnderTheBlanket = () => (
                 </tbody>
             </table>
         </div>
-        <NavFab />
+        <div data-testid="floating-nav" aria-hidden="true" style={FLOATING_NAV} />
         <Modal show title="Over the page chrome" body={SHORT} showBottomButtons={false} onClose={() => {}} />
     </div>
 );
@@ -283,7 +293,7 @@ ChromeUnderTheBlanket.play = async ({ canvasElement }) => {
     const blanket = dialog.closest('.plus-pattern-blanket');
     const blanketLayer = Number(getComputedStyle(blanket).zIndex);
     const head = within(canvasElement).getByTestId('sticky-head');
-    const fab = doc.querySelector('.nav-fab');
+    const fab = doc.querySelector('[data-testid="floating-nav"]');
     await expect(getComputedStyle(head).zIndex).toBe('100');
     await expect(getComputedStyle(fab).zIndex).toBe('200');
     for (const el of [head, fab]) {

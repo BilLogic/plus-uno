@@ -3,7 +3,7 @@
  * so they agree: today is Mon, Jan 22, 2024, and the tutor is Boyuan Guo.
  */
 
-import growthMindsetImage from '../../../home-redesign/src/assets/supporting-growth-mindset.png';
+import growthMindsetImage from '../assets/supporting-growth-mindset.png';
 
 export const TODAY = {
     iso: '2024-01-22',

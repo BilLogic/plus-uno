@@ -156,9 +156,8 @@ export function componentIdentity(entry) {
  *
  * A pattern page names its barrel only when the pattern is its own export,
  * which is exactly when the generator wrote an agent file beside it. A
- * docs-only pattern page (Templates, Popups) documents something else's props,
- * PageLayout or none, so it shows the props table with no import line rather
- * than an import that does not resolve.
+ * docs-only pattern page (Popups) documents no export of its own, so it shows
+ * no import line rather than an import that does not resolve.
  *
  * @param {{importPath?: string}} [entry] The page's meta entry.
  * @param {boolean} [hasGeneratedDoc] Whether the page has an Agent view.

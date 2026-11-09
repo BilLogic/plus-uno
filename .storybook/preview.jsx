@@ -9,7 +9,6 @@ import '../design-system/src/storybook-docs/storybook-tailwind.css';
 import './storybook-overrides.css';
 import { TocDocsContainer } from './docs-toc.jsx';
 import { mountDocsFab } from '../design-system/src/storybook-docs/chrome/mount-docs-fab.js';
-import ResponsiveFrame from '../design-system/src/specs/Universal/ResponsiveFrame';
 import BrowserFrame from '../design-system/src/storybook-docs/chrome/BrowserFrame';
 import { applyColorModes, COLOR_SCHEME_QUERY } from '../design-system/src/storybook-docs/lib/color-modes.js';
 
@@ -434,20 +433,6 @@ const preview = {
   },
 
   globalTypes: {
-    plusBreakpoint: {
-      description: 'Constrain any Specs story to a PLUS breakpoint width (works in docs and canvas)',
-      toolbar: {
-        title: 'Breakpoint',
-        icon: 'ruler',
-        items: [
-          { value: '', title: 'Native (no constraint)' },
-          { value: 'md', title: 'MD — 768px' },
-          { value: 'lg', title: 'LG — 1024px' },
-          { value: 'xl', title: 'XL — 1440px' },
-        ],
-        dynamicTitle: true,
-      },
-    },
     plusBrowser: {
       description: 'Browser window chrome around the Template stories (docs only)',
       toolbar: {
@@ -512,43 +497,6 @@ const preview = {
         <Story />
       </ColorModes>
     ),
-    // Global PLUS breakpoint toggle: constrains every Specs story (pages, sections,
-    // cards, elements) to the selected width so responsive behavior can be inspected
-    // from the toolbar — in docs pages and in canvas view alike. Complements the
-    // built-in Viewport tool (canvas-only) and the per-page-story `breakpoint` arg.
-    (Story, context) => {
-      const bp = context.globals.plusBreakpoint;
-      const widths = { md: 768, lg: 1024, xl: 1440 };
-      const isSpecs = context.title.startsWith('Specs/');
-      // Pages get the responsive DISPLAY WELL. Native fills available space; MD/LG/XL set a
-      // minimum width (scroll horizontally when the docs column is narrower, fill when wider).
-      // Nesting-safe: stories that already wrap in ResponsiveFrame collapse the inner one.
-      const isPage = isSpecs && /\/Pages\//.test(context.title);
-      if (isPage) {
-        return (
-          <ResponsiveFrame breakpoint={bp && widths[bp] ? bp : 'native'}>
-            <Story />
-          </ResponsiveFrame>
-        );
-      }
-      // Other Specs: same min-width semantics (do not shrink below the selected breakpoint).
-      if (bp && widths[bp] && isSpecs) {
-        return (
-          <div
-            style={{
-              width: '100%',
-              minWidth: `${widths[bp]}px`,
-              maxWidth: '100%',
-              overflowX: 'auto',
-              containerType: 'inline-size',
-            }}
-          >
-            <Story />
-          </div>
-        );
-      }
-      return <Story />;
-    },
     (Story, context) => {
       // Docs-only: disable pointer interaction on static component examples so
       // scroll stays stable. Canvas / Interactive / Overview stay fully usable

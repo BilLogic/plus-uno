@@ -13,15 +13,11 @@ const __dirname = path.dirname(__filename);
 /** @type { import('@storybook/react-vite').StorybookConfig } */
 const config = {
   stories: [
-    // Every folder under design-system/src except specs/: the Specs replica is
-    // out of Storybook until its rebuild is ready. Its code stays in the repo.
-    '../design-system/src/!(specs)/**/*.mdx',
-    '../design-system/src/!(specs)/**/*.stories.{js,jsx,ts,tsx}',
+    '../design-system/src/**/*.mdx',
+    '../design-system/src/**/*.stories.{js,jsx,ts,tsx}',
 
     // Playground prototypes selectively included in Storybook
     '../prototypes/tutor-revamp/src/**/*.stories.{js,jsx}',
-    // '../prototypes/storybook-ai-agent-llm-api/**/*.stories.{js,jsx,ts,tsx}',
-    // '../prototypes/training-onboarding/**/*.stories.{js,jsx,ts,tsx}',
   ],
 
   addons: [
