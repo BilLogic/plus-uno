@@ -14,7 +14,7 @@ Group labeled inputs, selection controls, and actions into a coherent data-entry
 ## When to use this pattern
 
 - Modal or Card contains more than one field
-- Standalone form section inside `PageLayout` content
+- Standalone form section inside a template's content (`Frame`)
 - Prototype needs validated field spacing without inventing layout
 
 ## Building blocks

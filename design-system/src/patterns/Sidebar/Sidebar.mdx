@@ -11,6 +11,21 @@ import {
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
 
+export const figmaMeta = {
+  "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+  "sets": [
+    {
+      "id": "sidebar",
+      "name": "Sidebar",
+      "componentSetNodeId": "19393:46573",
+      "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573",
+      "source": "manual",
+      "status": "verified",
+      "isComponentSet": true
+    }
+  ]
+};
+
 <Meta of={SidebarStories} />
 
 <Title>Sidebar</Title>
@@ -22,7 +37,10 @@ The app's side navigation: the logo row, the groups with their section titles, o
 <DocsTab tab="examples">
 
 <ResourcesBlock
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573"
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Sidebar"
+    sets={figmaMeta.sets}
+    figmaFileKey={figmaMeta.fileKey}
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -99,7 +117,7 @@ Hover and focus are the browser's own states and are described under Usage.
 
 ## Usage
 
-Use the Sidebar for the app's main areas. `PageLayout` draws it from the config you pass, and the Frame decides whether it docks, collapses or floats; this page covers what is inside it.
+Use the Sidebar for the app's main areas. The PLUS `Sidebar` (`@/components`) fills it from the role's config, and the Frame decides whether it docks, collapses or floats; this page covers what is inside it.
 
 Content is data. The Sidebar draws the `groups` it is given and never changes the URL: the caller handles `onSelect` and decides which groups a role sees.
 

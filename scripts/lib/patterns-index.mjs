@@ -73,7 +73,7 @@ export function readPatterns(repoRoot) {
 /** The router names every pattern too; this is the line it does so in. */
 export const OVERVIEW_FILE = 'design-system/guidelines/overview.md';
 
-/** Every pattern the facts hold: the `@/patterns` barrel's and `PageLayout`. */
+/** Every pattern the facts hold: the `@/patterns` barrel's. */
 const patternNames = (facts) => facts.manifests.components.components.filter((c) => c.kind === 'pattern').map((c) => c.name);
 
 /** The committed list, read against the real facts and the router. */

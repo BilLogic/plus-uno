@@ -179,7 +179,7 @@ test('the real corpus is walked, and the real baseline matches it', () => {
     path: rel,
     text: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8'),
   }));
-  assert.ok(files.length > 1300, `${files.length} files — the walk must not narrow silently`);
+  assert.ok(files.length > 700, `${files.length} files — the walk must not narrow silently`);
   // Through the real ratchet: the record's `uses` and `bare` sets, keyed by name.
   const { undefinedTokens } = audit(files);
   const open = (set) => openRatchet({ file: 'scripts/baselines/undefined-token-baseline.json', set, repoRoot: REPO_ROOT });
@@ -210,7 +210,7 @@ test('a property no file defines is a finding, with nothing allowlisted as exter
   assert.equal(EXTERNAL.size, 0);
 });
 
-test('only five bare uses remain, and each is a token the system does not have', () => {
+test('no bare use of a token the system does not have remains', () => {
   const files = corpus(REPO_ROOT, ['design-system/src', '.storybook', 'prototypes']).map((rel) => ({
     path: rel,
     text: fs.readFileSync(path.join(REPO_ROOT, rel), 'utf8'),
@@ -220,16 +220,9 @@ test('only five bare uses remain, and each is a token the system does not have',
     .filter((u) => u.bare && !defined.has(u.name) && !isInterpolated(u.name) && !EXTERNAL.has(u.name))
     .map((u) => u.name)
     .sort();
-  // The design system has no min-size and no width tokens at all. Pointing
-  // these anywhere would be inventing a value, so they are recorded rather
-  // than guessed — and this asserts the list has not quietly grown.
-  assert.deepEqual([...new Set(bare)], [
-    '--size-button-min-height-md',
-    '--size-button-min-width-md',
-    '--size-modal-min-height-md',
-    '--size-modal-min-height-sm',
-    '--size-modal-width-sm',
-  ]);
+  // The last five (button and modal min-size and width names the system never
+  // had) left with the Specs code; this asserts the list stays empty.
+  assert.deepEqual([...new Set(bare)], []);
 });
 
 /*
@@ -274,7 +267,7 @@ test('an empty token directory fires the sentinel floor, not a clean sweep', () 
     const found = messagesOf(run, root);
     assert.ok(found.length > 0, 'an empty token directory must not report a clean sweep');
     assert.ok(
-      found.some((message) => /fewer than the 1300 this was measured over/.test(message)),
+      found.some((message) => /fewer than the 700 this was measured over/.test(message)),
       `expected the searched-files floor, got:\n${found.join('\n')}`,
     );
   } finally {

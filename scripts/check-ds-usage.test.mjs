@@ -45,8 +45,9 @@ test('the whole scope passes against the recorded baseline, in under five second
 });
 
 test('scope: consumer code only, tests and stories skipped', () => {
-  assert.ok(inScope('prototypes/live-app/src/App.jsx'));
-  assert.ok(inScope('src/App.scss'));
+  assert.ok(inScope('prototypes/tutor-revamp/src/App.jsx'));
+  assert.ok(inScope('prototypes/x/src/App.scss'));
+  assert.ok(!inScope('src/App.jsx'));
   assert.ok(!inScope('design-system/src/components/x/X.jsx'));
   assert.ok(!inScope('prototypes/x/src/App.test.jsx'));
   assert.ok(!inScope('prototypes/x/node_modules/y/index.js'));
@@ -76,10 +77,10 @@ test('outside a git checkout, the files on disk stand in for the tracked list', 
 test('the real facts hold patterns: invented name, wrong prop and wrong value fail; valid use passes', () => {
   const ctx = contextOf(REPO_ROOT);
   const rules = (text) => escapesIn({ path: 'prototypes/x/src/App.jsx', text }, ctx).map((f) => f.rule);
-  const head = "import { PatternCard, PatternSection } from '@/patterns';\nimport { PageLayout } from '@/specs/Universal/Pages';\n";
-  assert.deepEqual(rules(head + '<PageLayout frame="focused"><PatternSection><PatternCard title="x" padding="md" /></PatternSection></PageLayout>'), []);
+  const head = "import { Frame, PatternCard, PatternSection } from '@/patterns';\n";
+  assert.deepEqual(rules(head + '<Frame width="reading"><PatternSection><PatternCard title="x" padding="md" /></PatternSection></Frame>'), []);
   assert.deepEqual(rules("import { PatternCardd } from '@/patterns';"), ['ds/no-unknown-component']);
   assert.deepEqual(rules(head + '<PatternCard heading="x" />'), ['ds/no-unknown-prop']);
   assert.deepEqual(rules(head + '<PatternCard padding="xl" />'), ['ds/no-unknown-prop']);
-  assert.deepEqual(rules(head + '<PageLayout frame="wide" />'), ['ds/no-unknown-prop']);
+  assert.deepEqual(rules(head + '<Frame width="wide" />'), ['ds/no-unknown-prop']);
 });

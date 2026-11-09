@@ -19,7 +19,7 @@ import { documents } from './lib/corpus.mjs';
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
 /** Where an entry point or a setup snippet writes a Google Fonts link. */
-const ROOTS = ['.storybook', 'prototypes', 'design-system/README.md', 'index.html'];
+const ROOTS = ['.storybook', 'prototypes', 'design-system/README.md', 'skills/uno-prototype/scripts/scaffold-prototype.sh'];
 
 /** The weights a family loads, from a `css2` URL: `Noto+Sans:wght@300;400` → [300, 400]. */
 export function weights(url, family) {
@@ -50,8 +50,8 @@ test('weights reads a family out of a css2 URL', () => {
 
 test('every link that loads Noto Sans loads 500, the medium weight', () => {
   const found = links(REPO_ROOT).filter(({ url }) => weights(url, 'Noto\\+Sans'));
-  // The Storybook preview, the root page, the README snippet and the prototypes.
-  assert.ok(found.length >= 15, `only ${found.length} Noto Sans links found`);
+  // The Storybook preview, the README snippet, the prototypes and the scaffold.
+  assert.ok(found.length >= 4, `only ${found.length} Noto Sans links found`);
   const missing = found.filter(({ url }) => !weights(url, 'Noto\\+Sans').includes(500));
   assert.deepEqual(missing.map(({ file }) => file), []);
 });

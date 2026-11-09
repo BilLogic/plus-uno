@@ -9,7 +9,6 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
 
 /** What the facts answer for each name: a pattern, a component, or nothing. */
 const ANSWERS = {
-  PageLayout: { status: 'exists', kind: 'pattern', import: "import { PageLayout } from '@/specs/Universal/Pages';", source: 'p/PageLayout.jsx' },
   Frame: { status: 'exists', kind: 'pattern', import: "import { Frame } from '@/patterns';", source: 'p/Frame.jsx' },
   PatternCard: { status: 'exists', kind: 'pattern', import: "import { PatternCard } from '@/patterns';", source: 'p/PatternCard.jsx' },
   Popup: { status: 'exists', kind: 'component', import: "import { Popup } from '@/components';", source: 'c/Popup.jsx' },
@@ -20,7 +19,7 @@ const row = (name, group = 'Card') => ({ group, name, use: 'x' });
 const env = (required = ['Frame', 'PatternCard']) => ({ lookup, exists, required });
 
 test('a list that names only real patterns and components passes', () => {
-  assert.deepEqual(checkPatterns([row('PageLayout'), row('Frame'), row('PatternCard'), row('Popup')], env()), []);
+  assert.deepEqual(checkPatterns([row('Frame'), row('PatternCard'), row('Popup')], env()), []);
 });
 
 test('A NAME THE FACTS DO NOT HOLD FAILS', () => {
@@ -43,9 +42,9 @@ test('a pattern the facts hold and the list leaves out fails', () => {
 });
 
 test('rendering takes the import line and the doc from the facts', () => {
-  const out = renderPatterns([row('PageLayout', 'Templates'), row('PatternCard')], { from: 'design-system/agent-views/components', lookup });
+  const out = renderPatterns([row('Frame', 'Templates'), row('PatternCard')], { from: 'design-system/agent-views/components', lookup });
   assert.match(out, /^## Patterns: start a page, section, card, table or overlay here/m);
-  assert.match(out, /\| Templates \| \[`PageLayout`\]\(\.\.\/\.\.\/\.\.\/p\/PageLayout\.mdx\) \| `import \{ PageLayout \} from '@\/specs\/Universal\/Pages';` \| x \|/);
+  assert.match(out, /\| Templates \| \[`Frame`\]\(\.\.\/\.\.\/\.\.\/p\/Frame\.mdx\) \| `import \{ Frame \} from '@\/patterns';` \| x \|/);
   assert.match(out, /\| Card \| \[`PatternCard`\]/);
 });
 

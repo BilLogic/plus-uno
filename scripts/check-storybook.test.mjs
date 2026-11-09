@@ -45,7 +45,7 @@ const a11yMessage = (rule) =>
 /** A `play` failure, which carries no a11y marker anywhere. */
 const playMessage =
   'AssertionError: expected element to be visible\n' +
-  ' ❯ play design-system/src/specs/Thing/Thing.stories.jsx:42:5';
+  ' ❯ play design-system/src/components/Thing/Thing.stories.jsx:42:5';
 
 const report = (files) => ({
   numTotalTests: files.reduce((n, f) => n + (f.assertionResults?.length ?? 0), 0),

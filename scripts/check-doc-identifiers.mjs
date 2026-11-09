@@ -125,7 +125,7 @@ function collectTokens(repoRoot = REPO_ROOT) {
  */
 function collectComponents(repoRoot = REPO_ROOT) {
   const index = new Map();
-  const roots = ['components', 'dataviz', 'patterns', 'specs', 'assets'].map((d) => path.join(dsSrc(repoRoot), d));
+  const roots = ['components', 'dataviz', 'patterns', 'assets'].map((d) => path.join(dsSrc(repoRoot), d));
   const files = roots.flatMap((root) =>
     walk(root, (n) => n.endsWith('.jsx') && !/\.(stories|test)\.jsx$/.test(n), repoRoot),
   );
@@ -141,15 +141,8 @@ function collectComponents(repoRoot = REPO_ROOT) {
       for (const p of parsePropTypes(source, symbol)) props.set(p.name, p.enumValues);
       for (const p of parseSignatureProps(source, symbol)) if (!props.has(p)) props.set(p, null);
       const entry = { name: symbol, file, symbol, props, subComponents: parseSubComponents(source, symbol) };
-      // A Specs page can carry a same-named stand-in for a library component (`StackedBarChart`), with a
-      // different prop list. The library's own source is what a docs page describes, so Specs never displaces it.
       const existing = index.get(symbol);
-      const inSpecs = file.includes('/specs/');
-      const existingInSpecs = existing?.file.includes('/specs/');
-      const wins =
-        !existing ||
-        (existingInSpecs && !inSpecs) ||
-        (existingInSpecs === inSpecs && existing.props.size < props.size);
+      const wins = !existing || existing.props.size < props.size;
       if (wins) index.set(symbol, entry);
       // `<Name>` when the file exports the implementation under the filename
       if (symbol !== fileName && /^[A-Z]/.test(fileName) && implSymbol(source, fileName) === symbol) {

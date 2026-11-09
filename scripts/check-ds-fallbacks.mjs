@@ -43,7 +43,8 @@ const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..
  * The floor, measured 2026-10-25 at 1421 files. A listing that stopped finding
  * the tree finds no fallback either, which is the one green this must not give.
  */
-export const MIN_FILES = 1300;
+// Lowered from 1300 to 700 when the Specs code, the root app and the specs prototypes left main (kept on archive/legacy-ds).
+export const MIN_FILES = 700;
 
 export const REMEDY =
   '  -> Write the token bare: `var(--ds-border-focused)`, not\n' +

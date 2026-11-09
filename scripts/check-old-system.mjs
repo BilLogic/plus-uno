@@ -3,13 +3,13 @@
  * `npm run check:old-system` — the code holds only the current design system.
  *
  * The old system is every token generated from a Figma collection now under
- * `archived /`, plus the old type classes. It is gone from the code outside
- * `design-system/src/specs/`, and the ban is hard: any hit is a finding, with
- * no baseline and no `--update`. Git history and the `archive/deprecated-library`
- * branch keep the past.
+ * `archived /`, plus the old type classes. It is gone from the code, and the
+ * ban is hard: any hit is a finding, with no baseline and no `--update`. Git
+ * history and the `archive/deprecated-library` and `archive/legacy-ds`
+ * branches keep the past.
  *
  * WHAT IT READS. Every tracked `.scss .css .jsx .js .mjs .ts .tsx .html .mdx
- * .md` file under `design-system/src`, `prototypes` and `src`, by
+ * .md` file under `design-system/src` and `prototypes`, by
  * `git ls-files` (a filesystem walk finds a second copy of the tree under
  * `.claude/worktrees/`). Comments count: a comment that cites an old name
  * teaches it.
@@ -21,11 +21,8 @@
  * purge removes their legacy rows.
  *
  * WHAT IT SKIPS.
- *   - `design-system/src/specs/`: the Storybook Specs replica, not yet
- *     revamped. It reads the old tokens until its revamp deletes them.
- *   - `OLD_DEFINITIONS`: the token files that still declare the old names
- *     the Specs replica reads. They leave the global layer for `specs/`, and
- *     this list empties.
+ *   - `OLD_DEFINITIONS`: the token files that still declare the old names.
+ *     This list empties as the components move off them.
  *   - `NOT_THE_DESIGN_SYSTEM`: a file whose matching names belong to another
  *     tool's namespace, named with its reason.
  */
@@ -40,9 +37,7 @@ export { REPO_ROOT };
 export const SEARCH_ROOTS = SOURCE_ROOTS;
 export const SEARCHED = /\.(scss|css|jsx|js|mjs|ts|tsx|html|mdx|md)$/;
 
-const SPECS = /^design-system\/src\/specs\//;
-
-/** The token files that declare old names for the Specs replica, until they move into `specs/`. */
+/** The token files that still declare old names, until the components move off them. */
 export const OLD_DEFINITIONS = [
   'design-system/src/tokens/_colors.scss',
   'design-system/src/tokens/_color_roles.scss',
@@ -112,7 +107,7 @@ export const FAMILIES = [
 export function measure(sources) {
   const found = new Map();
   for (const { path: file, text } of sources) {
-    if (SPECS.test(file) || OLD_DEFINITIONS.includes(file) || NOT_THE_DESIGN_SYSTEM.has(file)) continue;
+    if (OLD_DEFINITIONS.includes(file) || NOT_THE_DESIGN_SYSTEM.has(file)) continue;
     const lines = text.split('\n');
     for (const { name, pattern } of FAMILIES) {
       const hits = lines.flatMap((l, i) => (pattern.test(l) ? [i + 1] : []));
@@ -129,7 +124,7 @@ export function sourcesOf(repoRoot) {
 
 const REMEDY_OF = new Map(FAMILIES.map(({ name, remedy }) => [name, remedy]));
 
-export const REMEDY = '  -> outside specs/ the code holds only the current design system; the old names may not come back.';
+export const REMEDY = '  -> the code holds only the current design system; the old names may not come back.';
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
 export function run({ repoRoot = REPO_ROOT, sources } = {}) {

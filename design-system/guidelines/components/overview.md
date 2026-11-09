@@ -72,8 +72,9 @@ coverage columns detect it.
 ## How the authored half grows
 
 **The top of the list was measured, not guessed.** Ranking every public
-component by the number of files under `design-system/src/specs/` and
-`prototypes/` that import it from the design system and render it, the leaders
+component by the number of files under the Specs code and `prototypes/` that
+imported it from the design system and rendered it (measured before the Specs
+code left `main`), the leaders
 are: `Button` (139 files), `Badge` (60), `Modal` (29), `Select` (24),
 `Dropdown` (17), `ButtonGroup` (17), `Card` (14), `Pagination` (14),
 `NavTabs` (11), `Alert` (11), `TextField` (10), `TextArea` (9), `Checkbox` (9),

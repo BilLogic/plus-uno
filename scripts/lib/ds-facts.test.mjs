@@ -74,12 +74,12 @@ test('real repo: a pattern answers with its kind and barrel', () => {
   assert.equal(loadFacts(REPO_ROOT).lookup('PatternCard.padding=xl').status, 'unknown');
 });
 
-test('real repo: PageLayout and PatternSidebar answer with their props, from source', () => {
+test('real repo: Frame and PatternSidebar answer with their props, from source', () => {
   const facts = loadFacts(REPO_ROOT);
-  const layout = facts.lookup('PageLayout');
-  assert.equal(layout.kind, 'pattern');
-  assert.equal(layout.import, "import { PageLayout } from '@/specs/Universal/Pages';");
-  assert.deepEqual(layout.props.find((p) => p.name === 'frame').values, ['default', 'focused']);
+  const frame = facts.lookup('Frame');
+  assert.equal(frame.kind, 'pattern');
+  assert.equal(frame.import, "import { Frame } from '@/patterns';");
+  assert.deepEqual(frame.props.find((p) => p.name === 'width').values, ['content', 'reading']);
   const sidebar = facts.lookup('PatternSidebar');
   assert.equal(sidebar.kind, 'pattern');
   assert.equal(sidebar.source, 'design-system/src/patterns/Sidebar/Sidebar.jsx');
@@ -126,7 +126,7 @@ test('real repo: not-here lists inventions and retired tokens, each with a repla
 test('real repo: scope is the consumer-code roots, and the barrel reaches across sections for importable names', () => {
   const facts = loadFacts(REPO_ROOT);
   assert.deepEqual(facts.scope, CONSUMER_ROOTS);
-  assert.deepEqual(CONSUMER_ROOTS, ['prototypes', 'src']);
+  assert.deepEqual(CONSUMER_ROOTS, ['prototypes']);
   assert.ok(facts.importable.has('Button'));
   const { components: listed, names } = readBarrel(REPO_ROOT);
   assert.ok(listed.length > 40);
@@ -135,18 +135,17 @@ test('real repo: scope is the consumer-code roots, and the barrel reaches across
 
 test('every check that scopes consumer code composes its roots from the facts module', async () => {
   const facts = await import('./ds-facts.mjs');
-  const { CONSUMER_ROOTS: consumer, SOURCE_ROOTS, LIBRARY_ROOT, STORYBOOK_ROOT, PROTOTYPE_ROOTS, APP_SHELL_ROOT } = facts;
+  const { CONSUMER_ROOTS: consumer, SOURCE_ROOTS, LIBRARY_ROOT, STORYBOOK_ROOT } = facts;
   assert.deepEqual(SOURCE_ROOTS, [LIBRARY_ROOT, ...consumer]);
-  assert.deepEqual(PROTOTYPE_ROOTS, consumer.filter((root) => root !== APP_SHELL_ROOT));
   const roots = async (file, name) => (await import(`../${file}`))[name];
   assert.equal(await roots('check-ds-usage.mjs', 'SCOPE'), consumer);
   for (const file of ['check-ads-language.mjs', 'check-old-system.mjs', 'check-react-bootstrap-imports.mjs']) {
     assert.equal(await roots(file, 'SEARCH_ROOTS'), SOURCE_ROOTS, file);
   }
   for (const file of ['check-font-families.mjs', 'check-undefined-tokens.mjs']) {
-    assert.deepEqual(await roots(file, 'ROOTS'), [LIBRARY_ROOT, STORYBOOK_ROOT, ...PROTOTYPE_ROOTS], file);
+    assert.deepEqual(await roots(file, 'ROOTS'), [LIBRARY_ROOT, STORYBOOK_ROOT, ...consumer], file);
   }
-  assert.deepEqual((await import('./fallback-check.mjs')).SEARCH_ROOTS, [LIBRARY_ROOT, STORYBOOK_ROOT, ...PROTOTYPE_ROOTS]);
+  assert.deepEqual((await import('./fallback-check.mjs')).SEARCH_ROOTS, [LIBRARY_ROOT, STORYBOOK_ROOT, ...consumer]);
 });
 
 test('an unknown name is answered, not thrown', () => {

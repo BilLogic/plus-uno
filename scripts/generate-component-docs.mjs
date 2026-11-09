@@ -3,7 +3,7 @@
  * components manifest.
  *
  *   design-system/src/components/<group>/<Name>/index.md   ← per component (`<group>/<Name>.md` when filed flat)
- *   design-system/src/patterns/<Folder>/index.md           ← per pattern, and PageLayout and the Logo beside their source
+ *   design-system/src/patterns/<Folder>/index.md           ← per pattern, and the Logo beside its source
  *   design-system/src/components/<group>/index.md          ← group index + coverage
  *   design-system/agent-views/components.json              ← the manifest
  *
@@ -427,11 +427,10 @@ function manifestEntryOf({ name, group, jsx, summary, props, defaults, descripti
 }
 
 /**
- * The barrels patterns come from: the patterns, and the page templates
- * `PageLayout` comes from. Each gets a generated doc beside its source, as a
- * component does.
+ * The barrels patterns come from. Each pattern gets a generated doc beside its
+ * source, as a component does.
  */
-const PATTERN_BARRELS = ['@/patterns', '@/specs/Universal/Pages'];
+const PATTERN_BARRELS = ['@/patterns'];
 
 /**
  * Each pattern barrel's components, parsed from source the way a component
@@ -533,7 +532,7 @@ for (const group of groups) {
  * The machine copy of the same facts, for checkers and the eval
  * (`scripts/lib/agent-manifests.mjs`). Keyed to the barrels, so it lists exactly
  * what `agent-views/components/index.md` lists: the components, then the
- * patterns and `PageLayout` from theirs.
+ * patterns from theirs.
  */
 const { components: exports } = readBarrel(REPO_ROOT, '@/components', {
   onUnresolved: (spec) => fail(`components barrel: cannot resolve \`export * from '${spec}'\``),

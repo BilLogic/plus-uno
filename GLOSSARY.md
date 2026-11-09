@@ -344,7 +344,7 @@ Work-in-progress Figma screens for one **Build ticket**, folded into its **Flow 
 _Avoid_: "spec" for a draft
 
 **Product screen**:
-A coded copy of one PLUS screen, built from design-system components, shown in Storybook's Specs section.
+A coded copy of one PLUS screen, built from design-system components. The Specs set is kept on the `archive/legacy-ds` branch until its rebuild.
 _Avoid_: bare "spec", "page" for the coded screen
 
 **Prompt-spec**:
@@ -398,7 +398,7 @@ The Figma file of **Flow spec**s and **Ticket draft**s, the source of truth for 
 _Avoid_: "Spec file"
 
 **Vibe app**:
-The coded prototype of PLUS in this repo, built from **Product screen**s and served beside Storybook.
+The coded prototype of PLUS built from **Product screen**s, kept on the `archive/legacy-ds` branch; its URLs redirect to Storybook.
 _Avoid_: "live app", "the app"
 
 **Production app / QA app**:

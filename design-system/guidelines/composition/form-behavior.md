@@ -136,29 +136,6 @@ a subtle `type="number"` field takes the look only, so its caller saves on
 blur. Select and the other pickers have no subtle look yet, so a surface that
 needs one of them stays standard throughout.
 
-## Forms still to move
-
-These spec and prototype files validate or submit a form and predate this
-page. Each moves to the timing above; `MonthlyReportContent.jsx` checks its
-feedback field on every keystroke.
-
-- `design-system/src/specs/Home/Modals/UserFeedbackModal/UserFeedbackModal.jsx` and `.stories.jsx`
-- `design-system/src/specs/Home/Sections/HomeHero/HomeHero.jsx` and `.stories.jsx`
-- `design-system/src/specs/Login/Elements/AccessCodeForm/AccessCodeForm.jsx`
-- `design-system/src/specs/Login/Sections/LoginForm/LoginForm.jsx`
-- `design-system/src/specs/Toolkit/Post-Session/Elements/NavigationButtons/NavigationButtons.jsx`
-- `design-system/src/specs/Toolkit/Post-Session/Pages/FormFeedback/FormFeedback.stories.jsx`
-- `design-system/src/specs/Toolkit/Post-Session/Pages/ReflectionFlow/ReflectionFlow.jsx`
-- `design-system/src/specs/Toolkit/Post-Session/Sections/FormFeedbackForm/FormFeedbackForm.jsx`
-- `design-system/src/specs/Toolkit/Post-Session/Sections/SessionInfoForm/SessionInfoForm.jsx`
-- `design-system/src/specs/Toolkit/Post-Session/Sections/SideNavBar/SideNavBar.jsx`
-- `design-system/src/specs/Toolkit/Pre-Session/Elements/NewFormDateInput.stories.jsx`
-- `design-system/src/specs/Toolkit/Pre-Session/Elements/NewFormTimeInput.stories.jsx`
-- `design-system/src/specs/Training/Onboarding/Modals/StrategyContentPromptModal/StrategyContentPromptModal.jsx` and `.stories.jsx`
-- `design-system/src/specs/Training/Onboarding/Pages/OnboardingInnerPage/OnboardingInnerPage.jsx`
-- `prototypes/home-redesign/src/components/Dashboard.jsx`
-- `prototypes/monthly-report/src/MonthlyReportContent.jsx`
-
 ## Related
 
 - `forms.md` — how the fields compose on a surface

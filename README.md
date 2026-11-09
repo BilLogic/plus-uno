@@ -1,5 +1,5 @@
 ---
-summary: The front page — what plus-uno is, every surface it ships (Storybook, the Vibe app, the demo, the design-system lookup, uno skills, uno-bot), and where each one's docs live.
+summary: The front page — what plus-uno is, every surface it ships (Storybook, the design-system lookup, the prototypes, uno skills, uno-bot), and where each one's docs live.
 ---
 
 # plus-uno
@@ -13,8 +13,6 @@ It is a prototype estate, not a production app.
 | | |
 |---|---|
 | **Storybook** | [plus-uno.netlify.app/storybook](https://plus-uno.netlify.app/storybook/) — the design system's docs |
-| **Vibe app** | [plus-uno.netlify.app/home](https://plus-uno.netlify.app/home) — the product's screens, built from the design system |
-| **Full Demo Walkthrough** | [plus-uno.netlify.app/demo/demo.html](https://plus-uno.netlify.app/demo/demo.html) — the end-to-end flow, clickable |
 | **uno-blueprint** | [plus-uno.netlify.app/blueprint](https://plus-uno.netlify.app/blueprint/) — the service as it runs today |
 | **Prototype Marketplace** | [Notion catalog](https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f) (PLUS workspace access) — every prototype and its deploy URL |
 | **New here** | [`SETUP.md`](SETUP.md) to run it · [`AGENTS.md`](AGENTS.md) for how uno works · [`GLOSSARY.md`](GLOSSARY.md) for the words |
@@ -27,8 +25,7 @@ People ask for work in **skills**. Skills summon **agents**. Agents follow **con
 |---|---|---|---|
 | Design system | React components, patterns, AI UI, data-viz charts and tokens | `design-system/` | [Storybook](https://plus-uno.netlify.app/storybook/) · [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) |
 | Design-system lookup | One lookup with three doors: the `ds` CLI, a local MCP server, a hosted MCP endpoint | `scripts/ds.mjs`, `scripts/ds-mcp.mjs`, `netlify/functions/ds-mcp/` | [`docs/connectors/ds-mcp.md`](docs/connectors/ds-mcp.md) |
-| Vibe app and demo | The product's screens, and the recorded walkthrough | `prototypes/live-app/`, `prototypes/home-redesign/` | [`prototypes/README.md`](prototypes/README.md) |
-| Prototypes and marketplace | Branch experiments, cataloged in Notion | `prototypes/`, `skills/uno-publish/` | [`docs/connectors/notion/marketplace-db.md`](docs/connectors/notion/marketplace-db.md) |
+| Prototypes and marketplace | The tutor revamp on `main`; branch experiments, cataloged in Notion | `prototypes/`, `skills/uno-publish/` | [`prototypes/README.md`](prototypes/README.md) · [`docs/connectors/notion/marketplace-db.md`](docs/connectors/notion/marketplace-db.md) |
 | uno skills and agents | Six IDE workflows and the agents they summon | `skills/`, `agents/` | [`skills/README.md`](skills/README.md) · [`agents/README.md`](agents/README.md) |
 | uno-bot | uno in Slack as `@le goat`, a Cloudflare Worker | `agents/uno-bot/` | [`agents/uno-bot/README.md`](agents/uno-bot/README.md) |
 | uno-blueprint | The current service journey, in Supabase | [BilLogic/uno-blueprint](https://github.com/BilLogic/uno-blueprint) | [`docs/connectors/supabase/overview.md`](docs/connectors/supabase/overview.md) |
@@ -41,10 +38,10 @@ Use the Node version in `package.json` `engines`.
 git clone https://github.com/BilLogic/plus-uno.git
 cd plus-uno
 npm install
-npm run dev          # the app shell on :4100 and Storybook on :4200
+npm run dev          # Storybook on :4200
 ```
 
-Storybook opens at [localhost:4200](http://localhost:4200) and the Vibe app at [localhost:4100/home](http://localhost:4100/home). `npm run dev:demo` runs the Full Demo Walkthrough. Every other script is in [`package.json`](package.json); [`SETUP.md`](SETUP.md) says which part of the repo you are in.
+Storybook opens at [localhost:4200](http://localhost:4200), and `npm run dev:tutor-revamp` runs the tutor revamp prototype. Every other script is in [`package.json`](package.json); [`SETUP.md`](SETUP.md) says which part of the repo you are in.
 
 ## Storybook
 
@@ -56,7 +53,6 @@ The design system's documentation, published at [plus-uno.netlify.app/storybook]
 - **Patterns**: the page structure (Frame, Sidebar, Page, Panel, Section), overlays and templates.
 - **AI**: the AI chat and the components it is built from.
 - **Data visualizations**: Highcharts-based charts by question type: comparison, distribution, part-to-whole, temporal and more.
-- **Specs**: the product's screens, area by area.
 
 The docs pages carry an AI assistant that answers from the design-system index (`netlify/functions/docs-agent/`).
 
@@ -115,23 +111,22 @@ The source of truth for how the PLUS service runs today: phases, scenarios, step
 
 ## Prototypes and the marketplace
 
-`main` hosts three surfaces: Storybook, the Vibe app (`/home`; the app shell sends `/app` there) and the Full Demo Walkthrough (`/demo/*`, entry `/demo/demo.html`). Everything else is an experiment:
+`main` hosts Storybook and the tutor revamp prototype (`/prototypes/tutor-revamp/`), and holds only the current design system. The old Specs screens, the Vibe app and the Full Demo Walkthrough live on the `archive/legacy-ds` branch; their old URLs (`/home`, `/app`, `/demo`) redirect to Storybook. Everything else is an experiment:
 
-1. Copy `prototypes/starter/` on a feature branch and build with design-system components.
+1. Scaffold one on a feature branch (`bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>`) and build with design-system components.
 2. Open a PR; the Netlify deploy preview is the prototype's URL.
 3. Run `uno-publish` to register it in the [Prototype Marketplace](https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f), the Notion catalog with that deploy URL (PLUS workspace access).
-4. When accepted, fold it into the Storybook specs and the Vibe app. One-off experiments are not merged to `main`.
+4. When accepted, fold what it proves into the design system. One-off experiments are not merged to `main`.
 
 ## Repository layout
 
 ```
 plus-uno/
 ├── AGENTS.md            the constitution: identity, skills, hard rules
-├── design-system/       components, patterns, data viz, specs, tokens, guidelines
+├── design-system/       components, patterns, data viz, tokens, guidelines
 │   ├── agent-views/     generated indexes agents read (regenerate, never hand-edit)
 │   └── figma/           Figma registries and alignment runbooks
-├── prototypes/          the Vibe app (live-app/), the demo (home-redesign/), experiments
-├── src/                 the Vite shell that routes /home and embeds Storybook
+├── prototypes/          the tutor revamp (tutor-revamp/)
 ├── skills/              the six uno skills
 ├── agents/              researchers/, reviewers/, writers/, and uno-bot/ (the Worker)
 ├── docs/                connectors/, engineering/, conventions/, adr/, evals/, knowledge/

@@ -24,7 +24,7 @@ export interface BakedProp {
   deprecated?: { replacement?: string };
 }
 
-/** A component, pattern or `PageLayout` as baked: the facts module's answer for it. */
+/** A component or pattern as baked: the facts module's answer for it. */
 export interface BakedComponent {
   name: string;
   kind?: string;

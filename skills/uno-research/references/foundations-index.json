@@ -12,7 +12,6 @@
     "npm run storybook",
     "npm run build",
     "npm run build-storybook",
-    "npm run preview:react",
     "npm run sync:tokens",
     "npm run generate:tokens"
   ],
@@ -37,21 +36,21 @@
       "name": "card",
       "token_scope": "--card-*",
       "typical_locations": [
-        "design-system/src/specs/*/Cards/"
+        "design-system/src/patterns/PatternCard/"
       ]
     },
     {
       "name": "section",
       "token_scope": "--section-*",
       "typical_locations": [
-        "design-system/src/specs/*/Sections/"
+        "design-system/src/patterns/PatternSection/"
       ]
     },
     {
       "name": "table",
       "token_scope": "--table-*",
       "typical_locations": [
-        "design-system/src/specs/*/Tables/"
+        "design-system/src/patterns/PatternTable/"
       ]
     },
     {
@@ -59,13 +58,13 @@
       "token_scope": "--modal-*",
       "typical_locations": [
         "design-system/src/components/",
-        "design-system/src/specs/*/Modals/"
+        "design-system/src/patterns/PatternModal/"
       ]
     },
     {
-      "name": "page_or_spec",
+      "name": "page",
       "typical_locations": [
-        "design-system/src/specs/*/Pages/"
+        "design-system/src/patterns/PageTemplates/"
       ]
     }
   ],
@@ -75,7 +74,7 @@
     "section": "Major page region.",
     "table": "Structured tabular layout.",
     "modal": "Overlay dialog surface.",
-    "spec": "Higher-level composition in design-system/src/specs."
+    "pattern": "Higher-level composition (Frame, Page, Section, Card, Table, overlays, templates) in design-system/src/patterns."
   },
   "token_prefixes": [
     "--ds-*",

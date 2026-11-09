@@ -39,7 +39,7 @@ const lengthOf = (field) => LENGTH[field] ?? B;
 /**
  * Words that carry no meaning in a query, shared by the ranker and the lookup's
  * lanes. `page` is left out on purpose: it is the word for the page layout
- * (PageLayout, the Page pattern, the layout guideline), not filler.
+ * (Frame, the Page pattern, the layout guideline), not filler.
  */
 export const STOPWORDS = new Set(
   (

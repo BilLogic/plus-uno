@@ -946,27 +946,6 @@
         ]
       }
     },
-    "MaintenanceAlert": {
-      "code": {
-        "import": "@/specs/Universal/Elements/MaintenanceAlert/MaintenanceAlert",
-        "export": "default",
-        "mdxPath": "design-system/src/specs/Universal/Elements/MaintenanceAlert/MaintenanceAlert.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/MaintenanceAlert",
-        "source": "design-system/src/specs/Universal/Elements/MaintenanceAlert/MaintenanceAlert.jsx"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "maintenance-alert",
-            "name": "Maintenance alert",
-            "source": "manual",
-            "status": "missing",
-            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built."
-          }
-        ]
-      }
-    },
     "MenuGroup": {
       "code": {
         "import": "@/components/navigation",
@@ -1038,30 +1017,6 @@
         ]
       }
     },
-    "OverviewCard": {
-      "code": {
-        "import": "@/specs/Universal/Cards/OverviewCard/OverviewCard",
-        "export": "default",
-        "mdxPath": "design-system/src/specs/Universal/Cards/OverviewCard/OverviewCard.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Cards/OverviewCard",
-        "source": "design-system/src/specs/Universal/Cards/OverviewCard/OverviewCard.jsx"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "overview-card",
-            "name": "Overview card",
-            "componentSetNodeId": "20095:6532",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-6532",
-            "source": "manual",
-            "status": "verified",
-            "isComponentSet": true
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-6532"
-      }
-    },
     "PageHeader": {
       "code": {
         "import": "@/components/layout-and-structure",
@@ -1084,28 +1039,6 @@
             "isComponentSet": false
           }
         ]
-      }
-    },
-    "PageLayout": {
-      "code": {
-        "import": "@/specs/Universal/Pages/PageLayout/PageLayout",
-        "export": "default",
-        "mdxPath": "design-system/src/specs/Universal/Pages/PageLayout/PageLayout.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Pages/PageLayout",
-        "source": "design-system/src/specs/Universal/Pages/PageLayout/PageLayout.jsx"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "page-layout",
-            "name": "Page layout",
-            "source": "manual",
-            "status": "missing",
-            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built."
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=112-597"
       }
     },
     "Pagination": {
@@ -1364,11 +1297,12 @@
     },
     "Sidebar": {
       "code": {
-        "import": "@/specs/Universal/Sections/Sidebar/Sidebar",
+        "import": "@/patterns/Sidebar/Sidebar",
         "export": "default",
-        "mdxPath": "design-system/src/specs/Universal/Sections/Sidebar/Sidebar.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Sections/Sidebar",
-        "source": "design-system/src/specs/Universal/Sections/Sidebar/Sidebar.jsx"
+        "mdxPath": "design-system/src/patterns/Sidebar/Sidebar.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Sidebar",
+        "source": "design-system/src/patterns/Sidebar/Sidebar.jsx",
+        "storybookId": "patterns-sidebar--docs"
       },
       "figma": {
         "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -1438,27 +1372,6 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20455-854"
-      }
-    },
-    "SmartBadges": {
-      "code": {
-        "import": "@/specs/Universal/Elements/SmartBadges/SmartBadges",
-        "export": "default",
-        "mdxPath": "design-system/src/specs/Universal/Elements/SmartBadges/SmartBadges.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/SmartBadges",
-        "source": "design-system/src/specs/Universal/Elements/SmartBadges/SmartBadges.stories.jsx"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "smart-badges",
-            "name": "Smart badges",
-            "source": "manual",
-            "status": "missing",
-            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built."
-          }
-        ]
       }
     },
     "Spinner": {
@@ -2000,51 +1913,6 @@
           }
         ],
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043"
-      }
-    },
-    "UserAvatar": {
-      "code": {
-        "import": "@/specs/Universal/Elements/UserAvatar/UserAvatar",
-        "export": "default",
-        "mdxPath": "design-system/src/specs/Universal/Elements/UserAvatar/UserAvatar.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/UserAvatar",
-        "source": "design-system/src/specs/Universal/Elements/UserAvatar/UserAvatar.jsx"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "user-avatar",
-            "name": "User avatar",
-            "componentSetNodeId": "20979:1397",
-            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20979-1397",
-            "source": "manual",
-            "status": "verified",
-            "isComponentSet": true
-          }
-        ],
-        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20979-1397"
-      }
-    },
-    "UserTypeIndicator": {
-      "code": {
-        "import": "@/specs/Universal/Elements/UserTypeIndicator/UserTypeIndicator",
-        "export": "default",
-        "mdxPath": "design-system/src/specs/Universal/Elements/UserTypeIndicator/UserTypeIndicator.mdx",
-        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/specs/Universal/Elements/UserTypeIndicator",
-        "source": "design-system/src/specs/Universal/Elements/UserTypeIndicator/UserTypeIndicator.jsx"
-      },
-      "figma": {
-        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
-        "sets": [
-          {
-            "id": "user-type-indicator",
-            "name": "User type indicator",
-            "source": "manual",
-            "status": "missing",
-            "notes": "No Core set or component found by this name on 2026-11-07. Re-map when it is built."
-          }
-        ]
       }
     }
   },

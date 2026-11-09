@@ -110,20 +110,18 @@ function attachedStories(mdxPath, content) {
  */
 function developerLinks(mdxPath, content, name) {
   const stories = attachedStories(mdxPath, content);
-  const title = stories && fs.readFileSync(stories.file, 'utf8').match(/\btitle:\s*['"]([^'"]+)['"]/);
+  // The meta's title, read from `export default {` on: story files carry `title` props on sample data above it.
+  const storiesSrc = stories ? fs.readFileSync(stories.file, 'utf8') : '';
+  const metaStart = storiesSrc.indexOf('export default {');
+  const title = stories && storiesSrc.slice(Math.max(metaStart, 0)).match(/\btitle:\s*['"]([^'"]+)['"]/);
   const dir = path.dirname(mdxPath);
   const own = ['.jsx', '.js', '.tsx'].map((ext) => path.join(dir, `${name}${ext}`)).find((f) => fs.existsSync(f));
   const source = own ?? stories?.file;
   return {
     ...(source ? { source: path.relative(REPO_ROOT, source).replace(/\\/g, '/') } : {}),
-    // specs/ is out of Storybook until its rebuild, so a page there has no live id to link.
-    ...(title && !isSpecsPage(mdxPath) ? { storybookId: storybookId(title[1], stories.docsName) } : {}),
+    ...(title ? { storybookId: storybookId(title[1], stories.docsName) } : {}),
   };
 }
-
-/** A page in the Specs replica, which `.storybook/main.js` leaves out of Storybook. */
-const isSpecsPage = (mdxPath) =>
-  path.relative(REPO_ROOT, mdxPath).replace(/\\/g, '/').startsWith('design-system/src/specs/');
 
 /**
  * `figmaMeta.deliberate`, checked: an object of code prop → a non-empty

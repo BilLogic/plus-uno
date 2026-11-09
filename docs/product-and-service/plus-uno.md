@@ -31,7 +31,6 @@ Counts are not kept here; they went stale every time a component landed. The gen
 | Components, grouped by job | `design-system/src/components/` |
 | Patterns: page structure, overlays, AI chat | `design-system/src/patterns/` |
 | Data visualizations, by question type | `design-system/src/dataviz/` |
-| Specs: the product's screens by area | `design-system/src/specs/` |
 | Tokens (generated, never hand-edited) | `design-system/src/tokens/` |
 | Guidelines | `design-system/guidelines/` |
 
@@ -42,11 +41,12 @@ Netlify hosts the site, configured in `netlify.toml`. A PR gets a deploy preview
 | Target | URL | Built from |
 |--------|-----|------------|
 | **Storybook** | https://plus-uno.netlify.app/storybook/ (also the site root) | `npm run build:all` → `dist/storybook/` |
-| **Vibe app** | https://plus-uno.netlify.app/home (the app shell routes `/app` here) | `prototypes/live-app/` through the root Vite shell |
-| **Full Demo Walkthrough** | https://plus-uno.netlify.app/demo/demo.html | `prototypes/home-redesign/` demo build |
+| **Tutor revamp** | https://plus-uno.netlify.app/prototypes/tutor-revamp/ | `prototypes/tutor-revamp/` |
 | **Hosted DS MCP** | https://plus-uno.netlify.app/mcp/ds (team key) | `netlify/functions/ds-mcp/` |
 | **PLUS Uno Blueprint** (the blueprint app) | https://plus-uno.netlify.app/blueprint/ | Its own Netlify site (`plus-uno-blueprint`), proxied by a forced rewrite in `netlify.toml` |
 | **Experiments** | Deploy previews or standalone Netlify sites | Feature branches; cataloged in the Notion Prototype Marketplace |
+
+The Specs screens, the Vibe app and the Full Demo Walkthrough are on the `archive/legacy-ds` branch; their old URLs (`/home`, `/app`, `/demo`) redirect to Storybook.
 
 uno-bot is not on Netlify: it is a Cloudflare Worker, deployed by `.github/workflows/uno-bot-deploy.yml` on every push to `main` (`agents/uno-bot/README.md` § Deploy).
 

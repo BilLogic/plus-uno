@@ -149,8 +149,8 @@ export const COLOR_TOKEN_FILES = [COLOR_PALETTE_FILE, COLOR_SEMANTIC_FILE, COLOR
 export const COLOR_TOKEN_PATHS = COLOR_TOKEN_FILES.map((file) => `${COLOR_TOKEN_DIR}/${file}`);
 
 /**
- * The color prefixes a check reads: the old set the Specs replica still uses,
- * and the `--ds-*` tokens. The old prefix leaves with the Specs revamp. A check
+ * The color prefixes a check reads: the old set the token files still declare,
+ * and the `--ds-*` tokens. The old prefix leaves with those declarations. A check
  * that reads color names this list rather than spelling the pair itself.
  */
 export const COLOR_PREFIXES = ['--color-', '--ds-'];

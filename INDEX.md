@@ -23,7 +23,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`README.md`](README.md) | The front page — what plus-uno is, every surface it ships (Storybook, the Vibe app, the demo, the design-system lookup, uno skills, uno-bot), and where each one's docs live. |
+| [`README.md`](README.md) | The front page — what plus-uno is, every surface it ships (Storybook, the design-system lookup, the prototypes, uno skills, uno-bot), and where each one's docs live. |
 | [`SETUP.md`](SETUP.md) | Clone, install, run, and find your way around — without reading the constitution first. |
 | [`AGENTS.md`](AGENTS.md) | The constitution — identity, routing, the loading contract, and hard rules for every embodiment. |
 | [`GLOSSARY.md`](GLOSSARY.md) | Use these terms consistently across all design system work, prototypes, and documentation |
@@ -98,7 +98,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/composition/form-behavior.md`](design-system/guidelines/composition/form-behavior.md) | How a PLUS form behaves — when it validates, how errors surface on submit, required fields, disabled vs read-only, unsaved changes, dependent fields, and subtle vs standard fields |
 | [`design-system/guidelines/composition/forms.md`](design-system/guidelines/composition/forms.md) | How PLUS form elements compose inside surfaces |
 | [`design-system/guidelines/composition/hierarchy.md`](design-system/guidelines/composition/hierarchy.md) | Every PLUS surface sits at one of four context levels |
-| [`design-system/guidelines/composition/layout.md`](design-system/guidelines/composition/layout.md) | If you are building a full page (like a dashboard, student list, or toolkit), you MUST wrap the entire page in the <PageLayout> component |
+| [`design-system/guidelines/composition/layout.md`](design-system/guidelines/composition/layout.md) | If you are building a full page (like a dashboard, student list, or toolkit), you MUST build it on a template — the Frame with the PLUS Sidebar and a breadcrumb |
 | [`design-system/guidelines/composition/overview.md`](design-system/guidelines/composition/overview.md) | How components combine |
 | [`design-system/guidelines/composition/surfaces.md`](design-system/guidelines/composition/surfaces.md) | Cards, tables, modals, and the empty and loading states they fall into |
 | [`design-system/guidelines/documentation-ia.md`](design-system/guidelines/documentation-ia.md) | The documentation IA contract — the shared tree Storybook titles, repo folders and Figma all speak, plus the MDX page shell. |

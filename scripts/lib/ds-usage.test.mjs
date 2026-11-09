@@ -69,7 +69,7 @@ test('ds/no-deep-import: a path past the barrel', () => {
   assert.deepEqual(rulesOf('p/App.jsx', "import { P } from '@plus-ds/patterns/Card';"), ['ds/no-deep-import']);
 });
 
-// Patterns and PageLayout are held like components: each to its own barrel.
+// Patterns are held like components: each to its own barrel.
 const patternCtx = contextFrom({
   components: {
     components: [
@@ -84,22 +84,22 @@ const patternCtx = contextFrom({
         ],
       },
       {
-        name: 'PageLayout',
+        name: 'Frame',
         kind: 'pattern',
-        import: "import { PageLayout } from '@/specs/Universal/Pages';",
-        props: [{ name: 'frame', values: ['default', 'focused'], deprecated: null }],
+        import: "import { Frame } from '@/patterns';",
+        props: [{ name: 'width', values: ['content', 'reading'], deprecated: null }],
       },
     ],
   },
   tokens: { tokens: [] },
   exported: new Set(['Button']),
-  barrels: { '@/patterns': new Set(['PatternCard', 'useOpenTabs']), '@/specs/Universal/Pages': new Set(['PageLayout']) },
+  barrels: { '@/patterns': new Set(['PatternCard', 'useOpenTabs', 'Frame']) },
 });
 const patternRules = (text) => escapesIn({ path: 'p/App.jsx', text }, patternCtx).map((f) => f.rule);
-const PATTERNS = "import { PatternCard, useOpenTabs } from '@/patterns';\nimport { PageLayout } from '@/specs/Universal/Pages';\n";
+const PATTERNS = "import { PatternCard, useOpenTabs } from '@/patterns';\nimport { Frame } from '@/patterns';\n";
 
-test('patterns: a valid pattern and PageLayout use passes', () => {
-  assert.deepEqual(patternRules(PATTERNS + '<PageLayout frame="focused"><PatternCard title="x" padding="md" /></PageLayout>'), []);
+test('patterns: a valid Frame and pattern use passes', () => {
+  assert.deepEqual(patternRules(PATTERNS + '<Frame width="reading"><PatternCard title="x" padding="md" /></Frame>'), []);
   assert.deepEqual(patternRules("import { PatternCard } from '@plus-ds/patterns';\n<PatternCard padding=\"lg\" />"), []);
 });
 
@@ -108,7 +108,7 @@ test('patterns: an invented pattern name fails, with the nearest real one', () =
   assert.equal(rest.length, 0);
   assert.equal(f.rule, 'ds/no-unknown-component');
   assert.match(f.fix, /PatternCard/);
-  assert.deepEqual(patternRules("import { PageShell } from '@/specs/Universal/Pages';"), ['ds/no-unknown-component']);
+  assert.deepEqual(patternRules("import { PageShell } from '@/patterns';"), ['ds/no-unknown-component']);
 });
 
 test('patterns: a pattern imported from a barrel that does not export it fails, naming its barrel', () => {
@@ -117,11 +117,11 @@ test('patterns: a pattern imported from a barrel that does not export it fails, 
   assert.match(f.fix, /@\/patterns/);
 });
 
-test('patterns: a wrong prop or a wrong value on PatternCard or PageLayout fails', () => {
+test('patterns: a wrong prop or a wrong value on PatternCard or Frame fails', () => {
   assert.deepEqual(patternRules(PATTERNS + '<PatternCard heading="x" />'), ['ds/no-unknown-prop']);
   assert.deepEqual(patternRules(PATTERNS + '<PatternCard padding="xl" />'), ['ds/no-unknown-prop']);
-  assert.deepEqual(patternRules(PATTERNS + '<PageLayout frame="wide" />'), ['ds/no-unknown-prop']);
-  assert.deepEqual(patternRules(PATTERNS + '<PageLayout layout="focused" />'), ['ds/no-unknown-prop']);
+  assert.deepEqual(patternRules(PATTERNS + '<Frame width="wide" />'), ['ds/no-unknown-prop']);
+  assert.deepEqual(patternRules(PATTERNS + '<Frame layout="focused" />'), ['ds/no-unknown-prop']);
 });
 
 test('patterns: a namespace import of @/patterns holds its members too', () => {
@@ -233,7 +233,7 @@ test('closest: the nearest name within a small edit distance, else null', () => 
   assert.equal(closest('Zebra', ['Button', 'Modal']), null);
 });
 
-// A page starts from PageLayout or a pattern, not from a hand-made shell.
+// A page starts from a template (Frame) or a pattern, not from a hand-made shell.
 const pageRules = (path, text, page) => escapesIn({ path, text, page }, patternCtx).map((f) => [f.rule, f.level]);
 const SHELL = "export default function App() {\n  return (\n    <div style={{ display: 'grid', gap: 0 }}>\n      <h1>Sessions</h1>\n    </div>\n  );\n}\n";
 
@@ -241,7 +241,7 @@ test('ds/page-starts-from-pattern: a page whose outer element is a hand-styled c
   const [f, ...rest] = escapesIn({ path: 'p/src/App.jsx', text: SHELL }, patternCtx);
   assert.equal(rest.length, 0);
   assert.deepEqual([f.rule, f.level, f.line, f.col], ['ds/page-starts-from-pattern', 'warn', 3, 5]);
-  assert.match(f.fix, /PageLayout/);
+  assert.match(f.fix, /Frame/);
   assert.deepEqual(pageRules('p/pages/Home.jsx', 'const Home = () => (\n  <main className="home-grid"><p>x</p></main>\n);\nexport default Home;\n'), [
     ['ds/page-starts-from-pattern', 'warn'],
   ]);
@@ -250,8 +250,8 @@ test('ds/page-starts-from-pattern: a page whose outer element is a hand-styled c
   ]);
 });
 
-test('ds/page-starts-from-pattern: a PageLayout or pattern root passes, through a fragment or a provider', () => {
-  const layout = PATTERNS + 'export default function App() {\n  return (\n    <PageLayout frame="focused">\n      <div style={{ display: \'flex\' }} />\n    </PageLayout>\n  );\n}\n';
+test('ds/page-starts-from-pattern: a Frame or pattern root passes, through a fragment or a provider', () => {
+  const layout = PATTERNS + 'export default function App() {\n  return (\n    <Frame width="reading">\n      <div style={{ display: \'flex\' }} />\n    </Frame>\n  );\n}\n';
   assert.deepEqual(pageRules('p/src/App.jsx', layout), []);
   const card = PATTERNS + 'export default function Home() {\n  return (\n    <>\n      <PatternCard title="x" />\n    </>\n  );\n}\n';
   assert.deepEqual(pageRules('p/pages/Home/Home.jsx', card), []);

@@ -40,11 +40,10 @@ const STYLE = /\.(scss|css)$/;
 const MARKUP = /\.html$/;
 
 /**
- * Specifiers that are a public barrel: the components, the patterns, and the
- * page templates `PageLayout` comes from. The capture is the barrel's canonical
- * `@/` name, whichever alias wrote it.
+ * Specifiers that are a public barrel: the components and the patterns. The
+ * capture is the barrel's canonical `@/` name, whichever alias wrote it.
  */
-const BARREL = /^(?:@|@plus-ds)\/(components|patterns|specs\/Universal\/Pages)\/?$/;
+const BARREL = /^(?:@|@plus-ds)\/(components|patterns)\/?$/;
 const barrelOf = (source) => `@/${source.match(BARREL)[1]}`;
 /** The barrel a manifest record imports from: its import line's specifier, or `@/components`. */
 const homeOf = (record) => record.import?.match(/from '([^']+)'/)?.[1] ?? '@/components';
@@ -620,7 +619,7 @@ function pageEscapes(text, add) {
   add(
     'ds/page-starts-from-pattern',
     root.index,
-    `the page's outer element is a hand-styled \`<${root.name}>\`, not \`PageLayout\` or a pattern`,
-    "wrap the page in `PageLayout` (import { PageLayout } from '@/specs/Universal/Pages'), or start it from a pattern such as `Page` or `PatternCard` (@/patterns)",
+    `the page's outer element is a hand-styled \`<${root.name}>\`, not a template or a pattern`,
+    "start the page from a template, `Frame` with the PLUS `Sidebar` (import { Frame } from '@/patterns'), or from a pattern such as `Page` or `PatternCard` (@/patterns)",
   );
 }

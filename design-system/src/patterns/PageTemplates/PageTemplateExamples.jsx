@@ -2,9 +2,8 @@ import React from 'react';
 
 import { Breadcrumb, Button, Sidebar } from '@/components';
 import { Frame, PatternCard } from '@/patterns';
-import { PageLayout } from '@/specs/Universal/Pages';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import { slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { FocusedFrame, InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { ScaledPreview } from '@/storybook-docs/lib/scaled-preview.jsx';
 
 /**
@@ -19,18 +18,13 @@ const ACCOUNT = { id: 'john-doe', name: 'John Doe', role: 'Lead' };
 // Stage geometry for the docs, not a design value.
 const Stage = ({ children }) => <ScaledPreview width={1024} height={560}>{children}</ScaledPreview>;
 
-const pageProps = {
-    sidebarConfig: { user: 'tutor', activeTabId: 'home' },
-    topBarConfig: { breadcrumbs: BREADCRUMBS, user: { name: 'John Doe', type: 'lead tutor' } },
-    style: { height: '100%' },
-};
 
 /** Do: the template, with its content slot filled. */
 export const FillSlotsDo = () => (
     <Stage>
-        <PageLayout title="Sessions" {...pageProps}>
+        <InAppFrame breadcrumbs={BREADCRUMBS} account={ACCOUNT} height="100%">
             {slotContent('Content slot: Sections')}
-        </PageLayout>
+        </InAppFrame>
     </Stage>
 );
 
@@ -64,9 +58,9 @@ const noteActions = (
 /** Do: a focused page names its task and offers Back and Close. */
 export const FocusedHeaderDo = () => (
     <Stage>
-        <PageLayout frame="focused" title="Add a session note" style={{ height: '100%' }} onBack={() => {}} onClose={() => {}}>
+        <FocusedFrame title="Add a session note" onBack={() => {}} onClose={() => {}}>
             {slotContent('Content slot: Sections')}
-        </PageLayout>
+        </FocusedFrame>
     </Stage>
 );
 
@@ -82,19 +76,17 @@ export const FocusedHeaderDont = () => (
 /** Do: the actions end-aligned in the footer, one primary, last. */
 export const FocusedActionsDo = () => (
     <Stage>
-        <PageLayout frame="focused" title="Add a session note" style={{ height: '100%' }} onBack={() => {}} onClose={() => {}} actions={noteActions}>
+        <FocusedFrame title="Add a session note" onBack={() => {}} onClose={() => {}} actions={noteActions}>
             {slotContent('Content slot: Sections')}
-        </PageLayout>
+        </FocusedFrame>
     </Stage>
 );
 
 /** Don't: several primary actions, start-aligned in the footer. */
 export const FocusedActionsDont = () => (
     <Stage>
-        <PageLayout
-            frame="focused"
+        <FocusedFrame
             title="Add a session note"
-            style={{ height: '100%' }}
             onBack={() => {}}
             onClose={() => {}}
             actions={(
@@ -107,7 +99,7 @@ export const FocusedActionsDont = () => (
             )}
         >
             {slotContent('Content slot: Sections')}
-        </PageLayout>
+        </FocusedFrame>
     </Stage>
 );
 

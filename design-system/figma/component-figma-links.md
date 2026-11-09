@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-39 docs-page links + 66 style/variant entries across 63 components.
+36 docs-page links + 60 style/variant entries across 57 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -49,10 +49,7 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Components | Toggle | `14876:12006` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=14876-12006) |
 | Components | Tooltip | `3497:19486` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19486) |
 | Components | TreeTable | `19685:27043` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19685-27043) |
-| Other | OverviewCard | `20095:6532` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-6532) |
-| Other | PageLayout | `112:597` | [Open](https://www.figma.com/design/W0qzhXWxFsMwSJzkdV2yal/Design-System---Web-App-Specs?node-id=112-597) |
 | Other | Sidebar | `19393:46573` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573) |
-| Other | UserAvatar | `20979:1397` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20979-1397) |
 
 ## Styles / variants
 
@@ -119,10 +116,4 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Tooltip | Tooltip | `20871:3142` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20871-3142) | verified |
 | Components | TreeTable | Tree table | `20095:15470` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-15470) | verified |
 | Other | Logo | Logo | `21004:1217` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21004-1217) | verified |
-| Other | MaintenanceAlert | Maintenance alert |  |  | missing |
-| Other | OverviewCard | Overview card | `20095:6532` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-6532) | verified |
-| Other | PageLayout | Page layout |  |  | missing |
 | Other | Sidebar | Sidebar | `19393:46573` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573) | verified |
-| Other | SmartBadges | Smart badges |  |  | missing |
-| Other | UserAvatar | User avatar | `20979:1397` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20979-1397) | verified |
-| Other | UserTypeIndicator | User type indicator |  |  | missing |

@@ -9,11 +9,11 @@ Status: **LIVE** — Design HQ · Prototype Marketplace.
 - Database `397b7cca-4982-8002-826c-c45e2baa8e4f` — https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f
 - Data source `397b7cca-4982-80d8-9967-000b69521ce9`
 
-**Source of truth: this Notion DB.** The in-app `/market` UI is retired. On `main`: Storybook + live app (`/home`) + Full Demo Walkthrough (`/demo/demo.html`, id `1028` — frozen). Experiments use branch Deploy Previews / standalone Netlify — do not add numeric SPA routes on `main`. `prototypes-data.js` lists only those two production surfaces.
+**Source of truth: this Notion DB.** The in-app `/market` UI is retired. On `main`: Storybook + the tutor revamp (`/prototypes/tutor-revamp/`). The Vibe app and the Full Demo Walkthrough (id `1028`) are on the `archive/legacy-ds` branch, and their URLs redirect to Storybook. Experiments use branch Deploy Previews / standalone Netlify.
 
 ## Why Notion (vs. the old JS marketplace UI)
 
-Team filtering, Project-card relations, and Roadmap rollups live in Notion. Prototypes stay **hosted** on Netlify (`plus-uno.netlify.app/{id}` or deploy-preview URLs); Notion stores the **Deployment URL** link.
+Team filtering, Project-card relations, and Roadmap rollups live in Notion. Prototypes stay **hosted** on Netlify (deploy-preview URLs, or `plus-uno.netlify.app/prototypes/{slug}/`); Notion stores the **Deployment URL** link.
 
 ## Properties
 
@@ -31,7 +31,7 @@ A given field whose column the live schema lacks goes in the page body as a `**P
 | **Design status** | rollup ← Project card (show original) | — | live design status from the card |
 | **Roadmap ID** | rollup ← Project card (show original) | `notionCardId` | card ID from the relation |
 | **Contributors** | people | `contributors[]` (+ `creators[]`) | workspace members only |
-| **Deployment URL** | url | `deploymentUrl` / production path | prefer `https://plus-uno.netlify.app/{id}` or PR preview URL |
+| **Deployment URL** | url | `deploymentUrl` / production path | the deploy-preview URL, or `https://plus-uno.netlify.app/prototypes/{slug}/` for a prototype `main` builds |
 | **Loom** | url | `loomVideoUrl` | null → empty |
 | **Repo path** | rich_text | `repoPath` | always ends `/` |
 | **Local path** | rich_text | `localPath` | app route, e.g. `/1025` |
@@ -43,13 +43,13 @@ A given field whose column the live schema lacks goes in the page body as a `**P
 
 | Context | URL pattern | When |
 |---|---|---|
-| **Production** | `https://plus-uno.netlify.app/{id}` | After merge to `main` (site build wires routes in `App.jsx`) |
-| **Deploy Preview** | `https://deploy-preview-{PR#}--plus-uno.netlify.app/{id}` | Open a PR against `main` — Netlify builds the whole site |
-| **Branch deploy** | `https://{branch-name}--plus-uno.netlify.app/{id}` | If branch deploys are enabled for the site (same build as prod) |
+| **Production** | `https://plus-uno.netlify.app/prototypes/{slug}/` | A prototype `main` builds (today only `tutor-revamp`), with its build in `build:all` and its redirect in `netlify.toml` |
+| **Deploy Preview** | `https://deploy-preview-{PR#}--plus-uno.netlify.app/{path}` | Open a PR against `main` — Netlify builds the whole site |
+| **Branch deploy** | `https://{branch-name}--plus-uno.netlify.app/{path}` | If branch deploys are enabled for the site (same build as prod) |
 
 Ritual for side-branch work (not yet on `main`):
 
-1. Put the prototype under `prototypes/{slug}/` and wire `App.jsx` + `prototypes-data.js` (routing registry).
+1. Put the prototype under `prototypes/{slug}/` (`skills/uno-prototype/scripts/scaffold-prototype.sh` writes it).
 2. Open a PR → wait for Netlify Deploy Preview.
 3. Paste the preview URL (path to the prototype) into Notion **Deployment URL**.
 4. After merge, update **Deployment URL** to the production `plus-uno.netlify.app` path.
@@ -62,7 +62,6 @@ Landing page (`/`) redirects to **Storybook** (`/storybook/`). Discovery lives i
 2. Set **Deployment URL** to the live Netlify URL (preview or production).
 3. Link **Project card** when a Roadmap card exists (unlocks Product Pillar rollup).
 4. Write the Notion row: update the row already carrying the prototype's name or Deployment URL, create one only when none does. The rollups fill themselves from **Project card**.
-5. Keep `prototypes-data.js` in sync **only** when the prototype is embedded in the Netlify SPA router.
 
 ## Entry page body (template shape)
 

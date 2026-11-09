@@ -10,8 +10,8 @@
  *   Cursor       `.cursor/hooks.json` afterFileEdit. Cursor reads no reply
  *                from this event, so there the hook only logs.
  *
- * Only consumer code is checked (the same scope as the checker: `prototypes/`
- * and `src/`); any other edit returns at once without reading a file. Every
+ * Only consumer code is checked (the same scope as the checker: `prototypes/`);
+ * any other edit returns at once without reading a file. Every
  * run appends one line to `.local/ds-usage-runs.jsonl` (git-ignored): time,
  * file, session, the count of findings by rule, and `duration_ms` from the
  * start of `main()`, so the checker's import is in the cost of an edit.

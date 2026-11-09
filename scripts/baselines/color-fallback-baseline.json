@@ -2,65 +2,7 @@
   "why": "Literal fallbacks that disagree with their own token (#268). Keyed on \"<token> <literal>\" rather than file and line, because a line number churns on every edit above it while the pair is the actual decision. The set may shrink and never grow; delete an entry when it is fixed and the check reports any that no longer disagree. `undefinedTokens` is a separate list with a different endpoint: those names have no definition at all, so the fallback IS the color, and the list should be driven to zero deliberately rather than shrinking as files are touched.",
   "sets": {
     "disagreements": {
-      "entries": {
-        "--color-danger #d32f2f": {
-          "count": 1
-        },
-        "--color-danger-container #fce8e6": {
-          "count": 1
-        },
-        "--color-on-danger-container #c5221f": {
-          "count": 1
-        },
-        "--color-on-success-container #1e4620": {
-          "count": 1
-        },
-        "--color-outline #79747e": {
-          "count": 1
-        },
-        "--color-outline #8e8e8e": {
-          "count": 1
-        },
-        "--color-outline-variant #c4c4c4": {
-          "count": 1
-        },
-        "--color-outline-variant #c4c7c5": {
-          "count": 1
-        },
-        "--color-outline-variant #e0e0e0": {
-          "count": 1
-        },
-        "--color-outline-variant #e2e2e5": {
-          "count": 1
-        },
-        "--color-primary #006b5e": {
-          "count": 1
-        },
-        "--color-primary #0e8175": {
-          "count": 1
-        },
-        "--color-primary-text #005a50": {
-          "count": 1
-        },
-        "--color-secondary-text #445c6a": {
-          "count": 1
-        },
-        "--color-success #2e7d32": {
-          "count": 1
-        },
-        "--color-success-container #a1eb83": {
-          "count": 1
-        },
-        "--color-success-container #d6f7c8": {
-          "count": 1
-        },
-        "--color-success-container #e6f4ea": {
-          "count": 1
-        },
-        "--color-warning-container #f8efc1": {
-          "count": 1
-        }
-      }
+      "entries": {}
     },
     "undefinedTokens": {
       "entries": {}

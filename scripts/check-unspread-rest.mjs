@@ -40,13 +40,7 @@
  *
  * WHY ONLY `design-system/src/components`. That directory is the published
  * library: its prop contract is what callers depend on and what the MDX pages
- * document, so a dropped rest element there is a broken promise. `specs/` is
- * page mockups composed FROM the library, and nine of them have the same shape
- * (#230 swept them) — but their roots are other React components, mostly
- * `PageLayout`, not DOM elements, so "where would it spread" is a real design
- * question per file rather than a mechanical fix, and answering it wrong forwards
- * arbitrary DOM attributes into another component's contract. Those are reported
- * in #230, not silenced here. `prototypes/` is out for the reason
+ * document, so a dropped rest element there is a broken promise. `prototypes/` is out for the reason
  * `check:token-collision` gives for the same boundary: prototypes are not the
  * source of truth, and a prototype going red teaches people to reach for a
  * bypass flag.

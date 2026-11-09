@@ -44,7 +44,7 @@ height hugs its content up to the cap the Blanket sets
 ## Alternatives
 
 - For a message the person only reads, use `SectionMessage` in the page or `Flag` at the screen corner.
-- For a task that takes more than a screen or has sections, use `PageLayout` with `frame="focused"`.
+- For a task that takes more than a screen or has sections, use `Frame`: the focused template, with no sidebar.
 - For a task that keeps the page in view, use `PatternDrawer`: a row's details, filters, a short edit.
 - For a small aside anchored to a control, use `Popup`.
 - For a list of actions or a value to pick, use `DropdownMenu` or `Select`.
@@ -137,7 +137,7 @@ its `onClose`.
 
 - `PatternModal`: use when a docs page or a mockup draws the Modal shell inline, with no focus trap.
 - `Blanket`: use when a new blocking layer needs the dimmed screen under it; `Modal` brings its own.
-- `PageLayout`: use when choosing between a Modal and a focused page; its Focused frame section weighs the two.
+- Templates: use when choosing between a Modal and a focused page; its Usage section weighs the two.
 
 Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `SectionMessage` · `Spotlight`
 

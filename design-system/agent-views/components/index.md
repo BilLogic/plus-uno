@@ -4,7 +4,7 @@
 
 > **CRITICAL**: Only use components and patterns listed here. If it's not listed, it DOES NOT EXIST.
 
-Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`. Patterns import from `@/patterns`, and `PageLayout` from `@/specs/Universal/Pages` (§ Patterns).
+Mirrors `design-system/src/components/`. Import from the barrel: `import { Button } from '@/components';`. Patterns import from `@/patterns` (§ Patterns).
 
 This index is the existence list. Each entry links to its generated doc — props, variants, tokens touched — derived from source.
 
@@ -74,9 +74,8 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 
 | Group | Name | Import | Reach for it when |
 |---|---|---|---|
-| Templates | [`PageLayout`](../../src/specs/Universal/Pages/PageLayout/PageLayout.mdx) | `import { PageLayout } from '@/specs/Universal/Pages';` | Every full page: wraps it in the Frame with the Sidebar, the breadcrumb row and the Page with its 12-column content grid. `frame="focused"` for one task the person finishes or leaves. |
-| Frame | [`Frame`](../../src/patterns/Frame/Frame.mdx) | `import { Frame } from '@/patterns';` | The app frame under PageLayout: Sidebar, Page and Panel with no top bar. Reach for it directly only for a shell PageLayout does not give. |
-| Frame | [`PatternSidebar`](../../src/patterns/Sidebar/Sidebar.mdx) | `import { PatternSidebar } from '@/patterns';` | The Frame's Sidebar with its open tabs. PageLayout draws it from the config you pass. |
+| Templates | [`Frame`](../../src/patterns/Frame/Frame.mdx) | `import { Frame } from '@/patterns';` | Every full page: the app frame (Sidebar, Page with its 12-column content grid, and Panel, with no top bar). The default template puts the PLUS `Sidebar` (@/components) in `sidebar` and a `Breadcrumb` in `header`; the focused template, for one task the person finishes or leaves, has no `sidebar`, `width="reading"`, the task's name as the `h1` in `header`, and `onBack` and `onClose`. |
+| Frame | [`PatternSidebar`](../../src/patterns/Sidebar/Sidebar.mdx) | `import { PatternSidebar } from '@/patterns';` | The Frame's Sidebar with its open tabs. The PLUS `Sidebar` (@/components) fills it from the role's config; reach for this only for a sidebar that is not the app's. |
 | Page | [`Page`](../../src/patterns/Page/Page.mdx) | `import { Page } from '@/patterns';` | A tokenized box with a level (fill and shadow together), a pad and a radius. The Frame draws the page's own; use it for any other block that needs a level. |
 | Section | [`PatternSection`](../../src/patterns/PatternSection/PatternSection.mdx) | `import { PatternSection } from '@/patterns';` | A span of the page grid under one heading, with its header, toolbar and tabs. No box of its own: the Page supplies the pad. `detail` for a list with a detail region. |
 | Card | [`PatternCard`](../../src/patterns/PatternCard/PatternCard.mdx) | `import { PatternCard } from '@/patterns';` | A raised container for one object: a student, a session, a metric. Optional image, a header over the body, optional footer. |
@@ -176,10 +175,10 @@ A pattern is a shell that owns the frame (fill, pad, radius, elevation) and leav
 
 Re-read what you wrote, then fix each of these:
 
-1. Every component and pattern comes from these lists, imported from its barrel (`@/components`, `@/patterns`, or `@/specs/Universal/Pages` for `PageLayout`); a deep path becomes the barrel import.
+1. Every component and pattern comes from these lists, imported from its barrel (`@/components` or `@/patterns`); a deep path becomes the barrel import.
 2. Every prop and value is in the component's generated doc (or `components.json`).
 3. Every color, size, radius and font is a token from `../tokens/tokens.md`, read at the ladder step for its role, in place of a raw value or a `--space-*`, `--radius-<n>` or `--palette-*` primitive.
 4. Every name in the tables above is replaced by its right-hand name.
-5. A page or card starts from its pattern: a full page sits in `PageLayout`, and a section, card, table or overlay is its pattern from the Patterns table, before any `div` with its own flex or grid.
+5. A page or card starts from its pattern: a full page sits in a template (`Frame` with the PLUS `Sidebar`), and a section, card, table or overlay is its pattern from the Patterns table, before any `div` with its own flex or grid.
 
 Then run `npm run check:ds-usage -- <your files>` and fix what it reports; its rules are `docs/engineering/ds-usage-rules.md`.

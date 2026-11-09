@@ -182,7 +182,7 @@
         },
         "search": {
           "type": "string",
-          "description": "Code-search mode: find WHERE something lives in the repo (e.g. 'focus-ring', 'PageLayout') — returns matching file paths + github.com links to read or cite. When set, 'path' is ignored."
+          "description": "Code-search mode: find WHERE something lives in the repo (e.g. 'focus-ring', 'PatternSection') — returns matching file paths + github.com links to read or cite. When set, 'path' is ignored."
         },
         "repo": {
           "type": "string",

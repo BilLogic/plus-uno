@@ -19,10 +19,9 @@ const DOCS_LINK = /<DocsLink\s+id="([a-z0-9-]+)"(?:\s+story="([a-z0-9-]+)")?/g;
 
 /**
  * Paths whose Storybook ids are a record or a test fixture, not a link a reader
- * follows. The Specs replica is out of Storybook until its rebuild, so the links
- * between its own pages wait with it.
+ * follows.
  */
-const NOT_LINKS = [/^design-system\/src\/specs\//, /^docs\/plans\//, /^docs\/adr\//, /^agents\/uno-bot\/tests\//, /^scripts\/lib\/storybook-links\.test\.mjs$/, /(^|\/)package-lock\.json$/, /(^|\/)node_modules\//];
+const NOT_LINKS = [/^docs\/plans\//, /^docs\/adr\//, /^agents\/uno-bot\/tests\//, /^scripts\/lib\/storybook-links\.test\.mjs$/, /(^|\/)package-lock\.json$/, /(^|\/)node_modules\//];
 
 export const isLinkable = (file) => !NOT_LINKS.some((pattern) => pattern.test(file));
 

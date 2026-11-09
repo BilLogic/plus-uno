@@ -8,7 +8,6 @@ import { compare, DEFAULT_ARMS, LOOKUP_ARMS, lookupWiring, meteredIn, rescore, s
 import { spawnSync } from 'node:child_process';
 
 import { REPO_ROOT } from './lib/corpus.mjs';
-import { openRatchet } from './lib/ratchet.mjs';
 
 test('every task has a brief, and the template and judge exist', () => {
   for (const task of TASKS) assert.ok(fs.existsSync(path.join(REPO_ROOT, SCENARIOS, task, 'BRIEF.md')), task);
@@ -294,11 +293,9 @@ test('the four harder scenarios are tasks, each prepared with its brief and its 
 });
 
 test('seedScore: the debt scenario starts with recorded debt, the migration with retired names, the rest clean', () => {
-  // The debt file is a trimmed copy of a prototype whose escapes the baseline records.
+  // The debt file is a trimmed copy of a prototype that carried recorded escapes.
   const debt = seedScore({ task: 'debt-extend' });
   assert.deepEqual(debt.byRule, { 'ds/no-deep-import': 4, 'ds/no-raw-literal': 2 });
-  const baseline = openRatchet({ file: 'scripts/baselines/ds-usage.json' }).entries;
-  for (const [rule, n] of Object.entries(debt.byRule)) assert.ok(baseline.get(`${rule} prototypes/monthly-report/src/MonthlyReportsListContent.jsx`)?.count >= n, rule);
 
   const migration = seedScore({ task: 'migrate-retired' });
   assert.ok(migration.byRule['ds/no-unknown-component'] >= 3, JSON.stringify(migration));
@@ -396,10 +393,10 @@ test('score: the layout formula is the page rule, following the app entry to the
   try {
     fs.mkdirSync(path.join(dir, 'src'));
     fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import History from './History';\nexport default function App() {\n  return <History />;\n}\n");
-    const page = (root) => `import { PageLayout } from '@/specs/Universal/Pages';\nexport default function History() {\n  return (\n    ${root}\n  );\n}\n`;
+    const page = (root) => `import { Frame } from '@/patterns';\nexport default function History() {\n  return (\n    ${root}\n  );\n}\n`;
     fs.writeFileSync(path.join(dir, 'src', 'History.jsx'), page('<div className="history-grid" />'));
     assert.equal(score({ folder: dir, label: 'eval-x' }).layoutFormula, false);
-    fs.writeFileSync(path.join(dir, 'src', 'History.jsx'), page('<PageLayout />'));
+    fs.writeFileSync(path.join(dir, 'src', 'History.jsx'), page('<Frame />'));
     assert.equal(score({ folder: dir, label: 'eval-x' }).layoutFormula, true);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });

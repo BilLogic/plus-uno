@@ -10,10 +10,10 @@
  *     .scope                   the consumer-code roots
  *   readBarrel(root, spec)     what a barrel exports, for the generators that
  *                              write the manifests this module reads
- *   CONSUMER_ROOTS             the folders consumer code lives in; SOURCE_ROOTS,
- *                              PROTOTYPE_ROOTS and the named roots beside them
- *                              are the checks' documented extensions of it
- *   BARRELS                    the public barrels: components, patterns, page templates
+ *   CONSUMER_ROOTS             the folders consumer code lives in; SOURCE_ROOTS
+ *                              and the named roots beside them are the checks'
+ *                              documented extensions of it
+ *   BARRELS                    the public barrels: components and patterns
  *
  * Every reader of these facts is an adapter at this seam: `check:ds-usage`,
  * the component index generator and the manifest generator today. Each answer
@@ -21,8 +21,8 @@
  * that is missing is answered, never thrown on.
  *
  * WHERE THE FACTS COME FROM. The generated manifests
- * (`agent-views/components.json`, `tokens.json`: components, patterns and
- * `PageLayout`, each with its kind, import, props and values), the hand-kept
+ * (`agent-views/components.json`, `tokens.json`: components and patterns,
+ * each with its kind, import, props and values), the hand-kept
  * lists (`_inventions.json`; `_patterns.json`, which adds only a pattern's group
  * and when to reach for it; `_aliases.json`, the other words a component is
  * asked by, as `lookup(name).aliases`), the glossary's design-system avoid-words
@@ -42,11 +42,8 @@ import { tokenMatchers } from './inventions.mjs';
 import { stripComments } from './js-comments.mjs';
 import { retiredRenames } from './tokens/plan.mjs';
 
-/** The prototype gallery's own shell: consumer code, and the newest root. */
-export const APP_SHELL_ROOT = 'src';
-
 /** Where consumer code lives: what the usage checks read and hold to the system. */
-export const CONSUMER_ROOTS = ['prototypes', APP_SHELL_ROOT];
+export const CONSUMER_ROOTS = ['prototypes'];
 
 /*
  * A check that reads more or less than consumer code says so by composing
@@ -62,17 +59,10 @@ export const SOURCE_ROOTS = [LIBRARY_ROOT, ...CONSUMER_ROOTS];
 /** Storybook's config and preview, styled like the library: the style checks read it too. */
 export const STORYBOOK_ROOT = '.storybook';
 
-/**
- * Consumer code less the app shell, for the style checks that predate the
- * shell and have not been run over it: its legacy color reads and font
- * fallbacks would be new findings. Widening one of them is a migration.
- */
-export const PROTOTYPE_ROOTS = CONSUMER_ROOTS.filter((root) => root !== APP_SHELL_ROOT);
-
 const COMPONENTS_BARREL = '@/components';
 
 /** The public barrels consumer code imports the design system from. */
-export const BARRELS = [COMPONENTS_BARREL, '@/patterns', '@/specs/Universal/Pages'];
+export const BARRELS = [COMPONENTS_BARREL, '@/patterns'];
 
 /** The design-system folder under `root`: `design-system/` in a repo, `root` itself in a package. */
 function dsDir(root) {

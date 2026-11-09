@@ -23,16 +23,17 @@ import { fileURLToPath } from 'node:url';
 
 import { corpus } from './undefined-tokens.mjs';
 import { failures, familyFallbacks, familyTokens } from './font-families.mjs';
-import { LIBRARY_ROOT, PROTOTYPE_ROOTS, STORYBOOK_ROOT } from './lib/ds-facts.mjs';
+import { CONSUMER_ROOTS, LIBRARY_ROOT, STORYBOOK_ROOT } from './lib/ds-facts.mjs';
 import { byRoot, main } from './lib/findings.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
-/** The library, Storybook and the prototypes; the app shell is not held yet (`PROTOTYPE_ROOTS`). */
-export const ROOTS = [LIBRARY_ROOT, STORYBOOK_ROOT, ...PROTOTYPE_ROOTS];
+/** The library, Storybook and the prototypes. */
+export const ROOTS = [LIBRARY_ROOT, STORYBOOK_ROOT, ...CONSUMER_ROOTS];
 
 /** The floor, measured 2026-08-29. A walk that stopped matching finds nothing. */
-export const MIN_FILES = 1300;
+// Lowered from 1300 to 700 when the Specs code, the root app and the specs prototypes left main (kept on archive/legacy-ds).
+export const MIN_FILES = 700;
 
 export const REMEDY =
   '  -> A fallback only paints when the token fails to load, which is exactly when\n' +

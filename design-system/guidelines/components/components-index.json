@@ -4,8 +4,7 @@
   "component_roots": [
     "design-system/src/components",
     "design-system/src/patterns",
-    "design-system/src/dataviz",
-    "design-system/src/specs"
+    "design-system/src/dataviz"
   ],
   "export_entrypoints": [
     "design-system/src/index.js",

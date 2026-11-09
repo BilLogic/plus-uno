@@ -61,9 +61,8 @@ export const TOOL_ORDER = ['ds_find', 'ds_get', 'ds_tokens', 'ds_guide', 'ds_che
 export const ORIENTATION = `PLUS design system: the React components, patterns and tokens every PLUS prototype is built from. A name the lookup does not know does not exist here: propose it rather than write it.
 
 Barrels (import only from these):
-- ${BARRELS[1]}: the shells (PageLayout's parts, PatternCard, PatternSection, PatternTable, overlays)
+- ${BARRELS[1]}: the shells (Frame, which every full page starts from, PatternCard, PatternSection, PatternTable, overlays)
 - ${BARRELS[0]}: the components (Button, TextField, SectionMessage...)
-- ${BARRELS[2]}: PageLayout, which every full page starts from
 
 Order: ds_find (what exists for the task) → ds_get (props, usage, practices, a11y, figma) → ds_tokens (steps for a role) → ds_guide (layout, content, a rule) → write → ds_check (findings to zero).
 
@@ -72,7 +71,7 @@ Hard rules:
 - Props and values come from ds_get, never from memory.
 - Style with semantic, pattern or component tokens (ds_tokens); never a literal, never a primitive (--palette-*, --space-<n>).
 - Icons are Font Awesome Free: fa-solid, fa-regular, fa-brands.
-- A full page starts from PageLayout (ds_guide layout).`;
+- A full page starts from a template: Frame with the PLUS Sidebar (ds_guide layout).`;
 
 const FIND_LIMIT = 10;
 const PER_KIND = { token: 3, icon: 3 };

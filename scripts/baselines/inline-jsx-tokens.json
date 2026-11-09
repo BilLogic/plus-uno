@@ -3,18 +3,6 @@
   "sets": {
     "main": {
       "entries": {
-        "inline-style-literal design-system/src/components/_internal/layout/DashboardLayout.jsx": {
-          "count": 3
-        },
-        "inline-style-literal design-system/src/components/_internal/training/LessonProgressBar.jsx": {
-          "count": 1
-        },
-        "inline-style-literal design-system/src/components/_internal/training/LikertScale.jsx": {
-          "count": 1
-        },
-        "inline-style-literal design-system/src/components/_internal/training/OnboardingModuleCard.jsx": {
-          "count": 2
-        },
         "inline-style-literal design-system/src/components/images-and-icons/Illustration/Illustration.jsx": {
           "count": 2
         },
