@@ -1338,6 +1338,11 @@ html[data-color-mode="dark"] .docs-story {
   margin-bottom: var(--page-stack-lg);
 }
 
+/* The block carries the space above it, so its heading adds none of its own. */
+.sbdocs .sb-ds-resources > h2 {
+  margin-top: 0 !important;
+}
+
 .sbdocs .sb-ds-resources-block {
   display: flex;
   flex-wrap: wrap;

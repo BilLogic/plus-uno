@@ -20,7 +20,7 @@ Groups follow Atlassian's component categories, in Atlassian's order, and
 
 - [Forms and inputs](forms-and-inputs.md) — fields sorted by the shape of the answer, then `Button`, `ButtonGroup` and `CloseButton`
 - Images and icons — `Tile` alone, so its docs page is the whole guidance
-- [Labels](labels.md) — `StatusTag`, `CountTag`, `Tag`, `TagGroup`, `Suggestion` and `AiLabel`
+- [Labels](labels.md) — `StatusTag`, `CountTag`, `Tag`, `TagGroup` and `Suggestion`
 - [Layout and structure](layout-and-structure.md) — nine containers
 - [Loading](loading.md) — `Progress`, `Skeleton`, `Spinner`
 - [Messaging](messaging.md) — `Alert`, `Flag`, `Modal`, `Banner`, `InlineMessage`
