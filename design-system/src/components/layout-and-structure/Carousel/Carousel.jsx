@@ -1,34 +1,16 @@
-import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
-import { Tabs as BaseTabs } from '@base-ui/react/tabs';
-import { Toggle as BaseToggle } from '@base-ui/react/toggle';
-// The component folder, not the barrel: the barrel exports Carousel itself, so
+// Component folders, not the barrel: the barrel exports Carousel itself, so
 // importing it from here would read Carousel before it is defined.
 import IconButton from '@/components/forms-and-inputs/IconButton';
+import ProgressIndicator from '@/components/status-indicators/ProgressIndicator';
+import Heading from '@/components/text-and-data-display/Heading';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './Carousel.scss';
 
 const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
 const IMAGE_PATH = /\.(jpg|jpeg|png|gif|webp|svg)$/i;
-
-/*
- * Stage geometry. The active slide takes a share of the stage, capped; a
- * neighbor is scaled and turned toward it in perspective, and its near edge
- * sits one gap off the active slide's edge. These live here rather than in the
- * stylesheet because the placement math needs them as numbers.
- */
-const GEOMETRY = {
-    maxWidth: 1000,
-    share: (stage) => (stage < 520 ? 0.86 : stage < 700 ? 0.8 : 0.74),
-    neighborScale: 0.65,
-    turn: 32,
-    perspective: 1500,
-    gap: 28,
-    gapFrom: 700,
-    dim: 0.45,
-};
 const SWIPE_DISTANCE = 48;
-const CAPTION_OUT_MS = 120;
 
 // Reads the person's motion preference and follows it if it changes.
 const usePrefersReducedMotion = () => {
@@ -68,21 +50,6 @@ const useInputModality = () => {
     }, []);
 };
 
-// The width of an element, kept current as it resizes.
-const useWidth = (ref) => {
-    const [width, setWidth] = useState(0);
-    useLayoutEffect(() => {
-        const element = ref.current;
-        if (!element) return undefined;
-        setWidth(element.clientWidth);
-        if (typeof ResizeObserver !== 'function') return undefined;
-        const observer = new ResizeObserver(() => setWidth(element.clientWidth));
-        observer.observe(element);
-        return () => observer.disconnect();
-    }, [ref]);
-    return width;
-};
-
 // Where slide `k` sits relative to the active one: wrapped around the ring
 // when there are enough slides for a neighbor on each side, plain otherwise.
 const offsetOf = (k, active, count, wraps) => {
@@ -92,29 +59,16 @@ const offsetOf = (k, active, count, wraps) => {
     return ((d + half + count) % count) - half;
 };
 
-const placeSlide = (d, stage, flat) => {
-    const width = Math.round(Math.min(GEOMETRY.maxWidth, stage * GEOMETRY.share(stage)));
-    const gap = GEOMETRY.gap * Math.min(1, stage / GEOMETRY.gapFrom);
-    const theta = (GEOMETRY.turn * Math.PI) / 180;
-    const half = (GEOMETRY.neighborScale * width) / 2;
-    const step = flat
-        ? width + gap
-        : width / 2 + gap + (half * Math.cos(theta) * GEOMETRY.perspective) / (GEOMETRY.perspective + half * Math.sin(theta));
-    const distance = Math.abs(d);
-    const near = Math.min(distance, 1);
-    const turn = flat ? 0 : -Math.sign(d) * GEOMETRY.turn * near;
-    const scale = flat ? 1 : 1 - (1 - GEOMETRY.neighborScale) * near;
-    return {
-        width,
-        transform: `translate3d(${(d * step).toFixed(1)}px, 0, 0) perspective(${GEOMETRY.perspective}px) rotateY(${turn.toFixed(2)}deg) scale(${scale.toFixed(4)})`,
-        opacity: Math.max(0, Math.min(1, 2 - distance)),
-        dim: GEOMETRY.dim * near,
-        zIndex: 10 - Math.round(distance),
-    };
+// How long the caption takes to lift out: the short motion duration, which
+// the token layer already sets to 0 under reduced motion.
+const captionOutMs = (element) => {
+    const value = element ? getComputedStyle(element).getPropertyValue('--motion-duration-short') : '';
+    const ms = parseFloat(value);
+    return Number.isFinite(ms) ? ms : 0;
 };
 
 // The caption lifts out, swaps its text, then rises back in.
-const useCaptionSwap = (index, animate) => {
+const useCaptionSwap = (index, animate, rootRef) => {
     const [shown, setShown] = useState(index);
     const [phase, setPhase] = useState('in');
     const shownRef = useRef(index);
@@ -134,12 +88,12 @@ const useCaptionSwap = (index, animate) => {
             frame = requestAnimationFrame(() => {
                 frame = requestAnimationFrame(() => setPhase('in'));
             });
-        }, CAPTION_OUT_MS);
+        }, captionOutMs(rootRef.current));
         return () => {
             clearTimeout(timer);
             cancelAnimationFrame(frame);
         };
-    }, [index, animate]);
+    }, [index, animate, rootRef]);
     return [shown, phase];
 };
 
@@ -161,13 +115,13 @@ const SlideContent = ({ item, index }) => {
 
 /**
  * Carousel
- * A centered stage of slides: the active one flat and full size, one neighbor
- * on each side turned toward it and dimmed. Under it, a play button whose ring
- * fills over the slide's time, one progress pill per slide, and a caption that
+ * A centered stage of slides: the active one full size, one neighbor on each
+ * side in the same flat row, smaller and dimmed. Under it, a play button whose
+ * ring fills over the slide's time, a dot per slide, and a caption that
  * changes with the slide. Autoplay holds while the pointer rests on the stage,
  * keyboard focus is inside, the carousel is out of view or the tab is hidden.
  * Under reduced motion it never moves on its own: arrows replace the play
- * button and the slides sit in a flat row.
+ * button and every move is instant.
  */
 const Carousel = ({
     slides = [],
@@ -185,8 +139,6 @@ const Carousel = ({
 }) => {
     const count = slides.length;
     const rootRef = useRef(null);
-    const stageRef = useRef(null);
-    const stageWidth = useWidth(stageRef);
     const reduced = usePrefersReducedMotion();
 
     const autoplays = autoplay && !reduced && count > 1 && interval > 0;
@@ -194,7 +146,7 @@ const Carousel = ({
     const wraps = loop || autoplays;
     // A neighbor wraps round the ends only when the carousel itself wraps and
     // there are enough slides for one on each side.
-    const ringWraps = wraps && count >= 4;
+    const ringWraps = wraps && count >= 3;
 
     const [index, setIndex] = useState(() => Math.min(Math.max(defaultIndex, 0), Math.max(count - 1, 0)));
     const indexRef = useRef(index);
@@ -207,8 +159,6 @@ const Carousel = ({
     const [pageHidden, setPageHidden] = useState(() => typeof document !== 'undefined' && document.hidden);
 
     const elapsedRef = useRef(0);
-    const autoplaysRef = useRef(autoplays);
-    autoplaysRef.current = autoplays;
     const paint = useCallback((progress) => {
         rootRef.current?.style.setProperty('--carousel-progress', progress.toFixed(4));
     }, []);
@@ -222,15 +172,15 @@ const Carousel = ({
             ? ((target % count) + count) % count
             : Math.min(Math.max(target, 0), count - 1);
         elapsedRef.current = 0;
-        paint(autoplaysRef.current ? 0 : 1);
+        paint(0);
         if (next === indexRef.current) return;
         indexRef.current = next;
         setIndex(next);
         onIndexChangeRef.current?.(next);
     }, [count, paint, wraps]);
 
-    // The clock: one frame loop writing a single progress value the ring and
-    // the active pill both read. It holds, and resumes where it held.
+    // The clock: one frame loop writing a single progress value the ring
+    // reads. It holds, and resumes where it held.
     const running = autoplays && !paused && !hovered && !focusHeld && inView && !pageHidden;
     useEffect(() => {
         if (!running) return undefined;
@@ -253,10 +203,6 @@ const Carousel = ({
     }, [running, interval, goTo, paint]);
 
     useEffect(() => {
-        paint(autoplays ? elapsedRef.current / interval : 1);
-    }, [autoplays, interval, paint]);
-
-    useEffect(() => {
         const onVisibility = () => setPageHidden(document.hidden);
         document.addEventListener('visibilitychange', onVisibility);
         return () => document.removeEventListener('visibilitychange', onVisibility);
@@ -274,7 +220,7 @@ const Carousel = ({
     }, []);
 
     // Keyboard focus inside holds the clock; a pointer press does not, so
-    // clicking a pill or the play button never stalls the slide it starts.
+    // clicking a dot or the play button never stalls the slide it starts.
     useInputModality();
     const onFocus = () => {
         if (!lastInputWasPointer) setFocusHeld(true);
@@ -283,7 +229,8 @@ const Carousel = ({
         if (!rootRef.current?.contains(event.relatedTarget)) setFocusHeld(false);
     };
 
-    const onPressedChange = (nextPaused) => {
+    const togglePaused = () => {
+        const nextPaused = !paused;
         setPaused(nextPaused);
         // Pressing Play is an explicit request to move, so focus on the
         // button no longer holds the clock until it leaves and returns.
@@ -293,8 +240,6 @@ const Carousel = ({
     const onKeyDown = (event) => {
         if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
         if (event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return;
-        // The pills are a tablist that moves on its own arrow keys.
-        if (event.target.closest?.('[role="tablist"]')) return;
         event.preventDefault();
         goTo(indexRef.current + (event.key === 'ArrowRight' ? 1 : -1));
     };
@@ -316,15 +261,10 @@ const Carousel = ({
     };
     const onPointerCancel = () => { swipeRef.current = null; };
 
-    const [captionIndex, captionPhase] = useCaptionSwap(index, !reduced);
+    const [captionIndex, captionPhase] = useCaptionSwap(index, !reduced, rootRef);
     const caption = slides[captionIndex];
     const hasCaption = slides.some((item) => item.title || item.description);
-    const CaptionTitle = headingTag(useHeadingLevel() + 1);
-
-    const measured = stageWidth > 0;
-    const placed = slides.map((_, k) => placeSlide(offsetOf(k, index, count, ringWraps), stageWidth, reduced));
-    const slideWidth = placed[0]?.width ?? 0;
-    const trackHeight = slideWidth / (aspectRatio || 16 / 10);
+    const captionTag = headingTag(useHeadingLevel() + 1);
 
     const classes = [
         'plus-carousel',
@@ -349,7 +289,6 @@ const Carousel = ({
             {...props}
         >
             <div
-                ref={stageRef}
                 className="plus-carousel-stage"
                 onPointerEnter={(event) => { if (event.pointerType === 'mouse') setHovered(true); }}
                 onPointerLeave={(event) => { if (event.pointerType === 'mouse') setHovered(false); }}
@@ -357,31 +296,23 @@ const Carousel = ({
                 onPointerUp={onPointerUp}
                 onPointerCancel={onPointerCancel}
             >
-                <div
-                    className={`plus-carousel-track${measured ? '' : ' plus-carousel-track--measuring'}`}
-                    style={{ '--carousel-slide-width': slideWidth, '--carousel-track-height': trackHeight }}
-                >
+                <div className="plus-carousel-track" style={{ '--carousel-aspect': aspectRatio }}>
                     {slides.map((item, k) => {
                         const active = k === index;
-                        const place = placed[k];
+                        const offset = offsetOf(k, index, count, ringWraps);
                         return (
                             <div
                                 key={item.id ?? k}
                                 className={[
                                     'plus-carousel-slide',
                                     active && 'plus-carousel-slide--active',
-                                    place.opacity === 0 && 'plus-carousel-slide--away',
+                                    Math.abs(offset) >= 2 && 'plus-carousel-slide--away',
                                 ].filter(Boolean).join(' ')}
                                 role="group"
                                 aria-roledescription="slide"
                                 aria-label={`${k + 1} of ${count}`}
                                 aria-hidden={active ? undefined : true}
-                                style={{
-                                    transform: place.transform,
-                                    opacity: place.opacity,
-                                    zIndex: place.zIndex,
-                                    '--carousel-dim': place.dim,
-                                }}
+                                style={{ '--carousel-offset': offset }}
                                 onClick={active ? undefined : () => {
                                     // The click that ends a swipe is not a choice.
                                     const swiped = swipeRef.current?.moved;
@@ -403,60 +334,44 @@ const Carousel = ({
                     {autoplays && (
                         /*
                          * The pause control comes first (WCAG 2.2.2). Its name says
-                         * what a press will do, so `aria-pressed` is dropped: a
-                         * name that flips and a pressed state would say it twice.
+                         * what a press will do; the ring around it is the slide's
+                         * clock.
                          */
-                        <BaseToggle
-                            className="plus-carousel-play"
-                            pressed={paused}
-                            onPressedChange={onPressedChange}
-                            aria-pressed={undefined}
-                            aria-label={paused ? 'Play' : 'Pause'}
-                        >
+                        <span className="plus-carousel-play">
                             <svg className="plus-carousel-ring" viewBox="0 0 44 44" aria-hidden="true" focusable="false">
                                 <circle className="plus-carousel-ring-track" cx="22" cy="22" r="20" />
                                 <circle className="plus-carousel-ring-progress" cx="22" cy="22" r="20" pathLength="1" />
                             </svg>
-                            <i className={`fa-solid ${paused ? 'fa-play' : 'fa-pause'} plus-carousel-play-icon`} aria-hidden="true" />
-                        </BaseToggle>
+                            <IconButton
+                                icon={paused ? 'fa-solid fa-play' : 'fa-solid fa-pause'}
+                                label={paused ? 'Play' : 'Pause'}
+                                appearance="subtle"
+                                shape="circle"
+                                onClick={togglePaused}
+                            />
+                        </span>
                     )}
                     {isStatic && (
                         <IconButton
                             icon="fa-solid fa-chevron-left"
                             label="Previous slide"
                             shape="circle"
-                            className="plus-carousel-arrow"
                             isDisabled={!wraps && index === 0}
                             onClick={() => goTo(index - 1)}
                         />
                     )}
-                    <BaseTabs.Root
-                        className="plus-carousel-dots"
-                        value={index}
-                        onValueChange={(value) => goTo(value)}
-                    >
-                        <BaseTabs.List className="plus-carousel-dot-list" activateOnFocus aria-label="Choose a slide">
-                            {slides.map((item, k) => (
-                                <BaseTabs.Tab
-                                    key={item.id ?? k}
-                                    value={k}
-                                    className={`plus-carousel-dot${k < index ? ' plus-carousel-dot--done' : ''}`}
-                                    aria-label={`Slide ${k + 1} of ${count}${item.title ? `: ${item.title}` : ''}`}
-                                    onClick={() => { if (k === index) goTo(k); }}
-                                >
-                                    <span className="plus-carousel-dot-pill">
-                                        <span className="plus-carousel-dot-fill" />
-                                    </span>
-                                </BaseTabs.Tab>
-                            ))}
-                        </BaseTabs.List>
-                    </BaseTabs.Root>
+                    <ProgressIndicator
+                        values={slides.map((item, k) => `Slide ${k + 1} of ${count}${item.title ? `: ${item.title}` : ''}`)}
+                        selectedIndex={index}
+                        appearance="primary"
+                        label="Choose a slide"
+                        onSelect={({ index: chosen }) => goTo(chosen)}
+                    />
                     {isStatic && (
                         <IconButton
                             icon="fa-solid fa-chevron-right"
                             label="Next slide"
                             shape="circle"
-                            className="plus-carousel-arrow"
                             isDisabled={!wraps && index === count - 1}
                             onClick={() => goTo(index + 1)}
                         />
@@ -467,7 +382,7 @@ const Carousel = ({
             {hasCaption && (
                 <div className="plus-carousel-caption" aria-live={isStatic || paused ? 'polite' : 'off'}>
                     <div className={`plus-carousel-caption-inner plus-carousel-caption-inner--${captionPhase}`}>
-                        {caption?.title && <CaptionTitle className="plus-carousel-caption-title">{caption.title}</CaptionTitle>}
+                        {caption?.title && <Heading as={captionTag} size="xsmall">{caption.title}</Heading>}
                         {caption?.description && <p className="plus-carousel-caption-description">{caption.description}</p>}
                     </div>
                 </div>
@@ -487,7 +402,7 @@ const requireName = (props, propName, componentName) => {
 };
 
 Carousel.propTypes = {
-    /** The slides, in order. `content` is the card; `title` and `description` fill the caption and name the pill. A string `content` renders as text, or as an image when it is a path ending in an image extension (`alt` describes it). */
+    /** The slides, in order. `content` is the card; `title` and `description` fill the caption and name the dot. A string `content` renders as text, or as an image when it is a path ending in an image extension (`alt` describes it). */
     slides: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         content: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,

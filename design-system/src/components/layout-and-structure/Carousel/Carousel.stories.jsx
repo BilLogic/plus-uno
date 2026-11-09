@@ -11,7 +11,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'A centered stage of slides with a play ring, one progress pill per slide and a caption that changes with the slide.',
+                component: 'A centered stage of slides in a flat row, with a play button in a progress ring, a dot per slide and a caption that changes with the slide.',
             },
         },
     },
@@ -91,14 +91,14 @@ const CarouselFrame = (props) => (
 
 /* ----------------------------------------------------------------- examples */
 
-/** Autoplay: the ring fills over each slide's time, then the next slide comes to the front. */
+/** Autoplay: the ring round the play button fills over each slide's time, then the next slide comes to the front. */
 export const Overview = {
     render: (args) => <CarouselFrame {...args} />,
     args: { autoplay: true, interval: 6000 },
     parameters: { docs: { source: { language: 'jsx', code: webAppSourceSnippets.carousel } } },
 };
 
-/** Autoplay off: arrows on either side of the pills, and the slides wait to be chosen. */
+/** Autoplay off: arrows on either side of the dots, and the slides wait to be chosen. */
 export const Static = {
     render: (args) => <CarouselFrame {...args} />,
     args: { autoplay: false },
@@ -113,7 +113,7 @@ export const NoLoop = {
         await expect(canvas.getByRole('button', { name: 'Previous slide' })).toBeDisabled();
         // The first slide has no neighbor on its left: nothing wraps round.
         await expect(slideAt(canvasElement, 4)).toHaveClass('plus-carousel-slide--away');
-        await userEvent.click(canvas.getByRole('tab', { name: /^Slide 5 of 5/ }));
+        await userEvent.click(canvas.getByRole('button', { name: /^Slide 5 of 5/ }));
         await waitFor(() => expect(canvas.getByRole('button', { name: 'Next slide' })).toBeDisabled());
         await expect(slideAt(canvasElement, 0)).toHaveClass('plus-carousel-slide--away');
     },
@@ -142,7 +142,7 @@ const fakeReducedMotion = () => {
     return () => { window.matchMedia = real; };
 };
 
-/** Reduced motion: no autoplay and no play button; arrows show, the row is flat and moves in one step. */
+/** Reduced motion: no autoplay and no play button; arrows show and every move is instant. */
 export const ReducedMotion = {
     render: (args) => <CarouselFrame {...args} />,
     args: { autoplay: true, interval: 500 },
@@ -157,10 +157,8 @@ export const ReducedMotion = {
         await new Promise((resolve) => setTimeout(resolve, 1200));
         await expect(activeLabel(canvasElement)).toBe('1 of 5');
 
-        // No tilt and no scale on a neighbor.
-        const neighbor = slideAt(canvasElement, 1);
-        await expect(neighbor.style.transform).toContain('rotateY(0deg)');
-        await expect(neighbor.style.transform).toContain('scale(1)');
+        // The same flat row, with no movement between places.
+        await expect(getComputedStyle(slideAt(canvasElement, 1)).transitionDuration).toBe('0s');
 
         await userEvent.click(canvas.getByRole('button', { name: 'Next slide' }));
         await waitFor(() => expect(activeLabel(canvasElement)).toBe('2 of 5'));
@@ -207,16 +205,16 @@ export const PauseStopsProgress = {
     },
 };
 
-/** Choosing a pill moves to its slide and starts that slide's clock over; it does not pause. */
+/** Choosing a dot moves to its slide and starts that slide's clock over; it does not pause. */
 export const DotRestartsClock = {
     render: () => <CarouselFrame interval={3000} />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         await waitFor(() => expect(progressOf(canvasElement)).toBeGreaterThan(0.1));
 
-        const third = canvas.getByRole('tab', { name: 'Slide 3 of 5: Training that fits between sessions' });
+        const third = canvas.getByRole('button', { name: 'Slide 3 of 5: Training that fits between sessions' });
         await userEvent.click(third);
-        await waitFor(() => expect(third).toHaveAttribute('aria-selected', 'true'));
+        await waitFor(() => expect(third).toHaveAttribute('aria-current', 'step'));
         await expect(activeLabel(canvasElement)).toBe('3 of 5');
         await expect(progressOf(canvasElement)).toBeLessThan(0.1);
 
@@ -289,7 +287,20 @@ export const RegionIsNamed = {
         const canvas = within(canvasElement);
         const region = canvas.getByRole('region', { name: "What's new for tutors" });
         await expect(region).toHaveAttribute('aria-roledescription', 'carousel');
-        await expect(canvas.getByRole('tablist', { name: 'Choose a slide' })).toBeTruthy();
+        await expect(canvas.getByRole('group', { name: 'Choose a slide' })).toBeTruthy();
         await expect(canvasElement.querySelector('.plus-carousel-caption')).toHaveAttribute('aria-live', 'polite');
+    },
+};
+
+/** One neighbor each side in a flat row; the rest wait off stage, and the ring wraps round. */
+export const NeighborsWrap = {
+    render: () => <CarouselFrame autoplay={false} />,
+    play: async ({ canvasElement }) => {
+        const offsets = [...canvasElement.querySelectorAll('.plus-carousel-slide')]
+            .map((slide) => slide.style.getPropertyValue('--carousel-offset'));
+        await expect(offsets).toEqual(['0', '1', '2', '-2', '-1']);
+        await expect(slideAt(canvasElement, 4)).not.toHaveClass('plus-carousel-slide--away');
+        await expect(slideAt(canvasElement, 2)).toHaveClass('plus-carousel-slide--away');
+        await expect(getComputedStyle(slideAt(canvasElement, 1)).transform).not.toContain('matrix3d');
     },
 };
