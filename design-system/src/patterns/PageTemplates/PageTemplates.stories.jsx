@@ -7,6 +7,7 @@ import { PageLayout } from '@/specs/Universal/Pages';
 import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import BrowserFrame from '@/storybook-docs/chrome/BrowserFrame';
+import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 
 /**
@@ -149,7 +150,7 @@ export const InBrowserFrame = {
     render: () => (
         <div>
             <div data-case="bare">{fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>)}</div>
-            {['chrome', 'safari'].map((browser) => (
+            {['chrome', 'safari', 'edge'].map((browser) => (
                 <div key={browser} data-case={browser}>
                     <BrowserFrame browser={browser}>
                         {fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>)}
@@ -161,18 +162,26 @@ export const InBrowserFrame = {
     play: async ({ canvasElement }) => withTestViewport(1280, 900, async () => {
         const measure = (name) => {
             const box = canvasElement.querySelector(`[data-case="${name}"]`);
-            const aside = box.querySelector('.plus-frame__sidebar');
+            const frame = box.querySelector('.plus-frame');
+            const aside = frame.querySelector('.plus-frame__sidebar');
             return {
+                box,
                 sidebarLeft: aside.getBoundingClientRect().left - box.getBoundingClientRect().left,
-                pageWidth: box.querySelector('.plus-frame__surface').getBoundingClientRect().width,
+                pageWidth: frame.querySelector('.plus-frame__surface').getBoundingClientRect().width,
+                frameWidth: frame.getBoundingClientRect().width,
             };
         };
-        const bare = measure('bare');
-        for (const name of ['chrome', 'safari']) {
-            const framed = measure(name);
-            await expect(framed.sidebarLeft, `${name}: sidebar left edge`).toBeCloseTo(bare.sidebarLeft, 0);
-            await expect(framed.pageWidth, `${name}: page width`).toBeCloseTo(bare.pageWidth, 0);
-        }
+        await inEveryColorMode(async (mode) => {
+            const bare = measure('bare');
+            await expect(bare.box.querySelector('[data-browser]'), `no chrome without the browser (${mode})`).toBeNull();
+            for (const name of ['chrome', 'safari', 'edge']) {
+                const framed = measure(name);
+                await expect(framed.box.querySelector('[data-browser]'), `${name} chrome is drawn (${mode})`).not.toBeNull();
+                await expect(framed.sidebarLeft, `${name}: sidebar left edge (${mode})`).toBeCloseTo(bare.sidebarLeft, 0);
+                await expect(framed.pageWidth, `${name}: page width (${mode})`).toBeCloseTo(bare.pageWidth, 0);
+                await expect(framed.frameWidth, `${name}: frame width (${mode})`).toBeCloseTo(bare.frameWidth, 0);
+            }
+        });
     }),
 };
 
