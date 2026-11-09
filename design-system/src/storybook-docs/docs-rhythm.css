@@ -1,0 +1,116 @@
+/*
+ * Docs rhythm: the space between the parts of a docs page, on the app's own
+ * Page and Section token roles (Spacing foundation), so the docs group content
+ * the way a PLUS page does. The map is in
+ * design-system/guidelines/documentation-ia.md § Spacing; this file is the only
+ * place that sets it.
+ *
+ *   page title → lead                        --stack-sm          title to description
+ *   page header → tabs or first section      --page-stack-md     page title to content
+ *   before a section (h2)                    --page-stack-lg     before a new topic
+ *   before a subsection (h3)                 --page-stack-md     between sections
+ *   heading → its description                --stack-sm          title to description
+ *   header → body, and block to block        --section-stack-md  heading to body
+ *
+ * Every gap is a margin on the later block, set here by role, so two neighbors
+ * have exactly one distance between them. The containers are flex columns with
+ * no gap of their own, and their children's own margins are cleared, because
+ * margins do not collapse in a flex column.
+ *
+ * Three page builds share it: component pages (`.sb-ds-doc-section`, its
+ * examples flat as h3 + demo shell), foundation pages (`.sb-docs-section`,
+ * `.sb-docs-subsection` from foundation-page.jsx) and MDX prose pages (bare
+ * headings in `.sbdocs-content`, set by the heading rules below).
+ */
+
+/* Page header: the title and its lead. */
+.sbdocs .sbdocs-title,
+.sbdocs .sb-docs-header > * {
+    margin-block: 0 !important;
+}
+
+.sbdocs .sbdocs-title + p,
+.sbdocs .sb-docs-header > * + * {
+    margin-block: var(--stack-sm) 0 !important;
+}
+
+.sbdocs .sbdocs-title + p {
+    margin-block-end: var(--page-stack-md) !important;
+}
+
+.sbdocs .sb-docs-header {
+    display: flex;
+    flex-direction: column;
+    margin-block-end: var(--page-stack-md);
+}
+
+/* Sections and subsections: flex columns, one distance between neighbors. */
+.sbdocs .sb-ds-doc-section,
+.sbdocs .sb-docs-section,
+.sbdocs .sb-docs-subsection {
+    display: flex;
+    flex-direction: column;
+    gap: 0 !important;
+}
+
+.sbdocs :is(.sb-ds-doc-section, .sb-docs-section, .sb-docs-subsection) > * {
+    margin-block: 0 !important;
+}
+
+/* Header to body, and block to block within one group. */
+.sbdocs :is(.sb-ds-doc-section, .sb-docs-section, .sb-docs-subsection) > * + * {
+    margin-block-start: var(--section-stack-md) !important;
+}
+
+/* A heading's description sits under it, closer than the body. */
+.sbdocs :is(.sb-ds-doc-section, .sb-docs-subsection) > h3 + .sb-docs-demo:has(> .sb-ds-canvas-description:first-child),
+.sbdocs :is(.sb-ds-doc-section, .sb-docs-section, .sb-docs-subsection) > :is(h2, h3) + .sb-docs-description {
+    margin-block-start: var(--stack-sm) !important;
+}
+
+/* A subsection starts a new group: further from what came before. */
+.sbdocs .sb-ds-doc-section > h3,
+.sbdocs .sb-docs-section > .sb-docs-subsection {
+    margin-block-start: var(--page-stack-md) !important;
+}
+
+/* The first subsection follows its section heading as that heading's body. */
+.sbdocs .sb-ds-doc-section > h2 + h3,
+.sbdocs .sb-docs-section > h2 + .sb-docs-subsection {
+    margin-block-start: var(--section-stack-md) !important;
+}
+
+/* A section starts a new topic. */
+.sbdocs .sb-ds-doc-section,
+.sbdocs .sb-docs-section {
+    margin-block: var(--page-stack-lg) 0 !important;
+}
+
+.sbdocs :is(.sb-ds-doc-section, .sb-docs-section):first-child {
+    margin-block-start: 0 !important;
+}
+
+/* Inside a demo shell: the description, then the preview, Section/stack-md apart. */
+.sbdocs .sb-docs-demo {
+    display: flex;
+    flex-direction: column;
+    gap: var(--section-stack-md);
+}
+
+/* Component pages: the tabs row to the tab's first section is heading to body. */
+.sbdocs .sb-ds-component-docs.sb-ds-component-docs--page {
+    margin-block-start: var(--section-stack-md) !important;
+}
+
+/* MDX prose pages: bare headings in the page's own flow. */
+.sbdocs .sbdocs-content > h2 {
+    margin-block: var(--page-stack-lg) var(--section-stack-md) !important;
+}
+
+.sbdocs .sbdocs-content > h3 {
+    margin-block: var(--page-stack-md) var(--section-stack-md) !important;
+}
+
+.sbdocs .sbdocs-content > :is(h4, h5, h6) {
+    margin-block: var(--section-stack-lg) var(--section-stack-md) !important;
+}

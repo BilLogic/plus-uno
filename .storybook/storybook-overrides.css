@@ -102,30 +102,22 @@ body,
 .sbdocs h2:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
     font: var(--heading-large) !important;
     color: var(--ds-text) !important;
-    margin-top: var(--page-stack-lg) !important;
-    margin-bottom: var(--section-stack-sm) !important;
 }
 
 .sbdocs h3:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
     font: var(--heading-medium) !important;
     color: var(--ds-text) !important;
-    margin-top: var(--page-stack-md) !important;
-    margin-bottom: var(--section-stack-sm) !important;
 }
 
 .sbdocs h4:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
     font: var(--heading-small) !important;
     color: var(--ds-text) !important;
-    margin-top: var(--section-stack-lg) !important;
-    margin-bottom: var(--section-stack-sm) !important;
 }
 
 .sbdocs h5:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)),
 .sbdocs h6:not([style]):not(:where(.docs-story *, .sb-ds-dodont-card *, aside *)) {
     font: var(--heading-xsmall) !important;
     color: var(--ds-text) !important;
-    margin-top: var(--section-stack-md) !important;
-    margin-bottom: var(--section-stack-sm) !important;
 }
 
 /*
@@ -302,81 +294,13 @@ a.sbdocs-a {
     color: var(--ds-text-inverse) !important;
 }
 
-/*
- * Component MDX: section rhythm.
- *
- * The `.sb-button-*` aliases that used to shadow every selector here are gone —
- * `sb-button-docs`, `sb-button-doc-section` and `sb-button-interactive-panel`
- * had zero occurrences anywhere in the repo, so they doubled the size of this
- * block while matching nothing.
- *
- * SPACING HAS ONE AUTHORITY, and it is `gap`.
- *
- * A section is a flex column, and margins do NOT collapse inside a flex
- * container. While its children kept their own margins, a paragraph pair cost
- * `margin-bottom 16 + gap 10 + margin-top 16 = 42px` where block flow would have
- * collapsed it to 16 — measured at 46px on the Introduction page, whose gap is
- * wider. Zeroing the children's margins makes the sum impossible: the only
- * number that can appear between two children is `gap`.
- *
- * The margins are zeroed on DIRECT children only. Prose inside a
- * `DocsCanvasShell` is not a direct child, is still in block flow, and still
- * collapses normally — that spacing is the shell's business, not this rule's.
- *
- * `--section-stack-md` replaces the hand-picked `0.5rem`/`0.625rem` pair. One
- * value at every width: a heading sits the same distance from its content as two
- * paragraphs sit from each other, which is the trade of having one authority.
- */
-.sbdocs .sb-ds-component-docs.sb-ds-component-docs--page {
-  margin-top: var(--page-stack-lg);
-}
-
-.sbdocs .sb-ds-component-docs .sb-ds-doc-section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--section-stack-md);
-}
-
-.sbdocs .sb-ds-component-docs .sb-ds-doc-section > * {
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-}
-
-/*
- * Space between major sections.
- *
- * `!important` because it has to beat the `> *` rule above on a section that is
- * itself the child of another — and because four earlier authored values used to
- * lose to a block like this one silently. There is now nothing left to fight:
- * the three `margin-bottom` clamps and the `:last-child` reset that used to sit
- * above were unreachable, and are deleted rather than reinstated.
- */
-.sbdocs .sb-ds-doc-section {
-  margin-top: var(--page-stack-lg) !important;
-  margin-bottom: var(--page-stack-lg) !important;
-}
-
-/*
- * The last section ends the panel. Its bottom margin was authored as 0, lost to
- * the block above, and left 40-64px of dead space under every tab panel on all
- * 48 component pages. Restored here, where it can actually win.
- */
-.sbdocs .sb-ds-doc-section:last-child {
-  margin-bottom: 0 !important;
-}
+/* Docs spacing (sections, subsections, headings, demo blocks) lives in
+   design-system/src/storybook-docs/docs-rhythm.css, on the app's Page and Section tokens. */
 
 /*
  * PLUS Docs Introduction: tighter narrative rhythm than component API docs.
  */
-.sbdocs .sb-plus-intro-page {
-  margin-top: clamp(var(--space-250), 4vw, var(--space-400)) !important;
-}
 
-.sbdocs .sb-plus-intro-page .sb-ds-doc-section {
-  margin-top: clamp(var(--section-pad-y-spacious), 4vw, 3.25rem) !important;
-  margin-bottom: clamp(var(--section-pad-y-spacious), 4vw, 3.25rem) !important;
-  gap: var(--space-0875);
-}
 
 .sbdocs .sb-plus-intro-page .sb-plus-intro-overview-title {
   font-family: var(--type-family-heading-serif);
@@ -387,13 +311,7 @@ a.sbdocs-a {
   color: var(--ds-text);
 }
 
-.sbdocs .sb-plus-intro-page .sb-ds-doc-section:first-child {
-  margin-top: 0 !important;
-}
 
-.sbdocs .sb-plus-intro-page .sb-ds-doc-section:last-child {
-  margin-bottom: 0 !important;
-}
 
 /*
  * `.sb-plus-intro-mini-grid` was the other half of both of these selector lists.
@@ -553,21 +471,9 @@ a.sbdocs-a {
  * every argument here is a bare tag, so this ranks exactly where the old
  * four-selector list did.
  */
-.sbdocs .sb-ds-component-docs .sb-ds-doc-section > :is(h2, h3, h4) {
-  /* The size is the tag's, from the type scale at the top of this file; inside a
-     section the gap is the only space between children. */
-  margin-top: 0 !important;
-  margin-bottom: 0 !important;
-}
 
-/*
- * An example's heading starts a new block: more room above it than the section's
- * gap gives between a description and its canvas, so each example reads as one
- * heading, one line and one canvas. The first child needs none.
- */
-.sbdocs .sb-ds-component-docs .sb-ds-doc-section > :is(h3, h4):not(:first-child) {
-  margin-top: var(--page-stack-sm) !important;
-}
+
+
 
 /*
  * Docs tables inside `.not-prose` (catalog / states).
@@ -627,18 +533,13 @@ a.sbdocs-a {
  * Does not affect Canvas.
  */
 .sbdocs-title + p {
-  opacity: 0.92;
-  margin-top: var(--section-stack-lg) !important;
-  margin-bottom: var(--space-400) !important;
+  color: var(--ds-text-subtle);
 }
 
 /* Add margin under the main Title. Fenced out of story canvases for the same
    reason as the type-scale rules at the top of this file — LessonsDetailPage's
    P5 canvas renders `<h1>`s of its own. */
-.sbdocs h1:not(:where(.docs-story *, .sb-ds-dodont-card *)),
-.sbdocs-title {
-  margin-bottom: var(--section-stack-md) !important;
-}
+
 
 /*
  * TOC "ON THIS PAGE" heading.
@@ -1237,12 +1138,6 @@ html[data-color-mode="dark"] .docs-story {
  * does, from the body type token; before this it carried a class and no style,
  * so Storybook's own 14px gray paragraph rule drew it in another font.
  */
-.sbdocs .sb-docs-demo {
-  display: flex;
-  flex-direction: column;
-  gap: var(--section-stack-md);
-}
-
 .sbdocs .sb-docs-demo > * {
   margin: 0 !important;
 }
