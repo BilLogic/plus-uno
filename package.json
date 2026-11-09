@@ -91,6 +91,7 @@
     "check:state-mixin": "node scripts/check-state-mixin.mjs",
     "check:inline-jsx-tokens": "node scripts/check-inline-jsx-tokens.mjs",
     "check:react-bootstrap-imports": "node scripts/check-react-bootstrap-imports.mjs",
+    "check:raw-buttons": "node scripts/check-raw-buttons.mjs",
     "check:retired-spelling": "node scripts/check-retired-spelling.mjs",
     "check:cross-repo": "node scripts/check-cross-repo-duplication.mjs",
     "check:button-contrast": "node scripts/check-button-contrast.mjs",

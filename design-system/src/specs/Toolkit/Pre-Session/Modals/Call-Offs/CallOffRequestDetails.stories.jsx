@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CloseButton } from '@/components';
 import Modal from '@/components/messaging/Modal';
 import Button from '@/components/forms-and-inputs/Button';
 import Select from '@/components/forms-and-inputs/Select';
@@ -67,26 +68,7 @@ const CallOffAlert = ({ onClose }) => (
                 This session begins in <strong>less than 12 hours</strong>. Dropping now may leave students without enough tutors. Please think carefully before submitting your call-off request, as it <strong>may not be excused</strong> and could count toward your absences.
             </span>
         </div>
-        <button
-            type="button"
-            aria-label="Close"
-            onClick={onClose}
-            style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                alignSelf: 'flex-start'
-            }}
-        >
-            <i
-                className="fa-solid fa-xmark"
-                style={{
-                    fontSize: 'var(--font-size-fa-h4-solid)',
-                    color: 'var(--ds-icon-subtle)'
-                }}
-            />
-        </button>
+        <CloseButton label="Close" onClick={onClose} style={{ alignSelf: 'flex-start' }} />
     </div>
 );
 

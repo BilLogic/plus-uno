@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import CountTag from '@/components/labels/CountTag';
+import { Button } from '@/components';
 
 export default {
     title: 'Specs/Toolkit/Pre-Session/Tables/Nav Horizontal',
@@ -30,31 +31,12 @@ const defaultTabs = [
  * - Typography: body1-txt font-weight-semibold
  */
 const TabItem = ({ label, count, isSelected, onClick }) => (
-    <button
-        onClick={onClick}
-        style={{
-            flex: 1,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 'var(--stack-lg)',
-            padding: 'var(--pad-y-lg) var(--pad-x-lg)',
-            backgroundColor: 'transparent',
-            border: 'none',
-            borderBottom: isSelected ? '2px solid var(--color-secondary)' : '2px solid transparent',
-            borderRadius: 'var(--radius-md) var(--radius-md) 0 0',
-            cursor: 'pointer',
-            color: isSelected ? 'var(--color-secondary-text)' : 'var(--ds-text-subtle)',
-            whiteSpace: 'nowrap',
-            minWidth: '120px'
-        }}
-        className="body1-txt font-weight-semibold"
-    >
+    <Button appearance="subtle" isSelected={isSelected} onClick={onClick} style={{ flex: 1, minWidth: '120px' }}>
         {label}
         <span style={{ display: 'flex', alignItems: 'center' }}>
             <CountTag value={count} isBold={isSelected} className="py-0" />
         </span>
-    </button>
+    </Button>
 );
 
 /**

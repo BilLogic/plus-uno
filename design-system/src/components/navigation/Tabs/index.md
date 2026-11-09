@@ -109,7 +109,7 @@ Same group: `Breadcrumb` · `Link` · `MenuGroup` · `Pagination` · `Sidebar`
 ## Parts
 
 1. **Tab strip.** A `tablist` of buttons, aligned left, center, right or justified.
-2. **Tab.** A button whose label names a view; the selected one is marked by an underline (`default`) or a filled pill (`pill`).
+2. **Tab.** A button whose label names a view, on one line; the selected one is marked by an underline on the strip's baseline (`default`) or a filled pill (`pill`), whose strip has no baseline.
 3. **Baseline.** The hairline under an underline strip that the selected bar sits on.
 4. **Panel.** The content one tab controls, shown below the strip.
 
@@ -121,7 +121,7 @@ Same group: `Breadcrumb` · `Link` · `MenuGroup` · `Pagination` · `Sidebar`
 | Hovered | The subtle neutral hovered fill. |
 | Pressed | The subtle neutral pressed fill. |
 | Focused | The 2px ring, 2px off the tab; no fill. |
-| Selected | Selected ink with the underline bar, or the bold fill with inverse ink in `pill`. |
+| Selected | Selected ink with the underline bar, or the neutral fill with the default ink in `pill`. |
 | Disabled | Disabled ink; the tab cannot be pressed or selected. |
 
 ### Tokens
@@ -133,8 +133,8 @@ Same group: `Breadcrumb` · `Link` · `MenuGroup` · `Pagination` · `Sidebar`
 | Ink | `--ds-text-subtle`, selected `--ds-text-selected`, disabled `--ds-text-disabled` |
 | Baseline and bar | `--ds-border`, `--border-default`; `--ds-border-selected`, `--border-selected` |
 | Hovered, pressed | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
-| Selected pill | `--ds-background-selected-bold`, `--ds-text-inverse`; `--ds-background-selected-bold-hovered`, `--ds-background-selected-bold-pressed` |
-| Gap | `--stack-md`, pill strip `--stack-sm` |
+| Selected pill | `--ds-background-neutral`, `--ds-text`; `--ds-background-neutral-hovered`, `--ds-background-neutral-pressed` |
+| Gap | `--stack-md`, pill strip `--inline-lg` (12) |
 | Panel offset | `--section-stack-sm` |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width` |
 
@@ -196,7 +196,7 @@ Implemented as `Panel`.
 
 ## Tokens touched
 
-`--body-default` · `--border-default` · `--border-selected` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected-bold` · `--ds-background-selected-bold-hovered` · `--ds-background-selected-bold-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-border-selected` · `--ds-text-disabled` · `--ds-text-inverse` · `--ds-text-selected` · `--ds-text-subtle` · `--item-height-md` · `--item-height-sm` · `--motion-duration-short` · `--motion-easing-standard` · `--pad-x-lg` · `--pad-x-md` · `--radius-full` · `--radius-md` · `--section-stack-sm` · `--stack-md` · `--stack-sm` · `--type-weight-medium`
+`--body-default` · `--border-default` · `--border-selected` · `--ds-background-neutral` · `--ds-background-neutral-hovered` · `--ds-background-neutral-pressed` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-border-selected` · `--ds-text` · `--ds-text-disabled` · `--ds-text-selected` · `--ds-text-subtle` · `--inline-lg` · `--item-height-md` · `--item-height-sm` · `--motion-duration-short` · `--motion-easing-standard` · `--pad-x-lg` · `--pad-x-md` · `--radius-full` · `--radius-md` · `--section-stack-sm` · `--stack-md` · `--type-weight-medium`
 
 From `design-system/src/components/navigation/Tabs/Tabs.scss`. Override these through the token layer, never with a literal.
 

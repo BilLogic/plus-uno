@@ -169,13 +169,13 @@ describe('Tabs — appearance', () => {
     it('applies the appearance and spacing classes to the root', () => {
         const { container } = renderTabs({ appearance: 'pill', spacing: 'compact' });
         const root = container.firstChild;
-        expect(root).toHaveClass('plus-tabs--pill');
-        expect(root).toHaveClass('plus-tabs--compact');
+        expect(root).toHaveClass('plus-tabs--appearance-pill');
+        expect(root).toHaveClass('plus-tabs--spacing-compact');
     });
 
     it('defaults to default spacing and declares no size prop', () => {
         const { container } = renderTabs();
-        expect(container.firstChild).toHaveClass('plus-tabs--default');
+        expect(container.firstChild).toHaveClass('plus-tabs--appearance-default');
         expect(Tabs.propTypes.size).toBeUndefined();
         expect(Tabs.propTypes.spacing).toBeDefined();
     });

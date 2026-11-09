@@ -136,19 +136,29 @@ export const Flag = ({
                     </div>
                 )}
             </div>
-            {bold && (
-                <IconButton
-                    icon={expanded ? 'chevron-up' : 'chevron-down'}
-                    label={expanded ? 'Collapse' : 'Expand'}
-                    appearance="subtle"
-                    className="plus-flag-expand"
-                    aria-expanded={expanded}
-                    onClick={() => setExpanded((open) => !open)}
-                />
+            {/*
+              * The controls share one row, centered on the title's first line,
+              * compact (24) as a flag's controls are. On a bold fill both take
+              * the inverse tone, so the chevron reads on the fill as the × does.
+              */}
+            {(bold || dismissible) && (
+                <div className="plus-flag-controls">
+                    {bold && (
+                        <IconButton
+                            icon={expanded ? 'chevron-up' : 'chevron-down'}
+                            label={expanded ? 'Collapse' : 'Expand'}
+                            appearance="subtle"
+                            spacing="compact"
+                            className="plus-flag-expand"
+                            aria-expanded={expanded}
+                            onClick={() => setExpanded((open) => !open)}
+                        />
+                    )}
+                    {/* The shared CloseButton, default tone on the flag's surface, or
+                        inverse on a bold one. A message is dismissed, not closed. */}
+                    {dismissible && <CloseButton label="Dismiss flag" spacing="compact" tone={bold ? 'inverse' : 'default'} onClick={onDismiss} />}
+                </div>
             )}
-            {/* The shared CloseButton, default tone on the flag's surface, or
-                inverse on a bold one. A message is dismissed, not closed. */}
-            {dismissible && <CloseButton label="Dismiss flag" tone={bold ? 'inverse' : 'default'} onClick={onDismiss} />}
         </div>
     );
 };

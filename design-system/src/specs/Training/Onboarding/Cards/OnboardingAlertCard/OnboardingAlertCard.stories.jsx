@@ -6,6 +6,7 @@
  */
 
 import React, { useState } from 'react';
+import { Button } from '@/components';
 import OnboardingAlertCard from './OnboardingAlertCard';
 import './OnboardingAlertCard.scss';
 
@@ -94,19 +95,9 @@ export const Interactive = {
         if (!visible) {
             return (
                 <div style={{ padding: 'var(--size-section-pad-y-lg)' }}>
-                    <button 
-                        onClick={() => setVisible(true)}
-                        style={{
-                            padding: '8px 16px',
-                            backgroundColor: 'var(--color-primary)',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer'
-                        }}
-                    >
+                    <Button appearance="primary" onClick={() => setVisible(true)}>
                         Show Alert Again
-                    </button>
+                    </Button>
                 </div>
             );
         }

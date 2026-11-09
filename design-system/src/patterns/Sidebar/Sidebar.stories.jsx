@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
-import { Breadcrumb, Sidebar as RoleSidebar } from '@/components';
+import { Breadcrumb, Sidebar as RoleSidebar, Button } from '@/components';
 import { Frame } from '@/patterns';
 import PatternSidebar, {
     createOpenTabsStore,
@@ -326,7 +326,7 @@ export const SectionsCollapsed = {
         const [key, remount] = useState(0);
         return (
             <div>
-                <button type="button" data-testid="remount" onClick={() => remount((k) => k + 1)}>Remount</button>
+                <Button data-testid="remount" onClick={() => remount((k) => k + 1)}>Remount</Button>
                 <Live key={key} {...args} />
             </div>
         );

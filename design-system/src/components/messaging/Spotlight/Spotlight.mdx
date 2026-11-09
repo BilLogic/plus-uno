@@ -30,6 +30,7 @@ export const StaticSpotlight = ({ headline, children, stepCount, primaryAction, 
     <div className="plus-spotlight" inert aria-hidden="true">
         <div className="plus-spotlight-header">
             <div className="plus-spotlight-dismiss">
+                {/* raw-button: mirrors the markup Spotlight.jsx renders for its own dismiss control; this copy is inert */}
                 <button type="button" className="plus-spotlight-dismiss-button" aria-label="Dismiss">
                     <i className="fa-solid fa-xmark" aria-hidden="true" />
                 </button>

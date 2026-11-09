@@ -1,153 +1,89 @@
 /*
- * Rich text editor — Figma 10010:37927. Toolbar uses DS Button + ButtonGroup; field uses tokens + body3.
+ * Rich text editor — Figma 10010:37927.
+ *
+ * ANATOMY. The label sits above one box, as a Field's does. The box has one
+ * border, `border.input`, and one fill, `background.input`, with the Text
+ * area's radius. Inside it the toolbar runs along the top, separated from the
+ * writing area by a 1px keyline in `border`; the writing area has no border
+ * of its own, so nothing is drawn twice.
+ *
+ * TOOLBAR. Flat subtle icon buttons (and the block-style menu, a subtle
+ * Button) in one row, 4 from the box's edge. Both presets draw it the same
+ * way: `compact` has five controls at 24, `full` every command at 32.
+ *
+ * FOCUS. The writing area is the control; the ring wraps the whole box, as
+ * a Field's does. Toolbar buttons draw their own.
  */
 @use '../../../styles/state' as *;
 
 .plus-rich-text-editor {
-    --rte-content-pad-x: var(--pad-x-sm);
-    --rte-content-pad-y: var(--space-025);
+    --rte-content-pad-x: var(--pad-x-md);
+    --rte-content-pad-y: var(--pad-y-lg);
 
     display: flex;
     flex-direction: column;
+    gap: var(--stack-sm);
     width: 100%;
     max-width: 56rem;
-    align-items: stretch;
-    background-color: var(--ds-background-input);
-    border-radius: var(--radius-md);
-    overflow: hidden;
     box-sizing: border-box;
 
-    // The writing area is the control; the ring wraps the whole editor, as a
-    // Field's does. Toolbar buttons draw their own.
-    &:has(.plus-rich-text-editor-content:focus-visible) {
-        @include plus-ring();
-    }
-
-    // `spacing="compact"` tightens the writing area's padding and minimum height.
+    // `spacing="compact"` tightens the writing area's padding.
     &.plus-rich-text-editor--compact {
-        --rte-content-pad-x: var(--pad-x-xs);
-        --rte-content-pad-y: var(--space-0125);
+        --rte-content-pad-x: var(--pad-x-sm);
+        --rte-content-pad-y: var(--pad-y-md);
     }
 
     &.plus-rich-text-editor--full {
         max-width: none;
-        border: var(--border-default) solid var(--ds-border-input);
-        border-radius: var(--radius-md);
     }
 }
 
-/* ========== Compact toolbar (DS components) ========== */
+/* The field's label: Body/default 14/20, above the box. */
+.plus-rich-text-editor-label {
+    font: var(--body-default);
+    color: var(--ds-text);
+}
 
-.plus-rich-text-editor:not(.plus-rich-text-editor--full) .plus-rich-text-editor-toolbar {
-    align-self: stretch;
-    width: 100%;
+.plus-rich-text-editor-box {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    box-sizing: border-box;
+    border: var(--border-default) solid var(--ds-border-input);
+    border-radius: var(--radius-0625);
+    background-color: var(--ds-background-input);
+    // The toolbar and the writing area keep to the rounded corners.
+    overflow: hidden;
+
+    &:has(.plus-rich-text-editor-content:focus-visible) {
+        @include plus-ring();
+    }
+}
+
+/* ========== Toolbar ========== */
+
+.plus-rich-text-editor-toolbar {
+    display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: var(--stack-md);
-    padding: var(--space-025) var(--pad-x-sm);
-    box-sizing: border-box;
-    background-color: var(--ds-surface-container);
+    padding: var(--pad-x-xs);
+    border-bottom: var(--border-default) solid var(--ds-border);
 }
 
-/* Block style: flat “text” control (no button chrome) — Figma Normal + arrows-up-down */
-.plus-rich-text-editor-block-toggle {
+// The clusters inside the toolbar: buttons in a cluster sit 4 apart.
+.plus-rich-text-editor-biu-cluster,
+.plus-rich-text-editor-ghost-tools,
+.plus-rich-text-editor-full-group {
     display: inline-flex;
-    flex-direction: row;
+    flex-wrap: wrap;
     align-items: center;
-    gap: var(--stack-md);
-    margin: 0;
-    padding: var(--space-025) var(--pad-x-sm);
-    border: none;
-    background-color: transparent;
-    box-shadow: none;
-    cursor: pointer;
-    color: var(--ds-text);
-    font: var(--body-small);
-    border-radius: var(--radius-md);
-
-    @include plus-state(
-        $states: (
-            hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
-            pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
-        ),
-        $hovered-selector: '&:hover:not(:disabled)',
-        $pressed-selector: '&:active:not(:disabled)'
-    );
-
-    &:disabled {
-        cursor: not-allowed;
-        opacity: var(--ds-opacity-disabled);
-    }
+    gap: var(--stack-sm);
 }
 
-.plus-rich-text-editor-block-toggle-caret .fa-solid {
-    font-size: var(--icon-sm);
-    line-height: 1;
-    color: var(--ds-icon-subtle);
+// The block-style menu reads as the current style, not as an action.
+.plus-rich-text-editor-block-toggle.plus-btn {
+    font-weight: var(--type-weight-regular);
 }
-
-/*
- * Compact icon row: Figma has no borders on individual icon hits — flat on
- * surface-container-high. Button's own transparent-edge default can still
- * read as a border on some tokens; strip it here only inside this toolbar.
- */
-.plus-rich-text-editor:not(.plus-rich-text-editor--full) .plus-rich-text-editor-toolbar {
-    .plus-btn {
-        border: none;
-        box-shadow: none;
-        background-color: transparent;
-
-        // The steps of a secondary ghost button, whose icons these are: the
-        // transparent rest above would otherwise drop Button's own.
-        @include plus-state(
-            $states: (
-                hovered: (background-color: var(--ds-background-neutral-subtle-hovered)),
-                pressed: (background-color: var(--ds-background-neutral-subtle-pressed)),
-            ),
-            $hovered-selector: '&:hover:not(:disabled):not(.active)',
-            $pressed-selector: '&:active:not(:disabled):not(.active)'
-        );
-
-        &.active {
-            background-color: var(--ds-background-selected);
-            color: var(--ds-text-selected);
-        }
-
-        &:disabled,
-        &.disabled {
-            background-color: transparent;
-            border: none;
-            opacity: var(--ds-opacity-disabled);
-        }
-    }
-
-    .plus-btn:not(.active) :is(.fa-solid, .fa-regular) {
-        color: var(--ds-icon-subtle);
-    }
-
-    .plus-btn.active :is(.fa-solid, .fa-regular) {
-        color: var(--ds-icon-selected);
-    }
-}
-
-.plus-rich-text-editor-biu-cluster {
-    display: inline-flex;
-    flex-direction: row;
-    align-items: center;
-    gap: var(--stack-md);
-}
-
-
-.plus-rich-text-editor-ghost-tools {
-    display: inline-flex;
-    flex-direction: row;
-    align-items: center;
-    gap: var(--stack-md);
-}
-
-/* Compact row: icon-only buttons use FA B3 via .body-small on parent scope — inherit from Button small */
 
 .plus-rich-text-editor-readonly .plus-rich-text-editor-toolbar,
 .plus-rich-text-editor-disabled .plus-rich-text-editor-toolbar {
@@ -155,53 +91,38 @@
     pointer-events: none;
 }
 
-/* ========== Full toolbar ========== */
-
-.plus-rich-text-editor--full .plus-rich-text-editor-toolbar {
-    padding: 0;
-    background: transparent;
-}
-
-.plus-rich-text-editor-full-group.plus-button-group {
-    flex-wrap: wrap;
-    max-width: 100%;
-}
+/* ========== Writing area ========== */
 
 .plus-rich-text-editor-content {
-    font: var(--body-default);
     flex: 1 1 auto;
     // 120 at least, growing with what is typed.
     min-height: var(--field-min-height-lg);
     padding: var(--rte-content-pad-y) var(--rte-content-pad-x);
-    color: var(--ds-text);
-    background-color: var(--ds-background-input);
     box-sizing: border-box;
-    border: var(--border-default) solid var(--ds-border-input);
-    font-weight: var(--type-weight-regular);
+    color: var(--ds-text);
+    font: var(--body-default);
+    text-align: start;
 
     &:focus {
         @include plus-ring-reset;
     }
 }
 
+// The placeholder sits where the first line of text will: at the start.
 .plus-rich-text-editor:not(.plus-rich-text-editor-has-value) .plus-rich-text-editor-content:empty::before {
     content: attr(data-placeholder);
     display: block;
-    width: 100%;
-    text-align: center;
     color: var(--ds-text-subtlest);
     pointer-events: none;
-    font-weight: var(--type-weight-regular);
+}
+
+.plus-rich-text-editor-readonly .plus-rich-text-editor-box,
+.plus-rich-text-editor-disabled .plus-rich-text-editor-box {
+    background-color: var(--ds-background-neutral);
 }
 
 .plus-rich-text-editor-readonly .plus-rich-text-editor-content,
 .plus-rich-text-editor-disabled .plus-rich-text-editor-content {
-    background-color: var(--ds-background-neutral);
     color: var(--ds-text-subtle);
     cursor: default;
-}
-
-/* The field's label: Body/default 14/20. */
-.plus-rich-text-editor-label {
-    font: var(--body-default);
 }
