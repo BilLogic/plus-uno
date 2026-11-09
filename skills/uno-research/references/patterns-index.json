@@ -11,11 +11,11 @@
     },
     {
       "name": "plus_component_first",
-      "rule": "Prefer PLUS components/forms/specs before generic framework primitives.",
+      "rule": "Prefer PLUS components and patterns before generic framework primitives.",
       "references": [
         "design-system/src/components",
         "design-system/src/components/forms-and-inputs",
-        "design-system/src/specs"
+        "design-system/src/patterns"
       ]
     },
     {
@@ -38,26 +38,26 @@
     },
     {
       "name": "responsive_verification",
-      "rule": "Use md/lg/xl checks and ResponsiveFrame patterns for page-level UI.",
+      "rule": "Use md/lg/xl checks for page-level UI; PageLayout's Frame resolves the layout from its own width.",
       "references": [
-        "design-system/src/specs/Universal/ResponsiveFrame.jsx"
+        "design-system/src/patterns/PageLayout/PageLayout.jsx",
+        "design-system/src/patterns/Frame/frameLayout.js"
       ]
     },
     {
       "name": "card_styling_alignment",
-      "rule": "Align section/chart card styling with admin spec patterns.",
+      "rule": "Build section and chart cards on the Card and Section patterns.",
       "references": [
-        "design-system/src/specs/Admin/Tutor/Cards/TutorDataCard/TutorDataCard.scss",
-        "design-system/src/specs/Admin/Student/Sections/StudentOverviewSection/StudentOverviewSection.scss",
-        "design-system/src/specs/Admin/Session/Sections/SessionOverviewSection/SessionOverviewSection.scss"
+        "design-system/src/patterns/PatternCard/PatternCard.scss",
+        "design-system/src/patterns/PatternSection/PatternSection.scss"
       ]
     },
     {
       "name": "table_styling_alignment",
-      "rule": "Respect global table behavior and align table SCSS with admin implementations.",
+      "rule": "Respect global table behavior and build tables on the Table pattern.",
       "references": [
         "design-system/src/styles/main.scss",
-        "design-system/src/specs/Admin/Student/Tables/StudentsTable/StudentsTable.scss"
+        "design-system/src/patterns/PatternTable/PatternTable.scss"
       ]
     },
     {

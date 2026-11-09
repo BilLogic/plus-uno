@@ -30,7 +30,7 @@ a. **Ask for a Figma file first — one question, before any build:** *"Do you
      variables translate to tokens via `design-system/figma/token-registry.json`.
    - **No** → build from the confirmed plan on the design system directly.
 b. Scaffold: `bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>`
-   — copies `prototypes/starter/`, patches the name, picks the next free port
+   — writes the Vite app with a first page in `PageLayout`, names it, picks the next free port
    (details: `docs/engineering/setup.md`; config shape:
    `skills/uno-prototype/examples/vite-config-example.js`).
 c. **Load the design system before any component or token use, in this

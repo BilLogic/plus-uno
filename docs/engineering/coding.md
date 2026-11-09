@@ -11,7 +11,7 @@ summary: How to write code in this repo — barrel imports, tokens over literals
 
 - **Components**: PascalCase directories and files (e.g., `Button/Button.jsx`, `Alert/Alert.scss`)
 - **Stories**: Co-located with component (e.g., `Button.stories.jsx`)
-- **Prototypes**: kebab-case directories (e.g., `prototypes/home-redesign/`)
+- **Prototypes**: kebab-case directories (e.g., `prototypes/tutor-revamp/`)
 - **Docs**: kebab-case with a date prefix for plans (e.g., `2026-04-11-001-refactor-three-tier-context-architecture-plan.md`)
 - **Prompt-specs**: same folder, same date prefix, `-spec` suffix (`docs/plans/YYYY-MM-DD-NNN-<slug>-<deliverable>-spec.md`). `uno-prototype`'s spec-handoff deliverables — text handed to an external design tool, not code, so nothing builds them.
 
@@ -64,14 +64,8 @@ import '@/styles/globals.scss';
 (`@/components/forms-and-inputs/Button/Button`), `_internal/` paths, and the `@plus-ds`
 alias.
 
-**What the code actually does**, so the rule is read for what it is rather than
-as a description: about 400 deep imports live inside `design-system/src/specs/`
-and roughly 70 call sites use the barrel. The spec-side deep imports predate the
-rule and are **grandfathered** — they are not a license to copy the pattern into
-a new file, and sweeping them is its own piece of work, not a side effect of
-touching a neighboring line. Two cases are not violations at all: a component
-importing its own siblings inside `design-system/src/components/`, and a spec
-shell imported from its area group index (`@/specs/Universal/Pages`).
+One case is not a violation: a component importing its own siblings inside
+`design-system/src/components/`.
 
 ## Token usage
 
@@ -97,7 +91,7 @@ Use design tokens everywhere — never hardcode colors, spacing, typography, or 
 - Each prototype lives at `prototypes/{project-name}/` (flat, no creator grouping)
 - Each has its own `vite.config.js` with `@` alias pointing to `../../design-system/src`
 - Creator info is metadata in the prototype's README or marketplace data, not the directory name
-- `src/pages/PrototypeMarket/prototypes-data.js` is a LEGACY routing registry for the live-app shell — do not add new experiment IDs for `main` (`skills/uno-publish/references/marketplace.md`); new prototypes register in the Notion marketplace DB
+- New prototypes register in the Notion marketplace DB (`skills/uno-publish/references/marketplace.md`)
 
 ## Token workflow
 

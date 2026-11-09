@@ -42,7 +42,7 @@ To look a name, prop, token or rule up without reading files, ask the `ds` comma
 **Build UI with components**
 → `agent-views/components/index.md` (does it exist?) → the component's generated doc, linked from that index (props, variants, tokens touched) → `agent-views/tokens/tokens.md` if styling beyond them
 
-**Start a page or a container from a pattern**: `PageLayout` (from `@/specs/Universal/Pages`) for every full page; `Frame`, `PatternSidebar`, `Page`, `PatternSection`, `PatternCard`, `PatternTable`, `PatternModal`, `PatternDrawer`, `Blanket` and `AiChat` from `@/patterns`; the Popups (`DropdownMenu`, `Popup`, `Flag`, `Tooltip`) from `@/components`. When to reach for each: `agent-views/components/index.md` § Patterns.
+**Start a page or a container from a pattern**: `PageLayout` for every full page; `Frame`, `PatternSidebar`, `Page`, `PatternSection`, `PatternCard`, `PatternTable`, `PatternModal`, `PatternDrawer`, `Blanket` and `AiChat` from `@/patterns`; the Popups (`DropdownMenu`, `Popup`, `Flag`, `Tooltip`) from `@/components`. When to reach for each: `agent-views/components/index.md` § Patterns.
 
 **Build a page or dashboard**
 → `agent-views/components/index.md` § Patterns (`PageLayout` and the Section, Card and Table shells, with their imports) → `composition/layout.md` → `composition/hierarchy.md` → `src/styles/Grid.mdx`
@@ -133,7 +133,7 @@ product decisions.
 ### Implementation
 
 - **PLUS components first** — fall back to generic React-Bootstrap only where no PLUS equivalent exists.
-- **Barrel imports** — public components (forms and dataviz included) are named exports from `@/components`; spec shells come from spec group indexes such as `@/specs/Universal/Pages`. There is no `@/specs` root barrel.
+- **Barrel imports** — public components (forms and dataviz included) are named exports from `@/components`; patterns, `PageLayout` among them, from `@/patterns`.
 - **Figma registries are law** — for design-to-code, load `design-system/figma/component-registry.json` and `token-registry.json` before mapping nodes or tokens.
 - **No hallucinated props or layouts** — use the skeletons in `composition/layout.md` and read the source for prop names.
 - **Minimal scope** — match surrounding conventions; do not add unrelated changes.

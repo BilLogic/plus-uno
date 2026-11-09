@@ -15,15 +15,13 @@ vocabulary, that is `GLOSSARY.md`. Neither is required to get a dev server up.
 git clone https://github.com/BilLogic/plus-uno.git
 cd plus-uno
 npm install
-npm run dev          # Vite app shell (4100) + Storybook (4200)
+npm run dev          # Storybook (4200)
 ```
 
 | Where | What you get |
 |-------|--------------|
 | [localhost:4200](http://localhost:4200) | Storybook — the design system, and the source of truth for what a component does |
-| [localhost:4100/home](http://localhost:4100/home) | The live app (`npm run dev:app`) |
-| `npm run dev:demo` | The Full Demo Walkthrough |
-| `npm run dev:<slug>` | A single prototype, e.g. `dev:home-redesign` |
+| `npm run dev:<slug>` | A single prototype, e.g. `dev:tutor-revamp` |
 
 Every command lives in `package.json`. It is the only place a command or a
 version is stated — if a doc lists one, the doc is wrong.
@@ -35,8 +33,8 @@ confusion:
 
 | Thing | Where | What it is |
 |-------|-------|------------|
-| **Design system** | `design-system/src/` | The components, tokens and specs. Published as Storybook. |
-| **Prototypes** | `prototypes/` | Standalone Vite apps, one per idea. `prototypes/starter/` is the template. |
+| **Design system** | `design-system/src/` | The components, patterns and tokens. Published as Storybook. |
+| **Prototypes** | `prototypes/` | Standalone Vite apps, one per idea. `skills/uno-prototype/scripts/scaffold-prototype.sh` writes a new one. |
 | **The harness** | `AGENTS.md`, `skills/`, `agents/`, `docs/` | What agents read. Not shipped to users. |
 | **uno-bot** | `agents/uno-bot/` | The Slack embodiment — a Cloudflare Worker, deployed separately. |
 

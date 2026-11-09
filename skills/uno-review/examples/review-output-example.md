@@ -7,7 +7,7 @@ embodiment: ide
 ## PASS — No violations
 
 ```
-PLUS Review: prototypes/home-redesign/src
+PLUS Review: prototypes/tutor-revamp/src
 ===
   PASS  No hardcoded hex colors
   PASS  No raw HTML form elements (using DS components)

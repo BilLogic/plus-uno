@@ -24,7 +24,7 @@ summary: How to find out whether a component already exists before proposing a n
 3. Understand hierarchy before implementing
 - Primitives/tokens: `design-system/src/tokens/*`
 - Reusable components: `design-system/src/components/*`, `design-system/src/components/forms-and-inputs/*`, `design-system/src/DataViz/*`
-- Higher-level compositions/specs: `design-system/src/specs/*`
+- Higher-level compositions (Frame, Page, Section, Card, Table, overlays, templates): `design-system/src/patterns/*`
 
 4. Decide when to ask vs proceed
 - Ask when design intent is ambiguous, target context level is unclear, or multiple component families fit equally.

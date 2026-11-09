@@ -33,15 +33,13 @@ import '@/styles/main.scss';
 - `design-system/src/index.js`
 - `design-system/src/components/index.js` (form elements live in `design-system/src/components/forms-and-inputs/`, re-exported via this barrel)
 
-**New files import from the barrel.** Existing deep imports inside
-`design-system/src/specs/` are grandfathered — see `coding.md` § Imports for the
-full rule and what the code actually does.
+**Files import from the barrel** — see `coding.md` § Imports for the full rule.
 
 ## Package Structure
 
 ```
 design-system/
-  src/           # DS source (components, forms, specs, tokens, styles, MDX)
+  src/           # DS source (components, patterns, tokens, styles, MDX)
   guidelines/    # Authored DS protocol (foundations, components, composition, figma)
   agent-views/   # Generated facts — component index, forms redirect, token list
   figma/         # Registries + alignment runbooks
@@ -54,13 +52,13 @@ skills/         # Workflow skills (uno-prototype, uno-review, …)
 ## Prototype conventions
 
 - Experiments: `prototypes/{project-name}/` on a **feature branch** (flat, kebab-case)
-- **Starter template:** scaffold with `bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>` — copies `prototypes/starter/` (DS aliases, SCSS config, shared React resolution) and sets the `index.html` title and an unused `server.port` (check `prototypes/*/vite.config.js`; range ~3000–3025)
+- **Scaffold:** `bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>` writes the prototype (DS aliases, SCSS config, shared React resolution, a first page in `PageLayout`) with its `index.html` title and the next unused `server.port`
 - Each prototype has its own `vite.config.js` with `@` → `../../design-system/src`
 - Register in **Notion Marketplace** with the Deploy Preview / standalone URL — do **not** add numeric SPA routes on `main`
 - Optional local script: `"dev:{project-name}": "vite --config prototypes/{project-name}/vite.config.js"` (branch only)
-- **Production on `main`:** live app (`/home`) + Full Demo Walkthrough (`/demo/demo.html`, id `1028`) via `prototypes/home-redesign/`
+- **Production on `main`:** Storybook + the tutor revamp (`/prototypes/tutor-revamp/`). The Vibe app and the Full Demo Walkthrough are on the `archive/legacy-ds` branch; `/home`, `/app` and `/demo` redirect to Storybook
 
-**Starter includes:**
+**The scaffold writes:**
 
 | File | Purpose |
 |------|---------|
@@ -73,11 +71,11 @@ skills/         # Workflow skills (uno-prototype, uno-review, …)
 `https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@7.2.0/css/all.min.css`.
 That is the host and path that serve FA 7's `all.min.css`; the cdnjs path most
 agents reach for by habit is laid out differently for FA 7 and the icons come up
-blank. Copy the `<link>` from `prototypes/starter/index.html` rather than typing
+blank. Copy the `<link>` from `prototypes/tutor-revamp/index.html` rather than typing
 it. Icons themselves are FA Free — `fa-solid`, `fa-regular`, `fa-brands`
 (AGENTS.md § Hard rules 3).
 
-**Minimal structure** (if not using starter):
+**Minimal structure** (if not using the scaffold):
 
 ```
 prototypes/{project-name}/
@@ -89,7 +87,7 @@ prototypes/{project-name}/
 
 ## Example Selection
 
-When mirroring existing code: nearest `*.stories.jsx` → matching `specs/**` → `prototypes/**`.
+When mirroring existing code: nearest `*.stories.jsx` → `prototypes/**`.
 
 ## Bootstrap & Providers
 
@@ -273,7 +271,7 @@ _Avoid_: "the whitelist", "the exceptions file", "the allow-list"
 
 ## The ds-usage post-edit hook
 
-After an agent edits a file in `prototypes/` or `src/`, `.cursor/hooks/ds-usage/post-edit.mjs` runs `check:ds-usage` on that file and hands any fail-level escape back to the agent, with its fix, so the agent corrects it before going on. The file is held to zero, as the checker holds any file a change touches, so escapes recorded in the baseline come back too. Edits anywhere else return at once.
+After an agent edits a file in `prototypes/`, `.cursor/hooks/ds-usage/post-edit.mjs` runs `check:ds-usage` on that file and hands any fail-level escape back to the agent, with its fix, so the agent corrects it before going on. The file is held to zero, as the checker holds any file a change touches, so escapes recorded in the baseline come back too. Edits anywhere else return at once.
 
 - **Claude Code**: `PostToolUse` on `Edit|Write|MultiEdit` in `.claude/settings.json`. Exit 2 puts the findings in front of the agent; the edit itself has already landed.
 - **Cursor**: `afterFileEdit` in `.cursor/hooks.json`. Cursor takes no reply from this event, so there it only logs.
@@ -355,12 +353,11 @@ Two kinds of failure, two mechanisms:
   changes no byte.
 - **The component language is a hard ban** (`check:ads-language`): old names,
   props, state steps and words are findings wherever they appear in
-  `design-system/src`, `prototypes` and `src`. There is no baseline and no
+  `design-system/src` and `prototypes`. There is no baseline and no
   `--update`; a citation that must stay is named in the check itself.
 - **The old design system is a hard ban** (`check:old-system`): a name from a
   token family generated from an archived Figma collection fails anywhere in
-  `design-system/src`, `prototypes` and `src` outside `design-system/src/specs/`,
-  comments included. There is no baseline; each family that moves to the current
+  `design-system/src` and `prototypes`, comments included. There is no baseline; each family that moves to the current
   system adds its row to the check.
 - **The harness and docs records read it too** (#601) — the glossary's prose
   count, the negation scopes with their corpus floors, and the benchmark's
@@ -390,9 +387,9 @@ Two kinds of failure, two mechanisms:
 block costs runtime on every PR, so the set is chosen rather than grown: a
 component earns one when its behavior *is* the product and its usage is high
 enough that a break is expensive. Usage is #166's measurement, recorded in
-`design-system/guidelines/components/overview.md` and re-run on today's tree:
-files under `design-system/src/specs/` and `prototypes/` that import a component
-and render it. Ranked that way, #209 took `Modal` (33 files), `Select` (24),
+`design-system/guidelines/components/overview.md`: files under the Specs code
+and `prototypes/` that imported a component and rendered it, measured before the
+Specs code left `main`. Ranked that way, #209 took `Modal` (33 files), `Select` (24),
 `Pagination` (13) and `Tabs` (11) — the four highest-usage components that
 are pure state machines and had no interaction cover.
 
@@ -445,9 +442,8 @@ Tests: `npm run test:scripts`.
 ## Local Preview
 
 ```bash
-npm run build
-npm run preview:react -- --host 127.0.0.1 --port 8080 --strictPort
-# Storybook: npm run storybook → http://127.0.0.1:4200
+npm run storybook          # http://127.0.0.1:4200
+npm run dev:tutor-revamp   # the tutor revamp prototype
 ```
 
 ## File Naming

@@ -35,20 +35,13 @@ See also `design-system/src/styles/Accessibility.mdx`.
 ## Before Finishing
 
 - [ ] Tokens only — no hardcoded visual values where DS tokens exist
-- [ ] PLUS components/specs before generic framework substitutions
+- [ ] PLUS components and patterns before generic framework substitutions
 - [ ] Storybook stories updated for changed behavior/states
-- [ ] Responsive at `md`, `lg`, `xl` — use `ResponsiveFrame` patterns for page-level work
+- [ ] Responsive at `md`, `lg`, `xl` — page-level work sits in `PageLayout`, whose Frame resolves the layout from its own width
 - [ ] Accessibility pass (focus, keyboard, labels, contrast)
 
-## Spec References (common patterns)
+## Pattern references
 
-**Card surfaces in admin contexts:**
-- `design-system/src/specs/Admin/Tutor Admin/Cards/TutorDataCard/TutorDataCard.scss`
-- `design-system/src/specs/Admin/Student Admin/Sections/StudentOverviewSection/StudentOverviewSection.scss`
-
-**Table styling:**
-- Respect global table reset in `design-system/src/styles/main.scss`
-- Reference: `design-system/src/specs/Admin/Student Admin/Tables/StudentsTable/StudentsTable.scss`
-
-**Responsive verification:**
-- `design-system/src/specs/Universal/ResponsiveFrame.jsx`
+- **Card surfaces:** `design-system/src/patterns/PatternCard/`
+- **Tables:** `design-system/src/patterns/PatternTable/`; respect the global table reset in `design-system/src/styles/main.scss`
+- **Page layout and breakpoints:** `design-system/src/patterns/PageLayout/` and `design-system/src/patterns/Frame/`

@@ -19,7 +19,7 @@ Under `scenarios/ds-usage/`, each a `BRIEF.md` (plus `frame.png` for the frame t
 | `frame-to-code` | a component from an exported design frame |
 | `trap-missing-component` | a drag-and-drop board PLUS has no component for: the right answer names the gap |
 | `two-page-flow` | a supervisor's escalation list and detail pages, each with its own address and navigation between them |
-| `debt-extend` | a filter added to a file that already carries recorded debt: a trimmed copy of `prototypes/monthly-report/src/MonthlyReportsListContent.jsx`, with the 4 deep imports and 2 raw literals the baseline holds for it. The post-edit hook hands that debt back on the first edit; the score shows whether it was paid |
+| `debt-extend` | a filter added to a file that already carries recorded debt: a trimmed copy of `prototypes/monthly-report/src/MonthlyReportsListContent.jsx` (now on the `archive/legacy-ds` branch), with the 4 deep imports and 2 raw literals the baseline held for it. The post-edit hook hands that debt back on the first edit; the score shows whether it was paid |
 | `migrate-retired` | a call-off confirmation written in retired names (`Alert`, `Toast`, `Badge`, `size`/`fill`/`variant`, `--size-element-*`, `--color-surface-container`) to bring current, as the brief itself asks in those names |
 | `forbidden-ask` | an onboarding checklist whose brief asks for Font Awesome duotone (Pro) icons and a hex color: the right answer names both rules and takes the compliant path |
 

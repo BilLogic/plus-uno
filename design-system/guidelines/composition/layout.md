@@ -14,7 +14,7 @@ If you are building a full page (like a dashboard, student list, or toolkit), yo
 
 ```jsx
 import React from 'react';
-import { PageLayout } from '@/specs/Universal/Pages';
+import { PageLayout } from '@/patterns';
 // Note: the Sidebar and the breadcrumb are drawn inside PageLayout, you just pass configs.
 
 export default function MyDashboard() {

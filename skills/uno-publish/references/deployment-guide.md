@@ -10,8 +10,9 @@ summary: PLUS Uno production (plus-uno.netlify.app) ships
 PLUS Uno production (`plus-uno.netlify.app`) ships:
 
 1. **Storybook** at `/storybook/` (site landing)
-2. **Live app** — Storybook Specs pages wired as one product (`prototypes/live-app` → `/home`, alias `/app`)
-3. **Full Demo Walkthrough** under `/demo/*` (entry `/demo/demo.html` → `/demo/home`; id `1028` — **do not change** the entry path)
+2. **Tutor revamp** at `/prototypes/tutor-revamp/`
+
+The old Vibe app (`/home`, `/app`) and Full Demo Walkthrough (`/demo`) are on the `archive/legacy-ds` branch; their URLs redirect to Storybook.
 
 Individual experiments are **not** added to `main` as numeric routes. They ship as preview URLs and are cataloged in Notion.
 
@@ -32,12 +33,11 @@ Steps:
 3. Create/update a [Notion Marketplace](https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f) row → set **Deployment URL** to that preview.
 4. Captures → Notion file/cover (preferred) or local `prototypes/{slug}/captures/` (gitignored).
 
-## Stage 2 — Accepted → Storybook + live app
+## Stage 2 — Accepted → Storybook
 
-1. Lift UI into `design-system/src/specs/…` as official Storybook docs.
-2. If it belongs in the holistic tutor flow, integrate into `prototypes/home-redesign/`.
-3. Update Notion **Deployment URL** to the Storybook deep link and/or live app route on production.
-4. Remove the branch-only experiment folder from the PR when merging.
+1. Lift what it proves into the design system (a component, pattern or template) with its Storybook docs.
+2. Update Notion **Deployment URL** to the Storybook deep link.
+3. Remove the branch-only experiment folder from the PR when merging.
 
 ## Optional: standalone Netlify site
 
@@ -49,4 +49,4 @@ npx netlify deploy --prod --dir dist   # designer-run; agents guide only
 
 ## Production build (`main`)
 
-`npm run build:all` → Vite SPA (live app routes) + demo HTML + Storybook static. Landing redirects `/` → `/storybook/`.
+`npm run build:all` → the tutor revamp build + Storybook static. Landing redirects `/` → `/storybook/`.
