@@ -6,7 +6,7 @@ import Carousel from './Carousel/Carousel';
 /**
  * What a `Carousel` slide does with a string.
  *
- * WHY THIS FILE EXISTS (#316). `slides[].content` is typed `string | node`, and
+ * WHY THIS FILE EXISTS (#316). `slides[].media` is typed `string | node`, and
  * the string branch had two destinations: a path ending in an image extension
  * became an `img`, and everything else was written into the DOM with
  * `dangerouslySetInnerHTML`. `slides` is a public prop, so any caller piping a
@@ -44,7 +44,7 @@ export const StringSlidesRenderAsText = () => (
     <div style={{ maxWidth: '640px' }}>
         <Carousel
             aria-label="Session notes"
-            slides={[{ content: untrusted }]}
+            slides={[{ media: untrusted }]}
             autoplay={false}
             data-testid="sce-carousel"
         />
@@ -72,7 +72,7 @@ export const ImagePathsStillRenderAsImages = () => (
     <div style={{ maxWidth: '640px' }}>
         <Carousel
             aria-label="Session notes"
-            slides={[{ content: '/logo.svg', alt: 'A slide' }]}
+            slides={[{ media: '/logo.svg', alt: 'A slide' }]}
             autoplay={false}
         />
     </div>

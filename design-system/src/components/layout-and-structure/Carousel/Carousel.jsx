@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 // Component folders, not the barrel: the barrel exports Carousel itself, so
 // importing it from here would read Carousel before it is defined.
 import IconButton from '@/components/forms-and-inputs/IconButton';
-import ProgressIndicator from '@/components/status-indicators/ProgressIndicator';
 import Heading from '@/components/text-and-data-display/Heading';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './Carousel.scss';
@@ -97,12 +96,12 @@ const useCaptionSwap = (index, animate, rootRef) => {
     return [shown, phase];
 };
 
-const SlideContent = ({ item, index }) => {
-    if (typeof item.content === 'string' && IMAGE_PATH.test(item.content)) {
+const SlideMedia = ({ item, index }) => {
+    if (typeof item.media === 'string' && IMAGE_PATH.test(item.media)) {
         return (
             <img
                 className="plus-carousel-image"
-                src={item.content}
+                src={item.media}
                 alt={item.alt ?? item.title ?? `Slide ${index + 1}`}
             />
         );
@@ -110,27 +109,29 @@ const SlideContent = ({ item, index }) => {
     // A string renders as text, never as markup: `slides` is a public prop, so
     // whatever a caller pipes through it stays escaped. A caller holding
     // trusted HTML passes their own element and owns that decision.
-    return <div className="plus-carousel-content">{item.content}</div>;
+    return <div className="plus-carousel-content">{item.media}</div>;
 };
 
 /**
  * Carousel
- * A centered stage of slides: the active one full size, one neighbor on each
- * side in the same flat row, smaller and dimmed. Under it, a play button whose
- * ring fills over the slide's time, a dot per slide, and a caption that
+ * A centered stage of slides: the active one full size and, with `peek`, one
+ * neighbor on each side in the same flat row, smaller and faded. Under it, a
+ * play button whose ring fills over the slide's time, a pill per slide (the
+ * active one stretches and fills on the same clock), and a caption that
  * changes with the slide. Autoplay holds while the pointer rests on the stage,
  * keyboard focus is inside, the carousel is out of view or the tab is hidden.
  * Under reduced motion it never moves on its own: arrows replace the play
- * button and every move is instant.
+ * button, the active pill shows full and every move is instant.
  */
 const Carousel = ({
     slides = [],
     autoplay = true,
-    interval = 6000,
+    interval = 5000,
+    peek = true,
     loop = true,
     aspectRatio = 16 / 10,
     defaultIndex = 0,
-    onIndexChange,
+    onSlideChange,
     className,
     style,
     'aria-label': ariaLabel,
@@ -163,8 +164,8 @@ const Carousel = ({
         rootRef.current?.style.setProperty('--carousel-progress', progress.toFixed(4));
     }, []);
 
-    const onIndexChangeRef = useRef(onIndexChange);
-    onIndexChangeRef.current = onIndexChange;
+    const onSlideChangeRef = useRef(onSlideChange);
+    onSlideChangeRef.current = onSlideChange;
 
     const goTo = useCallback((target) => {
         if (count === 0) return;
@@ -176,11 +177,11 @@ const Carousel = ({
         if (next === indexRef.current) return;
         indexRef.current = next;
         setIndex(next);
-        onIndexChangeRef.current?.(next);
+        onSlideChangeRef.current?.(next);
     }, [count, paint, wraps]);
 
-    // The clock: one frame loop writing a single progress value the ring
-    // reads. It holds, and resumes where it held.
+    // The clock: one frame loop writing a single progress value the ring and
+    // the active pill both read. It holds, and resumes where it held.
     const running = autoplays && !paused && !hovered && !focusHeld && inView && !pageHidden;
     useEffect(() => {
         if (!running) return undefined;
@@ -269,6 +270,8 @@ const Carousel = ({
     const classes = [
         'plus-carousel',
         paused && 'plus-carousel--paused',
+        isStatic && 'plus-carousel--static',
+        !peek && 'plus-carousel--no-peek',
         reduced && 'plus-carousel--reduced',
         className,
     ].filter(Boolean).join(' ');
@@ -321,7 +324,7 @@ const Carousel = ({
                                 }}
                             >
                                 <div className="plus-carousel-card" inert={!active}>
-                                    <SlideContent item={item} index={k} />
+                                    <SlideMedia item={item} index={k} />
                                 </div>
                             </div>
                         );
@@ -360,13 +363,27 @@ const Carousel = ({
                             onClick={() => goTo(index - 1)}
                         />
                     )}
-                    <ProgressIndicator
-                        values={slides.map((item, k) => `Slide ${k + 1} of ${count}${item.title ? `: ${item.title}` : ''}`)}
-                        selectedIndex={index}
-                        appearance="primary"
-                        label="Choose a slide"
-                        onSelect={({ index: chosen }) => goTo(chosen)}
-                    />
+                    {/*
+                      * A pill per slide. The active one stretches and its fill
+                      * grows on the slide's clock; under reduced motion or
+                      * without autoplay it shows full.
+                      */}
+                    <div className="plus-carousel-pills" role="group" aria-label="Choose a slide">
+                        {slides.map((item, k) => (
+                            <button
+                                key={item.id ?? k}
+                                type="button"
+                                className={['plus-carousel-pill', k === index && 'plus-carousel-pill--active'].filter(Boolean).join(' ')}
+                                aria-label={`Slide ${k + 1} of ${count}${item.title ? `: ${item.title}` : ''}`}
+                                aria-current={k === index ? 'true' : undefined}
+                                onClick={() => goTo(k)}
+                            >
+                                <span className="plus-carousel-pill-track" aria-hidden="true">
+                                    <span className="plus-carousel-pill-fill" />
+                                </span>
+                            </button>
+                        ))}
+                    </div>
                     {isStatic && (
                         <IconButton
                             icon="fa-solid fa-chevron-right"
@@ -402,18 +419,20 @@ const requireName = (props, propName, componentName) => {
 };
 
 Carousel.propTypes = {
-    /** The slides, in order. `content` is the card; `title` and `description` fill the caption and name the dot. A string `content` renders as text, or as an image when it is a path ending in an image extension (`alt` describes it). */
+    /** The slides, in order. `media` is the card; `title` and `description` fill the caption and name the pill. A string `media` renders as text, or as an image when it is a path ending in an image extension (`alt` describes it). */
     slides: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        content: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
+        media: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
         title: PropTypes.string,
         description: PropTypes.string,
         alt: PropTypes.string,
     })),
     /** Moves to the next slide on its own, with a play button to stop it. Off under reduced motion, where arrows show instead. Defaults to `true`. */
     autoplay: PropTypes.bool,
-    /** Milliseconds each slide shows before the next. Defaults to `6000`. */
+    /** Milliseconds each slide shows before the next. Defaults to `5000`. */
     interval: PropTypes.number,
+    /** Shows the neighbors at each side, smaller and faded. Off, only the current slide shows. Defaults to `true`. */
+    peek: PropTypes.bool,
     /** Lets the arrows and arrow keys wrap from the last slide to the first. Autoplay always wraps. Defaults to `true`. */
     loop: PropTypes.bool,
     /** Width over height of a slide. Defaults to `16 / 10`. */
@@ -421,7 +440,7 @@ Carousel.propTypes = {
     /** The slide shown first. Defaults to `0`. */
     defaultIndex: PropTypes.number,
     /** Called with the new index whenever the slide changes. */
-    onIndexChange: PropTypes.func,
+    onSlideChange: PropTypes.func,
     /** Extra class names on the root, beside `plus-carousel`. */
     className: PropTypes.string,
     /** Inline styles on the root. */

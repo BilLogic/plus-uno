@@ -98,9 +98,9 @@ export const webAppSourceSnippets = {
         '<Carousel',
         '  aria-label="What\'s new for tutors"',
         '  slides={[',
-        '    { title: \'Prep a session in two minutes\', description: \'See goals and notes before you join.\', content: <SessionPrepArt /> },',
-        '    { title: \'Reflect while it is fresh\', description: \'Record what worked and what to try next.\', content: <ReflectionArt /> },',
-        '    { title: \'Training between sessions\', description: \'Lessons run ten minutes or less.\', content: <TrainingArt /> },',
+        '    { title: \'Prep a session in two minutes\', description: \'See goals and notes before you join.\', media: <SessionPrepArt /> },',
+        '    { title: \'Reflect while it is fresh\', description: \'Record what worked and what to try next.\', media: <ReflectionArt /> },',
+        '    { title: \'Training between sessions\', description: \'Lessons run ten minutes or less.\', media: <TrainingArt /> },',
         '  ]}',
         '/>'
     ]),

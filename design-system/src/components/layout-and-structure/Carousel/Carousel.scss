@@ -7,9 +7,10 @@
  * play button in its ring and the dots, or arrows and the dots when it does
  * not autoplay), then the caption.
  *
- * The controls are PLUS components (IconButton, ProgressIndicator, Heading)
- * and keep their own states; this sheet only lays them out and draws the
- * ring. `--carousel-progress` (0 to 1) is written by the component's clock.
+ * The play button and arrows are IconButtons and the caption title a Heading;
+ * they keep their own states. This sheet lays them out and draws the ring and
+ * the pills. `--carousel-progress` (0 to 1) is written by the component's
+ * clock; the ring and the active pill both read it.
  *
  * Placement is CSS: the stage is a size container, the slide width is a share
  * of it, and each slide reads its `--carousel-offset` from the active one.
@@ -198,9 +199,78 @@
     stroke-dashoffset: calc(1 - var(--carousel-progress));
 }
 
-// Paused, the arc holds where it stopped and turns neutral.
-.plus-carousel--paused .plus-carousel-ring-progress {
-    stroke: var(--ds-icon-subtle);
+// --- PILLS ---
+// A pill per slide. The button is the 24px target; the track inside it is the
+// visible mark: an 8px dot, or for the active slide a 32px pill whose brand
+// fill grows left to right on the clock.
+.plus-carousel-pills {
+    display: flex;
+    align-items: center;
+}
+
+.plus-carousel-pill {
+    display: grid;
+    place-items: center;
+    min-width: var(--control-sm);
+    height: var(--control-sm);
+    padding: 0 var(--inline-md);
+    border: none;
+    border-radius: var(--radius-full);
+    background: none;
+    cursor: pointer;
+
+    @include plus-state((
+        hovered: (--carousel-pill-track: var(--ds-border-bold)),
+        pressed: (--carousel-pill-track: var(--ds-border-bold)),
+    ));
+}
+
+.plus-carousel-pill-track {
+    position: relative;
+    display: block;
+    width: var(--progress-indicator-dot-size-8);
+    height: var(--progress-indicator-dot-size-8);
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background-color: var(--carousel-pill-track, var(--ds-border));
+    transition: width var(--motion-duration-medium) var(--motion-easing-standard);
+}
+
+.plus-carousel-pill-fill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-color: var(--ds-background-brand-bold);
+    transform: scaleX(0);
+    transform-origin: left center;
+}
+
+.plus-carousel-pill--active .plus-carousel-pill-track {
+    width: var(--control-md);
+}
+
+.plus-carousel-pill--active .plus-carousel-pill-fill {
+    transform: scaleX(var(--carousel-progress));
+}
+
+// Without the clock (reduced motion, or no autoplay) the active pill is full.
+.plus-carousel--static .plus-carousel-pill--active .plus-carousel-pill-fill {
+    transform: scaleX(1);
+}
+
+// Right to left, the fill grows from the right.
+[dir='rtl'] .plus-carousel-pill-fill {
+    transform-origin: right center;
+}
+
+@media (forced-colors: active) {
+    .plus-carousel-pill-track {
+        background-color: GrayText;
+    }
+
+    .plus-carousel-pill-fill {
+        background-color: Highlight;
+    }
 }
 
 // --- CAPTION ---
@@ -239,12 +309,26 @@
     text-wrap: pretty;
 }
 
+// --- NO PEEK ---
+// Only the current slide shows; the stage drops its edge fade.
+.plus-carousel--no-peek {
+    .plus-carousel-stage {
+        mask-image: none;
+    }
+
+    .plus-carousel-slide:not(.plus-carousel-slide--active) {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
 // --- REDUCED MOTION ---
 // The same flat row, with every move and swap in one step.
 .plus-carousel--reduced {
     .plus-carousel-slide,
     .plus-carousel-card::after,
-    .plus-carousel-caption-inner {
+    .plus-carousel-caption-inner,
+    .plus-carousel-pill-track {
         transition: none;
     }
 }

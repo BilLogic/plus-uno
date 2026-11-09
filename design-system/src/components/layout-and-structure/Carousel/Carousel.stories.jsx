@@ -7,11 +7,11 @@ export default {
     title: 'Components/Layout and structure/Carousel',
     component: Carousel,
     tags: ['!dev', '!autodocs'],
-    args: { onIndexChange: fn() },
+    args: { onSlideChange: fn() },
     parameters: {
         docs: {
             description: {
-                component: 'A centered stage of slides in a flat row, with a play button in a progress ring, a dot per slide and a caption that changes with the slide.',
+                component: 'A centered stage of slides in a flat row, with a play button in a progress ring, a progress pill per slide and a caption that changes with the slide.',
             },
         },
     },
@@ -19,13 +19,14 @@ export default {
         slides: { table: { disable: true } },
         style: { table: { disable: true } },
         className: { table: { disable: true } },
-        onIndexChange: { table: { disable: true } },
+        onSlideChange: { table: { disable: true } },
         defaultIndex: { table: { disable: true } },
         'aria-label': { table: { disable: true } },
         'aria-labelledby': { table: { disable: true } },
         autoplay: { control: 'boolean', table: { category: 'Behavior' } },
         interval: { control: { type: 'number', min: 2000, max: 12000, step: 500 }, table: { category: 'Behavior' } },
         loop: { control: 'boolean', table: { category: 'Behavior' } },
+        peek: { control: 'boolean', table: { category: 'Layout' } },
         aspectRatio: { control: { type: 'number', min: 1, max: 2.4, step: 0.1 }, table: { category: 'Layout' } },
     },
 };
@@ -53,31 +54,31 @@ const featureSlides = [
         id: 'session-prep',
         title: 'Prep a session in two minutes',
         description: 'Open a student before you join and see their goals, last notes and the lesson you planned.',
-        content: <SlideArt accent="blue" icon="clipboard-list" eyebrow="Session prep" />,
+        media: <SlideArt accent="blue" icon="clipboard-list" eyebrow="Session prep" />,
     },
     {
         id: 'reflection',
         title: 'Reflect while it is fresh',
         description: 'A short reflection after each session records what worked and what to try next time.',
-        content: <SlideArt accent="green" icon="pen-to-square" eyebrow="Reflection" />,
+        media: <SlideArt accent="green" icon="pen-to-square" eyebrow="Reflection" />,
     },
     {
         id: 'training',
         title: 'Training that fits between sessions',
         description: 'Lessons run ten minutes or less, so you can finish one in the gap before your next student.',
-        content: <SlideArt accent="purple" icon="graduation-cap" eyebrow="Training" />,
+        media: <SlideArt accent="purple" icon="graduation-cap" eyebrow="Training" />,
     },
     {
         id: 'skills',
         title: 'See your skills grow',
         description: 'Each lesson you finish and each session you reflect on fills in your skills profile.',
-        content: <SlideArt accent="orange" icon="chart-line" eyebrow="Skills" />,
+        media: <SlideArt accent="orange" icon="chart-line" eyebrow="Skills" />,
     },
     {
         id: 'schedule',
         title: 'Your week at a glance',
         description: 'Upcoming sessions, open shifts and call-offs sit on one schedule you can check from your phone.',
-        content: <SlideArt accent="teal" icon="calendar-days" eyebrow="Schedule" />,
+        media: <SlideArt accent="teal" icon="calendar-days" eyebrow="Schedule" />,
     },
 ];
 
@@ -94,7 +95,7 @@ const CarouselFrame = (props) => (
 /** Autoplay: the ring round the play button fills over each slide's time, then the next slide comes to the front. */
 export const Overview = {
     render: (args) => <CarouselFrame {...args} />,
-    args: { autoplay: true, interval: 6000 },
+    args: { autoplay: true, interval: 5000 },
     parameters: { docs: { source: { language: 'jsx', code: webAppSourceSnippets.carousel } } },
 };
 
@@ -142,7 +143,7 @@ const fakeReducedMotion = () => {
     return () => { window.matchMedia = real; };
 };
 
-/** Reduced motion: no autoplay and no play button; arrows show and every move is instant. */
+/** Reduced motion: no autoplay, no play button or ring, the active pill full; arrows show and every move is instant. */
 export const ReducedMotion = {
     render: (args) => <CarouselFrame {...args} />,
     args: { autoplay: true, interval: 500 },
@@ -152,6 +153,8 @@ export const ReducedMotion = {
         await expect(canvas.queryByRole('button', { name: /^(Pause|Play)$/ })).toBeNull();
         await expect(canvas.getByRole('button', { name: 'Previous slide' })).toBeVisible();
         await expect(canvas.getByRole('button', { name: 'Next slide' })).toBeVisible();
+        await expect(canvasElement.querySelector('.plus-carousel-ring')).toBeNull();
+        await waitFor(() => expect(pillFillScale(canvasElement.querySelector('.plus-carousel-pill--active'))).toBe(1));
 
         // Nothing moves on its own, even past several intervals.
         await new Promise((resolve) => setTimeout(resolve, 1200));
@@ -168,7 +171,17 @@ export const ReducedMotion = {
 /** Change the props in the table below. */
 export const Interactive = {
     render: (args) => <CarouselFrame {...args} />,
-    args: { autoplay: true, interval: 6000, loop: true, aspectRatio: 1.6 },
+    args: { autoplay: true, interval: 5000, loop: true, aspectRatio: 1.6 },
+};
+
+/** Without `peek`, only the current slide shows. */
+export const NoPeek = {
+    render: (args) => <CarouselFrame {...args} />,
+    args: { autoplay: false, peek: false },
+    play: async ({ canvasElement }) => {
+        await expect(canvasElement.querySelector('.plus-carousel')).toHaveClass('plus-carousel--no-peek');
+        await waitFor(() => expect(getComputedStyle(slideAt(canvasElement, 1)).visibility).toBe('hidden'));
+    },
 };
 
 /* -------------------------------------------------------------------- tests */
@@ -205,7 +218,7 @@ export const PauseStopsProgress = {
     },
 };
 
-/** Choosing a dot moves to its slide and starts that slide's clock over; it does not pause. */
+/** Choosing a pill moves to its slide and starts that slide's clock over; it does not pause. */
 export const DotRestartsClock = {
     render: () => <CarouselFrame interval={3000} />,
     play: async ({ canvasElement }) => {
@@ -214,7 +227,7 @@ export const DotRestartsClock = {
 
         const third = canvas.getByRole('button', { name: 'Slide 3 of 5: Training that fits between sessions' });
         await userEvent.click(third);
-        await waitFor(() => expect(third).toHaveAttribute('aria-current', 'step'));
+        await waitFor(() => expect(third).toHaveAttribute('aria-current', 'true'));
         await expect(activeLabel(canvasElement)).toBe('3 of 5');
         await expect(progressOf(canvasElement)).toBeLessThan(0.1);
 
@@ -302,5 +315,35 @@ export const NeighborsWrap = {
         await expect(slideAt(canvasElement, 4)).not.toHaveClass('plus-carousel-slide--away');
         await expect(slideAt(canvasElement, 2)).toHaveClass('plus-carousel-slide--away');
         await expect(getComputedStyle(slideAt(canvasElement, 1)).transform).not.toContain('matrix3d');
+    },
+};
+
+const pillFillScale = (pill) => new DOMMatrixReadOnly(
+    getComputedStyle(pill.querySelector('.plus-carousel-pill-fill')).transform
+).a;
+
+/** The active slide is a 32px pill whose fill grows on the ring's clock; the others are 8px dots. */
+export const PillFills = {
+    render: () => <CarouselFrame interval={3000} />,
+    play: async ({ canvasElement }) => {
+        const pills = [...canvasElement.querySelectorAll('.plus-carousel-pill')];
+        await expect(pills).toHaveLength(5);
+        await expect(pills[0]).toHaveAttribute('aria-current', 'true');
+        await waitFor(() => expect(pills[0].querySelector('.plus-carousel-pill-track').getBoundingClientRect().width).toBe(32));
+        await expect(pills[1].querySelector('.plus-carousel-pill-track').getBoundingClientRect().width).toBe(8);
+
+        await waitFor(() => expect(pillFillScale(pills[0])).toBeGreaterThan(0.1));
+        // The pill and the ring read the same clock.
+        await expect(Math.abs(pillFillScale(pills[0]) - progressOf(canvasElement))).toBeLessThan(0.1);
+        await expect(pillFillScale(pills[1])).toBe(0);
+    },
+};
+
+/** Without autoplay the active pill shows full. */
+export const StaticPillFull = {
+    render: () => <CarouselFrame autoplay={false} />,
+    play: async ({ canvasElement }) => {
+        const active = canvasElement.querySelector('.plus-carousel-pill--active');
+        await waitFor(() => expect(pillFillScale(active)).toBe(1));
     },
 };
