@@ -35,70 +35,27 @@ export const Captioned = ({ caption, children }) => (
 
 In PLUS the illustrations are hand-drawn characters: one for each SMART area, plus a set of math-symbol characters. Use one where a page has room to breathe, such as an empty state, onboarding or a moment of completion. Its body takes the area's color token, so the character follows Light and Dark.
 
-The characters are spot illustrations. A low-fidelity illustration of the UI uses basic shapes in mostly gray and never a real screenshot. The component page lives under Components, Images and icons.
+The characters are spot illustrations. A low-fidelity illustration of the UI uses basic shapes in mostly gray and never a real screenshot.
 
-```jsx
-import { Illustration } from '@/components';
-```
-
-</FoundationSection>
-
-<FoundationSection title="Anatomy">
-
-A character is four parts: a body, a face, two arms and two legs.
-
-<FoundationExample>
-<Row>
-    <Illustration character="technology" size={160} title="Technology character" />
-</Row>
-</FoundationExample>
-
-<RefTable
-    head={['Part', 'What it is', 'Fill']}
-    rows={[
-        ['1 · Body', 'The textured shape. 12 types.', <>A SMART character takes <C>color/background/smart/&lt;area&gt;/subtle</C>; a math character takes an accent hue at <C>color/background/accent/&lt;hue&gt;/subtle</C>.</>],
-        ['2 · Face', 'Eyes, nose and mouth in line work. 15 options.', <C>color/icon/subtle</C>],
-        ['3 · Arm', 'Left and right, 14 options each.', <C>color/icon/subtle</C>],
-        ['4 · Leg', 'Left and right, 13 options each.', <C>color/icon/subtle</C>],
-    ]}
-/>
-
-The parts are private. Compose a new character from them; do not restyle a part in place.
-
-</FoundationSection>
-
-<FoundationSection title="Properties">
-
-One variant property, `character`, makes 12 variants. The default is mastering content. Every variant sits on the same 1000 × 1000 frame.
-
-<RefTable
-    head={['Property', 'Type', 'Default', 'Values']}
-    rows={[
-        [<C>character</C>, 'Variant', 'mastering-content', 'SMART: mastering-content, advocacy, technology, relationships, social-emotional. Math: dot, approximately-equal, root, all, pi, equal, divider.'],
-        [<C>size</C>, 'Number', '96', 'The frame width and height in pixels: 48, 96, 160 or 240.'],
-        [<C>title</C>, 'String', 'none', 'Makes the character an image with this name. Without it the character is decorative and hidden.'],
-    ]}
-/>
-
-<FoundationSubsection title="Parts">
-
-<RefTable
-    head={['Part', 'Property', 'Values']}
-    rows={[
-        ['Body', 'type', '12 types, one for each character.'],
-        ['Face', 'option', '15 options, 1 to 15.'],
-        ['Arm', 'side · option', 'left, right · 14 options, 1 to 14.'],
-        ['Leg', 'side · option', 'left, right · 13 options, 1 to 13.'],
-    ]}
-/>
-
-</FoundationSubsection>
+The <a href="?path=/docs/components-images-and-icons-illustration--docs">Illustration</a> component draws a character: its props, anatomy, sizes and code are on that page. This page says which character to use, and when.
 
 </FoundationSection>
 
 <FoundationSection title="Characters">
 
 Twelve characters. The five SMART characters each stand for an area; the seven math characters stand for nothing and take a free accent hue.
+
+<FoundationSubsection title="Which character for what">
+
+<RefTable
+    head={['Moment', 'Character']}
+    rows={[
+        ['A lesson, card or page about one SMART area', <>That area's character: <C>mastering-content</C>, <C>advocacy</C>, <C>technology</C>, <C>relationships</C> or <C>social-emotional</C>.</>],
+        ['Anything not about one SMART area: an empty state, a welcome, a completion', <>A math character: <C>dot</C>, <C>approximately-equal</C>, <C>root</C>, <C>all</C>, <C>pi</C>, <C>equal</C> or <C>divider</C>.</>],
+    ]}
+/>
+
+</FoundationSubsection>
 
 <FoundationSubsection title="SMART characters">
 
@@ -148,30 +105,6 @@ All 12 bodies sit at one mid strength, so the set reads equally light in Light a
 
 </FoundationSection>
 
-<FoundationSection title="Sizes">
-
-Scale uniformly to one of four sizes. Below 48 the line work breaks up; above 240 the texture turns coarse.
-
-<FoundationExample>
-<Row>
-    {[48, 96, 160, 240].map((s) => (
-        <Captioned key={s} caption={String(s)}><Illustration character="technology" size={s} title="Technology character" /></Captioned>
-    ))}
-</Row>
-</FoundationExample>
-
-<RefTable
-    head={['Size', 'Use']}
-    rows={[
-        ['48', 'Beside a heading or in a compact card.'],
-        ['96', 'Cards and small empty states.'],
-        ['160', 'Page empty states.'],
-        ['240', 'Onboarding and full-page moments.'],
-    ]}
-/>
-
-</FoundationSection>
-
 <FoundationSection title="Usage">
 
 Use an illustration where the page has room to breathe: empty states, onboarding, and success and completion moments. Decide first that it is needed; it supports the copy and never replaces it. Keep it out of dense working surfaces.
@@ -195,10 +128,10 @@ Use an illustration where the page has room to breathe: empty states, onboarding
 <FoundationSubsection title="Rules">
 
 - Use a Character instance; never detach it or recolor its parts. Color comes from the tokens, so Light and Dark follow.
-- Pick a size from the scale (48, 96, 160 or 240) and scale uniformly.
-- Limbs reach past the 1000 frame, so leave room around the instance and do not clip it.
+- Pick a size from the scale, and scale uniformly. The sizes and the room a character needs around it are on the <a href="?path=/docs/components-images-and-icons-illustration--docs">Illustration</a> component.
 - The math characters do not stand for a SMART area. Their accent hues are free choices; never reuse a SMART character's color on them.
 - Reuse the existing characters first. A new character, or a new kind of illustration, is a design lead's call.
+- Keep illustrations decorative, and never put the only copy of information in one. How to name one that carries meaning is on the component page.
 - An illustration works with the copy and never replaces it. Art with no job to do stays out of working surfaces; too much of it adds to what a reader has to take in.
 - Other visual aids have their own homes: Avatar for people, Icon for actions with labels, Logo for brand, Image for photos.
 
@@ -260,15 +193,6 @@ A single character carries the mood; a crowd competes with the message.
 </DoDont>
 
 </FoundationSubsection>
-
-</FoundationSection>
-
-<FoundationSection title="Accessibility">
-
-- Decorative by default. In code, a character with no `title` is hidden from screen readers.
-- When a character carries meaning the text around it does not, give it a `title` that names the idea, not the drawing: "Technology and tools", not "brown equals sign with arms".
-- Never put the only copy of information in an illustration.
-- Line work uses `color/icon/subtle`, about 2.6:1 on the bodies in Light, as in the source art. Decorative art is not held to 3:1, so keep illustrations decorative.
 
 </FoundationSection>
 
