@@ -4,40 +4,7 @@
   "sets": {
     "main": {
       "reasons": "required",
-      "entries": {
-        "design-system/src/specs/Admin/Session/Tables/SessionBreakdownTable/SessionBreakdownTable.scss|--color-outline-variant|--color-surface": {
-          "count": 1,
-          "reason": "EXEMPT — INACTIVE table sort arrow. WCAG 1.4.11 exempts inactive components outright, and the active state is --color-secondary (6.70:1). One of eight identical sort indicators across the admin tables."
-        },
-        "design-system/src/specs/Admin/Session/Tables/SessionsTable/SessionsTable.scss|--color-outline-variant|--color-surface": {
-          "count": 1,
-          "reason": "EXEMPT — INACTIVE table sort arrow, &--active is --color-secondary (6.70:1). See the SessionBreakdownTable entry."
-        },
-        "design-system/src/specs/Admin/Tutor/Modals/TutorModal/TutorModal.scss|--color-outline-variant|--color-surface": {
-          "count": 1,
-          "reason": "EXEMPT — a 10px trailing chevron beside a label that carries the text itself. Decorative; the label is --color-on-surface."
-        },
-        "design-system/src/specs/Admin/Tutor/Tables/TutorSessionsTable/TutorSessionsTable.scss|--color-outline-variant|--color-surface": {
-          "count": 1,
-          "reason": "EXEMPT — INACTIVE table sort arrow. See the SessionBreakdownTable entry."
-        },
-        "design-system/src/specs/Admin/Tutor/Tables/TutorsPerformanceTable/TutorsPerformanceTable.scss|--color-outline-variant|--color-surface": {
-          "count": 1,
-          "reason": "EXEMPT — INACTIVE table sort arrow. See the SessionBreakdownTable entry."
-        },
-        "design-system/src/specs/Admin/Tutor/Tables/TutorsToolUsageTable/TutorsToolUsageTable.scss|--color-outline-variant|--color-surface": {
-          "count": 1,
-          "reason": "EXEMPT — INACTIVE table sort arrow. See the SessionBreakdownTable entry."
-        },
-        "design-system/src/specs/Admin/Tutor/Tables/TutorsTrainingProgressTable/TutorsTrainingProgressTable.scss|--color-outline-variant|--color-surface": {
-          "count": 1,
-          "reason": "EXEMPT — INACTIVE table sort arrow. See the SessionBreakdownTable entry."
-        },
-        "design-system/src/specs/Home/Sections/StudentsOverviewSection/StudentsOverviewSection.scss|--color-outline-variant|--color-surface": {
-          "count": 1,
-          "reason": "EXEMPT — a 14px table-header icon beside a text label. Decorative; the label carries the meaning."
-        }
-      }
+      "entries": {}
     }
   }
 }

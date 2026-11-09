@@ -7,38 +7,12 @@
     "border": {
       "direction": "both",
       "reasons": "required",
-      "entries": {
-        "design-system/src/specs/Home/Cards/DataVisualization/DataVisualization.scss": {
-          "count": 0,
-          "reason": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
-        },
-        "design-system/src/specs/Training/Lessons/Elements/AiIndicator/AiIndicator.scss": {
-          "count": 0,
-          "reason": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
-        },
-        "design-system/src/specs/Training/Lessons/Elements/RatingSingle/RatingSingle.scss": {
-          "count": 0,
-          "reason": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
-        }
-      }
+      "entries": {}
     },
     "outline": {
       "direction": "both",
       "reasons": "required",
-      "entries": {
-        "design-system/src/specs/Home/Cards/DataVisualization/DataVisualization.scss": {
-          "count": 1,
-          "reason": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
-        },
-        "design-system/src/specs/Training/Lessons/Elements/AiIndicator/AiIndicator.scss": {
-          "count": 1,
-          "reason": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
-        },
-        "design-system/src/specs/Training/Lessons/Elements/RatingSingle/RatingSingle.scss": {
-          "count": 1,
-          "reason": "Focus rings. All 25 outline uses take --color-primary, and a focus indicator is its own role — Atlassian names color.border.focused beside color.border. No --color-X-focus-ring exists here, so renaming these to -border would assert an equivalence nobody decided. Recorded, not migrated (#368)."
-        }
-      }
+      "entries": {}
     },
     "mixedStates": {
       "direction": "both",

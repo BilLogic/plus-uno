@@ -70,14 +70,11 @@
     },
     "ide": {
       "entries": {
-        "docs/connectors/notion/marketplace-db.md": {
-          "count": 1
-        },
         "docs/conventions/writing.md": {
           "count": 8
         },
         "docs/engineering/coding.md": {
-          "count": 3
+          "count": 2
         },
         "docs/engineering/setup.md": {
           "count": 3
@@ -134,9 +131,6 @@
           "count": 9
         },
         "skills/uno-publish/references/deployment-guide.md": {
-          "count": 2
-        },
-        "skills/uno-publish/references/marketplace.md": {
           "count": 1
         },
         "skills/uno-publish/references/method.md": {
@@ -178,7 +172,7 @@
       "direction": "grow-only",
       "entries": {
         "docs": {
-          "count": 57
+          "count": 55
         }
       }
     },

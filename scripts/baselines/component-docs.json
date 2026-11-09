@@ -315,24 +315,6 @@
         "LinkIconButton target": {
           "count": 1
         },
-        "LoadingGif (summary)": {
-          "count": 1
-        },
-        "LoadingGif className": {
-          "count": 1
-        },
-        "LoadingGif id": {
-          "count": 1
-        },
-        "LoadingGif label": {
-          "count": 1
-        },
-        "LoadingGif size": {
-          "count": 1
-        },
-        "LoadingGif type": {
-          "count": 1
-        },
         "MenuGroup children": {
           "count": 1
         },
@@ -496,39 +478,6 @@
           "count": 1
         },
         "ScrollBar style": {
-          "count": 1
-        },
-        "SessionAvailabilitySnackbar (summary)": {
-          "count": 1
-        },
-        "SessionAvailabilitySnackbar available": {
-          "count": 1
-        },
-        "SessionAvailabilitySnackbar className": {
-          "count": 1
-        },
-        "SessionAvailabilitySnackbar onClose": {
-          "count": 1
-        },
-        "SessionAvailabilitySnackbar timestamp": {
-          "count": 1
-        },
-        "SessionAvailabilitySnackbar type": {
-          "count": 1
-        },
-        "SessionManagementSnackbar (summary)": {
-          "count": 1
-        },
-        "SessionManagementSnackbar className": {
-          "count": 1
-        },
-        "SessionManagementSnackbar onClose": {
-          "count": 1
-        },
-        "SessionManagementSnackbar timestamp": {
-          "count": 1
-        },
-        "SessionManagementSnackbar type": {
           "count": 1
         },
         "Sidebar className": {
