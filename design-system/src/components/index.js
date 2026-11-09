@@ -40,7 +40,7 @@ export { default as VerticalButton, VERTICAL_BUTTON_APPEARANCES } from '@/compon
 export { default as AiIcon, AI_ICON_ALL_SIZES, AI_ICON_NAMES, AI_ICON_SIZES } from '@/components/images-and-icons/AiIcon';
 export { default as Avatar, AVATAR_COLORS, AVATAR_SHAPES, AVATAR_SIZES, AVATAR_STATUSES, initialsOf } from '@/components/images-and-icons/Avatar';
 export { default as AvatarGroup } from '@/components/images-and-icons/AvatarGroup';
-export { default as Icon, ICON_COLORS, ICON_SIZES } from '@/components/images-and-icons/Icon';
+export { default as Icon, ICON_COLORS, ICON_SIZES, ICON_STYLES } from '@/components/images-and-icons/Icon';
 export { default as Illustration, ILLUSTRATION_CHARACTERS, ILLUSTRATION_SIZES, MATH_CHARACTERS, SMART_CHARACTERS } from '@/components/images-and-icons/Illustration';
 export { default as Image, IMAGE_SIZES } from '@/components/images-and-icons/Image';
 export { default as Logo } from '@/components/images-and-icons/Logo';

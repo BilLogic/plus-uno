@@ -30,7 +30,7 @@ One Font Awesome Free glyph, drawn from its name at an icon size and in an icon 
 
 ## Overview
 
-<ComponentExample of={IconStories.Names} title="From a name" description={<><code>name</code> draws <code>fa-regular</code> where Font Awesome Free has a regular weight and <code>fa-solid</code> where it does not. A name that carries its family, such as <code>fa-brands fa-slack</code>, is kept as given.</>} />
+<ComponentExample of={IconStories.Names} title="From a name" description={<><code>name</code> draws regular where Font Awesome Free has a regular and solid where it does not. A name that carries its family, such as <code>fa-brands fa-slack</code>, is kept as given.</>} />
 
 <ComponentExample of={IconStories.InAComponent} title="In a component" description={<>Button takes <code>iconBefore</code> and <code>iconAfter</code>, and Icon button takes <code>icon</code>. Pass the name, and the component draws it with Icon.</>} />
 
@@ -43,6 +43,14 @@ One Font Awesome Free glyph, drawn from its name at an icon size and in an icon 
 <ComponentExample of={IconStories.Sizes} title="Sizes" description={<><code>size</code> is 12, 16 or 24, each a square box on its icon size token.</>} />
 
 <ComponentExample of={IconStories.Inherited} title="Without a size or color" description={<>Unset, the glyph takes the color around it and the small icon size, and a component that holds it sets its own size.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Style
+
+<ComponentExample of={IconStories.Styles} title="Regular or solid" description={<><code>iconStyle</code> is <code>regular</code> or <code>solid</code>. Unset, the glyph is regular where Font Awesome Free has a regular and solid where it does not. <code>solid</code> always draws solid, for a selected or filled mark. <code>regular</code> falls back to solid where Free has no regular. The <code>fa-brands</code> family is not a style: it rides in the name (<code>fa-brands fa-figma</code>), and such a name ignores <code>iconStyle</code>.</>} />
 
 </div>
 
@@ -76,7 +84,7 @@ One Font Awesome Free glyph, drawn from its name at an icon size and in an icon 
 
 <DocsInteractivePlayground
     of={IconStories.Interactive}
-    description={<>Type a Font Awesome Free name, and pick a size, a color role and a label.</>}
+    description={<>Type a Font Awesome Free name, and pick a style, a size, a color role and a label.</>}
 />
 
 </div>
@@ -102,7 +110,7 @@ import { Icon } from '@/components';
 <Icon name="circle-check" size={16} color="success" label="Approved" />
 ```
 
-Use a glyph's current name: an alias is not in the regular list, so it draws solid. Only the Free families draw: `fa-solid`, `fa-regular` and `fa-brands`.
+Pass a plain name and set `iconStyle` when a glyph must be solid; never write `fa-solid` or `fa-regular` into the name. Use a glyph's current name: an alias is not in the regular list, so it draws solid. A `fa-brands` name carries its family: `fa-brands fa-figma`.
 
 </div>
 

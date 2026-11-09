@@ -2,13 +2,13 @@
 
 # Icon
 
-One Font Awesome Free glyph, drawn from its name. - **name** is a Free name: regular where Free has a regular weight, solid where it does not. A name that carries its family (`fa-brands fa-slack`) is kept. - **size** is 12, 16 or 24, each bound to its icon size token. Without it the glyph is the small icon size, or the size the component around it sets. - **color** is an icon color role. Without it the glyph takes the color around it. - **label** names the icon for assistive technology. Without it the icon is hidden, so the words beside it carry the meaning.
+One Font Awesome Free glyph, drawn from its name. - **name** is a Free name: regular where Free has a regular weight, solid where it does not. A name that carries its family (`fa-brands fa-slack`) is kept. - **iconStyle** is `regular` or `solid`. Unset, the glyph is regular where Free has a regular and solid where it does not; `regular` falls back to solid the same way. `solid` always draws solid. A name that carries its family ignores it. - **size** is 12, 16 or 24, each bound to its icon size token. Without it the glyph is the small icon size, or the size the component around it sets. - **color** is an icon color role. Without it the glyph takes the color around it. - **label** names the icon for assistive technology. Without it the icon is hidden, so the words beside it carry the meaning.
 
 **Import:** `import { Icon } from '@/components';`
 
 **Source:** `design-system/src/components/images-and-icons/Icon/Icon.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/Icon/Icon.stories.jsx` — Names, Sizes, Colors, Inherited, Labeled, InAComponent, Interactive, Rest
+**Stories:** `design-system/src/components/images-and-icons/Icon/Icon.stories.jsx` — Names, Styles, Sizes, Colors, Inherited, Labeled, InAComponent, Interactive, Rest
 
 **Storybook page:** `design-system/src/components/images-and-icons/Icon/Icon.mdx`
 
@@ -23,7 +23,7 @@ import { Icon } from '@/components';
 <Icon name="circle-check" size={16} color="success" label="Approved" />
 ```
 
-Use a glyph's current name: an alias is not in the regular list, so it draws solid. Only the Free families draw: `fa-solid`, `fa-regular` and `fa-brands`.
+Pass a plain name and set `iconStyle` when a glyph must be solid; never write `fa-solid` or `fa-regular` into the name. Use a glyph's current name: an alias is not in the regular list, so it draws solid. A `fa-brands` name carries its family: `fa-brands fa-figma`.
 
 ## Best practices
 
@@ -78,6 +78,7 @@ Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` �
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `name` | string (required) | — | A Font Awesome Free name, such as `calendar-days`, or a name with its family. |
+| `iconStyle` | enum | — | `regular` or `solid`. Unset, regular where Font Awesome Free has a regular and solid where it does not; `regular` falls back to solid where Free has none. Ignored when the name carries its family. |
 | `size` | enum | — | The size in px, bound to an icon size token. Unset, the glyph is the small icon size, or the size the component around it sets. |
 | `color` | enum | — | An icon color role. Unset, the glyph takes the color around it. |
 | `label` | string | — | An accessible name. Without it the icon is hidden from assistive technology. |
@@ -85,6 +86,8 @@ Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` �
 | `style` | object | — | Inline styles for the glyph. |
 
 ## Variants
+
+**`iconStyle`** — `regular` · `solid`
 
 **`size`** — `12` · `16` · `24`
 

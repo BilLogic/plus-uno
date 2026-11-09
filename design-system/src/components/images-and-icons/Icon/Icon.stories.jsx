@@ -4,13 +4,13 @@ import { expect, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { Button, IconButton } from '@/components';
-import Icon, { ICON_COLORS, ICON_SIZES } from './Icon';
+import Icon, { ICON_COLORS, ICON_SIZES, ICON_STYLES } from './Icon';
 
 /**
  * `Icon` -- one Font Awesome Free glyph, drawn from its name.
  *
  * THE TEST SEAM IS THIS FILE. Story `play:` functions run by `check:storybook`
- * in a real browser: the family a name resolves to, the box each size draws,
+ * in a real browser: the family a name resolves to, the style that forces, the box each size draws,
  * each color role resolved to its token in every color mode, the accessible
  * name, and a component drawing its string icon through Icon.
  */
@@ -29,6 +29,7 @@ export default {
     argTypes: {
         name: { control: 'text', table: { category: 'Content' } },
         label: { control: 'text', table: { category: 'Content' } },
+        iconStyle: { control: 'inline-radio', options: [undefined, ...ICON_STYLES], table: { category: 'Design' } },
         size: { control: 'inline-radio', options: [undefined, ...ICON_SIZES], table: { category: 'Design' } },
         color: { control: 'select', options: [undefined, ...ICON_COLORS], table: { category: 'Design' } },
         className: { control: false },
@@ -64,6 +65,35 @@ Names.play = async ({ canvasElement }) => {
     await expect(glyphs[0]).toHaveClass('fa-regular', 'fa-calendar-days');
     await expect(glyphs[2]).toHaveClass('fa-solid', 'fa-gear');
     await expect(glyphs[3], 'a family passed in is kept').toHaveClass('fa-brands', 'fa-slack');
+};
+
+/* ----------------------------------------------------------------- styles */
+
+const STYLE_CASES = [
+    { name: 'star', iconStyle: undefined, caption: 'star' },
+    { name: 'star', iconStyle: 'regular', caption: 'star · regular' },
+    { name: 'star', iconStyle: 'solid', caption: 'star · solid' },
+    { name: 'gear', iconStyle: 'regular', caption: 'gear · regular' },
+];
+
+export const Styles = () => (
+    <div style={row}>
+        {STYLE_CASES.map(({ name, iconStyle, caption: text }) => (
+            <div key={text} style={cell}>
+                <Icon name={name} iconStyle={iconStyle} size={24} color="default" />
+                <span style={caption}>{text}</span>
+            </div>
+        ))}
+    </div>
+);
+
+/** Unset and `regular` draw regular where Free has it; `solid` always draws solid; `regular` without a Free regular draws solid. */
+Styles.play = async ({ canvasElement }) => {
+    const glyphs = canvasElement.querySelectorAll('i');
+    await expect(glyphs[0]).toHaveClass('fa-regular', 'fa-star');
+    await expect(glyphs[1]).toHaveClass('fa-regular', 'fa-star');
+    await expect(glyphs[2]).toHaveClass('fa-solid', 'fa-star');
+    await expect(glyphs[3], 'no Free regular, so solid').toHaveClass('fa-solid', 'fa-gear');
 };
 
 /* ------------------------------------------------------------------ sizes */
@@ -189,7 +219,7 @@ InAComponent.play = async ({ canvasElement }) => {
 export const Interactive = (args) => <Icon {...args} />;
 Interactive.args = { name: 'calendar-days', size: 24, color: 'default' };
 
-/** The controls drive `name`, `size`, `color` and `label`. */
+/** The controls drive `name`, `iconStyle`, `size`, `color` and `label`. */
 Interactive.play = async ({ canvasElement }) => {
     await expect(canvasElement.querySelector('i.plus-icon')).not.toBeNull();
 };

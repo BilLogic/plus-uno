@@ -370,7 +370,7 @@ const Carousel = ({
                                 <circle className="plus-carousel-ring-progress" cx="22" cy="22" r="20" pathLength="1" />
                             </svg>
                             <IconButton
-                                icon={paused ? 'fa-solid fa-play' : 'fa-solid fa-pause'}
+                                icon={paused ? 'play' : 'pause'}
                                 label={paused ? 'Play' : 'Pause'}
                                 appearance="subtle"
                                 shape="circle"
@@ -380,7 +380,7 @@ const Carousel = ({
                     )}
                     {isStatic && (
                         <IconButton
-                            icon="fa-solid fa-chevron-left"
+                            icon="chevron-left"
                             label="Previous slide"
                             shape="circle"
                             isDisabled={!wraps && index === 0}
@@ -395,7 +395,7 @@ const Carousel = ({
                     <CarouselDots slides={slides} index={index} timed={autoplays} clockRef={dotsClockRef} onSelect={goTo} />
                     {isStatic && (
                         <IconButton
-                            icon="fa-solid fa-chevron-right"
+                            icon="chevron-right"
                             label="Next slide"
                             shape="circle"
                             isDisabled={!wraps && index === count - 1}

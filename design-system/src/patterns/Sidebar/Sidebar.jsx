@@ -9,9 +9,6 @@ import './Sidebar.scss';
 /** Where collapsed section titles are remembered, per person: `<key>:<account id>`. */
 export const SIDEBAR_SECTIONS_STORAGE_KEY = 'plus-sidebar-sections';
 
-/** A Font Awesome Free class list, from a bare solid name (`house`) or a full list (`fa-regular fa-house`). */
-const faClass = (icon) => (icon.includes('fa-') ? icon : `fa-solid fa-${icon}`);
-
 /** The tooltip and message of a section locked until assigned training is done. */
 export const lockMessage = (title) => `Complete your assigned training to unlock the ${title}`;
 
@@ -194,7 +191,7 @@ const PatternSidebar = ({
     const rowContent = (item, extra) => (
         <>
             <span className="plus-pattern-sidebar__slot" aria-hidden="true">
-                {item.icon ? <Icon name={faClass(item.icon)} /> : null}
+                {item.icon ? <Icon name={item.icon} /> : null}
             </span>
             <span className="plus-pattern-sidebar__label">{item.text}</span>
             {item.external ? <span className="visually-hidden">(opens in a new tab)</span> : null}
@@ -486,7 +483,7 @@ const itemShape = PropTypes.shape({
     /** Unique id; `activeId`, `onSelect` and `tabs` use it */
     id: PropTypes.string.isRequired,
     text: PropTypes.string.isRequired,
-    /** Font Awesome Free class list for the 16 icon (`fa-regular fa-house`); a bare name is solid */
+    /** Font Awesome Free name for the 16 icon (`house`), drawn by Icon; a brand logo carries its family (`fa-brands fa-slack`) */
     icon: PropTypes.string,
     /** Makes the row a link */
     href: PropTypes.string,

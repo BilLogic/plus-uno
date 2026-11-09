@@ -170,7 +170,7 @@ const RatingItem = ({
                 aria-label={`Rate ${value}`}
                 {...props}
             >
-                <Icon name={selected ? `fa-solid fa-${icon}` : icon} />
+                <Icon name={icon} iconStyle={selected ? 'solid' : undefined} />
             </BaseRadio.Root>
         </div>
     );
