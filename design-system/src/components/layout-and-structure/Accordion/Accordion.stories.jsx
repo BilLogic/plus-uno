@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '@/components';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import { expect, userEvent, within } from 'storybook/test';
 import Accordion from './Accordion';
@@ -164,9 +165,9 @@ function AccordionContentDemos() {
             <Accordion defaultActiveKey="custom-1">
                 <Accordion.Item eventKey="custom-1" header="Custom Header One">
                     <p>This is custom content passed as children.</p>
-                    <button className="plus-btn plus-btn--primary plus-btn--compact" type="button">
+                    <Button appearance="primary" spacing="compact">
                         Action Button
-                    </button>
+                    </Button>
                 </Accordion.Item>
                 <Accordion.Item eventKey="custom-2" header="Custom Header Two">
                     <p>Another custom content area with more flexibility.</p>

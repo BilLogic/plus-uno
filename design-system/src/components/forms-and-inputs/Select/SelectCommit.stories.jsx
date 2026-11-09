@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '@/components';
 import { expect, fireEvent, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import Select from './Select';
@@ -324,7 +325,7 @@ PickLimitDisablesRows.play = async ({ canvasElement }) => {
 /** Without focus, the tags that do not fit collapse into "+n". */
 export const CollapsedTagsShowPlusN = () => (
     <div style={{ ...stack, width: 220 }}>
-        <button type="button">Before</button>
+        <Button>Before</Button>
         <Select
             id="scommit-collapse"
             label="Subjects"

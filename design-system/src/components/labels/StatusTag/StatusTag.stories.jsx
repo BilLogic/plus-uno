@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '@/components';
 import { expect, fireEvent, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
@@ -264,7 +265,7 @@ LeadingVisual.play = async ({ canvasElement }) => {
  */
 export const Truncation = () => (
     <div style={row}>
-        <button type="button">Before</button>
+        <Button>Before</Button>
         <StatusTag appearance="info" data-testid="short">In progress</StatusTag>
         <StatusTag appearance="info" data-testid="long">
             Waiting on the district data export before the next session
@@ -347,7 +348,7 @@ export const NeverAButton = () => {
     const [clicks, setClicks] = useState(0);
     return (
         <div style={row}>
-            <button type="button" onClick={() => setMounted(true)}>Mount a Status with onClick</button>
+            <Button onClick={() => setMounted(true)}>Mount a Status with onClick</Button>
             <span data-testid="clicks">{clicks}</span>
             {mounted && (
                 <StatusTag
@@ -426,7 +427,7 @@ export const UnknownValuesFallBack = () => {
     const [mounted, setMounted] = useState(false);
     return (
         <div style={row}>
-            <button type="button" onClick={() => setMounted(true)}>Mount an unknown appearance</button>
+            <Button onClick={() => setMounted(true)}>Mount an unknown appearance</Button>
             <StatusTag data-testid="neutral">Not started</StatusTag>
             {mounted && <StatusTag appearance="purple" data-testid="unknown-style">Not started</StatusTag>}
         </div>

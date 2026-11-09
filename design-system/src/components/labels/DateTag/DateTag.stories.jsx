@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '@/components';
 import { expect, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
@@ -137,7 +138,7 @@ Styles.play = async ({ canvasElement }) => {
  */
 export const Truncation = () => (
     <div style={row}>
-        <button type="button">Before</button>
+        <Button>Before</Button>
         <DateTag appearance="warning" data-testid="short">Due tomorrow</DateTag>
         <DateTag appearance="danger" data-testid="long">
             This session was due several days ago and still has not been rescheduled
@@ -179,7 +180,7 @@ export const NeverAButton = () => {
     const [clicks, setClicks] = useState(0);
     return (
         <div style={row}>
-            <button type="button" onClick={() => setMounted(true)}>Mount a Date tag with onClick</button>
+            <Button onClick={() => setMounted(true)}>Mount a Date tag with onClick</Button>
             <span data-testid="clicks">{clicks}</span>
             {mounted && (
                 <DateTag
@@ -216,7 +217,7 @@ export const UnknownAppearanceFallsBack = () => {
     const [mounted, setMounted] = useState(false);
     return (
         <div style={row}>
-            <button type="button" onClick={() => setMounted(true)}>Mount an unknown appearance</button>
+            <Button onClick={() => setMounted(true)}>Mount an unknown appearance</Button>
             <DateTag data-testid="neutral">Due Oct 14</DateTag>
             {mounted && <DateTag appearance="success" data-testid="fallback">Due Oct 14</DateTag>}
         </div>

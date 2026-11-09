@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from '@/components';
 import { expect, within } from 'storybook/test';
 
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
@@ -83,10 +84,9 @@ Overview.play = async ({ canvasElement }) => {
 /* ------------------------------------------------------------ accessible name */
 
 export const NamesAControl = () => (
-    <button type="button" className="btn btn-outline-secondary" style={{ width: 40, height: 40 }}>
-        <i className={iconClass('trash')} aria-hidden="true" />
+    <Button iconBefore="trash">
         <VisuallyHidden>Delete session</VisuallyHidden>
-    </button>
+    </Button>
 );
 
 /**
@@ -100,7 +100,8 @@ NamesAControl.play = async ({ canvasElement }) => {
     const label = canvas.getByText('Delete session');
     await inEveryColorMode((mode) => expectNotDrawn(label, 'the label', mode));
     await expectInTree(label, 'the label');
-    await expect(button.getBoundingClientRect().width, 'the button stays its own size').toBe(40);
+    // The hidden label takes no room, so the button is the icon and its padding, not the width of "Delete session".
+    await expect(button.getBoundingClientRect().width, 'the button stays icon-sized').toBeLessThan(56);
 };
 
 /* ----------------------------------------------------------------- header cell */
@@ -143,7 +144,7 @@ HiddenColumnHeaders.play = async ({ canvasElement }) => {
 
 export const RoleAndId = () => (
     <div>
-        <button type="button" className="btn btn-primary" aria-describedby="vh-results">Search</button>
+        <Button appearance="primary" aria-describedby="vh-results">Search</Button>
         <VisuallyHidden id="vh-results" role="status">12 results found</VisuallyHidden>
     </div>
 );
