@@ -2,7 +2,7 @@
 
 # Carousel
 
-A centered stage of slides: the active one full size and, with `peek`, one neighbor on each side in the same flat row, smaller and faded. Under it, a play button whose ring fills over the slide's time, a pill per slide (the active one stretches and fills on the same clock), and a caption that changes with the slide. Autoplay holds while the pointer rests on the stage, keyboard focus is inside, the carousel is out of view or the tab is hidden. Under reduced motion it never moves on its own: arrows replace the play button, the active pill shows full and every move is instant.
+A centered stage of slides: the active one full size and, with `peek`, one neighbor on each side in the same flat row, smaller and faded. Under it, a play button whose ring fills over the slide's time, a progress indicator whose current dot stretches into a bar that fills on the same clock, and a caption that changes with the slide. Autoplay holds while the pointer rests on the stage, keyboard focus is inside, the carousel is out of view or the tab is hidden. Under reduced motion it never moves on its own: arrows replace the play button, the current bar shows full and every move is instant.
 
 Also asked as: slideshow, gallery.
 
@@ -10,7 +10,7 @@ Also asked as: slideshow, gallery.
 
 **Source:** `design-system/src/components/layout-and-structure/Carousel/Carousel.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Carousel/Carousel.stories.jsx` — Overview, Static, NoLoop, FewSlides, ReducedMotion, Interactive, NoPeek, PauseStopsProgress, DotRestartsClock, ArrowKeysMove, HoverHolds, InactiveSlidesHidden, RegionIsNamed, NeighborsWrap, PillFills, StaticPillFull
+**Stories:** `design-system/src/components/layout-and-structure/Carousel/Carousel.stories.jsx` — Overview, Static, NoLoop, FewSlides, ReducedMotion, Interactive, NoPeek, PauseStopsProgress, DotRestartsClock, ArrowKeysMove, HoverHolds, InactiveSlidesHidden, RegionIsNamed, NeighborsWrap, DotFills, StaticBarFull, DotTargets
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Carousel/Carousel.mdx`
 
@@ -21,7 +21,7 @@ new, a short tour, a handful of featured items. Every slide but one is hidden at
 any moment, so nothing a person must read or act on belongs in it.
 
 `slides` takes `{ media, title, description }`. `media` is the card; `title`
-and `description` fill the caption under the controls and name each pill.
+and `description` fill the caption under the controls and name each dot.
 Autoplay is on, at `interval` 5000 ms a slide, and loops. `peek` shows the
 neighbors; turn it off to show the current slide alone. `onSlideChange` gets
 the new index. Give the region a name
@@ -31,17 +31,17 @@ with `aria-label` or `aria-labelledby`.
 
 ### Keep it to three to six slides. {#keep-it-to-three-to-six-slides}
 
-The pills are the map. Past six, nobody gets to the end.
+The dots are the map. Past six, nobody gets to the end.
 
 Do: Three slides, each worth seeing.
-Don't: Ten slides and a row of pills to match.
+Don't: Ten slides and a row of dots to match.
 
 ### Give every slide a title. {#give-every-slide-a-title}
 
-The title is the caption a sighted reader sees and the name a screen reader hears on each pill.
+The title is the caption a sighted reader sees and the name a screen reader hears on each dot.
 
 Do: A title and one line for each slide.
-Don't: No titles: the pills say only Slide 1 of 3.
+Don't: No titles: the dots say only Slide 1 of 3.
 
 ### Keep the caption to one line. {#keep-the-caption-to-one-line}
 
@@ -58,9 +58,9 @@ Autoplay moves on whether or not a person finished. Turn it off with `autoplay={
 - **The pause control comes first.** Autoplay can always be stopped from the
   play button, which is the first control in the row. Its name says what a
   press will do: Pause, then Play.
-- **Each pill is a button.** The pills are a group named "Choose a slide"; each
+- **Each dot is a button.** The dots are a group named "Choose a slide"; each
   is named "Slide 2 of 5" and the slide's title, and the current one carries
-  `aria-current="true"`. Each pill is its own tab stop, with a 24px target.
+  `aria-current="step"`. Each dot is its own tab stop, with a 24px target.
 - **Only the active slide is read.** Each slide is a group named "2 of 5";
   the others are `aria-hidden` and inert, so focus never lands behind the
   front card.
@@ -88,7 +88,7 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 1. **Stage.** Full width, with the edges fading out.
 2. **Slide.** A card, centered. A neighbor on each side sits in the same row, scaled down and faded; clicking one brings it to the front.
 3. **Play button.** A subtle circle `IconButton`, Pause while playing and Play while paused, inside a ring whose arc fills over the slide's time.
-4. **Pills.** One per slide. Inactive slides are 8px dots; the active one stretches to a 32px pill whose fill grows left to right over the slide's time. When it fills, the next slide comes up and its pill starts. Choosing a pill moves to its slide and starts its clock over.
+4. **Progress indicator.** A selectable `ProgressIndicator`, one dot per slide. The current dot stretches into a 32px bar whose fill grows from the start edge over the slide's time. When it fills, the next slide comes up and its dot takes the bar. Choosing a dot moves to its slide and starts its clock over.
 5. **Arrows.** Circle `IconButton`s, only when the carousel does not autoplay, in place of the play button.
 6. **Caption.** The active slide's title as a `Heading` and one line of body text, centered under the controls.
 
@@ -96,11 +96,11 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 
 | State | What changes |
 | --- | --- |
-| Playing | The ring arc and the active pill fill together in `--ds-background-brand-bold`. |
-| Paused | The play icon shows. The arc and the pill fill hold where they stopped. |
+| Playing | The ring arc and the bar fill together in `--ds-background-brand-bold`. |
+| Paused | The play icon shows. The arc and the bar hold where they stopped. |
 | Held | The clock stops while the pointer rests on the stage, keyboard focus is inside, the carousel is out of view or the tab is hidden. It resumes where it held. Pressing Play starts it again even with focus inside. |
-| Hovered, pressed, focused | The play button and the arrows keep the states of `IconButton`. A hovered or pressed pill's track turns `--ds-border-bold`; a focused one takes the focus ring. |
-| Reduced motion or no autoplay | No ring; the active pill shows full. |
+| Hovered, pressed, focused | The play button and the arrows keep the states of `IconButton`. The dots keep the states of `ProgressIndicator`. |
+| Reduced motion or no autoplay | No ring; the bar shows full. |
 | Disabled arrow | Without `loop`, at the first or last slide. |
 
 ### Tokens
@@ -110,7 +110,7 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 | Card | `--ds-surface-raised` with `--ds-shadow-raised`, corners `--card-radius`. |
 | Neighbors | Faded under `--ds-surface` at 45%, `--section-stack-lg` apart (`--inline-lg` on a narrow stage). |
 | Ring | `--control-lg` across, `--border-selected` wide. Track `--ds-border`; progress `--ds-background-brand-bold`. |
-| Pills | Dot `--progress-indicator-dot-size-8`, active pill `--control-md` long, both `--radius-full`. Track `--ds-border`; fill `--ds-background-brand-bold`. Each sits in a `--control-sm` target with `--inline-md` either side. |
+| Progress indicator | The default `ProgressIndicator`: dots `--progress-indicator-dot-size-8`, the bar `--control-md` long, each dot a `--control-sm` target. |
 | Motion | A move takes `--motion-duration-long` on `--motion-easing-standard`. The caption lifts out over `--motion-duration-short` and rises in over `--motion-duration-medium`. |
 | Caption | `Heading` size small; line in `--body-default` and `--ds-text-subtle`; at most `--content-max-width-reading` wide. |
 | Spacing | `--section-stack-md` between the stage, the controls and the caption; `--inline-md` between controls. |
@@ -119,7 +119,7 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `slides` | arrayOf (required) | `[]` | The slides, in order. `media` is the card; `title` and `description` fill the caption and name the pill. A string `media` renders as text, or as an image when it is a path ending in an image extension (`alt` describes it). |
+| `slides` | arrayOf (required) | `[]` | The slides, in order. `media` is the card; `title` and `description` fill the caption and name the slide's dot. A string `media` renders as text, or as an image when it is a path ending in an image extension (`alt` describes it). |
 | `autoplay` | bool | `true` | Moves to the next slide on its own, with a play button to stop it. Off under reduced motion, where arrows show instead. Defaults to `true`. |
 | `interval` | number | `5000` | Milliseconds each slide shows before the next. Defaults to `5000`. |
 | `peek` | bool | `true` | Shows the neighbors at each side, smaller and faded. Off, only the current slide shows. Defaults to `true`. |
@@ -132,7 +132,7 @@ Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar`
 
 ## Tokens touched
 
-`--body-default` · `--border-selected` · `--card-radius` · `--carousel-aspect` · `--carousel-edge-fade` · `--carousel-neighbor-dim` · `--carousel-neighbor-gap` · `--carousel-neighbor-scale` · `--carousel-offset` · `--carousel-pill-track` · `--carousel-progress` · `--carousel-ring-size` · `--carousel-ring-stroke` · `--carousel-slide-max` · `--carousel-slide-share` · `--carousel-slide-share-md` · `--carousel-slide-share-sm` · `--carousel-slide-width` · `--carousel-step` · `--content-max-width-reading` · `--control-lg` · `--control-md` · `--control-sm` · `--ds-background-brand-bold` · `--ds-border` · `--ds-border-bold` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-raised` · `--ds-text` · `--ds-text-subtle` · `--inline-lg` · `--inline-md` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-duration-short` · `--motion-easing-entrance` · `--motion-easing-exit` · `--motion-easing-standard` · `--page-stack-md` · `--progress-indicator-dot-size-8` · `--radius-full` · `--section-stack-lg` · `--section-stack-md` · `--stack-md` · `--stack-sm`
+`--body-default` · `--border-selected` · `--card-radius` · `--carousel-aspect` · `--carousel-edge-fade` · `--carousel-neighbor-dim` · `--carousel-neighbor-gap` · `--carousel-neighbor-scale` · `--carousel-offset` · `--carousel-progress` · `--carousel-ring-size` · `--carousel-ring-stroke` · `--carousel-slide-max` · `--carousel-slide-share` · `--carousel-slide-share-md` · `--carousel-slide-share-sm` · `--carousel-slide-width` · `--carousel-step` · `--content-max-width-reading` · `--control-lg` · `--ds-background-brand-bold` · `--ds-border` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-raised` · `--ds-text` · `--ds-text-subtle` · `--inline-lg` · `--inline-md` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-duration-short` · `--motion-easing-entrance` · `--motion-easing-exit` · `--motion-easing-standard` · `--page-stack-md` · `--section-stack-lg` · `--section-stack-md` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/layout-and-structure/Carousel/Carousel.scss`. Override these through the token layer, never with a literal.
 

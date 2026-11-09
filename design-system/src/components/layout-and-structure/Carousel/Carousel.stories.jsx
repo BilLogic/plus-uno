@@ -11,7 +11,7 @@ export default {
     parameters: {
         docs: {
             description: {
-                component: 'A centered stage of slides in a flat row, with a play button in a progress ring, a progress pill per slide and a caption that changes with the slide.',
+                component: 'A centered stage of slides in a flat row, with a play button in a progress ring, a progress indicator whose current dot fills over the time each slide shows, and a caption that changes with the slide.',
             },
         },
     },
@@ -185,7 +185,7 @@ const fakeReducedMotion = () => {
     return () => { window.matchMedia = real; };
 };
 
-/** Reduced motion: no autoplay, no play button or ring, the active pill full; arrows show and every move is instant. */
+/** Reduced motion: no autoplay, no play button or ring, the current bar full; arrows show and every move is instant. */
 export const ReducedMotion = {
     render: (args) => <CarouselFrame {...args} />,
     args: { autoplay: true, interval: 500 },
@@ -196,7 +196,7 @@ export const ReducedMotion = {
         await expect(canvas.getByRole('button', { name: 'Previous slide' })).toBeVisible();
         await expect(canvas.getByRole('button', { name: 'Next slide' })).toBeVisible();
         await expect(canvasElement.querySelector('.plus-carousel-ring')).toBeNull();
-        await waitFor(() => expect(pillFillScale(canvasElement.querySelector('.plus-carousel-pill--active'))).toBe(1));
+        await waitFor(() => expect(fillScale(currentDot(canvasElement))).toBe(1));
 
         // Nothing moves on its own, even past several intervals.
         await new Promise((resolve) => setTimeout(resolve, 1200));
@@ -262,7 +262,7 @@ export const PauseStopsProgress = {
     },
 };
 
-/** Choosing a pill moves to its slide and starts that slide's clock over; it does not pause. */
+/** Choosing a dot moves to its slide and starts that slide's clock over; it does not pause. */
 export const DotRestartsClock = {
     render: () => <CarouselFrame interval={3000} />,
     beforeEach: clockReady,
@@ -273,7 +273,7 @@ export const DotRestartsClock = {
 
         const third = canvas.getByRole('button', { name: 'Slide 3 of 5: Training that fits between sessions' });
         await userEvent.click(third);
-        await waitFor(() => expect(third).toHaveAttribute('aria-current', 'true'));
+        await waitFor(() => expect(third).toHaveAttribute('aria-current', 'step'));
         await expect(activeLabel(canvasElement)).toBe('3 of 5');
         await expect(progressOf(canvasElement)).toBeLessThan(0.1);
 
@@ -366,35 +366,50 @@ export const NeighborsWrap = {
     },
 };
 
-const pillFillScale = (pill) => new DOMMatrixReadOnly(
-    getComputedStyle(pill.querySelector('.plus-carousel-pill-fill')).transform
-).a;
+const dotsOf = (canvasElement) => [...canvasElement.querySelectorAll('.plus-progress-indicator__dot')];
+const currentDot = (canvasElement) => canvasElement.querySelector('.plus-progress-indicator__dot--selected');
+// The fill's horizontal scale, or 0 for a dot with no bar.
+const fillScale = (dot) => {
+    const fill = dot.querySelector('.plus-progress-indicator__fill');
+    return fill ? new DOMMatrixReadOnly(getComputedStyle(fill).transform).a : 0;
+};
 
-/** The active slide is a 32px pill whose fill grows on the ring's clock; the others are 8px dots. */
-export const PillFills = {
+/** The current slide's dot is a 32px bar whose fill grows on the ring's clock; the others are 8px dots. */
+export const DotFills = {
     render: () => <CarouselFrame interval={3000} />,
     beforeEach: clockReady,
     play: async ({ canvasElement }) => {
         await pointerOffStage(canvasElement);
-        const pills = [...canvasElement.querySelectorAll('.plus-carousel-pill')];
-        await expect(pills).toHaveLength(5);
-        await expect(pills[0]).toHaveAttribute('aria-current', 'true');
-        await waitFor(() => expect(pills[0].querySelector('.plus-carousel-pill-track').getBoundingClientRect().width).toBe(32));
-        await expect(pills[1].querySelector('.plus-carousel-pill-track').getBoundingClientRect().width).toBe(8);
+        const dots = dotsOf(canvasElement);
+        await expect(dots).toHaveLength(5);
+        await expect(dots[0]).toHaveAttribute('aria-current', 'step');
+        await waitFor(() => expect(dots[0].getBoundingClientRect().width).toBe(32));
+        await expect(dots[1].getBoundingClientRect().width).toBe(8);
 
         await clockPasses(canvasElement, 0.1);
-        await waitFor(() => expect(pillFillScale(pills[0])).toBeGreaterThan(0.05));
-        // The pill and the ring read the same clock.
-        await expect(Math.abs(pillFillScale(pills[0]) - progressOf(canvasElement))).toBeLessThan(0.1);
-        await expect(pillFillScale(pills[1])).toBe(0);
+        await waitFor(() => expect(fillScale(dots[0])).toBeGreaterThan(0.05));
+        // The bar and the ring read the same clock.
+        await expect(Math.abs(fillScale(dots[0]) - progressOf(canvasElement))).toBeLessThan(0.1);
+        await expect(fillScale(dots[1])).toBe(0);
     },
 };
 
-/** Without autoplay the active pill shows full. */
-export const StaticPillFull = {
+/** Without autoplay the current bar shows full. */
+export const StaticBarFull = {
     render: () => <CarouselFrame autoplay={false} />,
     play: async ({ canvasElement }) => {
-        const active = canvasElement.querySelector('.plus-carousel-pill--active');
-        await waitFor(() => expect(pillFillScale(active)).toBe(1));
+        await waitFor(() => expect(fillScale(currentDot(canvasElement))).toBe(1));
+    },
+};
+
+/** Every dot is a button with at least a 24px target, so a dot is easy to hit. */
+export const DotTargets = {
+    render: () => <CarouselFrame autoplay={false} />,
+    play: async ({ canvasElement }) => {
+        for (const dot of dotsOf(canvasElement)) {
+            const area = getComputedStyle(dot, '::before');
+            await expect(parseFloat(area.height), 'target height').toBeGreaterThanOrEqual(24);
+            await expect(dot.getBoundingClientRect().width + 2 * -parseFloat(area.left), 'target width').toBeGreaterThanOrEqual(24);
+        }
     },
 };

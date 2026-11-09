@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import './Object.scss';
 import { iconClass } from '../../../lib/icon';
+import Icon from '../Icon';
 
 export const OBJECT_SIZES = [12, 16];
 
@@ -26,7 +27,7 @@ export function createObjectIcon(faClass, defaultLabel) {
             className={clsx('plus-object', `plus-object--${size}`, className)}
             {...props}
         >
-            <i className={faClass} aria-hidden="true" />
+            <Icon name={faClass} />
         </span>
     );
     ObjectIcon.propTypes = objectPropTypes;

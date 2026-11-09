@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
+import Icon from '../Icon';
 import './Avatar.scss';
-import { iconClass } from '../../../lib/icon';
 
 /**
  * A person or an agent, as a picture, their initials or an icon.
@@ -36,8 +36,7 @@ export const initialsOf = (name = '', max = 2) => {
 
 const renderIcon = (icon) => {
     if (typeof icon !== 'string') return icon;
-    const className = iconClass(icon);
-    return <i className={className} aria-hidden="true" />;
+    return <Icon name={icon} />;
 };
 
 /** A person or an agent shown as a picture, initials or an icon. The picture wins when it loads, then the initials, then the icon, then a plain person glyph. */

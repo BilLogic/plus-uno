@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import AiIcon from '../../images-and-icons/AiIcon';
+import Icon from '../../images-and-icons/Icon';
 import './Button.scss';
-import { iconClass } from '../../../lib/icon';
 
 /** A bare `#` or empty `href` names no real destination; Enter still needs one to fire a click on an anchor. */
 const isTrivialHref = (href) => !href || href.trim() === '#';
@@ -18,7 +18,7 @@ const ButtonContent = ({ children, text, iconBefore, iconAfter }) => {
     const renderIcon = (icon, position) => {
         if (!icon) return null;
         const glyph = typeof icon === 'string'
-            ? <i className={iconClass(icon)} aria-hidden="true" />
+            ? <Icon name={icon} />
             : icon;
         return <span className={`plus-btn-visual plus-btn-visual--${position}`}>{glyph}</span>;
     };

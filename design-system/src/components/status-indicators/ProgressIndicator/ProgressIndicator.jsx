@@ -12,7 +12,13 @@ export const PROGRESS_INDICATOR_SPACINGS = ['comfortable', 'cozy', 'compact'];
  *
  * `onSelect` makes every dot a button and lets a person jump to any step;
  * without it the dots are decorative and `aria-current` on the active one is
- * the only state a screen reader gets.
+ * the only state a screen reader gets. A dot that is a button keeps a 24px
+ * target, so the gap between buttons widens to fit it.
+ *
+ * `progress` times the current step: its dot stretches into a bar whose fill
+ * tracks `progress`, from 0 to 1, as in a carousel that moves on its own. A
+ * step with no clock passes `1`, and the bar shows full; under reduced motion
+ * the bar always shows full.
  *
  * @param {object} props
  * @param {string[]} props.values - One entry per step. Only `.length` and index are used to render dots; each entry becomes a dot's accessible name when `onSelect` is set.
@@ -23,6 +29,7 @@ export const PROGRESS_INDICATOR_SPACINGS = ['comfortable', 'cozy', 'compact'];
  * @param {(selection: { index: number }) => void} [props.onSelect] - Present → dots become buttons.
  * @param {string} [props.ariaControls] - Id of the panel the dots control.
  * @param {string} [props.label='Progress'] - Accessible name for the dot group.
+ * @param {number} [props.progress] - Present → the current dot is a bar filled to this fraction, 0 to 1.
  */
 const ProgressIndicator = ({
     values,
@@ -33,9 +40,12 @@ const ProgressIndicator = ({
     onSelect,
     ariaControls,
     label = 'Progress',
+    progress,
 }) => {
     const interactive = typeof onSelect === 'function';
     const Tag = interactive ? 'button' : 'span';
+    const timed = typeof progress === 'number' && !Number.isNaN(progress);
+    const fraction = timed ? Math.min(Math.max(progress, 0), 1) : 0;
 
     return (
         <div
@@ -44,7 +54,9 @@ const ProgressIndicator = ({
                 `plus-progress-indicator--${appearance}`,
                 `plus-progress-indicator--${spacing}`,
                 `plus-progress-indicator--size-${size}`,
-            ].join(' ')}
+                interactive && 'plus-progress-indicator--interactive',
+                timed && 'plus-progress-indicator--timed',
+            ].filter(Boolean).join(' ')}
             role="group"
             aria-label={label}
         >
@@ -62,7 +74,16 @@ const ProgressIndicator = ({
                         aria-controls={interactive ? ariaControls : undefined}
                         aria-label={interactive ? String(value) : undefined}
                         onClick={interactive ? () => onSelect({ index }) : undefined}
-                    />
+                    >
+                        {timed && isSelected && (
+                            <span className="plus-progress-indicator__bar" aria-hidden="true">
+                                <span
+                                    className="plus-progress-indicator__fill"
+                                    style={{ '--progress-indicator-progress': String(fraction) }}
+                                />
+                            </span>
+                        )}
+                    </Tag>
                 );
             })}
         </div>
@@ -78,6 +99,8 @@ ProgressIndicator.propTypes = {
     onSelect: PropTypes.func,
     ariaControls: PropTypes.string,
     label: PropTypes.string,
+    /** Times the current step: its dot stretches into a bar filled to this fraction, 0 to 1. Pass `1` for a step with no clock. */
+    progress: PropTypes.number,
 };
 
 export default ProgressIndicator;

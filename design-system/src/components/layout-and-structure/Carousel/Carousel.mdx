@@ -42,7 +42,7 @@ export const figmaMeta = {
 <Meta of={CarouselStories} />
 
 <Title />
-A centered stage of slides in a flat row: the active one full size, a smaller, faded neighbor peeking on each side. A pill per slide shows where you are: the active one stretches and fills over the slide's time, on the same clock as the ring round the play button.
+A centered stage of slides in a flat row: the active one full size, a smaller, faded neighbor peeking on each side. A <a href="?path=/docs/components-status-indicators-progress-indicator--docs">progress indicator</a> shows where you are: the current dot stretches into a bar that fills over the slide's time, on the same clock as the ring round the play button.
 
 <DocsTabs of={CarouselStories}>
 
@@ -63,7 +63,7 @@ A centered stage of slides in a flat row: the active one full size, a smaller, f
 
 <ComponentExample of={CarouselStories.Overview} title="Autoplay" description="The default. The ring round the play button fills over each slide's time, then the next slide comes to the front." />
 
-<ComponentExample of={CarouselStories.Static} title="Autoplay off" description={<>With <code>autoplay={'{false}'}</code>, arrows sit either side of the pills and the slides wait to be chosen.</>} />
+<ComponentExample of={CarouselStories.Static} title="Autoplay off" description={<>With <code>autoplay={'{false}'}</code>, arrows sit either side of the dots and the slides wait to be chosen.</>} />
 
 <ComponentExample of={CarouselStories.NoLoop} title="No loop" description={<>Without <code>loop</code>, the arrows stop at the first and last slide.</>} />
 
@@ -106,7 +106,7 @@ new, a short tour, a handful of featured items. Every slide but one is hidden at
 any moment, so nothing a person must read or act on belongs in it.
 
 `slides` takes `{ media, title, description }`. `media` is the card; `title`
-and `description` fill the caption under the controls and name each pill.
+and `description` fill the caption under the controls and name each dot.
 Autoplay is on, at `interval` 5000 ms a slide, and loops. `peek` shows the
 neighbors; turn it off to show the current slide alone. `onSlideChange` gets
 the new index. Give the region a name
@@ -121,7 +121,7 @@ with `aria-label` or `aria-labelledby`.
 1. **Stage.** Full width, with the edges fading out.
 2. **Slide.** A card, centered. A neighbor on each side sits in the same row, scaled down and faded; clicking one brings it to the front.
 3. **Play button.** A subtle circle `IconButton`, Pause while playing and Play while paused, inside a ring whose arc fills over the slide's time.
-4. **Pills.** One per slide. Inactive slides are 8px dots; the active one stretches to a 32px pill whose fill grows left to right over the slide's time. When it fills, the next slide comes up and its pill starts. Choosing a pill moves to its slide and starts its clock over.
+4. **Progress indicator.** A selectable `ProgressIndicator`, one dot per slide. The current dot stretches into a 32px bar whose fill grows from the start edge over the slide's time. When it fills, the next slide comes up and its dot takes the bar. Choosing a dot moves to its slide and starts its clock over.
 5. **Arrows.** Circle `IconButton`s, only when the carousel does not autoplay, in place of the play button.
 6. **Caption.** The active slide's title as a `Heading` and one line of body text, centered under the controls.
 
@@ -132,11 +132,11 @@ with `aria-label` or `aria-labelledby`.
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Playing</td><td>The ring arc and the active pill fill together in <code>--ds-background-brand-bold</code>.</td></tr>
-<tr><td>Paused</td><td>The play icon shows. The arc and the pill fill hold where they stopped.</td></tr>
+<tr><td>Playing</td><td>The ring arc and the bar fill together in <code>--ds-background-brand-bold</code>.</td></tr>
+<tr><td>Paused</td><td>The play icon shows. The arc and the bar hold where they stopped.</td></tr>
 <tr><td>Held</td><td>The clock stops while the pointer rests on the stage, keyboard focus is inside, the carousel is out of view or the tab is hidden. It resumes where it held. Pressing Play starts it again even with focus inside.</td></tr>
-<tr><td>Hovered, pressed, focused</td><td>The play button and the arrows keep the states of <code>IconButton</code>. A hovered or pressed pill's track turns <code>--ds-border-bold</code>; a focused one takes the focus ring.</td></tr>
-<tr><td>Reduced motion or no autoplay</td><td>No ring; the active pill shows full.</td></tr>
+<tr><td>Hovered, pressed, focused</td><td>The play button and the arrows keep the states of <code>IconButton</code>. The dots keep the states of <code>ProgressIndicator</code>.</td></tr>
+<tr><td>Reduced motion or no autoplay</td><td>No ring; the bar shows full.</td></tr>
 <tr><td>Disabled arrow</td><td>Without <code>loop</code>, at the first or last slide.</td></tr>
 </tbody>
 </DocsTable>
@@ -151,7 +151,7 @@ with `aria-label` or `aria-labelledby`.
 <tr><td>Card</td><td><code>--ds-surface-raised</code> with <code>--ds-shadow-raised</code>, corners <code>--card-radius</code>.</td></tr>
 <tr><td>Neighbors</td><td>Faded under <code>--ds-surface</code> at 45%, <code>--section-stack-lg</code> apart (<code>--inline-lg</code> on a narrow stage).</td></tr>
 <tr><td>Ring</td><td><code>--control-lg</code> across, <code>--border-selected</code> wide. Track <code>--ds-border</code>; progress <code>--ds-background-brand-bold</code>.</td></tr>
-<tr><td>Pills</td><td>Dot <code>--progress-indicator-dot-size-8</code>, active pill <code>--control-md</code> long, both <code>--radius-full</code>. Track <code>--ds-border</code>; fill <code>--ds-background-brand-bold</code>. Each sits in a <code>--control-sm</code> target with <code>--inline-md</code> either side.</td></tr>
+<tr><td>Progress indicator</td><td>The default <code>ProgressIndicator</code>: dots <code>--progress-indicator-dot-size-8</code>, the bar <code>--control-md</code> long, each dot a <code>--control-sm</code> target.</td></tr>
 <tr><td>Motion</td><td>A move takes <code>--motion-duration-long</code> on <code>--motion-easing-standard</code>. The caption lifts out over <code>--motion-duration-short</code> and rises in over <code>--motion-duration-medium</code>.</td></tr>
 <tr><td>Caption</td><td><code>Heading</code> size small; line in <code>--body-default</code> and <code>--ds-text-subtle</code>; at most <code>--content-max-width-reading</code> wide.</td></tr>
 <tr><td>Spacing</td><td><code>--section-stack-md</code> between the stage, the controls and the caption; <code>--inline-md</code> between controls.</td></tr>
@@ -166,24 +166,24 @@ with `aria-label` or `aria-labelledby`.
 
 ### Keep it to three to six slides.
 
-The pills are the map. Past six, nobody gets to the end.
+The dots are the map. Past six, nobody gets to the end.
 
 <DoDontPair
     doExample={<Carousel aria-label="Features" slides={titled} autoplay={false} />}
     doCaption="Three slides, each worth seeing."
     dontExample={<Carousel aria-label="Features" slides={many} autoplay={false} />}
-    dontCaption="Ten slides and a row of pills to match."
+    dontCaption="Ten slides and a row of dots to match."
 />
 
 ### Give every slide a title.
 
-The title is the caption a sighted reader sees and the name a screen reader hears on each pill.
+The title is the caption a sighted reader sees and the name a screen reader hears on each dot.
 
 <DoDontPair
     doExample={<Carousel aria-label="Features" slides={titled} autoplay={false} />}
     doCaption="A title and one line for each slide."
     dontExample={<Carousel aria-label="Features" slides={untitled} autoplay={false} />}
-    dontCaption="No titles: the pills say only Slide 1 of 3."
+    dontCaption="No titles: the dots say only Slide 1 of 3."
 />
 
 ### Keep the caption to one line.
@@ -205,9 +205,9 @@ Autoplay moves on whether or not a person finished. Turn it off with `autoplay={
 - **The pause control comes first.** Autoplay can always be stopped from the
   play button, which is the first control in the row. Its name says what a
   press will do: Pause, then Play.
-- **Each pill is a button.** The pills are a group named "Choose a slide"; each
+- **Each dot is a button.** The dots are a group named "Choose a slide"; each
   is named "Slide 2 of 5" and the slide's title, and the current one carries
-  `aria-current="true"`. Each pill is its own tab stop, with a 24px target.
+  `aria-current="step"`. Each dot is its own tab stop, with a 24px target.
 - **Only the active slide is read.** Each slide is a group named "2 of 5";
   the others are `aria-hidden` and inert, so focus never lands behind the
   front card.

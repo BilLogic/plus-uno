@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field } from '@base-ui/react/field';
 import Tooltip from '../../overlays-and-layering/Tooltip/Tooltip';
+import Icon from '../../images-and-icons/Icon';
 import './FieldFrame.scss';
-import { iconClass } from '../../../lib/icon';
 
 /**
  * What a caption tone means for the box and the control. One place, so every
@@ -77,7 +77,7 @@ export const FieldLabel = ({
                     className="plus-field-info"
                     aria-label={`About ${name ?? (typeof children === 'string' ? children : 'this field')}`}
                 >
-                    <i className={iconClass('circle-info')} aria-hidden="true" />
+                    <Icon name="circle-info" />
                 </button>
             </Tooltip>
         </div>
@@ -100,9 +100,9 @@ FieldLabel.propTypes = {
 };
 
 const CAPTION_ICON = {
-    invalid: iconClass('circle-exclamation'),
-    warning: iconClass('triangle-exclamation'),
-    success: iconClass('circle-check'),
+    invalid: 'circle-exclamation',
+    warning: 'triangle-exclamation',
+    success: 'circle-check',
 };
 
 /**
@@ -131,7 +131,7 @@ export const FieldCaption = ({
                     className={`plus-field-caption__message plus-field-caption__message--${tone}`}
                     role={tone === 'invalid' ? 'alert' : undefined}
                 >
-                    {CAPTION_ICON[tone] && <i className={CAPTION_ICON[tone]} aria-hidden="true" />}
+                    {CAPTION_ICON[tone] && <Icon name={CAPTION_ICON[tone]} />}
                     <span>{message}</span>
                 </div>
             ) : <span />}

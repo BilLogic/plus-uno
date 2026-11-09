@@ -2,6 +2,7 @@ import React, { createContext, useContext, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import { Popover } from '@base-ui/react/popover';
+import Icon from '../../images-and-icons/Icon';
 import './Spotlight.scss';
 
 export const SPOTLIGHT_PLACEMENTS = [
@@ -101,7 +102,7 @@ export const Spotlight = ({
 
     const dismissControl = dismissible && (
         <button type="button" className="plus-spotlight-dismiss-button" aria-label="Dismiss" onClick={onDismiss}>
-            <i className="fa-solid fa-xmark" aria-hidden="true" />
+            <Icon name="xmark" />
         </button>
     );
 

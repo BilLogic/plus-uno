@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import Tag, { TagContext, resolveTagKind, useTagContext } from '../Tag';
 import DropdownMenu from '../../forms-and-inputs/DropdownMenu';
 import { ButtonItem, CustomItem } from '@/components/navigation/MenuGroup';
+import Icon from '../../images-and-icons/Icon';
 import './TagGroup.scss';
-import { iconClass } from '../../../lib/icon';
 
 /**
  * The container for a set of tags.
@@ -103,7 +103,7 @@ const menuRowOf = (child) => {
                     key={child.key}
                     component={props.linkComponent || 'a'}
                     href={props.href}
-                    elemAfter={<i className={iconClass('arrow-right')} aria-hidden="true" />}
+                    elemAfter={<Icon name="arrow-right" />}
                     onClick={props.onClick}
                 >
                     {text}

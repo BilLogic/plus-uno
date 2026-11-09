@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { expect, fireEvent, userEvent, within } from 'storybook/test';
+import React, { useEffect, useState } from 'react';
+import { expect, fireEvent, userEvent, waitFor, within } from 'storybook/test';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
-import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 
 import ProgressIndicator, {
     PROGRESS_INDICATOR_APPEARANCES,
@@ -30,6 +30,7 @@ export default {
         size: { control: 'select', options: PROGRESS_INDICATOR_SIZES },
         spacing: { control: 'select', options: PROGRESS_INDICATOR_SPACINGS },
         onSelect: { table: { disable: true } },
+        progress: { control: { type: 'range', min: 0, max: 1, step: 0.05 } },
     },
 };
 
@@ -151,4 +152,81 @@ SizeTokens.play = async ({ canvasElement }) => {
     const large = canvasElement.querySelector('[aria-label="Large"] .plus-progress-indicator__dot');
     await expect(parseFloat(getComputedStyle(large).width)).toBeGreaterThan(parseFloat(getComputedStyle(small).width));
     await expect(canvasElement.querySelector('.plus-progress-indicator').getAttribute('style')).toBeNull();
+};
+
+/* ------------------------------------------------------------------ timed */
+
+const fillScale = (dot) => {
+    const fill = dot.querySelector('.plus-progress-indicator__fill');
+    return fill ? new DOMMatrixReadOnly(getComputedStyle(fill).transform).a : 0;
+};
+
+/** With `progress`, the current dot stretches into a bar filled to that fraction; the other dots stay dots. */
+export const Timed = () => (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-100)' }}>
+        <ProgressIndicator values={VALUES} selectedIndex={1} progress={0} label="Start" />
+        <ProgressIndicator values={VALUES} selectedIndex={1} progress={0.5} label="Half" />
+        <ProgressIndicator values={VALUES} selectedIndex={1} progress={1} label="Full" />
+    </div>
+);
+Timed.play = async ({ canvasElement }) => {
+    const current = (name) => canvasElement.querySelector(`[aria-label="${name}"] .plus-progress-indicator__dot--selected`);
+    const other = canvasElement.querySelector('[aria-label="Half"] .plus-progress-indicator__dot');
+    // Probes are read outside waitFor: a probe adds an element, which would wake waitFor again.
+    const bar = tokenLength(canvasElement, '--control-md');
+    await waitFor(() => expect(current('Half').getBoundingClientRect().width).toBe(bar));
+    await expect(other.getBoundingClientRect().width).toBe(tokenLength(canvasElement, '--progress-indicator-dot-size-8'));
+    await expect(getComputedStyle(current('Half')).backgroundColor, 'track').toBe(tokenColor(canvasElement, '--ds-icon-subtlest'));
+    const fill = current('Half').querySelector('.plus-progress-indicator__fill');
+    await expect(getComputedStyle(fill).backgroundColor, 'fill').toBe(tokenColor(canvasElement, '--ds-background-brand-bold'));
+    await expect(fillScale(current('Start'))).toBe(0);
+    await expect(fillScale(current('Half'))).toBeCloseTo(0.5);
+    await expect(fillScale(current('Full'))).toBe(1);
+};
+
+/** A clock drives `progress`: the bar fills over the step's time, then the next dot takes it. Here each step lasts two seconds, once through. */
+export const Clock = () => {
+    const [step, setStep] = useState({ index: 0, progress: 0 });
+    useEffect(() => {
+        let frame = 0;
+        let start = 0;
+        const tick = (now) => {
+            if (!start) start = now;
+            const elapsed = (now - start) / 2000;
+            if (elapsed >= VALUES.length) {
+                setStep({ index: VALUES.length - 1, progress: 1 });
+                return;
+            }
+            setStep({ index: Math.floor(elapsed), progress: elapsed % 1 });
+            frame = requestAnimationFrame(tick);
+        };
+        frame = requestAnimationFrame(tick);
+        return () => cancelAnimationFrame(frame);
+    }, []);
+    return <ProgressIndicator values={VALUES} selectedIndex={step.index} progress={step.progress} label="Slides" />;
+};
+Clock.play = async ({ canvasElement }) => {
+    const current = () => canvasElement.querySelector('.plus-progress-indicator__dot--selected');
+    await waitFor(() => expect(fillScale(current())).toBeGreaterThan(0.1), { timeout: 3000 });
+};
+
+/** Interactive and timed together, as in a carousel: every dot is a button with a target of at least 24. */
+export const TimedInteractive = () => {
+    const [selectedIndex, setSelectedIndex] = useState(0);
+    return (
+        <ProgressIndicator values={VALUES} selectedIndex={selectedIndex} progress={1} onSelect={({ index }) => setSelectedIndex(index)} label="Slides" />
+    );
+};
+TimedInteractive.play = async ({ canvasElement }) => {
+    const buttons = within(canvasElement).getAllByRole('button');
+    const target = tokenLength(canvasElement, '--control-sm');
+    for (const button of buttons) {
+        const area = getComputedStyle(button, '::before');
+        await expect(parseFloat(area.height), 'target height').toBeGreaterThanOrEqual(target);
+        await expect(button.getBoundingClientRect().width - 2 * parseFloat(area.left), 'target width').toBeGreaterThanOrEqual(target);
+    }
+    const bar = tokenLength(canvasElement, '--control-md');
+    await userEvent.click(buttons[2]);
+    await expect(buttons[2]).toHaveAttribute('aria-current', 'step');
+    await waitFor(() => expect(buttons[2].getBoundingClientRect().width).toBe(bar));
 };

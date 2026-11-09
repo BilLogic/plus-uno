@@ -84,7 +84,7 @@ Don't: A dot on a tiny byline, where presence is not the question.
 - For a school, a tool or a lesson in a square, use `Tile`.
 - For a role or state beside a name, use `Status`.
 
-Same group: `AiIcon` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile`
+Same group: `AiIcon` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Object` · `Tile`
 
 ## Parts
 

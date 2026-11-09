@@ -1571,7 +1571,7 @@
       "import": "import { Carousel } from '@/components';",
       "group": "layout-and-structure",
       "source": "design-system/src/components/layout-and-structure/Carousel/Carousel.jsx",
-      "summary": "A centered stage of slides: the active one full size and, with `peek`, one neighbor on each side in the same flat row, smaller and faded. Under it, a play button whose ring fills over the slide's time, a pill per slide (the active one stretches and fills on the same clock), and a caption that changes with the slide. Autoplay holds while the pointer rests on the stage, keyboard focus is inside, the carousel is out of view or the tab is hidden. Under reduced motion it never moves on its own: arrows replace the play button, the active pill shows full and every move is instant.",
+      "summary": "A centered stage of slides: the active one full size and, with `peek`, one neighbor on each side in the same flat row, smaller and faded. Under it, a play button whose ring fills over the slide's time, a progress indicator whose current dot stretches into a bar that fills on the same clock, and a caption that changes with the slide. Autoplay holds while the pointer rests on the stage, keyboard focus is inside, the carousel is out of view or the tab is hidden. Under reduced motion it never moves on its own: arrows replace the play button, the current bar shows full and every move is instant.",
       "props": [
         {
           "name": "slides",
@@ -1579,7 +1579,7 @@
           "required": true,
           "default": "[]",
           "values": null,
-          "description": "The slides, in order. `media` is the card; `title` and `description` fill the caption and name the pill. A string `media` renders as text, or as an image when it is a path ending in an image extension (`alt` describes it).",
+          "description": "The slides, in order. `media` is the card; `title` and `description` fill the caption and name the slide's dot. A string `media` renders as text, or as an image when it is a path ending in an image extension (`alt` describes it).",
           "deprecated": null
         },
         {
@@ -1679,8 +1679,9 @@
         "InactiveSlidesHidden",
         "RegionIsNamed",
         "NeighborsWrap",
-        "PillFills",
-        "StaticPillFull"
+        "DotFills",
+        "StaticBarFull",
+        "DotTargets"
       ],
       "tokens": [
         "--body-default",
@@ -1692,7 +1693,6 @@
         "--carousel-neighbor-gap",
         "--carousel-neighbor-scale",
         "--carousel-offset",
-        "--carousel-pill-track",
         "--carousel-progress",
         "--carousel-ring-size",
         "--carousel-ring-stroke",
@@ -1704,11 +1704,8 @@
         "--carousel-step",
         "--content-max-width-reading",
         "--control-lg",
-        "--control-md",
-        "--control-sm",
         "--ds-background-brand-bold",
         "--ds-border",
-        "--ds-border-bold",
         "--ds-shadow-raised",
         "--ds-surface",
         "--ds-surface-raised",
@@ -1723,8 +1720,6 @@
         "--motion-easing-exit",
         "--motion-easing-standard",
         "--page-stack-md",
-        "--progress-indicator-dot-size-8",
-        "--radius-full",
         "--section-stack-lg",
         "--section-stack-md",
         "--stack-md",
@@ -5000,6 +4995,116 @@
       ]
     },
     {
+      "name": "Icon",
+      "kind": "component",
+      "import": "import { Icon } from '@/components';",
+      "group": "images-and-icons",
+      "source": "design-system/src/components/images-and-icons/Icon/Icon.jsx",
+      "summary": "One Font Awesome Free glyph, drawn from its name. - **name** is a Free name: regular where Free has a regular weight, solid where it does not. A name that carries its family (`fa-brands fa-slack`) is kept. - **size** is 12, 16 or 24, each bound to its icon size token. Without it the glyph is the small icon size, or the size the component around it sets. - **color** is an icon color role. Without it the glyph takes the color around it. - **label** names the icon for assistive technology. Without it the icon is hidden, so the words beside it carry the meaning.",
+      "props": [
+        {
+          "name": "name",
+          "type": "string",
+          "required": true,
+          "default": null,
+          "values": null,
+          "description": "A Font Awesome Free name, such as `calendar-days`, or a name with its family.",
+          "deprecated": null
+        },
+        {
+          "name": "size",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "12",
+            "16",
+            "24"
+          ],
+          "description": "The size in px, bound to an icon size token. Unset, the glyph is the small icon size, or the size the component around it sets.",
+          "deprecated": null
+        },
+        {
+          "name": "color",
+          "type": "enum",
+          "required": false,
+          "default": null,
+          "values": [
+            "default",
+            "subtle",
+            "subtlest",
+            "inverse",
+            "brand",
+            "selected",
+            "disabled",
+            "success",
+            "warning",
+            "warning-inverse",
+            "danger",
+            "information",
+            "discovery"
+          ],
+          "description": "An icon color role. Unset, the glyph takes the color around it.",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "An accessible name. Without it the icon is hidden from assistive technology.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "More classes for the glyph, beside the family and name classes.",
+          "deprecated": null
+        },
+        {
+          "name": "style",
+          "type": "object",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Inline styles for the glyph.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Names",
+        "Sizes",
+        "Colors",
+        "Inherited",
+        "Labeled",
+        "InAComponent",
+        "Interactive",
+        "Rest"
+      ],
+      "tokens": [
+        "--ds-icon",
+        "--ds-icon-brand",
+        "--ds-icon-danger",
+        "--ds-icon-disabled",
+        "--ds-icon-discovery",
+        "--ds-icon-information",
+        "--ds-icon-inverse",
+        "--ds-icon-selected",
+        "--ds-icon-subtle",
+        "--ds-icon-subtlest",
+        "--ds-icon-success",
+        "--ds-icon-warning",
+        "--ds-icon-warning-inverse",
+        "--icon-lg",
+        "--icon-md",
+        "--icon-sm"
+      ]
+    },
+    {
       "name": "IconButton",
       "kind": "component",
       "import": "import { IconButton } from '@/components';",
@@ -5229,6 +5334,10 @@
         "SmartCharacters",
         "MathCharacters",
         "Sizes",
+        "Size48",
+        "Size96",
+        "Size160",
+        "Size240",
         "DefaultSize",
         "Rest",
         "Decorative",
@@ -9101,7 +9210,7 @@
       "import": "import { ProgressIndicator } from '@/components';",
       "group": "status-indicators",
       "source": "design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.jsx",
-      "summary": "A row of dots showing where you are along the steps of a journey. Unlike `ProgressTracker`, the steps carry no label of their own — only a position. `onSelect` makes every dot a button and lets a person jump to any step; without it the dots are decorative and `aria-current` on the active one is the only state a screen reader gets.",
+      "summary": "A row of dots showing where you are along the steps of a journey. Unlike `ProgressTracker`, the steps carry no label of their own — only a position. `onSelect` makes every dot a button and lets a person jump to any step; without it the dots are decorative and `aria-current` on the active one is the only state a screen reader gets. A dot that is a button keeps a 24px target, so the gap between buttons widens to fit it. `progress` times the current step: its dot stretches into a bar whose fill tracks `progress`, from 0 to 1, as in a carousel that moves on its own. A step with no clock passes `1`, and the bar shows full; under reduced motion the bar always shows full.",
       "props": [
         {
           "name": "values",
@@ -9186,6 +9295,15 @@
           "values": null,
           "description": null,
           "deprecated": null
+        },
+        {
+          "name": "progress",
+          "type": "number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Times the current step: its dot stretches into a bar filled to this fraction, 0 to 1. Pass `1` for a step with no clock.",
+          "deprecated": null
         }
       ],
       "stories": [
@@ -9199,9 +9317,14 @@
         "Pressed",
         "Focused",
         "Decorative",
-        "SizeTokens"
+        "SizeTokens",
+        "Timed",
+        "Clock",
+        "TimedInteractive"
       ],
       "tokens": [
+        "--control-md",
+        "--control-sm",
         "--ds-background-brand-bold",
         "--ds-background-discovery-bold",
         "--ds-background-inverse-subtle",
@@ -9215,10 +9338,16 @@
         "--focus-ring-width",
         "--inline-md",
         "--inline-sm",
+        "--motion-duration-medium",
         "--motion-duration-short",
         "--motion-easing-standard",
+        "--progress-indicator-dot",
         "--progress-indicator-dot-size-12",
         "--progress-indicator-dot-size-8",
+        "--progress-indicator-fill",
+        "--progress-indicator-gap",
+        "--progress-indicator-progress",
+        "--progress-indicator-spacing",
         "--radius-full",
         "--stack-sm"
       ]

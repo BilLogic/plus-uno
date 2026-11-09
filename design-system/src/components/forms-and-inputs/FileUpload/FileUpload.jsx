@@ -2,8 +2,8 @@ import React, { useState, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Button from '@/components/forms-and-inputs/Button';
 import useFieldId from '../useFieldId';
+import Icon from '../../images-and-icons/Icon';
 import './FileUpload.scss';
-import { iconClass } from '../../../lib/icon';
 
 /** FileUpload: a form field that opens the platform file picker. It chooses files; it does not upload them. */
 const FileUpload = ({
@@ -68,9 +68,9 @@ const FileUpload = ({
     };
 
     const validationIcon = state === 'invalid' ? (
-        <i className={iconClass('triangle-exclamation')} aria-hidden="true" />
+        <Icon name="triangle-exclamation" />
     ) : state === 'valid' ? (
-        <i className={iconClass('circle-check')} aria-hidden="true" />
+        <Icon name="circle-check" />
     ) : null;
 
     // Build description text

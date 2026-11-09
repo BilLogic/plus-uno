@@ -1,0 +1,86 @@
+// `.plus-icon` carries no rules: a glyph without a size or color keeps the
+// global glyph size and the color around it, so a component's own rules for
+// its icons keep working. A size draws a square box on its icon size token; a color draws the
+// role's icon color token.
+
+.plus-icon--size-12 {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--icon-sm);
+    height: var(--icon-sm);
+    font-size: var(--icon-sm);
+    line-height: 1;
+}
+
+.plus-icon--size-16 {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--icon-md);
+    height: var(--icon-md);
+    font-size: var(--icon-md);
+    line-height: 1;
+}
+
+.plus-icon--size-24 {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--icon-lg);
+    height: var(--icon-lg);
+    font-size: var(--icon-lg);
+    line-height: 1;
+}
+
+.plus-icon--color-default {
+    color: var(--ds-icon);
+}
+
+.plus-icon--color-subtle {
+    color: var(--ds-icon-subtle);
+}
+
+.plus-icon--color-subtlest {
+    color: var(--ds-icon-subtlest);
+}
+
+.plus-icon--color-inverse {
+    color: var(--ds-icon-inverse);
+}
+
+.plus-icon--color-brand {
+    color: var(--ds-icon-brand);
+}
+
+.plus-icon--color-selected {
+    color: var(--ds-icon-selected);
+}
+
+.plus-icon--color-disabled {
+    color: var(--ds-icon-disabled);
+}
+
+.plus-icon--color-success {
+    color: var(--ds-icon-success);
+}
+
+.plus-icon--color-warning {
+    color: var(--ds-icon-warning);
+}
+
+.plus-icon--color-warning-inverse {
+    color: var(--ds-icon-warning-inverse);
+}
+
+.plus-icon--color-danger {
+    color: var(--ds-icon-danger);
+}
+
+.plus-icon--color-information {
+    color: var(--ds-icon-information);
+}
+
+.plus-icon--color-discovery {
+    color: var(--ds-icon-discovery);
+}

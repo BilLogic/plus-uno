@@ -5,6 +5,7 @@ import FieldBox from '../_internal/FieldBox';
 import { FieldCaption, FieldLabel, FieldFrame, fieldDescription, toneProps } from '../_internal/FieldFrame';
 import OptionRow from '../_internal/OptionRow';
 import { useAnchoredPopup } from '../_internal/anchorPlacement';
+import Icon from '../../images-and-icons/Icon';
 import '../_internal/Listbox.scss';
 import './Cascader.scss';
 
@@ -369,7 +370,7 @@ const Cascader = ({
                     {...tones.field}
                     onClick={handleInputClick}
                     trailing={(
-                        <i className={`fa-solid fa-caret-down plus-cascader-arrow ${isOpen ? 'plus-cascader-arrow-open' : ''}`} aria-hidden="true" />
+                        <Icon name="caret-down" className={`plus-cascader-arrow ${isOpen ? 'plus-cascader-arrow-open' : ''}`} />
                     )}
                 >
                     <input

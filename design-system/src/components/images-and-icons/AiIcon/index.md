@@ -49,7 +49,7 @@ Don't: The sparkle on an action that is not AI.
 - For any non-AI icon, use a Font Awesome Free glyph.
 - For the border that shows generation in progress, use `GenerativeBorder`.
 
-Same group: `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object` · `Tile`
+Same group: `Avatar` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Object` · `Tile`
 
 ## Parts
 

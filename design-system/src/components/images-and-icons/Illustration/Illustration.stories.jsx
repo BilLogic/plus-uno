@@ -187,6 +187,24 @@ Sizes.play = async ({ canvasElement }) => {
     }
 };
 
+/** One named size alone, with room around it for the limbs: up to 35% of the size at the left, 60% at the right, 15% above and 50% below. */
+const atSize = (size) => ({
+    name: String(size),
+    render: () => (
+        <div style={{ padding: `${size * 0.15}px ${size * 0.6}px ${size * 0.5}px ${size * 0.35}px` }}>
+            <Illustration character="technology" size={size} data-testid={`at-${size}`} />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        await expectRendered(within(canvasElement).getByTestId(`at-${size}`), 'technology', size);
+    },
+});
+
+export const Size48 = atSize(48);
+export const Size96 = atSize(96);
+export const Size160 = atSize(160);
+export const Size240 = atSize(240);
+
 /** Without a size, a character is 96. */
 export const DefaultSize = () => <Illustration data-testid="default" />;
 

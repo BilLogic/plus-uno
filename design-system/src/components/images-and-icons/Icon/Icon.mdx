@@ -1,0 +1,193 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as IconStories from './Icon.stories.jsx';
+import { Icon } from '@/components';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={IconStories} />
+
+<Title />
+One Font Awesome Free glyph, drawn from its name at an icon size and in an icon color. When to use an icon and which one are on <a href="?path=/docs/foundations-iconography--docs">Iconography</a>.
+
+<DocsTabs of={IconStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/images-and-icons/Icon"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Overview
+
+<ComponentExample of={IconStories.Names} title="From a name" description={<><code>name</code> draws <code>fa-regular</code> where Font Awesome Free has a regular weight and <code>fa-solid</code> where it does not. A name that carries its family, such as <code>fa-brands fa-slack</code>, is kept as given.</>} />
+
+<ComponentExample of={IconStories.InAComponent} title="In a component" description={<>Button takes <code>iconBefore</code> and <code>iconAfter</code>, and Icon button takes <code>icon</code>. Pass the name, and the component draws it with Icon.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Size
+
+<ComponentExample of={IconStories.Sizes} title="Sizes" description={<><code>size</code> is 12, 16 or 24, each a square box on its icon size token.</>} />
+
+<ComponentExample of={IconStories.Inherited} title="Without a size or color" description={<>Unset, the glyph takes the color around it and the small icon size, and a component that holds it sets its own size.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<ComponentExample of={IconStories.Colors} title="Colors" description={<><code>color</code> is an icon color role. <code>default</code> is <code>--ds-icon</code>; every other role is <code>--ds-icon-&lt;role&gt;</code>. The inverse roles sit on the bold ground each is made for.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<ComponentExample of={IconStories.Labeled} title="Labeled or decorative" description={<><code>label</code> names the icon for assistive technology. Beside words that say the same thing, leave it out and the icon is hidden.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={IconStories.Rest} title="Rest" description={<>An icon is a picture, not a control, so rest is its one state.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={IconStories.Interactive}
+    description={<>Type a Font Awesome Free name, and pick a size, a color role and a label.</>}
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Pass the icon's name to the component that shows it. Where no component takes the name, draw it with Icon:
+
+```jsx
+import { Icon } from '@/components';
+
+<Icon name="calendar-days" size={16} color="subtle" />
+<Icon name="circle-check" size={16} color="success" label="Approved" />
+```
+
+Use a glyph's current name: an alias is not in the regular list, so it draws solid. Only the Free families draw: `fa-solid`, `fa-regular` and `fa-brands`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Glyph.** An `i` element with the family and name classes. With `size` it is a square box of that size; without, it is the small icon size, or the size the component around it sets.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>The only state. An icon is a picture, not a control.</td></tr>
+<tr><td>Hovered, pressed, focused, disabled</td><td>None. Put the icon inside a control, which carries them.</td></tr>
+</tbody>
+</DocsTable>
+
+### Tokens
+
+<DocsTable>
+<thead>
+<tr><th>Prop</th><th>Value</th><th>Token</th></tr>
+</thead>
+<tbody>
+<tr><td><code>size</code></td><td>12 · 16 · 24</td><td><code>--icon-sm</code> · <code>--icon-md</code> · <code>--icon-lg</code></td></tr>
+<tr><td><code>color</code></td><td><code>default</code> · <code>subtle</code> · <code>subtlest</code></td><td><code>--ds-icon</code> · <code>--ds-icon-subtle</code> · <code>--ds-icon-subtlest</code>: beside body text, beside a label, beside metadata.</td></tr>
+<tr><td><code>color</code></td><td><code>success</code> · <code>warning</code> · <code>danger</code> · <code>information</code> · <code>discovery</code></td><td>The status icon tokens, such as <code>--ds-icon-danger</code>.</td></tr>
+<tr><td><code>color</code></td><td><code>brand</code> · <code>selected</code> · <code>disabled</code> · <code>inverse</code> · <code>warning-inverse</code></td><td>The brand, selected and disabled icon tokens, and the inverse pair for a bold background.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Pair it with words, or give it a `label`.
+
+Without `label` the icon is hidden from assistive technology, so the words beside it carry the meaning.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}><Icon name="calendar-days" size={16} color="subtle" />Tuesday, 4 pm</div>}
+    doCaption="The icon beside the words it backs up."
+    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-sm)' }}><Icon name="calendar-days" size={16} color="subtle" /></div>}
+    dontCaption="An icon alone with no label, so it has no name."
+/>
+
+### Color it with a role, never a picked color.
+
+<DoDontPair
+    doExample={<Icon name="circle-check" size={24} color="success" label="Approved" />}
+    doCaption="The success role for a success mark."
+    dontExample={<Icon name="circle-check" size={24} color="brand" label="Approved" />}
+    dontCaption="The brand role on a status mark."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- **Labeled or hidden.** With `label` the icon is `role="img"` named by it. Without, it is `aria-hidden`.
+- **An icon-only control is named by the control.** Icon button takes a required `label`, and the glyph inside stays hidden.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a href="?path=/docs/foundations-iconography--docs">Iconography</a> for when to use an icon and which one.
+- <a href="?path=/docs/ai-ui-components-icon--docs">AI icon</a> for AI actions.
+- <a href="?path=/docs/components-forms-and-inputs-button-icon-button--docs">Icon button</a> for an action shown as an icon alone.
+- <a href="?path=/docs/components-images-and-icons-tile--docs">Tile</a> for a mark above 24.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>
