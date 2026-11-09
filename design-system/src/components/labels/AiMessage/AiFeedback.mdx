@@ -1,0 +1,98 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as AiFeedbackStories from './AiFeedback.stories.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={AiFeedbackStories} />
+
+<Title />
+Thumbs up and down on an AI answer. A press reports the rating, a second press on the same thumb clears it, and thumbs down asks for an optional comment.
+
+<DocsTabs of={AiFeedbackStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/components/labels/AiMessage/AiFeedback.jsx"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<ComponentExample of={AiFeedbackStories.Overview} title="Unrated" description="Two subtle icon buttons in a group named Rate this answer." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={AiFeedbackStories.RatedUp} title="Rated up" description="The pressed thumb fills in." />
+
+<ComponentExample of={AiFeedbackStories.RatedDown} title="Rated down" description="At most one thumb is pressed." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Behavior
+
+<ComponentExample of={AiFeedbackStories.AskForComment} title="Comment" description={<>Thumbs down opens a popup with an optional comment; Send reports <code>{'{ rating: \'down\', comment }'}</code> and Skip closes it.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground of={AiFeedbackStories.Interactive} description={<>Set the rating in the table below, or press the thumbs.</>} />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Place `AiFeedback` under a finished AI message. Leave `value` unset to let it hold the rating, starting from `defaultValue`, or pass `value` to own it. `onFeedback` receives `{ rating }` on a press, with `rating` set to `up`, `down` or null, and `{ rating: 'down', comment }` when a comment is sent.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- The two thumbs are toggle buttons named "Good answer" and "Bad answer" that report whether they are pressed.
+- A rating, and a change of rating, is confirmed in a status message a screen reader hears.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a href="?path=/docs/ai-ui-components-ai-message--docs">AI message</a> for the reply being rated.
+- <a href="?path=/docs/ai-ui-components-ai-message-ai-sources--docs">AI sources</a> for what the answer read.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

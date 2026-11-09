@@ -173,6 +173,7 @@ const RENDERS_WITH = {
     items: [{ id: 'ava', cells: [{ content: 'Ava' }] }],
   },
   PromptStarters: { starters: [{ id: 'sample', label: 'Sample' }] },
+  AiSources: { sources: [{ title: 'Sample', href: '#sample', type: 'Report' }] },
 };
 
 function baseProps(props, componentName) {

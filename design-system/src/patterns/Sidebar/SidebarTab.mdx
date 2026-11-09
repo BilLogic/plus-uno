@@ -1,0 +1,129 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as SidebarTabStories from './SidebarTab.stories.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    ResourcesBlock,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+
+<Meta of={SidebarTabStories} />
+
+<Title />
+One row of the Navigation system: a 32 row padded 12 at the sides, with a 16 icon and a label that truncates. The Sidebar draws its rows from its `groups` config; use `SidebarTab` directly only for a row outside it.
+
+<DocsTabs of={SidebarTabStories}>
+
+<DocsTab tab="examples">
+
+<ResourcesBlock
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Sidebar/SidebarTab.jsx"
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<ComponentExample of={SidebarTabStories.Overview} title="Row" description="The icon and the label, on no fill." />
+
+<ComponentExample of={SidebarTabStories.WithDescription} title="Description" description="A second line in Body/small; the row grows past 32 to hold it." />
+
+<ComponentExample of={SidebarTabStories.WithCount} title="Trailing slot" description={<><code>elemAfter</code> holds a count, a badge or a status at the end of the row.</>} />
+
+<ComponentExample of={SidebarTabStories.WithActions} title="Actions on hover" description={<><code>actionsOnHover</code> shows its controls on hover and focus, beside the row, so a press on one never opens the row.</>} />
+
+<ComponentExample of={SidebarTabStories.ExternalLink} title="External link" description={<><code>href</code> makes the row a link; <code>external</code> opens it in a new tab and says so.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## State
+
+<ComponentExample of={SidebarTabStories.Selected} title="Selected" description={<>The selected fill, ink text and the medium weight, with <code>aria-current="page"</code>.</>} />
+
+<ComponentExample of={SidebarTabStories.Disabled} title="Disabled" description="The disabled text and icon colors, and no tab stop." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Interactive playground
+
+<DocsInteractivePlayground
+    of={SidebarTabStories.Interactive}
+    description={<>Change the label, icon and state in the table below.</>}
+/>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+The Sidebar builds every row from its config, so a page passes `groups` to the Sidebar rather than placing rows. Reach for `SidebarTab` for a row of the same shape outside the Sidebar. Leave `state` on `enabled` or `selected`: the stylesheet draws hover and focus.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+1. **Icon.** A 16 Font Awesome Free glyph, hidden from assistive technology.
+2. **Label.** Body/default, truncated with an ellipsis.
+3. **Description** (optional). A second line in Body/small.
+4. **Trailing slot** (optional). A count, a badge or a status.
+5. **Actions** (optional). Controls beside the row, shown on hover and focus.
+
+### States
+
+<DocsTable>
+<thead>
+<tr><th>State</th><th>What changes</th></tr>
+</thead>
+<tbody>
+<tr><td>Rest</td><td>Subtle text and icon, no fill.</td></tr>
+<tr><td>Hovered</td><td>The neutral hovered fill; pressed takes its pressed step.</td></tr>
+<tr><td>Focused</td><td>A 2px focused ring, 2px inside the row, and no fill.</td></tr>
+<tr><td>Selected</td><td>The selected fill, selected text and icon, the medium weight and <code>aria-current="page"</code>.</td></tr>
+<tr><td>Disabled</td><td>The disabled text and icon colors, and no tab stop.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- A row with `onClick` is a button: Enter and Space activate it. A row with `href` is a link.
+- The selected row carries `aria-current="page"`, so selection never rests on the fill alone.
+- An external link announces "(opens in a new tab)".
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a href="?path=/docs/components-navigation-navigation-system--docs">Navigation system</a> for the Sidebar that holds the rows.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>
