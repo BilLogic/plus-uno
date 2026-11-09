@@ -130,6 +130,10 @@ $count-dot: (
 .plus-count .plus-count__value {
     font: var(--body-small);
     line-height: var(--plus-count-size);
+    // The `font` shorthand resets every font-variant longhand, so the tabular
+    // figures set on the badge are restored here, after it: a "11" is as wide
+    // as a "44" and a changing count does not jiggle.
+    font-variant-numeric: tabular-nums;
 }
 
 /* The accessible name for a numeric count: read, not seen. */

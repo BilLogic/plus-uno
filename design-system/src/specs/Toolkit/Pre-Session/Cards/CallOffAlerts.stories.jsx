@@ -1,4 +1,5 @@
 import React from 'react';
+import { CloseButton } from '@/components';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
 
 export default {
@@ -98,26 +99,7 @@ const UpdateAlert = ({ title, description, onClose }) => (
                 {description}
             </span>
         </div>
-        <button
-            type="button"
-            aria-label="Dismiss alert"
-            onClick={onClose}
-            style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                alignSelf: 'flex-start'
-            }}
-        >
-            <i
-                className="fa-solid fa-xmark"
-                style={{
-                    fontSize: 'var(--font-size-fa-h6-solid)',
-                    color: 'var(--ds-icon-subtle)'
-                }}
-            />
-        </button>
+        <CloseButton label="Dismiss alert" onClick={onClose} style={{ alignSelf: 'flex-start' }} />
     </div>
 );
 
@@ -141,26 +123,7 @@ const TimeWarningAlert = ({ onClose }) => (
         <span className="body2-txt" style={{ color: 'var(--ds-text)', flex: 1 }}>
             This session begins in <strong>less than 12 hours</strong>. Dropping now may leave students without enough tutors. Please think carefully before submitting your call-off request, as it <strong>may not be excused</strong> and could count toward your absences.
         </span>
-        <button
-            type="button"
-            aria-label="Dismiss alert"
-            onClick={onClose}
-            style={{
-                background: 'none',
-                border: 'none',
-                cursor: 'pointer',
-                padding: 0,
-                alignSelf: 'flex-start'
-            }}
-        >
-            <i
-                className="fa-solid fa-xmark"
-                style={{
-                    fontSize: 'var(--font-size-fa-h6-solid)',
-                    color: 'var(--ds-icon-subtle)'
-                }}
-            />
-        </button>
+        <CloseButton label="Dismiss alert" onClick={onClose} style={{ alignSelf: 'flex-start' }} />
     </div>
 );
 

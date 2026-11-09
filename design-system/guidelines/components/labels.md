@@ -1,5 +1,5 @@
 ---
-summary: The label family — Status tag, Date tag, Count tag, Tag, Smart tag, TagGroup, Suggestion and AI label — and how to choose between them
+summary: The label family — Status tag, Date tag, Count tag, Tag, Smart tag, TagGroup and Suggestion — and how to choose between them
 ---
 
 <!-- Tier: 2 | Load when: choosing a component from the labels group -->
@@ -7,7 +7,7 @@ summary: The label family — Status tag, Date tag, Count tag, Tag, Smart tag, T
 # Labels — which component to reach for
 
 The label family: `StatusTag`, `DateTag`, `CountTag`, `Tag`, `SmartTag`,
-`TagGroup`, `Suggestion` and `AiLabel`. Generated facts are in
+`TagGroup` and `Suggestion`. Generated facts are in
 `design-system/src/components/labels/index.md`; when to use each is on its own
 docs page.
 

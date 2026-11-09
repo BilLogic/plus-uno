@@ -102,7 +102,7 @@ success · warning · danger).
 - For a due or event date, use `DateTag`.
 - For a category, a subject or a person, use `Tag` (or `SmartTag` for a SMART subject).
 
-Same group: `AiLabel` · `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 

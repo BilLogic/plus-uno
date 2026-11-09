@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '@/components';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import Modal from './Modal';
@@ -72,7 +73,7 @@ export const EveryRouteOut = () => {
 
     return (
         <div style={stack}>
-            <button type="button" onClick={() => setOpen(true)}>Open</button>
+            <Button onClick={() => setOpen(true)}>Open</Button>
             <Modal
                 id="mdis-delete"
                 show={open}

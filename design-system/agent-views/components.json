@@ -425,142 +425,6 @@
       ]
     },
     {
-      "name": "AiLabel",
-      "kind": "component",
-      "import": "import { AiLabel } from '@/components';",
-      "group": "labels",
-      "source": "design-system/src/components/labels/AiLabel/AiLabel.jsx",
-      "summary": "AiLabel: marks content the agent had a hand in and says how much to trust it.",
-      "props": [
-        {
-          "name": "children",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The label (takes precedence over `text`).",
-          "deprecated": null
-        },
-        {
-          "name": "text",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "The label, as a string. Defaults per `origin`.",
-          "deprecated": null
-        },
-        {
-          "name": "origin",
-          "type": "enum",
-          "required": false,
-          "default": "'generated'",
-          "values": [
-            "generated",
-            "assisted",
-            "reviewed"
-          ],
-          "description": "Who authored the value — the axis that matters, not whether a model was involved.",
-          "deprecated": null
-        },
-        {
-          "name": "confidence",
-          "type": "enum",
-          "required": false,
-          "default": "'high'",
-          "values": [
-            "high",
-            "low"
-          ],
-          "description": "`low` adds the caution treatment and the note.",
-          "deprecated": null
-        },
-        {
-          "name": "note",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "What to do about low confidence. Shown only when `confidence` is `low`.",
-          "deprecated": null
-        },
-        {
-          "name": "onExplain",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": "Renders a real button inside the mark. The mark itself is never a control.",
-          "deprecated": null
-        },
-        {
-          "name": "explainLabel",
-          "type": "string",
-          "required": false,
-          "default": "'How was this made?'",
-          "values": null,
-          "description": "The explain button's own words. It says what it DOES.",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Origins",
-        "TheMarkIsNotAControl",
-        "LowConfidenceCarriesItsAdvice",
-        "ConfidenceIsInTheName",
-        "ExplainIsARealButton",
-        "TheGlyphIsDecoration",
-        "NoBrandHueIsAssumed",
-        "Interactive",
-        "Rest",
-        "Hovered",
-        "Pressed",
-        "Focused",
-        "Disabled"
-      ],
-      "tokens": [
-        "--body-small",
-        "--border-default",
-        "--ds-background-warning",
-        "--ds-border",
-        "--ds-border-focused",
-        "--ds-border-warning",
-        "--ds-icon-subtle",
-        "--ds-icon-success",
-        "--ds-icon-warning",
-        "--ds-surface",
-        "--ds-text",
-        "--ds-text-warning-bolder",
-        "--focus-ring-width",
-        "--icon-sm",
-        "--pad-x-sm",
-        "--plus-ai-accent",
-        "--radius-md",
-        "--space-025",
-        "--stack-md",
-        "--stack-sm",
-        "--stroke-2"
-      ]
-    },
-    {
       "name": "AiMessage",
       "kind": "component",
       "import": "import { AiMessage } from '@/components';",
@@ -3217,8 +3081,7 @@
         "KeyboardFocus"
       ],
       "tokens": [
-        "--ds-icon-subtle",
-        "--ds-text-subtlest"
+        "--ds-icon-subtle"
       ]
     },
     {
@@ -4570,6 +4433,7 @@
         "--ds-background-success-bold",
         "--ds-background-warning-bold",
         "--ds-border",
+        "--ds-border-focused-inverse",
         "--ds-icon-danger",
         "--ds-icon-information",
         "--ds-icon-inverse",
@@ -4577,6 +4441,8 @@
         "--ds-icon-success",
         "--ds-icon-warning",
         "--ds-icon-warning-inverse",
+        "--ds-interaction-inverse-hovered",
+        "--ds-interaction-inverse-pressed",
         "--ds-shadow-overlay",
         "--ds-surface",
         "--ds-surface-overlay",
@@ -4591,6 +4457,7 @@
         "--icon-md",
         "--inline-lg",
         "--inline-md",
+        "--inline-sm",
         "--label-height-md",
         "--layer-flag",
         "--popover-gap-screen",
@@ -4601,84 +4468,6 @@
         "--radius-md",
         "--stack-sm",
         "--type-weight-medium"
-      ]
-    },
-    {
-      "name": "Footer",
-      "kind": "component",
-      "import": "import { Footer } from '@/components';",
-      "group": "layout-and-structure",
-      "source": "design-system/src/components/layout-and-structure/Footer/Footer.jsx",
-      "summary": "Per Figma spec: node-id=111-227939 Simple footer with version, copyright, and terms - no border/stroke",
-      "props": [
-        {
-          "name": "version",
-          "type": "string",
-          "required": false,
-          "default": "'v5.2.0'",
-          "values": null,
-          "description": "The product version, shown first.",
-          "deprecated": null
-        },
-        {
-          "name": "copyright",
-          "type": "string",
-          "required": false,
-          "default": "'Copyright © Carnegie Mellon University 2024'",
-          "values": null,
-          "description": "The copyright line.",
-          "deprecated": null
-        },
-        {
-          "name": "termsText",
-          "type": "string",
-          "required": false,
-          "default": "'Terms of Use'",
-          "values": null,
-          "description": "The label of the terms link.",
-          "deprecated": null
-        },
-        {
-          "name": "termsUrl",
-          "type": "string",
-          "required": false,
-          "default": "'#'",
-          "values": null,
-          "description": "Where the terms link goes.",
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "style",
-          "type": "object",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "CustomContent",
-        "Interactive",
-        "Rest",
-        "Hovered",
-        "Pressed",
-        "Focused"
-      ],
-      "tokens": [
-        "--ds-link",
-        "--ds-link-pressed",
-        "--radius-sm"
       ]
     },
     {
@@ -11044,32 +10833,26 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
         "--border-default",
         "--ds-background-input",
         "--ds-background-neutral",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
-        "--ds-background-selected",
+        "--ds-border",
         "--ds-border-input",
-        "--ds-icon-selected",
-        "--ds-icon-subtle",
         "--ds-opacity-disabled",
-        "--ds-surface-container",
         "--ds-text",
-        "--ds-text-selected",
         "--ds-text-subtle",
         "--ds-text-subtlest",
         "--field-min-height-lg",
-        "--icon-sm",
+        "--pad-x-md",
         "--pad-x-sm",
         "--pad-x-xs",
-        "--radius-md",
+        "--pad-y-lg",
+        "--pad-y-md",
+        "--radius-0625",
         "--rte-content-pad-x",
         "--rte-content-pad-y",
-        "--space-0125",
-        "--space-025",
         "--stack-md",
+        "--stack-sm",
         "--type-weight-regular"
       ]
     },
@@ -11414,6 +11197,15 @@
           "default": null,
           "values": null,
           "description": "Called with the text of a created option, which is then picked.",
+          "deprecated": null
+        },
+        {
+          "name": "createOption",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(text)` → the option a typed text creates, `{ value, label }`, or null to create nothing. Defaults to the text itself.",
           "deprecated": null
         },
         {
@@ -13036,18 +12828,19 @@
         "--body-default",
         "--border-default",
         "--border-selected",
+        "--ds-background-neutral",
+        "--ds-background-neutral-hovered",
+        "--ds-background-neutral-pressed",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
-        "--ds-background-selected-bold",
-        "--ds-background-selected-bold-hovered",
-        "--ds-background-selected-bold-pressed",
         "--ds-border",
         "--ds-border-focused",
         "--ds-border-selected",
+        "--ds-text",
         "--ds-text-disabled",
-        "--ds-text-inverse",
         "--ds-text-selected",
         "--ds-text-subtle",
+        "--inline-lg",
         "--item-height-md",
         "--item-height-sm",
         "--motion-duration-short",
@@ -13058,7 +12851,6 @@
         "--radius-md",
         "--section-stack-sm",
         "--stack-md",
-        "--stack-sm",
         "--type-weight-medium"
       ],
       "subComponents": [
@@ -14764,7 +14556,7 @@
       "import": "import { TimePicker } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/TimePicker/TimePicker.jsx",
-      "summary": "TimePicker — a time field with an AM/PM toggle (Figma `Time picker`). Built from the shared parts: the field is `FieldBox`, which owns the box, the border, the fill, the size and every state, same as DatePicker; the AM/PM menu in Trailing is the PLUS DropdownMenu. - **Typing:** the field takes an hour and a minute, with or without a colon. It is checked when you press Enter or leave the field: a real time (hour 1–12, minute 0–59) is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Value:** a 12-hour string, \"02:30 PM\". A 24-hour value given through `value` is split into the hour this control can show and the period that says which half of the day it is. - **AM/PM:** a separate toggle, since the field itself has no notion of one. Changing it reports immediately, with whichever half of the time is already set. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: TimePicker has no `label` prop, so that is how a caller names it.",
+      "summary": "TimePicker — a time field: type a time, or pick one from the list of the day's times under it (Figma `Time picker`). It is the PLUS Select, searchable: the field is the shared `FieldBox`, the list is the shared `Listbox`, so the box, the list, the keyboard and every state are Select's. There is no separate AM/PM control: each time in the list carries its own period, and typing \"2:30p\" or \"1430\" finds it. - **List:** `times`, 24-hour `HH:mm` strings, every half hour by default, shown as \"2:30 PM\". Typing filters it. - **Typing a time that is not in the list** (`timeIsEditable`, on by default): Enter on the \"Create\" row reads it — \"9:05\", \"905a\", \"21:05\" — and picks it. Text that is not a real time is refused and the field is marked invalid. - **Value:** a 12-hour string, \"02:30 PM\", or null once cleared. A 24-hour `value` (\"14:30\") is accepted and read the same way. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the combobox, which is the control a screen reader lands on: TimePicker has no `label` prop, so that is how a caller names it.",
       "props": [
         {
           "name": "id",
@@ -14772,7 +14564,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `id` of the combobox input.",
           "deprecated": null
         },
         {
@@ -14781,7 +14573,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Submitted with a form, as the 12-hour value.",
           "deprecated": null
         },
         {
@@ -14799,7 +14591,25 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "A 12-hour string (\"02:30 PM\") or a 24-hour one (\"14:30\"), split on read.",
+          "description": "A 12-hour string (\"02:30 PM\") or a 24-hour one (\"14:30\").",
+          "deprecated": null
+        },
+        {
+          "name": "times",
+          "type": "arrayOf",
+          "required": false,
+          "default": "DEFAULT_TIMES",
+          "values": null,
+          "description": "The times the list offers, as 24-hour `HH:mm`. Every half hour of the day by default.",
+          "deprecated": null
+        },
+        {
+          "name": "timeIsEditable",
+          "type": "bool",
+          "required": false,
+          "default": "true",
+          "values": null,
+          "description": "Lets a typed time that is not in the list be picked. On by default.",
           "deprecated": null
         },
         {
@@ -14820,7 +14630,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Disables the hour and minute inputs and the period menu.",
+          "description": "Dims the field and blocks opening and changing it.",
           "deprecated": null
         },
         {
@@ -14838,7 +14648,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Draws the field invalid; a typed time outside 1–12 / 0–59 does too.",
+          "description": "Draws the field invalid; a typed text that is not a time does too.",
           "deprecated": null
         },
         {
@@ -14856,7 +14666,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "`(value)` — a 12-hour string, or null once either half is cleared.",
+          "description": "`(value)` — a 12-hour string, \"02:30 PM\", or null once cleared.",
           "deprecated": null
         },
         {
@@ -14865,7 +14675,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Focus entering the field from outside it.",
           "deprecated": null
         },
         {
@@ -14874,7 +14684,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Focus leaving the field and its list.",
           "deprecated": null
         },
         {
@@ -14883,7 +14693,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names on the field's wrapper, beside its own.",
           "deprecated": null
         },
         {
@@ -14892,7 +14702,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline style on the field's wrapper.",
           "deprecated": null
         }
       ],
@@ -14911,18 +14721,6 @@
         "HoveredState",
         "KeyboardFocus",
         "Interactive"
-      ],
-      "tokens": [
-        "--ds-icon-brand",
-        "--ds-icon-danger",
-        "--ds-icon-success",
-        "--ds-text-brand",
-        "--ds-text-danger",
-        "--ds-text-success",
-        "--item-height-sm",
-        "--radius-md",
-        "--stack-sm",
-        "--type-weight-semibold"
       ]
     },
     {
@@ -15427,154 +15225,6 @@
         "Focused",
         "FieldDisabled",
         "FieldInvalid"
-      ]
-    },
-    {
-      "name": "UserAvatar",
-      "kind": "component",
-      "import": "import { UserAvatar } from '@/components';",
-      "group": "images-and-icons",
-      "source": "design-system/src/components/images-and-icons/UserAvatar/UserAvatar.jsx",
-      "summary": "The signed-in user: an initial pill, the name, the role indicator (\"Lead\") and an optional notification counter. Per the Specs User Avatar (111-227876). - `spacing=\"compact\"` is 32 high (`--item-height-md`), for the 32 topbar. The name truncates at `--label-max-width`. - `spacing=\"default\"` pads `--pad-y-md` around a 32 pill, for table rows.",
-      "props": [
-        {
-          "name": "firstChar",
-          "type": "string",
-          "required": false,
-          "default": "'J'",
-          "values": null,
-          "description": "The initial shown in the pill.",
-          "deprecated": null
-        },
-        {
-          "name": "name",
-          "type": "string",
-          "required": false,
-          "default": "'John Doe'",
-          "values": null,
-          "description": "The user's name. Truncates with an ellipsis; at the label maximum width in the compact spacing.",
-          "deprecated": null
-        },
-        {
-          "name": "counter",
-          "type": "bool",
-          "required": false,
-          "default": "true",
-          "values": null,
-          "description": "Show the notification counter.",
-          "deprecated": null
-        },
-        {
-          "name": "counterValue",
-          "type": "number",
-          "required": false,
-          "default": "2",
-          "values": null,
-          "description": "The number in the counter.",
-          "deprecated": null
-        },
-        {
-          "name": "state",
-          "type": "enum",
-          "required": false,
-          "default": "'enabled'",
-          "values": [
-            "enabled",
-            "hover",
-            "disabled"
-          ],
-          "description": "Forces the hover look, for docs, or dims the row as disabled.",
-          "deprecated": null
-        },
-        {
-          "name": "type",
-          "type": "enum",
-          "required": false,
-          "default": "'regular tutor'",
-          "values": [
-            "regular tutor",
-            "lead tutor",
-            "admin"
-          ],
-          "description": "The user type. `lead tutor` adds the Lead status tag.",
-          "deprecated": null
-        },
-        {
-          "name": "spacing",
-          "type": "enum",
-          "required": false,
-          "default": "'default'",
-          "values": [
-            "default",
-            "compact"
-          ],
-          "description": "`compact` is 32 high, for the topbar. `default` is padded, for table rows.",
-          "deprecated": null
-        },
-        {
-          "name": "id",
-          "type": "string",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "onClick",
-          "type": "func",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
-          "name": "className",
-          "type": "string",
-          "required": false,
-          "default": "''",
-          "values": null,
-          "description": null,
-          "deprecated": null
-        }
-      ],
-      "stories": [
-        "Overview",
-        "Spacing",
-        "Types",
-        "Counter",
-        "Interactive",
-        "Rest",
-        "Hovered",
-        "Pressed",
-        "Focused",
-        "Disabled"
-      ],
-      "tokens": [
-        "--body-default",
-        "--body-small",
-        "--ds-background-brand-subtlest",
-        "--ds-background-danger-subtler",
-        "--ds-interaction-hovered",
-        "--ds-opacity-disabled",
-        "--ds-surface",
-        "--ds-text",
-        "--ds-text-brand",
-        "--ds-text-danger",
-        "--image-md",
-        "--image-sm",
-        "--inline-md",
-        "--item-height-md",
-        "--label-height-md",
-        "--label-max-width",
-        "--pad-x-md",
-        "--pad-x-sm",
-        "--pad-y-md",
-        "--radius-full",
-        "--radius-h32",
-        "--radius-md",
-        "--space-0625"
       ]
     },
     {

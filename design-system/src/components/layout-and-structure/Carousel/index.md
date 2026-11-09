@@ -81,7 +81,7 @@ Autoplay moves on whether or not a person finished. Turn it off with `autoplay={
 - For switching between alternative views of the same content, use `Tabs`.
 - For a short guided tour of a new feature, use `Spotlight`.
 
-Same group: `Accordion` · `Footer` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
+Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
 
 ## Parts
 

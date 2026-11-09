@@ -102,6 +102,22 @@ export const Warning = appearanceStory('warning', 'Connection is slow', 'Some ch
 export const ErrorAppearance = appearanceStory('error', 'Upload failed', 'The file was larger than 10 MB.', { actions: [{ text: 'Try again' }] });
 ErrorAppearance.storyName = 'Error';
 export const Bold = appearanceStory('success', 'Plan saved', 'Your session plan is saved for Monday.', { bold: true, defaultExpanded: true });
+/** On the bold fill the chevron takes the inverse icon, as the × does, and both sit on the title's line. */
+Bold.play = async ({ canvasElement }) => {
+    const flag = canvasElement.querySelector('.plus-flag--bold');
+    const ground = getComputedStyle(flag).backgroundColor;
+    const title = flag.querySelector('.plus-flag-title').getBoundingClientRect();
+    for (const name of ['Collapse', 'Dismiss flag']) {
+        const button = within(flag).getByRole('button', { name });
+        const glyph = getComputedStyle(button.querySelector('i')).color;
+        const ratio = contrastRatio(glyph, ground);
+        await expect(ratio, `${name} glyph on the bold fill is ${ratio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
+        const box = button.getBoundingClientRect();
+        await expect(Math.round(box.height), `${name} is compact`).toBe(24);
+        const offset = Math.abs((box.top + box.bottom) / 2 - (title.top + title.bottom) / 2);
+        await expect(offset, `${name} is centered on the title line`).toBeLessThanOrEqual(1);
+    }
+};
 
 const FlagInteractiveWrapper = ({ appearance, bold, position, title, children, show, autohide, delay }) => {
     const [isOpen, setIsOpen] = useState(show);

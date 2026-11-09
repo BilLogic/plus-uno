@@ -30,7 +30,7 @@ export const lifecycleOfEntry = (item, getData) => {
  * Roots that start closed, by id (the title slug, which is what the sidebar matches).
  * Get started stays open as the way in; the selected entry's root opens itself.
  */
-export const COLLAPSED_ROOTS = ['foundations', 'components', 'patterns', 'ai', 'tools', 'data-visualizations', 'specs'];
+export const COLLAPSED_ROOTS = ['foundations', 'patterns', 'components', 'ai-ui', 'data-visualizations'];
 
 /**
  * The badge's CSS, written as a rule because the manager has no stylesheet that

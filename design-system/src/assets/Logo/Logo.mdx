@@ -1,6 +1,6 @@
-import { Meta, Title, Description, Canvas } from '@storybook/addon-docs/blocks';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as LogoStories from './Logo.stories.jsx';
-import { ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import { ComponentExample, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -26,9 +26,7 @@ export const figmaMeta = {
 
 <Title />
 
-<Description>
 The application Logo. Seven sizes from 16 to 96 and six appearances. The mark alone, or the lockup with the wordmark from size 24.
-</Description>
 
 <ResourcesBlock
     githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/assets/Logo"
@@ -39,15 +37,43 @@ The application Logo. Seven sizes from 16 to 96 and six appearances. The mark al
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
-### Overview
 
-<LogoStories.Overview />
+## Size
+
+<ComponentExample of={LogoStories.Sizes} title="Sizes" description="The mark at 16, 20, 24, 32, 48, 64 and 96. From 24 down, a drawing made for small sizes keeps the plus open." />
+
+<ComponentExample of={LogoStories.SizesDark} title="Sizes in dark mode" description="The same sizes on the dark ground, where the glows are drawn stronger." />
+
 </div>
 
 <div className="sb-ds-doc-section">
-### Construction
 
-The logomark's keyline grid, circles and plus-arm measures are drawn on the Logos page under Foundations, which holds the brand guidance. See [Logos: Construction](?path=/docs/foundations-logos--docs#foundation-construction).
+## Lockup
+
+<ComponentExample of={LogoStories.Lockup} title="Lockup" description="wordmark adds the wordmark from size 24. Below 24 the mark stands alone." />
+
+<ComponentExample of={LogoStories.LockupDark} title="Lockup in dark mode" description="The lockup on the dark ground." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Appearance
+
+<ComponentExample of={LogoStories.Appearances} title="Appearances" description="Each appearance at 48, mark and lockup, on the ground it is drawn for." />
+
+<ComponentExample of={LogoStories.LightAndDark} title="Light and dark" description="The appearances that follow the color mode, side by side." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Construction
+
+<ComponentExample of={LogoStories.ClearSpace} title="Clear space" description="Half the mark's height on every side of the lockup." />
+
+The keyline grid, circles and plus-arm measures are drawn on the Logos page under Foundations, which holds the brand guidance. See [Logos: Construction](?path=/docs/foundations-logos--docs#foundation-construction).
+
 </div>
 
 </div>

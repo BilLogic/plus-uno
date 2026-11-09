@@ -9,12 +9,6 @@
         "AiIcon style": {
           "count": 1
         },
-        "AiLabel className": {
-          "count": 1
-        },
-        "AiLabel id": {
-          "count": 1
-        },
         "AiMessage className": {
           "count": 1
         },
@@ -202,12 +196,6 @@
           "count": 1
         },
         "FilterButton onClick": {
-          "count": 1
-        },
-        "Footer className": {
-          "count": 1
-        },
-        "Footer style": {
           "count": 1
         },
         "GenerativeBorder className": {
@@ -627,24 +615,6 @@
         "Tile className": {
           "count": 1
         },
-        "TimePicker className": {
-          "count": 1
-        },
-        "TimePicker id": {
-          "count": 1
-        },
-        "TimePicker name": {
-          "count": 1
-        },
-        "TimePicker onBlur": {
-          "count": 1
-        },
-        "TimePicker onFocus": {
-          "count": 1
-        },
-        "TimePicker style": {
-          "count": 1
-        },
         "TreeSelect className": {
           "count": 1
         },
@@ -667,15 +637,6 @@
           "count": 1
         },
         "TreeSelect value": {
-          "count": 1
-        },
-        "UserAvatar className": {
-          "count": 1
-        },
-        "UserAvatar id": {
-          "count": 1
-        },
-        "UserAvatar onClick": {
           "count": 1
         },
         "VerticalButton appearance": {

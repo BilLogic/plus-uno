@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { expect, userEvent, within } from 'storybook/test';
+import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import TimePicker from './TimePicker';
@@ -12,7 +12,7 @@ export default {
         docs: {
             description: {
                 component:
-                    'A time field with an AM/PM toggle. It is checked when you press Enter or leave the field: a real time (hour 1–12, minute 0–59) is picked, anything else is kept as typed and marked invalid.',
+                    'A time field: type a time, or pick one from the day\'s times, every half hour by default. Each time carries its period. A typed time that is not in the list is read on Enter; text that is not a time is refused and marked invalid.',
             },
         },
     },
@@ -66,7 +66,7 @@ export const Spacing = () => (
 );
 Spacing.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const [defaultField, compactField] = canvas.getAllByRole('textbox');
+    const [defaultField, compactField] = canvas.getAllByRole('combobox');
     await inEveryColorModeOf(canvasElement, async (mode) => {
         await expect(defaultField.closest('.plus-field'), `${mode}: default field`).toHaveAttribute('data-spacing', 'default');
         await expect(compactField.closest('.plus-field'), `${mode}: compact field`).toHaveAttribute('data-spacing', 'compact');
@@ -99,10 +99,10 @@ export const InteractionStates = () => (
 );
 InteractionStates.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const withValue = canvas.getAllByRole('textbox')[1];
-    await expect(withValue).toHaveValue('02:30');
-    const toggle = withValue.closest('.plus-field').querySelector('.plus-time-picker__period-toggle');
-    await expect(toggle.textContent.trim()).toBe('PM');
+    const withValue = canvas.getAllByRole('combobox')[1];
+    // The picked time reads as it does in the list; there is no AM/PM control beside it.
+    await expect(withValue).toHaveValue('2:30 PM');
+    await expect(withValue.closest('.plus-field').querySelector('.plus-time-picker__period-toggle')).toBeNull();
 };
 
 export const PickTime = () => {
@@ -132,36 +132,40 @@ export const PickTime = () => {
 PickTime.storyName = 'Pick Time';
 PickTime.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('textbox');
-    await userEvent.type(input, '0930');
-    await userEvent.tab();
-    await expect(input).toHaveValue('09:30');
-    await expect(canvas.getByText('Time:')).toBeVisible();
+    const input = canvas.getByRole('combobox');
+    const body = within(canvasElement.ownerDocument.body);
+
+    // Typing filters the day's times; picking one reports it.
+    await userEvent.click(input);
+    await userEvent.type(input, '9:30');
+    await userEvent.click(await body.findByRole('option', { name: '9:30 AM' }));
+    await expect(canvas.getByText('09:30 AM')).toBeVisible();
+
+    // A time that is not in the list is read from what was typed.
+    await userEvent.click(input);
+    await userEvent.type(input, '1405{Enter}');
+    await expect(canvas.getByText('02:05 PM')).toBeVisible();
 };
 
 export const TwentyFourHourValueIsSplit = () => (
     <TimePicker aria-label="Time" value="14:30" />
 );
-TwentyFourHourValueIsSplit.storyName = '24-hour value is split';
+TwentyFourHourValueIsSplit.storyName = '24-hour value';
 TwentyFourHourValueIsSplit.parameters = {
     docs: {
         description: {
-            story: 'A 24-hour value is split into the hour this control can show and the period that says which half of the day it is.',
+            story: 'A 24-hour value is read as the same time and shown in 12-hour form.',
         },
     },
 };
 TwentyFourHourValueIsSplit.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const input = canvas.getByRole('textbox');
-    await expect(input).toHaveValue('02:30');
-    const toggle = canvasElement.querySelector('.plus-time-picker__period-toggle');
-    await expect(toggle.textContent.trim()).toBe('PM');
+    await expect(canvas.getByRole('combobox')).toHaveValue('2:30 PM');
 };
 
 /** One story per state, for the Examples tab. */
 const wrap = { maxWidth: 'var(--size-1400)' };
-const input = (canvasElement) => within(canvasElement).getByRole('textbox');
-const period = (canvasElement) => canvasElement.querySelector('.plus-time-picker__period-toggle');
+const input = (canvasElement) => within(canvasElement).getByRole('combobox');
 
 export const Default = {
     render: () => <div style={wrap}><TimePicker aria-label="Reminder time" /></div>,
@@ -174,8 +178,18 @@ export const Default = {
 export const WithValue = {
     render: () => <div style={wrap}><TimePicker aria-label="Reminder time" value="02:30 PM" /></div>,
     play: async ({ canvasElement }) => {
-        await expect(input(canvasElement)).toHaveValue('02:30');
-        await expect(period(canvasElement).textContent.trim()).toBe('PM');
+        await expect(input(canvasElement)).toHaveValue('2:30 PM');
+        // Opening the list brings the picked time into view, without scrolling the page.
+        const pageTop = window.scrollY;
+        await userEvent.click(input(canvasElement));
+        const picked = await within(document.body).findByRole('option', { name: '2:30 PM' });
+        const surface = picked.closest('.plus-listbox').getBoundingClientRect();
+        await waitFor(() => {
+            const row = picked.getBoundingClientRect();
+            expect(row.top >= surface.top && row.bottom <= surface.bottom, 'the picked row is in view').toBe(true);
+        });
+        await expect(window.scrollY, 'the page did not move').toBe(pageTop);
+        await userEvent.keyboard('{Escape}');
     },
 };
 

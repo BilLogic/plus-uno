@@ -1,0 +1,48 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { Button } from '@/components';
+import * as ButtonStories from '@/components/forms-and-inputs/Button/Button.stories.jsx';
+import { ComponentExample, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { FoundationHero, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+
+<Meta title="AI UI/Components for AI/Button" />
+
+<FoundationHero
+    title="Button"
+    summary="The AI appearance of Button, for the one primary AI action in a region."
+/>
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## AI appearance
+
+<ComponentExample of={ButtonStories.Ai} title="AI" description="appearance=&quot;ai&quot; draws the sparkle before the label, on the AI action ground." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## One primary AI action per region
+
+The AI appearance marks the single main AI action in a region, such as "Generate summary" on a session's notes. Use it only for actions that call the AI, and leave its look as shipped: the sparkle is always drawn and a label is required. Every other AI action in the region is a default or subtle button with an AI <DocsLink id="ai-ui-components-for-ai-icon">Icon</DocsLink>.
+
+<DoDontPair
+    doExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="ai" text="Generate summary" /><Button appearance="subtle" text="Edit notes" /></div>}
+    doCaption="One AI button for the region's main AI action, with the other actions subtle."
+    dontExample={<div style={{ display: 'flex', gap: 'var(--inline-md)' }}><Button appearance="ai" text="Generate summary" /><Button appearance="ai" text="Save notes" /></div>}
+    dontCaption="A second AI button competes with the first, and Save notes is not an AI action."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <DocsLink id="components-forms-and-inputs-button-button">Button</DocsLink>: every appearance, size and state, and the full props.
+- <DocsLink id="ai-ui-foundations-for-ai-color">Color</DocsLink>: the AI action ground.
+
+</div>
+
+</div>

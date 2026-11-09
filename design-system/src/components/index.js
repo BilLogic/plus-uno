@@ -33,7 +33,7 @@ export { default as SplitButton } from '@/components/forms-and-inputs/SplitButto
 export { default as TagInput } from '@/components/forms-and-inputs/TagInput';
 export { default as TextArea } from '@/components/forms-and-inputs/TextArea';
 export { default as TextField } from '@/components/forms-and-inputs/TextField';
-export { default as TimePicker } from '@/components/forms-and-inputs/TimePicker';
+export { default as TimePicker, DEFAULT_TIMES, parseTime } from '@/components/forms-and-inputs/TimePicker';
 export { default as Toggle } from '@/components/forms-and-inputs/Toggle';
 export { default as TreeSelect, TREE_SELECT_SPACINGS } from '@/components/forms-and-inputs/TreeSelect';
 export { default as VerticalButton, VERTICAL_BUTTON_APPEARANCES } from '@/components/forms-and-inputs/VerticalButton';
@@ -46,9 +46,7 @@ export { default as Image, IMAGE_SIZES } from '@/components/images-and-icons/Ima
 export { default as Logo } from '@/components/images-and-icons/Logo';
 export { default as Object, BugIcon, createObjectIcon, IdeaIcon, OBJECT_SIZES, PageIcon, ProjectIcon, PullRequestIcon, TaskIcon } from '@/components/images-and-icons/Object';
 export { default as Tile, TILE_APPEARANCES, TILE_COLORS, TILE_CONTENTS, TILE_SIZES } from '@/components/images-and-icons/Tile';
-export { default as UserAvatar } from '@/components/images-and-icons/UserAvatar';
 
-export { default as AiLabel } from '@/components/labels/AiLabel';
 export { default as AiMessage, AI_MESSAGE_STATUSES, AiFeedback, AiSources, TypingText } from '@/components/labels/AiMessage';
 export { default as CountTag, COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS, formatCount } from '@/components/labels/CountTag';
 export { default as DateTag, DATE_TAG_APPEARANCES, DATE_TAG_ICONS, DATE_TAG_SPACINGS } from '@/components/labels/DateTag';
@@ -61,7 +59,6 @@ export { default as TagGroup, TAG_GROUP_ALIGNMENTS, TAG_GROUP_OVERFLOWS } from '
 
 export { default as Accordion } from '@/components/layout-and-structure/Accordion';
 export { default as Carousel } from '@/components/layout-and-structure/Carousel';
-export { default as Footer } from '@/components/layout-and-structure/Footer';
 export { default as PageHeader } from '@/components/layout-and-structure/PageHeader';
 export { default as Panel, PanelActionGroup, PanelBackAction, PanelBody, PanelCloseAction, PanelContainer, PanelDisclaimer, PanelDownAction, PanelFooter, PanelHeader, PanelHostContext, PanelMoreAction, PanelNewTabAction, PanelProvider, PanelSubheader, PanelUpAction, PanelViewSwitcher, usePanelManager } from '@/components/layout-and-structure/Panel';
 export { default as ScrollBar } from '@/components/layout-and-structure/ScrollBar';

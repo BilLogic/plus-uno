@@ -76,7 +76,7 @@ the tooltip holding the full date.
 - For a status or a category, use `Tag`.
 - For a numeric count, use `CountTag`.
 
-Same group: `AiLabel` · `AiMessage` · `CountTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiMessage` · `CountTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 

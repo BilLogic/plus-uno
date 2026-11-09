@@ -260,9 +260,11 @@ const Manifest = ({ subjects }) => (
 const subjects = documentedComponents();
 
 export default {
-  title: 'Tools/Documented contract',
+  // A test harness, not a page: `!dev` keeps it out of the sidebar while the
+  // Storybook tests still run it.
+  title: 'Get started/Documented contract',
   component: Manifest,
-  tags: ['!autodocs'],
+  tags: ['!dev', '!autodocs'],
   parameters: {
     // This story mounts other components on purpose, in states their own pages
     // warn about (icon-only Buttons have no accessible name by design). The a11y

@@ -49,7 +49,6 @@ const FORMS_PART_3 = [
 ].map((name) => `design-system/src/components/forms-and-inputs/${name}.mdx`);
 
 const LABELS = [
-  'AiLabel',
   'CountTag',
   'DateTag',
   'SmartTag',

@@ -1,51 +1,7 @@
 /**
- * Time Picker — `_Field` with an AM/PM toggle in Trailing, the PLUS DropdownMenu.
+ * Time Picker — a searchable Select. The field, the list and every state are
+ * Select's (FieldBox.scss, Listbox.scss); this file places nothing of its own.
  */
-@use '../../../styles/state' as *;
-
-.plus-time-picker__input {
+.plus-time-picker {
     width: 100%;
-}
-
-.plus-time-picker__period-toggle {
-    display: flex;
-    align-items: center;
-    gap: var(--stack-sm);
-    // The toggle is 24, like a button in a field's Trailing slot.
-    height: var(--item-height-sm);
-    padding: 0;
-    border: 0;
-    border-radius: var(--radius-md);
-    background: transparent;
-    color: var(--ds-text-brand);
-    font: inherit;
-    font-weight: var(--type-weight-semibold);
-    cursor: pointer;
-
-    @include plus-state();
-
-    .fa-caret-down {
-        color: var(--ds-icon-brand);
-    }
-
-    &:disabled {
-        color: inherit;
-        cursor: default;
-    }
-
-    .plus-field--invalid & {
-        color: var(--ds-text-danger);
-
-        .fa-caret-down {
-            color: var(--ds-icon-danger);
-        }
-    }
-
-    .plus-field--valid & {
-        color: var(--ds-text-success);
-
-        .fa-caret-down {
-            color: var(--ds-icon-success);
-        }
-    }
 }

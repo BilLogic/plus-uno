@@ -4,9 +4,8 @@ import useFieldId from '@/components/forms-and-inputs/useFieldId';
 import DropdownMenu from '@/components/forms-and-inputs/DropdownMenu/DropdownMenu';
 import { ButtonItem } from '@/components/navigation/MenuGroup';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
-import ButtonGroup from '@/components/forms-and-inputs/ButtonGroup/ButtonGroup';
+import Button from '@/components/forms-and-inputs/Button/Button';
 import './RichTextEditor.scss';
-import { iconClass } from '../../../lib/icon';
 
 const FULL_DEFAULT_BUTTONS = [
     'bold', 'italic', 'underline', 'strikethrough',
@@ -206,31 +205,15 @@ const RichTextEditor = ({
         );
     };
 
+    /*
+     * The full preset is the compact toolbar with more buttons: the same flat,
+     * subtle icon buttons in one row, not a bordered button group. A segmented
+     * group is for a choice between options; these are separate commands.
+     */
     const renderFullToolbar = () => (
-        <ButtonGroup
-            label="Rich text formatting"
-            className="plus-rich-text-editor-full-group"
-        >
-            {(toolbarButtons || FULL_DEFAULT_BUTTONS).map((btnKey) => {
-                const def = BUTTON_DEFS[btnKey];
-                if (!def) return null;
-                return (
-                    <IconButton
-                        key={btnKey}
-                        type="button"
-                        spacing={toolbarBtnSpacing}
-                        icon={def.icon}
-                        label={def.title}
-                        isSelected={Boolean(toolbarState[btnKey])}
-                        onClick={(e) => {
-                            e.preventDefault();
-                            execCommand(def.command, def.value);
-                        }}
-                        isDisabled={disabled || readOnly}
-                    />
-                );
-            })}
-        </ButtonGroup>
+        <div className="plus-rich-text-editor-full-group" role="group" aria-label="Rich text formatting">
+            {(toolbarButtons || FULL_DEFAULT_BUTTONS).map((btnKey) => renderFormatButton(btnKey))}
+        </div>
     );
 
     return (
@@ -246,84 +229,90 @@ const RichTextEditor = ({
                     {label}
                 </span>
             )}
-            <div className="plus-rich-text-editor-toolbar">
-                {useFullToolbar ? (
-                    renderFullToolbar()
-                ) : (
-                    <>
-                        <DropdownMenu
-                            spacing="compact"
-                            minWidth="10rem"
-                            trigger={(
-                                <button
-                                    type="button"
-                                    id={`${fieldId}-block-format`}
-                                    className="plus-rich-text-editor-block-toggle"
-                                    disabled={disabled || readOnly}
-                                >
-                                    <span className="plus-rich-text-editor-block-toggle-label">{blockLabel}</span>
-                                    <span className="plus-rich-text-editor-block-toggle-caret" aria-hidden>
-                                        <i className={iconClass('arrows-up-down')} />
-                                    </span>
-                                </button>
-                            )}
-                        >
-                            {BLOCK_OPTIONS.map((opt) => (
-                                <ButtonItem
-                                    key={opt.value}
-                                    isSelected={blockFormat === opt.value}
-                                    onClick={() => execCommand('formatBlock', opt.value)}
-                                >
-                                    {opt.label}
-                                </ButtonItem>
-                            ))}
-                        </DropdownMenu>
-                        <div
-                            className="plus-rich-text-editor-biu-cluster"
-                            role="group"
-                            aria-label="Bold, italic, and underline"
-                        >
-                            {renderFormatButton('bold')}
-                            {renderFormatButton('italic')}
-                            {renderFormatButton('underline')}
-                        </div>
-                        <div className="plus-rich-text-editor-ghost-tools">
-                            {renderFormatButton('link')}
-                            {renderFormatButton('list-ul', COMPACT_LIST_ICON)}
-                        </div>
-                    </>
-                )}
-            </div>
+            {/*
+              * One box, one border: the toolbar sits inside it on top, the
+              * writing area under it. The label is outside, above, as a
+              * Field's is.
+              */}
+            <div className="plus-rich-text-editor-box">
+                <div className="plus-rich-text-editor-toolbar">
+                    {useFullToolbar ? (
+                        renderFullToolbar()
+                    ) : (
+                        <>
+                            <DropdownMenu
+                                spacing="compact"
+                                minWidth="10rem"
+                                trigger={(
+                                    <Button
+                                        id={`${fieldId}-block-format`}
+                                        appearance="subtle"
+                                        spacing={toolbarBtnSpacing}
+                                        className="plus-rich-text-editor-block-toggle"
+                                        iconAfter="arrows-up-down"
+                                        isDisabled={disabled || readOnly}
+                                    >
+                                        {blockLabel}
+                                    </Button>
+                                )}
+                            >
+                                {BLOCK_OPTIONS.map((opt) => (
+                                    <ButtonItem
+                                        key={opt.value}
+                                        isSelected={blockFormat === opt.value}
+                                        onClick={() => execCommand('formatBlock', opt.value)}
+                                    >
+                                        {opt.label}
+                                    </ButtonItem>
+                                ))}
+                            </DropdownMenu>
+                            <div
+                                className="plus-rich-text-editor-biu-cluster"
+                                role="group"
+                                aria-label="Bold, italic, and underline"
+                            >
+                                {renderFormatButton('bold')}
+                                {renderFormatButton('italic')}
+                                {renderFormatButton('underline')}
+                            </div>
+                            <div className="plus-rich-text-editor-ghost-tools">
+                                {renderFormatButton('link')}
+                                {renderFormatButton('list-ul', COMPACT_LIST_ICON)}
+                            </div>
+                        </>
+                    )}
+                </div>
 
-            <div
-                ref={editorRef}
-                id={editorId}
-                className="plus-rich-text-editor-content"
-                contentEditable={!readOnly && !disabled}
-                /*
-                 * #329. `textbox` with `aria-multiline` is what a contentEditable
-                 * region has to say about itself; without it, it is announced as
-                 * a group of whatever happens to be inside. `aria-readonly`
-                 * tracks the same flag that turns editing off, so the two cannot
-                 * drift.
-                 */
-                role="textbox"
-                aria-multiline="true"
-                aria-labelledby={labelId}
-                aria-readonly={readOnly || disabled || undefined}
-                data-placeholder={placeholder}
-                style={{ minHeight: minHeight ? `${minHeight}px` : undefined }}
-                onInput={handleInput}
-                onFocus={(e) => {
-                    updateToolbarState();
-                    if (onFocus) onFocus(e);
-                }}
-                onBlur={(e) => {
-                    if (onBlur) onBlur(e);
-                }}
-                onKeyUp={updateToolbarState}
-                onMouseUp={updateToolbarState}
-            />
+                <div
+                    ref={editorRef}
+                    id={editorId}
+                    className="plus-rich-text-editor-content"
+                    contentEditable={!readOnly && !disabled}
+                    /*
+                     * #329. `textbox` with `aria-multiline` is what a contentEditable
+                     * region has to say about itself; without it, it is announced as
+                     * a group of whatever happens to be inside. `aria-readonly`
+                     * tracks the same flag that turns editing off, so the two cannot
+                     * drift.
+                     */
+                    role="textbox"
+                    aria-multiline="true"
+                    aria-labelledby={labelId}
+                    aria-readonly={readOnly || disabled || undefined}
+                    data-placeholder={placeholder}
+                    style={{ minHeight: minHeight ? `${minHeight}px` : undefined }}
+                    onInput={handleInput}
+                    onFocus={(e) => {
+                        updateToolbarState();
+                        if (onFocus) onFocus(e);
+                    }}
+                    onBlur={(e) => {
+                        if (onBlur) onBlur(e);
+                    }}
+                    onKeyUp={updateToolbarState}
+                    onMouseUp={updateToolbarState}
+                />
+            </div>
             {name && <input type="hidden" name={name} value={value || (editorRef.current?.innerHTML || '')} />}
         </div>
     );

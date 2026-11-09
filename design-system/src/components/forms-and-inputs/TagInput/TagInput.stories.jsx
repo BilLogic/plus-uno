@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '@/components';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
@@ -374,7 +375,7 @@ const Confirming = ({ onChange }) => {
                 onChange={onChange}
                 onCreate={() => new Promise((resolve) => setConfirm(() => resolve))}
             />
-            <button type="button" disabled={!confirm} onClick={() => confirm('topic-42')}>Confirm</button>
+            <Button isDisabled={!confirm} onClick={() => confirm('topic-42')}>Confirm</Button>
         </div>
     );
 };
@@ -705,7 +706,7 @@ export const NoTidyingWithoutHandlers = {
     render: (args) => (
         <div style={stack}>
             <Tidy {...args} menu={false} reorder={false} />
-            <button type="button">After</button>
+            <Button>After</Button>
         </div>
     ),
     play: async ({ canvasElement }) => {

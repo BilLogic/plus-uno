@@ -3,6 +3,7 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px } from '@/storybook-docs/lib/style-probes.js';
+import { Button } from '@/components';
 import InlineEdit from './InlineEdit';
 import InlineEditableTextfield from '../InlineEditableTextfield';
 
@@ -101,7 +102,7 @@ Textfield.play = async ({ canvasElement, args }) => {
 export const LeavingConfirms = (args) => (
     <div style={column}>
         <InlineEditableTextfield label="Nickname" defaultValue="Ada" onConfirm={args.onConfirm} />
-        <button type="button">Somewhere else</button>
+        <div><Button>Somewhere else</Button></div>
     </div>
 );
 LeavingConfirms.args = { onConfirm: fn() };
@@ -129,7 +130,7 @@ export const KeepOpenOnBlur = (args) => (
             keepEditViewOpenOnBlur
             onConfirm={args.onConfirm}
         />
-        <button type="button">Somewhere else</button>
+        <div><Button>Somewhere else</Button></div>
     </div>
 );
 KeepOpenOnBlur.args = { onConfirm: fn() };

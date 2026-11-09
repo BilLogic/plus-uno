@@ -106,10 +106,16 @@ const Tabs = ({
         }
     });
 
+    /*
+     * Appearance and spacing both have a value called `default`, so each
+     * modifier names its prop: a bare `plus-tabs--default` once meant either,
+     * and a default-spacing pill picked up the underline strip's baseline.
+     */
     const rootClasses = [
         'plus-tabs',
-        `plus-tabs--${appearance}`,
-        `plus-tabs--${spacing}`,
+        `plus-tabs--appearance-${appearance}`,
+        `plus-tabs--spacing-${spacing}`,
+        alignment === 'justified' && 'plus-tabs--justified',
         className
     ].filter(Boolean).join(' ');
 
