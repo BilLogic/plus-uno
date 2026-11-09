@@ -20,7 +20,7 @@ import AiIcon, { AI_ICON_NAMES, AI_ICON_SIZES, AI_ICON_ALL_SIZES } from './AiIco
  */
 
 export default {
-    title: 'Components/Images and icons/AI icon',
+    title: 'AI UI/Components for AI/Icon',
     component: AiIcon,
     tags: ['!dev', '!autodocs'],
     parameters: {

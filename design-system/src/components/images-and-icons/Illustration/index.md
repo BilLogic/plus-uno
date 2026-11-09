@@ -56,9 +56,9 @@ Don't: Clipping the box cuts off the limbs.
 ## Related
 
 - For a small square picture of a thing, use `Tile`.
-- For a person, use `UserAvatar`.
+- For a person, use `Avatar`.
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Image` · `Object` · `Tile` · `UserAvatar`
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Image` · `Object` · `Tile`
 
 ## Parts
 

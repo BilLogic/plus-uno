@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import Footer from '@/components/layout-and-structure/Footer';
+import { Link } from '@/components';
 
 /**
  * Login page footer with version, copyright, and terms link.
@@ -26,12 +26,11 @@ export default function LoginFooter({
                 padding: 'var(--size-section-pad-y-md)',
             }}
         >
-            <Footer
-                version={version}
-                copyright={copyright}
-                termsText={termsText}
-                termsUrl={termsUrl}
-            />
+            <footer style={{ paddingBottom: 'var(--pad-y-lg)' }}>
+                <p className="m-0" style={{ font: 'var(--body-small)', color: 'var(--ds-text)' }}>
+                    {version} | {copyright} | <Link href={termsUrl}>{termsText}</Link>
+                </p>
+            </footer>
         </div>
     );
 }

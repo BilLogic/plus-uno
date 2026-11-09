@@ -5,7 +5,7 @@
 # Component Figma Links
 
 Consolidated reference of every component design system Figma node.
-40 docs-page links + 68 style/variant entries across 65 components.
+39 docs-page links + 66 style/variant entries across 63 components.
 Links may span multiple Figma files — see the Figma link column per row.
 
 ## Docs pages (Resources → Figma)
@@ -15,7 +15,6 @@ The Figma link used by each Storybook docs page **Resources** card (`ResourcesBl
 | Group | Component | Node ID | Figma link |
 | --- | --- | --- | --- |
 | Components | Accordion | `13265:5813` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=13265-5813) |
-| Components | AiLabel | `20094:1214` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-1214) |
 | Components | Breadcrumb | `3497:19484` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19484) |
 | Components | Button | `3497:19482` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19482) |
 | Components | Carousel | `3497:19498` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3497-19498) |
@@ -62,7 +61,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Group | Component | Style / variant | Node ID | Figma link | Status |
 | --- | --- | --- | --- | --- | --- |
 | Components | Accordion | accordion | `20095:6341` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-6341) | verified |
-| Components | AiLabel | AI label | `20094:1214` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20094-1214) | verified |
 | Components | Avatar | Avatar | `20557:1424` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20557-1424) | verified |
 | Components | AvatarGroup | Avatar group | `20557:1716` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20557-1716) | verified |
 | Components | Breadcrumb | Breadcrumb | `20095:11156` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-11156) | verified |
@@ -120,7 +118,6 @@ Individual Figma component sets mapped to each component style or variant (`figm
 | Components | Toggle | Form Switch Button | `20328:89241` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20328-89241) | verified |
 | Components | Tooltip | Tooltip | `20871:3142` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20871-3142) | verified |
 | Components | TreeTable | Tree table | `20095:15470` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-15470) | verified |
-| Other | Footer | Footer | `20978:1305` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20978-1305) | verified |
 | Other | Logo | Logo | `21004:1217` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=21004-1217) | verified |
 | Other | MaintenanceAlert | Maintenance alert |  |  | missing |
 | Other | OverviewCard | Overview card | `20095:6532` | [Open](https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=20095-6532) | verified |

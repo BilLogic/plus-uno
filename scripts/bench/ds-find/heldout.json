@@ -2,8 +2,7 @@
  {
   "q": "avatar",
   "want": [
-   "Avatar",
-   "UserAvatar"
+   "Avatar"
   ],
   "kind": "real-name",
   "source": "ledger"

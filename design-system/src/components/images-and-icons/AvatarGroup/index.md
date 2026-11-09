@@ -58,9 +58,9 @@ Don't: Folding most of a roster behind +n: link to the list instead.
 ## Related
 
 - For a single person or agent, use `Avatar`.
-- For the signed-in user in the topbar, with a name and a counter, use `UserAvatar`.
+- For the signed-in person, with a name and a role, use the Sidebar's account row.
 
-Same group: `AiIcon` · `Avatar` · `Illustration` · `Image` · `Object` · `Tile` · `UserAvatar`
+Same group: `AiIcon` · `Avatar` · `Illustration` · `Image` · `Object` · `Tile`
 
 ## Parts
 

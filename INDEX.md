@@ -88,7 +88,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | Doc | Summary |
 |-----|---------|
 | [`design-system/guidelines/components/forms-and-inputs.md`](design-system/guidelines/components/forms-and-inputs.md) | Which input or button to use, sorted by the shape of the answer, plus the id, validation and required rules that apply across the group |
-| [`design-system/guidelines/components/labels.md`](design-system/guidelines/components/labels.md) | The label family — Status tag, Date tag, Count tag, Tag, Smart tag, TagGroup, Suggestion and AI label — and how to choose between them |
+| [`design-system/guidelines/components/labels.md`](design-system/guidelines/components/labels.md) | The label family — Status tag, Date tag, Count tag, Tag, Smart tag, TagGroup and Suggestion — and how to choose between them |
 | [`design-system/guidelines/components/layout-and-structure.md`](design-system/guidelines/components/layout-and-structure.md) | The remaining container components sorted by what is being contained |
 | [`design-system/guidelines/components/loading.md`](design-system/guidelines/components/loading.md) | Progress (Progress bar), Skeleton or Spinner — showing work in flight |
 | [`design-system/guidelines/components/messaging.md`](design-system/guidelines/components/messaging.md) | Alert, Flag or Modal — choosing by how long the message lives and whether it blocks |

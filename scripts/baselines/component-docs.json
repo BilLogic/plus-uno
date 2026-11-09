@@ -9,12 +9,6 @@
         "AiIcon style": {
           "count": 1
         },
-        "AiLabel className": {
-          "count": 1
-        },
-        "AiLabel id": {
-          "count": 1
-        },
         "AiMessage className": {
           "count": 1
         },
@@ -241,12 +235,6 @@
           "count": 1
         },
         "FilterButton onClick": {
-          "count": 1
-        },
-        "Footer className": {
-          "count": 1
-        },
-        "Footer style": {
           "count": 1
         },
         "GenerativeBorder className": {
@@ -688,15 +676,6 @@
           "count": 1
         },
         "TreeSelect value": {
-          "count": 1
-        },
-        "UserAvatar className": {
-          "count": 1
-        },
-        "UserAvatar id": {
-          "count": 1
-        },
-        "UserAvatar onClick": {
           "count": 1
         },
         "VerticalButton appearance": {

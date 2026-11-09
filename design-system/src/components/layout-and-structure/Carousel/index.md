@@ -116,7 +116,7 @@ Don't: Two carousels stacked.
 - For stepping through a sequence with a known end, use `ProgressBar` alongside your own controls.
 - For alternative views of the same thing, use `Tabs`.
 
-Same group: `Accordion` · `Footer` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
+Same group: `Accordion` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
 
 ## Parts
 

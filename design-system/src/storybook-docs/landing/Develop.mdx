@@ -25,3 +25,18 @@ import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from 
 A new page starts from a template in <DocsLink id="patterns-templates">Templates</DocsLink>, sits in a <DocsLink id="patterns-frame-frame">Frame</DocsLink> and is filled with <DocsLink id="patterns-section-section">Sections</DocsLink>.
 
 </FoundationSection>
+
+<FoundationSection title="Generators">
+
+- `npm run regenerate` runs the generators in the order their inputs need, then the ratchets. Generated files are never edited by hand.
+- `node scripts/sync-storybook-sort.mjs` is run on its own after a taxonomy edit: it writes this sidebar's order from `storybook.taxonomy.json`.
+
+</FoundationSection>
+
+<FoundationSection title="Checks">
+
+- `npm run check:harness` says which generated file is stale.
+- `npm run check:storybook-categories` holds the sidebar sections, component groups and story titles to the taxonomy.
+- `DocumentedContract.stories.jsx` mounts every prop and variant the docs name, in a real browser. It runs with the Storybook tests and stays out of the sidebar.
+
+</FoundationSection>
