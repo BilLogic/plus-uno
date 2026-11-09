@@ -74,7 +74,7 @@ Hold the Drawer full height at a screen edge, inside a Blanket. Never put it str
 - [Section](?path=/docs/patterns-section-section--docs) and [Card](?path=/docs/patterns-section-card--docs) hold content that belongs on the page itself.
 - Templates show a medium Drawer over the page.
 
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PageLayout` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 

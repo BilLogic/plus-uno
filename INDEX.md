@@ -23,7 +23,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`README.md`](README.md) | The front page — what plus-uno is, every surface it ships (Storybook, the Vibe app, the demo, the design-system lookup, uno skills, uno-bot), and where each one's docs live. |
+| [`README.md`](README.md) | The front page — what plus-uno is, every surface it ships (Storybook, the design-system lookup, the prototypes, uno skills, uno-bot), and where each one's docs live. |
 | [`SETUP.md`](SETUP.md) | Clone, install, run, and find your way around — without reading the constitution first. |
 | [`AGENTS.md`](AGENTS.md) | The constitution — identity, routing, the loading contract, and hard rules for every embodiment. |
 | [`GLOSSARY.md`](GLOSSARY.md) | Use these terms consistently across all design system work, prototypes, and documentation |

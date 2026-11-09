@@ -81,7 +81,7 @@ Let the Blanket place the modal. Do not detach it to move things around: the pad
 - [Popups](?path=/docs/patterns-popups--docs) covers the floating layers that never take a blanket.
 - For a floating sidebar, use the [Sidebar](?path=/docs/patterns-sidebar--docs): it takes a shadow and no blanket.
 
-Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Frame` · `Page` · `PageLayout` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 

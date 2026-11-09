@@ -85,7 +85,7 @@ Don't: Don't open the detail as a modal over the list: it hides the queue behind
 - Table: the section header above a table carries its toolbar and tabs.
 - Frame sets the pad a section sits in; its `sectionDetail` prop keeps 960 of content for a detail.
 
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PageLayout` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 

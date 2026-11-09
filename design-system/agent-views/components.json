@@ -7026,9 +7026,9 @@
     {
       "name": "PageLayout",
       "kind": "pattern",
-      "import": "import { PageLayout } from '@/specs/Universal/Pages';",
-      "group": "pages",
-      "source": "design-system/src/specs/Universal/Pages/PageLayout/PageLayout.jsx",
+      "import": "import { PageLayout } from '@/patterns';",
+      "group": "patterns",
+      "source": "design-system/src/patterns/PageLayout/PageLayout.jsx",
       "summary": "PageLayout: the template for a full page, wrapping its content in the Frame with the Sidebar and the breadcrumb row.",
       "props": [
         {
@@ -7179,15 +7179,6 @@
           "deprecated": null
         },
         {
-          "name": "floatingContent",
-          "type": "node",
-          "required": false,
-          "default": null,
-          "values": null,
-          "description": null,
-          "deprecated": null
-        },
-        {
           "name": "drawer",
           "type": "enum",
           "required": false,
@@ -7250,22 +7241,6 @@
           "description": null,
           "deprecated": null
         }
-      ],
-      "stories": [
-        "Overview",
-        "Frame",
-        "WithDrawer",
-        "Interactive",
-        "Focused",
-        "FocusedKeyboardAndLandmarks",
-        "FocusedColorModes",
-        "FocusedLongTitle",
-        "FocusedBare",
-        "FocusedBackAsLink",
-        "FocusedLongBody",
-        "FocusedMedium768",
-        "FocusedLarge1024",
-        "FocusedXLarge1440"
       ],
       "tokens": [
         "--ds-surface",

@@ -63,7 +63,7 @@ Don't: Everything in the label, and the time is cut off.
 - Templates draw the Sidebar from the config you pass.
 - For a count on a row, the Sidebar uses `CountTag`.
 
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternTable`
+Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PageLayout` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternTable`
 
 ## Parts
 

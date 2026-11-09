@@ -70,7 +70,7 @@ Don't: Without it, the Sidebar and the Panel both dock, the content drops under 
 - Templates for a whole page, Frame with its content slot filled, and the focused frame for one task.
 - Layout & grid for the column math the frame is sized by.
 
-Same group: `AiChat` · `Blanket` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Blanket` · `Page` · `PageLayout` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 

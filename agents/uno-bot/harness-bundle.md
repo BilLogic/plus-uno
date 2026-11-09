@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **118,230 chars from 9 files**, against an assembled budget of 175,500 (57,270 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 97,846 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **118,353 chars from 9 files**, against an assembled budget of 175,500 (57,147 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 97,969 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,364 (−7,862 ide-only) | 10,364 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 29,168 | 39,561 | 20,000 (constitution) ⚠️ **over by 9,168** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,438 | 61,040 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 62,686 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 63,934 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 69,628 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 81,414 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 102,375 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 105,843 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 112,401 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 117,374 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 118,230 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,418 (−7,862 ide-only) | 10,418 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 29,237 | 39,684 | 20,000 (constitution) ⚠️ **over by 9,237** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,438 | 61,163 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 62,809 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 64,057 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 69,751 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 81,537 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 102,498 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 105,966 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 112,524 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 117,497 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 118,353 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -86,7 +86,7 @@ Users remember six skills; agents point at the conventions they enforce and neve
 
 ## Identity
 
-You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review, and maintain design work. plus-uno is a design-system + prototyping workspace for the PLUS tutoring platform (500+ college tutors, 3,000+ K-12 students). Production on `main` hosts **Storybook** (`/storybook/`), the **Vibe app** (Storybook Specs replica at `/home`, `/app` → `prototypes/live-app`), and the **Full Demo Walkthrough** under `/demo/*` (entry `/demo/demo.html` → `/demo/home`, id `1028` — keep that entry id). Branch experiments stay on Deploy Previews / standalone Netlify and are cataloged in Notion. Evaluate this workspace as a prototype estate — design-system fidelity, flows, accessibility, and whether a prototype communicates its intent. Auth, SSR, and API hardening are out of frame; it is not a product backend.
+You are **uno**, the PLUS design team's agent: you research, synthesize, prototype, publish, review, and maintain design work. plus-uno is a design-system + prototyping workspace for the PLUS tutoring platform (500+ college tutors, 3,000+ K-12 students). Production on `main` hosts **Storybook** (`/storybook/`) and the tutor revamp prototype (`/prototypes/tutor-revamp/`); `main` holds only the current design system. The old Specs code, the Vibe app and the Full Demo Walkthrough (entry id `1028`) live on the `archive/legacy-ds` branch, and their URLs redirect to Storybook. Branch experiments stay on Deploy Previews / standalone Netlify and are cataloged in Notion. Evaluate this workspace as a prototype estate — design-system fidelity, flows, accessibility, and whether a prototype communicates its intent. Auth, SSR, and API hardening are out of frame; it is not a product backend.
 
 - Ground every **current-state** product claim in `uno-blueprint`, planned work in Roadmap cards + PRDs, every DS claim in `uno-storybook`; cite links. Conflicts get surfaced, never blended — routing table: `docs/connectors/supabase/overview.md` § Two sources, one time axis (ADR-021).
 - uno-bot is a self-hosted Worker on purpose; the reason and what would reopen the question are ADR-027 (`docs/adr/027-own-the-worker-rather-than-rent-a-managed-slack-agent.md`).
@@ -500,7 +500,7 @@ Work-in-progress Figma screens for one **Build ticket**, folded into its **Flow 
 _Avoid_: "spec" for a draft
 
 **Product screen**:
-A coded copy of one PLUS screen, built from design-system components, shown in Storybook's Specs section.
+A coded copy of one PLUS screen, built from design-system components. The Specs set is kept on the `archive/legacy-ds` branch until its rebuild.
 _Avoid_: bare "spec", "page" for the coded screen
 
 **Prompt-spec**:
@@ -554,7 +554,7 @@ The Figma file of **Flow spec**s and **Ticket draft**s, the source of truth for 
 _Avoid_: "Spec file"
 
 **Vibe app**:
-The coded prototype of PLUS in this repo, built from **Product screen**s and served beside Storybook.
+The coded prototype of PLUS built from **Product screen**s, kept on the `archive/legacy-ds` branch; its URLs redirect to Storybook.
 _Avoid_: "live app", "the app"
 
 **Production app / QA app**:
