@@ -21,8 +21,8 @@
  * that is missing is answered, never thrown on.
  *
  * WHERE THE FACTS COME FROM. The generated manifests
- * (`agent-views/components.json`, `tokens.json`: components, patterns and
- * `PageLayout`, each with its kind, import, props and values), the hand-kept
+ * (`agent-views/components.json`, `tokens.json`: components and patterns,
+ * each with its kind, import, props and values), the hand-kept
  * lists (`_inventions.json`; `_patterns.json`, which adds only a pattern's group
  * and when to reach for it; `_aliases.json`, the other words a component is
  * asked by, as `lookup(name).aliases`), the glossary's design-system avoid-words

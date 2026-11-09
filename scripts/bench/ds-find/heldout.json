@@ -299,7 +299,7 @@
  {
   "q": "page layout with title, primary action, table of sessions, filter, search, pagination",
   "want": [
-   "PageLayout",
+   "Frame",
    "PatternTable",
    "PageHeader"
   ],
@@ -309,7 +309,7 @@
  {
   "q": "page layout with title, actions, and a table list with filter, search, pagination",
   "want": [
-   "PageLayout",
+   "Frame",
    "PatternTable",
    "PageHeader"
   ],
@@ -319,7 +319,7 @@
  {
   "q": "page layout with title and primary action",
   "want": [
-   "PageLayout",
+   "Frame",
    "PageHeader"
   ],
   "kind": "real-intent",

@@ -34,8 +34,7 @@ export function deprecationOf(description) {
 
 /**
  * One record per barrel export, each with its `kind`: a `component` from
- * `@/components`, or a `pattern` from `@/patterns` or the page templates
- * (`PageLayout`). A component the barrel does not export is not part of the
+ * `@/components`, or a `pattern` from `@/patterns`. A component the barrel does not export is not part of the
  * public surface and is left out; an export with no parsed component (a hook,
  * a constant) is still listed, with `props: null`, so the manifest and the
  * existence index agree name for name.

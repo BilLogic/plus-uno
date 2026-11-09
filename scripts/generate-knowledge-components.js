@@ -59,7 +59,7 @@ function renderComponentIndex(components, aliases) {
   doc += `# PLUS DS — Components\n\n`;
   doc += `> **CRITICAL**: Only use components and patterns listed here. If it's not listed, it DOES NOT EXIST.\n\n`;
   doc += `Mirrors \`design-system/src/components/\`. Import from the barrel: \`import { Button } from '@/components';\`. `;
-  doc += `Patterns, \`PageLayout\` among them, import from \`@/patterns\` (§ Patterns).\n\n`;
+  doc += `Patterns import from \`@/patterns\` (§ Patterns).\n\n`;
   doc += `This index is the existence list. Each entry links to its generated doc — `;
   doc += `props, variants, tokens touched — derived from source.\n\n`;
   doc += renderInventions(readInventions());

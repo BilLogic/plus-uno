@@ -74,12 +74,12 @@ test('real repo: a pattern answers with its kind and barrel', () => {
   assert.equal(loadFacts(REPO_ROOT).lookup('PatternCard.padding=xl').status, 'unknown');
 });
 
-test('real repo: PageLayout and PatternSidebar answer with their props, from source', () => {
+test('real repo: Frame and PatternSidebar answer with their props, from source', () => {
   const facts = loadFacts(REPO_ROOT);
-  const layout = facts.lookup('PageLayout');
-  assert.equal(layout.kind, 'pattern');
-  assert.equal(layout.import, "import { PageLayout } from '@/patterns';");
-  assert.deepEqual(layout.props.find((p) => p.name === 'frame').values, ['default', 'focused']);
+  const frame = facts.lookup('Frame');
+  assert.equal(frame.kind, 'pattern');
+  assert.equal(frame.import, "import { Frame } from '@/patterns';");
+  assert.deepEqual(frame.props.find((p) => p.name === 'width').values, ['content', 'reading']);
   const sidebar = facts.lookup('PatternSidebar');
   assert.equal(sidebar.kind, 'pattern');
   assert.equal(sidebar.source, 'design-system/src/patterns/Sidebar/Sidebar.jsx');

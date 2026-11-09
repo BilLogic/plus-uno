@@ -128,7 +128,7 @@ export function renderSelfCheck() {
     `2. Every prop and value is in the component's generated doc (or \`components.json\`).\n` +
     `3. Every color, size, radius and font is a token from \`../tokens/tokens.md\`, read at the ladder step for its role, in place of a raw value or a \`--space-*\`, \`--radius-<n>\` or \`--palette-*\` primitive.\n` +
     `4. Every name in the tables above is replaced by its right-hand name.\n` +
-    `5. A page or card starts from its pattern: a full page sits in \`PageLayout\`, and a section, card, table or overlay is its pattern from the Patterns table, before any \`div\` with its own flex or grid.\n\n` +
+    `5. A page or card starts from its pattern: a full page sits in a template (\`Frame\` with the PLUS \`Sidebar\`), and a section, card, table or overlay is its pattern from the Patterns table, before any \`div\` with its own flex or grid.\n\n` +
     `Then run \`npm run check:ds-usage -- <your files>\` and fix what it reports; its rules are \`docs/engineering/ds-usage-rules.md\`.\n`
   );
 }

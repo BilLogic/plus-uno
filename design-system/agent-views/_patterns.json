@@ -3,18 +3,13 @@
   "patterns": [
     {
       "group": "Templates",
-      "name": "PageLayout",
-      "use": "Every full page: wraps it in the Frame with the Sidebar, the breadcrumb row and the Page with its 12-column content grid. `frame=\"focused\"` for one task the person finishes or leaves."
-    },
-    {
-      "group": "Frame",
       "name": "Frame",
-      "use": "The app frame under PageLayout: Sidebar, Page and Panel with no top bar. Reach for it directly only for a shell PageLayout does not give."
+      "use": "Every full page: the app frame (Sidebar, Page with its 12-column content grid, and Panel, with no top bar). The default template puts the PLUS `Sidebar` (@/components) in `sidebar` and a `Breadcrumb` in `header`; the focused template, for one task the person finishes or leaves, has no `sidebar`, `width=\"reading\"`, the task's name as the `h1` in `header`, and `onBack` and `onClose`."
     },
     {
       "group": "Frame",
       "name": "PatternSidebar",
-      "use": "The Frame's Sidebar with its open tabs. PageLayout draws it from the config you pass."
+      "use": "The Frame's Sidebar with its open tabs. The PLUS `Sidebar` (@/components) fills it from the role's config; reach for this only for a sidebar that is not the app's."
     },
     {
       "group": "Page",

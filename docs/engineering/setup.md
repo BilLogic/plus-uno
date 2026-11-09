@@ -52,7 +52,7 @@ skills/         # Workflow skills (uno-prototype, uno-review, …)
 ## Prototype conventions
 
 - Experiments: `prototypes/{project-name}/` on a **feature branch** (flat, kebab-case)
-- **Scaffold:** `bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>` writes the prototype (DS aliases, SCSS config, shared React resolution, a first page in `PageLayout`) with its `index.html` title and the next unused `server.port`
+- **Scaffold:** `bash skills/uno-prototype/scripts/scaffold-prototype.sh <slug>` writes the prototype (DS aliases, SCSS config, shared React resolution, a first page in the default template) with its `index.html` title and the next unused `server.port`
 - Each prototype has its own `vite.config.js` with `@` → `../../design-system/src`
 - Register in **Notion Marketplace** with the Deploy Preview / standalone URL — do **not** add numeric SPA routes on `main`
 - Optional local script: `"dev:{project-name}": "vite --config prototypes/{project-name}/vite.config.js"` (branch only)

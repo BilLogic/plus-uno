@@ -1,5 +1,5 @@
 ---
-summary: If you are building a full page (like a dashboard, student list, or toolkit), you MUST wrap the entire page in the <PageLayout> component
+summary: If you are building a full page (like a dashboard, student list, or toolkit), you MUST build it on a template — the Frame with the PLUS Sidebar and a breadcrumb
 ---
 
 <!-- Tier: 2 -->
@@ -10,36 +10,30 @@ summary: If you are building a full page (like a dashboard, student list, or too
 
 ## The standard app shell
 
-If you are building a full page (like a dashboard, student list, or toolkit), you MUST wrap the entire page in the `<PageLayout>` component. This automatically handles the responsive Sidebar and the breadcrumb row (§ The frame).
+If you are building a full page (like a dashboard, student list, or toolkit), you MUST build it on the default template: `Frame` with the PLUS `Sidebar` in `sidebar` and a `Breadcrumb` in `header`. The Frame handles the responsive Sidebar and the breadcrumb row (§ The frame); the Templates pattern page (`design-system/src/patterns/PageTemplates/PageTemplates.mdx`) shows both templates.
 
 ```jsx
 import React from 'react';
-import { PageLayout } from '@/patterns';
-// Note: the Sidebar and the breadcrumb are drawn inside PageLayout, you just pass configs.
+import { Breadcrumb, Sidebar } from '@/components';
+import { Frame, PatternSection } from '@/patterns';
 
 export default function MyDashboard() {
     return (
-        <PageLayout
-            topBarConfig={{
-                breadcrumbs: [{ text: 'Home', href: '/' }, { text: 'Dashboard', active: true }],
-                user: { name: 'Admin User', role: 'admin' }
-            }}
-            sidebarConfig={{
-                activeTabId: 'dashboard'
-            }}
+        <Frame
+            header={<Breadcrumb items={[{ text: 'Home', href: '/' }, { text: 'Dashboard' }]} />}
+            sidebar={<Sidebar user="tutor" activeTabId="dashboard" account={{ id: 'ana', name: 'Ana Ruiz', role: 'Tutor' }} />}
         >
             {/* ⬇️ YOUR PAGE CONTENT GOES HERE ⬇️ */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-                {/* Example Content */}
-                <h1 className="heading-large">Dashboard Overview</h1>
-            </div>
+            <PatternSection level="page" title="Dashboard" description="This week at a glance." />
             {/* ⬆️ YOUR PAGE CONTENT ENDS HERE ⬆️ */}
-        </PageLayout>
+        </Frame>
     );
 }
 ```
 
-For a page that holds one task the person finishes or leaves (a session note, a setup flow), pass `frame="focused"`: no sidebar, Back · title · Close in the Page header row, the 864 reading column, and `actions` held at the foot of the Page. It has the Frame's seamless edges, with no pad, no top bar and no footer row. The props and when to use it versus a Modal are in `PageLayout.mdx` § Focused frame.
+The page-level Section header's title is the page's `h1`.
+
+For a page that holds one task the person finishes or leaves (a session note, a setup flow), use the focused template: `Frame` with no `sidebar`, `width="reading"`, the task's name as the `h1` in `header`, and `onBack` and `onClose`, which draw Back · title · Close in the Page header row. The actions sit in a group at the foot of the content. When to use it versus a Modal is in the Templates pattern page § Usage.
 
 ## The standard overlay
 
@@ -88,12 +82,13 @@ The sidebar is a collapsible tree with three categories:
 - **Training** — tutor onboarding, certification, practice modules
 - **Admin** — user management, billing, platform settings
 
-The active item is highlighted. `PageLayout` renders it; build every page's
-navigation through it, so there is one navigation surface.
+The active item is highlighted. The PLUS `Sidebar` (`@/components`) renders it
+from the role's config; build every page's navigation through it, so there is
+one navigation surface.
 
 ## The frame
 
-`PageLayout` sits in the `Frame` pattern (`@/patterns/Frame`,
+Every template sits in the `Frame` pattern (`@/patterns`,
 Figma `Pattern/Surface container`), which owns every frame size and the sidebar's
 behavior:
 

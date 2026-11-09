@@ -76,8 +76,9 @@ Adding the `h1` moves everything under it: a page that ran `h4 → h4` becomes
 
 **For developers.** axe's `heading-order` rule cannot see a missing top, because the first heading
 has no predecessor, and its `page-has-heading-one` rule does not run when the
-check is scoped to a story. `PageLayout` renders a page's hidden `h1` from
-its `title`.
+check is scoped to a story. In the default template the page-level Section
+header's title is the `h1`; in the focused template it is the task's name in
+the Frame's header row.
 
 </FoundationSection>
 

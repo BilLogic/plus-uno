@@ -41,7 +41,7 @@
     "AiChat": ["chat", "assistant", "chatbot", "conversation"],
     "PromptInput": ["ask the assistant", "prompt box", "chat input"],
     "PageHeader": ["heading with buttons", "header actions", "page heading"],
-    "PageLayout": ["page template", "page shell"],
+    "Frame": ["page template", "page shell", "page layout", "full page", "new page"],
     "VisuallyHidden": ["screen reader only", "sr-only", "assistive text", "screen reader text"],
     "Spotlight": ["onboarding", "feature tour", "coach mark", "new feature highlight", "walkthrough"],
     "PatternTable": ["list of records", "data table on a page", "sortable list", "records with filters"],

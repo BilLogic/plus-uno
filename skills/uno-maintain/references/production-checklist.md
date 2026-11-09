@@ -37,11 +37,11 @@ See also `design-system/src/styles/Accessibility.mdx`.
 - [ ] Tokens only — no hardcoded visual values where DS tokens exist
 - [ ] PLUS components and patterns before generic framework substitutions
 - [ ] Storybook stories updated for changed behavior/states
-- [ ] Responsive at `md`, `lg`, `xl` — page-level work sits in `PageLayout`, whose Frame resolves the layout from its own width
+- [ ] Responsive at `md`, `lg`, `xl` — page-level work sits in a template, whose Frame resolves the layout from its own width
 - [ ] Accessibility pass (focus, keyboard, labels, contrast)
 
 ## Pattern references
 
 - **Card surfaces:** `design-system/src/patterns/PatternCard/`
 - **Tables:** `design-system/src/patterns/PatternTable/`; respect the global table reset in `design-system/src/styles/main.scss`
-- **Page layout and breakpoints:** `design-system/src/patterns/PageLayout/` and `design-system/src/patterns/Frame/`
+- **Page layout and breakpoints:** `design-system/src/patterns/PageTemplates/` and `design-system/src/patterns/Frame/`

@@ -110,7 +110,10 @@ function attachedStories(mdxPath, content) {
  */
 function developerLinks(mdxPath, content, name) {
   const stories = attachedStories(mdxPath, content);
-  const title = stories && fs.readFileSync(stories.file, 'utf8').match(/\btitle:\s*['"]([^'"]+)['"]/);
+  // The meta's title, read from `export default {` on: story files carry `title` props on sample data above it.
+  const storiesSrc = stories ? fs.readFileSync(stories.file, 'utf8') : '';
+  const metaStart = storiesSrc.indexOf('export default {');
+  const title = stories && storiesSrc.slice(Math.max(metaStart, 0)).match(/\btitle:\s*['"]([^'"]+)['"]/);
   const dir = path.dirname(mdxPath);
   const own = ['.jsx', '.js', '.tsx'].map((ext) => path.join(dir, `${name}${ext}`)).find((f) => fs.existsSync(f));
   const source = own ?? stories?.file;

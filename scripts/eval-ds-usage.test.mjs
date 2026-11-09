@@ -393,10 +393,10 @@ test('score: the layout formula is the page rule, following the app entry to the
   try {
     fs.mkdirSync(path.join(dir, 'src'));
     fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import History from './History';\nexport default function App() {\n  return <History />;\n}\n");
-    const page = (root) => `import { PageLayout } from '@/patterns';\nexport default function History() {\n  return (\n    ${root}\n  );\n}\n`;
+    const page = (root) => `import { Frame } from '@/patterns';\nexport default function History() {\n  return (\n    ${root}\n  );\n}\n`;
     fs.writeFileSync(path.join(dir, 'src', 'History.jsx'), page('<div className="history-grid" />'));
     assert.equal(score({ folder: dir, label: 'eval-x' }).layoutFormula, false);
-    fs.writeFileSync(path.join(dir, 'src', 'History.jsx'), page('<PageLayout />'));
+    fs.writeFileSync(path.join(dir, 'src', 'History.jsx'), page('<Frame />'));
     assert.equal(score({ folder: dir, label: 'eval-x' }).layoutFormula, true);
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });

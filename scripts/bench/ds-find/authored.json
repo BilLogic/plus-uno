@@ -283,7 +283,7 @@
  {
   "q": "start a new full page layout",
   "want": [
-   "PageLayout",
+   "Frame",
    "Page"
   ],
   "kind": "intent"

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # scaffold-prototype.sh — write a new prototype under prototypes/<slug>: a Vite
-# app on the design-system aliases, a page in PageLayout, and the next free dev
+# app on the design-system aliases, a page in the default template, and the next free dev
 # port, picked automatically.
 #
 # Usage:
@@ -96,6 +96,7 @@ import ReactDOM from 'react-dom/client';
 import '@/styles/bootstrap-layer.css';
 import '@/styles/main.scss';
 import App from './App';
+import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
@@ -104,15 +105,25 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 );
 EOF
 
+cat > "$dest/src/index.css" <<'EOF'
+/* The Frame fills its box: give it the whole window. */
+html, body, #root { height: 100%; }
+body { margin: 0; background: var(--ds-surface-sunken); }
+EOF
+
 cat > "$dest/src/App.jsx" <<'EOF'
 import React from 'react';
-import { PageLayout, PatternCard } from '@/patterns';
+import { Breadcrumb, Sidebar } from '@/components';
+import { Frame, PatternSection } from '@/patterns';
 
-/** The prototype's first page. Build against the confirmed plan. */
+/** The prototype's first page, on the default template. Build against the confirmed plan. */
 const App = () => (
-    <PageLayout title="Home" topBarConfig={{ breadcrumbs: [{ text: 'Home' }] }}>
-        <PatternCard title="Start here" />
-    </PageLayout>
+    <Frame
+        header={<Breadcrumb items={[{ text: 'Home' }]} />}
+        sidebar={<Sidebar user="tutor" activeTabId="home" account={{ id: 'ana', name: 'Ana Ruiz', role: 'Tutor' }} />}
+    >
+        <PatternSection level="page" title="Home" description="Start here." />
+    </Frame>
 );
 
 export default App;
