@@ -35,7 +35,7 @@ if a change genuinely needs to interrupt, that is `Flag` — see
 
 Color is never the whole message: an appearance only changes the palette, so the
 text has to say what the label means, per
-`design-system/guidelines/foundations/accessibility.md`.
+`design-system/src/styles/Accessibility.mdx`.
 
 ## Related
 

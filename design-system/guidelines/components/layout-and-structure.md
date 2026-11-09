@@ -46,7 +46,7 @@ several of them would clutter the landmark list.
 
 **`Carousel` hides content behind motion.** It exposes `interval`, `pause`,
 `wrap`, `keyboard` and `slide`, so auto-advance can be turned off — and should
-be, for anything a user has to read. `design-system/guidelines/foundations/accessibility.md`
+be, for anything a user has to read. `design-system/src/styles/Motion.mdx`
 requires that essential information never depend on motion.
 
 ## Related

@@ -164,4 +164,4 @@ feedback field on every keystroke.
 - `forms.md` — how the fields compose on a surface
 - `../components/forms-and-inputs.md` — which component to reach for
 - `../components/messaging.md` — field errors vs an `Alert`
-- `../foundations/accessibility.md` — the WCAG bar
+- `../../src/styles/Accessibility.mdx` — the WCAG bar

@@ -69,4 +69,4 @@ makes naming the `nav` load-bearing.
 ## Related
 
 - `design-system/src/components/navigation/index.md` — generated facts and coverage
-- `design-system/guidelines/foundations/accessibility.md` — the WCAG bar
+- `design-system/src/styles/Accessibility.mdx` — the WCAG bar

@@ -168,7 +168,7 @@ test('tokens returns steps with intent and leaves primitives out', () => {
 test('guide returns the orientation, a guideline and a rule section', () => {
   assert.equal(lookup.guide().text, ORIENTATION);
   assert.equal(lookup.guide('layout formulas').path, 'design-system/guidelines/composition/layout.md');
-  assert.equal(lookup.guide('a11y').path, 'design-system/guidelines/foundations/accessibility.md');
+  assert.equal(lookup.guide('a11y').path, 'design-system/src/styles/Accessibility.mdx');
   assert.match(lookup.guide('no-raw-literal').text, /^## ds\/no-raw-literal/);
   assert.ok(lookup.guide('nope').topics.includes('layout'));
 });
