@@ -1,213 +1,302 @@
 @use '../../../styles/state' as *;
 
-// #333. The play/pause control for an autoplaying carousel. It sits outside the
-// slides so it cannot scroll away from the person reaching for it, and it is
-// positioned over the bottom-left corner where it does not collide with the
-// prev/next controls or the indicators.
-.plus-carousel-shell {
-    position: relative;
-}
+/*
+ * Carousel
+ * A centered stage: the active slide flat, its neighbors turned toward it
+ * and dimmed. Under it one row of controls (play ring and pills, or arrows
+ * and pills when it does not autoplay), then the caption.
+ *
+ * `--carousel-progress` (0 to 1) is written by the component's clock; the
+ * ring and the active pill both read it.
+ *
+ * The geometry and timing below come from the pattern itself and have no
+ * token: the play button's size, the pill sizes, the move curve and the
+ * caption swap.
+ */
 
-.plus-carousel-playpause {
-    position: absolute;
-    /*
-     * A 10px inset, and it has to come from a token that IS 10px. The element
-     * pad ramp is 12px on x and 6px on y, so `-md` on both axes was writing
-     * `10px` as a fallback beside two tokens that are neither — the control sat
-     * 12px in and 6px up, asymmetrically, and the literal made it read square.
-     * Caught by check:size-fallbacks (#336).
-     */
-    left: var(--carousel-control-offset);
-    bottom: var(--carousel-control-offset);
-    z-index: 2;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--control-md);
-    height: var(--control-md);
-    border: 0;
-    border-radius: 50%;
-    color: var(--ds-text);
-    background-color: var(--ds-surface);
-    cursor: pointer;
+.plus-carousel {
+    --carousel-progress: 0;
+    --carousel-move-duration: 550ms;
+    --carousel-move-easing: cubic-bezier(0.32, 0.72, 0, 1);
+    --carousel-edge-fade: 12%;
+    --carousel-controls-gap: 6px;
+    --carousel-play-size: 44px;
+    --carousel-ring-stroke: 2.5px;
+    --carousel-pill-width: 17px;
+    --carousel-pill-width-active: 43px;
+    --carousel-pill-height: 7px;
+    --carousel-pill-hit-x: 3px;
+    --carousel-pill-hit-y: 10px;
+    --carousel-caption-out: 120ms;
+    --carousel-caption-in: 200ms;
+    --carousel-caption-rise: 6px;
+    --carousel-caption-lift: 4px;
+    --carousel-pressed-scale: 0.94;
+
+    position: relative;
+    width: 100%;
+    border-radius: var(--card-radius);
 
     @include plus-state(());
 }
 
-/*
- * Carousel Component Styles
- * Built on hand-rolled markup (ADR-037: no React Bootstrap); styled on
- * `--ds-*` role tokens.
- */
-
-.plus-carousel {
+// --- STAGE ---
+// Full width, clipped, with the edges fading out so a neighbor reads as
+// "more to come" rather than cut off.
+.plus-carousel-stage {
     position: relative;
-    width: 100%;
-    border-radius: var(--radius-md);
     overflow: hidden;
+    overflow: clip;
+    padding-block: var(--page-stack-md) var(--section-stack-md);
+    touch-action: pan-y;
+    mask-image: linear-gradient(
+        90deg,
+        transparent,
+        black var(--carousel-edge-fade),
+        black calc(100% - var(--carousel-edge-fade)),
+        transparent
+    );
+}
 
-    // --- TRACK & SLIDES ---
-    .plus-carousel-track {
-        display: flex;
-        width: 100%;
-        transition: transform 0.4s ease;
-    }
+// The component measures the stage and writes the slide width and the
+// track height, unitless, in pixels.
+.plus-carousel-track {
+    position: relative;
+    height: calc(var(--carousel-track-height, 0) * 1px);
 
-    .plus-carousel-item {
-        position: relative;
-        flex: 0 0 100%;
-        width: 100%;
-    }
-
-    .plus-carousel-image {
-        display: block;
-        object-fit: cover;
-        width: 100%;
-    }
-
-    .plus-carousel-content {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        min-height: var(--carousel-slide-min-height);
-
-        // Ensure child content fills width
-        >* {
-            width: 100%;
-        }
-    }
-
-    // --- CAPTIONS ---
-    .plus-carousel-caption {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        padding: var(--section-pad-y-default) var(--section-pad-x-default);
-        background: linear-gradient(transparent, var(--ds-background-inverse-subtle));
-        text-align: left;
-        color: var(--ds-text-inverse);
-
-        .plus-carousel-title {
-            font: var(--heading-medium);
-            margin-bottom: var(--stack-md);
-            color: inherit;
-        }
-
-        p {
-            font: var(--body-large);
-            margin-bottom: 0;
-            color: inherit;
-            opacity: 0.85;
-        }
-    }
-
-    // --- CONTROLS (Prev/Next) ---
-    .plus-carousel-control {
-        position: absolute;
-        top: 50%;
-        transform: translateY(-50%);
-        z-index: 1;
-
-        display: flex;
-        align-items: center;
-        justify-content: center;
-
-        padding: var(--carousel-control-pad);
-        min-width: var(--carousel-control-size); // Touch target
-        min-height: var(--carousel-control-size);
-
-        color: var(--ds-text-subtle);
-        background: none;
-        border: 0;
-        opacity: 0.7;
-        transition: opacity 0.15s ease, color 0.15s ease;
-        cursor: pointer;
-
-        .plus-carousel-control-icon {
-            i {
-                font-size: var(--icon-lg);
-            }
-        }
-
-        @include plus-state((
-            hovered: (opacity: 1, color: var(--ds-text)),
-            disabled: (opacity: var(--ds-opacity-disabled), cursor: not-allowed),
-        ),
-            $hovered-selector: '&:hover:not(:disabled)');
-    }
-
-    .plus-carousel-control-prev {
-        left: 0;
-    }
-
-    .plus-carousel-control-next {
-        right: 0;
-    }
-
-    // --- INDICATORS ---
-    .plus-carousel-indicators {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        z-index: 2;
-        margin-bottom: var(--section-pad-y-compact);
-        gap: var(--stack-md);
-        display: flex;
-        justify-content: center;
-        padding: 0;
-    }
-
-    .plus-carousel-indicator {
-        width: var(--carousel-indicator-width);
-        height: var(--carousel-indicator-height);
-        padding: 0;
-        border: none;
-        border-radius: var(--radius-lg);
-        background-color: var(--ds-border);
-        opacity: 1;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-
-        @include plus-state(());
-
-        &.active {
-            background-color: var(--ds-background-selected-bold);
-        }
-    }
-
-    // --- SIZE VARIANTS ---
-    &--sm {
-        .plus-carousel-content {
-            min-height: var(--carousel-slide-min-height-compact);
-            padding: var(--section-pad-y-compact) var(--section-pad-x-compact);
-        }
-
-        .plus-carousel-indicator {
-            width: var(--carousel-indicator-width-compact);
-            height: var(--carousel-indicator-height-compact);
-        }
-    }
-
-    &--lg {
-        .plus-carousel-content {
-            min-height: var(--carousel-slide-min-height-spacious);
-            padding: var(--section-pad-y-spacious) var(--section-pad-x-spacious);
-        }
-
-        .plus-carousel-indicator {
-            width: var(--carousel-indicator-width);
-            height: var(--carousel-indicator-height-spacious);
-        }
+    // Until the stage is measured, the slides have no place to stand.
+    &--measuring {
+        visibility: hidden;
     }
 }
 
-@media (prefers-reduced-motion: reduce) {
-    .plus-carousel .plus-carousel-track,
-    .plus-carousel .plus-carousel-control,
-    .plus-carousel .plus-carousel-indicator {
+.plus-carousel-slide {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: calc(var(--carousel-slide-width, 0) * 1px);
+    height: 100%;
+    margin-left: calc(var(--carousel-slide-width, 0) * -0.5px);
+    transform-origin: 50% 50%;
+    backface-visibility: hidden;
+    cursor: pointer;
+    transition:
+        transform var(--carousel-move-duration) var(--carousel-move-easing),
+        opacity var(--carousel-move-duration) var(--carousel-move-easing);
+
+    &--active {
+        cursor: auto;
+    }
+
+    // Two or more places off: faded out, and out of the way of the pointer.
+    &--away {
+        visibility: hidden;
+    }
+}
+
+// The card: the slide's own surface, raised, no border.
+.plus-carousel-card {
+    position: relative;
+    height: 100%;
+    overflow: hidden;
+    border-radius: var(--card-radius);
+    background-color: var(--ds-surface-raised);
+    box-shadow: var(--ds-shadow-raised);
+    color: var(--ds-text);
+
+    // A neighbor dims under a layer of the page color.
+    &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        background-color: var(--ds-surface);
+        opacity: var(--carousel-dim, 0);
+        pointer-events: none;
+        transition: opacity var(--carousel-move-duration) var(--carousel-move-easing);
+    }
+}
+
+.plus-carousel-content {
+    height: 100%;
+}
+
+.plus-carousel-image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+// --- CONTROLS ---
+.plus-carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--carousel-controls-gap);
+}
+
+// The play button: a ring with no fill. The track is the border color; the
+// progress arc fills clockwise from twelve o'clock over the slide's time.
+.plus-carousel-play {
+    position: relative;
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: var(--carousel-play-size);
+    height: var(--carousel-play-size);
+    padding: 0;
+    border: 0;
+    border-radius: var(--radius-full);
+    background: transparent;
+    color: var(--ds-icon);
+    cursor: pointer;
+
+    @include plus-state((
+        pressed: (transform: scale(var(--carousel-pressed-scale))),
+    ));
+}
+
+.plus-carousel-ring {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+
+    circle {
+        fill: none;
+        stroke-width: var(--carousel-ring-stroke);
+    }
+}
+
+.plus-carousel-ring-track {
+    stroke: var(--ds-border);
+}
+
+.plus-carousel-ring-progress {
+    stroke: var(--ds-background-brand-bold);
+    stroke-linecap: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: calc(1 - var(--carousel-progress));
+}
+
+.plus-carousel-play-icon {
+    position: relative;
+    font-size: var(--font-size-0875);
+    line-height: 1;
+}
+
+// --- PILLS ---
+.plus-carousel-dot-list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.plus-carousel-dot {
+    display: block;
+    padding: var(--carousel-pill-hit-y) var(--carousel-pill-hit-x);
+    border: 0;
+    border-radius: var(--radius-full);
+    background: none;
+    cursor: pointer;
+
+    @include plus-state((
+        hovered: (--carousel-pill-ground: var(--ds-border-bold)),
+    ), $ring-offset: calc(-1 * var(--focus-ring-width)));
+}
+
+.plus-carousel-dot-pill {
+    position: relative;
+    display: block;
+    width: var(--carousel-pill-width);
+    height: var(--carousel-pill-height);
+    overflow: hidden;
+    border-radius: var(--radius-full);
+    background-color: var(--carousel-pill-ground, var(--ds-border));
+    transition:
+        width var(--carousel-move-duration) var(--carousel-move-easing),
+        background-color var(--motion-duration-medium) var(--motion-easing-standard);
+}
+
+// Done pills, the ones before the active slide, sit a step darker.
+.plus-carousel-dot--done {
+    --carousel-pill-ground: var(--ds-border-bold);
+}
+
+.plus-carousel-dot-fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 0;
+    border-radius: inherit;
+    background-color: var(--ds-background-brand-bold);
+}
+
+.plus-carousel-dot[aria-selected='true'] {
+    .plus-carousel-dot-pill {
+        width: var(--carousel-pill-width-active);
+    }
+
+    .plus-carousel-dot-fill {
+        width: calc(var(--carousel-progress) * 100%);
+    }
+}
+
+// Paused, the fill so far turns neutral.
+.plus-carousel--paused .plus-carousel-dot-fill {
+    background-color: var(--ds-text-subtle);
+}
+
+// --- CAPTION ---
+// Centered, at reading width, two lines tall at least so the page does not
+// jump between a short caption and a long one.
+.plus-carousel-caption {
+    max-width: var(--content-max-width-reading);
+    min-height: calc(2lh + var(--stack-sm));
+    margin: var(--section-stack-md) auto 0;
+    text-align: center;
+}
+
+.plus-carousel-caption-inner {
+    transition:
+        opacity var(--carousel-caption-in) var(--carousel-move-easing),
+        transform var(--carousel-caption-in) var(--carousel-move-easing);
+
+    &--out {
+        opacity: 0;
+        transform: translateY(calc(-1 * var(--carousel-caption-lift)));
+        transition-duration: var(--carousel-caption-out);
+    }
+
+    &--pre {
+        opacity: 0;
+        transform: translateY(var(--carousel-caption-rise));
+        transition: none;
+    }
+}
+
+.plus-carousel-caption-title {
+    margin: 0;
+    font: var(--heading-small);
+    color: var(--ds-text);
+    text-wrap: balance;
+}
+
+.plus-carousel-caption-description {
+    margin: var(--stack-sm) 0 0;
+    font: var(--body-default);
+    color: var(--ds-text-subtle);
+    text-wrap: pretty;
+}
+
+// --- REDUCED MOTION ---
+// A flat row that moves in one step, with no caption motion.
+.plus-carousel--reduced {
+    .plus-carousel-slide,
+    .plus-carousel-card::after,
+    .plus-carousel-dot-pill,
+    .plus-carousel-caption-inner {
         transition: none;
     }
 }

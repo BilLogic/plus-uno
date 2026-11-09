@@ -43,9 +43,9 @@ const untrusted = '<img src=x onerror="window.__slideEscaped = false"> Ran 45 mi
 export const StringSlidesRenderAsText = () => (
     <div style={{ maxWidth: '640px' }}>
         <Carousel
+            aria-label="Session notes"
             slides={[{ content: untrusted }]}
-            controls={false}
-            indicators={false}
+            autoplay={false}
             data-testid="sce-carousel"
         />
     </div>
@@ -71,9 +71,9 @@ StringSlidesRenderAsText.play = async ({ canvasElement }) => {
 export const ImagePathsStillRenderAsImages = () => (
     <div style={{ maxWidth: '640px' }}>
         <Carousel
+            aria-label="Session notes"
             slides={[{ content: '/logo.svg', alt: 'A slide' }]}
-            controls={false}
-            indicators={false}
+            autoplay={false}
         />
     </div>
 );

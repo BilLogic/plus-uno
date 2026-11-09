@@ -2,7 +2,7 @@
 
 # Carousel
 
-Rotates through a set of slides, with controls, indicators, captions, and a pausable autoplay that stays off under reduced motion. Hand-built: Base UI has no carousel part.
+A centered stage of slides: the active one flat and full size, one neighbor on each side turned toward it and dimmed. Under it, a play button whose ring fills over the slide's time, one progress pill per slide, and a caption that changes with the slide. Autoplay holds while the pointer rests on the stage, keyboard focus is inside, the carousel is out of view or the tab is hidden. Under reduced motion it never moves on its own: arrows replace the play button and the slides sit in a flat row.
 
 Also asked as: slideshow, gallery.
 
@@ -10,182 +10,126 @@ Also asked as: slideshow, gallery.
 
 **Source:** `design-system/src/components/layout-and-structure/Carousel/Carousel.jsx`
 
-**Stories:** `design-system/src/components/layout-and-structure/Carousel/Carousel.stories.jsx` — Content, Overview, Interactive, Rest, Hovered, Pressed, Focused, Disabled
+**Stories:** `design-system/src/components/layout-and-structure/Carousel/Carousel.stories.jsx` — Overview, Static, NoLoop, FewSlides, ReducedMotion, Interactive, PauseStopsProgress, DotRestartsClock, ArrowKeysMove, HoverHolds, InactiveSlidesHidden, RegionIsNamed
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Carousel/Carousel.mdx`
 
 ## Usage
 
-Use `Carousel` for a small set of equal, browsable panels the user is invited to
-look through — onboarding screens, a few featured items, a gallery. Everything in
-it is one slide away from being unseen, so nothing essential belongs here.
+Use `Carousel` for a few equal panels a person is invited to look through: what is
+new, a short tour, a handful of featured items. Every slide but one is hidden at
+any moment, so nothing a person must read or act on belongs in it.
 
-`slides` takes an array of `{ content, alt, title, caption }`, or you can
-compose the items yourself as `children`. `interval` is `null` by default, which
-means it does not advance on its own; `controls` and `indicators` are both on,
-and both appear only when there is more than one slide.
+`slides` takes `{ content, title, description }`. `content` is the card; `title`
+and `description` fill the caption under the controls and name each pill.
+Autoplay is on, at `interval` 6000 ms a slide, and loops. Give the region a name
+with `aria-label` or `aria-labelledby`.
 
 ## Best practices
 
-### Show controls when there is more than one slide. {#show-controls-when-there-is-more-than-one-slide}
+### Keep it to three to six slides. {#keep-it-to-three-to-six-slides}
 
-Controls and indicators are the only cue that more slides exist.
+The pills are the map. Past six, nobody gets to the end.
 
-Do: Controls on a multi-slide carousel.
-Don't: Slides with no way to move.
+Do: Three slides, each worth seeing.
+Don't: Ten slides and a row of pills to match.
 
-### Give it the column width. {#give-it-the-column-width}
+### Give every slide a title. {#give-every-slide-a-title}
 
-A carousel needs room to show a slide in full; squeezed, it hides what it carries.
+The title is the caption a sighted reader sees and the name a screen reader hears on each pill.
 
-Do: Full column width.
-Don't: Squeezed into a sliver.
+Do: A title and one line for each slide.
+Don't: No titles: the pills say only Slide 1 of 3.
 
-### One carousel per view. {#one-carousel-per-view}
+### Keep the caption to one line. {#keep-the-caption-to-one-line}
 
-Two carousels compete for the same gesture and the same attention.
+The caption holds two lines of room so the page does not jump. A paragraph pushes the page down every time the slide changes.
 
-Do: A single carousel.
-Don't: Two carousels stacked.
+### Leave autoplay to slides that can be missed. {#leave-autoplay-to-slides-that-can-be-missed}
 
-### A string slide is text, and only text. {#a-string-slide-is-text-and-only-text}
-
-```jsx
-// A string that is not an image path renders escaped. Markup in it appears as
-// characters on the slide rather than as elements, which is what makes it safe
-// to pass content you did not write.
-<Carousel slides={[{ content: review.body }]} />
-
-// Prefer an element anyway — it is the only way to style a slide.
-<Carousel slides={[{ content: <Review body={review.body} /> }]} />
-
-// And if you genuinely hold trusted HTML, say so explicitly. The component will
-// render the element you pass; the decision is yours and it is visible.
-<Carousel slides={[{ content: <div dangerouslySetInnerHTML={{ __html: trusted }} /> }]} />
-```
-
-### Give every image slide an `alt`. {#give-every-image-slide-an-alt}
-
-```jsx
-// Incorrect — the fallback is "Slide 0", "Slide 1", zero-based and meaningless.
-<Carousel slides={[{ content: '/hero/autumn.png' }]} />
-
-// Correct.
-<Carousel slides={[{ content: '/hero/autumn.png', alt: 'Students in a workshop' }]} />
-```
-
-### Autoplay is off, and turning it on adds a control. {#autoplay-is-off-and-turning-it-on-adds-a-control}
-
-```jsx
-// Setting an interval starts the rotation AND renders a play/pause button, so
-// the movement can be stopped without a mouse. Leaving it off is still
-// the better default — a carousel nobody asked to move is a carousel people
-// read half of.
-<Carousel interval={4000} slides={slides} />
-
-<Carousel slides={slides} />
-```
+Autoplay moves on whether or not a person finished. Turn it off with `autoplay={false}` when a slide asks someone to read closely.
 
 ## Accessibility
 
-- **The controls are named.** The previous and next buttons carry
-  `aria-label="Previous slide"` and `"Next slide"`, and each indicator is
-  labeled "Slide 1", "Slide 2" and so on; the arrows themselves are
-  `aria-hidden`. That is what keeps them from being unnamed buttons.
-- **Slides off screen are still in the DOM.** A link or button inside a hidden
-  slide can still be reached. Keep controls out of the slides, or accept that
-  they are focusable before they are visible.
-- **`keyboard` is on by default.** Left and right arrows move between slides when
-  the carousel has focus. Leaving it on is what makes the component operable
-  without a mouse.
-- **Autoplay comes with its pause control.** Anything that moves for more than
-  five seconds must be pausable, and `pause="hover"` covers a mouse and nothing
-  else. Setting an `interval` renders a play/pause button, named for what
-  pressing it will do and reachable by keyboard. It appears only when
-  there is autoplay to pause.
-- **Reduced motion turns autoplay off.** When a person has asked for reduced
-  motion, an `interval` does nothing and the pause control is not drawn. The
-  slide transition is instant, and the arrows, dots and arrow keys still move
-  between slides.
-- **Captions are a heading and a `p`.** The title is a heading one level below
-  the section the carousel sits in, so it fits the page's outline.
+- **The region needs a name.** It is a `region` announced as a carousel; pass
+  `aria-label` or `aria-labelledby`.
+- **The pause control comes first.** Autoplay can always be stopped from the
+  play button, which is the first control in the row. Its name says what a
+  press will do: Pause, then Play.
+- **Each pill is a tab.** The pills are a tablist named "Choose a slide". Arrow
+  keys move between them and select as they go; each is named "Slide 2 of 5"
+  and the slide's title.
+- **Only the active slide is read.** Each slide is a group named "2 of 5";
+  the others are `aria-hidden` and inert, so focus never lands behind the
+  front card.
+- **Keyboard focus holds the clock.** Tabbing into the carousel stops
+  autoplay so nothing moves under a keyboard user; pressing Play starts it
+  again. A mouse click on a control does not hold it.
+- **Arrow keys move the stage.** With focus on the region or a control,
+  ArrowLeft and ArrowRight move a slide either way.
+- **The caption speaks only when asked.** It is a polite live region while the
+  carousel is paused or does not autoplay, and silent while it plays, so it
+  never talks over a screen reader on its own.
+- **Reduced motion is respected.** When the viewer asks for less motion, the
+  carousel does not autoplay, shows arrows, lays the slides flat and moves in
+  one step.
 
 ## Related
 
-- For content the user must see, take it out of the carousel and lay it out — a slide that is not on screen is a slide most people never read.
-- For stepping through a sequence with a known end, use `ProgressBar` alongside your own controls.
-- For alternative views of the same thing, use `Tabs`.
+- To show a few items side by side, all at once, lay them out as cards in a grid. Nothing is hidden and nothing moves.
+- For switching between alternative views of the same content, use `Tabs`.
+- For a short guided tour of a new feature, use `Spotlight`.
 
 Same group: `Accordion` · `Footer` · `PageHeader` · `Panel` · `ScrollBar` · `VisuallyHidden`
 
 ## Parts
 
-1. **Slide.** One at a time, sliding across the track.
-2. **Previous and next.** Controls over the left and right edge, each a 48 tall touch target.
-3. **Indicators.** One bar per slide at the bottom; the current slide is the selected one.
-4. **Play and pause.** Only when `interval` is set. It sits outside the track at the bottom-left, so it never scrolls away.
+1. **Stage.** Full width, with the edges fading out.
+2. **Slide.** The active card is centered and flat. A neighbor on each side is scaled down, turned toward it and dimmed; clicking one brings it to the front.
+3. **Play button.** A ring with no fill. Its arc fills over the slide's time. Pause while playing, play while paused.
+4. **Pills.** One per slide. The active pill stretches and fills with the slide's progress; pills already shown sit a step darker.
+5. **Arrows.** Only when the carousel does not autoplay, in place of the play button.
+6. **Caption.** The active slide's title and one line, centered under the controls.
 
 ### States
 
 | State | What changes |
 | --- | --- |
-| Rest | Controls at 70% opacity in `--ds-text-subtle`. Indicators in `--ds-border`, the current one in `--ds-background-selected-bold`. |
-| Hovered | Controls at full opacity in `--ds-text`. |
-| Pressed | No pressed layer. The press moves to the slide. |
-| Focused | A 2px ring 2px off the control or indicator. |
-| Disabled | At the first or last slide with `wrap` off, the control is disabled and dimmed to `--ds-opacity-disabled`. With `pause="hover"`, the default, autoplay pauses while the pointer is over the carousel. |
+| Playing | The ring arc and the active pill fill in `--ds-background-brand-bold`. |
+| Paused | The play icon shows. The fill holds where it stopped and turns `--ds-text-subtle`. |
+| Held | The clock stops while the pointer rests on the stage, keyboard focus is inside, the carousel is out of view or the tab is hidden. It resumes where it held. Pressing Play starts it again even with focus inside. |
+| Hovered pill | The pill darkens to `--ds-border-bold`. |
+| Pressed play | The button scales to 94%. |
+| Focused | The 2px ring on the play button, a pill or an arrow. |
+| Disabled arrow | Without `loop`, at the first or last slide. |
 
 ### Tokens
 
 | Part | Token |
 | --- | --- |
-| Corner | `--radius-md`. |
-| Controls | `--ds-text-subtle`, `--ds-text` on hover; icon `--icon-lg`; padding `--space-100`; touch target `--space-300`. |
-| Play and pause | `--control-md` round, `--ds-surface` ground, inset `--space-0625`. |
-| Slide content | At least `--size-1400` tall, padded `--section-pad-y-default` and `--section-pad-x-default`. |
-| Caption | Title in `--heading-medium`, text in `--body-large`, both `--ds-text-inverse` over a gradient to `--ds-background-inverse-subtle`. |
-| Indicators | `--ds-border`, `--ds-background-selected-bold` when current; `--size-750` wide, `--space-0375` tall, corner `--radius-lg`; `--stack-md` apart. |
-| Focus ring | `--ds-border-focused`, `--focus-ring-width` wide and offset. |
-| Disabled | `--ds-opacity-disabled`. |
-
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| Give each slide one idea and a short title. | Put a paragraph on a slide that rotates away. |
-| Write alt text that says what the image shows. | Leave `alt` empty on an image that carries the point. |
-| Write a caption that adds to the image. | Repeat the title as the caption. |
+| Card | `--ds-surface-raised` with `--ds-shadow-raised`, corners `--card-radius`. |
+| Neighbor dimming | `--ds-surface` at 45%. |
+| Ring and pills | Track and upcoming pills `--ds-border`; progress `--ds-background-brand-bold`; pills already shown `--ds-border-bold`. |
+| Caption | Title in `--heading-small` and `--ds-text`; line in `--body-default` and `--ds-text-subtle`; at most `--content-max-width-reading` wide. |
+| Spacing | `--section-stack-md` between the stage, the controls and the caption. |
 
 ## Props
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `id` | string | — | — |
-| `slides` | arrayOf (required) | `[]` | — |
-| `activeIndex` | number | — | — |
-| `onSelect` | func | — | — |
-| `controls` | bool | `true` | Show previous/next navigation controls |
-| `indicators` | bool | `true` | Show slide position indicators |
-| `interval` | number | `null` | Auto-advance interval in milliseconds (0 to disable) |
-| `pause` | enum | `'hover'` | — |
-| `wrap` | bool | `true` | — |
-| `keyboard` | bool | `true` | — |
-| `slide` | bool | — | — |
-| `className` | string | `''` | — |
-| `style` | object | — | — |
-| `prevIcon` | node | — | — |
-| `nextIcon` | node | — | — |
-| `children` | node | — | — |
-
-## Variants
-
-**`pause`** — `hover`
-
-The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
+| `slides` | arrayOf (required) | `[]` | The slides, in order. `content` is the card; `title` and `description` fill the caption and name the pill. A string `content` renders as text, or as an image when it is a path ending in an image extension (`alt` describes it). |
+| `autoplay` | bool | `true` | Moves to the next slide on its own, with a play button to stop it. Off under reduced motion, where arrows show instead. Defaults to `true`. |
+| `interval` | number | `6000` | Milliseconds each slide shows before the next. Defaults to `6000`. |
+| `loop` | bool | `true` | Lets the arrows and arrow keys wrap from the last slide to the first. Autoplay always wraps. Defaults to `true`. |
+| `aspectRatio` | number | `16 / 10` | Width over height of a slide. Defaults to `16 / 10`. |
+| `defaultIndex` | number | `0` | The slide shown first. Defaults to `0`. |
+| `onIndexChange` | func | — | Called with the new index whenever the slide changes. |
+| `className` | string | — | Extra class names on the root, beside `plus-carousel`. |
+| `style` | object | — | Inline styles on the root. |
 
 ## Tokens touched
 
-`--body-large` · `--carousel-control-offset` · `--carousel-control-pad` · `--carousel-control-size` · `--carousel-indicator-height` · `--carousel-indicator-height-compact` · `--carousel-indicator-height-spacious` · `--carousel-indicator-width` · `--carousel-indicator-width-compact` · `--carousel-slide-min-height` · `--carousel-slide-min-height-compact` · `--carousel-slide-min-height-spacious` · `--control-md` · `--ds-background-inverse-subtle` · `--ds-background-selected-bold` · `--ds-border` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--heading-medium` · `--icon-lg` · `--radius-lg` · `--radius-md` · `--section-pad-x-compact` · `--section-pad-x-default` · `--section-pad-x-spacious` · `--section-pad-y-compact` · `--section-pad-y-default` · `--section-pad-y-spacious` · `--stack-md`
+`--body-default` · `--card-radius` · `--carousel-caption-in` · `--carousel-caption-lift` · `--carousel-caption-out` · `--carousel-caption-rise` · `--carousel-controls-gap` · `--carousel-dim` · `--carousel-edge-fade` · `--carousel-move-duration` · `--carousel-move-easing` · `--carousel-pill-ground` · `--carousel-pill-height` · `--carousel-pill-hit-x` · `--carousel-pill-hit-y` · `--carousel-pill-width` · `--carousel-pill-width-active` · `--carousel-play-size` · `--carousel-pressed-scale` · `--carousel-progress` · `--carousel-ring-stroke` · `--carousel-slide-width` · `--carousel-track-height` · `--content-max-width-reading` · `--ds-background-brand-bold` · `--ds-border` · `--ds-border-bold` · `--ds-icon` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-raised` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--font-size-0875` · `--heading-small` · `--motion-duration-medium` · `--motion-easing-standard` · `--page-stack-md` · `--radius-full` · `--section-stack-md` · `--stack-sm`
 
 From `design-system/src/components/layout-and-structure/Carousel/Carousel.scss`. Override these through the token layer, never with a literal.
 

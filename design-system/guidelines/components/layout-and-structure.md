@@ -44,10 +44,11 @@ library (Figma keeps them under Retired). Their replacements:
 deliberately does *not* add `role="region"` — that would create a landmark, and
 several of them would clutter the landmark list.
 
-**`Carousel` hides content behind motion.** It exposes `interval`, `pause`,
-`wrap`, `keyboard` and `slide`, so auto-advance can be turned off — and should
-be, for anything a user has to read. `design-system/src/styles/Motion.mdx`
-requires that essential information never depend on motion.
+**`Carousel` hides content behind motion.** It autoplays by default; set
+`autoplay={false}` for anything a user has to read. Autoplay holds on hover,
+keyboard focus and when out of view, and never runs under reduced motion.
+`design-system/src/styles/Motion.mdx` requires that essential information never
+depend on motion.
 
 ## Related
 
