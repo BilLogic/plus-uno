@@ -64,8 +64,7 @@ Names agents reach for that this system does not have, or has retired. Write the
 | `--space-200 (32px) and up` | `--page-stack-lg` (space this large belongs to a page; it is rarely right inside a component) |
 | `--radius-<n>` | `--radius-sm`, `--radius-md`, `--radius-lg`, `--card-radius` |
 | `--stack-xl` | `--stack-lg`, `--section-stack-lg` |
-| `--ds-on-surface, --color-on-surface` | `--ds-text`, `--ds-text-subtle` |
-| `--color-surface-container*` | `--ds-surface`, `--ds-surface-sunken`, `--ds-surface-raised` |
+| `--ds-on-surface` | `--ds-text`, `--ds-text-subtle` |
 | `--size-element-*, --element-*` | `--pad-x-md`, `--stack-md`, `--radius-md` (retired; these are the commonest replacements, and check:ds-usage names the exact one for each old name) |
 
 ## Patterns: start a page, section, card, table or overlay here

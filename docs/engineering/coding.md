@@ -28,7 +28,7 @@ required — a component with no tests or no docs page just has fewer of them):
 and any named export it chooses to carry alongside it); `design-system/src/components/index.js`
 is generated from the folder tree by `npm run generate:component-barrel`
 (`npm run check:component-barrel` in CI) — a source for regeneration, same as
-`_colors.scss` and the other generated files above. Every component folder in
+the generated token files. Every component folder in
 every group is re-exported one hop from its own folder, even in a group that
 also owns its own `index.js` (today, only `forms-and-inputs`, kept for the
 handful of callers that import it directly): a chained re-export through that
@@ -84,7 +84,7 @@ Use design tokens everywhere — never hardcode colors, spacing, typography, or 
 - Color: `--ds-background-brand-bold`, `--ds-text-inverse`, `--ds-surface`, `--ds-surface-sunken`, `--ds-text-danger`
 - Typography: `--heading-large`, `--body-default`, `--type-family-heading`, `--type-weight-medium`, `--font-size-0875`
 - Elevation: `--ds-shadow-raised`, `--ds-shadow-overlay`
-- Breakpoints: `--breakpoint-md-min`, `--breakpoint-lg-min`, `--breakpoint-xl-min`
+- Breakpoints: `@media (min-width: 1024px)` and `@media (min-width: 1440px)`, where the token ladder switches modes (a media query takes the number itself)
 
 ## Playground
 
@@ -99,9 +99,9 @@ Use design tokens everywhere — never hardcode colors, spacing, typography, or 
 Figma export (manual) → npm run generate:tokens → commit SCSS; the token ladder and motion (ADR-038) generate code → Figma instead, via npm run generate:design-tokens
 ```
 
-- Never edit generated token files (`_colors.scss`, `_spacing.scss`, etc.) directly
+- Edit the token source and regenerate: every token file is generated output except `_fonts.scss`, the hand-authored fallback faces and base heading and body type
 - Token source is Figma, not the SCSS files — for every family except the
-  Atlassian-shaped color set below
+  `--ds-*` color set below
 
 ```
 scripts/lib/color/plans/plan-*.json → npm run generate:color-tokens → design-system/src/tokens/color/ → Figma (figma-spec.json)

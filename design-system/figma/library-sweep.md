@@ -249,9 +249,7 @@ Display, Headline and Title variant is Lato; every Body variant is Merriweather
 Sans. It is the only place in the type system where the face changes WITHIN a
 register.
 
-The code agrees with it rather than contradicting it —
-`--font-family-display4: "Open Sans", sans-serif` while display1, display2 and
-display3 all alias `--font-family-header`. So this is not a drift to reconcile;
+The code agreed with it rather than contradicting it, so this is not a drift to reconcile;
 it is a design question nothing has asked out loud. Recorded, not changed: a
 face is Bill's call.
 

@@ -58,7 +58,7 @@ export default function MyPageWithModal() {
             >
                 {/* ⬇️ YOUR MODAL CONTENT GOES HERE ⬇️ */}
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-0625)' }}>
-                    <p className="body1-txt">Here is the detailed breakdown.</p>
+                    <p className="body-large">Here is the detailed breakdown.</p>
                 </div>
                 {/* ⬆️ YOUR MODAL CONTENT ENDS HERE ⬆️ */}
             </Modal>
