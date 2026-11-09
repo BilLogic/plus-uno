@@ -449,7 +449,7 @@ const preview = {
       },
     },
     plusBrowser: {
-      description: 'Browser window chrome around the Frame and page-template stories (docs only)',
+      description: 'Browser window chrome around the Template stories (docs only)',
       toolbar: {
         title: 'Browser',
         icon: 'browser',
@@ -457,6 +457,7 @@ const preview = {
           { value: 'none', title: 'No browser' },
           { value: 'chrome', title: 'Chrome' },
           { value: 'safari', title: 'Safari' },
+          { value: 'edge', title: 'Edge' },
         ],
         dynamicTitle: true,
       },
@@ -490,10 +491,11 @@ const preview = {
   },
 
   decorators: [
-    // Browser chrome from the toolbar, around the Frame and page-template
-    // stories. A story can opt in or out with parameters.browserFrame ('chrome' | 'safari' | 'none').
+    // Browser chrome from the toolbar, around the Template stories only: the
+    // Template carries the browser, the Frame is the app alone. A story can opt
+    // in or out with parameters.browserFrame ('chrome' | 'safari' | 'none').
     (Story, context) => {
-      const framed = /^Patterns\/(Frame\/Frame|Templates)/.test(context.title);
+      const framed = /^Patterns\/Templates/.test(context.title);
       const browser = context.parameters.browserFrame || (framed ? context.globals.plusBrowser : 'none');
       return (
         <BrowserFrame browser={browser || 'none'}>
