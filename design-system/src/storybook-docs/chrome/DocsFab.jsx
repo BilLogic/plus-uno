@@ -8,8 +8,11 @@ import './DocsFab.scss';
 export const MARKETPLACE_HREF =
     'https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f?v=397b7cca4982803893a8000c8fdd359c';
 export const BLUEPRINT_HREF = '/blueprint/';
-/** Served from `public/` on the site and from a Storybook static dir locally (see .storybook/main.js). */
-export const BLUEPRINT_LOGO_SRC = '/uno-bot/logos/uno-blueprint.png';
+/**
+ * Relative to the preview page, so it resolves under Storybook's own static dir
+ * (see .storybook/main.js) both locally (`/uno-bot/…`) and on the site (`/storybook/uno-bot/…`).
+ */
+export const BLUEPRINT_LOGO_SRC = 'uno-bot/logos/uno-blueprint.png';
 
 /**
  * The floating button in the Storybook docs' bottom-right corner. It

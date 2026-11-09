@@ -117,7 +117,7 @@ describe('DocsFab', () => {
         expect(link).toHaveClass('plus-btn--circle');
         // The stack lives in the preview frame; Blueprint must replace the whole page.
         expect(link).toHaveAttribute('target', '_top');
-        expect(link.querySelector('img')).toHaveAttribute('src', '/uno-bot/logos/uno-blueprint.png');
+        expect(link.querySelector('img')).toHaveAttribute('src', 'uno-bot/logos/uno-blueprint.png');
     });
 
     it('uses the default 32px spacing and the Tooltip in place of a native title', async () => {

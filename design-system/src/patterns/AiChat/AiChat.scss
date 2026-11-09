@@ -116,9 +116,12 @@
     }
 }
 
-.plus-ai-chat__footer {
+// The footer is a PanelFooter, which centers a button row; the chat's footer
+// is a stack (starters, prompt, disclaimer), so each part takes the full width.
+.plus-ai-chat .plus-ai-chat__footer {
     display: flex;
     flex-direction: column;
+    align-items: stretch;
     gap: var(--stack-sm);
 }
 
