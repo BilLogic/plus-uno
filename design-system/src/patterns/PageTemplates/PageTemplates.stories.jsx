@@ -2,8 +2,8 @@ import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { Button, TextField, TextArea } from '@/components';
-import { PageLayout, PatternCard, PatternSection } from '@/patterns';
-import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { PatternCard, PatternDrawer, PatternSection } from '@/patterns';
+import { FocusedFrame, InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import BrowserFrame from '@/storybook-docs/chrome/BrowserFrame';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
@@ -13,11 +13,12 @@ import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
  * Templates: the page every screen starts from. The frame (a 240
  * sidebar docked from 1024, the Page on a 12-column grid under its breadcrumb) with content
  * in the surface. The stories here are the examples the docs page shows, each
- * built from `PageLayout`, `Frame`, `PatternSection` and `PatternCard`.
+ * composed from `Frame` with the PLUS `Sidebar` and a `Breadcrumb` (the default
+ * template) or with no sidebar (the focused one), filled with `PatternSection`
+ * and `PatternCard`.
  */
 
 const BREADCRUMBS = [{ text: 'Home', href: '#' }, { text: 'Sessions' }];
-const USER = { name: 'John Doe', type: 'lead tutor' };
 
 const fullHeight = (node) => <div style={{ height: '100vh' }}>{node}</div>;
 
@@ -79,15 +80,13 @@ const ReadingContent = () => (
     </>
 );
 
-const pageProps = {
-    sidebarConfig: { user: 'tutor', activeTabId: 'home' },
-    topBarConfig: { breadcrumbs: BREADCRUMBS, user: USER },
-    style: { height: '100%' },
-};
+/** The default template: the app frame with the Sidebar and the breadcrumb, filling the box it sits in. */
+const AppPage = ({ children, ...frameProps }) => (
+    <InAppFrame breadcrumbs={BREADCRUMBS} height="100%" {...frameProps}>{children}</InAppFrame>
+);
 
 export default {
     title: 'Patterns/Templates',
-    component: PageLayout,
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },
     // The preview's `^on[A-Z]` actions rule skips an arg that is already a key, so naming
@@ -115,24 +114,8 @@ export default {
             control: 'boolean',
             table: { category: 'Design', defaultValue: { summary: 'false' } },
         },
-        drawer: { table: { disable: true } },
-        children: { table: { disable: true } },
-        actions: { table: { disable: true } },
         onBack: { control: false, table: { disable: true } },
         onClose: { control: false, table: { disable: true } },
-        backHref: { table: { disable: true } },
-        actionsLabel: { table: { disable: true } },
-        sidebarConfig: { table: { disable: true } },
-        topBarConfig: { table: { disable: true } },
-        footerConfig: { table: { disable: true } },
-        mainClassName: { table: { disable: true } },
-        contentDirect: { table: { disable: true } },
-        shellLoading: { table: { disable: true } },
-        shellEntered: { table: { disable: true } },
-        sidebarExpanded: { table: { disable: true } },
-        style: { table: { disable: true } },
-        className: { table: { disable: true } },
-        id: { table: { disable: true } },
     },
 };
 
@@ -147,11 +130,11 @@ export const InBrowserFrame = {
     parameters: { docs: { disable: true }, a11y: { test: 'off' } },
     render: () => (
         <div>
-            <div data-case="bare">{fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>)}</div>
+            <div data-case="bare">{fullHeight(<AppPage><DashboardContent /></AppPage>)}</div>
             {['chrome', 'safari', 'edge'].map((browser) => (
                 <div key={browser} data-case={browser}>
                     <BrowserFrame browser={browser}>
-                        {fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>)}
+                        {fullHeight(<AppPage><DashboardContent /></AppPage>)}
                     </BrowserFrame>
                 </div>
             ))}
@@ -185,7 +168,7 @@ export const InBrowserFrame = {
 
 /** content=dashboard: a page header, metric cards that reflow, and a section. */
 export const Dashboard = {
-    render: () => fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>),
+    render: () => fullHeight(<AppPage><DashboardContent /></AppPage>),
     // An ordinary page: no Back, no Close.
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
@@ -197,7 +180,7 @@ export const Dashboard = {
 /** content=blank: the template with one empty slot. */
 export const Blank = {
     render: () => fullHeight(
-        <PageLayout title="Page title" {...pageProps}>{slotContent('Content slot: Sections')}</PageLayout>,
+        <AppPage>{slotContent('Content slot: Sections')}</AppPage>,
     ),
 };
 
@@ -210,7 +193,7 @@ export const Reading = {
 
 /** 768: the sidebar is closed, and the frame's left edge is hovered, so it floats over the page. */
 export const SidebarOverPage = {
-    render: () => fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>),
+    render: () => fullHeight(<AppPage><DashboardContent /></AppPage>),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const peek = async () => {
@@ -263,13 +246,13 @@ const NoteActions = () => (
     </>
 );
 
-/** frame="focused": Back, the title and Close in the Page header row, the sections at reading width, the actions in a footer. */
+/** The focused template: Back, the title and Close in the Page header row, the sections at reading width, the actions at the foot. */
 export const Focused = {
     args: { title: 'Add a session note', onBack: fn(), onClose: fn() },
     render: (args) => fullHeight(
-        <PageLayout frame="focused" style={{ height: '100%' }} actions={<NoteActions />} {...args}>
+        <FocusedFrame actions={<NoteActions />} {...args}>
             <NoteForm />
-        </PageLayout>,
+        </FocusedFrame>,
     ),
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
@@ -318,13 +301,13 @@ export const FocusedStill = {
 export const FocusedReadOnly = {
     args: { title: 'Session report · Jordan · Oct 24', onClose: fn() },
     render: (args) => fullHeight(
-        <PageLayout frame="focused" style={{ height: '100%' }} {...args}>
+        <FocusedFrame {...args}>
             <PatternSection title="Summary" description="What the student worked on today.">
                 <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>
                     Jordan solved two-step equations and started word problems.
                 </p>
             </PatternSection>
-        </PageLayout>,
+        </FocusedFrame>,
     ),
 };
 
@@ -333,37 +316,36 @@ export const FocusedReadOnly = {
 const PageWithDrawer = () => {
     const [open, setOpen] = React.useState(true);
     return (
-        <PageLayout
-            title="Sessions"
-            {...pageProps}
-            drawer={{
-                open,
-                width: 'md',
-                title: 'Session details',
-                description: 'Thursday · 4:00–5:00 PM',
-                onClose: () => setOpen(false),
-                footer: (
+        <>
+            <AppPage>
+                <DashboardContent />
+                <div>
+                    <Button text="Open session details" spacing="compact" onClick={() => setOpen(true)} />
+                </div>
+            </AppPage>
+            {/* The Drawer pattern over the template; it places itself at the edge in its own Overlay. */}
+            <PatternDrawer
+                open={open}
+                width="md"
+                title="Session details"
+                description="Thursday · 4:00–5:00 PM"
+                onClose={() => setOpen(false)}
+                footer={(
                     <>
                         <Button text="Cancel" spacing="compact" onClick={() => setOpen(false)} />
                         <Button text="Save changes" appearance="primary" spacing="compact" onClick={() => setOpen(false)} />
                     </>
-                ),
-                children: (
-                    <p style={{ margin: 0, font: 'var(--body-default)' }}>
-                        Ana Ruiz · Algebra I · Grade 9. Last session: reviewed factoring and assigned practice set 3.
-                    </p>
-                ),
-            }}
-        >
-            <DashboardContent />
-            <div>
-                <Button text="Open session details" spacing="compact" onClick={() => setOpen(true)} />
-            </div>
-        </PageLayout>
+                )}
+            >
+                <p style={{ margin: 0, font: 'var(--body-default)' }}>
+                    Ana Ruiz · Algebra I · Grade 9. Last session: reviewed factoring and assigned practice set 3.
+                </p>
+            </PatternDrawer>
+        </>
     );
 };
 
-/** The `drawer` prop: a drawer open over the page. The blanket covers the frame and the drawer runs the full height at the end edge. */
+/** A drawer open over the page. The blanket covers the frame and the drawer runs the full height at the end edge. */
 export const WithDrawer = {
     render: () => fullHeight(<PageWithDrawer />),
     play: async ({ canvasElement }) => {
@@ -382,9 +364,9 @@ export const WithDrawerStill = {
     parameters: { docs: { disable: true } },
 };
 
-/** With no `drawer` prop the template draws no drawer. */
+/** With no drawer the template draws none. */
 export const WithoutDrawer = {
-    render: () => fullHeight(<PageLayout title="Sessions" {...pageProps}><DashboardContent /></PageLayout>),
+    render: () => fullHeight(<AppPage><DashboardContent /></AppPage>),
     play: async ({ canvasElement }) => {
         await within(canvasElement).findByRole('main');
         await expect(within(canvasElement).queryByRole('dialog')).toBeNull();
@@ -395,22 +377,24 @@ export const WithoutDrawer = {
 
 /** The page with its props live: the default frame or the focused one. */
 export const Interactive = {
-    args: { frame: 'default', title: 'Sessions', backLabel: 'Back', closeLabel: 'Close', sidebarHidden: false },
-    render: ({ frame, ...args }) => (
+    args: { frame: 'default', title: 'Add a session note', backLabel: 'Back', closeLabel: 'Close', sidebarHidden: false },
+    render: ({ frame, title, backLabel, closeLabel, sidebarHidden }) => (
         <div style={{ height: 520 }}>
             {frame === 'focused' ? (
-                <PageLayout
-                    frame="focused"
-                    style={{ height: '100%' }}
+                <FocusedFrame
+                    title={title}
+                    backLabel={backLabel}
+                    closeLabel={closeLabel}
                     actions={<NoteActions />}
                     onBack={() => {}}
                     onClose={() => {}}
-                    {...args}
                 >
                     <NoteForm />
-                </PageLayout>
+                </FocusedFrame>
+            ) : sidebarHidden ? (
+                <InAppFrame breadcrumbs={BREADCRUMBS} height="100%" sidebar={null}><DashboardContent /></InAppFrame>
             ) : (
-                <PageLayout {...pageProps} {...args}><DashboardContent /></PageLayout>
+                <AppPage><DashboardContent /></AppPage>
             )}
         </div>
     ),

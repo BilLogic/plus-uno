@@ -72,7 +72,7 @@
         "design-system/src/components/text-and-data-display/Table/Table.scss": {
           "count": 2
         },
-        "design-system/src/patterns/PageLayout/PageTemplateExamples.jsx": {
+        "design-system/src/patterns/PageTemplates/PageTemplateExamples.jsx": {
           "count": 6
         },
         "design-system/src/patterns/PatternModal/PatternModal.scss": {

@@ -14,7 +14,7 @@ Sidebar pattern: the app's side navigation, 240 wide, padded 12, on the sunken f
 
 ## Usage
 
-Use the Sidebar for the app's main areas. `PageLayout` draws it from the config you pass, and the Frame decides whether it docks, collapses or floats; this page covers what is inside it.
+Use the Sidebar for the app's main areas. The PLUS `Sidebar` (`@/components`) fills it from the role's config, and the Frame decides whether it docks, collapses or floats; this page covers what is inside it.
 
 Content is data. The Sidebar draws the `groups` it is given and never changes the URL: the caller handles `onSelect` and decides which groups a role sees.
 
@@ -63,7 +63,7 @@ Don't: Everything in the label, and the time is cut off.
 - Templates draw the Sidebar from the config you pass.
 - For a count on a row, the Sidebar uses `CountTag`.
 
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PageLayout` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternTable`
+Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternTable`
 
 ## Parts
 
@@ -147,5 +147,9 @@ The Sidebar's width, 240, belongs to the Frame: see Frame.
 `--body-default` · `--body-small` · `--border-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-background-selected-pressed` · `--ds-border` · `--ds-icon` · `--ds-icon-selected` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--ds-text` · `--ds-text-selected` · `--ds-text-subtle` · `--ds-text-subtlest` · `--focus-ring-width` · `--frame-sidebar-group-gap` · `--frame-sidebar-pad` · `--frame-sidebar-row-gap` · `--frame-sidebar-row-radius` · `--icon-lg` · `--icon-md` · `--icon-sm` · `--inline-sm` · `--item-height-md` · `--pad-x-lg` · `--pad-x-md` · `--pad-x-sm` · `--pad-x-xs` · `--radius-sm` · `--stack-lg` · `--stack-md` · `--type-weight-medium`
 
 From `design-system/src/patterns/Sidebar/Sidebar.scss`. Override these through the token layer, never with a literal.
+
+## Figma
+
+- "Sidebar" node 19393:46573 in file zAecJNRdvJzAUOcjV32tRX
 
 <!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->

@@ -21,7 +21,7 @@ import {
 import { ModeExample } from '@/storybook-docs/lib/mode-frame.jsx';
 
 export const patterns = [
-    ['Templates', 'A template holds Frame with its content slot.', 'Start here for any new page.', 'PageLayout', null],
+    ['Templates', 'A template holds Frame with its content slot.', 'Start here for any new page.', 'Frame + Sidebar', null],
     ['Frame', 'The page frame: the Sidebar beside the Page, with no top bar. Its parts are Sidebar and Page.', 'Every page in the app sits inside one.', 'Frame', 'patterns-frame-frame'],
     ['Section', 'A span of the page grid that groups content under one heading, with a Section header.', 'A heading with content under it.', 'PatternSection', 'patterns-section-section'],
     ['Card', 'The container for one object, raised at rest with no border.', 'One object with a shape agreed.', 'PatternCard', 'patterns-section-card'],
@@ -46,8 +46,8 @@ The examples on this page follow the toolbar's Color mode and Contrast switches.
 <DocsTab tab="examples">
 
 <ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19422-2958"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PageLayout"
+    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19394-2044"
+    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PageTemplates"
 />
 
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
@@ -62,7 +62,7 @@ The examples on this page follow the toolbar's Color mode and Contrast switches.
 
 <ModeExample storyId="patterns-templates--reading" width={1024} height={560} title="Reading" description="The content capped at --content-max-width-reading, 864, and centered." />
 
-<ModeExample storyId="patterns-templates--focused-still" width={1024} height={640} title="Focused" description={<><code>frame="focused"</code>: Back, the task's name and Close in the Page header row, the Sections at reading width and the actions at the foot of the Page.</>} />
+<ModeExample storyId="patterns-templates--focused-still" width={1024} height={640} title="Focused" description={<>The focused frame: Back, the task's name and Close in the Page header row, the Sections at reading width and the actions at the foot of the Page.</>} />
 
 </div>
 
@@ -90,7 +90,7 @@ The examples on this page follow the toolbar's Color mode and Contrast switches.
 
 <ModeExample storyId="patterns-templates--focused-read-only" width={1024} height={480} title="Focused, no actions" description="A read-only task, such as a report with nothing to submit, drops the actions, and Close alone leaves it when there is no way back." />
 
-<ModeExample storyId="patterns-templates--with-drawer-still" width={1024} height={560} title="With a drawer" description={<>A <code>md</code> drawer over the dashboard, 677 wide: the page holds its open state and passes it to the template's <code>drawer</code> prop.</>} />
+<ModeExample storyId="patterns-templates--with-drawer-still" width={1024} height={560} title="With a drawer" description={<>A <code>md</code> drawer over the dashboard, 677 wide: the page holds its open state and passes it to <code>PatternDrawer</code>.</>} />
 
 </div>
 
@@ -153,7 +153,7 @@ A page is built from the top down out of patterns. A Sessions page is built on P
 
 ### For developers
 
-The template is `PageLayout`, which fills `Frame` with the PLUS sidebar and the breadcrumb. `frame="focused"` fills it with the reading page, whose header row carries Back and Close, and the actions at its foot. There is no mode prop in code: the layout tokens switch on the viewport width, so the screen picks the mode. A page that needs the reading cap in the default frame composes `Frame` with `width="reading"`. Figma's `drawer?` toggle is the `drawer` prop: pass it the props of `PatternDrawer` and the template renders the Drawer over the page. Figma's `footer?` is `actions`: without them there are no actions at the foot. `contentDirect` puts the children straight in the page with no content grid, for a full-width page such as chat.
+A template is a composition, not a component of its own. The default frame is `Frame` with the PLUS `Sidebar` (`@/components`, which fills the Sidebar pattern from the role's config) in `sidebar` and a `Breadcrumb` in `header`; the page's `h1` is its page-level Section header. The focused frame is `Frame` with no `sidebar`, `width="reading"`, the task's name as the `h1` in `header`, and `onBack` and `onClose`, which draw Back and Close; its actions are a group at the foot of the content. There is no mode prop in code: the layout tokens switch on the viewport width, so the screen picks the mode. Figma's `drawer?` toggle is a `PatternDrawer` beside the Frame, whose open state the page holds. `surfaceDirect` puts the children straight in the page with no content grid, for a full-width page such as chat.
 
 ### The patterns
 
@@ -216,19 +216,19 @@ The default frame has three parts.
 
 1. **Frame.** The sidebar beside the page, on the sunken fill.
 2. **Header.** The page's first row, 32 high on the sidebar logo row's center line: the breadcrumb. While the sidebar is closed the toggle leads it. Help Center and the account sit in the sidebar's account row.
-3. **Content.** A slot in the page. It holds a page-level Section header and the Sections. The page's `h1` is `title`, visually hidden.
+3. **Content.** A slot in the page. It holds a page-level Section header, whose title is the page's `h1`, and the Sections.
 
 The focused frame has three parts, all in the Frame with no sidebar.
 
-1. **Header row.** 32 high, held at the top of the Page while it scrolls. Back, an icon button with `arrow-left`, leads; the title, the page's one visible `h1` at Heading/xsmall on one line that truncates, follows; Close, an icon button with `xmark`, ends the row. Each button is drawn only with its handler.
+1. **Header row.** 32 high. Back, an icon button with `arrow-left`, leads; the title, the page's one visible `h1` at Heading/xsmall on one line that truncates, follows; Close, an icon button with `xmark`, ends the row. Each button is drawn only with its handler.
 2. **Content.** The Page's `main` at reading width: Sections capped at 864, centered and never under 720. It scrolls on its own.
-3. **Actions** (optional). A group inside the Page, held at its foot while it scrolls, end-aligned in the content column, 8 apart, the primary action last. Without `actions` there is none.
+3. **Actions** (optional). A group inside the Page, held at its foot while it scrolls, end-aligned in the content column, 8 apart, the primary action last. A task with nothing to submit has none.
 
 The page carries the content grid, 12 columns with a 16 gutter. The screen grid lives on Blanket only, and the modal guide belongs to Modal.
 
 ### States
 
-A template has no interactive states of its own. The sidebar's docked, collapsed, peeking and overlay states are the Frame's; the shell can also load (`shellLoading` shows the breadcrumb as a skeleton) and enter (`shellEntered` plays the header and sidebar entrance).
+A template has no interactive states of its own. The sidebar's docked, collapsed, peeking and overlay states are the Frame's.
 
 ### Tokens
 
@@ -339,7 +339,7 @@ In Figma, pick Medium, Large or X-Large on the template instance, and never resi
 
 <DoDontPair
     doExample={<FocusedHeaderDo />}
-    doCaption="Use frame=focused for a single task: Back, Close and its name, and nothing else competing."
+    doCaption="Use the focused frame for a single task: Back, Close and its name, and nothing else competing."
     dontExample={<FocusedHeaderDont />}
     dontCaption="Keep the sidebar on a one-task page, and its toggle and breadcrumb invite the person away."
 />
@@ -398,10 +398,10 @@ Spacing tokens set the structure. Where the eye needs a nudge, such as an icon b
 
 ## Accessibility
 
-- **Landmarks.** The sidebar's `nav` is the navigation and the page is the one `main`. The focused actions are a group named Page actions, or `actionsLabel`.
-- **One page title.** The page has one `h1`. In the default frame it is visually hidden and the breadcrumb shows the place. In the focused frame it is the visible title in the Page header row.
+- **Landmarks.** The sidebar's `nav` is the navigation and the page is the one `main`. The focused actions are a group named Page actions.
+- **One page title.** The page has one `h1`. In the default frame it is the page-level Section header's title, and the breadcrumb shows the place. In the focused frame it is the visible title in the Page header row.
 - **Focus order.** In the focused frame it is Back, Close, the content, then the actions. In the default frame the sidebar toggle comes first, then the page.
-- **Names.** Back and Close are icon buttons named Back and Close (`backLabel`, `closeLabel`), and Close keeps its name when the title truncates.
+- **Names.** Back and Close are icon buttons named Back and Close (Frame's `backLabel` and `closeLabel`), and Close keeps its name when the title truncates.
 - **Sidebar.** The toggle reports whether the sidebar is open. Hover is never the only way in: the toggle opens and docks it from the keyboard, and Escape closes a floating sidebar.
 - **Drawer.** It is a dialog named by its title. It moves focus inside, keeps Tab there and returns focus to its trigger.
 - **Color.** The frame, the page and the title use color roles, so they hold their contrast in Light, Dark and increased contrast.

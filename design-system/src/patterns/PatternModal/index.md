@@ -96,7 +96,7 @@ Pair a control with the field it controls, and group the fields that describe on
 - [Popups](?path=/docs/patterns-popups--docs) holds the floating layers that never block the page, such as a Tooltip for one line of help.
 - [Section](?path=/docs/patterns-section-section--docs) and [Card](?path=/docs/patterns-section-card--docs) hold content that belongs on the page itself.
 
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PageLayout` · `PatternCard` · `PatternDrawer` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 

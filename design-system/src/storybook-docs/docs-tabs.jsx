@@ -52,7 +52,7 @@ import {
  * The patterns match what `npm run generate:component-docs` writes: nested
  * components' `index.md`, flat components' `<Name>.md` (the group index is
  * excluded — it is a list, not a component), and `index.md` beside a pattern
- * (PageLayout among them) and the Logo.
+ * and the Logo.
  */
 const AGENT_DOCS = import.meta.glob(
   [

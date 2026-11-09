@@ -66,7 +66,7 @@ Don't: A raised Page with a hand-made title drifts from the Card pattern.
 - Color for which fill to reach for, under surface roles.
 - Frame for the page frame, the 12-column grid and the content pad.
 
-Same group: `AiChat` · `Blanket` · `Frame` · `PageLayout` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Blanket` · `Frame` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 
