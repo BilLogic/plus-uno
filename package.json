@@ -45,7 +45,7 @@
     "bench:ds-find:timing": "DS_BENCH_TIMING=1 node --test --test-concurrency=1 --test-name-pattern=\"first find on a fresh lookup\" scripts/bench-ds-find.test.mjs",
     "build": "npm run build:all",
     "build:netlify": "npm run build:all",
-    "build:all": "npm run build:tutor-revamp && npm run build-storybook",
+    "build:all": "rm -rf dist && npm run build:tutor-revamp && npm run build-storybook",
     "dev:tutor-revamp": "vite --config prototypes/tutor-revamp/vite.config.js",
     "build:tutor-revamp": "vite build --config prototypes/tutor-revamp/vite.config.js",
     "validate:figma-writeback": "node scripts/validate-figma-writeback-manifest.mjs",
