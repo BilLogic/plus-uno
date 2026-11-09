@@ -158,12 +158,8 @@
     ],
     "Patterns",
     [
-      "Introduction",
+      "Templates",
       "Frame",
-      [
-        "Frame",
-        "Topbar"
-      ],
       "Sidebar",
       "Page",
       [
@@ -183,8 +179,7 @@
         "Modal",
         "Drawer"
       ],
-      "Popups",
-      "Templates"
+      "Popups"
     ],
     "Components",
     [

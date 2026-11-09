@@ -193,12 +193,8 @@ const preview = {
           ],
           "Patterns",
           [
-            "Introduction",
+            "Templates",
             "Frame",
-            [
-              "Frame",
-              "Topbar"
-            ],
             "Sidebar",
             "Page",
             [
@@ -218,8 +214,7 @@ const preview = {
               "Modal",
               "Drawer"
             ],
-            "Popups",
-            "Templates"
+            "Popups"
           ],
           "Components",
           [
