@@ -106,7 +106,7 @@ Each iteration should make the next one easier. Document decisions, extract reus
 
 ### Accessibility by Default
 
-WCAG 2.1 AA is the minimum bar, not a stretch goal. Semantic HTML first, ARIA when needed, keyboard access always. See `foundations/accessibility.md` for specifics.
+WCAG 2.1 AA is the minimum bar, not a stretch goal. Semantic HTML first, ARIA when needed, keyboard access always. See `src/styles/Accessibility.mdx` for specifics.
 
 ### Consistency Over Novelty
 

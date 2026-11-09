@@ -13,7 +13,7 @@ topic, which today only `content/` does.
 | Foundation | Authored | Answers |
 |------------|:--------:|---------|
 | [tokens.md](tokens.md) | ✅ | Which semantic layer does this value come from? |
-| [accessibility.md](accessibility.md) | ✅ | What does WCAG 2.1 AA require here? |
+| [Accessibility.mdx](../../src/styles/Accessibility.mdx) | ✅ | What does WCAG 2.1 AA require here? |
 | [content/](content/overview.md) | ◐ | What does this button, error, or empty state say? |
 | [Spacing.mdx](../../src/styles/Spacing.mdx) | ✅ | How much padding, margin, gap? |
 | [Grid.mdx](../../src/styles/Grid.mdx) | ✅ | Breakpoints and column spans |
@@ -58,7 +58,7 @@ there, not silently on a move. Read the token list as the authority on names.
 
 ## Retiring a twin
 
-A foundation file here that has a Storybook page (`design-system/src/styles/*.mdx`) is a twin, and the page is where it ends up. Color, Elevation, Border, Radius, Spacing, Grid, Typography, Iconography, Illustrations and Logos have gone. One twin per ticket:
+A foundation file here that has a Storybook page (`design-system/src/styles/*.mdx`) is a twin, and the page is where it ends up. Color, Elevation, Border, Radius, Spacing, Grid, Typography, Iconography, Illustrations, Logos and Accessibility have gone. One twin per ticket:
 
 1. Move every sentence the page lacks into it, in `FoundationSection` and `FoundationSubsection`, with tables as `RefTable` or `TokenTable`. Write PLUS rules only, in current component names; a sentence that no longer matches the code is fixed or dropped, never carried.
 2. Delete the twin. `ds guide <topic>` then reads the page through the page model (`scripts/lib/docs-page.mjs`), locally and on the hosted server alike.
