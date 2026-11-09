@@ -5,6 +5,7 @@ import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Popup from './Popup';
 import Button from '@/components/forms-and-inputs/Button/Button';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
     title: 'Components/Overlays and layering/Popup',
@@ -97,7 +98,7 @@ function PopupLayoutDemos() {
 function PopupContentDemo() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">NO TITLE</span>
+            <DemoLabel>NO TITLE</DemoLabel>
             <Popup
                 trigger={<Button text="Content Only" appearance="primary" />}
                 placement="right"
@@ -111,7 +112,7 @@ function PopupContentDemo() {
 function PopupInteractionStatesDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">TRIGGER TYPES</span>
+            <DemoLabel>TRIGGER TYPES</DemoLabel>
             <div style={{ display: 'flex', gap: 'var(--space-100)', flexWrap: 'wrap' }}>
                 <Popup
                     trigger={<Button text="Click (Default)" appearance="primary" />}

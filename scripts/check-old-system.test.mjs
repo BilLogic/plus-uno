@@ -34,10 +34,9 @@ test('the current tokens and lookalike names pass', () => {
   assert.deepEqual(findings(src('design-system/src/components/A/A.scss', css)), []);
 });
 
-test("Tailwind's own --color-* theme namespace in the docs chrome is not the design system", () => {
-  const css = `@theme inline {\n  ${oldColor('primary')}: var(--primary);\n}\n`;
-  assert.deepEqual(findings(src('design-system/src/storybook-docs/storybook-tailwind.css', css)), []);
-  assert.equal(findings(src('design-system/src/storybook-docs/Other.css', css)).length, 1, 'only that one file');
+test('the docs chrome gets no exemption: an old color name there fails', () => {
+  const css = `.a {\n  ${oldColor('primary')}: var(--primary);\n}\n`;
+  assert.equal(findings(src('design-system/src/storybook-docs/docs.css', css)).length, 1);
 });
 
 test('a token file that declares an old name fails, and so does a doc that teaches one', () => {

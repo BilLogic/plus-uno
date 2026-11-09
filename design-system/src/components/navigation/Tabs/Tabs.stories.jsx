@@ -8,6 +8,7 @@ import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.j
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Tabs from './Tabs';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
     title: 'Components/Navigation/Tabs',
@@ -105,7 +106,7 @@ Overview.play = async ({ canvasElement }) => {
 export const Layout = () => (
     <div style={col}>
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">JUSTIFIED</span>
+            <DemoLabel>JUSTIFIED</DemoLabel>
             <Tabs alignment="justified" defaultActiveKey="1">
                 <Tabs.Tab eventKey="1">Tab One</Tabs.Tab>
                 <Tabs.Tab eventKey="2">Tab Two</Tabs.Tab>
@@ -132,7 +133,7 @@ export const Alignment = () => (
     <div style={col}>
         {['left', 'center', 'right'].map((alignment) => (
             <section key={alignment}>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">{alignment.toUpperCase()}</span>
+                <DemoLabel>{alignment.toUpperCase()}</DemoLabel>
                 <Tabs alignment={alignment} defaultActiveKey="1">
                     <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
                     <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
@@ -146,7 +147,7 @@ export const Alignment = () => (
 export const Appearance = () => (
     <div style={col}>
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT (UNDERLINE)</span>
+            <DemoLabel>DEFAULT (UNDERLINE)</DemoLabel>
             <Tabs defaultActiveKey="1">
                 <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
                 <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
@@ -154,7 +155,7 @@ export const Appearance = () => (
             </Tabs>
         </section>
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">PILL</span>
+            <DemoLabel>PILL</DemoLabel>
             <Tabs appearance="pill" defaultActiveKey="1">
                 <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
                 <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
@@ -162,7 +163,7 @@ export const Appearance = () => (
             </Tabs>
         </section>
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COMPACT</span>
+            <DemoLabel>COMPACT</DemoLabel>
             <Tabs spacing="compact" defaultActiveKey="1">
                 <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
                 <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
@@ -209,7 +210,7 @@ export const WithPanels = () => {
 function InteractionStatesDemos() {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INTERACTION STATES</span>
+            <DemoLabel>INTERACTION STATES</DemoLabel>
             <p className="body-default" style={{ marginBottom: '24px', color: 'var(--ds-text-subtle)' }}>
                 States below are artificially forced for demonstration.
             </p>

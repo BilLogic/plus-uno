@@ -16,9 +16,6 @@
  *
  * WHAT IT COUNTS, per family and per file, keyed `<family> <path>`: lines
  * matching one of `FAMILIES`, a family named by its wildcard (`--x-*`) included.
- *
- * WHAT IT SKIPS. `NOT_THE_DESIGN_SYSTEM`: a file whose matching names belong to
- * another tool's namespace, named with its reason.
  */
 
 import { REPO_ROOT } from './lib/corpus.mjs';
@@ -40,13 +37,6 @@ export const DOC_ROOTS = [
 export const SEARCH_ROOTS = [...SOURCE_ROOTS, ...DOC_ROOTS];
 export const SEARCHED = /\.(scss|css|jsx|js|mjs|ts|tsx|html|mdx|md)$/;
 
-/** Files whose matches are another tool's names, not the design system's. */
-const NOT_THE_DESIGN_SYSTEM = new Map([
-  [
-    'design-system/src/storybook-docs/storybook-tailwind.css',
-    "Tailwind's theme namespace is `--color-*`; these name the docs chrome's own palette",
-  ],
-]);
 
 /** A name from the archived size collections, or one the token ladder retired (ADR-038). */
 const OLD_SIZE = new RegExp(
@@ -99,7 +89,6 @@ export const FAMILIES = [
 export function measure(sources) {
   const found = new Map();
   for (const { path: file, text } of sources) {
-    if (NOT_THE_DESIGN_SYSTEM.has(file)) continue;
     const lines = text.split('\n');
     for (const { name, pattern } of FAMILIES) {
       const hits = lines.flatMap((l, i) => (pattern.test(l) ? [i + 1] : []));

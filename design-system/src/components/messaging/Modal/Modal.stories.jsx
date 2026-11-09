@@ -4,6 +4,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
 import Modal from '@/components/messaging/Modal';
 import { IconButton, Button } from '@/components';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
     title: 'Components/Messaging/Modal dialog',
@@ -97,9 +98,9 @@ function InlineModalCanvas({ minHeight = 400, modal }) {
 function ContentVariantCanvas({ title, description, minHeight, modal }) {
     return (
         <section>
-            <span className="text-[12px] uppercase tracking-wider text-[color:var(--ds-text-subtle)] font-semibold block mb-3">
+            <DemoLabel>
                 {title}
-            </span>
+            </DemoLabel>
             <p className="body-default" style={{ marginBottom: '12px', color: 'var(--ds-text-subtle)' }}>
                 {description}
             </p>

@@ -5,6 +5,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import Calendar from '../_internal/Calendar';
 import DatePicker from './DatePicker';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
     title: 'Components/Forms and inputs/Date time picker/Date picker',
@@ -101,11 +102,11 @@ Overview.parameters = {
 export const Spacing = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', paddingBottom: 'var(--size-1900)' }}>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT (40)</span>
+            <DemoLabel>DEFAULT (40)</DemoLabel>
             <DatePicker spacing="default" placeholder="Default" />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COMPACT (32)</span>
+            <DemoLabel>COMPACT (32)</DemoLabel>
             <DatePicker spacing="compact" placeholder="Compact" />
         </div>
     </div>
@@ -118,19 +119,19 @@ export const InteractionStates = () => (
         </p>
         <div style={{ display: 'flex', gap: 'var(--space-150)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
+                <DemoLabel>DEFAULT</DemoLabel>
                 <DatePicker placeholder="Default" />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH VALUE</span>
+                <DemoLabel>WITH VALUE</DemoLabel>
                 <DatePicker value="2023-10-25" placeholder="With Value" />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+                <DemoLabel>DISABLED</DemoLabel>
                 <DatePicker isDisabled placeholder="Disabled" />
             </div>
             <div>
-                <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
+                <DemoLabel>READ ONLY</DemoLabel>
                 <DatePicker isReadOnly value="2023-10-25" placeholder="Read Only" />
             </div>
         </div>

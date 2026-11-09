@@ -13,14 +13,6 @@ const require = createRequire(import.meta.url);
 const nodeModulesDir = () => nodeModulesDirFrom((id) => require.resolve(id));
 
 // This is Storybook's and Vitest's Vite config: the repo builds no root app.
-// Conditionally load Tailwind CSS vite plugin (used by Storybook docs)
-let tailwindcss;
-try {
-  tailwindcss = require('@tailwindcss/vite').default;
-} catch (e) {
-  tailwindcss = null;
-}
-
 // Conditionally load vitest plugins only when the packages are available
 // This allows Storybook to load vite.config.js without requiring vitest addon
 let storybookTest, playwright;
@@ -37,7 +29,7 @@ try {
 
 // More info at: https://storybook.js.org/docs/next/writing-tests/integrations/vitest-addon
 export default defineConfig({
-  plugins: [tailwindcss ? tailwindcss() : null, react()].filter(Boolean),
+  plugins: [react()],
   resolve: {
     dedupe: ['react', 'react-dom', 'motion'],
     alias: {

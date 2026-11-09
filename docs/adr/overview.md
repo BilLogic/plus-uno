@@ -26,7 +26,7 @@ disagreed the ADR says so instead of continuing to assert the decision.
 
 Four of 22 needed more than a move:
 
-- **[ADR-009](009-bootstrap-first-no-alternative-ui-frameworks.md) — superseded (2026-11-03) on its fallback-behavior half by [ADR-037](037-base-ui-is-the-behavior-layer-for-every-component.md).** It also bans Tailwind; `package.json` declares three Tailwind packages and ~65 source files use it — that half was already contradicted before the supersession.
+- **[ADR-009](009-bootstrap-first-no-alternative-ui-frameworks.md) — superseded (2026-11-03) on its fallback-behavior half by [ADR-037](037-base-ui-is-the-behavior-layer-for-every-component.md).** It also bans Tailwind; that half, long contradicted by the docs chrome, holds again since Tailwind was removed (2026-11-09).
 - **[ADR-012](012-declarative-route-manifest-over-parallel-maps.md) — unverifiable.** No route manifest exists under any name searched.
 - **[ADR-014](014-uno-bot-v2-pipedream-cloudflare-worker.md) — corrected.** Skills are no longer raw-fetched from GitHub at runtime; the harness is baked at build time.
 - **[ADR-010](010-three-tier-context-loading-architecture.md) — superseded.** The paths it names were dissolved in #171.

@@ -3,6 +3,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { expectFieldDisabled, expectFieldFocused, expectFieldHovered, expectFieldInvalid, expectFieldReadOnly, fieldBox } from '@/storybook-docs/lib/field-states.js';
 import TimePicker from './TimePicker';
+import { DemoLabel } from '@/storybook-docs/lib/pattern-demo';
 
 export default {
     title: 'Components/Forms and inputs/Date time picker/Time picker',
@@ -55,11 +56,11 @@ export const Overview = () => (
 export const Spacing = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-150)', maxWidth: 'var(--size-1400)' }}>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT (40)</span>
+            <DemoLabel>DEFAULT (40)</DemoLabel>
             <TimePicker spacing="default" aria-label="Time" placeholder="Default" />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">COMPACT (32)</span>
+            <DemoLabel>COMPACT (32)</DemoLabel>
             <TimePicker spacing="compact" aria-label="Time" placeholder="Compact" />
         </div>
     </div>
@@ -76,23 +77,23 @@ Spacing.play = async ({ canvasElement }) => {
 export const InteractionStates = () => (
     <div style={{ display: 'flex', gap: 'var(--space-150)', alignItems: 'flex-start', flexWrap: 'wrap' }}>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DEFAULT</span>
+            <DemoLabel>DEFAULT</DemoLabel>
             <TimePicker aria-label="Time" placeholder="Default" />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">WITH VALUE</span>
+            <DemoLabel>WITH VALUE</DemoLabel>
             <TimePicker aria-label="Time" value="02:30 PM" />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">DISABLED</span>
+            <DemoLabel>DISABLED</DemoLabel>
             <TimePicker aria-label="Time" isDisabled placeholder="Disabled" />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">READ ONLY</span>
+            <DemoLabel>READ ONLY</DemoLabel>
             <TimePicker aria-label="Time" isReadOnly value="02:30 PM" />
         </div>
         <div>
-            <span className="text-[12px] uppercase tracking-wider text-on-surface-variant font-semibold block mb-3">INVALID</span>
+            <DemoLabel>INVALID</DemoLabel>
             <TimePicker aria-label="Time" isInvalid placeholder="Invalid" />
         </div>
     </div>

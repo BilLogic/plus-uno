@@ -339,6 +339,36 @@ a.sbdocs-a {
   }
 }
 
+.sbdocs .sb-plus-intro-page .sb-plus-intro-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--inline-md);
+}
+
+.sbdocs .sb-plus-intro-page .sb-plus-intro-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--stack-md);
+}
+
+/* A color chip beside its token name. */
+.sbdocs .sb-plus-intro-page .sb-plus-intro-swatch {
+  display: inline-block;
+  inline-size: calc(var(--icon-sm) * 2);
+  block-size: var(--icon-sm);
+  border-radius: var(--radius-sm);
+  border: var(--border-default) solid var(--ds-border);
+}
+
+/* A boxed aside: a card, so its edge comes from elevation. */
+.sbdocs .sb-plus-intro-page .sb-plus-intro-box {
+  padding: var(--card-pad-default);
+  border-radius: var(--card-radius-sm);
+  background: var(--ds-surface-raised);
+  box-shadow: var(--ds-shadow-raised);
+}
+
 .sbdocs .sb-plus-intro-page .sb-plus-intro-mini-card {
   border-radius: var(--card-radius-sm);
   background: var(--ds-surface-raised);
