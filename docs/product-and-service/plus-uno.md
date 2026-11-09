@@ -42,7 +42,7 @@ Netlify hosts the site, configured in `netlify.toml`. A PR gets a deploy preview
 | Target | URL | Built from |
 |--------|-----|------------|
 | **Storybook** | https://plus-uno.netlify.app/storybook/ (also the site root) | `npm run build:all` → `dist/storybook/` |
-| **Vibe app** | https://plus-uno.netlify.app/home (`/app` redirects there) | `prototypes/live-app/` through the root Vite shell |
+| **Vibe app** | https://plus-uno.netlify.app/home (the app shell routes `/app` here) | `prototypes/live-app/` through the root Vite shell |
 | **Full Demo Walkthrough** | https://plus-uno.netlify.app/demo/demo.html | `prototypes/home-redesign/` demo build |
 | **Hosted DS MCP** | https://plus-uno.netlify.app/mcp/ds (team key) | `netlify/functions/ds-mcp/` |
 | **PLUS Uno Blueprint** (the blueprint app) | https://plus-uno.netlify.app/blueprint/ | Its own Netlify site (`plus-uno-blueprint`), proxied by a forced rewrite in `netlify.toml` |

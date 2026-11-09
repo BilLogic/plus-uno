@@ -14,7 +14,7 @@ It is a prototype estate, not a production app: nothing here serves tutors or st
 |---|---|
 | **Storybook** | [plus-uno.netlify.app/storybook](https://plus-uno.netlify.app/storybook/) — the design system's docs |
 | **Vibe app** | [plus-uno.netlify.app/home](https://plus-uno.netlify.app/home) — the product's screens, built from the design system |
-| **Full Demo Walkthrough** | [plus-uno.netlify.app/demo/demo.html](https://plus-uno.netlify.app/demo/demo.html) — the recorded end-to-end flow |
+| **Full Demo Walkthrough** | [plus-uno.netlify.app/demo/demo.html](https://plus-uno.netlify.app/demo/demo.html) — the end-to-end flow, clickable |
 | **uno-blueprint** | [plus-uno.netlify.app/blueprint](https://plus-uno.netlify.app/blueprint/) — the service as it runs today |
 | **Prototype Marketplace** | [Notion catalog](https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f) (PLUS workspace access) — every prototype and its deploy URL |
 | **New here** | [`SETUP.md`](SETUP.md) to run it · [`AGENTS.md`](AGENTS.md) for how uno works · [`GLOSSARY.md`](GLOSSARY.md) for the words |
@@ -35,7 +35,7 @@ People ask for work in **skills**. Skills summon **agents**. Agents follow **con
 
 ## Quick start
 
-Node 22 or later.
+Use the Node version in `package.json` `engines`.
 
 ```bash
 git clone https://github.com/BilLogic/plus-uno.git
@@ -73,11 +73,17 @@ npm run ds -- check --code '<Button appearance="primary">Save</Button>' --path f
 
 **Local MCP.** `plus-ds` is registered in [`.mcp.json`](.mcp.json), so Claude Code and Cursor start it from the checkout (`npm run ds:mcp`) and it matches the branch being edited. Its tools are `ds_find`, `ds_get`, `ds_tokens`, `ds_guide` and `ds_check`.
 
-**Hosted MCP.** For people without the checkout, the same tools are served read-only at `https://plus-uno.netlify.app/mcp/ds`, behind a team key (`DS_MCP_KEY`; ask the design-system owner). It serves the released design system. Client config and key handling: [`docs/connectors/ds-mcp.md`](docs/connectors/ds-mcp.md) § Hosted.
+**Hosted MCP.** For people without the checkout, the same tools are served read-only at `https://plus-uno.netlify.app/mcp/ds`, behind a team key (`DS_MCP_KEY`; ask the design-system owner). It serves the released design system. With the key in your environment, add it to Claude Code:
+
+```bash
+claude mcp add --transport http plus-ds-hosted https://plus-uno.netlify.app/mcp/ds --header "Authorization: Bearer $DS_MCP_KEY"
+```
+
+Cursor config and key handling: [`docs/connectors/ds-mcp.md`](docs/connectors/ds-mcp.md) § Hosted.
 
 **Storybook MCP.** `npm run storybook` also serves the Storybook MCP at `localhost:4200/mcp`, for component docs and story previews ([`docs/connectors/storybook-mcp.md`](docs/connectors/storybook-mcp.md)).
 
-**No npm package.** The design system is not published to a registry. Code in this repo imports it from the barrel, `import { Button } from '@/components'`.
+**No npm package.** The design system is not published to a registry. Code in this repo imports it from the barrel, `import { Button } from '@/components'`; another project reaches it through the hosted MCP or Storybook, not an install.
 
 ## uno skills
 
@@ -109,11 +115,11 @@ The source of truth for how the PLUS service runs today: phases, scenarios, step
 
 ## Prototypes and the marketplace
 
-`main` hosts three surfaces: Storybook, the Vibe app (`/home`, alias `/app`) and the Full Demo Walkthrough (`/demo/*`, entry `/demo/demo.html`). Everything else is an experiment:
+`main` hosts three surfaces: Storybook, the Vibe app (`/home`; the app shell sends `/app` there) and the Full Demo Walkthrough (`/demo/*`, entry `/demo/demo.html`). Everything else is an experiment:
 
 1. Copy `prototypes/starter/` on a feature branch and build with design-system components.
 2. Open a PR; the Netlify deploy preview is the prototype's URL.
-3. Run `uno-publish` to register it in the [Prototype Marketplace](https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f), the Notion catalog with that deploy URL.
+3. Run `uno-publish` to register it in the [Prototype Marketplace](https://app.notion.com/p/plus-tutors/397b7cca49828002826cc45e2baa8e4f), the Notion catalog with that deploy URL (PLUS workspace access).
 4. When accepted, fold it into the Storybook specs and the Vibe app. One-off experiments are not merged to `main`.
 
 ## Repository layout
@@ -155,4 +161,4 @@ Branch from `main`, follow `AGENTS.md`, and open a PR. `npm run check:harness` r
 
 ## License
 
-No license file is published yet.
+`package.json` declares ISC, but no LICENSE file is published yet.
