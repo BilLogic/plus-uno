@@ -73,37 +73,37 @@ describe('the module is importable from a browser bundle', () => {
 describe('the token grammar', () => {
   it('names a token as `--` plus lowercase letters, digits and hyphens', () => {
     const tail = new RegExp(`^--${TOKEN_NAME_TAIL}$`);
-    expect(tail.test('--color-primary')).toBe(true);
-    expect(tail.test('--color-primary-container')).toBe(true);
+    expect(tail.test('--ds-text-brand')).toBe(true);
+    expect(tail.test('--ds-background-brand-subtle')).toBe(true);
     expect(tail.test('--Color-Primary')).toBe(false);
     expect(tail.test('--color_primary')).toBe(false);
     expect(tail.test('--')).toBe(false);
   });
 
   it('builds a declaration pattern scoped to a prefix', () => {
-    const source = ':root { --color-primary: #123456; --space-2: 8px; }';
-    const colors = [...source.matchAll(tokenDeclarationPattern('--color-'))].map((m) => m[1]);
-    expect(colors).toEqual(['--color-primary']);
+    const source = ':root { --ds-text-brand: #123456; --space-2: 8px; }';
+    const colors = [...source.matchAll(tokenDeclarationPattern('--ds-'))].map((m) => m[1]);
+    expect(colors).toEqual(['--ds-text-brand']);
     const all = [...source.matchAll(tokenDeclarationPattern())].map((m) => m[1]);
-    expect(all).toEqual(['--color-primary', '--space-2']);
+    expect(all).toEqual(['--ds-text-brand', '--space-2']);
   });
 
   it('builds a var() reference pattern that reads the token out of a fallback', () => {
-    const found = [...'color: var(--color-warning, #9f8205);'.matchAll(varReferencePattern())];
-    expect(found.map((m) => m[1])).toEqual(['--color-warning']);
+    const found = [...'color: var(--ds-text-warning, #9f8205);'.matchAll(varReferencePattern())];
+    expect(found.map((m) => m[1])).toEqual(['--ds-text-warning']);
   });
 
   it('reads a list of prefixes as one alternation, with the same group numbers', () => {
-    const source = 'a: var(--ds-text); b: var(--color-primary, #000); c: var(--space-2);';
-    const found = [...source.matchAll(varReferencePattern(['--color-', '--ds-']))].map((m) => m[1]);
-    expect(found).toEqual(['--ds-text', '--color-primary']);
+    const source = 'a: var(--ds-text); b: var(--ds-text-brand, #000); c: var(--space-2);';
+    const found = [...source.matchAll(varReferencePattern(['--palette-', '--ds-']))].map((m) => m[1]);
+    expect(found).toEqual(['--ds-text', '--ds-text-brand']);
   });
 
   it('matches a whole bare token name, escaped, for one prefix or several', () => {
-    const name = tokenNamePattern(['--color-', '--ds-']);
+    const name = tokenNamePattern(['--palette-', '--ds-']);
     expect(name.test('--ds-text')).toBe(true);
-    expect(name.test('--color-primary')).toBe(true);
-    expect(name.test('--palette-teal-100')).toBe(false);
+    expect(name.test('--ds-text-brand')).toBe(true);
+    expect(name.test('--space-100')).toBe(false);
     expect(name.test('--ds-text extra')).toBe(false);
     expect(tokenNamePattern('--a.b-').test('--aXb-c')).toBe(false);
   });
@@ -112,33 +112,33 @@ describe('the token grammar', () => {
 describe('readTokens', () => {
   it('takes the first definition and ignores the rest', () => {
     const values = readTokens(
-      ':root { --color-primary: #123456; }\n.dark { --color-primary: #abcdef; }',
-      { prefix: '--color-' },
+      ':root { --ds-text-brand: #123456; }\n.dark { --ds-text-brand: #abcdef; }',
+      { prefix: '--ds-' },
     );
-    expect(values.get('--color-primary')).toBe('#123456');
+    expect(values.get('--ds-text-brand')).toBe('#123456');
   });
 
   it('reads every token when no prefix narrows it', () => {
-    const values = readTokens(':root { --color-primary: #123456; --radius-sm: 4px; }');
-    expect([...values.keys()]).toEqual(['--color-primary', '--radius-sm']);
+    const values = readTokens(':root { --ds-text-brand: #123456; --radius-sm: 4px; }');
+    expect([...values.keys()]).toEqual(['--ds-text-brand', '--radius-sm']);
   });
 });
 
 describe('resolveToken', () => {
   it('follows an alias to the literal behind it', () => {
     const values = new Map([
-      ['--color-tertiary', '#0e8175'],
-      ['--color-info', 'var(--color-tertiary)'],
+      ['--ds-text-accent-teal', '#0e8175'],
+      ['--ds-text-information', 'var(--ds-text-accent-teal)'],
     ]);
-    expect(resolveToken('--color-info', values)).toBe('#0e8175');
+    expect(resolveToken('--ds-text-information', values)).toBe('#0e8175');
   });
 
   it('follows an alias written with a fallback', () => {
     const values = new Map([
-      ['--color-tertiary', '#0e8175'],
-      ['--color-info', 'var(--color-tertiary, #000000)'],
+      ['--ds-text-accent-teal', '#0e8175'],
+      ['--ds-text-information', 'var(--ds-text-accent-teal, #000000)'],
     ]);
-    expect(resolveToken('--color-info', values)).toBe('#0e8175');
+    expect(resolveToken('--ds-text-information', values)).toBe('#0e8175');
   });
 
   it('terminates on a cycle rather than hanging', () => {
@@ -160,7 +160,7 @@ describe('parseColor', () => {
 
   it('returns null rather than a guess', () => {
     expect(parseColor('currentColor')).toBe(null);
-    expect(parseColor('var(--color-primary)')).toBe(null);
+    expect(parseColor('var(--ds-text-brand)')).toBe(null);
     expect(parseColor('rgb(300, 0, 0)')).toBe(null);
     expect(parseColor('rgba(0, 0, 0, 4)')).toBe(null);
     expect(parseColor(undefined)).toBe(null);

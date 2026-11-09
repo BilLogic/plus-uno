@@ -4,16 +4,14 @@
  * The fixtures are the real shapes, measured across `design-system/src`,
  * `.storybook` and `prototypes`.
  *
- * COLOR: 473 comparable literal fallbacks, 282 agreeing, 191 disagreeing
- * across 90 distinct token/literal pairs, and 27 `--color-*` names referenced
- * and never defined. The worst single case is `--color-on-surface-variant`,
- * which resolves to `#3f484a` and carries ten different fallbacks, none of them
- * the token.
+ * COLOR, when first measured: 473 comparable literal fallbacks, 282 agreeing,
+ * 191 disagreeing across 90 distinct token/literal pairs, and 27 color names
+ * referenced and never defined. The worst single token carried ten different
+ * fallbacks, none of them the token.
  *
  * DIMENSION: 1075 comparable, 621 agreeing, 454 disagreeing across 68 distinct
- * pairs. The worst single case is `var(--size-section-gap-sm, 16px)`, written 61
- * times for a token that is `8px` — a fallback that doubles a gap rather than
- * shifting a shade.
+ * pairs. The worst single case was an 8px gap written 61 times with a `16px`
+ * fallback — a fallback that doubles a gap rather than shifting a shade.
  */
 
 import { test } from 'node:test';
@@ -42,12 +40,12 @@ import {
 test('a var() with no fallback is captured, with a null literal', () => {
   // It still names a token, and a token that does not exist is a finding
   // whether or not a literal sits beside it.
-  const uses = fallbackUsages([{ path: 'a.scss', text: 'color: var(--color-primary);' }]);
-  assert.deepEqual(uses, [{ path: 'a.scss', line: 1, token: '--color-primary', literal: null }]);
+  const uses = fallbackUsages([{ path: 'a.scss', text: 'color: var(--ds-text-brand);' }]);
+  assert.deepEqual(uses, [{ path: 'a.scss', line: 1, token: '--ds-text-brand', literal: null }]);
 });
 
 test('the line number is the line the usage is on', () => {
-  const uses = fallbackUsages([{ path: 'a.scss', text: '\n\ncolor: var(--color-primary, #0472a8);' }]);
+  const uses = fallbackUsages([{ path: 'a.scss', text: '\n\ncolor: var(--ds-text-brand, #0472a8);' }]);
   assert.equal(uses[0].line, 3);
 });
 
@@ -56,10 +54,10 @@ test('a whole rgba() fallback is captured, commas and alpha included', () => {
   // the first comma would miss exactly the fallbacks a re-mixed base leaves
   // stale.
   const uses = fallbackUsages([
-    { path: 'a.scss', text: 'background: var(--color-primary-tint, rgba(4, 114, 168, 0.08));' },
+    { path: 'a.scss', text: 'background: var(--ds-background-brand-subtlest, rgba(4, 114, 168, 0.08));' },
   ]);
   assert.deepEqual(uses, [
-    { path: 'a.scss', line: 1, token: '--color-primary-tint', literal: 'rgba(4, 114, 168, 0.08)' },
+    { path: 'a.scss', line: 1, token: '--ds-background-brand-subtlest', literal: 'rgba(4, 114, 168, 0.08)' },
   ]);
 });
 
@@ -68,8 +66,8 @@ test('rgb() in space syntax and hsla() are captured too, with room before the cl
     {
       path: 'a.scss',
       text:
-        'a { color: var(--color-a, rgb(4 114 168 / 50%) ); }\n' +
-        'b { color: var(--color-b, hsla(0, 0%, 0%, 0.5)); }',
+        'a { color: var(--ds-a, rgb(4 114 168 / 50%) ); }\n' +
+        'b { color: var(--ds-b, hsla(0, 0%, 0%, 0.5)); }',
     },
   ]);
   assert.deepEqual(
@@ -79,29 +77,29 @@ test('rgb() in space syntax and hsla() are captured too, with room before the cl
 });
 
 test('an uppercase color function is captured, since CSS function names are case-insensitive', () => {
-  const uses = fallbackUsages([{ path: 'a.scss', text: 'color: var(--color-scrim, RGBA(0, 0, 0, 0.32));' }]);
+  const uses = fallbackUsages([{ path: 'a.scss', text: 'color: var(--ds-blanket, RGBA(0, 0, 0, 0.32));' }]);
   assert.deepEqual(uses.map((use) => use.literal), ['RGBA(0, 0, 0, 0.32)']);
 });
 
 test('a color function holding a var() falls through to the plain literal, as a fragment', () => {
   // It is not a color the key can read, so the audit counts it as not
   // comparable rather than guessing.
-  const uses = fallbackUsages([{ path: 'a.scss', text: 'color: var(--color-a, rgba(var(--x), 0.5));' }]);
-  assert.deepEqual(uses, [{ path: 'a.scss', line: 1, token: '--color-a', literal: 'rgba(var(--x' }]);
+  const uses = fallbackUsages([{ path: 'a.scss', text: 'color: var(--ds-a, rgba(var(--x), 0.5));' }]);
+  assert.deepEqual(uses, [{ path: 'a.scss', line: 1, token: '--ds-a', literal: 'rgba(var(--x' }]);
 });
 
 test('two var() calls on one line are both captured, each with its own fallback', () => {
   const uses = fallbackUsages([
     {
       path: 'a.scss',
-      text: 'border: 1px solid var(--color-a, rgba(0, 0, 0, 0.12)); color: var(--color-b, #3f484a);',
+      text: 'border: 1px solid var(--ds-a, rgba(0, 0, 0, 0.12)); color: var(--ds-b, #3f484a);',
     },
   ]);
   assert.deepEqual(
     uses.map(({ token, literal }) => [token, literal]),
     [
-      ['--color-a', 'rgba(0, 0, 0, 0.12)'],
-      ['--color-b', '#3f484a'],
+      ['--ds-a', 'rgba(0, 0, 0, 0.12)'],
+      ['--ds-b', '#3f484a'],
     ],
   );
 });
@@ -109,18 +107,18 @@ test('two var() calls on one line are both captured, each with its own fallback'
 test('a nested var() fallback is captured as the outer literal, and the inner var() in its own right', () => {
   // The outer token still names a token, so an undefined one is still found;
   // its literal is the inner var(), which the audit counts as not comparable.
-  const uses = fallbackUsages([{ path: 'a.scss', text: 'color: var(--color-a, var(--color-b, #fff));' }]);
+  const uses = fallbackUsages([{ path: 'a.scss', text: 'color: var(--ds-a, var(--ds-b, #fff));' }]);
   assert.deepEqual(
     uses.map(({ token, literal }) => [token, literal]),
     [
-      ['--color-a', 'var(--color-b, #fff)'],
-      ['--color-b', '#fff'],
+      ['--ds-a', 'var(--ds-b, #fff)'],
+      ['--ds-b', '#fff'],
     ],
   );
   const audit = fallbackAudit({
     tokens: new Map([
-      ['--color-a', '#ffffff'],
-      ['--color-b', '#ffffff'],
+      ['--ds-a', '#ffffff'],
+      ['--ds-b', '#ffffff'],
     ]),
     usages: uses,
   });
@@ -134,8 +132,8 @@ test('a fallback that disagrees with its token is reported', () => {
   // The real worst case: the token is #3f484a and the literal is one of ten
   // grays that is not it.
   const audit = fallbackAudit({
-    tokens: new Map([['--color-on-surface-variant', '#3f484a']]),
-    usages: [{ path: 'a.scss', line: 4, token: '--color-on-surface-variant', literal: '#5c5c5c' }],
+    tokens: new Map([['--ds-text-subtle', '#3f484a']]),
+    usages: [{ path: 'a.scss', line: 4, token: '--ds-text-subtle', literal: '#5c5c5c' }],
   });
   assert.equal(audit.disagreements.length, 1);
   assert.equal(audit.disagreements[0].expected, '#3f484a');
@@ -146,8 +144,8 @@ test('a fallback that disagrees with its token is reported', () => {
 test('a fallback that agrees is counted and not reported', () => {
   // The check has to be able to pass: 282 of the 473 are already correct.
   const audit = fallbackAudit({
-    tokens: new Map([['--color-primary', '#0472a8']]),
-    usages: [{ path: 'a.scss', line: 1, token: '--color-primary', literal: 'rgb(4, 114, 168)' }],
+    tokens: new Map([['--ds-text-brand', '#0472a8']]),
+    usages: [{ path: 'a.scss', line: 1, token: '--ds-text-brand', literal: 'rgb(4, 114, 168)' }],
   });
   assert.deepEqual(audit.disagreements, []);
   assert.equal(audit.agreeing, 1);
@@ -158,11 +156,11 @@ test('an rgba() fallback is compared with its alpha, so a stale wash is reported
   // The alpha is part of the color: a wash at 0.5 over a token at 0.32 paints
   // a different scrim, and so does the right alpha over the wrong base.
   const audit = fallbackAudit({
-    tokens: new Map([['--color-tertiary-tint', 'rgba(14, 129, 117, 0.08)']]),
+    tokens: new Map([['--ds-background-accent-teal-subtlest', 'rgba(14, 129, 117, 0.08)']]),
     usages: [
-      { path: 'a.scss', line: 1, token: '--color-tertiary-tint', literal: 'rgba(14, 129, 117, 0.08)' },
-      { path: 'b.scss', line: 2, token: '--color-tertiary-tint', literal: 'rgba(0, 82, 221, 0.08)' },
-      { path: 'c.scss', line: 3, token: '--color-tertiary-tint', literal: 'rgba(14, 129, 117, 0.5)' },
+      { path: 'a.scss', line: 1, token: '--ds-background-accent-teal-subtlest', literal: 'rgba(14, 129, 117, 0.08)' },
+      { path: 'b.scss', line: 2, token: '--ds-background-accent-teal-subtlest', literal: 'rgba(0, 82, 221, 0.08)' },
+      { path: 'c.scss', line: 3, token: '--ds-background-accent-teal-subtlest', literal: 'rgba(14, 129, 117, 0.5)' },
     ],
   });
   assert.equal(audit.comparable, 3);
@@ -174,24 +172,24 @@ test('an rgba() fallback is compared with its alpha, so a stale wash is reported
 });
 
 test('an undefined token is reported with a count, not as a disagreement', () => {
-  // `--color-neutral-text` is read 40 times and defined nowhere, so its
-  // fallback IS the color. That is a different defect from a wrong shade.
+  // `--ds-text-neutral` is read and defined nowhere, so its fallback IS the
+  // color. That is a different defect from a wrong shade.
   const audit = fallbackAudit({
-    tokens: new Map([['--color-primary', '#0472a8']]),
+    tokens: new Map([['--ds-text-brand', '#0472a8']]),
     usages: [
-      { path: 'a.scss', line: 1, token: '--color-neutral-text', literal: '#5c5c5c' },
-      { path: 'b.scss', line: 2, token: '--color-neutral-text', literal: '#666666' },
+      { path: 'a.scss', line: 1, token: '--ds-text-neutral', literal: '#5c5c5c' },
+      { path: 'b.scss', line: 2, token: '--ds-text-neutral', literal: '#666666' },
     ],
   });
-  assert.deepEqual(audit.undefinedTokens, [{ token: '--color-neutral-text', count: 2 }]);
+  assert.deepEqual(audit.undefinedTokens, [{ token: '--ds-text-neutral', count: 2 }]);
   assert.deepEqual(audit.disagreements, []);
 });
 
 test('an incomparable pair is counted rather than silently dropped', () => {
   // Otherwise the check cannot say what share of the corpus it actually read.
   const audit = fallbackAudit({
-    tokens: new Map([['--color-primary', '#0472a8']]),
-    usages: [{ path: 'a.scss', line: 1, token: '--color-primary', literal: 'var(--color-x)' }],
+    tokens: new Map([['--ds-text-brand', '#0472a8']]),
+    usages: [{ path: 'a.scss', line: 1, token: '--ds-text-brand', literal: 'var(--ds-x)' }],
   });
   assert.equal(audit.incomparable, 1);
   assert.equal(audit.comparable, 0);
@@ -208,39 +206,39 @@ test('an incomparable pair is counted rather than silently dropped', () => {
  * the SHAPE it hands the ratchet and what a finding SAYS.
  */
 
-const auditWith = (usages, tokens = new Map([['--color-primary', '#0472a8']])) =>
+const auditWith = (usages, tokens = new Map([['--ds-text-brand', '#0472a8']])) =>
   fallbackAudit({ tokens, usages });
 
 test('the measured side is keyed on token+literal, so the same pair in a new file is one key', () => {
   // A line number churns when someone adds an import above it, and a baseline
   // that churns gets regenerated blindly. The pair is the decision.
   const audit = auditWith([
-    { path: 'a.scss', line: 9, token: '--color-primary', literal: '#ff0000' },
-    { path: 'moved.scss', line: 400, token: '--color-primary', literal: '#ff0000' },
+    { path: 'a.scss', line: 9, token: '--ds-text-brand', literal: '#ff0000' },
+    { path: 'moved.scss', line: 400, token: '--ds-text-brand', literal: '#ff0000' },
   ]);
-  assert.deepEqual(fallbackSides(audit).disagreements, ['--color-primary #ff0000']);
+  assert.deepEqual(fallbackSides(audit).disagreements, ['--ds-text-brand #ff0000']);
 });
 
 test('the measured side carries the detail a finding needs and the record does not', () => {
-  const audit = auditWith([{ path: 'a.scss', line: 9, token: '--color-primary', literal: '#ff00ff' }]);
+  const audit = auditWith([{ path: 'a.scss', line: 9, token: '--ds-text-brand', literal: '#ff00ff' }]);
   const sides = fallbackSides(audit);
-  assert.equal(sides.detail.get('--color-primary #ff00ff').where, 'a.scss:9');
+  assert.equal(sides.detail.get('--ds-text-brand #ff00ff').where, 'a.scss:9');
   assert.deepEqual(sides.undefinedTokens, []);
 });
 
 test('an undefined name comes back with its use count, which is not in the record either', () => {
   const audit = auditWith([
-    { path: 'a.scss', line: 1, token: '--color-invented', literal: '#000000' },
-    { path: 'b.scss', line: 2, token: '--color-invented', literal: '#000000' },
+    { path: 'a.scss', line: 1, token: '--ds-invented', literal: '#000000' },
+    { path: 'b.scss', line: 2, token: '--ds-invented', literal: '#000000' },
   ]);
   const sides = fallbackSides(audit);
-  assert.deepEqual(sides.undefinedTokens, ['--color-invented']);
-  assert.equal(sides.uses.get('--color-invented'), 2);
+  assert.deepEqual(sides.undefinedTokens, ['--ds-invented']);
+  assert.equal(sides.uses.get('--ds-invented'), 2);
 });
 
 test('a NEW disagreement names the token, both values and the place', () => {
-  const audit = auditWith([{ path: 'a.scss', line: 9, token: '--color-primary', literal: '#ff00ff' }]);
-  const failures = fallbackFailures(audit, { disagreements: ['--color-primary #ff00ff'] });
+  const audit = auditWith([{ path: 'a.scss', line: 9, token: '--ds-text-brand', literal: '#ff00ff' }]);
+  const failures = fallbackFailures(audit, { disagreements: ['--ds-text-brand #ff00ff'] });
   assert.equal(failures.length, 1);
   assert.match(failures[0], /#0472a8/);
   assert.match(failures[0], /#ff00ff/);
@@ -249,19 +247,19 @@ test('a NEW disagreement names the token, both values and the place', () => {
 
 test('a NEW undefined token names itself and how many uses it has', () => {
   const audit = auditWith([
-    { path: 'a.scss', line: 1, token: '--color-border', literal: '#e5e7eb' },
-    { path: 'a.scss', line: 2, token: '--color-invented', literal: '#000000' },
+    { path: 'a.scss', line: 1, token: '--ds-edge', literal: '#e5e7eb' },
+    { path: 'a.scss', line: 2, token: '--ds-invented', literal: '#000000' },
   ]);
-  const failures = fallbackFailures(audit, { undefinedTokens: ['--color-invented'] });
+  const failures = fallbackFailures(audit, { undefinedTokens: ['--ds-invented'] });
   assert.equal(failures.length, 1);
-  assert.match(failures[0], /--color-invented {2}\(1 use\(s\)\)/);
-  assert.doesNotMatch(failures[0], /--color-border/);
+  assert.match(failures[0], /--ds-invented {2}\(1 use\(s\)\)/);
+  assert.doesNotMatch(failures[0], /--ds-edge/);
 });
 
 test('nothing new is nothing said, whatever the audit found', () => {
   // The point of a ratchet: fixing one, or holding 87 of them, must not fail
   // the build. Which keys are new is the ratchet's call, not this function's.
-  const audit = auditWith([{ path: 'a.scss', line: 1, token: '--color-primary', literal: '#ff0000' }]);
+  const audit = auditWith([{ path: 'a.scss', line: 1, token: '--ds-text-brand', literal: '#ff0000' }]);
   assert.deepEqual(fallbackFailures(audit, {}), []);
 });
 
@@ -282,17 +280,17 @@ test('an incomparable value is counted rather than called equal', () => {
 
 test('the name pattern selects which family is read', () => {
   // The dimension check passes any custom-property name and then filters by
-  // VALUE, because lengths are spread across --size-*, --spacing-*,
-  // --font-size-* and --font-line-height-* with no shared prefix.
-  const use = 'gap: var(--size-element-gap-md, 16px);';
+  // VALUE, because lengths are spread across --space-*, --size-*,
+  // --font-size-* and --line-height-* with no shared prefix.
+  const use = 'gap: var(--stack-md, 16px);';
   assert.deepEqual(fallbackUsages([{ path: 'a.scss', text: use }]), []);
   assert.equal(fallbackUsages([{ path: 'a.scss', text: use }], { prefix: '--' }).length, 1);
 });
 
 test('a disagreeing length is reported the same way a disagreeing color is', () => {
   const audit = fallbackAudit({
-    tokens: new Map([['--size-section-gap-sm', '8px']]),
-    usages: [{ path: 'a.scss', line: 2, token: '--size-section-gap-sm', literal: '1rem' }],
+    tokens: new Map([['--section-stack-sm', '8px']]),
+    usages: [{ path: 'a.scss', line: 2, token: '--section-stack-sm', literal: '1rem' }],
     normalize: dimensionKey,
     reportUndefined: false,
   });

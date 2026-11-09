@@ -110,8 +110,6 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 |----------------|----------------|-------|
 | Min Heights/listbox | `var(--listbox-min-height)` | 140 at every breakpoint. Code does not apply it: a list is as tall as its rows, so a short list has no empty band |
 | Max Heights/listbox | `var(--listbox-max-height)` | 300 at every breakpoint, about eight rows; the body scrolls past it |
-| Min Heights/card-body | `var(--layout-min-height-card-body)` | 20 / 30 / 40 at MD / LG / XL |
-| Min Heights/modal-body | `var(--layout-min-height-modal-body)` | 40 / 50 / 60 at MD / LG / XL |
 | — (code only) | `var(--layer-card)` … `var(--layer-tooltip)` | PLUS layers: card 100, navigation 200, dialog 300, popup 400, scrim 500, modal 510, flag 600, spotlight 700, tooltip 800. A popup opened from a field inside a modal mounts in the modal's overlay and takes its layer. Figma has no z-index |
 | — (code only) | `var(--listbox-max-width)` | 320, the widest a popup from a field or button grows. A popup with columns (Cascader, the calendar) is exempt |
 | — (code only) | `var(--checkbox-control-size)` · `var(--radio-control-size)` | 18 and 12, the checkbox box and radio dot; a description or reveal under the label indents by one plus the label gap |

@@ -72,7 +72,7 @@ default Highcharts border or line entirely) needs no token — it draws nothing.
 ## Type
 
 Tick labels, legends, tooltips and data labels take the current text tokens
-(`--font-size-body3`, `--font-weight-semibold-1`, and so on) — never a
+(`--font-size-075`, `--type-family-body`, `--type-weight-semibold`, and so on) — never a
 `'12px'` literal, and never a token `var()` paired with a literal fallback
 value. A chart's title comes from the surrounding Section or Card header, not from Highcharts'
 own `title` option (every chart sets `title: { text: null }`).

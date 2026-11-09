@@ -2,7 +2,7 @@
  * Design tokens that are USED and never DEFINED.
  *
  * THE DEFECT. `var(--font-weight-light)` appears in six shipped components. No
- * such token exists — the file defines `--font-weight-normal: 300` — so the
+ * such token exists — the file defined only a `normal` weight at 300 — so the
  * declaration is invalid at computed-value time and the element takes its
  * inherited weight instead. Text designed at 300 renders at 400, in `Select`,
  * `Dropdown`, `Carousel`, `Scrollspy`, `MediaObject` and `RichTextEditor`.

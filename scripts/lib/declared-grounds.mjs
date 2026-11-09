@@ -14,7 +14,7 @@
  *
  * ─── THE ANNOTATIONS ────────────────────────────────────────────────────────
  *
- *   `@grounds: --color-x --color-y`  the grounds this rule and everything nested
+ *   `@grounds: --ds-x --ds-y`  the grounds this rule and everything nested
  *                                    in it sit on.
  *   `@contrast: non-text`            this rule's own colors are a graphic (an
  *                                    icon glyph), held to WCAG 1.4.11's 3:1
@@ -31,7 +31,7 @@
  *
  *  1. GROUND RESOLUTION. For a measured declaration, walk from its own rule
  *     outward through its ancestors. The FIRST rule that has either a
- *     background declaration naming a `--color-*` or `--ds-*` token or a `@grounds`
+ *     background declaration naming a `--ds-*` token or a `@grounds`
  *     annotation decides: its background, or its declared grounds (each
  *     measured). A rule with both is decided by its background — that is the
  *     paint directly beneath. If no rule decides, the ground is the page. So a
@@ -43,9 +43,9 @@
  *     intent — children of a block on primary are on primary:
  *
  *         .zz {
- *             // @grounds: --color-primary
- *             .a { color: var(--color-surface); }   // measured on primary
- *             .b { color: var(--color-surface); }   // measured on primary
+ *             // @grounds: --ds-background-brand-bold
+ *             .a { color: var(--ds-text-inverse); }   // measured on brand
+ *             .b { color: var(--ds-text-inverse); }   // measured on brand
  *         }
  *
  *  3. `@contrast: non-text` applies ONLY to declarations directly in the rule it
@@ -92,7 +92,7 @@ export const NON_TEXT = 3;
 const KINDS = ['grounds', 'contrast'];
 const ANNOTATION = /^@([a-z-]+)\s*:([\s\S]*)$/;
 const BACKGROUND = /^background(-color)?$/;
-/** A `var()` naming a color token of either vocabulary, `--color-*` or `--ds-*`. */
+/** A `var()` naming a `--ds-*` color token. */
 const COLOR_TOKEN = new RegExp(varReferencePattern(COLOR_PREFIXES).source);
 /** A bare color token name, as a `@grounds` list writes it. */
 const COLOR_NAME = tokenNamePattern(COLOR_PREFIXES);
@@ -218,7 +218,7 @@ export function ruleAt(sheet, offset) {
   return found;
 }
 
-/** The `--color-*` or `--ds-*` token a rule's own background declaration names, or null. */
+/** The `--ds-*` token a rule's own background declaration names, or null. */
 function ownBackground(rule) {
   for (const node of rule.nodes ?? []) {
     if (node.type !== 'decl' || !BACKGROUND.test(node.prop)) continue;
@@ -351,7 +351,7 @@ export function groundErrors(declared, values) {
   if (!declared.tokens.length) errors.push('declares no grounds');
   for (const token of declared.tokens) {
     if (!COLOR_NAME.test(token)) {
-      errors.push(`\`${token}\` is not a --color-* or --ds-* token`);
+      errors.push(`\`${token}\` is not a --ds-* token`);
     } else if (!parseColor(resolveToken(token, values) ?? '')) {
       errors.push(`\`${token}\` does not resolve to a color in the token files`);
     }

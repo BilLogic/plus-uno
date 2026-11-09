@@ -5,7 +5,7 @@ import { TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
 import { tokenDeclarationPattern } from '../design-system/src/lib/tokens.mjs';
 import { compare, refusals } from './token-generation.mjs';
 import { FRAME_LAYER_COLLECTIONS, frameLayerFile, frameLayerFolder, frameLayerToken } from './lib/frame-layer-collections.mjs';
-import { dropRetired, RETIRED_COLORS } from './lib/tokens/retire.mjs';
+import { dropRetired } from './lib/tokens/retire.mjs';
 import { TYPOGRAPHY_FILE, TYPOGRAPHY_FOLDERS, typographyFolder, typographyToken } from './lib/typography-collection.mjs';
 
 /**
@@ -58,545 +58,15 @@ function cssColor({ r, g, b, a = 1 }) {
     return '#' + [r, g, b].map((n) => byte(n).toString(16).padStart(2, '0')).join('');
 }
 
-/**
- * The accent families in the `colors / accent` collection, in the order the
- * stylesheet lists them.
- */
-const ACCENT_FAMILIES = [
-    'Primary', 'Secondary', 'Tertiary', 'Danger', 'Success', 'Warning', 'Info',
-    'Social-Emotional', 'Mastering-Content', 'Advocacy', 'Relationship', 'Technology-Tools',
-];
-
-/**
- * Info is Tertiary under another name: Figma aliases `Info/*` to `Tertiary/*`,
- * so every Info token is written as a `var()` of its Tertiary twin. That also
- * covers a leaf Figma carries as a literal or not at all (there is no `Info
- * Border Subtle`), and the generator refuses if any Info variable stops
- * resolving to its Tertiary twin's color.
- */
-const ALIASED_FAMILIES = { Info: 'Tertiary' };
-
-/**
- * `Primary/Primary (Text)` -> `primary-text`, `Primary/Primary Container` ->
- * `primary-container`, and so on, or `null` for a
- * variable this file does not carry: the `-icon`/`-border` roles and focus
- * rings (hand-maintained in `_color_roles.scss`), the `Proposal/*` candidates,
- * and stray leaves such as `Advocacy/on-surface` and the `Content` string.
- */
-function accentToken(name) {
-    const [family, ...rest] = name.split('/');
-    if (!ACCENT_FAMILIES.includes(family) || rest.length === 0) return null;
-    const f = slug(family);
-    const leaf = rest.join('/');
-
-    const roles = {
-        [family]: f,
-        [`${family} (Text)`]: `${f}-text`,
-        [`On ${family}`]: `on-${f}`,
-        [`${family} Container`]: `${f}-container`,
-        [`On ${family} Container`]: `on-${f}-container`,
-        [`Inverse ${family}`]: `inverse-${f}`,
-        [`${family} Border Subtle`]: `${f}-border-subtle`,
-    };
-    return roles[leaf] ?? null;
-}
-
-/** The order a family's tokens are written in. */
-function familyOrder(f) {
-    return [f, `${f}-text`, `on-${f}`, `${f}-container`, `on-${f}-container`, `inverse-${f}`, `${f}-border-subtle`];
-}
-
-/**
- * `Neutral Colors/Alternative/surface-dim` -> `surface-dim`,
- * or `null` for the `Surface roles/*` aliases, which are not part of this file.
- */
-function neutralToken(name) {
-    const role = name.match(/^Neutral Colors\/(?:Surface container\/|Alternative\/)?([^/]+)$/);
-    return role ? slug(role[1]) : null;
-}
-
-const NEUTRAL_GROUPS = {
-    'Surface': ['surface', 'on-surface'],
-    'Surface Variant': ['surface-variant', 'on-surface-variant'],
-    'Outline': ['outline', 'outline-variant'],
-    'Raised surfaces': ['surface-container-lowest', 'surface-container-low', 'surface-container', 'surface-container-high', 'surface-container-highest'],
-    'Alternative Surfaces': ['surface-dim', 'surface-bright', 'scrim', 'disabled-opacity', 'inverse-surface', 'inverse-on-surface'],
-};
-
-/**
- * Not a Figma variable: the M3 disabled-content opacity. Figma applies it as
- * a layer opacity rather than a variable, and components read it from here.
- */
-const CODE_ONLY_NEUTRALS = { 'disabled-opacity': '0.38' };
-
-/**
- * `{token: cssValue}` for one collection, through `toToken`. Two variables that
- * land on one token must agree (`Neutral Colors/on-surface` and `Neutral
- * Colors/Surface container/on-surface` do); a disagreement is a refusal, not a
- * last-one-wins.
- */
-function collectColors(file, toToken) {
-    const { json, modes: [mode] } = readSource(file, { oneMode: true });
-    const map = {};
-    for (const v of json.variables) {
-        if (v.resolvedType !== 'COLOR') continue;
-        const token = toToken(v.name);
-        if (!token) continue;
-        const resolved = v.resolvedValuesByMode[mode];
-        if (!resolved || resolved.r === undefined) {
-            throw new Error(`${file}: ${v.name} has no resolved color. Export it with every alias resolved.`);
-        }
-        const value = cssColor(resolved);
-        if (map[token] !== undefined && map[token] !== value) {
-            throw new Error(`${file}: two variables map to --color-${token} with different values (${map[token]}, ${value}).`);
-        }
-        map[token] = value;
-    }
-    return map;
-}
-
-/**
- * Process and generate colors SCSS
- */
-function generateColorsSCSS() {
-    const accentMap = collectColors('colors _ accent.json', accentToken);
-    const neutralMap = collectColors('colors _ neutral.json', neutralToken);
-
-    const neutralNames = new Set(readSource('colors _ neutral.json').json.variables.map((v) => neutralToken(v.name)));
-    for (const key of Object.keys(CODE_ONLY_NEUTRALS)) {
-        if (neutralNames.has(key)) stale('CODE_ONLY_NEUTRALS', `--color-${key} is now a Figma variable; read it from the export.`);
-    }
-
-    let scss = `/**
- * Material Design 3 Color Tokens
- * Generated from Figma design system
- * Follows M3 color role guidance: https://m3.material.io/styles/color/roles
- */
-
-:root {
-    /* ============================================
-       ACCENT COLORS - Material Design 3 Roles
-       ============================================ */
-`;
-
-    for (const family of ACCENT_FAMILIES) {
-        const f = slug(family);
-        const roles = familyOrder(f);
-        const target = ALIASED_FAMILIES[family];
-        const line = (token) => {
-            if (!target) return accentMap[token] === undefined ? '' : `    --color-${token}: ${accentMap[token]};\n`;
-            const twin = token.replace(f, slug(target));
-            if (accentMap[twin] === undefined) return '';
-            if (accentMap[token] !== undefined && accentMap[token] !== accentMap[twin]) {
-                throw new Error(
-                    `colors _ accent.json: --color-${token} is ${accentMap[token]} but --color-${twin} is ` +
-                    `${accentMap[twin]}. ${family} is written as an alias of ${target}; they have to agree.`,
-                );
-            }
-            return `    --color-${token}: var(--color-${twin});\n`;
-        };
-        const note = target ? `    /* ${family} aliases to ${target} */\n` : '';
-        scss += `\n    /* ${family} Colors */\n${note}${roles.map(line).join('')}`;
-    }
-
-    scss += `
-    /* ============================================
-       NEUTRAL COLORS - Material Design 3
-       ============================================ */
-`;
-
-    const neutralValues = { ...neutralMap, ...CODE_ONLY_NEUTRALS };
-    for (const [group, keys] of Object.entries(NEUTRAL_GROUPS)) {
-        scss += `\n    /* ${group} */\n`;
-        for (const key of keys) {
-            if (neutralValues[key] !== undefined) scss += `    --color-${key}: ${neutralValues[key]};\n`;
-        }
-    }
-
-    /*
-     * Anything the maps produced that no list above placed. Written rather than
-     * dropped, so a new Figma role shows up in the diff instead of vanishing.
-     */
-    const placed = new Set([
-        ...ACCENT_FAMILIES.flatMap((f) => familyOrder(slug(f))),
-        ...Object.values(NEUTRAL_GROUPS).flat(),
-    ]);
-    const unplaced = Object.entries({ ...accentMap, ...neutralMap }).filter(([k]) => !placed.has(k));
-    if (unplaced.length) {
-        scss += `\n    /* Unsorted (add these to an order list in generate-all-tokens.js) */\n`;
-        for (const [key, value] of unplaced) scss += `    --color-${key}: ${value};\n`;
-    }
-
-    scss += `}\n`;
-
-    return scss;
-}
-
-/*
- * SIZE TOKENS
- *
- * The three `size / *` collections are exported whole. Where the stylesheets
- * and Figma disagree, the stylesheets win for now and the disagreement is
- * written down here, one constant per kind, so that it is a stated exception
- * rather than a silent one. Each is a known difference from Figma, not a
- * decision that Figma is wrong.
- */
-
 /** A size in CSS: `8px`, `1.5px`, `1023.98px`. */
 const px = (n) => `${+Number(n).toFixed(2)}px`;
 
-/**
- * Primitives the stylesheet declares that Figma does not have. They are kept
- * because components read them (the larger spacing steps and the column-width
- * proxies each have a user).
- */
-const CODE_ONLY_PRIMITIVES = {
-    spacing: {
-        'spacing-large-space-1200': 96,
-        'spacing-large-space-1500': 120,
-        'spacing-xlarge-space-2000': 160,
-        'spacing-xlarge-space-2500': 200,
-        'spacing-xlarge-space-5000': 400,
-    },
-    column: { 'column-xs': 60, 'column-sm': 80, 'column-md': 100, 'column-lg': 120 },
-};
-
-/** `{id: {token, value}}` for every Figma primitive, keyed by variable id so semantics can point at them. */
-function primitiveTokens() {
-    const { json, modes: [mode] } = readSource('size _ primitive.json', { oneMode: true });
-    const byId = {};
-    for (const v of json.variables) {
-        const value = v.resolvedValuesByMode[mode];
-        if (typeof value !== 'number') throw new Error(`size _ primitive.json: ${v.name} has no numeric value.`);
-        byId[v.id] = { token: slug(v.name), value };
-    }
-    return byId;
-}
-
-/**
- * Generate primitives SCSS
- */
-function generatePrimitivesSCSS() {
-    const primitives = Object.values(primitiveTokens());
-    const figmaNames = new Set(primitives.map((p) => p.token));
-    for (const token of Object.values(CODE_ONLY_PRIMITIVES).flatMap(Object.keys)) {
-        if (figmaNames.has(token)) stale('CODE_ONLY_PRIMITIVES', `--size-${token} is now a Figma variable; read it from the export.`);
-    }
-
-    const groups = { spacing: [], radius: [], stroke: [] };
-    for (const { token, value } of primitives) {
-        const group = token.startsWith('spacing-') ? 'spacing' : token.includes('-radius-') ? 'radius' : token.includes('-stroke-') ? 'stroke' : null;
-        if (!group) throw new Error(`size _ primitive.json: no group for --size-${token}.`);
-        groups[group].push({ token, value });
-    }
-    for (const [token, value] of Object.entries(CODE_ONLY_PRIMITIVES.spacing)) groups.spacing.push({ token, value });
-
-    const step = ({ token }) => parseFloat(token.match(/(\d+(?:\.\d+)?)$/)[1]);
-    const lines = (items) => items.sort((a, b) => step(a) - step(b)).map(({ token, value }) => `    --size-${token}: ${px(value)};\n`).join('');
-
-    return `/**
- * Primitive Size Tokens
- * Base values used to build semantic tokens
- * DO NOT USE DIRECTLY - Use semantic tokens instead
- */
-
-:root {
-    /* Spacing Primitives */
-${lines(groups.spacing)}
-    /* Column Width Proxies (not Figma variables; see CODE_ONLY_PRIMITIVES) */
-${Object.entries(CODE_ONLY_PRIMITIVES.column).map(([token, value]) => `    --size-${token}: ${px(value)};\n`).join('')}
-    /* Border Radius Primitives */
-${lines(groups.radius)}
-    /* Stroke/Border Width Primitives */
-${lines(groups.stroke)}}
-`;
-}
-
-/**
- * Semantic tokens whose value differs from Figma's alias: token -> the
- * primitive it points at instead. `element-radius-sm` is radius-100 (4px)
- * where the Figma export in `source/` still says radius-50 (2px). Storybook
- * won that conflict, and Figma's `Element/radius-sm` now points at radius-100,
- * so the next `sync:tokens` makes this override stale and the check below
- * asks for it to be deleted. `surface-container-gap-md` is space-300 (16px)
- * where Figma's `Surface Container/gap-md` is space-600 (32px).
- */
-const SEMANTIC_OVERRIDES = {
-    'element-radius-sm': 'border-radius-radius-100',
-    'surface-container-gap-md': 'spacing-medium-space-300',
-    // A table cell pads 12 on the inline axis and keeps 8 on the block axis.
-    // Figma's Table/cell-x and Table/cell-gap still say 10.
-    'table-cell-x': 'spacing-medium-space-200',
-    'table-cell-gap': 'spacing-medium-space-200',
-};
-
-/**
- * One primitive size scale used through five roles. A role names what the
- * size is for, and each step points at the spacing primitive of that size, so
- * a 24 Icon and a 24 Control stay one number. Steps are listed in the order
- * they are written.
- */
-const SIZE_ROLES = [
-    { prefix: 'icon', heading: 'Icon Sizes', steps: { sm: 'spacing-medium-space-200', md: 'spacing-medium-space-300', lg: 'spacing-medium-space-500' } },
-    { prefix: 'indicator', heading: 'Indicator Sizes', steps: { sm: 'spacing-medium-space-300', md: 'spacing-medium-space-400' } },
-    { prefix: 'control', heading: 'Control Sizes', steps: { sm: 'spacing-medium-space-500', md: 'spacing-large-space-600', lg: 'spacing-large-space-700' } },
-    { prefix: 'row', heading: 'Row Sizes', steps: { compact: 'spacing-large-space-600', default: 'spacing-large-space-700', comfortable: 'spacing-large-space-800' } },
-    {
-        prefix: 'media',
-        heading: 'Media Sizes',
-        steps: {
-            xxs: 'spacing-medium-space-300', xs: 'spacing-medium-space-400', sm: 'spacing-medium-space-500',
-            md: 'spacing-large-space-600', lg: 'spacing-large-space-700', xl: 'spacing-large-space-800',
-        },
-    },
-];
-
-/** Semantic tokens the stylesheet declares that Figma does not have. */
-const CODE_ONLY_SEMANTICS = {
-    'surface-container-pad-x': 'spacing-medium-space-300',
-    'surface-container-pad-y': 'spacing-medium-space-200',
-    'table-radius-md': 'border-radius-radius-200',
-    'table-radius-sm': 'border-radius-radius-150',
-    'table-cell-pad-x': 'spacing-medium-space-200',
-    'table-cell-pad-y': 'spacing-small-space-100',
-    'table-cell-inline': 'spacing-medium-space-200',
-    ...Object.fromEntries(
-        SIZE_ROLES.flatMap(({ prefix, steps }) => Object.entries(steps).map(([step, primitive]) => [`${prefix}-${step}`, primitive])),
-    ),
-};
-
-/**
- * Figma semantic variables not written yet. The Surface Container set is named
- * differently from the stylesheet's, and `Table/row-radius` aliases a spacing
- * primitive where the stylesheet has two radius tokens; adding them is a
- * separate change.
- */
-const SEMANTICS_NOT_WRITTEN = new Set([
-    'surface-container-pad-x-sm', 'surface-container-pad-x-md',
-    'surface-container-pad-y-sm', 'surface-container-pad-y-md',
-    'surface-container-gap-sm', 'surface-container-border',
-    'table-row-radius',
-]);
-
-/** The semantic layers in the order they are written. */
-const SEMANTIC_LAYERS = [
-    { prefix: 'element', heading: 'Elements Layer' },
-    { prefix: 'card', heading: 'Cards Layer' },
-    { prefix: 'section', heading: 'Sections Layer' },
-    { prefix: 'modal', heading: 'Modals Layer' },
-    { prefix: 'surface', heading: 'Surfaces Layer' },
-    { prefix: 'surface-container', heading: 'Frames Layer' },
-    { prefix: 'table', heading: 'Table Tokens' },
-    ...SIZE_ROLES.map(({ prefix, heading, steps }) => ({ prefix, heading, steps: Object.keys(steps) })),
-];
-
-/**
- * Within a layer, tokens are written by kind in this order, then by size with
- * `-full` last. A token of a kind not listed here is a refusal.
- */
-const SEMANTIC_KINDS = ['cell-pad-x', 'cell-pad-y', 'cell-inline', 'cell-x', 'cell-y', 'cell-gap', 'pad-x', 'pad-y', 'gap', 'radius', 'stroke', 'border'];
-
-/**
- * Generate semantic tokens SCSS
- */
-function generateSemanticsSCSS() {
-    const primitives = primitiveTokens();
-    const primitiveNames = new Set(Object.values(primitives).map((p) => p.token));
-    const { json, modes: [mode] } = readSource('size _ semantics.json', { oneMode: true });
-
-    const figmaNames = new Set(json.variables.map((v) => slug(v.name)));
-    for (const token of SEMANTICS_NOT_WRITTEN) {
-        if (!figmaNames.has(token)) stale('SEMANTICS_NOT_WRITTEN', `Figma no longer has ${token}; drop it from the list.`);
-    }
-    for (const token of Object.keys(CODE_ONLY_SEMANTICS)) {
-        if (figmaNames.has(token)) stale('CODE_ONLY_SEMANTICS', `--size-${token} is now a Figma variable; read it from the export.`);
-    }
-
-    const values = {};
-    for (const v of json.variables) {
-        const token = slug(v.name);
-        if (SEMANTICS_NOT_WRITTEN.has(token)) continue;
-        const val = v.valuesByMode[mode];
-        if (val?.type === 'VARIABLE_ALIAS') {
-            const target = primitives[val.id];
-            if (!target) throw new Error(`size _ semantics.json: ${v.name} aliases ${val.id}, which is not a primitive.`);
-            values[token] = `var(--size-${target.token})`;
-        } else if (typeof val === 'number') {
-            values[token] = px(val);
-        } else {
-            throw new Error(`size _ semantics.json: ${v.name} has neither an alias nor a number.`);
-        }
-    }
-    for (const [token, primitive] of Object.entries(SEMANTIC_OVERRIDES)) {
-        if (values[token] === undefined) {
-            stale('SEMANTIC_OVERRIDES', `Figma has no ${token}; it belongs in CODE_ONLY_SEMANTICS.`);
-        } else if (values[token] === `var(--size-${primitive})`) {
-            stale('SEMANTIC_OVERRIDES', `Figma's ${token} is now ${values[token]}, the same as the override; delete the override.`);
-        }
-    }
-    for (const [token, primitive] of Object.entries({ ...CODE_ONLY_SEMANTICS, ...SEMANTIC_OVERRIDES })) {
-        if (!primitiveNames.has(primitive) && !(primitive in CODE_ONLY_PRIMITIVES.spacing)) {
-            throw new Error(`generate-all-tokens.js: --size-${token} points at --size-${primitive}, which is not generated.`);
-        }
-        values[token] = `var(--size-${primitive})`;
-    }
-
-    const byLayer = Object.fromEntries(SEMANTIC_LAYERS.map(({ prefix }) => [prefix, []]));
-    for (const token of Object.keys(values)) {
-        // Longest prefix first, so `surface-container-*` is not read as `surface-*`.
-        const layer = SEMANTIC_LAYERS.filter(({ prefix }) => token.startsWith(`${prefix}-`))
-            .sort((a, b) => b.prefix.length - a.prefix.length)[0];
-        if (!layer) throw new Error(`size _ semantics.json: no layer for --size-${token}.`);
-        byLayer[layer.prefix].push(token);
-    }
-    const kind = (token, prefix) => {
-        const rest = token.slice(prefix.length + 1);
-        // A size role is ordered by its steps, not by SEMANTIC_KINDS.
-        const steps = SEMANTIC_LAYERS.find((l) => l.prefix === prefix).steps;
-        if (steps) return steps.indexOf(rest);
-        const index = SEMANTIC_KINDS.findIndex((k) => rest === k || rest.startsWith(`${k}-`));
-        if (index < 0) throw new Error(`size _ semantics.json: --size-${token} is none of SEMANTIC_KINDS.`);
-        return index;
-    };
-    const full = (t) => (t.endsWith('-full') ? 1 : 0);
-
-    let scss = `/**
- * Semantic Spacing Tokens
- * These are the tokens designers and developers should use
- * Organized by component layer: Elements, Cards, Sections, Modals, Surfaces, Frames,
- * Table, then the size roles: Icon, Indicator, Control, Row, Media
- */
-
-:root {
-`;
-    for (const { prefix, heading } of SEMANTIC_LAYERS) {
-        const tokens = byLayer[prefix].sort((a, b) => kind(a, prefix) - kind(b, prefix) || full(a) - full(b) || a.localeCompare(b));
-        if (!tokens.length) continue;
-        scss += `\n    /* ${heading} */\n`;
-        for (const token of tokens) scss += `    --size-${token}: ${values[token]};\n`;
-    }
-    scss += `}\n`;
-    return scss;
-}
-
-/** Figma's layout mode names to breakpoint keys. */
-const BREAKPOINT_KEYS = { 'Medium (768px)': 'md', 'Large (1024px)': 'lg', 'X-Large (1440px)': 'xl' };
-
-/**
- * Breakpoints that differ from Figma or are not in it: Figma's X-Large ends at
- * 1800, the stylesheet at 1919.98 with an XXL step from 1920.
- */
-const BREAKPOINT_OVERRIDES = { 'xl-max': 1919.98 };
-const CODE_ONLY_BREAKPOINTS = { 'xxl-min': 1920 };
-
-/**
- * The semantic token the grid gutter is documented as equal to. The note is
- * checked, not trusted: Figma's `Grid/content-gutter` and this token's
- * resolved value have to match.
- */
-const GRID_GAP_EQUALS = 'element-gap-sm';
-
-/**
- * Generate layout tokens SCSS
- *
- * Reads `Breakpoints/*`, `Columns/*`, `Grid/content-gutter`, `Min Heights/*`
- * and `Max Heights/*`. Not written yet: `Display/*`, `Grid/columns`,
- * `Grid/viewport-gutter` and `Grid/viewport-margin`.
- *
- * `Min Heights/listbox` is `--layout-min-height-listbox`. A height the modes
- * agree on is written once; one that differs by breakpoint is written at its
- * first mode and overridden in each wider breakpoint's block, as the column
- * spans are.
- */
-function generateLayoutSCSS() {
-    const { json } = readSource('size _ layout.json');
-    const figmaNames = new Set(json.variables.map((v) => slug(v.name)));
-    const modes = Object.entries(json.modes).map(([id, name]) => {
-        if (!BREAKPOINT_KEYS[name]) throw new Error(`size _ layout.json: unknown mode "${name}".`);
-        return { id, key: BREAKPOINT_KEYS[name] };
-    });
-    const variable = (name) => {
-        const v = json.variables.find((x) => x.name === name);
-        if (!v) throw new Error(`size _ layout.json: no ${name}.`);
-        return (mode) => v.resolvedValuesByMode[mode.id];
-    };
-
-    const breakpoints = {};
-    const min = variable('Breakpoints/min width');
-    const max = variable('Breakpoints/max width');
-    for (const mode of modes) {
-        breakpoints[`${mode.key}-min`] = min(mode);
-        breakpoints[`${mode.key}-max`] = max(mode);
-    }
-    for (const [key, value] of Object.entries(BREAKPOINT_OVERRIDES)) {
-        if (breakpoints[key] === undefined) stale('BREAKPOINT_OVERRIDES', `Figma has no ${key}; it belongs in CODE_ONLY_BREAKPOINTS.`);
-        else if (breakpoints[key] === value) stale('BREAKPOINT_OVERRIDES', `Figma's ${key} is now ${value}, the same as the override; delete the override.`);
-    }
-    for (const key of Object.keys(CODE_ONLY_BREAKPOINTS)) {
-        if (breakpoints[key] !== undefined) stale('CODE_ONLY_BREAKPOINTS', `Figma now has ${key}; read it from the export.`);
-    }
-    Object.assign(breakpoints, BREAKPOINT_OVERRIDES, CODE_ONLY_BREAKPOINTS);
-
-    const gutter = variable('Grid/content-gutter');
-    const gutters = new Set(modes.map(gutter));
-    if (gutters.size !== 1) throw new Error('size _ layout.json: Grid/content-gutter differs by mode; --layout-grid-gap is one value.');
-    const gridGap = [...gutters][0];
-
-    const semantics = readSource('size _ semantics.json', { oneMode: true });
-    const twin = semantics.json.variables.find((v) => slug(v.name) === GRID_GAP_EQUALS);
-    const twinValue = twin?.resolvedValuesByMode[semantics.modes[0]];
-    if (twinValue !== gridGap) {
-        stale('GRID_GAP_EQUALS', `Grid/content-gutter is ${gridGap} but ${GRID_GAP_EQUALS} is ${twinValue}; the note no longer holds.`);
-    }
-
-    const columns = (mode, indent) =>
-        Array.from({ length: 12 }, (_, i) => `${indent}--col-${i + 1}: ${px(variable(`Columns/col-${i + 1}`)(mode))};\n`).join('');
-
-    const heights = json.variables
-        .map((v) => ({ v, match: /^(Min|Max) Heights\/(.+)$/.exec(v.name) }))
-        .filter(({ match }) => match)
-        .map(({ v, match }) => ({
-            token: `layout-${match[1].toLowerCase()}-height-${slug(match[2])}`,
-            figma: v.name,
-            at: (mode) => v.resolvedValuesByMode[mode.id],
-        }))
-        .sort((a, b) => a.token.localeCompare(b.token));
-    const varies = (h) => new Set(modes.map(h.at)).size > 1;
-    const heightLines = (mode, indent, only) =>
-        heights.filter(only).map((h) => `${indent}--${h.token}: ${px(h.at(mode))}; /* Figma ${h.figma} */\n`).join('');
-
-    let scss = `/**
- * Layout Tokens
- * Breakpoints, containers, and column widths
- */
-
-:root {
-    /* Breakpoints */
-${Object.entries(breakpoints).map(([k, v]) => `    --breakpoint-${k}: ${px(v)};\n`).join('')}
-    /* App shell + content grid */
-    /* Legacy spec-page grid: --layout-grid-gap and --col-* below serve the spec pages only; new work uses the screen and content grid tokens in _frame_layers.scss */
-    --layout-grid-gap: ${px(gridGap)}; /* Figma Grid/content-gutter (= --stack-md); col-* spans assume this */
-
-    /* Min and max heights — ${modes[0].key.toUpperCase()} values where they differ by breakpoint */
-${heightLines(modes[0], '    ', () => true)}
-    /* Content-grid column spans — ${modes[0].key.toUpperCase()} values; wider breakpoints override below */
-${columns(modes[0], '    ')}}
-`;
-    for (const mode of modes.slice(1)) {
-        scss += `\n@media (min-width: ${px(breakpoints[`${mode.key}-min`])}) {\n    :root {\n${heightLines(mode, '        ', varies)}${columns(mode, '        ')}    }\n}\n`;
-    }
-    return scss;
-}
-
 /*
- * THE NEW SCALES
+ * THE SCALES
  *
- * The collections the layout, token and type system adds beside the old
- * `size / *` ones: spacing / primitives (space, radius, stroke and size,
+ * Two collections: spacing / primitives (space, radius, stroke and size,
  * hidden in Figma) and spacing / foundations, whose folders are Size (common
  * Height/Width plus Item, Row, Label, Field, Icon, Image), Element and Border.
- * They carry their own CSS names, so the old tokens keep resolving while each
- * use moves across.
  *
  * Nothing here derives a name. Each variable's WEB code syntax in Figma is its
  * CSS name, so a variable without one is a refusal rather than a guess, and
@@ -631,7 +101,7 @@ function byFolder(variables, depth = 0) {
 const webName = (syntax) => /^var\((--[a-z0-9-]+)\)$/.exec(syntax ?? '')?.[1] ?? null;
 
 /**
- * Generate the new scales SCSS
+ * Generate the scales SCSS
  */
 function generateScalesSCSS() {
     const sources = SCALE_COLLECTIONS.map(({ file, heading }) => ({ file, heading, ...readSource(file, { oneMode: true }) }));
@@ -682,14 +152,12 @@ function generateScalesSCSS() {
  * FRAME AND LAYER TOKENS
  *
  * The sets listed in `scripts/lib/frame-layer-collections.mjs`, which also
- * says how a variable's code name is made. They sit beside the `size / *`
- * tokens above under new names, so nothing that reads an old name changes
- * until it is moved. Each variable's Figma code syntax has to name the same
+ * says how a variable's code name is made. Each variable's Figma code syntax has to name the same
  * token, so the name a designer copies from Figma is the one code declares,
  * and every alias resolves into the scales above.
  */
 
-/** The modes `spacing / layout` takes, named as `size _ layout.json` names the breakpoint each starts at. */
+/** The modes `spacing / layout` takes, each named with the screen width it starts at. */
 const FRAME_LAYER_MODES = ['Medium (768px)', 'Large (1024px)', 'X-Large (1440px)'];
 
 /**
@@ -750,13 +218,11 @@ function generateFrameLayersSCSS() {
         }
     }
 
-    const layout = readSource('size _ layout.json').json;
-    const minWidth = layout.variables.find((v) => v.name === 'Breakpoints/min width');
-    const layoutModeIds = Object.fromEntries(Object.entries(layout.modes).map(([id, name]) => [name, id]));
+    // A mode names the screen width it starts at: `Large (1024px)` -> 1024.
     const startsAt = (mode) => {
-        const id = layoutModeIds[mode];
-        if (!id) throw new Error(`size _ layout.json: no "${mode}" mode.`);
-        return minWidth.resolvedValuesByMode[id];
+        const width = /\((\d+)px\)/.exec(mode)?.[1];
+        if (!width) throw new Error(`spacing / layout: mode "${mode}" names no width.`);
+        return Number(width);
     };
 
     const declared = new Map();
@@ -891,8 +357,8 @@ function typeToken(v) {
  * The faces after the Figma family in each stack. Figma holds one family name;
  * a stylesheet needs a chain that ends in a CSS generic, UNQUOTED: a quoted
  * `"sans-serif"` is a family nothing is called, so the chain simply ends
- * (`check:font-families`). The body stack keeps the Open Sans step
- * `--font-family-body` already had.
+ * (`check:font-families`). Each Noto face falls back to a local face resized
+ * to its metrics (`_fonts.scss`).
  */
 const FAMILY_FALLBACKS = {
     'Family/heading': ['"Noto Sans Fallback"', 'sans-serif'],
@@ -1045,10 +511,6 @@ const OUT_DIR = TOKEN_DIR;
 let generated;
 try {
     generated = [
-        { file: '_colors.scss', generated: dropRetired(generateColorsSCSS(), new Set(RETIRED_COLORS.keys())) },
-        { file: '_primitives.scss', generated: generatePrimitivesSCSS() },
-        { file: '_spacing_semantics.scss', generated: dropRetired(generateSemanticsSCSS()) },
-        { file: '_layout.scss', generated: dropRetired(generateLayoutSCSS()) },
         { file: '_scales.scss', generated: dropRetired(generateScalesSCSS()) },
         { file: '_frame_layers.scss', generated: dropRetired(generateFrameLayersSCSS()) },
         { file: '_type.scss', generated: generateTypeSCSS() },

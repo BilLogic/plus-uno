@@ -12,7 +12,7 @@
  * `scripts/baselines/focus-ring.json` records the sweep with no exceptions.
  *
  * A RING ON A GROUND ITS CALLER PAINTS is measured, not excused. A rule can
- * declare the grounds it sits on with `// @grounds: --color-x --color-y` as
+ * declare the grounds it sits on with `// @grounds: --ds-x --ds-y` as
  * the first thing in a rule (`scripts/lib/declared-grounds.mjs`, an AST walk
  * over postcss-scss). Walking out from a focus rule, the first rule with a
  * background or a `@grounds` decides its ground; a declared list is held to

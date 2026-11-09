@@ -1,10 +1,15 @@
 {
   "why": "Text colors below their contrast bar that are allowed to stand, each with the reason. A count may fall and never rise; a new finding is fixed, or recorded here with a reason a reader can check.",
-  "measured": "AA 4.5:1, ground from each rule, page fallback --color-surface",
+  "measured": "AA 4.5:1 for each --ds-text-* color, ground from each rule, page fallback --ds-surface",
   "sets": {
     "main": {
       "reasons": "required",
-      "entries": {}
+      "entries": {
+        "design-system/src/components/text-and-data-display/CodeBlock/CodeBlock.scss|--ds-text-code-gutter|--ds-background-code-gutter": {
+          "count": 1,
+          "reason": "Line numbers in the gutter, 4.19:1. The numbers are aria-hidden and unselectable, a reading aid beside the code rather than text a reader has to read; the code itself is measured on its own ground."
+        }
+      }
     }
   }
 }

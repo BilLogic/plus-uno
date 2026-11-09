@@ -33,7 +33,7 @@ test('the shrink refusal exiting 0 is cosmetic, and fails', () => {
 test('a stale exception fails, and the finding quotes the generator', () => {
   const output =
     'Generating token SCSS files...\n\n❌ Stale exception. These exceptions no longer describe a difference from Figma:\n\n' +
-    "   SEMANTIC_OVERRIDES: Figma's element-radius-sm is now var(--size-border-radius-radius-100)\n";
+    "   SEMANTIC_OVERRIDES: Figma's element-radius-sm is now var(--radius-025)\n";
   const [finding] = verdict({ status: 1, output });
   assert.match(finding, /exited 1, and not because a file would shrink/);
   assert.match(finding, /Stale exception/);

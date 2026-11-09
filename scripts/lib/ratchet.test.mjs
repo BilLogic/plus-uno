@@ -48,7 +48,7 @@ const record = (entries, extra = {}) => ({
 
 test('every live record is in the envelope, reads as itself, and a no-movement --update changes no byte', () => {
   const files = fs.readdirSync(path.join(REPO_ROOT, BASELINES)).filter((f) => f.endsWith('.json'));
-  assert.ok(files.length >= 20, `${files.length} records found`);
+  assert.ok(files.length >= 19, `${files.length} records found`);
   for (const name of files) {
     const file = `${BASELINES}/${name}`;
     const text = fs.readFileSync(path.join(REPO_ROOT, file), 'utf8');

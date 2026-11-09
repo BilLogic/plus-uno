@@ -95,14 +95,14 @@ const FABRICATED = ['--elevation-none', '--elevation-sm', '--elevation-md', '--e
 
 /* ------------------------------------------------- the defect that shipped */
 
-test('0c454cce: the four fabricated elevation tokens are absent from _elevation.scss', () => {
+test('0c454cce: the four fabricated elevation tokens are absent from the elevation tokens', () => {
   const scss = fs.readFileSync(
-    path.join(REPO_ROOT, `${TOKEN_DIR}/_elevation.scss`),
+    path.join(REPO_ROOT, `${TOKEN_DIR}/color/_elevation.scss`),
     'utf8',
   );
   const defined = new Set(definedTokens(scss));
-  assert.ok(defined.has('--elevation-light-4'), 'the real names must still be there');
-  assert.ok(defined.has('--elevation-light-5'));
+  assert.ok(defined.has('--ds-shadow-raised'), 'the real names must still be there');
+  assert.ok(defined.has('--ds-shadow-overlay'));
   for (const name of FABRICATED) {
     assert.equal(defined.has(name), false, `${name} must not exist — that was the defect`);
   }

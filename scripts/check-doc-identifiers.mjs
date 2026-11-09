@@ -9,10 +9,10 @@
  * resolves to nothing. Three of those shipped and were hand-fixed in a single
  * day, 2026-08-25:
  *
- *   #78  the elevation guideline documented `--elevation-none/-sm/-md/-lg`. The real names
- *        are `--elevation-light-1..5`.                            (0c454cce)
- *   #79  the spacing guideline's token values contradicted _spacing_semantics.scss. (dbdcf099)
- *   #98  layout.md invented `--size-surface-container-pad-x-sm`.
+ *   #78  the elevation guideline documented `--elevation-none/-sm/-md/-lg`, names
+ *        no stylesheet defined.                                   (0c454cce)
+ *   #79  the spacing guideline's token values contradicted the token file. (dbdcf099)
+ *   #98  layout.md invented a container pad token.
  *
  * All three are the same defect: a name in prose with no referent in source. An
  * agent reading the page writes `var(--elevation-sm)`, gets no shadow, and has
@@ -261,7 +261,7 @@ function check(repoRoot = REPO_ROOT) {
 
   /**
    * Runs of segments inside real token names. The color roles are referred to
-   * by role — "additive `on-surface` overlays" — and `--color-on-surface` is
+   * by role — "the `brand-bold` fill" — and `--ds-background-brand-bold` is
    * where that role is defined. A run that appears in no token name is still a
    * fabrication.
    */

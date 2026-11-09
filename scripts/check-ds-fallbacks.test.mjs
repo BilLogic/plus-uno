@@ -30,7 +30,7 @@ test('a color function, a keyword and a nested var() are all fallbacks', () => {
       [
         '.a { background: var(--ds-surface, rgba(255, 255, 255, 1)); }',
         '.b { color: var( --ds-text-subtle , white); }',
-        '.c { border-color: var(--ds-border, var(--color-outline-variant)); }',
+        '.c { border-color: var(--ds-border, var(--palette-neutral-300)); }',
       ].join('\n'),
     ),
   );
@@ -44,16 +44,16 @@ test('a fallback written across lines is found, on the line its var( opens', () 
   assert.deepEqual(found, [{ file: 'a.scss', line: 3, token: '--ds-border' }]);
 });
 
-test('a bare --ds- token, and a --color- token with a fallback, are not findings here', () => {
-  // The legacy set's fallbacks are `check:color-fallbacks`' record, not this rule.
+test('a bare --ds- token, and a ramp token with a fallback, are not findings here', () => {
+  // A ramp's fallback is `check:color-fallbacks`' question, not this rule's.
   const found = dsFallbacks(
-    file('.a { color: var(--ds-text); border-color: var(--color-primary, #0472a8); }\n'),
+    file('.a { color: var(--ds-text); border-color: var(--palette-lagoon-700, #0472a8); }\n'),
   );
   assert.deepEqual(found, []);
 });
 
-test('a --ds- token used as the FALLBACK of a legacy token is not a --ds- fallback', () => {
-  assert.deepEqual(dsFallbacks(file('.a { color: var(--color-x, var(--ds-text)); }\n')), []);
+test('a --ds- token used as the FALLBACK of another token is not a --ds- fallback', () => {
+  assert.deepEqual(dsFallbacks(file('.a { color: var(--palette-x, var(--ds-text)); }\n')), []);
 });
 
 test('a planted fallback in a fixture tree fails the check, and the generated files are not read', () => {

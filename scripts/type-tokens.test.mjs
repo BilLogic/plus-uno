@@ -79,11 +79,6 @@ test('the family and weight variables resolve to Noto Sans, Noto Serif, Noto San
   assert.equal(corpus.get('--type-weight-semibold')?.value, '600');
 });
 
-test('the older family names alias the new ones, so they change with them', () => {
-  assert.equal(corpus.get('--font-family-header')?.raw, 'var(--type-family-heading)');
-  assert.equal(corpus.get('--font-family-body')?.raw, 'var(--type-family-body)');
-});
-
 test('every text style resolves to its size, line height, weight and family', () => {
   for (const [style, family, size, lineHeight, weight] of STYLES) {
     assert.equal(

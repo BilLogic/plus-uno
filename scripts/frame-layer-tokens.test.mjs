@@ -337,20 +337,10 @@ test('every alias lands on the scales, never on an old --size-* primitive', () =
   }
 });
 
-test('the old tokens the new ones sit beside still resolve, unchanged', () => {
+test('the code-only frame tokens resolve, unchanged', () => {
   const OLD = {
     '--frame-sidebar-width-nav': '164px',
-    '--layout-grid-gap': '8px',
-    '--col-1': '48.67px',
-    '--size-modal-pad-x-sm': '10px',
-    '--size-card-pad-x-sm': '16px',
-    '--size-section-gap-md': '16px',
-    '--size-surface-pad-x': '32px',
-    '--size-surface-container-pad-x': '16px',
-    '--size-table-radius-md': '8px',
     '--listbox-max-width': '320px',
-    '--size-card-radius-sm': '12px',
-    '--size-surface-radius': '16px',
   };
   for (const [name, value] of Object.entries(OLD)) {
     assert.equal(corpus.get(name)?.value, value, name);

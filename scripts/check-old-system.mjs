@@ -11,20 +11,14 @@
  * WHAT IT READS. Every tracked `.scss .css .jsx .js .mjs .ts .tsx .html .mdx
  * .md` file under `design-system/src` and `prototypes`, by
  * `git ls-files` (a filesystem walk finds a second copy of the tree under
- * `.claude/worktrees/`). Comments count: a comment that cites an old name
- * teaches it.
+ * `.claude/worktrees/`), plus the docs that teach the system (`DOC_ROOTS`).
+ * Comments count: a comment that cites an old name teaches it.
  *
  * WHAT IT COUNTS, per family and per file, keyed `<family> <path>`: lines
  * matching one of `FAMILIES`, a family named by its wildcard (`--x-*`) included.
- * Each family that moves to the current system adds its row here. The docs
- * outside these roots (guidelines, agent views, `docs/`) join when the docs
- * purge removes their legacy rows.
  *
- * WHAT IT SKIPS.
- *   - `OLD_DEFINITIONS`: the token files that still declare the old names.
- *     This list empties as the components move off them.
- *   - `NOT_THE_DESIGN_SYSTEM`: a file whose matching names belong to another
- *     tool's namespace, named with its reason.
+ * WHAT IT SKIPS. `NOT_THE_DESIGN_SYSTEM`: a file whose matching names belong to
+ * another tool's namespace, named with its reason.
  */
 
 import { REPO_ROOT } from './lib/corpus.mjs';
@@ -34,19 +28,17 @@ import { RETIRED_TOKENS } from './lib/tokens/plan.mjs';
 import { trackedSources } from './lib/tracked-sources.mjs';
 
 export { REPO_ROOT };
-export const SEARCH_ROOTS = SOURCE_ROOTS;
-export const SEARCHED = /\.(scss|css|jsx|js|mjs|ts|tsx|html|mdx|md)$/;
-
-/** The token files that still declare old names, until the components move off them. */
-export const OLD_DEFINITIONS = [
-  'design-system/src/tokens/_colors.scss',
-  'design-system/src/tokens/_color_roles.scss',
-  'design-system/src/tokens/_elevation.scss',
-  'design-system/src/tokens/_primitives.scss',
-  'design-system/src/tokens/_spacing_semantics.scss',
-  'design-system/src/tokens/_layout.scss',
-  'design-system/src/tokens/_fonts.scss',
+/** The docs an agent or a designer learns the system from. */
+export const DOC_ROOTS = [
+  '.storybook',
+  'design-system/guidelines',
+  'design-system/agent-views',
+  'docs/engineering',
+  'docs/conventions',
+  'docs/connectors',
 ];
+export const SEARCH_ROOTS = [...SOURCE_ROOTS, ...DOC_ROOTS];
+export const SEARCHED = /\.(scss|css|jsx|js|mjs|ts|tsx|html|mdx|md)$/;
 
 /** Files whose matches are another tool's names, not the design system's. */
 const NOT_THE_DESIGN_SYSTEM = new Map([
@@ -107,7 +99,7 @@ export const FAMILIES = [
 export function measure(sources) {
   const found = new Map();
   for (const { path: file, text } of sources) {
-    if (OLD_DEFINITIONS.includes(file) || NOT_THE_DESIGN_SYSTEM.has(file)) continue;
+    if (NOT_THE_DESIGN_SYSTEM.has(file)) continue;
     const lines = text.split('\n');
     for (const { name, pattern } of FAMILIES) {
       const hits = lines.flatMap((l, i) => (pattern.test(l) ? [i + 1] : []));

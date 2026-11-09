@@ -293,18 +293,10 @@
       ]
     },
     {
-      "not": "--ds-on-surface, --color-on-surface",
+      "not": "--ds-on-surface",
       "use": [
         "--ds-text",
         "--ds-text-subtle"
-      ]
-    },
-    {
-      "not": "--color-surface-container*",
-      "use": [
-        "--ds-surface",
-        "--ds-surface-sunken",
-        "--ds-surface-raised"
       ]
     },
     {

@@ -71,8 +71,6 @@ const bannerOf = (text, name) =>
 const CASES = [
   { name: 'check:color-fallbacks', script: 'check-color-fallbacks.mjs', flag: '--report', prints: /"disagreements"/ },
   { name: 'check:size-fallbacks', script: 'check-size-fallbacks.mjs', flag: '--report', prints: /"disagreements"/ },
-  { name: 'check:atlassian-benchmark', script: 'check-atlassian-benchmark.mjs', flag: '--table', prints: /atlassian/ },
-  { name: 'check:atlassian-benchmark', script: 'check-atlassian-benchmark.mjs', flag: '--how', prints: /Re-measuring/ },
   { name: 'check:doc-identifiers', script: 'check-doc-identifiers.mjs', flag: '--stats', prints: /^pages\s+\d+/m },
 ];
 

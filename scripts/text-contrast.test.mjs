@@ -5,8 +5,8 @@
  * of this suite rather than a footnote:
  *
  *   1. READING A GROUND THAT IS NOT THERE. The first draft measured everything
- *      against the page and reported `color: var(--color-surface)` beside
- *      `background-color: var(--color-success)` as white-on-white at 1:1.
+ *      against the page and reported `color: var(--ds-text-inverse)` beside
+ *      `background-color: var(--ds-background-success-bold)` as white-on-white at 1:1.
  *   2. READING A STATE LAYER AS PAINT. The second draft read the ground from
  *      the rule and then treated `rgba(4, 114, 168, 0.08)` as solid. 34 of its
  *      48 findings were an 8% wash mistaken for a color — the same arithmetic
@@ -47,11 +47,16 @@ import { declarationErrors } from './lib/declared-grounds.mjs';
  * that, so this one has the right type.
  */
 const VALUES = new Map([
-  ['--color-surface', '#f9f9fc'],
-  ['--color-success', '#3e691a'],
-  ['--color-warning', '#9f8205'],
-  ['--color-warning-text', '#5b4a00'],
-  ['--color-primary', '#0472a8'],
+  ['--ds-surface', '#f9f9fc'],
+  ['--ds-background-success-bold', '#3e691a'],
+  ['--ds-background-warning-bold', '#9f8205'],
+  ['--ds-text-inverse', '#f9f9fc'],
+  // A page-colored text token that is not an inverse role, so the page is measured.
+  ['--ds-text-pale', '#f9f9fc'],
+  ['--ds-text-warning', '#9f8205'],
+  ['--ds-text-warning-bolder', '#5b4a00'],
+  ['--ds-background-brand-bold', '#0472a8'],
+  ['--ds-text-brand', '#0472a8'],
   ['--tint-primary-08', 'rgba(4, 114, 168, 0.08)'],
 ]);
 
@@ -65,10 +70,10 @@ function fixture(name, content) {
 test('a background in the SAME rule is the ground', () => {
   const { root, file } = fixture(
     'snack.scss',
-    `.a {\n  background-color: var(--color-success);\n  color: var(--color-surface);\n}\n`,
+    `.a {\n  background-color: var(--ds-background-success-bold);\n  color: var(--ds-text-inverse);\n}\n`,
   );
   const [use] = textDeclarations([file], root);
-  assert.equal(use.ground, '--color-success');
+  assert.equal(use.ground, '--ds-background-success-bold');
   // White on green, not white on white. Under the page assumption this is 1:1.
   assert.ok(ratio(use.token, VALUES, use.ground) > 4.5);
 });
@@ -79,48 +84,48 @@ test('a background in a CHILD rule is not this rule’s ground', () => {
   // baseline records why — a wrong answer here would be worse than no answer.
   const { root, file } = fixture(
     'child.scss',
-    `.a {\n  color: var(--color-surface);\n\n  &--created {\n    background-color: var(--color-success);\n  }\n}\n`,
+    `.a {\n  color: var(--ds-text-inverse);\n\n  &--created {\n    background-color: var(--ds-background-success-bold);\n  }\n}\n`,
   );
   const [use] = textDeclarations([file], root);
-  assert.equal(use.ground, '--color-surface');
+  assert.equal(use.ground, '--ds-surface');
 });
 
 test('a translucent ground is composited over the page, not read as paint', () => {
   const solid = opaqueGround('--tint-primary-08', VALUES);
   // 8% of #0472a8 over #f9f9fc is a near-white wash, nothing like the blue.
   assert.ok(solid.r > 220 && solid.g > 220 && solid.b > 230, JSON.stringify(solid));
-  const measured = ratio('--color-primary', VALUES, '--tint-primary-08');
+  const measured = ratio('--ds-text-brand', VALUES, '--tint-primary-08');
   assert.ok(measured > 4 && measured < 5, `expected ~4.46, got ${measured}`);
 });
 
 test('background-color and border-color are not text', () => {
   const { root, file } = fixture(
     'not-text.scss',
-    `.a {\n  background-color: var(--color-warning);\n  border-color: var(--color-warning);\n}\n`,
+    `.a {\n  background-color: var(--ds-background-warning-bold);\n  border-color: var(--ds-background-warning-bold);\n}\n`,
   );
   assert.deepEqual(textDeclarations([file], root), []);
 });
 
 test('the -text sibling is offered only when the token file defines one', () => {
-  assert.equal(textSibling('--color-warning', VALUES), '--color-warning-text');
-  assert.equal(textSibling('--color-primary', VALUES), null);
+  assert.equal(textSibling('--ds-text-warning', VALUES), '--ds-text-warning-bolder');
+  assert.equal(textSibling('--ds-text-brand', VALUES), null);
 });
 
 test('a warning text color on the page is a finding, and names its sibling', () => {
-  const { root, file } = fixture('tag.scss', `.a {\n  color: var(--color-warning);\n}\n`);
+  const { root, file } = fixture('tag.scss', `.a {\n  color: var(--ds-text-warning);\n}\n`);
   const [found] = findings(textDeclarations([file], root), VALUES);
-  assert.equal(found.token, '--color-warning');
+  assert.equal(found.token, '--ds-text-warning');
   assert.equal(found.ratio, 3.52);
-  assert.equal(found.sibling, '--color-warning-text');
+  assert.equal(found.sibling, '--ds-text-warning-bolder');
   assert.ok(found.siblingRatio > 8);
 });
 
 test('the same color via the -text sibling is not a finding', () => {
-  const { root, file } = fixture('tag.scss', `.a {\n  color: var(--color-warning-text);\n}\n`);
+  const { root, file } = fixture('tag.scss', `.a {\n  color: var(--ds-text-warning-bolder);\n}\n`);
   assert.deepEqual(findings(textDeclarations([file], root), VALUES), []);
 });
 
-const KEY = 'a.scss|--color-warning|--color-surface';
+const KEY = 'a.scss|--ds-text-warning|--ds-surface';
 
 // The four cases below are about the WORDING, which is what stayed with the
 // check when #599 moved the record, the direction and the write into
@@ -164,10 +169,10 @@ test('the ratchet says nothing when nothing moved', () => {
 });
 
 test('the baseline key is file + token + ground, not a line number', () => {
-  const key = keyOf({ file: 'a.scss', token: '--color-warning', ground: '--color-surface', line: 91 });
+  const key = keyOf({ file: 'a.scss', token: '--ds-text-warning', ground: '--ds-surface', line: 91 });
   assert.equal(key, KEY);
-  assert.deepEqual(census([{ file: 'a.scss', token: '--color-warning', ground: '--color-surface', line: 1 },
-    { file: 'a.scss', token: '--color-warning', ground: '--color-surface', line: 40 }]), { [KEY]: 2 });
+  assert.deepEqual(census([{ file: 'a.scss', token: '--ds-text-warning', ground: '--ds-surface', line: 1 },
+    { file: 'a.scss', token: '--ds-text-warning', ground: '--ds-surface', line: 40 }]), { [KEY]: 2 });
 });
 
 /*
@@ -176,35 +181,35 @@ test('the baseline key is file + token + ground, not a line number', () => {
  * holds an icon glyph to 3:1.
  */
 const INVERSE = (grounds) =>
-  `.x--inverse {\n  // @grounds: ${grounds}\n  color: var(--color-surface);\n  &:hover { color: var(--color-surface); }\n}\n`;
+  `.x--inverse {\n  // @grounds: ${grounds}\n  color: var(--ds-text-inverse);\n  &:hover { color: var(--ds-text-inverse); }\n}\n`;
 
 const errorsOf = ({ root, file }) => declarationErrors([file], root, VALUES, { contrast: true }).join('\n');
 
 test('@grounds: a color is measured on each declared ground, and passes when all clear the bar', () => {
-  const fx = fixture('inverse.scss', INVERSE('--color-success --color-primary'));
+  const fx = fixture('inverse.scss', INVERSE('--ds-background-success-bold --ds-background-brand-bold'));
   const uses = textDeclarations([fx.file], fx.root);
   // Two declarations (the rule and its nested :hover) × two grounds.
-  assert.deepEqual(uses.map((u) => u.ground).sort(), ['--color-primary', '--color-primary', '--color-success', '--color-success']);
+  assert.deepEqual(uses.map((u) => u.ground).sort(), ['--ds-background-brand-bold', '--ds-background-brand-bold', '--ds-background-success-bold', '--ds-background-success-bold']);
   assert.deepEqual(findings(uses, VALUES), []);
   assert.equal(errorsOf(fx), '');
 });
 
 test('@grounds: one declared ground under the bar is a finding, keyed by that ground', () => {
-  const { root, file } = fixture('inverse.scss', INVERSE('--color-success --color-warning'));
+  const { root, file } = fixture('inverse.scss', INVERSE('--ds-background-success-bold --ds-background-warning-bold'));
   const found = findings(textDeclarations([file], root), VALUES);
   assert.ok(found.length > 0);
-  assert.ok(found.every((f) => f.ground === '--color-warning' && f.ratio === 3.52));
+  assert.ok(found.every((f) => f.ground === '--ds-background-warning-bold' && f.ratio === 3.52));
 });
 
 test('@grounds: an unknown token or an empty list is an error, not a pass', () => {
-  assert.match(errorsOf(fixture('unknown.scss', INVERSE('--color-success --color-nope'))), /--color-nope/);
+  assert.match(errorsOf(fixture('unknown.scss', INVERSE('--ds-background-success-bold --ds-nope'))), /--ds-nope/);
   assert.match(errorsOf(fixture('empty.scss', INVERSE(''))), /declares no grounds/);
 });
 
 test('@grounds: without a declaration nothing changes — the page is the ground', () => {
-  const { root, file } = fixture('plain.scss', `.x {\n  color: var(--color-surface);\n}\n`);
+  const { root, file } = fixture('plain.scss', `.x {\n  color: var(--ds-text-pale);\n}\n`);
   const [use] = textDeclarations([file], root);
-  assert.equal(use.ground, '--color-surface');
+  assert.equal(use.ground, '--ds-surface');
   assert.equal(use.declared, null);
   assert.equal(use.nonText, false);
   assert.equal(findings([use], VALUES)[0].ratio, 1);
@@ -213,34 +218,34 @@ test('@grounds: without a declaration nothing changes — the page is the ground
 test('@grounds: a background in the rule itself still wins over a declaration', () => {
   const { root, file } = fixture(
     'own.scss',
-    `.x {\n  // @grounds: --color-warning\n  background-color: var(--color-success);\n  color: var(--color-surface);\n}\n`,
+    `.x {\n  // @grounds: --ds-background-warning-bold\n  background-color: var(--ds-background-success-bold);\n  color: var(--ds-text-inverse);\n}\n`,
   );
-  assert.deepEqual(textDeclarations([file], root).map((u) => u.ground), ['--color-success']);
+  assert.deepEqual(textDeclarations([file], root).map((u) => u.ground), ['--ds-background-success-bold']);
 });
 
 test('@grounds: an OWN background that is the page token beats an ancestor declaration', () => {
   const { root, file } = fixture(
     'own-page.scss',
-    `.x {\n  // @grounds: --color-success\n  .y {\n    background-color: var(--color-surface);\n    color: var(--color-surface);\n  }\n}\n`,
+    `.x {\n  // @grounds: --ds-background-success-bold\n  .y {\n    background-color: var(--ds-surface);\n    color: var(--ds-text-pale);\n  }\n}\n`,
   );
   const uses = textDeclarations([file], root);
-  assert.deepEqual(uses.map((u) => u.ground), ['--color-surface']);
+  assert.deepEqual(uses.map((u) => u.ground), ['--ds-surface']);
   assert.equal(findings(uses, VALUES).length, 1);
 });
 
 test('@grounds: a declaration is validated even where the rule has its own background', () => {
   const fx = fixture(
     'own-bad.scss',
-    `.x {\n  // @grounds: --color-nope\n  background-color: var(--color-success);\n  color: var(--color-surface);\n}\n`,
+    `.x {\n  // @grounds: --ds-nope\n  background-color: var(--ds-background-success-bold);\n  color: var(--ds-text-inverse);\n}\n`,
   );
-  assert.match(errorsOf(fx), /--color-nope/);
+  assert.match(errorsOf(fx), /--ds-nope/);
 });
 
-const ICON = (selector, grounds = '--color-success') =>
-  `.x--inverse {\n  // @grounds: ${grounds}\n  ${selector} {\n    // @contrast: non-text\n    color: var(--color-surface);\n  }\n}\n`;
+const ICON = (selector, grounds = '--ds-background-success-bold') =>
+  `.x--inverse {\n  // @grounds: ${grounds}\n  ${selector} {\n    // @contrast: non-text\n    color: var(--ds-text-pale);\n  }\n}\n`;
 
 test('@contrast: non-text holds an icon glyph to 3:1 — passes at 3.52:1 on warning', () => {
-  const fx = fixture('glyph.scss', ICON('.x__icon.fa-solid', '--color-warning'));
+  const fx = fixture('glyph.scss', ICON('.x__icon.fa-solid', '--ds-background-warning-bold'));
   const uses = textDeclarations([fx.file], fx.root);
   assert.ok(uses.every((u) => u.nonText));
   assert.deepEqual(findings(uses, VALUES), []);
@@ -248,14 +253,14 @@ test('@contrast: non-text holds an icon glyph to 3:1 — passes at 3.52:1 on war
 });
 
 test('@contrast: non-text still fails a glyph under 3:1', () => {
-  const { root, file } = fixture('glyph-low.scss', ICON('svg', '--color-surface'));
+  const { root, file } = fixture('glyph-low.scss', ICON('svg', '--ds-surface'));
   const [found] = findings(textDeclarations([file], root), VALUES);
   assert.equal(found.bar, 3);
   assert.equal(found.ratio, 1);
 });
 
 test('@contrast: non-text on a text selector is an error, and the text bar stays', () => {
-  const fx = fixture('text.scss', ICON('.x__label', '--color-warning'));
+  const fx = fixture('text.scss', ICON('.x__label', '--ds-background-warning-bold'));
   assert.match(errorsOf(fx), /@contrast: non-text on a text selector/);
   const uses = textDeclarations([fx.file], fx.root);
   assert.ok(uses.every((u) => !u.nonText));
@@ -266,10 +271,10 @@ test('a finding names where its ground came from: own rule, ancestor, @grounds, 
   const { root, file } = fixture(
     'origin.scss',
     [
-      '.own {\n  background-color: var(--color-success);\n  color: var(--color-warning);\n}\n',
-      '.outer {\n  background-color: var(--color-success);\n  .inner { color: var(--color-warning); }\n}\n',
-      '.declared {\n  // @grounds: --color-success\n  color: var(--color-warning);\n}\n',
-      '.page {\n  color: var(--color-warning);\n}\n',
+      '.own {\n  background-color: var(--ds-background-success-bold);\n  color: var(--ds-text-warning);\n}\n',
+      '.outer {\n  background-color: var(--ds-background-success-bold);\n  .inner { color: var(--ds-text-warning); }\n}\n',
+      '.declared {\n  // @grounds: --ds-background-success-bold\n  color: var(--ds-text-warning);\n}\n',
+      '.page {\n  color: var(--ds-text-warning);\n}\n',
     ].join(''),
   );
   const labels = textDeclarations([file], root).map((use) => groundLabel(use));
@@ -283,8 +288,8 @@ test('a finding names where its ground came from: own rule, ancestor, @grounds, 
 
 test('the report labels a hand-made finding from the origin it carries', () => {
   const finding = {
-    file: 'a.scss', line: 3, source: 'color: var(--color-warning);', token: '--color-warning',
-    ground: '--color-success', origin: { kind: 'ancestor', line: 1 }, ratio: 1.5, bar: 4.5, sibling: null,
+    file: 'a.scss', line: 3, source: 'color: var(--ds-text-warning);', token: '--ds-text-warning',
+    ground: '--ds-background-success-bold', origin: { kind: 'ancestor', line: 1 }, ratio: 1.5, bar: 4.5, sibling: null,
   };
-  assert.match(report([finding]), /on --color-success \(the background of an ancestor rule, line 1\)/);
+  assert.match(report([finding]), /on --ds-background-success-bold \(the background of an ancestor rule, line 1\)/);
 });

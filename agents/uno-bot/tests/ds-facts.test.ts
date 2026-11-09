@@ -75,7 +75,7 @@ test("tokens by name and by role, and the not-here list, answer as the root modu
   const root = await rootFacts();
   const facts = dsFacts();
   const groups = new Set(root.manifests.tokens.tokens.map((t) => t.group));
-  const queries = ["stack", "inline", "space", "radius", "--stack-md", "--stack-xl", "--radius-4", "--space-100", "--nonesuch", "--color-surface-container-high", ...groups];
+  const queries = ["stack", "inline", "space", "radius", "--stack-md", "--stack-xl", "--radius-4", "--space-100", "--nonesuch", "--ds-on-surface", ...groups];
   for (const t of root.manifests.tokens.tokens.slice(0, 200)) queries.push(t.name);
   for (const r of root.notHere().filter((r) => r.kind === "token")) queries.push(String(r.not).split(/[\s,(]/)[0]!);
   for (const q of queries) assert.deepEqual(facts.tokens(q), root.tokens(q), q);

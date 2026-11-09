@@ -46,7 +46,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { COLOR_TOKEN_PATHS, COLOR_VALUE_PREFIXES, TOKEN_DIR } from '../design-system/src/lib/tokens-node.mjs';
+import { COLOR_TOKEN_PATHS, COLOR_VALUE_PREFIXES } from '../design-system/src/lib/tokens-node.mjs';
 import {
   composite,
   contrast,
@@ -59,15 +59,10 @@ import {
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, '..');
 
-export const TOKENS_FILE = `${TOKEN_DIR}/_colors.scss`;
 export const BUTTON_SCSS = 'design-system/src/components/forms-and-inputs/Button/Button.scss';
 
-/**
- * The page a button sits on when its own fill draws no ground. Still the
- * legacy page while every component paints on it; it moves to `--ds-surface`
- * when the pages do.
- */
-export const PAGE_TOKEN = '--color-surface';
+/** The page a button sits on when its own fill draws no ground. */
+export const PAGE_TOKEN = '--ds-surface';
 
 /** WCAG AA for body text. Buttons are body text; none of ours is 24px regular. */
 export const AA_TEXT = 4.5;
@@ -257,18 +252,14 @@ export function findings(themes, values, verdicts = {}) {
 /**
  * Reads the repo. Separated so every function above stays testable on strings.
  *
- * The values are the legacy color file, then the generated `--palette-*` and
- * `--ds-*` sets, so a theme map naming `--ds-background-brand-bold` resolves it
- * exactly as it resolves `--color-primary`. The legacy file is required, as it
- * always was; the generated ones are read when they are there.
+ * The values are the generated `--palette-*` and `--ds-*` sets, so a theme map
+ * naming `--ds-background-brand-bold` resolves it through to its ramp value.
  */
 export function readRepo(root = REPO_ROOT) {
-  const tokens = [
-    fs.readFileSync(path.join(root, TOKENS_FILE), 'utf8'),
-    ...COLOR_TOKEN_PATHS.map((file) => path.join(root, file))
-      .filter((file) => fs.existsSync(file))
-      .map((file) => fs.readFileSync(file, 'utf8')),
-  ].join('\n');
+  const tokens = COLOR_TOKEN_PATHS.map((file) => path.join(root, file))
+    .filter((file) => fs.existsSync(file))
+    .map((file) => fs.readFileSync(file, 'utf8'))
+    .join('\n');
   const button = fs.readFileSync(path.join(root, BUTTON_SCSS), 'utf8');
   return { values: tokenValues(tokens), themes: themeMap(button) };
 }

@@ -60,27 +60,3 @@ export function dropRetired(scss, retired = RETIRED_TOKENS) {
   while (lines.length && lines[lines.length - 1].trim() === '') lines.pop();
   return `${lines.join('\n')}\n`;
 }
-
-/**
- * The color names already retired from the old color collections, each with
- * the `--ds-*` token its uses moved to. The generator still reads those
- * archived Figma exports, so it drops these from what it writes; the rest of
- * the old color set stays only until the components move off it.
- */
-export const RETIRED_COLORS = new Map([
-  ['--color-primary-border', '--ds-border-brand'],
-  ['--color-scrim', '--ds-blanket'],
-  ['--color-disabled-opacity', '--ds-opacity-disabled'],
-  ['--color-inverse-surface', '--ds-background-neutral-bold'],
-  ['--color-inverse-on-surface', '--ds-text-inverse'],
-  ['--color-focus-ring', '--ds-border-focused'],
-  ['--color-focus-ring-inverse', '--ds-border-focused-inverse'],
-  ['--surface-raised-shadow', '--ds-shadow-raised'],
-  ['--surface-overlay-shadow', '--ds-shadow-overlay'],
-  ['--elevation-light-1', '--ds-shadow-raised'],
-  ['--elevation-light-2', '--ds-shadow-raised'],
-  ['--elevation-light-3', '--ds-shadow-overlay'],
-]);
-
-/** The `--ds-*` token a retired color name moved to, or undefined for a name still declared. */
-export const retiredTo = (name) => RETIRED_COLORS.get(name);

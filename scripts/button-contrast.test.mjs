@@ -34,16 +34,16 @@ import {
 } from './button-contrast.mjs';
 
 test('tokenValues reads the color tokens and only those', () => {
-  const values = tokenValues(':root { --color-primary: #123456; --space-2: 8px; }');
-  assert.equal(values.get('--color-primary'), '#123456');
+  const values = tokenValues(':root { --ds-border-brand: #123456; --space-2: 8px; }');
+  assert.equal(values.get('--ds-border-brand'), '#123456');
   assert.equal(values.has('--space-2'), false, 'a spacing token is not a color this check can resolve');
 });
 
 test('tokenValues reads both color vocabularies and the ramps --ds- tokens alias', () => {
   const values = tokenValues(
-    ':root { --color-primary: #123456; --ds-text-brand: var(--palette-lagoon-800); --palette-lagoon-800: #106972; --space-2: 8px; }',
+    ':root { --ds-border-brand: #123456; --ds-text-brand: var(--palette-lagoon-800); --palette-lagoon-800: #106972; --space-2: 8px; }',
   );
-  assert.equal(values.get('--color-primary'), '#123456');
+  assert.equal(values.get('--ds-border-brand'), '#123456');
   assert.equal(values.get('--ds-text-brand'), 'var(--palette-lagoon-800)');
   assert.equal(values.get('--palette-lagoon-800'), '#106972');
   assert.equal(values.has('--space-2'), false);
@@ -51,7 +51,7 @@ test('tokenValues reads both color vocabularies and the ramps --ds- tokens alias
 
 test('a map written in --ds- tokens is swept through the palette aliases', () => {
   const values = tokenValues(`:root {
-    --color-surface: #f9f9fc;
+    --ds-surface: #f9f9fc;
     --palette-lagoon-700: #147b84;
     --palette-neutral-0: #ffffff;
     --palette-yellow-300: #f5e08a;
@@ -97,7 +97,7 @@ const FAILING = {
     { appearance: 'bad', ground: '--bad', label: '--on-bad', hovered: '--ok', pressed: '--ok', edge: 'transparent' },
   ],
   values: new Map([
-    ['--color-surface', '#ffffff'],
+    ['--ds-surface', '#ffffff'],
     ['--ok', '#00404a'], ['--on-ok', '#ffffff'],
     ['--bad', '#9f8205'], ['--on-bad', '#ffffff'],
   ]),
@@ -113,7 +113,7 @@ test('the sweep reports a label under AA', () => {
 
 test('a transparent ground is the page, and an alpha step is composited over it', () => {
   const values = new Map([
-    ['--color-surface', '#ffffff'], ['--label', '#000000'], ['--clear', 'transparent'], ['--step', 'rgba(0, 0, 0, 0.08)'],
+    ['--ds-surface', '#ffffff'], ['--label', '#000000'], ['--clear', 'transparent'], ['--step', 'rgba(0, 0, 0, 0.08)'],
   ]);
   const theme = { appearance: 'subtle', ground: '--clear', label: '--label', hovered: '--step', pressed: '--step', edge: 'transparent' };
   const rest = combination(theme, 'rest', values);
@@ -152,7 +152,7 @@ test('duplicateGrounds finds two appearances drawing one look, and an edge tells
     { appearance: 'c', ground: '--i', label: '--x', hovered: '--t', pressed: '--t', edge: '--line' },
   ];
   const values = new Map([
-    ['--color-surface', '#ffffff'], ['--t', '#0e8175'], ['--i', 'var(--t)'], ['--x', '#ffffff'], ['--line', '#888888'],
+    ['--ds-surface', '#ffffff'], ['--t', '#0e8175'], ['--i', 'var(--t)'], ['--x', '#ffffff'], ['--line', '#888888'],
   ]);
   assert.deepEqual(duplicateGrounds(themes, values), [['a', 'b']]);
   assert.deepEqual(measured(themes, values).duplicates, ['a+b']);
@@ -164,14 +164,14 @@ test('duplicateGrounds finds two appearances drawing one look, and an edge tells
 
 test('a duplicate baseline entry that no longer duplicates is a finding', () => {
   const themes = [{ appearance: 'solo', ground: '--t', label: '--x', hovered: '--t', pressed: '--t', edge: 'transparent' }];
-  const values = new Map([['--color-surface', '#ffffff'], ['--t', '#00404a'], ['--x', '#ffffff']]);
+  const values = new Map([['--ds-surface', '#ffffff'], ['--t', '#00404a'], ['--x', '#ffffff']]);
   const found = findings(themes, values, { duplicates: { stale: ['a+b'] } });
   assert.deepEqual(found, ['baseline entry "a+b" no longer duplicates — remove it']);
 });
 
 test('an unresolvable token is reported, not scored', () => {
   const themes = [{ appearance: 'ghosted', ground: '--missing', label: '--x', hovered: '--x', pressed: '--x', edge: 'transparent' }];
-  const values = new Map([['--color-surface', '#ffffff'], ['--x', '#000000']]);
+  const values = new Map([['--ds-surface', '#ffffff'], ['--x', '#000000']]);
   const built = combination(themes[0], 'rest', values);
   assert.deepEqual(built.unresolved, ['--missing']);
   assert.match(findings(themes, values)[0], /cannot resolve --missing/);

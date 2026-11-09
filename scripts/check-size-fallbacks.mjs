@@ -11,16 +11,16 @@
  * and the `--update` merge, reached through that same file (#600). What is left
  * here is the three ways this family differs (#610).
  *
- * IT IS THE BIGGER HALF. 546 disagreements inside `design-system/src` against
- * color's 191 across the whole corpus, and the spread is worse: 61 uses of
- * `var(--size-section-gap-sm, 16px)` for a token that is `8px`, 52 of
- * `var(--size-element-pad-y-lg, 12px)` for a token that is `8px`. When the token
+ * IT WAS THE BIGGER HALF. 546 disagreements inside `design-system/src` against
+ * color's 191 across the whole corpus when first measured, and the spread was
+ * worse: 61 uses of an 8px gap token with a `16px` fallback, 52 of an 8px pad
+ * with a `12px` one. When the token
  * sheet is late — the Storybook docs iframe and six prototype pages carry none —
  * that is not a slightly-wrong shade, it is a different layout.
  *
  * WHICH TOKENS COUNT. Any token, from the same token sources, whose value
  * RESOLVES to a length. Not a name prefix: dimensions are spread across
- * `--size-*`, `--spacing-*`, `--font-size-*` and `--font-line-height-*`, and a
+ * `--space-*`, `--size-*`, `--font-size-*` and `--line-height-*`, and a
  * prefix list is a thing to forget to update. Selecting by value means a new
  * family is covered the day it is minted.
  *

@@ -10,8 +10,9 @@
  * The generated color set (ADR-035) is the exception to deriving a name: its
  * Figma spec, `design-system/src/tokens/color/figma-spec.json`, carries each
  * variable's code syntax (`var(--ds-text-brand)`), so those collections are
- * read from it rather than guessed from the path. The legacy `colors / *`
- * collections keep their derived `--color-*` names until they are retired.
+ * read from it rather than guessed from the path. The archived `colors / *`
+ * and `size / *` collections are still in the Figma snapshot and have no code
+ * counterpart, so they are not mapped (`ARCHIVED_COLLECTION`).
  *
  * Usage:
  *   node scripts/generate-token-registry.mjs          (write)
@@ -37,6 +38,9 @@ const OUT = path.join(REPO_ROOT, 'design-system/figma/token-registry.json');
 /** The generated color set's Figma spec: the variables Figma will hold, with their code syntax. */
 export const COLOR_SPEC_PATH = `${COLOR_TOKEN_DIR}/figma-spec.json`;
 export const COLOR_SPEC = path.join(REPO_ROOT, COLOR_SPEC_PATH);
+
+/** The archived Figma collections, which hold no variable code reads. */
+export const ARCHIVED_COLLECTION = /^(?:colors|size) \/ /;
 
 /** `var(--ds-text-brand)` → `--ds-text-brand`; anything else → null. */
 const WEB_SYNTAX = /^var\(\s*(--[a-z0-9-]+)\s*\)$/;
@@ -188,49 +192,10 @@ export function deriveCandidates(collection, name, { codeSyntax } = {}) {
   if (codeSyntax?.has(name)) return [codeSyntax.get(name)];
   const parts = name.split('/').map((p) => p.trim());
   const leaf = parts[parts.length - 1];
-  const head = parts[0].replace(/^_/, '');
   const out = [];
 
   if (isFrameLayerCollection(collection)) return [`--${frameLayerToken(collection, name)}`];
   if (collection === TYPOGRAPHY_COLLECTION) return [typographyToken(name)].filter(Boolean);
-
-  if (collection.startsWith('colors')) {
-    if (/\(text\)/i.test(leaf)) out.push(`--color-${slug(leaf.replace(/\(text\)/i, ''))}-text`);
-    out.push(`--color-${slug(leaf)}`);
-    out.push(`--color-${slug(head)}-${slug(leaf)}`);
-    return out;
-  }
-
-  if (collection.includes('semantics')) {
-    out.push(`--size-${slug(head)}-${slug(leaf)}`);
-    // Some families are coarser in code than in Figma (Figma has
-    // `Surface Container/pad-x-md`, code only `--size-surface-container-pad-x`).
-    // Fall back to the size-suffix-free form so those still bind.
-    const stripped = slug(leaf).replace(/-(xs|sm|md|lg|xl|full)$/, '');
-    if (stripped !== slug(leaf)) out.push(`--size-${slug(head)}-${stripped}`);
-    return out;
-  }
-
-  if (collection.includes('primitive')) {
-    // Code keeps the full Figma path: "Border/Radius/radius-100" ->
-    // --size-border-radius-radius-100 ; "Spacing/Small/space-100" ->
-    // --size-spacing-small-space-100.
-    out.push(`--size-${slug(name)}`);
-    out.push(`--size-${slug(leaf)}`);
-    out.push(`--${slug(leaf)}`);
-    return out;
-  }
-
-  if (collection.includes('layout')) {
-    // "Min Heights/listbox" -> --layout-min-height-listbox.
-    const height = head.match(/^(Min|Max) Heights$/i);
-    if (height) out.push(`--layout-${height[1].toLowerCase()}-height-${slug(leaf)}`);
-    // Grid columns are bare in code (`--col-1`).
-    out.push(`--${slug(leaf)}`);
-    out.push(`--size-${slug(head)}-${slug(leaf)}`);
-    out.push(`--size-${slug(leaf)}`);
-    return out;
-  }
 
   // The new scale collections carry their code names in Figma's code syntax,
   // which the snapshot does not record, so these candidates restate the rule
@@ -279,7 +244,9 @@ function buildFigmaVariableMappings(scssTokens) {
     }
   };
 
-  for (const [collection, data] of Object.entries(snapshot.collections)) map(collection, data.variables);
+  for (const [collection, data] of Object.entries(snapshot.collections)) {
+    if (!ARCHIVED_COLLECTION.test(collection)) map(collection, data.variables);
+  }
   // A spec collection Figma does not hold yet is still the lookup an agent will
   // need the day it is pushed, and its names are the spec's, not a guess — so it
   // is mapped from the spec, and held to the token sheets like every other one.

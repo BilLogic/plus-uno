@@ -23,8 +23,8 @@ const BASELINE = JSON.stringify({
 test('a disagreeing color fallback in a fixture tree is a finding', () => {
   const { root, done } = policyTree(
     {
-      'design-system/src/tokens/_colors.scss': ':root { --color-primary: #0472a8; }\n',
-      'design-system/src/a.scss': '.a { color: var(--color-primary, #000000); }\n',
+      'design-system/src/tokens/color/_semantic.scss': ':root { --ds-text-brand: #0472a8; }\n',
+      'design-system/src/a.scss': '.a { color: var(--ds-text-brand, #000000); }\n',
       'scripts/baselines/color-fallback-baseline.json': BASELINE,
     },
     { git: true },
@@ -32,7 +32,7 @@ test('a disagreeing color fallback in a fixture tree is a finding', () => {
   try {
     const found = messagesOf(run, root);
     assert.ok(
-      found.some((message) => /--color-primary/.test(message) && /#000000/.test(message)),
+      found.some((message) => /--ds-text-brand/.test(message) && /#000000/.test(message)),
       `expected a disagreement finding, got:\n${found.join('\n')}`,
     );
   } finally {
@@ -44,10 +44,10 @@ test('a stale rgba() wash in a fixture tree is a finding', () => {
   // The token was re-mixed and the wash beside it was not: same alpha, old base.
   const { root, done } = policyTree(
     {
-      'design-system/src/tokens/_colors.scss':
-        ':root { --color-tertiary-tint: rgba(14, 129, 117, 0.08); }\n',
+      'design-system/src/tokens/color/_semantic.scss':
+        ':root { --ds-background-accent-teal-subtlest: rgba(14, 129, 117, 0.08); }\n',
       'design-system/src/a.scss':
-        '.a { background: var(--color-tertiary-tint, rgba(0, 82, 221, 0.08)); }\n',
+        '.a { background: var(--ds-background-accent-teal-subtlest, rgba(0, 82, 221, 0.08)); }\n',
       'scripts/baselines/color-fallback-baseline.json': BASELINE,
     },
     { git: true },
@@ -55,7 +55,7 @@ test('a stale rgba() wash in a fixture tree is a finding', () => {
   try {
     const found = messagesOf(run, root);
     assert.ok(
-      found.some((message) => /--color-tertiary-tint/.test(message) && /a\.scss:1/.test(message)),
+      found.some((message) => /--ds-background-accent-teal-subtlest/.test(message) && /a\.scss:1/.test(message)),
       `expected a disagreement finding for the stale wash, got:\n${found.join('\n')}`,
     );
   } finally {
@@ -66,7 +66,7 @@ test('a stale rgba() wash in a fixture tree is a finding', () => {
 test('an empty token directory fires the sentinel floor, not a clean sweep', () => {
   const { root, done } = policyTree(
     {
-      'design-system/src/a.scss': '.a { color: var(--color-primary, #000000); }\n',
+      'design-system/src/a.scss': '.a { color: var(--ds-text-brand, #000000); }\n',
       'scripts/baselines/color-fallback-baseline.json': BASELINE,
     },
     { git: true },
@@ -74,19 +74,17 @@ test('an empty token directory fires the sentinel floor, not a clean sweep', () 
   try {
     const found = messagesOf(run, root);
     assert.ok(found.length > 0, 'an empty token directory must not report a clean sweep');
-    assert.match(found[0], /no --color-\* or --ds-\* tokens found under design-system\/src\/tokens/);
+    assert.match(found[0], /no --ds-\* tokens found under design-system\/src\/tokens/);
   } finally {
     done();
   }
 });
 
 /*
- * BOTH VOCABULARIES. The `--ds-*` tokens are generated into `tokens/color/`, and
- * the check reads them beside the legacy `--color-*` set: a disagreeing
- * fallback on either is a finding, and so is a `--ds-*` name nothing defines.
+ * THE COLOR DIRECTORY. The `--ds-*` tokens are generated into `tokens/color/`:
+ * a disagreeing fallback is a finding, and so is a `--ds-*` name nothing defines.
  */
 const DS_TREE = (use) => ({
-  'design-system/src/tokens/_colors.scss': ':root { --color-primary: #0472a8; }\n',
   'design-system/src/tokens/color/_palette.scss': ':root { --palette-teal-700: #147d6a; }\n',
   'design-system/src/tokens/color/_semantic.scss': ':root { --ds-text-brand: var(--palette-teal-700); }\n',
   'design-system/src/a.scss': use,
@@ -95,7 +93,7 @@ const DS_TREE = (use) => ({
 
 test('a disagreeing --ds- fallback is a finding, its token followed through the palette', () => {
   const { root, done } = policyTree(
-    DS_TREE('.a { color: var(--ds-text-brand, #000000); border-color: var(--color-primary, #111111); }\n'),
+    DS_TREE('.a { color: var(--ds-text-brand, #000000); }\n'),
     { git: true },
   );
   try {
@@ -103,10 +101,6 @@ test('a disagreeing --ds- fallback is a finding, its token followed through the 
     assert.ok(
       found.some((message) => /--ds-text-brand {2}is #147d6a, fallback says #000000/.test(message)),
       `expected a --ds- disagreement, got:\n${found.join('\n')}`,
-    );
-    assert.ok(
-      found.some((message) => /--color-primary {2}is #0472a8, fallback says #111111/.test(message)),
-      `expected the legacy disagreement beside it, got:\n${found.join('\n')}`,
     );
   } finally {
     done();

@@ -6,14 +6,14 @@
  * this repo that styles the DOCUMENTATION rather than a component, and nothing
  * watched it. It accumulated `clamp(2.5rem, 5vw, 4rem)`, `0.625rem`, `1.5rem`
  * and a `#e4e4e7` — every one of them hand-picked, every one of them sitting a
- * few lines from a `var(--size-…)` doing the same job. #251 deleted some of
+ * few lines from a `var(--space-…)` doing the same job. #251 deleted some of
  * them by hand. Nothing stopped the next edit re-introducing them, and a defect
  * class that has to be swept by hand every few months is a defect class with no
  * gate on it.
  *
  * WHY NOT THE DESIGN SYSTEM'S OWN SCSS. That is where literals legitimately
- * live: `design-system/src/tokens/*.scss` is what DEFINES `--size-spacing-…`,
- * and `--color-primary: #0472a8` is not a violation, it is the token. A check
+ * live: `design-system/src/tokens/*.scss` is what DEFINES `--space-…`, and
+ * `--palette-lagoon-700: #…` is not a violation, it is the token. A check
  * that walked `design-system/src` would report thousands of "violations" that
  * are the source of truth, and a check nobody can act on gets switched off
  * (`scripts/check-harness.mjs` § rule 2). So the corpus is the docs stylesheets
@@ -22,17 +22,17 @@
  * WHAT IT LOOKS AT. Declaration values, split into two kinds of literal:
  *
  *   color     `#abc` / `#aabbcc` / `rgb()` / `rgba()` / `hsl()` / `hsla()`
- *              matched against every `--color-*` token, by value.
+ *              matched against every `--ds-*` and `--palette-*` token, by value.
  *   dimension  `<n>px` / `<n>rem` / `<n>%`, normalized to px at 16px/rem, and
  *              matched against `--font-size-*` for a `font-size`,
- *              `--font-line-height-*` for a `line-height`, and `--size-*`
- *              otherwise.
+ *              `--line-height-*` for a `line-height`, and the size, space,
+ *              radius and stroke primitives and spacing semantics otherwise.
  *
  * The token table is `tokenCorpus` (#620): one read, aliases followed, family
  * from the name, color and dimension keys from the same module. This check
  * used to carry its own copies of all four; they disagreed with `parseColor`
- * on alpha and with each other on a bare `0`. Indexing still prefers the
- * semantic name over the primitive `_primitives.scss` bans.
+ * on alpha and with each other on a bare `0`. Indexing prefers the semantic
+ * name over the primitive a component never names.
  *
  * WHAT HAPPENS WHEN A TOKEN MOVES. There is no baseline file and no snapshot.
  * Adding a token whose value equals a literal already in the docs stylesheet
@@ -49,41 +49,36 @@
  * same honesty is owed here.
  *
  *  1. A NEAR MISS. `13px` is not `12px`, so `font-size: 13px` passes even
- *     though `--font-size-body3` is plainly what was meant. This check tests
+ *     though `--font-size-075` is plainly what was meant. This check tests
  *     equality, never proximity. Choosing a tolerance would mean choosing which
  *     deliberate one-off is a mistake, and that is a judgment no exit code
  *     should make.
  *  2. A FALLBACK THAT DISAGREES WITH ITS OWN TOKEN. `var(--token, fallback)` is
  *     an allowance (see below), and this check does not compare the fallback to
- *     the token. The corpus has several that differ:
- *     `var(--color-outline-variant, #e4e4e7)` where the token is `#bec8ca`,
- *     `var(--color-on-surface-variant, #5c5c5c)` where it is `#3f484a`,
- *     `var(--color-surface, #fff)` where it is `#f9f9fc`. Those fallbacks only
- *     ever paint when the token sheet failed to load, so they are a different
+ *     the token. A fallback only ever paints when the token sheet failed to load, so they are a different
  *     defect — a wrong emergency color, not a hand-picked one — and they need
  *     their own check, not a widening of this one. They now have two:
  *     `check:color-fallbacks` and `check:size-fallbacks` (#268), which read
  *     the same token sources this does. This limitation stays written down
  *     because it is still true OF THIS CHECK; it is no longer unguarded.
  *  3. ANYTHING OUTSIDE A DECLARATION. Media-query preludes especially:
- *     `@media (min-width: 768px)` matches `--breakpoint-md-min` exactly, and is
- *     NOT a finding, because custom properties are invalid in a media prelude —
+ *     `@media (min-width: 768px)` is NOT a finding, because custom properties
+ *     are invalid in a media prelude —
  *     there is no `var()` that could replace it. Flagging it would be
  *     instructing the author to write code that does not work.
  *  4. WHICH token is the right one. It reports every token that carries the
- *     value and leaves the role to the author: `24px` is
- *     `--size-spacing-medium-space-500` and `--size-card-pad-x-lg` and
- *     `--size-section-gap-lg`, and only a human knows whether this is a card or
- *     a section. It filters by property family (a `font-size` is never offered
- *     a spacing token) and it prefers semantic names over the primitives
- *     `_primitives.scss` marks DO NOT USE DIRECTLY — but it does not choose.
- *  5. TOKEN FAMILIES OUTSIDE `--color-*`, `--font-size-*`,
- *     `--font-line-height-*` and `--size-*`. `--layout-*`, `--col-*` and
- *     `--breakpoint-*` describe the app-shell grid; a docs-chrome pixel that
- *     happened to equal `--col-3` would be a coincidence, not a token being
- *     ignored, and reporting it would train people to ignore the report.
+ *     value and leaves the role to the author: `24px` is `--space-150` and
+ *     `--card-pad-spacious` and `--section-pad-x-default`, and only a human
+ *     knows whether this is a card or a section. It filters by property family
+ *     (a `font-size` is never offered a spacing token) and it prefers semantic
+ *     names over the primitives — but it does not choose.
+ *  5. TOKEN FAMILIES OUTSIDE `BUCKET_OF`. The pattern tokens (`--page-*`,
+ *     `--grid-*`, `--screen-*`, `--content-*`) describe the app-shell layout; a
+ *     docs-chrome pixel that happened to equal a column width would be a
+ *     coincidence, not a token being ignored, and reporting it would train
+ *     people to ignore the report.
  *  6. WHETHER THE PAGE STILL LOOKS RIGHT. Swapping `1.5rem` for
- *     `var(--size-spacing-medium-space-500)` is only value-preserving while the
+ *     `var(--space-150)` is only value-preserving while the
  *     root font size is 16px. Nothing here renders anything; `check:storybook`
  *     drives the browser.
  *  7. SHORTHAND POSITION. `padding: 8px 12px` is read as two dimensions, not as
@@ -91,7 +86,7 @@
  *
  * ─── THE ALLOWANCES, AND WHY EACH ONE ───────────────────────────────────────
  *  • `0` in any unit. Zero is zero; there is no design decision in it, and
- *    `--size-spacing-small-space-000` exists only so Figma has a row for it.
+ *    `--space-0` exists only so Figma has a row for it.
  *  • `100%`. "As wide as the thing containing it" is a layout instruction, not
  *    a measurement, and no token can express it.
  *  • `1px` and `-1px`. A hairline is the thinnest line a border can be and the
@@ -161,8 +156,29 @@ const REPO_ROOT = path.resolve(__dirname, '..');
 const docsStyleDir = (root = REPO_ROOT) => path.join(root, '.storybook');
 const tokensDir = (root = REPO_ROOT) => path.join(root, TOKEN_DIR);
 
-/** Primitive tokens carry a DO NOT USE DIRECTLY banner; semantic names sort first. */
-const PRIMITIVES_FILE = '_primitives.scss';
+/** The primitive files: a component never names them, so semantic names sort first. */
+const PRIMITIVES_FILES = new Set(['_scales.scss', 'color/_palette.scss']);
+
+/**
+ * Which index bucket each token family fills (limitation 5). Colors are the
+ * `--ds-*` roles and the ramps under them; a `font-size` is offered the font
+ * size steps, a `line-height` the line height steps, and every other dimension
+ * the size, space, radius and stroke primitives and the spacing semantics.
+ */
+const BUCKET_OF = {
+  ds: 'color',
+  palette: 'color',
+  'font-size': 'font-size',
+  'line-height': 'font-line-height',
+  size: 'size',
+  space: 'size',
+  radius: 'size',
+  stroke: 'size',
+  'pad-x': 'size',
+  'pad-y': 'size',
+  stack: 'size',
+  inline: 'size',
+};
 
 // ── the token table ─────────────────────────────────────────────────────────
 
@@ -185,21 +201,21 @@ export function buildTokenIndex(defs = new Map()) {
   };
   const push = (bucket, key, name, file) => {
     if (!index[bucket].has(key)) index[bucket].set(key, []);
-    index[bucket].get(key).push({ name, primitive: file === PRIMITIVES_FILE });
+    index[bucket].get(key).push({ name, primitive: PRIMITIVES_FILES.has(file) });
   };
 
   const values = new Map([...defs].map(([name, def]) => [name, def.value]));
   for (const [name, def] of defs) {
     const value = resolveToken(name, values);
     if (value === undefined) continue;
-    const bucket = familyOf(name);
-    if (!bucket || !(bucket in index)) continue;
+    const bucket = BUCKET_OF[familyOf(name)];
+    if (!bucket) continue;
     const key = bucket === 'color' ? colorKey(value) : dimensionKey(value);
     if (key) push(bucket, key, name, def.file);
   }
 
   // Semantic names before primitives, then alphabetical — the report's first
-  // suggestion should be the one `_primitives.scss` tells people to reach for.
+  // suggestion should be the semantic one a component reaches for.
   for (const bucket of Object.values(index)) {
     for (const list of bucket.values()) {
       list.sort((a, b) => a.primitive - b.primitive || a.name.localeCompare(b.name));
@@ -372,8 +388,8 @@ export function findings(source, index) {
 // ── the chrome vocabulary guard ─────────────────────────────────────────────
 //
 // The value check above only sees a literal that some token happens to carry,
-// so a hex nobody tokenized, or a `var(--color-outline-variant)` on the name the
-// design system retired, walked past it. The docs chrome is the design system's
+// so a hex nobody tokenized, or a `var()` of a name the design system retired,
+// walked past it. The docs chrome is the design system's
 // own showcase: it speaks the current vocabulary (`--ds-*` color, the spacing
 // ladder, `--type-*`) and carries no raw hex. Two rules, by NAME, so they hold
 // whatever the token table says this week:

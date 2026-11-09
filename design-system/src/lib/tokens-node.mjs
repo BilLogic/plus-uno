@@ -149,25 +149,24 @@ export const COLOR_TOKEN_FILES = [COLOR_PALETTE_FILE, COLOR_SEMANTIC_FILE, COLOR
 export const COLOR_TOKEN_PATHS = COLOR_TOKEN_FILES.map((file) => `${COLOR_TOKEN_DIR}/${file}`);
 
 /**
- * The color prefixes a check reads: the old set the token files still declare,
- * and the `--ds-*` tokens. The old prefix leaves with those declarations. A check
- * that reads color names this list rather than spelling the pair itself.
+ * The color prefixes a check reads: the `--ds-*` tokens. A check that reads
+ * color names reads this list rather than spelling the prefix itself.
  */
-export const COLOR_PREFIXES = ['--color-', '--ds-'];
+export const COLOR_PREFIXES = ['--ds-'];
 
 /**
- * What a color VALUE can resolve through: both vocabularies and the ramps the
- * `--ds-*` tokens alias. A check resolving `--ds-text` has to be able to follow
+ * What a color VALUE can resolve through: the `--ds-*` tokens and the ramps they
+ * alias. A check resolving `--ds-text` has to be able to follow
  * it to `--palette-neutral-1000`, and a component never names the ramps.
  */
 export const COLOR_VALUE_PREFIXES = [...COLOR_PREFIXES, '--palette-'];
 
 /**
  * Files that carry primitives, which a component never names; callers rank on
- * it. `_primitives.scss` says DO NOT USE DIRECTLY in its banner, and the
- * palette is the color equivalent.
+ * it. The scales are the size primitives and the palette is the color
+ * equivalent.
  */
-const PRIMITIVE_FILES = new Set(['_primitives.scss', `color/${COLOR_PALETTE_FILE}`]);
+const PRIMITIVE_FILES = new Set(['_scales.scss', `color/${COLOR_PALETTE_FILE}`]);
 
 /**
  * The token stylesheets, sorted by name and read whole.
@@ -219,12 +218,12 @@ export function tokenSources({ root = REPO_ROOT } = {}) {
  *                             `var()` for a token nothing defines)
  * @property {boolean} resolved whether `value` is a literal or just `raw` again
  * @property {string} file     the stylesheet it was defined in
- * @property {boolean} primitive whether that file is `_primitives.scss`
+ * @property {boolean} primitive whether that file holds primitives (`PRIMITIVE_FILES`)
  * @property {string|null} family
  *
  * PRECEDENCE IS THE CALLER'S, because the two answers in the tree are both
  * right about their own question. `first` is `readTokens`' rule and means the
- * `:root` light value — the first block in `_colors.scss`. `last` is how the
+ * `:root` light value — the first block in `color/_semantic.scss`. `last` is how the
  * cascade actually resolves and is what the fallback checks compare against.
  * Measured over this repo's token sources the two agree; they would stop
  * agreeing the day a token is redefined, and that is the day a caller wants to
@@ -232,7 +231,7 @@ export function tokenSources({ root = REPO_ROOT } = {}) {
  *
  * @param {object} [options]
  * @param {string} [options.root]
- * @param {string|string[]} [options.prefix] e.g. `--color-`, or a list such
+ * @param {string|string[]} [options.prefix] e.g. `--ds-`, or a list such
  *        as `COLOR_PREFIXES`; defaults to every token
  * @param {'first'|'last'} [options.precedence]
  * @returns {Map<string, TokenEntry>}
@@ -288,30 +287,16 @@ export function tokenCorpus({ root = REPO_ROOT, prefix = '--', precedence = 'fir
  * corpus. Minting a family means adding a row.
  */
 export const FAMILIES = [
-  { family: 'color', prefix: '--color-', what: 'the legacy color values and roles, until the `--ds-` set replaces them' },
   {
     family: 'ds',
     prefix: '--ds-',
-    what: 'the Atlassian-shaped color, elevation and opacity tokens, generated per mode (ADR-035)',
+    what: 'the color, elevation and opacity tokens, generated per mode (ADR-035)',
   },
   { family: 'palette', prefix: '--palette-', what: 'the color ramps the `--ds-` tokens alias; never named by a component' },
-  {
-    family: 'surface',
-    prefix: '--surface-',
-    what: 'the pre-`--ds-` elevation bridge: a surface\'s color and, separately, its shadow',
-  },
   { family: 'page', prefix: '--page-', what: 'the Page: its pad, stack, radius and border width' },
   { family: 'panel', prefix: '--panel-', what: 'the Panel: its minimum, default and maximum width' },
   { family: 'frame', prefix: '--frame-', what: 'the Frame: the topbar height and the sidebar widths' },
-  { family: 'font-size', prefix: '--font-size-', what: 'the type scale, icon sizes included' },
-  { family: 'font-line-height', prefix: '--font-line-height-', what: 'line height per type step' },
-  { family: 'font-family', prefix: '--font-family-', what: 'font stacks' },
-  { family: 'font-weight', prefix: '--font-weight-', what: 'weights' },
-  {
-    family: 'font-letter-spacing',
-    prefix: '--font-letter-spacing-',
-    what: 'tracking per type step',
-  },
+  { family: 'font-size', prefix: '--font-size-', what: 'the font size primitives, by rem × 100' },
   { family: 'line-height', prefix: '--line-height-', what: 'line height primitives, by rem × 100' },
   { family: 'heading', prefix: '--heading-', what: 'a heading text style: the `font` shorthand' },
   { family: 'body', prefix: '--body-', what: 'a body text style: the `font` shorthand' },
@@ -320,9 +305,9 @@ export const FAMILIES = [
   {
     family: 'type',
     prefix: '--type-',
-    what: 'the typography family and weight variables, and the older `font` shorthands per type step',
+    what: 'the typography family, weight and tracking variables',
   },
-  { family: 'size', prefix: '--size-', what: 'the old spacing, radius, border and component metrics, and the size primitives (`--size-200`)' },
+  { family: 'size', prefix: '--size-', what: 'the size primitives (`--size-200`)' },
   { family: 'space', prefix: '--space-', what: 'the space primitives, named by rem × 100' },
   { family: 'radius', prefix: '--radius-', what: 'the radius primitives' },
   { family: 'stroke', prefix: '--stroke-', what: 'the stroke-width primitives' },

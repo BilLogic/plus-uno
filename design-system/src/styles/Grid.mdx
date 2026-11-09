@@ -53,14 +53,13 @@ and the gutter 16 at every width. The sidebar docks from 1024.
 <RefTable
     head={['Mode', 'From', 'Code', 'Sidebar', 'Page pad', 'Content width', 'Column']}
     rows={[
-        ['Medium', '768', <C>--breakpoint-md-min</C>, 'closed', '24', '720', '45.33'],
-        ['Large', '1024', <C>--breakpoint-lg-min</C>, 'docked, 240', '24', '736', '46.67'],
-        ['X-Large', '1440', <C>--breakpoint-xl-min</C>, 'docked, 240', '24', '1152', '81.33'],
+        ['Medium', '768', <C>:root</C>, 'closed', '24', '720', '45.33'],
+        ['Large', '1024', <C>@media (min-width: 1024px)</C>, 'docked, 240', '24', '736', '46.67'],
+        ['X-Large', '1440', <C>@media (min-width: 1440px)</C>, 'docked, 240', '24', '1152', '81.33'],
     ]}
 />
 
-Code also defines `--breakpoint-xxl-min` (1920), but nothing switches there.
-Below 768 nothing switches either: the content holds its 720 minimum and the
+Nothing switches above 1440. Below 768 nothing switches either: the content holds its 720 minimum and the
 page scrolls sideways. Design at Medium and X-Large at least, so the stretch
 between them is intentional.
 

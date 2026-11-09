@@ -16,7 +16,7 @@ import { useRef, useState, useLayoutEffect } from 'react';
  *   contract-test harness (and anything else that reads body's direct
  *   children to find a portaled node) depends on. `Flag` is the one adapter
  *   with no portal or stack entry: it draws from `--layer-flag`, the
- *   top of the scale in `design-system/src/tokens/_layout.scss`, so it layers
+ *   top of the scale in `design-system/src/tokens/ladder/_layers.scss`, so it layers
  *   above a modal wherever its `FlagGroup` is placed.
  * - **At most two overlays stack**: a modal (or drawer) and the confirm it
  *   raises. A third is refused by `useOverlaySlot`: it does not open,
@@ -36,7 +36,7 @@ import { useRef, useState, useLayoutEffect } from 'react';
  *   Modal as "outside", so it asks `isPressInRaisedOverlay` and keeps
  *   itself open when the press landed in a Modal or Drawer it sits outside.
  *
- * `--layout-z-index-*` itself stays in `_layout.scss` — this module
+ * The `--layer-*` scale itself stays in `ladder/_layers.scss` — this module
  * coordinates who uses the scale, it does not duplicate its values in JS.
  */
 

@@ -1,48 +1,24 @@
 /**
  * The pure half of `check:intent-roles` (#368).
  *
- * WHAT THE ROLE TOKENS ARE. `design-system/src/tokens/_color_roles.scss` names
- * two roles the seven intent colors never had: `--color-X-icon` and
- * `--color-X-border`. Six of the seven borders resolve to the base, because the
- * base already clears WCAG 1.4.11's 3:1 on all five surface steps. Warning does
- * not — #9f8205 falls to 2.87:1 on `--color-surface-container-highest` — so
- * `--color-warning-border` is the one role with a value of its own.
- *
  * WHAT THIS MEASURES. Every `border*` and `outline*` declaration in the design
- * system's stylesheets that paints its edge from an intent BASE rather than
- * from the base's `-border` role. On 2026-08-29 there were 135 of them and the
- * role tokens had no users at all, which is the state the roles file described
- * itself as leaving behind: "these tokens have no users yet, so this file
- * changes no pixel — it is the vocabulary that the uses can then be moved onto,
- * one at a time, against a ratchet." This is that ratchet.
- *
- * WHY A RENAME THAT CHANGES NO PIXEL IS WORTH DOING. `border-color:
- * var(--color-danger)` and `border-color: var(--color-danger-border)` resolve to
- * the same bytes today. They do not say the same thing. The first is a use of
- * the bold fill color that happens to land on an edge; the second is a
- * declaration that an edge was intended and 3:1 was the bar it was chosen
- * against. The value can then move for borders alone — which is exactly what
- * warning needs and what no amount of care at 110 call sites can deliver.
+ * system's stylesheets that paints its edge from an intent's bold FILL
+ * (`--ds-background-danger-bold`) rather than from its edge role
+ * (`--ds-border-danger`). The two can resolve to the same bytes and still not
+ * say the same thing: the first is the fill color landing on an edge, the
+ * second declares that an edge was intended and 3:1 (WCAG 1.4.11) was the bar it
+ * was chosen against. The edge role can then move for edges alone.
  *
  * ─── WHAT IT DELIBERATELY CANNOT SEE ────────────────────────────────────────
  *
- *  1. INLINE STYLES. `style={{ borderColor: 'var(--color-primary)' }}` in JSX
- *     is invisible here; the corpus is stylesheets. `SidebarTab.jsx` alone
- *     carries an `outline` in a style object.
+ *  1. INLINE STYLES. `style={{ borderColor: 'var(--ds-background-brand-bold)' }}`
+ *     in JSX is invisible here; the corpus is stylesheets.
  *  2. WHETHER THE EDGE SHOULD BE AN EDGE. A `border-bottom` used as a two-pixel
  *     underline on a selected tab is a border to this scanner and arguably a
  *     graphic to a designer. Both are held to 3:1, so the distinction changes
  *     nothing about the bar.
- *  3. A FOCUS RING IS NOT QUITE A BORDER. All 24 `outline` uses take
- *     `--color-primary`, and Atlassian names that role separately —
- *     `color.border.focused` beside `color.border`. We have no
- *     `--color-X-focus-ring`, so those 24 are RECORDED here rather than
- *     migrated: renaming them to `-border` would assert an equivalence nobody
- *     has decided. That is a finding about a missing token, not a defect in the
- *     call sites.
- *  4. THE GROUND. Unlike `check:text-contrast`, this measures no ratio. It asks
- *     which vocabulary a declaration uses. The contrast argument lives in
- *     `_color_roles.scss` beside the values.
+ *  3. THE GROUND. Unlike `check:text-contrast`, this measures no ratio. It asks
+ *     which role a declaration names.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -63,7 +39,7 @@ export const INTENTS = ['primary', 'secondary', 'tertiary', 'danger', 'success',
  *
  * The property alternation is explicit so that `border-radius`, `border-width`
  * and `border-style` — which carry no color — cannot match. The value part
- * spans newlines on purpose: `border:\n  1px solid var(--color-primary);` is
+ * spans newlines on purpose: `border:\n  1px solid var(--ds-border-brand);` is
  * one declaration written across two lines and a line-anchored scanner misses
  * it. `[^;{}]` stops the match at the end of the declaration rather than
  * running into the next rule.
@@ -74,16 +50,15 @@ export const EDGE = new RegExp(
 );
 
 /**
- * The same rule in the `--ds-` vocabulary (ADR-035). Atlassian names a role's
- * fill and its edge separately — `--ds-background-danger-bold` and
- * `--ds-border-danger` — so the fill on an edge is the base standing in for the
- * role, exactly as `--color-danger` is. Only the bold fill counts: a subtle
+ * A role's fill and its edge are named separately — `--ds-background-danger-bold`
+ * and `--ds-border-danger` — so the fill on an edge is the base standing in for
+ * the role. Only the bold fill counts: a subtle
  * fill on an edge is a different (pale) color, not a role skipped, and its
  * `-hovered` / `-pressed` steps are states of the fill. `neutral` has no
  * `--ds-border-neutral` role to name, so it is not one of these.
  *
- * ONE VOCABULARY. The PLUS intent a theme-map row is keyed by maps to the role
- * it became under ADR-035: primary is `brand` (Lagoon), info is `information`
+ * The PLUS intent a theme-map row is keyed by maps to its role (ADR-035):
+ * primary is `brand` (Lagoon), info is `information`
  * (it moved to blue so it stops reading as brand), and danger, success and
  * warning keep their names. Secondary and tertiary have no role there.
  * `DS_ROLES` is derived from that map plus the two roles no PLUS intent
@@ -93,19 +68,18 @@ const DS_ROLE_OF = { primary: 'brand', danger: 'danger', success: 'success', war
 const DS_ROLES = [...Object.values(DS_ROLE_OF), 'discovery', 'selected'];
 
 const BASE = new RegExp(
-  `var\\(\\s*(--color-(?:${INTENTS.join('|')})|--ds-background-(?:${DS_ROLES.join('|')})-bold)\\s*[,)]`,
+  `var\\(\\s*(--ds-background-(?:${DS_ROLES.join('|')})-bold)\\s*[,)]`,
   'g',
 );
 
-/** The edge role a base stands in for: `--color-danger-border`, `--ds-border-danger`. */
+/** The edge role a bold fill stands in for: `--ds-border-danger`. */
 function roleOf(token) {
-  const ds = /^--ds-background-([a-z]+)-bold$/.exec(token);
-  return ds ? `--ds-border-${ds[1]}` : `${token}-border`;
+  return `--ds-border-${/^--ds-background-([a-z]+)-bold$/.exec(token)[1]}`;
 }
 
 export function stylesheets(root = REPO_ROOT, dir = CORPUS) {
-  // `tokens/` DEFINES the roles; `--color-danger-border: var(--color-danger)`
-  // is the definition of the role, not a call site that skipped it.
+  // `tokens/` DEFINES the roles; `--ds-border-danger: var(--palette-…)` is the
+  // definition of the role, not a call site that skipped it.
   return documents(dir, { root, ext: ['.scss', '.css'] }).filter(
     (file) => !file.includes('/tokens/'),
   );
@@ -139,7 +113,7 @@ export function edgeUses(files, root = REPO_ROOT) {
  * A STATE COLOR MIXED BY HAND (`Colors.mdx` § States: hover and press have
  * their own tokens, never a hand-mixed color).
  *
- * `color-mix(in srgb, var(--color-primary), black 8%)` and
+ * `color-mix(in srgb, var(--ds-background-brand-bold), black 8%)` and
  * `filter: brightness(0.92)` are both a hover color computed at the call site.
  * The system already names that darkening: the role's own `.hovered` and
  * `.pressed` tokens, and `--ds-interaction-hovered` / `-pressed` where the
@@ -208,8 +182,7 @@ export function mixFailures(uses, { failures: verdicts = [], stale = [], unrevie
 
 /**
  * A ROLE SLOT IN A THEME MAP. Button and Dropdown carry their intent colors as
- * quoted Sass maps — `'danger': ('--color-danger', …, '--color-danger-border')`,
- * or in the new words `('--ds-background-danger-bold', …, '--ds-border-danger')`
+ * quoted Sass maps — `'danger': ('--ds-background-danger-bold', …, '--ds-border-danger')`
  * — and the edge is painted from `var(#{$col-border})` far from the name, so
  * `edgeUses` cannot see which token a map row hands its edge. The map says
  * which slot is the edge: a slot where any intent row names its own `-border`
@@ -229,17 +202,17 @@ export function themeMapUses(files, root = REPO_ROOT) {
       const slots = [...match[2].matchAll(/'([^']*)'/g)].map((m) => m[1].trim());
       rows.push({ intent: match[1], slots, line: source.slice(0, match.index).split('\n').length });
     }
-    // Either vocabulary names the edge: `--color-danger-border` or `--ds-border-danger`.
+    // The edge slot is the one where a row names its `--ds-border-*` role.
     const edgeSlots = new Set();
     for (const { intent, slots } of rows) {
       const role = DS_ROLE_OF[intent];
       slots.forEach((slot, i) => {
-        if (slot === `--color-${intent}-border` || (role && slot === `--ds-border-${role}`)) edgeSlots.add(i);
+        if (role && slot === `--ds-border-${role}`) edgeSlots.add(i);
       });
     }
     for (const { intent, slots, line } of rows) {
       const role = DS_ROLE_OF[intent];
-      const bases = [`--color-${intent}`, ...(role ? [`--ds-background-${role}-bold`] : [])];
+      const bases = role ? [`--ds-background-${role}-bold`] : [];
       for (const i of edgeSlots) {
         if (bases.includes(slots[i])) {
           uses.push({ file, line, intent, slot: i + 1, token: slots[i], role: roleOf(slots[i]) });
