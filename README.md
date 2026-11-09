@@ -83,7 +83,7 @@ Cursor config and key handling: [`docs/connectors/ds-mcp.md`](docs/connectors/ds
 
 **Storybook MCP.** `npm run storybook` also serves the Storybook MCP at `localhost:4200/mcp`, for component docs and story previews ([`docs/connectors/storybook-mcp.md`](docs/connectors/storybook-mcp.md)).
 
-**No npm package.** The design system is not published to npm. Code in this repo imports it from the barrel, `import { Button } from '@/components'`; other projects use the hosted MCP or Storybook.
+**npm package: not yet.** Installing the design system and the `ds` tools outside this repo is a work in progress. Until then, code in this repo imports from the barrel, `import { Button } from '@/components'`, and other projects use the hosted MCP or Storybook.
 
 ## uno skills
 
