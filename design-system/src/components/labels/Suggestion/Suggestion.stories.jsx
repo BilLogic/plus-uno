@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '@/components';
 import { expect, fn, userEvent, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
@@ -255,14 +256,14 @@ export const DisabledBesideTags = {
     args: { onAccept: fn() },
     render: ({ onAccept }) => (
         <div style={row}>
-            <button type="button">Before</button>
+            <Button>Before</Button>
             <TagContext.Provider value={{ isDisabled: true }}>
                 <Tag color="blue" data-testid="tag">Algebra</Tag>
                 <Tag isRemovable color="blue" onAfterRemoveAction={() => {}}>Advocacy</Tag>
                 <Suggestion label="Relationships" onAccept={onAccept} />
                 <Suggestion type="prompt" label="Summarize" onAccept={onAccept} />
             </TagContext.Provider>
-            <button type="button">After</button>
+            <Button>After</Button>
             <Suggestion label="Fractions" isDisabled onAccept={onStray} />
         </div>
     ),

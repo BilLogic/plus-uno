@@ -3115,8 +3115,7 @@
         "KeyboardFocus"
       ],
       "tokens": [
-        "--ds-icon-subtle",
-        "--ds-text-subtlest"
+        "--ds-icon-subtle"
       ]
     },
     {
@@ -4468,6 +4467,7 @@
         "--ds-background-success-bold",
         "--ds-background-warning-bold",
         "--ds-border",
+        "--ds-border-focused-inverse",
         "--ds-icon-danger",
         "--ds-icon-information",
         "--ds-icon-inverse",
@@ -4475,6 +4475,8 @@
         "--ds-icon-success",
         "--ds-icon-warning",
         "--ds-icon-warning-inverse",
+        "--ds-interaction-inverse-hovered",
+        "--ds-interaction-inverse-pressed",
         "--ds-shadow-overlay",
         "--ds-surface",
         "--ds-surface-overlay",
@@ -4489,6 +4491,7 @@
         "--icon-md",
         "--inline-lg",
         "--inline-md",
+        "--inline-sm",
         "--label-height-md",
         "--layer-flag",
         "--popover-gap-screen",
@@ -10864,32 +10867,26 @@
       ],
       "tokens": [
         "--body-default",
-        "--body-small",
         "--border-default",
         "--ds-background-input",
         "--ds-background-neutral",
-        "--ds-background-neutral-subtle-hovered",
-        "--ds-background-neutral-subtle-pressed",
-        "--ds-background-selected",
+        "--ds-border",
         "--ds-border-input",
-        "--ds-icon-selected",
-        "--ds-icon-subtle",
         "--ds-opacity-disabled",
-        "--ds-surface-container",
         "--ds-text",
-        "--ds-text-selected",
         "--ds-text-subtle",
         "--ds-text-subtlest",
         "--field-min-height-lg",
-        "--icon-sm",
+        "--pad-x-md",
         "--pad-x-sm",
         "--pad-x-xs",
-        "--radius-md",
+        "--pad-y-lg",
+        "--pad-y-md",
+        "--radius-0625",
         "--rte-content-pad-x",
         "--rte-content-pad-y",
-        "--space-0125",
-        "--space-025",
         "--stack-md",
+        "--stack-sm",
         "--type-weight-regular"
       ]
     },
@@ -11234,6 +11231,15 @@
           "default": null,
           "values": null,
           "description": "Called with the text of a created option, which is then picked.",
+          "deprecated": null
+        },
+        {
+          "name": "createOption",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(text)` → the option a typed text creates, `{ value, label }`, or null to create nothing. Defaults to the text itself.",
           "deprecated": null
         },
         {
@@ -12856,18 +12862,19 @@
         "--body-default",
         "--border-default",
         "--border-selected",
+        "--ds-background-neutral",
+        "--ds-background-neutral-hovered",
+        "--ds-background-neutral-pressed",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
-        "--ds-background-selected-bold",
-        "--ds-background-selected-bold-hovered",
-        "--ds-background-selected-bold-pressed",
         "--ds-border",
         "--ds-border-focused",
         "--ds-border-selected",
+        "--ds-text",
         "--ds-text-disabled",
-        "--ds-text-inverse",
         "--ds-text-selected",
         "--ds-text-subtle",
+        "--inline-lg",
         "--item-height-md",
         "--item-height-sm",
         "--motion-duration-short",
@@ -12878,7 +12885,6 @@
         "--radius-md",
         "--section-stack-sm",
         "--stack-md",
-        "--stack-sm",
         "--type-weight-medium"
       ],
       "subComponents": [
@@ -14584,7 +14590,7 @@
       "import": "import { TimePicker } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/TimePicker/TimePicker.jsx",
-      "summary": "TimePicker — a time field with an AM/PM toggle (Figma `Time picker`). Built from the shared parts: the field is `FieldBox`, which owns the box, the border, the fill, the size and every state, same as DatePicker; the AM/PM menu in Trailing is the PLUS DropdownMenu. - **Typing:** the field takes an hour and a minute, with or without a colon. It is checked when you press Enter or leave the field: a real time (hour 1–12, minute 0–59) is picked, anything else is kept as typed and marked invalid, and `onChange` is not called. - **Value:** a 12-hour string, \"02:30 PM\". A 24-hour value given through `value` is split into the hour this control can show and the period that says which half of the day it is. - **AM/PM:** a separate toggle, since the field itself has no notion of one. Changing it reports immediately, with whichever half of the time is already set. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the input, which is the control a screen reader lands on: TimePicker has no `label` prop, so that is how a caller names it.",
+      "summary": "TimePicker — a time field: type a time, or pick one from the list of the day's times under it (Figma `Time picker`). It is the PLUS Select, searchable: the field is the shared `FieldBox`, the list is the shared `Listbox`, so the box, the list, the keyboard and every state are Select's. There is no separate AM/PM control: each time in the list carries its own period, and typing \"2:30p\" or \"1430\" finds it. - **List:** `times`, 24-hour `HH:mm` strings, every half hour by default, shown as \"2:30 PM\". Typing filters it. - **Typing a time that is not in the list** (`timeIsEditable`, on by default): Enter on the \"Create\" row reads it — \"9:05\", \"905a\", \"21:05\" — and picks it. Text that is not a real time is refused and the field is marked invalid. - **Value:** a 12-hour string, \"02:30 PM\", or null once cleared. A 24-hour `value` (\"14:30\") is accepted and read the same way. Props it does not name (`aria-label`, `aria-labelledby`, `aria-describedby`, `data-*`) go to the combobox, which is the control a screen reader lands on: TimePicker has no `label` prop, so that is how a caller names it.",
       "props": [
         {
           "name": "id",
@@ -14592,7 +14598,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "The `id` of the combobox input.",
           "deprecated": null
         },
         {
@@ -14601,7 +14607,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Submitted with a form, as the 12-hour value.",
           "deprecated": null
         },
         {
@@ -14619,7 +14625,25 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "A 12-hour string (\"02:30 PM\") or a 24-hour one (\"14:30\"), split on read.",
+          "description": "A 12-hour string (\"02:30 PM\") or a 24-hour one (\"14:30\").",
+          "deprecated": null
+        },
+        {
+          "name": "times",
+          "type": "arrayOf",
+          "required": false,
+          "default": "DEFAULT_TIMES",
+          "values": null,
+          "description": "The times the list offers, as 24-hour `HH:mm`. Every half hour of the day by default.",
+          "deprecated": null
+        },
+        {
+          "name": "timeIsEditable",
+          "type": "bool",
+          "required": false,
+          "default": "true",
+          "values": null,
+          "description": "Lets a typed time that is not in the list be picked. On by default.",
           "deprecated": null
         },
         {
@@ -14640,7 +14664,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Disables the hour and minute inputs and the period menu.",
+          "description": "Dims the field and blocks opening and changing it.",
           "deprecated": null
         },
         {
@@ -14658,7 +14682,7 @@
           "required": false,
           "default": "false",
           "values": null,
-          "description": "Draws the field invalid; a typed time outside 1–12 / 0–59 does too.",
+          "description": "Draws the field invalid; a typed text that is not a time does too.",
           "deprecated": null
         },
         {
@@ -14676,7 +14700,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "`(value)` — a 12-hour string, or null once either half is cleared.",
+          "description": "`(value)` — a 12-hour string, \"02:30 PM\", or null once cleared.",
           "deprecated": null
         },
         {
@@ -14685,7 +14709,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Focus entering the field from outside it.",
           "deprecated": null
         },
         {
@@ -14694,7 +14718,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Focus leaving the field and its list.",
           "deprecated": null
         },
         {
@@ -14703,7 +14727,7 @@
           "required": false,
           "default": "''",
           "values": null,
-          "description": null,
+          "description": "Extra class names on the field's wrapper, beside its own.",
           "deprecated": null
         },
         {
@@ -14712,7 +14736,7 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": null,
+          "description": "Inline style on the field's wrapper.",
           "deprecated": null
         }
       ],
@@ -14731,18 +14755,6 @@
         "HoveredState",
         "KeyboardFocus",
         "Interactive"
-      ],
-      "tokens": [
-        "--ds-icon-brand",
-        "--ds-icon-danger",
-        "--ds-icon-success",
-        "--ds-text-brand",
-        "--ds-text-danger",
-        "--ds-text-success",
-        "--item-height-sm",
-        "--radius-md",
-        "--stack-sm",
-        "--type-weight-semibold"
       ]
     },
     {

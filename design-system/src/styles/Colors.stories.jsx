@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { Button, TextField } from '@/components';
+import { Button, CloseButton, TextField } from '@/components';
 import { ModeCompare, Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 import { contrastRatio } from '@/storybook-docs/lib/contrast.js';
 import { expect } from 'storybook/test';
@@ -627,7 +627,7 @@ export const BootstrapBridge = () => (
                 <div className="modal-content">
                     <div className="modal-header">
                         <h2 className="modal-title fs-5">Modal</h2>
-                        <button type="button" className="btn-close" aria-label="Close" />
+                        <CloseButton />
                     </div>
                     <div className="modal-body">The dialog surface, body text and border.</div>
                 </div>

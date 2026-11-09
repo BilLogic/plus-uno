@@ -278,6 +278,12 @@ const Listbox = ({
         if (bodyRef.current.clientHeight) setViewport(bodyRef.current.clientHeight);
     });
 
+    // Opening the list brings the picked row into view, so a long list (a
+    // day of times) opens at the value rather than at its top.
+    useLayoutEffect(() => {
+        if (open) scrollOnMove.current = true;
+    }, [open]);
+
     // Keep the cursor's row on screen after a keyboard move.
     useLayoutEffect(() => {
         if (!scrollOnMove.current || !bodyRef.current || !resolvedActive) return;
@@ -292,8 +298,13 @@ const Listbox = ({
             setScrollTop(body.scrollTop);
             return;
         }
+        // Scroll the list's own body only, never the page behind it.
         const row = surfaceRef.current?.querySelector(`#${CSS.escape(resolvedActive)}`);
-        if (row && row.scrollIntoView) row.scrollIntoView({ block: 'nearest' });
+        if (!row) return;
+        const r = row.getBoundingClientRect();
+        const b = body.getBoundingClientRect();
+        if (r.top < b.top) body.scrollTop -= b.top - r.top;
+        else if (r.bottom > b.bottom) body.scrollTop += r.bottom - b.bottom;
     });
 
     /* ---------- live announcements ---------- */

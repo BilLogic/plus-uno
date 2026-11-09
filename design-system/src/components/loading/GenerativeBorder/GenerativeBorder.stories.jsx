@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '@/components';
 import { expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { expect, userEvent, within } from 'storybook/test';
 
@@ -181,9 +182,9 @@ export const Interactive = (args) => {
             <GenerativeBorder {...args} isActive={isActive} data-testid="wrapper" style={wrap}>
                 <Draft />
             </GenerativeBorder>
-            <button type="button" style={toggle} onClick={() => setIsActive((v) => !v)}>
+            <Button style={toggle} onClick={() => setIsActive((v) => !v)}>
                 {isActive ? 'Finish generating' : 'Start generating'}
-            </button>
+            </Button>
         </div>
     );
 };

@@ -189,13 +189,13 @@ Unfilled.play = async ({ canvasElement }) => {
 
     // The caption names the pair, because it cannot name either control.
     const pair = canvas.getByRole('group', { name: /Session time/ });
-    const inputs = within(pair).getAllByRole('textbox');
+    const inputs = within(pair).getAllByRole('combobox');
     await expect(inputs).toHaveLength(2);
 
     // `getByRole` throws on more than one match, so a distinct name each is the
     // assertion: two controls, two names, neither of them "Time".
-    const start = within(pair).getByRole('textbox', { name: 'Start time' });
-    const end = within(pair).getByRole('textbox', { name: 'End time' });
+    const start = within(pair).getByRole('combobox', { name: 'Start time' });
+    const end = within(pair).getByRole('combobox', { name: 'End time' });
     await expect(start).not.toBe(end);
 
     // `showLabel={false}` is a visual switch: the label is in the document,

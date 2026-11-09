@@ -2,7 +2,7 @@ import React from 'react';
 import { expect, waitFor, within } from 'storybook/test';
 
 import { probe, px } from '@/storybook-docs/lib/style-probes.js';
-import { Flag, FlagGroup } from '@/components';
+import { Flag, FlagGroup, Button } from '@/components';
 import Popup from './Popup/Popup';
 import Tooltip from './Tooltip/Tooltip';
 
@@ -71,7 +71,7 @@ export const PopupWidths = () => {
                     show={open}
                     placement="bottom-start"
                     title="Session notes"
-                    trigger={<button type="button">{`Popup ${width}`}</button>}
+                    trigger={<Button>{`Popup ${width}`}</Button>}
                 >
                     Notes stay with the session.
                 </Popup>
@@ -121,7 +121,7 @@ export const PopupLayers = () => {
                 show={open}
                 placement="bottom-start"
                 title="On the page"
-                trigger={<button type="button">Page popup</button>}
+                trigger={<Button>Page popup</Button>}
             >
                 Notes stay with the session.
             </Popup>
@@ -132,7 +132,7 @@ export const PopupLayers = () => {
                     show={open}
                     placement="bottom-start"
                     title="In a modal"
-                    trigger={<button type="button">Modal popup</button>}
+                    trigger={<Button>Modal popup</Button>}
                 >
                     Notes stay with the session.
                 </Popup>
@@ -167,7 +167,7 @@ export const PopupKeepsOffTheScreenEdge = () => {
                 triggerType="manual"
                 show={open}
                 placement="bottom"
-                trigger={<button type="button">Edge</button>}
+                trigger={<Button>Edge</Button>}
             >
                 A wide popup opened from a trigger at the screen edge.
             </Popup>
@@ -198,7 +198,7 @@ export const TooltipSize = () => {
                 placement="bottom"
                 text="Copies the session link so you can paste it into a message to the student's family"
             >
-                <button type="button">Copy</button>
+                <Button>Copy</Button>
             </Tooltip>
         </div>
     );

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Button } from '@/components';
 import { expect, fn, spyOn, userEvent, waitFor, within } from 'storybook/test';
 
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
@@ -322,7 +323,7 @@ export const TypeBehaviors = {
                     >
                         {`${label} page`}
                     </Tag>
-                    <button type="button" onClick={() => setSaving((v) => !v)}>{`Save ${type}`}</button>
+                    <Button onClick={() => setSaving((v) => !v)}>{`Save ${type}`}</Button>
                     <TagContext.Provider value={{ isDisabled: true }}>
                         <Tag type={type} isRemovable onAfterRemoveAction={() => {}} data-testid={`${type}-disabled`}>{`${label} locked`}</Tag>
                     </TagContext.Provider>
@@ -463,8 +464,8 @@ export const AvatarEdgeCases = {
         const [saving, setSaving] = useState(false);
         return (
             <div style={row}>
-                <button type="button" onClick={() => setMounted(true)}>Mount the edge cases</button>
-                <button type="button" onClick={() => setSaving((v) => !v)}>Toggle saving</button>
+                <Button onClick={() => setMounted(true)}>Mount the edge cases</Button>
+                <Button onClick={() => setSaving((v) => !v)}>Toggle saving</Button>
                 {mounted && (
                     <>
                         <Tag type="agent" data-testid="emoji">😀 Helper</Tag>
@@ -746,7 +747,7 @@ export const RemoveNeedsANameForNodeLabels = {
         const [mounted, setMounted] = useState(false);
         return (
             <div style={row}>
-                <button type="button" onClick={() => setMounted(true)}>Mount</button>
+                <Button onClick={() => setMounted(true)}>Mount</Button>
                 {mounted && (
                     <>
                         <Tag isRemovable onAfterRemoveAction={() => {}}><em>Unnamed</em></Tag>
@@ -824,7 +825,7 @@ export const LinkWithRemove = {
     args: { onRemoveSpy: fn(), onFollowSpy: fn() },
     render: ({ onRemoveSpy, onFollowSpy }) => (
         <div style={row}>
-            <button type="button">Before</button>
+            <Button>Before</Button>
             <Tag
                 color="purple"
                 href="#algebra"
@@ -868,7 +869,7 @@ export const LinkWithRemove = {
  */
 export const DisabledInField = () => (
     <div style={row}>
-        <button type="button">Before</button>
+        <Button>Before</Button>
         <TagContext.Provider value={{ isDisabled: true }}>
             <Tag color="blue" data-testid="read-only">Read only</Tag>
             <Tag isRemovable color="blue" onAfterRemoveAction={() => {}} data-testid="removable">Removable</Tag>
@@ -876,7 +877,7 @@ export const DisabledInField = () => (
             <Tag color="blue" isSelected data-testid="selected">Selected</Tag>
             <Tag color="blue" href="#tag" data-testid="link">Link</Tag>
         </TagContext.Provider>
-        <button type="button">After</button>
+        <Button>After</Button>
     </div>
 );
 
@@ -931,7 +932,7 @@ export const CountOnSelectable = {
         return (
             <div style={row}>
                 <Tag isSelected={false} color="green" trailingMetric={12}>Science</Tag>
-                <button type="button" onClick={() => setMounted(true)}>Mount a removable with a count</button>
+                <Button onClick={() => setMounted(true)}>Mount a removable with a count</Button>
                 {mounted && (
                     <Tag isRemovable color="green" trailingMetric={34} onAfterRemoveAction={() => {}}>History</Tag>
                 )}
@@ -985,9 +986,9 @@ export const Saving = {
                     >
                         Calculus
                     </Tag>
-                    <button type="button" onClick={() => setSaving((v) => !v)}>
+                    <Button onClick={() => setSaving((v) => !v)}>
                         {saving ? 'Done' : 'Save'}
-                    </button>
+                    </Button>
                 </div>
             );
         };
@@ -1453,7 +1454,7 @@ export const ElevatedOnlyReadOnlyAndLink = {
         const [mounted, setMounted] = useState(false);
         return (
             <div style={row}>
-                <button type="button" onClick={() => setMounted(true)}>Mount elevated editable tags</button>
+                <Button onClick={() => setMounted(true)}>Mount elevated editable tags</Button>
                 {mounted && (
                     <>
                         <Tag isRemovable color="purple" isElevated onAfterRemoveAction={() => {}} data-testid="removable">

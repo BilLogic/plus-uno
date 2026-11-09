@@ -23,7 +23,7 @@ Adding a doc changes this file; editing this file changes nothing.
 
 | Doc | Summary |
 |-----|---------|
-| [`README.md`](README.md) | ![Netlify Status](https://app.netlify.com/projects/plus-uno/deploys) |
+| [`README.md`](README.md) | The front page — what plus-uno is, every surface it ships (Storybook, the Vibe app, the demo, the design-system lookup, uno skills, uno-bot), and where each one's docs live. |
 | [`SETUP.md`](SETUP.md) | Clone, install, run, and find your way around — without reading the constitution first. |
 | [`AGENTS.md`](AGENTS.md) | The constitution — identity, routing, the loading contract, and hard rules for every embodiment. |
 | [`GLOSSARY.md`](GLOSSARY.md) | Use these terms consistently across all design system work, prototypes, and documentation |
@@ -138,7 +138,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/product-and-service/flows.md`](docs/product-and-service/flows.md) | The core workflow — what happens before, during, and after every tutoring session |
 | [`docs/product-and-service/onboarding.md`](docs/product-and-service/onboarding.md) | New designer, PM, developer, or intern: this page + the six skills are all you memorize |
 | [`docs/product-and-service/plus-app.md`](docs/product-and-service/plus-app.md) | AI is rewriting our economy, but global K-12 math proficiency is at a historic low due to lack of content mastery and emotional support |
-| [`docs/product-and-service/plus-uno.md`](docs/product-and-service/plus-uno.md) | This repo is the design system, prototyping workspace, and agent infrastructure for the PLUS tutoring platform |
+| [`docs/product-and-service/plus-uno.md`](docs/product-and-service/plus-uno.md) | This repo as a product — who runs it, what it deploys where, and what it connects to; the surface map itself is README.md |
 | [`docs/product-and-service/uno-bot-flowcharts/uno-bot-v2-flowcharts.md`](docs/product-and-service/uno-bot-flowcharts/uno-bot-v2-flowcharts.md) | The system around uno-bot: where it sits relative to GitHub Actions, Slack, Notion, Figma, and the model provider |
 | [`docs/product-and-service/users.md`](docs/product-and-service/users.md) | PLUS Users & Stakeholders |
 

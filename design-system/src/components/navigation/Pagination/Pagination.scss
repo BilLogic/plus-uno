@@ -74,6 +74,18 @@
     }
 }
 
+// The end segments take the pill's own rounded ends: the pill clips to its
+// radius, so a square end segment had its inset ring cut off at the corners.
+.plus-pagination__item:first-child > :is(.plus-pagination__page, .plus-pagination__navigator, .plus-pagination__gap) {
+    border-start-start-radius: var(--radius-full);
+    border-end-start-radius: var(--radius-full);
+}
+
+.plus-pagination__item:last-child > :is(.plus-pagination__page, .plus-pagination__navigator, .plus-pagination__gap) {
+    border-start-end-radius: var(--radius-full);
+    border-end-end-radius: var(--radius-full);
+}
+
 // Each part draws its own ring, inside the segment so its neighbors do not
 // cover it.
 .plus-pagination__page:focus-visible {

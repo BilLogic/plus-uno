@@ -258,7 +258,7 @@ export const WithValue = {
     ),
     play: async ({ canvasElement }) => {
         await expect(dateInput(canvasElement)).toHaveValue('10/21/2026');
-        await expect(timeInput(canvasElement)).toHaveValue('04:00');
+        await expect(timeInput(canvasElement)).toHaveValue('4:00 PM');
     },
 };
 

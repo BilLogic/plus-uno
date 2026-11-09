@@ -289,6 +289,15 @@ export const CHECKS = [
     guards: 'imports of react-bootstrap in design-system/src, prototypes and src, counted per file; a count may fall and never rise.',
   },
   {
+    name: 'check:raw-buttons',
+    script: 'node scripts/check-raw-buttons.mjs',
+    pkg: 'root',
+    trigger: 'pull_request',
+    module: 'scripts/check-raw-buttons.mjs',
+    floors: { MIN_FILES: 500 },
+    guards: 'raw `<button>` tags and Bootstrap `btn` classes in stories and MDX docs, which render unstyled; use the PLUS Button, IconButton or CloseButton.',
+  },
+  {
     name: 'check:retired-spelling',
     script: 'node scripts/check-retired-spelling.mjs',
     pkg: 'root',
