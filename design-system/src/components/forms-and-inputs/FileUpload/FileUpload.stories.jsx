@@ -235,7 +235,9 @@ export const WithFiles = () => (
     </div>
 );
 
-export const Interactive = (args) => (
+// `formatPreset` is this story's own control, not a FileUpload prop: it picks
+// the accepted formats and stays out of the component's props.
+export const Interactive = ({ formatPreset, ...args }) => (
     <div style={{ maxWidth: 'var(--size-4000)' }}>
         <FileUpload
             {...args}
@@ -243,7 +245,7 @@ export const Interactive = (args) => (
                 mixed: formats,
                 documents: ['.pdf', '.docx', '.txt'],
                 media: ['.mp4', '.mov', '.mp3']
-            }[args.formatPreset] || formats}
+            }[formatPreset] || formats}
         />
     </div>
 );
