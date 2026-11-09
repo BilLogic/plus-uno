@@ -49,7 +49,7 @@ A rich text editor lets a person write text with formatting such as emphasis, li
 
 <ComponentExample of={RichTextEditorStories.Empty} title="Default" description="The default toolbar over an empty writing area with a placeholder." />
 
-<ComponentExample of={RichTextEditorStories.FullToolbar} title="Full" description="`toolbarPreset` set to `full` shows every formatting button in a bordered editor." />
+<ComponentExample of={RichTextEditorStories.FullToolbar} title="Full" description="`toolbarPreset` set to `full` shows every formatting button, in the same flat toolbar as the compact preset." />
 
 <ComponentExample of={RichTextEditorStories.Compact} title="Compact spacing" description="`spacing` set to `compact` tightens the writing area's padding and minimum height." />
 
@@ -63,7 +63,7 @@ A rich text editor lets a person write text with formatting such as emphasis, li
 
 <ComponentExample of={RichTextEditorStories.Filled} title="Filled" description="The writing area holds formatted content." />
 
-<ComponentExample of={RichTextEditorStories.Focused} title="Focused" description="A 2px ring wraps the editor while the writing area has focus." />
+<ComponentExample of={RichTextEditorStories.Focused} title="Focused" description="A 2px ring wraps the box while the writing area has focus." />
 
 <ComponentExample of={RichTextEditorStories.ReadOnly} title="Read-only" description="The content shows on the neutral fill and cannot be edited. The toolbar is inactive." />
 
@@ -109,9 +109,10 @@ Use a rich text editor where the formatting is part of the meaning: session note
 
 ## Parts
 
-1. **Label.** Text above the editor that names it.
-2. **Toolbar.** Formatting buttons: block style, bold, italic, underline, lists, link and more.
-3. **Writing area.** The editable region, with a placeholder while it is empty.
+1. **Label.** Text above the box that names it.
+2. **Box.** One edge around the toolbar and the writing area together.
+3. **Toolbar.** Flat formatting buttons along the top of the box: block style, bold, italic, underline, lists, link and more. A keyline separates it from the writing area.
+4. **Writing area.** The editable region, with a placeholder at the start of its first line while it is empty.
 
 ### States
 
@@ -120,13 +121,13 @@ Use a rich text editor where the formatting is part of the meaning: session note
 <tr><th>State</th><th>What changes</th></tr>
 </thead>
 <tbody>
-<tr><td>Rest</td><td><code>--ds-background-input</code> writing area inside a <code>--ds-border-input</code> edge.</td></tr>
+<tr><td>Rest</td><td>A <code>--ds-background-input</code> box inside one <code>--ds-border-input</code> edge.</td></tr>
 <tr><td>Hovered</td><td>Toolbar buttons take <code>--ds-background-neutral-subtle-hovered</code>. The writing area has no hover step.</td></tr>
 <tr><td>Pressed</td><td>Toolbar buttons take <code>--ds-background-neutral-subtle-pressed</code>.</td></tr>
 <tr><td>Active format</td><td>The button takes <code>--ds-background-selected</code> with <code>--ds-text-selected</code> and <code>--ds-icon-selected</code>.</td></tr>
-<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> wraps the editor while the writing area has focus.</td></tr>
-<tr><td>Read-only</td><td><code>--ds-background-neutral</code> writing area, <code>--ds-text-subtle</code> text, toolbar faded and inert.</td></tr>
-<tr><td>Disabled</td><td>As read-only: the neutral writing area and subtle text, and the toolbar faded to <code>--ds-opacity-disabled</code> and inert.</td></tr>
+<tr><td>Focused</td><td>A 2px ring in <code>--ds-border-focused</code> wraps the box while the writing area has focus.</td></tr>
+<tr><td>Read-only</td><td><code>--ds-background-neutral</code> box, <code>--ds-text-subtle</code> text, toolbar faded and inert.</td></tr>
+<tr><td>Disabled</td><td>As read-only: the neutral box and subtle text, and the toolbar faded to <code>--ds-opacity-disabled</code> and inert.</td></tr>
 <tr><td>Invalid</td><td>Not drawn. Mark the surrounding field and explain the error beside it.</td></tr>
 </tbody>
 </DocsTable>
@@ -138,9 +139,9 @@ Use a rich text editor where the formatting is part of the meaning: session note
 <tr><th>Part</th><th>Token</th></tr>
 </thead>
 <tbody>
-<tr><td>Fill, edge</td><td><code>--ds-background-input</code>; <code>--ds-border-input</code> at <code>--border-default</code>; corner <code>--radius-md</code>.</td></tr>
-<tr><td>Toolbar</td><td><code>--ds-surface-container</code>; gap <code>--stack-md</code>; padding <code>--space-025</code> and <code>--pad-x-sm</code>.</td></tr>
-<tr><td>Writing area</td><td>Body default in <code>--ds-text</code>; minimum height <code>--field-min-height-lg</code> (120).</td></tr>
+<tr><td>Fill, edge</td><td><code>--ds-background-input</code>; <code>--ds-border-input</code> at <code>--border-default</code>; corner <code>--radius-0625</code>, the Text area's.</td></tr>
+<tr><td>Toolbar</td><td>Subtle icon buttons; gap <code>--stack-md</code> between clusters, <code>--stack-sm</code> inside one; padding <code>--pad-x-xs</code>; keyline <code>--ds-border</code>.</td></tr>
+<tr><td>Writing area</td><td>Body default in <code>--ds-text</code>; padding <code>--pad-y-lg</code> and <code>--pad-x-md</code>; minimum height <code>--field-min-height-lg</code> (120).</td></tr>
 <tr><td>Placeholder</td><td><code>--ds-text-subtlest</code>.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px.</td></tr>
 </tbody>
