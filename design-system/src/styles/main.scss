@@ -18,20 +18,12 @@
   // Design Tokens
   // Loaded via meta.load-css (not @use) so each module's :root blocks and CSS
   // rules land inside this layer; @use cannot be nested inside an at-rule.
-  @include meta.load-css("../tokens/colors");
-  // Hand-maintained role layer; see the header of _color_roles.scss. Must follow
-  // colors, since most of it aliases values defined there.
-  @include meta.load-css("../tokens/color_roles");
-  @include meta.load-css("../tokens/primitives");
-  @include meta.load-css("../tokens/spacing_semantics");
-  @include meta.load-css("../tokens/layout");
-  // The new scales, beside the old size tokens; see the header of _scales.scss.
   @include meta.load-css("../tokens/scales");
   @include meta.load-css("../tokens/frame_layers");
+  // The type tokens, the fallback faces and the base heading and body type.
   @include meta.load-css("../tokens/fonts");
-  @include meta.load-css("../tokens/elevation");
-  // The generated color tokens (palette ramps, `--ds-*` roles, elevation pairs),
-  // beside the old ones until the components move over. Each mode is a selector
+  // The generated color tokens (palette ramps, `--ds-*` roles, elevation pairs).
+  // Each mode is a selector
   // on <html>: `data-color-mode` (light, dark, auto) and `data-contrast-mode`
   // (more, no-preference, auto); no attribute is light at standard contrast. The
   // Bootstrap bridge points Bootstrap's root `--bs-*` variables at these roles, so
@@ -44,7 +36,7 @@
   @include meta.load-css("../tokens/color/bootstrap-bridge");
   // The token ladder and motion (ADR-038, #1756): generated from
   // scripts/lib/tokens/plan.mjs, never from Figma. Each tier declares its own
-  // values; the retired size, layout and role names are gone. Regenerate,
+  // values. Regenerate,
   // never edit: `npm run generate:design-tokens`.
   @include meta.load-css("../tokens/ladder/motion");
   @include meta.load-css("../tokens/ladder/semantics");

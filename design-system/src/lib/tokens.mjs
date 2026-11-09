@@ -51,7 +51,7 @@
  * differences were real and are recorded where they were handled: a name is no
  * longer read case-insensitively (no custom property in the tree has an
  * uppercase letter), and `scripts/doc-identifiers.mjs` still rejects a trailing
- * hyphen on top of this grammar, because `--color-` in a docs page means a
+ * hyphen on top of this grammar, because `--ds-` in a docs page means a
  * FAMILY rather than a token.
  */
 
@@ -65,11 +65,10 @@ export const TOKEN_NAME_TAIL = '[a-z0-9-]+';
 export const TOKEN_NAME = `--${TOKEN_NAME_TAIL}`;
 
 /**
- * Escape a literal prefix so `--color-` cannot act as a pattern. A LIST of
+ * Escape a literal prefix so `--ds-` cannot act as a pattern. A LIST of
  * prefixes is one non-capturing alternation, so a caller reading two families
- * at once (`['--color-', '--ds-']`, while the legacy color tokens and the
- * Atlassian-shaped ones coexist) keeps the same group numbers as one reading a
- * single prefix.
+ * at once (`['--ds-', '--palette-']`) keeps the same group numbers as one
+ * reading a single prefix.
  *
  * @param {string|string[]} text
  */
@@ -85,7 +84,7 @@ function literal(text) {
  * left on. A fresh RegExp each call, because a `/g` pattern carries `lastIndex`
  * and a shared one is a bug that only shows up on the second caller.
  *
- * @param {string|string[]} [prefix] e.g. `--color-`, or a list of them;
+ * @param {string|string[]} [prefix] e.g. `--ds-`, or a list of them;
  *        defaults to every token
  */
 export function tokenDeclarationPattern(prefix = '--') {
@@ -121,7 +120,7 @@ const ALIAS = new RegExp(`^var\\(\\s*(${TOKEN_NAME})\\s*(?:,[^)]*)?\\)$`, 'i');
  * value. The FIRST definition wins and the rest are ignored.
  *
  * That is not arbitrary: only the `:root` light values are read, and `:root`
- * comes first in `_colors.scss`. A dark-mode sweep is a second job and a bigger
+ * comes first in `color/_semantic.scss`. A dark-mode sweep is a second job and a bigger
  * one — it needs the dark page as well as the dark tokens — and saying so here
  * is better than a half-measure that looks like both.
  *

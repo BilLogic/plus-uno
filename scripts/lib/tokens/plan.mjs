@@ -61,16 +61,8 @@ export const MOTION_EASINGS = {
  *  - `--focus-ring-radius` has no single existing source (nothing in the repo
  *    binds a radius to a focus ring today); seeded at `--radius-sm` as a first
  *    pass, same as ADR-038 left Motion's curves for Adrija to refine.
- *  - `--size-icon-*` / `--size-indicator-*` / `--size-row-*` / `--size-media-*`
- *    (the `SIZE_ROLES` in `generate-all-tokens.js`) are a second, overlapping
- *    size-role vocabulary this ladder does not fold in yet — only `Control`
- *    is missing from `_scales.scss`'s Icon/Image/Item/Label/Row/Field set, so
- *    only `--control-*` is added here. Reconciling Icon/Row/Media across both
- *    vocabularies is a follow-up a family PR scopes on its own.
- *  - The legacy spec-page grid (`--breakpoint-*`, `--col-*`, `--layout-grid-gap`
- *    in `_layout.scss`) is out of this ladder: `_layout.scss` already calls it
- *    legacy and routes new work at the screen/content grid tokens instead, so
- *    there is nothing current to re-home it to.
+ *  - Only `--control-*` is added to the size roles: `_scales.scss` already
+ *    carries Icon, Image, Item, Label, Row and Field.
  *  - `color / foundations` -> `color / semantics` and `opacity` -> `color /
  *    opacity`, and Figma's `Element/opacity-disabled` moving into the latter,
  *    are Figma-collection-membership changes only: code already names the one
@@ -425,7 +417,7 @@ export const TOKEN_LADDER = [
  *  - `--size-element-*`: the old Figma element vocabulary, split by property
  *    onto the semantics Pad / Stack / Radius steps. Two of its values have no
  *    semantic step (a 4px vertical pad, a 10px gap) and read the primitive
- *    instead, and its 1.5px and 3px strokes read the stroke primitive.
+ *    instead, and its 1.5px and 3px strokes take the 2px stroke.
  *  - `--element-{pad|gap|radius}-{default|compact}`: the role tokens this
  *    plan's first pass wrote; no "roles" concept survives (Bill, 2026-11-04).
  *  - `--card-pad-{sm|md|lg}`: the same 16/20/24 as `--card-pad-{compact|default|spacious}`.
@@ -447,9 +439,9 @@ export const RETIRED_RENAMES = {
   '--size-element-radius-lg': '--radius-lg',
   '--size-element-radius-full': '--radius-full',
   '--size-element-stroke-sm': '--stroke-1',
-  '--size-element-stroke-md': '--size-border-stroke-stroke-150',
+  '--size-element-stroke-md': '--stroke-2',
   '--size-element-stroke-lg': '--stroke-2',
-  '--size-element-stroke-xl': '--size-border-stroke-stroke-300',
+  '--size-element-stroke-xl': '--stroke-2',
   '--size-element-border': '--border-default',
   '--element-radius-full': '--radius-full',
   '--element-pad-default': '--pad-x-md',
