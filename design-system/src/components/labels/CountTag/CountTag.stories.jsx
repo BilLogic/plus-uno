@@ -3,6 +3,7 @@ import { expect, spyOn, userEvent, within } from 'storybook/test';
 
 import { contrastRatio as contrast } from '@/storybook-docs/lib/contrast.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
+import { Button } from '@/components';
 import CountTag, { COUNT_TAG_APPEARANCES, COUNT_TAG_SPACINGS } from './CountTag';
 import { expectGroundUnder, expectNoStateChange, expectNotAControl } from '@/storybook-docs/lib/label-states.js';
 import { iconClass } from '../../../lib/icon';
@@ -66,9 +67,7 @@ export const Appearances = () => (
     <div style={row}>
         <CountTag value={12} />
         <CountTag value={13} isBold appearance="danger" />
-        <button type="button" className="btn btn-primary">
-            Review <CountTag value={14} isInverse />
-        </button>
+        <Button appearance="primary" iconAfter={<CountTag value={14} isInverse />}>Review</Button>
         <span style={{ background: 'var(--ds-background-neutral-bold)', padding: '8px', borderRadius: '6px' }}>
             <CountTag value={15} isInverse />
         </span>
@@ -292,10 +291,10 @@ export const DotNeedsALabel = () => {
     const [unnamed, setUnnamed] = useState(false);
     return (
         <div style={row}>
-            <button type="button" onClick={() => setNamed(true)}>Mount a named dot</button>
-            <button type="button" onClick={() => setUnnamed((v) => !v)}>
+            <Button onClick={() => setNamed(true)}>Mount a named dot</Button>
+            <Button onClick={() => setUnnamed((v) => !v)}>
                 {unnamed ? 'Remove the unnamed dot' : 'Mount an unnamed dot'}
-            </button>
+            </Button>
             {named && <CountTag isDot appearance="success" label="Online" />}
             {unnamed && <span data-testid="unnamed"><CountTag isDot /></span>}
         </div>
@@ -321,9 +320,7 @@ DotNeedsALabel.play = async ({ canvasElement }) => {
 
 /** With a label, a number is read as information rather than a bare digit. */
 export const LabeledNumber = () => (
-    <button type="button" className="btn btn-outline-secondary">
-        Messages <CountTag value={4} label="4 unread" />
-    </button>
+    <Button iconAfter={<CountTag value={4} label="4 unread" />}>Messages</Button>
 );
 LabeledNumber.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
