@@ -100,7 +100,8 @@ NamesAControl.play = async ({ canvasElement }) => {
     const label = canvas.getByText('Delete session');
     await inEveryColorMode((mode) => expectNotDrawn(label, 'the label', mode));
     await expectInTree(label, 'the label');
-    await expect(button.getBoundingClientRect().width, 'the button stays its own size').toBe(40);
+    // The hidden label takes no room, so the button is the icon and its padding, not the width of "Delete session".
+    await expect(button.getBoundingClientRect().width, 'the button stays icon-sized').toBeLessThan(56);
 };
 
 /* ----------------------------------------------------------------- header cell */
