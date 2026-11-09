@@ -261,13 +261,16 @@ html {
     }
 }
 
-/* Links - using primary-text for accessibility */
-.sbdocs a,
+/* Links in the docs prose take the link color. Fenced off story canvases and
+   do and don't cards: a component paints its own link ink (Link's inverse and
+   subtle appearances, Link button's filled appearances), and this rule's
+   !important overrode it, turning every link a story renders link-colored. */
+.sbdocs a:not(:where(.docs-story *, .sb-unstyled *, .sb-ds-dodont-card *)),
 a.sbdocs-a {
     color: var(--ds-link) !important;
 }
 
-.sbdocs a:hover {
+.sbdocs a:not(:where(.docs-story *, .sb-unstyled *, .sb-ds-dodont-card *)):hover {
     color: var(--ds-link-pressed) !important;
 }
 
