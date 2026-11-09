@@ -25,7 +25,8 @@
     margin-block-end: var(--stack-md);
 }
 
-.plus-prompt-input__control {
+// Scoped under the root: Field's `textarea.plus-field__control` (resize: vertical) is more specific than one class.
+.plus-prompt-input .plus-prompt-input__control {
     resize: none;
     max-height: var(--plus-prompt-input-max-height);
     overflow-y: auto;
