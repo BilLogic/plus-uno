@@ -49,6 +49,18 @@ A row of dots showing where you are along the steps of a journey. Unlike
 
 <div className="sb-ds-doc-section">
 
+## Timed bar
+
+<ComponentExample of={ProgressIndicatorStories.Timed} title="Progress" description={<>With <code>progress</code>, the current dot stretches into a bar whose fill grows to that fraction, from 0 to 1. A step with no clock passes <code>1</code>, so the bar shows full.</>} />
+
+<ComponentExample of={ProgressIndicatorStories.Clock} title="On a clock" description={<>A clock drives <code>progress</code>: the bar fills over the step's time, then the next dot stretches and starts over. A carousel that moves on its own works this way.</>} />
+
+<ComponentExample of={ProgressIndicatorStories.TimedInteractive} title="Timed and selectable" description={<>With <code>onSelect</code> as well, every dot is a button a person can press to jump there.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## State
 
 <ComponentExample of={ProgressIndicatorStories.Rest} title="Rest" description="Dots on the subtlest icon ground; the current dot on the brand ground." />
@@ -96,6 +108,9 @@ Use `ProgressIndicator` for a short sequence where position matters more than
 the name of each step — a carousel, an onboarding flight, a slide deck. When
 each step has its own label people need to see, use `ProgressTracker` instead.
 
+When each step lasts a set time and moves on by itself, pass `progress` so the
+current dot shows how much of its time is left.
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -105,6 +120,8 @@ each step has its own label people need to see, use `ProgressTracker` instead.
 1. **Dot.** One per step: 8 or 12 across, a circle.
 2. **Current dot.** The brand ground (discovery for help, inverse icon for inverted), with <code>aria-current="step"</code>.
 3. **Group.** The row, named by <code>label</code>.
+4. **Bar.** With <code>progress</code>, the current dot is 32 long: the subtlest icon ground is the track, and the fill, in the current dot's color, grows from the start edge. Under reduced motion it shows full.
+5. **Target.** A dot that is a button keeps a 24 target, so the gap between buttons widens to fit it.
 
 ### States
 
@@ -132,7 +149,8 @@ each step has its own label people need to see, use `ProgressTracker` instead.
 <tr><td>Current dot</td><td><code>--ds-background-brand-bold</code>, <code>--ds-background-discovery-bold</code>, <code>--ds-icon-inverse</code></td></tr>
 <tr><td>Inverted dot</td><td><code>--ds-background-inverse-subtle</code> and its states</td></tr>
 <tr><td>Size</td><td><code>--progress-indicator-dot-size-8</code>, <code>--progress-indicator-dot-size-12</code></td></tr>
-<tr><td>Gap</td><td><code>--inline-md</code>, <code>--inline-sm</code>, <code>--stack-sm</code></td></tr>
+<tr><td>Bar</td><td><code>--control-md</code> long; track <code>--ds-icon-subtlest</code>, fill the current dot's color</td></tr>
+<tr><td>Gap</td><td><code>--inline-md</code>, <code>--inline-sm</code>, <code>--stack-sm</code>; between buttons at least <code>--control-sm</code> less the dot</td></tr>
 <tr><td>Ring</td><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td></tr>
 </tbody>
 </DocsTable>
@@ -217,7 +235,11 @@ The array's content never renders. Its length becomes the number of dots, and wh
 - **The current step is `aria-current="step"`.** This is the only state a
   non-interactive indicator exposes.
 - **Interactive dots are real buttons**, each named from its `values` entry
-  and linked to the content it controls with `ariaControls`.
+  and linked to the content it controls with `ariaControls`, each with a 24
+  target.
+- **The bar is hidden from assistive technology.** Its fill is a picture of
+  time; `aria-current` still names the current step.
+- **Reduced motion shows the bar full**, so nothing grows on screen.
 
 </div>
 

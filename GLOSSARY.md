@@ -291,7 +291,7 @@ _Avoid_: "mascot", "avatar" for a character
 
 **Progress indicator**:
 A row of dots that shows the current step of a sequence. With `progress`, the current dot stretches into a bar that fills over the step's time, as in a **Carousel**; without a clock (autoplay off, or reduced motion) the stretched dot shows full.
-_Avoid_: "pill", "dots", "slide marker"
+_Avoid_: "dots", "slide marker"
 
 ### Design system: tokens
 

@@ -7,7 +7,7 @@ authored half, counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [ProgressIndicator](ProgressIndicator/index.md) | 8 | ✅ | ✅ | ✅ |
+| [ProgressIndicator](ProgressIndicator/index.md) | 9 | ✅ | ✅ | ✅ |
 | [ProgressTracker](ProgressTracker/index.md) | 4 | ✅ | ✅ | ✅ |
 
 **Authored coverage:** When to use 2/2 (100%) · Correct/incorrect 2/2 (100%) · Accessibility 2/2 (100%)

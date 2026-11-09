@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 // importing it from here would read Carousel before it is defined.
 import IconButton from '@/components/forms-and-inputs/IconButton';
 import Heading from '@/components/text-and-data-display/Heading';
+import ProgressIndicator from '@/components/status-indicators/ProgressIndicator';
 import { headingTag, useHeadingLevel } from '@/lib/headingLevel';
 import './Carousel.scss';
 
@@ -112,16 +113,37 @@ const SlideMedia = ({ item, index }) => {
     return <div className="plus-carousel-content">{item.media}</div>;
 };
 
+// The progress indicator under the stage. It holds the clock's value itself,
+// so the frame loop re-renders the dots and not the whole carousel.
+const CarouselDots = ({ slides, index, timed, clockRef, onSelect }) => {
+    const [progress, setProgress] = useState(0);
+    useEffect(() => {
+        clockRef.current = setProgress;
+        return () => { clockRef.current = null; };
+    }, [clockRef]);
+    const count = slides.length;
+    return (
+        <ProgressIndicator
+            values={slides.map((item, k) => `Slide ${k + 1} of ${count}${item.title ? `: ${item.title}` : ''}`)}
+            selectedIndex={index}
+            progress={timed ? progress : 1}
+            onSelect={({ index: k }) => onSelect(k)}
+            label="Choose a slide"
+        />
+    );
+};
+
 /**
  * Carousel
  * A centered stage of slides: the active one full size and, with `peek`, one
  * neighbor on each side in the same flat row, smaller and faded. Under it, a
- * play button whose ring fills over the slide's time, a pill per slide (the
- * active one stretches and fills on the same clock), and a caption that
- * changes with the slide. Autoplay holds while the pointer rests on the stage,
- * keyboard focus is inside, the carousel is out of view or the tab is hidden.
- * Under reduced motion it never moves on its own: arrows replace the play
- * button, the active pill shows full and every move is instant.
+ * play button whose ring fills over the slide's time, a progress indicator
+ * whose current dot stretches into a bar that fills on the same clock, and a
+ * caption that changes with the slide. Autoplay holds while the pointer rests
+ * on the stage, keyboard focus is inside, the carousel is out of view or the
+ * tab is hidden. Under reduced motion it never moves on its own: arrows
+ * replace the play button, the current bar shows full and every move is
+ * instant.
  */
 const Carousel = ({
     slides = [],
@@ -160,8 +182,10 @@ const Carousel = ({
     const [pageHidden, setPageHidden] = useState(() => typeof document !== 'undefined' && document.hidden);
 
     const elapsedRef = useRef(0);
+    const dotsClockRef = useRef(null);
     const paint = useCallback((progress) => {
         rootRef.current?.style.setProperty('--carousel-progress', progress.toFixed(4));
+        dotsClockRef.current?.(progress);
     }, []);
 
     const onSlideChangeRef = useRef(onSlideChange);
@@ -181,7 +205,7 @@ const Carousel = ({
     }, [count, paint, wraps]);
 
     // The clock: one frame loop writing a single progress value the ring and
-    // the active pill both read. It holds, and resumes where it held.
+    // the current dot both read. It holds, and resumes where it held.
     const running = autoplays && !paused && !hovered && !focusHeld && inView && !pageHidden;
     useEffect(() => {
         if (!running) return undefined;
@@ -364,26 +388,11 @@ const Carousel = ({
                         />
                     )}
                     {/*
-                      * A pill per slide. The active one stretches and its fill
-                      * grows on the slide's clock; under reduced motion or
+                      * A dot per slide. The current one stretches into a bar
+                      * that fills on the slide's clock; under reduced motion or
                       * without autoplay it shows full.
                       */}
-                    <div className="plus-carousel-pills" role="group" aria-label="Choose a slide">
-                        {slides.map((item, k) => (
-                            <button
-                                key={item.id ?? k}
-                                type="button"
-                                className={['plus-carousel-pill', k === index && 'plus-carousel-pill--active'].filter(Boolean).join(' ')}
-                                aria-label={`Slide ${k + 1} of ${count}${item.title ? `: ${item.title}` : ''}`}
-                                aria-current={k === index ? 'true' : undefined}
-                                onClick={() => goTo(k)}
-                            >
-                                <span className="plus-carousel-pill-track" aria-hidden="true">
-                                    <span className="plus-carousel-pill-fill" />
-                                </span>
-                            </button>
-                        ))}
-                    </div>
+                    <CarouselDots slides={slides} index={index} timed={autoplays} clockRef={dotsClockRef} onSelect={goTo} />
                     {isStatic && (
                         <IconButton
                             icon="fa-solid fa-chevron-right"
@@ -419,7 +428,7 @@ const requireName = (props, propName, componentName) => {
 };
 
 Carousel.propTypes = {
-    /** The slides, in order. `media` is the card; `title` and `description` fill the caption and name the pill. A string `media` renders as text, or as an image when it is a path ending in an image extension (`alt` describes it). */
+    /** The slides, in order. `media` is the card; `title` and `description` fill the caption and name the slide's dot. A string `media` renders as text, or as an image when it is a path ending in an image extension (`alt` describes it). */
     slides: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
         media: PropTypes.oneOfType([PropTypes.string, PropTypes.node]).isRequired,
