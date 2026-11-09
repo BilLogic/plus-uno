@@ -24,8 +24,8 @@ export const DS_MCP_URL = "https://plus-uno.netlify.app/mcp/ds";
 /** The read timeout every repo read in this Worker uses (`GH_TIMEOUT_MS`); a miss falls back at no further cost. */
 export const DS_MCP_TIMEOUT_MS = 8000;
 
-export type DsSection = "props" | "usage" | "examples" | "a11y" | "figma";
-export const DS_SECTIONS: readonly DsSection[] = ["props", "usage", "examples", "a11y", "figma"];
+export type DsSection = "props" | "usage" | "practices" | "a11y" | "figma";
+export const DS_SECTIONS: readonly DsSection[] = ["props", "usage", "practices", "a11y", "figma"];
 
 export type DsMcpPost = (url: string, init: RequestInit, timeoutMs?: number) => Promise<Response>;
 

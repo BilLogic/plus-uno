@@ -32,7 +32,7 @@ import { createPageFinder, readDocsPage } from './lib/docs-page.mjs';
 import { resolveNamedOneOf } from './doc-identifiers.mjs';
 import { varReferencePattern } from '../design-system/src/lib/tokens.mjs';
 import { readBarrel } from './lib/ds-facts.mjs';
-import { searchAliases } from './lib/ds-vocabulary.mjs';
+import { aliasInputs, searchAliases } from './lib/ds-vocabulary.mjs';
 import { buildComponentsManifest, serializeManifest } from './lib/agent-manifests.mjs';
 import { AGENT_ROOT } from './agent-views-paths.js';
 import { enumValuesOf } from './lib/enum-values.mjs';
@@ -554,11 +554,10 @@ written.push([path.join(AGENT_ROOT, 'components.json'), serializeManifest(manife
 const registry = JSON.parse(readIf(path.join(REPO_ROOT, 'design-system/figma/component-registry.json')) || '{}');
 const findPage = createPageFinder(REPO_ROOT, registry);
 /** The words each component is asked by: `agent-views/_aliases.json`, then the glossary's design-system avoid-words. */
-const { rows: aliasRows } = searchAliases(readIf(path.join(REPO_ROOT, 'GLOSSARY.md')) || '', {
-  names: manifest.components.map((c) => c.name),
-  notHere: (JSON.parse(readIf(path.join(AGENT_ROOT, '_inventions.json')) || '{}').components ?? []).map((r) => r.not),
-  handAliases: JSON.parse(readIf(path.join(AGENT_ROOT, '_aliases.json')) || '{}').components ?? {},
-});
+const { rows: aliasRows } = searchAliases(
+  readIf(path.join(REPO_ROOT, 'GLOSSARY.md')) || '',
+  aliasInputs(AGENT_ROOT, manifest.components.map((c) => c.name)),
+);
 const docsOf = (record) => {
   const page = findPage({ name: record.name, source: record.source });
   return page ? { path: page, page: readDocsPage(fs.readFileSync(path.join(REPO_ROOT, page), 'utf8'), { root: REPO_ROOT, file: page }) } : null;

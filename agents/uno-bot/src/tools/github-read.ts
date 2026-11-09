@@ -49,42 +49,52 @@ export interface DsLookupOptions {
   section?: DsSection;
 }
 
+type Facts = ReturnType<typeof dsFacts>;
+type Found = ReturnType<Facts["find"]>;
+
 /**
- * A design-system question, asked of the hosted MCP first and answered from the
- * facts baked into the Worker when it misses. A name — `Card`, `card`,
- * `Button.appearance`, `--stack-md` — is `ds_get`; a task in words is
- * `ds_find`; a token role (`stack`) is answered from the built-in facts, with
- * no call. One subrequest at most (`integrations/ds-mcp.ts`).
+ * What a design-system question is, decided from the built-in facts alone,
+ * before anything is spent:
+ *
+ *   token-role  a token role (`stack`): answered from the built-in facts, no call
+ *   get         a name the facts know, or a token (`--stack-md`): `ds_get`
+ *   find        a task in words: `ds_find`
+ *
+ * `found` is the built-in answer the facts give when the hosted call is not made or misses.
  */
-export async function lookupDesignSystem(query: string, opts: DsLookupOptions = {}): Promise<string> {
-  const facts = dsFacts();
-  const q = query.trim();
+export type DsQuery =
+  | { kind: "token-role"; q: string; found: Found; tokens: ReturnType<Facts["tokens"]> }
+  | { kind: "get"; q: string; found: Found | null; name: string }
+  | { kind: "find"; q: string; found: Found | null };
+
+export function classifyDsQuery(q: string, facts: Facts): DsQuery {
   const found = q.startsWith("--") ? null : facts.find(q);
-  const roleTokens = found && found.answer.status === "unknown" && !q.includes(".") ? facts.tokens(q) : [];
-
-  // Which hosted call the question is: a name the facts know (or a token) is a get, words are a find.
-  const named = q.startsWith("--") || (found !== null && found.answer.status !== "unknown");
-  // `ds_get` takes a prop, not a prop's value: `Button.appearance=primary` asks for `Button.appearance`.
-  const hostedName = (found && found.answer.status !== "unknown" ? found.answer.name : q).split("=")[0]!;
-  let fallback: DsMcpMiss | undefined;
-  if (opts.ds && !roleTokens.length) {
-    const tool = named ? "ds_get" : "ds_find";
-    const hosted = named ? await opts.ds.get(hostedName, opts.section) : await opts.ds.find(q);
-    if (hosted.ok) return JSON.stringify({ ok: true, lookup: query, source: "hosted", tool, text: hosted.text, note: HOSTED_NOTE });
-    fallback = hosted.reason;
+  const known = found !== null && found.answer.status !== "unknown";
+  if (found && !known && !q.includes(".")) {
+    const tokens = facts.tokens(q);
+    if (tokens.length) return { kind: "token-role", q, found, tokens };
   }
+  if (q.startsWith("--") || known) {
+    // `ds_get` takes a prop, not a prop's value: `Button.appearance=primary` asks for `Button.appearance`.
+    return { kind: "get", q, found, name: (known ? found.answer.name : q).split("=")[0]! };
+  }
+  return { kind: "find", q, found };
+}
+
+/** The answer from the facts baked into the Worker; `fallback` is why the hosted call missed, when one was made. */
+function answerFromFacts(query: string, asked: DsQuery, facts: Facts, fallback?: DsMcpMiss): string {
   const builtIn = { source: "built-in", ...(fallback ? { fallback } : {}) };
-
+  const { found } = asked;
   if (!found) {
-    return JSON.stringify({ ok: true, lookup: query, ...builtIn, tokens: facts.tokens(q), note: LOOKUP_NOTE });
+    return JSON.stringify({ ok: true, lookup: query, ...builtIn, tokens: facts.tokens(asked.q), note: LOOKUP_NOTE });
   }
-  if (roleTokens.length) {
+  if (asked.kind === "token-role") {
     return JSON.stringify({
       ok: true,
       lookup: query,
       ...builtIn,
-      tokens: roleTokens.slice(0, TOKEN_LIMIT),
-      ...(roleTokens.length > TOKEN_LIMIT ? { more: roleTokens.length - TOKEN_LIMIT } : {}),
+      tokens: asked.tokens.slice(0, TOKEN_LIMIT),
+      ...(asked.tokens.length > TOKEN_LIMIT ? { more: asked.tokens.length - TOKEN_LIMIT } : {}),
       note: LOOKUP_NOTE,
     });
   }
@@ -95,8 +105,27 @@ export async function lookupDesignSystem(query: string, opts: DsLookupOptions = 
     answer: found.answer,
     ...(found.use.length ? { use: found.use } : {}),
     ...(found.near.length ? { near: found.near } : {}),
-    note: fallback && !named ? WORDS_FALLBACK_NOTE : LOOKUP_NOTE,
+    note: fallback && asked.kind === "find" ? WORDS_FALLBACK_NOTE : LOOKUP_NOTE,
   });
+}
+
+/**
+ * A design-system question, asked of the hosted MCP first and answered from the
+ * facts baked into the Worker when it misses. `classifyDsQuery` decides which
+ * call it is; a token role makes none. One subrequest at most: the single
+ * `get` or `find` below (`integrations/ds-mcp.ts`).
+ */
+export async function lookupDesignSystem(query: string, opts: DsLookupOptions = {}): Promise<string> {
+  const facts = dsFacts();
+  const asked = classifyDsQuery(query.trim(), facts);
+  let fallback: DsMcpMiss | undefined;
+  if (opts.ds && asked.kind !== "token-role") {
+    const hosted = asked.kind === "get" ? await opts.ds.get(asked.name, opts.section) : await opts.ds.find(asked.q);
+    const tool = asked.kind === "get" ? "ds_get" : "ds_find";
+    if (hosted.ok) return JSON.stringify({ ok: true, lookup: query, source: "hosted", tool, text: hosted.text, note: HOSTED_NOTE });
+    fallback = hosted.reason;
+  }
+  return answerFromFacts(query, asked, facts, fallback);
 }
 
 
@@ -118,7 +147,9 @@ export async function readGithub(input: Record<string, unknown>, deps: GithubRea
   const search = typeof input.search === "string" ? input.search.trim() : "";
   const lookup = typeof input.lookup === "string" ? input.lookup.trim() : "";
   if (lookup) {
-    const section = DS_SECTIONS.find((s) => s === input.section);
+    // `examples` is Best practices' old name; the hosted lookup still reads it as `practices`.
+    const asked = input.section === "examples" ? "practices" : input.section;
+    const section = DS_SECTIONS.find((s) => s === asked);
     return lookupDesignSystem(lookup, { ...(deps.ds ? { ds: deps.ds } : {}), ...(section ? { section } : {}) });
   }
 

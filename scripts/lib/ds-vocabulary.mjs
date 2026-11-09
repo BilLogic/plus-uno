@@ -1,11 +1,13 @@
 /**
- * The glossary's design-system vocabulary, as DS search reads it. Pure: the
- * glossary's text and the design system's names in, terms and aliases out.
+ * The glossary's design-system vocabulary, as DS search reads it. Pure but for
+ * `aliasInputs`: the glossary's text and the design system's names in, terms
+ * and aliases out.
  *
  *   parseGlossary(markdown)          [{term, section, avoid: [{word, plain, named?}]}]
  *   vocabularyAliases(terms, facts)  {aliases, excluded, unmatched, collisions}
  *   componentOf(term, names)        the component or pattern a term names, or null
  *   searchAliases(glossary, facts)   {rows, vocabulary}: the hand-kept aliases with the glossary's appended
+ *   aliasInputs(views, names)        the `facts` both take, read from an agent-views folder
  *   DS_SECTION                       the `###` headings whose terms feed DS search
  *
  * ONLY THE DESIGN-SYSTEM SECTIONS FEED SEARCH. A product term's avoid-words
@@ -36,6 +38,9 @@
  * hand-kept alias would route that component's word to this term. It is never
  * an alias, and `check:ds-vocabulary` fails on it.
  */
+
+import fs from 'node:fs';
+import path from 'node:path';
 
 /** The qualifier that keeps a word plain but avoids it only as a name: `"region" as a name`. */
 export const NAMED = 'as a name';
@@ -194,4 +199,22 @@ export function searchAliases(glossary, facts) {
   const rows = {};
   for (const name of new Set([...Object.keys(hand), ...Object.keys(vocabulary.aliases)])) rows[name] = [...(hand[name] ?? []), ...(vocabulary.aliases[name] ?? [])];
   return { rows, vocabulary };
+}
+
+/**
+ * The `facts` `vocabularyAliases` and `searchAliases` take, read from an
+ * agent-views folder: the not-here names (`_inventions.json`) and the hand-kept
+ * aliases (`_aliases.json`), each empty when its file is not there. The facts
+ * module, the component-docs generator and `check:ds-vocabulary` all read them
+ * here, so search and the check see the same inputs.
+ * @param {string} views  the agent-views folder
+ * @param {string[]} names  every component and pattern name
+ */
+export function aliasInputs(views, names) {
+  const read = (file) => (fs.existsSync(path.join(views, file)) ? JSON.parse(fs.readFileSync(path.join(views, file), 'utf8')) : null);
+  return {
+    names,
+    notHere: (read('_inventions.json')?.components ?? []).map((r) => r.not),
+    handAliases: read('_aliases.json')?.components ?? {},
+  };
 }

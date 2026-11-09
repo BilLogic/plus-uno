@@ -15,6 +15,8 @@
  *   sectionText(page, title)        one section's text, or null
  *   pageText(page)                  the whole page as markdown: `#` title, intro, `##` sections
  *   createPageFinder(root, registry?)  ({name, source}) → the page's repo path, or null
+ *   pagesUnder(root, dir?)          every authored `.mdx` under the design-system source, or under `dir`
+ *   topLevelEntries(text, open)     the entries of the literal group opening at `open`, as written
  *   importedConstants(root, file, source)  the literal constants a page imports: name → value
  *   exportedValue(root, file, name)        one literal constant a module exports, or undefined
  *
@@ -75,21 +77,30 @@ function skipString(s, i) {
   return s.length;
 }
 
-/** The index after the balanced `{`, `[` or `(` group starting at `i`: strings, comments and JSX inside are skipped whole. */
-function skipGroup(s, i) {
+/** The index after a line or block comment starting at `i`, or `i` when none starts there. */
+function skipComment(s, i) {
+  if (s[i] !== '/') return i;
+  if (s[i + 1] === '*') {
+    const end = s.indexOf('*/', i + 2);
+    return end === -1 ? s.length : end + 2;
+  }
+  if (s[i + 1] === '/') {
+    const end = s.indexOf('\n', i);
+    return end === -1 ? s.length : end;
+  }
+  return i;
+}
+
+/** The index after the balanced `{`, `[` or `(` group starting at `i`, or -1 when it never closes: strings, comments and JSX inside are skipped whole. */
+function groupEnd(s, i) {
   const close = { '{': '}', '[': ']', '(': ')' };
   const stack = [close[s[i]]];
   let j = i + 1;
   while (j < s.length && stack.length) {
     const ch = s[j];
     if (ch === '"' || ch === "'" || ch === '`') j = skipString(s, j);
-    else if (ch === '/' && s[j + 1] === '*') {
-      const end = s.indexOf('*/', j + 2);
-      j = end === -1 ? s.length : end + 2;
-    } else if (ch === '/' && s[j + 1] === '/') {
-      const end = s.indexOf('\n', j);
-      j = end === -1 ? s.length : end;
-    } else if (isTagStart(s, j)) j = readElement(s, j).end;
+    else if (skipComment(s, j) !== j) j = skipComment(s, j);
+    else if (isTagStart(s, j)) j = readElement(s, j).end;
     else if (close[ch]) {
       stack.push(close[ch]);
       j++;
@@ -98,7 +109,13 @@ function skipGroup(s, i) {
       j++;
     }
   }
-  return j;
+  return stack.length ? -1 : j;
+}
+
+/** The index after the balanced group starting at `i`; a group that never closes runs to the end of the text. */
+function skipGroup(s, i) {
+  const end = groupEnd(s, i);
+  return end === -1 ? s.length : end;
 }
 
 /** The index after a fenced code block whose opening line starts at `i`. */
@@ -184,7 +201,7 @@ function unquote(lit) {
 }
 const isStringLiteral = (t) => /^(["'`])[\s\S]*\1$/.test(t) && skipString(t, 0) === t.length;
 
-/** Split `text` at top-level commas: strings, groups and JSX stay whole. */
+/** Split `text` at top-level commas: strings, comments, groups and JSX stay whole. */
 function splitTop(text) {
   const parts = [];
   let start = 0;
@@ -192,6 +209,7 @@ function splitTop(text) {
   while (j < text.length) {
     const ch = text[j];
     if (ch === '"' || ch === "'" || ch === '`') j = skipString(text, j);
+    else if (skipComment(text, j) !== j) j = skipComment(text, j);
     else if (ch === '{' || ch === '[' || ch === '(') j = skipGroup(text, j);
     else if (isTagStart(text, j)) j = readElement(text, j).end;
     else if (ch === ',') {
@@ -201,6 +219,15 @@ function splitTop(text) {
   }
   parts.push(text.slice(start));
   return parts.map((p) => p.trim()).filter(Boolean);
+}
+
+/**
+ * The top-level entries of the `{`, `[` or `(` group starting at `open`, each
+ * as written and trimmed (`key: value` for an object): strings, comments,
+ * nested groups and JSX stay whole. An entry's leading comment stays on it.
+ */
+export function topLevelEntries(text, open) {
+  return splitTop(text.slice(open + 1, skipGroup(text, open) - 1));
 }
 
 /** An element's attributes: name → raw value (`"…"`, `'…'`, `{…}`, or true). */
@@ -563,27 +590,10 @@ function figmaMetaOf(source) {
   if (m === -1) return null;
   const braceStart = source.indexOf('{', m);
   if (braceStart === -1) return null;
-  let depth = 0;
-  let inStr = false;
-  let end = -1;
-  for (let i = braceStart; i < source.length; i++) {
-    const ch = source[i];
-    if (inStr) {
-      if (ch === '\\') i++;
-      else if (ch === '"') inStr = false;
-    } else if (ch === '"') inStr = true;
-    else if (ch === '{') depth++;
-    else if (ch === '}') {
-      depth--;
-      if (depth === 0) {
-        end = i;
-        break;
-      }
-    }
-  }
+  const end = groupEnd(source, braceStart);
   if (end === -1) return null;
   try {
-    return JSON.parse(source.slice(braceStart, end + 1));
+    return JSON.parse(source.slice(braceStart, end));
   } catch (err) {
     throw new Error(`Failed to parse figmaMeta object: ${err.message}`);
   }
@@ -642,8 +652,8 @@ export function sectionText(page, title) {
 const DS_SRC = 'design-system/src';
 const toPosix = (p) => p.split(path.sep).join('/');
 
-/** Every authored `.mdx` under the design-system source, repo-relative. A ` 2.mdx` name is a Finder copy, not a page. */
-function pagesUnder(root) {
+/** Every authored `.mdx` under the design-system source (or the folder `dir` names), repo-relative. A ` 2.mdx` name is a Finder copy, not a page. */
+export function pagesUnder(root, dir = DS_SRC) {
   const out = [];
   const walk = (dir) => {
     for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -653,7 +663,7 @@ function pagesUnder(root) {
       else if (e.name.endsWith('.mdx') && !/ \d+\.mdx$/.test(e.name)) out.push(toPosix(path.relative(root, full)));
     }
   };
-  const base = path.join(root, DS_SRC);
+  const base = path.join(root, dir);
   if (fs.existsSync(base)) walk(base);
   return out.sort();
 }

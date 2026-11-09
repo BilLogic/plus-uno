@@ -56,7 +56,8 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { byRoot, main, report } from './lib/findings.mjs';
-import { createPageFinder, readDocsPage } from './lib/docs-page.mjs';
+import { createPageFinder, readDocsPage, topLevelEntries } from './lib/docs-page.mjs';
+import { lineOf, readJson, readText, withoutCode, withoutFences } from './lib/ds-check-helpers.mjs';
 import { ENFORCE_STRICT, STRICT_PAGES } from './lib/ds-strict.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -74,11 +75,6 @@ const ALWAYS_ERROR = new Set(['stale-marker']);
 export const SPINE = ['Usage', 'Alternatives', 'Best practices', 'Accessibility', 'Related'];
 
 // ── text helpers ────────────────────────────────────────────────────────────
-
-/** Text with fenced code blocks blanked. */
-const withoutFences = (text) => text.replace(/^[ \t]*(`{3,}|~{3,})[\s\S]*?^[ \t]*\1[^\n]*$/gm, '');
-/** Text with fenced code blocks and code spans blanked, so code never reads as prose. */
-const withoutCode = (text) => withoutFences(text).replace(/`+[^`\n]*`+/g, ' ');
 
 const sentencesOf = (text) => text.split(/(?<=[.!?])\s+|\n+/).map((s) => s.trim()).filter(Boolean);
 
@@ -217,36 +213,13 @@ export function argTypesOf(source) {
   if (at === -1) return [];
   const open = src.indexOf('{', at);
   if (open === -1) return [];
-  const out = [];
-  let depth = 0;
-  let entryStart = open + 1;
-  for (let i = open; i < src.length; i++) {
-    const ch = src[i];
-    if (ch === '"' || ch === "'" || ch === '`') {
-      for (i++; i < src.length && src[i] !== ch; i++) if (src[i] === '\\') i++;
-    } else if (ch === '/' && src[i + 1] === '/') {
-      i = src.indexOf('\n', i);
-      if (i === -1) break;
-    } else if (ch === '{' || ch === '[' || ch === '(') depth++;
-    else if (ch === '}' || ch === ']' || ch === ')') {
-      depth--;
-      if (depth === 0) {
-        pushEntry(src.slice(entryStart, i));
-        break;
-      }
-    } else if (ch === ',' && depth === 1) {
-      pushEntry(src.slice(entryStart, i));
-      entryStart = i + 1;
-    }
-  }
-  function pushEntry(raw) {
-    const m = raw.trim().match(/^(?:["']([^"']+)["']|([A-Za-z_$][\w$]*))\s*:\s*([\s\S]*)$/);
-    if (!m) return;
+  return topLevelEntries(src, open).flatMap((raw) => {
+    const m = raw.match(/^(?:["']([^"']+)["']|([A-Za-z_$][\w$]*))\s*:\s*([\s\S]*)$/);
+    if (!m) return [];
     const opts = m[3].match(/\boptions\s*:\s*\[([^\]]*)\]/);
     const options = opts ? [...opts[1].matchAll(/["']([^"']*)["']/g)].map((o) => o[1]) : null;
-    out.push({ name: m[1] ?? m[2], options });
-  }
-  return out;
+    return [{ name: m[1] ?? m[2], options }];
+  });
 }
 
 function parityFindings(props, storiesSource) {
@@ -310,20 +283,6 @@ export function gradeFindings(raw, { strict, enforce }) {
 }
 
 // ── the tree ────────────────────────────────────────────────────────────────
-
-const readJson = (root, rel) => (fs.existsSync(path.join(root, rel)) ? JSON.parse(fs.readFileSync(path.join(root, rel), 'utf8')) : null);
-const readText = (root, rel) => (rel && fs.existsSync(path.join(root, rel)) ? fs.readFileSync(path.join(root, rel), 'utf8') : null);
-
-/** The 1-based line of the first source line containing `anchor` (or its first words), else 1. */
-function lineOf(source, anchor) {
-  const lines = source.split('\n');
-  const probes = [anchor, anchor?.replace(/`/g, '').slice(0, 40), anchor?.slice(0, 24)].filter((p) => p && p.length > 3);
-  for (const probe of probes) {
-    const k = lines.findIndex((l) => l.includes(probe));
-    if (k !== -1) return k + 1;
-  }
-  return 1;
-}
 
 /** Every component page with its raw findings, read once per repo root. */
 const inputs = byRoot((repoRoot) => {

@@ -37,7 +37,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { searchAliases } from './ds-vocabulary.mjs';
+import { aliasInputs, searchAliases } from './ds-vocabulary.mjs';
 import { tokenMatchers } from './inventions.mjs';
 import { stripComments } from './js-comments.mjs';
 import { retiredRenames } from './tokens/plan.mjs';
@@ -198,13 +198,11 @@ export function loadFacts(root) {
   const tokenManifest = optional('tokens.json', { tokens: [] });
   const inventions = optional('_inventions.json', { components: [], props: [], tokens: [] });
   const patterns = optional('_patterns.json', { patterns: [] }).patterns;
-  const handAliases = optional('_aliases.json', { components: {} }).components;
   const glossaryFile = path.join(root, 'GLOSSARY.md');
-  const { rows: aliasRows, vocabulary } = searchAliases(fs.existsSync(glossaryFile) ? fs.readFileSync(glossaryFile, 'utf8') : '', {
-    names: componentManifest.components.map((c) => c.name),
-    notHere: inventions.components.map((r) => r.not),
-    handAliases,
-  });
+  const { rows: aliasRows, vocabulary } = searchAliases(
+    fs.existsSync(glossaryFile) ? fs.readFileSync(glossaryFile, 'utf8') : '',
+    aliasInputs(views, componentManifest.components.map((c) => c.name)),
+  );
   const barrel = readBarrel(root);
   const barrels = Object.fromEntries(BARRELS.map((spec) => [spec, new Set(spec === COMPONENTS_BARREL ? barrel.names : readBarrel(root, spec).names)]));
   const importable = barrels[COMPONENTS_BARREL];
