@@ -382,7 +382,7 @@ const Carousel = ({
             {hasCaption && (
                 <div className="plus-carousel-caption" aria-live={isStatic || paused ? 'polite' : 'off'}>
                     <div className={`plus-carousel-caption-inner plus-carousel-caption-inner--${captionPhase}`}>
-                        {caption?.title && <Heading as={captionTag} size="xsmall">{caption.title}</Heading>}
+                        {caption?.title && <Heading as={captionTag} size="small">{caption.title}</Heading>}
                         {caption?.description && <p className="plus-carousel-caption-description">{caption.description}</p>}
                     </div>
                 </div>

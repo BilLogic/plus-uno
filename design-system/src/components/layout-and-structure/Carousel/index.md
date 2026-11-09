@@ -108,7 +108,7 @@ Same group: `Accordion` · `Footer` · `PageHeader` · `Panel` · `ScrollBar` ·
 | Neighbors | Dimmed under `--ds-surface` at 45%, `--section-stack-lg` apart (`--inline-lg` on a narrow stage). |
 | Ring | `--control-lg` across, `--border-selected` wide. Track `--ds-border`; progress `--ds-background-brand-bold`; paused `--ds-icon-subtle`. |
 | Motion | A move takes `--motion-duration-long` on `--motion-easing-standard`. The caption lifts out over `--motion-duration-short` and rises in over `--motion-duration-medium`. |
-| Caption | `Heading` size xsmall; line in `--body-default` and `--ds-text-subtle`; at most `--content-max-width-reading` wide. |
+| Caption | `Heading` size small; line in `--body-default` and `--ds-text-subtle`; at most `--content-max-width-reading` wide. |
 | Spacing | `--section-stack-md` between the stage, the controls and the caption; `--inline-md` between controls. |
 
 ## Props
