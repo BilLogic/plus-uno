@@ -47,13 +47,13 @@ Use a time picker when a user needs to enter a time of day.
 
 ## Content
 
-<ComponentExample of={TimePickerStories.Default} title="Default" description="An empty field with an AM/PM toggle beside the text." />
+<ComponentExample of={TimePickerStories.Default} title="Default" description="An empty field. Opening it shows the day's times, every half hour." />
 
-<ComponentExample of={TimePickerStories.WithValue} title="With a value" description="A chosen time. The text holds the hour and minute; the toggle holds the period." />
+<ComponentExample of={TimePickerStories.WithValue} title="With a value" description="A chosen time, shown as it reads in the list: 2:30 PM." />
 
-<ComponentExample of={TimePickerStories.PickTime} title="Pick a time" description="Type an hour and a minute, with or without a colon, and press Enter. Anything that is not a real hour (1 to 12) and minute (0 to 59) is kept as typed and marked invalid. The AM/PM toggle reports immediately." />
+<ComponentExample of={TimePickerStories.PickTime} title="Pick a time" description="Typing filters the list: 9:30 finds 9:30 AM and 9:30 PM. A time that is not in the list, such as 1405, is read and picked on Enter. Text that is not a time is refused and the field is marked invalid." />
 
-<ComponentExample of={TimePickerStories.TwentyFourHourValueIsSplit} title="A 24-hour value" description="A 24-hour value is split into the hour this control shows and the period that says which half of the day it is." />
+<ComponentExample of={TimePickerStories.TwentyFourHourValueIsSplit} title="A 24-hour value" description="A 24-hour value reads as the same time, in 12-hour form." />
 
 </div>
 
@@ -113,8 +113,8 @@ Use a time picker for a time of day alone: a reminder time, a recurring slot's s
 
 ## Parts
 
-1. **Field.** A 40 box (32 at compact) on the input fill, holding the hour and minute as text.
-2. **AM/PM toggle.** A button that opens a small menu to set the period. It is a separate control from the typed text.
+1. **Field.** A 40 box (32 at compact) on the input fill. It holds the chosen time, and takes typing.
+2. **List.** The day's times, every half hour by default (`times` changes them), each with its period. It opens under the field and filters as you type.
 
 ### States
 
@@ -154,15 +154,15 @@ Use a time picker for a time of day alone: a reminder time, a recurring slot's s
 
 ### The field always reports a 12-hour value.
 
-`onChange` fires with a string like `"02:30 PM"` regardless of how `value` was given. A 24-hour `value` is accepted and split into the hour and period this control shows, but what it hands back is always 12-hour.
+`onChange` fires with a string like `"02:30 PM"` regardless of how `value` was given, or `null` once the field is cleared. A 24-hour `value` is accepted and read as the same time, but what it hands back is always 12-hour.
 
 ```jsx
 <TimePicker value={time} onChange={setTime} />
 ```
 
-### Type hours and minutes with a colon.
+### Show the format in the placeholder.
 
-The colon separates hours from minutes. Without it, 330 can be read several ways. The field also accepts bare digits and adds the colon when it loses focus, so the placeholder is where people see the format.
+The placeholder shows hours and minutes with a colon, so an empty field says what it holds. The field also reads bare digits, 1430 or 930a, and shows the time it picked.
 
 <DoDontPair
     doExample={<TimePicker aria-label="Session start" />}
@@ -173,7 +173,7 @@ The colon separates hours from minutes. Without it, 330 can be read several ways
 
 ### Offer round steps.
 
-Steps of 15 or 30 minutes match how sessions are booked. Odd minutes nobody books only add choices.
+Steps of 15 or 30 minutes match how sessions are booked; pass them as `times`. Odd minutes nobody books only add choices.
 
 <DoDontPair
     doExample={<TimePicker aria-label="Session start" value="02:30 PM" />}
@@ -182,9 +182,9 @@ Steps of 15 or 30 minutes match how sessions are booked. Odd minutes nobody book
     dontCaption="An odd minute."
 />
 
-### Set AM or PM in the menu.
+### Pick the period with the time.
 
-The menu beside the field holds AM or PM. Typing sets the hour and minute; the menu sets the period on its own and reports at once with whichever half of the time is already set. Asking for AM or PM in the field too leaves two places that can disagree, so keep the placeholder to the hour and minute.
+Every time in the list carries its period, so 9:30 AM and 9:30 PM are two rows, not one time and a separate switch. A typed time without AM or PM is read on the 24-hour clock: 9:30 is morning, 21:30 evening.
 
 ### Show a set time as read-only, not disabled.
 
@@ -210,7 +210,7 @@ Read-only shows a time the person may read but not change. Disabled fades the fi
 <tbody>
 <tr><td>Name the time by its role: "Reminder time", "Session start".</td><td>A generic name: "Time".</td></tr>
 <tr><td>Say what is expected when invalid: "Enter a time such as 2:30".</td><td>"Invalid time".</td></tr>
-<tr><td>Show the period in the toggle, AM or PM.</td><td>Ask people to type AM or PM into the text.</td></tr>
+<tr><td>Show the period with every time: "2:30 PM".</td><td>A bare "2:30" that could be either half of the day.</td></tr>
 <tr><td>Use sentence case in labels and messages.</td><td>Title case: "Reminder Time".</td></tr>
 </tbody>
 </DocsTable>
@@ -221,9 +221,9 @@ Read-only shows a time the person may read but not change. Disabled fades the fi
 
 ## Accessibility
 
-- **There is no `label` prop.** Name the field with `aria-label` or `aria-labelledby`, forwarded straight to the input a screen reader lands on, same as `aria-describedby` and `data-*`.
-- **The AM/PM toggle is a real button inside a menu**, reachable and operable by keyboard like any other PLUS dropdown.
-- **An invalid typed time keeps the typed text** rather than silently reverting, so the person can see and correct what they entered.
+- **There is no `label` prop.** Name the field with `aria-label` or `aria-labelledby`, forwarded straight to the combobox a screen reader lands on, same as `aria-describedby` and `data-*`.
+- **It is a combobox with a listbox**, the same as Select: arrow keys move through the times, Enter picks, Escape closes the list.
+- **A refused typed time marks the field invalid** with `aria-invalid`, so the person hears that it was not taken.
 
 </div>
 

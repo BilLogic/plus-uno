@@ -1,63 +1,63 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import TimePicker from './TimePicker';
+import TimePicker, { parseTime } from './TimePicker';
 
 vi.mock('@fortawesome/fontawesome-free', () => ({}));
 
-/** The toggle's own text, read by class since its role is `button` and an open menu's row is `menuitem`. */
-const toggleText = (container) => container.querySelector('.plus-time-picker__period-toggle').textContent.trim();
+describe('parseTime', () => {
+    it.each([
+        ['02:30 PM', '02:30 PM'],
+        ['2:30pm', '02:30 PM'],
+        ['2:30 p', '02:30 PM'],
+        ['14:30', '02:30 PM'],
+        ['1430', '02:30 PM'],
+        ['930', '09:30 AM'],
+        ['0930', '09:30 AM'],
+        ['9', '09:00 AM'],
+        ['00:15', '12:15 AM'],
+        ['12:45', '12:45 PM'],
+        ['12am', '12:00 AM'],
+    ])('reads %s as %s', (text, expected) => {
+        expect(parseTime(text)).toBe(expected);
+    });
+
+    it.each(['0199', '13pm', '24:00', 'abc', '', '9:5'])('refuses %s', (text) => {
+        expect(parseTime(text)).toBeNull();
+    });
+});
 
 describe('TimePicker', () => {
-    it('splits a 24-hour value into the hour it can show and the period', () => {
-        const { container } = render(<TimePicker aria-label="Time" value="14:30" />);
-        expect(screen.getByRole('textbox', { name: 'Time' })).toHaveValue('02:30');
-        expect(toggleText(container)).toBe('PM');
+    it('is a combobox, with no separate AM/PM control', () => {
+        const { container } = render(<TimePicker aria-label="Time" />);
+        expect(screen.getByRole('combobox', { name: 'Time' })).toBeInTheDocument();
+        expect(container.querySelector('.plus-field__trailing button[aria-haspopup="menu"]')).toBeNull();
     });
 
-    it('shows a 12-hour value as given', () => {
-        render(<TimePicker aria-label="Time" value="02:30 PM" />);
-        expect(screen.getByRole('textbox', { name: 'Time' })).toHaveValue('02:30');
-        expect(screen.queryByRole('textbox', { name: 'Time' })).not.toHaveValue('14:30');
+    it('shows a 24-hour value as the 12-hour time', () => {
+        render(<TimePicker aria-label="Time" value="14:30" />);
+        expect(screen.getByRole('combobox', { name: 'Time' })).toHaveValue('2:30 PM');
     });
 
-    it('commits a typed time on blur', () => {
+    it('the input is the field control, drawing no box of its own', () => {
+        render(<TimePicker aria-label="Time" />);
+        expect(screen.getByRole('combobox', { name: 'Time' })).toHaveClass('plus-field__control');
+    });
+
+    it('offers every half hour of the day', () => {
+        render(<TimePicker aria-label="Time" />);
+        fireEvent.click(screen.getByRole('combobox', { name: 'Time' }));
+        const options = screen.getAllByRole('option');
+        expect(options).toHaveLength(48);
+        expect(options[0]).toHaveTextContent('12:00 AM');
+        expect(options[19]).toHaveTextContent('9:30 AM');
+    });
+
+    it('reports a picked time as a 12-hour value', () => {
         const onChange = vi.fn();
         render(<TimePicker aria-label="Time" onChange={onChange} />);
-        const input = screen.getByRole('textbox', { name: 'Time' });
-        fireEvent.change(input, { target: { value: '0930' } });
-        expect(onChange).not.toHaveBeenCalled();
-        fireEvent.blur(input);
-        expect(input).toHaveValue('09:30');
-        expect(onChange).toHaveBeenLastCalledWith('09:30 AM');
-    });
-
-    it('commits a typed time on Enter', () => {
-        const onChange = vi.fn();
-        render(<TimePicker aria-label="Time" onChange={onChange} />);
-        const input = screen.getByRole('textbox', { name: 'Time' });
-        fireEvent.change(input, { target: { value: '9:05' } });
-        fireEvent.keyDown(input, { key: 'Enter' });
-        expect(input).toHaveValue('09:05');
-        expect(onChange).toHaveBeenLastCalledWith('09:05 AM');
-    });
-
-    it('refuses a minute past 59, keeping the typed text and marking it invalid', () => {
-        const onChange = vi.fn();
-        render(<TimePicker aria-label="Time" onChange={onChange} />);
-        const input = screen.getByRole('textbox', { name: 'Time' });
-        fireEvent.change(input, { target: { value: '0199' } });
-        fireEvent.blur(input);
-        expect(input).toHaveValue('0199');
-        expect(input).toHaveAttribute('aria-invalid', 'true');
-        expect(onChange).not.toHaveBeenCalled();
-    });
-
-    it('reports immediately when the AM/PM toggle changes, with whichever half is set', () => {
-        const onChange = vi.fn();
-        const { container } = render(<TimePicker aria-label="Time" value="09:15 AM" onChange={onChange} />);
-        fireEvent.click(container.querySelector('.plus-time-picker__period-toggle'));
-        fireEvent.click(screen.getByRole('menuitem', { name: 'PM' }));
-        expect(onChange).toHaveBeenLastCalledWith('09:15 PM');
+        fireEvent.click(screen.getByRole('combobox', { name: 'Time' }));
+        fireEvent.click(screen.getByRole('option', { name: '2:30 PM' }));
+        expect(onChange).toHaveBeenLastCalledWith('02:30 PM');
     });
 
     it('draws the field invalid', () => {
@@ -65,8 +65,8 @@ describe('TimePicker', () => {
         expect(container.querySelector('.plus-field')).toHaveClass('plus-field--invalid');
     });
 
-    it('disables the period toggle when disabled', () => {
-        const { container } = render(<TimePicker aria-label="Time" isDisabled value="02:30 PM" />);
-        expect(container.querySelector('.plus-time-picker__period-toggle')).toBeDisabled();
+    it('disables the combobox when disabled', () => {
+        render(<TimePicker aria-label="Time" isDisabled value="02:30 PM" />);
+        expect(screen.getByRole('combobox', { name: 'Time' })).toBeDisabled();
     });
 });

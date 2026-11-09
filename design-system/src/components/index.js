@@ -33,7 +33,7 @@ export { default as SplitButton } from '@/components/forms-and-inputs/SplitButto
 export { default as TagInput } from '@/components/forms-and-inputs/TagInput';
 export { default as TextArea } from '@/components/forms-and-inputs/TextArea';
 export { default as TextField } from '@/components/forms-and-inputs/TextField';
-export { default as TimePicker } from '@/components/forms-and-inputs/TimePicker';
+export { default as TimePicker, DEFAULT_TIMES, parseTime } from '@/components/forms-and-inputs/TimePicker';
 export { default as Toggle } from '@/components/forms-and-inputs/Toggle';
 export { default as TreeSelect, TREE_SELECT_SPACINGS } from '@/components/forms-and-inputs/TreeSelect';
 export { default as VerticalButton, VERTICAL_BUTTON_APPEARANCES } from '@/components/forms-and-inputs/VerticalButton';
