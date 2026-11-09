@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { Breadcrumb, Button, IconButton, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, Sidebar } from '@/components';
-import { Frame, PANEL_STORAGE_KEY, usePanelControl, useSidebarControl } from '@/patterns';
+import { Frame, PANEL_STORAGE_KEY, PatternDrawer, usePanelControl, useSidebarControl } from '@/patterns';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -316,29 +316,6 @@ const FrameDemo = ({ peek = false, ...args }) => {
 };
 
 const PeekedFrame = (args) => <FrameDemo {...args} peek />;
-
-/**
- * One frame per layout mode, one story each: a page holds one landmark of each
- * kind. The frame docks by the mode it is in; the pads follow the browser width.
- */
-const atMode = (breakpoint, peek) => ({
-    render: (args) => (
-        <div data-plus-breakpoint={breakpoint}>
-            <FrameDemo {...args} peek={peek} />
-        </div>
-    ),
-    parameters: { layout: 'padded' },
-});
-
-/** sidebar = auto: closed at Medium, docked at Large and X-Large. */
-export const DocsAuto768 = atMode('md', false);
-export const DocsAuto1024 = atMode('lg', false);
-export const DocsAuto1440 = atMode('xl', false);
-
-/** sidebar = floating: a closed sidebar peeked over the page. */
-export const DocsPeeking768 = atMode('md', true);
-export const DocsPeeking1024 = atMode('lg', true);
-export const DocsPeeking1440 = atMode('xl', true);
 
 export const Floating = {
     render: PeekedFrame,
@@ -837,13 +814,6 @@ const panelParts = (canvasElement) => {
 const openPanel = async (p) => {
     await userEvent.click(p.canvas.getByRole('button', { name: 'Open chat' }));
     await waitFor(() => expect(p.panel(), 'the Panel opens').not.toBeNull());
-};
-
-/** Docs example: the Panel open, inline at a fixed height. Nothing is remembered, so it always opens. */
-export const DocsPanel = {
-    render: (args) => <WithPanel {...args} height={DOCS_HEIGHT} />,
-    args: { defaultPanelOpen: true, panelStorageKey: null },
-    parameters: { layout: 'padded' },
 };
 
 /** 1440 with a 400 Panel: both fit at the 720 floor, so the Sidebar and the Panel dock, and the Page meets the Panel at a hairline. */
@@ -1390,3 +1360,181 @@ export const SectionDetailSplitterKeepsSplitAt1440 = {
         await expect(rect(p.content).width, 'content keeps 960').toBeGreaterThanOrEqual(960 - 0.5);
     }),
 };
+
+/* ------------------------------------------------------------- states */
+
+/**
+ * Every Frame state, one story each, for the docs page's state gallery. The
+ * docs page draws each one in an iframe at its stated width (`ModeFrame`), so
+ * the Frame measures a real width and the layout tokens read a real viewport.
+ * `frameWidth` holds the same width in the test runner, where each play reads
+ * the resolved state a person sees.
+ *
+ * `act` does once, after mount, what a person does: hover the left edge
+ * (`peek-sidebar`), press the toggle (`open-sidebar`) or hover the right edge
+ * (`peek-panel`). The Panel is controlled open where a state needs it. A
+ * modal or drawer opens after `act`, so it meets the Sidebar the act left.
+ */
+const STATE_PEEK = 'peek-sidebar';
+const STATE_OPEN = 'open-sidebar';
+const STATE_PEEK_PANEL = 'peek-panel';
+
+const hoverEdge = (el) => el?.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
+
+const FrameState = ({ act, overlay, ...args }) => {
+    const ref = useRef(null);
+    const [overlayOpen, setOverlayOpen] = useState(false);
+    useEffect(() => {
+        const root = ref.current;
+        const timers = [setTimeout(() => {
+            if (act === STATE_PEEK) hoverEdge(root?.querySelector('.plus-frame__edge'));
+            if (act === STATE_OPEN) root?.querySelector('.plus-frame__toggle')?.click();
+            if (act === STATE_PEEK_PANEL) hoverEdge(root?.querySelector('.plus-frame__panel-edge'));
+        }, 100)];
+        if (overlay) timers.push(setTimeout(() => setOverlayOpen(true), 300));
+        return () => timers.forEach(clearTimeout);
+    }, [act, overlay]);
+    const close = () => setOverlayOpen(false);
+    return (
+        <div ref={ref}>
+            <InAppFrame panelLabel="AI chat" panelStorageKey={null} {...args}>
+                {slot('Content slot')}
+                {slot('Content slot')}
+            </InAppFrame>
+            {overlay === 'modal' ? (
+                <Modal
+                    show={overlayOpen}
+                    width="6-col"
+                    title="Settings"
+                    body="Choose how this page shows your sessions."
+                    primaryButton={{ text: 'Done', onClick: close }}
+                    onClose={close}
+                />
+            ) : null}
+            {overlay === 'drawer' ? (
+                <PatternDrawer open={overlayOpen} width="sm" title="Session details" description="Thursday · 4:00–5:00 PM" onClose={close}>
+                    {slot('Drawer content')}
+                </PatternDrawer>
+            ) : null}
+        </div>
+    );
+};
+
+const statePanel = <ChatPanel />;
+
+/** One state at `width`: rendered by `FrameState`, left out of the docs page's inline canvases. */
+const frameState = (width, args = {}, play) => ({
+    render: FrameState,
+    args,
+    parameters: { frameWidth: width, docs: { disable: true } },
+    ...(play ? { play: async (ctx) => atViewport(width, () => play(panelParts(ctx.canvasElement), ctx)) } : {}),
+});
+
+const sidebarIs = async (p, state) => waitFor(() => {
+    const box = p.sidebar();
+    if (state === 'closed') return expect(box, 'the Sidebar is closed').toBeNull();
+    return expect(box?.className ?? '', `the Sidebar is ${state}`).toContain(`plus-frame__sidebar--${state}`);
+});
+const panelIs = async (p, mode) => waitFor(() => expect(p.panel()?.className ?? '', `the Panel is ${mode}`).toContain(`plus-frame__panel--${mode}`));
+const blanketShows = (p) => p.frame.querySelector('.plus-frame__blanket');
+
+/** Sidebar docked: in flow beside the Page from 1024. */
+export const StateSidebarDocked = frameState(1440, {}, async (p) => sidebarIs(p, 'docked'));
+
+/** Sidebar closed: no rail, and the toggle at the Page's top left. */
+export const StateSidebarClosed = frameState(1440, { sidebarDocked: false }, async (p) => {
+    await sidebarIs(p, 'closed');
+    await expect(p.pageToggle()).not.toBeNull();
+});
+
+/** Sidebar peek: hovering the left edge floats a closed Sidebar over the Page, with no Blanket. */
+export const StateSidebarPeek = frameState(1440, { sidebarDocked: false, act: STATE_PEEK }, async (p) => {
+    await sidebarIs(p, 'raised');
+    await expect(blanketShows(p), 'no Blanket under a peek').toBeNull();
+});
+
+/** Sidebar floating: under 1024 the toggle opens it over the Page, since it never docks there. */
+export const StateSidebarFloating = frameState(768, { act: STATE_OPEN }, async (p) => {
+    await sidebarIs(p, 'raised');
+    await expect(p.toggle).toHaveAttribute('aria-expanded', 'true');
+});
+
+/** Panel docked: beside the Page at a hairline, with the Sidebar closed by hand. */
+export const StatePanelDocked = frameState(1440, { sidebarDocked: false, panel: statePanel, panelOpen: true }, async (p) => {
+    await panelIs(p, 'docked');
+    await expect(blanketShows(p)).toBeNull();
+});
+
+/** Panel peek: with `panelPeek`, hovering the right edge floats a closed Panel over the Page. */
+export const StatePanelPeek = frameState(1440, { panel: statePanel, panelPeek: true, act: STATE_PEEK_PANEL }, async (p) => {
+    await panelIs(p, 'peek');
+    await expect(blanketShows(p), 'no Blanket under a peek').toBeNull();
+});
+
+/** Panel overlay: under 1024 the Panel opens over the Page on a Blanket, capped at 320. */
+export const StatePanelOverlay = frameState(768, { panel: statePanel, panelOpen: true }, async (p) => {
+    await panelIs(p, 'overlay');
+    await expect(rect(p.panel()).width).toBeCloseTo(320, 0);
+    await expect(blanketShows(p)).not.toBeNull();
+});
+
+/** Panel full width: under 768 the overlay Panel takes the whole Frame. */
+export const StatePanelFullWidth = frameState(600, { panel: statePanel, panelOpen: true }, async (p) => {
+    await panelIs(p, 'overlay');
+    await expect(rect(p.panel()).width).toBeCloseTo(rect(p.frame).width, 0);
+});
+
+/** Panel resized to its narrowest, 320, beside a docked Sidebar. */
+export const StatePanelNarrowest = frameState(1440, { panel: statePanel, panelOpen: true, panelDefaultWidth: 320 }, async (p) => {
+    await sidebarIs(p, 'docked');
+    await panelIs(p, 'docked');
+    await expect(rect(p.panel()).width).toBeCloseTo(320, 0);
+});
+
+/** Panel resized to its widest, 640, with the Sidebar closed. */
+export const StatePanelWidest = frameState(1440, { sidebarDocked: false, panel: statePanel, panelOpen: true, panelDefaultWidth: 640 }, async (p) => {
+    await panelIs(p, 'docked');
+    await expect(rect(p.panel()).width).toBeCloseTo(640, 0);
+});
+
+/** Sidebar and Panel together: at 1440 a 400 Panel docks beside the docked Sidebar and keeps 720. */
+export const StateSidebarAndPanel = frameState(1440, { panel: statePanel, panelOpen: true }, async (p) => {
+    await sidebarIs(p, 'docked');
+    await panelIs(p, 'docked');
+});
+
+/** At 1200 both would not fit, so the Panel collapses the Sidebar left open by default. */
+export const StatePanelCollapsesSidebar = frameState(1200, { panel: statePanel, panelOpen: true }, async (p) => {
+    await sidebarIs(p, 'closed');
+    await panelIs(p, 'docked');
+});
+
+/** At 1100 even the Panel alone leaves under 720, so it opens on a Blanket over the Page and the Sidebar. */
+export const StatePanelOnBlanket = frameState(1100, { panel: statePanel, panelOpen: true }, async (p) => {
+    await panelIs(p, 'overlay');
+    await expect(blanketShows(p)).not.toBeNull();
+    // Under the overlay Panel the Sidebar is inert, so it is read among the hidden roles.
+    await waitFor(() => expect(p.coveredSidebar()?.className ?? '').toContain('plus-frame__sidebar--docked'));
+});
+
+/** A modal over a docked Sidebar and Panel: both stay where they are. */
+export const StateWithModal = frameState(1440, { panel: statePanel, panelOpen: true, overlay: 'modal' }, async (p, { canvasElement }) => {
+    await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
+    await expect(p.coveredSidebar()?.className ?? '').toContain('plus-frame__sidebar--docked');
+});
+
+/** Under 1024 a modal closes the floating Sidebar it opens over. */
+export const StateModalClosesFloating = frameState(768, { act: STATE_OPEN, overlay: 'modal' }, async (p, { canvasElement }) => {
+    await waitFor(() => expect(dialog(canvasElement)).not.toBeNull());
+    await waitFor(() => expect(p.coveredSidebar(), 'the floating Sidebar closed').toBeNull());
+});
+
+/** A drawer over the Frame at 1024, on its own Blanket. */
+export const StateWithDrawer = frameState(1024, { overlay: 'drawer' }, async (p, { canvasElement }) => {
+    await expect(await within(canvasElement.ownerDocument.body).findByRole('dialog', { name: 'Session details' })).toBeTruthy();
+});
+
+/** The Frame at each layout mode. */
+export const StateAt768 = frameState(768, {}, async (p) => sidebarIs(p, 'closed'));
+export const StateAt1024 = frameState(1024, {}, async (p) => sidebarIs(p, 'docked'));
+export const StateAt1440 = frameState(1440, {}, async (p) => sidebarIs(p, 'docked'));
