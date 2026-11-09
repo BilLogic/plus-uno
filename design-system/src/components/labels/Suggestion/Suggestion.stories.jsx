@@ -30,7 +30,7 @@ import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
  */
 
 export default {
-    title: 'AI UI/Components for AI/Suggestion',
+    title: 'AI UI/Components/Suggestion',
     component: Suggestion,
     tags: ['!dev', '!autodocs'],
     parameters: {

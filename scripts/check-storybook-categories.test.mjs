@@ -34,7 +34,6 @@ function fixture(files) {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), 'sb-categories-'));
   const taxonomy = {
     componentGroups: { 'Forms and inputs': [], Labels: [] },
-    patternComponents: ['Panel'],
     aiComponents: ['AI message'],
     storySortOrder: [
       'Get started',
@@ -175,20 +174,17 @@ test('a docs page under a root the sidebar does not list goes red', () => {
   assert.ok(!found.some((m) => m.includes('Page.stories.jsx')));
 });
 
-test('a pattern-backed component may sit under Patterns, and only one the taxonomy names', () => {
+test('a component story under Patterns goes red: components are titled under their category', () => {
   const root = fixture({
     'design-system/src/components/layout-and-structure/Panel.stories.jsx': story('Patterns/Panel'),
-    'design-system/src/components/labels/Tag.stories.jsx': story('Patterns/Tag'),
   });
-  const found = messages(root);
-  assert.ok(!found.some((m) => m.includes('Panel.stories.jsx')));
-  assert.ok(found.some((m) => m.includes('Tag.stories.jsx')));
+  assert.ok(messages(root).some((m) => m.includes('Panel.stories.jsx')));
 });
 
 test('an AI component may sit under AI UI, and only one the taxonomy names', () => {
   const root = fixture({
-    'design-system/src/components/labels/AiMessage.stories.jsx': story('AI UI/Components for AI/AI message'),
-    'design-system/src/components/labels/Tag.stories.jsx': story('AI UI/Components for AI/Tag'),
+    'design-system/src/components/labels/AiMessage.stories.jsx': story('AI UI/Components/AI message'),
+    'design-system/src/components/labels/Tag.stories.jsx': story('AI UI/Components/Tag'),
   });
   const found = messages(root);
   assert.ok(!found.some((m) => m.includes('AiMessage.stories.jsx')));

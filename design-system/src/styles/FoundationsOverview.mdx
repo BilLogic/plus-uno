@@ -11,10 +11,10 @@ import {
 
 export const Page = ({ id, children }) => <a href={`?path=/docs/foundations-${id}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{children}</a>;
 
-<Meta title="Foundations/Foundations overview" tags={['!dev']} />
+<Meta title="Foundations/Overview" tags={['!dev']} />
 
 <FoundationHero
-    title="Foundations overview"
+    title="Overview"
     summary="Foundations create consistent experiences across the tutor and student apps."
 />
 
@@ -41,7 +41,7 @@ Each foundation has a one-line definition.
         ['Guidelines', <Page id="accessibility">Accessibility</Page>, 'What makes the apps usable by everyone, and how each foundation supports it.'],
         ['Guidelines', 'Content', 'How the words inside the apps are written. The guidance lives in the repo.'],
         ['Guidelines', <Page id="spacing">Spacing</Page>, 'The space inside and between boxes, named by the job it does.'],
-        ['Guidelines', <Page id="layout-grid">Layout & grid</Page>, 'Two 12-column grids, the breakpoints and the content widths.'],
+        ['Guidelines', <Page id="grid">Grid</Page>, 'Two 12-column grids, the breakpoints and the content widths.'],
         ['Styles', <Page id="color">Color</Page>, 'Every color as a token named for its job.'],
         ['Styles', <Page id="typography">Typography</Page>, 'Heading, Body, Metric and Code text styles.'],
         ['Styles', <Page id="motion">Motion</Page>, 'Duration, easing and what is allowed to move.'],

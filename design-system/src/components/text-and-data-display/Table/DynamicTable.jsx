@@ -4,7 +4,7 @@ import PatternTable from '@/patterns/PatternTable';
 import Pagination from '@/components/navigation/Pagination';
 import Spinner from '@/components/loading/Spinner';
 import Checkbox from '@/components/forms-and-inputs/Checkbox';
-import VisuallyHidden from '@/components/layout-and-structure/VisuallyHidden';
+import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
 import HeadCell from './HeadCell';
 import { TableCell, TableRow, TableFooter } from './TableParts';
 import './Table.scss';

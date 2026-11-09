@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Tooltip from '@/components/overlays-and-layering/Tooltip';
-import VisuallyHidden from '@/components/layout-and-structure/VisuallyHidden';
+import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
 import { alignName, useClipped } from './TableParts';
 import './Table.scss';
 import { iconClass } from '../../../lib/icon';

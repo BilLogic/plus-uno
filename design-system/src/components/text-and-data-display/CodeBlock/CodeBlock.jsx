@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import VisuallyHidden from '../../layout-and-structure/VisuallyHidden';
+import VisuallyHidden from '../VisuallyHidden';
 import './CodeBlock.scss';
 
 /**

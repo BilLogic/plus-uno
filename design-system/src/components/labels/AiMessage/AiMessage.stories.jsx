@@ -11,7 +11,7 @@ import AiMessage, { AI_MESSAGE_STATUSES } from './AiMessage';
  * typing indicator announces itself and shows no text.
  */
 export default {
-    title: 'AI UI/Components for AI/AI message',
+    title: 'AI UI/Components/AI message',
     component: AiMessage,
     tags: ['!dev', '!autodocs'],
     parameters: {

@@ -5,7 +5,7 @@ import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px } from '@/storybook-docs/lib/style-probes.js';
 import { Button } from '@/components';
 import InlineEdit from './InlineEdit';
-import InlineEditableTextfield from '../InlineEditableTextfield';
+import InlineEditableTextfield from '@/components/forms-and-inputs/InlineEditableTextfield';
 
 /**
  * `InlineEdit` and `InlineEditableTextfield`: text that becomes a field when pressed.
@@ -18,7 +18,7 @@ import InlineEditableTextfield from '../InlineEditableTextfield';
  */
 
 export default {
-    title: 'Components/Forms and inputs/Inline edit',
+    title: 'Components/Text and data display/Inline edit',
     component: InlineEdit,
     tags: ['!dev', '!autodocs'],
     parameters: {

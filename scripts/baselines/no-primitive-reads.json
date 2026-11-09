@@ -15,9 +15,6 @@
         "design-system/src/components/forms-and-inputs/DropdownMenu/DropdownMenu.scss": {
           "count": 1
         },
-        "design-system/src/components/forms-and-inputs/InlineEdit/InlineEdit.scss": {
-          "count": 1
-        },
         "design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss": {
           "count": 1
         },
@@ -68,6 +65,9 @@
         },
         "design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss": {
           "count": 4
+        },
+        "design-system/src/components/text-and-data-display/InlineEdit/InlineEdit.scss": {
+          "count": 1
         },
         "design-system/src/components/text-and-data-display/Table/Table.scss": {
           "count": 2

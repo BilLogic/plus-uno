@@ -25,7 +25,7 @@ import Illustration, {
  */
 
 export default {
-    title: 'Components/Images and icons/Illustrations',
+    title: 'Components/Images and icons/Illustration',
     component: Illustration,
     tags: ['!dev', '!autodocs'],
     parameters: {

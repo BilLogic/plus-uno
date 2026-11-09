@@ -19,7 +19,7 @@ const STARTERS = [
 ];
 
 export default {
-    title: 'AI UI/Components for AI/Prompt starters',
+    title: 'AI UI/Components/Prompt starters',
     component: PromptStarters,
     tags: ['!dev', '!autodocs'],
     parameters: {
