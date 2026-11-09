@@ -99,8 +99,9 @@ export const ModalTitle = () => (
 );
 
 ModalTitle.play = async ({ canvasElement }) => {
-    // Inline: the dialog sits in the canvas, not over the docs page.
-    const dialog = await within(canvasElement).findByRole('dialog', { name: 'Edit session' });
+    // Inline: the modal sits in the canvas, not over the docs page (and is no dialog there).
+    const dialog = canvasElement.querySelector('.plus-modal');
+    await expect(dialog, 'the modal renders inside the canvas').not.toBeNull();
     const inside = within(dialog);
     await expectStyle(inside.getByRole('heading', { level: 1, name: 'Edit session' }), 'modal title', HEADING_MEDIUM);
     await expectStyle(inside.getByText('Changes apply to every session in the series.'), 'modal description', BODY_DEFAULT);
