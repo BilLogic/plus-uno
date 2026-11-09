@@ -89,19 +89,15 @@ The page every screen starts from, and the container the app is dropped into: th
 _Avoid_: "page template" for the Frame alone, "browser frame" as a pattern
 
 **Frame**:
-The pattern for the app's outer shell: the Topbar, Sidebar and **Panel** that stay put while the **Page** inside changes. The **Template** adds the browser around it. "App shell" is an informal alias for talk; code and docs say Frame.
+The pattern for the app's outer shell: the **Sidebar** and **Panel** that stay put while the **Page** inside changes. The **Template** adds the browser around it. "App shell" is an informal alias for talk; code and docs say Frame.
 _Avoid_: "surface container", bare "shell"
 
-**Topbar**:
-The bar across the top of the **Frame**, one word like Sidebar.
-_Avoid_: "top bar", "navbar"
-
 **Sidebar**:
-The area at the left of the **Frame**, below the **Topbar**, holding navigation. It is **docked** from 1024 and collapsed below, where a hover **peek**s it.
+The full-height area at the left of the **Frame**, holding navigation. It is **docked** from 1024 and collapsed below, where a hover **peek**s it.
 _Avoid_: "left nav", "side nav"
 
 **Panel**:
-The area at the right of the **Frame**, below the **Topbar**, holding AI chat first. It is app-level, 320 to 640 wide (400 by default), and **docked** beside the **Page** or opens as an **overlay** on a **Blanket** when there is no room. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
+The full-height area at the right of the **Frame**, holding AI chat first. It is app-level, 320 to 640 wide (400 by default), and **docked** beside the **Page** or opens as an **overlay** on a **Blanket** when there is no room. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
 _Avoid_: "right sidebar", "side panel", "inspector", "Card" for the area
 
 **Docked / overlay**:
@@ -129,7 +125,7 @@ The pattern for the container of one object, raised at rest with no border. Rela
 _Avoid_: "tile" (Tile is its own component), "panel" (Panel is the Frame's right area)
 
 **Blanket**:
-The pattern for the layer that dims what sits behind it: full screen for a **Modal** or **Drawer**, which it also holds and sizes; under an **overlay** **Panel** it covers the **Page** and **Sidebar** but not the **Topbar**.
+The pattern for the layer that dims what sits behind it: full screen for a **Modal** or **Drawer**, which it also holds and sizes; under an **overlay** **Panel** it covers the **Page** and **Sidebar**.
 _Avoid_: "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
 
 **Modal**:
