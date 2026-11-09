@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import { headingTag } from '@/lib/headingLevel';
 import { messageIcon } from '../messageAppearance';
+import Icon from '../../images-and-icons/Icon';
 import './SectionMessage.scss';
-import { iconClass } from '../../../lib/icon';
 
 /** The six styles, as the Figma Section message set names them. */
 export const SECTION_MESSAGE_APPEARANCES = ['primary', 'secondary', 'success', 'danger', 'warning', 'info'];
@@ -87,7 +87,7 @@ const SectionMessage = ({
                 <div className="plus-section-message-leading" aria-hidden="true">
                     {strut}
                     {typeof visual === 'string'
-                        ? <i className={`plus-section-message-leading-icon ${iconClass(visual)}`} />
+                        ? <Icon name={visual} className="plus-section-message-leading-icon" />
                         : <span className="plus-section-message-leading-icon">{visual}</span>}
                 </div>
             )}

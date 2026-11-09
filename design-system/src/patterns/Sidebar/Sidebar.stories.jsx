@@ -30,7 +30,7 @@ const groups = (view) => [
     {
         id: 'home',
         items: [
-            { id: 'home', text: 'Home', icon: 'fa-regular fa-house' },
+            { id: 'home', text: 'Home', icon: 'house' },
             { id: 'slack', text: 'Slack', icon: 'fa-brands fa-slack', href: 'https://slack.com/', external: true },
         ],
     },
@@ -38,8 +38,8 @@ const groups = (view) => [
         id: 'training',
         title: 'Training',
         items: [
-            { id: 'lessons', text: 'Lessons', icon: 'fa-regular fa-lightbulb', training: 'lessons' },
-            { id: 'onboarding', text: 'Onboarding', icon: 'fa-regular fa-compass', training: 'modules' },
+            { id: 'lessons', text: 'Lessons', icon: 'lightbulb', training: 'lessons' },
+            { id: 'onboarding', text: 'Onboarding', icon: 'compass', training: 'modules' },
         ],
     },
     {
@@ -47,20 +47,20 @@ const groups = (view) => [
         title: 'Toolkit',
         lockedDuringOnboarding: true,
         items: [
-            { id: 'sessions', text: 'Sessions', icon: 'fa-regular fa-calendar' },
-            { id: 'students', text: 'Students', icon: 'fa-regular fa-user' },
+            { id: 'sessions', text: 'Sessions', icon: 'calendar' },
+            { id: 'students', text: 'Students', icon: 'user' },
         ],
     },
     ...(view === 'supervisor' ? [{
         id: 'admin',
         title: 'Admin',
         items: [
-            { id: 'compliance', text: 'Compliance', icon: 'fa-regular fa-flag', count: 3, countLabel: '3 open flags' },
-            { id: 'a-reflections', text: 'Reflections', icon: 'fa-regular fa-comment-dots' },
-            { id: 'a-tutors', text: 'Tutors', icon: 'fa-regular fa-id-badge' },
-            { id: 'a-sessions', text: 'Sessions', icon: 'fa-regular fa-calendar-check' },
-            { id: 'a-students', text: 'Students', icon: 'fa-regular fa-address-book' },
-            { id: 'a-groups', text: 'Groups', icon: 'fa-regular fa-object-group' },
+            { id: 'compliance', text: 'Compliance', icon: 'flag', count: 3, countLabel: '3 open flags' },
+            { id: 'a-reflections', text: 'Reflections', icon: 'comment-dots' },
+            { id: 'a-tutors', text: 'Tutors', icon: 'id-badge' },
+            { id: 'a-sessions', text: 'Sessions', icon: 'calendar-check' },
+            { id: 'a-students', text: 'Students', icon: 'address-book' },
+            { id: 'a-groups', text: 'Groups', icon: 'object-group' },
         ],
     }] : []),
 ];

@@ -4,6 +4,7 @@ import PatternTable from '@/patterns/PatternTable';
 import Spinner from '@/components/loading/Spinner';
 import HeadCell from './HeadCell';
 import { TableCell, TableRow, TableMessageRow } from './TableParts';
+import Icon from '../../images-and-icons/Icon';
 import './Table.scss';
 import './DynamicTable.scss';
 import './TreeTable.scss';
@@ -286,7 +287,7 @@ const TreeTable = ({
                                                     >
                                                         {toggleState === 'loading' && <Spinner size={16} />}
                                                         {(toggleState === 'expanded' || toggleState === 'collapsed') && (
-                                                            <i className={classes('fa-solid', toggleState === 'expanded' ? 'fa-chevron-down' : 'fa-chevron-right')} />
+                                                            <Icon name={toggleState === 'expanded' ? 'chevron-down' : 'chevron-right'} />
                                                         )}
                                                     </span>
                                                 </>

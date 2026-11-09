@@ -2,42 +2,67 @@
  * ProgressIndicator styles. Every dot is a circle whose diameter is the
  * `size` prop: 8 reads `--progress-indicator-dot-size-8`, 12 reads `--progress-indicator-dot-size-12`, through a size
  * class, so no pixel value is set inline. `spacing` sets the gap between dots.
+ *
+ * A dot that is a button keeps a `--control-sm` (24px) target: the gap widens
+ * to at least the target less the dot, and a hit area drawn round each button
+ * fills its share of the gap, so the targets meet without overlapping.
+ *
+ * With `progress` the current dot stretches to `--control-md` and draws a bar:
+ * the dot's own ground is the track, and the fill grows from the start edge to
+ * `--progress-indicator-progress`, which the component writes on the fill.
  */
 @use '../../../styles/state' as *;
 
 .plus-progress-indicator {
+    --progress-indicator-dot: var(--progress-indicator-dot-size-8);
+    --progress-indicator-spacing: var(--inline-md);
+    --progress-indicator-gap: var(--progress-indicator-spacing);
     display: inline-flex;
     align-items: center;
-    gap: var(--inline-md);
+    gap: var(--progress-indicator-gap);
 }
 
 .plus-progress-indicator--cozy {
-    gap: var(--inline-sm);
+    --progress-indicator-spacing: var(--inline-sm);
 }
 
 .plus-progress-indicator--compact {
-    gap: var(--stack-sm);
+    --progress-indicator-spacing: var(--stack-sm);
+}
+
+.plus-progress-indicator--size-12 {
+    --progress-indicator-dot: var(--progress-indicator-dot-size-12);
+}
+
+.plus-progress-indicator--interactive {
+    --progress-indicator-gap: max(var(--progress-indicator-spacing), calc(var(--control-sm) - var(--progress-indicator-dot)));
 }
 
 .plus-progress-indicator__dot {
+    position: relative;
     flex-shrink: 0;
-    width: var(--progress-indicator-dot-size-8);
-    height: var(--progress-indicator-dot-size-8);
+    width: var(--progress-indicator-dot);
+    height: var(--progress-indicator-dot);
     border-radius: var(--radius-full);
     border: none;
     padding: 0;
     background-color: var(--ds-icon-subtlest);
     cursor: default;
-    transition: background-color var(--motion-duration-short) var(--motion-easing-standard);
-}
-
-.plus-progress-indicator--size-12 .plus-progress-indicator__dot {
-    width: var(--progress-indicator-dot-size-12);
-    height: var(--progress-indicator-dot-size-12);
+    transition:
+        background-color var(--motion-duration-short) var(--motion-easing-standard),
+        width var(--motion-duration-medium) var(--motion-easing-standard);
 }
 
 button.plus-progress-indicator__dot {
     cursor: pointer;
+
+    // The hit area: `--control-sm` tall, and as wide as the dot plus half the
+    // gap on each side.
+    &::before {
+        content: '';
+        position: absolute;
+        inset: calc((var(--progress-indicator-dot) - var(--control-sm)) / 2) calc(var(--progress-indicator-gap) / -2);
+    }
 }
 
 // A selected dot keeps its ground; the other dots take the state steps.
@@ -79,4 +104,60 @@ button.plus-progress-indicator__dot--selected {
         hovered: (background-color: var(--ds-background-inverse-subtle-hovered)),
         pressed: (background-color: var(--ds-background-inverse-subtle-pressed)),
     ), $ring: false);
+}
+
+// --- TIMED ---
+// The current dot stretches into a bar. Its ground turns to the track (the
+// color of the other dots) and the fill carries the selected color.
+.plus-progress-indicator--timed .plus-progress-indicator__dot--selected {
+    width: var(--control-md);
+    background-color: var(--ds-icon-subtlest);
+    --progress-indicator-fill: var(--ds-background-brand-bold);
+}
+
+.plus-progress-indicator--timed.plus-progress-indicator--help .plus-progress-indicator__dot--selected {
+    --progress-indicator-fill: var(--ds-background-discovery-bold);
+}
+
+.plus-progress-indicator--timed.plus-progress-indicator--inverted .plus-progress-indicator__dot--selected {
+    background-color: var(--ds-background-inverse-subtle);
+    --progress-indicator-fill: var(--ds-icon-inverse);
+}
+
+.plus-progress-indicator__bar {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    border-radius: inherit;
+}
+
+.plus-progress-indicator__fill {
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-color: var(--progress-indicator-fill);
+    transform: scaleX(var(--progress-indicator-progress, 1));
+    transform-origin: left center;
+}
+
+// Right to left, the fill grows from the right.
+[dir='rtl'] .plus-progress-indicator__fill {
+    transform-origin: right center;
+}
+
+// Under reduced motion the bar never moves: it shows full.
+@media (prefers-reduced-motion: reduce) {
+    .plus-progress-indicator__fill {
+        transform: none;
+    }
+}
+
+@media (forced-colors: active) {
+    .plus-progress-indicator--timed .plus-progress-indicator__dot--selected {
+        background-color: GrayText;
+    }
+
+    .plus-progress-indicator__fill {
+        background-color: Highlight;
+    }
 }

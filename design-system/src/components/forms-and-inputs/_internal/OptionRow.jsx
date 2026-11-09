@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';
+import Icon from '../../images-and-icons/Icon';
 import './OptionRow.scss';
-import { iconClass } from '../../../lib/icon';
 
 /** The Figma row's Leading slot holds at most this many items. */
 const MAX_LEADING = 4;
@@ -28,8 +28,8 @@ const Mark = ({ type, checked, indeterminate = false }) => (
             indeterminate && !checked ? 'is-indeterminate' : '',
         ].filter(Boolean).join(' ')}
     >
-        {type === 'checkbox' && checked && <i className={iconClass('check')} />}
-        {type === 'checkbox' && indeterminate && !checked && <i className={iconClass('minus')} />}
+        {type === 'checkbox' && checked && <Icon name="check" />}
+        {type === 'checkbox' && indeterminate && !checked && <Icon name="minus" />}
     </span>
 );
 
@@ -94,7 +94,7 @@ const RowToggle = ({ state, onToggle }) => (
         }}
     >
         {state !== 'leaf' && (
-            <i className={`fa-solid ${state === 'expanded' ? 'fa-caret-down' : 'fa-caret-right'}`} />
+            <Icon name={state === 'expanded' ? 'caret-down' : 'caret-right'} />
         )}
     </span>
 );
@@ -108,7 +108,7 @@ RowToggle.propTypes = {
  *
  * @returns {JSX.Element}
  */
-const RowChevron = () => <i aria-hidden="true" className="fa-solid fa-caret-right plus-option-row-chevron" />;
+const RowChevron = () => <Icon name="caret-right" className="plus-option-row-chevron" />;
 
 /**
  * OptionRow — the one row every option list draws: Select, TagInput, the
@@ -230,7 +230,7 @@ const OptionRow = ({
         >
             {kind === 'create' && (
                 <span className="plus-option-row-leading">
-                    <i aria-hidden="true" className={iconClass('plus')} />
+                    <Icon name="plus" />
                 </span>
             )}
             {kind === 'option' && leadingItems.length > 0 && (
@@ -246,7 +246,7 @@ const OptionRow = ({
                 <span className="plus-option-row-trailing">
                     {trailing}
                     {kind === 'option' && selected && check && (
-                        <i aria-hidden="true" className={`${iconClass('check')} plus-option-row-selected-mark`} />
+                        <Icon name="check" className="plus-option-row-selected-mark" />
                     )}
                 </span>
             )}

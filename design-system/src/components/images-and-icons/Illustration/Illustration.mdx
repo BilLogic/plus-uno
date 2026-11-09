@@ -35,9 +35,9 @@ export const figmaMeta = {
 <Meta of={IllustrationStories} />
 
 <Title />
-The PLUS illustration characters: five that stand for the SMART areas of
-tutoring and seven math characters. Each is a textured body with a face, arms
-and legs drawn in line work, and takes every color from a token.
+Draws one PLUS character at a size: a textured body with a face, arms and legs
+in line work, every color from a token. Which character to use, and when, is on
+<a href="?path=/docs/foundations-illustrations--docs">Illustrations</a>.
 
 <DocsTabs of={IllustrationStories}>
 
@@ -54,14 +54,6 @@ and legs drawn in line work, and takes every color from a token.
 
 <div className="sb-ds-doc-section">
 
-## Overview
-
-<ComponentExample of={IllustrationStories.Gallery} title="Gallery" description={<>All twelve characters. Switch the color mode in the toolbar to see them in Dark: the bodies and the line work change with the tokens.</>} />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
 ## Anatomy
 
 - **Frame.** A 1000 × 1000 square in Figma, scaled to `size` in code. It is the
@@ -71,74 +63,44 @@ and legs drawn in line work, and takes every color from a token.
 - **Face, arms and legs.** Line work in `--ds-icon-subtle`. Most characters
   reach past the frame with their limbs.
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Color and the SMART mapping
-
-Every body sits at one mid strength, so no character reads louder than the
-others in either mode. The five SMART characters use their area's `subtle`
-step, which exists for illustration bodies. The seven math characters use an
-accent hue at the same strength, and never a SMART hue, so a math character is
-never read as a SMART area. There are only four accent hues left once the SMART
-hues are set aside, so three of them repeat.
-
-<DocsTable>
-    <thead>
-        <tr><th>Character</th><th>Kind</th><th>Body token</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>mastering-content</code></td><td>SMART</td><td><code>--ds-background-smart-mastering-content-subtle</code></td></tr>
-        <tr><td><code>advocacy</code></td><td>SMART</td><td><code>--ds-background-smart-advocacy-subtle</code></td></tr>
-        <tr><td><code>technology</code></td><td>SMART</td><td><code>--ds-background-smart-technology-tools-subtle</code></td></tr>
-        <tr><td><code>relationships</code></td><td>SMART</td><td><code>--ds-background-smart-relationship-subtle</code></td></tr>
-        <tr><td><code>social-emotional</code></td><td>SMART</td><td><code>--ds-background-smart-social-emotional-subtle</code></td></tr>
-        <tr><td><code>dot</code></td><td>Math</td><td><code>--ds-background-accent-red-subtle</code></td></tr>
-        <tr><td><code>approximately-equal</code></td><td>Math</td><td><code>--ds-background-accent-blue-subtle</code></td></tr>
-        <tr><td><code>root</code></td><td>Math</td><td><code>--ds-background-accent-green-subtle</code></td></tr>
-        <tr><td><code>all</code></td><td>Math</td><td><code>--ds-background-accent-purple-subtle</code></td></tr>
-        <tr><td><code>pi</code></td><td>Math</td><td><code>--ds-background-accent-red-subtle</code></td></tr>
-        <tr><td><code>equal</code></td><td>Math</td><td><code>--ds-background-accent-blue-subtle</code></td></tr>
-        <tr><td><code>divider</code></td><td>Math</td><td><code>--ds-background-accent-green-subtle</code></td></tr>
-    </tbody>
-</DocsTable>
-
-Technology's brown is the one body with noticeably less chroma than the rest:
-brown has no more saturated SMART step. The line work is `--ds-icon-subtle` on
-every character.
+`character` picks one of the twelve. The galleries, and which character goes
+with which SMART area, are on
+<a href="?path=/docs/foundations-illustrations--docs">Illustrations</a>.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## SMART characters
+## Size
 
-<ComponentExample of={IllustrationStories.SmartCharacters} title="Smart characters" description={<>Mastering content, advocacy, technology, relationships and social emotional. Each body takes its SMART area's <code>subtle</code> step.</>} />
+`size` is the frame's width and height in pixels. 48, 96, 160 and 240 are the
+named sizes, and 96 is the default. Any other number also works.
 
-</div>
+<ComponentExample of={IllustrationStories.Size48} title="48" description="Beside a heading or in a compact card." />
 
-<div className="sb-ds-doc-section">
+<ComponentExample of={IllustrationStories.Size96} title="96" description="Cards and small empty states. The default." />
 
-## Math characters
+<ComponentExample of={IllustrationStories.Size160} title="160" description="Page empty states." />
 
-<ComponentExample of={IllustrationStories.MathCharacters} title="Math characters" description={<>Dot, approximately equal, root, all, pi, equal and divider. Each body takes an accent hue at the same strength as the SMART bodies.</>} />
+<ComponentExample of={IllustrationStories.Size240} title="240" description="Onboarding and full-page moments." />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Sizes
-
-<ComponentExample of={IllustrationStories.Sizes} title="Sizes" description={<>48, 96, 160 and 240 are the named sizes; any number of pixels also works. The size is the frame's width and height, and the limbs reach past it.</>} />
-
-- **48, 96, 160, 240.** Below 48 the line work breaks into specks; above 240
-  the stipple starts to read as noise.
+- **Below 48 and above 240.** Below 48 the line work breaks into specks; above
+  240 the stipple starts to read as noise.
 - **The safe area is outside the frame.** The limbs are not clipped. Across
   the twelve characters they reach up to about 33% of the size to the left,
   60% to the right, 14% above and 50% below; dot reaches farthest. Leave that
   much room on the sides a character has limbs on, or the limbs run into what
   sits next to it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content
+
+<ComponentExample of={IllustrationStories.Titled} title="Titled" description={<><code>title</code> makes the character one image with that name.</>} />
+
+<ComponentExample of={IllustrationStories.Decorative} title="Decorative" description={<>Without <code>title</code>, the character is hidden from assistive technology.</>} />
 
 </div>
 
@@ -178,16 +140,23 @@ every character.
 
 ## Usage
 
-Use `Illustration` to give a page or a moment some warmth: the header of Home,
-an empty state, a welcome, or a card that introduces a SMART area. A character
-is decoration beside words that already say what the page is about.
+```jsx
+import { Illustration } from '@/components';
 
-Use an icon, not a character, for anything a person acts on or has to read to
-understand. Use `Tile` for a small square picture of a thing.
+<Illustration character="technology" size={160} />
+<Illustration character="advocacy" size={96} title="Advocacy" />
+```
 
-When to use a character, which one and how it sits on a page are on
-<a href="?path=/docs/foundations-illustrations--docs">Illustrations</a>. This
-page is the component's API.
+<DocsTable>
+<thead>
+<tr><th>Prop</th><th>Type</th><th>Default</th><th>What it does</th></tr>
+</thead>
+<tbody>
+<tr><td><code>character</code></td><td>One of twelve</td><td><code>mastering-content</code></td><td>The SMART characters <code>mastering-content</code>, <code>advocacy</code>, <code>technology</code>, <code>relationships</code> and <code>social-emotional</code>; the math characters <code>dot</code>, <code>approximately-equal</code>, <code>root</code>, <code>all</code>, <code>pi</code>, <code>equal</code> and <code>divider</code>.</td></tr>
+<tr><td><code>size</code></td><td>Number</td><td>96</td><td>The frame's width and height in pixels: 48, 96, 160 or 240.</td></tr>
+<tr><td><code>title</code></td><td>String</td><td>None</td><td>Makes the character an image with this name. Without it the character is decorative and hidden.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -225,20 +194,14 @@ page is the component's API.
 </tbody>
 </DocsTable>
 
+The body token for each character is on
+<a href="?path=/docs/foundations-illustrations--docs">Illustrations</a>.
+
 </div>
 
 <div className="sb-ds-doc-section">
 
 ## Best practices
-
-### Pick a SMART character for a SMART area, and a math character for anything else.
-
-<DoDontPair
-    doExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Illustration character="advocacy" title="Advocacy" size={96} /><Illustration character="pi" size={96} /></div>}
-    doCaption="A SMART character for its area; a math character for the rest."
-    dontExample={<div style={{ display: 'flex', alignItems: 'center', gap: 'var(--inline-md)' }}><Illustration character="pi" title="Advocacy" size={96} /></div>}
-    dontCaption="A math character standing in for a SMART area."
-/>
 
 ### Keep characters decorative unless they carry meaning.
 
@@ -249,11 +212,11 @@ page is the component's API.
     dontCaption="A title that repeats the heading, so it is read twice."
 />
 
-### Don't crop a character.
+### Give a character room.
 
 <DoDontPair
     doExample={<div style={{ padding: 'var(--pad-x-md)' }}><Illustration character="dot" size={96} /></div>}
-    doCaption="Give it room."
+    doCaption="Room on every side the limbs reach."
     dontExample={<div style={{ overflow: 'hidden', height: 'var(--image-lg)' }}><Illustration character="dot" size={96} /></div>}
     dontCaption="Clipping the box cuts off the limbs."
 />
@@ -269,7 +232,7 @@ page is the component's API.
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Title a character that stands alone with what it stands for: "Advocacy".</td><td>Title it "Illustration" or "Character", which names the picture.</td></tr>
+<tr><td>Title a character that stands alone with the idea it stands for: "Advocacy".</td><td>Title it with the drawing, such as "Illustration" or "Brown equals sign with arms".</td></tr>
 <tr><td>Leave the title off a character beside a heading that says it.</td><td>Repeat the heading in both places.</td></tr>
 </tbody>
 </DocsTable>
@@ -299,7 +262,7 @@ page is the component's API.
 
 ## Related
 
-- <a href="?path=/docs/foundations-illustrations--docs">Illustrations</a> for when to use a character and which one.
+- <a href="?path=/docs/foundations-illustrations--docs">Illustrations</a> for which character to use, and when.
 - For a small square picture of a thing, use `Tile`.
 - For a person, use `Avatar`.
 

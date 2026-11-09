@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **118,357 chars from 9 files**, against an assembled budget of 175,500 (57,143 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 97,973 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **119,583 chars from 9 files**, against an assembled budget of 175,500 (55,917 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 99,199 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,418 (−7,862 ide-only) | 10,418 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 29,237 | 39,684 | 20,000 (constitution) ⚠️ **over by 9,237** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 61,167 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 62,813 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 64,061 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 69,755 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 81,541 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 102,502 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 105,970 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 112,528 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 117,501 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 118,357 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 30,463 | 40,910 | 20,000 (constitution) ⚠️ **over by 10,463** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 62,393 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 64,039 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 65,287 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 70,981 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 82,767 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 103,728 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 107,196 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 113,754 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 118,727 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 119,583 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -249,7 +249,7 @@ The pattern for the app's outer shell: the **Sidebar** and **Panel** that stay p
 _Avoid_: "surface container", bare "shell"
 
 **Sidebar**:
-The full-height area at the left of the **Frame**, holding navigation. It is **docked** from 1024 and collapsed below, where a hover **peek**s it.
+The full-height area at the left of the **Frame**, holding navigation. From 1024 it is **docked**; below it is collapsed, where a hover **peek**s it and the toggle opens it as an **overlay**. A peek and an overlay look the same; they differ in how they open and close.
 _Avoid_: "left nav", "side nav"
 
 **Panel**:
@@ -436,6 +436,18 @@ _Avoid_: "state layer"
 **Focus ring**:
 The ring that shows keyboard focus, drawn in the focused border color rather than as a fill.
 _Avoid_: "focus outline", "focus state color"
+
+**Icon**:
+The component that draws one Font Awesome Free glyph at a token size and an icon color, with an accessible name or marked decorative. Components that take an icon name render it. Its **style** is regular or solid (`iconStyle` in code, `style` in Figma); regular is the default where Font Awesome Free has one. Brand logos are a separate family, chosen by name. **Iconography** is the foundation page with the guidance; Icon is the component.
+_Avoid_: "glyph" for the component, a bare `<i>` with Font Awesome classes
+
+**Illustration**:
+The component that draws one PLUS character, a SMART character or a math character, at a size. **Illustrations** is the foundation page that says which character to use and when; Illustration is the component.
+_Avoid_: "mascot", "avatar" for a character
+
+**Progress indicator**:
+A row of dots that shows the current step of a sequence. With `progress`, the current dot stretches into a bar that fills over the step's time, as in a **Carousel**; without a clock (autoplay off, or reduced motion) the stretched dot shows full.
+_Avoid_: "dots", "slide marker"
 
 ### Design system: tokens
 

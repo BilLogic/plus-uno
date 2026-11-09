@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import Tooltip from '@/components/overlays-and-layering/Tooltip';
 import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
 import { alignName, useClipped } from './TableParts';
+import Icon from '../../images-and-icons/Icon';
 import './Table.scss';
-import { iconClass } from '../../../lib/icon';
 
 const classes = (...names) => names.filter(Boolean).join(' ');
 
@@ -36,8 +36,8 @@ const SORT_ACTION_TEXT = {
  *
  * - `label`: the column name. Required, since it names the column for
  *   assistive technology even when `isIconOnlyHeader` hides it.
- * - `icon`: Font Awesome Free classes for the column's data type, such as
- *   `fa-regular fa-calendar`. Drawn at the small icon size.
+ * - `icon`: Font Awesome Free name for the column's data type, such as
+ *   `calendar`. Drawn at the small icon size.
  * - `isSortable`: renders the sort button. `sort` is `none` | `ascending` |
  *   `descending`; the page owns it and gets the requested direction from
  *   `onSort`. The unsorted arrow shows on hover and focus; a sorted column
@@ -78,7 +78,7 @@ const HeadCell = ({
     };
 
     const typeIcon = icon ? (
-        <i className={classes(icon, 'plus-table-head-cell-type')} aria-hidden="true" />
+        <Icon name={icon} className="plus-table-head-cell-type" />
     ) : null;
 
     const labelNode = showLabel ? (
@@ -99,10 +99,7 @@ const HeadCell = ({
             {labelNode}
             {isSortable && (
                 <>
-                    <i
-                        className={classes(iconClass(SORT_GLYPH[sortState]), 'plus-table-head-cell-sort')}
-                        aria-hidden="true"
-                    />
+                    <Icon name={SORT_GLYPH[sortState]} className="plus-table-head-cell-sort" />
                     <VisuallyHidden>{`, ${SORT_STATE_TEXT[sortState]}`}</VisuallyHidden>
                 </>
             )}
@@ -158,7 +155,7 @@ const HeadCell = ({
 HeadCell.propTypes = {
     /** The column name. Read by assistive technology even when only the icon shows. */
     label: PropTypes.string.isRequired,
-    /** Font Awesome Free classes for the column's data type, such as `fa-regular fa-calendar`. */
+    /** Font Awesome Free name for the column's data type, such as `calendar`. */
     icon: PropTypes.string,
     /** Renders the sort button and sets `aria-sort` on the header. */
     isSortable: PropTypes.bool,

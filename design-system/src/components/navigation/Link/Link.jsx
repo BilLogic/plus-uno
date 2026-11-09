@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { clsx } from 'clsx';
 import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
+import Icon from '../../images-and-icons/Icon';
 import './Link.scss';
-import { iconClass } from '../../../lib/icon';
 
 export const LINK_APPEARANCES = ['default', 'subtle', 'inverse'];
 
@@ -34,7 +34,7 @@ export const Link = ({
             {children}
             {isOpenInNewWindow && (
                 <>
-                    <i className={`${iconClass('arrow-up-right-from-square')} plus-link-icon`} aria-hidden="true" />
+                    <Icon name="arrow-up-right-from-square" className="plus-link-icon" />
                     <VisuallyHidden> (opens in a new tab)</VisuallyHidden>
                 </>
             )}

@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useId, useState } from 'react';
 import PropTypes from 'prop-types';
-import { CountTag, IconButton, Logo, Tooltip } from '@/components';
+import { CountTag, Icon, IconButton, Logo, Tooltip } from '@/components';
 import { useSidebarControl } from '../Frame/SidebarControl';
 import SidebarAccount, { ACCOUNT_ROLES } from './SidebarAccount';
 import { SIDEBAR_RECENT_TABS } from './openTabs';
@@ -8,9 +8,6 @@ import './Sidebar.scss';
 
 /** Where collapsed section titles are remembered, per person: `<key>:<account id>`. */
 export const SIDEBAR_SECTIONS_STORAGE_KEY = 'plus-sidebar-sections';
-
-/** A Font Awesome Free class list, from a bare solid name (`house`) or a full list (`fa-regular fa-house`). */
-const faClass = (icon) => (icon.includes('fa-') ? icon : `fa-solid fa-${icon}`);
 
 /** The tooltip and message of a section locked until assigned training is done. */
 export const lockMessage = (title) => `Complete your assigned training to unlock the ${title}`;
@@ -184,7 +181,7 @@ const PatternSidebar = ({
         if (item.external) {
             return (
                 <span className="plus-pattern-sidebar__end plus-pattern-sidebar__end--icon" aria-hidden="true">
-                    <i className="fa-solid fa-arrow-up-right-from-square" />
+                    <Icon name="arrow-up-right-from-square" />
                 </span>
             );
         }
@@ -194,7 +191,7 @@ const PatternSidebar = ({
     const rowContent = (item, extra) => (
         <>
             <span className="plus-pattern-sidebar__slot" aria-hidden="true">
-                {item.icon ? <i className={faClass(item.icon)} /> : null}
+                {item.icon ? <Icon name={item.icon} /> : null}
             </span>
             <span className="plus-pattern-sidebar__label">{item.text}</span>
             {item.external ? <span className="visually-hidden">(opens in a new tab)</span> : null}
@@ -401,7 +398,7 @@ const PatternSidebar = ({
                         {/* The lock is focusable so a keyboard reaches its message. */}
                         {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex */}
                         <span className="plus-pattern-sidebar__caret plus-pattern-sidebar__caret--lock" tabIndex={0} role="img" aria-label={`Locked. ${message}`}>
-                            <i className="fa-solid fa-lock" aria-hidden="true" />
+                            <Icon name="lock" />
                         </span>
                     </Tooltip>
                 </div>
@@ -417,7 +414,7 @@ const PatternSidebar = ({
                 >
                     <span id={titleId} className="plus-pattern-sidebar__title-text">{group.title}</span>
                     <span className="plus-pattern-sidebar__caret" aria-hidden="true">
-                        <i className="fa-solid fa-angle-down" />
+                        <Icon name="angle-down" />
                     </span>
                 </button>
             );
@@ -486,7 +483,7 @@ const itemShape = PropTypes.shape({
     /** Unique id; `activeId`, `onSelect` and `tabs` use it */
     id: PropTypes.string.isRequired,
     text: PropTypes.string.isRequired,
-    /** Font Awesome Free class list for the 16 icon (`fa-regular fa-house`); a bare name is solid */
+    /** Font Awesome Free name for the 16 icon (`house`), drawn by Icon; a brand logo carries its family (`fa-brands fa-slack`) */
     icon: PropTypes.string,
     /** Makes the row a link */
     href: PropTypes.string,

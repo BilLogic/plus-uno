@@ -4,10 +4,11 @@ import IconButton from '@/components/forms-and-inputs/IconButton';
 import Button from '@/components/forms-and-inputs/Button';
 import TextArea from '@/components/forms-and-inputs/TextArea';
 import Popup from '@/components/overlays-and-layering/Popup';
+import Icon from '../../images-and-icons/Icon';
 import './AiMessage.scss';
 
 const thumb = (direction, selected) => (
-    <i className={`${selected ? 'fa-solid' : 'fa-regular'} fa-thumbs-${direction}`} aria-hidden="true" />
+    <Icon name={`thumbs-${direction}`} iconStyle={selected ? 'solid' : 'regular'} />
 );
 
 /**

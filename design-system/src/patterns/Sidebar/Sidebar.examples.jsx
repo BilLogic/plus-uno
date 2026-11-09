@@ -21,13 +21,13 @@ const sidebar = (props) => (
     </Box>
 );
 
-const home = { id: 'home', items: [{ id: 'home', text: 'Home', icon: 'fa-regular fa-house' }] };
+const home = { id: 'home', items: [{ id: 'home', text: 'Home', icon: 'house' }] };
 const training = {
     id: 'training',
     title: 'Training',
     items: [
-        { id: 'lessons', text: 'Lessons', icon: 'fa-regular fa-lightbulb', training: 'lessons' },
-        { id: 'onboarding', text: 'Onboarding', icon: 'fa-regular fa-compass', training: 'modules' },
+        { id: 'lessons', text: 'Lessons', icon: 'lightbulb', training: 'lessons' },
+        { id: 'onboarding', text: 'Onboarding', icon: 'compass', training: 'modules' },
     ],
 };
 const toolkit = (sessions = 'Sessions', students = 'Students') => ({
@@ -35,8 +35,8 @@ const toolkit = (sessions = 'Sessions', students = 'Students') => ({
     title: 'Toolkit',
     lockedDuringOnboarding: true,
     items: [
-        { id: 'sessions', text: sessions, icon: 'fa-regular fa-calendar' },
-        { id: 'students', text: students, icon: 'fa-regular fa-user' },
+        { id: 'sessions', text: sessions, icon: 'calendar' },
+        { id: 'students', text: students, icon: 'user' },
     ],
 });
 

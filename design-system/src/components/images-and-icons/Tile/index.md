@@ -64,7 +64,7 @@ Don't: A bold ground on the logo, which keeps its own.
 - For a person, use `Avatar`.
 - For a value someone picked, with a label, use `Tag`.
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Object`
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Object`
 
 ## Parts
 

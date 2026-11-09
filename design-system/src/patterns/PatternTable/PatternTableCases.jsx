@@ -1,9 +1,8 @@
 import React from 'react';
 import PatternTable from '@/patterns/PatternTable';
 import PatternSection from '@/patterns/PatternSection';
-import { DynamicTable, TableBulkActions, TreeTable } from '@/components';
+import { DynamicTable, Icon, TableBulkActions, TreeTable } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import { iconClass } from '../../lib/icon';
 
 /**
  * The do and don't examples of the Table page: the composition pairs and the
@@ -23,7 +22,7 @@ const unstyled = (Case) => {
 
 const numeric = { textAlign: 'right' };
 const subtle = { color: 'var(--ds-text-subtle)' };
-const icon = (name) => <i className={iconClass(name)} aria-hidden="true" style={{ fontSize: 'var(--icon-sm)' }} />;
+const icon = (name) => <Icon name={name} size={12} />;
 
 const roster = [
     ['Ava Thompson', 'Priya Nair', 'Oct 24', 12, '92%'],

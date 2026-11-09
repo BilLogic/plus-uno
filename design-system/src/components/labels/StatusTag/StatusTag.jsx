@@ -4,8 +4,8 @@ import PropTypes from 'prop-types';
 import CountTag, { COUNT_TAG_APPEARANCES, formatCount } from '../CountTag/CountTag';
 import Tooltip from '../../overlays-and-layering/Tooltip';
 import { useIsTruncated } from '../../../lib/useIsTruncated';
+import Icon from '../../images-and-icons/Icon';
 import './StatusTag.scss';
-import { iconClass } from '../../../lib/icon';
 
 /**
  * `StatusTag` — the condition something is in.
@@ -39,7 +39,7 @@ const warn = (message) => {
 
 /** A string is a Font Awesome Free icon name, as Button takes it; anything else renders as given. */
 const renderVisual = (visual) => (typeof visual === 'string'
-    ? <i className={iconClass(visual)} aria-hidden="true" />
+    ? <Icon name={visual} />
     : visual);
 
 /** A filled label for the condition something is in, such as "Needs review" or "Overdue". It is never a button; its appearance carries the meaning. */

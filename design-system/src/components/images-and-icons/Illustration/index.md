@@ -4,42 +4,41 @@
 
 One of the PLUS illustration characters: a textured body with a face, arms and legs in line work. It is decorative unless given a `title`.
 
+Also asked as: mascot.
+
 **Import:** `import { Illustration } from '@/components';`
 
 **Source:** `design-system/src/components/images-and-icons/Illustration/Illustration.jsx`
 
-**Stories:** `design-system/src/components/images-and-icons/Illustration/Illustration.stories.jsx` — Gallery, SmartCharacters, MathCharacters, Sizes, DefaultSize, Rest, Decorative, Titled, MasteringContent, Advocacy, Technology, Relationships, SocialEmotional, Dot, ApproximatelyEqual, Root, All, Pi, Equal, Divider, Interactive
+**Stories:** `design-system/src/components/images-and-icons/Illustration/Illustration.stories.jsx` — Gallery, SmartCharacters, MathCharacters, Sizes, Size48, Size96, Size160, Size240, DefaultSize, Rest, Decorative, Titled, MasteringContent, Advocacy, Technology, Relationships, SocialEmotional, Dot, ApproximatelyEqual, Root, All, Pi, Equal, Divider, Interactive
 
 **Storybook page:** `design-system/src/components/images-and-icons/Illustration/Illustration.mdx`
 
 ## Usage
 
-Use `Illustration` to give a page or a moment some warmth: the header of Home,
-an empty state, a welcome, or a card that introduces a SMART area. A character
-is decoration beside words that already say what the page is about.
+```jsx
+import { Illustration } from '@/components';
 
-Use an icon, not a character, for anything a person acts on or has to read to
-understand. Use `Tile` for a small square picture of a thing.
+<Illustration character="technology" size={160} />
+<Illustration character="advocacy" size={96} title="Advocacy" />
+```
 
-When to use a character, which one and how it sits on a page are on
-Illustrations. This
-page is the component's API.
+| Prop | Type | Default | What it does |
+| --- | --- | --- | --- |
+| `character` | One of twelve | `mastering-content` | The SMART characters `mastering-content`, `advocacy`, `technology`, `relationships` and `social-emotional`; the math characters `dot`, `approximately-equal`, `root`, `all`, `pi`, `equal` and `divider`. |
+| `size` | Number | 96 | The frame's width and height in pixels: 48, 96, 160 or 240. |
+| `title` | String | None | Makes the character an image with this name. Without it the character is decorative and hidden. |
 
 ## Best practices
-
-### Pick a SMART character for a SMART area, and a math character for anything else. {#pick-a-smart-character-for-a-smart-area-and-a-math-character-for-anything-else}
-
-Do: A SMART character for its area; a math character for the rest.
-Don't: A math character standing in for a SMART area.
 
 ### Keep characters decorative unless they carry meaning. {#keep-characters-decorative-unless-they-carry-meaning}
 
 Do: Decorative beside a heading that already says it.
 Don't: A title that repeats the heading, so it is read twice.
 
-### Don't crop a character. {#don-t-crop-a-character}
+### Give a character room. {#give-a-character-room}
 
-Do: Give it room.
+Do: Room on every side the limbs reach.
 Don't: Clipping the box cuts off the limbs.
 
 ## Accessibility
@@ -59,11 +58,11 @@ Don't: Clipping the box cuts off the limbs.
 
 ## Related
 
-- Illustrations for when to use a character and which one.
+- Illustrations for which character to use, and when.
 - For a small square picture of a thing, use `Tile`.
 - For a person, use `Avatar`.
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Image` · `Object` · `Tile`
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Image` · `Object` · `Tile`
 
 ## Parts
 
@@ -87,11 +86,14 @@ Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Image` · `Object` · `Til
 | Body, math characters | An accent `subtle` background: red, blue, green or purple. |
 | Line work | `--ds-icon-subtle` |
 
+The body token for each character is on
+Illustrations.
+
 ## Content guidelines
 
 | Do | Don't |
 | --- | --- |
-| Title a character that stands alone with what it stands for: "Advocacy". | Title it "Illustration" or "Character", which names the picture. |
+| Title a character that stands alone with the idea it stands for: "Advocacy". | Title it with the drawing, such as "Illustration" or "Brown equals sign with arms". |
 | Leave the title off a character beside a heading that says it. | Repeat the heading in both places. |
 
 ## Props

@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DocsContainer } from '@storybook/addon-docs/blocks';
+import { themes } from 'storybook/theming';
 
 /**
  * The "On this page" rail's four page-side fixes, applied from the docs container.
@@ -155,10 +156,34 @@ function TocEnhancer() {
   return null;
 }
 
-/** Storybook's docs container with the rail enhancer mounted beside the page. */
+/**
+ * The resolved color mode, light or dark, read from `data-bs-theme` on <html>.
+ * The Color mode toolbar writes it through `applyColorModes` (auto resolves to
+ * the OS preference there), so following the attribute follows every mode.
+ */
+function useResolvedColorMode() {
+  const read = () => (typeof document !== 'undefined'
+    && document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light');
+  const [mode, setMode] = useState(read);
+  useEffect(() => {
+    const observer = new MutationObserver(() => setMode(read()));
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-bs-theme'] });
+    setMode(read());
+    return () => observer.disconnect();
+  }, []);
+  return mode;
+}
+
+/**
+ * Storybook's docs container with the rail enhancer mounted beside the page.
+ * Its theme follows the Color mode: Storybook's own docs blocks (tables, the
+ * props table, code blocks and their syntax colors, the Show code bar) are
+ * themed by it, and a light theme left them white, or dark-on-dark, in dark mode.
+ */
 export function TocDocsContainer({ children, ...props }) {
+  const mode = useResolvedColorMode();
   return (
-    <DocsContainer {...props}>
+    <DocsContainer {...props} theme={mode === 'dark' ? themes.dark : themes.light}>
       <TocEnhancer />
       {children}
     </DocsContainer>

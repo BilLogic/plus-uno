@@ -5,9 +5,9 @@ import FieldBox from '../_internal/FieldBox';
 import Calendar from '../_internal/Calendar';
 import { popupLayerOf, useAnchoredPopup } from '../_internal/anchorPlacement';
 import { formatDisplay, formatIso, outOfBounds, parseDate, parseTyped } from '../_internal/dates';
+import Icon from '../../images-and-icons/Icon';
 import '../_internal/Listbox.scss';
 import './DatePicker.scss';
-import { iconClass } from '../../../lib/icon';
 
 /** Joins a range's two ends in the field: "10/19/2026 – 10/23/2026". */
 const RANGE_JOIN = ' – ';
@@ -215,7 +215,7 @@ const DatePicker = ({
                             if (open) setOpen(false); else openCalendar();
                         }}
                     >
-                        <i className={iconClass('calendar-day')} />
+                        <Icon name="calendar-day" />
                     </span>
                 )}
             >

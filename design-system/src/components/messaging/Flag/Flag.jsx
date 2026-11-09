@@ -3,8 +3,8 @@ import PropTypes from 'prop-types';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import { MESSAGE_APPEARANCE_ICONS } from '../messageAppearance';
+import Icon from '../../images-and-icons/Icon';
 import './Flag.scss';
-import { iconClass } from '../../../lib/icon';
 
 /**
  * How long a normal, information or success flag stays before it closes itself. Warning and
@@ -45,7 +45,7 @@ export const Flag = ({
 }) => {
     // An appearance outside the list falls back to the default, normal.
     const flagAppearance = FLAG_APPEARANCES.includes(appearance) ? appearance : 'normal';
-    const glyph = iconClass(MESSAGE_APPEARANCE_ICONS[flagAppearance]);
+    const glyph = MESSAGE_APPEARANCE_ICONS[flagAppearance];
     const isUrgent = URGENT_APPEARANCES.includes(flagAppearance);
 
     /*
@@ -104,7 +104,7 @@ export const Flag = ({
                   * these components is `aria-hidden`. The title beside it
                   * carries the meaning.
                   */}
-                <i className={glyph} aria-hidden="true"></i>
+                <Icon name={glyph} />
             </div>
             <div className="plus-flag-content">
                 <div className={`plus-flag-header ${headerClass}`}>

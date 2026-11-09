@@ -93,7 +93,7 @@ The pattern for the app's outer shell: the **Sidebar** and **Panel** that stay p
 _Avoid_: "surface container", bare "shell"
 
 **Sidebar**:
-The full-height area at the left of the **Frame**, holding navigation. It is **docked** from 1024 and collapsed below, where a hover **peek**s it.
+The full-height area at the left of the **Frame**, holding navigation. From 1024 it is **docked**; below it is collapsed, where a hover **peek**s it and the toggle opens it as an **overlay**. A peek and an overlay look the same; they differ in how they open and close.
 _Avoid_: "left nav", "side nav"
 
 **Panel**:
@@ -280,6 +280,18 @@ _Avoid_: "state layer"
 **Focus ring**:
 The ring that shows keyboard focus, drawn in the focused border color rather than as a fill.
 _Avoid_: "focus outline", "focus state color"
+
+**Icon**:
+The component that draws one Font Awesome Free glyph at a token size and an icon color, with an accessible name or marked decorative. Components that take an icon name render it. Its **style** is regular or solid (`iconStyle` in code, `style` in Figma); regular is the default where Font Awesome Free has one. Brand logos are a separate family, chosen by name. **Iconography** is the foundation page with the guidance; Icon is the component.
+_Avoid_: "glyph" for the component, a bare `<i>` with Font Awesome classes
+
+**Illustration**:
+The component that draws one PLUS character, a SMART character or a math character, at a size. **Illustrations** is the foundation page that says which character to use and when; Illustration is the component.
+_Avoid_: "mascot", "avatar" for a character
+
+**Progress indicator**:
+A row of dots that shows the current step of a sequence. With `progress`, the current dot stretches into a bar that fills over the step's time, as in a **Carousel**; without a clock (autoplay off, or reduced motion) the stretched dot shows full.
+_Avoid_: "dots", "slide marker"
 
 ### Design system: tokens
 

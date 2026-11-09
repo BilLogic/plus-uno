@@ -60,7 +60,7 @@ Don't: Folding most of a roster behind +n: link to the list instead.
 - For a single person or agent, use `Avatar`.
 - For the signed-in person, with a name and a role, use the Sidebar's account row.
 
-Same group: `AiIcon` · `Avatar` · `Illustration` · `Image` · `Object` · `Tile`
+Same group: `AiIcon` · `Avatar` · `Icon` · `Illustration` · `Image` · `Object` · `Tile`
 
 ## Parts
 

@@ -2,15 +2,15 @@
 
 # ProgressIndicator
 
-A row of dots showing where you are along the steps of a journey. Unlike `ProgressTracker`, the steps carry no label of their own — only a position. `onSelect` makes every dot a button and lets a person jump to any step; without it the dots are decorative and `aria-current` on the active one is the only state a screen reader gets.
+A row of dots showing where you are along the steps of a journey. Unlike `ProgressTracker`, the steps carry no label of their own — only a position. `onSelect` makes every dot a button and lets a person jump to any step; without it the dots are decorative and `aria-current` on the active one is the only state a screen reader gets. A dot that is a button keeps a 24px target, so the gap between buttons widens to fit it. `progress` times the current step: its dot stretches into a bar whose fill tracks `progress`, from 0 to 1, as in a carousel that moves on its own. A step with no clock passes `1`, and the bar shows full; under reduced motion the bar always shows full.
 
-Also asked as: dots, carousel dots, step dots.
+Also asked as: dots, carousel dots, step dots, slide marker.
 
 **Import:** `import { ProgressIndicator } from '@/components';`
 
 **Source:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.jsx`
 
-**Stories:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.stories.jsx` — Default, Interactive, Appearances, Sizes, Spacing, Rest, Hovered, Pressed, Focused, Decorative, SizeTokens
+**Stories:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.stories.jsx` — Default, Interactive, Appearances, Sizes, Spacing, Rest, Hovered, Pressed, Focused, Decorative, SizeTokens, Timed, Clock, TimedInteractive
 
 **Storybook page:** `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.mdx`
 
@@ -19,6 +19,9 @@ Also asked as: dots, carousel dots, step dots.
 Use `ProgressIndicator` for a short sequence where position matters more than
 the name of each step — a carousel, an onboarding flight, a slide deck. When
 each step has its own label people need to see, use `ProgressTracker` instead.
+
+When each step lasts a set time and moves on by itself, pass `progress` so the
+current dot shows how much of its time is left.
 
 ## Best practices
 
@@ -63,7 +66,11 @@ The array's content never renders. Its length becomes the number of dots, and wh
 - **The current step is `aria-current="step"`.** This is the only state a
   non-interactive indicator exposes.
 - **Interactive dots are real buttons**, each named from its `values` entry
-  and linked to the content it controls with `ariaControls`.
+  and linked to the content it controls with `ariaControls`, each with a 24
+  target.
+- **The bar is hidden from assistive technology.** Its fill is a picture of
+  time; `aria-current` still names the current step.
+- **Reduced motion shows the bar full**, so nothing grows on screen.
 
 ## Related
 
@@ -77,6 +84,8 @@ Same group: `ProgressTracker`
 1. **Dot.** One per step: 8 or 12 across, a circle.
 2. **Current dot.** The brand ground (discovery for help, inverse icon for inverted), with `aria-current="step"`.
 3. **Group.** The row, named by `label`.
+4. **Bar.** With `progress`, the current dot is 32 long: the subtlest icon ground is the track, and the fill, in the current dot's color, grows from the start edge. Under reduced motion it shows full.
+5. **Target.** A dot that is a button keeps a 24 target, so the gap between buttons widens to fit it.
 
 ### States
 
@@ -96,7 +105,8 @@ Same group: `ProgressTracker`
 | Current dot | `--ds-background-brand-bold`, `--ds-background-discovery-bold`, `--ds-icon-inverse` |
 | Inverted dot | `--ds-background-inverse-subtle` and its states |
 | Size | `--progress-indicator-dot-size-8`, `--progress-indicator-dot-size-12` |
-| Gap | `--inline-md`, `--inline-sm`, `--stack-sm` |
+| Bar | `--control-md` long; track `--ds-icon-subtlest`, fill the current dot's color |
+| Gap | `--inline-md`, `--inline-sm`, `--stack-sm`; between buttons at least `--control-sm` less the dot |
 | Ring | `--ds-border-focused`, `--focus-ring-width` |
 
 ## Content guidelines
@@ -119,6 +129,7 @@ Same group: `ProgressTracker`
 | `onSelect` | func | — | — |
 | `ariaControls` | string | — | — |
 | `label` | string | `'Progress'` | — |
+| `progress` | number | — | Times the current step: its dot stretches into a bar filled to this fraction, 0 to 1. Pass `1` for a step with no clock. |
 
 ## Variants
 
@@ -132,7 +143,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-background-brand-bold` · `--ds-background-discovery-bold` · `--ds-background-inverse-subtle` · `--ds-background-inverse-subtle-hovered` · `--ds-background-inverse-subtle-pressed` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--focus-ring-width` · `--inline-md` · `--inline-sm` · `--motion-duration-short` · `--motion-easing-standard` · `--progress-indicator-dot-size-12` · `--progress-indicator-dot-size-8` · `--radius-full` · `--stack-sm`
+`--control-md` · `--control-sm` · `--ds-background-brand-bold` · `--ds-background-discovery-bold` · `--ds-background-inverse-subtle` · `--ds-background-inverse-subtle-hovered` · `--ds-background-inverse-subtle-pressed` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-subtlest` · `--focus-ring-width` · `--inline-md` · `--inline-sm` · `--motion-duration-medium` · `--motion-duration-short` · `--motion-easing-standard` · `--progress-indicator-dot` · `--progress-indicator-dot-size-12` · `--progress-indicator-dot-size-8` · `--progress-indicator-fill` · `--progress-indicator-gap` · `--progress-indicator-progress` · `--progress-indicator-spacing` · `--radius-full` · `--stack-sm`
 
 From `design-system/src/components/status-indicators/ProgressIndicator/ProgressIndicator.scss`. Override these through the token layer, never with a literal.
 

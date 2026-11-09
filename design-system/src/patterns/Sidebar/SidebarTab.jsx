@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import './SidebarTab.scss';
-import { iconClass } from '../../lib/icon';
+import { Icon } from '@/components';
 
 /**
  * SidebarTab Component
@@ -69,7 +69,7 @@ const SidebarTab = ({
     // `trailingVisual` is the older placeholder glyph; `elemAfter` is the slot that replaces it.
     const after = elemAfter ?? (trailingVisual ? (
         <span className="plus-sidebar-tab__icon" aria-hidden="true">
-            <i className={iconClass('icons')} />
+            <Icon name="icons" />
         </span>
     ) : null);
 
@@ -77,7 +77,7 @@ const SidebarTab = ({
         <>
             {leadingVisual && icon && (
                 <span className="plus-sidebar-tab__icon" aria-hidden="true">
-                    <i className={iconClass(icon)} />
+                    <Icon name={icon} />
                 </span>
             )}
             <span className="plus-sidebar-tab__text">

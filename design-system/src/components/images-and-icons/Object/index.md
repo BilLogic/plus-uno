@@ -61,7 +61,7 @@ Don't: A second glyph to hint at a status.
 - For a bitmap, use `Image`.
 - For a person or an agent, use `Avatar`.
 
-Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Illustration` · `Image` · `Tile`
+Same group: `AiIcon` · `Avatar` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · `Tile`
 
 ## Parts
 

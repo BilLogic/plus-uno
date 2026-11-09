@@ -8,12 +8,11 @@ import {
     FoundationRelated,
     FoundationExample,
 } from '@/storybook-docs/foundation-page.jsx';
-import { Banner } from '@/components';
-import { iconClass } from '@/lib/icon';
+import { Banner, Icon } from '@/components';
 import * as IconsStories from './Icons.stories.jsx';
 
-export const Glyph = ({ name, size = '--icon-md', family }) => (
-    <i className={family ? `${family} fa-${name}` : iconClass(name)} aria-hidden="true" style={{ fontSize: `var(${size})`, width: `var(${size})`, height: `var(${size})`, color: 'var(--ds-icon)' }} />
+export const Glyph = ({ name, family }) => (
+    <Icon name={family ? `${family} fa-${name}` : name} size={16} color="default" />
 );
 
 <Meta of={IconsStories} />
@@ -27,13 +26,13 @@ export const Glyph = ({ name, size = '--icon-md', family }) => (
 
 <FoundationSection title="Overview">
 
-This page holds the rules every icon follows. The icon component itself lives on Components, Images and icons, next to Avatar, Image, Logo and Tile.
+This page holds the rules every icon follows. The <a href="?path=/docs/components-images-and-icons-icon--docs">Icon</a> component draws one glyph, and its page has the props, examples and playground.
 
 ```jsx
-<i className="fa-regular fa-calendar-days" />
+<Icon name="calendar-days" size={16} color="subtle" />
 ```
 
-A component that takes an icon takes its name as a string, such as Button's `iconBefore` and `iconAfter`. It renders `fa-regular fa-<name>`, or `fa-solid` where Font Awesome Free has no regular weight; `iconClass` in `design-system/src/lib/icon.js` decides. A node in place of the name renders as given.
+A component that takes an icon takes its name as a string, such as Button's `iconBefore` and `iconAfter`, and draws it through Icon: `fa-regular fa-<name>`, or `fa-solid` where Font Awesome Free has no regular weight. A node in place of the name renders as given.
 
 ```jsx
 <Button appearance="primary" text="Add tutor" iconBefore="plus" />
@@ -191,7 +190,7 @@ Icons are 16 beside body text. Keep 12 for chevrons, validation and compact part
 <span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="plus" />Add tutor<Glyph name="chevron-down" size="--icon-sm" /></span>
 </Do>
 <Dont caption="A 12 icon as the main way-finding mark is too small to read beside the label.">
-<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Glyph name="plus" size="--icon-sm" />Add tutor</span>
+<span style={{ display: 'inline-flex', alignItems: 'center', gap: 'var(--inline-md)', font: 'var(--body-default)' }}><Icon name="plus" size={12} color="default" />Add tutor</span>
 </Dont>
 </DoDont>
 
