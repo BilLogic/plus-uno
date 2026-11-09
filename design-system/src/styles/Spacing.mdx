@@ -40,21 +40,28 @@ Five principles decide which tier a gap takes. Similar things share one gap,
 a new group gets a bigger one, tiers grow from the component to the page,
 headings and actions get room, and a modal breathes before its footer.
 
-**1 · Similarity: the same kind of thing takes the same gap**
+<FoundationSubsection title="1 · Similarity: the same kind of thing takes the same gap">
+
 
 Items of equal weight, such as the fields of one form group, sit close
 together with one stack.
 
 <Canvas of={SpacingStories.Similarity} sourceState="none" />
 
-**2 · Differentiation: a new group gets a bigger gap**
+</FoundationSubsection>
+
+<FoundationSubsection title="2 · Differentiation: a new group gets a bigger gap">
+
 
 When the content changes kind, from a suggestion to the form controls, step
 up a tier so the change reads at a glance.
 
 <Canvas of={SpacingStories.Differentiation} sourceState="none" />
 
-**3 · Rhythm: tiers, never one value**
+</FoundationSubsection>
+
+<FoundationSubsection title="3 · Rhythm: tiers, never one value">
+
 
 Gaps grow with the box: Element and Card 4 · 8 · 12 inside a component,
 Section and Modal 8 · 16 · 24 inside a region, Surface 16 · 24 · 40 between
@@ -62,19 +69,27 @@ regions.
 
 <Canvas of={SpacingStories.Rhythm} sourceState="none" />
 
-**4 · Hierarchy: headings and primary actions get room**
+</FoundationSubsection>
+
+<FoundationSubsection title="4 · Hierarchy: headings and primary actions get room">
+
 
 The heading and the main action read first because they have space around
 them. Give them the larger stack of their tier, and never add space by hand.
 
 <Canvas of={SpacingStories.Hierarchy} sourceState="none" />
 
-**5 · White space: let a modal breathe before its footer**
+</FoundationSubsection>
+
+<FoundationSubsection title="5 · White space: let a modal breathe before its footer">
+
 
 Pad the modal on every side, and leave the largest gap of its tier between the
 content and the footer buttons.
 
 <Canvas of={SpacingStories.WhiteSpace} sourceState="none" />
+
+</FoundationSubsection>
 
 </FoundationSection>
 
@@ -189,7 +204,8 @@ Every box on a page is one of three kinds, and the kind decides its padding.
 An Item pads by its height, a Container pads by its size, and a Wrapper has no
 pad.
 
-**Items: height first**
+<FoundationSubsection title="Items: height first">
+
 
 The label stays 14/20 at every size, so pad-y is (height − 20) ÷ 2: 2 at 24
 and 6 at 32. Pad-x is always the larger: 8 at 24 and 12 at 32. Buttons and tabs come in
@@ -209,7 +225,10 @@ other control rounds to its height ÷ 4. Labels (Tag, Status, Count) pad 4 acros
     ]}
 />
 
-**Containers: one pad on every side**
+</FoundationSubsection>
+
+<FoundationSubsection title="Containers: one pad on every side">
+
 
 A pattern carries its own pad. A container that is not a pattern takes the
 Card pad of its size: a Section message and File upload take 16.
@@ -228,7 +247,10 @@ Card pad of its size: a Section message and File upload take 16.
     ]}
 />
 
-**Table cells**
+</FoundationSubsection>
+
+<FoundationSubsection title="Table cells">
+
 
 Cells pad 4 top and bottom and 8 across. The row height is a minimum, and the
 row grows with its content. On a plain table, the first and last cells sit
@@ -242,6 +264,8 @@ flush with the table's edge.
         { token: '--table-indent', figma: 'Table/indent', use: 'One level of a tree' },
     ]}
 />
+
+</FoundationSubsection>
 
 </FoundationSection>
 
@@ -280,7 +304,8 @@ size: stack follows use, not the size of the box.
 
 Every pattern has its own tokens, so a value is read from where it sits.
 
-**Frame and Page**
+<FoundationSubsection title="Frame and Page">
+
 
 The Frame is the whole screen: the topbar above a row holding the sidebar and
 the Page. The Page is the rounded box that holds the content, and its pad is
@@ -295,7 +320,10 @@ the content grid's margin.
     ]}
 />
 
-**Section**
+</FoundationSubsection>
+
+<FoundationSubsection title="Section">
+
 
 A span of the page grid under one heading. A section has no fill, no pad and
 no size options.
@@ -310,7 +338,10 @@ no size options.
     ]}
 />
 
-**Card**
+</FoundationSubsection>
+
+<FoundationSubsection title="Card">
+
 
 Pad and radius follow the card's size; stack and inline follow use.
 
@@ -334,7 +365,10 @@ Pad and radius follow the card's size; stack and inline follow use.
     ]}
 />
 
-**Table**
+</FoundationSubsection>
+
+<FoundationSubsection title="Table">
+
 
 Plain and full-span by default.
 
@@ -349,7 +383,10 @@ Plain and full-span by default.
     ]}
 />
 
-**Blanket and Modal**
+</FoundationSubsection>
+
+<FoundationSubsection title="Blanket and Modal">
+
 
 The Blanket pads the screen. A modal pads 16 on every side at every width.
 
@@ -367,7 +404,10 @@ The Blanket pads the screen. A modal pads 16 on every side at every width.
     ]}
 />
 
-**Popup, menu and tooltip**
+</FoundationSubsection>
+
+<FoundationSubsection title="Popup, menu and tooltip">
+
 
 Menu, popup, flag and tooltip float without a Blanket. The outer box of a menu
 pads 4, and a popup or flag pads 16.
@@ -389,6 +429,8 @@ pads 4, and a popup or flag pads 16.
         { token: '--popover-gap-screen', figma: 'Placement/gap-screen', use: 'The closest a floating layer comes to the screen edge' },
     ]}
 />
+
+</FoundationSubsection>
 
 </FoundationSection>
 

@@ -123,6 +123,21 @@ behavior; a known gap lives in a GitHub issue, so the page carries no `TODO`,
 fails on a stale marker, and fails a page in its strict list (`STRICT_PAGES`,
 `Modal` first) on every rule.
 
+## Spacing
+
+A docs page groups its content the way a PLUS page does, on the app's Page and Section token roles (Spacing foundation). The rules live in one file, `design-system/src/storybook-docs/docs-rhythm.css`, and apply to component, foundation and prose pages alike:
+
+| Between | Token | Role |
+|---|---|---|
+| Page title and its lead | `--stack-sm` | title to description |
+| Page header and the tabs or first section | `--page-stack-md` | page title to content |
+| Anything and a section (h2) | `--page-stack-lg` | before a new topic |
+| Anything and a subsection (h3) | `--page-stack-md` | between sections |
+| A heading and its one-line description | `--stack-sm` | title to description |
+| A heading and its body; blocks in one group | `--section-stack-md` | heading to body |
+
+A heading is a real heading: a sub-topic is a `FoundationSubsection` or an `###`, never a bold paragraph, so it takes the subsection gap and appears in the page outline. Demos render inside their canvas (Modal `renderAs="inline"`, `FlagGroup containerPosition="static"`, or a frame); the Storybook tests fail a docs story whose demo covers the page.
+
 ## Related
 
 - `overview.md` — where design knowledge lives

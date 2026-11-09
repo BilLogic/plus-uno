@@ -7,6 +7,7 @@ import '../design-system/src/styles/main.scss';
 // Docs-only Tailwind (no Preflight; see storybook-tailwind.css)
 import '../design-system/src/storybook-docs/storybook-tailwind.css';
 import './storybook-overrides.css';
+import '../design-system/src/storybook-docs/docs-rhythm.css';
 import { TocDocsContainer } from './docs-toc.jsx';
 import { mountDocsFab } from '../design-system/src/storybook-docs/chrome/mount-docs-fab.js';
 import BrowserFrame from '../design-system/src/storybook-docs/chrome/BrowserFrame';

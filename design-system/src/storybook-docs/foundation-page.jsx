@@ -16,14 +16,7 @@ const linkStyle = { font: 'var(--body-default)', color: 'var(--ds-link)', textDe
  * so a page does not also render `<Title />`.
  */
 export const FoundationHero = ({ title, summary }) => (
-    <header
-        style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--section-stack-sm)',
-            marginBlockEnd: 'var(--section-stack-lg)',
-        }}
-    >
+    <header className="sb-docs-header">
         <span style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' }}>Foundation</span>
         <h1 style={{ margin: 0, font: 'var(--heading-xlarge)', color: 'var(--ds-text)' }}>{title}</h1>
         <div style={{ margin: 0, font: 'var(--body-large)', color: 'var(--ds-text-subtle)', maxWidth: '64ch' }}>{summary}</div>
@@ -45,7 +38,7 @@ export const FoundationContents = () => {
         );
     }, []);
     return (
-        <nav aria-label="Contents" style={{ marginBlockEnd: 'var(--section-stack-lg)' }}>
+        <nav aria-label="Contents">
             <h2 style={{ margin: 0, marginBlockEnd: 'var(--stack-md)', font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>
                 Contents
             </h2>
@@ -66,13 +59,8 @@ const slug = (title) => title.toLowerCase().replace(/&/g, 'and').replace(/[^a-z0
 export const FoundationSection = ({ title, id = slug(title), children }) => (
     <section
         id={`foundation-${id}`}
+        className="sb-docs-section"
         {...{ [SECTION_ATTR]: title }}
-        style={{
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 'var(--section-stack-md)',
-            marginBlockEnd: 'var(--section-stack-lg)',
-        }}
     >
         <h2 style={{ margin: 0, font: 'var(--heading-large)', color: 'var(--ds-text)' }}>{title}</h2>
         {children}
@@ -81,7 +69,7 @@ export const FoundationSection = ({ title, id = slug(title), children }) => (
 
 /** A sub-heading inside a section. */
 export const FoundationSubsection = ({ title, children }) => (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-sm)' }}>
+    <div className="sb-docs-subsection">
         <h3 style={{ margin: 0, font: 'var(--heading-medium)', color: 'var(--ds-text)' }}>{title}</h3>
         {children}
     </div>
