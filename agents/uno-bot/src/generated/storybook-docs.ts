@@ -281,5 +281,10 @@ export const STORYBOOK_DOCS: ReadonlyArray<readonly [string, string, string]> = 
     "design-system/src/components/text-and-data-display/Table/TreeTable.",
     "TreeTable",
     "components-text-and-data-display-tree-table--docs"
+  ],
+  [
+    "design-system/src/patterns/Sidebar/",
+    "Sidebar",
+    "patterns-sidebar--docs"
   ]
 ];

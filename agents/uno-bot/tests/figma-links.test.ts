@@ -355,9 +355,10 @@ describe("only registry components", () => {
     // TopBar left when the Sidebar refresh removed the top bar (-1 net).
     // 63: Footer was deleted from code and AiLabel was deleted when the AI UI
     // section replaced it, and their registry rows went with them (-2 net).
-    // 56: the Specs code left main for the archive/legacy-ds branch, and the
-    // seven rows its docs pages carried went with it (-7 net).
-    assert.equal(names.length, 56);
+    // 57: the Specs code left main for the archive/legacy-ds branch, and six
+    // rows its docs pages carried went with it; Sidebar's moved to the Sidebar
+    // pattern's page (-6 net).
+    assert.equal(names.length, 57);
     for (const name of names) {
       const code = registry.components[name]!.code!;
       assert.ok(code.source && existsSync(join(root, code.source)), `${name}: ${code.source}`);

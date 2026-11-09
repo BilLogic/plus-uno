@@ -1295,6 +1295,31 @@
         "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=3496-1444"
       }
     },
+    "Sidebar": {
+      "code": {
+        "import": "@/patterns/Sidebar/Sidebar",
+        "export": "default",
+        "mdxPath": "design-system/src/patterns/Sidebar/Sidebar.mdx",
+        "githubLink": "https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/Sidebar",
+        "source": "design-system/src/patterns/Sidebar/Sidebar.jsx",
+        "storybookId": "patterns-sidebar--docs"
+      },
+      "figma": {
+        "fileKey": "zAecJNRdvJzAUOcjV32tRX",
+        "sets": [
+          {
+            "id": "sidebar",
+            "name": "Sidebar",
+            "componentSetNodeId": "19393:46573",
+            "url": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573",
+            "source": "manual",
+            "status": "verified",
+            "isComponentSet": true
+          }
+        ],
+        "docsPageUrl": "https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX/Design-System---BS4-Foundation--Component-LIbrary-?node-id=19393-46573"
+      }
+    },
     "Skeleton": {
       "code": {
         "import": "@/components/loading",
