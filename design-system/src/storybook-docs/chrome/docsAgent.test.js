@@ -35,7 +35,7 @@ describe('createAgentResponder', () => {
 describe('createAgentResponder pages and navigation', () => {
     const entries = [
         { title: 'Foundations/Color', name: 'Color', id: 'foundations-color--docs', type: 'docs' },
-        { title: 'Components/Forms and inputs/Button/Button', name: 'Button', id: 'button--docs', type: 'docs' },
+        { title: 'Components/Forms and inputs/Button/Button', name: 'Button', id: 'components-forms-and-inputs-button-button--docs', type: 'docs' },
     ];
     const pages = async () => entries;
     const href = (id) => `?path=/docs/${id}`;
@@ -43,7 +43,7 @@ describe('createAgentResponder pages and navigation', () => {
     it('turns the model\'s page: links into docs addresses and drops a link to a page that does not exist', async () => {
         const fetchFn = async () => ok({ text: 'See [Button](page:Components/Forms and inputs/Button/Button) and [Nope](page:Nope/Missing).' });
         const out = await createAgentResponder({ fetchFn, search, pages, href })('q');
-        expect(out.text).toBe('See [Button](?path=/docs/button--docs) and Nope.');
+        expect(out.text).toBe('See [Button](?path=/docs/components-forms-and-inputs-button-button--docs) and Nope.');
     });
 
     it('opens the page the model asked for, in place, and says so when it wrote nothing', async () => {

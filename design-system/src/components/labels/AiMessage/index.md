@@ -147,7 +147,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--code` · `--ds-background-neutral` · `--ds-text` · `--ds-text-subtle` · `--heading-xsmall` · `--icon-md` · `--inline-md` · `--inline-sm` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-easing-standard` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-md` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--radius-md` · `--radius-sm` · `--space-150` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-small` · `--code` · `--ds-background-neutral` · `--ds-text` · `--ds-text-subtle` · `--heading-xsmall` · `--icon-md` · `--inline-md` · `--inline-sm` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-easing-standard` · `--pad-x-lg` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-md` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--radius-md` · `--radius-sm` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/labels/AiMessage/AiMessage.scss`. Override these through the token layer, never with a literal.
 

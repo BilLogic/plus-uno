@@ -15,11 +15,11 @@ describe('parseBlocks', () => {
 
 describe('AiMarkdown', () => {
     it('draws bold, italic, inline code and links, not the raw marks', () => {
-        const { container } = render(<AiMarkdown text="Use **Button** with `appearance`, see *also* [Link](?path=/docs/link--docs)." />);
+        const { container } = render(<AiMarkdown text="Use **Button** with `appearance`, see *also* [Link](?path=/docs/components-forms-and-inputs-button-button--docs)." />);
         expect(container.querySelector('strong')).toHaveTextContent('Button');
         expect(container.querySelector('em')).toHaveTextContent('also');
         expect(container.querySelector('code')).toHaveTextContent('appearance');
-        expect(screen.getByRole('link', { name: 'Link' })).toHaveAttribute('href', '?path=/docs/link--docs');
+        expect(screen.getByRole('link', { name: 'Link' })).toHaveAttribute('href', '?path=/docs/components-forms-and-inputs-button-button--docs');
         expect(container.textContent).not.toMatch(/\*\*|`/);
     });
 

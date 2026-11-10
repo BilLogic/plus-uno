@@ -1,12 +1,12 @@
 import { describe, it, expect, vi } from 'vitest';
 import { goToTarget, interceptDocsLinks, navigateInPlace, SELECT_STORY, storybookTarget } from './docsNavigate';
 
-const BASE = 'http://localhost:6006/iframe.html?id=x';
+const BASE = 'http://localhost:6006/iframe.html?id=foundations-color--docs';
 
 describe('storybookTarget', () => {
     it('reads a docs or story address, relative or absolute', () => {
         expect(storybookTarget('?path=/docs/foundations-color--docs', BASE)).toEqual({ storyId: 'foundations-color--docs', viewMode: 'docs' });
-        expect(storybookTarget('http://localhost:6006/?path=/story/button--primary', BASE)).toEqual({ storyId: 'button--primary', viewMode: 'story' });
+        expect(storybookTarget('http://localhost:6006/?path=/story/components-forms-and-inputs-close-button--overview', BASE)).toEqual({ storyId: 'components-forms-and-inputs-close-button--overview', viewMode: 'story' });
     });
 
     it('is null for anything else', () => {
@@ -20,12 +20,12 @@ describe('navigateInPlace', () => {
     it('asks the manager to select the page over the channel', () => {
         const emit = vi.fn();
         const win = { location: { href: BASE }, __STORYBOOK_ADDONS_CHANNEL__: { emit } };
-        expect(navigateInPlace('?path=/docs/a--docs', win)).toBe(true);
-        expect(emit).toHaveBeenCalledWith(SELECT_STORY, { storyId: 'a--docs', viewMode: 'docs' });
+        expect(navigateInPlace('?path=/docs/foundations-color--docs', win)).toBe(true);
+        expect(emit).toHaveBeenCalledWith(SELECT_STORY, { storyId: 'foundations-color--docs', viewMode: 'docs' });
     });
 
     it('declines without a channel or for a page outside Storybook', () => {
-        expect(navigateInPlace('?path=/docs/a--docs', { location: { href: BASE } })).toBe(false);
+        expect(navigateInPlace('?path=/docs/foundations-color--docs', { location: { href: BASE } })).toBe(false);
         const win = { location: { href: BASE }, __STORYBOOK_ADDONS_CHANNEL__: { emit: vi.fn() } };
         expect(navigateInPlace('https://example.com', win)).toBe(false);
     });
@@ -39,15 +39,15 @@ describe('interceptDocsLinks', () => {
 
     it('switches pages in place on a plain click on a docs link', () => {
         const navigate = vi.fn(() => true);
-        const event = click(anchor('?path=/docs/a--docs'));
+        const event = click(anchor('?path=/docs/foundations-color--docs'));
         interceptDocsLinks(navigate)(event);
-        expect(navigate).toHaveBeenCalledWith('?path=/docs/a--docs');
+        expect(navigate).toHaveBeenCalledWith('?path=/docs/foundations-color--docs');
         expect(event.preventDefault).toHaveBeenCalled();
     });
 
     it('leaves a modified click and a new-window link alone', () => {
         const navigate = vi.fn(() => true);
-        interceptDocsLinks(navigate)(click(anchor('?path=/docs/a--docs'), { metaKey: true }));
+        interceptDocsLinks(navigate)(click(anchor('?path=/docs/foundations-color--docs'), { metaKey: true }));
         interceptDocsLinks(navigate)(click(anchor('https://x.test', '_blank')));
         expect(navigate).not.toHaveBeenCalled();
     });

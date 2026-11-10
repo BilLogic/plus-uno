@@ -593,6 +593,7 @@
         "--motion-duration-long",
         "--motion-duration-medium",
         "--motion-easing-standard",
+        "--pad-x-lg",
         "--pad-x-sm",
         "--pad-x-xs",
         "--pad-y-md",
@@ -601,7 +602,6 @@
         "--radius-full",
         "--radius-md",
         "--radius-sm",
-        "--space-150",
         "--stack-md",
         "--stack-sm"
       ]
