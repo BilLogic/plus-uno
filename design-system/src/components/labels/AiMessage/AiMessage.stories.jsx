@@ -95,17 +95,32 @@ const SOURCES = [
     { title: 'Tutor handbook', href: 'https://example.com/handbook', type: 'Guide' },
 ];
 
-/** What the answer read: title links with their type, folded past three. */
+/** What the answer read, folded under it behind one toggle with the count. */
 export const WithSources = {
     render: () => <AiMessage text="Ava attended 12 of 14 sessions this term, and her last two were in Grade 7 · Math." sources={SOURCES} />,
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const list = canvas.getByRole('list', { name: 'Sources' });
-        await expect(within(list).getAllByRole('listitem')).toHaveLength(3);
-        const toggle = canvas.getByRole('button', { name: 'Show 2 more sources' });
+        await expect(canvas.queryByRole('list', { name: 'Sources' })).toBeNull();
+        const toggle = canvas.getByRole('button', { name: 'Sources (5)' });
         await userEvent.click(toggle);
+        const list = canvas.getByRole('list', { name: 'Sources' });
         await expect(within(list).getAllByRole('listitem')).toHaveLength(5);
-        await expect(canvas.getByRole('button', { name: 'Show fewer sources' })).toHaveAttribute('aria-expanded', 'true');
+        await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    },
+};
+
+/** Text is Markdown: bold, code, lists and links draw as themselves, never as raw marks. */
+export const WithMarkdown = {
+    render: () => (
+        <AiMessage text={'Use **Button** with `appearance="primary"` for the main action.\n\n- One primary per region\n- Others are default or subtle\n\n```jsx\n<Button appearance="primary" text="Book session" />\n```\n\nSee [Button](#button).'} />
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvasElement.querySelector('strong')).toHaveTextContent('Button');
+        await expect(canvas.getAllByRole('listitem')).toHaveLength(2);
+        await expect(canvasElement.querySelector('pre code')).toHaveTextContent('<Button appearance="primary" text="Book session" />');
+        await expect(canvas.getByRole('link', { name: 'Button' })).toHaveAttribute('href', '#button');
+        await expect(canvasElement.textContent).not.toMatch(/\*\*|```/);
     },
 };
 

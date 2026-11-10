@@ -172,7 +172,7 @@
       "import": "import { AiChat } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/AiChat/AiChat.jsx",
-      "summary": "AI chat on a Frame: a floating action button at the bottom right of the Page opens chat as a popup; from there it moves to the Frame's Panel or to full screen. It takes the Frame's props and adds the chat. - The button is the one way in. It hides while chat is open in the Panel or full screen. - The mode is remembered for the tab in sessionStorage (and an open Panel). - Under 768 the popup is shown full screen. - `variant=\"storybook\"` is the Storybook docs' chat: clear, move to Panel and close only, with no full screen and no more menu. - The conversation is kept in memory and moves with the mode. There is no history, and no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`. A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.",
+      "summary": "AI chat on a Frame: a floating action button at the bottom right of the Page opens chat as a popup; from there it moves to the Frame's Panel or to full screen. It takes the Frame's props and adds the chat. - The button is the one way in. It hides while chat is open in the Panel or full screen. - The mode is remembered for the tab in sessionStorage (and an open Panel). - Under 768 the popup is shown full screen. - `variant=\"storybook\"` is the Storybook docs' chat: the same chat, with its mode remembered under its own key. - The conversation moves with the mode and is kept for the tab (the last 50 messages, under `${storageKey}-messages`), so a reload keeps it. There is no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`. A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.",
       "props": [
         {
           "name": "variant",
@@ -183,7 +183,7 @@
             "app",
             "storybook"
           ],
-          "description": "`app` carries every header control; `storybook` carries clear, move to Panel and close.",
+          "description": "`storybook` is the docs' chat, which remembers its mode under its own key; the controls are the same.",
           "deprecated": null
         },
         {
@@ -214,7 +214,7 @@
           "required": false,
           "default": "variant === 'storybook' ? `${AI_CHAT_STORAGE_KEY}-storybook` : AI_CHAT_STORAGE_KEY",
           "values": null,
-          "description": "The sessionStorage key the mode is kept under (the Storybook variant has its own); null keeps nothing.",
+          "description": "The sessionStorage key the mode and the conversation are kept under (the Storybook variant has its own); null keeps nothing.",
           "deprecated": null
         },
         {
@@ -232,7 +232,16 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Where a reply's source links open, such as `_top` from inside a frame.",
+          "description": "Where a reply's links and source links open, such as `_top` from inside a frame.",
+          "deprecated": null
+        },
+        {
+          "name": "resolveHref",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Rewrites a link's address in a reply's text: `(href) => href`, such as a page named by its title.",
           "deprecated": null
         },
         {
@@ -268,7 +277,7 @@
           "required": true,
           "default": null,
           "values": null,
-          "description": "`{ id, label, text }` prompts offered while the conversation is empty.",
+          "description": "`{ id, label, text }` prompts offered in the empty conversation, under its opening line.",
           "deprecated": null
         },
         {
@@ -278,6 +287,24 @@
           "default": "'AI chat'",
           "values": null,
           "description": "The chat's name: the header title, the button's label and the Panel landmark.",
+          "deprecated": null
+        },
+        {
+          "name": "placeholder",
+          "type": "string",
+          "required": false,
+          "default": "'Ask anything'",
+          "values": null,
+          "description": "The prompt input's placeholder: what this chat can be asked about. Keep it to one line.",
+          "deprecated": null
+        },
+        {
+          "name": "emptyText",
+          "type": "string",
+          "required": false,
+          "default": "'Ask about what you are working on.'",
+          "values": null,
+          "description": "The line an empty conversation opens with, above the starters.",
           "deprecated": null
         },
         {
@@ -338,7 +365,9 @@
         "--pad-y-sm",
         "--page-pad",
         "--popover-radius",
+        "--popover-width-md",
         "--radius-md",
+        "--stack-lg",
         "--stack-md",
         "--stack-sm"
       ]
@@ -430,7 +459,7 @@
       "import": "import { AiMessage } from '@/components';",
       "group": "labels",
       "source": "design-system/src/components/labels/AiMessage/AiMessage.jsx",
-      "summary": "An assistant reply, marked as AI by the small AI icon at its start (named \"AI\" for assistive technology), so no answer reads as a person's. The content is `text`, or `parts` when a reply mixes text with other content: a part is `{ type: 'text', text }` or any other `{ type, ... }`, which `renderPart` draws. - `status=\"complete\"` is a finished message. - `status=\"streaming\"` is text still arriving: a caret follows the last character and the message is marked busy for assistive technology. - `status=\"thinking\"` is the typing indicator, before any text exists. `sources` lists what a finished answer read, under the message: an answer that draws on records always shows them. `onFeedback` puts thumbs up and down under a finished answer; `feedback` holds the rating when the page owns it.",
+      "summary": "An assistant reply, marked as AI by the small AI icon at its start (named \"AI\" for assistive technology), so no answer reads as a person's. Text is Markdown: paragraphs, lists, headings, code, bold, italic and links. The content is `text`, or `parts` when a reply mixes text with other content: a part is `{ type: 'text', text }` or any other `{ type, ... }`, which `renderPart` draws. - `status=\"complete\"` is a finished message. - `status=\"streaming\"` is text still arriving: a caret follows the last character and the message is marked busy for assistive technology. - `status=\"thinking\"` is the typing indicator, before any text exists. `sources` lists what a finished answer read, folded under the message behind one toggle: the answer links what it names in its own text, so the list is there to check, not to read. `onFeedback` puts thumbs up and down under a finished answer; `feedback` holds the rating when the page owns it.",
       "props": [
         {
           "name": "text",
@@ -496,7 +525,16 @@
           "required": false,
           "default": null,
           "values": null,
-          "description": "Where the source links open, such as `_top` from inside a frame.",
+          "description": "Where the reply's links and its source links open, such as `_top` from inside a frame.",
+          "deprecated": null
+        },
+        {
+          "name": "resolveHref",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Rewrites a link's address in the reply's text: `(href) => href`, such as a docs page named by its title.",
           "deprecated": null
         },
         {
@@ -538,23 +576,32 @@
         "WithParts",
         "Interactive",
         "WithSources",
+        "WithMarkdown",
         "WithFeedback"
       ],
       "tokens": [
         "--body-default",
         "--body-small",
+        "--code",
+        "--ds-background-neutral",
         "--ds-text",
         "--ds-text-subtle",
-        "--heading-xxsmall",
+        "--heading-xsmall",
         "--icon-md",
         "--inline-md",
         "--inline-sm",
         "--motion-duration-long",
         "--motion-duration-medium",
         "--motion-easing-standard",
+        "--pad-x-lg",
+        "--pad-x-sm",
+        "--pad-x-xs",
+        "--pad-y-md",
         "--plus-ai-message-caret",
         "--plus-ai-message-dot",
         "--radius-full",
+        "--radius-md",
+        "--radius-sm",
         "--stack-md",
         "--stack-sm"
       ]
@@ -9631,6 +9678,7 @@
         "Interactive"
       ],
       "tokens": [
+        "--height-250",
         "--line-height-125",
         "--plus-prompt-input-max-height",
         "--space-0375",

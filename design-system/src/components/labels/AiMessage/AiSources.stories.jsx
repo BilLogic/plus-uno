@@ -4,10 +4,10 @@ import { expect, userEvent, within } from 'storybook/test';
 import { AiSources } from './AiSources';
 
 /**
- * `AiSources` -- what an AI answer read, listed under the message.
+ * `AiSources` -- what an AI answer read, folded under the message.
  *
- * THE TEST SEAM IS THIS FILE. Each play reads what a person meets: the list
- * named "Sources", one link per source, and the toggle that shows the rest.
+ * THE TEST SEAM IS THIS FILE. Each play reads what a person meets: the
+ * "Sources (N)" toggle, and behind it the list named "Sources", one link per source.
  */
 export default {
     title: 'AI UI/Components/AI message/AI sources',
@@ -16,6 +16,7 @@ export default {
     argTypes: {
         sources: { control: 'object', table: { category: 'Content' } },
         target: { control: 'text', table: { category: 'Development' } },
+        defaultOpen: { control: 'boolean', table: { category: 'Behavior' } },
         className: { table: { disable: true } },
     },
 };
@@ -28,24 +29,28 @@ const SOURCES = [
     { title: 'Grade 7 math plan', href: '#plan', type: 'Plan' },
 ];
 
-/** Up to three sources, each a link with its type beside it. */
+/** Closed at first: the toggle carries the count, and opens the list of links. */
 export const Overview = {
     args: { sources: SOURCES.slice(0, 3) },
     play: async ({ canvasElement }) => {
-        const list = within(canvasElement).getByRole('list', { name: 'Sources' });
+        const canvas = within(canvasElement);
+        await expect(canvas.queryByRole('list', { name: 'Sources' })).toBeNull();
+        const toggle = canvas.getByRole('button', { name: 'Sources (3)' });
+        await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+        await userEvent.click(toggle);
+        const list = canvas.getByRole('list', { name: 'Sources' });
         await expect(within(list).getAllByRole('link')).toHaveLength(3);
+        await expect(toggle).toHaveAttribute('aria-expanded', 'true');
     },
 };
 
-/** Past three, the rest fold behind "Show N more sources". */
-export const MoreThanThree = {
-    args: { sources: SOURCES },
+/** The same address twice shows once, and the count says so. */
+export const Repeated = {
+    args: { sources: [...SOURCES, SOURCES[0], SOURCES[1]], defaultOpen: true },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getAllByRole('link')).toHaveLength(3);
-        await userEvent.click(canvas.getByRole('button', { name: 'Show 2 more sources' }));
+        await expect(canvas.getByRole('button', { name: 'Sources (5)' })).toBeInTheDocument();
         await expect(canvas.getAllByRole('link')).toHaveLength(5);
-        await expect(canvas.getByRole('button', { name: 'Show fewer sources' }).getAttribute('aria-expanded')).toBe('true');
     },
 };
 

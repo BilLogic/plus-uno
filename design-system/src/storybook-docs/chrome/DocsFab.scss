@@ -7,9 +7,20 @@
     z-index: var(--layer-navigation);
 }
 
-// A circle needs a lift to read over page content.
-.plus-docs-fab__button {
+// A circle needs a lift to read over page content. The button's own rule
+// clears its shadow, so this one is doubled to win.
+.plus-docs-fab__button.plus-btn {
     box-shadow: var(--ds-shadow-raised);
+}
+
+// The actions are one set: the same surface, the same border, whatever their
+// icon. Only the trigger is filled.
+.plus-docs-fab__menu .plus-docs-fab__button.plus-btn {
+    border-color: transparent;
+    background-color: var(--ds-surface-raised);
+
+    &:hover { background-color: var(--ds-surface-raised-hovered); }
+    &:active { background-color: var(--ds-surface-raised-pressed); }
 }
 
 // Reduced motion needs no branch here: the --motion-duration-* tokens collapse to 0ms under it.

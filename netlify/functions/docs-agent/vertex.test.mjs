@@ -73,7 +73,7 @@ test('callVertex sends system prompt, contents and output cap with a bearer toke
         env, fetch, token: 'tok', system: 'SYS', maxOutputTokens: 300,
         contents: [{ role: 'user', parts: [{ text: 'hi' }] }],
     });
-    assert.deepEqual(r, { ok: true, status: 200, text: 'A B' });
+    assert.deepEqual(r, { ok: true, status: 200, text: 'A B', calls: [] });
     assert.equal(seen.init.headers.authorization, 'Bearer tok');
     const body = JSON.parse(seen.init.body);
     assert.equal(body.systemInstruction.parts[0].text, 'SYS');
@@ -88,4 +88,20 @@ test('callVertex maps a 429 and other failures to ok:false with the status', asy
     const down = await callVertex({ env, token: 't', system: '', contents: [], maxOutputTokens: 1, fetch: async () => { throw new Error('boom'); } });
     assert.equal(down.ok, false);
     assert.equal(down.status, undefined);
+});
+
+test('callVertex sends the tools it is given and returns the function calls', async () => {
+    let body;
+    const fetch = async (_url, init) => {
+        body = JSON.parse(init.body);
+        return new Response(JSON.stringify({ candidates: [{ content: { parts: [
+            { text: 'Here it is.' },
+            { functionCall: { name: 'open_page', args: { title: 'Components/Forms and inputs/Button/Button' } } },
+        ] } }] }), { status: 200 });
+    };
+    const tools = [{ functionDeclarations: [{ name: 'open_page' }] }];
+    const r = await callVertex({ env: { GEMINI_PROJECT_ID: 'p' }, fetch, token: 'tok', system: 'SYS', contents: [], tools, maxOutputTokens: 10 });
+    assert.deepEqual(body.tools, tools);
+    assert.equal(r.text, 'Here it is.');
+    assert.deepEqual(r.calls, [{ name: 'open_page', args: { title: 'Components/Forms and inputs/Button/Button' } }]);
 });

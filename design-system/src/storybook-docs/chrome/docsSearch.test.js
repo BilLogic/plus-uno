@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseComponentNames, buildDocsEntries, answerDocsQuery } from './docsSearch';
+import { parseComponentNames, buildDocsEntries, answerDocsQuery, findPage, resolvePageLinks } from './docsSearch';
 
 const INDEX = {
     v: 5,
@@ -87,5 +87,27 @@ describe('answerDocsQuery', () => {
             `x-${i}--docs`, { id: `x-${i}--docs`, title: `Group/Card ${i}`, type: 'docs' },
         ])) }, []);
         expect(answerDocsQuery('card', many, { href }).sources).toHaveLength(5);
+    });
+});
+
+describe('findPage and resolvePageLinks', () => {
+    const entries = [
+        { title: 'Foundations/Color', name: 'Color', id: 'foundations-color--docs', type: 'docs' },
+        { title: 'AI UI/Foundations/Color', name: 'Color', id: 'ai-ui-foundations-color--docs', type: 'docs' },
+        { title: 'Components/Forms and inputs/Button/Button', name: 'Button', id: 'button--docs', type: 'docs' },
+        { title: 'Tag', name: 'Tag', id: null, type: null },
+    ];
+    it('matches the exact title first, then a title ending in it, then a name', () => {
+        expect(findPage('AI UI/Foundations/Color', entries).id).toBe('ai-ui-foundations-color--docs');
+        expect(findPage('forms and inputs/button/button', entries).id).toBe('button--docs');
+        expect(findPage('Button', entries).id).toBe('button--docs');
+    });
+    it('never returns a page that does not exist', () => {
+        expect(findPage('Tag', entries)).toBeNull();
+        expect(findPage('zzz', entries)).toBeNull();
+    });
+    it('rewrites page: links and keeps the label of one that does not resolve', () => {
+        const out = resolvePageLinks('[Color](page:Foundations/Color), [X](page:zzz)', entries, (id) => `#${id}`);
+        expect(out).toBe('[Color](#foundations-color--docs), X');
     });
 });

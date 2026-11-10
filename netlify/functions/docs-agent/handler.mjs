@@ -1,4 +1,4 @@
-// POST { question, history } -> { text }. Collaborators are injected, so the
+// POST { question, history } -> { text, open? }, `open` being a page title the model asked to open. Collaborators are injected, so the
 // handler is tested without a network: the token source and the Vertex call.
 
 const MAX_QUESTION = 2000;
@@ -8,16 +8,33 @@ const MAX_TURNS = 6;
 const MAX_OUTPUT_TOKENS = 1500;
 const DEFAULT_LIMIT = { max: 20, windowMs: 60_000 };
 
-export const buildSystemPrompt = (grounding) => [
-    'You are the PLUS design system docs assistant, answering inside the Storybook docs.',
+export const buildSystemPrompt = (grounding, pageTitles = []) => [
+    'You are the PLUS design system docs assistant, inside the Storybook docs. Designers and engineers ask you where things are and how to use them.',
     'Answer only from the context below. If the context does not cover the question, say so plainly and do not guess.',
     'Name real components, props and tokens exactly as the context spells them; never invent one.',
-    'Say which Storybook page the answer comes from, by its title (for example "Forms and inputs/Button").',
+    'Lead with the answer in a sentence or two. Use a short list only for steps or options. Add a code sample only when asked how to write the code.',
+    'Write Markdown. Link every Storybook page you name, inline, as [Button](page:Components/Forms and inputs/Button/Button): `page:` then the page title from the PAGES list.',
+    'Never cite files, paths or "Source:" lines; the chat lists its sources itself.',
+    'When the person asks to go to, open or be taken to a page, call open_page with that page title, and say in one short sentence what is there.',
     'Keep answers short and plain, in American English.',
     '',
+    ...(pageTitles.length ? ['--- PAGES ---', ...pageTitles, ''] : []),
     '--- CONTEXT ---',
     grounding,
 ].join('\n');
+
+/** The one tool: opening a docs page in place, by its title. */
+export const OPEN_PAGE_TOOL = {
+    functionDeclarations: [{
+        name: 'open_page',
+        description: 'Open a Storybook docs page for the person, in place. Use when they ask to go to, open or be taken to a page.',
+        parameters: {
+            type: 'OBJECT',
+            properties: { title: { type: 'STRING', description: 'The page title, from the PAGES list.' } },
+            required: ['title'],
+        },
+    }],
+};
 
 /** The last few valid turns, as Vertex `contents`, each bounded. */
 export const trimHistory = (history) => {
@@ -32,7 +49,9 @@ const reply = (status, body) => new Response(JSON.stringify(body), { status, hea
 
 const clientIp = (req) => req.headers.get('x-nf-client-connection-ip') ?? 'unknown';
 
-export const createHandler = ({ getToken, callVertex, grounding, now = Date.now, rateLimit = DEFAULT_LIMIT }) => {
+export const createHandler = ({
+    getToken, callVertex, grounding, pageTitles = async () => [], now = Date.now, rateLimit = DEFAULT_LIMIT,
+}) => {
     const hits = new Map(); // ip -> timestamps in the window (per warm instance)
     const limited = (ip) => {
         const t = now();
@@ -54,13 +73,16 @@ export const createHandler = ({ getToken, callVertex, grounding, now = Date.now,
 
         let token;
         try { token = await getToken(); } catch (error) { console.error('docs-agent token:', error?.message); return reply(502, { error: 'agent unavailable' }); }
+        const titles = await pageTitles(req).catch(() => []);
         const result = await callVertex({
             token,
-            system: buildSystemPrompt(grounding),
+            system: buildSystemPrompt(grounding, titles),
             contents: [...trimHistory(body.history), { role: 'user', parts: [{ text: question }] }],
+            tools: [OPEN_PAGE_TOOL],
             maxOutputTokens: MAX_OUTPUT_TOKENS,
         });
-        if (result.ok && result.text) return reply(200, { text: result.text });
+        const open = result.calls?.find((c) => c.name === 'open_page' && typeof c.args?.title === 'string')?.args.title;
+        if (result.ok && (result.text || open)) return reply(200, open ? { text: result.text ?? '', open } : { text: result.text });
         console.error('docs-agent vertex:', result.status ?? '', result.error ?? 'empty reply');
         return result.status === 429 ? reply(429, { error: 'quota' }) : reply(502, { error: 'agent unavailable' });
     };

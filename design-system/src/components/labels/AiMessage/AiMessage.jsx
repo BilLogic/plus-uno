@@ -4,6 +4,7 @@ import { clsx } from 'clsx';
 import AiIcon from '@/components/images-and-icons/AiIcon';
 import AiSources from './AiSources';
 import AiFeedback from './AiFeedback';
+import AiMarkdown from './aiMarkdown';
 import './AiMessage.scss';
 
 export const AI_MESSAGE_STATUSES = ['complete', 'streaming', 'thinking'];
@@ -64,7 +65,8 @@ const TypingIndicator = () => (
 
 /**
  * An assistant reply, marked as AI by the small AI icon at its start (named
- * "AI" for assistive technology), so no answer reads as a person's. The
+ * "AI" for assistive technology), so no answer reads as a person's. Text is
+ * Markdown: paragraphs, lists, headings, code, bold, italic and links. The
  * content is `text`, or `parts` when a reply mixes
  * text with other content: a part is `{ type: 'text', text }` or any other
  * `{ type, ... }`, which `renderPart` draws.
@@ -74,8 +76,9 @@ const TypingIndicator = () => (
  *   character and the message is marked busy for assistive technology.
  * - `status="thinking"` is the typing indicator, before any text exists.
  *
- * `sources` lists what a finished answer read, under the message: an answer
- * that draws on records always shows them. `onFeedback` puts thumbs up and
+ * `sources` lists what a finished answer read, folded under the message
+ * behind one toggle: the answer links what it names in its own text, so the
+ * list is there to check, not to read. `onFeedback` puts thumbs up and
  * down under a finished answer; `feedback` holds the rating when the page
  * owns it.
  */
@@ -87,6 +90,7 @@ const AiMessage = ({
     renderPart,
     sources,
     linkTarget,
+    resolveHref,
     onFeedback,
     feedback,
     className,
@@ -107,16 +111,19 @@ const AiMessage = ({
                     if (!part) return null;
                     if (part.type === 'text') {
                         const streaming = status === 'streaming' && index === lastText;
+                        if (typeOut && status === 'complete') {
+                            return (
+                                <p key={index} className="plus-ai-message__text">
+                                    <span className="plus-ai-message__sr">{part.text}</span>
+                                    <span aria-hidden="true"><TypingText text={part.text} /></span>
+                                </p>
+                            );
+                        }
                         return (
-                            <p key={index} className="plus-ai-message__text">
-                                {typeOut && status === 'complete' ? (
-                                    <>
-                                        <span className="plus-ai-message__sr">{part.text}</span>
-                                        <span aria-hidden="true"><TypingText text={part.text} /></span>
-                                    </>
-                                ) : part.text}
+                            <div key={index} className="plus-ai-message__markdown">
+                                <AiMarkdown text={part.text} resolveHref={resolveHref} linkTarget={linkTarget} />
                                 {streaming ? <span className="plus-ai-message__caret" aria-hidden="true" /> : null}
-                            </p>
+                            </div>
                         );
                     }
                     return <div key={index} className="plus-ai-message__part">{renderPart?.(part, index) ?? null}</div>;
@@ -145,8 +152,10 @@ AiMessage.propTypes = {
         href: PropTypes.string.isRequired,
         type: PropTypes.string,
     })),
-    /** Where the source links open, such as `_top` from inside a frame. */
+    /** Where the reply's links and its source links open, such as `_top` from inside a frame. */
     linkTarget: PropTypes.string,
+    /** Rewrites a link's address in the reply's text: `(href) => href`, such as a docs page named by its title. */
+    resolveHref: PropTypes.func,
     /** Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`. */
     onFeedback: PropTypes.func,
     /** The rating, when the page owns it: `up`, `down` or null. */

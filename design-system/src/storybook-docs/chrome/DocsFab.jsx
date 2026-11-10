@@ -25,7 +25,8 @@ export const BLUEPRINT_LOGO_SRC = 'uno-bot/logos/uno-blueprint.png';
  *
  * `aiAgent` is the slot for the AI agent button, a menu item like the other
  * two (arrow keys reach it). Nothing renders when it is omitted; give it a
- * circle `IconButton` with a `tooltip` so it matches the two below.
+ * default circle `IconButton` with a `tooltip` so it matches the two below:
+ * the three actions share one look, and only the trigger is filled.
  */
 export const DocsFab = ({ aiAgent = null }) => (
     <div className="plus-docs-fab">

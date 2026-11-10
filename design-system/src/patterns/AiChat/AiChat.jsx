@@ -27,7 +27,9 @@ import {
     initialAiChatState,
     isFabHidden,
     readAiChatMemory,
+    readAiChatMessages,
     writeAiChatMemory,
+    writeAiChatMessages,
 } from './aiChatState';
 import './AiChat.scss';
 
@@ -72,9 +74,8 @@ const transcriptOf = (messages) => messages
 const ChatSurface = ({ presentation }) => {
     const chat = useAiChat();
     const {
-        variant, title, messages, loading, draft, setDraft, starters, dispatch, clear, send, stop, narrow, linkTarget, rate,
+        title, placeholder, emptyText, messages, loading, draft, setDraft, starters, dispatch, clear, send, stop, narrow, linkTarget, resolveHref, rate,
     } = chat;
-    const storybook = variant === 'storybook';
     const listRef = useRef(null);
 
     useEffect(() => {
@@ -89,7 +90,7 @@ const ChatSurface = ({ presentation }) => {
     const inPanel = presentation === 'panel';
     const actions = (
         <>
-            <IconButton icon="broom" label="Clear chat" spacing="compact" appearance="subtle" isDisabled={messages.length === 0} onClick={clear} />
+            <IconButton icon="eraser" label="Clear chat" spacing="compact" appearance="subtle" isDisabled={messages.length === 0} onClick={clear} />
             <IconButton
                 icon={inPanel ? 'window-restore' : 'table-columns'}
                 label={inPanel ? 'Move to popup' : 'Move to Panel'}
@@ -97,7 +98,7 @@ const ChatSurface = ({ presentation }) => {
                 appearance="subtle"
                 onClick={() => dispatch({ type: 'switchMode' })}
             />
-            {storybook || narrow ? null : (
+            {narrow ? null : (
                 <IconButton
                     icon={presentation === 'fullscreen' ? 'compress' : 'expand'}
                     label={presentation === 'fullscreen' ? 'Exit full screen' : 'Full screen'}
@@ -106,14 +107,12 @@ const ChatSurface = ({ presentation }) => {
                     onClick={() => dispatch({ type: 'toggleFullscreen' })}
                 />
             )}
-            {storybook ? null : (
-                <DropdownMenu
-                    placement="bottom-end"
-                    trigger={<IconButton icon="ellipsis" label="More actions" spacing="compact" appearance="subtle" />}
-                >
-                    <ButtonItem isDisabled={messages.length === 0} onClick={copy}>Copy conversation</ButtonItem>
-                </DropdownMenu>
-            )}
+            <DropdownMenu
+                placement="bottom-end"
+                trigger={<IconButton icon="ellipsis" label="More actions" spacing="compact" appearance="subtle" />}
+            >
+                <ButtonItem isDisabled={messages.length === 0} onClick={copy}>Copy conversation</ButtonItem>
+            </DropdownMenu>
             <IconButton icon="xmark" label="Close chat" spacing="compact" appearance="subtle" onClick={() => dispatch({ type: 'close' })} />
         </>
     );
@@ -124,7 +123,12 @@ const ChatSurface = ({ presentation }) => {
             <PanelBody className="plus-ai-chat__body">
                 <div ref={listRef} className="plus-ai-chat__messages" role="log" aria-label="Conversation" aria-live="polite">
                     {messages.length === 0 ? (
-                        <p className="plus-ai-chat__empty">Ask about what you are working on.</p>
+                        <div className="plus-ai-chat__empty">
+                            <p className="plus-ai-chat__empty-text">{emptyText}</p>
+                            {starters?.length ? (
+                                <PromptStarters label="Suggested prompts" starters={starters} onSelect={(s) => setDraft(s.text ?? s.label)} />
+                            ) : null}
+                        </div>
                     ) : messages.map((m) => (
                         <div key={m.id} className={`plus-ai-chat__message plus-ai-chat__message--${m.role}`}>
                             {m.role === 'ai'
@@ -134,6 +138,7 @@ const ChatSurface = ({ presentation }) => {
                                         text={m.text}
                                         sources={m.sources}
                                         linkTarget={linkTarget}
+                                        resolveHref={resolveHref}
                                         feedback={m.feedback ?? null}
                                         onFeedback={(feedback) => rate(m, feedback)}
                                     />
@@ -149,18 +154,17 @@ const ChatSurface = ({ presentation }) => {
                 </div>
             </PanelBody>
             <PanelFooter className="plus-ai-chat__footer">
-                {messages.length === 0 && starters?.length ? (
-                    <PromptStarters label="Suggested prompts" starters={starters} onSelect={(s) => setDraft(s.text ?? s.label)} />
-                ) : null}
-                <PromptInput
-                    label={`Message to ${title}`}
-                    placeholder="Ask anything"
-                    value={draft}
-                    onChange={(event) => setDraft(event.target.value)}
-                    onSubmit={(text) => { setDraft(''); send(text); }}
-                    isLoading={loading}
-                    onStop={stop}
-                />
+                <div className="plus-ai-chat__compose">
+                    <PromptInput
+                        label={`Message to ${title}`}
+                        placeholder={placeholder}
+                        value={draft}
+                        onChange={(event) => setDraft(event.target.value)}
+                        onSubmit={(text) => { setDraft(''); send(text); }}
+                        isLoading={loading}
+                        onStop={stop}
+                    />
+                </div>
                 {/* Fallibility, said once under the input, never per message. */}
                 <p className="plus-ai-chat__disclaimer">{AI_CHAT_DISCLAIMER}</p>
             </PanelFooter>
@@ -254,10 +258,10 @@ const Launcher = () => {
  *   full screen.
  * - The mode is remembered for the tab in sessionStorage (and an open Panel).
  * - Under 768 the popup is shown full screen.
- * - `variant="storybook"` is the Storybook docs' chat: clear, move to Panel and
- *   close only, with no full screen and no more menu.
- * - The conversation is kept in memory and moves with the mode. There is no
- *   history, and no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`.
+ * - `variant="storybook"` is the Storybook docs' chat: the same chat, with
+ *   its mode remembered under its own key.
+ * - The conversation moves with the mode and is kept for the tab (the last
+ *   50 messages, under `${storageKey}-messages`), so a reload keeps it. There is no backend: `respond(text, history)` returns the reply, `history` being the turns before it as `{ role, text }`.
  *   A reply is text, or `{ text, sources }`: the pages or records it drew on list under it.
  */
 const AiChat = ({
@@ -267,11 +271,14 @@ const AiChat = ({
     storageKey = variant === 'storybook' ? `${AI_CHAT_STORAGE_KEY}-storybook` : AI_CHAT_STORAGE_KEY,
     launcher = true,
     linkTarget,
+    resolveHref,
     onModeChange,
     respond,
     onFeedback,
     starters,
     title = 'AI chat',
+    placeholder = 'Ask anything',
+    emptyText = 'Ask about what you are working on.',
     panelLabel,
     children,
     ...frameProps
@@ -281,7 +288,7 @@ const AiChat = ({
         undefined,
         () => initialAiChatState(readAiChatMemory(storageKey), defaultMode, defaultOpen),
     );
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState(() => readAiChatMessages(storageKey));
     const messagesRef = useRef(messages);
     messagesRef.current = messages;
     const [draft, setDraft] = useState('');
@@ -290,6 +297,7 @@ const AiChat = ({
     const pending = useRef(0);
 
     useEffect(() => { writeAiChatMemory(storageKey, state); }, [storageKey, state]);
+    useEffect(() => { writeAiChatMessages(storageKey, messages); }, [storageKey, messages]);
 
     const lastMode = useRef(state.mode);
     useEffect(() => {
@@ -313,7 +321,8 @@ const AiChat = ({
         const ticket = pending.current + 1;
         pending.current = ticket;
         const history = messagesRef.current.map((m) => ({ role: m.role === 'ai' ? 'assistant' : 'user', text: m.text }));
-        setMessages((prev) => [...prev, { id: `u${prev.length}-${ticket}`, role: 'user', text }]);
+        const stamp = Date.now().toString(36);
+        setMessages((prev) => [...prev, { id: `u${prev.length}-${stamp}`, role: 'user', text }]);
         if (!respond) return;
         setLoading(true);
         let reply;
@@ -328,7 +337,7 @@ const AiChat = ({
         if (reply == null) return;
         // A reply is its text, or `{ text, sources }`; sources are what it drew on.
         const { text: replyText, sources } = typeof reply === 'string' ? { text: reply } : reply;
-        setMessages((prev) => [...prev, { id: `a${prev.length}-${ticket}`, role: 'ai', text: replyText, sources }]);
+        setMessages((prev) => [...prev, { id: `a${prev.length}-${stamp}`, role: 'ai', text: replyText, sources }]);
     }, [respond]);
 
     // Every answer takes a rating; it stays on the message as chat moves between modes.
@@ -338,8 +347,8 @@ const AiChat = ({
     }, [onFeedback]);
 
     const value = useMemo(() => ({
-        variant, title, messages, loading, draft, setDraft, starters, state, dispatch, clear, send, stop, narrow, launcher, linkTarget, rate,
-    }), [variant, launcher, linkTarget, title, messages, loading, draft, starters, state, clear, send, stop, narrow, rate]);
+        variant, title, placeholder, emptyText, messages, loading, draft, setDraft, starters, state, dispatch, clear, send, stop, narrow, launcher, linkTarget, resolveHref, rate,
+    }), [variant, launcher, linkTarget, resolveHref, title, placeholder, emptyText, messages, loading, draft, starters, state, clear, send, stop, narrow, rate]);
 
     return (
         <AiChatContext.Provider value={value}>
@@ -358,25 +367,27 @@ const AiChat = ({
 };
 
 AiChat.propTypes = {
-    /** `app` carries every header control; `storybook` carries clear, move to Panel and close. */
+    /** `storybook` is the docs' chat, which remembers its mode under its own key; the controls are the same. */
     variant: PropTypes.oneOf(['app', 'storybook']),
     /** The mode a tab with nothing remembered starts in. */
     defaultMode: PropTypes.oneOf(AI_CHAT_MODES),
     /** Whether chat starts open when the tab has nothing remembered. */
     defaultOpen: PropTypes.bool,
-    /** The sessionStorage key the mode is kept under (the Storybook variant has its own); null keeps nothing. */
+    /** The sessionStorage key the mode and the conversation are kept under (the Storybook variant has its own); null keeps nothing. */
     storageKey: PropTypes.string,
     /** `false` leaves out the floating button: the popup then floats above the bottom right corner, and the host opens chat with `useAiChat().dispatch({ type: 'open' })`. */
     launcher: PropTypes.bool,
-    /** Where a reply's source links open, such as `_top` from inside a frame. */
+    /** Where a reply's links and source links open, such as `_top` from inside a frame. */
     linkTarget: PropTypes.string,
+    /** Rewrites a link's address in a reply's text: `(href) => href`, such as a page named by its title. */
+    resolveHref: PropTypes.func,
     /** Called with the new mode whenever chat moves between popup, Panel and full screen. */
     onModeChange: PropTypes.func,
     /** Returns the reply (or a promise of it) to a sent message: a string, or `{ text, sources: [{ title, href, type }] }`. Without it nothing answers. */
     respond: PropTypes.func,
     /** Called with the answer and `{ rating }` (or `{ rating: 'down', comment }`) when a person rates it. Every answer offers thumbs. */
     onFeedback: PropTypes.func,
-        /** `{ id, label, text }` prompts offered while the conversation is empty. */
+        /** `{ id, label, text }` prompts offered in the empty conversation, under its opening line. */
     starters: PropTypes.arrayOf(PropTypes.shape({
         id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
         label: PropTypes.string.isRequired,
@@ -384,6 +395,10 @@ AiChat.propTypes = {
     })),
     /** The chat's name: the header title, the button's label and the Panel landmark. */
     title: PropTypes.string,
+    /** The prompt input's placeholder: what this chat can be asked about. Keep it to one line. */
+    placeholder: PropTypes.string,
+    /** The line an empty conversation opens with, above the starters. */
+    emptyText: PropTypes.string,
     /** Overrides the Panel landmark's name; defaults to `title`. */
     panelLabel: PropTypes.string,
     /** The Page content. */
