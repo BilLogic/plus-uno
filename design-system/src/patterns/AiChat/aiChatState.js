@@ -86,3 +86,30 @@ export const writeAiChatMemory = (key, state) => {
         // Storage full or blocked: chat still works, it just forgets.
     }
 };
+
+/** How many messages a tab keeps; older ones drop off the top. */
+export const AI_CHAT_KEPT_MESSAGES = 50;
+
+const isMessage = (m) => m && typeof m.id === 'string' && (m.role === 'user' || m.role === 'ai') && typeof m.text === 'string';
+
+/** The conversation kept for the tab under `${key}-messages`, so a reload or a page change does not lose it. */
+export const readAiChatMessages = (key) => {
+    if (!key || typeof window === 'undefined') return [];
+    try {
+        const parsed = JSON.parse(window.sessionStorage.getItem(`${key}-messages`));
+        return Array.isArray(parsed) ? parsed.filter(isMessage).slice(-AI_CHAT_KEPT_MESSAGES) : [];
+    } catch {
+        return [];
+    }
+};
+
+/** Keeps the last `AI_CHAT_KEPT_MESSAGES` messages for the tab; an empty conversation clears the key. */
+export const writeAiChatMessages = (key, messages) => {
+    if (!key || typeof window === 'undefined') return;
+    try {
+        if (messages.length === 0) window.sessionStorage.removeItem(`${key}-messages`);
+        else window.sessionStorage.setItem(`${key}-messages`, JSON.stringify(messages.slice(-AI_CHAT_KEPT_MESSAGES)));
+    } catch {
+        // Storage full or blocked: the conversation lasts as long as the page.
+    }
+};

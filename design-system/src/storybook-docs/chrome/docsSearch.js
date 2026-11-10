@@ -90,3 +90,39 @@ export const answerDocsQuery = (query, entries, { href }) => {
     }
     return { text: 'I found no page for that. Try a component name, such as "Button" or "Modal".', sources: [] };
 };
+
+/**
+ * The docs page a title or a name points at, for a link the model wrote as
+ * `page:<title>` or a "take me to …" question: the exact title, then a title
+ * ending in it, then a page of that name, then the best search match. Only
+ * entries with a page; null when nothing matches.
+ */
+export const findPage = (name, entries) => {
+    const wanted = normalize(name ?? '');
+    if (!wanted) return null;
+    const pages = entries.filter((e) => e.id);
+    const byTitle = pages.find((e) => normalize(e.title) === wanted);
+    if (byTitle) return byTitle;
+    const ending = pages.filter((e) => normalize(e.title).endsWith(` ${wanted}`) && compact(e.title).endsWith(compact(wanted)));
+    if (ending.length) return ending.find((e) => e.type === 'docs') ?? ending[0];
+    const byName = pages.filter((e) => compact(e.name) === compact(wanted));
+    if (byName.length) return byName.find((e) => e.type === 'docs') ?? byName[0];
+    const tokens = wanted.split(' ').filter((t) => t && !STOP_WORDS.has(t));
+    if (tokens.length === 0) return null;
+    const best = pages
+        .map((entry) => ({ entry, points: score(entry, tokens, tokens.join(' ')) }))
+        .filter((r) => r.points >= 5)
+        .sort((a, b) => b.points - a.points || a.entry.title.localeCompare(b.entry.title))[0];
+    return best?.entry ?? null;
+};
+
+const PAGE_LINK = /\[([^\]\n]+)\]\(\s*page:([^)\n]+)\)/g;
+
+/**
+ * Turns the model's `[label](page:<title>)` links into docs addresses; a link
+ * to a page that does not exist keeps its label as plain text.
+ */
+export const resolvePageLinks = (text, entries, href) => String(text ?? '').replace(PAGE_LINK, (whole, label, title) => {
+    const page = findPage(title.trim(), entries);
+    return page ? `[${label}](${href(page.id, page.type)})` : label;
+});

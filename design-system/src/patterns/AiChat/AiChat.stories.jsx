@@ -339,9 +339,8 @@ export const RepliesWithSources = {
         await waitFor(() => expect(p.popup()).not.toBeNull());
         const popup = within(p.popup());
         await userEvent.type(popup.getByRole('textbox', { name: 'Message to AI chat' }), 'Ava{Enter}');
-        const list = await popup.findByRole('list', { name: 'Sources' });
-        await expect(within(list).getAllByRole('link')).toHaveLength(3);
-        await userEvent.click(popup.getByRole('button', { name: 'Show 1 more source' }));
+        await userEvent.click(await popup.findByRole('button', { name: 'Sources (4)' }));
+        const list = popup.getByRole('list', { name: 'Sources' });
         await expect(within(list).getAllByRole('link')).toHaveLength(4);
     }),
 };
@@ -359,7 +358,7 @@ const DOCS_ENTRIES = buildDocsEntries({
 const fakeAgent = (status = 200) => async (url, init) => ({
     ok: status < 400,
     status,
-    json: async () => (status < 400 ? { text: `Button is in the context. (${JSON.parse(init.body).question})` } : {}),
+    json: async () => (status < 400 ? { text: `[Button](page:Forms and inputs/Button) is in the context. (${JSON.parse(init.body).question})` } : {}),
 });
 
 const docsHrefFor = (id) => `/?path=/docs/${id}`;
@@ -377,6 +376,7 @@ export const DocsAgent = {
     parameters: { layout: 'fullscreen' },
     beforeEach: () => {
         window.sessionStorage.removeItem(DOCS_STORAGE_KEY);
+        window.sessionStorage.removeItem(`${DOCS_STORAGE_KEY}-messages`);
         window.sessionStorage.removeItem(DOCS_PANEL_KEY);
     },
     render: () => <DocsAiAgent loadEntries={async () => DOCS_ENTRIES} hrefFor={docsHrefFor} fetchFn={fakeAgent()} />,
@@ -400,9 +400,10 @@ export const DocsAgent = {
         const input = within(popup()).getByRole('textbox', { name: 'Message to AI chat' });
         await expect(input, 'focus lands in the input').toHaveFocus();
         await userEvent.type(input, 'Where is Button?{Enter}');
-        const link = await within(popup()).findByRole('link', { name: 'Button' });
-        await within(popup()).findByText(/Button is in the context/);
-        await expect(link, 'the answer links the docs page').toHaveAttribute('href', '/?path=/docs/components-forms-and-inputs-button-button--docs');
+        await within(popup()).findByText(/is in the context/);
+        const link = within(popup()).getByRole('link', { name: 'Button' });
+        await expect(link, 'the answer links the page it names, inline').toHaveAttribute('href', '/?path=/docs/components-forms-and-inputs-button-button--docs');
+        await expect(within(popup()).getByRole('button', { name: /^Sources \(/ }), 'its sources start folded').toHaveAttribute('aria-expanded', 'false');
 
         const names = within(popup()).getAllByRole('button').map((b) => b.getAttribute('aria-label'));
         await expect(names, 'the app chat\'s header controls').toEqual(expect.arrayContaining(['Clear chat', 'Move to Panel', 'Full screen', 'More actions', 'Close chat']));
@@ -430,6 +431,7 @@ export const DocsAgentFallback = {
     parameters: { layout: 'fullscreen' },
     beforeEach: () => {
         window.sessionStorage.removeItem(DOCS_STORAGE_KEY);
+        window.sessionStorage.removeItem(`${DOCS_STORAGE_KEY}-messages`);
         window.sessionStorage.removeItem(DOCS_PANEL_KEY);
     },
     render: () => <DocsAiAgent loadEntries={async () => DOCS_ENTRIES} hrefFor={docsHrefFor} fetchFn={fakeAgent(429)} />,

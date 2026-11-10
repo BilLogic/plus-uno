@@ -54,14 +54,15 @@ export const vertexEndpoint = (env) => {
     return `https://${host}/v1/projects/${env.GEMINI_PROJECT_ID ?? ''}/locations/${region}/publishers/google/models/${model}:generateContent`;
 };
 
-/** One non-streaming call. Never throws: `{ ok, status?, text? , error? }`. */
-export const callVertex = async ({ env, fetch = globalThis.fetch, token, system, contents, maxOutputTokens }) => {
+/** One non-streaming call. Never throws: `{ ok, status?, text?, calls?, error? }`, `calls` being the model's `{ name, args }` function calls. */
+export const callVertex = async ({ env, fetch = globalThis.fetch, token, system, contents, tools, maxOutputTokens }) => {
     try {
         const res = await fetch(vertexEndpoint(env), {
             method: 'POST',
             headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
             body: JSON.stringify({
                 contents,
+                ...(tools?.length ? { tools } : {}),
                 systemInstruction: { parts: [{ text: system }] },
                 generationConfig: { maxOutputTokens, thinkingConfig: { thinkingLevel: 'low' } },
             }),
@@ -70,7 +71,8 @@ export const callVertex = async ({ env, fetch = globalThis.fetch, token, system,
         if (!res.ok) return { ok: false, status: res.status, error: `HTTP ${res.status}: ${data.error?.message ?? 'unknown'}`.slice(0, 300) };
         const parts = data.candidates?.[0]?.content?.parts ?? [];
         const text = parts.filter((p) => p.text && !p.thought).map((p) => p.text).join('');
-        return { ok: true, status: res.status, text };
+        const calls = parts.filter((p) => p.functionCall?.name).map((p) => ({ name: p.functionCall.name, args: p.functionCall.args ?? {} }));
+        return { ok: true, status: res.status, text, calls };
     } catch (error) {
         return { ok: false, error: error instanceof Error ? error.message : String(error) };
     }

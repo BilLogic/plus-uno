@@ -104,7 +104,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Part | Token |
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`, `--radius-0625`. |
-| Height | Starts at `--field-min-height-sm` and grows to five lines: `--line-height-125` × 5 plus `--space-0375` top and bottom, then scrolls. |
+| Height | Starts at one line, `--height-250` (40, a single-line field), and grows to five lines: `--line-height-125` × 5 plus `--space-0375` top and bottom, then scrolls. |
 | Padding | `--pad-y-md` top and bottom, `--pad-x-md` either side. |
 | Text | `--body-default` in `--ds-text`; placeholder `--ds-text-subtlest`. |
 | Attachments | `--stack-md` between files and under the row. |
@@ -147,7 +147,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--line-height-125` · `--plus-prompt-input-max-height` · `--space-0375` · `--stack-md` · `--stack-sm`
+`--height-250` · `--line-height-125` · `--plus-prompt-input-max-height` · `--space-0375` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/forms-and-inputs/PromptInput/PromptInput.scss`. Override these through the token layer, never with a literal.
 

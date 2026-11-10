@@ -28,7 +28,7 @@ describe('AiMessage', () => {
     it('marks a streaming message busy with a caret after the last text', () => {
         const { container } = render(<AiMessage status="streaming" parts={[{ type: 'text', text: 'One' }, { type: 'text', text: 'Two' }]} />);
         expect(container.firstChild).toHaveAttribute('aria-busy', 'true');
-        const texts = container.querySelectorAll('.plus-ai-message__text');
+        const texts = container.querySelectorAll('.plus-ai-message__markdown');
         expect(texts[0].querySelector('.plus-ai-message__caret')).toBeNull();
         expect(texts[1].querySelector('.plus-ai-message__caret')).not.toBeNull();
     });
@@ -68,8 +68,13 @@ describe('AiMessage sources', () => {
         { title: 'Tutor handbook', href: 'https://example.com/handbook' },
     ];
 
-    it('lists the sources under a finished answer as title links with their type', () => {
+    it('folds the sources behind one toggle with the count, then lists them as title links with their type', () => {
         render(<AiMessage text="Ava attended 12 sessions." sources={sources.slice(0, 2)} />);
+        expect(screen.queryByRole('list', { name: 'Sources' })).toBeNull();
+        const toggle = screen.getByRole('button', { name: 'Sources (2)' });
+        expect(toggle).toHaveAttribute('aria-expanded', 'false');
+        fireEvent.click(toggle);
+        expect(toggle).toHaveAttribute('aria-expanded', 'true');
         const list = screen.getByRole('list', { name: 'Sources' });
         const links = within(list).getAllByRole('link');
         expect(links.map((a) => a.getAttribute('href'))).toEqual(['/sessions/1024', '/students/ava']);
@@ -77,21 +82,10 @@ describe('AiMessage sources', () => {
         expect(within(list).getByText('Session')).toBeInTheDocument();
     });
 
-    it('shows three and collapses the rest behind a toggle', () => {
-        render(<AiMessage text="Here is what I found." sources={sources} />);
-        const list = screen.getByRole('list', { name: 'Sources' });
-        expect(within(list).getAllByRole('listitem')).toHaveLength(3);
-        const more = screen.getByRole('button', { name: 'Show 2 more sources' });
-        expect(more).toHaveAttribute('aria-expanded', 'false');
-        fireEvent.click(more);
-        expect(within(list).getAllByRole('listitem')).toHaveLength(5);
-        const fewer = screen.getByRole('button', { name: 'Show fewer sources' });
-        expect(fewer).toHaveAttribute('aria-expanded', 'true');
-    });
-
-    it('has no toggle with three sources or fewer', () => {
-        render(<AiMessage text="x" sources={sources.slice(0, 3)} />);
-        expect(screen.queryByRole('button', { name: /sources/ })).toBeNull();
+    it('lists an address given twice once', () => {
+        render(<AiMessage text="x" sources={[...sources, sources[0]]} />);
+        fireEvent.click(screen.getByRole('button', { name: 'Sources (5)' }));
+        expect(within(screen.getByRole('list', { name: 'Sources' })).getAllByRole('listitem')).toHaveLength(5);
     });
 
     it('waits for the answer to finish before showing sources', () => {

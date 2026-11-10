@@ -2,13 +2,13 @@
 
 # AiMessage
 
-An assistant reply, marked as AI by the small AI icon at its start (named "AI" for assistive technology), so no answer reads as a person's. The content is `text`, or `parts` when a reply mixes text with other content: a part is `{ type: 'text', text }` or any other `{ type, ... }`, which `renderPart` draws. - `status="complete"` is a finished message. - `status="streaming"` is text still arriving: a caret follows the last character and the message is marked busy for assistive technology. - `status="thinking"` is the typing indicator, before any text exists. `sources` lists what a finished answer read, under the message: an answer that draws on records always shows them. `onFeedback` puts thumbs up and down under a finished answer; `feedback` holds the rating when the page owns it.
+An assistant reply, marked as AI by the small AI icon at its start (named "AI" for assistive technology), so no answer reads as a person's. Text is Markdown: paragraphs, lists, headings, code, bold, italic and links. The content is `text`, or `parts` when a reply mixes text with other content: a part is `{ type: 'text', text }` or any other `{ type, ... }`, which `renderPart` draws. - `status="complete"` is a finished message. - `status="streaming"` is text still arriving: a caret follows the last character and the message is marked busy for assistive technology. - `status="thinking"` is the typing indicator, before any text exists. `sources` lists what a finished answer read, folded under the message behind one toggle: the answer links what it names in its own text, so the list is there to check, not to read. `onFeedback` puts thumbs up and down under a finished answer; `feedback` holds the rating when the page owns it.
 
 **Import:** `import { AiMessage } from '@/components';`
 
 **Source:** `design-system/src/components/labels/AiMessage/AiMessage.jsx`
 
-**Stories:** `design-system/src/components/labels/AiMessage/AiMessage.stories.jsx` — Message, Streaming, TypingIndicator, TypedOut, WithParts, Interactive, WithSources, WithFeedback
+**Stories:** `design-system/src/components/labels/AiMessage/AiMessage.stories.jsx` — Message, Streaming, TypingIndicator, TypedOut, WithParts, Interactive, WithSources, WithMarkdown, WithFeedback
 
 **Storybook page:** `design-system/src/components/labels/AiMessage/AiMessage.mdx`
 
@@ -131,7 +131,8 @@ Same group: `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `Status
 | `typeOut` | bool | `false` | Types a finished text out character by character, as a reply that has just arrived. |
 | `renderPart` | func | — | Draws a part that is not text: `(part, index) => node`. |
 | `sources` | arrayOf (required) | — | What a finished answer read: one `{ title, href, type }` per source, listed under the message. |
-| `linkTarget` | string | — | Where the source links open, such as `_top` from inside a frame. |
+| `linkTarget` | string | — | Where the reply's links and its source links open, such as `_top` from inside a frame. |
+| `resolveHref` | func | — | Rewrites a link's address in the reply's text: `(href) => href`, such as a docs page named by its title. |
 | `onFeedback` | func | — | Thumbs up and down under a finished answer: called with `{ rating }`, or `{ rating: 'down', comment }`. |
 | `feedback` | enum | — | The rating, when the page owns it: `up`, `down` or null. |
 | `className` | string | — | — |
@@ -146,7 +147,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-text` · `--ds-text-subtle` · `--heading-xxsmall` · `--icon-md` · `--inline-md` · `--inline-sm` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-easing-standard` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--stack-md` · `--stack-sm`
+`--body-default` · `--body-small` · `--code` · `--ds-background-neutral` · `--ds-text` · `--ds-text-subtle` · `--heading-xsmall` · `--icon-md` · `--inline-md` · `--inline-sm` · `--motion-duration-long` · `--motion-duration-medium` · `--motion-easing-standard` · `--pad-x-sm` · `--pad-x-xs` · `--pad-y-md` · `--plus-ai-message-caret` · `--plus-ai-message-dot` · `--radius-full` · `--radius-md` · `--radius-sm` · `--space-150` · `--stack-md` · `--stack-sm`
 
 From `design-system/src/components/labels/AiMessage/AiMessage.scss`. Override these through the token layer, never with a literal.
 

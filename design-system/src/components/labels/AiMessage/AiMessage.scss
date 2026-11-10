@@ -39,6 +39,19 @@
         margin-block: var(--stack-md);
     }
 
+    // A reply's Markdown: blocks a list-gap apart, so it reads as a message, not a document.
+    &__markdown {
+        display: flex;
+        flex-direction: column;
+        gap: var(--stack-md);
+        min-width: 0;
+        overflow-wrap: anywhere;
+
+        & + & {
+            margin-block-start: var(--stack-md);
+        }
+    }
+
     &__sr {
         position: absolute;
         width: 1px;
@@ -77,6 +90,44 @@
     }
 }
 
+/* Markdown blocks inside a reply. Headings are a bold line: a reply has no outline of its own. */
+.plus-ai-markdown {
+    &__heading {
+        margin: 0;
+        font: var(--heading-xsmall);
+    }
+
+    &__list {
+        display: flex;
+        flex-direction: column;
+        gap: var(--stack-sm);
+        margin: 0;
+        padding-inline-start: var(--pad-x-lg);
+    }
+
+    &__code {
+        padding-inline: var(--pad-x-xs);
+        border-radius: var(--radius-sm);
+        background: var(--ds-background-neutral);
+        color: var(--ds-text);
+        font: var(--code);
+    }
+
+    &__pre {
+        margin: 0;
+        padding: var(--pad-y-md) var(--pad-x-sm);
+        overflow-x: auto;
+        border-radius: var(--radius-md);
+        background: var(--ds-background-neutral);
+        color: var(--ds-text);
+        font: var(--code);
+        white-space: pre;
+
+        code { color: inherit; font: inherit; }
+        overflow-wrap: normal;
+    }
+}
+
 @keyframes plus-ai-message-blink {
     to { visibility: hidden; }
 }
@@ -94,19 +145,19 @@
 }
 
 /*
- * The sources an answer read: a quiet heading, one row per source (title
- * link, type beside it) and the toggle past three.
+ * The sources an answer read: one quiet toggle with the count, and behind it
+ * one row per source (title link, type beside it).
  */
 .plus-ai-sources {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     gap: var(--stack-sm);
-    margin-block-start: var(--stack-md);
+    margin-block-start: var(--stack-sm);
 
-    &__heading {
-        margin: 0;
-        font: var(--heading-xxsmall);
+    // The toggle's label sits on the reply's left edge, like the text above it.
+    &__toggle {
+        margin-inline-start: calc(-1 * var(--pad-x-sm));
         color: var(--ds-text-subtle);
     }
 

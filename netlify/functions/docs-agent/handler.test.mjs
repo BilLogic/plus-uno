@@ -81,3 +81,27 @@ test('per-IP rate limit answers 429, per IP and per window', async () => {
     t = 61_000;
     assert.equal((await handler(post({ question: 'q' }))).status, 200);
 });
+
+test('offers open_page, lists the page titles, and returns the page the model asked to open', async () => {
+    const { handler, calls } = make({
+        pageTitles: async () => ['Components/Forms and inputs/Button/Button', 'Foundations/Color'],
+        callVertex: async (args) => { calls.push(args); return { ok: true, status: 200, text: '', calls: [{ name: 'open_page', args: { title: 'Foundations/Color' } }] }; },
+    });
+    const res = await handler(post({ question: 'Take me to color' }));
+    assert.equal(res.status, 200);
+    assert.deepEqual(await res.json(), { text: '', open: 'Foundations/Color' });
+    assert.equal(calls[0].tools[0].functionDeclarations[0].name, 'open_page');
+    assert.match(calls[0].system, /--- PAGES ---\nComponents\/Forms and inputs\/Button\/Button\nFoundations\/Color/);
+});
+
+test('a page list that fails to load still answers', async () => {
+    const { handler } = make({ pageTitles: async () => { throw new Error('offline'); } });
+    const res = await handler(post({ question: 'What is Button?' }));
+    assert.equal(res.status, 200);
+});
+
+test('the prompt asks for inline page links and no file citations', () => {
+    const p = buildSystemPrompt('CTX', ['Foundations/Color']);
+    assert.match(p, /page:/);
+    assert.match(p, /Never cite files/);
+});

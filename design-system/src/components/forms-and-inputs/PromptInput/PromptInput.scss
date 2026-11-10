@@ -2,7 +2,7 @@
  * PromptInput — a Field that grows with its text, wrapped in a
  * GenerativeBorder while loading.
  *
- * The control starts at one line and grows to five (`--plus-prompt-input-max-height`,
+ * The control starts at one line, as tall as a single-line field (40), and grows to five (`--plus-prompt-input-max-height`,
  * five lines of body text plus the box's own vertical padding), then scrolls.
  * The send and attach buttons are the Button's compact (24) icon-only size, so
  * they sit inside the field the same way a stepper does.
@@ -32,7 +32,14 @@
     overflow-y: auto;
 }
 
+// A prompt starts as one line, not a Text area's 80: a chat question is usually one.
+.plus-prompt-input .plus-prompt-input__field.plus-field--multiline {
+    min-height: var(--height-250);
+}
+
+// The buttons stay on the last line as the text grows.
 .plus-prompt-input__trailing-group {
+    align-self: flex-end;
     display: inline-flex;
     align-items: center;
     gap: var(--stack-sm);

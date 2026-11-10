@@ -89,7 +89,16 @@
     box-sizing: border-box;
 }
 
+// An empty conversation: the opening line, then the starters under it, at
+// the top of the body where a reply would start, not crowded over the input.
 .plus-ai-chat__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--stack-lg);
+}
+
+.plus-ai-chat__empty-text {
     margin: 0;
     color: var(--ds-text-subtle);
     font: var(--body-default);
@@ -117,15 +126,16 @@
 }
 
 // The footer is a PanelFooter, which centers a button row; the chat's footer
-// is a stack (compose, disclaimer), so each part takes the full width.
+// is a stack (compose, disclaimer), so each part takes the full width. The
+// disclaimer belongs to the input, so it sits a tight gap under it.
 .plus-ai-chat .plus-ai-chat__footer {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    gap: var(--section-stack-md);
+    gap: var(--stack-sm);
 }
 
-// Starters and the prompt input read as one compose group.
+// The prompt input and anything composed with it, such as attachments.
 .plus-ai-chat__compose {
     display: flex;
     flex-direction: column;

@@ -7,7 +7,7 @@ authored half, counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
 |-----------|------:|:---:|:---:|:---:|
-| [AiMessage](AiMessage/index.md) | 10 | ✅ | ✅ | ✅ |
+| [AiMessage](AiMessage/index.md) | 11 | ✅ | ✅ | ✅ |
 | [CountTag](CountTag/index.md) | 12 | ✅ | ✅ | ✅ |
 | [DateTag](DateTag/index.md) | 6 | ✅ | ✅ | ✅ |
 | [PromptStarters](PromptStarters/index.md) | 4 | ✅ | ✅ | ✅ |
