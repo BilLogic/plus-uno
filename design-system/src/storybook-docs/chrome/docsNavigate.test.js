@@ -6,7 +6,7 @@ const BASE = 'http://localhost:6006/iframe.html?id=foundations-color--docs';
 describe('storybookTarget', () => {
     it('reads a docs or story address, relative or absolute', () => {
         expect(storybookTarget('?path=/docs/foundations-color--docs', BASE)).toEqual({ storyId: 'foundations-color--docs', viewMode: 'docs' });
-        expect(storybookTarget('http://localhost:6006/?path=/story/components-forms-and-inputs-close-button--overview', BASE)).toEqual({ storyId: 'components-forms-and-inputs-close-button--overview', viewMode: 'story' });
+        expect(storybookTarget('http://localhost:6006/?path=/story/components-forms-and-inputs-button-button--overview', BASE)).toEqual({ storyId: 'components-forms-and-inputs-button-button--overview', viewMode: 'story' });
     });
 
     it('is null for anything else', () => {
