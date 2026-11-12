@@ -28,7 +28,7 @@ beyond that.
 
 The tooltip is a floating layer: the Popup pattern's surface
 (`--ds-surface-overlay`), overlay shadow (`--ds-shadow-overlay`), radius
-(`--popover-radius`) and padding (`--popover-pad`), plus the shared
+(`--popup-radius`) and padding (`--popover-pad`), plus the shared
 `--layer-popup` z-index. `useHTML` alone only moves the tooltip's TEXT into a
 foreignObject — the box Highcharts draws around it is always its own SVG
 `<path>`, and `background`/`border-radius`/`box-shadow` are no-ops there, so

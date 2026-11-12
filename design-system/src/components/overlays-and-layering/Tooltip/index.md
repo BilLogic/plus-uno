@@ -161,7 +161,7 @@ Same group: `Popup`
 | --- | --- |
 | Fill, text | `--ds-background-neutral-bold`, `--ds-text-inverse` |
 | Padding | `--popover-pad-y-tooltip`, `--pad-x-sm` |
-| Radius | `--popover-radius-tooltip` |
+| Radius | `--radius-control-sm` |
 | Maximum width | `--popover-max-width-tooltip` |
 | Type | `--body-small` |
 
@@ -196,7 +196,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-small` · `--ds-background-neutral-bold` · `--ds-text-inverse` · `--layer-popup` · `--pad-x-sm` · `--popover-max-width-tooltip` · `--popover-pad-y-tooltip` · `--popover-radius-tooltip`
+`--body-small` · `--ds-background-neutral-bold` · `--ds-text-inverse` · `--layer-popup` · `--pad-x-sm` · `--popover-max-width-tooltip` · `--popover-pad-y-tooltip` · `--radius-control-sm`
 
 From `design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss`. Override these through the token layer, never with a literal.
 

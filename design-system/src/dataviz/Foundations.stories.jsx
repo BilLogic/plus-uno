@@ -28,7 +28,7 @@ export const TooltipSurface = () => (
         <div
             style={{
                 background: 'var(--ds-surface-overlay)',
-                borderRadius: 'var(--popover-radius)',
+                borderRadius: 'var(--popup-radius)',
                 boxShadow: 'var(--ds-shadow-overlay)',
                 padding: 'var(--popover-pad)',
                 color: 'var(--ds-text)',

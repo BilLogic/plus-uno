@@ -20,7 +20,6 @@ Start here for space, size and radius (ADR-038). A component reads its component
 --control-md  /* Height of a default control: 32px high. */
 --control-sm  /* Height of a small control: 24px high. */
 --focus-ring-offset  /* Gap between an element and its focus ring, when it must differ from the ring width. */
---focus-ring-radius  /* Corner rounding of the keyboard focus ring. */
 --focus-ring-width  /* Width of the keyboard focus ring; also its offset unless the offset must differ. */
 --grid-columns  /* Column count of the page grid. */
 --grid-gutter  /* Gap between columns of the page grid. */
@@ -36,12 +35,14 @@ Start here for space, size and radius (ADR-038). A component reads its component
 --pad-y-lg  /* Vertical padding inside a large control or a roomy row. */
 --pad-y-md  /* Vertical padding inside a default control: a Button, a field, a menu item. */
 --pad-y-sm  /* Vertical padding inside a compact control, such as a compact Button or a Sidebar tab. */
---radius-h24  /* Corner rounding for a control 24px high. */
---radius-h32  /* Corner rounding for a control 32px high. */
---radius-h40  /* Corner rounding for a control 40px high. */
+--radius-control-lg  /* Corner rounding for a control 40px high: a default field. */
+--radius-control-md  /* Corner rounding for a control 32px high: a compact field, a tab, a menu row. */
+--radius-control-sm  /* Corner rounding for a control 24px high: a compact field, a Tooltip, a Sidebar row. */
 --radius-lg  /* Corner rounding for larger containers that are not a pattern, such as a tile or image. */
 --radius-md  /* Corner rounding for controls and small containers. */
---radius-sm  /* Corner rounding for small marks: a checkbox, a focus ring, a small tag. */
+--radius-sm  /* Corner rounding for small marks: a checkbox, a small tag. */
+--radius-xl  /* Corner rounding for a floating or compact surface, such as a Popup or a compact card. */
+--radius-xxl  /* Corner rounding for a top-level surface, such as a Section or a card. */
 --screen-max-width  /* Widest the screen frame gets at the current breakpoint. */
 --screen-min-width  /* Narrowest the screen frame gets at the current breakpoint. */
 --screen-pad-x  /* Horizontal padding between the screen edge and the page content. */
@@ -62,6 +63,8 @@ Space owned by a pattern: page, section, card, table, modal, popover. Inside a p
 --card-pad-compact  /* Padding inside a PatternCard with compact spacing. */
 --card-pad-default  /* Padding inside a PatternCard with default spacing. */
 --card-pad-spacious  /* Padding inside a PatternCard with spacious spacing. */
+--card-radius  /* Corner rounding of a PatternCard. */
+--card-radius-compact  /* Corner rounding of a compact PatternCard or a card nested in another surface. */
 --frame-sidebar-group-gap  /* Vertical gap between two groups of rows in the Sidebar. */
 --frame-sidebar-pad  /* Padding on every side inside the Sidebar. */
 --frame-sidebar-row-gap  /* Vertical gap between two rows in the Sidebar. */
@@ -76,6 +79,7 @@ Space owned by a pattern: page, section, card, table, modal, popover. Inside a p
 --modal-pad-y-compact  /* Vertical padding of a Modal with compact spacing. */
 --modal-pad-y-default  /* Vertical padding of a Modal with default spacing. */
 --modal-pad-y-spacious  /* Vertical padding of a Modal with spacious spacing. */
+--modal-radius  /* Corner rounding of a Modal. */
 --modal-width-lg  /* Width of a large Modal, such as a table or a long form. */
 --modal-width-md  /* Width of a default Modal, such as a short form. */
 --modal-width-sm  /* Width of a small Modal, such as a confirmation. */
@@ -86,10 +90,10 @@ Space owned by a pattern: page, section, card, table, modal, popover. Inside a p
 --page-pad-y-compact  /* Vertical padding of a Page with compact spacing. */
 --page-pad-y-default  /* Vertical padding of a Page with default spacing. */
 --page-pad-y-spacious  /* Vertical padding of a Page with spacious spacing. */
---page-radius-md  /* Corner rounding of a Page frame. */
 --panel-max-width  /* Widest the Panel may be dragged. */
 --panel-min-width  /* Narrowest the Panel may be dragged. */
 --panel-width-default  /* Width the Panel opens at. */
+--popup-radius  /* Corner rounding of a Popup. */
 --section-pad-x-compact  /* Horizontal padding of a PatternSection with compact spacing. */
 --section-pad-x-default  /* Horizontal padding of a PatternSection with default spacing. */
 --section-pad-x-spacious  /* Horizontal padding of a PatternSection with spacious spacing. */
@@ -98,6 +102,7 @@ Space owned by a pattern: page, section, card, table, modal, popover. Inside a p
 --section-pad-y-spacious  /* Vertical padding of a PatternSection with spacious spacing. */
 --section-radius  /* Corner rounding of a PatternSection that has a fill. */
 --table-overflow-reach  /* How far a PatternTable lets a row's overflow, such as a focus ring, reach past its clip. */
+--table-radius  /* Corner rounding of a PatternTable. */
 ```
 
 ## Ladder Components
@@ -319,8 +324,6 @@ The patterns on the page frame, per breakpoint: page, section, card, table, over
 --card-min-width-lg  /* Narrowest a large PatternCard may shrink in a grid. */
 --card-min-width-md  /* Narrowest a default PatternCard may shrink in a grid. */
 --card-min-width-sm  /* Narrowest a small PatternCard may shrink in a grid. */
---card-radius  /* Corner rounding of a PatternCard. */
---card-radius-sm  /* Corner rounding of a small PatternCard or a card nested in another container. */
 --card-stack-lg  /* Vertical gap between a PatternCard's header, body and footer. */
 --card-stack-md  /* Vertical gap between blocks in a PatternCard. */
 --card-stack-sm  /* Vertical gap between tightly related lines in a PatternCard, such as a title and its meta. */
@@ -342,12 +345,10 @@ The patterns on the page frame, per breakpoint: page, section, card, table, over
 --modal-inline-md  /* Horizontal gap between the actions in a Modal footer. */
 --modal-inline-sm  /* Horizontal gap between small items in a Modal row. */
 --modal-pad  /* Padding inside a Modal at the current breakpoint. */
---modal-radius  /* Corner rounding of a Modal. */
 --modal-stack-lg  /* Vertical gap between a Modal's header, body and footer. */
 --modal-stack-md  /* Vertical gap between blocks in a Modal's body. */
 --modal-stack-sm  /* Vertical gap between a Modal's title and its description. */
 --page-pad  /* Padding around a Page's content at the current breakpoint. */
---page-radius  /* Corner rounding of a Page inside the Frame. */
 --page-stack-lg  /* Vertical gap between major regions of a Page. */
 --page-stack-md  /* Vertical gap between sections on a Page. */
 --page-stack-sm  /* Vertical gap between closely related blocks on a Page, such as a header and its subtitle. */
@@ -360,10 +361,6 @@ The patterns on the page frame, per breakpoint: page, section, card, table, over
 --popover-pad  /* Padding inside a Popup. */
 --popover-pad-menu  /* Padding inside a DropdownMenu or listbox. */
 --popover-pad-y-tooltip  /* Vertical padding inside a Tooltip. */
---popover-radius  /* Corner rounding of a Popup. */
---popover-radius-menu-md  /* Corner rounding of a default DropdownMenu. */
---popover-radius-menu-sm  /* Corner rounding of a compact DropdownMenu. */
---popover-radius-tooltip  /* Corner rounding of a Tooltip. */
 --popover-stack-flag  /* Vertical gap between stacked Flags. */
 --popover-width-flag  /* Width of a Flag. */
 --popover-width-lg  /* Width of a large Popup. */
@@ -379,10 +376,7 @@ The patterns on the page frame, per breakpoint: page, section, card, table, over
 --table-pad-x-cell  /* Horizontal padding inside a PatternTable cell. */
 --table-pad-x-footer  /* Horizontal padding of a PatternTable footer, such as its Pagination row. */
 --table-pad-y-cell  /* Vertical padding inside a PatternTable cell. */
---table-radius  /* Corner rounding of a PatternTable. */
 --table-stack  /* Vertical gap between a PatternTable and its toolbar or footer. */
---tile-radius-lg  /* Corner rounding of a large Tile. */
---tile-radius-sm  /* Corner rounding of a small Tile. */
 ```
 
 ## Type Scale
@@ -1203,12 +1197,10 @@ The primitives (spacing / primitives), named by rem × 100; point semantic token
 ```css
 --radius-0125
 --radius-025
---radius-03125
 --radius-0375
 --radius-050
 --radius-0625
 --radius-075
---radius-0875
 --radius-100
 --radius-full
 --size-075

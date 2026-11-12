@@ -139,7 +139,7 @@ export const AnatomyFilterMenu = {
         leadersCrossNoOtherPart(canvasElement, ANATOMY_PARTS);
         const layer = canvasElement.querySelector('.plus-filter-menu');
         await expect(getComputedStyle(layer).paddingTop, 'pad 16').toBe(`${tokenLength(canvasElement, '--popover-pad')}px`);
-        await expect(getComputedStyle(layer).borderTopLeftRadius, 'radius 12').toBe(`${tokenLength(canvasElement, '--popover-radius')}px`);
+        await expect(getComputedStyle(layer).borderTopLeftRadius, 'radius 12').toBe(`${tokenLength(canvasElement, '--popup-radius')}px`);
         const trigger = rect(canvasElement.querySelector('.plus-filter-menu__trigger'));
         const gap = rect(layer).top - trigger.bottom;
         const stage = canvasElement.querySelector('[data-popup-stage]');

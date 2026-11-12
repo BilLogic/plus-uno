@@ -481,7 +481,7 @@ export const LoadingCard = () => {
                     width: '294px',
                     padding: '16px',
                     border: '1px solid var(--ds-border)',
-                    borderRadius: 'var(--card-radius-sm)',
+                    borderRadius: 'var(--card-radius-compact)',
                 }}
             >
                 {loaded ? (

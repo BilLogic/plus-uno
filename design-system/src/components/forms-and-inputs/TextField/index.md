@@ -157,7 +157,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | --- | --- |
 | Box | `--ds-background-input` fill, `--border-default` edge in `--ds-border-input`. |
 | Height | 40: `--height-250`. Compact 32: `--item-height-md`. |
-| Radius | 10: `--radius-0625`. Compact 8: `--radius-h32`. |
+| Radius | 10: `--radius-0625`. Compact 8: `--radius-control-md`. |
 | Side padding | `--pad-x-md`; a Button in a slot sits `--pad-x-xs` from the edge. |
 | Slot button | `--item-height-md` in the 40 field, `--item-height-sm` in the 32 field. |
 | Slots | `--ds-text-subtle`, `--stack-sm` apart; `--space-0625` between slot and control. |

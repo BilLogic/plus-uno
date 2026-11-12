@@ -128,6 +128,20 @@
           }
         },
         {
+          "name": "Radius/xl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--radius-xl)"
+          }
+        },
+        {
+          "name": "Radius/xxl",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--radius-xxl)"
+          }
+        },
+        {
           "name": "Radius/full",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -135,24 +149,24 @@
           }
         },
         {
-          "name": "Radius/h24",
+          "name": "Radius/Control/sm",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--radius-h24)"
+            "WEB": "var(--radius-control-sm)"
           }
         },
         {
-          "name": "Radius/h32",
+          "name": "Radius/Control/md",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--radius-h32)"
+            "WEB": "var(--radius-control-md)"
           }
         },
         {
-          "name": "Radius/h40",
+          "name": "Radius/Control/lg",
           "resolvedType": "FLOAT",
           "codeSyntax": {
-            "WEB": "var(--radius-h40)"
+            "WEB": "var(--radius-control-lg)"
           }
         },
         {
@@ -167,13 +181,6 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--focus-ring-offset)"
-          }
-        },
-        {
-          "name": "Focus/ring-radius",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--focus-ring-radius)"
           }
         },
         {
@@ -469,6 +476,27 @@
           }
         },
         {
+          "name": "Card/radius",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--card-radius)"
+          }
+        },
+        {
+          "name": "Card/radius-compact",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--card-radius-compact)"
+          }
+        },
+        {
+          "name": "Table/radius",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--table-radius)"
+          }
+        },
+        {
           "name": "Blanket/pad-x",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -532,6 +560,13 @@
           }
         },
         {
+          "name": "Modal/radius",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--modal-radius)"
+          }
+        },
+        {
           "name": "Modal/width-sm",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -553,13 +588,6 @@
           }
         },
         {
-          "name": "Page/radius-md",
-          "resolvedType": "FLOAT",
-          "codeSyntax": {
-            "WEB": "var(--page-radius-md)"
-          }
-        },
-        {
           "name": "Page/border-width",
           "resolvedType": "FLOAT",
           "codeSyntax": {
@@ -578,6 +606,13 @@
           "resolvedType": "FLOAT",
           "codeSyntax": {
             "WEB": "var(--modal-body-min-height)"
+          }
+        },
+        {
+          "name": "Popup/radius",
+          "resolvedType": "FLOAT",
+          "codeSyntax": {
+            "WEB": "var(--popup-radius)"
           }
         }
       ]

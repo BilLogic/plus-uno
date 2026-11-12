@@ -8,7 +8,7 @@ test('numbered space, radius, size and stroke steps are primitives', () => {
 });
 
 test('tier tokens and --radius-full are not primitives', () => {
-  for (const name of ['--pad-x-md', '--checkbox-control-size', '--radius-full', '--radius-h32', '--space-pad']) {
+  for (const name of ['--pad-x-md', '--checkbox-control-size', '--radius-full', '--radius-control-md', '--space-pad']) {
     assert.ok(!isPrimitive(name), name);
   }
 });

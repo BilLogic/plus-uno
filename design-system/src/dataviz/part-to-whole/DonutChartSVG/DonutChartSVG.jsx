@@ -106,7 +106,7 @@ const DonutChartSVG = ({
                         backgroundColor: 'var(--ds-surface-overlay)',
                         color: 'var(--ds-text)',
                         padding: 'var(--popover-pad-y-tooltip) var(--pad-x-sm)',
-                        borderRadius: 'var(--popover-radius-tooltip)',
+                        borderRadius: 'var(--radius-control-sm)',
                         fontSize: 'var(--font-size-075)',
                         fontFamily: 'var(--type-family-body)',
                         pointerEvents: 'none',

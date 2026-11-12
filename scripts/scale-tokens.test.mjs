@@ -46,12 +46,10 @@ const PRIMITIVES = {
   '--space-500': [80, null],
   '--radius-0125': [2, '--space-0125'],
   '--radius-025': [4, '--space-025'],
-  '--radius-03125': [5, '--space-03125'],
   '--radius-0375': [6, '--space-0375'],
   '--radius-050': [8, '--space-050'],
   '--radius-0625': [10, '--space-0625'],
   '--radius-075': [12, '--space-075'],
-  '--radius-0875': [14, '--space-0875'],
   '--radius-100': [16, '--space-100'],
   '--radius-full': [9999, null],
   '--stroke-1': [1, '--space-00625'],
@@ -93,8 +91,6 @@ const SEMANTICS = {
   '--radius-sm': [2, '--radius-0125'],
   '--radius-md': [4, '--radius-025'],
   '--radius-lg': [8, '--radius-050'],
-  '--radius-h24': [6, '--radius-0375'],
-  '--radius-h32': [8, '--radius-050'],
 };
 
 const SIZE = {

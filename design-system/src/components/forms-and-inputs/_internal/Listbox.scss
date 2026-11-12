@@ -35,7 +35,7 @@
     // The shadow's ring is the edge; the transparent border keeps one in
     // forced colors, where shadows are dropped.
     border: var(--border-default) solid transparent;
-    border-radius: var(--popover-radius-menu-md);
+    border-radius: var(--popup-radius);
     box-shadow: var(--ds-shadow-overlay);
 }
 

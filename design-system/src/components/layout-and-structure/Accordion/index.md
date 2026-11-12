@@ -147,7 +147,7 @@ Same group: `Carousel` · `PageHeader` · `Panel` · `ScrollBar`
 | Trigger ground | `--ds-surface`; `--ds-background-neutral-subtle-hovered` and `-pressed` under the pointer; open, `--ds-background-selected` and `--ds-background-selected-hovered`. |
 | Trigger and chevron | `--ds-text-subtle`; title in `--heading-small`; chevron at `--icon-md`. |
 | Body | `--body-large` on `--ds-surface`, `--ds-text-subtle`, with a `--ds-border` rule above it. |
-| Edge | `--ds-border` at `--stroke-1`, corners `--card-radius-sm`. |
+| Edge | `--ds-border` at `--stroke-1`, corners `--card-radius-compact`. |
 | Padding | `--card-pad-default` on every side. |
 | Focus ring | `--ds-border-focused`, `--focus-ring-width` wide and offset. |
 | Disabled | `--ds-opacity-disabled`. |
@@ -190,7 +190,7 @@ Implemented as `AccordionItem`.
 
 ## Tokens touched
 
-`--body-large` · `--border-default` · `--card-pad-default` · `--card-radius-sm` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text-subtle` · `--heading-small` · `--icon-md`
+`--body-large` · `--border-default` · `--card-pad-default` · `--card-radius-compact` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-selected` · `--ds-background-selected-hovered` · `--ds-border` · `--ds-opacity-disabled` · `--ds-surface` · `--ds-text-subtle` · `--heading-small` · `--icon-md`
 
 From `design-system/src/components/layout-and-structure/Accordion/Accordion.scss`. Override these through the token layer, never with a literal.
 

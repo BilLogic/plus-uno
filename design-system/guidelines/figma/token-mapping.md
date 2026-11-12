@@ -68,7 +68,7 @@ Two kinds of text node carry no text style, and each binds its type variables di
 |----------------------|----------------------|
 | Card padding | `var(--card-pad-{compact\|default\|spacious})` |
 | Card gap | `var(--card-stack-{sm\|md\|lg})`, `var(--card-inline-{sm\|md\|lg})` |
-| Card radius | `var(--card-radius)`, `var(--card-radius-sm)` |
+| Card radius | `var(--card-radius)`, `var(--card-radius-compact)` |
 | Element padding | `var(--pad-x-{xs\|sm\|md\|lg})`, `var(--pad-y-{sm\|md\|lg})` (ADR-038) |
 | Element gap | `var(--stack-{sm\|md\|lg})`, `var(--inline-{sm\|md\|lg})`; the 10px step reads `var(--space-0625)` |
 | Element radius | `var(--radius-{sm\|md\|lg\|full})` |
@@ -87,7 +87,7 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 | spacing / primitives `Space/space-*`, `Radius/radius-*`, `Stroke/stroke-*`, `Size/size-*` | `var(--space-025)`, `var(--radius-050)`, `var(--stroke-1)`, `var(--size-200)` | Named by rem × 100 (`space-025` is 4). Hidden in Figma; semantic tokens point at them |
 | Foundations `Element/pad-x-{xs\|sm\|md}`, `pad-y-{sm\|md}` | `var(--pad-x-sm)` | 4 · 8 · 12 · 16 and 2 · 6 · 8 |
 | Foundations `Element/stack-*`, `inline-*` | `var(--stack-md)`, `var(--inline-sm)` | 4 · 8 · 12 |
-| Foundations `Element/radius-{sm\|md\|lg}`, `radius-item-{sm\|md}`, `radius-full` | `var(--radius-h32)` | 2 · 4 · 8, items 6 · 8 |
+| Semantics `Radius/{sm\|md\|lg\|xl\|xxl\|full}`, `Radius/Control/{sm\|md\|lg}` | `var(--radius-control-md)` | 2 · 4 · 8 · 12 · 16, controls 6 · 8 · 10 |
 | Foundations `Size/Height/*`, `Width/*` | `var(--height-200)`, `var(--width-1400)` | Common scales, named by rem × 100 |
 | Foundations `Size/Item/height-{sm\|md}` | `var(--item-height-md)` | 24 · 32; there is no 40 Item |
 | Foundations `Size/Row/height-{sm\|md\|lg}` | `var(--row-height-md)` | 32 · 40 · 48 |

@@ -14,7 +14,7 @@
     --frame-sidebar-pad: var(--space-075); /* the Sidebar pads 12 on every side */
     --frame-sidebar-row-gap: var(--space-0125); /* two Sidebar rows sit 2 apart */
     --frame-sidebar-group-gap: var(--space-100); /* two Sidebar groups sit 16 apart */
-    --frame-sidebar-row-radius: var(--radius-0375); /* the rounding of a Sidebar row (6) */
+    --frame-sidebar-row-radius: var(--radius-control-sm); /* the rounding of a Sidebar row (6) */
 
     /* Page */
     --page-pad-x-compact: var(--space-150);
@@ -23,7 +23,6 @@
     --page-pad-y-compact: var(--space-100);
     --page-pad-y-default: var(--space-150);
     --page-pad-y-spacious: var(--space-200);
-    --page-radius-md: var(--radius-075);
     --page-border-width: var(--stroke-2);
 
     /* Panel */
@@ -38,12 +37,18 @@
     --section-pad-y-compact: var(--space-100);
     --section-pad-y-default: var(--space-150);
     --section-pad-y-spacious: var(--space-200);
-    --section-radius: var(--radius-100); /* the rounding of a Section with a fill */
+    --section-radius: var(--radius-xxl); /* the rounding of a Section with a fill */
 
     /* Card */
     --card-pad-compact: var(--space-100);
     --card-pad-default: var(--space-125);
     --card-pad-spacious: var(--space-150);
+    --card-radius: var(--radius-xxl);
+    --card-radius-compact: var(--radius-xl);
+
+    /* Table */
+    --table-radius: var(--radius-lg);
+    --table-overflow-reach: var(--space-150);
 
     /* Blanket */
     --blanket-pad-x: var(--space-100);
@@ -58,13 +63,14 @@
     --modal-pad-y-compact: var(--space-050);
     --modal-pad-y-default: var(--space-075);
     --modal-pad-y-spacious: var(--space-100);
+    --modal-radius: var(--radius-xl); /* reads xl (12) until the template-values ticket moves it to xxl (16) */
     --modal-width-sm: 384px; /* lifted out of spacing / layout, beside the pattern’s pad/stack tokens */
     --modal-width-md: 507px;
     --modal-width-lg: 629px;
     --modal-body-min-height: var(--space-500);
 
-    /* Table */
-    --table-overflow-reach: var(--space-150);
+    /* Popover */
+    --popup-radius: var(--radius-xl);
 }
 
 @media (max-height: 639.98px) {

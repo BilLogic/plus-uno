@@ -8,8 +8,8 @@
 :root {
 
     /* Button */
-    --button-radius-default: var(--radius-0375); /* 32-high control, radius 6 */
-    --button-radius-compact: var(--radius-025); /* 24-high control, radius 4 */
+    --button-radius-default: calc(var(--radius-control-lg) - var(--pad-x-xs)); /* nests in a 40-high field: its radius 10 minus the 4 slot inset = 6 */
+    --button-radius-compact: calc(var(--radius-control-md) - var(--pad-x-xs)); /* nests in a 32-high field: its radius 8 minus the 4 slot inset = 4 */
     --button-vertical-size: var(--space-400);
 
     /* Calendar */

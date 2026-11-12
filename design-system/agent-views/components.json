@@ -110,7 +110,7 @@
         "--body-large",
         "--border-default",
         "--card-pad-default",
-        "--card-radius-sm",
+        "--card-radius-compact",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
         "--ds-background-selected",
@@ -365,7 +365,7 @@
         "--pad-x-md",
         "--pad-y-sm",
         "--page-pad",
-        "--popover-radius",
+        "--popup-radius",
         "--radius-md",
         "--stack-lg",
         "--stack-md",
@@ -3340,7 +3340,7 @@
         "--plus-date-tag-height",
         "--plus-date-tag-icon-box",
         "--plus-date-tag-max",
-        "--radius-h24",
+        "--radius-control-sm",
         "--radius-md",
         "--stack-sm",
         "--tag-gap",
@@ -3872,7 +3872,7 @@
         "--pad-y-md",
         "--popover-max-height-menu",
         "--popover-max-width-menu",
-        "--popover-radius-menu-md",
+        "--popup-radius",
         "--stack-md"
       ]
     },
@@ -4854,9 +4854,9 @@
         "--layer-flag",
         "--popover-gap-screen",
         "--popover-pad",
-        "--popover-radius",
         "--popover-stack-flag",
         "--popover-width-flag",
+        "--popup-radius",
         "--radius-md",
         "--stack-sm",
         "--type-weight-medium"
@@ -7376,10 +7376,10 @@
         "--page-pad-x-spacious",
         "--page-pad-y-compact",
         "--page-pad-y-spacious",
-        "--page-radius-md",
         "--page-stack-md",
         "--radius-lg",
-        "--section-radius"
+        "--radius-xl",
+        "--radius-xxl"
       ]
     },
     {
@@ -7952,7 +7952,7 @@
         "--card-pad-default",
         "--card-pad-spacious",
         "--card-radius",
-        "--card-radius-sm",
+        "--card-radius-compact",
         "--card-stack-lg",
         "--card-stack-md",
         "--card-stack-sm",
@@ -9277,11 +9277,11 @@
         "--plus-popup-reach",
         "--popover-offset",
         "--popover-pad",
-        "--popover-radius",
         "--popup-clip-reach",
         "--popup-max-width",
         "--popup-min-width",
         "--popup-pad",
+        "--popup-radius",
         "--stack-md"
       ]
     },
@@ -9805,8 +9805,8 @@
         "--inline-sm",
         "--item-height-md",
         "--pad-x-md",
+        "--radius-control-md",
         "--radius-full",
-        "--radius-h32",
         "--space-050",
         "--space-150",
         "--stack-lg",
@@ -11536,7 +11536,7 @@
         "--pad-y-md",
         "--popover-max-height-menu",
         "--popover-pad-menu",
-        "--radius-h32"
+        "--radius-control-md"
       ]
     },
     {
@@ -12468,8 +12468,8 @@
         "--plus-skeleton-height",
         "--plus-skeleton-radius",
         "--plus-skeleton-width",
+        "--radius-control-sm",
         "--radius-full",
-        "--radius-h24",
         "--radius-md",
         "--radius-sm",
         "--skeleton-circle-size",
@@ -12989,7 +12989,7 @@
         "--plus-status-height",
         "--plus-status-icon-box",
         "--plus-status-max",
-        "--radius-h24",
+        "--radius-control-sm",
         "--radius-md",
         "--stack-sm",
         "--tag-gap",
@@ -15170,10 +15170,10 @@
         "--image-xl",
         "--image-xs",
         "--image-xxs",
+        "--radius-control-lg",
         "--radius-sm",
         "--tile-inner",
         "--tile-radius",
-        "--tile-radius-lg",
         "--tile-size"
       ]
     },
@@ -15672,7 +15672,7 @@
         "--pad-x-sm",
         "--popover-max-width-tooltip",
         "--popover-pad-y-tooltip",
-        "--popover-radius-tooltip"
+        "--radius-control-sm"
       ]
     },
     {

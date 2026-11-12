@@ -195,7 +195,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-border-bold` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-sunken` · `--ds-text` · `--heading-large` · `--heading-large-tracking` · `--page-border-width` · `--page-pad` · `--page-pad-x-compact` · `--page-pad-x-spacious` · `--page-pad-y-compact` · `--page-pad-y-spacious` · `--page-radius-md` · `--page-stack-md` · `--radius-lg` · `--section-radius`
+`--ds-border-bold` · `--ds-shadow-overlay` · `--ds-shadow-raised` · `--ds-surface` · `--ds-surface-overlay` · `--ds-surface-raised` · `--ds-surface-sunken` · `--ds-text` · `--heading-large` · `--heading-large-tracking` · `--page-border-width` · `--page-pad` · `--page-pad-x-compact` · `--page-pad-x-spacious` · `--page-pad-y-compact` · `--page-pad-y-spacious` · `--page-stack-md` · `--radius-lg` · `--radius-xl` · `--radius-xxl`
 
 From `design-system/src/patterns/Page/Page.scss`. Override these through the token layer, never with a literal.
 

@@ -73,7 +73,7 @@
 .highcharts-tooltip-container {
     z-index: var(--layer-popup);
     background: var(--ds-surface-overlay);
-    border-radius: var(--popover-radius);
+    border-radius: var(--popup-radius);
     box-shadow: var(--ds-shadow-overlay);
     padding: var(--popover-pad);
 }

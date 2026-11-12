@@ -225,7 +225,7 @@ export const ModeCompare = ({ children, initial = 'both' }) => {
                         style={{
                             height: 'var(--item-height-md)',
                             padding: '0 var(--pad-x-md)',
-                            borderRadius: 'var(--radius-h32)',
+                            borderRadius: 'var(--radius-control-md)',
                             border: 'var(--border-default) solid var(--ds-border)',
                             background: mode === m.id ? 'var(--ds-background-selected)' : 'var(--ds-background-neutral-subtle)',
                             color: mode === m.id ? 'var(--ds-text-selected)' : 'var(--ds-text-subtle)',
