@@ -169,7 +169,7 @@ const SortRow = ({ x, y, w, i }) => (
 const reorder = scene({
   id: 'reorder-sort',
   title: 'The same rows, a new order',
-  caption: 'Each row moves straight to its new place on spatial.default, 20 ms apart. In a grid it moves x then y. Dragging is covered by the drag ticket.',
+  caption: 'Each row moves straight to its new place on spatial.default, 20 ms apart. In a grid it moves x then y.',
   initial: { r0: 0, r1: 0, r2: 0 },
   landing: { r0: 1, r1: 1, r2: 1 },
   arrows: [[[100, 55], [100, 69]], [[146, 83], [146, 55]]],
