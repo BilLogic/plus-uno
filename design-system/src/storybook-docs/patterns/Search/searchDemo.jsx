@@ -17,8 +17,9 @@ import { BarEnd, STUDENTS, row } from '@/storybook-docs/lib/view-bar.jsx';
 /** The width a Search picture lays out at, in px: docs geometry. */
 export const STAGE = 1024; // docs-literal
 
-/** How wide the open field draws, in docs geometry; no token holds a field width. */
-const SEARCH_FIELD_WIDTH = '20rem'; // docs-literal
+/** How wide the open field draws, in docs geometry. */
+// docs-literal: no token holds a field width.
+const SEARCH_FIELD_WIDTH = '20rem';
 
 export const SCOPE = 'Search students';
 

@@ -18,7 +18,7 @@ Grow, narrow, Esc, Esc. Press the icon and type: the count updates as you go. Es
 
 ## Usage
 
-Use Search when a person is looking for rows by what they are called, inside the Section they are looking at. Search narrows as you type; it is not a filter, so it keeps its own icon before the filters and never shares a count with them. Server-backed lists narrow the same way through Popup select's `loadOptions`, 50 at a time.
+Use Search when a person is looking for rows by what they are called, inside the Section they are looking at. Search narrows as you type; it is not a filter, so it keeps its own icon before the filters and never shares a count with them. Server-backed lists narrow the same way through the Select's `loadOptions`, 50 at a time.
 
 | Key or action | With text | Empty |
 | --- | --- | --- |
