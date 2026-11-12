@@ -45,7 +45,7 @@ Backdrop reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-appearance-default` | The Blanket dims on the same fade as the layer it sits under. |
+| enter | Open and close an overlay | `--ds-motion-appearance-default` | The Backdrop dims on the same fade as the layer it sits under. |
 | exit | Open and close an overlay | `--ds-motion-appearance-fast` | It fades with the layer; a docked Panel never has one. |
 
 ## Best practices

@@ -58,7 +58,7 @@ benchmark for every page, so a name that matches it needs no row.
 | Tag | Tag | Same name and role |
 | Tag group | Tag group | Same name and role |
 | Suggestion | none | Offers what the AI proposes, accepted or dismissed |
-| Drawer (pattern) | Drawer | Kept as a PLUS pattern; its docs say it is a PLUS addition |
+| Panel (floating) | Drawer | A floating Panel over the page with no Backdrop; PLUS has no Drawer |
 | `appearance` | `appearance` | Same prop; values carry meaning (`default`, `subtle`, `primary`) |
 | `spacing` | `spacing` | Density in words: `default`, `compact`, `spacious`; pixel values stay on `size` |
 

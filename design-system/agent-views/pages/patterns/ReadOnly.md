@@ -54,7 +54,7 @@ Use Read-only for a value someone could change but this person cannot right now:
 
 - Disabled: use for a prerequisite fixable on this screen.
 - Forms: use for the form the read-only field sits in.
-- Overflow: use for everything else that may clip; it lands as its own pattern page.
+- Overflow: use for everything else that may clip.
 - `TextField`, `TextArea`, `Select`, `DatePicker`, `TimePicker`, `Checkbox`, `RadioGroup`, `Toggle`: the components with `isReadOnly`.
 
 ## Best practices

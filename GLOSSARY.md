@@ -152,10 +152,6 @@ _Avoid_: "overlay" for the pattern (the word is a **Panel** and **Sidebar** stat
 The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time. `Modal` is the component; `PatternModal` draws its shell inline.
 _Avoid_: "Modal dialog", "ModalDialog", "popup" for a blocking dialog
 
-**Popover**:
-The pattern for any layer that floats above the page with no **Backdrop**: **Dropdown menu**, **Popup**, Flag and Tooltip. It names the pattern only.
-_Avoid_: "popover" for the **Popup** component, "floating layer", "popover family"
-
 **Part**:
 A `_`-prefixed piece only its parent uses, such as `_Section header` or `_Modal header`: it lives inside its parent and stays out of the public exports.
 _Avoid_: "sub-component" for a part, "element"
@@ -183,7 +179,7 @@ A table whose rows nest under parent rows.
 _Avoid_: "table tree", "nested table"
 
 **Popup**:
-A floating layer anchored to its trigger, closed by clicking outside: one member of the **Popover** pattern.
+A floating layer anchored to its trigger, closed by clicking outside: a menu, a select list, a filter menu or content, with no **Backdrop**.
 _Avoid_: "popover", "inline dialog"
 
 **Menu**:

@@ -395,9 +395,9 @@ Each overlay moves by its layer; the full enter and exit for each is in the comp
 <RefTable
     head={['Component', 'Enter', 'Exit']}
     rows={[
-        ['Modal', 'scales up from 96% and fades in; the Blanket dims', 'scales to 98% and fades'],
+        ['Modal', 'scales up from 96% and fades in; the Backdrop dims', 'scales to 98% and fades'],
         ['Popup, FilterMenu', 'clips open from the trigger\'s top-right corner along one axis', 'fades'],
-        ['Floating Panel', 'slides in from its edge over the page, with no Blanket', 'slides back to the same edge and stays there'],
+        ['Floating Panel', 'slides in from its edge over the page, with no Backdrop', 'slides back to the same edge and stays there'],
         ['Flag', 'slides in from the top-right corner', 'leaves the way it came, by the exit rules in Physics'],
         ['Tooltip', 'fades in after a short wait', 'fades out shortly after the pointer leaves'],
     ]}
@@ -446,7 +446,7 @@ A Modal opens only from something the person did, never by itself. Focus moves t
     ]}
 />
 
-A panel on the page's layer pushes and resizes the page; one above it slides over the page with no Blanket. Below the docking width the Panel slides over with a Blanket. A quick look promoted to its record page grows from the floating Panel itself instead of closing first.
+A panel on the page's layer pushes and resizes the page; one above it slides over the page with no Backdrop. Below the docking width the Panel slides over with a Backdrop. A quick look promoted to its record page grows from the floating Panel itself instead of closing first.
 
 <Canvas of={TransitionStories.DockAPanel} sourceState="none" />
 
