@@ -48,3 +48,14 @@ Each primitive takes a position, a size and an `accent` flag. The top drawing is
 </IllustrationFigure>
 
 </FoundationSection>
+
+<FoundationSection title="Contributing">
+
+Every docs drawing, static or animated, comes from this one kit. Template, pattern and motion pages all draw from it and add to it.
+
+- Check the primitives above first. Extend one before you add another, the same way components grow.
+- A new primitive takes `x`, `y`, `w`, `h` and `accent`, plus `label` where it has a real fidelity. It paints from `paint.js` only.
+- Give it a gallery entry, neutral above and accented below, and keep the kit story test passing.
+- Animated drawings move kit primitives on the spring tokens and settle to a still frame under reduced motion. The motion layer lives beside the primitives in this folder.
+
+</FoundationSection>
