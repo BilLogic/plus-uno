@@ -226,6 +226,27 @@ export const MOTION_REGISTRY = [
       status: { transition: 'Update a value or state', appearance: 'appearance.default', note: 'A status that changes fades to its new word and fill on appearance.default; nothing bounces.' },
       'count-first': { transition: 'Update a value or state', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A count rolls once on first view, downward, and then fades to later values on appearance.fast.' },
       progress: { transition: 'Update a value or state', spatial: 'linear', note: 'Progress fills on linear with the work, never ahead. Nothing bounces.' },
+    name: 'Notifications',
+    tier: 'pattern',
+    events: {
+      'flag-enter': { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'A Flag enters from the top right.' },
+      'flag-timeout': { transition: 'Open and close an overlay', spatial: 'spatial.exit', note: 'A Flag that times out exits the way it came.' },
+      'flag-dismiss': { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'A Flag closed by hand does a quick fade in place.' },
+      stack: { transition: 'Add or remove an item', spatial: 'spatial.default', note: 'The stack closes up when a Flag leaves.' },
+      message: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A SectionMessage or InlineMessage makes room on spatial.fast, then fades in; it reverses on exit.' },
+      banner: { transition: 'Add or remove an item', spatial: 'spatial.default', appearance: 'appearance.fast', note: 'A Banner pushes the page down on spatial.default, then fades in.' },
+    },
+  },
+  {
+    name: 'Navigation',
+    tier: 'pattern',
+    events: {
+      area: { transition: 'Go to another area', spatial: 'spatial.fast', appearance: 'appearance.default', note: 'The Sidebar highlight glides on spatial.fast; the page fades through on appearance.default.' },
+      'open-item': { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Opening a record adds an open item to the Sidebar; closing one removes it. Picking one is Go to another area.' },
+      view: { transition: 'Switch views', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Only the selected indicator glides; the content swaps in place.' },
+      swap: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'Filters swap the content in place.' },
+      drill: { transition: 'Drill into and climb back out', spatial: 'spatial.default', note: 'Drilling into a record moves on spatial.default.' },
+      climb: { transition: 'Drill into and climb back out', spatial: 'spatial.fast', note: 'Climbing out moves on spatial.fast. The Breadcrumb never animates on its own.' },
     },
   },
   {
