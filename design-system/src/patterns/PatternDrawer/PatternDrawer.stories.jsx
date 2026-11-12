@@ -56,7 +56,7 @@ const Inline = (props) => (
 const dialogs = (canvasElement) => within(canvasElement).getAllByRole('dialog');
 
 export default {
-    title: 'Patterns/Overlays/Drawer',
+    title: 'Templates/Overlays/Panel',
     component: PatternDrawer,
     tags: ['!dev', '!autodocs'],
     argTypes: {

@@ -86,7 +86,7 @@ const AppPage = ({ children, ...frameProps }) => (
 );
 
 export default {
-    title: 'Patterns/Templates',
+    title: 'Templates/Page templates',
     tags: ['!dev', '!autodocs'],
     parameters: { layout: 'fullscreen' },
     // The preview's `^on[A-Z]` actions rule skips an arg that is already a key, so naming

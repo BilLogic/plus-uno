@@ -81,16 +81,36 @@ A Zoom sub-room for one-on-one tutoring.
 ### Design system: structure
 
 **Pattern**:
-A reusable layout of components with named slots, which the patterns overview in Storybook lists. A component is one control in a **Category**; a pattern arranges components.
-_Avoid_: "layout component"
+Code-free guidance for a situation, shown on annotated **Template**s used as they are or tweaked: when to use a choice, which choice fits, and the words. A pattern holds a rule that applies across two or more templates and has no anatomy and no code. A **Component** is one piece with props; a **Template** arranges components; a pattern guides.
+_Avoid_: "layout component", "practice"
 
 **Template**:
-The page every screen starts from, and the container the app is dropped into: the browser window with the **Frame** inside it, its content already filled (blank, dashboard or reading; default or focused). The browser belongs to the Template.
-_Avoid_: "page template" for the Frame alone, "browser frame" as a pattern
+An arrangement of components with named **Slot**s, holding its key scenarios and key states and linking to each component for the rest: **Frame**, **Page**, **Section**, Form, Modal, Panel and Popup. The tie-break: behavior splits out into a component, and a template that only redraws one component stays a component. How pieces sit in one template goes on that template's page; a rule that holds across two or more templates is a **Pattern**.
+_Avoid_: "container", "starter", "page template" for the **Frame** alone
 
 **Frame**:
-The pattern for the app's outer shell: the **Sidebar** and **Panel** that stay put while the **Page** inside changes. The **Template** adds the browser around it. "App shell" is an informal alias for talk; code and docs say Frame.
+The template for the app's outer shell: the **Sidebar** and **Panel** that stay put while the **Page** inside changes. Frame has three types: **Frame default**, **Frame focused** and **Frame bare**. The browser window is drawn around it in examples only. "App shell" is an informal alias for talk; code and docs say Frame.
 _Avoid_: "surface container", bare "shell"
+
+**Frame default**:
+The **Frame** type for pages people move among: the **Sidebar**, the **Page** and the slot for the AI **Panel**.
+_Avoid_: "main frame"
+
+**Frame focused**:
+The **Frame** type for one task: no **Sidebar**, a Close button at the start of the title row, steps down a left **Section** side when there are five or more and across the top when there are four or fewer, and a bottom bar with Cancel on the left and Back and Next on the right.
+_Avoid_: "wizard page", "full-screen modal"
+
+**Frame bare**:
+The **Frame** type with no **Sidebar** and one centered column, such as sign-in.
+_Avoid_: "blank frame"
+
+**Screen**:
+A **Frame** with its **Slot**s filled for one page. The empty Frame is the **Template**; a filled Frame is a Screen. Screens are documented under Flows in Figma, and stay apart from the templates.
+_Avoid_: "page" for the whole filled Frame, "mockup"
+
+**Flow**:
+A sequence of **Screen**s that fulfills one user story. Flows are documented under Flows in Figma, and stay apart from the templates.
+_Avoid_: "journey" for a Flow (the blueprint's journey is a different thing), "wizard"
 
 **Sidebar**:
 The full-height area at the left of the **Frame**, holding navigation. From 1024 it is **docked**; below it is collapsed, where a hover **peek**s it and the toggle opens it as an **overlay**. A peek and an overlay look the same; they differ in how they open and close.
@@ -113,11 +133,11 @@ The draggable edge of the docked **Panel**, a vertical separator that resizes it
 _Avoid_: "resize handle", "drag bar"
 
 **Page**:
-The pattern for the main content area inside a **Frame**: it carries the page title and a body.
+The template for the main content area inside a **Frame**: it carries the page title and a body.
 _Avoid_: "surface" as a name
 
 **Section**:
-The pattern for a span of the page grid that groups content, including **Card**s, under one heading with a `_Section header`. It can carry an optional `detail` region on its right that shows one record of its content: the body takes 7 of the **Page**'s 12 columns and the detail, a Section with a subtle fill, takes 5; the split holds from 960 and below that the detail replaces the list under a back link. A bare "Section" always means this pattern.
+The template for a span of the page grid that groups content, including **Card**s, under one heading with a `_Section header`. It can carry an optional `detail` region on its right that shows one record of its content: the body takes 7 of the **Page**'s 12 columns and the detail, a Section with a subtle fill, takes 5; the split holds from 960 and below that the detail replaces the list under a back link. A bare "Section" always means this template.
 _Avoid_: "block" as a name, "region" as a name; "section" for a **Figma section** or a **Menu section**
 
 **Card**:

@@ -25,7 +25,7 @@ const footer = (primary) => (
  * Patterns group draws them inline, at a stand-in screen.
  */
 export default {
-    title: 'Patterns/Overlays/Blanket',
+    title: 'Templates/Overlays/Blanket',
     component: Blanket,
     tags: ['!dev', '!autodocs'],
     argTypes: {

@@ -91,10 +91,10 @@ Pair a control with the field it controls, and group the fields that describe on
 
 ## Related
 
-- [Blanket](?path=/docs/patterns-overlays-blanket--docs) places the Modal and carries the dimmed ground, the pads and the screen grid.
-- [Drawer](?path=/docs/patterns-overlays-drawer--docs) takes the same width steps at a screen edge, for a task that needs the page in view.
-- [Popups](?path=/docs/patterns-popups--docs) holds the floating layers that never block the page, such as a Tooltip for one line of help.
-- [Section](?path=/docs/patterns-section-section--docs) and [Card](?path=/docs/patterns-section-card--docs) hold content that belongs on the page itself.
+- [Blanket](?path=/docs/templates-overlays-blanket--docs) places the Modal and carries the dimmed ground, the pads and the screen grid.
+- [Drawer](?path=/docs/templates-overlays-panel--docs) takes the same width steps at a screen edge, for a task that needs the page in view.
+- [Popups](?path=/docs/templates-popup--docs) holds the floating layers that never block the page, such as a Tooltip for one line of help.
+- [Section](?path=/docs/templates-section-section--docs) and [Card](?path=/docs/templates-section-card--docs) hold content that belongs on the page itself.
 
 Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
