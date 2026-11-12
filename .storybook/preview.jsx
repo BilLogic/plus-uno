@@ -189,9 +189,10 @@ const preview = {
             "Border",
             "Radius"
           ],
-          "Patterns",
+          "Templates",
           [
-            "Templates",
+            "Templates and patterns",
+            "Overview",
             "Frame",
             "Page",
             [
@@ -204,13 +205,23 @@ const preview = {
               "Card",
               "Table"
             ],
-            "Overlays",
+            "Modal",
             [
-              "Blanket",
               "Modal",
-              "Drawer"
+              "Backdrop"
             ],
-            "Popups"
+            "Panel",
+            [
+              "Panel"
+            ],
+            "Popup",
+            [
+              "Popup"
+            ]
+          ],
+          "Patterns",
+          [
+            "Overview"
           ],
           "Components",
           [

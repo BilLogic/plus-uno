@@ -86,11 +86,11 @@ The examples on this page follow the **Color mode** switch in the toolbar.
 
 Each state below is drawn at a real screen width, with no browser around it, so the Frame decides what docks exactly as it does in the app.
 
-<ModeExample storyId="patterns-frame-frame--state-at-768" width={768} height={480} title="Medium, 768" description="The Sidebar is closed: under 1024 it never docks, and the toggle leads the header row." />
+<ModeExample storyId="templates-frame-frame--state-at-768" width={768} height={480} title="Medium, 768" description="The Sidebar is closed: under 1024 it never docks, and the toggle leads the header row." />
 
-<ModeExample storyId="patterns-frame-frame--state-at-1024" width={1024} height={480} title="Large, 1024" description="The Sidebar docks, 240 wide." />
+<ModeExample storyId="templates-frame-frame--state-at-1024" width={1024} height={480} title="Large, 1024" description="The Sidebar docks, 240 wide." />
 
-<ModeExample storyId="patterns-frame-frame--state-at-1440" width={1440} height={560} title="X-Large, 1440" description="The Sidebar docks, and the Page pad is 24 as at every width." />
+<ModeExample storyId="templates-frame-frame--state-at-1440" width={1440} height={560} title="X-Large, 1440" description="The Sidebar docks, and the Page pad is 24 as at every width." />
 
 </div>
 
@@ -98,13 +98,13 @@ Each state below is drawn at a real screen width, with no browser around it, so 
 
 ## Sidebar
 
-<ModeExample storyId="patterns-frame-frame--state-sidebar-docked" width={1440} height={480} title="Docked" description="In flow beside the Page from 1024, meeting it at the Sidebar's 1px edge." />
+<ModeExample storyId="templates-frame-frame--state-sidebar-docked" width={1440} height={480} title="Docked" description="In flow beside the Page from 1024, meeting it at the Sidebar's 1px edge." />
 
-<ModeExample storyId="patterns-frame-frame--state-sidebar-closed" width={1440} height={480} title="Closed" description={<>Closed by the toggle, Ctrl+[ or <code>sidebarDocked={'{false}'}</code>: no rail, and the toggle at the Page's top left.</>} />
+<ModeExample storyId="templates-frame-frame--state-sidebar-closed" width={1440} height={480} title="Closed" description={<>Closed by the toggle, Ctrl+[ or <code>sidebarDocked={'{false}'}</code>: no rail, and the toggle at the Page's top left.</>} />
 
-<ModeExample storyId="patterns-frame-frame--state-sidebar-peek" width={1440} height={480} title="Peek" description="Hovering the left edge floats a closed Sidebar over the Page with the overlay shadow and no Blanket; the Page does not move." />
+<ModeExample storyId="templates-frame-frame--state-sidebar-peek" width={1440} height={480} title="Peek" description="Hovering the left edge floats a closed Sidebar over the Page with the overlay shadow and no Blanket; the Page does not move." />
 
-<ModeExample storyId="patterns-frame-frame--state-sidebar-floating" width={768} height={480} title="Floating, under 1024" description="Opened by hand under 1024, the Sidebar floats over the Page; an outside press or Escape closes it." />
+<ModeExample storyId="templates-frame-frame--state-sidebar-floating" width={768} height={480} title="Floating, under 1024" description="Opened by hand under 1024, the Sidebar floats over the Page; an outside press or Escape closes it." />
 
 </div>
 
@@ -112,19 +112,19 @@ Each state below is drawn at a real screen width, with no browser around it, so 
 
 ## Panel
 
-<ModeExample storyId="patterns-frame-frame--state-sidebar-docked" width={1440} height={480} title="None" description={<>Closed, or no <code>panel</code> passed: the Page takes the room.</>} />
+<ModeExample storyId="templates-frame-frame--state-sidebar-docked" width={1440} height={480} title="None" description={<>Closed, or no <code>panel</code> passed: the Page takes the room.</>} />
 
-<ModeExample storyId="patterns-frame-frame--state-panel-docked" width={1440} height={480} title="Docked" description="Beside the Page at a hairline, with the splitter on its edge." />
+<ModeExample storyId="templates-frame-frame--state-panel-docked" width={1440} height={480} title="Docked" description="Beside the Page at a hairline, with the splitter on its edge." />
 
-<ModeExample storyId="patterns-frame-frame--state-panel-peek" width={1440} height={480} title="Peek" description={<>With <code>panelPeek</code>, hovering the right edge floats a closed Panel over the Page, with no Blanket.</>} />
+<ModeExample storyId="templates-frame-frame--state-panel-peek" width={1440} height={480} title="Peek" description={<>With <code>panelPeek</code>, hovering the right edge floats a closed Panel over the Page, with no Blanket.</>} />
 
-<ModeExample storyId="patterns-frame-frame--state-panel-overlay" width={768} height={480} title="Overlay, under 1024" description="Over the Page on a Blanket, capped at 320." />
+<ModeExample storyId="templates-frame-frame--state-panel-overlay" width={768} height={480} title="Overlay, under 1024" description="Over the Page on a Blanket, capped at 320." />
 
-<ModeExample storyId="patterns-frame-frame--state-panel-full-width" width={600} height={480} title="Full width, under 768" description="The overlay Panel takes the whole Frame." />
+<ModeExample storyId="templates-frame-frame--state-panel-full-width" width={600} height={480} title="Full width, under 768" description="The overlay Panel takes the whole Frame." />
 
-<ModeExample storyId="patterns-frame-frame--state-panel-narrowest" width={1440} height={480} title="Resized, 320" description="The splitter's narrowest width, beside a docked Sidebar." />
+<ModeExample storyId="templates-frame-frame--state-panel-narrowest" width={1440} height={480} title="Resized, 320" description="The splitter's narrowest width, beside a docked Sidebar." />
 
-<ModeExample storyId="patterns-frame-frame--state-panel-widest" width={1440} height={480} title="Resized, 640" description="The splitter's widest width, never past what keeps 720 of content beside a docked Sidebar." />
+<ModeExample storyId="templates-frame-frame--state-panel-widest" width={1440} height={480} title="Resized, 640" description="The splitter's widest width, never past what keeps 720 of content beside a docked Sidebar." />
 
 </div>
 
@@ -132,11 +132,11 @@ Each state below is drawn at a real screen width, with no browser around it, so 
 
 ## Sidebar and Panel
 
-<ModeExample storyId="patterns-frame-frame--state-sidebar-and-panel" width={1440} height={480} title="Both docked, 1440" description="The Sidebar, a 400 Panel and 720 of content fit, so both dock." />
+<ModeExample storyId="templates-frame-frame--state-sidebar-and-panel" width={1440} height={480} title="Both docked, 1440" description="The Sidebar, a 400 Panel and 720 of content fit, so both dock." />
 
-<ModeExample storyId="patterns-frame-frame--state-panel-collapses-sidebar" width={1200} height={480} title="Panel collapses the Sidebar, 1200" description="Both would leave under 720, so the Sidebar left open by default collapses, and comes back when the Panel closes." />
+<ModeExample storyId="templates-frame-frame--state-panel-collapses-sidebar" width={1200} height={480} title="Panel collapses the Sidebar, 1200" description="Both would leave under 720, so the Sidebar left open by default collapses, and comes back when the Panel closes." />
 
-<ModeExample storyId="patterns-frame-frame--state-panel-on-blanket" width={1100} height={480} title="Panel on a Blanket, 1100" description="Even the Panel alone leaves under 720, so it opens over the Page and the Sidebar on a Blanket." />
+<ModeExample storyId="templates-frame-frame--state-panel-on-blanket" width={1100} height={480} title="Panel on a Blanket, 1100" description="Even the Panel alone leaves under 720, so it opens over the Page and the Sidebar on a Blanket." />
 
 </div>
 
@@ -144,11 +144,11 @@ Each state below is drawn at a real screen width, with no browser around it, so 
 
 ## Overlays
 
-<ModeExample storyId="patterns-frame-frame--state-with-modal" width={1440} height={560} title="Modal" description="A modal leaves a docked Sidebar and the Panel where they are, under its Blanket." />
+<ModeExample storyId="templates-frame-frame--state-with-modal" width={1440} height={560} title="Modal" description="A modal leaves a docked Sidebar and the Panel where they are, under its Blanket." />
 
-<ModeExample storyId="patterns-frame-frame--state-modal-closes-floating" width={768} height={560} title="Modal, under 1024" description="A modal closes a floating Sidebar, and while it is open the Sidebar does not peek." />
+<ModeExample storyId="templates-frame-frame--state-modal-closes-floating" width={768} height={560} title="Modal, under 1024" description="A modal closes a floating Sidebar, and while it is open the Sidebar does not peek." />
 
-<ModeExample storyId="patterns-frame-frame--state-with-drawer" width={1024} height={560} title="Drawer" description="A drawer does the same as a modal: it closes a floating Sidebar and blocks the peek." />
+<ModeExample storyId="templates-frame-frame--state-with-drawer" width={1024} height={560} title="Drawer" description="A drawer does the same as a modal: it closes a floating Sidebar and blocks the peek." />
 
 </div>
 
@@ -163,7 +163,7 @@ Each state below is drawn at a real screen width, with no browser around it, so 
             Use the table below to change props. The preview is rendered{' '}
             <strong>inline</strong> while you scroll the docs page. The
             Frame is the app alone, with no browser around it: the{' '}
-            <a href="?path=/docs/patterns-templates--docs">Template</a> adds the browser window.
+            <a href="?path=/docs/templates-overview--docs">Template</a> adds the browser window.
         </>
     }
 />
@@ -349,10 +349,10 @@ The header row is the breadcrumb. A page's title belongs to its content, in a Se
 
 ## Related
 
-- <a href="?path=/docs/patterns-page-page--docs">Page</a> for the bare fill-and-elevation primitive the content box is built on.
+- <a href="?path=/docs/templates-page-page--docs">Page</a> for the bare fill-and-elevation primitive the content box is built on.
 - <a href="?path=/docs/components-navigation-navigation-system--docs">Sidebar</a> for the part the frame places beside the Page.
-- <a href="?path=/docs/patterns-section-section--docs">Section</a> for a region inside the content.
-- <a href="?path=/docs/patterns-templates--docs">Templates</a> for a whole page, Frame with its content slot filled, and the focused frame for one task.
+- <a href="?path=/docs/templates-section-section--docs">Section</a> for a region inside the content.
+- <a href="?path=/docs/templates-overview--docs">Templates</a> for a whole page, Frame with its content slot filled, and the focused frame for one task.
 - <a href="?path=/docs/foundations-grid--docs">Grid</a> for the column math the frame is sized by.
 
 </div>

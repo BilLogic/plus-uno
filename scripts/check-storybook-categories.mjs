@@ -25,13 +25,20 @@
  *      not "Text Field". An all-caps acronym (AI, API) is allowed.
  *   5. No tracked file names a retired folder path.
  *   6. The sidebar's roots lead with the benchmark site's sections plus our
- *      Patterns, in order: Get started, Foundations, Patterns, Components, AI UI.
- *      Patterns come before Components because a page is composed from them
- *      first. Our own extra (Data visualizations) follows.
+ *      Templates and Patterns, in order: Get started, Foundations, Templates,
+ *      Patterns, Components, AI UI. Templates and Patterns come before
+ *      Components because a page is composed from them first, Templates before
+ *      the guidance that points at them. Our own extra (Data visualizations)
+ *      follows.
  *   7. Every docs page and story file under `design-system/src/` is titled
  *      under a root the sidebar sort lists, so a page left under a retired
  *      root (`Getting started/…`, `Foundations/Patterns/…`) cannot open a
  *      stray top-level entry of its own.
+ *   8. A page lives under the root its source folder belongs to. The taxonomy's
+ *      `rootSources` lists the source folders (or file prefixes) of each of
+ *      Templates and Patterns: a page titled under one of those roots sits in
+ *      one of that root's sources, and a page in one of a root's sources is
+ *      titled under that root.
  *
  * An AI component (Icon, Prompt input) is listed in the taxonomy's
  * `aiComponents` and titled `AI UI/Components/<name>`, while its folder stays
@@ -84,8 +91,8 @@ export const ATLASSIAN_CATEGORIES = [
 export const AI_ROOT = 'AI UI';
 export const AI_COMPONENTS = 'Components';
 
-/** The sidebar's leading sections, in order: the benchmark site's, with our Patterns before Components. */
-export const SITE_SECTIONS = ['Get started', 'Foundations', 'Patterns', 'Components', 'AI UI'];
+/** The sidebar's leading sections, in order: the benchmark site's, with our Templates and Patterns before Components. */
+export const SITE_SECTIONS = ['Get started', 'Foundations', 'Templates', 'Patterns', 'Components', 'AI UI'];
 
 /**
  * Folders that held components before the move, as the repo path or the `@/`
@@ -243,6 +250,27 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
       found.push(
         `${rel}  is titled "${title}", under "${root}", which the sidebar sort does not list.\n` +
           `      -> Retitle it under one of ${roots.join(' · ')}.`,
+      );
+    }
+  }
+
+  // (8) Templates and Patterns pages live in their own root's sources.
+  const sources = taxonomy.rootSources ?? {};
+  const rootOf = (rel) =>
+    Object.keys(sources).find((r) => (sources[r] ?? []).some((prefix) => rel.startsWith(prefix)));
+  for (const { rel, title } of pages) {
+    if (title === null) continue;
+    const root = title.split('/')[0];
+    const home = rootOf(rel);
+    if (home && root !== home) {
+      found.push(
+        `${rel}  is titled "${title}" but sits in the ${home} sources.\n` +
+          `      -> It belongs under "${home}": retitle it ${home}/…, or move the file out of ${home}'s source folder.`,
+      );
+    } else if (!home && root in sources) {
+      found.push(
+        `${rel}  is titled "${title}" but is not under a source folder listed for "${root}".\n` +
+          `      -> Move it into one of ${(sources[root] ?? []).join(', ')}, or list its folder in rootSources.`,
       );
     }
   }

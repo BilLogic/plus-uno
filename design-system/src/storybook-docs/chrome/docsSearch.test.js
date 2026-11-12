@@ -7,7 +7,7 @@ const INDEX = {
         'components-forms-and-inputs-button-button--docs': { id: 'components-forms-and-inputs-button-button--docs', title: 'Forms and inputs/Button', name: 'Docs', type: 'docs' },
         'components-forms-and-inputs-button-button--overview': { id: 'components-forms-and-inputs-button-button--overview', title: 'Forms and inputs/Button', name: 'Overview', type: 'story' },
         'components-forms-and-inputs-checkbox--overview': { id: 'components-forms-and-inputs-checkbox--overview', title: 'Forms and inputs/Checkbox', name: 'Overview', type: 'story' },
-        'patterns-frame--docs': { id: 'patterns-frame--docs', title: 'Patterns/Frame', name: 'Docs', type: 'docs' },
+        'patterns-frame--docs': { id: 'patterns-frame--docs', title: 'Templates/Frame', name: 'Docs', type: 'docs' },
         'foundations-color--docs': { id: 'foundations-color--docs', title: 'Foundations/Color', name: 'Docs', type: 'docs' },
     },
 };

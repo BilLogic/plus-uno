@@ -13,11 +13,12 @@ const linkStyle = { font: 'var(--body-default)', color: 'var(--ds-link)', textDe
 
 /**
  * Kind label, title and one-line summary. The title is the page's one `h1`,
- * so a page does not also render `<Title />`.
+ * so a page does not also render `<Title />`. `kind` names the page's layer;
+ * it reads "Foundation" unless the page says otherwise.
  */
-export const FoundationHero = ({ title, summary }) => (
+export const FoundationHero = ({ title, summary, kind = 'Foundation' }) => (
     <header className="sb-docs-header">
-        <span style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' }}>Foundation</span>
+        <span style={{ font: 'var(--heading-xxsmall)', color: 'var(--ds-text-subtle)' }}>{kind}</span>
         <h1 style={{ margin: 0, font: 'var(--heading-xlarge)', color: 'var(--ds-text)' }}>{title}</h1>
         <div style={{ margin: 0, font: 'var(--body-large)', color: 'var(--ds-text-subtle)', maxWidth: '64ch' }}>{summary}</div>
     </header>

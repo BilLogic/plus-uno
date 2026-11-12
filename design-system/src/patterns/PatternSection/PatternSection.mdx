@@ -61,7 +61,7 @@ The examples on this page follow the toolbar's Color mode switch.
 
 <ComponentExample of={PatternSectionStories.Levels} title="Levels" description={<>A <code>level="page"</code> title, a section inside it and a subsection inside that: h1, h2 and h3, each one size smaller.</>} />
 
-<ModeExample storyId="patterns-section-section--detail" width={1440} height={640} title="Detail" description="A Compliance queue at 1440: the list at 7 columns beside the selected flag at 5." />
+<ModeExample storyId="templates-section-section--detail" width={1440} height={640} title="Detail" description="A Compliance queue at 1440: the list at 7 columns beside the selected flag at 5." />
 
 </div>
 
@@ -148,7 +148,7 @@ The type is read from the slots you fill: `header` makes it custom, `toolbar` ma
 
 Use `detail` for a queue a person works through, such as Admin › Compliance or Admin › Reflections. The detail is for a decision that takes a glance or a short form. Heavy work, such as the recording review, gets its own page: put "Open full review" in `detailFooter`.
 
-The section holds the split from 960 of its own width. Below that, the detail replaces the list and a back link returns to it; with no record open, the list fills the row. Inside a Frame, pass `sectionDetail` and the Frame keeps the split instead, as <a href="?path=/docs/patterns-frame-frame--docs">Frame</a> shows.
+The section holds the split from 960 of its own width. Below that, the detail replaces the list and a back link returns to it; with no record open, the list fills the row. Inside a Frame, pass `sectionDetail` and the Frame keeps the split instead, as <a href="?path=/docs/templates-frame-frame--docs">Frame</a> shows.
 
 The Page around a section supplies the pad; for a region with a fill of its own, use a Page or a Card.
 
@@ -291,10 +291,10 @@ Put Previous and Next in the detail header, and keep one detail per Section.
 
 ## Related
 
-- <a target="_top" href="./?path=/docs/patterns-section-card--docs">Card</a> for one object rather than a region.
-- <a target="_top" href="./?path=/docs/patterns-page-page--docs">Page</a> for a region that needs a fill or an edge. A section is transparent.
-- <a target="_top" href="./?path=/docs/patterns-section-table--docs">Table</a>: the section header above a table carries its toolbar and tabs.
-- <a target="_top" href="./?path=/docs/patterns-frame-frame--docs">Frame</a> sets the pad a section sits in; its `sectionDetail` prop keeps 960 of content for a detail.
+- <a target="_top" href="./?path=/docs/templates-section-card--docs">Card</a> for one object rather than a region.
+- <a target="_top" href="./?path=/docs/templates-page-page--docs">Page</a> for a region that needs a fill or an edge. A section is transparent.
+- <a target="_top" href="./?path=/docs/templates-section-table--docs">Table</a>: the section header above a table carries its toolbar and tabs.
+- <a target="_top" href="./?path=/docs/templates-frame-frame--docs">Frame</a> sets the pad a section sits in; its `sectionDetail` prop keeps 960 of content for a detail.
 
 </div>
 

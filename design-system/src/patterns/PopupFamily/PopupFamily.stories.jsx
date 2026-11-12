@@ -16,7 +16,7 @@ const POPUP_PLACEMENTS = ['top', 'bottom', 'left', 'right', 'bottom-start', 'bot
  * stories (`Components/Forms and inputs/Dropdown menu`).
  */
 export default {
-    title: 'Patterns/Popups',
+    title: 'Templates/Popup/Popup',
     tags: ['!dev', '!autodocs'],
     argTypes: {
         title: {

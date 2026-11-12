@@ -138,7 +138,7 @@ const QUEUE = { width: 720, height: 280 };
  */
 export const DetailBesideList = () => (
     <div inert aria-hidden="true" style={{ width: '100%' }}>
-        <ModeFrame storyId="patterns-section-section--detail" width={1440} height={640} title="A list beside its detail" />
+        <ModeFrame storyId="templates-section-section--detail" width={1440} height={640} title="A list beside its detail" />
     </div>
 );
 
