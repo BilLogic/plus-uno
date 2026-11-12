@@ -9136,6 +9136,178 @@
       ]
     },
     {
+      "name": "PopupSelect",
+      "kind": "component",
+      "import": "import { PopupSelect } from '@/components';",
+      "group": "forms-and-inputs",
+      "source": "design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.jsx",
+      "summary": "Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads \"Status: Upcoming\" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a section's view bar; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start`; one at the end opens `bottom-end` (the default). - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.",
+      "props": [
+        {
+          "name": "options",
+          "type": "arrayOf",
+          "required": false,
+          "default": "[]",
+          "values": null,
+          "description": "Strings, or objects with `value`, `label`, `description`, `disabled` and `group`, as Select takes.",
+          "deprecated": null
+        },
+        {
+          "name": "value",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The picked option's `value`. Leave it out to let the menu keep its own.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultValue",
+          "type": "string or number",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The value it starts with, when `value` is left out.",
+          "deprecated": null
+        },
+        {
+          "name": "onChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(value, option)`, called the moment a row is picked.",
+          "deprecated": null
+        },
+        {
+          "name": "label",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "What is being picked, such as \"Status\". Names the menu, and with no `trigger` it heads the labeled trigger: \"Status: Upcoming\".",
+          "deprecated": null
+        },
+        {
+          "name": "trigger",
+          "type": "node or func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A trigger of your own, or `({ isOpen, option }) => node`. Without it the labeled trigger is drawn.",
+          "deprecated": null
+        },
+        {
+          "name": "placement",
+          "type": "enum",
+          "required": false,
+          "default": "'bottom-end'",
+          "values": [
+            "bottom-start",
+            "bottom-end"
+          ],
+          "description": "`bottom-start` for a trigger at the start of a bar, `bottom-end` (default) for one at its end.",
+          "deprecated": null
+        },
+        {
+          "name": "isSearchable",
+          "type": "bool",
+          "required": false,
+          "default": "true",
+          "values": null,
+          "description": "A search field above the list. Turn it off for a short list.",
+          "deprecated": null
+        },
+        {
+          "name": "searchPlaceholder",
+          "type": "string",
+          "required": false,
+          "default": "'Search'",
+          "values": null,
+          "description": "The search field's placeholder.",
+          "deprecated": null
+        },
+        {
+          "name": "open",
+          "type": "bool",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "Whether the menu is open. Leave it out to let the trigger open and close it.",
+          "deprecated": null
+        },
+        {
+          "name": "defaultOpen",
+          "type": "bool",
+          "required": false,
+          "default": "false",
+          "values": null,
+          "description": "Opens the menu on first render, when `open` is left out.",
+          "deprecated": null
+        },
+        {
+          "name": "onOpenChange",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(open)`.",
+          "deprecated": null
+        },
+        {
+          "name": "spacing",
+          "type": "enum",
+          "required": false,
+          "default": "'default'",
+          "values": [
+            "default",
+            "compact"
+          ],
+          "description": "`default` draws 40 rows and a 32 trigger; `compact` draws 32 rows and a 24 trigger.",
+          "deprecated": null
+        },
+        {
+          "name": "emptyMessage",
+          "type": "node",
+          "required": false,
+          "default": "'No results'",
+          "values": null,
+          "description": "Shown when the search matches nothing.",
+          "deprecated": null
+        },
+        {
+          "name": "className",
+          "type": "string",
+          "required": false,
+          "default": "''",
+          "values": null,
+          "description": "Extra classes on the popup.",
+          "deprecated": null
+        },
+        {
+          "name": "id",
+          "type": "string",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The popup's id; the list's id is this plus `-listbox`.",
+          "deprecated": null
+        }
+      ],
+      "stories": [
+        "Overview",
+        "Keyboard",
+        "Placement",
+        "Searchable",
+        "Spacing",
+        "Interactive"
+      ],
+      "tokens": [
+        "--popover-max-height-menu",
+        "--popover-pad-menu"
+      ]
+    },
+    {
       "name": "ProgressBar",
       "kind": "component",
       "import": "import { ProgressBar } from '@/components';",

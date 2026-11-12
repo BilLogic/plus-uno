@@ -2,7 +2,7 @@
 
 # Forms and inputs
 
-33 components. Each row links to the generated facts; the three columns after it are the
+34 components. Each row links to the generated facts; the three columns after it are the
 authored half, counted rather than assumed.
 
 | Component | Props | When to use | Correct/incorrect | Accessibility |
@@ -25,6 +25,7 @@ authored half, counted rather than assumed.
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
 | [LinkButton](LinkButton/index.md) | 13 | ✅ | ✅ | ✅ |
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✅ | ✅ | ✅ |
+| [PopupSelect](PopupSelect/index.md) | 16 | ✅ | ✕ | ✅ |
 | [PromptInput](PromptInput/index.md) | 16 | ✅ | ✅ | ✅ |
 | [Radio](Radio/index.md) | 20 | ✅ | ✅ | ✅ |
 | [RadioGroup](RadioGroup/index.md) | 19 | ✅ | ✅ | ✅ |
@@ -41,7 +42,7 @@ authored half, counted rather than assumed.
 | [TreeSelect](TreeSelect/index.md) | 17 | ✅ | ✅ | ✅ |
 | [VerticalButton](VerticalButton/index.md) | 8 | ✅ | ✅ | ✅ |
 
-**Authored coverage:** When to use 32/33 (97%) · Correct/incorrect 32/33 (97%) · Accessibility 32/33 (97%)
+**Authored coverage:** When to use 33/34 (97%) · Correct/incorrect 32/34 (94%) · Accessibility 33/34 (97%)
 
 ✕ means the section is not written. It is omitted from the component page
 rather than stubbed — a missing section says nothing, and a stub says

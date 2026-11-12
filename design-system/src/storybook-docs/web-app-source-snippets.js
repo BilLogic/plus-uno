@@ -56,6 +56,15 @@ export const webAppSourceSnippets = {
         '  trailingMetric={2}',
         '/>'
     ]),
+    popupSelect: snippet([
+        '<PopupSelect',
+        '  label="Status"',
+        '  options={["Upcoming", "Completed", "Canceled"]}',
+        '  value={status}',
+        '  onChange={setStatus}',
+        '  isSearchable={false}',
+        '/>'
+    ]),
     verticalButton: snippet([
         '<VerticalButton',
         '  icon="user-gear"',

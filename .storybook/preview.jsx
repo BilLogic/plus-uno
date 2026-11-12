@@ -241,6 +241,7 @@ const preview = {
               "Fieldset",
               "File upload",
               "Form",
+              "Popup select",
               "Radio",
               [
                 "Radio",

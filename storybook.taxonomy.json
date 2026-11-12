@@ -31,6 +31,7 @@
       "Fieldset",
       "File upload",
       "Form",
+      "Popup select",
       "Radio",
       "Radio group",
       "Choice grid",
@@ -213,6 +214,7 @@
         "Fieldset",
         "File upload",
         "Form",
+        "Popup select",
         "Radio",
         [
           "Radio",
