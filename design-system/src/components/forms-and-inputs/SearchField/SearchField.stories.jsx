@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import SearchField from './SearchField';
+import Button from '../Button/Button';
 
 const stack = { display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-start' };
 const SCOPES = [
@@ -131,7 +132,7 @@ export const Collapsible = {
     render: () => (
         <div style={stack}>
             <SearchField placeholder="Search students" isCollapsible />
-            <button type="button">After</button>
+            <Button>After</Button>
         </div>
     ),
     play: async ({ canvasElement }) => {
