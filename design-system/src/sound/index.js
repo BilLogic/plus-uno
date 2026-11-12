@@ -1,4 +1,4 @@
-// Sound (ADR-042): synthesized in the browser from the sound plan, one on/off
+// Sound (ADR-043): synthesized in the browser from the sound plan, one on/off
 // setting, started against its motion's land time.
 import { SOUND_SPEC } from './spec.generated';
 
