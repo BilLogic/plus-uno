@@ -101,6 +101,7 @@ export const Overview = {
         await expect(style.rowGap, 'Modal/stack-md').toBe(`${tokenLength(canvasElement, '--modal-stack-md')}px`);
         await expect(style.borderTopLeftRadius, 'Modal/radius').toBe(`${tokenLength(canvasElement, '--modal-radius')}px`);
         await expect(style.borderTopLeftRadius, 'Modal radius is 16').toBe('16px');
+        await expect(getComputedStyle(modal.querySelector('.plus-pattern-modal-footer')).borderBottomLeftRadius, 'footer inner corners are square').toBe('0px');
         const overlayStyle = getComputedStyle(overlay);
         await expect(overlayStyle.paddingLeft, 'Overlay/pad-x').toBe(`${tokenLength(canvasElement, '--blanket-pad-x')}px`);
         await expect(overlayStyle.paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--blanket-pad-y')}px`);

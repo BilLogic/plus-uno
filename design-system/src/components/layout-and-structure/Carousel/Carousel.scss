@@ -34,7 +34,7 @@
 
     position: relative;
     width: 100%;
-    border-radius: var(--card-radius);
+    border-radius: var(--radius-xxl);
 
     @include plus-state(());
 }
@@ -122,7 +122,7 @@
     position: relative;
     height: 100%;
     overflow: hidden;
-    border-radius: var(--card-radius);
+    border-radius: var(--radius-xxl);
     background-color: var(--ds-surface-raised);
     box-shadow: var(--ds-shadow-raised);
     color: var(--ds-text);

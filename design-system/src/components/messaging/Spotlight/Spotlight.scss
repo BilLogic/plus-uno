@@ -5,7 +5,7 @@
     max-width: calc(100vw - var(--space-100) * 2);
     background: var(--ds-background-brand-bold);
     color: var(--ds-text-inverse);
-    border-radius: var(--radius-100);
+    border-radius: var(--radius-xl);
     padding: var(--space-150);
     box-shadow: var(--ds-shadow-overlay);
 }
@@ -42,7 +42,7 @@
     width: 100%;
     height: var(--spotlight-media-height);
     margin: var(--space-100) auto;
-    border-radius: var(--radius-050);
+    border-radius: var(--radius-lg);
     overflow: hidden;
 
     img {
@@ -78,7 +78,7 @@
 }
 
 .plus-spotlight-action {
-    border-radius: var(--radius-050);
+    border-radius: var(--radius-lg);
     padding: var(--space-050) var(--space-100);
     font: var(--body-default);
     cursor: pointer;

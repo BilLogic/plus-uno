@@ -569,3 +569,8 @@ export const Focused = {
         await expectFocusRing(canvasElement, await closeOf(canvasElement), 'modal close');
     },
 };
+
+HeaderOptions.play = async ({ canvasElement }) => {
+    await expect(getComputedStyle(canvasElement.querySelector('.plus-modal')).borderTopLeftRadius, 'Modal radius is 16').toBe('16px');
+    await expect(getComputedStyle(canvasElement.querySelector('.plus-modal-footer')).borderBottomLeftRadius, 'footer inner corners are square').toBe('0px');
+};

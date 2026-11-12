@@ -4,7 +4,7 @@
  * Import via main.scss so any app using the design system gets correct modal appearance.
  *
  * Matches the Figma pattern Modal and its Overlay: pad Modal/pad 16, stack
- * Modal/stack-md 16, radius Modal/radius 12, centered in an overlay that pads
+ * Modal/stack-md 16, radius Modal/radius 16, centered in an overlay that pads
  * Overlay/pad-x 16 at the sides and Overlay/pad-y 64 above and below.
  */
 @use '../../../styles/screen-grid' as *;
@@ -143,6 +143,7 @@
     justify-content: flex-end;
     align-items: center;
     gap: var(--modal-inline-sm);
+    border-radius: 0; // full bleed: the Modal's own radius clips the outer corners
 }
 
 .plus-modal-button-row {

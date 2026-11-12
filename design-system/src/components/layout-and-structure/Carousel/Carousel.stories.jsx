@@ -413,3 +413,8 @@ export const DotTargets = {
         }
     },
 };
+
+const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
+Static.play = async ({ canvasElement }) => {
+    await expect(radiusOf(canvasElement, '.plus-carousel'), 'Carousel radius is 16').toBe('16px');
+};

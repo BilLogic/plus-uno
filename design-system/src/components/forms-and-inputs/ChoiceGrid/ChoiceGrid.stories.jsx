@@ -418,3 +418,8 @@ export const Disabled = {
         await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
     },
 };
+
+const radiusOf = (root, selector) => getComputedStyle(root.querySelector(selector)).borderTopLeftRadius;
+Overview.play = async ({ canvasElement }) => {
+    await expect(radiusOf(canvasElement, '.plus-choice-grid-table'), 'Choice grid radius is 12').toBe('12px');
+};

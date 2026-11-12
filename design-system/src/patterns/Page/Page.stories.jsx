@@ -190,6 +190,7 @@ export const MediumPad = {
         for (const side of ['Top', 'Right', 'Bottom', 'Left']) {
             await expect(px(style[`padding${side}`]), `pad ${side.toLowerCase()}`).toBe(pad);
         }
+        await expect(style.borderTopLeftRadius, 'Page is flush in the Frame: radius 0').toBe('0px');
     },
 };
 
