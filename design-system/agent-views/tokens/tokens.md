@@ -52,7 +52,7 @@ Start here for space, size and radius (ADR-038). A component reads its component
 ```
 
 ## Ladder Patterns
-Space owned by a pattern: page, section, card, table, modal, drawer, popover. Inside a pattern, read its token before a semantics step.
+Space owned by a pattern: page, section, card, table, modal, popover. Inside a pattern, read its token before a semantics step.
 
 ```css
 --blanket-fill  /* Fill of the Blanket that dims the page behind a Modal. */

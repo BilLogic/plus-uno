@@ -208,8 +208,7 @@ function generateFrameLayersSCSS() {
     for (const { file } of SCALE_COLLECTIONS) {
         for (const v of readSource(file).json.variables) scaleName[v.id] = webName(v.codeSyntax?.WEB);
     }
-    // A frame or layer token may also alias another one, as a pattern width
-    // may alias Modal/width-modal-*: it is written as a var() of that token, so it
+    // A frame or layer token may also alias another one, by name: it is written as a var() of that token, so it
     // follows the target at every mode.
     const frameLayerName = {};
     for (const { name: collection } of FRAME_LAYER_COLLECTIONS) {
