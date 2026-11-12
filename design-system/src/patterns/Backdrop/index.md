@@ -21,10 +21,9 @@ A Backdrop interrupts the page for one task. It dims everything behind it with o
 | Layer | When to use |
 | --- | --- |
 | Modal | One task blocks the page. The Backdrop centers it. |
-| Drawer | The task needs the page in view. The Backdrop holds it at an edge. |
-| Overlay Panel | The Frame is too narrow to dock the Panel. A `contained` Backdrop covers the Frame's Page and Sidebar, with the same fill and layer order as a modal's. |
+| Edge layer | A full-height layer the Backdrop holds at an edge. A Panel is the way forward: it floats with no Backdrop. |
 
-The Backdrop draws the layer only. It does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. The Drawer pattern brings its own focus handling. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
+The Backdrop draws the layer only. It does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
 
 ### Layers
 
@@ -35,7 +34,7 @@ Figma has no z-index, so the order is written here and lives in code.
 | Navigation | 200 | `--layer-navigation` | The floating sidebar. It has a shadow and no backdrop, and an outside click closes it. |
 | Menu and Popup | 400 | `--layer-popup` | The Menu and the Popup. One opened from a Modal mounts in it and takes the Modal layer, 510. |
 | Backdrop | 500 | `--layer-blanket` | The Backdrop and its fill. |
-| Modal | 510 | `--layer-modal` | A Modal or a Drawer. |
+| Modal | 510 | `--layer-modal` | A Modal. |
 | Flag | 600 | `--layer-flag` | Flags, above a modal. |
 | Tooltip | 800 | `--layer-tooltip` | Tooltips, above everything. |
 
@@ -45,8 +44,8 @@ Figma has no z-index, so the order is written here and lives in code.
 
 A confirm raised from a Panel or a focused task is a second Backdrop over the first. A Modal for another task waits until the first one closes.
 
-Do: A drawer and the confirm it raises, stacked over it.
-Don't: A modal for an unrelated task opened over a drawer.
+Do: An edge layer and the confirm it raises, stacked over it.
+Don't: A modal for an unrelated task opened over an edge layer.
 
 ### Never a Modal on a Modal. {#never-a-modal-on-a-modal}
 
@@ -68,7 +67,7 @@ Let the Backdrop place the modal. Do not detach it to move things around: the pa
 
 ## Accessibility
 
-- The Backdrop is a layout layer with no role. The Modal or Drawer inside it is the dialog.
+- The Backdrop is a layout layer with no role. The Modal inside it is the dialog.
 - The backdrop is a pointer shortcut, not a control. A keyboard closes a dialog from inside it, so the backdrop takes no role and no key handler.
 - The backdrop at `--ds-blanket` keeps the dialog legible in Light and Dark. The toolbar's Contrast switch changes it with the rest of the page.
 - A layer wider than a narrow screen keeps its width, and the Backdrop scrolls.
@@ -76,17 +75,16 @@ Let the Backdrop place the modal. Do not detach it to move things around: the pa
 ## Related
 
 - [Modal](?path=/docs/templates-modal-modal--docs) is the layer a Backdrop usually holds, centered, for one task that blocks the page.
-- [Drawer](?path=/docs/templates-panel-panel--docs) is the layer held at an edge, for a task that needs the page in view.
-- [Panel](?path=/docs/components-layout-and-structure-panel--docs) opens over a contained Backdrop when its Frame is too narrow to dock it.
+- [Panel](?path=/docs/templates-panel-panel--docs) floats beside the page for a task that needs it in view, with no Backdrop.
 - [Popups](?path=/docs/templates-popup-popup--docs) covers the floating layers that never take a backdrop.
-- [Frame](?path=/docs/templates-frame-frame--docs) shows the floating Sidebar, which takes a shadow and no backdrop, and the overlay Panel on its contained Backdrop.
+- [Frame](?path=/docs/templates-frame-frame--docs) shows the floating Sidebar and the floating AI panel, which take a shadow and no backdrop.
 
 Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 
 1. **Backdrop.** The screen-size layer with the backdrop fill, the screen grid and the pads.
-2. **Layer.** The one modal or drawer it holds, centered or at an edge. The Modal brings its body and footer slots.
+2. **Layer.** The one modal it holds, centered. The Modal brings its body and footer slots.
 
 The Backdrop carries the screen grid; page frames carry the content grid. Height, hug or fill, lives on the Modal inside it.
 
@@ -98,7 +96,7 @@ A Backdrop has no states. It is shown while its layer is open and gone when it c
 
 | Token | Value | What it is for |
 | --- | --- | --- |
-| `--ds-blanket` | 32% in Light, 60% in Dark | The fill, under every modal, drawer and overlay Panel. |
+| `--ds-blanket` | 32% in Light, 60% in Dark | The fill, under every modal. |
 | `--blanket-pad-x` | 16 | The closest a modal gets to the sides. |
 | `--blanket-pad-y` | 64 | The closest a modal gets to the top and bottom. It drops to 24 under 640 tall. |
 | `--blanket-max-height-modal` | screen height less 2 × pad-y: 128, or 48 under 640 tall | The tallest a modal or confirm gets. Its body scrolls past it. |

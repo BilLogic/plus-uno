@@ -66,7 +66,7 @@ const PANEL_DISMISS_REASONS = new Set(['outside-press', 'escape-key']);
  *   or the pointer leaving closes the peek.
  * - Either toggle, or Ctrl+[ (Cmd+[ on a Mac), closes a showing Sidebar and
  *   opens a closed one; focus follows to the toggle that is left.
- * - Opening a modal (or drawer) closes a floating Sidebar and leaves a docked
+ * - Opening a modal closes a floating Sidebar and leaves a docked
  *   one alone, and while one is open the Sidebar does not peek. The frame
  *   hears it from the shared overlay module (`@/lib/overlay`), so a page does
  *   not wire its modals to the frame. A modal opened from inside the floating
@@ -299,7 +299,7 @@ const Frame = ({
     // opened from inside the floating Sidebar loses its trigger with it, so
     // once that modal closes, focus goes to the toggle.
     const focusToggleOnClose = useRef(false);
-    // Whether a modal (or drawer) is open: the overlay Panel then lets go of focus so the modal can hold it.
+    // Whether a modal is open: the overlay Panel then lets go of focus so the modal can hold it.
     const [modalOpen, setModalOpen] = useState(() => openOverlayCount() > 0);
     useEffect(() => subscribeOverlays((event) => {
         setModalOpen(event.count > 0);

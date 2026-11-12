@@ -129,6 +129,7 @@
       "design-system/src/patterns/PatternTable/",
       "design-system/src/patterns/Backdrop/",
       "design-system/src/patterns/PatternModal/",
+      "design-system/src/patterns/Panel/",
       "design-system/src/patterns/PatternDrawer/",
       "design-system/src/patterns/PopupFamily/",
       "design-system/src/patterns/HeadingOutline",

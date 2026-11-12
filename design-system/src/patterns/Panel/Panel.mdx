@@ -1,0 +1,324 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
+
+import * as PanelStories from './Panel.stories.jsx';
+import {
+    ComponentExample,
+    DocsInteractivePlayground,
+    DocsTable,
+    DoDontPair,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    BesideAiPanel,
+    CoversAiPanel,
+    FloatsNoBackdrop,
+    OneFloatingPanel,
+    PanelOnBackdrop,
+    ReadingNoFooter,
+    ReadingWithFooter,
+    TwoFloatingPanels,
+} from '@/storybook-docs/illustrations/panel.jsx';
+
+<Meta title="Templates/Panel/Panel" tags={['!dev', 'manifest']} />
+
+<Title>Panel</Title>
+A full-height layer beside or over the Page with no Backdrop. Two floating types: Details and Notifications. The AI panel is a region of the Frame.
+
+<DocsTabs of={PanelStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Types
+
+Both float over the right of the Page with no Backdrop. The AI panel is docked and lives on Frame. Where the Frame can dock a Panel beside 720 of content (1168 and up), it docks it at an edge line instead; floating at every width is Planned.
+
+<TypeGrid>
+<TypeCard of={PanelStories.TypeDetails} title="Details" stage={1100}>A quick look at a row, floating over the right of the Page. The picked row stays highlighted.</TypeCard>
+<TypeCard of={PanelStories.TypeNotifications} title="Notifications" stage={1100}>The Inbox, opened from the Bell. It lists items by time and stays open as you pick one.</TypeCard>
+</TypeGrid>
+
+The Inbox grows out of the Sidebar over the left of the Page. That placement is Planned: today the Frame's one Panel area is on the right, and the Inbox is drawn there.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+### Details
+
+Opened from a session row. The page behind stays usable.
+
+<Story of={PanelStories.AnatomyDetails} inline />
+
+1. **Picked row.** Highlighted while the Panel is open.
+2. **Splitter.** On the Page-facing edge; it resizes from 320 to 640.
+3. **Header.** The title names the record, with its status under it; then the fixed actions: Up, Down, More, Close.
+4. **Body.** The record's Sections. It scrolls between the header and the footer.
+
+### Notifications
+
+Picking an item opens its page behind the Panel and marks it read. The Inbox stays open.
+
+<Story of={PanelStories.AnatomyNotifications} inline />
+
+1. **Header.** The title, a filter (Unread, All, Mentions), Archive all and Close.
+2. **Items.** Avatar, who did what and where, a one-line excerpt and the time.
+3. **Unread dot.** Paired with the word "unread" for a screen reader.
+
+The Bell in the Sidebar, with its unread count, opens the Inbox. It sits with the Sidebar and is Planned with the Inbox's placement.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Width behavior
+
+Drag the Frame's width. From 1168 a 400 Panel docks beside the Page at an edge line with no shadow. Under it the Panel floats on the overlay fill and shadow, capped at 320 under 1024 and full width under 768. It never has a Backdrop.
+
+<DocsInteractivePlayground of={PanelStories.ResponsiveWidth} description="The width control sets the Frame's own width." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key states
+
+<ComponentExample of={PanelStories.KeyEditing} title="Editing" description="The same Panel with the form open and its full-bleed footer: Cancel (Default) left and Save (Primary) right. Save returns to reading, which has no footer." />
+
+<ComponentExample of={PanelStories.KeyRecordGone} title="Record gone" description="When the row no longer exists the body shows its empty state with a way back: Patterns, Empty." />
+
+<ComponentExample of={PanelStories.KeyUnder1024} title="Under 1024" description="Too narrow to float beside the table: the Panel is capped at 320 and takes the whole width under 768. It floats on the overlay fill and shadow, still with no Backdrop." />
+
+### Beside the AI panel <PlannedTag />
+
+A floating Panel and the docked AI panel sit side by side, and the AI panel is never covered. The Frame has one Panel area today, so this pair is Planned.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sizes
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--panel-width-default</code></td><td>400</td><td>The width a Panel opens at.</td></tr>
+<tr><td><code>--panel-min-width</code></td><td>320</td><td>The narrowest, and the cap under 1024.</td></tr>
+<tr><td><code>--space-300</code></td><td>48</td><td>The full-bleed footer's height, shown only while editing.</td></tr>
+<tr><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td><td>pair</td><td>The floating Panel's fill and elevation. A docked Panel uses <code>--ds-surface</code> and an edge line.</td></tr>
+<tr><td><code>--ds-border</code></td><td>1</td><td>The edge line where a docked Panel meets the Page.</td></tr>
+</tbody>
+</DocsTable>
+
+The Panel resizes from 320 to 640 by drag or keys, never past what keeps 720 of content beside it.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="code">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Slots
+
+```jsx
+import { PanelContainer, PanelHeader, PanelBody, PanelFooter } from '@/components';
+import { Frame } from '@/patterns';
+```
+
+The Panel components are the parts: header with its fixed actions, body, footer, and Escape to close. The Frame hosts one and decides whether it docks or floats. The template is its filled layout, one per type. The AI panel is the Frame's `panel`.
+
+<DocsTable>
+<thead>
+<tr><th>Slot</th><th>Details</th><th>Notifications</th></tr>
+</thead>
+<tbody>
+<tr><td><code>title</code></td><td>The record's name, with its StatusTag under it</td><td>"Inbox"</td></tr>
+<tr><td><code>actions</code></td><td>Up, Down, More and Close</td><td>A filter (Select), Archive all and Close</td></tr>
+<tr><td><code>body</code></td><td>Sections of the record; the form while editing</td><td>Items grouped by time</td></tr>
+<tr><td><code>footer</code></td><td>Only while editing: Cancel and Save, full bleed. The page composes it from Button. <PlannedTag /> Planned as a prop.</td><td>None</td></tr>
+<tr><td>Placement</td><td>Floating, right. Floats under 1168; at 1168 and up the Frame docks it. <PlannedTag /> Floating at every width is Planned.</td><td>Floating, left, out of the Sidebar. <PlannedTag /> Planned. Today it uses the right-hand area.</td></tr>
+<tr><td>Beside the AI panel <PlannedTag /></td><td>Planned. The Frame has one Panel area.</td><td>Planned.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use a Panel when content is read beside the page and outlives a click: a quick look at a row, a short edit with the table in view, the Inbox. It never has a Backdrop, so the page behind stays usable. Details floats over the right of the Page; the Inbox floats out of the Sidebar on the left. One floating Panel is open at a time; opening another replaces it.
+
+The AI panel is not a floating Panel. It is a region of the Frame, docked where there is room, so it persists across pages.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a decision that must happen before the page continues, use `Modal`.
+- For a queue page, use a `Section` detail: the record in place beside its list.
+- For a short aside off a control, use `Popup`.
+- For complex or multistep work, give the record its own page with `Frame` · focused.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Float a Panel with no Backdrop.
+
+<RuleTag kind="automatic" />
+
+The page keeps scrolling and stays clickable. A press on the page outside the Panel, or Escape, closes it. Under 1024 it is capped at 320, and under 768 it takes the whole width, still with no Backdrop. A confirm Modal over a Panel brings its own Backdrop.
+
+<DoDontPair
+    doExample={<FloatsNoBackdrop />}
+    doCaption="The Panel floats on its shadow and the page beside it stays undimmed."
+    dontExample={<PanelOnBackdrop />}
+    dontCaption="The same Panel with a Backdrop dimming the whole page."
+/>
+
+### Open one floating Panel at a time.
+
+<RuleTag kind="automatic" />
+
+Another row swaps the content; the Inbox replaces Details. The overlay module keeps a second overlay closed.
+
+<DoDontPair
+    doExample={<OneFloatingPanel />}
+    doCaption="One Panel; another row swaps what it shows."
+    dontExample={<TwoFloatingPanels />}
+    dontCaption="Two Panels open at once, the second covering the first."
+/>
+
+### Keep the picked row highlighted while Details is open.
+
+<RuleTag kind="review" />
+
+Picking the same row again closes it; Up and Down step through the rows.
+
+### Show a footer only while editing.
+
+<RuleTag kind="review" />
+
+Cancel (Default) and Save (Primary), full bleed. Reading needs no footer.
+
+<DoDontPair
+    doExample={<ReadingNoFooter />}
+    doCaption="Reading: a header and a body, nothing to save."
+    dontExample={<ReadingWithFooter />}
+    dontCaption="A footer of buttons on a Panel that is only read."
+/>
+
+### Leave the AI panel uncovered.
+
+<RuleTag kind="review" />
+
+A floating Panel and the docked AI panel sit side by side. The AI panel is never covered. This pair is Planned.
+
+<DoDontPair
+    doExample={<BesideAiPanel />}
+    doCaption="The floating Panel beside the docked AI panel, both fully visible."
+    dontExample={<CoversAiPanel />}
+    dontCaption="The floating Panel drawn over the AI panel, hiding part of it."
+/>
+
+### Move a Panel that needs full attention into a Modal.
+
+<RuleTag kind="review" />
+
+If the person must not look at anything outside it, it is a Modal.
+
+### Grow the Inbox out of the Sidebar.
+
+<RuleTag kind="review" />
+
+Its left edge sits against the Sidebar, over the left of the Page. Picking an item opens its page behind the Inbox, which stays open. Flags still show at the top right. This placement is Planned.
+
+### Title the Panel with the object.
+
+<RuleTag kind="review" />
+
+"Session · Mar 4", not "Details", so someone who opened it from elsewhere still knows.
+
+### Offer "Open as page" in More.
+
+<RuleTag kind="review" />
+
+For the step up when the quick look is not enough.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Title Details with the record: "Ana Ruiz · Thu 4:00 PM".</td><td>"Details".</td></tr>
+<tr><td>Name the filter by what it keeps: "Unread".</td><td>"Filter".</td></tr>
+<tr><td>Give the empty state a way back: "Back to sessions".</td><td>"Nothing here".</td></tr>
+<tr><td>Name the footer's actions: "Cancel" and "Save".</td><td>"OK" and "Done".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- Floating, the Panel is a complementary landmark named by its title, after the Page in reading order. Focus moves to its title on open and returns to the row, or the Bell, on close.
+- Under 1024 it is a dialog: focus is trapped, and Escape, a press outside or Close return it.
+- Escape closes the Panel unless an inner control handles it, such as an open menu.
+- Up and Down are named "Previous" and "Next" and announce the record that opens.
+- An unread dot is paired with the text "unread" for a screen reader.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/templates-frame-frame--docs">Frame</a>: use when the question is the AI panel, which is a Frame region.
+- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use when the record belongs beside its list on a queue page.
+- <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>: use when the task needs full attention.
+- <a target="_top" href="./?path=/docs/templates-form--docs">Form</a>: use when the Panel edits a record.
+- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use when you need the rules around a Panel: Navigation, Empty, Notifications.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>
