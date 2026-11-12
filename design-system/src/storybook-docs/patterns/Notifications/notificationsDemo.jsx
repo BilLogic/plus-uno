@@ -36,7 +36,7 @@ const pad = { padding: 'var(--page-pad)', boxSizing: 'border-box' };
 
 /** A Flag stack at the top right, held in the picture. */
 const TopRight = ({ children }) => (
-    <div style={{ ...pad, display: 'flex', justifyContent: 'flex-end', minBlockSize: 'var(--card-min-width-lg)' }}>
+    <div style={{ ...pad, display: 'flex', justifyContent: 'flex-end' }}>
         <FlagGroup position="top-end" containerPosition="static">
             {children}
         </FlagGroup>
