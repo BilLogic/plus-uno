@@ -89,7 +89,7 @@ Two to five views of one thing opened in any order; one footer saves them all. V
 Do: Views in order are Steps: Cancel at the start, Back and Next on the right half.
 Don't: Numbered tabs as steps: any order, one Save, nothing to go back to.
 
-Footer buttons, Cancel and Close: Patterns, Common actions. Which destructive tier, including type the name: Patterns, Common actions. A blocked submit: Patterns, Forms. The sending button: Patterns, Loading.
+Footer buttons, Cancel and Close, and which destructive tier, including type the name: Common actions. A blocked submit: Forms. The sending button: Patterns, Loading.
 
 ## Accessibility
 

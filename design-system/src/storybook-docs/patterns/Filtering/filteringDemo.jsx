@@ -176,6 +176,9 @@ export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, vie
         filters = <IconButton icon="filter" label="Filters" appearance="subtle" trailingMetric={count || undefined} onClick={() => setShowSide(true)} />;
     }
 
+    // A menu a press opens mounts where `container` points at that moment: until the picture's element is in state, those filters wait, so no menu lands on the page. A held-open menu waits on its own (`held`).
+    if (mount === null && !openMenu) filters = null;
+
     const status = <span role="status" style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{countWords(rows, value)}</span>;
     const results = rows.length > 0 ? <StudentsTable rows={rows} /> : (
         <EmptyState
