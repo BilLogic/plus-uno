@@ -84,7 +84,7 @@ const thrown = ({ id, title, caption, keepsSpeed }) => ({
           <Panel x={96} y={24} w={52} h={64} floating accent />
         </g>
       </Clip>
-      {h > 0 && <Pointer x={mix(104, 124, x / 20)} y={50} accent />}
+      {h > 0 && <Pointer x={mix(104, 124, x / 20)} y={50} />}
     </>
   ),
   play: async (ctx) => {

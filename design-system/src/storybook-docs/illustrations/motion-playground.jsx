@@ -51,8 +51,9 @@ const POPUP = { x: 92, y: 36, w: 48, h: 36 };
 const SAMPLES = 48;
 
 /** A menu opening on a spring you set: the controls, the move, and the curve it follows. */
-export const SpringPlayground = () => {
-  const prefersReduced = useReducedMotion();
+export const SpringPlayground = ({ reduced: forcedReduced }) => {
+  const deviceReduced = useReducedMotion();
+  const prefersReduced = forcedReduced ?? deviceReduced;
   const [token, setToken] = useState('spatial.default');
   const [mode, setMode] = useState('productive');
   const [stiffness, setStiffness] = useState(null);

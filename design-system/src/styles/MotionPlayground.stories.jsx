@@ -9,6 +9,7 @@ import React from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 
 import { MotionDemo, springFor } from '@/storybook-docs/illustrations/motion.jsx';
+import { reducedStory } from '@/storybook-docs/illustrations/motion-story-helpers.jsx';
 import { PLAYGROUND_DEMOS, SpringPlayground, playgroundConfig } from '@/storybook-docs/illustrations/motion-playground.jsx';
 
 export default {
@@ -24,7 +25,7 @@ const configOf = (root) => JSON.parse(root.dataset.config);
 
 /** Untouched controls give exactly the config the generator emits for the token and mode. */
 export const ControlsStartAtTheGeneratorsConfig = {
-  render: () => <SpringPlayground />,
+  render: () => <SpringPlayground reduced={false} />,
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('[data-playground]');
     await expect(configOf(root)).toEqual(springFor('spatial.default', 'productive'));
@@ -34,7 +35,7 @@ export const ControlsStartAtTheGeneratorsConfig = {
 
 /** Changing a control changes the spring config the demo reads on its next move. */
 export const ChangingAControlChangesTheSpringTheDemoReads = {
-  render: () => <SpringPlayground />,
+  render: () => <SpringPlayground reduced={false} />,
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('[data-playground]');
     const view = within(canvasElement);
@@ -63,7 +64,7 @@ export const ChangingAControlChangesTheSpringTheDemoReads = {
 
 /** The mode switch loads that mode's generated spring into the controls. */
 export const ModeLoadsTheModesSpring = {
-  render: () => <SpringPlayground />,
+  render: () => <SpringPlayground reduced={false} />,
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('[data-playground]');
     const view = within(canvasElement);
@@ -74,7 +75,7 @@ export const ModeLoadsTheModesSpring = {
 
 /** The speed control slows the playback of what the demo plays. */
 export const SpeedSlowsThePlayback = {
-  render: () => <SpringPlayground />,
+  render: () => <SpringPlayground reduced={false} />,
   play: async ({ canvasElement }) => {
     const root = canvasElement.querySelector('[data-playground]');
     const view = within(canvasElement);
@@ -114,5 +115,20 @@ export const ThreeSpeeds = {
     for (const scene of PLAYGROUND_DEMOS.speeds.scenes) {
       await expect(JSON.parse(canvasElement.querySelector(`[data-tile="${scene.id}"]`).dataset.state)).toMatchObject(scene.landing);
     }
+  },
+};
+
+/** Under reduced motion each demo shows its landing, still: the same end frame as the animated pass. */
+export const StiffAndSoftReduced = reducedStory(PLAYGROUND_DEMOS.extremes);
+export const TheShakeReduced = reducedStory(PLAYGROUND_DEMOS.shake);
+export const ThreeSpeedsReduced = reducedStory(PLAYGROUND_DEMOS.speeds);
+
+/** The spring controls under reduced motion: Play lands on the end frame with no travel. */
+export const PlayLandsStillWhenReduced = {
+  render: () => <SpringPlayground reduced />,
+  play: async ({ canvasElement }) => {
+    const root = canvasElement.querySelector('[data-playground]');
+    await userEvent.click(within(canvasElement).getByRole('button', { name: /play/i }));
+    await waitFor(() => expect(root.dataset.phase).toBe('settled'), PASS);
   },
 };

@@ -355,7 +355,7 @@ const causeScene = ({ id, title, caption, pushes }) => ({
           <Flag x={92} y={10} w={56} h={20} />
         </Moved>
       )}
-      <Pointer x={60} y={52} accent />
+      <Pointer x={60} y={52} />
     </>
   ),
   play: async (ctx) => {
@@ -399,7 +399,7 @@ const bpScene = ({ id, title, caption, lags }) => ({
       <g opacity={blend}>
         <ReflowScreen width={shown} />
       </g>
-      <Pointer x={8 + w / 8} y={52} accent />
+      <Pointer x={8 + w / 8} y={52} />
     </>
   ),
   play: async (ctx) => {

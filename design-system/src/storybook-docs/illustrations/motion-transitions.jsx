@@ -24,8 +24,8 @@ const HEADER_BUTTON = [128, 34];
 
 // ---------- Drill into and climb back out ----------
 
-/** The list a record is opened from: a header (or a Breadcrumb) and three rows, the middle one chosen. */
-const ListLayer = ({ crumbs, chosen }) => (
+/** The list a record is opened from: a header (or a Breadcrumb) and three rows. The middle row is what gets pressed, so it stays neutral. */
+const ListLayer = ({ crumbs }) => (
   <>
     {crumbs ? (
       <>
@@ -36,7 +36,7 @@ const ListLayer = ({ crumbs, chosen }) => (
       <PageHeader x={60} y={26} w={83} />
     )}
     <Row x={BODY.x} y={BODY.y} w={BODY.w} />
-    <Row x={ROW.x} y={ROW.y} w={ROW.w} accent={chosen} />
+    <Row x={ROW.x} y={ROW.y} w={ROW.w} />
     <Row x={BODY.x} y={76} w={BODY.w} />
   </>
 );
@@ -68,9 +68,9 @@ const drill = ({ id, title, caption, crumbs = 0, mode = 'grow' }) => ({
     <>
       <Screen x={8} y={6} w={144} h={88} header={false}>
         <g opacity={l}>
-          <ListLayer crumbs={crumbs} chosen />
+          <ListLayer crumbs={crumbs} />
         </g>
-        {mode === 'grow' && g > 0 && (
+        {mode !== 'slide' && g > 0 && (
           <>
             <Rect
               x={mix(ROW.x, PAGE.x, g)}
