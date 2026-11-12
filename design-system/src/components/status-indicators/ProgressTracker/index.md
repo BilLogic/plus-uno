@@ -14,7 +14,7 @@ Also asked as: steps, stepper, wizard, multi-step, checkout steps.
 
 **Storybook page:** `design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · success `appearance.fast`, sound `sound.done.step`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
@@ -27,9 +27,10 @@ have no names to show, use `ProgressIndicator` instead.
 
 ProgressTracker reads these motion tokens and no literal duration or curve.
 
-| Event | Transition | Tokens | What it does |
-| --- | --- | --- | --- |
-| change | Update a value or state | `--ds-motion-appearance-fast` | Step states change in place: the step left becomes visited, the next current. |
+| Event | Transition | Tokens | What it does | Sound |
+| --- | --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Step states change in place: the step left becomes visited, the next current. |  |
+| success | Update a value or state | `--ds-motion-appearance-fast` | The last step changes to done in place. | `sound.done.step` on land: a module or lesson is done |
 
 ## Best practices
 

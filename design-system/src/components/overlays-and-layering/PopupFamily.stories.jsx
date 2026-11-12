@@ -251,6 +251,8 @@ export const FlagsStack = () => (
 FlagsStack.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const doc = documentOf(canvasElement);
+    // Measure where the flags settle: their enter slide moves them until it lands.
+    await Promise.all(['pf-flag-1', 'pf-flag-2'].flatMap((id) => canvas.getByTestId(id).getAnimations().map((a) => a.finished)));
     const first = canvas.getByTestId('pf-flag-1').getBoundingClientRect();
     const second = canvas.getByTestId('pf-flag-2').getBoundingClientRect();
     const view = { width: doc.documentElement.clientWidth, height: doc.defaultView.innerHeight };

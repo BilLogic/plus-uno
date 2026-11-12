@@ -14,7 +14,7 @@ Also asked as: percent complete, determinate loading.
 
 **Storybook page:** `design-system/src/components/loading/ProgressBar/ProgressBar.mdx`
 
-**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `linear` · success `appearance.fast`, sound `sound.done.step`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
@@ -34,9 +34,10 @@ a short wait with no task to track, use a `Spinner`.
 
 ProgressBar reads these motion tokens and no literal duration or curve.
 
-| Event | Transition | Tokens | What it does |
-| --- | --- | --- | --- |
-| change | Load content | `--ds-motion-linear` | Fills with the work, never ahead of it. |
+| Event | Transition | Tokens | What it does | Sound |
+| --- | --- | --- | --- | --- |
+| change | Load content | `--ds-motion-linear` | Fills with the work, never ahead of it. |  |
+| success | Update a value or state | `--ds-motion-appearance-fast` | The bar reaches its end and its fill changes to done. | `sound.done.step` on land: a module or lesson is done |
 
 ## Best practices
 

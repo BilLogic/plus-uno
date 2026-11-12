@@ -39,9 +39,9 @@
  * picked up for free; a component that should stay private lives under
  * `_internal` and this script never looks at it.
  *
- * `@/dataviz` is a sibling of `design-system/src/components/`, not a group
- * inside it, so it stays a hand-written trailing line, same as the stylesheet
- * side-effect import at the top.
+ * `@/dataviz` and `@/sound` are siblings of `design-system/src/components/`,
+ * not groups inside it, so they stay hand-written trailing lines, same as the
+ * stylesheet side-effect import at the top.
  *
  * Usage:
  *   node scripts/generate-component-barrel.mjs          (write)
@@ -136,8 +136,9 @@ export function artifacts(repoRoot = REPO_ROOT) {
   for (const group of groups) {
     content += groupBlock(group).join('\n') + '\n\n';
   }
-  content += `// A sibling of components/, not a group inside it.\n`;
+  content += `// Siblings of components/, not groups inside it.\n`;
   content += `export * from '@/dataviz';\n`;
+  content += `export * from '@/sound';\n`;
 
   return [{ file: OUT, content, counts: { groups: groups.length } }];
 }

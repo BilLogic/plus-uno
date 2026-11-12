@@ -12,7 +12,7 @@ Also asked as: rows and columns, grid.
 
 **Storybook page:** `design-system/src/components/text-and-data-display/Table/StaticTable.mdx`
 
-**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `spatial.fast` + `appearance.fast` · roster `spatial.fast` + `appearance.fast`, sound `sound.roster`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
@@ -23,9 +23,10 @@ card. A table people sort, filter, select or page is a Dynamic table.
 
 Table reads these motion tokens and no literal duration or curve.
 
-| Event | Transition | Tokens | What it does |
-| --- | --- | --- | --- |
-| change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Rows are added, removed and reordered; sort is Reorder, a filter is Swap content. Ticking rows cross-fades the head row into the bulk bar, same height, nothing slides. |
+| Event | Transition | Tokens | What it does | Sound |
+| --- | --- | --- | --- | --- |
+| change | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Rows are added, removed and reordered; sort is Reorder, a filter is Swap content. Ticking rows cross-fades the head row into the bulk bar, same height, nothing slides. |  |
+| roster | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | A student joins or leaves the session roster: the row is added or removed. | `sound.roster` on land: in a session; changes within 2 s play once |
 
 ## Best practices
 

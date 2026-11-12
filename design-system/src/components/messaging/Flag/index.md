@@ -10,11 +10,11 @@ Also asked as: notification, snackbar, success message, undo, temporary message,
 
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
-**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused, StackClosesUp, StackClosesUpReduced
+**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused, LandsWithNotify, StackClosesUp, StackClosesUpReduced
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 
-**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.exit` · dismiss `appearance.fast` · change `spatial.default` · milestone `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** enter `spatial.default` + `appearance.default`, sound `sound.notify` · exit `spatial.exit` · dismiss `appearance.fast` · change `spatial.default` · milestone `spatial.fast`, sound `sound.done.step` · prompt `spatial.default` + `appearance.default`, sound `sound.prompt` · failed `spatial.default` + `appearance.default`, sound `sound.error`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
@@ -37,13 +37,15 @@ state. `FlagGroup` positions a stack of them.
 
 Flag reads these motion tokens and no literal duration or curve.
 
-| Event | Transition | Tokens | What it does |
-| --- | --- | --- | --- |
-| enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Slides in from the top-right corner. |
-| exit | Open and close an overlay | `--ds-motion-spatial-exit` | Timed out: leaves the way it came, toward the top-right corner, on spatial.exit aimed 3.8× past the edge; the stack then closes up. |
-| dismiss | Open and close an overlay | `--ds-motion-appearance-fast` | Closed by hand: a quick fade in place. |
-| change | Add or remove an item | `--ds-motion-spatial-default` | The stack closes up when one leaves. |
-| milestone | Open and close an overlay | `--ds-motion-spatial-fast` | Finishing a reflection: inside an Expressive container, slides in from the top-right corner with one overshoot; leaves by the exit rules. |
+| Event | Transition | Tokens | What it does | Sound |
+| --- | --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Slides in from the top-right corner. | `sound.notify` on land: outside a session; any appearance but error, which plays Error (the failed event); Flags that arrive together play once |
+| exit | Open and close an overlay | `--ds-motion-spatial-exit` | Timed out: leaves the way it came, toward the top-right corner, on spatial.exit aimed 3.8× past the edge; the stack then closes up. |  |
+| dismiss | Open and close an overlay | `--ds-motion-appearance-fast` | Closed by hand: a quick fade in place. |  |
+| change | Add or remove an item | `--ds-motion-spatial-default` | The stack closes up when one leaves. |  |
+| milestone | Open and close an overlay | `--ds-motion-spatial-fast` | Finishing a reflection: inside an Expressive container, slides in from the top-right corner with one overshoot; leaves by the exit rules. | `sound.done.step` on land: a reflection is complete |
+| prompt | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | A Flag that asks for action now enters like any Flag. | `sound.prompt` on land: session link ready, a lead with an empty tutor, wrap-up, few students at 10 min; an app passes sound="prompt"; plays when the tab is hidden |
+| failed | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | A danger Flag for a failed background job enters like any Flag and stays until closed. | `sound.error` on land: an error Flag, the default for that appearance: a background job the person started failed |
 
 ## Best practices
 
@@ -185,6 +187,7 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 | `headerClass` | string | `''` | Extra class on the header row that holds the title and timestamp. |
 | `bodyClass` | string | `''` | Extra class on the description container. |
 | `timestamp` | node | — | Small text beside the title, such as "11 mins ago". |
+| `sound` | string or enum | — | The sound token it plays as it lands, through the app's sound setting, or `false` for none. Unset, an `error` flag plays `error` and every other appearance plays `notify`. Pass `false` when a flag should stay quiet, such as during a session. |
 | `reducedMotion` | bool | — | Hold reduced motion on or off for this flag. Unset, it follows its FlagGroup, then the person's setting. |
 
 ## Variants
@@ -195,7 +198,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-bold` · `--ds-background-information-bold` · `--ds-background-neutral-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-focused-inverse` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-exit` · `--ds-motion-spatial-exit-duration` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-warning-inverse` · `--flag-min-height` · `--flag-offset` · `--flag-pad` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-radius` · `--popover-stack-flag` · `--popover-width-flag` · `--radius-md` · `--stack-sm` · `--type-weight-medium`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-bold` · `--ds-background-information-bold` · `--ds-background-neutral-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-focused-inverse` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-default` · `--ds-motion-spatial-default-duration` · `--ds-motion-spatial-exit` · `--ds-motion-spatial-exit-duration` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-warning-inverse` · `--flag-min-height` · `--flag-offset` · `--flag-pad` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-radius` · `--popover-stack-flag` · `--popover-width-flag` · `--radius-md` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/Flag/Flag.scss`. Override these through the token layer, never with a literal.
 

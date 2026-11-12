@@ -4766,6 +4766,15 @@
           "deprecated": null
         },
         {
+          "name": "sound",
+          "type": "string or enum",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "The sound token it plays as it lands, through the app's sound setting, or `false` for none. Unset, an `error` flag plays `error` and every other appearance plays `notify`. Pass `false` when a flag should stay quiet, such as during a session.",
+          "deprecated": null
+        },
+        {
           "name": "reducedMotion",
           "type": "bool",
           "required": false,
@@ -4792,6 +4801,7 @@
         "Hovered",
         "Pressed",
         "Focused",
+        "LandsWithNotify",
         "StackClosesUp",
         "StackClosesUpReduced"
       ],
@@ -4817,8 +4827,12 @@
         "--ds-icon-warning-inverse",
         "--ds-interaction-inverse-hovered",
         "--ds-interaction-inverse-pressed",
+        "--ds-motion-appearance-default",
+        "--ds-motion-appearance-default-duration",
         "--ds-motion-appearance-fast",
         "--ds-motion-appearance-fast-duration",
+        "--ds-motion-spatial-default",
+        "--ds-motion-spatial-default-duration",
         "--ds-motion-spatial-exit",
         "--ds-motion-spatial-exit-duration",
         "--ds-shadow-overlay",
