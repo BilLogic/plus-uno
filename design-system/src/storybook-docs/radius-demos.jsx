@@ -125,9 +125,9 @@ const badge = {
 const Legended = ({ testid, title, stage, parts, children }) => {
     const [values, probes] = useRadii(parts.filter((p) => p.token).map((p) => p.token));
     return (
-        <div data-testid={testid} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, var(--card-min-width-sm)), 1fr))', gap: 'var(--grid-gutter)', alignItems: 'center' }}>
+        <div data-testid={testid} style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: 'var(--grid-gutter)', alignItems: 'center' }}>
             {probes}
-            <div style={{ ...well, gridColumn: 'span 2' }}>
+            <div style={well}>
                 <div style={{ position: 'relative' }}>
                     <Illustration viewBox={`0 0 ${stage.w} ${stage.h}`} capped={false} title={title}>
                         {children}
