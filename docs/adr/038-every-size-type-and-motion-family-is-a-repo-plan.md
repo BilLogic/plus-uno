@@ -7,6 +7,8 @@ verified: 2026-11-03 (#1704)
 
 # ADR-038: Every size, type and motion family is a repo plan (2026-11-03)
 
+> **Superseded for motion** by [ADR-041](041-motion-is-springs-on-four-tiers.md) (2026-11-12): springs only, no durations or bezier easings. The rest of this ADR stands.
+
 **Decision.** Extends ADR-035's pattern — a plan this repo owns, generated into SCSS and a Figma variables payload, Figma downstream of code — from color to every other token family: space, size, radius, border width, typography and motion. PLUS ×16 numbering stays (`--space-100` is 16px, per Bill 2026-11-03); nothing here renumbers the primitive ladder. Container roles are keyed to density, not `sm`/`md`/`lg`: `--{card|section|modal|page}-pad[-x|-y]-{default|compact|spacious}`. Element roles: `--element-{pad|gap|radius}-{default|compact}`. Motion gets duration and easing roles, with reduced motion handled once at the token layer rather than once per component.
 
 **What this ticket (#1704) actually ships.** `scripts/lib/tokens/plan.mjs` is the plan; `scripts/generate-design-tokens.mjs` renders it into `design-system/src/tokens/deep/`: `_roles.scss` (container and element roles), `_motion.scss` (duration/easing roles plus one `prefers-reduced-motion` block that zeroes every duration), `_legacy-size-aliases.scss` (old names pointed at their role-token replacement, value-exact — see below) and `figma-spec.json` (the Figma variables payload — **written, not pushed**; pushing it is a separate, one-writer-queue step #1698 leaves to Phase D). `npm run regenerate` runs it.

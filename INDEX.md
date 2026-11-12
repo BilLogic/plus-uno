@@ -186,6 +186,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md`](docs/adr/038-every-size-type-and-motion-family-is-a-repo-plan.md) | Space, size, radius, border width, typography and motion become generated from plans this repo owns, the way ADR-035 generates color — Figma downstream, PLUS ×16 numbering kept, one token ladder with the old vocabulary deleted |
 | [`docs/adr/039-one-checker-defines-an-escape.md`](docs/adr/039-one-checker-defines-an-escape.md) | One deterministic checker, check:ds-usage, defines an escape from the design system; the hook, CI, the prototype exit, ds-lens and the usage eval all call it, and AI review advises while the checker blocks |
 | [`docs/adr/040-agent-view-is-the-fourth-component-tab.md`](docs/adr/040-agent-view-is-the-fourth-component-tab.md) | Component docs pages gain a 4th tab, Agent view, that shows the component's generated file byte for byte through one raw glob in the tabs module; amends ADR-025, whose tabs were a human affordance only (2026-11-08) |
+| [`docs/adr/041-motion-is-springs-on-four-tiers.md`](docs/adr/041-motion-is-springs-on-four-tiers.md) | Motion is springs only, on four tiers (primitives, semantics, patterns and components); Expressive is a container switch, Reduced is a fade, Figma holds no motion tokens; supersedes the motion half of ADR-038 |
 | [`docs/adr/overview.md`](docs/adr/overview.md) | One file per architecture decision, each checked against the code rather than ported. |
 
 ## Conventions
@@ -214,6 +215,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-143 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+144 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.
