@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useId, useState } from 'react';
 import PropTypes from 'prop-types';
 import { CountTag, Icon, IconButton, Logo, Tooltip } from '@/components';
+import { ClippedTooltip } from '@/lib/ClippedTooltip';
 import { useSidebarControl } from '../Frame/SidebarControl';
 import SidebarAccount, { ACCOUNT_ROLES } from './SidebarAccount';
 import { SIDEBAR_RECENT_TABS } from './openTabs';
@@ -188,19 +189,19 @@ const PatternSidebar = ({
         return null;
     };
 
-    const rowContent = (item, extra) => (
+    const rowContent = (item, extra, labelRef) => (
         <>
             <span className="plus-pattern-sidebar__slot" aria-hidden="true">
                 {item.icon ? <Icon name={item.icon} /> : null}
             </span>
-            <span className="plus-pattern-sidebar__label">{item.text}</span>
+            <span ref={labelRef} className="plus-pattern-sidebar__label">{item.text}</span>
             {item.external ? <span className="visually-hidden">(opens in a new tab)</span> : null}
             {trailing(item, extra)}
         </>
     );
 
     /** A row: a link with `href`, else a button. A plain function, so a Tooltip's ref lands on the element. */
-    const renderRow = ({ item, rowClass, current, onPress, extra, ...rest }) => {
+    const renderRow = ({ item, rowClass, current, onPress, extra, labelRef, ...rest }) => {
         const shared = {
             className: rowClass,
             'aria-current': current ? 'page' : undefined,
@@ -221,13 +222,13 @@ const PatternSidebar = ({
                         onPress();
                     }}
                 >
-                    {rowContent(item, extra)}
+                    {rowContent(item, extra, labelRef)}
                 </a>
             );
         }
         return (
             <button type="button" {...shared} onClick={rest['aria-disabled'] ? undefined : onPress}>
-                {rowContent(item, extra)}
+                {rowContent(item, extra, labelRef)}
             </button>
         );
     };
@@ -251,14 +252,24 @@ const PatternSidebar = ({
                 target?.focus();
             });
         };
+        // The row is already a link or a button, so it carries the tooltip and
+        // adds no tab stop. A clipped label shows its full text, with the longer
+        // name after it when the tab has one; a tab that fits shows only that name.
         const row = (
-            renderRow({
-                item: { id: tab.id, text: tab.label, href: tab.href },
-                rowClass: ['plus-pattern-sidebar__row', selected && 'plus-pattern-sidebar__row--selected'].filter(Boolean).join(' '),
-                current: selected,
-                onPress: () => onSelectTab?.(tab, item),
-                extra: tab.live ? <CountTag isDot appearance="success" label="Live" /> : undefined,
-            })
+            <ClippedTooltip
+                text={tab.tooltip ? `${tab.label}. ${tab.tooltip}` : tab.label}
+                textWhenFits={tab.tooltip}
+                placement="right"
+            >
+                {({ measureRef }) => renderRow({
+                    item: { id: tab.id, text: tab.label, href: tab.href },
+                    rowClass: ['plus-pattern-sidebar__row', selected && 'plus-pattern-sidebar__row--selected'].filter(Boolean).join(' '),
+                    current: selected,
+                    onPress: () => onSelectTab?.(tab, item),
+                    extra: tab.live ? <CountTag isDot appearance="success" label="Live" /> : undefined,
+                    labelRef: measureRef,
+                })}
+            </ClippedTooltip>
         );
         return (
             <li
@@ -266,7 +277,7 @@ const PatternSidebar = ({
                 className={['plus-pattern-sidebar__tab', last && 'plus-pattern-sidebar__tab--last', selected && 'plus-pattern-sidebar__tab--selected'].filter(Boolean).join(' ')}
                 onKeyDown={onKeyDown}
             >
-                {tab.tooltip ? <Tooltip text={tab.tooltip} placement="right">{row}</Tooltip> : row}
+                {row}
                 <IconButton
                     className="plus-pattern-sidebar__tab-close"
                     appearance="subtle"

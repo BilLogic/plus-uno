@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import Tooltip from '@/components/overlays-and-layering/Tooltip/Tooltip';
+import { useIsTruncated } from '@/lib/useIsTruncated';
 import Icon from '../../images-and-icons/Icon';
 import './OptionRow.scss';
 
@@ -119,7 +120,9 @@ const RowChevron = () => <Icon name="caret-right" className="plus-option-row-che
  * - `create`: "Create *text*", picked like an option.
  * - `group`: a heading over the options that follow it. Not focusable.
  *
- * The row fills its list's width, and its highlight spans the whole row.
+ * The row fills its list's width, and its highlight spans the whole row. A label
+ * that is clipped shows its full text in a tooltip, on the row's hover, focus
+ * or keyboard cursor, and only while it is clipped; the row stays the one tab stop.
  * While a list is reordered, `dragging` lifts the row being moved and
  * `dropIndicator` draws the line where it will land.
  *
@@ -152,12 +155,23 @@ const OptionRow = ({
     onSelect,
     onClick,
     onKeyDown,
+    onMouseEnter,
+    onMouseLeave,
+    onFocus,
+    onBlur,
     className = '',
     ref,
     ...props
 }) => {
-    const [truncated, setTruncated] = useState(false);
+    const labelRef = useRef(null);
     const text = label ?? children;
+    const truncated = useIsTruncated(labelRef, [text, kind, spacing]);
+    // A row never takes a second tab stop for its tooltip: the row is what
+    // holds focus (a roving tab stop) or is pointed at (`aria-activedescendant`),
+    // so the tooltip follows the row's own pointer, focus and cursor.
+    const [hovered, setHovered] = useState(false);
+    const [focused, setFocused] = useState(false);
+    const showTooltip = truncated && (hovered || focused || highlighted);
 
     const leadingItems = React.Children.toArray(elemBefore);
     if (leadingItems.length > MAX_LEADING && process.env.NODE_ENV !== 'production') {
@@ -193,14 +207,7 @@ const OptionRow = ({
     if (tabbable !== undefined) tabIndex = tabbable && !disabled ? 0 : -1;
 
     const labelNode = (
-        <span
-            className="plus-option-row-label"
-            onMouseEnter={(event) => {
-                const node = event.currentTarget;
-                setTruncated(node.scrollWidth > node.clientWidth);
-            }}
-            onMouseLeave={() => setTruncated(false)}
-        >
+        <span ref={labelRef} className="plus-option-row-label">
             {kind === 'create' && <><span className="plus-option-row-create-verb">Create</span>{' '}</>}
             {text}
         </span>
@@ -214,6 +221,22 @@ const OptionRow = ({
             aria-selected={selected}
             aria-disabled={disabled || undefined}
             tabIndex={tabIndex}
+            onMouseEnter={(event) => {
+                setHovered(true);
+                if (onMouseEnter) onMouseEnter(event);
+            }}
+            onMouseLeave={(event) => {
+                setHovered(false);
+                if (onMouseLeave) onMouseLeave(event);
+            }}
+            onFocus={(event) => {
+                setFocused(true);
+                if (onFocus) onFocus(event);
+            }}
+            onBlur={(event) => {
+                setFocused(false);
+                if (onBlur) onBlur(event);
+            }}
             onClick={(event) => {
                 if (onClick) onClick(event);
                 choose();
@@ -237,7 +260,7 @@ const OptionRow = ({
                 <span className="plus-option-row-leading">{leadingItems}</span>
             )}
             <span className="plus-option-row-content">
-                <Tooltip text={text} show={truncated}>
+                <Tooltip text={text} show={showTooltip}>
                     {labelNode}
                 </Tooltip>
                 {description && <span className="plus-option-row-description">{description}</span>}
@@ -292,6 +315,10 @@ OptionRow.propTypes = {
     onSelect: PropTypes.func,
     onClick: PropTypes.func,
     onKeyDown: PropTypes.func,
+    onMouseEnter: PropTypes.func,
+    onMouseLeave: PropTypes.func,
+    onFocus: PropTypes.func,
+    onBlur: PropTypes.func,
     className: PropTypes.string,
     ref: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
 };

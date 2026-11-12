@@ -8830,6 +8830,7 @@
         "TabsNone",
         "TabsFew",
         "TabsMany",
+        "TabsClipped",
         "TabRest",
         "TabHover",
         "TabFocus",

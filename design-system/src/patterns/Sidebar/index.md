@@ -8,7 +8,7 @@ Sidebar pattern: the app's side navigation, 240 wide, padded 12, on the sunken f
 
 **Source:** `design-system/src/patterns/Sidebar/Sidebar.jsx`
 
-**Stories:** `design-system/src/patterns/Sidebar/Sidebar.stories.jsx` — Overview, Geometry, Tutor, OnboardingInProgress, OnboardingDone, SectionsOpen, SectionsCollapsed, TabsNone, TabsFew, TabsMany, TabRest, TabHover, TabFocus, TabSelected, TabsCollapsedWithSelection, ClosingTabs, AccountHug, AccountRow, SidebarOpen, SidebarClosed, SidebarFloating, Interactive, Light, Dark
+**Stories:** `design-system/src/patterns/Sidebar/Sidebar.stories.jsx` — Overview, Geometry, Tutor, OnboardingInProgress, OnboardingDone, SectionsOpen, SectionsCollapsed, TabsNone, TabsFew, TabsMany, TabsClipped, TabRest, TabHover, TabFocus, TabSelected, TabsCollapsedWithSelection, ClosingTabs, AccountHug, AccountRow, SidebarOpen, SidebarClosed, SidebarFloating, Interactive, Light, Dark
 
 **Storybook page:** `design-system/src/patterns/Sidebar/Sidebar.mdx`
 
