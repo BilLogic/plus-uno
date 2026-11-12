@@ -102,7 +102,7 @@ The spacing / primitives and spacing / foundations collections (Foundations hold
 | Raised surface (cards) | `var(--ds-surface-raised)` |
 | Raised shadow (cards; a clickable card lifts to the overlay shadow on hover or drag) | `var(--ds-shadow-raised)` |
 | Overlay surface (modals, menus, listboxes, popovers, tooltips, toasts, the floating sidebar) | `var(--ds-surface-overlay)` |
-| Overlay shadow (modals, menus, listboxes, popovers, tooltips, toasts, the floating sidebar) | `var(--ds-shadow-overlay)` |
+| Overlay shadow (modals, menus, listboxes, popovers, toasts, the floating sidebar) | `var(--ds-shadow-overlay)` |
 
 ## Layout Tokens
 
