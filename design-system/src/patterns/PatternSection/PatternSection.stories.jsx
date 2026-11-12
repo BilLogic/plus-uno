@@ -1147,6 +1147,7 @@ export const FilterSideAtStart = {
 export const ResponsiveWidth = {
     name: 'Width behavior',
     args: { width: 1024 },
+    parameters: { controls: { include: ['width'] } },
     argTypes: {
         width: { control: { type: 'range', min: 600, max: 1280, step: 8 }, description: 'The Section\'s own width, in px.', table: { category: 'Docs' } },
     },

@@ -42,7 +42,8 @@ export const ScaledStory = ({ width, children }) => {
         return () => observer.disconnect();
     }, []);
     return (
-        <div ref={ref} className="not-prose sb-unstyled" inert aria-hidden="true" style={{ width: '100%', height: height * scale, overflow: 'hidden' }}>
+        // `docs-story` puts the picture's headings on Tocbot's ignore list, so "On this page" lists the page's own.
+        <div ref={ref} className="docs-story not-prose sb-unstyled" inert aria-hidden="true" style={{ width: '100%', height: height * scale, overflow: 'hidden' }}>
             <div ref={inner} style={{ width, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
                 {children}
             </div>
@@ -56,8 +57,8 @@ ScaledStory.propTypes = {
     children: PropTypes.node,
 };
 
-/** The stage a type card's story lays out at, so every card shows one scale. */
-const TYPE_STAGE = 720;
+/** The stage a type card's story lays out at, so every card shows one scale; wide enough for a list beside its detail. */
+const TYPE_STAGE = 1024;
 
 /** The opening grid of a template's types: two across, a Section group apart. */
 export const TypeGrid = ({ children }) => (
@@ -115,6 +116,10 @@ TypeCard.propTypes = {
  *   selector inside the story, in Parts-list order, and its name for the
  *   figure's accessible description
  */
+/** Whether an earlier marker starts within a marker's height of this one, so the gutter is taken. */
+const MARKER_CLEARANCE = 24; // docs-literal: the marker's own size, --control-sm, in px for the layout math
+const sharesLine = (marks, i) => marks.slice(0, i).some((m) => m && marks[i] && Math.abs(m.top - marks[i].top) < MARKER_CLEARANCE);
+
 export const LiveAnatomy = ({ width, parts, title, children }) => {
     const box = React.useRef(null);
     const [marks, setMarks] = React.useState([]);
@@ -165,8 +170,11 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
                             aria-hidden="true"
                             style={{
                                 position: 'absolute',
-                                top: m.top,
-                                left: 'calc(-1 * var(--control-lg))',
+                                // Two parts that start on one line (a body and its detail): the
+                                // second marker moves onto its part's corner instead of the gutter.
+                                ...(sharesLine(marks, i)
+                                    ? { top: `calc(${m.top}px - var(--control-sm) / 2)`, left: `calc(${m.left}px - var(--control-sm) / 2)` }
+                                    : { top: m.top, left: 'calc(-1 * var(--control-lg))' }),
                                 width: 'var(--control-sm)',
                                 height: 'var(--control-sm)',
                                 display: 'grid',
