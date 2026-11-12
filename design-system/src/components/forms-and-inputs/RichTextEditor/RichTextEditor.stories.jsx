@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.js';
-import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import RichTextEditor from './RichTextEditor';
 
@@ -175,6 +175,16 @@ export const Filled = {
     render: () => <RichTextEditor label="Session notes" defaultValue="<p>Worked through fractions.</p>" minHeight={150} />,
     play: async ({ canvasElement }) => {
         await expect(writing(canvasElement).textContent).toBe('Worked through fractions.');
+    },
+};
+
+/** Fields, multi-line ones included, round at the 40-high control radius. */
+export const BoxRadius = {
+    render: () => <RichTextEditor label="Session notes" minHeight={150} />,
+    play: async ({ canvasElement }) => {
+        const box = canvasElement.querySelector('.plus-rich-text-editor-box');
+        await expect(px(getComputedStyle(box).borderTopLeftRadius)).toBe(tokenLength(canvasElement, '--radius-control-lg'));
+        await expect(tokenLength(canvasElement, '--radius-control-lg')).toBe(10);
     },
 };
 
