@@ -177,7 +177,10 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
         const observer = new ResizeObserver(read);
         observer.observe(root);
         root.querySelectorAll('*').forEach((el) => observer.observe(el));
-        return () => observer.disconnect();
+        // A layer that mounts or is placed after the first read (a Popup floating into its stage) moves a part: read again.
+        const mutations = typeof MutationObserver === 'undefined' ? null : new MutationObserver(read);
+        mutations?.observe(root, { childList: true, subtree: true, attributes: true, attributeFilter: ['style'] });
+        return () => { observer.disconnect(); mutations?.disconnect(); };
     }, [parts]);
     return (
         <figure

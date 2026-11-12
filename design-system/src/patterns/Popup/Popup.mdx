@@ -1,0 +1,343 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
+
+import * as PopupStories from './Popup.stories.jsx';
+import {
+    ComponentExample,
+    DocsTable,
+    DoDontPair,
+} from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    AsWideAsTrigger,
+    AtCap,
+    EndAligned,
+    FieldsInModal,
+    FormInPopup,
+    NarrowerThanTrigger,
+    OneFlatMenu,
+    PopupBesidePopup,
+    StartAlignedAtEnd,
+    WiderThanCap,
+} from '@/storybook-docs/illustrations/popup.jsx';
+
+<Meta title="Templates/Popup/Popup" tags={['!dev', 'manifest']} />
+
+<Title>Popup</Title>
+A floating layer that hangs off its trigger and closes on an outside click. Five types: menu, select list, filter menu, profile menu and content.
+
+<DocsTabs of={PopupStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Types
+
+Each is a composition on the Popup component, which owns placement, the outside click and Escape.
+
+<TypeGrid>
+<TypeCard of={PopupStories.TypeMenu} title="Menu" stage={480}>Actions from a More button, at auto width. Applies on pick.</TypeCard>
+<TypeCard of={PopupStories.TypeProfileMenu} title="Profile menu" stage={480}>From the account row: who is signed in, then links and Sign out. The 3-col width is Planned: today the menu hugs its rows.</TypeCard>
+<TypeCard of={PopupStories.TypeSelectList} title="Select list" stage={480}>One list that applies as you pick: radios for one choice, checkboxes for several.</TypeCard>
+<TypeCard of={PopupStories.TypeContent} title="Content" stage={480}>A preview or a short explanation at 4-col, the cap. Anything wider is a Panel or a Modal.</TypeCard>
+<TypeCard of={PopupStories.TypeFilterMenu} title="Filter menu" stage={480}>Two or three categories, held until Apply. Reset and Apply sit full bleed, half each.</TypeCard>
+<TypeCard of={PopupStories.TypeFilterMenuStacked} title="Filter menu, stacked" stage={480}>Four or more categories, or long lists, stacked at 3-col up to 4-col. The categories scroll between the pinned header and footer.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+A filter menu off the Filter icon. Every part once; the layer is padded 16 and rounded 12 on the overlay pair.
+
+<Story of={PopupStories.AnatomyFilterMenu} inline />
+
+1. **Trigger.** The control it hangs off. It shows the open state and, for the Filter icon, the count.
+2. **Layer.** Hangs 4 below the trigger, aligned to the trigger's end edge because the trigger sits at the end of the bar.
+3. **Rows or categories.** Menu rows; a list of checkboxes or radios; columns or stacked categories.
+4. **Footer** (filter menu only). Reset (Default) and Apply (Primary), full bleed, half each.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Widths
+
+Auto and the column steps of the screen grid, here at 1024. Auto follows the words: at least the trigger, 160 to 320. The steps follow the grid. The 2-col step, with a 200 floor, is Planned.
+
+<ComponentExample of={PopupStories.WidthSteps} title="auto · 3-col · 4-col" description="Each layer measured against the screen grid at 1024." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Placement
+
+Aligned to the edge of the trigger on the side where it sits. A trigger at the start of a bar, such as the view picker under page tabs, gets a layer aligned to its start edge. A trigger at the end, such as Filter or More, gets one aligned to its end edge. Both open 4 below.
+
+<ComponentExample of={PopupStories.Placement} title="Start and end" description="The select list under a start trigger lines up with its start edge; the menu under an end trigger lines up with its end edge." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key states
+
+<ComponentExample of={PopupStories.KeyLongLabel} title="Long label" description="A menu stops at 320. Past that a row ends in an ellipsis, and the full text opens in a Tooltip when clipped: Patterns, Overflow. The Tooltip on a clipped row is Planned." />
+
+<ComponentExample of={PopupStories.KeyLoading} title="Loading a list" description="One “Loading options” row, with no skeleton: Patterns, Loading." />
+
+<ComponentExample of={PopupStories.KeyLoadFailed} title="Load failed" description="“Couldn't load options” with Retry; the menu stays open." />
+
+<ComponentExample of={PopupStories.KeyFlipped} title="Flipped" description="With no room below, the layer opens above the trigger and stays 8 from the screen edge." />
+
+<ComponentExample of={PopupStories.KeyFilterApplied} title="Filter applied" description="After Apply the menu closes and the count sits on the Filter icon's selected fill, read “Filters, 2 applied”. No chip row: Patterns, Filtering." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sizes
+
+<DocsTable>
+<thead>
+<tr><th>Width</th><th>768</th><th>1024</th><th>1280</th><th>Used for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>auto</code> (default)</td><td>160 to 320</td><td>160 to 320</td><td>160 to 320</td><td>Menus and select lists; at least the trigger</td></tr>
+<tr><td>2-col <PlannedTag /></td><td>200 (floor)</td><td>200 (floor)</td><td>about 224</td><td>A short choice list, a small date or time picker</td></tr>
+<tr><td>3-col</td><td>200</td><td>264</td><td>328</td><td>A filter menu, the profile menu</td></tr>
+<tr><td>4-col</td><td>261</td><td>347</td><td>432</td><td>Content; the cap</td></tr>
+</tbody>
+</DocsTable>
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--popup-min-width</code>, <code>--popup-max-width</code></td><td>160, 320</td><td>The auto range.</td></tr>
+<tr><td><code>--popover-offset</code>, <code>--popover-gap-screen</code></td><td>4, 8</td><td>Below the trigger; from the screen edge.</td></tr>
+<tr><td><code>--popover-pad</code>, <code>--popover-radius</code></td><td>16, 12</td><td>The layer's pad and corner.</td></tr>
+<tr><td><code>--popover-max-height-menu</code></td><td>320</td><td>A menu's rows scroll past this height.</td></tr>
+<tr><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td><td>pair</td><td>The layer's fill and its one edge, the shadow's ring.</td></tr>
+<tr><td><code>--layer-popup</code></td><td>400</td><td>The layer's place in the stack.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="code">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Slots
+
+```jsx
+import { Popup, DropdownMenu, PopupSelect, FilterMenu, IconButton } from '@/components';
+```
+
+Popup is the component: placement, offset, outside click and Escape. Each type is a composition on it: DropdownMenu for the menu and the profile menu, PopupSelect for one list, FilterMenu for several categories.
+
+<DocsTable>
+<thead>
+<tr><th>Slot or prop</th><th>Holds</th></tr>
+</thead>
+<tbody>
+<tr><td><code>trigger</code></td><td>The control it hangs off: an IconButton, a FilterButton, the labeled view trigger, the account row.</td></tr>
+<tr><td><code>placement</code></td><td><code>bottom-start</code> for a trigger at the start of a bar, <code>bottom-end</code> for one at the end. It flips when there is no room.</td></tr>
+<tr><td><code>width</code></td><td><code>auto</code> (default) · <code>3-col</code> · <code>4-col</code>.</td></tr>
+<tr><td><code>width="2-col"</code> <PlannedTag /></td><td>Planned. The short-list step with a 200 floor.</td></tr>
+<tr><td><code>children</code></td><td>Menu rows, a list, filter categories, or a short aside.</td></tr>
+<tr><td>Filter footer</td><td>Reset and Apply, full bleed. It belongs to FilterMenu.</td></tr>
+<tr><td>Profile menu width <PlannedTag /></td><td>Planned. DropdownMenu hugs its rows today; it takes the 3-col step once it takes a width.</td></tr>
+<tr><td>Tooltip on a clipped row <PlannedTag /></td><td>Planned. The full text of a row that ends in an ellipsis.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use a Popup for content anchored to a trigger that leaves on an outside click or Escape: a menu of actions, a list to pick from, the filter menu behind the Filter icon, the profile menu, a short aside. It brings no Backdrop and the page stays usable.
+
+<DocsTable>
+<thead>
+<tr><th>Type</th><th>Use when</th><th>Width</th><th>Applies</th></tr>
+</thead>
+<tbody>
+<tr><td>Menu</td><td>Choosing one action from a short list</td><td>auto</td><td>On pick</td></tr>
+<tr><td>Select list</td><td>One category, picked as you go; the view picker under page tabs</td><td>auto</td><td>As you pick</td></tr>
+<tr><td>Filter menu</td><td>Two or more categories applied together</td><td>3-col, stacked up to 4-col</td><td>On Apply</td></tr>
+<tr><td>Profile menu</td><td>The account row</td><td>3-col</td><td>On pick</td></tr>
+<tr><td>Content</td><td>A preview, a definition, a short explanation</td><td>4-col at most</td><td>—</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a decision before going on, use `Modal`.
+- For content read alongside the page, use `Panel`.
+- For one line that names a control, use `Tooltip`.
+- For a passing notice, use `Flag`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Hang a Popup 4 below its trigger, aligned to the trigger's edge on the side where it sits.
+
+<RuleTag kind="automatic" />
+
+A trigger at the start of a bar, such as the view picker under page tabs, gets a layer aligned to its start edge; a trigger at the end, such as Filter or More, gets one aligned to its end edge. So it grows into the page and stays on it. It flips above when there is no room below and stays 8 from the screen edge.
+
+<DoDontPair
+    doExample={<EndAligned />}
+    doCaption="More sits at the end of the bar, so its menu aligns to its end edge and grows into the page."
+    dontExample={<StartAlignedAtEnd />}
+    dontCaption="An end trigger with a start-aligned menu: it runs off the edge of the page."
+/>
+
+### Make a menu at least as wide as its trigger, from 160 up to 320.
+
+<RuleTag kind="automatic" />
+
+It hugs the longest item. The width is set once, on open, so it holds still while someone types. A long or loading list opens at 320. A long row: Patterns, Overflow.
+
+<DoDontPair
+    doExample={<AsWideAsTrigger />}
+    doCaption="The menu is at least as wide as its trigger, so their edges line up."
+    dontExample={<NarrowerThanTrigger />}
+    dontCaption="A menu narrower than the trigger it hangs off: the edges no longer line up."
+/>
+
+### Cap a Popup at 4-col.
+
+<RuleTag kind="review" />
+
+Anything wider is a Panel or a Modal. Anything with inputs the person must finish, steps or a long scroll belongs in a Modal.
+
+<DoDontPair
+    doExample={<AtCap />}
+    doCaption="A content Popup at 4-col, the cap."
+    dontExample={<WiderThanCap />}
+    dontCaption="A Popup wider than 4-col: anything this wide is a Panel or a Modal."
+/>
+
+### Put fields the person must finish in a Modal.
+
+<RuleTag kind="review" />
+
+An outside click closes a Popup and loses what was typed.
+
+<DoDontPair
+    doExample={<FieldsInModal />}
+    doCaption="Fields to finish go in a Modal, over its Backdrop."
+    dontExample={<FormInPopup />}
+    dontCaption="A form in a Popup: an outside click loses what was typed."
+/>
+
+### Open one Popup at a time, each off its own trigger.
+
+<RuleTag kind="automatic" />
+
+A confirm Modal may open over a Popup and brings its own Backdrop. A Popup opened from a Modal sits above it; a Tooltip sits above everything.
+
+<DoDontPair
+    doExample={<OneFlatMenu />}
+    doCaption="One flat menu; a choice with two forms is two rows."
+    dontExample={<PopupBesidePopup />}
+    dontCaption="A menu opening a second Popup beside it: two layers off one trigger."
+/>
+
+### Leave the Backdrop to the Modal.
+
+<RuleTag kind="automatic" />
+
+A Popup floats on the overlay pair, `--ds-surface-overlay` with `--ds-shadow-overlay`, and the page behind it stays usable.
+
+### Keep a menu's label short and move the detail to its description.
+
+<RuleTag kind="review" />
+
+Start with the verb: "Reschedule", "Export notes". An option that waits on something says why in its description line, as visible text.
+
+When a list applies, and the words Reset and Reset filters: Patterns, Filtering.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>A menu label that starts with the verb: "Reschedule".</td><td>A sentence as the label.</td></tr>
+<tr><td>A category title in a filter menu: "Grade", "Tutor".</td><td>"Filter by grade".</td></tr>
+<tr><td>A Filter Tooltip that names the control: "Filters".</td><td>"Click to filter the table".</td></tr>
+<tr><td>Say Reset in a menu: Reset, Apply.</td><td>"Reset filters" inside the menu.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- The trigger carries `aria-haspopup` and an `aria-expanded` that tracks the open state. A Filter icon's name says what is on: "Filters, 2 applied".
+- A menu moves focus to its first row; Up and Down move, and Escape closes and returns focus to the trigger. A content Popup is a popup, so focus stays where it was and Tab reaches what is inside.
+- A select list is a listbox or a group of checkboxes, and the chosen state is announced. The labeled view trigger reads "Status, Upcoming".
+- In a filter menu, Reset and Apply are reachable after the categories. Apply announces the new count in words.
+- A "Loading options" row is announced once, and "Couldn't load options" offers a Retry button.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use when placing the Filter icon, the view picker or More in the view bar.
+- <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>: use when the content must be finished before going on.
+- <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>: use when the content is wider than 4-col or outlives a click.
+- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use when you need the rules around a Popup: Filtering, Overflow, Loading, Disabled.
+- <a target="_top" href="./?path=/docs/components-overlays-and-layering-popup--docs">Popup</a>: use when you need its props and states.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

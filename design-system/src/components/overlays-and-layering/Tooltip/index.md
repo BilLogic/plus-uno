@@ -21,7 +21,7 @@ what you can see — an icon-only `Button`, a truncated cell, an abbreviation. I
 wraps a single trigger element and shows on hover and focus by default, after
 250ms, hiding 400ms after you leave.
 
-It is the Popups pattern's Tooltip: body.small 12/16 in `--ds-text-inverse` on
+It is the Tooltip of the Popup layers: body.small 12/16 in `--ds-text-inverse` on
 `--ds-background-neutral-bold`, so it flips with the color mode,
 padded 4 · 8, wrapping past 240, with no arrow. It opens 4 from its trigger
 and never comes nearer than 8 to the screen's edge.

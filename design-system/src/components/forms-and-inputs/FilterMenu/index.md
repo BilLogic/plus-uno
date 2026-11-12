@@ -98,6 +98,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `container` | object | — | Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region. |
 | `categories` | arrayOf (required) | `[]` | The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, disabled }`. Each category is a list of checkboxes; pick as many as apply. |
 | `value` | objectOf | — | The applied values, `{ [categoryId]: value[] }`. Leave it out to let the menu keep its own. |
 | `defaultValue` | objectOf | — | The values applied at first, when `value` is left out. |

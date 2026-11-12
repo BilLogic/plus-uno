@@ -78,7 +78,7 @@ Let the Backdrop place the modal. Do not detach it to move things around: the pa
 - [Modal](?path=/docs/templates-modal-modal--docs) is the layer a Backdrop usually holds, centered, for one task that blocks the page.
 - [Drawer](?path=/docs/templates-panel-panel--docs) is the layer held at an edge, for a task that needs the page in view.
 - [Panel](?path=/docs/components-layout-and-structure-panel--docs) opens over a contained Backdrop when its Frame is too narrow to dock it.
-- [Popups](?path=/docs/templates-popup-popup--docs) covers the floating layers that never take a backdrop.
+- [Popup](?path=/docs/templates-popup-popup--docs): use when the layer floats off a trigger and the page stays usable, with no Backdrop.
 - [Frame](?path=/docs/templates-frame-frame--docs) shows the floating Sidebar, which takes a shadow and no backdrop, and the overlay Panel on its contained Backdrop.
 
 Same group: `AiChat` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
