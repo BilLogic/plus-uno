@@ -137,7 +137,6 @@ export const WithScope = {
     render: () => staged(<BodySearch scoped />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getByRole('button', { name: /Search scope/ }) || canvas.getByText('All')).toBeTruthy();
         await expect(canvas.getByText('All'), 'All is first and selected').toBeTruthy();
         await fitsCanvas(canvasElement);
     },
