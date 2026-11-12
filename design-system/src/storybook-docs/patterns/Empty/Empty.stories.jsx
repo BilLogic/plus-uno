@@ -95,7 +95,7 @@ export const PlaceFullPage = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const [title, empty] = canvas.getAllByRole('heading');
-        await expect(title, 'the page title leads').toHaveTextContent('Algebra B');
+        await expect(title, 'the page title leads').toHaveTextContent('Lincoln Middle');
         await expect(empty, 'the empty state names the view').toHaveTextContent('No students in this group yet');
         await fitsCanvas(canvasElement);
     },

@@ -73,9 +73,9 @@ subtree is complete.
     value={topics}
     onChange={setTopics}
     options={[
-        { value: 'geometry', label: 'Geometry', children: [
-            { value: 'triangles', label: 'Triangles' },
-            { value: 'circles', label: 'Circles' },
+        { value: 'roosevelt-k8', label: 'Roosevelt K-8', children: [
+            { value: 'roosevelt-mon', label: 'Monday 3:30 PM' },
+            { value: 'roosevelt-wed', label: 'Wednesday 3:30 PM' },
         ] },
     ]}
 />
@@ -132,7 +132,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Do | Don't |
 | --- | --- |
-| Name each node by what it is: "Algebra". | A node that only reads right under its parent. |
+| Name each node by what it is: "Lincoln Middle". | A node that only reads right under its parent. |
 | Keep branches shallow, two or three levels. | A tree deeper than people can hold in mind. |
 | Say what to do in an error: "Pick a topic". | "Required" or "Invalid". |
 | Use the same label form at every level. | Mix a category name with a full sentence. |

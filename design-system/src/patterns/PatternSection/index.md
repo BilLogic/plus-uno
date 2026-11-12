@@ -213,7 +213,7 @@ The bulk bar lives in the Dynamic table's head row, through its `bulkActions`, a
 | Do | Don't |
 | --- | --- |
 | Title the Section with what it holds, in sentence case: "Upcoming sessions". | A title that repeats the only card inside it. |
-| Keep the description to one line: "Algebra B · 24 students". | A paragraph under the title. |
+| Keep the description to one line: "Lincoln Middle · 24 students". | A paragraph under the title. |
 | Name views by the rows they show: "All students", "Needs follow-up". | Views of different things in one strip. |
 | Name the scope in Search: "Search students". | A bare "Search". |
 

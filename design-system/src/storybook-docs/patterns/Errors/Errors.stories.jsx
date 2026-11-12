@@ -119,7 +119,7 @@ export const KeyBlockedSubmit = {
         const canvas = within(canvasElement);
         await expect(canvas.queryAllByRole('dialog'), 'one dialog, never a second').toHaveLength(1);
         await expect(canvas.getByLabelText(/Student/), 'the field is marked').toHaveAttribute('aria-invalid', 'true');
-        await expect(canvas.getByText('Choose a subject.'), 'the message is on the field').toBeInTheDocument();
+        await expect(canvas.getByText('Choose a site.'), 'the message is on the field').toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },
 };
@@ -143,7 +143,7 @@ export const KeySectionFailed = {
     render: () => staged(<InPage />),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getByRole('heading', { name: 'Algebra B', level: 1 }), 'the page around it is up').toBeInTheDocument();
+        await expect(canvas.getByRole('heading', { name: 'Lincoln Middle', level: 1 }), 'the page around it is up').toBeInTheDocument();
         await expect(canvas.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
         await fitsCanvas(canvasElement);
     },

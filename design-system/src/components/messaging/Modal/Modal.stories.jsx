@@ -513,14 +513,14 @@ export const BlockingShadow = {
 /** A Select list opened inside a Modal keeps the overlay shadow: a smaller layer, lower than the Modal. */
 export const SelectKeepsOverlayShadow = {
     render: () => (
-        <Modal show width="6-col" title="Pick a subject" onClose={() => {}}>
-            <Select label="Subject" options={[{ value: 'a', label: 'Algebra' }, { value: 'b', label: 'Biology' }]} placeholder="Select a subject" />
+        <Modal show width="6-col" title="Pick a site" onClose={() => {}}>
+            <Select label="Site" options={[{ value: 'a', label: 'Lincoln Middle' }, { value: 'b', label: 'North High' }]} placeholder="Select a site" />
         </Modal>
     ),
     play: async ({ canvasElement }) => {
         const doc = canvasElement.ownerDocument;
         const body = within(doc.body);
-        const dialog = await body.findByRole('dialog', { name: 'Pick a subject' });
+        const dialog = await body.findByRole('dialog', { name: 'Pick a site' });
         await expect(getComputedStyle(dialog).boxShadow, 'the live Modal').toBe(paintedShadow(doc, '--ds-shadow-blocking'));
 
         await userEvent.click(within(dialog).getByRole('combobox'));

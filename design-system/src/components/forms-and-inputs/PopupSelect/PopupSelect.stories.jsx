@@ -8,15 +8,15 @@ import PopupSelect, { POPUP_SELECT_PLACEMENTS, POPUP_SELECT_SPACINGS } from './P
 const STATUSES = ['Upcoming', 'Completed', 'Canceled'];
 
 const SESSIONS = [
-    { name: 'Algebra I with Maya', status: 'Upcoming' },
-    { name: 'Geometry with Leo', status: 'Upcoming' },
+    { name: 'Lincoln Middle with Maya', status: 'Upcoming' },
+    { name: 'Roosevelt K-8 with Leo', status: 'Upcoming' },
     { name: 'Reading with Ava', status: 'Completed' },
-    { name: 'Biology with Sam', status: 'Canceled' },
+    { name: 'North High with Sam', status: 'Canceled' },
 ];
 
-const SUBJECTS = [
-    'Algebra I', 'Algebra II', 'Geometry', 'Precalculus', 'Calculus', 'Statistics',
-    'Biology', 'Chemistry', 'Physics', 'Reading', 'Writing', 'History',
+const SITES = [
+    'Lincoln Middle', 'Lincoln High', 'Roosevelt K-8', 'Riverside Academy', 'Jefferson Elementary', 'Washington Middle',
+    'North High', 'South High', 'Oakwood', 'Eastside',
 ];
 
 const pad = { padding: 'var(--space-300)', minHeight: 'calc(var(--space-400) * 7)' };
@@ -140,19 +140,19 @@ export const Keyboard = {
 export const Placement = {
     render: () => {
         const Bar = () => {
-            const [subject, setSubject] = useState(null);
+            const [site, setSite] = useState(null);
             const [sort, setSort] = useState('Newest');
             return (
                 <div style={{ ...pad, ...bar }}>
                     <PopupSelect
-                        label="Subject"
-                        options={SUBJECTS}
-                        value={subject}
-                        onChange={setSubject}
+                        label="Site"
+                        options={SITES}
+                        value={site}
+                        onChange={setSite}
                         placement="bottom-start"
                         defaultOpen
                         id="popup-select-start"
-                        trigger={<FilterButton text="Subject" trailingMetric={subject ? 1 : undefined} />}
+                        trigger={<FilterButton text="Site" trailingMetric={site ? 1 : undefined} />}
                     />
                     <PopupSelect
                         label="Sort"
@@ -169,7 +169,7 @@ export const Placement = {
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const start = canvas.getByRole('button', { name: 'Subject' });
+        const start = canvas.getByRole('button', { name: 'Site' });
         const menu = await openMenu(canvasElement);
         const startBox = start.getBoundingClientRect();
         const menuBox = menu.getBoundingClientRect();
@@ -194,14 +194,14 @@ export const Placement = {
 export const Searchable = {
     render: () => {
         const Demo = () => {
-            const [subject, setSubject] = useState(null);
+            const [site, setSite] = useState(null);
             return (
                 <div style={{ ...pad, minHeight: 'calc(var(--space-400) * 12)' }}>
                     <PopupSelect
-                        label="Subject"
-                        options={SUBJECTS}
-                        value={subject}
-                        onChange={setSubject}
+                        label="Site"
+                        options={SITES}
+                        value={site}
+                        onChange={setSite}
                     />
                 </div>
             );
@@ -210,15 +210,15 @@ export const Searchable = {
     },
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await userEvent.click(canvas.getByRole('button', { name: 'Subject' }));
+        await userEvent.click(canvas.getByRole('button', { name: 'Site' }));
         const menu = await openMenu(canvasElement);
-        const search = within(menu).getByRole('combobox', { name: 'Search subject' });
+        const search = within(menu).getByRole('combobox', { name: 'Search site' });
         await expect(search).toHaveFocus();
-        await userEvent.type(search, 'alg');
+        await userEvent.type(search, 'lin');
         await waitFor(() => expect(within(menu).getAllByRole('option')).toHaveLength(2));
         await userEvent.keyboard('{Enter}');
         await menuClosed(canvasElement);
-        await expect(canvas.getByRole('button', { name: 'Subject: Algebra I' })).toBeInTheDocument();
+        await expect(canvas.getByRole('button', { name: 'Site: Lincoln Middle' })).toBeInTheDocument();
     },
 };
 

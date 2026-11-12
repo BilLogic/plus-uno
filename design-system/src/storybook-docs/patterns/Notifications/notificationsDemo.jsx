@@ -77,7 +77,7 @@ export const FlagWithActions = () => (
             show
             actions={[{ text: 'Undo', onClick: noop }, { text: 'View sessions', onClick: noop }]}
         >
-            Algebra B on Tuesday.
+            Lincoln Middle on Tuesday.
         </Flag>
     </TopRight>
 );
@@ -125,7 +125,7 @@ export const TierPage = () => (
 export const TierSection = () => (
     <BrowserWindow address="app.plus.org/students">
         <div style={pad}>
-            <DemoPageHeader title="Students" description="Algebra B" />
+            <DemoPageHeader title="Students" description="Lincoln Middle" />
             <PatternSection title="Students" tabs={<ViewBar views={['All students']} filters={null} primary={null} />}>
                 <Banner appearance="warning">Two students have no guardian contact on file.</Banner>
                 <StudentsTable count={2} />

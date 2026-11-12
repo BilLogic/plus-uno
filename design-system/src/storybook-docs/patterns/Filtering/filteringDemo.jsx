@@ -237,7 +237,7 @@ export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, vie
             >
                 <PatternSection
                     title="Students"
-                    description="Algebra B"
+                    description="Lincoln Middle"
                     tabs={<ViewBar views={views} start={start ? start(mount) : undefined} filters={filters} primary="Add students" narrow={width < FRAME_LAYOUT.fullWidthBelow} />}
                 >
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>{body}</div>

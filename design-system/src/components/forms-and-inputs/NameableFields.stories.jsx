@@ -129,14 +129,9 @@ export const CallerPropsNameTheControl = () => (
         <span id="nf-term-label">Term</span>
         <Select
             id="nf-subject"
-<<<<<<< HEAD
-            aria-label="Subject"
-            isSearchable={false}
-            options={[{ value: 'maths', label: 'Maths' }, { value: 'english', label: 'English' }]}
-=======
             aria-label="Site"
+            isSearchable={false}
             options={[{ value: 'lincoln', label: 'Lincoln Middle' }, { value: 'roosevelt', label: 'Roosevelt K-8' }]}
->>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
         />
         <Select
             id="nf-term"

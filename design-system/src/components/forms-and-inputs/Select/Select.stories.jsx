@@ -138,19 +138,19 @@ const field = { maxWidth: 'var(--width-2500)' };
 
 /** One story per value, for the Examples tab. */
 export const Empty = {
-    render: () => <div style={field}><Select label="Subject" options={sampleOptions} placeholder="Select a subject" /></div>,
+    render: () => <div style={field}><Select label="Site" options={sampleOptions} placeholder="Select a subject" /></div>,
 };
 
 export const Filled = {
-    render: () => <div style={field}><Select label="Subject" defaultValue="option-1" options={sampleOptions} placeholder="Select a subject" /></div>,
+    render: () => <div style={field}><Select label="Site" defaultValue="option-1" options={sampleOptions} placeholder="Select a subject" /></div>,
 };
 
 export const Multi = {
-    render: () => <div style={field}><Select label="Subjects" isMulti options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select subjects" /></div>,
+    render: () => <div style={field}><Select label="Sites" isMulti options={sampleOptions} defaultValue={['option-1', 'option-2']} placeholder="Select subjects" /></div>,
 };
 
 export const Searchable = {
-    render: () => <div style={field}><Select label="Subject" options={sampleOptions} placeholder="Type to search" /></div>,
+    render: () => <div style={field}><Select label="Site" options={sampleOptions} placeholder="Type to search" /></div>,
 };
 
 /** A single pick is marked with a check by default; `marker="radio"` draws a radio before the label. Several picks always use checkboxes. */
@@ -194,15 +194,15 @@ export const NotSearchable = {
 };
 
 export const Creatable = {
-    render: () => <div style={field}><Select label="Subjects" isMulti isCreatable options={sampleOptions} placeholder="Type to search or create" /></div>,
+    render: () => <div style={field}><Select label="Sites" isMulti isCreatable options={sampleOptions} placeholder="Type to search or create" /></div>,
 };
 
 export const SpacingDefault = {
-    render: () => <div style={field}><Select label="Subject" spacing="default" options={sampleOptions} placeholder="Select a subject" /></div>,
+    render: () => <div style={field}><Select label="Site" spacing="default" options={sampleOptions} placeholder="Select a subject" /></div>,
 };
 
 export const SpacingCompact = {
-    render: () => <div style={field}><Select label="Subject" spacing="compact" options={sampleOptions} placeholder="Select a subject" /></div>,
+    render: () => <div style={field}><Select label="Site" spacing="compact" options={sampleOptions} placeholder="Select a subject" /></div>,
 };
 
 /** Spacing — default (40) and compact (32). */
@@ -529,7 +529,7 @@ export const FieldReadOnlyLongValue = {
 /** The open list has one edge, the shadow's ring: no painted border (a transparent one stays for forced colors). */
 export const OpenListEdge = {
     parameters: { docs: { disable: true } },
-    render: () => <div style={field}><Select label="Subject" options={sampleOptions} placeholder="Select a subject" /></div>,
+    render: () => <div style={field}><Select label="Site" options={sampleOptions} placeholder="Select a subject" /></div>,
     play: async ({ canvasElement }) => {
         await userEvent.click(within(canvasElement).getByRole('combobox', { name: 'Subject' }));
         const list = await waitFor(() => {

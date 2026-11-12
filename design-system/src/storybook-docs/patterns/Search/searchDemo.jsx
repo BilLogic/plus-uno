@@ -93,7 +93,7 @@ export const SearchStudents = ({ initialQuery = '', initialOpen = false, isLoadi
         <div style={{ padding: 'var(--page-pad)' }}>
             <PatternSection
                 title="Students"
-                description="Algebra B"
+                description="Lincoln Middle"
                 tabs={(
                     <div className="plus-section-view-bar" style={{ ...row, inlineSize: '100%' }}>
                         <Tabs appearance="pill" activeKey={view} onSelect={setView} aria-label="Views">
@@ -141,7 +141,7 @@ export const BodySearch = ({ initialQuery = '', scoped = false }) => {
 };
 
 const PEOPLE = STUDENTS.map(([name, grade], index) => ({ value: `s${index}`, label: name, description: grade }));
-const SESSIONS = [{ value: 'x1', label: 'Algebra B, Tuesday 4pm' }, { value: 'x2', label: 'Geometry, Thursday 5pm' }];
+const SESSIONS = [{ value: 'x1', label: 'Lincoln Middle, Tuesday 4pm' }, { value: 'x2', label: 'Roosevelt K-8, Thursday 5pm' }];
 
 /** The panel's groups for a text: students by name, sessions by subject. */
 export const groupsFor = (text) => {
@@ -176,7 +176,7 @@ export const FocusedStudents = ({ text: initialText = '', holdFocus = false }) =
                 onValueChange={setText}
                 inputRef={input}
                 results={groupsFor(text)}
-                recent={['Ava', 'Algebra B']}
+                recent={['Ava', 'Lincoln Middle']}
                 panelLabel={PANEL}
                 onSelect={() => {}}
                 onSearch={() => {}}
@@ -230,7 +230,7 @@ export const FocusedPage = ({ text = 'a' }) => {
                         placeholder={SCOPE}
                         value={text}
                         results={groups}
-                        recent={['Ava', 'Algebra B']}
+                        recent={['Ava', 'Lincoln Middle']}
                         panelLabel={PANEL}
                         defaultPanelOpen
                         panelContainer={mount}
@@ -242,7 +242,7 @@ export const FocusedPage = ({ text = 'a' }) => {
                 </div>
             )}
         >
-            <PatternSection title="Roster" description="Algebra B">
+            <PatternSection title="Roster" description="Lincoln Middle">
                 <div aria-busy="true"><Skeleton shape="text" lines={6} /></div>
             </PatternSection>
         </PageFrame>

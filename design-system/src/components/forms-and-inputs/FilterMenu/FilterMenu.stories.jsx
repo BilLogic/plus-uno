@@ -6,7 +6,7 @@ import FilterMenu, { FILTER_MENU_LAYOUTS, FILTER_MENU_PLACEMENTS, FILTER_MENU_WI
 
 const SIDE_BY_SIDE = [
     { id: 'status', label: 'Status', options: ['Upcoming', 'Completed', 'Canceled'] },
-    { id: 'subject', label: 'Subject', options: ['Math', 'Reading', 'Science'] },
+    { id: 'site', label: 'Site', options: ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'Riverside Academy'] },
     { id: 'format', label: 'Format', options: ['Online', 'In person'] },
 ];
 
@@ -17,10 +17,10 @@ const STACKED = [
 ];
 
 const SESSIONS = [
-    { name: 'Algebra I with Maya', status: 'Upcoming', subject: 'Math', format: 'Online' },
-    { name: 'Geometry with Leo', status: 'Upcoming', subject: 'Math', format: 'In person' },
-    { name: 'Reading with Ava', status: 'Completed', subject: 'Reading', format: 'Online' },
-    { name: 'Biology with Sam', status: 'Canceled', subject: 'Science', format: 'In person' },
+    { name: 'Lincoln Middle with Maya', status: 'Upcoming', site: 'Lincoln Middle', format: 'Online' },
+    { name: 'Roosevelt K-8 with Leo', status: 'Upcoming', site: 'Roosevelt K-8', format: 'In person' },
+    { name: 'Riverside Academy with Ava', status: 'Completed', site: 'Riverside Academy', format: 'Online' },
+    { name: 'North High with Sam', status: 'Canceled', site: 'North High', format: 'In person' },
 ];
 
 const pad = { padding: 'var(--space-300)', minHeight: 'calc(var(--space-400) * 10)' };
@@ -111,7 +111,7 @@ export const Overview = {
         await userEvent.click(within(menu).getByRole('button', { name: 'Apply' }));
         await menuClosed(canvasElement);
         await expect(canvas.getAllByRole('listitem')).toHaveLength(1);
-        await expect(canvas.getByText('Algebra I with Maya')).toBeInTheDocument();
+        await expect(canvas.getByText('Lincoln Middle with Maya')).toBeInTheDocument();
         const counted = canvas.getByRole('button', { name: 'Filters, 2 applied' });
         await waitFor(() => expect(counted).toHaveFocus());
     },

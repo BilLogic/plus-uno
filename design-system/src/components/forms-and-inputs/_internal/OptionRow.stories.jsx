@@ -161,19 +161,11 @@ LongLabelsTruncate.play = async ({ canvasElement }) => {
  */
 export const Colors = () => (
     <div role="listbox" aria-label="Colors" aria-multiselectable="true" style={frame}>
-<<<<<<< HEAD
-        <OptionRow label="Algebra" />
-        <OptionRow label="Biology" highlighted />
-        <OptionRow label="Chemistry" selected description="Grade 9" />
-        <OptionRow label="Physics" check={false} selected elemBefore={<OptionRow.Checkbox checked />} />
-        <OptionRow label="Geometry" dragging />
-=======
         <OptionRow label="Lincoln Middle" />
         <OptionRow label="North High" highlighted />
         <OptionRow label="South High" selected description="Grade 9" />
-        <OptionRow label="Physics" check={false} selected leading={<OptionRow.Checkbox checked />} />
+        <OptionRow label="Physics" check={false} selected elemBefore={<OptionRow.Checkbox checked />} />
         <OptionRow label="Roosevelt K-8" dragging />
->>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
         <OptionRow label="History" dropIndicator="before" />
     </div>
 );

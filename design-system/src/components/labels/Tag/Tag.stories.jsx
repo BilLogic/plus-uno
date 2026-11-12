@@ -1044,11 +1044,7 @@ export const Saving = {
             return (
                 <div style={row}>
                     <span data-testid="removable-wrap">
-<<<<<<< HEAD
-                        <Tag isRemovable color="yellow" swatchBefore isLoading={saving} onAfterRemoveAction={onRemoveSpy} data-testid="removable">Geometry</Tag>
-=======
-                        <Tag isRemovable color="yellow" isLoading={saving} onAfterRemoveAction={onRemoveSpy} data-testid="removable">Roosevelt K-8</Tag>
->>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
+                        <Tag isRemovable color="yellow" swatchBefore isLoading={saving} onAfterRemoveAction={onRemoveSpy} data-testid="removable">Roosevelt K-8</Tag>
                     </span>
                     <Tag isSelected={false} color="yellow" isLoading={saving} onClick={onToggleSpy}>Statistics</Tag>
                     <Tag
@@ -1216,11 +1212,7 @@ export const OnImages = () => (
     <div style={thumbnail}>
         <div style={picture} aria-hidden="true" />
         <div style={onPicture}>
-<<<<<<< HEAD
-            <Tag color="blue" swatchBefore isElevated data-testid="read-only">Algebra</Tag>
-=======
-            <Tag color="blue" isElevated data-testid="read-only">Lincoln Middle</Tag>
->>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
+            <Tag color="blue" swatchBefore isElevated data-testid="read-only">Lincoln Middle</Tag>
             <Tag color="green" isElevated>Advocacy</Tag>
             <Tag color="gray" href="#video" isElevated>Video</Tag>
             <Tag type="person" color="blue" isElevated data-testid="person">Rosa Chen</Tag>

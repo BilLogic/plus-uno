@@ -181,7 +181,7 @@ export const CardLevels = {
     },
 };
 
-const options = ['Algebra I', 'Geometry', 'Reading', 'Writing'].map((label) => ({ value: label.toLowerCase(), label }));
+const options = ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'South High'].map((label) => ({ value: label.toLowerCase(), label }));
 
 /** A Popup held open beside its trigger. */
 export const OpenPopup = {
@@ -222,8 +222,8 @@ const SessionsFrame = ({ edge, columns = 1, ...frameProps }) => {
                 {...frameProps}
             >
                 <div style={{ display: 'grid', gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`, gap: 'var(--grid-gutter)' }}>
-                    <PatternCard title="Session 12" description="Thursday, 4:30 PM · Algebra I" />
-                    <PatternCard title="Session 13" description="Monday, 4:30 PM · Geometry" />
+                    <PatternCard title="Session 12" description="Thursday, 4:30 PM · Lincoln Middle" />
+                    <PatternCard title="Session 13" description="Monday, 4:30 PM · Roosevelt K-8" />
                     {columns > 1 && <PatternCard title="Session 14" description="Tuesday, 5:00 PM · Reading" />}
                     {columns > 1 && <PatternCard title="Session 15" description="Friday, 3:30 PM · Writing" />}
                 </div>
@@ -293,7 +293,7 @@ export const OpenTooltip = {
 export const OpenSelect = {
     render: () => (
         <div style={{ minHeight: 'calc(var(--image-xl) * 3)' }}>
-            <Select label="Subject" options={options} defaultOpen />
+            <Select label="Site" options={options} defaultOpen />
         </div>
     ),
     play: async () => {

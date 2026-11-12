@@ -88,7 +88,7 @@ const WaitFlag = ({ title, children }) => (
  */
 export const LoadingList = ({ band = 'shape', first = false, reduced }) => (
     <div style={stack}>
-        <PatternSection title="Students" description="Algebra B" tabs={<ViewBar views={['All students']} filters={null} primary={null} />}>
+        <PatternSection title="Students" description="Lincoln Middle" tabs={<ViewBar views={['All students']} filters={null} primary={null} />}>
             <section aria-label="Students" aria-busy={band === 'under' ? undefined : 'true'}>
                 {band === 'under'
                     ? (first ? <div style={{ minBlockSize: BLANK }} /> : <StudentsTable count={4} />)
@@ -108,7 +108,7 @@ export const LoadingList = ({ band = 'shape', first = false, reduced }) => (
 export const LoadingAction = ({ band = 'shape' }) => (
     <div style={stack}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)', maxInlineSize: ACTION_WIDTH }}>
-            <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>Ana Ruiz · Thursday at 4:00 PM · Algebra I</p>
+            <p style={{ margin: 0, font: 'var(--body-default)', color: 'var(--ds-text)' }}>Ana Ruiz · Thursday at 4:00 PM · Lincoln Middle</p>
             <div style={{ display: 'flex', gap: 'var(--inline-md)' }}>
                 <Button text="Save session" appearance="primary" isLoading={band !== 'under'} onClick={noop} />
                 <Button text="Cancel" appearance="subtle" onClick={noop} />
@@ -125,7 +125,7 @@ export const LoadingPage = ({ band = 'shape', reduced }) => (
             <PatternSection title="Sessions" description="This week"><StudentsTable count={3} /></PatternSection>
         ) : (
             <div aria-busy="true" style={stack}>
-                <PatternSection title="Roster" description="Algebra B"><SkeletonRows rows={3} reduced={reduced} /></PatternSection>
+                <PatternSection title="Roster" description="Lincoln Middle"><SkeletonRows rows={3} reduced={reduced} /></PatternSection>
                 <PatternSection title="Sessions" description="This week"><SkeletonRows rows={2} reduced={reduced} /></PatternSection>
             </div>
         )}

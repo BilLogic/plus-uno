@@ -52,7 +52,6 @@ const node = (id, name, type, sessions, more = {}) => ({
     ...more
 });
 
-<<<<<<< HEAD
 const items = [
     node('lincoln', 'Lincoln Middle', 'School', 54, {
         count: 3,
@@ -68,20 +67,10 @@ const items = [
         ]
     }),
     node('roosevelt', 'Roosevelt K-8', 'School', 31, { hasChildren: true })
-=======
-const ROWS = [
-    { depth: 0, expandable: true, name: 'Lincoln Middle', sessions: '12' },
-    { depth: 1, expandable: true, name: 'Tuesday 4:00 PM', sessions: '5' },
-    { depth: 2, expandable: false, name: 'Ana Ruiz', sessions: '2' },
-    { depth: 2, expandable: false, name: 'Marcus Lee', sessions: '3' },
-    { depth: 1, expandable: false, name: 'Thursday 4:00 PM', sessions: '7' },
-    { depth: 0, expandable: true, name: 'Roosevelt K-8', sessions: '9' }
->>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
 ];
 
 const row = (canvas, name) => canvas.getByText(name).closest('tr');
 
-<<<<<<< HEAD
 export const Overview = {
     args: { head, items, label: 'Schools', defaultExpandedIds: ['lincoln', 'g7', 'g8'] },
     parameters: { docs: { description: { story: 'Each level indents one step and keeps the columns. A parent shows its count; an open parent with nothing in it shows a message row at the child level.' } } },
@@ -194,17 +183,4 @@ export const Focused = {
 /** The playground: the overview story's args, with every control live. */
 export const Interactive = {
     args: { ...Overview.args }
-=======
-/** Depth sets indentation; a branch's title cell carries the expand chevron. */
-Overview.play = async ({ canvasElement }) => {
-    const canvas = within(canvasElement);
-    const table = canvas.getByTestId('tree-table');
-    const leaf = within(table).getByText('Ana Ruiz').closest('td');
-    const root = within(table).getByText('Lincoln Middle').closest('td');
-    const leafPad = parseFloat(getComputedStyle(leaf).paddingLeft);
-    const rootPad = parseFloat(getComputedStyle(root).paddingLeft);
-    await expect(leafPad, 'a depth-2 row indents further than depth-0').toBeGreaterThan(rootPad);
-    await expect(root.querySelector('.fa-chevron-down')).not.toBeNull();
-    await expect(leaf.querySelector('.fa-chevron-down')).toBeNull();
->>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
 };

@@ -93,7 +93,7 @@ export const EmptyType = ({ kind, spacing = 'default', action = true }) => {
 export const FullPage = () => (
     <BrowserWindow address="app.plus.org/groups/algebra-b" height={WINDOW}>
         <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
-            <DemoPageHeader title="Algebra B" description="Tuesdays and Thursdays, 4:00 PM" />
+            <DemoPageHeader title="Lincoln Middle" description="Tuesdays and Thursdays, 4:00 PM" />
             <EmptyType kind="first" />
         </div>
     </BrowserWindow>
@@ -102,7 +102,7 @@ export const FullPage = () => (
 /** A Section whose table is empty: the empty state replaces the whole table; the view bar above stays. */
 export const InTable = ({ kind = 'first' }) => (
     <div style={{ padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
-        <PatternSection title="Students" description="Algebra B" tabs={<ViewBar views={['All students']} filters={null} />}>
+        <PatternSection title="Students" description="Lincoln Middle" tabs={<ViewBar views={['All students']} filters={null} />}>
             <EmptyType kind={kind} spacing="compact" />
         </PatternSection>
     </div>

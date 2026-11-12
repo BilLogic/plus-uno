@@ -119,13 +119,7 @@ export const Overview = () => {
     );
 };
 
-<<<<<<< HEAD
 const fieldWrap = { maxWidth: 'var(--width-2500)' };
-=======
-export const Content = () => {
-    const [single, setSingle] = useState('');
-    const [multi, setMulti] = useState(['roosevelt-mon', 'roosevelt-wed', 'roosevelt-k8']);
->>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
 
 /** Single select: clicking any node selects it and closes the panel. */
 export const SingleSelect = () => {
@@ -139,7 +133,7 @@ export const SingleSelect = () => {
 
 /** Multi select: a parent's check cascades to its children; a partly checked branch is indeterminate. */
 export const MultiSelect = () => {
-    const [value, setValue] = useState(['triangles', 'circles', 'geometry']);
+    const [value, setValue] = useState(['roosevelt-mon', 'roosevelt-wed', 'roosevelt-k8']);
     return (
         <div style={fieldWrap}>
             <TreeSelect id="tree-select-multi" label="Topics" value={value} options={sampleOptions} onChange={setValue} isMulti />

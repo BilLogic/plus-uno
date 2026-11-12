@@ -139,7 +139,7 @@ The image sits above a padded frame, and the header, body and footer sit inside 
 | Do | Don't |
 | --- | --- |
 | Title the card with the object it holds, in sentence case: "Ana Ruiz", "Sessions this week". | A generic title such as "Details" or "Info". |
-| Keep the description to one line that adds something, such as "Algebra I · Thu 4:00 PM". | A description that repeats the title. |
+| Keep the description to one line that adds something, such as "Lincoln Middle · Thu 4:00 PM". | A description that repeats the title. |
 | Name a footer action for what it does: "Save note", "View session". | "OK" or "Submit". |
 
 ## Props

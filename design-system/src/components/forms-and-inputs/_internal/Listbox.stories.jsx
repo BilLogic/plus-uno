@@ -32,13 +32,8 @@ export default {
     },
 };
 
-<<<<<<< HEAD
-const SUBJECTS = ['Algebra', 'Biology', 'Chemistry', 'Economics', 'Geometry', 'History', 'Physics'];
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' };
-=======
 const SITES = ['Lincoln Middle', 'North High', 'Riverside Academy', 'Roosevelt K-8', 'South High', 'Jefferson Elementary', 'Washington Middle'];
-const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)', maxWidth: '360px' };
->>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' };
 
 /**
  * A field with its list: focus stays in the input, which points at the

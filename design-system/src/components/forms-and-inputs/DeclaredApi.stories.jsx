@@ -68,7 +68,7 @@ export const SelectRequired = () => (
         <Select
             id="dapi-optional"
             options={schoolOptions}
-            placeholder="Select a subject"
+            placeholder="Select a site"
         />
     </div>
 );
@@ -77,7 +77,7 @@ SelectRequired.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const field = canvas.getByRole('combobox', { name: /Select a school/ });
     await expect(field).toHaveAttribute('aria-required', 'true');
-    const optional = canvas.getByRole('combobox', { name: /Select a subject/ });
+    const optional = canvas.getByRole('combobox', { name: /Select a site/ });
     await expect(optional).not.toHaveAttribute('aria-required');
 };
 

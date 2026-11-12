@@ -32,31 +32,6 @@ const sessionBody = (
 
 const viewSession = <Button text="View session" appearance="subtle" spacing="compact" onClick={() => {}} />;
 
-<<<<<<< HEAD
-=======
-/** The three sizes: each sets the pad, the radius and the minimum width together. */
-function PatternCardSizesDemo() {
-    return (
-        <div style={wrapRow}>
-            {CARD_SIZES.map((size) => (
-                <div key={size}>
-                    <DemoCaption>{`size=${size}`}</DemoCaption>
-                    <PatternCard
-                        padding={size}
-                        minWidth={`var(--card-min-width-${size})`}
-                        title="Ana Ruiz"
-                        description="Lincoln Middle · Thu 4:00 PM"
-                        footer={viewSession}
-                    >
-                        {sessionBody}
-                    </PatternCard>
-                </div>
-            ))}
-        </div>
-    );
-}
-
->>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
 const imagePlaceholder = (ratio) => (
     <div
         style={{
@@ -75,53 +50,6 @@ const imagePlaceholder = (ratio) => (
     </div>
 );
 
-<<<<<<< HEAD
-=======
-/** The image slot at each ratio, edge to edge above the padded content. */
-function PatternCardImageDemo() {
-    return (
-        <div style={wrapRow}>
-            {['16:9', '4:3', '1:1'].map((ratio) => (
-                <PatternCard
-                    key={ratio}
-                    image={imagePlaceholder(ratio)}
-                    title="Ana Ruiz"
-                    description="Lincoln Middle · Thu 4:00 PM"
-                    style={{ width: 'var(--card-min-width-md)' }}
-                >
-                    {sessionBody}
-                </PatternCard>
-            ))}
-        </div>
-    );
-}
-
-/** A loading card: text bars at the text line heights, in a card kept at its final size. */
-function PatternCardLoadingDemo() {
-    return (
-        <div style={wrapRow}>
-            <div>
-                <DemoCaption>Default</DemoCaption>
-                <PatternCard title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" footer={viewSession} style={{ width: 'var(--card-min-width-md)' }}>
-                    {sessionBody}
-                </PatternCard>
-            </div>
-            <div>
-                <DemoCaption>Loading</DemoCaption>
-                <PatternCard aria-busy="true" style={{ width: 'var(--card-min-width-md)' }}>
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-md)' }}>
-                        <Skeleton shape="text" width="50%" />
-                        <Skeleton shape="text" width="75%" />
-                        <Skeleton shape="text" width="100%" />
-                        <Skeleton shape="text" width="40%" />
-                    </div>
-                </PatternCard>
-            </div>
-        </div>
-    );
-}
-
->>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
 /** A row of cards at three content widths: the most that keeps each card at its minimum. */
 function PatternCardRowsDemo() {
     const people = [
@@ -327,7 +255,7 @@ const sizedCard = (size) => (
         padding={size}
         minWidth={`var(--card-min-width-${size})`}
         title="Ana Ruiz"
-        description="Algebra I · Thu 4:00 PM"
+        description="Lincoln Middle · Thu 4:00 PM"
         footer={viewSession}
     >
         {sessionBody}
@@ -341,7 +269,7 @@ export const SizeLarge = { name: 'Large', render: () => sizedCard('lg') };
 
 /** One image ratio per story, edge to edge above the padded content. */
 const imageCard = (ratio) => (
-    <PatternCard image={imagePlaceholder(ratio)} title="Ana Ruiz" description="Algebra I · Thu 4:00 PM" style={{ width: 'var(--card-min-width-md)' }}>
+    <PatternCard image={imagePlaceholder(ratio)} title="Ana Ruiz" description="Lincoln Middle · Thu 4:00 PM" style={{ width: 'var(--card-min-width-md)' }}>
         {sessionBody}
     </PatternCard>
 );
