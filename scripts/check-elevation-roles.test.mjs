@@ -3,14 +3,14 @@
  * must name the same shadow.
  *
  * WHY THIS EXISTS. `design-system/guidelines/figma/token-mapping.md` and
- * the Elevation page (`design-system/src/styles/Elevation.mdx`) say which surface and shadow each layer takes, and
+ * the Elevation page (its tables are data in `design-system/src/storybook-docs/elevation-demos.jsx`) say which surface and shadow each layer takes, and
  * the stylesheets draw it. The two live in different file types, and a role
  * once answered "which shadow does a card get?" differently from the table
  * with nothing noticing, because no check read both.
  *
  * WHAT IS ASSERTED. The mapping's overlay rows name the overlay pair for every
- * floating layer, the Elevation page's pattern table agrees, and each surface
- * below draws the shadow its row names.
+ * floating layer and its blocking row the Modal, the Elevation page's level
+ * and behavior rows agree, and each surface below draws the shadow its row names.
  *
  * ─── WHAT IT DELIBERATELY CANNOT SEE ────────────────────────────────────────
  *
@@ -37,27 +37,29 @@ import { fileURLToPath } from 'node:url';
 import * as sass from 'sass';
 import postcss from 'postcss';
 
-import { readDocsPage, sectionText } from './lib/docs-page.mjs';
 
 const REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MAPPING = path.join(REPO_ROOT, 'design-system/guidelines/figma/token-mapping.md');
-const ELEVATION_PAGE = 'design-system/src/styles/Elevation.mdx';
+const ELEVATION_DEMOS = 'design-system/src/storybook-docs/elevation-demos.jsx';
 
-test('floating layers take the overlay pair; the Modal takes the blocking shadow', () => {
-  // Decision 3 of the color proposal: a modal sits at the overlay level, as
-  // every floating layer does, and the blanket under it is what sets it apart
-  // from a menu.
+test('every floating layer takes the overlay pair, and only the Modal blocks', () => {
+  // Elevation 2.0: a layer that floats with the page usable is on the overlay
+  // pair; the Modal on its Backdrop is the one surface on the blocking shadow,
+  // over the same overlay surface.
   const mapping = fs.readFileSync(MAPPING, 'utf8');
-  for (const [half, token] of [['surface', '--ds-surface-overlay'], ['shadow', '--ds-shadow-overlay']]) {
-    const row = mapping.split('\n').find((line) => new RegExp(`^\\|\\s*Overlay ${half}\\s*\\(`).test(line.trim()));
-    assert.ok(row, `token-mapping.md has no Overlay ${half} row`);
-    // A tooltip is a label on the neutral bold fill, so only the surface row names it.
-    const named = [/modals/i, /menus/i, /popovers/i, /toasts/i, ...(half === 'surface' ? [/tooltips/i] : [])];
-    for (const words of named) {
-      assert.match(row, words, `the Overlay ${half} row no longer names ${words}`);
+  const rowOf = (name) => mapping.split('\n').find((line) => new RegExp(`^\\|\\s*${name}\\s*\\(`).test(line.trim()));
+  for (const [half, token] of [['Overlay surface', '--ds-surface-overlay'], ['Overlay shadow', '--ds-shadow-overlay']]) {
+    const row = rowOf(half);
+    assert.ok(row, `token-mapping.md has no ${half} row`);
+    for (const words of [/menus/i, /popups/i, /flags/i, /floating Sidebar/i]) {
+      assert.match(row, words, `the ${half} row no longer names ${words}`);
     }
-    assert.ok(row.includes(`var(${token})`), `the Overlay ${half} row does not name var(${token})`);
+    assert.ok(row.includes(`var(${token})`), `the ${half} row does not name var(${token})`);
   }
+  const blocking = rowOf('Blocking shadow');
+  assert.ok(blocking, 'token-mapping.md has no Blocking shadow row');
+  assert.match(blocking, /Modal/);
+  assert.ok(blocking.includes('var(--ds-shadow-blocking)'), 'the Blocking shadow row does not name var(--ds-shadow-blocking)');
   const file = 'design-system/src/patterns/PatternModal/PatternModal.scss';
   assert.match(fs.readFileSync(path.join(REPO_ROOT, file), 'utf8'), /--ds-shadow-overlay/, `${file} does not take the overlay shadow`);
 });
@@ -137,20 +139,23 @@ test('Tooltip.scss draws a flat label: neutral bold fill, no box-shadow', () => 
   assert.match(block, /background-color:\s*var\(--ds-background-neutral-bold\)/);
 });
 
-test("the Elevation page's pattern table says the same steps", () => {
-  const page = readDocsPage(fs.readFileSync(path.join(REPO_ROOT, ELEVATION_PAGE), 'utf8'), { kind: 'foundation' });
-  const table = sectionText(page, "Each pattern's level");
-  assert.ok(table, `${ELEVATION_PAGE} has no "Each pattern's level" section`);
-  const rowOf = (words) => table.split('\n').find((line) => line.startsWith('|') && words.test(line));
-  for (const layer of [/modal/i, /menu/i, /DropdownMenu/, /listbox/i, /popup/i, /flag/i, /sidebar, opened over/i]) {
-    const row = rowOf(layer);
-    assert.ok(row, `the Elevation page's pattern table has no row matching ${layer}`);
-    assert.match(row, /--ds-surface-overlay/, `the Elevation page does not put ${layer} on the overlay surface`);
-    assert.match(row, /--ds-shadow-overlay/, `the Elevation page does not put ${layer} on the overlay shadow`);
+test("the Elevation page's levels and behavior rows say the same steps", () => {
+  // The page's level and behavior tables are data in its demos module, so the
+  // rows are read from that source.
+  const source = fs.readFileSync(path.join(REPO_ROOT, ELEVATION_DEMOS), 'utf8');
+  const lineOf = (re) => source.split('\n').find((line) => re.test(line)) ?? '';
+  const level = (id) => lineOf(new RegExp(`\\{ id: '${id}', name:`));
+  assert.match(level('raised'), /surface: '--ds-surface-raised', shadow: '--ds-shadow-raised'/, 'raised is not the raised pair');
+  assert.match(level('overlay'), /surface: '--ds-surface-overlay', shadow: '--ds-shadow-overlay'/, 'overlay is not the overlay pair');
+  assert.match(level('blocking'), /surface: '--ds-surface-overlay', shadow: '--ds-shadow-blocking'/, 'blocking is not the overlay surface under the blocking shadow');
+  const behavior = (id) => lineOf(new RegExp(`\\{ id: '${id}', behavior:`));
+  assert.match(behavior('floats'), /level: 'overlay'/);
+  for (const layer of [/floating Sidebar/i, /floating Panel/i, /Popup/, /Flag/, /dragged Card/]) {
+    assert.match(behavior('floats'), layer, `the floats row does not name ${layer}`);
   }
-  const card = rowOf(/^\|\s*Card\s*\|/) ?? '';
-  assert.match(card, /--ds-surface-raised` \+ `--ds-shadow-raised/, 'the Elevation page does not rest a card on the raised pair');
-  assert.match(card, /clickable cards lift to `--ds-shadow-overlay`/, 'the Elevation page does not lift a clickable card to the overlay shadow');
+  assert.match(behavior('blocks'), /level: 'blocking'.*Modal only/, 'the blocks row is not the Modal alone');
+  assert.match(behavior('marks'), /level: 'raised'.*Card/, 'a Card does not mark one object on the raised level');
+  assert.match(behavior('labels'), /level: null.*Tooltip/, 'the Tooltip row carries a level');
 });
 
 /**

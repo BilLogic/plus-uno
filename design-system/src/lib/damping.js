@@ -38,6 +38,19 @@ export function springBackValue(stretch, elapsedMs, { settleMs = DEFAULT_SETTLE_
 }
 
 /**
+ * The `settleMs` that makes `springBack` follow a spring token's config
+ * (`tokens/ladder/springs.generated.js`, ADR-041). `springBackValue` is a
+ * critically damped response with omega = 8 / settleMs, so a token fits it
+ * when its damping is critical: settleMs = 8 / sqrt(k / m), in ms. The
+ * appearance family is critically damped; a bouncy spring throws.
+ */
+export function settleMsOf({ stiffness, damping, mass = 1 }) {
+    const ratio = damping / (2 * Math.sqrt(stiffness * mass));
+    if (Math.abs(ratio - 1) > 0.01) throw new Error(`settleMsOf takes a critically damped spring; this one has a damping ratio of ${ratio.toFixed(2)}`);
+    return 8000 / Math.sqrt(stiffness / mass);
+}
+
+/**
  * Animate the stretch back to 0. Under reduced motion it lands on 0 in one call.
  * Returns a cancel function. `raf`, `caf` and `now` are injectable for tests.
  */
