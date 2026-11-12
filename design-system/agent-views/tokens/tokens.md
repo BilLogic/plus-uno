@@ -208,18 +208,6 @@ Stacking order: `z-index: var(--layer-modal)`.
 --layer-tooltip  /* Stacking order of a Tooltip, above everything else. */
 ```
 
-## Motion
-Durations and easings; reduced motion is handled at this layer.
-
-```css
---motion-duration-long
---motion-duration-medium
---motion-duration-short
---motion-easing-entrance
---motion-easing-exit
---motion-easing-standard
-```
-
 ## Motion Springs (`--ds-motion-`)
 How things move (ADR-041). Each semantic is an easing with its settle time beside it: `transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast)`. Spatial is for position and size, appearance for fades and color, `exit` for leaving, `loop` for work in progress. A component names its own enter, exit and change in the motion registry; read Foundations / Motion, then the component's Motion section.
 

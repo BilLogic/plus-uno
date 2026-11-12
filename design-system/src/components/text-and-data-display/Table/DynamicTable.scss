@@ -118,7 +118,7 @@
 
 .plus-dynamic-table-bulk > *,
 .plus-dynamic-table-head--returned > th:not(.plus-dynamic-table-select) > * {
-    animation: plus-dynamic-table-label-in var(--motion-duration-short) var(--motion-easing-standard);
+    animation: plus-dynamic-table-label-in var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 }
 
 .plus-table-bulk-actions {

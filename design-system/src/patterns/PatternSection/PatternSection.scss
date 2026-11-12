@@ -281,7 +281,7 @@
 
 // Grows from the icon's width, its end edge fixed, so it opens to the left.
 .plus-section-search--open.plus-section-search--grow {
-    animation: plus-section-search-grow var(--motion-duration-medium) var(--motion-easing-standard);
+    animation: plus-section-search-grow var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default);
 }
 
 @keyframes plus-section-search-grow {
@@ -312,7 +312,7 @@
     background-color: var(--ds-background-input);
     pointer-events: none;
     opacity: 0;
-    animation: plus-section-search-shrink var(--motion-duration-medium) var(--motion-easing-standard);
+    animation: plus-section-search-shrink var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default);
 }
 
 @keyframes plus-section-search-shrink {

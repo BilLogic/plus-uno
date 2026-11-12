@@ -19,7 +19,7 @@ export default {
   // A test harness and the page's figures: `!dev` keeps it out of the sidebar.
   // The page itself is Foundations/Motion/Physics (MotionPhysics.mdx).
   title: 'Foundations/Motion/Physics',
-  tags: ['!dev', '!autodocs'],
+  tags: ['!dev', '!autodocs', 'manifest'],
   parameters: { layout: 'padded' },
 };
 

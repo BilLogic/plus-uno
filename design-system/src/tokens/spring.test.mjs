@@ -1,7 +1,7 @@
-import { test } from 'node:test';
+import { test } from 'vitest';
 import assert from 'node:assert/strict';
 
-import { dampingFor, linearEasing, measureSpring, sampleLinear, sineEasing, springStep } from './spring.mjs';
+import { dampingFor, linearEasing, measureSpring, sampleLinear, sineEasing, springStep } from './spring.js';
 
 const near = (actual, expected, tolerance, label) =>
   assert.ok(Math.abs(actual - expected) <= tolerance, `${label}: ${actual} is not within ${tolerance} of ${expected}`);

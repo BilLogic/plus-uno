@@ -59,10 +59,10 @@ const offsetOf = (k, active, count, wraps) => {
     return ((d + half + count) % count) - half;
 };
 
-// How long the caption takes to lift out: the short motion duration, which
-// the token layer already sets to 0 under reduced motion.
+// How long the caption takes to lift out: the appearance.fast duration, which
+// is a fade in every mode.
 const captionOutMs = (element) => {
-    const value = element ? getComputedStyle(element).getPropertyValue('--motion-duration-short') : '';
+    const value = element ? getComputedStyle(element).getPropertyValue('--ds-motion-appearance-fast-duration') : '';
     const ms = parseFloat(value);
     return Number.isFinite(ms) ? ms : 0;
 };

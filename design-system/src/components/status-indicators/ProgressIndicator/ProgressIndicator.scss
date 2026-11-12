@@ -49,8 +49,8 @@
     background-color: var(--ds-icon-subtlest);
     cursor: default;
     transition:
-        background-color var(--motion-duration-short) var(--motion-easing-standard),
-        width var(--motion-duration-medium) var(--motion-easing-standard);
+        background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast),
+        width var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default);
 }
 
 button.plus-progress-indicator__dot {

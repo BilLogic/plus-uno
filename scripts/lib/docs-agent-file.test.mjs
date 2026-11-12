@@ -106,3 +106,32 @@ test('a page titled by a <Title> block keeps its name, and the pointer that open
   assert.match(text, /^# Disabled$/m);
   assert.match(text, /## Best practices\n\nThe rules live in Patterns, Forms\.\n\n### Give every/);
 });
+
+// ── Foundations · Motion through get-documentation ──
+
+const MOTION_MDX = (name) => `import { Meta } from '@storybook/addon-docs/blocks';\n\n<Meta title="Foundations/Motion/${name}" tags={['!dev', 'manifest']} />\n\n# ${name}\n`;
+const MOTION_STORIES = (name, tags) => `export default {\n    title: 'Foundations/Motion/${name}',\n    tags: [${tags}],\n};\n`;
+
+test('a Foundations · Motion page without the manifest tag is named, whether its Meta or its stories file carries the title', () => {
+  const root = fixture({
+    'design-system/src/styles/MotionLibrary.mdx': MOTION_MDX('Library').replace(", 'manifest'", ''),
+    'design-system/src/styles/MotionPhysics.mdx': `import * as S from './MotionPhysics.stories.jsx';\n\n<Meta of={S} />\n`,
+    'design-system/src/styles/MotionPhysics.stories.jsx': MOTION_STORIES('Physics', "'!dev'"),
+    'design-system/src/styles/MotionPrinciples.mdx': `import * as S from './MotionPrinciples.stories.jsx';\n\n<Meta of={S} />\n`,
+    'design-system/src/styles/MotionPrinciples.stories.jsx': MOTION_STORIES('Principles', "'!dev', 'manifest'"),
+  });
+  assert.deepEqual(pagesMissingManifestTag(root).sort(), [
+    'design-system/src/styles/MotionLibrary.mdx',
+    'design-system/src/styles/MotionPhysics.mdx',
+  ]);
+});
+
+test('on the real repo every Foundations · Motion page is served, and a component with a motion row carries its Motion section', () => {
+  const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), '..', '..');
+  assert.deepEqual(pagesMissingManifestTag(root), []);
+  const served = fs.readdirSync(path.join(root, 'design-system/src/styles')).filter((f) => /^Motion[A-Z].*\.mdx$/.test(f));
+  assert.ok(served.length >= 6, `expected the six Foundations · Motion pages, found ${served.length}`);
+  const popup = fs.readFileSync(path.join(root, 'design-system/src/components/overlays-and-layering/Popup/index.md'), 'utf8');
+  assert.match(popup, /^## Motion$/m);
+  assert.match(popup, /--ds-motion-spatial-fast/);
+});

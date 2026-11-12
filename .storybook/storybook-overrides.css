@@ -1185,7 +1185,7 @@ html[data-color-mode="dark"] .docs-story {
   box-shadow: var(--ds-shadow-raised);
   color: var(--ds-text);
   text-decoration: none;
-  transition: background-color var(--motion-duration-short) var(--motion-easing-standard);
+  transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 }
 
 .sbdocs a.sb-ds-resource-card:hover {

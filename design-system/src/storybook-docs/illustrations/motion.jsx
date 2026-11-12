@@ -5,7 +5,7 @@ import { useReducedMotion } from 'motion/react';
 import { Button, IconButton } from '@/components';
 
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
-import { measureSpring, springStep } from '../../../../scripts/lib/tokens/spring.mjs';
+import { measureSpring, springStep } from '@/tokens/spring.js';
 import { Illustration } from './Illustration.jsx';
 import { Trail, TapRing } from './primitives-motion.jsx';
 

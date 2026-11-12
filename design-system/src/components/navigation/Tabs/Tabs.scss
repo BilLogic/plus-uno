@@ -89,7 +89,7 @@
     // One line, always: a tab label never wraps into a two-line tab.
     white-space: nowrap;
     cursor: pointer;
-    transition: border-color var(--motion-duration-short) var(--motion-easing-standard), color var(--motion-duration-short) var(--motion-easing-standard), background-color var(--motion-duration-short) var(--motion-easing-standard);
+    transition: border-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
     @include plus-state((
         disabled: (color: var(--ds-text-disabled)),

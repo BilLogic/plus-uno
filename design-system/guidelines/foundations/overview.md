@@ -19,7 +19,7 @@ topic, which today only `content/` does.
 | [Grid.mdx](../../src/styles/Grid.mdx) | ✅ | Breakpoints and column spans |
 | [Colors.mdx](../../src/styles/Colors.mdx) | ✅ | Which color, and what does it mean? |
 | [Typography.mdx](../../src/styles/Typography.mdx) | ✅ | Which type class and weight? |
-| [motion.md](motion.md) | ✕ | Duration, easing, what may animate |
+| [MotionPhysics.mdx](../../src/styles/MotionPhysics.mdx) | ✅ | Which spring, which transition, what may animate |
 | [Icons.mdx](../../src/styles/Icons.mdx) | ✅ | Which icon set, which size |
 | [Illustrations.mdx](../../src/styles/Illustrations.mdx) | ✅ | Illustration style and assets |
 | [Logos.mdx](../../src/styles/Logos.mdx) | ✅ | The marks, clear space, variants |

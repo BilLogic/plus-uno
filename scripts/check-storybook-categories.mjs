@@ -39,6 +39,10 @@
  *      Templates and Patterns: a page titled under one of those roots sits in
  *      one of that root's sources, and a page in one of a root's sources is
  *      titled under that root.
+ *   9. Foundations · Motion is exactly the pages the sidebar sort lists under
+ *      Foundations > Motion, Library among them: a page titled
+ *      `Foundations/Motion/<name>` is listed, and a listed name has a page.
+ *      This is where the first-pass "Durations and easings" page was caught.
  *
  * An AI component (Icon, Prompt input) is listed in the taxonomy's
  * `aiComponents` and titled `AI UI/Components/<name>`, while its folder stays
@@ -128,6 +132,19 @@ export function docsTitle(src) {
 /** The sidebar sort's roots, in order, without the `*` catch-all. */
 const sortRoots = (taxonomy) =>
   (taxonomy.storySortOrder ?? []).filter((e) => typeof e === 'string' && e !== '*');
+
+/** Where Foundations · Motion pages live, and the page the component docs link to. */
+export const MOTION_ROOT = 'Foundations/Motion';
+export const MOTION_LIBRARY = 'Library';
+
+/** The Foundations > Motion entries of the sidebar sort, or null when it lists none. */
+function sortMotion(taxonomy) {
+  const order = taxonomy.storySortOrder ?? [];
+  const foundations = order[order.indexOf('Foundations') + 1];
+  if (!Array.isArray(foundations)) return null;
+  const nested = foundations[foundations.indexOf('Motion') + 1];
+  return Array.isArray(nested) ? nested.filter((e) => typeof e === 'string') : null;
+}
 
 /** The Components entries of the sidebar sort, groups only. */
 function sortGroups(taxonomy) {
@@ -272,6 +289,31 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
         `${rel}  is titled "${title}" but is not under a source folder listed for "${root}".\n` +
           `      -> Move it into one of ${(sources[root] ?? []).join(', ')}, or list its folder in rootSources.`,
       );
+    }
+  }
+
+  // (9) Foundations · Motion: the listed pages, Library among them, and no others.
+  const motion = sortMotion(taxonomy);
+  if (motion) {
+    if (!motion.includes(MOTION_LIBRARY)) {
+      found.push(`storybook.taxonomy.json  Foundations > Motion does not list ${MOTION_LIBRARY}.`);
+    }
+    const titled = new Set(
+      pages.filter(({ title }) => title?.startsWith(`${MOTION_ROOT}/`)).map(({ title }) => title.split('/')[2]),
+    );
+    for (const { rel, title } of pages) {
+      if (!title?.startsWith(`${MOTION_ROOT}/`)) continue;
+      if (!motion.includes(title.split('/')[2])) {
+        found.push(
+          `${rel}  is titled "${title}", a Foundations · Motion page the sidebar sort does not list.\n` +
+            `      -> List it under Foundations > Motion in storybook.taxonomy.json, or delete the page.`,
+        );
+      }
+    }
+    for (const name of motion) {
+      if (!titled.has(name)) {
+        found.push(`storybook.taxonomy.json  Foundations > Motion lists "${name}", but no page is titled ${MOTION_ROOT}/${name}.`);
+      }
     }
   }
 

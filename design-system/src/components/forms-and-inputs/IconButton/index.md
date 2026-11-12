@@ -148,7 +148,7 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 | Icon | `--ds-icon-subtle` (default, subtle), `--ds-icon-inverse` (primary, discovery); the selected and disabled roles. 16, `--icon-md`. |
 | Focus ring | `--ds-border-focused`, 2px, 2px offset. |
 | Size | 32: `--item-height-md`. 24: `--item-height-sm`. Square, except with a count. |
-| Count | `--ds-text-subtlest`, or the selected text color when selected. `--inline-sm` after the icon. Motion: `--motion-duration-medium` to open, `--motion-duration-short` to fade in. |
+| Count | `--ds-text-subtlest`, or the selected text color when selected. `--inline-sm` after the icon. Motion: `--ds-motion-appearance-default` to open, `--ds-motion-appearance-fast` to fade in. |
 | Radius | 6: `--button-radius-default`. Compact 4: `--button-radius-compact`. Circle 50%. |
 
 ## Content guidelines
@@ -190,7 +190,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--ds-text-subtlest` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--item-height-sm` · `--motion-duration-medium` · `--motion-duration-short` · `--motion-easing-entrance` · `--motion-easing-standard`
+`--border-default` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-text-subtlest` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--item-height-sm`
 
 From `design-system/src/components/forms-and-inputs/IconButton/IconButton.scss`. Override these through the token layer, never with a literal.
 
