@@ -4,7 +4,7 @@
     "main": {
       "entries": {
         "motion-literal design-system/src/components/forms-and-inputs/Button/Button.scss": {
-          "count": 4
+          "count": 3
         },
         "motion-literal design-system/src/components/forms-and-inputs/Cascader/Cascader.scss": {
           "count": 1
@@ -30,8 +30,11 @@
         "motion-literal design-system/src/components/forms-and-inputs/_internal/FieldBox.scss": {
           "count": 2
         },
+        "motion-literal design-system/src/components/forms-and-inputs/_internal/Listbox.scss": {
+          "count": 2
+        },
         "motion-literal design-system/src/components/forms-and-inputs/_internal/OptionRow.scss": {
-          "count": 3
+          "count": 1
         },
         "motion-literal design-system/src/components/labels/Tag/Tag.scss": {
           "count": 3
@@ -55,7 +58,7 @@
           "count": 1
         },
         "motion-literal design-system/src/components/loading/Spinner/Spinner.scss": {
-          "count": 2
+          "count": 1
         },
         "motion-literal design-system/src/components/status-indicators/ProgressTracker/ProgressTracker.scss": {
           "count": 1

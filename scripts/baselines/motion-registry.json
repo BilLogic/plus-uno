@@ -36,6 +36,9 @@
         "Cascader": {
           "count": 1
         },
+        "ChangeTag": {
+          "count": 1
+        },
         "Checkbox": {
           "count": 1
         },
@@ -69,6 +72,9 @@
         "FilterButton": {
           "count": 1
         },
+        "FilterMenu": {
+          "count": 1
+        },
         "Flag": {
           "count": 1
         },
@@ -96,9 +102,6 @@
         "LinkIconButton": {
           "count": 1
         },
-        "MenuGroup": {
-          "count": 1
-        },
         "Modal": {
           "count": 1
         },
@@ -112,6 +115,9 @@
           "count": 1
         },
         "Popup": {
+          "count": 1
+        },
+        "PopupSelect": {
           "count": 1
         },
         "ProgressBar": {
