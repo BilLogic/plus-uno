@@ -11,7 +11,7 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
-import { CORNER_TOKEN, PAINT, ROLE_SOURCES } from '../src/storybook-docs/illustrations/paint.js';
+import { CORNER_TOKEN, HEIGHTS, PAINT, ROLE_SOURCES } from '../src/storybook-docs/illustrations/paint.js';
 import * as primitives from '../src/storybook-docs/illustrations/primitives.jsx';
 import * as compositions from '../src/storybook-docs/illustrations/compositions.jsx';
 
@@ -28,6 +28,58 @@ describe('every role names a token its source component uses', () => {
       const named = new RegExp(`${token}(?![\\w-])`).test(scss);
       const name = role.startsWith('corner:') ? `CORNER.${role.slice(7)}` : `PAINT.${role}`;
       expect(named, `${source} no longer uses ${token}: update ${name} in illustrations/paint.js`).toBe(true);
+    });
+  }
+});
+
+/** A token's px value, followed through the scale files (`--a: var(--b)` or `Npx`). */
+const scaleSrc = ['tokens/_scales.scss', 'tokens/ladder/_semantics.scss', 'tokens/ladder/_patterns.scss', 'tokens/ladder/_components.scss']
+  .map((f) => readFileSync(resolve(SRC, f), 'utf8'))
+  .join('\n');
+const px = (token) => {
+  const m = scaleSrc.match(new RegExp(`${token}:\\s*([^;]+);`));
+  if (!m) throw new Error(`${token} not found in the token files`);
+  const v = m[1].trim();
+  const ref = v.match(/^var\((--[\w-]+)\)/);
+  return ref ? px(ref[1]) : parseFloat(v);
+};
+
+describe('every drawn height is its token, halved', () => {
+  for (const [role, [token, source, drawn]] of Object.entries(HEIGHTS)) {
+    it(role, () => {
+      expect(readFileSync(resolve(SRC, source), 'utf8')).toMatch(new RegExp(`${token}(?![\\w-])`));
+      expect(drawn, `${role}: ${token} is ${px(token)}px, so the kit draws it ${px(token) / 2} high`).toBe(px(token) / 2);
+    });
+  }
+  it('the primitives draw those heights', () => {
+    const drawnH = (node, fill) => {
+      const html = renderToStaticMarkup(<svg>{node}</svg>);
+      return [...html.matchAll(new RegExp(`<rect[^>]*height="([\\d.]+)"[^>]*fill="${fill.replace(/[()]/g, '\\$&')}"`, 'g'))].map((m) => +m[1]);
+    };
+    expect(drawnH(<primitives.Field x={0} y={0} w={100} />, PAINT.fieldSurface)).toEqual([HEIGHTS.field[2]]);
+    expect(drawnH(<primitives.ButtonShape x={0} y={0} w={40} label="Save" appearance="primary" />, PAINT.buttonPrimary)).toEqual([HEIGHTS.button[2]]);
+    expect(drawnH(<primitives.CountTag x={0} y={0} />, PAINT.countSurface)).toEqual([HEIGHTS.count[2]]);
+    expect(drawnH(<primitives.ProgressTracker x={0} y={0} w={120} />, PAINT.trackerCurrent)).toEqual([HEIGHTS.tracker[2]]);
+    expect(drawnH(<primitives.Sidebar x={0} y={0} w={44} h={88} />, PAINT.sidebarSelected)).toEqual([HEIGHTS.sidebarRow[2]]);
+    const tabs = renderToStaticMarkup(<svg><primitives.Tabs x={0} y={0} w={100} /></svg>);
+    expect(tabs).toMatch(new RegExp(`y1="${HEIGHTS.tab[2]}"`));
+  });
+});
+
+describe('no corner exceeds half its drawn height, except a full one', () => {
+  const all = [
+    ...Object.entries(primitives).filter(([n, C]) => typeof C === 'function' && !['Rect', 'Rule', 'pageBody', 'screenLayout'].includes(n)).map(([n, C]) => [n, <C x={4} y={4} w={100} h={60} />]),
+    ['ResponsiveReflow', <compositions.ResponsiveReflow width={1280} />],
+    ['ThreeLayers', <compositions.ThreeLayers />],
+  ];
+  for (const [name, node] of all) {
+    it(name, () => {
+      const html = renderToStaticMarkup(<svg>{node}</svg>);
+      for (const [, attrs] of html.matchAll(/<rect([^>]*)>/g)) {
+        const h = +(attrs.match(/height="([\d.]+)"/)?.[1] ?? NaN);
+        const rx = attrs.match(/rx:\s*min\([^,]+,\s*([\d.]+)px\)/)?.[1];
+        if (rx) expect(+rx, `${name}: a corner above half its ${h} height`).toBeLessThanOrEqual(h / 2);
+      }
     });
   }
 });

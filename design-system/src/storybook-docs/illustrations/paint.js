@@ -38,7 +38,8 @@ const ROLES = {
   sidebarSelected: ['--ds-background-selected', 'patterns/Sidebar/Sidebar.scss'],
   sidebarIcon: ['--ds-icon-subtle', 'patterns/Sidebar/Sidebar.scss'],
   // Section and Card
-  sectionSurface: ['--ds-surface-sunken', 'patterns/PatternSection/PatternSection.scss'],
+  // Only the `fill="subtle"` variant has a surface; the default Section draws none.
+  sectionSubtleSurface: ['--ds-surface-sunken', 'patterns/PatternSection/PatternSection.scss'],
   cardSurface: ['--ds-surface-raised', 'patterns/PatternCard/PatternCard.scss'],
   cardShadow: ['--ds-shadow-raised', 'patterns/PatternCard/PatternCard.scss'],
   // Overlays
@@ -93,6 +94,20 @@ const ROLES = {
   // Drawing devices, no component behind them
   windowDot: ['--ds-background-neutral', null],
   annotation: ['--ds-border-bold', null],
+};
+
+/**
+ * height role: [height token, source SCSS]. The kit draws it at half (one unit
+ * is 2px), and the paint test resolves each token to px and holds the drawn
+ * height to it. Only roles whose real component sets a height token are here.
+ */
+export const HEIGHTS = {
+  field: ['--height-250', 'components/forms-and-inputs/_internal/FieldBox.scss', 20],
+  button: ['--item-height-md', 'components/forms-and-inputs/Button/Button.scss', 16],
+  tab: ['--item-height-md', 'components/navigation/Tabs/Tabs.scss', 16],
+  count: ['--label-height-md', 'components/labels/_label-heights.scss', 10],
+  tracker: ['--item-height-md', 'components/status-indicators/ProgressTracker/ProgressTracker.scss', 16],
+  sidebarRow: ['--item-height-md', 'patterns/Sidebar/Sidebar.scss', 16],
 };
 
 /** corner role: [radius token, source SCSS]. Drawn at the kit's half scale. */

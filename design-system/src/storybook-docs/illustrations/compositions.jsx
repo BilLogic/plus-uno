@@ -21,8 +21,8 @@ export const ThreeLayers = ({
     <ButtonShape x={24} y={72} w={56} appearance="primary" label="Save" />
     <Link x1={92} x2={112} y={80} />
     <Section x={118} y={46} w={88} h={66} rows={2} />
-    <ButtonShape x={126} y={88} w={34} label="Cancel" />
-    <ButtonShape x={164} y={88} w={34} appearance="primary" label="Save" />
+    <ButtonShape x={118} y={88} w={34} label="Cancel" />
+    <ButtonShape x={156} y={88} w={34} appearance="primary" label="Save" />
     <Link x1={214} x2={234} y={80} />
     <Rect x={236} y={26} w={76} h={108} fill={PAINT.frameSunken} stroke={PAINT.frameDivider} corner="window" />
     <Section x={242} y={32} w={64} h={46} rows={1} />
@@ -108,7 +108,7 @@ export const ResponsiveReflow = ({ width = 1280, title }) => {
     <Illustration width={176} height={112} title={title ?? defaultTitle}>
       <Screen {...box} sidebar={sidebar} accentSidebar={sidebar === 'overlay'}>
         <Section x={body.x} y={body.y} w={mainW} h={body.h} rows={2} accent={sidebar !== 'overlay'} />
-        {split && <Section x={body.x + mainW + 6} y={body.y} w={body.w - mainW - 6} h={body.h} rows={2} />}
+        {split && <Section x={body.x + mainW + 6} y={body.y} w={body.w - mainW - 6} h={body.h} rows={2} fill="subtle" />}
       </Screen>
     </Illustration>
   );

@@ -100,8 +100,13 @@ export const Frame = ({ x, y, w, h, accent = false }) => (
 );
 
 const SIDEBAR_W = 44;
+/** A Sidebar row: item-height-md (32) halved, 2 apart (frame-sidebar-row-gap) halved. */
+const SIDEBAR_ROW_H = 16;
+const SIDEBAR_ROW_PITCH = SIDEBAR_ROW_H + 1;
 
-export const Sidebar = ({ x, y, w, h, accent = false, overlay = false }) => (
+export const Sidebar = ({ x, y, w, h, accent = false, overlay = false }) => {
+  const rowCount = Math.max(1, Math.min(5, Math.floor((h - 28) / SIDEBAR_ROW_PITCH)));
+  return (
   <g>
     {overlay ? (
       <Layer x={x} y={y} w={w} h={h} fill={PAINT.sidebarOverlaySurface} shadow={PAINT.sidebarOverlayShadow} />
@@ -111,29 +116,31 @@ export const Sidebar = ({ x, y, w, h, accent = false, overlay = false }) => (
         <Rule x1={x + w} x2={x + w} y1={y} y2={y + h} />
       </>
     )}
-    <Rect x={x + 6} y={y + 8} w={10} h={10} fill={accent ? PAINT.accent : PAINT.sidebarIcon} corner="sidebarRow" />
-    {[0, 1, 2, 3, 4].map((i) => {
-      const yy = y + 28 + i * 12;
+    <Rect x={x + 6} y={y + 4} w={12} h={12} fill={accent ? PAINT.accent : PAINT.sidebarIcon} corner="sidebarRow" />
+    {Array.from({ length: rowCount }, (_, i) => {
+      const ry = y + 24 + i * SIDEBAR_ROW_PITCH;
+      const selected = i === (rowCount > 1 ? 1 : 0);
       return (
         <React.Fragment key={i}>
-          {i === 1 && (
+          {selected && (
             <Rect
               x={x + 4}
-              y={yy - 3}
+              y={ry}
               w={w - 8}
-              h={10}
+              h={SIDEBAR_ROW_H}
               fill={accent ? PAINT.accent : PAINT.sidebarSelected}
               corner="sidebarRow"
               opacity={accent ? 0.25 : 1}
             />
           )}
-          <Rect x={x + 8} y={yy} w={4} h={4} fill={PAINT.sidebarIcon} corner="tab" />
-          <SkeletonBar x={x + 16} y={yy} w={w - 28} />
+          <Rect x={x + 8} y={ry + 4} w={8} h={8} fill={PAINT.sidebarIcon} corner="tab" />
+          <SkeletonBar x={x + 20} y={ry + SIDEBAR_ROW_H / 2 - 2} w={w - 32} />
         </React.Fragment>
       );
     })}
   </g>
-);
+  );
+};
 
 /**
  * The content area of a Frame: the page surface with its edge, an optional
@@ -193,16 +200,26 @@ export const PageHeader = ({ x, y, w, accent = false }) => (
   </g>
 );
 
-export const Section = ({ x, y, w, h, accent = false, rows = 3 }) => (
-  <g>
-    <Rect x={x} y={y} w={w} h={h} fill={PAINT.sectionSurface} corner="section" />
-    {accent && <AccentRing x={x} y={y} w={w} h={h} corner="section" />}
-    <SkeletonBar x={x + 8} y={y + 8} w={w * 0.3} h={5} accent={accent} heading />
-    {Array.from({ length: rows }, (_, i) => (
-      <SkeletonBar key={i} x={x + 8} y={y + 22 + i * 9} w={Math.min(w * (0.8 - i * 0.15), w - 16)} />
-    ))}
-  </g>
-);
+/**
+ * A Section. By default it has no fill, no pad and no box: the real
+ * PatternSection draws only its parts, so the drawing is a heading and rows on
+ * whatever surface it sits on. `fill="subtle"` is the one variant with a box
+ * (the sunken surface, padded and rounded), for a section beside a list.
+ */
+export const Section = ({ x, y, w, h, accent = false, rows = 3, fill = 'none' }) => {
+  const subtle = fill === 'subtle';
+  const pad = subtle ? 8 : 0;
+  return (
+    <g data-part="section">
+      {subtle && <Rect x={x} y={y} w={w} h={h} fill={PAINT.sectionSubtleSurface} corner="section" />}
+      {subtle && accent && <AccentRing x={x} y={y} w={w} h={h} corner="section" />}
+      <SkeletonBar x={x + pad} y={y + pad} w={w * 0.3} h={5} accent={accent} heading />
+      {Array.from({ length: rows }, (_, i) => (
+        <SkeletonBar key={i} x={x + pad} y={y + pad + 14 + i * 9} w={Math.min(w * (0.8 - i * 0.15), w - 2 * pad)} />
+      ))}
+    </g>
+  );
+};
 
 export const Card = ({ x, y, w, h, accent = false }) => (
   <g>
@@ -225,11 +242,14 @@ export const Row = ({ x, y, w, accent = false }) => (
   </g>
 );
 
+/** A single-line field: --height-250 (40) halved. */
+const FIELD_H = 20;
+
 export const Field = ({ x, y, w, accent = false }) => (
   <g>
     <SkeletonBar x={x} y={y} w={w * 0.3} h={3} heading />
-    <Rect x={x} y={y + 7} w={w} h={12} fill={PAINT.fieldSurface} stroke={accent ? PAINT.accent : PAINT.fieldBorder} corner="field" />
-    <SkeletonBar x={x + 5} y={y + 11} w={w * 0.4} />
+    <Rect x={x} y={y + 7} w={w} h={FIELD_H} fill={PAINT.fieldSurface} stroke={accent ? PAINT.accent : PAINT.fieldBorder} corner="field" />
+    <SkeletonBar x={x + 6} y={y + 7 + FIELD_H / 2 - 2} w={w * 0.4} />
   </g>
 );
 
@@ -309,7 +329,7 @@ export const Modal = ({ x, y, w, h, accent = false }) => {
 };
 
 /** A strip of `count` tabs. The selected one carries the underline: the accent when `accent`. */
-export const Tabs = ({ x, y, w, h = 14, count = 3, selected = 0, accent = false }) => {
+export const Tabs = ({ x, y, w, h = 16, count = 3, selected = 0, accent = false }) => {
   const tw = Math.min(36, w / count);
   return (
     <g>
@@ -364,7 +384,7 @@ export const Breadcrumb = ({ x, y, w, h = 8, count = 3, accent = false }) => {
  * `count` steps: visited (a check), current (a ring on the selected pill) and
  * unvisited (an empty ring), joined by connectors. `accent` fills the current dot.
  */
-export const ProgressTracker = ({ x, y, w, h = 12, count = 4, current = 1, accent = false }) => {
+export const ProgressTracker = ({ x, y, w, h = 16, count = 4, current = 1, accent = false }) => {
   const connector = 10;
   const iw = (w - (count - 1) * connector) / count;
   const cy = y + h / 2;
@@ -425,7 +445,7 @@ export const Flag = ({ x, y, w, h, tone = 'neutral', accent = false }) => (
 );
 
 /** A small count pill. The accent is an outline, since CountTag has no brand tone. */
-export const CountTag = ({ x, y, w = 14, h = 9, accent = false }) => (
+export const CountTag = ({ x, y, w = 14, h = 10, accent = false }) => (
   <g>
     <Rect x={x} y={y} w={w} h={h} fill={PAINT.countSurface} corner="count" />
     <SkeletonBar x={x + w * 0.3} y={y + h / 2 - 1} w={w * 0.4} h={2} tone={PAINT.countText} />

@@ -106,7 +106,7 @@ export const ResponsiveReflowDrawings = {
     await expect(has(svgs[2], '--ds-blanket')).toBe(true);
     await expect(has(svgs[2], '--ds-shadow-overlay')).toBe(true);
     // The Section's side column sits beside the body only at 1280: one Section fewer below.
-    const sections = (svg) => svg.querySelectorAll('rect[fill="var(--ds-surface-sunken)"][style*="--section-radius"]').length;
+    const sections = (svg) => svg.querySelectorAll('[data-part="section"]').length;
     await expect(sections(svgs[0])).toBe(2);
     await expect(sections(svgs[1])).toBe(1);
     await expect(sections(svgs[2])).toBe(1);
