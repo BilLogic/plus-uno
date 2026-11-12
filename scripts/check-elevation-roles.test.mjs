@@ -139,6 +139,16 @@ test('Tooltip.scss draws a flat label: neutral bold fill, no box-shadow', () => 
   assert.match(block, /background-color:\s*var\(--ds-background-neutral-bold\)/);
 });
 
+test('Tooltip.scss sits on --layer-tooltip, above a Modal, and keeps an outline edge in forced colors', () => {
+  const source = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss'), 'utf8');
+  const start = source.indexOf('.plus-tooltip {');
+  const block = source.slice(start, source.indexOf('}', start));
+  assert.match(block, /z-index:\s*var\(--layer-tooltip\)\s*;/, 'Tooltip is on --layer-tooltip (800) so it opens over a Modal (--layer-modal 510)');
+  const forced = /@media\s*\(forced-colors:\s*active\)\s*\{[^@]*?\.plus-tooltip\s*\{([^}]*)\}/.exec(source);
+  assert.ok(forced, 'Tooltip.scss has no forced-colors rule for .plus-tooltip');
+  assert.match(forced[1], /outline:\s*\S+/, 'the chip keeps a visible edge in forced colors');
+});
+
 test("the Elevation page's levels and behavior rows say the same steps", () => {
   // The page's level and behavior tables are data in its demos module, so the
   // rows are read from that source.
