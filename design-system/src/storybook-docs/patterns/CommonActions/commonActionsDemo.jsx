@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import { Button, ButtonItem, DropdownMenu, IconButton, InlineEdit, TextField, Tooltip } from '@/components';
 import { PatternCard, PatternSection } from '@/patterns';
-import { FilterSide, StudentsTable, ViewBar } from '@/storybook-docs/lib/view-bar.jsx';
+import { FilterSide, StudentsTable, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 import { CELL, FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { FocusedType } from '@/storybook-docs/lib/focused-task.jsx';
 import { FormFields, FILLED, PageFooter } from '../../../patterns/Form/formDemo.jsx';
@@ -87,15 +87,16 @@ export const Reset = () => {
 };
 
 /** Copy: an icon button beside the value; the tooltip says "Copied" once the value is on the clipboard. */
-export const Copy = () => {
-    const [copied, setCopied] = useState(false);
+export const Copy = ({ held = false }) => {
+    const [copied, setCopied] = useState(held);
     useEffect(() => {
-        if (!copied) return undefined;
+        // A picture holds the tooltip open, so the page shows the state; a press elsewhere lets it leave on its own.
+        if (!copied || held) return undefined;
         const id = setTimeout(() => setCopied(false), 2000); // docs-literal: how long the tooltip stays
         return () => clearTimeout(id);
-    }, [copied]);
+    }, [copied, held]);
     return (
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--stack-md)', padding: 'var(--page-pad)' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--stack-md)', padding: 'var(--page-pad)', paddingBlockStart: 'calc(var(--page-pad) * 2)' }}>
             <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>plus.org/join/algebra-b</span>
             <Tooltip text="Copied" placement="top" show={copied ? true : undefined}>
                 <IconButton icon="copy" label="Copy" appearance="subtle" isTooltipDisabled onClick={() => setCopied(true)} />
@@ -121,15 +122,24 @@ export const EditOne = () => {
 };
 
 /** The whole record: Edit sits in the More menu beside the record's other actions. */
-export const EditRecord = () => (
-    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: 'var(--page-pad)' }}>
-        <span style={{ font: 'var(--heading-small)', color: 'var(--ds-text)' }}>Ana Ruiz</span>
-        <DropdownMenu trigger={<IconButton icon="ellipsis" label="More" appearance="subtle" />} placement="bottom-end">
-            <ButtonItem onClick={() => {}}>Edit</ButtonItem>
-            <ButtonItem onClick={() => {}}>Remove from group</ButtonItem>
-        </DropdownMenu>
-    </div>
-);
+export const EditRecord = ({ held = false }) => {
+    const [setMount, mount] = useLayerMount();
+    return (
+        // A held-open menu waits for the picture's element, so it mounts inside it and not on the page.
+        <div ref={setMount} style={{ position: 'relative', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', padding: 'var(--page-pad)', minBlockSize: held ? 'calc(var(--card-min-width-md) * 0.6)' : undefined }}>
+            <span style={{ font: 'var(--heading-small)', color: 'var(--ds-text)' }}>Ana Ruiz</span>
+            <DropdownMenu
+                trigger={<IconButton icon="ellipsis" label="More" appearance="subtle" />}
+                placement="bottom-end"
+                {...(held && mount ? { isOpen: true, onOpenChange: () => {} } : {})}
+                container={mount ?? undefined}
+            >
+                <ButtonItem onClick={() => {}}>Edit</ButtonItem>
+                <ButtonItem onClick={() => {}}>Remove from group</ButtonItem>
+            </DropdownMenu>
+        </div>
+    );
+};
 
 /** Rows selected: the head row becomes the bulk bar, so the actions sit with the rows they act on. */
 export const ManyRows = () => (

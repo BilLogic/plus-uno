@@ -121,7 +121,7 @@ Don't: Help only in a tooltip: gone on touch, gone after typing.
 
 **Checked:** Automatic
 
-Close, Cancel and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three . A form with no edits leaves at once. In a focused task, Close and Cancel play the opening backwards once the person confirms.
+Close, Cancel and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A confirm view prop on the Modal is Planned . A form with no edits leaves at once. In a focused task, Close and Cancel play the opening backwards once the person confirms.
 
 ### Prefer a bound input to a free one. {#prefer-a-bound-input-to-a-free-one}
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { Backdrop, ButtonShape, Field, Modal, Popup, Rect, SkeletonBar } from './primitives.jsx';
+import { Backdrop, Field, Modal, Popup, Rect, SkeletonBar } from './primitives.jsx';
 
 /**
  * The Forms pattern's do and don't drawings. Each lesson is about where a
@@ -30,8 +30,6 @@ const FormModal = ({ invalid = false, children }) => (
     <Modal x={MODAL.x} y={MODAL.y} w={MODAL.w} h={MODAL.h} />
     <SkeletonBar x={FIELD_X} y={MODAL.y + 8} w={36} h={5} heading />
     <Field x={FIELD_X} y={MODAL.y + 22} w={FIELD_W} invalid={invalid} />
-    <ButtonShape x={FIELD_X} y={MODAL.y + MODAL.h - 12} w={FIELD_W / 2 - 2} />
-    <ButtonShape x={FIELD_X + FIELD_W / 2 + 2} y={MODAL.y + MODAL.h - 12} w={FIELD_W / 2 - 2} appearance="primary" />
     {children}
   </g>
 );

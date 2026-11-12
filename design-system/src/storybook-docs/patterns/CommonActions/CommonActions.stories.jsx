@@ -145,11 +145,10 @@ export const ResetChoices = {
 /** Copy: an icon button beside the value; the confirmation is a "Copied" tooltip, not a Flag. */
 export const CopyValue = {
     name: 'Copy',
-    render: () => staged(<Copy />, 480),
+    render: () => staged(<Copy held />, 480),
     play: async ({ canvasElement }) => {
         const copy = within(canvasElement).getByRole('button', { name: 'Copy' });
         await expect(copy.textContent, 'an icon button').toBe('');
-        await userEvent.click(copy);
         await expect(await within(document.body).findByText('Copied'), 'the tooltip says Copied').toBeInTheDocument();
         await expect(document.body.querySelector('[role="alert"], .plus-flag'), 'no Flag').toBeNull();
     },
@@ -173,13 +172,12 @@ export const EditValue = {
 /** Edit the whole record from More. */
 export const EditWholeRecord = {
     name: 'Edit: the whole record',
-    render: () => staged(<EditRecord />, 480),
+    render: () => staged(<EditRecord held />, 480),
     play: async ({ canvasElement }) => {
-        const more = within(canvasElement).getByRole('button', { name: 'More' });
-        await userEvent.click(more);
-        await waitFor(() => expect(within(document.body).getByRole('menuitem', { name: 'Edit' })).toBeInTheDocument());
-        await expect(within(document.body).getByRole('menuitem', { name: 'Remove from group' }), 'Remove sits beside Edit, Default, not Danger').toBeInTheDocument();
-        await userEvent.keyboard('{Escape}');
+        // The menu is held open inside the picture, once the picture's element is in state.
+        await waitFor(() => expect(within(canvasElement).getByRole('menuitem', { name: 'Edit' }), 'Edit sits in the More menu').toBeInTheDocument());
+        await expect(within(canvasElement).getByRole('menuitem', { name: 'Remove from group' }), 'beside Remove, which is Default').toBeInTheDocument();
+        await fitsCanvas(canvasElement);
     },
 };
 
