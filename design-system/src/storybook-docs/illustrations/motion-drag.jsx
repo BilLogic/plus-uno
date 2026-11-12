@@ -8,7 +8,7 @@ import { useReducedMotion } from 'motion/react';
 
 import { Icon, VisuallyHidden } from '@/components';
 import { CORNER_TOKEN, PAINT } from './paint.js';
-import { Pointer } from './primitives-motion.jsx';
+import { Pointer, Trail } from './primitives-motion.jsx';
 import { springFor } from './motion.jsx';
 import { dropInto, dropOnto, locate, orderKey, step } from './drag-model.js';
 
@@ -33,12 +33,13 @@ const LISTS = {
   between: { left: ['a', 'b', 'c'], right: ['x', 'y', 'z'] },
 };
 const WEIGHT = { chip: 'spatial.fast', card: 'spatial.default' };
+const SUBJECT = 'a';
 const LABEL = (id) => `Item ${id.toUpperCase()}`;
 
 const px = (n) => `${n}px`;
 const rectOf = (el) => el.getBoundingClientRect();
 
-const Item = ({ id, kind, held, grabbed, onKeyDown, register }) => {
+const Item = ({ id, kind, held, accent, grabbed, onKeyDown, register }) => {
   const ref = useRef(null);
   const handle = useRef(null);
   useEffect(() => register(id, ref.current, handle.current, kind), [id, kind, register]);
@@ -53,11 +54,12 @@ const Item = ({ id, kind, held, grabbed, onKeyDown, register }) => {
         alignItems: 'center',
         gap: 'var(--stack-md)',
         height: px(kind === 'chip' ? 24 : 40),
-        width: kind === 'chip' ? '60%' : '100%',
+        width: '100%',
         padding: '0 var(--stack-md)',
-        borderRadius: CORNER_TOKEN.shape,
-        background: grabbed ? PAINT.accent : PAINT.cardSurface,
-        border: `var(--border-default) solid ${PAINT.rowDivider}`,
+        background: PAINT.cardSurface,
+        boxShadow: PAINT.cardShadow,
+        borderRadius: CORNER_TOKEN.card,
+        outline: accent ? `var(--border-default) solid ${PAINT.accent}` : undefined,
         // The slot stays while the copy travels: a held item reads as an empty place.
         opacity: held ? 0.35 : 1,
         listStyle: 'none',
@@ -68,13 +70,13 @@ const Item = ({ id, kind, held, grabbed, onKeyDown, register }) => {
         ref={handle}
         data-grab
         aria-label={`Grab ${LABEL(id)}`}
-        aria-pressed={grabbed}
+        aria-pressed={!!grabbed}
         onKeyDown={(e) => onKeyDown(e, id)}
-        style={{ all: 'unset', cursor: 'grab', display: 'inline-flex', color: PAINT.placeholderText, outlineOffset: 2 }}
+        style={{ all: 'unset', cursor: 'grab', display: 'inline-flex', color: accent ? PAINT.accent : PAINT.placeholderText, outlineOffset: 2 }}
       >
         <Icon name="grip-vertical" />
       </Button>
-      <span aria-hidden style={{ flex: 1, height: 6, borderRadius: CORNER_TOKEN.shape, background: PAINT.placeholderText }} />
+      <span aria-hidden style={{ width: '55%', height: 6, borderRadius: CORNER_TOKEN.shape, background: accent ? PAINT.accent : PAINT.placeholderText }} />
     </li>
   );
 };
@@ -89,6 +91,8 @@ export const DragReorder = ({ between = false, reduced: forcedReduced, fastForwa
   const [grabbed, setGrabbed] = useState(null);
   const [message, setMessage] = useState('');
   const [float, setFloat] = useState(null);
+  const [over, setOver] = useState(null);
+  const [hint, setHint] = useState(null);
 
   const nodes = useRef(new Map());
   const listNodes = useRef(new Map());
@@ -196,6 +200,7 @@ export const DragReorder = ({ between = false, reduced: forcedReduced, fastForwa
         origin.current = latest.current;
         pointerTrail.current = [];
         setHeldId(source.data.id);
+        setHint(null);
         setPhase('dragging');
         const { clientX, clientY } = location.current.input;
         const { el } = nodes.current.get(source.data.id);
@@ -208,6 +213,8 @@ export const DragReorder = ({ between = false, reduced: forcedReduced, fastForwa
         pointerTrail.current.push({ x: clientX, y: clientY, t: performance.now() });
         pointerTrail.current = pointerTrail.current.slice(-6);
         follow(source.data.id, clientX, clientY);
+        const hit = location.current.dropTargets.find((t) => t.data.type === 'list') ?? location.current.dropTargets[0];
+        setOver(hit ? (hit.data.type === 'list' ? hit.data.list : locate(latest.current, hit.data.id).list) : null);
         const next = targetOf(location, source.data.id, origin.current);
         if (JSON.stringify(next) !== JSON.stringify(latest.current)) {
           snapshot();
@@ -216,6 +223,7 @@ export const DragReorder = ({ between = false, reduced: forcedReduced, fastForwa
       },
       onDrop: ({ source, location }) => {
         const id = source.data.id;
+        setOver(null);
         const next = targetOf(location, id, origin.current);
         fxAnim?.stop(); fyAnim?.stop();
         if (JSON.stringify(next) !== JSON.stringify(latest.current)) {
@@ -262,6 +270,7 @@ export const DragReorder = ({ between = false, reduced: forcedReduced, fastForwa
         setPhase((p) => (p === 'grabbed' ? 'settled' : p));
       } else {
         origin.current = lists;
+        setHint(null);
         setGrabbed(id);
         setPhase('grabbed');
         setMessage(`${LABEL(id)} grabbed at ${where(lists, id)}. Use the arrow keys to move it, Space to drop, Escape to cancel.`);
@@ -296,13 +305,30 @@ export const DragReorder = ({ between = false, reduced: forcedReduced, fastForwa
     if (motions.current.size === 0 && phase === 'settling') setPhase('settled');
   }, [phase, lists]);
 
+  // Rest frame: the arrow from the dragged item to its landing spot, and the pointer on it.
+  useEffect(() => {
+    const src = nodes.current.get(SUBJECT);
+    const rootBox = root.current && rectOf(root.current);
+    if (!src || !rootBox) return;
+    const from = rectOf(src.el);
+    const rel = (x, y) => [x - rootBox.left, y - rootBox.top];
+    if (between) {
+      const dest = listNodes.current.get('right');
+      const to = rectOf(dest);
+      setHint({ points: [rel(from.right - 48, from.top + from.height / 2), rel(to.left + to.width * 0.35, from.top + from.height * 1.7)], pointer: rel(from.right - 48, from.top + from.height / 2 - 2) });
+    } else {
+      const last = rectOf(nodes.current.get('c').el);
+      setHint({ points: [rel(from.right - 48, from.top + from.height / 2 + 10), rel(from.right - 48, last.top + last.height / 2)], pointer: rel(from.right - 48, from.top + from.height / 2 - 2) });
+    }
+  }, [between]);
+
   const listIds = Object.keys(lists);
   return (
     <div
       ref={root}
       data-reorder-root
       data-phase={phase}
-      style={{ display: 'flex', gap: 'var(--space-100)', padding: 'var(--space-100)', background: PAINT.shape, borderRadius: CORNER_TOKEN.shape }}
+      style={{ position: 'relative', display: 'flex', gap: 'var(--space-100)', padding: 'var(--space-200)', background: PAINT.sectionSubtleSurface, borderRadius: CORNER_TOKEN.section }}
     >
       {listIds.map((list) => (
         <ul
@@ -311,13 +337,21 @@ export const DragReorder = ({ between = false, reduced: forcedReduced, fastForwa
           data-reorder-list={list}
           data-order={orderKey(lists[list])}
           aria-label={between ? `${list} list` : 'List'}
-          style={{ flex: 1, margin: 0, padding: 'var(--stack-md)', display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', minHeight: 140, border: `var(--border-default) dashed ${PAINT.target}`, borderRadius: CORNER_TOKEN.shape }}
+          style={{ flex: 1, margin: 0, padding: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', minHeight: 140, borderRadius: CORNER_TOKEN.shape, background: over === list && between ? PAINT.rowSelected : 'transparent' }}
         >
           {lists[list].map((id) => (
-            <Item key={id} id={id} kind={kindOf(id, list)} held={heldId === id} grabbed={grabbed === id} onKeyDown={onKeyDown} register={register} />
+            <Item key={id} id={id} kind={kindOf(id, list)} held={heldId === id} accent={id === SUBJECT || grabbed === id} grabbed={grabbed === id} onKeyDown={onKeyDown} register={register} />
           ))}
         </ul>
       ))}
+      {hint && phase === 'idle' && (
+        <svg aria-hidden data-hint width="100%" height="100%" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'visible' }}>
+          <Trail points={hint.points} accent />
+          <g transform={`translate(${hint.pointer[0]} ${hint.pointer[1]}) scale(1.6) translate(${-hint.pointer[0]} ${-hint.pointer[1]})`}>
+            <Pointer x={hint.pointer[0]} y={hint.pointer[1]} accent />
+          </g>
+        </svg>
+      )}
       {float && (
         <div
           aria-hidden
@@ -325,7 +359,7 @@ export const DragReorder = ({ between = false, reduced: forcedReduced, fastForwa
           style={{
             position: 'fixed', left: 0, top: 0, width: float.w, height: float.h, pointerEvents: 'none', zIndex: 10,
             transform: `translate(${float.x}px, ${float.y}px)`,
-            background: PAINT.cardSurface, border: `var(--border-default) solid ${PAINT.accent}`, borderRadius: CORNER_TOKEN.shape,
+            background: PAINT.cardSurface, border: `var(--border-default) solid ${PAINT.accent}`, borderRadius: CORNER_TOKEN.card, boxShadow: PAINT.cardShadow,
           }}
         >
           <svg width="20" height="24" viewBox="0 0 20 24" style={{ position: 'absolute', right: -8, bottom: -14 }}>
