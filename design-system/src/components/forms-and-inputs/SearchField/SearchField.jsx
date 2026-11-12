@@ -83,6 +83,9 @@ const SearchField = ({
     isDisabled = false,
     clearLabel = 'Clear search',
     panelLabel = 'Suggestions',
+    recentLabel = 'Recent searches',
+    noMatchesLabel = 'No matches for',
+    seeAllLabel = 'See all results for',
     scopeLabel = 'Search scope',
     inputRef: inputRefProp,
     className = '',
@@ -333,13 +336,13 @@ const SearchField = ({
         };
         if (!trimmed) {
             return [
-                <OptionRow key="head" kind="group" label="Recent searches" />,
+                <OptionRow key="head" kind="group" label={recentLabel} />,
                 ...rows.map((row) => rowFor(row, { label: row.text, elemBefore: <Icon name="clock-rotate-left" /> })),
             ];
         }
         const out = [];
         if (groups.length === 0) {
-            out.push(<div key="none" className="plus-search-field__none">{`No matches for \u201C${trimmed}\u201D`}</div>);
+            out.push(<div key="none" className="plus-search-field__none">{`${noMatchesLabel} \u201C${trimmed}\u201D`}</div>);
         }
         groups.forEach((group) => {
             out.push(
@@ -356,7 +359,7 @@ const SearchField = ({
                 ));
             });
         });
-        out.push(rowFor({ kind: 'seeAll' }, { label: `See all results for \u201C${trimmed}\u201D`, elemBefore: <Icon name="magnifying-glass" /> }));
+        out.push(rowFor({ kind: 'seeAll' }, { label: `${seeAllLabel} \u201C${trimmed}\u201D`, elemBefore: <Icon name="magnifying-glass" /> }));
         actions.forEach((action) => out.push(rowFor({ kind: 'action', action }, { label: action.props.children })));
         return out;
     };
@@ -459,6 +462,7 @@ const SearchField = ({
                                 aria-label={panelLabel}
                                 className="plus-search-field__panel"
                                 onMouseDown={(event) => event.preventDefault()}
+                                onMouseLeave={() => setCursor(-1)}
                             >
                                 {renderRows()}
                             </div>
@@ -539,6 +543,12 @@ SearchField.propTypes = {
     clearLabel: PropTypes.string,
     /** The focused panel's accessible name. */
     panelLabel: PropTypes.string,
+    /** The group heading over recent searches. */
+    recentLabel: PropTypes.string,
+    /** Starts the empty-results line; the typed text follows in quotes. */
+    noMatchesLabel: PropTypes.string,
+    /** Starts the last row's label; the typed text follows in quotes. */
+    seeAllLabel: PropTypes.string,
     /** The scope filter's accessible name. */
     scopeLabel: PropTypes.string,
     /** Ref to the underlying `<input>`. */

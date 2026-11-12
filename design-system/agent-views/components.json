@@ -11422,6 +11422,33 @@
           "deprecated": null
         },
         {
+          "name": "recentLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Recent searches'",
+          "values": null,
+          "description": "The group heading over recent searches.",
+          "deprecated": null
+        },
+        {
+          "name": "noMatchesLabel",
+          "type": "string",
+          "required": false,
+          "default": "'No matches for'",
+          "values": null,
+          "description": "Starts the empty-results line; the typed text follows in quotes.",
+          "deprecated": null
+        },
+        {
+          "name": "seeAllLabel",
+          "type": "string",
+          "required": false,
+          "default": "'See all results for'",
+          "values": null,
+          "description": "Starts the last row's label; the typed text follows in quotes.",
+          "deprecated": null
+        },
+        {
           "name": "scopeLabel",
           "type": "string",
           "required": false,

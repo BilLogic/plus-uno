@@ -140,6 +140,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `isDisabled` | bool | `false` | Dims the field and blocks typing. |
 | `clearLabel` | string | `'Clear search'` | The clear button's name. |
 | `panelLabel` | string | `'Suggestions'` | The focused panel's accessible name. |
+| `recentLabel` | string | `'Recent searches'` | The group heading over recent searches. |
+| `noMatchesLabel` | string | `'No matches for'` | Starts the empty-results line; the typed text follows in quotes. |
+| `seeAllLabel` | string | `'See all results for'` | Starts the last row's label; the typed text follows in quotes. |
 | `scopeLabel` | string | `'Search scope'` | The scope filter's accessible name. |
 | `inputRef` | func or shape or any | — | Ref to the underlying `<input>`. |
 | `className` | string | `''` | Extra class on the outer wrapper. |
