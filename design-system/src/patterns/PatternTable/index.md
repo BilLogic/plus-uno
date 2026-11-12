@@ -14,6 +14,8 @@ Also asked as: list of records, data table on a page, sortable list, records wit
 
 **Storybook page:** `design-system/src/patterns/PatternTable/PatternTable.mdx`
 
+**Motion:** selection `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 A table sits in a Section and spans it. Its first and last cells sit flush with the section edge. The Section header carries the toolbar and the tabs: search, filters and the record count use the toolbar type, and saved views use the tabs type. The bulk bar is never in the Section header: while rows are selected, a Dynamic table's head row becomes it, so the toolbar stays put. Empty, no results, loading and error states happen inside the table, under its header, so the Section header stays usable. Paging stays under the rows, inside the same Section.
@@ -29,6 +31,14 @@ Pick the type from what people do with the rows. Ask the questions in order, and
 | Otherwise, people only read it. | Static table |
 
 Search, filters and actions sit in the Section header: `<PatternSection toolbar={<PatternSection.Toolbar />}>`.
+
+## Motion
+
+PatternTable reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| selection | Update a value or state | `--ds-motion-appearance-fast` | Ticking a row turns the head row into the bulk bar: labels cross-fade, same row, same height, nothing slides. Selected rows take the selected fill. The view bar above never moves. |
 
 ## Best practices
 

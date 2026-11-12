@@ -14,6 +14,8 @@ Also asked as: summary card, object card.
 
 **Storybook page:** `design-system/src/patterns/PatternCard/PatternCard.mdx`
 
+**Motion:** change `appearance.fast` · milestone `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a card when one object needs its own container on the page. A card holds a heading, some content and, when people can act on it, a footer. This pattern is the shell: you fill its slots with your own parts.
@@ -41,6 +43,15 @@ In a row, place the most cards that keep each card at its minimum width. Each ro
 | Medium, 768 | 720 | 3 | 2 | 1 |
 | Large, 1024 | 736 | 3 | 2 | 1 |
 | X-Large, 1440 | 1152 | 4 | 3 | 2 |
+
+## Motion
+
+PatternCard reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | It changes color on hover and press like a Button. Opening a clickable card is Drill. |
+| milestone | Opening a page | `--ds-motion-spatial-default` | The one card in a milestone page entrance is Expressive and leaves by the exit rules. |
 
 ## Best practices
 

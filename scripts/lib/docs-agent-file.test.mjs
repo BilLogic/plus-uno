@@ -107,6 +107,24 @@ test('a page titled by a <Title> block keeps its name, and the pointer that open
   assert.match(text, /## Best practices\n\nThe rules live in Patterns, Forms\.\n\n### Give every/);
 });
 
+test('a page with a MotionSection gets its registry row as a Motion section, once', () => {
+  const registry = [
+    { name: 'Shell', tier: 'component', events: { enter: { spatial: 'spatial.fast' } } },
+    { name: 'Shell', tier: 'template', events: { enter: { transition: 'Dock', spatial: 'spatial.slow', note: 'Slides in.' } } },
+  ];
+  const source = PAGE.replace('## Best practices', `## Motion\n\n<MotionSection component="Shell" tier="template" />\n\n## Best practices`);
+  const text = renderDocsAgentFile(source, { file: 'x.mdx', kind: 'Template', registry });
+  assert.equal(text.match(/^## Motion$/gm).length, 1);
+  assert.match(text, /\| enter \| Dock \| `--ds-motion-spatial-slow` \| Slides in\. \|/);
+  assert.ok(text.indexOf('## Motion') < text.indexOf('## Best practices'));
+  assert.doesNotMatch(renderDocsAgentFile(PAGE, { file: 'x.mdx', kind: 'Template', registry }), /## Motion/);
+});
+
+test('a MotionSection naming a row the registry lacks fails the render', () => {
+  const source = PAGE.replace('## Best practices', `## Motion\n\n<MotionSection component="Ghost" tier="template" />\n\n## Best practices`);
+  assert.throws(() => renderDocsAgentFile(source, { file: 'x.mdx', kind: 'Template', registry: [] }), /Ghost/);
+});
+
 // ── Foundations · Motion through get-documentation ──
 
 const MOTION_MDX = (name) => `import { Meta } from '@storybook/addon-docs/blocks';\n\n<Meta title="Foundations/Motion/${name}" tags={['!dev', 'manifest']} />\n\n# ${name}\n`;

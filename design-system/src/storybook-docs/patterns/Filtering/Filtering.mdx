@@ -3,6 +3,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as FilteringStories from './Filtering.stories.jsx';
 import { STAGE } from './filteringDemo.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
 import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
@@ -69,6 +70,14 @@ The side hides and the Filter icon returns with its count. Pressing it gives the
 ### Widths
 
 A one-list menu is auto: at least the trigger, 160 to 320, truncating with a tooltip. Side by side takes 3-col; stacked takes 3-col and never goes past 4-col. The widths are the <a target="_top" href="./?path=/docs/templates-popup-popup--docs">Popup</a> template's.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Filtering" tier="pattern" />
 
 </div>
 

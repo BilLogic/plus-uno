@@ -14,6 +14,8 @@ Also asked as: dialog layout, confirm layout.
 
 **Storybook page:** `design-system/src/patterns/PatternModal/PatternModal.mdx`
 
+**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast` · swap `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a Modal when the next step has to happen before anything else can: a confirm, a rare critical task with fewer than five fields, something to read before going on. It is always centered over a Backdrop. A Panel that needs full attention becomes a Modal.
@@ -24,6 +26,17 @@ Use a Modal when the next step has to happen before anything else can: a confirm
 | Active | A choice, a confirm or a short form | Cancel and the action |
 | Acknowledge | One thing to read and accept | One button |
 | Steps | A short ordered sequence | Cancel · Back · Next |
+
+## Motion
+
+PatternModal reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Scales from 96% and fades in; the Blanket dims on appearance.default. It opens only from something the person did, and focus moves to its first input as the motion starts. |
+| exit | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Leaves at 98%, fading. |
+| swap | Swap content in place | `--ds-motion-appearance-fast` | One Modal at a time: a confirm replaces the content in place, never a second Modal. |
+| rejected | Call attention | `--ds-motion-spatial-fast` | A blocked submit shakes it once; never in reduced motion. |
 
 ## Alternatives
 
