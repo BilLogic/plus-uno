@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as IndicatorsStories from './Indicators.stories.jsx';
@@ -11,8 +12,23 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 
 <Meta title="Patterns/Notifications and indicators/Indicators" tags={['!dev', 'manifest']} />
 
-<Title>Indicators</Title>
-The small labels that say how something is: a Status tag for its state, a Count tag for how many, a Change tag for how much it moved. The words carry the meaning; color never carries it alone.
+<DocsLanding
+    page="patterns-notifications-and-indicators-indicators"
+    eyebrow="Pattern · Notifications and indicators"
+    title="Indicators"
+    purpose="The small labels that say how something is: a Status tag for its state, a Count tag for how many, a Change tag for how much it moved. The words carry the meaning; color never carries it alone."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Status tag', href: './?path=/docs/components-labels-status-tag--docs' },
+            { title: 'Count tag', href: './?path=/docs/components-labels-count-tag--docs' },
+            { title: 'Change tag', href: './?path=/docs/components-labels-change-tag--docs' },
+            { title: 'Tag', href: './?path=/docs/components-labels-tag--docs' },
+            { title: 'Flag', href: './?path=/docs/components-messaging-flag--docs' },
+            { title: 'Section message', href: './?path=/docs/components-messaging-section-message--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={IndicatorsStories}>
 

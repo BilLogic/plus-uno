@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as FormsStories from './Forms.stories.jsx';
@@ -16,8 +17,22 @@ import {
 
 <Meta title="Patterns/Actions and input/Forms" tags={['!dev', 'manifest']} />
 
-<Title>Forms</Title>
-How a form takes and checks what someone types: which host it lives in, when to validate, what a blocked submit does, how required and optional are marked, and what happens on leaving with edits.
+<DocsLanding
+    page="patterns-actions-and-input-forms"
+    eyebrow="Pattern · Actions and input"
+    title="Forms"
+    purpose="How a form takes and checks what someone types: which host it lives in, when to validate, what a blocked submit does, how required and optional are marked, and what happens on leaving with edits."
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Form', href: './?path=/docs/templates-form--docs' },
+            { title: 'Modal', href: './?path=/docs/templates-modal-modal--docs' },
+            { title: 'Panel', href: './?path=/docs/templates-panel-panel--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Frame', href: './?path=/docs/templates-frame-frame--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={FormsStories}>
 

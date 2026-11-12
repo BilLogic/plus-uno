@@ -69,6 +69,8 @@ const ROLES = {
   fieldSurface: ['--ds-background-input', 'components/forms-and-inputs/_internal/FieldBox.scss'],
   fieldBorder: ['--ds-border-input', 'components/forms-and-inputs/_internal/FieldBox.scss'],
   fieldBorderInvalid: ['--ds-border-danger', 'components/forms-and-inputs/_internal/FieldBox.scss'],
+  // A danger message block: the Banner's danger surface, edged by the invalid field's border.
+  dangerSurface: ['--ds-background-danger', 'components/messaging/Banner/Banner.scss'],
   fieldMessageDanger: ['--ds-text-danger', 'components/forms-and-inputs/_internal/FieldFrame.scss'],
   // Button
   buttonPrimary: ['--ds-background-brand-bold', 'components/forms-and-inputs/Button/Button.scss'],

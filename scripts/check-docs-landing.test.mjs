@@ -60,8 +60,16 @@ test('a hero with no description fails', () => {
   assert.ok(found.some((m) => /no description/.test(m)), found.join('\n'));
 });
 
-test('the real tree passes, and Color is the only page covered so far', () => {
-  assert.deepEqual(PAGES.map((p) => p.id), ['foundations-color']);
+test('the real tree passes, and covers Color and all 14 Patterns pages', () => {
+  const ids = PAGES.map((p) => p.id);
+  assert.equal(ids.filter((id) => id.startsWith('patterns-')).length, 14);
+  assert.ok(ids.includes('foundations-color'));
   assert.ok(REGISTRY.endsWith('hero-registry.jsx'));
   assert.deepEqual(run(), []);
+});
+
+test('a Patterns page still opening with <Title> fails', () => {
+  const source = "<DocsLanding page=\"patterns-states-empty\" />\n<Title>Empty</Title>\n";
+  const found = checkPage({ file: 'Empty.mdx', source, id: 'patterns-states-empty', heroes: ['patterns-states-empty'] });
+  assert.ok(found.some((m) => /<Title>/.test(m)), found.join('\n'));
 });

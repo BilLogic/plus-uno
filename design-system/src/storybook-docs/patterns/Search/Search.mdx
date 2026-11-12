@@ -1,5 +1,6 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/addon-docs/blocks';
+import { DocsLanding } from '@/storybook-docs/docs-landing/DocsLanding.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 import * as SearchStories from './Search.stories.jsx';
@@ -10,8 +11,23 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 
 <Meta title="Patterns/Finding things/Search" tags={['!dev', 'manifest']} />
 
-<Title>Search</Title>
-How a person finds a record by typing. Every search is a <a target="_top" href="./?path=/docs/components-forms-and-inputs-search-field--docs">Search field</a> in one of three modes, picked by where the answer lands: active filters the rows in place, focused opens a panel of matches, basic runs on Enter.
+<DocsLanding
+    page="patterns-finding-things-search"
+    eyebrow="Pattern · Finding things"
+    title="Search"
+    purpose={<>How a person finds a record by typing. Every search is a <a target="_top" href="./?path=/docs/components-forms-and-inputs-search-field--docs">Search field</a> in one of three modes, picked by where the answer lands: active filters the rows in place, focused opens a panel of matches, basic runs on Enter.</>}
+    links={{
+        label: 'Uses',
+        items: [
+            { title: 'Search field', href: './?path=/docs/components-forms-and-inputs-search-field--docs' },
+            { title: 'Dynamic table', href: './?path=/docs/components-text-and-data-display-dynamic-table--docs' },
+            { title: 'Empty state', href: './?path=/docs/components-messaging-empty-state--docs' },
+            { title: 'Skeleton', href: './?path=/docs/components-loading-skeleton--docs' },
+            { title: 'Section', href: './?path=/docs/templates-section-section--docs' },
+            { title: 'Popup', href: './?path=/docs/templates-popup-popup--docs' },
+        ],
+    }}
+/>
 
 <DocsTabs of={SearchStories}>
 
