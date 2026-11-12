@@ -2,13 +2,13 @@
 
 # SearchField
 
-Search field: find a record by typing. It is a TextField with a search icon before the text and a clear button after it, and its label is hidden: the placeholder names the scope ("Search students"). `mode="active"` reports the text on every keystroke through `onValueChange`. Hold the rows yourself and filter them (sync), or give `loadResults` for a list on a server (async): it is asked after a short pause, and what it returns goes to `onResults`. Results show in the results area, never under the field. While results load, a Spinner takes the search icon's place. `isCollapsible` starts as an icon button that grows into the field and collapses when left empty. Esc clears the text; a second Esc closes the field and returns focus to the icon. `scopes` puts a scope filter before the field, with "All" first and selected.
+Search field: find a record by typing. It is a TextField with a search icon before the text and a clear button after it, and its label is hidden: the placeholder names the scope ("Search students"). `mode="active"` reports the text on every keystroke through `onValueChange`. Hold the rows yourself and filter them (sync), or give `loadResults` for a list on a server (async): it is asked after a short pause, and what it returns goes to `onResults`. Results show in the results area, never under the field. While results load, a Spinner takes the search icon's place. `isCollapsible` starts as an icon button that grows into the field and collapses when left empty. Esc clears the text; a second Esc closes the field and returns focus to the icon. `scopes` puts a scope filter before the field, with "All" first and selected. `mode="basic"` runs `onSearch(text)` on Enter and does no work per keystroke. `mode="focused"` opens a panel (a Popup) under the field. On focus with no text it lists `recent` searches; while typing it lists matches grouped by type, then a last "See all" row that acts as a basic search. Arrow keys move through the rows, Enter chooses, Esc closes the panel. A `SearchFieldAction` child is the optional last row.
 
 **Import:** `import { SearchField } from '@/components';`
 
 **Source:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.stories.jsx` — Overview, Active, Spacing, Filled, Disabled, Loading, Async, Collapsible, Scopes, Interactive
+**Stories:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.stories.jsx` — Overview, Active, Spacing, Filled, Disabled, Loading, Async, Collapsible, Scopes, Basic, Focused, FocusedKeyboard, Interactive
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/SearchField/SearchField.mdx`
 
@@ -22,13 +22,21 @@ Use `SearchField` to find a record in a list by typing. To pick a value, use
 Results show in the results area, never under the field: the count in the table
 or results header, and the no-matches message in the table body.
 
+Pick the mode by where the answer lands:
+
+- `active` (default): the rows you hold filter as you type, through `onValueChange`.
+- `basic`: the search runs on Enter through `onSearch`, for a search too heavy to run on every keystroke.
+- `focused`: a panel under the field, for jumping straight to a record from anywhere. It lists `recent` searches on focus, matches grouped by type while typing, then a "See all" row. The panel is the one exception to the rule above: its rows sit under the field.
+
+The panel's last row is a slot: pass a `SearchFieldAction` child, such as "Create student", and it joins the keyboard order.
+
 ## Motion
 
 SearchField reads these motion tokens and no literal duration or curve.
 
 | Event | Transition | Tokens | What it does |
 | --- | --- | --- | --- |
-| enter | Update a value or state | `--ds-motion-spatial-fast` | A collapsed search grows from its icon into the field, end edge fixed, so it opens to the left; focus moves in. |
+| enter | Update a value or state | `--ds-motion-spatial-fast` | A collapsed search grows from its icon into the field, end edge fixed, so it opens to the left; focus moves in. The focused mode's panel is a Popup and takes the Popup row's open and close. |
 | exit | Update a value or state | `--ds-motion-appearance-fast` | Left empty, the field narrows back into the icon and fades; Esc twice does the same. |
 
 ## Best practices
@@ -52,6 +60,7 @@ leave the field open.
 - **The hidden label still names the field.** The accessible name is the placeholder, or `label` when given.
 - **The collapsed icon button is named** by the same words, and its tooltip shows them.
 - **The scope filter has its own name**, "Search scope" unless `scopeLabel` says otherwise.
+- **In `focused` the input is the combobox.** Focus stays in it and the highlighted row is its `aria-activedescendant`; the panel is a named listbox.
 - **Loading is announced** through the spinner's status text.
 
 ## Related
@@ -84,7 +93,9 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Key | What it does |
 | --- | --- |
 | Esc | Clears the text. When already empty and starting as an icon, closes the field and returns focus to the icon. |
-| Arrow and Enter | Inside the scope list, move and choose. |
+| Enter | In `basic`, runs `onSearch`. In `focused`, chooses the row under the cursor, or runs `onSearch` when none is. |
+| Arrow down and up | In `focused`, move through the panel's rows and wrap. Inside the scope list, move and choose. |
+| Esc in the panel | Closes the panel and keeps the text. The next Esc clears. |
 
 ### Tokens
 
@@ -107,12 +118,17 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 |------|------|---------|-------------|
 | `placeholder` | string (required) | — | Names the scope ("Search students"). Required: the label is hidden, so this is what a sighted person reads, and it names the collapsed icon and its tooltip. |
 | `label` | string | — | The accessible name, when it should differ from the placeholder. |
-| `mode` | enum | `'active'` | `active` filters on each keystroke through `onValueChange`. |
+| `mode` | enum | `'active'` | `active` filters on each keystroke through `onValueChange`. `basic` runs `onSearch` on Enter and nothing per keystroke. `focused` adds the results panel. |
 | `value` | string | — | The search text, when the caller holds it. Pair with `onValueChange`. |
 | `defaultValue` | string | `''` | Starting text when the field holds its own. |
 | `onValueChange` | func | — | `(text)`: called on every edit, on Esc and on the clear button. |
 | `loadResults` | func | — | `(text, { offset, limit, scope })` → `Promise<{ results, total }>`. Asked on first render (so `onResults` fires without typing) and after a short pause in typing; an older answer never replaces a newer one. `scope` is sent when `scopes` is set. |
 | `onResults` | func | — | `({ results, total })`: called with each answer of `loadResults`. |
+| `onSearch` | func | — | `(text)`: the search to run. Called on Enter in `basic`, and on Enter or the "See all" row in `focused`. |
+| `results` | arrayOf | — | `focused` panel: groups of matches, `{ value, label, count?, items: [{ value, label, description?, icon? }] }`. Feed it from `onResults`, or filter your own rows. |
+| `recent` | arrayOf | — | `focused` panel: recent searches shown when the field is focused and empty. |
+| `onSelect` | func | — | `focused` panel: `(item, group)` called when a match is chosen. |
+| `children` | node | — | `focused` panel: the optional last row, as `<SearchFieldAction onSelect>`. It is a slot, not a prop. |
 | `isLoading` | bool | `false` | A search is running. A Spinner takes the search icon's place. `loadResults` sets this by itself. |
 | `isCollapsible` | bool | `false` | Starts as an icon button that grows into the field and collapses when left empty. |
 | `defaultOpen` | bool | `false` | With `isCollapsible`, starts open. |
@@ -123,6 +139,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `spacing` | enum | `'default'` | `default` draws 40; `compact` draws 32. Bars pass `compact`. |
 | `isDisabled` | bool | `false` | Dims the field and blocks typing. |
 | `clearLabel` | string | `'Clear search'` | The clear button's name. |
+| `panelLabel` | string | `'Suggestions'` | The focused panel's accessible name. |
 | `scopeLabel` | string | `'Search scope'` | The scope filter's accessible name. |
 | `inputRef` | func or shape or any | — | Ref to the underlying `<input>`. |
 | `className` | string | `''` | Extra class on the outer wrapper. |
@@ -130,7 +147,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 ## Variants
 
-**`mode`** — `active`
+**`mode`** — `active` · `basic` · `focused`
 
 **`spacing`** — `default` · `compact`
 
@@ -138,7 +155,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--border-default` · `--ds-background-input` · `--ds-border-input` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--field-width-md` · `--inline-sm` · `--item-height-md` · `--radius-h32`
+`--body-default` · `--border-default` · `--ds-background-input` · `--ds-border-input` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-fast` · `--ds-motion-spatial-fast-duration` · `--ds-text-subtle` · `--field-width-md` · `--inline-sm` · `--item-height-md` · `--pad-x-md` · `--pad-y-md` · `--popover-max-height-menu` · `--popover-pad-menu` · `--radius-h32`
 
 From `design-system/src/components/forms-and-inputs/SearchField/SearchField.scss`. Override these through the token layer, never with a literal.
 

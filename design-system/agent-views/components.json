@@ -11208,7 +11208,7 @@
       "import": "import { SearchField } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/SearchField/SearchField.jsx",
-      "summary": "Search field: find a record by typing. It is a TextField with a search icon before the text and a clear button after it, and its label is hidden: the placeholder names the scope (\"Search students\"). `mode=\"active\"` reports the text on every keystroke through `onValueChange`. Hold the rows yourself and filter them (sync), or give `loadResults` for a list on a server (async): it is asked after a short pause, and what it returns goes to `onResults`. Results show in the results area, never under the field. While results load, a Spinner takes the search icon's place. `isCollapsible` starts as an icon button that grows into the field and collapses when left empty. Esc clears the text; a second Esc closes the field and returns focus to the icon. `scopes` puts a scope filter before the field, with \"All\" first and selected.",
+      "summary": "Search field: find a record by typing. It is a TextField with a search icon before the text and a clear button after it, and its label is hidden: the placeholder names the scope (\"Search students\"). `mode=\"active\"` reports the text on every keystroke through `onValueChange`. Hold the rows yourself and filter them (sync), or give `loadResults` for a list on a server (async): it is asked after a short pause, and what it returns goes to `onResults`. Results show in the results area, never under the field. While results load, a Spinner takes the search icon's place. `isCollapsible` starts as an icon button that grows into the field and collapses when left empty. Esc clears the text; a second Esc closes the field and returns focus to the icon. `scopes` puts a scope filter before the field, with \"All\" first and selected. `mode=\"basic\"` runs `onSearch(text)` on Enter and does no work per keystroke. `mode=\"focused\"` opens a panel (a Popup) under the field. On focus with no text it lists `recent` searches; while typing it lists matches grouped by type, then a last \"See all\" row that acts as a basic search. Arrow keys move through the rows, Enter chooses, Esc closes the panel. A `SearchFieldAction` child is the optional last row.",
       "props": [
         {
           "name": "placeholder",
@@ -11234,9 +11234,11 @@
           "required": false,
           "default": "'active'",
           "values": [
-            "active"
+            "active",
+            "basic",
+            "focused"
           ],
-          "description": "`active` filters on each keystroke through `onValueChange`.",
+          "description": "`active` filters on each keystroke through `onValueChange`. `basic` runs `onSearch` on Enter and nothing per keystroke. `focused` adds the results panel.",
           "deprecated": null
         },
         {
@@ -11282,6 +11284,51 @@
           "default": null,
           "values": null,
           "description": "`({ results, total })`: called with each answer of `loadResults`.",
+          "deprecated": null
+        },
+        {
+          "name": "onSearch",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`(text)`: the search to run. Called on Enter in `basic`, and on Enter or the \"See all\" row in `focused`.",
+          "deprecated": null
+        },
+        {
+          "name": "results",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`focused` panel: groups of matches, `{ value, label, count?, items: [{ value, label, description?, icon? }] }`. Feed it from `onResults`, or filter your own rows.",
+          "deprecated": null
+        },
+        {
+          "name": "recent",
+          "type": "arrayOf",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`focused` panel: recent searches shown when the field is focused and empty.",
+          "deprecated": null
+        },
+        {
+          "name": "onSelect",
+          "type": "func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`focused` panel: `(item, group)` called when a match is chosen.",
+          "deprecated": null
+        },
+        {
+          "name": "children",
+          "type": "node",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "`focused` panel: the optional last row, as `<SearchFieldAction onSelect>`. It is a slot, not a prop.",
           "deprecated": null
         },
         {
@@ -11378,6 +11425,15 @@
           "deprecated": null
         },
         {
+          "name": "panelLabel",
+          "type": "string",
+          "required": false,
+          "default": "'Suggestions'",
+          "values": null,
+          "description": "The focused panel's accessible name.",
+          "deprecated": null
+        },
+        {
           "name": "scopeLabel",
           "type": "string",
           "required": false,
@@ -11424,9 +11480,13 @@
         "Async",
         "Collapsible",
         "Scopes",
+        "Basic",
+        "Focused",
+        "FocusedKeyboard",
         "Interactive"
       ],
       "tokens": [
+        "--body-default",
         "--border-default",
         "--ds-background-input",
         "--ds-border-input",
@@ -11434,9 +11494,14 @@
         "--ds-motion-appearance-fast-duration",
         "--ds-motion-spatial-fast",
         "--ds-motion-spatial-fast-duration",
+        "--ds-text-subtle",
         "--field-width-md",
         "--inline-sm",
         "--item-height-md",
+        "--pad-x-md",
+        "--pad-y-md",
+        "--popover-max-height-menu",
+        "--popover-pad-menu",
         "--radius-h32"
       ]
     },

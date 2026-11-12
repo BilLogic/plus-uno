@@ -404,7 +404,7 @@ export const MOTION_REGISTRY = [
     name: 'SearchField',
     tier: 'component',
     events: {
-      enter: { transition: 'Update a value or state', spatial: 'spatial.fast', note: 'A collapsed search grows from its icon into the field, end edge fixed, so it opens to the left; focus moves in.' },
+      enter: { transition: 'Update a value or state', spatial: 'spatial.fast', note: 'A collapsed search grows from its icon into the field, end edge fixed, so it opens to the left; focus moves in. The focused mode\'s panel is a Popup and takes the Popup row\'s open and close.' },
       exit: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Left empty, the field narrows back into the icon and fades; Esc twice does the same.' },
     },
   },

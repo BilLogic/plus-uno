@@ -43,6 +43,16 @@ what is searched.
 
 <div className="sb-ds-doc-section">
 
+## Mode
+
+<ComponentExample of={SearchFieldStories.Basic} title="Basic" description="Nothing runs per keystroke. Enter runs onSearch with the text." />
+
+<ComponentExample of={SearchFieldStories.Focused} title="Focused" description="On focus the panel lists recent searches. While typing it lists results grouped by type with counts, then See all, which acts as a basic search. A last action row is a slot." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Spacing
 
 <ComponentExample of={SearchFieldStories.Spacing} title="Spacing" description="Default draws 40; compact draws 32, for bars." />
@@ -107,6 +117,14 @@ Use `SearchField` to find a record in a list by typing. To pick a value, use
 Results show in the results area, never under the field: the count in the table
 or results header, and the no-matches message in the table body.
 
+Pick the mode by where the answer lands:
+
+- `active` (default): the rows you hold filter as you type, through `onValueChange`.
+- `basic`: the search runs on Enter through `onSearch`, for a search too heavy to run on every keystroke.
+- `focused`: a panel under the field, for jumping straight to a record from anywhere. It lists `recent` searches on focus, matches grouped by type while typing, then a "See all" row. The panel is the one exception to the rule above: its rows sit under the field.
+
+The panel's last row is a slot: pass a `SearchFieldAction` child, such as "Create student", and it joins the keyboard order.
+
 </div>
 
 <div className="sb-ds-doc-section">
@@ -142,7 +160,9 @@ or results header, and the no-matches message in the table body.
 </thead>
 <tbody>
 <tr><td>Esc</td><td>Clears the text. When already empty and starting as an icon, closes the field and returns focus to the icon.</td></tr>
-<tr><td>Arrow and Enter</td><td>Inside the scope list, move and choose.</td></tr>
+<tr><td>Enter</td><td>In <code>basic</code>, runs <code>onSearch</code>. In <code>focused</code>, chooses the row under the cursor, or runs <code>onSearch</code> when none is.</td></tr>
+<tr><td>Arrow down and up</td><td>In <code>focused</code>, move through the panel's rows and wrap. Inside the scope list, move and choose.</td></tr>
+<tr><td>Esc in the panel</td><td>Closes the panel and keeps the text. The next Esc clears.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -208,6 +228,7 @@ leave the field open.
 - **The hidden label still names the field.** The accessible name is the placeholder, or `label` when given.
 - **The collapsed icon button is named** by the same words, and its tooltip shows them.
 - **The scope filter has its own name**, "Search scope" unless `scopeLabel` says otherwise.
+- **In `focused` the input is the combobox.** Focus stays in it and the highlighted row is its `aria-activedescendant`; the panel is a named listbox.
 - **Loading is announced** through the spinner's status text.
 
 </div>

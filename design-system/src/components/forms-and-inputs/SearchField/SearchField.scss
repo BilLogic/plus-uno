@@ -93,3 +93,23 @@
         animation: none;
     }
 }
+
+// The focused mode's results panel: a Popup at the field's width, rows on the
+// shared option row. The Popup draws the surface and its own open and close.
+.plus-search-field__popup.plus-popup {
+    padding: var(--popover-pad-menu);
+}
+
+.plus-search-field__panel {
+    display: flex;
+    flex-direction: column;
+    max-height: var(--popover-max-height-menu);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.plus-search-field__none {
+    padding: var(--pad-y-md) var(--pad-x-md);
+    color: var(--ds-text-subtle);
+    font: var(--body-default);
+}

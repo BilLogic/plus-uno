@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import SearchField from './SearchField';
+import SearchField, { SearchFieldAction } from './SearchField';
 import Button from '../Button/Button';
 
 const stack = { display: 'flex', flexDirection: 'column', gap: '16px', alignItems: 'flex-start' };
@@ -16,7 +16,7 @@ export default {
     parameters: { docs: { toc: { title: 'On this page' } } },
     argTypes: {
         placeholder: { control: 'text', table: { category: 'Content' } },
-        mode: { control: 'inline-radio', options: ['active'], table: { category: 'Behavior' } },
+        mode: { control: 'inline-radio', options: ['active', 'basic', 'focused'], table: { category: 'Behavior' } },
         spacing: { control: 'inline-radio', options: ['default', 'compact'], table: { category: 'Design' } },
         isCollapsible: { control: 'boolean', table: { category: 'Behavior' } },
         isLoading: { control: 'boolean', table: { category: 'Behavior' } },
@@ -172,6 +172,133 @@ export const Scopes = {
         const scope = canvas.getByRole('combobox', { name: 'Search scope' });
         await expect(scope).toHaveTextContent('All');
         await expect(canvas.getByTestId('scope')).toHaveTextContent('all');
+    },
+};
+
+export const Basic = {
+    render: () => {
+        const [searched, setSearched] = useState([]);
+        const [keys, setKeys] = useState(0);
+        return (
+            <div style={stack}>
+                <SearchField
+                    placeholder="Search students"
+                    mode="basic"
+                    onValueChange={() => setKeys((n) => n + 1)}
+                    onSearch={(text) => setSearched((list) => [...list, text])}
+                />
+                <output data-testid="searched">{searched.join('|')}</output>
+                <output data-testid="keys">{keys}</output>
+            </div>
+        );
+    },
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.type(canvas.getByRole('searchbox'), 'ada');
+        // Typing alone runs nothing.
+        await expect(canvas.getByTestId('searched')).toHaveTextContent('');
+        await userEvent.keyboard('{Enter}');
+        await expect(canvas.getByTestId('searched')).toHaveTextContent('ada');
+    },
+};
+
+const PEOPLE = [
+    { value: 's1', label: 'Ada Lovelace', description: 'Grade 8' },
+    { value: 's2', label: 'Grace Hopper', description: 'Grade 9' },
+    { value: 's3', label: 'Alan Turing', description: 'Grade 7' },
+];
+const SESSIONS = [{ value: 'x1', label: 'Math, Tuesday 4pm' }];
+
+const FocusedDemo = (args) => {
+    const [text, setText] = useState('');
+    const [log, setLog] = useState('');
+    const q = text.trim().toLowerCase();
+    const students = PEOPLE.filter((p) => p.label.toLowerCase().includes(q));
+    const sessions = q && 'math'.includes(q) ? SESSIONS : [];
+    const results = [
+        { value: 'students', label: 'Students', count: students.length, items: students },
+        { value: 'sessions', label: 'Sessions', count: sessions.length, items: sessions },
+    ];
+    return (
+        <div style={stack}>
+            <SearchField
+                {...args}
+                mode="focused"
+                value={text}
+                onValueChange={setText}
+                results={results}
+                recent={['Ada', 'Math']}
+                onSelect={(item) => setLog(`select:${item.value}`)}
+                onSearch={(t) => setLog(`search:${t}`)}
+            >
+                <SearchFieldAction onSelect={(t) => setLog(`create:${t}`)}>{`Create student \u201C${text}\u201D`}</SearchFieldAction>
+            </SearchField>
+            <output data-testid="log">{log}</output>
+        </div>
+    );
+};
+
+export const Focused = {
+    render: (args) => <FocusedDemo {...args} />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const page = within(canvasElement.ownerDocument.body);
+        const input = canvas.getByRole('combobox', { name: 'Search students' });
+        await userEvent.click(input);
+        // Focus with no text lists recent searches.
+        await waitFor(() => expect(page.getByText('Recent searches')).toBeVisible());
+        await expect(input).toHaveAttribute('aria-expanded', 'true');
+        await userEvent.click(page.getByRole('option', { name: 'Ada' }));
+        await expect(input).toHaveValue('Ada');
+        // Typing: groups with counts, then See all, then the action row.
+        await waitFor(() => expect(page.getByText('Students (1)')).toBeVisible());
+        // A click on the See all row runs a basic search and closes the panel.
+        await userEvent.click(page.getByRole('option', { name: /See all results for/ }));
+        await expect(canvas.getByTestId('log')).toHaveTextContent('search:Ada');
+        await waitFor(() => expect(page.queryByRole('listbox', { name: 'Suggestions' })).toBeNull());
+        await expect(input).toHaveAttribute('aria-expanded', 'false');
+        // Clicking the focused field opens it again; Tab away closes it.
+        await userEvent.click(input);
+        await waitFor(() => expect(page.getByRole('listbox', { name: 'Suggestions' })).toBeVisible());
+        await userEvent.tab();
+        await waitFor(() => expect(page.queryByRole('listbox', { name: 'Suggestions' })).toBeNull());
+        // A group with nothing in it is not drawn.
+        await expect(page.queryByText('Sessions (0)')).toBeNull();
+    },
+};
+
+export const FocusedKeyboard = {
+    render: (args) => <FocusedDemo {...args} />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const page = within(canvasElement.ownerDocument.body);
+        const input = canvas.getByRole('combobox', { name: 'Search students' });
+        await userEvent.type(input, 'a');
+        await waitFor(() => expect(page.getByRole('option', { name: /See all results for/ })).toBeVisible());
+        // Arrow down to the first result, Enter chooses it.
+        await userEvent.keyboard('{ArrowDown}');
+        await expect(input).toHaveAttribute('aria-activedescendant');
+        await userEvent.keyboard('{Enter}');
+        await expect(canvas.getByTestId('log')).toHaveTextContent('select:s1');
+        await waitFor(() => expect(page.queryByRole('listbox', { name: 'Suggestions' })).toBeNull());
+        // Esc closes the panel and keeps the text; a second Esc clears.
+        await userEvent.type(input, 'l');
+        await waitFor(() => expect(page.getByRole('listbox', { name: 'Suggestions' })).toBeVisible());
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(page.queryByRole('listbox', { name: 'Suggestions' })).toBeNull());
+        await expect(input).toHaveValue('al');
+        await userEvent.keyboard('{Escape}');
+        await expect(input).toHaveValue('');
+        // Enter with no row under the cursor is a basic search.
+        await userEvent.type(input, 'gr');
+        await waitFor(() => expect(page.getByRole('listbox', { name: 'Suggestions' })).toBeVisible());
+        await userEvent.keyboard('{Enter}');
+        await expect(canvas.getByTestId('log')).toHaveTextContent('search:gr');
+        // Last row: See all, then the action row, by arrow from the end.
+        await userEvent.type(input, 'x');
+        await waitFor(() => expect(page.getByRole('option', { name: 'Create student \u201Cgrx\u201D' })).toBeVisible());
+        await userEvent.keyboard('{ArrowUp}{Enter}');
+        await expect(canvas.getByTestId('log')).toHaveTextContent('create:grx');
     },
 };
 
