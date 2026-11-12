@@ -3,7 +3,7 @@
  * `npm run check:ads-language` — the guard on the component language.
  *
  * The library speaks the ADS names: `appearance`, `spacing`, named state
- * tokens, Blanket / Frame / Page. The old words (Alert, Toast, Switch, NavTabs,
+ * tokens, Backdrop / Frame / Page. The old words (Alert, Toast, Switch, NavTabs,
  * Badge, `style` x `fill`, small / medium / large, the 08 / 12 / 16 state
  * steps, surface container, scrim, Rovo) are gone from the tree, and the ban is
  * hard: any hit is a finding, with no baseline and no exemption beyond the

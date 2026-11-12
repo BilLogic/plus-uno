@@ -23,7 +23,7 @@ export const STEPS_ACROSS_MAX = 4;
 export const TASK_STEPS = ['Student', 'Schedule', 'Goals', 'Materials', 'Review'];
 
 /** One step list for the focused type: visited steps come back, the rest wait. */
-const stepItems = (labels, at, go) => labels.map((label, i) => ({
+export const stepItems = (labels, at, go) => labels.map((label, i) => ({
     id: label.toLowerCase(),
     label,
     status: i < at ? 'visited' : i === at ? 'current' : 'unvisited',

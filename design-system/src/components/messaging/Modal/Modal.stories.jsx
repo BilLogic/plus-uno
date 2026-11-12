@@ -436,15 +436,14 @@ export const ConfirmViewEscape = {
 };
 
 /**
- * At most two overlays stack (B4): a modal and the confirm it raises. Each
- * opens from inside the one below it, the only way in once a blanket covers
- * the page, and a third raised from the confirm is refused.
+ * A Modal never opens on another Modal. One raised from inside the open Modal
+ * stays closed and calls its `onClose`, so its owner's state says closed; the
+ * open Modal confirms inside itself instead.
  */
-export const TwoOverlayLimit = {
+export const ModalOverModalRefused = {
     render: () => {
         const [firstOpen, setFirstOpen] = useState(false);
         const [secondOpen, setSecondOpen] = useState(false);
-        const [thirdOpen, setThirdOpen] = useState(false);
         return (
             <>
                 <Button text="Open first" onClick={() => setFirstOpen(true)} />
@@ -456,15 +455,7 @@ export const TwoOverlayLimit = {
                     primaryButton={{ text: 'Open second', onClick: () => setSecondOpen(true) }}
                     onClose={() => setFirstOpen(false)}
                 />
-                <Modal
-                    show={secondOpen}
-                    width="6-col"
-                    title="Second"
-                    body="Two."
-                    primaryButton={{ text: 'Open third', onClick: () => setThirdOpen(true) }}
-                    onClose={() => setSecondOpen(false)}
-                />
-                <Modal show={thirdOpen} width="6-col" title="Third" body="At most two stack; this one is refused." onClose={() => setThirdOpen(false)} />
+                <Modal show={secondOpen} width="6-col" title="Second" body="A Modal never opens on another Modal." onClose={() => setSecondOpen(false)} />
             </>
         );
     },
@@ -472,20 +463,19 @@ export const TwoOverlayLimit = {
         const canvas = within(canvasElement);
         const body = within(canvasElement.ownerDocument.body);
         const hiddenDialog = (name) => body.queryByRole('dialog', { name, hidden: true });
-        await userEvent.click(canvas.getByRole('button', { name: 'Open first' }));
-        await waitFor(() => expect(dialogNamed(canvasElement, 'First')).not.toBeNull());
-        await userEvent.click(body.getByRole('button', { name: 'Open second' }));
-        await waitFor(() => expect(dialogNamed(canvasElement, 'Second')).not.toBeNull());
+        const warn = console.warn;
+        console.warn = () => {};
+        try {
+            await userEvent.click(canvas.getByRole('button', { name: 'Open first' }));
+            await waitFor(() => expect(dialogNamed(canvasElement, 'First')).not.toBeNull());
 
-        await userEvent.click(body.getByRole('button', { name: 'Open third' }));
-        await expect(hiddenDialog('Third'), 'a third overlay is refused').toBeNull();
-        await expect(dialogNamed(canvasElement, 'Second'), 'the second dialog stays open on top').not.toBeNull();
-        await expect(hiddenDialog('First'), 'the first dialog stays open underneath').not.toBeNull();
-
-        // Topmost Escape: the second closes, the first is back in front.
-        await userEvent.keyboard('{Escape}');
-        await waitFor(() => expect(hiddenDialog('Second')).toBeNull());
-        await waitFor(() => expect(dialogNamed(canvasElement, 'First')).not.toBeNull());
+            await userEvent.click(body.getByRole('button', { name: 'Open second' }));
+            await expect(hiddenDialog('Second'), 'a Modal over a Modal is refused').toBeNull();
+            await expect(dialogNamed(canvasElement, 'First'), 'the first Modal stays open').not.toBeNull();
+            await expect(canvasElement.ownerDocument.querySelectorAll('.plus-pattern-backdrop').length, 'one Backdrop').toBe(1);
+        } finally {
+            console.warn = warn;
+        }
     },
 };
 
@@ -501,7 +491,7 @@ const paintedShadow = (doc, token) => {
     return value;
 };
 
-/** The Modal is the one surface on a blanket, so it draws the blocking shadow in every width. */
+/** The Modal is the one surface on a backdrop, so it draws the blocking shadow in every width. */
 export const BlockingShadow = {
     render: () => (
         <div style={col}>

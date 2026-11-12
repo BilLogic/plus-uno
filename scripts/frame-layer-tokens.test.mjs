@@ -353,7 +353,7 @@ const MODAL_PAD_PX = 16;
 
 /*
  * The screen grid (`styles/_screen-grid.scss`) is the one rule every
- * floating layer takes its column steps from: Modal, the Blanket patterns and
+ * floating layer takes its column steps from: Modal, the Backdrop patterns and
  * Popup. At the three mode widths it has to land on Figma's Modal/width-modal-*.
  */
 const SCREEN_GRID_SCSS = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/styles/_screen-grid.scss'), 'utf8');
@@ -430,7 +430,7 @@ test('the Frame stacks its layers by name: no arithmetic on --layer-navigation a
   assert.doesNotMatch(scss, /z-index:\s*-?\d/);
 });
 
-test('the Frame layer steps are named and ordered edge < Sidebar < Topbar start < Blanket < Panel peek', () => {
+test('the Frame layer steps are named and ordered edge < Sidebar < Topbar start < Backdrop < Panel peek', () => {
   const order = ['edge', 'sidebar', 'topbar-start', 'blanket', 'panel-peek'].map((n) => `--frame-layer-${n}`);
   const values = order.map((n) => {
     const token = corpus.get(n);

@@ -20,7 +20,7 @@ export {
 export { default as PatternCard } from './PatternCard';
 export { default as PatternSection, SECTION_DETAIL_FLOOR, sectionDetailView } from './PatternSection';
 export { default as AiChat, useAiChat, AI_CHAT_MODES, AI_CHAT_STORAGE_KEY, AI_CHAT_FULLSCREEN_BELOW, AI_CHAT_DISCLAIMER } from './AiChat';
-export { default as Blanket, BLANKET_WIDTHS, BLANKET_HEIGHTS, BLANKET_SPANS, BLANKET_PLACEMENTS } from './Blanket';
+export { default as Backdrop, BACKDROP_WIDTHS, BACKDROP_HEIGHTS, BACKDROP_SPANS, BACKDROP_PLACEMENTS } from './Backdrop';
 export { default as PatternDrawer, DRAWER_PLACEMENTS } from './PatternDrawer';
 export { default as PatternModal } from './PatternModal';
 export { default as PatternTable } from './PatternTable';

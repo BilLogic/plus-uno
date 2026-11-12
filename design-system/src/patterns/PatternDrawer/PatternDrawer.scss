@@ -1,7 +1,7 @@
 /**
  * Drawer pattern (Patterns/Drawer)
  * A full-height panel at the edge of the screen, placed in the Overlay
- * pattern at `start` or `end`, over the same blanket a modal takes. The overlay
+ * pattern at `start` or `end`, over the same backdrop a modal takes. The overlay
  * pair (elevation.surface.overlay with elevation.shadow.overlay), Drawer/pad
  * 16, Drawer/stack-md 16 and Drawer/inline-sm 8, which alias the Modal steps;
  * no radius, since it meets the screen on three sides. Width is a step of the

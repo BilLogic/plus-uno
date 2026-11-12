@@ -2,7 +2,7 @@
 
 # PatternDrawer
 
-Drawer pattern for PLUS design system. A full-height panel at the edge of the screen, for a task that needs the page in view: the details of a row, a set of filters, a short edit. It places itself in `Blanket` at that edge, over the same blanket a modal takes. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), the Modal width steps. The title, description and close button follow the Modal rules. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), Drawer/pad 16, Drawer/stack-md 16 and Drawer/inline-sm 8, no radius. Mirrors "Pattern/Drawer" in the Figma design system file. It is a real dialog: opening it moves focus inside and Tab cycles there, Escape, the close button and a click on the blanket call `onClose`, and closing returns focus to what had it. An `inline` drawer, drawn in the page flow for docs, leaves focus where it is. It takes a stack slot from the shared overlay module (`@/lib/overlay`) alongside `Modal`: at most two stack (a drawer and the confirm it raises), a third stays closed and calls `onClose`, and opening either closes a floating sidebar. An `inline` drawer takes no slot.
+Drawer pattern for PLUS design system. A full-height panel at the edge of the screen, for a task that needs the page in view: the details of a row, a set of filters, a short edit. It places itself in `Backdrop` at that edge, over the same backdrop a modal takes. Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), the Modal width steps. The title, description and close button follow the Modal rules. Baked-in tokens: the overlay pair (`--ds-surface-overlay` with `--ds-shadow-overlay`), Drawer/pad 16, Drawer/stack-md 16 and Drawer/inline-sm 8, no radius. Mirrors "Pattern/Drawer" in the Figma design system file. It is a real dialog: opening it moves focus inside and Tab cycles there, Escape, the close button and a click on the backdrop call `onClose`, and closing returns focus to what had it. An `inline` drawer, drawn in the page flow for docs, leaves focus where it is. It takes a stack slot from the shared overlay module (`@/lib/overlay`) alongside `Modal`: at most two stack (a drawer and the confirm it raises), a third stays closed and calls `onClose`, and opening either closes a floating sidebar. An `inline` drawer takes no slot.
 
 Also asked as: slide-over, sheet, side sheet, off-canvas.
 
@@ -16,7 +16,7 @@ Also asked as: slide-over, sheet, side sheet, off-canvas.
 
 ## Usage
 
-Use a Drawer to open a panel beside the page, so a person can work on one thing while the page stays in view. It dims the page with the blanket but does not hide it.
+Use a Drawer to open a panel beside the page, so a person can work on one thing while the page stays in view. It dims the page with the backdrop but does not hide it.
 
 | Task | Use |
 | --- | --- |
@@ -34,7 +34,7 @@ A Drawer takes the Modal width steps, never the page grid. The width grows with 
 | `md` | 507 | 677 | 848 | 8 columns + 2 × 16 |
 | `lg` | 629 | 843 | 1056 | 10 columns + 2 × 16 |
 
-A Drawer is placed in the [Blanket](?path=/docs/templates-modal-backdrop--docs) with an edge placement. The Blanket drops its pad and holds the Drawer at that edge, over the same blanket and layers a [Modal](?path=/docs/templates-modal-modal--docs) takes.
+A Drawer is placed in the [Backdrop](?path=/docs/templates-modal-backdrop--docs) with an edge placement. The Backdrop drops its pad and holds the Drawer at that edge, over the same backdrop and layers a [Modal](?path=/docs/templates-modal-modal--docs) takes.
 
 ## Best practices
 
@@ -55,26 +55,26 @@ Don't: A wide drawer that covers the page.
 Do: A small modal for a short decision.
 Don't: A drawer for a short decision.
 
-### Place the Drawer in a Blanket. {#place-the-drawer-in-a-blanket}
+### Place the Drawer in a Backdrop. {#place-the-drawer-in-a-backdrop}
 
-Hold the Drawer full height at a screen edge, inside a Blanket. Never put it straight on the page, and never center it: a centered layer is a Modal.
+Hold the Drawer full height at a screen edge, inside a Backdrop. Never put it straight on the page, and never center it: a centered layer is a Modal.
 
 ## Accessibility
 
 - The Drawer is a dialog with `aria-modal` set to true. The title is its h1 and names it through `aria-labelledby`, and the description is linked through `aria-describedby`.
 - Opening moves focus to the first control inside and traps it there. Tab and Shift+Tab cycle inside.
-- Escape, the Close button and a click on the blanket call `onClose`, and focus returns to the control that opened it. An inner control that handles Escape keeps it.
+- Escape, the Close button and a click on the backdrop call `onClose`, and focus returns to the control that opened it. An inner control that handles Escape keeps it.
 - A body that scrolls is a tab stop, so a keyboard can reach it.
 - An `inline` Drawer, drawn in the page flow for docs, sets `aria-modal` to false and leaves focus where it is.
 
 ## Related
 
 - [Modal](?path=/docs/templates-modal-modal--docs) is the centered layer for a task that blocks the page.
-- [Blanket](?path=/docs/templates-modal-backdrop--docs) places the Drawer at an edge and draws the fill.
+- [Backdrop](?path=/docs/templates-modal-backdrop--docs) places the Drawer at an edge and draws the fill.
 - [Section](?path=/docs/templates-section-section--docs) and [Card](?path=/docs/templates-section-card--docs) hold content that belongs on the page itself.
 - Frame shows a Drawer open over the app frame, and how it meets the Sidebar.
 
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
 
 ## Parts
 
@@ -101,7 +101,7 @@ A Drawer is open or closed. Closing it returns focus to what had it before it op
 | `--heading-medium` | 20/24 | The title. |
 | `--body-default`, `--ds-text-subtle` | 14/20 | The description. |
 | `--ds-border-focused`, `--focus-ring-width` | focus ring | The ring when the Drawer itself holds focus. |
-| `--ds-blanket` | 32% in Light, 60% in Dark | The fill the Blanket draws behind it. |
+| `--ds-blanket` | 32% in Light, 60% in Dark | The fill the Backdrop draws behind it. |
 
 ## Content guidelines
 
@@ -119,7 +119,7 @@ A Drawer is open or closed. Closing it returns focus to what had it before it op
 | `open` | bool | `true` | Whether the drawer shows. Closing it returns focus to what had it before it opened. |
 | `title` | node | — | The title in the header row: the dialog's h1, at Heading/medium 20, and its name |
 | `description` | node | — | One line under the title, in the subtle text color; it describes the dialog |
-| `onClose` | func | — | Called by the close button, Escape and a click on the blanket; renders the close button |
+| `onClose` | func | — | Called by the close button, Escape and a click on the backdrop; renders the close button |
 | `footer` | node | — | Footer slot, pinned to the bottom edge (typically action buttons, the primary last) |
 | `width` | oneOf | `'sm'` | `sm` · `md` · `lg`: 6 · 8 · 10 columns of the screen grid plus the drawer pad (384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 at 1440), the Modal width steps. Grows with the screen, never shrinks, ignores the sidebar. |
 | `placement` | enum | `'end'` | `end` (default) holds it at the right edge of a left-to-right page; `start` at the left. |

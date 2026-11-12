@@ -1,9 +1,10 @@
 import React, { useRef, useState } from 'react';
 
 import { Button, Fieldset, PanelBody, PanelCloseAction, PanelContainer, PanelFooter, PanelHeader, SectionMessage, Select, Skeleton, TextField } from '@/components';
-import { Blanket, PatternModal, PatternSection } from '@/patterns';
+import { Backdrop, PatternModal, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { CELL, FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
 import { BAR_TOKEN, FocusedType, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx';
 
 /**
@@ -20,8 +21,6 @@ const MODAL_PAD = '--modal-pad-x-default';
 /** The Modal's corner radius, which the full-bleed footer's bottom corners follow. */
 const HOST_RADIUS = '--modal-radius';
 
-/** A full-bleed cell fills its half edge to edge, so it has no corners of its own. */
-const CELL = { borderRadius: 0 };
 
 /** The Modal's stand-in screen on the docs page: docs geometry, in px. */
 /** A page form needs more room than the other windows: the fields, the footer below them, and a server message above. */
@@ -96,27 +95,10 @@ export const PageFooter = ({ sending, onSave }) => (
  * so the cells never change size, and only that button disables.
  */
 export const FullBleedFooter = ({ sending, onSave, onCancel, primary = 'Save session', cancel = 'Cancel', cancelAppearance = 'default', bleed }) => (
-    <div
-        data-probe="footer"
-        style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            blockSize: `var(${BAR_TOKEN})`,
-            flex: '1 1 auto',
-            // Composed inside the host's footer region: the footer cancels the host's pad on the sides and the bottom,
-            // squares its cells, and clips its own bottom corners to the host's radius, so it can't draw past the host's edge.
-            overflow: 'hidden',
-            ...(bleed && {
-                marginInline: `calc(-1 * var(${bleed}))`,
-                marginBlockEnd: `calc(-1 * var(${bleed}))`,
-                borderEndStartRadius: `var(${HOST_RADIUS})`,
-                borderEndEndRadius: `var(${HOST_RADIUS})`,
-            }),
-        }}
-    >
+    <FooterCells bleed={bleed} radius={HOST_RADIUS}>
         <Button text={cancel} appearance={cancelAppearance} shouldFitContainer onClick={onCancel} style={CELL} />
         <Button text={primary} appearance="primary" shouldFitContainer isLoading={sending} onClick={onSave} style={CELL} />
-    </div>
+    </FooterCells>
 );
 
 /** A page body made of placeholder bars, so the form is what reads. */
@@ -195,7 +177,7 @@ export const FormInModal = ({ initial, server, sendingForever, height = 'hug', s
     const close = () => { if (dirty) setConfirming(true); };
     return (
         <BrowserWindow address="app.plus.org/students" height={SCREEN.height}>
-            <Blanket inline screenWidth={SCREEN.width} screenHeight={screenHeight}>
+            <Backdrop inline screenWidth={SCREEN.width} screenHeight={screenHeight}>
                 {confirming ? (
                     <PatternModal
                         width="sm"
@@ -225,7 +207,7 @@ export const FormInModal = ({ initial, server, sendingForever, height = 'hug', s
                         <FormFields values={f.values} onChange={f.setValues} errors={f.errors} onBlurField={f.onBlurField} setRef={f.setRef} />
                     </PatternModal>
                 )}
-            </Blanket>
+            </Backdrop>
         </BrowserWindow>
     );
 };

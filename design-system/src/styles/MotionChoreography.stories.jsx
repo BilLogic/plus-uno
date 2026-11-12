@@ -67,7 +67,7 @@ const stillAtItsLanding = (demo) => async ({ canvasElement }) => {
   await expect(everyPaintIsAToken(root)).toBe(true);
 };
 
-const story = (demo) => ({ render: () => <MotionDemo {...demo} />, play: playsToItsLanding(demo) });
+const story = (demo) => ({ render: () => <MotionDemo {...demo} reduced={false} />, play: playsToItsLanding(demo) });
 const reducedStory = (demo) => ({ render: () => <MotionDemo {...demo} reduced />, play: stillAtItsLanding(demo) });
 
 export const Direction = story(CHOREOGRAPHY_DEMOS.direction);
@@ -104,7 +104,7 @@ export const StaggerIsComputedFromTheRule = {
 
 /** The stagger demo: a 20 ms gap, none, and 150 ms, each with its strip; the strip's bars follow the delays. */
 export const StaggerStripsMatchTheDelays = {
-  render: () => <MotionDemo {...CHOREOGRAPHY_DEMOS.stagger} />,
+  render: () => <MotionDemo {...CHOREOGRAPHY_DEMOS.stagger} reduced={false} />,
   play: async ({ canvasElement }) => {
     await settled(canvasElement);
     const tight = stateOf(canvasElement, 'stagger-tight');
@@ -120,7 +120,7 @@ export const StaggerStripsMatchTheDelays = {
 
 /** Clean fades: the new content starts when the old is about 90% out, read from the appearance.fast spring. */
 export const CleanFadeGapIsTheNinetyPercentTime = {
-  render: () => <MotionDemo {...CHOREOGRAPHY_DEMOS.fades} />,
+  render: () => <MotionDemo {...CHOREOGRAPHY_DEMOS.fades} reduced={false} />,
   play: async ({ canvasElement }) => {
     await expect(CLEAN_FADE_GAP_MS).toBeGreaterThan(40);
     await expect(CLEAN_FADE_GAP_MS).toBeLessThan(120);
@@ -132,7 +132,7 @@ export const CleanFadeGapIsTheNinetyPercentTime = {
 
 /** Keep space: nothing moves into a place until what was there has gone. */
 export const NothingMovesIntoAnOccupiedPlace = {
-  render: () => <MotionDemo {...CHOREOGRAPHY_DEMOS.space} />,
+  render: () => <MotionDemo {...CHOREOGRAPHY_DEMOS.space} reduced={false} />,
   play: async ({ canvasElement }) => {
     await settled(canvasElement);
     await expect(stateOf(canvasElement, 'space-clear').clash).toBe(0);
@@ -142,7 +142,7 @@ export const NothingMovesIntoAnOccupiedPlace = {
 
 /** Breakpoints: the layout steps through the kit's three states as the hand crosses each one. */
 export const BreakpointsFollowTheHand = {
-  render: () => <MotionDemo {...CHOREOGRAPHY_DEMOS.breakpoints} />,
+  render: () => <MotionDemo {...CHOREOGRAPHY_DEMOS.breakpoints} reduced={false} />,
   play: async ({ canvasElement }) => {
     await settled(canvasElement);
     const follows = stateOf(canvasElement, 'bp-follows');

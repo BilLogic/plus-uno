@@ -27,17 +27,34 @@ export const markersLevelWithParts = async (canvasElement, parts) => {
     });
 };
 
-/** No leader line passes through a part other than its own: the line's box against every other part's box, ignoring a 1px touch. */
+/**
+ * No leader line passes through a part other than its own: the line's box against every other part's box, ignoring a 1px touch.
+ * A part flagged `holds` contains the others (a Backdrop around its Modal), so a leader crossing it is not a crossing.
+ */
 export const leadersCrossNoOtherPart = (canvasElement, parts) => {
     parts.forEach(({ label }, i) => {
         const leader = canvasElement.querySelector(`[data-anatomy-leader="${i + 1}"]`);
         expect(leader, `${label}: its leader exists`).not.toBeNull();
         const line = rect(leader);
         parts.forEach((other, j) => {
-            if (j === i) return;
+            if (j === i || other.holds) return;
             const box = rect(canvasElement.querySelector(other.selector));
             const inside = line.right > box.left + 1 && line.left < box.right - 1 && line.bottom > box.top + 1 && line.top < box.bottom - 1;
             expect(inside, `leader ${i + 1} (${label}) does not cross ${other.label}`).toBe(false);
         });
     });
+};
+
+/**
+ * The story's root sits inside its canvas with equal insets on both sides: a stage wider than the canvas
+ * runs past the right edge and leaves a lopsided inset.
+ */
+export const fitsCanvas = (canvasElement) => {
+    const root = canvasElement.firstElementChild;
+    expect(root, 'the story has a root').not.toBeNull();
+    const box = rect(canvasElement);
+    const r = rect(root);
+    expect(r.left, 'the story starts inside its canvas').toBeGreaterThanOrEqual(box.left - 0.5);
+    expect(r.right, 'the story ends inside its canvas').toBeLessThanOrEqual(box.right + 0.5);
+    expect(Math.abs((r.left - box.left) - (box.right - r.right)), 'equal insets on both sides').toBeLessThanOrEqual(1);
 };

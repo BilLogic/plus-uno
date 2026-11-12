@@ -351,7 +351,7 @@ const PageWithDrawer = () => {
     );
 };
 
-/** A drawer open over the page. The blanket covers the frame and the drawer runs the full height at the end edge. */
+/** A drawer open over the page. The backdrop covers the frame and the drawer runs the full height at the end edge. */
 export const WithDrawer = {
     render: () => fullHeight(<PageWithDrawer />),
     play: async ({ canvasElement }) => {

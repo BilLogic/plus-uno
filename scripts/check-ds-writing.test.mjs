@@ -167,7 +167,7 @@ test('gradeFindings: warnings everywhere, a stale marker always an error, a stri
 });
 
 test('the strict list holds Modal and the Section template, enforced in the gate', () => {
-  assert.deepEqual(STRICT_PAGES, ['Modal', 'PatternSection', 'Frame', 'Page']);
+  assert.deepEqual(STRICT_PAGES, ['Modal', 'PatternModal', 'PatternSection', 'Frame', 'Page']);
   assert.equal(ENFORCE_STRICT, true);
 });
 

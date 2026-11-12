@@ -663,7 +663,7 @@ export const DetailSplitHoldsWithPanelAt1440 = {
         await waitFor(() => expect(p.sidebar(), 'the Sidebar collapsed to keep 960').toBeNull());
         await waitFor(() => expect(rect(p.root).width).toBeGreaterThanOrEqual(SECTION_DETAIL_FLOOR));
         await expectSplit(p, 1440 - 400 - 48);
-        await expect(canvasElement.querySelector('.plus-frame__blanket'), 'the Panel stays docked').toBeNull();
+        await expect(canvasElement.querySelector('.plus-frame__backdrop'), 'the Panel stays docked').toBeNull();
     }),
 };
 

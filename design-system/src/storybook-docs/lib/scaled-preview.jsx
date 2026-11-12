@@ -3,9 +3,9 @@ import PropTypes from 'prop-types';
 import { useFitScale } from './use-fit-scale.js';
 
 /**
- * A whole shell (a Frame, a template, a Blanket at a stand-in screen) drawn at
+ * A whole shell (a Frame, a template, a Backdrop at a stand-in screen) drawn at
  * a fixed stage size and scaled down to fit a do or don't card. The shell
- * lays itself out at `width`, so a Frame docks and a Blanket pads as they do
+ * lays itself out at `width`, so a Frame docks and a Backdrop pads as they do
  * at that size; only the picture shrinks.
  *
  * It is a picture, not a second working page: the box is `inert` and hidden

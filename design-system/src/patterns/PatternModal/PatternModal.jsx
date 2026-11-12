@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Icon, Tabs, Skeleton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
-import { BLANKET_HEIGHTS, BLANKET_WIDTHS } from '../Blanket';
+import { BACKDROP_HEIGHTS, BACKDROP_WIDTHS } from '../Backdrop';
 import './PatternModal.scss';
 
 /**
@@ -11,7 +11,7 @@ import './PatternModal.scss';
  * title and close button, body slot, footer slot. Width is a step of the
  * screen grid (sm · md · lg: 6 · 8 · 10 columns plus the modal pad), and
  * height hugs the content up to the screen less 128 or fills to it, the body
- * scrolling past it. Place it in `Blanket`.
+ * scrolling past it. Place it in `Backdrop`.
  * Baked-in tokens: the overlay pair (`--ds-surface-overlay` with
  * `--ds-shadow-overlay`), as the Modal component draws it, and Modal/pad,
  * Modal/stack-md and Modal/radius.
@@ -229,9 +229,9 @@ PatternModal.propTypes = {
      * (384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 at 1440).
      * Grows with the screen, never shrinks, ignores the sidebar.
      */
-    width: PropTypes.oneOf(BLANKET_WIDTHS),
+    width: PropTypes.oneOf(BACKDROP_WIDTHS),
     /** `hug` grows with the content to the screen less 128 and then scrolls its body; `fill` sits at that cap. */
-    height: PropTypes.oneOf(BLANKET_HEIGHTS),
+    height: PropTypes.oneOf(BACKDROP_HEIGHTS),
     /**
      * A tab group under the title: `{ key, label, content, disabled? }` per tab.
      * The tabs stay put in the header and the body, now the tab panel, shows the

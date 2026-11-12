@@ -53,7 +53,7 @@ const ROLES = {
   modalSurface: ['--ds-surface-overlay', 'components/messaging/Modal/Modal.scss'],
   modalShadow: ['--ds-shadow-blocking', 'components/messaging/Modal/Modal.scss'],
   modalDivider: ['--ds-border', 'components/messaging/Modal/Modal.scss'],
-  backdrop: ['--ds-blanket', 'patterns/Blanket/Blanket.scss'],
+  backdrop: ['--ds-blanket', 'patterns/Backdrop/Backdrop.scss'],
   // Placeholder text: the Skeleton component's own bar
   placeholderText: ['--ds-skeleton', 'components/loading/Skeleton/Skeleton.scss'],
   placeholderHeading: ['--ds-skeleton', 'components/loading/Skeleton/Skeleton.scss'],
