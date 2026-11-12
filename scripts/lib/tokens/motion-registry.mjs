@@ -3,8 +3,8 @@
  * enter, exit and change motion by semantic token (`MOTION_SEMANTICS` in
  * `plan.mjs`, e.g. `spatial.fast`), plus any per-row rule.
  *
- * Empty until BilLogic/plus-uno#2211 fills it from the motion docs' Components,
- * Patterns and Templates tables. `check:motion-registry` holds it:
+ * Filled from the motion docs' Components, Patterns and Templates tables, one
+ * row per PR. `check:motion-registry` holds it:
  * every interactive component is a row here or on the allow-list in
  * `scripts/baselines/motion-registry.json`, and every token a row names exists.
  *
@@ -26,4 +26,23 @@
  * @typedef {{transition?: string, spatial?: string, appearance?: string, note?: string, sound?: MotionSound}} MotionEvent
  * @type {{name: string, tier: 'component' | 'pattern' | 'template', events: Record<string, MotionEvent>}[]}
  */
-export const MOTION_REGISTRY = [];
+export const MOTION_REGISTRY = [
+  {
+    name: 'Popup',
+    tier: 'component',
+    events: {
+      enter: {
+        transition: 'Open',
+        spatial: 'spatial.fast',
+        appearance: 'appearance.fast',
+        note: "Clips open from the trigger's corner on the side it is aligned to. From the keyboard it opens with no animation.",
+      },
+      exit: {
+        transition: 'Close',
+        spatial: 'spatial.exit',
+        appearance: 'appearance.fast',
+        note: 'The clip folds back to the same corner while it fades. Under reduced motion it is the fade alone.',
+      },
+    },
+  },
+];

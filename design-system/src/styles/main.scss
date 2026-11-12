@@ -37,6 +37,7 @@
   // values. Regenerate,
   // never edit: `npm run generate:design-tokens`.
   @include meta.load-css("../tokens/ladder/motion");
+  @include meta.load-css("../tokens/ladder/springs");
   @include meta.load-css("../tokens/ladder/semantics");
   @include meta.load-css("../tokens/ladder/patterns");
   @include meta.load-css("../tokens/ladder/components");
