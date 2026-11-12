@@ -72,7 +72,7 @@ Use Notifications when the product needs to tell someone something: an action fi
 
 - Errors: use for where a failure shows.
 - Loading: use for the Flag past 10 s.
-- Indicators: use for the count on the Bell; it lands as its own pattern page.
+- Indicators: use for the count on the Bell.
 - Panel: use for the Inbox.
 - Modal: use for what must be answered first.
 - Page: use for where a Page banner sits.

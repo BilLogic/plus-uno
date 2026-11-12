@@ -226,6 +226,9 @@ export const MOTION_REGISTRY = [
       status: { transition: 'Update a value or state', appearance: 'appearance.default', note: 'A status that changes fades to its new word and fill on appearance.default; nothing bounces.' },
       'count-first': { transition: 'Update a value or state', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A count rolls once on first view, downward, and then fades to later values on appearance.fast.' },
       progress: { transition: 'Update a value or state', spatial: 'linear', note: 'Progress fills on linear with the work, never ahead. Nothing bounces.' },
+    },
+  },
+  {
     name: 'Notifications',
     tier: 'pattern',
     events: {
