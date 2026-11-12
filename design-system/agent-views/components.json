@@ -3885,12 +3885,12 @@
         "DisabledRow",
         "DisabledRowWithReason",
         "HoveredState",
-        "KeyboardFocus"
+        "KeyboardFocus",
+        "OpenMenuEdge"
       ],
       "tokens": [
         "--body-default",
         "--border-default",
-        "--ds-border",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text-subtle",
@@ -9381,6 +9381,7 @@
       "tokens": [
         "--anchor-width",
         "--body-default",
+        "--border-default",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
@@ -11887,7 +11888,8 @@
         "FieldDisabled",
         "FieldInvalid",
         "FieldReadOnly",
-        "FieldReadOnlyLongValue"
+        "FieldReadOnlyLongValue",
+        "OpenListEdge"
       ],
       "tokens": [
         "--body-default",

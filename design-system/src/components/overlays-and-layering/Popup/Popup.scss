@@ -52,9 +52,10 @@
     z-index: var(--layer-popup);
 
     // The overlay pair. Its shadow carries the 1px edge ring (firmer under
-    // increased contrast), so the popup draws no border of its own.
+    // increased contrast), so the popup paints no border of its own; the
+    // transparent one keeps an edge in forced colors, where shadows are dropped.
     background-color: var(--ds-surface-overlay);
-    border: none;
+    border: var(--border-default) solid transparent;
     border-radius: var(--popover-radius);
     box-shadow: var(--ds-shadow-overlay);
 
