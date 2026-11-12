@@ -191,10 +191,6 @@ time {
     border: 1px solid var(--ds-border);
 }
 
-.border-radius-sm {
-    border-radius: 2px;
-}
-
 // Visually hidden: read by assistive technology, never seen. A one-pixel,
 // clipped box out of the flow; `VisuallyHidden` renders it, and components
 // that announce status text use the class directly. It paints nothing, so it
