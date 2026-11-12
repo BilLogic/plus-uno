@@ -377,6 +377,7 @@ export const ActionKinds = {
         const [normal, bold] = canvasElement.querySelectorAll('.plus-flag');
         const link = await waitFor(() => within(normal).getByRole('link', { name: 'View plan' }));
         await expect(link.classList.contains('plus-btn'), 'a normal action stays a plain link').toBe(false);
+        await expect(link.getAttribute('href'), 'a normal link keeps its href').toBe('/plan');
         const buttons = within(bold).getAllByRole('button').filter((el) => el.classList.contains('plus-flag-action'));
         await expect(buttons.map((el) => el.textContent), 'bold actions are buttons, in order').toEqual(['View plan', 'Undo']);
         await expect(buttons[0].getAttribute('href'), 'an href action navigates').toBe('/plan');
