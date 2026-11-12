@@ -126,6 +126,8 @@ export const Flags = {
     play: async ({ canvasElement }) => {
         const flags = canvasElement.querySelectorAll('.plus-flag');
         await expect(flags).toHaveLength(4);
+        // Measure where the flags settle: their enter slide moves them until it lands.
+        await Promise.all([...flags].flatMap((flag) => flag.getAnimations().map((a) => a.finished)));
         await expect(flags[0].getBoundingClientRect().width, 'Popover/width-flag').toBe(400);
         const gap = flags[1].getBoundingClientRect().top - flags[0].getBoundingClientRect().bottom;
         await expect(Math.round(gap), 'Popover/stack-flag').toBe(16);
