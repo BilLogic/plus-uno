@@ -26,11 +26,6 @@ import * as ElevationStories from './Elevation.stories.jsx';
 
 <Canvas of={ElevationStories.Stack} sourceState="none" />
 
-```css
-background: var(--ds-surface-raised);
-box-shadow: var(--ds-shadow-raised);
-```
-
 </FoundationSection>
 
 <FoundationSection title="The levels">
@@ -152,11 +147,11 @@ A label, so it has no shadow: the dark fill sets it apart.
 
 <FoundationSection title="Motion">
 
-Three rules for a shadow that moves. The springs themselves are in [Motion](?path=/docs/foundations-motion--docs).
+Three rules for a shadow that moves. A shadow moves on the appearance springs, the `--ds-motion-appearance-*` tokens; the springs themselves are in [Motion](?path=/docs/foundations-motion--docs).
 
 <FoundationSubsection title="A shadow changes with its fill">
 
-It moves on an appearance spring, together with the surface. Click the Card.
+It moves on `--ds-motion-appearance-default`, together with the surface. Click the Card.
 
 <Canvas of={ElevationStories.Lift} sourceState="none" />
 
@@ -164,7 +159,7 @@ It moves on an appearance spring, together with the surface. Click the Card.
 
 <FoundationSubsection title="A clip never cuts a shadow">
 
-A clip-path open rests past the shadow's reach, drawn dashed.
+A clip-path open runs on `--ds-motion-appearance-default` and rests past the shadow's reach, drawn dashed.
 
 <Canvas of={ElevationStories.Clip} sourceState="none" />
 
@@ -172,7 +167,7 @@ A clip-path open rests past the shadow's reach, drawn dashed.
 
 <FoundationSubsection title="A scroll shadow tracks the scroll">
 
-It grows one to one with the scroll position, with no spring of its own.
+It grows one to one with the scroll position, with no spring token of its own.
 
 <Canvas of={ElevationStories.ScrollShadow} sourceState="none" />
 

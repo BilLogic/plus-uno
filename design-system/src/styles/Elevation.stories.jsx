@@ -1,7 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
-import { Button, Popup, Select, Tooltip } from '@/components';
-import { Blanket, Frame, PatternCard, PatternModal, PatternSection, PatternTable } from '@/patterns';
+import { Button, Modal, PanelBody, PanelContainer, PanelHeader, Popup, Select, Tooltip } from '@/components';
+import { Blanket, PatternCard, PatternSection, PatternTable } from '@/patterns';
+import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 import {
     BehaviorGuide,
@@ -39,8 +40,17 @@ export const Stack = {
         const root = canvasElement.querySelector('[data-testid="exploded-stack"]');
         const canvas = within(canvasElement);
         await expect(root).toHaveAttribute('data-state', 'exploded');
-        await expect(root.querySelectorAll('[data-plate]')).toHaveLength(7);
-        await waitFor(() => expect(within(root).getByText(/--layer-tooltip \d+/)).toBeInTheDocument());
+        // Six plates, each drawn from the illustration kit, with no words inside the figure:
+        // the names and the --layer-* values live in the numbered legend beside it.
+        const plates = root.querySelectorAll('[data-plate]');
+        await expect(plates).toHaveLength(6);
+        for (const plate of plates) {
+            await expect(plate.querySelector('svg'), `${plate.dataset.plate} is a kit drawing`).not.toBeNull();
+            await expect(plate.querySelector('svg text'), `${plate.dataset.plate} draws no words`).toBeNull();
+        }
+        const legend = within(root.querySelector('[data-testid="stack-legend"]'));
+        await waitFor(() => expect(legend.getByText(/--layer-modal \d+/)).toBeInTheDocument());
+        await expect(legend.getByText('Backdrop')).toBeInTheDocument();
         await userEvent.click(canvas.getByRole('button', { name: 'Collapse' }));
         await expect(root).toHaveAttribute('data-state', 'collapsed');
         await waitFor(() => expect(root).toHaveAttribute('data-progress', '0'));
@@ -170,13 +180,17 @@ const options = ['Algebra I', 'Geometry', 'Reading', 'Writing'].map((label) => (
 export const OpenPopup = {
     render: () => (
         <div style={{ minHeight: 'calc(var(--image-xl) * 2)', display: 'flex', alignItems: 'flex-start', padding: 'var(--card-pad-compact)' }}>
-            <Popup trigger={<Button text="Details" />} title="Session 12" placement="right-start" triggerType="manual" show>
+            <Popup trigger={<Button text="Details" />} title="Session 12" placement="right-start" triggerType="manual" show initialFocus={false}>
                 Ran 45 minutes over.
             </Popup>
         </div>
     ),
     play: async () => {
         await waitFor(() => expect(document.querySelector('.plus-popup')).not.toBeNull());
+        // At rest: opening it moves no focus, so it draws no focus ring.
+        const popup = document.querySelector('.plus-popup');
+        await expect(popup.contains(document.activeElement)).toBe(false);
+        await expect(popup.matches(':focus-visible')).toBe(false);
     },
 };
 
@@ -185,28 +199,44 @@ const peek = (root, selector) => {
     root?.querySelector(selector)?.dispatchEvent(new PointerEvent('pointerover', { bubbles: true, pointerType: 'mouse' }));
 };
 
-const navRows = ['Home', 'Sessions', 'Students', 'Reports'];
+const ACCOUNT = { id: 'elevation', name: 'Ana Ruiz', role: 'Tutor' };
 
-/** The Sidebar peeked from the left edge: it floats over the page with no Backdrop. */
+/** A Frame at a fixed height, with the real Sidebar and two Session cards on its Page. */
+const SessionsFrame = ({ edge, ...frameProps }) => {
+    const ref = useRef(null);
+    useEffect(() => { peek(ref.current, edge); }, [edge]);
+    return (
+        <div ref={ref}>
+            <InAppFrame
+                height="calc(var(--image-xl) * 5)"
+                breadcrumbs={[{ text: 'Home', href: '#' }, { text: 'Sessions' }]}
+                account={ACCOUNT}
+                panelStorageKey={null}
+                {...frameProps}
+            >
+                <PatternCard title="Session 12" description="Thursday, 4:30 PM · Algebra I" />
+                <PatternCard title="Session 13" description="Monday, 4:30 PM · Geometry" />
+            </InAppFrame>
+        </div>
+    );
+};
+
+const expectOverlay = async (canvasElement, selector) => {
+    await waitFor(() => expect(canvasElement.querySelector(selector)).not.toBeNull());
+    const box = canvasElement.querySelector(selector);
+    await waitFor(() => expect(getComputedStyle(box).boxShadow).not.toBe('none'));
+    await expect(canvasElement.querySelector('.plus-frame__blanket'), 'no Backdrop under it').toBeNull();
+};
+
+/** The real Sidebar peeked from the left edge: it floats over the page with no Backdrop. */
 export const FloatingSidebar = {
-    render: () => {
-        const Demo = () => {
-            const ref = useRef(null);
-            useEffect(() => { peek(ref.current, '.plus-frame__edge'); }, []);
-            return (
-                <div ref={ref} style={{ height: 'calc(var(--image-xl) * 4)' }}>
-                    <Frame
-                        header={<strong>Sessions</strong>}
-                        sidebar={<nav aria-label="Main" style={{ padding: 'var(--frame-sidebar-pad)', display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', font: 'var(--body-default)' }}>{navRows.map((r) => <span key={r}>{r}</span>)}</nav>}
-                        sidebarDocked={false}
-                        style={{ height: '100%' }}
-                    >
-                        <PatternCard title="Session 12" description="Thursday, 4:30 PM" />
-                    </Frame>
-                </div>
-            );
-        };
-        return <Demo />;
+    render: () => <SessionsFrame edge=".plus-frame__edge" sidebarDocked={false} />,
+    play: async ({ canvasElement }) => {
+        await expectOverlay(canvasElement, '.plus-frame__sidebar--raised');
+        // The real Sidebar, with its rows: not a bare list.
+        const sidebar = canvasElement.querySelector('.plus-frame__sidebar--raised');
+        await expect(within(sidebar).getByRole('navigation', { name: 'Main' })).toBeInTheDocument();
+        await expect(within(sidebar).getByText('Home')).toBeInTheDocument();
     },
 };
 
@@ -214,15 +244,24 @@ export const FloatingSidebar = {
 export const ModalOnBackdrop = {
     render: () => (
         <Blanket inline screenWidth={768} screenHeight={420}>
-            <PatternModal
+            <Modal
+                show
+                renderAs="inline"
+                width="6-col"
                 title="Move session"
+                body="Move Thursday’s session with Ana Ruiz to 4:30 PM?"
+                primaryButton={{ text: 'Move session', onClick: () => {} }}
+                secondaryButton={{ text: 'Cancel', onClick: () => {} }}
                 onClose={() => {}}
-                footer={<><Button text="Cancel" spacing="compact" onClick={() => {}} /><Button text="Move session" appearance="primary" spacing="compact" onClick={() => {}} /></>}
-            >
-                <p style={{ margin: 0, font: 'var(--body-default)' }}>Move Thursday’s session with Ana Ruiz to 4:30 PM?</p>
-            </PatternModal>
+            />
         </Blanket>
     ),
+    play: async ({ canvasElement }) => {
+        const modal = canvasElement.querySelector('.plus-modal');
+        await expect(modal).not.toBeNull();
+        await expect(getComputedStyle(modal).boxShadow, 'the Modal ships on the blocking shadow').not.toBe('none');
+        await expect(within(canvasElement).getByRole('button', { name: 'Move session' })).toBeInTheDocument();
+    },
 };
 
 /** A Tooltip held open on its trigger. */
@@ -251,31 +290,25 @@ export const OpenSelect = {
     },
 };
 
-/** The Panel peeked from the right edge: it floats over the page with no Backdrop. */
+/** The real Panel peeked from the right edge: it floats over the page with no Backdrop. */
 export const FloatingPanel = {
-    render: () => {
-        const Demo = () => {
-            const ref = useRef(null);
-            useEffect(() => {
-                peek(ref.current, '.plus-frame__panel-edge');
-            }, []);
-            return (
-                <div ref={ref} style={{ height: 'calc(var(--image-xl) * 4)' }}>
-                    <Frame
-                        header={<strong>Sessions</strong>}
-                        panel={<p style={{ margin: 0, font: 'var(--body-default)' }}>Notes on Thursday’s session.</p>}
-                        panelLabel="Notes"
-                        panelPeek
-                        style={{ height: '100%' }}
-                    >
-                        <PatternCard title="Session 12" description="Thursday, 4:30 PM" />
-                    </Frame>
-                </div>
-            );
-        };
-        return <Demo />;
+    render: () => (
+        <SessionsFrame
+            edge=".plus-frame__panel-edge"
+            panelLabel="Session notes"
+            panelPeek
+            panel={(
+                <PanelContainer>
+                    <PanelHeader title="Session notes" />
+                    <PanelBody>Thursday with Ana Ruiz: factoring went well; review the quadratic formula next time.</PanelBody>
+                </PanelContainer>
+            )}
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        await expectOverlay(canvasElement, '.plus-frame__panel--peek');
+        await expect(within(canvasElement).getByText('Session notes', { selector: 'h1, h2, h3, h4, [class*="title"]' })).toBeInTheDocument();
     },
-    parameters: { layout: 'padded' },
 };
 
 /** A sticky table header, scrolled: the overflow shadow shows where content runs under it. */
@@ -422,13 +455,18 @@ export const AlwaysPair = () => (
 export const BlockingOnBackdrop = () => (
     <DoDont>
         <Do caption="The Modal on the Backdrop takes the blocking shadow.">
-            <div style={{ ...ground, background: 'var(--ds-blanket)' }}>
-                <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--modal-radius)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-blocking)', font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Move session?</div>
-            </div>
+            <Blanket inline screenWidth={480} screenHeight={240}>
+                <Modal show renderAs="inline" width="4-col" title="Move session" body="To 4:30 PM?" primaryButton={{ text: 'Move', onClick: () => {} }} onClose={() => {}} />
+            </Blanket>
         </Do>
         <Dont caption="A Panel with the blocking shadow and no Backdrop. If it needs full attention, make it a Modal.">
             <div style={ground}>
-                <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-blocking)', font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>Notes</div>
+                <div style={{ boxShadow: 'var(--ds-shadow-blocking)', borderRadius: 'var(--card-radius)' }}>
+                    <PanelContainer width="100%">
+                        <PanelHeader title="Session notes" />
+                        <PanelBody>Factoring went well.</PanelBody>
+                    </PanelContainer>
+                </div>
             </div>
         </Dont>
     </DoDont>
@@ -438,8 +476,8 @@ export const BlockingOnBackdrop = () => (
 export const SunkenNeverFloats = () => (
     <DoDont>
         <Do caption="Sunken is the ground: the frame, or a subtle Section.">
-            <div style={{ ...ground, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                <div style={{ padding: 'var(--card-pad-compact)', borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-sunken)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>12 sessions this week</div>
+            <div style={ground}>
+                <PatternSection fill="subtle" title="This week" description="12 sessions" />
             </div>
         </Do>
         <Dont caption="A sunken fill with a shadow: the gray says recessed, the shadow says lifted.">
@@ -468,10 +506,16 @@ export const TooltipFlat = () => (
 export const OneFocalPoint = () => (
     <DoDont>
         <Do caption="One raised Card marks the next session.">
-            <div style={{ ...ground, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                <PatternCard title="Next session" description="Today, 4:30 PM" />
-                <div style={{ padding: 'var(--card-pad-compact)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Past session · Monday</div>
-                <div style={{ padding: 'var(--card-pad-compact)', font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>Past session · Friday</div>
+            <div style={ground}>
+                <PatternSection title="Sessions">
+                    <PatternCard title="Next session" description="Today, 4:30 PM" />
+                    <PatternTable>
+                        <tbody>
+                            <tr><td>Past session</td><td>Monday</td></tr>
+                            <tr><td>Past session</td><td>Friday</td></tr>
+                        </tbody>
+                    </PatternTable>
+                </PatternSection>
             </div>
         </Do>
         <Dont caption="Every row raised: nothing stands out.">

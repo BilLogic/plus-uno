@@ -3,15 +3,20 @@ import { Button, Toggle } from '@/components';
 import { Page, PatternCard } from '@/patterns';
 import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
 import { C } from '@/storybook-docs/foundation-blocks.jsx';
-import { springBack } from '@/lib/damping';
+import { settleMsOf, springBack } from '@/lib/damping';
+import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
+import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
+import { Backdrop, Card, Frame as FrameShape, Modal as ModalShape, PageHeader, Popup as PopupShape, Rect, Sidebar as SidebarShape, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
+import { PAINT } from '@/storybook-docs/illustrations/paint.js';
 import { composeShadow, groundDarkness, ink, parseShadow, shadowReach, slotted } from '@/storybook-docs/lib/shadow-anatomy';
 
 /**
  * The live blocks of Foundations/Elevation. Every value a block shows is read
  * from the page as it resolves the tokens now (in the block's own color mode
  * and the toolbar's contrast), so nothing here restates a number by hand.
- * Motion runs on the repo's spring (`lib/damping`), and lands at once under
- * reduced motion.
+ * Motion runs on the spring tokens' appearance family (`--ds-motion-appearance-*`,
+ * read here from `tokens/ladder/springs.generated.js`) through the repo's
+ * spring helper (`lib/damping`), and lands at once under reduced motion.
  */
 
 /* ------------------------------------------------------------------ data */
@@ -78,11 +83,13 @@ export const useReducedMotion = () => {
 };
 
 /**
- * A number that springs to `target` on the repo's critically damped spring,
- * from wherever it is, so a second press mid-flight turns it around. Under
- * reduced motion it lands at once.
+ * A number that springs to `target` on an appearance spring token
+ * (`appearance.default` is `--ds-motion-appearance-default`), from wherever it
+ * is, so a second press mid-flight turns it around. Under reduced motion it
+ * lands at once.
  */
-export const useSpring = (target) => {
+export const useSpring = (target, token = 'appearance.default') => {
+    const settleMs = settleMsOf(SPRINGS[token].productive);
     const reduced = useReducedMotion();
     const [value, setValue] = useState(target);
     const current = useRef(target);
@@ -92,12 +99,13 @@ export const useSpring = (target) => {
         const delta = from - target;
         return springBack(1, {
             reducedMotion: reduced,
+            settleMs,
             onUpdate: (v) => {
                 current.current = target + delta * v;
                 setValue(current.current);
             },
         });
-    }, [target, reduced]);
+    }, [target, reduced, settleMs]);
     return value;
 };
 
@@ -201,28 +209,58 @@ const alphaPct = (a) => `${Math.round(a * 1000) / 10}%`;
 
 /* ------------------------------------------------------- exploded stack */
 
+/** The stage every plate draws on, in kit units (one unit is 2px of product UI). */
+const STAGE = { w: 320, h: 200 };
+
+/**
+ * The plates of the stack, bottom to top, each drawn from the illustration kit
+ * with no words: the lesson holds without them, so the names and the
+ * `--layer-*` values sit in the numbered legend. `at` is where the plate's
+ * number pins, in stage units. The kit has no Tooltip shape yet, so the
+ * Tooltip's layer is in the Layering list below and not drawn here.
+ */
+const PLATES = [
+    {
+        id: 'frame', title: 'Frame', level: 'sunken', layer: null, at: [0, 0],
+        draw: <><FrameShape x={0} y={0} w={STAGE.w} h={STAGE.h} /><SidebarShape x={0} y={12} w={64} h={STAGE.h - 12} /></>,
+    },
+    {
+        id: 'page', title: 'Page', level: 'default', layer: null, at: [70, 18],
+        draw: (
+            <>
+                <Rect x={70} y={18} w={244} h={176} fill={PAINT.surface} stroke={PAINT.line} corner="md" />
+                <PageHeader x={80} y={28} w={224} />
+                {[0, 1, 2].map((i) => <SkeletonBar key={i} x={80} y={56 + i * 10} w={200 - i * 40} />)}
+            </>
+        ),
+    },
+    { id: 'card', title: 'Card', level: 'raised', layer: '--layer-card', at: [80, 104], draw: <Card x={80} y={104} w={100} h={72} /> },
+    { id: 'popup', title: 'Popup', level: 'overlay', layer: '--layer-popup', at: [196, 92], draw: <PopupShape x={196} y={92} w={96} h={50} /> },
+    { id: 'backdrop', title: 'Backdrop', level: 'blocking', layer: '--layer-blanket', at: [0, 0], draw: <Backdrop x={0} y={0} w={STAGE.w} h={STAGE.h} /> },
+    { id: 'modal', title: 'Modal', level: 'blocking', layer: '--layer-modal', at: [90, 46], draw: <ModalShape x={90} y={46} w={140} h={104} accent /> },
+];
+
+const badge = {
+    display: 'grid',
+    placeItems: 'center',
+    width: 'var(--image-xs)',
+    height: 'var(--image-xs)',
+    borderRadius: 'var(--radius-full)',
+    background: 'var(--ds-background-brand-bold)',
+    color: 'var(--ds-text-inverse)',
+    font: 'var(--heading-xsmall)',
+};
+
 /**
  * One screen taken apart into its layers: the Frame, the Page, a Card, a
- * Popup, the Backdrop with its Modal, and a Tooltip. Collapsed it is the
- * screen; exploded each layer lifts by its place in the stack and carries
- * its level and its `--layer-*` value.
+ * Popup, the Backdrop and the Modal. Collapsed it is the screen; exploded each
+ * plate lifts by its place in the stack, on `--ds-motion-appearance-slow`.
  */
 export const ExplodedStack = () => {
     const [exploded, setExploded] = useState(true);
-    const p = useSpring(exploded ? 1 : 0);
+    const p = useSpring(exploded ? 1 : 0, 'appearance.slow');
     const stage = useRef(null);
     const layers = useVarsOn(stage, LAYERS.map((l) => l.token));
-
-    const fill = { position: 'absolute', inset: 0, margin: 0 };
-    const plates = [
-        { id: 'frame', title: 'Frame', level: 'sunken', layer: null, inset: '0%', body: <div style={{ ...fill, borderRadius: 'var(--card-radius)', background: 'var(--ds-surface-sunken)' }} /> },
-        { id: 'page', title: 'Page', level: 'default', layer: null, inset: '5% 3% 5% 20%', body: <Page level="default" radius="md" padding="none" style={fill} /> },
-        { id: 'card', title: 'Card', level: 'raised', layer: '--layer-card', inset: '10% 46% 40% 24%', body: <PatternCard title="Session 12" description="Thursday" padding="sm" style={fill} /> },
-        { id: 'popup', title: 'Popup', level: 'overlay', layer: '--layer-popup', inset: '44% 26% 18% 48%', body: <div className="plus-popup" style={{ ...fill, width: 'auto' }}><div className="plus-popup-title">Details</div><div className="plus-popup-body">45 min over</div></div> },
-        { id: 'backdrop', title: 'Backdrop', level: 'blocking', layer: '--layer-blanket', inset: '0%', body: <div style={{ ...fill, borderRadius: 'var(--card-radius)', background: 'var(--ds-blanket)' }} /> },
-        { id: 'modal', title: 'Modal', level: 'blocking', layer: '--layer-modal', inset: '20% 26% 22% 28%', body: <div style={{ ...fill, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)', padding: 'var(--card-pad-compact)', borderRadius: 'var(--modal-radius)', background: 'var(--ds-surface-overlay)', boxShadow: 'var(--ds-shadow-blocking)', color: 'var(--ds-text)' }}><strong style={{ font: 'var(--heading-small)' }}>Move session</strong><span style={{ font: 'var(--body-default)' }}>To 4:30 PM?</span></div> },
-        { id: 'tooltip', title: 'Tooltip', level: null, layer: '--layer-tooltip', inset: '10% 36% 80% 46%', body: <div className="plus-tooltip" style={{ ...fill, maxWidth: 'none', display: 'grid', placeItems: 'center' }}>Reschedule</div> },
-    ];
 
     return (
         <div style={stack} data-testid="exploded-stack" data-state={exploded ? 'exploded' : 'collapsed'} data-progress={Math.round(p * 100)}>
@@ -233,47 +271,31 @@ export const ExplodedStack = () => {
             <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 2fr) minmax(0, 1fr)', gap: 'var(--grid-gutter)', alignItems: 'center' }}>
                 <div ref={stage} style={{ ...well, perspective: 'calc(var(--image-xl) * 14)', paddingBlockStart: `calc(var(--card-pad-spacious) + ${p} * var(--image-xl) * 2)`, paddingBlockEnd: `calc(var(--card-pad-spacious) + ${p} * var(--image-xl) / 2)` }}>
                     <div
-                        role="img"
-                        aria-label="A screen taken apart into seven layers, bottom to top: Frame, Page, Card, Popup, Backdrop, Modal and Tooltip."
                         style={{
                             position: 'relative',
-                            aspectRatio: '16 / 10',
+                            aspectRatio: `${STAGE.w} / ${STAGE.h}`,
                             margin: '0 auto',
                             width: `calc(100% - ${p} * var(--card-min-width-sm) / 2)`,
                             transformStyle: 'preserve-3d',
                             transform: `rotateX(${p * 58}deg) rotateZ(${p * -38}deg)`,
                         }}
                     >
-                        {plates.map((plate, i) => (
+                        {PLATES.map((plate, i) => (
                             <div
                                 key={plate.id}
                                 data-plate={plate.id}
-                                style={{
-                                    position: 'absolute',
-                                    inset: plate.inset,
-                                    transform: `translateZ(calc(${p * i} * var(--image-md)))`,
-                                    transformStyle: 'preserve-3d',
-                                    borderRadius: 'var(--card-radius)',
-                                    // docs-literal: the dashed outline fades in with the explode spring.
-                                    outline: `var(--border-default) dashed color-mix(in srgb, var(--ds-border-bold) ${Math.round(p * 100)}%, transparent)`,
-                                    outlineOffset: 'var(--border-default)',
-                                }}
+                                style={{ position: 'absolute', inset: 0, transform: `translateZ(calc(${p * i} * var(--image-md)))`, transformStyle: 'preserve-3d' }}
                             >
-                                {plate.body}
+                                <Illustration viewBox={`0 0 ${STAGE.w} ${STAGE.h}`} capped={false} title={`Layer ${i + 1}: ${plate.title}`}>
+                                    {plate.draw}
+                                </Illustration>
                                 <span
                                     aria-hidden="true"
                                     style={{
+                                        ...badge,
                                         position: 'absolute',
-                                        insetInlineStart: 'calc(-1 * var(--image-xxs) / 2)',
-                                        insetBlockStart: 'calc(-1 * var(--image-xxs) / 2)',
-                                        display: 'grid',
-                                        placeItems: 'center',
-                                        width: 'var(--image-xs)',
-                                        height: 'var(--image-xs)',
-                                        borderRadius: 'var(--radius-full)',
-                                        background: 'var(--ds-background-brand-bold)',
-                                        color: 'var(--ds-text-inverse)',
-                                        font: 'var(--heading-xsmall)',
+                                        insetInlineStart: `calc(${(plate.at[0] / STAGE.w) * 100}% - var(--image-xs) / 2)`,
+                                        insetBlockStart: `calc(${(plate.at[1] / STAGE.h) * 100}% - var(--image-xs) / 2)`,
                                         opacity: p,
                                     }}
                                 >
@@ -283,18 +305,13 @@ export const ExplodedStack = () => {
                         ))}
                     </div>
                 </div>
-                <ol aria-label="Layers, top first" style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column-reverse', gap: 'var(--stack-md)' }}>
-                    {plates.map((plate, i) => (
+                <ol data-testid="stack-legend" aria-label="Layers, top first" style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column-reverse', gap: 'var(--stack-md)' }}>
+                    {PLATES.map((plate, i) => (
                         <li key={plate.id} data-legend={plate.id} style={{ display: 'grid', gridTemplateColumns: 'var(--image-xs) 1fr', columnGap: 'var(--inline-md)', alignItems: 'center' }}>
-                            <span
-                                aria-hidden="true"
-                                style={{ display: 'grid', placeItems: 'center', width: 'var(--image-xs)', height: 'var(--image-xs)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-brand-bold)', color: 'var(--ds-text-inverse)', font: 'var(--heading-xsmall)' }}
-                            >
-                                {i + 1}
-                            </span>
+                            <span aria-hidden="true" style={badge}>{i + 1}</span>
                             <span style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'baseline', gap: 'var(--inline-sm)', font: 'var(--body-default)', color: 'var(--ds-text)' }}>
                                 <strong>{plate.title}</strong>
-                                <span style={{ color: 'var(--ds-text-subtle)' }}>{plate.level ? levelOf(plate.level).name.toLowerCase() : 'no level'}</span>
+                                <span style={{ color: 'var(--ds-text-subtle)' }}>{levelOf(plate.level).name.toLowerCase()}</span>
                                 <code style={{ ...codeText, color: 'var(--ds-text-subtle)' }}>{plate.layer ? `${plate.layer} ${layers[plate.layer] ?? ''}` : 'no layer'}</code>
                             </span>
                         </li>
