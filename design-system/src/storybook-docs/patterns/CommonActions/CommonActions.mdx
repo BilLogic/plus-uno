@@ -1,0 +1,310 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as CommonActionsStories from './CommonActions.stories.jsx';
+import { STAGE } from './commonActionsDemo.jsx';
+import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import { OnePrimary, TwoPrimaries } from '@/storybook-docs/illustrations/common-actions.jsx';
+import {
+    ModalFooterFullBleed,
+    ModalFooterInset,
+    PageButtonsFarRight,
+    PageButtonsLeft,
+} from '@/storybook-docs/illustrations/form.jsx';
+
+<Meta title="Patterns/Actions and input/Common actions" tags={['!dev', 'manifest']} />
+
+<Title>Common actions</Title>
+Which button, in which look, in which place, with which word. Cancel, Close, Reset, copy, edit, remove, the destructive tiers, and acting on many rows at once.
+
+<DocsTabs of={CommonActionsStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Appearances
+
+Primary, Default, Subtle, Warning, Danger, Discovery and AI. One Primary per area; one AI per region. The Button page holds every appearance and state; these are the places they go.
+
+<ComponentExample of={CommonActionsStories.AppearancesRow} title="Appearances" description="Each takes the word that says what happens: a verb and its object." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Placement
+
+The place sets the alignment. A page form's buttons start under the fields; a layer's end where the eye does.
+
+<TypeGrid>
+<TypeCard of={CommonActionsStories.PlacementPage} title="In a page form" stage={STAGE}>Left-aligned under the fields, Primary first, Cancel Subtle beside it.</TypeCard>
+<TypeCard of={CommonActionsStories.PlacementModal} title="In a Modal" stage={STAGE}>Full bleed across the footer: Cancel (Default) left, Primary right, Close in the header. The footer is 48 high and never moves.</TypeCard>
+<TypeCard of={CommonActionsStories.PlacementFocused} title="In a focused task" stage={STAGE}>The bottom bar: Cancel (Subtle) at the start, Back and Next at the end. Back is disabled on the first step.</TypeCard>
+<TypeCard of={CommonActionsStories.PlacementCard} title="In a card" stage={STAGE}>The main action is Subtle in the footer. A clickable card has no inner buttons; when in doubt, full-span inside tiles.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Small actions
+
+<ComponentExample of={CommonActionsStories.ResetChoices} title="Reset" description="Reset clears choices without applying them; Clear empties one field. They are never merged." />
+
+<ComponentExample of={CommonActionsStories.CopyValue} title="Copy" description="An icon button beside the value. Press it and a &quot;Copied&quot; tooltip confirms; it leaves on its own." />
+
+<ComponentExample of={CommonActionsStories.EditValue} title="Edit one value" description="Press the value, change it and press Enter. The read view is one button; the pencil shows on hover and focus." />
+
+<ComponentExample of={CommonActionsStories.EditWholeRecord} title="Edit the whole record" description="Edit sits in the More menu, beside Remove from group. Remove takes something out of a group and can be undone, so it is Default." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Destructive tiers
+
+Three tiers, picked by whether the change can be undone. No danger-outline combinations.
+
+<TypeGrid>
+<TypeCard of={CommonActionsStories.TierActiveModal} title="Active" stage={STAGE}>A change that can be undone: Cancel and the action in Primary.</TypeCard>
+<TypeCard of={CommonActionsStories.TierDangerModal} title="Active with Danger" stage={STAGE}>A delete: the action takes the Danger appearance.</TypeCard>
+<TypeCard of={CommonActionsStories.TierTypeNameModal} title="Danger, type the name" stage={STAGE}>A delete that cannot be undone: the caption asks for the name, and Danger enables once it matches.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Acting on many rows
+
+<ComponentExample of={CommonActionsStories.BulkBar} title="The bulk bar" description="The Dynamic table's head row becomes the bulk bar: the part-ticked select-all, &quot;2 selected&quot;, then the actions, left-aligned. No Cancel; the checkboxes clear it. Remove from group sits here and in the row's More menu; Delete never does." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key cases
+
+<ComponentExample of={CommonActionsStories.SendingKeepsWidth} title="Sending" description="Press Save session. The button swaps its label for a spinner in place and keeps its width; Cancel stays live and the footer does not move." />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Common actions when a page needs a button and the choice is about the look, the place or the word. The appearance says how much the action matters; the place says what it belongs to; the word says what happens.
+
+<DocsTable>
+<thead>
+<tr><th>Action</th><th>Appearance</th><th>Place</th><th>Word</th></tr>
+</thead>
+<tbody>
+<tr><td>The main action of an area</td><td>Primary, one per area</td><td>Last in its group</td><td>Verb and object: "Add students"</td></tr>
+<tr><td>Another action in the area</td><td>Default</td><td>Before the Primary</td><td>Verb and object: "Reschedule session"</td></tr>
+<tr><td>Leave without doing anything</td><td>Subtle; Default in a full-bleed footer</td><td>Left of the Primary</td><td>"Cancel"; a link is allowed</td></tr>
+<tr><td>Close a layer</td><td>Icon button</td><td>Start of a focused title row; end of a Modal, Panel or Flag header</td><td>Named "Close"</td></tr>
+<tr><td>Empty a menu's choices</td><td>Default, full bleed with Apply</td><td>The menu's footer, or the top of a filter side</td><td>"Reset" in a menu; "Reset filters" everywhere else</td></tr>
+<tr><td>Empty one field</td><td>Icon button inside the field</td><td>End of the field</td><td>Named "Clear", "Clear search"</td></tr>
+<tr><td>Copy a value</td><td>Icon button</td><td>Beside the value</td><td>Named "Copy"; "Copied" in a tooltip after</td></tr>
+<tr><td>Change one value on a record</td><td>Inline edit on hover</td><td>On the value</td><td>Pencil named "Edit"</td></tr>
+<tr><td>Change the whole record</td><td>Default, or Edit inside More</td><td>Title row or More menu</td><td>"Edit"</td></tr>
+<tr><td>Take something out of a group</td><td>Default, or inside More</td><td>Row's More menu, or the bulk bar</td><td>"Remove from group"</td></tr>
+<tr><td>Destroy something</td><td>Danger, after a confirm</td><td>A Modal's footer</td><td>"Delete note"; "Delete group" with the name typed when it cannot be undone</td></tr>
+<tr><td>A change with a cost, not a delete</td><td>Warning</td><td>A Modal's footer</td><td>"Remove from this week"</td></tr>
+<tr><td>The call to try something new</td><td>Discovery</td><td>Where the new thing starts</td><td>"Try the new schedule view"</td></tr>
+<tr><td>The one AI action in a region</td><td>AI</td><td>With the region's actions</td><td>"Generate summary"</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a set of choices the person picks between, use `RadioGroup`, not a row of buttons.
+- For a menu of actions behind one trigger, use `DropdownMenu` from a More icon button.
+- For a main action with variations, use `SplitButton`.
+- For moving to another page, use `LinkButton`; a button acts on this page.
+- For narrowing rows, follow <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>: a filter is not an action.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Give an area one Primary button.
+
+<RuleTag kind="automatic" />
+
+The Primary is the main call to action or a form's submit. A second main action is Default beside it; a second Primary makes neither read as the next step. The AI appearance follows the same rule, one per region, and only for an action that calls AI.
+
+<DoDontPair
+    doExample={<OnePrimary />}
+    doCaption="One Primary, with the other action Default beside it."
+    dontExample={<TwoPrimaries />}
+    dontCaption="Two Primary buttons in one row: neither reads as the next step."
+/>
+
+### Left-align buttons under a page form and right-align them in a Modal, a focused task or steps.
+
+<RuleTag kind="automatic" />
+
+On a page the Primary comes first, read in the same direction as the fields. In a layer the Primary is furthest right, where the eye ends. Stacked buttons put the Primary on top. Never top-aligned.
+
+<DoDontPair
+    doExample={<PageButtonsLeft />}
+    doCaption="Primary first, then Cancel, left-aligned under the fields."
+    dontExample={<PageButtonsFarRight />}
+    dontCaption="The buttons at the far end of the page, away from the fields, with the Primary last."
+/>
+
+### Go full bleed in a Modal footer and keep it 48 high.
+
+<RuleTag kind="automatic" />
+
+Buttons fill the footer, each a fraction of its width with a hairline between, losing their inner corners. One button takes the whole footer. The footer is the same 32 button plus 16 bottom pad a regular footer takes, so nothing inside changes its size. A Panel's editing footer and a card form's footer go full bleed the same way.
+
+<DoDontPair
+    doExample={<ModalFooterFullBleed />}
+    doCaption="Two buttons filling the footer edge to edge."
+    dontExample={<ModalFooterInset />}
+    dontCaption="Small buttons inset at the end, with spare footer around them."
+/>
+
+### Keep the footer where it is.
+
+<RuleTag kind="automatic" />
+
+Header and footer stay pinned while the body scrolls. A blocked submit, a server message and a sending button change the body or a button, never the footer's size or place. A sending button swaps its label for a spinner in place and keeps its width; only that button disables, and Cancel stays live.
+
+### Keep Close an icon button, separate from Cancel.
+
+<RuleTag kind="automatic" />
+
+Close ends a layer and lives in its header, or at the start of a focused title row. Cancel leaves a form without saving and lives with the form's buttons. Neither stands in for the other; a Modal has both.
+
+### Make Cancel Subtle beside a Primary and Default in a full-bleed footer.
+
+<RuleTag kind="automatic" />
+
+Beside a Primary it is already clear the row is interactive, so Cancel steps back. In a full-bleed footer every cell is a button, so Cancel takes the Default fill to read as one. Cancel may be a link where a button would compete.
+
+### Say Reset in a menu and Reset filters everywhere else.
+
+<RuleTag kind="automatic" />
+
+The words and where they sit: <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs#say-reset-in-a-menu-and-reset-filters-everywhere-else">Filtering › Say Reset in a menu and Reset filters everywhere else</a>.
+
+### Confirm a copy with a Copied tooltip, not a Flag.
+
+<RuleTag kind="automatic" />
+
+The tooltip opens on the Copy button the moment the value is on the clipboard and leaves on its own. Flags stay for events that happened somewhere else.
+
+### Edit one value inline and the whole record from More.
+
+<RuleTag kind="review" />
+
+A value read far more than changed takes `InlineEdit`: a pencil on hover and focus, saved on its own. The record's More menu includes Edit, which opens the form host the <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a> pattern picks. Never put inline edits inside a form that has its own Save.
+
+### Name a destructive action by its tier.
+
+<RuleTag kind="review" />
+
+Active: it can be undone, Cancel and a Primary. Active with Danger: a delete, the action in Danger. Danger with the name typed: a delete that cannot be undone, the field caption asks for the name and the Danger button enables once it matches, with no tooltip. Remove, which takes something out of a group it can return to, is Default, not Danger. The Modal that raises the confirm: <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>.
+
+### Turn the head row into the bulk bar when rows are selected.
+
+<RuleTag kind="automatic" />
+
+The bar and its words: <a target="_top" href="./?path=/docs/templates-section-section--docs#turn-the-head-row-into-the-bulk-bar-when-rows-are-selected">Section › Turn the head row into the bulk bar when rows are selected</a>.
+
+### Keep a card's main action Subtle in its footer.
+
+<RuleTag kind="review" />
+
+A clickable card has no inner buttons; the whole card is the action. When a card does carry a button, it is Subtle in the footer, and inside tiles it spans the full width when in doubt.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Verb and object: "Log session", "Add students", "Remove from group".</td><td>"Submit", "OK", "Yes", "Continue" with nothing after it.</td></tr>
+<tr><td>"Cancel" to leave a form; "Close" to end a layer.</td><td>"Dismiss" on a form; "Cancel" on a Close icon.</td></tr>
+<tr><td>"Reset" in a menu; "Reset filters" everywhere else.</td><td>"Clear all", "Clear filters", "Reset all".</td></tr>
+<tr><td>"Delete" for something destroyed; "Remove" for something taken out of a group.</td><td>"Delete" for leaving a group; "Remove" for erasing a record.</td></tr>
+<tr><td>Sentence case: "Mark attendance".</td><td>Title Case: "Mark Attendance".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- A button performs an action and a link navigates; the element gives the role. An icon-only button is an `IconButton` with a `label`: "Close", "Copy", "Edit", "More".
+- A sending button sets `aria-busy` and keeps its label in the tree; only that button disables, and Cancel stays live.
+- The Danger button in a type-the-name confirm is disabled until the name matches; the field caption carries the reason, never a tooltip.
+- The bulk bar's count is a polite live region; the select-all checkbox reports its mixed state. Focus stays on the checkbox that was ticked.
+- The focus ring takes `--ds-border-focused` on every appearance.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Component</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>Action</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-button--docs">Button</a></td><td>The seven appearances; `isLoading` swaps the label for a spinner and keeps the width.</td></tr>
+<tr><td>Icon action</td><td><a target="_top" href="./?path=/docs/components-forms-and-inputs-button-icon-button--docs">Icon button</a></td><td>Close, Copy, Edit and More; its `label` names it.</td></tr>
+<tr><td>Full-bleed footer</td><td><a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a> footer</td><td>Composed from Button in fixed cells today. Planned as a footer prop on the Modal and the Panel.</td></tr>
+<tr><td>Bulk bar</td><td><a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a> table head</td><td>The Dynamic table's head row, through `TableBulkActions`.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>: use when the buttons submit fields.
+- <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>: use for Reset and Apply inside a filter menu.
+- <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>: use for the confirm a destructive action raises.
+- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use when you need Disabled for an action that cannot run yet.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

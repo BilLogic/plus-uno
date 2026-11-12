@@ -8,11 +8,7 @@ import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
     EditInModal,
     EditInPanel,
-    ModalFooterFullBleed,
-    ModalFooterInset,
     OneColumn,
-    PageButtonsFarRight,
-    PageButtonsLeft,
     TwoColumns,
 } from '@/storybook-docs/illustrations/form.jsx';
 
@@ -95,7 +91,7 @@ A stepped form on its own page is Frame · focused with the form in the body. Ba
 
 Each state shows how the form behaves in its host. Every field's own states live with the field.
 
-<ComponentExample of={FormStories.KeyFieldError} title="Field error on blur" description="The field takes its error look and the message says how to fix it. It clears once the rule is met: Patterns, Forms." />
+<ComponentExample of={FormStories.KeyFieldError} title="Field error on blur" description="The field takes its error look and the message says how to fix it. It clears once the rule is met." />
 
 <ComponentExample of={FormStories.KeyDisabledReason} title="Disabled with its reason" description="A field waits on another on the same screen; the caption says what to do first. Save stays enabled and says what is missing when pressed: Patterns, Disabled." />
 
@@ -105,7 +101,7 @@ Each state shows how the form behaves in its host. Every field's own states live
 
 <ComponentExample of={FormStories.KeySending} title="Sending" description="The only time a button disables: it swaps its label for a spinner in place and keeps its width. Cancel stays live." />
 
-<ComponentExample of={FormStories.KeyLeaving} title="Leaving with edits" description="Close or Cancel with unsaved work asks first, in the same Modal's confirm view. Back returns without losing anything typed: Patterns, Forms." />
+<ComponentExample of={FormStories.KeyLeaving} title="Leaving with edits" description="Close or Cancel with unsaved work asks first, in the same Modal's confirm view. Back returns without losing anything typed." />
 
 </div>
 
@@ -187,7 +183,7 @@ Pick the host from the task:
 </tbody>
 </DocsTable>
 
-When to validate, what a blocked submit does, required and optional marks, and leaving with edits are the Forms pattern; where the buttons sit is the Common actions pattern. This page shows how a form sits in each container.
+When to validate, what a blocked submit does, required and optional marks, and leaving with edits are the <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a> pattern; where the buttons sit is the <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a> pattern. This page shows how a form sits in each container.
 
 </div>
 
@@ -205,44 +201,12 @@ When to validate, what a blocked submit does, required and optional marks, and l
 
 ## Best practices
 
-Most of the rules for a form live in <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>, Forms. This page keeps only how a form sits in each container.
+The rules for a form live in the pattern pages. This page keeps only how a form sits in each container.
 
-- Where the buttons sit, and in which look: Patterns, Common actions.
-- When to validate, the enabled submit, a blocked submit, bound inputs and leaving with edits: Patterns, Forms.
+- Where the buttons sit and in which look, full bleed and 48 high, and the footer that stays put: <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs#left-align-buttons-under-a-page-form-and-right-align-them-in-a-modal-a-focused-task-or-steps">Common actions</a>.
+- When to validate, the enabled submit, a blocked submit and a rejected one, bound inputs and leaving with edits: <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>.
 - The sending button: Patterns, Loading.
 - A field that waits on another, and where its reason goes: Patterns, Disabled.
-
-### Left-align the buttons under a page form.
-
-<RuleTag kind="review" />
-
-On its own page a form's buttons sit at the start, under the fields they save, Primary first and Cancel Subtle. A page is not a dialog: the far end of the page is a long way from the last field.
-
-<DoDontPair
-    doExample={<PageButtonsLeft />}
-    doCaption="Primary first, then Cancel, left-aligned under the fields."
-    dontExample={<PageButtonsFarRight />}
-    dontCaption="The buttons at the far end of the page, away from the fields, with the primary last."
-/>
-
-### Go full bleed in a Modal footer and keep it 48 high.
-
-<RuleTag kind="automatic" />
-
-A Modal's footer is two fixed cells, `--space-300` high, each button filling its half, Primary furthest right. The same height as a regular footer means switching to full bleed never changes the Modal's height.
-
-<DoDontPair
-    doExample={<ModalFooterFullBleed />}
-    doCaption="Two buttons filling the footer edge to edge."
-    dontExample={<ModalFooterInset />}
-    dontCaption="Small buttons inset at the end, with spare footer around them."
-/>
-
-### Keep the footer where it is.
-
-<RuleTag kind="automatic" />
-
-Header and footer stay pinned while the body scrolls. A blocked submit, a server message and a sending button all change the body or a button, never the footer's size or place.
 
 ### Keep a short edit beside the page.
 
@@ -256,12 +220,6 @@ Editing a row opens a Panel so the person keeps the page in view. A Modal is for
     dontExample={<EditInModal />}
     dontCaption="The same short edit in a Modal that covers the rows."
 />
-
-### Show a rejected submit as a danger SectionMessage at the top of the form.
-
-<RuleTag kind="automatic" />
-
-Scrolled into view and announced, with the field errors it names on their fields. It says what happened and what to do, and it cannot be dismissed while it blocks.
 
 ### Keep a form to one column.
 
@@ -315,7 +273,7 @@ Pair two fields side by side only when they belong together, such as first and l
 - <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use for the region a page form sits in.
 - <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>: use for a rare, critical task with few fields.
 - <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>: use for a short edit with the page still in view.
-- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use for the rules across forms: Forms, Common actions, Loading, Disabled, Errors.
+- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use for the rules across forms: <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>, <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a>, Loading, Disabled, Errors.
 
 </div>
 
