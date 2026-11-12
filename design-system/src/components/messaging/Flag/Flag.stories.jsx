@@ -458,6 +458,8 @@ const playClosesUp = async ({ canvasElement }) => {
     const groupThree = canvas.getByTestId('stack-three');
     const groupTwo = canvas.getByTestId('stack-two');
     const last = canvas.getByTestId('three-last');
+    // Flags slide in as they enter; measure the stacks once every enter has landed.
+    await Promise.all(canvasElement.getAnimations({ subtree: true }).map((animation) => animation.finished));
     const freshLastTop = topWithin(canvas.getByTestId('two-last'), groupTwo);
 
     await userEvent.click(within(canvas.getByTestId('three-middle')).getByRole('button', { name: 'Dismiss flag' }));

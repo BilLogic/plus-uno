@@ -282,8 +282,8 @@ describe('Flag sound', () => {
     });
 
     it('under reduced motion still plays, landing with the reduced spring', () => {
-        reducedMotion(true);
-        render(<Flag title="Saved" />);
+        // The flag's own reduced flag (prop, then FlagGroup, then the OS); the prop is the stable lever in jsdom.
+        render(<Flag title="Saved" reducedMotion />);
         const expected = soundStartFor('spatial.default', 'notify', { mode: 'reduced' });
         expect(Math.abs(scheduledStart() - expected)).toBeLessThan(0.01);
     });
