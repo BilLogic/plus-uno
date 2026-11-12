@@ -1,0 +1,169 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import { SpringTokenTable } from '@/storybook-docs/illustrations/motion-physics.jsx';
+import * as PhysicsStories from './MotionPhysics.stories.jsx';
+
+<Meta of={PhysicsStories} />
+
+<FoundationHero
+    title="Physics"
+    summary="Every motion in PLUS is a spring, picked by name from one token table."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Springs">
+
+A spring has no fixed duration. It is pulled toward its target and settles when it arrives, so it can be interrupted, reversed and handed the speed of a hand at any moment. Linear motion is the one exception: it is for things that follow time or the pointer one to one.
+
+Every demo on this page draws each path from start to landing first, then plays. Use its speed control to watch at ½× or ¼×.
+
+<FoundationSubsection title="Three families">
+
+Pick the family by the property that changes.
+
+<RefTable
+    head={['Family', 'Changes', 'Overshoot']}
+    rows={[
+        [<C>spatial</C>, 'Position, size, scale, rotation, corner radius, clip', 'Only in Expressive'],
+        [<C>appearance</C>, 'Opacity, color, blur, shadow', 'Never: a spring with no bounce, so it can still be interrupted'],
+        [<C>linear</C>, 'Anything that follows time or the pointer one to one: progress, countdowns, Skeleton shimmer, scrolling, dragging', 'Never: it is not a spring'],
+    ]}
+/>
+
+Each family is shown first as a shape on a flat stage, then in the app.
+
+<Canvas of={PhysicsStories.Families} sourceState="none" />
+
+The page header on scroll is linear too: its small title, actions and tabs follow the scroll position one to one, and stay put when scrolling stops.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="How quick and how bouncy">
+
+A spring has two settings: how quick it is (stiffness) and how bouncy it is (damping ratio). At ratio 1 it lands on its target and stays. Below 1 it passes the target and comes back: 0.8 by about 1.5%, 0.6 by about 9.5%. Damping, below, compares them side by side.
+
+Each time is given twice: to 90%, when the motion reads as arrived, and to settled, within 1% of the target.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Modes and tokens">
+
+Elsewhere in the docs a token drops its `motion.` prefix (`spatial.fast`), and "Expressive `spatial.fast`" means that token in Expressive mode. Every number below is read from the generated spring config, the same table the CSS easings and every demo use.
+
+<SpringTokenTable />
+
+All tokens are mass 1. Figma has no motion tokens; a Figma prototype uses the nearest spring as a proxy.
+
+**Productive** is the mode for everything. **Expressive** is switched on for one container at a time (`data-motion="expressive"`), at two levels, for these moments only:
+
+- **Finish:** every completed reflection. The confirmation Flag lands with one overshoot on Expressive `spatial.fast`.
+- **Milestone:** onboarding complete, first session done, a student's goal reached, term start and term end. The one card in the hero entrance is Expressive. A goal shows once per person: the student sees it the moment it happens, the tutor the next time they open that student.
+
+Expressive marks the end of something worth finishing, a few times a week at most. Controls, fields and anything done dozens of times a day stay Productive. Inside an Expressive container, page transitions and data marks stay Productive too, because an overshooting page or bar shows something that isn't true. This is the only list of Expressive moments; other pages point here.
+
+**The shake** is the one other bounce. A blocked submit shakes its container once: a loose spring (stiffness 1187.5, damping 15, mass 1) kicked sideways at 420 px/s. It peaks at 9 px after 40 ms and settles back, and it can be interrupted like every spring. It is one pattern, used by Modal, a field with its own button and InlineEdit, and it is not a token.
+
+<Canvas of={PhysicsStories.Modes} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Speed follows size and distance">
+
+<RefTable
+    head={['Speed', 'For', 'Examples']}
+    rows={[
+        [<C>fast</C>, 'Small things, short distances', 'Toggle thumb, Popup, a row, a tab indicator'],
+        [<C>default</C>, 'Mid-size layers, short travel', 'Modal, Flag, content changing in place, the Sidebar opening, a row growing into its record (Drill, because it repeats all day)'],
+        [<C>slow</C>, 'Large layers, long travel', 'Drawer, a docking Panel, a whole page that slides; anything traveling more than about 600 px'],
+    ]}
+/>
+
+<Canvas of={PhysicsStories.Size} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Exits">
+
+Two questions decide how something leaves.
+
+1. **Can it come back?** If yes (a Drawer, the Sidebar, a Panel), it reverses its entrance one speed faster (`fast` stays `fast`) and settles at the edge, held there.
+2. **If it is gone for good, who started it?**
+   - **The system** (a Flag timing out): `spatial.exit`. It is aimed 3.8 times past the edge, so it is still speeding up when it crosses and leaves at full speed.
+   - **The person, with a click** (a close button, a deleted row): a quick fade on `appearance.fast`, in place. The rows around a deleted row close the gap on `spatial.fast`.
+   - **The person, with a flick:** `spatial.exit` starts from the hand's velocity instead of from rest, so it leaves at the speed it was thrown.
+
+An exit is shorter than its entrance and lands without a bounce. A floating layer may shrink 2% as it fades (a Modal to 98%). Every component names an enter and exit pair, and the exit is the entrance one speed faster, so there is no second token set.
+
+<Canvas of={PhysicsStories.Exits} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Loops">
+
+`motion.loop` is a spring with no damping, so it swings as a sine wave, one cycle every 1.2 s, and never settles. Three typing dots are the same loop, each an eighth of a cycle behind the one before. To end a loop softly, turn the damping back on and it settles at rest.
+
+- A loop runs only while work runs (loading, thinking, typing) and stops the moment the work ends.
+- A decorative loop stops by 5 s.
+- Every loop has a pause.
+- In Reduced mode a loop becomes a static label, such as "Thinking".
+
+<Canvas of={PhysicsStories.Loops} sourceState="none" />
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Damping">
+
+Damping is how much a motion is held back. In the spring itself, it is how far the motion passes its target.
+
+These four share one stiffness, `spatial.default`'s, and differ only in damping ratio. The line under each is its position over time; the dashed line is the target. Productive motion uses ratio 1 everywhere. Expressive uses 0.8 and, for small things thrown with energy, 0.6. Every token stays at 0.6 or above: below that a spring rings, swinging back and forth before it settles.
+
+<Canvas of={PhysicsStories.Damping} sourceState="none" />
+
+</FoundationSection>
+
+<FoundationSection title="In code">
+
+CSS reads a semantic token as a `linear()` easing plus its settle time. Components read the `--ds-motion-*` semantics only, never a `--motion-spring-*` primitive, and reduced motion is handled once, in the token layer.
+
+```css
+transition: transform var(--ds-motion-spatial-default-duration) var(--ds-motion-spatial-default);
+```
+
+JS motion (drag, throw, interruption, layout) uses the `motion` package, configured from the same table:
+
+```js
+import { animate } from 'motion';
+import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
+
+animate(panel, { x: 0 }, SPRINGS['spatial.default'].productive);
+```
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Accessibility', description: 'Reduced motion and what it keeps.', href: '?path=/docs/foundations-accessibility--docs' },
+        { title: 'Illustration kit', description: 'The shapes these demos are drawn with, and the motion layer that moves them.', href: '?path=/docs/get-started-illustration-kit--docs' },
+    ]}
+/>
+
+</FoundationSection>
+
+<FoundationSection title="References">
+
+- ADR-041 records why motion moved to springs and how the tokens are named.
+- The token table is generated from `scripts/lib/tokens/plan.mjs` into `design-system/src/tokens/ladder/_springs.scss` and `springs.generated.js`.
+
+</FoundationSection>
