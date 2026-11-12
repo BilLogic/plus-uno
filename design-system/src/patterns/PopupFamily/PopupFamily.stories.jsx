@@ -3,8 +3,8 @@ import { expect, waitFor, within } from 'storybook/test';
 import { Button, Popup, Flag, FlagGroup, Tooltip } from '@/components';
 import { px } from '@/storybook-docs/lib/style-probes.js';
 
-/** The popup widths, Popover/width-sm · md · lg. */
-const POPUP_WIDTHS = ['sm', 'md', 'lg'];
+/** The popup widths: auto, and the column steps of the screen grid. */
+const POPUP_WIDTHS = ['auto', '3-col', '4-col'];
 
 /** The placements a Popup takes around its trigger. */
 const POPUP_PLACEMENTS = ['top', 'bottom', 'left', 'right', 'bottom-start', 'bottom-end'];
@@ -60,9 +60,9 @@ const noteList = (
     </ul>
 );
 
-const popupIds = { sm: 'pfam-popup-sm', md: 'pfam-popup-md', lg: 'pfam-popup-lg' };
+const popupIds = { auto: 'pfam-popup-auto', '3-col': 'pfam-popup-3-col', '4-col': 'pfam-popup-4-col' };
 
-/** The three width tiers, 320 · 400 · 480, padded 16 and 4 from the trigger. */
+/** Auto and the two column steps, padded 16 and 4 from the trigger. */
 export const Popups = {
     render: () => (
         <Stage height={720}>
@@ -79,7 +79,7 @@ export const Popups = {
                                 title="Session notes"
                                 trigger={<Button text={`Popup ${width}`} spacing="compact" />}
                             >
-                                {width === 'lg' ? noteList : 'Notes stay with the session.'}
+                                {width === 'auto' ? 'Notes stay with the session.' : noteList}
                             </Popup>
                         </div>
                     ))}
@@ -88,17 +88,20 @@ export const Popups = {
         </Stage>
     ),
     play: async ({ canvasElement }) => {
-        const expected = { sm: 320, md: 400, lg: 480 };
+        const widths = {};
         for (const width of POPUP_WIDTHS) {
             const popup = await waitFor(() => {
                 const node = canvasElement.ownerDocument.getElementById(popupIds[width]);
                 if (!node) throw new Error('not open');
                 return node;
             });
-            await expect(popup.getBoundingClientRect().width, `width ${width}`).toBe(expected[width]);
+            widths[width] = popup.getBoundingClientRect().width;
             await expect(px(getComputedStyle(popup).paddingTop), 'Popover/pad').toBe(16);
             await expect(px(getComputedStyle(popup).borderTopLeftRadius), 'Popover/radius').toBe(12);
         }
+        await expect(widths.auto, 'auto hugs inside 160 to 320').toBeGreaterThanOrEqual(160);
+        await expect(widths.auto, 'auto hugs inside 160 to 320').toBeLessThanOrEqual(320);
+        await expect(widths['4-col'], 'one more column').toBeGreaterThan(widths['3-col']);
     },
 };
 
@@ -166,7 +169,7 @@ export const Tooltips = {
 /** The Popup: pick its width and where it opens; click the trigger. */
 /* ---------------------------------------------------- one value per story */
 
-/** One Popup width tier per story, held open. */
+/** One Popup width per story, held open. */
 const popupAt = (width) => (
     <Stage height={240}>
         {({ open }) => (
@@ -184,9 +187,9 @@ const popupAt = (width) => (
     </Stage>
 );
 
-export const PopupSmall = { name: 'Popup small', render: () => popupAt('sm') };
-export const PopupMedium = { name: 'Popup medium', render: () => popupAt('md') };
-export const PopupLarge = { name: 'Popup large', render: () => popupAt('lg') };
+export const PopupAuto = { name: 'Popup auto', render: () => popupAt('auto') };
+export const Popup3Col = { name: 'Popup 3-col', render: () => popupAt('3-col') };
+export const Popup4Col = { name: 'Popup 4-col', render: () => popupAt('4-col') };
 
 /** One Flag appearance per story. */
 const flagOf = (appearance, title) => (
@@ -224,7 +227,7 @@ export const TooltipWrapped = {
 };
 
 export const Interactive = {
-    args: { title: 'Session notes', width: 'md', placement: 'bottom-start' },
+    args: { title: 'Session notes', width: 'auto', placement: 'bottom-start' },
     render: (args) => (
         <Stage height={220}>
             {() => (

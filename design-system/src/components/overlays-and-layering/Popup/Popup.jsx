@@ -5,8 +5,24 @@ import { popupMountOf } from '@/lib/popoverPlacement';
 import { isOverlayRaisedOver, isPressInRaisedOverlay } from '@/lib/overlay';
 import './Popup.scss';
 
-/** The width tiers, popup width-sm · md · lg (`--popover-width-*`): 320 · 400 · 480. */
-const WIDTHS = ['sm', 'md', 'lg'];
+/**
+ * The `width` options. `auto` hugs one list: at least the trigger, 160 to 320
+ * (`--popup-min-width` to `--popup-max-width`). `3-col` and `4-col` hold a
+ * menu of several categories and span that many screen-grid columns plus the
+ * popup pad, the same steps and the same math as Modal's `6-col` and up
+ * (`screen-grid-width` in styles/_screen-grid.scss).
+ */
+export const POPUP_WIDTHS = ['auto', '3-col', '4-col'];
+
+/**
+ * Each column step in pixels at the screens Modal's widths are read at,
+ * 768 · 1024 · 1280, as Popup.scss computes them and rounded to a whole pixel.
+ * scripts/frame-layer-tokens.test.mjs holds them to the screen-grid rule.
+ */
+export const POPUP_WIDTH_PX = {
+    '3-col': [200, 264, 328],
+    '4-col': [261, 347, 432],
+};
 
 /** Every placement this component accepts, ADS-shaped (side + optional `-start`/`-end`). */
 const PLACEMENTS = [
@@ -73,12 +89,12 @@ const Popup = ({
     container,
     offset,
     rootClose,
-    width = 'sm',
+    width = 'auto',
     className = '',
     id,
     ...props
 }) => {
-    const widthClass = WIDTHS.includes(width) && width !== 'sm' ? `plus-popup--${width}` : '';
+    const widthClass = POPUP_WIDTHS.includes(width) && width !== 'auto' ? `plus-popup--${width}` : '';
     const { side, align } = sideAlignOf(placement);
     const [along = 4, away] = offset ?? [];
 
@@ -190,8 +206,8 @@ Popup.propTypes = {
     offset: PropTypes.array,
     /** Dismiss on a click outside. Defaults to true for every trigger but `manual`. */
     rootClose: PropTypes.bool,
-    /** The width tier: sm 320 (default), md 400 or lg 480. */
-    width: PropTypes.oneOf(WIDTHS),
+    /** `auto` (default) hugs its content, at least the trigger's width and 160 to 320. `3-col` and `4-col` span that many screen-grid columns, for a menu of several categories. */
+    width: PropTypes.oneOf(POPUP_WIDTHS),
     className: PropTypes.string,
     id: PropTypes.string,
 };

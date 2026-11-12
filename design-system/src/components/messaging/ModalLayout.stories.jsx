@@ -15,7 +15,7 @@ import { IconButton, Select } from '@/components';
  * that cap. A render assertion cannot see any of that, so these stories measure
  * the boxes.
  *
- * The screen grid is read from `--plus-modal-screen` when an ancestor sets it,
+ * The screen grid is read from `--plus-overlay-screen` when an ancestor sets it,
  * and from the browser width otherwise. The width stories set it on a frame so
  * the three layout modes can be measured in one browser.
  */
@@ -87,7 +87,7 @@ function ScreenFrame({ screen, sidebar, children }) {
     return (
         <div
             data-testid={`screen-${screen}-${sidebar ? 'sidebar' : 'nosidebar'}`}
-            style={{ '--plus-modal-screen': `${screen}px`, display: 'flex', gap: 'var(--space-100)', width: '100%' }}
+            style={{ '--plus-overlay-screen': `${screen}px`, display: 'flex', gap: 'var(--space-100)', width: '100%' }}
         >
             {sidebar && <div data-sidebar style={{ flex: '0 0 var(--frame-sidebar-width)' }} />}
             <div style={{ ...stack, flex: '1 1 0', minWidth: 0, overflow: 'hidden' }}>{children}</div>
@@ -318,7 +318,7 @@ ChromeUnderTheBlanket.play = async ({ canvasElement }) => {
 /* -------------------------------------------------------------------------- */
 
 export const HeaderOptions = () => (
-    <div style={{ ...stack, '--plus-modal-screen': '1024px' }}>
+    <div style={{ ...stack, '--plus-overlay-screen': '1024px' }}>
         <Modal
             renderAs="inline"
             show
