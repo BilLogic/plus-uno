@@ -101,6 +101,7 @@ const Listbox = ({
     footer,
     rowActions,
     rowActionsIndex,
+    marker = 'check',
     loading = false,
     error,
     emptyMessage = 'No results',
@@ -320,6 +321,7 @@ const Listbox = ({
         const before = [];
         if (option.elemBefore) before.push(...React.Children.toArray(option.elemBefore));
         if (multi) before.unshift(<OptionRow.Checkbox key="__check" checked={selected} />);
+        else if (marker === 'radio') before.unshift(<OptionRow.Radio key="__radio" checked={selected} />);
         return (
             <OptionRow
                 key={rowId}
@@ -330,7 +332,7 @@ const Listbox = ({
                 selected={selected}
                 disabled={option.disabled}
                 highlighted={rowId === resolvedActive}
-                check={!multi}
+                check={!multi && marker !== 'radio'}
                 dragging={option.dragging}
                 dropIndicator={option.dropIndicator}
                 elemBefore={before.length ? before : undefined}
@@ -521,6 +523,8 @@ Listbox.propTypes = {
     mode: PropTypes.oneOf(['single', 'multi']),
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
     defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
+    /** How a single pick is marked: `check` at the row's end, or `radio` before the label. Multi mode always uses checkboxes. */
+    marker: PropTypes.oneOf(['check', 'radio']),
     /** `(next, option)`; `next` is an array in multi mode. */
     onChange: PropTypes.func,
     /** The text typed in the field; rows whose label contains it are shown. */

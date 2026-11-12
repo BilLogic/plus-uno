@@ -9141,7 +9141,7 @@
       "import": "import { PopupSelect } from '@/components';",
       "group": "forms-and-inputs",
       "source": "design-system/src/components/forms-and-inputs/PopupSelect/PopupSelect.jsx",
-      "summary": "Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads \"Status: Upcoming\" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a section's view bar; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start`; one at the end opens `bottom-end` (the default). - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.",
+      "summary": "Popup select: one list in a Popup, applied the moment a row is picked. - **One list, applied on pick.** Picking a row sets the value, the menu fades out, and focus goes back to the trigger. There is no Apply. - **Two triggers.** With `label` and no `trigger`, the labeled trigger reads \"Status: Upcoming\" with a chevron, as the view switch under page tabs. Pass `trigger` for anything else, such as a filter button in a section's view bar; a function gets `{ isOpen, option }`. - **Placement follows the trigger's side.** A trigger at the start of a bar opens `bottom-start`; one at the end opens `bottom-end` (the default). - **Width** is Popup's `auto`: at least the trigger, 160 to 320. - **Marker** is a radio before the label: one choice among several. `marker=\"check\"` puts a check at the row's end. - **Search** sits above the list and filters it. Short lists turn it off with `isSearchable={false}`. The list is Select's own: the same rows, keys and messages.",
       "props": [
         {
           "name": "options",
@@ -9252,6 +9252,18 @@
           "default": null,
           "values": null,
           "description": "`(open)`.",
+          "deprecated": null
+        },
+        {
+          "name": "marker",
+          "type": "enum",
+          "required": false,
+          "default": "'radio'",
+          "values": [
+            "radio",
+            "check"
+          ],
+          "description": "`radio` (default) marks the picked row with a radio before its label; `check` puts a check at the row's end.",
           "deprecated": null
         },
         {
@@ -11520,6 +11532,18 @@
           "deprecated": null
         },
         {
+          "name": "marker",
+          "type": "enum",
+          "required": false,
+          "default": "'check'",
+          "values": [
+            "check",
+            "radio"
+          ],
+          "description": "How a single pick is marked: `check` (default) or `radio`. `isMulti` always draws checkboxes.",
+          "deprecated": null
+        },
+        {
           "name": "onChange",
           "type": "func",
           "required": false,
@@ -11570,6 +11594,7 @@
         "Filled",
         "Multi",
         "Searchable",
+        "Marker",
         "NotSearchable",
         "Creatable",
         "SpacingDefault",

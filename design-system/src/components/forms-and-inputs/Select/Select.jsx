@@ -54,6 +54,7 @@ const Select = ({
     displayMode = 'tags',
     lineWrap = true,
     truncate = false,
+    marker = 'check',
     spacing = 'default',
     isDisabled = false,
     isReadOnly = false,
@@ -446,6 +447,7 @@ const Select = ({
                     open={shown}
                     anchorRef={fieldRef}
                     mode={multi ? 'multi' : 'single'}
+                    marker={marker}
                     spacing={spacing}
                     options={listOptions}
                     value={multi ? current : (hasValue ? current : null)}
@@ -577,6 +579,8 @@ Select.propTypes = {
     recent: PropTypes.arrayOf(valueType),
     /** Ids shown under "Suggested" before typing, in a list of more than 50. */
     suggested: PropTypes.arrayOf(valueType),
+    /** How a single pick is marked: `check` (default) or `radio`. `isMulti` always draws checkboxes. */
+    marker: PropTypes.oneOf(['check', 'radio']),
     /** `(next)`: an id, or an array of ids with `isMulti`. */
     onChange: PropTypes.func,
     /** Focus entering the field from outside it. */

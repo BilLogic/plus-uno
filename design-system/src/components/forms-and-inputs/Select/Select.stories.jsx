@@ -29,6 +29,11 @@ export default {
             control: 'boolean',
             table: { category: 'Design' }
         },
+        marker: {
+            control: { type: 'inline-radio' },
+            options: ['check', 'radio'],
+            table: { category: 'Design' }
+        },
         spacing: {
             control: { type: 'inline-radio' },
             options: ['default', 'compact'],
@@ -145,6 +150,41 @@ export const Multi = {
 
 export const Searchable = {
     render: () => <div style={field}><Select label="Subject" options={sampleOptions} placeholder="Type to search" /></div>,
+};
+
+/** A single pick is marked with a check by default; `marker="radio"` draws a radio before the label. Several picks always use checkboxes. */
+export const Marker = {
+    render: () => (
+        <div style={{ ...grid, pointerEvents: 'auto' }}>
+            <Select label="Check" options={sampleOptions} defaultValue="option-1" />
+            <Select label="Radio" marker="radio" options={sampleOptions} defaultValue="option-1" />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const picked = async (name) => {
+            await userEvent.click(canvas.getByRole('combobox', { name }));
+            const body = within(canvasElement.ownerDocument.body);
+            const option = await waitFor(() => {
+                const found = body.getAllByRole('option').find((row) => row.getAttribute('aria-selected') === 'true');
+                expect(found).toBeTruthy();
+                return found;
+            });
+            const marks = {
+                radio: option.querySelector('.plus-option-row-check--radio'),
+                check: option.querySelector('.plus-option-row-selected-mark'),
+            };
+            await userEvent.keyboard('{Escape}');
+            return marks;
+        };
+        const check = await picked('Check');
+        await expect(check.check).not.toBeNull();
+        await expect(check.radio).toBeNull();
+        const radio = await picked('Radio');
+        await expect(radio.radio).not.toBeNull();
+        await expect(radio.radio).toHaveClass('is-checked');
+        await expect(radio.check).toBeNull();
+    },
 };
 
 /** A short list in a filter menu opts out: the field is a plain trigger that opens the list. */

@@ -31,6 +31,7 @@ const optionInfo = (option) => {
  * - **Placement follows the trigger's side.** A trigger at the start of a bar
  *   opens `bottom-start`; one at the end opens `bottom-end` (the default).
  * - **Width** is Popup's `auto`: at least the trigger, 160 to 320.
+ * - **Marker** is a radio before the label: one choice among several. `marker="check"` puts a check at the row's end.
  * - **Search** sits above the list and filters it. Short lists turn it off
  *   with `isSearchable={false}`.
  *
@@ -49,6 +50,7 @@ const PopupSelect = ({
     open,
     defaultOpen = false,
     onOpenChange,
+    marker = 'radio',
     spacing = 'default',
     emptyMessage = 'No results',
     className = '',
@@ -141,6 +143,7 @@ const PopupSelect = ({
                 onClose={() => setOpen(false)}
                 header={search}
                 spacing={spacing}
+                marker={marker}
                 emptyMessage={emptyMessage}
                 onActiveChange={setActiveId}
                 aria-label={label}
@@ -186,6 +189,8 @@ PopupSelect.propTypes = {
     defaultOpen: PropTypes.bool,
     /** `(open)`. */
     onOpenChange: PropTypes.func,
+    /** `radio` (default) marks the picked row with a radio before its label; `check` puts a check at the row's end. */
+    marker: PropTypes.oneOf(['radio', 'check']),
     /** `default` draws 40 rows and a 32 trigger; `compact` draws 32 rows and a 24 trigger. */
     spacing: PropTypes.oneOf(POPUP_SELECT_SPACINGS),
     /** Shown when the search matches nothing. */
