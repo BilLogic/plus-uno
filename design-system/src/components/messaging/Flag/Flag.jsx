@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { animate, motion, useReducedMotion } from 'motion/react';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import CloseButton from '@/components/forms-and-inputs/CloseButton';
+import Button from '@/components/forms-and-inputs/Button';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import { MESSAGE_APPEARANCE_ICONS } from '../messageAppearance';
 import Icon from '../../images-and-icons/Icon';
@@ -45,6 +46,22 @@ const defaultSound = (appearance) => (appearance === 'error' ? 'error' : 'notify
 
 /** Warning and error are urgent: they interrupt a screen reader and stay until dismissed. */
 const URGENT_APPEARANCES = ['warning', 'error'];
+
+/** A default flag's action: a link when it has an `href`, otherwise a link-styled button. */
+const ActionTag = ({ action }) => {
+    const Tag = action.href ? 'a' : 'button';
+    return (
+        <Tag
+            type={action.href ? undefined : 'button'}
+            className="plus-flag-action"
+            href={action.href}
+            target={action.target}
+            onClick={action.onClick}
+        >
+            {action.text}
+        </Tag>
+    );
+};
 
 /**
  * The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide,
@@ -234,22 +251,22 @@ export const Flag = ({
                 )}
                 {showDetails && actions && actions.length > 0 && (
                     <div className="plus-flag-actions">
-                        {actions.map((action) => {
-                            // Links on a default flag, buttons on a bold one.
-                            const ActionTag = bold ? 'button' : (action.href ? 'a' : 'button');
-                            return (
-                                <ActionTag
-                                    key={action.text}
-                                    type={ActionTag === 'a' ? undefined : 'button'}
-                                    className="plus-flag-action"
-                                    href={ActionTag === 'a' ? action.href : undefined}
-                                    target={ActionTag === 'a' ? action.target : undefined}
-                                    onClick={action.onClick}
-                                >
-                                    {action.text}
-                                </ActionTag>
-                            );
-                        })}
+                        {actions.map((action) => (bold ? (
+                            // Buttons on a bold flag: the PLUS Button, compact, restyled for the fill in Flag.scss.
+                            <Button
+                                key={action.text}
+                                appearance="subtle"
+                                spacing="compact"
+                                className="plus-flag-action"
+                                text={action.text}
+                                href={action.href}
+                                target={action.target}
+                                onClick={action.onClick}
+                            />
+                        ) : (
+                            // Links on a default flag.
+                            <ActionTag key={action.text} action={action} />
+                        )))}
                     </div>
                 )}
             </div>
@@ -289,7 +306,7 @@ Flag.propTypes = {
     title: PropTypes.node.isRequired,
     /** An optional description under the title. */
     children: PropTypes.node,
-    /** Actions under the description, in the order given, at most two. Links on a default flag, buttons on a bold one. An action with an `href` on a bold flag still draws a button: put the navigation in `onClick`. */
+    /** Actions under the description, in the order given, at most two. Links on a default flag, buttons on a bold one. An action with an `href` on a bold flag draws a button that navigates. */
     actions: PropTypes.arrayOf(PropTypes.shape({
         text: PropTypes.string.isRequired,
         href: PropTypes.string,

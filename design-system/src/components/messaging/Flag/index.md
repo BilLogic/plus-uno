@@ -10,7 +10,7 @@ Also asked as: notification, snackbar, success message, undo, temporary message,
 
 **Source:** `design-system/src/components/messaging/Flag/Flag.jsx`
 
-**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, Rest, Hovered, Pressed, Focused, LandsWithNotify, StackClosesUp, StackClosesUpReduced
+**Stories:** `design-system/src/components/messaging/Flag/Flag.stories.jsx` — Overview, Normal, Information, Success, Warning, ErrorAppearance, BackgroundFailure, Bold, Interactive, Dismiss, FlagContent, UnknownAppearance, ActionKinds, Rest, Hovered, Pressed, Focused, LandsWithNotify, StackClosesUp, StackClosesUpReduced
 
 **Storybook page:** `design-system/src/components/messaging/Flag/Flag.mdx`
 
@@ -143,7 +143,7 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 2. **Title.** What happened, in a few words.
 3. **Timestamp.** Optional, subtle, after the title.
 4. **Description.** At most one line.
-5. **Actions.** At most two, under the description: links on a default flag, buttons on a bold one.
+5. **Actions.** At most two, under the description: links on a default flag, compact Buttons on a bold one; an action with an `href` navigates either way.
 6. **Expand toggle.** Only on a bold flag that has a description or actions; it starts collapsed to its title.
 7. **Dismiss.** The shared CloseButton, named "Dismiss flag", on default flags only.
 
@@ -188,7 +188,7 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 | `appearance` | enum | `'normal'` | `normal` (default), `information`, `warning`, `error` or `success`. |
 | `title` | node (required) | — | What happened, in a few words. |
 | `children` | node | — | An optional description under the title. |
-| `actions` | arrayOf (required) | — | Actions under the description, in the order given, at most two. Links on a default flag, buttons on a bold one. An action with an `href` on a bold flag still draws a button: put the navigation in `onClick`. |
+| `actions` | arrayOf (required) | — | Actions under the description, in the order given, at most two. Links on a default flag, buttons on a bold one. An action with an `href` on a bold flag draws a button that navigates. |
 | `icon` | string or node | — | The default flag's leading icon: a status icon name, or an element such as an Avatar. Unset, the information icon in the subtle icon color. Ignored on a bold flag, which shows its appearance's icon. |
 | `defaultExpanded` | bool | `false` | Whether a bold flag starts expanded. |
 | `show` | bool | `true` | Whether the flag renders. Defaults to true; false renders nothing and stops the auto-close timer. |

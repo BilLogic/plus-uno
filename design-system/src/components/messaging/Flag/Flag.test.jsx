@@ -138,6 +138,27 @@ describe('Flag actions and dismiss', () => {
     });
 });
 
+describe('Flag bold actions', () => {
+    it('draws each bold action as a compact PLUS Button, in the order given, and an href action navigates', () => {
+        const onClick = vi.fn();
+        render(<Flag appearance="warning" defaultExpanded title="T" autohide={false} actions={[{ text: 'Retry', onClick }, { text: 'Details', href: '/details', target: '_blank' }]} />);
+        const [retry, details] = screen.getAllByRole('button');
+        expect(retry).toHaveTextContent('Retry');
+        expect(retry).toHaveClass('plus-btn', 'plus-btn--compact');
+        fireEvent.click(retry);
+        expect(onClick).toHaveBeenCalledTimes(1);
+        expect(details).toHaveTextContent('Details');
+        expect(details).toHaveClass('plus-btn');
+        expect(details).toHaveAttribute('href', '/details');
+        expect(details).toHaveAttribute('target', '_blank');
+    });
+
+    it('keeps link actions plain on a normal flag', () => {
+        render(<Flag title="T" autohide={false} actions={[{ text: 'Open', href: '/open' }]} />);
+        expect(screen.getByRole('link', { name: 'Open' })).not.toHaveClass('plus-btn');
+    });
+});
+
 describe('Flag icon', () => {
     it('shows the information icon by default and swaps for a status icon name or an element', () => {
         const { container, rerender } = render(<Flag title="T" autohide={false} />);

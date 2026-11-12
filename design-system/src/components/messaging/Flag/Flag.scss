@@ -147,7 +147,7 @@
         height: var(--label-height-md);
     }
 
-    // --- ACTIONS: link buttons under the description ---
+    // --- ACTIONS: links under the description on a default flag, Buttons on a bold one ---
     .plus-flag-actions {
         display: flex;
         flex-wrap: wrap;
@@ -155,7 +155,8 @@
         margin-top: var(--stack-sm);
     }
 
-    .plus-flag-action {
+    // The link action of a default flag. A bold flag's actions are PLUS Buttons.
+    .plus-flag-action:not(.plus-btn) {
         padding: 0;
         border: 0;
         background: none;
@@ -228,10 +229,26 @@
 
         .plus-flag-title,
         .plus-flag-body,
-        .plus-flag-timestamp,
-        .plus-flag-action {
+        .plus-flag-timestamp {
             // @grounds: --ds-background-neutral-bold --ds-background-success-bold --ds-background-danger-bold
             color: var(--ds-text-inverse);
+        }
+
+        // The action Buttons are the subtle appearance, which reads on a surface, not a fill:
+        // their label takes the inverse text and their steps the inverse interaction tokens.
+        .plus-flag-action.plus-btn {
+            // @grounds: --ds-background-neutral-bold --ds-background-success-bold --ds-background-danger-bold
+            --_button-fg: var(--ds-text-inverse);
+            --_button-icon: var(--ds-icon-inverse);
+            color: var(--ds-text-inverse);
+
+            @include plus-state(
+                $states: (
+                    hovered: (background-color: var(--ds-interaction-inverse-hovered)),
+                    pressed: (background-color: var(--ds-interaction-inverse-pressed)),
+                ),
+                $ring-token: --ds-border-focused-inverse
+            );
         }
 
         .plus-flag-icon {
@@ -239,10 +256,6 @@
                 // @contrast: non-text
                 color: var(--ds-icon-inverse);
             }
-        }
-
-        .plus-flag-action {
-            @include plus-state((), $ring-token: --ds-border-focused-inverse);
         }
     }
 
@@ -264,8 +277,14 @@
 
         .plus-flag-title,
         .plus-flag-body,
-        .plus-flag-timestamp,
-        .plus-flag-action {
+        .plus-flag-timestamp {
+            color: var(--ds-text-warning-inverse);
+        }
+
+        .plus-flag-action.plus-btn {
+            // @grounds: --ds-background-warning-bold
+            --_button-fg: var(--ds-text-warning-inverse);
+            --_button-icon: var(--ds-icon-warning-inverse);
             color: var(--ds-text-warning-inverse);
         }
 
