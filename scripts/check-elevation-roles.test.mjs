@@ -51,7 +51,9 @@ test('floating layers take the overlay pair; the Modal takes the blocking shadow
   for (const [half, token] of [['surface', '--ds-surface-overlay'], ['shadow', '--ds-shadow-overlay']]) {
     const row = mapping.split('\n').find((line) => new RegExp(`^\\|\\s*Overlay ${half}\\s*\\(`).test(line.trim()));
     assert.ok(row, `token-mapping.md has no Overlay ${half} row`);
-    for (const words of [/modals/i, /menus/i, /popovers/i, /tooltips/i, /toasts/i]) {
+    // A tooltip is a label on the neutral bold fill, so only the surface row names it.
+    const named = [/modals/i, /menus/i, /popovers/i, /toasts/i, ...(half === 'surface' ? [/tooltips/i] : [])];
+    for (const words of named) {
       assert.match(row, words, `the Overlay ${half} row no longer names ${words}`);
     }
     assert.ok(row.includes(`var(${token})`), `the Overlay ${half} row does not name var(${token})`);
@@ -65,7 +67,7 @@ test('floating layers take the overlay pair; the Modal takes the blocking shadow
  *
  * The Elevation page assigns the levels by pattern. The floating
  * layers on the new color tokens (menus and dropdowns, Listbox, Popover,
- * Tooltip, Toast) and modals take the overlay pair, `--ds-surface-overlay`
+ * Toast) and modals take the overlay pair, `--ds-surface-overlay`
  * with `--ds-shadow-overlay`; the Frame's floating sidebar floats too, so it
  * takes the overlay pair. A card is on the
  * raised pair or lifts while a clickable card is hovered or dragged. Each row
@@ -75,7 +77,6 @@ test('floating layers take the overlay pair; the Modal takes the blocking shadow
 const SURFACES = [
   { file: 'design-system/src/patterns/PatternCard/PatternCard.scss', rule: '.plus-pattern-card--dragging {', shadow: '--ds-shadow-overlay' },
   { file: 'design-system/src/components/overlays-and-layering/Popup/Popup.scss', rule: '.plus-popup {', shadow: '--ds-shadow-overlay' },
-  { file: 'design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss', rule: '.plus-tooltip {', shadow: '--ds-shadow-overlay' },
   { file: 'design-system/src/components/messaging/Flag/Flag.scss', rule: '.plus-flag', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
   // The floating Sidebar floats, so it takes the overlay pair; the docked one stays on the sunken fill.
   { file: 'design-system/src/patterns/Frame/Frame.scss', rule: '.plus-frame__sidebar--raised {', shadow: '--ds-shadow-overlay', fill: '--ds-surface-overlay' },
@@ -126,6 +127,15 @@ for (const surface of SURFACES) {
     }
   });
 }
+
+test('Tooltip.scss draws a flat label: neutral bold fill, no box-shadow', () => {
+  const source = fs.readFileSync(path.join(REPO_ROOT, 'design-system/src/components/overlays-and-layering/Tooltip/Tooltip.scss'), 'utf8');
+  const start = source.indexOf('.plus-tooltip {');
+  assert.ok(start >= 0, 'rule ".plus-tooltip {" is gone');
+  const block = source.slice(start, source.indexOf('}', start));
+  assert.doesNotMatch(block, /box-shadow/, 'Tooltip takes no shadow');
+  assert.match(block, /background-color:\s*var\(--ds-background-neutral-bold\)/);
+});
 
 test("the Elevation page's pattern table says the same steps", () => {
   const page = readDocsPage(fs.readFileSync(path.join(REPO_ROOT, ELEVATION_PAGE), 'utf8'), { kind: 'foundation' });

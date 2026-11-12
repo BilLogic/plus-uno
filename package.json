@@ -76,6 +76,8 @@
     "check:old-system": "node scripts/check-old-system.mjs",
     "check:state-mixin": "node scripts/check-state-mixin.mjs",
     "check:inline-jsx-tokens": "node scripts/check-inline-jsx-tokens.mjs",
+    "check:motion-literals": "node scripts/check-motion-literals.mjs",
+    "check:motion-registry": "node scripts/check-motion-registry.mjs",
     "check:raw-buttons": "node scripts/check-raw-buttons.mjs",
     "check:retired-spelling": "node scripts/check-retired-spelling.mjs",
     "check:cross-repo": "node scripts/check-cross-repo-duplication.mjs",
