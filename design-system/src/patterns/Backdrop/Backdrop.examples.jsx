@@ -5,7 +5,7 @@ import { Backdrop, PatternDrawer, PatternModal } from '@/patterns';
 import { ScaledPreview } from '@/storybook-docs/lib/scaled-preview.jsx';
 
 /**
- * The do and don't examples on the Backdrop, Modal and Drawer docs pages: the
+ * The do and don't examples on the Backdrop and Modal docs pages: the
  * overlays at a 1024 stand-in screen, scaled down to the card. Stage sizes are
  * docs geometry, not design values.
  *
@@ -74,7 +74,7 @@ const moveSession = (
 );
 
 /** Do: a drawer and the confirm it raises, stacked over it. */
-export const DrawerWithConfirm = () => (
+export const EdgeLayerWithConfirm = () => (
     <Stage>
         {drawer}
         <Over>{discard()}</Over>
@@ -82,7 +82,7 @@ export const DrawerWithConfirm = () => (
 );
 
 /** Don't: a modal for an unrelated task opened over a drawer. */
-export const DrawerWithUnrelatedModal = () => (
+export const EdgeLayerWithUnrelatedModal = () => (
     <Stage>
         {drawer}
         <Over>{moveSession}</Over>

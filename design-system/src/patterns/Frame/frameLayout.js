@@ -2,7 +2,7 @@
  * Frame layout resolver. One pure function: the Frame's width, the Panel's
  * width, the Sidebar's request, the chat mode and whether a Section detail
  * layout is active go in; the Sidebar state, the Panel state, the Panel's
- * width, whether the split holds and whether a Backdrop shows come out. Fit is measured from the
+ * width and whether the split holds come out. Fit is measured from the
  * Frame's own width, never the window.
  *
  * Rules, in order:
@@ -66,7 +66,6 @@ export function dockedPanelMax({ frameWidth, sidebarDocked, splitHolds }) {
  *   panel: 'none' | 'docked' | 'overlay',
  *   panelWidth: number,
  *   splitHolds: boolean,
- *   backdrop: boolean,
  * }}
  */
 export function resolveFrameLayout({
@@ -148,7 +147,5 @@ export function resolveFrameLayout({
         panel: panelState,
         panelWidth: effectivePanelWidth,
         splitHolds: sectionDetail && rawContent >= L.splitFloor,
-        // The Backdrop belongs to an overlay Panel only: a raised Sidebar has none.
-        backdrop: panelState === 'overlay',
     };
 }

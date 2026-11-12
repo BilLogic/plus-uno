@@ -52,7 +52,6 @@ export const colorTokens = [
     ['--ds-border', 'The 1px line on the Page-facing edge of a docked Sidebar, the same as the divider above its account row. Where the Page\'s edge is drawn, it lies on the same pixel, so one line shows.'],
     ['--ds-surface-overlay', 'The fill of an overlay or peeking Panel, and of a floating Sidebar (a peek, or opened under 1024). A docked Sidebar stays on the sunken fill.'],
     ['--ds-shadow-overlay', 'The shadow of a peeking or overlay Sidebar, and of an overlay or peeking Panel.'],
-    ['--ds-blanket', 'The Backdrop under an overlay Panel. It covers the Page and the Sidebar.'],
     ['--ds-border-focused', 'The splitter\'s line while it has keyboard focus or is dragged.'],
 ];
 
@@ -128,7 +127,7 @@ Five or more steps go down the left. Four or fewer run across the top. The bar i
 
 ## Width behavior
 
-The Frame decides what docks from its own width, so the content never drops under 720. Drag the width: the Sidebar and an open AI panel both dock from 1408 with a 400 panel; from 1168 the panel docks alone and the Sidebar collapses; below that, and under 1024, the panel opens over the Page on a Backdrop. Under 768 the panel is full width.
+The Frame decides what docks from its own width, so the content never drops under 720. Drag the width: the Sidebar and an open AI panel both dock from 1408 with a 400 panel; from 1168 the panel docks alone and the Sidebar collapses; below that, and under 1024, the panel floats over the Page with no Backdrop. Under 768 the panel is full width.
 
 <DocsInteractivePlayground of={FrameStories.ResponsiveWidth} description="The width control sets the Frame's own width, with the AI panel open." />
 
@@ -142,7 +141,7 @@ The Frame decides what docks from its own width, so the content never drops unde
 
 <ComponentExample of={FrameStories.KeyPanelCollapsesSidebar} title="Panel collapses the Sidebar, 1200" description="The Sidebar, a 400 panel and 720 of content cannot all fit, so the Sidebar collapses and the toggle moves to the Page's top left. It comes back when the panel closes." />
 
-<ComponentExample of={FrameStories.KeyUnder1024} title="Under 1024" description="The Sidebar never docks: opened by hand it floats over the Page. The panel opens over a Backdrop, and one layer is open at a time." />
+<ComponentExample of={FrameStories.KeyUnder1024} title="Under 1024" description="The Sidebar never docks: opened by hand it floats over the Page. The panel floats over the Page with no Backdrop, and one layer is open at a time." />
 
 A system banner, when one is needed, spans the whole width above the Sidebar and the Page: <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>, Notifications.
 
@@ -243,7 +242,7 @@ Use Frame for every page of the app. It owns the frame sizes and the Sidebar's b
 The Frame decides what docks from its own width, not the window's, through one layout resolver, so the content never drops under 720:
 
 - **Sidebar.** It docks from 1024 and never docks below that. Under 1024, opened by hand, it floats over the Page and closes on an outside press or Escape. Hovering the toggle or the left edge peeks a collapsed Sidebar over the Page with no Backdrop. Clicking the toggle, or pressing Ctrl+[, closes a docked Sidebar and opens a collapsed one.
-- **AI panel.** It opens from anything inside the Frame through `usePanelControl()`. Both dock when the Sidebar, the panel and 720 fit: with a 400 panel that is from 1408. Otherwise a Sidebar left open by default collapses, and comes back when the panel closes; with a 400 panel the panel docks alone from 1168. Below that, the panel opens over a Backdrop that covers the Page and the Sidebar.
+- **AI panel.** It opens from anything inside the Frame through `usePanelControl()`. Both dock when the Sidebar, the panel and 720 fit: with a 400 panel that is from 1408. Otherwise a Sidebar left open by default collapses, and comes back when the panel closes; with a 400 panel the panel docks alone from 1168. Below that, the panel floats over the Page and the Sidebar on the overlay fill and shadow, with no Backdrop.
 - **Under 1024** the panel is 320 wide, and only one layer is open at a time: opening the Sidebar closes the panel, and opening the panel closes the Sidebar. Under 768 the panel is full width.
 - **`sectionDetail`** collapses the Sidebar first, so a list and its detail keep 960 side by side. If a collapsed Sidebar still leaves under 960, the panel stays docked and the detail replaces the list.
 - **Modals.** Opening a Modal closes a peeking or floating Sidebar, and a docked Sidebar stays. While a Modal is open the Sidebar does not peek, and Escape closes the Modal only. A Modal leaves the panel open under its Backdrop.
@@ -296,7 +295,7 @@ The bottom bar is fixed along the bottom, one row high (`--space-300`). Cancel (
 
 <RuleTag kind="review" />
 
-The AI panel is a region of the Frame, never a floating layer, so it stays put as a person moves between pages. The Page makes room for it; below `FRAME_LAYOUT.dockMin` it opens over a Backdrop.
+The AI panel is a region of the Frame, not a floating Panel, so it stays put as a person moves between pages. The Page makes room for it; below `FRAME_LAYOUT.dockMin` it floats over the Page, with no Backdrop.
 
 <DoDontPair
     doExample={<AiPanelDocked />}
@@ -365,7 +364,7 @@ Elevation and fills follow <a target="_top" href="./?path=/docs/foundations-elev
 - The Page is the `main` landmark, and the `nav` inside the Sidebar is the navigation landmark. Pass `contentAs="div"` when the page supplies its own `main`.
 - The toggle is a button. Open, it ends the Sidebar's logo row as "Close sidebar"; closed, it sits at the Page's top left as "Open sidebar". It reports whether the Sidebar is showing and announces its shortcut, Ctrl+[ (Cmd+[ on a Mac).
 - A peeking or floating Sidebar closes on Escape, and focus returns to the toggle.
-- Docked, the AI panel is a complementary landmark named by `panelLabel`, after the Page in reading order. Below `FRAME_LAYOUT.dockMin` it is a Modal-style layer: focus moves to its first control, Tab stays inside it, the Page and the Sidebar under the Backdrop are inert, and closing returns focus to what opened it.
+- Docked, the AI panel is a complementary landmark named by `panelLabel`, after the Page in reading order. Below `FRAME_LAYOUT.dockMin` it is a Modal-style layer: focus moves to its first control, Tab stays inside it, the Page and the Sidebar under it are inert, and closing returns focus to what opened it.
 - The splitter is a vertical separator named "Resize panel" that reports its width. The left arrow widens the panel by 16 and the right arrow narrows it, 64 with Shift; Home and End go to the narrowest and the widest.
 - A focused task's steps are a navigation named "Steps"; the current step is marked, and the bar's buttons follow the body in the tab order.
 

@@ -14,102 +14,9 @@ Also asked as: slide-over, sheet, side sheet, off-canvas.
 
 **Storybook page:** `design-system/src/patterns/PatternDrawer/PatternDrawer.mdx`
 
-## Usage
-
-Use a Drawer to open a panel beside the page, so a person can work on one thing while the page stays in view. It dims the page with the backdrop but does not hide it.
-
-| Task | Use |
-| --- | --- |
-| The details of a row, filters or a short edit, with the page in view. | A Drawer. |
-| A task that blocks the page, or a short decision. | A Modal. |
-| Content that belongs on the page itself. | A Section or a Card. |
-
-### Width guidance
-
-A Drawer takes the Modal width steps, never the page grid. The width grows with the screen, never shrinks, and the sidebar never changes it. Past `lg` the page behind it is no longer in view, and the task wants a Modal or a page of its own.
-
-| Step | Medium 768 | Large 1024 | X-Large 1440 | Made of |
-| --- | --- | --- | --- | --- |
-| `sm` | 384 | 512 | 640 | 6 screen-grid columns + 2 × 16 |
-| `md` | 507 | 677 | 848 | 8 columns + 2 × 16 |
-| `lg` | 629 | 843 | 1056 | 10 columns + 2 × 16 |
-
-A Drawer is placed in the [Backdrop](?path=/docs/templates-modal-backdrop--docs) with an edge placement. The Backdrop drops its pad and holds the Drawer at that edge, over the same backdrop and layers a [Modal](?path=/docs/templates-modal-modal--docs) takes.
-
-## Best practices
-
-### At most two overlays. {#at-most-two-overlays}
-
-At most two overlays: a modal or drawer, and the confirm it raises. Never two unrelated overlays, and never a third; the overlay module keeps a third closed.
-
-Do: A drawer and the confirm it raises, stacked over it.
-Don't: A modal for an unrelated task opened over a drawer.
-
-### Keep the page in view. {#keep-the-page-in-view}
-
-Do: A medium drawer for a form or detail.
-Don't: A wide drawer that covers the page.
-
-### Use a modal for a short decision. {#use-a-modal-for-a-short-decision}
-
-Do: A small modal for a short decision.
-Don't: A drawer for a short decision.
-
-### Place the Drawer in a Backdrop. {#place-the-drawer-in-a-backdrop}
-
-Hold the Drawer full height at a screen edge, inside a Backdrop. Never put it straight on the page, and never center it: a centered layer is a Modal.
-
-## Accessibility
-
-- The Drawer is a dialog with `aria-modal` set to true. The title is its h1 and names it through `aria-labelledby`, and the description is linked through `aria-describedby`.
-- Opening moves focus to the first control inside and traps it there. Tab and Shift+Tab cycle inside.
-- Escape, the Close button and a click on the backdrop call `onClose`, and focus returns to the control that opened it. An inner control that handles Escape keeps it.
-- A body that scrolls is a tab stop, so a keyboard can reach it.
-- An `inline` Drawer, drawn in the page flow for docs, sets `aria-modal` to false and leaves focus where it is.
-
 ## Related
 
-- [Modal](?path=/docs/templates-modal-modal--docs) is the centered layer for a task that blocks the page.
-- [Backdrop](?path=/docs/templates-modal-backdrop--docs) places the Drawer at an edge and draws the fill.
-- [Section](?path=/docs/templates-section-section--docs) and [Card](?path=/docs/templates-section-card--docs) hold content that belongs on the page itself.
-- Frame shows a Drawer open over the app frame, and how it meets the Sidebar.
-
 Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`
-
-## Parts
-
-1. **Header.** The title, an optional description and the Close button, which shows whenever `onClose` is set.
-2. **Body.** A slot that takes the height the header and footer leave, and scrolls past it.
-3. **Footer** (optional). A slot pinned to the bottom edge, with actions right-aligned and the primary last.
-
-The Drawer pads 16 on every side and stacks its parts 16 apart. It has no radius, because it meets the screen edge at the top, the bottom and its own side. Figma's custom header, `actions?`, `divider?` and `loading?` have no prop in code; `column guide?` is Figma only and never ships.
-
-### States
-
-A Drawer is open or closed. Closing it returns focus to what had it before it opened. Its parts have no hover, pressed or disabled states of their own; those belong to the controls in the header and footer. When focus lands on the Drawer itself, it draws the focus ring inside its edge.
-
-### Tokens
-
-| Token | Value | What it is for |
-| --- | --- | --- |
-| `--drawer-pad` | 16 | Pad on every side, every size. |
-| `--drawer-stack-md` | 16 | Space between the header, body and footer. |
-| `--drawer-inline-sm` | 8 | Space in the header row and between footer buttons. |
-| `--drawer-stack-sm`, `-lg`; `--drawer-inline-md`, `-lg` | 8, 24; 16, 24 | Spacing for the content you place in the body. The Drawer does not apply them. |
-| `--drawer-width-sm`, `-md`, `-lg` | see Width guidance | The three width steps, the same values as the Modal's. |
-| `--ds-surface-overlay`, `--ds-shadow-overlay` | overlay pair | The Drawer's fill and elevation. |
-| `--heading-medium` | 20/24 | The title. |
-| `--body-default`, `--ds-text-subtle` | 14/20 | The description. |
-| `--ds-border-focused`, `--focus-ring-width` | focus ring | The ring when the Drawer itself holds focus. |
-| `--ds-blanket` | 32% in Light, 60% in Dark | The fill the Backdrop draws behind it. |
-
-## Content guidelines
-
-| Do | Don't |
-| --- | --- |
-| A short title that names what the Drawer holds: "Session details". | A title that repeats the button that opened it word for word. |
-| A description only when it adds something, such as "Thursday · 4:00–5:00 PM". | A description that restates the title. |
-| Name the primary action for what it does: "Save changes". | "OK" or "Submit". |
 
 ## Props
 
@@ -145,4 +52,8 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 From `design-system/src/patterns/PatternDrawer/PatternDrawer.scss`. Override these through the token layer, never with a literal.
 
-<!-- authored coverage: whenToUse=yes correctIncorrect=yes accessibility=yes -->
+<!-- authored coverage: whenToUse=no correctIncorrect=no accessibility=no -->
+
+> No authored guidance yet: when to use, correct/incorrect, and accessibility
+> are unwritten for this component. Nothing above tells you whether
+> reaching for `PatternDrawer` is the right call, only what it accepts.
