@@ -100,8 +100,8 @@ describe('OptionRow', () => {
     });
 
     it('takes another role, such as a tree item, with its own aria', () => {
-        render(<OptionRow role="treeitem" label="Algebra" aria-expanded={false} aria-level={1} />);
-        const item = screen.getByRole('treeitem', { name: 'Algebra' });
+        render(<OptionRow role="treeitem" label="Lincoln Middle" aria-expanded={false} aria-level={1} />);
+        const item = screen.getByRole('treeitem', { name: 'Lincoln Middle' });
         expect(item).toHaveAttribute('aria-expanded', 'false');
         expect(item).toHaveAttribute('aria-level', '1');
     });
@@ -113,7 +113,7 @@ describe('OptionRow', () => {
         render(
             <OptionRow
                 role="treeitem"
-                label="Algebra"
+                label="Lincoln Middle"
                 onSelect={onSelect}
                 elemBefore={<OptionRow.Toggle state="collapsed" onToggle={onToggle} />}
             />

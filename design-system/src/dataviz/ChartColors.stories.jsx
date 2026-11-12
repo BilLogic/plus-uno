@@ -55,7 +55,7 @@ const Gallery = () => (
         </section>
         <section data-chart="pie">
             <h3 style={heading}>Pie</h3>
-            <PieChart height={220} data={[{ name: 'Algebra', y: 40 }, { name: 'Geometry', y: 30 }, { name: 'Ratios', y: 20 }, { name: 'Other', y: 10 }]} />
+            <PieChart height={220} data={[{ name: 'Lincoln Middle', y: 40 }, { name: 'Roosevelt K-8', y: 30 }, { name: 'North High', y: 20 }, { name: 'Other', y: 10 }]} />
         </section>
         <section data-chart="donut">
             <h3 style={heading}>Donut</h3>

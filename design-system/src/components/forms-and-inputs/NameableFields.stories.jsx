@@ -129,9 +129,14 @@ export const CallerPropsNameTheControl = () => (
         <span id="nf-term-label">Term</span>
         <Select
             id="nf-subject"
+<<<<<<< HEAD
             aria-label="Subject"
             isSearchable={false}
             options={[{ value: 'maths', label: 'Maths' }, { value: 'english', label: 'English' }]}
+=======
+            aria-label="Site"
+            options={[{ value: 'lincoln', label: 'Lincoln Middle' }, { value: 'roosevelt', label: 'Roosevelt K-8' }]}
+>>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
         />
         <Select
             id="nf-term"
@@ -146,7 +151,7 @@ export const CallerPropsNameTheControl = () => (
 CallerPropsNameTheControl.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    const subject = canvas.getByRole('combobox', { name: 'Subject' });
+    const subject = canvas.getByRole('combobox', { name: 'Site' });
     await expect(subject.classList.contains('plus-select-combobox')).toBe(true);
 
     // A caller's own label and `required` both survive.

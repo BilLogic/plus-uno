@@ -701,8 +701,270 @@ export const Light = {
 export const Dark = {
     globals: { plusColorMode: 'dark' },
     play: async ({ canvasElement }) => {
+<<<<<<< HEAD
         const row = rowNamed(canvasElement, 'Sessions');
         await expect(getComputedStyle(row).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-selected'));
         await expect(document.documentElement.getAttribute('data-color-mode')).toBe('dark');
+=======
+        const canvas = within(canvasElement);
+        const chevron = canvas.getByRole('button', { name: 'Sessions tabs' });
+        const list = canvasElement.querySelector(`#${CSS.escape(chevron.getAttribute('aria-controls'))}`);
+        await expect(list, 'aria-controls names the tab list').toBeInTheDocument();
+        await expect(chevron).toHaveAttribute('aria-expanded', 'true');
+        await expect(list).toBeVisible();
+
+        await userEvent.click(chevron);
+        await expect(chevron).toHaveAttribute('aria-expanded', 'false');
+        await expect(list).not.toBeVisible();
+
+        await userEvent.click(canvas.getByRole('button', { name: 'Open Beauxbatons · Wed, Sep 10' }));
+        await waitFor(() => expect(chevron).toHaveAttribute('aria-expanded', 'true'));
+        await expect(list).toBeVisible();
+
+        await userEvent.click(canvas.getByRole('button', { name: /^Sessions$/ }));
+        await expect(canvas.getByRole('button', { name: /^Sessions$/ }), 'the label opens the list page').toHaveAttribute('aria-current', 'page');
+        await expect(chevron, 'and leaves the accordion as it was').toHaveAttribute('aria-expanded', 'true');
+    },
+};
+
+/** Delete (and Backspace) closes the focused tab; focus moves to the next one, then to the parent. */
+export const DeleteClosesTab = {
+    render: () => <OpenTabsHarness storeKey="story:delete" seed={manySessions(3)} select="sessions" />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(tabTitles(canvasElement)).toEqual(['Session 3', 'Session 2', 'Session 1']);
+        canvas.getByRole('link', { name: 'Session 2' }).focus();
+        await userEvent.keyboard('{Delete}');
+        await expect(tabTitles(canvasElement)).toEqual(['Session 3', 'Session 1']);
+        await waitFor(() => expect(document.activeElement).toBe(canvas.getByRole('link', { name: 'Session 1' })));
+
+        await userEvent.keyboard('{Backspace}');
+        await waitFor(() => expect(document.activeElement).toBe(canvas.getByRole('link', { name: 'Session 3' })));
+        await userEvent.keyboard('{Delete}');
+        await expect(tabRows(canvasElement)).toHaveLength(0);
+        await waitFor(() => expect(document.activeElement).toBe(canvas.getByRole('button', { name: /^Sessions$/ })));
+    },
+};
+
+/** Five tabs show; past five a "Show N more" row expands the rest. */
+export const Overflow = {
+    render: () => <OpenTabsHarness storeKey="story:overflow" seed={manySessions(20)} select="sessions" boxHeight="var(--size-5400)" />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(tabRows(canvasElement)).toHaveLength(5);
+        await expect(tabTitles(canvasElement)[0], 'the most recent first').toBe('Session 20');
+        await userEvent.click(canvas.getByRole('button', { name: 'Show 15 more' }));
+        await expect(tabRows(canvasElement)).toHaveLength(20);
+        await userEvent.click(canvas.getByRole('button', { name: 'Show fewer' }));
+        await expect(tabRows(canvasElement)).toHaveLength(5);
+    },
+};
+
+/**
+ * The thread ties the tabs to their parent. Each row is a 28 thread column and
+ * a surface: a 1 border-color line runs under the parent's icon center,
+ * unbroken through the gaps, and ends in a radius-6 elbow at the last row,
+ * which is "Show N more" when it shows. The surface pads 8, so labels line up
+ * with the parent's label, and every state fill starts at 28.
+ */
+export const Thread = {
+    render: () => <OpenTabsHarness storeKey="story:thread" seed={manySessions(20)} select="sessions:s20" boxHeight="var(--size-5400)" />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const outline = tokenColor(canvasElement, '--ds-border');
+        const stroke = tokenLength(canvasElement, '--stroke-1');
+        const thread = (li) => getComputedStyle(li, '::before');
+        const parentRow = canvas.getByRole('button', { name: /^Sessions$/ });
+        const parentIcon = parentRow.querySelector('.plus-sidebar-tab__icon').getBoundingClientRect();
+        const parentLabel = parentRow.querySelector('.plus-sidebar-tab__label').getBoundingClientRect();
+        const column = tokenLength(canvasElement, '--pad-x-md') + tokenLength(canvasElement, '--icon-md');
+        const check = async () => {
+            const rows = [...canvasElement.querySelectorAll('.plus-pattern-sidebar__tabs > li')];
+            const last = rows[rows.length - 1];
+            await expect(last, 'the last row is "Show N more" or "Show fewer"').toHaveClass('plus-pattern-sidebar__more');
+            for (const [index, li] of rows.entries()) {
+                const line = thread(li);
+                const box = li.getBoundingClientRect();
+                const surface = li.querySelector('.plus-sidebar-tab');
+                await expect(line.borderLeftColor, 'the border color').toBe(outline);
+                await expect(px(line.borderLeftWidth), 'a 1 stroke').toBeCloseTo(stroke, 1);
+                await expect(box.left + px(line.left), 'under the parent icon center').toBeCloseTo(parentIcon.left + parentIcon.width / 2, 0);
+                await expect(box.left, 'the row starts where the parent does').toBeCloseTo(parentRow.getBoundingClientRect().left, 0);
+                await expect(surface.getBoundingClientRect().left, 'the surface starts after the 28 thread column').toBeCloseTo(box.left + column, 0);
+                if (index === 0) {
+                    await expect(box.top + px(line.top), 'the thread hangs from the parent row, through the gap above the first tab')
+                        .toBeCloseTo(parentRow.getBoundingClientRect().bottom, 0);
+                    await expect(box.top - parentRow.getBoundingClientRect().bottom, 'the 4 gap above the first tab')
+                        .toBeCloseTo(tokenLength(canvasElement, '--stack-sm'), 0);
+                }
+                if (li === last) {
+                    await expect(box.top + px(line.top) + px(line.height), 'the elbow stops at the row middle').toBeCloseTo(box.top + box.height / 2, 0);
+                    await expect(px(line.borderBottomWidth), 'the elbow turns').toBeCloseTo(stroke, 1);
+                    await expect(px(line.borderBottomLeftRadius), 'radius 6').toBeCloseTo(tokenLength(canvasElement, '--radius-h24'), 0);
+                    await expect(box.left + px(line.left) + px(line.width), 'the stub stops short of a focused surface\'s ring')
+                        .toBeCloseTo(box.left + column - 2 * tokenLength(canvasElement, '--stroke-2'), 0);
+                } else {
+                    await expect(box.top + px(line.top) + px(line.height), 'runs through the gap to the next row').toBeCloseTo(rows[index + 1].getBoundingClientRect().top, 0);
+                    await expect(px(line.borderBottomWidth), 'no elbow mid-thread').toBe(0);
+                }
+                const label = li.querySelector('.plus-sidebar-tab__label');
+                await expect(label.getBoundingClientRect().left, 'the label lines up with the parent label').toBeCloseTo(parentLabel.left, 0);
+            }
+            const selected = canvasElement.querySelector('.plus-pattern-sidebar__tabs [aria-current="page"]');
+            if (selected) {
+                await expect(getComputedStyle(selected).backgroundColor, 'selected fills the surface, neutral')
+                    .toBe(tokenColor(canvasElement, '--ds-background-selected'));
+                await expect(getComputedStyle(selected).boxShadow, 'and draws no leading bar').toBe('none');
+                await expect(getComputedStyle(selected.querySelector('.plus-sidebar-tab__label')).fontWeight, 'its label takes the medium weight')
+                    .toBe(getComputedStyle(canvasElement).getPropertyValue('--type-weight-medium').trim());
+            }
+        };
+        await expect(canvas.getByRole('link', { name: 'Session 20' }), 'a selected tab').toHaveAttribute('aria-current', 'page');
+        await check();
+        await userEvent.click(canvas.getByRole('button', { name: 'Show 15 more' }));
+        await check();
+    },
+};
+
+/** Exactly five tabs: no "Show more" row. */
+export const FiveTabs = {
+    render: () => <OpenTabsHarness storeKey="story:five" seed={manySessions(5)} select="sessions" />,
+    play: async ({ canvasElement }) => {
+        await expect(tabRows(canvasElement)).toHaveLength(5);
+        await expect(within(canvasElement).queryByRole('button', { name: /^Show \d+ more$/ })).toBeNull();
+    },
+};
+
+const longTitle = (n) => `Lincoln Middle, Tuesday Zoom session with Ms. Okonkwo-Rivera, session ${n}`;
+
+/** Long titles end in an ellipsis; rows stay 32, and × still fits on hover. */
+export const LongTitles = {
+    render: () => (
+        <OpenTabsHarness
+            storeKey="story:long"
+            seed={[...manySessions(2, longTitle), ['sessions', { id: 'live', title: longTitle(3), status: 'live' }], studentRecord('long', 'Maximiliana Theodora Featherstonehaugh-Wintervale')]}
+            select="sessions:live"
+        />
+    ),
+    play: async ({ canvasElement }) => {
+        for (const row of tabRows(canvasElement)) {
+            const label = row.querySelector('.plus-sidebar-tab__label');
+            await expect(label.scrollWidth, 'clipped').toBeGreaterThan(label.clientWidth);
+            await expect(row.getBoundingClientRect().height).toBeCloseTo(tokenLength(canvasElement, '--item-height-md'), 0);
+        }
+        const row = within(canvasElement).getByRole('button', { name: /^Lincoln.*session 3/ });
+        row.focus();
+        const close = within(canvasElement).getByRole('button', { name: `Close ${longTitle(3)}` });
+        await waitFor(() => expect(getComputedStyle(close.parentElement).visibility).toBe('visible'));
+        const label = row.querySelector('.plus-sidebar-tab__label');
+        await expect(label.getBoundingClientRect().right, 'the label stops before ×').toBeLessThanOrEqual(close.getBoundingClientRect().left);
+    },
+};
+
+const PERSIST_KEY = 'story:persistence';
+
+const PersistenceDemo = () => {
+    const [load, setLoad] = useState(0);
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
+            <div><Button spacing="compact" text="Reload" onClick={() => setLoad((n) => n + 1)} /></div>
+            <OpenTabsHarness
+                key={load}
+                storeKey={PERSIST_KEY}
+                keepStored={load > 0}
+                records={[sessionRecord(1, 'Hogwarts · Tue, Sep 9', { status: 'live' }), studentRecord('kiera', 'Kiera Wintervale')]}
+            />
+        </div>
+    );
+};
+
+/**
+ * Tabs are session-scoped: they live in sessionStorage, so a new store over it
+ * (a reload) shows the same tabs and selection. `clearOpenTabs()`, for
+ * sign-out, empties the app's store and its stored copy.
+ */
+export const SessionPersistence = {
+    render: () => <PersistenceDemo />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await userEvent.click(canvas.getByRole('button', { name: 'Open Hogwarts · Tue, Sep 9' }));
+        await userEvent.click(canvas.getByRole('button', { name: 'Open Kiera Wintervale' }));
+        await expect(JSON.parse(sessionStorage.getItem(PERSIST_KEY)).tabs).toHaveLength(2);
+
+        const before = canvasElement.querySelector('.plus-pattern-sidebar');
+        await userEvent.click(canvas.getByRole('button', { name: 'Reload' }));
+        await waitFor(() => expect(canvasElement.querySelector('.plus-pattern-sidebar')).not.toBe(before));
+        await expect(tabTitles(canvasElement), 'remounted from storage').toEqual(['Hogwarts · Tue, Sep 9', 'Kiera Wintervale']);
+        await expect(canvas.getByRole('link', { name: 'Kiera Wintervale' })).toHaveAttribute('aria-current', 'page');
+        sessionStorage.removeItem(PERSIST_KEY);
+
+        // Sign-out, on the app's own store.
+        const app = getOpenTabsStore();
+        app.open('sessions', { id: 'probe', title: 'Probe' });
+        await expect(sessionStorage.getItem(OPEN_TABS_STORAGE_KEY)).not.toBeNull();
+        clearOpenTabs();
+        await expect(sessionStorage.getItem(OPEN_TABS_STORAGE_KEY)).toBeNull();
+        await expect(app.getSnapshot().tabs).toEqual([]);
+    },
+};
+
+/** Tab actions never change the URL or add history: each tab only links to its record. */
+export const UrlUnchanged = {
+    render: () => <OpenTabsHarness storeKey="story:url" seed={tutorExample} select="sessions" />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const href = window.location.href;
+        const length = window.history.length;
+        const tab = canvas.getByRole('link', { name: /^Hogwarts/ });
+        await expect(tab).toHaveAttribute('href', '/toolkit/sessions?session=s1');
+
+        await userEvent.click(tab);
+        await expect(tab).toHaveAttribute('aria-current', 'page');
+        await userEvent.click(canvas.getByRole('button', { name: 'Sessions tabs' }));
+        await userEvent.click(canvas.getByRole('button', { name: 'Sessions tabs' }));
+        canvas.getByRole('link', { name: 'Kiera Wintervale' }).focus(); // focus shows the hover actions, as hover does
+        await userEvent.click(canvas.getByRole('button', { name: 'Close Kiera Wintervale' }));
+        canvas.getByRole('button', { name: /^Sessions$/ }).focus(); // focus shows the hover actions, as hover does
+        await userEvent.click(canvas.getByRole('button', { name: 'Close all Sessions tabs' }));
+        await expect(tabRows(canvasElement)).toHaveLength(0);
+        await expect(window.location.href).toBe(href);
+        await expect(window.history.length).toBe(length);
+    },
+};
+
+/** Playground extremes: none, one, five, twenty and long titles, side by side. */
+export const OpenTabExtremes = {
+    render: () => (
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--section-stack-md)', alignItems: 'flex-start' }}>
+            <OpenTabsHarness label="Sidebar, 0 open" storeKey="story:extremes-0" />
+            <OpenTabsHarness label="Sidebar, 1 open" storeKey="story:extremes-1" seed={[sessionRecord(1, 'Hogwarts · Tue, Sep 9', { status: 'live' })]} select="sessions:s1" />
+            <OpenTabsHarness label="Sidebar, 5 open" storeKey="story:extremes-5" seed={manySessions(5)} select="sessions" />
+            <OpenTabsHarness label="Sidebar, 20 open" storeKey="story:extremes-20" seed={manySessions(20)} select="sessions" boxHeight="var(--size-5400)" />
+            <OpenTabsHarness label="Sidebar, long titles" storeKey="story:extremes-long" seed={manySessions(3, longTitle)} select="sessions:s3" />
+        </div>
+    ),
+};
+
+/** Collapsing the parent of the selected tab selects the parent, so the sidebar always shows a selection. */
+export const CollapsedKeepsSelection = {
+    render: () => <OpenTabsHarness storeKey="story:collapsed" seed={[sessionRecord(1, 'Hogwarts · Tue, Sep 9')]} select="sessions:s1" />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('button', { name: /^Sessions$/ })).not.toHaveAttribute('aria-current');
+        await userEvent.click(canvas.getByRole('button', { name: 'Sessions tabs' }));
+        await expect(canvas.getByRole('button', { name: /^Sessions$/ })).toHaveAttribute('aria-current', 'page');
+        await userEvent.click(canvas.getByRole('button', { name: 'Sessions tabs' }));
+        await expect(canvas.getByRole('link', { name: 'Hogwarts · Tue, Sep 9' })).toHaveAttribute('aria-current', 'page');
+    },
+};
+
+/** A selected tab older than the five most recent still shows, after them. */
+export const SelectedPastTheFive = {
+    render: () => <OpenTabsHarness storeKey="story:selected-old" seed={manySessions(7)} select="sessions:s1" />,
+    play: async ({ canvasElement }) => {
+        await expect(tabTitles(canvasElement)).toEqual(['Session 7', 'Session 6', 'Session 5', 'Session 4', 'Session 3', 'Session 1']);
+        await expect(within(canvasElement).getByRole('link', { name: 'Session 1' })).toHaveAttribute('aria-current', 'page');
+        await expect(within(canvasElement).getByRole('button', { name: 'Show 2 more' })).toBeInTheDocument();
+>>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
     },
 };

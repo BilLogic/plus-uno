@@ -173,7 +173,7 @@ ClickPicks.play = async ({ canvasElement }) => {
 /** Backspace in an empty entry removes the last tag, and says so. */
 export const BackspaceRemovesTheLastTag = () => (
     <div style={stack}>
-        <TagInput label="Topics" options={TOPICS} defaultTags={['Algebra', 'Geometry']} />
+        <TagInput label="Topics" options={TOPICS} defaultTags={['Session prep', 'Tutor coaching']} />
     </div>
 );
 
@@ -185,18 +185,18 @@ BackspaceRemovesTheLastTag.play = async ({ canvasElement }) => {
     await userEvent.type(input, 'a');
     await userEvent.keyboard('{Backspace}');
     // The first Backspace deleted the typed letter; the tags are untouched.
-    await expect(tagsIn(canvas, 'Topics').getByText('Geometry')).toBeInTheDocument();
+    await expect(tagsIn(canvas, 'Topics').getByText('Tutor coaching')).toBeInTheDocument();
 
     await userEvent.keyboard('{Backspace}');
-    await expect(tagsIn(canvas, 'Topics').queryByText('Geometry')).not.toBeInTheDocument();
-    await expect(tagsIn(canvas, 'Topics').getByText('Algebra')).toBeInTheDocument();
-    await waitFor(() => expect(announcer(canvasElement)).toHaveTextContent('Geometry removed'));
+    await expect(tagsIn(canvas, 'Topics').queryByText('Tutor coaching')).not.toBeInTheDocument();
+    await expect(tagsIn(canvas, 'Topics').getByText('Session prep')).toBeInTheDocument();
+    await waitFor(() => expect(announcer(canvasElement)).toHaveTextContent('Tutor coaching removed'));
 };
 
 /** Esc closes the list and clears only the typed text; the tags stay. */
 export const EscClearsOnlyTheText = () => (
     <div style={stack}>
-        <TagInput label="Topics" options={TOPICS} defaultTags={['Algebra']} />
+        <TagInput label="Topics" options={TOPICS} defaultTags={['Session prep']} />
     </div>
 );
 
@@ -211,7 +211,7 @@ EscClearsOnlyTheText.play = async ({ canvasElement }) => {
     await expect(input).toHaveValue('');
     await expect(input).toHaveAttribute('aria-expanded', 'false');
     await expect(body.queryByRole('listbox', { name: 'Topics options' })).not.toBeInTheDocument();
-    await expect(tagsIn(canvas, 'Topics').getByText('Algebra')).toBeInTheDocument();
+    await expect(tagsIn(canvas, 'Topics').getByText('Session prep')).toBeInTheDocument();
 };
 
 /** Pasting "a, b, c" makes three tags, trimmed, and an existing option is picked, not copied. */
@@ -279,7 +279,7 @@ export const MaxLength = {
 /** At the pick limit, Create hides and the list says why. */
 export const PickLimit = () => (
     <div style={stack}>
-        <TagInput label="Topics" options={TOPICS} maxTags={2} defaultTags={['Algebra', 'Geometry']} />
+        <TagInput label="Topics" options={TOPICS} maxTags={2} defaultTags={['Session prep', 'Tutor coaching']} />
     </div>
 );
 
@@ -297,7 +297,7 @@ PickLimit.play = async ({ canvasElement }) => {
     await expect(tagsIn(canvas, 'Topics').getAllByRole('listitem')).toHaveLength(2);
 };
 
-const MANY = ['Algebra', 'Geometry', 'Fractions', 'Decimals', 'Ratios', 'Statistics', 'Probability'];
+const MANY = ['Session prep', 'Tutor coaching', 'Reflections', 'Attendance', 'Training', 'Recordings', 'Compliance'];
 
 /** Without focus, tags past one line collapse into "+n". With focus, every tag shows. */
 export const CollapsesWithoutFocus = () => (
@@ -315,7 +315,7 @@ CollapsesWithoutFocus.play = async ({ canvasElement }) => {
     await userEvent.click(overflow);
     await expect(canvas.getByRole('combobox', { name: 'Topics' })).toHaveFocus();
     await waitFor(() => expect(within(list).queryByRole('button', { name: /more tag/ })).not.toBeInTheDocument());
-    await expect(within(list).getByText('Probability')).toBeVisible();
+    await expect(within(list).getByText('Compliance')).toBeVisible();
 };
 
 /**
@@ -401,7 +401,7 @@ export const TemporaryIdUntilConfirmed = {
 /** Read-only: the tags show on the read-only fill, with no × and no list. */
 export const ReadOnly = () => (
     <div style={stack}>
-        <TagInput label="Topics" options={TOPICS} defaultTags={['Algebra', 'Geometry']} readOnly />
+        <TagInput label="Topics" options={TOPICS} defaultTags={['Session prep', 'Tutor coaching']} readOnly />
     </div>
 );
 
@@ -417,7 +417,7 @@ ReadOnly.play = async ({ canvasElement }) => {
     await userEvent.click(input);
     await userEvent.keyboard('{Backspace}');
     await expect(body.queryByRole('listbox', { name: 'Topics options' })).not.toBeInTheDocument();
-    await expect(tagsIn(canvas, 'Topics').getByText('Geometry')).toBeInTheDocument();
+    await expect(tagsIn(canvas, 'Topics').getByText('Tutor coaching')).toBeInTheDocument();
 };
 
 /** Invalid: the danger border, and the message under the field names the problem. */
@@ -459,7 +459,7 @@ Invalid.play = async ({ canvasElement }) => {
 /** Disabled: every tag is disabled, with no × and no entry. */
 export const Disabled = () => (
     <div style={stack}>
-        <TagInput label="Topics" options={TOPICS} defaultTags={['Algebra', 'Geometry']} disabled />
+        <TagInput label="Topics" options={TOPICS} defaultTags={['Session prep', 'Tutor coaching']} disabled />
     </div>
 );
 
@@ -470,7 +470,7 @@ Disabled.play = async ({ canvasElement }) => {
 };
 
 const ControlledField = () => {
-    const [tags, setTags] = useState(['Algebra', 'Geometry']);
+    const [tags, setTags] = useState(['Session prep', 'Tutor coaching']);
     return <TagInput label="With onChange" options={TOPICS} tags={tags} onChange={setTags} />;
 };
 
@@ -478,15 +478,15 @@ const ControlledField = () => {
 export const Controlled = () => (
     <div style={stack}>
         <ControlledField />
-        <TagInput label="No handler" options={TOPICS} tags={['Algebra']} />
+        <TagInput label="No handler" options={TOPICS} tags={['Session prep']} />
     </div>
 );
 
 Controlled.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(tagsIn(canvas, 'No handler').queryAllByRole('button', { name: /^Remove/ })).toHaveLength(0);
-    await userEvent.click(tagsIn(canvas, 'With onChange').getByRole('button', { name: 'Remove Algebra' }));
-    await expect(tagsIn(canvas, 'With onChange').queryByText('Algebra')).not.toBeInTheDocument();
+    await userEvent.click(tagsIn(canvas, 'With onChange').getByRole('button', { name: 'Remove Session prep' }));
+    await expect(tagsIn(canvas, 'With onChange').queryByText('Session prep')).not.toBeInTheDocument();
 };
 
 /**

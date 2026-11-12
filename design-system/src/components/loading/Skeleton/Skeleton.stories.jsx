@@ -97,7 +97,7 @@ export const LabelPresets = () => (
         </span>
         <span style={pair}>
             <Skeleton preset="tag" data-testid="tag" />
-            <Tag text="Algebra" />
+            <Tag text="Lincoln Middle" />
         </span>
         <span style={pair}>
             <Skeleton preset="tag-person" data-testid="tag-person" />
@@ -108,7 +108,7 @@ export const LabelPresets = () => (
 LabelPresets.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const [status, statusLarge] = canvas.getAllByText('Completed').map(labelOf);
-    const tag = labelOf(canvas.getByText('Algebra'));
+    const tag = labelOf(canvas.getByText('Lincoln Middle'));
 
     const pairs = [
         ['status', status],
@@ -160,8 +160,8 @@ export const TagGroupPreset = () => (
     <div style={{ display: 'grid', gap: '16px' }}>
         <Skeleton preset="tag-group" data-testid="group" />
         <TagGroup>
-            <Tag text="Algebra" />
-            <Tag text="Geometry" />
+            <Tag text="Lincoln Middle" />
+            <Tag text="Roosevelt K-8" />
             <Tag text="Fractions" />
         </TagGroup>
     </div>
@@ -172,7 +172,7 @@ TagGroupPreset.play = async ({ canvasElement }) => {
     const shapes = [...group.children];
     await expect(shapes, 'three tag shapes').toHaveLength(3);
 
-    const realTags = ['Algebra', 'Geometry'].map((text) => labelOf(canvas.getByText(text)));
+    const realTags = ['Lincoln Middle', 'Roosevelt K-8'].map((text) => labelOf(canvas.getByText(text)));
     const tagBox = realTags[0];
 
     for (const shape of shapes) {
@@ -418,7 +418,7 @@ export const LoadingTable = () => {
                                 <>
                                     <span className="body-default" style={{ width }}>{name}</span>
                                     <StatusTag appearance="success">Active</StatusTag>
-                                    <Tag text="Algebra" />
+                                    <Tag text="Lincoln Middle" />
                                 </>
                             ) : (
                                 <>

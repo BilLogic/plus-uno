@@ -223,7 +223,7 @@ export const Behaviors = () => (
         <Tag color="blue" isSelected trailingMetric={12} data-testid="selected">Selected</Tag>
         <Tag color="blue" href="#tag" data-testid="link">Link</Tag>
         <Tag color="blue" href="#tag" isRemovable onAfterRemoveAction={() => {}} data-testid="split">Link with remove</Tag>
-        <Tag isRemovable color="blue" onAfterRemoveAction={() => {}} isLoading data-testid="saving">Algebra</Tag>
+        <Tag isRemovable color="blue" onAfterRemoveAction={() => {}} isLoading data-testid="saving">Lincoln Middle</Tag>
     </div>
 );
 
@@ -257,7 +257,7 @@ const avatarOf = (tag) => tag.querySelector('[aria-hidden="true"]');
  */
 export const Types = () => (
     <div style={row}>
-        <Tag color="blue" data-testid="plain">Algebra</Tag>
+        <Tag color="blue" data-testid="plain">Lincoln Middle</Tag>
         <Tag type="person" isRemovable onAfterRemoveAction={() => {}} data-testid="person">Rosa Chen</Tag>
         <Tag type="agent" color="purple" isRemovable onAfterRemoveAction={() => {}} data-testid="agent">Grading bot</Tag>
         <Tag type="team" isRemovable onAfterRemoveAction={() => {}} data-testid="team">Math team</Tag>
@@ -906,14 +906,14 @@ export const LinkWithRemove = {
                 }}
                 isRemovable onAfterRemoveAction={onRemoveSpy}
             >
-                Algebra
+                Lincoln Middle
             </Tag>
         </div>
     ),
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
-        const link = canvas.getByRole('link', { name: 'Algebra' });
-        const x = canvas.getByRole('button', { name: 'Remove Algebra' });
+        const link = canvas.getByRole('link', { name: 'Lincoln Middle' });
+        const x = canvas.getByRole('button', { name: 'Remove Lincoln Middle' });
 
         await expect(link.contains(x), 'the × is not nested in the link').toBe(false);
         await expect(x.closest('a'), 'nor inside any link').toBeNull();
@@ -1044,7 +1044,11 @@ export const Saving = {
             return (
                 <div style={row}>
                     <span data-testid="removable-wrap">
+<<<<<<< HEAD
                         <Tag isRemovable color="yellow" swatchBefore isLoading={saving} onAfterRemoveAction={onRemoveSpy} data-testid="removable">Geometry</Tag>
+=======
+                        <Tag isRemovable color="yellow" isLoading={saving} onAfterRemoveAction={onRemoveSpy} data-testid="removable">Roosevelt K-8</Tag>
+>>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
                     </span>
                     <Tag isSelected={false} color="yellow" isLoading={saving} onClick={onToggleSpy}>Statistics</Tag>
                     <Tag
@@ -1056,7 +1060,7 @@ export const Saving = {
                             onFollowSpy();
                         }}
                     >
-                        Calculus
+                        Riverside Academy
                     </Tag>
                     <Button onClick={() => setSaving((v) => !v)}>
                         {saving ? 'Done' : 'Save'}
@@ -1087,12 +1091,12 @@ export const Saving = {
         await userEvent.click(toggle);
         await expect(args.onToggleSpy).not.toHaveBeenCalled();
 
-        const link = canvas.getByRole('link', { name: 'Calculus' });
+        const link = canvas.getByRole('link', { name: 'Riverside Academy' });
         await expect(link).toHaveAttribute('aria-disabled', 'true');
         await userEvent.click(link);
         await expect(args.onFollowSpy, 'a saving link does not follow').not.toHaveBeenCalled();
 
-        await userEvent.click(canvas.getByRole('button', { name: 'Remove Geometry' }));
+        await userEvent.click(canvas.getByRole('button', { name: 'Remove Roosevelt K-8' }));
         await expect(args.onRemoveSpy, 'the × waits for the save').not.toHaveBeenCalled();
 
         const spinner = tag.querySelector('[aria-hidden="true"]');
@@ -1103,7 +1107,7 @@ export const Saving = {
 
         await userEvent.click(canvas.getByRole('button', { name: 'Done' }));
         await expect(status, 'and it goes quiet when the save lands').toHaveTextContent('');
-        await userEvent.click(canvas.getByRole('button', { name: 'Remove Geometry' }));
+        await userEvent.click(canvas.getByRole('button', { name: 'Remove Roosevelt K-8' }));
         await expect(args.onRemoveSpy).toHaveBeenCalledTimes(1);
     },
 };
@@ -1212,7 +1216,11 @@ export const OnImages = () => (
     <div style={thumbnail}>
         <div style={picture} aria-hidden="true" />
         <div style={onPicture}>
+<<<<<<< HEAD
             <Tag color="blue" swatchBefore isElevated data-testid="read-only">Algebra</Tag>
+=======
+            <Tag color="blue" isElevated data-testid="read-only">Lincoln Middle</Tag>
+>>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
             <Tag color="green" isElevated>Advocacy</Tag>
             <Tag color="gray" href="#video" isElevated>Video</Tag>
             <Tag type="person" color="blue" isElevated data-testid="person">Rosa Chen</Tag>
@@ -1530,7 +1538,7 @@ export const ElevatedOnlyReadOnlyAndLink = {
                 {mounted && (
                     <>
                         <Tag isRemovable color="purple" isElevated onAfterRemoveAction={() => {}} data-testid="removable">
-                            Geometry
+                            Roosevelt K-8
                         </Tag>
                         <Tag isSelected={false} color="purple" isElevated>Fractions</Tag>
                     </>
@@ -1569,7 +1577,7 @@ export const ElevatedOnlyReadOnlyAndLink = {
  * list of options.
  */
 export const AnswerChips = () => {
-    const options = ['Fractions', 'Ratios', 'Geometry', 'Statistics'];
+    const options = ['Fractions', 'Ratios', 'Roosevelt K-8', 'Statistics'];
     const [chosen, setChosen] = useState(['Ratios']);
     const toggle = (name) => setChosen((now) => (now.includes(name) ? now.filter((n) => n !== name) : [...now, name]));
     return (

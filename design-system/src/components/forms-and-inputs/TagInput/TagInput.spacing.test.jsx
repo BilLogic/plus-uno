@@ -2,7 +2,7 @@ import { render } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import TagInput from './TagInput';
 
-const OPTIONS = [{ id: 'a', label: 'Algebra' }];
+const OPTIONS = [{ id: 'a', label: 'Session prep' }];
 
 describe('TagInput spacing', () => {
     it('draws the compact field for spacing="compact"', () => {

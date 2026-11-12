@@ -112,8 +112,8 @@ const MiniSection = ({ title, gap, cardGap }) => (
     <div style={col(gap)}>
         <span style={{ font: 'var(--heading-small)', color: 'var(--ds-text)' }}>{title}</span>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: cardGap }}>
-            <PatternCard title="Algebra" description="4 students" />
-            <PatternCard title="Geometry" description="6 students" />
+            <PatternCard title="Lincoln Middle" description="4 students" />
+            <PatternCard title="Roosevelt K-8" description="6 students" />
         </div>
     </div>
 );
@@ -197,13 +197,13 @@ export const NeverHandSpace = () => (
         <Do caption={<>The gap looked tight, so it steps up a tier: <C>--section-stack-lg</C> (24).</>}>
             <div style={col('var(--section-stack-lg)')}>
                 <span style={{ font: 'var(--heading-small)', color: 'var(--ds-text)' }}>Upcoming</span>
-                <PatternCard title="Algebra with Maya" description="Tuesday, 11:00 am" />
+                <PatternCard title="Lincoln Middle with Maya" description="Tuesday, 11:00 am" />
             </div>
         </Do>
         <Dont caption="6 added under a 16 gap because it looked tight. The extra space is invisible in the tokens and nobody can repeat it.">
             <div style={col('var(--section-stack-md)')}>
                 <span style={{ font: 'var(--heading-small)', color: 'var(--ds-text)', paddingBottom: 'var(--space-0375)' }}>Upcoming</span>
-                <PatternCard title="Algebra with Maya" description="Tuesday, 11:00 am" />
+                <PatternCard title="Lincoln Middle with Maya" description="Tuesday, 11:00 am" />
             </div>
         </Dont>
     </DoDont>

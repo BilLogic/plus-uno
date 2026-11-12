@@ -90,14 +90,14 @@ Overview.play = async ({ canvasElement }) => {
 export const CustomLabel = () => (
     <div style={row}>
         <SmartTag subject="mastering-content" data-testid="default" />
-        <SmartTag subject="mastering-content" text="Algebra II" data-testid="text" />
+        <SmartTag subject="mastering-content" text="Mastering fractions" data-testid="text" />
         <SmartTag subject="advocacy" data-testid="children">Self-advocacy</SmartTag>
     </div>
 );
 CustomLabel.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await expect(canvas.getByTestId('default')).toHaveTextContent('Mastering content');
-    await expect(canvas.getByTestId('text')).toHaveTextContent('Algebra II');
+    await expect(canvas.getByTestId('text')).toHaveTextContent('Mastering fractions');
     await expect(canvas.getByTestId('children')).toHaveTextContent('Self-advocacy');
 };
 

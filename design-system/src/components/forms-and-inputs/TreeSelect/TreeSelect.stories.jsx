@@ -63,40 +63,40 @@ export default {
 
 const sampleOptions = [
     {
-        label: 'Mathematics',
-        value: 'mathematics',
+        label: 'Middle schools',
+        value: 'middle-schools',
         children: [
             {
-                label: 'Algebra',
-                value: 'algebra',
+                label: 'Lincoln Middle',
+                value: 'lincoln-middle',
                 children: [
-                    { label: 'Linear equations', value: 'linear-equations' },
-                    { label: 'Quadratic equations', value: 'quadratic-equations' },
+                    { label: 'Tuesday 4:00 PM', value: 'lincoln-tue' },
+                    { label: 'Thursday 4:00 PM', value: 'lincoln-thu' },
                 ],
             },
             {
-                label: 'Geometry',
-                value: 'geometry',
+                label: 'Roosevelt K-8',
+                value: 'roosevelt-k8',
                 children: [
-                    { label: 'Triangles', value: 'triangles' },
-                    { label: 'Circles', value: 'circles' },
+                    { label: 'Monday 3:30 PM', value: 'roosevelt-mon' },
+                    { label: 'Wednesday 3:30 PM', value: 'roosevelt-wed' },
                 ],
             },
         ],
     },
     {
-        label: 'Science',
-        value: 'science',
+        label: 'High schools',
+        value: 'high-schools',
         children: [
             {
-                label: 'Biology',
-                value: 'biology',
+                label: 'North High',
+                value: 'north-high',
                 children: [
-                    { label: 'Cells', value: 'cells' },
-                    { label: 'Genetics', value: 'genetics' },
+                    { label: 'Friday 3:30 PM', value: 'north-fri-early' },
+                    { label: 'Friday 4:15 PM', value: 'north-fri-late' },
                 ],
             },
-            { label: 'Chemistry', value: 'chemistry' },
+            { label: 'South High', value: 'south-high' },
         ],
     },
 ];
@@ -119,7 +119,13 @@ export const Overview = () => {
     );
 };
 
+<<<<<<< HEAD
 const fieldWrap = { maxWidth: 'var(--width-2500)' };
+=======
+export const Content = () => {
+    const [single, setSingle] = useState('');
+    const [multi, setMulti] = useState(['roosevelt-mon', 'roosevelt-wed', 'roosevelt-k8']);
+>>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
 
 /** Single select: clicking any node selects it and closes the panel. */
 export const SingleSelect = () => {
@@ -155,13 +161,13 @@ export const SpacingCompact = () => (
 
 export const Interactive = (args) => {
     const presetValue = args.contentPreset === 'preselected'
-        ? (args.isMulti ? ['triangles', 'circles', 'geometry'] : 'triangles')
+        ? (args.isMulti ? ['roosevelt-mon', 'roosevelt-wed', 'roosevelt-k8'] : 'roosevelt-mon')
         : (args.isMulti ? [] : '');
     const [value, setValue] = useState(presetValue);
 
     useEffect(() => {
         setValue(args.contentPreset === 'preselected'
-            ? (args.isMulti ? ['triangles', 'circles', 'geometry'] : 'triangles')
+            ? (args.isMulti ? ['roosevelt-mon', 'roosevelt-wed', 'roosevelt-k8'] : 'roosevelt-mon')
             : (args.isMulti ? [] : ''));
     }, [args.contentPreset, args.isMulti]);
 

@@ -42,7 +42,7 @@ export const Metric = {
     render: () => (
         <div style={row}>
             <FilterButton text="Assignee" trailingMetric={0} />
-            <FilterButton text="Subject" trailingMetric={3} />
+            <FilterButton text="Site" trailingMetric={3} />
             <FilterButton text="Grade" trailingMetric="99+" />
             <FilterButton text="Sort" hasChevronDown={false} />
         </div>

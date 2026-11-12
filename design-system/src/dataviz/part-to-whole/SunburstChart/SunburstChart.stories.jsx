@@ -41,7 +41,7 @@ A sunburst chart displays **hierarchical data as nested rings**, radiating from 
 
 | Scenario | Example |
 |----------|---------|
-| **Curriculum Structure** | Subject → Unit → Lesson |
+| **Session Structure** | University → Site → Session |
 | **Competency Framework** | Domain → Skill → Indicator |
 | **Time Breakdown** | Category → Subcategory → Activity |
 | **Content Organization** | Library → Section → Resource |
@@ -70,21 +70,21 @@ A sunburst chart displays **hierarchical data as nested rings**, radiating from 
     }
 };
 
-const curriculumData = {
+const sessionData = {
     data: [
-        { id: '0', parent: '', name: 'Curriculum' },
-        { id: '1', parent: '0', name: 'Math' },
-        { id: '2', parent: '0', name: 'Science' },
-        { id: '3', parent: '0', name: 'Language' },
-        { id: '1.1', parent: '1', name: 'Algebra', value: 10 },
-        { id: '1.2', parent: '1', name: 'Geometry', value: 8 },
-        { id: '1.3', parent: '1', name: 'Calculus', value: 6 },
-        { id: '2.1', parent: '2', name: 'Physics', value: 9 },
-        { id: '2.2', parent: '2', name: 'Chemistry', value: 7 },
-        { id: '2.3', parent: '2', name: 'Biology', value: 8 },
-        { id: '3.1', parent: '3', name: 'Grammar', value: 5 },
-        { id: '3.2', parent: '3', name: 'Literature', value: 7 },
-        { id: '3.3', parent: '3', name: 'Writing', value: 6 }
+        { id: '0', parent: '', name: 'Sessions' },
+        { id: '1', parent: '0', name: 'CMU' },
+        { id: '2', parent: '0', name: 'Pitt' },
+        { id: '3', parent: '0', name: 'Duquesne' },
+        { id: '1.1', parent: '1', name: 'Lincoln Middle', value: 10 },
+        { id: '1.2', parent: '1', name: 'Roosevelt K-8', value: 8 },
+        { id: '1.3', parent: '1', name: 'Riverside Academy', value: 6 },
+        { id: '2.1', parent: '2', name: 'North High', value: 9 },
+        { id: '2.2', parent: '2', name: 'South High', value: 7 },
+        { id: '2.3', parent: '2', name: 'Oakwood', value: 8 },
+        { id: '3.1', parent: '3', name: 'Jefferson Elementary', value: 5 },
+        { id: '3.2', parent: '3', name: 'Washington Middle', value: 7 },
+        { id: '3.3', parent: '3', name: 'Eastside', value: 6 }
     ]
 };
 
@@ -94,11 +94,11 @@ const curriculumData = {
 export const Overview = () => (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '48px' }}>
         <section>
-            <h3 style={{ marginBottom: '16px' }}>Curriculum Structure</h3>
+            <h3 style={{ marginBottom: '16px' }}>Session Structure</h3>
             <p style={{ marginBottom: '16px', color: 'var(--ds-text-subtle)' }}>
                 Click to drill down into subcategories.
             </p>
-            <SunburstChart {...curriculumData} />
+            <SunburstChart {...sessionData} />
         </section>
     </div>
 );

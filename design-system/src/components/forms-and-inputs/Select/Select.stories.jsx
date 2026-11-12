@@ -414,9 +414,9 @@ export const Interactive = {
 };
 
 const COLOR_OPTIONS = [
-    { value: 'algebra', label: 'Algebra' },
-    { value: 'biology', label: 'Biology' },
-    { value: 'chemistry', label: 'Chemistry' },
+    { value: 'lincoln-middle', label: 'Lincoln Middle' },
+    { value: 'north-high', label: 'North High' },
+    { value: 'south-high', label: 'South High' },
 ];
 
 /**
@@ -428,15 +428,15 @@ export const Colors = {
     parameters: { docs: { disable: true } },
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '320px' }}>
-            <Select label="Subject" options={COLOR_OPTIONS} placeholder="Pick a subject" />
-            <Select label="Subjects" isMulti selectAll options={COLOR_OPTIONS} defaultValue={['algebra']} />
+            <Select label="Site" options={COLOR_OPTIONS} placeholder="Pick a site" />
+            <Select label="Sites" isMulti selectAll options={COLOR_OPTIONS} defaultValue={['lincoln-middle']} />
         </div>
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const subject = canvas.getByRole('combobox', { name: 'Subject' });
         const caret = canvasElement.querySelector('.plus-select-caret');
-        await userEvent.click(canvas.getByRole('combobox', { name: 'Subjects' }));
+        await userEvent.click(canvas.getByRole('combobox', { name: 'Sites' }));
         const all = await waitFor(() => {
             const el = document.querySelector('.plus-select-all');
             if (!el) throw new Error('the list has not opened');

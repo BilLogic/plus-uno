@@ -225,7 +225,7 @@ Backdrop.play = async ({ canvasElement }) => {
     await expect(getComputedStyle(dialog).zIndex).toBe('510');
 };
 
-const OPTIONS = ['Algebra', 'Geometry', 'Statistics', 'Calculus'].map((label) => ({ value: label.toLowerCase(), label }));
+const OPTIONS = ['Lincoln Middle', 'Roosevelt K-8', 'North High', 'South High'].map((label) => ({ value: label.toLowerCase(), label }));
 
 export const MenuInsideModal = () => (
     <Modal show title="Pick a subject" showBottomButtons={false} onClose={() => {}}>

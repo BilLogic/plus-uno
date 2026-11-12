@@ -96,7 +96,7 @@ export const NameWithoutId = () => (
         <DateTimePicker name="starts" label="Session start" />
         <RadioGroup name="confidence" legend="Confidence" orientation="inline" options={scaleOptions} />
         <Rating name="overall" label="Overall rating" value={3} />
-        <TagInput name="topics" label="Topics" options={['Algebra', 'Geometry']} tags={['Algebra', 'Geometry']} />
+        <TagInput name="topics" label="Topics" options={['Session prep', 'Tutor coaching']} tags={['Session prep', 'Tutor coaching']} />
     </div>
 );
 
@@ -313,7 +313,7 @@ export const ExplicitIds = () => (
         <DateTimePicker id="la-starts" name="starts" label="Session start" />
         <RadioGroup id="la-confidence" name="confidence" legend="Confidence" orientation="inline" options={scaleOptions} />
         <Rating id="la-overall" name="overall" label="Overall rating" value={3} />
-        <TagInput id="la-topics" name="topics" label="Topics" options={['Algebra']} tags={['Algebra']} />
+        <TagInput id="la-topics" name="topics" label="Topics" options={['Session prep']} tags={['Session prep']} />
         <Radio id="la-cadence" name="cadence" label="Every session" value="every"/>
         <RadioGroup id="la-reminder" name="reminder" legend="Reminder" options={reminderOptions} />
     </div>

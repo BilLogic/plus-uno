@@ -356,16 +356,16 @@ export const CollapsedTagsShowPlusN = () => (
         <Button>Before</Button>
         <Select
             id="scommit-collapse"
-            label="Subjects"
+            label="Sites"
             isMulti
             options={[
-                { value: 'alg', label: 'Algebra' },
-                { value: 'bio', label: 'Biology' },
-                { value: 'chem', label: 'Chemistry' },
-                { value: 'econ', label: 'Economics' },
-                { value: 'geo', label: 'Geometry' },
+                { value: 'lincoln', label: 'Lincoln Middle' },
+                { value: 'north', label: 'North High' },
+                { value: 'south', label: 'South High' },
+                { value: 'riverside', label: 'Riverside Academy' },
+                { value: 'roosevelt', label: 'Roosevelt K-8' },
             ]}
-            defaultValue={['alg', 'bio', 'chem', 'econ', 'geo']}
+            defaultValue={['lincoln', 'north', 'south', 'riverside', 'roosevelt']}
         />
     </div>
 );
@@ -374,7 +374,7 @@ CollapsedTagsShowPlusN.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     await waitFor(() => expect(canvas.getByRole('button', { name: /^\+\d+ more tags$/ })).toBeInTheDocument());
 
-    await userEvent.click(canvas.getByRole('combobox', { name: 'Subjects' }));
+    await userEvent.click(canvas.getByRole('combobox', { name: 'Sites' }));
     await waitFor(() => expect(canvas.queryByRole('button', { name: /more tags$/ })).toBeNull());
     await userEvent.keyboard('{Escape}');
     await userEvent.click(canvas.getByRole('button', { name: 'Before' }));
@@ -550,7 +550,7 @@ LongListSearchFirst.play = async ({ canvasElement }) => {
  */
 export const ClearableDefaults = () => (
     <div style={stack}>
-        <Select id="sclear-multi" label="Subjects" isMulti options={schools} defaultValue={['north']} />
+        <Select id="sclear-multi" label="Sites" isMulti options={schools} defaultValue={['north']} />
         <Select id="sclear-single" label="School" options={schools} defaultValue="north" />
         <Select id="sclear-required" label="Home school" options={schools} defaultValue="north" isRequired />
         <Select id="sclear-sort" label="Sort" options={schools} defaultValue="north" clearable={false} />
@@ -560,7 +560,7 @@ export const ClearableDefaults = () => (
 ClearableDefaults.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
 
-    await expect(canvas.queryByRole('button', { name: 'Clear Subjects' })).not.toBeNull();
+    await expect(canvas.queryByRole('button', { name: 'Clear Sites' })).not.toBeNull();
     await expect(canvas.queryByRole('button', { name: 'Clear School' })).not.toBeNull();
     await expect(canvas.queryByRole('button', { name: 'Clear Home school' })).toBeNull();
     await expect(canvas.queryByRole('button', { name: 'Clear Sort' })).toBeNull();

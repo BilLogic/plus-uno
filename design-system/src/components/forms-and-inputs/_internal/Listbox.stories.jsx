@@ -32,8 +32,13 @@ export default {
     },
 };
 
+<<<<<<< HEAD
 const SUBJECTS = ['Algebra', 'Biology', 'Chemistry', 'Economics', 'Geometry', 'History', 'Physics'];
 const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', maxWidth: '360px' };
+=======
+const SITES = ['Lincoln Middle', 'North High', 'Riverside Academy', 'Roosevelt K-8', 'South High', 'Jefferson Elementary', 'Washington Middle'];
+const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--size-section-gap-md)', maxWidth: '360px' };
+>>>>>>> f7a15101e (docs(ds): replace subject-based example content with real PLUS sites, platforms and universities)
 
 /**
  * A field with its list: focus stays in the input, which points at the
@@ -42,7 +47,7 @@ const stack = { display: 'flex', flexDirection: 'column', gap: 'var(--section-st
  * @param {object} props
  * @returns {JSX.Element}
  */
-const ComboboxDemo = ({ label = 'Subject', options = SUBJECTS, mode = 'single', creatable = false, fieldStyle }) => {
+const ComboboxDemo = ({ label = 'Site', options = SITES, mode = 'single', creatable = false, fieldStyle }) => {
     const inputRef = useRef(null);
     const anchorRef = useRef(null);
     const listRef = useRef(null);
@@ -102,7 +107,7 @@ export const ArrowKeysHomeAndEnd = () => {
     const [value, setValue] = useState(null);
     return (
         <div style={stack}>
-            <Listbox aria-label="Subject" options={SUBJECTS} value={value} onChange={setValue} />
+            <Listbox aria-label="Site" options={SITES} value={value} onChange={setValue} />
             <p data-testid="value">{value ?? 'none'}</p>
         </div>
     );
@@ -110,7 +115,7 @@ export const ArrowKeysHomeAndEnd = () => {
 
 ArrowKeysHomeAndEnd.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
-    const listbox = canvas.getByRole('listbox', { name: 'Subject' });
+    const listbox = canvas.getByRole('listbox', { name: 'Site' });
     const options = within(listbox).getAllByRole('option');
     const active = () => listbox.getAttribute('aria-activedescendant');
 
@@ -260,27 +265,27 @@ export const TypingFiltersAndEscClearsTheFilter = () => <ComboboxDemo />;
 TypingFiltersAndEscClearsTheFilter.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const body = within(canvasElement.ownerDocument.body);
-    const input = canvas.getByRole('combobox', { name: 'Subject' });
+    const input = canvas.getByRole('combobox', { name: 'Site' });
 
     await userEvent.click(input);
-    const listbox = await body.findByRole('listbox', { name: 'Subject options' });
+    const listbox = await body.findByRole('listbox', { name: 'Site options' });
     await expect(input).toHaveAttribute('aria-activedescendant', within(listbox).getAllByRole('option')[0].id);
 
     // Pick one first, so Esc can be seen to leave it alone.
     await userEvent.keyboard('{ArrowDown}{Enter}');
-    await expect(canvas.getByTestId('value').textContent).toBe('Biology');
+    await expect(canvas.getByTestId('value').textContent).toBe('North High');
 
     await userEvent.click(input);
-    await userEvent.type(input, 'ry');
-    const filtered = await body.findByRole('listbox', { name: 'Subject options' });
+    await userEvent.type(input, 'id');
+    const filtered = await body.findByRole('listbox', { name: 'Site options' });
     await waitFor(() => expect(within(filtered).getAllByRole('option').map((o) => o.textContent))
-        .toEqual(['Chemistry', 'Geometry', 'History']));
+        .toEqual(['Lincoln Middle', 'Riverside Academy', 'Washington Middle']));
     await waitFor(() => expect(body.getByRole('status')).toHaveTextContent('3 results'));
 
     await userEvent.keyboard('{Escape}');
-    await waitFor(() => expect(body.queryByRole('listbox', { name: 'Subject options' })).toBeNull());
+    await waitFor(() => expect(body.queryByRole('listbox', { name: 'Site options' })).toBeNull());
     await expect(input).toHaveValue('');
-    await expect(canvas.getByTestId('value').textContent).toBe('Biology');
+    await expect(canvas.getByTestId('value').textContent).toBe('North High');
     await expect(document.activeElement).toBe(input);
 };
 
@@ -318,7 +323,7 @@ export const InsideAModal = () => {
     const [show, setShow] = useState(true);
     return (
         <Modal show={show} onClose={() => setShow(false)} title="Add a student" showBottomButtons={false} width={360}>
-            <ComboboxDemo label="School" options={SUBJECTS} />
+            <ComboboxDemo label="School" options={SITES} />
         </Modal>
     );
 };
@@ -352,7 +357,7 @@ InsideAModal.play = async ({ canvasElement }) => {
 
 /** Without room below the field, the list opens above it. */
 export const FlipsAboveWithoutRoom = () => (
-    <ComboboxDemo label="Grade" options={SUBJECTS} fieldStyle={{ position: 'fixed', left: 16, right: 16, bottom: 8, maxWidth: 360 }} />
+    <ComboboxDemo label="Grade" options={SITES} fieldStyle={{ position: 'fixed', left: 16, right: 16, bottom: 8, maxWidth: 360 }} />
 );
 
 FlipsAboveWithoutRoom.play = async ({ canvasElement }) => {
@@ -408,11 +413,11 @@ export const Colors = () => (
     <div style={stack}>
         <Listbox
             aria-label="Topic"
-            options={[{ value: 'a', label: 'Algebra' }, { value: 'b', label: 'Biology' }]}
+            options={[{ value: 'a', label: 'Lincoln Middle' }, { value: 'b', label: 'North High' }]}
             value="a"
             header={(
                 <div className="plus-tag-input__rename">
-                    <TextField label="Name" isLabelHidden spacing="compact" defaultValue="Algebra" />
+                    <TextField label="Name" isLabelHidden spacing="compact" defaultValue="Lincoln Middle" />
                 </div>
             )}
         />

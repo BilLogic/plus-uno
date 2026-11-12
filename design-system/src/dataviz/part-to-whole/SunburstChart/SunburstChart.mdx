@@ -73,12 +73,12 @@ leaves; a parent's size is the sum of its children.
 <SunburstChart
     data={[
         { id: 'all', parent: '', name: 'Session hours' },
-        { id: 'math', parent: 'all', name: 'Math' },
-        { id: 'reading', parent: 'all', name: 'Reading' },
-        { id: 'fractions', parent: 'math', name: 'Fractions', value: 120 },
-        { id: 'algebra', parent: 'math', name: 'Algebra', value: 90 },
-        { id: 'fluency', parent: 'reading', name: 'Fluency', value: 70 },
-        { id: 'comprehension', parent: 'reading', name: 'Comprehension', value: 110 },
+        { id: 'zoom', parent: 'all', name: 'Zoom' },
+        { id: 'pencil', parent: 'all', name: 'Pencil Spaces' },
+        { id: 'lincoln', parent: 'zoom', name: 'Lincoln Middle', value: 120 },
+        { id: 'roosevelt', parent: 'zoom', name: 'Roosevelt K-8', value: 90 },
+        { id: 'north', parent: 'pencil', name: 'North High', value: 70 },
+        { id: 'south', parent: 'pencil', name: 'South High', value: 110 },
     ]}
 />
 ```
