@@ -102,6 +102,7 @@
     "check:color-system": "node scripts/check-color-system.mjs",
     "check:color-tokens": "node scripts/generate-color-tokens.mjs --check",
     "check:design-tokens": "node scripts/generate-design-tokens.mjs --check",
+    "check:sound-registry": "node scripts/check-sound-registry.mjs",
     "check:sound-spec": "node scripts/generate-sound-spec.mjs --check",
     "check:ds-usage": "node scripts/check-ds-usage.mjs",
     "check:no-primitive-reads": "node scripts/check-no-primitive-reads.mjs",
