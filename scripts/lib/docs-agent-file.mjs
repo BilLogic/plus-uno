@@ -87,7 +87,7 @@ export function renderDocsAgentFile(source, { file, kind, root, top }) {
   if (page.rules.length) {
     d += `## Best practices\n\n`;
     // What the section says before its first rule: a pointer to the pattern that owns the rules.
-    const lead = best?.text?.split(/\n#{3} /)[0]?.trim();
+    const lead = best?.text?.split(/(?:^|\n)#{3} /)[0]?.trim();
     if (lead) d += `${lead}\n\n`;
     for (const r of page.rules) {
       d += `### ${r.sentence} {#${r.id}}\n\n**Checked:** ${label(tags[r.id] ?? 'review')}\n\n${r.text ? `${r.text}\n\n` : ''}`;

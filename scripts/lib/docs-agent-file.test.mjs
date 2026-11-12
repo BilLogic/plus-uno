@@ -106,3 +106,10 @@ test('a page titled by a <Title> block keeps its name, and the pointer that open
   assert.match(text, /^# Disabled$/m);
   assert.match(text, /## Best practices\n\nThe rules live in Patterns, Forms\.\n\n### Give every/);
 });
+
+test('a Best practices section that opens straight on its first rule prints that rule once, with its id', () => {
+  const text = renderDocsAgentFile(PAGE, { file: PAGE_PATH, kind: 'Pattern' });
+  const best = text.slice(text.indexOf('## Best practices'));
+  assert.equal(best.match(/### Give every disabled control a reason in visible text\./g).length, 1);
+  assert.match(best, /^## Best practices\n\n### Give every disabled control/);
+});

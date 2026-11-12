@@ -120,6 +120,11 @@ describe('which docs pages are tabbed', () => {
     expect(isTabbedDocsPage('./design-system/src/patterns/PageTemplates/PageTemplates.mdx')).toBe(true);
   });
 
+  it('tabs a docs-only pattern page in its own folder under storybook-docs/patterns', () => {
+    expect(isTabbedDocsPage('design-system/src/storybook-docs/patterns/Filtering/Filtering.mdx')).toBe(true);
+    expect(isTabbedDocsPage('design-system/src/storybook-docs/patterns/PatternsOverview.mdx')).toBe(false);
+  });
+
   it('leaves the flat pattern reading pages and the foundations untabbed', () => {
     expect(isTabbedDocsPage('design-system/src/patterns/Introduction.mdx')).toBe(false);
     expect(isTabbedDocsPage('design-system/src/patterns/HeadingOutline.mdx')).toBe(false);
@@ -162,7 +167,7 @@ const read = (repoPath) => fs.readFileSync(path.join(REPO_ROOT, repoPath), 'utf8
  */
 function rawGlob(repoPaths) {
   return Object.fromEntries(
-    repoPaths.map((p) => [p.replace(/^design-system\/src\//, '../'), read(p)]),
+    repoPaths.map((p) => [p.replace(/^design-system\/src\//, '../').replace(/^design-system\//, '../../'), read(p)]),
   );
 }
 
@@ -170,7 +175,8 @@ describe('the Agent view tab', () => {
   const MODAL = 'design-system/src/components/messaging/Modal/index.md';
   const FIELDSET = 'design-system/src/components/forms-and-inputs/Fieldset.md';
   const PATTERN = 'design-system/src/patterns/PatternModal/index.md';
-  const modules = rawGlob([MODAL, FIELDSET, PATTERN]);
+  const PATTERN_PAGE = 'design-system/agent-views/pages/patterns/Filtering.md';
+  const modules = rawGlob([MODAL, FIELDSET, PATTERN, PATTERN_PAGE]);
 
   it('shows exactly the generated file for a nested component', () => {
     const entry = agentViewEntry(modules, {
@@ -196,6 +202,15 @@ describe('the Agent view tab', () => {
     });
     expect(entry).toMatchObject({ path: PATTERN, name: 'PatternModal' });
     expect(entry.value).toBe(read(PATTERN));
+  });
+
+  it('shows the generated agent file for a docs-only pattern page', () => {
+    const entry = agentViewEntry(modules, {
+      importPath: './design-system/src/storybook-docs/patterns/Filtering/Filtering.stories.jsx',
+    });
+    expect(entry).toMatchObject({ path: PATTERN_PAGE, name: 'Filtering' });
+    expect(entry.value).toBe(read(PATTERN_PAGE));
+    expect(repoPathOfGlobKey('../../agent-views/pages/patterns/Filtering.md')).toBe(PATTERN_PAGE);
   });
 
   it('is absent for a pattern page with no generated file beside it', () => {
