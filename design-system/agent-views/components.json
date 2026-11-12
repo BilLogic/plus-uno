@@ -9192,10 +9192,19 @@
         {
           "name": "trigger",
           "type": "node",
-          "required": true,
+          "required": false,
           "default": null,
           "values": null,
           "description": "The element that triggers the popup. A plain string becomes a real `button`.",
+          "deprecated": null
+        },
+        {
+          "name": "anchor",
+          "type": "object or func",
+          "required": false,
+          "default": null,
+          "values": null,
+          "description": "A ref or element the popup points at when there is no `trigger`: a control that is not itself the popup's opener, such as a toggle whose press opens a follow-up. Drive it with `show`.",
           "deprecated": null
         },
         {

@@ -29,7 +29,7 @@ export const Overview = {
         await expect(canvas.getByRole('group', { name: 'Rate this answer' })).toBeTruthy();
         await userEvent.click(canvas.getByRole('button', { name: 'Good answer' }));
         await expect(args.onFeedback).toHaveBeenCalledWith({ rating: 'up' });
-        await expect(canvas.getByRole('button', { name: 'Good answer' })).toHaveAccessibleDescription('Selected');
+        await expect(canvas.getByRole('button', { name: 'Good answer' })).toHaveAttribute('aria-pressed', 'true');
     },
 };
 

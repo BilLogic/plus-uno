@@ -159,7 +159,8 @@ Same group: `Tooltip`
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `trigger` | node (required) | — | The element that triggers the popup. A plain string becomes a real `button`. |
+| `trigger` | node | — | The element that triggers the popup. A plain string becomes a real `button`. |
+| `anchor` | object or func | — | A ref or element the popup points at when there is no `trigger`: a control that is not itself the popup's opener, such as a toggle whose press opens a follow-up. Drive it with `show`. |
 | `children` | node (required) | — | The popup's body content. |
 | `title` | node | — | Popup title |
 | `label` | string | — | Names the popup for assistive tech when there is no `title`. Falls back to the trigger's own accessible text when neither is given. |

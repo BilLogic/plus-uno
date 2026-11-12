@@ -1,10 +1,9 @@
-import React, { useId, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import IconButton from '@/components/forms-and-inputs/IconButton';
 import Button from '@/components/forms-and-inputs/Button';
 import TextArea from '@/components/forms-and-inputs/TextArea';
 import Popup from '@/components/overlays-and-layering/Popup';
-import VisuallyHidden from '@/components/text-and-data-display/VisuallyHidden';
 import Icon from '../../images-and-icons/Icon';
 import './AiMessage.scss';
 
@@ -16,9 +15,9 @@ const thumb = (direction, selected) => (
  * Thumbs up and down on an AI answer. Two buttons, at most one chosen: a press reports `{ rating }` through `onFeedback`, a second press
  * on the same thumb clears it (`rating: null`). Thumbs down also opens a
  * popup for an optional comment, sent as `{ rating: 'down', comment }`.
- * Thumbs down is a popup trigger, so it reports `aria-expanded` and never
- * `aria-pressed`; neither thumb does, so the two read alike. The chosen thumb
- * is drawn selected and described as "Selected" to a screen reader.
+ * Both thumbs are plain toggle buttons and report `aria-pressed`, true on the
+ * chosen one. Thumbs down is not the popup's trigger: the popup opens after the
+ * pick, anchored to the thumb, takes focus, and hands it back to the thumb on close.
  * A rating is confirmed quietly, in words a screen reader hears, and a
  * change of rating is announced as well.
  */
@@ -28,11 +27,7 @@ export const AiFeedback = ({ value, defaultValue = null, onFeedback, className =
     const rating = controlled ? value : own;
     const [asking, setAsking] = useState(false);
     const [comment, setComment] = useState('');
-    const chosenId = useId();
-    // Both thumbs say which one is chosen the same way: a description, not aria-pressed.
-    const choice = (which) => (rating === which
-        ? { className: 'plus-btn--selected', 'aria-describedby': chosenId }
-        : {});
+    const downRef = useRef(null);
 
     const rate = (next) => {
         const chosen = rating === next ? null : next;
@@ -56,8 +51,17 @@ export const AiFeedback = ({ value, defaultValue = null, onFeedback, className =
                     label="Good answer"
                     appearance="subtle"
                     spacing="compact"
+                    isSelected={rating === 'up'}
                     onClick={() => rate('up')}
-                    {...choice('up')}
+                />
+                <IconButton
+                    ref={downRef}
+                    icon={thumb('down', rating === 'down')}
+                    label="Bad answer"
+                    appearance="subtle"
+                    spacing="compact"
+                    isSelected={rating === 'down'}
+                    onClick={() => rate('down')}
                 />
                 <Popup
                     triggerType="manual"
@@ -65,16 +69,7 @@ export const AiFeedback = ({ value, defaultValue = null, onFeedback, className =
                     onToggle={(open) => { if (!open) setAsking(false); }}
                     placement="bottom-start"
                     title="What went wrong?"
-                    trigger={(
-                        <IconButton
-                            icon={thumb('down', rating === 'down')}
-                            label="Bad answer"
-                            appearance="subtle"
-                            spacing="compact"
-                            onClick={() => rate('down')}
-                            {...choice('down')}
-                        />
-                    )}
+                    anchor={downRef}
                 >
                     <div className="plus-ai-feedback__ask">
                         <TextArea
@@ -92,7 +87,6 @@ export const AiFeedback = ({ value, defaultValue = null, onFeedback, className =
                     </div>
                 </Popup>
             </div>
-            {rating && <VisuallyHidden id={chosenId}>Selected</VisuallyHidden>}
             <span role="status" className="plus-ai-feedback__thanks">
                 {/* Each rating has its own words, so a change of mind is announced too. */}
                 {rating === 'up' && 'Thanks. Marked as a good answer.'}

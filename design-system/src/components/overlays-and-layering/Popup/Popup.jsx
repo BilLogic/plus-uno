@@ -78,6 +78,7 @@ const DISMISS_REASONS = new Set(['outside-press', 'escape-key', 'focus-out']);
 /** Popup: a small panel of secondary content anchored to a control, text or a short list and never a form. */
 const Popup = ({
     trigger,
+    anchor,
     children,
     title,
     label,
@@ -117,11 +118,14 @@ const Popup = ({
         onToggle?.(next);
     };
 
-    const isTextTrigger = !React.isValidElement(trigger);
+    const isTextTrigger = trigger !== undefined && !React.isValidElement(trigger);
+    // With an `anchor` and no trigger the popup is driven by `show` alone and
+    // the control it points at is not its trigger, so it reports no aria-expanded.
+    const hasTrigger = trigger !== undefined;
     const triggerElement = isTextTrigger
         ? <button type="button" className="plus-popup-trigger">{trigger}</button>
         : trigger;
-    const expandable = acceptsExpandedState(triggerElement);
+    const expandable = hasTrigger && acceptsExpandedState(triggerElement);
     const openOnHover = triggerType === 'hover' || triggerType === 'focus'
         || (Array.isArray(triggerType) && (triggerType.includes('hover') || triggerType.includes('focus')));
 
@@ -130,9 +134,10 @@ const Popup = ({
     // so it is current by the time the Portal below reads it on first open.
     const triggerNodeRef = useRef(null);
     const containerRef = useRef(null);
+    if (!hasTrigger) triggerNodeRef.current = anchor?.current ?? anchor ?? null;
     containerRef.current = container ?? popupMountOf(triggerNodeRef);
-    const ownRef = triggerElement.props?.ref ?? triggerElement.ref;
-    const mergedTrigger = React.cloneElement(triggerElement, {
+    const ownRef = triggerElement?.props?.ref ?? triggerElement?.ref;
+    const mergedTrigger = hasTrigger && React.cloneElement(triggerElement, {
         ref: (node) => {
             triggerNodeRef.current = node;
             if (typeof ownRef === 'function') ownRef(node);
@@ -146,20 +151,23 @@ const Popup = ({
     // it names the control that opens it.
     const titleId = useId();
     const generatedTriggerId = useId();
-    const triggerId = triggerElement.props?.id ?? generatedTriggerId;
+    const triggerId = triggerElement?.props?.id ?? generatedTriggerId;
     const labelledBy = title ? titleId : (label ? undefined : triggerId);
 
     return (
         <BasePopover.Root open={isOpen} onOpenChange={handleOpenChange}>
-            <BasePopover.Trigger
-                render={mergedTrigger}
-                id={triggerElement.props?.id ? undefined : triggerId}
-                nativeButton={isTextTrigger || isButtonLike(triggerElement)}
-                openOnHover={openOnHover}
-                {...(expandable ? { 'aria-haspopup': 'dialog' } : {})}
-            />
+            {hasTrigger && (
+                <BasePopover.Trigger
+                    render={mergedTrigger}
+                    id={triggerElement.props?.id ? undefined : triggerId}
+                    nativeButton={isTextTrigger || isButtonLike(triggerElement)}
+                    openOnHover={openOnHover}
+                    {...(expandable ? { 'aria-haspopup': 'dialog' } : {})}
+                />
+            )}
             <BasePopover.Portal container={containerRef}>
                 <BasePopover.Positioner
+                    anchor={anchor}
                     side={side}
                     align={align}
                     sideOffset={away ?? along}
@@ -184,7 +192,9 @@ const Popup = ({
 
 Popup.propTypes = {
     /** The element that triggers the popup. A plain string becomes a real `button`. */
-    trigger: PropTypes.node.isRequired,
+    trigger: PropTypes.node,
+    /** A ref or element the popup points at when there is no `trigger`: a control that is not itself the popup's opener, such as a toggle whose press opens a follow-up. Drive it with `show`. */
+    anchor: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
     /** The popup's body content. */
     children: PropTypes.node.isRequired,
     /** Heading shown at the top of the popup. It also names the popup for assistive tech. */

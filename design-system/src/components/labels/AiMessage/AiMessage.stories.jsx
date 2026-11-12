@@ -133,11 +133,11 @@ export const WithFeedback = {
         const up = within(group).getByRole('button', { name: 'Good answer' });
         const down = within(group).getByRole('button', { name: 'Bad answer' });
         await userEvent.click(up);
-        await expect(up).toHaveAccessibleDescription('Selected');
+        await expect(up).toHaveAttribute('aria-pressed', 'true');
         await expect(canvas.getByRole('status')).toHaveTextContent('Thanks. Marked as a good answer.');
         await userEvent.click(down);
-        await expect(up).not.toHaveAccessibleDescription('Selected');
-        await expect(down).toHaveAccessibleDescription('Selected');
+        await expect(up).toHaveAttribute('aria-pressed', 'false');
+        await expect(down).toHaveAttribute('aria-pressed', 'true');
         const field = await within(document.body).findByRole('textbox', { name: /What went wrong/ });
         await expect(field).toBeVisible();
         await userEvent.click(within(document.body).getByRole('button', { name: 'Skip' }));
