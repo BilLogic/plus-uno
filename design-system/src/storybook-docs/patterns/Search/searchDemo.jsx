@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, DynamicTable, EmptyState, SearchField, SearchFieldAction, Skeleton, Tabs } from '@/components';
+import { Button, DynamicTable, EmptyState, PageHeader, SearchField, SearchFieldAction, Skeleton, Tabs } from '@/components';
 import { PatternSection } from '@/patterns';
-import { BarEnd, STUDENTS, row } from '@/storybook-docs/lib/view-bar.jsx';
+import { BarEnd, STUDENTS, row, useLayerMount } from '@/storybook-docs/lib/view-bar.jsx';
 
 /**
  * The Search pattern's examples: the real SearchField in each of its three
@@ -13,6 +13,8 @@ import { BarEnd, STUDENTS, row } from '@/storybook-docs/lib/view-bar.jsx';
  *   SearchStudents      active: the view bar's field, rows narrow as you type
  *   FocusedStudents     focused: the panel of recent searches or grouped results
  *   BasicStudents       basic: the field, submitted on Enter
+ *   FocusedPage         focused in a page's top bar, its panel held open for a picture
+ *   BasicPage           basic in a page's top bar, with the results page Enter leads to
  *   ScopedStudents      the scope filter before the field
  *   matching, countWords   the rule and the count the field reads
  */
@@ -190,4 +192,80 @@ export const BasicStudents = ({ onSearch }) => (
     <div style={{ padding: 'var(--page-pad)' }}>
         <BodyField mode="basic" onSearch={onSearch} />
     </div>
+);
+
+/** The height a type card's picture lays out at, in px: docs geometry, half the stage so it fills the card's 2 / 1 frame. */
+const THUMB_HEIGHT = STAGE / 2; // docs-literal
+
+/** A page whose top bar carries the search field, at the picture's frame size. */
+const PageFrame = ({ mountRef, field, children }) => (
+    <div ref={mountRef} style={{ position: 'relative', blockSize: THUMB_HEIGHT, overflow: 'hidden', padding: 'var(--page-pad)', boxSizing: 'border-box' }}>
+        <PageHeader title="Students" actions={field} />
+        <div style={{ marginBlockStart: 'var(--stack-lg)' }}>{children}</div>
+    </div>
+);
+
+/**
+ * Focused, as a picture: the field in the page's top bar with its panel open
+ * under it, grouped matches for the text and the "See all results" row. The
+ * panel mounts inside the picture, so it scales and clips with it.
+ */
+export const FocusedPage = ({ text = 'a' }) => {
+    const [setMount, mount] = useLayerMount();
+    // The picture is scaled after the panel first places itself, so it is placed again once settled.
+    useEffect(() => {
+        if (!mount) return undefined;
+        const replace = setTimeout(() => window.dispatchEvent(new Event('resize')), 250); // docs-literal: after the picture is scaled
+        return () => clearTimeout(replace);
+    }, [mount]);
+    const groups = groupsFor(text).map((group) => ({ ...group, items: group.items.slice(0, 3) }));
+    return (
+        <PageFrame
+            mountRef={setMount}
+            field={mount && (
+                <div style={{ inlineSize: 'var(--field-width-md)' }}>
+                    <SearchField
+                        mode="focused"
+                        spacing="compact"
+                        placeholder={SCOPE}
+                        value={text}
+                        results={groups}
+                        recent={['Ava', 'Algebra B']}
+                        panelLabel={PANEL}
+                        defaultPanelOpen
+                        panelContainer={mount}
+                        onSelect={() => {}}
+                        onSearch={() => {}}
+                    >
+                        <SearchFieldAction onSelect={() => {}}>{`Add student \u201C${text.trim()}\u201D`}</SearchFieldAction>
+                    </SearchField>
+                </div>
+            )}
+        >
+            <PatternSection title="Roster" description="Algebra B">
+                <div aria-busy="true"><Skeleton shape="text" lines={6} /></div>
+            </PatternSection>
+        </PageFrame>
+    );
+};
+
+/**
+ * Basic, as a picture: the field with its text in the page's top bar, and
+ * under it the results page that Enter leads to, as Skeleton bars.
+ */
+export const BasicPage = ({ text = 'Ava' }) => (
+    <PageFrame
+        field={(
+            <div style={{ ...row, inlineSize: '100%' }}>
+                <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)', whiteSpace: 'nowrap' }}>Press Enter to search</span>
+                <div style={{ inlineSize: 'var(--field-width-md)' }}>
+                    <SearchField mode="basic" spacing="compact" placeholder={SCOPE} defaultValue={text} onSearch={() => {}} />
+                </div>
+            </div>
+        )}
+    >
+        <PatternSection title="Results" description={`For \u201C${text}\u201D`}>
+            <div aria-busy="true"><Skeleton shape="text" lines={8} /></div>
+        </PatternSection>
+    </PageFrame>
 );

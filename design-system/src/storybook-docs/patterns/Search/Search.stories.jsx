@@ -3,7 +3,7 @@ import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
-import { BasicStudents, BodySearch, FocusedStudents, PANEL, SCOPE, STAGE, SearchStudents } from './searchDemo.jsx';
+import { BasicPage, BasicStudents, BodySearch, FocusedPage, FocusedStudents, PANEL, SCOPE, STAGE, SearchStudents } from './searchDemo.jsx';
 
 /**
  * Search: the pattern page's examples, run in the Storybook tests. Each is a
@@ -39,18 +39,35 @@ export const TypeActive = {
     },
 };
 
-/** Focused: the field in a page body; its panel opens on focus (see Focused panel). */
+/** Focused: the field in a page's top bar with its panel open under it, grouped matches and "See all results". */
 export const TypeFocused = {
     name: 'Type: focused',
-    render: () => staged(<FocusedStudents />),
+    render: () => staged(<FocusedPage />),
     play: async ({ canvasElement }) => {
-        await expect(within(canvasElement).getByRole('combobox', { name: SCOPE })).toBeTruthy();
+        const canvas = within(canvasElement);
+        await expect(canvas.getByRole('combobox', { name: SCOPE })).toBeTruthy();
+        await waitFor(() => expect(canvasElement.querySelector('[role="listbox"]'), 'the panel is open inside the picture').toBeTruthy());
+        await expect(canvas.getByText(/See all results for/), 'the last row runs a basic search').toBeTruthy();
+        await fitsCanvas(canvasElement);
     },
 };
 
-/** Basic: the field alone; Enter runs the search and a results page takes over. */
+/** Basic: the field with its text in the top bar, and the results page Enter leads to. */
 export const TypeBasic = {
     name: 'Type: basic',
+    render: () => staged(<BasicPage />),
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        await expect(field(canvas).value).toBe('Ava');
+        await expect(canvasElement.querySelector('[aria-busy="true"]'), 'the results page waits under the bar').toBeTruthy();
+        await expect(canvasElement.querySelector('[role="listbox"]'), 'no panel in basic').toBeNull();
+        await fitsCanvas(canvasElement);
+    },
+};
+
+/** Basic, the field alone: no panel and no per-keystroke work. */
+export const BasicField = {
+    name: 'Type: basic, the field',
     render: () => staged(<BasicStudents />),
     play: async ({ canvasElement }) => {
         await expect(field(within(canvasElement))).toBeTruthy();
