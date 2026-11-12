@@ -60,6 +60,15 @@ export const TypeModal = {
         await expect(rect(footer).height, 'the full-bleed footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
         await expect(rect(canvas.getByRole('button', { name: 'Cancel' }).parentElement).left, 'Cancel (Default) is the first cell').toBeLessThan(rect(canvas.getByRole('button', { name: 'Save session' })).left);
         await expect(canvas.getByRole('heading', { level: 1, name: 'Log a session' }), 'the title is the dialog’s h1').toBeInTheDocument();
+        const modal = rect(canvasElement.querySelector('.plus-pattern-modal'));
+        const halves = [canvas.getByRole('button', { name: 'Cancel' }), canvas.getByRole('button', { name: 'Save session' })].map(rect);
+        for (const b of halves) {
+            await expect(b.left, 'a footer button starts inside the Modal’s left edge').toBeGreaterThanOrEqual(modal.left - 0.5);
+            await expect(b.right, 'a footer button ends inside the Modal’s right edge').toBeLessThanOrEqual(modal.right + 0.5);
+        }
+        await expect(halves[0].left, 'Cancel sits flush with the Modal’s left edge').toBeCloseTo(modal.left, 0);
+        await expect(halves[1].right, 'Save sits flush with the Modal’s right edge').toBeCloseTo(modal.right, 0);
+        await expect(halves[0].width, 'the two halves are equal').toBeCloseTo(halves[1].width, 0);
     },
 };
 

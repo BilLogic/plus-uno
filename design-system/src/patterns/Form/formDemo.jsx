@@ -17,6 +17,12 @@ import { BAR_TOKEN, FocusedType, WINDOW_HEIGHT } from '@/storybook-docs/lib/focu
 /** The Modal's own pad, which a full-bleed footer cancels. */
 const MODAL_PAD = '--modal-pad-x-default';
 
+/** The Modal's corner radius, which the full-bleed footer's bottom corners follow. */
+const HOST_RADIUS = '--modal-radius';
+
+/** A full-bleed cell fills its half edge to edge, so it has no corners of its own. */
+const CELL = { borderRadius: 0 };
+
 /** The Modal's stand-in screen on the docs page: docs geometry, in px. */
 /** A page form needs more room than the other windows: the fields, the footer below them, and a server message above. */
 const PAGE_HEIGHT = 540; // docs-literal
@@ -92,10 +98,24 @@ export const PageFooter = ({ sending, onSave }) => (
 export const FullBleedFooter = ({ sending, onSave, onCancel, primary = 'Save session', cancel = 'Cancel', cancelAppearance = 'default', bleed }) => (
     <div
         data-probe="footer"
-        style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', blockSize: `var(${BAR_TOKEN})`, flex: '1 1 auto', ...(bleed && { marginInline: `calc(-1 * var(${bleed}))`, marginBlockEnd: `calc(-1 * var(${bleed}))` }) }}
+        style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            blockSize: `var(${BAR_TOKEN})`,
+            flex: '1 1 auto',
+            // Composed inside the host's footer region: the footer cancels the host's pad on the sides and the bottom,
+            // squares its cells, and clips its own bottom corners to the host's radius, so it can't draw past the host's edge.
+            overflow: 'hidden',
+            ...(bleed && {
+                marginInline: `calc(-1 * var(${bleed}))`,
+                marginBlockEnd: `calc(-1 * var(${bleed}))`,
+                borderEndStartRadius: `var(${HOST_RADIUS})`,
+                borderEndEndRadius: `var(${HOST_RADIUS})`,
+            }),
+        }}
     >
-        <Button text={cancel} appearance={cancelAppearance} shouldFitContainer onClick={onCancel} />
-        <Button text={primary} appearance="primary" shouldFitContainer isLoading={sending} onClick={onSave} />
+        <Button text={cancel} appearance={cancelAppearance} shouldFitContainer onClick={onCancel} style={CELL} />
+        <Button text={primary} appearance="primary" shouldFitContainer isLoading={sending} onClick={onSave} style={CELL} />
     </div>
 );
 
