@@ -28,7 +28,7 @@ const FALLBACK_ROW_HEIGHT = 36;
  *
  * @param {string|object} option
  * @param {number} index Its place in the caller's array, which keeps its id stable while filtering.
- * @returns {{ value: *, label: *, text: string, description?: *, disabled: boolean, group?: string, elemBefore?: *, trailing?: *, index: number, source: * }}
+ * @returns {{ value: *, label: *, text: string, description?: *, disabled: boolean, group?: string, elemBefore?: *, elemAfter?: *, index: number, source: * }}
  */
 const normalize = (option, index) => {
     if (typeof option === 'string' || typeof option === 'number') {
@@ -43,7 +43,7 @@ const normalize = (option, index) => {
         disabled: Boolean(option.disabled),
         group: option.group,
         elemBefore: option.elemBefore,
-        trailing: option.trailing,
+        elemAfter: option.elemAfter,
         dragging: Boolean(option.dragging),
         dropIndicator: option.dropIndicator,
         index,
@@ -341,7 +341,7 @@ const Listbox = ({
                 dragging={option.dragging}
                 dropIndicator={option.dropIndicator}
                 elemBefore={before.length ? before : undefined}
-                trailing={option.trailing}
+                elemAfter={option.elemAfter}
                 spacing={spacing}
                 style={revealStyle}
                 className={reveal ? 'plus-listbox-reveal' : undefined}
@@ -513,7 +513,7 @@ Listbox.propTypes = {
     /**
      * Strings, or objects with `value`, `label` (or `text`), `description`,
      * `disabled`, `group` (consecutive options with one group share a heading),
-     * `elemBefore` and `trailing`.
+     * `elemBefore` and `elemAfter`.
      */
     options: PropTypes.arrayOf(PropTypes.oneOfType([
         PropTypes.string,
@@ -526,7 +526,7 @@ Listbox.propTypes = {
             disabled: PropTypes.bool,
             group: PropTypes.string,
             elemBefore: PropTypes.node,
-            trailing: PropTypes.node,
+            elemAfter: PropTypes.node,
             dragging: PropTypes.bool,
             dropIndicator: PropTypes.oneOf(['before', 'after']),
         }),

@@ -248,7 +248,9 @@ ValueChange.play = async ({ canvasElement }) => {
     const entering = valueEl();
     await expect(getComputedStyle(entering).animationName, 'the new value fades in').not.toBe('none');
     await expect(getComputedStyle(chipOf(el)).transitionProperty, 'the color moves').toContain('background-color');
-    await waitFor(() => expect(getComputedStyle(chipOf(el)).backgroundColor).toBe(token('--ds-background-success')));
+    // Read outside waitFor: a probe adds an element, which would wake waitFor again, forever.
+    const success = token('--ds-background-success');
+    await waitFor(() => expect(getComputedStyle(chipOf(el)).backgroundColor).toBe(success));
 
     await userEvent.click(canvas.getByRole('button', { name: 'Re-render' }));
     await expect(valueEl(), 'the same value keeps its element').toBe(entering);

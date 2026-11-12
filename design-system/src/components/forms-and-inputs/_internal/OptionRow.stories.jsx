@@ -83,10 +83,10 @@ export const LeadingAndTrailing = () => (
         <OptionRow
             label="Decision recall"
             elemBefore={<i className={iconClass('grip-vertical')} aria-hidden="true" />}
-            trailing={<i className={iconClass('ellipsis')} aria-hidden="true" />}
+            elemAfter={<i className={iconClass('ellipsis')} aria-hidden="true" />}
         />
-        <OptionRow label="Unread" elemBefore={<i className={iconClass('inbox')} aria-hidden="true" />} trailing={<CountTag value={12} />} />
-        <OptionRow label="Pennsylvania" trailing={<OptionRow.Chevron />} />
+        <OptionRow label="Unread" elemBefore={<i className={iconClass('inbox')} aria-hidden="true" />} elemAfter={<CountTag value={12} />} />
+        <OptionRow label="Pennsylvania" elemAfter={<OptionRow.Chevron />} />
         <OptionRow label="Maria Lopez" description="Grade 7 · Brookfield Middle School" />
     </div>
 );

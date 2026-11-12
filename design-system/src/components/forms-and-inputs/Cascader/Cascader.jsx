@@ -432,7 +432,7 @@ const Cascader = ({
                                                 // The path is the value, so a row shows no check of its own.
                                                 check={false}
                                                 spacing={spacing}
-                                                trailing={hasChildren ? <OptionRow.Chevron /> : undefined}
+                                                elemAfter={hasChildren ? <OptionRow.Chevron /> : undefined}
                                                 /* One tab stop per open menu, on the cursor. */
                                                 tabbable={Boolean(activeCell
                                                     && activeCell.column === columnIndex

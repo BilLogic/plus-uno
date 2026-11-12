@@ -118,7 +118,7 @@ Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `Smart
 | `goodDirection` | enum | `'none'` | Which way is good: `up` or `down` turn the tag success or danger; `none` keeps it neutral for a change with no value judgment. |
 | `comparison` | node | — | What the change is measured against, such as "vs last week", in subtle text after the tag. |
 | `spacing` | enum | `'default'` | `default` (20) in cards and headers; `compact` (16) in table cells. |
-| `iconBefore` | string or node | — | Replaces the direction arrow: a Font Awesome Free name (`arrow-trend-up`) or a node. Decorative; the words carry the direction. |
+| `iconBefore` | string | — | Replaces the direction arrow: a Font Awesome Free name (`arrow-trend-up`). Decorative; the words carry the direction. |
 | `className` | string | `''` | Extra class names added to the tag element beside the component's own. |
 | `id` | string | — | The `id` attribute of the tag element. |
 

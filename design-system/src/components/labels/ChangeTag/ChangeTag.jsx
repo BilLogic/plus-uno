@@ -119,7 +119,7 @@ export const ChangeTag = ({
 
     const { direction, text, spoken } = describeChange(value, effectiveFormat);
     const tone = changeTone(direction, effectiveGood);
-    const visual = iconBefore ?? (direction ? CHANGE_TAG_ICONS[direction] : null);
+    const icon = iconBefore ?? (direction ? CHANGE_TAG_ICONS[direction] : null);
 
     /*
      * A new value fades in. The value is keyed on how many times it has
@@ -144,9 +144,9 @@ export const ChangeTag = ({
     return (
         <span id={id} className={classes} {...rest}>
             <span className="plus-change-tag__chip" aria-hidden="true">
-                {visual && (
+                {icon && (
                     <span className="plus-change-tag__visual">
-                        {typeof visual === 'string' ? <Icon name={visual} /> : visual}
+                        <Icon name={icon} />
                     </span>
                 )}
                 <span
@@ -178,8 +178,8 @@ ChangeTag.propTypes = {
     comparison: PropTypes.node,
     /** `default` (20) in cards and headers; `compact` (16) in table cells. */
     spacing: PropTypes.oneOf(CHANGE_TAG_SPACINGS),
-    /** Replaces the direction arrow: a Font Awesome Free name (`arrow-trend-up`) or a node. Decorative; the words carry the direction. */
-    iconBefore: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    /** Replaces the direction arrow: a Font Awesome Free name (`arrow-trend-up`). Decorative; the words carry the direction. */
+    iconBefore: PropTypes.string,
     /** Extra class names added to the tag element beside the component's own. */
     className: PropTypes.string,
     /** The `id` attribute of the tag element. */

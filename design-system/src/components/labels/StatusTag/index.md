@@ -106,7 +106,7 @@ Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStar
 
 ## Parts
 
-1. **Icon before.** Optional: a Font Awesome Free icon by name, or a node.
+1. **Icon before.** Optional: a Font Awesome Free icon by name.
 2. **Label.** The condition, in a word or two. Past `maxWidth` it ends in an ellipsis and the full text is a tooltip.
 3. **Trailing metric.** Optional: a compact Count tag nested inside, with its own appearance when it means something else.
 4. **Fill.** The appearance's tinted ground with its words and an edge one step darker.
@@ -147,7 +147,7 @@ Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStar
 | `children` | node (required) | — | The status text, as people say it: "Needs review", "Due tomorrow". |
 | `appearance` | enum | `'neutral'` | The meaning. Info is Tertiary; discovery is the curriculum purple. |
 | `spacing` | enum | `'default'` | `default` (20) in rows, lists and sentences; `spacious` (32) beside a heading. |
-| `iconBefore` | string or node | — | One icon before the label: a Font Awesome Free name (`circle-check`) or a node. |
+| `iconBefore` | string | — | One icon before the label: a Font Awesome Free name (`circle-check`). |
 | `trailingMetric` | number or string | — | A small count at the end of the tag, a Count tag nested inside it: compact (16) in default, default (20) in spacious. Hidden at 0. |
 | `trailingMetricAppearance` | oneOf | — | The Count tag's appearance. Defaults to the Status tag's own. |
 | `maxWidth` | number or string | `200` | The widest the Status tag grows, in px or any CSS length, and never wider than its container. Past it the label ends in an ellipsis and the full text is a tooltip. |

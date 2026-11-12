@@ -36,7 +36,7 @@ describe('Cascader', () => {
         const [first, second] = screen.getAllByRole('listbox');
         const [scotland, wales] = within(first).getAllByRole('option');
         expect(scotland).toHaveClass('plus-option-row');
-        expect(scotland.querySelector('.plus-option-row-trailing .plus-option-row-chevron')).not.toBeNull();
+        expect(scotland.querySelector('.plus-option-row-elem-after .plus-option-row-chevron')).not.toBeNull();
         expect(wales.querySelector('.plus-option-row-chevron')).toBeNull();
 
         // The path so far is selected in each column, without a trailing check.

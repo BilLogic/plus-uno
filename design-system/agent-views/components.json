@@ -2015,11 +2015,11 @@
         },
         {
           "name": "iconBefore",
-          "type": "string or node",
+          "type": "string",
           "required": false,
           "default": null,
           "values": null,
-          "description": "Replaces the direction arrow: a Font Awesome Free name (`arrow-trend-up`) or a node. Decorative; the words carry the direction.",
+          "description": "Replaces the direction arrow: a Font Awesome Free name (`arrow-trend-up`). Decorative; the words carry the direction.",
           "deprecated": null
         },
         {
@@ -12630,11 +12630,11 @@
         },
         {
           "name": "iconBefore",
-          "type": "string or node",
+          "type": "string",
           "required": false,
           "default": null,
           "values": null,
-          "description": "One icon before the label: a Font Awesome Free name (`circle-check`) or a node.",
+          "description": "One icon before the label: a Font Awesome Free name (`circle-check`).",
           "deprecated": null
         },
         {
