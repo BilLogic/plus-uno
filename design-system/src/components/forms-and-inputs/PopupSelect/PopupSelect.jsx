@@ -53,6 +53,7 @@ const PopupSelect = ({
     marker = 'radio',
     spacing = 'default',
     emptyMessage = 'No results',
+    container,
     className = '',
     id,
     ...props
@@ -127,6 +128,7 @@ const PopupSelect = ({
             show={isOpen}
             onToggle={setOpen}
             width="auto"
+            container={container}
             className={['plus-popup-select', className].filter(Boolean).join(' ')}
             id={id}
         >
@@ -154,6 +156,8 @@ const PopupSelect = ({
 };
 
 PopupSelect.propTypes = {
+    /** Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region. */
+    container: PropTypes.object,
     /** Strings, or objects with `value`, `label`, `description`, `disabled` and `group`, as Select takes. */
     options: PropTypes.arrayOf(PropTypes.oneOfType([
         PropTypes.string,
