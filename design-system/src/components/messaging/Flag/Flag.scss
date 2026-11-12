@@ -23,6 +23,18 @@
     border-radius: var(--popover-radius);
     box-shadow: var(--ds-shadow-overlay);
 
+    // MOTION. Enter, from the Flag row of the motion registry: it slides in from
+    // the top-right corner on `spatial.default` while it fades in on
+    // `appearance.default`; Notify sounds as it lands. Reduced motion is the fade
+    // alone. Only transform and opacity move.
+    animation:
+        plus-flag-slide-in var(--ds-motion-spatial-default-duration) var(--ds-motion-spatial-default),
+        plus-flag-fade-in var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default);
+
+    @media (prefers-reduced-motion: reduce) {
+        animation: plus-flag-fade-in var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default);
+    }
+
     // --- ICON: 16, in a box one title line tall ---
     .plus-flag-icon {
         display: flex;
@@ -349,4 +361,13 @@
     left: 50%;
     bottom: var(--flag-offset);
     transform: translateX(-50%);
+}
+@keyframes plus-flag-slide-in {
+    from { transform: translate(var(--space-150), calc(-1 * var(--space-150))); }
+    to { transform: none; }
+}
+
+@keyframes plus-flag-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }

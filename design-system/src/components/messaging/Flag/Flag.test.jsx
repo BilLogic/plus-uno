@@ -1,6 +1,10 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Flag, FlagGroup, FLAG_AUTO_CLOSE_MS, FLAG_APPEARANCES } from './Flag';
+import { resetSound, unlockAudio } from '@/sound/play';
+import { scoreFor } from '@/sound/score';
+import { setSoundEnabled } from '@/sound/settings';
+import { soundStartFor, springT90 } from '@/sound/timing';
 
 /**
  * How long a flag stays. Success and information close themselves after 8 seconds;
@@ -146,5 +150,110 @@ describe('FlagGroup', () => {
     it('takes a logical position as given', () => {
         render(<FlagGroup data-testid="flags" position="top-end"><span>flag</span></FlagGroup>);
         expect(screen.getByTestId('flags')).toHaveAttribute('data-position', 'top-end');
+    });
+});
+
+/** A stand-in for Web Audio that records every node it starts, as in the sound runtime's tests. */
+function fakeAudioContext() {
+    const made = [];
+    const starts = [];
+    const param = (value = 0) => ({ value, setValueAtTime: vi.fn(), exponentialRampToValueAtTime: vi.fn() });
+    const node = (extra = {}) => ({ connect: vi.fn(), start: vi.fn((t) => starts.push(t)), stop: vi.fn(), ...extra });
+    class FakeAudioContext {
+        constructor() {
+            this.currentTime = 1;
+            this.sampleRate = 8000;
+            this.state = 'running';
+            this.destination = node();
+            made.push(this);
+        }
+        resume() { return Promise.resolve(); }
+        close() { this.state = 'closed'; }
+        createGain() { return node({ gain: param(1) }); }
+        createOscillator() { return node({ type: 'sine', frequency: param() }); }
+        createBiquadFilter() { return node({ type: 'lowpass', frequency: param(), Q: param() }); }
+        createBufferSource() { return node({ buffer: null }); }
+        createConvolver() { return node({ buffer: null }); }
+        createDynamicsCompressor() {
+            return node({ threshold: param(), knee: param(), ratio: param(), attack: param(), release: param() });
+        }
+        createBuffer(channels, length) {
+            const data = Array.from({ length: channels }, () => new Float32Array(length));
+            return { getChannelData: (ch) => data[ch] };
+        }
+    }
+    return { FakeAudioContext, made, starts };
+}
+
+/**
+ * Flag's enter plays Notify as it lands (its motion registry row): the sound
+ * starts at the `spatial.default` spring's 90% time minus Notify's pickup.
+ * The tests read what is scheduled, never audio frames.
+ */
+describe('Flag sound', () => {
+    let audio;
+    const originalMatchMedia = window.matchMedia;
+    const reducedMotion = (matches) => {
+        window.matchMedia = vi.fn().mockReturnValue({ matches, addEventListener: vi.fn(), removeEventListener: vi.fn() });
+    };
+    /** Seconds from now to the earliest node the flag scheduled: the sound's start. */
+    const scheduledStart = () => Math.min(...audio.starts) - audio.made[0].currentTime;
+
+    beforeEach(() => {
+        resetSound();
+        window.localStorage.clear();
+        audio = fakeAudioContext();
+        window.AudioContext = audio.FakeAudioContext;
+        unlockAudio();
+        audio.starts.length = 0; // the unlock's silent sample is not the flag's sound
+    });
+    afterEach(() => {
+        resetSound();
+        delete window.AudioContext;
+        window.matchMedia = originalMatchMedia;
+    });
+
+    it('starts Notify at the spatial.default 90% time minus the pickup, within 10 ms', () => {
+        reducedMotion(false);
+        render(<Flag title="Saved" />);
+        const expected = springT90('spatial.default') - scoreFor('notify').pickup;
+        expect(expected).toBeCloseTo(soundStartFor('spatial.default', 'notify'), 6);
+        expect(Math.abs(scheduledStart() - expected)).toBeLessThan(0.01);
+        // The landing note sounds on the 90% time itself.
+        expect(audio.starts.length).toBeGreaterThan(0);
+    });
+
+    it('plays once, on enter, not on a re-render', () => {
+        reducedMotion(false);
+        const { rerender } = render(<Flag title="Saved" />);
+        const count = audio.starts.length;
+        rerender(<Flag title="Saved again" />);
+        expect(audio.starts).toHaveLength(count);
+    });
+
+    it('with the setting off, schedules nothing', () => {
+        reducedMotion(false);
+        setSoundEnabled(false);
+        render(<Flag title="Saved" />);
+        expect(audio.starts).toHaveLength(0);
+    });
+
+    it('with sound={false}, schedules nothing: the app decides when a flag is quiet', () => {
+        reducedMotion(false);
+        render(<Flag title="Saved" sound={false} />);
+        expect(audio.starts).toHaveLength(0);
+    });
+
+    it('under reduced motion still plays, landing with the reduced spring', () => {
+        reducedMotion(true);
+        render(<Flag title="Saved" />);
+        const expected = soundStartFor('spatial.default', 'notify', { mode: 'reduced' });
+        expect(Math.abs(scheduledStart() - expected)).toBeLessThan(0.01);
+    });
+
+    it('a hidden flag plays nothing', () => {
+        reducedMotion(false);
+        render(<Flag title="Saved" show={false} />);
+        expect(audio.starts).toHaveLength(0);
     });
 });

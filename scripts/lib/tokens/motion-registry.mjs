@@ -45,4 +45,28 @@ export const MOTION_REGISTRY = [
       },
     },
   },
+  {
+    name: 'Flag',
+    tier: 'component',
+    events: {
+      enter: {
+        transition: 'Open',
+        spatial: 'spatial.default',
+        appearance: 'appearance.default',
+        note: 'Slides in from the top-right corner while it fades in. Under reduced motion it is the fade alone.',
+        sound: { token: 'notify', at: 'land', when: 'outside a session; Flags that arrive together play once' },
+      },
+      exit: {
+        transition: 'Close',
+        spatial: 'spatial.exit',
+        appearance: 'appearance.fast',
+        note: 'Leaves the way it came, by the exit rules.',
+      },
+      change: {
+        transition: 'Add or remove an item',
+        spatial: 'spatial.default',
+        note: 'The stack closes up when one leaves.',
+      },
+    },
+  },
 ];

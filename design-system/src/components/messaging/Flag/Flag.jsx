@@ -4,6 +4,7 @@ import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import { MESSAGE_APPEARANCE_ICONS } from '../messageAppearance';
 import Icon from '../../images-and-icons/Icon';
+import { playSound, soundStartFor } from '@/sound';
 import './Flag.scss';
 
 /**
@@ -14,6 +15,20 @@ export const FLAG_AUTO_CLOSE_MS = 8000;
 
 /** The five appearances, as the Figma Flag set names them. */
 export const FLAG_APPEARANCES = ['normal', 'information', 'warning', 'error', 'success'];
+
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
+/**
+ * Flag's enter, from its motion registry row: it lands on `spatial.default` and
+ * Notify sounds as it lands, so the sound starts at that spring's 90% time minus
+ * Notify's pickup. Under reduced motion the flag fades in on the reduced spring
+ * and the sound still plays, on that landing.
+ */
+function playNotifyOnLand() {
+    const reduced = typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+        && window.matchMedia(REDUCED_MOTION_QUERY).matches;
+    playSound('notify', { at: soundStartFor('spatial.default', 'notify', { mode: reduced ? 'reduced' : 'productive' }) });
+}
 
 /** Warning and error are urgent: they interrupt a screen reader and stay until dismissed. */
 const URGENT_APPEARANCES = ['warning', 'error'];
@@ -41,6 +56,7 @@ export const Flag = ({
     headerClass = '',
     bodyClass = '',
     timestamp, // '11 mins ago' etc
+    sound = true,
     ...props
 }) => {
     // An appearance outside the list falls back to the default, normal.
@@ -82,6 +98,17 @@ export const Flag = ({
         const timer = setTimeout(() => onDismissRef.current?.(), delay);
         return () => clearTimeout(timer);
     }, [show, closesItself, delay]);
+
+    /*
+     * Notify plays once as the flag lands, when it is shown, through the one
+     * sound setting (off plays nothing). When a flag should stay quiet, such
+     * as during a session or after the first of several that arrive together,
+     * is the app's call: it passes `sound={false}`.
+     */
+    useEffect(() => {
+        if (show && sound) playNotifyOnLand();
+        // Only `show` re-runs it: a flag's arrival sounds, never another prop change.
+    }, [show]);
 
     if (!show) return null;
 
@@ -200,7 +227,9 @@ Flag.propTypes = {
     /** Extra class on the description container. */
     bodyClass: PropTypes.string,
     /** Small text beside the title, such as "11 mins ago". */
-    timestamp: PropTypes.node
+    timestamp: PropTypes.node,
+    /** Plays Notify as the flag lands, through the app's sound setting. Defaults to true; the app passes false when a flag should stay quiet, such as during a session or for all but the first of several that arrive together. */
+    sound: PropTypes.bool
 };
 
 /**
