@@ -782,6 +782,7 @@
         "--image-sm",
         "--image-xxs",
         "--radius-full",
+        "--radius-xxl",
         "--type-weight-semibold"
       ]
     },
@@ -1453,6 +1454,7 @@
       ],
       "stories": [
         "Overview",
+        "Seams",
         "Appearances",
         "Spacing",
         "IconOnly",
@@ -2293,6 +2295,7 @@
         "--pad-x-md",
         "--plus-choice-indent",
         "--radius-025",
+        "--radius-lg",
         "--space-025",
         "--space-0375",
         "--space-050",
@@ -3032,7 +3035,7 @@
         "--plus-count-min",
         "--plus-count-size",
         "--radius-full",
-        "--radius-sm",
+        "--radius-md",
         "--stroke-2"
       ]
     },
@@ -3340,7 +3343,7 @@
         "--plus-date-tag-height",
         "--plus-date-tag-icon-box",
         "--plus-date-tag-max",
-        "--radius-control-sm",
+        "--radius-lg",
         "--radius-md",
         "--stack-sm",
         "--tag-gap",
@@ -6511,7 +6514,7 @@
         "--ds-text-inverse",
         "--icon-sm",
         "--inline-md",
-        "--radius-lg"
+        "--radius-md"
       ]
     },
     {
@@ -10275,8 +10278,8 @@
         "--pad-x-md",
         "--plus-choice-indent",
         "--radio-control-size",
-        "--radius-025",
         "--radius-full",
+        "--radius-lg",
         "--space-025",
         "--space-0375",
         "--space-050",
@@ -12463,10 +12466,9 @@
         "--plus-skeleton-height",
         "--plus-skeleton-radius",
         "--plus-skeleton-width",
-        "--radius-control-sm",
         "--radius-full",
+        "--radius-lg",
         "--radius-md",
-        "--radius-sm",
         "--skeleton-circle-size",
         "--skeleton-height",
         "--skeleton-status-width",
@@ -12807,7 +12809,6 @@
       "tokens": [
         "--body-default",
         "--body-small",
-        "--border-default",
         "--ds-background-brand-bold",
         "--ds-icon-inverse",
         "--ds-interaction-inverse-hovered",
@@ -12819,7 +12820,6 @@
         "--heading-small",
         "--radius-lg",
         "--radius-xl",
-        "--space-050",
         "--space-075",
         "--space-100",
         "--space-150",
@@ -12982,7 +12982,7 @@
         "--plus-status-height",
         "--plus-status-icon-box",
         "--plus-status-max",
-        "--radius-control-sm",
+        "--radius-lg",
         "--radius-md",
         "--stack-sm",
         "--tag-gap",
@@ -13313,6 +13313,7 @@
         "--inline-md",
         "--plus-table-cell-max-width",
         "--plus-table-row-height",
+        "--radius-md",
         "--row-height-lg",
         "--row-height-md",
         "--row-height-sm",
@@ -13430,6 +13431,7 @@
         "Layout",
         "Alignment",
         "Appearance",
+        "UnderlineRadius",
         "WithPanels",
         "InteractionStates",
         "Interactive",
@@ -13464,10 +13466,12 @@
         "--item-height-sm",
         "--pad-x-lg",
         "--pad-x-md",
+        "--radius-control-md",
+        "--radius-control-sm",
         "--radius-full",
-        "--radius-md",
         "--section-stack-sm",
         "--stack-md",
+        "--tab-radius",
         "--type-weight-medium"
       ],
       "subComponents": [

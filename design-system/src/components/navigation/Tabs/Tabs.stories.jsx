@@ -173,6 +173,31 @@ export const Appearance = () => (
     </div>
 );
 
+/** Underline tab tops round by the tab's height: Radius / Control sm at 24, md at 32. */
+export const UnderlineRadius = () => (
+    <div style={col}>
+        <Tabs defaultActiveKey="1" data-testid="default">
+            <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
+            <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
+        </Tabs>
+        <Tabs spacing="compact" defaultActiveKey="1" data-testid="compact">
+            <Tabs.Tab eventKey="1">Overview</Tabs.Tab>
+            <Tabs.Tab eventKey="2">Sessions</Tabs.Tab>
+        </Tabs>
+    </div>
+);
+UnderlineRadius.play = async ({ canvasElement }) => {
+    const underline = [...canvasElement.querySelectorAll('.plus-tabs--appearance-default')];
+    for (const [i, [height, radius]] of [[32, 8], [24, 6]].entries()) {
+        const tab = underline[i].querySelector('.plus-tab');
+        const t = getComputedStyle(tab);
+        await expect(tab.getBoundingClientRect().height, 'tab height').toBe(height);
+        await expect(px(t.borderTopLeftRadius), `${height} tab top-left`).toBe(radius);
+        await expect(px(t.borderTopRightRadius), `${height} tab top-right`).toBe(radius);
+        await expect(px(t.borderBottomLeftRadius), 'bottom stays square').toBe(0);
+    }
+};
+
 /** A pill strip has no baseline: neither the list nor any tab draws a bottom border. */
 Appearance.play = async ({ canvasElement }) => {
     const pill = canvasElement.querySelector('.plus-tabs--appearance-pill');

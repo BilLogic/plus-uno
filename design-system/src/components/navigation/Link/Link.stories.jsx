@@ -31,6 +31,8 @@ Appearances.play = async ({ canvasElement }) => {
         const node = canvasElement.querySelector(`#link-${appearance}`);
         await expect(node, `${appearance} renders an anchor`).toBeTruthy();
         await expect(node.tagName).toBe('A');
+        // The focus ring follows the link's corners: radius-md.
+        await expect(parseFloat(getComputedStyle(node).borderTopLeftRadius), `${appearance} radius`).toBe(4);
     }
 };
 

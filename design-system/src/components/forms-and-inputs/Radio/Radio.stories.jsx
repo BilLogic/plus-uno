@@ -199,6 +199,9 @@ DescriptionAndCard.play = async ({ canvasElement }) => {
     const weekly = canvas.getByRole('radio', { name: 'Weekly' });
     const desc = canvasElement.ownerDocument.getElementById(weekly.getAttribute('aria-describedby'));
     await expect(desc.textContent).toBe('Every week at the same time.');
+    // The choice card rounds at radius-lg.
+    const card = canvas.getByRole('radio', { name: 'Just once' }).closest('.plus-choice-card');
+    await expect(parseFloat(getComputedStyle(card).borderTopLeftRadius), 'choice card radius').toBe(8);
 };
 
 /**

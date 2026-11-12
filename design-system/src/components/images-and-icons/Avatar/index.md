@@ -108,7 +108,7 @@ Same group: `AiIcon` · `AvatarGroup` · `Icon` · `Illustration` · `Image` · 
 | --- | --- |
 | Size | `--image-xxs` to `--image-lg` for 16 to 40; 96 and 128 are built from the large spacing primitives. |
 | Ground and ink | `--ds-background-accent-blue-subtler` and `--ds-text-accent-blue` for blue, and the same pair for each other Tag color. |
-| Radius | `--radius-full` for a circle; a quarter of the size for a square. |
+| Radius | `--radius-full` for a circle; a quarter of the size for a square, capped at `--radius-xxl`. |
 | Presence dot | `--ds-background-success-bold`, `-warning-bold`, `-danger-bold`, `-neutral-bold`; ring `--ds-surface`. |
 
 ## Content guidelines
@@ -148,7 +148,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--avatar-font` · `--avatar-glyph` · `--avatar-size` · `--avatar-size-128` · `--avatar-size-96` · `--border-default` · `--ds-background-accent-blue-subtler` · `--ds-background-accent-gray-subtle` · `--ds-background-accent-gray-subtler` · `--ds-background-accent-green-subtler` · `--ds-background-accent-magenta-subtler` · `--ds-background-accent-purple-subtler` · `--ds-background-accent-teal-subtler` · `--ds-background-accent-yellow-subtler` · `--ds-background-danger-bold` · `--ds-background-neutral-bold` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-surface` · `--ds-text-accent-blue` · `--ds-text-accent-gray` · `--ds-text-accent-green` · `--ds-text-accent-magenta` · `--ds-text-accent-purple` · `--ds-text-accent-teal` · `--ds-text-accent-yellow` · `--font-size-075` · `--font-size-0875` · `--font-size-100` · `--font-size-200` · `--icon-lg` · `--icon-md` · `--icon-sm` · `--image-lg` · `--image-md` · `--image-sm` · `--image-xxs` · `--radius-full` · `--type-weight-semibold`
+`--avatar-font` · `--avatar-glyph` · `--avatar-size` · `--avatar-size-128` · `--avatar-size-96` · `--border-default` · `--ds-background-accent-blue-subtler` · `--ds-background-accent-gray-subtle` · `--ds-background-accent-gray-subtler` · `--ds-background-accent-green-subtler` · `--ds-background-accent-magenta-subtler` · `--ds-background-accent-purple-subtler` · `--ds-background-accent-teal-subtler` · `--ds-background-accent-yellow-subtler` · `--ds-background-danger-bold` · `--ds-background-neutral-bold` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-surface` · `--ds-text-accent-blue` · `--ds-text-accent-gray` · `--ds-text-accent-green` · `--ds-text-accent-magenta` · `--ds-text-accent-purple` · `--ds-text-accent-teal` · `--ds-text-accent-yellow` · `--font-size-075` · `--font-size-0875` · `--font-size-100` · `--font-size-200` · `--icon-lg` · `--icon-md` · `--icon-sm` · `--image-lg` · `--image-md` · `--image-sm` · `--image-xxs` · `--radius-full` · `--radius-xxl` · `--type-weight-semibold`
 
 From `design-system/src/components/images-and-icons/Avatar/Avatar.scss`. Override these through the token layer, never with a literal.
 

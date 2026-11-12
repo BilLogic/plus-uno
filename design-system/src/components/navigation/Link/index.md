@@ -96,7 +96,7 @@ Same group: `Breadcrumb` · `Pagination` · `Sidebar` · `Tabs`
 | Default | `--ds-link`, `--ds-link-visited`, `--ds-link-pressed` |
 | Subtle | `--ds-text`, `--ds-link-pressed` |
 | Inverse | `--ds-text-inverse`, ring `--ds-border-focused-inverse` |
-| Corners | `--radius-lg` |
+| Corners | `--radius-md` |
 | New-window glyph | `--icon-sm`, `--inline-md` |
 
 ## Content guidelines
@@ -128,7 +128,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--ds-link` · `--ds-link-pressed` · `--ds-link-visited` · `--ds-text` · `--ds-text-inverse` · `--icon-sm` · `--inline-md` · `--radius-lg`
+`--ds-link` · `--ds-link-pressed` · `--ds-link-visited` · `--ds-text` · `--ds-text-inverse` · `--icon-sm` · `--inline-md` · `--radius-md`
 
 From `design-system/src/components/navigation/Link/Link.scss`. Override these through the token layer, never with a literal.
 
