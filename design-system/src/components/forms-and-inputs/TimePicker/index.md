@@ -79,7 +79,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Hovered | The border takes `--ds-border-focused`. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the box. |
 | Invalid | The border takes `--ds-border-danger`. |
-| Read-only | The box takes `--ds-background-neutral`. |
+| Read-only | The box takes `--ds-background-neutral`, at full contrast with no hover. The chevron is not drawn and a press opens no list. |
 | Disabled | The box fades to `--ds-opacity-disabled` and leaves the tab order. |
 
 ### Tokens

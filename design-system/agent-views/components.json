@@ -2167,6 +2167,7 @@
         "--ds-background-disabled",
         "--ds-background-input",
         "--ds-background-input-hovered",
+        "--ds-background-neutral",
         "--ds-background-selected-bold",
         "--ds-background-selected-bold-hovered",
         "--ds-border",
@@ -10219,6 +10220,7 @@
         "--ds-background-disabled",
         "--ds-background-input",
         "--ds-background-input-hovered",
+        "--ds-background-neutral",
         "--ds-background-selected-bold",
         "--ds-background-selected-bold-hovered",
         "--ds-border",
@@ -11730,7 +11732,8 @@
         "Focused",
         "FieldDisabled",
         "FieldInvalid",
-        "FieldReadOnly"
+        "FieldReadOnly",
+        "FieldReadOnlyLongValue"
       ],
       "tokens": [
         "--body-default",

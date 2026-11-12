@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import Checkbox from './Checkbox';
 import Fieldset from '../Fieldset';
 
@@ -242,6 +243,9 @@ ReadOnly.play = async ({ canvasElement }) => {
     off.focus();
     await userEvent.keyboard(' ');
     await expect(off.getAttribute('aria-checked')).toBe('false');
+
+    await expectChoiceReadOnly(canvasElement, on, 'checked checkbox');
+    await expectChoiceReadOnly(canvasElement, off, 'unchecked checkbox');
 };
 
 /** A description under the label, and the card appearance. */

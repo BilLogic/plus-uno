@@ -10,7 +10,7 @@ Also asked as: combobox, picklist, option list.
 
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Async, AsyncCreatable, AsyncLoading, AsyncFailed, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly, FieldReadOnlyLongValue
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
@@ -121,6 +121,13 @@ that fails keeps the rows already loaded and puts the same message in the
 footer. Options fade in one after another, 20 ms apart, the wait capped at
 500 ms; reduced motion shows them at once.
 
+### Read-only is not disabled. {#read-only-is-not-disabled}
+
+`isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, has no hover and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field.
+
+Do: Read-only keeps the value readable, and the caption says why.
+Don't: Disabled fades a value people need to read.
+
 ## Accessibility
 
 - **A real combobox.** The field is `role="combobox"` with
@@ -161,7 +168,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Disabled | The whole field fades to `--ds-opacity-disabled` and leaves the tab order. |
 | Invalid | The edge takes `--ds-border-danger` and the message `--ds-text-danger`. |
 | Valid | With `isValid`, the edge takes `--ds-border-success` and `successMessage` shows under the field. |
-| Read-only | The `--ds-background-neutral` fill. The value can be read, selected and copied. |
+| Read-only | The `--ds-background-neutral` fill, full contrast, no hover. The chevron is not drawn, a press opens nothing, and a long value wraps instead of clipping. The value can be read, selected and copied. |
 
 ### Tokens
 

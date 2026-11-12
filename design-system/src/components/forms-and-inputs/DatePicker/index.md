@@ -62,6 +62,13 @@ A range picks start and end in one field and one calendar. Two separate fields s
 Do: One range field.
 Don't: Two separate fields.
 
+### Read-only is not disabled. {#read-only-is-not-disabled}
+
+`isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, has no hover and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field.
+
+Do: Read-only keeps the value readable, and the caption says why.
+Don't: Disabled fades a value people need to read.
+
 ## Accessibility
 
 - **The input is the named control.** `aria-label`, `aria-labelledby` and `aria-describedby` are read straight off the props and land on the text input a screen reader focuses.
@@ -92,7 +99,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Hovered | The border takes `--ds-border-focused`. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the box. |
 | Invalid | The border takes `--ds-border-danger` and the input sets `aria-invalid`. |
-| Read-only | The box takes `--ds-background-neutral`. |
+| Read-only | The box takes `--ds-background-neutral`, at full contrast with no hover. The calendar icon is not drawn and a press opens no calendar. The date can be read, selected and copied. |
 | Disabled | The box fades to `--ds-opacity-disabled` and leaves the tab order. |
 
 ### Tokens

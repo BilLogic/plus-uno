@@ -183,7 +183,7 @@ holds one short list, applied as you pick, has nothing to search: pass
 <tr><td>Disabled</td><td>The whole field fades to <code>--ds-opacity-disabled</code> and leaves the tab order.</td></tr>
 <tr><td>Invalid</td><td>The edge takes <code>--ds-border-danger</code> and the message <code>--ds-text-danger</code>.</td></tr>
 <tr><td>Valid</td><td>With <code>isValid</code>, the edge takes <code>--ds-border-success</code> and <code>successMessage</code> shows under the field.</td></tr>
-<tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill. The value can be read, selected and copied.</td></tr>
+<tr><td>Read-only</td><td>The <code>--ds-background-neutral</code> fill, full contrast, no hover. The chevron is not drawn, a press opens nothing, and a long value wraps instead of clipping. The value can be read, selected and copied.</td></tr>
 </tbody>
 </DocsTable>
 
@@ -310,6 +310,17 @@ footer. Options fade in one after another, 20 ms apart, the wait capped at
 </div>
 
 <div className="sb-ds-doc-section">
+
+### Read-only is not disabled.
+
+`isReadOnly` shows a value someone could change but this person cannot right now: it stays in the tab order at full contrast, can be selected and copied, takes the neutral fill, has no hover and says `aria-readonly`. Say why in the caption. `isDisabled` is for a field that does not apply yet, and takes it out of the tab order. Never swap one for the other, and never clip a read-only value. Content nobody can edit is plain text, not a field.
+
+<DoDontPair
+    doExample={<div style={{ width: 'var(--width-2000)' }}><Select label="Session length" options={lengths} defaultValue="45" isReadOnly caption="Set by your supervisor." /></div>}
+    doCaption="Read-only keeps the value readable, and the caption says why."
+    dontExample={<div style={{ width: 'var(--width-2000)' }}><Select label="Session length" options={lengths} defaultValue="45" isDisabled caption="Set by your supervisor." /></div>}
+    dontCaption="Disabled fades a value people need to read."
+/>
 
 ## Content guidelines
 

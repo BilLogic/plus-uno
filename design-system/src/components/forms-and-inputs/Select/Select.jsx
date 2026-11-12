@@ -139,7 +139,8 @@ const Select = ({
         selectAll,
         live,
     });
-    const typeable = isSearchable || isCreatable || searchFirst || Boolean(loadOptions);
+    // A read-only value is text to read, not an input to type in: it wraps and is never clipped.
+    const typeable = !isReadOnly && (isSearchable || isCreatable || searchFirst || Boolean(loadOptions));
 
     const controlRef = useRef(null);
     const fieldRef = useRef(null);
@@ -359,7 +360,7 @@ const Select = ({
             live={live}
             disabled={disabled}
             label={typeof label === 'string' ? label : props['aria-label']}
-            collapsed={!(focused || shown)}
+            collapsed={!(focused || shown || isReadOnly)}
             onOverflowClick={() => { openList(); controlRef.current?.focus(); }}
         />
     ) : null;
@@ -424,8 +425,9 @@ const Select = ({
         disabled ? 'plus-select-disabled' : '',
         isReadOnly ? 'plus-select-readonly' : '',
         shown ? 'plus-select-open' : '',
-        lineWrap ? '' : 'plus-select-nowrap',
-        truncate ? 'plus-select-truncate' : '',
+        // A read-only value is shown whole: it wraps and is never clipped.
+        lineWrap || isReadOnly ? '' : 'plus-select-nowrap',
+        truncate && !isReadOnly ? 'plus-select-truncate' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -441,7 +443,7 @@ const Select = ({
                 <FieldBox
                     ref={fieldRef}
                     spacing={spacing}
-                    grow={multi && lineWrap}
+                    grow={(multi && lineWrap) || isReadOnly}
                     disabled={disabled}
                     readOnly={isReadOnly}
                     {...tones.field}

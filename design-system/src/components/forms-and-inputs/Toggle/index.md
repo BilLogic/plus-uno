@@ -51,7 +51,7 @@ A toggle changes the setting as the person flips it. If the change needs confirm
 
 ### Read-only is not disabled. {#read-only-is-not-disabled}
 
-`isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast and ignores clicks. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now.
+`isReadOnly` shows a setting the person may read but not change: the toggle stays in the tab order at full contrast, has no hover, says `aria-readonly` and ignores clicks. Say why beside it. `isDisabled` takes it out of the tab order and grays it, for a setting that does not apply right now.
 
 ### Name and id. {#name-and-id}
 
@@ -93,7 +93,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Pressed | No step of its own. The hovered fill holds while the pointer is down. |
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the track, for keyboard focus only. |
 | Disabled | `--ds-background-disabled` track, `--ds-icon-disabled` thumb, in both positions. Out of the tab order. |
-| Read-only | Full contrast, in the tab order, not changeable. |
+| Read-only | Full contrast, in the tab order, no hover, `aria-readonly`. Not changeable. |
 | Loading | A spinner sits between the track and the label; input is ignored. |
 
 ### Tokens

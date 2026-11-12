@@ -36,7 +36,7 @@ Don't: Long-form writing limited to the compact toolbar.
 
 ### Use read-only for content people read. {#use-read-only-for-content-people-read}
 
-Set `readOnly` on content people need to read, and keep `disabled` for an editor that is unavailable. Both draw the same here, so the choice is about what the content is for.
+Set `readOnly` on content people need to read: it stays in the tab order at full contrast, so it can be selected and copied. Keep `disabled` for an editor that is unavailable; it steps down and leaves the tab order.
 
 ### Use the placeholder for a hint. {#use-the-placeholder-for-a-hint}
 
@@ -71,7 +71,7 @@ Don't: No label, only a placeholder, which disappears as soon as someone types.
 
 ## Accessibility
 
-- **The editable region announces itself as a multi-line textbox.** `role="textbox"` with `aria-multiline`, and `aria-readonly` tracking the flag that turns editing off.
+- **The editable region announces itself as a multi-line textbox.** `role="textbox"` with `aria-multiline`, and `aria-readonly` while it is read-only and `aria-disabled` while it is disabled.
 - **`label` names it, and is effectively required.** The prop renders a `span` above the editor and the region points at it with `aria-labelledby`. A `label` element cannot be used, because `contentEditable` is not a form control for `htmlFor` to bind to. Without a `label` the region is a named role with no name, which a screen-reader user hears as nothing.
 - **The toolbar buttons are named.** Each carries an `aria-label` from its definition, and the bold, italic and underline set is a `role="group"` labeled "Bold, italic, and underline". Their pressed state is tracked internally and is not exposed as `aria-pressed`.
 - **The placeholder is CSS.** It is drawn from a `data-placeholder` attribute, so it is not part of the accessible name and may not be announced at all.
@@ -101,8 +101,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | Pressed | Toolbar buttons take `--ds-background-neutral-subtle-pressed`. |
 | Active format | The button takes `--ds-background-selected` with `--ds-text-selected` and `--ds-icon-selected`. |
 | Focused | A 2px ring in `--ds-border-focused` wraps the box while the writing area has focus. |
-| Read-only | `--ds-background-neutral` box, `--ds-text-subtle` text, toolbar faded and inert. |
-| Disabled | As read-only: the neutral box and subtle text, and the toolbar faded to `--ds-opacity-disabled` and inert. |
+| Read-only | `--ds-background-neutral` box, `--ds-text` text at full contrast, the writing area in the tab order, toolbar faded and inert. |
+| Disabled | `--ds-background-neutral` box and `--ds-text-subtle` text, the writing area out of the tab order, and the toolbar faded to `--ds-opacity-disabled` and inert. |
 | Invalid | Not drawn. Mark the surrounding field and explain the error beside it. |
 
 ### Tokens

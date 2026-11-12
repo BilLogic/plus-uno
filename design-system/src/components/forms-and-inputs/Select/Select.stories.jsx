@@ -494,5 +494,33 @@ export const FieldInvalid = {
 
 export const FieldReadOnly = {
     render: () => <div style={wrap}><Select id="select-ex-readonly" label="Option" options={sampleOptions} placeholder="Please select" isReadOnly /></div>,
-    play: async ({ canvasElement }) => expectReadOnly(canvasElement, controlOf(canvasElement)),
+    play: async ({ canvasElement }) => {
+        await expectReadOnly(canvasElement, controlOf(canvasElement));
+        // Nothing to open: the chevron is not drawn, and a press or Enter leaves the list shut.
+        await expect(canvasElement.querySelector('.plus-select-caret')).toBeNull();
+        await expect(controlOf(canvasElement)).toHaveAttribute('aria-readonly', 'true');
+        await userEvent.click(controlOf(canvasElement));
+        await userEvent.keyboard('{Enter}');
+        await expect(controlOf(canvasElement)).toHaveAttribute('aria-expanded', 'false');
+    },
+};
+
+/** A read-only value is shown whole: it wraps, and is never clipped to one line. */
+export const FieldReadOnlyLongValue = {
+    render: () => (
+        <div style={{ ...wrap, maxWidth: '200px' }}>
+            <Select
+                id="select-ex-readonly-long"
+                label="Option"
+                isReadOnly
+                value="long"
+                options={[{ value: 'long', label: 'Introduction to organic chemistry for first-year students' }]}
+            />
+        </div>
+    ),
+    play: async ({ canvasElement }) => {
+        const text = canvasElement.querySelector('.plus-select-text');
+        await expect(text.scrollWidth).toBeLessThanOrEqual(text.clientWidth);
+        await expect(getComputedStyle(text).textOverflow).toBe('clip');
+    },
 };

@@ -200,6 +200,10 @@ export const ReadOnly = {
         const area = writing(canvasElement);
         await expect(area).toHaveAttribute('aria-readonly', 'true');
         await expect(area).toHaveAttribute('contenteditable', 'false');
+        // Read-only is not disabled: the writing area stays in the tab order, at full contrast.
+        await expect(area.tabIndex).toBe(0);
+        await expect(area).not.toHaveAttribute('aria-disabled');
+        await expect(getComputedStyle(area).color).toBe(tokenColor(canvasElement, '--ds-text'));
         // The box takes the read-only fill; the writing area is clear on it.
         await expect(getComputedStyle(area.closest('.plus-rich-text-editor-box')).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
     },
@@ -210,6 +214,8 @@ export const DisabledState = {
     play: async ({ canvasElement }) => {
         const area = writing(canvasElement);
         await expect(area).toHaveAttribute('contenteditable', 'false');
+        await expect(area).toHaveAttribute('aria-disabled', 'true');
+        await expect(area.tabIndex).toBe(-1);
         // The box takes the read-only fill; the writing area is clear on it.
         await expect(getComputedStyle(area.closest('.plus-rich-text-editor-box')).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
         await expect(within(canvasElement).getAllByRole('button').every((b) => b.disabled)).toBe(true);

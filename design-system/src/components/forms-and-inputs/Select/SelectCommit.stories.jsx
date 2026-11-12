@@ -441,7 +441,9 @@ ReadonlyIsNotDisabled.play = async ({ canvasElement }) => {
     await userEvent.click(readonly);
     await expect(page().queryByRole('option', { name: 'North High' })).toBeNull();
     await userEvent.keyboard('{Delete}');
-    await expect(readonly).toHaveValue('North High');
+    await expect(readonly).toHaveTextContent('North High');
+    // The value is text to read: no chevron, nothing to type in.
+    await expect(readonly.closest('.plus-field').querySelector('.plus-select-caret')).toBeNull();
 
     // Disabled is out of the tab order.
     await userEvent.tab();
