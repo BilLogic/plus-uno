@@ -4615,8 +4615,10 @@
         "Interactive"
       ],
       "tokens": [
+        "--border-default",
         "--heading-xsmall",
         "--inline-lg",
+        "--plus-filter-menu-bleed",
         "--plus-filter-menu-columns",
         "--popover-max-height-menu",
         "--popover-pad",
