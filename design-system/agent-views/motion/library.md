@@ -69,8 +69,14 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Forms | pattern | failed | Call attention | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
 | Forms | pattern | steps | Step to the next or previous | `--ds-motion-appearance-fast` |
 | Forms | pattern | saving | Update a value or state | `--ds-motion-appearance-fast` |
+| Indicators | pattern | status | Update a value or state | `--ds-motion-appearance-default` |
+| Indicators | pattern | count-first | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
+| Indicators | pattern | progress | Update a value or state | `--ds-motion-linear` |
 | Loading | pattern | load | Load content | `--ds-motion-linear` · `--ds-motion-appearance-fast` |
 | Loading | pattern | action | Update a value or state | `--ds-motion-appearance-fast` |
+| Overflow | pattern | fold-open | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
+| Overflow | pattern | fold-close | Open and close an overlay | `--ds-motion-spatial-exit` |
+| Overflow | pattern | truncate | Update a value or state | `--ds-motion-appearance-fast` |
 | Read-only | pattern | change | Update a value or state | `--ds-motion-appearance-fast` |
 | Accordion | component | change | Expand and collapse | `--ds-motion-spatial-fast` |
 | AiMessage | component | change | Load content | `--ds-motion-appearance-fast` |
