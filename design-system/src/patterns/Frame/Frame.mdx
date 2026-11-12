@@ -9,7 +9,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
-import { LiveAnatomy, PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
 import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
 import {
     AiPanelDocked,
@@ -77,9 +77,9 @@ The app frame: the Sidebar beside the Page, with the AI panel as its own region.
 Every page of the app sits in one of three, each shown in a browser window. A Frame with its slots filled for one page is a Screen, and Screens in order are a Flow; both live with the flows, not here.
 
 <TypeGrid>
-<TypeCard of={FrameStories.TypeDefault} title="Default">Pages people move among: the Sidebar, the Page, and the AI panel as its own region on the right.</TypeCard>
-<TypeCard of={FrameStories.TypeFocused} title="Focused">One task a person finishes or leaves: the whole window, Close beside the title, no Sidebar.</TypeCard>
-<TypeCard of={FrameStories.TypeBare} title="Bare">Sign-in, errors and welcome: one centered column, with no Sidebar and no header row.</TypeCard>
+<TypeCard of={FrameStories.TypeDefault} title="Default" stage={1440}>Pages people move among: the Sidebar, the Page, and the AI panel as its own region on the right.</TypeCard>
+<TypeCard of={FrameStories.TypeFocused} title="Focused" stage={1440}>One task a person finishes or leaves: the whole window, Close beside the title, no Sidebar.</TypeCard>
+<TypeCard of={FrameStories.TypeBare} title="Bare" stage={1440}>Sign-in, errors and welcome: one centered column, with no Sidebar and no header row.</TypeCard>
 </TypeGrid>
 
 </div>
@@ -92,18 +92,7 @@ Every page of the app sits in one of three, each shown in a browser window. A Fr
 
 The default type at 1440 with the AI panel docked.
 
-<LiveAnatomy
-    width={1440}
-    title="The default Frame with its parts numbered"
-    parts={[
-        { selector: '.plus-frame__sidebar', label: 'Sidebar' },
-        { selector: '.plus-frame__head', label: 'Header row' },
-        { selector: '.plus-frame__content', label: 'Content' },
-        { selector: '.plus-frame__panel', label: 'AI panel' },
-    ]}
->
-    <Story of={FrameStories.AnatomyDefault} inline />
-</LiveAnatomy>
+<Story of={FrameStories.AnatomyDefault} inline />
 
 1. **Sidebar.** 240 wide, docked from 1024, with the toggle ending its logo row.
 2. **Header row.** The Page's first row, 32 high on the logo row's center line: the breadcrumb, once a person has drilled into a record.
@@ -114,18 +103,7 @@ The default type at 1440 with the AI panel docked.
 
 A task with five steps. No Sidebar and no breadcrumb: nothing invites the person away.
 
-<LiveAnatomy
-    width={1024}
-    title="The focused Frame with its parts numbered"
-    parts={[
-        { selector: '.plus-frame__head', label: 'Title row' },
-        { selector: '[data-probe="steps"]', label: 'Steps' },
-        { selector: '.plus-frame__content', label: 'Body' },
-        { selector: '[data-probe="bar"]', label: 'Bar' },
-    ]}
->
-    <Story of={FrameStories.AnatomyFocused} inline />
-</LiveAnatomy>
+<Story of={FrameStories.AnatomyFocused} inline />
 
 1. **Title row.** Close at the start, then the task's name as the page's one h1.
 2. **Steps.** A Section side at the start, 256 wide (320 for long labels), for five or more.

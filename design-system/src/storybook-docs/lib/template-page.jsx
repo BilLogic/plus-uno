@@ -73,7 +73,7 @@ export const TypeGrid = ({ children }) => (
 TypeGrid.propTypes = { children: PropTypes.node };
 
 /** One type: its live story on the raised card, then its name and one line. */
-export const TypeCard = ({ of, title, children }) => (
+export const TypeCard = ({ of, title, stage = TYPE_STAGE, children }) => (
     <figure
         style={{
             margin: 0,
@@ -86,7 +86,7 @@ export const TypeCard = ({ of, title, children }) => (
             boxShadow: 'var(--ds-shadow-raised)',
         }}
     >
-        <ScaledStory width={TYPE_STAGE}>
+        <ScaledStory width={stage}>
             <Story of={of} inline />
         </ScaledStory>
         <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)' }}>
@@ -100,40 +100,61 @@ TypeCard.propTypes = {
     /** The type's story export. */
     of: PropTypes.any.isRequired,
     title: PropTypes.string.isRequired,
+    /** The width the story lays out at, when the type needs more than the shared stage (a Frame docks its Sidebar from 1024 of its own width, inside the window's border). */
+    stage: PropTypes.number,
     /** The one line: what the type is and when it fits. */
     children: PropTypes.node,
 };
 
 /**
  * A live story with a numbered marker on each part, the numbers matching the
- * Parts list beside it. Markers sit in a gutter at the start, each joined to
- * its part's outline, and follow the story as it lays out; the story is
- * scaled to fit, the markers are not, so they read at one size.
+ * Parts list beside it. Markers sit in a gutter outside the picture, each
+ * level with its part and joined to the part's outline by a hairline, so no
+ * marker covers content. The story is scaled to fit, the markers are not, so
+ * they read at one size.
  *
  * @param {object} props
  * @param {number} props.width  the stage width the story lays out at
- * @param {{selector: string, label: string}[]} props.parts  each part's CSS
- *   selector inside the story, in Parts-list order, and its name for the
- *   figure's accessible description
+ * @param {{selector: string, label: string, side?: 'start'|'end', at?: 'start'|'middle'|'end'}[]} props.parts
+ *   each part's CSS selector inside the story, in Parts-list order, and its
+ *   name for the figure's accessible description. `side` picks the gutter
+ *   (start by default); `at` picks where along the part the marker sits level
+ *   with it (its top by default), for a part whose top shares a line with another.
  */
-/** Whether an earlier marker starts within a marker's height of this one, so the gutter is taken. */
-const MARKER_CLEARANCE = 24; // docs-literal: the marker's own size, --control-sm, in px for the layout math
-const sharesLine = (marks, i) => marks.slice(0, i).some((m) => m && marks[i] && Math.abs(m.top - marks[i].top) < MARKER_CLEARANCE);
+const MARKER = 24; // docs-literal: the marker's own size, --control-sm, in px for the layout math
+const GUTTER = 'var(--control-lg)';
+
+/** Each marker's top, in order: level with its part, moved down past an earlier marker on the same side, never below its part. */
+const placeMarkers = (rects, parts) => {
+    const taken = { start: [], end: [] };
+    return rects.map((r, i) => {
+        if (!r) return null;
+        const side = parts[i].side === 'end' ? 'end' : 'start';
+        const at = parts[i].at;
+        let top = at === 'end' ? r.top + r.height - MARKER : at === 'middle' ? r.top + (r.height - MARKER) / 2 : r.top;
+        taken[side].forEach((t) => { if (Math.abs(t - top) < MARKER) top = t + MARKER; });
+        top = Math.min(top, r.top + r.height - MARKER);
+        taken[side].push(top);
+        return { ...r, side, markerTop: top };
+    });
+};
 
 export const LiveAnatomy = ({ width, parts, title, children }) => {
     const box = React.useRef(null);
     const [marks, setMarks] = React.useState([]);
+    const [boxWidth, setBoxWidth] = React.useState(0);
     React.useLayoutEffect(() => {
         const root = box.current;
         if (!root) return undefined;
         const read = () => {
             const origin = root.getBoundingClientRect();
-            setMarks(parts.map(({ selector }) => {
+            setBoxWidth(origin.width);
+            setMarks(placeMarkers(parts.map(({ selector }) => {
                 const el = root.querySelector(selector);
                 if (!el) return null;
                 const r = el.getBoundingClientRect();
                 return { top: r.top - origin.top, left: r.left - origin.left, width: r.width, height: r.height };
-            }));
+            }), parts));
         };
         read();
         if (typeof ResizeObserver === 'undefined') return undefined;
@@ -147,7 +168,7 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
             role="img"
             aria-label={`${title}: ${parts.map((p, i) => `${i + 1}, ${p.label}`).join('; ')}`}
             className="not-prose"
-            style={{ margin: 0, position: 'relative', paddingInlineStart: 'var(--control-lg)' }}
+            style={{ margin: 0, position: 'relative', paddingInline: GUTTER }}
         >
             <div ref={box} style={{ position: 'relative' }}>
                 <ScaledStory width={width}>{children}</ScaledStory>
@@ -170,11 +191,21 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
                             aria-hidden="true"
                             style={{
                                 position: 'absolute',
-                                // Two parts that start on one line (a body and its detail): the
-                                // second marker moves onto its part's corner instead of the gutter.
-                                ...(sharesLine(marks, i)
-                                    ? { top: `calc(${m.top}px - var(--control-sm) / 2)`, left: `calc(${m.left}px - var(--control-sm) / 2)` }
-                                    : { top: m.top, left: 'calc(-1 * var(--control-lg))' }),
+                                top: m.markerTop + MARKER / 2,
+                                height: 0,
+                                borderTop: 'var(--border-default) dashed var(--ds-border-brand)',
+                                ...(m.side === 'end'
+                                    ? { left: m.left + m.width, width: Math.max(boxWidth - m.left - m.width, 0) }
+                                    : { right: boxWidth - m.left, width: Math.max(m.left, 0) }),
+                            }}
+                        />
+                        <span
+                            aria-hidden="true"
+                            data-anatomy-marker={i + 1}
+                            style={{
+                                position: 'absolute',
+                                top: m.markerTop,
+                                ...(m.side === 'end' ? { left: `calc(${boxWidth}px + (${GUTTER} - ${MARKER}px) / 2)` } : { left: `calc(-1 * (${GUTTER} + ${MARKER}px) / 2)` }),
                                 width: 'var(--control-sm)',
                                 height: 'var(--control-sm)',
                                 display: 'grid',
@@ -197,7 +228,12 @@ export const LiveAnatomy = ({ width, parts, title, children }) => {
 
 LiveAnatomy.propTypes = {
     width: PropTypes.number.isRequired,
-    parts: PropTypes.arrayOf(PropTypes.shape({ selector: PropTypes.string.isRequired, label: PropTypes.string.isRequired })).isRequired,
+    parts: PropTypes.arrayOf(PropTypes.shape({
+        selector: PropTypes.string.isRequired,
+        label: PropTypes.string.isRequired,
+        side: PropTypes.oneOf(['start', 'end']),
+        at: PropTypes.oneOf(['start', 'middle', 'end']),
+    })).isRequired,
     /** What the figure shows, read before its numbered parts. */
     title: PropTypes.string.isRequired,
     children: PropTypes.node,

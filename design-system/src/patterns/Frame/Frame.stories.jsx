@@ -4,7 +4,7 @@ import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Breadcrumb, Button, IconButton, Logo, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, Sidebar, Skeleton, TextField } from '@/components';
 import { Frame, PANEL_STORAGE_KEY, PatternDrawer, PatternSection, usePanelControl, useSidebarControl } from '@/patterns';
 import { FRAME_LAYOUT } from './frameLayout';
-import { BrowserWindow, ScaledStory } from '@/storybook-docs/lib/template-page.jsx';
+import { BrowserWindow, LiveAnatomy, ScaledStory } from '@/storybook-docs/lib/template-page.jsx';
 import { computedShadow, px, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
@@ -1585,15 +1585,15 @@ const DefaultType = ({ withPanel = false, ...args }) => (
     </BrowserWindow>
 );
 
-/** Default: Sidebar, Page and the AI panel region (closed here). */
+/** Default: Sidebar, Page and the AI panel region, docked at 1440. */
 export const TypeDefault = {
     name: 'Type: Default',
     parameters: { layout: 'padded' },
-    render: () => <DefaultType panel={<ChatPanel />} />,
+    render: () => <div style={{ inlineSize: 1440 /* docs-literal: the X-Large stage, wide enough to dock the Sidebar and the AI panel */ }}><DefaultType withPanel /></div>,
     play: async ({ canvasElement }) => {
         const p = parts(canvasElement);
         await waitFor(() => expect(p.sidebar(), 'the Sidebar docks').not.toBeNull());
-        await expect(p.frame.querySelector('.plus-frame__panel'), 'the AI panel region starts closed').toBeNull();
+        await expect(p.frame.querySelector('.plus-frame__panel'), 'the AI panel docks beside the Page').not.toBeNull();
     },
 };
 
@@ -1706,26 +1706,58 @@ export const TypeBare = {
     },
 };
 
-/** Anatomy: the default type at 1440 with the AI panel docked. */
+/** The default anatomy's parts, in the Parts list's order: the figure and its play read this one list. */
+const ANATOMY_DEFAULT_PARTS = [
+    { selector: '.plus-frame__sidebar', label: 'Sidebar', at: 'end' },
+    { selector: '.plus-frame__head', label: 'Header row' },
+    { selector: '.plus-frame__content', label: 'Content', at: 'middle' },
+    { selector: '.plus-frame__panel', label: 'AI panel', side: 'end' },
+];
+
+/** The focused anatomy's parts, in the Parts list's order. */
+const ANATOMY_FOCUSED_PARTS = [
+    { selector: '.plus-frame__head', label: 'Title row' },
+    { selector: '[data-probe="steps"]', label: 'Steps' },
+    { selector: '.plus-frame__content', label: 'Body', at: 'end' },
+    { selector: '[data-probe="bar"]', label: 'Bar' },
+];
+
+/** Every marker's part exists and the marker sits level with it: its center within the part's top and bottom. */
+const markersLevelWithParts = async (canvasElement, parts) => {
+    await waitFor(() => expect(canvasElement.querySelectorAll('[data-anatomy-marker]'), 'a marker for each part').toHaveLength(parts.length));
+    parts.forEach(({ selector, label }, i) => {
+        const target = canvasElement.querySelector(selector);
+        expect(target, `${label}: its element exists`).not.toBeNull();
+        const marker = canvasElement.querySelector(`[data-anatomy-marker="${i + 1}"]`);
+        const box = rect(target);
+        const middle = rect(marker).top + rect(marker).height / 2;
+        expect(middle, `marker ${i + 1} (${label}) sits level with its part`).toBeGreaterThanOrEqual(box.top - 1);
+        expect(middle, `marker ${i + 1} (${label}) sits level with its part`).toBeLessThanOrEqual(box.bottom + 1);
+    });
+};
+
+/** Anatomy: the default type at 1440 with the AI panel docked, a marker on each part. */
 export const AnatomyDefault = {
     name: 'Anatomy: Default',
     parameters: { layout: 'padded' },
     render: () => (
-        <div data-anatomy-root style={{ inlineSize: 1440 /* docs-literal: the X-Large stage */ }}>
+        <LiveAnatomy width={1440 /* docs-literal: the X-Large stage */} title="The default Frame with its parts numbered" parts={ANATOMY_DEFAULT_PARTS}>
             <DefaultType withPanel />
-        </div>
+        </LiveAnatomy>
     ),
+    play: ({ canvasElement }) => markersLevelWithParts(canvasElement, ANATOMY_DEFAULT_PARTS),
 };
 
-/** Anatomy: the focused type, five steps. */
+/** Anatomy: the focused type, five steps, a marker on each part. */
 export const AnatomyFocused = {
     name: 'Anatomy: Focused',
     parameters: { layout: 'padded' },
     render: () => (
-        <div data-anatomy-root style={{ inlineSize: 1024 /* docs-literal: the Large stage */ }}>
+        <LiveAnatomy width={1024 /* docs-literal: the Large stage */} title="The focused Frame with its parts numbered" parts={ANATOMY_FOCUSED_PARTS}>
             <FocusedType count={5} />
-        </div>
+        </LiveAnatomy>
     ),
+    play: ({ canvasElement }) => markersLevelWithParts(canvasElement, ANATOMY_FOCUSED_PARTS),
 };
 
 /** Steps down the left: five or more, a rail 256 wide, the bar at 48 with Cancel, Back and Next. */
