@@ -200,6 +200,10 @@ export const Interactive = {
             {tableContent}
         </PatternTable>
     ),
+    play: async ({ canvasElement }) => {
+        const scroll = canvasElement.querySelector('.plus-pattern-table-scroll');
+        await expect(getComputedStyle(scroll).borderTopLeftRadius, 'Table radius is 12').toBe('12px');
+    },
 };
 
 /**

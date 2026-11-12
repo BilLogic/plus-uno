@@ -152,7 +152,7 @@ Modal is the component: Backdrop, focus trap, Escape and focus return. The templ
 | Token | Value | Used for |
 | --- | --- | --- |
 | `--modal-pad-x-default` | 16 | Pad on every side. |
-| `--modal-radius` | 12 | Corner radius at every width. |
+| `--modal-radius` | 16 | Corner radius at every width. |
 | `--modal-stack-sm`, `-md`, `-lg` | 8, 16, 24 | Title to tabs; header, body and footer; groups of fields. |
 | `--modal-body-min-height` | 80 | The least the body draws. |
 | `--space-300` | 48 | The full-bleed footer's height: a 32 button plus 16 pad, so full bleed never changes the Modal's height. |

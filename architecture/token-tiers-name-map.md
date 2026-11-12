@@ -159,7 +159,7 @@ Every token below is declared by the generator in `design-system/src/tokens/ladd
 | Modal | `--modal-inline-sm` (declared elsewhere) |  |
 | Modal | `--modal-inline-md` (declared elsewhere) |  |
 | Modal | `--modal-inline-lg` (declared elsewhere) |  |
-| Modal | `--modal-radius` | reads xl (12) until the template-values ticket moves it to xxl (16) |
+| Modal | `--modal-radius` |  |
 | Modal | `--modal-width-sm` | lifted out of spacing / layout, beside the pattern’s pad/stack tokens |
 | Modal | `--modal-width-md` |  |
 | Modal | `--modal-width-lg` |  |

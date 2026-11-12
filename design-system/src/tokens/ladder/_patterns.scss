@@ -47,7 +47,7 @@
     --card-radius-compact: var(--radius-xl);
 
     /* Table */
-    --table-radius: var(--radius-lg);
+    --table-radius: var(--radius-xl);
     --table-overflow-reach: var(--space-150);
 
     /* Blanket */
@@ -63,7 +63,7 @@
     --modal-pad-y-compact: var(--space-050);
     --modal-pad-y-default: var(--space-075);
     --modal-pad-y-spacious: var(--space-100);
-    --modal-radius: var(--radius-xl); /* reads xl (12) until the template-values ticket moves it to xxl (16) */
+    --modal-radius: var(--radius-xxl);
     --modal-width-sm: 384px; /* lifted out of spacing / layout, beside the pattern’s pad/stack tokens */
     --modal-width-md: 507px;
     --modal-width-lg: 629px;

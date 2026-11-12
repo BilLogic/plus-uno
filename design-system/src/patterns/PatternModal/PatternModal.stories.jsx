@@ -100,6 +100,7 @@ export const Overview = {
         await expect(style.paddingTop, 'Modal/pad').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
         await expect(style.rowGap, 'Modal/stack-md').toBe(`${tokenLength(canvasElement, '--modal-stack-md')}px`);
         await expect(style.borderTopLeftRadius, 'Modal/radius').toBe(`${tokenLength(canvasElement, '--modal-radius')}px`);
+        await expect(style.borderTopLeftRadius, 'Modal radius is 16').toBe('16px');
         const overlayStyle = getComputedStyle(overlay);
         await expect(overlayStyle.paddingLeft, 'Overlay/pad-x').toBe(`${tokenLength(canvasElement, '--blanket-pad-x')}px`);
         await expect(overlayStyle.paddingTop, 'Overlay/pad-y').toBe(`${tokenLength(canvasElement, '--blanket-pad-y')}px`);
@@ -553,7 +554,7 @@ export const AnatomyActive = {
         leadersCrossNoOtherPart(canvasElement, ANATOMY_PARTS);
         const modal = canvasElement.querySelector('.plus-pattern-modal');
         await expect(getComputedStyle(modal).paddingTop, 'pad 16 on every side').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
-        await expect(getComputedStyle(modal).borderTopLeftRadius, 'radius 12').toBe(`${tokenLength(canvasElement, '--modal-radius')}px`);
+        await expect(getComputedStyle(modal).borderTopLeftRadius, 'radius 16').toBe(`${tokenLength(canvasElement, '--modal-radius')}px`);
     },
 };
 
