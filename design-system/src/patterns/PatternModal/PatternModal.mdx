@@ -149,9 +149,9 @@ The rule for full bleed, Cancel and Close: Patterns, Common actions.
 
 A confirm Modal may open over a Panel, a Popup or a focused task, and brings its own Backdrop. A Modal never opens on another Modal.
 
-<ComponentExample of={PatternModalStories.StackConfirmOverPanel} title="A confirm over a Panel" description="Open the confirm: the Panel stays open under a second Backdrop, and closing the confirm returns to it." />
+<ComponentExample of={PatternModalStories.StackConfirmOverPanel} title="A confirm over a Panel" description="The Panel stays open under the confirm's own Backdrop. Cancel closes the confirm and focus returns to the Panel." />
 
-<ComponentExample of={PatternModalStories.StackModalOnModalRefused} title="Never a Modal on a Modal" description="Open the Modal, then ask it for another: the second stays closed and calls its onClose." />
+<ComponentExample of={PatternModalStories.StackModalOnModalRefused} title="Confirm inside the Modal" description="A Modal that needs a confirm holds it inside itself: a warning SectionMessage in the body and the action in Danger. A second Modal never opens on it." />
 
 </div>
 

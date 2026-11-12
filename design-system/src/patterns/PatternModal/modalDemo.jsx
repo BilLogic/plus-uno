@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-import { Button, Modal, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, SectionMessage, Skeleton, TextField } from '@/components';
+import { Button, PanelBody, PanelCloseAction, PanelContainer, PanelHeader, ProgressTracker, SectionMessage, Skeleton, TextField } from '@/components';
 import { Backdrop, PatternModal, PatternSection } from '@/patterns';
 import { BrowserWindow } from '@/storybook-docs/lib/template-page.jsx';
 import { CELL, FooterCells } from '@/storybook-docs/lib/full-bleed-footer.jsx';
@@ -103,7 +103,7 @@ export const Steps = ({ start = 1 }) => {
 
 /** Active, 8-col, with its fields: every part once. */
 export const ActiveForm = () => (
-    <ModalStage width="md" title="Log a session" footer={<TwoCells action="Save session" />}>
+    <ModalStage width="md" height={640} title="Log a session" footer={<TwoCells action="Save session" />}>
         <FormFieldsStatic />
     </ModalStage>
 );
@@ -144,8 +144,8 @@ export const TierTypeName = () => {
 };
 
 /** A Modal that confirms inside itself: the view swaps, a warning SectionMessage above the danger button. */
-export const ConfirmInside = () => {
-    const [confirming, setConfirming] = useState(false);
+export const ConfirmInside = ({ start = 'details' }) => {
+    const [confirming, setConfirming] = useState(start === 'confirm');
     return (
         <ModalStage
             title={confirming ? 'Delete session?' : 'Session details'}
@@ -184,52 +184,50 @@ const PageBehind = () => (
 );
 
 /**
- * A real confirm Modal opened over a Panel: the Panel stays open under the
- * confirm's own Backdrop. Real components, so the focus trap, Escape and
- * overlay rules all run.
+ * A confirm Modal over a Panel, drawn open: the Panel open, the confirm over it,
+ * and the confirm's own Backdrop covering the Panel. Cancel or Escape closes the
+ * confirm and hands focus back to the Panel's trigger.
  */
 export const ConfirmOverPanel = () => {
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState(true);
+    const root = useRef(null);
+    const close = () => {
+        setOpen(false);
+        root.current?.querySelector('.plus-panel .plus-btn--danger')?.focus();
+    };
+    useEffect(() => {
+        if (open) root.current?.querySelector('.plus-pattern-modal-footer button')?.focus();
+    }, [open]);
     return (
         <BrowserWindow address="app.plus.org/students" height={420}>
-            <div style={{ display: 'flex', blockSize: '100%', background: 'var(--ds-surface-sunken)' }}>
-                <div style={{ flex: '1 1 auto', minInlineSize: 0, padding: 'var(--page-pad)' }}><PageBehind /></div>
-                <PanelContainer width="var(--panel-width-default)">
-                    <PanelHeader title="Ana Ruiz" actions={<PanelCloseAction onClick={() => {}} />} />
-                    <PanelBody>
-                        <Button text="Delete student" appearance="danger" onClick={() => setOpen(true)} />
-                    </PanelBody>
-                </PanelContainer>
+            <div ref={root} style={{ position: 'relative', blockSize: '100%' }} onKeyDown={(e) => { if (open && e.key === 'Escape') close(); }}>
+                <div style={{ display: 'flex', blockSize: '100%', background: 'var(--ds-surface-sunken)' }}>
+                    <div style={{ flex: '1 1 auto', minInlineSize: 0, padding: 'var(--page-pad)' }}><PageBehind /></div>
+                    <PanelContainer width="var(--panel-width-default)">
+                        <PanelHeader title="Ana Ruiz" actions={<PanelCloseAction onClick={() => {}} />} />
+                        <PanelBody>
+                            <Button text="Delete student" appearance="danger" onClick={() => setOpen(true)} />
+                        </PanelBody>
+                    </PanelContainer>
+                </div>
+                {open && (
+                    <Backdrop inline screenWidth={SCREEN.width} screenHeight={420} style={{ position: 'absolute', inset: 0, inlineSize: '100%' }}>
+                        <PatternModal
+                            width="sm"
+                            title="Delete student?"
+                            onClose={close}
+                            footer={(
+                                <FooterCells bleed={MODAL_PAD}>
+                                    <Button text="Cancel" shouldFitContainer style={CELL} onClick={close} />
+                                    <Button text="Delete student" appearance="danger" shouldFitContainer style={CELL} onClick={close} />
+                                </FooterCells>
+                            )}
+                        >
+                            {text('This removes Ana and her sessions. This cannot be undone.')}
+                        </PatternModal>
+                    </Backdrop>
+                )}
             </div>
-            <Modal
-                show={open}
-                width="6-col"
-                title="Delete student?"
-                body="This removes Ana and her sessions. This cannot be undone."
-                secondaryButton={{ text: 'Cancel', onClick: () => setOpen(false) }}
-                primaryButton={{ text: 'Delete student', appearance: 'danger', onClick: () => setOpen(false) }}
-                onClose={() => setOpen(false)}
-            />
         </BrowserWindow>
-    );
-};
-
-/** A real Modal that tries to open another: the second stays closed, so the first confirms inside itself instead. */
-export const ModalOnModal = () => {
-    const [first, setFirst] = useState(false);
-    const [second, setSecond] = useState(false);
-    return (
-        <>
-            <Button text="Open Modal" onClick={() => setFirst(true)} />
-            <Modal
-                show={first}
-                width="6-col"
-                title="Session settings"
-                body="A Modal never opens on another Modal."
-                primaryButton={{ text: 'Open another Modal', onClick: () => setSecond(true) }}
-                onClose={() => setFirst(false)}
-            />
-            <Modal show={second} width="6-col" title="Another Modal" body="This one is refused." onClose={() => setSecond(false)} />
-        </>
     );
 };

@@ -6,7 +6,9 @@ import { Button } from '@/components';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { LiveAnatomy } from '@/storybook-docs/lib/template-page.jsx';
-import { leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
+import { fitsCanvas, leadersCrossNoOtherPart, markersLevelWithParts } from '@/storybook-docs/lib/anatomy-asserts.js';
+import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
+import { openOverlay } from '@/lib/overlay.js';
 import { BAR_TOKEN } from '@/storybook-docs/lib/focused-task.jsx';
 import * as Demo from './modalDemo.jsx';
 
@@ -459,6 +461,7 @@ const rect = (el) => el.getBoundingClientRect();
 
 /** Every footer button sits inside the Modal's box and the footer's own box: nothing overflows its container. */
 const buttonsInside = async (canvasElement) => {
+    fitsCanvas(canvasElement);
     const modal = rect(canvasElement.querySelector('.plus-pattern-modal'));
     const footer = canvasElement.querySelector('[data-probe="footer"]');
     const box = footer ? rect(footer) : modal;
@@ -477,14 +480,14 @@ const buttonsInside = async (canvasElement) => {
     }
 };
 
-const sized = (story) => (
-    <div style={{ overflowX: 'auto' }}><div style={{ inlineSize: STAGE }}>{story}</div></div>
-);
+/** The 1024 stand-in screen, drawn to fit the canvas: never wider than it. */
+const sized = (story, width = STAGE) => <FitStage width={width}>{story}</FitStage>;
 
 export const TypePassive = {
     name: 'Type: Passive',
     render: () => sized(<Demo.Passive />),
     play: async ({ canvasElement }) => {
+        fitsCanvas(canvasElement);
         await expect(canvasElement.querySelector('.plus-pattern-modal-footer'), 'Passive has no footer').toBeNull();
         await expect(within(canvasElement).getByRole('button', { name: 'Close' }), 'Close is the way out').toBeInTheDocument();
     },
@@ -517,7 +520,7 @@ export const TypeSteps = {
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
         const modal = rect(canvasElement.querySelector('.plus-pattern-modal'));
-        await expect(modal.width, '10-col at 1024').toBeCloseTo(WIDTHS_AT_1024.lg, 0);
+        await expect(canvasElement.querySelector('.plus-pattern-modal').offsetWidth, '10-col at 1024').toBeCloseTo(WIDTHS_AT_1024.lg, 0);
         await expect(canvas.getByRole('navigation', { name: 'Steps' }), 'the steps run across the top').toHaveClass('plus-progress-tracker--horizontal');
         const back = rect(canvas.getByRole('button', { name: 'Back' }));
         await expect(back.left, 'Back and Next share the right half').toBeGreaterThanOrEqual(modal.left + modal.width / 2 - 1);
@@ -543,7 +546,10 @@ export const AnatomyActive = {
         </LiveAnatomy>
     ),
     play: async ({ canvasElement }) => {
+        fitsCanvas(canvasElement);
         await markersLevelWithParts(canvasElement, ANATOMY_PARTS);
+        const body = canvasElement.querySelector('.plus-pattern-modal-body');
+        await expect(body.scrollHeight, 'the body shows every field whole: nothing clips').toBeLessThanOrEqual(body.clientHeight + 1);
         leadersCrossNoOtherPart(canvasElement, ANATOMY_PARTS);
         const modal = canvasElement.querySelector('.plus-pattern-modal');
         await expect(getComputedStyle(modal).paddingTop, 'pad 16 on every side').toBe(`${tokenLength(canvasElement, '--modal-pad-x-default')}px`);
@@ -554,7 +560,7 @@ export const AnatomyActive = {
 /** The width steps against the screen grid: 6 · 8 · 10 columns plus 16 a side at 1024. 4-col is Planned. */
 export const WidthStrip = {
     render: () => (
-        <div style={{ overflowX: 'auto' }}>
+        <FitStage width={STAGE}>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)', inlineSize: STAGE }}>
             {[['sm', '6-col'], ['md', '8-col'], ['lg', '10-col']].map(([width, label]) => (
                 <Demo.ModalStage key={width} width={width} height={240} title={label} footer={<Demo.TwoCells action="Save" />}>
@@ -562,15 +568,16 @@ export const WidthStrip = {
                 </Demo.ModalStage>
             ))}
         </div>
-        </div>
+        </FitStage>
     ),
     play: async ({ canvasElement }) => {
+        fitsCanvas(canvasElement);
         const modals = within(canvasElement).getAllByRole('dialog');
         for (const [i, width] of ['sm', 'md', 'lg'].entries()) {
-            await expect(rect(modals[i]).width, `${width} matches the grid at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
+            await expect(modals[i].offsetWidth, `${width} matches the grid at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
         }
-        await expect(rect(modals[0]).width, 'widths step up').toBeLessThan(rect(modals[1]).width);
-        await expect(rect(modals[1]).width, 'widths step up').toBeLessThan(rect(modals[2]).width);
+        await expect(modals[0].offsetWidth, 'widths step up').toBeLessThan(modals[1].offsetWidth);
+        await expect(modals[1].offsetWidth, 'widths step up').toBeLessThan(modals[2].offsetWidth);
     },
 };
 
@@ -583,18 +590,19 @@ export const ResponsiveWidth = {
         width: { control: { type: 'range', min: 768, max: 1440, step: 8 }, description: 'The screen’s width, in px.', table: { category: 'Docs' } },
     },
     render: ({ width }) => (
-        <div style={{ overflowX: 'auto' }}>
+        <FitStage width={width}>
             <Demo.ModalStage width="md" screenWidth={width} height={260} title="Session settings" footer={<Demo.TwoCells action="Save" />}>
                 <p style={{ margin: 0, font: 'var(--body-default)' }}>The Modal takes its width from the screen grid.</p>
             </Demo.ModalStage>
-        </div>
+        </FitStage>
     ),
     play: async ({ canvasElement }) => {
+        fitsCanvas(canvasElement);
         const backdrop = canvasElement.querySelector('.plus-pattern-backdrop');
         const modal = within(canvasElement).getByRole('dialog');
         const at = (screen) => {
             backdrop.style.setProperty('--plus-overlay-screen', `${screen}px`);
-            return rect(modal).width;
+            return modal.offsetWidth;
         };
         const small = at(768);
         const mid = at(1024);
@@ -634,7 +642,7 @@ export const FooterOne = {
     render: () => sized(<Demo.Acknowledge />),
     play: async ({ canvasElement }) => {
         const footer = canvasElement.querySelector('[data-probe="footer"]');
-        await expect(rect(footer).height, 'the footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
+        await expect(footer.offsetHeight, 'the footer is 48 high').toBeCloseTo(tokenLength(footer, BAR_TOKEN), 0);
         await buttonsInside(canvasElement);
     },
 };
@@ -651,7 +659,7 @@ export const FooterTwo = {
 
 export const FooterThree = {
     name: 'Footer: Three buttons',
-    render: () => sized(<div style={{ inlineSize: STAGE }}><Demo.ModalStage title="Schedule session" footer={<Demo.ThreeCells />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Save it as a draft, or schedule it now.</p></Demo.ModalStage></div>),
+    render: () => sized(<Demo.ModalStage title="Schedule session" footer={<Demo.ThreeCells />}><p style={{ margin: 0, font: 'var(--body-default)' }}>Save it as a draft, or schedule it now.</p></Demo.ModalStage>),
     play: async ({ canvasElement }) => {
         const buttons = [...canvasElement.querySelectorAll('.plus-pattern-modal-footer button')];
         await expect(buttons, 'three cells').toHaveLength(3);
@@ -701,40 +709,58 @@ export const KeyConfirmInside = {
     },
 };
 
-const dialogNamed = (canvasElement, name) => within(canvasElement.ownerDocument.body).queryByRole('dialog', { name });
+const dialogNamed = (canvasElement, name) => within(canvasElement).queryByRole('dialog', { name });
 
-/** A confirm Modal over a Panel: its own Backdrop, the Panel stays open under it. */
+/**
+ * A confirm Modal over a Panel, drawn open: the Panel open, the confirm over it,
+ * and the confirm's own Backdrop covering the Panel. Cancel closes the confirm and
+ * focus returns to the Panel's Delete student button.
+ */
 export const StackConfirmOverPanel = {
     name: 'Stacking: Confirm over a Panel',
-    render: () => <div style={{ inlineSize: STAGE }}><Demo.ConfirmOverPanel /></div>,
+    render: () => sized(<Demo.ConfirmOverPanel />),
     play: async ({ canvasElement }) => {
+        fitsCanvas(canvasElement);
         const canvas = within(canvasElement);
-        await userEvent.click(canvas.getByRole('button', { name: 'Delete student' }));
-        await waitFor(() => expect(dialogNamed(canvasElement, 'Delete student?')).not.toBeNull());
-        await expect(canvasElement.ownerDocument.querySelectorAll('.plus-pattern-backdrop').length, 'the confirm brings its own Backdrop').toBe(1);
-        await expect(canvas.getByText('Ana Ruiz'), 'the Panel stays open under the confirm').toBeInTheDocument();
-        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(dialogNamed(canvasElement, 'Delete student?'), 'the confirm is open').not.toBeNull());
+        const backdrop = canvasElement.querySelector('.plus-pattern-backdrop');
+        const panel = rect(canvasElement.querySelector('.plus-panel'));
+        const cover = rect(backdrop);
+        await expect(cover.left, 'the confirm’s Backdrop covers the Panel').toBeLessThanOrEqual(panel.left + 0.5);
+        await expect(cover.right, 'the confirm’s Backdrop covers the Panel').toBeGreaterThanOrEqual(panel.right - 0.5);
+        await expect(cover.top, 'the confirm’s Backdrop covers the Panel').toBeLessThanOrEqual(panel.top + 0.5);
+        await expect(cover.bottom, 'the confirm’s Backdrop covers the Panel').toBeGreaterThanOrEqual(panel.bottom - 0.5);
+        await expect(canvas.getByText('Ana Ruiz'), 'the Panel is open under the confirm').toBeInTheDocument();
+        await userEvent.click(canvas.getByRole('button', { name: 'Cancel' }));
         await waitFor(() => expect(dialogNamed(canvasElement, 'Delete student?')).toBeNull());
-        await expect(canvas.getByText('Ana Ruiz'), 'the Panel is still open after the confirm closes').toBeInTheDocument();
+        await expect(canvasElement.ownerDocument.activeElement, 'focus returns to the Panel').toBe(canvas.getByRole('button', { name: 'Delete student' }));
+        await expect(canvas.getByText('Ana Ruiz'), 'the Panel is still open').toBeInTheDocument();
     },
 };
 
-/** A Modal never opens on another Modal: the overlay module refuses the second. */
+/**
+ * A Modal never opens on another Modal; one that needs a confirm holds it inside itself.
+ * Drawn open: the confirm view, a warning SectionMessage in the body and a Danger action.
+ */
 export const StackModalOnModalRefused = {
-    name: 'Stacking: Never a Modal on a Modal',
-    render: () => <Demo.ModalOnModal />,
+    name: 'Stacking: Confirm inside the Modal',
+    render: () => sized(<Demo.ConfirmInside start="confirm" />),
     play: async ({ canvasElement }) => {
-        const body = within(canvasElement.ownerDocument.body);
+        fitsCanvas(canvasElement);
+        const canvas = within(canvasElement);
+        await expect(canvas.getAllByRole('dialog'), 'one Modal, one Backdrop').toHaveLength(1);
+        await expect(canvasElement.querySelector('.plus-section-message--warning, [class*="section-message"][class*="warning"]'), 'a warning SectionMessage in the body').not.toBeNull();
+        await expect(canvas.getByRole('button', { name: 'Delete session' }), 'the action takes the Danger appearance').toHaveClass('plus-btn--danger');
+        // The overlay module refuses a second Modal while one is open.
+        const first = openOverlay('modal');
         const warn = console.warn;
         console.warn = () => {};
         try {
-            await userEvent.click(within(canvasElement).getByRole('button', { name: 'Open Modal' }));
-            await waitFor(() => expect(dialogNamed(canvasElement, 'Session settings')).not.toBeNull());
-            await userEvent.click(body.getByRole('button', { name: 'Open another Modal' }));
-            await expect(body.queryByRole('dialog', { name: 'Another Modal', hidden: true }), 'the second Modal stays closed').toBeNull();
-            await expect(canvasElement.ownerDocument.querySelectorAll('.plus-pattern-backdrop').length, 'one Backdrop').toBe(1);
+            await expect(first, 'the first Modal takes the slot').not.toBeNull();
+            await expect(openOverlay('modal'), 'the second Modal stays closed').toBeNull();
         } finally {
             console.warn = warn;
+            first?.release();
         }
     },
 };

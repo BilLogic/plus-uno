@@ -44,3 +44,17 @@ export const leadersCrossNoOtherPart = (canvasElement, parts) => {
         });
     });
 };
+
+/**
+ * The story's root sits inside its canvas with equal insets on both sides: a stage wider than the canvas
+ * runs past the right edge and leaves a lopsided inset.
+ */
+export const fitsCanvas = (canvasElement) => {
+    const root = canvasElement.firstElementChild;
+    expect(root, 'the story has a root').not.toBeNull();
+    const box = rect(canvasElement);
+    const r = rect(root);
+    expect(r.left, 'the story starts inside its canvas').toBeGreaterThanOrEqual(box.left - 0.5);
+    expect(r.right, 'the story ends inside its canvas').toBeLessThanOrEqual(box.right + 0.5);
+    expect(Math.abs((r.left - box.left) - (box.right - r.right)), 'equal insets on both sides').toBeLessThanOrEqual(1);
+};
