@@ -127,7 +127,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 - Table: use when the body is rows and columns.
 - Patterns: use when picking a filter tier (Filtering), the search field's behavior (Search) or an empty body (Empty).
 
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSidebar` · `PatternTable`
 
 ## Types
 

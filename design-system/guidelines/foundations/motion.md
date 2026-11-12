@@ -14,7 +14,7 @@ Motion has three attributes, duration, easing and property, tuned for a calm tut
 |---|---|---|
 | `--motion-duration-short` | 100 ms | Frequent interactions: hover, press, focus, a tab, a row. |
 | `--motion-duration-medium` | 200 ms | Things that appear or change in place: popup, flag, accordion panel, content swaps. |
-| `--motion-duration-long` | 300 ms | Large surfaces: modal, blanket, drawer. The ceiling for anything a tutor meets mid-task. |
+| `--motion-duration-long` | 300 ms | Large surfaces: modal, backdrop, drawer. The ceiling for anything a tutor meets mid-task. |
 | `--motion-easing-standard` | `cubic-bezier(0.2, 0, 0, 1)` | Default: color and state changes, elements that reposition or resize in place. |
 | `--motion-easing-entrance` | `cubic-bezier(0, 0, 0.2, 1)` | Elements arriving: starts fast, lands softly. |
 | `--motion-easing-exit` | `cubic-bezier(0.4, 0, 1, 1)` | Elements leaving: starts slowly, accelerates away. |
@@ -41,7 +41,7 @@ Guidance for choosing tokens; as components adopt the tokens, this table is what
 | Popup, Menu | medium, entrance | short, exit |
 | Tooltip | short, entrance (fade only) | short, exit |
 | Flag | medium, entrance | short, exit |
-| Modal and Blanket | long, entrance, together | medium, exit, together |
+| Modal and Backdrop | long, entrance, together | medium, exit, together |
 | Drawer | long, entrance | medium, exit |
 | Accordion, Progress | medium, standard | medium, standard |
 

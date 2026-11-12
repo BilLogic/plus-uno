@@ -169,7 +169,7 @@ const expectNoTopbar = async (frame) => {
     await expect(frame.querySelector('.plus-frame__topbar'), 'no top bar').toBeNull();
 };
 
-/** A floating sidebar (peek or under 1024): overlay fill and shadow, over the page, and no Blanket under it. */
+/** A floating sidebar (peek or under 1024): overlay fill and shadow, over the page, and no Backdrop under it. */
 const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
     await expect(getComputedStyle(aside).position).toBe('absolute');
     await expect(getComputedStyle(aside).boxShadow, 'floating sidebar shadow')
@@ -181,7 +181,7 @@ const expectFloating = async (frame, aside, surface, surfaceLeftBefore) => {
     await expect(rect(aside).top, 'the raised sidebar runs from the top').toBeCloseTo(rect(frame).top, 0);
     await expect(rect(aside).bottom, 'the raised sidebar runs to the foot').toBeCloseTo(rect(frame).bottom, 0);
     await expect(rect(surface).left, 'the surface did not move').toBeCloseTo(surfaceLeftBefore, 0);
-    // No Blanket: a point on the page beside the sidebar still hits the page.
+    // No Backdrop: a point on the page beside the sidebar still hits the page.
     const s = rect(surface);
     const hit = document.elementFromPoint(s.right - 40, s.top + 40);
     await expect(surface.contains(hit), 'nothing covers the page beside the floating sidebar').toBe(true);
@@ -697,7 +697,7 @@ export const ModalClosesOverlaySidebarAt768 = {
 /**
  * The Panel area: the Frame's right-hand area, full height. The layout
  * resolver decides whether it docks beside the Page at a hairline or opens
- * over it on a Blanket. Each story sets the viewport first, then opens the
+ * over it on a Backdrop. Each story sets the viewport first, then opens the
  * Panel the way a person does, from a button on the Page.
  */
 const ChatToggle = () => {
@@ -813,7 +813,7 @@ const panelParts = (canvasElement) => {
         panel: () => p.frame.querySelector('.plus-frame__panel'),
         landmark: () => p.canvas.queryByRole('complementary', { name: 'AI chat' }),
         splitter: () => p.canvas.queryByRole('separator', { name: /resize/i }),
-        blanket: () => p.frame.querySelector('.plus-frame__blanket'),
+        backdrop: () => p.frame.querySelector('.plus-frame__backdrop'),
         openButton: () => p.canvas.getByRole('button', { name: /chat/i }),
     };
 };
@@ -844,7 +844,7 @@ export const PanelDockedAt1440 = {
         await expect(getComputedStyle(panel).backgroundColor, 'docked, the Panel is the Page fill').toBe(tokenColor(p.frame, '--ds-surface'));
         await expect(p.sidebar(), 'the Sidebar stays docked').not.toBeNull();
         await expect(rect(p.content).width, 'content 1440 - 240 - 400 - 48').toBeCloseTo(752, 0);
-        await expect(p.blanket(), 'docked has no Blanket').toBeNull();
+        await expect(p.backdrop(), 'docked has no Backdrop').toBeNull();
         // Landmark order: nav, main, panel.
         const main = p.canvas.getByRole('main');
         await expect(main.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
@@ -854,16 +854,16 @@ export const PanelDockedAt1440 = {
     }),
 };
 
-/** The Blanket covers the Page and the Sidebar's column, full height. */
-const expectBlanket = async (p) => {
-    const blanket = p.blanket();
-    await expect(blanket, 'an overlay Panel has a Blanket').not.toBeNull();
-    await expect(rect(blanket).top, 'from the top').toBeCloseTo(rect(p.frame).top, 0);
-    await expect(rect(blanket).left, 'it covers the Sidebar column').toBeCloseTo(rect(p.frame).left, 0);
-    await expect(getComputedStyle(blanket).backgroundColor).toBe(tokenColor(p.frame, '--ds-blanket'));
+/** The Backdrop covers the Page and the Sidebar's column, full height. */
+const expectBackdrop = async (p) => {
+    const backdrop = p.backdrop();
+    await expect(backdrop, 'an overlay Panel has a Backdrop').not.toBeNull();
+    await expect(rect(backdrop).top, 'from the top').toBeCloseTo(rect(p.frame).top, 0);
+    await expect(rect(backdrop).left, 'it covers the Sidebar column').toBeCloseTo(rect(p.frame).left, 0);
+    await expect(getComputedStyle(backdrop).backgroundColor).toBe(tokenColor(p.frame, '--ds-blanket'));
     const s = rect(p.surface);
     const hit = document.elementFromPoint(s.left + 40, s.top + 40);
-    await expect(hit, 'a press on the Page lands on the Blanket').toBe(blanket);
+    await expect(hit, 'a press on the Page lands on the Backdrop').toBe(backdrop);
 };
 
 const expectOverlayPanel = async (p, width) => {
@@ -900,7 +900,7 @@ export const PanelAutoCollapsesSidebarAt1200 = {
     }),
 };
 
-/** 1100 with a 400 Panel: even the Panel alone leaves 652, so it opens over the Page on a Blanket; a press outside closes it. */
+/** 1100 with a 400 Panel: even the Panel alone leaves 652, so it opens over the Page on a Backdrop; a press outside closes it. */
 export const PanelOverlayAt1100 = {
     parameters: { frameWidth: 1100 },
     render: WithPanel,
@@ -909,14 +909,14 @@ export const PanelOverlayAt1100 = {
         await waitFor(() => expect(p.sidebar()).not.toBeNull());
         await openPanel(p);
         await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
-        await expect(p.coveredSidebar(), 'the Sidebar stays docked under the Blanket, out of reach').not.toBeNull();
+        await expect(p.coveredSidebar(), 'the Sidebar stays docked under the Backdrop, out of reach').not.toBeNull();
         await expect(rect(p.content).width, 'the Page keeps its width').toBeCloseTo(1100 - 240 - 48, 0);
-        await expectBlanket(p);
+        await expectBackdrop(p);
 
-        // A press on the Blanket closes it.
-        await userEvent.click(p.blanket());
+        // A press on the Backdrop closes it.
+        await userEvent.click(p.backdrop());
         await waitFor(() => expect(p.panel(), 'a press outside closes it').toBeNull());
-        await expect(p.blanket()).toBeNull();
+        await expect(p.backdrop()).toBeNull();
 
         // Escape closes it too.
         await openPanel(p);
@@ -935,14 +935,14 @@ export const SidebarByHandWinsAt1300 = {
         await waitFor(() => expect(p.sidebar()).toBeNull());
         const panel = p.panel();
         await expect(getComputedStyle(panel).position).not.toBe('absolute');
-        // Docked, the Panel has no Blanket, so the Page's toggle is pressable.
+        // Docked, the Panel has no Backdrop, so the Page's toggle is pressable.
         await userEvent.click(p.toggle);
-        // The Panel moves to overlay, so the docked Sidebar is under its Blanket, out of reach.
+        // The Panel moves to overlay, so the docked Sidebar is under its Backdrop, out of reach.
         await waitFor(() => expect(p.coveredSidebar(), 'opened by hand, it docks').not.toBeNull());
         await expect(getComputedStyle(p.coveredSidebar()).position).not.toBe('absolute');
         await expect(p.panel(), 'the same Panel, not remounted').toBe(panel);
         await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
-        await expectBlanket(p);
+        await expectBackdrop(p);
         // Now an overlay, it is modal: focus moves in and the Page goes inert.
         await waitFor(() => expect(panel.contains(canvasElement.ownerDocument.activeElement), 'focus moves into the Panel').toBe(true));
         await expect(p.surface.inert).toBe(true);
@@ -973,7 +973,7 @@ export const ModalOverOverlayPanelAt1100 = {
         const p = panelParts(canvasElement);
         await openPanel(p);
         await expectOverlayPanel(p, tokenLength(p.frame, '--panel-width-default'));
-        // The Page is inert under the Blanket, so the Modal is raised from inside the Panel.
+        // The Page is inert under the Backdrop, so the Modal is raised from inside the Panel.
         const settings = within(p.panel()).getByRole('button', { name: 'Chat settings' });
         settings.focus();
         await userEvent.keyboard('{Enter}');
@@ -989,7 +989,7 @@ export const ModalOverOverlayPanelAt1100 = {
 
 /**
  * 1100: an overlay Panel is modal. Opening it moves focus in, the Page and the
- * Sidebar under the Blanket are inert, Tab stays inside it, and closing it
+ * Sidebar under the Backdrop are inert, Tab stays inside it, and closing it
  * hands focus back to the opener.
  */
 export const OverlayPanelIsModalAt1100 = {
@@ -1009,8 +1009,8 @@ export const OverlayPanelIsModalAt1100 = {
         await expect(panel).toHaveAttribute('aria-modal', 'true');
         await expect(panel).toHaveAccessibleName('AI chat');
         await waitFor(() => expect(panel.contains(doc.activeElement), 'focus moves into the Panel').toBe(true));
-        await expect(p.surface.inert, 'the Page under the Blanket is inert').toBe(true);
-        await expect(p.coveredSidebar().inert, 'the Sidebar under the Blanket is inert').toBe(true);
+        await expect(p.surface.inert, 'the Page under the Backdrop is inert').toBe(true);
+        await expect(p.coveredSidebar().inert, 'the Sidebar under the Backdrop is inert').toBe(true);
         await expect(p.sidebar(), 'and out of the accessibility tree').toBeNull();
         // Tab and Shift+Tab stay inside the Panel.
         for (let i = 0; i < 4; i += 1) {
@@ -1162,13 +1162,13 @@ export const OneOverlayAt768 = {
         const p = panelParts(canvasElement);
         await openPanel(p);
         await expectOverlayPanel(p, tokenLength(p.frame, '--panel-min-width'));
-        await expectBlanket(p);
+        await expectBackdrop(p);
         await expect(p.splitter(), 'no splitter under 1024').toBeNull();
-        // Hovering the left edge under the Blanket does not peek the Sidebar.
+        // Hovering the left edge under the Backdrop does not peek the Sidebar.
         await userEvent.hover(p.edge());
         await new Promise((resolve) => { setTimeout(resolve, 100); });
         await expect(p.sidebar(), 'no second overlay').toBeNull();
-        // Opening the Sidebar by hand (the toggle is under the Blanket, so Ctrl+[) closes the Panel.
+        // Opening the Sidebar by hand (the toggle is under the Backdrop, so Ctrl+[) closes the Panel.
         await userEvent.keyboard('{Control>}[[{/Control}');
         await waitFor(() => expect(p.sidebar(), 'the Sidebar opens as an overlay').not.toBeNull());
         await waitFor(() => expect(p.panel(), 'and the Panel closes').toBeNull());
@@ -1306,7 +1306,7 @@ export const PanelRememberedForTheTab = {
     }),
 };
 
-/** The peek is off by default; turned on, hovering the right edge peeks a closed Panel over the Page with no Blanket. */
+/** The peek is off by default; turned on, hovering the right edge peeks a closed Panel over the Page with no Backdrop. */
 export const PanelPeek = {
     parameters: { frameWidth: 1440 },
     render: WithPanel,
@@ -1319,7 +1319,7 @@ export const PanelPeek = {
         await userEvent.hover(edge);
         await waitFor(() => expect(p.panel(), 'the Panel peeks').not.toBeNull());
         await expect(getComputedStyle(p.panel()).position, 'over the Page').toBe('absolute');
-        await expect(p.blanket(), 'a peek has no Blanket').toBeNull();
+        await expect(p.backdrop(), 'a peek has no Backdrop').toBeNull();
         await expect(rect(p.content).width, 'the Page does not move').toBeCloseTo(contentWidth, 0);
         await expect(p.splitter(), 'a peek does not resize').toBeNull();
         await userEvent.keyboard('{Escape}');
@@ -1443,7 +1443,7 @@ const sidebarIs = async (p, state) => waitFor(() => {
     return expect(box?.className ?? '', `the Sidebar is ${state}`).toContain(`plus-frame__sidebar--${state}`);
 });
 const panelIs = async (p, mode) => waitFor(() => expect(p.panel()?.className ?? '', `the Panel is ${mode}`).toContain(`plus-frame__panel--${mode}`));
-const blanketShows = (p) => p.frame.querySelector('.plus-frame__blanket');
+const backdropShows = (p) => p.frame.querySelector('.plus-frame__backdrop');
 
 /** Sidebar docked: in flow beside the Page from 1024. */
 export const StateSidebarDocked = frameState(1440, {}, async (p) => sidebarIs(p, 'docked'));
@@ -1454,10 +1454,10 @@ export const StateSidebarClosed = frameState(1440, { sidebarDocked: false }, asy
     await expect(p.pageToggle()).not.toBeNull();
 });
 
-/** Sidebar peek: hovering the left edge floats a closed Sidebar over the Page, with no Blanket. */
+/** Sidebar peek: hovering the left edge floats a closed Sidebar over the Page, with no Backdrop. */
 export const StateSidebarPeek = frameState(1440, { sidebarDocked: false, act: STATE_PEEK }, async (p) => {
     await sidebarIs(p, 'raised');
-    await expect(blanketShows(p), 'no Blanket under a peek').toBeNull();
+    await expect(backdropShows(p), 'no Backdrop under a peek').toBeNull();
 });
 
 /** Sidebar floating: under 1024 the toggle opens it over the Page, since it never docks there. */
@@ -1469,20 +1469,20 @@ export const StateSidebarFloating = frameState(768, { act: STATE_OPEN }, async (
 /** Panel docked: beside the Page at a hairline, with the Sidebar closed by hand. */
 export const StatePanelDocked = frameState(1440, { sidebarDocked: false, panel: statePanel, panelOpen: true }, async (p) => {
     await panelIs(p, 'docked');
-    await expect(blanketShows(p)).toBeNull();
+    await expect(backdropShows(p)).toBeNull();
 });
 
 /** Panel peek: with `panelPeek`, hovering the right edge floats a closed Panel over the Page. */
 export const StatePanelPeek = frameState(1440, { panel: statePanel, panelPeek: true, act: STATE_PEEK_PANEL }, async (p) => {
     await panelIs(p, 'peek');
-    await expect(blanketShows(p), 'no Blanket under a peek').toBeNull();
+    await expect(backdropShows(p), 'no Backdrop under a peek').toBeNull();
 });
 
-/** Panel overlay: under 1024 the Panel opens over the Page on a Blanket, capped at 320. */
+/** Panel overlay: under 1024 the Panel opens over the Page on a Backdrop, capped at 320. */
 export const StatePanelOverlay = frameState(768, { panel: statePanel, panelOpen: true }, async (p) => {
     await panelIs(p, 'overlay');
     await expect(rect(p.panel()).width).toBeCloseTo(320, 0);
-    await expect(blanketShows(p)).not.toBeNull();
+    await expect(backdropShows(p)).not.toBeNull();
 });
 
 /** Panel full width: under 768 the overlay Panel takes the whole Frame. */
@@ -1516,10 +1516,10 @@ export const StatePanelCollapsesSidebar = frameState(1200, { panel: statePanel, 
     await panelIs(p, 'docked');
 });
 
-/** At 1100 even the Panel alone leaves under 720, so it opens on a Blanket over the Page and the Sidebar. */
-export const StatePanelOnBlanket = frameState(1100, { panel: statePanel, panelOpen: true }, async (p) => {
+/** At 1100 even the Panel alone leaves under 720, so it opens on a Backdrop over the Page and the Sidebar. */
+export const StatePanelOnBackdrop = frameState(1100, { panel: statePanel, panelOpen: true }, async (p) => {
     await panelIs(p, 'overlay');
-    await expect(blanketShows(p)).not.toBeNull();
+    await expect(backdropShows(p)).not.toBeNull();
     // Under the overlay Panel the Sidebar is inert, so it is read among the hidden roles.
     await waitFor(() => expect(p.coveredSidebar()?.className ?? '').toContain('plus-frame__sidebar--docked'));
 });
@@ -1536,7 +1536,7 @@ export const StateModalClosesFloating = frameState(768, { act: STATE_OPEN, overl
     await waitFor(() => expect(p.coveredSidebar(), 'the floating Sidebar closed').toBeNull());
 });
 
-/** A drawer over the Frame at 1024, on its own Blanket. */
+/** A drawer over the Frame at 1024, on its own Backdrop. */
 export const StateWithDrawer = frameState(1024, { overlay: 'drawer' }, async (p, { canvasElement }) => {
     await expect(await within(canvasElement.ownerDocument.body).findByRole('dialog', { name: 'Session details' })).toBeTruthy();
 });
@@ -1792,6 +1792,6 @@ export const KeyUnder1024 = {
         const p = panelParts(canvasElement);
         await panelIs(p, 'overlay');
         await expect(p.sidebar(), 'the Sidebar is not docked').toBeNull();
-        await expect(blanketShows(p), 'the panel opens over a Backdrop').not.toBeNull();
+        await expect(backdropShows(p), 'the panel opens over a Backdrop').not.toBeNull();
     },
 };

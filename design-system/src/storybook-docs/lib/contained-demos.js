@@ -1,6 +1,6 @@
 /**
  * A demo shown in the docs stays inside its canvas: an overlay that takes over
- * the page (a modal dialog, a Blanket, a Flag stack fixed to the screen) or
+ * the page (a modal dialog, a Backdrop, a Flag stack fixed to the screen) or
  * anything fixed to the viewport from inside the canvas covers the docs page
  * itself. Overlays anchored to a trigger (Popup, menus, tooltips) portal to the
  * body by design and are not counted.
@@ -22,7 +22,7 @@ const describe = (el) => {
 
 const TAKEOVER_SELECTOR = [
     '[aria-modal="true"]',
-    '.plus-pattern-blanket',
+    '.plus-pattern-backdrop',
     '.plus-flag-container[data-container-position="fixed"]',
 ].join(', ');
 

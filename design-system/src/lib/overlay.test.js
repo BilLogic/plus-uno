@@ -13,8 +13,8 @@ import {
 } from './overlay';
 
 const opened = [];
-const open = () => {
-    const handle = openOverlay();
+const open = (kind) => {
+    const handle = openOverlay(kind);
     if (handle) opened.push(handle);
     return handle;
 };
@@ -50,6 +50,37 @@ describe('openOverlay', () => {
         expect(openOverlayCount()).toBe(1);
         expect(open()).not.toBeNull();
         expect(openOverlayCount()).toBe(2);
+    });
+});
+
+describe('a Modal never opens on another Modal', () => {
+    it('refuses a Modal while one is open, and warns in development', () => {
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        expect(open('modal')).not.toBeNull();
+        expect(open('modal')).toBeNull();
+        expect(openOverlayCount()).toBe(1);
+        expect(warn.mock.calls[0][0]).toMatch(/never opens on another Modal/);
+    });
+
+    it('lets a confirm Modal open over a drawer, and over nothing else that holds a slot', () => {
+        expect(open('drawer')).not.toBeNull();
+        expect(open('modal')).not.toBeNull();
+        expect(openOverlayCount()).toBe(2);
+    });
+
+    it('lets a Modal open again once the first closes', () => {
+        const first = open('modal');
+        first.release();
+        expect(open('modal')).not.toBeNull();
+    });
+
+    it('refuses the second Modal through the hook and calls onRefused', () => {
+        vi.spyOn(console, 'warn').mockImplementation(() => {});
+        open('modal');
+        const onRefused = vi.fn();
+        const { result } = renderHook(() => useOverlaySlot(true, onRefused, 'modal'));
+        expect(result.current[0]).toBe(false);
+        expect(onRefused).toHaveBeenCalledTimes(1);
     });
 });
 
@@ -96,14 +127,14 @@ describe('getOverlayPortalRoot', () => {
 });
 
 describe('overlayMountOf', () => {
-    it('mounts in the nearest .plus-pattern-blanket ancestor, when there is one', () => {
-        const blanket = document.createElement('div');
-        blanket.className = 'plus-pattern-blanket';
+    it('mounts in the nearest .plus-pattern-backdrop ancestor, when there is one', () => {
+        const backdrop = document.createElement('div');
+        backdrop.className = 'plus-pattern-backdrop';
         const trigger = document.createElement('button');
-        blanket.appendChild(trigger);
-        document.body.appendChild(blanket);
-        expect(overlayMountOf(trigger)).toBe(blanket);
-        blanket.remove();
+        backdrop.appendChild(trigger);
+        document.body.appendChild(backdrop);
+        expect(overlayMountOf(trigger)).toBe(backdrop);
+        backdrop.remove();
     });
 
     it('falls back to the shared portal root outside a modal', () => {
@@ -163,7 +194,7 @@ describe('isPressInRaisedOverlay', () => {
         document.body.innerHTML = `
             <button id="chat"></button>
             <div id="popup"><span id="popup-text"></span></div>
-            <div class="plus-pattern-blanket" id="blanket">
+            <div class="plus-pattern-backdrop" id="backdrop">
                 <div role="dialog"><p id="modal-text"></p><button id="inner"></button></div>
             </div>
             <main id="page"></main>`;
@@ -175,7 +206,7 @@ describe('isPressInRaisedOverlay', () => {
     it('is true for a press in a Modal the owner sits outside of', () => {
         const el = build();
         expect(isPressInRaisedOverlay(el('modal-text'), el('chat'))).toBe(true);
-        expect(isPressInRaisedOverlay(el('blanket'), el('popup'))).toBe(true);
+        expect(isPressInRaisedOverlay(el('backdrop'), el('popup'))).toBe(true);
     });
 
     it('is false for a press on the page or in the popup itself', () => {
@@ -205,7 +236,7 @@ describe('isOverlayRaisedOver', () => {
     });
 
     it('is true for an owner outside the open Modal, false for one inside it', () => {
-        document.body.innerHTML = '<button id="chat"></button><div class="plus-pattern-blanket"><button id="inner"></button></div>';
+        document.body.innerHTML = '<button id="chat"></button><div class="plus-pattern-backdrop"><button id="inner"></button></div>';
         open();
         expect(isOverlayRaisedOver(document.getElementById('chat'))).toBe(true);
         expect(isOverlayRaisedOver(document.getElementById('inner'))).toBe(false);

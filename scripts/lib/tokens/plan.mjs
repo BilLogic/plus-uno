@@ -269,7 +269,7 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Table', new: '--table-pad-x-footer', old: '--table-pad-x-footer', use: 'Horizontal padding of a PatternTable footer, such as its Pagination row.' },
   { tier: 'patterns', group: 'Table', new: '--table-min-width-title', old: '--table-min-width-title', use: 'Narrowest a PatternTable\'s title column may shrink.' },
 
-  // ─── Patterns / Blanket (renamed from Overlay) ───────────────────────
+  // ─── Patterns / Backdrop (renamed from Overlay) ───────────────────────
   { tier: 'patterns', group: 'Blanket', new: '--blanket-pad-x', old: '--overlay-pad-x', ref: 'var(--space-100)', use: 'Horizontal space between the screen edge and a Modal on its Blanket.' },
   { tier: 'patterns', group: 'Blanket', new: '--blanket-pad-y', old: '--overlay-pad-y', ref: 'var(--space-400)', at: { '(max-height: 639.98px)': 'var(--space-150)' }, use: 'Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens.' },
   { tier: 'patterns', group: 'Blanket', new: '--blanket-fill', old: '--overlay-scrim', type: 'COLOR', ref: 'rgba(0, 0, 0, 0.38)', note: "the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word", use: 'Fill of the Blanket that dims the page behind a Modal.' },
@@ -453,7 +453,7 @@ export const TOKEN_LADDER = [
   { tier: 'layers', group: 'Layer', new: '--layer-dialog', old: '--layout-z-index-dialog', ref: '300', use: 'Stacking order of a non-modal dialog over the page, below popups.' },
   { tier: 'layers', group: 'Layer', new: '--layer-popup', old: '--layout-z-index-popup', ref: '400', use: 'Stacking order of a Popup, DropdownMenu or listbox.' },
   { tier: 'layers', group: 'Layer', new: '--layer-blanket', old: '--layout-z-index-scrim', ref: '500', note: "the Blanket's z-index; the old declaration's value, written directly so this file carries no old-language word", use: 'Stacking order of the Blanket behind a Modal.' },
-  { tier: 'layers', group: 'Layer', new: '--layer-modal', old: '--layout-z-index-modal', ref: '510', use: 'Stacking order of a Modal, above its Blanket.' },
+  { tier: 'layers', group: 'Layer', new: '--layer-modal', old: '--layout-z-index-modal', ref: '510', use: 'Stacking order of a Modal, above its Backdrop.' },
   { tier: 'layers', group: 'Layer', new: '--layer-flag', old: '--layout-z-index-flag', ref: '600', use: 'Stacking order of a Flag, above any Modal.' },
   { tier: 'layers', group: 'Layer', new: '--layer-spotlight', old: '--layout-z-index-spotlight', ref: '700', use: 'Stacking order of a Spotlight, above Flags.' },
   { tier: 'layers', group: 'Layer', new: '--layer-tooltip', old: '--layout-z-index-tooltip', ref: '800', use: 'Stacking order of a Tooltip, above everything else.' },

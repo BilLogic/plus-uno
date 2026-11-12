@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { CloseButton } from '@/components';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { useOverlaySlot } from '@/lib/overlay';
-import Blanket, { BLANKET_WIDTHS } from '../Blanket';
+import Backdrop, { BACKDROP_WIDTHS } from '../Backdrop';
 import './PatternDrawer.scss';
 
 /** The edges a drawer sits at: `end` (right in a left-to-right page) by default, or `start`. */
@@ -30,7 +30,7 @@ const focusablesIn = (el) => Array.from(el.querySelectorAll(FOCUSABLE))
  * Drawer pattern for PLUS design system.
  * A full-height panel at the edge of the screen, for a task that needs the
  * page in view: the details of a row, a set of filters, a short edit. It
- * places itself in `Blanket` at that edge, over the same blanket a modal takes.
+ * places itself in `Backdrop` at that edge, over the same backdrop a modal takes.
  * Width is a step of the screen grid (sm · md · lg: 6 · 8 · 10 columns plus
  * the modal pad), the Modal width steps. The title, description and close
  * button follow the Modal rules.
@@ -39,7 +39,7 @@ const focusablesIn = (el) => Array.from(el.querySelectorAll(FOCUSABLE))
  * Mirrors "Pattern/Drawer" in the Figma design system file.
  *
  * It is a real dialog: opening it moves focus inside and Tab cycles there,
- * Escape, the close button and a click on the blanket call `onClose`, and
+ * Escape, the close button and a click on the backdrop call `onClose`, and
  * closing returns focus to what had it. An `inline` drawer, drawn in the page
  * flow for docs, leaves focus where it is.
  *
@@ -137,12 +137,12 @@ const PatternDrawer = ({
     };
 
     return (
-        <Blanket
+        <Backdrop
             placement={placement}
             inline={inline}
             screenWidth={screenWidth}
             screenHeight={screenHeight}
-            onBlanketClick={onClose}
+            onBackdropClick={onClose}
         >
             <div
                 ref={panelRef}
@@ -172,7 +172,7 @@ const PatternDrawer = ({
                 </HeadingLevelContext.Provider>
                 {footer && <div className="plus-pattern-drawer-footer">{footer}</div>}
             </div>
-        </Blanket>
+        </Backdrop>
     );
 };
 
@@ -201,7 +201,7 @@ PatternDrawer.propTypes = {
     title: PropTypes.node,
     /** One line under the title, in the subtle text color; it describes the dialog */
     description: PropTypes.node,
-    /** Called by the close button, Escape and a click on the blanket; renders the close button */
+    /** Called by the close button, Escape and a click on the backdrop; renders the close button */
     onClose: PropTypes.func,
     /** Footer slot, pinned to the bottom edge (typically action buttons, the primary last) */
     footer: PropTypes.node,
@@ -210,7 +210,7 @@ PatternDrawer.propTypes = {
      * (384 · 507 · 629 at 768, 512 · 677 · 843 at 1024, 640 · 848 · 1056 at 1440),
      * the Modal width steps. Grows with the screen, never shrinks, ignores the sidebar.
      */
-    width: PropTypes.oneOf(BLANKET_WIDTHS),
+    width: PropTypes.oneOf(BACKDROP_WIDTHS),
     /** `end` (default) holds it at the right edge of a left-to-right page; `start` at the left. */
     placement: PropTypes.oneOf(DRAWER_PLACEMENTS),
     /** Draw in the page flow at a stand-in screen, for docs and previews; focus stays where it is. */

@@ -178,7 +178,7 @@ TriggerSemantics.play = async ({ canvasElement }) => {
  *
  * The AI chat popup raises a confirm (clear chat). The Modal portals to the
  * document, outside the popup, so Base UI hears a press in it as an outside
- * press. The popup stays open under the Modal's Blanket instead.
+ * press. The popup stays open under the Modal's Backdrop instead.
  */
 const RaisedModal = () => {
     const [open, setOpen] = React.useState(false);

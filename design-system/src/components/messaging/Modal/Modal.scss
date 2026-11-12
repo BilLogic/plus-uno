@@ -22,7 +22,7 @@
     @include screen-grid-width(var(--modal-pad-x-default));
     --plus-overlay-span: 6;
 
-    /* The overlay fill, with the blocking shadow: the Modal is the one surface on a blanket, so it lifts higher than a menu or Select list (those keep the overlay shadow). The shadow reaches about 80px below; the Modal has no clip-path open or close, so nothing cuts it. */
+    /* The overlay fill, with the blocking shadow: the Modal is the one surface on a backdrop, so it lifts higher than a menu or Select list (those keep the overlay shadow). The shadow reaches about 80px below; the Modal has no clip-path open or close, so nothing cuts it. */
     background-color: var(--ds-surface-overlay);
     color: var(--ds-text);
     border-radius: var(--modal-radius);

@@ -69,7 +69,7 @@ test('every rule is a hard ban: one hit is one finding, with no baseline to excu
   const findings = run({ sources: [src('design-system/src/A.scss', '.a { /* scrim */ }\n')] });
   assert.equal(findings.length, 1);
   assert.match(findings[0].message, /word:scrim/);
-  assert.deepEqual(run({ sources: [src('design-system/src/A.scss', '.a { /* blanket */ }\n')] }), []);
+  assert.deepEqual(run({ sources: [src('design-system/src/A.scss', '.a { /* backdrop */ }\n')] }), []);
 });
 
 test('a renamed-with-no-alias component surviving in doc prose fails with zero allowed', () => {

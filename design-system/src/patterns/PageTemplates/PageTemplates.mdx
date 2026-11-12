@@ -26,10 +26,10 @@ export const patterns = [
     ['Section', 'A span of the page grid that groups content under one heading, with a Section header.', 'A heading with content under it.', 'PatternSection', 'templates-section-section'],
     ['Card', 'The container for one object, raised at rest with no border.', 'One object with a shape agreed.', 'PatternCard', 'templates-section-card'],
     ['Table', 'Records in rows and columns, with its own header and pagination slots.', 'Many objects of the same shape.', 'PatternTable', 'templates-section-table'],
-    ['Backdrop', 'The shared layer under a Modal or an overlay Panel.', 'Anything that blocks the page behind it.', 'Blanket', 'templates-modal-backdrop'],
+    ['Backdrop', 'The shared layer under a Modal or an overlay Panel.', 'Anything that blocks the page behind it.', 'Backdrop', 'templates-modal-backdrop'],
     ['Modal', 'Interrupts the page for one task, centered on the screen.', 'A step that must happen before the page continues.', 'PatternModal', 'templates-modal-modal'],
-    ['Panel', 'A full-height panel at the screen edge, over the blanket.', 'Details or a task that keeps the page in view.', 'PatternDrawer', 'templates-panel-panel'],
-    ['Popups', 'The floating layers: Menu, Popup, Flag and Tooltip, with no blanket.', 'Something anchored to a trigger.', 'Popup (component)', 'templates-popup-popup'],
+    ['Panel', 'A full-height panel at the screen edge, over the backdrop.', 'Details or a task that keeps the page in view.', 'PatternDrawer', 'templates-panel-panel'],
+    ['Popups', 'The floating layers: Menu, Popup, Flag and Tooltip, with no backdrop.', 'Something anchored to a trigger.', 'Popup (component)', 'templates-popup-popup'],
 ];
 
 <Meta of={PageTemplatesStories} />
@@ -219,7 +219,7 @@ The focused frame has three parts, all in the Frame with no sidebar.
 2. **Content.** The Page's `main` at reading width: Sections capped at 864, centered and never under 720. It scrolls on its own.
 3. **Actions** (optional). A group inside the Page, held at its foot while it scrolls, end-aligned in the content column, 8 apart, the primary action last. A task with nothing to submit has none.
 
-The page carries the content grid, 12 columns with a 16 gutter. The screen grid lives on Blanket only, and the modal guide belongs to Modal.
+The page carries the content grid, 12 columns with a 16 gutter. The screen grid lives on Backdrop only, and the modal guide belongs to Modal.
 
 ### States
 
@@ -237,7 +237,7 @@ The layout mode is the screen width: **Medium** is 768 to 1023, **Large** is 102
     </thead>
     <tbody>
         <tr><td><code>--screen-width</code></td><td>768</td><td>1024</td><td>1440</td><td>The width of the template frame.</td></tr>
-        <tr><td><code>--screen-pad-x</code></td><td>24</td><td>24</td><td>32</td><td>Pads the screen grid on Blanket, not the page grid.</td></tr>
+        <tr><td><code>--screen-pad-x</code></td><td>24</td><td>24</td><td>32</td><td>Pads the screen grid on Backdrop, not the page grid.</td></tr>
         <tr><td><code>--screen-min-width</code></td><td>768</td><td>1024</td><td>1440</td><td>The narrowest the frame goes within the mode.</td></tr>
         <tr><td><code>--screen-max-width</code></td><td>1023</td><td>1439</td><td>none</td><td>The widest the frame goes within the mode. X-Large has no limit.</td></tr>
     </tbody>
