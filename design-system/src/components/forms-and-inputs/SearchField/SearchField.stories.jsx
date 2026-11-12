@@ -224,7 +224,7 @@ export const Basic = {
         await expect(canvas.getByTestId('searched')).toHaveTextContent('');
         await userEvent.keyboard('{Enter}');
         await expect(canvas.getByTestId('searched')).toHaveTextContent('ada');
-        // Never loads while typing, only on Enter.
+        // Basic mode never calls loadResults, typing or Enter.
         await expect(loadSpy).not.toHaveBeenCalled();
     },
 };
