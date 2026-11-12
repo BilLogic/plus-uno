@@ -12,7 +12,7 @@ What the product says back, and where. A Flag at the top right for something tha
 
 Four components carry every message. Each component page holds its appearances; this pattern picks the carrier and the place. A Modal is the fifth, for the one message that must be answered first.
 
-- **Flag.** A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and danger stay until acted on.
+- **Flag.** A passing notice at the top right, two lines at most. Routine ones leave on their own; warning and error stay until acted on.
 - **Banner.** A condition that holds for the whole Frame, page or Section: one line, no dismiss, one at a time.
 - **SectionMessage.** Something to read or act on that belongs to this part of the page and stays until resolved or dismissed.
 - **The Inbox.** Notifications that arrived over time, in a Panel. The Bell that carries its count, and the Panel growing out of the Sidebar, are Planned .
