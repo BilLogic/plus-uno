@@ -14,7 +14,7 @@ Also asked as: summary card, object card.
 
 **Storybook page:** `design-system/src/patterns/PatternCard/PatternCard.mdx`
 
-**Motion:** change `appearance.fast` · milestone `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · milestone `spatial.default`, sound `sound.done.milestone`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
@@ -48,10 +48,10 @@ In a row, place the most cards that keep each card at its minimum width. Each ro
 
 PatternCard reads these motion tokens and no literal duration or curve.
 
-| Event | Transition | Tokens | What it does |
-| --- | --- | --- | --- |
-| change | Update a value or state | `--ds-motion-appearance-fast` | It changes color on hover and press like a Button. Opening a clickable card is Drill. |
-| milestone | Opening a page | `--ds-motion-spatial-default` | The one card in a milestone page entrance is Expressive and leaves by the exit rules. |
+| Event | Transition | Tokens | What it does | Sound |
+| --- | --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | It changes color on hover and press like a Button. Opening a clickable card is Drill. |  |
+| milestone | Opening a page | `--ds-motion-spatial-default` | The one card in a milestone page entrance is Expressive and leaves by the exit rules. | `sound.done.milestone` on land: onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it |
 
 ## Best practices
 

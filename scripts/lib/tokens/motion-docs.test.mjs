@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { motionEventsOf, motionLibraryOf, motionLibraryTableOf, motionLineOf, motionRowOf, motionSectionOf, motionVarOf } from './motion-docs.mjs';
+import { motionEventsOf, motionLibraryOf, motionLibraryTableOf, motionLineOf, motionRowOf, motionSectionOf, motionVarOf, soundTextOf } from './motion-docs.mjs';
 
 const row = {
   name: 'Widget',
@@ -53,7 +53,7 @@ test('the Library has one row per registry row, with every event and token', () 
 
 test('the Library table renders one line per event under the row name', () => {
   const table = motionLibraryTableOf(registry);
-  assert.match(table, /^\| Name \| Tier \| Event \| Transition \| Tokens \|/);
+  assert.match(table, /^\| Name \| Tier \| Event \| Transition \| Tokens \| Sound \|/);
   assert.match(table, /\| Widget \| component \| enter \| Open \| `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` \|/);
   assert.match(table, /\| Gizmo \| component \| exit \|  \| `--ds-motion-appearance-fast` \|/);
 });
@@ -109,4 +109,47 @@ test('every MotionSection in a docs page names a row of the real registry, in it
     }
   }
   assert.ok(templates >= 11, `expected the template pages to carry a MotionSection, found ${templates}`);
+});
+
+const loud = {
+  name: 'Beeper',
+  tier: 'component',
+  events: {
+    enter: { transition: 'Open', spatial: 'spatial.fast', note: 'Grows.', sound: { token: 'notify', when: 'outside a session' } },
+    exit: { appearance: 'appearance.fast', sound: { token: 'done.sent', at: 'start' } },
+    change: { appearance: 'appearance.fast' },
+  },
+};
+
+test('an event carries its sound cell, at land by default, and null when silent', () => {
+  assert.deepEqual(motionEventsOf(loud).map((e) => e.sound), [
+    { token: 'notify', at: 'land', when: 'outside a session' },
+    { token: 'done.sent', at: 'start', when: '' },
+    null,
+  ]);
+});
+
+test('a sound reads as its token, its moment and its condition', () => {
+  assert.equal(soundTextOf({ token: 'notify', at: 'land', when: 'outside a session' }), '`sound.notify` on land: outside a session');
+  assert.equal(soundTextOf({ token: 'done.sent', at: 'start', when: '' }), '`sound.done.sent` on start');
+  assert.equal(soundTextOf(null), '');
+});
+
+test('the Motion section gains a Sound column only when the row plays', () => {
+  const section = motionSectionOf(loud);
+  assert.match(section, /\| Event \| Transition \| Tokens \| What it does \| Sound \|/);
+  assert.match(section, /\| enter \| Open \| `--ds-motion-spatial-fast` \| Grows\. \| `sound\.notify` on land: outside a session \|/);
+  assert.match(section, /\| change \|  \| `--ds-motion-appearance-fast` \|  \|  \|/);
+  assert.doesNotMatch(motionSectionOf(row), /Sound/);
+});
+
+test('the motion line names a sound beside its event', () => {
+  assert.match(motionLineOf(loud), /enter `spatial.fast`, sound `sound.notify` · exit `appearance.fast`, sound `sound.done.sent` · change `appearance.fast`\./);
+});
+
+test('the Library has a Sound column on every line', () => {
+  const table = motionLibraryTableOf([loud, row]);
+  assert.match(table, /^\| Name \| Tier \| Event \| Transition \| Tokens \| Sound \|/);
+  assert.match(table, /\| Beeper \| component \| enter \| Open \| `--ds-motion-spatial-fast` \| `sound\.notify` on land: outside a session \|/);
+  assert.match(table, /\| Widget \| component \| change \|  \| `--ds-motion-appearance-default` \|  \|/);
 });

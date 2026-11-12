@@ -8,7 +8,8 @@
  *     token of the sound plan (`SOUND_SEMANTICS`), with `at` of `land` or
  *     `start` when given.
  *   - No `sound` cell sits on a row or event the always-silent list
- *     (`scripts/lib/tokens/sound-silence.mjs`) covers; each entry carries a `why`.
+ *     (`scripts/lib/tokens/sound-silence.mjs`) covers; each entry carries a
+ *     `why` and names a real registry row (and event, when it gives one).
  *   - `AudioContext` and `new Audio(` appear only in the sound runtime
  *     (`design-system/src/sound/`) and in tests, so every sound goes through
  *     the one switch.
@@ -51,6 +52,13 @@ export function run({
   for (const entry of silent) {
     if (!entry.row || !entry.why) {
       findings.push({ message: `always-silent entry ${JSON.stringify(entry)} needs a row and a why` });
+      continue;
+    }
+    const rows = registry.filter((r) => r.name === entry.row);
+    if (rows.length === 0) {
+      findings.push({ message: `always-silent entry names "${entry.row}", which has no registry row; name a real row or drop it` });
+    } else if (entry.event !== undefined && !rows.some((r) => entry.event in (r.events ?? {}))) {
+      findings.push({ message: `always-silent entry names "${entry.row}" event "${entry.event}", which that row does not have` });
     }
   }
   const silenced = (row, event) =>

@@ -12,7 +12,7 @@ An assistant reply, marked as AI by the small AI icon at its start (named "AI" f
 
 **Storybook page:** `design-system/src/components/labels/AiMessage/AiMessage.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · ready `appearance.fast`, sound `sound.ai.ready` · strong `appearance.fast`, sound `sound.ai.strong` · refine `appearance.fast`, sound `sound.ai.refine`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
@@ -33,9 +33,12 @@ sent until the first text arrives, `streaming` while text arrives, then
 
 AiMessage reads these motion tokens and no literal duration or curve.
 
-| Event | Transition | Tokens | What it does |
-| --- | --- | --- | --- |
-| change | Load content | `--ds-motion-appearance-fast` | Sources fade in place 20 ms apart, each tied to real work; the answer streams in chunks with no fade. |
+| Event | Transition | Tokens | What it does | Sound |
+| --- | --- | --- | --- | --- |
+| change | Load content | `--ds-motion-appearance-fast` | Sources fade in place 20 ms apart, each tied to real work; the answer streams in chunks with no fade. |  |
+| ready | Load content | `--ds-motion-appearance-fast` | Feedback fades in over its Spinner. | `sound.ai.ready` on land: the feedback took over 1 s, so a Spinner showed |
+| strong | Load content | `--ds-motion-appearance-fast` | Strong feedback fades in over its Spinner. | `sound.ai.strong` on land: the feedback took over 1 s, so a Spinner showed |
+| refine | Load content | `--ds-motion-appearance-fast` | Refine feedback fades in over its Spinner. | `sound.ai.refine` on land: the feedback took over 1 s, so a Spinner showed |
 
 ## Best practices
 
