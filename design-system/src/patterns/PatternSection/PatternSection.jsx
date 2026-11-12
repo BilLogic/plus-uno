@@ -399,5 +399,4 @@ PatternSection.propTypes = {
 
 PatternSection.Toolbar = SectionToolbar;
 
-
 export default PatternSection;

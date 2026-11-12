@@ -9,11 +9,11 @@ import {
     PanelCloseAction,
     PanelContainer,
     PanelHeader,
+    SearchField,
     Select,
     StatusTag,
     TextField,
     Toggle,
-    SearchField,
     Tabs as TabsComponent,
 } from '@/components';
 import { PANEL_STORAGE_KEY, PatternCard, PatternSection, SECTION_DETAIL_FLOOR, usePanelControl } from '@/patterns';
