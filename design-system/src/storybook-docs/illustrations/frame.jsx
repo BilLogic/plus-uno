@@ -1,7 +1,7 @@
 import React from 'react';
 import { PAINT } from './paint.js';
 import { Illustration } from './Illustration.jsx';
-import { ButtonShape, Panel, Rect, Row, Rule, Sidebar, SkeletonBar } from './primitives.jsx';
+import { ButtonShape, Field, Panel, Rect, Row, Rule, Sidebar, SkeletonBar } from './primitives.jsx';
 
 /**
  * The Frame template's do and don't drawings. Each lesson is about which
@@ -17,13 +17,13 @@ const BAR_H = 12;
 
 const Canvas = ({ title, children }) => (
   <Illustration width={W} height={H} title={title}>
-    <Rect x={0} y={0} w={W} h={H} fill={PAINT.sunken} corner="none" />
+    <Rect x={0} y={0} w={W} h={H} fill={PAINT.frameSunken} />
     {children}
   </Illustration>
 );
 
 /** The Page: a surface that runs to the window's edges. */
-const PageBox = ({ x, w, h = H }) => <Rect x={x} y={0} w={w} h={h} fill={PAINT.surface} corner="none" />;
+const PageBox = ({ x, w, h = H }) => <Rect x={x} y={0} w={w} h={h} fill={PAINT.pageSurface} />;
 
 /** A few placeholder rows in the Page. */
 const Body = ({ x, y = 28, w }) => (
@@ -35,7 +35,7 @@ const Body = ({ x, y = 28, w }) => (
 /** The focused bottom bar: Cancel at the start, Back and Next at the end. */
 const Bar = ({ order = 'right' }) => (
   <g>
-    <Rect x={0} y={H - BAR_H} w={W} h={BAR_H} fill={PAINT.surface} corner="none" />
+    <Rect x={0} y={H - BAR_H} w={W} h={BAR_H} fill={PAINT.pageSurface} />
     <Rule x1={0} x2={W} y1={H - BAR_H} y2={H - BAR_H} />
     {order === 'right' ? (
       <g>
@@ -57,7 +57,7 @@ const Bar = ({ order = 'right' }) => (
 export const FocusedNoSidebar = ({ title = 'A focused task filling the whole window with no Sidebar, its steps down the left of the body' }) => (
   <Canvas title={title}>
     <PageBox x={0} w={W} h={H - BAR_H} />
-    <SkeletonBar x={8} y={8} w={40} h={6} tone={PAINT.accent} />
+    <SkeletonBar x={8} y={8} w={40} h={6} heading accent />
     <Body x={8} w={W - 16} />
     <Bar />
   </Canvas>
@@ -68,7 +68,7 @@ export const FocusedWithSidebar = ({ title = 'A focused task with the Sidebar st
   <Canvas title={title}>
     <Sidebar x={0} y={0} w={SIDE} h={H} accent />
     <PageBox x={SIDE} w={W - SIDE} h={H - BAR_H} />
-    <SkeletonBar x={SIDE + 8} y={8} w={40} h={6} />
+    <SkeletonBar x={SIDE + 8} y={8} w={40} h={6} heading />
     <Body x={SIDE + 8} w={W - SIDE - 16} />
     <Bar />
   </Canvas>
@@ -80,7 +80,7 @@ export const BarInOrder = ({ title = 'A bottom bar with Cancel at the start, and
     <PageBox x={0} w={W} h={H - BAR_H} />
     <Body x={8} y={12} w={W - 16} />
     <Bar />
-    <Rect x={W - 62} y={H - BAR_H} w={60} h={BAR_H} fill="none" stroke={PAINT.accent} corner="sm" />
+    <Rect x={W - 62} y={H - BAR_H} w={60} h={BAR_H} fill="none" stroke={PAINT.accent} corner="button" />
   </Canvas>
 );
 
@@ -90,7 +90,7 @@ export const BarScrambled = ({ title = 'A bottom bar whose three buttons sit tog
     <PageBox x={0} w={W} h={H - BAR_H} />
     <Body x={8} y={12} w={W - 16} />
     <Bar order="end" />
-    <Rect x={W - 90} y={H - BAR_H} w={86} h={BAR_H} fill="none" stroke={PAINT.accent} corner="sm" />
+    <Rect x={W - 90} y={H - BAR_H} w={86} h={BAR_H} fill="none" stroke={PAINT.accent} corner="button" />
   </Canvas>
 );
 
@@ -100,10 +100,7 @@ export const AiPanelDocked = ({ title = 'The AI panel docked at the right edge a
     <Sidebar x={0} y={0} w={SIDE} h={H} />
     <PageBox x={SIDE} w={W - SIDE - 52} />
     <Body x={SIDE + 8} y={14} w={W - SIDE - 52 - 16} />
-    <Rect x={W - 52} y={0} w={52} h={H} fill={PAINT.surface} corner="none" />
-    <Rule x1={W - 52} x2={W - 52} y1={0} y2={H} stroke={PAINT.accent} />
-    <SkeletonBar x={W - 44} y={10} w={24} h={5} tone={PAINT.accent} />
-    {[0, 1, 2].map((i) => <SkeletonBar key={i} x={W - 44} y={26 + i * 10} w={36 - i * 6} />)}
+    <Panel x={W - 52} y={0} w={52} h={H} accent />
   </Canvas>
 );
 
@@ -113,7 +110,7 @@ export const AiPanelFloating = ({ title = 'The AI panel floating over the Page a
     <Sidebar x={0} y={0} w={SIDE} h={H} />
     <PageBox x={SIDE} w={W - SIDE} />
     <Body x={SIDE + 8} y={14} w={W - SIDE - 16} />
-    <Panel x={W - 64} y={8} w={56} h={H - 16} accent />
+    <Panel x={W - 64} y={8} w={56} h={H - 16} accent floating />
   </Canvas>
 );
 
@@ -122,11 +119,10 @@ export const BareColumn = ({ title = 'A bare Frame with one centered column of f
   <Canvas title={title}>
     <PageBox x={0} w={W} />
     <g transform={`translate(${(W - 64) / 2} 0)`}>
-      <Rect x={0} y={14} w={14} h={14} fill={PAINT.accent} corner="sm" />
-      <SkeletonBar x={0} y={38} w={40} />
-      <Rect x={0} y={46} w={64} h={12} fill={PAINT.surface} stroke={PAINT.accent} corner="sm" />
-      <Rect x={0} y={64} w={64} h={12} fill={PAINT.surface} stroke={PAINT.ink} corner="sm" />
-      <ButtonShape x={0} y={84} w={64} appearance="primary" />
+      <Rect x={0} y={6} w={14} h={14} fill={PAINT.accent} corner="shape" />
+      <Field x={0} y={26} w={64} accent />
+      <Field x={0} y={58} w={64} />
+      <ButtonShape x={0} y={92} w={64} appearance="primary" />
     </g>
   </Canvas>
 );
@@ -137,10 +133,9 @@ export const BareWithSidebar = ({ title = 'A sign-in form with the full Sidebar 
     <Sidebar x={0} y={0} w={SIDE} h={H} accent />
     <PageBox x={SIDE} w={W - SIDE} />
     <g transform={`translate(${SIDE + (W - SIDE - 64) / 2} 0)`}>
-      <SkeletonBar x={0} y={38} w={40} />
-      <Rect x={0} y={46} w={64} h={12} fill={PAINT.surface} stroke={PAINT.ink} corner="sm" />
-      <Rect x={0} y={64} w={64} h={12} fill={PAINT.surface} stroke={PAINT.ink} corner="sm" />
-      <ButtonShape x={0} y={84} w={64} appearance="primary" />
+      <Field x={0} y={26} w={64} />
+      <Field x={0} y={58} w={64} />
+      <ButtonShape x={0} y={92} w={64} appearance="primary" />
     </g>
   </Canvas>
 );

@@ -22,7 +22,8 @@
  *   so a neutral drawing never uses the brand fill.
  * - CountTag: the accent is an outline around the pill, since CountTag has no
  *   brand tone.
- * - Panel: its SCSS has an edge line and no shadow, so the kit draws the same.
+ * - Panel: docked, its SCSS has an edge line and no shadow, so the kit draws the
+ *   same; floating, Frame's overlay fill and shadow, and no edge line.
  */
 
 /** role: [token, source SCSS relative to design-system/src] */
@@ -47,6 +48,8 @@ const ROLES = {
   popupShadow: ['--ds-shadow-overlay', 'components/overlays-and-layering/Popup/Popup.scss'],
   panelSurface: ['--ds-surface-overlay', 'components/layout-and-structure/Panel/Panel.scss'],
   panelEdge: ['--ds-border', 'components/layout-and-structure/Panel/Panel.scss'],
+  // A floating Panel (peek or overlay) takes Frame's overlay shadow; a docked one has none.
+  panelFloatingShadow: ['--ds-shadow-overlay', 'patterns/Frame/Frame.scss'],
   modalSurface: ['--ds-surface-overlay', 'components/messaging/Modal/Modal.scss'],
   modalShadow: ['--ds-shadow-blocking', 'components/messaging/Modal/Modal.scss'],
   modalDivider: ['--ds-border', 'components/messaging/Modal/Modal.scss'],
