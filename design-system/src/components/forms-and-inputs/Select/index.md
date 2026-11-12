@@ -10,7 +10,7 @@ Also asked as: combobox, picklist, option list.
 
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, Marker, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
@@ -63,6 +63,10 @@ Don't: The same words as plain help, in a default field.
 ### Pick the mode by the answer. {#pick-the-mode-by-the-answer}
 
 `isMulti` shows picks as Tags and checkboxes in the list; `selectAll` and `maxSelections` apply to it only. Typing filters the list unless you pass `isSearchable={false}`, and `isCreatable` adds a "Create" row when nothing matches. `createOption` turns the typed text into the option it creates, or refuses it with null; Time picker uses it to read "1430" as 2:30 PM. `clearable` defaults to on with `isMulti` and off for a required single select.
+
+### Mark a single pick with a check or a radio. {#mark-a-single-pick-with-a-check-or-a-radio}
+
+A single Select marks its pick with a check at the end of the row. Pass `marker="radio"` to draw a radio before the label instead, when the list reads as a set of alternatives to choose between, as in a view switch or a filter menu. Several picks always use checkboxes, so `marker` has no effect with `isMulti`. The marker changes color on selection; it does not move.
 
 ### Show picks as text when Tags crowd the field. {#show-picks-as-text-when-tags-crowd-the-field}
 
@@ -205,6 +209,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `loadOptions` | func | — | `(text, { offset, limit })` → `Promise<{ options, total }>`. Options load as the list opens, as you type and as you scroll, 50 at a time. |
 | `recent` | arrayOf | — | Ids shown under "Recent" before typing, in a list of more than 50. |
 | `suggested` | arrayOf | — | Ids shown under "Suggested" before typing, in a list of more than 50. |
+| `marker` | enum | `'check'` | How a single pick is marked: `check` (default) or `radio`. `isMulti` always draws checkboxes. |
 | `onChange` | func | — | `(next)`: an id, or an array of ids with `isMulti`. |
 | `onFocus` | func | — | Focus entering the field from outside it. |
 | `onBlur` | func | — | Focus leaving the field and its list. |
@@ -216,6 +221,8 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 **`displayMode`** — `tags` · `text`
 
 **`spacing`** — `default` · `compact`
+
+**`marker`** — `check` · `radio`
 
 The named string values each prop takes. A prop's full type is in Props: a prop listed here may also take a boolean or a number, and a prop missing here may still have named values.
 

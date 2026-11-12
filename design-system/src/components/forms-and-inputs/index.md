@@ -25,14 +25,14 @@ authored half, counted rather than assumed.
 | [InlineEditableTextfield](InlineEditableTextfield/index.md) | 21 | ✕ | ✕ | ✕ |
 | [LinkButton](LinkButton/index.md) | 13 | ✅ | ✅ | ✅ |
 | [LinkIconButton](LinkIconButton/index.md) | 11 | ✅ | ✅ | ✅ |
-| [PopupSelect](PopupSelect/index.md) | 16 | ✅ | ✕ | ✅ |
+| [PopupSelect](PopupSelect/index.md) | 17 | ✅ | ✕ | ✅ |
 | [PromptInput](PromptInput/index.md) | 16 | ✅ | ✅ | ✅ |
 | [Radio](Radio/index.md) | 20 | ✅ | ✅ | ✅ |
 | [RadioGroup](RadioGroup/index.md) | 19 | ✅ | ✅ | ✅ |
 | [Range](Range/index.md) | 14 | ✅ | ✅ | ✅ |
 | [Rating](Rating/index.md) | 13 | ✅ | ✅ | ✅ |
 | [RichTextEditor](RichTextEditor/index.md) | 17 | ✅ | ✅ | ✅ |
-| [Select](Select/index.md) | 43 | ✅ | ✅ | ✅ |
+| [Select](Select/index.md) | 44 | ✅ | ✅ | ✅ |
 | [SplitButton](SplitButton/index.md) | 3 | ✅ | ✅ | ✅ |
 | [TagInput](TagInput/index.md) | 27 | ✅ | ✅ | ✅ |
 | [TextArea](TextArea/index.md) | 27 | ✅ | ✅ | ✅ |

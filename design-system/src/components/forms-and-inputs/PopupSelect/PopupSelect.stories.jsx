@@ -99,7 +99,10 @@ export const Overview = {
         await userEvent.click(trigger);
         const menu = await openMenu(canvasElement);
         const list = within(menu).getByRole('listbox', { name: 'Status' });
-        await expect(within(list).getByRole('option', { name: 'Upcoming' })).toHaveAttribute('aria-selected', 'true');
+        const upcoming = within(list).getByRole('option', { name: 'Upcoming' });
+        await expect(upcoming).toHaveAttribute('aria-selected', 'true');
+        await expect(upcoming.querySelector('.plus-option-row-check--radio.is-checked')).not.toBeNull();
+        await expect(upcoming.querySelector('.plus-option-row-selected-mark')).toBeNull();
 
         await userEvent.click(within(list).getByRole('option', { name: 'Completed' }));
         await menuClosed(canvasElement);

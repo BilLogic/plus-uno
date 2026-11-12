@@ -102,7 +102,7 @@ actions, not values, is a `DropdownMenu`.
 1. **Trigger.** The labeled trigger is a subtle `FilterButton` reading "Label: Value" with a chevron. Any other trigger is the caller's.
 2. **Popup.** A `Popup` at `width="auto"`: at least the trigger's width, never under 160, up to 320. It sits 4 from the trigger.
 3. **Search** (optional). A compact search field above the list, on by default. Turn it off with `isSearchable={false}` for a short list.
-4. **List.** `Select`'s list: the same rows, groups, descriptions and messages. The picked row takes the selected fill and a check.
+4. **List.** `Select`'s list: the same rows, groups, descriptions and messages. The picked row takes the selected fill and a radio before its label, since the menu picks one value. `marker="check"` draws a check at the row's end instead.
 
 ### Placement
 
