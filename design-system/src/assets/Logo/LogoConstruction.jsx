@@ -1,6 +1,9 @@
 import React from 'react';
 import Logo from './Logo';
 import './LogoConstruction.scss';
+import {
+    BOX, CIRCLES, CONSTRUCTION_RADII, DIAGONALS, GRID, KEY_CORNERS, PLUS_BOX,
+} from './logoConstructionGeometry.js';
 
 /**
  * The Logo construction drawing, docs only. The mark is drawn in a 96 box
@@ -17,7 +20,6 @@ const W = 560;
 const H = 460;
 const UNIT = MARK / 96;
 
-const grid = Array.from({ length: 11 }, (_, i) => (i + 1) * 8);
 
 /** Labels in the outer drawing (mark at 396, so 4.125 px per unit) so they stay readable. */
 const LABELS = [
@@ -32,7 +34,7 @@ const LABELS = [
     [-20, 60, 'tangent 2u', 'end'],
 ];
 
-export const CONSTRUCTION_RADII = { outer: 48, inner: 36, corner: 16 };
+export { CONSTRUCTION_RADII };
 
 const LogoConstruction = ({ appearance = 'colored' }) => (
     <div className="plus-logo-construction" data-testid="logo-construction">
@@ -46,22 +48,25 @@ const LogoConstruction = ({ appearance = 'colored' }) => (
             aria-label="Logo construction: keyline grid, circles of radius 6 and 4.5 units, corner circles of 2 units and the plus arm box of 3 by 3 units"
         >
             <g transform={`scale(${UNIT})`} data-testid="construction-guides">
-                {grid.map((n) => (
+                {GRID.map((n) => (
                     <React.Fragment key={n}>
-                        <line className="plus-logo-construction__grid" x1={n} y1="0" x2={n} y2="96" />
-                        <line className="plus-logo-construction__grid" x1="0" y1={n} x2="96" y2={n} />
+                        <line className="plus-logo-construction__grid" x1={n} y1="0" x2={n} y2={BOX} />
+                        <line className="plus-logo-construction__grid" x1="0" y1={n} x2={BOX} y2={n} />
                     </React.Fragment>
                 ))}
-                <rect className="plus-logo-construction__long" x="0" y="0" width="96" height="96" />
-                <circle className="plus-logo-construction__long" cx="48" cy="48" r={CONSTRUCTION_RADII.outer} />
-                <circle className="plus-logo-construction__long" cx="48" cy="48" r={CONSTRUCTION_RADII.inner} />
-                <line className="plus-logo-construction__long" x1="0" y1="0" x2="96" y2="96" />
-                <line className="plus-logo-construction__long" x1="96" y1="0" x2="0" y2="96" />
-                <circle className="plus-logo-construction__short" cx="80" cy="16" r={CONSTRUCTION_RADII.corner} />
-                <circle className="plus-logo-construction__short" cx="16" cy="80" r={CONSTRUCTION_RADII.corner} />
+                <rect className="plus-logo-construction__long" x="0" y="0" width={BOX} height={BOX} />
+                {CIRCLES.map((c) => (
+                    <circle key={c.r} className="plus-logo-construction__long" cx={c.cx} cy={c.cy} r={c.r} />
+                ))}
+                {DIAGONALS.map(([x1, y1, x2, y2]) => (
+                    <line key={`${x1}${y1}`} className="plus-logo-construction__long" x1={x1} y1={y1} x2={x2} y2={y2} />
+                ))}
+                {KEY_CORNERS.map(([cx, cy]) => (
+                    <circle key={`${cx}${cy}`} className="plus-logo-construction__short" cx={cx} cy={cy} r={CONSTRUCTION_RADII.corner} />
+                ))}
                 <line className="plus-logo-construction__short" x1="80" y1="-6" x2="80" y2="102" />
                 <line className="plus-logo-construction__short" x1="-6" y1="16" x2="102" y2="16" />
-                <rect className="plus-logo-construction__line" x="56" y="16" width="24" height="24" />
+                <rect className="plus-logo-construction__line" x={PLUS_BOX.x} y={PLUS_BOX.y} width={PLUS_BOX.w} height={PLUS_BOX.h} />
                 <line className="plus-logo-construction__line" x1="68" y1="0" x2="68" y2="16" />
                 <line className="plus-logo-construction__line" x1="80" y1="28" x2="96" y2="28" />
                 <circle className="plus-logo-construction__dot" cx="68" cy="16" r=".9" />
