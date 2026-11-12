@@ -1,0 +1,81 @@
+/**
+ * Motion springs (ADR-041)
+ * Generated from scripts/lib/tokens/plan.mjs's SPRING_PRIMITIVES and
+ * MOTION_SEMANTICS — never hand-edit.
+ * Each spring is a linear() easing sampled from its analytic response, with
+ * its settle time in -duration beside it. Components read a --ds-motion-*
+ * semantic as `transition: transform var(--ds-motion-spatial-default-duration)
+ * var(--ds-motion-spatial-default)`; they never read a --motion-spring-*
+ * primitive. A loop alternates over its 600 ms half cycle.
+ */
+
+:root {
+    /* Primitives: raw springs, mass 1, named by stiffness (-r<percent> when the ratio is not 1) */
+    --motion-spring-880: linear(0, 0.005 1.55%, 0.0202 3.25%, 0.046 5.1%, 0.0837 7.2%, 0.1643 10.9%, 0.4428 22.6%, 0.5274 26.6%, 0.6003 30.45%, 0.6589 33.95%, 0.7117 37.55%, 0.7581 41.2%, 0.7994 45%, 0.8417 49.7%, 0.8777 54.7%, 0.9077 60.05%, 0.9326 65.9%, 0.9536 72.75%, 0.9698 80.5%, 0.99 99.95%, 1);
+    --motion-spring-880-duration: 224ms;
+    --motion-spring-440: linear(0, 0.0049 1.55%, 0.0202 3.25%, 0.0459 5.1%, 0.0836 7.2%, 0.1641 10.9%, 0.4434 22.65%, 0.528 26.65%, 0.6007 30.5%, 0.6592 34%, 0.7112 37.55%, 0.7577 41.2%, 0.799 45%, 0.8413 49.7%, 0.8774 54.7%, 0.9074 60.05%, 0.9323 65.9%, 0.9534 72.75%, 0.9697 80.5%, 0.99 99.95%, 1);
+    --motion-spring-440-duration: 317ms;
+    --motion-spring-190: linear(0, 0.005 1.55%, 0.0202 3.25%, 0.0459 5.1%, 0.0837 7.2%, 0.1643 10.9%, 0.4427 22.6%, 0.5274 26.6%, 0.6002 30.45%, 0.6588 33.95%, 0.7116 37.55%, 0.758 41.2%, 0.7993 45%, 0.8416 49.7%, 0.8776 54.7%, 0.9077 60.05%, 0.9325 65.9%, 0.9536 72.75%, 0.9698 80.5%, 0.99 99.95%, 1);
+    --motion-spring-190-duration: 482ms;
+    --motion-spring-3800: linear(0, 0.005 1.55%, 0.0203 3.25%, 0.0461 5.1%, 0.084 7.2%, 0.1636 10.85%, 0.4437 22.6%, 0.5274 26.55%, 0.6004 30.4%, 0.6591 33.9%, 0.712 37.5%, 0.7584 41.15%, 0.7997 44.95%, 0.8421 49.65%, 0.878 54.65%, 0.908 60%, 0.9328 65.85%, 0.954 72.75%, 0.9701 80.5%, 0.9901 99.95%, 1);
+    --motion-spring-3800-duration: 108ms;
+    --motion-spring-1600: linear(0, 0.0049 1.55%, 0.0202 3.25%, 0.0459 5.1%, 0.0836 7.2%, 0.1641 10.9%, 0.4435 22.65%, 0.528 26.65%, 0.6008 30.5%, 0.6593 34%, 0.7113 37.55%, 0.7577 41.2%, 0.7991 45%, 0.8414 49.7%, 0.8774 54.7%, 0.9075 60.05%, 0.9324 65.9%, 0.9535 72.75%, 0.9697 80.5%, 0.99 99.95%, 1);
+    --motion-spring-1600-duration: 166ms;
+    --motion-spring-800: linear(0, 0.005 1.55%, 0.0202 3.25%, 0.046 5.1%, 0.0838 7.2%, 0.1632 10.85%, 0.4429 22.6%, 0.5276 26.6%, 0.6004 30.45%, 0.659 33.95%, 0.7112 37.5%, 0.7576 41.15%, 0.799 44.95%, 0.8414 49.65%, 0.8775 54.65%, 0.9075 60%, 0.9324 65.85%, 0.9537 72.75%, 0.9699 80.5%, 0.99 99.95%, 1);
+    --motion-spring-800-duration: 235ms;
+    --motion-spring-800-r60: linear(0, 0.0078 2.05%, 0.0311 4.2%, 0.07 6.5%, 0.1264 9.05%, 0.2508 13.6%, 0.5221 22.4%, 0.6325 26.15%, 0.7334 29.9%, 0.819 33.5%, 0.8848 36.7%, 0.9398 39.85%, 0.986 43.05%, 1.0238 46.35%, 1.057 50.3%, 1.0797 54.5%, 1.092 59%, 1.0945 63.95%, 1.0823 71.95%, 1.0311 90.25%, 1.0099 99.95%, 1);
+    --motion-spring-800-r60-duration: 222ms;
+    --motion-spring-380-r80: linear(0, 0.0062 1.8%, 0.025 3.75%, 0.0566 5.85%, 0.1015 8.15%, 0.2002 12.3%, 0.425 20.75%, 0.5228 24.6%, 0.6136 28.5%, 0.6922 32.3%, 0.7529 35.65%, 0.8063 39.05%, 0.8523 42.5%, 0.8921 46.1%, 0.9322 50.7%, 0.9636 55.6%, 0.9868 60.9%, 1.0026 66.75%, 1.0126 74.35%, 1.0151 83.8%, 1.01 99.95%, 1);
+    --motion-spring-380-r80-duration: 326ms;
+    --motion-spring-200-r80: linear(0, 0.0062 1.8%, 0.025 3.75%, 0.0566 5.85%, 0.1015 8.15%, 0.2003 12.3%, 0.4252 20.75%, 0.5218 24.55%, 0.6138 28.5%, 0.6914 32.25%, 0.7522 35.6%, 0.8057 39%, 0.8518 42.45%, 0.8917 46.05%, 0.932 50.65%, 0.9634 55.55%, 0.9867 60.85%, 1.0026 66.7%, 1.0125 74.25%, 1.0151 83.7%, 1.01 99.95%, 1);
+    --motion-spring-200-r80-duration: 450ms;
+    --motion-spring-25: linear(0, 0.0034 4.3%, 0.0137 8.75%, 0.0308 13.35%, 0.055 18.1%, 0.1245 28.15%, 0.2233 39.05%, 0.3477 50.55%, 0.5055 63.5%, 0.6974 78.05%, 1);
+    --motion-spring-25-duration: 199ms;
+    --motion-spring-27-r0: linear(0, 0.007 5.35%, 0.0282 10.75%, 0.0638 16.25%, 0.1142 21.95%, 0.1831 28.15%, 0.2716 34.9%, 0.3757 42%, 0.687 62.2%, 0.7752 68.55%, 0.8457 74.3%, 0.914 81.05%, 0.9619 87.5%, 0.9905 93.8%, 1);
+    --motion-spring-27-r0-duration: 600ms;
+
+    /* Semantics, Productive */
+    --ds-motion-spatial-fast: var(--motion-spring-880);
+    --ds-motion-spatial-fast-duration: var(--motion-spring-880-duration);
+    --ds-motion-spatial-default: var(--motion-spring-440);
+    --ds-motion-spatial-default-duration: var(--motion-spring-440-duration);
+    --ds-motion-spatial-slow: var(--motion-spring-190);
+    --ds-motion-spatial-slow-duration: var(--motion-spring-190-duration);
+    --ds-motion-appearance-fast: var(--motion-spring-3800);
+    --ds-motion-appearance-fast-duration: var(--motion-spring-3800-duration);
+    --ds-motion-appearance-default: var(--motion-spring-1600);
+    --ds-motion-appearance-default-duration: var(--motion-spring-1600-duration);
+    --ds-motion-appearance-slow: var(--motion-spring-800);
+    --ds-motion-appearance-slow-duration: var(--motion-spring-800-duration);
+    --ds-motion-spatial-exit: var(--motion-spring-25);
+    --ds-motion-spatial-exit-duration: var(--motion-spring-25-duration);
+    --ds-motion-loop: var(--motion-spring-27-r0);
+    --ds-motion-loop-duration: var(--motion-spring-27-r0-duration);
+    --ds-motion-linear: linear;
+}
+
+/* Expressive: one container opts in; only the semantics that differ are re-declared. */
+[data-motion='expressive'] {
+    --ds-motion-spatial-fast: var(--motion-spring-800-r60);
+    --ds-motion-spatial-fast-duration: var(--motion-spring-800-r60-duration);
+    --ds-motion-spatial-default: var(--motion-spring-380-r80);
+    --ds-motion-spatial-default-duration: var(--motion-spring-380-r80-duration);
+    --ds-motion-spatial-slow: var(--motion-spring-200-r80);
+    --ds-motion-spatial-slow-duration: var(--motion-spring-200-r80-duration);
+}
+
+/* Reduced: every spatial semantic is the appearance.fast fade, never a cut. Listed after
+   Expressive and covering it, so reduced motion wins inside an Expressive container. */
+@media (prefers-reduced-motion: reduce) {
+    :root,
+    [data-motion='expressive'] {
+        --ds-motion-spatial-fast: var(--ds-motion-appearance-fast);
+        --ds-motion-spatial-fast-duration: var(--ds-motion-appearance-fast-duration);
+        --ds-motion-spatial-default: var(--ds-motion-appearance-fast);
+        --ds-motion-spatial-default-duration: var(--ds-motion-appearance-fast-duration);
+        --ds-motion-spatial-slow: var(--ds-motion-appearance-fast);
+        --ds-motion-spatial-slow-duration: var(--ds-motion-appearance-fast-duration);
+        --ds-motion-spatial-exit: var(--ds-motion-appearance-fast);
+        --ds-motion-spatial-exit-duration: var(--ds-motion-appearance-fast-duration);
+    }
+}
