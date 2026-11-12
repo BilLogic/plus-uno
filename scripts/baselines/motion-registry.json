@@ -1,0 +1,222 @@
+{
+  "why": "Interactive components with no motion row in scripts/lib/tokens/motion-registry.mjs yet (spec #2200). The list may only shrink. Regenerate with `npm run check:motion-registry -- --update`; never edit by hand.",
+  "sets": {
+    "main": {
+      "entries": {
+        "Accordion": {
+          "count": 1
+        },
+        "AiMessage": {
+          "count": 1
+        },
+        "Avatar": {
+          "count": 1
+        },
+        "AvatarGroup": {
+          "count": 1
+        },
+        "Banner": {
+          "count": 1
+        },
+        "Breadcrumb": {
+          "count": 1
+        },
+        "Button": {
+          "count": 1
+        },
+        "ButtonGroup": {
+          "count": 1
+        },
+        "Calendar": {
+          "count": 1
+        },
+        "Carousel": {
+          "count": 1
+        },
+        "Cascader": {
+          "count": 1
+        },
+        "Checkbox": {
+          "count": 1
+        },
+        "ChoiceGrid": {
+          "count": 1
+        },
+        "CloseButton": {
+          "count": 1
+        },
+        "Comment": {
+          "count": 1
+        },
+        "CountTag": {
+          "count": 1
+        },
+        "DatePicker": {
+          "count": 1
+        },
+        "DateTimePicker": {
+          "count": 1
+        },
+        "DropdownMenu": {
+          "count": 1
+        },
+        "EmptyState": {
+          "count": 1
+        },
+        "FileUpload": {
+          "count": 1
+        },
+        "FilterButton": {
+          "count": 1
+        },
+        "Flag": {
+          "count": 1
+        },
+        "GenerativeBorder": {
+          "count": 1
+        },
+        "IconButton": {
+          "count": 1
+        },
+        "InlineEdit": {
+          "count": 1
+        },
+        "InlineEditableTextfield": {
+          "count": 1
+        },
+        "InlineMessage": {
+          "count": 1
+        },
+        "Link": {
+          "count": 1
+        },
+        "LinkButton": {
+          "count": 1
+        },
+        "LinkIconButton": {
+          "count": 1
+        },
+        "MenuGroup": {
+          "count": 1
+        },
+        "Modal": {
+          "count": 1
+        },
+        "PageHeader": {
+          "count": 1
+        },
+        "Pagination": {
+          "count": 1
+        },
+        "Panel": {
+          "count": 1
+        },
+        "Popup": {
+          "count": 1
+        },
+        "ProgressBar": {
+          "count": 1
+        },
+        "ProgressIndicator": {
+          "count": 1
+        },
+        "ProgressTracker": {
+          "count": 1
+        },
+        "PromptInput": {
+          "count": 1
+        },
+        "PromptStarters": {
+          "count": 1
+        },
+        "Radio": {
+          "count": 1
+        },
+        "RadioGroup": {
+          "count": 1
+        },
+        "Range": {
+          "count": 1
+        },
+        "Rating": {
+          "count": 1
+        },
+        "RichTextEditor": {
+          "count": 1
+        },
+        "ScrollBar": {
+          "count": 1
+        },
+        "SectionMessage": {
+          "count": 1
+        },
+        "Select": {
+          "count": 1
+        },
+        "Sidebar": {
+          "count": 1
+        },
+        "Skeleton": {
+          "count": 1
+        },
+        "SmartTag": {
+          "count": 1
+        },
+        "Spinner": {
+          "count": 1
+        },
+        "SplitButton": {
+          "count": 1
+        },
+        "Spotlight": {
+          "count": 1
+        },
+        "StatusTag": {
+          "count": 1
+        },
+        "Suggestion": {
+          "count": 1
+        },
+        "Table": {
+          "count": 1
+        },
+        "Tabs": {
+          "count": 1
+        },
+        "Tag": {
+          "count": 1
+        },
+        "TagGroup": {
+          "count": 1
+        },
+        "TagInput": {
+          "count": 1
+        },
+        "TextArea": {
+          "count": 1
+        },
+        "TextField": {
+          "count": 1
+        },
+        "Tile": {
+          "count": 1
+        },
+        "TimePicker": {
+          "count": 1
+        },
+        "Toggle": {
+          "count": 1
+        },
+        "Tooltip": {
+          "count": 1
+        },
+        "TreeSelect": {
+          "count": 1
+        },
+        "VerticalButton": {
+          "count": 1
+        }
+      }
+    }
+  }
+}
