@@ -569,7 +569,7 @@ export const TRANSITION_DEMOS = {
     title: 'Deeper levels: the same rule',
     scenes: [
       drill({ id: 'deeper-grow', title: 'Depth 2: the row grows again', crumbs: 2, caption: 'Whatever was chosen becomes the page, at any depth, and the Breadcrumb arrives one level longer.' }),
-      drill({ id: 'deeper-slide', title: 'Depth 2: a page slides in from the right', mode: 'slide', crumbs: 2, caption: 'Beside a docked Sidebar a sliding page reads as a drawer, not a deeper place.' }),
+      drill({ id: 'deeper-slide', title: 'Depth 2: a page slides in from the right', mode: 'slide', crumbs: 2, caption: 'Beside a docked Sidebar a sliding page reads as a floating Panel opening, not a deeper place.' }),
     ],
   },
   climb: { title: 'Climbing back out', scenes: [climbOne, climbTwo] },

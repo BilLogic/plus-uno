@@ -224,8 +224,8 @@ How things move (ADR-041). Each semantic is an easing with its settle time besid
 --ds-motion-spatial-exit-duration  /* The settle time of --ds-motion-spatial-exit. A thing that is gone for good, leaving on the system's say, or thrown by the hand. */
 --ds-motion-spatial-fast  /* Small things over short distances: a toggle thumb, a Popup, a row, a tab indicator. */
 --ds-motion-spatial-fast-duration  /* The settle time of --ds-motion-spatial-fast. Small things over short distances: a toggle thumb, a Popup, a row, a tab indicator. */
---ds-motion-spatial-slow  /* Large layers and long travel: a Drawer, a docking Panel, a whole page that slides. */
---ds-motion-spatial-slow-duration  /* The settle time of --ds-motion-spatial-slow. Large layers and long travel: a Drawer, a docking Panel, a whole page that slides. */
+--ds-motion-spatial-slow  /* Large layers and long travel: a floating Panel, a docking Panel, a whole page that slides. */
+--ds-motion-spatial-slow-duration  /* The settle time of --ds-motion-spatial-slow. Large layers and long travel: a floating Panel, a docking Panel, a whole page that slides. */
 ```
 
 ## Motion Spring Primitives

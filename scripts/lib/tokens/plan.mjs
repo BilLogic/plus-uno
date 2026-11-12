@@ -48,7 +48,7 @@ export const SPRING_PRIMITIVES = [
 export const MOTION_SEMANTICS = [
   { name: 'spatial.fast', productive: '880', expressive: '800-r60', use: 'Small things over short distances: a toggle thumb, a Popup, a row, a tab indicator.' },
   { name: 'spatial.default', productive: '440', expressive: '380-r80', use: 'Mid-size layers over short travel: a Modal, a Flag, the Sidebar opening, content changing in place.' },
-  { name: 'spatial.slow', productive: '190', expressive: '200-r80', use: 'Large layers and long travel: a Drawer, a docking Panel, a whole page that slides.' },
+  { name: 'spatial.slow', productive: '190', expressive: '200-r80', use: 'Large layers and long travel: a floating Panel, a docking Panel, a whole page that slides.' },
   { name: 'appearance.fast', productive: '3800', use: 'The quickest fade and color change; also what every spatial token becomes in Reduced motion.' },
   { name: 'appearance.default', productive: '1600', use: 'A fade or color change at default weight.' },
   { name: 'appearance.slow', productive: '800', use: 'A deliberate fade, such as a large surface appearing.' },
