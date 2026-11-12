@@ -348,6 +348,7 @@
         "DocsAgentFallback"
       ],
       "tokens": [
+        "--ai-chat-width",
         "--body-default",
         "--body-small",
         "--content-max-width-reading",
@@ -365,7 +366,6 @@
         "--pad-y-sm",
         "--page-pad",
         "--popover-radius",
-        "--popover-width-md",
         "--radius-md",
         "--stack-lg",
         "--stack-md",
@@ -6863,8 +6863,6 @@
       "tokens": [
         "--blanket-max-height-modal",
         "--body-default",
-        "--content-max-width",
-        "--content-min-width",
         "--ds-background-neutral-subtle-hovered",
         "--ds-background-neutral-subtle-pressed",
         "--ds-border",
@@ -6876,8 +6874,6 @@
         "--ds-text",
         "--ds-text-subtle",
         "--focus-ring-width",
-        "--grid-columns",
-        "--grid-gutter",
         "--heading-medium",
         "--icon-md",
         "--inline-sm",
@@ -6888,13 +6884,7 @@
         "--modal-stack-md",
         "--motion-duration-short",
         "--motion-easing-standard",
-        "--plus-modal-column",
-        "--plus-modal-grid",
-        "--plus-modal-screen",
-        "--plus-modal-screen-pad",
-        "--plus-modal-span",
         "--radius-md",
-        "--space-150",
         "--stack-md",
         "--stack-sm",
         "--stroke-1"
@@ -9103,13 +9093,13 @@
           "name": "width",
           "type": "enum",
           "required": false,
-          "default": "'sm'",
+          "default": "'auto'",
           "values": [
-            "sm",
-            "md",
-            "lg"
+            "auto",
+            "3-col",
+            "4-col"
           ],
-          "description": "The width tier: sm 320 (default), md 400 or lg 480.",
+          "description": "`auto` (default) hugs its content, at least the trigger's width and 160 to 320. `3-col` and `4-col` span that many screen-grid columns, for a menu of several categories.",
           "deprecated": null
         },
         {
@@ -9146,9 +9136,11 @@
         "PlacementBottom",
         "PlacementLeft",
         "PlacementRight",
-        "WidthSmall",
-        "WidthMedium",
-        "WidthLarge",
+        "WidthAuto",
+        "WidthAutoCaps",
+        "WidthColumns",
+        "OpensWithAClip",
+        "KeyboardOpenIsInstant",
         "BodyOnly",
         "TriggerClick",
         "TriggerHover",
@@ -9156,18 +9148,28 @@
         "TriggerHoverAndClick"
       ],
       "tokens": [
+        "--anchor-width",
         "--body-default",
         "--ds-shadow-overlay",
         "--ds-surface-overlay",
         "--ds-text",
         "--heading-xsmall",
         "--layer-popup",
+        "--motion-duration-medium",
+        "--motion-duration-short",
+        "--motion-easing-entrance",
+        "--motion-easing-exit",
+        "--plus-popup-clip-bottom",
+        "--plus-popup-clip-left",
+        "--plus-popup-clip-right",
+        "--plus-popup-clip-top",
+        "--plus-popup-reach",
         "--popover-offset",
         "--popover-pad",
         "--popover-radius",
-        "--popover-width-lg",
-        "--popover-width-md",
-        "--popover-width-sm",
+        "--popup-clip-reach",
+        "--popup-max-width",
+        "--popup-min-width",
         "--popup-pad",
         "--stack-md"
       ]
@@ -12143,7 +12145,6 @@
         "--ds-text",
         "--ds-text-inverse",
         "--heading-small",
-        "--popover-width-md",
         "--radius-050",
         "--radius-100",
         "--radius-md",
@@ -12152,7 +12153,8 @@
         "--space-075",
         "--space-100",
         "--space-150",
-        "--spotlight-media-height"
+        "--spotlight-media-height",
+        "--spotlight-width"
       ]
     },
     {

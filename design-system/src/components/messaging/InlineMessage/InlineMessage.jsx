@@ -50,7 +50,6 @@ export const InlineMessage = ({
                 />
             )}
             placement={placement}
-            width="sm"
             id={id}
             className={`plus-inline-message ${className}`}
         >

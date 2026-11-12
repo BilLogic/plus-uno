@@ -83,7 +83,7 @@ export { default as Pagination, PAGINATION_NAVIGATORS, PAGINATION_SPACINGS } fro
 export { default as Sidebar } from '@/components/navigation/Sidebar';
 export { default as Tabs } from '@/components/navigation/Tabs';
 
-export { default as Popup, acceptsExpandedState } from '@/components/overlays-and-layering/Popup';
+export { default as Popup, acceptsExpandedState, POPUP_WIDTH_PX, POPUP_WIDTHS } from '@/components/overlays-and-layering/Popup';
 export { default as Tooltip } from '@/components/overlays-and-layering/Tooltip';
 
 export { default as ProgressIndicator, PROGRESS_INDICATOR_APPEARANCES, PROGRESS_INDICATOR_SIZES, PROGRESS_INDICATOR_SPACINGS } from '@/components/status-indicators/ProgressIndicator';

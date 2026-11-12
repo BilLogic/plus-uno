@@ -113,13 +113,17 @@ export const isInterpolated = (name) => name.endsWith('-');
 /**
  * Properties something OUTSIDE this repository defines.
  *
- * Empty today. Each entry names the outside owner that defines it at runtime,
+ * Each entry names the outside owner that defines it at runtime,
  * so a reader is not sent to "fix" it into a design token.
  *
  * Keep this list short and give every entry its owner. An allowlist is where a
  * check goes to stop being true.
  */
-export const EXTERNAL = new Set();
+export const EXTERNAL = new Set([
+  // Base UI's Positioner sets it on every floating layer it places: the
+  // trigger's width, which an auto-width Popup is never narrower than.
+  '--anchor-width',
+]);
 
 /**
  * `{name: {uses, bare, files}}` for every used-and-undefined token, plus the
