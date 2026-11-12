@@ -752,12 +752,12 @@ export const StackModalOnModalRefused = {
         await expect(canvasElement.querySelector('.plus-section-message--warning, [class*="section-message"][class*="warning"]'), 'a warning SectionMessage in the body').not.toBeNull();
         await expect(canvas.getByRole('button', { name: 'Delete session' }), 'the action takes the Danger appearance').toHaveClass('plus-btn--danger');
         // The overlay module refuses a second Modal while one is open.
-        const first = openOverlay('modal');
+        const first = openOverlay();
         const warn = console.warn;
         console.warn = () => {};
         try {
             await expect(first, 'the first Modal takes the slot').not.toBeNull();
-            await expect(openOverlay('modal'), 'the second Modal stays closed').toBeNull();
+            await expect(openOverlay(), 'the second Modal stays closed').toBeNull();
         } finally {
             console.warn = warn;
             first?.release();

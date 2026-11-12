@@ -28,8 +28,6 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Panel | template | narrow-exit | Open and close an overlay | `--ds-motion-spatial-default` |
 | PatternCard | template | change | Update a value or state | `--ds-motion-appearance-fast` |
 | PatternCard | template | milestone | Opening a page | `--ds-motion-spatial-default` |
-| PatternDrawer | template | enter | Open and close an overlay | `--ds-motion-spatial-slow` |
-| PatternDrawer | template | exit | Open and close an overlay | `--ds-motion-spatial-default` |
 | PatternModal | template | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` |
 | PatternModal | template | exit | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |
 | PatternModal | template | swap | Swap content in place | `--ds-motion-appearance-fast` |

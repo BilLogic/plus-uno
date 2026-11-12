@@ -97,14 +97,6 @@ export const MOTION_REGISTRY = [
     },
   },
   {
-    name: 'PatternDrawer',
-    tier: 'template',
-    events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.slow', note: 'Slides from its edge; only the Blanket fades, the Drawer itself never does.' },
-      exit: { transition: 'Open and close an overlay', spatial: 'spatial.default', note: 'Slides back to the same edge and stays there.' },
-    },
-  },
-  {
     name: 'Panel',
     tier: 'template',
     events: {
@@ -112,7 +104,7 @@ export const MOTION_REGISTRY = [
       'docked-exit': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Reverses and stays at the edge.' },
       'floating-enter': { transition: 'Dock and undock a panel', spatial: 'spatial.default', note: 'Details and the Inbox slide in from their edge over the page; the Inbox grows out of the Sidebar from the left. A quick look promoted to its record grows from the Panel itself.' },
       'floating-exit': { transition: 'Dock and undock a panel', spatial: 'spatial.fast', note: 'Reverses.' },
-      'narrow-enter': { transition: 'Open and close an overlay', spatial: 'spatial.slow', note: 'At narrow widths it slides over with a Blanket, like an edge layer.' },
+      'narrow-enter': { transition: 'Open and close an overlay', spatial: 'spatial.slow', note: 'At narrow widths it slides over with a Blanket.' },
       'narrow-exit': { transition: 'Open and close an overlay', spatial: 'spatial.default', note: 'The same way back.' },
     },
   },

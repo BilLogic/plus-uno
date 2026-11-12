@@ -124,7 +124,7 @@ Panel reads these motion tokens and no literal duration or curve.
 | docked-exit | Dock and undock a panel | `--ds-motion-spatial-default` | Reverses and stays at the edge. |
 | floating-enter | Dock and undock a panel | `--ds-motion-spatial-default` | Details and the Inbox slide in from their edge over the page; the Inbox grows out of the Sidebar from the left. A quick look promoted to its record grows from the Panel itself. |
 | floating-exit | Dock and undock a panel | `--ds-motion-spatial-fast` | Reverses. |
-| narrow-enter | Open and close an overlay | `--ds-motion-spatial-slow` | At narrow widths it slides over with a Blanket, like an edge layer. |
+| narrow-enter | Open and close an overlay | `--ds-motion-spatial-slow` | At narrow widths it slides over with a Blanket. |
 | narrow-exit | Open and close an overlay | `--ds-motion-spatial-default` | The same way back. |
 
 ## Best practices

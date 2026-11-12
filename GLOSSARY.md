@@ -145,16 +145,12 @@ The pattern for the container of one object, raised at rest with no border. Rela
 _Avoid_: "tile" (Tile is its own component), "panel" (Panel is the Frame's right area)
 
 **Backdrop**:
-The pattern for the layer that dims what sits behind it: full screen for a **Modal** or **Drawer**, which it also holds and sizes; under an **overlay** **Panel** it covers the **Page** and **Sidebar**.
+The pattern for the layer that dims what sits behind it: full screen for a **Modal**, which it also holds and sizes. A **Panel** floats with none.
 _Avoid_: "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
 
 **Modal**:
-The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, or opens as a second Modal stacked over it, up to the overlay limit `MAX_STACKED_OVERLAYS`. `Modal` is the component; `PatternModal` draws its shell inline.
+The component and pattern for content that takes over the screen until it is closed: a follow-up decision swaps the same Modal's content for its confirm view, and one Modal is open at a time. `Modal` is the component; `PatternModal` draws its shell inline.
 _Avoid_: "Modal dialog", "ModalDialog", "popup" for a blocking dialog
-
-**Drawer**:
-A PLUS pattern: a panel docked to one edge of the screen on a **Backdrop**, for work that leaves the **Page** visible behind it.
-_Avoid_: "side panel", "slide-over"
 
 **Popover**:
 The pattern for any layer that floats above the page with no **Backdrop**: **Dropdown menu**, **Popup**, Flag and Tooltip. It names the pattern only.
@@ -215,7 +211,7 @@ A form field for picking a value from a list of options. A list loaded from a se
 _Avoid_: "dropdown", "Dropdown menu" for a value picker, "async select"
 
 **Close / Dismiss**:
-Close ends a blocking layer (**Modal**, **Drawer**); Dismiss removes a message (Flag, Banner, Section message).
+Close ends a blocking layer (**Modal**); Dismiss removes a message (Flag, Banner, Section message).
 
 **Flag**:
 A short message that appears at the screen corner and leaves on its own or on Dismiss.
@@ -417,7 +413,7 @@ The transition for content that arrives after a wait: a placeholder, then the co
 _Avoid_: "spinner" for the transition
 
 **Open**:
-The transition of an overlay appearing and leaving: Popup, Modal, Drawer or Flag.
+The transition of an overlay appearing and leaving: Popup, Modal, floating Panel or Flag.
 _Avoid_: "show", "hide" for the motion
 
 **Dock**:

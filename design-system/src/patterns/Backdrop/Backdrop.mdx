@@ -4,8 +4,8 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as BackdropStories from './Backdrop.stories.jsx';
 import MotionSection from '@/storybook-docs/motion-section.jsx';
 import {
-    EdgeLayerWithConfirm,
-    EdgeLayerWithUnrelatedModal,
+    PanelWithConfirm,
+    PanelWithUnrelatedModal,
     ModalConfirmsInside,
     ModalOverModal,
     ConfirmSmallDo,
@@ -22,7 +22,7 @@ import {
 <Meta of={BackdropStories} />
 
 <Title />
-The Backdrop is the full-screen layer that holds the backdrop fill and the one layer above it, a modal, so that layer is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, and centers a modal, or holds a full-height layer at a screen edge. The examples on this page follow the toolbar's Color mode switch.
+The Backdrop is the full-screen layer that holds the backdrop fill and the one layer above it, a modal, so that layer is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, and centers a modal. The examples on this page follow the toolbar's Color mode switch.
 
 <DocsTabs of={BackdropStories}>
 
@@ -50,18 +50,6 @@ The Backdrop is the full-screen layer that holds the backdrop fill and the one l
 <ComponentExample of={BackdropStories.Pads} title="Pads" description="Pad 16 at the sides and 64 above and below, shaded here; under 640 tall the vertical pad drops to 24." />
 
 <ComponentExample of={BackdropStories.ScreenGrid} title="Screen grid" description="12 columns with a 16 gutter, centered and capped at 1232; a modal spans 6, 8 or 10 of them." />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Behavior
-
-<ComponentExample of={BackdropStories.PlacementCenter} title="Center" description={<><code>placement="center"</code>, the default, centers a modal in the pads.</>} />
-
-<ComponentExample of={BackdropStories.PlacementEnd} title="End" description={<><code>placement="end"</code> holds a full-height layer at the right edge, with no pad.</>} />
-
-<ComponentExample of={BackdropStories.PlacementStart} title="Start" description={<><code>placement="start"</code> holds a full-height layer at the left edge, with no pad.</>} />
 
 </div>
 
@@ -109,11 +97,10 @@ A Backdrop interrupts the page for one task. It dims everything behind it with o
 </thead>
 <tbody>
 <tr><td>Modal</td><td>One task blocks the page. The Backdrop centers it.</td></tr>
-<tr><td>Edge layer</td><td>A full-height layer the Backdrop holds at an edge. A Panel is the way forward: it floats with no Backdrop.</td></tr>
 </tbody>
 </DocsTable>
 
-The Backdrop draws the layer only. It does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
+A task that keeps the page in view is a Panel, which floats with no Backdrop. The Backdrop draws the layer only. It does not trap focus, close on Escape or take the Modal slot. For a real dialog, use the core Modal component, which draws the same layers and backdrop token. `inline` draws the Backdrop in the page flow at a stand-in screen of `screenWidth` and `screenHeight`, for docs and previews.
 
 ### Layers
 
@@ -172,17 +159,17 @@ A Backdrop has no states. It is shown while its layer is open and gone when it c
 
 ## Best practices
 
-A confirm Modal may open over a Panel, a Popup or a focused task, each with its own Backdrop. A Modal never opens on another Modal.
+A confirm Modal may open over a Panel, a Popup or a focused task, and brings its own Backdrop, because a Panel floats with none. A Modal never opens on another Modal.
 
 ### Stack only a confirm over a Panel, a Popup or a focused task.
 
-A confirm raised from a Panel or a focused task is a second Backdrop over the first. A Modal for another task waits until the first one closes.
+A confirm raised from a Panel or a focused task puts one Backdrop over the page and the Panel. A Modal for another task waits until the first one closes.
 
 <DoDontPair
-    doExample={<EdgeLayerWithConfirm />}
-    doCaption="An edge layer and the confirm it raises, stacked over it."
-    dontExample={<EdgeLayerWithUnrelatedModal />}
-    dontCaption="A modal for an unrelated task opened over an edge layer."
+    doExample={<PanelWithConfirm />}
+    doCaption="A Panel and the confirm it raises, over it."
+    dontExample={<PanelWithUnrelatedModal />}
+    dontCaption="A modal for an unrelated task opened over a Panel."
 />
 
 ### Never a Modal on a Modal.
