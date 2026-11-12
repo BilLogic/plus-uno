@@ -2,7 +2,7 @@
 
 # Select
 
-Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. A searchable field is a text input: typing in it filters the list. A plain one is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which collapse into "+n" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.
+Select — pick one value, or several, from a list, on `_Field` with the internal `Listbox` under it. - **The field is the combobox.** Focus stays in it, and the highlighted row is its `aria-activedescendant`. The field is a text input: typing in it filters the list. With `isSearchable={false}` it is a select-only combobox. - **Values are ids; options are objects.** `value` is an option's `value` (an array with `isMulti`), controlled or not. - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which collapse into "+n" without focus. - **Trailing** holds the clear × (not a tab stop; Delete does the same) and the caret.
 
 Also asked as: combobox, picklist, option list.
 
@@ -10,16 +10,32 @@ Also asked as: combobox, picklist, option list.
 
 **Source:** `design-system/src/components/forms-and-inputs/Select/Select.jsx`
 
-**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
+**Stories:** `design-system/src/components/forms-and-inputs/Select/Select.stories.jsx` — Empty, Filled, Multi, Searchable, NotSearchable, Creatable, SpacingDefault, SpacingCompact, Spacing, DependentFields, LongList, Overview, Interactive, Colors, Rest, Hovered, Focused, FieldDisabled, FieldInvalid, FieldReadOnly
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
 ## Usage
 
-Use `Select` for a list too long to show all at once, or when typing to
-filter helps more than scanning — a tutor roster, a list of schools. For a
-handful of options visible all at once, use `RadioGroup` instead. For
-options arranged in a hierarchy, use `TreeSelect` or `Cascader`.
+Use `Select` for a list of six or more options, where typing to filter
+helps more than scanning — a tutor roster, a list of schools. Up to five
+options belong in view as a `RadioGroup` (one pick) or a Checkbox group
+(several). Pick the control by the shape of the answer.
+
+| The choice is | Reach for |
+| --- | --- |
+| One pick, up to 5 options | `RadioGroup` |
+| Several picks, up to 5 options | A Checkbox group (`Fieldset` with `Checkbox`) |
+| 6 or more options | `Select`, searchable by default |
+| A list held on a server, too large to ship | `Select` with `loadOptions` |
+| Options in a hierarchy | `Cascader` or `TreeSelect` |
+| Narrowing a table or list from a bar | The tiers of the Filtering pattern |
+| An action run from a button | `DropdownMenu` |
+
+### Turn typing off for a short filter list.
+
+Typing is on because most lists are long enough to need it. A filter menu that
+holds one short list, applied as you pick, has nothing to search: pass
+`isSearchable={false}` so the field stays a plain trigger and Space opens it.
 
 ## Best practices
 
@@ -46,7 +62,7 @@ Don't: The same words as plain help, in a default field.
 
 ### Pick the mode by the answer. {#pick-the-mode-by-the-answer}
 
-`isMulti` shows picks as Tags and checkboxes in the list; `selectAll` and `maxSelections` apply to it only. `isSearchable` filters by typing, and `isCreatable` adds a "Create" row when nothing matches. `createOption` turns the typed text into the option it creates, or refuses it with null; Time picker uses it to read "1430" as 2:30 PM. `clearable` defaults to on with `isMulti` and off for a required single select.
+`isMulti` shows picks as Tags and checkboxes in the list; `selectAll` and `maxSelections` apply to it only. Typing filters the list unless you pass `isSearchable={false}`, and `isCreatable` adds a "Create" row when nothing matches. `createOption` turns the typed text into the option it creates, or refuses it with null; Time picker uses it to read "1430" as 2:30 PM. `clearable` defaults to on with `isMulti` and off for a required single select.
 
 ### Show picks as text when Tags crowd the field. {#show-picks-as-text-when-tags-crowd-the-field}
 
@@ -160,7 +176,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 | `value` | arrayOf | — | The picked id, or ids with `isMulti`. Pass it to control the field. |
 | `defaultValue` | arrayOf | — | The picked id, or ids with `isMulti`, to start with when the field is uncontrolled. |
 | `placeholder` | string | `'Select...'` | The text shown when nothing is picked. It names the field when there is no label. |
-| `isSearchable` | bool | `false` | Typing in the field filters the list. |
+| `isSearchable` | bool | `true` | Typing in the field filters the list. On by default; pass `false` for a short list, such as a filter menu's. |
 | `isCreatable` | bool | `false` | Offers "Create text " when nothing matches exactly, ignoring case. Implies typing. |
 | `onCreate` | func | — | Called with the text of a created option, which is then picked. |
 | `createOption` | func | — | `(text)` → the option a typed text creates, `{ value, label }`, or null to create nothing. Defaults to the text itself. |

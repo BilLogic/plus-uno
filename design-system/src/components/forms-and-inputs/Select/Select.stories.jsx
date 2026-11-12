@@ -7,7 +7,8 @@ import Select from './Select';
 
 /**
  * Select — pick one value, or several, from a list. The field is `_Field`
- * and the list is the internal Listbox; isSearchable means typing in the field.
+ * and the list is the internal Listbox; typing in the field filters it, and
+ * isSearchable={false} turns that off for a short list.
  */
 export default {
     title: 'Components/Forms and inputs/Select',
@@ -143,7 +144,12 @@ export const Multi = {
 };
 
 export const Searchable = {
-    render: () => <div style={field}><Select label="Subject" isSearchable options={sampleOptions} placeholder="Type to search" /></div>,
+    render: () => <div style={field}><Select label="Subject" options={sampleOptions} placeholder="Type to search" /></div>,
+};
+
+/** A short list in a filter menu opts out: the field is a plain trigger that opens the list. */
+export const NotSearchable = {
+    render: () => <div style={field}><Select label="Status" isSearchable={false} options={sampleOptions.slice(0, 3)} placeholder="Any status" /></div>,
 };
 
 export const Creatable = {
@@ -264,7 +270,7 @@ export const Interactive = {
         label: 'Option',
         placeholder: 'Select...',
         caption: '',
-        isSearchable: false,
+        isSearchable: true,
         isCreatable: false,
         displayMode: 'tags',
         spacing: 'default',
@@ -297,7 +303,7 @@ export const Colors = {
     ),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        const placeholder = canvasElement.querySelector('.plus-select-placeholder');
+        const subject = canvas.getByRole('combobox', { name: 'Subject' });
         const caret = canvasElement.querySelector('.plus-select-caret');
         await userEvent.click(canvas.getByRole('combobox', { name: 'Subjects' }));
         const all = await waitFor(() => {
@@ -308,7 +314,7 @@ export const Colors = {
         const mark = all.querySelector('.plus-select-all-mark');
         const picked = document.querySelector('.plus-option-row.is-selected');
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
-            await expect(getComputedStyle(placeholder).color, `${mode}: placeholder`).toBe(token('--ds-text-subtlest'));
+            await expect(getComputedStyle(subject, '::placeholder').color, `${mode}: placeholder`).toBe(token('--ds-text-subtlest'));
             await expect(getComputedStyle(caret).color, `${mode}: caret`).toBe(token('--ds-icon-subtle'));
             await expect(getComputedStyle(mark).borderTopColor, `${mode}: select-all mark edge`).toBe(token('--ds-border-input'));
             await expect(getComputedStyle(mark).backgroundColor, `${mode}: select-all mark fill`).toBe(token('--ds-background-input'));
