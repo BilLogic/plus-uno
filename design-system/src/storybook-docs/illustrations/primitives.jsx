@@ -8,32 +8,43 @@ import { PAINT, CORNER, HAIRLINE } from './paint.js';
  * product UI. No primitive draws text; skeleton bars stand in for it.
  */
 
-const Rect = ({ x, y, w, h, fill, stroke, corner = 'xs', opacity }) => (
-  <rect
-    x={x}
-    y={y}
-    width={w}
-    height={h}
-    fill={fill}
-    stroke={stroke}
-    opacity={opacity}
-    style={{ ...(stroke ? HAIRLINE : null), rx: CORNER[corner] }}
-  />
-);
+/**
+ * A corner token, held to half the shape's shorter side. SVG draws a corner
+ * larger than that as an ellipse, so the clamp keeps every rect a rounded
+ * rectangle however small it is.
+ */
+const clampedCorner = (token, w, h) => (token ? `min(${token}, ${Math.min(w, h) / 2}px)` : undefined);
+
+const Rect = ({ x, y, w, h, fill, stroke, corner = 'xs', opacity }) => {
+  const radius = clampedCorner(CORNER[corner], w, h);
+  return (
+    <rect
+      x={x}
+      y={y}
+      width={w}
+      height={h}
+      fill={fill}
+      stroke={stroke}
+      opacity={opacity}
+      style={{ ...(stroke ? HAIRLINE : null), rx: radius, ry: radius }}
+    />
+  );
+};
 
 const Rule = ({ x1, y1, x2, y2, stroke = PAINT.line, dash }) => (
   <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={stroke} strokeDasharray={dash} style={HAIRLINE} />
 );
 
-/** A line of placeholder text. */
+/** A line of placeholder text: a pill, so its corner is half its own height. */
 export const SkeletonBar = ({ x, y, w, h = 4, accent = false, tone }) => (
   <rect
     x={x}
     y={y}
     width={w}
     height={h}
+    rx={h / 2}
+    ry={h / 2}
     fill={tone ?? (accent ? PAINT.accent : PAINT.skeleton)}
-    style={{ rx: CORNER.full }}
   />
 );
 

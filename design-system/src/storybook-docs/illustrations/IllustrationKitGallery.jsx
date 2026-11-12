@@ -30,7 +30,7 @@ export const IllustrationKitGallery = () => (
   >
     {SETS.map(([name, draw]) => (
       <IllustrationFigure key={name} caption={name}>
-        <Illustration width={160} height={200} title={`${name}, neutral above and accented below`}>
+        <Illustration width={160} height={200} capped={false} title={`${name}, neutral above and accented below`}>
           <svg x={0} y={0} width={160} height={100} viewBox="0 0 160 100">{draw(false)}</svg>
           <svg x={0} y={100} width={160} height={100} viewBox="0 0 160 100">{draw(true)}</svg>
         </Illustration>

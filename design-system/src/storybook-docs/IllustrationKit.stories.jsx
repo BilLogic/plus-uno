@@ -14,7 +14,7 @@ import { ThreeLayers, OpeningARecord } from './illustrations/compositions.jsx';
 
 export default {
   // A test harness, not a page: `!dev` keeps it out of the sidebar while the
-  // Storybook tests still run it. The page itself is Templates/Illustration kit.
+  // Storybook tests still run it. The page itself is Get started/Illustration kit.
   title: 'Get started/Illustration kit',
   tags: ['!dev', '!autodocs'],
   parameters: { layout: 'padded' },
