@@ -64,6 +64,9 @@ export const SOUND_SPEC = {
     "fuller": -21.5
   },
   "pickup": 0.06,
+  "land": 0.9,
+  "burst": 2,
+  "noiseSeconds": 0.2,
   "aiCount": {
     "lead": 0.15,
     "ticks": [

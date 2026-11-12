@@ -5,9 +5,9 @@
  */
 import { SPRINGS } from '../tokens/ladder/springs.generated';
 import { scoreFor } from './score';
+import { SOUND_SPEC } from './spec.generated';
 
 const STEP = 0.0001;
-const LAND = 0.9;
 const LIMIT = 10;
 
 /** Position over time of a spring config ({stiffness, damping, mass}) released from 0 toward 1. */
@@ -21,6 +21,9 @@ function springStep({ stiffness, damping, mass = 1 }) {
   return (t) => 1 - Math.exp(-w * t) * (1 + w * t);
 }
 
+/** The spring mode a reduced-motion value lands in. */
+export const modeFor = (reduced) => (reduced ? 'reduced' : 'productive');
+
 /**
  * A motion token's 90% time, in seconds. A mode the token does not re-declare
  * (Expressive only where it differs) reads its Productive spring. An exit
@@ -32,7 +35,7 @@ export function springT90(name, { mode = 'productive' } = {}) {
   const entry = SPRINGS[name];
   if (!entry) throw new Error(`"${name}" is not a motion token: ${Object.keys(SPRINGS).join(', ')}`);
   const y = springStep(entry[mode] ?? entry.productive);
-  const target = LAND / (entry.aim ?? 1);
+  const target = SOUND_SPEC.land / (entry.aim ?? 1);
   let t = 0;
   while (y(t) < target && t < LIMIT) t += STEP;
   return t;

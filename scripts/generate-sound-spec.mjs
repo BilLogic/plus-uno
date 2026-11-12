@@ -19,7 +19,7 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 import { isEntry, main } from './lib/findings.mjs';
-import { SOUND_AI_COUNT, SOUND_KEY, SOUND_LEVELS, SOUND_MATERIAL, SOUND_OUTPUT, SOUND_PICKUP, SOUND_SEMANTICS } from './lib/tokens/sound-plan.mjs';
+import { SOUND_AI_COUNT, SOUND_BURST, SOUND_KEY, SOUND_LAND, SOUND_LEVELS, SOUND_MATERIAL, SOUND_NOISE_SECONDS, SOUND_OUTPUT, SOUND_PICKUP, SOUND_SEMANTICS } from './lib/tokens/sound-plan.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
@@ -32,7 +32,7 @@ export function soundSpec() {
   const tokens = Object.fromEntries(
     SOUND_SEMANTICS.map(({ name, base, ...token }) => [name, { ...token, base: SOUND_KEY[base].hz }]),
   );
-  return { key: SOUND_KEY, material: SOUND_MATERIAL, levels: SOUND_LEVELS, pickup: SOUND_PICKUP, aiCount: SOUND_AI_COUNT, output: SOUND_OUTPUT, tokens };
+  return { key: SOUND_KEY, material: SOUND_MATERIAL, levels: SOUND_LEVELS, pickup: SOUND_PICKUP, land: SOUND_LAND, burst: SOUND_BURST, noiseSeconds: SOUND_NOISE_SECONDS, aiCount: SOUND_AI_COUNT, output: SOUND_OUTPUT, tokens };
 }
 
 /** @returns {string} the generated module's text */

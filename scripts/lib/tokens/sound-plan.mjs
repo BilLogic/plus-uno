@@ -66,6 +66,15 @@ export const SOUND_LEVELS = {
  */
 export const SOUND_PICKUP = 0.06;
 
+/** Where a sound lands in its motion: the spring's 90% time, as a fraction of the move. */
+export const SOUND_LAND = 0.9;
+
+/** The burst window, in seconds: a token that plays again inside it is dropped, so a burst sounds once. */
+export const SOUND_BURST = 2;
+
+/** The length of the one shared noise buffer every knock and tick is cut from, in seconds. */
+export const SOUND_NOISE_SECONDS = 0.2;
+
 /** The AI count: six rising ticks over the 150 ms before an AI sound lands. */
 export const SOUND_AI_COUNT = {
   lead: 0.15,

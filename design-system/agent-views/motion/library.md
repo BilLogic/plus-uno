@@ -42,7 +42,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Popup | template | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Popup | template | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Common actions | pattern | selection | Update a value or state | `--ds-motion-appearance-fast` |  |
-| Common actions | pattern | confirm | Open and close an overlay | `--ds-motion-appearance-fast` | `sound.done.sent` on land: a call-off or a lead request is sent |
+| Common actions | pattern | confirm | Open and close an overlay | `--ds-motion-appearance-fast` | `sound.done.sent` on land: only a call-off or lead request sent; other confirms stay silent |
 | Common actions | pattern | cancel | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Common actions | pattern | undo | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Disabled | pattern | change | Update a value or state | `--ds-motion-appearance-fast` |  |
@@ -51,7 +51,6 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Errors | pattern | appear | Call attention | `--ds-motion-appearance-fast` |  |
 | Errors | pattern | field | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | Errors | pattern | blocked | Call attention | `--ds-motion-spatial-fast` |  |
-| Errors | pattern | failed | Call attention | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | `sound.error` on land: the person's own submit was rejected (a danger SectionMessage) |
 | Filtering | pattern | menu-open | Open and close an overlay | `--ds-motion-spatial-fast` |  |
 | Filtering | pattern | menu-close | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Filtering | pattern | count-first | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
@@ -110,7 +109,7 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | Cascader | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Cascader | component | change | Expand and collapse | `--ds-motion-spatial-fast` |  |
 | Checkbox | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
-| Checkbox | component | goal | Update a value or state | `--ds-motion-appearance-fast` | `sound.goal` on land: set or checked together in a session; shared, so the student hears it |
+| Checkbox | component | goal | Update a value or state | `--ds-motion-appearance-fast` | `sound.goal` on land: only the session goal check-in done together, shared with the student; other checkboxes stay silent |
 | ChoiceGrid | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | CloseButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |
 | DatePicker | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
@@ -126,13 +125,13 @@ Every template's, pattern's and component's enter, exit and change motion, one l
 | FilterButton | component | change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | FilterMenu | component | enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` |  |
 | FilterMenu | component | exit | Open and close an overlay | `--ds-motion-appearance-fast` |  |
-| Flag | component | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | `sound.notify` on land: outside a session; Flags that arrive together play once |
+| Flag | component | enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | `sound.notify` on land: outside a session; any appearance but error, which plays Error (the failed event); Flags that arrive together play once |
 | Flag | component | exit | Open and close an overlay | `--ds-motion-spatial-exit` |  |
 | Flag | component | dismiss | Open and close an overlay | `--ds-motion-appearance-fast` |  |
 | Flag | component | change | Add or remove an item | `--ds-motion-spatial-default` |  |
 | Flag | component | milestone | Open and close an overlay | `--ds-motion-spatial-fast` | `sound.done.step` on land: a reflection is complete |
-| Flag | component | prompt | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | `sound.prompt` on land: session link ready, a lead with an empty tutor, wrap-up, few students at 10 min; plays when the tab is hidden |
-| Flag | component | failed | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | `sound.error` on land: a background job the person started failed |
+| Flag | component | prompt | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | `sound.prompt` on land: session link ready, a lead with an empty tutor, wrap-up, few students at 10 min; an app passes sound="prompt"; plays when the tab is hidden |
+| Flag | component | failed | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | `sound.error` on land: an error Flag, the default for that appearance: a background job the person started failed |
 | GenerativeBorder | component | change | Load content | `--ds-motion-linear` |  |
 | GenerativeBorder | component | pulse | Load content | `--ds-motion-loop` |  |
 | IconButton | component | change | Update a value or state | `--ds-motion-appearance-fast` |  |

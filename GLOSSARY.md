@@ -459,11 +459,11 @@ _Avoid_: "send whoosh"
 _Avoid_: "success sound"
 
 **Done milestone**:
-`sound.done.milestone`, G4 rising to B5 in five notes, the fullest sound in the set: onboarding complete, a first session, a term start or end. An Expressive milestone plays it.
+`sound.done.milestone`, G4 rising to B5 in five notes, the fullest sound in the set: onboarding complete, a first session, a goal reached, a term start or end, a badge claimed. An Expressive milestone plays it.
 _Avoid_: "fanfare", "celebration sound"
 
 **Concern sound**:
-`sound.error`, E5 then D5: something needs a second look, such as a rejected form or a failed save.
+`sound.error`, E5 then D5: something needs a second look, such as a rejected submit or a failed background job.
 _Avoid_: "error buzz", "failure sound"
 
 ### Design work

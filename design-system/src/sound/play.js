@@ -13,12 +13,13 @@ import { ENVELOPE, scoreFor } from './score';
 import { forgetSoundSetting, isSoundEnabled } from './settings';
 import { SOUND_SPEC } from './spec.generated';
 
-const NOISE_SECONDS = 0.2;
 // The shortest lead a sound is scheduled with, so its first notch is not clipped.
 const MIN_LEAD = 0.005;
 const GESTURES = ['pointerdown', 'keydown', 'touchend'];
 
 let engine = null;
+// When each token last played, on the audio clock: a burst sounds once.
+const lastPlayed = new Map();
 
 const contextClass = () => (typeof window === 'undefined' ? undefined : window.AudioContext ?? window.webkitAudioContext);
 
@@ -69,7 +70,7 @@ function createEngine(AudioContextClass) {
   room.connect(wet);
   wet.connect(master);
 
-  return { ctx, dry, send, noise: noise(ctx, NOISE_SECONDS) };
+  return { ctx, dry, send, noise: noise(ctx, SOUND_SPEC.noiseSeconds) };
 }
 
 /** iOS unlocks a context by playing one silent sample inside the gesture. */
@@ -161,16 +162,21 @@ function scheduleKnock({ ctx, dry, send, noise: buffer }, e, start) {
  * motion. Reduced motion does not mute it; only the setting does.
  * @param {string} token a sound token without the `sound.` prefix, e.g. `notify`
  * @param {{at?: number}} [options]
+ * A token that plays again inside the plan's burst window is dropped, so a burst of
+ * the same sound plays once.
  * @returns {boolean} whether it was scheduled
  */
 export function playSound(token, { at = 0 } = {}) {
   if (!isSoundEnabled()) return false;
   const score = scoreFor(token);
   if (!engine || engine.ctx.state === 'closed') return false;
+  const now = engine.ctx.currentTime;
+  if (now - (lastPlayed.get(token) ?? -Infinity) < SOUND_SPEC.burst) return false;
   try {
     if (engine.ctx.state === 'suspended') engine.ctx.resume();
     const start = engine.ctx.currentTime + Math.max(MIN_LEAD, at);
     score.events.forEach((e) => (e.kind === 'tone' ? scheduleTone(engine, e, start) : scheduleKnock(engine, e, start)));
+    lastPlayed.set(token, now);
     return true;
   } catch {
     return false;
@@ -185,5 +191,6 @@ export function resetSound() {
     // Already closed.
   }
   engine = null;
+  lastPlayed.clear();
   forgetSoundSetting();
 }

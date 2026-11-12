@@ -4,6 +4,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { playSound, resetSound, unlockAudio } from './play';
 import { scoreFor } from './score';
+import { SOUND_SPEC } from './spec.generated';
 import { SOUND_STORAGE_KEY, isSoundEnabled, setSoundEnabled } from './settings';
 import { SoundProvider, useSound } from './SoundProvider';
 
@@ -89,6 +90,27 @@ describe('playSound', () => {
   it('waits for the first gesture: before audio is unlocked, nothing plays', () => {
     expect(playSound('notify')).toBe(false);
     expect(audio.made).toHaveLength(0);
+  });
+
+  it('plays a token once per burst: a repeat inside the burst window is dropped, one after it plays again', () => {
+    unlockAudio();
+    const [ctx] = audio.made;
+    const nodes = [];
+    const create = ctx.createOscillator.bind(ctx);
+    ctx.createOscillator = () => { const n = create(); nodes.push(n); return n; };
+    const burst = SOUND_SPEC.burst;
+    expect(burst).toBe(2);
+    expect([playSound('roster'), (ctx.currentTime += 0.5, playSound('roster')), (ctx.currentTime += 1, playSound('roster'))]).toEqual([true, false, false]);
+    expect(nodes).toHaveLength(scoreFor('roster').events.filter((e) => e.kind === 'tone').length);
+    ctx.currentTime += burst;
+    expect(playSound('roster')).toBe(true);
+    expect(nodes).toHaveLength(2 * scoreFor('roster').events.filter((e) => e.kind === 'tone').length);
+  });
+
+  it('a different token inside the window still plays', () => {
+    unlockAudio();
+    expect(playSound('roster')).toBe(true);
+    expect(playSound('notify')).toBe(true);
   });
 
   it('throws on a name that is not a sound token', () => {

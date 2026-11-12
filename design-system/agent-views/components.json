@@ -4767,11 +4767,11 @@
         },
         {
           "name": "sound",
-          "type": "bool",
+          "type": "string or enum",
           "required": false,
-          "default": "true",
+          "default": null,
           "values": null,
-          "description": "Plays Notify as the flag lands, through the app's sound setting. Defaults to true; the app passes false when a flag should stay quiet, such as during a session or for all but the first of several that arrive together.",
+          "description": "The sound token it plays as it lands, through the app's sound setting, or `false` for none. Unset, an `error` flag plays `error` and every other appearance plays `notify`. Pass `false` when a flag should stay quiet, such as during a session.",
           "deprecated": null
         },
         {
