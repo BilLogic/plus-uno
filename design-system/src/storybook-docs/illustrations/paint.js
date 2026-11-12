@@ -18,9 +18,9 @@ export const PAINT = {
   blanket: ds('blanket'),
   accent: ds('background-brand-bold'),
   accentTint: ds('background-brand-subtlest'),
-  // Button labels: the same text tokens the real Button uses.
+  // A real-fidelity subject's words, in the real Button's text tokens.
+  text: ds('text'),
   onAccent: ds('text-inverse'),
-  label: ds('text-subtlest'),
 };
 
 /** Corners, from the radius tokens (SVG reads them as user units). */
@@ -34,3 +34,13 @@ export const CORNER = {
 
 /** The hairline every outline and divider draws with. */
 export const HAIRLINE = { strokeWidth: 'var(--stroke-1)' };
+
+/**
+ * A real-fidelity label. Drawings show at up to twice their viewBox, so the
+ * size is the real label size halved: at full width it reads at true size.
+ */
+export const LABEL_FONT = {
+  fontFamily: 'var(--type-family-body)',
+  fontWeight: 'var(--type-weight-semibold)',
+  fontSize: 'calc(var(--font-size-0875) / 2)',
+};

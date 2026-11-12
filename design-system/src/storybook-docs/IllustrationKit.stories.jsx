@@ -36,7 +36,8 @@ export const Primitives = {
     for (const figure of figures) {
       const svg = figure.querySelector('svg[role="img"]');
       await expect(svg.getAttribute('aria-label')).toMatch(/neutral above and accented below/);
-      await expect(svg.querySelector('text')).toBeNull();
+      // Words appear only on a real-fidelity subject.
+      await expect(svg.querySelectorAll('text:not([data-fidelity="real"] text)').length).toBe(0);
       await expect(everyPaintIsAToken(svg)).toBe(true);
       // The accented half paints the brand token; the neutral half never does.
       const [neutral, accented] = svg.querySelectorAll(':scope > svg');
@@ -69,7 +70,7 @@ export const OpeningPageDrawings = {
       // A name for screen readers, a caption outside the drawing, and no words inside it.
       await expect(svg.getAttribute('aria-label').length).toBeGreaterThan(20);
       await expect(svg.querySelector('title').textContent).toBe(svg.getAttribute('aria-label'));
-      await expect(svg.querySelector('text')).toBeNull();
+      await expect(svg.querySelectorAll('text:not([data-fidelity="real"] text)').length).toBe(0);
       await expect(figure.querySelector('figcaption').closest('svg')).toBeNull();
       await expect(everyPaintIsAToken(svg)).toBe(true);
     }

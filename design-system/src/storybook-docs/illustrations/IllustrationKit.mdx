@@ -17,16 +17,21 @@ import { ThreeLayers, OpeningARecord } from '@/storybook-docs/illustrations/comp
 <FoundationSection title="Drawing rules">
 
 - Paint with design-system tokens only: color, stroke and corner. The kit follows light and dark on its own.
-- Draw skeleton bars where text would sit. Put the words in the caption beside the drawing.
+- Pick each example's fidelity by what the lesson depends on. Remove every word in your head: if the lesson still holds, draw it abstract.
+  - **Concrete:** the lesson is a component's look, states, behavior or wording, such as anatomy, states, content do's and don'ts, or an interaction. Use a live story with real content, not a drawing.
+  - **Real subject:** the lesson is one element inside a screen, such as which action is primary, a label, or one piece's placement. Draw that element real, with its words, and keep everything around it blocked out.
+  - **Blocked out:** the lesson is structure across screens, such as layout options, which surface opens, alignment, phases, or many variants side by side. Use no words, and draw buttons as flat strips.
+  - Motion follows the same split. A component's own motion is a live story. A principle such as easing, choreography or stagger animates blocked-out shapes. One element moving inside a screen animates the real subject over a blocked-out context.
+- Draw skeleton bars where text would sit. Words appear only on a real subject; the rest goes in the caption beside the drawing.
+- Draw buttons only in shipped appearances: primary, the brand fill, on the subject; default, the neutral fill, everywhere else.
 - Keep one scale per set and equal margins around every drawing, balanced by eye.
 - Give each drawing one accent, and place it on the subject.
-- A drawing shows a concept no component can render. A screen a component can render is a live story.
 
 </FoundationSection>
 
 <FoundationSection title="Primitives">
 
-Each primitive takes a position, a size and an `accent` flag. The top drawing is neutral and the bottom one is accented.
+Each primitive takes a position, a size and an `accent` flag. The top drawing is neutral and the bottom one is accented. Button shows its two fidelities instead: blocked out on top, real below.
 
 <IllustrationKitGallery />
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { PAINT, CORNER, HAIRLINE } from './paint.js';
+import { LABEL_FONT, PAINT, CORNER, HAIRLINE } from './paint.js';
 
 /**
  * The illustration kit: plain components that return SVG fragments. Each takes
@@ -137,17 +137,33 @@ export const Field = ({ x, y, w, accent = false }) => (
 );
 
 /**
- * A Button, drawn only in appearances PLUS ships. `primary` is the brand fill,
- * so it is the drawing's accent: draw it only on the subject. Every other
- * button is `default` (neutral fill). The label is a thin bar in the real
- * Button's text token, so it reads as a word rather than a block.
+ * A Button in one of two fidelities, and only in appearances PLUS ships:
+ * `primary` (brand fill, the drawing's accent, on the subject only) or
+ * `default` (neutral fill).
+ * - Blocked out (no `label`): a flat strip with no words, for drawings about
+ *   where things sit (layout, placement, which surface opens, a sequence).
+ * - Real (`label`): the real button with its word, for drawings about which
+ *   element or what it says. Only the subject is drawn real; its context stays
+ *   blocked out.
  */
-export const ButtonShape = ({ x, y, w, appearance = 'default' }) => {
+export const ButtonShape = ({ x, y, w, appearance = 'default', label }) => {
   const primary = appearance === 'primary';
+  if (!label) {
+    return <Rect x={x} y={y} w={w} h={8} fill={primary ? PAINT.accent : PAINT.neutral} corner="xs" />;
+  }
   return (
-    <g>
-      <Rect x={x} y={y} w={w} h={12} fill={primary ? PAINT.accent : PAINT.neutral} corner="sm" />
-      <SkeletonBar x={x + w * 0.3} y={y + 5} w={w * 0.4} h={2} tone={primary ? PAINT.onAccent : PAINT.label} />
+    <g data-fidelity="real">
+      <Rect x={x} y={y} w={w} h={16} fill={primary ? PAINT.accent : PAINT.neutral} corner="sm" />
+      <text
+        x={x + w / 2}
+        y={y + 8}
+        textAnchor="middle"
+        dominantBaseline="central"
+        fill={primary ? PAINT.onAccent : PAINT.text}
+        style={LABEL_FONT}
+      >
+        {label}
+      </text>
     </g>
   );
 };
@@ -183,8 +199,8 @@ export const Modal = ({ x, y, w, h, accent = false }) => {
     <SkeletonBar x={x + 10} y={y + 24} w={w * 0.75} />
     <SkeletonBar x={x + 10} y={y + 33} w={w * 0.6} />
     <Rule x1={x} x2={x + w} y1={y + h - 22} y2={y + h - 22} />
-    <ButtonShape x={x + w - 14 - 2 * bw} y={y + h - 16} w={bw} />
-    <ButtonShape x={x + w - 10 - bw} y={y + h - 16} w={bw} appearance={accent ? 'primary' : 'default'} />
+    <ButtonShape x={x + w - 14 - 2 * bw} y={y + h - 14} w={bw} />
+    <ButtonShape x={x + w - 10 - bw} y={y + h - 14} w={bw} appearance={accent ? 'primary' : 'default'} />
   </g>
   );
 };

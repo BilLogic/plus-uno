@@ -7,24 +7,26 @@ import { Backdrop, ButtonShape, Frame, Modal, Panel, Popup, Rect, Rule, Section,
 const Link = ({ x1, x2, y }) => <Rule x1={x1} x2={x2} y1={y} y2={y} stroke={PAINT.ink} dash="2 3" />;
 
 /**
- * Component, then template, then pattern. The accent follows one button
+ * Component, then template, then pattern, drawn real: the drawing is about
+ * which element travels. The accent follows one button
  * through all three layers.
  */
 export const ThreeLayers = ({
   title = 'The same primary button as a component, inside a Section template, and placed on a Frame by a pattern',
 }) => (
   <Illustration width={312} height={132} viewBox="12 14 312 132" title={title}>
-    <ButtonShape x={28} y={74} w={48} appearance="primary" />
+    {/* About which element travels, so the button is drawn real and its context blocked out. */}
+    <ButtonShape x={24} y={72} w={56} appearance="primary" label="Save" />
     <Link x1={92} x2={112} y={80} />
-    <Section x={118} y={50} w={84} h={60} rows={2} />
-    <ButtonShape x={130} y={94} w={28} />
-    <ButtonShape x={162} y={94} w={28} appearance="primary" />
+    <Section x={118} y={46} w={88} h={66} rows={2} />
+    <ButtonShape x={126} y={88} w={34} label="Cancel" />
+    <ButtonShape x={164} y={88} w={34} appearance="primary" label="Save" />
     <Link x1={214} x2={234} y={80} />
-    <Rect x={236} y={30} w={72} h={100} fill={PAINT.sunken} stroke={PAINT.line} corner="md" />
-    <Section x={242} y={38} w={60} h={40} rows={1} />
-    <ButtonShape x={270} y={64} w={26} appearance="primary" />
-    <Section x={242} y={84} w={60} h={40} rows={1} />
-    <ButtonShape x={270} y={110} w={26} />
+    <Rect x={236} y={26} w={76} h={108} fill={PAINT.sunken} stroke={PAINT.line} corner="md" />
+    <Section x={242} y={32} w={64} h={46} rows={1} />
+    <ButtonShape x={274} y={56} w={28} appearance="primary" label="Save" />
+    <Section x={242} y={82} w={64} h={46} rows={1} />
+    <ButtonShape x={274} y={106} w={28} label="Edit" />
   </Illustration>
 );
 
