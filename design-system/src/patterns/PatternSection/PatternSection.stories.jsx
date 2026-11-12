@@ -303,7 +303,8 @@ export const ToolbarSearch = {
             expect(field()).toHaveAttribute('placeholder', 'Search students');
             const root = field().closest('.plus-section-search');
             expect(getComputedStyle(root).animationName).toBe('plus-section-search-grow');
-            expect(getComputedStyle(root).justifyContent).toBe('flex-end');
+            // Some Chromium builds serialize the computed flex-end as flow-end; both pin the end edge.
+            expect(getComputedStyle(root).justifyContent).toMatch(/^(flex|flow)-end$/);
         });
 
         await step('The count narrows in words, in a polite live region', async () => {
