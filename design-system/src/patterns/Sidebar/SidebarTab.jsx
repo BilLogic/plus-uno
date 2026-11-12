@@ -141,7 +141,7 @@ const SidebarTab = ({
 SidebarTab.propTypes = {
     /** The label. It truncates with an ellipsis past the row's width. */
     text: PropTypes.string.isRequired,
-    /** Font Awesome Free solid name for the 16 icon before the label, e.g. `house` */
+    /** Font Awesome Free name for the 16 icon before the label, e.g. `house`; drawn outlined, selected or not */
     iconBefore: PropTypes.string,
     /** `hover` and `focus` are documentation values; drive only `enabled`, `selected` and `disabled`. */
     state: PropTypes.oneOf(['enabled', 'hover', 'selected', 'disabled', 'focus']),
