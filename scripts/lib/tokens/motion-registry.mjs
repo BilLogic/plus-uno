@@ -171,6 +171,22 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'Empty',
+    tier: 'pattern',
+    events: {
+      appear: { transition: 'Go to another area', appearance: 'appearance.default', note: 'Arrives with its page or section in the page\'s entrance; never animates on its own.' },
+      filled: { transition: 'Swap content in place', appearance: 'appearance.fast', note: 'The first item swaps the empty state for the list in place.' },
+    },
+  },
+  {
+    name: 'Loading',
+    tier: 'pattern',
+    events: {
+      load: { transition: 'Load content', spatial: 'linear', appearance: 'appearance.fast', note: 'The Skeleton shimmers on linear in the real shape; the content fades in over it in load order. The shimmer stops in Reduced mode.' },
+      action: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'A button action keeps the button\'s width: its label fades out and a Spinner fades in.' },
+    },
+  },
+  {
     name: 'Popup',
     tier: 'component',
     events: {
