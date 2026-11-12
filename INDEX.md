@@ -116,7 +116,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`design-system/guidelines/foundations/content/overview.md`](design-system/guidelines/foundations/content/overview.md) | Product copy rules |
 | [`design-system/guidelines/foundations/content/voice-and-tone.md`](design-system/guidelines/foundations/content/voice-and-tone.md) | Warm, direct, encouraging |
 | [`design-system/guidelines/foundations/data-visualization.md`](design-system/guidelines/foundations/data-visualization.md) | A chart's foundations other than color come from the same component tokens as the rest of the design system |
-| [`design-system/guidelines/foundations/overview.md`](design-system/guidelines/foundations/overview.md) | The fourteen foundations, in the order they are documented |
+| [`design-system/guidelines/foundations/overview.md`](design-system/guidelines/foundations/overview.md) | The fifteen foundations, in the order they are documented |
 | [`design-system/guidelines/overview.md`](design-system/guidelines/overview.md) | says where design knowledge lives |
 
 ## Engineering
@@ -128,6 +128,7 @@ Adding a doc changes this file; editing this file changes nothing.
 | [`docs/engineering/measurement-window.md`](docs/engineering/measurement-window.md) | How to run uno-bot's measurement window each week and close it — the five numbers, where each comes from, where it is recorded, and what stays private. |
 | [`docs/engineering/operations.md`](docs/engineering/operations.md) | THE standing-automation registry — every cron, scheduled Worker job, webhook and PR gate, with its trigger, owner and a link to its home. |
 | [`docs/engineering/setup.md`](docs/engineering/setup.md) | Aliases, package structure, prototype conventions, token workflow, local preview. |
+| [`docs/engineering/sound.md`](docs/engineering/sound.md) | How code adds a sound — a cell on the motion registry, played through the runtime in design-system/src/sound/. |
 
 ## Product and service
 
@@ -216,6 +217,6 @@ Adding a doc changes this file; editing this file changes nothing.
 
 ---
 
-145 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
+146 routable documents. History (`docs/plans/`, `docs/knowledge/`) and
 frozen fixtures are deliberately not indexed — they record what happened rather
 than telling you what to do.

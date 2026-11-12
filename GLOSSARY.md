@@ -463,7 +463,7 @@ _Avoid_: "send whoosh"
 _Avoid_: "success sound"
 
 **Done milestone**:
-`sound.done.milestone`, G4 rising to B5 in five notes, the fullest sound in the set: onboarding complete, a first session, a term start or end. The Expressive Milestone plays it, and a Badge is a Milestone.
+`sound.done.milestone`, G4 rising to B5 in five notes, the fullest sound in the set: onboarding complete, a first session, a term start or end. The Expressive Milestone plays it.
 _Avoid_: "fanfare", "celebration sound"
 
 **Concern sound**:

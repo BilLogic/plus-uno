@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **126,007 chars from 9 files**, against an assembled budget of 175,500 (49,493 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 105,623 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **125,979 chars from 9 files**, against an assembled budget of 175,500 (49,521 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 105,595 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
 | 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,284 (−8,789 ide-only) | 10,284 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 37,021 | 47,334 | 20,000 (constitution) ⚠️ **over by 17,021** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 68,817 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 70,463 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 71,711 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 77,405 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 89,191 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 110,152 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 113,620 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 120,178 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 125,151 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 126,007 | — |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 36,993 | 47,306 | 20,000 (constitution) ⚠️ **over by 16,993** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 68,789 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 70,435 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 71,683 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 77,377 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 89,163 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 110,124 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 113,592 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 120,150 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 125,123 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 125,979 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -619,7 +619,7 @@ _Avoid_: "send whoosh"
 _Avoid_: "success sound"
 
 **Done milestone**:
-`sound.done.milestone`, G4 rising to B5 in five notes, the fullest sound in the set: onboarding complete, a first session, a term start or end. The Expressive Milestone plays it, and a Badge is a Milestone.
+`sound.done.milestone`, G4 rising to B5 in five notes, the fullest sound in the set: onboarding complete, a first session, a term start or end. The Expressive Milestone plays it.
 _Avoid_: "fanfare", "celebration sound"
 
 **Concern sound**:
