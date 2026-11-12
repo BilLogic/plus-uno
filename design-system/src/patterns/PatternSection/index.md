@@ -10,7 +10,7 @@ Also asked as: page section, toolbar, section header, block, region.
 
 **Source:** `design-system/src/patterns/PatternSection/PatternSection.jsx`
 
-**Stories:** `design-system/src/patterns/PatternSection/PatternSection.stories.jsx` — Overview, HeaderDefault, HeaderTabs, HeaderToolbar, HeaderCustom, HeaderTabsOnly, LayoutSingle, LayoutSplit, LayoutSubsections, FillSubtle, Footer, Anatomy, Levels, ToolbarSelected, LoadingDefault, LoadingToolbar, LoadingTabsOnly, Interactive, ColorModes, SplitLayout, Spacing, Detail, DetailWithPanel, DetailWithPanelNoSectionDetail, DetailSplitAt1440, DetailSplitHoldsWithPanelAt1440, DetailReplacesListBelow960
+**Stories:** `design-system/src/patterns/PatternSection/PatternSection.stories.jsx` — Overview, HeaderDefault, HeaderTabs, HeaderToolbar, HeaderCustom, HeaderTabsOnly, LayoutSingle, LayoutSplit, LayoutSubsections, FillSubtle, Footer, Anatomy, Levels, ToolbarSearch, LoadingDefault, LoadingToolbar, LoadingTabsOnly, Interactive, ColorModes, SplitLayout, Spacing, Detail, DetailWithPanel, DetailWithPanelNoSectionDetail, DetailSplitAt1440, DetailSplitHoldsWithPanelAt1440, DetailReplacesListBelow960
 
 **Storybook page:** `design-system/src/patterns/PatternSection/PatternSection.mdx`
 
@@ -75,8 +75,9 @@ Don't: Don't open the detail as a modal over the list: it hides the queue behind
 - In the custom and tabs-only types the title is hidden from sight but stays in the page, so the section keeps its name. Always give those sections a title.
 - `named` makes the section a region named by its title, for a section that stands apart as a landmark. The detail region is named by `detailTitle`.
 - A loading section is marked busy, and the skeleton bars are hidden from assistive technology.
-- The selected toolbar announces its selection, such as "3 selected", politely. Selection is never color alone: the count and Clear say it in words.
 - Give the tabs row a label that says what the tabs switch, such as "Views".
+- The toolbar count is a polite live region, so a screen reader hears "12 of 48 students" as search and filters narrow the rows.
+- Search's icon, label and placeholder all name its scope. Its clear button is "Clear search". Esc clears, then closes and returns focus to the icon.
 
 ## Related
 
@@ -95,7 +96,15 @@ Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `Patt
 4. **Footer** (optional). A slot at the end, for "View all" or paging.
 5. **Detail** (optional). A subtle-fill region on the right with its own title, description, Previous and Next, and footer.
 
-The **toolbar** is its own part, `PatternSection.Toolbar`: search, filters and a count that truncates first, then actions. In its selected state it shows the selection, bulk actions and Clear.
+The **toolbar** is its own part, `PatternSection.Toolbar`: search, filters and a count that truncates first, then actions. Selecting rows never changes it: a Dynamic table's bulk bar is the table's own head row, so the toolbar stays put.
+
+**Search** is a part too, `PatternSection.Search`: an icon button that grows left into a compact Text field and shrinks back into the icon. It narrows the rows of its own section as you type; there is no results page. `label` names the scope ("Search students"): it is the icon's name, the field's label and its placeholder.
+
+- Press the icon and the field opens with focus in it. Set `defaultOpen` when search is the main way into a large collection.
+- Esc clears the text. A second Esc closes the field and returns focus to the icon.
+- The field stays open while it holds text. Empty, it closes when focus leaves it.
+- "Clear search" empties the field and keeps focus in it.
+- Hold the text yourself (`value`, `onValueChange`) so Reset filters clears the search with the filters. Switching views keeps the search; leaving the page clears it.
 
 ### States
 
@@ -104,8 +113,8 @@ A section has no interactive states: it does not respond to hover, press or focu
 | State | What changes |
 | --- | --- |
 | Loading | Skeleton bars replace the header, and the section is marked busy. The body is the content's to load. |
-| Toolbar selected | The toolbar row swaps to the selection, bulk actions and Clear on `--ds-background-selected`. |
 | Detail open | A record shows in the detail region; below 960 it replaces the list. |
+| Search open | The Search icon is a field on `--field-width-md`, until it is cleared and closed. |
 
 ### Tokens
 
@@ -122,7 +131,8 @@ A section has no interactive states: it does not respond to hover, press or focu
 | `--heading-large`, `-medium`, `-small` | 24/28, 20/24, 16/20 | A page title, a section title and a subsection title. |
 | `--body-default` | 14/20 | The description, at every level. |
 | `--ds-text`, `--ds-text-subtle` | color | The title and the description. |
-| `--ds-background-selected` | color | The bulk bar of the selected toolbar. |
+| `--field-width-md`, `--item-height-md` | 240, 32 | The open Search field, and the icon it grows from. |
+| `--motion-duration-medium`, `--motion-easing-standard` | 200 ms, standard | Search growing into a field and shrinking back. Reduced motion makes it instant. |
 
 ## Content guidelines
 
@@ -131,7 +141,9 @@ A section has no interactive states: it does not respond to hover, press or focu
 | Title the section with what it holds, in sentence case: "Upcoming sessions". | A title that repeats the only card inside it. |
 | Keep the description to one line: "Next 7 days". | A paragraph under the title. |
 | View labels of one or two words: "Active", "Paused". | Long labels, or views of different things. |
-| A count in words: "48 students", "3 selected". | A bare number. |
+| A count in words: "48 students", "12 open flags". | A bare number. |
+| Name the search's scope: "Search students". | A bare "Search", which says nothing of what it searches. |
+| A narrowed count against the whole: "12 of 48 students". | A count that drops without saying what it is out of. |
 
 ## Props
 
@@ -194,20 +206,19 @@ Implemented as `SectionToolbar`.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `state` | enum | — | `default`: search, filters, count and actions. `selected`: the selection, bulk actions and Clear. |
 | `search` | node | — | Search field slot, at the start |
 | `filters` | node | — | Filters slot: dropdown buttons |
-| `count` | node | — | Count, such as "48 students"; truncates first |
+| `count` | node | — | Count in words, such as "12 of 48 students"; truncates first, and is announced politely when it changes |
 | `actions` | node | — | Actions slot, at the end |
-| `selection` | node | — | Selected state: the selection, such as "3 selected" |
-| `bulkActions` | node | — | Selected state: bulk action buttons |
-| `onClear` | func | — | Selected state: shows Clear, and runs when it is pressed |
-| `clearLabel` | string | — | Selected state: the Clear button's label |
 | `className` | string | — | — |
+
+### `PatternSection.Search`
+
+Implemented as `SectionSearch`.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--ds-background-selected` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--grid-gutter` · `--heading-large` · `--heading-large-tracking` · `--heading-medium` · `--heading-small` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--item-height-md` · `--radius-lg` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--table-pad-x-cell` · `--width-3000`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-input` · `--ds-border-input` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--field-width-md` · `--grid-gutter` · `--heading-large` · `--heading-large-tracking` · `--heading-medium` · `--heading-small` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--item-height-md` · `--motion-duration-medium` · `--motion-easing-standard` · `--radius-h32` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--width-3000`
 
 From `design-system/src/patterns/PatternSection/PatternSection.scss`. Override these through the token layer, never with a literal.
 

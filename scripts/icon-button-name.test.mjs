@@ -40,9 +40,9 @@ test('a name in any of the four attributes clears it', () => {
 });
 
 test('an EMPTY name is not a name', () => {
-  // Four real call sites are written `text="" leadingVisual="list-ul"`, which
+  // Four real call sites are written `text="" iconBefore="list-ul"`, which
   // renders plus-btn--icon-only with nothing to announce.
-  assert.equal(hasName(' text="" leadingVisual="list-ul"'), false);
+  assert.equal(hasName(' text="" iconBefore="list-ul"'), false);
   assert.equal(hasName(' text="Save"'), true);
   // An expression could hold a name; evaluating it is out of scope.
   assert.equal(hasName(' aria-label={label}'), true);
@@ -69,7 +69,7 @@ test('an icon whose className is an expression is still an icon', () => {
 });
 
 test('a self-closing <Button> with no text is icon-only', () => {
-  const found = scan('<Button style="primary" leadingVisual="arrow-left" onClick={go} />');
+  const found = scan('<Button style="primary" iconBefore="arrow-left" onClick={go} />');
   assert.equal(found.length, 1);
   assert.equal(found[0].tag, 'Button');
 });

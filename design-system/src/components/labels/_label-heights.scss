@@ -1,7 +1,7 @@
 /*
  * Label heights — written down once, for the labels and their skeletons.
  *
- * Status and Count read the label height roles (--label-height-sm is 16,
+ * Status, Count and Change read the label height roles (--label-height-sm is 16,
  * --label-height-md is 20) and the item height for the spacious Status tag
  * (32). Each label sets its own height custom property from these, and
  * Skeleton's presets read the same values, so a label and its placeholder
@@ -14,4 +14,6 @@ $status-height: var(--label-height-md);
 $status-height-spacious: var(--item-height-md);
 $count-height: var(--label-height-md);
 $count-height-compact: var(--label-height-sm);
+$change-height: var(--label-height-md);
+$change-height-compact: var(--label-height-sm);
 $tag-height: 22px;

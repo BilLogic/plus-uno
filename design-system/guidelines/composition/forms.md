@@ -99,9 +99,9 @@ Footer actions: either extra `Button` row in `children`, or `primaryButton` / `s
 
 ### Incorrect
 
-- Raw `<form><input /></form>` with Bootstrap classes only
+- Raw `<form><input /></form>` with no PLUS field components
 - Mixed hardcoded px gaps and token gaps in the same form
-- `Button variant="primary"` (Bootstrap) instead of PLUS `appearance`
+- `Button variant="primary"` instead of PLUS `appearance`
 - Product-specific wizard steps or IA — out of scope for this pattern doc
 
 ## Field-level conventions

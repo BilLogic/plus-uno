@@ -23,9 +23,7 @@ test('legacy components count as tags and imports, and a longer name is not its 
   assert.equal(found.get('component:BadgeVariants src/App.jsx').count, 1);
 });
 
-test("React-Bootstrap's Overlay is not the Overlay pattern", () => {
-  const bootstrap = "import { Overlay } from 'react-bootstrap';\n<Overlay show />\n";
-  assert.equal(measure([src('design-system/src/Tooltip.jsx', bootstrap)]).size, 0);
+test('the retired Overlay pattern name is counted', () => {
   const pattern = "import { Overlay } from '@/patterns';\n<Overlay />\n";
   assert.equal(countOf([src('design-system/src/P.jsx', pattern)], 'component:Overlay design-system/src/P.jsx'), 2);
 });

@@ -64,8 +64,10 @@ Don't: A finished answer with no way to rate it.
   beside the message.
 - **Sources are a named list.** The list is named by its "Sources" heading,
   and the toggle past three says how many more and carries `aria-expanded`.
-- **Thumbs are toggle buttons.** They sit in a group named "Rate this answer",
-  carry `aria-pressed`, and a polite status names each rating ("Thanks. Marked
+- **Thumbs are toggle buttons.** They sit in a group named "Rate this answer" and
+  each reports `aria-pressed`, true on the chosen one. Thumbs down is not the popup's
+  trigger: the comment popup opens after the pick, takes focus, and returns it to the
+  thumb on close. A polite status names each rating ("Thanks. Marked
   as a good answer."), so a change of mind is heard too. No animation.
 - **Busy while arriving.** A streaming message is marked `aria-busy`, so a
   screen reader waits for the finished text. A typed-out reply carries its full
@@ -81,7 +83,7 @@ Don't: A finished answer with no way to rate it.
 - `PromptInput`, which sends the message.
 - AI sources and AI feedback, which sit under a finished reply.
 
-Same group: `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 

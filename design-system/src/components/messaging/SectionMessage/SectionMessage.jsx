@@ -31,8 +31,8 @@ export const SECTION_MESSAGE_ICONS = Object.fromEntries(
  * </SectionMessage>
  *
  * // Leading icon: each style has a default; a name or a node replaces it, false removes it
- * <SectionMessage appearance="info" leadingVisual="bell">Reminders are on.</SectionMessage>
- * <SectionMessage appearance="warning" leadingVisual={false}>Sign-in didn't complete. Please try again.</SectionMessage>
+ * <SectionMessage appearance="info" icon="bell">Reminders are on.</SectionMessage>
+ * <SectionMessage appearance="warning" icon={false}>Sign-in didn't complete. Please try again.</SectionMessage>
  *
  * // Actions: link buttons after the body, in the order given
  * <SectionMessage appearance="warning" actions={[{ text: 'Reschedule', onClick: onReschedule }]}>
@@ -45,7 +45,7 @@ const SectionMessage = ({
     title,
     headingLevel,
     children,
-    leadingVisual = true,
+    icon = true,
     actions,
     dismissible = true,
     onDismiss,
@@ -74,7 +74,7 @@ const SectionMessage = ({
 
     // `true` (the default) is the style's own icon; a string is a Font Awesome
     // solid name, as Button and Status take it; a node renders as given.
-    const visual = leadingVisual === true ? (SECTION_MESSAGE_ICONS[sectionMessageAppearance] ?? SECTION_MESSAGE_ICONS.primary) : leadingVisual;
+    const visual = icon === true ? (SECTION_MESSAGE_ICONS[sectionMessageAppearance] ?? SECTION_MESSAGE_ICONS.primary) : icon;
 
     return (
         <div
@@ -140,7 +140,7 @@ SectionMessage.propTypes = {
     /** Message content - supports text, JSX, or React components */
     children: PropTypes.node.isRequired,
     /** Leading icon on the first line: `true` for the style's default, a Font Awesome solid name or a node to replace it, `false` to remove it. Always decorative. */
-    leadingVisual: PropTypes.oneOfType([PropTypes.bool, PropTypes.string, PropTypes.node]),
+    icon: PropTypes.oneOfType([PropTypes.bool, PropTypes.string, PropTypes.node]),
     /** Link-button actions after the body, in the order given. Avoid more than two. */
     actions: PropTypes.arrayOf(PropTypes.shape({
         text: PropTypes.string.isRequired,

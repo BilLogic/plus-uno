@@ -215,7 +215,6 @@ const Launcher = () => {
                 <Popup
                     triggerType="manual"
                     placement="top-end"
-                    width="md"
                     className="plus-ai-chat__popup"
                     label={title}
                     show={popupShown}

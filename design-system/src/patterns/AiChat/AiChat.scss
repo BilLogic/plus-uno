@@ -18,6 +18,9 @@
 
 // The popup is the chat surface itself: no pad of its own, a fixed height.
 .plus-popup.plus-ai-chat__popup {
+    width: var(--ai-chat-width);
+    min-width: 0;
+    max-width: calc(100vw - var(--page-pad) * 2);
     padding: 0;
     gap: 0;
     height: calc(var(--height-2000) * 2);
@@ -38,7 +41,7 @@
     inset-block-end: calc(var(--page-pad) + var(--height-300) + var(--stack-md));
     z-index: calc(var(--layer-navigation) - 1);
     display: flex;
-    width: var(--popover-width-md);
+    width: var(--ai-chat-width);
     max-width: calc(100vw - var(--page-pad) * 2);
     height: calc(var(--height-2000) * 2);
     max-height: calc(100vh - var(--height-300) - var(--page-pad) * 3);

@@ -56,6 +56,26 @@ export const webAppSourceSnippets = {
         '  trailingMetric={2}',
         '/>'
     ]),
+    popupSelect: snippet([
+        '<PopupSelect',
+        '  label="Status"',
+        '  options={["Upcoming", "Completed", "Canceled"]}',
+        '  value={status}',
+        '  onChange={setStatus}',
+        '  isSearchable={false}',
+        '/>'
+    ]),
+    filterMenu: snippet([
+        '<FilterMenu',
+        '  categories={[',
+        '    { id: "status", label: "Status", options: ["Upcoming", "Completed", "Canceled"] },',
+        '    { id: "subject", label: "Subject", options: ["Math", "Reading", "Science"] },',
+        '    { id: "format", label: "Format", options: ["Online", "In person"] },',
+        '  ]}',
+        '  value={applied}',
+        '  onApply={setApplied}',
+        '/>'
+    ]),
     verticalButton: snippet([
         '<VerticalButton',
         '  icon="user-gear"',
@@ -191,7 +211,7 @@ export const webAppSourceSnippets = {
         '<Spinner />'
     ]),
     flag: snippet([
-        '<FlagGroup className="p-3" containerPosition="static">',
+        '<FlagGroup style={{ padding: \'var(--card-pad-compact)\' }} containerPosition="static">',
         '  <Flag title="Normal flag" timestamp="Just now">',
         '    This is a normal flag (default).',
         '  </Flag>',

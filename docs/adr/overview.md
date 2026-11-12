@@ -26,7 +26,7 @@ disagreed the ADR says so instead of continuing to assert the decision.
 
 Four of 22 needed more than a move:
 
-- **[ADR-009](009-bootstrap-first-no-alternative-ui-frameworks.md) — superseded (2026-11-03) on its fallback-behavior half by [ADR-037](037-base-ui-is-the-behavior-layer-for-every-component.md).** It also bans Tailwind; that half, long contradicted by the docs chrome, holds again since Tailwind was removed (2026-11-09).
+- **[ADR-009](009-bootstrap-first-no-alternative-ui-frameworks.md) — superseded (2026-11-03) on its fallback-behavior half by [ADR-037](037-base-ui-is-the-behavior-layer-for-every-component.md), and retired in full (2026-11-11) by [ADR-042](042-plus-ships-no-bootstrap.md), which removes Bootstrap.** Its Tailwind ban holds again since Tailwind was removed (2026-11-09).
 - **[ADR-038](038-every-size-type-and-motion-family-is-a-repo-plan.md) — superseded for motion (2026-11-12) by [ADR-041](041-motion-is-springs-on-four-tiers.md).** Its duration and easing roles give way to springs; the space, size and type half stands.
 - **[ADR-012](012-declarative-route-manifest-over-parallel-maps.md) — unverifiable.** No route manifest exists under any name searched.
 - **[ADR-014](014-uno-bot-v2-pipedream-cloudflare-worker.md) — corrected.** Skills are no longer raw-fetched from GitHub at runtime; the harness is baked at build time.

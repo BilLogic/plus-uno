@@ -51,16 +51,16 @@ describe('OptionRow', () => {
         expect(screen.getByRole('option', { name: /Maria Lopez/ })).toHaveTextContent('Grade 7 · Brookfield');
     });
 
-    it('holds up to four leading items and one trailing item', () => {
+    it('holds up to four leading items and one after item', () => {
         render(
             <OptionRow
                 label="Linear equations"
-                leading={[
+                elemBefore={[
                     <OptionRow.Indent key="indent" level={2} />,
                     <OptionRow.Toggle key="toggle" state="collapsed" />,
                     <OptionRow.Checkbox key="check" checked={false} indeterminate />,
                 ]}
-                trailing={<span data-testid="count">12</span>}
+                elemAfter={<span data-testid="count">12</span>}
             />
         );
         const row = screen.getByRole('option');
@@ -68,12 +68,12 @@ describe('OptionRow', () => {
         expect(leading.children).toHaveLength(3);
         expect(leading.querySelector('.plus-option-row-indent')).toHaveStyle({ '--plus-option-row-level': '2' });
         expect(leading.querySelector('.plus-option-row-check')).toHaveClass('is-indeterminate');
-        expect(row.querySelector('.plus-option-row-trailing')).toContainElement(screen.getByTestId('count'));
+        expect(row.querySelector('.plus-option-row-elem-after')).toContainElement(screen.getByTestId('count'));
     });
 
     it('warns when more than four leading items are passed', () => {
         const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
-        render(<OptionRow label="x" leading={[1, 2, 3, 4, 5].map((n) => <i key={n} />)} />);
+        render(<OptionRow label="x" elemBefore={[1, 2, 3, 4, 5].map((n) => <i key={n} />)} />);
         expect(warn).toHaveBeenCalledWith(expect.stringContaining('at most 4'));
         warn.mockRestore();
     });
@@ -115,7 +115,7 @@ describe('OptionRow', () => {
                 role="treeitem"
                 label="Algebra"
                 onSelect={onSelect}
-                leading={<OptionRow.Toggle state="collapsed" onToggle={onToggle} />}
+                elemBefore={<OptionRow.Toggle state="collapsed" onToggle={onToggle} />}
             />
         );
         await user.click(document.querySelector('.plus-option-row-toggle'));

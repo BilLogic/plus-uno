@@ -61,7 +61,7 @@ Don't: A standalone action dressed as a link. Use a button.
 - For a standalone action styled like a button, use `LinkButton`.
 - For a trail of links showing where a page sits, use `Breadcrumb`.
 
-Same group: `Breadcrumb` · `MenuGroup` · `Pagination` · `Sidebar` · `Tabs`
+Same group: `Breadcrumb` · `Pagination` · `Sidebar` · `Tabs`
 
 ## Parts
 

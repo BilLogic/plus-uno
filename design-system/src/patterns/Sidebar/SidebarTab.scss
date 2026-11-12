@@ -26,7 +26,7 @@
     transition: background-color 0.15s ease;
 
     // A link row keeps its own color on hover: without this, the link hover
-    // color (Bootstrap's hovered link rule) wins over the row's rest color. The selected and
+    // color wins over the row's rest color. The selected and
     // disabled rows restate theirs on hover for the same reason.
     @include plus-state(
         (hovered: (color: var(--ds-text-subtle), text-decoration: none)),

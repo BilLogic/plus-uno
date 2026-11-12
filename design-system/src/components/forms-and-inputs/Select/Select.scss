@@ -21,6 +21,14 @@
     cursor: pointer;
 }
 
+// A read-only value is never truncated: it wraps onto as many lines as it needs.
+.plus-select-readonly .plus-select-text {
+    overflow: visible;
+    text-overflow: clip;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
 // Chips and the combobox share the content slot, and wrap onto more lines.
 .plus-select-wrapper .plus-field__content {
     flex-wrap: wrap;

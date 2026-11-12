@@ -1,5 +1,5 @@
 import React from 'react';
-import { expect, fn, userEvent, within } from 'storybook/test';
+import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 
 import { AiFeedback } from './AiFeedback';
 
@@ -22,14 +22,14 @@ export default {
     },
 };
 
-/** Two toggle buttons in a group named "Rate this answer". */
+/** Two buttons in a group named "Rate this answer". */
 export const Overview = {
     play: async ({ canvasElement, args }) => {
         const canvas = within(canvasElement);
         await expect(canvas.getByRole('group', { name: 'Rate this answer' })).toBeTruthy();
         await userEvent.click(canvas.getByRole('button', { name: 'Good answer' }));
         await expect(args.onFeedback).toHaveBeenCalledWith({ rating: 'up' });
-        await expect(canvas.getByRole('button', { name: 'Good answer' }).getAttribute('aria-pressed')).toBe('true');
+        await expect(canvas.getByRole('button', { name: 'Good answer' })).toHaveAttribute('aria-pressed', 'true');
     },
 };
 
@@ -49,6 +49,30 @@ export const AskForComment = {
         await userEvent.type(await body.findByRole('textbox', { name: 'What went wrong?' }), 'Too long');
         await userEvent.click(body.getByRole('button', { name: 'Send' }));
         await expect(args.onFeedback).toHaveBeenCalledWith({ rating: 'down', comment: 'Too long' });
+    },
+};
+
+/** Escape or Skip closes the reason popup and hands focus back to the Bad answer thumb, still pressed. */
+export const ReasonPopupReturnsFocus = {
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const body = within(canvasElement.ownerDocument.body);
+        const thumb = canvas.getByRole('button', { name: 'Bad answer' });
+
+        await userEvent.click(thumb);
+        const box = await body.findByRole('textbox', { name: 'What went wrong?' });
+        await waitFor(() => expect(box.closest('[role="dialog"]')?.contains(canvasElement.ownerDocument.activeElement) ?? box.contains(canvasElement.ownerDocument.activeElement)).toBe(true));
+        await userEvent.keyboard('{Escape}');
+        await waitFor(() => expect(body.queryByRole('textbox', { name: 'What went wrong?' })).toBeNull());
+        await waitFor(() => expect(thumb).toHaveFocus());
+        await expect(thumb).toHaveAttribute('aria-pressed', 'true');
+
+        await userEvent.click(thumb);
+        await userEvent.click(thumb);
+        await userEvent.click(await body.findByRole('button', { name: 'Skip' }));
+        await waitFor(() => expect(body.queryByRole('textbox', { name: 'What went wrong?' })).toBeNull());
+        await waitFor(() => expect(thumb).toHaveFocus());
+        await expect(thumb).toHaveAttribute('aria-pressed', 'true');
     },
 };
 

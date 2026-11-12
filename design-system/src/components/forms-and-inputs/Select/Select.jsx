@@ -16,6 +16,8 @@ export { SEARCH_FIRST_ABOVE };
 
 export const SELECT_SPACINGS = ['default', 'compact'];
 
+const LOAD_FAILED = "Couldn't load options";
+
 const isEmpty = (value) => value === undefined || value === null || value === ''
     || (Array.isArray(value) && value.length === 0);
 
@@ -24,8 +26,8 @@ const isEmpty = (value) => value === undefined || value === null || value === ''
  * internal `Listbox` under it.
  *
  * - **The field is the combobox.** Focus stays in it, and the highlighted row is
- *   its `aria-activedescendant`. A searchable field is a text input: typing in
- *   it filters the list. A plain one is a select-only combobox.
+ *   its `aria-activedescendant`. The field is a text input: typing in it
+ *   filters the list. With `isSearchable={false}` it is a select-only combobox.
  * - **Values are ids; options are objects.** `value` is an option's `value` (an
  *   array with `isMulti`), controlled or not.
  * - **`isMulti`** shows Tags in a TagGroup (`displayMode="tags"`), which
@@ -43,7 +45,7 @@ const Select = ({
     value,
     defaultValue,
     placeholder = 'Select...',
-    isSearchable = false,
+    isSearchable = true,
     isCreatable = false,
     onCreate,
     createOption,
@@ -54,6 +56,7 @@ const Select = ({
     displayMode = 'tags',
     lineWrap = true,
     truncate = false,
+    marker = 'check',
     spacing = 'default',
     isDisabled = false,
     isReadOnly = false,
@@ -136,7 +139,8 @@ const Select = ({
         selectAll,
         live,
     });
-    const typeable = isSearchable || isCreatable || searchFirst || Boolean(loadOptions);
+    // A read-only value is text to read, not an input to type in: it wraps and is never clipped.
+    const typeable = !isReadOnly && (isSearchable || isCreatable || searchFirst || Boolean(loadOptions));
 
     const controlRef = useRef(null);
     const fieldRef = useRef(null);
@@ -229,6 +233,11 @@ const Select = ({
         if (event.key === 'Delete' && canClear && hasValue && !typing) {
             event.preventDefault();
             clear();
+            return;
+        }
+        if (event.key === 'Enter' && paging.firstFailed) {
+            event.preventDefault();
+            paging.retry();
             return;
         }
         if (listRef.current) listRef.current.handleKeyDown(event);
@@ -351,7 +360,7 @@ const Select = ({
             live={live}
             disabled={disabled}
             label={typeof label === 'string' ? label : props['aria-label']}
-            collapsed={!(focused || shown)}
+            collapsed={!(focused || shown || isReadOnly)}
             onOverflowClick={() => { openList(); controlRef.current?.focus(); }}
         />
     ) : null;
@@ -395,6 +404,8 @@ const Select = ({
     let footer = null;
     if (atLimit) {
         footer = <Listbox.Message kind="limit">{`You can pick up to ${maxSelections}`}</Listbox.Message>;
+    } else if (paging.failed && !paging.firstFailed) {
+        footer = <Listbox.Message kind="error" onRetry={paging.retry}>{LOAD_FAILED}</Listbox.Message>;
     } else if (paging.more) {
         footer = (
             <Listbox.Message kind={paging.busy ? 'loading' : 'count'}>
@@ -404,6 +415,8 @@ const Select = ({
     }
 
     const listLoading = isLoading || paging.firstPage;
+    // The first page failing leaves the list with nothing to show but the way to try again.
+    const listError = paging.firstFailed ? LOAD_FAILED : undefined;
 
     const wrapperClasses = [
         'plus-select-wrapper',
@@ -412,8 +425,9 @@ const Select = ({
         disabled ? 'plus-select-disabled' : '',
         isReadOnly ? 'plus-select-readonly' : '',
         shown ? 'plus-select-open' : '',
-        lineWrap ? '' : 'plus-select-nowrap',
-        truncate ? 'plus-select-truncate' : '',
+        // A read-only value is shown whole: it wraps and is never clipped.
+        lineWrap || isReadOnly ? '' : 'plus-select-nowrap',
+        truncate && !isReadOnly ? 'plus-select-truncate' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -429,7 +443,7 @@ const Select = ({
                 <FieldBox
                     ref={fieldRef}
                     spacing={spacing}
-                    grow={multi && lineWrap}
+                    grow={(multi && lineWrap) || isReadOnly}
                     disabled={disabled}
                     readOnly={isReadOnly}
                     {...tones.field}
@@ -446,6 +460,7 @@ const Select = ({
                     open={shown}
                     anchorRef={fieldRef}
                     mode={multi ? 'multi' : 'single'}
+                    marker={marker}
                     spacing={spacing}
                     options={listOptions}
                     value={multi ? current : (hasValue ? current : null)}
@@ -461,6 +476,9 @@ const Select = ({
                     header={header}
                     footer={footer}
                     loading={listLoading}
+                    error={listError}
+                    onRetry={paging.retry}
+                    reveal={Boolean(loadOptions)}
                     emptyMessage={waitingForSearch ? 'Type to search' : 'No results'}
                 />
             </div>
@@ -501,7 +519,7 @@ Select.propTypes = {
     defaultValue: PropTypes.oneOfType([valueType, PropTypes.arrayOf(valueType)]),
     /** The text shown when nothing is picked. It names the field when there is no label. */
     placeholder: PropTypes.string,
-    /** Typing in the field filters the list. */
+    /** Typing in the field filters the list. On by default; pass `false` for a short list, such as a filter menu's. */
     isSearchable: PropTypes.bool,
     /** Offers "Create *text*" when nothing matches exactly, ignoring case. Implies typing. */
     isCreatable: PropTypes.bool,
@@ -577,6 +595,8 @@ Select.propTypes = {
     recent: PropTypes.arrayOf(valueType),
     /** Ids shown under "Suggested" before typing, in a list of more than 50. */
     suggested: PropTypes.arrayOf(valueType),
+    /** How a single pick is marked: `check` (default) or `radio`. `isMulti` always draws checkboxes. */
+    marker: PropTypes.oneOf(['check', 'radio']),
     /** `(next)`: an id, or an array of ids with `isMulti`. */
     onChange: PropTypes.func,
     /** Focus entering the field from outside it. */

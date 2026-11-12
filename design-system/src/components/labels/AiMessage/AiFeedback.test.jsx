@@ -7,7 +7,7 @@ const up = () => screen.getByRole('button', { name: 'Good answer' });
 const down = () => screen.getByRole('button', { name: 'Bad answer' });
 
 describe('AiFeedback', () => {
-    it('is a named group of two toggle buttons, neither pressed at first', () => {
+    it('is a named group of two buttons, neither chosen at first', () => {
         render(<AiFeedback onFeedback={() => {}} />);
         expect(screen.getByRole('group', { name: 'Rate this answer' })).toBeInTheDocument();
         expect(up()).toHaveAttribute('aria-pressed', 'false');
@@ -42,6 +42,8 @@ describe('AiFeedback', () => {
         render(<AiFeedback onFeedback={onFeedback} />);
         fireEvent.click(down());
         const field = await screen.findByRole('textbox', { name: /What went wrong/ });
+        expect(down()).not.toHaveAttribute('aria-expanded');
+        await waitFor(() => expect(screen.getByRole('dialog')).toContainElement(document.activeElement));
         fireEvent.change(field, { target: { value: 'Wrong student' } });
         fireEvent.click(screen.getByRole('button', { name: 'Send' }));
         expect(onFeedback).toHaveBeenLastCalledWith({ rating: 'down', comment: 'Wrong student' });
@@ -54,6 +56,7 @@ describe('AiFeedback', () => {
         fireEvent.click(down());
         fireEvent.click(await screen.findByRole('button', { name: 'Skip' }));
         await waitFor(() => expect(screen.queryByRole('textbox', { name: /What went wrong/ })).toBeNull());
+        await waitFor(() => expect(down()).toHaveFocus());
         expect(onFeedback).toHaveBeenCalledTimes(1);
         expect(down()).toHaveAttribute('aria-pressed', 'true');
     });

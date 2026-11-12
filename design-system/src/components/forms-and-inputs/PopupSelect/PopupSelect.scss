@@ -1,0 +1,20 @@
+/*
+ * Popup select: Select's list inside a Popup. The Popup draws the surface,
+ * the width (auto: at least the trigger, 160 to 320) and the motion: it
+ * clips open from the trigger's corner and fades on close, so a pick reads
+ * as the row's color change and then the fade. This file only sets the
+ * menu's inner spacing: rows inset Popover/pad-menu 4, as every menu, and a
+ * list that scrolls past Popover/max-height-menu 320.
+ */
+.plus-popup.plus-popup-select {
+    padding: var(--popover-pad-menu);
+
+    .plus-listbox-header {
+        padding-bottom: var(--popover-pad-menu);
+        margin-bottom: var(--popover-pad-menu);
+    }
+
+    .plus-listbox-body {
+        max-height: var(--popover-max-height-menu);
+    }
+}

@@ -39,7 +39,7 @@ const px = (value) => Math.round(parseFloat(value));
 export const Anatomy = () => (
     <div style={row}>
         <FieldBox
-            leading={<i className={iconClass('magnifying-glass')} aria-hidden="true" />}
+            elemBefore={<i className={iconClass('magnifying-glass')} aria-hidden="true" />}
             trailing={<i className="fa-solid fa-caret-down" aria-hidden="true" />}
         >
             {control('Search tutors')}

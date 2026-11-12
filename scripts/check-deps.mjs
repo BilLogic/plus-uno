@@ -50,12 +50,7 @@ const ALLOWED = new Map([
  * A baseline, not an amnesty: the reason has to say what it would take to
  * close it, so it does not quietly become permanent.
  */
-const CDN_BASELINE = new Map([
-  [
-    "bootstrap",
-    { versions: ["5.3.3"], why: "pinned 5.3.3 on the CDN across the prototype pages while package.json installs 5.3.8 for the app, so a prototype and a component can render the same markup differently. Closing it means deciding whether the prototypes should share the app's Bootstrap at all." },
-  ],
-]);
+const CDN_BASELINE = new Map([]);
 
 // `mts`/`cts` are here because a TypeScript ESM module was invisible to this
 // sweep: agents/uno-bot/vitest.workerd.config.mts imports
@@ -173,8 +168,8 @@ export function run({ repoRoot = REPO_ROOT } = {}) {
   const staleBaseline = [];
   for (const [lib, recorded] of CDN_BASELINE) {
     // Not "no conflict found" — "no conflict found, and we were able to look".
-    // bootstrap's split is CDN-pin-versus-shipped, so without node_modules the
-    // comparison never runs, and calling that closed would delete a live entry.
+    // A CDN-pin-versus-shipped split needs node_modules to compare, so without
+    // it the comparison never runs, and calling that closed would delete a live entry.
     if (unresolved.includes(lib)) continue;
     const live = conflicts.find((c) => c.lib === lib);
     const stillSplit = live ? recorded.versions.filter((v) => live.versions.includes(v)) : [];

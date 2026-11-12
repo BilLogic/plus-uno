@@ -5,8 +5,24 @@ import { popupMountOf } from '@/lib/popoverPlacement';
 import { isOverlayRaisedOver, isPressInRaisedOverlay } from '@/lib/overlay';
 import './Popup.scss';
 
-/** The width tiers, popup width-sm · md · lg (`--popover-width-*`): 320 · 400 · 480. */
-const WIDTHS = ['sm', 'md', 'lg'];
+/**
+ * The `width` options. `auto` hugs one list: at least the trigger, 160 to 320
+ * (`--popup-min-width` to `--popup-max-width`). `3-col` and `4-col` hold a
+ * menu of several categories and span that many screen-grid columns plus the
+ * popup pad, the same steps and the same math as Modal's `6-col` and up
+ * (`screen-grid-width` in styles/_screen-grid.scss).
+ */
+export const POPUP_WIDTHS = ['auto', '3-col', '4-col'];
+
+/**
+ * Each column step in pixels at the screens Modal's widths are read at,
+ * 768 · 1024 · 1280, as Popup.scss computes them and rounded to a whole pixel.
+ * scripts/frame-layer-tokens.test.mjs holds them to the screen-grid rule.
+ */
+export const POPUP_WIDTH_PX = {
+    '3-col': [200, 264, 328],
+    '4-col': [261, 347, 432],
+};
 
 /** Every placement this component accepts, ADS-shaped (side + optional `-start`/`-end`). */
 const PLACEMENTS = [
@@ -62,6 +78,7 @@ const DISMISS_REASONS = new Set(['outside-press', 'escape-key', 'focus-out']);
 /** Popup: a small panel of secondary content anchored to a control, text or a short list and never a form. */
 const Popup = ({
     trigger,
+    anchor,
     children,
     title,
     label,
@@ -73,12 +90,12 @@ const Popup = ({
     container,
     offset,
     rootClose,
-    width = 'sm',
+    width = 'auto',
     className = '',
     id,
     ...props
 }) => {
-    const widthClass = WIDTHS.includes(width) && width !== 'sm' ? `plus-popup--${width}` : '';
+    const widthClass = POPUP_WIDTHS.includes(width) && width !== 'auto' ? `plus-popup--${width}` : '';
     const { side, align } = sideAlignOf(placement);
     const [along = 4, away] = offset ?? [];
 
@@ -101,11 +118,14 @@ const Popup = ({
         onToggle?.(next);
     };
 
-    const isTextTrigger = !React.isValidElement(trigger);
+    const isTextTrigger = trigger !== undefined && !React.isValidElement(trigger);
+    // With an `anchor` and no trigger the popup is driven by `show` alone and
+    // the control it points at is not its trigger, so it reports no aria-expanded.
+    const hasTrigger = trigger !== undefined;
     const triggerElement = isTextTrigger
         ? <button type="button" className="plus-popup-trigger">{trigger}</button>
         : trigger;
-    const expandable = acceptsExpandedState(triggerElement);
+    const expandable = hasTrigger && acceptsExpandedState(triggerElement);
     const openOnHover = triggerType === 'hover' || triggerType === 'focus'
         || (Array.isArray(triggerType) && (triggerType.includes('hover') || triggerType.includes('focus')));
 
@@ -114,9 +134,10 @@ const Popup = ({
     // so it is current by the time the Portal below reads it on first open.
     const triggerNodeRef = useRef(null);
     const containerRef = useRef(null);
+    if (!hasTrigger) triggerNodeRef.current = anchor?.current ?? anchor ?? null;
     containerRef.current = container ?? popupMountOf(triggerNodeRef);
-    const ownRef = triggerElement.props?.ref ?? triggerElement.ref;
-    const mergedTrigger = React.cloneElement(triggerElement, {
+    const ownRef = triggerElement?.props?.ref ?? triggerElement?.ref;
+    const mergedTrigger = hasTrigger && React.cloneElement(triggerElement, {
         ref: (node) => {
             triggerNodeRef.current = node;
             if (typeof ownRef === 'function') ownRef(node);
@@ -130,20 +151,23 @@ const Popup = ({
     // it names the control that opens it.
     const titleId = useId();
     const generatedTriggerId = useId();
-    const triggerId = triggerElement.props?.id ?? generatedTriggerId;
+    const triggerId = triggerElement?.props?.id ?? generatedTriggerId;
     const labelledBy = title ? titleId : (label ? undefined : triggerId);
 
     return (
         <BasePopover.Root open={isOpen} onOpenChange={handleOpenChange}>
-            <BasePopover.Trigger
-                render={mergedTrigger}
-                id={triggerElement.props?.id ? undefined : triggerId}
-                nativeButton={isTextTrigger || isButtonLike(triggerElement)}
-                openOnHover={openOnHover}
-                {...(expandable ? { 'aria-haspopup': 'dialog' } : {})}
-            />
+            {hasTrigger && (
+                <BasePopover.Trigger
+                    render={mergedTrigger}
+                    id={triggerElement.props?.id ? undefined : triggerId}
+                    nativeButton={isTextTrigger || isButtonLike(triggerElement)}
+                    openOnHover={openOnHover}
+                    {...(expandable ? { 'aria-haspopup': 'dialog' } : {})}
+                />
+            )}
             <BasePopover.Portal container={containerRef}>
                 <BasePopover.Positioner
+                    anchor={anchor}
                     side={side}
                     align={align}
                     sideOffset={away ?? along}
@@ -168,7 +192,9 @@ const Popup = ({
 
 Popup.propTypes = {
     /** The element that triggers the popup. A plain string becomes a real `button`. */
-    trigger: PropTypes.node.isRequired,
+    trigger: PropTypes.node,
+    /** A ref or element the popup points at when there is no `trigger`: a control that is not itself the popup's opener, such as a toggle whose press opens a follow-up. Drive it with `show`. */
+    anchor: PropTypes.oneOfType([PropTypes.object, PropTypes.func]),
     /** The popup's body content. */
     children: PropTypes.node.isRequired,
     /** Heading shown at the top of the popup. It also names the popup for assistive tech. */
@@ -190,8 +216,8 @@ Popup.propTypes = {
     offset: PropTypes.array,
     /** Dismiss on a click outside. Defaults to true for every trigger but `manual`. */
     rootClose: PropTypes.bool,
-    /** The width tier: sm 320 (default), md 400 or lg 480. */
-    width: PropTypes.oneOf(WIDTHS),
+    /** `auto` (default) hugs its content, at least the trigger's width and 160 to 320. `3-col` and `4-col` span that many screen-grid columns, for a menu of several categories. */
+    width: PropTypes.oneOf(POPUP_WIDTHS),
     className: PropTypes.string,
     id: PropTypes.string,
 };

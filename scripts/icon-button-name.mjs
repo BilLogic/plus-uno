@@ -55,7 +55,7 @@ export const NAMING = /(^|\s)(aria-label|aria-labelledby|title|text)\s*=\s*(?:"(
  * Does this attribute list actually NAME the control?
  *
  * An EMPTY name is not a name, and this is not a corner case: the lesson
- * overview's view toggles are written `text=""` beside a `leadingVisual`, which
+ * overview's view toggles are written `text=""` beside a `iconBefore`, which
  * renders `plus-btn--icon-only` with nothing to announce. A scanner that only
  * asked whether the attribute was PRESENT called four of them named. An
  * expression value is treated as a name, since evaluating it is blind spot 1.

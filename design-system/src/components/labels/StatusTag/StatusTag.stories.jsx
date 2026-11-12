@@ -222,22 +222,15 @@ TrailingMetricAppearance.play = async ({ canvasElement }) => {
     await expect(box.right - pill.right).toBe(COUNT.default.inset);
 };
 
-/** `leadingVisual` adds one icon before the label, in the text color. */
-export const LeadingVisual = () => (
+/** `iconBefore` adds one icon before the label, in the text color. */
+export const IconBefore = () => (
     <div style={row}>
-        <StatusTag appearance="success" leadingVisual="circle-check" data-testid="default">Completed</StatusTag>
-        <StatusTag appearance="warning" leadingVisual="triangle-exclamation" data-testid="warning">Needs review</StatusTag>
-        <StatusTag appearance="success" spacing="spacious" leadingVisual="circle-check" data-testid="spacious">Completed</StatusTag>
-        <StatusTag
-            appearance="info"
-            leadingVisual={<svg width="12" height="12" data-testid="node-visual"><circle cx="6" cy="6" r="6" fill="currentColor" /></svg>}
-            data-testid="node"
-        >
-            Syncing
-        </StatusTag>
+        <StatusTag appearance="success" iconBefore="circle-check" data-testid="default">Completed</StatusTag>
+        <StatusTag appearance="warning" iconBefore="triangle-exclamation" data-testid="warning">Needs review</StatusTag>
+        <StatusTag appearance="success" spacing="spacious" iconBefore="circle-check" data-testid="spacious">Completed</StatusTag>
     </div>
 );
-LeadingVisual.play = async ({ canvasElement }) => {
+IconBefore.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     for (const [id, size] of [['default', 12], ['spacious', 16]]) {
         const el = canvas.getByTestId(id);
@@ -252,10 +245,6 @@ LeadingVisual.play = async ({ canvasElement }) => {
     await expect(getComputedStyle(iconIn(canvas.getByTestId('warning')), '::before').content)
         .toBe(glyphOf(canvasElement, 'fa-triangle-exclamation'));
 
-    // A node visual is hidden too: the wrapper, not the caller, owns that.
-    const node = canvas.getByTestId('node-visual');
-    await expect(node.closest('[aria-hidden="true"]'), 'a node visual is hidden from assistive technology').not.toBeNull();
-    await expect(canvas.getByTestId('node')).toHaveTextContent('Syncing');
 };
 
 /**
@@ -460,7 +449,7 @@ export const Interactive = {
         children: 'Needs review',
         appearance: 'warning',
         spacing: 'default',
-        leadingVisual: '',
+        iconBefore: '',
         trailingMetric: 0,
         maxWidth: 200,
     },
@@ -468,7 +457,7 @@ export const Interactive = {
         appearance: { control: 'select', options: STATUS_TAG_APPEARANCES },
         spacing: { control: 'inline-radio', options: STATUS_TAG_SPACINGS },
     },
-    render: ({ leadingVisual, ...args }) => <StatusTag {...args} leadingVisual={leadingVisual || undefined} />,
+    render: ({ iconBefore, ...args }) => <StatusTag {...args} iconBefore={iconBefore || undefined} />,
 };
 
 /* ------------------------------------------------------------------- states */

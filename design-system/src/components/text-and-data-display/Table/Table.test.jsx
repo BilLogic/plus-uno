@@ -77,8 +77,8 @@ describe('cell content', () => {
         expect(b).toHaveClass('plus-table-cell--wrap');
     });
 
-    it('renders a secondary line and a leading slot', () => {
-        inBody(<TableRow><TableCell secondary="Grade 7" leading={<i data-testid="lead" />}>Ava</TableCell></TableRow>);
+    it('renders a secondary line and an elemBefore slot', () => {
+        inBody(<TableRow><TableCell secondary="Grade 7" elemBefore={<i data-testid="lead" />}>Ava</TableCell></TableRow>);
         const cell = screen.getByRole('cell');
         expect(cell).toHaveClass('plus-table-cell--lines-2');
         expect(within(cell).getByText('Grade 7')).toBeInTheDocument();

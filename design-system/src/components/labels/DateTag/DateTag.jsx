@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import PropTypes from 'prop-types';
+import { devWarn } from '../../../lib/devWarn';
 
 import Tooltip from '../../overlays-and-layering/Tooltip';
 import { useIsTruncated } from '../../../lib/useIsTruncated';
@@ -32,12 +33,7 @@ export const DATE_TAG_ICONS = {
     danger: 'triangle-exclamation',
 };
 
-const warn = (message) => {
-    if (process.env.NODE_ENV !== 'production') {
-        // eslint-disable-next-line no-console
-        console.warn(`[DateTag] ${message}`);
-    }
-};
+const warn = devWarn('DateTag');
 
 /** An outlined label for a due or event date, such as "Due tomorrow". The app picks the appearance from how close the date is; it is never a button. */
 export const DateTag = ({

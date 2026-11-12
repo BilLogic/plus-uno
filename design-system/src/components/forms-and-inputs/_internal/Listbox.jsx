@@ -28,7 +28,7 @@ const FALLBACK_ROW_HEIGHT = 36;
  *
  * @param {string|object} option
  * @param {number} index Its place in the caller's array, which keeps its id stable while filtering.
- * @returns {{ value: *, label: *, text: string, description?: *, disabled: boolean, group?: string, leading?: *, trailing?: *, index: number, source: * }}
+ * @returns {{ value: *, label: *, text: string, description?: *, disabled: boolean, group?: string, elemBefore?: *, elemAfter?: *, index: number, source: * }}
  */
 const normalize = (option, index) => {
     if (typeof option === 'string' || typeof option === 'number') {
@@ -42,8 +42,8 @@ const normalize = (option, index) => {
         description: option.description,
         disabled: Boolean(option.disabled),
         group: option.group,
-        leading: option.leading,
-        trailing: option.trailing,
+        elemBefore: option.elemBefore,
+        elemAfter: option.elemAfter,
         dragging: Boolean(option.dragging),
         dropIndicator: option.dropIndicator,
         index,
@@ -101,8 +101,11 @@ const Listbox = ({
     footer,
     rowActions,
     rowActionsIndex,
+    marker = 'check',
     loading = false,
     error,
+    onRetry,
+    reveal = false,
     emptyMessage = 'No results',
     embedded = false,
     spacing = 'default',
@@ -309,17 +312,21 @@ const Listbox = ({
 
     /* ---------- live announcements ---------- */
     let announcement = '';
-    if (loading) announcement = 'Loading';
+    if (loading) announcement = 'Loading options';
     else if (error) announcement = typeof error === 'string' ? error : 'Failed to load';
     else if (query) announcement = `${shown.length} ${shown.length === 1 ? 'result' : 'results'}`;
 
     /* ---------- rendering ---------- */
+    // With `reveal`, each row fades in a step after the one before it.
+    let revealIndex = 0;
     const row = (option, extra = {}) => {
         const rowId = optionId(option);
+        const revealStyle = reveal ? { '--plus-listbox-reveal-index': revealIndex++ } : undefined;
         const selected = isSelected(option.value);
-        const leading = [];
-        if (option.leading) leading.push(...React.Children.toArray(option.leading));
-        if (multi) leading.unshift(<OptionRow.Checkbox key="__check" checked={selected} />);
+        const before = [];
+        if (option.elemBefore) before.push(...React.Children.toArray(option.elemBefore));
+        if (multi) before.unshift(<OptionRow.Checkbox key="__check" checked={selected} />);
+        else if (marker === 'radio') before.unshift(<OptionRow.Radio key="__radio" checked={selected} />);
         return (
             <OptionRow
                 key={rowId}
@@ -330,12 +337,14 @@ const Listbox = ({
                 selected={selected}
                 disabled={option.disabled}
                 highlighted={rowId === resolvedActive}
-                check={!multi}
+                check={!multi && marker !== 'radio'}
                 dragging={option.dragging}
                 dropIndicator={option.dropIndicator}
-                leading={leading.length ? leading : undefined}
-                trailing={option.trailing}
+                elemBefore={before.length ? before : undefined}
+                elemAfter={option.elemAfter}
                 spacing={spacing}
+                style={revealStyle}
+                className={reveal ? 'plus-listbox-reveal' : undefined}
                 onSelect={() => choose(option)}
                 onMouseMove={() => { if (!option.disabled && rowId !== resolvedActive) setActiveId(rowId); }}
                 {...extra}
@@ -346,9 +355,9 @@ const Listbox = ({
     let message = null;
     let rows = null;
     if (loading) {
-        message = <ListboxMessage kind="loading">Loading…</ListboxMessage>;
+        message = <ListboxMessage kind="loading">Loading options</ListboxMessage>;
     } else if (error) {
-        message = <ListboxMessage kind="error">{error}</ListboxMessage>;
+        message = <ListboxMessage kind="error" onRetry={onRetry}>{error}</ListboxMessage>;
     } else if (shown.length === 0) {
         message = <ListboxMessage kind="empty">{emptyMessage}</ListboxMessage>;
     } else if (virtual) {
@@ -475,19 +484,24 @@ const Listbox = ({
  *
  * @param {object} props
  * @param {'loading'|'empty'|'error'|'count'|'limit'} props.kind
+ * @param {() => void} [props.onRetry] an error row shows a Retry button that calls it
  * @param {React.ReactNode} props.children
  * @returns {JSX.Element}
  */
-export const ListboxMessage = ({ kind, children }) => (
+export const ListboxMessage = ({ kind, onRetry, children }) => (
     <div className={`plus-listbox-message plus-listbox-message--${kind}`} role="presentation">
         {kind === 'loading' && <Spinner size={16} label="" />}
         {kind === 'error' && <Icon name="circle-exclamation" />}
         <span>{children}</span>
+        {kind === 'error' && onRetry && (
+            <button type="button" className="plus-listbox-retry" tabIndex={-1} onClick={onRetry}>Retry</button>
+        )}
     </div>
 );
 
 ListboxMessage.propTypes = {
     kind: PropTypes.oneOf(['loading', 'empty', 'error', 'count', 'limit']).isRequired,
+    onRetry: PropTypes.func,
     children: PropTypes.node,
 };
 
@@ -499,7 +513,7 @@ Listbox.propTypes = {
     /**
      * Strings, or objects with `value`, `label` (or `text`), `description`,
      * `disabled`, `group` (consecutive options with one group share a heading),
-     * `leading` and `trailing`.
+     * `elemBefore` and `elemAfter`.
      */
     options: PropTypes.arrayOf(PropTypes.oneOfType([
         PropTypes.string,
@@ -511,8 +525,8 @@ Listbox.propTypes = {
             description: PropTypes.node,
             disabled: PropTypes.bool,
             group: PropTypes.string,
-            leading: PropTypes.node,
-            trailing: PropTypes.node,
+            elemBefore: PropTypes.node,
+            elemAfter: PropTypes.node,
             dragging: PropTypes.bool,
             dropIndicator: PropTypes.oneOf(['before', 'after']),
         }),
@@ -521,6 +535,8 @@ Listbox.propTypes = {
     mode: PropTypes.oneOf(['single', 'multi']),
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
     defaultValue: PropTypes.oneOfType([PropTypes.string, PropTypes.number, PropTypes.array]),
+    /** How a single pick is marked: `check` at the row's end, or `radio` before the label. Multi mode always uses checkboxes. */
+    marker: PropTypes.oneOf(['check', 'radio']),
     /** `(next, option)`; `next` is an array in multi mode. */
     onChange: PropTypes.func,
     /** The text typed in the field; rows whose label contains it are shown. */
@@ -550,6 +566,10 @@ Listbox.propTypes = {
     rowActionsIndex: PropTypes.number,
     loading: PropTypes.bool,
     error: PropTypes.node,
+    /** `()`: the error row shows a Retry button that calls it. */
+    onRetry: PropTypes.func,
+    /** Rows fade in one after another, 20 ms apart, as options arrive from a server. */
+    reveal: PropTypes.bool,
     emptyMessage: PropTypes.node,
     /** Draws no surface of its own, for a list inside another menu. */
     embedded: PropTypes.bool,

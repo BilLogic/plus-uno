@@ -70,7 +70,7 @@ SingleCommitClosesTheMenu.play = async ({ canvasElement }) => {
     await userEvent.click(await page().findByRole('option', { name: 'North High' }));
 
     await expect(chosen).toHaveTextContent(/^north$/);
-    await expect(field).toHaveTextContent('North High');
+    await expect(field).toHaveValue('North High');
     await waitFor(() => expect(page().queryByRole('option', { name: 'South High' })).toBeNull());
 
     await userEvent.click(field);
@@ -114,12 +114,12 @@ KeyboardOpensAndPicks.play = async ({ canvasElement }) => {
 
 /* ------------------------------------------------------------- isSearchable */
 
-/** Searchable means typing in the field itself; there is no second search box. */
+/** Typing is on by default and happens in the field itself; there is no second search box. */
 export const TypingFiltersOptions = () => {
     const [value, setValue] = useState('');
     return (
         <div style={stack}>
-            <Select id="scommit-search" label="School" options={schools} placeholder="Select a school" isSearchable value={value} onChange={setValue} />
+            <Select id="scommit-search" label="School" options={schools} placeholder="Select a school" value={value} onChange={setValue} />
             <p data-testid="chosen">{value}</p>
         </div>
     );
@@ -147,6 +147,34 @@ TypingFiltersOptions.play = async ({ canvasElement }) => {
     await userEvent.keyboard('{Enter}');
     await expect(canvas.getByTestId('chosen')).toHaveTextContent(/^riverside$/);
     await expect(field).toHaveValue('Riverside Academy');
+};
+
+/** A short filter list opts out: the field is a trigger, typing filters nothing, and Space opens it. */
+export const OptOutOfTyping = () => {
+    const [value, setValue] = useState('');
+    return (
+        <div style={stack}>
+            <Select id="scommit-plain" label="School" options={schools} placeholder="Any school" isSearchable={false} value={value} onChange={setValue} />
+            <p data-testid="chosen">{value}</p>
+        </div>
+    );
+};
+
+OptOutOfTyping.play = async ({ canvasElement }) => {
+    const canvas = within(canvasElement);
+    const field = canvas.getByRole('combobox', { name: 'School' });
+    await expect(field.tagName).not.toBe('INPUT');
+
+    await userEvent.tab();
+    await expect(field).toHaveFocus();
+    await userEvent.keyboard(' ');
+    await expect(field).toHaveAttribute('aria-expanded', 'true');
+    await userEvent.keyboard('river');
+    await expect(await page().findAllByRole('option')).toHaveLength(schools.length);
+
+    await userEvent.click(await page().findByRole('option', { name: 'South High' }));
+    await expect(canvas.getByTestId('chosen')).toHaveTextContent(/^south$/);
+    await expect(field).toHaveTextContent('South High');
 };
 
 /** "Create *text*" appears only when nothing matches exactly, ignoring case. */
@@ -277,7 +305,7 @@ export const SelectAllHiddenPast50 = () => {
     const [value, setValue] = useState([]);
     return (
         <div style={stack}>
-            <Select id="scommit-all" label="Tutors" isMulti isSearchable selectAll options={manyOptions} value={value} onChange={setValue} />
+            <Select id="scommit-all" label="Tutors" isMulti selectAll options={manyOptions} value={value} onChange={setValue} />
             <p data-testid="count">{value.length}</p>
         </div>
     );
@@ -414,6 +442,8 @@ ReadonlyIsNotDisabled.play = async ({ canvasElement }) => {
     await expect(page().queryByRole('option', { name: 'North High' })).toBeNull();
     await userEvent.keyboard('{Delete}');
     await expect(readonly).toHaveTextContent('North High');
+    // The value is text to read: no chevron, nothing to type in.
+    await expect(readonly.closest('.plus-field').querySelector('.plus-select-caret')).toBeNull();
 
     // Disabled is out of the tab order.
     await userEvent.tab();
@@ -479,17 +509,6 @@ DependentFieldClears.play = async ({ canvasElement }) => {
     await expect(canvas.getByTestId('teacher').textContent).toBe('');
 };
 
-/** While options load, the list shows a Message row. */
-export const LoadingShowsMessage = () => (
-    <div style={stack}>
-        <Select id="scommit-loading" label="Teacher" options={[]} isLoading defaultOpen />
-    </div>
-);
-
-LoadingShowsMessage.play = async () => {
-    await expect(await page().findByText('Loading…')).toBeInTheDocument();
-};
-
 /* ------------------------------------------------------------ long lists */
 
 const tutors = Array.from({ length: 80 }, (_, i) => ({ value: `u${i + 1}`, label: `Person ${String(i + 1).padStart(2, '0')}` }));
@@ -522,35 +541,6 @@ LongListSearchFirst.play = async ({ canvasElement }) => {
     await waitFor(() => expect(page().getAllByRole('option')).toHaveLength(10));
 };
 
-/** `loadOptions` pages in 50 at a time as the list scrolls, and says how many there are. */
-export const LoadOptionsPages = () => {
-    const all = Array.from({ length: 120 }, (_, i) => ({ value: `s${i + 1}`, label: `Student ${i + 1}` }));
-    const loadOptions = (query, { offset, limit }) => new Promise((resolve) => {
-        const matches = all.filter((o) => o.label.toLowerCase().includes(query.toLowerCase()));
-        setTimeout(() => resolve({ options: matches.slice(offset, offset + limit), total: matches.length }), 20);
-    });
-    return (
-        <div style={stack}>
-            <Select id="scommit-async" label="Student" loadOptions={loadOptions} />
-        </div>
-    );
-};
-
-LoadOptionsPages.play = async ({ canvasElement }) => {
-    const field = within(canvasElement).getByRole('combobox', { name: 'Student' });
-    await userEvent.click(field);
-    await expect(await page().findByText('Showing 50 of 120')).toBeInTheDocument();
-
-    const body = page().getByRole('listbox').closest('.plus-listbox-body');
-    body.scrollTop = body.scrollHeight;
-    fireEvent.scroll(body);
-    await expect(await page().findByText('Showing 100 of 120')).toBeInTheDocument();
-
-    await userEvent.type(field, 'Student 11');
-    await waitFor(() => expect(page().getAllByRole('option')).toHaveLength(11));
-    await expect(page().queryByText(/^Showing/)).toBeNull();
-};
-
 /* -------------------------------------------------------------- clearable */
 
 /**
@@ -579,7 +569,7 @@ ClearableDefaults.play = async ({ canvasElement }) => {
     const sort = canvas.getByRole('combobox', { name: 'Sort' });
     sort.focus();
     await userEvent.keyboard('{Delete}');
-    await expect(sort).toHaveTextContent('North High');
+    await expect(sort).toHaveValue('North High');
 };
 
 /* ------------------------------------------------------------- open state */

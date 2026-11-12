@@ -76,13 +76,13 @@ spelling; the aliases exist for content written before it changed.
 - For a category outside the five SMART subjects, use `Tag` directly.
 - For a group of tags, including smart tags, use `TagGroup`.
 
-Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `PromptStarters` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 
 1. **Subject icon.** Fixed per subject: a heart, a book, a bullhorn, a handshake, a laptop. It is decoration.
 2. **Label.** The subject's own name unless the context needs other words.
-3. **Edge and ground.** The subject's hue on the border and the swatch, with neutral text, exactly as Tag draws a color.
+3. **Edge and ground.** The subject's hue on the border, with neutral text, exactly as Tag draws a color.
 
 ### States
 

@@ -2,8 +2,7 @@
  * The Popups pattern's placement rule, read from its tokens: a menu, popup,
  * tooltip or flag opens `--popover-offset` (4px) from its trigger and never
  * comes nearer than `--popover-gap-screen` (8px) to the screen's edge.
- * Field popups place themselves with `placePopup` (forms-and-inputs); popups
- * and tooltips hand the same two numbers to Popper.
+ * Field popups place themselves with `placePopup` (forms-and-inputs).
  */
 import { overlayMountOf } from '@/lib/overlay';
 
@@ -37,27 +36,6 @@ export function readPopoverOffset() {
  */
 export function readScreenGap() {
     return readPx('--popover-gap-screen', SCREEN_GAP);
-}
-
-/**
- * The props a react-bootstrap `Overlay` or `OverlayTrigger` takes to follow
- * the rule: the offset from its trigger, and Popper padding so neither
- * flipping nor sliding along its edge brings it nearer than the screen gap.
- *
- * @param {[number, number]} [offset] a caller's own `[skidding, distance]`
- * @returns {{offset: [number, number], popperConfig: object}}
- */
-export function popoverOverlayProps(offset) {
-    const padding = readScreenGap();
-    return {
-        offset: offset ?? [0, readPopoverOffset()],
-        popperConfig: {
-            modifiers: [
-                { name: 'preventOverflow', options: { padding } },
-                { name: 'flip', options: { padding } },
-            ],
-        },
-    };
 }
 
 /**

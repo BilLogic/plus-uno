@@ -66,7 +66,7 @@ Don't guard the component with your own conditional: passing an empty
 - For a single follow-up prompt once a conversation is underway, use `Suggestion` directly.
 - For where a selected starter's text typically lands, see `PromptInput`.
 
-Same group: `AiMessage` · `CountTag` · `DateTag` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
+Same group: `AiMessage` · `ChangeTag` · `CountTag` · `DateTag` · `SmartTag` · `StatusTag` · `Suggestion` · `Tag` · `TagGroup`
 
 ## Parts
 

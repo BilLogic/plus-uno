@@ -10,7 +10,10 @@ export const EMPTY_STATE_SPACINGS = ['default', 'compact'];
 /**
  * What a view shows when it has nothing to show yet: a picture, a short
  * header, one line saying what goes here, and the action that fills it. It
- * invites; it does not apologize.
+ * invites; it does not apologize. It also fills the slot when content cannot
+ * be shown: a load failure ("Couldn't load sessions" with Try again) or no
+ * access (the plain reason and who can help). Those are the same parts with
+ * different words, so they need no props of their own.
  *
  * - **image** is a slot for an Illustration or any picture. Without it, `icon`
  *   (a Font Awesome Free solid name) stands in. Both are decorative.

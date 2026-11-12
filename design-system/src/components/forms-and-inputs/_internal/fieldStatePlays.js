@@ -7,6 +7,7 @@
 import { expect, waitFor } from 'storybook/test';
 import { px, probe, tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
+import { expectFieldReadOnly } from '@/storybook-docs/lib/field-states.js';
 
 const boxOf = (control) => control.closest('.plus-field');
 
@@ -46,8 +47,6 @@ export const expectInvalid = async (canvasElement, control) => {
     await expect(getComputedStyle(boxOf(control)).borderTopColor).toBe(tokenColor(canvasElement, '--ds-border-danger'));
 };
 
-export const expectReadOnly = async (canvasElement, control) => {
-    const box = boxOf(control);
-    await expect(box).toHaveClass('plus-field--readonly');
-    await expect(getComputedStyle(box).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-neutral'));
-};
+/** Read-only, whole: see `expectFieldReadOnly`. */
+export const expectReadOnly = async (canvasElement, control) =>
+    expectFieldReadOnly(canvasElement, boxOf(control));

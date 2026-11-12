@@ -4,6 +4,7 @@ import { webAppSourceSnippets } from '@/storybook-docs/web-app-source-snippets.j
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { px, tokenColor } from '@/storybook-docs/lib/style-probes.js';
+import { expectChoiceReadOnly } from '@/storybook-docs/lib/field-states.js';
 import Radio from './Radio';
 
 export default {
@@ -181,6 +182,9 @@ ReadOnly.play = async ({ canvasElement }) => {
     await userEvent.click(online);
     await expect(online.nextElementSibling.checked).toBe(false);
     await expect(canvas.getByRole('radio', { name: 'In person' }).nextElementSibling.checked).toBe(true);
+
+    await expectChoiceReadOnly(canvasElement, online, 'unchecked radio');
+    await expectChoiceReadOnly(canvasElement, canvas.getByRole('radio', { name: 'In person' }), 'checked radio');
 };
 
 /** A description under the label, and the card appearance. */
@@ -328,6 +332,19 @@ export const Disabled = {
         const el = radioOf(canvasElement, 'Not available');
         await expect(el).toHaveAttribute('data-disabled');
         await expect(getComputedStyle(el).backgroundColor).toBe(tokenColor(canvasElement, '--ds-background-disabled'));
+    },
+};
+
+/** An option disabled for a prerequisite the person can fix here; its description says what to do. */
+export const DisabledWithReason = {
+    render: () => <Radio id="radio-ex-reason" name="radio-ex-reason" label="Text message" value="text" description="Add a phone number first." isDisabled />,
+    play: async ({ canvasElement }) => {
+        const canvas = within(canvasElement);
+        const el = radioOf(canvasElement, 'Text message');
+        await expect(el).toHaveAttribute('data-disabled');
+        const reason = canvas.getByText('Add a phone number first.');
+        await expect(reason).toBeVisible();
+        await expect(getComputedStyle(reason.closest('.plus-field-caption')).opacity).toBe('1');
     },
 };
 
