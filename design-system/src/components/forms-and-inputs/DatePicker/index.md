@@ -14,9 +14,21 @@ Also asked as: calendar input, date field, date input, date selector.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/DatePicker/DatePicker.mdx`
 
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast` · change `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `DatePicker` for a single date or a date range typed or chosen from a calendar: a session date, a billing period. For a time alone, use Time picker; for a date and a time together, use Date time picker.
+
+## Motion
+
+DatePicker reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Opens as a Popup. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. |
+| change | Step to the next or previous | `--ds-motion-spatial-default` | A month change slides the grid flat. |
 
 ## Best practices
 

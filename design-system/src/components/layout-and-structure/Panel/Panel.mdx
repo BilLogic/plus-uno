@@ -21,6 +21,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const DemoPanel = ({ width, title = 'Session details', titleIcon, backAction, subheader, footer = true }) => (
     <PanelContainer width={width}>
@@ -95,6 +96,14 @@ a secondary conversation.
 <ComponentExample of={PanelStories.Pressed} title="Pressed" description="No pressed layer on the panel." />
 
 <ComponentExample of={PanelStories.Focused} title="Focused" description="The panel is not a control, so Tab skips it and lands on the close action." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Panel" />
 
 </div>
 

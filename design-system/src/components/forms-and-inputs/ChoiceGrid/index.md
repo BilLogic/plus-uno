@@ -14,11 +14,21 @@ Also asked as: matrix question.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/ChoiceGrid/ChoiceGrid.mdx`
 
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a choice grid when the same question is asked of several things at once: rate each of these six statements, tick which of these tools each tutor uses. It is a matrix with one question in the column headers and one subject per row.
 
 It is fully controlled. `values` is `{ rowId: columnId }` in `radio` mode and `{ rowId: { columnId: boolean } }` in `checkbox` mode, and the component holds no state of its own.
+
+## Motion
+
+ChoiceGrid reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Mark and fill change color. |
 
 ## Best practices
 

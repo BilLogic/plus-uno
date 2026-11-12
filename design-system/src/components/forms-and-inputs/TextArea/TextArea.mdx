@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as TextAreaStories from './TextArea.stories.jsx';
 import { DocsInteractivePlayground, ResourcesBlock, DocsTable, DoDontPair, ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TextArea } from '@/components';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -93,6 +94,14 @@ A text area lets users enter long form text which spans over multiple lines.
 <ComponentExample of={TextAreaStories.FieldReadOnly} title="Read-only" description="The read-only fill; the value can be read, selected and copied." />
 
 <ComponentExample of={TextAreaStories.FieldDisabled} title="Disabled" description="The whole field fades and leaves the tab order." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="TextArea" />
 
 </div>
 

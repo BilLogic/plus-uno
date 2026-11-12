@@ -14,6 +14,8 @@ Also asked as: switch views, tab bar, segmented, view switcher.
 
 **Storybook page:** `design-system/src/components/navigation/Tabs/Tabs.mdx`
 
+**Motion:** change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Tabs` for the tab bar that switches between sibling views of the same
@@ -27,6 +29,14 @@ It can be uncontrolled (`defaultActiveKey`) or controlled (`activeKey` plus
 stretches the tabs to fill the bar. `appearance` is `default` (an underline) or
 `pill` (a filled, rounded selected tab); `spacing` is `default` (32px) or
 `compact` (24px).
+
+## Motion
+
+Tabs reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Switch views | `--ds-motion-spatial-fast` | The indicator glides; both tab bodies slide together toward the chosen tab, no fade. Pill views: the fill glides and the content swaps in place. |
 
 ## Best practices
 

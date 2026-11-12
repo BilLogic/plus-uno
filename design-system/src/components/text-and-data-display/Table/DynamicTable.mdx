@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const sortHead = { cells: [{ key: 'student', content: 'Student', isSortable: true }, { key: 'date', content: 'Date', isSortable: true }] };
 export const keyedRows = [['Ava Thompson', 'Nov 2', 20261102], ['Marcus Lee', 'Oct 24', 20261024], ['Sofia Ramirez', 'Oct 9', 20261009]].map(([s, d, k]) => ({ key: s, cells: [{ key: s, content: s }, { key: k, content: d }] }));
@@ -127,6 +128,14 @@ A table people sort, page or act on. `DynamicTable` sits on the `PatternTable` s
 <ComponentExample of={DynamicTableStories.Focused} title="Focused" description={<>The sort button shows the 2px ring inset in the cell, and the arrow appears.</>} />
 
 <ComponentExample of={DynamicTableStories.DisabledRow} title="Disabled row" description={<>A row can be disabled and takes the disabled ink.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Table" />
 
 </div>
 

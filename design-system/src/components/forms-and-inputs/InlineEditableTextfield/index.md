@@ -8,6 +8,17 @@ InlineEditableTextfield — `InlineEdit` with a Text field for its edit view. It
 
 **Source:** `design-system/src/components/forms-and-inputs/InlineEditableTextfield/InlineEditableTextfield.jsx`
 
+**Motion:** change `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
+## Motion
+
+InlineEditableTextfield reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Swap content in place | `--ds-motion-appearance-fast` | Read and edit states swap in place. |
+| rejected | Call attention | `--ds-motion-spatial-fast` | A blocked save shakes the field and its button once. |
+
 ## Related
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `DropdownMenu` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`

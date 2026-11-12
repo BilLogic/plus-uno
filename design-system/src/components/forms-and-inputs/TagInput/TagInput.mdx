@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as TagInputStories from './TagInput.stories.jsx';
 import { TagInput } from '@/components';
 import { DocsInteractivePlayground, ResourcesBlock, ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const topics = [
     { value: 'fractions', label: 'Fractions', color: 'blue' },
@@ -115,6 +116,14 @@ from a list or adds, such as the topics a session covers.
 <ComponentExample of={TagInputStories.ReadOnly} title="Read-only" description="The tags on the read-only fill, with no × and no list." />
 
 <ComponentExample of={TagInputStories.Disabled} title="Disabled" description="Every tag is disabled, with no × and no entry." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="TagInput" />
 
 </div>
 

@@ -10,6 +10,17 @@ Also asked as: left nav, side nav.
 
 **Source:** `design-system/src/components/navigation/Sidebar/Sidebar.jsx`
 
+**Motion:** enter `spatial.default` · exit `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
+## Motion
+
+Sidebar reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Dock and undock a panel | `--ds-motion-spatial-default` | Slides in from its edge while the Page narrows on the same clock; the Page toggle fades out. |
+| exit | Dock and undock a panel | `--ds-motion-spatial-fast` | Slides out to its edge and leaves nothing behind; the Page widens and its toggle fades in. |
+
 ## Related
 
 Same group: `Breadcrumb` · `Link` · `Pagination` · `Tabs`

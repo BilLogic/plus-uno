@@ -53,6 +53,7 @@ function tokenSections() {
     const c = (file) => extractScssDeclarations(path.join(COLOR_DIR, file));
     const l = (file) => extractScssDeclarations(path.join(TOKENS_DIR, 'ladder', file));
     const scales = t('_scales.scss');
+    const springs = l('_springs.scss');
     // The ladder (ADR-038) comes first: it is what new code reads, and a name
     // another file also declares keeps its ladder tier.
     return [
@@ -61,6 +62,8 @@ function tokenSections() {
         { group: 'Ladder Components', tier: 'component', tokens: l('_components.scss') },
         { group: 'Layers', tier: 'semantic', tokens: l('_layers.scss') },
         { group: 'Motion', tier: 'semantic', tokens: l('_motion.scss') },
+        { group: 'Motion Springs (--ds-motion-)', tier: 'semantic', tokens: springs.filter((d) => d.name.startsWith('--ds-motion-')) },
+        { group: 'Motion Spring Primitives', tier: 'primitive', tokens: springs.filter((d) => d.name.startsWith('--motion-spring-')) },
         { group: 'Scale Tokens', tier: 'semantic', tokens: scales.filter((d) => !isScalePrimitive(d.name)) },
         { group: 'Frame and Layer Tokens', tier: 'pattern', tokens: t('_frame_layers.scss') },
         { group: 'Type Scale', tier: 'semantic', tokens: t('_type.scss') },
@@ -110,6 +113,8 @@ function renderTokensDoc() {
     const ladderComponents = lines['Ladder Components'];
     const layerTokens = lines['Layers'];
     const motionTokens = lines['Motion'];
+    const springTokens = lines['Motion Springs (--ds-motion-)'];
+    const springPrimitives = lines['Motion Spring Primitives'];
     const scaleFoundations = lines['Scale Tokens'];
     const frameLayerTokens = lines['Frame and Layer Tokens'];
     const typeTokens = lines['Type Scale'];
@@ -144,6 +149,14 @@ function renderTokensDoc() {
     tokensDoc += `## Motion\n`;
     tokensDoc += `Durations and easings; reduced motion is handled at this layer.\n\n`;
     tokensDoc += "```css\n" + motionTokens + "\n```\n\n";
+
+    tokensDoc += `## Motion Springs (\`--ds-motion-\`)\n`;
+    tokensDoc += `How things move (ADR-041). Each semantic is an easing with its settle time beside it: \`transition: transform var(--ds-motion-spatial-fast-duration) var(--ds-motion-spatial-fast)\`. Spatial is for position and size, appearance for fades and color, \`exit\` for leaving, \`loop\` for work in progress. A component names its own enter, exit and change in the motion registry; read Foundations / Motion, then the component's Motion section.\n\n`;
+    tokensDoc += "```css\n" + springTokens + "\n```\n\n";
+
+    tokensDoc += `## Motion Spring Primitives\n`;
+    tokensDoc += `The raw springs, named by stiffness (\`-r<percent>\` when the damping ratio is not 1). A semantic aliases one; never name a primitive in a component.\n\n`;
+    tokensDoc += "```css\n" + springPrimitives + "\n```\n\n";
 
     tokensDoc += `## Scale Tokens\n`;
     tokensDoc += `The Size and Border scales (spacing / foundations): heights, widths, and the Icon, Image, Item, Row, Label and Field sizes.\n\n`;

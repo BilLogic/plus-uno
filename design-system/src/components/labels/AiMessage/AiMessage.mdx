@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={AiMessageStories} />
 
@@ -57,6 +58,14 @@ as a person's.
 <ComponentExample of={AiMessageStories.Streaming} title="Streaming" description="Text still arriving: a caret follows the last character." />
 
 <ComponentExample of={AiMessageStories.TypingIndicator} title="Thinking" description="Three pulsing dots before any text exists." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="AiMessage" />
 
 </div>
 

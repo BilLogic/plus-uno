@@ -14,6 +14,8 @@ Also asked as: loading placeholder, shimmer, ghost.
 
 **Storybook page:** `design-system/src/components/loading/Skeleton/Skeleton.mdx`
 
+**Motion:** change `linear`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Skeleton` while content loads, so the space it will fill is already on
@@ -22,6 +24,14 @@ screen and the layout does not jump when it arrives.
 - **One label loading on its own** (a status calculated after the row appears, a
   tag list fetched separately): the matching preset.
 - **A thumbnail, avatar or header:** a rectangle or circle with its own size.
+
+## Motion
+
+Skeleton reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Load content | `--ds-motion-linear` | Shimmer from top-left to bottom-right; content fades in over it. |
 
 ## Best practices
 

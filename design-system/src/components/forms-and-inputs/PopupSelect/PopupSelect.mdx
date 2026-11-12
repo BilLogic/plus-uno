@@ -8,6 +8,7 @@ import {
     DocsTable,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={PopupSelectStories} />
 
@@ -50,6 +51,14 @@ or sets one filter from a button, with no field and no Apply.
 ## Behavior
 
 <ComponentExample of={PopupSelectStories.Keyboard} title="Keyboard" description="Enter or Space opens it on the current value. Arrow keys move, Enter picks and closes, Escape closes and keeps the value. Focus goes back to the trigger." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="PopupSelect" />
 
 </div>
 

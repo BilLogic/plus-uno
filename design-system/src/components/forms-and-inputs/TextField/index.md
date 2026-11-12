@@ -14,6 +14,8 @@ Also asked as: search box, single-line, text box.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/TextField/TextField.mdx`
 
+**Motion:** change `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a Text field for single-line text entry: names, emails, search boxes and
@@ -22,6 +24,14 @@ the right home for an error rather than a Section message at the top of the form
 
 Use a [Text area](?path=/docs/components-forms-and-inputs-text-area--docs) for several lines, a
 Select for a value chosen from a list, and a Date picker for dates.
+
+## Motion
+
+TextField reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Border color changes on focus and error. An error message makes room, then fades in; it fades, then the room closes, once the field is fixed. |
 
 ## Best practices
 

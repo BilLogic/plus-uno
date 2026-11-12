@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={PromptStartersStories} />
 
@@ -44,6 +45,14 @@ A few things a person could ask the AI, as a wrapping row of prompt
 <ComponentExample of={PromptStartersStories.FillsThePromptInput} title="Fills the prompt input" description={<>The common pattern: <code>onSelect</code> puts the starter's <code>text</code> into a <code>PromptInput</code> for a person to read and send.</>} />
 
 <ComponentExample of={PromptStartersStories.EmptyRendersNothing} title="Empty" description={<>An empty <code>starters</code> array renders nothing: no empty group, no placeholder.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="PromptStarters" />
 
 </div>
 

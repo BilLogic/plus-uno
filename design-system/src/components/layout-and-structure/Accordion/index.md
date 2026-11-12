@@ -14,6 +14,8 @@ Also asked as: collapsible, expand collapse, disclosure, expandable sections, fa
 
 **Storybook page:** `design-system/src/components/layout-and-structure/Accordion/Accordion.mdx`
 
+**Motion:** change `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Accordion` when a page carries several long, independent sections and only
@@ -24,6 +26,14 @@ shape and the headers stay a readable index of what is there.
 It is uncontrolled by default: give it `defaultActiveKey` and it tracks the open
 item itself. Pass `activeKey` and `onSelect` together to control it. `alwaysOpen`
 lets more than one item stay open at once.
+
+## Motion
+
+Accordion reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Expand and collapse | `--ds-motion-spatial-fast` | Height and chevron move together, opening down from the header and collapsing back into it. A section uses spatial.default; closing is one speed faster. |
 
 ## Best practices
 

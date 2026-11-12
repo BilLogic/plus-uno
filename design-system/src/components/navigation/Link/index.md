@@ -12,12 +12,22 @@ Link: an inline navigation anchor.
 
 **Storybook page:** `design-system/src/components/navigation/Link/Link.mdx`
 
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Link` for navigation inside a sentence or a block of text — "see the
 session report," "read more." For a standalone action styled like a button,
 use `Button` or `LinkButton` instead; `Link`'s appearances are for text, not
 for a control that stands on its own.
+
+## Motion
+
+Link reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Color only, on the fast fade. |
 
 ## Best practices
 

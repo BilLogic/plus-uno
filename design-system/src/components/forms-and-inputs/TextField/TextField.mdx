@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as TextFieldStories from './TextField.stories.jsx';
 import { DocsInteractivePlayground, ResourcesBlock, DocsTable, DoDontPair, ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
 import { TextField } from '@/components';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -107,6 +108,14 @@ A text field is an input that allows a user to write or edit text.
 <ComponentExample of={TextFieldStories.FieldReadOnly} title="Read-only" description="The read-only fill; the value can be read, selected and copied." />
 
 <ComponentExample of={TextFieldStories.FieldDisabled} title="Disabled" description="The whole field fades and leaves the tab order." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="TextField" />
 
 </div>
 
