@@ -149,6 +149,28 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'Common actions',
+    tier: 'pattern',
+    events: {
+      selection: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Ticking a row turns the table\'s head row into the bulk bar: the labels cross-fade, same row, same height, nothing slides. The selected rows take the selected fill and the count fades to each new value. Clearing the rows, or the select-all checkbox, reverses it. The view bar above never moves.' },
+      confirm: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'A destructive action opens a Modal. Confirm fades it and carries on: the row\'s status changes color, and a Flag confirms.' },
+      cancel: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Cancel reverses the Modal\'s entrance one speed faster.' },
+      undo: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Keep and Undo sit beside the change, tinted, until the person moves on. Undo reverses the Add or remove that made the change.' },
+    },
+  },
+  {
+    name: 'Forms',
+    tier: 'pattern',
+    events: {
+      focus: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Border color on appearance.fast. The focus ring never animates.' },
+      error: { transition: 'Call attention', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'An error on leaving a field makes room on spatial.fast, then fades in; it fades and the room closes once the field is fixed.' },
+      blocked: { transition: 'Call attention', spatial: 'spatial.fast', note: 'A blocked submit shakes the Modal, or the field with its own button, once. Never bigger on repeat; never in Reduced mode.' },
+      failed: { transition: 'Call attention', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'When the system failed, a message makes room at the top of the Modal or form, then fades in. No shake: the person did nothing wrong. A page-level error is a one-line summary that makes room at the top; focus goes to the first error.' },
+      steps: { transition: 'Step to the next or previous', appearance: 'appearance.fast', note: 'Step states change in place.' },
+      saving: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The button keeps its width: its label fades out, a Spinner fades in, and the same button confirms when done.' },
+    },
+  },
+  {
     name: 'Popup',
     tier: 'component',
     events: {
