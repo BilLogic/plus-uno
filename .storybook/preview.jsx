@@ -314,7 +314,6 @@ const preview = {
             [
               "Breadcrumbs",
               "Link",
-              "Menu",
               "Navigation system",
               [
                 "Navigation system",

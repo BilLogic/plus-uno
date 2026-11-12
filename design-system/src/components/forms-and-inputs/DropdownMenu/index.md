@@ -2,7 +2,7 @@
 
 # DropdownMenu
 
-DropdownMenu: a trigger that opens a `MenuGroup` of `Menu` items in a floating popup. Positioning and dismissal (outside click, Escape) are Base UI Menu's; the rows are the public Menu family (`MenuGroup`, `ButtonItem`, `LinkItem`, `CustomItem`, `Section`) so a dropdown's menu looks exactly like any other menu in the system.
+DropdownMenu: a trigger that opens a list of menu items in a floating popup. Positioning and dismissal (outside click, Escape) are Base UI Menu's; the rows are `ButtonItem`, `LinkItem`, `CustomItem` and `Section`, which this folder's `index.js` re-exports.
 
 Also asked as: actions menu, overflow menu, kebab, more actions, context menu, menu button, dropdown button.
 
@@ -16,7 +16,7 @@ Also asked as: actions menu, overflow menu, kebab, more actions, context menu, m
 
 ## Usage
 
-Use a dropdown menu for a trigger that opens a list of actions or navigation links. Its rows are the public Menu family: Section, Button item, Link item and Custom item. For picking one value from a list of options, use Select: a dropdown menu is for actions, a select is for a value.
+Use a dropdown menu for a trigger that opens a list of actions or navigation links. Its rows are Section, Button item, Link item and Custom item, all exported from Dropdown menu. For picking one value from a list of options, use Select: a dropdown menu is for actions, a select is for a value.
 
 `trigger` is the element that opens it, `children` are its rows. `isOpen` and `onOpenChange` make it controlled; left uncontrolled it opens and closes on its own. `placement` and `shouldFlip` govern where it opens and whether it flips when there is no room. `spacing` is `cozy` (40 rows, the default) or `compact` (32). `loading` swaps the rows for one Loading options row while its options are still being fetched; after a failure, `hasError` shows Couldn't load options with a Retry row that calls `onRetry`. A menu never draws skeleton rows.
 
@@ -81,7 +81,6 @@ The public Menu family has no submenu-trigger row of its own yet. Flatten the ch
 ## Related
 
 - For picking one value from a list, use Select.
-- For the rows themselves, outside a floating menu, use Menu directly.
 - For a page's title row with its own actions, see Page header.
 
 Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGrid` · `CloseButton` · `Comment` · `DatePicker` · `DateTimePicker` · `Fieldset` · `FileUpload` · `FilterButton` · `FilterMenu` · `IconButton` · `InlineEditableTextfield` · `LinkButton` · `LinkIconButton` · `PopupSelect` · `PromptInput` · `Radio` · `RadioGroup` · `Range` · `Rating` · `RichTextEditor` · `Select` · `SplitButton` · `TagInput` · `TextArea` · `TextField` · `TimePicker` · `Toggle` · `TreeSelect` · `VerticalButton`
@@ -92,6 +91,10 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 2. **Menu.** A floating list 4px from the trigger, on the raised surface.
 3. **Rows.** Button items, Link items or Custom items, 40 tall at cozy and 32 at compact.
 4. **Section title and separator** (optional). Group related rows.
+
+### Menu items
+
+Dropdown menu exports the four row parts: `Section`, `ButtonItem`, `LinkItem` and `CustomItem`. `ButtonItem` runs an action and `LinkItem` navigates with `href`. `CustomItem` renders through a `component` of the caller's choosing, such as a `label` around a checkbox. All three take `elemBefore`, `elemAfter`, `description`, `isSelected` and `isDisabled`. `Section` takes a `title` and `hasSeparator` and groups rows. Arrow keys move between enabled rows and wrap at the ends.
 
 ### States
 

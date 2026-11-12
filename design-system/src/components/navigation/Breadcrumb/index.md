@@ -114,7 +114,7 @@ Don't: Names that mean nothing out of context.
 - For a persistent hierarchy the user browses rather than retraces, use the Sidebar pattern.
 - When the hierarchy is one level deep, a single "Back to X" link says the same thing with less furniture.
 
-Same group: `Link` · `MenuGroup` · `Pagination` · `Sidebar` · `Tabs`
+Same group: `Link` · `Pagination` · `Sidebar` · `Tabs`
 
 ## Parts
 

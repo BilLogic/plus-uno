@@ -3,11 +3,11 @@ import { expect, userEvent, within } from 'storybook/test';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
 import { expectGroundUnder } from '@/storybook-docs/lib/label-states.js';
 import { expectInk } from '@/storybook-docs/lib/navigation-states.js';
-import MenuGroup, { ButtonItem, CustomItem, LinkItem, Section } from '@/components/navigation/MenuGroup';
+import MenuGroup, { ButtonItem, CustomItem, LinkItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import { iconClass } from '../../../lib/icon';
 
 export default {
-    title: 'Components/Navigation/Menu',
+    title: 'Components/Forms and inputs/Menu items',
     component: MenuGroup,
     tags: ['!dev', '!autodocs'],
     argTypes: {

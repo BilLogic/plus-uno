@@ -12,7 +12,7 @@ Also asked as: left nav, side nav.
 
 ## Related
 
-Same group: `Breadcrumb` · `Link` · `MenuGroup` · `Pagination` · `Tabs`
+Same group: `Breadcrumb` · `Link` · `Pagination` · `Tabs`
 
 ## Props
 

@@ -208,7 +208,7 @@ test('Button: keyboard focus is a 2px focus ring 2px off the edge, with no fill'
 // DropdownMenu has no toggle theme of its own (its trigger is a caller's own
 // Button or IconButton, which carries Button's steps); its rows are
 // MenuGroup's `plus-menu-item`, shared with every other menu in the system.
-const MENU_GROUP = 'components/navigation/MenuGroup/MenuGroup.scss';
+const MENU_GROUP = 'components/forms-and-inputs/_internal/MenuGroup.scss';
 
 test('Menu item: neutral hovered and pressed, selected neutral ink, focus ring only', () => {
   expectRule(MENU_GROUP, '.plus-menu-item:hover', { 'background-color': layer('--ds-background-neutral-subtle-hovered') });

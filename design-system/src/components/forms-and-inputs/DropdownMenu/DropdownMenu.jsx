@@ -4,7 +4,7 @@ import { clsx } from 'clsx';
 import { Menu as BaseMenu } from '@base-ui/react/menu';
 import Icon from '@/components/images-and-icons/Icon';
 import Spinner from '@/components/loading/Spinner/Spinner';
-import { ButtonItem, CustomItem, MenuGroup } from '@/components/navigation/MenuGroup';
+import { ButtonItem, CustomItem, MenuGroup } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import './DropdownMenu.scss';
 
 /** Every placement this component accepts, matching Popup's side+align shape. */
@@ -29,12 +29,11 @@ function isButtonLike(element) {
 }
 
 /**
- * DropdownMenu: a trigger that opens a `MenuGroup` of `Menu` items in a
+ * DropdownMenu: a trigger that opens a list of menu items in a
  * floating popup. Positioning and
- * dismissal (outside click, Escape) are Base UI Menu's; the rows are the
- * public Menu family (`MenuGroup`, `ButtonItem`, `LinkItem`, `CustomItem`,
- * `Section`) so a dropdown's menu looks exactly like any other menu in the
- * system.
+ * dismissal (outside click, Escape) are Base UI Menu's; the rows are
+ * `ButtonItem`, `LinkItem`, `CustomItem` and `Section`, which this folder's
+ * `index.js` re-exports.
  */
 const DropdownMenu = ({
     trigger,

@@ -1,7 +1,7 @@
 import React from 'react';
 import { expect, fn, userEvent, waitFor, within } from 'storybook/test';
 import Button from '@/components/forms-and-inputs/Button';
-import { ButtonItem, LinkItem, Section } from '@/components/navigation/MenuGroup';
+import { ButtonItem, LinkItem, Section } from '@/components/forms-and-inputs/_internal/MenuGroup';
 import { withForcedPseudo } from '@/storybook-docs/lib/force-pseudo.js';
 import { tokenColor } from '@/storybook-docs/lib/style-probes.js';
 import { expectFocusRing } from '@/storybook-docs/lib/button-states.js';
