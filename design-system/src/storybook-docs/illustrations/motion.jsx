@@ -8,12 +8,17 @@ import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { measureSpring, springStep } from '@/tokens/spring.js';
 import { Illustration } from './Illustration.jsx';
 import { Trail, TapRing } from './primitives-motion.jsx';
+import { crossings, ghostOf, pointsOf } from './trails.js';
 
 /**
  * The illustration kit's motion layer. A demo animates kit primitives on the
  * generated springs (`springs.generated.js`, ADR-041) through the `motion`
  * package, so a drawing moves exactly as the product does. Every demo:
- * - draws each subject's path, start to landing, before the motion plays;
+ * - draws each subject's path, start to landing, before the motion plays, with
+ *   a dashed outline where it lands;
+ * - keeps the paths of things that move together heading one way: none cross,
+ *   unless the scene is the broken version and says `crossing: true` (dev builds
+ *   warn about the rest);
  * - has a 1×, ½× and ¼× speed control that slows every spring and pause alike;
  * - under reduced motion, shows its landing as a still frame with the paths
  *   drawn, and plays one pass only when the reader asks.
@@ -22,7 +27,8 @@ import { Trail, TapRing } from './primitives-motion.jsx';
  * initial, landing, arrows, draw, play }`: `draw(state)` returns the SVG for a
  * state, `play(ctx)` moves the state from `initial` to `landing` with the
  * `ctx` calls below, and `arrows` lists the paths (point lists, in viewBox
- * units) the subjects travel. There are no timings here: every move reads a
+ * units) the subjects travel, each a point list or `{ points, ghost }` (see
+ * `trails.js`). There are no timings here: every move reads a
  * spring token, and every pause is counted in beats.
  */
 
@@ -329,8 +335,8 @@ const Tile = ({ scene, state, arrows, dim, showArrows }) => {
           )}
           {(showArrows || arrows > 0) && (
             <g opacity={round(arrows)}>
-              {(scene.arrows ?? []).map((points, i) => (
-                <Trail key={i} points={points} accent />
+              {(scene.arrows ?? []).map((arrow, i) => (
+                <Trail key={i} points={pointsOf(arrow)} ghost={ghostOf(arrow)} accent />
               ))}
             </g>
           )}
@@ -367,6 +373,14 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward 
   const statesRef = useRef(states);
   const { track, setSpeed, setPaused, stopAll } = useTracker(fastForward);
   const titleId = useId();
+
+  // Dev only: paths that move together must not cross unless the scene is the broken version.
+  useEffect(() => {
+    if (!import.meta.env?.DEV) return;
+    scenes
+      .filter((s) => !s.crossing && crossings(s.arrows).length)
+      .forEach((s) => console.warn(`Motion scene "${s.id}": trails cross. Unify their direction, or set crossing: true.`));
+  }, [scenes]);
 
   useEffect(() => {
     let live = true;

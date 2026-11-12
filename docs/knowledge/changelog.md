@@ -68,3 +68,7 @@ UserAvatar, TrainingProgressCard, the tutor-revamp kit), the screen overlay is
 the Blanket everywhere it was called a scrim, and the stale Rovo and surface
 container wording is gone. One named carve-out remains: the two token files that
 define `--color-scrim` may keep the word until token removal is decided.
+
+## 2026-11-12 — Figma Core clipping and layout audit
+
+The audit of Figma Core's docs pages (clipping, section hugging, absolute layout, unbound spacing, hand-built blocks) landed with the fix runs. Its one durable lesson, how to run a bulk Figma fix safely (node-count guard, saved before and after shots, per-minute limit), went to `design-system/guidelines/figma/mcp-guide.md` § Bulk fix runs. The findings file stays only as the receipt; the next sweep deletes it.

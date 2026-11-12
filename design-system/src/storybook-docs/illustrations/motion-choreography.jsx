@@ -1,9 +1,10 @@
 import React from 'react';
 import { PAINT } from './paint.js';
-import { CardBox, Flag, Frame, PageHeader, Popup, ProgressTracker, Rect, Row, Section } from './primitives.jsx';
+import { ButtonShape, CardBox, Flag, Frame, PageHeader, Popup, Rect, Row, Section, SkeletonBar } from './primitives.jsx';
 import { Pointer, SequenceStrip } from './primitives-motion.jsx';
 import { ReflowScreen } from './compositions.jsx';
 import { measure, springFor } from './motion.jsx';
+import { travel } from './trails.js';
 
 /**
  * The Choreography page's figures (Foundations/Motion/Choreography). Each is a
@@ -35,48 +36,62 @@ const FADE = measure(springFor('appearance.fast'));
 export const CLEAN_FADE_GAP_MS = Math.round(FADE.t90 * 1000);
 const FADE_MS = Math.round(FADE.settle * 1000);
 
-// ---------- Direction: unify, and step indicators stay put ----------
+// ---------- Direction: unify ----------
 
-const CARD_BASE = [16, 62, 108];
-const unifyScene = ({ id, title, caption, scatter }) => ({
+// Five parts of one screen, each landing in its place. Every part's start is
+// offset from its landing; `UNIFIED` offsets all point the same way (down and
+// right, so each travels up and left), `SCATTERED` ones each point their own way.
+const PARTS = [
+  { rect: { x: 16, y: 14, w: 52, h: 36 }, card: true },
+  { rect: { x: 76, y: 18, w: 44, h: 6 }, heading: true },
+  { rect: { x: 76, y: 30, w: 30, h: 4 } },
+  { rect: { x: 16, y: 58, w: 128, h: 14 }, row: true },
+  { rect: { x: 16, y: 80, w: 28, h: 8 }, button: true },
+];
+const UNIFIED = [[40, 24], [30, 18], [30, 18], [20, 12], [16, 10]];
+const SCATTERED = [[60, 0], [-30, 30], [-30, 0], [0, -45], [60, -60]];
+
+const unifyScene = ({ id, title, caption, offsets, crossing }) => ({
   id,
   title,
   caption,
   viewBox: VIEW,
-  initial: { p: 0, step: 0 },
-  landing: { p: 1, step: 1 },
-  arrows: CARD_BASE.map((x, i) => (scatter && i === 1 ? [[x + 20, 73], [x + 20, 43]] : [[x + 60, 43], [x + 20, 43]])),
-  draw: ({ p, step }) => (
+  crossing,
+  initial: { p: 0 },
+  landing: { p: 1 },
+  arrows: PARTS.map(({ rect }, i) => travel(rect, ...offsets[i])),
+  draw: ({ p }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} />
-      {CARD_BASE.map((x, i) => {
-        const fromBelow = scatter && i === 1;
-        return (
-          <Moved key={i} x={fromBelow ? 0 : (1 - p) * 40} y={fromBelow ? (1 - p) * 30 : 0} opacity={p}>
-            <CardBox x={x} y={26} w={36} h={34} accent={i === 1} />
-          </Moved>
-        );
-      })}
-      <ProgressTracker x={16} y={74} w={128} count={4} current={step >= 1 ? 2 : 1} />
+      {PARTS.map(({ rect, card, heading, row, button }, i) => (
+        <Moved key={i} x={offsets[i][0] * (1 - p)} y={offsets[i][1] * (1 - p)} opacity={p}>
+          {card ? (
+            <CardBox {...rect} accent />
+          ) : row ? (
+            <Row x={rect.x} y={rect.y} w={rect.w} />
+          ) : button ? (
+            <ButtonShape {...rect} />
+          ) : (
+            <SkeletonBar {...rect} heading={heading} />
+          )}
+        </Moved>
+      ))}
     </>
   ),
-  play: async (ctx) => {
-    await ctx.spring('p', 1, 'spatial.default');
-    await ctx.hold(1);
-    // A step indicator changes state where it is: it never travels.
-    ctx.set({ step: 1 });
-  },
+  play: (ctx) => ctx.spring('p', 1, 'spatial.default'),
 });
 const unify = unifyScene({
   id: 'direction-unify',
-  title: 'Every part moves along one axis',
-  caption: 'Three cards arrive along x. The step indicator changes state in place: it does not travel.',
+  title: 'Every part heads the same way',
+  caption: 'Five parts, each from where it is to where it lands, all up and to the left: none crosses another.',
+  offsets: UNIFIED,
 });
 const scatter = unifyScene({
   id: 'direction-scatter',
-  title: 'One part comes from another axis',
-  caption: 'The middle card rises from below while its neighbors slide across: three motions, no shared direction.',
-  scatter: true,
+  title: 'Each part its own way',
+  caption: 'The same five parts, each arriving from a different side: the paths cross and the eye has nowhere to follow.',
+  offsets: SCATTERED,
+  crossing: true,
 });
 
 // ---------- Move along the grid ----------
@@ -184,7 +199,11 @@ const spaceScene = ({ id, title, caption, collide }) => ({
   viewBox: VIEW,
   initial: { f: 1, m: 0, clash: 0 },
   landing: { f: 0, m: 1, clash: collide ? 1 : 0 },
-  arrows: [[[80, 65], [80, 51]], [[80, 79], [80, 65]]],
+  // The two rows below close up together: each from where it is to where it lands, side by side.
+  arrows: [
+    travel({ x: 16, y: 44, w: 128, h: 14 }, 0, 14, { lane: { x: 52 } }),
+    travel({ x: 16, y: 58, w: 128, h: 14 }, 0, 14, { lane: { x: 108 } }),
+  ],
   draw: ({ f, m }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} />
@@ -336,7 +355,10 @@ const causeScene = ({ id, title, caption, pushes }) => ({
   viewBox: VIEW,
   initial: { sel: 0, flag: 0, shift: 0 },
   landing: { sel: 1, flag: pushes ? 0 : 1, shift: pushes ? 1 : 0 },
-  arrows: pushes ? [[[84, 44], [84, 58]]] : [[[150, 20], [128, 20]]],
+  // A push moves every row under the hand, so each one's path is drawn, side by side.
+  arrows: pushes
+    ? [0, 1, 2].map((i) => travel({ x: 16, y: 44 + i * 14, w: 128, h: 14 }, 0, -14, { lane: { x: 40 + i * 40 } }))
+    : [[[150, 20], [128, 20]]],
   draw: ({ sel, flag, shift }) => (
     <>
       <Frame x={8} y={6} w={144} h={88} />

@@ -6,6 +6,7 @@ import {
 } from './primitives.jsx';
 import { TreeEdge, TreeNode } from './primitives-motion.jsx';
 import { Clip, Moved, VIEW, mix } from './motion-parts.jsx';
+import { travel } from './trails.js';
 import { ABOVE_DEMOS, FEEDBACK_DEMOS, WITHIN_DEMOS } from './motion-transitions-place.jsx';
 
 /**
@@ -244,7 +245,16 @@ const goTo = ({ id, title, caption, slide }) => ({
   viewBox: VIEW,
   initial: slide ? { hl: 0, p: 0 } : { hl: 0, o: 1, n: 0 },
   landing: slide ? { hl: 1, p: 1 } : { hl: 1, o: 0, n: 1 },
-  arrows: [[[30, 67], [30, 50]]],
+  // The highlight tracks the place (exempt from the shared axis); when the pages slide, both travel left together.
+  arrows: [
+    travel({ x: 12, y: SIDEBAR_ROWS[0], w: 36, h: 16 }, 0, SIDEBAR_ROWS[1] - SIDEBAR_ROWS[0]),
+    ...(slide
+      ? [
+          { points: [[101, 40], [62, 40]] },
+          { points: [[148, 72], [101, 72]], ghost: { x: 60, y: 26, w: 83, h: 60 } },
+        ]
+      : []),
+  ],
   draw: ({ hl, o = 1, n = 0, p = 0 }) => (
     <>
       <Screen x={8} y={6} w={144} h={88} header={false} />
@@ -287,7 +297,12 @@ const switchViews = ({ id, title, caption, fade }) => ({
   viewBox: VIEW,
   initial: fade ? { i: 0, p: 0, o: 0 } : { i: 0, p: 0 },
   landing: fade ? { i: 1, p: 1, o: 1 } : { i: 1, p: 1 },
-  arrows: [[[130, 66], [78, 66]]],
+  // The underline tracks the tab (exempt from the shared axis); the old and new content both travel left.
+  arrows: [
+    travel({ x: 60 + TAB_W, y: 46, w: TAB_W, h: 4 }, -TAB_W, 0),
+    { points: [[110, 60], [66, 60]] },
+    { points: [[140, 80], [101, 80]], ghost: { x: 60, y: 54, w: 83, h: 36 } },
+  ],
   draw: ({ i, p, o = 0 }) => (
     <>
       <Screen x={8} y={6} w={144} h={88} header={false}>
@@ -373,7 +388,17 @@ const step = ({ id, title, caption, side, axis }) => {
     viewBox: VIEW,
     initial: { cur: 0, p: 0 },
     landing: { cur: 1, p: 1 },
-    arrows: [axis === 'x' ? [[box.x + box.w - 6, box.y + box.h / 2], [box.x + 8, box.y + box.h / 2]] : [[box.x + box.w / 2, box.y + box.h - 4], [box.x + box.w / 2, box.y + 6]]],
+    // The step you leave and the step you arrive at travel the same way, in two lanes.
+    arrows:
+      axis === 'x'
+        ? [
+            { points: [[box.x + box.w / 2, box.y + box.h * 0.3], [box.x + 6, box.y + box.h * 0.3]] },
+            { points: [[box.x + box.w - 6, box.y + box.h * 0.7], [box.x + box.w / 2, box.y + box.h * 0.7]], ghost: box },
+          ]
+        : [
+            { points: [[box.x + box.w * 0.3, box.y + box.h / 2], [box.x + box.w * 0.3, box.y + 6]] },
+            { points: [[box.x + box.w * 0.7, box.y + box.h - 4], [box.x + box.w * 0.7, box.y + box.h / 2]], ghost: box },
+          ],
     draw: ({ cur, p }) => {
       const off = (t) => (axis === 'x' ? { x: t * along } : { y: t * along });
       return (

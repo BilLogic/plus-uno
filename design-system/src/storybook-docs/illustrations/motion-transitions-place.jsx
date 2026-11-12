@@ -5,6 +5,7 @@ import {
 } from './primitives.jsx';
 import { BEAT } from './motion.jsx';
 import { Clip, Moved, VIEW, mix } from './motion-parts.jsx';
+import { travel } from './trails.js';
 
 /**
  * The Transitions page's figures for Within a place, Above a place and Feedback
@@ -32,6 +33,28 @@ const Base = ({ children, header = true }) => (
 );
 
 const scene = (s) => ({ viewBox: VIEW, arrows: [], ...s });
+
+/**
+ * The rows below something that opens or closes: each moves straight up or down
+ * by `shift`, in its own lane. A row that starts or lands below the body's edge
+ * is out of view there, so its path runs to the frame's edge and it draws no
+ * landing outline.
+ */
+const BODY_BOTTOM = BODY.y + BODY.h;
+const FRAME_BOTTOM = 93;
+const visible = (y) => y >= BODY.y && y + 14 <= BODY_BOTTOM;
+const rowsBelow = (rows, shift) =>
+  rows.map((y, i) => {
+    const lane = 80 + i * 40;
+    const landing = y + shift;
+    return {
+      points: [
+        [lane, visible(y) ? y + 7 : FRAME_BOTTOM],
+        [lane, visible(landing) ? landing + 7 : FRAME_BOTTOM],
+      ],
+      ...(visible(landing) ? { ghost: { x: 60, y: landing, w: 83, h: 14 } } : {}),
+    };
+  });
 
 // ---------- Scroll to a spot on the page ----------
 
@@ -123,7 +146,8 @@ const addRemove = ({ id, title, caption, removing }) =>
     caption,
     initial: removing ? { h: 1, c: 1 } : { h: 0, c: 0 },
     landing: removing ? { h: 0, c: 0 } : { h: 1, c: 1 },
-    arrows: [removing ? [[148, 80], [148, 66]] : [[148, 66], [148, 80]]],
+    // Adding: the two rows below move down to make room; removing, up to close the gap.
+    arrows: removing ? rowsBelow([76, 90], -14) : rowsBelow([62, 76], 14),
     draw: ({ h, c }) => (
       <>
         <Base />
@@ -172,7 +196,11 @@ const reorder = scene({
   caption: 'Each row moves straight to its new place on spatial.default, 20 ms apart. In a grid it moves x then y.',
   initial: { r0: 0, r1: 0, r2: 0 },
   landing: { r0: 1, r1: 1, r2: 1 },
-  arrows: [[[100, 55], [100, 69]], [[146, 83], [146, 55]]],
+  // Each row moves straight to its new place, in its own lane. Rows trade places, so the one that
+  // goes to the top travels against the other two; the lanes keep their paths from crossing.
+  arrows: PERM.map((slot, i) =>
+    travel({ x: 60, y: 48 + slot * ROW_H, w: 83, h: ROW_H }, 0, (i - slot) * ROW_H, { lane: { x: 80 + i * 20 } }),
+  ),
   draw: ({ r0, r1, r2 }) => (
     <>
       <Base />
@@ -216,7 +244,8 @@ const expand = ({ id, title, caption, closing }) =>
     caption,
     initial: closing ? { h: 1, c: 1 } : { h: 0, c: 0 },
     landing: closing ? { h: 0, c: 0 } : { h: 1, c: 1 },
-    arrows: [closing ? [[100, 90], [100, 66]] : [[100, 66], [100, 90]]],
+    // The two rows below travel the height of the detail together, as it opens or closes.
+    arrows: closing ? rowsBelow([62 + DETAIL, 76 + DETAIL], -DETAIL) : rowsBelow([62, 76], DETAIL),
     draw: ({ h, c }) => (
       <>
         <Base />
@@ -260,6 +289,10 @@ const load = ({ id, title, caption, skeleton }) =>
     caption,
     initial: { sk: skeleton ? 1 : 0, sh: 0, hd: 0, r1: 0, r2: 0, r3: 0, pri: 0, ch: 0 },
     landing: { sk: 0, hd: 1, r1: 1, r2: 1, r3: 1, pri: 1, ch: 1 },
+    // With no Skeleton, the three rows are pushed down together when the header arrives.
+    arrows: skeleton
+      ? []
+      : LOAD_ROWS.map((y, i) => travel({ x: 60, y, w: 83, h: 14 }, 0, -12, { lane: { x: 80 + i * 30 } })),
     draw: ({ sk, sh, hd, r1, r2, r3, pri, ch }) => {
       // With no Skeleton to hold the room, the rows sit high until the header arrives and push them down.
       const rise = skeleton ? 0 : 12 * (1 - hd);
@@ -483,7 +516,16 @@ const dockScene = ({ id, title, caption, closing }) =>
     caption,
     initial: closing ? { p: 1, c: 1 } : { p: 0, c: 0 },
     landing: closing ? { p: 0, c: 0 } : { p: 1, c: 1 },
-    arrows: [closing ? [[130, 55], [152, 55]] : [[152, 55], [130, 55]]],
+    // The Panel and the page's edge move the same way: left to dock, right to undock.
+    arrows: closing
+      ? [
+          { points: [[130, 60], [152, 60]] },
+          { points: [[109, 36], [143, 36]], ghost: { x: 60, y: 26, w: 83, h: 64 } },
+        ]
+      : [
+          { points: [[152, 60], [130, 60]], ghost: DOCK_PANEL },
+          { points: [[143, 36], [109, 36]], ghost: { x: 60, y: 26, w: 83 - SIDE, h: 64 } },
+        ],
     draw: ({ p, c }) => (
       <>
         <Base header={false} />
@@ -641,6 +683,8 @@ const errField = ({ id, title, caption, early }) =>
     caption,
     initial: { f1: 0, f2: 0, b: 0, h: 0, m: 0 },
     landing: { f1: 0, f2: 1, b: 1, h: 1, m: 1 },
+    // The message makes room: the second field moves down to land below it.
+    arrows: [travel({ x: 60, y: 64, w: FIELD_W, h: 20 }, 0, -8)],
     draw: ({ f1, f2, b, h, m }) => (
       <>
         <Base header={false} />
@@ -712,6 +756,10 @@ const errPage = ({ id, title, caption, shakes }) =>
     caption,
     initial: shakes ? { b: 0, sx: 0, shook: 0 } : { b: 0, h: 0, m: 0, f1: 0 },
     landing: shakes ? { b: 1, sx: 0, shook: 1 } : { b: 1, h: 1, m: 1, f1: 1 },
+    // The summary makes room: both fields move down together, in two lanes.
+    arrows: shakes
+      ? []
+      : [travel({ x: 60, y: 33, w: 58, h: 20 }, 0, -9, { lane: { x: 80 } }), travel({ x: 60, y: 64, w: 58, h: 20 }, 0, -9, { lane: { x: 105 } })],
     draw: ({ b, sx = 0, h = 0, m = 0, f1 = 0 }) => (
       <Moved x={sx}>
         <Base header={false} />
