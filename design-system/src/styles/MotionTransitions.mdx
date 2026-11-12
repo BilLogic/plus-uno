@@ -1,0 +1,202 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { C, RefTable } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import * as TransitionStories from './MotionTransitions.stories.jsx';
+
+<Meta of={TransitionStories} />
+
+<FoundationHero
+    title="Transitions"
+    summary="Fourteen transitions in four groups, named for what the person sees. Pick one by the relationship between the two screens."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Reading this page">
+
+To tell the Between places transitions apart, look at the Breadcrumb:
+
+- It gets longer or shorter: **Drill into and climb back out**.
+- It stays the same length but your place in an ordered set changes: **Step to the next or previous**.
+- Tabs change: **Switch views**.
+- It is replaced by an unrelated one: **Go to another area**.
+
+In running text, Drill, Step and Go to stand for the full names. Tokens drop the `motion.` prefix (`spatial.fast`); their values are on Physics.
+
+Each transition gives what the move tells the person, when to use it and when not, a PLUS case, what triggers it, and how it moves: one timeline where spatial, appearance and linear rows play together. Per-component motion is in each component's Motion section.
+
+Every demo draws its paths from start to landing first, then plays, and has a speed control. Each Don't is the same scene with one rule broken. Figma holds no motion tokens: a prototype uses Smart Animate with the nearest spring for each token, and splits any move into x then y, because Smart Animate goes diagonal by default.
+
+</FoundationSection>
+
+<FoundationSection title="Between places">
+
+The person ends up somewhere else. Each transition in this group starts from a small tree of screens: where you were, and where you land.
+
+<FoundationSubsection title="Go to another area">
+
+<Canvas of={TransitionStories.TreeGoTo} sourceState="none" />
+
+**Tells the person:** this is a different area; nothing here relates to where you were.
+
+**When:** moving between Sidebar areas, such as Toolkit to Admin.
+
+**Not:** if the new view sits inside the current one, it is Drill.
+
+**Breadcrumb:** replaced.
+
+**PLUS case:** Sidebar from Sessions to Tutors.
+
+**Triggered by:** a Sidebar click, browser back.
+
+<RefTable
+    head={['What', 'Property', 'Token', 'Starts']}
+    rows={[
+        ['Sidebar highlight', 'position', <C>spatial.fast</C>, '0'],
+        ['Old page', 'opacity out', <C>appearance.fast</C>, '0'],
+        ['New page', 'opacity in, in place, all at once', <C>appearance.default</C>, 'After the clean-fade gap'],
+    ]}
+/>
+
+Never a slide, which would suggest the areas sit side by side, and never a cut. The Sidebar itself doesn't move. From the keyboard, a menu opens with no animation.
+
+<Canvas of={TransitionStories.GoTo} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Drill into and climb back out">
+
+<Canvas of={TransitionStories.TreeDrill} sourceState="none" />
+
+**Tells the person:** you went one level deeper, and the way back is the way you came.
+
+**When:** opening one record or item from a list, card or overview, or opening a focused task from the work you're in.
+
+**Not:** a quick look that leaves the page in place is Open an overlay.
+
+**Breadcrumb:** gains a level going in, loses one coming back. A focused task has no Breadcrumb; it still counts as a Drill.
+
+**PLUS case:** a session row in a tutor's record; Log a session from a button.
+
+**Triggered by:** a row or button, the Breadcrumb, browser back.
+
+**Depth 1: the row grows into the record.**
+
+<RefTable
+    head={['What', 'Property', 'Token', 'Starts']}
+    rows={[
+        ['Tapped row', 'grows into the record (position, size, corner radius together)', <C>spatial.default</C>, '0'],
+        ['The row\'s own content', 'opacity out', <C>appearance.fast</C>, '0'],
+        ['List', 'fades out in place; it doesn\'t move, and nothing dims', <C>appearance.fast</C>, '0'],
+        ['Record header, tabs and content', 'opacity in, together, in place', <C>appearance.default</C>, 'About 140 ms, once the container is well on its way'],
+    ]}
+/>
+
+The row is the thing the person chose, so the row becomes the page: its own bars fade as it grows, and the record's content fades in only once the container has shown where it is going. Nothing inside travels; the container is the only mover. People drill many times a day, so the grow runs on `spatial.default`, one speed under its page size: a slower grow repeated all day reads as a delay. Back reverses it one speed faster, on `spatial.fast`, and the list returns at the same scroll position with that row briefly lit.
+
+<Canvas of={TransitionStories.DrillGrow} sourceState="none" />
+
+**Deeper levels: the same rule, because PLUS is shallow.** The row or card the person clicked grows into its page: the session row in a tutor's record grows into the session page, and the Breadcrumb arrives one level longer. This container transform is for shallow hierarchies, and PLUS is at most three levels deep (area, record, one record inside it), so the rule holds at every level we have. A flow that needs a fourth level is a hierarchy to flatten, not a fourth grow. On a desktop with a fixed Sidebar a page never slides in: a slide reads as a drawer.
+
+<Canvas of={TransitionStories.DrillDeeper} sourceState="none" />
+
+Climbing back one level shrinks the page into the row it came from. Jumping back two or more levels, past a page that is no longer on screen, is a fade in place with the Breadcrumb already shorter: there is no row to shrink into.
+
+<Canvas of={TransitionStories.ClimbOut} sourceState="none" />
+
+**Focused task.** Opening a focused task (Log a session) changes the frame itself: the Sidebar leaves and Frame · focused takes the whole window. A change of frame is a clean fade in place, not a grow and not a slide: the page and the Sidebar fade out together on `appearance.fast`, then the task (header with × and the title, step list, form and bottom bar) fades in on `appearance.default`. The trigger doesn't matter: a button, a row's menu item or a link all open the task the same way, because the frame changes, not the thing pressed. Moving between steps is Step: with the steps down the left, the body slides up. Leaving through × or Cancel with unsaved work asks first in a Modal, then reverses one speed faster. Finishing carries on forward to the new record and a Flag confirms.
+
+<Canvas of={TransitionStories.FocusedTask} sourceState="none" />
+
+**Used in:** Record page, Table rows, PatternCard, Breadcrumb, focused tasks.
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Switch views">
+
+<Canvas of={TransitionStories.TreeSwitch} sourceState="none" />
+
+**Tells the person:** the same thing, seen another way.
+
+**When:** page tabs, such as a session's Overview, Notes and Reflection.
+
+**Not:** an ordered set is Step. Pill views, the format switch and the view dropdown are Swap content in place, because they filter the same content rather than switching between peers: a fill glides, and the content swaps.
+
+**Breadcrumb:** unchanged.
+
+**PLUS case:** a session's Overview, Notes and Reflection tabs.
+
+**Triggered by:** the tab bar, arrow keys within it.
+
+<RefTable
+    head={['What', 'Property', 'Token', 'Starts']}
+    rows={[
+        ['Tab indicator', 'position, width', <C>spatial.fast</C>, '0'],
+        ['Both tab bodies', 'slide together toward the chosen tab, as one flat sheet, no fade', <><C>spatial.slow</C> for a page-size body, <C>spatial.default</C> for a panel</>, '0'],
+        ['Tab labels', 'color', <C>appearance.fast</C>, '0'],
+    ]}
+/>
+
+The views are peers in a row, so the bodies move sideways as a group and nothing fades: a fade on the slide would read as going deeper. In Reduced mode the slide becomes an `appearance.fast` fade.
+
+<Canvas of={TransitionStories.SwitchViews} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Step to the next or previous">
+
+<Canvas of={TransitionStories.TreeStep} sourceState="none" />
+
+**Tells the person:** the next one in line, and where you are in the set.
+
+**When:** an ordered set where the Breadcrumb keeps its length: form steps, paging, one week to the next, one student's reflection after another.
+
+**Not:** going deeper is Drill; another area is Go to.
+
+**Breadcrumb:** unchanged; the position label changes ("2 of 4").
+
+**PLUS case:** reflection questions 1 of 4; Schedule, this week to next week.
+
+**Triggered by:** Next and Back, arrow keys, swipe on touch.
+
+**The body moves on the same axis as the step list.** The move must match where the steps sit on screen.
+
+<RefTable
+    head={['Steps sit', 'Body', 'Token']}
+    rows={[
+        ['Across the top (a horizontal ProgressTracker; in Frame · focused, four steps or fewer), paging, Schedule weeks, Carousel', 'Old and new slide together, sideways, no fade (as Switch views)', 'By size; step states change in place on appearance.fast'],
+        ['Down a side (a vertical ProgressTracker; in Frame · focused, five steps or more; reflection questions in a side list)', 'Old and new slide together, vertically, no fade: Next brings the new step up from below, Back brings it down from above', 'By size; step states change in place on appearance.fast'],
+    ]}
+/>
+
+Step states change in place, at the same moment the body starts: the step just left becomes visited and the next becomes current, both on `appearance.fast`, and the steps after it stay unvisited. Nothing travels along the ProgressTracker.
+
+**Where the steps sit** is a Frame · focused rule: four steps or fewer run across the top, five or more go down a left Section side. Two edges keep the motion honest:
+
+- **Placement is set once, when the task opens,** by the longest path the flow can take. A branch that adds a step never moves the ProgressTracker from the top to the side mid-task; that would break the axis the body slides on.
+- **Fit can push top to side, never the reverse.** Four steps whose labels would truncate across the top go down the side instead, where the wider side fits long labels. This too is decided at open. The position label ("2 of 4") swaps on `appearance.fast`. The header, Sidebar and step list never move.
+
+<Canvas of={TransitionStories.Step} sourceState="none" />
+
+**Used in:** Form steps, Table paging, Schedule weeks, Carousel, focused tasks.
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Principles', description: 'What motion is for, with a Do and Don\'t for each principle.', href: '?path=/docs/foundations-motion-principles--docs' },
+        { title: 'Physics', description: 'The springs and the token table every transition reads.', href: '?path=/docs/foundations-motion-physics--docs' },
+    ]}
+/>
+
+</FoundationSection>
