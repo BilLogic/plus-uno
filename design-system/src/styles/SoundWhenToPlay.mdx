@@ -1,0 +1,53 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import { SilentTable, SoundRegistryTable } from '@/storybook-docs/sound-docs.jsx';
+
+<Meta title="Foundations/Sound/When to play" tags={['!dev', 'manifest']} />
+
+<FoundationHero
+    title="When to play"
+    summary="The registry names every moment that plays. Everything else is silent."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Rules">
+
+- **Rare:** frequent actions, field errors and anything once per keystroke, row or field stay silent. Repeats inside a burst play once.
+- **Severity:** Error follows only a person's own submit or a job they started. Most confirmations stay silent; the registry names the ones that play.
+- **Session:** inside a session, only Roster, Goal, Prompt, Sent and Milestone play. Other notices wait until the session ends.
+
+</FoundationSection>
+
+<FoundationSection title="Rows that play">
+
+Each row is a motion registry row with a `sound` cell: the token, when it plays and any condition. The same cell shows in the row's Motion section.
+
+<SoundRegistryTable />
+
+The app decides the conditions, such as whether a session is running. To add a sound, add the cell to the row; `check:sound-registry` fails on a token that does not exist or a row the list below covers.
+
+</FoundationSection>
+
+<FoundationSection title="Always silent">
+
+<SilentTable />
+
+These moments are silent too, and have no registry row of their own: "Revise your response", Goal updated, Copied, strikes, Tutor Coach flags, TIP and PIP, escalations, and any concern while a student can hear.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'With motion', description: 'When in its motion a sound starts.', href: '?path=/docs/foundations-sound-with-motion--docs' },
+    ]}
+/>
+
+</FoundationSection>

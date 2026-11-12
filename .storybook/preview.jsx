@@ -187,6 +187,14 @@ const preview = {
               "Transitions",
               "Library"
             ],
+            "Sound",
+            [
+              "Overview",
+              "Sounds",
+              "When to play",
+              "With motion",
+              "Settings and accessibility"
+            ],
             "Iconography",
             "Illustrations",
             "Logos",

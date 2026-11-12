@@ -1,0 +1,47 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import { SoundSwitch } from '@/storybook-docs/sound-docs.jsx';
+
+<Meta title="Foundations/Sound/Settings and accessibility" tags={['!dev', 'manifest']} />
+
+<FoundationHero
+    title="Settings and accessibility"
+    summary="One switch turns all sound off, and no one misses anything when it is off."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="The switch">
+
+<SoundSwitch />
+
+One setting turns every sound off. It is on by default and kept across visits. Nothing is opt-in, and reduced motion does not mute sound. Sound follows the device's volume.
+
+</FoundationSection>
+
+<FoundationSection title="Pairing">
+
+Every sound has an on-screen change that says the same thing: a Flag, a step checked, a message. Sound is never the only signal, so a person who cannot hear it, or has it off, misses nothing.
+
+</FoundationSection>
+
+<FoundationSection title="The student rule">
+
+A sound a student can hear is good news only. A concern never plays while a student can hear, and a shared moment, such as a goal reached, plays for both.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Accessibility', description: 'Reduced motion and the rules that cut across foundations.', href: '?path=/docs/foundations-accessibility--docs' },
+    ]}
+/>
+
+</FoundationSection>

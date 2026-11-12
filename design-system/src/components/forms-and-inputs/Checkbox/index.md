@@ -14,7 +14,7 @@ Also asked as: multi-select, checklist, tick box.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Checkbox/Checkbox.mdx`
 
-**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+**Motion:** change `appearance.fast` · goal `appearance.fast`, sound `sound.goal`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
@@ -26,9 +26,10 @@ Individual checkboxes have two states, selected and unselected. When checkboxes 
 
 Checkbox reads these motion tokens and no literal duration or curve.
 
-| Event | Transition | Tokens | What it does |
-| --- | --- | --- | --- |
-| change | Update a value or state | `--ds-motion-appearance-fast` | Mark and fill change color. |
+| Event | Transition | Tokens | What it does | Sound |
+| --- | --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Mark and fill change color. |  |
+| goal | Update a value or state | `--ds-motion-appearance-fast` | A session goal set or checked off together: the mark and fill change color, like any change. | `sound.goal` on land: only the session goal check-in done together, shared with the student; other checkboxes stay silent |
 
 ## Best practices
 

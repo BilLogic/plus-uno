@@ -68,7 +68,7 @@ export const MOTION_REGISTRY = [
     tier: 'template',
     events: {
       change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'It changes color on hover and press like a Button. Opening a clickable card is Drill.' },
-      milestone: { transition: 'Opening a page', spatial: 'spatial.default', note: 'The one card in a milestone page entrance is Expressive and leaves by the exit rules.' },
+      milestone: { transition: 'Opening a page', spatial: 'spatial.default', note: 'The one card in a milestone page entrance is Expressive and leaves by the exit rules.', sound: { token: 'done.milestone', when: 'onboarding complete, first session, goal reached, term start or end, badge claimed; goal reached is shared, so the student hears it' } },
     },
   },
   {
@@ -145,7 +145,7 @@ export const MOTION_REGISTRY = [
     tier: 'pattern',
     events: {
       selection: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Ticking a row turns the table\'s head row into the bulk bar: the labels cross-fade, same row, same height, nothing slides. The selected rows take the selected fill and the count fades to each new value. Clearing the rows, or the select-all checkbox, reverses it. The view bar above never moves.' },
-      confirm: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'A destructive action opens a Modal. Confirm fades it and carries on: the row\'s status changes color, and a Flag confirms.' },
+      confirm: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'A destructive action opens a Modal. Confirm fades it and carries on: the row\'s status changes color, and a Flag confirms.', sound: { token: 'done.sent', when: 'only a call-off or lead request sent; other confirms stay silent' } },
       cancel: { transition: 'Open and close an overlay', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Cancel reverses the Modal\'s entrance one speed faster.' },
       undo: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Keep and Undo sit beside the change, tinted, until the person moves on. Undo reverses the Add or remove that made the change.' },
     },
@@ -157,9 +157,10 @@ export const MOTION_REGISTRY = [
       focus: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Border color on appearance.fast. The focus ring never animates.' },
       error: { transition: 'Call attention', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'An error on leaving a field makes room on spatial.fast, then fades in; it fades and the room closes once the field is fixed.' },
       blocked: { transition: 'Call attention', spatial: 'spatial.fast', note: 'A blocked submit shakes the Modal, or the field with its own button, once. Never bigger on repeat; never in Reduced mode.' },
-      failed: { transition: 'Call attention', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'When the system failed, a message makes room at the top of the Modal or form, then fades in. No shake: the person did nothing wrong. A page-level error is a one-line summary that makes room at the top; focus goes to the first error.' },
+      failed: { transition: 'Call attention', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'When the system failed, a message makes room at the top of the Modal or form, then fades in. No shake: the person did nothing wrong. A page-level error is a one-line summary that makes room at the top; focus goes to the first error.', sound: { token: 'error', when: 'the person\'s own submit was rejected (a danger SectionMessage)' } },
       steps: { transition: 'Step to the next or previous', appearance: 'appearance.fast', note: 'Step states change in place.' },
       saving: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The button keeps its width: its label fades out, a Spinner fades in, and the same button confirms when done.' },
+      success: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The same button confirms: its Spinner fades out and the done label fades in, at the same width.', sound: { token: 'commit', when: 'a sign-up is confirmed: one-time, recurring or fill-in' } },
     },
   },
   {
@@ -169,7 +170,6 @@ export const MOTION_REGISTRY = [
       appear: { transition: 'Call attention', appearance: 'appearance.fast', note: 'Once; the message carries the meaning.' },
       field: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A field error makes room on spatial.fast, then fades in on appearance.fast; it reverses once fixed.' },
       blocked: { transition: 'Call attention', spatial: 'spatial.fast', note: 'A blocked submit shakes once, a spring per Physics; never in Reduced mode.' },
-      failed: { transition: 'Call attention', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A system failure makes room at the top, then fades in. No shake.' },
     },
   },
   {
@@ -327,6 +327,7 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Mark and fill change color.' },
+      goal: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'A session goal set or checked off together: the mark and fill change color, like any change.', sound: { token: 'goal', when: 'only the session goal check-in done together, shared with the student; other checkboxes stay silent' } },
     },
   },
   {
@@ -490,11 +491,13 @@ export const MOTION_REGISTRY = [
     name: 'Flag',
     tier: 'component',
     events: {
-      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Slides in from the top-right corner.' },
+      enter: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'Slides in from the top-right corner.', sound: { token: 'notify', at: 'land', when: 'outside a session; any appearance but error, which plays Error (the failed event); Flags that arrive together play once' } },
       exit: { transition: 'Open and close an overlay', spatial: 'spatial.exit', note: 'Timed out: leaves the way it came, toward the top-right corner, on spatial.exit aimed 3.8× past the edge; the stack then closes up.' },
       dismiss: { transition: 'Open and close an overlay', appearance: 'appearance.fast', note: 'Closed by hand: a quick fade in place.' },
       change: { transition: 'Add or remove an item', spatial: 'spatial.default', note: 'The stack closes up when one leaves.' },
-      milestone: { transition: 'Open and close an overlay', spatial: 'spatial.fast', note: 'Finishing a reflection: inside an Expressive container, slides in from the top-right corner with one overshoot; leaves by the exit rules.' },
+      milestone: { transition: 'Open and close an overlay', spatial: 'spatial.fast', note: 'Finishing a reflection: inside an Expressive container, slides in from the top-right corner with one overshoot; leaves by the exit rules.', sound: { token: 'done.step', when: 'a reflection is complete' } },
+      prompt: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'A Flag that asks for action now enters like any Flag.', sound: { token: 'prompt', when: 'session link ready, a lead with an empty tutor, wrap-up, few students at 10 min; an app passes sound="prompt"; plays when the tab is hidden' } },
+      failed: { transition: 'Open and close an overlay', spatial: 'spatial.default', appearance: 'appearance.default', note: 'A danger Flag for a failed background job enters like any Flag and stays until closed.', sound: { token: 'error', when: 'an error Flag, the default for that appearance: a background job the person started failed' } },
     },
   },
   {
@@ -618,6 +621,7 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       change: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'Rows are added, removed and reordered; sort is Reorder, a filter is Swap content. Ticking rows cross-fades the head row into the bulk bar, same height, nothing slides.' },
+      roster: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A student joins or leaves the session roster: the row is added or removed.', sound: { token: 'roster', when: 'in a session; changes within 2 s play once' } },
     },
   },
   {
@@ -662,6 +666,9 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       change: { transition: 'Load content', appearance: 'appearance.fast', note: 'Sources fade in place 20 ms apart, each tied to real work; the answer streams in chunks with no fade.' },
+      ready: { transition: 'Load content', appearance: 'appearance.fast', note: 'Feedback fades in over its Spinner.', sound: { token: 'ai.ready', when: 'the feedback took over 1 s, so a Spinner showed' } },
+      strong: { transition: 'Load content', appearance: 'appearance.fast', note: 'Strong feedback fades in over its Spinner.', sound: { token: 'ai.strong', when: 'the feedback took over 1 s, so a Spinner showed' } },
+      refine: { transition: 'Load content', appearance: 'appearance.fast', note: 'Refine feedback fades in over its Spinner.', sound: { token: 'ai.refine', when: 'the feedback took over 1 s, so a Spinner showed' } },
     },
   },
   {
@@ -698,6 +705,7 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       change: { transition: 'Load content', appearance: 'linear', note: 'Fills with the work, never ahead of it.' },
+      success: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The bar reaches its end and its fill changes to done.', sound: { token: 'done.step', when: 'a module or lesson is done' } },
     },
   },
   {
@@ -705,6 +713,7 @@ export const MOTION_REGISTRY = [
     tier: 'component',
     events: {
       change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'Step states change in place: the step left becomes visited, the next current.' },
+      success: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'The last step changes to done in place.', sound: { token: 'done.step', when: 'a module or lesson is done' } },
     },
   },
   {

@@ -62,10 +62,10 @@ export { ruleTags };
 const TAGS = /\btags(?:=\{\[|:\s*\[)([^\]]*)\]/;
 
 /**
- * The Foundations · Motion pages, as `{file, tags}`. A page names its title and tags in its own
+ * The Foundations · Motion and Foundations · Sound pages, as `{file, tags}`. A page names its title and tags in its own
  * `<Meta>` or, with `<Meta of={Stories}>`, in the stories file it imports.
  */
-function motionPages(root) {
+function foundationPages(root) {
   const out = [];
   for (const file of pagesUnder(root)) {
     const source = fs.readFileSync(path.join(root, file), 'utf8');
@@ -77,22 +77,22 @@ function motionPages(root) {
       holder = fs.readFileSync(abs, 'utf8');
     }
     const title = holder.match(/<Meta\b[^>]*?\btitle=["']([^"']+)["']/)?.[1] ?? holder.match(/\btitle:\s*['"]([^'"]+)['"]/)?.[1];
-    if (title?.startsWith('Foundations/Motion/')) out.push({ file, tags: holder.match(TAGS)?.[1] ?? '' });
+    if (title?.startsWith('Foundations/Motion/') || title?.startsWith('Foundations/Sound/')) out.push({ file, tags: holder.match(TAGS)?.[1] ?? '' });
   }
   return out;
 }
 
 /**
  * Pages the Storybook MCP would not serve: `get-documentation` lists a docs page
- * only when it carries the `manifest` tag, so a template, pattern or Foundations ·
- * Motion page without it is invisible to an agent that asks the endpoint.
+ * only when it carries the `manifest` tag, so a template, pattern, Foundations · Motion
+ * or Foundations · Sound page without it is invisible to an agent that asks the endpoint.
  */
 export function pagesMissingManifestTag(root) {
   const docsOnly = docsAgentPages(root).map((p) => ({
     file: p.file,
     tags: fs.readFileSync(path.join(root, p.file), 'utf8').match(/<Meta\b[^>]*?\btags=\{\[([^\]]*)\]\}/)?.[1] ?? '',
   }));
-  return [...docsOnly, ...motionPages(root)].filter((p) => !/['"]manifest['"]/.test(p.tags)).map((p) => p.file);
+  return [...docsOnly, ...foundationPages(root)].filter((p) => !/['"]manifest['"]/.test(p.tags)).map((p) => p.file);
 }
 
 const label = (kind) => (kind === 'automatic' ? 'Automatic' : 'Review');

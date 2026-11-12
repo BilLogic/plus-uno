@@ -6,6 +6,7 @@ import CloseButton from '@/components/forms-and-inputs/CloseButton';
 import IconButton from '@/components/forms-and-inputs/IconButton/IconButton';
 import { MESSAGE_APPEARANCE_ICONS } from '../messageAppearance';
 import Icon from '../../images-and-icons/Icon';
+import { modeFor, playSound, soundStartFor } from '@/sound';
 import './Flag.scss';
 
 /**
@@ -27,6 +28,20 @@ const FlagGroupContext = createContext(undefined);
 
 /** The five appearances, as the Figma Flag set names them. */
 export const FLAG_APPEARANCES = ['normal', 'information', 'warning', 'error', 'success'];
+
+
+/**
+ * Flag's enter, from its motion registry row: it lands on `spatial.default` and
+ * its sound plays as it lands, so the sound starts at that spring's 90% time
+ * minus its pickup. Under reduced motion the flag fades in on the reduced spring
+ * and the sound still plays, on that landing.
+ */
+function playOnLand(token, reduced) {
+    playSound(token, { at: soundStartFor('spatial.default', token, { mode: modeFor(reduced) }) });
+}
+
+/** The sound a Flag plays by default: an error appearance sounds Error, every other one Notify. */
+const defaultSound = (appearance) => (appearance === 'error' ? 'error' : 'notify');
 
 /** Warning and error are urgent: they interrupt a screen reader and stay until dismissed. */
 const URGENT_APPEARANCES = ['warning', 'error'];
@@ -54,6 +69,7 @@ export const Flag = ({
     headerClass = '',
     bodyClass = '',
     timestamp, // '11 mins ago' etc
+    sound,
     reducedMotion,
     ...props
 }) => {
@@ -156,6 +172,21 @@ export const Flag = ({
         lastTop.current = el.offsetTop;
     });
 
+    /*
+     * Its sound plays once as the flag lands, when it is shown, through the one
+     * sound setting (off plays nothing): Error for an error appearance, Notify
+     * for the rest, or the token the app passes. When a flag should stay quiet,
+     * such as during a session, the app passes `sound={false}`. The effect reads
+     * both through refs, so only `show` re-runs it: a flag's arrival sounds,
+     * never another prop change.
+     */
+    const landing = useRef({});
+    landing.current = { sound: sound ?? defaultSound(flagAppearance), reduced };
+    useEffect(() => {
+        const { sound: token, reduced: isReduced } = landing.current;
+        if (show && token) playOnLand(token, isReduced);
+    }, [show]);
+
     if (!show && !leaving) return null;
 
     return (
@@ -164,6 +195,7 @@ export const Flag = ({
             layout={show && !reduced ? 'position' : false}
             transition={CLOSE_UP}
             id={id}
+            data-reduced={reduced ? 'true' : 'false'}
             data-leaving={!show ? exitKind.current : undefined}
             onAnimationEnd={!show ? () => setLeaving(false) : undefined}
             className={`plus-flag plus-flag--${flagAppearance}${bold ? ' plus-flag--bold' : ''} ${className}`}
@@ -279,6 +311,8 @@ Flag.propTypes = {
     bodyClass: PropTypes.string,
     /** Small text beside the title, such as "11 mins ago". */
     timestamp: PropTypes.node,
+    /** The sound token it plays as it lands, through the app's sound setting, or `false` for none. Unset, an `error` flag plays `error` and every other appearance plays `notify`. Pass `false` when a flag should stay quiet, such as during a session. */
+    sound: PropTypes.oneOfType([PropTypes.string, PropTypes.oneOf([false])]),
     /** Hold reduced motion on or off for this flag. Unset, it follows its FlagGroup, then the person's setting. */
     reducedMotion: PropTypes.bool
 };
