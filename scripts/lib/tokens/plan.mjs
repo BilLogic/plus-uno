@@ -16,24 +16,6 @@
  */
 
 /**
- * Motion: duration and easing roles. First pass — ADS-shaped round numbers,
- * not benchmarked live (architecture ticket, not a family rebuild). Adrija
- * refines the actual curves; this plan only has to give every component one
- * place to read a duration and an easing from, per #1698's user story 7.
- */
-export const MOTION_DURATIONS = {
-  short: '100ms',
-  medium: '200ms',
-  long: '300ms',
-};
-
-export const MOTION_EASINGS = {
-  standard: 'cubic-bezier(0.2, 0, 0, 1)',
-  entrance: 'cubic-bezier(0, 0, 0.2, 1)',
-  exit: 'cubic-bezier(0.4, 0, 1, 1)',
-};
-
-/**
  * Motion springs (ADR-041). Primitives are raw springs, mass 1, named by
  * stiffness with the damping ratio appended as `-r<percent>` only when it is
  * not 1. Components never read a primitive; they read a semantic below. The
@@ -269,7 +251,7 @@ export const TOKEN_LADDER = [
   { tier: 'patterns', group: 'Table', new: '--table-pad-x-footer', old: '--table-pad-x-footer', use: 'Horizontal padding of a PatternTable footer, such as its Pagination row.' },
   { tier: 'patterns', group: 'Table', new: '--table-min-width-title', old: '--table-min-width-title', use: 'Narrowest a PatternTable\'s title column may shrink.' },
 
-  // ─── Patterns / Blanket (renamed from Overlay) ───────────────────────
+  // ─── Patterns / Backdrop (renamed from Overlay) ───────────────────────
   { tier: 'patterns', group: 'Blanket', new: '--blanket-pad-x', old: '--overlay-pad-x', ref: 'var(--space-100)', use: 'Horizontal space between the screen edge and a Modal on its Blanket.' },
   { tier: 'patterns', group: 'Blanket', new: '--blanket-pad-y', old: '--overlay-pad-y', ref: 'var(--space-400)', at: { '(max-height: 639.98px)': 'var(--space-150)' }, use: 'Vertical space between the screen edge and a Modal on its Blanket; shrinks on short screens.' },
   { tier: 'patterns', group: 'Blanket', new: '--blanket-fill', old: '--overlay-scrim', type: 'COLOR', ref: 'rgba(0, 0, 0, 0.38)', note: "the Blanket's own fill color; the old declaration's value, written directly so this file carries no old-language word", use: 'Fill of the Blanket that dims the page behind a Modal.' },
@@ -453,7 +435,7 @@ export const TOKEN_LADDER = [
   { tier: 'layers', group: 'Layer', new: '--layer-dialog', old: '--layout-z-index-dialog', ref: '300', use: 'Stacking order of a non-modal dialog over the page, below popups.' },
   { tier: 'layers', group: 'Layer', new: '--layer-popup', old: '--layout-z-index-popup', ref: '400', use: 'Stacking order of a Popup, DropdownMenu or listbox.' },
   { tier: 'layers', group: 'Layer', new: '--layer-blanket', old: '--layout-z-index-scrim', ref: '500', note: "the Blanket's z-index; the old declaration's value, written directly so this file carries no old-language word", use: 'Stacking order of the Blanket behind a Modal.' },
-  { tier: 'layers', group: 'Layer', new: '--layer-modal', old: '--layout-z-index-modal', ref: '510', use: 'Stacking order of a Modal, above its Blanket.' },
+  { tier: 'layers', group: 'Layer', new: '--layer-modal', old: '--layout-z-index-modal', ref: '510', use: 'Stacking order of a Modal, above its Backdrop.' },
   { tier: 'layers', group: 'Layer', new: '--layer-flag', old: '--layout-z-index-flag', ref: '600', use: 'Stacking order of a Flag, above any Modal.' },
   { tier: 'layers', group: 'Layer', new: '--layer-spotlight', old: '--layout-z-index-spotlight', ref: '700', use: 'Stacking order of a Spotlight, above Flags.' },
   { tier: 'layers', group: 'Layer', new: '--layer-tooltip', old: '--layout-z-index-tooltip', ref: '800', use: 'Stacking order of a Tooltip, above everything else.' },

@@ -1,0 +1,24 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+} from '@/storybook-docs/foundation-page.jsx';
+import MotionLibrary from '@/storybook-docs/motion-library.jsx';
+
+<Meta title="Foundations/Motion/Library" tags={['!dev', 'manifest']} />
+
+<FoundationHero
+    title="Library"
+    summary="Every template's, pattern's and component's enter, exit and change motion in one table, to compare them in one pass."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Every row">
+
+Each row is a template's, pattern's or component's entry in the motion registry, and the same text sits in that page's Motion section. Rows are grouped by tier: templates first, then patterns, then components. A page absent from the table does not move: it is static, or its motion is the Update a value or state change on its own page.
+
+<MotionLibrary />
+
+</FoundationSection>

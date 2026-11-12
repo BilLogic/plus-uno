@@ -65,7 +65,7 @@ Three variants, one component:
 
 All use `<Modal show={bool} onClose={fn} title="…">`. For wider content, set
 `width` to a wider step of `MODAL_WIDTHS` (`6-col` is the default, then `8-col`
-and `10-col`). A press on the Blanket and Escape both close.
+and `10-col`). A press on the Backdrop and Escape both close.
 
 ## Empty states
 

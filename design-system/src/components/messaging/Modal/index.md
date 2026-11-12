@@ -2,7 +2,7 @@
 
 # Modal
 
-Universal modal component for creating dialog windows that overlay the main content. It is a real dialog on Base UI's `Dialog`, placed in `Blanket`: opening it moves focus inside and keeps it there, the page behind is hidden from assistive tech and stops scrolling, Escape and a press on the blanket close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`) alongside `PatternDrawer`: at most two stack, a third stays closed and calls `onClose`. A follow-up about the dialog itself — "discard these edits?" — is best shown in place: the caller swaps `title`, `body` and the footer buttons, driven by its own state. A confirm raised as a second Modal is allowed too; it is the most that stacks.
+Universal modal component for creating dialog windows that overlay the main content. It is a real dialog on Base UI's `Dialog`, placed in `Backdrop`: opening it moves focus inside and keeps it there, the page behind is hidden from assistive tech and stops scrolling, Escape and a press on the backdrop close it, and closing returns focus to what had it. It takes a stack slot from the shared overlay module (`@/lib/overlay`) alongside `PatternDrawer`: at most two stack, a third stays closed and calls `onClose`. A follow-up about the dialog itself — "discard these edits?" — is best shown in place: the caller swaps `title`, `body` and the footer buttons, driven by its own state. A confirm raised as a second Modal is allowed too; it is the most that stacks.
 
 Also asked as: confirm, confirmation dialog, destructive confirm, popup window, modal dialog.
 
@@ -10,9 +10,11 @@ Also asked as: confirm, confirmation dialog, destructive confirm, popup window, 
 
 **Source:** `design-system/src/components/messaging/Modal/Modal.jsx`
 
-**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, TwoOverlayLimit, BlockingShadow, SelectKeepsOverlayShadow, Rest, Hovered, Pressed, Focused
+**Stories:** `design-system/src/components/messaging/Modal/Modal.stories.jsx` — Width6Col, Width8Col, Width10Col, HeightHug, HeightFill, HeaderOptions, WithoutCloseButton, Loading, Content, Layout, Interactive, Overview, ConfirmView, ConfirmViewEscape, ModalOverModalRefused, BlockingShadow, SelectKeepsOverlayShadow, Rest, Hovered, Pressed, Focused
 
 **Storybook page:** `design-system/src/components/messaging/Modal/Modal.mdx`
+
+**Motion:** enter `spatial.default` + `appearance.default` · exit `spatial.fast` + `appearance.fast` · rejected `spatial.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
 
 ## Usage
 
@@ -38,12 +40,22 @@ many columns of the screen grid plus the modal pad.
 | 10-col | A table or an editor. | 629 · 843 · 1056 |
 
 The Modal draws `--ds-surface-overlay` with `--ds-shadow-blocking`, in every
-type and width: it is the one surface that sits on a Blanket, so it lifts higher
+type and width: it is the one surface that sits on a Backdrop, so it lifts higher
 than a menu. A `Select` list opened inside it keeps `--ds-shadow-overlay`.
 
 The width grows with the screen, never shrinks, and ignores the Sidebar. The
-height hugs its content up to the cap the Blanket sets
+height hugs its content up to the cap the Backdrop sets
 (`--blanket-max-height-modal`); `height="fill"` sits at that cap.
+
+## Motion
+
+Modal reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | Scales from 96% while it fades in; the Backdrop dims on the same fade. |
+| exit | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Scales to 98% while it fades. |
+| rejected | Call attention | `--ds-motion-spatial-fast` | A blocked submit shakes it once; never in reduced motion. |
 
 ## Alternatives
 
@@ -86,13 +98,12 @@ Don't: Dividers around a short body.
 `primaryButton`, `secondaryButton` or `footer` is given; describe the actions as
 objects and the component renders the Button pair.
 
-### Show a follow-up decision in the same Modal, or stack its confirm as a second Modal. {#show-a-follow-up-decision-in-the-same-modal-or-stack-its-confirm-as-a-second-modal}
+### Show a follow-up decision in the same Modal; a Modal never opens on another Modal. {#show-a-follow-up-decision-in-the-same-modal-a-modal-never-opens-on-another-modal}
 
 The confirm view swaps the same Modal's title, body and footer, and Back returns
-to the form with what was typed. A confirm raised as a second Modal stacks over
-the first: at most `MAX_STACKED_OVERLAYS` (2) overlays
-stack, a `PatternDrawer` counted among them, and one more stays closed and calls
-its `onClose`.
+to the form with what was typed. A Modal raised from an open Modal stays closed
+and calls its `onClose`; a confirm Modal may open over a Panel, a Popup or a
+focused task, each with its own Backdrop.
 
 ```jsx
 <Modal
@@ -108,7 +119,7 @@ its `onClose`.
 
 ## Accessibility
 
-- **Escape and a press on the Blanket close the Modal by default.** `keyboard`
+- **Escape and a press on the Backdrop close the Modal by default.** `keyboard`
   and `backdrop` both default to `true`. Turning either off leaves the close
   button as the exit, so keep that button. The header, and its close button, is
   left out only when the Modal has no `title`, no `description`, no
@@ -127,27 +138,27 @@ its `onClose`.
 - **Opening traps focus inside the dialog and closing returns it to the
   trigger.** Tab cycles within the dialog; a view change (the confirm view
   swapping in) moves focus into the dialog again.
-- **Turn off the Blanket click for an inline confirmation of a destructive
+- **Turn off the Backdrop click for an inline confirmation of a destructive
   action.** Set `backdrop="static"` (or `false`) while the confirmation shows,
   so a stray click outside cannot destroy something by accident; Close, Escape
   or the footer's Back still work.
 - **Focus order is Close, then the content, then the secondary action, then
   the primary action.**
 - **`renderAs="inline"` is for docs previews only.** It draws the panel with no
-  Blanket, no focus trap and no Escape, so a live dialog keeps the default
+  Backdrop, no focus trap and no Escape, so a live dialog keeps the default
   `renderAs="modal"`.
 
 ## Related
 
 - `PatternModal`: use when a docs page or a mockup draws the Modal shell inline, with no focus trap.
-- `Blanket`: use when a new blocking layer needs the dimmed screen under it; `Modal` brings its own.
+- `Backdrop`: use when a new blocking layer needs the dimmed screen under it; `Modal` brings its own.
 - Templates: use when choosing between a Modal and a focused page; its Usage section weighs the two.
 
 Same group: `Banner` · `EmptyState` · `Flag` · `InlineMessage` · `SectionMessage` · `Spotlight`
 
 ## Parts
 
-1. **Blanket.** Dims the page and holds focus inside.
+1. **Backdrop.** Dims the page and holds focus inside.
 2. **Header.** Title, optional description, header actions and the close button.
 3. **Body.** Text or any content; scrolls when it overflows.
 4. **Footer.** Appears only when a button or `footer` is given: a secondary and a primary.
@@ -192,12 +203,12 @@ touched in the Agent view tab.
 | `dividers` | bool | `false` | A rule under the header and over the footer. |
 | `loading` | bool | `false` | Skeleton bars in place of the body while its content loads. |
 | `show` | bool | `false` | Whether the dialog is open. Controlled by the parent: set it to false in `onClose` to close. |
-| `backdrop` | enum | `true` | `true` (default): a click on the blanket closes. `static`: the blanket shows but refuses to close on a click. `false`: no close on a click. |
+| `backdrop` | enum | `true` | `true` (default): a click on the backdrop closes. `static`: the backdrop shows but refuses to close on a click. `false`: no close on a click. |
 | `keyboard` | bool | `true` | Escape closes, by default. `false` for a dialog that has to be answered. |
 | `renderAs` | enum | `'modal'` | `modal` (default) opens as a real dialog over the page; `inline` draws the same panel in place as a plain block, for docs previews. |
 | `primaryButton` | buttonShape | — | The confirming footer button, drawn on the right. Takes `text` (default "Confirm"), `onClick`, `appearance` (default `primary`), `spacing` and `icon`. |
 | `secondaryButton` | buttonShape | — | The cancelling footer button, drawn left of the primary one. Takes `text` (default "Cancel"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. |
-| `onClose` | func | — | Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `backdrop` blocks it). The parent sets `show` to false. |
+| `onClose` | func | — | Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the backdrop (unless `backdrop` blocks it). The parent sets `show` to false. |
 | `width` | enum or number or string | `'6-col'` | `6-col` · `8-col` · `10-col`: 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with the screen, never shrinks, ignores the sidebar. A number or a length is a fixed width, kept for the callers that still pass one. |
 | `className` | string | `''` | Extra class names added to the dialog panel beside the component's own. |
 | `style` | object | — | Inline styles for the dialog panel. A fixed `width` is applied after them. |
@@ -215,7 +226,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--blanket-max-height-modal` · `--body-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-subtle` · `--ds-shadow-blocking` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--heading-medium` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--motion-duration-short` · `--motion-easing-standard` · `--radius-md` · `--stack-md` · `--stack-sm` · `--stroke-1`
+`--blanket-max-height-modal` · `--body-default` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-border` · `--ds-border-focused` · `--ds-icon` · `--ds-icon-subtle` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-shadow-blocking` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-subtle` · `--focus-ring-width` · `--heading-medium` · `--icon-md` · `--inline-sm` · `--item-height-md` · `--modal-inline-sm` · `--modal-pad-x-default` · `--modal-radius` · `--modal-stack-md` · `--radius-md` · `--stack-md` · `--stack-sm` · `--stroke-1`
 
 From `design-system/src/components/messaging/Modal/Modal.scss`. Override these through the token layer, never with a literal.
 

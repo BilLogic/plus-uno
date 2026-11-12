@@ -2,7 +2,6 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as FlagStories from './Flag.stories.jsx';
-import MotionSection from '@/storybook-docs/motion-section.jsx';
 import { Flag } from '@/components';
 import {
     ComponentExample,
@@ -11,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -90,8 +90,6 @@ reply. It appears over the page and goes away on its own or when dismissed.
 <div className="sb-ds-doc-section">
 
 ## Motion
-
-<ComponentExample of={FlagStories.LandsWithNotify} title="Lands with Notify" description={<>It slides in from the top-right corner while it fades in, and Notify sounds as it lands. The app's one sound setting turns the sound off.</>} />
 
 <MotionSection component="Flag" />
 

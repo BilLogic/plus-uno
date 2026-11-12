@@ -5,7 +5,7 @@ import Button from '@/components/forms-and-inputs/Button';
 import Skeleton from '@/components/loading/Skeleton';
 import { HeadingLevelContext } from '@/lib/headingLevel';
 import { useOverlaySlot, reportFocusLost } from '@/lib/overlay';
-import Blanket from '@/patterns/Blanket';
+import Backdrop from '@/patterns/Backdrop';
 import Icon from '../../images-and-icons/Icon';
 
 /** Safe CSS length / custom-property patterns for Modal width. */
@@ -81,9 +81,9 @@ function useOverflows(el, loading) {
  * Modal component for PLUS design system.
  * Universal modal component for creating dialog windows that overlay the main content.
  *
- * It is a real dialog on Base UI's `Dialog`, placed in `Blanket`: opening it
+ * It is a real dialog on Base UI's `Dialog`, placed in `Backdrop`: opening it
  * moves focus inside and keeps it there, the page behind is hidden from
- * assistive tech and stops scrolling, Escape and a press on the blanket close
+ * assistive tech and stops scrolling, Escape and a press on the backdrop close
  * it, and closing returns focus to what had it. It takes a stack slot from the
  * shared overlay module (`@/lib/overlay`) alongside `PatternDrawer`: at most
  * two stack, a third stays closed and calls `onClose`.
@@ -132,7 +132,7 @@ const Modal = ({
     const descriptionId = useId();
     const [bodyEl, setBodyEl] = useState(null);
 
-    const [placed, trigger] = useOverlaySlot(show && renderAs === 'modal', onClose);
+    const [placed, trigger] = useOverlaySlot(show && renderAs === 'modal', onClose, 'modal');
     const visible = renderAs === 'inline' ? show : show && placed;
 
     const hasFooter = showBottomButtons && Boolean(footer || primaryButton || secondaryButton);
@@ -140,16 +140,16 @@ const Modal = ({
     const overflows = useOverflows(bodyEl, loading);
 
     // Base UI asks before it closes: Escape and a press outside the popup
-    // (the blanket) arrive here with their reason, and `keyboard` and
+    // (the backdrop) arrive here with their reason, and `keyboard` and
     // `backdrop` decide whether the owner hears them. Staying open is the
     // owner's state not changing, since `open` is controlled. `static` keeps
-    // the blanket but refuses to close on a press there, for a dialog over an
+    // the backdrop but refuses to close on a press there, for a dialog over an
     // in-flight operation a stray click should not abandon.
-    const blanketCloses = backdrop !== false && backdrop !== 'static';
+    const backdropCloses = backdrop !== false && backdrop !== 'static';
     const handleOpenChange = (nextOpen, details) => {
         if (nextOpen || !onClose) return;
         if (details?.reason === 'escape-key' && !keyboard) return;
-        if (details?.reason === 'outside-press' && !blanketCloses) return;
+        if (details?.reason === 'outside-press' && !backdropCloses) return;
         onClose(details?.event);
     };
 
@@ -295,13 +295,13 @@ const Modal = ({
 
     if (!isModal) return panel;
 
-    // The popup is placed in `Blanket`, which draws the fill and the pad, so a
-    // press on the blanket is a press outside the popup: Base UI's own
+    // The popup is placed in `Backdrop`, which draws the fill and the pad, so a
+    // press on the backdrop is a press outside the popup: Base UI's own
     // outside-press dismissal, held back by `backdrop`.
     return (
         <Dialog.Root open={visible} onOpenChange={handleOpenChange}>
             <Dialog.Portal>
-                <Blanket>{panel}</Blanket>
+                <Backdrop>{panel}</Backdrop>
             </Dialog.Portal>
         </Dialog.Root>
     );
@@ -343,7 +343,7 @@ Modal.propTypes = {
     loading: PropTypes.bool,
     /** Whether the dialog is open. Controlled by the parent: set it to false in `onClose` to close. */
     show: PropTypes.bool,
-    /** `true` (default): a click on the blanket closes. `static`: the blanket shows but refuses to close on a click. `false`: no close on a click. */
+    /** `true` (default): a click on the backdrop closes. `static`: the backdrop shows but refuses to close on a click. `false`: no close on a click. */
     backdrop: PropTypes.oneOf([true, false, 'static']),
     /** Escape closes, by default. `false` for a dialog that has to be answered. */
     keyboard: PropTypes.bool,
@@ -353,7 +353,7 @@ Modal.propTypes = {
     primaryButton: buttonShape,
     /** The cancelling footer button, drawn left of the primary one. Takes `text` (default "Cancel"), `onClick`, `appearance` (default `default`), `spacing` and `icon`. */
     secondaryButton: buttonShape,
-    /** Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the blanket (unless `backdrop` blocks it). The parent sets `show` to false. */
+    /** Called when the dialog asks to close: the close button, Escape (unless `keyboard` is false) or a press on the backdrop (unless `backdrop` blocks it). The parent sets `show` to false. */
     onClose: PropTypes.func,
     /**
      * `6-col` · `8-col` · `10-col`: 6 · 8 · 10 columns of the screen grid plus the modal pad. Grows with

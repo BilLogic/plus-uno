@@ -20,7 +20,7 @@ Grab a template, fill the slots, and open a pattern when you are lost or want to
 
 Behavior splits out into a component, and a template that only redraws one component stays a component. One component's behavior goes on the component page. How pieces sit in one template goes on that template's page. Anything that holds across two or more templates is a pattern.
 
-A rule lives in one place. A template page that needs a pattern's rule links to it and keeps its own words for the slots.
+The step up from a quick look to its own page is on the Templates overview. A rule lives in one place. A template page that needs a pattern's rule links to it and keeps its own words for the slots.
 
 ## Frame, Screen, Flow
 

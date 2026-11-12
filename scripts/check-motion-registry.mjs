@@ -17,6 +17,9 @@
  *   - Each event's `spatial` and `appearance` (each optional, at least one
  *     required) is a semantic token from `MOTION_SEMANTICS` in the plan, or
  *     `linear`. `transition`, `note` and `sound` are not read here.
+ *   - Every Patterns page (a Storybook title under `Patterns/`, the Overview
+ *     excluded) has a `tier: 'pattern'` row named by its page. No allow-list:
+ *     a new Patterns page arrives with its row.
  *   - A `tier: 'component'` row for a component the index does not list fails;
  *     `pattern` and `template` rows skip that rule; an unknown tier fails.
  *
@@ -47,6 +50,9 @@ export const INDEX = 'design-system/agent-views/components/index.md';
 export const STATIC = new Set([
   'AiIcon', 'Code', 'CodeBlock', 'DateTag', 'Fieldset', 'Heading', 'Icon', 'Illustration', 'Image',
   'Logo', 'Object', 'VisuallyHidden',
+  // The motion docs' "No motion" list (05-components.md): they never move.
+  'Avatar', 'AvatarGroup', 'ButtonGroup', 'ChangeTag', 'Comment', 'CountTag', 'EmptyState',
+  'RichTextEditor', 'ScrollBar', 'SmartTag', 'StatusTag', 'Tag', 'TagGroup', 'Tile',
 ]);
 
 const TIERS = ['component', 'pattern', 'template'];
@@ -61,6 +67,30 @@ export function interactiveComponents(index) {
   return [...section.matchAll(/^- \[([A-Za-z0-9]+)\]\(/gm)].map((m) => m[1]).filter((n) => !STATIC.has(n));
 }
 
+const PATTERNS_DIR = 'design-system/src/storybook-docs/patterns';
+const NOT_PAGES = new Set(['Overview']);
+
+/** Patterns pages by Storybook title (`Patterns/<Group>/<Page>[/...]`), the Overview excluded. */
+export function patternPages(repoRoot = REPO_ROOT) {
+  const names = new Set();
+  const walk = (dir) => {
+    for (const e of fs.readdirSync(dir, { withFileTypes: true })) {
+      const full = path.join(dir, e.name);
+      if (e.isDirectory()) walk(full);
+      else if (/\.(mdx|stories\.jsx?)$/.test(e.name)) {
+        for (const m of fs.readFileSync(full, 'utf8').matchAll(/title[:=]\s*['"]Patterns\/([^'"]+)['"]/g)) {
+          const parts = m[1].split('/');
+          const page = parts.length > 1 ? parts[1] : parts[0];
+          if (!NOT_PAGES.has(page)) names.add(page);
+        }
+      }
+    }
+  };
+  const root = path.join(repoRoot, PATTERNS_DIR);
+  if (fs.existsSync(root)) walk(root);
+  return [...names].sort();
+}
+
 const ratchetFor = (repoRoot) => openRatchet({ file: BASELINE, repoRoot });
 const asRecord = (names) => Object.fromEntries([...names].sort().map((n) => [n, 1]));
 const unregistered = (components, registry) => {
@@ -71,11 +101,11 @@ const unregistered = (components, registry) => {
 const readIndex = (repoRoot) => fs.readFileSync(path.join(repoRoot, INDEX), 'utf8');
 
 export const REMEDY =
-  '  -> add the component\'s row to scripts/lib/tokens/motion-registry.mjs, naming semantic tokens from plan.mjs.\n' +
+  '  -> add the component\'s (or Patterns page\'s, tier: \'pattern\') row to scripts/lib/tokens/motion-registry.mjs, naming semantic tokens from plan.mjs.\n' +
   '     The allow-list only shrinks: `npm run check:motion-registry -- --update` after a row lands; never edit it by hand.';
 
 /** @returns {import('./lib/findings.mjs').Finding[]} */
-export function run({ repoRoot = REPO_ROOT, index, registry = MOTION_REGISTRY } = {}) {
+export function run({ repoRoot = REPO_ROOT, index, registry = MOTION_REGISTRY, patterns = patternPages(repoRoot) } = {}) {
   const components = interactiveComponents(index ?? readIndex(repoRoot));
   const findings = [];
   const valid = validTokens();
@@ -95,6 +125,12 @@ export function run({ repoRoot = REPO_ROOT, index, registry = MOTION_REGISTRY } 
           findings.push({ message: `motion registry row "${row.name}" event "${event}" ${key} names "${spec[key]}", which is not a motion token (${[...valid].join(', ')})` });
         }
       }
+    }
+  }
+  const patternRows = new Set(registry.filter((r) => r.tier === 'pattern').map((r) => r.name));
+  for (const page of patterns) {
+    if (!patternRows.has(page)) {
+      findings.push({ message: `Patterns page "${page}" has no tier: 'pattern' row in the motion registry` });
     }
   }
   const missing = unregistered(components, registry);

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import { Button, Modal, PanelBody, PanelContainer, PanelHeader, Popup, Select, Tooltip } from '@/components';
-import { Blanket, PatternCard, PatternSection, PatternTable } from '@/patterns';
+import { Backdrop, PatternCard, PatternSection, PatternTable } from '@/patterns';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
 import { Do, Dont, DoDont, C } from '@/storybook-docs/foundation-blocks.jsx';
 import {
@@ -233,7 +233,7 @@ const expectOverlay = async (canvasElement, selector) => {
     await waitFor(() => expect(canvasElement.querySelector(selector)).not.toBeNull());
     const box = canvasElement.querySelector(selector);
     await waitFor(() => expect(getComputedStyle(box).boxShadow).not.toBe('none'));
-    await expect(canvasElement.querySelector('.plus-frame__blanket'), 'no Backdrop under it').toBeNull();
+    await expect(canvasElement.querySelector('.plus-frame__backdrop'), 'no Backdrop under it').toBeNull();
 };
 
 /** The real Sidebar peeked from the left edge: it floats over the page with no Backdrop. */
@@ -251,7 +251,7 @@ export const FloatingSidebar = {
 /** The Modal on its Backdrop. */
 export const ModalOnBackdrop = {
     render: () => (
-        <Blanket inline screenWidth={768} screenHeight={420}>
+        <Backdrop inline screenWidth={768} screenHeight={420}>
             <Modal
                 show
                 renderAs="inline"
@@ -262,7 +262,7 @@ export const ModalOnBackdrop = {
                 secondaryButton={{ text: 'Cancel', onClick: () => {} }}
                 onClose={() => {}}
             />
-        </Blanket>
+        </Backdrop>
     ),
     play: async ({ canvasElement }) => {
         const modal = canvasElement.querySelector('.plus-modal');
@@ -463,9 +463,9 @@ export const AlwaysPair = () => (
 export const BlockingOnBackdrop = () => (
     <DoDont>
         <Do caption="The Modal on the Backdrop takes the blocking shadow.">
-            <Blanket inline screenWidth={360} screenHeight={220}>
+            <Backdrop inline screenWidth={360} screenHeight={220}>
                 <Modal show renderAs="inline" width={280} title="Move session" body="To 4:30 PM?" primaryButton={{ text: 'Move', onClick: () => {} }} onClose={() => {}} />
-            </Blanket>
+            </Backdrop>
         </Do>
         <Dont caption="A Panel with the blocking shadow and no Backdrop. If it needs full attention, make it a Modal.">
             <div style={ground}>

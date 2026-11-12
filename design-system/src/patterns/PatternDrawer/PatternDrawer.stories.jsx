@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import PatternDrawer, { DRAWER_PLACEMENTS } from '@/patterns/PatternDrawer';
-import { BLANKET_WIDTHS } from '@/patterns/Blanket';
+import { BACKDROP_WIDTHS } from '@/patterns/Backdrop';
 import { Button, Modal } from '@/components';
 import { inEveryColorModeOf } from '@/storybook-docs/lib/color-modes.js';
 import { probe, tokenLength } from '@/storybook-docs/lib/style-probes.js';
@@ -56,7 +56,7 @@ const Inline = (props) => (
 const dialogs = (canvasElement) => within(canvasElement).getAllByRole('dialog');
 
 export default {
-    title: 'Templates/Panel/Panel',
+    title: 'Templates/Panel/Edge layer',
     component: PatternDrawer,
     tags: ['!dev', '!autodocs'],
     argTypes: {
@@ -78,7 +78,7 @@ export default {
         },
         width: {
             control: 'inline-radio',
-            options: BLANKET_WIDTHS,
+            options: BACKDROP_WIDTHS,
             table: { category: 'Design' },
         },
         placement: {
@@ -91,11 +91,11 @@ export default {
     },
 };
 
-/** A sm drawer at the end edge of the 1024 screen: the blanket, no pad, the drawer full height. */
+/** A sm drawer at the end edge of the 1024 screen: the backdrop, no pad, the drawer full height. */
 export const Overview = {
     render: () => <Inline>{details}</Inline>,
     play: async ({ canvasElement }) => {
-        const overlay = canvasElement.querySelector('.plus-pattern-blanket');
+        const overlay = canvasElement.querySelector('.plus-pattern-backdrop');
         const [drawer] = dialogs(canvasElement);
         const style = getComputedStyle(drawer);
         await expect(style.paddingTop, 'Drawer/pad').toBe(`${tokenLength(canvasElement, '--drawer-pad')}px`);
@@ -110,7 +110,7 @@ export const Overview = {
         const title = getComputedStyle(within(drawer).getByRole('heading', { level: 1 }));
         await expect(title.font, 'Heading/medium').toBe(probe(canvasElement, 'font', 'var(--heading-medium)'));
         await inEveryColorModeOf(canvasElement, async (mode, token) => {
-            await expect(getComputedStyle(overlay).backgroundColor, `blanket fill (${mode})`).toBe(token('--ds-blanket'));
+            await expect(getComputedStyle(overlay).backgroundColor, `backdrop fill (${mode})`).toBe(token('--ds-blanket'));
             await expect(getComputedStyle(drawer).backgroundColor, `surface overlay (${mode})`).toBe(token('--ds-surface-overlay'));
             await expect(getComputedStyle(drawer).boxShadow, `shadow overlay (${mode})`).toBe(probe(canvasElement, 'boxShadow', 'var(--ds-shadow-overlay)'));
             await expect(getComputedStyle(drawer.querySelector('.plus-pattern-drawer-description')).color, `description is subtle (${mode})`).toBe(token('--ds-text-subtle'));
@@ -122,14 +122,14 @@ export const Overview = {
 export const Widths = {
     render: () => (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--section-stack-md)' }}>
-            {BLANKET_WIDTHS.map((width) => (
+            {BACKDROP_WIDTHS.map((width) => (
                 <Inline key={width} title={`width="${width}"`} width={width} screenHeight={320}>{details}</Inline>
             ))}
         </div>
     ),
     play: async ({ canvasElement }) => {
         const drawers = dialogs(canvasElement);
-        for (const [i, width] of BLANKET_WIDTHS.entries()) {
+        for (const [i, width] of BACKDROP_WIDTHS.entries()) {
             await expect(drawers[i].getBoundingClientRect().width, `width ${width} at 1024`).toBeCloseTo(WIDTHS_AT_1024[width], 0);
         }
     },
@@ -145,7 +145,7 @@ export const Placements = {
         </div>
     ),
     play: async ({ canvasElement }) => {
-        const overlays = canvasElement.querySelectorAll('.plus-pattern-blanket');
+        const overlays = canvasElement.querySelectorAll('.plus-pattern-backdrop');
         const [end, start] = dialogs(canvasElement);
         await expect(end.getBoundingClientRect().right, 'end meets the right edge').toBeCloseTo(overlays[0].getBoundingClientRect().right, 0);
         await expect(start.getBoundingClientRect().left, 'start meets the left edge').toBeCloseTo(overlays[1].getBoundingClientRect().left, 0);
@@ -217,7 +217,7 @@ const WithTrigger = (args) => {
 
 /**
  * Keyboard and focus: opening moves focus to the first control, Tab and
- * Shift+Tab cycle inside, Escape and the blanket close it, and focus returns to
+ * Shift+Tab cycle inside, Escape and the backdrop close it, and focus returns to
  * the button that opened it.
  */
 export const KeyboardAndFocus = {
@@ -254,7 +254,7 @@ export const KeyboardAndFocus = {
         const box = overlay.getBoundingClientRect();
         await userEvent.click(overlay, { clientX: box.left + 8, clientY: box.top + 8 });
         await waitFor(() => expect(canvas.queryByRole('dialog')).not.toBeInTheDocument());
-        await expect(opener, 'a blanket click returns focus too').toHaveFocus();
+        await expect(opener, 'a backdrop click returns focus too').toHaveFocus();
     },
 };
 

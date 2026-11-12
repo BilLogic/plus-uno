@@ -27,7 +27,7 @@ less than a `Modal`, and unlike a modal it does not take the page.
 title. `triggerType` is `click` (the default), `hover`, `focus`, an array of
 those, or `manual` for a popup you drive with `show`.
 
-It is the Popups pattern's Popup: one surface padded 16, with the title in
+It is the Popup template's layer: one surface padded 16, with the title in
 heading.xsmall over the body, and no arrow. `width` is `auto` (the default),
 which hugs its content between 160 and 320 and is never narrower than the
 trigger, or a column step, `3-col` or `4-col`, for a menu of several

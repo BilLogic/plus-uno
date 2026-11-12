@@ -1,0 +1,293 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
+
+import * as FormStories from './Form.stories.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    EditInModal,
+    EditInPanel,
+    OneColumn,
+    TwoColumns,
+} from '@/storybook-docs/illustrations/form.jsx';
+
+<Meta title="Templates/Form" tags={['!dev', 'manifest']} />
+
+<Title>Form</Title>
+A stack of fields with a footer, in one of four places: in a page, in a Panel, in a Modal, or in steps. There is no Form component; Fieldset groups the fields.
+
+<DocsTabs of={FormStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Types
+
+The place sets the footer. The fields are the same everywhere.
+
+<TypeGrid>
+<TypeCard of={FormStories.TypePage} title="In a page">Settings and anything saved as a group. Buttons left-aligned under the fields, Primary first.</TypeCard>
+<TypeCard of={FormStories.TypePanel} title="In a Panel">Editing a record beside the page. A full-bleed footer, only while editing.</TypeCard>
+<TypeCard of={FormStories.TypeModal} title="In a Modal">Fewer than five fields. A full-bleed footer, Primary furthest right.</TypeCard>
+<TypeCard of={FormStories.TypeSteps} title="In steps">Frame · focused with the form in the body. The bar carries Cancel, Back and Next.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Anatomy
+
+### In a page
+
+Settings saved as a group, in a Section with the subtle fill.
+
+<Story of={FormStories.AnatomyPage} inline />
+
+1. **Message slot.** At the top, for a server failure.
+2. **Group.** One Fieldset per group of fields that describe one thing, with its legend.
+3. **Field.** Label, control, help text, and the error under it when there is one. Required fields are marked.
+4. **Footer.** Left-aligned, `--space-300` below the last field, Primary first. Cancel is Subtle.
+
+### In a Panel
+
+The Details Panel with the form open. The footer shows only while editing.
+
+<Story of={FormStories.AnatomyPanel} inline />
+
+1. **Header.** The record's name and its fixed actions.
+2. **Body.** The fields, with `--space-200` of pad from every edge.
+3. **Footer.** Cancel (Default) and Save (Primary), full bleed, half each.
+
+### In a Modal
+
+A short form at 8-col: the Modal's header, the fields in its body, its full-bleed footer.
+
+<Story of={FormStories.AnatomyModal} inline />
+
+1. **Header.** The title and Close.
+2. **Body.** The fields, scrolling past the cap.
+3. **Footer.** Cancel (Default) and the action (Primary), full bleed.
+
+### In steps
+
+A stepped form on its own page is Frame · focused with the form in the body. Back keeps what was typed.
+
+<Story of={FormStories.AnatomySteps} inline />
+
+1. **Steps.** The rail at the start, with done, current and later steps; four or fewer run across the top.
+2. **Body.** One group per step, at reading width.
+3. **Bar.** Cancel (Subtle) at the start; Back and Next at the end. On the last step Next takes the outcome's name.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key states
+
+Each state shows how the form behaves in its host. Every field's own states live with the field.
+
+<ComponentExample of={FormStories.KeyFieldError} title="Field error on blur" description="The field takes its error look and the message says how to fix it. It clears once the rule is met." />
+
+<ComponentExample of={FormStories.KeyDisabledReason} title="Disabled with its reason" description="A field waits on another on the same screen; the caption says what to do first. Save stays enabled and says what is missing when pressed: Patterns, Disabled." />
+
+<ComponentExample of={FormStories.KeyBlockedSubmit} title="Blocked submit" description="The Modal stays open and marks the field with what to fix. Focus moves to the first bad field and the footer never moves. The Modal's single shake is Planned." />
+
+<ComponentExample of={FormStories.KeyServerSaysNo} title="The server says no" description="A danger SectionMessage at the top of the form, plus the field errors the server sent back. Nothing shakes: Patterns, Errors." />
+
+<ComponentExample of={FormStories.KeySending} title="Sending" description="The only time a button disables: it swaps its label for a spinner in place and keeps its width. Cancel stays live." />
+
+<ComponentExample of={FormStories.KeyLeaving} title="Leaving with edits" description="Close or Cancel with unsaved work asks first, in the same Modal's confirm view. Back returns without losing anything typed." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sizes
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Value</th><th>Purpose</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--space-300</code></td><td>48</td><td>The height of a full-bleed footer, and of the focused bar: the 32 button plus 16 of pad. It is also the gap from the last field to a page form's footer.</td></tr>
+<tr><td><code>--panel-width-default</code></td><td>400</td><td>The Panel a form opens in.</td></tr>
+<tr><td><code>--space-200</code></td><td>24</td><td>The Panel body's pad from every edge, and the stack between groups.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Form" tier="template" />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="code">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Slots
+
+```jsx
+import { Fieldset, TextField, Select, DatePicker, Button, SectionMessage } from '@/components';
+```
+
+A Form is a composition: the fields in a Fieldset, inside a Page, a Panel, a Modal or a focused Frame. Its footer is the container's.
+
+<DocsTable>
+<thead>
+<tr><th>Slot</th><th>Holds</th></tr>
+</thead>
+<tbody>
+<tr><td><code>message</code></td><td>A <code>SectionMessage</code> at the top for a server failure, scrolled into view and announced; a warning one when a disabled prerequisite blocks the main action.</td></tr>
+<tr><td><code>groups</code></td><td>One <code>Fieldset</code> per group of fields that describe one thing.</td></tr>
+<tr><td><code>footer</code></td><td>The container's: left-aligned on a page; full bleed in a Modal, a Panel or a card; Cancel, Back and Next in a step flow.</td></tr>
+<tr><td>Modal and Panel <code>footer</code>, full bleed <PlannedTag /></td><td>Planned. A footer that fills its cells edge to edge at <code>--space-300</code>, with the inner corners squared. Today the page composes it from two Buttons.</td></tr>
+<tr><td>Blocked-submit shake <PlannedTag /></td><td>Planned. The Modal's single shake when a submit is blocked. Today the Modal stays open and marks the field.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use a Form wherever a person enters or changes values that are saved together. The place sets the footer: in a page the buttons sit left under the fields; in a Panel, a Modal or a card they go full bleed; in steps the bar carries Cancel, Back and Next. A stepped form on its own page is Frame · focused with the form in the body.
+
+Pick the host from the task:
+
+<DocsTable>
+<thead>
+<tr><th>The form…</th><th>Host</th><th>Buttons</th></tr>
+</thead>
+<tbody>
+<tr><td>is saved as a group on its own page: settings, a profile</td><td>In a page</td><td>Left-aligned under the fields, Primary first, Cancel Subtle</td></tr>
+<tr><td>is a short edit of a row, with the page still in view</td><td>In a Panel · Details</td><td>Cancel and Save full bleed at the bottom</td></tr>
+<tr><td>is rare and critical, with fewer than five fields</td><td>In a Modal, 8-col</td><td>Cancel (Default) and the action, full bleed</td></tr>
+<tr><td>is long, or has sections someone works through</td><td>In steps on Frame · focused</td><td>Cancel, Back and Next in the bar</td></tr>
+</tbody>
+</DocsTable>
+
+When to validate, what a blocked submit does, required and optional marks, and leaving with edits are the <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a> pattern; where the buttons sit is the <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a> pattern. This page shows how a form sits in each container.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a single value changed in place, use `InlineEdit`.
+- For a yes-or-no that applies at once, use `Toggle`.
+- For a confirm with no fields, use `Modal` · Active at 4-col.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+The rules for a form live in the pattern pages. This page keeps only how a form sits in each container.
+
+- Where the buttons sit and in which look, full bleed and 48 high, and the footer that stays put: <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs#left-align-buttons-under-a-page-form-and-right-align-them-in-a-modal-a-focused-task-or-steps">Common actions</a>.
+- When to validate, the enabled submit, a blocked submit and a rejected one, bound inputs and leaving with edits: <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>.
+- The sending button: Patterns, Loading.
+- A field that waits on another, and where its reason goes: Patterns, Disabled.
+
+### Keep a short edit beside the page.
+
+<RuleTag kind="review" />
+
+Editing a row opens a Panel so the person keeps the page in view. A Modal is for a rare, critical task with fewer than five fields.
+
+<DoDontPair
+    doExample={<EditInPanel />}
+    doCaption="A short edit in a Panel, the rows still in view."
+    dontExample={<EditInModal />}
+    dontCaption="The same short edit in a Modal that covers the rows."
+/>
+
+### Keep a form to one column.
+
+<RuleTag kind="review" />
+
+Pair two fields side by side only when they belong together, such as first and last name, or date and time. Anything else reads down one column.
+
+<DoDontPair
+    doExample={<OneColumn />}
+    doCaption="One column, so the eye moves straight down."
+    dontExample={<TwoColumns />}
+    dontCaption="Unrelated fields scattered across two columns."
+/>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Title a Modal or Panel form for what it does: "Log a session".</td><td>A generic title such as "Form".</td></tr>
+<tr><td>Name a legend with two or three words: "Session".</td><td>A sentence for a legend.</td></tr>
+<tr><td>Name the footer's action for the outcome: "Save session".</td><td>"Submit" or "OK".</td></tr>
+<tr><td>Say what to fix: "Enter the student's name."</td><td>"Invalid input".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- Group related fields in a `Fieldset`, so a screen reader announces the legend with each field.
+- A Modal form's title is the dialog's one h1. Focus goes to the first field when it opens.
+- A server message is announced when it appears. A field's error is tied to its field, and focus moves to the first field that needs fixing.
+- A sending button keeps its name while its label is replaced by a spinner, and Cancel stays reachable.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/templates-frame-frame--docs">Frame</a>: use for a stepped form on its own page, in the focused type.
+- <a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>: use for the region a page form sits in.
+- <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>: use for a rare, critical task with few fields.
+- <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>: use for a short edit with the page still in view.
+- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use for the rules across forms: <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>, <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a>, Loading, Disabled, Errors.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

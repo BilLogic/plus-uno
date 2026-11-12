@@ -13,6 +13,9 @@ import './Flag.scss';
  */
 export const FLAG_AUTO_CLOSE_MS = 8000;
 
+/** Longest an exiting flag stays mounted if `animationend` never fires. */
+const FLAG_EXIT_FALLBACK_MS = 800;
+
 /** The five appearances, as the Figma Flag set names them. */
 export const FLAG_APPEARANCES = ['normal', 'information', 'warning', 'error', 'success'];
 
@@ -93,11 +96,43 @@ export const Flag = ({
         onDismissRef.current = onDismiss;
     }, [onDismiss]);
 
+    // How the flag is leaving: 'timeout' flies out the way it came, 'hand' fades in place.
+    const exitKind = useRef('timeout');
+    const dismissByHand = (event) => {
+        exitKind.current = 'hand';
+        onDismiss?.(event);
+    };
+
     useEffect(() => {
         if (!show || !closesItself || !(delay > 0)) return undefined;
-        const timer = setTimeout(() => onDismissRef.current?.(), delay);
+        const timer = setTimeout(() => {
+            exitKind.current = 'timeout';
+            onDismissRef.current?.();
+        }, delay);
         return () => clearTimeout(timer);
     }, [show, closesItself, delay]);
+
+    /*
+     * Leaving. A flag that was showing keeps its place until its exit animation ends, then
+     * unmounts, in every motion setting. Timed out, it flies toward the top-right on
+     * `spatial.exit`; closed by hand, it fades in place on `appearance.fast`. Under reduced
+     * motion the tokens and Flag.scss turn both into that fade. The timer backs up `animationend`.
+     */
+    const [leaving, setLeaving] = useState(false);
+    const wasShown = useRef(show);
+    useEffect(() => {
+        if (show) {
+            wasShown.current = true;
+            exitKind.current = 'timeout';
+            setLeaving(false);
+            return undefined;
+        }
+        if (!wasShown.current) return undefined;
+        wasShown.current = false;
+        setLeaving(true);
+        const timer = setTimeout(() => setLeaving(false), FLAG_EXIT_FALLBACK_MS);
+        return () => clearTimeout(timer);
+    }, [show]);
 
     /*
      * Notify plays once as the flag lands, when it is shown, through the one
@@ -110,11 +145,13 @@ export const Flag = ({
         // Only `show` re-runs it: a flag's arrival sounds, never another prop change.
     }, [show]);
 
-    if (!show) return null;
+    if (!show && !leaving) return null;
 
     return (
         <div
             id={id}
+            data-leaving={!show ? exitKind.current : undefined}
+            onAnimationEnd={!show ? () => setLeaving(false) : undefined}
             className={`plus-flag plus-flag--${flagAppearance}${bold ? ' plus-flag--bold' : ''} ${className}`}
             role={liveRole}
             aria-live={livePoliteness}
@@ -183,7 +220,7 @@ export const Flag = ({
                     )}
                     {/* The shared CloseButton, default tone on the flag's surface, or
                         inverse on a bold one. A message is dismissed, not closed. */}
-                    {dismissible && <CloseButton label="Dismiss flag" spacing="compact" tone={bold ? 'inverse' : 'default'} onClick={onDismiss} />}
+                    {dismissible && <CloseButton label="Dismiss flag" spacing="compact" tone={bold ? 'inverse' : 'default'} onClick={dismissByHand} />}
                 </div>
             )}
         </div>

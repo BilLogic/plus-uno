@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -66,6 +67,14 @@ A file upload lets a person choose a file from their device.
 <ComponentExample of={FileUploadStories.ReadOnly} title="Read-only" description="Shows the field and the files already chosen, with no button to choose another." />
 
 <ComponentExample of={FileUploadStories.Disabled} title="Disabled" description="The input and the button cannot be used. Avoid it where a message would explain why." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="FileUpload" />
 
 </div>
 

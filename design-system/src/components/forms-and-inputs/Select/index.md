@@ -14,6 +14,8 @@ Also asked as: combobox, picklist, option list, async select.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/Select/Select.mdx`
 
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Select` for a list of six or more options, where typing to filter
@@ -36,6 +38,15 @@ options belong in view as a `RadioGroup` (one pick) or a Checkbox group
 Typing is on because most lists are long enough to need it. A menu that
 holds a few choices, applied as you pick, has nothing to search: pass
 `isSearchable={false}` so the field stays a plain trigger and Space opens it.
+
+## Motion
+
+Select reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. The exit is the fade. |
 
 ## Best practices
 

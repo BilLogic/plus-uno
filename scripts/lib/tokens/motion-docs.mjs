@@ -11,11 +11,20 @@
  */
 
 import { MOTION_REGISTRY } from './motion-registry.mjs';
+import { MOTION_SEMANTICS } from './plan.mjs';
 
-/** The registry row named `name`, or null. */
-export function motionRowOf(name, registry = MOTION_REGISTRY) {
-  return registry.find((r) => r.name === name) ?? null;
+/**
+ * The registry row named `name`, or null. A template page and a component can
+ * share a name (Panel, Popup, Modal), so `tier` picks one; without it the
+ * component's row wins, then any row of that name.
+ */
+export function motionRowOf(name, registry = MOTION_REGISTRY, tier = null) {
+  if (tier) return registry.find((r) => r.name === name && r.tier === tier) ?? null;
+  return registry.find((r) => r.name === name && r.tier === 'component') ?? registry.find((r) => r.name === name) ?? null;
 }
+
+/** The order the Library groups rows in: the page-level moves first, then what they hold. */
+export const MOTION_TIERS = ['template', 'pattern', 'component'];
 
 /** The CSS custom property a semantic token name is read through: `spatial.fast` → `--ds-motion-spatial-fast`. */
 export function motionVarOf(token) {
@@ -51,3 +60,41 @@ export function motionSectionOf(row) {
   }
   return `${d}\n`;
 }
+
+
+/**
+ * Every registry row as plain data for the Motion · Library index, grouped by
+ * tier (`MOTION_TIERS`) and sorted by name within a tier: `{ name, tier, events }`.
+ * A token a row names that the plan does not declare throws, so the index can
+ * never show a custom property nothing sets; so does a tier outside the three.
+ */
+export function motionLibraryOf(registry = MOTION_REGISTRY) {
+  const valid = new Set([...MOTION_SEMANTICS.map((s) => s.name), 'linear']);
+  for (const row of registry) {
+    if (!MOTION_TIERS.includes(row.tier)) throw new Error(`motion registry row "${row.name}" has tier "${row.tier}", which is not one of ${MOTION_TIERS.join(', ')}`);
+  }
+  const rank = (row) => MOTION_TIERS.indexOf(row.tier);
+  return [...registry]
+    .sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name))
+    .map((row) => {
+      const events = motionEventsOf(row);
+      for (const e of events) {
+        for (const t of e.tokens) {
+          if (!valid.has(t)) throw new Error(`motion registry row "${row.name}" event "${e.event}" names "${t}", which is not a motion token`);
+        }
+      }
+      return { name: row.name, tier: row.tier, events };
+    });
+}
+
+/** The Library as one Markdown table: one line per event, grouped by row, for the agent file. */
+export function motionLibraryTableOf(registry = MOTION_REGISTRY) {
+  let d = `| Name | Tier | Event | Transition | Tokens |\n| --- | --- | --- | --- | --- |\n`;
+  for (const r of motionLibraryOf(registry)) {
+    for (const e of r.events) {
+      d += `| ${r.name} | ${r.tier} | ${e.event} | ${e.transition} | ${e.tokens.map((t) => code(motionVarOf(t))).join(' · ')} |\n`;
+    }
+  }
+  return d;
+}
+

@@ -14,11 +14,26 @@ Also asked as: page section, toolbar, section header, block, region.
 
 **Storybook page:** `design-system/src/patterns/PatternSection/PatternSection.mdx`
 
+**Motion:** view-bar `spatial.fast` + `appearance.fast` · side-open `spatial.default` · side-close `spatial.default` · detail `spatial.default` + `appearance.default` · body `spatial.fast` + `appearance.fast` · footer `spatial.default`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `PatternSection` when content has a heading, shares actions, shows or hides as a unit, or takes its own span of the grid; otherwise the content belongs to the Section above it. The header is the Section's, not the Table's: the title row names it, and the view bar under it holds the views at the start and everything that acts on the content at the end, so switching views can swap a table for cards while the bar stays put.
 
 A Section has two looks, `none` and `subtle`, and five parts: header, body, side, detail and footer. The side and the detail take either fill. Below 960 a side or a detail takes over the body, with a way back.
+
+## Motion
+
+PatternSection reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| view-bar | Swap content in place | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Title row: nothing moves. The selected pill's fill and the format switch's indicator glide while the content swaps in place. Search and the Filter count grow to the left. |
+| side-open | Expand and collapse | `--ds-motion-spatial-default` | The side opens and collapses as a section. Below 960 it hides with no animation. |
+| side-close | Expand and collapse | `--ds-motion-spatial-default` | Collapses back the same way. Below 960 the side is gone in the same frame, with no animation. |
+| detail | Open and close an overlay | `--ds-motion-spatial-default` · `--ds-motion-appearance-default` | A quick look is an overlay; promoted to its record page it grows from the Panel itself. |
+| body | Load content | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Content loads on arrival; add or remove, reorder and swap content as it changes. |
+| footer | Step to the next or previous | `--ds-motion-spatial-default` | Paging is Step. |
 
 ## Alternatives
 
@@ -125,9 +140,10 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 - Panel: use when the record should float over the Page instead of sitting beside the list.
 - Popup: use when choosing the menu the view Select or the Filter icon opens.
 - Table: use when the body is rows and columns.
-- Patterns: use when picking a filter tier (Filtering), the search field's behavior (Search) or an empty body (Empty).
+- Filtering: use when picking a filter tier for the view bar.
+- Patterns: use when the question is the search field's behavior (Search) or an empty body (Empty).
 
-Same group: `AiChat` · `Blanket` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSidebar` · `PatternTable`
+Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSidebar` · `PatternTable`
 
 ## Types
 
@@ -144,7 +160,7 @@ Common starting types of the one Section, not new components. Each is a header t
 
 ## Header types
 
-A starting set, picked by what the Section holds. Every control state lives on its component: Icon button, Filter button and Tabs. How the search field behaves and which filters the bar takes are the Search and Filtering patterns, listed in Patterns.
+A starting set, picked by what the Section holds. Every control state lives on its component: Icon button, Filter button and Tabs. Which filters the bar takes is Filtering; how the search field behaves is the Search pattern, listed in Patterns.
 
 - **Title.** A title and a description, nothing to act on. Most Sections that hold cards or a form.
 - **Title and actions.** Section actions in the title row, only when there is no view bar. One Primary and two others at most.
@@ -274,7 +290,7 @@ Implemented as `SectionSearch`.
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-input` · `--ds-border-input` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--field-width-md` · `--grid-gutter` · `--heading-large` · `--heading-large-tracking` · `--heading-medium` · `--heading-small` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--item-height-md` · `--motion-duration-medium` · `--motion-easing-standard` · `--radius-h32` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--width-3000`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-input` · `--ds-border-input` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-surface-sunken` · `--ds-text` · `--ds-text-subtle` · `--field-width-md` · `--grid-gutter` · `--heading-large` · `--heading-large-tracking` · `--heading-medium` · `--heading-small` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--item-height-md` · `--radius-h32` · `--section-min-width-main` · `--section-min-width-side` · `--section-pad-x-default` · `--section-pad-y-default` · `--section-radius` · `--section-stack-lg` · `--section-stack-md` · `--section-stack-sm` · `--size-300` · `--stack-sm` · `--width-3000`
 
 From `design-system/src/patterns/PatternSection/PatternSection.scss`. Override these through the token layer, never with a literal.
 

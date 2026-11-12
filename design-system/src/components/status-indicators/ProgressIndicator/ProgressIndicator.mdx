@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={ProgressIndicatorStories} />
 
@@ -72,6 +73,14 @@ A row of dots showing where you are along the steps of a journey. Unlike
 <ComponentExample of={ProgressIndicatorStories.Focused} title="Focused" description="Tab reaches each dot and draws the 2px ring." />
 
 <ComponentExample of={ProgressIndicatorStories.Decorative} title="Disabled" description={<>No disabled state. Without <code>onSelect</code> the dots are not buttons and Tab skips them.</>} />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="ProgressIndicator" />
 
 </div>
 

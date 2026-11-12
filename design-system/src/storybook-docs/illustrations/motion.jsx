@@ -5,7 +5,7 @@ import { useReducedMotion } from 'motion/react';
 import { Button, IconButton } from '@/components';
 
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
-import { measureSpring, springStep } from '../../../../scripts/lib/tokens/spring.mjs';
+import { measureSpring, springStep } from '@/tokens/spring.js';
 import { Illustration } from './Illustration.jsx';
 import { Trail, TapRing } from './primitives-motion.jsx';
 
@@ -66,6 +66,16 @@ const LOOP = springFor('loop');
 export const LOOP_PERIOD = (2 * Math.PI) / Math.sqrt(LOOP.stiffness / (LOOP.mass ?? 1));
 export const BEAT = LOOP_PERIOD / 2;
 
+/**
+ * Where a release would come to rest: the hand's speed carries it a further
+ * velocity ÷ 1000 × 0.998 ÷ 0.002 px. Positions and velocities here are in the
+ * kit's units (1 unit = 2 px).
+ */
+export const projectedRest = (position, velocity) => position + (((velocity * 2) / 1000) * 0.998) / 0.002 / 2;
+
+/** Resistance past a limit: the square root of the extra distance, × 4 px, in kit units. */
+export const resisted = (extra) => (Math.sqrt(Math.max(0, extra) * 2) * 4) / 2;
+
 const round = (v) => (typeof v === 'number' ? Math.round(v * 100) / 100 : v);
 const roundState = (state) => Object.fromEntries(Object.entries(state).map(([k, v]) => [k, round(v)]));
 
@@ -97,9 +107,96 @@ function createContext({ scene, getState, setState, track, instant, isLive }) {
     /** Move one state key to a value on a spring token (or a config). */
     spring: (key, to, token, { mode, velocity } = {}) =>
       springTo(key, to, typeof token === 'string' ? springFor(token, mode) : token, velocity ? { velocity } : {}),
-    /** Follow time one to one: `linear`, over a number of beats. */
-    linear: (key, to, beats) =>
-      run(getState()[key], to, { duration: beats * BEAT, ease: 'linear', onUpdate: (v) => set({ [key]: v }) }),
+    /**
+     * Follow time one to one: `linear`, over a number of beats. `derive(value)`
+     * returns more state that follows the same value, such as a panel under a hand.
+     */
+    linear: (key, to, beats, { derive } = {}) =>
+      run(getState()[key], to, {
+        duration: beats * BEAT,
+        ease: 'linear',
+        onUpdate: (v) => set({ [key]: v, ...derive?.(v) }),
+      }),
+    /**
+     * Start a spring that something can interrupt. `halt()` stops it where it is
+     * and returns that value and the speed it had, to hand to the next spring.
+     */
+    begin: (key, to, token, { mode, velocity } = {}) => {
+      if (instant) {
+        set({ [key]: to });
+        return { done: Promise.resolve(), halt: () => ({ value: to, velocity: 0 }) };
+      }
+      const config = typeof token === 'string' ? springFor(token, mode) : token;
+      let last = { v: getState()[key], t: 0 };
+      let speed = 0;
+      let controls;
+      const done = new Promise((resolve) => {
+        controls = track(
+          animate(getState()[key], to, {
+            ...config,
+            ...(velocity ? { velocity } : {}),
+            onUpdate: (v) => {
+              const t = controls?.time ?? 0;
+              if (t > last.t) speed = (v - last.v) / (t - last.t);
+              last = { v, t };
+              set({ [key]: v });
+            },
+          }),
+        );
+        controls.then(resolve, resolve);
+        controls.__resolve = resolve;
+      });
+      return {
+        done,
+        halt: () => {
+          controls.stop();
+          controls.__resolve();
+          return { value: last.v, velocity: speed };
+        },
+      };
+    },
+    /**
+     * Something carried: `keys` (x, y) chase the target keys on a spring token
+     * for a number of beats, the way a dragged thing follows the pointer. The
+     * farthest it falls behind is kept in `lag`, then it lands on the target.
+     */
+    chase: ([kx, ky], [tx, ty], token, beats, lag = 'lag') => {
+      const snap = () => set({ [kx]: getState()[tx], [ky]: getState()[ty] });
+      if (instant) {
+        snap();
+        return Promise.resolve();
+      }
+      const { stiffness, damping, mass = 1 } = springFor(token);
+      const v = { x: 0, y: 0 };
+      let prev = 0;
+      let peak = 0;
+      return run(0, 1, {
+        duration: beats * BEAT,
+        ease: 'linear',
+        onUpdate: (p) => {
+          const dt = (p - prev) * beats * BEAT;
+          prev = p;
+          const s = getState();
+          const pos = { x: s[kx], y: s[ky] };
+          const goal = { x: s[tx], y: s[ty] };
+          const n = 8;
+          const h = dt / n;
+          for (let i = 0; i < n; i++) {
+            for (const a of ['x', 'y']) {
+              v[a] += ((-stiffness * (pos[a] - goal[a]) - damping * v[a]) / mass) * h;
+              pos[a] += v[a] * h;
+            }
+          }
+          peak = Math.max(peak, Math.hypot(pos.x - goal.x, pos.y - goal.y));
+          set({ [kx]: pos.x, [ky]: pos.y, [lag]: peak });
+        },
+      }).then(snap);
+    },
+    /** Wait a number of milliseconds, for rules stated in milliseconds (a stagger, a gap between fades). */
+    after: (ms) => (instant || ms <= 0 ? Promise.resolve() : run(0, 1, { duration: ms / 1000, ease: 'linear' })),
+    /** A clock: `key` counts up to `ms` over `ms` milliseconds, for a sequence strip's playhead. */
+    clock: (key, ms) =>
+      run(getState()[key], ms, { duration: ms / 1000, ease: 'linear', onUpdate: (v) => set({ [key]: v }) }),
     /** Wait a number of beats. */
     hold: (beats) => (instant ? Promise.resolve() : run(0, 1, { duration: beats * BEAT, ease: 'linear' })),
     /**
@@ -177,8 +274,8 @@ function createContext({ scene, getState, setState, track, instant, isLive }) {
 }
 
 /** Pause or play every running animation of a demo, and keep new ones at its speed. */
-function useTracker() {
-  const ref = useRef({ speed: 1, paused: false, controls: new Set() });
+function useTracker(initialSpeed = 1) {
+  const ref = useRef({ speed: initialSpeed, paused: false, controls: new Set() });
   const track = useCallback((controls) => {
     const g = ref.current;
     controls.speed = g.speed;
@@ -255,8 +352,10 @@ const startStates = (scenes, extra) =>
  * A group of scenes that play together and share one speed control. Phases,
  * on `data-phase`: `arrows` (paths drawn over the dimmed start), `playing`,
  * `settled` (holding at the landing), and `still` under reduced motion.
+ * `fastForward` starts every animation at that multiple of 1×, so a test
+ * waits for a pass in a fraction of the time; the control still reads 1×.
  */
-export const MotionDemo = ({ title, scenes, reduced: forcedReduced }) => {
+export const MotionDemo = ({ title, scenes, reduced: forcedReduced, fastForward = 1 }) => {
   const prefersReduced = useReducedMotion();
   const reduced = forcedReduced ?? Boolean(prefersReduced);
   const [states, setStates] = useState(() => startStates(scenes));
@@ -266,7 +365,7 @@ export const MotionDemo = ({ title, scenes, reduced: forcedReduced }) => {
   const [paused, setPausedState] = useState(false);
   const [replay, setReplay] = useState(0);
   const statesRef = useRef(states);
-  const { track, setSpeed, setPaused, stopAll } = useTracker();
+  const { track, setSpeed, setPaused, stopAll } = useTracker(fastForward);
   const titleId = useId();
 
   useEffect(() => {

@@ -117,15 +117,15 @@ The full-height area at the left of the **Frame**, holding navigation. From 1024
 _Avoid_: "left nav", "side nav"
 
 **Panel**:
-The full-height area at the right of the **Frame**, holding AI chat first. It is app-level, 320 to 640 wide (400 by default), and **docked** beside the **Page** or opens as an **overlay** on a **Blanket** when there is no room. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
+The full-height area at the right of the **Frame**, holding AI chat first. It is app-level, 320 to 640 wide (400 by default), and **docked** beside the **Page** or opens as an **overlay** on a **Backdrop** when there is no room. The Panel parts (`PanelContainer` and its header, body and footer) fill it.
 _Avoid_: "right sidebar", "side panel", "inspector", "Card" for the area
 
 **Docked / overlay**:
-The two states of the **Sidebar** and the **Panel**. Docked sits beside the **Page** and moves it; overlay opens over the **Page**, and an overlay **Panel** has a **Blanket**.
+The two states of the **Sidebar** and the **Panel**. Docked sits beside the **Page** and moves it; overlay opens over the **Page**, and an overlay **Panel** has a **Backdrop**.
 _Avoid_: "inline", "pinned", "floating" as a state
 
 **Peek**:
-A collapsed **Sidebar**, or a closed **Panel** whose `panelPeek` option is on, shown over the **Page** while a pointer rests on its toggle or edge. It has no **Blanket**, does not move the **Page**, and closes on an outside click or Escape.
+A collapsed **Sidebar**, or a closed **Panel** whose `panelPeek` option is on, shown over the **Page** while a pointer rests on its toggle or edge. It has no **Backdrop**, does not move the **Page**, and closes on an outside click or Escape.
 _Avoid_: "flyout" as our word, "hover menu"
 
 **Splitter**:
@@ -144,7 +144,7 @@ _Avoid_: "block" as a name, "region" as a name; "section" for a **Figma section*
 The pattern for the container of one object, raised at rest with no border. Related cards group in a **Section**, one card level deep.
 _Avoid_: "tile" (Tile is its own component), "panel" (Panel is the Frame's right area)
 
-**Blanket**:
+**Backdrop**:
 The pattern for the layer that dims what sits behind it: full screen for a **Modal** or **Drawer**, which it also holds and sizes; under an **overlay** **Panel** it covers the **Page** and **Sidebar**.
 _Avoid_: "overlay" for the pattern (the word is a **Panel** and **Sidebar** state), "scrim"
 
@@ -153,11 +153,11 @@ The component and pattern for content that takes over the screen until it is clo
 _Avoid_: "Modal dialog", "ModalDialog", "popup" for a blocking dialog
 
 **Drawer**:
-A PLUS pattern: a panel docked to one edge of the screen on a **Blanket**, for work that leaves the **Page** visible behind it.
+A PLUS pattern: a panel docked to one edge of the screen on a **Backdrop**, for work that leaves the **Page** visible behind it.
 _Avoid_: "side panel", "slide-over"
 
 **Popover**:
-The pattern for any layer that floats above the page with no **Blanket**: **Dropdown menu**, **Popup**, Flag and Tooltip. It names the pattern only.
+The pattern for any layer that floats above the page with no **Backdrop**: **Dropdown menu**, **Popup**, Flag and Tooltip. It names the pattern only.
 _Avoid_: "popover" for the **Popup** component, "floating layer", "popover family"
 
 **Part**:
@@ -303,7 +303,7 @@ _Avoid_: "input wrapper", "form group"
 
 **Overlay module**:
 The shared layer code for everything that floats: the portal, the z-index scale and the stacking rules.
-_Avoid_: "overlay" for the **Blanket**
+_Avoid_: "overlay" for the **Backdrop**
 
 **State mixin**:
 The one shared source of hover, pressed, selected and focus styling, reading **Named state token**s.
@@ -364,6 +364,73 @@ _Avoid_: "state layer", "08/12/16"
 **Elevation**:
 The surface and shadow pair that lifts a layer: `--ds-surface-*` with its shadow. The only place the word "surface" belongs.
 _Avoid_: "surface" for a layout box
+
+### Design system: motion
+
+**Productive**:
+The default motion mode: springs at damping ratio 1 everywhere, so nothing overshoots. Controls, fields and anything done dozens of times a day stay Productive.
+_Avoid_: "Standard" motion, "normal" motion
+
+**Expressive**:
+The motion mode one container opts into with `data-motion="expressive"`, for the end of something worth finishing: a completed reflection or a milestone. Only the spatial tokens change, with a small overshoot; page transitions and data marks stay **Productive**.
+_Avoid_: "Playful" motion, "bouncy" for the mode
+
+**Go to**:
+The transition between unrelated areas, such as Toolkit to Admin: nothing on the new Page relates to where the person was.
+_Avoid_: "navigate" for any move
+
+**Drill in**:
+The transition that makes the Breadcrumb longer: a list item or card grows into its detail.
+_Avoid_: "open" for a deeper level
+
+**Climb out**:
+The transition that makes the Breadcrumb shorter: the detail returns to the place it came from, the reverse of **Drill in**.
+_Avoid_: "go back", "close"
+
+<!-- retired-names-ok: the Switch transition is a motion name; the retired Switch component is Toggle -->
+**Switch**:
+The transition between Tabs or views of one place, with the Breadcrumb unchanged.
+_Avoid_: "toggle" for a view change
+
+**Step**:
+The transition to the next or previous item of an ordered set, such as a ProgressTracker step; the Breadcrumb keeps its length.
+_Avoid_: "next page" for the transition
+
+**Swap**:
+The transition that replaces content in place, with the container unchanged.
+_Avoid_: "crossfade" for any replacement
+
+**Add or remove**:
+The transition for one item entering or leaving a collection, with its neighbors making or closing the gap.
+_Avoid_: "insert", "delete" for the motion
+
+**Reorder**:
+The transition for items changing position, by drag or keyboard: the carried item follows the hand and its neighbors move aside.
+_Avoid_: "sort animation"
+
+**Expand**:
+The transition that opens and closes content in place, such as an accordion panel or a row's detail.
+_Avoid_: "collapse" as a separate transition
+
+**Load**:
+The transition for content that arrives after a wait: a placeholder, then the content.
+_Avoid_: "spinner" for the transition
+
+**Open**:
+The transition of an overlay appearing and leaving: Popup, Modal, Drawer or Flag.
+_Avoid_: "show", "hide" for the motion
+
+**Dock**:
+The transition of a Panel attaching to or detaching from the **Frame**.
+_Avoid_: "slide in" for a Panel
+
+**Update**:
+The transition that marks a value or state changing in place, such as a count, a ChangeTag or a validation state.
+_Avoid_: "flash"
+
+**Call attention**:
+The transition that draws the eye to something the person did not ask for: a shake for an error, a pulse for new content.
+_Avoid_: "alert animation"
 
 ### Design work
 

@@ -1,0 +1,105 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import { C } from '@/storybook-docs/foundation-blocks.jsx';
+import {
+    FoundationHero,
+    FoundationContents,
+    FoundationSection,
+    FoundationSubsection,
+    FoundationRelated,
+} from '@/storybook-docs/foundation-page.jsx';
+import * as PrinciplesStories from './MotionPrinciples.stories.jsx';
+
+<Meta of={PrinciplesStories} />
+
+<FoundationHero
+    title="Principles"
+    summary="Motion in PLUS explains a change. If it explains nothing, it is not there."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="Four principles">
+
+Four principles follow, and each carries the question a reviewer asks. Nearly everything a tutor does in a day is Productive. One moment in a term is Expressive.
+
+Every Do and Don't below is the same scene with one rule broken, so the difference is the lesson. Each draws its paths from start to landing first, then plays; use the speed control to watch at ½× or ¼×.
+
+<FoundationSubsection title="Show what changed">
+
+Where it came from, where it went, and where you are now.
+
+*Ask: Can someone point to where the thing went?*
+
+<Canvas of={PrinciplesStories.ShowWhatChanged} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Always responsive">
+
+Something answers the person at once. The first visible answer to a press, hover or toggle is its color or press state. It starts in the same frame and is 90% done by about 110 ms. A moving part, such as a Toggle's thumb, follows on `spatial.fast`.
+
+Nothing waits for an animation to finish. Any motion can be interrupted mid-way, switched to Reduced mode by the system setting, and paused if it runs longer than 5 s.
+
+*Ask: Does anything wait for an animation to finish? Can someone stop it?*
+
+<Canvas of={PrinciplesStories.AlwaysResponsive} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Move like real things">
+
+Motion keeps the speed of the hand that started it, carries the weight of the thing that moves, and settles where it belongs.
+
+*Ask: Does the weight fit the object and the input?*
+
+<Canvas of={PrinciplesStories.MoveLikeRealThings} sourceState="none" />
+
+</FoundationSubsection>
+
+<FoundationSubsection title="Quiet by default, bold when it counts">
+
+How often something happens sets how loud its motion is, never to zero at page level. A change seen dozens of times a day moves quietly, usually a short fade or a flat slide. From the keyboard, controls and Popups open with no animation; layers and pages keep their motion. Reduced mode keeps one short fade, so a change is still noticed.
+
+Expressive marks the end of something worth finishing, a few times a week at most. Never a control, a field, or anything done dozens of times a day.
+
+*Ask: Does it happen many times a day? Then make it quieter.*
+
+<Canvas of={PrinciplesStories.QuietByDefault} sourceState="none" />
+
+</FoundationSubsection>
+
+</FoundationSection>
+
+<FoundationSection title="Sound">
+
+Sound is rare and never the only signal.
+
+- No sound for field errors, saves, live counts or anything frequent. A burst of the same sound plays once, never per field or per keystroke.
+- A sound only for a few confirmations and critical errors, matched to how serious they are.
+- Never a negative sound where a student can hear it.
+- Loudness follows importance.
+- Every sound has something on screen that says the same thing, and the person can switch sound off.
+
+</FoundationSection>
+
+<FoundationSection title="Before you add motion">
+
+1. What does it explain? Where something came from, where it went, or what is new.
+2. How often will someone see it? Dozens a day means quiet.
+3. Does it answer at once, and can it be interrupted?
+4. Would someone notice it every time? If yes and it is not a milestone, quiet it down.
+
+If the answer to the first question is "nothing", leave it out. A new kind of motion is a question for the design team.
+
+</FoundationSection>
+
+<FoundationSection title="Related">
+
+<FoundationRelated
+    items={[
+        { title: 'Physics', description: 'The springs these principles are built on, and the token table.', href: '?path=/docs/foundations-motion-physics--docs' },
+        { title: 'Transitions', description: 'The fourteen transitions, picked by the relationship between two screens.', href: '?path=/docs/foundations-motion-transitions--docs' },
+    ]}
+/>
+
+</FoundationSection>

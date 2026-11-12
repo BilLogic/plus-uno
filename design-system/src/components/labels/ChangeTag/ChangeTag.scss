@@ -41,8 +41,8 @@
     color: var(--plus-change-tag-ink);
     box-shadow: inset 0 0 0 var(--border-default) var(--plus-change-tag-edge);
     transition-property: background-color, color, box-shadow;
-    transition-duration: var(--motion-duration-medium);
-    transition-timing-function: var(--motion-easing-standard);
+    transition-duration: var(--ds-motion-appearance-default-duration);
+    transition-timing-function: var(--ds-motion-appearance-default);
 }
 
 .plus-change-tag--compact .plus-change-tag__chip {
@@ -67,7 +67,7 @@
 }
 
 .plus-change-tag__value--entering {
-    animation: plus-change-tag-value-in var(--motion-duration-medium) var(--motion-easing-entrance) both;
+    animation: plus-change-tag-value-in var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default) both;
 }
 
 @keyframes plus-change-tag-value-in {

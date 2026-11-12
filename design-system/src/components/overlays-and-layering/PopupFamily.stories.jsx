@@ -130,7 +130,7 @@ export const PopupLayers = () => {
             >
                 Notes stay with the session.
             </Popup>
-            <div className="plus-pattern-blanket" style={{ position: 'relative', display: 'block', zIndex: 'var(--layer-modal)' }}>
+            <div className="plus-pattern-backdrop" style={{ position: 'relative', display: 'block', zIndex: 'var(--layer-modal)' }}>
                 <Popup
                     id="pf-popup-modal"
                     triggerType="manual"
@@ -156,9 +156,9 @@ PopupLayers.play = async ({ canvasElement }) => {
     const z = (token) => probe(canvasElement, 'zIndex', `var(${token})`, { position: 'relative' });
     // On the popup layer (400) from the page, not above toasts.
     await expect(getComputedStyle(page).zIndex, 'popup layer').toBe(z('--layer-popup'));
-    // Opened from a modal it mounts in the modal's blanket and so rides its layer (510).
-    await expect(inModal.closest('.plus-pattern-blanket'), 'mounted in the modal').not.toBeNull();
-    await expect(getComputedStyle(inModal.closest('.plus-pattern-blanket')).zIndex, 'modal layer').toBe(z('--layer-modal'));
+    // Opened from a modal it mounts in the modal's backdrop and so rides its layer (510).
+    await expect(inModal.closest('.plus-pattern-backdrop'), 'mounted in the modal').not.toBeNull();
+    await expect(getComputedStyle(inModal.closest('.plus-pattern-backdrop')).zIndex, 'modal layer').toBe(z('--layer-modal'));
     await expect(getComputedStyle(inModal).zIndex, 'popup layer inside the modal').toBe(z('--layer-popup'));
 };
 

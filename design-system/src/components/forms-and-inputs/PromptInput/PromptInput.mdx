@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as PromptInputStories from './PromptInput.stories.jsx';
 import { PromptInput } from '@/components';
 import { ComponentExample, DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={PromptInputStories} />
 
@@ -55,6 +56,14 @@ action after it.
 <ComponentExample of={PromptInputStories.Loading} title="Loading" description="isLoading turns the send button into Stop and rings the field in a GenerativeBorder." />
 
 <ComponentExample of={PromptInputStories.Disabled} title="Disabled" description="The field and the send button fade and take no input." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="PromptInput" />
 
 </div>
 

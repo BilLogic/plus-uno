@@ -6,8 +6,7 @@ import { C } from '@/storybook-docs/foundation-blocks.jsx';
 import { settleMsOf, springBack } from '@/lib/damping';
 import { SPRINGS } from '@/tokens/ladder/springs.generated.js';
 import { Illustration } from '@/storybook-docs/illustrations/Illustration.jsx';
-import { Backdrop, Card, Frame as FrameShape, Modal as ModalShape, PageHeader, Popup as PopupShape, Rect, Sidebar as SidebarShape, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
-import { PAINT } from '@/storybook-docs/illustrations/paint.js';
+import { Backdrop, Card, Frame as FrameShape, Modal as ModalShape, Page as PageShape, PageHeader, Popup as PopupShape, Sidebar as SidebarShape, SkeletonBar } from '@/storybook-docs/illustrations/primitives.jsx';
 import { composeShadow, groundDarkness, ink, parseShadow, shadowReach, slotted } from '@/storybook-docs/lib/shadow-anatomy';
 
 /**
@@ -228,7 +227,7 @@ const PLATES = [
         id: 'page', title: 'Page', level: 'default', layer: null, at: [70, 18],
         draw: (
             <>
-                <Rect x={70} y={18} w={244} h={176} fill={PAINT.surface} stroke={PAINT.line} corner="md" />
+                <PageShape x={70} y={18} w={244} h={176} />
                 <PageHeader x={80} y={28} w={224} />
                 {[0, 1, 2].map((i) => <SkeletonBar key={i} x={80} y={56 + i * 10} w={200 - i * 40} />)}
             </>

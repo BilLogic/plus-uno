@@ -14,6 +14,8 @@ Also asked as: filter dropdown.
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/FilterMenu/FilterMenu.mdx`
 
+**Motion:** enter `spatial.fast` + `appearance.fast` · exit `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `FilterMenu` when a section's content takes two or more filter
@@ -27,6 +29,15 @@ rather than a button per category.
 One category in a menu, applied as you pick, is a `PopupSelect`. One to
 three short categories with room in the bar are a `FilterButton` each. A bar
 holds one or the other, never quick filters and a filter menu together.
+
+## Motion
+
+FilterMenu reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Open and close an overlay | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Clips open from the trigger's corner on the side it is aligned to. |
+| exit | Open and close an overlay | `--ds-motion-appearance-fast` | Fades. The exit is the fade. |
 
 ## Best practices
 
@@ -98,6 +109,7 @@ Same group: `Button` · `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` 
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
+| `container` | object | — | Where the open menu mounts: an element. Leave it out for the page's overlay layer; name one to keep the menu inside a picture or a scrolling region. |
 | `categories` | arrayOf (required) | `[]` | The filter categories, in order: `{ id, label, options }`. Options are strings, or `{ value, label, disabled }`. Each category is a list of checkboxes; pick as many as apply. |
 | `value` | objectOf | — | The applied values, `{ [categoryId]: value[] }`. Leave it out to let the menu keep its own. |
 | `defaultValue` | objectOf | — | The values applied at first, when `value` is left out. |

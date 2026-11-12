@@ -5,26 +5,26 @@ import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from 
 
 <FoundationHero
     title="Motion"
-    summary="There is no animation library. Every transition is CSS that reads six motion tokens."
+    summary="Components animate with CSS that reads the motion tokens. No component imports an animation library."
 />
 
 <FoundationContents />
 
 <FoundationSection title="What it is for">
 
-PLUS motion is three duration tokens (`--motion-duration-short`, `--motion-duration-medium`, `--motion-duration-long`) and three easing tokens (`--motion-easing-standard`, `--motion-easing-entrance`, `--motion-easing-exit`), defined once in the token ladder. A component names a duration and an easing and adds nothing else. Under reduced motion the durations collapse to zero, so a component needs no branch of its own.
+PLUS motion is springs on four tiers, written once in the token ladder as `--ds-motion-*` semantics. A component names a spatial or appearance token and its duration and adds nothing else. Under reduced motion every spatial token becomes a fade, so a component needs no branch of its own. The values and when to use each are on <DocsLink id="foundations-motion-physics">Physics</DocsLink>.
 
 </FoundationSection>
 
 <FoundationSection title="What wraps it">
 
-Components that appear and disappear, such as <DocsLink id="components-overlays-and-layering-popup">Popup</DocsLink> and <DocsLink id="components-messaging-modal-dialog">Modal dialog</DocsLink>, transition on the `data-starting-style` and `data-ending-style` attributes that <DocsLink id="libraries-base-ui">Base UI</DocsLink> sets, using the tokens. No component imports a JavaScript animation library. Which token each motion takes is on <DocsLink id="foundations-motion-durations-and-easings">Motion</DocsLink>.
+Components that appear and disappear, such as <DocsLink id="components-overlays-and-layering-popup">Popup</DocsLink> and <DocsLink id="components-messaging-modal-dialog">Modal dialog</DocsLink>, transition on the `data-starting-style` and `data-ending-style` attributes that <DocsLink id="libraries-base-ui">Base UI</DocsLink> sets, using the tokens. The `motion` package drives only the Storybook illustrations, and drag uses Pragmatic drag and drop. No component imports a JavaScript animation library. Which token each component takes is on <DocsLink id="foundations-motion-library">Motion · Library</DocsLink>.
 
 </FoundationSection>
 
 <FoundationSection title="What not to do">
 
-- Do not write a literal `ms` value or `cubic-bezier()` in a component. Read the tokens.
+- Do not write a literal `ms` value or `cubic-bezier()` in a component. Read the `--ds-motion-*` tokens.
 - Do not add an animation library for a transition CSS can do.
 - Do not animate more than one or two properties, and prefer transform and opacity to size and position.
 - Do not make motion the only signal. Each motion has a reduced-motion form that still shows what changed.

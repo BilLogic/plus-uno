@@ -192,8 +192,8 @@ const CODE_ONLY_FRAME_LAYERS = {
     'frame-layer-edge': { value: 'calc(var(--layer-navigation) - 1)', note: 'the hover strips that peek a closed Sidebar or Panel', figmaName: 'Layer/frame-edge' },
     'frame-layer-sidebar': { value: 'var(--layer-navigation)', note: 'the raised Sidebar', figmaName: 'Layer/frame-sidebar' },
     'frame-layer-topbar-start': { value: 'calc(var(--layer-navigation) + 1)', note: 'the Topbar start, above a raised Sidebar', figmaName: 'Layer/frame-topbar-start' },
-    'frame-layer-blanket': { value: 'calc(var(--layer-navigation) + 2)', note: "the overlay Panel's Blanket", figmaName: 'Layer/frame-blanket' },
-    'frame-layer-panel-peek': { value: 'calc(var(--layer-navigation) + 3)', note: 'a peeking or overlay Panel, above its Blanket', figmaName: 'Layer/frame-panel-peek' },
+    'frame-layer-blanket': { value: 'calc(var(--layer-navigation) + 2)', note: "the overlay Panel's Backdrop", figmaName: 'Layer/frame-blanket' },
+    'frame-layer-panel-peek': { value: 'calc(var(--layer-navigation) + 3)', note: 'a peeking or overlay Panel, above its Backdrop', figmaName: 'Layer/frame-panel-peek' },
     'frame-layer-splitter': { value: '1', note: "local to the Panel's own stacking context, not a step on the navigation scale: the splitter's hit strip", figmaName: 'Layer/frame-splitter' },
     'frame-layer-docked-edge': { value: '1', note: "local to the Frame's row, not a step on the navigation scale: lifts a docked Sidebar so its 1px edge lies over the Page's first pixel", figmaName: 'Layer/frame-docked-edge' },
 };

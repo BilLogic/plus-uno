@@ -14,6 +14,8 @@ Also asked as: ai chip.
 
 **Storybook page:** `design-system/src/components/labels/Suggestion/Suggestion.mdx`
 
+**Motion:** enter `appearance.fast` · exit `spatial.fast` + `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use `Suggestion` when the system proposes a value and a person decides whether
@@ -30,6 +32,15 @@ value will land, after the tags already there.
 
 Use `Tag` for a value that is already in the field. Use `Button` for an action
 that is not a proposed value.
+
+## Motion
+
+Suggestion reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| enter | Swap content in place | `--ds-motion-appearance-fast` | Fades in place. |
+| exit | Add or remove an item | `--ds-motion-spatial-fast` · `--ds-motion-appearance-fast` | Accepting folds it away; dismissing fades. |
 
 ## Best practices
 

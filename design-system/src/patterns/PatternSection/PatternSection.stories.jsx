@@ -2,10 +2,6 @@ import React, { useState } from 'react';
 import { expect, userEvent, waitFor, within } from 'storybook/test';
 import {
     Button,
-    ButtonGroup,
-    Checkbox,
-    CountTag,
-    DynamicTable,
     EmptyState,
     FilterButton,
     IconButton,
@@ -26,6 +22,7 @@ import { withTestViewport } from '@/storybook-docs/lib/test-viewport.js';
 import { tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { inEveryColorMode } from '@/storybook-docs/lib/color-modes.js';
 import { InAppFrame, slotContent } from '@/storybook-docs/lib/pattern-demo.jsx';
+import { FilterSide, STUDENTS, StudentsTable, ViewBar, row } from '@/storybook-docs/lib/view-bar.jsx';
 import { iconClass } from '../../lib/icon';
 
 const col = { display: 'flex', flexDirection: 'column', gap: 'var(--space-200)' };
@@ -663,7 +660,7 @@ export const DetailSplitHoldsWithPanelAt1440 = {
         await waitFor(() => expect(p.sidebar(), 'the Sidebar collapsed to keep 960').toBeNull());
         await waitFor(() => expect(rect(p.root).width).toBeGreaterThanOrEqual(SECTION_DETAIL_FLOOR));
         await expectSplit(p, 1440 - 400 - 48);
-        await expect(canvasElement.querySelector('.plus-frame__blanket'), 'the Panel stays docked').toBeNull();
+        await expect(canvasElement.querySelector('.plus-frame__backdrop'), 'the Panel stays docked').toBeNull();
     }),
 };
 
@@ -696,49 +693,8 @@ export const DetailReplacesListBelow960 = {
  * Primary at the end.
  */
 
-const STUDENTS = [
-    ['Ava Thompson', 'Grade 7', 'Oct 24'],
-    ['Marcus Lee', 'Grade 8', 'Oct 23'],
-    ['Sofia Ramirez', 'Grade 7', 'Oct 23'],
-    ['Jordan Patel', 'Grade 6', 'Oct 21'],
-    ['Emily Chen', 'Grade 8', 'Oct 20'],
-    ['Noah Williams', 'Grade 6', 'Oct 18'],
-];
-const STUDENT_HEAD = { cells: [{ key: 'name', content: 'Name' }, { key: 'grade', content: 'Grade' }, { key: 'last', content: 'Last session' }] };
-const studentRows = (count) => STUDENTS.slice(0, count).map(([name, grade, last]) => ({
-    key: name,
-    cells: [{ key: name, content: name }, { key: grade, content: grade }, { key: last, content: last }],
-}));
-const StudentsTable = ({ count = 4, ...props }) => <DynamicTable head={STUDENT_HEAD} rows={studentRows(count)} label="Students" isFixedSize {...props} />;
-
 /** The width the queue and filter-side stories lay out at: past the 960 floor, so the detail and the side sit beside the list. */
 const STAGE = SECTION_DETAIL_FLOOR + 64;
-
-const row = { display: 'flex', alignItems: 'center', gap: 'var(--inline-md)', minWidth: 0 };
-
-/** Pill views: a fixed set the product defines, one pill even with one view. */
-const ViewPills = ({ views }) => {
-    const [active, setActive] = useState(views[0]);
-    return (
-        <TabsComponent appearance="pill" activeKey={active} onSelect={setActive} aria-label="Views">
-            {views.map((view) => <TabsComponent.Tab key={view} eventKey={view}>{view}</TabsComponent.Tab>)}
-        </TabsComponent>
-    );
-};
-
-/** The format switch: equal-width segments, first on the right. */
-const FormatSwitch = ({ iconsOnly = true }) => {
-    const [format, setFormat] = useState('table');
-    return (
-        <ButtonGroup label="Format">
-            {[['table', 'table-list', 'Table'], ['calendar', 'calendar', 'Calendar']].map(([key, icon, label]) => (
-                iconsOnly
-                    ? <IconButton key={key} icon={icon} label={label} isSelected={format === key} onClick={() => setFormat(key)} />
-                    : <Button key={key} text={label} iconBefore={icon} isSelected={format === key} onClick={() => setFormat(key)} />
-            ))}
-        </ButtonGroup>
-    );
-};
 
 /** The Filter icon with its count, on the shipped FilterButton: named "Filters", read "Filters, 2 applied". */
 const FiltersButton = ({ applied, onClick }) => (
@@ -754,29 +710,7 @@ const FiltersButton = ({ applied, onClick }) => (
     />
 );
 
-/**
- * The view bar's end, in order: format switch, Search, filters, More, the
- * labeled Primary. `narrow` keeps only the Primary's icon, below 768.
- */
-const BarEnd = ({ format = false, search = true, filters = null, more = true, primary = 'Add students', narrow = false }) => (
-    <div style={{ ...row, marginInlineStart: 'auto' }}>
-        {format && <FormatSwitch />}
-        {search && <IconButton icon="magnifying-glass" label="Search students" appearance="subtle" onClick={() => {}} />}
-        {filters}
-        {more && <IconButton icon="ellipsis" label="More" appearance="subtle" onClick={() => {}} />}
-        {primary && (narrow
-            ? <IconButton icon="user-plus" label={primary} appearance="primary" onClick={() => {}} />
-            : <Button text={primary} iconBefore="user-plus" appearance="primary" onClick={() => {}} />)}
-    </div>
-);
 
-/** The view bar: views at the start, everything that acts on the rows at the end. */
-const ViewBar = ({ views = ['All students'], start, ...end }) => (
-    <div className="plus-section-view-bar" style={{ ...row, inlineSize: '100%' }}>
-        {start ?? <ViewPills views={views} />}
-        <BarEnd {...end} />
-    </div>
-);
 
 const SESSIONS = [
     ['Algebra B', 'Tue 4:30 PM · 6 students'],
@@ -1058,32 +992,6 @@ export const SideAtEnd = {
         </PatternSection>
     ),
 };
-
-const FILTERS = [
-    ['Grade', ['Grade 6', 'Grade 7', 'Grade 8']],
-    ['Status', ['Active', 'Paused']],
-];
-
-/** The filter side: "Reset filters" at its top, a count beside each category. */
-const FilterSide = ({ checked, onToggle, onReset }) => (
-    <div className="plus-section-filter-side" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--stack-lg)' }}>
-        <div>
-            <Button text="Reset filters" appearance="subtle" spacing="compact" onClick={onReset} />
-        </div>
-        {FILTERS.map(([category, values]) => {
-            const on = values.filter((v) => checked.includes(v)).length;
-            return (
-                <fieldset key={category} style={{ margin: 0, padding: 0, border: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-md)' }}>
-                    <legend style={{ ...row, padding: 0, marginBlockEnd: 'var(--stack-md)', font: 'var(--heading-xxsmall)', color: 'var(--ds-text)' }}>
-                        {category}
-                        <CountTag value={on} label={`${on} applied`} spacing="compact" />
-                    </legend>
-                    {values.map((v) => <Checkbox key={v} label={v} isChecked={checked.includes(v)} onChange={() => onToggle(v)} />)}
-                </fieldset>
-            );
-        })}
-    </div>
-);
 
 /**
  * A Section whose main job is filtering, read from its own width. From 960

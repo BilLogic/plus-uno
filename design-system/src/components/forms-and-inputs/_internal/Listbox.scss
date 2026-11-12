@@ -1,7 +1,7 @@
 /*
  * Listbox — the internal option list (Figma _Listbox), a Popups Menu.
  * `elevation.surface.overlay` and its shadow (as every floating layer
- * without a blanket; the shadow's ring is the edge) and
+ * without a backdrop; the shadow's ring is the edge) and
  * Popover/radius-menu-md, with its options inset Popover/pad-menu 4.
  */
 @use '../../../styles/state' as *;
@@ -182,7 +182,7 @@
 // Options that arrive from a server fade in one after another, 20 ms apart,
 // the last wait capped at 500 ms. Reduced motion shows them at once.
 .plus-listbox-reveal {
-    animation: plus-listbox-reveal var(--motion-duration-medium) var(--motion-easing-entrance) both;
+    animation: plus-listbox-reveal var(--ds-motion-appearance-default-duration) var(--ds-motion-appearance-default) both;
     animation-delay: min(calc(var(--plus-listbox-reveal-index, 0) * 20ms), 500ms);
 
     @media (prefers-reduced-motion: reduce) {

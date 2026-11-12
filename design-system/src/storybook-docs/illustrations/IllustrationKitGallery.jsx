@@ -1,7 +1,8 @@
 import React from 'react';
 import { Illustration, IllustrationFigure } from './Illustration.jsx';
 import {
-  AnatomyMarker, Backdrop, ButtonShape, Card, Field, Frame, Modal, Panel, PageHeader, Popup, Row, Section, Sidebar,
+  AnatomyMarker, Backdrop, Breadcrumb, ButtonShape, Card, CountTag, Field, Flag, Frame, Modal, Page, PageHeader, Panel, Popup,
+  ProgressTracker, Row, Screen, Section, Sidebar, Tabs, Tooltip,
 } from './primitives.jsx';
 import { MOTION_SETS } from './primitives-motion.jsx';
 
@@ -21,8 +22,16 @@ const SETS = [
     ? <><ButtonShape x={34} y={42} w={44} label="Cancel" /><ButtonShape x={82} y={42} w={44} appearance="primary" label="Save" /></>
     : <><ButtonShape x={38} y={46} w={40} /><ButtonShape x={82} y={46} w={40} /></>)],
   ['Popup', (a) => (<><ButtonShape x={20} y={18} w={40} /><Popup x={20} y={34} w={80} h={48} accent={a} /></>)],
+  ['Tooltip', (a) => (<><Tooltip x={20} y={14} w={72} accent={a} /><ButtonShape x={20} y={34} w={40} /></>)],
   ['Panel', (a) => (<><Frame x={10} y={8} w={140} h={84} /><Panel x={96} y={20} w={54} h={72} accent={a} /></>)],
   ['Modal and backdrop', (a) => (<><Frame x={10} y={8} w={140} h={84} /><Backdrop x={10} y={20} w={140} h={72} /><Modal x={34} y={32} w={92} h={52} accent={a} /></>)],
+  ['Page', (a) => (<><Frame x={10} y={8} w={140} h={84} /><Page x={14} y={22} w={132} h={68} header accent={a}><Section x={22} y={52} w={116} h={32} rows={1} /></Page></>)],
+  ['Screen', (a) => <Screen x={10} y={8} w={140} h={84} accent={a}><Section x={62} y={44} w={80} h={40} rows={1} /></Screen>],
+  ['Tabs', (a) => <Tabs x={20} y={40} w={120} count={4} selected={1} accent={a} />],
+  ['Breadcrumb', (a) => <Breadcrumb x={20} y={46} w={120} count={4} accent={a} />],
+  ['Progress tracker', (a) => <ProgressTracker x={12} y={44} w={136} count={4} current={1} accent={a} />],
+  ['Flag', (a) => <Flag x={30} y={26} w={100} h={48} tone={a ? 'success' : 'neutral'} accent={a} />],
+  ['Count tag', (a) => <CountTag x={64} y={44} w={32} h={14} accent={a} />],
   ['Anatomy marker', (a) => (<><Section x={44} y={22} w={100} h={56} /><AnatomyMarker x={20} y={50} tx={44} ty={34} accent={a} /></>)],
   // Motion's own primitives: chart axis and curve, trail, tap ring, pointer.
   ...MOTION_SETS,

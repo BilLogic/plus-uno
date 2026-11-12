@@ -1,0 +1,270 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+
+import * as FormsStories from './Forms.stories.jsx';
+import { STAGE } from './formsDemo.jsx';
+import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    ErrorInSecondDialog,
+    ErrorOnField,
+    HelpInCaption,
+    HelpInTooltip,
+} from '@/storybook-docs/illustrations/forms.jsx';
+
+<Meta title="Patterns/Actions and input/Forms" tags={['!dev', 'manifest']} />
+
+<Title>Forms</Title>
+How a form takes and checks what someone types: which host it lives in, when to validate, what a blocked submit does, how required and optional are marked, and what happens on leaving with edits.
+
+<DocsTabs of={FormsStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## The hosts
+
+A form lives in one of four hosts. The <a target="_top" href="./?path=/docs/templates-form--docs">Form</a> template draws each; this pattern says which to pick and how the form behaves inside it.
+
+<TypeGrid>
+<TypeCard of={FormsStories.HostPage} title="In a page" stage={STAGE}>Settings and anything saved as a group. Buttons left-aligned under the fields.</TypeCard>
+<TypeCard of={FormsStories.HostPanel} title="In a Panel" stage={STAGE}>A short edit from a table, with the page in view. Cancel and Save full bleed at the bottom.</TypeCard>
+<TypeCard of={FormsStories.HostModal} title="In a Modal" stage={STAGE}>A rare, critical task with fewer than five fields. 8-col; a confirm is 4-col or 6-col.</TypeCard>
+<TypeCard of={FormsStories.HostSteps} title="In steps" stage={STAGE}>A long task on Frame · focused: steps down the left side when there are five or more.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Marks and help
+
+<ComponentExample of={FormsStories.RequiredMarks} title="Required marks and help" description="Required fields carry an asterisk, explained once in the legend. Optional fields say &quot;(optional)&quot; only when most of the form is required. Help sits under the field, where it stays after typing." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Validation
+
+<ComponentExample of={FormsStories.ShownOnBlur} title="On blur" description="Student was clicked into and left empty. The field checks itself when it loses focus; the error says what to fix and clears once the rule is met. Subject was not touched, so it is not marked." />
+
+<ComponentExample of={FormsStories.ShownSubmitStaysEnabled} title="Submit stays enabled" description="The Primary is pressable with fields missing. After the press every missing field is marked and focus moves to the first." />
+
+<ComponentExample of={FormsStories.ShownBlockedSubmit} title="Blocked submit in a Modal" description="The Modal stays open, marks the field, says what to fix inline, scrolls the body to it and shakes once. Never a second dialog." />
+
+<ComponentExample of={FormsStories.ServerRefuses} title="Rejected by the server" description="A danger SectionMessage at the top of the form, scrolled into view, plus the field errors it names. Nothing shakes." />
+
+<ComponentExample of={FormsStories.ShownSending} title="Sending" description="After Save session is pressed the button swaps its label for a spinner in place and keeps its width. Only that button disables; Cancel stays live." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Leaving with edits
+
+<ComponentExample of={FormsStories.LeavingWithEdits} title="Leaving with edits" description="Type a name and press Cancel. The same Modal asks first; Back returns without losing anything typed. A form with no edits leaves at once." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Bound inputs
+
+<ComponentExample of={FormsStories.BoundInput} title="A control that cannot be wrong" description="Radios for up to five choices, a Select for six or more, a date picker for a date, a number with min and max. A radio group starts unanswered." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Forms" tier="pattern" />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Forms when a page asks for input that is saved together: adding a student, logging a session, a reflection, profile settings. Ask only what is needed, group fields under a `Fieldset` legend of two or three words, keep one column except for pairs that belong together (first and last name, date and time), and reveal a conditional field under the answer that needs it rather than adding a separate one.
+
+<DocsTable>
+<thead>
+<tr><th>The form…</th><th>Host</th><th>Buttons</th></tr>
+</thead>
+<tbody>
+<tr><td>is saved as a group on its own page: settings, a profile</td><td>In a page</td><td>Left-aligned under the fields, Primary first, Cancel Subtle</td></tr>
+<tr><td>is a short edit of a row, with the page still in view</td><td>In a Panel · Details</td><td>Cancel and Save full bleed at the bottom</td></tr>
+<tr><td>is rare and critical, with fewer than five fields</td><td>In a Modal, 8-col</td><td>Cancel (Default) and the action, full bleed</td></tr>
+<tr><td>is long, or has sections someone works through</td><td>In steps on Frame · focused</td><td>Cancel (Subtle) left; Back and Next full bleed right</td></tr>
+<tr><td>asks for one value read far more than changed</td><td>Inline edit on the record</td><td>None; it saves on its own</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For one value on a record page, use `InlineEdit`; it saves on its own.
+- For a setting that applies at once, use `Toggle`; it never waits for Save.
+- For a filter, follow <a target="_top" href="./?path=/docs/patterns-finding-things-filtering--docs">Filtering</a>: filters are not a form.
+- For a decision with no fields, use <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a> · Active.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Validate a field when it loses focus and clear the error once the rule is met.
+
+<RuleTag kind="automatic" />
+
+The error shows on the field, says what to fix, and goes away as soon as the value passes. Nothing is checked while typing. A warning accepts the value; a field is invalid only when the form cannot go on.
+
+### Keep the submit button enabled and let it show what is missing.
+
+<RuleTag kind="automatic" />
+
+A disabled submit gives no direction and leaves the tab order. Pressing it marks every missing field and moves focus to the first; the body scrolls to it. The button disables only while sending, when it swaps its label for a spinner in place and keeps its width.
+
+### Keep a blocked submit in the same Modal.
+
+<RuleTag kind="automatic" />
+
+Mark the field, say what to fix inline, scroll the body to it, shake once. Never a second dialog for the error. Reduced motion drops the shake; the color, icon, message and focus move carry it. A server failure: <a target="_top" href="./?path=/docs/patterns-overview--docs">Errors</a>.
+
+<DoDontPair
+    doExample={<ErrorOnField />}
+    doCaption="The message under the field, in the same Modal."
+    dontExample={<ErrorInSecondDialog />}
+    dontCaption="A second dialog over the first, with the field left unexplained."
+/>
+
+### Mark required fields with an asterisk and explain it once.
+
+<RuleTag kind="automatic" />
+
+The legend says what the asterisk means. Optional fields are marked "(optional)" only in a form where most fields are required, so one pattern holds across the product. `isRequired` sets the mark and `aria-required`.
+
+### Put help in the caption, never in a tooltip.
+
+<RuleTag kind="automatic" />
+
+A caption stays after the person types and is read by a screen reader with the field. A tooltip never carries the only copy of anything. An explanation most people will never need opens from an `InlineMessage` beside the field.
+
+<DoDontPair
+    doExample={<HelpInCaption />}
+    doCaption="Help in the caption, where it stays after typing."
+    dontExample={<HelpInTooltip />}
+    dontCaption="Help only in a tooltip: gone on touch, gone after typing."
+/>
+
+### Ask before leaving with unsaved edits.
+
+<RuleTag kind="automatic" />
+
+Close, Cancel and navigating away raise a 4-col Modal: Back returns without losing anything typed; Discard is Danger. A form already in a Modal asks in that Modal's confirm view, so two layers never become three. A confirm view prop on the Modal is Planned <PlannedTag />. A form with no edits leaves at once. In a focused task, Close and Cancel play the opening backwards once the person confirms.
+
+### Prefer a bound input to a free one.
+
+<RuleTag kind="review" />
+
+Up to five choices: `RadioGroup` or checkboxes, visible at once. Six or more: `Select`. A date: `DatePicker`. A number: min and max. A radio group starts unanswered and never falls back to its first option. A `Toggle` applies at once, so anything that waits for Save is a `Checkbox`.
+
+### Give the form a title from its host and a legend for each group.
+
+<RuleTag kind="review" />
+
+The form's title is the page, Panel or Modal heading. Groups take a `Fieldset` legend, two or three words, a noun phrase. Labels are sentence case, one to three words, naming the field rather than what to do.
+
+### Set autofill on every field the browser can fill.
+
+<RuleTag kind="automatic" />
+
+`autoComplete` on name, email, phone and address fields. Prefill what is already known, such as the student picked from a row.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Label names the field: "School email".</td><td>Label gives an instruction: "Enter your school email:".</td></tr>
+<tr><td>Error says what to fix: "Enter a full email, like name@school.org".</td><td>"Invalid input", "Error 422".</td></tr>
+<tr><td>Caption says what the field is for: "Shared with the supervisor".</td><td>Caption repeats the label.</td></tr>
+<tr><td>Placeholder shows a good answer: "name@school.org".</td><td>Placeholder names the control: "Text field".</td></tr>
+<tr><td>Submit names the outcome: "Log session", "Add student".</td><td>"Submit", "Save" when the outcome has a name.</td></tr>
+<tr><td>Dates and times as the person reads them: "Mar 4, 2026 · 4:00 PM".</td><td>"2026-03-04T16:00".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- Every input has a visible label. A group is a `fieldset` with a `legend`; its one error is announced once.
+- A field error is announced and sets `aria-invalid`; the submit moves focus to the first invalid field. A server message is announced when it appears.
+- A required field sets `aria-required`; the asterisk is explained in the legend and never carries the meaning alone.
+- A sending button keeps its name and sets `aria-busy`; Cancel stays reachable.
+- A dialog opens only from a person's action. Focus goes to the first input and stays trapped until it closes.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Parts
+
+<DocsTable>
+<thead>
+<tr><th>Part</th><th>Component</th><th>Notes</th></tr>
+</thead>
+<tbody>
+<tr><td>Fields</td><td><a target="_top" href="./?path=/docs/templates-form--docs">Form</a> template</td><td>There is no Form component: a Fieldset groups the fields inside a host.</td></tr>
+<tr><td>Rejection at the top</td><td>`SectionMessage`</td><td>A danger message, scrolled into view.</td></tr>
+<tr><td>Choices</td><td>`RadioGroup`, `Select`, `DatePicker`</td><td>A control that cannot be wrong.</td></tr>
+<tr><td>Hosts</td><td><a target="_top" href="./?path=/docs/templates-section-section--docs">Section</a>, <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>, <a target="_top" href="./?path=/docs/templates-modal-modal--docs">Modal</a>, <a target="_top" href="./?path=/docs/templates-frame-frame--docs">Frame</a></td><td>Page, Panel, Modal and steps.</td></tr>
+<tr><td>Confirm view</td><td>Modal</td><td>Swapped in place today. <PlannedTag /> A confirm view prop is Planned.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a>: use for where the buttons sit and which look they take.
+- <a target="_top" href="./?path=/docs/templates-form--docs">Form</a>: use for how a form sits in each host.
+- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use when you need Loading, Disabled or Errors.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

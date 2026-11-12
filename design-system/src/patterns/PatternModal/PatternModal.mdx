@@ -1,16 +1,9 @@
 import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
-import { Meta, Title } from '@storybook/addon-docs/blocks';
+import { Meta, Story, Title } from '@storybook/addon-docs/blocks';
 
 import * as PatternModalStories from './PatternModal.stories.jsx';
-import {
-    FooterActions,
-    ButtonsInBody,
-    TabsForViews,
-    TabsAsSteps,
-    HugShortContent,
-    FillShortContent,
-} from './PatternModal.examples.jsx';
-import { ModalWithConfirm, ThirdOverlay, ConfirmSmallDo, ConfirmSmallDont } from '../Blanket/Blanket.examples.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
+import * as FormStories from '../Form/Form.stories.jsx';
 import {
     ComponentExample,
     DocsInteractivePlayground,
@@ -18,11 +11,23 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    ButtonInBody,
+    ConfirmNarrow,
+    ConfirmsInside,
+    ConfirmWide,
+    FooterPinned,
+    ModalOnModal,
+    StepsForSequence,
+    TabsForSteps,
+} from '@/storybook-docs/illustrations/modal.jsx';
 
 <Meta of={PatternModalStories} />
 
-<Title />
-The Modal interrupts the page for one task. It is always centered on the screen inside a Blanket, and it carries a title, a body and a footer. Its width is a step of the screen grid, its height hugs or fills, and it sits on the overlay level. The examples on this page follow the toolbar's Color mode switch.
+<Title>Modal</Title>
+One task before anything else can happen, centered over a Backdrop. Four types: Passive, Active, Acknowledge and Steps.
 
 <DocsTabs of={PatternModalStories}>
 
@@ -37,63 +42,185 @@ The Modal interrupts the page for one task. It is always centered on the screen 
 
 <div className="sb-ds-doc-section">
 
-## Appearance
+## Types
 
-<ComponentExample of={PatternModalStories.Overview} title="Modal" description={<>A <code>sm</code>, <code>hug</code> Modal centered in its Blanket at the 1024 stand-in screen.</>} />
+Picked by what the person has to do. The component page holds every prop and state; these are the filled layouts.
 
-<ComponentExample of={PatternModalStories.Divider} title="Divider" description={<><code>divider</code> draws a 1px rule under the header and above the footer.</>} />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Size and layout
-
-<ComponentExample of={PatternModalStories.WidthSmall} title="Small" description={<><code>width="sm"</code>, the default: 6 screen-grid columns plus 16 on each side, 512 at 1024.</>} />
-
-<ComponentExample of={PatternModalStories.WidthMedium} title="Medium" description={<><code>width="md"</code>: 8 columns plus 16 on each side, 677 at 1024.</>} />
-
-<ComponentExample of={PatternModalStories.WidthLarge} title="Large" description={<><code>width="lg"</code>: 10 columns plus 16 on each side, 843 at 1024.</>} />
-
-<ComponentExample of={PatternModalStories.HugLong} title="Hug, long content" description={<><code>height="hug"</code>, the default, grows with its content to the cap, then the body scrolls.</>} />
-
-<ComponentExample of={PatternModalStories.HeightFill} title="Fill" description={<><code>height="fill"</code> always sits at the cap, so a settings or editor Modal never jumps.</>} />
-
-<ComponentExample of={PatternModalStories.BodyMinHeight} title="Body floor" description={<>The body never draws shorter than <code>--modal-body-min-height</code>, 80.</>} />
+<TypeGrid>
+<TypeCard of={PatternModalStories.TypePassive} title="Passive">Information only, with Close. No footer.</TypeCard>
+<TypeCard of={PatternModalStories.TypeActive} title="Active">A choice, a confirm or a short form. Cancel and the action.</TypeCard>
+<TypeCard of={PatternModalStories.TypeAcknowledge} title="Acknowledge">One thing to read and one button that fills the footer.</TypeCard>
+<TypeCard of={PatternModalStories.TypeSteps} title="Steps">A short sequence at 10-col: Cancel (Subtle) left, Back and Next on the right half.</TypeCard>
+</TypeGrid>
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Behavior
+## Anatomy
 
-<ComponentExample of={PatternModalStories.TabsStill} title="Tabs" description={<><code>tabs</code> puts a tab group under the title; the tabs stay put and only the body, now the tab panel, scrolls.</>} />
+An Active Modal at 8-col with a short form. Every part once; the pad is 16 on every side, the radius 12, and the parts sit 16 apart.
 
-<ComponentExample of={PatternModalStories.CustomHeader} title="Custom header" description={<><code>header</code> takes the place of the title row, so the caller owns the title and Close and names the dialog with <code>aria-label</code>.</>} />
+<Story of={PatternModalStories.AnatomyActive} inline />
 
-</div>
-
-<div className="sb-ds-doc-section">
-
-## State
-
-<ComponentExample of={PatternModalStories.Loading} title="Loading" description={<><code>loading</code> swaps the body for a skeleton paragraph and marks it busy; the header and footer stay.</>} />
+1. **Backdrop.** Dims the page and holds the Modal centered.
+2. **Header.** The title at 20/24 and the Close icon button. With tabs, the tab group sits 8 under the title.
+3. **Body.** Text, a list, fields or a table. It scrolls past the cap and never draws under 80 tall.
+4. **Footer** (optional). Full-bleed buttons; Cancel (Default) left, Primary right.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Interactive playground
+## Widths
 
-<DocsInteractivePlayground
-    of={PatternModalStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
+A width is a step of the screen grid plus 16 on each side: 6, 8 and 10 columns, here at 1024. It grows with the window and never shrinks; the Sidebar never changes it. The 4-col step is Planned: today the smallest step is 6-col.
+
+<ComponentExample of={PatternModalStories.WidthStrip} title="6 · 8 · 10-col" description="Each Modal measured against the screen grid at 1024." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Width behavior
+
+Drag the screen's width. The Modal grows with it and never shrinks.
+
+<DocsInteractivePlayground of={PatternModalStories.ResponsiveWidth} description="The width control sets the screen's width." />
+
+<DocsTable>
+<thead>
+<tr><th>Width</th><th>768</th><th>1024</th><th>1440</th><th>Made of</th></tr>
+</thead>
+<tbody>
+<tr><td>4-col <PlannedTag /></td><td>261</td><td>347</td><td>432</td><td>4 screen-grid columns + 2 × 16</td></tr>
+<tr><td>6-col</td><td>384</td><td>512</td><td>640</td><td>6 columns + 2 × 16</td></tr>
+<tr><td>8-col</td><td>507</td><td>677</td><td>848</td><td>8 columns + 2 × 16</td></tr>
+<tr><td>10-col</td><td>629</td><td>843</td><td>1056</td><td>10 columns + 2 × 16</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Destructive tiers
+
+Which tier, and its words: <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs#name-a-destructive-action-by-its-tier">Common actions</a>.
+
+<ComponentExample of={PatternModalStories.TierActive} title="Active" description="A change that can be undone: Cancel and the action in Primary." />
+
+<ComponentExample of={PatternModalStories.TierDanger} title="Active with Danger" description="A delete: the action takes the Danger appearance." />
+
+<ComponentExample of={PatternModalStories.TierTypeName} title="Danger, type the name" description="A delete that cannot be undone: the caption asks for the name, and Danger enables once it matches." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Footers
+
+The rule for full bleed, Cancel and Close: <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs#go-full-bleed-in-a-modal-footer-and-keep-it-48-high">Common actions</a>.
+
+<ComponentExample of={PatternModalStories.FooterOne} title="One button" description="It fills the whole footer, flush with the bottom and both sides." />
+
+<ComponentExample of={PatternModalStories.FooterTwo} title="Two buttons" description="Cancel (Default) left, Primary right, half each." />
+
+<ComponentExample of={PatternModalStories.FooterThree} title="Three buttons" description="A third each; only the last is Primary." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key states
+
+<ComponentExample of={PatternModalStories.KeyLongContent} title="Long content" description="Each width has a maximum height. Past it the body scrolls between the pinned header and footer; the footer never moves." />
+
+<ComponentExample of={PatternModalStories.KeyLoading} title="Loading" description="No skeleton on the Modal itself; the body shows its content's own loading state: Patterns, Loading." />
+
+<ComponentExample of={FormStories.KeyBlockedSubmit} title="Blocked submit" description="The field is marked and the message says what to fix. The Modal stays open and its single shake is Planned." />
+
+<ComponentExample of={PatternModalStories.KeyConfirmInside} title="Its confirm" description="A Modal confirms inside itself: the title, body and footer swap in place, with a warning SectionMessage and the danger button. Back returns without losing anything." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Stacking
+
+A confirm Modal may open over a Panel, a Popup or a focused task, and brings its own Backdrop. A Modal never opens on another Modal.
+
+<ComponentExample of={PatternModalStories.StackConfirmOverPanel} title="A confirm over a Panel" description="The Panel stays open under the confirm's own Backdrop. Cancel closes the confirm and focus returns to the Panel." />
+
+<ComponentExample of={PatternModalStories.StackModalOnModalRefused} title="Confirm inside the Modal" description="A Modal that needs a confirm holds it inside itself: a warning SectionMessage in the body and the action in Danger. A second Modal never opens on it." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Sizes
+
+<DocsTable>
+<thead>
+<tr><th>Token</th><th>Value</th><th>Used for</th></tr>
+</thead>
+<tbody>
+<tr><td><code>--modal-pad-x-default</code></td><td>16</td><td>Pad on every side.</td></tr>
+<tr><td><code>--modal-radius</code></td><td>12</td><td>Corner radius at every width.</td></tr>
+<tr><td><code>--modal-stack-sm</code>, <code>-md</code>, <code>-lg</code></td><td>8, 16, 24</td><td>Title to tabs; header, body and footer; groups of fields.</td></tr>
+<tr><td><code>--modal-body-min-height</code></td><td>80</td><td>The least the body draws.</td></tr>
+<tr><td><code>--space-300</code></td><td>48</td><td>The full-bleed footer's height: a 32 button plus 16 pad, so full bleed never changes the Modal's height.</td></tr>
+<tr><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-blocking</code></td><td>pair</td><td>The Modal's fill and its elevation, the one surface that lifts above a Backdrop.</td></tr>
+<tr><td><code>--ds-blanket</code></td><td>color</td><td>The Backdrop's fill.</td></tr>
+</tbody>
+</DocsTable>
+
+The Modal's maximum height is the screen less `--space-400` above and below.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="PatternModal" tier="template" />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="code">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Slots
+
+```jsx
+import { Modal, Button } from '@/components';
+```
+
+Modal is the component: Backdrop, focus trap, Escape and focus return. The template is its filled layout, one per type.
+
+<DocsTable>
+<thead>
+<tr><th>Slot or prop</th><th>Holds</th></tr>
+</thead>
+<tbody>
+<tr><td><code>title</code> · <code>onClose</code></td><td>The h1 and the Close icon button.</td></tr>
+<tr><td><code>width</code></td><td><code>6-col</code> · <code>8-col</code> · <code>10-col</code>.</td></tr>
+<tr><td><code>width="4-col"</code> <PlannedTag /></td><td>Planned. The confirm width, 4 columns plus the pad. Today the smallest step is 6-col.</td></tr>
+<tr><td><code>body</code></td><td>Text, a list, fields or a table. It scrolls past the cap.</td></tr>
+<tr><td><code>footer</code> or <code>primaryButton</code> · <code>secondaryButton</code></td><td>The footer's buttons. Leave them out for Passive.</td></tr>
+<tr><td>Full-bleed footer <PlannedTag /></td><td>Planned. Cells that fill the footer edge to edge at <code>--space-300</code> with the inner corners squared. Today the page composes it from Button.</td></tr>
+<tr><td><code>tabs</code></td><td>Two to five views of one thing under the title.</td></tr>
+<tr><td><code>confirmView</code> <PlannedTag /></td><td>Planned. The swapped title, body and footer for a confirm about the Modal itself. Today the caller swaps them in place.</td></tr>
+<tr><td>Blocked-submit shake <PlannedTag /></td><td>Planned. The Modal's single shake when a submit is blocked.</td></tr>
+</tbody>
+</DocsTable>
 
 </div>
 
@@ -109,92 +236,30 @@ The Modal interrupts the page for one task. It is always centered on the screen 
 
 ## Usage
 
-A Modal asks for one decision or one short task before the person goes on, such as moving a session or confirming a delete. It blocks the page, so keep it brief and give it a clear way out.
-
-This pattern draws the Modal inline, with no portal, focus trap or Escape handling. For a real dialog, use the core Modal component, which draws the same layers and tokens.
-
-### Width guidance
-
-Width is a step of the screen grid. It grows with the screen, never shrinks, and the sidebar never changes it. A Modal never comes closer than 16 to the screen sides.
+Use a Modal when the next step has to happen before anything else can: a confirm, a rare critical task with fewer than five fields, something to read before going on. It is always centered over a Backdrop. A Panel that needs full attention becomes a Modal.
 
 <DocsTable>
 <thead>
-<tr><th>Step</th><th>Medium 768</th><th>Large 1024</th><th>X-Large 1440</th><th>Made of</th></tr>
+<tr><th>Type</th><th>Use when</th><th>Footer</th></tr>
 </thead>
 <tbody>
-<tr><td><code>sm</code></td><td>384</td><td>512</td><td>640</td><td>6 screen-grid columns + 2 × 16</td></tr>
-<tr><td><code>md</code></td><td>507</td><td>677</td><td>848</td><td>8 columns + 2 × 16</td></tr>
-<tr><td><code>lg</code></td><td>629</td><td>843</td><td>1056</td><td>10 columns + 2 × 16</td></tr>
+<tr><td>Passive</td><td>Something to read, with nothing to decide</td><td>None; Close only</td></tr>
+<tr><td>Active</td><td>A choice, a confirm or a short form</td><td>Cancel and the action</td></tr>
+<tr><td>Acknowledge</td><td>One thing to read and accept</td><td>One button</td></tr>
+<tr><td>Steps</td><td>A short ordered sequence</td><td>Cancel · Back · Next</td></tr>
 </tbody>
 </DocsTable>
-
-### Height guidance
-
-<DocsTable>
-<thead>
-<tr><th>Height</th><th>When to use</th></tr>
-</thead>
-<tbody>
-<tr><td><code>hug</code></td><td>Most modals. It grows with the content to the cap the <a href="?path=/docs/templates-modal-backdrop--docs">Blanket</a> sets, screen height less 2 × 64, then the body scrolls.</td></tr>
-<tr><td><code>fill</code></td><td>A settings or editor Modal, or tabs whose views differ in length, so switching never resizes it.</td></tr>
-</tbody>
-</DocsTable>
-
-### Tabs guidance
-
-- Use tabs for two to five views of one thing that people open in any order.
-- When the views must be done in order, split the flow into steps: one view at a time, Back and Next in the footer, and the step in the title or the body, such as "Step 2 of 3".
-- Keep each label to one or two words on one line. At width `sm` that is about three tabs. Never wrap or scroll the strip, and never nest a second tab group in the body.
-- One footer serves every tab. Save saves them all, and switching tabs keeps what was typed.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Parts
+## Alternatives
 
-1. **Header.** The title and the Close button, which shows whenever `onClose` is set. With `tabs`, a tab group sits 8 under the title. A custom `header` replaces the title row.
-2. **Body.** A slot for text, a list, media or fields. It scrolls past the cap.
-3. **Footer** (optional). A slot for actions, right-aligned, with the primary last. Leaving out `footer` removes it.
-
-The Modal pads 16 on every side and rounds 12 at every width, and its parts stack 16 apart. The title is Heading/medium 20/24. Figma's `description?` and `actions?` have no prop in code; put a description line in the body. `column guide?` is Figma only and never ships.
-
-### States
-
-A Modal is open or closed, and loading swaps its body for a skeleton. It has no hover, pressed or disabled states of its own; those belong to the controls inside it.
-
-<DocsTable>
-<thead>
-<tr><th>State</th><th>What changes</th></tr>
-</thead>
-<tbody>
-<tr><td>Rest</td><td>The overlay pair: <code>--ds-surface-overlay</code> with <code>--ds-shadow-overlay</code>.</td></tr>
-<tr><td>Loading</td><td>A Skeleton paragraph in the body, with <code>aria-busy</code> on it. The header and footer stay.</td></tr>
-<tr><td>Scrolling</td><td>Once the body outgrows the cap, it scrolls and becomes a tab stop.</td></tr>
-</tbody>
-</DocsTable>
-
-### Tokens
-
-<DocsTable>
-<thead>
-<tr><th>Token</th><th>Value</th><th>What it is for</th></tr>
-</thead>
-<tbody>
-<tr><td><code>--modal-pad-x-default</code></td><td>16</td><td>Pad on every side, every size.</td></tr>
-<tr><td><code>--modal-stack-sm</code></td><td>8</td><td>The title row to the tab group.</td></tr>
-<tr><td><code>--modal-stack-md</code></td><td>16</td><td>Between the header, body and footer, and between fields in a group.</td></tr>
-<tr><td><code>--modal-stack-lg</code></td><td>24</td><td>Between groups of fields you place in the body. The Modal does not apply it.</td></tr>
-<tr><td><code>--modal-inline-sm</code>, <code>-md</code>, <code>-lg</code></td><td>8, 16, 24</td><td>Inline space in slot content. The footer spaces its buttons with <code>--stack-md</code>, 8.</td></tr>
-<tr><td><code>--modal-body-min-height</code></td><td>80</td><td>The least height the body draws, so a short body or the skeleton does not collapse.</td></tr>
-<tr><td><code>--modal-radius</code></td><td>12</td><td>Corner radius at every width.</td></tr>
-<tr><td><code>--modal-width-sm</code>, <code>-md</code>, <code>-lg</code></td><td>see Width guidance</td><td>The three width steps, per screen size.</td></tr>
-<tr><td><code>--blanket-max-height-modal</code></td><td>screen height less 2 × pad-y</td><td>The cap a hug Modal grows to and a fill Modal sits at.</td></tr>
-<tr><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td><td>overlay pair</td><td>The Modal's fill and elevation.</td></tr>
-<tr><td><code>--heading-medium</code></td><td>20/24</td><td>The title.</td></tr>
-<tr><td><code>--ds-border</code>, <code>--border-default</code></td><td>color, 1</td><td>The divider rules.</td></tr>
-</tbody>
-</DocsTable>
+- For content read beside the page, use `Panel`.
+- For a short aside off a control, use `Popup`.
+- For a long or stepped task, use `Frame` · focused.
+- For a passing notice, use `Flag`.
 
 </div>
 
@@ -202,60 +267,65 @@ A Modal is open or closed, and loading swaps its body for a skeleton. It has no 
 
 ## Best practices
 
-Size the modal to its job, and stack no more than its confirm.
+### Open a Modal only from a person's action.
 
-### At most two overlays.
+<RuleTag kind="review" />
 
-At most two overlays: a modal or drawer, and the confirm it raises. Never two unrelated overlays, and never a third. For a confirm about the dialog itself, such as discarding its edits, prefer the Modal's own confirm view: it swaps the title, body and footer in place, and Back returns without losing anything typed. A confirm stacked over the Modal is allowed too.
+A button, a link, an icon. Never on its own.
+
+### Size a confirm at 4-col and step up to 6-col with a detail line or a field.
+
+<RuleTag kind="review" />
+
+One rule, so nobody guesses. A short form is 8-col; a table, an editor or steps is 10-col. Never pick a width to make content look a certain way. The 4-col step is Planned: until it lands a confirm takes 6-col.
 
 <DoDontPair
-    doExample={<ModalWithConfirm />}
-    doCaption="A modal and the confirm it raises: two overlays."
-    dontExample={<ThirdOverlay />}
-    dontCaption="A third overlay over a modal and its confirm."
+    doExample={<ConfirmNarrow />}
+    doCaption="A confirm at the narrow step: the title, one line and two buttons."
+    dontExample={<ConfirmWide />}
+    dontCaption="The same confirm at a wide step: empty width around one line, picked to make it look a certain way."
 />
 
-### Confirm in a small modal.
+### Confirm inside the Modal, and never open a Modal on another Modal.
+
+<RuleTag kind="automatic" />
+
+A confirm Modal may open over a Panel, a Popup or a focused task, and brings its own Backdrop. A Modal that needs a confirm holds it inside itself: the title, body and footer swap in place, with a warning SectionMessage and the danger button, and Back returns without losing anything typed. The overlay module keeps a second Modal closed and calls its `onClose`.
 
 <DoDontPair
-    doExample={<ConfirmSmallDo />}
-    doCaption="Confirm in a small modal."
-    dontExample={<ConfirmSmallDont />}
-    dontCaption="Confirm in a large modal."
+    doExample={<ConfirmsInside />}
+    doCaption="One Modal that confirms inside itself, with a message and its own buttons."
+    dontExample={<ModalOnModal />}
+    dontCaption="A Modal opened on another Modal, a second Backdrop dimming the first."
 />
 
-### Size the modal to its content.
+### Scroll the body between a fixed header and footer.
+
+<RuleTag kind="automatic" />
+
+Each width has a maximum height, the screen less `--space-400` above and below. Header and footer are pinned and the footer never moves. Actions never sit in the body, which scrolls away; a missing-field error shows on the field and the body scrolls to it, and a rejected submit shows its message at the top of the body.
 
 <DoDontPair
-    doExample={<HugShortContent />}
-    doCaption="Size the modal to its content."
-    dontExample={<FillShortContent />}
-    dontCaption="Fill the height for short content."
-/>
-
-### Put the actions in the footer.
-
-End-align them with the primary last. Never place them in the body, which scrolls while the footer stays put.
-
-<DoDontPair
-    doExample={<FooterActions />}
-    doCaption="Header, body and footer each hold their own content, so the actions stay apart from the fields."
-    dontExample={<ButtonsInBody />}
-    dontCaption="The buttons sit inside the body with the fields and the footer is off. They scroll away with the content."
+    doExample={<FooterPinned />}
+    doCaption="Past the cap the body scrolls; the footer stays pinned with its buttons."
+    dontExample={<ButtonInBody />}
+    dontCaption="The button inside the scrolling body: it scrolls out of reach."
 />
 
 ### Use tabs for views, not steps.
 
+<RuleTag kind="review" />
+
+Two to five views of one thing opened in any order; one footer saves them all. Views in order are Steps, with Back and Next in the footer.
+
 <DoDontPair
-    doExample={<TabsForViews />}
-    doCaption="Tabs for views of one session that a tutor opens in any order. One Save in the footer saves every tab."
-    dontExample={<TabsAsSteps />}
-    dontCaption="Numbered tabs that fake a sequence. Use steps: one view at a time, with Back and Next in the footer."
+    doExample={<StepsForSequence />}
+    doCaption="Views in order are Steps: Cancel at the start, Back and Next on the right half."
+    dontExample={<TabsForSteps />}
+    dontCaption="Numbered tabs as steps: any order, one Save, nothing to go back to."
 />
 
-### Group the fields.
-
-Pair a control with the field it controls, and group the fields that describe one thing. Space groups `--modal-stack-lg` apart and fields within a group `--modal-stack-md` apart, and keep the body apart from the actions.
+Footer buttons, Cancel and Close, and which destructive tier, including type the name: <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a>. A blocked submit: <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>. The sending button: Patterns, Loading.
 
 </div>
 
@@ -268,10 +338,10 @@ Pair a control with the field it controls, and group the fields that describe on
 <tr><th>Do</th><th>Don't</th></tr>
 </thead>
 <tbody>
-<tr><td>Title a confirm with the question: "Delete this session?"</td><td>"Are you sure?"</td></tr>
+<tr><td>Title a confirm with the question: "Delete this session?"</td><td>"Are you sure?" or "Warning".</td></tr>
 <tr><td>Give the consequence in one line: "This cannot be undone."</td><td>A paragraph that repeats the title.</td></tr>
-<tr><td>Name the primary action after the question: "Delete session". It takes the danger appearance when it destroys something.</td><td>"OK" or "Yes".</td></tr>
-<tr><td>Tab labels of one or two words: "Details", "Students".</td><td>Numbered labels, or labels that wrap.</td></tr>
+<tr><td>Name the action after the question: "Delete session".</td><td>"OK" or "Yes".</td></tr>
+<tr><td>On the last step, name Next after the outcome: "Schedule".</td><td>"Finish".</td></tr>
 </tbody>
 </DocsTable>
 
@@ -281,13 +351,11 @@ Pair a control with the field it controls, and group the fields that describe on
 
 ## Accessibility
 
-- The Modal has the role dialog. Its title is an h1 and names it through `aria-labelledby`, so the dialog reads as its own page, and a section inside it opens at h2.
-- A Modal with a custom `header` or no title needs its own `aria-label`.
-- A body that scrolls is a tab stop, so a keyboard can reach it.
-- With tabs, the tab group is a tablist. Left and Right move between tabs, Home and End jump to the ends, and Tab moves from the strip into the panel. The panel is named by its tab.
-- A loading body is marked `aria-busy`.
-- The Close button's accessible name is "Close".
-- The pattern has no focus trap or Escape handling. The core Modal adds them and returns focus to the trigger on close. How an open modal meets the Sidebar is on <a href="?path=/docs/templates-frame-frame--docs">Frame</a>.
+- The Modal is a dialog named by its title, which is its h1; a Section inside opens at h2. A Modal with a custom header needs its own name.
+- Focus goes to the first input on open, or to the Primary when there are no fields, and stays trapped until it closes. Escape, Close and the Backdrop close it, and focus returns to what opened it.
+- A body that scrolls is a tab stop. With tabs, Left and Right move between tabs and the panel is named by its tab.
+- A blocked submit announces the first error; with reduced motion the color, icon, message and focus move carry it without the shake.
+- Close is named "Close". The Danger button in a type-the-name confirm stays disabled until the name matches, and the caption carries the reason.
 
 </div>
 
@@ -295,10 +363,11 @@ Pair a control with the field it controls, and group the fields that describe on
 
 ## Related
 
-- [Blanket](?path=/docs/templates-modal-backdrop--docs) places the Modal and carries the dimmed ground, the pads and the screen grid.
-- [Drawer](?path=/docs/templates-panel-panel--docs) takes the same width steps at a screen edge, for a task that needs the page in view.
-- [Popups](?path=/docs/templates-popup-popup--docs) holds the floating layers that never block the page, such as a Tooltip for one line of help.
-- [Section](?path=/docs/templates-section-section--docs) and [Card](?path=/docs/templates-section-card--docs) hold content that belongs on the page itself.
+- <a target="_top" href="./?path=/docs/templates-form--docs">Form</a>: use when the Modal holds fields.
+- <a target="_top" href="./?path=/docs/templates-panel-panel--docs">Panel</a>: use when the page must stay usable.
+- <a target="_top" href="./?path=/docs/templates-popup-popup--docs">Popup</a>: use when the content is a menu or a short list.
+- <a target="_top" href="./?path=/docs/templates-modal-backdrop--docs">Backdrop</a>: use when you need the dimmed ground, the pads and the screen grid under the Modal.
+- <a target="_top" href="./?path=/docs/patterns-overview--docs">Patterns</a>: use when you need the rules across Modals: <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a>, <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>, Errors, Loading.
 
 </div>
 

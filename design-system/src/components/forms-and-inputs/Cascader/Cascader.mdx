@@ -4,6 +4,7 @@ import { Meta, Title } from '@storybook/addon-docs/blocks';
 import * as CascaderStories from './Cascader.stories.jsx';
 import { Cascader } from '@/components';
 import { DocsInteractivePlayground, DocsTable, DoDontPair, ResourcesBlock, ComponentExample } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const regionOptions = [
     { text: 'Zhejiang', value: 'zhejiang', children: [
@@ -63,6 +64,14 @@ one level to reveal the next column of choices beneath it.
 <ComponentExample of={CascaderStories.FieldInvalid} title="Invalid" description="The danger edge with the message under the field." />
 
 <ComponentExample of={CascaderStories.FieldDisabled} title="Disabled" description="The whole field fades and leaves the tab order." />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Motion
+
+<MotionSection component="Cascader" />
 
 </div>
 

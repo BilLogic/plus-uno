@@ -1,14 +1,14 @@
 import React from 'react';
 
 import { Button } from '@/components';
-import { Blanket, PatternDrawer, PatternModal } from '@/patterns';
+import { Backdrop, PatternDrawer, PatternModal } from '@/patterns';
 import { ScaledPreview } from '@/storybook-docs/lib/scaled-preview.jsx';
 
 /**
  * The do and don't examples on the Drawer docs page: the overlay at a 1024
  * stand-in screen, scaled down to the card. Stage sizes are docs geometry,
- * not design values. The stacking pair is the Blanket page's, imported
- * from `Blanket.examples.jsx`.
+ * not design values. The stacking pair is the Backdrop page's, imported
+ * from `Backdrop.examples.jsx`.
  */
 
 const SCREEN = { width: 1024, height: 480 };
@@ -48,11 +48,11 @@ export const WideDrawer = () => <Stage>{detailsDrawer('lg')}</Stage>;
 /** Do: a short decision in a small modal. */
 export const DecisionInModal = () => (
     <Stage>
-        <Blanket inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>
+        <Backdrop inline screenWidth={SCREEN.width} screenHeight={SCREEN.height}>
             <PatternModal title="Discard changes?" width="sm" onClose={() => {}} footer={footer('Discard changes', 'danger')}>
                 {text('Your edits to this session plan will be lost.')}
             </PatternModal>
-        </Blanket>
+        </Backdrop>
     </Stage>
 );
 

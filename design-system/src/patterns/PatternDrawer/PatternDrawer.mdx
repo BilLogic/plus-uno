@@ -2,242 +2,33 @@ import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
 import { Meta, Title } from '@storybook/addon-docs/blocks';
 
 import * as PatternDrawerStories from './PatternDrawer.stories.jsx';
-import { MediumDrawer, WideDrawer, DecisionInModal, DecisionInDrawer } from './PatternDrawer.examples.jsx';
-import { DrawerWithConfirm, DrawerWithUnrelatedModal } from '../Blanket/Blanket.examples.jsx';
-import {
-    ComponentExample,
-    DocsInteractivePlayground,
-    DocsTable,
-    DoDontPair,
-    ResourcesBlock,
-} from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 <Meta of={PatternDrawerStories} />
 
-<Title />
-The Drawer is a full-height panel at the edge of the screen, for a task that needs the page in view: the details of a row, a set of filters or a short edit. It sits in a Blanket at the right edge or the left edge, over the same blanket a Modal takes. It carries a title, a description, a body and a footer, like a Modal. The examples on this page follow the toolbar's Color mode switch.
+<Title>Edge layer</Title>
+
+A full-height layer a Backdrop holds at a screen edge. It is retiring: a [Panel](?path=/docs/templates-panel-panel--docs) floats beside the page with no Backdrop and is the way forward.
 
 <DocsTabs of={PatternDrawerStories}>
 
 <DocsTab tab="examples">
 
-<ResourcesBlock
-    figmaLink="https://www.figma.com/design/zAecJNRdvJzAUOcjV32tRX?node-id=19844-125964"
-    githubLink="https://github.com/BilLogic/plus-uno/tree/main/design-system/src/patterns/PatternDrawer"
-/>
-
 <div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
 
 <div className="sb-ds-doc-section">
 
-## Appearance
+## Status
 
-<ComponentExample of={PatternDrawerStories.Overview} title="Drawer" description={<>A <code>sm</code> Drawer at the <code>end</code> edge of a 1024 stand-in screen, on the overlay pair with no radius.</>} />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Size and layout
-
-<ComponentExample of={PatternDrawerStories.WidthSmall} title="Small" description={<><code>width="sm"</code>, the default: 6 screen-grid columns plus 16 on each side, 512 at 1024.</>} />
-
-<ComponentExample of={PatternDrawerStories.WidthMedium} title="Medium" description={<><code>width="md"</code>: 8 columns plus 16 on each side, 677 at 1024.</>} />
-
-<ComponentExample of={PatternDrawerStories.WidthLarge} title="Large" description={<><code>width="lg"</code>, the widest: 10 columns plus 16 on each side, 843 at 1024.</>} />
-
-<ComponentExample of={PatternDrawerStories.LongContentStill} title="Long content" description="The Drawer runs full height; the body scrolls past it and becomes a tab stop, and the footer stays pinned." />
+Use a [Panel](?path=/docs/templates-panel-panel--docs) for a task that needs the page in view. Existing screens keep working until they move to one.
 
 </div>
 
 <div className="sb-ds-doc-section">
 
-## Behavior
+## Motion
 
-<ComponentExample of={PatternDrawerStories.PlacementEnd} title="End" description={<><code>placement="end"</code>, the default, holds the Drawer at the right edge, for a panel about something on the page.</>} />
-
-<ComponentExample of={PatternDrawerStories.PlacementStart} title="Start" description={<><code>placement="start"</code> holds it at the left edge, for a panel that reads like navigation.</>} />
-
-<ComponentExample of={PatternDrawerStories.NoFooter} title="No footer" description={<>Leave out <code>footer</code> for read-only details, and the Drawer ends at the body.</>} />
-
-<ComponentExample of={PatternDrawerStories.OpenAndClose} title="Open and close" description="Press the button: focus moves to the first control, Tab cycles inside, and Escape, Close or a blanket click send it back to the button." />
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Interactive playground
-
-<DocsInteractivePlayground
-    of={PatternDrawerStories.Interactive}
-    description={
-        <>
-            Use the table below to change props. The preview is rendered{' '}
-            <strong>inline</strong> while you scroll the docs page.
-        </>
-    }
-/>
-
-</div>
-
-</div>
-
-</DocsTab>
-
-<DocsTab tab="usage">
-
-<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
-
-<div className="sb-ds-doc-section">
-
-## Usage
-
-Use a Drawer to open a panel beside the page, so a person can work on one thing while the page stays in view. It dims the page with the blanket but does not hide it.
-
-<DocsTable>
-<thead>
-<tr><th>Task</th><th>Use</th></tr>
-</thead>
-<tbody>
-<tr><td>The details of a row, filters or a short edit, with the page in view.</td><td>A Drawer.</td></tr>
-<tr><td>A task that blocks the page, or a short decision.</td><td>A Modal.</td></tr>
-<tr><td>Content that belongs on the page itself.</td><td>A Section or a Card.</td></tr>
-</tbody>
-</DocsTable>
-
-### Width guidance
-
-A Drawer takes the Modal width steps, never the page grid. The width grows with the screen, never shrinks, and the sidebar never changes it. Past `lg` the page behind it is no longer in view, and the task wants a Modal or a page of its own.
-
-<DocsTable>
-<thead>
-<tr><th>Step</th><th>Medium 768</th><th>Large 1024</th><th>X-Large 1440</th><th>Made of</th></tr>
-</thead>
-<tbody>
-<tr><td><code>sm</code></td><td>384</td><td>512</td><td>640</td><td>6 screen-grid columns + 2 × 16</td></tr>
-<tr><td><code>md</code></td><td>507</td><td>677</td><td>848</td><td>8 columns + 2 × 16</td></tr>
-<tr><td><code>lg</code></td><td>629</td><td>843</td><td>1056</td><td>10 columns + 2 × 16</td></tr>
-</tbody>
-</DocsTable>
-
-A Drawer is placed in the [Blanket](?path=/docs/templates-modal-backdrop--docs) with an edge placement. The Blanket drops its pad and holds the Drawer at that edge, over the same blanket and layers a [Modal](?path=/docs/templates-modal-modal--docs) takes.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Parts
-
-1. **Header.** The title, an optional description and the Close button, which shows whenever `onClose` is set.
-2. **Body.** A slot that takes the height the header and footer leave, and scrolls past it.
-3. **Footer** (optional). A slot pinned to the bottom edge, with actions right-aligned and the primary last.
-
-The Drawer pads 16 on every side and stacks its parts 16 apart. It has no radius, because it meets the screen edge at the top, the bottom and its own side. Figma's custom header, `actions?`, `divider?` and `loading?` have no prop in code; `column guide?` is Figma only and never ships.
-
-### States
-
-A Drawer is open or closed. Closing it returns focus to what had it before it opened. Its parts have no hover, pressed or disabled states of their own; those belong to the controls in the header and footer. When focus lands on the Drawer itself, it draws the focus ring inside its edge.
-
-### Tokens
-
-<DocsTable>
-<thead>
-<tr><th>Token</th><th>Value</th><th>What it is for</th></tr>
-</thead>
-<tbody>
-<tr><td><code>--drawer-pad</code></td><td>16</td><td>Pad on every side, every size.</td></tr>
-<tr><td><code>--drawer-stack-md</code></td><td>16</td><td>Space between the header, body and footer.</td></tr>
-<tr><td><code>--drawer-inline-sm</code></td><td>8</td><td>Space in the header row and between footer buttons.</td></tr>
-<tr><td><code>--drawer-stack-sm</code>, <code>-lg</code>; <code>--drawer-inline-md</code>, <code>-lg</code></td><td>8, 24; 16, 24</td><td>Spacing for the content you place in the body. The Drawer does not apply them.</td></tr>
-<tr><td><code>--drawer-width-sm</code>, <code>-md</code>, <code>-lg</code></td><td>see Width guidance</td><td>The three width steps, the same values as the Modal's.</td></tr>
-<tr><td><code>--ds-surface-overlay</code>, <code>--ds-shadow-overlay</code></td><td>overlay pair</td><td>The Drawer's fill and elevation.</td></tr>
-<tr><td><code>--heading-medium</code></td><td>20/24</td><td>The title.</td></tr>
-<tr><td><code>--body-default</code>, <code>--ds-text-subtle</code></td><td>14/20</td><td>The description.</td></tr>
-<tr><td><code>--ds-border-focused</code>, <code>--focus-ring-width</code></td><td>focus ring</td><td>The ring when the Drawer itself holds focus.</td></tr>
-<tr><td><code>--ds-blanket</code></td><td>32% in Light, 60% in Dark</td><td>The fill the Blanket draws behind it.</td></tr>
-</tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Best practices
-
-Use a drawer for work beside the page, a modal for a short decision.
-
-### At most two overlays.
-
-At most two overlays: a modal or drawer, and the confirm it raises. Never two unrelated overlays, and never a third; the overlay module keeps a third closed.
-
-<DoDontPair
-    doExample={<DrawerWithConfirm />}
-    doCaption="A drawer and the confirm it raises, stacked over it."
-    dontExample={<DrawerWithUnrelatedModal />}
-    dontCaption="A modal for an unrelated task opened over a drawer."
-/>
-
-### Keep the page in view.
-
-<DoDontPair
-    doExample={<MediumDrawer />}
-    doCaption="A medium drawer for a form or detail."
-    dontExample={<WideDrawer />}
-    dontCaption="A wide drawer that covers the page."
-/>
-
-### Use a modal for a short decision.
-
-<DoDontPair
-    doExample={<DecisionInModal />}
-    doCaption="A small modal for a short decision."
-    dontExample={<DecisionInDrawer />}
-    dontCaption="A drawer for a short decision."
-/>
-
-### Place the Drawer in a Blanket.
-
-Hold the Drawer full height at a screen edge, inside a Blanket. Never put it straight on the page, and never center it: a centered layer is a Modal.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Content guidelines
-
-<DocsTable>
-<thead>
-<tr><th>Do</th><th>Don't</th></tr>
-</thead>
-<tbody>
-<tr><td>A short title that names what the Drawer holds: "Session details".</td><td>A title that repeats the button that opened it word for word.</td></tr>
-<tr><td>A description only when it adds something, such as "Thursday · 4:00–5:00 PM".</td><td>A description that restates the title.</td></tr>
-<tr><td>Name the primary action for what it does: "Save changes".</td><td>"OK" or "Submit".</td></tr>
-</tbody>
-</DocsTable>
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Accessibility
-
-- The Drawer is a dialog with `aria-modal` set to true. The title is its h1 and names it through `aria-labelledby`, and the description is linked through `aria-describedby`.
-- Opening moves focus to the first control inside and traps it there. Tab and Shift+Tab cycle inside.
-- Escape, the Close button and a click on the blanket call `onClose`, and focus returns to the control that opened it. An inner control that handles Escape keeps it.
-- A body that scrolls is a tab stop, so a keyboard can reach it.
-- An `inline` Drawer, drawn in the page flow for docs, sets `aria-modal` to false and leaves focus where it is.
-
-</div>
-
-<div className="sb-ds-doc-section">
-
-## Related
-
-- [Modal](?path=/docs/templates-modal-modal--docs) is the centered layer for a task that blocks the page.
-- [Blanket](?path=/docs/templates-modal-backdrop--docs) places the Drawer at an edge and draws the fill.
-- [Section](?path=/docs/templates-section-section--docs) and [Card](?path=/docs/templates-section-card--docs) hold content that belongs on the page itself.
-- <a href="?path=/docs/templates-frame-frame--docs">Frame</a> shows a Drawer open over the app frame, and how it meets the Sidebar.
+<MotionSection component="PatternDrawer" tier="template" />
 
 </div>
 

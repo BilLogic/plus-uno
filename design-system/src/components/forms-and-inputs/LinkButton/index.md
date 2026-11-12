@@ -12,9 +12,19 @@ Link button: navigates, and looks like a button. It renders an anchor, so it has
 
 **Storybook page:** `design-system/src/components/forms-and-inputs/LinkButton/LinkButton.mdx`
 
+**Motion:** change `appearance.fast`. Read the tokens through `--ds-motion-*`; see Foundations · Motion.
+
 ## Usage
 
 Use a link button to open another page, a site or a place on the page. For an action that stays on the current page, use a Button.
+
+## Motion
+
+LinkButton reads these motion tokens and no literal duration or curve.
+
+| Event | Transition | Tokens | What it does |
+| --- | --- | --- | --- |
+| change | Update a value or state | `--ds-motion-appearance-fast` | Hover and press change color, 90% by about 110 ms. |
 
 ## Best practices
 

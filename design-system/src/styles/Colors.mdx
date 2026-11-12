@@ -54,7 +54,7 @@ A name reads from the general to the specific: property, role, emphasis, state. 
     head={['Part', 'In `color/background/danger/bold/hovered`', 'What it says']}
     rows={[
         ['color', 'Namespace', 'Dropped in CSS. Surface and shadow tokens start with elevation.'],
-        ['background', 'Property', 'What it paints: text, icon, border, background, link, chart, blanket, skeleton or interaction.'],
+        ['background', 'Property', 'What it paints: text, icon, border, background, link, chart, backdrop, skeleton or interaction.'],
         ['danger', 'Role', 'What it means. Left out for the default neutral.'],
         ['bold', 'Emphasis', 'How far it stands from the surface. Only the steps a role defines exist.'],
         ['hovered', 'State', 'hovered, pressed or visited. Interactive backgrounds and links only.'],
@@ -64,7 +64,7 @@ A name reads from the general to the specific: property, role, emphasis, state. 
 <RefTable
     head={['Part', 'Values', 'What it says']}
     rows={[
-        ['property', <><C>text</C> · <C>icon</C> · <C>border</C> · <C>background</C> · <C>link</C> · <C>surface</C> · <C>shadow</C> · <C>blanket</C> · <C>skeleton</C> · <C>interaction</C> · <C>chart</C></>, 'What the color paints. Always there.'],
+        ['property', <><C>text</C> · <C>icon</C> · <C>border</C> · <C>background</C> · <C>link</C> · <C>surface</C> · <C>shadow</C> · <C>backdrop</C> · <C>skeleton</C> · <C>interaction</C> · <C>chart</C></>, 'What the color paints. Always there.'],
         ['role', <><C>brand</C> · <C>neutral</C> · <C>selected</C> · <C>input</C> · <C>inverse</C> · <C>disabled</C> · <C>focused</C> · <C>danger</C> · <C>warning</C> · <C>success</C> · <C>information</C> · <C>discovery</C> · <C>accent-teal</C> · <C>smart-advocacy</C></>, 'What it means. Left out for the default neutral.'],
         ['emphasis', <><C>subtlest</C> · <C>subtler</C> · <C>subtle</C> · (default) · <C>bold</C> · <C>bolder</C> · <C>boldest</C></>, 'How far it stands from the surface.'],
         ['state', <><C>hovered</C> · <C>pressed</C> · <C>visited</C></>, 'Interactive backgrounds and links only.'],
@@ -85,7 +85,7 @@ Pick the family by job:
 PLUS has two color modes, light and dark, and each has an increased contrast version for people who need stronger text and edges. That makes four modes. A fifth setting, auto, follows the operating system: `prefers-color-scheme` picks light or dark, and `prefers-contrast` turns increased contrast on.
 
 - Dark is not light inverted. Raised and overlay surfaces get lighter as they rise, because a shadow is hard to see on a dark page.
-- Increased contrast darkens text and meaningful borders in light and lightens them in dark. Text then reaches 7:1, and borders, icons and the focus ring reach 4.5:1. Tints, surfaces and the Blanket stay as they are.
+- Increased contrast darkens text and meaningful borders in light and lightens them in dark. Text then reaches 7:1, and borders, icons and the focus ring reach 4.5:1. Tints, surfaces and the Backdrop stay as they are.
 - Tokens map per theme. Design in dark mode by choosing the same token, and never map your own values.
 - In code, the page sets `data-color-mode` (light, dark or auto) and `data-contrast-mode` (no-preference, more or auto). No attribute means light at standard contrast.
 - In Figma, set the mode on the frame: Light, Dark, Light IC or Dark IC. Each swatch below shows the value the page resolves for its token right now, so switching the toolbar changes it at once.

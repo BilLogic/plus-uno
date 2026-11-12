@@ -10,6 +10,7 @@ import {
     DoDontPair,
     ResourcesBlock,
 } from '@/storybook-docs/ds-docs-layout.jsx';
+import MotionSection from '@/storybook-docs/motion-section.jsx';
 
 export const figmaMeta = {
   "fileKey": "zAecJNRdvJzAUOcjV32tRX",
@@ -125,6 +126,14 @@ An icon button is a button with an icon and no visible label. Its required `labe
 
 <div className="sb-ds-doc-section">
 
+## Motion
+
+<MotionSection component="IconButton" />
+
+</div>
+
+<div className="sb-ds-doc-section">
+
 ## Interactive playground
 
 <DocsInteractivePlayground
@@ -214,7 +223,7 @@ Default spacing suits most places. Use compact in table rows and inline toolbars
 <tr><td>Icon</td><td><code>--ds-icon-subtle</code> (default, subtle), <code>--ds-icon-inverse</code> (primary, discovery); the selected and disabled roles. 16, <code>--icon-md</code>.</td></tr>
 <tr><td>Focus ring</td><td><code>--ds-border-focused</code>, 2px, 2px offset.</td></tr>
 <tr><td>Size</td><td>32: <code>--item-height-md</code>. 24: <code>--item-height-sm</code>. Square, except with a count.</td></tr>
-<tr><td>Count</td><td><code>--ds-text-subtlest</code>, or the selected text color when selected. <code>--inline-sm</code> after the icon. Motion: <code>--motion-duration-medium</code> to open, <code>--motion-duration-short</code> to fade in.</td></tr>
+<tr><td>Count</td><td><code>--ds-text-subtlest</code>, or the selected text color when selected. <code>--inline-sm</code> after the icon. Motion: <code>--ds-motion-appearance-default</code> to open, <code>--ds-motion-appearance-fast</code> to fade in.</td></tr>
 <tr><td>Radius</td><td>6: <code>--button-radius-default</code>. Compact 4: <code>--button-radius-compact</code>. Circle 50%.</td></tr>
 </tbody>
 </DocsTable>

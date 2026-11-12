@@ -7,27 +7,8 @@ import { Rect } from './primitives.jsx';
  * tap ring and a pointer. Same contract as `primitives.jsx`: position, size and
  * `accent` (the one subject), 1 unit = 2px of product UI, no words.
  *
- * Each role paints from the token the real thing uses for that role. The map
- * stays here until `paint.js` becomes a role map; then these entries move there.
+ * Each paints from a role in `paint.js`, the token the real thing uses for it.
  */
-const ds = (name) => `var(--ds-${name})`;
-
-export const MOTION_PAINT = {
-  // A chart's axis and gridlines: the charts' neutral-20 (dataviz/chartTheme.css).
-  axis: ds('border'),
-  // A chart's reference line, such as the target: the charts' neutral-40 (chartTheme.css).
-  target: ds('border-bold'),
-  // A plotted series: the data-viz neutral series, and the brand series for the subject.
-  curve: ds('chart-neutral'),
-  curveAccent: ds('chart-brand'),
-  // A path a thing travels: the subtle stroke dividers use.
-  trail: ds('border'),
-  // A press: the ring the pressed and focused states draw (styles/_state.scss, plus-ring).
-  tapRing: ds('border-focused'),
-  // The pointer: body in the text ink, edged in the page surface so it reads on any fill.
-  pointer: ds('text'),
-  pointerEdge: ds('surface'),
-};
 
 /** The chart line's weight, from the stroke the charts draw a series with. */
 const SERIES = { strokeWidth: 'var(--stroke-2)', strokeLinejoin: 'round', strokeLinecap: 'round' };
@@ -39,14 +20,14 @@ const RING = { strokeWidth: 'var(--focus-ring-width)' };
  */
 export const ChartAxis = ({ x, y, w, h, target = 0.8 }) => (
   <g>
-    <line x1={x} x2={x} y1={y} y2={y + h} stroke={MOTION_PAINT.axis} style={HAIRLINE} />
-    <line x1={x} x2={x + w} y1={y + h} y2={y + h} stroke={MOTION_PAINT.axis} style={HAIRLINE} />
+    <line x1={x} x2={x} y1={y} y2={y + h} stroke={PAINT.axis} style={HAIRLINE} />
+    <line x1={x} x2={x + w} y1={y + h} y2={y + h} stroke={PAINT.axis} style={HAIRLINE} />
     <line
       x1={x}
       x2={x + w}
       y1={y + h - h * target}
       y2={y + h - h * target}
-      stroke={MOTION_PAINT.target}
+      stroke={PAINT.target}
       strokeDasharray="3 3"
       style={HAIRLINE}
     />
@@ -68,7 +49,7 @@ export const ChartCurve = ({ x, y, w, h, values, scale = 0.8, upTo = 1, accent =
       <polyline
         points={pts.map(([px, py]) => `${px.toFixed(1)},${py.toFixed(1)}`).join(' ')}
         fill="none"
-        stroke={accent ? MOTION_PAINT.curveAccent : MOTION_PAINT.curve}
+        stroke={accent ? PAINT.accent : PAINT.curve}
         style={SERIES}
       />
       {accent && <circle cx={hx} cy={hy} r={2.5} fill={PAINT.accent} />}
@@ -81,7 +62,7 @@ export const ChartCurve = ({ x, y, w, h, values, scale = 0.8, upTo = 1, accent =
  * arrowhead where it lands. A path that ends where it began draws one way only.
  */
 export const Trail = ({ points, accent = false }) => {
-  const color = accent ? PAINT.accent : MOTION_PAINT.trail;
+  const color = accent ? PAINT.accent : PAINT.trail;
   const [sx, sy] = points[0];
   const [ex, ey] = points[points.length - 1];
   const [px, py] = points[points.length - 2] ?? points[0];
@@ -107,8 +88,8 @@ export const Trail = ({ points, accent = false }) => {
  */
 export const TapRing = ({ x, y, r = 6, opacity = 1, accent = false }) => (
   <g opacity={opacity}>
-    <circle cx={x} cy={y} r={r} fill="none" stroke={MOTION_PAINT.tapRing} style={RING} />
-    <circle cx={x} cy={y} r={1.75} fill={accent ? PAINT.accent : MOTION_PAINT.pointer} />
+    <circle cx={x} cy={y} r={r} fill="none" stroke={PAINT.tapRing} style={RING} />
+    <circle cx={x} cy={y} r={1.75} fill={accent ? PAINT.accent : PAINT.pointer} />
   </g>
 );
 
@@ -116,11 +97,79 @@ export const TapRing = ({ x, y, r = 6, opacity = 1, accent = false }) => (
 export const Pointer = ({ x, y, accent = false }) => (
   <path
     d={`M${x} ${y} l0 11 l2.6 -2.6 l2 4.4 l1.8 -0.8 l-2 -4.3 l3.6 0 z`}
-    fill={accent ? PAINT.accent : MOTION_PAINT.pointer}
-    stroke={MOTION_PAINT.pointerEdge}
+    fill={accent ? PAINT.accent : PAINT.pointer}
+    stroke={PAINT.pointerEdge}
     style={{ ...HAIRLINE, strokeLinejoin: 'round' }}
   />
 );
+
+/**
+ * The timeline under a figure: one thin bar per part, each from when it starts
+ * to when it lands, on a shared time axis. `lanes` are `{ start, end }` in
+ * 0..1 of the axis; `now` (0..1) is the playhead, drawn as the target line.
+ * Accented, the bars are the subject's color. Up to six lanes fit the height.
+ */
+export const SequenceStrip = ({ x, y, w, h = 14, lanes, now = 0, accent = false }) => {
+  const rows = Math.max(1, lanes.length);
+  const lane = (h - 2) / rows;
+  const bar = Math.min(3, lane - 1);
+  return (
+    <g data-sequence-strip>
+      <line x1={x} x2={x + w} y1={y + h} y2={y + h} stroke={PAINT.axis} style={HAIRLINE} />
+      {lanes.map((l, i) => (
+        <Rect
+          key={i}
+          x={x + w * l.start}
+          y={y + 1 + i * lane}
+          w={Math.max(1.5, w * (l.end - l.start))}
+          h={bar}
+          fill={accent ? PAINT.accent : PAINT.shape}
+          corner="shape"
+        />
+      ))}
+      <line x1={x + w * now} x2={x + w * now} y1={y} y2={y + h} stroke={PAINT.target} style={HAIRLINE} />
+    </g>
+  );
+};
+
+/**
+ * A screen in a transition tree: a small block that lights in the subject's
+ * brand color as `lit` runs 0..1. `done` marks it passed with the visited check,
+ * for the steps of an ordered set. Painted from the shape and visited roles.
+ */
+export const TreeNode = ({ x, y, w = 16, h = 12, lit = 0, done = false, accent = false }) => (
+  <g data-part="tree-node">
+    <Rect x={x} y={y} w={w} h={h} fill={PAINT.shape} corner="shape" />
+    {(lit > 0 || accent) && <Rect x={x} y={y} w={w} h={h} fill={PAINT.accent} corner="shape" opacity={accent ? 1 : lit} />}
+    {done && (
+      <path
+        d={`M${x + w / 2 - 2.5} ${y + h / 2} L${x + w / 2 - 0.5} ${y + h / 2 + 2} L${x + w / 2 + 3} ${y + h / 2 - 2}`}
+        fill="none"
+        stroke={PAINT.trackerVisited}
+        style={HAIRLINE}
+      />
+    )}
+  </g>
+);
+
+/**
+ * A link between two screens in a tree, from (`x1`, `y1`) to (`x2`, `y2`). The
+ * neutral line is always there; `progress` (0..1) draws the subject's accent
+ * line over it from the start, and its arrowhead lands once the line has arrived.
+ */
+export const TreeEdge = ({ x1, y1, x2, y2, progress = 0, accent = false }) => {
+  const angle = Math.atan2(y2 - y1, x2 - x1);
+  const head = (a) => `${(x2 - 5 * Math.cos(angle + a)).toFixed(1)},${(y2 - 5 * Math.sin(angle + a)).toFixed(1)}`;
+  const px = x1 + (x2 - x1) * progress;
+  const py = y1 + (y2 - y1) * progress;
+  return (
+    <g data-part="tree-edge">
+      <line x1={x1} y1={y1} x2={x2} y2={y2} stroke={PAINT.trail} style={HAIRLINE} />
+      {progress > 0 && <line x1={x1} y1={y1} x2={px} y2={py} stroke={PAINT.accent} style={SERIES} />}
+      {accent && progress >= 0.999 && <polygon points={`${x2},${y2} ${head(0.5)} ${head(-0.5)}`} fill={PAINT.accent} />}
+    </g>
+  );
+};
 
 /**
  * Gallery entries, neutral then accented, in the kit gallery's 160 × 100 cell.
@@ -141,7 +190,7 @@ export const MOTION_SETS = [
     'Trail',
     (a) => (
       <>
-        <Rect x={22} y={44} w={12} h={12} fill={PAINT.neutral} corner="sm" />
+        <Rect x={22} y={44} w={12} h={12} fill={PAINT.shape} corner="shape" />
         <Trail points={[[34, 50], [80, 34], [126, 50]]} accent={a} />
       </>
     ),
@@ -150,10 +199,37 @@ export const MOTION_SETS = [
     'Tap ring',
     (a) => (
       <>
-        <Rect x={54} y={42} w={52} h={16} fill={PAINT.neutral} corner="sm" />
+        <Rect x={54} y={42} w={52} h={16} fill={PAINT.shape} corner="shape" />
         <TapRing x={80} y={50} r={9} accent={a} />
       </>
     ),
   ],
   ['Pointer', (a) => <Pointer x={76} y={42} accent={a} />],
+  [
+    'Sequence strip',
+    (a) => (
+      <>
+        <Rect x={22} y={26} w={116} h={8} fill={PAINT.shape} corner="shape" />
+        <SequenceStrip
+          x={22}
+          y={44}
+          w={116}
+          h={24}
+          lanes={[{ start: 0, end: 0.3 }, { start: 0.12, end: 0.42 }, { start: 0.24, end: 0.54 }]}
+          now={0.4}
+          accent={a}
+        />
+      </>
+    ),
+  ],
+  [
+    'Tree node and edge',
+    (a) => (
+      <>
+        <TreeEdge x1={80} y1={34} x2={80} y2={62} progress={a ? 1 : 0} accent={a} />
+        <TreeNode x={72} y={22} lit={a ? 0.35 : 0} />
+        <TreeNode x={72} y={62} lit={a ? 1 : 0} />
+      </>
+    ),
+  ],
 ];
