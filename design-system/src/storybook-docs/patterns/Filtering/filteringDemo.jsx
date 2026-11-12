@@ -12,12 +12,8 @@ import { FilterSide, ViewBar, useLayerMount } from '@/storybook-docs/lib/view-ba
  * mounts inside its picture (`container`), so it scales and clips with it.
  *
  *   FilteredStudents   the Section, its bar in one tier, its rows narrowing
- *   TIERS              the five tiers, by id
  *   ROSTER             tutoring rows the filters narrow
  */
-
-/** The tiers, in the order the page teaches them. */
-export const TIERS = ['1', '2a', '2b', '2c', '3'];
 
 /** The width a tier's picture lays out at: past the Section's 960, so a filter side sits beside its rows. Docs geometry, in px. */
 export const STAGE = 1024;
@@ -130,7 +126,7 @@ const OneListMenu = ({ category, value, onPick, open, mount }) => {
  * @param {string[]} [props.views]  the pill views at the bar's start
  * @param {(mount: Element | null) => React.ReactNode} [props.start]  the bar's start in place of the pills (a view picker), given the picture's mount
  */
-export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, views = ['All students', 'Needs follow-up'], start, emptyAction = true }) => {
+export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, views = ['All students', 'Needs follow-up'], start }) => {
     const ref = useRef(null);
     const width = useOwnWidth(ref, STAGE);
     const [setMount, mount] = useLayerMount();
@@ -186,7 +182,7 @@ export const FilteredStudents = ({ tier, categories, initial = {}, openMenu, vie
             icon="user-group"
             header="No students match these filters"
             description={`Nothing matches ${flat(value).join(' and ')}. Reset the filters to see every student.`}
-            primaryAction={emptyAction ? <Button text="Reset filters" appearance="primary" onClick={reset} /> : undefined}
+            primaryAction={<Button text="Reset filters" appearance="primary" onClick={reset} />}
         />
     );
 
