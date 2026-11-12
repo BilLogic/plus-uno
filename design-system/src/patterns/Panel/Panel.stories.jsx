@@ -8,7 +8,7 @@ import { BAR_TOKEN, WINDOW_HEIGHT } from '@/storybook-docs/lib/focused-task.jsx'
 import { computedShadow, tokenColor, tokenLength } from '@/storybook-docs/lib/style-probes.js';
 import { FRAME_LAYOUT } from '@/patterns/Frame/frameLayout';
 import { InAppFrame } from '@/storybook-docs/lib/pattern-demo.jsx';
-import { DetailsFrame, DetailsPanel, FLOAT_STAGE, GoneFrame, InboxFrame, PanelFrame } from './panelDemo.jsx';
+import { DetailsFrame, DetailsPanel, FLOAT_STAGE, GoneFrame, InboxFrame, PanelFrame, SessionsBehind } from './panelDemo.jsx';
 
 /**
  * Panel: the template page's examples, run in the Storybook tests. They compose
@@ -91,7 +91,6 @@ export const TypeNotifications = {
 /* ---------------------------------------------------------------- anatomy */
 
 const ANATOMY_DETAILS_PARTS = [
-    { selector: 'tbody tr:nth-child(2)', label: 'Picked row' },
     { selector: '.plus-frame__splitter', label: 'Splitter', side: 'top', at: 'start' },
     { selector: '.plus-panel-header', label: 'Header', side: 'end', at: 'middle' },
     { selector: '[data-probe="body"]', label: 'Body', side: 'end', at: 'middle' },
@@ -112,8 +111,8 @@ export const AnatomyDetails = {
 
 const ANATOMY_INBOX_PARTS = [
     { selector: '.plus-panel-header', label: 'Header', side: 'end', at: 'middle' },
-    { selector: '[data-probe="body"] ul', label: 'Items', side: 'end', at: 'end' },
     { selector: '[data-probe="unread"]', label: 'Unread dot', side: 'end', at: 'start' },
+    { selector: '[data-probe="body"] ul', label: 'Items', side: 'end', at: 'end' },
 ];
 
 export const AnatomyNotifications = {
@@ -135,8 +134,8 @@ export const AnatomyNotifications = {
 const WidthStage = ({ width }) => (
     <div style={{ overflowX: 'auto' }}>
         <div data-probe="stage" style={{ inlineSize: width, blockSize: WINDOW_HEIGHT }}>
-            <InAppFrame height="100%" panel={<DetailsPanel />} panelLabel="Session details" panelStorageKey={null} defaultPanelOpen>
-                <div style={{ paddingBlock: 'var(--page-pad)' }} />
+            <InAppFrame height="100%" panel={<DetailsPanel />} panelLabel="Session details" panelStorageKey={null} panelOpen>
+                <SessionsBehind />
             </InAppFrame>
         </div>
     </div>

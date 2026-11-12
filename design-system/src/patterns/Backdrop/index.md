@@ -2,7 +2,7 @@
 
 # Backdrop
 
-The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). With `placement` `start` or `end` it drops the pad and holds its child full height at that edge of the screen, for a drawer. Modal, Drawer and the overlay Panel all draw this one Backdrop, so the fill and the layer order are the same under each. The Panel's is `contained`: it covers its Frame, not the screen. It draws the layer only: it does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token; PatternDrawer brings its own focus handling.
+The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). With `placement` `start` or `end` it drops the pad and holds its child full height at that edge of the screen, for a drawer. A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token; PatternDrawer brings its own focus handling.
 
 Also asked as: scrim.
 
@@ -120,8 +120,7 @@ The Backdrop holds no text of its own. The words belong to the layer it holds.
 |------|------|---------|-------------|
 | `placement` | enum | `'center'` | `center` (default) for a modal; `start` or `end` holds the layer full height at that edge, with no pad. |
 | `inline` | bool | `false` | Draw in the page flow at a stand-in screen, for docs and previews, instead of fixed over the page. |
-| `contained` | bool | `false` | Cover the nearest positioned parent instead of the screen, with no pad and no layer inside: the overlay Panel's Backdrop over a Frame's Page and Sidebar. The fill and the layer order stay the shared ones. |
-| `screenWidth` | number | — | Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440. |
+| `screenWidth` | number | — | Cover the nearest positioned parent instead of the screen, with no pad and no layer inside: the overlay Panel's Backdrop over a Frame's Page and Sidebar. The fill and the layer order stay the shared ones. |
 | `screenHeight` | number | — | Inline only: the screen height (px); a layer inside caps at it less Backdrop/pad-y above and below. The pad follows the real viewport (24 under 640 tall), not this height, as Figma's frames do. |
 | `onBackdropClick` | func | — | Called for a click on the backdrop, not on the layer it holds. |
 | `className` | string | `''` | — |
@@ -136,7 +135,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--blanket-contained-layer` · `--blanket-pad-x` · `--blanket-pad-y` · `--ds-blanket` · `--layer-blanket` · `--layer-modal` · `--plus-overlay-screen` · `--plus-overlay-screen-height`
+`--blanket-pad-x` · `--blanket-pad-y` · `--ds-blanket` · `--layer-blanket` · `--layer-modal` · `--plus-overlay-screen` · `--plus-overlay-screen-height`
 
 From `design-system/src/patterns/Backdrop/Backdrop.scss`. Override these through the token layer, never with a literal.
 

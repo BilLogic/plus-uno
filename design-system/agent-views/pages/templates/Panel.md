@@ -23,18 +23,19 @@ The Inbox grows out of the Sidebar over the left of the Page. That placement is 
 
 Opened from a session row. The page behind stays usable.
 
-1. **Picked row.** Highlighted while the Panel is open.
-2. **Splitter.** On the Page-facing edge; it resizes from 320 to 640.
-3. **Header.** The title names the record, with its status under it; then the fixed actions: Up, Down, More, Close.
-4. **Body.** The record's Sections. It scrolls between the header and the footer.
+1. **Splitter.** On the Page-facing edge; it resizes from 320 to 640.
+2. **Header.** The title names the record, with its status under it; then the fixed actions: Up, Down, More, Close.
+3. **Body.** The record's Sections. It scrolls between the header and the footer.
+
+The picked row stays highlighted on the page while the Panel is open.
 
 ### Notifications
 
 Picking an item opens its page behind the Panel and marks it read. The Inbox stays open.
 
 1. **Header.** The title, a filter (Unread, All, Mentions), Archive all and Close.
-2. **Items.** Avatar, who did what and where, a one-line excerpt and the time.
-3. **Unread dot.** Paired with the word "unread" for a screen reader.
+2. **Unread dot.** Paired with the word "unread" for a screen reader.
+3. **Items.** Avatar, who did what and where, a one-line excerpt and the time.
 
 The Bell in the Sidebar, with its unread count, opens the Inbox. It sits with the Sidebar and is Planned with the Inbox's placement.
 

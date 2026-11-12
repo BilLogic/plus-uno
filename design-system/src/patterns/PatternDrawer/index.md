@@ -12,6 +12,8 @@ Also asked as: slide-over, sheet, side sheet, off-canvas.
 
 **Stories:** `design-system/src/patterns/PatternDrawer/PatternDrawer.stories.jsx` — Overview, Widths, Placements, LongContent, Footer, KeyboardAndFocus, DrawerSharesTheTwoOverlayLimit, WidthSmall, WidthMedium, WidthLarge, PlacementEnd, PlacementStart, NoFooter, LongContentStill, OpenAndClose, Interactive
 
+**Storybook page:** `design-system/src/patterns/PatternDrawer/PatternDrawer.mdx`
+
 ## Related
 
 Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternModal` · `PatternSection` · `PatternSidebar` · `PatternTable`

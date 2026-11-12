@@ -887,7 +887,7 @@
       "import": "import { Backdrop } from '@/patterns';",
       "group": "patterns",
       "source": "design-system/src/patterns/Backdrop/Backdrop.jsx",
-      "summary": "The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). With `placement` `start` or `end` it drops the pad and holds its child full height at that edge of the screen, for a drawer. Modal, Drawer and the overlay Panel all draw this one Backdrop, so the fill and the layer order are the same under each. The Panel's is `contained`: it covers its Frame, not the screen. It draws the layer only: it does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token; PatternDrawer brings its own focus handling.",
+      "summary": "The full-screen layer that holds the backdrop fill and a modal, so a modal is placed, not drawn. It fills with the backdrop, pads 16 at the sides and 64 above and below, centers its child, and sits on the backdrop layer (500) with its child on the modal layer (510). With `placement` `start` or `end` it drops the pad and holds its child full height at that edge of the screen, for a drawer. A Modal draws this Backdrop. A Panel never does: it floats on the overlay fill and shadow. It draws the layer only: it does not trap focus, close on Escape or count toward the two-overlay limit. For a real dialog, use the core Modal component, which draws the same layers and backdrop token; PatternDrawer brings its own focus handling.",
       "props": [
         {
           "name": "placement",
@@ -912,21 +912,12 @@
           "deprecated": null
         },
         {
-          "name": "contained",
-          "type": "bool",
-          "required": false,
-          "default": "false",
-          "values": null,
-          "description": "Cover the nearest positioned parent instead of the screen, with no pad and no layer inside: the overlay Panel's Backdrop over a Frame's Page and Sidebar. The fill and the layer order stay the shared ones.",
-          "deprecated": null
-        },
-        {
           "name": "screenWidth",
           "type": "number",
           "required": false,
           "default": null,
           "values": null,
-          "description": "Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440.",
+          "description": "Cover the nearest positioned parent instead of the screen, with no pad and no layer inside: the overlay Panel's Backdrop over a Frame's Page and Sidebar. The fill and the layer order stay the shared ones.",
           "deprecated": null
         },
         {
@@ -988,7 +979,6 @@
         "Interactive"
       ],
       "tokens": [
-        "--blanket-contained-layer",
         "--blanket-pad-x",
         "--blanket-pad-y",
         "--ds-blanket",

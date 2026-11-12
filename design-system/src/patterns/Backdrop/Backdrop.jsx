@@ -27,9 +27,8 @@ export const BACKDROP_PLACEMENTS = ['center', 'start', 'end'];
  * With `placement` `start` or `end` it drops the pad and holds its child
  * full height at that edge of the screen, for a drawer.
  *
- * Modal, Drawer and the overlay Panel all draw this one Backdrop, so the fill
- * and the layer order are the same under each. The Panel's is `contained`:
- * it covers its Frame, not the screen.
+ * A Modal draws this Backdrop. A Panel never does: it floats on the overlay
+ * fill and shadow.
  *
  * It draws the layer only: it does not trap focus, close on Escape or count
  * toward the two-overlay limit. For a real dialog, use the core Modal
@@ -39,7 +38,6 @@ export const BACKDROP_PLACEMENTS = ['center', 'start', 'end'];
 const Backdrop = ({
     placement = 'center',
     inline = false,
-    contained = false,
     screenWidth,
     screenHeight,
     onBackdropClick,
@@ -52,7 +50,6 @@ const Backdrop = ({
         'plus-pattern-backdrop',
         placement !== 'center' ? `plus-pattern-backdrop-placement-${placement}` : '',
         inline ? 'plus-pattern-backdrop-inline' : '',
-        contained ? 'plus-pattern-backdrop-contained' : '',
         className,
     ].filter(Boolean).join(' ');
 
@@ -88,7 +85,6 @@ Backdrop.propTypes = {
      * Cover the nearest positioned parent instead of the screen, with no pad and no layer inside: the
      * overlay Panel's Backdrop over a Frame's Page and Sidebar. The fill and the layer order stay the shared ones.
      */
-    contained: PropTypes.bool,
     /** Inline only: the screen width (px) the layers inside take their width from, such as 768, 1024 or 1440. */
     screenWidth: PropTypes.number,
     /**

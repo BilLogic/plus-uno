@@ -48,7 +48,7 @@ const SESSIONS = [
 ];
 
 /** The page under a Details Panel: the session list, the picked row highlighted while the Panel is open. */
-const SessionsBehind = ({ picked = 1 }) => (
+export const SessionsBehind = ({ picked = 1 }) => (
     <PatternSection title="Upcoming sessions">
         <StaticTable
             headers={['Student', 'Time', 'Status']}
@@ -147,14 +147,14 @@ export const InboxPanel = ({ onClose = () => {}, items = INBOX }) => (
                 {items.map((n) => (
                     <li key={n.id} data-probe="item" style={{ display: 'flex', gap: 'var(--inline-md)', alignItems: 'flex-start' }}>
                         <Avatar name={n.name} size={32} />
-                        <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-xs)' }}>
+                        <div style={{ flex: '1 1 auto', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 'var(--stack-sm)' }}>
                             <span style={{ font: 'var(--body-default)', color: 'var(--ds-text)' }}>{`${n.name} ${n.what} in ${n.where}`}</span>
                             <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{n.excerpt}</span>
                             <span style={{ font: 'var(--body-small)', color: 'var(--ds-text-subtle)' }}>{n.time}</span>
                         </div>
                         {n.unread ? (
                             <>
-                                <span aria-hidden="true" data-probe="unread" style={{ inlineSize: 'var(--space-100)', blockSize: 'var(--space-100)', marginBlockStart: 'var(--space-075)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-brand-bold)' }} />
+                                <span aria-hidden="true" data-probe="unread" style={{ inlineSize: 'var(--inline-md)', blockSize: 'var(--inline-md)', marginBlockStart: 'var(--stack-md)', borderRadius: 'var(--radius-full)', background: 'var(--ds-background-brand-bold)' }} />
                                 <VisuallyHidden>unread</VisuallyHidden>
                             </>
                         ) : null}
