@@ -65,15 +65,3 @@
         z-index: auto;
     }
 }
-
-/*
- * Contained: covers the nearest positioned parent, such as a Frame, instead of
- * the screen. No pad, nothing inside. Its layer is `--blanket-contained-layer`
- * when the parent sets one, else the shared backdrop layer.
- */
-.plus-pattern-backdrop-contained {
-    position: absolute;
-    z-index: var(--blanket-contained-layer, var(--layer-blanket));
-    padding: 0;
-    overflow: hidden;
-}
