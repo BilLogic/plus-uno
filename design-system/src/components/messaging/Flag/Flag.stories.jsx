@@ -118,7 +118,8 @@ BackgroundFailure.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const flag = canvasElement.querySelector('.plus-flag');
     await expect(flag.getAttribute('role'), 'a failure interrupts').toBe('alert');
-    await expect(canvas.getByRole('button', { name: 'Try again' }), 'retry in the flag').toBeVisible();
+    // Read once the enter fade has begun: at its first frame the flag is still at opacity 0.
+    await waitFor(() => expect(canvas.getByRole('button', { name: 'Try again' }), 'retry in the flag').toBeVisible());
     await expect(canvas.getByRole('button', { name: 'Dismiss flag' }), 'closable').toBeVisible();
 };
 
@@ -340,7 +341,7 @@ const actionsList = [{ text: 'View plan', onClick: () => {} }];
 export const Rest = {
     render: () => <StateFlag />,
     play: async ({ canvasElement }) => {
-        await expect(within(canvasElement).getByText('Plan saved')).toBeVisible();
+        await waitFor(() => expect(within(canvasElement).getByText('Plan saved')).toBeVisible());
         await expect(dismissOf(canvasElement)).toBeVisible();
     },
 };
