@@ -82,7 +82,7 @@ Same group: `ButtonGroup` · `Calendar` · `Cascader` · `Checkbox` · `ChoiceGr
 2. **Icon before** (optional). A Font Awesome Free glyph at 16, before the label.
 3. **Label.** Body/default at the medium weight. It says what the action does.
 4. **Icon after** (optional). A Font Awesome Free glyph at 16, after the label.
-5. **Spinner** (loading only). Replaces the label and the icons while the button is busy.
+5. **Spinner** (loading only). The `Spinner` component at 16, the icon size, in both spacings. It replaces the label and the icons while the button is busy, in the label color.
 
 Most buttons need no icon. Add one where the glyph has a clear, established meaning, such as `plus` for add.
 
@@ -95,7 +95,7 @@ Most buttons need no icon. Add one where the glyph has a clear, established mean
 | Focused | A 2px ring in `--ds-border-focused`, 2px off the edge, for keyboard focus only. |
 | Selected | The selected role fill, label and icon. Applies to default and subtle, and sets `aria-pressed`. |
 | Disabled | The disabled fill, label and icon: a change of color, not of opacity. Subtle stays transparent. |
-| Loading | A spinner replaces the label and icons. The container keeps its fill, blocks interaction and sets `aria-busy`. |
+| Loading | A 16 `Spinner` replaces the label and icons, in both spacings. The container keeps its fill, blocks interaction and sets `aria-busy`. |
 
 ### Tokens
 
