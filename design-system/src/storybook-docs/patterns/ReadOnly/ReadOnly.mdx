@@ -1,0 +1,194 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as ReadOnlyStories from './ReadOnly.stories.jsx';
+import { CARD_STAGE } from './readOnlyDemo.jsx';
+import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    FadedNoReason,
+    FieldForFixedValue,
+    PlainValue,
+    ReadableWithReason,
+} from '@/storybook-docs/illustrations/read-only.jsx';
+
+<Meta title="Patterns/States/Read-only" tags={['!dev', 'manifest']} />
+
+<Title>Read-only</Title>
+A value someone could change but this person cannot right now. It stays in the tab order at full contrast, can be selected and copied, and says why in its caption.
+
+<DocsTabs of={ReadOnlyStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## The three cases
+
+Read-only is one of three ways to show a value without a way to change it. Pick by whether anyone can change it, and who.
+
+<TypeGrid>
+<TypeCard of={ReadOnlyStories.KeyField} title="Read-only" stage={CARD_STAGE}>Someone can change it; this person cannot right now. Neutral fill, full contrast, the reason in the caption.</TypeCard>
+<TypeCard of={ReadOnlyStories.CasePlainText} title="Plain text" stage={CARD_STAGE}>Nobody ever changes it here. It is a label and a value, not a field.</TypeCard>
+</TypeGrid>
+
+The third case is <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a>: the value waits on something fixable on this screen. It is faded and out of the tab order, and it is never swapped with read-only.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key cases
+
+<ComponentExample of={ReadOnlyStories.KeyField} title="A read-only field" description="Neutral fill, full contrast, no hover change. It is in the tab order, the value can be selected and copied, and the caption says why." />
+
+<ComponentExample of={ReadOnlyStories.KeyPickers} title="A Select and a date" description="Select hides its chevron and DatePicker its calendar button; the value reads as text on the neutral fill." />
+
+<ComponentExample of={ReadOnlyStories.KeyChoices} title="Choices" description="Checkbox, RadioGroup and Toggle keep their state at full contrast, ignore clicks, and report aria-readonly." />
+
+<ComponentExample of={ReadOnlyStories.KeyOwnedForm} title="A whole form someone else owns" description="A tutor reads a session the supervisor set: every field read-only, one caption on the group, no Save." />
+
+<ComponentExample of={ReadOnlyStories.KeyLongValue} title="A long value" description={<>A read-only value is shown whole. A TextArea does not size itself to its value yet, so set its rows to show all of it. Growing to fit is Planned <PlannedTag />.</>} />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Read-only for a value someone could change but this person cannot right now: a session time the supervisor set, a field locked while a process runs, a record another person is editing. The common PLUS case is permission. Content that is never editable is plain text, not a read-only field.
+
+<DocsTable>
+<thead>
+<tr><th>Who can change it</th><th>Show it as</th><th>Tab order</th><th>Looks</th></tr>
+</thead>
+<tbody>
+<tr><td>Someone else, or this person later</td><td>Read-only field</td><td>In</td><td>Neutral fill, full contrast, no chevron or calendar, no hover</td></tr>
+<tr><td>Nobody, ever, here</td><td>Plain text: label and value</td><td>Out</td><td>Text</td></tr>
+<tr><td>This person, once a prerequisite on this screen is met</td><td>Disabled field</td><td>Out</td><td>Faded, the reason in the caption</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a value nobody changes here, show plain text in a details Section.
+- For a field that waits on another on this screen, follow <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a>.
+- For a value this person can change but rarely, use `InlineEdit`.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Keep a read-only field in the tab order at full contrast.
+
+<RuleTag kind="automatic" />
+
+It can be reached, read, selected and copied. `isReadOnly` sets `aria-readonly` on the controls that carry the role; the text keeps its color and the fill goes neutral. There is no hover change and the cursor is an arrow.
+
+### Drop the interactive cues.
+
+<RuleTag kind="automatic" />
+
+`Select` hides its chevron and `DatePicker` its calendar button. `Checkbox`, `RadioGroup` and `Toggle` keep their state and ignore clicks.
+
+### Say why in the caption.
+
+<RuleTag kind="review" />
+
+"Set by your supervisor." "Locked while the import runs." One caption on a group is enough when every field in it is read-only for the same reason.
+
+<DoDontPair
+    doExample={<ReadableWithReason />}
+    doCaption='Read-only at full contrast, with "Set by your supervisor" in the caption.'
+    dontExample={<FadedNoReason />}
+    dontCaption="A faded value with no reason: out of the tab order and hard to read."
+/>
+
+### Show a read-only value whole.
+
+<RuleTag kind="review" />
+
+A person who cannot change a value must at least read all of it. A `Select` wraps to show its value; for a `TextArea`, set `rows` so all of it shows. <PlannedTag /> A TextArea that grows to fit its value is Planned.
+
+### Show never-editable content as plain text.
+
+<RuleTag kind="review" />
+
+A field promises an input. A value nobody changes here is a label and a value in a details Section.
+
+<DoDontPair
+    doExample={<PlainValue />}
+    doCaption="A value nobody changes here is plain text."
+    dontExample={<FieldForFixedValue />}
+    dontCaption="A field for a value that was never editable: it promises an input."
+/>
+
+### Keep read-only and disabled apart.
+
+<RuleTag kind="automatic" />
+
+Disabled is for a prerequisite fixable on this screen and leaves the tab order. Read-only is for content people must read.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Caption: "Set by your supervisor."</td><td>"Read-only", "Locked".</td></tr>
+<tr><td>Caption: "Locked while the import runs."</td><td>"Temporarily unavailable".</td></tr>
+<tr><td>Group caption: "Session details are set by Lincoln's supervisor."</td><td>A caption repeated on every field.</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- `aria-readonly` on every read-only control that carries the role; it is reachable and read by screen readers with its label and caption.
+- Text contrast is unchanged from an editable field.
+- The value can be selected and copied with the keyboard.
+- The caption is tied to the field, so the reason is read with it.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/patterns-states-disabled--docs">Disabled</a>: use for a prerequisite fixable on this screen.
+- <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>: use for the form the read-only field sits in.
+- Overflow: use for everything else that may clip; it lands as its own pattern page.
+- `TextField`, `TextArea`, `Select`, `DatePicker`, `TimePicker`, `Checkbox`, `RadioGroup`, `Toggle`: the components with `isReadOnly`.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>

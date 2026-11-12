@@ -171,6 +171,30 @@ export const MOTION_REGISTRY = [
     },
   },
   {
+    name: 'Errors',
+    tier: 'pattern',
+    events: {
+      appear: { transition: 'Call attention', appearance: 'appearance.fast', note: 'Once; the message carries the meaning.' },
+      field: { transition: 'Add or remove an item', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A field error makes room on spatial.fast, then fades in on appearance.fast; it reverses once fixed.' },
+      blocked: { transition: 'Call attention', spatial: 'spatial.fast', note: 'A blocked submit shakes once, a spring per Physics; never in Reduced mode.' },
+      failed: { transition: 'Call attention', spatial: 'spatial.fast', appearance: 'appearance.fast', note: 'A system failure makes room at the top, then fades in. No shake.' },
+    },
+  },
+  {
+    name: 'Disabled',
+    tier: 'pattern',
+    events: {
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'No motion; the state is color.' },
+    },
+  },
+  {
+    name: 'Read-only',
+    tier: 'pattern',
+    events: {
+      change: { transition: 'Update a value or state', appearance: 'appearance.fast', note: 'No motion; the state is color.' },
+    },
+  },
+  {
     name: 'Empty',
     tier: 'pattern',
     events: {

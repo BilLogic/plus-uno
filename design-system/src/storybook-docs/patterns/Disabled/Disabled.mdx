@@ -1,0 +1,209 @@
+import { DocsTabs, DocsTab } from '@/storybook-docs/docs-tabs.jsx';
+import { Meta, Title } from '@storybook/addon-docs/blocks';
+
+import * as DisabledStories from './Disabled.stories.jsx';
+import { CARD_STAGE } from './disabledDemo.jsx';
+import { ComponentExample, DocsTable, DoDontPair } from '@/storybook-docs/ds-docs-layout.jsx';
+import { PlannedTag, TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { RuleTag } from '@/storybook-docs/rule-tag.jsx';
+import {
+    DimmedInMenu,
+    LeftOutOfMenu,
+    ReasonInCaption,
+    ReasonInTooltip,
+} from '@/storybook-docs/illustrations/disabled.jsx';
+
+<Meta title="Patterns/States/Disabled" tags={['!dev', 'manifest']} />
+
+<Title>Disabled</Title>
+When a control cannot be used yet, or by this person. Actions stay enabled and explain; a field or option disables only for a prerequisite fixable on the same screen, with the reason as visible text; what a role can never use is hidden.
+
+<DocsTabs of={DisabledStories}>
+
+<DocsTab tab="examples">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## The four answers
+
+From most to least often. Disabling is the exception, not the default.
+
+<TypeGrid>
+<TypeCard of={DisabledStories.AnswerExplains} title="Enabled, and it explains" stage={CARD_STAGE}>An action stays pressable and says what is missing when pressed. It disables only while sending.</TypeCard>
+<TypeCard of={DisabledStories.AnswerDisabledWithReason} title="Disabled with a visible reason" stage={CARD_STAGE}>A field or option that waits on a prerequisite the person can fix here. The reason is the caption or the option's description line.</TypeCard>
+<TypeCard of={DisabledStories.AnswerReadOnly} title="Read-only" stage={CARD_STAGE}>Content people must read but cannot change. It has its own pattern.</TypeCard>
+<TypeCard of={DisabledStories.AnswerHidden} title="Hidden" stage={CARD_STAGE}>What this role can never use is left out, not dimmed. The one exception is the Toolkit, locked during onboarding and never hidden.</TypeCard>
+</TypeGrid>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Key cases
+
+<ComponentExample of={DisabledStories.KeyWaitsOnField} title="A field that waits on another" description="Group waits on School. The caption says &quot;Choose a school first&quot;; the field fades and leaves the tab order, and the caption stays at full contrast." />
+
+<ComponentExample of={DisabledStories.KeyOptionCannotApply} title="An option that cannot apply" description="The option's description line carries the reason. The rest of the list is live." />
+
+<ComponentExample of={DisabledStories.KeyBlocksAction} title="It blocks the main action" description="When the prerequisite blocks the main action or several items, a warning SectionMessage above says how to turn it on." />
+
+<ComponentExample of={DisabledStories.KeySelfEvident} title="Self-evident" description="Back on the first step, and the Danger button until the name matches: no reason needed beyond what is on screen." />
+
+<ComponentExample of={DisabledStories.KeySending} title="Sending" description="The only time a button disables: it swaps its label for a spinner and Cancel stays live." />
+
+<ComponentExample of={DisabledStories.KeyLocked} title="Locked, not hidden" description={<>The Toolkit in the Sidebar during onboarding: the rows show, faded. The visible line that says what unlocks them is Planned <PlannedTag />.</>} />
+
+</div>
+
+</div>
+
+</DocsTab>
+
+<DocsTab tab="usage">
+
+<div className="sb-ds-component-docs sb-ds-component-docs--page not-prose">
+
+<div className="sb-ds-doc-section">
+
+## Usage
+
+Use Disabled when something on the page cannot be used right now. Reach for it last: an enabled action that explains is better than a dimmed one, read-only is better for content people must read, and hiding is right for what a role can never use.
+
+<DocsTable>
+<thead>
+<tr><th>The situation</th><th>Answer</th><th>Where the reason goes</th></tr>
+</thead>
+<tbody>
+<tr><td>A submit with fields missing</td><td>Enabled; pressing it marks the fields</td><td>Field errors</td></tr>
+<tr><td>A button while its action sends</td><td>Disabled with a spinner in place</td><td>None; it is self-evident</td></tr>
+<tr><td>A field that waits on another field on this screen</td><td>Disabled</td><td>The caption: "Choose a school first"</td></tr>
+<tr><td>An option that cannot apply</td><td>Disabled</td><td>The option's description line</td></tr>
+<tr><td>A prerequisite that blocks the main action or several items</td><td>Disabled, plus a warning `SectionMessage` above</td><td>The message says how to turn it on</td></tr>
+<tr><td>Back on step one; Danger until the name matches</td><td>Disabled</td><td>None, or the field caption</td></tr>
+<tr><td>Content this person must read but cannot change</td><td>Read-only</td><td>The caption</td></tr>
+<tr><td>An action this role can never take</td><td>Hidden</td><td>None</td></tr>
+<tr><td>The Toolkit during onboarding</td><td>Locked, visible</td><td>The Sidebar line that says what unlocks it <PlannedTag /></td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Alternatives
+
+- For a value this person cannot change but must read, follow <a target="_top" href="./?path=/docs/patterns-states-read-only--docs">Read-only</a>.
+- For what a role can never use, leave the control, page or Sidebar item out.
+- For a submit that is not ready, keep it enabled and let validation explain; see <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Best practices
+
+### Keep actions enabled and explain what is missing when pressed.
+
+<RuleTag kind="automatic" />
+
+A disabled button gives no direction and leaves the tab order. Pressing an action that cannot run yet marks what is missing. A button disables only while sending. A form's submit follows <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>.
+
+### Disable a field or option only for a prerequisite the person can fix on the same screen.
+
+<RuleTag kind="review" />
+
+Group waits on School; a time slot waits on a date. Anything blocked by something off this screen is enabled and explains, read-only, or hidden.
+
+### Put the reason in visible text where the cause is.
+
+<RuleTag kind="automatic" />
+
+The field caption or the option's description line. When the prerequisite blocks the main action or several items, a warning `SectionMessage` above says how to turn it on. Self-evident cases need no reason: Back on the first step.
+
+### Keep the reason in text on the page, never in a tooltip on a disabled control.
+
+<RuleTag kind="automatic" />
+
+A disabled control gets no events and is absent on touch, so a tooltip would never open for the people who need it most. A disabled control keeps its default behavior and leaves the tab order.
+
+<DoDontPair
+    doExample={<ReasonInCaption />}
+    doCaption='The reason as the caption: "Choose a school first".'
+    dontExample={<ReasonInTooltip />}
+    dontCaption="The reason in a tooltip on a faded field: it never opens on touch."
+/>
+
+### Hide what a role can never use.
+
+<RuleTag kind="review" />
+
+An action a tutor can never take, such as deleting a school, is left out, not dimmed. A breadcrumb level the person cannot open is left out. Only a change of role brings it back.
+
+<DoDontPair
+    doExample={<LeftOutOfMenu />}
+    doCaption="An action a tutor can never take is left out of the menu."
+    dontExample={<DimmedInMenu />}
+    dontCaption='A faded "Delete school" that a tutor will never be able to press.'
+/>
+
+### Lock the Toolkit during onboarding and keep it visible.
+
+<RuleTag kind="review" />
+
+Tutors see what training unlocks. The Sidebar item shows a lock and a line that says what unlocks it; the line is Planned <PlannedTag />.
+
+### Make content people must read read-only, not disabled.
+
+<RuleTag kind="automatic" />
+
+Disabled fades and leaves the tab order; read-only stays readable at full contrast. The two are never swapped.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Content guidelines
+
+<DocsTable>
+<thead>
+<tr><th>Do</th><th>Don't</th></tr>
+</thead>
+<tbody>
+<tr><td>Caption: "Choose a school first."</td><td>"Disabled", "Not available".</td></tr>
+<tr><td>Option description: "Ms. Ortiz has a session then."</td><td>A faded option with no line.</td></tr>
+<tr><td>Warning message: "Add a school to this group to schedule sessions." with "Add school".</td><td>"Some actions are unavailable."</td></tr>
+<tr><td>Toolkit: "Complete your assigned training to unlock the Toolkit."</td><td>"Locked".</td></tr>
+</tbody>
+</DocsTable>
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Accessibility
+
+- A disabled control leaves the tab order and gets no events; the reason beside it is ordinary text a screen reader reads with the field, tied through the caption.
+- The warning `SectionMessage` is announced when it appears.
+- Disabled controls fade; the caption keeps full contrast, so the reason stays readable.
+
+</div>
+
+<div className="sb-ds-doc-section">
+
+## Related
+
+- <a target="_top" href="./?path=/docs/patterns-states-read-only--docs">Read-only</a>: use when the value must be read.
+- <a target="_top" href="./?path=/docs/patterns-actions-and-input-forms--docs">Forms</a>: use for the enabled submit.
+- <a target="_top" href="./?path=/docs/patterns-actions-and-input-common-actions--docs">Common actions</a>: use for the sending button.
+- Navigation: use for the Sidebar's locked Toolkit; it lands as its own pattern page.
+- `Button`, `IconButton`, `Select`, `Checkbox`, `RadioGroup`, `Toggle`, `DropdownMenu`, `SectionMessage`: the components.
+
+</div>
+
+</div>
+
+</DocsTab>
+
+</DocsTabs>
