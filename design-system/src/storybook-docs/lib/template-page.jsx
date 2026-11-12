@@ -73,7 +73,7 @@ export const TypeGrid = ({ children }) => (
 TypeGrid.propTypes = { children: PropTypes.node };
 
 /** One type: its live story on the raised card, then its name and one line. */
-export const TypeCard = ({ of, title, stage = TYPE_STAGE, children }) => (
+export const TypeCard = ({ of, title, stage = TYPE_STAGE, to, thumbRatio, children }) => (
     <figure
         style={{
             margin: 0,
@@ -86,11 +86,16 @@ export const TypeCard = ({ of, title, stage = TYPE_STAGE, children }) => (
             boxShadow: 'var(--ds-shadow-raised)',
         }}
     >
-        <ScaledStory width={stage}>
-            <Story of={of} inline />
-        </ScaledStory>
+        {/* A fixed ratio crops the picture to one height, so cards that sit side by side match. */}
+        <div style={thumbRatio ? { aspectRatio: thumbRatio, overflow: 'hidden' } : undefined}>
+            <ScaledStory width={stage}>
+                <Story of={of} inline />
+            </ScaledStory>
+        </div>
         <figcaption style={{ display: 'flex', flexDirection: 'column', gap: 'var(--card-stack-sm)', marginBlockStart: 'auto' }}>
-            <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>{title}</span>
+            <span style={{ font: 'var(--heading-xsmall)', color: 'var(--ds-text)' }}>
+                {to ? <a href={`?path=/docs/${to}--docs`} style={{ color: 'var(--ds-link)', textDecoration: 'underline' }}>{title}</a> : title}
+            </span>
             <span style={{ font: 'var(--body-default)', color: 'var(--ds-text-subtle)' }}>{children}</span>
         </figcaption>
     </figure>
@@ -102,6 +107,10 @@ TypeCard.propTypes = {
     title: PropTypes.string.isRequired,
     /** The width the story lays out at, when the type needs more than the shared stage (a Frame docks its Sidebar from 1024 of its own width, inside the window's border). */
     stage: PropTypes.number,
+    /** A docs id (`templates-frame-frame`): the title links to that page. */
+    to: PropTypes.string,
+    /** A CSS aspect ratio (`16 / 10`) that crops every thumbnail to one height. */
+    thumbRatio: PropTypes.string,
     /** The one line: what the type is and when it fits. */
     children: PropTypes.node,
 };

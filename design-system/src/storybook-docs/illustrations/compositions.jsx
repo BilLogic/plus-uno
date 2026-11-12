@@ -2,7 +2,7 @@ import React from 'react';
 import { PAINT, HAIRLINE } from './paint.js';
 import { Illustration } from './Illustration.jsx';
 import {
-  Backdrop, ButtonShape, Frame, Modal, Panel, Popup, Rect, Rule, Screen, Section, SkeletonBar, pageBody, screenLayout,
+  Backdrop, ButtonShape, Frame, Modal, Panel, Rect, Rule, Row, Screen, Section, SkeletonBar, pageBody, screenLayout,
 } from './primitives.jsx';
 
 /** One dotted joint between two layers. */
@@ -32,45 +32,74 @@ export const ThreeLayers = ({
   </Illustration>
 );
 
-/** Popup, panel, modal, page: the lowest step that fits, left to right. */
+/**
+ * Opening a record, least room to most: expand the row, Section detail, Details
+ * Panel, Modal, its own page. Left to right, the lowest step that fits. The
+ * lesson is how much of the page each step takes, so the screens are blocked out.
+ */
 export const OpeningARecord = ({
-  title = 'Four ways to open a record, from lightest to heaviest: a popup, a side panel, a modal and its own page',
+  title = 'Five ways to open a record, from least room to most: expand the row, a Section detail, a Details Panel, a Modal and its own page',
 }) => (
-  <Illustration width={336} height={154} viewBox="-8 12 336 154" title={title}>
-    {[0, 1, 2, 3].map((i) => {
-      const x = 8 + i * 78;
+  <Illustration width={364} height={154} viewBox="-8 12 364 154" title={title}>
+    {[0, 1, 2, 3, 4].map((i) => {
+      const x = 8 + i * 68;
       const y = 28;
-      const w = 70;
+      const w = 60;
       const h = 104;
-      if (i === 3) {
-        return (
-          <g key={i}>
-            <Frame x={x} y={y} w={w} h={h} accent />
-            <SkeletonBar x={x + 6} y={y + 22} w={w * 0.5} h={6} accent />
-            <SkeletonBar x={x + 6} y={y + 34} w={w * 0.7} />
-            <Section x={x + 6} y={y + 46} w={w - 12} h={48} rows={2} />
-          </g>
-        );
-      }
       return (
         <g key={i}>
-          <Frame x={x} y={y} w={w} h={h} />
-          {[0, 1, 2, 3].map((k) => (
-            <SkeletonBar key={k} x={x + 6} y={y + 20 + k * 9} w={w * 0.6} />
-          ))}
-          {i === 0 && <Popup x={x + 18} y={y + 40} w={44} h={34} accent />}
-          {i === 1 && <Panel x={x + w - 30} y={y + 12} w={30} h={h - 12} accent />}
+          <Frame x={x} y={y} w={w} h={h} accent={i === 4} />
+          {i === 0 && (
+            <>
+              <Row x={x + 6} y={y + 10} w={w - 12} />
+              <Row x={x + 6} y={y + 24} w={w - 12} accent />
+              <SkeletonBar x={x + 10} y={y + 42} w={w * 0.6} />
+              <SkeletonBar x={x + 10} y={y + 51} w={w * 0.5} />
+              <Row x={x + 6} y={y + 62} w={w - 12} />
+              <Row x={x + 6} y={y + 76} w={w - 12} />
+            </>
+          )}
+          {i === 1 && (
+            <>
+              {[0, 1, 2, 3, 4].map((k) => (
+                <SkeletonBar key={k} x={x + 6} y={y + 12 + k * 12} w={w * 0.26} />
+              ))}
+              <Rect x={x + 6 + w * 0.36} y={y + 8} w={w * 0.64 - 12} h={h - 16} fill={PAINT.sectionSubtleSurface} stroke={PAINT.accent} />
+              <SkeletonBar x={x + 12 + w * 0.36} y={y + 16} w={w * 0.3} h={5} accent heading />
+              {[0, 1, 2].map((k) => (
+                <SkeletonBar key={k} x={x + 12 + w * 0.36} y={y + 30 + k * 9} w={w * 0.32} />
+              ))}
+            </>
+          )}
           {i === 2 && (
             <>
-              <Backdrop x={x} y={y + 12} w={w} h={h - 12} />
-              <Modal x={x + 8} y={y + 34} w={w - 16} h={50} accent />
+              {[0, 1, 2, 3].map((k) => (
+                <SkeletonBar key={k} x={x + 6} y={y + 20 + k * 9} w={w * 0.6} />
+              ))}
+              <Panel x={x + w - 28} y={y + 6} w={24} h={h - 12} floating accent />
+            </>
+          )}
+          {i === 3 && (
+            <>
+              {[0, 1, 2, 3].map((k) => (
+                <SkeletonBar key={k} x={x + 6} y={y + 20 + k * 9} w={w * 0.6} />
+              ))}
+              <Backdrop x={x} y={y} w={w} h={h} />
+              <Modal x={x + 6} y={y + 26} w={w - 12} h={50} accent />
+            </>
+          )}
+          {i === 4 && (
+            <>
+              <SkeletonBar x={x + 6} y={y + 12} w={w * 0.5} h={6} accent />
+              <SkeletonBar x={x + 6} y={y + 24} w={w * 0.7} />
+              <Section x={x + 6} y={y + 38} w={w - 12} h={56} rows={3} />
             </>
           )}
         </g>
       );
     })}
-    <Rule x1={8} x2={312} y1={146} y2={146} stroke={PAINT.annotation} />
-    <path d="M306 142 L312 146 L306 150" fill="none" stroke={PAINT.annotation} style={HAIRLINE} />
+    <Rule x1={8} x2={336} y1={146} y2={146} stroke={PAINT.annotation} />
+    <path d="M330 142 L336 146 L330 150" fill="none" stroke={PAINT.annotation} style={HAIRLINE} />
   </Illustration>
 );
 
