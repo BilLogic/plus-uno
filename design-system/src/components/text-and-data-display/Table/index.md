@@ -54,7 +54,7 @@ Same group: `Code` · `CodeBlock` · `Heading` · `InlineEdit` · `VisuallyHidde
 
 1. **Head cell.** A label with an optional type icon.
 2. **Row.** Cells in a band; rest, highlighted, selected or disabled.
-3. **Cell.** Text, a number, an icon or any node, with optional secondary text and a leading slot.
+3. **Cell.** Text, a number, an icon or any node, with optional secondary text and an `elemBefore` slot.
 4. **Summary row.** One calculation per column, muted, with no rule under it.
 
 ### States
@@ -96,7 +96,7 @@ Same group: `Code` · `CodeBlock` · `Heading` · `InlineEdit` · `VisuallyHidde
 |------|------|---------|-------------|
 | `id` | string | — | The `id` of the `table` element. The wrapper takes `{id}-wrapper`. |
 | `headers` | arrayOf | `[]` | The column headers. A string is the header text; an object adds `width`, `align`, `className` and `style` to `text`. |
-| `rows` | enum | `[]` | The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `leading`, `state`, `loading`, `className`, `colSpan` or `style`. |
+| `rows` | enum | `[]` | The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `elemBefore`, `state`, `loading`, `className`, `colSpan` or `style`. |
 | `striped` | bool | `false` | Shades alternate rows. |
 | `hover` | bool | `true` | Highlights a row on hover. On by default. |
 | `bordered` | bool | `false` | Draws a frame around the table and lines between columns. Shorthand for `frame="framed"` plus `verticalLines`. |

@@ -28,7 +28,7 @@ const FALLBACK_ROW_HEIGHT = 36;
  *
  * @param {string|object} option
  * @param {number} index Its place in the caller's array, which keeps its id stable while filtering.
- * @returns {{ value: *, label: *, text: string, description?: *, disabled: boolean, group?: string, leading?: *, trailing?: *, index: number, source: * }}
+ * @returns {{ value: *, label: *, text: string, description?: *, disabled: boolean, group?: string, elemBefore?: *, trailing?: *, index: number, source: * }}
  */
 const normalize = (option, index) => {
     if (typeof option === 'string' || typeof option === 'number') {
@@ -42,7 +42,7 @@ const normalize = (option, index) => {
         description: option.description,
         disabled: Boolean(option.disabled),
         group: option.group,
-        leading: option.leading,
+        elemBefore: option.elemBefore,
         trailing: option.trailing,
         dragging: Boolean(option.dragging),
         dropIndicator: option.dropIndicator,
@@ -317,9 +317,9 @@ const Listbox = ({
     const row = (option, extra = {}) => {
         const rowId = optionId(option);
         const selected = isSelected(option.value);
-        const leading = [];
-        if (option.leading) leading.push(...React.Children.toArray(option.leading));
-        if (multi) leading.unshift(<OptionRow.Checkbox key="__check" checked={selected} />);
+        const before = [];
+        if (option.elemBefore) before.push(...React.Children.toArray(option.elemBefore));
+        if (multi) before.unshift(<OptionRow.Checkbox key="__check" checked={selected} />);
         return (
             <OptionRow
                 key={rowId}
@@ -333,7 +333,7 @@ const Listbox = ({
                 check={!multi}
                 dragging={option.dragging}
                 dropIndicator={option.dropIndicator}
-                leading={leading.length ? leading : undefined}
+                elemBefore={before.length ? before : undefined}
                 trailing={option.trailing}
                 spacing={spacing}
                 onSelect={() => choose(option)}
@@ -499,7 +499,7 @@ Listbox.propTypes = {
     /**
      * Strings, or objects with `value`, `label` (or `text`), `description`,
      * `disabled`, `group` (consecutive options with one group share a heading),
-     * `leading` and `trailing`.
+     * `elemBefore` and `trailing`.
      */
     options: PropTypes.arrayOf(PropTypes.oneOfType([
         PropTypes.string,
@@ -511,7 +511,7 @@ Listbox.propTypes = {
             description: PropTypes.node,
             disabled: PropTypes.bool,
             group: PropTypes.string,
-            leading: PropTypes.node,
+            elemBefore: PropTypes.node,
             trailing: PropTypes.node,
             dragging: PropTypes.bool,
             dropIndicator: PropTypes.oneOf(['before', 'after']),

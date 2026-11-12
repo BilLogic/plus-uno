@@ -144,7 +144,7 @@ const OptionRow = ({
     check = true,
     dragging = false,
     dropIndicator,
-    leading,
+    elemBefore,
     trailing,
     tabbable,
     role,
@@ -159,7 +159,7 @@ const OptionRow = ({
     const [truncated, setTruncated] = useState(false);
     const text = label ?? children;
 
-    const leadingItems = React.Children.toArray(leading);
+    const leadingItems = React.Children.toArray(elemBefore);
     if (leadingItems.length > MAX_LEADING && process.env.NODE_ENV !== 'production') {
         console.warn(`OptionRow: Leading holds at most ${MAX_LEADING} items; got ${leadingItems.length}.`);
     }
@@ -279,7 +279,7 @@ OptionRow.propTypes = {
      */
     dropIndicator: PropTypes.oneOf(['before', 'after']),
     /** Up to 4 items: `OptionRow.Indent`, `.Toggle`, `.Checkbox`, `.Radio`, an icon, an avatar or a drag handle. */
-    leading: PropTypes.node,
+    elemBefore: PropTypes.node,
     /** One item: a Count, a "…" menu, or `OptionRow.Chevron`. */
     trailing: PropTypes.node,
     /** Roving tab stop: true on the row at the cursor, false on the rest. Unset under `aria-activedescendant`. */

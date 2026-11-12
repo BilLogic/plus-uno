@@ -10887,7 +10887,7 @@
       "import": "import { SectionMessage } from '@/components';",
       "group": "messaging",
       "source": "design-system/src/components/messaging/SectionMessage/SectionMessage.jsx",
-      "summary": "SectionMessage: a message that belongs to the page and stays there until it is resolved or dismissed. // Simple message <SectionMessage appearance=\"warning\">Warning message here</SectionMessage> // With title <SectionMessage appearance=\"info\" title=\"Info\">This is an info message.</SectionMessage> // Rich content <SectionMessage appearance=\"danger\"> <strong>Error:</strong> Something went wrong. <a href=\"/help\">Get help</a> </SectionMessage> // Leading icon: each style has a default; a name or a node replaces it, false removes it <SectionMessage appearance=\"info\" leadingVisual=\"bell\">Reminders are on.</SectionMessage> <SectionMessage appearance=\"warning\" leadingVisual={false}>Sign-in didn't complete. Please try again.</SectionMessage> // Actions: link buttons after the body, in the order given <SectionMessage appearance=\"warning\" actions={[{ text: 'Reschedule', onClick: onReschedule }]}> This term's schedule is provisional. </SectionMessage>",
+      "summary": "SectionMessage: a message that belongs to the page and stays there until it is resolved or dismissed. // Simple message <SectionMessage appearance=\"warning\">Warning message here</SectionMessage> // With title <SectionMessage appearance=\"info\" title=\"Info\">This is an info message.</SectionMessage> // Rich content <SectionMessage appearance=\"danger\"> <strong>Error:</strong> Something went wrong. <a href=\"/help\">Get help</a> </SectionMessage> // Leading icon: each style has a default; a name or a node replaces it, false removes it <SectionMessage appearance=\"info\" icon=\"bell\">Reminders are on.</SectionMessage> <SectionMessage appearance=\"warning\" icon={false}>Sign-in didn't complete. Please try again.</SectionMessage> // Actions: link buttons after the body, in the order given <SectionMessage appearance=\"warning\" actions={[{ text: 'Reschedule', onClick: onReschedule }]}> This term's schedule is provisional. </SectionMessage>",
       "props": [
         {
           "name": "id",
@@ -10949,7 +10949,7 @@
           "deprecated": null
         },
         {
-          "name": "leadingVisual",
+          "name": "icon",
           "type": "bool or string or node",
           "required": false,
           "default": "true",
@@ -12201,7 +12201,7 @@
           "deprecated": null
         },
         {
-          "name": "leadingVisual",
+          "name": "iconBefore",
           "type": "string or node",
           "required": false,
           "default": null,
@@ -12266,7 +12266,7 @@
         "Styles",
         "WithCount",
         "TrailingMetricAppearance",
-        "LeadingVisual",
+        "IconBefore",
         "Truncation",
         "NarrowContainer",
         "NeverAButton",
@@ -12480,7 +12480,7 @@
           "required": false,
           "default": "[]",
           "values": null,
-          "description": "The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `leading`, `state`, `loading`, `className`, `colSpan` or `style`.",
+          "description": "The body rows, each an array of cells. A cell is a node, or an object with `content` plus `align`, `emphasis`, `overflow`, `secondary`, `elemBefore`, `state`, `loading`, `className`, `colSpan` or `style`.",
           "deprecated": null
         },
         {

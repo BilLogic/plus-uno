@@ -16,8 +16,8 @@
  *
  *   1. A CSS custom property — `--elevation-sm`, `var(--x)`, or `--x:` inside a
  *      css/scss fence. This is the #78 / #79 / #98 defect class verbatim.
- *   2. A JSX attribute in a fenced example — `<Button leadingVisual="trash" />`
- *      claims `leadingVisual` is a prop and `"trash"` a legal value.
+ *   2. A JSX attribute in a fenced example — `<Button iconBefore="trash" />`
+ *      claims `iconBefore` is a prop and `"trash"` a legal value.
  *   3. A prose code span of the form `prop="value"` — `size="h1"`, `mode="multi"`.
  *      The `=` is what makes it a claim rather than a mention.
  *   4. A prose code span holding a bare identifier — `primaryButton`, `Dropdown`,

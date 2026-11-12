@@ -219,7 +219,7 @@ const TagInput = ({
             ),
             source: option.source,
             // The handle, drawn on every option row; the one under the pointer is a button.
-            leading: canReorder && option.index !== undefined
+            elemBefore: canReorder && option.index !== undefined
                 ? (
                     <Icon
                         name="grip-vertical"
@@ -387,7 +387,7 @@ const TagInput = ({
             rows.push({
                 value: DELETE,
                 label: 'Delete',
-                leading: <Icon name="trash" />,
+                elemBefore: <Icon name="trash" />,
             });
         }
         if (onColorChange) {
