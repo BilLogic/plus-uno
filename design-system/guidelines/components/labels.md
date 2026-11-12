@@ -29,7 +29,11 @@ discovery) and `spacing` (default 20, spacious 32). `DateTag` takes
 takes `appearance`, `spacing` (default 20, compact 16) and the `isBold`,
 `isInverse`, `isDot` and `hasRing` booleans.
 
-Both are read-only: no `onClick`, and no button semantics, because a label sits
+A plain `Tag` leads with nothing: `swatchBefore` opts in to its color square,
+and `elemBefore` is its leading slot for an avatar or icon. Slot names follow
+`docs/engineering/coding.md` § Slot names.
+
+Labels are read-only: no `onClick`, and no button semantics, because a label sits
 inside buttons, tabs and rows and nesting one control inside another is invalid
 ARIA. A number that changes while the page is open is not announced by either;
 if a change genuinely needs to interrupt, that is `Flag` — see

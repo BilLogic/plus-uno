@@ -46,4 +46,4 @@ npx netlify deploy --prod --dir dist   # designer-run; agents guide only
 
 ## Production build (`main`)
 
-`npm run build:all` → the tutor revamp build + Storybook static. Landing redirects `/` → `/storybook/`.
+`npm run build:all` → the Storybook static build, the only thing `main` builds. Landing redirects `/` → `/storybook/`.

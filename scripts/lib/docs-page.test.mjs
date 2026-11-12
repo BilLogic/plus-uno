@@ -147,6 +147,14 @@ test('each ### under Best practices is one rule, its id the slug', () => {
   );
 });
 
+test('a rule carries the RuleTag under its heading, or null', () => {
+  const { rules } = readDocsPage('## Best practices\n\n### Keep it short.\n\n<RuleTag kind="automatic" />\n\nOne line.\n\n### Say why.\n\nOne reason.\n');
+  assert.deepEqual(rules.map(({ id, tag }) => ({ id, tag })), [
+    { id: 'keep-it-short', tag: 'automatic' },
+    { id: 'say-why', tag: null },
+  ]);
+});
+
 test('Alternatives routes name the component each one sends to', () => {
   assert.deepEqual(readDocsPage(COMPONENT_PAGE).alternatives, [
     { text: 'For a message the user only has to read, use `SectionMessage`.', routesTo: 'SectionMessage' },

@@ -25,7 +25,7 @@ and regenerate rather than touching the literal.
 - **AI UI:** About AI UI · AI interaction guidelines · Foundations (Color, Elevation, Motion, Voice and tone) · Components (Button, Icon, Illustration, Generative border, Prompt input, Prompt starters, Suggestion, Skills tag, AI message with AI sources and AI feedback nested) · Patterns (AI chat), named as the Figma AI dividers name them. Everything AI sits here, as on the Figma AI pages. A page with nothing defined yet says so in one line rather than being left out. An AI component is listed in the taxonomy's `aiComponents` and titled `AI UI/Components/<name>`, while its folder stays under its category. Its pages live in `design-system/src/storybook-docs/ai/`.
 - **Test harnesses** such as `DocumentedContract.stories.jsx` carry the `!dev` tag: the Storybook tests run them and the sidebar leaves them out. The generators and checks behind the docs are listed on Get started › Develop.
 - **Components groups** are Atlassian's component categories, in Atlassian's order, and only those with members: ten groups, each with a kebab-case folder under `design-system/src/components/` (`forms-and-inputs`, `images-and-icons`, `labels`, `layout-and-structure`, `loading`, `messaging`, `navigation`, `overlays-and-layering`, `status-indicators`, `text-and-data-display`). The Storybook group is the category in sentence case. A story outside `components/` may also sit in a group: Logo, whose source is in `design-system/src/assets/`, is under Images and icons, and the Navigation system (the Sidebar, source in `design-system/src/patterns/Sidebar/`) is under Navigation with Sidebar tab nested in it, as on the Figma page list. Button sits in Forms and inputs, as on atlassian.design. Undocumented internal composites live in `_internal/` until they graduate; a story there may sit in any category. `npm run check:storybook-categories` holds folders, titles and the taxonomy to this.
-- **Pages follow the BS4 Foundation library's page list.** Inside each group the sidebar shows Figma's pages in Figma's order, named as Figma names them. A Figma page that holds several components becomes a folder of the same name, with one docs page per component in the page's section order: `Button/` (Button, Close button), `Status, count & tag/` (Status, Count, Tag, Tag group), `Loading/` (Spinner, Skeleton), `Tabs, nav pills & navbar/` (Tabs, Nav pills, Navbar). A Figma page with no code has no Storybook page; the gap is recorded where the change is reviewed, not as an empty page. Foundations follow Figma's foundation pages the same way.
+- **Pages follow the BS4 Foundation library's page list.** Inside each group the sidebar shows Figma's pages in Figma's order, named as Figma names them. A Figma page that holds several components becomes a folder of the same name, with one docs page per component in the page's section order: `Button/` (Button, Close button), `Status, count & tag/` (Status, Count, Tag, Tag group), `Loading/` (Spinner, Skeleton). A Figma page with no code has no Storybook page; the gap is recorded where the change is reviewed, not as an empty page. Foundations follow Figma's foundation pages the same way.
 - **Libraries:** Overview · Base UI · Font Awesome · Highcharts · Motion. One short page per library PLUS builds on: what it is for, which component wraps it and what not to do. Source lives in `design-system/src/storybook-docs/libraries/`. A library with no component yet, such as drag and drop, is named on Overview and gets its page when a component wraps it.
 - **Data viz** lives in `design-system/src/dataviz/<purpose>/` — comparison, correlation, distribution, flow-and-relationships, part-to-whole, temporal.
 - **Specs** left `main` for their rebuild; the old code is on the `archive/legacy-ds` branch. When they return, the grammar is `Specs/<Area>/(<Phase>/)<Type>/<Component>`, with Type order Overview → Elements → Cards → Tables → Modals → Sections → Pages. Title Case phases and types, PascalCase component folders, no spaces in folder names. Every area (and Admin sub-area) leads with an `Overview.mdx` featuring its flagship page.
@@ -124,6 +124,26 @@ behavior; a known gap lives in a GitHub issue, so the page carries no `TODO`,
 `scripts/check-ds-writing.mjs` keeps each rule's reason. It warns on every page,
 fails on a stale marker, and fails a page in its strict list (`STRICT_PAGES`,
 `Modal` first) on every rule.
+
+## Examples
+
+This section owns how every docs example and drawing is made — Storybook pages,
+Figma docs and the review checklists point here.
+
+**Example fidelity.** If an example's lesson depends on a component's look,
+states or wording, show the real component with real labels. If the lesson
+still holds with every word removed, draw blocked-out shapes from the
+illustration kit, with no words inside the figure.
+
+**One illustration kit.** Every docs diagram and animation, abstract or
+specific, is drawn from the shared illustration kit
+(`design-system/src/storybook-docs/illustrations/`, the Illustration kit page in
+Storybook). A shape the kit lacks is added to the kit the way its Contributing
+section says — reuse or extend a primitive first, each part painted by its
+real component's role token, one accent, correct in light and dark, with a
+gallery entry and its story test green — in its own PR, which the templates and
+patterns session, the kit's owner, reviews before merge. A figure on a page is
+always a kit composition, so one-off SVGs and hand-drawn figures have no home.
 
 ## Spacing
 

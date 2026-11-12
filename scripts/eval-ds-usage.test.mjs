@@ -127,9 +127,9 @@ test('score: escapes by rule from this checkout\'s rules; the untouched template
 test('score: warnings are counted by rule beside the fail-level escapes', () => {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'ds-eval-warn-'));
   try {
-    fs.mkdirSync(path.join(dir, 'src'));
-    fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { Button } from 'react-bootstrap';\nexport default () => <Button>Hi</Button>;\n");
-    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 1, byRule: {}, warnByRule: { 'ds/prefer-plus-component': 1 }, layoutFormula: true });
+    fs.cpSync(path.join(REPO_ROOT, SCENARIOS, '_template'), dir, { recursive: true });
+    fs.writeFileSync(path.join(dir, 'src', 'App.jsx'), "import { Button } from '@/components';\nexport default () => <div style={{ display: 'flex' }}><Button appearance=\"primary\" /></div>;\n");
+    assert.deepEqual(score({ folder: dir, label: 'eval-x' }), { escapes: 0, warnings: 1, byRule: {}, warnByRule: { 'ds/page-starts-from-pattern': 1 }, layoutFormula: false });
   } finally {
     fs.rmSync(dir, { recursive: true, force: true });
   }

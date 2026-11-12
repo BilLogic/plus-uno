@@ -27,7 +27,6 @@ export const RULES = {
   'ds/no-unknown-token': { level: 'fail' },
   'ds/no-primitive-read': { level: 'fail' },
   'ds/fa-free-only': { level: 'fail' },
-  'ds/prefer-plus-component': { level: 'warn' },
   'ds/no-retired-name': { level: 'warn' },
   'ds/page-starts-from-pattern': { level: 'warn' },
 };
@@ -49,7 +48,6 @@ const barrelOf = (source) => `@/${source.match(BARREL)[1]}`;
 const homeOf = (record) => record.import?.match(/from '([^']+)'/)?.[1] ?? '@/components';
 /** Specifiers that reach past a barrel into design-system source. */
 const DEEP = /^(?:@|@plus-ds)\/(?:components|patterns|dataviz)\/.+|(?:^|\/)design-system\/(?:src\/)?components(?:\/|$)|(?:^|\/)design-system\/src\//;
-const BOOTSTRAP = /^react-bootstrap(?:\/([\w]+))?$/;
 
 /**
  * Props every component takes without declaring them: React's own, and the
@@ -265,19 +263,6 @@ function scriptEscapes(text, ctx, add) {
         if (record) bound.set(local, record);
       }
       if (imp.default && ctx.components.has(imp.default)) bound.set(imp.default, ctx.components.get(imp.default));
-    } else {
-      const bs = imp.source.match(BOOTSTRAP);
-      if (!bs) continue;
-      const names = [...imp.named.map((n) => n.imported), ...(bs[1] && imp.default ? [bs[1]] : [])];
-      for (const name of names) {
-        if (!ctx.components.has(name)) continue;
-        add(
-          'ds/prefer-plus-component',
-          nameIndex(text, imp.index, name),
-          `\`${name}\` comes from react-bootstrap, and the design system has its own`,
-          `import { ${name} } from '@/components'`,
-        );
-      }
     }
   }
 

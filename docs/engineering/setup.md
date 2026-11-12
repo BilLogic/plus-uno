@@ -25,7 +25,7 @@ Implementation requirements only. For design rules, load `design-system/guidelin
 **Barrel exports — always import from index:**
 
 ```js
-import { Button, Alert, Modal, Input, Select, Checkbox } from '@/components';
+import { Button, SectionMessage, Modal, TextField, Select, Checkbox } from '@/components';
 import '@/styles/main.scss';
 ```
 
@@ -375,21 +375,17 @@ Two kinds of failure, two mechanisms:
 **Which components carry `play` blocks, and why not all of them.** A `play`
 block costs runtime on every PR, so the set is chosen rather than grown: a
 component earns one when its behavior *is* the product and its usage is high
-enough that a break is expensive. Usage is #166's measurement, recorded in
-`design-system/guidelines/components/overview.md`: files under the Specs code
+enough that a break is expensive. Usage is #166's measurement: files under the Specs code
 and `prototypes/` that imported a component and rendered it, measured before the
 Specs code left `main`. Ranked that way, #209 took `Modal` (33 files), `Select` (24),
 `Pagination` (13) and `Tabs` (11) — the four highest-usage components that
 are pure state machines and had no interaction cover.
 
-The absences are as deliberate as the set. `Button` (138) and `Alert` (11) are
-behavioral and already have unit tests beside their source, so a second
-assertion in a browser buys nothing. `Badge` (62) does one thing, dismiss, and
-`SelectCommit` exercises it where it actually matters. `Dropdown` (21) and
-`Switch` (7) are covered by `DeclaredApi` (#207). `Table` (19), `ButtonGroup`
-(17) and `Card` (14) render and do not act. Below that the ranking falls away
-fast — `Accordion` is 2 files and `TagInput` is 0, so behavior alone does not
-earn a slot. Adding to the set is fine; adding without a usage number and a
+The absences are as deliberate as the set. `Button` has unit tests beside its
+source, so a second assertion in a browser buys nothing; `DropdownMenu` and
+`Toggle` are covered by `DeclaredApi` (#207); `Table` and `ButtonGroup` render
+and do not act. Below the top of the ranking usage falls away fast, so behavior
+alone does not earn a slot. Adding to the set is fine; adding without a usage number and a
 sentence saying what breaks is how a four-minute gate becomes a ten-minute one.
 
 Fixing the inherited violations is tracked separately at #153 — the ratchet

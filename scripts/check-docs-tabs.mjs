@@ -95,6 +95,13 @@ const USAGE_HEADINGS = new Set([
 ]);
 
 /**
+ * The headings a page may author in its Code tab. Code is generated (the
+ * import line and the props table); a template page adds its Slots table,
+ * with its planned slots marked, and the tab draws it between the two.
+ */
+const CODE_HEADINGS = new Set(['Slots']);
+
+/**
  * Headings #254 retired, and which must never come back.
  *
  * `Correct and incorrect` was a category, not a rule. It collected every
@@ -191,11 +198,11 @@ export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
   if (!read.hasImport) found.push(`${file}: renders tabs but never imports docs-tabs.jsx.`);
   if (!read.tabs.includes('examples')) found.push(`${file}: has no <DocsTab tab="examples">.`);
 
-  const unknown = read.tabs.filter((t) => t !== 'examples' && t !== 'usage');
+  const unknown = read.tabs.filter((t) => t !== 'examples' && t !== 'usage' && t !== 'code');
   if (unknown.length) {
     found.push(
-      `${file}: only "examples" and "usage" are authored — Code and Agent view ` +
-        `are generated. Found: ${unknown.join(', ')}.`,
+      `${file}: only "examples", "usage" and a template's "code" Slots are authored — ` +
+        `the rest of Code and Agent view are generated. Found: ${unknown.join(', ')}.`,
     );
   }
 
@@ -212,7 +219,7 @@ export function checkFile(file, source, tabbed = isTabbedDocsPage(file)) {
     //    coming back would draw both "move it to the examples tab" and
     //    "dissolve it" — and following the first leaves the page still red.
     if (RETIRED_HEADINGS.has(section.heading)) continue;
-    const belongs = USAGE_HEADINGS.has(section.heading) ? 'usage' : 'examples';
+    const belongs = USAGE_HEADINGS.has(section.heading) ? 'usage' : CODE_HEADINGS.has(section.heading) ? 'code' : 'examples';
     if (section.tab !== belongs) {
       found.push(
         `${file}: section ${JSON.stringify(section.heading)} is in the "${section.tab}" ` +

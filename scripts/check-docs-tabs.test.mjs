@@ -45,6 +45,22 @@ test('a well-formed page is silent — the green twin every case below needs', (
   assert.deepEqual(checkFile(COMPONENT, ok, true), []);
 });
 
+const withCode = (headings) => page({ examples: ['Types'], usage: ['Usage', 'Related'] }).replace(
+  '<DocsTab tab="usage">',
+  `<DocsTab tab="code">\n\n${headings.map(section).join('\n\n')}\n\n</DocsTab>\n\n<DocsTab tab="usage">`,
+);
+
+test('a template page may author a Code tab holding its Slots table, and nothing else', () => {
+  assert.deepEqual(checkFile(COMPONENT, withCode(['Slots']), true), []);
+  const found = checkFile(COMPONENT, withCode(['Slots', 'Overview']), true);
+  assert.ok(found.some((f) => /section "Overview" is in the "code" tab but belongs in "examples"/.test(f)), found.join('\n'));
+});
+
+test('a Slots section outside the Code tab is caught', () => {
+  const found = checkFile(COMPONENT, page({ examples: ['Slots'], usage: ['Related'] }), true);
+  assert.ok(found.some((f) => /section "Slots" is in the "examples" tab but belongs in "code"/.test(f)), found.join('\n'));
+});
+
 test('1. a page missing its <DocsTabs> wrapper is caught', () => {
   const broken = page({ tabs: false, extra: section('Overview') });
   const found = checkFile(COMPONENT, broken, true);
@@ -263,10 +279,12 @@ test('8c. a Usage tab with no `##` section is still asked for `Related`', () => 
   assert.equal(found.length, 1, found.join('\n'));
 });
 
-test('an unknown tab name is caught — Code is generated, never authored', () => {
-  const broken = page().replace('<DocsTab tab="examples">', '<DocsTab tab="code">');
+test('an unknown tab name is caught; Code takes only a template\'s Slots', () => {
+  const broken = page().replace('<DocsTab tab="examples">', '<DocsTab tab="preview">');
   const found = checkFile(COMPONENT, broken, true);
-  assert.ok(found.some((f) => /Found: code/.test(f)), found.join('\n'));
+  assert.ok(found.some((f) => /Found: preview/.test(f)), found.join('\n'));
+  const props = page().replace('<DocsTab tab="examples">', '<DocsTab tab="code">');
+  assert.ok(checkFile(COMPONENT, props, true).some((f) => /section "Overview" is in the "code" tab but belongs in "examples"/.test(f)));
 });
 
 test('an authored Agent view is caught — it shows the generated file, so no MDX carries agent text', () => {
