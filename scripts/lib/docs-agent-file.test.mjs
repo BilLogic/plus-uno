@@ -135,3 +135,10 @@ test('on the real repo every Foundations · Motion page is served, and a compone
   assert.match(popup, /^## Motion$/m);
   assert.match(popup, /--ds-motion-spatial-fast/);
 });
+
+test('a Best practices section that opens straight on its first rule prints that rule once, with its id', () => {
+  const text = renderDocsAgentFile(PAGE, { file: PAGE_PATH, kind: 'Pattern' });
+  const best = text.slice(text.indexOf('## Best practices'));
+  assert.equal(best.match(/### Give every disabled control a reason in visible text\./g).length, 1);
+  assert.match(best, /^## Best practices\n\n### Give every disabled control/);
+});

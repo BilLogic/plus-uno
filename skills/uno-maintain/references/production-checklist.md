@@ -45,4 +45,4 @@ See also `design-system/src/styles/Accessibility.mdx`.
 
 - **Card surfaces:** `design-system/src/patterns/PatternCard/`
 - **Tables:** `design-system/src/patterns/PatternTable/`; respect the global table reset in `design-system/src/styles/main.scss`
-- **Page layout and breakpoints:** `design-system/src/patterns/PageTemplates/` and `design-system/src/patterns/Frame/`
+- **Page layout and breakpoints:** `design-system/src/patterns/Page/` and `design-system/src/patterns/Frame/`

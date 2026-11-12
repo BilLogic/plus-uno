@@ -125,7 +125,8 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 - Panel: use when the record should float over the Page instead of sitting beside the list.
 - Popup: use when choosing the menu the view Select or the Filter icon opens.
 - Table: use when the body is rows and columns.
-- Patterns: use when picking a filter tier (Filtering), the search field's behavior (Search) or an empty body (Empty).
+- Filtering: use when picking a filter tier for the view bar.
+- Patterns: use when the question is the search field's behavior (Search) or an empty body (Empty).
 
 Same group: `AiChat` · `Backdrop` · `Frame` · `Page` · `PatternCard` · `PatternDrawer` · `PatternModal` · `PatternSidebar` · `PatternTable`
 
@@ -144,7 +145,7 @@ Common starting types of the one Section, not new components. Each is a header t
 
 ## Header types
 
-A starting set, picked by what the Section holds. Every control state lives on its component: Icon button, Filter button and Tabs. How the search field behaves and which filters the bar takes are the Search and Filtering patterns, listed in Patterns.
+A starting set, picked by what the Section holds. Every control state lives on its component: Icon button, Filter button and Tabs. Which filters the bar takes is Filtering; how the search field behaves is the Search pattern, listed in Patterns.
 
 - **Title.** A title and a description, nothing to act on. Most Sections that hold cards or a form.
 - **Title and actions.** Section actions in the title row, only when there is no view bar. One Primary and two others at most.
