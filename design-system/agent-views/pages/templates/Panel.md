@@ -129,13 +129,6 @@ Panel reads these motion tokens and no literal duration or curve.
 
 ## Best practices
 
-### Float a Panel with no Backdrop.
-
-The page keeps scrolling and stays clickable. A press on the page outside the Panel, or Escape, closes it. Under 1024 it is capped at 320, and under 768 it takes the whole width, still with no Backdrop. A confirm Modal over a Panel brings its own Backdrop.
-
-Do: The Panel floats on its shadow and the page beside it stays undimmed.
-Don't: The same Panel with a Backdrop dimming the whole page.
-
 ### Float a Panel with no Backdrop. {#float-a-panel-with-no-backdrop}
 
 **Checked:** Automatic

@@ -59,7 +59,7 @@ test('comments are not declarations', () => {
 });
 
 test('generated token output, tests and the generator are excluded', () => {
-  assert.equal(excluded('design-system/src/tokens/ladder/_motion.scss'), true);
+  assert.equal(excluded('design-system/src/tokens/ladder/_springs.scss'), true);
   assert.equal(excluded('design-system/src/tokens/ladder/springs.generated.js'), true);
   assert.equal(excluded('design-system/src/components/A/A.test.jsx'), true);
   assert.equal(excluded('design-system/src/tokens/ladder/Motion.stories.jsx'), false);

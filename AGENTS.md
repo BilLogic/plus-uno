@@ -112,6 +112,7 @@ Finished work leaves behind a **rule** in the doc that already owns the subject,
 |---------|------|
 | DS implementation task, any kind | `design-system/guidelines/overview.md` (MANDATORY entry — route from here) |
 | Building UI, using components or tokens, or a component's facts (usage, rules, props, variants) | `design-system/agent-views/components/index.md` (existence) + `tokens/tokens.md` (names), then the component's generated file, `design-system/src/components/<group>/<Name>/index.md` (`<Name>.md` when filed flat): one read answers it, the same text `ds_get` returns and Storybook's Agent view shows. A disabled state follows `design-system/guidelines/composition/form-behavior.md` § Unavailable actions and fields; a slot prop, `docs/engineering/coding.md` § Slot names |
+| Animating anything | Foundations · Motion (`design-system/src/styles/MotionPhysics.mdx`, then the page for the transition), then the component's own Motion section, in its generated file under `src/components/` |
 | Verifying a component's API, or writing a story's code | `docs/connectors/storybook-mcp.md` |
 | Building new pages, dashboards, layouts | `design-system/guidelines/composition/layout.md` (MANDATORY) |
 | Laying out on the grid, or matching a Figma frame's breakpoint modes | `design-system/src/styles/Grid.mdx` (`npm run ds -- guide grid`) |

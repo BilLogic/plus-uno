@@ -81,7 +81,8 @@ test('a lifecycle tag written in a story is one of the three', () => {
       // Row data (a `tags` column of labels) is not story meta: meta lists dev/autodocs.
       if (!tags.some((t) => /^!?(dev|autodocs)$/.test(t))) continue;
       for (const tag of tags) {
-        if (/^!?(dev|autodocs)$/.test(tag) || LIFECYCLE_TAGS.includes(tag)) continue;
+        // `manifest` is the Storybook MCP's serve tag, not a lifecycle state.
+        if (/^!?(dev|autodocs)$/.test(tag) || tag === 'manifest' || LIFECYCLE_TAGS.includes(tag)) continue;
         stray.push(`${file}: ${tag}`);
       }
     }

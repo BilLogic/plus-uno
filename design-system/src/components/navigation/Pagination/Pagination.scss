@@ -67,7 +67,7 @@
 .plus-pagination__navigator {
     position: relative;
     cursor: pointer;
-    transition: background-color var(--motion-duration-short) var(--motion-easing-standard), color var(--motion-duration-short) var(--motion-easing-standard);
+    transition: background-color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast), color var(--ds-motion-appearance-fast-duration) var(--ds-motion-appearance-fast);
 
     &:focus {
         @include plus-ring-reset;

@@ -52,7 +52,8 @@ import {
  * The patterns match what `npm run generate:component-docs` writes: nested
  * components' `index.md`, flat components' `<Name>.md` (the group index is
  * excluded — it is a list, not a component), and `index.md` beside a pattern
- * and the Logo.
+ * and the Logo. A docs-only pattern page's file is the one
+ * `npm run generate:docs-agent-files` writes under `agent-views/pages/patterns/`.
  */
 const AGENT_DOCS = import.meta.glob(
   [
@@ -61,6 +62,7 @@ const AGENT_DOCS = import.meta.glob(
     '!../components/*/index.md',
     '../patterns/*/index.md',
     '../assets/*/index.md',
+    '../../agent-views/pages/patterns/*.md',
   ],
   { query: '?raw', import: 'default' },
 );

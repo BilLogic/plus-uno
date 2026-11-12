@@ -75,6 +75,17 @@ export const TABBED_EXCEPTIONS = [];
 const PATTERNS_ROOT = 'design-system/src/patterns';
 
 /**
+ * Where a docs-only pattern page lives: `storybook-docs/patterns/<Name>/<Name>.mdx`,
+ * beside its stories. It has no component, so its Agent view is the file
+ * `generate:docs-agent-files` writes for it under `agent-views/pages/patterns/`.
+ */
+const PATTERN_PAGES_ROOT = 'design-system/src/storybook-docs/patterns';
+const PATTERN_AGENT_FILES = 'design-system/agent-views/pages/patterns';
+
+/** Whether `path` is `<root>/<Name>/<file>`: one folder down, no deeper. */
+const inOwnFolder = (path, root) => path.startsWith(`${root}/`) && path.slice(root.length + 1).split('/').length === 2;
+
+/**
  * Whether a repo-relative MDX path is a docs page that gets a tab strip.
  * @param {string} file A repo-relative path, e.g. `design-system/src/components/forms-and-inputs/Button/Button.mdx`.
  * @returns {boolean}
@@ -84,7 +95,7 @@ export function isTabbedDocsPage(file) {
   if (TABBED_EXCEPTIONS.includes(path)) return true;
   if (!path.endsWith('.mdx')) return false;
   if (path.startsWith(`${COMPONENTS_ROOT}/`)) return true;
-  return path.startsWith(`${PATTERNS_ROOT}/`) && path.slice(PATTERNS_ROOT.length + 1).split('/').length === 2;
+  return inOwnFolder(path, PATTERNS_ROOT) || inOwnFolder(path, PATTERN_PAGES_ROOT);
 }
 
 /** `Button.stories.jsx`, `Button.mdx` and `Button.jsx` all name the component `Button`. */
@@ -199,6 +210,7 @@ export function generatedDocPathFor(entry) {
   if (component) return component.generatedDoc;
   if (!entry || typeof entry.importPath !== 'string') return null;
   const file = repoPath(entry.importPath);
+  if (inOwnFolder(file, PATTERN_PAGES_ROOT)) return `${PATTERN_AGENT_FILES}/${file.split('/').at(-2)}.md`;
   if (!file.startsWith('design-system/src/') || file.startsWith(`${COMPONENTS_ROOT}/`)) return null;
   return `${file.slice(0, file.lastIndexOf('/'))}/index.md`;
 }
@@ -213,7 +225,7 @@ export function generatedDocPathFor(entry) {
  * @returns {string}
  */
 export function repoPathOfGlobKey(key) {
-  return repoPath(key).replace(/^\.\.\//, 'design-system/src/');
+  return repoPath(key).replace(/^\.\.\/\.\.\//, 'design-system/').replace(/^\.\.\//, 'design-system/src/');
 }
 
 /**

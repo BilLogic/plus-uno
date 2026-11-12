@@ -15,22 +15,22 @@ one escaped string. To change what the bot is told, edit the doc, then run
 
 ## Manifest
 
-Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **121,719 chars from 9 files**, against an assembled budget of 175,500 (53,781 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 101,335 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
+Load order is a bundle-level fact, declared once in the bundler's `SECTIONS` list. **124,517 chars from 9 files**, against an assembled budget of 175,500 (50,983 to spare), and a floor of 16,384 + 4,000 (implicit cache, GEMINI_REGION global), 104,133 above it. The floor is the minimum the cache in force will hold — Google's implicit cache on the `global` endpoint, the explicit `cachedContents` cache on a regional one — chosen by `GEMINI_REGION` in `agents/uno-bot/wrangler.toml`; a bundle cut under it ships uncached.
 
 | # | Section | Doc | Chars | Running total | Budget |
 |--:|---------|-----|------:|--------------:|--------|
-| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,284 (−8,348 ide-only) | 10,284 | 20,000 (constitution) |
-| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 32,733 | 43,046 | 20,000 (constitution) ⚠️ **over by 12,733** |
-| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 64,529 | 22,048 (persona) |
-| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 66,175 | — |
-| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 67,423 | — |
-| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 73,117 | — |
-| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 84,903 | — |
-| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 105,864 | — |
-| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 109,332 | — |
-| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 115,890 | — |
-| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 120,863 | — |
-| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 121,719 | — |
+| 1 | constitution | [`AGENTS.md`](../../AGENTS.md) | 10,284 (−8,563 ide-only) | 10,284 | 20,000 (constitution) |
+| 2 | constitution | [`GLOSSARY.md`](../../GLOSSARY.md) | 35,531 | 45,844 | 20,000 (constitution) ⚠️ **over by 15,531** |
+| 3 | persona | [`agents/uno-bot/AGENT.md`](../../agents/uno-bot/AGENT.md) | 21,442 | 67,327 | 22,048 (persona) |
+| 4 | bot-skills | pointer lines (bot-skills — read_reference by name) | 1,593 | 68,973 | — |
+| 5 | scheduled-actions | pointer lines (scheduled-actions — read_reference by name) | 1,188 | 70,221 | — |
+| 6 | connectors | [`docs/connectors/figma/overview.md`](../../docs/connectors/figma/overview.md) | 5,643 (−203 ide-only) | 75,915 | — |
+| 7 | connectors | [`docs/connectors/notion/overview.md`](../../docs/connectors/notion/overview.md) | 11,734 (−369 ide-only) | 87,701 | — |
+| 8 | connectors | [`docs/connectors/slack/overview.md`](../../docs/connectors/slack/overview.md) | 20,910 (−8,407 ide-only) | 108,662 | — |
+| 9 | connectors | [`docs/connectors/supabase/blueprint-navigation.md`](../../docs/connectors/supabase/blueprint-navigation.md) | 3,402 | 112,130 | — |
+| 10 | connectors | [`docs/connectors/supabase/blueprint.md`](../../docs/connectors/supabase/blueprint.md) | 6,503 | 118,688 | — |
+| 11 | connectors | [`docs/connectors/supabase/overview.md`](../../docs/connectors/supabase/overview.md) | 4,919 (−1,734 ide-only) | 123,661 | — |
+| 12 | connectors | pointer lines (connectors — read_reference by name) | 803 | 124,517 | — |
 
 `Chars` is the body as it ships, after `<!-- ide-only -->` regions are dropped; the strip is shown
 where it happened. Per-file budgets are asserted on the body BEFORE that strip, so an IDE-only
@@ -520,6 +520,73 @@ _Avoid_: "state layer", "08/12/16"
 **Elevation**:
 The surface and shadow pair that lifts a layer: `--ds-surface-*` with its shadow. The only place the word "surface" belongs.
 _Avoid_: "surface" for a layout box
+
+### Design system: motion
+
+**Productive**:
+The default motion mode: springs at damping ratio 1 everywhere, so nothing overshoots. Controls, fields and anything done dozens of times a day stay Productive.
+_Avoid_: "Standard" motion, "normal" motion
+
+**Expressive**:
+The motion mode one container opts into with `data-motion="expressive"`, for the end of something worth finishing: a completed reflection or a milestone. Only the spatial tokens change, with a small overshoot; page transitions and data marks stay **Productive**.
+_Avoid_: "Playful" motion, "bouncy" for the mode
+
+**Go to**:
+The transition between unrelated areas, such as Toolkit to Admin: nothing on the new Page relates to where the person was.
+_Avoid_: "navigate" for any move
+
+**Drill in**:
+The transition that makes the Breadcrumb longer: a list item or card grows into its detail.
+_Avoid_: "open" for a deeper level
+
+**Climb out**:
+The transition that makes the Breadcrumb shorter: the detail returns to the place it came from, the reverse of **Drill in**.
+_Avoid_: "go back", "close"
+
+<!-- retired-names-ok: the Switch transition is a motion name; the retired Switch component is Toggle -->
+**Switch**:
+The transition between Tabs or views of one place, with the Breadcrumb unchanged.
+_Avoid_: "toggle" for a view change
+
+**Step**:
+The transition to the next or previous item of an ordered set, such as a ProgressTracker step; the Breadcrumb keeps its length.
+_Avoid_: "next page" for the transition
+
+**Swap**:
+The transition that replaces content in place, with the container unchanged.
+_Avoid_: "crossfade" for any replacement
+
+**Add or remove**:
+The transition for one item entering or leaving a collection, with its neighbors making or closing the gap.
+_Avoid_: "insert", "delete" for the motion
+
+**Reorder**:
+The transition for items changing position, by drag or keyboard: the carried item follows the hand and its neighbors move aside.
+_Avoid_: "sort animation"
+
+**Expand**:
+The transition that opens and closes content in place, such as an accordion panel or a row's detail.
+_Avoid_: "collapse" as a separate transition
+
+**Load**:
+The transition for content that arrives after a wait: a placeholder, then the content.
+_Avoid_: "spinner" for the transition
+
+**Open**:
+The transition of an overlay appearing and leaving: Popup, Modal, Drawer or Flag.
+_Avoid_: "show", "hide" for the motion
+
+**Dock**:
+The transition of a Panel attaching to or detaching from the **Frame**.
+_Avoid_: "slide in" for a Panel
+
+**Update**:
+The transition that marks a value or state changing in place, such as a count, a ChangeTag or a validation state.
+_Avoid_: "flash"
+
+**Call attention**:
+The transition that draws the eye to something the person did not ask for: a shake for an error, a pulse for new content.
+_Avoid_: "alert animation"
 
 ### Design work
 

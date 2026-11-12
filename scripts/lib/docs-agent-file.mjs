@@ -59,18 +59,40 @@ export function agentFilePath(file, top) {
 /** Each rule's tag by its id; the page model reads the same marker (`ruleTags` in `docs-page.mjs`). */
 export { ruleTags };
 
+const TAGS = /\btags(?:=\{\[|:\s*\[)([^\]]*)\]/;
+
+/**
+ * The Foundations · Motion pages, as `{file, tags}`. A page names its title and tags in its own
+ * `<Meta>` or, with `<Meta of={Stories}>`, in the stories file it imports.
+ */
+function motionPages(root) {
+  const out = [];
+  for (const file of pagesUnder(root)) {
+    const source = fs.readFileSync(path.join(root, file), 'utf8');
+    let holder = source;
+    if (/<Meta\b[^>]*?\bof=/.test(source)) {
+      const stories = source.match(/from\s+['"](\.[^'"]+\.stories\.[jt]sx?)['"]/)?.[1];
+      const abs = stories && path.join(root, path.dirname(file), stories);
+      if (!abs || !fs.existsSync(abs)) continue;
+      holder = fs.readFileSync(abs, 'utf8');
+    }
+    const title = holder.match(/<Meta\b[^>]*?\btitle=["']([^"']+)["']/)?.[1] ?? holder.match(/\btitle:\s*['"]([^'"]+)['"]/)?.[1];
+    if (title?.startsWith('Foundations/Motion/')) out.push({ file, tags: holder.match(TAGS)?.[1] ?? '' });
+  }
+  return out;
+}
+
 /**
  * Pages the Storybook MCP would not serve: `get-documentation` lists a docs page
- * only when it carries the `manifest` tag, so a template or pattern page without
- * it is invisible to an agent that asks the endpoint.
+ * only when it carries the `manifest` tag, so a template, pattern or Foundations ·
+ * Motion page without it is invisible to an agent that asks the endpoint.
  */
 export function pagesMissingManifestTag(root) {
-  return docsAgentPages(root)
-    .filter((p) => {
-      const tags = fs.readFileSync(path.join(root, p.file), 'utf8').match(/<Meta\b[^>]*?\btags=\{\[([^\]]*)\]\}/)?.[1] ?? '';
-      return !/['"]manifest['"]/.test(tags);
-    })
-    .map((p) => p.file);
+  const docsOnly = docsAgentPages(root).map((p) => ({
+    file: p.file,
+    tags: fs.readFileSync(path.join(root, p.file), 'utf8').match(/<Meta\b[^>]*?\btags=\{\[([^\]]*)\]\}/)?.[1] ?? '',
+  }));
+  return [...docsOnly, ...motionPages(root)].filter((p) => !/['"]manifest['"]/.test(p.tags)).map((p) => p.file);
 }
 
 const label = (kind) => (kind === 'automatic' ? 'Automatic' : 'Review');
@@ -96,7 +118,7 @@ export function renderDocsAgentFile(source, { file, kind, root, top, registry = 
   if (page.rules.length) {
     d += `## Best practices\n\n`;
     // What the section says before its first rule: a pointer to the pattern that owns the rules.
-    const lead = best?.text?.split(/\n#{3} /)[0]?.trim();
+    const lead = best?.text?.split(/(?:^|\n)#{3} /)[0]?.trim();
     if (lead) d += `${lead}\n\n`;
     for (const r of page.rules) {
       d += `### ${r.sentence} {#${r.id}}\n\n**Checked:** ${label(tags[r.id] ?? 'review')}\n\n${r.text ? `${r.text}\n\n` : ''}`;

@@ -2,7 +2,7 @@
  * The spring maths behind the motion tokens (ADR-041): the analytic step
  * response of a mass-spring-damper, how long it takes, and a `linear()`
  * sample of it. Pure; the plan (`plan.mjs`) says which springs exist and
- * `build.mjs` writes them out.
+ * `scripts/lib/tokens/build.mjs` writes them out.
  */
 
 /** Damping coefficient for a stiffness, ratio and mass: 2 x ratio x sqrt(stiffness x mass). */

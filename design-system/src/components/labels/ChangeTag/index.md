@@ -99,7 +99,7 @@ Same group: `AiMessage` · `CountTag` · `DateTag` · `PromptStarters` · `Smart
 | Success | `--ds-background-success` fill, `--ds-text-success` words, `--ds-background-success-pressed` edge. |
 | Danger | `--ds-background-danger` fill, `--ds-text-danger` words, `--ds-background-danger-pressed` edge. |
 | Comparison | `--ds-text-subtle`. |
-| Motion | `--motion-duration-medium`, with `--motion-easing-entrance` for the value and `--motion-easing-standard` for the color. |
+| Motion | `--ds-motion-appearance-default` for both the value and the color. |
 
 ## Content guidelines
 
@@ -134,7 +134,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-small` · `--border-default` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-success` · `--icon-sm` · `--inline-sm` · `--motion-duration-medium` · `--motion-easing-entrance` · `--motion-easing-standard` · `--pad-x-xs` · `--plus-change-tag-edge` · `--plus-change-tag-fill` · `--plus-change-tag-height` · `--plus-change-tag-ink` · `--radius-md` · `--tag-gap-compact`
+`--body-small` · `--border-default` · `--ds-background-danger` · `--ds-background-danger-pressed` · `--ds-background-neutral` · `--ds-background-neutral-pressed` · `--ds-background-success` · `--ds-background-success-pressed` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-text` · `--ds-text-danger` · `--ds-text-subtle` · `--ds-text-success` · `--icon-sm` · `--inline-sm` · `--pad-x-xs` · `--plus-change-tag-edge` · `--plus-change-tag-fill` · `--plus-change-tag-height` · `--plus-change-tag-ink` · `--radius-md` · `--tag-gap-compact`
 
 From `design-system/src/components/labels/ChangeTag/ChangeTag.scss`. Override these through the token layer, never with a literal.
 

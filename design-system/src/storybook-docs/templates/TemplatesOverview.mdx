@@ -1,0 +1,105 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { IllustrationFigure } from '@/storybook-docs/illustrations/Illustration.jsx';
+import { OpeningARecord } from '@/storybook-docs/illustrations/compositions.jsx';
+import { FoundationHero, FoundationContents, FoundationSection, DocsLink } from '@/storybook-docs/foundation-page.jsx';
+import { DocsTable } from '@/storybook-docs/ds-docs-layout.jsx';
+import { TypeCard, TypeGrid } from '@/storybook-docs/lib/template-page.jsx';
+import { ChooserDot, HIDDEN } from '@/storybook-docs/templates/overview-parts.jsx';
+
+import { THUMB_STAGE, FrameThumb, PageThumb, SectionThumb, FormThumb, ModalThumb, PanelThumb, PopupThumb } from '@/storybook-docs/templates/overview-thumbs.jsx';
+
+<Meta title="Templates/Overview" tags={['!dev', 'manifest']} />
+
+<FoundationHero
+    kind="Overview"
+    title="Templates"
+    summary="A template is an arrangement of components with slots. Grab one, fill the slots, and the thinking from the patterns comes with it."
+/>
+
+<FoundationContents />
+
+<FoundationSection title="The seven templates">
+
+Broadest first. Each page opens with its types, then the anatomy and key states of each type, then the usage spine. <DocsLink id="templates-templates-and-patterns">Templates and patterns</DocsLink> says how the layers fit together.
+
+<TypeGrid>
+<TypeCard thumb={<FrameThumb />} stage={THUMB_STAGE.width} title="Frame" to="templates-frame-frame" thumbRatio="16 / 10">The app frame: the Sidebar beside the Page, with the AI panel as its own region. Three types: default, focused and bare.</TypeCard>
+<TypeCard thumb={<PageThumb />} stage={THUMB_STAGE.width} title="Page" to="templates-page-page" thumbRatio="16 / 10">The content inside a Frame: a page header, then Sections on the 12-column grid. Two types: default and full width.</TypeCard>
+<TypeCard thumb={<SectionThumb />} stage={THUMB_STAGE.width} title="Section" to="templates-section-section" thumbRatio="16 / 10">A span of the page grid under one heading: a header, a body, and an optional side, detail and footer.</TypeCard>
+<TypeCard thumb={<FormThumb />} stage={THUMB_STAGE.width} title="Form" to="templates-form" thumbRatio="16 / 10">A stack of fields with a footer, in one of four places: in a page, in a Panel, in a Modal, or in steps.</TypeCard>
+<TypeCard thumb={<ModalThumb />} stage={THUMB_STAGE.width} title="Modal" to="templates-modal-modal" thumbRatio="16 / 10">One task before anything else can happen, centered over a Backdrop. Four types: Passive, Active, Acknowledge and Steps.</TypeCard>
+<TypeCard thumb={<PanelThumb />} stage={THUMB_STAGE.width} title="Panel" to="templates-panel-panel" thumbRatio="16 / 10">A full-height layer beside or over the Page with no Backdrop. Two floating types: Details and Notifications.</TypeCard>
+<TypeCard thumb={<PopupThumb />} stage={THUMB_STAGE.width} title="Popup" to="templates-popup-popup" thumbRatio="16 / 10">A floating layer that hangs off its trigger and closes on an outside click. Five types, from menu to filter menu.</TypeCard>
+</TypeGrid>
+
+</FoundationSection>
+
+<FoundationSection title="Which template for which job">
+
+A suggested starting point for each scenario, with the patterns to consult and the components it is built from. Never "always use". The patterns are named in words until their pages land; <DocsLink id="patterns-overview">Patterns</DocsLink> lists them.
+
+<DocsTable>
+<thead>
+<tr><th>Scenario</th><th>Template</th><th>Patterns</th><th>Components</th></tr>
+</thead>
+<tbody>
+<tr><td>An area page with one collection</td><td><DocsLink id="templates-page-page">Page</DocsLink> · default, with a <DocsLink id="templates-section-section">Section</DocsLink> view bar alone</td><td>Filtering · Search · Common actions</td><td><code>PageHeader</code>, <code>Tabs</code> (pill), <code>FilterButton</code>, <code>IconButton</code>, <code>Button</code>, <code>Table</code></td></tr>
+<tr><td>A home page with several Sections</td><td><DocsLink id="templates-page-page">Page</DocsLink> · default, titled Sections, cards</td><td>Empty · Loading</td><td><code>PageHeader</code>, <code>Card</code>, <code>Button</code></td></tr>
+<tr><td>A record page, one level down</td><td><DocsLink id="templates-page-page">Page</DocsLink> with a breadcrumb and page tabs</td><td>Navigation · Indicators</td><td><code>Breadcrumb</code>, <code>PageHeader</code>, <code>StatusTag</code>, <code>Tabs</code>, <code>PopupSelect</code></td></tr>
+<tr><td>Working through a queue</td><td><DocsLink id="templates-section-section">Section</DocsLink> with a detail</td><td>Navigation · Common actions</td><td><code>Table</code>, <code>Button</code></td></tr>
+<tr><td>A quick look at one row</td><td><DocsLink id="templates-panel-panel">Panel</DocsLink> · Details</td><td>Navigation</td><td><code>Panel</code>, <code>Button</code></td></tr>
+<tr><td>A short decision before going on</td><td><DocsLink id="templates-modal-modal">Modal</DocsLink> · Active, 4-col</td><td>Common actions · Errors</td><td><code>Modal</code>, <code>Button</code></td></tr>
+<tr><td>A long task with steps</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink> · focused, with a <DocsLink id="templates-form">Form</DocsLink> in steps</td><td>Forms · Navigation</td><td><code>ProgressTracker</code>, <code>Fieldset</code>, <code>Button</code></td></tr>
+<tr><td>Settings saved as a group</td><td><DocsLink id="templates-section-section">Section</DocsLink> with subsections, <DocsLink id="templates-form">Form</DocsLink> in a page</td><td>Forms · Read-only · Disabled</td><td><code>Fieldset</code>, <code>TextField</code>, <code>PopupSelect</code>, <code>Toggle</code>, <code>Button</code></td></tr>
+<tr><td>Narrowing a long catalog</td><td><DocsLink id="templates-section-section">Section</DocsLink> with a filter side</td><td>Filtering</td><td><code>Checkbox</code>, <code>PopupSelect</code>, <code>Button</code></td></tr>
+<tr><td>Signing in</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink> · bare</td><td>Forms · Errors</td><td><code>Logo</code>, <code>TextField</code>, <code>Button</code></td></tr>
+<tr><td>Notifications</td><td><DocsLink id="templates-panel-panel">Panel</DocsLink> · Notifications (the Inbox)</td><td>Notifications</td><td><code>Panel</code>, <code>Avatar</code>, <code>PopupSelect</code></td></tr>
+<tr><td>AI chat</td><td><DocsLink id="templates-frame-frame">Frame</DocsLink>, the AI panel region</td><td>AI interaction guidelines</td><td><code>AiChat</code>, <code>PromptInput</code>, <code>AiMessage</code></td></tr>
+</tbody>
+</DocsTable>
+
+</FoundationSection>
+
+<FoundationSection title="Frame, Modal, Panel or Popup?">
+
+One chooser for the four layers that take over from the page or sit above it. A filled dot means the layer is built for it.
+
+<DocsTable>
+<thead>
+<tr><th>The task…</th><th>Frame · focused</th><th>Modal</th><th>Panel</th><th>Popup</th></tr>
+</thead>
+<tbody>
+<tr><td>blocks the page until it is done</td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+<tr><td>keeps the page in view and usable</td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td></tr>
+<tr><td>holds a long task, or five or more steps</td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+<tr><td>holds a short sequence of steps</td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+<tr><td>takes a form</td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+<tr><td>is a destructive confirm</td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+<tr><td>hangs off its trigger</td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td></tr>
+<tr><td>dims the page under a Backdrop</td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+<tr><td>has its own URL</td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot /><span style={HIDDEN}>No</span></td></tr>
+<tr><td>closes on Escape and returns focus</td><td><ChooserDot /><span style={HIDDEN}>No</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td><td><ChooserDot filled /><span style={HIDDEN}>Yes</span></td></tr>
+</tbody>
+</DocsTable>
+
+A Panel that needs full attention becomes a Modal. Anything wider than 4-col, or that outlives a click, leaves the Popup for a Panel. Leaving a focused task goes through Close or Cancel, and unsaved work asks first, in a Modal. Only a Modal brings a Backdrop, and a confirm Modal over a Panel, a Popup or a focused task brings its own.
+
+</FoundationSection>
+
+<FoundationSection title="Opening a record">
+
+Least room to most. Pick the lowest step that fits; navigation rules are in the Navigation pattern.
+
+<IllustrationFigure caption="Opening a record, least room to most: expand the row, Section detail, Details Panel, Modal, its own page.">
+    <OpeningARecord />
+</IllustrationFigure>
+
+1. **Expand the row.** A few more lines, links at most.
+2. **Section detail.** On a queue page, the record opens beside its list.
+3. **Details Panel.** A quick look or a short edit from a table on any other page.
+4. **Modal.** A rare, critical task with fewer than five fields.
+5. **Its own page.** Complex or stepped work, or anything worth a URL.
+
+Where a message sits, in a Frame, Page or Section banner, a Flag or a SectionMessage, is the Notifications pattern.
+
+</FoundationSection>
