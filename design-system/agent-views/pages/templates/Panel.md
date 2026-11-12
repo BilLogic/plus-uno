@@ -10,12 +10,10 @@ A full-height layer beside or over the Page with no Backdrop. Two floating types
 
 ## Types
 
-Both float over the right of the Page with no Backdrop. The AI panel is docked and lives on Frame. Where the Frame can dock a Panel beside 720 of content (1168 and up), it docks it at an edge line instead; floating at every width is Planned.
+Both open on the right with no Backdrop: docked at an edge line from 1168 and floating over the Page below that. Floating at every width is Planned.
 
 - **Details.** A quick look at a row, floating over the right of the Page. The picked row stays highlighted.
 - **Notifications.** The Inbox, opened from the Bell. It lists items by time and stays open as you pick one.
-
-The Inbox grows out of the Sidebar over the left of the Page. That placement is Planned: today the Frame's one Panel area is on the right, and the Inbox is drawn there.
 
 ## Anatomy
 
@@ -24,7 +22,7 @@ The Inbox grows out of the Sidebar over the left of the Page. That placement is 
 Opened from a session row. The page behind stays usable.
 
 1. **Splitter.** On the Page-facing edge; it resizes from 320 to 640.
-2. **Header.** The title names the record, with its status under it; then the fixed actions: Up, Down, More, Close.
+2. **Header.** The title names the record, with its status in the Subheader row under it; then the fixed actions: Up, Down, More, Close.
 3. **Body.** The record's Sections. It scrolls between the header and the footer.
 
 The picked row stays highlighted on the page while the Panel is open.
