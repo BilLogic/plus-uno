@@ -2,7 +2,7 @@
 
 # Flag
 
-The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16: a 16 icon in the appearance's icon color on the title's first line, the title and its optional description, actions, and the dismiss button. `bold` expands the surface to the appearance's bold fill.
+The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide, padded 16: a 16 icon on the title's first line, the title and its optional description, actions, and the controls. `appearance` alone decides the kind: `normal` is the default flag (overlay surface, a status icon or an avatar, always the dismiss ×, actions as links); every other appearance is bold (its bold fill, no ×, collapsed to its title behind a chevron, actions as buttons).
 
 Also asked as: notification, snackbar, success message, undo, temporary message, notify, save confirmation.
 
@@ -22,16 +22,30 @@ Use `Flag` to confirm something that has already happened and needs no reply:
 saved, sent, copied. `show` and `onDismiss` are yours; the component holds no
 state. `FlagGroup` positions a stack of them.
 
+`appearance` alone decides the kind of flag and its controls. A **default flag**
+(`normal`) is for passive news a person can clear: the overlay surface, an `icon`
+that carries the meaning (a status icon name or an element such as an Avatar), the
+dismiss × and actions as links. A **bold flag** (`information`, `warning`, `error`,
+`success`) takes the appearance's bold fill, starts collapsed to its title, and
+opens its description and actions behind a chevron; its actions are buttons.
+
+### The dismiss rule
+
+- The × is on default flags only, never on bold.
+- A bold flag leaves when its action resolves it, or, for information and success,
+  when it times out. Warning and error never close themselves and offer a next action.
+- A `FlagGroup` never mixes dismissible and non-dismissible flags: a stack is all
+  default flags or all bold.
+
 ### Appearance guidance
 
 | Appearance | When to use |
 | --- | --- |
-| Normal | The default, for a neutral update. Example: "Notes copied". |
-| Information | Something worth knowing. Example: "Schedule updated". |
-| Success | A finished action. Example: "Plan saved". |
-| Warning | Something to check before going on. Stays until dismissed. |
-| Error | Something that failed. Stays until dismissed. |
-| Bold | Any appearance on its bold fill, for the one message that must be seen. |
+| Normal | The default flag, for passive news a person can clear. Example: "Notes copied". Set `icon` to a status icon or an Avatar. |
+| Information | Bold. Something worth knowing, on the dark neutral fill. Times out. |
+| Success | Bold. A finished action. Times out. |
+| Warning | Bold. Something to check before going on. Never closes itself; offers a next action. |
+| Error | Bold. Something that failed. Never closes itself; offers a next action. |
 
 ## Motion
 
@@ -56,11 +70,11 @@ Success for a finished action; error only when something failed.
 Do: Success appearance for a saved session.
 Don't: Error appearance on good news.
 
-### Keep bold for the one message that must be seen. {#keep-bold-for-the-one-message-that-must-be-seen}
+### Keep routine news on the default flag. {#keep-routine-news-on-the-default-flag}
 
-A bold flag competes with the page; routine news stays quiet.
+A bold flag competes with the page; routine news stays quiet and can be cleared.
 
-Do: Quiet flag for routine news.
+Do: Default flag for routine news.
 Don't: Bold fill on a routine confirmation.
 
 ### Say what happened and what to do next. {#say-what-happened-and-what-to-do-next}
@@ -73,12 +87,12 @@ Don't: A bare title with no next step.
 ### Show a background failure as an error Flag with Try again. {#show-a-background-failure-as-an-error-flag-with-try-again}
 
 When work fails out of sight, such as a sync or an autosave, use an error flag.
-It stays until closed and carries **Try again** as its action, so the person can
+It stays until the action resolves it and carries **Try again** as its action, so the person can
 retry without leaving what they are doing. A failure to load a view is not a
 flag: it takes the view's `EmptyState`.
 
-Do: Error flag with Try again; it stays until closed.
-Don't: A failure that times out before it is read.
+Do: Error flag with Try again; it stays until the action resolves it.
+Don't: A failure with no next action.
 
 ### Nothing important goes only in a flag. {#nothing-important-goes-only-in-a-flag}
 
@@ -88,12 +102,11 @@ at the top with an error on each field.
 
 ### Turn off autohide for anything the user might need to re-read. {#turn-off-autohide-for-anything-the-user-might-need-to-re-read}
 
-With `autohide={false}`, or `delay={0}`, the flag waits for its close button.
+With `autohide={false}`, or `delay={0}`, a default flag waits for its ×.
 
-### Keep dismissible on. {#keep-dismissible-on}
+### Do not mix dismissible and non-dismissible flags in one stack. {#do-not-mix-dismissible-and-non-dismissible-flags-in-one-stack}
 
-It is on by default and is the only way to close a flag that is not timing out.
-Turning it off with `autohide={false}` leaves a flag that never goes away.
+The × is on default flags only, so a stack is all default flags or all bold.
 
 ## Accessibility
 
@@ -103,18 +116,18 @@ Turning it off with `autohide={false}` leaves a flag that never goes away.
   what it is saying. Every appearance is `aria-atomic`, so the flag is read as one
   message.
 - **The timeout is a timing limit.** Content that disappears on its own has to
-  be dismissible or extendable to satisfy WCAG's timing rule. The close button
-  is what does that here, which is why it is on by default.
+  be dismissible or extendable to satisfy WCAG's timing rule. The ×
+  is what does that on a default flag; a bold flag that times out is information or
+  success, and one that does not is warning or error, which offer an action.
 - **Announcement needs the region to already exist.** A flag mounted at the same
   moment as its container may not be announced at all. Render `FlagGroup`
   with the page and put flags into it.
-- **The dismiss button is the shared `CloseButton`** in its default tone on the
-  flag's surface, with an `aria-hidden` ×. The × and its focus ring are at least
+- **The dismiss button is the shared `CloseButton`** on a default flag's surface, with an `aria-hidden` ×. The × and its focus ring are at least
   3:1 on that surface.
 - **The appearance icon is decorative.** It is `aria-hidden`, so the title beside it
   carries the meaning; the color and icon should never carry it alone.
-- **Every flag is one surface.** The title and the description keep the same
-  text colors on every appearance, so no appearance needs a contrast exception.
+- **The chevron reports its state.** It sets `aria-expanded`, so a screen reader
+  hears whether a bold flag is expanded or collapsed.
 
 ## Related
 
@@ -126,13 +139,13 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 
 ## Parts
 
-1. **Icon.** The appearance glyph, decorative.
+1. **Icon.** On a default flag the `icon` (the information icon unless set); on a bold flag the appearance glyph. Decorative.
 2. **Title.** What happened, in a few words.
 3. **Timestamp.** Optional, subtle, after the title.
 4. **Description.** At most one line.
-5. **Actions.** Link buttons under the description.
-6. **Expand toggle.** Only on a bold flag, which starts collapsed to its title.
-7. **Dismiss.** The shared CloseButton, named "Dismiss flag".
+5. **Actions.** At most two, under the description: links on a default flag, buttons on a bold one.
+6. **Expand toggle.** Only on a bold flag that has a description or actions; it starts collapsed to its title.
+7. **Dismiss.** The shared CloseButton, named "Dismiss flag", on default flags only.
 
 ### States
 
@@ -144,7 +157,7 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 | Focused | Dismiss, the toggle and each action show the 2px ring; the ring is inverse on a bold fill. |
 | Disabled | Not supported. |
 | Expanded | A bold flag shows its description and actions; collapsed, only the title. |
-| Autohide | Normal, information and success close after 8 seconds; warning and error stay. |
+| Autohide | Normal, information and success close after 8 seconds (keep any `delay` at 8000 or more); warning and error never close themselves. |
 | Dismissed | The flag leaves the stack. |
 
 ### Tokens
@@ -154,7 +167,7 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 | Surface | `--ds-surface-overlay`, `--ds-shadow-overlay`, `--popup-radius`, `--popover-pad`, `--popover-width-flag` |
 | Title, description | `--heading-xsmall`, `--ds-text`; `--body-default`, `--ds-text-subtle` |
 | Icon | `--ds-icon-subtle`, `--ds-icon-information`, `--ds-icon-success`, `--ds-icon-warning`, `--ds-icon-danger`, at `--icon-md` |
-| Bold fill | `--ds-background-neutral-bold`, `-information-bold`, `-success-bold`, `-warning-bold`, `-danger-bold`, with `--ds-text-inverse` (`--ds-text-warning-inverse` on warning) |
+| Bold fill | `--ds-background-neutral-bold` (information), `-success-bold`, `-warning-bold`, `-danger-bold`, with `--ds-text-inverse` (`--ds-text-warning-inverse` on warning) |
 | Dismiss, toggle | `--ds-background-neutral-subtle-hovered`, `--ds-background-neutral-subtle-pressed` |
 | Gaps | `--inline-lg` before Dismiss, `--inline-md`, `--stack-sm`; `--popover-stack-flag` between flags |
 | Group | `--layer-flag`, `--popover-gap-screen` |
@@ -175,14 +188,13 @@ Same group: `Banner` · `EmptyState` · `InlineMessage` · `Modal` · `SectionMe
 | `appearance` | enum | `'normal'` | `normal` (default), `information`, `warning`, `error` or `success`. |
 | `title` | node (required) | — | What happened, in a few words. |
 | `children` | node | — | An optional description under the title. |
-| `actions` | arrayOf (required) | — | Link-button actions under the description, in the order given. Avoid more than two. |
-| `bold` | bool | `false` | The appearance's bold fill. A bold flag starts collapsed to its title, with a toggle that expands the description and actions. |
+| `actions` | arrayOf (required) | — | Actions under the description, in the order given, at most two. Links on a default flag, buttons on a bold one. An action with an `href` on a bold flag still draws a button: put the navigation in `onClick`. |
+| `icon` | string or node | — | The default flag's leading icon: a status icon name, or an element such as an Avatar. Unset, the information icon in the subtle icon color. Ignored on a bold flag, which shows its appearance's icon. |
 | `defaultExpanded` | bool | `false` | Whether a bold flag starts expanded. |
-| `dismissible` | bool | `true` | Shows the dismiss button. Defaults to true; set false to leave it out. |
 | `show` | bool | `true` | Whether the flag renders. Defaults to true; false renders nothing and stops the auto-close timer. |
 | `onDismiss` | func | — | Called with no arguments when the dismiss button is pressed and when the auto-close timer ends. The caller sets `show` to false. |
-| `delay` | number | `FLAG_AUTO_CLOSE_MS` | How long it stays before closing itself, in ms. 8000 by default. |
-| `autohide` | bool | — | Close itself after `delay`. Defaults to true for normal, information and success, false for warning and error. |
+| `delay` | number | `FLAG_AUTO_CLOSE_MS` | How long it stays before closing itself, in ms. 8000 by default; keep it at 8000 or more so a slow reader is not cut off. |
+| `autohide` | bool | — | Close itself after `delay`. Defaults to true for normal, information and success; warning and error never close themselves. |
 | `className` | string | `''` | Extra class on the flag surface. |
 | `headerClass` | string | `''` | Extra class on the header row that holds the title and timestamp. |
 | `bodyClass` | string | `''` | Extra class on the description container. |
@@ -198,7 +210,7 @@ The named string values each prop takes. A prop's full type is in Props: a prop 
 
 ## Tokens touched
 
-`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-bold` · `--ds-background-information-bold` · `--ds-background-neutral-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-focused-inverse` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-default` · `--ds-motion-spatial-default-duration` · `--ds-motion-spatial-exit` · `--ds-motion-spatial-exit-duration` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-warning-inverse` · `--flag-min-height` · `--flag-offset` · `--flag-pad` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-stack-flag` · `--popover-width-flag` · `--popup-radius` · `--radius-md` · `--stack-sm` · `--type-weight-medium`
+`--body-default` · `--body-small` · `--border-default` · `--ds-background-danger-bold` · `--ds-background-neutral-bold` · `--ds-background-neutral-subtle-hovered` · `--ds-background-neutral-subtle-pressed` · `--ds-background-success-bold` · `--ds-background-warning-bold` · `--ds-border` · `--ds-border-focused-inverse` · `--ds-icon-danger` · `--ds-icon-information` · `--ds-icon-inverse` · `--ds-icon-subtle` · `--ds-icon-success` · `--ds-icon-warning` · `--ds-icon-warning-inverse` · `--ds-interaction-inverse-hovered` · `--ds-interaction-inverse-pressed` · `--ds-motion-appearance-default` · `--ds-motion-appearance-default-duration` · `--ds-motion-appearance-fast` · `--ds-motion-appearance-fast-duration` · `--ds-motion-spatial-default` · `--ds-motion-spatial-default-duration` · `--ds-motion-spatial-exit` · `--ds-motion-spatial-exit-duration` · `--ds-shadow-overlay` · `--ds-surface` · `--ds-surface-overlay` · `--ds-text` · `--ds-text-inverse` · `--ds-text-subtle` · `--ds-text-warning-inverse` · `--flag-min-height` · `--flag-offset` · `--flag-pad` · `--heading-xsmall` · `--icon-md` · `--inline-lg` · `--inline-md` · `--inline-sm` · `--label-height-md` · `--layer-flag` · `--popover-gap-screen` · `--popover-pad` · `--popover-stack-flag` · `--popover-width-flag` · `--popup-radius` · `--radius-md` · `--stack-sm` · `--type-weight-medium`
 
 From `design-system/src/components/messaging/Flag/Flag.scss`. Override these through the token layer, never with a literal.
 

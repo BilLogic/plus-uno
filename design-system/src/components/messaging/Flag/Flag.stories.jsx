@@ -28,8 +28,8 @@ export default {
             options: FLAG_APPEARANCES,
             table: { category: 'Design' }
         },
-        bold: {
-            control: 'boolean',
+        icon: {
+            control: false,
             table: { category: 'Design' }
         },
         position: {
@@ -82,15 +82,20 @@ Overview.parameters = {
 
 /** One appearance per story, for the docs page's Appearance section. */
 const appearanceStory = (appearance, title, message, props = {}) => {
+    const bold = appearance !== 'normal';
     const story = () => (
         <FlagGroup containerPosition="static">
-            <Flag appearance={appearance} title={title} timestamp="Just now" autohide={false} {...props}>
+            <Flag appearance={appearance} title={title} timestamp="Just now" autohide={false} defaultExpanded={bold} {...props}>
                 {message}
             </Flag>
         </FlagGroup>
     );
     story.play = async ({ canvasElement }) => {
-        await expect(canvasElement.querySelector('.plus-flag')).toHaveClass(`plus-flag--${appearance}`);
+        const flag = canvasElement.querySelector('.plus-flag');
+        await expect(flag).toHaveClass(`plus-flag--${appearance}`);
+        // Appearance decides the controls: × on the default flag only, a chevron on a bold one.
+        await expect(!!within(flag).queryByRole('button', { name: 'Dismiss flag' }), 'dismiss × only on normal').toBe(!bold);
+        await expect(!!within(flag).queryByRole('button', { name: 'Collapse' }), 'chevron only on bold').toBe(bold);
     };
     return story;
 };
@@ -105,11 +110,11 @@ ErrorAppearance.storyName = 'Error';
 /**
  * A failure in the background (a sync that did not finish) is an error Flag with
  * Try again. It sets no `autohide`, because error never closes itself: it stays
- * until closed.
+ * until its action resolves it.
  */
 export const BackgroundFailure = () => (
     <FlagGroup containerPosition="static">
-        <Flag appearance="error" title="Couldn't sync notes" timestamp="Just now" actions={[{ text: 'Try again' }]}>
+        <Flag appearance="error" defaultExpanded title="Couldn't sync notes" timestamp="Just now" actions={[{ text: 'Try again' }]}>
             Your latest changes are saved on this device only.
         </Flag>
     </FlagGroup>
@@ -120,16 +125,16 @@ BackgroundFailure.play = async ({ canvasElement }) => {
     await expect(flag.getAttribute('role'), 'a failure interrupts').toBe('alert');
     // Read once the enter fade has begun: at its first frame the flag is still at opacity 0.
     await waitFor(() => expect(canvas.getByRole('button', { name: 'Try again' }), 'retry in the flag').toBeVisible());
-    await expect(canvas.getByRole('button', { name: 'Dismiss flag' }), 'closable').toBeVisible();
+    await expect(canvas.queryByRole('button', { name: 'Dismiss flag' }), 'a bold flag has no ×').toBeNull();
 };
 
-export const Bold = appearanceStory('success', 'Plan saved', 'Your session plan is saved for Monday.', { bold: true, defaultExpanded: true });
-/** On the bold fill the chevron takes the inverse icon, as the × does, and both sit on the title's line. */
+export const Bold = appearanceStory('error', 'Upload failed', 'The file was larger than 10 MB.', { actions: [{ text: 'Try again' }] });
+/** On the bold fill the chevron takes the inverse icon and sits on the title's line; actions are buttons. */
 Bold.play = async ({ canvasElement }) => {
     const flag = canvasElement.querySelector('.plus-flag--bold');
     const ground = getComputedStyle(flag).backgroundColor;
     const title = flag.querySelector('.plus-flag-title').getBoundingClientRect();
-    for (const name of ['Collapse', 'Dismiss flag']) {
+    for (const name of ['Collapse']) {
         const button = within(flag).getByRole('button', { name });
         const glyph = getComputedStyle(button.querySelector('i')).color;
         const ratio = contrastRatio(glyph, ground);
@@ -139,9 +144,10 @@ Bold.play = async ({ canvasElement }) => {
         const offset = Math.abs((box.top + box.bottom) / 2 - (title.top + title.bottom) / 2);
         await expect(offset, `${name} is centered on the title line`).toBeLessThanOrEqual(1);
     }
+    await waitFor(() => expect(within(flag).getByRole('button', { name: 'Try again' }), 'bold actions are buttons').toBeVisible());
 };
 
-const FlagInteractiveWrapper = ({ appearance, bold, position, title, children, show, autohide, delay }) => {
+const FlagInteractiveWrapper = ({ appearance, position, title, children, show, autohide, delay }) => {
     const [isOpen, setIsOpen] = useState(show);
 
     React.useEffect(() => {
@@ -156,7 +162,6 @@ const FlagInteractiveWrapper = ({ appearance, bold, position, title, children, s
                     onDismiss={() => setIsOpen(false)}
                     title={title}
                     appearance={appearance}
-                    bold={bold}
                     timestamp="Just now"
                     delay={delay}
                     autohide={autohide}
@@ -175,7 +180,6 @@ export const Interactive = (args) => <FlagInteractiveWrapper {...args} />;
 Interactive.args = {
     show: false,
     appearance: 'success',
-    bold: false,
     position: 'top-end',
     title: 'Flag Title',
     children: 'This is an interactive flag message.',
@@ -215,25 +219,32 @@ const FlagPerStyle = ({ flagProps, children }) => (
 );
 
 /**
- * The × on every flag. It is the shared `CloseButton` in its default tone on
- * the flag's surface, so its size and focus ring are CloseButton's own tests;
- * what is tested here is how the flag uses it: the last thing in the row, one
- * Element/inline-lg gap after the content, its × at least 3:1 on the surface.
- * Pressing it calls `onDismiss`.
+ * The × is on the default flag only: the shared `CloseButton` in its default tone on the
+ * flag's surface. Its size and focus ring are CloseButton's own tests; what is tested here is
+ * how the flag uses it: the last thing in the row, one Element/inline-lg gap after the content,
+ * its × at least 3:1 on the surface. Pressing it calls `onDismiss`. A bold flag has none.
  */
 export const Dismiss = () => {
-    const [closed, setClosed] = useState([]);
+    const [closed, setClosed] = useState(false);
     return (
-        <FlagPerStyle
-            flagProps={(style) => ({
-                show: !closed.includes(style),
-                onDismiss: () => setClosed((list) => [...list, style]),
-                'data-testid': `dismiss-${style}`,
-                children: 'Press the × to close it.',
-            })}
-        >
-            <span className="body-default" data-testid="dismiss-closed">{closed.join(' ')}</span>
-        </FlagPerStyle>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-start' }}>
+            <Flag
+                title="Notes copied"
+                timestamp="Just now"
+                autohide={false}
+                show={!closed}
+                onDismiss={() => setClosed(true)}
+                data-testid="dismiss-normal"
+            >
+                Press the × to close it.
+            </Flag>
+            {FLAG_APPEARANCES.filter((style) => style !== 'normal').map((style) => (
+                <Flag key={style} appearance={style} title={`${style} flag`} autohide={false} defaultExpanded data-testid={`dismiss-${style}`}>
+                    A bold flag has no ×.
+                </Flag>
+            ))}
+            <span className="body-default" data-testid="dismiss-closed">{closed ? 'normal' : ''}</span>
+        </div>
     );
 };
 
@@ -241,56 +252,57 @@ Dismiss.play = async ({ canvasElement }) => {
     const canvas = within(canvasElement);
     const ring = tokenColor(canvasElement, '--ds-border-focused');
 
-    for (const style of FLAG_STYLE_LIST) {
-        const flag = canvas.getByTestId(`dismiss-${style}`);
-        const button = within(flag).getByRole('button', { name: 'Dismiss flag' });
-        const ground = getComputedStyle(flag).backgroundColor;
-
-        // The × closes the row, one inline-lg gap after the content.
-        const rowGap = px(getComputedStyle(flag).columnGap);
-        await expect(rowGap, `${style}: row gap`).toBe(12);
-        const content = flag.querySelector('.plus-flag-content').getBoundingClientRect();
-        await expect(Math.round(button.getBoundingClientRect().left - content.right), `${style}: content → × gap`).toBe(rowGap);
-
-        // The × is an icon glyph: WCAG 1.4.11 non-text, 3:1.
-        const glyph = button.querySelector('i');
-        const glyphRatio = contrastRatio(getComputedStyle(glyph).color, ground);
-        await expect(glyphRatio, `${style}: × on ${ground} is ${glyphRatio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
-
-        button.focus({ focusVisible: true });
-        await expect(button.matches(':focus-visible'), `${style}: keyboard-focused`).toBe(true);
-        await expect(getComputedStyle(button).outlineColor, `${style}: default ring`).toBe(ring);
-        button.blur();
+    for (const style of FLAG_STYLE_LIST.filter((name) => name !== 'normal')) {
+        await expect(within(canvas.getByTestId(`dismiss-${style}`)).queryByRole('button', { name: 'Dismiss flag' }), `${style}: no ×`).toBeNull();
     }
 
+    const flag = canvas.getByTestId('dismiss-normal');
+    const button = within(flag).getByRole('button', { name: 'Dismiss flag' });
+    const ground = getComputedStyle(flag).backgroundColor;
+
+    // The × closes the row, one inline-lg gap after the content.
+    const rowGap = px(getComputedStyle(flag).columnGap);
+    await expect(rowGap, 'row gap').toBe(12);
+    const content = flag.querySelector('.plus-flag-content').getBoundingClientRect();
+    await expect(Math.round(button.getBoundingClientRect().left - content.right), 'content → × gap').toBe(rowGap);
+
+    // The × is an icon glyph: WCAG 1.4.11 non-text, 3:1.
+    const glyph = button.querySelector('i');
+    const glyphRatio = contrastRatio(getComputedStyle(glyph).color, ground);
+    await expect(glyphRatio, `× on ${ground} is ${glyphRatio.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
+
+    button.focus({ focusVisible: true });
+    await expect(button.matches(':focus-visible'), 'keyboard-focused').toBe(true);
+    await expect(getComputedStyle(button).outlineColor, 'default ring').toBe(ring);
+    button.blur();
+
     // Dismissal: the button, found by its name, calls onDismiss.
-    const warning = canvas.getByTestId('dismiss-warning');
-    await userEvent.click(within(warning).getByRole('button', { name: 'Dismiss flag' }));
-    await expect(canvas.getByTestId('dismiss-closed')).toHaveTextContent('warning');
-    await waitFor(() => expect(canvas.queryByTestId('dismiss-warning')).toBeNull());
+    await userEvent.click(button);
+    await expect(canvas.getByTestId('dismiss-closed')).toHaveTextContent('normal');
+    await waitFor(() => expect(canvas.queryByTestId('dismiss-normal')).toBeNull());
 };
 
 /**
- * Every flag is the same surface, elevation.surface.overlay; the appearance
- * shows in its icon alone, drawn in the role's icon color. The title is color.text
- * and the message color.text.subtle on every appearance.
+ * The default flag sits on one surface, elevation.surface.overlay, with a subtle icon; a bold
+ * flag takes its appearance's bold fill (information is the dark neutral fill) with inverse
+ * text, and warning keeps its warning-inverse text.
  */
 export const FlagContent = () => (
     <FlagPerStyle
         flagProps={(style) => ({
             show: true,
+            defaultExpanded: true,
             'data-testid': `flag-${style}`,
             children: `The ${style} flag's message.`,
         })}
     />
 );
 
-const ICON_COLOR = {
-    normal: '--ds-icon-subtle',
-    error: '--ds-icon-danger',
-    success: '--ds-icon-success',
-    information: '--ds-icon-information',
-    warning: '--ds-icon-warning',
+const FILL = {
+    information: '--ds-background-neutral-bold',
+    error: '--ds-background-danger-bold',
+    success: '--ds-background-success-bold',
+    warning: '--ds-background-warning-bold',
 };
 
 FlagContent.play = async ({ canvasElement }) => {
@@ -301,12 +313,18 @@ FlagContent.play = async ({ canvasElement }) => {
 
     for (const style of FLAG_STYLE_LIST) {
         const flag = canvas.getByTestId(`flag-${style}`);
-        await expect(getComputedStyle(flag).backgroundColor, `${style}: one surface`).toBe(surface);
-        await expect(getComputedStyle(flag.querySelector('.plus-flag-title')).color, `${style}: title`).toBe(text);
-        await expect(getComputedStyle(flag.querySelector('.plus-flag-body')).color, `${style}: message`).toBe(textSubtle);
         const icon = flag.querySelector('.plus-flag-icon i');
-        await expect(getComputedStyle(icon).color, `${style}: icon`).toBe(tokenColor(canvasElement, ICON_COLOR[style]));
         await expect(getComputedStyle(icon).fontSize, `${style}: icon 16`).toBe('16px');
+        if (style === 'normal') {
+            await expect(getComputedStyle(flag).backgroundColor, 'normal: overlay surface').toBe(surface);
+            await expect(getComputedStyle(flag.querySelector('.plus-flag-title')).color, 'normal: title').toBe(text);
+            await expect(getComputedStyle(flag.querySelector('.plus-flag-body')).color, 'normal: message').toBe(textSubtle);
+            await expect(getComputedStyle(icon).color, 'normal: icon').toBe(tokenColor(canvasElement, '--ds-icon-subtle'));
+        } else {
+            await expect(getComputedStyle(flag).backgroundColor, `${style}: bold fill`).toBe(tokenColor(canvasElement, FILL[style]));
+            const ink = style === 'warning' ? '--ds-text-warning-inverse' : '--ds-text-inverse';
+            await expect(getComputedStyle(flag.querySelector('.plus-flag-title')).color, `${style}: title`).toBe(tokenColor(canvasElement, ink));
+        }
     }
 };
 
@@ -436,15 +454,15 @@ const ClosingStack = ({ reducedMotion }) => {
         <div style={{ position: 'relative', display: 'flex', gap: 24, height: 360 }}>
             <div style={STACK_SLOT}>
                 <FlagGroup position="top-start" containerPosition="absolute" reducedMotion={reducedMotion} data-testid="stack-three">
-                    <Flag title="First" autohide={false} dismissible={false} data-testid="three-first" />
+                    <Flag title="First" autohide={false} data-testid="three-first" />
                     <Flag title="Middle" autohide={false} show={middleOpen} onDismiss={() => setMiddleOpen(false)} data-testid="three-middle" />
-                    <Flag title="Last" autohide={false} dismissible={false} data-testid="three-last" />
+                    <Flag title="Last" autohide={false} data-testid="three-last" />
                 </FlagGroup>
             </div>
             <div style={STACK_SLOT}>
                 <FlagGroup position="top-start" containerPosition="absolute" reducedMotion={reducedMotion} data-testid="stack-two">
-                    <Flag title="First" autohide={false} dismissible={false} data-testid="two-first" />
-                    <Flag title="Last" autohide={false} dismissible={false} data-testid="two-last" />
+                    <Flag title="First" autohide={false} data-testid="two-first" />
+                    <Flag title="Last" autohide={false} data-testid="two-last" />
                 </FlagGroup>
             </div>
         </div>

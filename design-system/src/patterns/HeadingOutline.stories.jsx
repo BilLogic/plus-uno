@@ -120,7 +120,7 @@ export const PopupAndFlagTitles = () => (
         >
             Shared with the student.
         </Popup>
-        <Flag appearance="information" title="Session moved" show onDismiss={() => {}}>Now Thursday at 4:00 PM.</Flag>
+        <Flag title="Session moved" show onDismiss={() => {}}>Now Thursday at 4:00 PM.</Flag>
     </div>
 );
 

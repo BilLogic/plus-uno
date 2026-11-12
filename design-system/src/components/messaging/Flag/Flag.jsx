@@ -48,9 +48,12 @@ const URGENT_APPEARANCES = ['warning', 'error'];
 
 /**
  * The Popups pattern's Flag (Figma Pattern/Flag). One surface, 400 wide,
- * padded 16: a 16 icon in the appearance's icon color on the title's first
- * line, the title and its optional description, actions, and the dismiss
- * button. `bold` expands the surface to the appearance's bold fill.
+ * padded 16: a 16 icon on the title's first line, the title and its optional
+ * description, actions, and the controls. `appearance` alone decides the kind:
+ * `normal` is the default flag (overlay surface, a status icon or an avatar,
+ * always the dismiss ×, actions as links); every other appearance is bold
+ * (its bold fill, no ×, collapsed to its title behind a chevron, actions as
+ * buttons).
  */
 export const Flag = ({
     id,
@@ -58,9 +61,8 @@ export const Flag = ({
     title,
     children, // Description
     actions,
-    bold = false,
+    icon,
     defaultExpanded = false,
-    dismissible = true,
     show = true,
     onDismiss,
     delay = FLAG_AUTO_CLOSE_MS,
@@ -75,7 +77,9 @@ export const Flag = ({
 }) => {
     // An appearance outside the list falls back to the default, normal.
     const flagAppearance = FLAG_APPEARANCES.includes(appearance) ? appearance : 'normal';
+    const bold = flagAppearance !== 'normal';
     const glyph = MESSAGE_APPEARANCE_ICONS[flagAppearance];
+    const hasDetails = Boolean(children) || (actions?.length > 0);
     const isUrgent = URGENT_APPEARANCES.includes(flagAppearance);
 
     /*
@@ -91,14 +95,14 @@ export const Flag = ({
 
     /*
      * Normal, information and success close themselves after 8 seconds;
-     * warning and error stay until they are dismissed. A caller's `autohide`
-     * or `delay` wins.
+     * warning and error never close themselves, whatever `autohide` says: they
+     * ask for something to be done. A caller's `delay` sets the wait.
      */
-    const closesItself = autohide ?? !isUrgent;
+    const closesItself = !isUrgent && (autohide ?? true);
 
     // A bold flag collapses to its title and expands to the description and actions.
     const [expanded, setExpanded] = useState(defaultExpanded);
-    const showDetails = !bold || expanded;
+    const showDetails = !bold || (hasDetails && expanded);
 
     // Only the latest onDismiss fires; changing it mid-countdown does not
     // restart the timer, matching the previous react-bootstrap Toast timing.
@@ -214,7 +218,9 @@ export const Flag = ({
                   * these components is `aria-hidden`. The title beside it
                   * carries the meaning.
                   */}
-                <Icon name={glyph} />
+                {bold || !icon
+                    ? <Icon name={glyph} />
+                    : (typeof icon === 'string' ? <Icon name={icon} /> : icon)}
             </div>
             <div className="plus-flag-content">
                 <div className={`plus-flag-header ${headerClass}`}>
@@ -229,14 +235,15 @@ export const Flag = ({
                 {showDetails && actions && actions.length > 0 && (
                     <div className="plus-flag-actions">
                         {actions.map((action) => {
-                            const ActionTag = action.href ? 'a' : 'button';
+                            // Links on a default flag, buttons on a bold one.
+                            const ActionTag = bold ? 'button' : (action.href ? 'a' : 'button');
                             return (
                                 <ActionTag
                                     key={action.text}
-                                    type={action.href ? undefined : 'button'}
+                                    type={ActionTag === 'a' ? undefined : 'button'}
                                     className="plus-flag-action"
-                                    href={action.href}
-                                    target={action.target}
+                                    href={ActionTag === 'a' ? action.href : undefined}
+                                    target={ActionTag === 'a' ? action.target : undefined}
                                     onClick={action.onClick}
                                 >
                                     {action.text}
@@ -251,7 +258,7 @@ export const Flag = ({
               * compact (24) as a flag's controls are. On a bold fill both take
               * the inverse tone, so the chevron reads on the fill as the × does.
               */}
-            {(bold || dismissible) && (
+            {(bold ? hasDetails : true) && (
                 <div className="plus-flag-controls">
                     {bold && (
                         <IconButton
@@ -266,7 +273,7 @@ export const Flag = ({
                     )}
                     {/* The shared CloseButton, default tone on the flag's surface, or
                         inverse on a bold one. A message is dismissed, not closed. */}
-                    {dismissible && <CloseButton label="Dismiss flag" spacing="compact" tone={bold ? 'inverse' : 'default'} onClick={dismissByHand} />}
+                    {!bold && <CloseButton label="Dismiss flag" spacing="compact" onClick={dismissByHand} />}
                 </div>
             )}
         </motion.div>
@@ -282,26 +289,24 @@ Flag.propTypes = {
     title: PropTypes.node.isRequired,
     /** An optional description under the title. */
     children: PropTypes.node,
-    /** Link-button actions under the description, in the order given. Avoid more than two. */
+    /** Actions under the description, in the order given, at most two. Links on a default flag, buttons on a bold one. An action with an `href` on a bold flag still draws a button: put the navigation in `onClick`. */
     actions: PropTypes.arrayOf(PropTypes.shape({
         text: PropTypes.string.isRequired,
         href: PropTypes.string,
         target: PropTypes.string,
         onClick: PropTypes.func,
     })),
-    /** The appearance's bold fill. A bold flag starts collapsed to its title, with a toggle that expands the description and actions. */
-    bold: PropTypes.bool,
+    /** The default flag's leading icon: a status icon name, or an element such as an Avatar. Unset, the information icon in the subtle icon color. Ignored on a bold flag, which shows its appearance's icon. */
+    icon: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
     /** Whether a bold flag starts expanded. */
     defaultExpanded: PropTypes.bool,
-    /** Shows the dismiss button. Defaults to true; set false to leave it out. */
-    dismissible: PropTypes.bool,
     /** Whether the flag renders. Defaults to true; false renders nothing and stops the auto-close timer. */
     show: PropTypes.bool,
     /** Called with no arguments when the dismiss button is pressed and when the auto-close timer ends. The caller sets `show` to false. */
     onDismiss: PropTypes.func,
-    /** How long it stays before closing itself, in ms. 8000 by default. */
+    /** How long it stays before closing itself, in ms. 8000 by default; keep it at 8000 or more so a slow reader is not cut off. */
     delay: PropTypes.number,
-    /** Close itself after `delay`. Defaults to true for normal, information and success, false for warning and error. */
+    /** Close itself after `delay`. Defaults to true for normal, information and success; warning and error never close themselves. */
     autohide: PropTypes.bool,
     /** Extra class on the flag surface. */
     className: PropTypes.string,

@@ -9,7 +9,7 @@ authored half, counted rather than assumed.
 |-----------|------:|:---:|:---:|:---:|
 | [Banner](Banner/index.md) | 5 | ✅ | ✅ | ✅ |
 | [EmptyState](EmptyState/index.md) | 8 | ✅ | ✅ | ✅ |
-| [Flag](Flag/index.md) | 18 | ✅ | ✅ | ✅ |
+| [Flag](Flag/index.md) | 17 | ✅ | ✅ | ✅ |
 | [InlineMessage](InlineMessage/index.md) | 8 | ✅ | ✅ | ✅ |
 | [Modal](Modal/index.md) | 23 | ✅ | ✅ | ✅ |
 | [SectionMessage](SectionMessage/index.md) | 10 | ✅ | ✅ | ✅ |

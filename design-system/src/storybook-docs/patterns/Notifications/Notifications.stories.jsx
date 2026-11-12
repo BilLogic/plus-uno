@@ -1,5 +1,5 @@
 import React from 'react';
-import { expect, userEvent, waitFor, within } from 'storybook/test';
+import { expect, waitFor, within } from 'storybook/test';
 
 import { fitsCanvas } from '@/storybook-docs/lib/anatomy-asserts.js';
 import { FitStage } from '@/storybook-docs/lib/fit-stage.jsx';
@@ -141,9 +141,9 @@ export const KeyFlagStack = {
     render: () => staged(<FlagStack />, PLACE_STAGE),
     play: async ({ canvasElement }) => {
         const canvas = within(canvasElement);
-        await expect(canvas.getByText('Your session starts in 10 minutes')).toBeInTheDocument();
-        await expect(canvas.getByRole('alert'), 'a warning Flag is an alert').toBeInTheDocument();
-        await expect(canvas.getAllByRole('status'), 'the others are polite statuses').toHaveLength(2);
+        await expect(canvas.getByText('Note saved')).toBeInTheDocument();
+        await expect(canvas.getAllByRole('status'), 'default Flags are polite statuses').toHaveLength(2);
+        await expect(canvas.getAllByRole('button', { name: 'Dismiss flag' }), 'each default Flag has its ×').toHaveLength(2);
         await fitsCanvas(canvasElement);
     },
 };
@@ -209,7 +209,7 @@ const Timers = () => {
     );
 };
 
-/** Test: routine Flags leave on their own; warning and danger stay until dismissed. */
+/** Test: routine Flags leave on their own; warning and danger never close themselves. */
 export const TestFlagsLeave = {
     name: 'Test: routine Flags leave, danger stays',
     render: () => <Timers />,
@@ -217,7 +217,6 @@ export const TestFlagsLeave = {
         const canvas = within(canvasElement);
         await waitFor(() => expect(canvas.queryByText('Saved'), 'the routine Flag left on its own').toBeNull(), { timeout: 3000 });
         await expect(canvas.getByText("Couldn't save"), 'the danger Flag stays').toBeInTheDocument();
-        await userEvent.click(canvas.getByRole('button', { name: /dismiss/i }));
-        await waitFor(() => expect(canvas.queryByText("Couldn't save"), 'it leaves on Dismiss').toBeNull());
+        await expect(canvas.queryByRole('button', { name: /dismiss/i }), 'a bold Flag has no ×').toBeNull();
     },
 };

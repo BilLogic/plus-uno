@@ -46,22 +46,19 @@ const TopRight = ({ children }) => (
 /** One passing notice: the title names the event, one line gives the next step. */
 export const FlagTopRight = () => (
     <TopRight>
-        <Flag appearance="success" title="Session logged" autohide={false} show>
+        <Flag icon="circle-check" title="Session logged" autohide={false} show>
             Maya's supervisor will see it Friday.
         </Flag>
     </TopRight>
 );
 
-/** Several Flags, newest on top, each its own message. The bold fill is the one that must be seen. */
+/** Several Flags, newest on top, each its own message. A stack is all default flags, each with its ×. */
 export const FlagStack = () => (
     <TopRight>
-        <Flag appearance="warning" bold title="Your session starts in 10 minutes" autohide={false} show>
-            Open the room to check your audio.
-        </Flag>
-        <Flag appearance="success" title="Note saved" autohide={false} show>
+        <Flag icon="circle-check" title="Note saved" autohide={false} show>
             Maya can read it now.
         </Flag>
-        <Flag appearance="information" title="Schedule updated" autohide={false} show>
+        <Flag title="Schedule updated" autohide={false} show>
             Thursday moved to 4:30 PM.
         </Flag>
     </TopRight>
@@ -71,7 +68,7 @@ export const FlagStack = () => (
 export const FlagWithActions = () => (
     <TopRight>
         <Flag
-            appearance="success"
+            icon="circle-check"
             title="Session deleted"
             autohide={false}
             show
@@ -137,14 +134,14 @@ export const TierSection = () => (
 /** Do: a finished action as a success Flag, the event in the title and the next step below. */
 export const FlagDo = () => (
     <TopRight>
-        <Flag appearance="success" title="Session logged" autohide={false} show>Maya's supervisor will see it Friday.</Flag>
+        <Flag icon="circle-check" title="Session logged" autohide={false} show>Maya's supervisor will see it Friday.</Flag>
     </TopRight>
 );
 
 /** Don't: a decision in a Flag, which is gone before it is answered. */
 export const FlagDont = () => (
     <TopRight>
-        <Flag appearance="normal" title="Move this session to 4:30 PM?" autohide={false} show actions={[{ text: 'Move', onClick: noop }, { text: 'Keep', onClick: noop }]} />
+        <Flag title="Move this session to 4:30 PM?" autohide={false} show actions={[{ text: 'Move', onClick: noop }, { text: 'Keep', onClick: noop }]} />
     </TopRight>
 );
 
@@ -169,7 +166,7 @@ export const FlagOnPage = () => (
         <div style={pad}>
             <DemoPageHeader title="Sessions" description="This week" />
             <TopRight>
-                <Flag appearance="success" title="Session logged" autohide={false} show>
+                <Flag icon="circle-check" title="Session logged" autohide={false} show>
                     Maya's supervisor will see it Friday.
                 </Flag>
             </TopRight>
