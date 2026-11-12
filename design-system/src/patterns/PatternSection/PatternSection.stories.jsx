@@ -1210,7 +1210,7 @@ export const RowsSelected = {
         await expect(head.getByRole('button', { name: 'Move to group' })).toBeInTheDocument();
         await expect(head.getByRole('checkbox', { name: 'Select all rows' })).toBePartiallyChecked();
         await expect(canvas.queryByRole('button', { name: /Cancel|Clear/ }), 'no Cancel: the checkboxes clear it').toBeNull();
-        await expect(canvas.getByRole('tablist', { name: 'Views' }), 'the view bar stays put').toBeInTheDocument();
+        await expect(canvas.getByRole('tab', { name: 'All students' }), 'the view bar stays put').toBeInTheDocument();
         await userEvent.click(canvas.getByRole('checkbox', { name: 'Select all rows' }));
         await userEvent.click(canvas.getByRole('checkbox', { name: 'Select all rows' }));
         await waitFor(() => expect(head.queryByText(/selected/), 'clearing brings the column heads back').toBeNull());

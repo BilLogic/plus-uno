@@ -114,7 +114,7 @@ The table's empty state replaces the whole table, by the Empty pattern; elevatio
 ## Accessibility
 
 - The title is a heading whose level follows nesting: h2 for a Section, h3 for a subsection. With the view bar alone the title stays in the page, hidden from sight.
-- The pill views are a tablist named "Views"; the selected pill names the body. Views swap in place.
+- The pill views are a tablist; the selected tab says which rows the body shows. Views swap in place.
 - Search, Filter and More carry their names: "Search students", "Filters, 2 applied", "More". The Filter count is in the name as well as on the button.
 - The table announces a selection politely, "2 selected", and the bulk bar's actions follow the select-all checkbox in the tab order.
 - The detail is a region named by its title. Below 960 its back link returns to the list.
